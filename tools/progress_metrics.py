@@ -13,8 +13,22 @@ Sources (all committed, read at --ref unless noted):
                                 certified factorization status and recorded raw relation counts
   research/nist_skip_criterion_20261025/factor_followup_20261026/results/factor-summary.json
                                 proved complete integer records in the all-21 selection census
+  research/nist_skip_criterion_20261025/period_ecpp_20261026/results/summary.json
+                                retained original orders in the period-software trial
+  research/nist_skip_criterion_20261025/freelip_replay_20261027/results/summary.json
+                                distinct original orders in the recovered FreeLIP replay
+  research/nist_skip_criterion_20261025/period_work_20261027/results/verification.json
+                                independently checked saved work-count cells, not security
+  research/nist_skip_criterion_20261025/generator_b_execution_20261029/results/verification.json
+                                verified point-trait cells on 21 choices; repeated controls, not security
+  research/nist_skip_criterion_20261025/expanded_cutoff_reanalysis_20261030/results/verification.json
+                                verified fixed-cohort cutoff coverage, not random sampling or security
+  research/nist_skip_criterion_20261025/broader_census_reanalysis_20261030/results/verification.json
+                                verified broader recorded-census coverage, not historical use or security
   research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json
                                 IC collect-phase component: paired native ratio and its A/A floor
+  research/explicit_relations_e2e_20261030/results-v*/
+                                exact recovery counts and bounded two-target frontier; no L0 timing rank
 Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 """
 # ---- progress-metrics exporter boilerplate (copied verbatim into each repo's tools/progress_metrics.py) ----
@@ -28,34 +42,10 @@ import json
 import os
 import subprocess
 import sys
-from concurrent.futures import ThreadPoolExecutor
-from functools import lru_cache
 from pathlib import Path
 
 REPO = Path(os.environ.get("PM_REPO_PATH") or Path(__file__).resolve().parents[1])
 TODAY = dt.date.today().isoformat()
-_BLOB_READER = None
-
-
-def _close_blob_reader():
-    global _BLOB_READER
-    if _BLOB_READER is not None:
-        reader, _BLOB_READER = _BLOB_READER, None
-        reader.stdin.close()
-        reader.stdout.close()
-        try:
-            reader.wait(timeout=5)
-        except subprocess.TimeoutExpired:
-            # All requested blobs have been read; reap only our idle reader.
-            reader.terminate()
-            try:
-                reader.wait(timeout=5)
-            except subprocess.TimeoutExpired:
-                reader.kill()
-                reader.wait(timeout=5)
-
-
-atexit.register(_close_blob_reader)
 
 
 def _git(*args, check=True):
@@ -65,82 +55,50 @@ def _git(*args, check=True):
     return p.stdout
 
 
+_object_reader = None
+
+
+def _close_object_reader():
+    global _object_reader
+    if _object_reader is not None:
+        _object_reader.stdin.close()
+        _object_reader.stdout.close()
+        _object_reader.wait()
+        _object_reader = None
+
+
+atexit.register(_close_object_reader)
+
+
 def show(ref, path):
-    # Reuse Git's object/tree cache across historical snapshots on remote filesystems.
-    global _BLOB_READER
-    if "\n" in ref or "\n" in path:
-        raise ValueError("Git blob specifications must be single-line")
-    if _BLOB_READER is None:
-        _BLOB_READER = subprocess.Popen(
+    """Read committed blobs through one Git process, preserving missing=None."""
+    global _object_reader
+    if _object_reader is None:
+        _object_reader = subprocess.Popen(
             ["git", "-C", str(REPO), "cat-file", "--batch"],
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
-    _BLOB_READER.stdin.write(f"{ref}:{path}\n".encode())
-    _BLOB_READER.stdin.flush()
-    header = _BLOB_READER.stdout.readline().split()
+    reader = _object_reader
+    reader.stdin.write(f"{ref}:{path}\n".encode())
+    reader.stdin.flush()
+    header = reader.stdout.readline().split()
     if header and header[-1] == b"missing":
         return None
     if len(header) != 3 or header[1] != b"blob":
-        raise RuntimeError(f"Expected committed blob: {ref}:{path}")
+        raise RuntimeError(f"invalid committed metrics source: {path}")
     size = int(header[2])
-    data = _BLOB_READER.stdout.read(size)
-    if len(data) != size or _BLOB_READER.stdout.read(1) != b"\n":
-        raise RuntimeError(f"Incomplete committed blob: {ref}:{path}")
+    data = reader.stdout.read(size)
+    if len(data) != size or reader.stdout.read(1) != b"\n":
+        raise RuntimeError(f"truncated committed metrics source: {path}")
     return data.decode()
-
-
-def show_many(ref, paths):
-    """Read committed blobs in one Git process, retaining input order."""
-    if not paths:
-        return []
-    request = "".join(f"{ref}:{path}\n" for path in paths).encode()
-    proc = subprocess.run(["git", "-C", str(REPO), "cat-file", "--batch"],
-                          input=request, capture_output=True, check=True)
-    data, offset, result = proc.stdout, 0, []
-    for path in paths:
-        end = data.index(b"\n", offset)
-        header = data[offset:end].split()
-        offset = end + 1
-        if header[-1] == b"missing":
-            result.append(None)
-            continue
-        if len(header) != 3 or header[1] != b"blob":
-            raise RuntimeError(f"Expected committed blob: {ref}:{path}")
-        size = int(header[2])
-        result.append(data[offset:offset + size].decode())
-        offset += size + 1
-    return result
 
 
 def ls(ref, path=""):
     return [l for l in _git("ls-tree", "-r", "--name-only", ref, "--", path, check=False).splitlines() if l]
 
 
-@lru_cache(maxsize=None)
-def _history_log(ref, path, since):
-    return _git("log", "--first-parent", ref, f"--since={since}",
-                "--format=%H %cs", "--", path, check=False)
-
-
-def _prefetch_histories(ref, since):
-    # Independent read-only history walks; output is still emitted in source order.
-    paths = [
-        "docs/ic/leaderboard.json", "benchmarks/README.md",
-        "research/nist_skip_criterion_20261025/factor_followup_20261026/results/factor-summary.json",
-        "research/nist_skip_criterion_20261025/exact_embedding_20261026/results/verification.json",
-        "research/n83_fixed_fall_catalog_20261028/evidence/summary.json",
-        "research/n83_top_quotient_20261028/evidence/summary.json",
-        "research/n83_fixed_factor_base_20261028/data/index.json",
-    ] + ["research/n83_candidate_pdp_20261028/" + path for path in (
-        "data/index.json", "evidence/pdp/paired-summary.json",
-        "evidence/degree3/summary.json", "evidence/top/verified-summary.json",
-        "evidence/hilbert/verified-summary.json", "evidence/binary-pair/verified-summary.json", "evidence/chain/verified-summary.json", "evidence/degree3-m3/summary.json", "evidence/degree3-continuation/summary.json", "evidence/chain-exact/verified-summary.json", "evidence/degree4-witness/summary.json", "evidence/degree4-propagation/summary.json", "evidence/degree4-quartic/summary.json", "evidence/prime-first-fall/summary.json", "evidence/prime-terminal/summary.json", "evidence/prime-linear/summary.json", "evidence/prime-quadratic/summary.json", "evidence/prime-lefschetz-native/summary.json")]
-    with ThreadPoolExecutor(max_workers=4) as pool:
-        list(pool.map(lambda path: _history_log(ref, path, since), paths))
-
-
 def file_history(ref, path, since):
     """Yield (date, commit, text) for the newest commit per day touching `path`, newest first."""
-    out = _history_log(ref, path, since)
+    out = _git("log", "--first-parent", ref, f"--since={since}", "--format=%H %cs", "--", path, check=False)
     seen = set()
     for line in out.splitlines():
         h, d = line.split()
@@ -333,6 +291,16 @@ def nist_selection_factor_census(ref, since):
                  label=f"NIST all-21 census: complete {family} records", source=source)
 
 
+def nist_selection_period_ecpp(ref, since):
+    path = "research/nist_skip_criterion_20261025/period_ecpp_20261026/results/summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_period_ecpp.retained_rows", data.get("rows"),
+             date=date, problem="nist-candidate-selection", unit="orders", better="neutral",
+             label="Period ECPP trial: original cohort rows retained, including indeterminate",
+             source=f"{path}@{commit}")
+
+
 def nist_selection_exact_embedding(ref, since):
     path = "research/nist_skip_criterion_20261025/exact_embedding_20261026/results/verification.json"
     for date, commit, text in file_history(ref, path, since):
@@ -341,6 +309,79 @@ def nist_selection_exact_embedding(ref, since):
              date=date, problem="nist-candidate-selection", unit="curves", better="higher",
              label="NIST all-21 census: exact embedding degrees with direct-power certificates",
              source=f"{path}@{commit}")
+
+
+def nist_selection_freelip(ref, since):
+    path = "research/nist_skip_criterion_20261025/freelip_replay_20261027/results/summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_freelip.distinct_orders", data.get("distinct_orders"),
+             date=date, problem="nist-candidate-selection", unit="orders", better="neutral",
+             label="Recovered FreeLIP replay: distinct original orders, not repeated-call count",
+             source=f"{path}@{commit}")
+
+
+def nist_selection_period_work(ref, since):
+    path = "research/nist_skip_criterion_20261025/period_work_20261027/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_period_work.verified_cells", data.get("cells_checked"),
+             date=date, problem="nist-candidate-selection", unit="cells", better="neutral",
+             label="Saved ECPP work: independently checked count cells; no historical-rule claim",
+             source=f"{path}@{commit}")
+
+
+
+
+def nist_selection_generator_traits(ref, since):
+    """Export recorded coverage only; do not compute curve traits or estimates."""
+    path = "research/nist_skip_criterion_20261025/generator_b_execution_20261029/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_generator_traits.verified_cells", data.get("trait_cells_checked"),
+             date=date, problem="nist-candidate-selection", unit="cells", better="neutral",
+             label="21 curve choices: verified point-trait cells under repeated controls; not security",
+             source=f"{path}@{commit}")
+
+
+def nist_selection_strict_elkies(ref, since):
+    """Export recorded exact-character coverage, without recomputing a result."""
+    path = "research/nist_skip_criterion_20261025/strict_elkies_20261029/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_strict_elkies.verified_character_cells",
+             data.get("odd_prime_character_cells_checked"), date=date,
+             problem="nist-candidate-selection", unit="cells", better="neutral",
+             label="21 curve choices: strict-character cells verified; no historical-use or security claim",
+             source=f"{path}@{commit}")
+
+
+def nist_selection_expanded_cutoff(ref, since):
+    """Export independently verified coverage from committed records only."""
+    path = "research/nist_skip_criterion_20261025/expanded_cutoff_reanalysis_20261030/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        if data.get("all_five_files_equal") is not True:
+            continue
+        for field, unit in (("character_cells", "cells"), ("integer_cutoffs", "cutoffs")):
+            emit(f"nist.selection_expanded_cutoff.verified_{field}", data.get(field),
+                 date=date, problem="nist-candidate-selection", unit=unit, better="neutral",
+                 label="Fixed 21-curve cohort: independently verified coverage; not security or sampling",
+                 source=f"{path}@{commit}")
+
+
+def nist_selection_broader_census(ref, since):
+    """Export recorded exact coverage only, without computing a new curve trait."""
+    path = "research/nist_skip_criterion_20261025/broader_census_reanalysis_20261030/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        if data.get("all_six_files_equal") is not True:
+            continue
+        for field, unit in (("character_cells", "cells"), ("seed_positions", "positions")):
+            emit(f"nist.selection_broader_census.verified_{field}", data.get(field),
+                 date=date, problem="nist-candidate-selection", unit=unit, better="neutral",
+                 label="Broader recorded census: independently verified coverage; not security or sampling",
+                 source=f"{path}@{commit}")
 
 
 def koblitz_modular_augmentation(ref, since):
@@ -469,8 +510,8 @@ def fall_degree(ref):
         or ("/out/E_" in f and (f.startswith(base + "e9/") or f.startswith(base + "e10/") or f.startswith(base + "e12/"))))]
     draws = censored = 0
     max_n = min_censored_n = None
-    for text in show_many(ref, files):
-        for line in (text or "").splitlines():
+    for f in files:
+        for line in (show(ref, f) or "").splitlines():
             if not line.startswith("{"):
                 continue
             r = json.loads(line)
@@ -489,326 +530,6 @@ def fall_degree(ref):
     emit("fall_degree.draws_censored", censored, problem="fall-degree", unit="draws", label="Draws whose closure did not reach 1 at its cap (d_F above the cap)", source=src)
     emit("fall_degree.max_n_vars_measured", max_n, problem="fall-degree", unit="variables", better="higher", label="Largest N with a recorded d_F draw", source=src)
     emit("fall_degree.min_n_vars_censored", min_censored_n, problem="fall-degree", unit="variables", label="Smallest N with a draw censored above its cap", source=src)
-
-
-def n83_fixed_fall(ref, since):
-    """Forward recorded fixed-base certificates, without inferring regularity."""
-    path = "research/n83_fixed_fall_catalog_20261028/evidence/summary.json"
-    for date, commit, text in file_history(ref, path, since):
-        data = json.loads(text)
-        for row in data.get("rows", []):
-            status = row.get("closure_status", {})
-            if status.get("closure_exit_code") != 0 or status.get("replay_exit_code") != 0:
-                continue
-            for field in ("last_fall_degree", "closure_rank", "linear_rank"):
-                emit(f"n83.fixed_ell27.{row['id']}.{field}", row.get(field),
-                     date=date, problem="n83-fixed-factor-base-fall-degree",
-                     unit="degree" if field == "last_fall_degree" else "rank",
-                     label=f"Fixed ell27 {row['id']}: {field}; producer replay, review pending",
-                     source=f"{path}@{commit}")
-
-
-def n83_top_quotient(ref, since):
-    """Forward certified top-form bounds; never turn an interval into a value."""
-    path = "research/n83_top_quotient_20261028/evidence/summary.json"
-    for date, commit, text in file_history(ref, path, since):
-        for row in json.loads(text).get("rows", []):
-            if row.get("status") not in ("finite_interval", "positive_dimensional_top_ideal"):
-                continue
-            for field in ("dreg_lower_bound", "dreg_upper_bound", "top_quotient_dimension_lower_bound"):
-                emit(f"n83.fixed_top_ell27.{row['id']}.{field}", row.get(field),
-                     date=date, problem="n83-fixed-factor-base-top-regularity",
-                     unit="dimension" if field == "top_quotient_dimension_lower_bound" else "degree",
-                     label=f"Fixed ell27 {row['id']}: {field}; producer certificate, review pending",
-                     source=f"{path}@{commit}")
-
-
-def n83_candidate_datasets(ref, since):
-    """Forward native point counts and replayed fall fields; unknowns stay absent."""
-    study = "research/n83_candidate_pdp_20261028"
-    for name, path in (
-        ("baseline", "research/n83_fixed_factor_base_20261028/data/index.json"),
-        ("spike40", f"{study}/data/index.json"),
-    ):
-        for date, commit, text in file_history(ref, path, since):
-            index = json.loads(text)
-            if index.get("complete") is not True:
-                continue
-            for family in index.get("families", []):
-                for field, unit in (("point_count", "points"), ("liftable_x", "x-values"),
-                                    ("compressed_bytes", "bytes")):
-                    emit(f"n83.base_ell27.{name}.{family['family']}.{field}", family.get(field),
-                         date=date, problem="n83-factor-base-datasets", unit=unit,
-                         label=f"{name} {family['family']} exhaustive base: {field}; no degree claim",
-                         source=f"{path}@{commit}")
-    path = f"{study}/evidence/pdp/paired-summary.json"
-    for date, commit, text in file_history(ref, path, since):
-        for pair in json.loads(text).get("rows", []):
-            if pair.get("targets_identical") is not True:
-                continue
-            for arm in ("baseline", "spike40"):
-                row = pair.get(arm, {})
-                status = row.get("closure_status", {})
-                if status.get("closure_exit_code") != 0 or status.get("replay_exit_code") != 0:
-                    continue
-                for field in ("last_fall_degree", "closure_rank", "linear_rank"):
-                    emit(f"n83.paired_v2.{arm}.{pair['id']}.{field}", row.get(field),
-                         date=date, problem="n83-paired-fall-degree",
-                         unit="degree" if field == "last_fall_degree" else "rank",
-                         label=f"Paired V2 {arm} {pair['id']}: {field}; producer replay, review pending",
-                         source=f"{path}@{commit}")
-    path = f"{study}/evidence/degree3/summary.json"
-    for date, commit, text in file_history(ref, path, since):
-        for row in json.loads(text).get("rows", []):
-            status = row.get("status", {})
-            if (row.get("verified") is not True or status.get("run_exit_code") != 0
-                    or status.get("replay_exit_code") != 0):
-                continue
-            for field in ("last_fall_degree", "last_fall_lower_bound", "last_fall_upper_bound",
-                          "closure_rank", "linear_rank"):
-                emit(f"n83.paired_v3.{row['key']}.{field}", row.get(field),
-                     date=date, problem="n83-paired-fall-degree",
-                     unit="rank" if field.endswith("rank") else "degree",
-                     label=f"Paired V3 {row['key']}: {field}; producer replay, review pending",
-                     source=f"{path}@{commit}")
-    path = f"{study}/evidence/top/verified-summary.json"
-    for date, commit, text in file_history(ref, path, since):
-        data = json.loads(text)
-        for row in data.get("rows", []):
-            if row.get("verified") is not True:
-                continue
-            for field in ("dreg_lower_bound", "dreg_upper_bound", "linear_top_rank",
-                          "top_quotient_dimension_lower_bound"):
-                emit(f"n83.paired_top.{row['key']}.{field}", row.get(field),
-                     date=date, problem="n83-paired-top-regularity",
-                     unit="degree" if field.startswith("dreg_") else "dimension",
-                     label=f"Original top ideal {row['key']}: {field}; certified bound, review pending",
-                     source=f"{path}@{commit}")
-        for proof in data.get("prime_isomorphisms", []):
-            if proof.get("verified") is True:
-                emit(f"n83.paired_top.{proof['id']}.graded_quotient_isomorphic", 1,
-                     date=date, problem="n83-paired-top-regularity", unit="certificate",
-                     label=f"Prime paired top quotients {proof['id']}: diagonal isomorphism; review pending",
-                     source=f"{path}@{commit}")
-
-
-    path = f"{study}/evidence/hilbert/verified-summary.json"
-    for date, commit, text in file_history(ref, path, since):
-        data = json.loads(text)
-        status = data.get("status", {})
-        if (status.get("producer_exit_code") != 0 or status.get("replay_exit_code") != 0
-                or data.get("replay_passed") is not True):
-            continue
-        for row in data.get("rows", []):
-            if row.get("verified") is not True:
-                continue
-            for field in ("dreg_exact", "last_nonzero_degree", "total_dimension"):
-                emit(f"n83.prime_m2_hilbert.{row['key']}.{field}", row.get(field),
-                     date=date, problem="n83-prime-m2-top-regularity",
-                     unit="dimension" if field == "total_dimension" else "degree",
-                     label=f"Original top ideal {row['key']}: exact {field}; producer replay, review pending",
-                     source=f"{path}@{commit}")
-
-
-    path = f"{study}/evidence/binary-pair/verified-summary.json"
-    for date, commit, text in file_history(ref, path, since):
-        data = json.loads(text)
-        status = data.get("status", {})
-        if (status.get("producer_exit_code") != 0 or status.get("replay_exit_code") != 0
-                or data.get("replay_passed") is not True):
-            continue
-        for row in data.get("rows", []):
-            if row.get("verified") is not True:
-                continue
-            for field in ("dreg_exact", "dreg_lower_bound", "dreg_upper_bound", "q_rank", "product_rank"):
-                emit(f"n83.binary_m2_pair.{row['key']}.{field}", row.get(field),
-                     date=date, problem="n83-binary-m2-top-regularity",
-                     unit="rank" if field.endswith("rank") else "degree",
-                     label=f"Original top ideal {row['key']}: {field}; producer replay, review pending",
-                     source=f"{path}@{commit}")
-
-
-    path = f"{study}/evidence/chain/verified-summary.json"
-    for date, commit, text in file_history(ref, path, since):
-        data = json.loads(text)
-        status = data.get("status", {})
-        if (status.get("producer_exit_code") != 0 or status.get("replay_exit_code") != 0
-                or data.get("replay_passed") is not True):
-            continue
-        for row in data.get("rows", []):
-            if row.get("verified") is not True:
-                continue
-            for field in ("dreg_lower_bound", "dreg_upper_bound", "selected_blocks"):
-                emit(f"n83.binary_chain.{row['key']}.{field}", row.get(field),
-                     date=date, problem="n83-binary-chain-top-regularity",
-                     unit="blocks" if field == "selected_blocks" else "degree",
-                     label=f"Original top ideal {row['key']}: {field}; certified bound, review pending",
-                     source=f"{path}@{commit}")
-
-    path = f"{study}/evidence/chain-exact/verified-summary.json"
-    for date, commit, text in file_history(ref, path, since):
-        data = json.loads(text)
-        status = data.get("status", {})
-        if (status.get("producer_exit_code") != 0 or status.get("replay_exit_code") != 0
-                or data.get("replay_passed") is not True):
-            continue
-        for row in data.get("rows", []):
-            if row.get("verified") is not True:
-                continue
-            for field in ("dreg_exact", "dreg_lower_bound", "dreg_upper_bound", "defect_socle_upper"):
-                emit(f"n83.binary_chain_exact.{row['key']}.{field}", row.get(field),
-                     date=date, problem="n83-binary-chain-top-regularity",
-                     unit="degree",
-                     label=f"Original top ideal {row['key']}: {field}; written overlap proof, review pending",
-                     source=f"{path}@{commit}")
-
-    path = f"{study}/evidence/degree3-m3/summary.json"
-    for date, commit, text in file_history(ref, path, since):
-        for row in json.loads(text).get("rows", []):
-            status = row.get("status", {})
-            if (row.get("verified") is not True or status.get("run_exit_code") != 0
-                    or status.get("replay_exit_code") != 0):
-                continue
-            for field in ("last_fall_degree", "last_fall_lower_bound", "last_fall_upper_bound",
-                          "closure_rank", "linear_rank"):
-                emit(f"n83.m3_v3.{row['key']}.{field}", row.get(field),
-                     date=date, problem="n83-m3-fall-degree",
-                     unit="rank" if field.endswith("rank") else "degree",
-                     label=f"Retained m3 V3 {row['key']}: {field}; admitted subspace; complete={row.get('closure_complete')}; review pending",
-                     source=f"{path}@{commit}")
-
-
-    path = f"{study}/evidence/degree3-continuation/summary.json"
-    for date, commit, text in file_history(ref, path, since):
-        for row in json.loads(text).get("rows", []):
-            status = row.get("status", {})
-            if (row.get("verified") is not True or status.get("run_exit_code") != 0
-                    or status.get("replay_exit_code") != 0):
-                continue
-            for field in ("last_fall_degree", "last_fall_lower_bound", "last_fall_upper_bound",
-                          "closure_rank", "linear_rank", "added_rows", "added_operations", "closure_complete"):
-                unit = ("rank" if field.endswith("rank") else "rows" if field == "added_rows"
-                        else "operations" if field == "added_operations" else "flag" if field == "closure_complete" else "degree")
-                emit(f"n83.m3_continue.{row['key']}.{field}", row.get(field),
-                     date=date, problem="n83-m3-fall-degree", unit=unit,
-                     label=f"Retained m3 continuation {row['key']}: {field}; complete={row.get('closure_complete')}; witness={row.get('witness_origin')}; review pending",
-                     source=f"{path}@{commit}")
-
-
-    path = f"{study}/evidence/degree4-witness/summary.json"
-    for date, commit, text in file_history(ref, path, since):
-        for row in json.loads(text).get("rows", []):
-            if (row.get("verified") is not True or row.get("run_exit_code") != 0
-                    or row.get("replay_exit_code") != 0):
-                continue
-            for field in ("candidates", "strict_candidates", "v3_rank",
-                          "last_fall_lower_bound", "strict_fall_found"):
-                unit = ("rank" if field == "v3_rank" else "degree" if field == "last_fall_lower_bound"
-                        else "flag" if field == "strict_fall_found" else "candidates")
-                emit(f"n83.m3_degree4.{row['key']}.{field}", row.get(field),
-                     date=date, problem="n83-m3-fall-degree", unit=unit,
-                     label=f"Retained m3 degree4 witness family {row['key']}: {field}; finite family only; review pending",
-                     source=f"{path}@{commit}")
-
-
-    path = f"{study}/evidence/degree4-propagation/summary.json"
-    for date, commit, text in file_history(ref, path, since):
-        for row in json.loads(text).get("rows", []):
-            if (row.get("verified") is not True or row.get("run_exit_code") != 0
-                    or row.get("replay_exit_code") != 0):
-                continue
-            values = {field: row.get(field) for field in (
-                "linear_rank", "last_fall_lower_bound", "last_fall_upper_bound", "last_fall_degree")}
-            values.update({field: row["state"][field] for field in (
-                "added_rows", "independent_seed_rows", "processed_operations", "pending_candidates")})
-            for field, value in values.items():
-                unit = ("degree" if field.startswith("last_fall") else "rank" if field == "linear_rank"
-                        else "operations" if field == "processed_operations" else "rows" if field.endswith("rows") else "candidates")
-                emit(f"n83.m3_propagation.{row['key']}.{field}", value,
-                     date=date, problem="n83-m3-fall-degree", unit=unit,
-                     label=f"Retained m3 V4 consequences {row['key']}: {field}; stop={row['state']['stop_reason']}; lower inherited; no unrestricted V4; review pending",
-                     source=f"{path}@{commit}")
-
-
-    path = f"{study}/evidence/degree4-quartic/summary.json"
-    for date, commit, text in file_history(ref, path, since):
-        for row in json.loads(text).get("rows", []):
-            if (row.get("verified") is not True or row.get("run_exit_code") != 0
-                    or row.get("replay_exit_code") != 0):
-                continue
-            values = {field: row.get(field) for field in (
-                "linear_rank", "last_fall_lower_bound", "last_fall_upper_bound", "last_fall_degree",
-                "complete_v4_normal_forms")}
-            values.update({field: row["state"][field] for field in (
-                "added_rows", "attempted_products", "completed_products", "pending_products",
-                "new_basis_payload_bytes")})
-            values.update({f"added_degree_{degree}_rows": count
-                           for degree, count in enumerate(row["state"]["added_rows_by_degree"])})
-            for field, value in values.items():
-                unit = ("degree" if field.startswith("last_fall") else "rank" if field == "linear_rank"
-                        else "flag" if field == "complete_v4_normal_forms"
-                        else "bytes" if field.endswith("bytes")
-                        else "rows" if field.endswith("rows") else "products")
-                emit(f"n83.m3_quartic.{row['key']}.{field}", value,
-                     date=date, problem="n83-m3-fall-degree", unit=unit,
-                     label=f"Retained m3 quartic closure {row['key']}: {field}; stop={row['state']['stop_reason']}; global upper requires separate certificate; no base-quality ranking; review pending",
-                     source=f"{path}@{commit}")
-
-
-    path = f"{study}/evidence/prime-first-fall/summary.json"
-    for date, commit, text in file_history(ref, path, since):
-        for row in json.loads(text).get("rows", []):
-            if row.get("verified") is not True:
-                continue
-            for field in ("first_fall_degree", "first_strict_filtered_fall_degree", "last_fall_lower_bound"):
-                emit(f"n83.prime_m2_first_fall.{row['key']}.{field}", row.get(field),
-                     date=date, problem="n83-prime-m2-fall-degree", unit="degree",
-                     label=f"Retained prime m2 {row['key']}: {field}; highest-form FFD and strict filtered witness distinct; global LFD upper/exact unknown; review pending",
-                     source=f"{path}@{commit}")
-
-
-    path = f"{study}/evidence/prime-terminal/summary.json"
-    for date, commit, text in file_history(ref, path, since):
-        for row in json.loads(text).get("rows", []):
-            if row.get("verified") is not True:
-                continue
-            for field in ("first_fall_upper_bound", "affine_derivation_degree_upper_bound", "affine_consequence_degree"):
-                emit(f"n83.prime_terminal.{row['key']}.{field}", row.get(field),
-                     date=date, problem="n83-prime-higher-m-fall-degree", unit="degree",
-                     label=f"Retained prime terminal {row['key']}: {field}; upper FFD only; affine strictness not checked; no new LFD bound; review pending",
-                     source=f"{path}@{commit}")
-
-
-
-    path = f"{study}/evidence/prime-linear/summary.json"
-    for date, commit, text in file_history(ref, path, since):
-        for row in json.loads(text).get("rows", []):
-            for field, unit in (("first_fall_lower_bound", "degree"), ("projected_rank", "rows"), ("projected_columns", "columns")):
-                emit(f"n83.prime_linear.{row['key']}.{field}", row.get(field),
-                     date=date, problem="n83-prime-higher-m-fall-degree", unit=unit,
-                     label=f"Retained prime {row['key']}: {field}; seven shared projection maps, covering argument; no exactFFD or LFD claim; review pending",
-                     source=f"{path}@{commit}")
-
-
-
-    path = f"{study}/evidence/prime-quadratic/summary.json"
-    for date, commit, text in file_history(ref, path, since):
-        for row in json.loads(text).get("rows", []):
-            for field, unit in (("first_fall_lower_bound", "degree"), ("projected_rank", "rows"), ("projected_columns", "columns")):
-                emit(f"n83.prime_quadratic.{row['key']}.{field}", row.get(field),
-                     date=date, problem="n83-prime-higher-m-fall-degree", unit=unit,
-                     label=f"Retained prime {row['key']}: {field}; seven shared projection maps, covering argument; no exactFFD or LFD claim; review pending",
-                     source=f"{path}@{commit}")
-
-
-    path = f"{study}/evidence/prime-lefschetz-native/summary.json"
-    for date, commit, text in file_history(ref, path, since):
-        for row in json.loads(text).get("rows", []):
-            for field in ("first_fall_lower_bound", "first_fall_upper_bound", "first_fall_degree"):
-                emit(f"n83.prime_lefschetz_native.{row['key']}.{field}", row.get(field),
-                     date=date, problem="n83-prime-higher-m-fall-degree", unit="degree",
-                     label=f"Retained prime {row['key']}: {field}; conditional on written Lefschetz/Koszul argument; independent review pending; no new LFD or regularity claim",
-                     source=f"{path}@{commit}")
 
 
 def curve_traits(ref):
@@ -879,9 +600,111 @@ def ic_aimed_gather(ref, since):
              source=src)
 
 
+def explicit_gpu_frontier(ref, since, study="research/explicit_relations_e2e_20261030",
+                          metric_prefix="gpu.explicit_relations"):
+    """Exact completed-panel counts; no timing or global-maximum claims."""
+    revision = _git("rev-parse", ref).strip()[:12]
+    paths = [p for p in ls(ref, study) if p.endswith("/coverage.json")]
+    requested = [f"{p.rsplit('/', 1)[0]}/{name}" for p in paths
+                 for name in ("coverage.json", "export.json", "frontier.txt")]
+    # One Git process avoids per-file process and remote-filesystem overhead.
+    batch = subprocess.run(["git", "-C", str(REPO), "cat-file", "--batch"],
+                           input="".join(f"{ref}:{p}\n" for p in requested).encode(),
+                           capture_output=True, check=True).stdout
+    blobs, offset = {}, 0
+    for path in requested:
+        end = batch.index(b"\n", offset)
+        header = batch[offset:end].split()
+        offset = end + 1
+        if header[-1] == b"missing":
+            continue
+        if len(header) != 3 or header[1] != b"blob":
+            raise ValueError(f"invalid committed GPU source: {path}")
+        size = int(header[2])
+        blobs[path] = batch[offset:offset + size].decode()
+        if batch[offset + size:offset + size + 1] != b"\n":
+            raise ValueError(f"truncated committed GPU source: {path}")
+        offset += size + 1
+    for path in paths:
+        directory = path.rsplit("/", 1)[0]
+        name = directory.rsplit("/", 1)[-1]
+        if not name.startswith("results-v") or not name[9:].isdigit():
+            continue
+        coverage_text = blobs.get(path)
+        export_text = blobs.get(f"{directory}/export.json")
+        if not coverage_text or not export_text:
+            continue
+        coverage, export = json.loads(coverage_text), json.loads(export_text)
+        date = export.get("created", "")[:10]
+        if len(date) != 10 or date < since:
+            continue
+        runs = export.get("runs", [])
+        verified = sum(r.get("status") == "succeeded" and
+                       r.get("verification", {}).get("status") == "verified" for r in runs)
+        if len(runs) != coverage.get("attempted") or verified != coverage.get("verified_recoveries"):
+            raise ValueError(f"inconsistent completed GPU panel: {path}")
+        prefix = f"{metric_prefix}.{name[8:]}"
+        source = f"{path}@{revision}"
+        for suffix, value, label in (
+            ("attempted", coverage["attempted"], "recorded executions"),
+            ("verified_recoveries", verified, "fresh CPU-replayed recoveries"),
+            ("timeouts", sum(r.get("status") == "timeout" for r in runs), "retained solve timeouts"),
+        ):
+            emit(f"{prefix}.{suffix}", value, date=date, problem="gpu-generic-decomposition",
+                 unit="count", better="neutral", label=f"GPU {name}: {label}; fixed bounded panel, L0",
+                 source=source)
+        frontier = blobs.get(f"{directory}/frontier.txt")
+        if frontier:
+            key, _, value = frontier.strip().partition("=")
+            if key == "largest_complete_bits" and value.isdigit():
+                emit(f"{prefix}.complete_field_bits", int(value), date=date,
+                     problem="gpu-generic-decomposition", unit="field bits", better="neutral",
+                     label=f"GPU {name}: complete two-target rung under fixed limits; not a global maximum",
+                     source=f"{directory}/frontier.txt@{revision}")
+
+
+
+def explicit_gpu_profile(ref, since):
+    """Committed diagnostic coverage only; no recovery or timing promotion."""
+    study = "research/explicit_relations_profile_20261031"
+    revision = _git("rev-parse", ref).strip()[:12]
+    for version in (1, 2):
+        path = f"{study}/results-v{version}/export.json"
+        text = show(ref, path)
+        if text is None:
+            continue
+        export = json.loads(text)
+        date = export.get("created", "")[:10]
+        if len(date) != 10 or date < since:
+            continue
+        runs = export.get("runs", [])
+        if len(runs) != export.get("flow", {}).get("attempted"):
+            raise ValueError(f"inconsistent GPU profile coverage: {path}")
+        verified = [r for r in runs if r.get("status") == "succeeded" and
+                    r.get("verification", {}).get("status") == "verified"]
+        if version == 1:
+            samples = (
+                ("verified_cells", len(verified), "byte-exact query replay cells"),
+                ("verified_queries", sum(r["measurements"]["counted"]["verified_queries"]
+                                         for r in verified), "byte-exact query replies"),
+            )
+        else:
+            samples = (
+                ("timeline_profiles", sum(r["arm"] == "t" for r in verified),
+                 "successful Nsight Systems traces"),
+                ("counter_unavailable", sum(r["measurements"]["counters"].get("native_status")
+                                             == "unsupported" for r in runs),
+                 "retained unavailable hardware-counter profiles"),
+            )
+        for suffix, value, label in samples:
+            emit(f"gpu.explicit_relations.profile.v{version}.{suffix}", value,
+                 date=date, problem="gpu-query-diagnostics", unit="count",
+                 better="neutral", label=f"GPU profile v{version}: {label}; fixed prefixes",
+                 source=f"{path}@{revision}")
+
+
 def main():
     a = args()
-    _prefetch_histories(a.ref, a.since)
     jacobian_catalog(a.ref, a.since)
     leaderboard(a.ref, a.since)
     timeline(a.ref)
@@ -891,19 +714,28 @@ def main():
     photo_volcano(a.ref)
     nist_factorization(a.ref, a.since)
     nist_selection_factor_census(a.ref, a.since)
+    nist_selection_period_ecpp(a.ref, a.since)
     nist_selection_exact_embedding(a.ref, a.since)
+    nist_selection_freelip(a.ref, a.since)
+    nist_selection_period_work(a.ref, a.since)
+    nist_selection_generator_traits(a.ref, a.since)
+    nist_selection_strict_elkies(a.ref, a.since)
+    nist_selection_expanded_cutoff(a.ref, a.since)
+    nist_selection_broader_census(a.ref, a.since)
+
+
     ghs_ipsec_archive(a.ref, a.since)
     fall_degree(a.ref)
-    n83_fixed_fall(a.ref, a.since)
-    n83_top_quotient(a.ref, a.since)
-    n83_candidate_datasets(a.ref, a.since)
-
     curve_traits(a.ref)
 
     koblitz_modular_augmentation(a.ref, a.since)
     koblitz_modular_geometry(a.ref, a.since)
     pencil_gate_observations(a.ref, a.since)
     ic_aimed_gather(a.ref, a.since)
+    explicit_gpu_frontier(a.ref, a.since)
+    explicit_gpu_frontier(a.ref, a.since, "research/explicit_relations_affine_20261030",
+                          "gpu.explicit_relations.affine")
+    explicit_gpu_profile(a.ref, a.since)
 
 if __name__ == "__main__":
     main()

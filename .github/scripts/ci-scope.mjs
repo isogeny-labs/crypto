@@ -2,7 +2,8 @@
 // Local, NUL-delimited git diffs avoid the API's 300-file path-filter limit.
 // Missing comparisons select every check; they must never silently skip work.
 import { execFileSync } from 'node:child_process';
-import { appendFileSync, existsSync, readFileSync } from 'node:fs';
+import { appendFileSync, closeSync, existsSync, mkdtempSync, openSync, readFileSync, rmSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -100,8 +101,21 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
 }
 
 function git(args, cwd) {
-  return execFileSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024,
-    env: { ...process.env, GIT_TERMINAL_PROMPT: '0' }, stdio: ['ignore', 'pipe', 'pipe'] });
+  // The tracked-path list can exceed child_process's buffered stdout limit.
+  // Keep every NUL-delimited path; spool stdout rather than truncating it or
+  // treating a complete checkout as an unavailable scope comparison.
+  const directory = mkdtempSync(path.join(os.tmpdir(), 'crypto-ci-git-'));
+  const output = path.join(directory, 'stdout');
+  let descriptor;
+  try {
+    descriptor = openSync(output, 'wx', 0o600);
+    execFileSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024,
+      env: { ...process.env, GIT_TERMINAL_PROMPT: '0' }, stdio: ['ignore', descriptor, 'pipe'] });
+    return readFileSync(output, 'utf8');
+  } finally {
+    if (descriptor !== undefined) closeSync(descriptor);
+    rmSync(directory, { recursive: true, force: true });
+  }
 }
 
 function trackedFiles(cwd) {

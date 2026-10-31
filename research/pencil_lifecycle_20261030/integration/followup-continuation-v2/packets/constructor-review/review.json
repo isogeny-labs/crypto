@@ -1,0 +1,44 @@
+{
+  "schema": "research.independent-source-fidelity-review/v1",
+  "producer_manifest_sha256": "33dbbc16021c91693db7948a1cff14324942327bf12dceb0aef09fe71d3fb99e",
+  "plan_sha256": "ea7688544102874e23ae64f1d783cf1d116c9e5e8301dfb2fd23840fcf13160a",
+  "source_sha256": {
+    "Constructor": "80769ad824650a4b2f6750a8b684c22fb75acf1ccc1aedf4008ca03412675c39",
+    "Literal": "033a662444e4ba4a19372555017808156a1755be2d129bc216f81f24bf80a5f9",
+    "Controls": "63ff75f824fa3aa6c38a7b0f0e09db748fd9106231dc2e5a5307e14af9ae4dbf",
+    "Readback": "ddb5af6c29f0bf66f7856ffc331100969232ac32a80299d301c5455431b34de9"
+  },
+  "compile_exit_codes": {
+    "Constructor": 0,
+    "Literal": 0,
+    "Controls": 0,
+    "Readback": 0,
+    "ReviewerControls": 0
+  },
+  "axioms": "Only propext, Classical.choice, Quot.sound; literal equality only propext",
+  "claims": {
+    "literal_word_tree": "supported: q*z2,r*z4,s*(z3*w),t*(z5*w), with modulus at each product and unchanged z,w",
+    "decode": "supported with positive modulus below 2^31 and six canonical inputs; prime not needed",
+    "normalized_invariant": "supported with prime modulus, affine divisibility, canonical inputs and nonzero weights",
+    "from_affine": "supported specifically for degree-two dispatch using weight_degree_two(d,1,1,f)",
+    "prelude_composition": "supported against an explicitly valid canonical nonzero-weight partner with 5<=p<2^31"
+  },
+  "controls": {
+    "producer": "p5 valid nonunit-weight theorem instance, zero-weight preservation, unit sameUDouble",
+    "reviewer": "p7 all nonzero coefficient arithmetic, unit-weight preservation, noncanonical retained z rejected by canonical predicate, zero-z preservation",
+    "reviewer_failed_attempt": "Decidable canonical predicate synthesis failed; original file/stdout retained, corrected proof extracts z bound and omega closes contradiction"
+  },
+  "external_source_conditions": [
+    "Rust Field.n=1, tables=None, odd prime, normal execution and counter headroom",
+    "Degree-two affine coefficients q=d.u[1],r=d.u[0],s=d.v[1],t=d.v[0] are canonical",
+    "Mathematical affine divisibility remains a premise; Rust Jacobian::valid bridge and transfer canonicality are not proved here"
+  ],
+  "blocking_findings": [],
+  "scope": "constructor and conditional initialization only; no nonidentity addition/walk closure",
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "rust_source_hashes": {
+    "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/src/bin/projective_law_gate.rs": "5976e7f30b3e9c5c49a5fc0f4095404b7322832e4b02f467bc3cb7e0d9dcc8c0",
+    "/home/ec2-user/crypto-pr2304-persist/src/cryptanalysis/three_leads.rs": "d354a3912db6ea6af70019920708610fe848a232119b0949d8a7c968aedf6354"
+  }
+}
