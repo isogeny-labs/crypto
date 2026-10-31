@@ -77,6 +77,7 @@ SOURCES = {
     "f4_f5_f6_cross_family": "research/f4_f5_f6_cross_family_20261011/ANALYSIS.json",
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
+    "conductor_gap_instructions": "research/ecbench_conductor_gap_ir_20261014/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
     "lazy_members": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
     "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
@@ -1516,6 +1517,15 @@ def jv_sieve_table() -> dict:
 def build(allow_unvalidated: bool = False) -> dict:
     names = Names()
     frontier_audit = latest_frontier_audit()
+    conductor_gap_ir = load(SOURCES["conductor_gap_instructions"])
+    if (conductor_gap_ir["schema"] != "conductor_gap.callgrind_analysis/v1"
+            or conductor_gap_ir["unit"] != "callgrind.Ir"
+            or not conductor_gap_ir["all_profiles_verified"]
+            or conductor_gap_ir["verified_profiles"] != conductor_gap_ir["expected_profiles"]
+            or conductor_gap_ir["expected_profiles"] != 100
+            or conductor_gap_ir["comparison_status"] != "admissible_implementation_diagnostic"
+            or len(conductor_gap_ir["comparisons"]) != 6):
+        raise ValueError("Conductor-gap instruction census source is incomplete")
     n83_holdout = load(SOURCES["n83_tier1_cold_holdout"])
     if (n83_holdout["schema"] != "n83.e2e-holdout-ic1/v1"
             or n83_holdout["evidence_status"] != "PASS_INDEPENDENT_REPLAY"
@@ -1929,6 +1939,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         # Native analysis computes these observations; this view only copies
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
+        "conductor_gap_instruction_diagnostic": conductor_gap_ir,
         "linear_algebra_component": la_component(),
         "prime_base_size_component": prime_base_size_component(),
         "lazy_members_component": lazy_members_component(),
@@ -2760,6 +2771,20 @@ def markdown(doc: dict) -> str:
         observed = session["arms"]["ic-mitm"]["cross_curve"]
         L.append(f"| {session['ell']} | {observed['ratio_floor_over_crater']:.6f} | "
                  f"{observed['ci99'][0]:.6f} to {observed['ci99'][1]:.6f} |")
+    ir = doc["conductor_gap_instruction_diagnostic"]
+    L += ["", "## Conductor-gap complete implementation instruction census", "",
+          "Copied from native Callgrind analysis in a separate instruction unit. "
+          "The same archived one-target workloads are replayed; method resolution, "
+          "target construction, external verification and kernel work remain outside "
+          "the interval. No full-cost GAE ranking changes.", "",
+          f"Profiles verified: {ir['verified_profiles']}/{ir['expected_profiles']}; "
+          f"comparison status: {ir['comparison_status']}.", "",
+          "| gap cell | IC floor/crater Ir | 99% interval |", "|---|---:|---|"]
+    for c in ir["comparisons"]:
+        if c["kind"] == "floor_over_crater_ic":
+            e = c["estimate"]
+            L.append(f"| {c['cell']} | {e['ratio_of_means']:.6f} | "
+                     f"{e['bootstrap_99'][0]:.6f} to {e['bootstrap_99'][1]:.6f} |")
     L += ghs_md(doc["ghs_weak_n4_component"])
     ls = doc["jv_cover_linear_stage_component"]
     L += ["", "## Linear stage after F4 (sparse FGLM) in the Jacobian-cover IC", "",
@@ -3959,6 +3984,22 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{observed["ci99"][0]:.6f} to {observed["ci99"][1]:.6f}</td></tr>')
     P.append('</tbody></table>' + gh(SOURCES["conductor_gap_counts"], 'Native analysis and source records') + '</section>')
 
+    ir = doc["conductor_gap_instruction_diagnostic"]
+    P.append('<section id="conductor-gap-instructions"><h2>Conductor-gap complete instruction census</h2>'
+             '<p>Callgrind simulated user-space instructions, including setup inside methods::solve. '
+             'Method resolution, target construction, external independent verification '
+             'and kernel work are excluded. This separate unit '
+             'does not change the GAE floor or fully priced rankings. '
+             f'{ir["verified_profiles"]}/{ir["expected_profiles"]} profiles verified; '
+             f'comparison status: {esc(ir["comparison_status"])}.</p>'
+             '<table><thead><tr><th>gap cell</th><th>IC floor/crater Ir</th>'
+             '<th>99% interval</th></tr></thead><tbody>')
+    for c in ir["comparisons"]:
+        if c["kind"] == "floor_over_crater_ic":
+            e = c["estimate"]
+            P.append(f'<tr><td>{esc(c["cell"])}</td><td>{e["ratio_of_means"]:.6f}</td>'
+                     f'<td>{e["bootstrap_99"][0]:.6f} to {e["bootstrap_99"][1]:.6f}</td></tr>')
+    P.append('</tbody></table>' + gh(SOURCES["conductor_gap_instructions"], 'Native instruction census and evidence') + '</section>')
     P.append(ghs_html(doc["ghs_weak_n4_component"]))
     ls = doc["jv_cover_linear_stage_component"]
     P.append('<section id="jv-cover-linear-stage-component"><h2>Linear stage after F4 (sparse FGLM) in the Jacobian-cover IC</h2>'
