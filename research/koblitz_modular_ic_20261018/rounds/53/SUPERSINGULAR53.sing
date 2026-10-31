@@ -54,4 +54,49 @@ if(actualQuarticMember53){dump53(actualOut53,"quarticLift53",actualQuarticLift53
 close(actualOut53);print("SUPER53_ACTUAL_BASIS");print(actualGB53);
 print("SUPER53_ACTUAL_QUARTIC_FACTORS");print(factorize(actualQuartic53));
 print("SUPER53_ACTUAL_RESULT dimension="+string(actualDimension53)+" Jacobian_unit="+string(actualSmooth53)+" quartic_member="+string(actualQuarticMember53)+" compact_N_zero="+string(actualN53==0));
+// Actual descended nu differs by b*zeta; lambda shift is zero at A=0.
+ring twistedSuper53=(2,a),(zeta,n,l),lp;minpoly=a^5+a^2+1;short=0;
+number bValue53=1+1/a;
+map twistedMap53=universalPolynomialCertificate51,n+bValue53*zeta,l,bValue53,1;
+ideal twistedQR53=twistedMap53(qr51);
+ideal twistedAugmented53=zeta^2+zeta+1,twistedQR53;
+ideal twistedStandard53=std(twistedAugmented53);
+ideal eliminated53=eliminate(twistedStandard53,zeta);
+ideal descendedAugmented53=zeta^2+zeta+1,eliminated53;
+ideal descendedStandard53=std(descendedAugmented53);
+int descent53=(size(reduce(twistedStandard53,descendedStandard53))==0 && size(reduce(descendedStandard53,twistedStandard53))==0);
+matrix descentForward53;matrix descentReverse53;
+if(descent53){
+ descentForward53=lift(twistedAugmented53,descendedAugmented53);descentReverse53=lift(descendedAugmented53,twistedAugmented53);
+ require53(matrix(twistedAugmented53)*descentForward53==matrix(descendedAugmented53) && matrix(descendedAugmented53)*descentReverse53==matrix(twistedAugmented53),"SUPER53_FULL_TWIST_DESCENT_PRODUCTS");
+}
+link descentOut53="ASCII:w supersingular-descent53.sing";
+write(descentOut53,"ring supersingularDescentCertificate53=(2,a),(zeta,n,l),lp;minpoly=a^5+a^2+1;short=0;ideal source53="+string(twistedAugmented53)+";ideal descended53="+string(descendedAugmented53)+";int descent53="+string(descent53)+";");
+if(descent53){dump53(descentOut53,"forward53",descentForward53);dump53(descentOut53,"reverse53",descentReverse53);}
+close(descentOut53);
+ring descendedSuper53=(2,a),(n,l),lp;minpoly=a^5+a^2+1;short=0;
+map descentMap53=twistedSuper53,0,n,l;
+ideal descendedSource53=descentMap53(eliminated53);ideal descendedGB53=std(descendedSource53);
+int descendedDimension53=vdim(descendedGB53);
+matrix descendedForward53=lift(descendedSource53,descendedGB53);matrix descendedReverse53=lift(descendedGB53,descendedSource53);
+require53(matrix(descendedSource53)*descendedForward53==matrix(descendedGB53) && matrix(descendedGB53)*descendedReverse53==matrix(descendedSource53),"SUPER53_DESCENDED_IDEAL_PRODUCTS");
+ideal descendedMinors53=minor(jacob(descendedSource53),2);
+ideal descendedJacobian53=descendedSource53,descendedMinors53;
+int descendedSmooth53=(reduce(poly(1),std(descendedJacobian53))==0);
+matrix descendedSmoothLift53;
+if(descendedSmooth53){descendedSmoothLift53=lift(descendedJacobian53,ideal(1));require53(matrix(descendedJacobian53)*descendedSmoothLift53==matrix(ideal(1)),"SUPER53_DESCENDED_JACOBIAN_PRODUCT");}
+poly descendedQuartic53=l^4+(1+1/a)*l+(1+1/a)^2;
+int descendedQuarticMember53=(reduce(descendedQuartic53,descendedGB53)==0);
+matrix descendedQuarticLift53;
+if(descendedQuarticMember53){descendedQuarticLift53=lift(descendedSource53,ideal(descendedQuartic53));require53(matrix(descendedSource53)*descendedQuarticLift53==matrix(ideal(descendedQuartic53)),"SUPER53_DESCENDED_QUARTIC_PRODUCT");}
+int rectangular53=0;
+if(size(descendedGB53)==2){rectangular53=((lead(descendedGB53[1])==n^4 && lead(descendedGB53[2])==l^4) || (lead(descendedGB53[2])==n^4 && lead(descendedGB53[1])==l^4));}
+link descendedOut53="ASCII:w descended-supersingular53.sing";
+write(descendedOut53,"ring descendedSupersingularCertificate53=(2,a),(n,l),lp;minpoly=a^5+a^2+1;short=0;ideal source53="+string(descendedSource53)+";ideal gb53="+string(descendedGB53)+";ideal minors53="+string(descendedMinors53)+";int dimension53="+string(descendedDimension53)+";int smooth53="+string(descendedSmooth53)+";int quarticMember53="+string(descendedQuarticMember53)+";");
+if(descendedSmooth53){dump53(descendedOut53,"smoothLift53",descendedSmoothLift53);}
+dump53(descendedOut53,"forward53",descendedForward53);dump53(descendedOut53,"reverse53",descendedReverse53);
+if(descendedQuarticMember53){dump53(descendedOut53,"quarticLift53",descendedQuarticLift53);}
+close(descendedOut53);
+print("SUPER53_DESCENDED_BASIS");print(descendedGB53);
+print("SUPER53_DESCENDED_RESULT dimension="+string(descendedDimension53)+" Jacobian_unit="+string(descendedSmooth53)+" quartic_member="+string(descendedQuarticMember53)+" full_descent="+string(descent53)+" rectangular4x4="+string(rectangular53));
 print("SUPERSINGULAR53_ALL_CHECKS_PASS");quit;

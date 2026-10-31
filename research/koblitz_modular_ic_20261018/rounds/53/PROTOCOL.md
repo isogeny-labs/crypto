@@ -140,3 +140,13 @@ For the trace-discriminant interpretation also read primary Stacks0BJF:
 https://stacks.math.columbia.edu/tag/0BJF . The finite-locally-free premise
 is the retained full rank32normal algebra;unit discriminant implies etale
 after localization. No completed-subring identification follows solely from it.
+
+The actual point check above first uses the ordinary QR fiber. Also check the
+actual descended twist:at A=0 the retained R51substitution is
+lordinary=ldescended,nordinary=ndescended+b*zeta,zeta²+zeta+1=0.
+Map the original QR generators directly,eliminate zeta,and test equality of
+the augmented ideal with the descended elimination ideal plus the quadratic
+constant equation. When equal,save both full inclusion products. In the
+descended two-variable ring,measure dimension,Jacobian unit and quartic
+membership;save full witnesses and basis. This distinguishes the ordinary
+F32fiber from the actual twisted fiber rather than identifying them silently.
