@@ -10436,6 +10436,9 @@ mod worker_math_decode_tests {
             assert_eq!(b.native, Reservation::default());
             assert_eq!(b.trace_bytes, 0);
         }
+        // Verification writes immutable telemetry; this control is a new attempt.
+        let f = Fixture::with_shape(23, false, 4);
+        let mut registry = Vec::new();
         let unbound = super::super::verify_and_store_worker_originals(
             &f.config,
             &f.case,
