@@ -4,13 +4,13 @@ import hashlib,json,subprocess
 h=Path(__file__).resolve().parent; repo=h.parents[3]
 r=json.loads((h/'results.json').read_text())
 assert all(x['status'] in ('accepted','rejected') for x in r['runs']), 'native work remains active'
-paths={'diamond51':'source-data/diamond-input51.sing','glue-prep51':'source-data/glue-prep-input51.sing','glue-forward51':'source-data/glue-direction1-input51.sing','glue-reverse51':'source-data/glue-direction2-input51.sing','glue-reload51':'source-data/glue-reload-input51.sing','universal51':'UNIVERSAL51.sing','twist51':'TWIST51.sing','base23-51':'BASE23_51.sing','fiber51':'FIBER51.rs','hecke351':'HECKE3_51.sing','overlap-lean51':'lean/Overlap51.lean'}
+paths={'diamond51':'source-data/diamond-input51.sing','glue-prep51':'source-data/glue-prep-input51.sing','glue-forward51':'source-data/glue-direction1-input51.sing','glue-reverse51':'source-data/glue-direction2-input51.sing','glue-reload51':'source-data/glue-reload-input51.sing','universal51':'UNIVERSAL51.sing','twist51':'TWIST51.sing','base23-51':'BASE23_51.sing','fiber51':'FIBER51.rs','hecke3-51':'HECKE3_51.sing','overlap-lean51':'lean/Overlap51.lean','specialize-lean51':'lean/Specialize51.lean'}
 checks=[]
 for row in r['runs']:
     p=h/'runs'/row['attempt']; rev=(p/'source-revision.txt').read_text().strip()
     key=next(k for k in paths if p.name.startswith(k+'-'))
-    target='Overlap51.lean' if row['kind']=='Lean' else ('input.rs' if row['kind']=='Rust' else 'input.sing')
-    runner='REPLAY_LEAN.sh' if row['kind']=='Lean' else ('REPLAY_FIBER.sh' if row['kind']=='Rust' else 'REPLAY_CAS.sh')
+    target=Path(paths[key]).name if row['kind']=='Lean' else ('input.rs' if row['kind']=='Rust' else 'input.sing')
+    runner=('REPLAY_SPECIALIZE_LEAN.sh' if key=='specialize-lean51' else 'REPLAY_LEAN.sh') if row['kind']=='Lean' else ('REPLAY_FIBER.sh' if row['kind']=='Rust' else 'REPLAY_CAS.sh')
     for source,actual in [(paths[key],target),(runner,'runner.sh')]:
         full=str((h/source).relative_to(repo))
         blob=subprocess.check_output(['git','show',rev+':'+full],cwd=repo)
