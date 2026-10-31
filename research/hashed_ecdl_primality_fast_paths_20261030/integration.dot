@@ -1,0 +1,13 @@
+digraph setup {
+  graph [rankdir=TB, bgcolor="white", pad=0.2];
+  node [shape=box, style="rounded,filled", fillcolor="#eef4fa", color="#395470", fontname="Helvetica", fontsize=12];
+  edge [color="#395470", fontname="Helvetica", fontsize=10];
+  proofs [label="Public p / r / s; hash-proof dependencies supplied\np: 131 bits; s: 132 bits; p/r proofs omitted"];
+  verify [label="Automatically certify p/r; verify supplied hash proofs\nRetain private checked-prime context"];
+  bases [label="Construct two factor-base predicates\nExplicit valid seeds; threshold 256"];
+  network_node [label="Published-Q decomposition network constructed\n1,684,796 edges; 249,620 vertices\nDegree 1,032; 526 interface bits", fillcolor="#e3f3e8"];
+  limits [label="Development policy\n2,000,000 steps / vector entries; 4,096 integer bits"];
+  open [label="Relation search / scalar recovery not attempted\nOriginal recursion guard unchanged", fillcolor="#fff1d6"];
+  proofs -> verify -> bases -> network_node -> open;
+  limits -> network_node [style=dashed, label="construction only"];
+}
