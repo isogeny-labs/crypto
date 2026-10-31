@@ -764,6 +764,8 @@ pub fn run_f2m4<S: RhoScalar>(
             work_unit: "row_ops".into(),
             cost: la,
         },
+        useful_rank: None,
+        cost_qualification: None,
         verify: ver,
         recovered: recovered.and_then(|d| u64::try_from(d.to_u128()).ok()),
         verified,
@@ -885,6 +887,7 @@ mod tests {
                 frobenius: true,
                 sparsest: true,
                 replay: true,
+                frob_roots: false,
             };
             let sp = spec(oracle);
             let mut o1 = BinD4Oracle::new(&inst, 11, sp.seed, opts);
