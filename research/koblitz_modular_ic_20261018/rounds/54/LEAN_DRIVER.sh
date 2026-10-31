@@ -23,12 +23,14 @@ export PATH="$(dirname "$lean_bin"):$PATH"
 "$lean_bin" --version > "$raw/version.txt"
 git -C /home/ec2-user/crypto-modular-ic/research/koblitz_modular_ic_20261018/lean/.lake/packages/mathlib rev-parse HEAD > "$raw/mathlib-revision.txt"
 [ "$(cat "$raw/mathlib-revision.txt")" = d13f23b723b8a846827a245b89c10fc7d3f11612 ]
+ulimit -v > "$raw/virtual-limit.txt"
+[ "$(cat "$raw/virtual-limit.txt")" = unlimited ]
 set +e
 (cd "$build";timeout 1200 taskset -c 0 "$lean_bin" -j1 -M4096 -o Fiber54.olean Fiber54.lean) > "$raw/compile.log" 2>&1
 rc=$?;printf '%s\n' "$rc" > "$raw/compile.exit"
 if [ "$rc" = 0 ];then
+ cp "$build/Fiber54.olean" "$raw/"
  (cd "$build";timeout 1200 taskset -c 0 "$lean_bin" -j1 -M4096 --run AuditAxioms.lean Fiber54) > "$raw/audit.log" 2>&1
  rc=$?;printf '%s\n' "$rc" > "$raw/audit.exit"
 fi
-if [ "$rc" = 0 ];then cp "$build/Fiber54.olean" "$raw/";fi
 exit "$rc"
