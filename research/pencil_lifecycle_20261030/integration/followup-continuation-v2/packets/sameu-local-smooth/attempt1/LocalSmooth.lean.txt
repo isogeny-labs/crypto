@@ -1,0 +1,72 @@
+import WeightedExtract
+import PositiveDistinct
+set_option autoImplicit false
+set_option maxHeartbeats 2000000
+namespace SameULocal
+open Polynomial MixedCancellation SameUMixed
+variable {K : Type*} [Field K]
+
+theorem zero_ordinate_square_factor (f : K[X]) (q r s1 t1 s2 t2 : K)
+ (h1 : support q r ∣ f-(ordinate s1 t1)^2)
+ (h2 : support q r ∣ f-(ordinate s2 t2)^2)
+ (hk : s1-s2≠0) (hn : ¬(s1= -s2 ∧ t1= -t2))
+ (hy : s1*((t2-t1)/(s1-s2))+t1=0) :
+ (X-C ((t2-t1)/(s1-s2)))^2 ∣ f := by
+ let x := (t2-t1)/(s1-s2)
+ have he : (s1-s2)*x=t2-t1 := by dsimp [x];rw [mul_comm,div_mul_cancel₀ _ hk]
+ have ht1 : t1= -(s1*x) := by
+  calc t1 = (s1*x+t1)-s1*x := by ring
+       _ = -(s1*x) := by change (s1*((t2-t1)/(s1-s2))+t1)-s1*x= _;rw [hy];ring
+ have ht2 : t2= -(s2*x) := by
+  calc t2 = ((s1-s2)*x)+t1 := by rw [he];ring
+       _ = -(s2*x) := by rw [ht1];ring
+ have hs := sum_slope_nonzero f q r s1 t1 s2 t2 h1 h2 hk hn
+ have hc : C ((s1-s2)*(s1+s2)) ≠ (0:K[X]) := by
+  exact C_ne_zero.mpr (mul_ne_zero hk hs)
+ have hi := factor_identity f q r s1 t1 s2 t2 h1 h2
+ have hid : (ordinate s1 t1-ordinate s2 t2)*(ordinate s1 t1+ordinate s2 t2) =
+ C ((s1-s2)*(s1+s2))*(X-C x)^2 := by
+  rw [ht1,ht2]
+  simp only [ordinate,C_mul,C_add,C_sub,C_neg];ring
+ have hu : support q r=(X-C x)^2 := by
+  apply mul_left_cancel₀ hc
+  exact hi.symm.trans hid
+ have hv : ordinate s1 t1=C s1*(X-C x) := by
+  rw [ht1];simp only [ordinate,C_neg,C_mul];ring
+ change (X-C x)^2 ∣ f
+ rw [hu,hv] at h1
+ have hh : (X-C x)^2 ∣ (C s1*(X-C x))^2 := by
+  refine ⟨(C s1)^2,?_⟩;ring
+ have hh' := dvd_add h1 hh
+ simpa using hh'
+
+theorem square_factor_value_derivative (a0 a1 a2 a3 x : K)
+ (h : (X-C x)^2 ∣ WeightedDoubling.curve a0 a1 a2 a3) :
+ WeightedDoubling.value a0 a1 a2 a3 x=0 ∧ WeightedDoubling.deriv a1 a2 a3 x=0 := by
+ let v := WeightedDoubling.value a0 a1 a2 a3 x
+ let d := WeightedDoubling.deriv a1 a2 a3 x
+ have hi := WeightedDoubling.tangent_identity a0 a1 a2 a3 x 0 0
+ simp only [zero_mul,zero_add,sub_zero,zero_pow (by decide : (2:Nat)≠0),C_0,add_zero] at hi
+ have hm : (X-C x)^2 ∣ (X-C x)^2*(X^3+C (2*x)*X^2+C (3*x^2+a3)*X+C (4*x^3+2*a3*x+a2)) := dvd_mul_right _ _
+ have hd := dvd_sub h hm
+ have he : WeightedDoubling.curve a0 a1 a2 a3-
+ (X-C x)^2*(X^3+C (2*x)*X^2+C (3*x^2+a3)*X+C (4*x^3+2*a3*x+a2)) = C d*X+C (v-d*x) := by
+  rw [hi]
+  dsimp [d,v]
+  simp only [C_sub,C_mul];ring
+ rw [he] at hd
+ have hdeg : ((X-C x)^2).natDegree=2 := by
+  have heq : (X-C x)^2=support (-2*x) (x^2) := by
+   simp only [MixedCancellation.support,C_mul,C_neg,C_pow,map_ofNat];ring
+  rw [heq]
+  simpa [MixedCancellation.support] using natDegree_quadratic (R:=K) (a:=(1:K)) (b:=(-2*x)) (c:=x^2) one_ne_zero
+ have hl : (C d*X+C (v-d*x)).natDegree≤1 := natDegree_linear_le
+ have hz := eq_zero_of_dvd_of_natDegree_lt hd (by omega : (C d*X+C (v-d*x)).natDegree < ((X-C x)^2).natDegree)
+ have hd0 : d=0 := by
+  have hh := congrArg (fun p : K[X]=>p.coeff 1) hz
+  simpa using hh
+ have hv0 : v=0 := by
+  have hh := congrArg (fun p : K[X]=>p.coeff 0) hz
+  simpa [hd0] using hh
+ exact ⟨hv0,hd0⟩
+end SameULocal

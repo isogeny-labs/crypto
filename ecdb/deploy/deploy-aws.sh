@@ -141,7 +141,7 @@ admin() { # admin <event json>
 log "migrate";         admin '{"action":"migrate"}'
 log "login roles";     admin '{"action":"bootstrap_roles"}'
 if [ "${ECDB_SKIP_IMPORT:-0}" != 1 ]; then
-  for what in registry walks traits covers transfers certificates derived; do
+  for what in registry walks traits covers transfers certificates derived enrich; do
     # Keep the full report in a variable: a pipe into head would SIGPIPE the script under pipefail.
     log "import $what"; report=$(admin "{\"action\":\"import\",\"what\":\"$what\"}"); echo "${report:0:2000}"
   done

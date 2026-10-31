@@ -1,0 +1,47 @@
+import SameUComposition
+import Mathlib.Algebra.Field.ZMod
+set_option autoImplicit false
+set_option maxHeartbeats 2000000
+namespace SameUCompositionControls
+open Polynomial MixedCancellation SameUMixed SameUZeroSlope SameUComposition
+instance : Fact (Nat.Prime 5) := ⟨by decide⟩
+@[simp] theorem five_zero : (5:ZMod 5)=0 := by decide
+def a : D2 (ZMod 5) := ⟨0,-16,0,96,2,3⟩
+def b : D2 (ZMod 5) := ⟨0,-81,54,0,3,2⟩
+theorem an : nq a=0 ∧ nr a= -1 ∧ ns a=0 ∧ nt a=1 := by decide
+theorem bn : nq b=0 ∧ nr b= -1 ∧ ns b=1 ∧ nt b=0 := by decide
+theorem va : validTwo (WeightedDoubling.curve (1:ZMod 5) (-1) 0 0) a := by
+ unfold validTwo
+ rw [an.1,an.2.1,an.2.2.1,an.2.2.2]
+ refine ⟨X^3+X,?_⟩
+ simp [MixedCancellation.support,ordinate,WeightedDoubling.curve] <;> ring
+theorem vb : validTwo (WeightedDoubling.curve (1:ZMod 5) (-1) 0 0) b := by
+ unfold validTwo
+ rw [bn.1,bn.2.1,bn.2.2.1,bn.2.2.2]
+ refine ⟨X^3+X-1,?_⟩
+ simp [MixedCancellation.support,ordinate,WeightedDoubling.curve] <;> ring
+theorem hg : IsCoprime (WeightedDoubling.curve (1:ZMod 5) (-1) 0 0)
+ (WeightedDoubling.curve (1:ZMod 5) (-1) 0 0).derivative := by
+ refine ⟨0,-1,?_⟩
+ norm_num [WeightedDoubling.curve,derivative_add,derivative_mul,derivative_X_pow]
+ <;> simp only [five_zero]
+example : sourceK a b≠0 ∧ route a b=.mixed ∧
+ validTwo (WeightedDoubling.curve (1:ZMod 5) (-1) 0 0)
+ (MixedPositiveDistinct.doubled 1 (-1) 0 0 (sourcePoint a b)) := by
+ obtain ⟨hk,hr,_,_,_,_,_,_,hv⟩ := source_same_u_mixed 1 (-1) 0 0 a b
+  (by decide) (by decide) (by decide) (by decide) va vb
+  (by decide) (by decide) (by decide) (by decide) hg (by decide)
+ exact ⟨hk,hr,hv⟩
+-- Equal branch retains precedence before zero-slope failure.
+example : route a a=.equalDouble22 := by decide
+-- Identity/inverse has precedence when both inverse and equal are true.
+def z : D2 (ZMod 5) := ⟨0,0,0,0,1,1⟩
+example : route z z=.inverse := by decide
+example : ¬IsCoprime (WeightedDoubling.curve (0:ZMod 5) 0 0 0)
+ (WeightedDoubling.curve (0:ZMod 5) 0 0 0).derivative := by
+ intro h
+ have hh := SameUGlobal.global_implies_local _ _ _ _ h 0
+ apply hh
+ norm_num [WeightedDoubling.value,WeightedDoubling.deriv]
+example : ¬((2:ZMod 2)≠0) := by decide
+end SameUCompositionControls

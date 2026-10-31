@@ -1,0 +1,5 @@
+Reviewer-only first boundary module failed: ZMod import absent, and rational zero multiplication was not definitionally reduced by rfl. Preserve first source/log/exit1. V2 adds explicit existing Mathlib.Data.ZMod.Basic import and uses norm_num [outputWith] for the same zero-weight assertion. All fixture values/claims unchanged. No producer edits.
+V2 additionally failed to infer Field (ZMod2) without explicit Fact prime2. V3 adds checked Fact (Nat.Prime2) instance, fixed mathematical fixture unchanged. Preserve V2 source/log/exit1.
+V3 still lacked the field-instance import. Inspected retained NatClassifier import: Mathlib.Algebra.Field.ZMod. V4 replaces Basic with that existing pinned module; retains checked prime2 Fact. No fixture or theorem claim changed.
+V4 reached mathematical witness goals but plain ring left characteristic2 signed coefficients unreduced. V5 uses ring_nf then norm_num for those unchanged witnesses; preserve V4 failure.
+V5 reduced to X=-X and 1+X=1-X. V6 adds an explicit coefficientwise ZMod2 polynomial identity and applies it. Mathematical fixture remains unchanged; preserve all prior failures.
