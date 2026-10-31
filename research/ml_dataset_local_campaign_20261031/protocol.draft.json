@@ -1,0 +1,427 @@
+{
+  "amendments": [],
+  "analysis_plan": {
+    "blinded": false,
+    "frozen_before_data": true,
+    "inputs": [
+      "runner receipt.json",
+      "config bytes",
+      "clean-build receipt"
+    ],
+    "outputs": [
+      "exact terminal classification and command-scoped elapsed nanoseconds"
+    ],
+    "script": null
+  },
+  "arms": [
+    {
+      "description": "The 32 untwisted cells, one fixed attempt per native shard, interleaved by mixed-radix index with the 32 twisted cells",
+      "id": "prime23-bsgs-untwisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 8,
+        "field_size_bits": 23,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 42,
+        "shard_count": 64,
+        "shard_indices": "0..63 inclusive",
+        "solver": "bsgs",
+        "trace_mib": 64,
+        "twists": false
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "The 32 twisted cells, one fixed attempt per native shard, interleaved by mixed-radix index with the 32 untwisted cells",
+      "id": "prime23-bsgs-twisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 8,
+        "field_size_bits": 23,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 42,
+        "shard_count": 64,
+        "shard_indices": "0..63 inclusive",
+        "solver": "bsgs",
+        "trace_mib": 64,
+        "twists": true
+      },
+      "role": "candidate"
+    }
+  ],
+  "authors": [
+    "ML dataset local campaign"
+  ],
+  "claims": [
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "fixed-population-accounting",
+      "text": "Exactly the 64 frozen plan indices have one retained local-XFS native generate attempt each, with terminal outcomes, including censored outcomes, independently classified."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "verified-custody",
+      "text": "Each completed shard that verifies has a native report, strict public and restricted export, restricted archive, and fresh S3 byte-for-byte readback receipt; failed stages remain counted."
+    },
+    {
+      "class": "out_of_scope",
+      "decided_by": [],
+      "id": "no-inference",
+      "text": "The campaign makes no comparative speed, solver-scaling, whole-worker-instruction-count or full requested-matrix claim."
+    }
+  ],
+  "controls": {
+    "aa": {
+      "comparison": null,
+      "not_applicable_reason": "Absolute software generation and custody of a fixed population; no timing-effect or method comparison.",
+      "present": false
+    },
+    "negative": {
+      "arm": null,
+      "not_applicable_reason": "Exact accounting of fixed native cells; no null-population inference.",
+      "null_population": null,
+      "present": false
+    },
+    "positive": {
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Native independent verify is the correctness gate for each retained solution; no detector sensitivity claim is made.",
+      "present": false
+    }
+  },
+  "created": "2026-10-31",
+  "decision_rule": {
+    "comparison_ids": [
+      "single-arm-receipt"
+    ],
+    "effect_size_measure": "Not applicable: no comparison",
+    "interval": "Not applicable: exact fixed-population accounting without inferential interval",
+    "multiple_comparison_correction": "none",
+    "statistic": "Exact counts of planned, attempted, verified, timed-out, failed, interrupted and S3-readback-complete cells",
+    "text": "Count all 64 planned indices, all attempts and all outcomes. A verified cell requires sealed native manifest and independent native verify. Custody requires immutable restricted archive PUT and fresh GET byte comparison. Report all failures, timeouts, interruptions and missing stages without replacement.",
+    "verdict_vocabulary": [
+      "verified_and_durable",
+      "verified_custody_pending",
+      "failed",
+      "timed_out",
+      "interrupted",
+      "invalid_receipt",
+      "unattempted"
+    ]
+  },
+  "execution": {
+    "backend": "local",
+    "checkpoint": {
+      "after_restore": {
+        "counted_units": "valid",
+        "wall_time": "invalid"
+      },
+      "grace_seconds": 5,
+      "interval_seconds": 1,
+      "policy": "application",
+      "restore_validation": "application_managed"
+    },
+    "measurement_class": "search",
+    "placement": {
+      "immediate_s3_custody": true,
+      "local_only": true,
+      "local_xfs_output": true,
+      "one_shard_at_a_time": true,
+      "single_worker": true
+    },
+    "queue": null,
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    },
+    "timeout_seconds": 90
+  },
+  "extensions": {
+    "ml_dataset_local_campaign": {
+      "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+      "cloud_dataset_cells": 0,
+      "max_cases_per_shard": 1,
+      "output_filesystem": "xfs",
+      "output_root": "/var/tmp/ml-dataset-local-campaign-20261031",
+      "planned_cells": 64,
+      "s3_content_addressed_prefix": "s3://setec-astronomy-artifacts/store/sha256",
+      "s3_logical_name_namespace": "restricted/ml-dataset-local-campaign-20261031",
+      "schema": "ml-dataset.local-campaign/v1",
+      "selected_shards": "0..63 inclusive",
+      "shard_count": 64,
+      "source_commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+      "store_binary_sha256": "0d965332c529967b066ddc99819f47cdd57baeccde59a37cbdee94455cbc17b3",
+      "twist_choices": [
+        false,
+        true
+      ]
+    }
+  },
+  "freeze": {
+    "commit": null,
+    "filed_before_affected_data": null,
+    "frozen_at": null,
+    "protocol_sha256": null,
+    "status": "draft"
+  },
+  "inadmissible": [
+    "replacing a seed or shard after failure",
+    "rerunning an existing attempted shard",
+    "dropping failed, timed-out or interrupted attempts",
+    "calling a recorded known-answer scalar an independently recovered ECDLP without native verify",
+    "using restricted witness material as public ML features",
+    "promoting missing S3 readback as durable",
+    "claiming storage or solver speedup from unmatched runs"
+  ],
+  "invalidation_rules": [
+    "Binary, plan or protocol file digest changes invalidate new admission.",
+    "Existing marker or live worker blocks a new attempt for that shard.",
+    "A missing or failed independent native verify prevents solution promotion.",
+    "A missing fresh S3 GET or hash mismatch prevents durability promotion."
+  ],
+  "literature": [
+    {
+      "claim": "Official protocol schema and freeze/checker contract",
+      "provenance": "internal",
+      "ref": "isogeny-labs/crypto-autoresearcher@f755085ff951888dbe64682c210c9ef7d167b40c:docs/experiment-protocol.md",
+      "verified_by": "pinned local tooling source"
+    },
+    {
+      "claim": "Native dataset scope, leakage boundaries and operations",
+      "provenance": "internal",
+      "ref": "docs/ml-dataset/DESIGN.md and docs/ml-dataset/OPERATIONS.md",
+      "verified_by": "current source package02"
+    },
+    {
+      "claim": "Two-cell local-XFS pilot outcomes and custody",
+      "provenance": "internal",
+      "ref": "research/ml_dataset_local_generation_20261031/RESULT-01.md",
+      "verified_by": "retained native receipts and S3 readback"
+    }
+  ],
+  "measurement": {
+    "clock": "monotonic",
+    "isolation_required": "none",
+    "order": "sequential",
+    "record": [
+      "source_commit",
+      "binary_sha256_before/after",
+      "plan/protocol SHA-256 before/after",
+      "shard index",
+      "argv",
+      "exit status",
+      "timeout classification",
+      "monotonic command interval",
+      "stdout/stderr hashes",
+      "native verify/report/export status",
+      "archive SHA-256 and bytes",
+      "S3 PUT and fresh GET receipt"
+    ],
+    "timed_primary_justification": null,
+    "warmups": 0
+  },
+  "metrics": {
+    "primary": [
+      {
+        "aggregation": "per_row",
+        "definition": "Frozen native generate shard completes, retains its manifest and passes dataset verify; failed or incomplete attempts remain recorded.",
+        "id": "sealed-cell-verified",
+        "kind": "exact",
+        "name": "Sealed cell verification",
+        "resolution": "1",
+        "source": "generated cell manifest plus crypto dataset verify receipt",
+        "uncertainty": "none_exact",
+        "unit": "Boolean"
+      }
+    ],
+    "secondary": [
+      {
+        "aggregation": "per_row",
+        "definition": "Instant duration around full dataset generate timeout process spawn through wait; includes parent and cell work, excludes runner receipt writes.",
+        "id": "observed-wall-ns",
+        "kind": "timed",
+        "name": "Observed wrapper command duration",
+        "resolution": "1 nanosecond clock representation",
+        "source": "runner receipt.observed_wall_nanoseconds",
+        "uncertainty": "none_exact",
+        "unit": "nanoseconds"
+      }
+    ]
+  },
+  "protocol_id": "ML-DATASET-PRIME23-BSGS-LOCAL-CAMPAIGN-20261031",
+  "question": "Do all 64 fixed prime n23 m2 BSGS native plan cells, including both twist choices, retain exact terminal outcomes and pass independent replay and restricted S3 custody where eligible?",
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "All 64 deterministic shard indices are processed in ascending order for resumability; no comparative timing effect is estimated.",
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Mechanical exact receipt and hash validation only.",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "The entire fixed 64-cell mixed-radix plan population is included; no outcome-dependent selection."
+    },
+    "seed_derivation": {
+      "method": "explicit_list",
+      "note": "Native plan seed42 fixed before data; curve seeds are deterministic indices0..7.",
+      "seeds": [
+        42
+      ]
+    }
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "graphs": [],
+    "report_dir": "reports",
+    "review_schema": "experiment.review/v1"
+  },
+  "repository": "crypto",
+  "sample_size": {
+    "instances": 64,
+    "power": {
+      "alpha": 0.05,
+      "correction": "none",
+      "method": "exact",
+      "note": "Full 64-cell selected population with no inferential effect or statistical power claim.",
+      "passes": true,
+      "tests_in_family": 1
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": 5720.0,
+      "fixed_seconds": 600.0,
+      "measured_on": "Conservative planning allowance for native generate only:64*80s plus600s fixed admission. Per-shard outer cap90s, which covers this per-instance planning figure including fixed allowance when averaged. Separate verify/report/export/archive/PUT/GET stages are bounded by the controller;12-hour overall admission ceiling is an operational cap, not a measured runtime estimate. The two local-XFS pilot observations are not extrapolated.",
+      "per_sample_seconds": 80.0,
+      "threads": 1
+    },
+    "replicates": 1,
+    "warmups": 0
+  },
+  "schema": "experiment.protocol/v1",
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "All 64 plan indices0..63, one new solver attempt each; retain all outcomes and no replacement."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "Each generate has 30s inner and90s outer cap; each auxiliary stage has a finite cap. Stop on failed custody and resume finalization only; campaign admission ceiling12 hours and at least4GiB XFS free before each new attempt."
+    }
+  ],
+  "study_dir": "research/ml_dataset_local_campaign_20261031",
+  "variable_ledger": {
+    "aa_not_applicable": "No comparative timing or advantage claim.",
+    "comparisons": [
+      {
+        "arms": [
+          "prime23-bsgs-untwisted",
+          "prime23-bsgs-twisted"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "single-arm-receipt",
+        "threshold": "All64 indices accounted; verified solutions require native replay; each attempted shard requires restricted S3 archive and readback for durable status."
+      }
+    ],
+    "crosses_map": false,
+    "factors": [
+      {
+        "how": "Clean source c41bec15 and binary SHA b8e0881e pinned; preflight and per-attempt hash checks.",
+        "name": "instrument",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Native plan crosses eight curve seeds, two generators, two keys and two twist choices at n23,m2,BSGS.",
+        "name": "curve-and-method",
+        "treatment": "crossed"
+      },
+      {
+        "how": "RAYON_NUM_THREADS=1 and one generate command at a time.",
+        "name": "threads",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Host conditions recorded as operational context; no timing-effect inference.",
+        "name": "host-and-contention",
+        "treatment": "measured"
+      },
+      {
+        "how": "30s inner worker and90s outer generate cap per shard.",
+        "name": "timeout",
+        "treatment": "fixed"
+      },
+      {
+        "how": "All64 frozen indices retained regardless of outcome.",
+        "name": "analyst-selection",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Local XFS under /var/tmp with free-space gate and per-shard restricted S3 archive/readback.",
+        "name": "output-filesystem",
+        "treatment": "fixed"
+      }
+    ],
+    "independent": []
+  },
+  "version": 1
+}
