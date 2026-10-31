@@ -4262,6 +4262,19 @@ fn verify_slot_identities(artifacts: &[crate::ml_dataset::types::Artifact]) -> R
     for a in artifacts {
         let live = a.path.strip_prefix("live/payloads/");
         let path = live.unwrap_or(&a.path);
+        if RAW_RETENTION_NAMES.iter().any(|(_, flat)| *flat == path) {
+            if a.role != "unregistered-partial-artifact"
+                || a.encoding != "native"
+                || artifacts
+                    .iter()
+                    .filter(|other| other.path == a.path)
+                    .count()
+                    != 1
+            {
+                return Err("invalid flat Koblitz partial artifact identity".into());
+            }
+            continue;
+        }
         if !path.starts_with("koblitz-m3-") && !a.role.starts_with("restricted-koblitz-m3-") {
             continue;
         }
@@ -6903,6 +6916,7 @@ struct CanonicalResultView<'a> {
     retired_hardware_instructions: Option<u64>,
 }
 struct CanonicalPipelineRun<'a> {
+    artifacts_taken: bool,
     pipeline: Option<BoundPipelineRun<'a>>,
     input_sha256: Option<String>,
     group: Option<TerminalEncoding>,
@@ -6922,6 +6936,7 @@ fn run_canonical_pipeline<'a>(
     persist: &mut impl FnMut(&[u8], &mut Budget) -> Result<(), String>,
 ) -> CanonicalPipelineRun<'a> {
     let mut out = CanonicalPipelineRun {
+        artifacts_taken: false,
         pipeline: None,
         input_sha256: None,
         group: None,
@@ -8063,6 +8078,9 @@ impl CanonicalPipelineRun<'_> {
         &self,
         mut visit: impl FnMut(RetainedArtifact<'_>) -> Result<(), E>,
     ) -> Result<(), E> {
+        if self.artifacts_taken {
+            return Ok(());
+        }
         let mut emit = |slot: (&'static str, &'static str, &'static str), bytes, publication| {
             visit(RetainedArtifact {
                 path: slot.0,
@@ -8721,6 +8739,337 @@ mod parent_retention_admission_tests {
             );
             assert_eq!(parent.budget.checking_work, 0);
             assert_eq!(parent.budget.stopped, Some(Stop::NativeFailure));
+        }
+    }
+}
+
+const RAW_RETENTION_NAMES: [(&str, &str); 5] = [
+    (
+        "partial/koblitz-m3-input.raw",
+        "partial-koblitz-m3-input.raw",
+    ),
+    (
+        "partial/koblitz-m3-native-event.raw",
+        "partial-koblitz-m3-native-event.raw",
+    ),
+    (
+        "partial/koblitz-m3-witness.raw",
+        "partial-koblitz-m3-witness.raw",
+    ),
+    (
+        "partial/koblitz-m3-group-replay.raw",
+        "partial-koblitz-m3-group-replay.raw",
+    ),
+    (
+        "partial/koblitz-m3-result.raw",
+        "partial-koblitz-m3-result.raw",
+    ),
+];
+fn parent_artifact_path(path: &'static str) -> &'static str {
+    RAW_RETENTION_NAMES
+        .iter()
+        .find(|(logical, _)| *logical == path)
+        .map_or(path, |(_, flat)| *flat)
+}
+struct OwnedRetainedArtifact {
+    logical_path: &'static str,
+    payload: crate::ml_dataset::types::ArtifactPayload,
+    publication: Option<crate::ml_dataset::capture::WitnessReceipt>,
+}
+struct ParentArtifacts {
+    items: Vec<OwnedRetainedArtifact>,
+    payload_bytes: u64,
+}
+#[derive(Debug)]
+struct OwnerQuote {
+    resources: RetentionQuote,
+    count: usize,
+    payload_bytes: u64,
+}
+fn quote_artifact_owners(run: &CanonicalPipelineRun<'_>) -> Result<OwnerQuote, Stop> {
+    if run.artifacts_taken {
+        return Err(Stop::Phase);
+    }
+    let mut out = OwnerQuote {
+        resources: RetentionQuote {
+            work: 512,
+            bytes: std::mem::size_of::<ParentArtifacts>() as u64,
+            trace: 0,
+        },
+        count: 0,
+        payload_bytes: 0,
+    };
+    run.visit_retained_artifacts(|a| {
+        out.count = out.count.checked_add(1).ok_or(Stop::Overflow)?;
+        if out.count > 10 {
+            return Err(Stop::Events);
+        }
+        let identity =
+            (parent_artifact_path(a.path).len() + a.role.len() + a.encoding.len()) as u64;
+        out.resources.bytes = out
+            .resources
+            .bytes
+            .checked_add(std::mem::size_of::<OwnedRetainedArtifact>() as u64)
+            .and_then(|n| n.checked_add(identity))
+            .ok_or(Stop::Overflow)?;
+        out.resources.work = out
+            .resources
+            .work
+            .checked_add(identity.checked_mul(8).ok_or(Stop::Overflow)?)
+            .and_then(|n| n.checked_add(512))
+            .ok_or(Stop::Overflow)?;
+        out.payload_bytes = out
+            .payload_bytes
+            .checked_add(a.bytes.len() as u64)
+            .ok_or(Stop::Overflow)?;
+        Ok(())
+    })?;
+    Ok(out)
+}
+fn retained_identity(value: &str) -> Result<String, Stop> {
+    let mut out = String::new();
+    out.try_reserve_exact(value.len())
+        .map_err(|_| Stop::Allocation)?;
+    out.push_str(value);
+    Ok(out)
+}
+/// Admit all owner metadata first. Allocate every identity before moving any
+/// existing data buffer, so allocation failure leaves the original run intact.
+/// This transfers ownership only; live/root storage needs separate admission.
+fn take_parent_artifacts(
+    run: &mut CanonicalPipelineRun<'_>,
+    parent: &mut ParentRetention<'_>,
+) -> RetentionCall<ParentArtifacts, Stop> {
+    let quote = match quote_artifact_owners(run) {
+        Ok(q) => q,
+        Err(e) => {
+            return RetentionCall {
+                value: None,
+                error: Some(e),
+                stop: Some(e),
+            }
+        }
+    };
+    parent.execute(quote.resources, || {
+        let mut items = Vec::new();
+        items
+            .try_reserve_exact(quote.count)
+            .map_err(|_| Stop::Allocation)?;
+        run.visit_retained_artifacts(|a| {
+            items.push(OwnedRetainedArtifact {
+                logical_path: a.path,
+                payload: crate::ml_dataset::types::ArtifactPayload {
+                    path: retained_identity(parent_artifact_path(a.path))?,
+                    role: retained_identity(a.role)?,
+                    encoding: retained_identity(a.encoding)?,
+                    bytes: Vec::new(),
+                },
+                publication: a.publication,
+            });
+            Ok::<(), Stop>(())
+        })?;
+        for item in &mut items {
+            let bytes = match item.logical_path {
+                "koblitz-m3-input.json" => {
+                    &mut run
+                        .pipeline
+                        .as_mut()
+                        .unwrap()
+                        .native
+                        .matrix
+                        .as_mut()
+                        .unwrap()
+                        .original_bytes
+                }
+                "koblitz-m3-events.jsonl" => {
+                    &mut run
+                        .pipeline
+                        .as_mut()
+                        .unwrap()
+                        .native
+                        .events
+                        .as_mut()
+                        .unwrap()
+                        .canonical
+                }
+                "partial/koblitz-m3-input.raw" => {
+                    &mut run
+                        .pipeline
+                        .as_mut()
+                        .unwrap()
+                        .native
+                        .persistence_failure
+                        .as_mut()
+                        .unwrap()
+                        .bytes
+                }
+                "partial/koblitz-m3-native-event.raw" => {
+                    &mut run
+                        .pipeline
+                        .as_mut()
+                        .unwrap()
+                        .native
+                        .events
+                        .as_mut()
+                        .unwrap()
+                        .pending_bytes
+                }
+                "pdp-witness.json" | "partial/koblitz-m3-witness.raw" => {
+                    &mut run
+                        .pipeline
+                        .as_mut()
+                        .unwrap()
+                        .publisher
+                        .as_mut()
+                        .unwrap()
+                        .encoding
+                        .as_mut()
+                        .unwrap()
+                        .bytes
+                }
+                "koblitz-m3-group-replay.json" | "partial/koblitz-m3-group-replay.raw" => {
+                    &mut run.group.as_mut().unwrap().bytes
+                }
+                "koblitz-m3-result.json" | "partial/koblitz-m3-result.raw" => {
+                    &mut run.result.as_mut().unwrap().bytes
+                }
+                _ => unreachable!("closed retained artifact registry"),
+            };
+            item.payload.bytes = std::mem::take(bytes);
+        }
+        run.artifacts_taken = true;
+        Ok(ParentArtifacts {
+            items,
+            payload_bytes: quote.payload_bytes,
+        })
+    })
+}
+#[cfg(test)]
+mod parent_artifact_owner_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native;
+    use crate::ml_dataset::capture::capture_limits;
+    #[test]
+    fn actual_buffers_move_once_with_publication_and_raw_identity_preserved() {
+        for scenario in 0..3 {
+            let binding = matrix_tests::binding();
+            let limits = capture_limits(16).unwrap();
+            let _sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+            let mut original = construction_tests::fixture();
+            if scenario == 1 {
+                original.target = original.signed[0];
+            }
+            let mut budget = construction_tests::budget();
+            let mut global = 0;
+            let mut run = run_canonical_pipeline(
+                &original,
+                &binding,
+                &limits,
+                &"8".repeat(64),
+                &"9".repeat(64),
+                native::Engine::F4Macaulay,
+                3,
+                &mut budget,
+                &mut global,
+                &mut |_, _| {
+                    if scenario == 2 {
+                        Err("selected input I/O failure".into())
+                    } else {
+                        Ok(())
+                    }
+                },
+            );
+            let mut before = Vec::new();
+            run.visit_retained_artifacts::<()>(|a| {
+                before.push((a.path, a.bytes.as_ptr(), a.bytes.len(), a.publication));
+                Ok(())
+            })
+            .unwrap();
+            let quote = quote_artifact_owners(&run).unwrap();
+            let original_stop = budget.stopped;
+            let trace = budget.trace_bytes;
+            let checking = budget.checking_work;
+            let bytes = budget.adapter_bytes;
+            let mut parent = ParentRetention::begin(&mut budget).unwrap();
+            let result = take_parent_artifacts(&mut run, &mut parent);
+            assert!(result.error.is_none() && result.stop.is_none());
+            let owned = result.value.unwrap();
+            assert_eq!(owned.items.len(), before.len());
+            assert_eq!(owned.payload_bytes, before.iter().map(|a| a.2 as u64).sum());
+            for (item, (logical, pointer, len, receipt)) in owned.items.iter().zip(before) {
+                assert_eq!(item.logical_path, logical);
+                assert_eq!(item.payload.bytes.as_ptr(), pointer);
+                assert_eq!(item.payload.bytes.len(), len);
+                assert_eq!(item.publication, receipt);
+                assert!(!item.payload.path.contains('/'));
+                if logical.starts_with("partial/") {
+                    assert!(item.payload.path.starts_with("partial-koblitz-m3-"));
+                    assert_eq!(item.payload.role, "unregistered-partial-artifact");
+                }
+            }
+            assert_eq!(parent.budget.checking_work, checking + quote.resources.work);
+            assert_eq!(parent.budget.adapter_bytes, bytes + quote.resources.bytes);
+            assert_eq!(parent.budget.trace_bytes, trace);
+            assert_eq!(parent.budget.stopped, original_stop);
+            assert!(run.artifacts_taken);
+            run.visit_retained_artifacts::<()>(|_| panic!("transferred bytes re-exposed"))
+                .unwrap();
+            assert_eq!(
+                take_parent_artifacts(&mut run, &mut parent).error,
+                Some(Stop::Phase)
+            );
+        }
+    }
+    #[test]
+    fn parent_admission_failure_leaves_all_producer_buffers_owned() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let _sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let original = construction_tests::fixture();
+        let mut budget = construction_tests::budget();
+        let mut global = 0;
+        let mut run = run_canonical_pipeline(
+            &original,
+            &binding,
+            &limits,
+            &"8".repeat(64),
+            &"9".repeat(64),
+            native::Engine::F4Macaulay,
+            3,
+            &mut budget,
+            &mut global,
+            &mut |_, _| Ok(()),
+        );
+        let before = run.result.as_ref().unwrap().bytes.as_ptr();
+        let len = run.result.as_ref().unwrap().bytes.len();
+        budget.memory_limit = budget.native.bytes + budget.adapter_bytes;
+        let mut parent = ParentRetention::begin(&mut budget).unwrap();
+        let result = take_parent_artifacts(&mut run, &mut parent);
+        assert!(result.value.is_none());
+        assert_eq!(result.stop, Some(Stop::Bytes));
+        assert!(!run.artifacts_taken);
+        assert_eq!(run.result.as_ref().unwrap().bytes.as_ptr(), before);
+        assert_eq!(run.result.as_ref().unwrap().bytes.len(), len);
+    }
+    #[test]
+    fn flat_partial_registry_rejects_canonical_promotion_and_duplicates() {
+        use crate::ml_dataset::types::Artifact;
+        for (_, path) in RAW_RETENTION_NAMES {
+            let a = Artifact {
+                path: path.into(),
+                role: "unregistered-partial-artifact".into(),
+                encoding: "native".into(),
+                bytes: 1,
+                sha256: "0".repeat(64),
+            };
+            verify_slot_identities(std::slice::from_ref(&a)).unwrap();
+            let mut forged = a.clone();
+            forged.role = KOBLITZ_SLOTS[0].1.into();
+            assert!(verify_slot_identities(&[forged]).is_err());
+            let mut forged = a.clone();
+            forged.encoding = "json".into();
+            assert!(verify_slot_identities(&[forged]).is_err());
+            assert!(verify_slot_identities(&[a.clone(), a]).is_err());
         }
     }
 }
