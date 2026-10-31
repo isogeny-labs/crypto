@@ -7,7 +7,7 @@ import json, glob, os, sys, math, statistics as st
 import numpy as np
 from scipy import stats
 ECB, MS = 3.51e7, 3.8e7
-START = {3: 13.90e6, 4: 14.30e6, 5: 13.97e6, 6: 14.31e6, 7: 14.74e6, 8: 14.73e6, 9: 15.56e6, 10: 16.43e6, 11: 17.61e6, 12: 18.5e6}   # median of the first-mode binaries on the contradictory one-line instance
+START = {3: 13.90e6, 4: 14.30e6, 5: 13.97e6, 6: 14.31e6, 7: 14.74e6, 8: 14.73e6, 9: 15.56e6, 10: 16.43e6, 11: 17.61e6, 12: 18.88e6, 13: 20.96e6}   # median of the first-mode binaries on the contradictory one-line instance
 def ir(p):
     for l in open(p):
         if "instructions retired" in l: return int(l.split()[0])

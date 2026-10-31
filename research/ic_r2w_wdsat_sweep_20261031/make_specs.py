@@ -26,7 +26,7 @@ for c in CELLS:
     dump(f'V3_{c}', spec(f'R2W {c} l3 viability', c, [3], [], targets=1, mt=3000, timeout=600))   # l=3 viability trial
     dump(f'W6_{c}', spec(f'R2W {c} l6', c, [6], []))
     dump(f'W7_{c}', spec(f'R2W {c} l7', c, [7], []))
-    for L in (9, 10, 11): dump(f'W{L}_{c}', spec(f'R2W {c} l{L} (extension)', c, [L], []))
+    for L in (9, 10, 11, 12, 13): dump(f'W{L}_{c}', spec(f'R2W {c} l{L} (extension)', c, [L], []))
     dump(f'W8_{c}', spec(f'R2W {c} l8 (extension beyond the pre-fixed grid)', c, [8], []))
 for c in CELLS:
     dump(f'W3_{c}', spec(f'R2W {c} wdsat l3 full', c, [3], []))            # l=3 full session (200000 trials)
