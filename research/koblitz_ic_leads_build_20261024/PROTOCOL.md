@@ -247,3 +247,24 @@ The satisfiable draws m = 4 (11, 5) 0 and 1 run under the same option as a sound
 - **Per cell.** A cell's restricted order is below the falsifier if at least 3 of its 4 draws have a ratio < 0.5. It reaches the payoff only if 3 of 4 are < 0.25.
 - **What a pass means.** Either outcome is a stage-level instrument result: a smaller peak echelon at degree 4. It is not an index-calculus cost change. It bears on C1 only through the memory a degree-5 run would need.
 - **m = 3.** These cells close L2 if all their draws stay ≥ 0.5.
+
+## Amendment 6 (2026-10-31, before any C1 measurement): draws 0 and 3 only
+
+The owner chose to run C1 on draws 0 and 3 only, within the remaining
+part of the $80 cap (about $24.50 already spent).
+
+- **Lifetime cap:** 8 h 45 min on `cpu3m-64-512` at $3.52/h, so at most about $31.
+- **Job:** `pod/job.sh` reads `DRAWS="0 3"` and `CONTROL=0`.
+- **Draws:** each draw keeps its 4 h timeout and 471 GB address-space cap.
+- **Control:** the satisfiable control is dropped for lack of budget.
+  Without it, a refutation can still be checked against the committed
+  degree-4 outcome. A saturation without refutation stays unconfirmed
+  until a control runs.
+- **Records:** each draw's record is fetched as soon as `queue.log`
+  reports it, so that losing the pod cannot lose a finished draw.
+- **Uploads:** the binary and draws file are the ones verified in
+  Amendment 4 (`9d72c7a4…`, `a6bf7f15…`).
+- **Account balance:** the pod is launched only when the RunPod balance
+  covers the whole lifetime, plus the other pods running on the account.
+  The previous pod was most likely deleted when the balance ran out.
+- **Reading:** outcomes are read as in §C1.
