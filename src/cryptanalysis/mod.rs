@@ -343,6 +343,7 @@ pub mod quasi_subfield;
 pub mod recursive_descent;
 pub mod research_bench;
 pub mod residual_walk;
+pub mod relation_yield_pruning;
 pub mod sat;
 pub mod sbox;
 pub mod secg_small_x;

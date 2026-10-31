@@ -24,6 +24,7 @@ listenerTemplate:
             memory: 256Mi
 template:
   spec:
+    serviceAccountName: arc-xmem-runner
     automountServiceAccountToken: false
     terminationGracePeriodSeconds: 110
     nodeSelector:
@@ -45,8 +46,8 @@ template:
           requests:
             cpu: "30"
             memory: 900Gi
-            ephemeral-storage: 20Gi
+            ephemeral-storage: 800Gi
           limits:
             cpu: "32"
             memory: 960Gi
-            ephemeral-storage: 100Gi
+            ephemeral-storage: 800Gi
