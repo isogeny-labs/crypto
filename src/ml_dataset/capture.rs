@@ -335,6 +335,8 @@ impl Write for LimitedBytes {
 pub enum TypedEventKind {
     #[serde(rename = "wide_prime_dynamic")]
     WidePrimeDynamic,
+    #[serde(rename = "koblitz_m3")]
+    KoblitzM3,
 }
 
 /// Reusable requested storage; the caller must debit its own ledger once.
@@ -344,6 +346,12 @@ pub struct TypedEventBuffer {
     limit: usize,
 }
 impl TypedEventBuffer {
+    /// Current encoded buffer length. Only a successful event_typed return
+    /// establishes acknowledgement; this accessor alone does not.
+    pub(super) fn encoded_len(&self) -> usize {
+        self.bytes.len()
+    }
+
     pub fn requested_bytes(event_cap: u64) -> Result<u64, CaptureError> {
         if !(512..=MAX_EVENT).contains(&event_cap) {
             return Err(CaptureError::LimitReached(CaptureStop::EventLimit));

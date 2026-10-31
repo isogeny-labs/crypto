@@ -24,6 +24,7 @@ pub(super) enum Stop {
     NativeFailure,
     Allocation,
     Serialization,
+    Events,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -3176,12 +3177,12 @@ impl<'a> BoundSignedPublisher<'a> {
 mod bound_signed_publisher_tests {
     use super::*;
     use crate::ml_dataset::capture::{capture_limits, CaptureEmitter};
-    struct SinkFixture {
-        dir: std::path::PathBuf,
+    pub(super) struct SinkFixture {
+        pub(super) dir: std::path::PathBuf,
         _guard: super::super::LiveSinkGuard,
     }
     impl SinkFixture {
-        fn new(binding: &crate::ml_dataset::capture::AttemptBinding) -> Self {
+        pub(super) fn new(binding: &crate::ml_dataset::capture::AttemptBinding) -> Self {
             let nonce = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
@@ -3334,5 +3335,195 @@ mod bound_signed_publisher_tests {
         assert!(publisher.receipt.is_none());
         assert_eq!(global, 0);
         assert!(!sink.dir.join("payloads/pdp-witness.json").exists());
+    }
+}
+const SIGNED_EVENT_CAP: u64 = 2048;
+#[derive(serde::Serialize)]
+struct SignedEventView<'a> {
+    phase: &'static str,
+    progress: &'a SignedPrefix,
+}
+pub(super) struct BoundSignedEvents<'a> {
+    binding: &'a crate::ml_dataset::capture::AttemptBinding,
+    limits: &'a crate::ml_dataset::capture::CaptureLimits,
+    buffer: crate::ml_dataset::capture::TypedEventBuffer,
+    acknowledged: u64,
+    encoded_bytes: u64,
+}
+impl<'a> BoundSignedEvents<'a> {
+    fn new(
+        binding: &'a crate::ml_dataset::capture::AttemptBinding,
+        limits: &'a crate::ml_dataset::capture::CaptureLimits,
+        budget: &mut Budget,
+    ) -> Result<Self, Stop> {
+        use crate::ml_dataset::capture::TypedEventBuffer;
+        let bytes =
+            TypedEventBuffer::requested_bytes(SIGNED_EVENT_CAP).map_err(|_| Stop::InvalidLimits)?;
+        budget.reserve_bytes(bytes, Instant::now())?;
+        let buffer =
+            TypedEventBuffer::try_new(SIGNED_EVENT_CAP, bytes).map_err(|_| Stop::Allocation)?;
+        Ok(Self {
+            binding,
+            limits,
+            buffer,
+            acknowledged: 0,
+            encoded_bytes: 0,
+        })
+    }
+    fn emit(
+        &mut self,
+        event: &SignedPrefix,
+        budget: &mut Budget,
+        global: &mut usize,
+    ) -> Result<(), Stop> {
+        if *global >= 4096 {
+            return budget.fail(Stop::Events);
+        }
+        // Identity hashing plus bounded two-pass event encoding. Work/trace
+        // reservations are explicit model bounds; actual encoded bytes below
+        // are recorded only after the emitter acknowledges the event.
+        budget.reserve_checking(64 * 1024 + 8 * SIGNED_EVENT_CAP, 4096, Instant::now())?;
+        budget.reserve_trace(SIGNED_EVENT_CAP, Instant::now())?;
+        let identity = super::LIVE_SINK.with(|slot| match slot.borrow().as_ref() {
+            Some(super::EventSink::Bound(sink)) => {
+                sink.verify_attempt_limits(self.binding, self.limits)
+            }
+            _ => Err("Koblitz typed event requires admitted bound sink".into()),
+        });
+        if identity.is_err() {
+            return budget.fail(Stop::InvalidLimits);
+        }
+        let view = SignedEventView {
+            phase: "signed-domain",
+            progress: event,
+        };
+        if super::live_typed_event(
+            crate::ml_dataset::capture::TypedEventKind::KoblitzM3,
+            &view,
+            &mut self.buffer,
+        )
+        .is_err()
+        {
+            return budget.fail(Stop::Observer);
+        }
+        *global += 1;
+        self.acknowledged += 1;
+        self.encoded_bytes += self.buffer.encoded_len() as u64;
+        // The call acknowledged; a subsequent deadline remains sticky but must
+        // not make the producer misclassify this event as unacknowledged.
+        let _ = budget.check(Instant::now());
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod signed_typed_event_tests {
+    use super::*;
+    use crate::ml_dataset::capture::capture_limits;
+    #[test]
+    fn real_signed_events_and_first_witness_share_one_acknowledgement_counter() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let mut original = construction_tests::fixture();
+        original.target = original.signed[0];
+        let mut budget = construction_tests::budget();
+        let mut events = BoundSignedEvents::new(&binding, &limits, &mut budget).unwrap();
+        let mut publisher = BoundSignedPublisher::new(&binding, &limits, &budget);
+        budget.begin_native(false, Instant::now()).unwrap();
+        budget.finish_native(Instant::now()).unwrap();
+        let prepared = prepare_signed(&original, &mut budget, false).unwrap();
+        let global = std::cell::RefCell::new(0usize);
+        let result = enumerate_prepared_signed(
+            prepared,
+            &mut |event, b| events.emit(event, b, &mut global.borrow_mut()),
+            &mut |w, b| publisher.publish(w, b, &mut global.borrow_mut()),
+        );
+        assert!(result.complete, "{:?}", result.stop);
+        assert!(result.first_receipt.is_some());
+        assert_eq!(*global.borrow(), 193);
+        assert_eq!(events.acknowledged, 192);
+        let stream = std::fs::read_to_string(sink.dir.join("events.jsonl")).unwrap();
+        let rows = stream
+            .lines()
+            .map(|l| serde_json::from_str::<serde_json::Value>(l).unwrap())
+            .collect::<Vec<_>>();
+        assert_eq!(rows.len(), 193);
+        let mut encoded = 0usize;
+        let mut signed = Vec::new();
+        for (i, (row, line)) in rows.iter().zip(stream.lines()).enumerate() {
+            assert_eq!(row["sequence"], (i + 1) as u64);
+            if row["event"]["kind"] == "koblitz_m3" {
+                assert_eq!(row["event"]["payload"]["phase"], "signed-domain");
+                signed.push(
+                    serde_json::from_value::<SignedPrefix>(
+                        row["event"]["payload"]["progress"].clone(),
+                    )
+                    .unwrap(),
+                );
+                encoded += line.len() + 1;
+            } else {
+                assert_eq!(row["event"]["kind"], "capture_payload_committed");
+            }
+        }
+        assert_eq!(signed, result.acknowledged);
+        assert_eq!(events.encoded_bytes, encoded as u64);
+        assert!(
+            verify_signed_prefix(&original, &signed, None)
+                .unwrap()
+                .all_tuples_acknowledged
+        );
+    }
+    #[test]
+    fn signed_event_global_cap_refuses_before_io_or_new_work() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let mut b = construction_tests::budget();
+        let mut events = BoundSignedEvents::new(&binding, &limits, &mut b).unwrap();
+        let event = SignedPrefix {
+            sequence: 0,
+            tuple: 0,
+            indices: [0; 3],
+            summand: 0,
+            prefix: None,
+            matches_target: false,
+        };
+        let mut global = 4096;
+        let before = b.checking_work;
+        assert_eq!(events.emit(&event, &mut b, &mut global), Err(Stop::Events));
+        assert_eq!(b.checking_work, before);
+        assert_eq!(global, 4096);
+        assert_eq!(events.acknowledged, 0);
+        assert!(std::fs::read(sink.dir.join("events.jsonl"))
+            .unwrap()
+            .is_empty());
+    }
+    #[test]
+    fn signed_events_reject_wrong_bound_sink_without_acknowledgement() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let mut wrong = binding.clone();
+        wrong.cell_index += 1;
+        let mut b = construction_tests::budget();
+        let mut events = BoundSignedEvents::new(&wrong, &limits, &mut b).unwrap();
+        let event = SignedPrefix {
+            sequence: 0,
+            tuple: 0,
+            indices: [0; 3],
+            summand: 0,
+            prefix: None,
+            matches_target: false,
+        };
+        let mut global = 0;
+        assert_eq!(
+            events.emit(&event, &mut b, &mut global),
+            Err(Stop::InvalidLimits)
+        );
+        assert_eq!(global, 0);
+        assert!(std::fs::read(sink.dir.join("events.jsonl"))
+            .unwrap()
+            .is_empty());
     }
 }
