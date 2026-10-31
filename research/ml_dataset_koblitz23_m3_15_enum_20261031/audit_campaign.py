@@ -115,6 +115,7 @@ def main():
         rows.append({"index": index, "method": method, "m": arity, "twist": twist,
             "generator_index": generator, "key_index": key, "native_status": status["native_status"],
             "archive_sha256": custody["archive_sha256"],
+            "archive_bytes": custody["archive_bytes"],
             "manifest_sha256": digest(manifest_raw), "public_sha256": digest(public_raw),
             "public_core_sha256": public_core_sha,
             "s3_uri": custody["s3_uri"]})
@@ -139,6 +140,7 @@ def main():
         "export_sha256": receipt["export_sha256"], "planned": 26, "retained": 26,
         "native_status_counts": dict(sorted(statuses.items())),
         "independent_ecdlp_solves": 0, "artifacts_rehashed": artifacts_checked,
+        "archive_bytes_total": sum(row["archive_bytes"] for row in rows),
         "twist_counts": {"untwisted": 13, "twisted": 13}, "rows": rows}
     target = HERE / "AUDIT.json"
     encoded = (json.dumps(result, sort_keys=True, indent=2) + "\n").encode()

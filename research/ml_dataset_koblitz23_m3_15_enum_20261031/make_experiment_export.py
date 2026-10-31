@@ -53,7 +53,7 @@ def main():
     ap.add_argument("--tooling", type=Path, default=Path("/home/ec2-user/ml-dataset-work-20261028/protocol-tooling-f755085ff951/tools/experiment_protocol.py"))
     args = ap.parse_args()
     protocol, plan = read(HERE / "protocol.json"), read(HERE / "plan.json")
-    assert protocol["freeze"]["status"] == "frozen" and len(protocol["arms"]) == 4
+    assert protocol["freeze"]["status"] == "frozen" and len(protocol["arms"]) == 2
     assert plan["protocol_sha256"] == digest(HERE / "protocol.json")
     loader = importlib.util.spec_from_file_location("experiment_protocol_pinned", args.tooling)
     tooling = importlib.util.module_from_spec(loader)
@@ -108,7 +108,7 @@ def main():
         else:
             export_status, verification = "infra_error", "no_claim"
         row = {"run_id": f"shard-{i:02d}", "arm": arm,
-               "instance_id": f"m{spec['m']:02d}",
+               "instance_id": str(spec["m"] - 3),
                "seed": 2026103106, "replicate": 0, "warmup": False,
                "status": export_status, "verification": verification,
                "sealed-cell-verified": int(bool(status["sealed_cell_verified"])),
@@ -132,7 +132,8 @@ def main():
         rows_path.write_bytes(row_bytes)
     export = tooling.from_rows(rows_path, protocol, "protocol.json", "koblitz23-m3-15-enum-26-20261031", {})
     export["created"] = datetime.fromtimestamp(max(finished_ns) / 1_000_000_000, timezone.utc).isoformat()
-    export["producer"] = {"runtime": "codex_cli", "model": None, "session": "T-1128", "role": "executor"}
+    export["producer"] = {"runtime": "codex_cli", "model": None,
+                          "session": "koblitz23-m3-15-enum-20261031", "role": "executor"}
     export["source"] = {"repo": protocol["repository"], "commit": protocol["arms"][0]["instrument"]["commit"], "dirty": False}
     export["backend"] = "local"
     export["arms"] = [{"id": a["id"], "role": a["role"],
