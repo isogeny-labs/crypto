@@ -72,3 +72,21 @@ none qualifies as a whole-worker instruction-to-solve training label.
 ```sh
 python3 research/ml_dataset_inventory_20261031/build_inventory_v4.py
 ```
+
+# Version 5 update
+
+`build_inventory_v5.py` appends the four-cell ordinary-binary n=47, m=4
+F6/enumeration pilot to the immutable version 4 inventory. It binds the frozen
+protocol and plan, four custody checkpoints, independent 128-artifact audit,
+official export and checker receipt, two-object fresh S3 readback sample, and
+phase cost observations. `inventory-v5.json` reports **172 retained receipts**,
+**93 independent scalar solves**, seven checker-receipted official exports
+with 99 completed and nine censored rows, and twelve retained F6 pair domains.
+The new pilot contributes two verified F6 pair domains, one verified bounded
+enumeration trace, and one censored twisted enumeration timeout. Its scoped
+PMU values remain ineligible as complete instruction-to-solve labels.
+
+```sh
+python3 tools/artifacts/artifacts.py pull research/ml_dataset_binary_methods_20261031
+python3 research/ml_dataset_inventory_20261031/build_inventory_v5.py
+```
