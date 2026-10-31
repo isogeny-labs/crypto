@@ -35,6 +35,7 @@ def t(s):return 'text('+json.dumps(s)+')'
 rows=[]
 for row in r['runs']:
  detail=('exit '+str(row['native_exit'])+'; '+str(row['error_count'])+' error lines') if row['kind']=='Singular' else 'compile '+str(row['compile_exit'])+'; audit '+str(row['audit_exit'])
+ if 'interruption' in row:detail='interrupted; intermediate custody invalid'
  rows += [row['attempt'],row['status'],detail]
 source='''#set page(paper: "a4", margin: 15mm)
 #set text(size: 10pt)

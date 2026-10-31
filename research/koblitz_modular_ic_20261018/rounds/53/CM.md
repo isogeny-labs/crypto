@@ -114,7 +114,8 @@ retained. `PACKET53.sing` is frozen to evaluate all5target equations in the
 complete rank64source algebra;its outcome is pending.
 
 `lean/Transfer53.lean` supplies the determinant-change and composed unit
-implications. Compilation/audit and native semantic binding are recorded
+implications. All3declarations compile/audit with zero failing/trusted in transfer-lean53-02;
+first audit launch failure is preserved. Native semantic binding is recorded
 separately. No actual completed local-ring, target QR/F2 map or subgroup
 action is asserted here before its respective check.
 
