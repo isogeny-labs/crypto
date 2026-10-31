@@ -291,7 +291,7 @@ pub fn irreducible_poly(p: u64, d: usize, rng: &mut SplitMix64) -> Poly {
     }
     let x: Poly = vec![0, 1];
     let primes: Vec<usize> = (2..=d)
-        .filter(|r| d.is_multiple_of(r) && (2..*r).all(|s| r % s != 0))
+        .filter(|r| d.is_multiple_of(*r) && (2..*r).all(|s| r % s != 0))
         .collect();
     loop {
         let mut f: Poly = (0..d).map(|_| rng.below(p)).collect();
@@ -1737,8 +1737,7 @@ impl Smith {
             }
             st.divisors_used = it + 1;
             if it >= 8 && it % 4 == 0 && rows.len() >= 14 {
-                mat = rows.clone();
-                let ns = nullspace(&mat, 15, p);
+                let ns = nullspace(&rows, 15, p);
                 st.nullity = ns.len();
                 if ns.len() == 1 {
                     break;
