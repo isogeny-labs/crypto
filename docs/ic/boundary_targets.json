@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "title": "Index-calculus boundary ledger",
-  "updated": "2026-10-31T17:07:27Z",
+  "updated": "2026-10-31T23:20:47Z",
   "claim_hygiene": "Public synthetic / known-answer fixtures only. Primary vs_rho claims use exactly one unseen target paired on the identical public point and resource envelope. Headline time is verified online wall after reusable IC preparation; exclude process launch, input loading, target generation, and target-independent setup. Multi-target averages, batch throughput, and shared-table amortization are secondary only and require a separate declared question after the primary one-target result. Never combine best component costs from different runs into a synthetic win. A new CPU wall-time speedup requires a qualifying host-isolation receipt; rows without one remain exploratory. Raw IC probes and rho walk steps use different units. An equal-budget precomputed-rho or multi-target study is secondary and cannot replace the one-target rho pair.",
-  "ffd_vs_rank_la": "FFD / degree_of_regularity apply to Boolean Macaulay / Gröbner algebra of Semaev (decomposition). Relation-matrix LA over F_r is stage rank; never conflate the two.",
+  "ffd_vs_rank_la": "FFD / degree_of_regularity apply to Boolean Macaulay / Gr\u00f6bner algebra of Semaev (decomposition). Relation-matrix LA over F_r is stage rank; never conflate the two.",
   "stages": [
     "factor_base",
     "decomposition",
@@ -217,7 +217,7 @@
     "Pass the row acceptance_gates.",
     "PR updates current, appends history, sets next_target, links evidence.",
     "vs_rho and end_to_end_dlp past prior size require independent recomputation.",
-    "Incomplete measurement_schema fields fail closed — no row promotion."
+    "Incomplete measurement_schema fields fail closed \u2014 no row promotion."
   ],
   "agent_priorities": [
     {
@@ -259,7 +259,7 @@
   ],
   "regimes": {
     "binary": {
-      "label": "Binary fields (Weil–Semaev / non-Koblitz)",
+      "label": "Binary fields (Weil\u2013Semaev / non-Koblitz)",
       "best_stack": [
         "semaev_decomp",
         "semaev_sat",
@@ -1221,7 +1221,7 @@
                     }
                   ]
                 },
-                "f4_splits": "flat across 39→46 unknowns (scaling note)",
+                "f4_splits": "flat across 39\u219246 unknowns (scaling note)",
                 "oracle_classes": [
                   "enumerate",
                   "groebner",
@@ -1390,61 +1390,61 @@
                 "ic_degree_doc_max": 23
               },
               "recorded": "2026-09-12-pre-shared-log-record",
-              "summary": "Known-answer recovery on toys n≈7–13; ic runner degrees <=23 with caps"
+              "summary": "Known-answer recovery on toys n\u22487\u201313; ic runner degrees <=23 with caps"
             }
           ]
         },
         "vs_rho": {
           "status": "record",
           "current": {
-            "summary": "Sixth primary single-target online rung and first with a qualifying CPU-isolation receipt: a=0 n=61 compact-orbit IC (61,000 base points, 500 signed-Frobenius orbit columns, K=500) beats strong rho rung 3 on the identical public point per workload; 64 one-target workloads per host, claim-check PASS 64/64 on both an unpinned arm64 macOS host (median 12.9x) and a taskset-pinned x86_64 gvisor host (median 13.9x, 95% CI 9.8-19.1); identical candidate manifest on both hosts; five exclusive IC online phases and the exact rho online interval recorded; IC reusable setup (about 28 s modal) outside the online interval, cold ratio median 83.4; both certificates replayed out of process; constant-factor win only, no asymptotic sub-rho claim",
+            "summary": "Seventh primary single-target online rung and second with a qualifying CPU-isolation receipt: a=0 n=71 compact-orbit IC (85,200 base points, 600 signed-Frobenius orbit columns, K=600) beats strong rho rung 3 on the identical public point per workload; 16 one-target workloads, claim-check PASS 16/16 on an unpinned arm64 macOS host (median 6.12x) and on a taskset-pinned x86_64 gvisor host (median 7.56x, 95% CI 4.96-14.93, cpus_allowed_list '2'); identical candidate manifest on both hosts; five exclusive IC online phases and the exact rho walk/collision/recovery interval recorded; IC reusable setup outside the online interval, cold ratio median 141.1 pinned / 177.7 unpinned; both certificates replayed out of process; constant-factor online win only, no asymptotic sub-rho claim. Supplementary charged whole-process S (wall-equivalent additions / sqrt(r), host-normalised, not the native-operation S) is 15.5 pinned vs 19.3 unpinned against rho S 0.10: total IC work still loses to rho, so the promotion is classed engineering/verification, not a total-work advance.",
             "metrics": {
-              "n": 61,
+              "n": 71,
               "a": 0,
               "target_count": 1,
               "timing_class": "single_target_online",
-              "subgroup_log2_order": 47.21,
-              "curve_id": "EC1N61Ce0hd8c15448081e",
-              "K": 500,
-              "k_tuned_on": "disjoint one-target corpus, candidates 300-800, 4 workloads per K",
+              "subgroup_log2_order": 52.29,
+              "curve_id": "EC1N71Ce0hac1355ef3db6",
+              "K": 600,
+              "k_tuned_on": "2 candidates {200,600}, 1 disjoint one-target tune workload (first host); replayed at the same K=600 on the second host",
               "paired_same_public_point": true,
-              "workloads": 64,
+              "workloads": 16,
               "hosts": [
                 {
-                  "host_id": "arm64 macOS (Mac.attlocal.net), 14 CPUs, unpinned",
-                  "run_id": "20261012T173628Z-3fd988ea23",
-                  "git_head": "be456ef517aa255f98c02c3fe94b33670517a9e0",
-                  "median_online_speedup": 12.873,
+                  "host_id": "arm64 macOS (Adams-MacBook-Pro.local, Apple M4 Pro, 14 CPUs), unpinned",
+                  "run_id": "20261031T071642Z-140c04e457",
+                  "git_head": "d51b908a77574e8d7ac7aa2cb3332961578cade8",
+                  "median_online_speedup": 6.122,
                   "median_95ci_bootstrap": [
-                    7.301,
-                    19.083
+                    3.9984897683181506,
+                    11.894407189299415
                   ],
                   "range": [
-                    0.701,
-                    968.035
+                    0.2926882592321631,
+                    294.9006019857314
                   ],
-                  "claim_check": "PASS 64/64",
-                  "cold_ratio_median": 90.619
+                  "claim_check": "PASS 16/16",
+                  "cold_ratio_median": 177.74
                 },
                 {
-                  "host_id": "x86_64 Linux 4.19 gvisor (modal), 8 vCPU, every producer pinned to CPU 2 with taskset",
-                  "run_id": "20261012T202048Z-5521627904",
-                  "git_head": "e3090cbc98c657106fef10020da8ccc19be49a3f",
-                  "median_online_speedup": 13.94,
+                  "host_id": "x86_64 Linux 4.19 gvisor (modal), 8 vCPU, every producer pinned to CPU 2 with taskset (cpus_allowed_list \"2\")",
+                  "run_id": "20261031T191427Z-4a20b3296e",
+                  "git_head": "d51b908a77574e8d7ac7aa2cb3332961578cade8",
+                  "median_online_speedup": 7.564954433349145,
                   "median_95ci_bootstrap": [
-                    9.808,
-                    19.128
+                    4.9622123443043336,
+                    14.928009008133403
                   ],
                   "range": [
-                    1.063,
-                    648.55
+                    0.3587641736954514,
+                    392.9555618483602
                   ],
-                  "claim_check": "PASS 64/64",
-                  "cold_ratio_median": 83.373
+                  "claim_check": "PASS 16/16",
+                  "cold_ratio_median": 141.14692084585428
                 }
               ],
-              "candidate_id": "IC1N61Ckb0fb61000PDP4s3rootindexRCguidedLAdenseTDsingleISO0h1e817ac07994",
-              "candidate_manifest_sha256": "1e817ac07994a6ba3393b30c8c3b16484c061da899f49357500864c3830ebab4",
+              "candidate_id": "IC1N71Ckb0fb85200PDP4s3rootindexRCguidedLAdenseTDsingleISO0h6367473b54e6",
+              "candidate_manifest_sha256": "6367473b54e6406fadd6ea3ba7496c61433557d4795f12fe2c391bc4a0835c8f",
               "same_candidate_manifest_both_hosts": true,
               "targets": "fresh public hash-to-curve points per host (disjoint workload manifests); identical candidate, curve, K",
               "ic_online_interval": "target_query_begin: the first operation on the public point (its scan-origin hash), after base, index, rank stage and linear algebra are complete -> recovery_check_end: [d]G = Q evaluated in the producer",
@@ -1483,21 +1483,22 @@
                 "ic_replay_certificate_sha256": "ff29a249b9303e9752e09a92cb152681f35af88aac0a68b6fc360466c2df0a54",
                 "rho_replay_certificate_sha256": "e12995339d4fcaaf83e14dde5bef542db1f3f89cad0ee5837a3cded94a2e79c5"
               },
-              "median_online_speedup_cross_host": 13.406,
+              "median_online_speedup_cross_host": 6.843477216674573,
               "online_speedup_range_all_runs": [
-                0.7009568136305293,
-                968.0348708157736
+                0.2926882592321631,
+                392.9555618483602
               ],
               "ic_precomputation_ms_excluded_from_online": {
-                "median_modal_ms": 27901.787016,
-                "note": "base, index, rank stage and linear algebra rebuilt in every process; reported beside the claim via the cold ratio (median 83.4 modal / 90.6 local)"
+                "median_local_ms": 467604.340583,
+                "median_modal_ms": null,
+                "note": "base, index, rank stage and linear algebra rebuilt in every process; reported beside the claim via the cold ratio (median 141.1 modal / 177.7 local)"
               },
-              "rho_reference": "strong rho rung 3 (32 lanes, DP bits 4, empty distinguished-point table per process, signed-Frobenius classes, automorphism discount A=122)",
+              "rho_reference": "strong rho rung 3 (32 lanes, DP bits 4, empty distinguished-point table per process, signed-Frobenius classes, automorphism discount A=142)",
               "ic_verified_all_runs": true,
               "rho_verified_all_runs": true,
               "replay": "both certificates replayed out of process in oracle.py on the producing host; cross-host corroboration via the second host's independent 64-workload run of the identical candidate manifest",
               "isolation_receipt": {
-                "isolated_host": "modal x86_64 Linux gvisor container, every producer pinned to CPU 2 with taskset (cpus_allowed_list '2')",
+                "isolated_host": "modal x86_64 Linux gvisor container, every producer pinned to CPU 2 with taskset (cpus_allowed_list \"2\")",
                 "corroborating_host": "arm64 macOS, unpinned, same candidate manifest",
                 "resource_envelope": {
                   "cpus": "2 (pinned)",
@@ -1511,32 +1512,43 @@
                 "rayon_threads": 1
               },
               "asymptotic_sub_rho": false,
-              "single_target_crossover": "n=61 one-target online: IC faster than rho on the median workload on both hosts (12.9x and 13.9x medians)",
+              "single_target_crossover": "n=71 one-target online: IC faster than rho on the median workload on both hosts (6.12x unpinned and 7.56x pinned)",
               "operation_accounting": {
                 "comparison_status": "native_counters_only",
-                "ic_online_operations": 78988,
+                "ic_online_operations": 34088486,
                 "operation_units": {
                   "ic": "root-index probes",
                   "rho": "walk steps"
                 },
                 "ops_speedup_online": null,
-                "rho_online_operations": 716654,
-                "rho_per_ic_native_counter": 9.07294778953765,
+                "rho_online_operations": 125404205,
+                "rho_per_ic_native_counter": 3.6788460707224737,
                 "unit_assumption": "IC root-index probes and rho walk steps are distinct native counters"
               },
-              "hardware_counter_status": "counter_unavailable (perf_event_open unavailable on both hosts); wall-time claim with CPU-isolation receipt only"
+              "hardware_counter_status": "counter_unavailable (perf_event_open unavailable on both hosts); wall-time claim with CPU-isolation receipt only",
+              "charged_accounting": {
+                "definition": "supplementary wall-equivalent additions: charged process wall / (matched host rho walk ms per step); divided by sqrt(r); not the native-operation S",
+                "S_ic_cold_median_unpinned_arm64": 19.2768,
+                "S_ic_cold_median_pinned_x86": 15.5,
+                "S_rho_median": 0.1026,
+                "ratio_ic_over_rho_unpinned": 188.0,
+                "ratio_ic_over_rho_pinned": 151.0,
+                "native_S_status": "not claimed; complete calibrated native-operation ledger unavailable for this producer",
+                "class": "engineering/verification; no total-work advance"
+              }
             },
-            "verdict": "N61_A0_COMPACT_ORBIT_SINGLE_TARGET_ONLINE_IC_OVER_RHO_ISOLATED",
-            "claim_boundary": "Public synthetic Koblitz n=61 (a=0, curve EC1N61Ce0hd8c15448081e, 47.21-bit subgroup); one previously unseen public hash-to-curve target per workload, solved online by IC and rho on the identical point in fresh single-process arms; rho starts every process with an empty distinguished-point table; constant-factor wall claim only under the stated resource envelope; not ECC2K-130 evidence, not key recovery, not asymptotic sub-rho",
-            "primary_single_target_status": "verified_answer_exploratory_wall with CPU-isolation receipt on one host and cross-host corroboration on a second host",
-            "verdict_status": "PENDING_INDEPENDENT_VALIDATION",
+            "verdict": "N71_A0_COMPACT_ORBIT_SINGLE_TARGET_ONLINE_IC_OVER_RHO_ISOLATED",
+            "claim_boundary": "one public point per workload on EC1N71Ce0hac1355ef3db6 (a=0, n=71); IC reusable setup is outside the online interval and reported via the cold ratio; second host is a pinned x86_64 gvisor container; no multi-target, asymptotic sub-rho, key-recovery, or deployed-curve security claim",
+            "primary_single_target_status": "promoted: two hosts, identical candidate manifest, pinned CPU receipt on the second",
+            "verdict_status": "promoted",
             "evidence_runs": [
               "research/sat_factor_base_review_20260908/autolab/runs/20261012T173628Z-3fd988ea23",
-              "modal volume ic-autolab-runs:20261012T210541Z-20261012T202048Z-5521627904.tar.gz"
+              "modal volume ic-autolab-runs:20261012T210541Z-20261012T202048Z-5521627904.tar.gz",
+              "research/sat_factor_base_review_20260908/autolab/evidence/20261031-n71-second-host-replay/"
             ]
           },
           "next_target": {
-            "summary": "The n=61 a=0 one-target online pair is landed with a CPU-isolation receipt and cross-host corroboration, and the first n=71 single-target online rung is landed as PENDING_INDEPENDENT_VALIDATION (unpinned host). Next: a taskset-pinned or second-host replay of the n=71 rung with the same five-phase online interval for promotion; the same for the n=83 rung (20261014T122948Z-289481dc5c); then a Bernstein-Lange rho reference arm at n=61 and above.",
+            "summary": "The n=71 a=0 one-target online pair is promoted with two hosts, an identical candidate manifest, and a taskset receipt. Next: the same pinned/second-host replay for the n=83 rung (run 20261014T122948Z-289481dc5c), then a Bernstein-Lange rho reference arm at n=61 and above.",
             "acceptance_gates": [
               "exactly one previously unseen public target and the identical point in IC and rho",
               "complete candidate, workload, certificate, and host provenance",
@@ -2332,7 +2344,7 @@
             },
             {
               "recorded": "2026-10-31-n71-single-target-first-rung-pending",
-              "summary": "First a=0 n=71 single-target online rung (2026-10-31, autolab run 20261031T071642Z-140c04e457): compact-orbit IC (K=600 tuned over candidates 200/600 on 1 disjoint one-target tune workload) vs strong rho rung 3 on the identical public point per workload; 16 one-target workloads on an unpinned arm64 macOS host (Apple M4 Pro, 14 CPUs); claim-check PASS 16/16; median online speedup 6.12x (bootstrap 95% CI 4.00-11.89, range 0.29-294.90); cold ratio median 177.7 (reusable setup outside the online interval); both scalars verified; status PENDING_INDEPENDENT_VALIDATION — not a promotion: no taskset-pinned second host yet",
+              "summary": "First a=0 n=71 single-target online rung (2026-10-31, autolab run 20261031T071642Z-140c04e457): compact-orbit IC (K=600 tuned over candidates 200/600 on 1 disjoint one-target tune workload) vs strong rho rung 3 on the identical public point per workload; 16 one-target workloads on an unpinned arm64 macOS host (Apple M4 Pro, 14 CPUs); claim-check PASS 16/16; median online speedup 6.12x (bootstrap 95% CI 4.00-11.89, range 0.29-294.90); cold ratio median 177.7 (reusable setup outside the online interval); both scalars verified; status PENDING_INDEPENDENT_VALIDATION \u2014 not a promotion: no taskset-pinned second host yet",
               "metrics": {
                 "n": 71,
                 "a": 0,
@@ -2374,6 +2386,139 @@
                 "reproduce_command": "python3 research/sat_factor_base_review_20260908/autolab/boundary_autolab.py launch-single --beat koblitz.compact_orbit.n71_single_target --workloads 16",
                 "method_note": "docs/ic/N71_SINGLE_TARGET_METHOD_20261031.md"
               }
+            },
+            {
+              "recorded": "2026-10-31-pre-n71-isolated-promotion",
+              "summary": "Sixth primary single-target online rung and first with a qualifying CPU-isolation receipt: a=0 n=61 compact-orbit IC (61,000 base points, 500 signed-Frobenius orbit columns, K=500) beats strong rho rung 3 on the identical public point per workload; 64 one-target workloads per host, claim-check PASS 64/64 on both an unpinned arm64 macOS host (median 12.9x) and a taskset-pinned x86_64 gvisor host (median 13.9x, 95% CI 9.8-19.1); identical candidate manifest on both hosts; five exclusive IC online phases and the exact rho online interval recorded; IC reusable setup (about 28 s modal) outside the online interval, cold ratio median 83.4; both certificates replayed out of process; constant-factor win only, no asymptotic sub-rho claim",
+              "metrics": {
+                "n": 61,
+                "a": 0,
+                "target_count": 1,
+                "timing_class": "single_target_online",
+                "subgroup_log2_order": 47.21,
+                "curve_id": "EC1N61Ce0hd8c15448081e",
+                "K": 500,
+                "k_tuned_on": "disjoint one-target corpus, candidates 300-800, 4 workloads per K",
+                "paired_same_public_point": true,
+                "workloads": 64,
+                "hosts": [
+                  {
+                    "host_id": "arm64 macOS (Mac.attlocal.net), 14 CPUs, unpinned",
+                    "run_id": "20261012T173628Z-3fd988ea23",
+                    "git_head": "be456ef517aa255f98c02c3fe94b33670517a9e0",
+                    "median_online_speedup": 12.873,
+                    "median_95ci_bootstrap": [
+                      7.301,
+                      19.083
+                    ],
+                    "range": [
+                      0.701,
+                      968.035
+                    ],
+                    "claim_check": "PASS 64/64",
+                    "cold_ratio_median": 90.619
+                  },
+                  {
+                    "host_id": "x86_64 Linux 4.19 gvisor (modal), 8 vCPU, every producer pinned to CPU 2 with taskset",
+                    "run_id": "20261012T202048Z-5521627904",
+                    "git_head": "e3090cbc98c657106fef10020da8ccc19be49a3f",
+                    "median_online_speedup": 13.94,
+                    "median_95ci_bootstrap": [
+                      9.808,
+                      19.128
+                    ],
+                    "range": [
+                      1.063,
+                      648.55
+                    ],
+                    "claim_check": "PASS 64/64",
+                    "cold_ratio_median": 83.373
+                  }
+                ],
+                "candidate_id": "IC1N61Ckb0fb61000PDP4s3rootindexRCguidedLAdenseTDsingleISO0h1e817ac07994",
+                "candidate_manifest_sha256": "1e817ac07994a6ba3393b30c8c3b16484c061da899f49357500864c3830ebab4",
+                "same_candidate_manifest_both_hosts": true,
+                "targets": "fresh public hash-to-curve points per host (disjoint workload manifests); identical candidate, curve, K",
+                "ic_online_interval": "target_query_begin: the first operation on the public point (its scan-origin hash), after base, index, rank stage and linear algebra are complete -> recovery_check_end: [d]G = Q evaluated in the producer",
+                "rho_online_interval": "after_target_built: the walk's first start [c]G + Q, after the curve, jump table and target point are ready -> recovery_check_true: a distinguished-point collision returned d with [d]G = Q",
+                "ic_online_phase_fields": [
+                  "target_query",
+                  "target_PDP",
+                  "target_relation_check",
+                  "target_descent",
+                  "target_recovery_check"
+                ],
+                "rho_online_phase_fields": [
+                  "walk",
+                  "collision",
+                  "recovery_check"
+                ],
+                "example_workload_w000": {
+                  "workload_id": "be223fc6e300",
+                  "ic_online_wall_ms": 35.449101,
+                  "rho_online_wall_ms": 180.314477,
+                  "online_speedup": 5.087,
+                  "ic_online_phase_ms": {
+                    "T_target_PDP_ms": 35.413653000000004,
+                    "T_target_descent_ms": 0.001253,
+                    "T_target_query_ms": 4.9999999999999996e-05,
+                    "T_target_recovery_check_ms": 0.026621000000000002,
+                    "T_target_relation_check_ms": 0.007524
+                  },
+                  "rho_online_phase_ms": {
+                    "recovery_check_ms": 0.048373,
+                    "walk_and_collision_ms": 180.266104
+                  },
+                  "same_public_point": true,
+                  "ic_scalar_verified": true,
+                  "rho_scalar_verified": true,
+                  "ic_replay_certificate_sha256": "ff29a249b9303e9752e09a92cb152681f35af88aac0a68b6fc360466c2df0a54",
+                  "rho_replay_certificate_sha256": "e12995339d4fcaaf83e14dde5bef542db1f3f89cad0ee5837a3cded94a2e79c5"
+                },
+                "median_online_speedup_cross_host": 13.406,
+                "online_speedup_range_all_runs": [
+                  0.7009568136305293,
+                  968.0348708157736
+                ],
+                "ic_precomputation_ms_excluded_from_online": {
+                  "median_modal_ms": 27901.787016,
+                  "note": "base, index, rank stage and linear algebra rebuilt in every process; reported beside the claim via the cold ratio (median 83.4 modal / 90.6 local)"
+                },
+                "rho_reference": "strong rho rung 3 (32 lanes, DP bits 4, empty distinguished-point table per process, signed-Frobenius classes, automorphism discount A=122)",
+                "ic_verified_all_runs": true,
+                "rho_verified_all_runs": true,
+                "replay": "both certificates replayed out of process in oracle.py on the producing host; cross-host corroboration via the second host's independent 64-workload run of the identical candidate manifest",
+                "isolation_receipt": {
+                  "isolated_host": "modal x86_64 Linux gvisor container, every producer pinned to CPU 2 with taskset (cpus_allowed_list '2')",
+                  "corroborating_host": "arm64 macOS, unpinned, same candidate manifest",
+                  "resource_envelope": {
+                    "cpus": "2 (pinned)",
+                    "rayon_threads": 1,
+                    "memory_cap": "none"
+                  }
+                },
+                "resource_caps": {
+                  "cpus": "2",
+                  "memory": "none",
+                  "rayon_threads": 1
+                },
+                "asymptotic_sub_rho": false,
+                "single_target_crossover": "n=61 one-target online: IC faster than rho on the median workload on both hosts (12.9x and 13.9x medians)",
+                "operation_accounting": {
+                  "comparison_status": "native_counters_only",
+                  "ic_online_operations": 78988,
+                  "operation_units": {
+                    "ic": "root-index probes",
+                    "rho": "walk steps"
+                  },
+                  "ops_speedup_online": null,
+                  "rho_online_operations": 716654,
+                  "rho_per_ic_native_counter": 9.07294778953765,
+                  "unit_assumption": "IC root-index probes and rho walk steps are distinct native counters"
+                },
+                "hardware_counter_status": "counter_unavailable (perf_event_open unavailable on both hosts); wall-time claim with CPU-isolation receipt only"
+              },
+              "verdict": "N61_A0_COMPACT_ORBIT_SINGLE_TARGET_ONLINE_IC_OVER_RHO_ISOLATED"
             }
           ],
           "accounting_non_claims_20261008": "The retained n=41 through n=83 rows pair one public target per rung. Repeated runs on the same point measure timing variation, not the distribution across targets. The historical online wall ratios have no qualifying host-isolation receipt and are exploratory. IC probes and rho walk steps are distinct counters; their quotient is not an operation-count speedup. Guided-rank mean probes follow a different query policy and do not establish a target-luck factor. A precomputed-rho comparator has not been measured; any such equal-budget study is secondary to the required one-target rho pair.",
@@ -2451,7 +2596,7 @@
               "eq_var_ratio": "not applicable: direct univariate root finding per (x_i, x_j) pair",
               "ffd": {
                 "status": "inapplicable",
-                "reason": "direct univariate quartic root finding (Cantor-Zassenhaus); no Boolean/Gröbner system solved"
+                "reason": "direct univariate quartic root finding (Cantor-Zassenhaus); no Boolean/Gr\u00f6bner system solved"
               },
               "oracle_class": "quartic_root_find_cantor_zassenhaus",
               "median_ms_per_target": 3320.0,
@@ -2483,7 +2628,7 @@
           ],
           "history": [
             {
-              "summary": "S3 2-decomp through bench sizes; S4/Gröbner not a scaling win; FFD not published on 2-decomp frontier",
+              "summary": "S3 2-decomp through bench sizes; S4/Gr\u00f6bner not a scaling win; FFD not published on 2-decomp frontier",
               "metrics": {
                 "summation": "S3",
                 "summands": 2,
@@ -2811,7 +2956,7 @@
       "title": "Index-calculus boundary ledger",
       "updated": "2026-09-22",
       "claim_hygiene": "Public synthetic / known-answer fixtures only. Never combine best component costs from different runs into a synthetic vs_rho win.",
-      "ffd_vs_rank_la": "FFD / degree_of_regularity apply to Boolean Macaulay / Gröbner algebra of Semaev (decomposition). Relation-matrix LA over F_r is stage rank; never conflate the two.",
+      "ffd_vs_rank_la": "FFD / degree_of_regularity apply to Boolean Macaulay / Gr\u00f6bner algebra of Semaev (decomposition). Relation-matrix LA over F_r is stage rank; never conflate the two.",
       "stages": [
         "factor_base",
         "decomposition",
@@ -2990,7 +3135,7 @@
         "Pass the row acceptance_gates.",
         "PR updates current, appends history, sets next_target, links evidence.",
         "vs_rho and end_to_end_dlp past prior size require independent recomputation.",
-        "Incomplete measurement_schema fields fail closed — no row promotion."
+        "Incomplete measurement_schema fields fail closed \u2014 no row promotion."
       ],
       "agent_priorities": [
         {
@@ -3051,7 +3196,7 @@
       ],
       "regimes": {
         "binary": {
-          "label": "Binary fields (Weil–Semaev / non-Koblitz)",
+          "label": "Binary fields (Weil\u2013Semaev / non-Koblitz)",
           "best_stack": [
             "semaev_decomp",
             "semaev_sat",
@@ -8816,7 +8961,7 @@
                       }
                     ]
                   },
-                  "f4_splits": "flat across 39→46 unknowns (scaling note)",
+                  "f4_splits": "flat across 39\u219246 unknowns (scaling note)",
                   "oracle_classes": [
                     "enumerate",
                     "groebner",
@@ -9839,7 +9984,7 @@
                     "demo_n_max": 13,
                     "ic_degree_doc_max": 23
                   },
-                  "summary": "Known-answer recovery on toys n≈7–13; ic runner degrees <=23 with caps"
+                  "summary": "Known-answer recovery on toys n\u22487\u201313; ic runner degrees <=23 with caps"
                 },
                 {
                   "metrics": {
@@ -14906,7 +15051,7 @@
             "decomposition": {
               "status": "record",
               "current": {
-                "summary": "S3 2-decomp through bench sizes; S4/Gröbner not a scaling win; FFD not published on 2-decomp frontier",
+                "summary": "S3 2-decomp through bench sizes; S4/Gr\u00f6bner not a scaling win; FFD not published on 2-decomp frontier",
                 "metrics": {
                   "summation": "S3",
                   "summands": 2,
