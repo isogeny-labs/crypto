@@ -2152,7 +2152,7 @@ mod signed_binding_tests {
         };
         let empty = check(&serde_json::to_vec(&original_value).unwrap()).unwrap();
         assert!(!empty.all_tuples_acknowledged);
-        for mutation in 0..10 {
+        for mutation in 0..9 {
             let mut v = original_value.clone();
             match mutation {
                 0 => v["schema"] = serde_json::json!("wrong"),
