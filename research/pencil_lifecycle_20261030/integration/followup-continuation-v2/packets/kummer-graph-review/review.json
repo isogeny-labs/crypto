@@ -1,0 +1,103 @@
+{
+  "schema": "research.independent-source-review/v1",
+  "producer_manifest_sha256": "2f84dffc03d57198849523064f97f88a52a8ed5d2f11443be32b2c5013feebe7",
+  "review_plan_sha256": "97c69bf139f61d6e3ecbc48e7a325b2a4810ba0932876262ec44bfc3603cde54",
+  "source_hashes": {
+    "src/graph.rs": "a612c5f4f2bea7c2573d147e4e54bfd2775fcf4057d2b11dd3ccf9cc63c58093",
+    "src/pruned.rs": "b119e0b93dbe488be205a68501f60a45e2fcb5ac8993afabcb329c8d8537ebbc",
+    "src/eager.rs": "a3ace6fa3a908f26e39d02f62c71263aff4a7de2bad9cadac2046b6215691559",
+    "src/check.rs": "e4798663a80242e21d512480a944265e64dcaa89deeb660a5a72acbaa631dc56",
+    "native/src/three_leads.rs": "d354a3912db6ea6af70019920708610fe848a232119b0949d8a7c968aedf6354"
+  },
+  "custody_checked_files": 30,
+  "custody_mismatches": [],
+  "native_replay_exit_code": 0,
+  "native_stdout_identical": true,
+  "independent_python_prefix_checks": 70,
+  "control_prefix_checks": 9,
+  "observations": {
+    "models": 21,
+    "arms": {
+      "eager": {
+        "states": 63,
+        "statuses": {
+          "recovery_failed": 2,
+          "nonsplit": 26,
+          "inserted": 35
+        },
+        "cycles": 0,
+        "terminals": 0,
+        "independent_dense_prefixes": 35,
+        "prime_moduli_checked": 21
+      },
+      "candidate": {
+        "states": 63,
+        "statuses": {
+          "degree_gate_skip": 2,
+          "nonsplit": 26,
+          "inserted": 35
+        },
+        "cycles": 0,
+        "terminals": 0,
+        "independent_dense_prefixes": 35,
+        "prime_moduli_checked": 21
+      }
+    },
+    "controls": [
+      {
+        "name": "positive_cycle",
+        "stop_prefix": 3,
+        "terminal": 7,
+        "independent_rank": 3
+      },
+      {
+        "name": "negative_anchor",
+        "stop_prefix": 2,
+        "terminal": 7,
+        "independent_rank": 2
+      },
+      {
+        "name": "zero_then_positive",
+        "stop_prefix": 4,
+        "terminal": 7,
+        "independent_rank": 3
+      }
+    ],
+    "equations_equal": true,
+    "raw_sha256": "76ff047da76412f1156d6ba99f4a58c85fbf5f16d4ba53917431420840f8a18c"
+  },
+  "claims": [
+    {
+      "claim": "Recovered original-G states feed existing signed graph interface before reference construction",
+      "finding": "supported for fixed fixtures by source and replay"
+    },
+    {
+      "claim": "Both arms insert 35 identical equations from 63 states",
+      "finding": "supported; independent raw recount and replay"
+    },
+    {
+      "claim": "Degree-one recovery adds no graph edge",
+      "finding": "supported; explicit degree!=2 early return"
+    },
+    {
+      "claim": "Every inserted prefix agrees with separately implemented dense elimination",
+      "finding": "supported; Rust matrix implementation separate from signed union-find; reviewer Python implementation confirms 70 prefixes"
+    },
+    {
+      "claim": "Synthetic controls exercise stopping at prefixes 3,2,4",
+      "finding": "supported; controls are not geometric cycles"
+    }
+  ],
+  "scope_notes": [
+    "21 retained models, three original-G transitions each, separate graph per model and arm",
+    "Zero geometric cycles and zero geometric terminal returns",
+    "Dense elimination checks formal signed equations over checked prime moduli, not individual-node subgroup membership",
+    "Historical collector filters before signed recovery; this wrapper recovers first, so scheduling and total-cost equivalence are not established",
+    "Duplicate and repeated-root geometric paths unobserved; inconsistent trailing synthetic sentinel intentionally unconsumed",
+    "Degree-one, Delta-zero, generic/fallback, and other earlier packets retain their separate scope"
+  ],
+  "blocking_findings": [],
+  "scientific_execution": false,
+  "new_cost_ratio": null,
+  "official_scientific_decision": "not made"
+}

@@ -1,0 +1,28 @@
+TAP version 13
+# Subtest: large tracked path lists preserve source discovery beyond 16 MiB
+not ok 1 - large tracked path lists preserve source discovery beyond 16 MiB
+  ---
+  duration_ms: 374.334763
+  type: 'test'
+  location: '/home/ec2-user/crypto-pencil-signed-graph-20261029/.github/scripts/test-ci-scope.mjs:319:1'
+  failureType: 'testCodeFailure'
+  error: 'large Git path list failed: ENOBUFS'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  operator: 'fail'
+  stack: |-
+    TestContext.<anonymous> (file:///home/ec2-user/crypto-pencil-signed-graph-20261029/.github/scripts/test-ci-scope.mjs:337:28)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 436.241569

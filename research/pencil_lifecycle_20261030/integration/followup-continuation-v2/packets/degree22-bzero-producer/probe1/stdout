@@ -1,0 +1,5 @@
+CharP.cast_eq_zero.{u_1} (R : Type u_1) [AddMonoidWithOne R] (p : ℕ) [CharP R p] : ↑p = 0
+Polynomial.C_ofNat.{u} {R : Type u} [Semiring R] (n : ℕ) [n.AtLeastTwo] : Polynomial.C (OfNat.ofNat n) = OfNat.ofNat n
+map_ofNat.{u_3, u_4, u_5} {R : Type u_3} {S : Type u_4} {F : Type u_5} [NonAssocSemiring R] [NonAssocSemiring S]
+  [FunLike F R S] [RingHomClass F R S] (f : F) (n : ℕ) [n.AtLeastTwo] : f (OfNat.ofNat n) = OfNat.ofNat n
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/Probe.lean:6:7: error(lean.unknownIdentifier): Unknown identifier `inv_eq_iff_eq_mul`

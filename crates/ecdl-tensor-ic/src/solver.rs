@@ -9,7 +9,7 @@ use rand::rngs::StdRng;
 use crate::curve::{Curve, Point, INFINITY};
 use crate::field::{add_mod, inv_mod, mul_mod, rand_below, sub_mod};
 use crate::gadgets::{bits_uint, concat, Arith, ArithRef};
-use crate::linalg::left_kernel_vector;
+use crate::linalg::left_kernel_vector_sparse;
 use crate::pointgadget::gadget_relation_network;
 use crate::relation::{
     mitm_find_relation, new_factor_bases, new_windowed_factor_bases, relation_network, FactorBases,
@@ -308,7 +308,7 @@ impl Solver {
                 }
                 rows.push(row);
             }
-            let coef = match left_kernel_vector(&rows, fb.points.len(), r) {
+            let coef = match left_kernel_vector_sparse(&rows, fb.points.len(), r) {
                 Some(c) => c,
                 None => {
                     return (

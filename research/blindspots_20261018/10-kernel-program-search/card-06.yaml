@@ -1,0 +1,61 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-10-06
+experiment_id: BLINDSPOT-10
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/10-kernel-program-search/raw/receipt-card-06.json
+binds:
+  - {path: examples/blindspots_10_kernel_search.rs, sha256: f69bbce49c64a6ff05670fa07ea615ce913f3eb35a5f94597220ca7f363fdb80}
+commands:
+  - id: make-bin-dir
+    argv: [mkdir, -p, target/blindspots-10/card-06]
+    timeout_seconds: 5
+    success_exit_codes: [0]
+  - id: build
+    argv: [prlimit, "--as=4294967296", rustc, --edition, "2021", -C, opt-level=3, -C, codegen-units=1, -C, target-cpu=native, -o, target/blindspots-10/card-06/b10, examples/blindspots_10_kernel_search.rs]
+    timeout_seconds: 40
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/10-kernel-program-search/raw/card-06-build.stdout.log
+    stderr: research/blindspots_20261018/10-kernel-program-search/raw/card-06-build.stderr.log
+  - id: search-n37-b-c2
+    argv: [prlimit, "--as=4294967296", target/blindspots-10/card-06/b10, search, --n, "37", --ell, "9", --arm, b, --state, research/blindspots_20261018/10-kernel-program-search/raw/state, --budget, "256", --max-new, "64"]
+    timeout_seconds: 150
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/10-kernel-program-search/raw/search-n37-b-c2.stdout.log
+    stderr: research/blindspots_20261018/10-kernel-program-search/raw/search-n37-b-c2.stderr.log
+    outputs: [research/blindspots_20261018/10-kernel-program-search/raw/state/n37-b.jsonl]
+  - id: search-n37-b-c3
+    argv: [prlimit, "--as=4294967296", target/blindspots-10/card-06/b10, search, --n, "37", --ell, "9", --arm, b, --state, research/blindspots_20261018/10-kernel-program-search/raw/state, --budget, "256", --max-new, "64"]
+    timeout_seconds: 150
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/10-kernel-program-search/raw/search-n37-b-c3.stdout.log
+    stderr: research/blindspots_20261018/10-kernel-program-search/raw/search-n37-b-c3.stderr.log
+    outputs: [research/blindspots_20261018/10-kernel-program-search/raw/state/n37-b.jsonl]
+  - id: search-n41-b-c0
+    argv: [prlimit, "--as=4294967296", target/blindspots-10/card-06/b10, search, --n, "41", --ell, "9", --arm, b, --state, research/blindspots_20261018/10-kernel-program-search/raw/state, --budget, "256", --max-new, "64"]
+    timeout_seconds: 150
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/10-kernel-program-search/raw/search-n41-b-c0.stdout.log
+    stderr: research/blindspots_20261018/10-kernel-program-search/raw/search-n41-b-c0.stderr.log
+    outputs: [research/blindspots_20261018/10-kernel-program-search/raw/state/n41-b.jsonl]
+  - id: remove-bin
+    argv: [rm, -f, target/blindspots-10/card-06/b10]
+    timeout_seconds: 5
+    success_exit_codes: [0]
+  - id: remove-bin-dir
+    argv: [rmdir, target/blindspots-10/card-06]
+    timeout_seconds: 5
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-10
+background: false
+write_scope:
+  - research/blindspots_20261018/10-kernel-program-search/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto."
