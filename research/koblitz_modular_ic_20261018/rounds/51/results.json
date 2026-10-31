@@ -1,8 +1,8 @@
 {
   "scope": "R51 actual chart maps and larger marked23 QR construction",
   "status_counts": {
-    "rejected": 2,
-    "accepted": 9,
+    "rejected": 4,
+    "accepted": 12,
     "running": 1
   },
   "runs": [
@@ -13,6 +13,38 @@
       "kind": "Singular",
       "native_exit": 124,
       "required_marker": "BASE23_51_ALL_CHECKS_PASS",
+      "error_lines": []
+    },
+    {
+      "attempt": "base23-struct51-01",
+      "status": "rejected",
+      "source_revision": "0a4d1b8992d763b26f41e79d7adb2a873cb9b630",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "BASE23_STRUCT51_ALL_CHECKS_PASS",
+      "error_lines": [
+        "   ? BASE23_STRUCT51_ACTUAL_BASE_UNITS",
+        "   ? BASE23_STRUCT51_COMPLETE_NU_NORMALIZATION"
+      ]
+    },
+    {
+      "attempt": "base23-struct51-02",
+      "status": "rejected",
+      "source_revision": "d210ca3b6b1cc576ea7928d79c6f81b44cabbc37",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "BASE23_STRUCT51_ALL_CHECKS_PASS",
+      "error_lines": [
+        "   ? BASE23_STRUCT51_ACTUAL_BASE_UNITS"
+      ]
+    },
+    {
+      "attempt": "base23-struct51-03",
+      "status": "accepted",
+      "source_revision": "6c62f56271834c79cf93d3f667810a531a3c73e4",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "BASE23_STRUCT51_ALL_CHECKS_PASS",
       "error_lines": []
     },
     {
@@ -71,8 +103,26 @@
     },
     {
       "attempt": "hecke3-51-01",
+      "status": "accepted",
+      "source_revision": "6079d58213f568b399f9bcfe02a134d06fc80ede",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "HECKE3_51_ALL_CHECKS_PASS",
+      "error_lines": []
+    },
+    {
+      "attempt": "line51-01",
       "status": "running",
       "source_revision": null
+    },
+    {
+      "attempt": "nu51-01",
+      "status": "accepted",
+      "source_revision": "2ce312f4e2380be7dbfb3ca5105301cbb327914c",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "NU51_ALL_CHECKS_PASS",
+      "error_lines": []
     },
     {
       "attempt": "overlap-lean51-01",

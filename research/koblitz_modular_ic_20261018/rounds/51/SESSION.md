@@ -71,3 +71,17 @@ verified. First good odd split prime filter gives23 at77 and11 at161.
 This obstructs a16-degree irreducible finite-fiber criterion under the stated
 Frobenius-action identification,not generic connectedness. hecke3-51-01
 admitted next as a generic quotient/annihilator control,not a nonzero CM map.
+
+base23-struct51-02 rejected:one unit-gate error before a late marker.
+base23-struct51-03 accepted exit0/noerrors/exactmarker. Actual rawD/C degrees
+156/54 reduce to6/6;fullf23-multiple bindings and transformed unit matrices
+pass,as do all6coupled source equations,2complete structured matrix products,
+actual G/N normalization witness and quotient dimension112. This is the
+complete structured algebra;the original expanded-matrix cap stays charged.
+
+nu51-01 accepted exit0/noerrors/exactmarker. Actual descendednu recovered,
+full quadratic norm and both actual source products pass. All32 D_RR*nu
+coefficients are polynomial,and the complete32-entry PID lift passes with
+corruption rejection:normal_chart_member=1,obstruction_code=0. This certifies
+actual finite-z chart denominator cancellation. Diamondnu transport is still
+separate. line51-01 admitted next for the source-bound ordinary packet test.
