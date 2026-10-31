@@ -5519,3 +5519,322 @@ fn verify_boundary_stream(
     }
     Ok(out)
 }
+
+const NATIVE_BOUNDARY_CAP: usize = 2048;
+const NATIVE_BOUNDARY_RECORDS: usize = 4096;
+#[derive(Clone, Copy)]
+struct PendingNativeBoundary {
+    sequence: u64,
+    capture_sequence: u64,
+    event: NativeBoundary,
+}
+#[derive(serde::Serialize)]
+struct NativeBoundaryView<'a> {
+    schema: &'static str,
+    binding_sha256: &'a str,
+    sequence: u64,
+    capture_sequence: u64,
+    event: &'a NativeBoundary,
+}
+struct BoundNativeEvents<'a> {
+    binding_digest: [u8; 64],
+    limits: &'a crate::ml_dataset::capture::CaptureLimits,
+    buffer: crate::ml_dataset::capture::TypedEventBuffer,
+    canonical: Vec<u8>,
+    pending_bytes: Vec<u8>,
+    pending: Option<PendingNativeBoundary>,
+    acknowledged: u64,
+    encoded_capture_bytes: u64,
+}
+impl<'a> BoundNativeEvents<'a> {
+    fn new(
+        binding: &crate::ml_dataset::capture::AttemptBinding,
+        limits: &'a crate::ml_dataset::capture::CaptureLimits,
+        budget: &mut Budget,
+    ) -> Result<Self, Stop> {
+        use crate::ml_dataset::capture::TypedEventBuffer;
+        budget.reserve_checking(64 * 1024, 4096, Instant::now())?;
+        if binding.validate().is_err() || limits.validate().is_err() {
+            return budget.fail(Stop::InvalidLimits);
+        }
+        let digest = binding
+            .digest()
+            .or_else(|_| budget.fail(Stop::InvalidLimits))?;
+        let mut binding_digest = [0; 64];
+        binding_digest.copy_from_slice(digest.as_bytes());
+        let wire = TypedEventBuffer::requested_bytes(NATIVE_BOUNDARY_CAP as u64)
+            .or_else(|_| budget.fail(Stop::Overflow))?;
+        let canonical_cap = NATIVE_BOUNDARY_RECORDS
+            .checked_mul(NATIVE_BOUNDARY_CAP)
+            .ok_or(Stop::Overflow)
+            .or_else(|s| budget.fail(s))?;
+        let bytes = (std::mem::size_of::<Self>() as u64)
+            .checked_add(wire)
+            .and_then(|v| v.checked_add(canonical_cap as u64))
+            .and_then(|v| v.checked_add(NATIVE_BOUNDARY_CAP as u64))
+            .ok_or(Stop::Overflow)
+            .or_else(|s| budget.fail(s))?;
+        budget.reserve_bytes(bytes, Instant::now())?;
+        let mut canonical = Vec::new();
+        let mut pending_bytes = Vec::new();
+        if canonical.try_reserve_exact(canonical_cap).is_err()
+            || pending_bytes
+                .try_reserve_exact(NATIVE_BOUNDARY_CAP)
+                .is_err()
+        {
+            return budget.fail(Stop::Allocation);
+        }
+        let buffer = TypedEventBuffer::try_new(NATIVE_BOUNDARY_CAP as u64, wire)
+            .or_else(|_| budget.fail(Stop::Allocation))?;
+        Ok(Self {
+            binding_digest,
+            limits,
+            buffer,
+            canonical,
+            pending_bytes,
+            pending: None,
+            acknowledged: 0,
+            encoded_capture_bytes: 0,
+        })
+    }
+    fn emit(
+        &mut self,
+        event: NativeBoundary,
+        budget: &mut Budget,
+        global: &mut usize,
+    ) -> Result<(), Stop> {
+        use std::io::Write;
+        if self.pending.is_some() {
+            return budget.fail(Stop::Observer);
+        }
+        if *global > NATIVE_BOUNDARY_RECORDS {
+            return budget.fail(Stop::InvalidLimits);
+        }
+        let snapshot = PendingNativeBoundary {
+            sequence: self.acknowledged + 1,
+            capture_sequence: *global as u64 + 1,
+            event,
+        };
+        self.pending = Some(snapshot);
+        if *global == NATIVE_BOUNDARY_RECORDS || self.acknowledged == NATIVE_BOUNDARY_RECORDS as u64
+        {
+            return budget.fail(Stop::Events);
+        }
+        // Separate canonical serialization and typed wire serialization, using
+        // the existing checking-work/identity metadata reservation convention.
+        budget.reserve_checking(1024 + 16 * NATIVE_BOUNDARY_CAP as u64, 4096, Instant::now())?;
+        let identity = super::LIVE_SINK.with(|slot| match slot.borrow().as_ref() {
+            Some(super::EventSink::Bound(sink)) => sink.verify_digest_limits_at_count(
+                &self.binding_digest,
+                self.limits,
+                *global as u64,
+            ),
+            _ => Err("native Koblitz boundary requires original bound capture".into()),
+        });
+        if identity.is_err() {
+            return budget.fail(Stop::InvalidLimits);
+        }
+        budget.reserve_trace(NATIVE_BOUNDARY_CAP as u64, Instant::now())?;
+        let digest = std::str::from_utf8(&self.binding_digest)
+            .or_else(|_| budget.fail(Stop::InvalidLimits))?;
+        let view = NativeBoundaryView {
+            schema: "crypto.ml-dataset.koblitz-m3-events/v1",
+            binding_sha256: digest,
+            sequence: snapshot.sequence,
+            capture_sequence: snapshot.capture_sequence,
+            event: &snapshot.event,
+        };
+        let bytes = std::mem::take(&mut self.pending_bytes);
+        let mut writer = InputWriter {
+            bytes,
+            capacity: NATIVE_BOUNDARY_CAP,
+            budget,
+        };
+        let encoded =
+            serde_json::to_writer(&mut writer, &view).is_ok() && writer.write_all(b"\n").is_ok();
+        self.pending_bytes = writer.bytes;
+        if !encoded {
+            return budget.fail(Stop::Serialization);
+        }
+        if self.pending_bytes.len()
+            > NATIVE_BOUNDARY_RECORDS * NATIVE_BOUNDARY_CAP - self.canonical.len()
+        {
+            return budget.fail(Stop::Trace);
+        }
+        if super::live_typed_event(
+            crate::ml_dataset::capture::TypedEventKind::KoblitzM3Native,
+            &view,
+            &mut self.buffer,
+        )
+        .is_err()
+        {
+            return budget.fail(Stop::Observer);
+        }
+        // All storage was pre-admitted. Acknowledgement survives a later clock
+        // failure; callers must not reinterpret it as an unacknowledged event.
+        self.canonical.extend_from_slice(&self.pending_bytes);
+        self.pending_bytes.clear();
+        self.pending = None;
+        self.acknowledged += 1;
+        *global += 1;
+        self.encoded_capture_bytes += self.buffer.encoded_len() as u64;
+        let _ = budget.check(Instant::now());
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod native_boundary_emitter_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native_matrix;
+    use crate::ml_dataset::capture::{capture_limits, verify_live_committed_prefix};
+    fn begin() -> NativeBoundary {
+        NativeBoundary::Construction {
+            stage: ConstructionBoundaryStage::Begin,
+            reserved: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Reservation::default(
+            ),
+        }
+    }
+    #[test]
+    fn native_callbacks_are_bound_to_the_actual_capture_stream() {
+        for engine in [
+            native_matrix::Engine::F4Macaulay,
+            native_matrix::Engine::F5KoszulFrobenius,
+        ] {
+            let binding = matrix_tests::binding();
+            let limits = capture_limits(16).unwrap();
+            let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+            let original = construction_tests::fixture();
+            let mut budget = construction_tests::budget();
+            let mut events = BoundNativeEvents::new(&binding, &limits, &mut budget).unwrap();
+            let mut global = 0;
+            let construction = construct_original(&original, &mut budget, &mut |event, b| {
+                events.emit(NativeBoundary::construction(event), b, &mut global)
+            });
+            assert_eq!(construction.adapter_stop, None);
+            let output = construction.output.unwrap();
+            let input = persist_original(
+                &original,
+                &output,
+                &mut budget,
+                &binding,
+                &"8".repeat(64),
+                &"9".repeat(64),
+                &mut |_, _| Ok(()),
+            )
+            .unwrap();
+            let step = matrix_step(input, engine, 3, &mut |event, b| {
+                events.emit(NativeBoundary::matrix(event), b, &mut global)
+            });
+            assert_eq!(step.adapter_stop, None);
+            let assessment = verify_boundary_stream(
+                &events.canonical,
+                &binding.digest().unwrap(),
+                23,
+                engine,
+                3,
+            )
+            .unwrap();
+            assert!(assessment.construction_complete_captured && assessment.matrix_finish_captured);
+            assert_eq!(assessment.records, global);
+            assert!(events.pending.is_none());
+            let captured = std::fs::read(sink.dir.join("events.jsonl")).unwrap();
+            let rows = captured
+                .split(|b| *b == b'\n')
+                .filter(|l| !l.is_empty())
+                .collect::<Vec<_>>();
+            let canonical = events
+                .canonical
+                .split(|b| *b == b'\n')
+                .filter(|l| !l.is_empty())
+                .collect::<Vec<_>>();
+            assert_eq!(rows.len(), canonical.len());
+            for (i, (wire, saved)) in rows.iter().zip(canonical).enumerate() {
+                let row: serde_json::Value = serde_json::from_slice(wire).unwrap();
+                let record: serde_json::Value = serde_json::from_slice(saved).unwrap();
+                assert_eq!(row["sequence"], (i + 1) as u64);
+                assert_eq!(row["event"]["kind"], "koblitz_m3_native");
+                assert_eq!(row["event"]["payload"], record);
+            }
+            assert_eq!(events.encoded_capture_bytes, captured.len() as u64);
+            assert!(
+                verify_live_committed_prefix(sink.dir.parent().unwrap(), &binding, &limits)
+                    .unwrap()
+                    .is_some()
+            );
+        }
+    }
+    #[test]
+    fn incorrect_shared_counter_refuses_publication_and_retains_snapshot() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let mut budget = construction_tests::budget();
+        let mut events = BoundNativeEvents::new(&binding, &limits, &mut budget).unwrap();
+        let mut global = 1;
+        assert_eq!(
+            events.emit(begin(), &mut budget, &mut global),
+            Err(Stop::InvalidLimits)
+        );
+        assert_eq!(events.pending.as_ref().unwrap().capture_sequence, 2);
+        assert_eq!(events.acknowledged, 0);
+        assert!(events.canonical.is_empty());
+        assert_eq!(
+            std::fs::metadata(sink.dir.join("events.jsonl"))
+                .unwrap()
+                .len(),
+            0
+        );
+    }
+    #[test]
+    fn partial_serialization_and_event_cap_preserve_unacknowledged_evidence() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let mut budget = construction_tests::budget();
+        let mut events = BoundNativeEvents::new(&binding, &limits, &mut budget).unwrap();
+        budget.trace_limit = NATIVE_BOUNDARY_CAP as u64 + 20;
+        let mut global = 0;
+        assert_eq!(
+            events.emit(begin(), &mut budget, &mut global),
+            Err(Stop::Trace)
+        );
+        assert!(events.pending.is_some());
+        assert!(!events.pending_bytes.is_empty());
+        assert!(events.pending_bytes.len() <= 20);
+        let retained = events.pending_bytes.clone();
+        assert_eq!(
+            events.emit(begin(), &mut budget, &mut global),
+            Err(Stop::Trace)
+        );
+        assert_eq!(events.pending_bytes, retained);
+        assert_eq!(global, 0);
+        assert_eq!(
+            std::fs::metadata(sink.dir.join("events.jsonl"))
+                .unwrap()
+                .len(),
+            0
+        );
+        let mut budget = construction_tests::budget();
+        let mut events = BoundNativeEvents::new(&binding, &limits, &mut budget).unwrap();
+        global = NATIVE_BOUNDARY_RECORDS;
+        assert_eq!(
+            events.emit(begin(), &mut budget, &mut global),
+            Err(Stop::Events)
+        );
+        assert_eq!(events.pending.unwrap().capture_sequence, 4097);
+        assert!(events.canonical.is_empty());
+    }
+    #[test]
+    fn storage_admission_failure_is_sticky_before_any_capture() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let mut budget = construction_tests::budget();
+        budget.memory_limit = 4096;
+        assert!(matches!(
+            BoundNativeEvents::new(&binding, &limits, &mut budget),
+            Err(Stop::Bytes)
+        ));
+        assert_eq!(budget.stopped, Some(Stop::Bytes));
+    }
+}

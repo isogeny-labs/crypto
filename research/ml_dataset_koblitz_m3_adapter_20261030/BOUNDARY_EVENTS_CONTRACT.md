@@ -46,3 +46,20 @@ include actual native F4/F5 boundaries, strict nested stage mutations, global vs
 native sequence mutations, missing/extra/reordered records, and a real capture
 acknowledgement followed by adapter deadline failure. No fixture has been generated
 under this contract yet and no new cloud execution is authorized by it.
+
+## Emitter storage and failure retention
+
+The emitter reserves its object, the typed capture buffer's requested storage,
+4096 times 2048 bytes for canonical retention, and 2048 bytes for pending encoding
+before allocating those buffers. Per event it reserves checking work for both
+serializations, typed wire trace capacity, and actual canonical serialization
+bytes. These are modeled reservations, not retired instructions or allocator RSS.
+
+The original binding digest and limits are checked against the active bound sink,
+and the shared global counter must equal its committed event count before any
+publication. A snapshot is retained before fallible work. A refused attempt at the
+4096-event cap may retain anticipated capture sequence 4097; that is pending
+failure evidence, never a canonical acknowledged record. The first stop remains
+sticky, and a second call cannot overwrite pending evidence. A successful capture
+appends to pre-admitted canonical storage and advances counters before checking
+for a subsequent deadline. Runtime dispatch remains disabled pending integration.

@@ -337,6 +337,8 @@ pub enum TypedEventKind {
     WidePrimeDynamic,
     #[serde(rename = "koblitz_m3")]
     KoblitzM3,
+    #[serde(rename = "koblitz_m3_native")]
+    KoblitzM3Native,
 }
 
 /// Reusable requested storage; the caller must debit its own ledger once.
@@ -1287,6 +1289,21 @@ impl CaptureEmitter {
             || &self.limits != limits
         {
             return Err("capture sink differs from original execution attempt or limits".into());
+        }
+        Ok(())
+    }
+
+    /// Bind an adapter's shared counter to the actual committed stream before
+    /// it records an anticipated capture sequence.
+    pub(super) fn verify_digest_limits_at_count(
+        &self,
+        binding_digest: &[u8],
+        limits: &CaptureLimits,
+        event_count: u64,
+    ) -> Result<(), String> {
+        self.verify_digest_limits(binding_digest, limits)?;
+        if self.head.event_count != event_count {
+            return Err("capture counter differs from original adapter counter".into());
         }
         Ok(())
     }
