@@ -1520,69 +1520,8 @@ def jv_sieve_table() -> dict:
 
 
 def f4_fp_ic_component() -> dict:
-    """Carry the frozen engineering result without promoting it to a gate verdict."""
-    counted_phases = ("setup_muls", "base_muls", "stream_muls", "weil_muls",
-                      "f4_muls", "lin_muls", "post_muls", "verify_muls", "la_muls")
-
-    def counted_total(raw):
-        return (all(type(raw.get(key)) is int and raw[key] >= 0 for key in counted_phases)
-                and type(raw.get("total_muls")) is int
-                and raw["total_muls"] == sum(raw[key] for key in counted_phases))
-
-    study = load(SOURCES["f4_fp_ic_effect"])
-    rows = study.get("dlp")
-    main = load(SOURCES["f4_fp_ic_main"])
-    new = load(SOURCES["f4_fp_ic_new"])
-    expected = {(53, 1), (53, 2), (101, 1), (101, 2)}
-    def valid_rows(value):
-        return (isinstance(value, list) and len(value) == 4
-                and all(isinstance(r, dict) for r in value)
-                and {(r.get("p"), r.get("seed")) for r in value} == expected)
-
-    def positive(value):
-        return (isinstance(value, (int, float)) and not isinstance(value, bool)
-                and math.isfinite(value) and value > 0)
-
-    def close(value, recomputed):
-        return positive(value) and math.isclose(value, recomputed, rel_tol=1e-12)
-
-    if (study.get("class") != "engineering" or not all(valid_rows(v) for v in (rows, main, new))):
-        raise SystemExit("f4_fp engineering summary is incomplete or inconsistent")
-    main_by_key = {(r["p"], r["seed"]): r for r in main}
-    new_by_key = {(r["p"], r["seed"]): r for r in new}
-    for r in rows:
-        before = main_by_key[(r["p"], r["seed"])]
-        after = new_by_key[(r["p"], r["seed"])]
-        rho = before.get("rho")
-        if (not counted_total(before) or not counted_total(after)
-                or not all(positive(v) for v in (before.get("l"), before.get("c_add_e"),
-                                          before.get("total_muls"), after.get("total_muls")))
-                or before["l"] != after.get("l") or before["c_add_e"] != after.get("c_add_e")
-                or not isinstance(rho, list) or len(rho) != 4 or rho != after.get("rho")
-                or not all(isinstance(v, dict) and v.get("correct") is True
-                           and positive(v.get("s")) for v in rho)
-                or r.get("rho_runs") != 4
-                or not all(r.get(key) == before.get(key) == after.get(key)
-                           for key in ("p", "seed", "residuals", "relations"))
-                or r.get("solved") != [before.get("solved"), after.get("solved")]
-                or r.get("correct") != [before.get("correct"), after.get("correct")]
-                or r["solved"] != [True, True] or r["correct"] != [True, True]
-                or not positive(r.get("relations"))):
-            raise SystemExit("f4_fp engineering summary is incomplete or inconsistent")
-        s_before = before["total_muls"] / (math.sqrt(before["l"]) * before["c_add_e"])
-        s_after = after["total_muls"] / (math.sqrt(after["l"]) * after["c_add_e"])
-        rho_mean = sum(v["s"] for v in rho) / len(rho)
-        if (not close(before.get("s"), s_before)
-                or not close(after.get("s"), s_after)
-                or not close(r.get("s_before"), s_before)
-                or not close(r.get("s_after"), s_after)
-                or not close(r.get("rho_s_mean"), rho_mean)
-                or not s_before > s_after
-                or not close(r.get("s_ratio"), s_before / s_after)
-                or not close(r.get("s_over_rho_before"), s_before / rho_mean)
-                or not close(r.get("s_over_rho_after"), s_after / rho_mean)):
-            raise SystemExit("f4_fp engineering summary is incomplete or inconsistent")
-    return study
+    """Display the frozen engineering result; native-audit checks its arithmetic."""
+    return load(SOURCES["f4_fp_ic_effect"])
 
 
 def build(allow_unvalidated: bool = False) -> dict:

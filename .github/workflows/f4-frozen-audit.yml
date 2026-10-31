@@ -1,0 +1,33 @@
+name: f4-frozen-audit
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/f4-frozen-audit.yml'
+      - 'research/f4_fp_ic_effect_20261018/native-audit/**'
+      - 'research/f4_fp_ic_effect_20261018/summary.json'
+      - 'research/f4_fp_ic_effect_20261018/reports/run-20261018T1548Z/raw/dlp_main.json'
+      - 'research/f4_fp_ic_effect_20261018/reports/run-20261018T1548Z/raw/dlp_new.json'
+      - 'scripts/build_ic_leaderboard.py'
+      - 'scripts/test_build_ic_leaderboard.py'
+      - 'docs/ic/LEADERBOARD.md'
+      - 'docs/ic-leaderboard.html'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: f4-frozen-audit-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  native-f4-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test native audit failure controls
+        run: cargo test --locked --manifest-path research/f4_fp_ic_effect_20261018/native-audit/Cargo.toml
+      - name: Recompute frozen F4 arithmetic from raw rows
+        run: cargo run --locked --manifest-path research/f4_fp_ic_effect_20261018/native-audit/Cargo.toml
