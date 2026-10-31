@@ -22,3 +22,8 @@ negative PDP or exact fall degree.
 The selected local backend uses a predeclared XFS output root because the
 cloud worker IAM and cumulative-budget admission for this campaign are not
 established. This four-cell pilot does not replace the full requested matrix.
+
+The completed four-cell results, independent archive audit, export checker,
+and S3 readback sample are linked in [report/run.md](report/run.md). The
+quantitative outcome figure is [report/outcomes.svg](report/outcomes.svg),
+with a PDF rendering in [report/run.pdf](report/run.pdf).
