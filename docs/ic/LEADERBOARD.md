@@ -786,6 +786,8 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/f4_fp_ic_effect_20261018/summary.json` — sha256 `7eff13424e0e9b1a…`
+- `research/f4_fp_ic_effect_20261018/reports/run-20261018T1548Z/raw/dlp_main.json` — sha256 `bca0162f22f19c74…`
+- `research/f4_fp_ic_effect_20261018/reports/run-20261018T1548Z/raw/dlp_new.json` — sha256 `114f27cd5a3eb091…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/ecbench_lazy_orbit_members_20261018/figures/ratios.json` — sha256 `c86743775097e0e1…`
 - `research/jv_cover_sparse_fglm_20261018/summary.json` — sha256 `4217cb1de3458ee8…`
