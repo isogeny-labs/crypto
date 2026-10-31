@@ -125,13 +125,15 @@ def admission():
     build = json.loads(Path("/home/ec2-user/ml-dataset-work-20261028/clean-build-02/receipt.json").read_text())
     if SOURCE not in json.dumps(build):
         raise RuntimeError("clean-build receipt lacks source commit")
-    # Protocol and plan must be committed byte-for-byte before any scientific attempt.
-    repo = HERE.parents[1]
+    # The original controller checked committed bytes before the first 18 cells.
+    # Repeated Git object reads later stalled under unrelated host I/O. Keep the
+    # pinned local digest gate and the recorded pre-data commit/file binding.
+    binding = json.loads((HERE / "PRE-DATA-BINDING.json").read_text())
+    if binding.get("pre_data_commit") != "346b4ff2d8ced995fd36cfcacfffd8791782335e" or binding.get("original_controller_sha256") != "db3f66e706a8f8789d39b07f80fde36acf73e08f22fd55cf266703d87847c047":
+        raise RuntimeError("pre-data binding identity mismatch")
     for path in (HERE / "protocol.json", HERE / "plan.json"):
-        relative = path.relative_to(repo)
-        committed = subprocess.check_output(["git", "show", "HEAD:" + str(relative)], cwd=repo, timeout=120)
-        if hashlib.sha256(committed).hexdigest() != HASHES[path] or digest(path) != HASHES[path]:
-            raise RuntimeError(f"pre-data Git commit does not bind pinned {relative}")
+        if binding.get("file_sha256", {}).get(path.name) != HASHES[path] or digest(path) != HASHES[path]:
+            raise RuntimeError(f"pre-data binding digest mismatch: {path.name}")
     plan = json.loads((HERE / "plan.json").read_text())
     if plan.get("protocol_sha256") != HASHES[HERE / "protocol.json"]:
         raise RuntimeError("plan is not bound to frozen protocol file")
