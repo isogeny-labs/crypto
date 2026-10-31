@@ -1,0 +1,123 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R56-INFINITY",
+  "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
+  "claims": [
+    {
+      "id": "basepoles",
+      "class": "exact_computation",
+      "statement": "full source chart products and base A poleorders4/1"
+    },
+    {
+      "id": "newton",
+      "class": "exact_computation",
+      "statement": "complete fixed128precision lower hull and exact residual polynomials;interpretation separate"
+    },
+    {
+      "id": "fullbranches",
+      "class": "out_of_scope",
+      "statement": "requires subsequent exact factor/residue/ramification proof;not assumed from hull"
+    }
+  ],
+  "arms": {
+    "reference": "actual R52degree16source/R55completeaffinezeroquotient",
+    "baseline": "finitezeroquotientwithoutpoles",
+    "candidate": "actual infinitycharts/formalbasejets/Newtondata",
+    "positive": [
+      "fullchart/coordinateproducts",
+      "telescopingidentity",
+      "both128jets/residues",
+      "hullendpoints"
+    ],
+    "negative": [
+      "corruptedjet"
+    ],
+    "A_A": {
+      "not_applicable_reason": "fixedexactcalculation,no noisycomparison"
+    }
+  },
+  "variables": {
+    "fixed": [
+      "sourcehashes",
+      "binary/oneSingularFLINTthread",
+      "4GiBvirtual/1200s",
+      "seed56",
+      "precision128",
+      "allmonomials/coefficientorder"
+    ],
+    "measured": [
+      "binaryhash",
+      "host",
+      "nativewalltime"
+    ],
+    "statistical": "notapplicable"
+  },
+  "randomization": {
+    "method": "fixed",
+    "reason": "exhaustive prescribed polynomial identities",
+    "seeds": [
+      56
+    ]
+  },
+  "blinding": {
+    "method": "none",
+    "reason": "exactpredeclaredproducts"
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": "notapplicable"
+  },
+  "metrics": [
+    "sourcechartidentities",
+    "basecoordinatevaluations",
+    "residualpolynomials",
+    "allcoefficientvaluations/hulledges/faces",
+    "changedjetrejected"
+  ],
+  "execution": {
+    "launcher": "REPLAY_CAS.sh infinity56-01 INFINITY56.sing INFINITY56_ALL_CHECKS_PASS",
+    "timeout_seconds": 1200,
+    "virtual_KiB": 4194304,
+    "threads": 1,
+    "seed": 56,
+    "queue": "one mathematical job atonce",
+    "checkpoint": "immutable raw sources,logs,exit,binaryhash,tar",
+    "source_gate": "sixexecutedfiles matchGit;all donor hashes"
+  },
+  "stopping": {
+    "accepted": "exit0,exactmarker,no nativeerrorlines,allprescribedchecks",
+    "failure": "retain errors/caps/partials;freeze repairbeforefreshattempt",
+    "no_duplicate": "reconcilelivehandlebeforeretry"
+  },
+  "decision": {
+    "basepoles": "allsourceproductsanddecisiveleadingterms",
+    "newton": "dataonlyuntilsubsequentlocalfactortheoremhypotheseschecked",
+    "errors": "notmathematicalnull"
+  },
+  "analysis": {
+    "kind": "exactsymbolicproducts/valuations/integerlowerhull",
+    "comparative": false,
+    "precision": "128fixed,zerosmodprecisionlabelledunknownnotinfinite"
+  },
+  "literature": [
+    {
+      "source": "R52relative-infinity50,R53actualcoordinates,R55quotient",
+      "use": "actualsourcebinding"
+    },
+    {
+      "url": "https://stacks.math.columbia.edu/tag/04GM",
+      "use": "completeDVRHenselroots"
+    },
+    {
+      "url": "https://stacks.math.columbia.edu/tag/0C1B",
+      "use": "ramification/valuationsemantics"
+    },
+    {
+      "url": "https://www.math.ucla.edu/~sharifi/notes/algnum-ch05.html",
+      "use": "valuation/completion setup;localfactorinterpretationrequiresfurtherreview"
+    }
+  ],
+  "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes"
+}

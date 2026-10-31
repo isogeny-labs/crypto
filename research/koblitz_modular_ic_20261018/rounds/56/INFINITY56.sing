@@ -1,0 +1,76 @@
+proc require56(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc orderH56(poly f){int value=100000;intvec e;while(f!=0){e=leadexp(f);if(e[2]<value){value=e[2];}f=f-lead(f);}return(value);}
+execute(read("../../../52/source-data/relative-infinity50.sing"));
+int i56;int j56;int k56;int branch56;intvec exponent56;poly rest56=relativeInfinityIdeal50[2];poly term56;list terms56;
+while(rest56!=0){term56=lead(rest56);exponent56=leadexp(term56);terms56[size(terms56)+1]=list(exponent56,string(leadcoef(term56)));rest56=rest56-term56;}
+ring chart56=2,(s,W,h),dp;short=0;poly G56=0;int power56;
+for(i56=1;i56<=size(terms56);i56++){
+ exponent56=terms56[i56][1];power56=64-4*exponent56[1]-2*exponent56[2]-exponent56[3];
+ require56(power56>=0,"INFINITY56_INTEGRAL_SCALED_CHART");
+ G56=G56+s^exponent56[1]*W^exponent56[2]*h^power56;
+}
+poly E56=W^2+W+h+h^3;poly Rnum56=(1+h)*W+1;poly cnum56=Rnum56+h^3;poly Anum56=cnum56+h^4;poly bnum56=Rnum56*(Rnum56+h^3);
+ring generic56=(2,h),(s,W),dp;short=0;
+map sourceMap56=relativeInfinity50,s/h^4,W/h^2,1/h;map chartMap56=chart56,s,W,h;
+ideal source56=sourceMap56(relativeInfinityIdeal50);
+require56(h^64*source56[2]==chartMap56(G56) && h^4*source56[1]==chartMap56(E56),"INFINITY56_FULL_SOURCE_CHART_IDENTITIES");
+poly R56=(1+1/h)*(W/h^2)+1/h^3;poly c56=(R56+1)/h;poly b56=R56*(R56+1)/h;
+require56(h^3*R56==chartMap56(Rnum56) && h^4*c56==chartMap56(cnum56) && h^4*(1+c56)==chartMap56(Anum56) && h^7*b56==chartMap56(bnum56),"INFINITY56_ACTUAL_COORDINATE_IDENTITIES");
+ring jets56=2,(s,h),dp;short=0;
+map chartMap56=chart56,s,0,h;
+poly g56=h+h^3;poly Wzero56=0;poly summand56=g56;
+for(i56=0;i56<7;i56++){Wzero56=Wzero56+summand56;summand56=summand56^2;}
+require56(Wzero56^2+Wzero56+g56==summand56,"INFINITY56_EXACT_TELESCOPING_IDENTITY");
+ideal jetGB56=std(ideal(h^128));Wzero56=reduce(Wzero56,jetGB56);
+list polynomials56;list numerators56;intmat valuations56[2][5];
+for(branch56=0;branch56<=1;branch56++){
+ poly Wbranch56=Wzero56+branch56;
+ require56(reduce(Wbranch56^2+Wbranch56+g56,jetGB56)==0,"INFINITY56_BOTH_HENSEL_JETS");
+ require56(subst(Wbranch56,h,0)==branch56,"INFINITY56_BRANCH_RESIDUE_LABEL");
+ map branchMap56=chart56,s,Wbranch56,h;
+ poly Rnum56=reduce(branchMap56(Rnum56),jetGB56);poly cnum56=reduce(branchMap56(cnum56),jetGB56);poly Anum56=reduce(branchMap56(Anum56),jetGB56);poly bnum56=reduce(branchMap56(bnum56),jetGB56);
+ poly deltaNum56=reduce(bnum56^3*(h^9*bnum56+cnum56*Anum56^3),jetGB56);
+ valuations56[branch56+1,1]=orderH56(Rnum56)-3;valuations56[branch56+1,2]=orderH56(bnum56)-7;valuations56[branch56+1,3]=orderH56(cnum56)-4;valuations56[branch56+1,4]=orderH56(Anum56)-4;valuations56[branch56+1,5]=orderH56(deltaNum56)-37;
+ polynomials56[branch56+1]=reduce(branchMap56(G56),jetGB56);numerators56[branch56+1]=list(Rnum56,bnum56,cnum56,Anum56,deltaNum56);
+ print("BASE56 branch="+string(branch56)+" R="+string(valuations56[branch56+1,1])+" b="+string(valuations56[branch56+1,2])+" c="+string(valuations56[branch56+1,3])+" A="+string(valuations56[branch56+1,4])+" Delta="+string(valuations56[branch56+1,5]));
+}
+require56(valuations56[1,4]==-4 && valuations56[2,4]==-1,"INFINITY56_PREDICTED_BASE_A_POLES");
+require56(subst(polynomials56[1],h,0)==(s^2+s+1)^8 && subst(polynomials56[2],h,0)==s^16,"INFINITY56_COVER_RESIDUAL_POLYNOMIALS");
+link baseOut56="base-jets56.sing";write(baseOut56,"ring baseJets56=2,(s,h),dp;short=0;poly Wzero56="+string(Wzero56)+";poly Gzero56="+string(polynomials56[1])+";poly Gone56="+string(polynomials56[2])+";");
+for(i56=1;i56<=2;i56++){for(j56=1;j56<=5;j56++){write(baseOut56,"poly numerator"+string(i56)+string(j56)+"56="+string(numerators56[i56][j56])+";");}}
+close(baseOut56);
+ring faces56=(2,a),(s,h),dp;minpoly=a^2+a+1;short=0;map jetMap56=jets56,s,h;
+proc gcdInt56(int x,int y){int r;while(y!=0){r=x%y;x=y;y=r;}if(x<0){x=-x;}return(x);}
+proc polygon56(poly F,string label){
+ int i;int j;int n;int v;int p;int q;int d;int cross;int left;int right;int col;intvec e;
+ intmat points[17][2];intmat hull[17][2];list lc;poly rest=F;poly term;poly face;list records;
+ for(i=0;i<=16;i++){points[i+1,1]=i;points[i+1,2]=100000;lc[i+1]=number(0);}
+ while(rest!=0){term=lead(rest);e=leadexp(term);i=e[1]+1;v=e[2];if(v<points[i,2]){points[i,2]=v;lc[i]=leadcoef(term);}rest=rest-term;}
+ for(i=1;i<=17;i++){
+  if(points[i,2]<128){
+   while(n>=2){cross=(hull[n,1]-hull[n-1,1])*(points[i,2]-hull[n,2])-(hull[n,2]-hull[n-1,2])*(points[i,1]-hull[n,1]);if(cross>0){break;}n--;}
+   n++;hull[n,1]=points[i,1];hull[n,2]=points[i,2];
+  }
+ }
+ require56(n>=2 && hull[1,1]==0 && hull[n,1]==16,"INFINITY56_COMPLETE_NEWTON_ENDPOINTS");
+ for(i=1;i<n;i++){
+  left=hull[i,1];right=hull[i+1,1];p=hull[i,2]-hull[i+1,2];q=right-left;d=gcdInt56(p,q);p=p/d;q=q/d;face=0;
+  for(j=left;j<=right;j++){
+   if(points[j+1,2]<128 && (points[j+1,2]-hull[i,2])*(right-left)==(hull[i+1,2]-hull[i,2])*(j-left)){
+    require56((j-left)%q==0,"INFINITY56_INTEGRAL_FACE_EXPONENT");face=face+lc[j+1]*s^((j-left)/q);
+   }
+  }
+  records[i]=list(left,right,p,q,face);
+  print("NEWTON56 label="+label+" left="+string(left)+" right="+string(right)+" root_value="+string(p)+"/"+string(q)+" residual="+string(face));
+ }
+ link out="newton-"+label+"56.sing";write(out,"ring newton"+label+"56=(2,a),(s,h),dp;minpoly=a^2+a+1;short=0;poly F56="+string(F)+";");
+ for(i=1;i<=17;i++){write(out,"int val"+string(i-1)+"56="+string(points[i,2])+";");}
+ for(i=1;i<size(records)+1;i++){write(out,"poly face"+string(i)+"56="+string(records[i][5])+";");}
+ close(out);return(records);
+}
+poly zero56=jetMap56(polynomials56[1]);poly one56=jetMap56(polynomials56[2]);
+list zeroFaces56=polygon56(subst(zero56,s,s+a),"zero");list oneFaces56=polygon56(one56,"one");
+poly badJet56=jetMap56(Wzero56)+h^3;
+require56(reduce(badJet56^2+badJet56+h+h^3,std(ideal(h^128)))!=0,"INFINITY56_CHANGED_JET_REJECTED");
+print("INFINITY56_RESULT jet_precision=128 base_branches=2 A_poles=4,1 source_degree=16 zero_edges="+string(size(zeroFaces56))+" one_edges="+string(size(oneFaces56)));
+print("INFINITY56_ALL_CHECKS_PASS");quit;
