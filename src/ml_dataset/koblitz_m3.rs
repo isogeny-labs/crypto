@@ -10607,6 +10607,7 @@ mod pre_matrix_input_store_tests {
                     std::fs::write(root.join(KOBLITZ_SLOTS[0].0), b"root collision").unwrap();
                 }
                 if mode == 2 {
+                    std::fs::create_dir_all(sink.dir.join("payloads")).unwrap();
                     std::fs::write(
                         sink.dir.join("payloads").join(KOBLITZ_SLOTS[0].0),
                         b"capture collision",
