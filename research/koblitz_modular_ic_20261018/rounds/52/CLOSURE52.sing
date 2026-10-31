@@ -1,0 +1,95 @@
+execute(read("../../source-data/compact-pid51.sing"));
+execute(read("../../source-data/nu-pid-certificate51.sing"));
+execute(read("../../source-data/nu-field-certificate51.sing"));
+execute(read("../../source-data/rr-table50.sing"));
+execute(read("../../source-data/rr-products50.sing"));
+execute(read("../../source-data/relative-infinity50.sing"));
+setring compactPid51;short=0;option(redSB);
+map nuMap52=nuPidCertificate51,u;map tableMap52=tablePidCertificate50,u;map productMap52=productPidCertificate50,u;
+matrix H52=matrix(basis51);matrix nuH52=nuMap52(H51);matrix nc52=nuMap52(lift51);
+matrix table52=tableMap52(table50);matrix embedding52=tableMap52(sourceLift50);
+module products52=productMap52(productNumerators50);
+intmat parents52=imap(tablePidCertificate50,parents50);
+matrix identity52[32][32];int i52;int j52;int k52;int p52;
+for(i52=1;i52<=32;i52++){identity52[i52,i52]=1;}
+if(H52!=nuH52 || embedding52!=sourceLift51 || H52*embedding52!=commonDenominator51*identity52 || commonDenominator51*H52*table52!=matrix(products52)) {ERROR("CLOSURE52_FULL_DONOR_PRODUCTS");quit;}
+matrix badTable52=table52;badTable52[1,1]=badTable52[1,1]+1;
+if(commonDenominator51*H52*badTable52==matrix(products52)){ERROR("CLOSURE52_BAD_TABLE_ACCEPTED");quit;}
+matrix T52[32][32];p52=0;
+for(i52=1;i52<=32;i52++){for(j52=i52;j52<=32;j52++){
+ p52++;
+ if(parents52[p52,1]!=i52 || parents52[p52,2]!=j52){ERROR("CLOSURE52_TABLE_PARENTS");quit;}
+ for(k52=1;k52<=32;k52++){
+ T52[k52,j52]=T52[k52,j52]+nc52[i52,1]*table52[k52,p52];
+ if(i52!=j52){T52[k52,i52]=T52[k52,i52]+nc52[j52,1]*table52[k52,p52];}
+ }
+}}
+print("CLOSURE52_STAGE complete_table_reloaded=true full_action_constructed=true");
+ring actual52=2,(l,v,u),wp(4,2,1);short=0;option(redSB);
+map actualSource52=relativeInfinity50,l,v,u;ideal source52=actualSource52(relativeInfinityIdeal50);ideal sourceStd52=std(source52);
+map actualPid52=compactPid51,u;matrix actualH52=actualPid52(H52);matrix actualT52=actualPid52(T52);poly D52=actualPid52(commonDenominator51);
+map actualNu52=nuPidCertificate51,u;vector actualNuVector52=actualNu52(target51);
+poly numeratorNu52=0;int i52;int j52;
+for(i52=1;i52<=32;i52++){numeratorNu52=numeratorNu52+actualNuVector52[i52]*l^((i52-1)%16)*v^((i52-1) div 16);}
+matrix actionNumerators52=actualH52*actualT52;poly input52;poly output52;ideal actionResiduals52;
+for(j52=1;j52<=32;j52++){
+ input52=0;output52=0;
+ for(i52=1;i52<=32;i52++){
+  input52=input52+actualH52[i52,j52]*l^((i52-1)%16)*v^((i52-1) div 16);
+  output52=output52+actionNumerators52[i52,j52]*l^((i52-1)%16)*v^((i52-1) div 16);
+ }
+ actionResiduals52[j52]=numeratorNu52*input52+D52*output52;
+ if(reduce(actionResiduals52[j52],sourceStd52)!=0){ERROR("CLOSURE52_ACTUAL_FIELD_ACTION_COLUMN");quit;}
+ print("CLOSURE52_COLUMN "+string(j52));
+}
+matrix actionLifts52=lift(source52,actionResiduals52);
+if(matrix(source52)*actionLifts52!=matrix(actionResiduals52)){ERROR("CLOSURE52_FULL_ACTION_SOURCE_PRODUCTS");quit;}
+// Bind the recovered numerator to the original R51 field certificate as well.
+setring nuFieldCertificate51;
+map mappedPid52=nuPidCertificate51,u;
+poly reconstructed52=0;int i52;
+for(i52=1;i52<=32;i52++){reconstructed52=reconstructed52+coefficients51[i52]*l^((i52-1)%16)*v^((i52-1) div 16);}
+if(mappedPid52(target51)!=coefficients51 || reconstructed52!=D51*nu51 || C51*nu51+numerator51!=source51[1]*nuQuotient51){ERROR("CLOSURE52_NU_SOURCE_BINDING");quit;}
+setring compactPid51;
+proc dump52(link out,string name,matrix A){
+ int r;int c;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");
+ for(r=1;r<=nrows(A);r++){for(c=1;c<=ncols(A);c++){if(A[r,c]!=0){write(out,name+"["+string(r)+","+string(c)+"]="+string(A[r,c])+";");}}}
+}
+link out52="ASCII:w closure-certificate52.sing";open(out52);
+write(out52,"ring closureCertificate52=2,(u),(c,dp);short=0;");
+dump52(out52,"T52",T52);dump52(out52,"initial52",embedding52);
+module current52=module(embedding52);module initialStd52=std(current52);
+matrix initialForward52=lift(current52,initialStd52);matrix initialReverse52=lift(initialStd52,current52);
+if(matrix(current52)*initialForward52!=matrix(initialStd52) || matrix(initialStd52)*initialReverse52!=matrix(current52) || size(initialStd52)!=32 || vdim(initialStd52)!=376){ERROR("CLOSURE52_INITIAL_MODULE");quit;}
+dump52(out52,"basis0_52",matrix(initialStd52));dump52(out52,"initialForward52",initialForward52);dump52(out52,"initialReverse52",initialReverse52);
+current52=initialStd52;
+int step52;int stable52=0;int length52=376;intvec lengths52=376;matrix image52;module combined52;module next52;matrix forward52;matrix reverse52;matrix stableLift52;
+print("CLOSURE52_LENGTH step=0 length=376");
+for(step52=1;step52<=31;step52++){
+ image52=T52*matrix(current52);
+ if(size(reduce(module(image52),current52))==0){stable52=1;break;}
+ combined52=current52,module(image52);next52=std(combined52);
+ forward52=lift(combined52,next52);reverse52=lift(next52,combined52);
+ if(size(next52)!=32 || matrix(combined52)*forward52!=matrix(next52) || matrix(next52)*reverse52!=matrix(combined52)){ERROR("CLOSURE52_STEP_FULL_PRODUCTS");quit;}
+ matrix badForward52=forward52;badForward52[1,1]=badForward52[1,1]+1;
+ if(matrix(combined52)*badForward52==matrix(next52)){ERROR("CLOSURE52_STEP_CORRUPTION_ACCEPTED");quit;}
+ length52=vdim(next52);if(length52<0 || length52>=lengths52[size(lengths52)]){ERROR("CLOSURE52_STRICT_LENGTH_DROP");quit;}
+ lengths52[size(lengths52)+1]=length52;
+ dump52(out52,"basis"+string(step52)+"_52",matrix(next52));dump52(out52,"forward"+string(step52)+"_52",forward52);dump52(out52,"reverse"+string(step52)+"_52",reverse52);
+ current52=next52;
+ print("CLOSURE52_LENGTH step="+string(step52)+" length="+string(length52));
+}
+if(stable52==0 && size(reduce(module(T52*matrix(current52)),current52))==0){stable52=1;}
+if(stable52!=1){ERROR("CLOSURE52_NO_STABILITY_WITHIN_RANK_BOUND");quit;}
+stableLift52=lift(current52,module(T52*matrix(current52)));
+if(matrix(current52)*stableLift52!=T52*matrix(current52)){ERROR("CLOSURE52_FULL_STABILITY_PRODUCT");quit;}
+poly determinant52=det(matrix(current52));if(deg(determinant52)!=length52){ERROR("CLOSURE52_DETERMINANT_LENGTH");quit;}
+list factors52=factorize(determinant52);
+poly rebuilt52=1;ideal factorPolys52=factors52[1];intvec powers52=factors52[2];
+for(i52=1;i52<=size(factorPolys52);i52++){rebuilt52=rebuilt52*factorPolys52[i52]^powers52[i52];}
+if(rebuilt52!=determinant52){ERROR("CLOSURE52_FACTOR_RECONSTRUCTION");quit;}
+dump52(out52,"final52",matrix(current52));dump52(out52,"stableLift52",stableLift52);
+write(out52,"intvec lengths52="+string(lengths52)+";poly determinant52="+string(determinant52)+";ideal factorPolys52="+string(factorPolys52)+";intvec powers52="+string(powers52)+";int extensions52="+string(size(lengths52)-1)+";");close(out52);
+print("CLOSURE52_FACTORS "+string(factorPolys52)+" powers="+string(powers52));
+print("CLOSURE52_RESULT rank=32 initial_length=376 final_length="+string(length52)+" extensions="+string(size(lengths52)-1)+" complete_field_columns=32 full_stability_product=true");
+print("CLOSURE52_ALL_CHECKS_PASS");quit;
