@@ -1,0 +1,83 @@
+{
+  "format": "correspondence-assessment-draft-v1",
+  "assessment_state": "preregistered",
+  "authority": "companion artifact; not a ledger record or certificate",
+  "source": {
+    "object_uid": "generic-prime-field-prime-order-elliptic-subgroup",
+    "representation_uid": "canonical-scalar-fixed-generator-target",
+    "equations": "Q=[k]P; psi_r(Q)=0",
+    "field": "F_p",
+    "dimension": 1,
+    "subgroup_order": "odd prime r"
+  },
+  "destination": {
+    "object_uid": "torsion-local-division-derivative-character",
+    "representation_uid": "constant-size maximal-two-power phase formula",
+    "equations": "phase(g^c0 delta_r^cd psi_(r-1)^cm psi_(r+1)^cp y^cy)=(M/2)(k mod 2)",
+    "field": "F_p phases over Z/MZ",
+    "dimension": "five coefficients independent of r",
+    "ambient_group_order": "r"
+  },
+  "transformation": {
+    "kind": "invariant derivation of the r-division polynomial at subgroup torsion",
+    "family": "torsion-local derivative character oracle",
+    "degree": "division indices r-1, r, r+1 evaluated by memoized recurrence",
+    "field_of_definition": "F_p",
+    "formulas": "D(x)=2y; D(y)=3x^2+a; delta_r=D psi_r",
+    "exceptional_cases": ["multiple torsion zero", "vanishing formula input", "local identity failure", "nonuniform coefficient rule", "unproved cost bound"],
+    "normalization": "least primitive root and canonical scalar parity"
+  },
+  "obligations": {
+    "existence": {"state": "unknown", "evidence": [], "scope": "complete constant-size formula enumeration pending"},
+    "explicit_construction": {"state": "unknown", "evidence": [], "scope": "dual recurrence implementation pending"},
+    "map_correctness": {"state": "unknown", "evidence": [], "scope": "local identity, independent product, decoder, and Lean checks pending"},
+    "subgroup_preservation": {"state": "supported", "evidence": ["all functions and derivatives are evaluated at the original target Q"], "scope": "abstract mechanism"},
+    "computational_advantage": {"state": "unknown", "evidence": [], "scope": "formula exactness and total cost pending"},
+    "scaling_support": {"state": "unknown", "evidence": [], "scope": "uniform formula and recurrence-cost proof pending"}
+  },
+  "mechanism": {
+    "proposed_benefit": "the local derivative may retain the scalar-multiplication differential factor while requiring only a constant-size public phase formula",
+    "prediction": "one frozen coefficient tuple is exact and generator-stable, with polylogarithmic recurrence evaluation",
+    "falsification_condition": "local identity failure, no exact formula, control-matched exactness, generator instability, or total cost above gate",
+    "assumptions": ["simple r-torsion zeros", "sound invariant derivation recurrence", "exact maximal character phase", "uniform coefficient rule"]
+  },
+  "cost_comparison": {
+    "workload": "seven curves, four generators, every nonzero target, 32 matched controls",
+    "baseline": "H107/H108 exact linear-support character modules and generic square-root algorithms",
+    "units": "recurrence nodes, field operations, phase evaluations, formula candidates, decoder steps, memory and advice",
+    "construction": "unmeasured",
+    "transfer": "none; target remains on E(F_p)",
+    "destination": "unmeasured",
+    "recovery": "conditional on an exact formula",
+    "verification": "full local identities, independent products, EC validations, and Lean",
+    "failed_attempts_and_duplicates": "closest internal predecessor is ECDLP-IDEA-006 and its P1540 audit; it studies elliptic-net annihilators/QRT index location, not the torsion-local derivative phase, and must remain a paired no-free-linearization control",
+    "memory_and_data": "unmeasured",
+    "setup_reuse": "none allowed for the full-runtime claim",
+    "uncertainty": "bounded literature search and toy curves cannot establish novelty or asymptotics",
+    "evidence_label": "unmeasured"
+  },
+  "controls": [
+    "16 symmetry-matched E101 label controls",
+    "16 symmetry-matched E127 label controls",
+    "H107/H108 paired cost baseline",
+    "squared local-derivative identity",
+    "direct small-index dual-derivative controls",
+    "independent field-product and EC reconstruction checks"
+  ],
+  "protocol": {
+    "parameter_scope": "r in {83,109,139,223,281,499,947}; multipliers 1,2,3,5; at most 4^5 formulas per row",
+    "sample_selection": "every nonzero subgroup point",
+    "stopping_rules": "complete all frozen formulas, rows, controls, and eligible decoders",
+    "invalidation_rules": "any recurrence, derivative, local identity, phase, product, parity, decoder, or EC mismatch",
+    "hardware_manifest": null,
+    "execution_route": "torsion_division_derivative_lab.py"
+  },
+  "open_obligations": [
+    "open the paired draft H109 PRs before implementation",
+    "implement and execute the dual recurrence",
+    "compile the Lean certificate and any claimed cost theorem",
+    "independently extend the prior-art review"
+  ],
+  "recommended_next_action": "open the canonical crypto and paired cryptanalysis draft H109 PRs",
+  "official_status_change": "none"
+}
