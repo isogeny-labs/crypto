@@ -4,8 +4,6 @@
 #
 # For every Lean target in the repository:
 #   * a Lake project (a directory with lakefile.toml / lakefile.lean): `lake build`,
-#     explicitly build every tracked source owned by it (not only default
-#     targets), then audit every compiled module;
 #     explicitly build every tracked Lean source, then audit every built module;
 #   * a standalone .lean file outside any Lake project: compile it with `lean -o`
 #     against the core library, then audit that module.
@@ -37,6 +35,7 @@ trusted="${LEAN_GATE_TRUSTED:-$root/tools/lean/trusted-native.txt}"
 # cannot silently turn an unrelated build failure into a passing target.
 archived_failed='research/isogeny_world_frontier_20261016/replay-optimization-v1/implementation-01/Newton.failed.lean'
 archived_failed_sha256='b439d1edbe04798a56012688254ea7bd120494e4fd10856f4bdc0c07796e9d1c'
+# shellcheck disable=SC2016 # The Lean diagnostic contains literal backticks.
 archived_failed_error='error(lean.unknownIdentifier): Unknown constant `Int.mul_two`'
 trust_args=()
 [ -f "$trusted" ] && trust_args=(--trusted "$trusted")
@@ -55,7 +54,6 @@ done
 discover() {
   cd "$root" || exit 3
   # Lake projects: every lakefile outside build output and vendored packages.
-  git ls-files -- '*lakefile.toml' '*lakefile.lean' | grep -vE '(^|/)tools/(lean/)?selftest/' | xargs -r -n1 dirname | sort -u
   git ls-files -- '*lakefile.toml' '*lakefile.lean' | grep -v '^tools/lean/selftest/' \
     | xargs -r -n1 dirname | sort -u
   # Standalone files: tracked .lean files with no lakefile in any parent directory.
@@ -77,7 +75,6 @@ command -v python3 > /dev/null || { echo "python3 not on PATH (target path norma
 scratch=$(mktemp -d)
 trap 'rm -rf "$scratch"' EXIT
 fail=0
-summary=()
 
 run_target() {
   local t slug log status
@@ -153,63 +150,8 @@ PY
     if ! (cd "$root/$t" && lake build) > "$log/build.log" 2>&1; then
       status=FAIL_build
     else
-      # A default target can omit a tracked proof entirely. Force each source
-      # through Lake's source-path target resolver. Unregistered auxiliary
-      # sources compile directly into a private directory and are audited too,
-      # so frozen Lake configurations need no edits. Tools and fixtures are outside
-      # the proof inventory. Nested Lake projects are owned by their own gate.
-      local source rel module owner aux auxfile probe
-      aux="$log/aux"
-      mkdir -p "$aux"
-      : > "$log/sources.log"
-      while IFS= read -r -d '' source; do
-        case "$source" in tools/selftest/*|*/tools/selftest/*|tools/lean/*|*/tools/lean/*|tools/AuditAxioms.lean|*/tools/AuditAxioms.lean|*/.lake/*|lakefile.lean|*/lakefile.lean) continue ;; esac
-        owner=$(dirname "$source")
-        while [ "$owner" != . ] && [ ! -f "$root/$owner/lakefile.toml" ] && [ ! -f "$root/$owner/lakefile.lean" ]; do
-          owner=$(dirname "$owner")
-        done
-        [ "$owner" = "$t" ] || { [ "$owner" = . ] && [ "$t" = . ]; } || continue
-        rel=${source#"$t"/}
-        [ "$t" = . ] && rel=$source
-        printf '%s\n' "$rel" >> "$log/sources.log"
-        probe="$log/source-target.log"
-        # Lake takes a module target here. Passing "Foo.lean" asks it for
-        # Foo/lean.lean, so convert the tracked source path to Foo.Bar.
-        module=${rel%.lean}
-        module=${module//\//.}
-        if ! (cd "$root/$t" && lake build "$module") > "$probe" 2>&1; then
-          if grep -q 'unknown target' "$probe"; then
-            printf 'direct source compile: %s\n' "$rel" >> "$log/build.log"
-            auxfile="$aux/${rel%.lean}.olean"
-            mkdir -p "$(dirname "$auxfile")"
-            if ! (cd "$root/$t" && LEAN_PATH="$aux:${LEAN_PATH:-}" lake env lean -o "$auxfile" "$rel") >> "$log/build.log" 2>&1; then
-              status=FAIL_build_source
-            fi
-          else
-            cat "$probe" >> "$log/build.log"
-            status=FAIL_build_source
-          fi
-          [ "$status" = PASS ] || break
-        else
-          cat "$probe" >> "$log/build.log"
-        fi
-      done < <(cd "$root" && git ls-files -z -- '*.lean')
-      if [ "$status" = PASS ] && [ ! -s "$log/sources.log" ]; then
-        status=FAIL_no_sources
-        echo 'error: no tracked project proof sources' >> "$log/build.log"
-      fi
-      local mods
-      mods=$({ (cd "$root/$t/.lake/build/lib/lean" 2>/dev/null && find . -name '*.olean');
-                (cd "$aux" && find . -name '*.olean'); } \
-        | sed 's|^\./||; s|\.olean$||; s|/|.|g' | sort -u | tr '\n' ' ')
-      if [ "$status" != PASS ]; then
-        : # Do not turn an omitted/unbuildable source into an audit success.
-      elif [ -z "$mods" ]; then
-        status=FAIL_no_modules
-      elif ! (cd "$root/$t" && LEAN_PATH="$aux:${LEAN_PATH:-}" lake env lean --run "$audit" -- ${trust_args[@]+"${trust_args[@]}"} $mods) > "$log/audit.log" 2>&1; then
-        status=FAIL_audit
-      local mods f module
-      local -a sources=()
+      local f module
+      local -a sources=() mods=()
       # A default target may omit an entire tracked module. The +Module
       # syntax works in both supported Lake versions; an unregistered source
       # fails closed rather than silently escaping the axiom audit.
@@ -224,18 +166,21 @@ PY
           lakefile.lean|AxiomAudit.lean|*/AxiomAudit.lean) continue ;;
         esac
         module=${module%.lean}
-        sources+=("+${module//\//.}")
+        # Quote path components as Lean identifiers: a tracked directory can
+        # contain a hyphen, which Lake otherwise parses as target syntax.
+        module=${module//\//».«}
+        sources+=("+«$module»")
       done < <(cd "$root" && git ls-files -z -- "$t")
       if [ ${#sources[@]} -eq 0 ]; then
         status=FAIL_no_sources
       elif ! (cd "$root/$t" && lake build "${sources[@]}") > "$log/source-build.log" 2>&1; then
         status=FAIL_source_build
       else
-        mods=$(cd "$root/$t/.lake/build/lib/lean" 2>/dev/null && find . -name '*.olean' \
-          | sed 's|^\./||; s|\.olean$||; s|/|.|g' | sort | tr '\n' ' ')
-        if [ -z "$mods" ]; then
+        mapfile -t mods < <(cd "$root/$t/.lake/build/lib/lean" 2>/dev/null && find . -name '*.olean' \
+          | sed 's|^\./|«|; s|\.olean$|»|; s|/|».«|g' | sort)
+        if [ ${#mods[@]} -eq 0 ]; then
           status=FAIL_no_modules
-        elif ! (cd "$root/$t" && lake env lean --run "$audit" -- "${trust_args[@]}" $mods) > "$log/audit.log" 2>&1; then
+        elif ! (cd "$root/$t" && lake env lean --run "$audit" -- "${trust_args[@]}" "${mods[@]}") > "$log/audit.log" 2>&1; then
           status=FAIL_audit
         fi
       fi

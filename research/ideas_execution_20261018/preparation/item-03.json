@@ -1,0 +1,40 @@
+{
+  "item": 3,
+  "title": "Dinur / Lokshtanov Boolean solver paradigm",
+  "original_requirement": "Implement published polynomial-method / beyond-brute-force family on n<=41 descended systems, fit effective exponent c against threshold c<1/2-1/m.",
+  "acceptance_criteria": [
+    "Published algorithm identity and applicability verified from primary source before implementation.",
+    "Natural, planted positive and certified negative controls where available; count actual Boolean variables including auxiliaries.",
+    "Correctness-checked operation/memory scaling; c fit with uncertainty and total oracle-call accounting."
+  ],
+  "source_bindings": [
+    {
+      "repository": "cryptanalysis",
+      "path": "experiments/pdp-scaling/descend.py"
+    },
+    {
+      "repository": "cryptanalysis",
+      "path": "experiments/pdp-scaling/solve.py"
+    },
+    {
+      "repository": "cryptanalysis",
+      "path": "experiments/pdp-scaling/sumpoly.py"
+    },
+    {
+      "repository": "crypto-autoresearcher",
+      "path": "experiments/EXP-ECDLP-97a533/specification.yaml"
+    }
+  ],
+  "source_supported_commands": [],
+  "remaining_gaps": [
+    "Dinur/Lokshtanov backend not in inspected ENGINES dispatch; implement actual published method, not brute-force renamed.",
+    "Primary algorithm literature verification and domain restrictions unresolved in this preparation.",
+    "Existing instance generator plants decompositions; extend frozen target-law corpus for natural/negative arms before complete comparison."
+  ],
+  "dependencies": [],
+  "existing_evidence_notes": [],
+  "preparation_status": "source_bound",
+  "scientific_completion_status": "not_claimed_by_this_preparation",
+  "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+  "original_audit_text": "Dinur's polynomial method and the Lokshtanov et al. beyond-brute-force family for Boolean systems. The corpus cites Dinur only for time-space tradeoffs. The required exponent is c < 1/2 − 1/m and the published c ≈ 0.69 does not reach it, but the descended systems are Frobenius-linear in most monomials and their effective exponent is unmeasured. Run it on the n ≤ 41 systems and fit c. Expected negative, cheap, and it closes a whole paradigm."
+}

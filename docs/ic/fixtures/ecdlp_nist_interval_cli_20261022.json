@@ -1,0 +1,192 @@
+{
+  "b571_seeded": {
+    "args": [
+      "B-571",
+      "--random-bits",
+      "8",
+      "--method",
+      "kangaroo",
+      "--threads",
+      "4",
+      "--seed",
+      "7",
+      "--max-iterations",
+      "100000"
+    ],
+    "curve": {
+      "catalog_name": "sect571r1",
+      "cofactor": "2",
+      "family": "binary",
+      "field_and_equation": {
+        "a_hex": "1",
+        "b_hex": "2f40e7e2221f295de297117b7f3d62f5c6a97ffcb8ceff1cd6ba8ce4a9a18ad84ffabbd8efa59332be7ad6756a66e294afd185a78ff12aa520e4de739baca0c7ffeff7f2955727a",
+        "irreducible_low_terms": [
+          0,
+          2,
+          5,
+          10
+        ],
+        "m": 571,
+        "model": "binary-weierstrass"
+      },
+      "field_bits": 571,
+      "field_size": "7729075046034516689390703781863974688597854659412869997314470502903038284579120849072387533163845155924927232063004354354730157322085975311485817346934161497393961629646848",
+      "generator": {
+        "x": "303001d34b856296c16c0d40d3cd7750a93d1d2955fa80aa5f40fc8db7b2abdbde53950f4c0d293cdd711a35b67fb1499ae60038614f1394abfa3b4c850d927e1e7769c8eec2d19",
+        "y": "37bf27342da639b6dccfffeb73d69d78c6c27a6009cbbca1980f8533921e8a684423e43bab08a576291af8f461bb2a8b3531d2f0485c19b16e2f1516e23dd3c1a4827af1b8ac15b"
+      },
+      "group_order": "7729075046034516689390703781863974688597854659412869997314470502903038284579120849072287998778831546166267762243853888972493744925633626140469056576606664822786382210571406",
+      "name": "B-571",
+      "order": "3864537523017258344695351890931987344298927329706434998657235251451519142289560424536143999389415773083133881121926944486246872462816813070234528288303332411393191105285703",
+      "order_bits": 570,
+      "standard": "SEC 2 / NIST B-571"
+    },
+    "method": "kangaroo",
+    "planted_recovered": true,
+    "scalar": "6",
+    "target": {
+      "x": "557287ac0922872935c3971223112a6345b8de8c112d37061f6643de94d758ce34552fdd6b0f21992f06e2e5dd6b3a69028d35c5c8f1c934177d64506ec14212727c6c1fa11edda",
+      "y": "295fd54014c36da83518a23c15f00037200697b8cb38b2f81afe4843e7954c00dd125ae7d6cccebe9eefa2b2653d8999421e9969544a2a5c534ce63037d44b77c01209ab18c04a8"
+    },
+    "verified": true
+  },
+  "date_utc": "2026-10-22T07:24:36.748626+00:00",
+  "negative_checks": [
+    {
+      "args": [
+        "P-256",
+        "--random-bits",
+        "8",
+        "--interval-width",
+        "0"
+      ],
+      "error_contains": "positive",
+      "no_panic": true,
+      "nonzero_exit": true
+    },
+    {
+      "args": [
+        "P-256",
+        "--random-bits",
+        "0"
+      ],
+      "error_contains": "positive",
+      "no_panic": true,
+      "nonzero_exit": true
+    },
+    {
+      "args": [
+        "P-256",
+        "--secret",
+        "256",
+        "--interval-bits",
+        "8"
+      ],
+      "error_contains": "outside the declared interval",
+      "no_panic": true,
+      "nonzero_exit": true
+    },
+    {
+      "args": [
+        "P-256",
+        "--secret",
+        "1",
+        "--interval-lo",
+        "1"
+      ],
+      "error_contains": "requires an interval width",
+      "no_panic": true,
+      "nonzero_exit": true
+    },
+    {
+      "args": [
+        "P-256",
+        "--secret",
+        "2037035976334486086268445688409378161051468393665936250636140449354381299763336706183397376"
+      ],
+      "error_contains": "below the subgroup order",
+      "no_panic": true,
+      "nonzero_exit": true
+    }
+  ],
+  "p256_external": {
+    "args": [
+      "P-256",
+      "--point",
+      "971581bdd1356ea1b317d7b29059611176788153b4d38f8d81155d60576d8c46,870ce8afdf0d59c19dd52f1e8654186aaae84346183f325380c784e32bcec592",
+      "--interval-lo",
+      "32",
+      "--interval-bits",
+      "8"
+    ],
+    "curve": {
+      "catalog_name": "p256",
+      "cofactor": "1",
+      "family": "prime",
+      "field_and_equation": {
+        "a_hex": "ffffffff00000001000000000000000000000000fffffffffffffffffffffffc",
+        "b_hex": "5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b",
+        "model": "short-weierstrass-prime",
+        "p_hex": "ffffffff00000001000000000000000000000000ffffffffffffffffffffffff"
+      },
+      "field_bits": 256,
+      "field_size": "115792089210356248762697446949407573530086143415290314195533631308867097853951",
+      "generator": {
+        "x": "6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296",
+        "y": "4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5"
+      },
+      "group_order": "115792089210356248762697446949407573529996955224135760342422259061068512044369",
+      "name": "P-256",
+      "order": "115792089210356248762697446949407573529996955224135760342422259061068512044369",
+      "order_bits": 256,
+      "standard": "NIST FIPS 186-4 / SEC 2"
+    },
+    "method": "bsgs",
+    "planted_scalar": null,
+    "scalar": "38",
+    "verified": true
+  },
+  "p256_seeded": {
+    "args": [
+      "P-256",
+      "--random-bits",
+      "8",
+      "--interval-lo",
+      "32",
+      "--seed",
+      "7"
+    ],
+    "curve": {
+      "catalog_name": "p256",
+      "cofactor": "1",
+      "family": "prime",
+      "field_and_equation": {
+        "a_hex": "ffffffff00000001000000000000000000000000fffffffffffffffffffffffc",
+        "b_hex": "5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b",
+        "model": "short-weierstrass-prime",
+        "p_hex": "ffffffff00000001000000000000000000000000ffffffffffffffffffffffff"
+      },
+      "field_bits": 256,
+      "field_size": "115792089210356248762697446949407573530086143415290314195533631308867097853951",
+      "generator": {
+        "x": "6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296",
+        "y": "4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5"
+      },
+      "group_order": "115792089210356248762697446949407573529996955224135760342422259061068512044369",
+      "name": "P-256",
+      "order": "115792089210356248762697446949407573529996955224135760342422259061068512044369",
+      "order_bits": 256,
+      "standard": "NIST FIPS 186-4 / SEC 2"
+    },
+    "method": "bsgs",
+    "planted_recovered": true,
+    "scalar": "38",
+    "target": {
+      "x": "971581bdd1356ea1b317d7b29059611176788153b4d38f8d81155d60576d8c46",
+      "y": "870ce8afdf0d59c19dd52f1e8654186aaae84346183f325380c784e32bcec592"
+    },
+    "verified": true
+  },
+  "schema": "crypto.ecdlp-nist-interval-cli-acceptance/v1",
+  "source_parent_commit": "54cc8dcb7f2085cd8c1481add9232a8443c80df1"
+}

@@ -1,0 +1,768 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+\hypersetup{colorlinks=true, linkcolor=blue!50!black, citecolor=blue!50!black, urlcolor=blue!50!black}
+
+\title{Negative Results for Elliptic-Curve Index Calculus:\\
+       Six Statements, the Proofs or Evidence Behind Them,\\
+       and What They Do Not Say}
+\author{Anonymous}
+\date{}
+
+\newcommand{\FF}{\mathbb{F}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\Aut}{\mathrm{Aut}}
+\newcommand{\ev}[1]{\textup{[#1]}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\begin{document}
+\maketitle
+\emergencystretch=2em
+
+\begin{abstract}
+We collect six negative results on index calculus for the elliptic-curve
+discrete logarithm and state each at the tier its evidence supports.
+(1) The compact-orbit Koblitz decomposition configurations measured in this
+programme sit on or above the generic preprocessing line
+$ST^2 \gtrsim r/|\mathrm{Aut}|$, and at the rank-stage mean on the
+non-adaptive line $ST \approx r/|\mathrm{Aut}|$.
+(2) Isogeny oracles add nothing in a generic group model: we reprove the bound
+$(Q+2)^2/r + 1/r$ and give a Lean statement of its counting core.
+(3) The mean decomposition yield of a factor base of size $B$ is
+$\binom{B+m-1}{m}/N$ whatever its geometry.
+(4) The monodromy group of the Semaev summation cover is
+$(\mathbb{Z}/2)^{m-2}$; this is a derivation that has not had an independent
+review.
+(5) Lemma 4 of Nagao's ePrint 2015/984, $d_F \le d'_F$, is false over
+$\mathbb{F}_2$ under the equality reading of its definitions; one witness is
+checked by hand and both are re-derived natively, and nothing is claimed about the
+paper's Proposition 5.
+(6) We could not establish that Semaev's Assumption 1 fails off the diagonal,
+and state what is and is not known. Every number links to a committed
+evidence file. None of this is a speedup or a statement about a deployed curve.
+\end{abstract}
+
+\section{Introduction}
+\label{sec:intro}
+
+A programme that searches for faster index calculus on elliptic curves
+produces many negative results, and they are easy to lose: each sits in a
+different repository, at a different strength, behind a different convention.
+This paper states six of them in one place. For each we say what is proved, what
+is an exact finite computation, what is a measured committed record, and what is
+only a derivation that nobody outside the programme has read. We also say what
+each statement does \emph{not} say.
+
+The six statements are:
+\begin{description}
+\item[S1] compact-orbit Koblitz index calculus is not evidence of a non-generic
+  speedup: its measured configurations sit on or above the generic
+  preprocessing lines (Section~\ref{sec:s1});
+\item[S2] isogeny oracles add nothing in the generic group model
+  (Section~\ref{sec:s2});
+\item[S3] the mean decomposition yield is conserved under factor-base geometry
+  (Section~\ref{sec:s3});
+\item[S4] the monodromy of the Semaev summation cover is $(\ZZ/2)^{m-2}$
+  (Section~\ref{sec:s4});
+\item[S5] Lemma 4 of Nagao's ePrint 2015/984 is false as a universal statement
+  (Section~\ref{sec:s5});
+\item[S6] whether Semaev's 2015 Assumption 1 fails off the diagonal is
+  \emph{not} established by the programme's records (Section~\ref{sec:s6}).
+\end{description}
+S6 is included because the design of this paper listed it as a negative result,
+and the evidence on disk does not support that. Reporting it as open is the
+result.
+
+\paragraph{Claim class.}
+Under the programme's success criterion a relabelling or an accounting change is
+not an improvement, and this paper is that: a consolidation of existing
+negatives. It measures no new speed, reports no gap to Pollard rho of its own
+(the studies it cites report theirs), and makes no key-recovery, sub-rho or
+deployed-curve claim.
+
+\paragraph{Labels.}
+Each statement carries one label, fixed by its evidence and not by our
+judgement of how convincing it is.
+\textsc{proved}: a proof is in the paper.
+\textsc{exact}: an exact finite computation that we re-ran natively, with its
+scope stated.
+\textsc{recorded}: committed measured rows, cited by file and digest.
+\textsc{derived, unreviewed}: a written derivation that has not had an
+independent review.
+\textsc{not established}: the records do not support the statement.
+Table~\ref{tab:summary} lists them.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}l p{4.6cm} p{2.9cm} p{4.4cm}@{}}
+\toprule
+ & statement & label & evidence \\
+\midrule
+S1 & compact-orbit IC on or above $ST^2 \gtrsim r/|\Aut|$ & \textsc{recorded} (14 rows) & \ev{E1}, \ev{E2}, \ev{E3} \\
+S2 & isogeny oracles add nothing generic & \textsc{proved}; counting core in Lean (not yet kernel-checked) & \ev{E4}, \ev{E31} \\
+S3 & mean yield conserved under base geometry & \textsc{proved}; \textsc{exact}; \textsc{recorded} & \ev{E5}, \ev{E7}, \ev{E6}, \ev{E18}, \ev{E32} \\
+S4 & Semaev cover monodromy $(\ZZ/2)^{m-2}$ & \textsc{derived, unreviewed} & \ev{E9}, \ev{E10}, \ev{E11}, \ev{E13} \\
+S5 & Nagao Lemma 4 false (equality reading, $\FF_2$) & \textsc{exact} & \ev{E14}, \ev{E15}, \ev{E18} \\
+S6 & Assumption 1 fails off the diagonal & \textsc{not established} & \ev{E20}, \ev{E21}, \ev{E22} \\
+\bottomrule
+\end{tabular}
+\caption{The six statements, their labels and evidence. Identifiers $E_i$ are
+rows of the evidence ledger (Appendix~\ref{app:ledger}).}
+\label{tab:summary}
+\end{table}
+
+\paragraph{Conventions.}
+Evidence files live in two repositories and are cited with the prefix
+\texttt{crypto:} or \texttt{crypto-autoresearcher:};
+Appendix~\ref{app:ledger} gives each file's SHA-256. $r$ is the prime order of
+the subgroup under attack, $A=|\Aut|$ is the order of the automorphism group the
+base is folded by, $S$ is the stored advice (table entries, not bits), $T$ is the
+online cost in the unit named in each section. All measurements are at toy
+scale. A \emph{probe} (one quadratic solve plus a root-table lookup) is not a
+group operation; where a bound is stated in group operations the section says
+so.
+
+\section{S1: compact-orbit Koblitz index calculus against the generic lines}
+\label{sec:s1}
+
+\paragraph{Setting.}
+The compact-orbit configuration on a Koblitz curve over $\FF_{2^n}$ folds a
+factor base by the Frobenius orbit, collects $4$-sum relations through a table of
+roots of the third summation polynomial, and extracts a target by a fixed
+state-and-shift scan of that table. The table has $S=K^2 n$ entries. The study
+we rely on (\ev{E3}, \ev{E1}, \ev{E2}) audits the committed records of this
+configuration for $n\in\{37,41,53,61,71,73,83\}$ against three published lower
+bounds, and we use only its \emph{adaptive} and \emph{non-adaptive}
+preprocessing lines:
+\begin{itemize}
+\item the adaptive line $S\,T^2 \approx r$ (Bernstein--Lange; Corrigan-Gibbs and
+  Kogan, which also gives the matching algorithm) \cite{BL13,CGK18};
+\item the non-adaptive line: a non-adaptive algorithm with advice $S$ and $T$
+  queries succeeds with probability at most $3T^2/r + 4\ln 2\cdot ST/r$, so
+  below $T=\sqrt r$ it needs $ST \gtrsim r$ \cite{DKM25}.
+\end{itemize}
+Dividing $r$ by $A$ is the audit's own convention (\ev{E3}: ``Theorem 3.2 has
+none''), not a theorem of the cited papers. We keep that division and say so.
+
+\paragraph{Result.}
+Table~\ref{tab:s1} reproduces the audit's compact-orbit ladder. The first block
+uses the single frozen target probes; the second the rank-stage mean probes per
+relation.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+rung & $\log_2 r$ & $A$ & $S=K^2n$ & $\log_2(ST^2)-\log_2(r/A)$ & $ST/(r/A)$ & $ST/(r/A)$ \\
+ & & & & frozen target & frozen target & rank-stage mean \\
+\midrule
+n37 & 27.78 & 74  & $1.813\times10^{3}$ & 9.4  & 0.627 & 1.094 \\
+n41 & 39.00 & 82  & $2.962\times10^{5}$ & 14.3 & 0.939 & 1.092 \\
+n53 & 44.26 & 106 & $2.565\times10^{6}$ & 13.1 & 0.342 & 1.081 \\
+n61 & 47.21 & 122 & $2.196\times10^{7}$ & 19.7 & 3.741 & 1.053 \\
+n71 & 52.29 & 142 & $2.556\times10^{7}$ & 7.1  & 0.010 & 1.478 \\
+n73 & 56.26 & 146 & $2.628\times10^{7}$ & 13.2 & 0.020 & 2.734 \\
+n83 & 52.93 & 166 & $2.988\times10^{7}$ & 25.4 & 5.120 & 1.417 \\
+\bottomrule
+\end{tabular}
+\caption{Compact-orbit ladder (\ev{E2}, rows \texttt{target\_probes\_online} and
+the rank-stage-mean sentence; same numbers in \ev{E1}). $T$ is in probes, not
+group operations.}
+\label{tab:s1}
+\end{table}
+
+\begin{proposition}[S1, \textsc{recorded}]
+\label{prop:s1}
+On the seven rungs of Table~\ref{tab:s1}:
+(a) every measured row, whether the single frozen target or the rank stage plus
+target, has $\log_2(ST^2)-\log_2(r/A)\ge 7.1$ (frozen target: $7.1$ to $25.4$;
+rank stage plus target: $16.8$ to $45.8$);
+(b) at the rank-stage mean probes per relation, $ST/(r/A)$ lies in
+$[1.053,\,2.734]$;
+(c) for single frozen targets $ST/(r/A)<1$ at n37, n41, n53, n71 and n73.
+\end{proposition}
+
+The audit also records, for the whole study, that none of $208$ configurations
+(prime, random binary, Koblitz round five, one-target and batch Koblitz, and the
+compact-orbit probe rows) has a measured cost below its bound (\ev{E3}, Result 1;
+smallest measured-to-bound ratios $38.9$, $56.8$, $355$, $2.84\times10^{6}$,
+$7.99\times10^{4}$ and $1077$ for the six families).
+
+\paragraph{How to read (c).}
+The non-adaptive bound limits the \emph{success probability} of an algorithm over
+random targets; a single cheap target is not a counterexample. The audit finds the
+two cheapest draws, n71 and n73, at $0.0065$ and $0.0075$ times the rank-stage mean
+probes per relation; under an exponential first-hit law each is a
+$P\approx0.006$--$0.007$ event, and it calls them improbably cheap (\ev{E3},
+``Record problems'', item 3). We report them and do not average them away.
+
+\paragraph{What S1 does not say.}
+It is not a proof that the configuration is a generic algorithm. The structured
+generic-group bound is vacuous here: every rung has $\delta_{\mathrm{upper}}=1$
+(its $4$-sums cover the subgroup), so it certifies nothing (\ev{E3}, Result 1).
+The comparison is in probes and table entries, and the audit flags the rows
+\texttt{unit\_not\_group\_operations}. The audit also found three record problems
+that we carry forward: the n61 subgroup order is recorded as $\log_2 r=47.54$ in
+the ledger against the exact $47.2109$; the excluded-precompute field means
+different things at different rungs; and the n71 and n73 frozen targets are
+improbable (\ev{E3}, ``Record problems''). The distance to matched rho at full
+cost is outside this paper.
+
+\section{S2: isogeny oracles add nothing in the generic group model}
+\label{sec:s2}
+
+Let $E_1,\dots,E_k$ be curves in one $\FF_q$-isogeny class with $N=h\,r$, $r$
+prime and $r\nmid h$. Each order-$r$ subgroup $G_j\subseteq E_j(\FF_q)$ is encoded
+by an independent random injection $\sigma_j:\ZZ/r\to\{0,1\}^{*}$. The algorithm
+has oracles for addition and negation in every $G_j$ and for every
+$\FF_q$-rational isogeny $\psi:E_i\to E_j$ of any degree, restricted to $G_i$,
+and is given the scalars $\lambda_\psi\in\ZZ/r$ through which each $\psi$ acts.
+
+\begin{theorem}[Theorem 15.1 of \ev{E4}; \textsc{proved}]
+\label{thm:151}
+An algorithm that makes $Q$ oracle calls finds $\log_{g_1}(Q_1)$ with
+probability at most $(Q+2)^2/r + 1/r$.
+\end{theorem}
+
+\paragraph{Counting convention.}
+The note does not say how the generators of the other $G_j$ are supplied. We read
+the theorem as giving the algorithm the encodings of $g_1$ and $Q_1$ only, with
+every other element obtained through an oracle answer; then at most $Q+2$ distinct
+elements ever exist. If encodings of fixed generators of the other groups are
+also given, $Q+2$ becomes $Q+k+1$ below and nothing else changes.
+
+\paragraph{Proof.}
+Write $x=\log_{g_1}Q_1$, uniform in $\ZZ/r$. Because $G_i$ has prime order,
+$\ker\psi\cap G_i$ is $0$ or $G_i$, so a rational isogeny maps $G_i$ either
+isomorphically onto $G_j$ or to the identity (this includes isogenies of degree
+divisible by $r$ whose kernel is the other Frobenius eigenline of $E[r]$). With
+the $\lambda_\psi$ known, every element the algorithm can hold has the form
+$\sigma_j(a+bx)$ with $(a,b)\in(\ZZ/r)^2$ computed from the query structure and
+the $\lambda_\psi$ alone: group operations add and negate forms, and an isogeny
+multiplies a form by $\lambda_\psi$ or by $0$.
+
+The argument is Shoup's \cite{Sho97}, adapted to forms on several curves.
+Game~0 is the real game. Game~1 is run by a simulator that tracks only the forms
+$(a,b)$, giving the forms $(1,0)$ and $(0,1)$ to the inputs $g_1$ and $Q_1$. It answers each query with the string already assigned to the same form
+on the same curve, and with a fresh random string if the form is new. The simulator
+never uses $x$. The two games give the same transcript unless two \emph{distinct}
+forms on one curve have the same value at $x$, the bad event. In Game~1 the
+algorithm's view is independent of $x$, so it outputs the right $x$ with
+probability exactly $1/r$.
+
+It remains to bound the bad event. Fix the simulator's random choices; they fix the
+families $P_1,\dots,P_k$ of forms issued on each curve, with
+$\sum_j |P_j|\le Q+2$. The set of secrets at which two different members of $P_j$
+coincide has at most $|P_j|^2-|P_j|$ elements, by Lemma~\ref{lem:core} below, which
+holds over any field. Summing over $j$ gives at most $(Q+2)^2$ bad secrets out of
+$r$. Averaging over the simulator's choices, the bad event has probability at most
+$(Q+2)^2/r$, so the real algorithm wins with probability at most
+$1/r+(Q+2)^2/r$. $\square$
+
+\begin{lemma}[counting core]
+\label{lem:core}
+Let $F$ be a field and $P\subseteq F\times F$ a finite set of affine forms
+$(a,b)$, read as $x\mapsto a+bx$. (i) Two distinct forms agree at no more than one
+$x\in F$. (ii) For any finite $S\subseteq F$, the number of $x\in S$ at which two
+different members of $P$ agree is at most $|P|^2-|P|$. (iii) Off that set the
+evaluation map $p\mapsto a+bx$ is injective on $P$.
+\end{lemma}
+\begin{proof}
+(i) If $a+bx=c+dx$ and $a+by=c+dy$ with $(a,b)\neq(c,d)$: if $b=d$ then $a=c$, a
+contradiction; otherwise $(b-d)(x-y)=0$ gives $x=y$. (ii) The bad set lies in the
+union, over the $|P|^2-|P|$ ordered pairs of distinct forms, of the sets in (i).
+(iii) is the definition. \qedhere
+\end{proof}
+
+The bound $|P|^2-|P|$ counts ordered pairs; the unordered count $\binom{|P|}{2}$
+holds as well, and is attained (see below).
+
+\paragraph{Machine support.}
+Lemma~\ref{lem:core} is stated and proved in Lean in
+\texttt{IcNegative/AffineCore.lean} (\ev{E31}; Section~\ref{sec:lean}), and it is
+checked exhaustively on $\ZZ/p$ for $p=5,7,11$ in the native instrument
+(\ev{E18}): $2352$ ordered pairs of distinct forms on $\ZZ/7$ and $14520$ on
+$\ZZ/11$ agree at most once; over all $18424$ sets of three forms on $\ZZ/7$ the
+largest bad set has $3=\binom32$ elements, and over all $211876$ sets of four forms
+on $\ZZ/7$ it has $6=\binom42$. The negative control behaves as it must: on $\ZZ/8$
+the forms $(0,0)$ and $(0,4)$ agree at $4$ points, and on $\ZZ/9$ the forms
+$(0,0)$ and $(0,3)$ at $3$, so the field hypothesis is needed.
+
+\paragraph{What S2 does not say.}
+Theorem~\ref{thm:151} concerns isogeny \emph{maps} used as oracles. Two things sit
+outside its hypotheses on purpose (\ev{E4}): the Weil and Tate pairing on the
+$[r]$-fibre is not an isogeny oracle, and Smart's attack uses a lift to $\mathbb{Q}_p$.
+Any effect of an isogeny on index calculus must therefore come from the
+\emph{representation}, the coordinates in which factor bases and summation
+polynomials live. The Lean statement is the counting step only; the oracle model,
+the simulator and the hybrid step are not formalised (\texttt{OPEN\_TARGETS.md}, O1).
+
+\section{S3: mean decomposition yield is conserved under base geometry}
+\label{sec:s3}
+
+Let $G$ be a finite abelian group of order $N$ and $D\subseteq G\setminus\{0\}$ a
+factor base of $B$ distinct elements. For $m\ge1$ and $g\in G$ let $c_D(g)$ be the
+number of size-$m$ multisets from $D$ whose sum is $g$.
+
+\begin{proposition}[yield conservation, \textsc{proved}]
+\label{prop:yield}
+$\sum_{g\in G} c_D(g)=\binom{B+m-1}{m}$. Hence the mean per-target yield is
+$\binom{B+m-1}{m}/N$ for every base of size $B$, and the fraction of targets with
+at least one decomposition is at most $\min\{1,\ \binom{B+m-1}{m}/N\}$.
+\end{proposition}
+\begin{proof}
+Every size-$m$ multiset has exactly one sum, so the multisets are partitioned by
+their sums; there are $\binom{B+m-1}{m}$ of them. The coverage bound is the
+pigeonhole bound on the image of a map from that set to $G$. \qedhere
+\end{proof}
+
+The identity holds for any map from a finite domain, not only for multiset sums.
+Lean (\ev{E32}): \texttt{sum\_yield} is $\sum_g \mathrm{yield}(\varphi,g)=|\tau|$,
+\texttt{total\_yield\_eq} says two maps on domains of equal size have equal total
+yield, and \texttt{coverage\_le\_card\_dom} and \texttt{coverage\_le\_card\_cod}
+bound the number of covered targets by $\min(|\tau|,|G|)$. The list form of the same
+identity (\texttt{sum\_count}, \texttt{patterns\_neutral}) is already kernel-checked
+in \ev{E7}, with the axiom log \ev{E8} showing only the standard foundations. The
+binomial count of the domain $\mathrm{Sym}^m(D)$ is not formalised (O2).
+
+\paragraph{Corollary (screening rule).}
+A proposal that promises a higher \emph{mean} yield at matched base size is refuted
+by arithmetic before any experiment. Only coverage, multiplicity, relation rank,
+recognisability and the cost of finding a decomposition are free.
+
+\paragraph{Exact and recorded support.}
+(i) The programme's finding records that over $144$ cells at $N\sim2^{14},2^{16},2^{18}$
+on $12$ generated prime-order curves with $m=3$ the largest absolute deviation of
+the exact cell mean from $\binom{B+2}{3}/N$ was exactly $0$ (\ev{E5}, Consequence 1).
+(ii) The native instrument enumerates every base of size $B\in\{3,4\}$ in
+$\ZZ/N$ for $N\in\{11,12,13\}$ ($1540$ bases in all) and finds the total always equal
+to $\binom{B+2}{3}$, while coverage varies, for example between $3$ and $9$ targets
+of $12$ at $B=3$, $N=12$, and an arithmetic-progression base has the same total
+with coverage below the maximum (\ev{E18}). (iii) The cyclotomic $\gamma$-weight base
+was tested against $1999$ random Frobenius-stable bases of equal column count at
+$n=23$: on all $10$ coverage tests and all $5$ energy tests it lies inside the null
+distribution, smallest two-sided $p=0.363$ against a critical $0.00333$, largest
+deviation from the null median $0.65\%$, while the positive control is detected
+at the floor $p=0.001$ (\ev{E6}). (iv) At toy sizes of $20$ to $30$ bits and $m=2$, the matched-size yield ratios of
+the $y$-window arms against a random set of the same size lie inside $[0.95,1.03]$
+(\ev{E33}).
+
+\paragraph{What S3 does not say.}
+It does not say that structured bases cannot beat random bases: coverage headroom
+up to $\min\{1,\mu\}$ is real (a Bose--Chowla Sidon base reaches it, \ev{E5}), and
+under a one-relation-per-target solve the gain is at most
+$\min\{1,\mu\}/(1-e^{-\mu})\le1.582$. It says nothing about the cost of finding a
+decomposition or the linear-algebra stage, where the cost of index calculus sits.
+The yield-neutral result of \ev{E6} tests the yield clause only; the solving-degree
+clause of that lead was not tested there. In the campaign of 2026-10-18 the planned
+toy check of conservation inside the kernel-program search (item 10) has not run
+(\ev{E23}); we cite no number from it. Item 17 (\ev{E35}) measures the counted cost of a cyclotomic base at $n=83$, not its yield: it reports that the base-dependent part of the cost is small next to the arm-independent pair table, and it is context for S3, not evidence for or against it.
+
+\section{S4: the monodromy of the Semaev cover is $(\ZZ/2)^{m-2}$}
+\label{sec:s4}
+
+Let $E$ be an elliptic curve over any field $K$, $\pi:E\to\mathbb{P}^1$ the
+quotient by inversion, $m\ge3$ and $n=m-1$. Let $t_1,\dots,t_n$ be independent
+transcendentals, $L=K(t_1,\dots,t_n)$, and $P_i$ the tautological point with
+$\pi(P_i)=t_i$. The $m$-th Semaev summation polynomial $S_m(t_1,\dots,t_n,T)\in L[T]$
+has degree $2^{m-2}$ in $T$, and its roots are the $x$-coordinates of the signed
+sums $\epsilon_1P_1+\dots+\epsilon_nP_n$.
+
+\begin{theorem}[\ev{E9}, \ev{E10}; \textsc{derived, unreviewed}]
+\label{thm:mono}
+\emph{(A)} $S_m$ is separable, its splitting field is the function field of
+$E^{n}/\Delta$ with $\Delta$ the diagonal inversion, and
+$\mathrm{Gal}(S_m/L)=(\ZZ/2)^{n}/\Delta\cong(\ZZ/2)^{m-2}$, acting simply
+transitively on the $2^{m-2}$ roots; arithmetic and geometric monodromy agree. The
+group is the same for every curve, base field and characteristic.
+\emph{(B)} Over $\FF_q$, at every specialisation outside an explicit degenerate
+locus of size $O_m(q^{m-2})$, $S_m(a,T)$ is squarefree and is either a product of
+$2^{m-2}$ distinct linear factors, when the $n$ fibres of $\pi$ over the $a_i$ are
+simultaneously rational, or a product of $2^{m-3}$ irreducible quadratics; no
+factor of degree $\ge3$ and no mixed type occurs.
+\emph{(C)} If every $a_i$ is the $x$-coordinate of an $\FF_q$-rational point, $S_m(a,T)$
+splits completely, at every $m$: the factor-base locus lies inside the totally
+split locus.
+\end{theorem}
+
+\paragraph{Derivation.}
+The roots are the $x$-coordinates of the signed sums. The splitting field sits
+inside $K(E^{n})$, which is Galois over $K((E/\pm)^{n})=L$ with group $(\ZZ/2)^{n}$:
+it is the fibre product of $n$ copies of a degree-$2$ Galois cover, so its deck
+group is $(\ZZ/2)^{n}$ by Artin's theorem, with no square-class computation and
+in every characteristic. The diagonal fixes every root since $x(R)=x(-R)$. Nothing
+else does: a further coincidence among the signed sums forces
+$\sum_{i\in S}\epsilon_iP_i\in E[2]$ for some proper nonempty $S$; the summation map
+$E^{n}\to E$ is a surjective homomorphism, so the preimage of the finite scheme
+$E[2]$ is a proper closed subscheme, and the generic point of the integral variety
+$E^{n}$ lies in no proper closed subscheme. The group is abelian, so stabilisers
+are normal and the root field is the splitting field. The last step is the whole
+content: an earlier sketch of this result omitted it, and a correction records the
+gap and its repair (\ev{E12}). The Frobenius element of a good specialisation is the
+class of the vector of fibre rationalities modulo global sign, and a non-identity
+element of a regular permutation group is fixed-point free, which gives (B). (C)
+holds because a rational point makes the decomposition group trivial.
+
+\paragraph{Toy-scale verification.}
+The verification run (\ev{E11}, seed $20260807$) found on the factor-base locus
+that all $7908$ good specialisations at $m=3$, all $7038$ at $m=4$ and all $1161$
+at $m=5$ split completely with roots equal to the signed sums, with no
+counterexample ($8000$, $8000$ and $2000$ samples, of which $92$, $962$ and $839$
+were degenerate). At $m=3$ it saw $7786$ good generic specialisations, exactly two
+Frobenius classes, only the patterns predicted, and maximum factor degree $2$; the
+discriminant identity $\mathrm{disc}_T S_3=16f(x_1)f(x_2)$ holds exactly over
+$\ZZ[x_1,x_2,A,B]$. Two null objects of the same shape obey the dichotomy in only
+$13.69\%$ and $48.91\%$ of separable degree-$4$ samples, so the instrument can
+reject (\ev{E11}, \texttt{C7\_null\_controls}).
+
+\paragraph{Status.}
+The derivation is complete and self-contained but has not been read by a reader
+experienced in function fields; the two points that most need it are Artin's theorem
+for a quotient by a finite group acting faithfully, and properness of the preimage
+of $E[2]$ in characteristic $2$ where $E[2]$ is non-reduced (\ev{E34}, ``Two blockers''). A separately derived hypothesis reaches the same group, and its toy-scale
+execution received a validator and a red-team review (\ev{E13}); that corroborates
+the statement and is not a proof review. Novelty has not been adjudicated.
+
+\paragraph{What S4 does not say.}
+It is not an algorithm. Statement (C) is about solving for the \emph{last}
+coordinate given the other $m-1$; relation search asks the opposite question, with
+the target fixed and the other coordinates to be found in the factor base, and
+complete splitting gives it no leverage. Its negative content is that a census of
+factorisation types or Frobenius classes of the summation fibre is constant on the
+factor-base locus and so cannot detect a relation-rate anomaly there, and that no
+curve has smaller monodromy. For $m\ge4$ the discriminant is a square in $L$, so a
+statistic built on its character is vacuous; $m=3$ is the only $m$ where it carries
+information. It implies no speedup, no security reduction and no change to any
+complexity estimate.
+
+\section{S5: Lemma 4 of Nagao's ePrint 2015/984 is false as a universal statement}
+\label{sec:s5}
+
+\begin{definition}[Definitions 5 and 6 of \cite{Nag15}, equality reading]
+\label{def:fall}
+Let $f_1,\dots,f_M\in\FF_2[X_1,\dots,X_N]$. A \emph{fall at degree $d$} is a tuple
+$(g_i)$ with $\max_i\deg(g_if_i)=d$, $\deg(\sum_ig_if_i)<d$ and $\sum_ig_if_i\neq0$.
+The \emph{first fall degree} $d_F$ of a generating set is the least $d$ at which a
+fall exists. The \emph{fake} first fall degree $d'_F$ of $\{f_i\}\cup S_{fe}$, with
+$S_{fe}=\{X_j^2+X_j\}$, is defined the same way with every degree taken after
+reduction modulo $S_{fe}$ and with $\sum_ig_if_i\not\equiv0$.
+\end{definition}
+
+Lemma 4 of \cite{Nag15} asserts $d_F\le d'_F$; the paper derives it from a lemma
+whose proof it declines to reproduce, and the fake quantity is what its applications
+bound (\ev{E29}). The printed condition reads ``$\max_i\deg(g_if_i)\ge d$''; under
+that literal reading the lemma holds only vacuously (\ev{E15}). We state the result
+for the equality reading, which is the one the complexity estimates need. We
+consider $d_F$ with the field equations \emph{outside} the generating set
+($F$ alone) and \emph{inside} ($F\cup S_{fe}$).
+
+\begin{proposition}[S5, \textsc{exact}]
+\label{prop:lemma4}
+Over $\FF_2$ the statement $d_F\le d'_F$ is false in both placements. Witness~A:
+$f_1=X^2Y$, $f_2=XY+X$ in $\FF_2[X,Y]$ has $d'_F=2$ and $d_F=3$ outside and inside.
+Witness~B: $f_1=X_1X_2+X_3$, $f_2=X_1X_3+X_2$ in $\FF_2[X_1,X_2,X_3]$ has $d'_F=2$ and
+$d_F=3$ outside and inside.
+\end{proposition}
+
+\begin{proof}[Hand proof for Witness A]
+\emph{$d'_F=2$.} Reduced, $f_1\equiv XY$, $f_2=XY+X$. Take $g_1=g_2=1$: both products
+have degree $2$ and the sum is $X$, of degree $1<2$ and nonzero, a fall at $2$. In
+the reduced ring with basis $1,X,Y,XY$, the multiples $g_1\bar f_1$ lie in $\{0,XY\}$
+and the multiples $g_2f_2$ in $\{0,XY+X\}$, since $X\cdot f_2=f_2$ and
+$Y\cdot f_2=XY\cdot f_2=0$. A nonzero product has degree $2$, so no tuple has maximum
+degree $1$ and no fall occurs below $2$.
+\emph{$d_F=3$.} At degree $3$, $g_1=1$, $g_2=X$ gives $f_1+Xf_2=X^2Y+X^2Y+X^2=X^2$,
+with both products of degree $3$ and the sum of degree $2$ and nonzero: a fall. For
+$d\le2$, $f_1$ has degree $3$ so $g_1=0$; $f_2$ has degree $2$, so at $d=2$ only
+$g_2$ constant, and $cf_2$ has degree $2$. Adjoining $X^2+X$ and $Y^2+Y$ changes
+nothing: at $d=2$ the leading forms $XY,X^2,Y^2$ of $f_2,X^2+X,Y^2+Y$ are linearly
+independent, so no nonzero combination has degree $<2$, and no generator has degree
+$\le1$. \qedhere
+\end{proof}
+
+\paragraph{Native re-derivation.}
+The instrument of \ev{E19} computes $d_F$ and $d'_F$ exactly. For degree $d$ the
+tuples with $\deg(g_if_i)\le d$ form an $\FF_2$-vector space $W_d$; those whose
+degree-$d$ part of the sum vanishes form a subspace $K$; $Z\subseteq K$ is the
+subspace with sum zero. A fall at $d$ exists exactly when $K\not\subseteq Z$ and
+$K\not\subseteq W_{d-1}$, because a vector space is never a union of two proper
+subspaces. For $d'_F$ the multipliers may be taken multilinear. The output
+(\ev{E18}) is in Table~\ref{tab:l4}.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}l c c c@{}}
+\toprule
+system & $d_F$ outside & $d_F$ inside & $d'_F$ \\
+\midrule
+control: $X$, $X+1$ (one variable)          & 1 & 1 & 1 \\
+Witness A: $X^2Y$, $XY+X$                   & 3 & 3 & 2 \\
+Witness B: $X_1X_2+X_3$, $X_1X_3+X_2$       & 3 & 3 & 2 \\
+Witness C: $X_1X_2+X_3$, $X_1+X_2$          & 3 & 2 & 2 \\
+\bottomrule
+\end{tabular}
+\caption{First fall degrees from the native instrument (\ev{E18}). Witness C is
+the ledger's first, outside-form example: it violates $d_F\le d'_F$ only outside.}
+\label{tab:l4}
+\end{table}
+
+The instrument also enumerates all $7875$ unordered pairs of distinct nonzero
+multilinear polynomials of degree $1$ or $2$ in three variables with a cap of $6$ on
+the degree. It finds $d_F>d'_F$ in $6138$ pairs outside and $4830$ inside, and
+$d_F<d'_F$ in none outside and $224$ inside; no pair was undetermined at the cap.
+The population is an arbitrary finite one and the rates describe it only; they show
+that violations are not rare in it. They are not comparable with the earlier
+sampled figure of $94$ in $400$ random multilinear pairs (\ev{E14}), which used a
+different generator.
+
+\paragraph{Provenance.}
+Each witness was computed by two implementations written without sight of each
+other (\ev{E14}); the refutation of the \emph{inside} form was first recorded as a
+correction of an earlier belief that it held (\ev{E16}, \ev{E17}). The native instrument here is a
+third implementation, in Rust, from the definitions.
+
+\paragraph{What S5 does not say.}
+Nothing about Proposition 5 of \cite{Nag15}, which may hold by another route, and
+nothing about descended summation-polynomial systems at any $n$. The note of \ev{E15} argues that Propositions 2 and 3 of \cite{Nag15} exhibit explicit
+certificates and so do not depend on Lemma 4, and that the inference ``fake bound implies
+true bound'' is recoverable per instance when every product in a fake-degree certificate
+already has unreduced degree at most the fake degree. The justification the paper offers
+for its Proposition 5, by contrast, runs through Lemma 4 (\ev{E29}); that justification,
+not the proposition, is what S5 affects. The first-fall-degree assumption itself
+is a separate matter, on which \cite{HKY15} give evidence against. The result is for
+characteristic $2$ and the equality reading.
+
+\section{S6: Assumption 1 of Semaev 2015 off the diagonal}
+\label{sec:s6}
+
+Assumption 1 of \cite{Sem15} asserts $d_{F4}\le4$ for the Boolean system equivalent
+to the paper's equation~(5) at every $2\le t\le m$ on the diagonal $k=\lceil n/m\rceil$,
+where $k$ is the dimension of the subspace $V\subseteq\FF_{2^n}$. The programme's
+goal record states that its experimental basis is $2300$ MAGMA systems at $n\le21$,
+$m\le6$ plus one cell at $n=40$, $m=t=2$, and that the paper's own Section 4.5.1
+reports that the regularity degree ``generally exceeds 4 when $k>\lceil n/m\rceil$
+though the first fall degree is still 4'' (\ev{E21}).
+
+The frozen design of this paper (\ev{E27}) listed ``Assumption 1 fails off the diagonal'' as a negative
+result. \textbf{We could not establish it.} What the committed records support is
+three separate facts.
+
+\paragraph{(i) The source's own remark.}
+The off-diagonal behaviour is a remark about the regularity degree in the source
+paper, not a programme measurement of $d_{F4}$ (\ev{E21}).
+
+\paragraph{(ii) On the diagonal the assumption is not refuted at reachable sizes.}
+With $m=2$ and $V$ a uniformly random $\FF_2$-subspace of dimension exactly $\lceil n/2\rceil$,
+the first fall degree is $3.00$, flat, for $n=7,\dots,63$, against a shape-matched
+random Boolean null at $4.00$; and a sound refutation predicate for $d_{F4}\le4$
+returns \textsc{refuted} at every cell $n=5,\dots,21$, which means the assumption's
+bound is consistent with every cell reached (\ev{E20}). The same record notes that an
+earlier degree ladder had measured Frobenius-invariant subspaces of dimension
+$\mathrm{ord}_n(2)$, which coincide with $\lceil n/2\rceil$ in $0$ of $23$ cells, so
+that ladder says nothing for or against the assumption. First fall and solving degree
+are not $d_{F4}$, and the record claims no refutation.
+
+\paragraph{(iii) One off-diagonal closure draw reads $D>4$.}
+Campaign item 07 measures the degree-4 closure of the chained $S_3$ descent system
+with a memory-blocked engine (\ev{E22}). Writing $\delta=l-\lceil n/m\rceil$ for the
+subspace dimension $l$ of a cell $(n,l,m)$ relative to the diagonal, its measured
+cells are:
+
+\begin{center}\small
+\begin{tabular}{@{}lrcp{7.4cm}@{}}
+\toprule
+cell $(n,l,m)$ & $\delta$ & draws & reading \\
+\midrule
+$(13,4,4)$ & $0$  & 5 & $D=4$ on all \\
+$(11,4,4)$ & $+1$ & 4 (+1 unreceipted) & $D=4$ on all \\
+$(13,5,4)$ & $+1$ & 2 & $D=4$ on both \\
+$(15,5,4)$ & $+1$ & 3 relayed & one draw saturates without $1$, $D>4$; two stop at the time limit, unmeasured \\
+$(19,6,3)$ & $-1$ & 4 & $D=4$ on all \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Of the three cells with $\delta=+1$, two read $D=4$ on every draw; the third, $(15,5,4)$
+with $N=50$ unknowns, has one measured draw of four planned that reads $D>4$. The record itself calls this
+a one-draw observation, a closure reading rather than a literal F4 reading (no msolve
+reading exists at that cell), and a result at toy scale; the cell is
+\textsc{blocked} on time (\ev{E22}).
+
+\begin{proposition}[S6, \textsc{not established}]
+\label{prop:s6}
+No committed record contains an F4 degree certificate $d_{F4}>4$ at any cell, on or
+off the diagonal. The programme's findings state that Assumption 1 is not refuted
+(\ev{E14}, ``reads this before using anything below''), and the only off-diagonal
+reading above $4$ is one closure draw in item 07. Items 04 and 05 (\ev{E36}, \ev{E37}) measure closure degrees of related descent systems at toy cells, the first with the chained $S_3$ route at $D=4$ on four cells, the second with grevlex at $D_{\mathrm{mat}}=4$ on its countable targets; neither is a reading at the deciding cell.
+\end{proposition}
+
+\paragraph{Why it matters, and what would settle it.}
+The campaign's pricing of binary curves at deployed sizes (item 02) is conditional on
+constant-degree arms ($D=3,4,6,7$) that are hypotheses at deployed $n$, and its gate on
+item 07 is open (\ev{E26}); the one arm that is the measured growth fit, $D=l+4$ at
+$m=4$, never reaches rho (gap $+105.1$ bits at $n=131$, rising to $+336.7$ at $n=571$,
+Koblitz, weight $1$, $K=1$). Settling S6 needs a degree-5 closure at $(15,5,4)$, which
+the record puts at $2.37\times10^{6}$ columns and $3.5\times10^{11}$ bytes of reduced
+basis, beyond this host, or a different engine. Whether the repository's chained
+$S_3$ descent system with a random subspace of dimension $l$ coincides with
+Semaev's equation~(5) up to his conventions is the open definitional question
+KN-OPEN-d218ec; the sign of $\delta$ above is parameter arithmetic, not a statement
+that the two objects agree.
+
+\section{Campaign results that bear on the statements}
+\label{sec:campaign}
+
+The blind-spot campaign of 2026-10-18 measured twenty directions. Table~\ref{tab:campaign}
+lists the ones whose results bear on S1--S6, quoted from each item's own verdict. Items
+03, 06, 08, 09, 11, 12, 13, 15 and 16 concern solver, learned-policy, rho-walk, genus-3 linear-algebra
+and toy-size oracle engineering and bear on none of the six; we cite no number from them. The
+selection of rows was fixed before the edit (\texttt{PROTOCOL.md}, Addendum B), and each row
+quotes the item's own verdict line and level, as the READMEs read when the ledger digests were taken
+(item 10's README was still a stage-2 assessment; its frozen rule had no input).
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}l p{6.6cm} p{4.3cm}@{}}
+\toprule
+item & verdict as recorded & bears on \\
+\midrule
+01 \ev{E24} & \textsc{regresses} at the constant level; \textsc{inconclusive} at the exponent level. No arm cheaper than matched rho at $\log_2\#E=24$ to $40$; best arms $50.0$ [$42.0,60.3$] and $51.6$ [$43.3,62.0$] times matched rho at $40$ bits, weight $0$ & S1 context: distance to rho remains \\
+02 \ev{E26} & \textsc{advances} (derived, model level), conditional on a constant-degree model; item-07 gate open; not a measured improvement & S6: the constant-degree hypothesis is the unsettled boundary \\
+04 \ev{E36} & \textsc{advances}, level primitive, stage diagnostic: the M\"obius-frame arm lowers the Macaulay closure degree of the incumbent presentation on $5$ of $5$ cells (for example $D$ from $7$ to $5$ at $(17,4,3)$) and does not go below the chained $S_3$ arm, $D=4$ on every cell where it was measured; no $S$, rho ratio or GAE is computed & S6 context: closure degrees at the cells Assumption 1 concerns \\
+05 \ev{E37} & \textsc{advances}, level constant, one arm (\texttt{wdeg}): $3.4\times$ to $18.6\times$ fewer matrix-entry touches than this engine's grevlex on four cells; the solving degree is not lowered ($D_{\mathrm{mat}}\ge4$ everywhere) and at the next size the arm hit the time cap & S6 context: grevlex closure degree is $4$ on every countable target \\
+07 \ev{E22} & \textsc{blocked} at $(15,5,4)$, level primitive; one draw reads $D>4$ & S6 (iii) \\
+10 \ev{E23} & \textsc{inconclusive}, level constant; the frozen rule has no input because the held-out, finalist and conservation cards were not run & S3: no evidence from this item \\
+14 \ev{E25} & \textsc{regresses}, level primitive; no $m=4$ oracle's $T_{\mathrm{dec}}$ grows slower than $p^{1/4}$ at the measured scale & S1 context: first measured $m=4$ cells \\
+17 \ev{E35} & \textsc{trades}, level constant: the cyclotomic base is never cheaper than the incumbent by the frozen rule at $n=83$ ($S_{\mathrm{ready}}$ ratio $0.995$ to $2.003$ across accountings and cells; about $96\%$ of $S_{\mathrm{ready}}$ is the arm-independent pair table); model rows put the cyclotomic arm at $231.9$ to $1.26\times10^{7}$ times the rho floor at $c=0$ (upper bounds, model rows, not run); the solving-degree leg is \textsc{blocked} & S1 context: distance to rho; S3 context: base-dependent cost is a few percent, yield not measured \\
+\bottomrule
+\end{tabular}
+\caption{Campaign items that bear on the six statements. None is a speedup claim.}
+\label{tab:campaign}
+\end{table}
+
+\section{Formalisation}
+\label{sec:lean}
+
+Two combinatorial cores are stated in Lean~4 with Mathlib, in a new project
+\texttt{lean/} (beside the register of \ev{E28}) pinned to the same toolchain (\texttt{v4.34.1}) and Mathlib revision
+as the repository's \texttt{S3Roots} project. Table~\ref{tab:proofmap} is the proof map.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}p{4.1cm} p{4.5cm} p{3.9cm}@{}}
+\toprule
+statement & Lean declaration & status \\
+\midrule
+Lemma~\ref{lem:core}(i) & \texttt{IcNegative.agree\_card\_le\_one} & written, \textbf{not yet kernel-checked} \\
+Lemma~\ref{lem:core}(ii) & \texttt{badSecrets\_card\_le}, \texttt{badSecrets\_card\_le\_sq} & written, not yet kernel-checked \\
+Lemma~\ref{lem:core}(iii) & \texttt{injOn\_of\_not\_bad} & written, not yet kernel-checked \\
+Prop.~\ref{prop:yield}, any map & \texttt{sum\_yield}, \texttt{sum\_yield\_cast}, \texttt{total\_yield\_eq} & written, not yet kernel-checked \\
+coverage bound & \texttt{coverage\_le\_card\_dom}, \texttt{coverage\_le\_card\_cod} & written, not yet kernel-checked \\
+Prop.~\ref{prop:yield}, list form & \texttt{FactorBaseDesigns.}\allowbreak\texttt{sum\_count}, \texttt{patterns\_neutral} & kernel-checked in CI \ev{E7}, \ev{E8} \\
+Theorem~\ref{thm:151} in full & --- & open (O1) \\
+$\mathrm{Sym}^m$ binomial count & --- & open (O2) \\
+Prop.~\ref{prop:lemma4} & --- & open (O3); finite check is native \\
+Theorem~\ref{thm:mono} & --- & open (O4) \\
+\bottomrule
+\end{tabular}
+\caption{Proof map. ``Not yet kernel-checked'' means the proofs were written on a
+host with no Lean toolchain and no Mathlib cache; the repository proof gate is the
+first check.}
+\label{tab:proofmap}
+\end{table}
+
+We do not call the new modules machine-checked. The authoring host had neither a
+Lean toolchain nor the Mathlib cache and too little disk to fetch them, so the proofs
+were written against the Mathlib interface and have not been elaborated. The
+repository's proof gate (\texttt{tools/lean/proof-gate.sh}) builds the project, fails
+any theorem whose transitive axioms include \texttt{sorryAx}, and accepts only
+\texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound}. The sources contain
+no \texttt{sorry}, \texttt{admit}, \texttt{native\_decide} or user axiom, and open
+targets are kept in \texttt{lean/OPEN\_TARGETS.md} rather than in compiled files.
+Until that gate passes, the Lean statements are specifications of the lemmas, whose
+mathematical proofs are those given above. The mathematical content is independent of
+the formalisation; if a Lean proof needs repair the statement stands.
+
+A Lean file is a statement, and its fidelity to the claim must still be read:
+Lemma~\ref{lem:core} is the counting step of Theorem~\ref{thm:151}, not the theorem,
+and \texttt{sum\_yield} is the double count behind Proposition~\ref{prop:yield}, not
+the multiset instance.
+
+\section{Limitations}
+\label{sec:limits}
+
+\begin{itemize}
+\item Everything measured is at toy scale; no statement concerns a deployed curve,
+  and none reaches the sizes ($n\ge131$) at which a speedup would matter.
+\item S1 is a comparison in probes and table entries against bounds stated in
+  group operations and bits; it is not a proof of genericity, and the structured
+  generic-group bound is vacuous for these rungs.
+\item S4 has not had an independent review of its proof, and novelty is not adjudicated.
+\item S5 is for characteristic $2$ and the equality reading and says nothing about
+  Proposition 5 of \cite{Nag15}.
+\item S6 is open. We include it so that a reader does not count it among the
+  closed negatives.
+\item Several evidence files were produced by sibling repositories whose heads moved
+  during the work; Appendix~\ref{app:ledger} fixes the digests read.
+\item The new Lean modules have not been kernel-checked (Section~\ref{sec:lean}).
+\end{itemize}
+
+\appendix
+\section{Evidence ledger}
+\label{app:ledger}
+
+Each row is a file read for this paper, with the first $16$ hex digits of its SHA-256.
+The full digests are in \texttt{evidence/ledger.full}; the ledger is regenerated by
+\texttt{evidence/make\_ledger.sh}. Repository heads when generated are in
+\texttt{EVIDENCE.md}.
+
+{\footnotesize
+\input{evidence/ledger.tex}
+}
+
+\section{Reproducing the native checks}
+\label{app:repro}
+
+\begin{verbatim}
+rustc --edition 2021 -C opt-level=3 -o b19 examples/blindspots_19_checks.rs
+prlimit --as=4294967296 ./b19 all > output.txt   # about 0.3 s, one thread
+diff <(tail -n +3 output.txt) \
+     <(tail -n +3 papers/ic-negative-results/evidence/checks.txt)
+\end{verbatim}
+\noindent The output ends with \texttt{ALL CHECKS PASS}. The subcommands are
+\texttt{lemma4}, \texttt{affine} and \texttt{yield}.
+
+\begin{thebibliography}{99}
+\bibitem{BL13} D.~J. Bernstein and T.~Lange. Non-uniform cracks in the concrete: the
+power of free precomputation. ASIACRYPT 2013.
+\bibitem{CGK18} H.~Corrigan-Gibbs and D.~Kogan. The discrete-logarithm problem with
+preprocessing. EUROCRYPT 2018.
+\bibitem{DKM25} I.~Dinur, N.~Keller and O.~Marmor. arXiv:2505.00894 (STOC 2026),
+Theorem 1.1, as quoted in \ev{E3}.
+\bibitem{HKY15} M.-D.~A. Huang, M.~Kosters and S.~L. Yeo. Last fall degree, HFE, and
+Weil descent attacks on ECDLP. CRYPTO 2015 (ePrint 2015/573).
+\bibitem{Nag15} K.~Nagao. Complexity of ECDLP under the first fall degree assumption.
+ePrint 2015/984.
+\bibitem{Sem15} I.~Semaev. New algorithm for the discrete logarithm problem on
+elliptic curves. ePrint 2015/310.
+\bibitem{Sho97} V.~Shoup. Lower bounds for discrete logarithms and related problems.
+EUROCRYPT 1997.
+\end{thebibliography}
+
+\end{document}
