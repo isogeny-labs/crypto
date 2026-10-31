@@ -11,7 +11,7 @@ for p in sorted((h/'runs').iterdir()):
     if (p/'compile.exit').exists():
         row.update(kind='Lean',compile_exit=int((p/'compile.exit').read_text()),audit_exit=int((p/'audit.exit').read_text()) if (p/'audit.exit').exists() else None)
         expected_root='Specialize51' if p.name.startswith('specialize-lean51-') else 'Overlap51'
-        expected_count=4 if expected_root=='Specialize51' else 5
+        expected_count=6 if expected_root=='Specialize51' else 5
         row.update(audited_theorems=expected_count,root=expected_root)
         if row['compile_exit']!=0: row['status']='rejected'
         elif row['audit_exit'] is not None:
@@ -91,6 +91,6 @@ primality or a selected order991 action. The finite-group stage checks whether
 an irreducible degree16 ordinary fiber can be an appropriate test at all.
 See the frozen stage protocols and NEXT.md for acceptance dependencies.
 '''
-if result['lean_theorems']>5: typ += '\nSpecialize51 adds four audited declarations: denominator-unit cancellation,scaled ideal equality,the three-doubling group consequence,and the exact line intersection identity. Actual native inputs remain external premises.\n'
+if result['lean_theorems']>5: typ += '\nSpecialize51 adds six audited declarations: denominator-unit cancellation,scaled ideal equality,the three-doubling group consequence,the exact line intersection,quartic difference and cross-kernel denominator inverse. Actual native inputs remain external premises.\n'
 (h/'report.typ').write_text(typ)
 print(json.dumps(result['status_counts']))
