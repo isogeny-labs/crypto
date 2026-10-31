@@ -247,6 +247,133 @@ impl Drop for LiveSinkGuard {
 /// Persist each exposed event and complete artifact before proceeding. The
 /// outer worker retains this directory even when a native call is killed.
 /// Native engines' currently unexposed internal states remain explicit gaps.
+/// A worker-owned proof of completed original verification and storage.
+/// It borrows public values only; it never retains the private witness.
+pub(super) struct VerifiedWorkerOriginal<'a> {
+    config: &'a CaseConfig,
+    public: &'a Value,
+    factor_base: &'a Value,
+    root: &'a Path,
+    binding: Option<&'a AttemptBinding>,
+    public_sha256: [u8; 32],
+    factor_base_sha256: [u8; 32],
+    public_bytes: u64,
+    factor_base_bytes: u64,
+}
+impl VerifiedWorkerOriginal<'_> {
+    fn matches_bound(
+        &self,
+        config: &CaseConfig,
+        case: &CaseData,
+        directory: &Path,
+        binding: &AttemptBinding,
+    ) -> Result<(), String> {
+        if !std::ptr::eq(self.config, config)
+            || !std::ptr::eq(self.public, &case.public_instance)
+            || !std::ptr::eq(self.factor_base, &case.factor_base)
+            || directory.parent() != Some(self.root)
+            || directory.file_name().is_none_or(|name| name != "live")
+            || self.binding != Some(binding)
+        {
+            return Err("verified worker originals differ from bound solver invocation".into());
+        }
+        if AttemptBinding::from_cell_files(self.root)? != *binding {
+            return Err("verified worker original context changed before dispatch".into());
+        }
+        for (path, sha256, bytes) in [
+            ("public.json", &self.public_sha256, self.public_bytes),
+            (
+                "factor-base.json",
+                &self.factor_base_sha256,
+                self.factor_base_bytes,
+            ),
+        ] {
+            super::storage::check_file(
+                &super::storage::contained_path(self.root, path, false)?,
+                &hex::encode(sha256),
+                bytes,
+            )?;
+        }
+        Ok(())
+    }
+}
+
+/// This replaces, rather than repeats, the worker's existing verification and
+/// original-file writes. Their telemetry remains separate from solver counters.
+pub(super) fn verify_and_store_worker_originals<'a>(
+    config: &'a CaseConfig,
+    case: &'a CaseData,
+    root: &'a Path,
+    binding: Option<&'a AttemptBinding>,
+    registry: &mut Vec<super::types::Artifact>,
+) -> Result<VerifiedWorkerOriginal<'a>, String> {
+    if let Some(binding) = binding {
+        if AttemptBinding::from_cell_files(root)? != *binding
+            || super::read_json::<CaseConfig>(&root.join("config.json"))? != *config
+        {
+            return Err("worker originals differ from admitted attempt/configuration".into());
+        }
+    }
+    super::telemetry::measured(root, registry, "known-answer-replay", || {
+        curves::verify(&case.public_instance, &case.private_witness)
+    })?;
+    super::telemetry::measured(root, registry, "factor-base-replay", || {
+        curves::verify_factor_base(&case.public_instance, &case.factor_base)
+    })?;
+    let public = super::storage::write_json(
+        root,
+        "public.json",
+        "public-instance",
+        &case.public_instance,
+    )?;
+    let mut public_sha256 = [0; 32];
+    hex::decode_to_slice(&public.sha256, &mut public_sha256).map_err(|e| e.to_string())?;
+    let public_bytes = public.bytes;
+    registry.push(public);
+    registry.push(super::storage::write_json(
+        root,
+        "witness.json",
+        "restricted-known-answer",
+        &case.private_witness,
+    )?);
+    let factor_base =
+        super::storage::write_json(root, "factor-base.json", "factor-base", &case.factor_base)?;
+    let mut factor_base_sha256 = [0; 32];
+    hex::decode_to_slice(&factor_base.sha256, &mut factor_base_sha256)
+        .map_err(|e| e.to_string())?;
+    let factor_base_bytes = factor_base.bytes;
+    registry.push(factor_base);
+    Ok(VerifiedWorkerOriginal {
+        config,
+        public: &case.public_instance,
+        factor_base: &case.factor_base,
+        root,
+        binding,
+        public_sha256,
+        factor_base_sha256,
+        public_bytes,
+        factor_base_bytes,
+    })
+}
+
+/// Internal worker path; unsupervised callers cannot obtain this token by
+/// setting an outcome flag. Adapter consumption is integrated separately.
+pub(super) fn solve_with_verified_worker_originals(
+    config: &CaseConfig,
+    case: &CaseData,
+    directory: &Path,
+    binding: AttemptBinding,
+    limits: CaptureLimits,
+    context: Option<&super::execution::SolverExecutionContext>,
+    original: &VerifiedWorkerOriginal<'_>,
+) -> Result<SolverData, String> {
+    original.matches_bound(config, case, directory, &binding)?;
+    if context.is_some_and(|c| c.launch.binding != binding) {
+        return Err("verified worker originals differ from execution attempt".into());
+    }
+    solve_with_bound_event_sink_context(config, case, directory, binding, limits, context)
+}
+
 pub fn solve_with_event_sink(
     config: &CaseConfig,
     case: &CaseData,
@@ -5816,6 +5943,167 @@ mod bounded_witness_bridge_tests {
                 Err(super::super::capture::WitnessError::Unbound)
             ));
             assert_eq!(budget.reserved_bytes, 0);
+        }
+    }
+}
+
+#[cfg(test)]
+mod verified_worker_original_tests {
+    use super::*;
+    use crate::ml_dataset::{self as dataset, storage};
+    struct Fixture {
+        root: PathBuf,
+        config: CaseConfig,
+        case: CaseData,
+        binding: AttemptBinding,
+    }
+    impl Fixture {
+        fn new() -> Self {
+            let nonce = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos();
+            let root = std::env::temp_dir()
+                .join(format!("verified-worker-{}-{nonce}", std::process::id()));
+            fs::create_dir(&root).unwrap();
+            let mut protocol = json!({"schema":"experiment.protocol/v1", "purpose":"verified worker input software controls"});
+            let body = dataset::protocol_canonical_bytes(&protocol).unwrap();
+            protocol["freeze"] = json!({"status":"frozen", "protocol_sha256":dataset::digest(&body), "filed_before_affected_data":true, "frozen_at":"2026-10-31T00:00:00Z"});
+            let bytes = serde_json::to_vec(&protocol).unwrap();
+            let plan = dataset::DatasetPlan {
+                schema: "crypto.ml-dataset.plan/v1".into(),
+                field_sizes: vec![23],
+                arities: vec![3],
+                families: vec!["koblitz".into()],
+                solvers: vec!["enumerate".into()],
+                curve_seeds: 1,
+                generators: 1,
+                keys: 1,
+                seed: 42,
+                factor_base_size: 2,
+                degree_bound: 3,
+                work_limit: 100,
+                twists: true,
+                protocol_sha256: Some(dataset::digest(&bytes)),
+                split_rule: "curve-twist-component-sha256-v1".into(),
+            };
+            let hash = plan.binding_sha256().unwrap();
+            let config = plan.cell(0).unwrap();
+            storage::write_json(&root,"run.json","run",&json!({"schema":"crypto.ml-dataset.run/v1","plan_sha256":hash,"source_commit":"a".repeat(40),"binary_sha256":"b".repeat(64)})).unwrap();
+            storage::write_json(&root, "plan.json", "plan", &plan).unwrap();
+            storage::write_json(&root, "config.json", "config", &config).unwrap();
+            storage::write_json(
+                &root,
+                "attempt.json",
+                "attempt",
+                &json!({"schema":"crypto.ml-dataset.attempt/v1","cell_index":0,"plan_sha256":hash}),
+            )
+            .unwrap();
+            storage::write_bytes(&root, "protocol.json", "protocol", "json", &bytes).unwrap();
+            let binding = AttemptBinding::from_cell_files(&root).unwrap();
+            let case = curves::generate(&config).unwrap();
+            Self {
+                root,
+                config,
+                case,
+                binding,
+            }
+        }
+    }
+    impl Drop for Fixture {
+        fn drop(&mut self) {
+            let _ = fs::remove_dir_all(&self.root);
+        }
+    }
+    #[test]
+    fn verified_worker_originals_bind_real_files_and_reject_substitution() {
+        let f = Fixture::new();
+        let mut registry = Vec::new();
+        let original = verify_and_store_worker_originals(
+            &f.config,
+            &f.case,
+            &f.root,
+            Some(&f.binding),
+            &mut registry,
+        )
+        .unwrap();
+        let live = f.root.join("live");
+        original
+            .matches_bound(&f.config, &f.case, &live, &f.binding)
+            .unwrap();
+        assert_eq!(
+            hex::encode(original.public_sha256),
+            dataset::digest(&fs::read(f.root.join("public.json")).unwrap())
+        );
+        assert_eq!(
+            hex::encode(original.factor_base_sha256),
+            dataset::digest(&fs::read(f.root.join("factor-base.json")).unwrap())
+        );
+        assert!(original
+            .matches_bound(&f.config.clone(), &f.case, &live, &f.binding)
+            .is_err());
+        assert!(original
+            .matches_bound(&f.config, &f.case.clone(), &live, &f.binding)
+            .is_err());
+        assert!(original
+            .matches_bound(&f.config, &f.case, &f.root.join("other"), &f.binding)
+            .is_err());
+        let mut wrong = f.binding.clone();
+        wrong.cell_index += 1;
+        assert!(original
+            .matches_bound(&f.config, &f.case, &live, &wrong)
+            .is_err());
+        for name in ["public.json", "factor-base.json", "config.json"] {
+            let path = f.root.join(name);
+            let saved = fs::read(&path).unwrap();
+            fs::write(&path, b"{}").unwrap();
+            assert!(
+                original
+                    .matches_bound(&f.config, &f.case, &live, &f.binding)
+                    .is_err(),
+                "{name}"
+            );
+            fs::write(path, saved).unwrap();
+        }
+        let result = solve_with_verified_worker_originals(
+            &f.config,
+            &f.case,
+            &live,
+            f.binding.clone(),
+            dataset::capture::capture_limits(16).unwrap(),
+            None,
+            &original,
+        )
+        .unwrap();
+        assert!(result.outcome.is_object());
+        assert!(live.join("committed.json").is_file());
+    }
+    #[test]
+    fn verified_worker_originals_require_both_checks_and_successful_storage() {
+        for failure in 0..4 {
+            let mut f = Fixture::new();
+            let mut registry = Vec::new();
+            match failure {
+                0 => f.case.private_witness["schema"] = json!("invalid"),
+                1 => f.case.factor_base["schema"] = json!("invalid"),
+                2 => {
+                    fs::write(f.root.join("public.json"), b"conflict").unwrap();
+                }
+                _ => f.binding.cell_index += 1,
+            }
+            assert!(
+                verify_and_store_worker_originals(
+                    &f.config,
+                    &f.case,
+                    &f.root,
+                    Some(&f.binding),
+                    &mut registry
+                )
+                .is_err(),
+                "{failure}"
+            );
+            assert!(!f.root.join("factor-base.json").exists());
+            assert!(!f.root.join("live").exists());
         }
     }
 }

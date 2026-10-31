@@ -1274,41 +1274,25 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
         let case = telemetry::measured(&out, &mut registry, "curve-construction", || {
             curves::generate(config)
         })?;
-        telemetry::measured(&out, &mut registry, "known-answer-replay", || {
-            curves::verify(&case.public_instance, &case.private_witness)
-        })?;
-        telemetry::measured(&out, &mut registry, "factor-base-replay", || {
-            curves::verify_factor_base(&case.public_instance, &case.factor_base)
-        })?;
-        registry.push(storage::write_json(
+        let verified_originals = solvers::verify_and_store_worker_originals(
+            config,
+            &case,
             &out,
-            "public.json",
-            "public-instance",
-            &case.public_instance,
-        )?);
-        registry.push(storage::write_json(
-            &out,
-            "witness.json",
-            "restricted-known-answer",
-            &case.private_witness,
-        )?);
-        registry.push(storage::write_json(
-            &out,
-            "factor-base.json",
-            "factor-base",
-            &case.factor_base,
-        )?);
+            capture_context.as_ref().map(|(binding, _)| binding),
+            &mut registry,
+        )?;
         known_answer = true;
         factor_base_verified = true;
         let solved = telemetry::measured(&out, &mut registry, "solver", || {
             if let Some((binding, limits)) = &capture_context {
-                solvers::solve_with_bound_event_sink_context(
+                solvers::solve_with_verified_worker_originals(
                     config,
                     &case,
                     &out.join("live"),
                     binding.clone(),
                     limits.clone(),
                     execution_context.as_ref(),
+                    &verified_originals,
                 )
             } else {
                 solvers::solve_with_event_sink_context(
