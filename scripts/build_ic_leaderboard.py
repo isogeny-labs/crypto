@@ -81,6 +81,7 @@ SOURCES = {
     "glv_k4": "research/glv_k4_pipeline_d4_20261017/summary.json",
     "glv_gls": "research/glv_gls_v4_20261018/summary.json",
     "glv_e31": "research/e31_chain_solve_20261024/summary.json",
+    "glv_e27": "experiments/32_walk_karatsuba/summary.json",
     "lazy_members": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
     "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
     "postgb_linear_stage": "research/postgb_linear_stage_20261026/analysis/summary.json",
@@ -883,6 +884,13 @@ def k4_v4_component() -> dict:
             or e2e.get("all_replay_fields_identical") is not True
             or e2e.get("rho_ahead_every_row_every_weight") is not True):
         raise SystemExit("review the E31 chain-solve summary before updating the leaderboard")
+    e27 = load(SOURCES["glv_e27"])
+    e27_study = "research/e27_walk_20261030"
+    if (e27.get("experiment") != "e27" or e27.get("all_walks_identical") is not True
+            or not all(z["other_fields_equal"] for z in e27["rows"])
+            or gate.check_evidence_dir(REPO / e27_study, REPO)):
+        raise SystemExit("review the E27 walk summary and its VALIDATION.json before updating the leaderboard")
+    span = lambda key, i: [min(z[key][i] for z in e27["rows"]), max(z[key][i] for z in e27["rows"])]
     return {**sm, "source": SOURCES["glv_k4"],
             "report": "research/glv_k4_pipeline_d4_20261017/REPORT.pdf",
             "gls": {**gls, "source": SOURCES["glv_gls"],
@@ -899,7 +907,20 @@ def k4_v4_component() -> dict:
                     "per_call_b": e31["stage_a"]["existing_over_B_range"],
                     "rows": [{k: z[k] for k in ("p", "seed", "arm", "log2_n", "S_E25", "S_A", "S_B",
                                                 "E25_over_A", "E25_over_B", "S_over_rho_A")}
-                             for z in e2e["rows"]]}}
+                             for z in e2e["rows"]]},
+            "e27": {"source": SOURCES["glv_e27"],
+                    "report": f"{e27_study}/REPORT.pdf",
+                    "validation": f"{e27_study}/VALIDATION.json",
+                    "add_cost": [e27["per_op_costs"]["schoolbook"]["add_distinct_unbatched"],
+                                 e27["per_op_costs"]["karatsuba"]["add_distinct_unbatched"]],
+                    "walk_ratio": e27["walk_ratio_range"],
+                    "ic_ratio": [min(z["S_A"] / z["S_AK"] for z in e27["rows"]),
+                                 max(z["S_A"] / z["S_AK"] for z in e27["rows"])],
+                    "growth": [span("growth", i) for i in range(3)],
+                    "dist_new": [span("dist_new", i) for i in range(3)],
+                    "rows": [{k: z[k] for k in ("p", "seed", "arm", "S_A", "S_AK", "rho_e25", "rho_e27",
+                                                "dist_old", "dist_new", "growth")}
+                             for z in e27["rows"]]}}
 
 def postgb_linear_stage_component() -> dict:
     """The linear stage after F4 across Gröbner-basis corpora, from
@@ -2977,6 +2998,17 @@ def markdown(doc: dict) -> str:
                  f"{z['E25_over_A'][0]:.2f}, {z['E25_over_A'][1]:.2f}, {z['E25_over_A'][2]:.3f} | "
                  f"{z['E25_over_B'][0]:.2f} | {z['S_over_rho_A'][0]:.2e} |")
     L.append("")
+    e = k["e27"]
+    L += [("The matched walk made stronger (E27, reference correction). Karatsuba F_p⁴ products and the norm inversions of 16 lockstep walks batched by Montgomery's trick take an affine addition from {a0} to {a1} F_p multiplications ({a2} with the batch share); every walk is bit-identical across the three arithmetics. The matched ⟨±ψ⟩ / negation walk becomes {w} cheaper; the index-calculus side, whose non-solve F_p⁴ work is about 2 % of S, only {ic}. Every row therefore moves further from rho, by {g0} at 0 GAE, {g1} at 0.1 and {g2} at 1; distance remaining {d0} at 0 GAE. Rho ahead at every weight. Class: a correction to the rho reference, not an improvement; validated (independent replay 11/11 runs, note §9.25 and §9.29).").format(a0=e["add_cost"][0], a1=e["add_cost"][1], a2="66.3–66.7", w=R(e["walk_ratio"], "{:.3f}"), ic=R(e["ic_ratio"], "{:.4f}"), g0=R(e["growth"][0], "{:.3f}"), g1=R(e["growth"][1], "{:.3f}"), g2=R(e["growth"][2], "{:.3f}"), d0=R(e["dist_new"][0], "{:.2e}"))
+          + f" Read the [report](../../{e['report']}), [summary](../../{e['source']}) and "
+            f"[validation](../../{e['validation']}).", "",
+          "| p | seed | arm | S (E31 A) | S (E27) | rho E25 walk | rho E27 walk | S / rho before → after (0 GAE) | growth (0, 0.1, 1 GAE) |",
+          "|--:|--:|:--|--:|--:|--:|--:|:--|:--|"]
+    for z in e["rows"]:
+        L.append(f"| {z['p']} | {z['seed']} | {z['arm']} | {z['S_A']:.3e} | {z['S_AK']:.3e} | {z['rho_e25']:.4g} | "
+                 f"{z['rho_e27']:.4g} | {z['dist_old'][0]:.3e} → {z['dist_new'][0]:.3e} | "
+                 f"{z['growth'][0]:.3f}, {z['growth'][1]:.3f}, {z['growth'][2]:.3f} |")
+    L.append("")
     return "\n".join(L) + "\n"
 
 
@@ -4146,7 +4178,19 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{z["S_A"]:.2e}</td><td>{z["S_B"]:.2e}</td><td>{z["E25_over_A"][0]:.2f}, '
                  f'{z["E25_over_A"][1]:.2f}, {z["E25_over_A"][2]:.3f}</td><td>{z["E25_over_B"][0]:.2f}</td>'
                  f'<td>{z["S_over_rho_A"][0]:.2e}</td></tr>')
-    P.append('</tbody></table></div>' + gh(e["source"], 'Frozen study summary') + '</section>')
+    P.append('</tbody></table></div>' + gh(e["source"], 'Frozen study summary'))
+    e = k["e27"]
+    P.append('<h3>The matched walk made stronger (E27)</h3><p>' + esc(("The matched walk made stronger (E27, reference correction). Karatsuba F_p⁴ products and the norm inversions of 16 lockstep walks batched by Montgomery's trick take an affine addition from {a0} to {a1} F_p multiplications ({a2} with the batch share); every walk is bit-identical across the three arithmetics. The matched ⟨±ψ⟩ / negation walk becomes {w} cheaper; the index-calculus side, whose non-solve F_p⁴ work is about 2 % of S, only {ic}. Every row therefore moves further from rho, by {g0} at 0 GAE, {g1} at 0.1 and {g2} at 1; distance remaining {d0} at 0 GAE. Rho ahead at every weight. Class: a correction to the rho reference, not an improvement; validated (independent replay 11/11 runs, note §9.25 and §9.29).").format(a0=e["add_cost"][0], a1=e["add_cost"][1], a2="66.3–66.7", w=R(e["walk_ratio"], "{:.3f}"), ic=R(e["ic_ratio"], "{:.4f}"), g0=R(e["growth"][0], "{:.3f}"), g1=R(e["growth"][1], "{:.3f}"), g2=R(e["growth"][2], "{:.3f}"), d0=R(e["dist_new"][0], "{:.2e}"))) + '</p>'
+             '<div class="scroll"><table><thead><tr><th>p</th><th>seed</th><th>arm</th><th>S (E31 A)</th>'
+             '<th>S (E27)</th><th>rho E25 walk</th><th>rho E27 walk</th><th>S / rho before → after (0 GAE)</th>'
+             '<th>growth (0, 0.1, 1 GAE)</th></tr></thead><tbody>')
+    for z in e["rows"]:
+        P.append(f'<tr><td>{z["p"]}</td><td>{z["seed"]}</td><td>{z["arm"]}</td><td>{z["S_A"]:.3e}</td>'
+                 f'<td>{z["S_AK"]:.3e}</td><td>{z["rho_e25"]:.4g}</td><td>{z["rho_e27"]:.4g}</td>'
+                 f'<td>{z["dist_old"][0]:.3e} → {z["dist_new"][0]:.3e}</td>'
+                 f'<td>{z["growth"][0]:.3f}, {z["growth"][1]:.3f}, {z["growth"][2]:.3f}</td></tr>')
+    P.append('</tbody></table></div>' + gh(e["source"], 'Frozen study summary') + ' · '
+             + gh(e["validation"], 'Validation') + '</section>')
     b = doc["bitop_prime_ladder"]
     t = bitop_text(b)
     P.append(f'<section class="card" id="bitop-prime-ladder"><h2>{esc(t["title"])}, outside the priced tables</h2>'

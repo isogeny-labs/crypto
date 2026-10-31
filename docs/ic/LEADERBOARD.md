@@ -778,6 +778,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/glv_k4_pipeline_d4_20261017/summary.json` — sha256 `369769457fdf5657…`
 - `research/glv_gls_v4_20261018/summary.json` — sha256 `c8de6d58008176d6…`
 - `research/e31_chain_solve_20261024/summary.json` — sha256 `0ebac1878e112a7d…`
+- `experiments/32_walk_karatsuba/summary.json` — sha256 `b20666d943bd0c3e…`
 - `research/ecbench_lazy_orbit_members_20261018/figures/ratios.json` — sha256 `c86743775097e0e1…`
 - `research/jv_cover_sparse_fglm_20261018/summary.json` — sha256 `4217cb1de3458ee8…`
 - `research/postgb_linear_stage_20261026/analysis/summary.json` — sha256 `ef9aae284eceddb7…`
@@ -966,4 +967,29 @@ The chain solve (E31, phase speed-up). E25's k = 4 solve replaced by its P₂-ch
 | 397 | 1 | B | 4.17e+10 | 1.63e+10 | 8.82e+09 | 2.56, 1.43, 1.053 | 4.73 | 4.42e+03 |
 | 397 | 2 | A | 1.31e+11 | 5.15e+10 | 2.79e+10 | 2.55, 1.42, 1.052 | 4.70 | 1.56e+04 |
 | 397 | 2 | B | 5.65e+10 | 2.22e+10 | 1.20e+10 | 2.55, 1.42, 1.052 | 4.70 | 6.71e+03 |
+
+The matched walk made stronger (E27, reference correction). Karatsuba F_p⁴ products and the norm inversions of 16 lockstep walks batched by Montgomery's trick take an affine addition from 97 to 79 F_p multiplications (66.3–66.7 with the batch share); every walk is bit-identical across the three arithmetics. The matched ⟨±ψ⟩ / negation walk becomes 1.453–1.463× cheaper; the index-calculus side, whose non-solve F_p⁴ work is about 2 % of S, only 1.0048–1.0057×. Every row therefore moves further from rho, by 1.448–1.456× at 0 GAE, 1.415–1.443× at 0.1 and 1.236–1.325× at 1; distance remaining 6.39e+03–4.06e+05× at 0 GAE. Rho ahead at every weight. Class: a correction to the rho reference, not an improvement; validated (independent replay 11/11 runs, note §9.25 and §9.29). Read the [report](../../research/e27_walk_20261030/REPORT.pdf), [summary](../../experiments/32_walk_karatsuba/summary.json) and [validation](../../research/e27_walk_20261030/VALIDATION.json).
+
+| p | seed | arm | S (E31 A) | S (E27) | rho E25 walk | rho E27 walk | S / rho before → after (0 GAE) | growth (0, 0.1, 1 GAE) |
+|--:|--:|:--|--:|--:|--:|--:|:--|:--|
+| 101 | 1 | A | 2.709e+10 | 2.696e+10 | 5.143e+05 | 3.518e+05 | 5.268e+04 → 7.664e+04 | 1.455, 1.436, 1.297 |
+| 101 | 1 | B | 1.390e+10 | 1.383e+10 | 5.143e+05 | 3.518e+05 | 2.703e+04 → 3.932e+04 | 1.455, 1.436, 1.297 |
+| 101 | 2 | A | 9.866e+09 | 9.818e+09 | 3.991e+05 | 2.727e+05 | 2.472e+04 → 3.601e+04 | 1.456, 1.443, 1.325 |
+| 101 | 2 | B | 4.682e+09 | 4.660e+09 | 3.991e+05 | 2.727e+05 | 1.173e+04 → 1.709e+04 | 1.456, 1.443, 1.325 |
+| 149 | 1 | A | 2.301e+11 | 2.290e+11 | 8.24e+05 | 5.646e+05 | 2.793e+05 → 4.055e+05 | 1.452, 1.428, 1.270 |
+| 149 | 1 | B | 8.643e+10 | 8.600e+10 | 8.24e+05 | 5.646e+05 | 1.049e+05 → 1.523e+05 | 1.452, 1.428, 1.270 |
+| 149 | 2 | A | 3.976e+10 | 3.956e+10 | 8.088e+05 | 5.542e+05 | 4.916e+04 → 7.138e+04 | 1.452, 1.428, 1.271 |
+| 149 | 2 | B | 2.247e+10 | 2.235e+10 | 8.088e+05 | 5.542e+05 | 2.778e+04 → 4.033e+04 | 1.452, 1.428, 1.271 |
+| 197 | 1 | A | 3.354e+10 | 3.336e+10 | 1.035e+06 | 7.095e+05 | 3.240e+04 → 4.702e+04 | 1.451, 1.425, 1.263 |
+| 197 | 1 | B | 2.488e+10 | 2.475e+10 | 1.035e+06 | 7.095e+05 | 2.404e+04 → 3.488e+04 | 1.451, 1.425, 1.263 |
+| 197 | 2 | A | 1.723e+10 | 1.714e+10 | 9.88e+05 | 6.773e+05 | 1.743e+04 → 2.530e+04 | 1.451, 1.425, 1.265 |
+| 197 | 2 | B | 1.017e+10 | 1.012e+10 | 9.88e+05 | 6.773e+05 | 1.030e+04 → 1.494e+04 | 1.451, 1.425, 1.265 |
+| 269 | 1 | A | 5.357e+10 | 5.329e+10 | 1.628e+06 | 1.117e+06 | 3.291e+04 → 4.770e+04 | 1.450, 1.420, 1.250 |
+| 269 | 1 | B | 3.086e+10 | 3.069e+10 | 1.628e+06 | 1.117e+06 | 1.895e+04 → 2.747e+04 | 1.450, 1.420, 1.250 |
+| 269 | 2 | A | 1.988e+10 | 1.978e+10 | 1.613e+06 | 1.107e+06 | 1.232e+04 → 1.786e+04 | 1.449, 1.420, 1.250 |
+| 269 | 2 | B | 9.827e+09 | 9.774e+09 | 1.613e+06 | 1.107e+06 | 6.091e+03 → 8.828e+03 | 1.449, 1.420, 1.250 |
+| 397 | 1 | A | 2.809e+10 | 2.793e+10 | 3.687e+06 | 2.533e+06 | 7.616e+03 → 1.103e+04 | 1.448, 1.415, 1.236 |
+| 397 | 1 | B | 1.628e+10 | 1.619e+10 | 3.687e+06 | 2.533e+06 | 4.415e+03 → 6.392e+03 | 1.448, 1.415, 1.236 |
+| 397 | 2 | A | 5.151e+10 | 5.123e+10 | 3.302e+06 | 2.268e+06 | 1.560e+04 → 2.258e+04 | 1.448, 1.416, 1.238 |
+| 397 | 2 | B | 2.217e+10 | 2.204e+10 | 3.302e+06 | 2.268e+06 | 6.713e+03 → 9.719e+03 | 1.448, 1.416, 1.238 |
 
