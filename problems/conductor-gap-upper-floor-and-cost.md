@@ -110,6 +110,16 @@ would unblock that instance. Partial sums, source/kernel certificates and
 the helper improvement do not discharge this exit condition or establish
 largest-known crossing status. The older upper instances remain distinct.
 
+The follow-up [measurement protocol](../research/prime_conductor_gap80_20261031/MEASUREMENT_PROTOCOL.md)
+records an exact native eligibility audit of the existing constructor. Its
+degree parser is 64-bit; after widening it, the baby-root slots alone would
+require 3,417,239,656,272 bytes, before limbs and polynomial trees. This exceeds
+the current 128-GiB lab cap. That constructor is also codomain-only. These
+are specific implementation/resource blockers, not a failed timed run or a
+universal lower bound. The explicit 80-bit construction, point evaluation
+and paired ECDLP times remain missing, rather than inferred from a smaller
+fixture or assigned zero.
+
 ### Historical 60-bit-prime instance imported on 2026-10-31
 
 The [archived gap60 study](../research/prime_conductor_gap60_20261031/README.md)
