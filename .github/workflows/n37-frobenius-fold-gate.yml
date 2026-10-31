@@ -95,13 +95,16 @@ jobs:
           toolchain: '1.98'
           components: rustfmt
       - uses: Swatinem/rust-cache@v2
-      - name: Check frozen source hashes and formatting
+      - name: Check archived inputs and current build lock
         run: |
           printf '%s  %s\n' \
             'ed66c80bc96eb576e006fb220eb914b4aae73e56348fb9c13b2df2a8005bffd2' examples/n37_frobenius_fold_gate.rs \
             '792a118ae3fb5a86ea6c1657c50f59013679307bf65f96c75b72f0b24f3eec93' examples/n37_frobenius_fold_replay.rs \
+            'ac5cd7a3459be776180afe1eb2975c76b1a88f84bd1e99aa20475927ec260a90' research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock \
             | sha256sum --check
           rustfmt --edition 2021 --check examples/n37_frobenius_fold_gate.rs examples/n37_frobenius_fold_replay.rs
+          # The archived lock is historical evidence. The current manifest is
+          # built with the repository's tracked lock, which must resolve as-is.
       - name: Build native producer and independent replay
         run: cargo build --release --locked --example n37_frobenius_fold_gate --example n37_frobenius_fold_replay
       - name: Verify preserved raw runs and deterministic projection
