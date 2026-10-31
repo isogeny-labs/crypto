@@ -1,0 +1,41 @@
+{
+ "schema": "e27-validator-manual-checks/v1",
+ "note": "Checks the validator ran outside validate_e27.rs (git, build, unit tests), each with its command and result. validate_e27.rs report reads this file and fails if any `holds` is false.",
+ "checks": [
+  {
+   "id": "preregistration",
+   "check": "the E27 pre-registration (§9.25, G2.95-G2.99) was committed before any E27 code and is unchanged since",
+   "command": "git log -1 --format='%H %cI' b3a0617ad 6490d0fac; git merge-base --is-ancestor b3a0617ad 6490d0fac; diff <(git show b3a0617ad:NOTE | sed -n '/^### 9.25 /,/^#{1,3} /p') <(git show HEAD:NOTE | ...)",
+   "result": "b3a0617adead7eaccf4ba545008ff16e6c053a9a 2026-10-30T17:42:12Z precedes code 6490d0faccc25cbcadce7dd4879c428344b3ae51 2026-10-30T18:34:23Z and is its ancestor; §9.25 at HEAD 5b8f3d217 is byte-identical to b3a0617ad except one trailing blank line added when §9.26 was appended (git log -L shows no other commit touching the section)",
+   "holds": true
+  },
+  {
+   "id": "binary_commit",
+   "check": "binary_commit.txt names the code commit plus compile repairs, and HEAD descends from it",
+   "command": "cat experiments/32_walk_karatsuba/binary_commit.txt; git rev-parse af2504ef1^; git merge-base --is-ancestor af2504ef1 HEAD; git show --stat af2504ef1",
+   "result": "binary_commit.txt = af2504ef161cbe804d855f3fa26c435bc02ba282, whose parent is the E27 code commit 6490d0fac; af2504ef1 touches only binary_semaev_chain_sat.rs (-1 line), ml_dataset/s3_budget.rs, ml_dataset/storage.rs, store/mod.rs (8+/4-, compile repairs off the E27 path); HEAD 5b8f3d217 descends from it",
+   "holds": true
+  },
+  {
+   "id": "export_identity",
+   "check": "the replayed tree is the recorded binary commit's build inputs, byte for byte",
+   "command": "git archive af2504ef1 -- Cargo.toml Cargo.lock src <the 2 examples> <every explicit [[bin]]/[[example]]/[[bench]] path> <6 path dependencies> <every include_str!/include_bytes! target of src> | tar -x -C /dev/shm/e27val-tree; git hash-object every extracted file and compare with git rev-parse af2504ef1:<path>",
+   "result": "1,732 files, every one equal to its af2504ef1 blob",
+   "holds": true
+  },
+  {
+   "id": "head_code_drift",
+   "check": "HEAD's E27 code equals the recorded binary's in behaviour (source level)",
+   "command": "git diff af2504ef1 HEAD -- src Cargo.toml Cargo.lock <path deps> examples/e27_walk.rs examples/quartic_pipeline_gls.rs",
+   "result": "not byte-identical: 37 files differ (merges of main and E28-E30 code). Cargo.toml, Cargo.lock and examples/e27_walk.rs are unchanged; the modules on the E27 path (quartic_folds, gaudry_quartic, residual_walk, glv_invariant_base, gaudry_quartic_d4, gaudry_cubic, d4_weighted_s5, klein_v4) are unchanged except quartic_folds.rs and gaudry_quartic.rs, whose E27-path changes are (a) `if m > 0 { cost / m }` -> `cost.checked_div(m)` in the batch share (identical), (b) E29's rho_twist24_with (not on E27's path), (c) E30's trivial-product audit counter, off unless --audit, serialized only when on (quartic_pipeline_gls gains the --audit flag); the e27_tests module is byte-identical. See head_replay for the executed check",
+   "holds": true
+  },
+  {
+   "id": "verify_check_commit",
+   "check": "main's 652238c03 is where rho4_folded began charging the [d]G = Q check, and E31's binary predates it",
+   "command": "git show 652238c03 -- src/cryptanalysis/quartic_folds.rs | grep 'curve.mul(&inst.g, d) == inst.q'; git merge-base --is-ancestor 652238c03 af2504ef1; git merge-base --is-ancestor 652238c03 a8f52422d5",
+   "result": "652238c03 (2026-10-24T10:26:43Z) adds `correct = found == Some(inst.d) && found.is_some_and(|d| curve.mul(&inst.g, d) == inst.q)` on the walk's counting curve; it is an ancestor of af2504ef1 and not of E31's recorded binary a8f52422d5, so E31's walks did not charge it and E27's do (recorded apart as verify_fp_muls / verify_group_ops)",
+   "holds": true
+  }
+ ]
+}
