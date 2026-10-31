@@ -121,3 +121,17 @@ Corrected-source Clippy, typed retained fixtures, full library tests and CLI bui
 
 ### Errors
 The original full suite had one GPU lock reacquisition failure; the same binary passed 5,793 tests at reduced test concurrency. Those results predate the Box correction and remain separately bound. No scientific execution was admitted.
+
+## 2026-10-31 01:43 UTC — fixed archival audit completed and reviewed
+
+### What was done
+Committed frozen producer and prospective review at 191a0210a7e150c922bc848b37fb639daacd89e1, then admitted one 120-second archival audit. Native exit0; all 420ordered identities retained. Independent review recomputed 218 ineligible and202 eligible inputs (174 first,28 redundant),174 edges,zero cycles/terminal returns; all 28 duplicates normalize to delta (0, 0). All 60 setup ledger entries reconcile.
+
+### Decisions made
+Retain these as exact archival dispositions. No new trajectory or full-cohort comparative clock was run. Cost/yield fields requiring those observations remain null.
+
+### Open threads
+Mixed-degree cancellation proof has compiled and awaits independent source review; generic mixed proof construction continues. Corrected native preflight software validation is still owned by its existing supervisor. Runtime qualification and final binary bindings remain pending.
+
+### Errors
+No archival validation failure, missing disposition or retry occurred. Historical source-review corrections and prior software failures remain retained.
