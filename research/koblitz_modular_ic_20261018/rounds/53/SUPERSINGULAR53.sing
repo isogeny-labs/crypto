@@ -1,0 +1,30 @@
+// Exact A=0 fiber of the original QR equations; predictions are outcomes.
+proc require53(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../../../51/runs/universal51-01/universal-polynomial51.sing"));
+ring supersingular53=(2,b),(n,l),lp;short=0;
+map fiberMap53=universalPolynomialCertificate51,n,l,b,1;
+ideal source53=fiberMap53(qr51);poly G53=fiberMap53(G51);poly N53=fiberMap53(N51);
+poly quartic53=l^4+b*l+b^2;
+require53(G53==quartic53^4,"SUPER53_QUARTIC_FOURTH_POWER");
+require53(diff(quartic53,l)==b,"SUPER53_SEPARABLE_QUARTIC");
+ideal gb53=std(source53);int dimension53=vdim(gb53);
+matrix forward53=lift(source53,gb53);matrix reverse53=lift(gb53,source53);
+require53(matrix(source53)*forward53==matrix(gb53) && matrix(gb53)*reverse53==matrix(source53),"SUPER53_FULL_IDEAL_PRODUCTS");
+ideal minors53=minor(jacob(source53),2);ideal augmented53=source53,minors53;
+ideal singularGB53=std(augmented53);
+int smooth53=(reduce(poly(1),singularGB53)==0);
+int quarticMember53=(reduce(quartic53,gb53)==0);
+matrix smoothLift53;matrix quarticLift53;
+if(smooth53){smoothLift53=lift(augmented53,ideal(1));require53(matrix(augmented53)*smoothLift53==matrix(ideal(1)),"SUPER53_JACOBIAN_UNIT_PRODUCT");}
+if(quarticMember53){quarticLift53=lift(source53,ideal(quartic53));require53(matrix(source53)*quarticLift53==matrix(ideal(quartic53)),"SUPER53_QUARTIC_MEMBERSHIP_PRODUCT");}
+if(dimension53>0){require53(reduce(poly(1),gb53)!=0,"SUPER53_NONZERO_QUOTIENT");}
+link out53="ASCII:w supersingular-certificate53.sing";
+write(out53,"ring supersingularCertificate53=(2,b),(n,l),lp;short=0;ideal source53="+string(source53)+";ideal gb53="+string(gb53)+";ideal minors53="+string(minors53)+";poly G53="+string(G53)+";poly N53="+string(N53)+";poly quartic53="+string(quartic53)+";int dimension53="+string(dimension53)+";int smooth53="+string(smooth53)+";int quarticMember53="+string(quarticMember53)+";");
+proc dump53(link out,string name,matrix A){int i;int j;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");for(i=1;i<=nrows(A);i++){for(j=1;j<=ncols(A);j++){if(A[i,j]!=0){write(out,name+"["+string(i)+","+string(j)+"]="+string(A[i,j])+";");}}}}
+dump53(out53,"forward53",forward53);dump53(out53,"reverse53",reverse53);
+if(smooth53){dump53(out53,"smoothLift53",smoothLift53);}
+if(quarticMember53){dump53(out53,"quarticLift53",quarticLift53);}
+close(out53);
+print("SUPER53_GROEBNER_BASIS");print(gb53);
+print("SUPER53_RESULT dimension="+string(dimension53)+" Jacobian_unit="+string(smooth53)+" quartic_member="+string(quarticMember53)+" compact_N_zero="+string(N53==0));
+print("SUPERSINGULAR53_ALL_CHECKS_PASS");quit;

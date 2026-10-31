@@ -112,3 +112,19 @@ Lean prerequisite and requires both saved compile.exit/audit.exit=0before
 checkpoint and invocation. Attempt01is rejected for admission ordering;the
 auditPASSlog had appeared but the audit terminal receipt had not. Keep its
 partials and stop receipt. Do not infer actual overlap solely from timestamps.
+
+## Supersingular projection-fiber check, frozen before execution
+
+Retained R51 ordinary compact G and original QR generators suggest the
+coordinate mechanism at A=0(c=1). SUPERSINGULAR53 first requires the exact
+identity G=(l^4+b*l+b²)^4 and derivative of the quartic=b(nonzero overF2(b)).
+Specialize all3original QR equations,compute their complete standard basis,
+both full ideal inclusion products,dimension,and Jacobian2x2minor unit test.
+If the Jacobian unit or quartic membership holds,save and verify the full
+membership product. Dimension16,smoothness,quartic membership and compactN=0
+are measured outcomes,not acceptance prerequisites. Save the complete basis
+and all witnesses;do not replace a failed geometric prediction. This is the
+generic c=1fiber overF2(b),not yet its actual fAresidue-field specialization
+or completed local-ring identification. Same native limits and serialization.
+Prior source review:R51CM.md,UNIVERSAL51/LINE51and the retained universal
+certificate;reuse established QR-line and Jacobian methods,no novelty claim.
