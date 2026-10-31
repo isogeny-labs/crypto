@@ -9607,7 +9607,7 @@ fn sat_decompose_chained_s3_checked(
         }
         for (step, slot) in intermediate_codes.iter_mut().enumerate().skip(1) {
             let mut codes: Option<Vec<BigUint>> = None;
-            if step + 1 <= tables.front {
+            if step < tables.front {
                 if let Some(layer) = chain_s3_sum_layer(kc, &signed, step + 1, tables.max_points) {
                     codes = Some(chain_s3_codes(layer.iter()));
                 }

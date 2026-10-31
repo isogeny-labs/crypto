@@ -23,19 +23,37 @@ fn median(mut v: Vec<f64>) -> Option<f64> {
     }
     v.sort_by(|a, b| a.partial_cmp(b).unwrap());
     let n = v.len();
-    Some(if n % 2 == 1 { v[n / 2] } else { (v[n / 2 - 1] + v[n / 2]) / 2.0 })
+    Some(if n % 2 == 1 {
+        v[n / 2]
+    } else {
+        (v[n / 2 - 1] + v[n / 2]) / 2.0
+    })
 }
 
 fn main() {
-    let study = std::env::args().nth(1).expect("usage: n83_chain_sat_analyze <study_dir>");
+    let study = std::env::args()
+        .nth(1)
+        .expect("usage: n83_chain_sat_analyze <study_dir>");
     let study = Path::new(&study);
     let mut rows: Vec<Value> = Vec::new();
-    let mut shards: Vec<_> = fs::read_dir(study.join("raw")).expect("raw/").flatten().map(|e| e.path()).collect();
+    let mut shards: Vec<_> = fs::read_dir(study.join("raw"))
+        .expect("raw/")
+        .flatten()
+        .map(|e| e.path())
+        .collect();
     shards.sort();
     for shard in shards {
-        let mut files: Vec<_> = fs::read_dir(&shard).into_iter().flatten().flatten().map(|e| e.path()).collect();
+        let mut files: Vec<_> = fs::read_dir(&shard)
+            .into_iter()
+            .flatten()
+            .flatten()
+            .map(|e| e.path())
+            .collect();
         files.sort();
-        for f in files.iter().filter(|p| p.extension().is_some_and(|e| e == "jsonl")) {
+        for f in files
+            .iter()
+            .filter(|p| p.extension().is_some_and(|e| e == "jsonl"))
+        {
             for line in fs::read_to_string(f).unwrap_or_default().lines() {
                 if let Ok(mut v) = serde_json::from_str::<Value>(line) {
                     v["record"] = json!(f.strip_prefix(study).unwrap_or(f).to_string_lossy());
@@ -72,13 +90,18 @@ fn main() {
     let mut by_target: BTreeMap<(u64, u64), BTreeMap<String, &Value>> = BTreeMap::new();
     for r in &rows {
         by_target
-            .entry((r["m"].as_u64().unwrap_or(0), r["target"].as_u64().unwrap_or(0)))
+            .entry((
+                r["m"].as_u64().unwrap_or(0),
+                r["target"].as_u64().unwrap_or(0),
+            ))
             .or_default()
             .insert(r["arm"].as_str().unwrap_or("").to_string(), r);
     }
     let mut pairs: BTreeMap<(u64, String), Vec<Value>> = BTreeMap::new();
     for ((m, t), arms) in &by_target {
-        let Some(base) = arms.get(BASELINE) else { continue };
+        let Some(base) = arms.get(BASELINE) else {
+            continue;
+        };
         for (arm, r) in arms {
             if arm == BASELINE {
                 continue;
@@ -140,18 +163,47 @@ fn main() {
         "cells": cells,
         "paired": paired,
     });
-    fs::write(study.join("ANALYSIS.json"), serde_json::to_string_pretty(&analysis).unwrap()).unwrap();
+    fs::write(
+        study.join("ANALYSIS.json"),
+        serde_json::to_string_pretty(&analysis).unwrap(),
+    )
+    .unwrap();
     let mut tsv = String::from("m\tarm\tkind\tqueries\trefuted\twitness\tverified\tundecided\tmedian_conflicts_decided\tmedian_seconds_decided\n");
     for c in analysis["cells"].as_array().unwrap() {
         let f = |k: &str| match &c[k] {
             Value::Null => String::new(),
-            Value::Number(n) => n.as_f64().map_or(n.to_string(), |x| if x.fract() == 0.0 { format!("{x}") } else { format!("{x:.3}") }),
+            Value::Number(n) => n.as_f64().map_or(n.to_string(), |x| {
+                if x.fract() == 0.0 {
+                    format!("{x}")
+                } else {
+                    format!("{x:.3}")
+                }
+            }),
             Value::String(s) => s.clone(),
             v => v.to_string(),
         };
-        tsv.push_str(&["m", "arm", "kind", "queries", "refuted", "witness", "verified", "undecided", "median_conflicts_decided", "median_seconds_decided"].map(f).join("\t"));
+        tsv.push_str(
+            &[
+                "m",
+                "arm",
+                "kind",
+                "queries",
+                "refuted",
+                "witness",
+                "verified",
+                "undecided",
+                "median_conflicts_decided",
+                "median_seconds_decided",
+            ]
+            .map(f)
+            .join("\t"),
+        );
         tsv.push('\n');
     }
     fs::write(study.join("table.tsv"), tsv).unwrap();
-    eprintln!("{} records, {} soundness flags", rows.len(), analysis["soundness_flags"].as_array().unwrap().len());
+    eprintln!(
+        "{} records, {} soundness flags",
+        rows.len(),
+        analysis["soundness_flags"].as_array().unwrap().len()
+    );
 }
