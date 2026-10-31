@@ -3489,3 +3489,78 @@ counts are not emitted.  The `F_{p⁴}`-priced phases are `1.53`–`1.90 %` of `
 **Where the line stands.**  Against the strengthened walk (iii), the `k = 4` `V₄`/GLS line with E31's solver A
 is `6.39·10³`–`4.06·10⁵×` rho at `0` GAE, rho ahead at every weight.  The modelled handover (`2^{88}`–`2^{90}`) is
 an extrapolation from `p = 101`–`521` (`22`–`32`-bit `n`), and every `S` above is `≥ 99 %` solve.
+
+### 9.35 E33 pre-registration: solver B's pivot selection, counted (and two cheaper selections)
+
+*Registered 2026-10-31, before any E33 code.*  **Numbering:** E32 (a parallel experiment in this
+checkout) owns §9.34, §9.36 and G2.114–G2.123; E33 takes §9.35 (this registration), §9.37 (results) and
+G2.124–G2.133.  **Motivation:** §9.24.  Solver B (`echelon_by_lead_with(…, sparsest = true)`,
+`gaudry_quartic.rs`) counts the nonzeros of every row of the built matrix before eliminating, compares
+the counts of every bucket's candidates, and recounts each updated row's tail after every row update.
+None of that is counted or emitted; the validator priced the first pass alone from a lower bound
+(`2 E_E25 − E_E31` entry reads) and found B behind E25 at `0.1` and `1` GAE, so B's rank is unresolved
+and B is not a baseline.  E33 counts the whole pass and, separately, builds two cheaper selections.
+**Class, fixed in advance:** counting B's work is *accounting*; only a variant that is cheaper than A
+with its own selection work counted, at weights where the order holds across the band, would be an
+improvement.
+
+**Counting rule.**  One native operation per Macaulay-matrix entry examined for its zero status and
+one per comparison of two candidates' keys (the convention of §9.16–§9.24: one per Macaulay entry,
+priced at `g · 97` `F_p` multiplications for `g ∈ {0, 0.1, 1}`).  Index bookkeeping that A also does
+(the bucket sort, the lead scan `row[c+1..].position(≠ 0)`, the swap) is common to every arm and is not
+pivot selection; it is emitted separately as `lead_scan_reads` and used only in the sensitivity G2.133.
+
+- **B, counted** (`chain-sparsest-counted`; the same code as B and the same choices): (i) the initial
+  pass, `rows · cols` per echelon built; (ii) `|bucket| − 1` comparisons in each column whose bucket
+  holds more than one row; (iii) the recount, `cols − l` reads per updated row with new lead `l`.
+- **B′, incremental** (`chain-sparsest-inc`; the same choices, by construction and checked): (i) each
+  row's count is inherited from its equation (a monomial shift is injective on terms), at one operation
+  per coefficient of each triangularised equation examined plus one per row; (ii) as B; (iii) during
+  each row update, the zero status of each updated entry before and after (two operations per entry the
+  pivot row touches) plus one per updated row.
+- **B″, estimate** (`chain-sparsest-est`; possibly different choices, so its `C` is measured): (i) as
+  B′; (ii) as B; (iii) the Markowitz fill bound `min(nnz − 1 + |pivot| − 1, cols − l)`, two operations
+  per updated row and no entry read.  Any pivot rule spans the same row space with the same pivot
+  columns, so the standard monomials, normal forms and decompositions must not change.
+- **A, counted** (`chain-counted`): A with `lead_scan_reads` emitted (no selection work), for G2.133.
+
+A fallback (the existing solver rerun) adds no selection work; the chain attempt's selection work is
+charged.  All new counting sits behind these new solver names; `macaulay`, `chain` and
+`chain-sparsest` are unchanged, and a test shows E25, A, B and E27 outputs bit-identical.
+
+**Protocol.**  *Stage A:* E31's setting exactly (`examples/e31_stage_a.rs`): E25's ten curves, the first
+1,000 targets of E25 arm A's stream per curve, one thread, every solver interleaved per call from the
+same per-target RNG seed: existing, A, A counted, B, B counted, B′, B″.  Per call: outputs, degree,
+outcome, decomposition set, every phase count, the pivot-selection work by part, `lead_scan_reads`, and
+a digest of the pivot row chosen in every column.  *End to end:* `quartic_pipeline_gls` on E25's ten
+curves, both arms, with `--karatsuba` (E27), `RAYON_NUM_THREADS=4` (the target stream), for B counted
+and B′; B″ only if, in Stage A, its per-call `S` at `0.1` GAE (`C + 9.7·(entries + selection work)`) is
+below A's on every curve.  *Reference:* A is E27's records (A with Karatsuba); E25 is its own records
+(schoolbook), compared with B's schoolbook `S` (E31 B's records plus the selection work measured here,
+which does not depend on the `F_{p⁴}` product); the matched rho is walk (iii) of E27 without the
+`[d]G` check (`experiments/32_walk_karatsuba/summary.json`, `rho_e27`, `walk_steps`).  Band:
+`S(g) = total_muls + 97 g (macaulay_entries + selection work)` and `rho(g) = rho + 97 g · steps`.  A rank
+is stated only where the order holds at `0`, `0.1` and `1` GAE on every row.  Host: the 4-vCPU
+container, at most 2 cores (isolab-eks is not reachable from it: no AWS CLI, the GitHub route refused);
+operation counts only, no wall-time claim.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.124 | identity (**kill**) | B counted, B′, B″ and A counted return the existing solver's decomposition set, outcome and degree on every Stage A call and every end-to-end record; B counted and B′ choose B's pivot in every column (equal digests) and reproduce B's phase counts; A counted reproduces A's; the end-to-end B counted and B′ records reproduce every field of each other apart from the selection fields and the solver tag, and every non-product field of E31 B's records; rerunning `macaulay`, `chain`, `chain-sparsest` and E27's `chain --karatsuba` at `p = 101` seed 2 reproduces the stored records byte for byte (wall times aside); unit tests: B′'s inherited and incremental counts equal a recount on every row of real E25 matrices.  Negative controls: a pivot moved to the second-sparsest candidate in one column changes the digest and is flagged; an incremental count off by one on one row is flagged by the recount check; E31's perturbed-coefficient control still changes non-empty sets | any difference, or a control not detected (E33 then stops) |
+| G2.125 | B's selection work per call (Stage A mean, all calls) | initial pass exactly `rows · cols` per echelon (`393 · 448 = 176,064`); comparisons `≤ 2 %` of the total; recount `>` initial pass; total in `[3·10⁵, 2·10⁶]` | outside |
+| G2.126 | B′'s selection work | B′ / B per call in `[0.15, 0.8]` | outside |
+| G2.127 | B″ | selection work `≤ 2·10⁴` per call; `C` median B″ / B in `[1.0, 1.3]` on every curve | outside |
+| G2.128 | B against A, counted (end to end, Karatsuba) | `S_A / S_B > 1` at `0` GAE and `< 1` at `0.1` and `1` GAE on every row: the order flips inside the band, so B is not ranked ahead of A | B ahead of A at `0.1` or `1` GAE on any row |
+| G2.129 | B against E25 | `S_E25 / S_B > 1` at `0`, `≤ 0.899` at `0.1` and `≤ 0.544` at `1` GAE on every row (the validator's lower bound; the recount only adds) | any row above those bounds |
+| G2.130 | B′ against A and E25 | behind A on every row at `0.1` and `1` GAE; behind E25 on every row at `0.1` and `1` GAE | B′ ahead of A or E25 at `0.1` or `1` GAE on any row |
+| G2.131 | B″ against A and E25 (Stage A per call; end to end if carried) | ahead of A at `0` and `0.1` GAE and behind at `1` GAE (unranked against A); ahead of E25 at every weight | any other order |
+| G2.132 | distance to the matched rho (walk (iii)), B counted | `S_B / rho` at `0` GAE in `[3.0·10³, 2.5·10⁵]`; rho ahead of every row of B, B′ and B″ at every weight | outside; any row below rho |
+| G2.133 | sensitivity: `lead_scan_reads` priced for every arm (Stage A) | changes no rank decided by G2.128–G2.131 | a rank changes |
+
+**What it would say.**  If G2.124–G2.130 hold, B's advantage over A and E25 exists at `0` GAE only:
+its pivot selection reads the matrix again, and any operation per entry costs more at `0.1` GAE than
+the `≈ 3·10⁵` multiplications per call that sparser pivots save.  A stays the ranked solver.  A
+selection that costs `O(1)` per row update (B″) could keep part of B's saving at `0.1` GAE, but at
+`1` GAE its comparisons and updates (thousands per call, `97` multiplications each) should exceed the
+saving; if so, no sparsest-pivot rule here ranks ahead of A across the band, and the next lever is the
+echelon's arithmetic itself, not its pivot order.
