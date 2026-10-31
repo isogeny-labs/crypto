@@ -1,0 +1,23 @@
+{
+  "job": {
+    "created_at": "2026-10-31T16:49:22Z",
+    "job_name": "n83-fb-variants-r34-20261031-r1",
+    "state": "active",
+    "uid": "b8af44ec-f5d7-4e24-8b91-6ec322329c96",
+    "pod": {
+      "name": "n83-fb-variants-r34-20261031-r1-zslkc",
+      "uid": "a32da11e-d4f8-407e-bfd1-3bdbf8b0ce7d",
+      "phase": "Pending",
+      "reason": "Unschedulable",
+      "message": "0/3 nodes are available: 1 node(s) didn't match pod anti-affinity rules, 2 node(s) didn't match Pod's node affinity/selector."
+    }
+  },
+  "results_uri": "s3://isolab-results-104186811093-us-east-2/runs/n83-fb-variants-r34-20261031-r1/",
+  "resources": {"cpu": 6, "memory": "8Gi", "active_deadline_seconds": 5700, "retries": 0},
+  "frozen_coordinate": 34,
+  "frozen_protocol": "protocol-factor-base-variants-v9-r29-39.json",
+  "frozen_protocol_sha256": "7276bd557a5625c358a4d063366a415a0265c078ffb2eddaa74dee40174529b2",
+  "frozen_source_index_sha256": "f87e444e174be8c1436b5380208a682c4b79c247b381ff6b3240d53f5730ece8",
+  "frozen_inner_command_sha256": "3a190a09edd4854899a69722d15ea682c5020f2f961f44fa6e1c4bc940913c3e",
+  "source_stage": "copies v9 source bundle from completed r33 prefix to r34's own results prefix before running the coordinate-derived launcher"
+}
