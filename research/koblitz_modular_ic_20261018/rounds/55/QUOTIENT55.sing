@@ -13,13 +13,20 @@ matrix one55[32][1];matrix v55[32][1];matrix lambda55[32][1];int i55;int j55;int
 for(i55=1;i55<=32;i55++){one55[i55,1]=sourceLift50[i55,1];lambda55[i55,1]=sourceLift50[i55,2];v55[i55,1]=sourceLift50[i55,17];}
 matrix V55=multiply55(v55,table50);matrix I55=unitmat(32);matrix Z55[32][32];
 require55(multiply55(one55,table50)==I55,"QUOTIENT55_GLOBAL_UNIT");
-require55(V55*V55+u^2*V55+(u+u^3)*I55==Z55,"QUOTIENT55_GLOBAL_BASE_EQUATION");
-matrix R55=(1+u)*V55+u^3*I55;
-matrix A55=I55+u*(R55+I55);matrix conjugate55=A55+(u^3+u^4)*I55;
+matrix baseResidual55=V55*V55;
+matrix R55[32][32];matrix A55[32][32];matrix conjugate55[32][32];matrix scalarIdentity55[32][32];
 poly f55=u^5+u^2+1;
-require55(A55*conjugate55==f55*I55 && conjugate55*A55==f55*I55,"QUOTIENT55_FULL_ANNIHILATOR_PRODUCTS");
+for(i55=1;i55<=32;i55++){for(j55=1;j55<=32;j55++){
+ baseResidual55[i55,j55]=baseResidual55[i55,j55]+u^2*V55[i55,j55]+(u+u^3)*I55[i55,j55];
+ R55[i55,j55]=(1+u)*V55[i55,j55]+u^3*I55[i55,j55];
+ A55[i55,j55]=I55[i55,j55]+u*(R55[i55,j55]+I55[i55,j55]);
+ conjugate55[i55,j55]=A55[i55,j55]+(u^3+u^4)*I55[i55,j55];
+ scalarIdentity55[i55,j55]=f55*I55[i55,j55];
+}}
+require55(baseResidual55==Z55,"QUOTIENT55_GLOBAL_BASE_EQUATION");
+require55(A55*conjugate55==scalarIdentity55 && conjugate55*A55==scalarIdentity55,"QUOTIENT55_FULL_ANNIHILATOR_PRODUCTS");
 matrix bad55=conjugate55;bad55[1,1]=bad55[1,1]+1;
-require55(A55*bad55!=f55*I55,"QUOTIENT55_CHANGED_ANNIHILATOR_REJECTED");
+require55(A55*bad55!=scalarIdentity55,"QUOTIENT55_CHANGED_ANNIHILATOR_REJECTED");
 link sourceOut55="source-annihilator55.sing";write(sourceOut55,"ring sourceAnnihilator55=2,(u),(c,dp);short=0;poly f55="+string(f55)+";");dump55(sourceOut55,"A55",A55);dump55(sourceOut55,"conjugate55",conjugate55);dump55(sourceOut55,"one55",one55);close(sourceOut55);
 matrix tableReduced55=reduce(table50,std(ideal(f55)));matrix AReduced55=reduce(A55,std(ideal(f55)));matrix oneReduced55=reduce(one55,std(ideal(f55)));
 ring crt55=2,(w),dp;short=0;

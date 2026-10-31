@@ -80,3 +80,6 @@ schema-validation claim. No ledger promotion or official evidence decision.
 
 ## Preserved attempt01 and diagnostic02
 Attempt01 rejected:base equation fails and intermediate R has32x64shape;later undefined matrices/late marker provide no evidence. Freeze DIAG55for dimensions and scalar multiplication diagnostics only,using same native limits. No revised mathematical prediction accepted. Diagnostic success marker DIAG55_ALL_CHECKS_PASS only means dimension probes executed.
+
+## Attempt02 repair
+Diagnostic01passed:V,I,residual32x32 but R32x64;scalar polynomial expressions can undergo native module arithmetic before matrix assignment. Build every scalar combination entrywise,keeping source formula/predictions unchanged. Full base/annihilator products decide whether this repairs the claim. Preserve original attempt01 as rejected.
