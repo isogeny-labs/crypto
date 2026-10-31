@@ -31,3 +31,19 @@ python3 research/ml_dataset_inventory_20261031/build_inventory.py
 
 The script refuses to overwrite a differing `inventory.json`; review changed
 source campaign evidence and create a new version instead.
+
+`build_inventory_v2.py` extends that immutable snapshot with the completed
+48-cell ordinary binary paired-method campaign. Its independent receipt
+projection checks contiguous indexes, protocol bindings, retained S3 readback
+receipts, and the pinned official export receipt. The versioned total is
+**148 observed cells**, **93 independently solved ECDLP cells**, **16 bounded
+root certificates**, and **two retained F6 pair domains**. Four official
+exports contain 84 rows: 78 completed and six censored. The new campaign
+contributes 15 native verified outcomes, 22 partial, seven budget-exhausted,
+and four timeouts; these native outcomes remain separate from administrative
+export status. A fresh independent S3 GET/hash was also performed on its final
+restricted archive; the inventory does not claim fresh GETs for every archive.
+
+```sh
+python3 research/ml_dataset_inventory_20261031/build_inventory_v2.py
+```
