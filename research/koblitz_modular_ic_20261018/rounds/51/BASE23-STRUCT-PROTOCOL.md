@@ -31,3 +31,11 @@ uses explicit ambient reductions by f23 at every base power/product and for
 G,N/normalized N. Require a full polynomial identity
 C*N_normalized+N_raw=f23*quotient and reject an altered constant. No implicit
 quotient-representation equality is used for these unit/normalization gates.
+
+Repair after rejected02:normalizing newly computed D,C is insufficient when
+the retained partial inverse file has unreduced D,C representatives. Require
+full identities D_normal+D_raw=f23*qD and C_normal+C_raw=f23*qC;transform
+both Bezout inverse matrices accordingly and check the resulting full unit
+products against the actual reduced base values. Export every difference
+quotient and both transformed matrices. Print both raw and normal degrees.
+The original02 late marker is rejected;all other obligations are retained.

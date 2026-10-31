@@ -9,7 +9,16 @@ proc baseNormal51(poly a){return(reduce(a,baseStandard51));}
 proc basePower51(poly a,int k){poly result51=1;while(k>0){if(k%2==1){result51=baseNormal51(result51*a);}k=k div 2;if(k>0){a=baseNormal51(a^2);}}return(result51);}
 poly ACheck51=1+actualC51;poly deltaCheck51=baseNormal51(basePower51(actualB51,3)*(actualB51+baseNormal51(actualC51*basePower51(ACheck51,3))));
 poly DCheck51=baseNormal51(basePower51(ACheck51,5)*basePower51(deltaCheck51,3));poly CCheck51=baseNormal51(basePower51(ACheck51,2)*deltaCheck51);
-if(DCheck51!=D51 || CCheck51!=C51 || baseNormal51(DCheck51*invDpoly51)!=1 || baseNormal51(CCheck51*invCpoly51)!=1){ERROR("BASE23_STRUCT51_ACTUAL_BASE_UNITS");quit;}
+poly dDifference51=DCheck51+D51;poly cDifference51=CCheck51+C51;
+matrix dRepresentativeLift51=lift(ideal(f51),ideal(dDifference51));matrix cRepresentativeLift51=lift(ideal(f51),ideal(cDifference51));
+if(f51*dRepresentativeLift51[1,1]!=dDifference51 || f51*cRepresentativeLift51[1,1]!=cDifference51){ERROR("BASE23_STRUCT51_FULL_DONOR_REPRESENTATIVE_BINDINGS");quit;}
+matrix normalizedDInverse51=denominatorInverse51;normalizedDInverse51[1,1]=normalizedDInverse51[1,1]+dRepresentativeLift51[1,1]*normalizedDInverse51[2,1];
+matrix normalizedCInverse51=nuInverse51;normalizedCInverse51[1,1]=normalizedCInverse51[1,1]+cRepresentativeLift51[1,1]*normalizedCInverse51[2,1];
+if(matrix(ideal(f51,DCheck51))*normalizedDInverse51!=matrix(ideal(1)) || matrix(ideal(f51,CCheck51))*normalizedCInverse51!=matrix(ideal(1))){ERROR("BASE23_STRUCT51_ACTUAL_BASE_UNITS");quit;}
+print("BASE23_STRUCT51_REPRESENTATIVES raw_D_degree="+string(deg(D51))+" normal_D_degree="+string(deg(DCheck51))+" raw_C_degree="+string(deg(C51))+" normal_C_degree="+string(deg(CCheck51)));
+link bindingOut51="ASCII:w marked23-base-bindings51.sing";open(bindingOut51);
+write(bindingOut51,"ring marked23BaseBindingCertificate51=(2,x),(y),dp;short=0;poly f51="+string(f51)+";poly b51="+string(actualB51)+";poly c51="+string(actualC51)+";poly rawD51="+string(D51)+";poly rawC51="+string(C51)+";poly D51="+string(DCheck51)+";poly C51="+string(CCheck51)+";poly dRepresentativeQuotient51="+string(dRepresentativeLift51[1,1])+";poly cRepresentativeQuotient51="+string(cRepresentativeLift51[1,1])+";matrix normalizedDInverse51[2][1];matrix normalizedCInverse51[2][1];");
+int unitIndex51;for(unitIndex51=1;unitIndex51<=2;unitIndex51++){write(bindingOut51,"normalizedDInverse51["+string(unitIndex51)+",1]="+string(normalizedDInverse51[unitIndex51,1])+";normalizedCInverse51["+string(unitIndex51)+",1]="+string(normalizedCInverse51[unitIndex51,1])+";");}close(bindingOut51);
 print("BASE23_STRUCT51_STAGE actual_base_bound=true complete_D_C_inverse_products=true explicit_normal_forms=true");
 execute(read("../twist51-02/universal-twisted51.sing"));
 if(D51!=(1+c)^5*(b^3*(b+c*(1+c)^3))^3){ERROR("BASE23_STRUCT51_UNIVERSAL_D_FACTOR");quit;}
