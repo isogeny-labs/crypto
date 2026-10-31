@@ -7,6 +7,12 @@
 # check still applies.  Every failing session is named, then the script
 # exits 1. Frozen scratch sessions without spec/host capsules are listed by
 # hash and reported as incomplete evidence, never counted as audited passes.
+# Each verify receipt (ecbench.audit/v1, audit.rs AuditReport) is read before
+# it is deleted: a session whose receipt says "records_bound": false (no
+# whole-file records hash binds records.jsonl, e.g. "interruption":
+# "never_finalised") is listed, with its interruption, as an unbound prefix,
+# not integrity-passed (sheriff SHF-20261028-0f3f64, PPN-5). This is reported,
+# not fatal. A receipt without a boolean records_bound fails the session.
 # Usage: ecbench-audit-sessions.sh LIST [ECBENCH] [INCOMPLETE_TSV]
 # AUDIT_SHARD=K/N audits only shard K (0-based) of N, so N jobs together audit
 # the whole list. Shards are balanced by record bytes (a .gz file counts 8x,
@@ -81,7 +87,8 @@ if ! cmp -s <(sort "$excluded_list") <(sort "$matched_list"); then
 fi
 rm -f "$excluded_list" "$matched_list"
 failed=$(mktemp)
-export ecbench failed
+unbound=$(mktemp)
+export ecbench failed unbound
 # xargs runs one audit per session; a failure is recorded, not fatal, so
 # every failing session is reported.
 if [[ "$audited" -gt 0 ]]; then
@@ -105,6 +112,17 @@ xargs -0 -P "$(nproc)" -n 1 bash -c '
   if ! "$ecbench" verify --dir "$dir" --replay 0 --allow-interrupted --exit-code > "$out.json" 2> "$out.err"; then
     msg=$(echo "$1"; { jq -r ".problems[]" "$out.json" 2> /dev/null || true; cat "$out.err"; } | sed "s/^/    /")
     printf "%s\n" "$msg" >> "$failed"
+  else
+    # Read the receipt before deleting it. records_bound is false when no
+    # whole-file records hash binds records.jsonl (audit.rs AuditReport).
+    bound=$(jq -r "if (.records_bound | type) == \"boolean\" then .records_bound else \"missing\" end" "$out.json" 2> /dev/null || echo unreadable)
+    case "$bound" in
+      true) ;;
+      false)
+        why=$(jq -r ".interruption // \"none\"" "$out.json")
+        printf "%s\t%s\n" "$1" "$why" >> "$unbound" ;;
+      *) printf "%s\n    verify receipt records_bound is %s\n" "$1" "$bound" >> "$failed" ;;
+    esac
   fi
   rm -rf "$out.json" "$out.err" "$out.session"
 ' audit < "$audit_list"
@@ -113,8 +131,30 @@ rm -f "$audit_list"
 if [ -s "$failed" ]; then
   echo "::error::committed ecbench sessions failing integrity:" >&2
   cat "$failed" >&2
-  rm -f "$failed"
+  rm -f "$failed" "$unbound"
   exit 1
 fi
 rm -f "$failed"
-echo "shard $shard: $audited of $index committed ecbench sessions pass integrity (--replay 0 --allow-interrupted); $incomplete_count hash-pinned scratch sessions remain incomplete"
+unbound_count=$(wc -l < "$unbound")
+bound_count=$((audited - unbound_count))
+if [[ "$unbound_count" -gt 0 ]]; then
+  report=$(mktemp)
+  {
+    echo "shard $shard: $unbound_count accepted ecbench sessions are unbound prefixes, not integrity-passed (records_bound=false: no records hash binds records.jsonl; cite only as an interrupted, unbound prefix of the plan):"
+    sort "$unbound" | while IFS=$'\t' read -r dir why; do
+      echo "- $dir (interruption: $why)"
+    done
+  } > "$report"
+  echo "::warning::$unbound_count ecbench sessions are unbound prefixes (records_bound=false), not integrity-passed" >&2
+  cat "$report"
+  if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+    { echo; cat "$report"; echo; } >> "$GITHUB_STEP_SUMMARY"
+  fi
+  rm -f "$report"
+fi
+rm -f "$unbound"
+summary="shard $shard: $bound_count of $index committed ecbench sessions pass integrity (--replay 0 --allow-interrupted); $unbound_count accepted as unbound prefixes (records_bound=false), not integrity-passed; $incomplete_count hash-pinned scratch sessions remain incomplete"
+echo "$summary"
+if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+  echo "$summary" >> "$GITHUB_STEP_SUMMARY"
+fi

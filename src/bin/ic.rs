@@ -5,6 +5,10 @@ mod bench;
 mod boundary;
 #[path = "ic/corpus.rs"]
 mod corpus;
+#[path = "icx/cubic_external.rs"]
+mod cubic_external;
+#[path = "icx/cubic_route.rs"]
+mod cubic_route;
 #[path = "ic/descent.rs"]
 mod descent;
 #[path = "ic/experiment.rs"]
@@ -21,12 +25,16 @@ mod plan;
 mod price;
 #[path = "ic/prime.rs"]
 mod prime;
+#[path = "icx/prime_external.rs"]
+mod prime_external;
 #[path = "ic/progress.rs"]
 mod progress;
 #[path = "ic/rho.rs"]
 mod rho;
 #[path = "ic/sweep/mod.rs"]
 mod sweep;
+#[path = "ic/tensor.rs"]
+mod tensor;
 #[path = "ic/workflow.rs"]
 mod workflow;
 
@@ -44,10 +52,10 @@ use std::{
 #[command(
     name = "ic",
     version,
-    about = "Curve inspection and synthetic index-calculus research"
+    about = "Curve inspection and index-calculus research, including explicit public EC targets"
 )]
 #[command(
-    long_about = "Inspect named/custom curves, generate reproducible known-answer fixtures, run the toy index-calculus pipeline, compare factor-base candidates, or search for high-yield factor bases. Bare ic runs the default synthetic example. A bare curve name (for example ic ecc2k-130) performs inspection only. The fixed subcommand accepts explicit K_0 parameters and points with full-width coordinates."
+    long_about = "Inspect named/custom curves, generate reproducible known-answer fixtures, run index-calculus pipelines, compare factor-base candidates, or search for high-yield factor bases. Solve-prime and solve-cubic accept caller-supplied public EC targets. Bare ic runs the default synthetic example. A bare curve name (for example ic ecc2k-130) performs inspection only. The fixed subcommand accepts explicit K_0 parameters and points with full-width coordinates."
 )]
 struct Cli {
     #[command(subcommand)]
@@ -66,6 +74,9 @@ struct Cli {
     /// Write the JSON report to a new file; existing files are never overwritten.
     #[arg(long, global = true)]
     out: Option<PathBuf>,
+    /// Publish --out through the configured artifact store under a new logical name.
+    #[arg(long, global = true, requires = "out")]
+    store_name: Option<String>,
 }
 #[derive(Subcommand)]
 enum Action {
@@ -109,8 +120,20 @@ enum Action {
     /// n−1 index calculus with the zero/single/double-large-prime variation.
     LargePrime(large_prime::LargePrimeArgs),
     /// Measure the exact pair-sum yield of a small-x factor base on a
-    /// prime-field curve (NIST P-192, or toy primes where hits are common).
+    /// prime-field curve (NIST P-192 or small prime fixtures with common hits).
     Prime(prime::PrimeArgs),
+    /// Run bounded EC index calculus on an explicit prime-field public target.
+    SolvePrime(prime_external::PrimeArgs),
+    /// Run bounded prime-field EC index calculus from a checked JSON target artifact.
+    SolvePrimeFile(prime_external::PrimeFileArgs),
+    /// Generate bounded certified prime-field IW1 isogeny routes for a public target.
+    PrimeRouteGenerate(prime_external::PrimeRouteGenerateArgs),
+    /// Run bounded EC index calculus on an explicit cubic-field public target.
+    SolveCubic(cubic_external::CubicArgs),
+    /// Enumerate bounded rational j-neighbours over an exact cubic field.
+    CubicGraph(cubic_route::GraphArgs),
+    /// Generate a checked one-hop cubic Vélu route for a rational prime-order kernel.
+    CubicRouteGenerate(cubic_route::GenerateArgs),
     /// Search index-calculus configurations with an Optuna-style sweeper: a
     /// typed conditional space, a TPE sampler, median pruning over a ladder
     /// of sizes, and an append-only resumable store.  The objective is the
@@ -120,6 +143,10 @@ enum Action {
     /// record: the unit `ic sweep` optimises over.  The score is a function
     /// of operation counts alone.
     SweepTrial(sweep::trial::TrialArgs),
+    /// Toy index calculus with relations found by Boolean tensor contraction
+    /// (crates/ecdl-tensor-ic): gadget-network shape table, or a solved toy
+    /// instance. Exponential counters; no speedup is claimed.
+    Tensor(tensor::TensorArgs),
 }
 #[derive(Args)]
 #[group(required = true, multiple = false)]
@@ -175,8 +202,15 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::Price(args)) => price::run(args.clone(), cli.json),
         Some(Action::LargePrime(args)) => large_prime::run(args.clone()),
         Some(Action::Prime(args)) => prime::run(args.clone()),
+        Some(Action::SolvePrime(args)) => prime_external::solve(args),
+        Some(Action::SolvePrimeFile(args)) => prime_external::solve_file(args),
+        Some(Action::PrimeRouteGenerate(args)) => prime_external::generate_route(args),
+        Some(Action::SolveCubic(args)) => cubic_external::solve(args),
+        Some(Action::CubicGraph(args)) => cubic_route::enumerate_j(args),
+        Some(Action::CubicRouteGenerate(args)) => cubic_route::generate(args),
         Some(Action::Sweep(args)) => sweep::run_sweep(args.clone(), cli.json),
         Some(Action::SweepTrial(args)) => sweep::trial::run(args.clone()),
+        Some(Action::Tensor(args)) => tensor::run(args.clone(), cli.json),
         Some(Action::Run(args)) => experiment::run(args.clone(), cli.json),
         None => {
             if let Some(name) = &cli.profile {
@@ -257,6 +291,7 @@ fn linear_algebra_summary(la: &Value) -> String {
 fn display(report: &Value) {
     match report["operation"].as_str() {
         Some("plan") => plan::display(report),
+        Some("tensor-scale" | "tensor-demo") => tensor::display(report),
         Some("inspect") => {
             println!(
                 "Curve: {}\nInspection: {}",
@@ -600,6 +635,31 @@ fn main() -> ExitCode {
             return ExitCode::FAILURE;
         }
     }
+    let mut publication_store = if let Some(name) = &cli.store_name {
+        if let Err(error) = crypto_lib::store::index::validate_name(name) {
+            eprintln!("ic: invalid store name: {error}");
+            return ExitCode::FAILURE;
+        }
+        match crypto_lib::store::Store::open_default() {
+            Ok(store) => {
+                if let Err(error) = store.remote() {
+                    eprintln!("ic: {error}");
+                    return ExitCode::FAILURE;
+                }
+                if store.index.get(name).is_some() {
+                    eprintln!("ic: store name already exists: {name}");
+                    return ExitCode::FAILURE;
+                }
+                Some(store)
+            }
+            Err(error) => {
+                eprintln!("ic: cannot open artifact store: {error}");
+                return ExitCode::FAILURE;
+            }
+        }
+    } else {
+        None
+    };
     let mut report = match execute(&cli) {
         Ok(v) => v,
         Err(message) => {
@@ -634,6 +694,31 @@ fn main() -> ExitCode {
             return ExitCode::FAILURE;
         }
     }
+    if let (Some(name), Some(path), Some(store)) =
+        (&cli.store_name, &cli.out, &mut publication_store)
+    {
+        let meta = crypto_lib::store::PushMeta {
+            description: format!(
+                "ic {} report",
+                report["operation"].as_str().unwrap_or("run")
+            ),
+            provenance: format!(
+                "ic CLI, git commit {}",
+                git_commit().as_deref().unwrap_or("unknown")
+            ),
+            ..Default::default()
+        };
+        match store.push(name, path, meta) {
+            Ok(published) => eprintln!(
+                "ic: published store:{name} sha256:{} bytes={} uploaded={}",
+                published.sha256, published.bytes, published.uploaded
+            ),
+            Err(error) => {
+                eprintln!("ic: could not publish report {}: {error}", path.display());
+                return ExitCode::FAILURE;
+            }
+        }
+    }
     if cli.json || report.get("operation").is_none() {
         println!("{text}");
     } else {
@@ -648,3 +733,17 @@ fn main() -> ExitCode {
         ExitCode::FAILURE
     }
 }
+
+// Keep the CLI's complete external contract suites available to a selected
+// binary test target. Cargo integration-test mode also builds unrelated bins.
+#[cfg(all(test, feature = "ic-cli-contracts"))]
+#[path = "../../tests/ic_framework.rs"]
+mod cli_framework_contract_tests;
+
+#[cfg(all(test, feature = "ic-cli-contracts"))]
+#[path = "../../tests/ic_progress.rs"]
+mod cli_progress_contract_tests;
+
+#[cfg(all(test, feature = "ic-cli-contracts"))]
+#[path = "../../tests/ic_tensor.rs"]
+mod cli_tensor_contract_tests;

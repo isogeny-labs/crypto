@@ -126,6 +126,13 @@ ic --json large-prime --manifest corpus/manifest.json --family koblitz-n11-l4 \
 ./target/release/ecbench verify --dir /tmp/ecbench/smoke-1 --replay 8
 ```
 
+`verify` prints a receipt and exits 1 when the audit finds a problem (2
+when it cannot run at all); `--exit-code` is still accepted and ignored.
+`--replay 8` replays eight runs chosen at random from the deterministic
+ones, with a seed drawn from the operating system and recorded in the
+receipt (`--replay-seed N` repeats a draw, `--replay-seq N` replays one run
+by sequence number, `--replay-all` replays every one).
+
 ```bash
 ./target/release/ecbench compare --dir /tmp/ecbench/smoke-1 --a rho-neg --b bsgs-neg
 ```
@@ -237,9 +244,35 @@ unseen target**, cold, with every phase charged, verified.
 
 Every record carries the curve's generic floor in `S`,
 `floor_s = √(π / 2A)`, with `A` the automorphisms a generic algorithm may
-use: 2 (negation) on any curve, `2m` on a Koblitz curve over `GF(2^m)`
-(signed Frobenius). The ratio `S / floor_s` is in every record and every
-table. The *reference* is an arm of the session, normally the matched
+use, computed from the curve (`workload::Instance::facts`): 2 (negation)
+on any curve; `2m` on a Koblitz curve over `GF(2^m)` (signed Frobenius),
+whether constructed or given as an explicit binary curve with `a ∈ {0,1}`,
+`b = 1`; 6 on a `j = 0` prime curve (`a = 0`, `p ≡ 1 (mod 3)`) and 4 on a
+`j = 1728` one (`b = 0`, `p ≡ 1 (mod 4)`), when the rational order-3
+(order-4) automorphism acts on the order-`r` subgroup as a scalar (the
+structure `rho.cubic` and `rho.quartic` need, checked with their own
+constructors). The ratio `S / floor_s` is in every record and every table.
+
+The count is versioned: a record carries `boundaries.floor_rule`
+(`automorphisms/v2`). A record without the field was written under the first
+rule, `A = 2` on every prime curve, and the audit recomputes it under that rule
+(`workload::legacy_automorphisms`), so a committed record keeps the floor it
+was written with. Under the first rule a `j = 0` curve's `rho.cubic` read
+0.91× a floor it was entitled to beat (`A = 6` makes that floor
+`√(π/12) = 0.51`, and the same run about 1.6× it). Apart from
+[`research/ecbench_accounting_v2_20261023`](../../research/ecbench_accounting_v2_20261023/REPORT.pdf),
+which measures this change on the registered `j = 0` curve
+`icv1-fp25-t9734-bcfe9f51`, the committed sessions that use a `j = 0` or
+`j = 1728` prime curve are the class set-up study's
+(`research/prime_rho_automorphism_20261015`, `j = 1728`) and the other
+pre-fix producers' (below), and every main-binary `rho.cubic` /
+`rho.quartic` record. Their records carry the first rule's `A = 2` and used
+6 or 4; the audit holds a record under the first rule (no `floor_rule`) to
+the count rebuilt from the spec (`audit::automorphisms_bound`), whichever
+binary wrote it, and a record under `automorphisms/v2` to its own figure. The explicit Koblitz curves in
+`research/ghs_curve_comparison_20261009` already carry `A = 2m`, because
+`binary_explicit_instance` certifies them as Koblitz. The audit checks that
+no record's `automorphisms_used` exceeds the `A` available. The *reference* is an arm of the session, normally the matched
 rho: `rho.negation` on a prime curve, `rho.signed_frobenius` on a Koblitz
 curve. `ecbench table` divides every arm by it.
 
@@ -252,7 +285,7 @@ identity, and two objects that hash alike are the same object.
 |---|---|---|
 | curve | ICV1 slug `icv1-…` ([ICV1](../curves/ICV1.md)), EC1 alias when the registry holds this generator | the curve model (AGENTS.md §11) |
 | workload | `W` + 12 hex | ICV1 string, subgroup order, cofactor, generator, **target point**, target law, seed, index, `target_count: 1`, `cache_policy: cold` |
-| method | `ECM1h` + 12 hex | registry id and every parameter, defaults written out |
+| method | `ECM1h` + 12 hex | registry id and every parameter, defaults written out; an integer-valued parameter is written in canonical decimal (`64`, `064` and `+64` are one method) |
 | factor base | `FB1h` + 12 hex | curve slug, family, parameters, column count, point count, SHA-256 of the sorted point keys |
 | spec | `ECS1h` + 12 hex | the spec without its label and description |
 | host class | `ECBENV3h` + 12 hex (`ECBENV2h` before version 3, `ECBENV1h` before version 2) | the stable host facts (§5): topology shape, memory in whole GiB, so a reboot keeps the class; version 3 leaves the compiler out (below) |
@@ -318,8 +351,8 @@ a run that fails the check loses its isolation level), or **recorded**
 | What each method counts | one tool counts additions, another wall time, another instructions | one `CountedGroup` ledger for every method; native work the unit does not charge is counted as `*_uncharged` and makes the total a lower bound (§7) | controlled |
 | Pricing drift | per-run measured ratios repriced identical runs by up to 8 % | IC native work is priced only at the repository's pinned ratios (`docs/ic/calibration.json`); a unit without one stays unpriced, never host-measured; an algebraic solver's wall-priced work is taken back out | controlled |
 | Selective reporting | dropping a failure, rerunning until it looks good | every execution writes a sealed record before the next starts; the output directory is claimed with an atomic `mkdir` under the lock, so a session queued for a used directory fails instead of writing over it; an interrupted session is marked, never deleted; a child that cannot be started or pinned is a `spawn_error` record and the session stops there with the reason recorded, not a silent end; a child killed by the session's own interruption is `interrupted`, not `crashed`; `timeout` is recorded only when the watchdog's SIGKILL actually ended the child (a child that exited by itself in the instant the deadline passed keeps its answer) | controlled |
-| Interruption | a killed runner leaves narrowed masks behind and a child solving on an unprotected core | SIGINT, SIGTERM, SIGHUP and SIGQUIT are taken by one thread, which kills the child's process group; the session is marked `interrupted`, the eviction restored, and the runner exits `128 + signal`; the child dies with the runner (`PR_SET_PDEATHSIG`). `session.json` is replaced atomically (temporary file, `fsync`, rename) after **every** record, with `records_written`, `last_seq` and the per-status counts, and `stop` (`kind`: `interrupt`, `spawn_error` or `error`; the `seq` it stopped at; the signal or message) once the session stops early. A runner killed outright (SIGKILL, host loss) cannot mark the session, which keeps reading `running` with the counts of the last record it wrote; `ecbench verify --allow-interrupted` audits such a session as interrupted (`interruption: never_finalised`, `records_bound: false`), with every per-record check (seal, sequence, plan, answer, grading) still applied. No whole-file records hash was ever written, so the file is explicitly unbound: truncation or appended records are seen only through the unkeyed per-record seals, and such a session must not be cited as complete | controlled |
-| Tampering and transcription | a figure edited by hand, or copied wrong | every file is hashed into `session.json`; `verify` re-derives identities, the plan, the answers and the seals, and replays runs | controlled |
+| Interruption | a killed runner leaves narrowed masks behind and a child solving on an unprotected core | SIGINT, SIGTERM, SIGHUP and SIGQUIT are taken by one thread, which kills the child's process group; the session is marked `interrupted`, the eviction restored, and the runner exits `128 + signal`; the child dies with the runner (`PR_SET_PDEATHSIG`). `session.json` is replaced atomically (temporary file, `fsync`, rename) after **every** record, with `records_written`, `last_seq` and the per-status counts, and `stop` (`kind`: `interrupt`, `spawn_error` or `error`; the `seq` it stopped at; the signal or message) once the session stops early. A runner killed outright (SIGKILL, host loss) cannot mark the session, which keeps reading `running` with the counts of the last record it wrote; `ecbench verify --allow-interrupted` audits such a session as interrupted (`interruption: never_finalised`, `records_bound: false`), with every per-record check (seal, sequence, plan, answer, grading) still applied. No whole-file records hash was ever written, so the file is explicitly unbound: truncation or appended records are seen only through the unkeyed per-record seals, and such a session must not be cited as complete; `verify` checks that the records end at `last_seq` (a killed session at most one record past it) and at `stop.seq`, and reports the stop in the receipt | controlled |
+| Tampering and transcription | a figure edited by hand, or copied wrong | every file is hashed into `session.json`; `verify` re-derives identities (the session id from its preimage), the plan, the answers, the seals, every derived figure and each record's internal consistency (§9), and replays randomly chosen runs; a failed audit exits non-zero | controlled |
 
 ## 6. Isolation levels
 
@@ -430,25 +463,32 @@ default; the ids are:
 
 | id | family | what it is |
 |---|---|---|
+| `ic.aps_v1` | ic | bounded APS polynomial instrument, exclusive cold/online wall phases and retained failures; only independent-check group work is priced, so native operation totals remain incomplete |
 | `rho.frozen_reference` | rho | the frozen r-adding walk every ledger row was priced against through §17 (A = 1); the historical "before" mark |
 | `rho.plain` | rho | tuned r-adding walk on points (A = 1), distinguished points, stride starts |
 | `rho.negation` | rho | tuned walk on `{P, −P}` (A = 2), Wiener–Zuccherato look-ahead and cycle escape; the matched reference on a prime curve |
+| `rho.negation_strong` | rho | strong negation-map walk on `{P, −P}` (A = 2) over `F_{(2^m)^4}` (`f2m4_torsion` only): 32 jumps, escape of fruitless cycles by doubling, distinguished points, `lanes` walks per Montgomery-batched `F_{q⁴}` inversion; charged in counted `F_q` multiplications, the unit `ic.pipeline` + `gaudry-d4-bin` is charged in on those curves |
 | `rho.quartic`, `rho.cubic` | rho | the same walk on `{±ι^i P}` (A = 4, j = 1728) and `{±ζ₃^i P}` (A = 6, j = 0); refused at plan time on a curve without the structure |
+| `rho.negation_v2`, `rho.cubic_v2`, `rho.quartic_v2`, `rho.signed_frobenius_v2`, `rho.signed_frobenius_strong_v2` | rho | the same walks under the `_v2` accounting: Brent cycle detection beside the 16-point window, lost-walk and distinguished-point table counters, the cubic/quartic class set-up in its own `automorphism_setup` phase, and for the strong reference the scaled `auto` shape with charged starts and a `verification` phase (Accounting v2 below) |
 | `rho.signed_frobenius` | rho | tuned walk on signed Frobenius orbits `{±φ^t P}` (A = 2n), Koblitz only; the matched reference there |
 | `rho.signed_frobenius_strong`, `…_legacy`, `…_escape` | rho | the strong single-target reference (lockstep walks, batched inversion), its trajectory-identical pre-2026-10-14 implementation control, and the variant that escapes fruitless cycles by doubling |
 | `rho.signed_frobenius_full`, `rho.signed_frobenius_strong_full`, `ic.pipeline_full` | — | the base method repriced with every native operation charged (`price-units`) |
 | `bsgs.textbook`, `bsgs.interleaved`, `bsgs.negation` | bsgs | baby table then giant steps (mean 1.5√r); Pollard's interleaving (mean 4√r/3); classes `{P, −P}` with stride 2m + 1 (mean about √r) |
-| `kangaroo.vow` | kangaroo | van Oorschot–Wiener tame/wild kangaroo on `[0, r)`, distinguished points |
-| `claw.pair_table` | claw | the four-point signed-Frobenius pair claw (cryptanalysis#175): known-log orbit base, target-independent quotient pair table |
+| `bsgs.textbook_v2`, `bsgs.interleaved_v2`, `bsgs.negation_v2` | bsgs | the same, plus one charged final `[d]G = Q` in a `verification` phase |
+| `kangaroo.vow`, `kangaroo.vow_v2` | kangaroo | van Oorschot–Wiener tame/wild kangaroo on `[0, r)`, distinguished points; the frozen id charges a re-placement after a same-kind collision to `search`, the `_v2` id to its own `restarts` phase and adds the charged final check |
+| `claw.pair_table`, `claw.pair_table_v2` | claw | the four-point signed-Frobenius pair claw (cryptanalysis#175): known-log orbit base, target-independent quotient pair table; the `_v2` id adds the final check and counts the `recover` phase in the `max_adds` budget |
 | `ic.pipeline`, `ic.pipeline_counted` | ic | the index-calculus pipeline (factor base, oracle, relations, linear algebra, verification), and the same with the relation charge rebuilt from counted work |
-| `ic.large_prime`, `ic.shared_rank` | ic | the large-prime variation and the shared-rank adapter on binary curves |
+| `ic.large_prime`, `ic.large_prime_v2`, `ic.shared_rank` | ic | the large-prime variation and the shared-rank adapter on binary curves; the `_v2` id charges the target's `[r]Q` membership check and the final `[d]G = Q` in the `verification` phase |
 | `ic.koblitz_descent` | ic | the ledger §23 one-target Koblitz index calculus as `ic price --single-target` runs it (subgroup-orbit base, folded pair table, aimed m = 3 collection, sparse logs, walked m = 2 descent), every stage charged by counted group operations; odd `n < 64` Koblitz curves |
 | `ic.k4_gaudry` | ic | Gaudry's k = 4 index calculus on `E(F_{p⁴})`, `fp4_translation` curves only |
 | `ic.hyperelliptic_thread` | ic | the hyperelliptic thread's index calculus (ADH/Gaudry: degree-1 places folded by ±, factor-base walk, sparse elimination mod `r`, optional single large primes) on a genus 2–4 Jacobian, `hyperelliptic_*` curves only |
-| `ic.cm_folded_native_v1`, `ic.cm_folded_recurrence_v1`, `ic.cm_folded_native_d43_v1` | ic | the CM scalar-orbit signed MITM2 controls with a native backend, prime curves only |
-| `ic.hyperelliptic` | ic | Adleman–DeMarrais–Huang / Gaudry index calculus on a genus-2 Jacobian (`genus2_*` workloads): factor base of degree-1 places, smoothness by gcd, sparse elimination mod r |
+| `ic.cm_folded_native_v1`, `ic.cm_folded_recurrence_v1`, `ic.cm_folded_native_d43_v1` | ic | the CM scalar-orbit signed MITM2 controls with a native backend, prime curves only; frozen: their records carry `total_gae` 0 |
+| `ic.cm_folded_native_v2`, `ic.cm_folded_recurrence_v2`, `ic.cm_folded_native_d43_v2` | ic | the same three controls with the replay's counted operations charged (2026-10-28): `independent_replay` carries them as GAE, `total_gae` is the phase sum, and `unpriced` names the `native_*_uncharged` counters instead of a sentence |
+| `ic.hyperelliptic` | ic | Adleman–DeMarrais–Huang / Gaudry index calculus on a genus-2 Jacobian (`genus2_*` workloads): factor base of degree-1 places, smoothness by gcd, sparse elimination mod r; frozen (verification uncharged, factor-base scan untallied) |
+| `ic.hyperelliptic_v2` | ic | `ic.hyperelliptic` with the verification `[k]D₁ = D₂` charged as Jacobian operations (phase `verification`) and the factor-base scan's `F_p` multiplications tallied (`factor_base_fp_muls_uncharged`, phase `factor_base`), 2026-10-28 |
 | `transfer.isogeny` | rho | carry the instance across a rational ℓ-isogeny (ℓ = 2, 3; Vélu), solve on the isogenous curve with a generic inner method, check `[k]G = Q` on the source; prime curves |
-| `transfer.quartic_cover` | rho | pull the instance back along the double cover `V⁴ = x³ + ax + b → E` into the Jacobian of a smooth plane quartic (non-hyperelliptic, genus 3), solve there, check on `E`; prime curves, `29 ≤ p < 2³¹` |
+| `transfer.quartic_cover` | rho | pull the instance back along the double cover `V⁴ = x³ + ax + b → E` into the Jacobian of a smooth plane quartic (non-hyperelliptic, genus 3), solve there, check on `E`; prime curves, `29 ≤ p < 2³¹`; frozen (the square roots of the point searches are neither charged nor tallied) |
+| `transfer.quartic_cover_v2` | rho | `transfer.quartic_cover` with the `F_p` multiplications of the point searches' square roots and `f(x)` evaluations tallied as `root_search_field_muls_uncharged` and listed unpriced (2026-10-28); charged work identical |
 | `transfer.ghs_cover` | rho | carry a `ghs_fp6` instance by the GHS conorm–norm map into the Jacobian of its genus-3 hyperelliptic cover over `F_{p²}`, solve there, check on `E` |
 
 Curves of higher genus and the transfers are described in
@@ -456,24 +496,32 @@ Curves of higher genus and the transfers are described in
 
 | family | charged | counted, not charged (`*_uncharged`) |
 |---|---|---|
-| `rho.*` | jump-table set-up, walk starts, every step, cycle escapes, look-ahead additions, internal verification | canonicalisations (negation, signed Frobenius), Frobenius maps |
-| `rho.quartic`, `rho.cubic` | as `rho.*`, plus the class set-up: the scalar multiplication that fixes ι (resp. ζ₃) on the subgroup, in the `setup` phase and in the total. Records written before 2026-10-18 carried it in the `setup` phase only, so their `total_gae` and `S` fall short of the phase sum by that set-up (21 GAE on the 17-bit crater curves of `research/prime_rho_automorphism_20261015`); the phase sum is the true total. `verify` replays such a record exactly, reporting it as reproduced under the pre-2026-10-18 accounting, with the set-up the replay itself measured subtracted from the total (`audit::legacy_class_setup`), but only when the record names one of the five pre-fix producer binaries in `audit::PRE_CLASS_SETUP_BINARIES` and carries no `detail.class_setup`; any other record, every one the current harness writes included, must replay exactly. The census of affected sessions and the corrected headline ratios are in [`CLASS_SETUP_AUDIT.md`](CLASS_SETUP_AUDIT.md). | as `rho.*` |
+| `rho.*` | jump-table set-up, walk starts, every step, cycle escapes, look-ahead additions, internal verification | canonicalisations (negation, signed Frobenius), Frobenius maps, distinguished-point table queries and inserts (counted in the `_v2` ids) |
+| `rho.quartic`, `rho.cubic` (frozen ids) | as `rho.*`, plus the class set-up: the scalar multiplication that fixes ι (resp. ζ₃) on the subgroup, in the `setup` phase and in the total. Records written before 2026-10-18 carried it in the `setup` phase only, so their `total_gae` and `S` fall short of the phase sum by that set-up (21 GAE on the 17-bit crater curves of `research/prime_rho_automorphism_20261015`); the phase sum is the true total. `verify` replays such a record exactly, reporting it as reproduced under the pre-2026-10-18 accounting, with the set-up the replay itself measured subtracted from the total (`audit::legacy_class_setup`), but only when the record names one of the six pre-fix producer binaries in `audit::PRE_CLASS_SETUP_BINARIES` and carries no `detail.class_setup`; any other record, every one the current harness writes included, must replay exactly. The census of affected sessions and the corrected headline ratios are in [`CLASS_SETUP_AUDIT.md`](CLASS_SETUP_AUDIT.md). | as `rho.*` |
+| `rho.quartic_v2`, `rho.cubic_v2` | as `rho.*` under the `_v2` walk (Brent cycle detection, charged lost-walk and distinguished-point table counters), plus the same class set-up scalar multiplication, charged in the total in its own `automorphism_setup` phase instead of the frozen ids' `setup` | as `rho.*`; the `_v2` ids also count the distinguished-point table queries and inserts |
+| `rho.negation_v2`, `rho.signed_frobenius_v2`, `rho.signed_frobenius_strong_v2` | as the matching first-rule id under the `_v2` accounting (the Accounting v2 paragraph below); the strong id's jump table, lanes and start multiples are charged and its candidate checks are a `verification` phase | as the first-rule id; the `_v2` walk also counts the distinguished-point table queries and inserts |
 | `rho.signed_frobenius_strong` | group additions exactly; each scalar multiplication (jump table, walk start stride, candidate checks) at `1.5·log₂ r` additions, `ic_boundary::signed_frobenius_rho`'s convention | canonicalisations, partition hashes, distinguished-point table queries and inserts |
+| `rho.negation_strong` | every `F_q` multiplication on the tower's counter (`Gf2q::muls`): the jump table and start points (`setup`), every step with its share of the batched inversion, the start additions, the escape doublings and unbatched additions (`search`), each canonicalisation at one `F_q` multiplication (`canonicalisation`: four `F_q` additions and a comparison, no multiplication, so one is an upper bound), the candidate checks (`check`); each phase's GAE is its multiplications over the curve's `fq_muls_per_add`, the divisor `solve_ic_f2m4` prices IC with | partition hashes, distinguished-point tests, table queries and inserts |
 | `rho.signed_frobenius_strong_legacy` | identical to `rho.signed_frobenius_strong`; comparison-only implementation control | identical to `rho.signed_frobenius_strong` |
 | `rho.multitarget_pooled` | the whole batch of `L = batch` targets: the shared jump table (full-size multiples of `G`), each target's `G + Q_i` and start stride, every walk start and step, look-ahead and escapes, and the internal `[d]G = Q_i` check of every recovered log; phases `setup`, `search`, `internal_verification` | canonicalisations; distinguished-point table inserts and probes |
-| `bsgs.*` | baby steps, the giant stride, giant steps | table inserts and lookups |
-| `kangaroo.vow` | jump-table set-up and the two starts (phase `setup`); every jump and any re-placement after a same-kind collision (phase `search`; before 2026-10-18 a re-placement was charged to `setup`, total unchanged; no committed record ever restarted, so every kangaroo record replays exactly; `generic::tests::a_kangaroo_restart_is_charged_to_search` is the pinned control on a curve where every seed restarts) | table inserts and lookups |
+| `bsgs.*` | baby steps, the giant stride, giant steps (the `_v2` ids add the final check, phase `verification`) | table inserts and lookups |
+| `kangaroo.vow` | jump-table set-up and the two starts (phase `setup`); every jump and any re-placement after a same-kind collision (phase `search`; before 2026-10-18 a re-placement was charged to `setup`, total unchanged; no committed record ever restarted, so every kangaroo record replays exactly; `generic::tests::a_kangaroo_restart_is_charged_to_search` is the pinned control on a curve where every seed restarts). `kangaroo.vow_v2`: the same walk, but a re-placement is charged to its own `restarts` phase (not to `search`), and the final `[d]G = Q` check is a charged `verification` phase | table inserts and lookups |
 | `claw.pair_table` | the known-log base's seed scalar multiplications, every table addition `P_i + F_b`, both query additions `Q − (F_k + F_l)`, the addition that rebuilds a hit's table sum; phases `base`, `table`, `search`, `recover` | Frobenius maps, canonicalisations, table inserts and probes |
 | `ic.pipeline` | factor base, oracle set-up (pair tables), relation trials, linear algebra, verification, each a phase; native work (lookups, row operations, square roots, Artin–Schreier solves, …) at the pinned ratio where the repository has one | native work with no pinned ratio for this curve; algebraic-solver operations |
 | `ic.pipeline_counted` | the same pipeline with the relation phase charge rebuilt from counted work and pinned conversions for deterministic SAT/PDP replays | algebraic-solver operations without a pinned conversion, including SAT conflicts; these runs remain lower bounds |
 | `ic.known_log_mitm2_v1` | every known-log base scalar multiplication, folded pair-table addition, failed query, pair witness check and final scalar verification; separate setup and five online phases | base sampling and indexing, table insertions and probes, negations and scalar combinations; native work is counted and unpriced |
-| `ic.hyperelliptic` | Jacobian operations: the factor-base walk's step precomputation (`setup`), every relation-search step (`relations`), verification | the smoothness oracle's `F_p` multiplications, elimination row operations (phase `linear_algebra`, 0 GAE); priced across the §5a band |
+| `ic.tensor_contraction_v1` | every non-trivial point addition and doubling (neither input O) the toy tensor-contraction index calculus of `crates/ecdl-tensor-ic` performs, from the crate's per-phase tally: the relation targets `[u]P + [v]Q` (`relation_target`), every point addition evaluated inside the exact sparse contraction and the witness check (`relation_search`), the final `[ξ]P = Q` check (`recovery_check`); `factor_base` and `linear_algebra` charge 0. Prime-order curves only (cofactor 1) | contraction-table rows (`relation_search.contraction_rows_uncharged`), the factor-base listing, which enumerates the group (`factor_base.fb_points_listed_uncharged`) and evaluates every SHA-256 membership hash (`factor_base.fb_membership_evals_uncharged`), and elimination multiplications mod r (`linear_algebra.linalg_mulmod_uncharged`); priced across the §5a band. Exponential by construction: no [Ope26] solver |
+| `ic.hyperelliptic` | Jacobian operations: the factor-base walk's step precomputation (`setup`), every relation-search step (`relations`). Not the verification: `d1.scalar_mul(k)` runs twice on a success and increments no counter (frozen; the older text of this row said it was charged) | the smoothness oracle's `F_p` multiplications, elimination row operations (phase `linear_algebra`, 0 GAE); priced across the §5a band. The factor-base scan's `F_p` work (`f(x)` and a square root at every `x` it visits) is not tallied at all |
+| `ic.hyperelliptic_v2` | as `ic.hyperelliptic`, plus every Cantor doubling and addition of both verifications (`verification`, `⌊log₂ k⌋ + 1` doublings and one addition per set bit each, in the total); `ic.hyperelliptic_v2` minus `ic.hyperelliptic` is exactly that phase | as `ic.hyperelliptic`, plus the factor-base scan's `F_p` multiplications (`factor_base_fp_muls_uncharged`, phase `factor_base`, counted by `hyper_ic::factor_base_scan_muls` over the same `x`: Horner `f(x)`, Euler test, Tonelli–Shanks); the record is a lower bound at `w = 0` |
+| `ic.cm_folded_*_v1` | nothing: `total_gae` and every phase's `gae` are 0 (the replay's operations are in `independent_replay.adds/doubles/scalar_mults` only), so `S` is 0, below the floor, and the prose `unpriced` entry names no counter. Frozen | the native backend's work (`native_*_uncharged`) |
+| `ic.cm_folded_*_v2` | the Rust replay's counted operations (`independent_replay`: base scalar replays, relation sums, `[α]G`, the final `[d]G = Q`) as GAE; `total_gae` is the phase sum | `native_*_uncharged` (each listed in `unpriced` by name), and, for `mode = velu`, the map derivation's group operations (`cm_map_derivation_group_ops_uncharged`); a lower bound |
 | `transfer.isogeny` | the inner method's phases (`target:*`, on the isogenous curve, the same unit), the source check `[k]G` (`verify`) | the kernel search and the two point maps, `F_p` multiplications and inversions (`transfer`, 0 GAE) |
-| `transfer.quartic_cover`, `transfer.ghs_cover` | everything: the cover's construction (`cover_setup`, quartic only), the two pullbacks (`transfer`, with the two additions `G + B`, `Q + B` on `E` for the quartic), the inner solve (`target:solve`), the check on `E` (`verify`); Jacobian work counted in `F_p` multiplications and divided by `c_E`, measured in the run (§7a) | nothing |
+| `transfer.quartic_cover_v2` | as `transfer.quartic_cover`, charges unchanged | `root_search_field_muls_uncharged`: the `F_p` multiplications of `f(x)` evaluations and Tonelli–Shanks square roots on `E` that search for the cover's rational points (`cover_setup`) and the base point `B` (`transfer`), which run outside `plane_quartic`'s counter; the record is a lower bound |
+| `transfer.quartic_cover`, `transfer.ghs_cover` | everything but, for the quartic, those square roots (frozen: its records say `unpriced: []`, which understates it; `transfer.quartic_cover_v2` tallies them): the cover's construction (`cover_setup`, quartic only), the two pullbacks (`transfer`, with the two additions `G + B`, `Q + B` on `E` for the quartic), the inner solve (`target:solve`), the check on `E` (`verify`); Jacobian work counted in `F_p` multiplications and divided by `c_E`, measured in the run (§7a) | nothing |
 | `ic.large_prime` | cofactor projection, exact combination-table group additions, target probes, and relation witness checks; the external runner verifies the returned scalar | combination states, MITM lookups, large-prime merge operations, and modular row operations; the record is therefore a lower bound, not a speed claim |
 | `ic.koblitz_descent` | every point addition and doubling each stage performs, counted in the arithmetic itself (`group_op_count`: `binary_ecc` `point_add`/`point_double`, `FastCurve`'s affine, batched, lazy, AVX-512 and López–Dahab paths, `koblitz_fast_arith`'s 64- and 128-bit curves; a batch of `k` counts `k`, a ladder its actual steps): the factor-base cofactor projections (`factor_base`), every folded pair sum (`oracle_setup`), the anchors, strides, walk steps, window scans, hit recoveries and witness checks (`relations`), the relation re-checks and column-log checks (`linear_algebra`), the descent's stride multiples (`descent_setup`), the walks' starts and steps, pair recoveries and the recovery ladder (`descent`, the online window), and the final `[d]G = Q` (`verify`) | canonicalisations, pair-table filter probes, bucket and point-index reads, Frobenius coordinate maps, factor-base lifts and rebuilds, sparse row operations; field arithmetic outside the group law, hashing, the descent's modular combination, and the forward pass of a vector batch that declined a degenerate block (its lane count is in `detail`, host-dependent) are listed unpriced without a replayed counter |
 | `rho.plain`, `rho.negation`, `rho.frozen_reference`, `bsgs.*`, `kangaroo.vow` on a hyperelliptic Jacobian | as on a curve: one Cantor composition-and-reduction (`hyperelliptic_word::HCurve`) is one addition or one doubling, whatever its degree; the walk's set-up, starts, steps, look-ahead, escapes and internal verification as `rho.*` | as `rho.*` (`canonicalisations_uncharged`, …) and `bsgs.*`; the `F_p` work inside a Cantor step is neither charged nor tallied (`counts_field_ops` is `false`) |
-| `ic.hyperelliptic_thread` | every Cantor addition on `HCurve`: the walk start `D₁ + D₂` (phase `walk_setup`, 1 GAE) and one addition per relation trial (phase `relations`); the factor base (`factor_base`) and the elimination (`linear_algebra`) are phases with no group operation. No internal verification: the runner verifies the returned `k` | every other operation, exactly: `F_p` multiplications building the factor base (`factor_base_fp_muls_uncharged`) and in the smoothness oracle — splitting `u`, evaluating `v` at its roots, inversions and square roots included (`oracle_fp_muls_uncharged`); column lookups and `±` canonicalisations per root; the walk's random draws (`step_draws_uncharged`); multiplications and inversions mod `r` in the Markowitz elimination (`linalg_mulmods_uncharged`, `linalg_inversions_uncharged`); with `large_primes = 1`, partial-table lookups and the combination's mulmods. The record is a lower bound at `w = 0` |
+| `ic.hyperelliptic_thread` | every Cantor addition on `HCurve`: the walk start `D₁ + D₂` (phase `walk_setup`, 1 GAE) and one addition per relation trial (phase `relations`), and the verification `[k]D₁ = D₂`, one counted scalar multiplication (phase `verification`, `⌊log₂ k⌋` doublings and `popcount(k) − 1` additions, in the total; before 2026-10-28 it was left to the runner and uncharged, fixed in place because no committed record names this id); the factor base (`factor_base`) and the elimination (`linear_algebra`) are phases with no group operation | every other operation, exactly: `F_p` multiplications building the factor base (`factor_base_fp_muls_uncharged`) and in the smoothness oracle — splitting `u`, evaluating `v` at its roots, inversions and square roots included (`oracle_fp_muls_uncharged`); column lookups and `±` canonicalisations per root; the walk's random draws (`step_draws_uncharged`); multiplications and inversions mod `r` in the Markowitz elimination (`linalg_mulmods_uncharged`, `linalg_inversions_uncharged`); with `large_primes = 1`, partial-table lookups and the combination's mulmods. The record is a lower bound at `w = 0` |
 
 **Hyperelliptic Jacobians** (`ecbench::hyper`, family `hyperelliptic`).
 `{"kind": "hyperelliptic_thread", "p": 41, "genus": 2}` builds the
@@ -527,9 +575,9 @@ for all targets (memory grows with `L`).
 `ic.koblitz_descent` reproduces `ic price --single-target` stage for stage
 (`src/bin/ic/price.rs`, test `the_ecbench_koblitz_descent_pipeline_is_this_pass`:
 the same logs, trials, relations, summands scanned, units and descent trials on
-the rule v8 `k0n41` recipe at three seeds). Its parameters are the rule v8
+the rule v8 `icv1-f2m41-tm2308219-7f48b14a` recipe at three seeds). Its parameters are the rule v8
 parameter files' fields; each defaults to `rule_v8`, the file's value at the
-six §23 sizes (k0n41, k0n53, k0n57, k0n61, k1n47, k1n59), and the planner
+six §23 sizes (icv1-f2m41-tm2308219-7f48b14a, icv1-f2m53-tm56619371-dac20a85, icv1-f2m57-tm747311035-c1f545af, icv1-f2m61-t158598901-ab42b6c5, icv1-f2m47-t22705043-f4e44623, icv1-f2m59-tm943548413-98844ecc), and the planner
 refuses `rule_v8` anywhere else, where every value must be given. `seed = run`
 takes the run's algorithm seed; by default the recipe's seed 201 fixes the
 base, the probes and the descent walks, so only the target varies between
@@ -763,6 +811,65 @@ sense of AGENTS.md §3: the same work in a faster constant. `ecbench` has no
 prime-curve Gröbner oracle (the note's Buchberger baseline terminates only
 at `|F| = 6`, too small for a DLP), so the prime side is compared with the
 existing `subtract` and `mitm` oracles.
+
+**Accounting v2.** Some rules above had gaps that a registered method's id
+freezes: counts are compared on replay, so a fix is a new id, and the old id
+keeps its records and says what it leaves out. The `_v2` ids below are the ones
+to read new work against; every phase sum equals the total for them
+(`accounting_tests::the_listed_methods_phases_sum_to_their_totals`).
+
+| old id (frozen) | new id | what changes |
+|---|---|---|
+| `rho.cubic`, `rho.quartic` | `rho.cubic_v2`, `rho.quartic_v2` | the class set-up `[κ]G` (`CubicClasses::new` / `QuarticClasses::new`) is in the total under both. The frozen ids have charged it since 2026-10-18, in the `setup` phase (older records put it in the `setup` phase only, not in `total_gae`, and replay through `audit::legacy_class_setup`; see [`CLASS_SETUP_AUDIT.md`](CLASS_SETUP_AUDIT.md)); the `_v2` ids charge it in its own `automorphism_setup` phase, together with the `_v2` walk of the next row. Before 2026-10-18 the frozen ids put the ledger in `search` after reading `gae`, so those records' phases sum to 26 GAE (3 % of `S` at 2^20) more than their total |
+| `rho.negation`, `rho.signed_frobenius`, + the two above | `rho.negation_v2`, `rho.signed_frobenius_v2` + the two above | Brent cycle detection (one stored checkpoint at powers of two, the cycle left from its least-key member) beside the 16-point window, so a cycle longer than the window is escaped and not run to the walk cap (`20·2^dp + 64`); `lost_walk_steps` (and by cause: `steps_in_walks_capped`, `…_abandoned_in_a_cycle`, `…_ending_at_the_identity`, `…_out_of_budget`) are charged counters (the work is in `walk_operations`), `cycles_longer_than_window` counts the detections, and the distinguished-point table's `…_table_queries_uncharged` and `…_inserts_uncharged` are counted. On the review's n = 37 runs 4 of 80 hit capped walks and the mean rose 14 % |
+| `rho.signed_frobenius_strong` | `rho.signed_frobenius_strong_v2` | lanes, distinguished-point bits and the jump table scale with `r` (`auto`, see below); the jump table is `[s]G` for distinct scalars from one table of `[2^i]G`, every doubling and addition counted (`1.5·log₂ r` a jump in the frozen id); the `lanes − 1` start multiples are charged (not in the frozen id); candidate checks are a `verification` phase; an exhausted solve records the work it spent (the frozen id records total 0 and no phases) |
+| `bsgs.textbook`, `bsgs.interleaved`, `bsgs.negation` | `…_v2` | one charged final `[d]G = Q` (phase `verification`, about `1.5·log₂ r` GAE, 2.7 % of `S` at 2^20), which rho and index calculus already paid for their answer |
+| `kangaroo.vow` | `kangaroo.vow_v2` | the final check, and restarts in their own phase `restarts`. The frozen id charges a restart to `search` (since 2026-10-18; to `setup` before, total unchanged) and runs no final check; the `_v2` id's `search` holds jumps only |
+| `claw.pair_table` | `claw.pair_table_v2` | the final check; the `max_adds` budget counts the `recover` phase too (the frozen id lets a run spend past it by its recover additions) |
+| `ic.large_prime` | `ic.large_prime_v2` | the target's `[r]Q` subgroup-membership check, which the frozen id ran on a ledger nobody read, and the final `[d]G = Q` are counted scalar multiplications in the `verification` phase |
+
+*One rule for verification.* A method that returns an answer charges one final
+`[d]G = Q` scalar multiplication, and every failed candidate check, in a phase
+named `verification` (rho: `internal_verification`). It is a property of the
+method id and not a harness phase added to every arm: rho and index calculus
+already pay it inside their frozen ids, so a harness phase would charge them
+twice unless it knew which methods verify (a per-method flag again), and it
+would have to be versioned through the plan, the record and the audit's
+`S = total / √r` recomputation, each owned elsewhere and each a new way for a
+historical record to stop recomputing. A `_v2` id carries the rule in the
+identity the audit, the replay and the run ids already hash, and one
+registry-wide test pins it.
+
+*The strong reference's `auto` shape.* With `ideal = √(πr/2A)` expected steps:
+`dp_bits = round(log₂(ideal)/2)` (1 to 20), `lanes` the power of two at most
+`ideal / 2^(dp_bits+3)` (1 to 32), and `jumps` the largest of 32, 16, 8 whose
+fixed set-up (`jump table + 3·log₂ r + 1.5·log₂ r`, the two start
+multiplications and the final check) is at most a tenth of `ideal`, never
+fewer than 8; the table repeats its distinct jumps to the reference's 32
+entries. Where `r` is too small for that (below about 2^31) the set-up share is
+not hidden by a worse walk: it is in each record's `detail.setup_share`.
+`methods::setup_share`, `row_flags` and `calibrated_log2_r` compute the
+flag a table row should carry (fixed set-up above 10 % of `S`, or `log₂ r`
+below the calibrated range: prime `r < 2^25`, Koblitz `r < 2^39`), and
+`ecbench table` prints it in its last column, `flags`. A row pools its verified
+runs: the share is the summed `setup` and `automorphism_setup` GAE over the
+summed totals (`methods::pooled_row_flags`). At the review's sizes the frozen reference was 58× (n = 13) and 15.5×
+(n = 19) theory, almost all of it 32 full-size jump scalars; at n = 13, with
+about eleven expected steps, even eight jumps cost more than the search.
+
+*The factor-base inventory.* An index-calculus run names its factor base in
+the record (`factor_base`: the `FB1h…` id, size and description). The measured
+child used to rebuild the base for that after `run_pipeline`, before closing
+its scheduler, hardware-counter and Callgrind windows, so those, and
+`max_rss_kib`, included a second build that is neither the solve nor counted
+in `S`. `ic.pipeline` now builds the base once and describes the base the run
+used (`run_pipeline_with_base`): no second build, but the description (hashing
+the base) still falls after the timed solve (`wall_ns`, the online phases) and
+inside those process windows. `ic.shared_rank` still rebuilds its inventory, so
+`methods::solve_measured` returns without it and the child calls
+`methods::complete` after every window has closed (`methods::solve` calls both
+for any other caller). No count changes: a replay of the committed
+`ic.pipeline` and `ic.shared_rank` sessions is identical.
 
 **Calibration.** The unit has been checked against theory in
 [`research/ecbench_calibration_20261002`](../../research/ecbench_calibration_20261002/README.md).
@@ -1060,22 +1167,74 @@ stays with the author.
 
 **Exact replay.** Operation counts depend only on the code, the workload
 and the seed, never on the host. `ecbench verify --replay N` re-executes
-N measured runs (`--replay-all`, every deterministic one) and requires
-the same answer, total, phase counts, counters, unpriced work and factor
-base, bit for bit. Run on another machine, it is an independent check of
-the figure. Records written before 2026-10-05 by an `ic.pipeline` arm
-whose solver work was wall-priced (the descent-algebraic arms of
-`research/ecbench_yield_sweep_20261004/sessions/koblitz`) carry gae
+N measured runs and requires the same answer, total, phase counts,
+counters, unpriced work and factor base, bit for bit (`--replay-all`
+replays every one). Run on another machine, it is an independent check of
+the figure. Which runs are replayed is the auditor's choice, never the
+record's:
+
+- Whether a run is deterministic is taken from the method registry (the
+  method's id and parameters), not from the `cost.deterministic` the record
+  declares; a record that declares itself nondeterministic under a
+  deterministic method fails the audit. Every measured run of a
+  deterministic method is a candidate, whatever its outcome: a `verified`,
+  `wrong_answer` or `exhausted` run must reproduce as such (an exhausted
+  run must replay to exhausted), and an `error` run must replay to the same
+  error. Three committed sessions recorded failed outcomes under code whose
+  failure paths have since changed (`audit::FAILED_OUTCOME_REPLAY_EXEMPT`,
+  with the reason for each); their failed runs are checked statically only.
+  A `timeout` is checked without a replay: it has no total, was
+  killed by SIGKILL (`signal 9`) and ran at least the spec's
+  `timeout_seconds`; a `crashed` run has no total and a signal or nonzero
+  exit; `interrupted` and `spawn_error` runs have no total.
+- `--replay N` draws the N runs uniformly at random, from a seed that
+  defaults to the operating system's entropy; the seed, the number of
+  candidates and `replay_selection` are in the receipt, and
+  `--replay-seed` repeats a draw. A session's author cannot know which runs
+  will be replayed. (Receipts written before this read
+  `candidates[j·len/n]` and have none of these fields.)
+
+Records written before 2026-10-05 by an `ic.pipeline` arm whose solver work
+was wall-priced (the descent-algebraic arms of
+`research/ecbench_yield_sweep_20261004/sessions/koblitz` and the other
+committed sessions listed in `audit::LEGACY_ROUNDING_RECORDS`) carry gae
 figures rounded to the binade of that wall term, because the term was
-removed by subtraction; the audit reproduces that rounding from the
-solver term and pre-removal total the record itself carries, reports the
-replay as `identical (legacy gae rounding, …)`, and new records carry the
-exact figure. The audit also recomputes every derived figure from the
-record's own counts (`S = total/√r`, the floor, the ratio, the
-lower-bound flag) and, for a session graded under the current rules,
-regrades every run from its recorded observations. A figure edited by
-hand and resealed is caught. The receipt names every file by SHA-256,
-and its own SHA-256 is the replay certificate a claim cites.
+removed by subtraction. The audit reproduces that rounding from the solver
+term and pre-removal total the record carries, and reports the replay as
+`identical (legacy gae rounding, …)`, only for those exact sealed
+`(session id, record id)` pairs, and only when the difference is within a
+few ulps of the pre-removal total (and a millionth of the exact total).
+A record that is not on the list must replay exactly. New records carry
+the exact figure.
+
+The audit also recomputes every derived figure from the record's own
+counts (`S = total/√r`, the floor, the ratio, the lower-bound flag) and
+checks each record against what needs no replay: phases sum to the total
+(except a class-set-up record from one of the named pre-fix producers,
+`audit::pre_class_setup_record`, whose replay checks the shortfall),
+`automorphisms_used` does not exceed
+`automorphisms_available`, `role` is the spec arm's, `env_class_id` and
+`binary_sha256` are the host capsule's, `field_ops` is present where the
+method counts field operations on a prime curve, and `status_counts`,
+`executions_planned` and the `session_id` (recomputed from the spec, host
+and plan hashes and the start time) are what the records and plan give.
+Every run is regraded from its recorded observations under the grading
+version the session records (`regraded` is a check: an unsupported version
+fails the audit; version 1 is reproduced from the current rules). A figure
+edited by hand and resealed is caught.
+
+An `interrupted` session accepted with `--allow-interrupted` is reported
+in the receipt (`warnings`, `interruption_point`, `planned_executions`) and
+on stderr as a prefix of its plan that must not be cited as complete, with
+the runner's `stop` (kind, seq, message); the records must end at the
+runner's `last_seq` (`last_seq` + 1 records; a killed session at most one
+more) and at `stop.seq` (that execution recorded or not yet run), and a
+complete session has no `stop`. A torn final line of
+`records.jsonl` is a problem in the receipt (under `--allow-interrupted`,
+for an interrupted or killed session, a warning, with the intact prefix
+audited). A record line with a duplicate key, or a number such as `1e400`
+that is not a finite float, is refused. The receipt names every file by
+SHA-256, and its own SHA-256 is the replay certificate a claim cites.
 
 What CI replays (`.github/workflows/ecbench.yml`):
 
@@ -1097,7 +1256,8 @@ historical reconstruction it needed:
 |:--|:--|
 | `identical` | every compared figure is bit for bit the record's |
 | `identical (legacy gae rounding, …)` | an `ic.pipeline` record from before 2026-10-05 whose solver wall term was removed by subtraction, reproduced from the record's own solver term |
-| `identical (pre-2026-10-18 phase accounting, reproduced from the replay)` | a `rho.quartic` / `rho.cubic` record from one of the five pre-fix producers, whose total left out the class set-up |
+| `identical (pre-2026-10-18 phase accounting, reproduced from the replay)` | a `rho.quartic` / `rho.cubic` record from one of the six pre-fix producers, or a `rho.gls` / `rho.frobenius_orbit` record from one of the two written before 2026-10-28, whose total left out the class set-up (the string keeps its original date) |
+
 
 **A method's counts are frozen by its id.** Changing what a registered
 method counts breaks the replay of every committed session that used it,
@@ -1125,13 +1285,35 @@ run was a lower bound); linear harvest on by default (`d1d034d94`,
 F4/F6-IC search and word count; #2043 (`d72e8b04d`) made every aarch64
 host charge the eager rewrite that x86-64 already charged, where before
 it rewrote lazily and charged only the rows read (the Apple-silicon
-records of 2026-10-13/14); #1646 (`e49afb98f`, 2026-10-11) sent the root's echelon form through the Four Russians kernel and had a child ask the node oracle before specialising (the F6-IC ladder of 2026-10-05, the yield sweep); #1640 (`31dd89b67`) added the `koblitz/K_0 / GF(2^23)` row to `docs/ic/calibration.json`, so native units of that curve were unpriced before; amendment A1 of `research/ext_endo_rho_20261023` changed the uncharged endomorphism counters of `rho.gls` and `rho.frobenius_orbit` in place (no `endomorphism_field_muls_uncharged`, three applications per GLS step), reproduced from the replay by `legacy::pre_endomorphism_a1`. The `oracle_setup` descriptors
+records of 2026-10-13/14); #1646 (`e49afb98f`, 2026-10-11) sent the root's echelon form through the Four Russians kernel and had a child ask the node oracle before specialising (the F6-IC ladder of 2026-10-05, the yield sweep); #1640 (`31dd89b67`) added the `koblitz/icv1-f2m23-t5197-69e76b73` row to `docs/ic/calibration.json`, so native units of that curve were unpriced before; amendment A1 of `research/ext_endo_rho_20261023` changed the uncharged endomorphism counters of `rho.gls` and `rho.frobenius_orbit` in place (no `endomorphism_field_muls_uncharged`, three applications per GLS step), reproduced from the replay by `legacy::pre_endomorphism_a1`. The `oracle_setup` descriptors
 `pair_table_kind`, `pair_table_points` and `window_div` were added to
 `pdp3-koblitz`'s set-up counters later; a record without one is compared
 without it. `engine=rootfind-window-negfold` without `window_div` is the
 `⌈|F|/3⌉` window it was before the divisor became a parameter.
 A change of accounting still needs a new id: do not add a profile to
 excuse one.
+
+**Accounting `_v2` ids (2026-10-28).** An audit found four methods whose
+counts left charged-looking work out. Where a committed record exists the
+old id is frozen and the fix has a new one: `ic.hyperelliptic_v2`
+(verification charged, factor-base scan tallied),
+`transfer.quartic_cover_v2` (square-root multiplications tallied) and
+`ic.cm_folded_{native,recurrence,native_d43}_v2` (replay operations
+charged; the `_v1` records' `total_gae` is 0). `ic.hyperelliptic_thread`
+had no committed record (no `spec.json` in `origin/main`'s history
+names it), so it was fixed in place: its `verification` phase is new. Each `_v2` has a test
+that the frozen id's counts are unchanged and that `v2 − frozen` is exactly
+the added charge or counter.
+
+**Plan-time refusals.** `applicable` now raises what `solve` raised on every
+run: `rho.gls` / `rho.frobenius_orbit` on a curve of the other family (and
+every method without a GLS / subfield implementation on those curves),
+`transfer.isogeny` with a non-generic `inner` (or `ell` outside 2, 3),
+`rho.multitarget_pooled` with `batch` outside 1..=65536, the CM folded
+controls on a curve the adapter refuses (cofactor, base size, query cap,
+watchdog, mode, no CM orbit action), and it looks through
+`wordram_price::base_of` as it does through `full_price::base_of`. Refusals
+change no counts.
 
 *Who may use a profile.* A legacy accounting excuses a difference, so it
 is offered only to a record whose `binary_sha256` is on that profile's
@@ -1307,12 +1489,21 @@ agree on it.
 
 The database is an **index**, rebuilt from session directories,
 comparison files, factor-base dumps and claim files; it is never the
-record of a measurement. Loading is idempotent in one way only:
+record of a measurement. `db sql` audits each session directory
+(`verify --replay 0 --allow-interrupted`) before it emits any of its rows:
+a tampered or unsealed record, a records file that does not hash to the
+session's, or a session that fails any other integrity check is skipped
+with the reason on stderr, the other paths still load, and the exit status
+is 1. Loading is idempotent in one way only:
 an insert tolerates a conflict on its table's primary key when it is the
 same row again, and nothing else. A second row claiming an existing run
 id is a UNIQUE error. A key arriving with a different identity (a curve
 slug on another ICV1 string, a workload, method, factor-base or host id
-on another hash) is stopped by the schema's identity triggers.
+on another hash, an arm on another role or method, a run with other
+figures, a comparison id with other content, a complete session reloaded
+as running or with other records) is stopped by the schema's identity
+triggers. The views read `complete` sessions only; an `interrupted` or
+`running` session is in the tables with its status.
 
 | table | holds |
 |---|---|
@@ -1383,6 +1574,16 @@ FROM method_by_curve ORDER BY curve_slug, mean_s;
 - **A factor base or oracle:** add it to `ic_framework` as a plug-in;
   `ic.pipeline` reaches it through its name. Dump it with `ecbench fb` to
   store its points.
+
+Explicit x-coordinate lists use `explicit-x:xs=X0;X1;...` on prime and narrow
+binary curves. The plug-in lifts exactly those abscissae, rejects duplicates
+and missing roots, and preserves input order as column order. Binary linear
+bases separately use `binary-subspace:dimension=D,basis=B0;B1;...`.
+Both specs work in `ecbench fb` and an `ic.pipeline` arm. See
+[explicit bases](explicit-bases.md) for identity/accounting rules and the
+[standalone CUDA relation service](../../gpu/explicit-relations/README.md)
+for signed per-slot bases and the paper reduction. GPU work is not priced as
+CPU GAE or registered as a measured ecbench method.
 
 ## 12. Limits
 
@@ -1458,9 +1659,17 @@ Stated so that nothing here is read as more than it is:
   not an isolated online wall claim; the
   [preregistered n37 gate](../../research/ecbench_n37_online_ir_20261004/PROTOCOL.md)
   defines its first comparison.
-- **Rho's distinguished-point table is not counted.** Its stores happen
-  once per distinguished point, a vanishing fraction of steps. BSGS and
-  the kangaroo count their table operations.
+- **Rho's distinguished-point table is not charged.** Its probes and stores
+  happen once per distinguished point, which is not a vanishing fraction of
+  steps at the walk lengths the references use: 1 in 16 at `dp_bits = 4`, so
+  6.5 % of the steps at n = 37 and 16 % at n = 13 for
+  `rho.signed_frobenius_strong`, which counts them as
+  `table_queries_uncharged` and `table_inserts_uncharged` (the tuned rho's
+  `_v2` ids as `distinguished_point_table_queries_uncharged` and
+  `…_inserts_uncharged`; the frozen tuned ids do not count them). The strong
+  `_v2` reference's `dp_bits` scales with `r`, which brings the fraction down
+  to about `1/√ideal`; §5a's pricing sees the counts either way. BSGS and the
+  kangaroo count their table operations.
 - **One thread.** Parallel collision search is out of scope until a
   multi-thread run can be graded (a parallel change must be measured at
   one thread and at many, AGENTS.md §10).
@@ -1571,3 +1780,30 @@ The [frozen comparison spec](../../research/nist_best2_small_batch_20261027/ecbe
 and [audit/status](../../research/nist_best2_small_batch_20261027/seeded-audit-v1/README.md)
 record the unexecuted integration/session/replay requirements. No model result
 may be multiplied by standalone GPU throughput to claim measured NIST savings.
+
+### Bounded APS instrument (`ic.aps_v1`)
+
+This native method exposes the existing APS zero-sum relation route with six
+encodings, exact/legacy root controls, exhaustive/first-informative recovery
+and certified cubic-orbit line pruning. Every search parameter is explicit;
+planning rejects unsupported combinations and p>65521. It takes the actual
+single target, never its known logarithm.
+
+The cold solver wall interval includes setup and all attempted bases, failed
+sampling/construction/solver work, equation export binding, roots, signed
+recovery and separate ordinary-residue witness/scalar checks. The five online
+phases start before target validation/sampling and sum exactly to their window.
+Final report aggregation/serialization is outside the solver clock. Observer and export
+construction overhead is included and must be assessed with controls.
+
+GAE prices only the independent check's counted group operations. F4/root
+multiplication diagnostics are retained; core group/field work, polynomial
+construction, allocations and hashing remain incompletely counted. Thus S and
+bitop totals are lower bounds, not admissible complete-cost rankings. The method
+is nondeterministic under a cooperative wall deadline; a returned witness is
+not a certificate of enumeration completeness, execution history or cost.
+
+[The instrument study](../../research/aps_measurement_20261029/README.md) has
+control specs and the remaining protocol/export/accounting/launch prerequisites.
+Those specs are development controls, not a frozen held-out scaling experiment.
+No benchmark or EKS job has run; the complete-cost research panel remains open.

@@ -11,11 +11,13 @@
 //! | [`canonical`] | canonical JSON, SHA-256 identities, derived seeds |
 //! | [`workload`] | curve constructions → ICV1-named single-target workloads |
 //! | [`methods`] | the method registry and the one `solve` every method goes through |
+//! | [`aps`] | bounded APS polynomial instrument with exclusive wall phases and explicit incomplete native pricing |
 //! | [`generic`] | counted BSGS (three forms) and the kangaroo on any [`CountedGroup`] |
 //! | [`fp4`] | `E(F_{p⁴})`: the curve, its counted group and `ic.k4_gaudry` (Gaudry `k = 4`) |
 //! | [`hyper`] | the hyperelliptic thread's Jacobians (genus 2–4, `p < 256`) for the generic arms |
 //! | [`hyper_ic`] | `ic.hyperelliptic`: the thread's index calculus on those Jacobians, counted |
 //! | [`koblitz_descent`] | `ic.koblitz_descent`: the ledger §23 one-target Koblitz index calculus, charged by counted group operations |
+//! | [`negation_strong`] | `rho.negation_strong`: batched negation-map rho on `E/F_{(2^m)^4}`, charged in counted `F_q` multiplications |
 //! | [`claw`] | the four-point signed-Frobenius pair claw (aburan28/cryptanalysis#175) on a Koblitz curve |
 //! | [`conductor_gap`] | CM crater/floor curve pairs with a certified prime endomorphism-conductor gap |
 //! | [`spec`] | the experiment spec and its deterministic expansion |
@@ -40,6 +42,7 @@
 //!
 //! [`CountedGroup`]: crate::cryptanalysis::ic_boundary::CountedGroup
 
+pub mod aps;
 pub mod audit;
 pub mod band;
 pub mod best2_model;
@@ -55,6 +58,10 @@ pub mod compare;
 pub mod conductor_gap;
 pub mod cover_quartic;
 pub mod db;
+pub mod diagnostic_launch;
+pub mod diagnostic_resources;
+pub mod diagnostic_runtime;
+pub mod diagnostics;
 pub mod ext;
 pub mod fbm;
 pub mod fp4;
@@ -74,6 +81,7 @@ pub mod known_log;
 pub mod koblitz_descent;
 pub mod legacy;
 pub mod methods;
+pub mod negation_strong;
 pub mod plane_quartic;
 pub mod record;
 pub mod resources;

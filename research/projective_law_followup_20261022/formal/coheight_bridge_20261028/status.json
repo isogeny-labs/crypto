@@ -3,17 +3,75 @@
   "date_utc": "2026-10-28",
   "curve_family": "weighted-Proj of y^2=x^5+a3*x^3+a2*x^2+a1*x+a0",
   "mathlib_commit": "d13f23b723b8a846827a245b89c10fc7d3f11612",
-  "declaration": "WeightedProjCoheight.coheight_one_of_dvr",
-  "scope": "generic scheme point conditional on domain and DVR stalk",
+  "declarations": [
+    "WeightedProjCoheight.coheight_one_of_dvr",
+    "WeightedProjQuadraticPoint.rootProjPoint",
+    "WeightedProjQuadraticPoint.rootPointIdeal_maximal",
+    "WeightedProjQuadraticPoint.rootProjStalkIso",
+    "WeightedProjQuadraticLocal.root_stalk_domain",
+    "WeightedProjQuadraticLocal.root_stalk_noetherian",
+    "WeightedProjQuadraticLocal.root_stalk_dvr_of_cotangent_one",
+    "WeightedProjQuadraticJacobian.root_affine_jacobian_nonzero",
+    "WeightedProjQuadraticJacobian.affineTangentRow_ker_finrank_one",
+    "WeightedProjQuadraticJacobian.root_affine_tangent_finrank_one"
+  ],
+  "scope": "irreducible-support weighted-Proj point; domain and Noetherian stalk; residue-field affine Jacobian nonzero and formal tangent kernel dimension one under odd characteristic and separability; actual stalk cotangent rank open; DVR conditional on that rank",
   "compiler_status": "passed",
   "compiler": "Lean 4.34.1, pinned Mathlib d13f23b723b8a846827a245b89c10fc7d3f11612",
-  "compiler_command": "LEAN_PATH=.lake/build/lib/lean:<pinned package olean paths> lean WeightedProjCoheight.lean",
+  "compiler_command": "lake env lean WeightedProjQuadraticJacobian.lean; lake build (pinned local package and predecessor olean caches)",
   "compiler_exit_code": 0,
   "source_sha256": "40a53fb825f755f201c184e448b46f308d3b08c4b00b1f158822ae2df51f1a58",
-  "axioms": ["propext", "Classical.choice", "Quot.sound"],
-  "quadratic_support_point_constructed": false,
+  "quadratic_point_source_sha256": "47f81b8dc108f35a5f70a6e6b1724f707c13a542feeae1dbd1a8932f437a6fb8",
+  "quadratic_local_source_sha256": "4215d5d97c29ec820e8985c4c23bd4bdd4c3fbbe444308a6a8260adcdeab086d",
+  "lakefile_sha256": "918b60652ecb6ae73a6f5b0955e229ee794c8a13229c326589b470e261bf0953",
+  "build_jobs": 2595,
+  "default_lake_build_status": "passed",
+  "default_lake_build_jobs": 2607,
+  "pre_push_rust_lib_tests": {
+    "first_full_run": {
+      "passed": 4993,
+      "failed": 1,
+      "ignored": 122,
+      "duration_seconds": 508.86,
+      "failed_test": "cryptanalysis::f4_fp::tests::hilbert_stop_gives_the_same_reduced_basis_as_the_plain_run",
+      "observed_cheaper": 19,
+      "asserted_minimum": 20
+    },
+    "named_test_repetitions": {
+      "passed": 20,
+      "failed": 0
+    },
+    "second_full_run": {
+      "passed": 4994,
+      "failed": 0,
+      "ignored": 122,
+      "duration_seconds": 650.13
+    },
+    "jacobian_branch_full_run": {
+      "passed": 4994,
+      "failed": 0,
+      "ignored": 122,
+      "duration_seconds": 550.77,
+      "command": "cargo test --release --lib --locked -- --test-threads=4"
+    }
+  },
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "quadratic_support_point_constructed": true,
+  "quadratic_support_affine_ideal_maximal": true,
+  "quadratic_support_projective_stalk_localization_identified": true,
+  "quadratic_support_globally_closed_proved": false,
+  "quadratic_support_stalk_domain_if_separable": true,
+  "quadratic_support_stalk_noetherian": true,
+  "quadratic_support_cotangent_dimension_one_proved": false,
   "quadratic_support_dvr_proved": false,
   "global_divisor_identity_proved": false,
   "new_target_runs": 0,
-  "cost_ratio": null
+  "cost_ratio": null,
+  "quadratic_jacobian_source_sha256": "2ba790e46226cf4982fb3c268d8a6e6295dff90cc86ee74aa9d91602b12d30fd",
+  "quadratic_support_affine_jacobian_nonzero_if_odd_and_separable": true,
+  "formal_affine_tangent_kernel_dimension_one_if_odd_and_separable": true
 }

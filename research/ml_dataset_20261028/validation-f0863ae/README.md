@@ -1,0 +1,7 @@
+# Combined native software validation
+
+Source `f0863aefd6e1a416929f8acc02283d46f9c69936` passed 5,043 full-library tests, zero failures, 123 ignored, including 71 dataset tests. The separately invoked endpoint test checked 360 parameter/method combinations; unsupported and capped outcomes remain incomplete, not solved instances. Strict maintained-code Clippy, formatting, release build and host/container preflight passed. `validation.json` records exact scope and identities.
+
+The executable and raw validation files are stored through `.artifacts.json`; fresh remote download/hash verification passed for all 38 new entries and the six older validation entries. `remote-readback.json` binds every checked path, digest, size and remote key; 29,192,020 bytes were downloaded without local cache reuse. `superseded-*` files preserve earlier failed or intermediate checks and their available source hash snapshots. They are not final-source validation. The older launch-source validation remains separately pinned in `../validation-4c94f1d/`.
+
+These are local software checks and packaging validation, not scientific campaign draws. No complete native cloud cell or corpus has been verified. The independent consumer software fixture uses a separate controller role and is not included as producer data here. The scoped worker policy remains unapplied, and cumulative campaign admission must be reconciled before another EKS launch. No exact fall-degree, comparative speed, complete instruction-count, CRIU, or model-efficacy claim follows from this package.

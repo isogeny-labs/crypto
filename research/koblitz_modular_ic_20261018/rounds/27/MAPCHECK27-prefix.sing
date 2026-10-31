@@ -1,0 +1,14 @@
+// Independently evaluate the actual455equations against TWO known coefficient
+// assignments using original source jets, not the generated monomial strings.
+proc mcApply(poly bits,ideal columns){
+ poly value=0;int i;
+ for(i=1;i<=size(bits);i++){value=value+columns[deg(bits[i])+1];}
+ return(value);
+}
+poly mcL1=mcApply(lCoordinates[1],basisJets389);
+poly mcH2=mcApply(hCoordinates[2],basisJets389);
+poly mcL2=mcApply(lCoordinates[2],basisJets389);
+poly mcH3=mcApply(hCoordinates[3],basisJets389);
+poly mcExpected1=jet(mcL1^2+mcL1,384);
+poly mcX=beta32*mcH2;poly mcY=beta32*mcL2+mcH3;
+poly mcExpected2=jet(mcY^2+mcX*mcY+mcX^3+mcX^2+1,384);

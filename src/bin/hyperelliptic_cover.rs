@@ -992,7 +992,34 @@ mod tests {
     fn every_current_catalog_model_reaches_the_standalone_constructor() {
         let registry: Value = serde_json::from_str(CURRENT_REGISTRY).expect("current registry");
         let rows = registry["curves"].as_array().expect("registry curve array");
-        assert_eq!(rows.len(), 20051);
+        let graph: Value = serde_json::from_str(CURRENT_COVER_GRAPH).expect("current cover graph");
+        let graph_rows = graph["curves"].as_array().expect("graph curve array");
+        let registry_models: std::collections::BTreeSet<_> = rows
+            .iter()
+            .map(|row| row["model_json"].as_str().expect("registry model"))
+            .collect();
+        let graph_models: std::collections::BTreeSet<_> = graph_rows
+            .iter()
+            .map(|row| row["model_json"].as_str().expect("graph model"))
+            .collect();
+        assert!(
+            !registry_models.is_empty(),
+            "current catalog must not be empty"
+        );
+        assert_eq!(
+            registry_models.len(),
+            rows.len(),
+            "duplicate registry model"
+        );
+        assert_eq!(
+            graph_models.len(),
+            graph_rows.len(),
+            "duplicate graph model"
+        );
+        assert_eq!(
+            registry_models, graph_models,
+            "registry/graph model coverage"
+        );
         for row in rows {
             let slug = row["slug"].as_str().expect("catalog slug");
             let model: Value = serde_json::from_str(
@@ -1011,7 +1038,29 @@ mod tests {
     fn every_binary_ec1_generator_has_checked_typed_transfer_hypotheses() {
         let graph: Value = serde_json::from_str(CURRENT_COVER_GRAPH).expect("current cover graph");
         let curves = graph["curves"].as_array().expect("graph curve array");
-        let mut checked = 0usize;
+        let registry: Value = serde_json::from_str(CURRENT_REGISTRY).expect("current registry");
+        let mut expected = std::collections::BTreeSet::new();
+        for row in registry["curves"].as_array().expect("registry curve array") {
+            let model = row["model_json"].as_str().expect("registry model");
+            let parsed: Value = serde_json::from_str(model).expect("registry model JSON");
+            if parsed["form"] == "y^2+xy=x^3+a*x^2+b" {
+                for representation in row["representations"]
+                    .as_array()
+                    .expect("registry representations")
+                {
+                    let ec1 = representation["ec1"].as_str().expect("registry EC1 alias");
+                    assert!(
+                        expected.insert((model.to_owned(), ec1.to_owned())),
+                        "duplicate registry binding"
+                    );
+                }
+            }
+        }
+        assert!(
+            !expected.is_empty(),
+            "binary generator controls must not be empty"
+        );
+        let mut checked = std::collections::BTreeSet::new();
         for row in curves {
             let model_value: Value =
                 serde_json::from_str(row["model_json"].as_str().expect("model_json"))
@@ -1129,10 +1178,19 @@ mod tests {
                     point,
                     "{ec1}: degree-inverse recovery failed"
                 );
-                checked += 1;
+                assert!(
+                    checked.insert((
+                        row["model_json"].as_str().expect("graph model").to_owned(),
+                        ec1.to_owned()
+                    )),
+                    "{ec1}: duplicate graph binding"
+                );
             }
         }
-        assert_eq!(checked, 148);
+        assert_eq!(
+            checked, expected,
+            "complete binary registry/graph EC1 coverage"
+        );
     }
 
     #[test]

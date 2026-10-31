@@ -122,6 +122,8 @@ jobs:
             /examples/
             /benches/
             /cd_attack/
+      - name: Materialize Rust module dependencies without research archives
+        run: node .github/scripts/ci-scope.mjs --materialize
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ env.RUST_TOOLCHAIN }}

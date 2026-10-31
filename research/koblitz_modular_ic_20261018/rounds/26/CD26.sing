@@ -1,0 +1,64 @@
+option(redSB);
+ring cd=2,(q,h,y,l,t),dp;
+poly u=1+t;
+poly P=t^2+t^3+t^4+t^6+t^8+t^12;
+poly E=q+1+t^8+t^16*q^2;
+poly Inv=h*u+1;
+ideal baseIdeal=std(ideal(E,Inv));
+int kind;int bit;poly vv;poly rn;poly cn;poly an;poly innerDelta;poly innerC;
+poly deltaNumerator;poly constantNumerator;poly d;poly e;poly b;poly c;poly A;
+poly H0;poly L0;poly jac0;
+for(kind=0;kind<=1;kind++){
+ vv=kind+P+t^16*q;rn=t*vv+1;cn=rn+u^3;an=u^4+cn;
+ if(vv^2+vv+u^3+u!=t^16*E){ERROR("wrong finite base coordinate change");}
+ innerDelta=rn*u^9+an^3;
+ innerC=rn^2*cn^2*u^6+rn*cn*an^2*u^5+cn*an^4;
+ deltaNumerator=rn^3*cn^4*innerDelta;
+ constantNumerator=rn^4*cn^4*innerC;
+ d=(deltaNumerator/t^11)*h^37;e=(constantNumerator/t^14)*h^48;
+ if(deltaNumerator!=t^11*(deltaNumerator/t^11) || constantNumerator!=t^14*(constantNumerator/t^14)){ERROR("finite coefficient factors differ from frozen chart");}
+ b=rn*cn*h^7;c=cn*h^4;A=1+c;
+ print("BASE_SUPPORT_KIND "+string(kind));
+ print("EXACT_COEFFICIENT_RESIDUALS");
+ poly checkDelta=reduce(b^3*(b+c*A^3)+t^11*d,baseIdeal);
+ poly checkConstant=reduce(b^4*(b^2+A^2*b+c*A^4)+t^14*e,baseIdeal);
+ checkDelta;checkConstant;
+ if(checkDelta!=0 || checkConstant!=0){ERROR("wrong original rational tower coefficient");}
+ map point=cd,1,1,1,0,0;
+ print("COEFFICIENT_UNIT_RESIDUES");point(d);point(e);point(A);
+ if(point(d)!=1 || point(e)!=1 || point(A)!=1){ERROR("nonunit finite tower coefficient");}
+ H0=t^10*y^8+t^3*d*y^2+A^2*d*y+e;
+ L0=l^2+A*l+t^3*y+b;
+ matrix J0=jacob(ideal(E,Inv,H0,L0));
+ matrix selectJ0[4][4]=J0[1,1],J0[1,2],J0[1,3],J0[1,4],J0[2,1],J0[2,2],J0[2,3],J0[2,4],J0[3,1],J0[3,2],J0[3,3],J0[3,4],J0[4,1],J0[4,2],J0[4,3],J0[4,4];
+ jac0=det(selectJ0);
+ for(bit=0;bit<=1;bit++){
+  map residue=cd,1,1,1,bit,0;
+  print("FINITE_E1_POINT "+string(kind)+" "+string(bit));
+  residue(E);residue(Inv);residue(H0);residue(L0);residue(jac0);
+  if(residue(E)!=0 || residue(Inv)!=0 || residue(H0)!=0 || residue(L0)!=0 || residue(jac0)!=1){ERROR("finite unramified Jacobian");}
+ }
+ // Retain these exact rational coefficient polynomials in the source ring.
+ write("coefficients-"+string(kind)+".dump","poly bb="+string(b)+";poly cc="+string(c)+";poly aa="+string(A)+";poly dd="+string(d)+";poly ee="+string(e)+";");
+ ring tame=2,(q,h,x,l,w),dp;
+ map change=cd,q,h,0,l,w^7*x^2;
+ poly ts=w^7*x^2;poly zs=w^11*x^3;
+ poly et=change(E);poly it=change(Inv);poly at=change(A);poly bt=change(b);
+ poly dt=change(d);poly ct=change(e);
+ poly ht=1+at^2*dt*x+w^11*dt*x^4+w^10*ct*x^4;
+ poly lt=l^2+at*l+zs+bt;
+ poly originalTower=zs^8+ts^11*dt*zs^2+at^2*ts^11*dt*zs+ts^14*ct;
+ if(originalTower!=w^88*x^24*ht){ERROR("finite tame tower identity");}
+ if(zs^2!=w*ts^3 || ts^11!=x*zs^7){ERROR("finite tame rational inverses");}
+ matrix jt=jacob(ideal(et,it,ht,lt));
+ matrix selectJt[4][4]=jt[1,1],jt[1,2],jt[1,3],jt[1,4],jt[2,1],jt[2,2],jt[2,3],jt[2,4],jt[3,1],jt[3,2],jt[3,3],jt[3,4],jt[4,1],jt[4,2],jt[4,3],jt[4,4];
+ poly jact=det(selectJt);
+ for(bit=0;bit<=1;bit++){
+  map residue=tame,1,1,1,bit,0;
+  print("FINITE_E7_POINT "+string(kind)+" "+string(bit));
+  residue(et);residue(it);residue(ht);residue(lt);residue(jact);
+  if(residue(et)!=0 || residue(it)!=0 || residue(ht)!=0 || residue(lt)!=0 || residue(jact)!=1){ERROR("finite tame Jacobian");}
+ }
+ setring cd;kill tame;
+}
+print("CD26_CHARTS_ALL_CHECKS_PASS");quit;

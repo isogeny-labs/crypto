@@ -234,23 +234,146 @@ On an authorized, resource-qualified host, fetch the immutable
 full-object checksum checks above. The local input layout needs
 `objects/c295da8898cfad29a053621c768ca059eea4263f89f5ca78b4f98af43c383f3f.jsonl.gz`,
 `s3-manifest.json`, the bound producer `manifest.json`, and the two
-`*-get-metadata.json` provider responses. From a clean checkout with pinned
-`blake3==1.0.8`, build `cargo build --release --example
-koblitz_n83_factor_base_export`, then invoke
-`xor-cadence-20261025/run.py --source SOURCE --binary BINARY --base BASE
---output FRESH_OUTPUT`. The supervisor permits natural search only after
-independent positive group replay and changed-target/row rejection. Run
-`xor-cadence-20261025/audit.py` against the same four paths and retain all
-raw receipts. A natural relation still needs useful-rank, factor-base log,
+`*-get-metadata.json` provider responses. The earlier Python supervisor and
+auditor are historical evidence paths. New comparisons use the native
+[frozen continuation](native-cadence-replay-20261026/PROTOCOL.md). From a
+clean source checkout, build both
+`cargo build --release --example koblitz_n83_factor_base_export --example n83_d18_native_relation_replay`.
+The [retained assignment amendment](native-cadence-replay-20261026/ASSIGNMENT_CERTIFICATE_AMENDMENT.md)
+requires `result.model.bin` beside a cadence-32 `result.json` SAT receipt and a separate
+native CNF/XOR, field and group replay before promoting that result.
+Record the source revision and SHA-256 of each release binary before timing.
+The producer `manifest.json` has SHA-256
+`1d3650eabc4662d8f2597498d7ac92b7cd0a4134ac5f8155aaa49c7af3407dce`;
+the distinct S3 custody `s3-manifest.json` has SHA-256
+`1b93351febd47dac4de8c5dd39dbf58564d0057a044054baf448d978f6c0d616`.
+
+After the addendum's host preflight, invoke the worker subcommand
+`primary-full-d18-m4-l0-ordered-xor-cadence32 positive BASE FIXTURE RESULT`.
+Keep stdout, stderr, `/usr/bin/time -l`, the exit code in `RESULT.exit.txt`,
+and all phase/result/cap files. Wrap the worker's 300-second internal cap
+with `gtimeout --kill-after=5s 310s`. Run
+`n83_d18_native_relation_replay BASE RESULT WORKER_BINARY FIXTURE RECEIPT`
+against a terminal result, or pass `RESULT.cap.json` for an internal cap.
+Only a passing constructed relation and native replay authorize one
+`natural` call with the worker's 2,400-second internal and 2,410-second outer
+caps. A natural relation still needs useful-rank, factor-base log,
 unseen-target descent, fully charged cold runtime and same-target rho gates.
 
-The hosted GitHub AWS principal stopped at `AccessDenied` for the full-D18
-manifest, and its [exact two-object read proposal](linux-phase-first-20261025/attempt-1/IAM_READ_PROPOSAL.md)
-remains unapplied. Read-only inspection on 2026-10-25 found the existing
+At the 2026-10-25 checkpoint, the hosted GitHub AWS principal stopped at
+`AccessDenied` for the full-D18 manifest, and its [exact two-object read proposal](linux-phase-first-20261025/attempt-1/IAM_READ_PROPOSAL.md)
+was unapplied. Read-only inspection then found the existing
 `n83-online-screen-ssm-20261019` profile has only its separate artifact put,
 while `n83-xor-panel-20261025` reads only the earlier XOR-panel input prefix.
-Neither profile grants this D18 object read. Apply the reviewed exact-object
-permission only after explicit authorization; do not route this experiment
-through a broader or unrelated role. The local SSH endpoints named
-`awsspot` and `runpod` were unavailable at this inspection and are not a
-completed hosted run.
+Neither profile granted this D18 object read. The local SSH endpoints named
+`awsspot` and `runpod` were unavailable at that inspection.
+
+## 2026-10-26 native continuation status
+
+The user subsequently authorized the exact two-object temporary policy
+`N83D18ExactInputRead20261025` on IAM user
+`rho-gh-snapshot-readonly-20261024`. The [live readback receipt](../../../../problems/evidence/n83-d18-exact-read-20261026.json)
+matches the [reviewed proposal](linux-phase-first-20261025/attempt-1/exact-read-policy-proposal.json)
+after canonical JSON sorting. Its sole statement permits `s3:GetObject` on
+the manifest and compressed object named above. Confirm the live grant before
+using that identity, and remove it with a verified absent-policy readback
+after the hosted attempt ends or is cancelled. Other AWS identities need
+their own read authorization; this grant does not make the spot or RunPod SSH
+endpoints available.
+
+The current source handoff is [PR #2649](https://github.com/isogeny-labs/crypto/pull/2649)
+and the [frozen native protocol](native-cadence-replay-20261026/PROTOCOL.md),
+including its [retained-assignment amendment](native-cadence-replay-20261026/ASSIGNMENT_CERTIFICATE_AMENDMENT.md).
+The [second source-bound preflight](native-cadence-replay-20261026/attempt-2/REPORT.md)
+used source `45ce91d503ee0d0acc57e3d8d5cb49108c90ded6`, worker SHA-256
+`11220d8b838bf5cac2985dbcba4ea96e69a64b70dc54044d180cf6a3e8970e49`,
+and separate verifier SHA-256
+`e89578703888568d67f79e5b2645e47b911a30a9d7a8a3d57e795be997296b71`.
+Fresh checksum-enabled S3 GETs matched both full-object hashes. Six selected
+one-minute local loads were 26.44–66.14, exceeding the frozen maximum 24;
+swapouts rose by 390,448. The constructed worker and natural arm were not
+launched. Use a host that passes the frozen load, swap and scratch gates,
+then run the positive arm and its independent assignment/group replay before
+the one public natural arm. Preserve every cap, timeout or infrastructure
+failure with its exact source and input identities.
+
+GitHub Actions on PR #2649 has stopped before runner assignment with an
+account billing or spending-limit annotation. The default AWS identity
+returned `ParameterNotFound` for `/ephemeral/config` in `us-east-1` and
+`us-west-2`. A configured second profile reached the deployed runner in
+account `104186811093`, but a direct original-manifest HEAD returned `403`.
+The [third preflight and exact two-sided access proposal](native-cadence-replay-20261026/attempt-3/REPORT.md)
+preserve that observation; the proposed bucket and runner-role policies
+remain unapplied. The documented `ephemeral` runner defaults to Spot capacity,
+while the current solver has no application checkpoint. This PR adds an explicit
+`ephemeral run --on-demand` path to both CLIs. Local market selection and Rust
+CLI unit tests passed. A live no-source `t3.small` On-Demand smoke was denied
+at `RunInstances` by the account's `SpotOnlyEC2Launch` v2 identity policy;
+the [attempt-3 receipt](native-cadence-replay-20261026/attempt-3/REPORT.md)
+records the empty tagged instance readback. The exact S3 read grants alone
+cannot lift that launch denial. No hosted native full-D18 positive/natural
+execution has been started from this handoff. The
+[problem record](../../../../problems/n83-mixed-orbit-factor-base-selection.md)
+tracks these gates and the downstream total-runtime selection obligations.
+
+A subsequent [local attempt 4](native-cadence-replay-20261026/attempt-4/REPORT.md)
+passed the exact fresh S3-input and local capacity gates, then exited in
+1.05 seconds before result generation because the worker binary's compile-time
+`CARGO_MANIFEST_DIR` still named the dirty original checkout. The correction
+is a fresh release build in a clean checkout of frozen source `45ce91d5`,
+with new worker/verifier hashes recorded before the next positive arm.
+
+The resulting [attempt-5 constructed control](native-cadence-replay-20261026/attempt-5/REPORT.md)
+used a new clean-source worker, fresh provider-checked D18 GET, and a launch
+load of 21.65. It produced constructed SAT after 85.564 seconds of import,
+0.153 seconds of model construction, and 0.352 seconds of SAT search; its
+retained model passed separate native group/row/assignment replay. Its
+`/usr/bin/time -l` wrapper exited 1 on a denied macOS `kern.clockrate`
+query, independently reproduced with `/usr/bin/true`, so the natural arm
+was held. The [exit-policy amendment](native-cadence-replay-20261026/EXIT_POLICY_AMENDMENT.md)
+uses `time -p` with an explicit terminal exit-0 gate for a fresh rerun.
+Attempt 6 has a newly verified full-object GET, but its current host load
+remains above the frozen launch maximum; no attempt-6 worker was launched
+at this handoff update. The verifier's terminal path now explicitly requires
+exit 0; its five focused tests pass, and it rejects attempt 5's actual exit 1.
+
+Two subsequent [no-source Spot capacity smokes](native-cadence-replay-20261026/spot-capacity-smoke-20261026/REPORT.md)
+ran through the deployed `ephemeral` account: `t3.small` and `c7i.2xlarge`
+each executed a marker command, uploaded the expected S3 output with exit 0,
+and reached EC2 `terminated` state. The larger host reported 8 logical CPUs
+and 15 GiB memory, above the constructed worker's 4,769,202,176-byte peak
+RSS. This establishes a live Spot admission and cleanup route in that account,
+not endurance under a 2,400-second solver query. The runner's original-D18
+manifest read still returned `403` at the last exact check; the reviewed
+two-sided bucket/runner-role grant is unapplied pending authorization.
+On-Demand remains denied by `SpotOnlyEC2Launch`, and a Spot interruption would
+censor the current no-checkpoint worker. The [Linux Spot protocol](native-cadence-replay-20261026/LINUX_SPOT_PROTOCOL.md)
+is now frozen as a plan; no Linux cryptographic arm has run. Before a hosted
+timing run, get/read back the exact S3 permission, verify both original S3
+objects on the worker, seal the per-job source/binary/host launch lock, then
+apply the positive exit-0 and separate replay gates before natural.
+
+A subsequent [build-only `c7i.2xlarge` Spot check](native-cadence-replay-20261026/linux-build-smoke-20261026/REPORT.md)
+allocated and self-terminated its host, but stopped before Cargo: the runner
+could not fetch the private GitHub source over HTTPS without noninteractive
+authentication. The raw child error, status and EC2 termination are retained;
+no binary, D18 GET or cryptographic arm resulted. Do not retry the unchanged
+`--ref 45ce91d5` path. The earlier approved 17,757,116-byte source archive
+was freshly fetched with its full-object checksum and correct SHA-256, but
+freezes `54cbef1a` and lacks portable Git metadata; it cannot supply the
+frozen `45ce91d5` cadence source. A reviewed exact-source delivery route
+must pass before the Linux build, independently of the still-unapplied
+two-sided original-D18 object read proposal. The temporary user IAM grant
+remains active pending completion or cancellation of the hosted attempt.
+
+The [follow-up no-source Rust Spot smoke](native-cadence-replay-20261026/linux-build-smoke-20261026/REPORT.md)
+executed `rustc` and AWS CLI, uploaded outputs with exit 0, and its EC2
+instance terminated, without trying private GitHub. A 58,011,243-byte
+[exact-source archive proposal](native-cadence-replay-20261026/linux-build-smoke-20261026/SOURCE_DELIVERY_PROPOSAL.md)
+is prepared with SHA-256 `dcc242fc0c4e6b4af99a854b885b0dece5d18ef69716a82cc5b5cc98d86044cd`.
+Fresh extraction resolves clean `45ce91d5`, the patched verifier blob and
+no Git remote; offline release example tests passed 20 worker and 5 verifier
+cases. The archive has not been uploaded. A proposed three-object temporary
+bucket/runner-role policy would cover this exact source key plus the two
+original D18 inputs and would supersede the unapplied two-object proposal
+only after explicit authorization. No Linux cryptographic arm has run.

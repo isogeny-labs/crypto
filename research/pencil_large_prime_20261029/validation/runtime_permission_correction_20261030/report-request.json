@@ -1,0 +1,77 @@
+{
+  "schema": "pencil-native-review-report-request/v1",
+  "title": "First-gate infrastructure failure and executable-mode correction",
+  "snapshot": "2026-10-30T00:15:53Z",
+  "plan_summary": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/accounting/aggregate/actual-plan-only-summary-final.json",
+    "sha256": "9c0d055e2af7f6f79ce201b9b0c2a22691da0af55e8f6f127acec7070bb7e665"
+  },
+  "observations": [
+    {
+      "id": "first-attempt",
+      "scope": "Actual first gate terminated before payload spawn. This is an infrastructure failure; no mathematical target was executed and no cost ratio was measured.",
+      "source": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/runtime_permission_correction_20261030/first-attempt-review.json",
+        "sha256": "6e0c4c56340da2bf3bff811eef76594819491ce563652814c7ae257f822b8998"
+      },
+      "fields": {
+        "run": "/failed_run/run_name",
+        "phase": "/failed_run/terminal_phase",
+        "error": "/failed_run/error",
+        "payload_pid": "/failed_run/payload_pid",
+        "checkpoint_generations": "/failed_run/checkpoint_generations",
+        "targets_executed": "/scientific_execution/targets_executed",
+        "mathematical_results": "/scientific_execution/mathematical_results"
+      }
+    },
+    {
+      "id": "mode-correction",
+      "scope": "A new immutable image changes only the progress executable permission. File bytes and other modes are unchanged. Offline usage checks do not invoke a workload.",
+      "source": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/runtime_permission_correction_20261030/receipt.json",
+        "sha256": "a22c525366e684e73c4559c4db6083d995109af7ccf04451baf1846a103b2a39"
+      },
+      "fields": {
+        "changed_path": "/changed_path",
+        "old_mode": "/old_mode",
+        "new_mode": "/new_mode",
+        "other_modes_equal": "/all_other_runtime_modes_owners_types_equal",
+        "file_bytes_equal": "/all_runtime_file_bytes_equal",
+        "before_uid1000_exit": "/offline_before/exit_code",
+        "after_uid1000_exit": "/offline_after/exit_code",
+        "after_result": "/offline_after/result",
+        "solver_executions": "/solver_executions"
+      }
+    },
+    {
+      "id": "independent-mode-review",
+      "scope": "Independent receipt, recipe, inventory, image-readback and no-payload usage review. This verifies the identified permission correction, not a future controller run or mathematical result.",
+      "source": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/runtime_permission_correction_20261030/independent-review.json",
+        "sha256": "63a7cf1b120c18ae7c9e3b8257009a4d6aed45479133a99c5ba6af2bf824a2fa"
+      },
+      "fields": {
+        "review_result": "/verdict",
+        "registry_digest_active": "/checks/registry_readback_digest_active",
+        "instrument_bytes_equal": "/checks/instrument_bytes_identical",
+        "stopped_container_never_started": "/checks/stopped_container_never_started",
+        "recovery_verified": "/boundaries/controller_end_to_end_recovery_verified",
+        "scientific_qualification": "/boundaries/scientific_qualification"
+      }
+    },
+    {
+      "id": "retry-boundary",
+      "scope": "Retry execution and its outcome are handled separately. This report preserves the failed attempt and records no empirical ratio from a later attempt.",
+      "source": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/runtime_permission_correction_20261030/report-scope.json",
+        "sha256": "271455d43d7e6b97338dd21b3b79bfb00bf69fd008fec8ee437040aade6590cd"
+      },
+      "fields": {
+        "retry_outcome": "/retry_outcome",
+        "new_empirical_ratio": "/new_empirical_ratio",
+        "new_solver_observations": "/new_solver_observations",
+        "report_launched_retries": "/cloud_retries_launched_by_report"
+      }
+    }
+  ]
+}

@@ -46,10 +46,17 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # The weekly lane the header and the schedule-gated steps describe
+  # (sheriff SHF-20261028-0f3f64, PPN-6): Sunday 05:37 UTC, off the hour.
+  # A scheduled event selects every scope (ci-scope.mjs).
+  schedule:
+    - cron: "37 5 * * 0"
 permissions:
   contents: read
 concurrency:
-  group: ecbench-${{ github.ref }}
+  # The weekly lane runs for hours on main; its own group keeps it from
+  # holding up or displacing push runs on main.
+  group: ecbench-${{ github.event_name == 'schedule' && 'schedule' || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 defaults:
   run:
@@ -296,7 +303,7 @@ jobs:
       - name: Unit tests
         run: cargo test --release --lib ecbench
       - name: Integration tests
-        run: cargo test --release --test ecbench
+        run: cargo test --release --test ecbench --test aps_ecbench
       - name: Exact n-1 and large-prime integration tests
         run: cargo test --release --test ecbench_large_prime
       - name: Build

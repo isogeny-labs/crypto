@@ -2,10 +2,12 @@
   "schema": "research.proof-boundary-diagram/v1",
   "nodes": [
     {"id": "source", "label": "Quadratic Mumford support", "status": "given"},
-    {"id": "point", "label": "Actual weighted-Proj point", "status": "open"},
-    {"id": "dvr", "label": "DVR stalk at that point", "status": "open"},
-    {"id": "coheight", "label": "Coheight = 1", "status": "conditional"},
+    {"id": "point", "label": "Maximal chart ideal and weighted-Proj point", "status": "proved"},
+    {"id": "local", "label": "Domain and Noetherian stalk under separability", "status": "proved"},
+    {"id": "jacobian", "label": "Affine Jacobian nonzero; formal tangent kernel dimension one", "status": "proved"},
+    {"id": "cotangent", "label": "Cotangent dimension one", "status": "open"},
+    {"id": "coheight", "label": "DVR and coheight one", "status": "conditional"},
     {"id": "divisor", "label": "Global divisor / Pic0 equation", "status": "open"}
   ],
-  "edges": [["source", "point"], ["point", "dvr"], ["dvr", "coheight"], ["coheight", "divisor"]]
+  "edges": [["source", "point"], ["point", "local"], ["point", "jacobian"], ["local", "cotangent"], ["jacobian", "cotangent"], ["cotangent", "coheight"], ["coheight", "divisor"]]
 }

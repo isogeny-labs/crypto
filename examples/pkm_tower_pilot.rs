@@ -78,6 +78,7 @@ use crypto_lib::cryptanalysis::f4_fp_tower::{self, RPoly, SquareRule, TowerF4Opt
 use crypto_lib::cryptanalysis::f4_tower_generic::{f4_tower_generic, GPoly, GTowerRing};
 use crypto_lib::cryptanalysis::fp_backend::{Fp224, Fp256, Fp32, Fp64, FpP192, FpWide, PrimeField};
 use crypto_lib::cryptanalysis::fp_backend_ifma::Fp52;
+use crypto_lib::cryptanalysis::hky_fp_tower::{self, HkyLimits, HkyRing};
 use crypto_lib::cryptanalysis::ic_boundary::{CountedGroup, GroupOps, PrimeCurve, PrimePoint};
 use crypto_lib::cryptanalysis::sig_fp_tower;
 use num_bigint::BigUint;
@@ -1295,6 +1296,101 @@ fn print_sig_step(k: usize, st: &sig_fp_tower::SigStep) {
 /// Run `f4_fp_tower` on a system: the tower equations become the ring's
 /// rewriting, and the other equations its input in normal form.
 #[allow(clippy::too_many_arguments)]
+/// The HKY closures of one system (`--engine hky`): the system in the tower
+/// quotient's normal form (the tower equations vanish there), `V_{F,c}` for
+/// `c` from the least input degree, and the fall degrees.
+fn measure_hky(
+    eqs: &[Pol],
+    tower: &Tower,
+    cell: &Cell,
+    n: usize,
+    p: u64,
+    sol: Option<&[u64]>,
+    a: &Args,
+) -> Outcome {
+    let ring = if cell.control == Control::Naive {
+        HkyRing::new(p, Vec::new(), n)
+    } else {
+        HkyRing::new(p, tower_ring(tower, cell.m, p).rules, cell.m - 2)
+    };
+    let gens: Vec<hky_fp_tower::NfPoly> = eqs
+        .iter()
+        .map(|e| ring.from_raw(&raw_terms(e)))
+        .filter(|g| !g.is_empty())
+        .collect();
+    let planted_ok = sol.map(|s| gens.iter().all(|g| ring.eval(g, s) == 0));
+    let nf_degrees: Vec<u32> = gens.iter().map(HkyRing::degree).collect();
+    let c_min = a
+        .hky_cmin
+        .unwrap_or_else(|| nf_degrees.iter().copied().min().unwrap_or(1));
+    let limits = HkyLimits {
+        max_cols: a.hky_max_cols,
+        max_entries: a.hky_max_entries,
+        budget: Duration::from_secs(a.budget),
+        ..HkyLimits::default()
+    };
+    let started = Instant::now();
+    let fd = hky_fp_tower::fall_degrees(&ring, &gens, c_min, a.hky_cmax, &limits);
+    let ms = started.elapsed().as_secs_f64() * 1e3;
+    let closures: Vec<Value> = fd
+        .closures
+        .iter()
+        .map(|c| {
+            json!({"c": c.c, "cols": c.cols as u64, "dims": c.dims, "one": c.contains_one,
+                   "censored": c.censored, "rows_reduced": c.rows_reduced,
+                   "entries": c.entries, "muladds": c.muladds, "ms": c.ms})
+        })
+        .collect();
+    let censored_at = fd
+        .closures
+        .last()
+        .and_then(|c| c.censored.as_ref().map(|_| c.c));
+    eprintln!(
+        "{:8} m={} {:6} t={:2} hky d_F={:?} ffd={:?} falls={:?} censored_at={:?} {:.0} ms",
+        cell.kind.name(),
+        cell.m,
+        cell.control.name(),
+        cell.t,
+        fd.last_fall,
+        fd.first_fall,
+        fd.falls,
+        censored_at,
+        ms
+    );
+    Outcome {
+        solving_degree_max: 0,
+        last_productive_degree: 0,
+        degree_reached: 0,
+        max_cols_to_solution: 0,
+        steps_to_solution: 0,
+        inconsistent: fd.last_fall.is_some(),
+        zero_dim: false,
+        linear: 0,
+        basis_len: 0,
+        steps: 0,
+        max_rows: 0,
+        max_cols: 0,
+        ms,
+        timed_out: censored_at.is_some(),
+        pairs_above_bound: 0,
+        staircase_at_stop: None,
+        planted_ok,
+        extra: json!({
+            "engine": "hky_fp_tower",
+            "nf_degrees": nf_degrees,
+            "hky_cmin": c_min,
+            "hky_cmax": a.hky_cmax,
+            "last_fall_degree": fd.last_fall,
+            "first_fall_degree": fd.first_fall,
+            "falls": fd.falls,
+            "censored_at": censored_at,
+            "muladds": fd.closures.iter().map(|c| c.muladds).sum::<u64>(),
+            "muladds_last_closure": fd.closures.last().map(|c| c.muladds),
+            "closures": closures,
+        }),
+    }
+}
+
 fn measure_tower(
     eqs: &[Pol],
     towers: std::ops::Range<usize>,
@@ -1681,6 +1777,12 @@ struct Args {
     wide: bool,
     /// `--verify`: wide builder only, the exhaustive and `BigUint` checks.
     verify: bool,
+    /// `--engine hky` only: the closure degrees, and the limits of one
+    /// closure (`--budget` is its time limit).
+    hky_cmin: Option<u32>,
+    hky_cmax: u32,
+    hky_max_cols: u128,
+    hky_max_entries: u64,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -1690,6 +1792,11 @@ enum Engine {
     Sig,
     /// `f4_tower_generic`, over the backend `--backend` picks.
     Generic,
+    /// `hky_fp_tower`: the Huang–Kosters–Yeo closures `V_{F,c}` for
+    /// `c = --hky-cmin … --hky-cmax`, and the first and last fall degree
+    /// read off them (`research/prime_fall_degree_20261027/`). No F4 runs;
+    /// the naive control runs too (free variables only).
+    Hky,
 }
 
 /// The prime-field backend of `--engine generic`. `Auto` picks by the
@@ -1850,6 +1957,10 @@ fn parse_args() -> Args {
         backend: Backend::Auto,
         wide: false,
         verify: false,
+        hky_cmin: None,
+        hky_cmax: 6,
+        hky_max_cols: 2_000_000,
+        hky_max_entries: 600_000_000,
     };
     let args: Vec<String> = std::env::args().skip(1).collect();
     let list = |s: &str| -> Vec<usize> {
@@ -1957,11 +2068,16 @@ fn parse_args() -> Args {
                     "tower" | "f4_fp_tower" => Engine::Tower,
                     "sig" | "f4_fp_tower_sig" => Engine::Sig,
                     "generic" | "f4_tower_generic" => Engine::Generic,
+                    "hky" | "hky_fp_tower" => Engine::Hky,
                     other => panic!("unknown engine `{other}`"),
                 }
             }
             "--max-nnz" => a.max_nnz = Some(v.parse().expect("--max-nnz")),
             "--max-dense" => a.max_dense = Some(v.parse().expect("--max-dense")),
+            "--hky-cmin" => a.hky_cmin = Some(v.parse().expect("--hky-cmin")),
+            "--hky-cmax" => a.hky_cmax = v.parse().expect("--hky-cmax"),
+            "--hky-max-cols" => a.hky_max_cols = v.parse().expect("--hky-max-cols"),
+            "--hky-max-entries" => a.hky_max_entries = v.parse().expect("--hky-max-entries"),
             "--sig-order" => {
                 a.sig.order = match v.as_str() {
                     "pot" => sig_fp_tower::ModuleOrder::PositionFirst,
@@ -2042,7 +2158,17 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
         ^ (cell.g as u64);
     let mut rng = StdRng::seed_from_u64(cell_seed);
     let tower = build_tower(cell.kind, p, cell.t, &mut rng);
-    let (curve, on) = target_curve(p, &tower, cell.m.max(2), &mut rng);
+    // A cell with planted targets needs m distinct base abscissae on the
+    // curve. Random targets need none beyond two. Capping the requirement
+    // at |V| changes nothing for a cell that could be drawn before
+    // (`m ≤ |V|`), and stops the search from looping when `m > |V|`
+    // (research/prime_fall_degree_20261027, Amendment 4).
+    let need = if a.planted == 0 && cell.control != Control::Ladder {
+        cell.m.max(2).min(tower.v.len())
+    } else {
+        cell.m.max(2)
+    };
+    let (curve, on) = target_curve(p, &tower, need, &mut rng);
     let mut targets = Vec::new();
     let planted = if cell.t > a.planted_max_t && cell.control != Control::Ladder {
         0
@@ -2070,7 +2196,7 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
             cell.g,
             &mut rng,
         );
-        if a.engine != Engine::F4 && cell.control == Control::Naive {
+        if !matches!(a.engine, Engine::F4 | Engine::Hky) && cell.control == Control::Naive {
             // The naive control has no tower to rewrite by.
             continue;
         }
@@ -2115,6 +2241,10 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
                     a.full_rank_exit,
                 ));
                 (out, Dumpable::Ring(basis))
+            }
+            Engine::Hky => {
+                let out = measure_hky(&eqs, &tower, cell, n, p, sol.as_deref(), a);
+                (out, Dumpable::Raw(Vec::new()))
             }
             Engine::Tower | Engine::Sig => {
                 let ring = tower_ring(&tower, cell.m, p);
@@ -2178,6 +2308,27 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
         if let (Some(obj), Some(extra)) = (row.as_object_mut(), r.extra.as_object()) {
             for (k, v) in extra {
                 obj.insert(k.clone(), v.clone());
+            }
+            if a.engine == Engine::Hky {
+                // No F4 ran: keep only the fields the closure measured.
+                for k in [
+                    "solving_degree_max",
+                    "last_productive_degree",
+                    "degree_reached",
+                    "max_cols_to_solution",
+                    "steps_to_solution",
+                    "inconsistent",
+                    "zero_dim",
+                    "linear_basis_elements",
+                    "basis_len",
+                    "steps",
+                    "max_rows",
+                    "max_cols",
+                    "pairs_above_bound",
+                    "staircase_at_stop",
+                ] {
+                    obj.remove(k);
+                }
             }
         }
         eprintln!(

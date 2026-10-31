@@ -1,0 +1,82 @@
+{
+  "schema": "pencil-symbolic-cost-model-draft/v1",
+  "status": "draft_not_frozen_not_executable_protocol",
+  "candidate_over_rho": null,
+  "scalar_model": {
+    "name": "atomic-scalar-inversion/v1",
+    "implementation": "src/scalar_ledger.rs",
+    "modulus": "verified odd prime r",
+    "B": "bitlength(r-2) + popcount(r-2)",
+    "candidate_additions": "arithmetic.scalar_adds + symbolic.semantic_counts.scalar_adds + symbolic.semantic_counts.scalar_negations",
+    "candidate_inversions": "arithmetic.scalar_inversions + symbolic.semantic_counts.scalar_inversions",
+    "candidate_multiplications": "arithmetic.scalar_muls + symbolic.semantic_counts.scalar_muls - candidate_inversions * B",
+    "rho_additions": "rho.native.scalar_adds_uncharged",
+    "rho_inversions": "rho.native.scalar_inversions_uncharged",
+    "rho_multiplications": "rho.native.scalar_muls_uncharged",
+    "weights": {
+      "unit": "native GAE per logical event",
+      "sensitivity": [
+        0,
+        0.1,
+        1
+      ],
+      "applies_to": [
+        "atomic scalar addition/negation",
+        "scalar multiplication outside inverse expansion",
+        "atomic scalar inverse"
+      ],
+      "base_field_inverse_price_applies": false
+    },
+    "raw_counts_preserved": true,
+    "negative_corrected_count": "reject",
+    "overflow": "helper rejects product/addition/subtraction overflow; analyzer must checked-add disjoint raw ledgers"
+  },
+  "phase_contract": {
+    "field_sum": "equals candidate field total before cold setup is added",
+    "arithmetic_sum": "equals candidate arithmetic total before cold setup is added",
+    "symbolic_sum": "equals whole candidate symbolic snapshot",
+    "candidate_elapsed_ns": "sum(phases.elapsed_ns) + candidate_phase_overhead_ns",
+    "negative_time_remainder": "reject",
+    "clock_status": "diagnostic until isolation and controls are verified"
+  },
+  "double_count_exclusions": [
+    "Residual diagnostic inversions and coefficient updates are not additional arithmetic",
+    "Phase counters are an attribution of totals, not additional work",
+    "Phase allocation observations are not added to the candidate envelope",
+    "Overlapping map and payload semantic events require separately declared weights"
+  ],
+  "open_requirements": [
+    "Freeze complete experiment.protocol/v1 and analysis before new data",
+    "Select fixed partition without post hoc best-arm selection",
+    "Resolve incomplete native logical and primality/setup coverage",
+    "Bind immutable workload, protocol, source and binary identities",
+    "Reconcile retained EKS jobs using existing authorized job-submitter connection",
+    "Retain failures and caps; only independently verified completed pairs receive ratios",
+    "Review and freeze explicit disjoint logical category mapping, preserving inherited hash/RNG work and actual reference coverage"
+  ],
+  "model_amendment": "atomic-scalar-disjoint-logical/v1-draft",
+  "inherited_price_grid": {
+    "S_over_M": [
+      0,
+      0.5,
+      1
+    ],
+    "I_over_M": [
+      1,
+      10,
+      100,
+      1000
+    ],
+    "native_GAE_per_logical": [
+      0,
+      0.1,
+      1
+    ],
+    "cells": 36,
+    "contract": "validation/accounting/historical-price-contract.json"
+  },
+  "amendment_scope": "New data only; preserve all historical raw records and old ratios. Atomic scalar normalization and disjoint primitive mapping are explicitly changed conventions.",
+  "allocation_valuation": "No inherited GAE weight. Preserve bytes/calls when observed and RSS separately; absence is null, not zero. Not an instruction-level cost census.",
+  "hash_policy": "Synthetic rho collision table uses rust-default-hasher-v1; bind Rust1.99.1/source/binary. Table layout and runtime differ from historical RandomState. validation/accounting/hash-policy-amendment.json",
+  "coverage_status": "Incomplete until engine geometry, adapter scope and importer/independent review bind all actual required categories. No full ratio admitted by these software tests."
+}

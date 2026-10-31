@@ -64,7 +64,9 @@
 
 pub mod archive;
 pub mod cm_orbit;
+pub mod explicit_base;
 pub mod fiber;
+pub mod hashed;
 pub mod large_prime;
 pub mod linalg;
 pub mod pkm_semaev;
@@ -490,6 +492,7 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         Targets::Random => TargetSource::Random,
         Targets::Stride => TargetSource::Stride,
         Targets::StrideRenew => TargetSource::StrideRenew,
+        Targets::StrideRenewDeferredGuard => TargetSource::StrideRenewDeferredGuard,
         Targets::Walk | Targets::Residual => TargetSource::Walk,
         Targets::WalkPrimeFast => TargetSource::WalkPrimeFast,
         Targets::WalkPrimeSerial4 => TargetSource::WalkPrimeLanes {
@@ -606,12 +609,29 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         outcome.verified &= audit.audit.invalid_rows == 0;
         audit.audit
     });
-    let cost_qualification = audit_enabled.then(|| {
-        if archive_import {
-            "partial_counted_cost: archive creation, transfer, instance certification, hashing, recipe replay, indexing, symmetry setup and rank normalization are unpriced; total-cost and speedup unknown".to_string()
-        } else {
-            "partial_counted_cost: rank normalization is unpriced; total-cost and speedup unknown".to_string()
-        }
+    let mut unpriced_work = Vec::new();
+    if base_builder.name() == "hashed-affine" {
+        unpriced_work.push(
+            "hashed-affine setup has uncalibrated hashed_tensor_steps and omitted tensor-curve certification work",
+        );
+    }
+    if oracle.name() == "hashed-tensor" {
+        unpriced_work.push(
+            "tensor-contraction primitive steps are uncalibrated, so S excludes most of the relation phase",
+        );
+    }
+    if archive_import {
+        unpriced_work.push(
+            "archive creation, transfer, instance certification, hashing, recipe replay, indexing, symmetry setup and rank normalization are unpriced",
+        );
+    } else if audit_enabled {
+        unpriced_work.push("rank normalization is unpriced");
+    }
+    let cost_qualification = (!unpriced_work.is_empty()).then(|| {
+        format!(
+            "partial_counted_cost: {}; total-cost and speedup unknown",
+            unpriced_work.join("; ")
+        )
     });
 
     // ── The report ─────────────────────────────────────────────────
@@ -771,7 +791,9 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
 pub fn format_markdown(rows: &[RunReport]) -> String {
     let mut out = String::new();
     if rows.iter().any(|r| r.cost_qualification.is_some()) {
-        out.push_str("Archive/rank-audit rows report partial counted cost only. Original generation/transfer and unpriced work prevent total-cost or speedup claims.\n\n");
+        out.push_str(
+            "Rows with a cost qualification report partial counted cost only; total-cost and speedup claims are unavailable.\n\n",
+        );
     }
     out.push_str(
         "| instance | configuration | base | cols | pts/col | hit rate | trials | rows | rank | D_solve | D_sr | S | vs rho | correct |\n",
@@ -814,6 +836,14 @@ pub fn format_markdown(rows: &[RunReport]) -> String {
                 "NO"
             },
         ));
+    }
+    for r in rows {
+        if let Some(qualification) = &r.cost_qualification {
+            out.push_str(&format!(
+                "\n- **{} / {}**: {}\n",
+                r.instance, r.label, qualification
+            ));
+        }
     }
     out
 }
@@ -863,6 +893,43 @@ mod tests {
         spec.factor_base_params.set("size", size.to_string());
         spec.oracle_params.set("negation_folded", "1");
         spec
+    }
+
+    #[test]
+    fn hashed_affine_setup_qualification_is_independent_of_oracle() {
+        use super::hashed::HashedAffineBase;
+        use crate::cryptanalysis::ic_boundary::prime_instance_for;
+
+        let inst = prime_instance_for(24, 11);
+        let (ctx, planted) = ctx_and_planted(&inst);
+        let base = HashedAffineBase { instance: &inst };
+        let mut oracle = SubtractOracle;
+        let spec = PipelineSpec {
+            factor_base: "hashed-affine".into(),
+            oracle: "subtract".into(),
+            targets: Targets::Walk,
+            max_trials: 1,
+            ..Default::default()
+        };
+        let report = run_pipeline(
+            &ctx,
+            &spec,
+            &base,
+            &mut oracle,
+            planted,
+            &Calibration::default(),
+            Some(1.0),
+        )
+        .expect("the bounded hashed-affine pipeline should report its costs");
+
+        let qualification = report
+            .cost_qualification
+            .as_deref()
+            .expect("hashed-affine setup is not fully priced");
+        assert!(qualification.contains("hashed_tensor_steps"));
+        assert!(qualification.contains("tensor-curve certification"));
+        assert!(report.s_over_rho.is_none());
+        assert!(format_markdown(std::slice::from_ref(&report)).contains(qualification));
     }
 
     /// **The known-log base recovers the planted logarithm on a 24-bit
@@ -915,6 +982,45 @@ mod tests {
         assert_eq!(la.cost.gae, 0.0);
         assert_eq!(la.rank, 1);
         assert_eq!(report.decomposition.relations_found, 1);
+    }
+
+    /// **The `k`-sum table oracle recovers the planted logarithm** on a
+    /// 24-bit prime-order curve with `k = 3` and `k = 4`: every relation
+    /// has `k` summands, and the table holds one entry per negation orbit
+    /// of the signed `k`-sums of the base.
+    #[test]
+    fn ksum_oracle_recovers_logs_with_three_four_and_five_summands() {
+        use super::plugins::{KSumOracle, PrimeAbscissaBase};
+        use crate::cryptanalysis::ic_boundary::prime_instance_for;
+        let inst = prime_instance_for(24, 5);
+        let (ctx, planted) = ctx_and_planted(&inst);
+        for (k, size) in [(3u32, 40u64), (4, 16), (5, 10)] {
+            let mut spec = PipelineSpec {
+                factor_base: "prime-abscissa".into(),
+                oracle: "ksum".into(),
+                targets: Targets::Walk,
+                linalg: "incremental-gauss".into(),
+                max_trials: 50_000_000,
+                seed: 11,
+                ..Default::default()
+            };
+            spec.factor_base_params.set("size", size.to_string());
+            spec.oracle_params.set("m", k.to_string());
+            let mut oracle = KSumOracle::new(k);
+            let report = run_pipeline(
+                &ctx,
+                &spec,
+                &PrimeAbscissaBase { instance: &inst },
+                &mut oracle,
+                planted,
+                &Calibration::default(),
+                None,
+            )
+            .expect("the configuration should run");
+            assert!(report.verified, "k = {k}: did not recover the log");
+            assert_eq!(report.recovered, Some(planted));
+            assert!(report.decomposition.relations_found > 0);
+        }
     }
 
     /// **`scalars=random`**: `B` seeded uniform scalars, charged as scalar
@@ -1203,6 +1309,36 @@ mod tests {
         let rn = &renew.decomposition.cost;
         assert!(rn.native.get("stride_renewals").copied().unwrap_or(0) >= 1);
         assert!(rn.group_ops.scalar_mults >= 6 && rn.group_ops.scalar_mults < 32);
+        // The deferred guard presents the same targets, keeps the same rows
+        // and recovers the same logarithm.  It probes only the targets that
+        // decompose; each repeat the eager guard skipped costs it one table
+        // lookup instead, and at most one confirming addition.
+        let deferred = run(Targets::StrideRenewDeferredGuard);
+        assert!(deferred.verified);
+        assert_eq!(deferred.recovered, Some(planted));
+        assert_eq!(
+            deferred.decomposition.targets_tried,
+            renew.decomposition.targets_tried
+        );
+        let dn = &deferred.decomposition.cost;
+        let count = |c: &PhaseCost, key: &str| c.native.get(key).copied().unwrap_or(0);
+        for key in [
+            "relations",
+            "stride_steps",
+            "stride_restarts",
+            "stride_renewals",
+        ] {
+            assert_eq!(count(dn, key), count(rn, key), "{key}");
+        }
+        let eager_skips = count(rn, "repeated_targets_skipped");
+        assert_eq!(count(dn, "lookups"), count(rn, "lookups") + eager_skips);
+        assert_eq!(dn.group_ops.scalar_mults, rn.group_ops.scalar_mults);
+        assert_eq!(dn.group_ops.doubles, rn.group_ops.doubles);
+        assert!(dn.group_ops.adds >= rn.group_ops.adds);
+        assert!(dn.group_ops.adds <= rn.group_ops.adds + eager_skips);
+        let probes = count(dn, "target_guard_probes");
+        assert!(probes <= count(dn, "relations") + count(dn, "repeated_targets_skipped"));
+        assert!(probes < count(rn, "target_guard_probes"));
         assert_eq!(stride.recovered, Some(planted));
         let rel = &stride.decomposition.cost;
         assert_eq!(rel.native.get("stride_restarts"), Some(&1));
