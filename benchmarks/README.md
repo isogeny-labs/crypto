@@ -38,6 +38,7 @@ text, digest, reason, and source provenance. Archived rows are not measurements
 admitted by this table and cannot satisfy the validation gate.
 The [N53 root-batching evidence awaiting validation](N53_ROOT_BATCH_UNADMITTED_20261021.md) is retained separately from the admitted index.
 
+The [retained Weil weighted decomposition entry](WEIL_UNADMITTED_20261021.md) is outside the admitted table pending validation artifacts.
 The [retained wide-variable engine report](WIDE_VARS_UNADMITTED_20261021.md)
 remains outside this table pending validation admission.
 The [retained cross-layout screen](N83_CROSSLAYOUT_UNADMITTED_20261021.md)

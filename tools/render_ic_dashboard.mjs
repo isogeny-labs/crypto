@@ -317,6 +317,7 @@ function ghsWeakPanel() {
 </section>`;
 }
 const retainedPanels = [
+  ['weil-weighted-20261019','Weighted cubic Weil slots on larger native fixtures · 19 October 2026'],
   ['ghs-weak-n4-20261019','GHS-weak family: plane-quartic index calculus against matched rho · 19 October 2026'],
   ['conductor-gap-native-20261015','Conductor-gap native controls: paired solves and generic recurrence · 15 October 2026'],
   ['cold-compact-orbit-20261003','Historical compact-orbit cold-cost panel'],
