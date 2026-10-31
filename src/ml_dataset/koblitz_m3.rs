@@ -6966,6 +6966,7 @@ struct CanonicalResultView<'a> {
     retired_hardware_instructions: Option<u64>,
 }
 struct CanonicalPipelineRun<'a> {
+    producer_input: Option<Box<ProducerInputReceipt>>,
     artifacts_taken: bool,
     pipeline: Option<BoundPipelineRun<'a>>,
     input_sha256: Option<String>,
@@ -6986,6 +6987,7 @@ fn run_canonical_pipeline<'a>(
     persist: &mut impl FnMut(&[u8], &mut Budget, &mut usize) -> Result<(), String>,
 ) -> CanonicalPipelineRun<'a> {
     let mut out = CanonicalPipelineRun {
+        producer_input: None,
         artifacts_taken: false,
         pipeline: None,
         input_sha256: None,
@@ -8298,11 +8300,15 @@ impl CanonicalPipelineRun<'_> {
             if let Some(failure) = &run.native.persistence_failure {
                 if !failure.bytes.is_empty() {
                     emit(
-                        (
-                            "partial/koblitz-m3-input.raw",
-                            "unregistered-partial-artifact",
-                            "native",
-                        ),
+                        if self.producer_input.is_some() {
+                            KOBLITZ_SLOTS[0]
+                        } else {
+                            (
+                                "partial/koblitz-m3-input.raw",
+                                "unregistered-partial-artifact",
+                                "native",
+                            )
+                        },
                         failure.bytes.as_slice(),
                         None,
                     )?;
@@ -8998,6 +9004,7 @@ struct OwnedRetainedArtifact {
     publication: Option<crate::ml_dataset::capture::WitnessReceipt>,
 }
 struct ParentArtifacts {
+    producer_input: Option<Box<ProducerInputReceipt>>,
     ledger_before_owners: SavedBudgetLedger,
     owner_quote: RetentionQuote,
     items: Vec<OwnedRetainedArtifact>,
@@ -9107,15 +9114,12 @@ fn take_parent_artifacts(
         for item in &mut items {
             let bytes = match item.logical_path {
                 "koblitz-m3-input.json" => {
-                    &mut run
-                        .pipeline
-                        .as_mut()
-                        .unwrap()
-                        .native
-                        .matrix
-                        .as_mut()
-                        .unwrap()
-                        .original_bytes
+                    let native = &mut run.pipeline.as_mut().unwrap().native;
+                    if let Some(matrix) = &mut native.matrix {
+                        &mut matrix.original_bytes
+                    } else {
+                        &mut native.persistence_failure.as_mut().unwrap().bytes
+                    }
                 }
                 "koblitz-m3-events.jsonl" => {
                     &mut run
@@ -9173,8 +9177,18 @@ fn take_parent_artifacts(
             };
             item.payload.bytes = std::mem::take(bytes);
         }
+        let mut producer_input = run.producer_input.take();
+        if let Some(r) = &mut producer_input {
+            let input = items
+                .iter_mut()
+                .find(|a| a.logical_path == KOBLITZ_SLOTS[0].0)
+                .expect("attached input has owner");
+            input.capture_acknowledged = r.capture_sequence.is_some();
+            input.root_artifact = r.root_artifact.take();
+        }
         run.artifacts_taken = true;
         Ok(ParentArtifacts {
+            producer_input,
             ledger_before_owners,
             owner_quote: quote.resources,
             items,
@@ -9381,6 +9395,10 @@ fn persist_parent_artifacts(
         return Err(stop);
     }
     for item in &mut owned.items {
+        if owned.producer_input.is_some() && item.logical_path == KOBLITZ_SLOTS[0].0 {
+            // Original producer attempt is terminal: never retry it here.
+            continue;
+        }
         if item.root_artifact.is_some() {
             continue;
         }
@@ -9776,6 +9794,7 @@ impl serde::Serialize for ParentItems<'_> {
 }
 #[derive(serde::Serialize)]
 struct ParentDeliveryView<'a> {
+    producer_input: Option<&'a ProducerInputReceipt>,
     schema: &'static str,
     snapshot_boundary: &'static str,
     binding: &'a crate::ml_dataset::capture::AttemptBinding,
@@ -9833,6 +9852,7 @@ impl ParentDeliveryFile {
                 .iter()
                 .all(|a| a.capture_acknowledged && a.root_artifact.is_some());
         let view = ParentDeliveryView {
+            producer_input: owned.producer_input.as_deref(),
             schema: "crypto.ml-dataset.koblitz-m3-parent-delivery/v1",
             snapshot_boundary: "before-parent-record-encoding-and-storage",
             binding,
@@ -9892,6 +9912,8 @@ struct SavedParentItem {
 #[derive(serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 struct SavedParentDelivery {
+    #[serde(default)]
+    producer_input: Option<ProducerInputReceipt>,
     schema: String,
     snapshot_boundary: String,
     binding: crate::ml_dataset::capture::AttemptBinding,
@@ -9906,6 +9928,8 @@ struct SavedParentDelivery {
 }
 #[derive(Debug)]
 struct VerifiedParentDelivery {
+    producer_transition_valid: bool,
+    producer_entry_anchor_verified: bool,
     delivery_complete: bool,
     root_artifacts: usize,
     capture_acknowledgements: usize,
@@ -9991,6 +10015,15 @@ fn verify_parent_delivery(
             return Err("parent inventory omits committed witness".into());
         }
     }
+    if let Some(p) = &r.producer_input {
+        if p.binding_sha256 != binding.digest()? || p.root_artifact.is_some() {
+            return Err("producer input receipt identity mismatch".into());
+        }
+        verify_producer_input_transition(p, expected_before, capture)?;
+        if !has_row(KOBLITZ_SLOTS[0].0, KOBLITZ_SLOTS[0].1, KOBLITZ_SLOTS[0].2) {
+            return Err("producer input omitted from parent inventory".into());
+        }
+    }
     let mut owner = RetentionQuote {
         work: 512,
         bytes: 512,
@@ -10064,9 +10097,24 @@ fn verify_parent_delivery(
         payload_total = payload_total
             .checked_add(a.bytes)
             .ok_or("payload sum overflow")?;
+        let producer = r
+            .producer_input
+            .as_ref()
+            .filter(|_| path == KOBLITZ_SLOTS[0].0);
+        if let Some(p) = producer {
+            if a.attempted
+                || a.admitted
+                || a.quote.is_some()
+                || a.bytes != p.payload_bytes
+                || a.capture_acknowledged != p.capture_sequence.is_some()
+                || a.root_artifact.is_none() && p.exit.first_stop.is_none()
+            {
+                return Err("producer input rewritten as parent action".into());
+            }
+        }
         if a.attempted != a.quote.is_some()
             || a.admitted && !a.attempted
-            || a.capture_acknowledged && !a.admitted
+            || a.capture_acknowledged && !a.admitted && producer.is_none()
             || a.root_artifact.is_some() && !a.capture_acknowledged
             || uncompleted && a.attempted
         {
@@ -10093,7 +10141,7 @@ fn verify_parent_delivery(
                     .ok_or("parent trace overflow")?;
             }
         }
-        if a.root_artifact.is_none() {
+        if a.root_artifact.is_none() && producer.is_none() {
             uncompleted = true;
         }
         let committed: Vec<_> = prefix
@@ -10108,6 +10156,16 @@ fn verify_parent_delivery(
             let p = &committed[0].1;
             if p.role != role || p.encoding != encoding || p.bytes != a.bytes {
                 return Err("parent capture identity mismatch".into());
+            }
+        }
+        if let Some(p) = producer {
+            if let Some(sequence) = p.capture_sequence {
+                if committed[0].0 != sequence
+                    || p.payload_sha256.map(|h| hex::encode(h)).as_deref()
+                        != Some(committed[0].1.sha256.as_str())
+                {
+                    return Err("producer input capture receipt mismatch".into());
+                }
             }
         }
         if a.capture_acknowledged {
@@ -10174,6 +10232,9 @@ fn verify_parent_delivery(
         return Err("parent delivery completion mismatch".into());
     }
     Ok(VerifiedParentDelivery {
+        producer_transition_valid: r.producer_input.is_some(),
+        // Later parent boundary does not independently anchor earlier entry.
+        producer_entry_anchor_verified: false,
         delivery_complete: complete,
         root_artifacts: roots,
         capture_acknowledgements: acknowledgements,
@@ -10458,10 +10519,77 @@ mod worker_math_decode_tests {
 
 /// One original-input publication attempt before matrix execution. Receipts are
 /// retained before post-call deadline checks; root storage follows capture.
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ProducerInputReceipt {
+    binding_sha256: String,
+    payload_sha256: Option<[u8; 32]>,
+    payload_bytes: u64,
+    entry: SavedBudgetLedger,
+    exit: SavedBudgetLedger,
+    quote: Option<RetentionQuote>,
+    checking_admitted: bool,
+    trace_admitted: bool,
+    capture_count_before: u64,
+    capture_sequence: Option<u64>,
+    root_artifact: Option<crate::ml_dataset::types::Artifact>,
+}
+/// This verifies modeled transitions, not an independently measured entry balance.
+fn verify_producer_input_transition(
+    r: &ProducerInputReceipt,
+    expected_parent: SavedBudgetLedger,
+    capture: &crate::ml_dataset::capture::CaptureLimits,
+) -> Result<(), String> {
+    let q = r.quote.ok_or("producer input missing storage quote")?;
+    if q != quote_parent_storage_length(r.payload_bytes, false, capture)
+        .map_err(|s| format!("producer storage quote: {s:?}"))?
+        || r.entry.phase != Phase::Constructed
+        || r.entry.first_stop.is_some()
+        || r.entry.original_limits != expected_parent.original_limits
+        || r.exit.original_limits != r.entry.original_limits
+        || r.exit.phase != r.entry.phase
+        || r.exit.native_reserved != r.entry.native_reserved
+        || r.exit.checking_reported_work != r.entry.checking_reported_work
+        || r.exit.group_additions != r.entry.group_additions
+        || r.trace_admitted && !r.checking_admitted
+        || r.capture_sequence.is_some() && !r.trace_admitted
+        || r.root_artifact.is_some() && r.capture_sequence.is_none()
+        || r.payload_sha256.is_none()
+        || (!r.trace_admitted || r.capture_sequence.is_none()) && r.exit.first_stop.is_none()
+    {
+        return Err("producer input admission order mismatch".into());
+    }
+    let work = if r.checking_admitted { q.work } else { 0 };
+    let bytes = if r.checking_admitted { q.bytes } else { 0 };
+    let trace = if r.trace_admitted { q.trace } else { 0 };
+    if r.entry.checking_reserved_work.checked_add(work) != Some(r.exit.checking_reserved_work)
+        || r.entry.adapter_reserved_bytes.checked_add(bytes) != Some(r.exit.adapter_reserved_bytes)
+        || r.entry.charged_trace_bytes.checked_add(trace) != Some(r.exit.charged_trace_bytes)
+        || r.exit.checking_reserved_work > expected_parent.checking_reserved_work
+        || r.exit.adapter_reserved_bytes > expected_parent.adapter_reserved_bytes
+        || r.exit.charged_trace_bytes > expected_parent.charged_trace_bytes
+        || r.exit.native_reserved.work > expected_parent.native_reserved.work
+        || r.exit.native_reserved.bytes > expected_parent.native_reserved.bytes
+        || r.exit.group_additions > expected_parent.group_additions
+        || r.exit.first_stop.is_some() && r.exit.first_stop != expected_parent.first_stop
+        || r.capture_sequence
+            .is_some_and(|seq| r.capture_count_before.checked_add(1) != Some(seq))
+    {
+        return Err("producer input modeled ledger mismatch".into());
+    }
+    for ledger in [r.entry, r.exit] {
+        verify_budget_ledger(
+            &serde_json::to_vec(&ledger).map_err(|e| e.to_string())?,
+            expected_parent.original_limits,
+        )?;
+    }
+    Ok(())
+}
 struct PreMatrixInputStore<'a> {
     root: &'a std::path::Path,
     limits: &'a crate::ml_dataset::capture::CaptureLimits,
     binding_digest: [u8; 64],
+    receipt: Option<Box<ProducerInputReceipt>>,
     attempted: bool,
     capture_acknowledged: bool,
     capture_sequence: Option<u64>,
@@ -10476,9 +10604,13 @@ impl<'a> PreMatrixInputStore<'a> {
         limits: &'a crate::ml_dataset::capture::CaptureLimits,
         budget: &mut Budget,
     ) -> Result<Self, Stop> {
+        // Original setup quote plus a bounded one-shot attachment allowance:
+        // 32-byte hex encoding, two 64-byte identity comparisons and fixed
+        // state/length checks. This allowance remains charged if never used.
         budget.reserve_checking(
-            4096,
-            std::mem::size_of::<Self>() as u64 + 4096,
+            4096 + 512,
+            (std::mem::size_of::<Self>() + std::mem::size_of::<ProducerInputReceipt>()) as u64
+                + 4096,
             Instant::now(),
         )?;
         let digest = binding
@@ -10491,6 +10623,19 @@ impl<'a> PreMatrixInputStore<'a> {
             root,
             limits,
             binding_digest,
+            receipt: Some(Box::new(ProducerInputReceipt {
+                binding_sha256: digest,
+                payload_sha256: None,
+                payload_bytes: 0,
+                entry: budget.saved_ledger(),
+                exit: budget.saved_ledger(),
+                quote: None,
+                checking_admitted: false,
+                trace_admitted: false,
+                capture_count_before: 0,
+                capture_sequence: None,
+                root_artifact: None,
+            })),
             attempted: false,
             capture_acknowledged: false,
             capture_sequence: None,
@@ -10518,6 +10663,10 @@ impl<'a> PreMatrixInputStore<'a> {
             return Err("original input publication already attempted".into());
         }
         self.attempted = true;
+        let receipt = self.receipt.as_mut().expect("publisher owns receipt");
+        receipt.entry = budget.saved_ledger();
+        receipt.payload_bytes = bytes.len() as u64;
+        receipt.capture_count_before = *global as u64;
         let result = (|| {
             if budget.phase != Phase::Constructed {
                 return budget
@@ -10534,12 +10683,18 @@ impl<'a> PreMatrixInputStore<'a> {
                 .ok_or("input capture sequence overflow")?;
             let quote = quote_parent_storage_length(bytes.len() as u64, false, self.limits)
                 .map_err(|s| format!("input storage quote: {s:?}"))?;
+            receipt.quote = Some(quote);
             budget
                 .reserve_checking(quote.work, quote.bytes, Instant::now())
                 .map_err(|s| format!("input storage admission: {s:?}"))?;
+            receipt.checking_admitted = true;
+            // Existing 32-per-byte storage tariff covers this digest work.
+            use sha2::Digest;
+            receipt.payload_sha256 = Some(sha2::Sha256::digest(bytes).into());
             budget
                 .reserve_trace(quote.trace, Instant::now())
                 .map_err(|s| format!("input storage trace: {s:?}"))?;
+            receipt.trace_admitted = true;
             super::LIVE_SINK.with(|slot| match slot.borrow().as_ref() {
                 Some(super::EventSink::Bound(sink)) => sink.verify_digest_limits_at_count(
                     &self.binding_digest,
@@ -10589,7 +10744,58 @@ impl<'a> PreMatrixInputStore<'a> {
             self.stop = budget.stopped;
             self.error = Some(error.clone());
         }
+        receipt.exit = budget.saved_ledger();
+        receipt.capture_sequence = self.capture_sequence;
         result
+    }
+    /// Attach once to the exact canonical input already hashed by its wrapper.
+    /// Fixed comparison/encoding work uses the constructor's prepaid 512 units.
+    /// No hashing, write or fresh budget reservation occurs after producer stop.
+    /// Error strings use the constructor's existing metadata allocation allowance.
+    fn attach_to(&mut self, run: &mut CanonicalPipelineRun<'_>) -> Result<(), String> {
+        if !self.attempted || run.artifacts_taken || run.producer_input.is_some() {
+            return Err("producer input attachment state mismatch".into());
+        }
+        let r = self
+            .receipt
+            .as_ref()
+            .ok_or("producer input receipt already moved")?;
+        let digest = r
+            .payload_sha256
+            .ok_or("producer input lacks admitted digest")?;
+        let mut encoded = [0u8; 64];
+        for (i, byte) in digest.iter().copied().enumerate() {
+            encoded[2 * i] = b"0123456789abcdef"[(byte >> 4) as usize];
+            encoded[2 * i + 1] = b"0123456789abcdef"[(byte & 15) as usize];
+        }
+        if run.input_sha256.as_ref().map(|s| s.as_bytes()) != Some(encoded.as_slice()) {
+            return Err("producer input differs from canonical buffer".into());
+        }
+        let native = &run
+            .pipeline
+            .as_ref()
+            .ok_or("missing producer pipeline")?
+            .native;
+        if native.events.as_ref().map(|e| e.binding_digest) != Some(self.binding_digest) {
+            return Err("producer input attempt differs from native attempt".into());
+        }
+        let retained_len = if let Some(m) = &native.matrix {
+            m.original_bytes.len()
+        } else if let Some(f) = &native.persistence_failure {
+            if !f.serialized_complete {
+                return Err("producer input is not fully encoded".into());
+            }
+            f.bytes.len()
+        } else {
+            return Err("producer input buffer absent".into());
+        };
+        if retained_len as u64 != r.payload_bytes {
+            return Err("producer input length mismatch".into());
+        }
+        let mut receipt = self.receipt.take().unwrap();
+        receipt.root_artifact = self.root_artifact.take();
+        run.producer_input = Some(receipt);
+        Ok(())
     }
 }
 
@@ -10738,6 +10944,278 @@ mod pre_matrix_input_store_tests {
                 let before = global;
                 assert!(storage.publish(b"retry", &mut budget, &mut global).is_err());
                 assert_eq!(global, before);
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod producer_input_adoption_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix::Engine;
+    #[test]
+    fn original_storage_moves_into_parent_without_republication() {
+        // Retain the existing owner tariffs; the receipt allocation was prepaid
+        // by its producer and moves through a single Box owner.
+        assert!(std::mem::size_of::<ParentArtifacts>() <= 512);
+        assert!(std::mem::size_of::<OwnedRetainedArtifact>() <= 512);
+        for engine in [Engine::F4Macaulay, Engine::F5KoszulFrobenius] {
+            for mode in 0..4 {
+                let binding = matrix_tests::binding();
+                let capture = crate::ml_dataset::capture::capture_limits(16).unwrap();
+                let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+                let root = sink.dir.parent().unwrap();
+                if mode == 1 {
+                    std::fs::write(root.join(KOBLITZ_SLOTS[0].0), b"root collision").unwrap();
+                }
+                let original = construction_tests::fixture();
+                let mut budget = construction_tests::budget();
+                let original_limits = budget.original_limits();
+                let mut delivery = ParentDeliveryFile::admit(&mut budget).unwrap();
+                let mut publisher =
+                    PreMatrixInputStore::new(root, &binding, &capture, &mut budget).unwrap();
+                let late = budget.deadline + Duration::from_secs(1);
+                let mut global = 0;
+                let mut run = run_canonical_pipeline(
+                    &original,
+                    &binding,
+                    &capture,
+                    &"8".repeat(64),
+                    &"9".repeat(64),
+                    engine,
+                    3,
+                    &mut budget,
+                    &mut global,
+                    &mut |bytes, b, g| {
+                        if mode == 3 {
+                            let quote =
+                                quote_parent_storage_length(bytes.len() as u64, false, &capture)
+                                    .unwrap();
+                            // Fault injection consumes existing trace headroom, without increasing limits.
+                            b.trace_bytes = b.trace_limit - quote.trace + 1;
+                        }
+                        if mode == 2 {
+                            publisher.publish_with_finish_time(bytes, b, g, || late)
+                        } else {
+                            publisher.publish(bytes, b, g)
+                        }
+                    },
+                );
+                assert_eq!(
+                    run.pipeline.as_ref().unwrap().native.matrix.is_some(),
+                    mode == 0
+                );
+                let actual_input_pointer = if mode == 0 {
+                    run.pipeline
+                        .as_ref()
+                        .unwrap()
+                        .native
+                        .matrix
+                        .as_ref()
+                        .unwrap()
+                        .original_bytes
+                        .as_ptr()
+                } else {
+                    run.pipeline
+                        .as_ref()
+                        .unwrap()
+                        .native
+                        .persistence_failure
+                        .as_ref()
+                        .unwrap()
+                        .bytes
+                        .as_ptr()
+                };
+                publisher.attach_to(&mut run).unwrap();
+                assert!(publisher.attach_to(&mut run).is_err());
+                let before = budget.saved_ledger();
+                let receipt = run.producer_input.as_ref().unwrap();
+                verify_producer_input_transition(receipt, before, &capture).unwrap();
+                assert!(receipt.checking_admitted);
+                assert_eq!(receipt.trace_admitted, mode != 3);
+                assert_eq!(receipt.capture_sequence.is_some(), mode != 3);
+                if mode == 3 {
+                    let q = receipt.quote.unwrap();
+                    assert_eq!(
+                        receipt.exit.checking_reserved_work,
+                        receipt.entry.checking_reserved_work + q.work
+                    );
+                    assert_eq!(
+                        receipt.exit.adapter_reserved_bytes,
+                        receipt.entry.adapter_reserved_bytes + q.bytes
+                    );
+                    assert_eq!(
+                        receipt.exit.charged_trace_bytes,
+                        receipt.entry.charged_trace_bytes
+                    );
+                    assert_eq!(receipt.exit.first_stop, Some(Stop::Trace));
+                }
+                let mut parent = ParentRetention::begin(&mut budget).unwrap();
+                let transferred = take_parent_artifacts(&mut run, &mut parent);
+                assert!(
+                    transferred.error.is_none(),
+                    "owner transfer {engine:?} mode {mode}"
+                );
+                let mut owned = transferred.value.unwrap();
+                let input = &owned.items[0];
+                assert_eq!(input.logical_path, KOBLITZ_SLOTS[0].0);
+                assert_eq!(input.payload.bytes.as_ptr(), actual_input_pointer);
+                assert!(
+                    !input.storage_attempted
+                        && !input.storage_admitted
+                        && input.storage_quote.is_none()
+                );
+                assert_eq!(input.root_artifact.is_some(), mode == 0 || mode == 2);
+                assert_eq!(input.capture_acknowledged, mode != 3);
+                let prefix_before = crate::ml_dataset::capture::verify_live_committed_prefix(
+                    root, &binding, &capture,
+                )
+                .unwrap()
+                .unwrap();
+                let original_input_count = prefix_before
+                    .payloads
+                    .iter()
+                    .filter(|(_, a)| a.path == format!("payloads/{}", KOBLITZ_SLOTS[0].0))
+                    .count();
+                let _ = persist_parent_artifacts(&mut owned, &mut parent, root, &binding, &capture);
+                let prefix_after = crate::ml_dataset::capture::verify_live_committed_prefix(
+                    root, &binding, &capture,
+                )
+                .unwrap()
+                .unwrap();
+                assert_eq!(
+                    prefix_after
+                        .payloads
+                        .iter()
+                        .filter(|(_, a)| a.path == format!("payloads/{}", KOBLITZ_SLOTS[0].0))
+                        .count(),
+                    original_input_count
+                );
+                assert!(!owned.items[0].storage_attempted);
+                if mode == 1 {
+                    assert_eq!(
+                        std::fs::read(root.join(KOBLITZ_SLOTS[0].0)).unwrap(),
+                        b"root collision"
+                    );
+                }
+                delivery.finish(&owned, &parent, &binding, root).unwrap();
+                let mut manifest: Vec<_> = owned
+                    .items
+                    .iter()
+                    .filter_map(|a| a.root_artifact.clone())
+                    .collect();
+                manifest.push(delivery.artifact.clone().unwrap());
+                let checked = verify_parent_delivery(
+                    root,
+                    &manifest,
+                    &binding,
+                    &capture,
+                    original_limits,
+                    before,
+                )
+                .unwrap();
+                assert!(checked.producer_transition_valid);
+                assert!(!checked.producer_entry_anchor_verified);
+                if mode == 1 || mode == 3 {
+                    assert!(!checked.delivery_complete);
+                }
+                if mode == 0 {
+                    let path = root.join(PARENT_DELIVERY_SLOT.0);
+                    let original_record = std::fs::read(&path).unwrap();
+                    let base: serde_json::Value = serde_json::from_slice(&original_record).unwrap();
+                    for mutation in 0..7 {
+                        let mut forged = base.clone();
+                        match mutation {
+                            0 => forged["producer_input"]["binding_sha256"] = "0".repeat(64).into(),
+                            1 => {
+                                let sequence = forged["producer_input"]["capture_sequence"]
+                                    .as_u64()
+                                    .unwrap();
+                                // Keep the claimed sequence transition coherent;
+                                // actual committed capture must still reject it.
+                                forged["producer_input"]["capture_sequence"] =
+                                    (sequence + 1).into();
+                                let prior = forged["producer_input"]["capture_count_before"]
+                                    .as_u64()
+                                    .unwrap();
+                                forged["producer_input"]["capture_count_before"] =
+                                    (prior + 1).into();
+                            }
+                            2 => {
+                                let byte = forged["producer_input"]["payload_sha256"][0]
+                                    .as_u64()
+                                    .unwrap();
+                                forged["producer_input"]["payload_sha256"][0] =
+                                    ((byte + 1) % 256).into();
+                            }
+                            3 => {
+                                let work =
+                                    forged["producer_input"]["quote"]["work"].as_u64().unwrap();
+                                forged["producer_input"]["quote"]["work"] = (work + 1).into();
+                            }
+                            4 => {
+                                // Forged parent-origin accounting of an already
+                                // acknowledged producer storage operation.
+                                forged["items"][0]["attempted"] = true.into();
+                                forged["items"][0]["admitted"] = true.into();
+                                forged["items"][0]["quote"] =
+                                    forged["producer_input"]["quote"].clone();
+                            }
+                            5 => {
+                                forged["items"].as_array_mut().unwrap().remove(0);
+                            }
+                            6 => forged["producer_input"] = serde_json::Value::Null,
+                            _ => unreachable!(),
+                        }
+                        let bytes = serde_json::to_vec(&forged).unwrap();
+                        // Re-sign the mutable test manifest entry so this tests
+                        // semantic receipt authentication, not outer file hashing.
+                        let mut forged_manifest = manifest.clone();
+                        let a = forged_manifest
+                            .iter_mut()
+                            .find(|a| a.path == PARENT_DELIVERY_SLOT.0)
+                            .unwrap();
+                        a.bytes = bytes.len() as u64;
+                        a.sha256 = crate::ml_dataset::digest(&bytes);
+                        std::fs::write(&path, &bytes).unwrap();
+                        assert!(
+                            verify_parent_delivery(
+                                root,
+                                &forged_manifest,
+                                &binding,
+                                &capture,
+                                original_limits,
+                                before
+                            )
+                            .is_err(),
+                            "producer receipt mutation {mutation} {engine:?}"
+                        );
+                    }
+                    std::fs::write(&path, &original_record).unwrap();
+                    assert!(verify_parent_delivery(
+                        root,
+                        &manifest,
+                        &binding,
+                        &capture,
+                        original_limits,
+                        before
+                    )
+                    .is_ok());
+                }
+                let r = owned.producer_input.as_mut().unwrap();
+                let old = r.exit.checking_reserved_work;
+                r.exit.checking_reserved_work += 1;
+                assert!(verify_producer_input_transition(r, before, &capture).is_err());
+                r.exit.checking_reserved_work = old;
+                let old_entry = r.entry.checking_reserved_work;
+                let old_exit = r.exit.checking_reserved_work;
+                // A consistently lowered report can fit beneath the trusted later
+                // boundary: it must never acquire independent-anchor status.
+                r.entry.checking_reserved_work -= 1;
+                r.exit.checking_reserved_work -= 1;
+                assert!(verify_producer_input_transition(r, before, &capture).is_ok());
+                r.entry.checking_reserved_work = old_entry;
+                r.exit.checking_reserved_work = old_exit;
             }
         }
     }
