@@ -1,0 +1,2 @@
+# Frozen receipt review plan
+Inspect the root-admitted single fixed-control execution without replay. Verify compiler/run receipts, exact commands and limits, bound compiler/dependency/source/executable hashes, one each six PASS and terminal markers, ordered probe outcomes and errno, child readiness/reap counts and status. Compare frozen helper to previously reviewed v2, preserve scope exclusions and original failure uncertainty. No repository edits or native rerun. Render neutral PDF/SVG/JSON with exact source references.

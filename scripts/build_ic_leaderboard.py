@@ -19,7 +19,7 @@ Every curve is named by its ICV1 slug (docs/curves/ICV1.md) through the
 curve registry.  Every number is read from a frozen file named in
 `SOURCES`; operation exponents are log2 of frozen total GAE counts.  The
 other arithmetic averages recorded repetitions, divides operations by
-sqrt(r) to express S, and taking a phase's share of its row's total. For the retained-setup online rows of the frontier audit, the generic-bound distance is log2(S*T^2) - log2(r/|Aut|) from the advice states S and online probes T the row's frozen file records; a row whose frozen files do not record S and T reads "not recorded".
+sqrt(r) to express S, and takes a phase's share of its row's total.
 """
 from __future__ import annotations
 
@@ -75,11 +75,13 @@ SOURCES = {
     "f6_small_cold_replay": "research/f6_ic_geometric_closure_20261003/small_cold/replay-certificate.json",
     "f6_ecbench_ladder": "research/f6_ic_ecbench_ladder_20261005/ANALYSIS.json",
     "f4_f5_f6_cross_family": "research/f4_f5_f6_cross_family_20261011/ANALYSIS.json",
+    "frontier_establishment": "research/ecbench_e2e_frontier_20261031/establishment/certificate.json",
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
     "lazy_members": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
     "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
+    "lazy_columns2": "research/ecbench_lazy_columns2_20261018/figures/ratios.json",
     "postgb_linear_stage": "research/postgb_linear_stage_20261026/analysis/summary.json",
     "ic_m2_linear_ladder": "research/ic_m2_linear_ladder_20261024/fit.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
@@ -119,7 +121,6 @@ SOURCES = {
     "ghs_weak_n4_primary": "research/quartic_n4_20261019/results/summary_primary.json",
     "ghs_weak_n4v2": "research/quartic_n4v2_20261020/results/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
-    "n83_dense_root_primary": "research/n83_dense_root_20261013/analysis_primary.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
     "jv_sieve_strong_rho": "research/jv_sieve_strong_rho_20261019/review-20261020/summary.json",
@@ -454,6 +455,10 @@ def attach_display_operation_costs(board: list[dict], names: Names) -> None:
             recipe["log2_total_gae"] = math.log2(total_gae)
 
 
+# These engineering components also carry validation gates outside tables A-C.
+COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather",)
+
+
 def require_materialized_gate_inputs(board: list[dict]) -> None:
     """Do not demote validated rows because their certificates are sparse-excluded.
 
@@ -465,8 +470,9 @@ def require_materialized_gate_inputs(board: list[dict]) -> None:
     sparse = {item[2:].decode("utf-8", "surrogateescape")
               for item in raw.split(b"\0") if item.startswith(b"S ")}
     needed = {gate.PRE_GATE_LEADERBOARD, gate.SWEEPS["leaderboard"]}
-    for row in board:
-        evidence = REPO / gate.board_evidence_dir(row)
+    evidence_dirs = {gate.board_evidence_dir(row) for row in board} | set(COMPONENT_EVIDENCE_DIRS)
+    for directory in sorted(evidence_dirs):
+        evidence = REPO / directory
         manifest = evidence / gate.MANIFEST
         needed.add(str(manifest.relative_to(REPO)))
         if not manifest.is_file():
@@ -488,7 +494,7 @@ def require_materialized_gate_inputs(board: list[dict]) -> None:
                         raw_path = (evidence / name).resolve()
                         if raw_path.is_relative_to(REPO):
                             needed.add(str(raw_path.relative_to(REPO)))
-    missing = sorted(needed & sparse)
+    missing = sorted(path for path in needed & sparse if not (REPO / path).is_file())
     if missing:
         raise SystemExit("leaderboard validation inputs are sparse-excluded; hydrate these "
                          "committed paths before generating:\n" + "\n".join(missing))
@@ -832,8 +838,10 @@ def prime_base_size_component() -> dict:
     return {"rows": rows, "class": "engineering", "study": study + "/", "report": study + "/README.pdf",
             "second_host": second_host,
             "unit": "S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation",
-            "validation": ("validated with caveats: replay certificate, validator report and the matched rho "
-                           f"reference with the §5a band ({study}/VALIDATION.json)") if not errs else NOT_VALIDATED,
+            "validation": ("Validated with caveats: replay certificate, validator report and the matched rho "
+                           f"reference with the §5a band are filed in `{study}/VALIDATION.json`. The promoted "
+                           "result is the 20-bit `N=45` engineering baseline only; it is one curve, counted "
+                           "pricing-band evidence, and not a scaling or wall-time claim.") if not errs else NOT_VALIDATED,
             "validated": not errs}
 
 
@@ -850,75 +858,20 @@ def lazy_members_component() -> dict:
             "source": SOURCES["lazy_members"], "validation": NOT_VALIDATED}
 
 
-N83_SUBGROUP_ORDER = 8569786107849059   # research/n83_dense_root_20261013/REPORT.md; checked against the registry
-
-
-def n83_generic_bound(n83: dict) -> dict:
-    """log2(S*T^2) - log2(r/|Aut|) for the n83 dense K1798 online row.
-
-    S is the primary run's `regular_states` (advice states), T its
-    `mean_target_probes` over the one public target, r the subgroup order,
-    |Aut| = 2n (negation and the n-fold Frobenius).  The inputs are the
-    frozen primary analysis and the registry; nothing is estimated.
-    """
-    dense = load(SOURCES["n83_dense_root_primary"])
-    arm = next((a for a in dense.get("arms", []) if a.get("arm") == "k1798_dense"), {})
-    same = next((c for c in dense.get("rho_same_point", {}).get("comparisons", [])
-                 if c.get("arm") == "k1798_dense"), {})
-    registry = json.dumps(load(SOURCES["registry"]))
-    if (dense.get("schema") != "n83.dense-root-analysis/v1"
-            or arm.get("status") != "PASS_INDEPENDENT_REPLAY"
-            or arm.get("targets") != 1
-            or arm.get("orbit_columns") != 1798
-            or abs(same.get("rho_over_ic_online_ratio_exploratory", 0)
-                   - n83["online_rho_over_ic"]) > 1e-6
-            or f'"subgroup_order": "{N83_SUBGROUP_ORDER}"' not in registry):
-        raise SystemExit("review the n83 dense-root primary analysis before updating the leaderboard")
-    states, probes = arm["regular_states"], arm["mean_target_probes"]
-    aut = 2 * 83
-    log_st2 = math.log2(states) + 2 * math.log2(probes)
-    log_n = math.log2(N83_SUBGROUP_ORDER / aut)
-    return {
-        "status": "computed",
-        "states": states, "probes": probes, "subgroup_order": N83_SUBGROUP_ORDER,
-        "aut": aut, "log2_s_t2": log_st2, "log2_r_over_aut": log_n,
-        "distance_bits": log_st2 - log_n,
-        "source": SOURCES["n83_dense_root_primary"],
-        "note": "S = regular_states, T = the one target's probes (`mean_target_probes`, targets = 1) "
-                "in the frozen primary analysis; derived, not measured here",
-    }
-
-
-def n61_generic_bound(n61: dict) -> dict:
-    """The n61 compact-orbit online row records no S or T in a committed file."""
-    return {
-        "status": "not recorded",
-        "source": SOURCES["frontier_audit"],
-        "note": "S and T are in no committed file. The row's evidence directory "
-                "`research/sat_factor_base_review_20260908/autolab/runs/20261012T173628Z-3fd988ea23/` "
-                "(`docs/ic/BOUNDARY_TARGETS.md`, `vs_rho` row) is not in the repository, and "
-                f"`{SOURCES['frontier_audit']}` holds only the ratio, interval, target count and setup "
-                "seconds. That run's record would have to carry the advice-state count and the mean "
-                "online probes",
-    }
-
-
-def bound_cell_md(b: dict) -> str:
-    if b["status"] != "computed":
-        return f"not recorded ({b['note']})"
-    return (f"**{b['distance_bits']:+.2f}** bits: `S` = {b['states']:,} states, `T` = {b['probes']:,.0f} "
-            f"probes, `r` = {b['subgroup_order']}, `|Aut|` = {b['aut']}; log₂(S·T²) = "
-            f"{b['log2_s_t2']:.2f}, log₂(r/|Aut|) = {b['log2_r_over_aut']:.2f}; "
-            f"[`{b['source']}`](../../{b['source']}). {b['note']}")
-
-
-def bound_cell_html(b: dict) -> str:
-    if b["status"] != "computed":
-        return f"not recorded<br><span class=\"muted\">{esc(b['note'])}</span>"
-    return (f"<strong>{b['distance_bits']:+.2f}</strong> bits<br><span class=\"muted\">"
-            f"S = {b['states']:,} states, T = {b['probes']:,.0f} probes, r = {b['subgroup_order']}, "
-            f"|Aut| = {b['aut']}; log₂(S·T²) = {b['log2_s_t2']:.2f}, log₂(r/|Aut|) = "
-            f"{b['log2_r_over_aut']:.2f}; {gh(b['source'])}. {esc(b['note'])}</span>")
+def lazy_columns2_component() -> dict:
+    """Two orbit columns against the frozen per-curve column count, under the lazy oracle:
+    research/ecbench_lazy_columns2_20261018, ratios copied from the study's saved ecbench
+    comparisons (figures/ratios.json). A tuning result for one parameter of an unchanged
+    algorithm; one cell of five improves. The ranked tables A-C are untouched."""
+    d = load(SOURCES["lazy_columns2"])
+    if d.get("schema") != "crypto.lazy_columns2/v1" or d.get("class") != "engineering":
+        raise SystemExit(f"{SOURCES['lazy_columns2']}: unexpected schema or class")
+    for r in d["rows"]:
+        if r["rho_frob_aa"]["ratio"] != 1.0:
+            raise SystemExit(f"{r['session']}: rho-frob A/A is not 1")
+    return {"rows": d["rows"], "unit": d["unit"], "class": d["class"], "note": d["note"],
+            "study": d["study"] + "/", "report": d["study"] + "/REPORT.pdf",
+            "source": SOURCES["lazy_columns2"], "validation": NOT_VALIDATED}
 
 def postgb_linear_stage_component() -> dict:
     """The linear stage after F4 across Gröbner-basis corpora, from
@@ -1504,7 +1457,6 @@ def latest_frontier_audit() -> dict:
             "label": n61["label"], "rho_over_ic": n61["online_rho_over_ic"],
             "ci95": n61["online_ci95"], "targets": n61["targets"],
             "setup_seconds_approx": n61["setup_seconds_approx"], "status": n61["status"],
-            "generic_bound": n61_generic_bound(n61),
             "correction": n61["correction"],
         },
         "exploratory_online": {
@@ -1513,7 +1465,6 @@ def latest_frontier_audit() -> dict:
             "setup_inclusive_class": n83["setup_inclusive_class"],
             "first_integer_break_even_under_model": n83["first_integer_break_even_under_model"],
             "status": n83["status"], "correction": n83["correction"],
-            "generic_bound": n83_generic_bound(n83),
         },
         "replay_block": {
             "identical": failed["replays_identical"], "total": failed["replays_total"],
@@ -1667,6 +1618,17 @@ def build(allow_unvalidated: bool = False) -> dict:
     cross = load(SOURCES["f4_f5_f6_cross_family"])
     if cross["schema"] != "f4f5f6-cross-family-analysis/v1":
         raise SystemExit("review the F4/F5/F6 cross-family analysis before updating the leaderboard")
+    establishment = load(SOURCES["frontier_establishment"])
+    current_replay = establishment.get("gates", {}).get("f4_f5_f6", {}).get(
+        "current_binary_all_replay", {})
+    replay_total = current_replay.get("total", {})
+    rho_replay = establishment.get("gates", {}).get("rho_optimization", {}).get(
+        "current_binary_replays", {})
+    if (establishment.get("schema") != "ecbench.frontier-establishment/v1"
+            or establishment.get("all_artifact_consistency_checks_passed") is not True
+            or replay_total != {"candidates": 144, "failures": 72, "reproduced": 72}
+            or rho_replay != {"candidates": 720, "reproduced": 720}):
+        raise SystemExit("review the 2026-10-31 frontier establishment certificate before updating the leaderboard")
 
     def med(arms: dict, arm: str, field: str):
         v = (arms.get(arm) or {}).get(field)
@@ -1695,6 +1657,13 @@ def build(allow_unvalidated: bool = False) -> dict:
         "source": SOURCES["f4_f5_f6_cross_family"],
         "class": "relabelling; stage diagnostic with solver word XORs unpriced (S is a lower bound)",
         "rows": cross_rows,
+        "current_binary_replay": {
+            "source": SOURCES["frontier_establishment"],
+            "auditor_binary_sha256": establishment["source_identity"]["auditor_binary_sha256"],
+            "status": establishment["gates"]["f4_f5_f6"]["status"],
+            "cells": current_replay["cells"],
+            "total": replay_total,
+        },
         "online_speedup": None,
         "fully_priced_cold_speedup": None,
     }
@@ -1984,6 +1953,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "linear_algebra_component": la_component(),
         "prime_base_size_component": prime_base_size_component(),
         "lazy_members_component": lazy_members_component(),
+        "lazy_columns2_component": lazy_columns2_component(),
         # A component speed-up (the linear stage after F4 in jv_cover) copied
         # from its study's frozen summary; it moves no row of tables A-C.
         "jv_cover_linear_stage_component": load(SOURCES["jv_cover_sparse_fglm"]),
@@ -2268,44 +2238,35 @@ def markdown(doc: dict) -> str:
     L += [f"## Frontier audit and subsequent corrections (implementation result {audit['date']})", "",
           "This performance handoff is published beside the curve-by-curve tables. The standing rho "
           "implementation improved, while its mathematical work and every ranked IC row stayed fixed.", "",
-          "| boundary | observed result | leaderboard treatment | generic-bound distance `log₂(S·T²) − log₂(r/\\|Aut\\|)` |",
-          "|:--|:--|:--|:--|",
+          "| boundary | observed result | leaderboard treatment |",
+          "|:--|:--|:--|",
           f"| Standing strong-rho implementation | complete-solve Callgrind: optimized / archived "
           f"baseline {rho['optimized_over_archived_baseline']:.6f}× and optimized / same-binary legacy "
           f"{rho['optimized_over_same_binary_legacy']:.6f}×; GAE {rho['ops_ratio']:.3f} "
           f"[{rho['ops_ci95'][0]:.3f}, {rho['ops_ci95'][1]:.3f}] over {rho['ops_pairs']} pairs; "
           f"{rho['replays_identical']}/{rho['measured_replays']} measured replays identical | "
           f"Implementation win; operation boundary unchanged. Native wall remained {rho['wall_level']} "
-          "and is not admitted | n/a (not an online IC row) |",
+          "and is not admitted |",
           f"| Canonical medium-tier Koblitz cold operations | `{cold['method']}` / "
           f"`{cold['bound_id']}`: {cold['ops_over_floor']:.3f}× floor "
           f"[{cold['ops_ci95'][0]:.3f}, {cold['ops_ci95'][1]:.3f}], "
-          f"{cold['runs']} runs at {cold['sizes']} sizes | Standing rho boundary; not an IC row | n/a (not an online IC row) |",
+          f"{cold['runs']} runs at {cold['sizes']} sizes | Standing rho boundary; not an IC row |",
           f"| Retained-setup online, `{admitted['label']}` | ~~rho/IC "
           f"{admitted['rho_over_ic']:.1f}× [{admitted['ci95'][0]:.1f}, "
           f"{admitted['ci95'][1]:.1f}], {admitted['targets']} unseen targets; about "
           f"{admitted['setup_seconds_approx']:.0f} s setup excluded~~ | **Superseded** (rho had an empty "
-          f"table); not an improvement. {admitted['correction']} | "
-          f"{bound_cell_md(admitted['generic_bound'])} |",
+          f"table); not an improvement. {admitted['correction']} |",
           f"| Retained-setup online, `{exploratory['label']}` | ~~rho/IC "
           f"{exploratory['rho_over_ic']:.6f}× on {exploratory['targets']} public point; complete IC "
           f"process {exploratory['complete_process_seconds']:.3f} s~~ | **Superseded** (rho had an empty "
-          f"table); not an improvement. {exploratory['correction']} | "
-          f"{bound_cell_md(exploratory['generic_bound'])} |",
+          f"table); not an improvement. {exploratory['correction']} |",
           f"| Current-binary root-finder replay-all | current main (2026-10-19): "
           f"{replay['current']['identical']}/{replay['current']['total']} identical; "
           f"{replay['current']['failures']} mismatches across all four IC arms; the 2026-10-13 receipt "
           f"recorded {replay['identical']}/{replay['total']} with {replay['failures']} inherited-F4 "
           "mismatches | **Open regression** under investigation (sweep D, PR #2290); root-finder rows "
           "are not claimed to pass; affected stage counters blocked from promotion. "
-          f"{replay['current']['correction']} | n/a (not an online IC row) |", "",
-          "The last column is the generic bound of "
-          "[`RESEARCH_IC_LEADS_AND_CONNECTIONS_20261010.md`](../../RESEARCH_IC_LEADS_AND_CONNECTIONS_20261010.md) "
-          "§2 and §4: `S` advice states, `T` online probes, `|Aut| = 2n`, `r` the subgroup order. A distance "
-          "of 0 is the line preprocessing rho sits on, and a row at or below it would be the first "
-          "non-generic signal. It is derived from the frozen file named in the cell, never measured here, "
-          "and a row whose frozen files do not record `S` and `T` reads \"not recorded\". "
-          "Online rows only; no cold row is priced this way.", "",
+          f"{replay['current']['correction']} |", "",
           f"[Latest result data](../../{audit['source']}); "
           f"[prior full synthesis](../../{audit['previous_source']}). {audit['reason']}", ""]
     lz = doc["lazy_members_component"]
@@ -2325,6 +2286,25 @@ def markdown(doc: dict) -> str:
     L += ["", f"[Report]({'../../' + lz['report']}) · [study](../../{lz['study']}) · "
               f"[data](../../{lz['source']}). Distance to rho is reported, not a gate; no ranking against "
               "rho is claimed.", "", lz["validation"], ""]
+    c2 = doc["lazy_columns2_component"]
+    L += ["## Component tuning: two orbit columns under the lazy oracle (2026-10-18, engineering)", "",
+          "Does `columns = 2` beat the per-curve column count frozen on 2026-10-14 now that the "
+          "member-index set-up is gone? One cell of five: it is cheaper at n17 a1 and dearer at the "
+          "other four, so the frozen counts stay the better choice on four of five curves. The n17 "
+          "gain is a tuning result on these seeds and needs fresh seeds before it is a rule. It moves "
+          f"no row of tables A–C. {c2['unit']}; 95 % intervals; below 1 the numerator is cheaper.", "",
+          "| curve | log₂ r | frozen c | frozen ÷ c=2 | frozen ÷ rho-strong | c=2 ÷ rho-strong | "
+          "frozen ÷ rho-frob | c=2 ÷ rho-frob |",
+          "|:--|--:|--:|:--|:--|:--|:--|:--|"]
+    for r in c2["rows"]:
+        def ci(x):
+            return f"{x['ratio']:.3f} [{x['ci95'][0]:.3f}, {x['ci95'][1]:.3f}]"
+        L.append(f"| `{r['curve']}` | {r['log2_r']:.1f} | {r['frozen_c']} | **{ci(r['frozen_over_c2'])}** | "
+                 f"{ci(r['frozen_over_rho_strong'])} | {ci(r['c2_over_rho_strong'])} | "
+                 f"{ci(r['frozen_over_rho_frob'])} | {ci(r['c2_over_rho_frob'])} |")
+    L += ["", f"[Report]({'../../' + c2['report']}) · [study](../../{c2['study']}) · "
+              f"[data](../../{c2['source']}). Distance to rho is reported, not a gate; no ranking against "
+              "rho is claimed (§5a band not applied).", "", c2["validation"], ""]
     for code in ("A", "B", "C"):
         f = fams[code]
         rows = [r for r in doc["board"] if r["family"] == code]
@@ -2547,8 +2527,13 @@ def markdown(doc: dict) -> str:
           "Matrix F4, matrix F5, inherited F4 and F6-IC through `pdp3-binary` on eight public "
           "one-target workloads per cell, beside same-target rho. IC `S` is a lower bound "
           "(solver word XORs unpriced; F6-IC's geometric additions charged). `W` is counted "
-          "solver word XORs. Prime curves have no algebraic oracle in `ecbench`. "
-          f"Read the [analysis](../../{y['source']}).", "",
+          "solver word XORs. Prime curves have no algebraic oracle in `ecbench`. These rows "
+          "remain bound to their historical binary: a 2026-10-31 current-binary all-replay "
+          f"audit reproduced {y['current_binary_replay']['total']['reproduced']}/"
+          f"{y['current_binary_replay']['total']['candidates']} deterministic rows; the other "
+          f"{y['current_binary_replay']['total']['failures']} changed counted phase work. "
+          f"Read the [historical analysis](../../{y['source']}) and "
+          f"[current-binary replay certificate](../../{y['current_binary_replay']['source']}).", "",
           "| family | m | curve | base points | rho-negation S | strong rho S | inherited F4 S | F6-IC S "
           "| W F5/F4 | W F4 matrix/inherited | median log2(W inh/W F6) |",
           "|:--|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|"]
@@ -3241,8 +3226,7 @@ def page(doc: dict, standalone: bool) -> str:
              '<p>The standing rho implementation improved while its mathematical work and every ranked IC '
              'row stayed fixed. Cold, retained-setup online, exploratory and failed-replay evidence remain separate.</p>'
              '<div class="scroll"><table><thead><tr><th>Boundary</th><th>Observed result</th>'
-             '<th>Leaderboard treatment</th><th>Generic-bound distance '
-             'log₂(S·T²) − log₂(r/|Aut|)</th></tr></thead><tbody>'
+             '<th>Leaderboard treatment</th></tr></thead><tbody>'
              '<tr><td>Standing strong-rho implementation</td>'
              f'<td>complete-solve Callgrind: optimized / archived baseline '
              f'{rho["optimized_over_archived_baseline"]:.6f}× and optimized / same-binary legacy '
@@ -3250,36 +3234,28 @@ def page(doc: dict, standalone: bool) -> str:
              f'[{rho["ops_ci95"][0]:.3f}, {rho["ops_ci95"][1]:.3f}] over {rho["ops_pairs"]} pairs; '
              f'{rho["replays_identical"]}/{rho["measured_replays"]} measured replays identical</td>'
              f'<td>Implementation win; operation boundary unchanged. Native wall remained '
-             f'{esc(rho["wall_level"])} and is not admitted</td><td>n/a (not an online IC row)</td></tr>'
+             f'{esc(rho["wall_level"])} and is not admitted</td></tr>'
              '<tr><td>Canonical medium-tier Koblitz cold operations</td>'
              f'<td><code>{esc(acold["method"])}</code> / <code>{esc(acold["bound_id"])}</code>: '
              f'{acold["ops_over_floor"]:.3f}× floor [{acold["ops_ci95"][0]:.3f}, '
              f'{acold["ops_ci95"][1]:.3f}], {acold["runs"]} runs at {acold["sizes"]} sizes</td>'
-             '<td>Standing rho boundary; not an IC row</td><td>n/a (not an online IC row)</td></tr>'
+             '<td>Standing rho boundary; not an IC row</td></tr>'
              f'<tr><td>Retained-setup online · <code>{esc(admitted["label"])}</code></td>'
              f'<td><s>rho/IC {admitted["rho_over_ic"]:.1f}× [{admitted["ci95"][0]:.1f}, '
              f'{admitted["ci95"][1]:.1f}], {admitted["targets"]} unseen targets; about '
              f'{admitted["setup_seconds_approx"]:.0f} s setup excluded</s></td>'
-             f'<td><b>Superseded</b> (rho had an empty table); not an improvement. {esc(admitted["correction"])}</td>'
-             f'<td>{bound_cell_html(admitted["generic_bound"])}</td></tr>'
+             f'<td><b>Superseded</b> (rho had an empty table); not an improvement. {esc(admitted["correction"])}</td></tr>'
              f'<tr><td>Retained-setup online · <code>{esc(exploratory["label"])}</code></td>'
              f'<td><s>rho/IC {exploratory["rho_over_ic"]:.6f}× on {exploratory["targets"]} public point; '
              f'complete IC process {exploratory["complete_process_seconds"]:.3f} s</s></td>'
-             f'<td><b>Superseded</b> (rho had an empty table); not an improvement. {esc(exploratory["correction"])}</td>'
-             f'<td>{bound_cell_html(exploratory["generic_bound"])}</td></tr>'
+             f'<td><b>Superseded</b> (rho had an empty table); not an improvement. {esc(exploratory["correction"])}</td></tr>'
              f'<tr><td>Current-binary root-finder replay-all</td><td>current main (2026-10-19): '
              f'{replay["current"]["identical"]}/{replay["current"]["total"]} identical; '
              f'{replay["current"]["failures"]} mismatches across all four IC arms; the 2026-10-13 receipt '
              f'recorded {replay["identical"]}/{replay["total"]} with {replay["failures"]} inherited-F4 mismatches</td>'
              '<td><b>Open regression</b> under investigation (sweep D, PR #2290); root-finder rows are not '
-             f'claimed to pass; affected stage counters blocked from promotion. {esc(replay["current"]["correction"])}</td><td>n/a (not an online IC row)</td></tr>'
+             f'claimed to pass; affected stage counters blocked from promotion. {esc(replay["current"]["correction"])}</td></tr>'
              '</tbody></table></div>'
-             '<p>The last column is the generic bound of '
-             f'{gh("RESEARCH_IC_LEADS_AND_CONNECTIONS_20261010.md")} §2 and §4: <code>S</code> advice states, '
-             '<code>T</code> online probes, <code>|Aut| = 2n</code>, <code>r</code> the subgroup order. A distance '
-             'of 0 is the line preprocessing rho sits on; a row at or below it would be the first non-generic '
-             'signal. It is derived from the frozen file named in the cell, never measured here, and a row whose '
-             'frozen files do not record <code>S</code> and <code>T</code> reads "not recorded". Online rows only.</p>'
              f'<p>{esc(audit["reason"])} {gh(audit["source"], "Latest result data")} · '
              f'{gh(audit["previous_source"], "prior full synthesis")}.</p></section>')
     lz = doc["lazy_members_component"]
@@ -3301,6 +3277,29 @@ def page(doc: dict, standalone: bool) -> str:
              f'<p>{gh(lz["report"], "Report")} · {gh(lz["study"], "study")} · {gh(lz["source"], "data")}. '
              'Distance to rho is reported, not a gate; no ranking against rho is claimed.</p>'
              f'<p class="muted">{esc(lz["validation"])}</p></section>')
+    c2 = doc["lazy_columns2_component"]
+    P.append('<section class="panel" id="lazy-columns2"><h2>Component tuning · two orbit columns under the '
+             'lazy oracle <span class="chip">engineering</span></h2>'
+             '<p>Is <code>columns = 2</code> cheaper than the column count frozen on 2026-10-14 now that '
+             'the member-index set-up is gone? One cell of five: cheaper at n17 a1, dearer at the other '
+             'four, so the frozen counts stay the better choice on four of five curves. The n17 gain is a '
+             'tuning result on these seeds and needs fresh seeds before it is a rule. It moves no row of '
+             f'tables A–C. {esc(c2["unit"])}; below 1 the numerator is cheaper.</p>'
+             '<div class="scroll"><table><thead><tr><th>Curve</th><th>log₂ r</th><th>frozen c</th>'
+             '<th>frozen ÷ c=2</th><th>frozen ÷ rho-strong</th><th>c=2 ÷ rho-strong</th>'
+             '<th>frozen ÷ rho-frob</th><th>c=2 ÷ rho-frob</th></tr></thead><tbody>')
+    for r in c2["rows"]:
+        def ci(x):
+            return f'{x["ratio"]:.3f} [{x["ci95"][0]:.3f}, {x["ci95"][1]:.3f}]'
+        P.append(f'<tr><td><code>{esc(r["curve"])}</code></td><td>{r["log2_r"]:.1f}</td><td>{r["frozen_c"]}</td>'
+                 f'<td><b>{ci(r["frozen_over_c2"])}</b></td><td>{ci(r["frozen_over_rho_strong"])}</td>'
+                 f'<td>{ci(r["c2_over_rho_strong"])}</td><td>{ci(r["frozen_over_rho_frob"])}</td>'
+                 f'<td>{ci(r["c2_over_rho_frob"])}</td></tr>')
+    P.append('</tbody></table></div>'
+             f'<p>{gh(c2["report"], "Report")} · {gh(c2["study"], "study")} · {gh(c2["source"], "data")}. '
+             'Distance to rho is reported, not a gate; no ranking against rho is claimed (§5a band not '
+             'applied).</p>'
+             f'<p class="muted">{esc(c2["validation"])}</p></section>')
     d = doc["bounded_diagnostics"][0]
     P.append(f'<section class="card" id="bounded-n37-diagnostic"><h2>New n37 counted diagnostic, outside the priced tables</h2>'
              f'<p>On <code>{esc(d["curve"])}</code>, shared-rank K16 has {d["usable_points"]:,} actual usable '
@@ -3402,8 +3401,14 @@ def page(doc: dict, standalone: bool) -> str:
              '<p>Matrix F4, matrix F5, inherited F4 and F6-IC through <code>pdp3-binary</code> on eight public '
              'one-target workloads per cell, beside same-target rho. IC S is a lower bound: solver word XORs '
              'are unpriced and F6-IC\'s geometric additions are charged. W is counted solver word XORs. '
-             'Prime curves have no algebraic oracle in <code>ecbench</code>. '
-             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(y["source"])}">Analysis</a>.</p>')
+             'Prime curves have no algebraic oracle in <code>ecbench</code>. These rows remain bound to their '
+             'historical binary: a 2026-10-31 current-binary all-replay audit reproduced '
+             f'{y["current_binary_replay"]["total"]["reproduced"]}/'
+             f'{y["current_binary_replay"]["total"]["candidates"]} deterministic rows; the other '
+             f'{y["current_binary_replay"]["total"]["failures"]} changed counted phase work. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(y["source"])}">Historical analysis</a> · '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(y["current_binary_replay"]["source"])}">'
+             'current-binary replay certificate</a>.</p>')
     P.append('<table><thead><tr><th>Family</th><th>m</th><th>Curve</th><th>Base points</th><th>Rho-negation S</th>'
              '<th>Strong rho S</th><th>Inherited F4 S</th><th>F6-IC S</th><th>W F5/F4</th>'
              '<th>W matrix F4/inherited</th><th>Median log₂(W inh/W F6)</th></tr></thead><tbody>')

@@ -1,0 +1,178 @@
+{
+  "schema": "research.proof-packet-status/v1",
+  "task": "T-1167",
+  "main_declarations": 7,
+  "control_declarations": 11,
+  "readback": [
+    {
+      "name": "CoefficientTraversal.step_correct",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientTraversal.run_correct",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientTraversal.zeros_good",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "CoefficientTraversal.transform_correct",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientTraversal.schedule_source_order",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientTraversal.schedule_size",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientTraversal.schedule_no_duplicates",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientTraversalControls.empty_schedule",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientTraversalControls.quadratic_schedule",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientTraversalControls.quintic_schedule",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientTraversalControls.empty_transform",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientTraversalControls.constant_transform",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientTraversalControls.quadratic_transform",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientTraversalControls.quadratic_scaled",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientTraversalControls.quintic_shift",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientTraversalControls.quintic_identity",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientTraversalControls.zero_polynomial",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientTraversalControls.omitted_row_changes",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    }
+  ],
+  "attempts": {
+    "attempt1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "schedule1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "claims": [
+    {
+      "claim": "cached-inverse array traversal preserves canonicality and decoded sum",
+      "domain": "n<=6; prime1<p<2^31; canonical coefficients,a,b,s; nonzero scale; valid event list"
+    },
+    {
+      "claim": "complete schedule has source order, no duplicates and n(n+1)/2 pairs",
+      "domain": "all n=0..6"
+    },
+    {
+      "claim": "transform from zero decodes to full contribution sum",
+      "domain": "preceding arithmetic hypotheses; generated inverse passed unchanged"
+    }
+  ],
+  "independent_source_fidelity_review": "pending",
+  "polynomial_composition_identification": "pending",
+  "trim_and_divisor_copy": "pending",
+  "compiled_rust_equivalence": "not established",
+  "scientific_execution": false,
+  "cost_ratio": null
+}

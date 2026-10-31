@@ -1,0 +1,7 @@
+# Independent cross-scaled value-composition review
+
+The final CrossScaling.lean SHA8adf2f18ade3eea2109ad4676720c0234d32e45c015353cceca5edd57d3fc2e7 matches the bounded word-value claim. Plan preceded source inspection. Fresh private source compilation and separate four-declaration axiom readback both exit0. Only standard propext/Classical.choice/Quot.sound occur.
+
+The literal scaledWords sequence uses z2=z*z, z3=z2*z, z4=z2*z2, z5=z4*z, then q*z2,r*z4,(s*z3)*w,(t*z5)*w with reduction after every multiplication. This matches the pinned Rust prelude; both cross halves correctly use opposite weights. MulExpr.composition inductively supplies canonical outputs, so no intermediate multiplication silently exceeds the prior bounded-word lemma's domain. Canonical equality reflects both support comparisons; branch order is inherited from the independently checked word classifier. None denotes bypass to the distinct-support path, not an arithmetic failure.
+
+For concrete Rust Field mapping, require n=1, odd prime and tables=None, plus counter headroom when counters execute. Current Field::mul/sq otherwise dispatch through tables or extension-field paths. The pinned projective gate constructs Field::new(p,1,0), whose tables start None. The value theorem itself is polynomial and permits zero weights; nonzero weights and valid divisor inputs are required only for later geometric/exclusion claims. No compiler equivalence, counter-state theorem, divisor sum, delegated payload or full dispatcher totality is established here.
