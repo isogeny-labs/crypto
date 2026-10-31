@@ -1,0 +1,16 @@
+from pathlib import Path
+import ast,json,hashlib,stat
+p=Path(__file__).parent;d=Path('/var/tmp/pencil-runtime-only-recovery-supervisor-20261031-v1');old=Path('/var/tmp/pencil-copy-only-assembly-execution-20261031-v1');H=lambda f:hashlib.sha256(f.read_bytes()).hexdigest();assert H(d/'manifest.json')=='9d0e16efbdf15ae9d8f95772f5492eba2be7a28b73445e1adc4c15f482a93197'
+m=json.loads((d/'manifest.json').read_text());assert all(H(d/n)==h for n,h in m.items());b=json.loads((d/'binding.template.json').read_text());o=json.loads((old/'binding.json').read_text());assert b['admitted'] is False and b['prospective_review_sha256'] is None
+assert all(b[k]==v for k,v in o.items() if k not in ['admitted','reviewed_supervisor_sha256','prospective_review_sha256'])
+assert all(H(old/n)==h for n,h in b['recovery_sources'].items());s=(d/'recover.py').read_text();ast.parse(s);assert H(d/'recover.py')==b['reviewed_supervisor_sha256'];cmd=json.loads((old/'005-build-base/receipt.json').read_text());assert cmd['client_terminal_exit']==0 and cmd['client_unknown'] is False
+expected_prefix=['/usr/bin/sudo','-n','/usr/bin/env','-i','PATH=/usr/bin:/bin','HOME='+str(old/'empty-docker-config'),'DOCKER_CONFIG='+str(old/'empty-docker-config'),'DOCKER_BUILDKIT=0',b['docker_client'],'--host','unix:///var/run/docker.sock'];assert cmd['argv'][:len(expected_prefix)]==expected_prefix
+inv=json.loads((old/'context-inventory.json').read_text());now={}
+for directory in [old/'contexts/base',old/'contexts/overlay']:
+ for f in directory.rglob('*'):
+  st=f.lstat();assert not f.is_symlink();now[str(f.relative_to(old/'contexts'))]={'kind':'directory' if f.is_dir() else 'file','mode':oct(stat.S_IMODE(st.st_mode)),'sha256':None if f.is_dir() else H(f)}
+assert now==inv
+x=json.loads((old/'006-uncertain-readback-base/inspection.json').read_text())[0];assert x['Id']=='sha256:347667d6ecc9294ab7bfcc83411fb47f7548c8d1ca5f7d315cca23fc4b115476';assert x['Config']['Labels']['isolab.local-assembly.owner']=='467e8502-46d8-4ab9-a13b-8d2375dd2ca2';assert x['Config']['Labels']['org.opencontainers.image.revision']==b['source_revision']
+iid=old/'base.iid';st=iid.lstat();assert stat.S_ISREG(st.st_mode) and st.st_uid==0 and stat.S_IMODE(st.st_mode)==0o600 and st.st_nlink==1;ret=Path('/var/tmp/pencil-assembly-recovery-review-20261031-v1');ir=json.loads((ret/'iid-readback.json').read_text());assert H(ret/'iid.stdout')==ir['stdout_sha256'];assert (ret/'iid.stdout').read_text().strip()==x['Id'];assert ir['exit']==0
+result={'producer_manifest_sha256':H(d/'manifest.json'),'producer_files_checked':len(m),'source_sha256':H(d/'recover.py'),'template_sha256':H(d/'binding.template.json'),'recovery_hash_joins':len(b['recovery_sources']),'original_context_entries_checked':len(inv),'template_preserves_original_binding_except_admission_and_review_refs':True,'original_base_client_exit':0,'retained_exact_base_id':x['Id'],'iid_current_metadata':{'uid':st.st_uid,'mode':oct(stat.S_IMODE(st.st_mode)),'nlink':st.st_nlink,'bytes':st.st_size},'retained_privileged_iid_readback_digest_matches':True,'ast_parse':'passed','docker_calls':0,'builds':0,'live_image_recheck_performed':False}
+(p/'checks.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result))

@@ -72,6 +72,13 @@ $B verify --curve p256 --dir runs/p256-2k     # independent replay
 
 `walk` writes three files into `--out`:
 
+The command also prints the exact `walk.json` summary to stdout, so
+`isogeny_walk walk ... > summary.json` and `crax --json isogeny-walk walk ...`
+return the enumerated curve and edge counts without parsing stderr. Progress
+and S3 publication diagnostics remain on stderr. The saved route file remains
+the input to `verify` and to checked IC transport; the stdout summary does
+not replace route verification.
+
 | file | contents |
 |:--|:--|
 | `curves.yaml` | every curve found, in the [`docs/curves/ic/curves.yaml`](../curves/ic/curves.yaml) format: ICV1 slug, EC1 id and UID, model, generator, traits with statuses, proved volcano levels, `IW1` routes |

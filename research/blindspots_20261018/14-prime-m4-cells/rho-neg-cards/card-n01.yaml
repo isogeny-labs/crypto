@@ -1,0 +1,181 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-14-RHONEG-01
+experiment_id: BLINDSPOT-14
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+# Addendum B (PROTOCOL-ADDENDUM-rho-neg.md): one build of the negation-map instrument, selftest --deep,
+# continuity controls (rho and fullic --arm a at 16, 20, 24, 28 bits), then rho-neg x16 at the same four cells.
+receipt: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/receipt-n01.json
+binds:
+  - {path: research/blindspots_20261018/instruments/blindspots_14_prime_m4_neg.rs, sha256: 1a7d51c3adcd7108de335cd7ac3b2d83a11f5ef1246b8b959271ced1f5e8710e}
+  - {path: research/blindspots_20261018/14-prime-m4-cells/raw/rho-b16.jsonl, sha256: 82a53bc6a5bdd95f24995996f2c86470dfcca5d898c687ff57aef86f9d514d46}
+  - {path: research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16.jsonl, sha256: 017b0d28297507bf45607468939b5cb76ccb81a50a82d8be0e2f81a11e82920e}
+  - {path: research/blindspots_20261018/14-prime-m4-cells/raw/rho-b20.jsonl, sha256: acb4957e2e5e3714cbd8079e27e6104bf752a0ed8c298d4064b8e45f3419ba78}
+  - {path: research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b20.jsonl, sha256: 61b5ac18a77940e2c54f808f35573e79c043dc52412f3ce5b81ee1a7a8c4df8e}
+  - {path: research/blindspots_20261018/14-prime-m4-cells/raw/rho-b24.jsonl, sha256: 126cfd524da872a9d562d69544d8821f1352b96f277bf1a5fc9a8d8cef4f4bef}
+  - {path: research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b24.jsonl, sha256: 49d179b1a73c7c59f6575abcebef84b27df55a0f70ad862883bffc2078cbbcf7}
+  - {path: research/blindspots_20261018/14-prime-m4-cells/raw/rho-b28.jsonl, sha256: 9ee54d450af8a7d7c339a66827d8bc4c46cad121e977a0de47cbee8ae1be9ecc}
+  - {path: research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b28.jsonl, sha256: 6e6d1181f844079e1baa9ee7c6ff9a6155606f8a2a36fa8224a30271ffd07afd}
+must_not_exist:
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/bin/b14neg
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/build.stdout.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/build.stderr.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/selftest.stdout.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/selftest.stderr.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b16.stdout.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b16.stderr.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b16.jsonl
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b20.stdout.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b20.stderr.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b20.jsonl
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b24.stdout.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b24.stderr.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b24.jsonl
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b28.stdout.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b28.stderr.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b28.jsonl
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b16.stdout.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b16.stderr.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b16.jsonl
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b20.stdout.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b20.stderr.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b20.jsonl
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b24.stdout.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b24.stderr.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b24.jsonl
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b28.stdout.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b28.stderr.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b28.jsonl
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b16.stdout.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b16.stderr.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b16.jsonl
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b20.stdout.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b20.stderr.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b20.jsonl
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b24.stdout.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b24.stderr.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b24.jsonl
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b28.stdout.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b28.stderr.log
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b28.jsonl
+commands:
+  - id: make-dirs
+    argv: ["mkdir", "-p", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/bin"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: build
+    argv: ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-C", "target-cpu=native", "-o", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/bin/b14neg", "research/blindspots_20261018/instruments/blindspots_14_prime_m4_neg.rs"]
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/build.stdout.log
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/build.stderr.log
+  - id: selftest
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/bin/b14neg", "selftest", "--deep"]
+    timeout_seconds: 300
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/selftest.stdout.log
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/selftest.stderr.log
+  - id: cont-rho-b16
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/bin/b14neg", "rho", "--bits", "16", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b16.jsonl"]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b16.stdout.log
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b16.stderr.log
+    outputs: ["research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b16.jsonl"]
+  - id: cont-rho-b20
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/bin/b14neg", "rho", "--bits", "20", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b20.jsonl"]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b20.stdout.log
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b20.stderr.log
+    outputs: ["research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b20.jsonl"]
+  - id: cont-rho-b24
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/bin/b14neg", "rho", "--bits", "24", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b24.jsonl"]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b24.stdout.log
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b24.stderr.log
+    outputs: ["research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b24.jsonl"]
+  - id: cont-rho-b28
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/bin/b14neg", "rho", "--bits", "28", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b28.jsonl"]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b28.stdout.log
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b28.stderr.log
+    outputs: ["research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b28.jsonl"]
+  - id: cont-fullic-a-b16
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/bin/b14neg", "fullic", "--bits", "16", "--arm", "a", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b16.jsonl"]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b16.stdout.log
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b16.stderr.log
+    outputs: ["research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b16.jsonl"]
+  - id: cont-fullic-a-b20
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/bin/b14neg", "fullic", "--bits", "20", "--arm", "a", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b20.jsonl"]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b20.stdout.log
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b20.stderr.log
+    outputs: ["research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b20.jsonl"]
+  - id: cont-fullic-a-b24
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/bin/b14neg", "fullic", "--bits", "24", "--arm", "a", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b24.jsonl"]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b24.stdout.log
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b24.stderr.log
+    outputs: ["research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b24.jsonl"]
+  - id: cont-fullic-a-b28
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/bin/b14neg", "fullic", "--bits", "28", "--arm", "a", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b28.jsonl"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b28.stdout.log
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b28.stderr.log
+    outputs: ["research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b28.jsonl"]
+  - id: rho-neg-b16
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/bin/b14neg", "rho-neg", "--bits", "16", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b16.jsonl"]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b16.stdout.log
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b16.stderr.log
+    outputs: ["research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b16.jsonl"]
+  - id: rho-neg-b20
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/bin/b14neg", "rho-neg", "--bits", "20", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b20.jsonl"]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b20.stdout.log
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b20.stderr.log
+    outputs: ["research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b20.jsonl"]
+  - id: rho-neg-b24
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/bin/b14neg", "rho-neg", "--bits", "24", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b24.jsonl"]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b24.stdout.log
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b24.stderr.log
+    outputs: ["research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b24.jsonl"]
+  - id: rho-neg-b28
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/bin/b14neg", "rho-neg", "--bits", "28", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b28.jsonl"]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b28.stdout.log
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b28.stderr.log
+    outputs: ["research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b28.jsonl"]
+  - id: remove-bin
+    argv: ["rm", "-f", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/bin/b14neg"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: remove-bin-dir
+    argv: ["rmdir", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/bin"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-14-rho-neg
+background: false
+write_scope:
+  - research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto. Run the command through the Bash tool with timeout 600000."

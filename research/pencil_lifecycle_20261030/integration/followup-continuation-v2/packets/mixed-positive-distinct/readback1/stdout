@@ -1,0 +1,20 @@
+'MixedPositiveDistinct.positive_nonzero' depends on axioms: [propext, Quot.sound]
+'MixedPositiveDistinct.point_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MixedPositiveDistinct.distinct_normalized' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MixedPositiveDistinct.doubled_valid' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MixedPositiveDistinct.generic_second_nonzero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MixedPositiveDistinct.positive_distinct_preserves' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MixedPositiveDistinct.source_branch_preserves' depends on axioms: [propext, Classical.choice, Quot.sound]
+MixedPositiveDistinct.source_branch_preserves.{u_1} {K : Type u_1} [Field K] [DecidableEq K] (a0 a1 a2 a3 : K)
+  (a : WeightedAdd11.Input K) (b : MixedCancellation.D2 K) (haz : a.z ≠ 0) (haw : a.w ≠ 0) (hbz : b.z ≠ 0)
+  (hbw : b.w ≠ 0) (ha : MixedCancellation.validPoint (MixedGeneric.curve a0 a1 a2 a3) a)
+  (hb : MixedCancellation.validTwo (MixedGeneric.curve a0 a1 a2 a3) b) (hk : MixedCancellation.rawK a b = 0)
+  (hc : a.y * MixedCancellation.rawW3 b ≠ -(MixedCancellation.rawY3 a b * a.w))
+  (hd : a.x * (b.z * b.z) ≠ (MixedCancellation.other a b).x) :
+  have d := MixedPositiveDistinct.doubled a0 a1 a2 a3 a;
+  have c := MixedGeneric.output (MixedCancellation.other a b) d a3;
+  MixedCancellation.classify a b = MixedCancellation.Branch.positiveCoincidence ∧
+    2 ≠ 0 ∧
+      a.y ≠ 0 ∧
+        MixedGeneric.dispatch (MixedCancellation.other a b) d a3 = some c ∧
+          c.z ≠ 0 ∧ c.w ≠ 0 ∧ MixedCancellation.validTwo (MixedGeneric.curve a0 a1 a2 a3) c

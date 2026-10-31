@@ -1,0 +1,37 @@
+#set page(paper:"a4",margin:16mm)
+#set text(size:9.5pt)
+#image("coverage.svg",width:100%)
+
+= Additive degree1 signed recovery
+
+#text("The private candidate passes all84 fixed successful-geometric-repair cases across21 models, including exact signed recovery. Eighty cases use the unchanged generic recovery path; four p739 degree1 cases use the new boundary lift. The locked offline build/check exits0. The preceding all84 gate exited101 on those four cases and remains preserved in its separate packet.")
+
+
+== Construction
+
+#text("The existing forward projection maps a degree1 divisor with affine coordinate x to the classical homogeneous vector(0:1:x:x²), then applies the invertible C1 theta-coordinate transform. The old inverse conversion normalizes by its first coordinate, so it rejects this chart. The candidate factors out the homogeneous inverse and, only after generic conversion fails, checks the boundary. A nonzero vector with q0=0,q1!=0 must satisfy q1*q3=q2²; then x=q2/q1. Evaluate the curve polynomial and obtain at most two y values with the existing counted square-root routine. Validate each divisor, project it back, add the signed anchor, and require its projected sum to match the supplied neighbour. Accept exactly one distinct matching divisor; reject zero or multiple matches.")
+
+
+#text("For identity(0:0:0:1), require the neighbour to project to the signed anchor. Zero vectors, malformed boundary chart, nonsquare ordinate, singular coordinate map, no match and ambiguous match have explicit statuses. The code assumes the existing valid curve/model, canonical coordinates, nonzero prime modulus and valid signed anchor. It does not prove those caller preconditions.")
+
+
+== Why sign selection is justified
+
+#text("Assuming faithful quotient coordinates, two opposite non2-torsion points R and -R can both match a signed-anchor neighbour only if2G=0: equality up to sign gives either2R=0 or2G=0. The algorithm checks uniqueness rather than silently relying on the anchor condition. Tests using torsion anchors reject as ambiguous. With y=0 the candidates coincide and are deduplicated. These are algebraic arguments about the quotient; no new universal Lean proof is claimed.")
+
+
+== Exact checks and limits
+
+#text("All84 pruned selected pairs still equal the eager pairs, and selected/evaluated masks remain correct. Recovered divisors equal direct signed Cantor expectations and differ from their inverses on these non2-torsion fixtures. Four p739 control sets check nonzero projective rescaling, zero input and zero neighbour rejection, identity recovery and wrong-neighbour rejection, invalid-conic rejection, and ambiguous torsion-anchor rejection. These four sets share the same degree1 output, so they are not four distinct coverage domains. Singular-map, nonsquare and no-matching-lift branches are explicit but unexercised.")
+
+
+#text("The expected divisor is only an assertion input. Recovery itself uses the signed anchor, quotient point, quotient neighbour, curve and model. It does not use a planted scalar, expected divisor or group-label reconstruction. Fixtures use torsion T to force repaired arithmetic; signed recovery uses the original non2-torsion G, not T.")
+
+
+== Provenance and accounting
+
+#text("PLAN.md froze the additive change and fixed controls before execution; source/fixture hashes and exact bounded command are retained. Existing84-row failure evidence is unchanged. All code and outputs are private; no scientific solve/cohort/cloud operation or production update occurred. Recovery work includes homogeneous conversion, inversion, square root, at most two validity/projection/addition checks and uniqueness bookkeeping. No timing or complete cost ratio was measured. Independent source-fidelity review is pending.")
+
+
+#text("Sources: historical N19 project_any and recover_impl_uncached.rs; Chung-Costello-Smith sections2,6.3,6.4,7.4, https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/recovery.pdf . The new software composition is derived from these coordinate interfaces; no novelty claim is made.")
+

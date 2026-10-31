@@ -1,0 +1,18 @@
+
+running 1 test
+test cryptanalysis::ecbench::hyper_ic::tests::ecbench_runs_are_deterministic_in_the_seed ... FAILED
+
+failures:
+
+---- cryptanalysis::ecbench::hyper_ic::tests::ecbench_runs_are_deterministic_in_the_seed stdout ----
+
+thread 'cryptanalysis::ecbench::hyper_ic::tests::ecbench_runs_are_deterministic_in_the_seed' (78739) panicked at src/cryptanalysis/ecbench/hyper_ic.rs:1126:37:
+called `Result::unwrap()` on an `Err` value: "method `ic.hyperelliptic` has no parameter `branches`"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    cryptanalysis::ecbench::hyper_ic::tests::ecbench_runs_are_deterministic_in_the_seed
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 5014 filtered out; finished in 0.01s
+

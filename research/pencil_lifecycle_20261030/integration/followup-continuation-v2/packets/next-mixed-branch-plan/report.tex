@@ -1,0 +1,20 @@
+\documentclass[11pt]{article}\usepackage[margin=.8in]{geometry}\usepackage[T1]{fontenc}\begin{document}
+\section*{Next construction: mixed-degree cancellation}
+Source/literature-derived plan; no theorem or native result claimed.
+
+Select the K=0 prelude and cancellation return in add12\_weighted\_complete (source lines828--878). Prove mismatch exclusion from valid inputs, plus normalized validity and nonzero weights of the returned degree-one p4. Existing abstract mismatch exclusion assumes equality of squares; this construction derives it from the actual weighted inputs and literal guards.
+
+Write normalized inputs as point $(x,y)$ and $u(U)=U^2+qU+r$, $v(U)=sU+t$, with four nonzero weights and both Mumford divisibilities against common f. Derive
+\[K_{raw}=Z^4Z_b^4W\,u(x),\qquad L=D y,\quad R=Dv(x),\]
+where $D=Z^5Z_b^5WW_b\ne0$. Thus K=0 gives shared support, and input validity implies $y^2=v(x)^2$. This excludes the mismatch None after cancellation fails.
+
+For the exact returned p4, derive $x_4=-q-x$, $y_4=v(x_4)$ and $u=(U-x)(U-x_4)$. Its support divides $f-y_4^2$ and its weights $ZZ_b,W_b$ are nonzero. No division by $x-x_4$ or y is needed: retain repeated-support and zero-ordinate cancellation.
+
+\textbf{Machine bridge.} Reuse FieldExpr composition under prime $5\le p<2^{31}$ and10 canonical coordinates, preserving source parentheses and guard order. This path needs only existing multiply/square/add/subtract/negate operations. Field.n=1, tables=None and counter headroom remain external. Prove actual cancellation dispatch and canonical valid WordD1 output; independently replay and source-review.
+
+\textbf{Controls to freeze.} Nonunit cancellation, repeated support, zero-y precedence, invalid ordinate mismatch, zero weights and p5 boundary. These are algebraic fixtures unless geometric assumptions are separately established.
+
+\textbf{Sources.} Ozbay Gurler--Hisil, DOI10.1007/s13389-024-00351-7, sections2,3.3,4.2; exact gate source; prior proof graph and law-remaining-obligations.md. The primary source supplies established mixed-support formulas; no novelty claim. Exact links/hashes and detailed acceptance targets are in PLAN.md/status.json.
+
+Next after this slice: generic K-nonzero output congruence/divisibility, then positive shared-support composition using reviewed doubling. Tripling remains separate. No cohort or cost scope is added.
+\end{document}
