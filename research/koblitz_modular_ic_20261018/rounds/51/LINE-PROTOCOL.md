@@ -28,3 +28,9 @@ bounded computational outcome,never silently converted to a new definition.
 Same manual local scope,seed51,one Singular/FLINT thread,4GiB virtual/1200s,
 serialized jobs. Freeze before data,strict exit0/no question-mark lines and
 LINE51_ALL_CHECKS_PASS. Preserve every partial output,cap and late marker.
+
+Before data,also construct the same explicit monic degree24 psi7 used by
+COLLISION51 and require its full source-ideal membership product,including
+serialized reload. This gives a concrete monic base-coefficient annihilator
+for r,independent of the abstract group-order interpretation,and supports
+the subsequent nu-integrality check. Total reloaded full products is now5.
