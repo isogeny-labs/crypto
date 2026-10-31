@@ -1498,19 +1498,32 @@ pub mod bounded_matrix {
         })
     }
 
+    /// Paid before inspecting the independently prepared original degrees.
+    /// Covers the <=61-element constant predicate and fixed status/pruned array.
+    pub(crate) fn criterion_setup_reservation(equations: usize) -> Result<Reservation, Stop> {
+        Ok(Reservation {
+            work: checked_add(4096, checked_mul(128, equations as u64)?)?,
+            bytes: 0,
+        })
+    }
+    pub(crate) fn criterion_active_reservation(equations: usize) -> Result<Reservation, Stop> {
+        Ok(Reservation {
+            work: checked_mul(1024, checked_add(checked_mul(32, equations as u64)?, 1)?)?,
+            bytes: 0,
+        })
+    }
     pub(crate) fn criterion_reservation(equations: usize) -> Result<Reservation, Stop> {
-        let e = equations as u64;
         Ok(Reservation {
             work: checked_add(
-                checked_add(4096, checked_mul(128, e)?)?,
-                checked_mul(1024, checked_add(checked_mul(32, e)?, 1)?)?,
+                criterion_setup_reservation(equations)?.work,
+                criterion_active_reservation(equations)?.work,
             )?,
             bytes: 0,
         })
     }
 
-    /// Structural worst-case reservation, not measured work. The F5 permit is
-    /// retained even when constants cause the criterion to be skipped.
+    /// Structural worst-case reservation, not measured work. Empty/constant
+    /// F5 inputs admit only setup; an active criterion retains this full bound.
     pub fn required_reservation(equations: usize, engine: Engine) -> Result<Reservation, Stop> {
         if equations > MAX_EQUATIONS {
             return Err(Stop::InvalidInput);

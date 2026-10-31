@@ -1,9 +1,7 @@
 //! Fallible finite-selector construction of the existing b=1 S4 equation.
 //! Reservations are conservative modeled totals, not CPU instructions or RSS.
 //! This module neither solves the equations nor proves signed-point completeness.
-use super::{
-    mono_key, F2BoolMono, F2BoolPoly, F2mElement, FieldStructure, FieldSum, IrreduciblePoly, Mask,
-};
+use super::{mono_key, F2BoolMono, F2BoolPoly, FieldStructure, FieldSum, IrreduciblePoly, Mask};
 use std::{mem::size_of, time::Instant};
 
 pub const MAX_WORK: u64 = 16_777_216;
@@ -170,18 +168,28 @@ impl<O: FnMut(Event) -> Result<(), ()>> Gate<'_, O> {
     fn table(&mut self, irr: &IrreduciblePoly) -> Result<FieldStructure, Stop> {
         let n = irr.degree as usize;
         self.admit(
-            4096 * (2 * n - 2) as u64 + 32 * (n * n + 3 * n + 1) as u64,
+            32 * (8 * (2 * n - 2) + 2 * irr.low_terms.len() + n * n + 3 * n + 8) as u64,
             1 << 20,
             Stage::Table,
         )?;
         let mut powers = self.vec(2 * n - 1)?;
-        let z = F2mElement::from_bit_positions(&[1], irr.degree);
-        let mut p = F2mElement::one(irr.degree);
-        powers.push(1);
+        // Same powers of z in the admitted polynomial quotient, without a
+        // general field multiplication for every single-bit multiplier.
+        // Eight modeled steps per advance plus tail construction are charged
+        // at the unchanged32 coefficient BEFORE any mutation/allocation.
+        let mask = (1u64 << n) - 1;
+        let mut tail = 0u64;
+        for &bit in &irr.low_terms {
+            self.check()?;
+            tail |= 1u64 << bit;
+        }
+        let mut p = 1u64;
+        powers.push(p);
         for _ in 1..2 * n - 1 {
             self.check()?;
-            p = p.mul(&z, irr);
-            powers.push(p.raw_bits().first().copied().unwrap_or(0));
+            let carry = 0u64.wrapping_sub(p >> (n - 1));
+            p = ((p << 1) & mask) ^ (tail & carry);
+            powers.push(p);
         }
         let mut reduced = self.vec(n)?;
         let mut squares = self.vec(n)?;
@@ -446,6 +454,7 @@ pub fn build<O: FnMut(Event) -> Result<(), ()>>(
 
 #[cfg(test)]
 mod tests {
+    use super::super::F2mElement;
     use super::*;
     use crate::cryptanalysis::{
         koblitz_index_calculus::find_irreducible_sparse as find_irreducible,
@@ -511,7 +520,7 @@ mod tests {
     }
     #[test]
     fn bounded_s4_power_tables_equal_legacy() {
-        for n in [23, 31, 47, 53, 61] {
+        for n in (23..=31).chain(47..=61) {
             let irr = find_irreducible(n).unwrap();
             let mut observer = |_| Ok(());
             let mut gate = Gate {
@@ -858,6 +867,7 @@ mod multiplier_recurrence_controls {
     use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
     use std::time::Duration;
     fn dense_reference(coefficient: u64, st: &FieldStructure) -> Vec<u64> {
+        assert!(coefficient < (1u64 << st.n));
         st.reduced
             .iter()
             .map(|reduced| {
@@ -888,6 +898,9 @@ mod multiplier_recurrence_controls {
         let mut coefficients = vec![0, 1, (1u64 << n) - 1, (1u64 << (n - 1)) | 3, 5, 5];
         coefficients.extend((0..n).map(|i| 1u64 << i));
         for coefficient in coefficients {
+            // n=2 quotient controls must obey the same n-bit operand domain.
+            let coefficient = coefficient & ((1u64 << n) - 1);
+            assert!(coefficient < (1u64 << n));
             let mut actual = vec![0; n as usize];
             gate.fill_multiplier_row(&mut actual, coefficient, &st)
                 .unwrap();
@@ -1067,6 +1080,85 @@ mod multiplier_recurrence_controls {
             for (actual, expected) in prefix.iter().zip(&full) {
                 assert_eq!(actual.stage, expected.stage);
                 assert_eq!(actual.reserved, expected.reserved);
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod table_recurrence_controls {
+    use super::*;
+    use std::time::Duration;
+    #[test]
+    fn table_quotient_edges_and_original_admission_failures() {
+        for n in [2, 3, 23, 61] {
+            for low_terms in [vec![0, n - 1], (0..n).collect()] {
+                let irr = IrreduciblePoly {
+                    degree: n,
+                    low_terms,
+                };
+                let expected = FieldStructure::new(n, &irr);
+                let width = n as usize;
+                let work = 32
+                    * (8 * (2 * width - 2)
+                        + 2 * irr.low_terms.len()
+                        + width * width
+                        + 3 * width
+                        + 8) as u64;
+                for mode in 0..5 {
+                    let mut observed = Vec::new();
+                    let mut observer = |event: Event| {
+                        observed.push(event.stage);
+                        if mode == 4 {
+                            Err(())
+                        } else {
+                            Ok(())
+                        }
+                    };
+                    let mut limits = Limits::default();
+                    limits.work = work - u64::from(mode == 1);
+                    limits.bytes = (1 << 20) - u64::from(mode == 2);
+                    let mut gate = Gate {
+                        limits,
+                        reserved: Reserved::default(),
+                        deadline: if mode == 3 {
+                            Instant::now() - Duration::from_secs(1)
+                        } else {
+                            Instant::now() + Duration::from_secs(30)
+                        },
+                        observer: &mut observer,
+                    };
+                    let result = gate.table(&irr);
+                    match mode {
+                        0 => {
+                            let got = result.unwrap();
+                            assert_eq!(got.reduced, expected.reduced);
+                            assert_eq!(got.squares, expected.squares);
+                            assert_eq!(gate.reserved.work, work);
+                        }
+                        1 => {
+                            assert!(matches!(result, Err(Stop::WorkLimit)));
+                            assert_eq!(gate.reserved, Reserved::default());
+                        }
+                        2 => {
+                            assert!(matches!(result, Err(Stop::ByteLimit)));
+                            assert_eq!(gate.reserved, Reserved::default());
+                        }
+                        3 => {
+                            assert!(matches!(result, Err(Stop::Deadline)));
+                            assert_eq!(gate.reserved, Reserved::default());
+                        }
+                        _ => {
+                            assert!(matches!(result, Err(Stop::Observer)));
+                            assert_eq!(gate.reserved.work, work);
+                        }
+                    }
+                    drop(gate);
+                    assert_eq!(observed.len(), usize::from(mode == 0 || mode == 4));
+                    if !observed.is_empty() {
+                        assert!(matches!(observed[0], Stage::Table));
+                    }
+                }
             }
         }
     }
