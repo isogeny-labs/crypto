@@ -116,5 +116,7 @@ native linalg.lib;Stacks0BJF;standard finite-field Frobenius/gcd criterion.
 See CM.md,PROOF_MAP.md,protocol.json and results.json for premises and receipts.
 '''
 source='\n'.join(line if line.startswith('#') else line.replace(',',', ').replace(';','; ').replace(':',': ').replace(',  ',', ').replace(';  ','; ').replace(':  ',': ') for line in source.splitlines())+'\n'
+source=re.sub(r'(?<=\d), (?=\d{3}\b)', ',', source)
+for old,new in {'ranks are16':'ranks are 16','all128':'all 128','all2,112':'all 2,112','complete16':'complete 16','rank4':'rank 4','rank8':'rank 8','all29':'all 29','4GiB':'4 GiB','1200s':'1200 s','Lean4.34.1':'Lean 4.34.1','mathlibd13f23b':'mathlib d13f23b','degree20':'degree 20','are16,16,18,18':'are 16,16,18,18','dimension80':'dimension 80','intended11':'intended 11','larger112/991':'larger 112/991'}.items():source=source.replace(old,new)
 (h/'report.typ').write_text(source);typst.compile(str(h/'report.typ'),output=str(h/'report.pdf'))
 print(json.dumps({'pdf_bytes':(h/'report.pdf').stat().st_size,'workflows':len(r['runs'])}))
