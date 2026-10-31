@@ -10,6 +10,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 RESEARCH = HERE.parent
 INVENTORY = RESEARCH / "ml_dataset_inventory_20261031" / "inventory-v2.json"
+PRIME_AUDIT = HERE / "prime-twist-archive-audit.json"
 FAMILIES = ("koblitz", "binary", "prime")
 METHODS = ("enumerate", "bsgs", "sat", "weil", "f4", "f5", "f6", "root", "pkm", "double-large-prime")
 FIELD_SIZES = tuple(range(23, 32)) + tuple(range(47, 62))
@@ -34,7 +35,11 @@ def require(test, message):
 
 def main():
     inventory = read(INVENTORY)
+    prime_audit = read(PRIME_AUDIT)
     require(inventory["schema"] == "ml-dataset.local-campaign-inventory/v2", "unexpected inventory")
+    require(prime_audit["schema"] == "ml-dataset.prime23-twist-archive-audit/v1" and
+            prime_audit["total"] == 64 and len(prime_audit["rows"]) == 64,
+            "prime archive twist audit absent or incomplete")
     planned = len(FIELD_SIZES) * len(ARITIES) * len(FAMILIES) * len(METHODS) * CURVE_SEEDS * GENERATORS * KEYS * 2
     require(planned == inventory["default_plan_method_cells"] == 165_150_720, "default plan mismatch")
     counts = collections.Counter()
@@ -52,6 +57,9 @@ def main():
         plan_path = base / "plan.json"
         plan = read(plan_path)
         require(digest(plan_path) == row["plan_file_sha256"]["plan.json"], f"{name}: plan digest")
+        if name == "ml_dataset_local_campaign_20261031":
+            require(prime_audit["campaign_plan_sha256"] == digest(plan_path),
+                    "prime archive twist audit plan binding mismatch")
         require(set(plan["families"]) <= set(FAMILIES), f"{name}: family outside requested axis")
         require(set(plan["field_sizes"]) <= set(FIELD_SIZES), f"{name}: size outside requested axis")
         require(set(plan["arities"]) <= set(ARITIES), f"{name}: arity outside requested axis")
@@ -78,6 +86,15 @@ def main():
                 method = plan["solvers"][0]
                 unknown_twist_receipts += 1
                 campaign_unknown_twists += 1
+                require(family == "prime" and n == 23 and m == 2 and index < 64,
+                        f"{name}: no archive twist audit for this cell")
+                archive_row = prime_audit["rows"][index]
+                require(archive_row["index"] == index and
+                        archive_row["archive_sha256"] == checkpoint["custody"]["archive_sha256"] and
+                        archive_row["s3_uri"] == checkpoint["custody"]["s3_uri"] and
+                        type(archive_row["twist"]) is bool,
+                        f"{name}: archive twist audit binding mismatch")
+                explicit_twists[family].add(archive_row["twist"])
             else:
                 method = spec["solver"]
                 require(method in plan["solvers"] and type(spec["twist"]) is bool,
@@ -96,11 +113,14 @@ def main():
             "twist_not_explicit_in_checkpoint_receipts": campaign_unknown_twists})
     require(sum(counts.values()) == inventory["totals"]["observed_receipts"] == 148,
             "inventory receipt total mismatch")
+    require(prime_audit["untwisted"] == prime_audit["twisted"] == 32 and
+            explicit_twists["prime"] == {False, True}, "prime twist coverage mismatch")
     grid = [{"family": family, "method": method,
              "observed_receipts": sum(v for (f, _, _, s), v in counts.items() if f == family and s == method)}
             for family in FAMILIES for method in METHODS]
-    output = {"schema": "ml-dataset.requested-versus-observed-coverage/v1",
+    output = {"schema": "ml-dataset.requested-versus-observed-coverage/v2",
         "inventory_sha256": digest(INVENTORY),
+        "prime_twist_archive_audit_sha256": digest(PRIME_AUDIT),
         "claim_scope": "retained local synthetic receipt coverage, not completion of the default plan",
         "requested": {"field_sizes": list(FIELD_SIZES), "arities": list(ARITIES),
             "families": list(FAMILIES), "methods": list(METHODS), "twists": [False, True],
@@ -113,6 +133,7 @@ def main():
             "families": sorted(observed_families), "methods": sorted(observed_methods),
             "explicit_twists_by_family": {f: sorted(explicit_twists[f]) for f in FAMILIES},
             "twist_not_explicit_in_checkpoint_receipts": unknown_twist_receipts,
+            "prime_twists_replayed_from_verified_restricted_archives": prime_audit["total"],
             "native_status_counts_where_retained": dict(sorted(native_statuses.items())),
             "family_method_grid": grid, "campaigns": campaigns},
         "unobserved_axes": {"field_sizes": sorted(set(FIELD_SIZES) - observed_sizes),
@@ -121,13 +142,13 @@ def main():
             "specific_prime_modulus_2^61-1": "no retained cell",
             "n_47_to_61": "no retained cell"},
         "interpretation": ["Counts are campaign receipts, not unique curve or key identities across campaigns.",
-            "A planned twist in a plan is not treated as an explicitly observed twist when its Git checkpoint lacks cell_spec.",
+            "The 64 prime twists were read from restricted archive manifests after exact archive hash checks; their Git checkpoints alone omit cell_spec.",
             "Absent family-method intersections are coverage gaps, not evidence that a method is mathematically unsupported.",
             "Native partial, timeout, and budget-exhausted outcomes remain retained rather than promoted to solutions."]}
-    target = HERE / "coverage.json"
+    target = HERE / "coverage-v2.json"
     data = (json.dumps(output, sort_keys=True, indent=2) + "\n").encode()
     if target.exists() and target.read_bytes() != data:
-        raise ValueError("coverage.json differs; review source changes before replacing")
+        raise ValueError("coverage-v2.json differs; review source changes before replacing")
     target.write_bytes(data)
     print(json.dumps({"retained": sum(counts.values()),
         "observed_sizes": sorted(observed_sizes), "observed_arities": sorted(observed_arities),

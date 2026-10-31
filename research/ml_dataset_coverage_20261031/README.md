@@ -1,9 +1,11 @@
 # Requested versus retained dataset coverage
 
-`build_coverage.py` reads the immutable five-campaign inventory and every
-retained Git custody checkpoint. It verifies campaign denominators, plan
-hashes, native export flags, and producer S3 readback receipts before emitting
-`coverage.json`. It does not generate cells or contact S3.
+`build_coverage.py` reads the immutable five-campaign inventory, every
+retained Git custody checkpoint, and `prime-twist-archive-audit.json`. It
+verifies campaign denominators, plan hashes, native export flags, archive
+audit bindings, and producer S3 readback receipts before emitting
+`coverage-v2.json`. The original `coverage.json` remains immutable. Neither
+script generates cells or contacts S3.
 
 The default CLI axes imply 165,150,720 planned method cells: 24 field sizes,
 14 arities, three families, ten methods, 16 curve seeds, eight generators,
@@ -15,15 +17,21 @@ modulus `2^61-1` have no retained cell. The report includes a 3-by-10
 family-method receipt grid and lists all unobserved size and arity values.
 
 Binary and Koblitz Git checkpoints explicitly show both twist settings.
-The 64 prime BSGS checkpoints retain the plan and restricted archive but omit
-`cell_spec`; this report does not infer an observed prime twist from a planned
-axis. A follow-up can promote prime twist coverage only after checking the
-restricted native manifests and retaining a reproducible disaggregation
-receipt. Absent method-family intersections are coverage gaps, not claims of
-mathematical impossibility.
+The 64 prime BSGS checkpoints omit `cell_spec`, so `audit_prime_twists.py`
+hashes each retained restricted archive against its custody checkpoint and
+reads the exact native manifest. It found 32 untwisted and 32 twisted cells;
+`coverage-v2.json` binds that audit to all 64 checkpoint archive hashes. The
+audit can be replayed from the content-addressed S3 objects after restoring
+the archives to a local directory. Absent method-family intersections are
+coverage gaps, not claims of mathematical impossibility.
+`prime-s3-readback-sample.json` records separate fresh GET/hash checks for
+shards 0 and 63; it is a two-object sample, not an independent S3 audit of all
+64 archives.
 
 Recompute without solver execution:
 
 ```sh
 python3 research/ml_dataset_coverage_20261031/build_coverage.py
+python3 research/ml_dataset_coverage_20261031/audit_prime_twists.py \
+  --archives /var/tmp/ml-dataset-local-campaign-20261031/archives
 ```
