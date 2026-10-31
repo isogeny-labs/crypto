@@ -1,0 +1,63 @@
+name: Quadratic twist phase demand native replay
+
+on:
+  pull_request:
+    paths:
+      - 'research/quadratic_twist_evidence_20261021/**'
+      - '.github/workflows/quadratic-twist-phase-demand.yml'
+      - 'src/cryptanalysis/identity_certificate.rs'
+      - 'src/hash/sha256.rs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-phase-demand:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/quadratic_twist_evidence_20261021/
+            /src/hash/sha256.rs
+            /src/cryptanalysis/identity_certificate.rs
+            /docs/identity-certificates/schoenhage-10mult.json
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/quadratic_twist_evidence_20261021
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: '1.99.1'
+      - name: Install native dependencies
+        run: sudo apt-get update && sudo apt-get install -y g++ libssl-dev jq ripgrep
+      - name: Replay setup, online and source-verification requests with independent arithmetic
+        run: bash research/quadratic_twist_evidence_20261021/run-phase-demand.sh "$RUNNER_TEMP/twist-phase-demand"
+      - name: Upload complete native evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quadratic-twist-phase-demand
+          path: ${{ runner.temp }}/twist-phase-demand/
+          if-no-files-found: error

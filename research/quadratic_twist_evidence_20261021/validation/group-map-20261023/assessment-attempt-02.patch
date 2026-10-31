@@ -1,0 +1,24 @@
+--- assessment-final.json
++++ assessment-attempt-02.json
+@@ -63,7 +63,7 @@
+     },
+     {
+       "path": "scripts/build_cover_transfer_assessments.mjs",
+-      "sha256": "2cbdd0bbe067fdb357a76c221a7d954de0c5e6aebfc9e038d5db8d1ad26901f9",
++      "sha256": "41bb552e5df616803b0d4f7b6f2a51d72ca36cab444108c2cac03441931266cb",
+       "role": "deterministic catalog-wide ledger generator",
+       "freshness": {
+         "status": "supported",
+@@ -446,9 +446,9 @@
+       "sha256": "e03922ea296923bfb2ba2a43f03758e05d336e8abed501b41f69fda6a318b507",
+       "role": "native formula-screen inventory with verified registry membership; not a transfer certificate",
+       "freshness": {
+-        "status": "refuted",
+-        "scope": "claim that this formula inventory itself supplies verified executable HC1/CV1 subgroup transfers",
+-        "rationale": "The 2026-10-23 native refresh now checks exact current 4,493-row registry membership and preserves all 2,572 prior per-model objects and the cost model. This corrects the former stale-membership finding, but the modeled routes still do not supply exact HC1/CV1 subgroup transfer certificates or measured advantage. The applicability status stays refuted for that stronger claim; the pinned historical open-obligation ledger is retained unchanged.",
++        "status": "supported",
++        "scope": "exact membership and native regeneration for the 4,493-row registry only",
++        "rationale": "The 2026-10-23 native refresh checks exact current registry membership and preserves all 2,572 prior per-model objects and the cost model. Its modeled routes still have no exact HC1/CV1 subgroup transfer certificates or measured advantage. This supports source freshness only; the pinned historical open-obligation ledger is retained unchanged.",
+         "evidence_refs": [
+           "docs/curves/jacobian-transfers.json",
+           "docs/curves/JACOBIAN_TRANSFERS.md",

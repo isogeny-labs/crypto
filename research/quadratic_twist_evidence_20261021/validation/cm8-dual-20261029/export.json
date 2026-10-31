@@ -1,0 +1,397 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "quadratic-twist-cm8-dual-20261029",
+  "created": "2026-10-29",
+  "protocol": {
+    "path": "research/quadratic_twist_evidence_20261021/CM8_DUAL_20261029_PROTOCOL.md",
+    "sha256": "9e52d49e1c03b69cab9c4464fcf9543287157f2e241cf9a5b682984f78777f89",
+    "protocol_id": "cm8-dual-20261029",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": null,
+    "role": "bounded existing-PR native replay"
+  },
+  "source": {
+    "repo": "isogeny-labs/crypto",
+    "commit": "f3d785d1cb924778f24522b9f0f7d246628fb161",
+    "dirty": null
+  },
+  "backend": "local",
+  "host": {
+    "path": null,
+    "sha256": null,
+    "class_id": null,
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": null
+    }
+  },
+  "arms": [
+    {
+      "id": "attempt-01",
+      "role": "candidate",
+      "binary_sha256": "3a87afe163c17e760d61d87ac4229b4c89049dd983ad796e6af736e9342a8f89",
+      "commit": "bfa7e448e62cb4325a3b8af7c78c3daa4254e413"
+    },
+    {
+      "id": "attempt-02",
+      "role": "candidate",
+      "binary_sha256": "3a87afe163c17e760d61d87ac4229b4c89049dd983ad796e6af736e9342a8f89",
+      "commit": "f3d785d1cb924778f24522b9f0f7d246628fb161"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "attempt-01",
+      "arm": "attempt-01",
+      "instance_id": "full-f13-dual-and-12-frozen-arms",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "source_points": 14,
+          "target_points": 14,
+          "addition_pairs": 392,
+          "source_recoveries": 72,
+          "pullbacks": 6
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "exact correctness census; no clock isolation earned"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "independent Rust; full failure/exit retained"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "existing local host; two build workers"
+    },
+    {
+      "run_id": "attempt-02",
+      "arm": "attempt-02",
+      "instance_id": "full-f13-dual-and-12-frozen-arms",
+      "seed": null,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "source_points": 14,
+          "target_points": 14,
+          "addition_pairs": 392,
+          "source_recoveries": 72,
+          "pullbacks": 6
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "exact correctness census; no clock isolation earned"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "independent Rust; full failure/exit retained"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "existing local host; two build workers"
+    }
+  ],
+  "flow": {
+    "planned": 1,
+    "attempted": 2,
+    "completed": 2,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/INPUTS.sha256",
+      "sha256": "e133546f4875c2514499eca125d6edd857084a0ed9c2d32f9757bca1027aaaf7",
+      "bytes": 16245,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/audit.json",
+      "sha256": "317cc8a628bfa419fc570ae5c7fc94d99a19ce2d645605af9064225e6ef0d4b2",
+      "bytes": 298,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/candidate-audit.json",
+      "sha256": "3ab52d35a588185dc8c3cf1ede5f438206cf08a8882708a68e4f0c33a91ef34a",
+      "bytes": 1001,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/candidate/index.json",
+      "sha256": "18f2e30716f89454a38bf7b8bbd4353c6b93de7c015428590b3ecea5eafe8473",
+      "bytes": 12841,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/candidate/main0.json",
+      "sha256": "146ed6916846b7cf21be48732728ce72c6dbbcddc3edc41a431803f83e344e70",
+      "bytes": 71318,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/candidate/main1.json",
+      "sha256": "15ab732d1640e0c5216b25d318159b9ac8432bfb114c2342f54aea8a901e6d44",
+      "bytes": 72349,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/candidate/main2.json",
+      "sha256": "e2f8a1aae0f1834f803dd452a4f14b186d54e2e6a83950dc81227b038a847123",
+      "bytes": 70275,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/candidate/matched0.json",
+      "sha256": "13ad9de422934555b9053ce15d293e4580a3155f3f6af7f898ff87fd7a3801ba",
+      "bytes": 75503,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/candidate/matched1.json",
+      "sha256": "34d2076329dd1254dc53ac56cee4196f3fb0146b991f868be81e6ed02e7d4320",
+      "bytes": 81049,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/candidate/matched2.json",
+      "sha256": "c5af0cd05516f3383ac8a4ba15862873795dcb6a8ca7fc7955941908a1ea8186",
+      "bytes": 71118,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/candidate/pullback0.json",
+      "sha256": "d2aaa0a1e05fe06332023aa6962acbe29f05dcb26962ea9087fbfb854f48fcf9",
+      "bytes": 72350,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/candidate/pullback1.json",
+      "sha256": "bed7ed0135befb9517a5350f04f39fd2f980b3ec3a676256a5e17e161a311019",
+      "bytes": 70275,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/candidate/pullback2.json",
+      "sha256": "ea5be7212b2e52e6dd8f6e7008a0110582d3131923b1710f9eeea971210b8dec",
+      "bytes": 71319,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/candidate/twist0.json",
+      "sha256": "3a912e340f9a9fc0e343f419adbdd5facde0dbdd48f653c2b9a0289111ccfbb2",
+      "bytes": 81048,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/candidate/twist1.json",
+      "sha256": "02bc0d3e70865a2826c238f54f932689dbbbd586345f4a4864d6954d496388d1",
+      "bytes": 71118,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/candidate/twist2.json",
+      "sha256": "1480687b9e326e675d6f41c95ebd98c8ad004c5d23cc375e340bee91c69229c0",
+      "bytes": 75502,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/dual.json",
+      "sha256": "5b3e1a9a3221fb321bf1c0804427704097d26843e6a052eb644a63294501d820",
+      "bytes": 38948,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/dual.sha256",
+      "sha256": "5068b37e180eaeecf15943a7207934ce6e86dedc374bd2c2c37c3d8ca1b687ca",
+      "bytes": 76,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/reference/index.json",
+      "sha256": "18f2e30716f89454a38bf7b8bbd4353c6b93de7c015428590b3ecea5eafe8473",
+      "bytes": 12841,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/reference/main0.json",
+      "sha256": "146ed6916846b7cf21be48732728ce72c6dbbcddc3edc41a431803f83e344e70",
+      "bytes": 71318,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/reference/main1.json",
+      "sha256": "15ab732d1640e0c5216b25d318159b9ac8432bfb114c2342f54aea8a901e6d44",
+      "bytes": 72349,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/reference/main2.json",
+      "sha256": "e2f8a1aae0f1834f803dd452a4f14b186d54e2e6a83950dc81227b038a847123",
+      "bytes": 70275,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/reference/matched0.json",
+      "sha256": "13ad9de422934555b9053ce15d293e4580a3155f3f6af7f898ff87fd7a3801ba",
+      "bytes": 75503,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/reference/matched1.json",
+      "sha256": "34d2076329dd1254dc53ac56cee4196f3fb0146b991f868be81e6ed02e7d4320",
+      "bytes": 81049,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/reference/matched2.json",
+      "sha256": "c5af0cd05516f3383ac8a4ba15862873795dcb6a8ca7fc7955941908a1ea8186",
+      "bytes": 71118,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/reference/pullback0.json",
+      "sha256": "d2aaa0a1e05fe06332023aa6962acbe29f05dcb26962ea9087fbfb854f48fcf9",
+      "bytes": 72350,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/reference/pullback1.json",
+      "sha256": "bed7ed0135befb9517a5350f04f39fd2f980b3ec3a676256a5e17e161a311019",
+      "bytes": 70275,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/reference/pullback2.json",
+      "sha256": "ea5be7212b2e52e6dd8f6e7008a0110582d3131923b1710f9eeea971210b8dec",
+      "bytes": 71319,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/reference/twist0.json",
+      "sha256": "3a912e340f9a9fc0e343f419adbdd5facde0dbdd48f653c2b9a0289111ccfbb2",
+      "bytes": 81048,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/reference/twist1.json",
+      "sha256": "02bc0d3e70865a2826c238f54f932689dbbbd586345f4a4864d6954d496388d1",
+      "bytes": 71118,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/cases/reference/twist2.json",
+      "sha256": "1480687b9e326e675d6f41c95ebd98c8ad004c5d23cc375e340bee91c69229c0",
+      "bytes": 75502,
+      "kind": "raw"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-dual-20261029/reference-audit.json",
+      "sha256": "3ab52d35a588185dc8c3cf1ede5f438206cf08a8882708a68e4f0c33a91ef34a",
+      "bytes": 1001,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": null,
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "exact native/proof/log records",
+      "text": "Both full native attempts passed; second changes only a misleading receipt key from nontorsion to non-r7, plus source provenance. All26case files match and all non-source dual fields match."
+    },
+    {
+      "kind": "observation",
+      "by": "exact native/proof/log records",
+      "text": "Nine rehashed controls reject101/no receipt;22backend tests pass; unmodified scoped Lean gate21named/25audited/0extra trusted."
+    },
+    {
+      "kind": "observation",
+      "by": "exact native/proof/log records",
+      "text": "Preregistered Markdown protocol was committed before data. This structured export is schema checked after execution, not a retroactive experiment.protocol/v1 JSON freeze or canonical protocol checker approval."
+    },
+    {
+      "kind": "observation",
+      "by": "exact native/proof/log records",
+      "text": "No useful-yield/degree or timing/calibrated-work gain is asserted. Full root suite reaches600sec cap124 without completion."
+    },
+    {
+      "kind": "observation",
+      "by": "source/cache provenance review",
+      "text": "Effective native sources were committed and hash checked. Whole-worktree dirty state at native execution was not captured; generated target files had been accidentally indexed and later ordinary cleanup removes them from the tip, so no global clean-worktree claim is inferred."
+    }
+  ],
+  "reviews_dir": "reviews",
+  "backend_record": {
+    "addition_pairs": 392,
+    "arms": 12,
+    "dual_sha256": "5b3e1a9a3221fb321bf1c0804427704097d26843e6a052eb644a63294501d820",
+    "independent_arithmetic": true,
+    "pullbacks": 6,
+    "rejected_valid_non_r7_points": 7,
+    "source_points": 14,
+    "source_recoveries": 72,
+    "status": "passed",
+    "subgroup_inverse_points": 7,
+    "target_points": 14
+  }
+}
