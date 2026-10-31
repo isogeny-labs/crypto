@@ -92,3 +92,11 @@ full doubling-line product,3unit products,source-compatible doubling,
 three doublings identity,chord recovery unit,exact sign action,changed
 intercept rejection,monic degree24 point annihilator and5fresh serialized
 full products. collision51-01 admitted next for the3/7denominator geometry.
+
+collision51-01 accepted exit0/noerrors/exactmarker. Normspsi2/psi4/psi7 are
+Delta,Delta^5,Delta^16. All12 multiplication-column products,full4-entry
+cofactor product,polynomial coefficient gates and U*psi3+V*psi7=Delta^16
+pass,including serialized replay. Thus the collision support is contained
+inDelta=0,with no inverseA and hence including goodA=0 fibers. diamond-nu51-01
+admitted next. This is the <2> marked-point diamond (s=c³/(b+(1+c)c)),distinct
+from the generic Hecke3 quotient. No extra generator/controller admitted.
