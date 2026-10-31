@@ -1,0 +1,33 @@
+{
+  "exit_code": 0,
+  "client_terminal_exit": 0,
+  "argv": [
+    "/usr/bin/sudo",
+    "-n",
+    "/usr/bin/env",
+    "-i",
+    "PATH=/usr/bin:/bin",
+    "/usr/bin/curl",
+    "-q",
+    "--head",
+    "--silent",
+    "--show-error",
+    "--max-time",
+    "15",
+    "--unix-socket",
+    "/var/run/docker.sock",
+    "--noproxy",
+    "*",
+    "http://localhost/v1.44/containers/0b8ac008507f0556c98d3aa450d0182681e8a87423b397ed991a532fdac768b1/archive?path=%2Fopt%2Fisolab%2Frecovery%2Flib"
+  ],
+  "started_monotonic": 195297.626116212,
+  "ended_monotonic": 195297.656984589,
+  "cap_seconds": 17,
+  "environment_names": [
+    "HOME",
+    "LANG",
+    "PATH"
+  ],
+  "docker_environment": "empty allowlist; no endpoint/TLS/proxy/credential selectors",
+  "supervisor_deadline": 195595.848124873
+}

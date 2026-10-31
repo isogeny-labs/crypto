@@ -184,7 +184,7 @@ jobs:
             examples
       - name: Materialize native build inputs
         working-directory: source
-        run: ../control/scripts/sparse-checkout.sh apply --profile minimal --path isogeny_algos --path crates --path research/pencil_large_prime_20261029 --path research/five_leads_e2e_20261019/native --path .artifacts
+        run: ../control/scripts/sparse-checkout.sh apply --profile minimal --path isogeny_algos --path crates --path research/pencil_large_prime_20261029 --path research/five_leads_e2e_20261019/native --path .artifacts --path taskq/deploy/eks-karpenter/resume/fresh-owner
       - name: Pull store data needed by the tested source
         working-directory: source
         env:
@@ -216,6 +216,7 @@ jobs:
           name: isolab-build-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             ${{ runner.temp }}/isolab-build/ecbench
+            ${{ runner.temp }}/isolab-build/isolab-fresh-owner
             ${{ runner.temp }}/isolab-build/build-info.json
           if-no-files-found: error
           retention-days: 7

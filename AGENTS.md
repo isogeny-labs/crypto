@@ -28,6 +28,20 @@ Keep entries about this project; do not copy private global logs or chat transcr
 
 # Agent instructions
 
+## Research progress and communication
+
+Owner instruction, 2026-10-30. Lead with what was derived, implemented,
+improved, or checked, and report it at that scope. A completed component is
+progress. State a material remaining dependency once, with the next technical
+step, and continue authorized work.
+
+Do not append an overall ECDLP verdict or a rho comparison to routine results,
+reports, or handoffs. Use those comparisons for an explicitly scoped evaluation,
+a required comparison table, or a specific factual correction. Exact checks,
+assumptions, measured costs, and actual failures provide the necessary context.
+This rule replaces older instructions that discount component progress or
+require routine overall-goal disclaimers.
+
 ## Literature first
 
 Owner instruction (2026-10-19): check relevant literature before doing any work.
@@ -78,11 +92,11 @@ implementing, running experiments, or making recommendations.
   examples' tests, and the relevant Python suites (for example
   `research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py`)
   and fix failures first.
-- **Claim hygiene** (see `docs/ic/boundary_targets.json`): public synthetic
-  / known-answer fixtures only; fail-closed evidence; no key-recovery,
-  asymptotic sub-rho, or deployed-curve-security claims; multi-target and
-  amortized results stay secondary; ledger rows promote only with complete
-  measurement fields and independent replay.
+- **Evidence scope** (see `docs/ic/boundary_targets.json`): use public synthetic
+  / known-answer fixtures and describe the domain and behavior actually checked.
+  Support recovery, complexity, and security conclusions with evidence for the
+  particular claim. Multi-target and amortized results stay secondary; ledger
+  rows promote only with complete measurement fields and independent replay.
 - **Beat the fastest external tool, and show it** (owner's rule,
   2026-10-16; details in §15): our implementations should be faster than
   every other implementation of the same computation. Every speed result
@@ -128,11 +142,10 @@ implementing, running experiments, or making recommendations.
 Owner's rule, 2026-10-15. It replaces any earlier wording that treats only
 beating rho, or only an "advance", as success.
 
-The long-term goal is an index calculus that beats Pollard rho. That will
-not come from one breakthrough. It comes from many measured improvements,
-each building on the last, until the gap closes. So **the success criterion
-is a verified, measured improvement over the current index-calculus
-baseline. Every such improvement is a success and is reported as one.**
+Verified, measured improvements accumulate toward the long-term index-calculus
+objective. **Each improvement over the named baseline is a success at the
+scope measured and is reported as one.** Constructions, identities, and
+descriptive investigations report their own technical outcomes and next steps.
 
 - **Baseline.** For each curve and size, the baseline is the best current
   verified index-calculus pipeline, frozen with its protocol, receipts and
@@ -152,12 +165,11 @@ baseline. Every such improvement is a success and is reported as one.**
 - **Ratchet.** Each landed improvement becomes the new baseline. Record it
   with its delta, so progress is cumulative and visible across the
   sequence.
-- **Distance to rho.** Report the gap to the matched rho on every row,
-  and to precomputation rho (Bernstein–Lange) where setup is excluded. The
-  gap is the distance remaining, not a pass/fail gate. Not beating rho
-  never makes an improvement a failure. A claim to *beat* rho still needs
-  every reference rule: an end-to-end cold `S` below the matched rho's,
-  robust at growing `n`, independently replayed.
+- **Comparison scope.** Include matched rho and precomputation references
+  where the pipeline comparison or frozen protocol calls for them. Component
+  work uses the matched reference for that component. A claim to beat rho uses
+  the complete accounting, growing-size checks, and independent replay for
+  that comparison.
 - **Keep going.** After each result, name the next improvement to try, and
   move on to it.
 
@@ -178,15 +190,14 @@ baseline and its own ratchet under the success criterion above.
   computing group sums or differences, and testing them against the base or a
   table of precomputed sums: `subtract`, `rootfind-*`, `mitm`, pair tables,
   and large primes on a pair table. Such an oracle runs identically on a
-  random base, so it is a generic algorithm bounded by √r. Improvements in
-  this track are successes under the 2026-10-15 criterion. They are labelled
-  "generic decomposition (bounded by √r; cannot beat rho)" and are never
-  described as algebraic progress.
+  random base. Label this track "generic decomposition" and document the
+  applicable generic-group bounds with their assumptions in its method
+  description. Improvements in this track count against its own baseline.
 
 Arms of the two tracks may be ranked against each other on the same
 instances, in the same unit and across the §5a band. A gain in one track
-never ratchets the other track's baseline. Each row reports its distance to
-matched rho. Per-oracle classification:
+never ratchets the other track's baseline. Include matched rho in tables whose
+protocol calls for that comparison. Per-oracle classification:
 `research/prime_ic_program_20261029/ruling/classification.json`, column C.
 
 ## Pointers
@@ -207,6 +218,9 @@ matched rho. Per-oracle classification:
   leads, and run `--match "<idea>"` before proposing an ECDLP mechanism. A
   result that lands here updates the lead it advances in the same PR or the
   next atlas review (skill `lead-atlas` there).
+- **Curve facts, by query instead of by file scan:** the curve database
+  ecdb (MCP server `ecdb` in `.mcp.json`, or HTTP). See "Querying the curve
+  database (ecdb)" below and [ecdb/docs/AGENTS.md](ecdb/docs/AGENTS.md).
 - Boundary ledger (machine): `docs/ic/boundary_targets.json`
 - Boundary scoreboard (human): `docs/ic/BOUNDARY_TARGETS.md`
 - Autolab runner: `research/sat_factor_base_review_20260908/autolab/`
@@ -449,6 +463,9 @@ resume the effort are checked into S3**, and kept current while it runs.
 
 A checkpoint is a safety net, not the record: the spec, protocol and results
 still land in a PR under the rules above.
+Switching runtimes when a budget runs out (Claude Code ↔ Codex):
+[docs/runtime-relay.md](docs/runtime-relay.md); on a pending `.resume/HANDOFF.md`, run
+`python3 scripts/relay.py accept` first.
 
 ## Research searches must leave visual reports
 
@@ -516,8 +533,8 @@ and `aburan28/ml-cryptanalysis`:
   category) and the PDF.
 - Claims follow the repository's evidence rules: every number cites a
   committed artefact in this repository or a sibling (prefix the path with
-  `crypto:`, `cryptanalysis:` or `crypto-autoresearcher:`); a stage
-  diagnostic is never reported as a speedup; every end-to-end row has
+  `crypto:`, `cryptanalysis:` or `crypto-autoresearcher:`); a component
+  speedup names the measured component and interval; every end-to-end row has
   verified answers; each change is classed as advance, engineering,
   relabelling or accounting. A draft is not submitted, posted or cleared for
   either until its README says so, and its README names the novelty audit
@@ -781,24 +798,24 @@ a downstream claim cannot silently treat them as accepted evidence.
 
 For performance changes, the existing frozen-suite, full-cost, matched-rho,
 and scoreboard requirements in sections 1–8 still apply. A PR that reports
-only a stage measurement must label it a stage diagnostic and leave
-end-to-end cost and speedup unset. Open or update the PR as part of the
-iteration and stop there; the merge automation of the default workflow above
-merges it once its evidence, review, and CI gates are satisfied.
+only a stage measurement reports that stage's cost or speedup, with its
+matched interval, and leaves unmeasured end-to-end fields unset. Open or update
+the PR as part of the iteration and stop there; the merge automation of the
+default workflow above merges it once its evidence, review, and CI gates are
+satisfied.
 
 ## The rule: boundary, table, ratio
 
-Any thread that claims to improve an attack must express its progress as
-a **ratio to a boundary**, reported in a **single table** whose rows are
-variants and whose columns are one unit.  A thread that cannot state its
-boundary has not started; a thread whose ratio to the boundary is flat
-has not progressed, however much its constants moved.
+For a quantitative performance comparison, report candidate and matched
+reference costs in the same unit, with their ratio and correctness checks.
+Include a proved lower bound when it informs that comparison. Recognize
+constant-factor, component, construction, and whole-pipeline improvements at
+their respective scopes; a flat ratio to a lower bound does not erase them.
 
 ### 1. State the boundary before measuring
 
-A **boundary** is a quantity that the method under study cannot cross,
-derived rather than measured.  It comes in two kinds, and a thread
-normally has one of each:
+A comparison can use a proved lower bound and a measured reference. They
+answer different questions:
 
 - A **floor**: a lower bound from a counting or generic-group argument.
   Example from `research/notes/index-calculus/RESEARCH_RESIDUAL_WALKS.md`: a generic algorithm's
@@ -811,9 +828,10 @@ normally has one of each:
   For the discrete logarithm that is Pollard rho, run on the same group,
   with the same operation accounting.
 
-Write both into the note *before* optimising, with the formula for the
-floor and the measured value of the reference.  A boundary chosen after
-the fact is not a boundary.
+Name the reference and any applicable floor before measuring the comparison.
+State the floor's assumptions and use the reference for the actual component
+or pipeline being measured. A new construction can proceed while its cost
+analysis is being developed.
 
 ### 2. Report one table, one unit
 
@@ -832,26 +850,19 @@ linear algebra, and any work an oracle does per call.  Convert foreign
 units with a measured conversion factor and record it, for instance the
 63 field multiplications per curve addition measured on `F_{p³}`.
 
-**End-to-end speed is the measure of speed.**  `S` is defined over the
-*whole* method, cold, from setup to the recovered logarithm; a number
-that prices only one phase — the relation search, the decomposition
-oracle, a single solver call, the linear algebra — is a stage
-diagnostic, never a speed.  "Faster than rho" means the method's `S`
-column, with every phase inside it, sits below rho's, robustly, at
-growing `n` — nothing less earns the phrase.  Quoting a phase crossover
-as a method crossover is the §5 mistake, and the residual-walk thread is
-the worked case: its relation phase crosses rho near `2^{96}` in
-isolation while the whole method never does, because the linear algebra
-it left out decides the exponent (§11.6–11.7).  Equivalently, the only
-admissible speed ratio is §8's
-`speedup = baseline_total_operations / candidate_total_operations`;
-a ratio taken over any smaller slice of the pipeline is labelled a stage
-diagnostic and may not be reported as a speedup.
+**Name the measured interval.** For a cold end-to-end comparison, `S` covers
+setup through the recovered logarithm and the ratio is
+`speedup = baseline_total_operations / candidate_total_operations`.
+For a component comparison, use the same component interval in both arms and
+report the ratio as that component's speedup. A relation search, decomposition
+oracle, solver, or linear-algebra improvement is a valid scoped result.
+Leave unmeasured pipeline costs unset. An explicit comparison against rho
+includes the full method at growing sizes under the reference rules.
 
 The table must carry a **ratio column** against each boundary, and a
 correctness column.  A row without a verified answer is not a result.
 
-### 3. Progress is the ratio, not the constant
+### 3. Describe what improved
 
 Classify every change, in the note, as one of:
 
@@ -891,10 +902,10 @@ relations.
 
 ### 5. Separate the phases, and price all of them
 
-An exponent claim covers the whole method or it is not an exponent
-claim.  Price each phase against the boundary separately and say which
-one dominates, at what size.  Fit exponents over at least four sizes and
-report the fit next to the prediction.
+State whether an exponent describes a component or the whole method. For a
+whole-method claim, account for every phase and identify which dominates at
+each size. Fit empirical exponents over at least four sizes and report the fit
+next to the prediction; distinguish a derived bound from a fitted exponent.
 
 This is where the residual-walk thread went wrong once and had to be
 corrected: three rounds priced the relation phase, quoted a crossover
@@ -1110,7 +1121,7 @@ system shape, solving degree, Macaulay and SAT figures), which the
 `ecbench` database exposes as the `ic_yield` view. It is how a reader
 gets from a number on the scoreboard to the curve, algorithm and
 evidence behind it, and how a candidate combination is informed: a
-yield is a stage diagnostic, and only a whole-pipeline `S` decides speed.
+yield describes a stage, while whole-pipeline `S` compares complete solves.
 
 - **Generated, never edited.** `docs/browser/data.json` is written by
   `python3 scripts/build_lab_browser.py` from committed files only (the
@@ -1134,6 +1145,52 @@ yield is a stage diagnostic, and only a whole-pipeline `S` decides speed.
   candidate on a curve the registry does not hold is shown as
   "not in the registry", never dropped or silently mapped; registering
   the curve (§11) is the fix.
+
+#### 7d. Dashboard coverage is a pre-merge contract
+
+The leaderboard, scoreboard, progress timeline and lab browser are one
+published research index. **Every PR that changes a curve, frozen IC/rho
+result, factor base, recipe, phase cost, validation status or reference must
+update all affected views in that PR.** A new study that does not qualify for
+the priced tables still needs a clearly labelled diagnostic or a documented
+exclusion. Reviewers check the dashboard diff against the frozen source,
+including losses, superseded figures and unresolved identities, before merge.
+
+- **All named curves remain findable.** The ICV1 slugs in the registry,
+  leaderboard roster and lab browser must agree exactly. The priced subset
+  is counted separately; absence of a measured whole-pipeline cost is shown
+  as unpriced, never inferred from a stage diagnostic. A new curve or result
+  must not silently fall out of search because another generated index is
+  stale.
+- **Every priced row is auditable.** Keep its ICV1 curve, exact regime and
+  target count, measured factor-base size and recipe, FB1 linkage status,
+  frozen source, validation status, phase costs, matched-rho quality, unit,
+  and the previous figure when superseded. Show counted totals as `2^x`
+  operations only when those totals are in the frozen record. Show IC/rho
+  with `1.0×` as parity; do not mix cold one-target and batch references or
+  timing and counted-operation units. A missing exact FB1 identity remains
+  explicitly unreconciled, even when a base size is known.
+- **Progress is append-only evidence.** Every new numeric comparison gets a
+  source-backed point in `docs/ic/progress-timeline.json` with merge date,
+  class, reference quality and anchor. Corrections retain the old point and
+  mark the new one `accounting`. Update the scoreboard's embedded chart and
+  point table from the canonical timeline in the same PR.
+- **Check before merge.** Run `node scripts/check_ic_dashboard_coverage.mjs`
+  and the leaderboard and browser `--check` commands on complete inputs.
+  The coverage check enforces registry/roster/browser equality, source
+  digests, required row fields and timeline metadata; the generators enforce
+  exact outputs. The `ic-leaderboard` workflow runs this on matching PRs,
+  not only after a push to `main`. A missing frozen or artifact-store input
+  is a failed check to repair or report, not a reason to call the page current.
+- **Publish and verify.** After merge, confirm the Pages workflow succeeded
+  and the public `/scoreboard/ic-leaderboard.html` and `/browser/` reflect
+  the merged source. A local preview or open PR does not establish that.
+
+The architecture and coverage limits are recorded in
+[`docs/ic/DASHBOARD_COVERAGE.md`](docs/ic/DASHBOARD_COVERAGE.md). Frozen
+files and replay receipts are the source of truth. The existing `ecbench`
+SQLite database is a rebuildable query index. Do not make a mutable hosted
+database, including RDS, the sole source for a published result.
 
 ### 8. Use the frozen benchmark to establish end-to-end speedups
 
@@ -1723,6 +1780,49 @@ it emits these records and kernel-certified `IW1` routes, and `isogeny_walk
 verify` replays them.
 The user guide, including S3 storage, is
 [docs/isogeny-walk/README.md](docs/isogeny-walk/README.md).
+
+## Querying the curve database (ecdb)
+
+ecdb is a Postgres catalogue on RDS (us-west-2). It holds every curve in the
+registry, the walk outputs and the trait catalogue, with their Jacobians,
+isogenies, covers, transfer prices and computed polynomials. Agents reach it
+through the MCP server `ecdb` in `.mcp.json` or over HTTP. The guide is
+[ecdb/docs/AGENTS.md](ecdb/docs/AGENTS.md); read it before the first query.
+
+- **Look up before computing.** Query ecdb before writing code or scanning
+  `docs/curves/*.json` for a curve fact. This covers trace, order, cofactor,
+  CM discriminant, End(E), embedding degree, twist, l-torsion, volcano level,
+  isogeny neighbours, covers, transfer price, division or modular
+  polynomials, and GLV data. Resolve curve names there too; on an ambiguous
+  name (409), choose a candidate explicitly.
+- **Token.** Export it before the runtime starts:
+
+  ```sh
+  export ECDB_TOKEN=$(aws secretsmanager get-secret-value --region us-west-2 --secret-id ecdb/api --query SecretString --output text | jq -r .read_token)
+  ```
+
+  Never print, commit or log it. Without AWS access to `ecdb/api`, say so and
+  fall back to the repository files.
+- **Cite the source, not the query.** ecdb is imported from this
+  repository's files at the commit `GET /v1/meta` names. A PR, report or
+  leaderboard row cites the repository file, certificate or run, not an ecdb
+  query.
+- **Keep statuses.** Report every value with its `fact_status`. Unknown is
+  `null`, never 0. `probable` is not `proved`.
+- **Transfer prices are leads.** `dlp_transfer.ratio_log2` is a formula
+  estimate. It is not a measured speedup, and it never enters the IC
+  leaderboard or `benchmarks/` (§5a and "The rule: boundary, table, ratio").
+- **Relations are not routes.** A twist, isomorphism or model-change row
+  does not transport a logarithm. Only a kernel-certified `isogeny` row does
+  (the typed curve-link rules above).
+- **Writes are claims.** `ecdb_record_evidence` and `POST /v1/isogenies`
+  need the write token. They record what a run or certificate in a PR
+  supports, with its artifact hash and true status. Correct imported data in
+  the source file, then redeploy (`ecdb/deploy/README.md`). Never patch rows.
+- **Keep it current.** A PR that changes a catalogue ecdb imports (the
+  registry, `traits.json`, `covers.json`, `jacobian-transfers.json`, the
+  certificates, the imported walk outputs) says so in its body. After merge,
+  redeploy with `ecdb/deploy/build-lambda.sh` and `ecdb/deploy/deploy-aws.sh`.
 
 ## IC measurement rules
 

@@ -1,0 +1,31 @@
+/var/tmp/pencil-mixed-positive-word-20261031-v1/Controls.lean:17:3: error: failed to synthesize
+  Decidable (WordD1.canonical 7 aa)
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+/var/tmp/pencil-mixed-positive-word-20261031-v1/Controls.lean:18:3: error: failed to synthesize
+  Decidable (WeightedWord.canonical 7 bb)
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/var/tmp/pencil-mixed-positive-word-20261031-v1/Controls.lean:23:1: error: unsolved goals
+case hva
+⊢ 1 + X * C 6 + X ^ 5 - C 64⁻¹ ^ 2 = X * 6 + X ^ 5
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/var/tmp/pencil-mixed-positive-word-20261031-v1/Controls.lean:26:1: error: unsolved goals
+case hvb
+⊢ 1 + X * C 6 + X ^ 5 - C (3 / 486) ^ 2 =
+    X * C (5 / 9) + X ^ 2 + X ^ 2 * C (5 / 9) + X ^ 3 + X ^ 3 * C (5 / 9) + X ^ 4 + X ^ 4 * C (5 / 9) + X ^ 5
+/var/tmp/pencil-mixed-positive-word-20261031-v1/Controls.lean:34:49: error: failed to synthesize
+  Decidable ¬WordD1.canonical 7 { x := 0, y := 7, z := 2, w := 2 }
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
