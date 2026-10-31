@@ -39,6 +39,8 @@
 //! | [`bounds`] | bound records: the fitted cost of a method on a domain, sealed and re-derivable |
 //! | [`frontier`] | the Pareto frontier of a domain's bounds, and its page |
 //! | [`challenge`] | challenges (frozen paired specs) and verdicts (how a frontier moves) |
+//! | [`report`] | a session directory as Markdown, SVG graphs, Typst source and JSON |
+//! | [`sweep`] | the spec generator for method × size scaling studies |
 //!
 //! [`CountedGroup`]: crate::cryptanalysis::ic_boundary::CountedGroup
 
@@ -84,11 +86,13 @@ pub mod methods;
 pub mod negation_strong;
 pub mod plane_quartic;
 pub mod record;
+pub mod report;
 pub mod resources;
 pub mod runner;
 pub mod signals;
 pub mod spec;
 pub mod stats;
+pub mod sweep;
 pub mod three_leads;
 pub mod trend;
 pub mod wordram_price;

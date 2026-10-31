@@ -1,0 +1,34 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "sweep: 1 method(s) on koblitz curves, degrees n of K_a/F_2^n 31",
+  "description": "Method × size scaling study (koblitz curves, degrees n of K_a/F_2^n 31; 4 independent single-target workload(s) per curve, 1 interleaved round(s)). One curve per size so `ecbench bound fit` and `ecbench report` can fit cost against r. Counted group operations; a measurement, not a performance claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 31
+      }
+    ],
+    "targets_per_curve": 4,
+    "target_seed": 20261002
+  },
+  "arms": [
+    {
+      "name": "rho-signed_frobenius_strong",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong",
+        "params": {}
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 1,
+    "isolation_required": "L2",
+    "timeout_seconds": 300
+  }
+}
