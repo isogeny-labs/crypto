@@ -1,0 +1,24 @@
+{
+  "kind": "self-test-planning-observations/v1",
+  "actual_cohort_read": false,
+  "seconds": {
+    "positive": 0.005,
+    "production": 0.004,
+    "verification": 0.024
+  },
+  "n_per_phase": 1,
+  "resolution_seconds": 0.001,
+  "isolation": "shared local host, no performance claim",
+  "estimate": {
+    "formula": "512*(positive+production+4*verification)",
+    "seconds": 53.760000000000005,
+    "scope": "Heuristic allowance for the full census plus three refusal controls; not measured NIST runtime or a bound"
+  },
+  "first_attempt": {
+    "id": "001",
+    "status": 127,
+    "actual_control_executed": false,
+    "cause": "/usr/bin/time unavailable"
+  },
+  "successful_attempt": "002, Bash time keyword"
+}

@@ -1,0 +1,13 @@
+# Concrete filled assembly binding review
+
+Finding: no blocking discrepancy in the supplied binding at its declared local assembly scope. The exact reviewed binding SHA256 is ad2050391e92f14425ab6bd255c44ed78ac7da09e2a1bdff14cb3304723428a4 and admitted remains false. Root may make the stated one-field false-to-true admission change after accepting this review; no other binding change is covered.
+
+Read-only checks recomputed ten binding hashes, all eleven retained artifact entries and all fifteen runtime archive member type/mode/length/hash joins. The final ecbench digest d0e2d1426115f5efecced07c298d691e1bcc7d5378015f992edc615dc9384f5b matches the terminal3c592af build receipt and separate final provenance review. Revision/tree, --no-default-features, x86_64-unknown-linux-musl, actual rustc verbose output and RUSTFLAGS all match. build_info.built_at is exactly the terminal receipt build_ended converted to UTC, not a new claimed compilation time. The owner digest matches retained source-qualified bytes. Source repository metadata preserves the unchanged Dockerfile contract.
+
+The prospective supervisor review hash resolves to the independent source review that accepted this exact supervisor SHA. The route/resolution hash resolves to the observed installed legacy route and exact reported-commit cached-parent contract. Its acquisition hash joins the bound immutable parent, same daemon, linux/amd64 and empty OnBuild. Actual parent presence and daemon identity are rechecked by the supervisor; no concurrent removal between check and use is assumed. pull=false does not establish enforced network denial.
+
+The final provenance review separately binds the final binary/source/map and static ELF analysis. Its bundled musl upstream-revision limitation remains; this binding does not assert that the private musl libc was the final link input or that the image is already qualified. Successful assembly supplies local IDs for subsequent qualification, not scientific admission.
+
+Prior involvement: this reviewer produced the assembly supervisor and local-route packet, but did not fill this binding, execute the final build or author the independent supervisor/final-provenance reviews. This is a concrete binding/custody check, not a second independent source review of my own supervisor.
+
+Only read-only file/hash/archive inspection was performed. No Docker command, image build, container, cloud action or native payload was run. The existing 600-second total/60-second readback reserve, one attempt per image and ambiguous-build reconciliation remain unchanged. Final Q0-Q4 qualification remains separate.
