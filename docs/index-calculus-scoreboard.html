@@ -830,6 +830,22 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
 </tbody></table></div>
 <p class="dash-footnote">Curves <code>icv1-f2m47-t22705043-f4e44623</code> (2.07&times;) and <code>icv1-f2m59-tm943548413-98844ecc</code> (2.07&times;) are in the frozen table and omitted here for width. Extrapolation, not a measurement: with the flat ratio, strong rho on <code>EC1N83Ckb1h876c2921cb64</code> costs about 2<sup>37.1</sup> additions, the claw about 2<sup>38.3</sup> at <code>c = 1</code> and 2<sup>42.3</sup> at the PR&rsquo;s shape. Host: macOS, isolation L0, so counts are the result and wall time is descriptive (claw <code>c = 1</code> median 10.5&times; rho&rsquo;s wall). <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_pair_claw_20261003/README.md">Protocol, session, audit, table, comparisons and scored predictions</a>. Class: accounting (AGENTS.md &sect;3); the best-of table and the verdict are unchanged.</p>
 </section></div></details>
+<!-- ps6-charge:begin -->
+<details class="dash-details"><summary>PS-6 &middot; the pairs-and-solve kernels charged in the counted unit</summary><div class="dash-detail-body"><section class="dash-section" id="lab-ps6-charge" aria-labelledby="ps6-charge-title" data-collapse="open"><div class="dash-section-head"><div><p class="dash-kicker">Binary decomposition oracle, one harness / 31 October 2026</p><h2 id="ps6-charge-title">The group-law kernel lowers the S4 oracle&rsquo;s counted cost at every rung; against the pair table its order is unresolved.</h2>
+<p class="panel-summary">Charges the S4 pairs-and-solve baseline, the PS-2 group-law kernel and the library&rsquo;s MITM table in ecbench on the ledger&rsquo;s five char2 rungs (n = 15..27); the kernel&rsquo;s pairs have no pinned price, so it is a lower bound with the section 5a band, a stage diagnostic; all three arms sit above matched rho at every rung and weight.</p></div><span class="status neutral">Engineering &middot; stage diagnostic</span></div>
+<p class="dash-section-intro">Same curves, subgroups, factor bases (<code>binary-subspace</code>, l = n/3), targets and seeds for every arm, one target per run, cold, every phase inside <code>S</code>; 40 workloads, all runs verified, exact replays reproduce, every recovered scalar re-verified by separate arithmetic. The baseline row reproduces the ledger&rsquo;s S4 row (n = 27: 114,574 against the ledger&rsquo;s 115,459) and its exponent (1.063 against 1.06). <strong>The kernel&rsquo;s pairs are counted but not priced</strong>: its recorded <code>S</code> is a lower bound; the columns at 0.1 and 1 GAE per pair are the AGENTS.md section 5a band and the anchored estimate (the pinned baseline-pair price times the measured kernel/baseline time ratio) is a further point that is not a pinned conversion. Whether the kernel is above or below the table changes inside the band at every rung.</p>
+<div class="dash-detail-body" style="padding:0"><table>
+<caption>Mean <code>S</code> = group-addition equivalents / &radic;r per arm (16 runs per cell, 8 at n = 27); the kernel at 0, 0.1 and 1 GAE per unpriced pair, and the order of kernel against the MITM table at those weights. Quoted from <code>raw/summary.json</code>.</caption>
+<thead><tr><th>n</th><th>rho (negation)</th><th>S4 baseline</th><th>kernel, recorded (lower bound)</th><th>kernel, 0.1 GAE/pair</th><th>kernel, 1 GAE/pair</th><th>kernel, anchored estimate (not pinned)</th><th>MITM</th><th>kernel / MITM at w = 0, 0.1, 1</th></tr></thead><tbody>
+<tr><td class="n">15</td><td class="n">2.099</td><td class="n">1,270</td><td class="n">33.75</td><td class="n">44.35</td><td class="n">140</td><td class="n">117</td><td class="n">57.89</td><td class="n">0.58, 0.77, 2.4</td></tr>
+<tr><td class="n">18</td><td class="n">1.969</td><td class="n">3,041</td><td class="n">26.85</td><td class="n">55</td><td class="n">308</td><td class="n">171</td><td class="n">65.87</td><td class="n">0.41, 0.83, 4.7</td></tr>
+<tr><td class="n">21</td><td class="n">1.305</td><td class="n">8,560</td><td class="n">22.9</td><td class="n">94.61</td><td class="n">740</td><td class="n">299</td><td class="n">73.56</td><td class="n">0.31, 1.29, 10.1</td></tr>
+<tr><td class="n">24</td><td class="n">1.288</td><td class="n">19,067</td><td class="n">16.28</td><td class="n">211</td><td class="n">1,964</td><td class="n">611</td><td class="n">93.85</td><td class="n">0.17, 2.25, 20.9</td></tr>
+<tr><td class="n">27</td><td class="n">1.09</td><td class="n">114,574</td><td class="n">22.38</td><td class="n">1,012</td><td class="n">9,915</td><td class="n">2,706</td><td class="n">197</td><td class="n">0.11, 5.14, 50.3</td></tr>
+</tbody></table></div>
+<p class="dash-footnote">Fitted total-cost exponents over the five rungs (total operations ~ r<sup>e</sup>, 95% bootstrap over targets): rho 0.405, baseline 1.063, kernel 0.436 (lower bound), 0.895 (0.1 GAE/pair), 1.036 (1 GAE/pair), 0.892 (anchored estimate), MITM 0.645. The finding rule asks whether the ratio to the floor changes slope: over these rungs the kernel&rsquo;s slope is below the baseline&rsquo;s by 0.03 to 0.17 depending on the pair price (none if a pair is priced as a baseline pair), tracking the per-pair time ratio that falls with l; five rungs ending at l = 9 do not show whether it persists. Timed sessions (descriptive; long runs reach L1 only): kernel over baseline wall 0.385 at n = 15 to 0.025 at n = 27. Memory is not in <code>S</code>: the table has 69,118 entries (2.1 MiB) at n = 27. Nothing here is a claim about ECC2K-130 or the m = 83 gate; no end-to-end speedup of the kernel. Class: engineering. No progress-chart point crosses rho, and the best-of table, the IC leaderboard and the other panels are unchanged. <a href="https://github.com/aburan28/crypto/blob/main/research/pdp_oracle_speedup_20261011/ps6_charge/README.md">Study, requirement table and deviations</a>, <a href="https://github.com/aburan28/crypto/blob/main/research/pdp_oracle_speedup_20261011/ps6_charge/report/report.pdf">results report (PDF)</a>, <a href="https://github.com/aburan28/crypto/tree/main/benchmarks/20261031-pdp-ps6-charge">benchmarks entry</a>.</p>
+</section></div></details>
+<!-- ps6-charge:end -->
 <details class="dash-details"><summary>Research progress over time · separate regimes and references</summary><div class="dash-detail-body"><section class="dash-section" id="lab-progress" aria-labelledby="progress-title" data-collapse="open"><div class="dash-section-head"><div><p class="dash-kicker">Progress over time / The rho barrier</p><h2 id="progress-title">Where index calculus stands against rho, by the day each result landed.</h2>
 <p class="panel-summary">Plots verified IC over rho ratios in each regime by the day they landed, with early below-one points hollow because their rho later proved unmatched, citing frozen timeline data.</p></div><span class="status neutral">Log scale &middot; rho = 1</span></div>
 <p class="dash-section-intro">Every point quotes a verified comparison from the named result on the day it landed on <code>main</code>. Below one means index calculus is cheaper only when both arms have a complete common cost. The heavy series is the repository&rsquo;s whole-method, cold, one-target test against matched rho. Early below-one points used a rho later proved unmatched and remain hollow as &ldquo;was&rdquo;. Grey series are separate regimes; the n37 counted-work point is a quotient of two incomplete lower bounds and is not a barrier test.</p>
@@ -917,6 +933,10 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
 <tr><td>2026-10-15</td><td>Elliptic curve, whole method, cold, one target</td><td>Joux&ndash;Vitse (n &minus; 1)-decomposition at n = 5 on E(F<sub>p&#8309;</sub>), complete DLP, p = 31 (&#8467; = 2<sup>24.8</sup>), F4 replaying a recorded trace; p = 11: 4.5&middot;10<sup>7</sup>&times; and 1.8&middot;10<sup>8</sup>&times;</td><td class="n">6.8&middot;10<sup>7</sup>&times; <small>F<sub>p</sub> multiplications against rho on the same target; extrapolated parity q &asymp; 2<sup>58.2</sup> (group 2<sup>291</sup>)</small></td><td>matched</td><td><span class="chip">accounting</span></td><td><a href="#rho-parity-ledger">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md">source</a></td></tr>
 <tr><td>2026-10-20</td><td>Elliptic curve, whole method, cold, one target</td><td>Rule v8: the Koblitz descent at baseline v8 against a matched rho, one target cold, closest size 2^36.6</td><td class="n">4.669&times; <small>rho matched; rule v7 read 3.43&times; against an unmatched rho</small></td><td>matched</td><td><span class="chip">accounting</span></td><td><a href="#ic-tool-programme-20261001">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v8/README.md">source</a></td></tr>
 <tr><td>2026-10-21</td><td>Elliptic curve, whole method, cold, one target</td><td>Planner validation (ic-planner/1): plan vs rho.negation, best registered cell icv1-fp24-tm5099-a6f137c6 (r = 2^24.0)</td><td class="n">14.39&times; <small>S; [11.63, 18.45]; rho cheaper on all six curves, 12.6&ndash;25.8&times;</small></td><td>matched</td><td><span class="chip">engineering</span></td><td><a href="#lab-planner-validation">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ic_planner_validation_20261020/README.md">source</a></td></tr>
+<tr><td>2026-10-31</td><td>Elliptic curve, whole method, cold, one target</td><td>PS-6: the ledger&#x27;s S4-family oracles in ecbench, best cold cell: negation-folded MITM on icv1-f2m15-t131-ed7256f0 (r = 2^14.0)</td><td class="n">26.734&times; <small>S</small></td><td>matched</td><td><span class="chip">engineering</span></td><td><a href="#lab-ps6-charge">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/pdp_oracle_speedup_20261011/ps6_charge/README.md">source</a></td></tr>
+<tr><td>2026-10-31</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>PS-6: PS-2 group-law kernel (S4 pairs-and-solve), recorded S over rho.negation, best cell icv1-f2m24-tm3047-2d0c0e8c (r = 2^21.0)</td><td class="n">12.64&times; <small>counted GAE lower-bound diagnostic</small></td><td>matched</td><td><span class="chip">engineering</span></td><td><a href="#lab-ps6-charge">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/pdp_oracle_speedup_20261011/ps6_charge/README.md">source</a></td></tr>
+<tr><td>2026-10-31</td><td>Binary decomposition-oracle stage (non-Koblitz, l=8..12)</td><td>PS-6: group-law kernel vs pairs-and-solve in the counted unit at n = 27 (l = 9), each kernel pair priced at 1 GAE</td><td class="n">0.0865&times; <small>stage</small></td><td>stage</td><td><span class="chip">engineering</span></td><td><a href="#lab-ps6-charge">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/pdp_oracle_speedup_20261011/ps6_charge/README.md">source</a></td></tr>
+<tr><td>2026-10-31</td><td>Binary decomposition-oracle stage (non-Koblitz, l=8..12)</td><td>PS-6: the library&#x27;s MITM pair table vs pairs-and-solve in the counted unit at n = 27 (l = 9), table build inside S</td><td class="n">0.00172&times; <small>stage</small></td><td>stage</td><td><span class="chip">engineering</span></td><td><a href="#lab-ps6-charge">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/pdp_oracle_speedup_20261011/ps6_charge/README.md">source</a></td></tr>
 </tbody><tr><td>2026-10-16</td><td>Binary decomposition-oracle stage (non-Koblitz, l=8..12)</td><td>MITM oracle ladder to l=12: 8,068 ops at l=11, 16,092 at l=12 vs 2,098,176 / 8,390,656 quartic solves, 128 targets, 0 disagreements</td><td class="n">0.0019&times;</td><td>stage</td><td><span class="chip">engineering</span></td><td><a href="#rho-parity-ledger">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l11_l12_20261016/REPORT.typ">source</a></td></tr><tr><td>2026-10-15</td><td>Binary decomposition-oracle stage (non-Koblitz, l=8..10)</td><td>MITM oracle ladder to l=10: 2,076 ops at l=9, 4,212 at l=10 vs 134,912 / 525,312 quartic solves, 128 targets, 0 disagreements</td><td class="n">0.0080&times;</td><td>stage</td><td><span class="chip">engineering</span></td><td><a href="#rho-parity-ledger">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l9_l10_20261015/REPORT.typ">source</a></td></tr><tr><td>2026-10-15</td><td>Binary decomposition-oracle stage (non-Koblitz, l=8)</td><td>First sub-2<sup>2&ell;</sup> oracle at &ell;=8: MITM pair table vs pairs-and-solve, 64 targets, 0 disagreements</td><td class="n">0.0325&times;</td><td>stage</td><td><span class="chip">engineering</span></td><td><a href="#rho-parity-ledger">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l8_20261015/REPORT.typ">source</a></td></tr></table></div></details>
 <noscript><div class="dash-detail-body"><p>The chart needs JavaScript; the table above lists every plotted point.</p></div></noscript>
 <p class="dash-footnote">What would move the heavy series below the line for good: a cold, one-target, every-phase-priced <code>S</code> below a matched rho&rsquo;s at growing size (AGENTS.md &sect;2, &sect;8). The nearest measured approaches are 1.36&times; (round 0025) and 1.314&times; in CPU time (n41). The exponent story is in the <a href="#boundary-ledger">boundary ledger</a>: no fitted exponent on an elliptic curve sits below rho&rsquo;s one half; the cover route&rsquo;s ratio falls with size but on a weak class.</p>
@@ -1119,6 +1139,17 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "reference": "matched",
      "source": "https://github.com/aburan28/crypto/blob/main/research/ic_planner_validation_20261020/README.md",
      "value": 14.39
+    },
+    {
+     "date": "2026-10-31",
+     "value": 26.734,
+     "reference": "matched",
+     "unit": "S",
+     "label": "PS-6: the ledger's S4-family oracles in ecbench, best cold cell: negation-folded MITM on icv1-f2m15-t131-ed7256f0 (r = 2^14.0)",
+     "detail": "One-target cold S of the negation-folded meet-in-the-middle table over rho.negation on the same 16 verified runs: 26.73 [22.61, 31.94] at w = 0; 15.45 when rho's unpriced canonicalisations cost 1 GAE each (section 5a band). The index-calculus arms are above rho at every rung (n = 15..27) and weight; the ratio grows with n (MITM 181x at n = 27). Class: engineering; no advance, no leaderboard row.",
+     "class": "engineering",
+     "anchor": "#lab-ps6-charge",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/pdp_oracle_speedup_20261011/ps6_charge/README.md"
     }
    ],
    "role": "emphasis"
@@ -1346,6 +1377,17 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "class": "engineering",
      "anchor": "#rootfinding-buffers-20261014",
      "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_rootfinding_alloc_20261014/REPORT.md"
+    },
+    {
+     "date": "2026-10-31",
+     "value": 12.64,
+     "reference": "matched",
+     "unit": "counted GAE lower-bound diagnostic",
+     "label": "PS-6: PS-2 group-law kernel (S4 pairs-and-solve), recorded S over rho.negation, best cell icv1-f2m24-tm3047-2d0c0e8c (r = 2^21.0)",
+     "detail": "The kernel's pairs have no pinned conversion, so they are counted and left out of S: the recorded S is a lower bound and a ratio of two lower bounds does not bound the full-cost ratio. Over the same 16 verified runs per arm the recorded ratio is 12.64; with each kernel pair priced at 0.1 and 1 GAE it is 150 and 800. Against the baseline pairs-and-solve the kernel is below at every weight; against the library's MITM table the order flips inside the band (kernel/MITM 0.17, 2.25, 20.9 at w = 0, 0.1, 1): unresolved. Class: engineering (stage diagnostic).",
+     "class": "engineering",
+     "anchor": "#lab-ps6-charge",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/pdp_oracle_speedup_20261011/ps6_charge/README.md"
     }
    ],
    "role": "context"
@@ -1856,12 +1898,32 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "class": "engineering",
      "anchor": "#rho-parity-ledger",
      "source": "https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l11_l12_20261016/REPORT.typ"
+    },
+    {
+     "date": "2026-10-31",
+     "value": 0.0865,
+     "reference": "stage",
+     "label": "PS-6: group-law kernel vs pairs-and-solve in the counted unit at n = 27 (l = 9), each kernel pair priced at 1 GAE",
+     "detail": "Sum S of the kernel over sum S of the baseline pairs-and-solve on the same 8 one-target runs (identical trial streams; 0 witness mismatches in 27,938 audited targets over the five rungs): 0.00020 with the kernel's pairs unpriced, 0.0088 at 0.1 GAE per pair, 0.0865 at 1 GAE (a baseline pair is priced 3.09 GAE by the pinned calibration). Value plotted: the 1 GAE end of the band, the conservative one. Stage diagnostic; the kernel has no pinned price; no end-to-end speedup is claimed.",
+     "class": "engineering",
+     "anchor": "#lab-ps6-charge",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/pdp_oracle_speedup_20261011/ps6_charge/README.md"
+    },
+    {
+     "date": "2026-10-31",
+     "value": 0.00172,
+     "reference": "stage",
+     "label": "PS-6: the library's MITM pair table vs pairs-and-solve in the counted unit at n = 27 (l = 9), table build inside S",
+     "detail": "Sum S of mitm:m=3 over sum S of the baseline on the same 8 one-target runs, every phase priced (no unpriced counter): 0.00172 (the baseline costs 582 times as much); the table has 69,118 entries and grows resident memory by about 2.1 MiB, which is not in S. Fitted total-cost exponents over n = 15..27: baseline 1.063, MITM 0.645. Class: engineering.",
+     "class": "engineering",
+     "anchor": "#lab-ps6-charge",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/pdp_oracle_speedup_20261011/ps6_charge/README.md"
     }
    ]
   }
  ],
  "unit_note": "Each point is quoted from the frozen result it links, in that result's own unit (Valgrind Ir, S, counted operations, online wall time, or isolated CPU time where marked). Direction against 1 is meaningful only for fully priced ratios; a quotient of incomplete lower bounds is diagnostic even when paired. No value on this page is computed from another.",
- "updated": "2026-10-21"
+ "updated": "2026-10-31"
 }
 </script>
 <script>
