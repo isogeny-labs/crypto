@@ -58,3 +58,15 @@ The next separately frozen stages compose the saved psi7membership and
 normalization and all targetQR/F2descent identities. Selected11/991action,
 proper polarized embeddings,full saturation and arbitrary reverse classes
 remain independent gates,with original controls and larger-source scope kept.
+
+## Alpha-unit stage, frozen before execution
+
+ALPHAUNIT53 composes the retained exact psi7 source membership with the
+retained psi3/psi7 Bezout identity. The full four-entry source row times its
+witness must equal Delta^16, and its alpha must equal the actual R52 norm
+coefficient. All donor products and psi7 equality are checked, with a changed
+witness rejected. A full Groebner basis must give the nonzero rank64 quotient
+by G,N,psi3. Save the full certificate before this quotient check. The unit is
+over generic F2(b,c), with Delta inverted; registered coefficient denominators
+and exceptional specializations are separate obligations. No coefficient-box
+or new inversion search, no asymptotic or speed claim, same native limits.
