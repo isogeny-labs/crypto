@@ -1,0 +1,560 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "N83-RADIX-NEURAL-20261031-LOCAL-V5",
+  "version": 5,
+  "created": "2026-10-30",
+  "repository": "crypto",
+  "study_dir": "research/n83_candidate_pdp_20261028",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "design": "RADIX_NEURAL_DESIGN.md",
+    "custody": "evidence/radix-census-r2/custody.json"
+  },
+  "question": "Can a fixed small neural regressor rank the 3010-partition prime m=2 radix census below the certified degree-42 baseline while respecting censored Hilbert lower bounds?",
+  "claims": [
+    {
+      "id": "C1",
+      "class": "comparative",
+      "text": "Evaluate five-fold held-out exact-degree MAE of one fixed 6-4-1 MLP against a censored-aware constant baseline on the 35 exact rows; keep 2975 certified lower bounds as one-sided constraints.",
+      "decided_by": [
+        "CV-exact-MAE"
+      ]
+    },
+    {
+      "id": "C2",
+      "class": "exact_computation",
+      "text": "Train once on all 3010 cases and check every predicted sub-42 flag against its exact degree or certified lower bound; any contradiction is rejected as a lead.",
+      "decided_by": []
+    },
+    {
+      "id": "C3",
+      "class": "out_of_scope",
+      "text": "No claim about new factor-base point sets, other m, curves, families, FFD, LFD, solving degree, or runtime improvement.",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "The fixed MLP yields descriptively lower held-out exact MAE than the fold-specific censored-aware constant on the 35 exact records.",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "held_out_exact_mae",
+          "direction": "lower",
+          "minimum_effect": "Any decrease, reported descriptively without an inferential claim.",
+          "provenance": {
+            "written_at": "2026-10-30",
+            "first_recorded_in": "protocol-radix-neural.json",
+            "data_seen": [
+              {
+                "path": "evidence/radix-census-r2/custody.json",
+                "measured": "3010 rows, 35 exact, 2975 lower-bound-only"
+              }
+            ],
+            "sample_status": "partially_in_sample",
+            "decisive_scope": "Exploratory within-census descriptive fit only."
+          },
+          "role": "calibration"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "censored_constant",
+      "role": "baseline",
+      "description": "Training-fold intercept-only estimator found by 128 bisections of the same equally weighted exact and lower-bound hinge objective, bracketed by the observed target/bound range plus one degree.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "865d283a401d45967606d1a02d5faf5c47525765",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "radix_neural_probe"
+          ]
+        ],
+        "binary_sha256": "c363e53c2db69630714a13169253fabdff76272f9391c00094074dbb4f8dda83",
+        "threads": 1
+      },
+      "parameters": {
+        "exact_train_rows": "fold-dependent, 28 or 29",
+        "censored_train_rows": 2975,
+        "objective": "equal-weight exact MSE and one-sided lower-bound squared hinge"
+      }
+    },
+    {
+      "id": "mlp",
+      "role": "candidate",
+      "description": "One fixed six-feature, four-tanh-hidden-unit, linear-output neural regressor",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "865d283a401d45967606d1a02d5faf5c47525765",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "radix_neural_probe"
+          ]
+        ],
+        "binary_sha256": "c363e53c2db69630714a13169253fabdff76272f9391c00094074dbb4f8dda83",
+        "threads": 1
+      },
+      "parameters": {
+        "architecture": "6-4-1",
+        "activation": "tanh",
+        "epochs": 160,
+        "optimizer": "full-batch Adam",
+        "learning_rate": 0.01,
+        "seed": "20261030 + fold index; full model seed 20261030",
+        "features": [
+          "part_count",
+          "socle_degree",
+          "largest_part",
+          "smallest_part",
+          "unit_parts",
+          "parts_ge_5"
+        ]
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Deterministic model fit; no timing or stochastic algorithm comparison."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "No held-out positive-lead control exists; the all-binary degree 42 is a reference, not a training/evaluation positive."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Certificate joins are outcome verification, not a null-population control; every flag is still checked against an exact value or lower bound."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "model",
+        "levels": [
+          "censored_constant",
+          "mlp"
+        ]
+      },
+      {
+        "name": "fold",
+        "levels": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "input_dataset",
+        "treatment": "fixed",
+        "how": "All 3010 partitions from the same prime m=2, n=83, fixed 2^27 candidate domain and fixed point base; manifest SHA-256 bound in analysis plan."
+      },
+      {
+        "name": "features",
+        "treatment": "fixed",
+        "how": "Six label-free partition summaries; no labels, censor status, Hilbert coefficients, or witnesses."
+      },
+      {
+        "name": "split",
+        "treatment": "fixed",
+        "how": "SHA-256 of domain tag plus serialized parts modulo five; exact labels only are held out, all censored rows remain in training."
+      },
+      {
+        "name": "loss",
+        "treatment": "fixed",
+        "how": "Equal average of exact squared error and one-sided squared lower-bound violation; no lower-bound imputation."
+      },
+      {
+        "name": "optimization",
+        "treatment": "fixed",
+        "how": "6-4-1 tanh/linear MLP, Adam 160 epochs, learning rate .01; no tuning."
+      },
+      {
+        "name": "host",
+        "treatment": "fixed",
+        "how": "One CPU Spot Kubernetes Job, one thread; runtime is not a metric."
+      },
+      {
+        "name": "model_architecture",
+        "treatment": "crossed",
+        "how": "One fixed intercept-only censored-aware baseline versus the specified MLP; architecture and all hyperparameters remain fixed."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "CV-exact-MAE",
+        "arms": [
+          "censored_constant",
+          "mlp"
+        ],
+        "differs_in": [
+          "model_architecture"
+        ],
+        "design": "one_factor"
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Deterministic fixed split and computation; no randomized arm order.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261030,
+        20261031,
+        20261032,
+        20261033,
+        20261034
+      ],
+      "nonce": null,
+      "note": "Fixed per-fold MLP initialization seeds; full-data seed 20261030; no seed search."
+    },
+    "instance_sampling": {
+      "rule": "Exhaust all 3010 manifest-bound partition records. Exact-row fold is SHA-256 over tag n83-radix-neural-fold-v1 concatenated with serialized parts, interpreted from first eight digest bytes big-endian modulo 5.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exploratory deterministic computation with exact rows visible to frozen fold assignment only through labels for training/test scoring.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 3010,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Finite census; only 35 exact labels and 2975 deterministic lower-bound observations. Descriptive within-census CV only; no inferential p-value."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 60,
+      "measured_on": "Resource cap only; not a performance estimate."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "held_out_exact_mae",
+        "name": "held-out exact degree MAE",
+        "unit": "degree",
+        "kind": "derived",
+        "definition": "Mean absolute error over the 35 exact rows, each scored only in its SHA-assigned held-out fold.",
+        "source": "results/cv.json:metrics.mlp_mae",
+        "formula": "sum(abs(prediction-exact_degree))/35",
+        "aggregation": "mean",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "constant_exact_mae",
+        "name": "held-out constant degree MAE",
+        "unit": "degree",
+        "kind": "derived",
+        "definition": "Same held-out rows and folds using fold-specific censored-aware constant baseline.",
+        "source": "results/cv.json:metrics.constant_mae",
+        "formula": "sum(abs(prediction-exact_degree))/35",
+        "aggregation": "mean",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "flagged_below_42",
+        "name": "full-fit predictions below 42",
+        "unit": "rows",
+        "kind": "counted",
+        "definition": "Count of censored rows with full-fit prediction below 42.",
+        "source": "results/metrics.json:model_flagged_censored_below_42",
+        "aggregation": "sum",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "contradicted_flags",
+        "name": "flags refuted by certificates",
+        "unit": "rows",
+        "kind": "counted",
+        "definition": "Flagged censored rows whose certified lower bound is at least 43.",
+        "source": "results/metrics.json:flagged_candidates_contradicted_by_certified_lower_bound",
+        "aggregation": "sum",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "held_out_exact_mae",
+      "constant_exact_mae",
+      "flagged_below_42",
+      "contradicted_flags"
+    ],
+    "record": [
+      "binary_sha256",
+      "source_revision",
+      "input_manifest_sha256",
+      "protocol_sha256",
+      "exit_code",
+      "stdout_sha256"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": "current-m8i.8xlarge-spot-workspace",
+    "placement": {
+      "cpus": 1,
+      "memory": "2Gi",
+      "spot": true
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 300,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "One five-fold CV plus one all-data fit over the full 3010-case census; no tuning or resampling."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "One local process, one CPU, 2GiB, 300-second hard timeout, one attempt; preserve incomplete outputs."
+    }
+  ],
+  "invalidation_rules": [
+    "Input manifest mismatch invalidates the run.",
+    "Any missing or duplicate case invalidates the run.",
+    "Any protocol or binary hash mismatch invalidates the run.",
+    "A certified contradiction disqualifies the flagged row as a lead."
+  ],
+  "decision_rule": {
+    "text": "Report only the fixed-census descriptive MAEs and certificate-checked flag counts. Any below-42 flag contradicted by a certified degree/bound is rejected. A flag without a certificate is unresolved, never a lead claim.",
+    "comparison_ids": [
+      "CV-exact-MAE"
+    ],
+    "statistic": "Descriptive held-out exact MAE and deterministic certificate join",
+    "interval": "not applicable",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "difference in held-out exact MAE; descriptive only",
+    "verdict_vocabulary": [
+      "exploratory_signal",
+      "no_new_lead",
+      "invalid",
+      "error",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "src/bin/radix_neural_probe.rs",
+      "sha256": "a94eba7295c755a1ebf2cc1452704992de8965e1e8c95cec75ae14852d9b1b5c"
+    },
+    "inputs": [
+      "3010 case JSON files in raw census manifest, all individually SHA-256 and byte-length verified against that manifest",
+      "Raw census manifest.json SHA-256 5546a85f4a7e4467289bc3d167845f9054dbbfb546d75949f0a9fceec6e70e78",
+      "Separate custody checksum-list file manifest.sha256 SHA-256 6dfb197cd95ee385c72f8874c3acddd9661ab2000515503449c1d261f8019dad (not the manifest.json digest)",
+      "fixed point-base identity and n83 prime m=2 metadata",
+      "Digest-pinned ECR image 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:6b8cfb24eca38c464ce24d50c839cd55973a9d7812c82c71be87e40a6c0a0c17",
+      "Container verifies raw manifest.json and all 3010 case paths, byte lengths and hashes before training",
+      "Corrected censored-aware constant baseline search: derivative root bracket [min observed exact/lower bound - 1, max observed exact/lower bound + 1], 128 bisections",
+      "Regression test tests::censored_constant_bracket_covers_large_certified_bounds passes for lower_bound 134217729",
+      "Cancelled-before-start attempt r1 receipt at evidence/radix-neural-r1-cancelled.json; no training outputs or uploaded objects",
+      "Cancelled EKS r2 receipt evidence/radix-neural-r2-cancelled.json; no model fit or output occurred in r1/r2."
+    ],
+    "outputs": [
+      "results/cv.json",
+      "results/predictions.json",
+      "results/model.json",
+      "results/metrics.json",
+      "results/run-manifest.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Five-fold held-out exact prediction scatter and baseline comparison; per-row certificate-checked flags."
+    ],
+    "report_dir": "reports/radix-neural"
+  },
+  "inadmissible": [
+    "Replacing a certified lower bound with an exact label or point imputation",
+    "Calling a model flag a factor-base point set or a new lead before exact verification",
+    "Generalizing this one-base, one-family, one-m encoding census to other m, curves, or factor-base sets",
+    "Reporting FFD, LFD, solving degree, runtime, attack or security improvements",
+    "Tuning model, folds, seeds, or threshold after seeing evaluation results",
+    "Dropping failed, partial, or certificate-contradicted outputs"
+  ],
+  "literature": [
+    {
+      "ref": "https://arxiv.org/abs/2009.13828",
+      "provenance": "retrieved",
+      "claim": "Right-censoring needs an explicit observation model; this study uses only a deterministic one-sided algebraic hinge, not Tobit likelihood.",
+      "verified_by": "Abstract and paper reviewed during protocol design."
+    }
+  ],
+  "extensions": {
+    "container_image": {
+      "uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:800bd85e381dd9820be7288d23c3c9d57d186e212643821a538d50738b3d06db",
+      "tag": "n83-radix-neural-20261030-r2",
+      "digest": "sha256:800bd85e381dd9820be7288d23c3c9d57d186e212643821a538d50738b3d06db",
+      "base_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:25163e42d64075e44ddfa2e1a2d55cdc53d25357ff036c152a6ebff1d417e3e9",
+      "dockerfile_path": "research/n83_candidate_pdp_20261028/radix-neural-image/Dockerfile",
+      "dockerfile_sha256": "e25f82ceb28fbf38e17e10622e6c3e2813b7ccad5088d680e651fffd57252b72",
+      "runner_path": "research/n83_candidate_pdp_20261028/radix-neural-image/run-radix-neural.sh",
+      "runner_sha256": "04853b720ef5e8c3290e9adeb0a3ae1142126b1a65d52a9444bbe845392defb6",
+      "runtime_user": "1000:1000",
+      "argv": [
+        "/usr/local/bin/run-radix-neural.sh",
+        "<frozen protocol SHA-256>"
+      ],
+      "validation_only": "UID-1000 image run checked manifest and 3010 case SHA-256 values; no model fit",
+      "status": "validated and pushed, but not used because the Spot Job remained unschedulable; see cancelled r2 receipt"
+    },
+    "run_id": "n83-radix-neural-20261031-local-r3",
+    "cancelled_attempts": [
+      "evidence/radix-neural-r1-cancelled.json"
+    ],
+    "regression_test": {
+      "command": "cargo test --release --locked --manifest-path research/n83_candidate_pdp_20261028/Cargo.toml --bin radix_neural_probe",
+      "passed": true,
+      "test": "censored_constant_bracket_covers_large_certified_bounds"
+    },
+    "attempt_history": [
+      "evidence/radix-neural-r1-cancelled.json",
+      "evidence/radix-neural-r2-cancelled.json"
+    ],
+    "local_attempt": {
+      "runner_path": "research/n83_candidate_pdp_20261028/run-radix-neural-local.sh",
+      "runner_sha256": "2c724319b5fd84f143d11aefe07955fe362515160936349a2e6521868f258ebc",
+      "runtime_host": "i-0370afde6bdc38d0a",
+      "instance_type": "m8i.8xlarge",
+      "instance_lifecycle": "spot",
+      "argv": [
+        "<runner>",
+        "/tmp/n83-radix-neural-input/cases",
+        "/tmp/n83-radix-neural-input/manifest.json",
+        "<output-dir>",
+        "<frozen protocol SHA-256>",
+        "s3://setec-astronomy-artifacts/runs/n83-radix-neural-20261031-local-r3/raw/"
+      ],
+      "timing_claim": "none"
+    }
+  },
+  "amendments": [
+    {
+      "id": "A-manifest-digest-correction",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "The prior draft bound the repository custody checksum-list digest as if it were the raw census manifest.json digest. Downloaded raw manifest bytes hash to 5546a85f4a7e4467289bc3d167845f9054dbbfb546d75949f0a9fceec6e70e78; all 3010 case paths, byte lengths and SHA-256 values in that manifest were verified before model fitting.",
+      "changes": [
+        "Preserve protocol v1 unchanged as superseded and freeze this v2 protocol for the run.",
+        "Bind raw manifest.json by its actual SHA-256 and separately identify the custody checksum-list digest.",
+        "Retain the same dataset, model, folds, features, loss, baseline, metrics and decision rules."
+      ]
+    },
+    {
+      "id": "A-pinned-container",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "The frozen v2 protocol fixed the experiment but did not yet name the exact runtime image. The UID-1000 image was built from the committed Dockerfile, validated without fitting by checking all 3010 manifest-bound case files, pushed to ECR, and resolved by immutable digest.",
+      "changes": [
+        "Pin the exact OCI image digest and its base image digest.",
+        "Bind the runner and Dockerfile hashes.",
+        "Pass the final frozen protocol SHA-256 as argv[1] to the runner; it records this value in run-manifest.json.",
+        "The model, inputs, fold assignment, losses, comparator and decision rules are unchanged."
+      ]
+    },
+    {
+      "id": "A-censored-baseline-bound-and-r1-cancel",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "After r1 submission but before pod scheduling, found its censored-aware constant baseline used fixed bracket 0..200, excluding the manifest-bound [27] case lower_bound 134217729. Cancelled r1 before model startup and preserved its empty-output receipt. Replaced the bracket with the observed exact/bound min/max plus one and tested the minimizer with the high-bound case.",
+      "changes": [
+        "Correct baseline root bracket and retain 128 bisections of the exact grouped-objective derivative.",
+        "Update source/binary/runner hashes and pin a new r2 container image.",
+        "Keep features, network, folds, losses, input census, metrics and lead decision rule unchanged.",
+        "Submit a new unique job name r2 only after freezing and checkpointing this amendment."
+      ]
+    },
+    {
+      "id": "A-local-fit-after-spot-scheduler-block",
+      "filed": "2026-10-31",
+      "filed_before_affected_data": true,
+      "reason": "Corrected EKS r2 used the frozen code/image but its Pod remained Pending for about three minutes with node=null, scheduler 0/4 affinity/taint mismatch, empty logs and zero output objects. It was cancelled before startup and preserved in evidence/radix-neural-r2-cancelled.json. The deterministic fit uses no timing comparison; execute once on the current 32-vCPU m8i.8xlarge Spot workspace after validating host capacity.",
+      "changes": [
+        "Change only execution backend from isolab-k8s Spot Job to one bounded local Spot-workspace process.",
+        "Keep exact source, binary, manifest-bound inputs, model, features, folds, censored loss, corrected baseline, metrics and decision rules unchanged.",
+        "Use the committed local runner, record host/command/input/output hashes, and publish output directory to S3.",
+        "Preserve r1 and r2 cancellations as pre-start attempts; run one local r3 fit."
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "66c2eb12cefef0dda537736cd5bc2ae0710003341c27a85108d08863ae4027c4",
+    "commit": "42474e0b1449d672b99f245abaea9ac8d3c0bd00",
+    "frozen_at": "2026-10-31T00:10:18Z",
+    "filed_before_affected_data": true
+  }
+}
