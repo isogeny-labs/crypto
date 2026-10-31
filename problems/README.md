@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Historical Lean coverage and semantic correspondence](https://github.com/aburan28/crypto-autoresearcher/blob/codex/lean-retrospective-20261018/problems/lean-retrospective-historical-coverage.md) | open | Certifying every past claim across the three repositories | Exact claim-to-proof inventory, remaining formal targets and concrete bridges, independent review and empirical replay |
 | [PQC cross-platform performance and leakage validation](pqc-cross-platform-validation.md) | open | ML-KEM/ML-DSA speed and side-channel claims across platforms | qualified PQC benchmark route, native target correctness, emitted-code audit and target-specific leakage evidence |
 | [IC campaign frontier implementation and validation gaps](ic-campaign-frontier-obstructions-20261018.md) | open | full F4/closure frontier trials, large certified replay, realistic Boolean c fits and GPU/distributed execution | closure-preserving disk integration, wider canonical monomials/adapters, independent certificates and prospective scaling/calibration, usable bounded cloud lifecycle |
 | [Transport-oracle exact simulation](transport-oracle-exact-simulation-gap.md) | open | R6.8 general simulation and closure claim | correct identity/kernel handling, complete lifting costs, and a proof of adaptive instance independence |
