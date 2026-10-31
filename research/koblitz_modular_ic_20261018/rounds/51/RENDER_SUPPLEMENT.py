@@ -17,7 +17,7 @@ svg += ['<text x="20" y="386" font-size="14">Counts are complete enumeration, no
 (h/'cycles51.svg').write_text('\n'.join(svg)+'\n')
 r=json.loads((h/'results.json').read_text())
 status=next((x['status'] for x in reversed(r['runs']) if x['attempt'].startswith('hecke3-51-')),'prepared')
-nodes=[('Generic Tate degree-3 quotient control',status),('Marked level point and actual QR7 packet','not yet constructed'),('Actual T3 action on retained Jacobian module','not yet computed'),('Integral zero-eigenspace projector / scalar d','proposed Bezout or Smith certificate'),('Selected target action and divisor saturation','requires actual source-bound certificates')]
+nodes=[('Generic Tate degree-3 quotient control',status),('Transport marked point and QR packet','not yet constructed'),('Actual T3 action on retained Jacobian module','not yet computed'),('Integral zero-eigenspace projector / scalar d','proposed Bezout or Smith certificate'),('Selected target action and divisor saturation','requires actual source-bound certificates')]
 svg=['<svg xmlns="http://www.w3.org/2000/svg" width="920" height="470" viewBox="0 0 920 470"><rect width="920" height="470" fill="white"/><g font-family="DejaVu Sans,sans-serif" fill="#17304a">','<text x="20" y="30" font-size="22">Direct relations: use T3 as an annihilator constraint</text>']
 for i,(label,state) in enumerate(nodes):
     y=58+77*i;color='#d4eddf' if state=='accepted' else '#edf0f3'

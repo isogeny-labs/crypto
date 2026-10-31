@@ -2,8 +2,7 @@
   "scope": "R51 actual chart maps and larger marked23 QR construction",
   "status_counts": {
     "rejected": 4,
-    "accepted": 14,
-    "running": 1
+    "accepted": 16
   },
   "runs": [
     {
@@ -58,8 +57,12 @@
     },
     {
       "attempt": "diamond-nu51-01",
-      "status": "running",
-      "source_revision": null
+      "status": "accepted",
+      "source_revision": "cc74d0a8eec63f3340a61be6d760916347d3ab46",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "DIAMONDNU51_ALL_CHECKS_PASS",
+      "error_lines": []
     },
     {
       "attempt": "diamond51-01",
@@ -150,7 +153,19 @@
       "compile_exit": 0,
       "audit_exit": 0,
       "audited_theorems": 5,
-      "root": "Overlap51"
+      "root": "Overlap51",
+      "audit_total_declarations": 5
+    },
+    {
+      "attempt": "specialize-lean51-01",
+      "status": "accepted",
+      "source_revision": "53b37e519de5ed78155d081856ab2819df464d48",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "audited_theorems": 6,
+      "root": "Specialize51",
+      "audit_total_declarations": 6
     },
     {
       "attempt": "twist51-01",
@@ -187,7 +202,7 @@
   "normalization_generators_per_direction": 32,
   "directional_regularity_certificates": 64,
   "clearing_power": 62,
-  "lean_theorems": 5,
+  "lean_theorems": 11,
   "scope_limits": [
     "native arrays and RR/open-cover premises are not encoded in Lean",
     "marked23 quotient dimension is not primality",
@@ -206,8 +221,8 @@
     "Hecke3_isogeny_degree": 3,
     "ordinary_QR_point_algebra_dimension": 48,
     "coprime_kernel_Bezout_Delta_exponent": 16,
-    "nu_diamond_PID_entries": null,
-    "nu_diamond_clearing_power": null,
-    "audited_unique_theorems": 5
+    "nu_diamond_PID_entries": 32,
+    "nu_diamond_clearing_power": 121,
+    "audited_unique_theorems": 11
   }
 }

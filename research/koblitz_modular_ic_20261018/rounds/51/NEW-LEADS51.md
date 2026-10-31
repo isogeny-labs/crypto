@@ -124,3 +124,29 @@ cannot certify an integral projector scalar or separate +/− sign eigenspaces
 in characteristic2. This is a concrete model dependency,not a completed
 Hecke action computation. The explicit curve correspondence and its module
 action must be bound by actual certificates before any Smith result is used.
+
+## 6. Test whether adjoining nu completes the original affine coordinates
+
+The accepted nu lift permits a decisive normalization-generation calculation.
+Let B be the retained free rank32 normal-chart algebra and
+S=F2[z][V,lambda]. The accepted sourceLift embeds S into B,and its lattice
+index is376. Construct the full32x32 multiplication matrix T_nu using the
+already verified multiplication table and nu's PID coordinates;verify every
+column against the actual source field. Starting from the sourceLift module,
+iterate M_(k+1)=M_k+T_nu*M_k with exact PID normal forms.
+
+Cayley-Hamilton gives the fixed complete bound k<=31 for adjoining powers
+nu^0,...,nu^31;there is no coefficient search. Require full inclusion products
+at each step and a final T_nu-stability product. If the final module is B,
+export a polynomial recovery certificate for every normal basis element from
+z,V,lambda,nu. If it is smaller,export its exact determinant/Smith cokernel
+and remaining support. Both outcomes directly address the original quotient
+coordinates. This is a proposed next experiment,not a computed closure.
+
+A positive result would give a closed model in the four original affine
+coordinates,using the existing complete multiplication presentation and
+polynomial recovery words. This is different from the retained R27 complete
+RR embedding in P67. A nonzero remaining index would pinpoint which extra
+normal generators the four-coordinate model still lacks. Preserve the actual
+normal-RR premise and the complete source module;do not substitute a subset
+of generators or another coefficient box.
