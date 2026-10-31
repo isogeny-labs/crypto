@@ -14,6 +14,9 @@ use std::time::{Duration, Instant};
 
 // Worker-only adapter: verified originals, bound capture, original execution
 // context, and central semantic replay gate the native profile.
+#[path = "binary_m3_original.rs"]
+mod binary_m3_original;
+
 #[path = "koblitz_m3.rs"]
 mod koblitz_m3;
 
@@ -493,7 +496,13 @@ fn koblitz_worker_profile(config: &CaseConfig, case: &CaseData) -> bool {
 
 /// Native causal projection seam for the separately owned exporter. Currently
 /// implements independently replayed signed-group prefixes only.
-#[allow(dead_code)] // Exporter T828 integration has not been applied.
+pub(super) fn is_koblitz_m3_native_source(
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+) -> bool {
+    koblitz_m3::is_native_source(outcome, artifacts)
+}
+
 pub(super) fn project_koblitz_m3_prefixes(
     dir: &Path,
     config: &CaseConfig,
@@ -6187,7 +6196,7 @@ mod verified_worker_original_tests {
                 None,
             )
         }
-        fn with_policy_profile(
+        pub(super) fn with_policy_profile(
             n: u32,
             twist: bool,
             factor_base_size: usize,

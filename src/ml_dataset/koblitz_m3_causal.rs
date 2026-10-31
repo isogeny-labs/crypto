@@ -280,12 +280,31 @@ pub(super) fn project_with_hooks(
     } else if head_path.exists() {
         return Err("Koblitz causal committed head appeared during admission".into());
     }
+    // original_math above authenticated the frozen recipe and sampling seed.
+    // Project only public recipe fields; never copy construction provenance.
+    let recipe = config
+        .factor_base_policy
+        .as_ref()
+        .map(|policy| {
+            let value = serde_json::to_value(policy).map_err(|e| e.to_string())?;
+            crate::ml_dataset::export::policy_projection(&value)
+        })
+        .transpose()?;
+    let mut with_recipe = |feature: Option<Value>, record: Value| {
+        let feature = feature.map(|mut feature| {
+            if let Some(recipe) = &recipe {
+                feature["static_inputs"]["source_factor_base_policy"] = recipe.clone();
+            }
+            feature
+        });
+        emit(feature, record)
+    };
     let mut summary = project_signed(
         &original,
         config.twist,
         &signed,
         &sequences[..signed.len()],
-        emit,
+        &mut with_recipe,
     )?;
     summary["source_binding_sha256"] = json!(binding_sha256);
     summary["source_committed_head"] = json!(head);

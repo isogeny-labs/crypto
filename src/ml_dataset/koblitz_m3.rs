@@ -335,109 +335,18 @@ pub(super) fn admit_original(
     Ok(budget)
 }
 
-/// Canonical original mathematical inputs for the initial two-code matrix
-/// profile. Setup admission/accounting and persistence must precede runtime use.
-pub(super) struct MathInput {
-    pub curve: Box<crate::binary_ecc::BinaryCurve>,
-    pub target: (u64, u64),
-    pub codes: [u64; 2],
-    pub signed: [(u64, u64); 4],
-}
-
-/// Validate public inputs using the existing independent curve/factor-base
-/// replay. Never consult private_witness or solver-produced input artifacts.
-/// The caller authenticates case provenance; this checks mathematical content.
+// The closed Koblitz caller retains its family/b=1 contract. The shared helper
+// does not register an ordinary-binary runtime profile.
+pub(super) use super::binary_m3_original::MathInput;
 pub(super) fn original_math(
     config: &super::super::types::CaseConfig,
     case: &super::super::types::CaseData,
 ) -> Result<MathInput, String> {
-    use super::{curves, domain, Element, Group};
-    use num_traits::ToPrimitive;
-    use serde_json::json;
-    if config.family != "koblitz"
-        || config.m != 3
-        || !((23..=31).contains(&config.n) || (47..=61).contains(&config.n))
-    {
-        return Err("outside Koblitz m3 field/arity profile".into());
-    }
-    let public = &case.public_instance;
-    if public["family"] != config.family
-        || public["n"] != json!(config.n)
-        || public["m"] != json!(config.m)
-        || public["twist"] != json!(config.twist)
-        || case.factor_base["requested_size"] != json!(config.factor_base_size)
-    {
-        return Err("Koblitz original public inputs differ from configuration".into());
-    }
-    let points = case.factor_base["points"]
-        .as_array()
-        .ok_or("missing original factor base")?;
-    if points.len() > 4 || points.is_empty() {
-        return Err("Koblitz two-code profile requires at most four original signed points".into());
-    }
-    let candidates = case.factor_base["construction_candidates"]
-        .as_array()
-        .ok_or("missing original construction candidates")?;
-    if candidates.len() > 255
-        || candidates
-            .iter()
-            .any(|row| row["lifts"].as_array().is_none_or(|lifts| lifts.len() > 2))
-    {
-        return Err("Koblitz two-code setup candidate replay cap exceeded".into());
-    }
-    // Full mathematical checks include actual twist, certified order,
-    // irreducibility, subgroup checks and factor-base construction replay.
-    // Their setup cost is not represented by native S4 reservation counters.
-    curves::verify_public(public)?;
-    curves::verify_factor_base_config(config, public, &case.factor_base)?;
-    let group = Group::read(case)?;
-    let Group::Binary(curve) = &group else {
-        return Err("Koblitz profile requires actual binary curve".into());
-    };
-    if curve.m != config.n || curve.b.to_biguint().to_u64() != Some(1) {
-        return Err("Koblitz S4 profile requires actual b=1 and original field degree".into());
-    }
-    let word = |p: &Element| -> Result<(u64, u64), String> {
-        match p {
-            Element::Binary(crate::binary_ecc::BinaryPoint::Affine { x, y }) => Ok((
-                x.to_biguint().to_u64().ok_or("x exceeds u64")?,
-                y.to_biguint().to_u64().ok_or("y exceeds u64")?,
-            )),
-            _ => Err("Koblitz original point must be affine".into()),
-        }
-    };
-    let target = word(&group.point(&public["target"])?)?;
-    let points = domain(&group, case)?;
-    if points.len() != 4 {
-        return Err(
-            "Koblitz matrix profile requires two distinct x codes, not two signed points".into(),
-        );
-    }
-    let mut signed = [(0, 0); 4];
-    for (out, point) in signed.iter_mut().zip(&points) {
-        *out = word(point)?;
-    }
-    signed.sort_unstable();
-    if signed.windows(2).any(|p| p[0] == p[1])
-        || signed[0].0 != signed[1].0
-        || signed[2].0 != signed[3].0
-        || signed[0].0 == signed[2].0
-        || signed[0].1 ^ signed[0].0 != signed[1].1
-        || signed[2].1 ^ signed[2].0 != signed[3].1
-    {
-        return Err("noncanonical original signed two-code domain".into());
-    }
-    let codes = [signed[0].0, signed[2].0];
-    let Group::Binary(mut curve) = group else {
-        unreachable!("validated binary group")
-    };
-    curve.irreducible.low_terms.sort_unstable();
-    Ok(MathInput {
-        curve,
-        target,
-        codes,
-        signed,
-    })
+    super::binary_m3_original::authenticate(
+        super::binary_m3_original::Profile::Koblitz,
+        config,
+        case,
+    )
 }
 
 /// Retain completed original equations even if the final adapter boundary fails.
@@ -11923,6 +11832,21 @@ pub(super) fn run_verified_worker_entry(
 }
 
 // Central original-bound replay for full and interrupted native worker output.
+pub(super) fn is_native_source(
+    outcome: &serde_json::Value,
+    artifacts: &[crate::ml_dataset::types::Artifact],
+) -> bool {
+    let reserved = artifacts.iter().any(|a| {
+        let p = a.path.strip_prefix("live/payloads/").unwrap_or(&a.path);
+        p.starts_with("koblitz-m3-")
+            || p.starts_with("partial-koblitz-m3-")
+            || a.role.starts_with("restricted-koblitz-m3-")
+    });
+    reserved
+        || outcome["strategy"] == "koblitz-m3-native-v1"
+        || outcome["adapter_id"] == "koblitz-m3-native-v1"
+}
+
 pub(super) fn verify_worker_cell(
     dir: &std::path::Path,
     config: &crate::ml_dataset::types::CaseConfig,
@@ -11932,16 +11856,7 @@ pub(super) fn verify_worker_cell(
     use super::prime_f4_wide::{artifact, read_bounded};
     use crate::cryptanalysis::koblitz_groebner::bounded_matrix::Engine;
     use crate::ml_dataset::{execution, storage, types::CaseData};
-    let reserved = artifacts.iter().any(|a| {
-        let p = a.path.strip_prefix("live/payloads/").unwrap_or(&a.path);
-        p.starts_with("koblitz-m3-")
-            || p.starts_with("partial-koblitz-m3-")
-            || a.role.starts_with("restricted-koblitz-m3-")
-    });
-    if !reserved
-        && outcome["strategy"] != "koblitz-m3-native-v1"
-        && outcome["adapter_id"] != "koblitz-m3-native-v1"
-    {
+    if !is_native_source(outcome, artifacts) {
         return Ok(None);
     }
     if !outcome.is_object() {
@@ -12381,11 +12296,35 @@ mod worker_central_replay_tests {
     }
 
     fn frozen_worker_cases_at_field(n: u32) {
+        frozen_worker_cases_at_field_with_policy(n, None);
+    }
+
+    #[test]
+    fn explicit_legacy_native_export_has_nonempty_authenticated_recipe_rows() {
+        frozen_worker_cases_at_field_with_policy(
+            23,
+            Some(crate::ml_dataset::types::FactorBasePolicy::Legacy {}),
+        );
+    }
+
+    fn frozen_worker_cases_at_field_with_policy(
+        n: u32,
+        policy: Option<crate::ml_dataset::types::FactorBasePolicy>,
+    ) {
         for solver in ["f4", "f5"] {
             for twist in [false, true] {
                 for root_collision in [false, true] {
                     eprintln!("frozen software control n={n} solver={solver} twist={twist} input_root_collision={root_collision}");
-                    let f = Fixture::with_runtime_shape(n, twist, 4, solver);
+                    let f = Fixture::with_policy_profile(
+                        n,
+                        twist,
+                        4,
+                        solver,
+                        16384,
+                        true,
+                        false,
+                        policy.clone(),
+                    );
                     let capture_limits = capture::capture_limits(128).unwrap();
                     let mut registry = vec![telemetry::checked::install_policy(&f.root).unwrap()];
                     registry.push(
@@ -12501,6 +12440,13 @@ mod worker_central_replay_tests {
                     for (feature, _) in &projected {
                         assert_eq!(feature["static_inputs"]["twist"], twist);
                     }
+                    crate::ml_dataset::export::check_native_export_rows(
+                        &f.root,
+                        &f.config,
+                        &data.outcome,
+                        &artifacts,
+                        if root_collision { 0 } else { 192 },
+                    );
                     let mut different_future = data.outcome.clone();
                     different_future["unused_future_note"] =
                         json!({"rank":8,"known_answer_scalar":"123"});

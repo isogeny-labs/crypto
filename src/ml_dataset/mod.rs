@@ -6542,9 +6542,12 @@ mod tests {
             }
         });
         verify_cell(&bad, false).unwrap();
-        assert!(verify_cell(&bad, true)
-            .unwrap_err()
-            .contains("frozen cell configuration"));
+        // The shared original-input guard now rejects the transplanted public
+        // arity before the later prime-chain reconstruction guard runs.
+        assert_eq!(
+            verify_cell(&bad, true).unwrap_err(),
+            "factor base or public identity differs from frozen config"
+        );
 
         let changed_config = altered_cell(&m3, &first.0.join("changed-config"), |dir, manifest| {
             manifest.config.m = 4;
