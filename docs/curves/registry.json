@@ -2888,10 +2888,49 @@
    "standard_names": [],
    "sources": [
     "the m = 83 confidence gate (AGENTS.md §8a)",
+    "research/n83_genus3_image_solver_20261031/n83_curve_records.json",
     "prose, by the constructor rule: docs/ic-leaderboard.html"
    ],
-   "representations": [],
-   "ec1_unresolved": "no generator recorded; KoblitzCurve covers n <= 63 and no tracked record carries this model's subgroup and generator"
+   "representations": [
+    {
+     "ec1": "EC1N83Ce0h5ad08e3bea59",
+     "curve_uid": "urn:ec-record:1:sha256:5ad08e3bea59aae5a686e5c0796ddda536d455b2fb3371f2641d4524ccbdd618",
+     "field_sha256": "d78fd861155327855b0429bab1e536c1f17706f5299f8d9cfef704e9bcad6ae8",
+     "field": {
+      "characteristic": 2,
+      "degree": 83,
+      "element_encoding": "hex polynomial coefficient bitset, least significant bit is constant",
+      "modulus_exponents": [
+       83,
+       45,
+       2,
+       1,
+       0
+      ],
+      "representation": "polynomial"
+     },
+     "curve": {
+      "coefficients": [
+       1,
+       0,
+       0,
+       0,
+       1
+      ],
+      "cofactor": 4,
+      "generator": [
+       "0x477f77103dfad59850800",
+       "0x2fa5e737d542c4e4fd5c3"
+      ],
+      "model": "binary Weierstrass",
+      "subgroup_order": "2417851639230796216685689",
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/n83_genus3_image_solver_20261031/n83_curve_records.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-f2m83-t6151469093347-9eba6cd5",
@@ -11619,6 +11658,134 @@
    ]
   },
   {
+   "slug": "icv1-fp3-t0-0388b21e",
+   "icv1": "ICV1:fp-5:0:6:0:unk:unk:r:0388b21e05d1",
+   "family": "prime",
+   "params": {
+    "p": "5",
+    "a": "0",
+    "b": "1"
+   },
+   "model_json": "{\"a\":\"0\",\"b\":\"1\",\"field\":\"fp-5\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"5\",\"v\":\"1\"}",
+   "trace": 0,
+   "order": "6",
+   "j": "0",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/prime_ic_zero_filter_20261030/implementation/implementation.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P3Cfphe20cb33f3186",
+     "curve_uid": "urn:ec-record:1:sha256:e20cb33f3186b70438ea6cbb73835323433b59250ccc521360aa8328a31c296c",
+     "field_sha256": "033503938f462b3d1988aa045e8be30b686de52757148500655b4b4a2252e726",
+     "field": {
+      "characteristic": 5,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       0,
+       1
+      ],
+      "subgroup_order": "3",
+      "cofactor": 2,
+      "generator": [
+       "0x0",
+       "0x1"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/prime_ic_zero_filter_20261030/implementation/implementation.json"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "icv1-fp5-tm1-a77cc6af",
+   "icv1": "ICV1:fp-17:-1:19:3:unk:unk:r:a77cc6af177e",
+   "family": "prime",
+   "params": {
+    "p": "17",
+    "a": "2",
+    "b": "2"
+   },
+   "model_json": "{\"a\":\"2\",\"b\":\"2\",\"field\":\"fp-17\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"17\",\"v\":\"1\"}",
+   "trace": -1,
+   "order": "19",
+   "j": "3",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/prime_factor_base_degree_20261031/parallel_20261031/audit/protocol.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp5-t0-c58356fb",
+   "icv1": "ICV1:fp-19:0:20:18:unk:unk:r:c58356fb1908",
+   "family": "prime",
+   "params": {
+    "p": "19",
+    "a": "1",
+    "b": "0"
+   },
+   "model_json": "{\"a\":\"1\",\"b\":\"0\",\"field\":\"fp-19\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"19\",\"v\":\"1\"}",
+   "trace": 0,
+   "order": "20",
+   "j": "18",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/prime_ic_zero_filter_20261030/implementation/implementation.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P5Cfphc371c6ca070b",
+     "curve_uid": "urn:ec-record:1:sha256:c371c6ca070b7907e57fa5748c61a10e21004e2a9cc2e531dfe433df18cfbb5f",
+     "field_sha256": "740e57a65ea47739a2b789fe04b9235148a2fcb5dd1ac95b3d17a9cc3478e29b",
+     "field": {
+      "characteristic": 19,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       1,
+       0
+      ],
+      "subgroup_order": "5",
+      "cofactor": 4,
+      "generator": [
+       "0x5",
+       "0x4"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/prime_ic_zero_filter_20261030/implementation/implementation.json"
+     ]
+    }
+   ]
+  },
+  {
    "slug": "icv1-fp6-tm7-fc20da94",
    "icv1": "ICV1:fp-59:-7:67:52:unk:unk:r:fc20da944826",
    "family": "prime",
@@ -17886,6 +18053,171 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
+   "slug": "icv1-fp20-tm1079-bf1bb5fd",
+   "icv1": "ICV1:fp-584767:-1079:585847:574173:unk:unk:r:bf1bb5fdd477",
+   "family": "prime",
+   "params": {
+    "p": "584767",
+    "a": "198133",
+    "b": "297747"
+   },
+   "model_json": "{\"a\":\"198133\",\"b\":\"297747\",\"field\":\"fp-584767\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"584767\",\"v\":\"1\"}",
+   "trace": -1079,
+   "order": "585847",
+   "j": "574173",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp20-tm1079-bf1bb5fd"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P20Cfph62330334fb40",
+     "curve_uid": "urn:ec-record:1:sha256:62330334fb40806a10a65e506f2a5059584900721c895f88d5d5ad9a1159fc8f",
+     "field_sha256": "42abbf4bdc0f231c9e1d93b913190fe0f4cfacf515fb63618532cad6f51f0690",
+     "field": {
+      "characteristic": 584767,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       198133,
+       297747
+      ],
+      "subgroup_order": "585847",
+      "cofactor": 1,
+      "generator": [
+       "0x6d818",
+       "0x227af"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "icv1-fp20-tm985-4efa604e",
+   "icv1": "ICV1:fp-641471:-985:642457:216044:unk:unk:r:4efa604e6a4a",
+   "family": "prime",
+   "params": {
+    "p": "641471",
+    "a": "382170",
+    "b": "201538"
+   },
+   "model_json": "{\"a\":\"382170\",\"b\":\"201538\",\"field\":\"fp-641471\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"641471\",\"v\":\"1\"}",
+   "trace": -985,
+   "order": "642457",
+   "j": "216044",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp20-tm985-4efa604e"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P20Cfph77abb1434cd5",
+     "curve_uid": "urn:ec-record:1:sha256:77abb1434cd5d199186864fde0689a6aff015597a78630ab19f9ff750177dd37",
+     "field_sha256": "d62e47d6c558a25d04ca7b7c2b327144902e9be3d2837b598c27ea18cdc7ac9d",
+     "field": {
+      "characteristic": 641471,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       382170,
+       201538
+      ],
+      "subgroup_order": "642457",
+      "cofactor": 1,
+      "generator": [
+       "0x44505",
+       "0x1b8a5"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "icv1-fp20-t457-f60a16c1",
+   "icv1": "ICV1:fp-658199:457:657743:387152:unk:unk:r:f60a16c111cc",
+   "family": "prime",
+   "params": {
+    "p": "658199",
+    "a": "423941",
+    "b": "256755"
+   },
+   "model_json": "{\"a\":\"423941\",\"b\":\"256755\",\"field\":\"fp-658199\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"658199\",\"v\":\"1\"}",
+   "trace": 457,
+   "order": "657743",
+   "j": "387152",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp20-t457-f60a16c1"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P20Cfph5e2fef5fb23b",
+     "curve_uid": "urn:ec-record:1:sha256:5e2fef5fb23b3a0e7d713172b27c154504255915a8944d93dd48d8b8f68efbf2",
+     "field_sha256": "b5e68fb0c0c78f58f90f96e8dfc276546f1924f631304ab1e70e82e3bd73cfbd",
+     "field": {
+      "characteristic": 658199,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       423941,
+       256755
+      ],
+      "subgroup_order": "657743",
+      "cofactor": 1,
+      "generator": [
+       "0x80f3",
+       "0x785a4"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
+     ]
+    }
+   ]
+  },
+  {
    "slug": "icv1-fp20-t99-a84fb1f1",
    "icv1": "ICV1:fp-684289:99:684191:417148:unk:unk:r:a84fb1f15744",
    "family": "prime",
@@ -17980,6 +18312,61 @@
      },
      "sources": [
       "docs/curves/sources/ci-registration-20261029.json"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "icv1-fp20-tm1141-c50333f6",
+   "icv1": "ICV1:fp-731999:-1141:733141:79528:unk:unk:r:c50333f60320",
+   "family": "prime",
+   "params": {
+    "p": "731999",
+    "a": "393706",
+    "b": "663716"
+   },
+   "model_json": "{\"a\":\"393706\",\"b\":\"663716\",\"field\":\"fp-731999\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"731999\",\"v\":\"1\"}",
+   "trace": -1141,
+   "order": "733141",
+   "j": "79528",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp20-tm1141-c50333f6"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P20Cfph226bac92e011",
+     "curve_uid": "urn:ec-record:1:sha256:226bac92e011ba4672183496a61ead48288c9bee8a41a9cbe67b7cddca458e4a",
+     "field_sha256": "625d11be73c93bdf65c873537961cabea66bdd2a519f27696eb1114ca776aec3",
+     "field": {
+      "characteristic": 731999,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       393706,
+       663716
+      ],
+      "subgroup_order": "733141",
+      "cofactor": 1,
+      "generator": [
+       "0x6671",
+       "0x92d6"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
      ]
     }
    ]
@@ -18329,6 +18716,116 @@
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp20-t1239-d852a683",
+   "icv1": "ICV1:fp-921517:1239:920279:29553:unk:unk:r:d852a6839db7",
+   "family": "prime",
+   "params": {
+    "p": "921517",
+    "a": "292594",
+    "b": "695767"
+   },
+   "model_json": "{\"a\":\"292594\",\"b\":\"695767\",\"field\":\"fp-921517\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"921517\",\"v\":\"1\"}",
+   "trace": 1239,
+   "order": "920279",
+   "j": "29553",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp20-t1239-d852a683"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P20Cfphe21a84313cac",
+     "curve_uid": "urn:ec-record:1:sha256:e21a84313cacf9ce22b44d6cf5158f4f7f2e7a8e5f8a4390d2bbde9259f71959",
+     "field_sha256": "027d73cd38981d8d3a2365be898a70db3fd70d10a06591c80285fb88770f564a",
+     "field": {
+      "characteristic": 921517,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       292594,
+       695767
+      ],
+      "subgroup_order": "920279",
+      "cofactor": 1,
+      "generator": [
+       "0xa4e16",
+       "0x4470"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "icv1-fp20-t375-aef80152",
+   "icv1": "ICV1:fp-923743:375:923369:898026:unk:unk:r:aef80152ad2e",
+   "family": "prime",
+   "params": {
+    "p": "923743",
+    "a": "891514",
+    "b": "586300"
+   },
+   "model_json": "{\"a\":\"891514\",\"b\":\"586300\",\"field\":\"fp-923743\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"923743\",\"v\":\"1\"}",
+   "trace": 375,
+   "order": "923369",
+   "j": "898026",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp20-t375-aef80152"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P20Cfph7f8b5291f6f7",
+     "curve_uid": "urn:ec-record:1:sha256:7f8b5291f6f78c4de277fcdc30bb89109583aeeb4f206f8931f55448db27938d",
+     "field_sha256": "50fe4f5920ccd98ade22b8a2f1b218110f61f5ab4b7c1141a498a4c79fc4dc47",
+     "field": {
+      "characteristic": 923743,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       891514,
+       586300
+      ],
+      "subgroup_order": "923369",
+      "cofactor": 1,
+      "generator": [
+       "0x3d520",
+       "0xafce3"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-fp20-tm183-1f9745f6",
@@ -18713,6 +19210,7 @@
       "target_group": "prime-order subgroup"
      },
      "sources": [
+      "research/explicit_relations_e2e_20261030/curves.json",
       "research/ic_frontier_campaign_20261015/prime_curves.json"
      ]
     }
@@ -39734,6 +40232,61 @@
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp24-tm2615-5e182037",
+   "icv1": "ICV1:fp-9845107:-2615:9847723:3042839:unk:unk:r:5e1820370d0e",
+   "family": "prime",
+   "params": {
+    "p": "9845107",
+    "a": "8171369",
+    "b": "9819050"
+   },
+   "model_json": "{\"a\":\"8171369\",\"b\":\"9819050\",\"field\":\"fp-9845107\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"9845107\",\"v\":\"1\"}",
+   "trace": -2615,
+   "order": "9847723",
+   "j": "3042839",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp24-tm2615-5e182037"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P24Cfphb5dc58176a20",
+     "curve_uid": "urn:ec-record:1:sha256:b5dc58176a20b021164e9c28539f0658f962fc73366e404da810e06fe944d506",
+     "field_sha256": "f343f6d166b25fe16254d46ffa0472729311eb55c38b938097e64937e2b8f8ec",
+     "field": {
+      "characteristic": 9845107,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       8171369,
+       9819050
+      ],
+      "subgroup_order": "9847723",
+      "cofactor": 1,
+      "generator": [
+       "0x19ac2d",
+       "0x4a7ff0"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-fp24-t5674-0211b71b",
@@ -132612,6 +133165,61 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
+   "slug": "icv1-fp24-tm3353-1a46dbd1",
+   "icv1": "ICV1:fp-12570703:-3353:12574057:8865301:unk:unk:r:1a46dbd14909",
+   "family": "prime",
+   "params": {
+    "p": "12570703",
+    "a": "11707519",
+    "b": "9091877"
+   },
+   "model_json": "{\"a\":\"11707519\",\"b\":\"9091877\",\"field\":\"fp-12570703\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"12570703\",\"v\":\"1\"}",
+   "trace": -3353,
+   "order": "12574057",
+   "j": "8865301",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp24-tm3353-1a46dbd1"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P24Cfph4d32c81ae8f1",
+     "curve_uid": "urn:ec-record:1:sha256:4d32c81ae8f1236bf813c17759ecec284feb4c5c1cfa462d30de3060b9993202",
+     "field_sha256": "a5553834e22b115ebc82c7b0899853f3e23c2bae722c617576676f964f67fae6",
+     "field": {
+      "characteristic": 12570703,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       11707519,
+       9091877
+      ],
+      "subgroup_order": "12574057",
+      "cofactor": 1,
+      "generator": [
+       "0xa30ce5",
+       "0xbe8d88"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
+     ]
+    }
+   ]
+  },
+  {
    "slug": "icv1-fp24-t62-008f1b92",
    "icv1": "ICV1:fp-12588977:62:12588916:12208574:unk:unk:r:008f1b92d774",
    "family": "prime",
@@ -148082,6 +148690,61 @@
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp24-t5097-1f48e65c",
+   "icv1": "ICV1:fp-13115629:5097:13110533:8849449:unk:unk:r:1f48e65ccf2f",
+   "family": "prime",
+   "params": {
+    "p": "13115629",
+    "a": "7911932",
+    "b": "1797942"
+   },
+   "model_json": "{\"a\":\"7911932\",\"b\":\"1797942\",\"field\":\"fp-13115629\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"13115629\",\"v\":\"1\"}",
+   "trace": 5097,
+   "order": "13110533",
+   "j": "8849449",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp24-t5097-1f48e65c"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P24Cfphe75d406589ce",
+     "curve_uid": "urn:ec-record:1:sha256:e75d406589ce8c25541150a18c1b2a2a24995301c803a06b710015427d6a7316",
+     "field_sha256": "182abfecd476c3cc02eb90df2867a5861f43f4a847239067427a7652a8212399",
+     "field": {
+      "characteristic": 13115629,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       7911932,
+       1797942
+      ],
+      "subgroup_order": "13110533",
+      "cofactor": 1,
+      "generator": [
+       "0x2d082c",
+       "0x4a2f9f"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-fp24-t4451-d5368b2d",
@@ -174852,6 +175515,61 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
+   "slug": "icv1-fp24-tm3365-ba8f1013",
+   "icv1": "ICV1:fp-13881823:-3365:13885189:448645:unk:unk:r:ba8f10138b31",
+   "family": "prime",
+   "params": {
+    "p": "13881823",
+    "a": "514726",
+    "b": "10178410"
+   },
+   "model_json": "{\"a\":\"514726\",\"b\":\"10178410\",\"field\":\"fp-13881823\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"13881823\",\"v\":\"1\"}",
+   "trace": -3365,
+   "order": "13885189",
+   "j": "448645",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp24-tm3365-ba8f1013"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P24Cfphd0b3d9e890ac",
+     "curve_uid": "urn:ec-record:1:sha256:d0b3d9e890ac9dadd0ebcb9fff0238e5213c8d4e3b2862ffd646d05179df63af",
+     "field_sha256": "5785d681ea1b90647e2c2900888a11f5f4f8a443d4df4d4e26b9277d9fa95444",
+     "field": {
+      "characteristic": 13881823,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       514726,
+       10178410
+      ],
+      "subgroup_order": "13885189",
+      "cofactor": 1,
+      "generator": [
+       "0x65e9c9",
+       "0xa12645"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
+     ]
+    }
+   ]
+  },
+  {
    "slug": "icv1-fp24-tm6778-008ff0ff",
    "icv1": "ICV1:fp-13897337:-6778:13904116:6388225:unk:unk:r:008ff0ff36f2",
    "family": "prime",
@@ -181564,6 +182282,61 @@
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp24-t3415-63d6e400",
+   "icv1": "ICV1:fp-14025293:3415:14021879:1770443:unk:unk:r:63d6e400ca1b",
+   "family": "prime",
+   "params": {
+    "p": "14025293",
+    "a": "639517",
+    "b": "7135581"
+   },
+   "model_json": "{\"a\":\"639517\",\"b\":\"7135581\",\"field\":\"fp-14025293\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"14025293\",\"v\":\"1\"}",
+   "trace": 3415,
+   "order": "14021879",
+   "j": "1770443",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp24-t3415-63d6e400"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P24Cfph66cc15c69a45",
+     "curve_uid": "urn:ec-record:1:sha256:66cc15c69a4540bdbeef8ef110756bea2d57b25e3baba7e4f2c30e41ee21d93b",
+     "field_sha256": "d8955a6f29945539523de877b769ff7e819aba50dd40f5079be614167776d3ef",
+     "field": {
+      "characteristic": 14025293,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       639517,
+       7135581
+      ],
+      "subgroup_order": "14021879",
+      "cofactor": 1,
+      "generator": [
+       "0xb6acf4",
+       "0x7c75d0"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-fp24-t3974-91872377",
@@ -209270,6 +210043,61 @@
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp24-tm1215-254f2c18",
+   "icv1": "ICV1:fp-15155017:-1215:15156233:11959795:unk:unk:r:254f2c186d2a",
+   "family": "prime",
+   "params": {
+    "p": "15155017",
+    "a": "3658211",
+    "b": "6153727"
+   },
+   "model_json": "{\"a\":\"3658211\",\"b\":\"6153727\",\"field\":\"fp-15155017\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"15155017\",\"v\":\"1\"}",
+   "trace": -1215,
+   "order": "15156233",
+   "j": "11959795",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp24-tm1215-254f2c18"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P24Cfphdfa8746c4db8",
+     "curve_uid": "urn:ec-record:1:sha256:dfa8746c4db80fc07045d4ab1751e5a63bb07888c416e46f1010db4baa9b17ca",
+     "field_sha256": "0d2477fd65f982ba1b787a0c7c30ffd925a11d5ed4609c48855a3e95df7f3aaf",
+     "field": {
+      "characteristic": 15155017,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       3658211,
+       6153727
+      ],
+      "subgroup_order": "15156233",
+      "cofactor": 1,
+      "generator": [
+       "0x218c77",
+       "0xb2c989"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-fp24-tm1781-131ae739",
@@ -245173,6 +246001,7 @@
       "target_group": "prime-order subgroup"
      },
      "sources": [
+      "research/explicit_relations_e2e_20261030/curves.json",
       "research/ic_frontier_campaign_20261015/prime_curves.json"
      ]
     }
@@ -448289,6 +449118,61 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
+   "slug": "icv1-fp28-tm5475-0f58a032",
+   "icv1": "ICV1:fp-146781643:-5475:146787119:79537464:unk:unk:r:0f58a032f26c",
+   "family": "prime",
+   "params": {
+    "p": "146781643",
+    "a": "51738534",
+    "b": "54545012"
+   },
+   "model_json": "{\"a\":\"51738534\",\"b\":\"54545012\",\"field\":\"fp-146781643\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"146781643\",\"v\":\"1\"}",
+   "trace": -5475,
+   "order": "146787119",
+   "j": "79537464",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp28-tm5475-0f58a032"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P28Cfphcc8aad2362ee",
+     "curve_uid": "urn:ec-record:1:sha256:cc8aad2362ee93066d44009a4200aed0fa803f71e3465b53e2cc97ccc7bef459",
+     "field_sha256": "e914726e327fca7f15c3fa57a45ea7659bff48576e4de2ef64a98f2ac892d836",
+     "field": {
+      "characteristic": 146781643,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       51738534,
+       54545012
+      ],
+      "subgroup_order": "146787119",
+      "cofactor": 1,
+      "generator": [
+       "0x166f022",
+       "0x5688578"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
+     ]
+    }
+   ]
+  },
+  {
    "slug": "icv1-fp28-t24675-0fc2ae58",
    "icv1": "ICV1:fp-152283451:24675:152258777:115656406:unk:unk:r:0fc2ae586cac",
    "family": "prime",
@@ -448867,6 +449751,61 @@
      },
      "sources": [
       "docs/curves/sources/ci-registration-20261029.json"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "icv1-fp28-t20259-8fb841e7",
+   "icv1": "ICV1:fp-155913907:20259:155893649:36861987:unk:unk:r:8fb841e70495",
+   "family": "prime",
+   "params": {
+    "p": "155913907",
+    "a": "146268840",
+    "b": "128469689"
+   },
+   "model_json": "{\"a\":\"146268840\",\"b\":\"128469689\",\"field\":\"fp-155913907\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"155913907\",\"v\":\"1\"}",
+   "trace": 20259,
+   "order": "155893649",
+   "j": "36861987",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp28-t20259-8fb841e7"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P28Cfphd86289dc94e1",
+     "curve_uid": "urn:ec-record:1:sha256:d86289dc94e19ad707045f6f608d262b10ae46e388b28907588d50f15da98fd7",
+     "field_sha256": "9423704d24ba07d8b00d356b6bc928cc69ad85b7ae6dde14a5c2e75ea45682e6",
+     "field": {
+      "characteristic": 155913907,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       146268840,
+       128469689
+      ],
+      "subgroup_order": "155893649",
+      "cofactor": 1,
+      "generator": [
+       "0x66ef33c",
+       "0x75cbf7e"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
      ]
     }
    ]
@@ -449898,6 +450837,61 @@
    ]
   },
   {
+   "slug": "icv1-fp28-t2985-10809654",
+   "icv1": "ICV1:fp-187745293:2985:187742309:104039225:unk:unk:r:108096540f3c",
+   "family": "prime",
+   "params": {
+    "p": "187745293",
+    "a": "146669529",
+    "b": "872892"
+   },
+   "model_json": "{\"a\":\"146669529\",\"b\":\"872892\",\"field\":\"fp-187745293\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"187745293\",\"v\":\"1\"}",
+   "trace": 2985,
+   "order": "187742309",
+   "j": "104039225",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp28-t2985-10809654"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P28Cfph2271eb8425ab",
+     "curve_uid": "urn:ec-record:1:sha256:2271eb8425ab02a6b34effb14647adf72258fffd898cf9e1e7eacfe7150429f8",
+     "field_sha256": "ea080ffe644682a784f87e7f4c38325c42ccfa19933ef2438a87761885255ad3",
+     "field": {
+      "characteristic": 187745293,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       146669529,
+       872892
+      ],
+      "subgroup_order": "187742309",
+      "cofactor": 1,
+      "generator": [
+       "0x6ad1f3c",
+       "0x2beffee"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
+     ]
+    }
+   ]
+  },
+  {
    "slug": "icv1-fp28-t19436-2c5ecd4b",
    "icv1": "ICV1:fp-194418247:19436:194398812:183268278:unk:unk:r:2c5ecd4bc8db",
    "family": "prime",
@@ -449999,6 +450993,116 @@
    ]
   },
   {
+   "slug": "icv1-fp28-tm18917-dbe6b497",
+   "icv1": "ICV1:fp-199324519:-18917:199343437:65080820:unk:unk:r:dbe6b497ed22",
+   "family": "prime",
+   "params": {
+    "p": "199324519",
+    "a": "183493953",
+    "b": "160573064"
+   },
+   "model_json": "{\"a\":\"183493953\",\"b\":\"160573064\",\"field\":\"fp-199324519\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"199324519\",\"v\":\"1\"}",
+   "trace": -18917,
+   "order": "199343437",
+   "j": "65080820",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp28-tm18917-dbe6b497"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P28Cfphd88ae68f34e2",
+     "curve_uid": "urn:ec-record:1:sha256:d88ae68f34e2fa5dbdf110ea502aed442dbf144aa12287cadb805de150238748",
+     "field_sha256": "15a38d2f05b4af39828f9274478f959e5500605c0fd132a184b46a2056ca38ad",
+     "field": {
+      "characteristic": 199324519,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       183493953,
+       160573064
+      ],
+      "subgroup_order": "199343437",
+      "cofactor": 1,
+      "generator": [
+       "0x9af3d8b",
+       "0xb057b96"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "icv1-fp28-t24271-da5b2687",
+   "icv1": "ICV1:fp-204948281:24271:204924011:111650691:unk:unk:r:da5b26876c48",
+   "family": "prime",
+   "params": {
+    "p": "204948281",
+    "a": "148287127",
+    "b": "84954211"
+   },
+   "model_json": "{\"a\":\"148287127\",\"b\":\"84954211\",\"field\":\"fp-204948281\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"204948281\",\"v\":\"1\"}",
+   "trace": 24271,
+   "order": "204924011",
+   "j": "111650691",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp28-t24271-da5b2687"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P28Cfphc0f475f23dbb",
+     "curve_uid": "urn:ec-record:1:sha256:c0f475f23dbb7046b470227bf4a255cdacd01e1b5bcd26c9946935a84849b4c9",
+     "field_sha256": "a24076f7df959d9464f04ce3c6c8349f4e6482639aa861c3b8f873dda7711060",
+     "field": {
+      "characteristic": 204948281,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       148287127,
+       84954211
+      ],
+      "subgroup_order": "204924011",
+      "cofactor": 1,
+      "generator": [
+       "0x17a469c",
+       "0x3467c82"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
+     ]
+    }
+   ]
+  },
+  {
    "slug": "icv1-fp28-tm5065-1146b4a5",
    "icv1": "ICV1:fp-212738657:-5065:212743723:88321037:unk:unk:r:1146b4a56e3a",
    "family": "prime",
@@ -450049,6 +451153,61 @@
      },
      "sources": [
       "docs/curves/sources/ci-registration-20261029.json"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "icv1-fp28-t12791-9e92c6c2",
+   "icv1": "ICV1:fp-213708647:12791:213695857:86410565:unk:unk:r:9e92c6c249db",
+   "family": "prime",
+   "params": {
+    "p": "213708647",
+    "a": "186338265",
+    "b": "118330842"
+   },
+   "model_json": "{\"a\":\"186338265\",\"b\":\"118330842\",\"field\":\"fp-213708647\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"213708647\",\"v\":\"1\"}",
+   "trace": 12791,
+   "order": "213695857",
+   "j": "86410565",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp28-t12791-9e92c6c2"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P28Cfph0bc85ff78582",
+     "curve_uid": "urn:ec-record:1:sha256:0bc85ff78582acaaf44f8cbc4b17499ed2d598e796b86ef696cc93f1d5072f9b",
+     "field_sha256": "4b35579fb8c398ecc75cb678e5fcd3bdebaef8499924438622c64a2f6d8f4f76",
+     "field": {
+      "characteristic": 213708647,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       186338265,
+       118330842
+      ],
+      "subgroup_order": "213695857",
+      "cofactor": 1,
+      "generator": [
+       "0x8f1bb8f",
+       "0xa2800e0"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
      ]
     }
    ]
@@ -451106,6 +452265,7 @@
       "target_group": "prime-order subgroup"
      },
      "sources": [
+      "research/explicit_relations_e2e_20261030/curves.json",
       "research/ic_frontier_campaign_20261015/prime_curves.json"
      ]
     }
@@ -452987,6 +454147,61 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
+   "slug": "icv1-fp32-tm70799-e5f3e6f2",
+   "icv1": "ICV1:fp-2468872309:-70799:2468943109:653299414:unk:unk:r:e5f3e6f2b045",
+   "family": "prime",
+   "params": {
+    "p": "2468872309",
+    "a": "740848899",
+    "b": "111551246"
+   },
+   "model_json": "{\"a\":\"740848899\",\"b\":\"111551246\",\"field\":\"fp-2468872309\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"2468872309\",\"v\":\"1\"}",
+   "trace": -70799,
+   "order": "2468943109",
+   "j": "653299414",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp32-tm70799-e5f3e6f2"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P32Cfphabeda8cc1d8c",
+     "curve_uid": "urn:ec-record:1:sha256:abeda8cc1d8cbe32d8bd72c4b3a8c28f0c6bb29327937bceef7334425e9a3993",
+     "field_sha256": "b77fb9c2f5594713c37bcebd24a4718f76cca2567efad56a86e31d0eadf469b8",
+     "field": {
+      "characteristic": 2468872309,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       740848899,
+       111551246
+      ],
+      "subgroup_order": "2468943109",
+      "cofactor": 1,
+      "generator": [
+       "0x87d6d310",
+       "0x7eced129"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
+     ]
+    }
+   ]
+  },
+  {
    "slug": "icv1-fp32-tm11535-8e4578de",
    "icv1": "ICV1:fp-2469181963:-11535:2469193499:135475565:unk:unk:r:8e4578de7069",
    "family": "prime",
@@ -453177,6 +454392,61 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
+   "slug": "icv1-fp32-t8395-a5210489",
+   "icv1": "ICV1:fp-2981198323:8395:2981189929:1964501035:unk:unk:r:a5210489d43f",
+   "family": "prime",
+   "params": {
+    "p": "2981198323",
+    "a": "1238630014",
+    "b": "2744266586"
+   },
+   "model_json": "{\"a\":\"1238630014\",\"b\":\"2744266586\",\"field\":\"fp-2981198323\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"2981198323\",\"v\":\"1\"}",
+   "trace": 8395,
+   "order": "2981189929",
+   "j": "1964501035",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp32-t8395-a5210489"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P32Cfph7e3c089ce4fb",
+     "curve_uid": "urn:ec-record:1:sha256:7e3c089ce4fbc463f67c1ca69f5fd1d72ae3d69a1dd7a236597fc54f0151b5df",
+     "field_sha256": "ec4d3329d1f35c096b4ad8ab60a35f4351859570be902d06e39a36698b35b5b7",
+     "field": {
+      "characteristic": 2981198323,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       1238630014,
+       2744266586
+      ],
+      "subgroup_order": "2981189929",
+      "cofactor": 1,
+      "generator": [
+       "0x283e2682",
+       "0x99390ed0"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
+     ]
+    }
+   ]
+  },
+  {
    "slug": "icv1-fp32-tm101415-9b187f52",
    "icv1": "ICV1:fp-3094378543:-101415:3094479959:3042964895:unk:unk:r:9b187f52394e",
    "family": "prime",
@@ -453227,6 +454497,116 @@
      },
      "sources": [
       "research/generic_dlp_correctness_20261017/inputs/curves.json"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "icv1-fp32-tm30557-158f1cf7",
+   "icv1": "ICV1:fp-3101101781:-30557:3101132339:1674257571:unk:unk:r:158f1cf72cd9",
+   "family": "prime",
+   "params": {
+    "p": "3101101781",
+    "a": "832459755",
+    "b": "1784514525"
+   },
+   "model_json": "{\"a\":\"832459755\",\"b\":\"1784514525\",\"field\":\"fp-3101101781\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"3101101781\",\"v\":\"1\"}",
+   "trace": -30557,
+   "order": "3101132339",
+   "j": "1674257571",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp32-tm30557-158f1cf7"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P32Cfpha15f56ed03ce",
+     "curve_uid": "urn:ec-record:1:sha256:a15f56ed03ce331d6715aceb8829f3d5ce1a785e779ee528e5a3ebbe8e0db7f6",
+     "field_sha256": "760d290837b91e3a24b5752d1c93304d9cd63f35b20d587a38232d91ceb368e7",
+     "field": {
+      "characteristic": 3101101781,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       832459755,
+       1784514525
+      ],
+      "subgroup_order": "3101132339",
+      "cofactor": 1,
+      "generator": [
+       "0x6c75ac89",
+       "0x485c2e52"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "icv1-fp32-tm14249-af783d1f",
+   "icv1": "ICV1:fp-3149148911:-14249:3149163161:1941955689:unk:unk:r:af783d1f200d",
+   "family": "prime",
+   "params": {
+    "p": "3149148911",
+    "a": "711291984",
+    "b": "671517315"
+   },
+   "model_json": "{\"a\":\"711291984\",\"b\":\"671517315\",\"field\":\"fp-3149148911\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"3149148911\",\"v\":\"1\"}",
+   "trace": -14249,
+   "order": "3149163161",
+   "j": "1941955689",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp32-tm14249-af783d1f"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P32Cfph774a2a737026",
+     "curve_uid": "urn:ec-record:1:sha256:774a2a7370266f1e048ac8e210c105d4d74b30a53ab3fceadfad692cc0303c8e",
+     "field_sha256": "a0ac07ca17bb8cf572abd5da4180c7b97163656b2a0794f1425a9f78c8df38b0",
+     "field": {
+      "characteristic": 3149148911,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       711291984,
+       671517315
+      ],
+      "subgroup_order": "3149163161",
+      "cofactor": 1,
+      "generator": [
+       "0x9093cc38",
+       "0xaedfb3c2"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
      ]
     }
    ]
@@ -453461,6 +454841,61 @@
    ]
   },
   {
+   "slug": "icv1-fp32-tm34607-b8d05587",
+   "icv1": "ICV1:fp-3546476803:-34607:3546511411:2452034776:unk:unk:r:b8d0558798a1",
+   "family": "prime",
+   "params": {
+    "p": "3546476803",
+    "a": "2720091890",
+    "b": "1740131956"
+   },
+   "model_json": "{\"a\":\"2720091890\",\"b\":\"1740131956\",\"field\":\"fp-3546476803\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"3546476803\",\"v\":\"1\"}",
+   "trace": -34607,
+   "order": "3546511411",
+   "j": "2452034776",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp32-tm34607-b8d05587"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P32Cfphc4f0f0be2232",
+     "curve_uid": "urn:ec-record:1:sha256:c4f0f0be2232663f9bd10fa63a15a8cde93d386603399c587704eeaefaba4ae5",
+     "field_sha256": "aea4092fdf6081c0a0b787779cd7536f5f7b3ff148e6fbf10e5e6409749472cf",
+     "field": {
+      "characteristic": 3546476803,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       2720091890,
+       1740131956
+      ],
+      "subgroup_order": "3546511411",
+      "cofactor": 1,
+      "generator": [
+       "0x4c72c23d",
+       "0x2dc66815"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
+     ]
+    }
+   ]
+  },
+  {
    "slug": "icv1-fp32-t93403-ef655380",
    "icv1": "ICV1:fp-3642104651:93403:3642011249:3455714807:unk:unk:r:ef6553807a3e",
    "family": "prime",
@@ -453654,6 +455089,61 @@
    ]
   },
   {
+   "slug": "icv1-fp32-t14279-7d108a60",
+   "icv1": "ICV1:fp-4219792397:14279:4219778119:275535077:unk:unk:r:7d108a606059",
+   "family": "prime",
+   "params": {
+    "p": "4219792397",
+    "a": "520906769",
+    "b": "80774089"
+   },
+   "model_json": "{\"a\":\"520906769\",\"b\":\"80774089\",\"field\":\"fp-4219792397\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"4219792397\",\"v\":\"1\"}",
+   "trace": 14279,
+   "order": "4219778119",
+   "j": "275535077",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp32-t14279-7d108a60"
+   ],
+   "standard_names": [],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P32Cfph0ef6203b6a43",
+     "curve_uid": "urn:ec-record:1:sha256:0ef6203b6a432f949d67d89442ba7f80673eea97a37f2cc3b6ec53912f59137f",
+     "field_sha256": "90b746414d6d324f599373764b6bff64ad49b832a62c23fff88c2e56210effb5",
+     "field": {
+      "characteristic": 4219792397,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       520906769,
+       80774089
+      ],
+      "subgroup_order": "4219778119",
+      "cofactor": 1,
+      "generator": [
+       "0x1cfd7d4d",
+       "0x5422a19"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "docs/curves/sources/prime-ksum-pooled-20261029.json"
+     ]
+    }
+   ]
+  },
+  {
    "slug": "icv1-fp32-t7319-90da43e9",
    "icv1": "ICV1:fp-4294967291:7319:4294959973:228885397:unk:unk:r:90da43e918ff",
    "family": "prime",
@@ -453709,6 +455199,7 @@
       "target_group": "prime-order subgroup"
      },
      "sources": [
+      "research/explicit_relations_e2e_20261030/curves.json",
       "research/generic_dlp_memory_parallelism_20261017/inputs/curves.json",
       "research/ic_frontier_campaign_20261015/prime_curves.json"
      ]
@@ -454079,6 +455570,7 @@
       "target_group": "prime-order subgroup"
      },
      "sources": [
+      "research/explicit_relations_e2e_20261030/curves.json",
       "research/generic_dlp_memory_parallelism_20261017/inputs/curves.json",
       "research/ic_frontier_campaign_20261015/prime_curves.json"
      ]
@@ -454656,6 +456148,7 @@
       "target_group": "prime-order subgroup"
      },
      "sources": [
+      "research/explicit_relations_e2e_20261030/curves.json",
       "research/generic_dlp_memory_parallelism_20261017/inputs/curves.json",
       "research/ic_frontier_campaign_20261015/prime_curves.json"
      ]

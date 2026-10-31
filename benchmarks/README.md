@@ -43,6 +43,12 @@ remains outside this table pending validation admission.
 The [retained cross-layout screen](N83_CROSSLAYOUT_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
+The [31 October n=83 genus-three image study](20261031-n83-genus3-image/)
+retains its exact transfer certificate, replayed toy panels, reports, and
+figures as documentary evidence. It remains outside the admitted table because
+the destination operations have no source-GAE conversion and all wall records
+earned only L0; no weak-destination or net-speedup claim is validated.
+
 The [31 October gap80 native-helper and partial-tile diagnostics](20261031-gap80-native-diagnostic/)
 retain documentary run/results PDFs and SVG/PNG copies. Historical medians
 were 0.469961 → 0.395023 s and 2.453493 → 2.087622 s for native helper

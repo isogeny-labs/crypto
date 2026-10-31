@@ -346,28 +346,6 @@ Matrix F4, matrix F5, inherited F4 and F6-IC through `pdp3-binary` on eight publ
 | koblitz | 19 | `icv1-f2m19-t797-b6cf2467` | 139 | 1.310 | 3.090 | 5.106 | 6483.443 | — | — | 0.359 |
 | binary | 19 | `icv1-f2m19-tm649-a9133fe6` | 129 | 1.387 | — | 3.405 | 4714.506 | — | — | 0.372 |
 
-## Tower F4, signature F5 and an F6 analogue on prime curves, outside tables A–C
-
-The `pkm-tower` oracle (S₃ on a PKM Kummer tower, a splitting tree decided by tower F4 or signature F5, small nodes closed geometrically by F6, `enum` with no algebra) on four prime-order curves, beside same-target rho-negation. Tower-arm `S` is a lower bound (F_p multiply-adds unpriced). Read the [analysis](../../research/pkm_tower_ecbench_20261011/ANALYSIS.json).
-
-| bits | curve | r | rho-negation S | F4 S | enum S | W sig-F5/F4 | log2(W F4/W F6) | F4 S/rho | enum S/rho |
-|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|
-| 9 | `icv1-fp9-t25-33fa1ca2` | 233 | 5.503 | 25.845 | 29.743 | 0.227 | 0.00590 | 4.638 | 5.422 |
-| 11 | `icv1-fp11-t43-4d73e7f7` | 1367 | 2.786 | 15.552 | 38.812 | 0.277 | 0.00047 | 5.389 | 11.997 |
-| 13 | `icv1-fp13-tm41-756f569a` | 7723 | 2.014 | 9.365 | 45.892 | 0.307 | 0.00007 | 4.768 | 21.709 |
-| 15 | `icv1-fp15-t181-50ff72d2` | 18253 | 1.984 | 7.483 | 60.616 | 0.326 | 0.00001 | 3.910 | 29.005 |
-
-## Root finders against tower F4 on prime curves, outside tables A–C
-
-`rootfind-subtract` (m = 2) against tower F4 on the PKM Kummer base and the same targets. Ratios are root finder / F4; F_p multiplications include F4's multiply-adds. The AGENTS.md §5a band leaves the order unresolved; the break-even weight is derived. Read the [analysis](../../research/pkm_tower_rootfind_20261018/ANALYSIS.json).
-
-| bits | curve | S ratio | F_p mult. ratio | wall ratio | §5a | break-even (GAE/op) |
-|--:|:--|--:|--:|--:|:--|--:|
-| 9 | `icv1-fp9-t25-33fa1ca2` | 1.155 | 2.77e-05 | 1.43e-04 | unresolved inside the band | 8.54e-07 |
-| 11 | `icv1-fp11-t43-4d73e7f7` | 2.230 | 2.29e-06 | 2.54e-05 | unresolved inside the band | 3.56e-07 |
-| 13 | `icv1-fp13-tm41-756f569a` | 3.529 | 3.26e-07 | 6.48e-06 | unresolved inside the band | 6.88e-08 |
-| 15 | `icv1-fp15-t181-50ff72d2` | 6.704 | 4.61e-08 | 1.07e-06 | unresolved inside the band | 1.20e-08 |
-
 ## n41/n53 shared-rank counted panel, outside tables A–C
 
 The four n37 arms (strong signed-Frobenius rho, K8, K16 and an identical K16 control, method parameters unchanged) ran on 16 new public one-target workloads on each of the next two registered sizes, five paired rounds each, on macOS at L0. Counted cold IC/rho is a quotient of two lower bounds (native work unpriced); a cell whose arm never verifies under the frozen parameters is unknown, not a cost. 206 of 640 measured runs verified; decision `frozen_parameters_do_not_transfer`; the L2 host run is pending. Read the [frozen decision](../../research/ecbench_n41_n53_shared_rank_20261005/DECISION.json).
@@ -829,8 +807,6 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/f6_ic_geometric_closure_20261003/small_cold/replay-certificate.json` — sha256 `307f02ce84e5cb46…`
 - `research/f6_ic_ecbench_ladder_20261005/ANALYSIS.json` — sha256 `69ca54385c62a50e…`
 - `research/f4_f5_f6_cross_family_20261011/ANALYSIS.json` — sha256 `143247c6b81d3539…`
-- `research/pkm_tower_ecbench_20261011/ANALYSIS.json` — sha256 `f229006fc05cf40b…`
-- `research/pkm_tower_rootfind_20261018/ANALYSIS.json` — sha256 `27b200683947773e…`
 - `research/ecbench_e2e_frontier_20261031/establishment/certificate.json` — sha256 `fb5759832dd0f80a…`
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
@@ -885,7 +861,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/n83_e2e_final_holdout_20261016/validated_rows.json` — sha256 `b296172d92739c4d…`
 - `research/n83_e2e_final_holdout_20261016/selection.json` — sha256 `860d24e60baa552d…`
 - `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
-- `docs/curves/registry.json` — sha256 `b38324fbadd3a5d3…`
+- `docs/curves/registry.json` — sha256 `6dce2c6f17bb1b3b…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `0bbdf920814f5946…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_v1.json` — sha256 `af8cfaf233c6b992…`

@@ -75,8 +75,6 @@ SOURCES = {
     "f6_small_cold_replay": "research/f6_ic_geometric_closure_20261003/small_cold/replay-certificate.json",
     "f6_ecbench_ladder": "research/f6_ic_ecbench_ladder_20261005/ANALYSIS.json",
     "f4_f5_f6_cross_family": "research/f4_f5_f6_cross_family_20261011/ANALYSIS.json",
-    "pkm_tower_prime": "research/pkm_tower_ecbench_20261011/ANALYSIS.json",
-    "pkm_rootfind_prime": "research/pkm_tower_rootfind_20261018/ANALYSIS.json",
     "frontier_establishment": "research/ecbench_e2e_frontier_20261031/establishment/certificate.json",
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
@@ -727,10 +725,14 @@ def roster(names: Names, measured: set[str]) -> list[dict]:
     for c in names.reg["curves"]:
         p = c["params"]
         if c["family"] == "prime":
-            field = f"GF(p), p = {p['p']}" if len(p["p"]) < 40 else f"GF(p), {int(p['p']).bit_length()}-bit p"
-            coeff = f"a = {p['a']}, b = {p['b']}" if len(p["p"]) < 40 else "standard coefficients"
+            p_text = str(p["p"])
+            field = f"GF(p), p = {p_text}" if len(p_text) < 40 else f"GF(p), {int(p_text).bit_length()}-bit p"
+            coeff = f"a = {p['a']}, b = {p['b']}" if len(p_text) < 40 else "standard coefficients"
         elif c["family"] == "extension":
-            field = f"GF({p['p']}^{p.get('k', p.get('degree'))})"
+            degree = p.get("k", p.get("degree"))
+            if degree is None:
+                raise ValueError(f"extension curve {c['slug']} has no field degree")
+            field = f"GF({p['p']}^{degree})"
             coeff = f"a = {p['a']}, b = {p['b']}"
         else:
             m = p.get("n", p.get("m"))
@@ -1712,55 +1714,6 @@ def build(allow_unvalidated: bool = False) -> dict:
         "online_speedup": None,
         "fully_priced_cold_speedup": None,
     }
-    prime = load(SOURCES["pkm_tower_prime"])
-    if prime["schema"] != "pkm-tower-prime-analysis/v1":
-        raise SystemExit("review the PKM tower prime analysis before updating the leaderboard")
-    prime_rows = []
-    for key in ("P5", "P6", "P7", "P8"):
-        for c in prime["sessions"][key]["cells"]:
-            q = c["questions"]
-            prime_rows.append({
-                "session": key,
-                "bits": c["bits"],
-                "curve": names(c["slug"])["slug"],
-                "r": c["r"],
-                "rho_negation_s": med(c["arms"], "rho-negation", "s"),
-                "f4_s": med(c["arms"], "f4", "s"),
-                "enum_s": med(c["arms"], "enum", "s"),
-                "sig_f5_over_f4_w": q["q1_sig_f5_over_f4_muladds"]["ratio"]["median"],
-                "log2_f4_over_f6_w": q["q2_log2_f4_over_f6_muladds"]["log2_ratio"]["median"],
-                "f4_over_rho": q["q3_s_over_rho_negation"]["f4"]["s_ratio"]["median"],
-                "enum_over_rho": q["q3_s_over_rho_negation"]["enum"]["s_ratio"]["median"],
-            })
-    prime_diagnostic = {
-        "source": SOURCES["pkm_tower_prime"],
-        "class": "accounting; stage diagnostic with tower F_p multiply-adds unpriced (S is a lower bound)",
-        "rows": prime_rows,
-        "online_speedup": None,
-        "fully_priced_cold_speedup": None,
-    }
-    rootf = load(SOURCES["pkm_rootfind_prime"])
-    if rootf["schema"] != "pkm-rootfind-analysis/v1":
-        raise SystemExit("review the root-finder analysis before updating the leaderboard")
-    rootf_rows = []
-    for key in ("P5", "P6", "P7", "P8"):
-        for c in rootf["sessions"][key]["cells"]:
-            q1 = c["questions"]["q1_s_root_over_groebner"]["rootfind-subtract/f4"]
-            q2 = c["questions"]["q2_fp_multiplications_root_over_groebner"]["rootfind-subtract/f4"]
-            rootf_rows.append({
-                "bits": c["bits"],
-                "curve": names(c["slug"])["slug"],
-                "s_ratio": q1["s_ratio"]["median"],
-                "fp_multiplication_ratio": q2["fp_multiplication_ratio"]["median"],
-                "wall_ratio": q2["relations_wall_ratio"]["median"],
-                "band_verdict": q1["band_verdict"],
-                "crossover_weight": q1["derived_crossover_weight_gae"]["median"],
-            })
-    rootf_diagnostic = {
-        "source": SOURCES["pkm_rootfind_prime"],
-        "class": "accounting; rootfind-subtract against tower F4 on one Kummer base, §5a band unresolved",
-        "rows": rootf_rows,
-    }
     rank_columns = load(SOURCES["n37_rank_columns"])
     if (rank_columns["status"] != "independently_replayed_l0_bounded_diagnostic"
             or rank_columns["selection"]["decision"] != "COUNTED_ENGINEERING_LEAD"
@@ -1992,8 +1945,6 @@ def build(allow_unvalidated: bool = False) -> dict:
         "f6_small_cold_diagnostic": small_cold_diagnostic,
         "f6_ecbench_ladder_diagnostic": ladder_diagnostic,
         "f4_f5_f6_cross_family_diagnostic": cross_diagnostic,
-        "pkm_tower_prime_diagnostic": prime_diagnostic,
-        "pkm_rootfind_prime_diagnostic": rootf_diagnostic,
         "latest_frontier_audit": frontier_audit,
         "n83_tier1_cold_holdout": {
             "source": SOURCES["n83_tier1_cold_holdout"],
@@ -2666,32 +2617,6 @@ def markdown(doc: dict) -> str:
                  f"{f3(z['rho_negation_s'])} | {f3(z['rho_strong_s'])} | {f3(z['inherited_s'])} | "
                  f"{f3(z['f6_s'])} | {f3(z['f5_over_f4_w'])} | {f3(z['matrix_f4_over_inherited_w'])} | "
                  f"{f3(z['log2_inherited_over_f6_w'])} |")
-    L.append("")
-    y = doc["pkm_tower_prime_diagnostic"]
-    L += ["## Tower F4, signature F5 and an F6 analogue on prime curves, outside tables A–C", "",
-          "The `pkm-tower` oracle (S₃ on a PKM Kummer tower, a splitting tree decided by "
-          "tower F4 or signature F5, small nodes closed geometrically by F6, `enum` with no "
-          "algebra) on four prime-order curves, beside same-target rho-negation. Tower-arm "
-          "`S` is a lower bound (F_p multiply-adds unpriced). "
-          f"Read the [analysis](../../{y['source']}).", "",
-          "| bits | curve | r | rho-negation S | F4 S | enum S | W sig-F5/F4 | log2(W F4/W F6) | F4 S/rho | enum S/rho |",
-          "|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|"]
-    for z in y["rows"]:
-        L.append(f"| {z['bits']} | `{z['curve']}` | {int(z['r'])} | {f3(z['rho_negation_s'])} | "
-                 f"{f3(z['f4_s'])} | {f3(z['enum_s'])} | {f3(z['sig_f5_over_f4_w'])} | "
-                 f"{z['log2_f4_over_f6_w']:.5f} | {f3(z['f4_over_rho'])} | {f3(z['enum_over_rho'])} |")
-    L.append("")
-    y = doc["pkm_rootfind_prime_diagnostic"]
-    L += ["## Root finders against tower F4 on prime curves, outside tables A–C", "",
-          "`rootfind-subtract` (m = 2) against tower F4 on the PKM Kummer base and the same targets. "
-          "Ratios are root finder / F4; F_p multiplications include F4's multiply-adds. "
-          "The AGENTS.md §5a band leaves the order unresolved; the break-even weight is derived. "
-          f"Read the [analysis](../../{y['source']}).", "",
-          "| bits | curve | S ratio | F_p mult. ratio | wall ratio | §5a | break-even (GAE/op) |",
-          "|--:|:--|--:|--:|--:|:--|--:|"]
-    for z in y["rows"]:
-        L.append(f"| {z['bits']} | `{z['curve']}` | {z['s_ratio']:.3f} | {z['fp_multiplication_ratio']:.2e} | "
-                 f"{z['wall_ratio']:.2e} | {z['band_verdict']} | {z['crossover_weight']:.2e} |")
     L.append("")
     v = doc["n41_n53_counted_diagnostic"]
 
@@ -3596,33 +3521,6 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{z["base_points"]}</td><td>{h3(z["rho_negation_s"])}</td><td>{h3(z["rho_strong_s"])}</td>'
                  f'<td>{h3(z["inherited_s"])}</td><td>{h3(z["f6_s"])}</td><td>{h3(z["f5_over_f4_w"])}</td>'
                  f'<td>{h3(z["matrix_f4_over_inherited_w"])}</td><td>{h3(z["log2_inherited_over_f6_w"])}</td></tr>')
-    P.append('</tbody></table></section>')
-    y = doc["pkm_tower_prime_diagnostic"]
-    P.append(f'<section class="card" id="bounded-pkm-tower-prime"><h2>Tower F4, signature F5 and an F6 analogue on prime curves, outside the priced tables</h2>'
-             '<p>The <code>pkm-tower</code> oracle (S₃ on a PKM Kummer tower, a splitting tree decided by tower F4 '
-             'or signature F5, small nodes closed geometrically by F6, <code>enum</code> with no algebra) on four '
-             'prime-order curves, beside same-target rho-negation. Tower-arm S is a lower bound (F_p multiply-adds unpriced). '
-             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(y["source"])}">Analysis</a>.</p>')
-    P.append('<table><thead><tr><th>Bits</th><th>Curve</th><th>r</th><th>Rho-negation S</th><th>F4 S</th><th>enum S</th>'
-             '<th>W sig-F5/F4</th><th>log₂(W F4/W F6)</th><th>F4 S/rho</th><th>enum S/rho</th></tr></thead><tbody>')
-    for z in y["rows"]:
-        P.append(f'<tr><td>{z["bits"]}</td><td><code>{esc(z["curve"])}</code></td><td>{int(z["r"])}</td>'
-                 f'<td>{h3(z["rho_negation_s"])}</td><td>{h3(z["f4_s"])}</td><td>{h3(z["enum_s"])}</td>'
-                 f'<td>{h3(z["sig_f5_over_f4_w"])}</td><td>{z["log2_f4_over_f6_w"]:.5f}</td>'
-                 f'<td>{h3(z["f4_over_rho"])}</td><td>{h3(z["enum_over_rho"])}</td></tr>')
-    P.append('</tbody></table></section>')
-    y = doc["pkm_rootfind_prime_diagnostic"]
-    P.append(f'<section class="card" id="bounded-pkm-rootfind-prime"><h2>Root finders against tower F4 on prime curves, outside the priced tables</h2>'
-             '<p><code>rootfind-subtract</code> (m = 2) against tower F4 on the PKM Kummer base and the same targets. '
-             'Ratios are root finder / F4; F<sub>p</sub> multiplications include F4\'s multiply-adds. The AGENTS.md §5a band '
-             'leaves the order unresolved; the break-even weight is derived. '
-             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(y["source"])}">Analysis</a>.</p>')
-    P.append('<table><thead><tr><th>Bits</th><th>Curve</th><th>S ratio</th><th>F<sub>p</sub> mult. ratio</th>'
-             '<th>Wall ratio</th><th>§5a</th><th>Break-even (GAE/op)</th></tr></thead><tbody>')
-    for z in y["rows"]:
-        P.append(f'<tr><td>{z["bits"]}</td><td><code>{esc(z["curve"])}</code></td><td>{z["s_ratio"]:.3f}</td>'
-                 f'<td>{z["fp_multiplication_ratio"]:.2e}</td><td>{z["wall_ratio"]:.2e}</td>'
-                 f'<td>{esc(z["band_verdict"])}</td><td>{z["crossover_weight"]:.2e}</td></tr>')
     P.append('</tbody></table></section>')
     v = doc["n41_n53_counted_diagnostic"]
 
