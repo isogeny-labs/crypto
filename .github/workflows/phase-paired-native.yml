@@ -81,6 +81,7 @@ jobs:
         run: |
           cd research/phase_paired_native_20261026
           sha256sum --check SHA256SUMS
+          sha256sum --check SHA256SUMS_CMS
           cd -
           rustfmt --edition 2021 --check examples/phase_paired_fixed_budget.rs examples/phase_paired_replay.rs
       - name: Build producer and replay (locked)
@@ -96,6 +97,11 @@ jobs:
           d=research/phase_paired_native_20261026
           target/release/examples/phase_paired_replay "$d/results/receipts_n13.jsonl" "$RUNNER_TEMP/replay.json" --sealed "$d/fixtures/witness_sealed.json"
           cmp "$RUNNER_TEMP/replay.json" "$d/results/replay_n13.json"
+      - name: Independent replay of the committed CryptoMiniSat receipts (no solver needed), compared with the committed output
+        run: |
+          d=research/phase_paired_native_20261026
+          target/release/examples/phase_paired_replay "$d/results/receipts_cms_n13.jsonl" "$RUNNER_TEMP/replay_cms.json" --sealed "$d/fixtures/witness_sealed.json" --controls "$d/results/controls_cms.jsonl" --native "$d/results/receipts_n13.jsonl"
+          cmp "$RUNNER_TEMP/replay_cms.json" "$d/results/replay_cms_n13.json"
       - name: Re-run one cheap attempt and compare its deterministic counters (informational)
         continue-on-error: true
         run: |
