@@ -22,7 +22,7 @@ for p in sorted((h/'runs').iterdir()):
         row.update(kind='Rust' if p.name.startswith('fiber') else 'Singular',native_exit=int((p/'exit.txt').read_text()),required_marker=marker,error_lines=errors)
         row['status']='accepted' if row['native_exit']==0 and not errors and marker in log.splitlines() else 'rejected'
     rows.append(row)
-result={'scope':'R51 actual chart maps and larger marked23 QR construction','status_counts':dict(Counter(r['status'] for r in rows)),'runs':rows,'retained_source_field_degree':32,'normalization_generators_per_direction':32,'directional_regularity_certificates':64,'clearing_power':62,'lean_theorems':sum(x.get('audited_theorems',0) for x in rows if x['status']=='accepted' and x.get('kind')=='Lean'),'scope_limits':['native arrays and RR/open-cover premises are not encoded in Lean','marked23 quotient dimension is not primality','selected modular-factor action and polarized embedding remain separate']}
+result={'scope':'R51 actual chart maps and larger marked23 QR construction','status_counts':dict(Counter(r['status'] for r in rows)),'runs':rows,'retained_source_field_degree':32,'normalization_generators_per_direction':32,'directional_regularity_certificates':64,'clearing_power':62,'lean_theorems':sum({x['root']:x['audited_theorems'] for x in rows if x['status']=='accepted' and x.get('kind')=='Lean'}.values()),'scope_limits':['native arrays and RR/open-cover premises are not encoded in Lean','marked23 quotient dimension is not primality','selected modular-factor action and polarized embedding remain separate']}
 (h/'results.json').write_text(json.dumps(result,indent=2)+'\n')
 state={k:next((r['status'] for r in reversed(rows) if r['attempt'].startswith(k+'51-') or (k=='base23' and r['attempt'].startswith('base23-51-'))),'prepared') for k in markers}
 if any(x['attempt'].startswith('base23-struct51-') and x['status']=='accepted' for x in rows): state['base23']='accepted'
@@ -32,7 +32,7 @@ for i,(key,label) in enumerate(nodes):
     col=i//4; y=65+(i%4)*78; x=24+col*475; status=state[key]
     color={'accepted':'#d4eddf','rejected':'#f6d8d6','running':'#fff0c2','prepared':'#edf0f3'}[status]
     svg += [f'<rect x="{x}" y="{y}" width="448" height="64" rx="7" fill="{color}"/>',f'<text x="{x+12}" y="{y+25}" font-size="16">{html.escape(label)}</text>',f'<text x="{x+12}" y="{y+49}" font-size="14">{status}; source: results.json / native receipts</text>']
-svg += ['<text x="24" y="407" font-size="15">Five overlap lemmas: compile 0, audit 0; zero failing or trusted declarations.</text>','<text x="24" y="434" font-size="14">Rank112 is an algebra acceptance target; primality and selected-factor action need separate evidence.</text>','<text x="24" y="458" font-size="13">Deterministic certificates; no timing comparison or statistical uncertainty.</text>','</g></svg>']
+svg += [f'<text x="24" y="407" font-size="15">{result["lean_theorems"]} unique accepted Lean lemmas; zero failing or trusted declarations.</text>','<text x="24" y="434" font-size="14">Rank112 is an algebra acceptance target; primality and selected-factor action need separate evidence.</text>','<text x="24" y="458" font-size="13">Deterministic certificates; no timing comparison or statistical uncertainty.</text>','</g></svg>']
 (h/'round51.svg').write_text('\n'.join(svg)+'\n')
 def text(s): return 'text('+json.dumps(s)+')'
 tr=[]
