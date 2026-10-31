@@ -5,6 +5,7 @@ execute(read("../../source-data/relative-infinity50.sing"));
 execute(read("../closure52-02/closure-certificate52.sing"));
 int savedExtensions52=extensions52;intvec savedLengths52=lengths52;
 setring compactPid51;short=0;option(redSB);
+matrix donorH52=matrix(basis51);
 map saved52=closureCertificate52,u;matrix T52=saved52(T52);matrix initial52=saved52(initial52);
 map nu52=nuPidCertificate51,u;matrix nc52=nu52(lift51);map table52=tablePidCertificate50,u;matrix coefficients52=table52(table50);
 if(initial52!=sourceLift51){ERROR("RELOAD52_INITIAL_BINDING");quit;}
@@ -40,8 +41,8 @@ execute(read("../closure52-02/action-field-certificate52.sing"));
 setring actionFieldCertificate52;
 if(matrix(source52)*actionLifts52!=matrix(actionResiduals52)){ERROR("RELOAD52_FULL_SERIALIZED_SOURCE_PRODUCTS");quit;}
 map boundSource52=relativeInfinity50,l,v,u;
-if(boundSource52(relativeInfinityIdeal50)!=source52){ERROR("RELOAD52_ACTUAL_SOURCE_BINDING");quit;}
-map fromPid52=compactPid51,u;matrix H52=fromPid52(matrix(basis51));matrix fieldT52=fromPid52(T52);poly D52=fromPid52(commonDenominator51);
+if(matrix(boundSource52(relativeInfinityIdeal50))!=matrix(source52)){ERROR("RELOAD52_ACTUAL_SOURCE_BINDING");quit;}
+map fromPid52=compactPid51,u;matrix H52=fromPid52(donorH52);matrix fieldT52=fromPid52(T52);poly D52=fromPid52(commonDenominator51);
 map fromNu52=nuPidCertificate51,u;vector nuVector52=fromNu52(target51);poly numerator52=0;poly input52;poly output52;matrix outputs52=H52*fieldT52;
 for(i52=1;i52<=32;i52++){numerator52=numerator52+nuVector52[i52]*l^((i52-1)%16)*v^((i52-1) div 16);}
 for(j52=1;j52<=32;j52++){
