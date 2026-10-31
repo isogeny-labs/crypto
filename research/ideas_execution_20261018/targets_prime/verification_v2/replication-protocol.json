@@ -1,0 +1,16 @@
+{
+  "schema":"targets-prime-packed-subfield-replication/v2",
+  "frozen_before_replication":true,
+  "classification":"Review-driven replication authored after internal cross-track review; not independent external review",
+  "parent_protocol":"../protocol.json item_1",
+  "original_source":"../diagnostic.cpp, SHA256 4553b72e9652327f0b8823e4267f01c59ea735166b99fe76ebf79a045010ae83",
+  "repair":"Embed discriminant constants into the prime subfield: f.mul(27%f.p,b^2), with 4%f.p for consistency. In packed F17², integer27 otherwise denotes10+u.",
+  "regression":"A=14,B=2 over F17² has true discriminant0; the original gate accepts it, the corrected driver must reject it",
+  "unchanged_fixture_grid":{"primes":[17,29,43,61],"seeds":[1,2,3,4,5,6],"registered_arms":"specified rational2-torsion; same seeded sampler/predicate r>=p and even cofactor; cofactor projected x-in-Fp base; generic two-sum table; same known-answer target and r-adding rho"},
+  "execution":"Run the original native unit controls plus the singular regression. Execute exactly the Fp2 panel of24 fixtures in a fresh directory; original prime m4 arms are not rerun or replaced.",
+  "cohort_check":"Compare p,seed,a,b,nonresidue,order,r,cofactor,generator,target,torsion,curve_draws against the original24 records. Preserve and report every identity change/rejection; never substitute the corrected cohort into original denominators.",
+  "candidate_trace":"Record every new sampler draw's field/seed/curve identity, acceptance and rejection reason. Logging adds no field/group operations.",
+  "verification":"Use verify_v2 with pinned new result SHA256, exact target/hit coverage, Jacobian replay, corrected discriminants, point counts and projected-base membership",
+  "budgets":{"address_space_mib":512,"cpu_seconds":300,"single_process":true},
+  "claim_limits":"Same generic table diagnostic as original; no Gaudry oracle, Qcurve/GLS,2LP, full IC extraction, timing speedup or FourQ extrapolation"
+}
