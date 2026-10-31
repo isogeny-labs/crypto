@@ -4023,3 +4023,306 @@ mod signed_capture_match_tests {
         }
     }
 }
+
+/// Frozen group-replay artifact envelope. Counts are producer reports whose
+/// consistency is checked here; they are not certified execution measurements.
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SavedGroupReplay {
+    schema: String,
+    signed: SavedSignedReplay,
+    reported_witness_check_additions: u8,
+    reported_total_additions: u64,
+}
+pub(super) struct VerifiedGroupReplay {
+    math: VerifiedSignedMath,
+    reported_witness_check_additions: u8,
+    reported_total_additions: u64,
+}
+pub(super) fn verify_group_replay(
+    bytes: &[u8],
+    witness_bytes: Option<&[u8]>,
+    original: &MathInput,
+    binding: &crate::ml_dataset::capture::AttemptBinding,
+    public_sha256: &str,
+    factor_base_sha256: &str,
+    input_sha256: &str,
+    addition_limit: u64,
+) -> Result<VerifiedGroupReplay, String> {
+    if bytes.len() > SIGNED_REPLAY_BYTE_CAP {
+        return Err("group replay exceeds byte cap".into());
+    }
+    let saved: SavedGroupReplay =
+        serde_json::from_slice(bytes).map_err(|e| format!("strict group replay: {e}"))?;
+    if saved.schema != "crypto.ml-dataset.koblitz-m3-group-replay/v1"
+        || saved.reported_witness_check_additions > 3
+    {
+        return Err("group replay schema or witness-check count mismatch".into());
+    }
+    let signed_bytes =
+        serde_json::to_vec(&saved.signed).map_err(|e| format!("bounded signed replay: {e}"))?;
+    let math = verify_signed_math(
+        &signed_bytes,
+        witness_bytes,
+        original,
+        binding,
+        public_sha256,
+        factor_base_sha256,
+        input_sha256,
+        addition_limit,
+    )?;
+    let checks = saved.reported_witness_check_additions;
+    let total = (math.prefix.performed_additions as u64)
+        .checked_add(u64::from(checks))
+        .ok_or("group replay counter overflow")?;
+    if total != saved.reported_total_additions || total > addition_limit {
+        return Err("group replay combined addition allowance mismatch".into());
+    }
+    let first = math.prefix.candidate_tuples.first();
+    if let Some(witness) = &math.witness {
+        if first != Some(&witness.tuple) {
+            return Err("group replay witness is not the first matching tuple".into());
+        }
+    }
+    if (first.is_none() && checks != 0) || (math.witness.is_some() && checks != 3) {
+        return Err("group replay checks lack candidate or witness prerequisites".into());
+    }
+    // Before three reference calls finish, the first candidate cannot have
+    // been acknowledged, and enumeration cannot have advanced beyond it.
+    if let Some(first) = first {
+        if checks < 3
+            && !saved.signed.unacknowledged.as_ref().is_some_and(|e| {
+                e.matches_target && e.tuple == *first && math.prefix.candidate_tuples.len() == 1
+            })
+        {
+            return Err("group replay advances past an unfinished first witness check".into());
+        }
+    }
+    Ok(VerifiedGroupReplay {
+        math,
+        reported_witness_check_additions: checks,
+        reported_total_additions: total,
+    })
+}
+
+#[cfg(test)]
+mod group_replay_envelope_tests {
+    use super::*;
+    fn run(limit: u64) -> (MathInput, SavedGroupReplay, Option<Vec<u8>>) {
+        let mut original = construction_tests::fixture();
+        original.target = original.signed[0];
+        let mut b = construction_tests::budget();
+        b.addition_limit = limit;
+        b.begin_native(false, Instant::now()).unwrap();
+        b.finish_native(Instant::now()).unwrap();
+        let prepared = prepare_signed(&original, &mut b, false).unwrap();
+        let mut witness = None;
+        let result = enumerate_prepared_signed(prepared, &mut |_, _| Ok(()), &mut |w, b| {
+            let encoded = encode_signed_witness(w, b);
+            assert!(encoded.complete && encoded.stop.is_none());
+            witness = Some(encoded.bytes);
+            Err(Stop::Observer)
+        });
+        let saved = SavedGroupReplay {
+            schema: "crypto.ml-dataset.koblitz-m3-group-replay/v1".into(),
+            signed: SavedSignedReplay {
+                schema: "crypto.ml-dataset.koblitz-m3-signed-prefix/v1".into(),
+                binding: matrix_tests::binding(),
+                public_sha256: "8".repeat(64),
+                factor_base_sha256: "9".repeat(64),
+                input_sha256: "a".repeat(64),
+                addition_limit: limit,
+                performed_additions: result.enumeration_additions as usize,
+                acknowledged_additions: result.acknowledged.len(),
+                acknowledged: result.acknowledged,
+                unacknowledged: result.unacknowledged,
+            },
+            reported_witness_check_additions: result.witness_check_additions as u8,
+            reported_total_additions: result.enumeration_additions + result.witness_check_additions,
+        };
+        (original, saved, witness)
+    }
+    fn check(
+        bytes: &[u8],
+        witness: Option<&[u8]>,
+        original: &MathInput,
+        limit: u64,
+    ) -> Result<VerifiedGroupReplay, String> {
+        verify_group_replay(
+            bytes,
+            witness,
+            original,
+            &matrix_tests::binding(),
+            &"8".repeat(64),
+            &"9".repeat(64),
+            &"a".repeat(64),
+            limit,
+        )
+    }
+    #[test]
+    fn group_replay_preserves_actual_partial_witness_checks_under_shared_allowance() {
+        let (_, complete, _) = run(16384);
+        let enumeration = complete.signed.performed_additions as u64;
+        for checks in 0..=3 {
+            let limit = enumeration + checks;
+            let (original, saved, witness) = run(limit);
+            assert_eq!(
+                saved.reported_witness_check_additions,
+                u8::try_from(checks).unwrap()
+            );
+            assert_eq!(saved.reported_total_additions, limit);
+            let verified = check(
+                &serde_json::to_vec(&saved).unwrap(),
+                witness.as_deref(),
+                &original,
+                limit,
+            )
+            .unwrap();
+            assert_eq!(verified.reported_witness_check_additions, checks as u8);
+            assert_eq!(verified.reported_total_additions, limit);
+            assert!(!verified.math.negative_domain_verified());
+        }
+    }
+    #[test]
+    fn group_replay_rejects_rehashed_counter_limit_and_schema_mutations() {
+        let (original, saved, witness) = run(16384);
+        let base = serde_json::to_value(saved).unwrap();
+        for mutation in 0..7 {
+            let mut v = base.clone();
+            match mutation {
+                0 => v["reported_total_additions"] = 0.into(),
+                1 => v["reported_witness_check_additions"] = 4.into(),
+                2 => v["reported_witness_check_additions"] = 2.into(),
+                3 => v["extra"] = true.into(),
+                4 => v["signed"]["extra"] = true.into(),
+                5 => v["schema"] = "wrong".into(),
+                _ => v["signed"]["addition_limit"] = 16385.into(),
+            }
+            assert!(check(
+                &serde_json::to_vec(&v).unwrap(),
+                witness.as_deref(),
+                &original,
+                16384
+            )
+            .is_err());
+        }
+    }
+}
+
+const KOBLITZ_SLOTS: [(&str, &str, &str); 4] = [
+    (
+        "koblitz-m3-input.json",
+        "restricted-koblitz-m3-original-equations/v1",
+        "json",
+    ),
+    (
+        "koblitz-m3-events.jsonl",
+        "restricted-koblitz-m3-boundary-events/v1",
+        "jsonl",
+    ),
+    (
+        "koblitz-m3-result.json",
+        "restricted-koblitz-m3-result/v1",
+        "json",
+    ),
+    (
+        "koblitz-m3-group-replay.json",
+        "restricted-koblitz-m3-group-replay/v1",
+        "json",
+    ),
+];
+/// Validate reserved identities even on a raw-prefix path. Files and capture
+/// chain authentication remain mandatory at the outer custody boundary.
+fn verify_slot_identities(artifacts: &[crate::ml_dataset::types::Artifact]) -> Result<(), String> {
+    for a in artifacts {
+        let live = a.path.strip_prefix("live/payloads/");
+        let path = live.unwrap_or(&a.path);
+        if !path.starts_with("koblitz-m3-") && !a.role.starts_with("restricted-koblitz-m3-") {
+            continue;
+        }
+        if artifacts
+            .iter()
+            .filter(|other| other.path == a.path)
+            .count()
+            != 1
+        {
+            return Err("duplicate Koblitz artifact path".into());
+        }
+        let (_, role, encoding) = KOBLITZ_SLOTS
+            .iter()
+            .find(|slot| slot.0 == path)
+            .ok_or("unknown or displaced reserved Koblitz artifact")?;
+        let raw = a.role == "unregistered-partial-artifact" && a.encoding == "native";
+        if live.is_some() {
+            if !raw {
+                return Err("Koblitz live copy has canonical manifest identity".into());
+            }
+        } else if !raw && (a.role != *role || a.encoding != *encoding) {
+            return Err("Koblitz canonical artifact identity mismatch".into());
+        }
+    }
+    Ok(())
+}
+/// All four canonical identities are required by this path regardless of
+/// producer completion flags. Censored incomplete prefixes use separate admission.
+fn require_canonical_slots(artifacts: &[crate::ml_dataset::types::Artifact]) -> Result<(), String> {
+    verify_slot_identities(artifacts)?;
+    for (path, role, encoding) in KOBLITZ_SLOTS {
+        super::prime_f4_wide::artifact(artifacts, path, role, encoding, true)?;
+    }
+    Ok(())
+}
+#[cfg(test)]
+mod koblitz_slot_tests {
+    use super::*;
+    use crate::ml_dataset::types::Artifact;
+    fn canonical() -> Vec<Artifact> {
+        KOBLITZ_SLOTS
+            .iter()
+            .map(|(path, role, encoding)| Artifact {
+                path: (*path).into(),
+                role: (*role).into(),
+                encoding: (*encoding).into(),
+                sha256: "8".repeat(64),
+                bytes: 1,
+            })
+            .collect()
+    }
+    #[test]
+    fn canonical_registry_rejects_missing_duplicate_alias_and_role_mutations() {
+        require_canonical_slots(&canonical()).unwrap();
+        for mutation in 0..7 {
+            let mut a = canonical();
+            match mutation {
+                0 => {
+                    a.pop();
+                }
+                1 => a.push(a[0].clone()),
+                2 => a[0].path = "alias.json".into(),
+                3 => a[0].role = a[1].role.clone(),
+                4 => a[0].encoding = "jsonl".into(),
+                5 => {
+                    a[0].role = "unregistered-partial-artifact".into();
+                    a[0].encoding = "native".into();
+                }
+                _ => a[0].path = "live/payloads/koblitz-m3-input.json".into(),
+            }
+            assert!(require_canonical_slots(&a).is_err());
+        }
+    }
+    #[test]
+    fn raw_live_custody_is_distinct_from_complete_canonical_evidence() {
+        let mut a = canonical();
+        for item in &mut a {
+            item.path = format!("live/payloads/{}", item.path);
+            item.role = "unregistered-partial-artifact".into();
+            item.encoding = "native".into();
+        }
+        verify_slot_identities(&a).unwrap();
+        assert!(require_canonical_slots(&a).is_err());
+        a.extend(canonical());
+        require_canonical_slots(&a).unwrap();
+        a[0].role = "restricted-koblitz-m3-original-equations/v1".into();
+        assert!(verify_slot_identities(&a).is_err());
+    }
+}
