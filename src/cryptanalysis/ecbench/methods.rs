@@ -22,7 +22,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
 use crate::binary_ecc::{
-    hcdlp_bsgs_counted, hcdlp_pollard_rho_counted, F2mElement, HcdlpGroupOps, OrdinaryBinaryCover,
+    hcdlp_bsgs_counted, hcdlp_pollard_rho_counted, operation_tally::OperationTally, F2mElement,
+    HcdlpGroupOps, OrdinaryBinaryCover,
 };
 use crate::cryptanalysis::ecbench::canonical::{derive_u64, sha256_hex, short_id};
 use crate::cryptanalysis::ecbench::claw::{
@@ -694,6 +695,33 @@ pub fn registry() -> &'static [MethodDecl] {
             family: "bsgs",
             summary: "textbook BSGS after the certified degree-three pullback into the same-field genus-three Jacobian image; native Jacobian operations are counted but remain unpriced in source-curve GAE",
             entry: "binary_ecc::hcdlp_bsgs_counted",
+            applies: Applies::BinaryOnly,
+            params: &[],
+        },
+        MethodDecl {
+            id: "jacobian_image.rho3_field_tally",
+            family: "rho",
+            summary: "accounting-only form of jacobian_image.rho3: the complete instrumented F2mElement route is tallied, so its wall/instruction timing includes ledger overhead and must not be compared with untallied source timing",
+            entry: "binary_ecc::hcdlp_pollard_rho_counted + operation_tally",
+            applies: Applies::BinaryOnly,
+            params: &[
+                ParamDecl {
+                    name: "cap_multiple",
+                    default: Some("64"),
+                    help: "walk-step budget per restart as a multiple of sqrt(r)",
+                },
+                ParamDecl {
+                    name: "max_restarts",
+                    default: Some("64"),
+                    help: "deterministic restart cap for degenerate rho collisions",
+                },
+            ],
+        },
+        MethodDecl {
+            id: "jacobian_image.bsgs_field_tally",
+            family: "bsgs",
+            summary: "accounting-only form of jacobian_image.bsgs: the complete instrumented F2mElement route is tallied, so its wall/instruction timing includes ledger overhead and must not be compared with untallied source timing",
+            entry: "binary_ecc::hcdlp_bsgs_counted + operation_tally",
             applies: Applies::BinaryOnly,
             params: &[],
         },
@@ -1715,10 +1743,13 @@ pub struct SolveReport {
     pub solver: Option<SolverStats>,
     /// The field operations behind the group operations — modular
     /// multiplications, squarings and inversions — summed over every
-    /// phase of the solve, when the group counted them
+    /// phase of the solve, when the group or an explicit complete-route
+    /// adapter counted them
     /// ([`CountedGroup::counts_field_ops`]: the prime-field curve
     /// arithmetic the generic walks and tables run on).  `None` is
-    /// unknown, never zero: binary and Koblitz curves do not count, and
+    /// unknown, never zero: generic binary and Koblitz groups do not count,
+    /// while the named Jacobian-image adapters count the instrumented
+    /// `F2mElement` route (cover, pullbacks, solve, and internal replay); and
     /// the index-calculus pipeline does field arithmetic outside the
     /// group law (square roots, Legendre symbols, the oracles, the
     /// elimination) that this tally would not see, so it reports none.
@@ -3064,6 +3095,8 @@ fn solve_jacobian_image(
         return Err("jacobian-image adapter requires an affine target".into());
     }
     let started = Instant::now();
+    let field_tally_enabled = method.id.ends_with("_field_tally");
+    let field_tally = field_tally_enabled.then(OperationTally::begin);
     let cover = OrdinaryBinaryCover::new(
         inst.n,
         inst.irreducible.clone(),
@@ -3089,13 +3122,13 @@ fn solve_jacobian_image(
         .map_err(|e| format!("pulling the target into the Jacobian: {e}"))?;
     let order = BigUint::from(inst.r);
     let outcome = match method.id.as_str() {
-        "jacobian_image.bsgs" => hcdlp_bsgs_counted(
+        "jacobian_image.bsgs" | "jacobian_image.bsgs_field_tally" => hcdlp_bsgs_counted(
             &image_generator,
             &image_target,
             &order,
             cover.source_curve(),
         ),
-        "jacobian_image.rho3" => hcdlp_pollard_rho_counted(
+        "jacobian_image.rho3" | "jacobian_image.rho3_field_tally" => hcdlp_pollard_rho_counted(
             &image_generator,
             &image_target,
             &order,
@@ -3108,6 +3141,17 @@ fn solve_jacobian_image(
     }
     .map_err(|e| format!("destination Jacobian solver failed: {e}"))?;
     measurement::end_online();
+
+    let field_counts = field_tally.map(OperationTally::finish).unwrap_or_default();
+    let field_key = |operation: &str| format!("f2m{}_{}", inst.n, operation);
+    let field_ops = field_tally_enabled.then(|| FieldOps {
+        muls: field_counts.get(&field_key("mul")).copied().unwrap_or(0),
+        sqrs: field_counts.get(&field_key("square")).copied().unwrap_or(0),
+        invs: field_counts
+            .get(&field_key("inverse_informational"))
+            .copied()
+            .unwrap_or(0),
+    });
 
     let recovered = outcome
         .recovered
@@ -3142,6 +3186,9 @@ fn solve_jacobian_image(
         ("rho_restarts".into(), outcome.restarts),
         ("rho_collisions".into(), outcome.collisions),
     ]);
+    for (name, count) in field_counts {
+        counters.insert(format!("complete_route_{name}_uncharged"), count);
+    }
     counters.retain(|_, value| *value > 0);
     let phases = vec![
         jacobian_phase("setup", outcome.setup),
@@ -3169,6 +3216,14 @@ fn solve_jacobian_image(
             "destination_solver": method.id,
             "map_degree": 3,
             "native_operation_unit": "Cantor additions/doublings in Jac(H)(F_2^m)",
+            "field_tally_enabled": field_tally_enabled,
+            "field_operation_scope": if field_tally_enabled {
+                "cover construction, both pullbacks, destination solve, and internal destination replay through instrumented F2mElement APIs"
+            } else {
+                "disabled: use the separately named accounting-only field-tally adapter"
+            },
+            "inversion_count_includes_its_mul_and_square_cost": true,
+            "complete_machine_instruction_count": false,
             "source_gae_conversion": "unavailable",
             "destination_candidate_verified": recovered.is_some(),
             "source_reverification": "performed independently by the ecbench runner"
@@ -3176,7 +3231,7 @@ fn solve_jacobian_image(
         online: None,
         online_error: None,
         solver: None,
-        field_ops: None,
+        field_ops,
     })
 }
 
@@ -6871,7 +6926,12 @@ mod tests {
         let scalar = 13u64;
         let target = binary.fast.mul_u64(binary.generator, scalar);
         let coordinates = [format!("0x{:x}", target.x), format!("0x{:x}", target.y)];
-        for id in ["jacobian_image.bsgs", "jacobian_image.rho3"] {
+        for (id, tallied) in [
+            ("jacobian_image.bsgs", false),
+            ("jacobian_image.rho3", false),
+            ("jacobian_image.bsgs_field_tally", true),
+            ("jacobian_image.rho3_field_tally", true),
+        ] {
             let method = resolve(&MethodSpec {
                 id: id.into(),
                 params: BTreeMap::new(),
@@ -6886,6 +6946,23 @@ mod tests {
                 .contains(&"jacobian_group_operations_uncharged".into()));
             assert_eq!(report.detail["destination"], "genus_3_jacobian_image");
             assert_eq!(report.detail["source_gae_conversion"], "unavailable");
+            assert_eq!(report.detail["field_tally_enabled"], tallied);
+            if tallied {
+                let field_ops = report.field_ops.expect("complete-route field tally");
+                assert!(field_ops.muls > 0);
+                assert!(field_ops.sqrs > 0);
+                assert!(field_ops.invs > 0);
+                assert!(report
+                    .counters
+                    .keys()
+                    .any(|name| name == "complete_route_f2m7_mul_uncharged"));
+            } else {
+                assert!(report.field_ops.is_none());
+                assert!(!report
+                    .counters
+                    .keys()
+                    .any(|name| name.starts_with("complete_route_f2m")));
+            }
             assert!(report
                 .online
                 .as_ref()

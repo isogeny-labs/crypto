@@ -1,6 +1,6 @@
 # Genus-3 image destination calculus and common-cost calibration are missing
 
-Status: open
+Status: open; standard full-Jacobian calculus rejected, common-cost L2 pending
 
 ## Blocked claim
 
@@ -13,9 +13,13 @@ Two linked obligations block that promotion:
 
 1. no complete, named non-generic destination calculus has been implemented
    on the transported image subgroup; and
-2. native Cantor additions, polynomial arithmetic, table work, pullbacks, and
-   source GAE do not have a certified common cost unit. The measured wall
-   samples earned only L0 isolation.
+2. source and destination do not yet share a certified arithmetic conversion.
+   Separately named accounting-only destination adapters now tally
+   instrumented `F2mElement` multiplications, squarings, and inversions over
+   the complete route, but the optimized source solver uses a different
+   kernel. The untallied timing adapters stay free of ledger overhead. The
+   earlier wall samples earned only L0 isolation, and the paired-host L2 panel
+   remains unexecuted.
 
 The exact object is the order-
 `2417851639230796216685689` image in the Jacobian of
@@ -36,6 +40,14 @@ The exact object is the order-
   from about 1.2 at `n=9` to about 13.6 at `n=23`. This is evidence against a
   practical win for this implementation on this host, not a lower bound or an
   impossibility theorem for another destination calculus.
+- [`DESTINATION_CALCULUS_SCREEN.md`](../research/n83_genus3_image_solver_20261031/DESTINATION_CALCULUS_SCREEN.md)
+  rejects the off-the-shelf full-Jacobian genus-three calculus for this
+  order-`r ~= q` image: its `q^(4/3)` ledger is about 70.17 exponent bits
+  above source rho here, and the current API cannot project arbitrary
+  factor-base classes into the image.
+- [`n83-genus3-image-common-cost-l2.json`](../docs/ecbench/specs/n83-genus3-image-common-cost-l2.json)
+  freezes the same four sizes, three substantive arms, and A/A control for
+  identical EKS Spot runs on `c8a.2xlarge` and `m8a.2xlarge`.
 
 ## Exit criteria
 
@@ -63,9 +75,10 @@ precomputation reuse, and amortization must be reported separately.
 
 ## Next discriminating experiment
 
-Implement a small-field genus-three index-calculus adapter behind a new named
-`ecbench` method. Run it first on `n=9,13,19,23` against the existing image BSGS
-control. Stop if relation yield, matrix dimension, or individual-log success
-does not follow the preregistered model. If it does, extend native counters to
-field multiplications, inversions, memory bytes, and linear-algebra work before
-considering the exact `n=83` family.
+Do not implement the ambient full-Jacobian calculus under a new method name.
+First design an image-compatible factor base and either an image projection or
+image-closed relation rule, with a relation probability and exponent stated in
+the actual order `r`. In parallel, execute the frozen common-cost L2 spec on
+both registered Spot host classes. Only an image-compatible candidate that
+passes the six admission criteria in `DESTINATION_CALCULUS_SCREEN.md` should be
+implemented and measured against the existing generic controls.
