@@ -1,0 +1,112 @@
+failures:
+
+---- cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload stdout ----
+
+thread 'cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload' (9172) panicked at src/cryptanalysis/ecbench/bounds.rs:2367:43:
+called `Result::unwrap()` on an `Err` value: "/workspace/crypto-quotient-target/research/ecbench_all_candidates_20261003/sessions/prime/records.jsonl: No such file or directory (os error 2)"
+
+---- cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible stdout ----
+
+thread 'cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible' (9174) panicked at src/cryptanalysis/ecbench/bounds.rs:2339:10:
+called `Result::unwrap()` on an `Err` value: "/workspace/crypto-quotient-target/research/ecbench_all_candidates_20261003/sessions/koblitz/session.json: No such file or directory (os error 2)"
+
+---- cryptanalysis::ecbench::bounds::tests::a_session_counted_twice_is_refused_and_a_copy_of_its_draws_too stdout ----
+
+thread 'cryptanalysis::ecbench::bounds::tests::a_session_counted_twice_is_refused_and_a_copy_of_its_draws_too' (9176) panicked at src/cryptanalysis/ecbench/bounds.rs:2191:9:
+Err("/workspace/crypto-quotient-target/research/ecbench_all_candidates_20261003/sessions/prime/session.json: No such file or directory (os error 2)")
+
+---- cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples stdout ----
+
+thread 'cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples' (9177) panicked at src/cryptanalysis/ecbench/bounds.rs:2245:10:
+called `Result::unwrap()` on an `Err` value: "/workspace/crypto-quotient-target/research/ecbench_all_candidates_20261003/sessions/prime/session.json: No such file or directory (os error 2)"
+
+---- cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version stdout ----
+
+thread 'cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version' (9179) panicked at src/cryptanalysis/ecbench/bounds.rs:2423:38:
+called `Result::unwrap()` on an `Err` value: "/workspace/crypto-quotient-target/docs/bounds/records/challenge-prime-toy-reference-e1-bsgs-negation.json: No such file or directory (os error 2)"
+
+---- cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band stdout ----
+
+thread 'cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band' (9187) panicked at src/cryptanalysis/ecbench/bounds.rs:2409:10:
+called `Result::unwrap()` on an `Err` value: "/workspace/crypto-quotient-target/research/ecbench_all_candidates_20261003/sessions/prime/session.json: No such file or directory (os error 2)"
+
+---- cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload stdout ----
+
+thread 'cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload' (9239) panicked at src/cryptanalysis/ecbench/claim.rs:2384:10:
+called `Result::unwrap()` on an `Err` value: "/workspace/crypto-quotient-target/research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01/records.jsonl: No such file or directory (os error 2)"
+
+---- cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup stdout ----
+
+thread 'cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup' (9254) panicked at src/cryptanalysis/ecbench/claim.rs:2384:10:
+called `Result::unwrap()` on an `Err` value: "/workspace/crypto-quotient-target/research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01/records.jsonl: No such file or directory (os error 2)"
+
+---- cryptanalysis::ic_framework::planner::tests::every_cited_file_exists stdout ----
+
+thread 'cryptanalysis::ic_framework::planner::tests::every_cited_file_exists' (11055) panicked at src/cryptanalysis/ic_framework/planner.rs:725:13:
+missing evidence file docs/ic/LEADERBOARD.md
+
+---- cryptanalysis::ic_framework::plugins::tests::compact_orbit_scan_matches_archived_n37_source42 stdout ----
+
+thread 'cryptanalysis::ic_framework::plugins::tests::compact_orbit_scan_matches_archived_n37_source42' (11069) panicked at src/cryptanalysis/ic_framework/plugins.rs:4142:10:
+called `Result::unwrap()` on an `Err` value: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+---- ecc::cryptopro_b_chain_set::tests::a_step_that_does_not_compose_is_refused stdout ----
+
+thread 'ecc::cryptopro_b_chain_set::tests::a_step_that_does_not_compose_is_refused' (13457) panicked at src/ecc/cryptopro_b_chain_set.rs:405:41:
+the frozen chain set is committed: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+note: panic did not contain expected string
+      panic message: "the frozen chain set is committed: Os { code: 2, kind: NotFound, message: \"No such file or directory\" }"
+ expected substring: "does not compose"
+---- ecc::cryptopro_b_chain_set::tests::frozen_chains_are_multiplication_by_lambda_and_orderings_agree stdout ----
+
+thread 'ecc::cryptopro_b_chain_set::tests::frozen_chains_are_multiplication_by_lambda_and_orderings_agree' (13458) panicked at src/ecc/cryptopro_b_chain_set.rs:405:41:
+the frozen chain set is committed: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+---- ecc::cryptopro_b_chain_set::tests::frozen_set_loads_and_every_chain_prepares stdout ----
+
+thread 'ecc::cryptopro_b_chain_set::tests::frozen_set_loads_and_every_chain_prepares' (13459) panicked at src/ecc/cryptopro_b_chain_set.rs:405:41:
+the frozen chain set is committed: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+---- ecc::cryptopro_b_chain_set::tests::frozen_set_reproduces_its_test_vectors stdout ----
+
+thread 'ecc::cryptopro_b_chain_set::tests::frozen_set_reproduces_its_test_vectors' (13460) panicked at src/ecc/cryptopro_b_chain_set.rs:405:41:
+the frozen chain set is committed: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+---- ecc::cryptopro_b_chain_set::tests::tampered_sets_are_refused stdout ----
+
+thread 'ecc::cryptopro_b_chain_set::tests::tampered_sets_are_refused' (13461) panicked at src/ecc/cryptopro_b_chain_set.rs:405:41:
+the frozen chain set is committed: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+---- ecc::endo_generic_chain_set::tests::cryptopro_b_set_loads_and_reproduces_its_vectors_on_the_generic_path stdout ----
+
+thread 'ecc::endo_generic_chain_set::tests::cryptopro_b_set_loads_and_reproduces_its_vectors_on_the_generic_path' (13552) panicked at src/ecc/endo_generic_chain_set.rs:565:40:
+the CryptoPro-B chain set parses: "read /workspace/crypto-quotient-target/research/cryptopro_b_chain_sweep_20261006/frozen_inputs/chains.constants.json: No such file or directory (os error 2)"
+
+---- ecc::endo_generic_chain_set::tests::tampered_sets_are_refused stdout ----
+
+thread 'ecc::endo_generic_chain_set::tests::tampered_sets_are_refused' (13555) panicked at src/ecc/endo_generic_chain_set.rs:665:49:
+called `Result::unwrap()` on an `Err` value: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+
+failures:
+    cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload
+    cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible
+    cryptanalysis::ecbench::bounds::tests::a_session_counted_twice_is_refused_and_a_copy_of_its_draws_too
+    cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples
+    cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version
+    cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band
+    cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload
+    cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup
+    cryptanalysis::ic_framework::planner::tests::every_cited_file_exists
+    cryptanalysis::ic_framework::plugins::tests::compact_orbit_scan_matches_archived_n37_source42
+    ecc::cryptopro_b_chain_set::tests::a_step_that_does_not_compose_is_refused
+    ecc::cryptopro_b_chain_set::tests::frozen_chains_are_multiplication_by_lambda_and_orderings_agree
+    ecc::cryptopro_b_chain_set::tests::frozen_set_loads_and_every_chain_prepares
+    ecc::cryptopro_b_chain_set::tests::frozen_set_reproduces_its_test_vectors
+    ecc::cryptopro_b_chain_set::tests::tampered_sets_are_refused
+    ecc::endo_generic_chain_set::tests::cryptopro_b_set_loads_and_reproduces_its_vectors_on_the_generic_path
+    ecc::endo_generic_chain_set::tests::tampered_sets_are_refused
+
+test result: FAILED. 4845 passed; 17 failed; 121 ignored; 0 measured; 0 filtered out; finished in 2064.68s
+
+error: test failed, to rerun pass `--lib`

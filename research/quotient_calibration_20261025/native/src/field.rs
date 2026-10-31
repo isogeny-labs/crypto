@@ -115,6 +115,12 @@ impl Sub for F {
 impl Mul for F {
     type Output = Self;
     fn mul(self, b: Self) -> Self {
+        if b.0[1..].iter().all(|x| *x == 0) {
+            return Self(self.0.map(|x| x * b.0[0] % 7));
+        }
+        if self.0[1..].iter().all(|x| *x == 0) {
+            return Self(b.0.map(|x| x * self.0[0] % 7));
+        }
         let mut t = [0_i32; 35];
         for i in 0..18 {
             for j in 0..18 {
