@@ -178,7 +178,7 @@ costs less in both P and T.
   single-target arm is #2808's `ic-ksum4`, at S = 11.5 on 40 bits, 12.4×
   rho. The k = 5 table, landed in the same PR
   ([`../prime_ksum_k5_20261028/`](../prime_ksum_k5_20261028/)), is the new
-  cold row. The known-log
+  generic-decomposition baseline on these curves (generic decomposition (bounded by √r; cannot beat rho)). The known-log
   table's online cost (0.117) is below rho's only after a target-blind
   precomputation of 5.0 √r. That is the ordinary precomputation trade, and
   preprocessing rho makes it better at equal memory beyond about 14 k

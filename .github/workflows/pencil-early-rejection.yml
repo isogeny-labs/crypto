@@ -1,0 +1,69 @@
+name: Pencil early rejection software checks
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/pencil-early-rejection.yml'
+      - 'research/pencil_early_rejection_20261030/src/**'
+      - 'research/pencil_early_rejection_20261030/provenance/**'
+      - 'research/pencil_early_rejection_20261030/Cargo.*'
+      - 'research/pencil_large_prime_20261029/src/**'
+      - 'research/pencil_large_prime_20261029/Cargo.*'
+      - 'research/five_leads_e2e_20261019/native/**'
+      - 'src/cryptanalysis/**'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/pencil-early-rejection.yml'
+      - 'research/pencil_early_rejection_20261030/src/**'
+      - 'research/pencil_early_rejection_20261030/provenance/**'
+      - 'research/pencil_early_rejection_20261030/Cargo.*'
+      - 'research/pencil_large_prime_20261029/src/**'
+      - 'research/pencil_large_prime_20261029/Cargo.*'
+      - 'research/five_leads_e2e_20261019/native/**'
+      - 'src/cryptanalysis/**'
+  merge_group:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pencil-software-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  software:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CARGO_BUILD_JOBS: 2
+      RUSTUP_TOOLCHAIN: 1.99.1
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/pencil_early_rejection_20261030/src/**
+            /research/pencil_early_rejection_20261030/provenance/**
+            /research/pencil_early_rejection_20261030/Cargo.*
+            /research/pencil_large_prime_20261029/src/**
+            /research/pencil_large_prime_20261029/Cargo.*
+            /research/five_leads_e2e_20261019/native/
+            /src/cryptanalysis/
+      - uses: dtolnay/rust-toolchain@1.99.1
+        with:
+          components: rustfmt, clippy
+      - name: Check the isolated software instrument only
+        shell: bash
+        run: |
+          set -euo pipefail
+          study_manifest=research/pencil_early_rejection_20261030/Cargo.toml
+          cargo fmt --manifest-path "$study_manifest" --check
+          # Inherited solver/rho tests must not execute in this software job.
+          cargo test --manifest-path "$study_manifest" --locked --lib early_rejection_tests -- --list > "$RUNNER_TEMP/pencil-test-list.txt"
+          test "$(grep -c ': test$' "$RUNNER_TEMP/pencil-test-list.txt")" -eq 5
+          cargo test --manifest-path "$study_manifest" --locked --lib early_rejection_tests -- --test-threads=1
+          cargo test --manifest-path "$study_manifest" --release --locked --lib early_rejection_tests -- --test-threads=1
+          cargo clippy --manifest-path "$study_manifest" --locked --all-targets -- -D warnings

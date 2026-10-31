@@ -1,0 +1,25 @@
+import Add11
+set_option autoImplicit false
+namespace WeightedDoubling
+open Polynomial
+variable {K : Type*} [Field K]
+def curve (a0 a1 a2 a3 : K) : K[X] := X^5+C a3*X^3+C a2*X^2+C a1*X+C a0
+def value (a0 a1 a2 a3 x : K) : K := x^5+a3*x^3+a2*x^2+a1*x+a0
+def deriv (a1 a2 a3 x : K) : K := 5*x^4+3*a3*x^2+2*a2*x+a1
+
+theorem tangent_identity (a0 a1 a2 a3 x y m : K) :
+ curve a0 a1 a2 a3 - (C m*X+C (y-m*x))^2 =
+ (X-C x)^2 * (X^3+C (2*x)*X^2+C (3*x^2+a3)*X+C (4*x^3+2*a3*x+a2-m^2)) +
+ C (value a0 a1 a2 a3 x-y^2) + C (deriv a1 a2 a3 x-2*y*m)*(X-C x) := by
+ simp only [curve,value,deriv,C_add,C_sub,C_mul,C_pow,C_neg,map_ofNat]
+ ring
+
+theorem tangent_valid (a0 a1 a2 a3 x y : K)
+ (hp : value a0 a1 a2 a3 x = y^2) (hy : 2*y ≠ 0) :
+ let m := deriv a1 a2 a3 x/(2*y)
+ (X-C x)^2 ∣ curve a0 a1 a2 a3-(C m*X+C (y-m*x))^2 := by
+ dsimp
+ have hd : deriv a1 a2 a3 x - 2*y*(deriv a1 a2 a3 x/(2*y)) = 0 := by field_simp; ring
+ rw [tangent_identity,hp,sub_self,hd,C_0,zero_mul,add_zero,add_zero]
+ exact dvd_mul_right _ _
+end WeightedDoubling

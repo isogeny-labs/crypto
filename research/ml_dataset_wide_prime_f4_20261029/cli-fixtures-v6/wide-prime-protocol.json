@@ -1,0 +1,143 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "ML-WIDE-PRIME-F4-CLI-SOFTWARE-20261030-V6",
+  "classification": "software_correctness_fixture",
+  "inputs": {
+    "n": [
+      47,
+      53,
+      61
+    ],
+    "m": [
+      2
+    ],
+    "family": "prime",
+    "solver": "f4",
+    "seed": 42,
+    "curve_seeds": 1,
+    "generators": 1,
+    "keys": 1,
+    "factor_base_size": 2,
+    "degree_bound": 4,
+    "work_limit": 50000,
+    "twists": [
+      false,
+      true
+    ],
+    "shards": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "shard_count": 6
+  },
+  "limits": {
+    "seconds_per_case": 20,
+    "memory_mib": 512,
+    "trace_mib": 16,
+    "seconds_per_command": 45,
+    "kill_grace_seconds": 5,
+    "total_runner_seconds": 1800,
+    "retries": 0,
+    "expected_cli_commands": 32
+  },
+  "software_binding": {
+    "source": "fe7ccef6eb7f640fc8e95212471b80700d3cf96b",
+    "binary_sha256": "a4ad63da4d7c1f89835c1aa51af37968ae7582cf60dea2a9acf9e2b51bde914d"
+  },
+  "adapter_contract_confirmed": true,
+  "result_pointers": {
+    "native_backend_invoked": [
+      "native_backend_invoked"
+    ],
+    "native_basis_derivation_verified": [
+      "native_basis_derivation_verified"
+    ]
+  },
+  "reserved_artifacts": {
+    "prime-f4-input.json": "complete-prime-field-polynomial-system",
+    "prime-f4-wide-events.jsonl": "restricted-wide-prime-f4-boundary-events/v1",
+    "prime-f4-wide-result.json": "restricted-wide-prime-f4-result/v1",
+    "prime-f4-root-extraction.json": "restricted-wide-prime-f4-original-domain-replay/v1",
+    "execution-context.json": "restricted-original-worker-execution-context/v1"
+  },
+  "forbidden_public_keys": [
+    "known_answer_scalar",
+    "found_pdp",
+    "events",
+    "basis",
+    "work_reserved",
+    "bytes_peak_reserved",
+    "native_backend_invoked",
+    "basis_derivation_verified",
+    "observations",
+    "retired_instructions_raw",
+    "native_basis_derivation_verified",
+    "bytes_reserved",
+    "native_statistics",
+    "exhaustive_no_decomposition"
+  ],
+  "controls": {
+    "source_bound_tests_passed": true,
+    "receipt_sha256": "0a7ad856fa49d89d0aed6304a6ffc04d546bdb27d3761d0356ec9bf66a8b1047",
+    "positive": "Fixed n47/n53 native-invoked PDP controls on both twists and prime61 group bridge passed; no witness supplied to solver.",
+    "negative": "Fixed prime61 signed domain P,-P with subgroup order greater than five and target 3P; complete original-domain no-lift controls passed on both twists.",
+    "natural_cells": "No PDP success/no-lift requirement or resampling; neither control is guaranteed by natural draws.",
+    "tampering": "Require source-bound tests for rehashed equation/group/binding/role/cap/event mutation and observer failure; archive receipt.",
+    "aa": "Not applicable: exact software validation; no statistical comparison."
+  },
+  "acceptance": "All six sealed manifests match fixed axes and native verify passes; all six demonstrate native invocation. Preserve typed stop and replay cursor. Capped native calls demonstrate invocation only, never completed solve. Pre-entry or construction censoring means six-cell coverage acceptance failed; retain outputs without retry.",
+  "stopping": "Fail fast on command/assertion error; preserve complete and partial output, zero retries. Parent timeout 1800s mandatory.",
+  "publication": "Parent archives full output including failed fixtures, runner/checker/protocol/control receipts/source/binary binding to authorized S3 namespace with conditional PUT, HEAD, GET and SHA256 verification. Restored native verify required for every sealed shard; no verification-success claim for unsealed partials. No cloud calls in runner.",
+  "scope": "Finite m2 software increment only. Original m2..15 corpus goal retained; no scientific samples, performance claim, full derivation/instruction trace claim, or scalar recovery claim.",
+  "variable_ledger": {
+    "output": "canonical existing /var/tmp parent on XFS checked before creation",
+    "inputs": "frozen seed42/shards0..5; no adaptation after results",
+    "source": "final combined source/binary and checker mappings must be frozen before any draw",
+    "clock": "bounds only, no comparative clock admission"
+  },
+  "runner_sha256": "a19e5877d82941571877e77fc78ead2767bbe7d50712bee92c28e3be2fb46ce4",
+  "checker_sha256": "1639b34c0a0821dd2f973d5157c25c3ff59bdeca4f6ebf6fb40df19babbaa251",
+  "version": 6,
+  "amendment": {
+    "reason": "Correct global forbidden-key false positive: permit only inputs.field.basis equal to canonical-residue. All other forbidden keys and paths remain rejected.",
+    "filed_before_affected_data": true,
+    "prior_data_disclosure": "V5 produced shard0, seven successful commands, then checker exit1. Its complete outputs and failure are preserved in S3. V6 repeats that fixed software control and executes the other five frozen cases; no seeds, runtime, budgets or scientific claims change.",
+    "prior_archive_sha256": "466a2212ae1be66089091f30b513777ab0a516bdd41d6c662e34af2d239151c9",
+    "prior_protocol_sha256": "3ff9d26e810f449d295e4c9222844d6ad2c98a0b1dce48396348e5d443343272"
+  },
+  "adapter_metadata": {
+    "reviewed_source": "fe7ccef6eb7f640fc8e95212471b80700d3cf96b",
+    "strategy": "prime-f4-fp64-finite-domain-m2/v1",
+    "limits_location": "prime-f4-wide-result.json.limits",
+    "original_limits_location": "execution-context.json and result.launch",
+    "encoded_bytes_rule": "min(original trace_bytes / 32, 4194304); admission requires >262144",
+    "expected_encoded_bytes": 524288,
+    "reservation_field": "bytes_reserved",
+    "reservation_scope": "cumulative non-refunded native modeled admission, not measured RSS",
+    "extraction_acceptance": "Required only for complete six-cell fixture acceptance. Early/persistence-failure partials can omit extraction and remain retained failed fixtures; no retry or universal schema claim."
+  },
+  "feature_scope": {
+    "public": "existing static structural view only",
+    "required": "exactly one nonempty feature row and matching target/index feature_id, expected public axes/modulus/target, source manifest digest",
+    "identity": "producer-assigned feature_id cross-reference checked; no invented canonical hash or consumer equivalence claim",
+    "restricted": "wide canonical equations/events/basis/extraction remain full-source restricted artifacts; export carries references only",
+    "outstanding": "T828 wide polynomial feature projector remains part of original goal",
+    "independent_consumer_wide_extraction_verified": false,
+    "independent_consumer_wide_negative_verified": false
+  },
+  "lint_validation": {
+    "source": "59227cd2220f4430e8b587d527a9d5e367932b42",
+    "correction": "Equivalent u64 range predicate; runtime and fixed controls remain source-pinned",
+    "original_style_failure_retained": true
+  },
+  "freeze": {
+    "status": "frozen",
+    "filed_before_affected_data": true,
+    "frozen_at": "2026-10-30T00:40:44Z",
+    "protocol_sha256": "6e3fae8d94d268317a47b090c442da529bdd53f0f798d6d3afe1f907fbd98427"
+  }
+}

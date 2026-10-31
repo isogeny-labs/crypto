@@ -24,7 +24,7 @@ pub struct Boundary {
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
-#[cfg_attr(feature = "producer", derive(serde::Serialize))]
+#[cfg_attr(feature = "reporting", derive(serde::Serialize))]
 pub struct Region {
     pub alloc_calls: u64,
     pub dealloc_calls: u64,

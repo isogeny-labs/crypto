@@ -14,7 +14,7 @@ use std::env;
 use std::fs;
 
 use crypto_lib::cryptanalysis::jv_cover::{
-    run_cover_ccov_mode, run_cover_dlp, run_rho_dp, CcovReport, CoverDlpReport, RhoDpReport,
+    run_cover_ccov_mode, run_cover_dlp_mode, run_rho_dp, CcovReport, CoverDlpReport, RhoDpReport,
     StopMode,
 };
 use crypto_lib::cryptanalysis::jv_rho_strong::{run_strong_rho, StrongOpts, StrongRun};
@@ -174,13 +174,18 @@ fn main() {
                     rows.push(Row::Ccov(r));
                 }
                 "dlp" => {
-                    let r = run_cover_dlp(
+                    let dlp_mode = match (hilbert, stop) {
+                        (Some(c), _) => StopMode::Hilbert(c),
+                        (None, 0) => StopMode::Full,
+                        (None, k) => StopMode::Staircase(k),
+                    };
+                    let r = run_cover_dlp_mode(
                         p,
                         seed,
                         rho_runs,
                         check_every,
                         rho_ref,
-                        (stop > 0).then_some(stop),
+                        dlp_mode,
                         trace,
                     );
                     println!(

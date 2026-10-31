@@ -57,8 +57,9 @@ proof DAGs against separately supplied inputs. Native binary-field arithmetic an
 the pinned cube-orbit fixture have development unit checks; no new field/base/target
 sweep or timing measurement was run. Lean checks only the declarations and
 hypotheses listed in \texttt{formal/PROOF\_MAP.json}. Ordinary closure and the
-uniform obstruction $1\notin V(F,4)$ for the six inputs are now formalized.
-The exact pair, degree-five upper, syzygy/Koszul and point bridges remain open.
+exact prime-field guarded three-abscissa pair $(4,5)$ are now formalized,
+including the degree-five construction, rational-root/unit-ideal bridge,
+uniform lower obstruction and graded top-syzygy/Koszul definition.
 
 \textbf{Prior work.} The checked sources are Huang--Kosters--Yang--Yeo,
 \href{https://arxiv.org/abs/1505.02532}{1505.02532}; Caminata--Gorla,
@@ -76,9 +77,9 @@ links are in \texttt{SOURCES.md}. No literature-priority claim is made.
 
 Solid arrows denote dependencies in the written arguments. The dashed arrow is
 an unresolved lower-bound transfer, not a proved implication. The Lean box
-certifies the uniform degree-four obstruction, closure and dependencies;
-native replay certifies finite proof operations only. The complete Lean
-exact-pair theorem remains open; see \texttt{formal/exact-pair-progress.md}.
+certifies the complete original prime-field guarded three-abscissa exact pair;
+native replay certifies finite proof operations only. See
+\texttt{formal/complete-exact-pair.md} for the full statement and checked chain.
 
 The existing E12 Boolean Weil-descent records are unchanged. Its completed cell
 retains labels $\ge5,4,\ge5,4$, a frozen lower median of $4$, and a separate
@@ -126,8 +127,11 @@ The large binary curves have theorem coverage only in this extension.
 \textbf{Sources and records.} \href{https://www.secg.org/sec2-v2.pdf}{SEC2 v2.0},
 Sections 2.4--2.6; \texttt{extensions/large\_curves/README.md}, the pinned
 parameter snapshot, and per-curve input/witness/DAG/replay records.
-Prime-field interpretation assumes the standard field primes. Full degree,
-curve-provenance and group-order arguments remain outside the Lean claim.
+Prime-field interpretation assumes the standard field primes. Fixture-specific
+curve-provenance and group-order arguments remain
+outside the Lean claim. The uniform conditional degree theorem is now
+Lean-checked; fixture-specific primality and UNSAT witnesses are not
+independently kernel-certified by that theorem.
 
 \newpage
 \begin{center}

@@ -1,0 +1,82 @@
+[
+  {
+    "curve": {
+      "field": {
+        "kind": "prime",
+        "modulus": "101"
+      },
+      "a": "0x2",
+      "b": "0x3",
+      "group_order": "0x60",
+      "subgroup_order": "0x3",
+      "cofactor": "0x20",
+      "generator": {
+        "x": "0x23",
+        "y": "0x56"
+      }
+    },
+    "recipe": {
+      "kind": "prime_multiplicative_coset",
+      "order": 100,
+      "generator": "2",
+      "coset": "3"
+    },
+    "max_candidates": 1024,
+    "shard_points": 3
+  },
+  {
+    "curve": {
+      "field": {
+        "kind": "prime",
+        "modulus": "101"
+      },
+      "a": "0x2",
+      "b": "0x3",
+      "group_order": "0x60",
+      "subgroup_order": "0x3",
+      "cofactor": "0x20",
+      "generator": {
+        "x": "0x23",
+        "y": "0x56"
+      }
+    },
+    "recipe": {
+      "kind": "prime_norm_one_trace",
+      "order": 102,
+      "generator_real": "3",
+      "generator_imag": "2",
+      "nonsquare": "2",
+      "scale": "1",
+      "shift": "1"
+    },
+    "max_candidates": 1024,
+    "shard_points": 3
+  },
+  {
+    "curve": {
+      "field": {
+        "kind": "prime",
+        "modulus": "101"
+      },
+      "a": "0x2",
+      "b": "0x3",
+      "group_order": "0x60",
+      "subgroup_order": "0x3",
+      "cofactor": "0x20",
+      "generator": {
+        "x": "0x23",
+        "y": "0x56"
+      }
+    },
+    "recipe": {
+      "kind": "prime_dickson_image",
+      "degree": 3,
+      "parameter": "1",
+      "start": "0",
+      "step": "1",
+      "count": 101
+    },
+    "max_candidates": 1024,
+    "shard_points": 3
+  }
+]
