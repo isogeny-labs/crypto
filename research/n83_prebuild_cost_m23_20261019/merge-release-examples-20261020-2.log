@@ -1,0 +1,151 @@
+   Compiling crypto v0.1.0 (/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-resume-20261019)
+    Finished `release` profile [optimized] target(s) in 15.30s
+     Running unittests src/bin/curve_cover_check.rs (/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-small-m4-build/release/deps/curve_cover_check-184e62dd6d8269cc)
+
+running 11 tests
+test tests::cover_graph_is_content_addressed_and_rejects_wrong_ec1_binding ... ok
+test tests::all_f8_models_and_cover_points ... ok
+test tests::rejects_invalid_fields_singular_models_and_noncanonical_coefficients ... ok
+test tests::rejects_tampered_certificates ... ok
+test tests::unknown_is_not_no_cover_and_identities_are_bound ... ok
+test tests::all_small_prime_models_and_cover_points ... ok
+test tests::rabin_counts_the_irreducible_polynomials ... ok
+test tests::all_small_model_changes_have_rational_inverses ... ok
+test tests::larger_extension_models_verify ... ok
+test tests::all_gf25_models_and_cover_points ... ok
+test tests::entire_catalog_replays_deterministically ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 28.01s
+
+     Running unittests src/bin/curve_standards.rs (/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-small-m4-build/release/deps/curve_standards-c6aa0bc3a8e58fb3)
+
+running 2 tests
+test import::tests::imports_full_representation_and_accounts_for_gaps ... ok
+test import::tests::signed_coefficients_and_exact_integer_hashing ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/bin/hyperelliptic_cover.rs (/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-small-m4-build/release/deps/hyperelliptic_cover-f98989c1831df40f)
+
+running 13 tests
+test tests::construction_rejects_unknown_model_fields ... ok
+test tests::construction_has_separate_verified_claims ... ok
+test tests::extension_cover_reaches_verified_construction_and_structured_arithmetic_boundary ... ok
+test tests::malformed_divisor_is_rejected_before_arithmetic ... ok
+test tests::non_fixture_binary_receipt_keeps_arbitrary_pushforward_unsupported ... ok
+test tests::normalized_montgomery_cover_reaches_verified_construction ... ok
+test tests::exact_fixed_f8_receipt_marks_arbitrary_pushforward_as_library_only ... ok
+test tests::odd_one_infinity_branch_divisor_is_supported_separately ... ok
+test tests::zero_prime_modulus_is_a_structured_error_not_a_panic ... ok
+test tests::prime_cover_arithmetic_is_structured_unsupported ... ok
+test tests::catalog_producer_digest_covers_checker_models_and_wrapper ... ok
+test tests::every_binary_ec1_generator_has_checked_typed_transfer_hypotheses ... ok
+test tests::every_current_catalog_model_reaches_the_standalone_constructor ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.05s
+
+     Running unittests examples/cover_catalog_transition_audit.rs (/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-small-m4-build/release/examples/cover_catalog_transition_audit-fb17f6c32f7f73f5)
+
+running 2 tests
+test tests::rejects_changed_or_removed_retained_identity ... ok
+test tests::rejects_duplicate_models_even_with_different_labels ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/koblitz_n83_factor_base_export.rs (/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-small-m4-build/release/examples/koblitz_n83_factor_base_export-5b35aed1fe7870af)
+
+running 24 tests
+test compact_cold::pinned_public_diagnostic_curve_has_exact_group_and_generator ... ok
+test compact_cold::wide::wide_json_tests::wide_point_coordinates_round_trip_as_decimal_strings ... ok
+test compact_cold::wide::wide_json_tests::wide_point_list_preserves_infinity_entries ... ok
+test primary_adapter::tests::cgroup_v2_membership_resolves_container_and_native_scope ... ok
+test primary_adapter::tests::five_summand_pinned_chain_model_checks_the_group_sum ... ok
+test compact_cold::wide::unordered_pair_index_retains_every_ordered_canonical_root_key ... ok
+test compact_cold::wide::wide_json_tests::wide_point_parser_accepts_small_legacy_numeric_words ... ok
+test primary_adapter::tests::selector_and_phase_modes_preserve_small_chain_model_and_group_lift ... ok
+test tests::gray_order_visits_the_same_complete_subspace ... ok
+test tests::invalid_point_and_out_of_range_case_fail_closed ... ok
+test tests::degree_83_cyclotomic_block_order_is_82 ... ok
+test primary_adapter::tests::supervised_source_snapshot_rejects_a_changed_compiled_file ... ok
+test primary_adapter::tests::v2_primary_selection_requires_replay_and_s3_receipts_before_object_import ... ok
+test primary_adapter::tests::public_target_and_post_solver_validation_bind_the_same_fixture ... ok
+test tests::point_only_oracle_finds_a_verified_relation_and_retains_censoring ... ok
+test tests::v2_object_gate_matches_the_frozen_size_receipt ... ok
+test primary_adapter::tests::wide_enumerator_matches_generic_witness_order_on_primary_curve ... ok
+test tests::subgroup_moduli_are_kept_separate ... ok
+test tests::small_export_replays_with_generic_arithmetic ... ok
+test primary_adapter::mixed_tests::mixed_four_point_row_replays_across_both_column_blocks ... ok
+test primary_adapter::xor_cache_worker::mixed_tests::mixed_four_point_row_replays_across_both_column_blocks ... ok
+test primary_adapter::tests::small_primary_export_maps_to_generic_orbits_and_zero_trial_preflight ... ok
+test compact_cold::wide::wide_compact_extractor_lifts_public_four_sums_on_small_curve ... ok
+test tests::finite_grid_is_addressable_and_accounts_for_every_tuple ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.01s
+
+     Running unittests examples/koblitz_n83_mixed_orbit_worker.rs (/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-small-m4-build/release/examples/koblitz_n83_mixed_orbit_worker-7b30d8beb67d0d69)
+
+running 6 tests
+test tests::known_witness_fixture_is_pinned_and_distinct_from_natural_corpus ... ok
+test tests::matched_public_corpus_digest_is_pinned ... ok
+test tests::pinned_manifests_reject_wrong_bytes_or_archive ... ok
+test tests::cross_stream_run_rejects_same_stream_before_cgroup_or_archive_io ... ok
+test tests::trial_coefficients_are_distinct_and_replayable ... ok
+test tests::pinned_pilot_selection_accepts_exactly_primary_arm_rows ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests examples/koblitz_n83_structured_orbit_worker.rs (/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-small-m4-build/release/examples/koblitz_n83_structured_orbit_worker-dbbae0734f63f8bf)
+
+running 2 tests
+test tests::decimal_and_affine_fields_reject_noncanonical_values ... ok
+test tests::pinned_manifest_and_archive_require_exact_bytes ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/n83_full_m4_audit.rs (/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-small-m4-build/release/examples/n83_full_m4_audit-f13458ee1d09f1bd)
+
+running 5 tests
+test tests::full_schedule_covers_each_public_point_and_first_point_repetitions ... ok
+test tests::partial_progress_cannot_be_promoted ... ok
+test tests::paired_contract_rejects_semantic_and_work_drift ... ok
+test tests::ranks_exclude_caps_keep_bases_separate_and_remove_dependent_rows ... ok
+test tests::rank_handles_modular_cancellation_and_independent_late_pivot ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/n83_full_m4_card_check.rs (/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-small-m4-build/release/examples/n83_full_m4_card_check-de068ea8d21f5d37)
+
+running 2 tests
+test tests::full_card_preserves_caller_labels_and_all_cells ... ok
+test tests::wall_capped_arm_is_retained_and_remaining_cells_run ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.38s
+
+     Running unittests examples/n83_prebuild_cost_m23.rs (/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-small-m4-build/release/examples/n83_prebuild_cost_m23-c34892cd60909b5e)
+
+running 6 tests
+test small_m4::policy_tests::full_control_gate_requires_model_work_and_cache_conservation ... ok
+test small_m4::policy_tests::full_policy_does_not_expand_old_commands_or_allow_off_natural_queries ... ok
+test tests::rank_rejects_a_scaled_duplicate ... ok
+test small_m4::tests::lift_checks_signs_membership_and_exact_target ... ok
+test tests::deterministic_pairs_are_distinct_and_stable ... ok
+test small_m4::policy_tests::watchdog_preserves_censor_when_resource_read_or_parse_fails ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running unittests examples/n83_small_m4_replay.rs (/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-small-m4-build/release/examples/n83_small_m4_replay-903cf00f417cc9e0)
+
+running 2 tests
+test tests::capped_control_and_wrong_mode_cannot_pass_replay_contract ... ok
+test tests::point_parser_rejects_noncanonical_and_outside_field_coordinates ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/n83_xor_cache_audit.rs (/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-small-m4-build/release/examples/n83_xor_cache_audit-4a89bf088735d697)
+
+running 2 tests
+test tests::paired_contract_rejects_semantic_and_work_drift ... ok
+test tests::partial_progress_cannot_be_promoted ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

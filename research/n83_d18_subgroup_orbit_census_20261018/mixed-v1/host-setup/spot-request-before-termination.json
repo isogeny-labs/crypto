@@ -1,0 +1,57 @@
+{
+    "SpotInstanceRequests": [
+        {
+            "CreateTime": "2026-10-19T09:33:05+00:00",
+            "InstanceId": "i-09517b7b9751f27a5",
+            "LaunchSpecification": {
+                "BlockDeviceMappings": [
+                    {
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "VolumeSize": 80,
+                            "VolumeType": "gp3",
+                            "Encrypted": true
+                        },
+                        "DeviceName": "/dev/xvda"
+                    }
+                ],
+                "ImageId": "ami-0803a33fd43db1fbf",
+                "InstanceType": "c7i.2xlarge",
+                "KeyName": "n83-mixed-20261019-cad5fb2",
+                "NetworkInterfaces": [
+                    {
+                        "DeleteOnTermination": true,
+                        "DeviceIndex": 0,
+                        "SubnetId": "subnet-07709db0a38a3857b"
+                    }
+                ],
+                "Placement": {
+                    "AvailabilityZone": "us-west-2b",
+                    "Tenancy": "default"
+                },
+                "SecurityGroups": [
+                    {
+                        "GroupId": "sg-01aa2c0334fcfd265",
+                        "GroupName": "n83-mixed-cad5fb2"
+                    }
+                ],
+                "Monitoring": {
+                    "Enabled": false
+                }
+            },
+            "LaunchedAvailabilityZone": "us-west-2b",
+            "ProductDescription": "Linux/UNIX",
+            "SpotInstanceRequestId": "sir-y4vfphjh",
+            "SpotPrice": "0.357000",
+            "State": "active",
+            "Status": {
+                "Code": "fulfilled",
+                "Message": "Your Spot request is fulfilled.",
+                "UpdateTime": "2026-10-19T11:24:18+00:00"
+            },
+            "Tags": [],
+            "Type": "one-time",
+            "InstanceInterruptionBehavior": "terminate"
+        }
+    ]
+}

@@ -1,0 +1,91 @@
+name: N83 prebuilt receipt replay
+
+on:
+  pull_request:
+    paths:
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'src/cryptanalysis/sat.rs'
+      - 'examples/n83_full_m4_audit.rs'
+      - 'examples/n83_xor_cache_audit.rs'
+      - 'examples/n83_full_m4_card_check.rs'
+      - 'examples/n83_prebuild_cost_m23.rs'
+      - 'examples/n83_prebuild_reuse_accounting.rs'
+      - 'examples/n83_small_m4_replay.rs'
+      - 'research/n83_prebuild_cost_m23_20261019/**'
+      - '.github/workflows/n83-prebuilt-receipts.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'src/cryptanalysis/sat.rs'
+      - 'examples/n83_full_m4_audit.rs'
+      - 'examples/n83_xor_cache_audit.rs'
+      - 'examples/n83_full_m4_card_check.rs'
+      - 'examples/n83_prebuild_cost_m23.rs'
+      - 'examples/n83_prebuild_reuse_accounting.rs'
+      - 'examples/n83_small_m4_replay.rs'
+      - 'research/n83_prebuild_cost_m23_20261019/**'
+      - '.github/workflows/n83-prebuilt-receipts.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n83-prebuilt-receipts-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  receipts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      CARGO_BUILD_JOBS: 2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.98'
+      - uses: Swatinem/rust-cache@v2
+      - name: Native worker, card and audit regression tests
+        run: |
+          cargo test --release \
+            --example n83_full_m4_audit \
+            --example n83_xor_cache_audit \
+            --example n83_full_m4_card_check \
+            --example n83_prebuild_cost_m23 \
+            --example n83_prebuild_reuse_accounting \
+            --example n83_small_m4_replay
+          cargo build --release --example n83_full_m4_audit --example n83_xor_cache_audit
+      - name: Replay both complete frozen receipt archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          study=research/n83_prebuild_cost_m23_20261019
+          for pair in xor-cache-v2:n83_xor_cache_audit full-m4-v1:n83_full_m4_audit; do
+            card=${pair%%:*}
+            auditor=${pair#*:}
+            source="$study/$card/final"
+            output="$RUNNER_TEMP/$card"
+            mkdir "$output"
+            cp "$source/runs.tar.xz" "$source/files.sha256" "$source/archive.sha256" "$output/"
+            (
+              cd "$output"
+              sha256sum -c archive.sha256
+              tar --no-same-owner --no-same-permissions -xJf runs.tar.xz
+              sha256sum -c files.sha256
+            )
+            archive=$(awk '$2 == "runs.tar.xz" { print $1 }' "$source/archive.sha256")
+            manifest=$(awk '$2 == "files.sha256" { print $1 }' "$source/archive.sha256")
+            "target/release/examples/$auditor" "$output" "$archive" "$manifest" "$RUNNER_TEMP/$card-audit.json"
+            cmp "$RUNNER_TEMP/$card-audit.json" "$source/audit.json"
+          done
+      - name: Re-derive the finite-query reuse accounting
+        run: |
+          cargo run --release --example n83_prebuild_reuse_accounting -- \
+            research/n83_prebuild_cost_m23_20261019 "$RUNNER_TEMP/reuse-accounting.json"
+          cmp "$RUNNER_TEMP/reuse-accounting.json" research/n83_prebuild_cost_m23_20261019/reports/reuse-20261020/accounting.json
