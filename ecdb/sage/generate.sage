@@ -396,7 +396,11 @@ def isogeny_records(p, a, b, N, canonical, neighbour_of=None):
     E = EllipticCurve(F, [a, b])
     squares = sorted({(u * u) % p for u in range(1, p)}) if canonical else None
     for l in ISOGENY_ELLS:
-        for phi in E.isogenies_prime_degree(l):
+        for psi in E.isogenies_prime_degree(l):
+            # isogenies_prime_degree may compose Velu's map with an isomorphism
+            # (e.g. at j = 1728); rebuild the plain Velu isogeny from its kernel so the
+            # stored codomain is the one the importer recomputes.
+            phi = E.isogeny(psi.kernel_polynomial())
             C = phi.codomain()
             if C.a1() or C.a2() or C.a3():
                 C = C.short_weierstrass_model()

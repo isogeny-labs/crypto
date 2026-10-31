@@ -20,7 +20,7 @@ use super::registry::{
 };
 use super::siblings::prime_icv1;
 use super::{bulk, bulk1, Ctx, Report};
-use crate::ec::{is_probable_prime, Curve};
+use crate::ec::{is_probable_prime, modpow, Curve};
 use crate::field::a_invariants;
 use crate::math::{icv1_binary_field, sha256_hex, weil_label};
 use anyhow::{anyhow, bail, Context, Result};
@@ -71,6 +71,20 @@ SELECT c.id, r.method, r.seed, r.procedure, r.call, true, 'proved', $2::bigint
 FROM jsonb_to_recordset($1::jsonb) AS r(key text, method text, seed text, procedure text, call text)
 JOIN ec.curve c ON c.icv1_slug = r.key
 ON CONFLICT (curve_id) DO NOTHING";
+
+const ISOGENY_SQL: &str = "
+INSERT INTO ec.isogeny (external_id, source_av_id, target_av_id, source_curve_id, target_curve_id, dimension, degree,
+       ell, kernel_structure, is_separable, field_of_definition_id, formula, kernel_polynomial, codomain_raw,
+       post_isomorphism, is_normalized, certificate, status, provenance_id)
+SELECT r.id, sa.id, ta.id, sc.id, tc.id, 1, r.ell, r.ell, ARRAY[r.ell]::numeric[], true, sc.field_id, 'velu',
+       r.kernel, r.codomain, r.post, true, r.certificate, 'proved', $2::bigint
+FROM jsonb_to_recordset($1::jsonb) AS r(id text, source text, target text, ell numeric, kernel jsonb, codomain jsonb,
+     post jsonb, certificate text)
+JOIN ec.curve sc ON sc.icv1_slug = r.source
+JOIN ec.curve tc ON tc.icv1_slug = r.target
+JOIN ec.abelian_variety sa ON sa.curve_id = sc.id
+JOIN ec.abelian_variety ta ON ta.curve_id = tc.id
+ON CONFLICT DO NOTHING";
 
 const G2_CURVE_SQL: &str = "
 INSERT INTO ec.curve (field_id, genus, model, form, coefficients, equation, family, is_smooth, smoothness_status,
@@ -153,6 +167,7 @@ struct Batch {
     twists: Vec<Value>,
     pairing: Vec<Value>,
     generation: Vec<Value>,
+    isogenies: Vec<Value>,
     g2_curves: Vec<Value>,
     g2_classes: BTreeMap<String, Value>,
     g2_links: Vec<Value>,
@@ -343,6 +358,161 @@ fn genus1(rec: &Value, b: &mut Batch, report: &mut Report) -> Result<()> {
     Ok(())
 }
 
+// ------------------------------------------------------------- isogenies
+
+type Poly = Vec<BigInt>; // ascending coefficients mod p
+
+fn pmul(a: &[BigInt], b: &[BigInt], p: &BigInt) -> Poly {
+    let mut out = vec![BigInt::zero(); a.len() + b.len() - 1];
+    for (i, x) in a.iter().enumerate() {
+        for (j, y) in b.iter().enumerate() {
+            out[i + j] = (&out[i + j] + x * y) % p;
+        }
+    }
+    out
+}
+
+fn psub(a: &[BigInt], b: &[BigInt], p: &BigInt) -> Poly {
+    let n = a.len().max(b.len());
+    (0..n)
+        .map(|i| {
+            let x = a.get(i).cloned().unwrap_or_default();
+            let y = b.get(i).cloned().unwrap_or_default();
+            (x - y).mod_floor(p)
+        })
+        .collect()
+}
+
+/// Remainder of a by a monic b over F_p.
+fn prem(a: &[BigInt], b: &[BigInt], p: &BigInt) -> Poly {
+    let mut r: Poly = a.iter().map(|c| c.mod_floor(p)).collect();
+    let db = b.len() - 1;
+    while r.len() > db {
+        let lead = r.pop().unwrap();
+        if lead.is_zero() {
+            continue;
+        }
+        let shift = r.len() - db;
+        for (i, c) in b[..db].iter().enumerate() {
+            r[shift + i] = (&r[shift + i] - &lead * c).mod_floor(p);
+        }
+    }
+    while r.last().is_some_and(|c| c.is_zero()) {
+        r.pop();
+    }
+    r
+}
+
+/// The l-division polynomial in x of y^2 = x^3 + a x + b (l = 2: the 2-torsion cubic).
+fn division_poly_x(l: u64, a: &BigInt, b: &BigInt, p: &BigInt) -> Result<Poly> {
+    let m = |v: i64| BigInt::from(v);
+    let n = |c: BigInt| c.mod_floor(p);
+    let cubic = vec![n(b.clone()), n(a.clone()), m(0), m(1)];
+    Ok(match l {
+        2 => cubic,
+        3 => vec![n(-(a * a)), n(m(12) * b), n(m(6) * a), m(0), m(3)],
+        5 => {
+            // psi_5 = (psi_4/psi_2) (psi_2^2)^2 - psi_3^3, psi_2^2 = 4(x^3 + a x + b),
+            // psi_4/psi_2 = 2(x^6 + 5a x^4 + 20b x^3 - 5a^2 x^2 - 4ab x - 8b^2 - a^3)
+            let q4 = vec![
+                n(m(2) * (m(-8) * b * b - a * a * a)),
+                n(m(-8) * a * b),
+                n(m(-10) * a * a),
+                n(m(40) * b),
+                n(m(10) * a),
+                m(0),
+                m(2),
+            ];
+            let f4: Poly = cubic.iter().map(|c| n(m(4) * c)).collect();
+            let psi3 = vec![n(-(a * a)), n(m(12) * b), n(m(6) * a), m(0), m(3)];
+            let lhs = pmul(&q4, &pmul(&f4, &f4, p), p);
+            let rhs = pmul(&psi3, &pmul(&psi3, &psi3, p), p);
+            psub(&lhs, &rhs, p)
+        }
+        other => bail!("no division polynomial for l = {other}"),
+    })
+}
+
+/// Velu / Kohel codomain of y^2 = x^3 + a x + b for the kernel polynomial psi (monic).
+fn velu_codomain(l: u64, a: &BigInt, b: &BigInt, psi: &[BigInt], p: &BigInt) -> (BigInt, BigInt) {
+    let d = psi.len() - 1;
+    let c = |i: isize| -> BigInt {
+        if i < 0 {
+            BigInt::zero()
+        } else {
+            psi[i as usize].clone()
+        }
+    };
+    let (t, w) = if l == 2 {
+        let x0 = (-&psi[0]).mod_floor(p);
+        let t = (BigInt::from(3) * &x0 * &x0 + a).mod_floor(p);
+        let w = (&x0 * &t).mod_floor(p);
+        (t, w)
+    } else {
+        let di = d as isize;
+        let s1 = -c(di - 1);
+        let s2 = c(di - 2);
+        let s3 = -c(di - 3);
+        let p1 = s1.clone();
+        let p2 = &s1 * &s1 - BigInt::from(2) * &s2;
+        let p3 = &s1 * &s1 * &s1 - BigInt::from(3) * &s1 * &s2 + BigInt::from(3) * &s3;
+        let dd = BigInt::from(d as u64);
+        let t = (BigInt::from(6) * &p2 + BigInt::from(2) * a * &dd).mod_floor(p);
+        let w = (BigInt::from(10) * &p3 + BigInt::from(6) * a * &p1 + BigInt::from(4) * b * &dd).mod_floor(p);
+        (t, w)
+    };
+    ((a - BigInt::from(5) * t).mod_floor(p), (b - BigInt::from(7) * w).mod_floor(p))
+}
+
+fn isogeny(rec: &Value, b: &mut Batch) -> Result<()> {
+    let p = int(&rec["field"]["p"], "p")?;
+    if !is_probable_prime(&p).0 {
+        bail!("p = {p} is composite");
+    }
+    let order = int(&rec["order"], "order")?;
+    let l = rec["ell"].as_u64().ok_or_else(|| anyhow!("no ell"))?;
+    let get = |v: &Value, k: &str| int(&v[k], k).map(|x| x.mod_floor(&p));
+    let (sa, sb) = (get(&rec["source"], "a")?, get(&rec["source"], "b")?);
+    let (ca, cb) = (get(&rec["codomain"], "a")?, get(&rec["codomain"], "b")?);
+    let (ta, tb) = (get(&rec["target"], "a")?, get(&rec["target"], "b")?);
+    let kernel: Poly = rec["kernel"]
+        .as_array()
+        .ok_or_else(|| anyhow!("no kernel polynomial"))?
+        .iter()
+        .map(|c| int(c, "kernel coefficient").map(|x| x.mod_floor(&p)))
+        .collect::<Result<_>>()?;
+    let want_deg = if l == 2 { 1 } else { ((l - 1) / 2) as usize };
+    if kernel.len() != want_deg + 1 || !kernel[want_deg].is_one() {
+        bail!("kernel polynomial is not monic of degree {want_deg}");
+    }
+    if !prem(&division_poly_x(l, &sa, &sb, &p)?, &kernel, &p).is_empty() {
+        bail!("kernel polynomial does not divide psi_{l}");
+    }
+    if velu_codomain(l, &sa, &sb, &kernel, &p) != (ca.clone(), cb.clone()) {
+        bail!("Velu codomain recomputed by ecdb differs from the record's");
+    }
+    let w = int(&rec["w"], "w")?.mod_floor(&p);
+    let euler = modpow(&w, &((&p - BigInt::one()) / BigInt::from(2)), &p);
+    if w.is_zero() || !euler.is_one() {
+        bail!("w = {w} is not a nonzero square: no F_p-isomorphism");
+    }
+    let w2 = (&w * &w) % &p;
+    if (&ca * &w2) % &p != ta || (&cb * &w2 * &w) % &p != tb {
+        bail!("target is not (a w^2, b w^3) of the codomain");
+    }
+    let (src, _, _, _) = prime_icv1(&p, &sa, &sb, &order)?;
+    let (dst, _, _, _) = prime_icv1(&p, &ta, &tb, &order)?;
+    let ksig: Vec<String> = kernel.iter().map(|c| c.to_string()).collect();
+    let id = format!("velu:{}", &sha256_hex(&format!("{src}|{l}|{}", ksig.join(",")))[..20]);
+    b.isogenies.push(json!({
+        "id": id, "source": src, "target": dst, "ell": l, "kernel": ksig,
+        "codomain": { "a4": ca.to_string(), "a6": cb.to_string() },
+        "post": { "w": w.to_string(), "map": "(x, y) -> (w x, w^(3/2) y), w a square" },
+        "certificate": "ecdb: kernel monic of degree (l-1)/2 (l = 2: 1), divides psi_l; Velu/Kohel codomain recomputed from the kernel's power sums; F_p-isomorphic to the target by (a w^2, b w^3), w a nonzero square",
+    }));
+    Ok(())
+}
+
 /// The generation_provenance row: the method in the table's vocabulary, the
 /// unit (whose name seeds Sage's RNG) and the generator path.
 fn generation(rec: &Value, mut key: Value) -> Value {
@@ -489,6 +659,7 @@ async fn flush(ctx: &Ctx<'_>, b: Batch, prov: i64, report: &mut Report) -> Resul
     report.count("twists", bulk(c, TWIST_SQL, &b.twists, prov).await?);
     report.count("pairing_data", bulk(c, PAIRING_SQL, &b.pairing, prov).await?);
     bulk(c, GENERATION_SQL, &b.generation, prov).await?;
+    report.count("isogenies", bulk(c, ISOGENY_SQL, &b.isogenies, prov).await?);
     let g2_classes: Vec<Value> = b.g2_classes.into_values().collect();
     report.count("genus2_classes", bulk(c, G2_CLASS_SQL, &g2_classes, prov).await?);
     report.count("genus2_curves", bulk(c, G2_CURVE_SQL, &b.g2_curves, prov).await?);
@@ -526,6 +697,7 @@ pub async fn import_bytes(ctx: &Ctx<'_>, label: &str, bytes: &[u8], report: &mut
             continue;
         }
         let res = match rec["genus"].as_u64() {
+            Some(1) if rec["record"].as_str() == Some("isogeny") => isogeny(&rec, &mut batch),
             Some(1) => genus1(&rec, &mut batch, report),
             Some(2) => genus2(&rec, &mut batch, report),
             _ => Err(anyhow!("unsupported genus")),
@@ -607,6 +779,21 @@ mod tests {
             }
         }
         assert_eq!(count_g2_points(&f, 7), brute);
+    }
+
+    #[test]
+    fn velu_matches_sage_on_p101() {
+        // y^2 = x^3 + 2x + 3 over F_101: Sage's 2- and 3-isogenies (kernel, codomain)
+        let p = BigInt::from(101);
+        let (a, b) = (BigInt::from(2), BigInt::from(3));
+        let k2 = vec![BigInt::from(1), BigInt::from(1)];
+        assert_eq!(velu_codomain(2, &a, &b, &k2, &p), (BigInt::from(78), BigInt::from(38)));
+        assert!(prem(&division_poly_x(2, &a, &b, &p).unwrap(), &k2, &p).is_empty());
+        let k3 = vec![BigInt::from(66), BigInt::from(1)];
+        assert_eq!(velu_codomain(3, &a, &b, &k3, &p), (BigInt::from(97), BigInt::from(75)));
+        assert!(prem(&division_poly_x(3, &a, &b, &p).unwrap(), &k3, &p).is_empty());
+        let not_kernel = vec![BigInt::from(5), BigInt::from(1)];
+        assert!(!prem(&division_poly_x(3, &a, &b, &p).unwrap(), &not_kernel, &p).is_empty());
     }
 
     #[test]
