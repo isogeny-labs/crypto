@@ -7201,3 +7201,385 @@ mod canonical_record_producer_tests {
         assert_eq!(global, 0);
     }
 }
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SavedConstructionResult {
+    output_retained: bool,
+    reserved: Reservation,
+    native_stop: Option<String>,
+    adapter_stop: Option<Stop>,
+}
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SavedSignedResult {
+    reported_complete: bool,
+    first_stop: Option<Stop>,
+    enumeration_additions: u64,
+    witness_check_additions: u64,
+    acknowledged_additions: usize,
+    has_unacknowledged_addition: bool,
+}
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SavedReceipt {
+    commit: String,
+    provenance: String,
+    payload_sha256_bytes: [u8; 32],
+    payload_bytes: u64,
+    sequence: Option<u64>,
+}
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SavedPersistenceResult {
+    reason: String,
+    serialized_complete: bool,
+    retained_bytes: usize,
+}
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SavedCanonicalResult {
+    schema: String,
+    binding: crate::ml_dataset::capture::AttemptBinding,
+    public_sha256: String,
+    factor_base_sha256: String,
+    input_sha256: Option<String>,
+    engine: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Engine,
+    degree: u32,
+    ledger_before_terminal_encoding: SavedBudgetLedger,
+    construction: Option<SavedConstructionResult>,
+    matrix: Option<SavedMatrixReport>,
+    signed: Option<SavedSignedResult>,
+    witness_receipt: Option<SavedReceipt>,
+    input_persistence_failure: Option<SavedPersistenceResult>,
+    native_capture_acknowledged: u64,
+    signed_capture_acknowledged: u64,
+    capture_count_before_artifact_publication: usize,
+    pending_native: Option<SavedBoundaryRecord>,
+    pending_native_encoding: Vec<u8>,
+    group_replay_encoded: bool,
+    group_replay_encoding_stop: Option<Stop>,
+    first_fall_degree: Option<u64>,
+    last_fall_degree: Option<u64>,
+    retired_hardware_instructions: Option<u64>,
+}
+/// Decode bounded reported metadata only. Independent equations, matrix row
+/// checks, group arithmetic and authenticated capture must still be matched.
+fn decode_terminal_result(
+    bytes: &[u8],
+    binding: &crate::ml_dataset::capture::AttemptBinding,
+    public_sha256: &str,
+    factor_base_sha256: &str,
+    input_sha256: Option<&str>,
+    limits: OriginalLimits,
+    engine: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Engine,
+    degree: u32,
+) -> Result<SavedCanonicalResult, String> {
+    if bytes.len() > 64 * 1024 {
+        return Err("terminal result exceeds cap".into());
+    }
+    binding.validate()?;
+    crate::store::index::validate_sha256(public_sha256)?;
+    crate::store::index::validate_sha256(factor_base_sha256)?;
+    if let Some(sha) = input_sha256 {
+        crate::store::index::validate_sha256(sha)?;
+    }
+    let r: SavedCanonicalResult =
+        serde_json::from_slice(bytes).map_err(|e| format!("strict terminal result: {e}"))?;
+    if r.schema != "crypto.ml-dataset.koblitz-m3-result/v1"
+        || &r.binding != binding
+        || r.public_sha256 != public_sha256
+        || r.factor_base_sha256 != factor_base_sha256
+        || r.input_sha256.as_deref() != input_sha256
+        || r.engine != engine
+        || r.degree != degree
+        || !(1..=6).contains(&degree)
+        || r.first_fall_degree.is_some()
+        || r.last_fall_degree.is_some()
+        || r.retired_hardware_instructions.is_some()
+    {
+        return Err("terminal original identity or unsupported claim mismatch".into());
+    }
+    let ledger = &r.ledger_before_terminal_encoding;
+    verify_budget_ledger(
+        &serde_json::to_vec(ledger).map_err(|e| e.to_string())?,
+        limits,
+    )?;
+    if r.capture_count_before_artifact_publication > 4096
+        || r.native_capture_acknowledged > 4096
+        || r.signed_capture_acknowledged > 192
+        || r.native_capture_acknowledged + r.signed_capture_acknowledged
+            > r.capture_count_before_artifact_publication as u64
+        || r.pending_native_encoding.len() > 2048
+        || (r.pending_native.is_none() && !r.pending_native_encoding.is_empty())
+    {
+        return Err("terminal capture count or pending encoding mismatch".into());
+    }
+    if let Some(p) = &r.pending_native {
+        if p.schema != "crypto.ml-dataset.koblitz-m3-events/v1"
+            || p.binding_sha256 != binding.digest()?
+            || p.sequence != r.native_capture_acknowledged + 1
+            || p.capture_sequence != r.capture_count_before_artifact_publication as u64 + 1
+            || ledger.first_stop.is_none()
+        {
+            return Err("terminal pending boundary identity mismatch".into());
+        }
+    }
+    let mut native = Reservation::default();
+    if let Some(c) = &r.construction {
+        if c.native_stop.as_deref().is_some_and(|s| {
+            !matches!(
+                s,
+                "InvalidInput"
+                    | "WorkLimit"
+                    | "ByteLimit"
+                    | "SupportLimit"
+                    | "PairLimit"
+                    | "Allocation"
+                    | "Overflow"
+                    | "Deadline"
+                    | "Observer"
+            )
+        }) || (c.output_retained && c.native_stop.is_some())
+            || (c.adapter_stop.is_some() && c.adapter_stop != ledger.first_stop)
+        {
+            return Err("terminal construction disposition mismatch".into());
+        }
+        native = c.reserved;
+    }
+    if let Some(m) = &r.matrix {
+        if !r
+            .construction
+            .as_ref()
+            .is_some_and(|c| c.output_retained && c.adapter_stop.is_none())
+            || r.input_persistence_failure.is_some()
+            || r.input_sha256.is_none()
+            || m.engine != engine
+            || m.degree != degree
+            || m.native_step_complete
+                != (m.stop
+                    == crate::cryptanalysis::koblitz_groebner::bounded_matrix::Stop::Complete)
+        {
+            return Err("terminal matrix prerequisites mismatch".into());
+        }
+        native.work = native
+            .work
+            .checked_add(m.reserved.work)
+            .ok_or("terminal phase work overflow")?;
+        native.bytes = native
+            .bytes
+            .checked_add(m.reserved.bytes)
+            .ok_or("terminal phase bytes overflow")?;
+    }
+    if native != ledger.native_reserved {
+        return Err("terminal native reservations differ from retained phases".into());
+    }
+    if let Some(f) = &r.input_persistence_failure {
+        if f.retained_bytes > INPUT_BYTE_CAP
+            || r.matrix.is_some()
+            || ledger.first_stop.is_none()
+            || (f.serialized_complete && f.retained_bytes == 0)
+        {
+            return Err("terminal persistence failure mismatch".into());
+        }
+    }
+    if matches!(
+        ledger.phase,
+        Phase::Constructed
+            | Phase::Matrix
+            | Phase::MatrixComplete
+            | Phase::Extraction
+            | Phase::Complete
+    ) && !r.construction.as_ref().is_some_and(|c| c.output_retained)
+    {
+        return Err("terminal phase lacks completed construction".into());
+    }
+    if matches!(
+        ledger.phase,
+        Phase::MatrixComplete | Phase::Extraction | Phase::Complete
+    ) && !r.matrix.as_ref().is_some_and(|m| m.native_step_complete)
+    {
+        return Err("terminal phase lacks completed matrix".into());
+    }
+    if matches!(ledger.phase, Phase::Extraction | Phase::Complete) && r.signed.is_none() {
+        return Err("terminal extraction phase lacks signed report".into());
+    }
+    if let Some(s) = &r.signed {
+        if !r.matrix.as_ref().is_some_and(|m| m.native_step_complete)
+            || s.enumeration_additions > 192
+            || s.acknowledged_additions > 192
+            || s.witness_check_additions > 3
+            || s.acknowledged_additions as u64 != r.signed_capture_acknowledged
+            || s.enumeration_additions
+                != s.acknowledged_additions as u64 + u64::from(s.has_unacknowledged_addition)
+            || s.enumeration_additions + s.witness_check_additions != ledger.group_additions
+            || (s.reported_complete
+                && (s.first_stop.is_some()
+                    || ledger.first_stop.is_some()
+                    || ledger.phase != Phase::Complete
+                    || s.enumeration_additions != 192
+                    || s.acknowledged_additions != 192
+                    || s.has_unacknowledged_addition))
+            || (!s.reported_complete
+                && (s.first_stop.is_none() || s.first_stop != ledger.first_stop))
+        {
+            return Err("terminal signed disposition or counters mismatch".into());
+        }
+    } else if ledger.group_additions != 0
+        || r.signed_capture_acknowledged != 0
+        || r.witness_receipt.is_some()
+        || ledger.phase == Phase::Complete
+    {
+        return Err("terminal signed facts lack signed phase".into());
+    }
+    if r.group_replay_encoded && (r.signed.is_none() || r.group_replay_encoding_stop.is_some()) {
+        return Err("terminal group encoding disposition mismatch".into());
+    }
+    if let Some(w) = &r.witness_receipt {
+        if !matches!(w.commit.as_str(), "NewCommit" | "AlreadyCommitted")
+            || !matches!(w.provenance.as_str(), "Dedicated" | "LegacyAdopted")
+            || w.payload_bytes == 0
+            || w.payload_bytes > SIGNED_WITNESS_BYTE_CAP as u64
+            || w.sequence
+                .is_some_and(|s| s == 0 || s > r.capture_count_before_artifact_publication as u64)
+            || (w.provenance == "Dedicated" && w.sequence.is_none())
+            || !r
+                .signed
+                .as_ref()
+                .is_some_and(|s| s.witness_check_additions == 3)
+        {
+            return Err("terminal witness receipt metadata mismatch".into());
+        }
+    }
+    Ok(r)
+}
+#[cfg(test)]
+mod terminal_result_reader_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native;
+    use crate::ml_dataset::capture::{capture_limits, AttemptBinding};
+    fn actual(
+        engine: native::Engine,
+        mode: u8,
+    ) -> (Vec<u8>, AttemptBinding, OriginalLimits, Option<String>) {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let _sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let mut original = construction_tests::fixture();
+        original.target = original.signed[0];
+        let mut budget = construction_tests::budget();
+        if mode == 2 {
+            budget.trace_limit = 128 * 1024 + 1;
+        }
+        let original_limits = budget.original_limits();
+        let mut global = 0;
+        let run = run_canonical_pipeline(
+            &original,
+            &binding,
+            &limits,
+            &"8".repeat(64),
+            &"9".repeat(64),
+            engine,
+            3,
+            &mut budget,
+            &mut global,
+            &mut |_, _| {
+                if mode == 1 {
+                    Err("selected I/O failure".into())
+                } else {
+                    Ok(())
+                }
+            },
+        );
+        assert!(run.result.as_ref().unwrap().complete);
+        (
+            run.result.as_ref().unwrap().bytes.clone(),
+            binding.clone(),
+            original_limits,
+            run.input_sha256.clone(),
+        )
+    }
+    #[test]
+    fn strict_terminal_reader_accepts_actual_complete_and_censored_native_paths() {
+        for engine in [
+            native::Engine::F4Macaulay,
+            native::Engine::F5KoszulFrobenius,
+        ] {
+            for mode in 0..3 {
+                let (bytes, binding, limits, input) = actual(engine, mode);
+                let parsed = decode_terminal_result(
+                    &bytes,
+                    &binding,
+                    &"8".repeat(64),
+                    &"9".repeat(64),
+                    input.as_deref(),
+                    limits,
+                    engine,
+                    3,
+                )
+                .unwrap();
+                assert_eq!(parsed.signed.is_some(), mode == 0);
+                assert_eq!(parsed.pending_native.is_some(), mode == 2);
+                assert_eq!(parsed.input_persistence_failure.is_some(), mode == 1);
+            }
+        }
+    }
+    #[test]
+    fn strict_terminal_reader_rejects_reencoded_identity_counter_and_claim_mutations() {
+        let engine = native::Engine::F4Macaulay;
+        let (bytes, binding, limits, input) = actual(engine, 0);
+        let base: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+        for mutation in 0..14 {
+            let mut v = base.clone();
+            match mutation {
+                0 => v["extra"] = true.into(),
+                1 => v["ledger_before_terminal_encoding"]["original_limits"]["extra"] = true.into(),
+                2 => v["matrix"]["extra"] = true.into(),
+                3 => v["public_sha256"] = "0".repeat(64).into(),
+                4 => {
+                    v["ledger_before_terminal_encoding"]["native_reserved"]["work"] = serde_json::json!(
+                        base["ledger_before_terminal_encoding"]["native_reserved"]["work"]
+                            .as_u64()
+                            .unwrap()
+                            + 1
+                    )
+                }
+                5 => v["native_capture_acknowledged"] = 4097.into(),
+                6 => v["signed"]["acknowledged_additions"] = 191.into(),
+                7 => v["signed"]["reported_complete"] = false.into(),
+                8 => v["witness_receipt"]["sequence"] = 4097.into(),
+                9 => v["group_replay_encoding_stop"] = "Trace".into(),
+                10 => v["first_fall_degree"] = 4.into(),
+                11 => v["matrix"] = serde_json::Value::Null,
+                12 => v["construction"]["output_retained"] = false.into(),
+                13 => v["pending_native_encoding"] = serde_json::json!([0]),
+                _ => unreachable!(),
+            }
+            assert!(
+                decode_terminal_result(
+                    &serde_json::to_vec(&v).unwrap(),
+                    &binding,
+                    &"8".repeat(64),
+                    &"9".repeat(64),
+                    input.as_deref(),
+                    limits,
+                    engine,
+                    3
+                )
+                .is_err(),
+                "mutation {mutation}"
+            );
+        }
+        assert!(decode_terminal_result(
+            &vec![b' '; 65537],
+            &binding,
+            &"8".repeat(64),
+            &"9".repeat(64),
+            input.as_deref(),
+            limits,
+            engine,
+            3
+        )
+        .is_err());
+    }
+}
