@@ -406,7 +406,7 @@ fn summarize(out: &str) {
             .filter(|r| {
                 r["t1"]["fit_error"]
                     .as_str()
-                    .map_or(false, |s| s.contains("hyperelliptic"))
+                    .is_some_and(|s| s.contains("hyperelliptic"))
             })
             .count();
         let holdout: u64 = curves
