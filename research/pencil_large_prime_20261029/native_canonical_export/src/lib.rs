@@ -197,7 +197,8 @@ fn basic_protocol_admission(p: &V, allow_post_data: bool) -> Result<()> {
         "analysis not frozen before data",
     )?;
     check(
-        !p["sample_size"]["preflight_runtime"]["estimated_total_seconds"].is_null(),
+        !p["sample_size"]["preflight_runtime"]["estimated_total_seconds"].is_null()
+            || protocol_lint::unknown_runtime_gate(p)?,
         "frozen protocol preflight absent",
     )?;
     let mut ids = BTreeSet::new();

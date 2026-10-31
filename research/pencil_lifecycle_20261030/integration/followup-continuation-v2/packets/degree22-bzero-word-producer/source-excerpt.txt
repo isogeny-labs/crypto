@@ -1,0 +1,32 @@
+fn double22_weighted_variant(
+    a: [u64; 6],
+    curve: &[u64],
+    f: &Field,
+    n6_uses_squared_w: bool,
+) -> (ResultPoint, &'static str) {
+    let [q, r, s, t, z, w] = a;
+    let n1 = f.sub(f.mul(q, s), t);
+    let n2 = f.mul(r, s);
+    let b = f.mul(2, f.sub(f.mul(n1, t), f.mul(n2, s)));
+    if b == 0 {
+        if s == 0 {
+            return (ResultPoint::Identity, "b_zero_identity");
+        }
+        let x = f.neg(f.mul(n1, s));
+        let y = f.mul(f.add(f.mul(s, t), x), f.sq(f.sq(s)));
+        return (
+            dbl(
+                D1 {
+                    x,
+                    y,
+                    z: f.mul(s, z),
+                    w,
+                },
+                curve,
+                f,
+            ),
+            "b_zero_point_double",
+        );
+    }
+    let z2 = f.sq(z);
+    let z4 = f.sq(z2);

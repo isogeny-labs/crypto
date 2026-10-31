@@ -1,0 +1,162 @@
+{
+  "schema": "pencil-controller-continuation-independent-review/v1",
+  "created_utc": "2026-10-30T06:36:00Z",
+  "reviewer": "/root/ci_audit",
+  "scope": "Read-only review of the version-5 prospective controller-supervision amendment. No cloud action, scientific execution, protocol edit, source edit, build submission, cancellation, project update, IAM/RBAC change, or worker action was performed.",
+  "documents": {
+    "v5": {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/replacement_upper_gate_20261030/protocol/controller-continuation-v5.json",
+      "sha256": "d00be8a9e4b12fd4e6bb60d3d6c423b9213850de1859e22e248b52cddf70c956",
+      "version": 5,
+      "canonical_body_sha256": "a1c416b0066d26c967a1aaa77de12a432ce4640d560f109263d7f958ac05cf5d",
+      "freeze_status": "frozen",
+      "filed_before_affected_data": true,
+      "frozen_at": "2026-10-30T06:32:55Z"
+    },
+    "v4_parent": {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/replacement_upper_gate_20261030/protocol/replacement-frozen-protocol.json",
+      "sha256": "4b1290eb3802af06238d70e83d6cdf049d85f483dc709ba89e40d9f73563166e",
+      "version": 4,
+      "canonical_body_sha256": "18d5ea7d08097c6b1c952d979a71be5d05efa82902bee1bc1470b031345f37c9"
+    },
+    "parent_binding_in_v5_exact": true
+  },
+  "native_validation": {
+    "command": "/tmp/pencil-unknown-runtime-target/release/pencil-native-canonical-export validate-protocol /home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/replacement_upper_gate_20261030/protocol/controller-continuation-v5.json",
+    "binary_sha256": "b904a0da30851284da6301d4c97117cf427d6e3d32ea0ff242d90a928367bf7e",
+    "exit_code": 0,
+    "stdout_path": "/tmp/pencil-v5-independent-native-validation.json",
+    "stdout_sha256": "aeac6c160f7b21e8ed1f796bbb5307b948da39d0a06d20da52c4ed63436439e1",
+    "stderr_path": "/tmp/pencil-v5-independent-native-validation.stderr",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "result": {
+      "schema": "pencil-native-protocol-validation/v1",
+      "passed": true,
+      "freeze_status": "frozen",
+      "launch_authorized": false,
+      "document_modified": false
+    }
+  },
+  "exact_delta": {
+    "method": "Recursive JSON value comparison of v4 and v5 followed by canonical sorted projection comparison after removing only the allowlisted operational fields.",
+    "changed_or_added_paths": [
+      "/version",
+      "/freeze/commit",
+      "/freeze/frozen_at",
+      "/freeze/protocol_sha256",
+      "/amendments/4",
+      "/stopping_rules/1/rule",
+      "/extensions/controller_continuation"
+    ],
+    "unexpected_paths": [],
+    "normalized_projection_removed": [
+      "/version",
+      "/freeze",
+      "/amendments/4",
+      "/stopping_rules/1/rule",
+      "/extensions/controller_continuation"
+    ],
+    "normalized_v4_sha256": "aa7cd2bef9b2145cc5f92069c5abe6e54de41bde2171fb61ac7ce2a2c3a4fe15",
+    "normalized_v5_sha256": "aa7cd2bef9b2145cc5f92069c5abe6e54de41bde2171fb61ac7ce2a2c3a4fe15",
+    "normalized_bytes_equal": true
+  },
+  "scientific_and_analysis_invariance": {
+    "projection": [
+      "question",
+      "arms",
+      "controls",
+      "randomization",
+      "sample_size",
+      "metrics",
+      "measurement",
+      "decision_rule",
+      "analysis_plan",
+      "variable_ledger",
+      "extensions.finite_cost_model",
+      "extensions.analysis_support_sha256",
+      "extensions.analysis_build",
+      "extensions.full_counted_cost_status",
+      "extensions.upper_gate",
+      "extensions.analysis_scope",
+      "extensions.canonical_packaging"
+    ],
+    "v4_projection_sha256": "b693c8794c534e73b08d19386eae30779d0beaada7c4f944369da410d175b344",
+    "v5_projection_sha256": "b693c8794c534e73b08d19386eae30779d0beaada7c4f944369da410d175b344",
+    "equal": true,
+    "preserved_finite_model": {
+      "policy": "pencil-algorithm-cost/atomic-scalar-disjoint-v1",
+      "mapping_sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d",
+      "cells": 36,
+      "analysis_scope": "gate-p186379-target0/v1",
+      "expected_workloads": 1,
+      "expected_executions": 18,
+      "expected_measured_pairs": 5,
+      "prepared_plan_sha256": "481d795e6208cfb3ca648c463de2d7b232adfb7d28bebc341afa4f58e119dfcf"
+    },
+    "preserved_analyzer_binaries": {
+      "analyze_pair_sha256": "a239de86526e9c37de451e8cc0218c5a2a09bf260d9f4606312f3726361b32d1",
+      "analyze_cohort_sha256": "e086ebeb7f261983af647284307a768e522b1f5921eabfb0146706f7eede360d"
+    },
+    "conclusion": "Version 5 changes no workload, arm, method, seed, plan, binary, finite-count mapping, price grid, metric, analysis rule, replay gate, timing status, or later-cohort barrier. Original version-4 scientific records remain interpreted under version 4; version 5 is an infrastructure sidecar for future controller invocations only."
+  },
+  "source_coverage_bridge": {
+    "original_review": {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/replacement_upper_gate_20261030/replacement-finite-coverage-review.json",
+      "sha256": "1d18cad8da81aea06105b7022fc9ff26565ea4eb62a3e116fa925c54a8f2855f",
+      "bound_v4_body_sha256": "18d5ea7d08097c6b1c952d979a71be5d05efa82902bee1bc1470b031345f37c9",
+      "bound_v4_file_sha256": "4b1290eb3802af06238d70e83d6cdf049d85f483dc709ba89e40d9f73563166e",
+      "mapping_sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d"
+    },
+    "bridge": "The exact equality of every scientific/source/finite-analysis field, plus version 5's explicit v4 parent body and file hashes, makes the existing source-coverage review applicable without re-reviewing scientific source. This bridges applicability only; it does not rewrite the original review to claim that it reviewed version 5 and does not requalify prior data under version 5.",
+    "required_downstream_binding": "Any continuation admission or publication must bind the version-5 body a1c416b0066d26c967a1aaa77de12a432ce4640d560f109263d7f958ac05cf5d, this review, and the unchanged original coverage review."
+  },
+  "controller_source_invariant": {
+    "prior_external_execution_admission": {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/replacement_upper_gate_20261030/execution-admission.json",
+      "sha256": "5b6c92fe9e1e1329cc14351fc81a7e7bfb40b5502d2aa16ece5cd3513dfd1bfd"
+    },
+    "controller_source_archive_sha256": "0bd84d4009064968365f03518adbca1bf6fd6c27eeed24721721e20018a9e85a",
+    "controller_source_version": "Fz9bO0_vOwOm_qUhALJ4zOxuCUopZwmg",
+    "approved_client_sha256": "ac7d57132617775679770dc55b6f8b3acc83f4454e31b025a1f35e9b915abc21",
+    "controller_request_sha256": "92897e1dc5fb7fb10b3df9eceeed01aa88ea083b5a67be1431e915bf3231d907",
+    "request_file_sha256": "e49b94e02639a57b5af1b71b6b0a415a852190156a4beef9583e88d205866c0d",
+    "runtime_image_digest": "sha256:e82333a5e77a03270335589848783e1d0cf55e42c7c2f5f35732ee8ba54523fd",
+    "scientific_image_digest": "sha256:13f27597322fced9230635cedc5a4e228daf2fb951f77652edbbcab17e674c1b",
+    "third_invocation": "Must be the AWS autoRetryNumber 2 child of the observed second controller. Automatic retry inherits the chain source/request; admission must still read back exact sourceVersion, request environment, durable owner and worker identity before accepting the takeover.",
+    "fourth_invocation": "A direct StartBuild must explicitly preserve or verify sourceVersion Fz9bO0_vOwOm_qUhALJ4zOxuCUopZwmg, project source archive 0bd84d4009064968365f03518adbca1bf6fd6c27eeed24721721e20018a9e85a, the exact request environment, and no buildspec/image/service-role/source-location override. A response readback must match before treating it as admitted continuation.",
+    "conclusion": "Version 5 semantically forbids controller source/runtime changes and retains the prior exact source evidence through the v4 bridge. Exact values remain external admission evidence rather than duplicated into the continuation object, so the separate continuation admission must bind and enforce them."
+  },
+  "invocation_cap_and_timeout_policy": {
+    "maximum_total_controller_invocations": 4,
+    "observed_invocations": [
+      "isolab-recovery-controller:9a658f4d-b903-4083-9a77-b04c217cb6a0",
+      "isolab-recovery-controller:592e9381-e505-48bc-a796-3d02c4d3a922"
+    ],
+    "scientific_row_attempt_cap": 2,
+    "worker_restore_cap": 1,
+    "request_deadline_G_unix": 1793347824,
+    "request_deadline_G_utc": "2026-10-30T08:10:24Z",
+    "outer_expiry_D_unix": 1793359074,
+    "outer_expiry_D_utc": "2026-10-30T11:17:54Z",
+    "active_worker_seconds_limit": 21600,
+    "third": "Only AWS autoRetryNumber 2 after controller 2 is terminal. Project AutoRetryLimit 2 exhausts automatic retries at this third total build.",
+    "fourth": {
+      "preconditions": [
+        "controller 3 authoritatively terminal",
+        "same durable run still nonterminal when admitted before G",
+        "same request, worker and source invariants reconciled",
+        "one active scientific payload",
+        "no scientific failure, cap, wrong answer or replay failure"
+      ],
+      "autoRetryLimitOverride": 0,
+      "queuedTimeoutInMinutesOverride": 15,
+      "timeout_formula": "T=max(5,ceil((G+900-now)/60))",
+      "admission_inequality": "now+900+60*T<=D",
+      "effect": "The 15-minute queue allowance plus T-minute build timeout remain inside D. The immutable request deadline G is unchanged and is enforced by the controller state machine; this permits post-G cleanup/receipt publication but no post-G scientific continuation.",
+      "no_fifth": "AWS automatic retry is disabled for invocation 4 and the protocol admits no further controller invocation."
+    },
+    "conclusion": "The cap is finite and closes both successor paths: at most the already observed two, one final automatic chain member, and one separately admitted direct continuation with automatic retries disabled."
+  },
+  "findings": [],
+  "verdict": "Ready for a separate exact-document continuation admission before controller invocation 3. The amendment is operational only; original scientific data remain under v4, and original source-coverage applicability is carried through the explicit parent and equality bridge without a new scientific qualification claim."
+}

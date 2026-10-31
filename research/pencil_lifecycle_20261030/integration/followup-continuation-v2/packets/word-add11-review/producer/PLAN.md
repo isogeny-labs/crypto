@@ -1,0 +1,7 @@
+# Frozen word-composition target
+
+Source first: exact Field::pow lines290–301 is right-to-left binary powering: conditional r=mul(r,a), shift e, square only if shifted exponent remains nonzero. Exponent5 trace is5->2->1->0 with two r products (including1*a) and two squares. This differs from the earlier constructor z4*z tree and must be retained. Actual weighted add11 uses both pow5 cross-y values, q neg/add, r multiplication, s/t subtraction, z multiplication and w product, with inverse/equal/unequal assertion order.
+
+Target: define source-faithful UInt64 bounded exponent loop, prove exponent5 unroll, canonical result and ZMod decode under5<=p<2^31 and canonical input. Extend finite word expression composition to add/neg/sub and literal weighted add11 output/guard if tractable. Nonzero weights and normalized distinct x required only to invoke field validity/establish distinct branch, not polynomial decoding. Primitive overflow bounds reused, no counter/compiler semantics. Field.n1,tablesNone and ordinary execution/counter headroom remain external source conditions. No group-law/class-sum or wholewalk claim.
+
+Private only, source hashes and failures retained, bounded120s compiles, independent readback, PDF/SVG/status. Existing pinned dependency union, no installation. Source: exact gate add11, Field arithmetic and pow; reviewed prior word primitives and pending weighted field extension.

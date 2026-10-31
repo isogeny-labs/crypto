@@ -1,0 +1,13 @@
+{
+  "schema":"quantum-fourier-postprocessing-protocol/v1",
+  "item":20,
+  "frozen_before_execution":true,
+  "purpose":"Extend the exact-congruence boundary diagnostic to the actual finite power-of-two Fourier output law on small synthetic cyclic groups.",
+  "fixtures":[{"r":5,"Q":16,"d":[1,2,3,4]},{"r":11,"Q":32,"d":[1,2,3,7]},{"r":19,"Q":64,"d":[1,2,3,7]}],
+  "state":"Uniform a,b in [0,Q); third register f(a,b)=a+d*b mod r. Trace out the third register after two Q-point Fourier transforms.",
+  "probability":"For each z, 2D FFT the indicator 1[f(a,b)=z]; sum squared amplitudes divided by Q^4. This is classical numerical state-law calculation, not a quantum run.",
+  "postprocessor":"s=round(u*r/Q) mod r; t=round(v*r/Q) mod r; if s invertible propose d=t/s mod r. Invalid s rejected. Half-integer ties round upward. Nearest-character decoding is a bounded heuristic, not a complete recovery algorithm.",
+  "metrics":["probability normalization error","correct candidate mass","wrong candidate mass","rejected mass","expected Euclid divisions per measured pair","FFT butterfly count"],
+  "controls":["Compare FFT with naive complex DFT on length8","Exhaustively verify transform norm/total probability","Check d=1 symmetry between Fourier registers","Compare ideal exact-congruence mode separately"],
+  "limitations":["Small synthetic cyclic groups only, no elliptic-curve circuit or group-law timings","Floating-point amplitudes, not formal rational bounds","No fault tolerance or noise","Candidate correctness checked against synthetic known secret; actual ECC verification still owed","No inference of cryptographic-size success probability"]
+}

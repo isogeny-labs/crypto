@@ -18,7 +18,11 @@ run_cmd do
   let allowed : Array Name := #[`propext, `Classical.choice, `Quot.sound]
   for name in #[`SemaevS3.d2_mul_addX,
       `SemaevS3.S3_factor,
-      `SemaevS3.S3_root_iff] do
+      `SemaevS3.S3_root_iff,
+      `SemaevS3.addX_eq_mathlib_addX,
+      `SemaevS3.pointX_add_eq_xPlus,
+      `SemaevS3.pointX_add_neg_eq_xMinus,
+      `SemaevS3.S3_factor_mathlib] do
     let axioms ← Lean.collectAxioms name
     let forbidden := axioms.filter fun ax => !allowed.contains ax
     unless forbidden.isEmpty do
@@ -28,3 +32,7 @@ run_cmd do
 #print axioms SemaevS3.d2_mul_addX
 #print axioms SemaevS3.S3_factor
 #print axioms SemaevS3.S3_root_iff
+#print axioms SemaevS3.addX_eq_mathlib_addX
+#print axioms SemaevS3.pointX_add_eq_xPlus
+#print axioms SemaevS3.pointX_add_neg_eq_xMinus
+#print axioms SemaevS3.S3_factor_mathlib
