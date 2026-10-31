@@ -1,0 +1,30 @@
+from pathlib import Path
+import json,hashlib,ast
+D=Path(__file__).parent;H=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+b=json.loads((D/'binding.template.json').read_text());b['reviewed_refresh_sha256']=H(D/'refresh-source.py');(D/'binding.template.json').write_text(json.dumps(b,indent=2))
+for p in ['prepare-final.py','refresh-source.py']:ast.parse((D/p).read_text())
+(D/'syntax-check.json').write_text(json.dumps({'ast_parse':['prepare-final.py','refresh-source.py'],'refresh_executed':False,'refresh_sha256':H(D/'refresh-source.py')},indent=2))
+text='''# Final-source sparse refresh proposal
+
+Exact source:3c592af96f3916fef3403e4cf173f22b6f7ef536; tree703733197d635aea5999c17ec7b99d10ab216c41. Read-only inventory and selection completed; no checkout mutation or build occurred.
+
+The new selection contains5,909 ordinary files,289,945,217 bytes, with190,081 omitted entries. Compared with b985, isolation.rs is the only changed previously selected file. Four added Rust files are retained benchlock-control v1/v2 helper/primitive evidence selected by the unchanged all-tracked-Rust rule. No selected paths were removed. All59 special entries remain omitted. Full Git delta, selected delta and old/new isolation hashes are retained.
+
+Recursive Cargo path-dependency closure contains the same eight packages, including optional native five-leads. No local build.rs exists and no manifest specifies a build script. Workspace-inherited dependencies fail closed for renewed review. Cargo manifests/lockfiles/config inputs are unchanged. Current relevant ancestor/CARGO_HOME config paths are absent; their readback is bound and rechecked by the proposed refresh.
+
+The package-source include scan is byte-for-byte identical to the old141-expression record. The sole unresolved hit remains the intentionally constructed runtime string fixture at tournament_tests.rs343. The four new evidence sources additionally contain two include!(benchlock.rs) references, both already selected. Lexical inclusion checks do not establish arbitrary macro expansion closure. No scientific target, feature, cohort or measurement scope changed.
+
+prepare-final.py adapts the retained selector with explicit commit/inventory/hash/output parameters and recursive local manifest discovery. First preparation failed because the old inventory parser shadowed the argument variable; its source, partial closure output, stderr and receipt are preserved under attempt1. The corrected read-only selector exited0. tree-inventory.txt SHA2566344af2a10ca8a5b6885acca7016246f45532f1c118fd1a657f6fc9e703d395e.
+
+refresh-source.py remains source-only, unexecuted. It requires an admitted exact binding, reviewed script hash and fresh receipt directory; acquires the existing nonblocking target lock; checks active Cargo/Git/source/cache owners; verifies detached b985, clean tracked state, all untracked including ignored, and full old materialization before any mutation. It then applies the reviewed anchored non-cone patterns, checks out exact3c592af, reapplies sparse selection, and verifies exact new tree, every blob/mode, no unexpected ordinary/special files and cleanliness. No clean/delete/build command exists. Git hooks/fsmonitor are disabled for these operations. Any failure retains the same destination for reconciliation rather than automatic retry. The original source and target-cache evidence are not overwritten.
+
+The proposed cap is root-selected1..600seconds: shared monotonic checks around commands/files/directory traversal plus <=120second child command timeouts; signal requests are deferred until command ownership is returned. Precommand, terminal and timeout receipts are retained. Filesystem blocking can exceed cooperative checks, so this is not a hard whole-process wall guarantee. Root will use timeout -k 5s 600s around the invocation and record its external exit independently; this is supervision, not proof of terminating uninterruptible IO. Root must reconcile any interrupted Git state. The lock is released at return; the build wrapper must reacquire it and recheck ownership, not assume a continuous lease.
+
+Invocation after independent review/admission: python3.11 refresh-source.py --binding FINAL_BINDING.json --receipts NEW_ABSOLUTE_PRIVATE_DIR --seconds ROOT_CHOSEN_CAP. binding.template.json has admitted=false. Build, runtime assembly and qualification remain separate. This packet allocates no scientific budget.
+'''
+(D/'REPORT.md').write_text(text)
+(D/'status.json').write_text(json.dumps({'schema':'software.sparse-source-proposal/v1','commit':b['commit'],'tree':b['tree'],'selector_exit':0,'selected_files':5909,'selected_bytes':289945217,'omitted':190081,'special_omitted':59,'local_packages':8,'local_build_scripts':0,'package_include_scan_identical':True,'changed_existing_selected':['src/cryptanalysis/ecbench/isolation.rs'],'added_retained_rust_files':4,'source_refresh_executed':False,'build_executed':False,'independent_review':'pending','cap_scope':'cooperative checks and subprocess deadlines; blocking IO not hard bounded'},indent=2))
+t='#set page(paper:"a4",margin:16mm)\n#set text(size:10pt)\n'
+for p in text.split('\n\n'):t+='#text('+json.dumps(p.removeprefix('# '))+')\n#parbreak()\n'
+(D/'report.typ').write_text(t)
+(D/'diagram.svg').write_text('<svg xmlns="http://www.w3.org/2000/svg" width="900" height="300"><rect width="900" height="300" fill="#f4f7fb"/><g fill="#192c41" font-family="sans-serif"><text x="25" y="42" font-size="23">Exact final source selection: b985 → 3c592af</text><text x="25" y="95" font-size="18">5,905 → 5,909 selected files; one existing source changed</text><text x="25" y="135" font-size="18">8 local packages unchanged · 141 package includes unchanged</text><text x="25" y="175" font-size="18">4 added retained Rust files · 59 special entries still omitted</text><text x="25" y="235" font-size="17">Read-only selection complete → independent review → root-owned refresh</text><text x="25" y="270" font-size="16">Refresh and build have not run.</text></g></svg>')

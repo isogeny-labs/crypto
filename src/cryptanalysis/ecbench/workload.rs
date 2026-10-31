@@ -475,10 +475,12 @@ impl CurveSpec {
                 seed,
                 max_cofactor,
             } => {
-                // Points pack into 4m ≤ 60 bits; the order search takes
-                // ≈ 2q baby and giant steps per point.
-                if !(4..=15).contains(&m) {
-                    return Err(format!("f2m4_torsion takes m from 4 to 15, not {m}"));
+                // Points pack into 4m ≤ 80 bits (one word while m ≤ 15;
+                // past that the orders are u128 and the methods go
+                // through `ic_wide`); the order search takes ≈ 2q baby
+                // and giant steps per point.
+                if !(4..=20).contains(&m) {
+                    return Err(format!("f2m4_torsion takes m from 4 to 20, not {m}"));
                 }
                 find_bin_curve(m, seed, max_cofactor).map(|c| Instance::F2m4(Box::new(c)))
             }
@@ -990,7 +992,7 @@ impl Instance {
             Instance::Wide(i) => i.kc.r,
             Instance::Fp4(i) => u128::from(i.r),
             Instance::Fp4Torsion(i) => u128::from(i.r),
-            Instance::F2m4(i) => u128::from(i.r),
+            Instance::F2m4(i) => i.r,
             Instance::Ext(i) => u128::from(i.r()),
             Instance::Genus2(i) => u128::from(i.r),
             Instance::Quartic(i) => u128::from(i.r),
@@ -1216,11 +1218,11 @@ impl Instance {
                     "extension",
                     None,
                     Some(f.f.m),
-                    u128::from(i.group_order),
-                    u128::from(i.r),
-                    u128::from(i.cofactor),
-                    u128::from(f.pack(&i.generator.x)),
-                    u128::from(f.pack(&i.generator.y)),
+                    i.group_order,
+                    i.r,
+                    i.cofactor,
+                    f.pack(&i.generator.x),
+                    f.pack(&i.generator.y),
                     2,
                 )
             }
@@ -1257,6 +1259,18 @@ impl Instance {
                 RawPointG::Affine { x, y } => Some([format!("0x{x:x}"), format!("0x{y:x}")]),
                 RawPointG::Infinity => None,
             };
+        }
+        // A curve over F_{(2^m)^4} may have a two-word order (m ≥ 16);
+        // its own u128 double-and-add gives the same point either way.
+        if let Instance::F2m4(i) = self {
+            let c = &i.curve;
+            let pt = c.mul(&i.generator, k % i.r);
+            return (!pt.inf).then(|| {
+                [
+                    format!("0x{:x}", c.f.pack(&pt.x)),
+                    format!("0x{:x}", c.f.pack(&pt.y)),
+                ]
+            });
         }
         // A one-word instance's subgroup order fits a word, so a reduced
         // scalar does too.
@@ -1344,17 +1358,13 @@ impl Instance {
         let model = model_hash(curve);
         let mut scratch = GroupOps::default();
         if let Instance::Fp4(_)
-            | Instance::Fp4Torsion(_)
-            | Instance::F2m4(_)
-            | Instance::ThreeLeads(_)
-            | Instance::Hyper(_) = self
+        | Instance::Fp4Torsion(_)
+        | Instance::F2m4(_)
+        | Instance::ThreeLeads(_)
+        | Instance::Hyper(_) = self
         {
             // Planted targets only on E(F_{p^4}), the tower, the three-leads
             // study and the hyperelliptic Jacobians: no public-target law yet.
-            return None;
-        }
-            // Planted targets only on E(F_{p⁴}) and on the hyperelliptic
-            // Jacobians: no public-target law yet.
             return None;
         }
         if let Instance::Wide(i) = self {
@@ -1454,14 +1464,23 @@ impl Instance {
                 Instance::F2m4(i) => {
                     let c = &i.curve;
                     let bits = 4 * c.f.f.m;
-                    let x = c.f.unpack(h & ((1u64 << bits) - 1));
+                    // One word of hash while 4m < 64 (every committed
+                    // target); past that a second, derived word on top.
+                    let raw = if bits < 64 {
+                        u128::from(h & ((1u64 << bits) - 1))
+                    } else {
+                        let hi = h.rotate_left(32).wrapping_mul(0x9e37_79b9_7f4a_7c15);
+                        (u128::from(h) | (u128::from(hi) << 64)) & ((1u128 << bits) - 1)
+                    };
+                    let x = c.f.unpack(raw);
                     let mut rng = <rand::rngs::StdRng as rand::SeedableRng>::seed_from_u64(h);
                     let Some(pt) = c.lift_x(&x, &mut rng) else {
                         continue;
                     };
                     let k = CountedGroup::key(c, &pt);
                     let pt = if (k & 1 == 1) != flip { pt } else { c.neg(&pt) };
-                    let q: PtB = CountedGroup::mul(c, &mut scratch, pt, i.cofactor);
+                    let cof = u64::try_from(i.cofactor).expect("a small cofactor");
+                    let q: PtB = CountedGroup::mul(c, &mut scratch, pt, cof);
                     if !q.inf {
                         return Some((
                             [
@@ -1795,18 +1814,15 @@ mod tests {
             assert!(inst.mul_generator_hex(0).is_none());
             assert!(inst.mul_generator_hex(inst.r()).is_none());
             assert!(inst.mul_generator_hex(2).is_some());
-            let target = inst.hash_to_subgroup(&facts, 1, 0);
-            if matches!(&inst, Instance::Fp4(_)) {
-                assert!(
-                    target.is_none(),
-                    "translation public-target law is unavailable"
-                );
-            } else {
-                let (target, counter) = target.expect("torsion public-target law from main");
-                assert_eq!(
-                    inst.hash_to_subgroup(&facts, 1, 0),
-                    Some((target.clone(), counter))
-                );
+            assert!(
+                inst.hash_to_subgroup(&facts, 1, 0).is_none(),
+                "quartic translation and torsion variants retain planted-only policy"
+            );
+            if !matches!(&inst, Instance::Fp4(_)) {
+                // Check subgroup arithmetic on the known fixture 2G, without
+                // enabling the deliberately unavailable public-target route.
+                let target = inst.mul_generator_hex(2).unwrap();
+                assert_eq!(inst.mul_generator_hex(2), Some(target.clone()));
                 let x = u64::from_str_radix(target[0].trim_start_matches("0x"), 16).unwrap();
                 let y = u64::from_str_radix(target[1].trim_start_matches("0x"), 16).unwrap();
                 let mut scratch = GroupOps::default();
@@ -1824,12 +1840,20 @@ mod tests {
                     Instance::F2m4(i) => {
                         let c = &i.curve;
                         let point = crate::cryptanalysis::gaudry_quartic_bin::PtB {
-                            x: c.f.unpack(x),
-                            y: c.f.unpack(y),
+                            x: c.f.unpack(u128::from(x)),
+                            y: c.f.unpack(u128::from(y)),
                             inf: false,
                         };
                         assert!(c.on_curve(&point));
-                        assert!(CountedGroup::mul(c, &mut scratch, point, i.r).inf);
+                        assert!(
+                            CountedGroup::mul(
+                                c,
+                                &mut scratch,
+                                point,
+                                u64::try_from(i.r).expect("small test subgroup order"),
+                            )
+                            .inf
+                        );
                     }
                     _ => unreachable!(),
                 }
