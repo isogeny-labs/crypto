@@ -107,3 +107,24 @@ timeouts at `m=5..15`, and zero complete instruction-to-solve labels.
 ```sh
 python3 research/ml_dataset_inventory_20261031/build_inventory_v6.py
 ```
+
+# Version 7 update
+
+`build_inventory_v7.py` appends the independently audited 26-cell
+ordinary-binary `n=23`, `m=3..15` enumeration campaign to immutable version 6.
+It binds the frozen plan and protocol, all 26 Git custody checkpoints, 832
+rehashed native artifacts, the official export/checker receipt, the first/last
+fresh S3 archive readback sample, and the `.artifacts.json` pointer for the
+85,780-byte migrated cost file. `inventory-v7.json` reports **224 retained
+receipts**, **93 independently solved ECDLP cells**, nine checker-receipted
+official exports with 129 completed and 31 censored rows, and 40,360,937
+restricted archive bytes. This campaign contributes six verified native
+enumeration outcomes at `m=3..5` and twenty `budget_exhausted` outcomes at
+`m=6..15`, all with successful native verify, report, and strict export.
+"Completed export" records successful finalization, not completion of a
+budget-limited search. It contributes no independent scalar solve or complete
+instruction-to-solve label; 104 scoped phase observations remain diagnostic.
+
+```sh
+python3 research/ml_dataset_inventory_20261031/build_inventory_v7.py
+```
