@@ -1,15 +1,19 @@
-    Updating crates.io index
-error: failed to get `isogeny_algos` as a dependency of package `volcano-cli v0.1.0 (/home/user/ps7wt/tools/volcano-cli)`
-    ... which satisfies path dependency `volcano-cli` (locked to 0.1.0) of package `crypto v0.1.0 (/home/user/ps7wt)`
+warning: unused import: `crate::cryptanalysis::binary_semaev::binary_semaev_s3`
+   --> src/cryptanalysis/semaev_sat.rs:105:5
+    |
+105 | use crate::cryptanalysis::binary_semaev::binary_semaev_s3;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
 
-Caused by:
-  failed to load source for dependency `isogeny_algos`
+warning: unused variable: `projected`
+    --> src/cryptanalysis/koblitz_index_calculus.rs:8804:10
+     |
+8804 |     let (projected, _) = project_by_frobenius_orbits_generic(kc, fb);
+     |          ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_projected`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
 
-Caused by:
-  unable to update /home/user/ps7wt/isogeny_algos
-
-Caused by:
-  failed to read `/home/user/ps7wt/isogeny_algos/Cargo.toml`
-
-Caused by:
-  No such file or directory (os error 2)
+warning: `crypto` (lib) generated 2 warnings (run `cargo fix --lib -p crypto` to apply 2 suggestions)
+   Compiling crypto v0.1.0 (/home/user/crypto)
+    Finished `release` profile [optimized] target(s) in 3.52s

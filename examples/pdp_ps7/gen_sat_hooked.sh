@@ -11,7 +11,7 @@
 # The library file is not edited; the copy exists because the library has no branching or
 # learnt-clause hook and tracked files were off limits for PS-7.
 set -euo pipefail
-cd "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../.."
+cd "$(git rev-parse --show-toplevel)"
 SRC=src/cryptanalysis/sat.rs
 DIR=examples/pdp_ps7
 OUT=${GEN_OUT:-$DIR/sat_hooked.rs}

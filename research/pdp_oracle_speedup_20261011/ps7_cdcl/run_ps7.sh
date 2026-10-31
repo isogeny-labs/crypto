@@ -6,10 +6,9 @@
 # Every heavy command goes through `tools/isolated_bench.py busy --wait` (the benchmark lock); the timed stage uses
 # `tools/isolated_bench.py run --cpus $PS7_CPU` (reserved core, contention recorded).  Counts do not depend on
 # contention; wall time is a note.  A failing command is logged to raw/failures.log and the run continues; the
-# script exits non-zero at the end if anything failed.  The counts, verify and reg stages are resumable at the
-# granularity of one (rung, arm): a finished arm (its summary record is in the file) is skipped, a partial one is rerun.
+# script exits non-zero at the end if anything failed.
 set -uo pipefail
-cd "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../../.."
+cd "$(git rev-parse --show-toplevel)"
 D=research/pdp_oracle_speedup_20261011
 OUT=$D/ps7_cdcl/raw
 C=$D/baseline_v1/corpus
@@ -33,26 +32,18 @@ try() {   # try LABEL CMD... : run, log a failure, keep going
 }
 want() {   # want STAGE: is it selected?  Selected stages log the host they ran on (the container can move between hosts).
   if [ "$STAGES" = all ] || [ "$STAGES" = "$1" ]; then
-    echo "$(date -u +%FT%TZ) stage=$1 host=$(hostname) cpu=\"$(lscpu | sed -n 's/^Model name: *//p')\" kernel=$(uname -r) up=$(cut -d' ' -f1 /proc/uptime)s" >> "$OUT/host_per_stage.log"
+    echo "$(date -u +%FT%TZ) stage=$1 host=$(hostname) cpu=\"$(lscpu | sed -n 's/^Model name: *//p')\" mhz=$(lscpu | sed -n 's/^CPU MHz: *//p') kernel=$(uname -r) up=$(cut -d' ' -f1 /proc/uptime)s" >> "$OUT/host_per_stage.log"
     return 0
   fi
   return 1
-}
-run_arm() {   # run_arm FILE LABEL CMD... : skip a finished arm, drop the partial lines of an unfinished one, run, log failures
-  local f=$1 label=$2; shift 2
-  [ -f "$f" ] || : > "$f"
-  if grep -q "\"kind\":\"summary\".*\"label\":\"$label\"" "$f"; then return 0; fi
-  grep -v "\"label\":\"$label\"" "$f" > "$f.tmp" || true; mv "$f.tmp" "$f"
-  try "$label" busy "$@" --label "$label" --out "$f" > /dev/null
 }
 
 if want build; then
   busy cargo build --release --example pdp_ps7 2>&1 | tee "$OUT/build.log"
   sha256sum "$BIN" > "$OUT/binary_hash.txt"
-  { echo "date_utc: $(date -u +%FT%TZ)";
-    echo "tree: origin/main $PS7_MAIN_SHA plus the PS-7 files (examples/pdp_ps7, research/pdp_oracle_speedup_20261011/ps7_cdcl, tools/plot_ps7.py, PLAN.md row)";
+  { echo "date_utc: $(date -u +%FT%TZ)"; echo "branch: $(git branch --show-current)"; echo "head: $(git rev-parse HEAD)";
+    echo "base_ps2: $(git rev-parse exp/pdp-ps2-scalar)";
     echo "sat.rs blob: $(git hash-object src/cryptanalysis/sat.rs)"; echo "sat_hooked.rs sha256: $(sha256sum examples/pdp_ps7/sat_hooked.rs | cut -d' ' -f1)";
-    echo "semaev_decomp.rs blob: $(git hash-object src/cryptanalysis/semaev_decomp.rs)";
     echo "rustc: $(rustc --version)"; echo "cargo: $(cargo --version)"; echo "uname: $(uname -a)";
     lscpu | grep -E 'Model name|^CPU\(s\)|Thread|L1d|L2|L3|Flags' | sed 's/^/lscpu: /'; free -m | sed 's/^/free: /'; } > "$OUT/host_revision.txt"
   examples/pdp_ps7/gen_sat_hooked.sh --check | tee -a "$OUT/host_revision.txt"
@@ -83,40 +74,42 @@ fi
 
 if want countcheck; then   # instrumented field-operation counters (a second build, feature pdp-opcount) against the harness' counts
   OPBIN=${PS7_OPTARGET:-target/ps7op}/release/examples/pdp_ps7
-  if CARGO_TARGET_DIR=${PS7_OPTARGET:-target/ps7op} busy cargo build --release --example pdp_ps7 --features pdp-opcount 2>&1 | tail -n 12 > "$OUT/build_opcount.log" && [ -x "$OPBIN" ]; then
-    sha256sum "$OPBIN" > "$OUT/binary_hash_opcount.txt"
-    : > "$OUT/count_check.jsonl"
-    for l in $RUNGS; do
-      try countcheck-$l busy "$OPBIN" count-check --l "$l" --corpus "$C/corpus_l$l.txt" --targets 2 >> "$OUT/count_check.jsonl"
-    done
-  else
-    echo "$(date -u +%FT%TZ) FAILED: countcheck build (see build_opcount.log)" >> "$OUT/failures.log"; FAIL=1
-  fi
+  CARGO_TARGET_DIR=${PS7_OPTARGET:-target/ps7op} busy cargo build --release --example pdp_ps7 --features pdp-opcount 2>&1 | tail -n 5
+  sha256sum "$OPBIN" > "$OUT/binary_hash_opcount.txt"
+  : > "$OUT/count_check.jsonl"
+  for l in $RUNGS; do
+    try countcheck-$l busy "$OPBIN" count-check --l "$l" --corpus "$C/corpus_l$l.txt" --targets 2 >> "$OUT/count_check.jsonl"
+  done
 fi
 
 if want counts; then   # first model / refutation, accounting on; the counted unit
   for l in $RUNGS; do
+    : > "$OUT/counts_l$l.jsonl"
     for arm in $ALL_ARMS; do
-      run_arm "$OUT/counts_l$l.jsonl" "counts-$arm-l$l" "$BIN" run --arm "$arm" --l "$l" --corpus "$C/corpus_l$l.txt" --gates "$GATES" --targets 16
+      try counts-$arm-$l busy "$BIN" run --arm "$arm" --l "$l" --corpus "$C/corpus_l$l.txt" --gates "$GATES" --targets 16 \
+        --label "counts-$arm-l$l" --out "$OUT/counts_l$l.jsonl" > /dev/null
     done
   done
 fi
 
 if want verify; then   # every model, blocking clauses: the full root set against the PS-0 corpus
   for l in $RUNGS; do
+    : > "$OUT/verify_l$l.jsonl"
     for arm in $ALL_ARMS; do
-      run_arm "$OUT/verify_l$l.jsonl" "verify-$arm-l$l" "$BIN" run --arm "$arm" --l "$l" --corpus "$C/corpus_l$l.txt" --gates "$GATES" --targets 16 --all
+      try verify-$arm-$l busy "$BIN" run --arm "$arm" --l "$l" --corpus "$C/corpus_l$l.txt" --gates "$GATES" --targets 16 --all \
+        --label "verify-$arm-l$l" --out "$OUT/verify_l$l.jsonl" > /dev/null
     done
   done
 fi
 
 if want reg; then
+  : > "$OUT/reg_counts.jsonl"; : > "$OUT/reg_verify.jsonl"; : > "$OUT/reg_group.jsonl"
   for arm in $ALL_ARMS; do
-    run_arm "$OUT/reg_counts.jsonl" "reg-$arm" "$BIN" reg --arm "$arm" --leaf quartic
-    run_arm "$OUT/reg_verify.jsonl" "regv-$arm" "$BIN" reg --arm "$arm" --leaf quartic --all
+    try reg-$arm busy "$BIN" reg --arm "$arm" --leaf quartic --label "reg-$arm" --out "$OUT/reg_counts.jsonl" > /dev/null
+    try regv-$arm busy "$BIN" reg --arm "$arm" --leaf quartic --all --label "regv-$arm" --out "$OUT/reg_verify.jsonl" > /dev/null
   done
   for arm in a1 a1u a2 a2l a3; do
-    run_arm "$OUT/reg_group.jsonl" "regg-$arm" "$BIN" reg --arm "$arm" --leaf group
+    try regg-$arm busy "$BIN" reg --arm "$arm" --leaf group --label "regg-$arm" --out "$OUT/reg_group.jsonl" > /dev/null
   done
 fi
 
