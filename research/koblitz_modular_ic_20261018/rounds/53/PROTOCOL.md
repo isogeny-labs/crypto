@@ -150,3 +150,17 @@ constant equation. When equal,save both full inclusion products. In the
 descended two-variable ring,measure dimension,Jacobian unit and quartic
 membership;save full witnesses and basis. This distinguishes the ordinary
 F32fiber from the actual twisted fiber rather than identifying them silently.
+
+## Compact residual clarification,frozen before execution
+
+Supersingular53-01accepted:generic/actual ordinary/descended algebras have
+dimension16and Jacobian unit;full descent and rectangular4x4basis pass.
+The compactN=0prediction failed:both generic and actual N are nonzero.
+COMPACTFIBER53reads that retained certificate and original universal
+polynomials,requires the observed source shape G=Q4,Nnonzero and nfree,
+then computes gcd(G,N),its exact Qexponent and the quotient dimension.
+Save both full ideal products identifying (G,N)with the principal gcd ideal.
+Factor N to explain the failed prediction. Gcd exponent and dimension are
+outcomes,not prescribed success values. Same limits/serialization;no accepted
+producer rerun,no coefficient boxes. The twist leaves compactN unchanged at
+A0because its ncoefficient vanishes;original QR twist remains distinct.
