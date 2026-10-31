@@ -1,0 +1,17 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "m=4 two-plus-two MITM on the isolated lab",
+  "description": "The m = 4 arity that rootfind-mitm (m = 3) and pkm-semaev (m <= 3) do not cover, priced against matched rho on the same prime curves. Isolation and correctness measurement, not a security claim.",
+  "workloads": {
+    "curves": [
+      { "kind": "prime_search", "bits": 20, "seed": 59297 }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 20261002
+  },
+  "arms": [
+    { "name": "rho-neg", "role": "reference", "method": { "id": "rho.negation" } },
+    { "name": "m4-mitm", "role": "candidate", "method": { "id": "ic.pipeline", "params": { "factor_base": "prime-abscissa:size=32", "oracle": "m4-mitm" } } }
+  ],
+  "measurement": { "rounds": 5, "warmup": 1, "order": "alternate", "seed": 1, "isolation_required": "L2", "timeout_seconds": 300 }
+}

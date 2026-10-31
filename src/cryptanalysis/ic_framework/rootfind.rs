@@ -287,6 +287,104 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindMitmOracle<G::Elt> {
     }
 }
 
+/// The `m4-mitm` oracle: two-plus-two meet-in-the-middle over a full pair
+/// table.  `R = P_i + P_j + P_k + P_l` is found by taking every pair sum
+/// `S = P_i + P_j`, forming `R - S` and probing it in the same table.  Two
+/// group additions per pair are charged (the pair sum and the difference),
+/// plus the table build; the search covers the m = 4 arity that
+/// `rootfind-mitm` (m = 3) and `pkm-semaev` (m <= 3) do not.
+pub struct M4MitmOracle {
+    table: Option<PairTable>,
+}
+
+impl M4MitmOracle {
+    pub fn new() -> Self {
+        Self { table: None }
+    }
+}
+
+impl Default for M4MitmOracle {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<G: PairedAdd> DecompositionOracle<G> for M4MitmOracle {
+    fn name(&self) -> &str {
+        "m4-mitm"
+    }
+
+    fn summands(&self) -> u32 {
+        4
+    }
+
+    fn describe(&self, _params: &Params) -> String {
+        "two-plus-two meet-in-the-middle over a full pair table: every pair sum P_i + P_j, \
+         then R - (P_i + P_j) probed in the same table (m = 4)"
+            .to_string()
+    }
+
+    fn prepare(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        _params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        let table = PairTable::build(ctx.group, fb);
+        ops.merge(table.build_ops);
+        self.table = Some(table);
+        Ok(())
+    }
+
+    fn setup_native(&self) -> BTreeMap<String, u64> {
+        let mut counts = BTreeMap::new();
+        if let Some(table) = &self.table {
+            counts.insert("pair_table_entries".into(), table.entries);
+        }
+        counts
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        let mut out = self
+            .table
+            .as_ref()
+            .map(PairTable::work_counters)
+            .unwrap_or_default();
+        out.insert("counted:table_insert_attempts".to_string(), 1);
+        out
+    }
+
+    fn decompose(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: G::Elt,
+    ) -> Option<Vec<usize>> {
+        let g = ctx.group;
+        let table = self.table.as_ref()?;
+        let n = fb.points.len();
+        for i in 0..n {
+            for j in i..n {
+                let s = g.add(ops, fb.points[i], fb.points[j]);
+                if g.is_identity(&s) {
+                    continue;
+                }
+                let d = g.add(ops, point, g.neg(s));
+                if g.is_identity(&d) {
+                    continue;
+                }
+                if let Some((k, l)) = table.probe(g, fb, ops, &mut counters.lookups, d) {
+                    return Some(vec![i, j, k, l]);
+                }
+            }
+        }
+        None
+    }
+}
+
 /// The `rootfind-pairs` oracle: the memoryless three-summand search.
 pub struct RootfindPairsOracle<E> {
     m: u32,

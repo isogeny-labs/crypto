@@ -70,7 +70,7 @@ use crate::cryptanalysis::ic_framework::plugins::{
     SubtractOracle,
 };
 use crate::cryptanalysis::ic_framework::prime_tower::{PrimeIsogenyBase, PrimeKummerBase};
-use crate::cryptanalysis::ic_framework::rootfind::{RootfindMitmOracle, RootfindPairsOracle};
+use crate::cryptanalysis::ic_framework::rootfind::{M4MitmOracle, RootfindMitmOracle, RootfindPairsOracle};
 use crate::cryptanalysis::ic_framework::shared_rank::{
     run_shared_rank_targets, SharedRankSpec, SharedTargetSpec,
 };
@@ -5397,6 +5397,7 @@ fn solve_ic_prime(
     let mut prime_blocked = PrimeBatchMitmOracle::blocked();
     let mut mitm_fiber = FiberMitmOracle::new(ms);
     let mut rootfind_mitm = RootfindMitmOracle::new(ms);
+    let mut m4_mitm = M4MitmOracle::new();
     let mut rootfind_pairs = RootfindPairsOracle::new(ms);
     let mut rootfind = RootfindSubtractOracle::new(ms, inst);
     // `pkm-semaev` writes its system on the base's own tower, so it reads
@@ -5428,6 +5429,7 @@ fn solve_ic_prime(
         "mitm-prime-blocked" => &mut prime_blocked,
         "mitm-fiber" => &mut mitm_fiber,
         "rootfind-mitm" => &mut rootfind_mitm,
+        "m4-mitm" => &mut m4_mitm,
         "rootfind-pairs" => &mut rootfind_pairs,
         "rootfind-subtract" => &mut rootfind,
         other => return Err(format!("oracle `{other}` does not run on a prime curve")),
