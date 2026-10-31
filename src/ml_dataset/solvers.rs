@@ -6215,7 +6215,14 @@ mod verified_worker_original_tests {
     }
     impl Drop for Fixture {
         fn drop(&mut self) {
-            let _ = fs::remove_dir_all(&self.root);
+            if std::thread::panicking() {
+                eprintln!(
+                    "preserved failed verified-worker fixture: {}",
+                    self.root.display()
+                );
+            } else {
+                let _ = fs::remove_dir_all(&self.root);
+            }
         }
     }
     #[test]

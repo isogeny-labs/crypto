@@ -11308,6 +11308,21 @@ pub(super) fn run_verified_worker_entry(
     let mut delivery_complete = false;
     let mut canonical_complete = false;
     let mut retention_failed = false;
+    // Fixed-size diagnostics use the already admitted output assembly allowance.
+    // They report the parent interval; never overwrite producer first_stop.
+    #[derive(serde::Serialize)]
+    struct FailedParentStorage {
+        logical_path: &'static str,
+        payload_bytes: u64,
+        quote: RetentionQuote,
+        ledger_after_attempt: SavedBudgetLedger,
+        remaining_shared_work_after_attempt: Option<u64>,
+    }
+    const _: () = assert!(std::mem::size_of::<FailedParentStorage>() <= 512);
+    let mut parent_retention_stop = None;
+    let mut parent_owner_transfer_stop = None;
+    let mut parent_delivery_stop = None;
+    let mut failed_parent_storage = None;
     // Never return Err after producer entry: acknowledged roots must reach the
     // worker even when another phase, final event, or capture finish fails.
     if let Ok(math) = decode_verified_worker_math(original, &mut budget) {
@@ -11349,6 +11364,7 @@ pub(super) fn run_verified_worker_entry(
             Ok(mut parent) => {
                 let taken = take_parent_artifacts(&mut run, &mut parent);
                 retention_failed |= taken.error.is_some() || taken.stop.is_some();
+                parent_owner_transfer_stop = taken.stop.or(taken.error);
                 if let Some(mut owners) = taken.value {
                     if persist_parent_artifacts(
                         &mut owners,
@@ -11361,6 +11377,28 @@ pub(super) fn run_verified_worker_entry(
                     {
                         retention_failed = true;
                     }
+                    parent_retention_stop = owners.retention_stop.or(parent.stop);
+                    if parent_retention_stop.is_some() {
+                        failed_parent_storage = owners
+                            .items
+                            .iter()
+                            .find(|item| item.storage_attempted && item.root_artifact.is_none())
+                            .and_then(|item| {
+                                item.storage_quote.map(|quote| FailedParentStorage {
+                                    logical_path: item.logical_path,
+                                    payload_bytes: item.payload.bytes.len() as u64,
+                                    quote,
+                                    ledger_after_attempt: parent.budget.saved_ledger(),
+                                    remaining_shared_work_after_attempt: parent
+                                        .budget
+                                        .native_work_limit
+                                        .checked_sub(parent.budget.native.work)
+                                        .and_then(|work| {
+                                            work.checked_sub(parent.budget.checking_work)
+                                        }),
+                                })
+                            });
+                    }
                     delivery_complete = owners.retention_stop.is_none()
                         && parent.stop.is_none()
                         && owners.persistence_error.is_none()
@@ -11369,10 +11407,8 @@ pub(super) fn run_verified_worker_entry(
                             .items
                             .iter()
                             .all(|a| a.capture_acknowledged && a.root_artifact.is_some());
-                    if delivery
-                        .finish(&owners, &parent, binding, original.root)
-                        .is_err()
-                    {
+                    if let Err(stop) = delivery.finish(&owners, &parent, binding, original.root) {
+                        parent_delivery_stop = Some(stop);
                         retention_failed = true;
                     }
                     for item in &mut owners.items {
@@ -11382,7 +11418,10 @@ pub(super) fn run_verified_worker_entry(
                     }
                 }
             }
-            Err(_) => retention_failed = true,
+            Err(stop) => {
+                parent_retention_stop = Some(stop);
+                retention_failed = true;
+            }
         }
         // Owner admission may fail after original input storage. Preserve the
         // acknowledged original root even though no parent record was emitted.
@@ -11434,6 +11473,11 @@ pub(super) fn run_verified_worker_entry(
         "performed_group_additions":ledger.group_additions,
         "first_stop":ledger.first_stop,
         "parent_delivery_complete":delivery_complete,
+        "parent_retention_stop":parent_retention_stop,
+        "parent_owner_transfer_stop":parent_owner_transfer_stop,
+        "parent_delivery_stop":parent_delivery_stop,
+        "failed_parent_storage":failed_parent_storage,
+        "parent_diagnostic_scope":"actual parent attempt identity and modeled reservation; producer first_stop unchanged",
         "unregistered_root_acknowledgements":&rejected_roots
     });
     if retention_failed || receipt_rejected {
@@ -12729,6 +12773,14 @@ mod positive_original_bound_worker_tests {
                     registry.push(a);
                 }
                 assert_eq!(data.outcome["retained_pdp_witness_verified"], true);
+                assert_eq!(data.outcome["parent_retention_stop"], json!(Stop::Observer));
+                assert_eq!(
+                    data.outcome["failed_parent_storage"]["logical_path"],
+                    "pdp-witness.json"
+                );
+                assert!(data.outcome["parent_owner_transfer_stop"].is_null());
+                assert!(data.outcome["parent_delivery_stop"].is_null());
+                assert!(data.outcome["first_stop"].is_null());
                 assert_eq!(data.outcome["pdp_witness_verified"], false);
                 assert_eq!(data.outcome["certificate_durably_persisted"], false);
                 assert_eq!(data.outcome["solver_completed"], false);
