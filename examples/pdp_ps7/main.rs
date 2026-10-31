@@ -874,9 +874,18 @@ fn cmd_summarize(args: &[String]) {
             } else {
                 "refuted"
             };
+            // The record's own `leaf` field holds the counts object; the kind of leaf is in the run label.
+            let label = v["label"].as_str().unwrap_or("");
+            let leaf_kind = if label.starts_with("regg-") {
+                "group"
+            } else if label.starts_with("reg") {
+                "quartic"
+            } else {
+                "group"
+            };
             let key = (
                 set,
-                v["leaf"].as_str().unwrap_or("").to_string(),
+                leaf_kind.to_string(),
                 v["arm"].as_str().unwrap().to_string(),
                 class.to_string(),
             );
@@ -929,6 +938,20 @@ fn cmd_summarize(args: &[String]) {
                 "conflicts_over_pairs".into(),
                 ratio(sum("conflicts"), sum("pairs_total")),
             );
+            let learned_json = if arm.as_str() == "a2p" {
+                sum("theory_refuted")
+            } else {
+                sum("conflicts")
+            };
+            row.insert("learned_clauses".into(), json!(learned_json));
+            row.insert(
+                "pairs_per_learned".into(),
+                ratio(sum("pairs_total"), learned_json),
+            );
+            row.insert(
+                "saved_per_learned".into(),
+                ratio(sum("pairs_saved"), learned_json),
+            );
             row.insert(
                 "pairs_per_conflict".into(),
                 ratio(sum("pairs_total"), sum("conflicts")),
@@ -940,12 +963,17 @@ fn cmd_summarize(args: &[String]) {
             writeln!(f, "{}", Value::Object(row)).unwrap();
         }
     }
-    println!("| set | leaf | arm | class | targets | ok | pairs/target | leaves/target | saved/target | conflicts/target | learned/target | saved per learned | cube per learned | marginal per learned | shorter than pair | leaf bitops/target | shell bitops/target | total bitops/target | ms/target |");
-    println!("|:--|:--|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|");
+    println!("| set | leaf | arm | class | targets | ok | pairs/target | leaves/target | saved/target | conflicts/target | learned/target | pairs per learned | saved per learned | cube per learned | marginal per learned | shorter than pair | leaf bitops/target | shell bitops/target | total bitops/target | ms/target |");
+    println!("|:--|:--|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|");
     for ((set, leaf, arm, class), g) in &groups {
         let n = g.n as f64;
         let s = |k: &str| g.sums.get(k).copied().unwrap_or(0.0);
-        let learned = s("conflicts");
+        // Learned clauses: one per analysed conflict; the bare-guard encoding analyses none and installs one guard per refuted pair.
+        let learned = if arm.as_str() == "a2p" {
+            s("theory_refuted")
+        } else {
+            s("conflicts")
+        };
         let per = |a: f64, b: f64| {
             if b > 0.0 {
                 format!("{:.3}", a / b)
@@ -954,7 +982,7 @@ fn cmd_summarize(args: &[String]) {
             }
         };
         println!(
-            "| {set} | {leaf} | {arm} | {class} | {} | {} | {:.1} | {:.1} | {:.1} | {:.1} | {:.1} | {} | {} | {} | {:.0} | {:.0} | {:.0} | {:.0} | {:.2} |",
+            "| {set} | {leaf} | {arm} | {class} | {} | {} | {:.1} | {:.1} | {:.1} | {:.1} | {:.1} | {} | {} | {} | {} | {:.0} | {:.0} | {:.0} | {:.0} | {:.2} |",
             g.n,
             g.ok,
             s("pairs_total") / n,
@@ -962,6 +990,7 @@ fn cmd_summarize(args: &[String]) {
             s("pairs_saved") / n,
             s("conflicts") / n,
             learned / n,
+            per(s("pairs_total"), learned),
             per(s("pairs_saved"), learned),
             per(s("acct_cube"), s("acct_pair_only")),
             per(s("acct_marginal"), s("acct_pair_only")),
