@@ -21,3 +21,17 @@ Controls cover both engines, exact canonical bytes, absent duplicate payload, ac
 ## Validation and next gate
 
 Compilation and scoped runtime validation are pending at this commit. Earlier wider-worker failures remain evidence; no completion is inferred from this design. Run the unchanged Koblitz suite, preserve any failing fixtures and exact remaining-work diagnosis, and check canonical/partial central replay. Full-library, CLI and scientific cloud dataset gates remain pending. No new cloud jobs or generation budget renewal occurred.
+
+## Terminal validation, 2026-10-31
+
+Source 8708d456d3e13f5501c3f1e92ecf7442168470f3 completed the scoped Koblitz release suite: 135 passed, 2 failed, 0 ignored, exit101. All seven source snapshot hashes still matched after the run. The original session51143 was observed live through a long period of host contention; increasing rustc CPU counters and running LTO threads confirmed progress, so no duplicate build was launched.
+
+All new projection controls and all four terminal-cap controls passed. The four positive original-bound F4/F5/plain/twist witness controls now pass their explicit assertion that parent storage reaches the intended witness root collision. Earlier Work refusal had prevented that collision from being exercised; this result fixes that coverage gap without changing the cells or limits.
+
+The two frozen wide tests still fail on their first n47/F4/plain cell. Native work4605360 and checking9232450 leave2939406 of original16777216 modeled work; the first parent native-events storage quote is3282368 for100526bytes. All192group additions completed, producer first_stop is null, and capture finalization acknowledges both event and finish. Parent retention is Work; ordinary completion remains false. The failing fixtures are retained at /tmp/verified-worker-3429243-1793461585177207015 and /tmp/verified-worker-3429243-1793461585621342467. Later cells in those test functions were not reached.
+
+Full terminal logs, exact source receipt and both restricted raw fixtures were uploaded and freshly downloaded with all hashes verified:
+
+s3://setec-astronomy-artifacts/ml-dataset/20261031/validation/koblitz-projection-terminal-failure/d02d96f8d31fe7e2a772e794700e390ccd92f04e3fc40303d087219a50c7d46c/checkpoint.tar.gz
+
+The next candidates remain external: a closed-constructor terminal bound tighter than the generic32KiB envelope, and exact native lengths with a single serialization pass and explicitly charged length calculator. No further reservation reduction is accepted merely because it would make a test pass. Full-library/CLI gates and scientific dataset production remain pending. POST_M3_ROADMAP.md records current capabilities/export drift and all retained corpus axes.
