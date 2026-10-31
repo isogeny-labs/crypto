@@ -1,5 +1,9 @@
 # Matched affine-query recovery comparison
 
+Completed V1: all 12 recoveries verified on one RTX 4090. See [results](RESULTS.md)
+for the per-input timings, matched controls and complete evidence. The large-target
+effect was mixed, so affine subtraction remains opt-in.
+
 Specialize the full-cache point subtraction while preserving all inputs,
 ordinary affine storage, hashing, table layouts, normalization, search minima,
 resource limits and certificate semantics. See

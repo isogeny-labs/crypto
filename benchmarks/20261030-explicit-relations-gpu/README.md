@@ -79,3 +79,15 @@ larger-base controls. This panel measures completion of the prescribed rung,
 not a global hardware maximum. Exact10-cell coverage passes; the canonical
 rectangular checker retains five findings. External comparison: not run in
 this configuration/admission panel. All earlier outcomes remain unchanged.
+
+The [affine-subtraction comparison](../../research/explicit_relations_affine_20261030/RESULTS.md)
+completed all 12 recoveries on one RTX 4090. Certificates and relation/query
+counts agree across both formulas and baseline repeats. The two 52-bit targets
+used 3.00% and 1.47% less cold solve time; the two 63-bit targets used 0.31% more
+and 1.37% less time. These are per-input L0 descriptions, not a uniform gain.
+The [two-page PDF](affine-v1-report.pdf), [SVG](affine-v1-scaling.svg), and
+[150-dpi PNG](affine-v1-scaling.png) retain every execution. Both pages were
+visually inspected after raw commit `c79bd38363f9` was pushed. Canonical schema
+and coverage checks passed with zero findings. Formula remains opt-in; next
+measure the costs within relation queries. No external-tool timing arm was
+prescribed for this formula-only comparison. Earlier records are unchanged.
