@@ -4,8 +4,8 @@
  "what_this_is": "A searchable index of the curves, methods, factor bases, candidate identities, tournament rounds and ecbench sessions this repository names, joined on the identities it already computes (ICV1 slugs, EC1 aliases, ECM1 method ids, FB1 factor-base ids, IC1 candidate ids). Every figure is quoted from a committed file named in `sources` or in the row; nothing is computed here beyond means over a session's own verified runs.",
  "counts": {
   "curves": 20844,
-  "cover_assessed": 20819,
-  "cover_unassessed": 25,
+  "cover_assessed": 20844,
+  "cover_unassessed": 0,
   "methods": 220,
   "factor_bases": 677,
   "candidates": 277,
@@ -16,8 +16,8 @@
  },
  "sources": {
   "docs/curves/registry.json": "6077a525a6ef0d692856fb02c16c8f8828c4f472a4bafdcdc4e67b0f2d146165",
-  "docs/curves/covers.json": "c4368a8673abafc7419a33731d13458f2710987090452d10b6a92609d6f57a61",
-  "docs/curves/cover-links.yaml": "9b92be448f72c2f5244064627f85c5eba2f6e03c98501019c650e32904350301",
+  "docs/curves/covers.json": "c50892fc377eb1c364969fbafc79933b08e5f9a6ef77ca03c239fb925d09ee23",
+  "docs/curves/cover-links.yaml": "65895b1111ff265d980b278ffc7fec671391d5e382fd0f5233bfa28e7a43dbba",
   "docs/curves/standards/coverage.json": "80cb0d6d5400904a34115be076d7463f5adf9ad0b40ffc2ce92f741a16985f56",
   "docs/ic/leaderboard.json": "9315ec956d190d4ea67b50a28ae8080def6ee2e89f713f18cfb08364f56a3c1c",
   "store/index.json": "9eb88295b5cc8ad1d14c276aa9162ebe645b5b7575fb5e44d8399d5f767ef841",
@@ -33086,8 +33086,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x2",
+      "0x0",
+      "0x2",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "a77cc6af177e2c7c940e01071c54562da5959666c430d7f6ab7555f32930380d",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp5-tm1-a77cc6af",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:f5106c4c186e8e7a180a5a44c108bcd85c5e4e66950bcd7ff001bb30e9c668ad",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:33909ba4b30752ea80c4efae6df524c1b8c592f016d15338eb16cd68d4bf2033",
+     "cover_id": "HC1G2hf5106c4c186e",
+     "map_id": "CV1D2h33909ba4b307"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -55357,8 +55403,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x48b13",
+      "0x0",
+      "0x305f5",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "bf1bb5fdd47706bc61da991a40e0453ef5d65efbcda93b6e9aee93ab293c046c",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp20-tm1079-bf1bb5fd",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:699e65fcb840efcd447b80037c24bafbacc8ef3c1a2ca20cb8618671943e8081",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:6605f9adb85c3f4c1b84cc17b9b0d5c3d1a5b28d3ca51223ef7cf232fc0b19c1",
+     "cover_id": "HC1G2h699e65fcb840",
+     "map_id": "CV1D2h6605f9adb85c"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -55409,8 +55501,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x31342",
+      "0x0",
+      "0x5d4da",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "4efa604e6a4af3f67e503ffb944e42cb28b5757600466fef4cb66ff373400c5f",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp20-tm985-4efa604e",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:77b086c9a67c541c495b432ffa60ecf87a9c27f08d8759ed12a8a6249b4736a2",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:8674fe822f8b206203b280851eb2addd8039f37ff03a5840a9cbcd55138d700c",
+     "cover_id": "HC1G2h77b086c9a67c",
+     "map_id": "CV1D2h8674fe822f8b"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -55461,8 +55599,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x3eaf3",
+      "0x0",
+      "0x67805",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "f60a16c111cc4e2c375be0852ca6388287ce63dc5bc9843e3af6e96b7a5b69ed",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp20-t457-f60a16c1",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:8254403ee4a17e0771368b786ee8d61adc0d82eb4b24267f47282386ac13f194",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:66f7f76b06f3af784390ec40293ab03e4bb962eb0a13204c8444e4c17374d7cd",
+     "cover_id": "HC1G2h8254403ee4a1",
+     "map_id": "CV1D2h66f7f76b06f3"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -55789,8 +55973,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0xa20a4",
+      "0x0",
+      "0x601ea",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "c50333f60320d0f9ba8e33b3435d8fc78fb64fa638316d92b1f749cdc71ac6cc",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp20-tm1141-c50333f6",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:aac9c09c4b793e9ddbb28bcabbdd35099d2cdc15699b305280a91cf8cefa5543",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:31c3a0170c979bde7824c392180b3ad7cb8580b57613baeea0ae5df420e50d7a",
+     "cover_id": "HC1G2haac9c09c4b79",
+     "map_id": "CV1D2h31c3a0170c97"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -56852,8 +57082,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0xa9dd7",
+      "0x0",
+      "0x476f2",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "d852a6839db76db6b6178030620e85ab3aa4d91f9de84038306695bba748e8ff",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp20-t1239-d852a683",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:f94b81dbe32f1c4e5c08b5602c2e642354a3e598f27065bfb6083ca9889be94d",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:db225d142ca3574127b328b3b6ff000b0ba86317c153f1c42b00641723e4efbc",
+     "cover_id": "HC1G2hf94b81dbe32f",
+     "map_id": "CV1D2hdb225d142ca3"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -56904,8 +57180,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x8f23c",
+      "0x0",
+      "0xd9a7a",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "aef80152ad2e613316b79789c0608d5feac8ec590e03b126eef22d6581c55342",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp20-t375-aef80152",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:bd9e32de459e0c619e2fba1371fa1fd8a087c57f81d4742c24af1617ae7482cc",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:3e7480c3b161c40fbb52995095e974b5987cfff74acbf0aea3feead1b11bd0a8",
+     "cover_id": "HC1G2hbd9e32de459e",
+     "map_id": "CV1D2h3e7480c3b161"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -129488,8 +129810,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x95d3aa",
+      "0x0",
+      "0x7caf69",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "5e1820370d0e240dbe98ea79dcd83d9b0ecaee1647d320b2cc06fabef914cfe9",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp24-tm2615-5e182037",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:b55390adbc7b2f07ee16b394fb35500fd2bf9fccab4805556e3d9799f4231b36",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:503506ea2d72e86a2692b5b2217bada0cebfd4d66d86358266cbaa2bcc52060d",
+     "cover_id": "HC1G2hb55390adbc7b",
+     "map_id": "CV1D2h503506ea2d72"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -467229,8 +467597,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x8abb25",
+      "0x0",
+      "0xb2a47f",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "1a46dbd14909124bc49aed9efc60ca94c9304d964e000085695eb24dfcaf974a",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp24-tm3353-1a46dbd1",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:6f60c640bb0a6b90fbfefc6302839d9840ae127aa378c5badc2fc21f62b634b5",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:07f57b1f41346765a8dcfea5515328a21962515965bb261187edc30b871035f5",
+     "cover_id": "HC1G2h6f60c640bb0a",
+     "map_id": "CV1D2h07f57b1f4134"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -523729,8 +524143,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x1b6f36",
+      "0x0",
+      "0x78b9fc",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "1f48e65ccf2ff571c000be4fbdf9effe5d83adc145844ded7d3c59cdbfa67891",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp24-t5097-1f48e65c",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:87cf2f3010423d31c15313b8fd7e8c57094f0fd0e9d54d4b45b02fe1c6c5cd3f",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:d77959e8e50246b4efea9254f149920f48846a08575db67983ae480aa0f792e5",
+     "cover_id": "HC1G2h87cf2f301042",
+     "map_id": "CV1D2hd77959e8e502"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -620698,8 +621158,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x9b4f6a",
+      "0x0",
+      "0x7daa6",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "ba8f10138b31a354c28db565ae2e3466c25867a25ff513e4356310f7432fe3a2",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp24-tm3365-ba8f1013",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:8ed5a064ab3f2e0b32964b987036eaa3230f8c11be70dc79256040c07941c53a",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:56adbb65e535bf5a7cb852c991dd23604e61b0d30f02927c3032cced39479e29",
+     "cover_id": "HC1G2h8ed5a064ab3f",
+     "map_id": "CV1D2h56adbb65e535"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -644683,8 +645189,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x6ce15d",
+      "0x0",
+      "0x9c21d",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "63d6e400ca1b0095915b467941a5f5b4ceba277bb2bf2df595b51d683bb9041a",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp24-t3415-63d6e400",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:447a6c3017bdd91f23b326bd58e798119244a53a56c9faac22b5c6de15009f45",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:5c5a00cd99063716ec67aa44973210af7b7e3ff533ccac9d49b73e25aca108f5",
+     "cover_id": "HC1G2h447a6c3017bd",
+     "map_id": "CV1D2h5c5a00cd9906"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -746074,8 +746626,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x5de5ff",
+      "0x0",
+      "0x37d1e3",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "254f2c186d2a66c45ef1d5a866608c8fc0b290d528dd457e7b4a8f77b047dd4d",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp24-tm1215-254f2c18",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:4c37755283fba2cfadc37e1860b6c77f47f1cbd9e81de334457d5b0325a36808",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:3826408a4144c5a5ccdad63498f06637e99fc73d2050d7ded93c6577fdf0e87e",
+     "cover_id": "HC1G2h4c37755283fb",
+     "map_id": "CV1D2h3826408a4144"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -1662026,8 +1662624,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x3404a74",
+      "0x0",
+      "0x31577a6",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "0f58a032f26c83615fb41ef1f268feff4b7c0e87bcbdf1f5c15c6673ea8e86a6",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp28-tm5475-0f58a032",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:b0d8b637047fcb4ddf572490f3486a91aa73626c5830844ab2c98b949d7a62f2",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:65e9d7399aea0f2411052f0499debe5618f611a66bf84dd36d47f2dbe2bc7ab7",
+     "cover_id": "HC1G2hb0d8b637047f",
+     "map_id": "CV1D2h65e9d7399aea"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -1663565,8 +1664209,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x7a84ab9",
+      "0x0",
+      "0x8b7e2a8",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "8fb841e704953c211d6db3711f067767c02958e420d88554e0607b2ca207f140",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp28-t20259-8fb841e7",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:a7241d19465b30aa8a97c256764456ac4c6075c7d085cf07d25746c02dc97f16",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:2e8b5c02e8df40e21c65e09d1c66ffe187595970e6e2d73f3ad3f8b83c9a489b",
+     "cover_id": "HC1G2ha7241d19465b",
+     "map_id": "CV1D2h2e8b5c02e8df"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -1666346,8 +1667036,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0xd51bc",
+      "0x0",
+      "0x8bdffd9",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "108096540f3cf1a8f5cad8431f862506a520d4f6b5bd3aca1f3cbd602731354c",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp28-t2985-10809654",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:236dadbfee59d656dd2ccd5c4157a12b90dd6127f6bfe5c8e42d15669708d16d",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:38630f299bb6c5c0bf0d1ea46562f4419b2b8dac75831eb6f795821a45bdd33a",
+     "cover_id": "HC1G2h236dadbfee59",
+     "map_id": "CV1D2h38630f299bb6"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -1666676,8 +1667412,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x9922688",
+      "0x0",
+      "0xaefe541",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "dbe6b497ed22d2d539a0b44cbccd5b04c86fe9a75c810bd39cf43f6d01bc27ee",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp28-tm18917-dbe6b497",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:46ef975db1a37abf116dd321068aef7bde8b64ea9b9a6af83e5b3699779a0d22",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:2f2e72c04d51c32898dd0686dec38cac16dddbad9865ba54164fcff943cba9b2",
+     "cover_id": "HC1G2h46ef975db1a3",
+     "map_id": "CV1D2h2f2e72c04d51"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -1666728,8 +1667510,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x5104c63",
+      "0x0",
+      "0x8d6ae97",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "da5b26876c48f06123323693565a10187689b5c276f4b1f435a5640fe53b967d",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp28-t24271-da5b2687",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:8455961c1967ec53c6169eb370cdbb17d2ea8f172d664a105bc3ed0ccba15dcc",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:25555f6880a99f7148600d5a45ec67115855207ee2afd3c271de817d14e0f729",
+     "cover_id": "HC1G2h8455961c1967",
+     "map_id": "CV1D2h25555f6880a9"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -1666878,8 +1667706,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x70d95da",
+      "0x0",
+      "0xb1b4bd9",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "9e92c6c249db9a8b56f7821ee34686aee3a80f6b58f20dd52e73234e3100d3e1",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp28-t12791-9e92c6c2",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:6cc0fac926746fbc2d40b6307eaa306d5f3a2ab73c93ab0f62b2f54808bb5e23",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:f0a8ddfcb1827e06ec9c239c9cdee7a6175ce329729fdae81f5b32c4e0aac020",
+     "cover_id": "HC1G2h6cc0fac92674",
+     "map_id": "CV1D2hf0a8ddfcb182"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -1674584,8 +1675458,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x6a6230e",
+      "0x0",
+      "0x2c287503",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "e5f3e6f2b045ed598bdd4e08036708bb7983967d638bd8c59b80606ebbdb397f",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp32-tm70799-e5f3e6f2",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:c27593d97c333bd743ae163319e3af77e8823b79f40db1bea9358ed83d2d0096",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:a92d0eba61a95f98cf974d341c494c374b6ece65d737691b25765716e91e0e78",
+     "cover_id": "HC1G2hc27593d97c33",
+     "map_id": "CV1D2ha92d0eba61a9"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -1675271,8 +1676191,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0xa3922f5a",
+      "0x0",
+      "0x49d3fe7e",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "a5210489d43fd0fad5cec5b8b95bb7936fb681d3f99300e76694e883e180a4db",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp32-t8395-a5210489",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:cb90f6215a565978ef2b3b663300eedc4f2db91db1d0a9a7350901b119c056a4",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:a93f03a710f5b557ffb6d593a011d6a9619f6584325b418c38ffb09c50970f60",
+     "cover_id": "HC1G2hcb90f6215a56",
+     "map_id": "CV1D2ha93f03a710f5"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -1675421,8 +1676387,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x6a5d87dd",
+      "0x0",
+      "0x319e53eb",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "158f1cf72cd99fb32d6c072af671f70988101db9311dfc3573d15fc6c6dd38d9",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp32-tm30557-158f1cf7",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:a31c6018cc06e8f722a384f51848b57305563f2f2dece6494d3da04457363e5f",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:e597cbe664b09755cba0e136a21142465b083383ab531742e8bbdf32e1e89660",
+     "cover_id": "HC1G2ha31c6018cc06",
+     "map_id": "CV1D2he597cbe664b0"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -1675473,8 +1676485,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x28068a83",
+      "0x0",
+      "0x2a657450",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "af783d1f200de8c5c363cc42dafb67cd462962849b3c218c2837d34fff968ba1",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp32-tm14249-af783d1f",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:6caa3d88baea07060899b42d9e3bde26bc84ed5ac330ccf53f2d45e9883eaaaa",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:535f94da548a07ced61c8d23bfa08be0d1bfa93c11bca2f7e23bbab1542925a5",
+     "cover_id": "HC1G2h6caa3d88baea",
+     "map_id": "CV1D2h535f94da548a"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -1676174,8 +1677232,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x67b84e74",
+      "0x0",
+      "0xa2214ef2",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "b8d0558798a1a23c620a37b18264d29fe871f163800844a2ea58353b80a23f45",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp32-tm34607-b8d05587",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:84df7f3fe0b2ad973418baa1215a0d70def400b8d66fe40d6b7e63df50f070cf",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:82eae3949b8435c6dda77886c25a36a1c2aaf5fea46928270a5dfc1dec97cded",
+     "cover_id": "HC1G2h84df7f3fe0b2",
+     "map_id": "CV1D2h82eae3949b84"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
@@ -1676615,8 +1677719,54 @@
    "ecbench": [],
    "factor_bases": [],
    "tournament_cells": [],
-   "hyperelliptic_cover": null,
-   "cover_links": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x4d083c9",
+      "0x0",
+      "0x1f0c6811",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "7d108a606059259d7732e33f15794ce3647a3b4a2070102778534433749efcf9",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp32-t14279-7d108a60",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:cec09bfd5057167315ed0968a0ef8c1b60d2d5f06ce2e1588ceb7830bb23553f",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:b6191ee0d0d14deb1f1c2917fb0d1e1d259494be527e36589b6b36a608cc4393",
+     "cover_id": "HC1G2hcec09bfd5057",
+     "map_id": "CV1D2hb6191ee0d0d1"
+    }
+   ],
    "standards_provenance": [],
    "store_objects": []
   },
