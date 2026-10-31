@@ -48,10 +48,11 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--native-root", type=Path, required=True)
     ap.add_argument("--tooling", type=Path, required=True, help="Pinned official experiment_protocol.py")
+    ap.add_argument("--native-root-v2", type=Path, required=True)
     args = ap.parse_args()
     base = Path(__file__).resolve().parent
-    protocol = read(base / "protocol.json")
-    plan = read(base / "plan.json")
+    protocol = read(base / "protocol-v2.json")
+    plan = read(base / "plan-v2.json")
     if protocol["freeze"]["status"] != "frozen" or len(protocol["arms"]) != 4:
         raise RuntimeError("unexpected frozen protocol")
     if plan.get("schema") is None:
@@ -63,7 +64,7 @@ def main():
     rows = []
     source = []
     for i in range(16):
-        shard = args.native_root / f"shard-{i:02d}"
+        shard = (args.native_root if i < 11 else args.native_root_v2) / f"shard-{i:02d}"
         status_path = shard / "local-status.json"
         receipt_path = shard / "runner/receipt.json"
         manifest_path = shard / f"runner/attempt/cells/{i:012d}/manifest.json"
@@ -77,6 +78,10 @@ def main():
         assert pointer["index"] == i and pointer["custody"]["index"] == i
         assert pointer["published"]["archive_fresh_get"] and pointer["published"]["pointer_fresh_get"]
         assert pointer["custody"]["archive_sha256"] == pointer["published"]["archive_sha256"]
+        expected_protocol = base / ("protocol.json" if i < 11 else "protocol-v2.json")
+        expected_plan = base / ("plan.json" if i < 11 else "plan-v2.json")
+        assert pointer["custody"]["protocol_file_sha256"] == digest(expected_protocol)
+        assert pointer["custody"]["plan_file_sha256"] == digest(expected_plan)
         assert receipt["binary_sha256_before"] == receipt["binary_sha256_after"] == arms[arm]["instrument"]["binary_sha256"]
         assert receipt["source_commit"] == arms[arm]["instrument"]["commit"]
         assert receipt["exit_code"] == 0 and not receipt["timed_out"]
@@ -95,7 +100,7 @@ def main():
             export_status, verification = "succeeded", "verified"
             counted = {"sealed-cell-verified": 1, "independent-ecdlp-solve": 1}
         else:
-            assert solver == "bsgs" and native_status == "timeout" and i in (1, 11)
+            raise RuntimeError(f"unexpected binary BSGS outcome at index {i}: {native_status}")
             assert status["ecdlp_solve_promoted"] is False and status["independently_solved_ecdlp_cells"] == 0
             export_status, verification = "timeout", "no_claim"
             counted = {"sealed-cell-verified": 1, "independent-ecdlp-solve": 0}
@@ -118,14 +123,14 @@ def main():
     rows_path = base / "experiment-rows.jsonl"
     rows_bytes = b"".join((json.dumps(r, sort_keys=True, ensure_ascii=False, allow_nan=False) + "\n").encode() for r in rows)
     write_once_or_equal(rows_path, rows_bytes)
-    export = tooling.from_rows(rows_path, protocol, "protocol.json", "binary23-root-bsgs-16-20261031", {})
+    export = tooling.from_rows(rows_path, protocol, "protocol-v2.json", "binary23-root-bsgs-16-20261031", {})
     export["created"] = read(base / "TERMINAL-01.json")["observed_at_utc"]
-    export["producer"] = {"runtime": "codex_cli", "model": None, "session": "T-1066", "role": "executor"}
+    export["producer"] = {"runtime": "codex_cli", "model": None, "session": "T-1076", "role": "executor"}
     export["source"] = {"repo": protocol["repository"], "commit": protocol["arms"][0]["instrument"]["commit"], "dirty": False}
     export["backend"] = "local"
     export["arms"] = [{"id": a["id"], "role": a["role"], "binary_sha256": a["instrument"]["binary_sha256"], "commit": a["instrument"]["commit"]} for a in protocol["arms"]]
     export["files"].extend(file_entry(base, base / name, kind) for name, kind in (
-        ("protocol.json", "protocol"), ("plan.json", "raw"), ("TERMINAL-01.json", "receipt"),
+        ("protocol.json", "protocol"), ("plan.json", "raw"), ("protocol-v2.json", "protocol"), ("plan-v2.json", "raw"), ("STORAGE-STOP-01.json", "receipt"), ("TERMINAL-01.json", "receipt"),
         ("AUDIT-01.json", "summary"), ("make_experiment_export.py", "other")))
     for row, (receipt, outcome, pointer_path) in zip(export["runs"], source):
         row["verification"]["verifier"] = "crypto dataset verify; root certificates or scalar replay only where promoted"
@@ -141,13 +146,13 @@ def main():
         row["isolation"]["tier"] = "none"
     export["flow"] = tooling.compute_flow(export["runs"])
     export["notes"] = [
-        {"kind": "observation", "text": "All 16 native generate commands exited zero, retained sealed manifests and passed dataset verify; two inner BSGS workers timed out at indices 1 and 11.", "by": "deterministic receipt projection"},
-        {"kind": "observation", "text": "Eight root outcomes are native partial with completed distinct-root certificates, no positive PDP witness and no scalar-recovery label. Six BSGS outcomes have independently replayed scalars.", "by": "deterministic receipt projection"},
-        {"kind": "observation", "text": "Observed wrapper nanoseconds are retained as diagnostic counters; native receipts mark their clocks invalid for comparison. Worker retired instruction counts are unavailable.", "by": "deterministic receipt projection"},
+        {"kind": "observation", "text": "All 16 frozen mixed-radix indices have one native generate attempt, sealed manifest and native verification. Indices 0..10 bind the v1 protocol and plan; after the first XFS fell below its 4 GiB gate, indices 11..15 bind the prospective v2 storage amendment and second XFS.", "by": "deterministic receipt projection"},
+        {"kind": "observation", "text": "Eight root outcomes are native partial with completed distinct-root certificates, no positive PDP witness and no scalar-recovery label. Eight BSGS outcomes have independently replayed scalars.", "by": "deterministic receipt projection"},
+        {"kind": "observation", "text": "Observed wrapper nanoseconds are diagnostic counters only; native receipts mark clocks invalid for comparison. Worker retired instruction counts are unavailable.", "by": "deterministic receipt projection"},
     ]
     export_path = base / "experiment-export.json"
     write_once_or_equal(export_path, encoded(export))
-    command = [sys.executable, str(args.tooling), "check-export", str(export_path), "--protocol", str(base / "protocol.json"), "--verify-files"]
+    command = [sys.executable, str(args.tooling), "check-export", str(export_path), "--protocol", str(base / "protocol-v2.json"), "--verify-files"]
     checked = subprocess.run(command, text=True, capture_output=True, check=False)
     if checked.returncode != 0:
         raise RuntimeError(f"official check-export failed ({checked.returncode}): {checked.stdout}{checked.stderr}")
