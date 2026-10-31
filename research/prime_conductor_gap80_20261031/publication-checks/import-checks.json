@@ -1,0 +1,35 @@
+{
+  "schema": "gap80-publication-integrity/v1",
+  "archive_sha256": "630e66aa7101ad0be6290e9e26acc969925e9ef07c488df20488370fee4a1e44",
+  "archive_bytes": 58863,
+  "frozen_manifest_checks": 55,
+  "parameters_summary_certificate_byte_identical": true,
+  "native_algorithm_files_byte_identical": [
+    "baseline.c",
+    "optimized.c",
+    "bench.c",
+    "check.c",
+    "search80.c",
+    "pari_verify.c"
+  ],
+  "portable_changes": [
+    "build script paths and configurable native prefix",
+    "GP output path and explicit replay of frozen certificate"
+  ],
+  "native_oracle_status": "pass: 96 direct-root and 96 rejection controls",
+  "pari_status": "pass: independent source/kernel checks and frozen certificate replay",
+  "admitted_benchmark_rows_unchanged": true,
+  "report_pdfs_inspected": [
+    "run-report: one page",
+    "results-report: one page"
+  ],
+  "cargo_test": {
+    "exit_status": 127,
+    "status": "unavailable: cargo not installed"
+  },
+  "conductor_check": {
+    "exit_status": 127,
+    "status": "unavailable: conductor not installed"
+  },
+  "scope": "Publishing integrity and native correctness checks; no new performance experiment"
+}
