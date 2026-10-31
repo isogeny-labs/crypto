@@ -1,0 +1,374 @@
+{
+  "amendments": [],
+  "analysis_plan": {
+    "blinded": false,
+    "frozen_before_data": true,
+    "inputs": [
+      "runner receipt.json",
+      "config bytes",
+      "clean-build receipt"
+    ],
+    "outputs": [
+      "exact terminal classification and command-scoped elapsed nanoseconds"
+    ],
+    "script": null
+  },
+  "arms": [
+    {
+      "description": "Native generate of frozen V1 plan shard62, one untwisted prime n23 m2 BSGS cell",
+      "id": "prime23-bsgs-generate",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "plan": "plan-bound-01.json",
+        "shard_index": 62,
+        "shard_count": 64,
+        "max_cases": 1,
+        "config_path": "arm-prime23-bsgs-config.json"
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Native generate of frozen V1 plan shard63, one twisted prime n23 m2 BSGS cell",
+      "id": "prime23-bsgs-twist-generate",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "plan": "plan-bound-01.json",
+        "shard_index": 63,
+        "shard_count": 64,
+        "max_cases": 1,
+        "config_path": "arm-prime23-bsgs-twist-config.json"
+      },
+      "role": "candidate"
+    }
+  ],
+  "authors": [
+    "ML dataset runtime-preflight development"
+  ],
+  "claims": [
+    {
+      "id": "two-cells",
+      "text": "The two selected native generate shards retain sealed cells and pass independent dataset verify on the same untwisted and twisted prime n23 m2 BSGS configurations.",
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ]
+    },
+    {
+      "id": "limited-scope",
+      "text": "This two-cell local pilot does not establish other sizes, arities, families, methods, cost scaling, instruction counts or cloud corpus coverage.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "controls": {
+    "aa": {
+      "comparison": null,
+      "not_applicable_reason": "Two absolute software generation checks; no method comparison or timing-effect claim.",
+      "present": false
+    },
+    "negative": {
+      "arm": null,
+      "not_applicable_reason": "Two fixed generated cells with no null-population inference.",
+      "null_population": null,
+      "present": false
+    },
+    "positive": {
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "The purpose is command-path runtime admission, not detector validation; solver outcome is retained without scientific promotion.",
+      "present": false
+    }
+  },
+  "created": "2026-10-30",
+  "decision_rule": {
+    "comparison_ids": [
+      "single-arm-receipt"
+    ],
+    "effect_size_measure": "Not applicable: no comparison",
+    "interval": "Not applicable: two exact generation cells, no inferential interval",
+    "multiple_comparison_correction": "none",
+    "statistic": "Exact receipt validation and terminal classification",
+    "text": "Retain every success, failure or timeout. Promote only cells whose sealed manifests independently verify; direct-worker durations inform planning only.",
+    "verdict_vocabulary": [
+      "completed",
+      "failed",
+      "timed_out",
+      "invalid_receipt"
+    ]
+  },
+  "execution": {
+    "backend": "local",
+    "checkpoint": {
+      "after_restore": {
+        "counted_units": "valid",
+        "wall_time": "invalid"
+      },
+      "grace_seconds": 5,
+      "interval_seconds": null,
+      "policy": "none",
+      "restore_validation": "none"
+    },
+    "measurement_class": "search",
+    "placement": {
+      "single_worker": true,
+      "two_selected_shards": true,
+      "local_only": true
+    },
+    "queue": null,
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    },
+    "timeout_seconds": 90
+  },
+  "extensions": {
+    "ml_dataset_generate_pilot": {
+      "schema": "ml-dataset.generate-pilot/v1",
+      "source_commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+      "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+      "unbound_plan_sha256": "46d2ed7d2dbea68b0121a71f0338da6248d4365b87afc4b27367f989d1124e01",
+      "selected_shards": [
+        62,
+        63
+      ],
+      "shard_count": 64,
+      "max_cases_per_shard": 1,
+      "worker_preflight_receipts": [
+        "d3362f450ec6922be2df6a8ebfbf8f2cf9ac2c0733e75c6155d2ae975571c714",
+        "3869a6c8bb9b7465d7477d6e22acd206b13ec31be3cc97cbd14c1efdef016001"
+      ],
+      "cloud_dataset_cells": 0
+    }
+  },
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "4eb882c13ef3d5b38338eac642cab9af677c5857fe902da6a8eacfd81cbb6783",
+    "commit": "70fb1c122356cdad3308da258c936cd65fcc4e88",
+    "frozen_at": "2026-10-31T00:02:03Z",
+    "filed_before_affected_data": true
+  },
+  "inadmissible": [
+    "selecting a replacement seed after a failure",
+    "discarding a failed or timed-out attempt",
+    "using direct-worker time as measured full-generate time",
+    "using public features from restricted witness artifacts",
+    "promoting an unsealed or unverified cell"
+  ],
+  "invalidation_rules": [
+    "Binary, plan or protocol digest changes during command invalidate the attempt.",
+    "Missing or malformed cell manifest or failed independent dataset verify prevents cell promotion.",
+    "No comparative advantage or scaling claim is drawn from this two-cell pilot."
+  ],
+  "literature": [
+    {
+      "claim": "Official protocol schema and preflight runtime requirement",
+      "provenance": "internal",
+      "ref": "isogeny-labs/crypto-autoresearcher@f755085ff951888dbe64682c210c9ef7d167b40c:docs/experiment-protocol.md",
+      "verified_by": "pinned local tooling source"
+    },
+    {
+      "claim": "Dataset population, leakage and measurement boundaries",
+      "provenance": "internal",
+      "ref": "docs/ml-dataset/DESIGN.md",
+      "verified_by": "source package02"
+    }
+  ],
+  "measurement": {
+    "clock": "monotonic",
+    "isolation_required": "none",
+    "order": "sequential",
+    "record": [
+      "source_commit",
+      "binary_sha256_before/after",
+      "input config SHA-256 before/after",
+      "command argv",
+      "exit status",
+      "timeout classification",
+      "monotonic command interval",
+      "stdout/stderr hashes and bytes"
+    ],
+    "timed_primary_justification": null,
+    "warmups": 0
+  },
+  "metrics": {
+    "primary": [
+      {
+        "aggregation": "per_row",
+        "definition": "Frozen native generate shard completes, retains its manifest and passes dataset verify; failed or incomplete attempts remain recorded.",
+        "id": "sealed-cell-verified",
+        "kind": "exact",
+        "name": "Sealed cell verification",
+        "resolution": "1",
+        "source": "generated cell manifest plus crypto dataset verify receipt",
+        "uncertainty": "none_exact",
+        "unit": "Boolean"
+      }
+    ],
+    "secondary": [
+      {
+        "aggregation": "per_row",
+        "definition": "Instant duration around full dataset generate timeout process spawn through wait; includes parent and cell work, excludes runner receipt writes.",
+        "id": "observed-wall-ns",
+        "kind": "timed",
+        "name": "Observed wrapper command duration",
+        "resolution": "1 nanosecond clock representation",
+        "source": "runner receipt.observed_wall_nanoseconds",
+        "uncertainty": "none_exact",
+        "unit": "nanoseconds"
+      }
+    ]
+  },
+  "protocol_id": "ML-DATASET-PRIME23-BSGS-GENERATE-PILOT-20261030",
+  "question": "Do two exact native generate shards, indices62 and63 of a frozen64-cell n23 prime BSGS plan, seal and independently verify the same untwisted and twisted configurations used in worker preflight?",
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Two fixed generate shards run untwisted then twisted; no comparative timing or effect claim.",
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Mechanical receipt validation only.",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "Two fixed config files named before commands; no outcome-dependent selection."
+    },
+    "seed_derivation": {
+      "method": "explicit_list",
+      "note": "Both configs fix seed42, curve_seed7, generator_index1 and key_index1 before execution.",
+      "seeds": [
+        42
+      ]
+    }
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "graphs": [],
+    "report_dir": "reports",
+    "review_schema": "experiment.review/v1"
+  },
+  "repository": "crypto",
+  "sample_size": {
+    "instances": 2,
+    "power": {
+      "alpha": 0.05,
+      "correction": "none",
+      "method": "exact",
+      "note": "Two exact software cells only; no statistical power or effect claim.",
+      "passes": true,
+      "tests_in_family": 1
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 2.0,
+      "per_sample_seconds": 8.0,
+      "threads": 1,
+      "estimated_total_seconds": 18.0,
+      "measured_on": "Two direct worker commands on the retained binary:7.582437679s untwisted,0.916209436s twisted. Per-sample8s rounds up observed maximum; fixed2s is an explicit unmeasured planning allowance for generate parent setup, not a measured phase."
+    },
+    "replicates": 1,
+    "warmups": 0
+  },
+  "schema": "experiment.protocol/v1",
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "Exactly one generate attempt for each of shard indices62 and63, max_cases1 each; no automatic solver retry."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "Stop at 90 seconds; retain timeout and partial files."
+    }
+  ],
+  "study_dir": "research/ml_dataset_runtime_preflight_20261030",
+  "variable_ledger": {
+    "aa_not_applicable": "No comparative timing or advantage claim.",
+    "comparisons": [
+      {
+        "arms": [
+          "prime23-bsgs-generate",
+          "prime23-bsgs-twist-generate"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "single-arm-receipt",
+        "threshold": "Both frozen shard cells are sealed and independently verify with exact source, plan, protocol and binary joins"
+      }
+    ],
+    "crosses_map": false,
+    "factors": [
+      {
+        "how": "Source commit, retained clean-build receipt and binary hash pinned before command.",
+        "name": "instrument",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Two selected mixed-radix indices62/63 of a 64-cell frozen V1 plan; fixed config bytes differ only in twist.",
+        "name": "curve-and-method",
+        "treatment": "fixed"
+      },
+      {
+        "how": "RAYON_NUM_THREADS=1, one generate command at a time.",
+        "name": "threads",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Record host metadata separately; elapsed time supports feasibility only.",
+        "name": "host-and-contention",
+        "treatment": "measured"
+      },
+      {
+        "how": "90 seconds, no retry.",
+        "name": "timeout",
+        "treatment": "fixed"
+      },
+      {
+        "how": "One arm and one attempt, retain every terminal outcome.",
+        "name": "analyst-selection",
+        "treatment": "fixed"
+      }
+    ],
+    "independent": []
+  },
+  "version": 1
+}
