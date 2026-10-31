@@ -8995,7 +8995,10 @@ mod parent_artifact_owner_tests {
             assert!(result.error.is_none() && result.stop.is_none());
             let owned = result.value.unwrap();
             assert_eq!(owned.items.len(), before.len());
-            assert_eq!(owned.payload_bytes, before.iter().map(|a| a.2 as u64).sum());
+            assert_eq!(
+                owned.payload_bytes,
+                before.iter().map(|a| a.2 as u64).sum::<u64>()
+            );
             for (item, (logical, pointer, len, receipt)) in owned.items.iter().zip(before) {
                 assert_eq!(item.logical_path, logical);
                 assert_eq!(item.payload.bytes.as_ptr(), pointer);
