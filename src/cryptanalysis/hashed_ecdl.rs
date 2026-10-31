@@ -4,7 +4,7 @@
 //! with a separate complete tensor implementation exported as [`tensor`].
 //! This bounded reference's default oracle enumerates group decompositions (generic
 //! decomposition, bounded by sqrt(r); cannot beat rho). No subexponential or
-//! performance claim is made. Cofactor-one prime-field curves below 2^60 are
+//! performance claim is made. Cofactor-one prime-field curves below 2^63 are
 //! supported using an exact prime-order witness; the original constructor
 //! retains its small-field exhaustive check. Answers carry replayable certificates.
 //!
@@ -186,6 +186,9 @@ fn inverse_with_table(a: u64, p: u64, table: &[u64]) -> u64 {
 }
 
 fn addmod(a: u64, b: u64, p: u64) -> u64 {
+    if p >= (1u64 << 63) {
+        return if a >= p - b { a - (p - b) } else { a + b };
+    }
     let sum = a + b;
     if sum >= p {
         sum - p
@@ -194,11 +197,13 @@ fn addmod(a: u64, b: u64, p: u64) -> u64 {
     }
 }
 
-fn floor_sqrt(n: u64) -> u64 {
-    let (mut lo, mut hi) = (0u64, 1u64 << 32);
+fn floor_sqrt(n: u128) -> u64 {
+    // Only Hasse radicands <=4*(2^63-1), plus u64 test inputs.
+    assert!(n < (1u128 << 65));
+    let (mut lo, mut hi) = (0u64, 1u64 << 33);
     while lo + 1 < hi {
         let mid = (lo + hi) / 2;
-        if u128::from(mid) * u128::from(mid) <= u128::from(n) {
+        if u128::from(mid) * u128::from(mid) <= n {
             lo = mid;
         } else {
             hi = mid;
@@ -315,6 +320,8 @@ impl SqrtContext {
 /// Explicit CPU reduction memory ceiling; callers must opt in above 512.
 /// Two dense triangular workspaces can require several GiB at this ceiling.
 pub const MAX_COLUMNS: usize = 16384;
+/// Bounded ordered factor-base slots shared with the standalone GPU service.
+pub const MAX_SLOTS: usize = 12;
 /// Bound inverse-hash enumeration, including independent certificate replay.
 pub const MAX_HASH_CANDIDATES: u64 = 1 << 24;
 
@@ -349,7 +356,7 @@ impl Curve {
         r: u64,
         generator: Point,
     ) -> Result<Self, Error> {
-        if !(5..(1u64 << 62)).contains(&p)
+        if !(5..(1u64 << 63)).contains(&p)
             || !(3..(1u64 << 63)).contains(&r)
             || !prime(p)
             || !prime(r)
@@ -376,7 +383,7 @@ impl Curve {
         if generator.is_none() || !curve.contains(generator) || curve.mul(generator, r)?.is_some() {
             return Err(Error::Invalid("invalid prime-order witness"));
         }
-        let radius = floor_sqrt(4 * p);
+        let radius = floor_sqrt(4 * u128::from(p));
         let (lower, upper) = (p + 1 - radius, p + 1 + radius);
         if lower.div_ceil(r) != 1 || upper / r != 1 {
             // Preserve exact validation for ambiguous tiny Hasse intervals.
@@ -395,7 +402,7 @@ impl Curve {
         if a >= p || b >= p || (4 * a * a % p * a + 27 * b * b) % p == 0 {
             return Err(Error::Invalid("noncanonical or singular curve"));
         }
-        let radius = floor_sqrt(4 * p);
+        let radius = floor_sqrt(4 * u128::from(p));
         if p >= 1024 && (p + 1 - radius).div_ceil(r) == 1 && (p + 1 + radius) / r == 1 {
             // The same exact certificate as with_order_witness, discovering
             // a public point rather than enumerating every x in the field.
@@ -582,7 +589,7 @@ impl Curve {
 /// One affine hash and its threshold, defining a slot-specific factor base.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct HashBase {
-    /// Prime hash modulus, in `[2p,4p]` and strictly below `2^63`.
+    /// Prime hash modulus, in `[2p,4p]` and representable as u64.
     pub s: u64,
     /// Nonzero multiplier modulo `s`.
     pub alpha: u64,
@@ -594,9 +601,8 @@ pub struct HashBase {
 
 impl HashBase {
     fn validate_parameters(&self, curve: &Curve) -> Result<(), Error> {
-        if self.s >= (1u64 << 63)
-            || self.s < 2 * curve.p
-            || self.s > 4 * curve.p
+        if self.s < 2 * curve.p
+            || u128::from(self.s) > 4 * u128::from(curve.p)
             || self.alpha == 0
             || self.alpha >= self.s
             || self.beta >= self.s
@@ -627,10 +633,15 @@ impl HashBase {
         if self.tau > MAX_HASH_CANDIDATES {
             return Err(Error::Limit("inverse-hash candidate bound"));
         }
-        let inv = inverse(self.alpha, self.s);
+        // Keep the established signed EEA bound; use Fermat for full-u64 hashes.
+        let inv = if self.s < (1u64 << 63) {
+            inverse(self.alpha, self.s)
+        } else {
+            pow(self.alpha, self.s - 2, self.s)
+        };
         let mut points = Vec::new();
         // z(t) = alpha^-1 * (t-beta) mod s, so z(t+1)=z(t)+inv mod s.
-        // Both operands are canonical and s<2^63: the addition cannot overflow.
+        // Both operands are canonical; addmod also handles full-u64 hash moduli.
         let mut z = mulmod(inv, sub(0, self.beta, self.s), self.s);
         for _ in 0..self.tau {
             if let Some(point) = curve.decode(z) {
@@ -704,7 +715,7 @@ impl DecompositionOracle for Enumerate {
         max_work: u64,
     ) -> Result<Option<Vec<Point>>, Error> {
         if bases.len() < 2
-            || bases.len() > 8
+            || bases.len() > MAX_SLOTS
             || !curve.contains(target)
             || bases.iter().any(|b| {
                 b.iter().any(|&a| a.is_none() || !curve.contains(a))
@@ -751,7 +762,7 @@ impl DecompositionOracle for Enumerate {
 /// Bounded reduction parameters. Bounds make exhaustion explicit.
 #[derive(Clone, Debug)]
 pub struct Config {
-    /// Number of ordered factor-base slots, 2 through 8.
+    /// Number of ordered factor-base slots, 2 through MAX_SLOTS.
     pub m: usize,
     /// Override the Lemma 13 threshold; `None` uses its integer ceiling.
     pub tau: Option<u64>,
@@ -983,7 +994,15 @@ pub fn solve_with_oracle(
     config: &Config,
     oracle: &mut impl DecompositionOracle,
 ) -> Result<Certificate, Error> {
-    solve_reduction::<false>(curve, p, q, config, oracle, &mut ReductionStats::default())
+    solve_reduction::<false>(
+        curve,
+        p,
+        q,
+        config,
+        oracle,
+        &mut ReductionStats::default(),
+        20,
+    )
 }
 
 /// Descriptive stage clocks, accumulated across all attempted trials.
@@ -1011,7 +1030,25 @@ pub fn solve_with_oracle_profile(
     oracle: &mut impl DecompositionOracle,
     stats: &mut ReductionStats,
 ) -> Result<Certificate, Error> {
-    solve_reduction::<true>(curve, p, q, config, oracle, stats)
+    solve_reduction::<true>(curve, p, q, config, oracle, stats, 20)
+}
+
+/// Profile a reduction with an explicit per-trial target-query budget.
+/// Each trial permits at most `attempts_per_column * (columns + 1)` queries.
+/// The multiplier must be in 1..=256; ordinary entry points retain 20.
+/// Smaller bases may need more queries to collect a complete relation matrix.
+/// This changes only exhaustion: every returned relation and certificate is
+/// checked in exactly the same way as the ordinary reduction.
+pub fn solve_with_oracle_profile_budget(
+    curve: &Curve,
+    p: Point,
+    q: Point,
+    config: &Config,
+    oracle: &mut impl DecompositionOracle,
+    stats: &mut ReductionStats,
+    attempts_per_column: usize,
+) -> Result<Certificate, Error> {
+    solve_reduction::<true>(curve, p, q, config, oracle, stats, attempts_per_column)
 }
 
 // One reduction body preserves identical random draws, bounds and verification.
@@ -1023,12 +1060,14 @@ fn solve_reduction<const PROFILE: bool>(
     config: &Config,
     oracle: &mut impl DecompositionOracle,
     stats: &mut ReductionStats,
+    attempts_per_column: usize,
 ) -> Result<Certificate, Error> {
     use std::time::Instant;
     if p.is_none() || !curve.contains(p) || !curve.contains(q) {
         return Err(Error::Invalid("generator or target"));
     }
-    if !(2..=8).contains(&config.m)
+    if !(2..=MAX_SLOTS).contains(&config.m)
+        || !(1..=256).contains(&attempts_per_column)
         || config.max_trials == 0
         || config.max_trials > 1000
         || config.max_columns == 0
@@ -1047,9 +1086,10 @@ fn solve_reduction<const PROFILE: bool>(
             attempts: 0,
         });
     }
-    let s = (2 * curve.p..=(4 * curve.p).min((1u64 << 63) - 1))
+    let upper = (4 * u128::from(curve.p)).min(u128::from(u64::MAX)) as u64;
+    let s = (2 * curve.p..=upper)
         .find(|&s| prime(s))
-        .ok_or(Error::Limit("no supported hash prime below 2^63"))?;
+        .ok_or(Error::Limit("no supported u64 hash prime in [2p,4p]"))?;
     // Binary search and saturating products avoid both a sqrt(r) setup loop
     // and overflow for large exponents; only comparison against r matters.
     let (mut lower, mut root) = (0, curve.r);
@@ -1093,7 +1133,7 @@ fn solve_reduction<const PROFILE: bool>(
             || bases.iter().zip(&hashes).any(|(base, h)| {
                 base.windows(2).any(|w| w[0] >= w[1])
                     || base.iter().any(|&point| match curve.encode(point) {
-                        Ok(z) => (mulmod(h.alpha, z, h.s) + h.beta) % h.s >= h.tau,
+                        Ok(z) => addmod(mulmod(h.alpha, z, h.s), h.beta, h.s) >= h.tau,
                         Err(_) => true,
                     })
             })
@@ -1111,7 +1151,10 @@ fn solve_reduction<const PROFILE: bool>(
             continue;
         }
         let mut relations = Vec::new();
-        for _ in 0..20 * (n + 1) {
+        let query_limit = (n + 1)
+            .checked_mul(attempts_per_column)
+            .ok_or(Error::Limit("target-query budget overflow"))?;
+        for _ in 0..query_limit {
             attempts += 1;
             let stage = PROFILE.then(Instant::now);
             let (u, v) = (rng.below(curve.r), rng.below(curve.r));
@@ -1388,7 +1431,7 @@ pub fn verify(curve: &Curve, p: Point, q: Point, cert: &Certificate) -> Result<(
             Err(Error::Verification)
         };
     }
-    if !(2..=8).contains(&cert.hashes.len()) {
+    if !(2..=MAX_SLOTS).contains(&cert.hashes.len()) {
         return Err(Error::Verification);
     }
     let bases = enumerate_hash_bases(curve, &cert.hashes)?;
@@ -1433,6 +1476,71 @@ mod tests {
     use super::*;
     fn fixture() -> (Curve, Point) {
         (Curve::new(211, 0, 7, 199).unwrap(), Some((3, 33)))
+    }
+
+    #[test]
+    fn twelve_slot_replay_and_bounded_oracle() {
+        let (curve, p) = fixture();
+        let q = curve.mul(p, 42).unwrap();
+        // Public known-answer certificate: each separate slot contains P only.
+        // enc(P)=7, hence (enc(P)+424) mod431=0 is the sole accepted encoding.
+        let hash = HashBase {
+            s: 431,
+            alpha: 1,
+            beta: 424,
+            tau: 1,
+        };
+        assert_eq!(hash.enumerate(&curve).unwrap(), vec![p]);
+        for m in [9, 10, MAX_SLOTS] {
+            let bases = vec![vec![p]; m];
+            let target = curve.mul(p, m as u64).unwrap();
+            assert_eq!(
+                Enumerate.find(&curve, &bases, target, 1).unwrap(),
+                Some(vec![p; m])
+            );
+            assert_eq!(Enumerate.find(&curve, &bases, None, 1).unwrap(), None);
+            let mut relations = vec![
+                Relation {
+                    u: m as u64,
+                    v: 0,
+                    points: vec![p; m]
+                };
+                m + 1
+            ];
+            relations[m].u = (m as u64 + curve.r - 42) % curve.r;
+            relations[m].v = 1;
+            let mut dependency = vec![0; m + 1];
+            dependency[0] = 1;
+            dependency[m] = curve.r - 1;
+            let cert = Certificate {
+                scalar: 42,
+                hashes: vec![hash; m],
+                relations,
+                dependency,
+                trials: 1,
+                attempts: m + 1,
+            };
+            verify(&curve, p, q, &cert).unwrap();
+            let mut bad = cert.clone();
+            bad.relations[0].points.pop();
+            assert_eq!(verify(&curve, p, q, &bad), Err(Error::Verification));
+            bad = cert;
+            bad.hashes.resize(MAX_SLOTS + 1, hash);
+            assert_eq!(verify(&curve, p, q, &bad), Err(Error::Verification));
+        }
+        let oversized = vec![vec![p]; MAX_SLOTS + 1];
+        assert!(matches!(
+            Enumerate.find(&curve, &oversized, p, 1),
+            Err(Error::Invalid("oracle input"))
+        ));
+        let config = Config {
+            m: MAX_SLOTS + 1,
+            ..Config::default()
+        };
+        assert!(matches!(
+            solve(&curve, p, q, &config),
+            Err(Error::Invalid("reduction bounds"))
+        ));
     }
 
     #[test]
@@ -1550,9 +1658,16 @@ mod tests {
                     linear: marker,
                     replay: marker,
                 };
-                let no_clocks =
-                    solve_reduction::<false>(&curve, p, q, &config, &mut Enumerate, &mut untouched)
-                        .unwrap();
+                let no_clocks = solve_reduction::<false>(
+                    &curve,
+                    p,
+                    q,
+                    &config,
+                    &mut Enumerate,
+                    &mut untouched,
+                    20,
+                )
+                .unwrap();
                 assert_eq!(no_clocks, expected);
                 for clock in [
                     untouched.bases,
@@ -1905,8 +2020,80 @@ mod tests {
             assert!(prime(n));
         }
         for n in [0, 1, 2, 3, 4, 15, 16, 17, u64::MAX] {
-            let x = u128::from(floor_sqrt(n));
+            let x = u128::from(floor_sqrt(u128::from(n)));
             assert!(x * x <= u128::from(n) && (x + 1) * (x + 1) > u128::from(n));
+        }
+    }
+
+    #[test]
+    fn field63_full_hash_and_hasse_boundaries() {
+        let p = 9_223_372_036_854_775_783u64;
+        let s = 18_446_744_073_709_551_557u64;
+        assert!(prime(p) && prime(s));
+        for modulus in [p, s, u64::MAX] {
+            for a in [0, 1, modulus / 2, modulus - 2, modulus - 1] {
+                for b in [0, 1, modulus / 2, modulus - 2, modulus - 1] {
+                    assert_eq!(
+                        addmod(a, b, modulus),
+                        ((u128::from(a) + u128::from(b)) % u128::from(modulus)) as u64
+                    );
+                }
+            }
+        }
+        for n in [u128::from(u64::MAX), 4 * u128::from(p), (1u128 << 65) - 1] {
+            let x = u128::from(floor_sqrt(n));
+            assert!(x * x <= n && (x + 1) * (x + 1) > n);
+        }
+        // Arithmetic fixture only: no group order is asserted by this struct.
+        let c = Curve {
+            p,
+            a: p - 3,
+            b: 7,
+            r: 3,
+            roots: vec![],
+            sqrt: Some(SqrtContext::new(p)),
+            inverses: small_inverses(p),
+            field: Modulus::new(p),
+        };
+        for x in [0, 1, p / 2, p - 2, p - 1] {
+            let expected = ((u128::from(mulmod(mulmod(x, x, p), x, p))
+                + u128::from(mulmod(c.a, x, p))
+                + u128::from(c.b))
+                % u128::from(p)) as u64;
+            assert_eq!(c.rhs(x), expected);
+            if let Some(q) = c.decode(2 * x) {
+                assert_eq!(c.decode(c.encode(Some(q)).unwrap()), Some(q));
+                assert!(c.contains(c.add(Some(q), Some(q)).unwrap()));
+            }
+        }
+        // Use a smaller 63-bit field so [2p,4p] contains u64 primes.
+        let hp = 6_917_529_027_641_081_737u64;
+        assert!(prime(hp));
+        let hc = Curve {
+            p: hp,
+            a: 0,
+            b: 7,
+            r: 3,
+            roots: vec![],
+            sqrt: Some(SqrtContext::new(hp)),
+            inverses: small_inverses(hp),
+            field: Modulus::new(hp),
+        };
+        for alpha in [1, 17, s - 1] {
+            for beta in [0, s / 2, s - 1] {
+                let h = HashBase {
+                    s,
+                    alpha,
+                    beta,
+                    tau: 257,
+                };
+                for point in h.enumerate(&hc).unwrap() {
+                    let z = hc.encode(point).unwrap();
+                    let expected = ((u128::from(mulmod(alpha, z, s)) + u128::from(beta))
+                        % u128::from(s)) as u64;
+                    assert!(expected < h.tau && hc.contains(point));
+                }
+            }
         }
     }
 
@@ -2209,6 +2396,77 @@ mod tests {
             let mut bad = cert;
             bad.hashes[0].alpha = 0;
             assert!(verify(&c, p, q, &bad).is_err());
+        }
+    }
+
+    #[test]
+    fn explicit_query_budget_preserves_default_and_bounds_exhaustion() {
+        // A deliberately non-solving mock isolates query-budget control flow;
+        // it is not used as decomposition or recovery evidence.
+        #[derive(Default)]
+        struct MissCounter {
+            calls: usize,
+            columns: usize,
+        }
+        impl DecompositionOracle for MissCounter {
+            fn find(
+                &mut self,
+                _curve: &Curve,
+                bases: &[Vec<Point>],
+                _target: Point,
+                _max_work: u64,
+            ) -> Result<Option<Vec<Point>>, Error> {
+                self.calls += 1;
+                self.columns = bases.iter().map(Vec::len).sum();
+                Ok(None)
+            }
+        }
+        let (c, p) = fixture();
+        let q = c.mul(p, 42).unwrap();
+        let config = Config {
+            tau: Some(40),
+            max_trials: 1,
+            ..Config::default()
+        };
+        let mut default = MissCounter::default();
+        assert!(matches!(
+            solve_with_oracle(&c, p, q, &config, &mut default),
+            Err(Error::Limit(_))
+        ));
+        assert!(default.columns > 0);
+        assert_eq!(default.calls, 20 * (default.columns + 1));
+        for multiplier in [1, 3, 20, 128] {
+            let mut oracle = MissCounter::default();
+            assert!(matches!(
+                solve_with_oracle_profile_budget(
+                    &c,
+                    p,
+                    q,
+                    &config,
+                    &mut oracle,
+                    &mut ReductionStats::default(),
+                    multiplier,
+                ),
+                Err(Error::Limit(_))
+            ));
+            assert_eq!(oracle.columns, default.columns);
+            assert_eq!(oracle.calls, multiplier * (oracle.columns + 1));
+        }
+        for multiplier in [0, 257, usize::MAX] {
+            let mut oracle = MissCounter::default();
+            assert!(matches!(
+                solve_with_oracle_profile_budget(
+                    &c,
+                    p,
+                    q,
+                    &config,
+                    &mut oracle,
+                    &mut ReductionStats::default(),
+                    multiplier,
+                ),
+                Err(Error::Invalid(_))
+            ));
+            assert_eq!(oracle.calls, 0);
         }
     }
 

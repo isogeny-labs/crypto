@@ -1,0 +1,70 @@
+{
+  "schema": "ecbench.frontier-campaign/v1",
+  "date": "2026-10-31",
+  "source_commit": "48c8a4767d2d1eed6a7b379f74410bc729239380",
+  "binary_sha256": "91f5895637501c6de257bbaf3afc9cbc2c0f5e964964d3dc4fc3bf78a427d96b",
+  "backend": "isolab-eks-spot",
+  "measurement_class": "measurement",
+  "state": "blocked_no_authenticated_eks_route",
+  "fixed_requirements": {
+    "one_target_scope": true,
+    "targets_per_cell": 8,
+    "warmups": 1,
+    "measured_rounds": 6,
+    "isolation_required": "L2",
+    "replay": "all",
+    "retain_failures_timeouts": true,
+    "pricing_weights_gae_per_native_op": [
+      0,
+      0.1,
+      1
+    ]
+  },
+  "jobs": [
+    {
+      "spec": "specs/prime-p20.json",
+      "cell": "prime",
+      "size": 20
+    },
+    {
+      "spec": "specs/prime-p24.json",
+      "cell": "prime",
+      "size": 24
+    },
+    {
+      "spec": "specs/prime-p28.json",
+      "cell": "prime",
+      "size": 28
+    },
+    {
+      "spec": "specs/prime-p32.json",
+      "cell": "prime",
+      "size": 32
+    },
+    {
+      "spec": "specs/koblitz-n13.json",
+      "cell": "koblitz",
+      "size": 13
+    },
+    {
+      "spec": "specs/koblitz-n19.json",
+      "cell": "koblitz",
+      "size": 19
+    },
+    {
+      "spec": "specs/koblitz-n23.json",
+      "cell": "koblitz",
+      "size": 23
+    },
+    {
+      "spec": "specs/koblitz-n31.json",
+      "cell": "koblitz",
+      "size": 31
+    },
+    {
+      "spec": "specs/solver-backends-k17.json",
+      "cell": "solver-backends",
+      "size": 17
+    }
+  ]
+}
