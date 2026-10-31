@@ -3,8 +3,8 @@
  "what_this_is": "The registry rows the native catalogs bind to: docs/curves/jacobian-transfers.json and docs/curves/traits.json are derived from exactly the rows of docs/curves/registry.json that this file names, and record catalog_rows_sha256, the SHA-256 of the sorted-key compact UTF-8 JSON of {\"schema_version\": <registry schema_version>, \"curves\": [the named rows, in registry order]}. Registry rows this file does not name (for example the isogeny-volcano census curves the registry builder sweeps in from research JSON) do not change that digest, so adding them leaves those two files current. Editing a named row, or naming a slug the registry does not hold, still fails their --check.",
  "how_to_extend": "Adding a curve to the catalog is an explicit, reviewed change: append its ICV1 slug here and bump count, then regenerate docs/curves/jacobian-transfers.json (jacobian_transfers build --budget 200000) and docs/curves/traits.json (curve_traits build).",
  "registry": "docs/curves/registry.json",
- "membership_origin": "every row docs/curves/registry.json held before aburan28/crypto#2446 added 13,219 volcano census curves (2,572 rows, the set the cover catalog was built over)",
- "count": 2572,
+ "membership_origin": "every row docs/curves/registry.json held before aburan28/crypto#2446 added 13,219 volcano census curves (2,572 rows, the set the cover catalog was built over), plus the two registry curves 'mixed twist IC p101' (icv1-fp7-tm5-7bc8be1d) and 'mixed twist IC p1009' (icv1-fp10-tm3-e1039cbb), whose trait records the transfer-audit registry sweep pins (src/bin/transfer_audit/suite.rs, PINNED_SWEPT)",
+ "count": 2574,
  "slugs": [
   "icv1-f2m7-t13-616700dd",
   "icv1-f2m7-tm13-ac10a42c",
@@ -2577,6 +2577,8 @@
   "icv1-fp42k6-tm94425043260925418064943765136461443902-2954d8b9",
   "icv1-fp42k6-tm96457303662662337409351348340650293994-e4919e97",
   "icv1-fp43k6-t80369948951667839190628429049567884210-1a345239",
-  "icv1-fp43k6-t80369948951667839190628429049567884210-8a669356"
+  "icv1-fp43k6-t80369948951667839190628429049567884210-8a669356",
+  "icv1-fp7-tm5-7bc8be1d",
+  "icv1-fp10-tm3-e1039cbb"
  ]
 }
