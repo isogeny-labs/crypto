@@ -63,6 +63,13 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Cmd {
+    /// Check pinned diagnostic metadata without launching work.
+    DiagnosticPreflight {
+        #[arg(long)]
+        request: PathBuf,
+        #[arg(long)]
+        request_sha256: String,
+    },
     /// Push, pull and index large files (factor bases, tables) in the object store.
     Store(crypto_lib::store::cli::StoreArgs),
     /// Run the existing CUDA ECC binary as a separately labelled GPU stage.
@@ -881,6 +888,18 @@ fn emit_claim(
 
 fn run(cli: Cli) -> Result<ExitCode, String> {
     match cli.cmd {
+        Cmd::DiagnosticPreflight {
+            request,
+            request_sha256,
+        } => {
+            let path = request.to_str().ok_or("request path must be UTF-8")?;
+            print_json(
+                &crypto_lib::cryptanalysis::ecbench::diagnostic_file_adapter::check_file(
+                    path,
+                    &request_sha256,
+                )?,
+            )?;
+        }
         Cmd::Store(args) => crypto_lib::store::cli::run(&args)?,
         Cmd::Work {
             sessions,
