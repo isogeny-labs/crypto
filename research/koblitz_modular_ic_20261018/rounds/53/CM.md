@@ -60,10 +60,31 @@ it. Attempt02 corrects those implementation errors and passes.
 
 ## Construction stages
 
-The separately frozen `ALPHAUNIT53.sing` composes saved torsion membership
-and coprime-kernel Bezout products to address the actual image-line denominator.
-`TATE53.sing` then constructs the generic marked Tate normalization. Their
-outcomes are pending; a frozen proposed formula is not a verified map.
+`alphaunit53-01` is accepted:exit0,exact marker,no native error lines. It
+rechecks the saved torsion membership and coprime-kernel Bezout products,
+including exact agreement of their psi7 and of the actual R52norm alpha with
+the line cubic. Write the torsion row as
+
+\[
+ \psi_7=Gx+Ny+\alpha z_0,\qquad U\psi_3+V\psi_7=\Delta^{16}.
+\]
+
+The native certificate then verifies the full product
+
+\[
+ (G,N,\psi_3,\alpha)
+ (Vx,Vy,U,Vz_0)^t=\Delta^{16}.
+\]
+
+It rejects a changed witness entry and computes dimension64for the quotient
+by G,N,psi3. Thus the actual alpha is a unit on the generic registered chart,
+with inverse numerator \(Vz_0\) and denominator \(\Delta^{16}\). The full
+7.6MiB witness is retained in raw custody. This is over generic F2(b,c);
+specializations require the registered coefficient denominators as well as
+Delta to remain invertible. This composition avoids a new inversion search.
+
+`TATE53.sing` constructs the generic marked Tate normalization. Its outcome
+is pending; its frozen proposed formula is not yet a verified map.
 
 `lean/Transfer53.lean` supplies the determinant-change and composed unit
 implications. Compilation/audit and native semantic binding are recorded
