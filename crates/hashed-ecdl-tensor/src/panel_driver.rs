@@ -352,9 +352,13 @@ impl Execution {
 /// * A seeded base permutation of the cases is cyclically rotated by a
 ///   different offset each round (rows of a cyclic Latin square), so each case
 ///   occupies a different position in every round while rounds <= cases.
-/// * Within a pair, which member runs first alternates with position and round
-///   (a 2x2 Latin square), so member order is balanced within every round and
-///   for every case across consecutive rounds.
+/// * Within a pair, which member runs first is `(base index + kind round +
+///   seed bit) mod 2`, where the base index is the case's index in the base
+///   permutation and the kind round counts earlier rounds of the same kind
+///   (a 2x2 Latin square). Member order is therefore balanced within every
+///   round and alternates for every case across consecutive rounds of the
+///   same kind. (Indexing by global round instead pins each case's A/B member
+///   order, because A/A and A/B rounds alternate.)
 /// * One warmup pair (both arms, on the base permutation's first case) runs
 ///   before round 0 and is excluded from analysis but retained.
 pub fn schedule(cases: usize, aa_rounds: usize, ab_rounds: usize, seed: u64) -> Vec<Execution> {
@@ -400,11 +404,20 @@ pub fn schedule(cases: usize, aa_rounds: usize, ab_rounds: usize, seed: u64) -> 
     }
     let total = kinds.len().max(1);
     let stride = (cases / total).max(1);
+    let (mut aa_seen, mut ab_seen) = (0usize, 0usize);
     for (round, kind) in kinds.into_iter().enumerate() {
+        let counter = if kind == RoundKind::AA {
+            &mut aa_seen
+        } else {
+            &mut ab_seen
+        };
+        let kind_round = *counter;
+        *counter += 1;
         let offset = (round * stride) % cases;
         for position in 0..cases {
-            let case = base[(position + offset) % cases];
-            let first_member = (position + round + member_phase) % 2;
+            let base_index = (position + offset) % cases;
+            let case = base[base_index];
+            let first_member = (base_index + kind_round + member_phase) % 2;
             for slot in 0..2 {
                 out.push(Execution {
                     kind,
@@ -822,6 +835,11 @@ pub fn run(options: &RunOptions) -> Result<Value> {
             })
             .collect::<Result<_>>()?,
     };
+    // A repeated id would schedule two pairs under one (round, case) key and
+    // the analysis could keep only one of them.
+    if selected.iter().collect::<BTreeSet<_>>().len() != selected.len() {
+        return Err("--cases lists a case id more than once".into());
+    }
     let protocol_complete = options.cases.is_none()
         && panel.manifest.cases.len() == PANEL_CASES
         && options.aa_rounds >= MIN_AA_ROUNDS
@@ -1054,6 +1072,10 @@ pub fn analyze(rows: &[Value]) -> Value {
     for kind in [RoundKind::AA, RoundKind::AB] {
         let mut status_counts: BTreeMap<String, BTreeMap<String, u64>> = BTreeMap::new();
         let mut pairs: BTreeMap<(u64, String), [Option<&Value>; 2]> = BTreeMap::new();
+        // A second row for an occupied (round, case, member) slot would
+        // otherwise overwrite the first; such pairs are counted and excluded.
+        let mut conflicted: BTreeSet<(u64, String)> = BTreeSet::new();
+        let mut duplicate_rows = 0u64;
         for row in rows.iter().filter(|r| r["kind"] == kind.label()) {
             let arm_key = format!("member{}", row["pair_member"]);
             *status_counts
@@ -1066,11 +1088,22 @@ pub fn analyze(rows: &[Value]) -> Value {
                 row["case_id"].as_str().unwrap_or("").to_string(),
             );
             let member = row["pair_member"].as_u64().unwrap_or(0).min(1) as usize;
-            pairs.entry(key).or_insert([None, None])[member] = Some(row);
+            let slot = &mut pairs.entry(key.clone()).or_insert([None, None])[member];
+            if slot.is_some() {
+                duplicate_rows += 1;
+                conflicted.insert(key);
+            } else {
+                *slot = Some(row);
+            }
         }
         let mut per_case: BTreeMap<String, Vec<f64>> = BTreeMap::new();
         let (mut complete, mut excluded, mut identical, mut compared) = (0u64, 0u64, 0u64, 0u64);
-        for ((_, case), [m0, m1]) in &pairs {
+        for (key, [m0, m1]) in &pairs {
+            let case = &key.1;
+            if conflicted.contains(key) {
+                excluded += 1;
+                continue;
+            }
             let ok = |r: &Option<&Value>| {
                 r.filter(|r| r["status"] == "validated")
                     .and_then(|r| r["solve_wall_ns"].as_u64())
@@ -1112,6 +1145,7 @@ pub fn analyze(rows: &[Value]) -> Value {
         result[kind.label()] = json!({
             "pairs": pairs.len() as u64, "complete_pairs": complete, "excluded_pairs": excluded,
             "cases_in_interval": n as u64, "status_counts": status_counts,
+            "duplicate_member_rows": duplicate_rows,
             "certificate_pairs_compared": compared, "certificate_pairs_identical": identical,
             "mean_log_ratio": finite(mean), "ci95_log_ratio": [finite(low), finite(high)],
             "ratio_point": finite(mean.map(f64::exp)),
@@ -1213,7 +1247,17 @@ pub fn cli_analyze(args: &[String]) -> Result<()> {
     if rows.iter().any(|r| r["schema"] != ROW_SCHEMA) {
         return Err("rows file contains a row with an unexpected schema".into());
     }
-    println!("{}", serde_json::to_string_pretty(&analyze(&rows))?);
+    let analysis = analyze(&rows);
+    println!("{}", serde_json::to_string_pretty(&analysis)?);
+    for kind in [RoundKind::AA, RoundKind::AB] {
+        if analysis[kind.label()]["duplicate_member_rows"] != 0 {
+            return Err(format!(
+                "{} rows repeat a (round, case, member) slot; those pairs were excluded",
+                kind.label()
+            )
+            .into());
+        }
+    }
     Ok(())
 }
 
@@ -1292,22 +1336,45 @@ mod tests {
         }
         // Each case occupies a distinct position in each of the ten rounds.
         assert!(positions.values().all(|p| p.len() == 10));
-        // Member order alternates for a case between consecutive rounds of
-        // the same parity class, so no case always runs the candidate first.
-        for case in 0..84 {
-            let firsts: BTreeSet<_> = rounds
-                .iter()
-                .filter(|e| e.case == case && e.slot == 0)
-                .map(|e| e.pair_member)
-                .collect();
-            assert_eq!(firsts.len(), 2, "case {case}");
-        }
         assert_eq!(plan[0].arm(), "baseline");
         assert_eq!(plan[1].arm(), "candidate");
         assert!(rounds
             .iter()
             .filter(|e| e.kind == RoundKind::AA)
             .all(|e| e.arm() == "baseline"));
+    }
+
+    /// Per kind, every case alternates which member runs first across that
+    /// kind's consecutive rounds, so no case runs the candidate first in every
+    /// A/B round. Pooling A/A with A/B rounds would hide a pinned A/B order.
+    #[test]
+    fn member_order_alternates_per_case_within_each_kind() {
+        for (cases, aa, ab, seed) in [
+            (84, 5, 5, 20261031),
+            (84, 5, 5, 7),
+            (84, 6, 6, 1),
+            (84, 5, 7, 3),
+            (84, 7, 5, 11),
+            (2, 1, 3, 5),
+        ] {
+            let plan = schedule(cases, aa, ab, seed);
+            for kind in [RoundKind::AA, RoundKind::AB] {
+                let mut firsts: BTreeMap<usize, Vec<usize>> = BTreeMap::new();
+                let mut round_balance: BTreeMap<usize, usize> = BTreeMap::new();
+                for e in plan.iter().filter(|e| e.kind == kind && e.slot == 0) {
+                    firsts.entry(e.case).or_default().push(e.pair_member);
+                    *round_balance.entry(e.round).or_default() += e.pair_member;
+                }
+                for (case, order) in &firsts {
+                    assert!(
+                        order.windows(2).all(|w| w[0] != w[1]),
+                        "{cases}/{aa}/{ab}/{seed} {kind:?} case {case}: {order:?}"
+                    );
+                }
+                // Within a round, member 1 runs first in exactly half the pairs.
+                assert!(round_balance.values().all(|&n| 2 * n == cases));
+            }
+        }
     }
 
     #[test]
@@ -1369,5 +1436,25 @@ mod tests {
         assert_eq!(a["ab"]["interval_excludes_no_change"], true);
         let point = a["ab"]["ratio_point"].as_f64().unwrap();
         assert!((point - 0.5).abs() < 0.01, "{point}");
+        assert_eq!(a["ab"]["duplicate_member_rows"], 0);
+    }
+
+    #[test]
+    fn analysis_excludes_and_counts_duplicate_member_rows() {
+        let mut rows = Vec::new();
+        for (i, case) in ["a", "b", "c"].iter().enumerate() {
+            let base = 10_000 + 1000 * i as u64;
+            rows.push(row("ab", 0, case, 0, "validated", base));
+            rows.push(row("ab", 0, case, 1, "validated", base / 2));
+        }
+        // A concatenated second copy of case "a" (e.g. two runs' rows joined)
+        // must not overwrite the first silently.
+        rows.push(row("ab", 0, "a", 1, "validated", 40_000));
+        let a = analyze(&rows);
+        assert_eq!(a["ab"]["duplicate_member_rows"], 1);
+        assert_eq!(a["ab"]["complete_pairs"], 2);
+        assert_eq!(a["ab"]["excluded_pairs"], 1);
+        assert_eq!(a["ab"]["cases_in_interval"], 2);
+        assert_eq!(a["ab"]["status_counts"]["member1"]["validated"], 4);
     }
 }

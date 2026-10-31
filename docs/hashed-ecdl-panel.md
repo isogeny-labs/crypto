@@ -98,7 +98,8 @@ What it does, in order:
 
 1. Refuses any manifest or problem byte not pinned by `--inputs-sha256`, a
    manifest that is not `hashed-ecdl-panel/v1`/`prepared`, duplicate ids, or a
-   problem path other than `problems/<id>.json`. Refuses an existing `--out`.
+   problem path other than `problems/<id>.json`. Refuses an existing `--out`
+   and a `--cases` list that repeats an id.
 2. Refuses a schedule below the frozen protocol (all 84 cases, at least five
    A/A and five A/B rounds, deadline at most 1,800 s) unless
    `--allow-incomplete-panel` is given; such output is labelled
@@ -136,7 +137,7 @@ limit), `not_run_deadline` (scheduled but the deadline had elapsed) or
 | A/A arm | Baseline binary twice (member 0 and member 1). |
 | Round order | A/A and A/B rounds strictly alternate; the seed picks which kind is first. |
 | Case order | Seeded Fisher-Yates base permutation (SplitMix64), cyclically rotated by `round * floor(cases/rounds)` each round (cyclic Latin rows): each case takes a different position in every round. |
-| Order inside a pair | Member run first = `(position + round + seed bit) mod 2`: balanced (42/42) inside every round and alternating per case across rounds. |
+| Order inside a pair | Member run first = `(base index + kind round + seed bit) mod 2`, where the base index is the case's index in the base permutation and the kind round counts earlier rounds of the same kind: balanced (42/42) inside every round and alternating per case across consecutive rounds of the same kind. (Corrected 2026-10-31 by red-team review: the first version used `(position + round + seed bit)`, which, because A/A and A/B rounds alternate, fixed each case's member order in every A/B round, so 42 cases always ran the candidate first.) |
 | Warmup | One pair (baseline then candidate) on the first case of the base permutation, before round 0; retained, excluded from analysis. |
 | Per-case limit | Required flag (`--case-limit-secs`), no default; capped by remaining global deadline. |
 | Global deadline | Default 1,800 s (original). After it elapses, remaining executions become `not_run_deadline` rows. |
@@ -145,6 +146,7 @@ limit), `not_run_deadline` (scheduled but the deadline had elapsed) or
 | Other phases | The arm binaries expose no phase timers. `setup`, `proof_validation`, `enumeration`, `encoding`, `relation_attempts`, `witness_search`, `matrix` are `null` in every row, not estimated; `solve_wall_ns` spans all of them. Phase accounting stays open until the arms emit it. |
 | Effect and interval | Per (round, case) pair: `ln(wall member1 / wall member0)`. Per-case mean over rounds where **both** members validated; two-sided 95% Student-t interval over cases (case is the unit; rounds are not treated as independent). |
 | Unsuccessful pairs | Excluded from the interval, counted by status per member in `status_counts`; candidate-only completions are not gains. |
+| Repeated rows | A second row for an occupied `(kind, round, case, member)` slot (for example two runs' `rows.jsonl` concatenated) is counted in `duplicate_member_rows`, and that pair is excluded rather than overwritten. `analyze` exits non-zero when any are present. |
 | Certificate identity | Reported per kind (`certificate_pairs_identical` of `certificate_pairs_compared`), not enforced for A/B. |
 | Meter counters | Copied as `meter_diagnostics`; never priced. `unpriced_common_operations` and `s_over_rho` are `null`. |
 | Runtime claim | `runtime_claim_admissible` is always `null`: the driver cannot attest native L2 isolation or matched hardware. |

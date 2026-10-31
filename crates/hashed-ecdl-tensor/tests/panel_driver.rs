@@ -148,6 +148,16 @@ fn aa_identity_validates_every_row_and_matches_certificates() {
     let again: Value = serde_json::from_slice(&again.stdout).unwrap();
     assert_eq!(again["aa"], analysis["aa"]);
     assert_eq!(again["ab"], analysis["ab"]);
+    // Two copies of the same rows are refused, never silently merged.
+    let rows_text = fs::read_to_string(f.dir.join("out/rows.jsonl")).unwrap();
+    fs::write(f.dir.join("doubled.jsonl"), rows_text.repeat(2)).unwrap();
+    let doubled = Command::new(PANEL)
+        .arg("analyze")
+        .arg(f.dir.join("doubled.jsonl"))
+        .output()
+        .unwrap();
+    assert!(!doubled.status.success());
+    assert!(String::from_utf8_lossy(&doubled.stderr).contains("repeat a (round, case, member)"));
 }
 
 fn corrupted(edit: impl Fn(&mut Value)) -> String {
@@ -289,6 +299,17 @@ fn incomplete_schedules_unpinned_inputs_and_old_evidence_are_refused() {
     assert!(!f.dir.join("partial").exists());
     let out = f.run("rounds", &good, &good, &["--aa-rounds", "4"]);
     assert!(!out.status.success());
+    // A repeated case id would put two pairs under one analysis key.
+    let twice = format!("{CASE},{CASE}");
+    let out = f.run(
+        "twice",
+        &good,
+        &good,
+        &["--cases", &twice, "--allow-incomplete-panel"],
+    );
+    assert!(!out.status.success());
+    assert!(String::from_utf8_lossy(&out.stderr).contains("more than once"));
+    assert!(!f.dir.join("twice").exists());
     // An existing output directory is never reused.
     fs::create_dir(f.dir.join("exists")).unwrap();
     let out = f.run("exists", &good, &good, SMALL);
