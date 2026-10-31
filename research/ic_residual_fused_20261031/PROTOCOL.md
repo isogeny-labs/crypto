@@ -42,3 +42,11 @@ For each pair (res{B}, res{B}f), paired by instance, with the harness's paired b
 Counts are exact and machine-independent; the route (isolab-eks vs this container) affects only isolation
 metadata. If L2 admission is unavailable the sessions are run here at the lowest isolation the harness
 accepts, the isolation tier is recorded, and no wall-clock claim is made.
+
+## Amendment 1 (2026-10-31, before any study data)
+The isolab-eks route could not be used from this container (no `aws` CLI; GitHub workflow dispatch
+returned 403 earlier in this session). The study is therefore run here with `specs-local/F-*.json`:
+byte-identical to `specs/F-*.json` except `measurement.isolation_required = "L0"` (`--allow-busy`).
+Counted S is deterministic given the seeds and independent of host/isolation, so C1-C3 are unaffected; no
+wall-clock statement is made. The L2 specs stay committed for a later isolab-eks replay. The only prior
+data are the 4-target, 1-round smoke session (scratchpad, not part of the study, used to check the harness accepts the arms).
