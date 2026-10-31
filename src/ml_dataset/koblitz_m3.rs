@@ -3378,7 +3378,13 @@ mod bound_signed_publisher_tests {
         assert!(!sink.dir.join("payloads/pdp-witness.json").exists());
     }
 }
-const SIGNED_EVENT_CAP: u64 = 2048;
+// Closed whole TypedEventRecord maximum:474bytes including newline. Both
+// digest strings are64hex, outer sequenceu64, inner sequenceu16/indicesu8,
+// pointNone or two u64, and bool. Keep the original buffer allocation.
+const SIGNED_EVENT_WIRE_MAX: usize = 474;
+const SIGNED_EVENT_CAP: u64 = 512;
+const SIGNED_EVENT_BUFFER_CAP: u64 = 2048;
+const _: () = assert!(SIGNED_EVENT_WIRE_MAX <= SIGNED_EVENT_CAP as usize);
 #[derive(serde::Serialize)]
 struct SignedEventView<'a> {
     phase: &'static str,
@@ -3405,11 +3411,11 @@ impl<'a> BoundSignedEvents<'a> {
         let digest = binding.digest().map_err(|_| Stop::InvalidLimits)?;
         let mut binding_digest = [0u8; 64];
         binding_digest.copy_from_slice(digest.as_bytes());
-        let bytes =
-            TypedEventBuffer::requested_bytes(SIGNED_EVENT_CAP).map_err(|_| Stop::InvalidLimits)?;
+        let bytes = TypedEventBuffer::requested_bytes(SIGNED_EVENT_BUFFER_CAP)
+            .map_err(|_| Stop::InvalidLimits)?;
         budget.reserve_bytes(bytes, Instant::now())?;
-        let buffer =
-            TypedEventBuffer::try_new(SIGNED_EVENT_CAP, bytes).map_err(|_| Stop::Allocation)?;
+        let buffer = TypedEventBuffer::try_new(SIGNED_EVENT_BUFFER_CAP, bytes)
+            .map_err(|_| Stop::Allocation)?;
         Ok(Self {
             binding_digest,
             limits,
@@ -3447,13 +3453,19 @@ impl<'a> BoundSignedEvents<'a> {
             phase: "signed-domain",
             progress: event,
         };
-        if super::live_typed_event(
-            crate::ml_dataset::capture::TypedEventKind::KoblitzM3,
-            &view,
-            &mut self.buffer,
-        )
-        .is_err()
-        {
+        let committed = super::LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+            Some(super::EventSink::Bound(sink)) => sink
+                .event_typed_precommit_with_limit(
+                    crate::ml_dataset::capture::TypedEventKind::KoblitzM3,
+                    &view,
+                    &mut self.buffer,
+                    SIGNED_EVENT_CAP as usize,
+                    &mut |_| Ok(()),
+                )
+                .is_ok(),
+            _ => false,
+        });
+        if !committed {
             return budget.fail(Stop::Observer);
         }
         *global += 1;
@@ -14486,5 +14498,174 @@ mod worker_terminal_closed_schema_controls {
             assert!(guard_worker_terminal(&bad).is_err());
             assert_eq!(bad, original);
         }
+    }
+}
+
+#[cfg(test)]
+mod signed_event_closed_wire_tests {
+    use super::*;
+    use crate::ml_dataset::capture::{
+        maximum_sequence_typed_wire, TypedEventBuffer, TypedEventKind,
+    };
+    fn maximum() -> SignedPrefix {
+        SignedPrefix {
+            sequence: u16::MAX,
+            tuple: u8::MAX,
+            indices: [u8::MAX; 3],
+            summand: u8::MAX,
+            prefix: Some((u64::MAX, u64::MAX)),
+            matches_target: false,
+        }
+    }
+    fn check(event: &SignedPrefix) {
+        let view = SignedEventView {
+            phase: "signed-domain",
+            progress: event,
+        };
+        let bytes = maximum_sequence_typed_wire(TypedEventKind::KoblitzM3, &view);
+        assert!(bytes.len() <= SIGNED_EVENT_WIRE_MAX);
+        assert!(bytes.len() <= SIGNED_EVENT_CAP as usize);
+        let saved: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+        assert_eq!(saved["sequence"], serde_json::json!(u64::MAX));
+        assert_eq!(
+            saved["event"]["payload"]["progress"],
+            serde_json::to_value(event).unwrap()
+        );
+        assert_eq!(bytes.last(), Some(&b'\n'));
+    }
+    #[test]
+    fn closed_wire_max_includes_all_digits_digests_envelope_and_newline() {
+        let event = maximum();
+        let view = SignedEventView {
+            phase: "signed-domain",
+            progress: &event,
+        };
+        assert_eq!(
+            maximum_sequence_typed_wire(TypedEventKind::KoblitzM3, &view).len(),
+            474
+        );
+        for matches_target in [false, true] {
+            for prefix in [None, Some((0, 0)), Some((u64::MAX, u64::MAX))] {
+                let mut event = maximum();
+                event.matches_target = matches_target;
+                event.prefix = prefix;
+                check(&event);
+            }
+        }
+        for value in [0u16, 9, 10, 99, 100, 999, 1000, 9999, 10000, u16::MAX] {
+            let mut event = maximum();
+            event.sequence = value;
+            check(&event);
+        }
+        for value in [0u8, 9, 10, 99, 100, u8::MAX] {
+            let mut event = maximum();
+            event.tuple = value;
+            check(&event);
+            event = maximum();
+            event.summand = value;
+            check(&event);
+            for index in 0..3 {
+                event = maximum();
+                event.indices[index] = value;
+                check(&event);
+            }
+        }
+        let mut power = 1u64;
+        for _ in 0..20 {
+            for value in [power - 1, power] {
+                for index in 0..2 {
+                    let mut event = maximum();
+                    event.prefix = Some(if index == 0 {
+                        (value, u64::MAX)
+                    } else {
+                        (u64::MAX, value)
+                    });
+                    check(&event);
+                }
+            }
+            if let Some(next) = power.checked_mul(10) {
+                power = next;
+            } else {
+                break;
+            }
+        }
+    }
+    #[test]
+    fn whole_wire_exact_limit_and_one_less_preserve_precommit_and_head() {
+        // Actual first sequence has1digit rather than the maximum20digits.
+        let exact = SIGNED_EVENT_WIRE_MAX - 19;
+        for cap in [0, exact - 1, exact, SIGNED_EVENT_CAP as usize] {
+            let binding = matrix_tests::binding();
+            let fixture = bound_signed_publisher_tests::SinkFixture::new(&binding);
+            let mut buffer = TypedEventBuffer::try_new(
+                SIGNED_EVENT_BUFFER_CAP,
+                TypedEventBuffer::requested_bytes(SIGNED_EVENT_BUFFER_CAP).unwrap(),
+            )
+            .unwrap();
+            let event = maximum();
+            let view = SignedEventView {
+                phase: "signed-domain",
+                progress: &event,
+            };
+            let mut called = false;
+            super::super::LIVE_SINK.with(|slot| {
+                let mut slot = slot.borrow_mut();
+                let Some(super::super::EventSink::Bound(sink)) = slot.as_mut() else {
+                    panic!("bound sink")
+                };
+                let result = sink.event_typed_precommit_with_limit(
+                    TypedEventKind::KoblitzM3,
+                    &view,
+                    &mut buffer,
+                    cap,
+                    &mut |_| {
+                        called = true;
+                        Ok(())
+                    },
+                );
+                assert_eq!(result.is_ok(), cap >= exact);
+                assert_eq!(sink.committed_event_count(), u64::from(cap >= exact));
+            });
+            assert_eq!(called, cap >= exact);
+            assert_eq!(
+                std::fs::read(fixture.dir.join("events.jsonl"))
+                    .unwrap()
+                    .len(),
+                if cap >= exact { exact } else { 0 }
+            );
+        }
+    }
+    #[test]
+    fn adapter_keeps_original_buffer_and_charges_full_new_model_before_ack() {
+        let binding = matrix_tests::binding();
+        let limits = crate::ml_dataset::capture::capture_limits(16).unwrap();
+        let fixture = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let mut budget = construction_tests::budget();
+        let mut events = BoundSignedEvents::new(&binding, &limits, &mut budget).unwrap();
+        let before = budget.saved_ledger();
+        let mut global = 0;
+        events.emit(&maximum(), &mut budget, &mut global).unwrap();
+        let after = budget.saved_ledger();
+        assert_eq!(
+            after.checking_reserved_work - before.checking_reserved_work,
+            1024 + 8 * SIGNED_EVENT_CAP
+        );
+        assert_eq!(
+            after.charged_trace_bytes - before.charged_trace_bytes,
+            SIGNED_EVENT_CAP
+        );
+        assert_eq!(
+            after.adapter_reserved_bytes - before.adapter_reserved_bytes,
+            4096
+        );
+        assert_eq!(events.acknowledged, 1);
+        assert_eq!(global, 1);
+        assert_eq!(
+            events.encoded_bytes,
+            std::fs::read(fixture.dir.join("events.jsonl"))
+                .unwrap()
+                .len() as u64
+        );
+        assert_eq!(SIGNED_EVENT_BUFFER_CAP, 2048);
     }
 }
