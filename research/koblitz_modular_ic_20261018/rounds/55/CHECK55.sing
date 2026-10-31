@@ -1,0 +1,63 @@
+LIB "linalg.lib";
+proc require55(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../quotient55-02/source-annihilator55.sing"));
+matrix scalar55[32][32];int i55;int j55;int k55;
+for(i55=1;i55<=32;i55++){scalar55[i55,i55]=f55;}
+require55(A55*conjugate55==scalar55 && conjugate55*A55==scalar55,"CHECK55_SAVED_FULL_ANNIHILATOR");
+matrix binaryA55[160][160];poly entry55;intvec ex55;int column55;int row55;ideal fGB55=std(ideal(f55));
+for(k55=0;k55<5;k55++){for(j55=1;j55<=32;j55++){
+ column55=32*k55+j55;for(i55=1;i55<=32;i55++){
+  entry55=reduce(u^k55*A55[i55,j55],fGB55);
+  while(entry55!=0){ex55=leadexp(entry55);row55=32*ex55[1]+i55;binaryA55[row55,column55]=leadcoef(entry55);entry55=entry55-lead(entry55);}
+ }
+}}
+execute(read("../quotient55-02/crt-quotient55.sing"));
+map binaryMap55=sourceAnnihilator55,0;require55(binaryA55==binaryMap55(binaryA55),"CHECK55_SOURCE_BINARY_EXPANSION");
+ideal normGB55=std(ideal(norm55));list norms55=norm155,norm255,norm355,norm455;
+require55(norm55==norm155*norm255*norm355*norm455 && deg(norm55)==80,"CHECK55_EXACT_NORM_PRODUCT");
+require55(deg(gcd(norm55,diff(norm55,w)))==0,"CHECK55_SQUAREFREE");
+require55(reduce(rho55^5+rho55^2+1,normGB55)==0,"CHECK55_BASE_RECOVERY");
+poly cofactor55;poly sum55=0;
+for(i55=1;i55<=4;i55++){
+ cofactor55=norm55/norms55[i55];require55(cofactor55*norms55[i55]==norm55,"CHECK55_EXACT_COFACTOR");
+ require55(norms55[i55]*gcdLifts55[1,i55]+cofactor55*gcdLifts55[2,i55]==1,"CHECK55_SAVED_BEZOUT");
+ require55(reduce(cofactor55*gcdLifts55[2,i55]+idempotents55[1,i55],normGB55)==0,"CHECK55_IDEMPOTENT_DEFINITION");
+ sum55=sum55+idempotents55[1,i55];
+ for(j55=1;j55<=4;j55++){require55(reduce(idempotents55[1,i55],std(ideal(norms55[j55])))==(i55==j55),"CHECK55_ALL_CRT_RESIDUES");}
+}
+require55(reduce(sum55+1,normGB55)==0,"CHECK55_PARTITION_UNITY");
+matrix evaluation55Replay[80][160];
+for(k55=0;k55<5;k55++){for(j55=1;j55<=32;j55++){
+ column55=32*k55+j55;entry55=reduce(rho55^k55*values55[1,j55],normGB55);
+ while(entry55!=0){ex55=leadexp(entry55);evaluation55Replay[ex55[1]+1,column55]=leadcoef(entry55);entry55=entry55-lead(entry55);}
+}}
+require55(evaluation55Replay==evaluation55,"CHECK55_COMPLETE_EVALUATION_EXPANSION");
+matrix zero55[80][160];
+require55(evaluation55*binaryA55==zero55 && evaluation55*recovery55==unitmat(80),"CHECK55_KERNEL_AND_SURJECTION_PRODUCTS");
+require55(binaryA55*kernelLift55==unitmat(160)+recovery55*evaluation55,"CHECK55_COMPLETE_EXACT_KERNEL_RECOVERY");
+require55(mat_rk(binaryA55)==80 && mat_rk(evaluation55)==80,"CHECK55_SAVED_RANKS");
+int point55;int valuesChecked55=0;
+for(point55=1;point55<=4;point55++){
+ execute(read("../../../54/runs/flatpoints54-01/flat-point"+string(point55)+"54.sing"));
+ setring crtQuotient55;map pointMap55=flatPointCertificate54,0,w;poly pointNorm55=pointMap55(norm54);poly pointRho55=pointMap55(rho54);matrix pointValues55=pointMap55(flatValues54);
+ require55(pointNorm55==norms55[point55],"CHECK55_POINT_FACTOR_LABEL");
+ require55(reduce(rho55+pointRho55,std(ideal(pointNorm55)))==0,"CHECK55_POINT_BASE_LABEL");
+ require55(reduce(values55+pointValues55,std(ideal(pointNorm55)))==matrix(ideal(0)),"CHECK55_ALL_POINT_VALUES");
+ valuesChecked55=valuesChecked55+32;
+}
+execute(read("../../../52/source-data/rr-table50.sing"));intmat parents55=parents50;
+matrix reducedTable55=reduce(table50,std(ideal(u^5+u^2+1)));matrix reducedUnit55[32][1];
+for(i55=1;i55<=32;i55++){reducedUnit55[i55,1]=reduce(sourceLift50[i55,1],std(ideal(u^5+u^2+1)));}
+setring crtQuotient55;map tableMap55=tablePidCertificate50,rho55;matrix table55=reduce(tableMap55(reducedTable55),normGB55);
+matrix unit55=reduce(tableMap55(reducedUnit55),normGB55);
+require55(reduce(values55*unit55,normGB55)==matrix(ideal(1)),"CHECK55_ACTUAL_SOURCE_UNIT");
+poly residual55;
+for(i55=1;i55<=528;i55++){
+ residual55=values55[1,parents55[i55,1]]*values55[1,parents55[i55,2]];
+ for(j55=1;j55<=32;j55++){residual55=residual55+table55[j55,i55]*values55[1,j55];}
+ require55(reduce(residual55,normGB55)==0,"CHECK55_ALL_SOURCE_PRODUCTS");
+}
+matrix badRecovery55=recovery55;int control55=1;while(evaluation55[1,control55]==0){control55++;}badRecovery55[control55,1]=badRecovery55[control55,1]+1;
+require55(evaluation55*badRecovery55!=unitmat(80),"CHECK55_CHANGED_RECOVERY_REJECTED");
+print("CHECK55_RESULT quotient_dimension=80 binary_entries=25600 evaluation_entries=12800 source_products=528 point_values=128 full_recovery=1");
+print("CHECK55_ALL_CHECKS_PASS");quit;

@@ -83,3 +83,6 @@ Attempt01 rejected:base equation fails and intermediate R has32x64shape;later un
 
 ## Attempt02 repair
 Diagnostic01passed:V,I,residual32x32 but R32x64;scalar polynomial expressions can undergo native module arithmetic before matrix assignment. Build every scalar combination entrywise,keeping source formula/predictions unchanged. Full base/annihilator products decide whether this repairs the claim. Preserve original attempt01 as rejected.
+
+## Serialized checker
+After attempt02 accepted,freeze CHECK55and pin its two arrays. Fresh invocation rechecks both annihilator products,all25600binary entries,all12800evaluation entries,all fullrecovery products/ranks,allCRT Bezout/residues,all128point values and all528sourceproducts. Changed recovery must fail. Same limits;no new candidate or performance comparison. This checker reconstructs serialized evidence and is not a producer rerun.
