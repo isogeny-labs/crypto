@@ -1,0 +1,50 @@
+{
+  "schema": "pencil-replacement-gate-design-review/v1",
+  "reviewer": "/root/four_lead_state",
+  "producer": "/root",
+  "status": "reviewed_finite_design_external_execution_admission_required",
+  "protocol": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/replacement_upper_gate_20261030/protocol/replacement-frozen-protocol.json",
+    "sha256": "4b1290eb3802af06238d70e83d6cdf049d85f483dc709ba89e40d9f73563166e",
+    "canonical_body_sha256": "18d5ea7d08097c6b1c952d979a71be5d05efa82902bee1bc1470b031345f37c9"
+  },
+  "checks": {
+    "request_spec_equals_retained_prepared_spec": true,
+    "scientific_source": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+    "scientific_binary": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+    "mapping_unchanged": true,
+    "analyzer_binary_hashes_match": true,
+    "exporter_binary_hash_matches": true,
+    "coverage_sources_checked": 17,
+    "workloads": 1,
+    "planned_slots": 18,
+    "measured_slots": 15,
+    "warmups": 3,
+    "pairs": 5,
+    "pricing_cells": 36,
+    "requires_all15_nonwall_replays": true,
+    "requires_independent_result_review": true,
+    "later_cohort_requires_separate_prospective_admission": true,
+    "prior_partial_rows_enrolled": false,
+    "clocks_qualified": false
+  },
+  "resource_boundary": {
+    "active_worker_seconds": 21600,
+    "authorization_start": "2026-10-30T05:17:54Z",
+    "internal_guard": "2026-10-30T08:10:24Z",
+    "outer_expiry": "2026-10-30T11:17:54Z",
+    "operational_review": "accepted conditional resource guard only",
+    "new_budget_not_reset_for_future_requests": true
+  },
+  "runtime_boundary": "Runtime estimate remains unknown. Resource caps are not estimates; complete gate and independent review are prerequisites for remaining-cohort consideration.",
+  "preparation_state_interpretation": "freeze records immutable prospective design, not execution permission. draft_only:true and pending scientific_design_review are retained preparation-state declarations. This external review resolves finite design review only; false scientific_admission and launch_authorized remain enforced. Parent must issue separate exact committed-freeze/request/live-state admission.",
+  "remaining": [
+    "Parent binds committed freeze and packaging source provenance",
+    "Parent reconciles live owners and exact approved client/runtime/request",
+    "Actual complete18-row result and15 independent nonwall replays required",
+    "No gate result by itself authorizes later cohort or timing claims"
+  ],
+  "new_solver_executions": 0,
+  "cloud_calls": 0,
+  "launch_authorized": false
+}

@@ -668,7 +668,11 @@ fn validate_checkpoint(
     checkpoint_sha256: &str,
 ) -> Result<(), String> {
     if checkpoint.schema != CHECKPOINT_SCHEMA
-        || checkpoint.source_commit != config.source_commit
+        // The predecessor digest binds the complete checkpoint, including its
+        // source identity. Requiring that identity to equal the current
+        // producer would make a hash-pinned bug-fix successor unable to
+        // continue an otherwise valid immutable chain.
+        || !is_lower_hex(&checkpoint.source_commit, 40)
         || checkpoint.class_number_receipt_sha256 != config.class_number_receipt_sha256
         || checkpoint.next_x != config.x_start
         || checkpoint.lanes.len() != LANES
@@ -830,14 +834,31 @@ fn closure_record(
     let predecessor = state
         .predecessor_j
         .ok_or("final row state lacks a predecessor")?;
-    let (target, kernel, u2) =
-        make_step(context, &context.row_phi, state.current, Some(predecessor))?;
-    if target.j != seed.point.j || target.model != seed.point.model {
+    let target_j = selected_target(
+        context,
+        &context.row_phi,
+        &state.current.model,
+        Some(predecessor),
+    )?;
+    if target_j != seed.point.j {
         return Err(format!(
             "degree-{ROW_DEGREE} row ({},{}) does not close at x={ROW_ORDER}",
             state.y, state.z
         ));
     }
+    let isogeny = kernel::elkies_isogeny(
+        &context.field,
+        &state.current.model,
+        &context.row_phi,
+        &target_j,
+    )
+    .map_err(|error| format!("degree-{ROW_DEGREE} closure construction: {error:?}"))?;
+    // Lane (0, 0) is deliberately stored as the registered root model, while
+    // ordinary row steps use the generic canonical-model rule. Certify the
+    // terminal codomain against the model actually stored at x=0 instead of
+    // requiring the generic representative to equal that registered model.
+    let u2 = kernel::link_to_target(&context.field, &isogeny.codomain, &seed.point.model)
+        .map_err(|error| format!("degree-{ROW_DEGREE} closure target link: {error:?}"))?;
     Ok(ClosureRecord {
         record: "closure".into(),
         source: Coordinate {
@@ -852,7 +873,8 @@ fn closure_record(
         },
         degree: ROW_DEGREE,
         predecessor_j: hex_fe(&context.field, &predecessor),
-        kernel_polynomial: kernel
+        kernel_polynomial: isogeny
+            .kernel
             .iter()
             .map(|value| hex_fe(&context.field, value))
             .collect(),
@@ -1460,6 +1482,65 @@ mod tests {
         assert!(continuation.validate().is_err());
         continuation.previous_checkpoint_sha256 = Some("c".repeat(64));
         assert!(continuation.validate().is_ok());
+    }
+
+    #[test]
+    fn checkpoint_digest_permits_an_explicit_source_transition() {
+        let config = SegmentConfig {
+            x_start: 10,
+            length: 10,
+            batch_steps: 4,
+            audit_points: 1,
+            audit_seed_x: 0,
+            source_commit: "a".repeat(40),
+            class_number_receipt_sha256: "b".repeat(64),
+            previous_checkpoint_sha256: Some("c".repeat(64)),
+        };
+        let curve = CurveRecord {
+            a: "0000000000000001".into(),
+            b: "0000000000000001".into(),
+            j: "0000000000000001".into(),
+            order_status: "consistent_unproved".into(),
+            qr_prefix_64: 0,
+            a_signed_bits: 1,
+            b_signed_bits: 1,
+            a_minus_3_model: false,
+        };
+        let lanes = (0..LANES)
+            .map(|index| LaneCheckpoint {
+                y: (index % COSET_ROWS as usize) as u8,
+                z: (index / COSET_ROWS as usize) as u8,
+                predecessor_j: Some("0000000000000001".into()),
+                current: curve.clone(),
+            })
+            .collect();
+        let checkpoint = Checkpoint {
+            schema: CHECKPOINT_SCHEMA.into(),
+            source_commit: "d".repeat(40),
+            class_number_receipt_sha256: config.class_number_receipt_sha256.clone(),
+            previous_checkpoint_sha256: Some("e".repeat(64)),
+            segment_sha256: "f".repeat(64),
+            x_start: 0,
+            next_x: config.x_start,
+            record_chain_sha256: "0".repeat(64),
+            lanes,
+        };
+        assert!(validate_checkpoint(&config, &checkpoint, &"c".repeat(64)).is_ok());
+        assert!(validate_checkpoint(&config, &checkpoint, &"9".repeat(64)).is_err());
+    }
+
+    #[test]
+    fn registered_root_is_not_the_generic_canonical_representative() {
+        let start = start_curve().expect("frozen start curve");
+        let field = Field::new(&start.p).expect("prime field");
+        let root = Model {
+            a: field.from_big(&start.a),
+            b: field.from_big(&start.b),
+        };
+        let (canonical, _) = curve::canonical_model(&field, &root).expect("ordinary root");
+        assert_ne!(canonical, root);
+        assert_eq!(canonical.j(&field), root.j(&field));
+        assert!(curve::isomorphism(&field, &canonical, &root).is_some());
     }
 
     #[test]

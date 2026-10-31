@@ -42,6 +42,9 @@ COVERS = "docs/curves/covers.json"
 COVER_LINKS = "docs/curves/cover-links.yaml"
 STANDARDS_COVERAGE = "docs/curves/standards/coverage.json"
 LEADERBOARD = "docs/ic/leaderboard.json"
+STORE_INDEX = "store/index.json"
+STORE_CONFIG = "store/config.json"
+STORE_SCHEMA = "crypto.store-index/v1"
 TOURNAMENT_RUNS = "research/ic_candidate_tournament_20260915/runs"
 ECBENCH_SESSIONS_GLOBS = ("research/ecbench_*/sessions/*", "research/isogeny_conductor_gap_*/sessions/*", "research/fiber_ic_scaling_*/sessions/*", "research/full_volcano_graphwide_ic_*/execution/campaigns/*/sessions/*")
 IC1_SCAN_GLOBS = (
@@ -331,7 +334,14 @@ def curve_rows(registry: dict, leaderboard: dict) -> list[dict]:
                 "log2_r": row.get("log2_r"),
                 "reference": row.get("reference"),
                 "best_recipe": best.get("variant"),
+                "best_base_points": best.get("base_points"),
+                "best_base_columns": best.get("columns"),
+                "best_base_source": row.get("source"),
                 "best_s": best.get("s"),
+                "log2_ic_gae": best.get("log2_total_gae"),
+                "log2_rho_gae": row.get("reference_log2_total_gae"),
+                "operation_unit": row.get("operation_unit"),
+                "validation_status": (row.get("validation") or {}).get("status"),
                 "ratio_rho": best.get("ratio_rho"),
                 "ratio_floor": best.get("ratio_floor"),
                 "verified": best.get("verified"),
@@ -358,7 +368,7 @@ def curve_rows(registry: dict, leaderboard: dict) -> list[dict]:
         a = params.get("a") if params.get("a") is not None else model.get("a")
         b = params.get("b") if params.get("b") is not None else model.get("b")
         # An extension coefficient is its list over 1, t, ..., t^(k-1).
-        a, b = ("[" + ", ".join(v) + "]" if isinstance(v, list) else v for v in (a, b))
+        a, b = ("[" + ", ".join(map(str, v)) + "]" if isinstance(v, list) else v for v in (a, b))
         rep = (c.get("representations") or [None])[0]
         subgroup = rep["curve"] if rep else {}
         r = subgroup.get("subgroup_order")
@@ -660,7 +670,13 @@ def candidate_identities(source: RepositoryInputs) -> list[dict]:
     found = defaultdict(lambda: {"count": 0, "files": Counter()})
     for pattern in IC1_SCAN_GLOBS:
         for path in source.glob_files(pattern):
-            if source.size(path) > MAX_SCAN_BYTES:
+            # The canonical leaderboard is required input even after it grows
+            # beyond the cap for incidental text files. Otherwise published
+            # IC1 identities disappear from search without a source change.
+            # The core leaderboard is already a required, fully parsed input
+            # to build(). Its growth must not hide IDs named only there. Keep
+            # the bound for the general research-note/candidate scan.
+            if path != LEADERBOARD and source.size(path) > MAX_SCAN_BYTES:
                 continue
             text = source.read_text(path, errors="replace")
             for ident in IC1_FULL_RE.findall(text):
@@ -693,22 +709,64 @@ def attach_covers(
     curves: list[dict],
     report: dict,
     source: RepositoryInputs | None = None,
-) -> None:
-    """Join preverified metadata only; mathematical checks are native Rust."""
-    if (
-        report.get("schema_version") != "curve-covers/v1"
-        or report.get("registry_sha256") != sha256_file(REGISTRY, source)
-    ):
-        raise ValueError("cover report schema or registry digest is stale")
+) -> set[str]:
+    """Join source-bound cover findings; leave newer registry curves unassessed."""
+    if (report.get("schema_version") != "curve-covers/v1" or
+            not re.fullmatch(r"[a-f0-9]{64}", report.get("registry_sha256", ""))):
+        raise ValueError("cover report schema or source digest is invalid")
     findings = report.get("curves", [])
     by_slug = {r["slug"]: r for r in findings}
-    if len(by_slug) != len(findings) or set(by_slug) != {c["slug"] for c in curves}:
-        raise ValueError("cover report must have exactly one finding per catalog model")
+    current_slugs = {c["slug"] for c in curves}
+    if len(by_slug) != len(findings) or not set(by_slug).issubset(current_slugs):
+        raise ValueError("cover report has duplicate or unknown catalog models")
+    if report["registry_sha256"] == sha256_file(REGISTRY, source) and set(by_slug) != current_slugs:
+        raise ValueError("current cover report must have one finding per catalog model")
     for curve in curves:
-        finding = by_slug[curve["slug"]]
-        if finding.get("model_sha256") != hashlib.sha256(curve["model_json"].encode()).hexdigest():
+        finding = by_slug.get(curve["slug"])
+        if finding and finding.get("model_sha256") != hashlib.sha256(curve["model_json"].encode()).hexdigest():
             raise ValueError(f"cover model digest mismatch: {curve['slug']}")
         curve["hyperelliptic_cover"] = finding
+    return set(by_slug)
+
+
+def store_objects(curves_by_slug: dict, fb_ids: set, source: RepositoryInputs) -> dict:
+    """The large files the repository keeps in its content-addressed store.
+
+    Quoted from the committed index (`store/index.json`); the bytes live in
+    the remote under their SHA-256 and are fetched on demand (`ecbench store
+    pull`).  The curve and factor-base links come from the entry's name, the
+    same rule the ecbench database uses (`factor-bases/<curve>/<FB1h id>.json`),
+    and are kept only where the id resolves to a row of this index.
+    """
+    index = load(STORE_INDEX, source)
+    if index.get("schema") != STORE_SCHEMA:
+        raise ValueError(f"{STORE_INDEX}: schema {index.get('schema')!r}, expected {STORE_SCHEMA!r}")
+    objects = []
+    for name, e in sorted(index["entries"].items()):
+        parts = name.split("/")
+        curve = fb = None
+        if parts[0] == "factor-bases" and len(parts) >= 3:
+            curve = parts[1]
+            stem = parts[-1].rsplit(".", 1)[0]
+            if stem.startswith("FB1h"):
+                fb = stem
+        objects.append(
+            {
+                "name": name,
+                "kind": parts[0],
+                "sha256": e["sha256"],
+                "bytes": e["bytes"],
+                "description": e.get("description") or None,
+                "tags": e.get("tags", []),
+                "provenance": e.get("provenance") or None,
+                "superseded": e.get("superseded", []),
+                "recorded_curve": curve,
+                "curve": curve if curve in curves_by_slug else None,
+                "fb_id": fb if fb in fb_ids else None,
+                "recorded_fb_id": fb,
+            }
+        )
+    return {"remote": load(STORE_CONFIG, source).get("remote"), "objects": objects}
 
 
 def build() -> dict:
@@ -716,18 +774,23 @@ def build() -> dict:
     registry = load(REGISTRY, source)
     leaderboard = load(LEADERBOARD, source)
     curves = curve_rows(registry, leaderboard)
-    attach_covers(curves, load(COVERS, source), source)
+    report = load(COVERS, source)
+    covered_slugs = attach_covers(curves, report, source)
     graph = load(COVER_LINKS, source)  # JSON syntax is a subset of YAML 1.2.
     if (
         graph.get("schema_version") != "curve-cover-graph/v1"
-        or graph.get("registry_sha256") != sha256_file(REGISTRY, source)
+        or graph.get("registry_sha256") != report.get("registry_sha256")
     ):
-        raise ValueError("stale cover graph")
+        raise ValueError("cover graph and report have different source registries")
     nodes = {node["icv1_identity"]["slug"]: node for node in graph["curves"]}
-    if len(nodes) != len(graph["curves"]) or set(nodes) != {c["slug"] for c in curves}:
-        raise ValueError("cover graph must bind every catalog model exactly once")
+    if len(nodes) != len(graph["curves"]) or set(nodes) != covered_slugs:
+        raise ValueError("cover graph must bind every assessed model exactly once")
     for curve in curves:
-        node = nodes[curve["slug"]]
+        node = nodes.get(curve["slug"])
+        if node is None:
+            curve["cover_links"] = []
+            curve["standards_provenance"] = []
+            continue
         if node["model_json"] != curve["model_json"]:
             raise ValueError("cover graph model mismatch")
         curve["cover_links"] = [dict(link, cover_id=graph["covers"][link["cover_uid"]]["cover_id"],
@@ -735,6 +798,9 @@ def build() -> dict:
         curve["standards_provenance"] = node.get("standards_provenance") or []
     by_slug = {c["slug"]: c for c in curves}
     sessions, methods, fbs, yields = ecbench_sessions(by_slug, source)
+    store = store_objects(by_slug, {f["fb_id"] for f in fbs}, source)
+    for c in curves:
+        c["store_objects"] = [o["name"] for o in store["objects"] if o["curve"] == c["slug"]]
     rounds = tournament_rounds(curves, source)
     candidates = candidate_identities(source)
     tag_to_slug = {}
@@ -749,6 +815,8 @@ def build() -> dict:
         COVER_LINKS: sha256_file(COVER_LINKS, source),
         STANDARDS_COVERAGE: sha256_file(STANDARDS_COVERAGE, source),
         LEADERBOARD: sha256_file(LEADERBOARD, source),
+        STORE_INDEX: sha256_file(STORE_INDEX, source),
+        STORE_CONFIG: sha256_file(STORE_CONFIG, source),
         **{
             os.path.join(s["dir"], "records.jsonl"): sha256_file(
                 os.path.join(s["dir"], "records.jsonl"), source
@@ -760,7 +828,11 @@ def build() -> dict:
         "schema_version": "lab-browser/1",
         "generated_by": "scripts/build_lab_browser.py",
         "what_this_is": "A searchable index of the curves, methods, factor bases, candidate identities, tournament rounds and ecbench sessions this repository names, joined on the identities it already computes (ICV1 slugs, EC1 aliases, ECM1 method ids, FB1 factor-base ids, IC1 candidate ids). Every figure is quoted from a committed file named in `sources` or in the row; nothing is computed here beyond means over a session's own verified runs.",
-        "counts": {"curves": len(curves), "methods": len(methods), "factor_bases": len(fbs), "candidates": len(candidates), "rounds": len(rounds), "sessions": len(sessions), "yields": len(yields)},
+        "counts": {"curves": len(curves), "cover_assessed": len(covered_slugs),
+                   "cover_unassessed": len(curves) - len(covered_slugs),
+                   "methods": len(methods), "factor_bases": len(fbs), "candidates": len(candidates),
+                   "rounds": len(rounds), "sessions": len(sessions), "yields": len(yields),
+                   "store_objects": len(store["objects"])},
         "sources": sources,
         "vocabulary": VOCABULARY,
         "standards_coverage": load(STANDARDS_COVERAGE, source),
@@ -771,6 +843,7 @@ def build() -> dict:
         "rounds": rounds,
         "sessions": sessions,
         "yields": yields,
+        "store": store,
     }
 
 

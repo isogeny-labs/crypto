@@ -1,17 +1,27 @@
 # Joux–Vitse `(n − 1)`-decomposition at `n = 5`: measured end to end against rho
 
-2026-10-15.  Report with figures: [`REPORT.pdf`](REPORT.pdf) (source
+2026-10-15 (plain route) and 2026-10-20 (2-torsion Edwards route).  Plain
+route, report with figures: [`REPORT.pdf`](REPORT.pdf) (source
 [`REPORT.typ`](REPORT.typ), which reads [`summary.json`](summary.json)).  Run
 report: [`reports/run-20261015T0518Z/`](reports/run-20261015T0518Z/).  Cost
 model and literature: [`MODEL.md`](MODEL.md).  Protocol frozen before data:
 [`PROTOCOL.md`](PROTOCOL.md), with [`PROTOCOL_ADDENDUM.md`](PROTOCOL_ADDENDUM.md).
+Edwards route: report [`REPORT_EDWARDS.pdf`](REPORT_EDWARDS.pdf) (source
+[`REPORT_EDWARDS.typ`](REPORT_EDWARDS.typ), reading
+[`summary_edwards.json`](summary_edwards.json)), run report
+[`reports/run-20261015T1723Z-edwards/`](reports/run-20261015T1723Z-edwards/),
+protocol [`PROTOCOL_EDWARDS.md`](PROTOCOL_EDWARDS.md), deviations
+[`data/edwards/DEVIATION.md`](data/edwards/DEVIATION.md).
 Code: `src/cryptanalysis/joux_vitse.rs`, `examples/joux_vitse_ladder.rs`,
-`examples/joux_vitse_summary.rs`.  Open obstruction:
+`examples/joux_vitse_summary.rs`; Edwards: `src/cryptanalysis/joux_vitse_edwards.rs`,
+`examples/joux_vitse_edwards.rs`, `examples/joux_vitse_edwards_summary.rs`.  Open obstruction:
 [`problems/k5-joux-vitse-trial-cost-and-fpk-ecbench.md`](../../problems/k5-joux-vitse-trial-cost-and-fpk-ecbench.md).
 
-**Class: a measurement of a published route (reproduction), plus an
-accounting correction to the scoreboard's `k = 5` plain constant. No
-advance.**
+**Class: the plain route is a measurement of a published route
+(reproduction) plus an accounting correction to the scoreboard's `k = 5`
+plain constant; the Edwards route's trace replay is engineering (a verified
+stage improvement of `1.74–1.77×`) and its complete DLPs are that route's
+first end-to-end baseline. No advance on the exponent.**
 
 ## Verdict
 
@@ -39,6 +49,45 @@ constant set by `C_trial / c_add ≈ 4·10⁷`.
 Large primes cannot help. There is no linear algebra to rebalance, and a
 smaller factor base raises the trials per relation as its fourth power
 (MODEL.md).
+
+## The 2-torsion Edwards route, end to end with trace replay (2026-10-20)
+
+The route the repository already measured as a stage (`jv_quintic_edwards.rs`,
+RESEARCH_K5_TORSION_JOUX_VITSE.md §3, `C″ = 7.3·10⁷`), run end to end with the
+F4 trace replay that note priced at `3–10×` and left undone (§5), under
+[`PROTOCOL_EDWARDS.md`](PROTOCOL_EDWARDS.md), frozen before data.
+
+- **The test.** Replay cuts it from `5.85·10⁷` (the committed solve on today's
+  engine) to `3.3–3.4·10⁷` `F_p` multiplications: `1.74–1.77×`, on 128 paired
+  residuals (`p = 271, 521`, two seeds, 32 each); 0 failed checks.
+- **Complete DLPs**, paired with rho on the same target (`data/edwards/`):
+
+| run | `log₂ n` | `|F|` | trials | relations | IC / rho | priced at 1 GAE | answer |
+|:--|--:|--:|--:|--:|--:|--:|:--|
+| `p31_s1` | 22.8 | 7 | 105,344 | 8 | 3.4·10⁶ | 1.1·10⁶ | both verified |
+| `p31_s2` | 22.8 | 6 | 310,048 | 7 | 5.8·10⁶ | 1.9·10⁶ | both verified |
+| `p41_s2` | 24.8 | 8 | 534,016 | 9 | 1.9·10⁶ | 6.5·10⁵ | both verified |
+| `p61_s1` | 27.7 | 14 | 451,408 | 15 | 1.2·10⁶ | 4.1·10⁵ | both verified |
+| `p71_s1` | 28.7 | 12 | 1,833,280 | 13 | 5.2·10⁶ | 1.7·10⁶ | both verified |
+| `p41_s1` | 24.8 | 6 | 1,377,312 | 3 of 7 | `≥ 1.5·10⁷` | — | stopped at its 10-hour cap |
+
+- **Distance to rho.** `1.2·10⁶–5.8·10⁶` times rho on the five solved arms
+  (`4.1·10⁵–1.9·10⁶` with rho's unpriced walk work priced at 1 group-addition
+  equivalent per operation, AGENTS.md §5a; rho stays ahead at every weight
+  in the `0, 0.1, 1` band, and IC's own unpriced F4 symbolic work only
+  widens the gap). The plain route measured `6.8·10⁷` at `p = 31`, so this
+  route is `12–20×` closer at that size.
+- **Trials per relation** are `0.91` of the census expectation
+  `n / (8 C(|F|, 4))` (geometric mean of the five arms; every 95 % interval
+  contains 1).
+- **Where it would meet rho** (extrapolation on the measured replayed test and
+  the census rate): `n ≈ 2^{227.4}`, against `2^{233}` without replay.
+- **Class.** Trace replay: engineering, `1.74–1.77×` on the test, with the
+  rest of the route unchanged. Nothing here changes the exponent.
+- **Incidents** (all in `data/edwards/DEVIATION.md`): an overlapped first
+  launch (discarded), at least three container restarts (partial records
+  kept; a resumable driver was added and checked for equivalence), and
+  `p = 41` seed 1 reaching its cap. Every protocol arm ran.
 
 ## Results
 
@@ -136,9 +185,10 @@ The committed `jv_quintic` plain test, re-run unchanged on today's `f4_fp`
   - trace replay of the trial;
   - the rate ladder with its oracle;
   - the corrected constant.
-- **Better per-trial constant elsewhere.** The 2-torsion Edwards test
-  (`7.3·10⁷`) is a better constant than anything here. Its crossover,
-  `2^{233}`, is likewise far out of reach.
+- **Better per-trial constant elsewhere.** The 2-torsion Edwards test is a
+  better constant than the plain one (`3.3·10⁷` replayed against `7.5·10⁹`);
+  it is measured above, end to end, and its extrapolated crossover,
+  `2^{227}`, is likewise far out of reach.
 - **Correction to the premise: the practical `F_{p⁶}` result.** Joux–Vitse's
   practical `F_{p⁶}` result is cover and decomposition (thesis ch. 8), not
   `(n − 1)`-decomposition. The repository measures that route on a weak

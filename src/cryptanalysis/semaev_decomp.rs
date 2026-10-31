@@ -651,8 +651,9 @@ impl Gf2 {
     /// trick in miniature, still with one field inversion.  Same inverses,
     /// same multiplication count, a quarter of the dependent chain.
     ///
-    /// Both passes walk `xs` and `scratch` as zipped chunks, so the loops
-    /// carry no bounds checks and no `Vec` growth checks.
+    /// Both passes walk `xs` and `scratch` as zipped chunks (fixed-width
+    /// arrays in the `pclmulqdq` copy), so the loops carry no bounds
+    /// checks and no `Vec` growth checks.
     pub fn batch_inv(&self, xs: &mut [u64], scratch: &mut Vec<u64>) {
         #[cfg(target_arch = "x86_64")]
         if self.folds() {
@@ -706,14 +707,26 @@ impl Gf2 {
         // longer batch than the last zero-fills, and only its new tail.
         scratch.truncate(xs.len());
         scratch.resize(xs.len(), 0);
-        let mut acc = [shifted(1); LANES];
-        for (xc, pc) in xs.chunks(LANES).zip(scratch.chunks_mut(LANES)) {
-            for ((&x, prefix), a) in xc.iter().zip(pc.iter_mut()).zip(acc.iter_mut()) {
-                *prefix = plain(*a);
-                if x != 0 {
-                    *a = self.fold_shifted(_mm_cvtsi64_si128(x as i64), *a);
-                }
+        // Whole chunks as `[u64; LANES]`, so each lane is a fixed index:
+        // zipping variable-length `chunks` cost 18 instructions an element
+        // in iterator bookkeeping, a fifth of the whole inversion.  The
+        // short tail goes last forward and first backward, as before.
+        let forward = |x: u64, prefix: &mut u64, a: &mut __m128i| {
+            *prefix = plain(*a);
+            if x != 0 {
+                *a = self.fold_shifted(_mm_cvtsi64_si128(x as i64), *a);
             }
+        };
+        let mut acc = [shifted(1); LANES];
+        let (xh, xt) = xs.as_chunks::<LANES>();
+        let (ph, pt) = scratch.as_chunks_mut::<LANES>();
+        for (xc, pc) in xh.iter().zip(ph.iter_mut()) {
+            for l in 0..LANES {
+                forward(xc[l], &mut pc[l], &mut acc[l]);
+            }
+        }
+        for ((&x, prefix), a) in xt.iter().zip(pt.iter_mut()).zip(acc.iter_mut()) {
+            forward(x, prefix, a);
         }
         let [a0, a1, a2, a3] = acc.map(plain);
         let p01 = self.mul(a0, a1);
@@ -727,13 +740,21 @@ impl Gf2 {
             shifted(self.mul(i23, a3)),
             shifted(self.mul(i23, a2)),
         ];
-        for (xc, pc) in xs.chunks_mut(LANES).zip(scratch.chunks(LANES)).rev() {
-            for ((x, &prefix), ia) in xc.iter_mut().zip(pc.iter()).zip(inv_acc.iter_mut()) {
-                if *x != 0 {
-                    let xi = _mm_cvtsi64_si128(*x as i64);
-                    *x = plain(self.fold_shifted(_mm_cvtsi64_si128(prefix as i64), *ia));
-                    *ia = self.fold_shifted(xi, *ia);
-                }
+        let backward = |x: &mut u64, prefix: u64, ia: &mut __m128i| {
+            if *x != 0 {
+                let xi = _mm_cvtsi64_si128(*x as i64);
+                *x = plain(self.fold_shifted(_mm_cvtsi64_si128(prefix as i64), *ia));
+                *ia = self.fold_shifted(xi, *ia);
+            }
+        };
+        let (xh, xt) = xs.as_chunks_mut::<LANES>();
+        let (ph, pt) = scratch.as_chunks::<LANES>();
+        for ((x, &prefix), ia) in xt.iter_mut().zip(pt.iter()).zip(inv_acc.iter_mut()) {
+            backward(x, prefix, ia);
+        }
+        for (xc, pc) in xh.iter_mut().zip(ph.iter()).rev() {
+            for l in 0..LANES {
+                backward(&mut xc[l], pc[l], &mut inv_acc[l]);
             }
         }
     }

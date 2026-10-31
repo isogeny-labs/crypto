@@ -213,6 +213,8 @@ impl Source {
 pub struct Factoring {
     pub budget: u64,
     pub hints: Vec<BigUint>,
+    /// Stored depth-1 level certificates (`docs/curves/level-certificates.json`).
+    pub certificates: points::Certificates,
     memo: Mutex<HashMap<BigUint, Factored>>,
 }
 
@@ -221,6 +223,7 @@ impl Factoring {
         Factoring {
             budget,
             hints,
+            certificates: points::Certificates::new(),
             memo: Mutex::new(HashMap::new()),
         }
     }
@@ -1129,18 +1132,29 @@ fn settle_by_walks(
         if survivors.is_empty() || pinned(&survivors) {
             break survivors.into_iter().cloned().collect();
         }
-        let classes: Vec<u32> = survivors
-            .iter()
-            .filter_map(|c| class(c))
-            .filter_map(|h| h.to_u32())
-            .collect();
         let mut lengthened = false;
         for i in 0..walks.open.len() {
             let (l, steps) = walks.open[i];
             let Some(reach) = walk::affordable(model, l, WALK_EXTENSION) else {
                 continue;
             };
-            let Some(next) = classes
+            // Where each surviving order would close the walk: the exact
+            // order of a prime above l in its class group, or, past word
+            // size, its class number (a multiple of that order).
+            let targets: Vec<u32> = survivors
+                .iter()
+                .filter_map(|cand| {
+                    let f = primes
+                        .iter()
+                        .zip(cand.iter())
+                        .fold(BigUint::one(), |acc, (p, &e)| acc * p.pow(e));
+                    match walk::class_order(dk, &f, l, u64::from(reach)) {
+                        Ok(order) => order.and_then(|o| u32::try_from(o).ok()),
+                        Err(()) => class(cand).and_then(|h| h.to_u32()),
+                    }
+                })
+                .collect();
+            let Some(next) = targets
                 .iter()
                 .copied()
                 .filter(|&h| h >= steps && h < reach)
@@ -1220,6 +1234,57 @@ fn settle_by_walks(
     Ok(())
 }
 
+/// Levels still open on a prime-field curve, `p < 2^63`, at `ℓ ≤ 19`:
+/// the height of `j(E)` above the floor of its `ℓ`-volcano by descending
+/// walks of `ℓ`-isogenies ([`walk::height_above_floor`]), the level being
+/// the depth minus that height. A level outside the bound the other tests
+/// reached stops the build.
+fn settle_by_descent(model: &Model, levels: &mut [LevelRecord]) -> Result<(), String> {
+    let Model::Prime { p, a, b } = model else {
+        return Ok(());
+    };
+    let Some(p) = p.to_u64().filter(|&p| p < 1 << 63) else {
+        return Ok(());
+    };
+    let (a, b) = (
+        (a % p).to_u64().expect("reduced"),
+        (b % p).to_u64().expect("reduced"),
+    );
+    let m = |x: u64, y: u64| (u128::from(x) * u128::from(y) % u128::from(p)) as u64;
+    let a3 = m(4, m(a, m(a, a)));
+    let den = (u128::from(a3) + u128::from(m(27, m(b, b)))) % u128::from(p);
+    if den == 0 {
+        return Ok(());
+    }
+    let inv = BigUint::from(den as u64)
+        .modpow(&BigUint::from(p - 2), &BigUint::from(p))
+        .to_u64()
+        .expect("reduced");
+    let j = m(m(1728 % p, a3), inv);
+    for lv in levels.iter_mut().filter(|lv| lv.level.is_none()) {
+        let Some(ell) = lv.ell.parse::<u64>().ok().filter(|&l| l <= 19) else {
+            continue;
+        };
+        let Some(h) = walk::height_above_floor(p, j, ell, lv.depth) else {
+            continue;
+        };
+        let level = lv.depth - h.min(lv.depth);
+        if level > lv.level_at_most {
+            return Err(format!(
+                "descending {ell}-isogeny walks put E at level {level}, above the bound {} ({})",
+                lv.level_at_most, lv.method
+            ));
+        }
+        lv.level = Some(level);
+        lv.level_at_most = level;
+        lv.method = format!(
+            "descending {ell}-isogeny walks reach the floor in {h} steps: level {level} of depth {}",
+            lv.depth
+        );
+    }
+    Ok(())
+}
+
 /// The most candidate orders [`settle_by_walks`] weighs.
 const MAX_CANDIDATE_ORDERS: usize = 4096;
 
@@ -1285,6 +1350,7 @@ fn endomorphism(
     frob: &Frobenius,
     sub: &SubfieldRecord,
     ordinary: bool,
+    certificates: &points::Certificates,
 ) -> Result<EndomorphismRecord, String> {
     let record = |f0: Option<String>, maximal, status, contains: Vec<String>| EndomorphismRecord {
         conductor_divides: f0,
@@ -1507,7 +1573,27 @@ fn endomorphism(
                             })
                         })
                     };
-                    let mut by_points = depth1(false);
+                    // A stored certificate first: it is only checked, so
+                    // it costs a few multiplications where the search
+                    // costs many; a certificate that fails stops the build.
+                    let certificate = (*depth == 1)
+                        .then(|| certificates.get(&(c.slug.clone(), small.unwrap_or(0))))
+                        .flatten();
+                    let by_certificate = match certificate {
+                        Some(cert) => Some(
+                            timed(&format!("certificate {ell}"), &c.slug, || {
+                                points::verify_level_certificate(&c.model, &c.trace, cert)
+                            })
+                            .map_err(|why| {
+                                format!("the level certificate at ℓ = {ell} fails: {why}")
+                            })?,
+                        ),
+                        None => None,
+                    };
+                    let mut by_points = by_certificate;
+                    if by_points.is_none() {
+                        by_points = depth1(false);
+                    }
                     let mut by_cycle = false;
                     if by_points.is_none() {
                         let cycles = cycles.get_or_insert_with(|| {
@@ -1527,6 +1613,20 @@ fn endomorphism(
                                 walk::describe(&cycles.as_ref().expect("walked").closed)
                             ),
                         ),
+                        Some(true) if by_certificate.is_some() => (
+                            Some(0),
+                            0,
+                            format!(
+                                "a stored certificate: two independent points of order ℓ over \
+                                 GF(q^{}){}, the crater",
+                                certificate.expect("checked").degree,
+                                if certificate.expect("checked").twist {
+                                    " on the twist"
+                                } else {
+                                    ""
+                                }
+                            ),
+                        ),
                         Some(true) => (
                             Some(0),
                             0,
@@ -1539,11 +1639,18 @@ fn endomorphism(
                                      is on the floor, but ℓ ∤ f₀"
                                 ));
                             }
-                            (
-                                Some(1),
-                                1,
-                                "the ℓ-part of E(GF(q^k)) is cyclic, k = ord(λ): the floor".into(),
-                            )
+                            let method = match certificate {
+                                Some(cert) => format!(
+                                    "a stored certificate: a point of order ℓ^{} over GF(q^{}){}, \
+                                     the ℓ-part cyclic, the floor",
+                                    cert.v,
+                                    cert.degree,
+                                    if cert.twist { " on the twist" } else { "" }
+                                ),
+                                None => "the ℓ-part of E(GF(q^k)) is cyclic, k = ord(λ): the floor"
+                                    .into(),
+                            };
+                            (Some(1), 1, method)
                         }
                         None => {
                             let why = match (&c.model, small) {
@@ -1626,6 +1733,9 @@ fn endomorphism(
         timed("orders", &c.slug, || {
             settle_by_walks(&c.model, &dk, walks, &mut levels, &mut contains)
         })?;
+        timed("descent", &c.slug, || {
+            settle_by_descent(&c.model, &mut levels)
+        })?;
         bound = BigUint::one();
         exact = BigUint::one();
         resolved = true;
@@ -1688,7 +1798,7 @@ pub fn compute(c: &RegistryCurve, fx: &Factoring) -> Result<CurveTraits, String>
     };
     let (subgroup, r) = subgroup(c, fx).map_err(ctx)?;
     let sub = subfield_record(c).map_err(ctx)?;
-    let endo = endomorphism(c, &frob, &sub, ordinary).map_err(ctx)?;
+    let endo = endomorphism(c, &frob, &sub, ordinary, &fx.certificates).map_err(ctx)?;
     let small = small_primes(&delta, &characteristic);
     let dissect = match &c.model {
         Model::Prime { .. } | Model::Binary { .. } | Model::Extension { .. } if ordinary => {
@@ -2031,7 +2141,7 @@ impl TraitFile {
             path: "docs/curves/registry.json".into(),
             text: registry_text.to_string(),
         };
-        Ok(Self::build_from(&registry, None, None, &[], budget)?.0)
+        Ok(Self::build_from(&registry, None, None, None, &[], budget)?.0)
     }
 
     /// The registry, the factor hints, and the curves of every source the
@@ -2040,6 +2150,7 @@ impl TraitFile {
     pub fn build_from(
         registry: &Input,
         hints: Option<&Input>,
+        certificates: Option<&Input>,
         manifest: Option<&Input>,
         sources: &[Input],
         budget: u64,
@@ -2073,7 +2184,11 @@ impl TraitFile {
                 curves.extend(read.into_iter().filter(|c| seen.insert(c.slug.clone())));
             }
         }
-        let fx = Factoring::new(budget, hint_primes);
+        let mut fx = Factoring::new(budget, hint_primes);
+        if let Some(c) = certificates {
+            inputs.push(c.digest());
+            fx.certificates = points::read_certificates(&c.text)?;
+        }
         let records: Result<Vec<_>, String> = curves
             .par_iter()
             .map(|c| {
@@ -2105,9 +2220,9 @@ impl TraitFile {
         Ok((file, fx))
     }
 
-    /// Pretty JSON with a trailing newline, as committed.
+    /// Compact JSON with a trailing newline.
     pub fn to_json(&self) -> String {
-        let mut s = serde_json::to_string_pretty(self).expect("serialisable");
+        let mut s = serde_json::to_string(self).expect("serialisable");
         s.push('\n');
         s
     }
@@ -2182,7 +2297,7 @@ mod tests {
             .iter()
             .filter(|curve| matches!(&curve.model, Model::Extension { .. }))
             .collect();
-        assert_eq!(extensions.len(), 1324);
+        assert_eq!(extensions.len(), 1371); // 1324 existing + 47 frozen three-leads models.
         for curve in extensions {
             let Model::Extension {
                 p,
@@ -2317,6 +2432,20 @@ mod tests {
             .iter()
             .any(|o| o.starts_with("O_K (j = ")));
         assert!(t.endomorphism.levels.iter().all(|l| l.level == Some(0)));
+        // GF(2^47), v = 31² at depth 2, h(d_K) = 11468: no 5- or 17-isogeny
+        // walk returns, but in Cl(O_31) the primes above 5 and 17 have
+        // orders 22936 and 91744 (O_K: 5734), so only the floor fits.
+        let t = get("icv1-f2m47-t4276051-826c5755");
+        let l31 = &t.endomorphism.levels[0];
+        assert_eq!((l31.ell.as_str(), l31.level), ("31", Some(2)));
+        // GF(2^61), ℓ = 31543 at depth 1: a cycle of 17934 13-isogenies
+        // fits Cl(O_{7³}) and not Cl(O_{7³·31543}) (orders exact past 2^60).
+        let t = get("icv1-f2m61-tm1864788689-c4a45971");
+        assert!(t
+            .endomorphism
+            .levels
+            .iter()
+            .any(|l| l.ell == "31543" && l.level == Some(0)));
         // v = 271 is beyond the scalar test, d_K = −7 has class number 1:
         // O_K would close every walk of l-isogenies in one step, and the
         // walk does not, so End(E) = Z[π], of conductor 271.

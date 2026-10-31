@@ -2,10 +2,34 @@
 //! Arithmetic for public curve data; based on the separately validated walker field.
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
+use serde::{Deserialize, Serialize};
 
 /// An element in Montgomery form (`x·R mod p`, `R = 2^(64*N)`).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Element<const N: usize>(pub [u64; N]);
+
+impl<const N: usize> Serialize for Element<N> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        self.0.as_slice().serialize(serializer)
+    }
+}
+
+impl<'de, const N: usize> Deserialize<'de> for Element<N> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let limbs = Vec::<u64>::deserialize(deserializer)?;
+        let actual_len = limbs.len();
+        let limbs = limbs.try_into().map_err(|_| {
+            serde::de::Error::custom(format!("expected {N} field limbs, got {actual_len}"))
+        })?;
+        Ok(Self(limbs))
+    }
+}
 
 /// The field `GF(p)`.
 #[derive(Clone, Debug)]
@@ -405,4 +429,20 @@ pub fn is_probable_prime(n: &BigUint) -> bool {
         return false;
     }
     true
+}
+
+#[cfg(test)]
+mod serde_tests {
+    use super::Element;
+
+    #[test]
+    fn field_elements_round_trip_with_exact_limb_count() {
+        let element = Element::<3>([0, 0x0123_4567_89ab_cdef, u64::MAX]);
+        let encoded = serde_json::to_vec(&element).unwrap();
+        assert_eq!(
+            serde_json::from_slice::<Element<3>>(&encoded).unwrap(),
+            element
+        );
+        assert!(serde_json::from_str::<Element<3>>("[1,2]").is_err());
+    }
 }

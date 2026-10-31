@@ -1,0 +1,236 @@
+{
+  "baseline": {
+    "algorithm": "Pollard rho on <G>",
+    "convention": "sqrt(pi r / (2c)) elliptic group operations for an equivalence class of c elements, negation included. The cost model's sqrt(pi r / 4) (jacobian_transfer::cost) is the c = 2 case, so a class enters as sqrt(c / 2); certificate v1 divided that reference by sqrt(c), counted negation twice and sat 0.5 bit low (Amendment 3). isogeny_degree_search::rho_reference uses sqrt(pi r / 2) (no equivalence class), a factor sqrt 2 higher, and is not used",
+    "equivalence_class_reason": "negation and the 2^1-Frobenius: E is defined over F_(2^1), so classes have size 2*15/1 = 30 (upper bound on the speedup)",
+    "equivalence_class_size": 30,
+    "log2_cost_of_one_group_operation": 9.514,
+    "log2_group_operations": 1.733,
+    "log2_r": 7.721,
+    "log2_total": 11.248,
+    "log2_total_negation_only": 13.201
+  },
+  "candidate": {
+    "id": "pairing:tate_mov_frey_ruck",
+    "label": "Tate/Weil pairing into F_(q^k)^*, k = embedding degree of r",
+    "transfer_type": "pairing_transfer"
+  },
+  "carried": true,
+  "checks": [
+    {
+      "evidence": "one element of F_(q^k) has 2.100e2 bits (1 TiB = 8.80e12 bits): above that the pairing cannot be evaluated and the price below is a formal extrapolation of the cost model",
+      "name": "pairing_target_element_storable",
+      "result": "PASS"
+    },
+    {
+      "evidence": "#E = q would put the curve in the scope of Smart's attack, which this tool does not cover",
+      "name": "anomalous_curve",
+      "result": "PASS"
+    }
+  ],
+  "costs": {
+    "destination_solver": "RhoInSubgroupOfFqk",
+    "log2_baseline": 11.248,
+    "log2_cost_ratio": 8.623,
+    "log2_total": 19.871,
+    "repo_ratio_log2": -6.669,
+    "rows": [
+      {
+        "formula": "the pairing is defined by the curve; no auxiliary curve or cover is constructed (the auxiliary point of the Weil pairing is not needed for the Tate pairing)",
+        "log2": null,
+        "phase": "map_construction",
+        "status": "not_applicable"
+      },
+      {
+        "formula": "two pairing evaluations: log2(2 * log2(r) * 12 * M(k log2 q)); MILLER_MULTS_PER_BIT is a placeholder that never decides a verdict",
+        "log2": 19.761,
+        "phase": "transfer_evaluation",
+        "status": "modeled"
+      },
+      {
+        "formula": "balanced with the linear algebra in L[1/3] algorithms; priced together below",
+        "log2": null,
+        "phase": "relation_collection",
+        "status": "not_applicable"
+      },
+      {
+        "formula": "see relation_collection",
+        "log2": null,
+        "phase": "linear_algebra",
+        "status": "not_applicable"
+      },
+      {
+        "formula": "conservative end of the band: min(L_N[1/3, 1.9230] with o(1) dropped, weighted by M(k log2 q) = 2^54.8; generic rho/Pohlig-Hellman in the order-r subgroup of F_(q^k)^* = 2^15.9); N = q^k. The attacker-favourable end (c = 1.5263, unweighted) is 2^33.8",
+        "log2": 15.914,
+        "phase": "destination_solve_unsplit",
+        "status": "modeled"
+      },
+      {
+        "formula": "the logarithm of e(G,S)^d to base e(G,S) is d mod r: recovery is free; one scalar multiplication on E verifies it",
+        "log2": 13.048,
+        "phase": "descent_back_mapping",
+        "status": "modeled"
+      }
+    ],
+    "solvers_considered": [
+      [
+        "IndexCalculusInFqk_L13_conservative",
+        54.789
+      ],
+      [
+        "IndexCalculusInFqk_L13_favourable",
+        33.782
+      ],
+      [
+        "RhoInSubgroupOfFqk",
+        15.914
+      ]
+    ],
+    "total_is_lower_bound": false,
+    "unit": "log2 bit operations (frozen formula model; measured rows say so)"
+  },
+  "curve": {
+    "family": "binary",
+    "field": {
+      "a": "0x1",
+      "b": "0x1",
+      "degree": 15,
+      "kind": "binary",
+      "log2_size": 15,
+      "model": "y^2+xy=x^3+a*x^2+b",
+      "modulus": "0x8003"
+    },
+    "instance_checks": [
+      {
+        "evidence": "modulus irreducible (Rabin), coefficients canonical, b != 0 (ordinary binary model)",
+        "name": "field_and_curve",
+        "result": "PASS"
+      },
+      {
+        "evidence": "G affine, y^2+xy = x^3+ax^2+b",
+        "name": "generator_on_curve",
+        "result": "PASS"
+      },
+      {
+        "evidence": "r passes Miller-Rabin to bases 2..53 (Proved); [r]G = O, G != O, so G has exact order r",
+        "name": "subgroup_order_is_prime_and_annihilates_generator",
+        "result": "PASS"
+      },
+      {
+        "evidence": "#E = cofactor * r = q + 1 - t, Hasse bound holds, two seeded random points are annihilated by #E (evidence for the recorded order, not a point-count proof)",
+        "name": "order_consistency",
+        "result": "PASS"
+      },
+      {
+        "evidence": "curve_traits::compute run live on this instance",
+        "name": "traits_record",
+        "result": "PASS"
+      }
+    ],
+    "name": "toy-k1-n15",
+    "registered": false,
+    "slug": "unregistered-toy-k1-n15",
+    "subgroup": {
+      "cofactor": "154",
+      "generator": [
+        "0x10a7",
+        "0x5106"
+      ],
+      "order": "32494",
+      "r": "211",
+      "r_log2": 7.721,
+      "trace": "275"
+    }
+  },
+  "evaluation": {
+    "reason": "the priced total is 8.6 bits above the matched baseline",
+    "status": "excluded"
+  },
+  "executed": null,
+  "invariants": {
+    "class_invariant": "the embedding degree depends only on q and r, which every curve of the isogeny class shares",
+    "embedding_degree": "14",
+    "embedding_degree_lower_bound": null,
+    "embedding_method": "least k <= 1000 with r | q^k - 1 (ascending scan)",
+    "lfs_c": 1.5262943,
+    "log2_ic_in_fqk_L13_conservative": 54.789,
+    "log2_ic_in_fqk_L13_favourable": 33.782,
+    "log2_rho_in_subgroup_of_fqk": 15.914,
+    "price_band": {
+      "conservative_log2_cost_ratio": 8.623,
+      "conservative_log2_total": 19.871,
+      "favourable_log2_cost_ratio": 8.623,
+      "favourable_log2_total": 19.871,
+      "reading": "robustly above the matched rho: even the attacker-favourable price exceeds it"
+    },
+    "target_element_bits": 210.0
+  },
+  "lead_class": "boundary",
+  "map": {
+    "construction_status": "not evaluated",
+    "degrees": {
+      "embedding_degree": "14",
+      "embedding_degree_lower_bound": null
+    },
+    "destination": "F_(q^k)^*",
+    "explicit_formulas": "Miller's algorithm; no generic pairing is implemented in the repository (mov_attack ships k = 2 supersingular only)",
+    "field_of_definition": "F_(q^k)",
+    "source": "E(F_q)[r]",
+    "type": "e_r(G, -): <G> -> mu_r subset F_(q^k)^*"
+  },
+  "notes": [
+    "reading of the verdict: it is relative. It compares the conservative price of a discrete logarithm in F_(q^k) (2^19.9 operations: generic NFS constant, o(1) dropped, weighted by the field-multiplication cost) with the matched rho on <G> (2^11.2). `class-weak` means the first is below the second by at least the 8-bit model margin, i.e. a conservative pairing price below rho under this model; it does not say the curve is weak at any absolute security level, and `no weakness found in scope` does not say it is strong"
+  ],
+  "obligations": {
+    "computational_advantage": "refuted",
+    "existence": "supported",
+    "explicit_construction": "unknown",
+    "map_correctness": "unknown",
+    "scaling_support": "unknown",
+    "subgroup_preservation": "supported"
+  },
+  "open_obligations": [
+    "implement a generic Tate pairing and execute it on the generator (only k = 2 supersingular exists in mov_attack.rs)",
+    "replace the L[1/3] lower bound by a priced index-calculus pipeline for F_(q^k) (quasi-polynomial algorithms for small characteristic are not modeled)"
+  ],
+  "references": [
+    "Menezes-Okamoto-Vanstone 1993; Frey-Ruck 1994 (as cited in src/cryptanalysis/mov_attack.rs)",
+    "src/cryptanalysis/curve_traits (embedding degree record)"
+  ],
+  "schema": "transfer-audit/certificate/v2",
+  "subgroup_preservation": {
+    "antecedents": [
+      {
+        "evidence": "validated",
+        "name": "r_prime",
+        "result": "PASS"
+      },
+      {
+        "evidence": "gcd(q, r) = 1, so the embedding degree is defined",
+        "name": "r_does_not_divide_q",
+        "result": "PASS"
+      },
+      {
+        "evidence": "least k <= 1000 with r | q^k - 1 (ascending scan)",
+        "name": "embedding_degree_exact",
+        "result": "PASS"
+      },
+      {
+        "evidence": "curve_traits::compute reports the same embedding degree or the same lower bound",
+        "name": "agrees_with_curve_traits_record",
+        "result": "PASS"
+      }
+    ],
+    "argument": "for k the embedding degree the Tate-Lichtenbaum pairing is non-degenerate (Frey-Ruck 1994), so some S makes e(G, S) a primitive r-th root of unity: the image of <G> has order r. Not executed",
+    "executed": null,
+    "image_order": "211",
+    "kernel_meets_subgroup": false,
+    "method": "arithmetic: Frey-Ruck non-degeneracy of the Tate pairing at k = ord_r(q)",
+    "status": "arithmetic"
+  },
+  "tool": "transfer-audit/2",
+  "verdict": "no weakness found in scope",
+  "verdict_basis": [
+    "priced route costs 2^8.6 times the matched baseline or more"
+  ]
+}

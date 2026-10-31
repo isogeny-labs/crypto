@@ -104,7 +104,8 @@ fn exhaustive(args: &[String]) {
             .enumerate()
             .map(|(i, n)| {
                 json!({"id": i, "weak": n.weak, "pass": n.pass, "jv": n.jv_weak, "t": n.t,
-                                 "comp2": n.comp2, "comp23": n.comp23})
+                                 "comp2": n.comp2, "comp23": n.comp23,
+                                 "key": [n.key.0, n.key.1, n.key.2], "a": n.a, "b": n.b})
             })
             .collect();
         let mut e2 = vec![];
@@ -344,6 +345,25 @@ fn fit(args: &[String]) {
             m + iv * inv_ratio
         };
         let cost = sum(&cost_of);
+        // labelled sensitivity: walks censored by a trap (step cap, trap
+        // rule, isolated start) left out of the numerator
+        let trapped = |v: &&Value| {
+            matches!(
+                v["res"]["censor_cause"].as_str(),
+                Some("steps") | Some("trapped") | Some("isolated")
+            )
+        };
+        let steps_excl: f64 = ws
+            .iter()
+            .filter(|v| !trapped(v))
+            .map(|v| g(v, &["res", "steps"]))
+            .sum();
+        let cost_excl: f64 = ws.iter().filter(|v| !trapped(v)).map(&cost_of).sum();
+        let cause = |c: &str| {
+            ws.iter()
+                .filter(|v| v["res"]["censor_cause"].as_str() == Some(c))
+                .count()
+        };
         let wall = sum(&|v| g(v, &["wall_s"]));
         let smith_s = sum(&|v| g(v, &["res", "smith_ns"])) * 1e-9;
         // censored-exponential means: total / successes
@@ -360,83 +380,155 @@ fn fit(args: &[String]) {
             "cost_per_step": cost / steps.max(1.0),
             "reflect_share": sum(&|v| g(v, &["res", "reflects"])) / steps.max(1.0),
             "censored": ws.iter().filter(|v| v["res"]["censored"].as_bool().unwrap()).count(),
+            "censored_nodes": cause("nodes"), "censored_steps": cause("steps"),
+            "censored_wall": cause("wall"), "censored_trapped": cause("trapped"),
+            "censored_isolated": cause("isolated"),
+            // per-operation unit costs (measured mults; Smith derived from wall)
+            "step_mults_per_step": sum(&|v| g(v, &["res", "cost_step", "mults"])) / steps.max(1.0),
+            "test_mults_per_node": sum(&|v| g(v, &["res", "cost_test", "mults"])) / nodes.max(1.0),
+            "descent_mults_per_model": sum(&|v| g(v, &["res", "cost_descent", "mults"]))
+                / sum(&|v| g(v, &["res", "models_tried"])).max(1.0),
+            "smith_mults_per_call_derived": smith_s / t_mul
+                / sum(&|v| g(v, &["res", "smith_calls"])).max(1.0),
+            "mean_cost_excl_trapped": cost_excl / succ.max(1.0),
+            // labelled sensitivity: walks stopped by the step cap (reflection
+            // traps) left out of numerator and denominator
+            "mean_steps_excl_trapped": steps_excl / succ.max(1.0),
         }));
     }
     // fits per arm: ln(mean) on ln p, bootstrap over walks within each p
     let mut fits = vec![];
+    // `frozen` is the protocol's fit. The others are post hoc, labelled:
+    // primes = 3 mod 4 only (where the walk is a non-branching path), and the
+    // conditional mean over successful walks only (censored walks dropped).
     for arm in ["A", "B"] {
-        let ps: Vec<u64> = per.keys().filter(|k| k.0 == arm).map(|k| k.1).collect();
-        if ps.len() < 3 {
-            continue;
-        }
-        for (metric, f) in [
-            (
-                "steps",
-                &(|v: &Value| v["res"]["steps"].as_f64().unwrap()) as &dyn Fn(&Value) -> f64,
-            ),
-            (
-                "nodes",
-                &(|v: &Value| v["res"]["nodes_tested"].as_f64().unwrap()),
-            ),
-            (
-                "cost",
-                &(|v: &Value| {
-                    let g = |c: &str, f: &str| v["res"][c][f].as_f64().unwrap_or(0.0);
-                    let m = g("cost_step", "mults")
-                        + g("cost_test", "mults")
-                        + g("cost_descent", "mults");
-                    let iv =
-                        g("cost_step", "invs") + g("cost_test", "invs") + g("cost_descent", "invs");
-                    m + iv * inv_ratio + v["res"]["smith_ns"].as_f64().unwrap_or(0.0) * 1e-9 / t_mul
-                }),
-            ),
+        for (variant, mod4_only, succ_only) in [
+            ("frozen", false, false),
+            ("post_hoc_p3mod4", true, false),
+            ("post_hoc_successes_only", false, true),
+            ("post_hoc_p3mod4_successes_only", true, true),
         ] {
-            let est = |sel: &dyn Fn(&Vec<Value>) -> Vec<Value>| -> (f64, f64) {
-                let mut xs = vec![];
-                let mut ys = vec![];
-                for &p in &ps {
-                    let ws = &per[&(arm.to_string(), p)];
-                    let ws = sel(ws);
-                    let succ = ws
-                        .iter()
-                        .filter(|v| v["res"]["passed"].as_bool().unwrap())
-                        .count() as f64;
-                    if succ == 0.0 {
-                        continue;
+            let ps: Vec<u64> = per
+                .keys()
+                .filter(|k| k.0 == arm && (!mod4_only || k.1 % 4 == 3))
+                .map(|k| k.1)
+                .collect();
+            if ps.len() < 3 {
+                continue;
+            }
+            for (metric, f) in [
+                (
+                    "steps",
+                    &(|v: &Value| v["res"]["steps"].as_f64().unwrap()) as &dyn Fn(&Value) -> f64,
+                ),
+                (
+                    "nodes",
+                    &(|v: &Value| v["res"]["nodes_tested"].as_f64().unwrap()),
+                ),
+                (
+                    "cost",
+                    &(|v: &Value| {
+                        let g = |c: &str, f: &str| v["res"][c][f].as_f64().unwrap_or(0.0);
+                        let m = g("cost_step", "mults")
+                            + g("cost_test", "mults")
+                            + g("cost_descent", "mults");
+                        let iv = g("cost_step", "invs")
+                            + g("cost_test", "invs")
+                            + g("cost_descent", "invs");
+                        m + iv * inv_ratio
+                            + v["res"]["smith_ns"].as_f64().unwrap_or(0.0) * 1e-9 / t_mul
+                    }),
+                ),
+            ] {
+                let est = |pset: &[u64], sel: &dyn Fn(&Vec<Value>) -> Vec<Value>| -> (f64, f64) {
+                    let mut xs = vec![];
+                    let mut ys = vec![];
+                    for &p in pset {
+                        let base: Vec<Value> = per[&(arm.to_string(), p)]
+                            .iter()
+                            .filter(|v| !succ_only || v["res"]["passed"].as_bool().unwrap())
+                            .cloned()
+                            .collect();
+                        let ws = sel(&base);
+                        let succ = ws
+                            .iter()
+                            .filter(|v| v["res"]["passed"].as_bool().unwrap())
+                            .count() as f64;
+                        if succ == 0.0 {
+                            continue;
+                        }
+                        let tot: f64 = ws.iter().map(f).sum();
+                        xs.push((p as f64).ln());
+                        ys.push((tot / succ).ln());
                     }
-                    let tot: f64 = ws.iter().map(f).sum();
-                    xs.push((p as f64).ln());
-                    ys.push((tot / succ).ln());
-                }
-                ols(&xs, &ys)
-            };
-            let (a, b) = est(&|w| w.clone());
-            let rng = std::cell::RefCell::new(sp::SplitMix64(99));
-            let mut slopes = vec![];
-            for _ in 0..2000 {
-                let (s, _) = est(&|ws: &Vec<Value>| {
+                    ols(&xs, &ys)
+                };
+                let (a, b) = est(&ps, &|w| w.clone());
+                let rng = std::cell::RefCell::new(sp::SplitMix64(99));
+                let resample = |ws: &Vec<Value>| -> Vec<Value> {
                     (0..ws.len())
                         .map(|_| ws[rng_below(&mut rng.borrow_mut(), ws.len())].clone())
                         .collect()
-                });
-                if s.is_finite() {
-                    slopes.push(s);
+                };
+                let ci = |slopes: &mut Vec<f64>| -> (f64, f64) {
+                    slopes.sort_by(|a, b| a.partial_cmp(b).unwrap());
+                    (
+                        slopes[(slopes.len() as f64 * 0.025) as usize],
+                        slopes[(slopes.len() as f64 * 0.975) as usize],
+                    )
+                };
+                // (i) walks resampled within each prime
+                let mut slopes = vec![];
+                for _ in 0..2000 {
+                    let (s, _) = est(&ps, &resample);
+                    if s.is_finite() {
+                        slopes.push(s);
+                    }
                 }
+                let (lo_w, hi_w) = ci(&mut slopes);
+                // (ii) primes resampled with replacement, then walks within each
+                // (the protocol's slope interval; the frozen verdict uses it)
+                let mut slopes_p = vec![];
+                for _ in 0..2000 {
+                    let pset: Vec<u64> = (0..ps.len())
+                        .map(|_| ps[rng_below(&mut rng.borrow_mut(), ps.len())])
+                        .collect();
+                    let mut uniq = pset.clone();
+                    uniq.sort_unstable();
+                    uniq.dedup();
+                    if uniq.len() < 2 {
+                        continue;
+                    }
+                    let (s, _) = est(&pset, &resample);
+                    if s.is_finite() {
+                        slopes_p.push(s);
+                    }
+                }
+                let (lo, hi) = ci(&mut slopes_p);
+                let no_success: Vec<u64> = ps
+                    .iter()
+                    .copied()
+                    .filter(|p| {
+                        !per[&(arm.to_string(), *p)]
+                            .iter()
+                            .any(|v| v["res"]["passed"].as_bool().unwrap())
+                    })
+                    .collect();
+                let verdict = if !no_success.is_empty() {
+                    "undetermined: prime(s) with no success"
+                } else if hi < 1.0 {
+                    "o(p)"
+                } else if lo > 1.0 {
+                    "omega(p)"
+                } else {
+                    "Theta~(p)"
+                };
+                fits.push(json!({"arm": arm, "variant": variant, "metric": metric,
+                       "exponent": a, "intercept": b,
+                       "ci95": [lo, hi], "ci95_walks_only": [lo_w, hi_w],
+                       "verdict": verdict, "n_primes": ps.len(),
+                       "primes_without_success": no_success}));
             }
-            slopes.sort_by(|a, b| a.partial_cmp(b).unwrap());
-            let lo = slopes[(slopes.len() as f64 * 0.025) as usize];
-            let hi = slopes[(slopes.len() as f64 * 0.975) as usize];
-            let verdict = if hi < 1.0 {
-                "o(p)"
-            } else if lo > 1.0 {
-                "omega(p)"
-            } else {
-                "Theta~(p)"
-            };
-            fits.push(
-                json!({"arm": arm, "metric": metric, "exponent": a, "intercept": b,
-                              "ci95": [lo, hi], "verdict": verdict, "n_primes": ps.len()}),
-            );
         }
     }
     let v = json!({"t_mul_s": t_mul, "inv_over_mul": inv_ratio, "rows": rows, "fits": fits});

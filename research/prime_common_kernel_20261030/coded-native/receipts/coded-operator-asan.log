@@ -1,0 +1,24 @@
+=================================================================
+==64050==ERROR: AddressSanitizer: attempting free on address which was not malloc()-ed: 0x502000000240 in thread T0
+    #0 0x7f0c4c209b58 in realloc ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:85
+    #1 0x7f0c4c090a27 in __gmp_default_reallocate (/lib/x86_64-linux-gnu/libgmp.so.10+0xda27) (BuildId: dff5c2156ec812613c5e4431005c576b212dd323)
+    #2 0x7f0c4c0aa251 in __gmpz_realloc (/lib/x86_64-linux-gnu/libgmp.so.10+0x27251) (BuildId: dff5c2156ec812613c5e4431005c576b212dd323)
+    #3 0x7f0c4c0a11cc in __gmpz_gcd (/lib/x86_64-linux-gnu/libgmp.so.10+0x1e1cc) (BuildId: dff5c2156ec812613c5e4431005c576b212dd323)
+    #4 0x7f0c4c0b0fc2 in __gmpq_mul (/lib/x86_64-linux-gnu/libgmp.so.10+0x2dfc2) (BuildId: dff5c2156ec812613c5e4431005c576b212dd323)
+    #5 0x558f9a4fbd90 in __gmp_binary_multiplies::eval(__mpq_struct*, __mpq_struct const*, __mpq_struct const*) /usr/include/gmpxx.h:539
+    #6 0x558f9a4fbd90 in __gmp_expr<__mpq_struct [1], __gmp_binary_expr<__gmp_expr<__mpq_struct [1], __mpq_struct [1]>, __gmp_expr<__mpq_struct [1], __mpq_struct [1]>, __gmp_binary_multiplies> >::eval(__mpq_struct*) const /usr/include/gmpxx.h:2412
+    #7 0x558f9a4fbd90 in void __gmp_set_expr<__gmp_binary_expr<__gmp_expr<__mpq_struct [1], __mpq_struct [1]>, __gmp_expr<__mpq_struct [1], __mpq_struct [1]>, __gmp_binary_multiplies> >(__mpq_struct*, __gmp_expr<__mpq_struct [1], __gmp_binary_expr<__gmp_expr<__mpq_struct [1], __mpq_struct [1]>, __gmp_expr<__mpq_struct [1], __mpq_struct [1]>, __gmp_binary_multiplies> > const&) /usr/include/gmpxx.h:2257
+    #8 0x558f9a4fbd90 in __gmp_expr<__mpq_struct [1], __mpq_struct [1]>& __gmp_expr<__mpq_struct [1], __mpq_struct [1]>::operator*=<__mpq_struct [1], __mpq_struct [1]>(__gmp_expr<__mpq_struct [1], __mpq_struct [1]> const&) /usr/include/gmpxx.h:3392
+    #9 0x558f9a4fbd90 in cardinal /workspace/audit/coded-operator-native.cpp:20
+    #10 0x558f9a4fc817 in main /workspace/audit/coded-operator-native.cpp:41
+    #11 0x7f0c4b520ca7  (/lib/x86_64-linux-gnu/libc.so.6+0x29ca7) (BuildId: 5e5b51f4c39af9ac589408c1dc432ba390a273cc)
+    #12 0x7f0c4b520d64 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x29d64) (BuildId: 5e5b51f4c39af9ac589408c1dc432ba390a273cc)
+    #13 0x558f9a4fb360 in _start (/workspace/audit/coded-operator-native-asan+0xa360) (BuildId: 65e6f96f7a859021bc2997cdd7ea8ec34e391bf7)
+
+0x502000000240 is located 8 bytes after 8-byte region [0x502000000230,0x502000000238)
+allocated by thread T0 here:
+    #0 0x7f0c4c20ac57 in malloc ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:69
+    #1 0x7f0c4c0909dc in __gmp_default_allocate (/lib/x86_64-linux-gnu/libgmp.so.10+0xd9dc) (BuildId: dff5c2156ec812613c5e4431005c576b212dd323)
+
+SUMMARY: AddressSanitizer: bad-free ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:85 in realloc
+==64050==ABORTING

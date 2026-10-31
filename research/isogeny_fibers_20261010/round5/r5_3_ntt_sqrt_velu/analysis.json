@@ -1,0 +1,848 @@
+{
+  "assumptions": {
+    "ell_max": "ell^2 | t^2 - 4p implies ell <= 2 sqrt(p)",
+    "g": "field mults per group op: 6 (affine add with batched inversion), 12 as sensitivity",
+    "generic_eval": "kernel-polynomial evaluation from the round-4 fit (O(ell) per point)",
+    "logp_scale": "ladder-type phases scale with log2 p / 61, p ~ r; Velu/sqrt-elu counts taken as p-independent",
+    "ntt_word": "1 NTT word multiplication (mod a 62-bit prime) = 1 M",
+    "rho_group_ops": "sqrt(pi r / 4)"
+  },
+  "crossover": [
+    {
+      "g_mults_per_group_op": 6.0,
+      "log2_ell_max": 33.0,
+      "log2_r": 64.0,
+      "log2_rho_mults": 34.410710565457315,
+      "logp_scale": 1.0491803278688525,
+      "rows": [
+        {
+          "log2_ell_star": 31.902277496774232,
+          "model": "rational kernel, Velu (fit ell>=2^10)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 35.88052943407331,
+          "model": "rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 36.42097180403678,
+          "model": "rational kernel, sqrt-elu NTT (fit ell>=2^16)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 37.43500024750842,
+          "model": "rational kernel, sqrt-elu NTT (fit ell>=2^20)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 40.94394668973395,
+          "model": "rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 9.583335095041006,
+          "model": "generic kernel, round-4 Karatsuba fit (31..433, central)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 9.605433932997125,
+          "model": "generic kernel, NTT fit (ell>=256, central)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 9.592726535867287,
+          "model": "generic kernel, NTT fit (ell>=256, exponent at CI low end)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 9.65510971876457,
+          "model": "generic kernel, NTT model l^2 log l (calibrated at top)",
+          "note": "crossover inside the possible range"
+        }
+      ]
+    },
+    {
+      "g_mults_per_group_op": 6.0,
+      "log2_ell_max": 65.0,
+      "log2_r": 128.0,
+      "log2_rho_mults": 66.41071056545732,
+      "logp_scale": 2.098360655737705,
+      "rows": [
+        {
+          "log2_ell_star": 64.06867448156451,
+          "model": "rational kernel, Velu (fit ell>=2^10)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 74.82576086319754,
+          "model": "rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 76.54326462691692,
+          "model": "rational kernel, sqrt-elu NTT (fit ell>=2^16)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 80.39744134068007,
+          "model": "rational kernel, sqrt-elu NTT (fit ell>=2^20)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 99.80225770662707,
+          "model": "rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 21.48557867904357,
+          "model": "generic kernel, round-4 Karatsuba fit (31..433, central)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 21.743148610455872,
+          "model": "generic kernel, NTT fit (ell>=256, central)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 22.774126580147467,
+          "model": "generic kernel, NTT fit (ell>=256, exponent at CI low end)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 24.483876041360705,
+          "model": "generic kernel, NTT model l^2 log l (calibrated at top)",
+          "note": "crossover inside the possible range"
+        }
+      ]
+    },
+    {
+      "g_mults_per_group_op": 6.0,
+      "log2_ell_max": 129.0,
+      "log2_r": 256.0,
+      "log2_rho_mults": 130.41071056545732,
+      "logp_scale": 4.19672131147541,
+      "rows": [
+        {
+          "log2_ell_star": 128.40146832065375,
+          "model": "rational kernel, Velu (fit ell>=2^10)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 152.7162235634546,
+          "model": "rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 156.78785010991072,
+          "model": "rational kernel, sqrt-elu NTT (fit ell>=2^16)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 166.32232335273517,
+          "model": "rational kernel, sqrt-elu NTT (fit ell>=2^20)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 223.15855858447765,
+          "model": "rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 45.67400914704018,
+          "model": "generic kernel, round-4 Karatsuba fit (31..433, central)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 46.41011710571184,
+          "model": "generic kernel, NTT fit (ell>=256, central)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 49.562133075612536,
+          "model": "generic kernel, NTT fit (ell>=256, exponent at CI low end)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 55.3949152479119,
+          "model": "generic kernel, NTT model l^2 log l (calibrated at top)",
+          "note": "crossover inside the possible range"
+        }
+      ]
+    },
+    {
+      "g_mults_per_group_op": 12.0,
+      "log2_ell_max": 33.0,
+      "log2_r": 64.0,
+      "log2_rho_mults": 35.410710565457315,
+      "logp_scale": 1.0491803278688525,
+      "rows": [
+        {
+          "log2_ell_star": 32.907477433132826,
+          "model": "rational kernel, Velu (fit ell>=2^10)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 37.097567953262676,
+          "model": "rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 37.67479349290018,
+          "model": "rational kernel, sqrt-elu NTT (fit ell>=2^16)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 38.777576572518846,
+          "model": "rational kernel, sqrt-elu NTT (fit ell>=2^20)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 42.70141230566685,
+          "model": "rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 9.967278443351272,
+          "model": "generic kernel, round-4 Karatsuba fit (31..433, central)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 9.996973123195069,
+          "model": "generic kernel, NTT fit (ell>=256, central)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 10.017932996216821,
+          "model": "generic kernel, NTT fit (ell>=256, exponent at CI low end)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 10.121108363381918,
+          "model": "generic kernel, NTT model l^2 log l (calibrated at top)",
+          "note": "crossover inside the possible range"
+        }
+      ]
+    },
+    {
+      "g_mults_per_group_op": 12.0,
+      "log2_ell_max": 65.0,
+      "log2_r": 128.0,
+      "log2_rho_mults": 67.41071056545732,
+      "logp_scale": 2.098360655737705,
+      "rows": [
+        {
+          "log2_ell_star": 65.07387438530027,
+          "model": "rational kernel, Velu (fit ell>=2^10)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 76.04279934288905,
+          "model": "rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 77.7970862750887,
+          "model": "rational kernel, sqrt-elu NTT (fit ell>=2^16)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 81.74001762211844,
+          "model": "rational kernel, sqrt-elu NTT (fit ell>=2^20)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 101.69390242551714,
+          "model": "rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 21.869522019805423,
+          "model": "generic kernel, round-4 Karatsuba fit (31..433, central)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 22.134687792920253,
+          "model": "generic kernel, NTT fit (ell>=256, central)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 23.199333032456448,
+          "model": "generic kernel, NTT fit (ell>=256, exponent at CI low end)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 24.969702703790624,
+          "model": "generic kernel, NTT model l^2 log l (calibrated at top)",
+          "note": "crossover inside the possible range"
+        }
+      ]
+    },
+    {
+      "g_mults_per_group_op": 12.0,
+      "log2_ell_max": 129.0,
+      "log2_r": 256.0,
+      "log2_rho_mults": 131.41071056545732,
+      "logp_scale": 4.19672131147541,
+      "rows": [
+        {
+          "log2_ell_star": 129.4066682243895,
+          "model": "rational kernel, Velu (fit ell>=2^10)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 153.93326204314613,
+          "model": "rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 158.0416717580825,
+          "model": "rational kernel, sqrt-elu NTT (fit ell>=2^16)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 167.66489963417354,
+          "model": "rational kernel, sqrt-elu NTT (fit ell>=2^20)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 225.1083566769449,
+          "model": "rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)",
+          "note": "beyond ell_max = 2 sqrt(p): no vertical gap that large exists"
+        },
+        {
+          "log2_ell_star": 46.057952487802034,
+          "model": "generic kernel, round-4 Karatsuba fit (31..433, central)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 46.80165628817622,
+          "model": "generic kernel, NTT fit (ell>=256, central)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 49.987339527921506,
+          "model": "generic kernel, NTT fit (ell>=256, exponent at CI low end)",
+          "note": "crossover inside the possible range"
+        },
+        {
+          "log2_ell_star": 55.888516090824716,
+          "model": "generic kernel, NTT model l^2 log l (calibrated at top)",
+          "note": "crossover inside the possible range"
+        }
+      ]
+    }
+  ],
+  "fits": [
+    {
+      "exponent": -0.012638139308896434,
+      "exponent_ci95": [
+        -0.027028945499787425,
+        0.001752666881994559
+      ],
+      "log2_constant": 9.774861553631116,
+      "n": 29,
+      "r2": 0.10734848029860944,
+      "range": "all ell",
+      "series": "rational_find (cofactor ladder)"
+    },
+    {
+      "exponent": 0.9948269953902263,
+      "exponent_ci95": [
+        0.9928722629810819,
+        0.9967817277993708
+      ],
+      "log2_constant": 2.673463632328035,
+      "n": 20,
+      "r2": 0.9999842553968961,
+      "range": "ell >= 2^10",
+      "series": "velu_1pt (codomain + 1 image)"
+    },
+    {
+      "exponent": 0.8554259750095412,
+      "exponent_ci95": [
+        0.8443741525023915,
+        0.866477797516691
+      ],
+      "log2_constant": 4.239921753820058,
+      "n": 29,
+      "r2": 0.9989306488270774,
+      "range": "ell >= 2^10",
+      "series": "sqrtvelu_karatsuba_1pt"
+    },
+    {
+      "exponent": 0.8216667070818258,
+      "exponent_ci95": [
+        0.805170646871532,
+        0.8381627672921196
+      ],
+      "log2_constant": 4.928874032101639,
+      "n": 17,
+      "r2": 0.9986709361500441,
+      "range": "2^16 <= ell <= 2^24.0",
+      "series": "sqrtvelu_karatsuba_1pt"
+    },
+    {
+      "exponent": 0.8457299273512979,
+      "exponent_ci95": [
+        0.8316000653793436,
+        0.8598597893232522
+      ],
+      "log2_constant": 4.37648762885315,
+      "n": 29,
+      "r2": 0.998213027988305,
+      "range": "ell >= 2^10",
+      "series": "sqrtvelu_ntt_1pt"
+    },
+    {
+      "exponent": 0.7975616001351704,
+      "exponent_ci95": [
+        0.774936221990954,
+        0.8201869782793868
+      ],
+      "log2_constant": 5.3627419500436755,
+      "n": 17,
+      "r2": 0.9973498826185883,
+      "range": "2^16 <= ell <= 2^24.0",
+      "series": "sqrtvelu_ntt_1pt"
+    },
+    {
+      "exponent": 0.7448366352254163,
+      "exponent_ci95": [
+        0.6857569715855503,
+        0.8039162988652824
+      ],
+      "log2_constant": 6.52775087653238,
+      "n": 9,
+      "r2": 0.9921804892988764,
+      "range": "ell >= 2^20",
+      "series": "sqrtvelu_ntt_1pt"
+    },
+    {
+      "exponent": 0.8558736835336864,
+      "exponent_ci95": [
+        0.8439165990577965,
+        0.8678307680095764
+      ],
+      "log2_constant": 2.9548501163709187,
+      "n": 29,
+      "r2": 0.9987498272097479,
+      "range": "ell >= 2^10",
+      "series": "sqrtvelu_karatsuba_marginal_per_extra_point"
+    },
+    {
+      "exponent": 0.845854120298144,
+      "exponent_ci95": [
+        0.8308743244977742,
+        0.8608339160985138
+      ],
+      "log2_constant": 3.0958622356724526,
+      "n": 29,
+      "r2": 0.9979926169513091,
+      "range": "ell >= 2^10",
+      "series": "sqrtvelu_ntt_marginal_per_extra_point"
+    },
+    {
+      "exponent": 0.7596778753027552,
+      "exponent_ci95": [
+        0.7401931821562271,
+        0.7791625684492833
+      ],
+      "log2_constant": -20.336451412030353,
+      "n": 17,
+      "r2": 0.9978325942570697,
+      "range": "ell >= 2^16",
+      "series": "sqrtvelu_karatsuba_1pt_wall_s_contended"
+    },
+    {
+      "exponent": 0.7492780949433371,
+      "exponent_ci95": [
+        0.715054346773841,
+        0.7835018431128331
+      ],
+      "log2_constant": -20.123098330480218,
+      "n": 17,
+      "r2": 0.9931586462508802,
+      "range": "ell >= 2^16",
+      "series": "sqrtvelu_ntt_1pt_wall_s_contended"
+    },
+    {
+      "exponent": 4.09736493057541,
+      "exponent_ci95": [
+        3.8583748806375895,
+        4.3363549805132315
+      ],
+      "log2_constant": -6.349600930851389,
+      "n": 17,
+      "r2": 0.98889155257577,
+      "range": "2^16 <= ell <= 2^24.0",
+      "series": "sqrtvelu_ntt_1pt: k in cost = c sqrt(ell) (log2 ell)^k (slope reported as exponent)"
+    },
+    {
+      "exponent": 2.6045509684208117,
+      "exponent_ci95": [
+        2.5780645938774835,
+        2.63103734296414
+      ],
+      "log2_constant": 9.381163147435707,
+      "n": 74,
+      "r2": 0.9981298249712143,
+      "range": "31 <= ell <= 433",
+      "series": "round4_generic_find_expected (Karatsuba)"
+    },
+    {
+      "exponent": 2.5874973592122616,
+      "exponent_ci95": [
+        2.5501467564195144,
+        2.624847962005009
+      ],
+      "log2_constant": 9.52130162425933,
+      "n": 20,
+      "r2": 0.9991509650590764,
+      "range": "ell >= 30",
+      "series": "generic_find_expected, Karatsuba arm (this run)"
+    },
+    {
+      "exponent": 2.5824156375878724,
+      "exponent_ci95": [
+        2.5443525572515666,
+        2.620478717924178
+      ],
+      "log2_constant": 9.554558453400915,
+      "n": 20,
+      "r2": 0.9991148231830898,
+      "range": "ell >= 30",
+      "series": "generic_find_expected, NTT arm"
+    },
+    {
+      "exponent": 2.5540228022797535,
+      "exponent_ci95": [
+        2.351798742868952,
+        2.756246861690555
+      ],
+      "log2_constant": 9.80895055855855,
+      "n": 8,
+      "r2": 0.9937499789675803,
+      "range": "ell >= 256",
+      "series": "generic_find_expected, NTT arm"
+    },
+    {
+      "exponent": 2.5826423454683582,
+      "exponent_ci95": [
+        2.5445647503263036,
+        2.620719940610413
+      ],
+      "log2_constant": 8.550304102375986,
+      "n": 20,
+      "r2": 0.999114303931681,
+      "range": "ell >= 30",
+      "series": "generic_ladder_per_attempt, NTT arm"
+    },
+    {
+      "exponent": 2.4612900038376924,
+      "exponent_ci95": [
+        2.419678541499829,
+        2.5029014661755555
+      ],
+      "log2_constant": 1.3074318315589828,
+      "n": 20,
+      "r2": 0.9988357305500851,
+      "range": "ell >= 30",
+      "series": "generic_minpoly, NTT arm"
+    },
+    {
+      "exponent": 2.9843627631517293,
+      "exponent_ci95": [
+        2.60721226828139,
+        3.3615132580220686
+      ],
+      "log2_constant": 3.415980455500737,
+      "n": 20,
+      "r2": 0.938851990884791,
+      "range": "ell >= 30",
+      "series": "generic_ext_setup (Ben-Or), NTT arm"
+    },
+    {
+      "exponent": 1.576696367433492,
+      "exponent_ci95": [
+        1.5399017791922118,
+        1.613490955674772
+      ],
+      "log2_constant": 0.2398715794807913,
+      "n": 20,
+      "r2": 0.997784012264155,
+      "range": "ell >= 30",
+      "series": "F_p^k product (vs ell), Karatsuba arm"
+    },
+    {
+      "exponent": 1.5733140484914607,
+      "exponent_ci95": [
+        1.484195644675197,
+        1.6624324523077245
+      ],
+      "log2_constant": 0.27042410043342,
+      "n": 12,
+      "r2": 0.9935777622811263,
+      "range": "ell >= 128",
+      "series": "F_p^k product (vs ell), NTT arm"
+    },
+    {
+      "exponent": 3.412714100101958,
+      "exponent_ci95": [
+        2.205297470757811,
+        4.620130729446105
+      ],
+      "log2_constant": 3.9869376806191834,
+      "n": 8,
+      "r2": 0.8884349040054556,
+      "range": "ell >= 256",
+      "series": "generic_find NTT: k in cost = c ell^2 (log2 ell)^k (slope reported as exponent)"
+    },
+    {
+      "exponent": 0.9595160008017718,
+      "exponent_ci95": [
+        0.9562028277397159,
+        0.9628291738638277
+      ],
+      "log2_constant": 0.35439014397010915,
+      "n": 74,
+      "r2": 0.9997840237963765,
+      "range": "ell >= 30",
+      "series": "round4_generic_eval_per_point_from_h (M; +1 I)"
+    }
+  ],
+  "generic_ntt_calibration": {
+    "Meq": 25192013303.0,
+    "ell": 863.0,
+    "k_l2_log": 3468.114359713769
+  },
+  "intermediate_k_r128_g6": [
+    {
+      "ext_mult_cost_Meq": 1.0,
+      "k": 1,
+      "log2_ell_star": 99.80225770662707,
+      "log2_find_M_scaled": 11.004918842272238
+    },
+    {
+      "ext_mult_cost_Meq": 5.0,
+      "k": 2,
+      "log2_ell_star": 95.41766575232886,
+      "log2_find_M_scaled": 16.808470520591975
+    },
+    {
+      "ext_mult_cost_Meq": 19.0,
+      "k": 4,
+      "log2_ell_star": 91.78938330521876,
+      "log2_find_M_scaled": 18.97427395619601
+    },
+    {
+      "ext_mult_cost_Meq": 71.0,
+      "k": 8,
+      "log2_ell_star": 88.21495993296479,
+      "log2_find_M_scaled": 21.317686521020217
+    },
+    {
+      "ext_mult_cost_Meq": 271.0,
+      "k": 16,
+      "log2_ell_star": 84.59215400003339,
+      "log2_find_M_scaled": 23.76171082552305
+    },
+    {
+      "ext_mult_cost_Meq": 799.0,
+      "k": 32,
+      "log2_ell_star": 81.674874778831,
+      "log2_find_M_scaled": 26.259477939185988
+    },
+    {
+      "ext_mult_cost_Meq": 2367.0,
+      "k": 64,
+      "log2_ell_star": 78.75162105129321,
+      "log2_find_M_scaled": 28.78504750331195
+    },
+    {
+      "ext_mult_cost_Meq": 7039.0,
+      "k": 128,
+      "log2_ell_star": 75.82550515725998,
+      "log2_find_M_scaled": 31.324760866127406
+    },
+    {
+      "ext_mult_cost_Meq": 20991.0,
+      "k": 256,
+      "log2_ell_star": 72.89991262006009,
+      "log2_find_M_scaled": 33.87160805556263
+    }
+  ],
+  "local_exponents": [
+    {
+      "karatsuba": [
+        0.9254781408542847,
+        0.8585012042467888,
+        0.9924550774617806
+      ],
+      "log2_ell_from": 10.0,
+      "log2_ell_to": 14.0,
+      "ntt": [
+        0.9254781408542847,
+        0.8585012042467888,
+        0.9924550774617806
+      ]
+    },
+    {
+      "karatsuba": [
+        0.9038143037949217,
+        0.8344476228596887,
+        0.9731809847301547
+      ],
+      "log2_ell_from": 11.0,
+      "log2_ell_to": 15.0,
+      "ntt": [
+        0.9038143037949217,
+        0.8344476228596887,
+        0.9731809847301547
+      ]
+    },
+    {
+      "karatsuba": [
+        0.8419850835846201,
+        0.8116506670291853,
+        0.8723195001400549
+      ],
+      "log2_ell_from": 12.0,
+      "log2_ell_to": 16.0,
+      "ntt": [
+        0.8419850835846201,
+        0.8116506670291853,
+        0.8723195001400549
+      ]
+    },
+    {
+      "karatsuba": [
+        0.878626825416277,
+        0.8484122555126073,
+        0.9088413953199467
+      ],
+      "log2_ell_from": 13.0,
+      "log2_ell_to": 17.0,
+      "ntt": [
+        0.878626825416277,
+        0.8484122555126073,
+        0.9088413953199467
+      ]
+    },
+    {
+      "karatsuba": [
+        0.862833893099775,
+        0.835810482525023,
+        0.889857303674527
+      ],
+      "log2_ell_from": 14.0,
+      "log2_ell_to": 18.0,
+      "ntt": [
+        0.862833893099775,
+        0.835810482525023,
+        0.889857303674527
+      ]
+    },
+    {
+      "karatsuba": [
+        0.8747218313899402,
+        0.8403153291695226,
+        0.9091283336103578
+      ],
+      "log2_ell_from": 15.0,
+      "log2_ell_to": 19.0,
+      "ntt": [
+        0.8747218313899402,
+        0.8403153291695226,
+        0.9091283336103578
+      ]
+    },
+    {
+      "karatsuba": [
+        0.8377577566186625,
+        0.7913890411351967,
+        0.8841264721021282
+      ],
+      "log2_ell_from": 16.0,
+      "log2_ell_to": 20.0,
+      "ntt": [
+        0.8369611724482567,
+        0.7900486126694224,
+        0.8838737322270911
+      ]
+    },
+    {
+      "karatsuba": [
+        0.8357729981095124,
+        0.7887682560505174,
+        0.8827777401685075
+      ],
+      "log2_ell_from": 17.0,
+      "log2_ell_to": 21.0,
+      "ntt": [
+        0.8308854565604984,
+        0.783673050521818,
+        0.8780978625991788
+      ]
+    },
+    {
+      "karatsuba": [
+        0.8068205609380023,
+        0.7572787947396937,
+        0.8563623271363108
+      ],
+      "log2_ell_from": 18.0,
+      "log2_ell_to": 22.0,
+      "ntt": [
+        0.7916023495244908,
+        0.7385097034931514,
+        0.8446949955558303
+      ]
+    },
+    {
+      "karatsuba": [
+        0.8208264098339001,
+        0.7770728455022656,
+        0.8645799741655346
+      ],
+      "log2_ell_from": 19.0,
+      "log2_ell_to": 23.0,
+      "ntt": [
+        0.7840324545871242,
+        0.7333943155402451,
+        0.8346705936340033
+      ]
+    },
+    {
+      "karatsuba": [
+        0.7994158760118276,
+        0.751976157077652,
+        0.8468555949460033
+      ],
+      "log2_ell_from": 20.0,
+      "log2_ell_to": 24.0,
+      "ntt": [
+        0.7448366352254163,
+        0.6857569715855503,
+        0.8039162988652824
+      ]
+    }
+  ],
+  "mode": "analyze",
+  "rational_find_max_Meq": 979.3333333333334,
+  "round4_reproduction": {
+    "generic_rows_matched": 16,
+    "generic_same_instance": 16,
+    "generic_same_ladder_counts": 16,
+    "rational_rows_matched": 87,
+    "rational_same_find_counts": 87,
+    "rational_same_instance": 87,
+    "rational_same_karatsuba_sqrtvelu_counts": 0
+  },
+  "sqrtvelu_ntt_calibration": {
+    "Meq": 22099462.0,
+    "ell": 16777259.0,
+    "k_sqrt_log2sq": 9.366958139201419
+  },
+  "text": "Round-4 reproduction: rational rows matched 87 (same p and codomain j: 87, same Karatsuba sqrt-elu M and I: 0, same find M and I: 87); generic Karatsuba rows matched 16 (same p and j: 16, same ladder M and I: 16)\n\nFits: log2(cost) = log2_constant + exponent * log2(ell), OLS, 95% t-interval\n  rational_find (cofactor ladder)                                                      all ell                exponent -0.013 [-0.027, 0.002]  log2 c 9.77  n=29 r2=0.1073\n  velu_1pt (codomain + 1 image)                                                        ell >= 2^10            exponent 0.995 [0.993, 0.997]  log2 c 2.67  n=20 r2=1.0000\n  sqrtvelu_karatsuba_1pt                                                               ell >= 2^10            exponent 0.855 [0.844, 0.866]  log2 c 4.24  n=29 r2=0.9989\n  sqrtvelu_karatsuba_1pt                                                               2^16 <= ell <= 2^24.0  exponent 0.822 [0.805, 0.838]  log2 c 4.93  n=17 r2=0.9987\n  sqrtvelu_ntt_1pt                                                                     ell >= 2^10            exponent 0.846 [0.832, 0.860]  log2 c 4.38  n=29 r2=0.9982\n  sqrtvelu_ntt_1pt                                                                     2^16 <= ell <= 2^24.0  exponent 0.798 [0.775, 0.820]  log2 c 5.36  n=17 r2=0.9973\n  sqrtvelu_ntt_1pt                                                                     ell >= 2^20            exponent 0.745 [0.686, 0.804]  log2 c 6.53  n=9 r2=0.9922\n  sqrtvelu_karatsuba_marginal_per_extra_point                                          ell >= 2^10            exponent 0.856 [0.844, 0.868]  log2 c 2.95  n=29 r2=0.9987\n  sqrtvelu_ntt_marginal_per_extra_point                                                ell >= 2^10            exponent 0.846 [0.831, 0.861]  log2 c 3.10  n=29 r2=0.9980\n  sqrtvelu_karatsuba_1pt_wall_s_contended                                              ell >= 2^16            exponent 0.760 [0.740, 0.779]  log2 c -20.34  n=17 r2=0.9978\n  sqrtvelu_ntt_1pt_wall_s_contended                                                    ell >= 2^16            exponent 0.749 [0.715, 0.784]  log2 c -20.12  n=17 r2=0.9932\n  sqrtvelu_ntt_1pt: k in cost = c sqrt(ell) (log2 ell)^k (slope reported as exponent)  2^16 <= ell <= 2^24.0  exponent 4.097 [3.858, 4.336]  log2 c -6.35  n=17 r2=0.9889\n  round4_generic_find_expected (Karatsuba)                                             31 <= ell <= 433       exponent 2.605 [2.578, 2.631]  log2 c 9.38  n=74 r2=0.9981\n  generic_find_expected, Karatsuba arm (this run)                                      ell >= 30              exponent 2.587 [2.550, 2.625]  log2 c 9.52  n=20 r2=0.9992\n  generic_find_expected, NTT arm                                                       ell >= 30              exponent 2.582 [2.544, 2.620]  log2 c 9.55  n=20 r2=0.9991\n  generic_find_expected, NTT arm                                                       ell >= 256             exponent 2.554 [2.352, 2.756]  log2 c 9.81  n=8 r2=0.9937\n  generic_ladder_per_attempt, NTT arm                                                  ell >= 30              exponent 2.583 [2.545, 2.621]  log2 c 8.55  n=20 r2=0.9991\n  generic_minpoly, NTT arm                                                             ell >= 30              exponent 2.461 [2.420, 2.503]  log2 c 1.31  n=20 r2=0.9988\n  generic_ext_setup (Ben-Or), NTT arm                                                  ell >= 30              exponent 2.984 [2.607, 3.362]  log2 c 3.42  n=20 r2=0.9389\n  F_p^k product (vs ell), Karatsuba arm                                                ell >= 30              exponent 1.577 [1.540, 1.613]  log2 c 0.24  n=20 r2=0.9978\n  F_p^k product (vs ell), NTT arm                                                      ell >= 128             exponent 1.573 [1.484, 1.662]  log2 c 0.27  n=12 r2=0.9936\n  generic_find NTT: k in cost = c ell^2 (log2 ell)^k (slope reported as exponent)      ell >= 256             exponent 3.413 [2.205, 4.620]  log2 c 3.99  n=8 r2=0.8884\n  round4_generic_eval_per_point_from_h (M; +1 I)                                       ell >= 30              exponent 0.960 [0.956, 0.963]  log2 c 0.35  n=74 r2=0.9998\n\nLocal sqrt-elu exponents over 4-octave windows (Karatsuba | NTT):\n  log2 ell 10.0..14.0: 0.925 [0.859, 0.992] | 0.925 [0.859, 0.992]\n  log2 ell 11.0..15.0: 0.904 [0.834, 0.973] | 0.904 [0.834, 0.973]\n  log2 ell 12.0..16.0: 0.842 [0.812, 0.872] | 0.842 [0.812, 0.872]\n  log2 ell 13.0..17.0: 0.879 [0.848, 0.909] | 0.879 [0.848, 0.909]\n  log2 ell 14.0..18.0: 0.863 [0.836, 0.890] | 0.863 [0.836, 0.890]\n  log2 ell 15.0..19.0: 0.875 [0.840, 0.909] | 0.875 [0.840, 0.909]\n  log2 ell 16.0..20.0: 0.838 [0.791, 0.884] | 0.837 [0.790, 0.884]\n  log2 ell 17.0..21.0: 0.836 [0.789, 0.883] | 0.831 [0.784, 0.878]\n  log2 ell 18.0..22.0: 0.807 [0.757, 0.856] | 0.792 [0.739, 0.845]\n  log2 ell 19.0..23.0: 0.821 [0.777, 0.865] | 0.784 [0.733, 0.835]\n  log2 ell 20.0..24.0: 0.799 [0.752, 0.847] | 0.745 [0.686, 0.804]\n\nsqrt-elu at the top (ell = 16777259): Karatsuba 2.4455e7 Meq, NTT 2.2099e7 Meq (ratio 1.11)\n\nDerived (extrapolated) crossover: smallest ell with find+evaluate >= g * sqrt(pi r / 4) F_p mults\n  g=6 M/op, r=2^64: rho = 2^34.41 M, ell_max = 2^33\n    rational kernel, Velu (fit ell>=2^10)                                        log2 ell* =    31.90  (crossover inside the possible range)\n    rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)                log2 ell* =    35.88  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    rational kernel, sqrt-elu NTT (fit ell>=2^16)                                log2 ell* =    36.42  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    rational kernel, sqrt-elu NTT (fit ell>=2^20)                                log2 ell* =    37.44  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)     log2 ell* =    40.94  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    generic kernel, round-4 Karatsuba fit (31..433, central)                     log2 ell* =     9.58  (crossover inside the possible range)\n    generic kernel, NTT fit (ell>=256, central)                                  log2 ell* =     9.61  (crossover inside the possible range)\n    generic kernel, NTT fit (ell>=256, exponent at CI low end)                   log2 ell* =     9.59  (crossover inside the possible range)\n    generic kernel, NTT model l^2 log l (calibrated at top)                      log2 ell* =     9.66  (crossover inside the possible range)\n  g=6 M/op, r=2^128: rho = 2^66.41 M, ell_max = 2^65\n    rational kernel, Velu (fit ell>=2^10)                                        log2 ell* =    64.07  (crossover inside the possible range)\n    rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)                log2 ell* =    74.83  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    rational kernel, sqrt-elu NTT (fit ell>=2^16)                                log2 ell* =    76.54  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    rational kernel, sqrt-elu NTT (fit ell>=2^20)                                log2 ell* =    80.40  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)     log2 ell* =    99.80  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    generic kernel, round-4 Karatsuba fit (31..433, central)                     log2 ell* =    21.49  (crossover inside the possible range)\n    generic kernel, NTT fit (ell>=256, central)                                  log2 ell* =    21.74  (crossover inside the possible range)\n    generic kernel, NTT fit (ell>=256, exponent at CI low end)                   log2 ell* =    22.77  (crossover inside the possible range)\n    generic kernel, NTT model l^2 log l (calibrated at top)                      log2 ell* =    24.48  (crossover inside the possible range)\n  g=6 M/op, r=2^256: rho = 2^130.41 M, ell_max = 2^129\n    rational kernel, Velu (fit ell>=2^10)                                        log2 ell* =   128.40  (crossover inside the possible range)\n    rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)                log2 ell* =   152.72  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    rational kernel, sqrt-elu NTT (fit ell>=2^16)                                log2 ell* =   156.79  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    rational kernel, sqrt-elu NTT (fit ell>=2^20)                                log2 ell* =   166.32  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)     log2 ell* =   223.16  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    generic kernel, round-4 Karatsuba fit (31..433, central)                     log2 ell* =    45.67  (crossover inside the possible range)\n    generic kernel, NTT fit (ell>=256, central)                                  log2 ell* =    46.41  (crossover inside the possible range)\n    generic kernel, NTT fit (ell>=256, exponent at CI low end)                   log2 ell* =    49.56  (crossover inside the possible range)\n    generic kernel, NTT model l^2 log l (calibrated at top)                      log2 ell* =    55.39  (crossover inside the possible range)\n  g=12 M/op, r=2^64: rho = 2^35.41 M, ell_max = 2^33\n    rational kernel, Velu (fit ell>=2^10)                                        log2 ell* =    32.91  (crossover inside the possible range)\n    rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)                log2 ell* =    37.10  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    rational kernel, sqrt-elu NTT (fit ell>=2^16)                                log2 ell* =    37.67  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    rational kernel, sqrt-elu NTT (fit ell>=2^20)                                log2 ell* =    38.78  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)     log2 ell* =    42.70  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    generic kernel, round-4 Karatsuba fit (31..433, central)                     log2 ell* =     9.97  (crossover inside the possible range)\n    generic kernel, NTT fit (ell>=256, central)                                  log2 ell* =    10.00  (crossover inside the possible range)\n    generic kernel, NTT fit (ell>=256, exponent at CI low end)                   log2 ell* =    10.02  (crossover inside the possible range)\n    generic kernel, NTT model l^2 log l (calibrated at top)                      log2 ell* =    10.12  (crossover inside the possible range)\n  g=12 M/op, r=2^128: rho = 2^67.41 M, ell_max = 2^65\n    rational kernel, Velu (fit ell>=2^10)                                        log2 ell* =    65.07  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)                log2 ell* =    76.04  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    rational kernel, sqrt-elu NTT (fit ell>=2^16)                                log2 ell* =    77.80  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    rational kernel, sqrt-elu NTT (fit ell>=2^20)                                log2 ell* =    81.74  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)     log2 ell* =   101.69  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    generic kernel, round-4 Karatsuba fit (31..433, central)                     log2 ell* =    21.87  (crossover inside the possible range)\n    generic kernel, NTT fit (ell>=256, central)                                  log2 ell* =    22.13  (crossover inside the possible range)\n    generic kernel, NTT fit (ell>=256, exponent at CI low end)                   log2 ell* =    23.20  (crossover inside the possible range)\n    generic kernel, NTT model l^2 log l (calibrated at top)                      log2 ell* =    24.97  (crossover inside the possible range)\n  g=12 M/op, r=2^256: rho = 2^131.41 M, ell_max = 2^129\n    rational kernel, Velu (fit ell>=2^10)                                        log2 ell* =   129.41  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)                log2 ell* =   153.93  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    rational kernel, sqrt-elu NTT (fit ell>=2^16)                                log2 ell* =   158.04  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    rational kernel, sqrt-elu NTT (fit ell>=2^20)                                log2 ell* =   167.66  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)     log2 ell* =   225.11  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)\n    generic kernel, round-4 Karatsuba fit (31..433, central)                     log2 ell* =    46.06  (crossover inside the possible range)\n    generic kernel, NTT fit (ell>=256, central)                                  log2 ell* =    46.80  (crossover inside the possible range)\n    generic kernel, NTT fit (ell>=256, exponent at CI low end)                   log2 ell* =    49.99  (crossover inside the possible range)\n    generic kernel, NTT model l^2 log l (calibrated at top)                      log2 ell* =    55.89  (crossover inside the possible range)\n\nDerived: kernel over F_(p^k), r = 2^128, g = 6 (find(k) + sqrt-elu NTT model(ell) x m(k))\n  k=1    m(k)=1       find(k)=2^11.0 M  log2 ell* = 99.8\n  k=2    m(k)=5       find(k)=2^16.8 M  log2 ell* = 95.4\n  k=4    m(k)=19      find(k)=2^19.0 M  log2 ell* = 91.8\n  k=8    m(k)=71      find(k)=2^21.3 M  log2 ell* = 88.2\n  k=16   m(k)=271     find(k)=2^23.8 M  log2 ell* = 84.6\n  k=32   m(k)=799     find(k)=2^26.3 M  log2 ell* = 81.7\n  k=64   m(k)=2367    find(k)=2^28.8 M  log2 ell* = 78.8\n  k=128  m(k)=7039    find(k)=2^31.3 M  log2 ell* = 75.8\n  k=256  m(k)=20991   find(k)=2^33.9 M  log2 ell* = 72.9\n\nrational find: max 979 Meq per kernel point (61-bit p)\n"
+}

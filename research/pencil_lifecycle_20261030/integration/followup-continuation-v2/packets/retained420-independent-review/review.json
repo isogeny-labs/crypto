@@ -1,0 +1,41 @@
+{
+  "schema": "research.component-review/v1",
+  "reviewer": "invariants_branches",
+  "producer": "kummer_transitions",
+  "independence": {
+    "produced_run": false,
+    "shares_code_for_source_inspection": true,
+    "native_replay": false,
+    "reason_no_replay": "single admitted attempt; independent saved-row arithmetic only"
+  },
+  "producer_preexecution_manifest_sha256": "33aa7bd47e204c1b9f70c3ba2e58095975ae4c81ff08792a13ddb9953cf7aac4",
+  "producer_results_manifest_sha256": "18a129148b648b674aa51f705dc18d505854453805b3d12bdcd0840c2b9dafab",
+  "judgments": [
+    {
+      "claim": "420 exact archived cases",
+      "judgment": "supported_within_scope"
+    },
+    {
+      "claim": "202 eligible =174 first+28 redundant",
+      "judgment": "supported_within_scope"
+    },
+    {
+      "claim": "28 designed inverse pairs yield zero normalized coefficient differences",
+      "judgment": "supported_within_scope"
+    },
+    {
+      "claim": "60 consistent once-per-target accounting entries",
+      "judgment": "supported_within_scope"
+    }
+  ],
+  "blocking_discrepancies": [],
+  "natural_yield": null,
+  "complete_cost_ratio": null,
+  "recommendation": "no_action",
+  "scope": "fixed archival correctness audit only",
+  "recomputation": "recomputed.json",
+  "patterns": "pattern.json",
+  "source_bindings": "input-bindings.json",
+  "generic_experiment_export_present": false,
+  "generic_review_schema_validation_claimed": false
+}

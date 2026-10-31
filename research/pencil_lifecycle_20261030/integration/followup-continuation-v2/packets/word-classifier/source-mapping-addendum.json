@@ -1,0 +1,30 @@
+{
+  "schema": "research.source-mapping-addendum/v1",
+  "bound_manifest_sha256": "9c941f866ef161ae821dc44084166b369bcb106e62c1bf73e42d27bfbf7d7622",
+  "bound_word_classifier_sha256": "8f34856f7007fc10327f5c786facc618b8e8dae377231abec24e5e67cd2fd476",
+  "external_mapping_hypotheses": [
+    "Field.n == 1",
+    "5 <= p < 2^31 and p prime",
+    "canonical cross-scaled input words",
+    "table-free field route for preceding mul/sq composition",
+    "normal execution with sufficient counter headroom; counter state is not encoded in theorem"
+  ],
+  "branch_mapping": {
+    "sameUInverse": "Rust immediate Identity return and same_u_inverse label",
+    "sameUDouble": "Rust delegation to double22_weighted; NOT its eventual returned branch string or payload",
+    "sameUMixedZeroSlope": "Rust zero-subtraction error path before mixed payload",
+    "sameUMixed": "entry to subsequent mixed payload; payload excluded"
+  },
+  "counter_boundary": {
+    "theorem_models_counters": false,
+    "conditional_source_mapping": "No counter overflow/external interruption before or within selected prefix",
+    "sufficient_full_cross_scaling_prefix_headroom": {
+      "multiplication_increments": 16,
+      "square_increments": 4,
+      "field_addition_increments": 4
+    },
+    "note": "Bounds are source-counted sufficient upper bounds and not proved machine-state lemmas. The classifier alone uses at most four field_adds increments."
+  },
+  "scientific_execution": false,
+  "proof_source_changed": false
+}

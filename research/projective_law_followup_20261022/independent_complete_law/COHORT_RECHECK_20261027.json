@@ -1,0 +1,92 @@
+{
+  "schema": "projective-law-independent-cohort-recheck/v1",
+  "date_utc": "2026-10-27",
+  "scope": "Read-only repricing and row accounting of the frozen two-arm public known-answer cohort; no target trial or law gate rerun",
+  "protocol_sha256": "895e688b1f4785a494f55e78c88385e823b647a93fd4fba40410c97c575e3151",
+  "source_sha256": {
+    "src/bin/projective_law_gate.rs": "5976e7f30b3e9c5c49a5fc0f4095404b7322832e4b02f467bc3cb7e0d9dcc8c0",
+    "src/bin/projective_collector.rs": "77853dbcb98221afba05564944324e30f8de293c4be0047799f8133a1c018e4d",
+    "src/bin/projective_state_collector.rs": "96246448e56f46b57e0ddd751990cf11fab122fbc04355b3e0ec6530194f1e35"
+  },
+  "raw_sha256": {
+    "results/projective-16.jsonl": "4d0da3c8767b2b37a88173924562f61f2c4276126416eb8ccd6b640f7a641b34",
+    "results/projective-20.jsonl": "fcd557e57fbd91ee4700cc60b8d6ba898eba575f0261aa3695797fffee79bbf0",
+    "results/projective-24.jsonl": "716aedd0c72dff729410b9935f9a2e8a458919544024e06289e3bff67fdd059a",
+    "results/projective-28.jsonl": "c5a9719bef0d41403c13ccd7463b2715e07501ab48a5ac5364274198d375207a",
+    "results/projective-32.jsonl": "ac19f79b58942923d0219334cb44e6e5a03df7d290656ce9eaf305878e6fd465",
+    "results/projective-36.jsonl": "231711200d7b7710a6ec1fcb3ed9e6153abb23ff16f8ec7e6e36908abe94cf7c",
+    "results/projective-40.jsonl": "08f152edfab81abbd4e3c1b5d8e25f38c1d4150c7151a421bf0aa7732ea5a8c0",
+    "results/state-16.jsonl": "06718eb9d9d7eb6949ee5d5657a0ba520e58e549b8bca4809cb1dfe5a1a61189",
+    "results/state-20.jsonl": "2aa916b1687f715ac22b3b37f12926401fd60dad5fc5fbe655b503f73345dbf3",
+    "results/state-24.jsonl": "33326d246b4603b69692cea9c201182a222c636cad96bc072903258d532f83dd",
+    "results/state-28.jsonl": "780cdd8f84cd0f0d17cea8d8ddb8f68ae340dffce420c9a77a6a64890a831546",
+    "results/state-32.jsonl": "2efcff84c5dff6ff4bc1f41353e4e1febcfb6911d7cd8a6606a27ce5bd427814",
+    "results/state-36.jsonl": "826102d653084827feb74fd0cb55a5fa598fa8ff8f083e55e1eb1f27353066ba",
+    "results/state-40.jsonl": "9e0abb035086b86bf3936acf43d6a0271f6f3873ec591aa321c92f377c4941ac"
+  },
+  "support_sha256": {
+    "replay-certificate.json": "139d4a19899691d5e8fcf055590e1a0656e5eee6fe73a316d1e983f45e388364",
+    "validator-report.json": "bd95fde7ac3cd727f311a8c3228ebd0c7aec6aacf58ebd89ef34655cfd8403c1",
+    "results/independent-validation.json": "0803b5cbffd1d3106991f9ec665ebf887b4e07478e4d0f84586ae61afa24e3ed",
+    "results/price-grid-projective.csv": "ab0c7659f7d15e575ae47177e485c7256ab13c0db1cae178a2a11bffd54f945f",
+    "results/price-grid-state.csv": "852c22e965f326fbfc8b3a2b482df6923f3372ce7000dba016958efad097e4f4",
+    "public_source_parity/SUMMARY.json": "65d8e74cd18028c5ac953b50cf37927ae004eccc72581f869238efe97ebe6809"
+  },
+  "pricing": {
+    "unit": "source-addition equivalent (GAE)",
+    "field": "M + 0.5S + 10I",
+    "native_logical_GAE": 0.1,
+    "method": "For each raw candidate and its same-process rho: (m+0.5s+10i)/(source_add.m+0.5 source_add.s+10 source_add.i) + 0.1*(field_adds+bit_ops+sum(native keys ending _uncharged)); sum target costs before division"
+  },
+  "arms": {
+    "projective": {
+      "targets": 1260,
+      "targets_per_size": {"16": 180, "20": 180, "24": 180, "28": 180, "32": 180, "36": 180, "40": 180},
+      "unique_workload_target_size_ids": 1260,
+      "candidate_verified": 1260,
+      "rho_verified": 1260,
+      "candidate_recovered_equals_planted": 1260,
+      "rho_recovered_equals_planted": 1260,
+      "candidate_exhausted": 0,
+      "rho_exhausted": 0,
+      "same_source_add_counter_as_rho": 1260,
+      "five_cold_phases_present": 1260,
+      "normalization_inversions": 440649754,
+      "candidate_GAE": 4130679615.461902,
+      "rho_GAE": 1088802370.3333328,
+      "candidate_over_rho": 3.7937827176086234,
+      "pooled_36_cell_ratio_min": 2.097462349972,
+      "pooled_36_cell_ratio_max": 21.488710054954,
+      "pooled_cells_below_rho": 0
+    },
+    "state": {
+      "targets": 1260,
+      "targets_per_size": {"16": 180, "20": 180, "24": 180, "28": 180, "32": 180, "36": 180, "40": 180},
+      "unique_workload_target_size_ids": 1260,
+      "candidate_verified": 1260,
+      "rho_verified": 1260,
+      "candidate_recovered_equals_planted": 1260,
+      "rho_recovered_equals_planted": 1260,
+      "candidate_exhausted": 0,
+      "rho_exhausted": 0,
+      "same_source_add_counter_as_rho": 1260,
+      "five_cold_phases_present": 1260,
+      "boundary_normalization_inversions": 222375456,
+      "candidate_GAE": 4550428527.247615,
+      "rho_GAE": 1088802370.3333328,
+      "candidate_over_rho": 4.179297043461173,
+      "pooled_36_cell_ratio_min": 1.472855213439,
+      "pooled_36_cell_ratio_max": 28.015264535504,
+      "pooled_cells_below_rho": 0
+    }
+  },
+  "pairing": {"same_target_ids": true, "same_process_rho_per_arm": true, "state_over_wrapper_representative": 1.1016173973441354, "state_over_wrapper_pooled_36_cell_range": [0.546762455504, 1.303720161139], "state_below_wrapper_cells": 12},
+  "claim_limits": [
+    "Operation-priced cold counts, not isolated wall time or a fastest-external-tool ranking",
+    "The retained-state law avoids routine group-law inversion but charges affine relation-boundary conversion; the full collector is not inversion-free",
+    "Finite author-source translation parity and written branch-reachability arguments do not establish a faithful universal Rust group-law theorem",
+    "The public author Magma program was translated for the finite parity fixture; Magma itself was not executed"
+  ],
+  "validation_gate_command": "python3 scripts/validation_gate.py evidence research/projective_law_followup_20261022",
+  "validation_gate_output": "valid"
+}

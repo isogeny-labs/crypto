@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="480" viewBox="0 0 1100 480" role="img" aria-labelledby="title desc">
+  <title id="title">Derivative-point local DVR proof dependencies</title>
+  <desc id="desc">Blue nodes are checked Lean theorems under separability and a nonzero point derivative. Gray nodes are open; amber records a singular counterexample.</desc>
+  <style>
+    text { font-family: DejaVu Sans, Arial, sans-serif; fill:#182436; }
+    .title { font-size:22px; font-weight:700; }
+    .sub { font-size:13px; fill:#536075; }
+    .label { font-size:16px; font-weight:600; }
+    .detail { font-size:12px; }
+    .checked { fill:#e8f3ff; stroke:#2372b8; stroke-width:2; }
+    .open { fill:#f1f3f6; stroke:#788596; stroke-width:2; }
+    .limit { fill:#fff1d6; stroke:#b87912; stroke-width:2; }
+    .line { fill:none; stroke:#596579; stroke-width:2; }
+    .tip { fill:#596579; }
+  </style>
+  <rect width="1100" height="480" fill="white"/>
+  <text x="30" y="38" class="title">Derivative-point case: actual local DVR</text>
+  <text x="30" y="60" class="sub">Lean 4.34.1 · source SHA-256 0e9a8e7a31ab5dc8564b13611683989880dee03428be5e4b9e690fac6d969197 · no measurements</text>
+  <rect x="35" y="90" width="310" height="70" rx="8" class="checked"/>
+  <text x="55" y="118" class="label">Separable monic quintic</text><text x="55" y="141" class="detail">affine ring domain, checked earlier</text>
+  <rect x="395" y="90" width="310" height="70" rx="8" class="checked"/>
+  <text x="415" y="118" class="label">Rational point; f'(a) != 0</text><text x="415" y="141" class="detail">visible pointwise hypothesis</text>
+  <rect x="755" y="90" width="310" height="70" rx="8" class="checked"/>
+  <text x="775" y="118" class="label">Difference quotient is a unit</text><text x="775" y="141" class="detail">q_a(a) = f'(a) != 0</text>
+  <path d="M705 125 H755" class="line"/><path d="M755 125 L745 120 L745 130 Z" class="tip"/>
+  <rect x="35" y="223" width="310" height="70" rx="8" class="checked"/>
+  <text x="55" y="251" class="label">Point ideal coordinates</text><text x="55" y="274" class="detail">kernel = (x-a, y-y0), checked earlier</text>
+  <rect x="395" y="223" width="310" height="70" rx="8" class="checked"/>
+  <text x="415" y="251" class="label">Maximal ideal is (y-y0)</text><text x="415" y="274" class="detail">(y-y0)(y+y0) = (x-a)q_a</text>
+  <rect x="755" y="223" width="310" height="70" rx="8" class="checked"/>
+  <text x="775" y="251" class="label">Actual weighted-Proj DVR</text><text x="775" y="274" class="detail">local criterion + stalk equivalence</text>
+  <path d="M910 160 V193 H550 V223 M345 258 H395 M705 258 H755 M190 160 V223" class="line"/>
+  <path d="M550 223 L545 213 L555 213 Z M395 258 L385 253 L385 263 Z M755 258 L745 253 L745 263 Z M190 223 L185 213 L195 213 Z" class="tip"/>
+  <rect x="35" y="356" width="310" height="72" rx="8" class="limit"/>
+  <text x="55" y="384" class="label">Singular limit remains</text><text x="55" y="407" class="detail">F2: X^5+X^3+1 at (0,1)</text>
+  <rect x="395" y="356" width="310" height="72" rx="8" class="open"/>
+  <text x="415" y="384" class="label">Common 2+2 norm transport</text><text x="415" y="407" class="detail">proof-side numerator into this DVR</text>
+  <rect x="755" y="356" width="310" height="72" rx="8" class="open"/>
+  <text x="775" y="384" class="label">Global Pic0 and runtime</text><text x="775" y="407" class="detail">divisor class and compiled semantics</text>
+  <path d="M910 293 V325 H550 V356 M705 392 H755" class="line"/>
+  <path d="M550 356 L545 346 L555 346 Z M755 392 L745 387 L745 397 Z" class="tip"/>
+  <text x="35" y="458" class="sub">Blue: checked under displayed hypotheses · amber: explicit limit · gray: open · arrows: proof dependencies</text>
+</svg>

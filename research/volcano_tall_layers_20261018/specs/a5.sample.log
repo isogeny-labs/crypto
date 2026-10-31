@@ -1,0 +1,30 @@
+# Prime-field volcano (sampled): D = -11, ℓ = 3, depth 12, m = 0
+p = 75665619317083 (47 bits), trace t = 17307679, #E = 75665602009405 = 5 · 15133120401881
+t² − 4p = -11 · (531441)²,  f = ℓ^k
+
+levels 0..=7 by breadth-first search, against the class numbers h(O_(ℓ^i)):
+  level  0:          1   expected          1  ok
+  level  1:          2   expected          2  ok
+  level  2:          6   expected          6  ok
+  level  3:         18   expected         18  ok
+  level  4:         54   expected         54  ok
+  level  5:        162   expected        162  ok
+  level  6:        486   expected        486  ok
+  level  7:       1458   expected       1458  ok
+degree rule at the 729 expanded vertices: 0 violations
+  level  8: (sampled)  expected       4374
+  level  9: (sampled)  expected      13122
+  level 10: (sampled)  expected      39366
+  level 11: (sampled)  expected     118098
+  level 12: (sampled)  expected     354294
+random descents from the crater: 4 (degree rule at every step; levels inside the BFS range agree): 0 failures
+blind descent (p, t, ℓ and j only) from 46 sampled vertices: 0 give a level other than the sampled one
+group structure of 47 sampled curves (from point orders) against O_d/(π−1): 0 differ; prime subgroup r = 15133120401881 (43.8 bits), common to all: true
+wrote /home/user/crypto/research/volcano_tall_layers_20261018/specs/a5/spec_t10.json
+wrote /home/user/crypto/research/volcano_tall_layers_20261018/specs/a5/spec_t20.json
+wrote /home/user/crypto/research/volcano_tall_layers_20261018/specs/a5/spec_t38.json
+wrote /home/user/crypto/research/volcano_tall_layers_20261018/specs/a5/spec_t150.json
+wrote /home/user/crypto/research/volcano_tall_layers_20261018/specs/a5/control.json
+wrote /home/user/crypto/research/volcano_tall_layers_20261018/specs/a5/vertices.json
+
+total 5.9 s — ALL CHECKS PASS

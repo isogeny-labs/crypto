@@ -1,0 +1,25 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{amsmath,amssymb,booktabs}
+\title{Genus-2 affine and infinity charts: punctured-overlap identities}
+\author{Formal result packet for independent review}
+\date{25 October 2026}
+\begin{document}
+\maketitle
+Let $K$ be any field. The affine equation is
+\[y^2=x^5+a_3x^3+a_2x^2+a_1x+a_0,\]
+and the infinity-chart equation is
+\[w^2=z(1+a_3z^2+a_2z^3+a_1z^4+a_0z^5).\]
+On $x\ne0$ put $z=x^{-1}$ and $w=yx^{-3}$. Lean proves the two equations are equivalent. On $z\ne0$, the inverse substitution $x=z^{-1}$, $y=wz^{-3}$ satisfies the affine equation; the coordinate round trips hold in both directions. These are field-level identities for arbitrary characteristic. The Lean 4.34.1 compile exited zero and the new theorems' axiom audits contain only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}.
+
+\begin{center}\begin{tabular}{p{0.50\linewidth}p{0.37\linewidth}}\toprule
+Gate & Status\\\midrule
+Equation equivalence and reciprocal coordinates & Checked in Lean\\
+Principal-open affine-scheme isomorphism & Open: localization maps absent\\
+Specific two-chart gluing and smooth projective curve & Open\\
+Projective infinity stalk isomorphism & Open\\
+Principal divisor and $\operatorname{Pic}^0$ transport & Open\\
+Rust semantic equivalence and rho cost & Open / not measured\\\bottomrule\end{tabular}\end{center}
+
+\noindent The checked identities are inputs to a future scheme-gluing proof, not a construction of a smooth projective curve. The prior affine-stalk theorem applies to $\operatorname{Spec}A$ only. No operation count or cost ratio is inferred here. See \texttt{Common22ChartOverlap.lean}, \texttt{chart-overlap.csv}, and \texttt{chart-overlap.svg} for reproducible evidence.
+\end{document}

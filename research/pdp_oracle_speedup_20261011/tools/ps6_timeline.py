@@ -122,7 +122,25 @@ points = {"ec-cold": p_cold, "ec-bounded-counts": p_lb, "binary-decomp-oracle": 
 # --- the canonical data file -----------------------------------------------------------------------------
 raw = open(TIMELINE).read()
 tl = json.loads(raw)
-assert json.dumps(tl, indent=1, ensure_ascii=False) + "\n" == raw or json.dumps(tl, indent=1, ensure_ascii=False) == raw.rstrip("\n"), "the file's formatting is not json.dumps(indent=1); edit by hand"
+
+
+def dump(obj):
+    return json.dumps(obj, indent=1, ensure_ascii=False)
+
+
+def decode_escapes(line):
+    return re.sub(r"\\u([0-9a-fA-F]{4})", lambda m: chr(int(m.group(1), 16)), line)
+
+
+def keep_old_lines(new_text, old_text):
+    """Lines that differ from the old file only by \\uXXXX escapes keep the old spelling (the file is not uniformly escaped)."""
+    old = {}
+    for line in old_text.split("\n"):
+        old.setdefault(decode_escapes(line), line)
+    return "\n".join(old.get(decode_escapes(line), line) for line in new_text.split("\n"))
+
+
+assert json.loads(dump(tl)) == tl
 for series in tl["series"]:
     series["points"] = [p for p in series["points"] if p.get("anchor") != ANCHOR]
     add = points.get(series["id"])
@@ -131,7 +149,7 @@ for series in tl["series"]:
     for p in (add if isinstance(add, list) else [add]):
         series["points"].append(p)
 tl["updated"] = max(tl["updated"], DATE)
-text = json.dumps(tl, indent=1, ensure_ascii=False) + ("\n" if raw.endswith("\n") else "")
+text = keep_old_lines(dump(tl), raw) + ("\n" if raw.endswith("\n") else "")
 open(TIMELINE, "w").write(text)
 
 # --- the page ----------------------------------------------------------------------------------------------

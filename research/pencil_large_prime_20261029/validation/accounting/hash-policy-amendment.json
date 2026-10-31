@@ -1,0 +1,16 @@
+{
+  "schema": "pencil-hash-policy-amendment/v1",
+  "status": "implemented_before_cohort_not_frozen_protocol",
+  "policy": "rust-default-hasher-v1",
+  "toolchain": "1.99.1",
+  "native_policy_marker": "rho_hash_policy_rust_default_v1=1",
+  "scope": "Synthetic three_leads::rho_native collision map only; unrelated baby-step map unchanged",
+  "change": "RandomState replaced by BuildHasherDefault<DefaultHasher> for exact comparison-count replay",
+  "preserved": "Walk RNG, mathematical group operations, collision equality, capacity policy, and legacy native counters must match parity tests.",
+  "not_preserved": "Table bucket layout, actual comparison count and runtime; no claim of historical performance equivalence.",
+  "version_limit": "DefaultHasher algorithm is toolchain specific; source/binary/toolchain identities are required for independent replay.",
+  "comparison_costs_retained": true,
+  "new_cohort_data_taken": false,
+  "original_failure_receipt": "integration-failure.json",
+  "integrated_test_log": "integrated-tests.log"
+}

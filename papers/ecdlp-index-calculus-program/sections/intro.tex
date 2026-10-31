@@ -25,9 +25,11 @@ priced alike on every arm across a band of weights, and a ranking reported
 only where it holds across that band. Third, open problems, each stated as
 the measurement or proof that would settle it (\S\ref{sec:open}).
 
-The measurements come from one open repository and a programme of work
+The measurements come mainly from one repository and a programme of work
 there between July and October 2026 (\S\ref{sec:chronology}): about
-6{,}900 commits and 450 dated study directories, a boundary ledger
+6{,}900 commits and, on \texttt{main} at the paper's date, 784 study
+directories under \art{research/}, 205 benchmark rows, 39 open-problem
+records and about 400 research notes and programme documents, a boundary ledger
 (\art{docs/ic/boundary_targets.json}), a native harness
 (\art{src/cryptanalysis/ecbench/}), and the engineering results of
 \S\S\ref{sec:rootfinding}--\ref{sec:transfer}. It is easy, in a body of
@@ -37,6 +39,21 @@ result is stated with the boundary on which it was measured (oracle stage,
 complete solve, cold one-target cost, online cost after retained set-up),
 the unit, the sample, the interval, and the committed artefact that holds
 the records.
+
+The paper is meant to be exhaustive for that repository. The family
+sections (\S\ref{sec:koblitz} Koblitz, \S\ref{sec:binary} random and
+prime-degree binary, \S\ref{sec:prime} prime fields, \S\ref{sec:transfer}
+covers and transfers) discuss the lines of work that bear on the comparison
+with rho, and Appendix~\ref{sec:catalogue} lists all 1{,}444 entries---every study
+directory, benchmark row, problem record and note---by family, with each
+one's headline number, class and status, and a check that none is missing;
+every line with a result is either discussed or catalogued.
+Work in open pull requests is listed separately and not used
+(Appendix~\ref{sec:openprs}). Nine companion repositories of the same
+laboratory, among them \texttt{crypto-autoresearcher} and
+\texttt{cryptanalysis}, are described in \S\ref{sec:companion} and
+catalogued unit by unit in Appendix~\ref{sec:companion-catalogue}, a further
+5{,}112 entries. \texttt{crypto} and three of the companions are private.
 
 \paragraph{The routes measured.} The engineering lines, each a section below:
 \begin{enumerate}
@@ -89,7 +106,9 @@ corrections that the harness forced on earlier claims.
   and the improvement ladder of 14--15 October measured against the
   index-calculus baseline, with the distance to rho left after each step
   (\S\ref{sec:ladder}), continued through 20 October with the corrections of a
-  repository-wide validation sweep (\S\ref{sec:ladder2}).
+  repository-wide validation sweep (\S\ref{sec:ladder2}) and through 24 October
+  with known-logarithm factor bases, a re-priced Koblitz reference and a third
+  weak family near rho (\S\ref{sec:ladder3}).
 \item Open problems, each with the experiment or proof that would settle it
   (\S\ref{sec:open}).
 \end{itemize}
@@ -103,7 +122,25 @@ is classed, in the repository's vocabulary, as an \cls{advance} (an
 exponent or a crossover moves under complete accounting),
 \cls{engineering} (a constant moves), \cls{relabelling}, or
 \cls{accounting}; with one modelled exception (\S\ref{sec:gaudry}) every
-improvement in this paper is \cls{engineering} or \cls{accounting}.
+improvement in this paper is \cls{engineering} or \cls{accounting}. One
+measurement places index calculus below the strongest rho: genus three
+after cubic GHS at $q=2^{16}$, under its preregistered pricing, in a weak
+class where theory predicts it, and not under the protocol's sensitivity
+pricing (\S\ref{sec:transfer}); we report it as a measured crossing at one
+size, not as an advance. A second measurement, in the same weak class
+through a plane quartic, places index calculus below a matched \emph{plain}
+rho at every size from $q=4051$ to $262{,}111$ (\S\ref{sec:transfer}). The
+repository's leaderboard classes it \cls{advance} restricted to that family.
+Its reference is not the strongest rho, so this paper does not count it as
+the programme's advance against rho.
+Nor does it claim to improve on published index calculus: every ratio is
+against rho or against this programme's own previous arm, and stage ratios
+against matrix F4 or Buchberger are against the repository's own engines.
+External engines were run as references only: msolve against the $\FF_p$ F4
+on the same systems, msolve and PolyBoRi computing full bases where our
+Boolean engines decide (a different computation), and CADO-NFS for the
+linear algebra (\S\ref{sec:groebner}). A reference arm built from the published methods is open
+problem~10 (\S\ref{sec:open}).
 
 \paragraph{How to read the numbers.} ``$X\times$'' always means
 baseline cost divided by candidate cost on the stated boundary. Stage

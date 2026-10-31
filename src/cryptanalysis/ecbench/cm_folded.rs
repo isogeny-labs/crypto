@@ -2,7 +2,7 @@
 //! Each invocation owns its table; the Rust replay uses separate affine arithmetic.
 use super::{
     canonical::sha256_hex,
-    methods::{OnlineWindow, PhaseRecord, ResolvedMethod, SolveReport},
+    methods::{unpriced_of, OnlineWindow, PhaseRecord, ResolvedMethod, SolveReport},
 };
 use crate::cryptanalysis::{
     ic_boundary::{CountedGroup, GroupOps, IncrementalGauss, PrimeInstance, PrimePoint, RowStatus},
@@ -48,6 +48,113 @@ fn parse_row(s: &str) -> Result<Vec<u64>, String> {
         .map(|x| x.parse().map_err(|_| "malformed native CSV".into()))
         .collect()
 }
+/// The `_v2` ids charge the Rust replay's counted operations and name the
+/// native counters they leave unpriced; `_v1` keeps the accounting its
+/// committed records were written under (`total_gae` 0, prose `unpriced`).
+pub fn is_v2(id: &str) -> bool {
+    id.starts_with("ic.cm_folded_") && id.ends_with("_v2")
+}
+
+/// The recurrence control, either version.
+fn is_recurrence(id: &str) -> bool {
+    id == "ic.cm_folded_recurrence_v1" || id == "ic.cm_folded_recurrence_v2"
+}
+
+/// The `D = −43` control, either version.
+fn is_d43(id: &str) -> bool {
+    id == "ic.cm_folded_native_d43_v1" || id == "ic.cm_folded_native_d43_v2"
+}
+
+/// The phases, total and unpriced list of a report.
+///
+/// `_v1` (frozen): `native_cold_backend` and `independent_replay` with
+/// `gae` 0, `total_gae` 0 (the report's default) and one prose `unpriced`
+/// entry; every group operation of the replay sits in the phase's `adds`,
+/// `doubles` and `scalar_mults` only.
+///
+/// `_v2`: the replay is the counted work, so `independent_replay.gae` is its
+/// additions plus doublings (the base scalar replays, the relation sums, the
+/// `[α]G` of each relation and the final `[d]G = Q`) and `total_gae` is the
+/// phase sum.  Native work stays unpriced, named by its `*_uncharged`
+/// counters, as every other method names it; the Vélu map derivation's group
+/// operations (`prep_ops`), which no phase carries, join them as
+/// `cm_map_derivation_group_ops_uncharged`.
+pub(super) fn account(
+    v2: bool,
+    audit_ops: GroupOps,
+    prep_ops: GroupOps,
+    backend_wall_ns: Option<u64>,
+    replay_ns: u64,
+    counters: &mut BTreeMap<String, u64>,
+) -> (Vec<PhaseRecord>, f64, Vec<String>) {
+    let phases = vec![
+        PhaseRecord {
+            name: "native_cold_backend".into(),
+            wall_ns: backend_wall_ns,
+            ..Default::default()
+        },
+        PhaseRecord {
+            name: "independent_replay".into(),
+            adds: audit_ops.adds,
+            doubles: audit_ops.doubles,
+            scalar_mults: audit_ops.scalar_mults,
+            gae: if v2 { audit_ops.gae() } else { 0.0 },
+            wall_ns: Some(replay_ns),
+            ..Default::default()
+        },
+    ];
+    if !v2 {
+        let unpriced = vec!["native field/group operations, hash probes, table scans, modular exponentiation, elimination and CM derivation lack a complete common price".into()];
+        return (phases, 0.0, unpriced);
+    }
+    if prep_ops.adds + prep_ops.doubles > 0 {
+        counters.insert(
+            "cm_map_derivation_group_ops_uncharged".into(),
+            prep_ops.adds + prep_ops.doubles,
+        );
+    }
+    let total = phases.iter().map(|p| p.gae).sum();
+    (phases, total, unpriced_of(counters))
+}
+
+/// What `solve` refuses on every execution, decided at plan time: a curve
+/// that is not of cofactor one and prime order, a base size outside
+/// `4..=16384` or not a multiple of four, a query cap not below `r`, a
+/// watchdog that is not a positive number, a mode other than `scalar` /
+/// `velu` (`velu` is refused for the recurrence control), and a curve with
+/// no CM orbit action for the control's discriminant (`D = −19`, or `−43`
+/// for the degree-11 control).  The backend binary itself is not checked
+/// here: it lives on the host that runs the arm.
+pub fn applicable(m: &ResolvedMethod, inst: &PrimeInstance) -> Result<(), String> {
+    if inst.cofactor != 1 || inst.group_order != inst.r {
+        return Err("CM folded controls require a cofactor-one prime-order curve".into());
+    }
+    let size: usize = m.params["size"].parse().map_err(|_| "bad base size")?;
+    let limit: u64 = m.params["query_limit"]
+        .parse()
+        .map_err(|_| "bad query cap")?;
+    if !(4..=16384).contains(&size) || !size.is_multiple_of(4) || limit >= inst.r {
+        return Err(format!(
+            "unsupported CM base or noninjective query cap: size {size} (a multiple of 4 in 4..=16384), query_limit {limit} must be below r = {}",
+            inst.r
+        ));
+    }
+    let seconds: f64 = m.params["seconds"]
+        .parse()
+        .map_err(|_| "bad wall watchdog")?;
+    if !seconds.is_finite() || seconds <= 0.0 {
+        return Err("watchdog must be finite and positive".into());
+    }
+    match (m.params["mode"].as_str(), is_recurrence(&m.id)) {
+        ("scalar", _) | ("velu", false) => {}
+        _ => return Err("CM mode must be velu or scalar".into()),
+    }
+    let abs_d = if is_d43(&m.id) { 43 } else { 19 };
+    action(inst, abs_d)
+        .map(|_| ())
+        .map_err(|e| format!("no CM orbit action for D = -{abs_d} on this curve: {e}"))
+}
+
 pub fn solve(
     m: &ResolvedMethod,
     inst: &PrimeInstance,
@@ -58,7 +165,7 @@ pub fn solve(
     if inst.cofactor != 1 || inst.group_order != inst.r {
         return Err("CM folded controls require a cofactor-one prime-order curve".into());
     }
-    let recurrence = m.id == "ic.cm_folded_recurrence_v1";
+    let recurrence = is_recurrence(&m.id);
     let start = Instant::now();
     let bytes = fs::read(&m.params["backend"]).map_err(|e| format!("native backend: {e}"))?;
     if sha256_hex(&bytes) != m.params["backend_sha256"] {
@@ -77,11 +184,7 @@ pub fn solve(
     if !seconds.is_finite() || seconds <= 0.0 {
         return Err("watchdog must be finite and positive".into());
     }
-    let abs_d = if m.id == "ic.cm_folded_native_d43_v1" {
-        43
-    } else {
-        19
-    };
+    let abs_d = if is_d43(&m.id) { 43 } else { 19 };
     let (_, lambda, degree) = action(inst, abs_d)?;
     let mut prep_ops = GroupOps::default();
     let map = match m.params["mode"].as_str() {
@@ -169,8 +272,10 @@ pub fn solve(
     let raw: Value =
         serde_json::from_slice(&out.stdout).map_err(|e| format!("native result: {e}"))?;
     let replay_start = Instant::now();
-    let fb = fs::read_to_string(dir.0.join("factor-bases/job-0.csv")).map_err(|e| e.to_string())?;
-    let rel = fs::read_to_string(dir.0.join("relations/job-0.jsonl")).map_err(|e| e.to_string())?;
+    let fb = fs::read_to_string(dir.0.join("factor-bases/job-0.csv"))
+        .map_err(|e| format!("{}: {e}", dir.0.join("factor-bases/job-0.csv").display()))?;
+    let rel = fs::read_to_string(dir.0.join("relations/job-0.jsonl"))
+        .map_err(|e| format!("{}: {e}", dir.0.join("relations/job-0.jsonl").display()))?;
     let base: Vec<Vec<u64>> = fb
         .lines()
         .skip(1)
@@ -307,26 +412,19 @@ pub fn solve(
         counters.insert(format!("native_{k}_uncharged"), u(&raw, k)?);
     }
     counters.insert("independent_replay_wall_ns".into(), replay_ns);
-    let unpriced=vec!["native field/group operations, hash probes, table scans, modular exponentiation, elimination and CM derivation lack a complete common price".into()];
-    let phases = vec![
-        PhaseRecord {
-            name: "native_cold_backend".into(),
-            wall_ns: raw["wall_seconds"].as_f64().map(|x| (x * 1e9) as u64),
-            ..Default::default()
-        },
-        PhaseRecord {
-            name: "independent_replay".into(),
-            adds: audit_ops.adds,
-            doubles: audit_ops.doubles,
-            scalar_mults: audit_ops.scalar_mults,
-            wall_ns: Some(replay_ns),
-            ..Default::default()
-        },
-    ];
+    let (phases, total_gae, unpriced) = account(
+        is_v2(&m.id),
+        audit_ops,
+        prep_ops,
+        raw["wall_seconds"].as_f64().map(|x| (x * 1e9) as u64),
+        replay_ns,
+        &mut counters,
+    );
     Ok(SolveReport {
         recovered,
         exhausted: recovered.is_none(),
         phases,
+        total_gae,
         counters,
         unpriced,
         automorphisms_used: 2,
@@ -337,4 +435,189 @@ pub fn solve(
         detail: json!({"native":raw,"lambda":lambda,"backend_sha256":m.params["backend_sha256"],"relations":relations,"replay":receipt,"replay_sha256":receipt_sha256}),
         ..Default::default()
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::cryptanalysis::ecbench::methods::{resolve, MethodSpec};
+    use crate::cryptanalysis::ic_boundary::PrimeCurve;
+
+    /// The public D = −19 control of `ic_framework::cm_orbit`'s tests.
+    fn control() -> PrimeInstance {
+        PrimeInstance {
+            name: "public control".into(),
+            curve: PrimeCurve {
+                p: 343073,
+                a: 36086,
+                b: 72172,
+            },
+            group_order: 342833,
+            r: 342833,
+            cofactor: 1,
+            generator: (0, 2882),
+        }
+    }
+
+    fn method(id: &str, extra: &[(&str, &str)]) -> ResolvedMethod {
+        let mut params: BTreeMap<String, String> = [
+            ("backend".to_string(), "/nonexistent/folded".to_string()),
+            ("backend_sha256".to_string(), "00".to_string()),
+            ("query_limit".to_string(), "1000".to_string()),
+        ]
+        .into_iter()
+        .collect();
+        params.extend(extra.iter().map(|(k, v)| (k.to_string(), v.to_string())));
+        resolve(&MethodSpec {
+            id: id.into(),
+            params,
+        })
+        .unwrap()
+    }
+
+    fn counters() -> BTreeMap<String, u64> {
+        [
+            ("native_field_muls_uncharged", 1000u64),
+            ("native_hits_uncharged", 0),
+            ("native_queries_uncharged", 77),
+            ("independent_replay_wall_ns", 5),
+        ]
+        .into_iter()
+        .map(|(k, v)| (k.to_string(), v))
+        .collect()
+    }
+
+    const AUDIT: GroupOps = GroupOps {
+        adds: 40,
+        doubles: 25,
+        scalar_mults: 9,
+        field_ops: crate::cryptanalysis::ic_boundary::FieldOps {
+            muls: 0,
+            sqrs: 0,
+            invs: 0,
+        },
+        montgomery_reductions: 0,
+    };
+
+    /// The frozen `_v1` report is byte for byte what its committed records
+    /// carry: zero gae everywhere, the prose entry, no extra counter.
+    #[test]
+    fn v1_accounting_is_unchanged() {
+        let mut c = counters();
+        let (phases, total, unpriced) =
+            account(false, AUDIT, GroupOps::default(), Some(11), 22, &mut c);
+        assert_eq!(total, 0.0);
+        assert!(phases.iter().all(|p| p.gae == 0.0));
+        assert_eq!(phases[1].name, "independent_replay");
+        assert_eq!(
+            (phases[1].adds, phases[1].doubles, phases[1].scalar_mults),
+            (40, 25, 9)
+        );
+        assert_eq!(unpriced.len(), 1);
+        assert!(unpriced[0].starts_with("native field/group operations"));
+        assert_eq!(c, counters());
+    }
+
+    /// `_v2` charges the replay's counted operations, and only them: the
+    /// total is the phase sum and `independent_replay.gae` is adds + doubles
+    /// (the `[d]G = Q` check included, it is in `audit_ops`).
+    #[test]
+    fn v2_charges_the_replay_and_names_the_unpriced_counters() {
+        let mut c = counters();
+        let (v1, t1, _) = account(
+            false,
+            AUDIT,
+            GroupOps::default(),
+            Some(11),
+            22,
+            &mut counters(),
+        );
+        let (phases, total, unpriced) =
+            account(true, AUDIT, GroupOps::default(), Some(11), 22, &mut c);
+        assert_eq!(total, 65.0);
+        assert!(total > 0.0);
+        assert_eq!(total, phases.iter().map(|p| p.gae).sum::<f64>());
+        assert_eq!(phases[0].gae, 0.0);
+        assert_eq!(phases[1].gae, 65.0);
+        // v2 − v1 is exactly the replay's gae; everything else is equal.
+        assert_eq!(total - t1, 65.0);
+        for (a, b) in v1.iter().zip(&phases) {
+            assert_eq!(
+                (&a.name, a.adds, a.doubles, a.scalar_mults, a.wall_ns),
+                (&b.name, b.adds, b.doubles, b.scalar_mults, b.wall_ns)
+            );
+        }
+        // The prose entry is replaced by the counters themselves, nonzero only.
+        assert_eq!(
+            unpriced,
+            ["native_field_muls_uncharged", "native_queries_uncharged"]
+        );
+        assert_eq!(c, counters(), "no derivation ops, no extra counter");
+        // A Vélu derivation's group operations are named, not charged.
+        let prep = GroupOps {
+            adds: 3,
+            doubles: 4,
+            ..GroupOps::default()
+        };
+        let (_, total_prep, unpriced) = account(true, AUDIT, prep, Some(11), 22, &mut c);
+        assert_eq!(total_prep, total);
+        assert_eq!(c["cm_map_derivation_group_ops_uncharged"], 7);
+        assert!(unpriced.contains(&"cm_map_derivation_group_ops_uncharged".to_string()));
+    }
+
+    #[test]
+    fn versions_are_told_apart_by_id() {
+        assert!(!is_v2("ic.cm_folded_native_v1"));
+        assert!(!is_v2("ic.cm_folded_recurrence_v1"));
+        assert!(!is_v2("ic.cm_folded_native_d43_v1"));
+        assert!(is_v2("ic.cm_folded_native_v2"));
+        assert!(is_v2("ic.cm_folded_recurrence_v2"));
+        assert!(is_v2("ic.cm_folded_native_d43_v2"));
+        assert!(is_recurrence("ic.cm_folded_recurrence_v2"));
+        assert!(is_d43("ic.cm_folded_native_d43_v2"));
+        assert!(!is_d43("ic.cm_folded_native_v2"));
+    }
+
+    /// The plan-time check is what the adapter refuses on every run.
+    #[test]
+    fn applicable_refuses_what_solve_refuses() {
+        let i = control();
+        for id in [
+            "ic.cm_folded_native_v1",
+            "ic.cm_folded_native_v2",
+            "ic.cm_folded_recurrence_v2",
+        ] {
+            applicable(&method(id, &[]), &i).unwrap_or_else(|e| panic!("{id}: {e}"));
+        }
+        let m = method("ic.cm_folded_native_v2", &[]);
+        // Cofactor not one.
+        let mut c = i.clone();
+        c.cofactor = 2;
+        assert!(applicable(&m, &c).unwrap_err().contains("cofactor-one"));
+        // Query cap not below r; base not a multiple of four, or too big.
+        let r = i.r.to_string();
+        for (k, v) in [
+            ("query_limit", r.as_str()),
+            ("size", "6"),
+            ("size", "32768"),
+        ] {
+            let err = applicable(&method("ic.cm_folded_native_v2", &[(k, v)]), &i).unwrap_err();
+            assert!(
+                err.contains("unsupported CM base or noninjective"),
+                "{k}={v}: {err}"
+            );
+        }
+        // Watchdog and mode.
+        assert!(applicable(&method("ic.cm_folded_native_v2", &[("seconds", "0")]), &i).is_err());
+        assert!(applicable(&method("ic.cm_folded_native_v2", &[("mode", "x")]), &i).is_err());
+        assert!(applicable(&method("ic.cm_folded_native_v2", &[("mode", "velu")]), &i).is_ok());
+        assert!(applicable(
+            &method("ic.cm_folded_recurrence_v2", &[("mode", "velu")]),
+            &i
+        )
+        .is_err());
+        // No CM orbit action: the D = −43 control on a D = −19 curve.
+        let err = applicable(&method("ic.cm_folded_native_d43_v2", &[]), &i).unwrap_err();
+        assert!(err.contains("no CM orbit action for D = -43"), "{err}");
+    }
 }

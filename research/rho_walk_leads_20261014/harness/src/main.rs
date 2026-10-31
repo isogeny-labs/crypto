@@ -606,6 +606,12 @@ fn dp_trial(c: &Curve, arm: &str, seed: u64, cfg: &DpCfg) -> Rec {
             } else if arm == "pair_table" {
                 let j = s.idx(x, 1, cfg.r);
                 s.wadd(st.w, pairs[i * cfg.r + j], false)
+            } else if arm == "neg_pm_score" {
+                // negation map with best of P + R and P - R (gpu/nist RHO_BEST2)
+                let plus = s.wadd(st.w, s.tab[i], false);
+                let minus = s.wadd(st.w, s.tab[i], true);
+                adds += 1;
+                if s.score(&minus.p) > s.score(&plus.p) { minus } else { plus }
             } else {
                 s.wadd(st.w, s.tab[i], false)
             };
@@ -1030,6 +1036,7 @@ fn main() {
             t(&MF::<1>::new([(1u64 << 62) - 57]), "2^62-57");
             t(&MF::<4>::new([0xFFFF_FFFF_FFFF_FFFF, 0x0000_0000_FFFF_FFFF, 0, 0xFFFF_FFFF_0000_0001]), "P-256");
         }
+        "gpuab" => gpuab(&args),
         "summary" => summary(&args),
         _ => eprintln!("usage: rho_walk_leads e1|rf|e2|e4|bench|summary [--bits B] [--trials T] [--seed S] [--arms a,b]"),
     }
@@ -1056,6 +1063,7 @@ fn predicted(exp: &str, arm: &str) -> Option<f64> {
         ("e1", "pm_coin") | ("e2", "lazy_dp") | ("e2", "pair_table") => Some(1.0),
         ("e2", "lazy_index") => Some(std::f64::consts::FRAC_1_SQRT_2),
         ("e4", "neg_canon") | ("e4", "neg_hashrule") => Some(std::f64::consts::SQRT_2),
+        ("e4", "neg_pm_score") => Some(std::f64::consts::SQRT_2 * k2(2.0)),
         _ => None,
     }
 }
@@ -1122,7 +1130,9 @@ fn summary(args: &[String]) {
             adds / tot,
             esc / tot * 1e6
         );
-        let rname = reference(exp);
+        // --ref ARM overrides the default reference for every experiment
+        let ref_override = arg_s(args, "--ref", "");
+        let rname = if ref_override.is_empty() { reference(exp) } else { ref_override.as_str() };
         if let Some(rrows) = cells.get(&(exp.clone(), *bits, rname.to_string())) {
             if rname != arm {
                 // paired by trial: ratio of means ref/arm, bootstrap over trials
@@ -1191,5 +1201,76 @@ fn summary(args: &[String]) {
             }
         }
         println!("{line}}}");
+    }
+}
+
+// ------------------------------------------------------------- gpu A/B
+
+/// gpu/nist RHO_BEST2 A/B: the raw log of `gpu/nist/best2_ab.sh`, where a
+/// `CELL rep= order= best2= W= iters=` line precedes each bench run and its
+/// `P-256 rho: walks=N ... W=W  G Gstep/s  (D DPs, dp_bits=B)` lines; the
+/// expected DP count is walks x iters / 2^B.  Per (curve, W): median
+/// rate per build, the per-repetition paired ratio best2/plain (median, min,
+/// max), the DP ratio observed/expected, and GPU time per solve relative to
+/// the plain kernel, `1 / (iteration speedup x rate ratio)`, at the measured
+/// iteration speedup and its interval (`--speedup S --lo L --hi H`).
+fn gpuab(args: &[String]) {
+    let path = arg_s(args, "--in", "-");
+    let sp: f64 = arg(args, "--speedup", 1.0);
+    let lo: f64 = arg(args, "--lo", sp);
+    let hi: f64 = arg(args, "--hi", sp);
+    let rd: Box<dyn BufRead> = if path == "-" {
+        Box::new(std::io::BufReader::new(std::io::stdin()))
+    } else {
+        Box::new(std::io::BufReader::new(std::fs::File::open(&path).expect("open")))
+    };
+    // (curve, W) -> rep -> [plain, best2] rates; DP sums per build
+    let mut cells: std::collections::BTreeMap<(String, u32), std::collections::BTreeMap<u32, [f64; 2]>> = Default::default();
+    let mut dps: std::collections::BTreeMap<(String, u32, usize), (f64, f64)> = Default::default();
+    // value after `key=` up to the next space, comma or parenthesis
+    let kv = |l: &str, k: &str| -> Option<f64> {
+        let i = l.find(&format!("{k}="))? + k.len() + 1;
+        l[i..].split(|c: char| c == ' ' || c == ',' || c == ')').next()?.parse().ok()
+    };
+    let (mut b, mut r, mut iters) = (0usize, 0u32, 0f64);
+    for l in rd.lines() {
+        let l = l.unwrap();
+        if l.starts_with("CELL ") {
+            b = kv(&l, "best2").unwrap() as usize;
+            r = kv(&l, "rep").unwrap() as u32;
+            iters = kv(&l, "iters").unwrap();
+            continue;
+        }
+        let Some((c, rest)) = l.split_once(" rho: walks=") else { continue };
+        let walks: f64 = rest.split(' ').next().unwrap().parse().unwrap();
+        let w = kv(&l, "W").unwrap() as u32;
+        let toks: Vec<&str> = l.split_whitespace().collect();
+        let g: f64 = toks[toks.iter().position(|t| *t == "Gstep/s").unwrap() - 1].parse().unwrap();
+        let d: f64 = toks[toks.iter().position(|t| *t == "DPs,").unwrap() - 1].trim_start_matches('(').parse().unwrap();
+        let key = (c.to_string(), w);
+        cells.entry(key.clone()).or_default().entry(r).or_insert([f64::NAN; 2])[b] = g;
+        let e = dps.entry((key.0, key.1, b)).or_insert((0.0, 0.0));
+        e.0 += d;
+        e.1 += walks * iters / 2f64.powf(kv(&l, "dp_bits").unwrap());
+    }
+    let med = |mut v: Vec<f64>| {
+        v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        let n = v.len();
+        if n % 2 == 1 { v[n / 2] } else { (v[n / 2 - 1] + v[n / 2]) / 2.0 }
+    };
+    for ((curve, w), reps) in &cells {
+        let plain: Vec<f64> = reps.values().map(|r| r[0]).collect();
+        let best: Vec<f64> = reps.values().map(|r| r[1]).collect();
+        let ratios: Vec<f64> = reps.values().map(|r| r[1] / r[0]).collect();
+        let rmin = ratios.iter().cloned().fold(f64::INFINITY, f64::min);
+        let rmax = ratios.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
+        let rmed = med(ratios.clone());
+        let d0 = dps[&(curve.clone(), *w, 0)];
+        let d1 = dps[&(curve.clone(), *w, 1)];
+        println!(
+            "{{\"curve\":\"{curve}\",\"W\":{w},\"reps\":{},\"plain_median_Gstep_s\":{:.4},\"best2_median_Gstep_s\":{:.4},\"rate_ratio_median\":{rmed:.4},\"rate_ratio_min\":{rmin:.4},\"rate_ratio_max\":{rmax:.4},\"dp_obs_over_exp_plain\":{:.4},\"dp_obs_over_exp_best2\":{:.4},\"iteration_speedup\":{sp},\"gpu_time_per_solve\":{:.4},\"gpu_time_per_solve_range\":[{:.4},{:.4}]}}",
+            ratios.len(), med(plain), med(best), d0.0 / d0.1, d1.0 / d1.1,
+            1.0 / (sp * rmed), 1.0 / (hi * rmax), 1.0 / (lo * rmin)
+        );
     }
 }

@@ -1,0 +1,9 @@
+digraph G { graph [rankdir=LR,bgcolor="white"]; node [shape=box,style="rounded,filled",fillcolor="#e7f1f3",fontname="Helvetica",fontsize=12]; edge [color="#526a73"];
+
+  inputs [label="Public known-answer inputs\noriginal and small fields"];
+  exact [label="Independent exact count\n0,6,6,0,18,0,0"];
+  small [label="Small exhaustive controls\n2,304 assignments\n373 symmetric roots\n2,880 signed lifts"];
+  replay [label="Original A/A\n12 deterministic rows equal"];
+  inputs -> exact; inputs -> small; inputs -> replay;
+
+}

@@ -1,0 +1,20 @@
+boot 2026-10-21T00:56:03Z
+fb: OK
+cell X1-A0-m4-t4
+date 2026-10-21T00:56:04Z
+commit fab81e175f405c502e4c38b85100be1ac39aa767
+binary_sha256 19a5d11bb8db6d06afd4f358a3205a28358d80dd629aa314fabdd2755a9bd72c
+MemTotal_kB 64774300
+cgroup_path /system.slice/cloud-final.service
+cgroup_file /sys/fs/cgroup/system.slice/cloud-final.service/memory.max
+cgroup_limit_kB unlimited
+nproc 8
+V_kB 64250012
+kernel 7.0.0-1014-aws
+product r7i.2xlarge
+model name	: Intel(R) Xeon(R) Platinum 8488C
+commit fab81e175f405c502e4c38b85100be1ac39aa767, host {"cores":8,"cpu":"Intel(R) Xeon(R) Platinum 8488C","hostname":"ip-172-31-32-34"}
+A0   m=4 t= 4 target=0 b=4.000 |V|=16 n_vars=18 n_eqs=19 D=null reached=null 1915.9 s aborted (memory allocation failed under ulimit -v 64250012 (signal: 6 (SIGABRT) (core dumped)))
+A0   m=4 t= 4 target=1 b=4.000 |V|=16 n_vars=18 n_eqs=19 D=null reached=null 1873.7 s aborted (memory allocation failed under ulimit -v 64250012 (signal: 6 (SIGABRT) (core dumped)))
+-- A0 m=4: a system at t = 4 hit a limit or failed; the series stops
+run exit 0 at 2026-10-21T01:59:13Z

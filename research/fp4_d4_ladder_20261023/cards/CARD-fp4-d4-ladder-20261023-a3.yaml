@@ -1,0 +1,116 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-fp4-d4-ladder-20261023-a3
+experiment_id: fp4_d4_ladder_20261023
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: def70079cc45cbb51f5fe3bab84704f2d20e057a
+receipt: research/fp4_d4_ladder_20261023/cards/CARD-fp4-d4-ladder-20261023-a3.receipt.json
+binds:
+- path: research/fp4_d4_ladder_20261023/PROTOCOL.md
+  sha256: 4374ff83601f2202326ede03d118af3413b62d1a87807988331b37a8a4fd09ac
+- path: research/fp4_d4_ladder_20261023/specs/SPEC-A.json
+  sha256: 514b9876d52d219819d765fe14951c50c684a298e79d549c63b7c918c3c97c08
+- path: Cargo.toml
+  sha256: def239e6a4e217a3059fc5b6740d658fa353f6cb023b685aeb2c40e528e94bfc
+- path: Cargo.lock
+  sha256: bf9f2d9eae5f6bfea66b0473d44bf77d63141dcc335fad01b30c420be444ea42
+- path: ./target/release/ecbench
+  sha256: 1153d340d7b81a58ff9622c81e9bed51396dc2b2e48b6ae0016e7d7a0799a6bc
+must_not_exist:
+- research/fp4_d4_ladder_20261023/sessions/A3
+- research/fp4_d4_ladder_20261023/sessions/A3.audit.json
+commands:
+- id: build-ecbench
+  argv:
+  - cargo
+  - build
+  - --release
+  - --bin
+  - ecbench
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/fp4_d4_ladder_20261023/receipts/A3-build-ecbench.stdout
+  stderr: research/fp4_d4_ladder_20261023/receipts/A3-build-ecbench.stderr
+- id: run-a
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --wait
+  - --allow-busy
+  - --cpus
+  - auto
+  - --spec
+  - research/fp4_d4_ladder_20261023/specs/SPEC-A.json
+  - --out
+  - research/fp4_d4_ladder_20261023/sessions/A3
+  cwd: .
+  timeout_seconds: 64800
+  success_exit_codes:
+  - 0
+  stdout: research/fp4_d4_ladder_20261023/receipts/A3-run-a.stdout
+  stderr: research/fp4_d4_ladder_20261023/receipts/A3-run-a.stderr
+- id: verify-a
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/fp4_d4_ladder_20261023/sessions/A3
+  - --replay
+  - '4'
+  - --out
+  - research/fp4_d4_ladder_20261023/sessions/A3.audit.json
+  cwd: .
+  timeout_seconds: 64800
+  success_exit_codes:
+  - 0
+  stdout: research/fp4_d4_ladder_20261023/receipts/A3-verify-a.stdout
+  stderr: research/fp4_d4_ladder_20261023/receipts/A3-verify-a.stderr
+  outputs:
+  - research/fp4_d4_ladder_20261023/sessions/A3.audit.json
+- id: table-a
+  argv:
+  - ./target/release/ecbench
+  - table
+  - --dir
+  - research/fp4_d4_ladder_20261023/sessions/A3
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/fp4_d4_ladder_20261023/sessions/A3.table.md
+  stderr: research/fp4_d4_ladder_20261023/receipts/A3-table-a.stderr
+  outputs:
+  - research/fp4_d4_ladder_20261023/sessions/A3.table.md
+- id: band-a
+  argv:
+  - ./target/release/ecbench
+  - band
+  - --dir
+  - research/fp4_d4_ladder_20261023/sessions/A3
+  - --ranks
+  - --json
+  - research/fp4_d4_ladder_20261023/sessions/A3.band.json
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/fp4_d4_ladder_20261023/sessions/A3.band.md
+  stderr: research/fp4_d4_ladder_20261023/receipts/A3-band-a.stderr
+  outputs:
+  - research/fp4_d4_ladder_20261023/sessions/A3.band.json
+  - research/fp4_d4_ladder_20261023/sessions/A3.band.md
+bus_address: executor-mechanical-fp4-d4-ladder-20261023-a3
+background: true
+write_scope:
+- research/fp4_d4_ladder_20261023/sessions/
+- research/fp4_d4_ladder_20261023/receipts/
+- research/fp4_d4_ladder_20261023/cards/
+- target/
+stop_when:
+- Any command in the card exits with a status other than 0.
+- The tool exits with status 2 and prints an IMPEDIMENT line.
+- The tool prints a line that begins with "command" and ends with "FAILED".
+notes: "Other experiments run on this host at the same time. Operation counts are the claim; wall time is an observation. Launch the one command detached so it survives you: setsid nohup python3 tools/task_card.py run research/fp4_d4_ladder_20261023/cards/CARD-fp4-d4-ladder-20261023-a3.yaml > research/fp4_d4_ladder_20261023/receipts/CARD-fp4-d4-ladder-20261023-a3.launch.log 2>&1 < /dev/null & - then print the PID (echo $!) and return immediately with the PID and the log path. Do not wait for it, do not poll it. Do not rerun, retry or repair any command; relay what the tool prints, unchanged."

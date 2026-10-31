@@ -1,0 +1,5965 @@
+{
+  "checks": [
+    {
+      "check": "R2, R2-A, R2-D and L1-L4 runs and cards byte-identical to the round-1 snapshot",
+      "detail": {
+        "cards_or_runs_touched": [],
+        "runs_changed": []
+      },
+      "ok": true
+    },
+    {
+      "check": "R2-L1: receipt card_sha256 = committed card",
+      "ok": true
+    },
+    {
+      "check": "R2-L1: receipt completed",
+      "detail": "completed",
+      "ok": true
+    },
+    {
+      "check": "R2-L1: every command exit 0, one attempt, no timeout",
+      "detail": [
+        [
+          "git-clean",
+          0
+        ],
+        [
+          "output-absent",
+          0
+        ],
+        [
+          "mkdir-runs",
+          0
+        ],
+        [
+          "disk-record",
+          0
+        ],
+        [
+          "lscpu-record",
+          0
+        ],
+        [
+          "disk-before-run",
+          0
+        ],
+        [
+          "quiet-before-run",
+          0
+        ],
+        [
+          "run",
+          0
+        ]
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L1: git-clean, disk and lscpu records, quiet-CPU wait, then run",
+      "detail": [
+        "git-clean",
+        "output-absent",
+        "mkdir-runs",
+        "disk-record",
+        "lscpu-record",
+        "disk-before-run",
+        "quiet-before-run",
+        "run"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L1: card binds the bench and jv_cover pins",
+      "detail": [
+        "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+        "afa830fc99087f12978f1e072c16b3f6e164c99b2b15e17fd6a3a7cc92bb050f"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L1: card binds PROTOCOL.md at its committed sha256",
+      "ok": true
+    },
+    {
+      "check": "R2-L1: receipt run argv = card run argv",
+      "detail": [
+        "./target/release/examples/postgb_la_bench",
+        "--families",
+        "jv-nagao,gaudry-s4,gaudry-d4",
+        "--per",
+        "8",
+        "--reps",
+        "7",
+        "--json",
+        "research/postgb_linear_stage_20261026/runs/R2-L1.json"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L1: output R2-L1.json sha256 = committed file",
+      "detail": [
+        "8ad1e7dade6ba91161412b4d6473a191816b9f7dc86c15d3b2babfef533cb69a",
+        "8ad1e7dade6ba91161412b4d6473a191816b9f7dc86c15d3b2babfef533cb69a"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L1: run stdout sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-L1: run stderr sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-L1: lscpu sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-L1: receipt commit is an ancestor of the snapshot",
+      "detail": "e370e78ba36c6b038514bc8ced50eb3d8b01df6b",
+      "ok": true
+    },
+    {
+      "check": "R2-L1: dirty_before only under cards/",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2-L2: receipt card_sha256 = committed card",
+      "ok": true
+    },
+    {
+      "check": "R2-L2: receipt completed",
+      "detail": "completed",
+      "ok": true
+    },
+    {
+      "check": "R2-L2: every command exit 0, one attempt, no timeout",
+      "detail": [
+        [
+          "git-clean",
+          0
+        ],
+        [
+          "output-absent",
+          0
+        ],
+        [
+          "mkdir-runs",
+          0
+        ],
+        [
+          "disk-record",
+          0
+        ],
+        [
+          "lscpu-record",
+          0
+        ],
+        [
+          "disk-before-run",
+          0
+        ],
+        [
+          "quiet-before-run",
+          0
+        ],
+        [
+          "run",
+          0
+        ]
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L2: git-clean, disk and lscpu records, quiet-CPU wait, then run",
+      "detail": [
+        "git-clean",
+        "output-absent",
+        "mkdir-runs",
+        "disk-record",
+        "lscpu-record",
+        "disk-before-run",
+        "quiet-before-run",
+        "run"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L2: card binds the bench and jv_cover pins",
+      "detail": [
+        "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+        "afa830fc99087f12978f1e072c16b3f6e164c99b2b15e17fd6a3a7cc92bb050f"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L2: card binds PROTOCOL.md at its committed sha256",
+      "ok": true
+    },
+    {
+      "check": "R2-L2: receipt run argv = card run argv",
+      "detail": [
+        "./target/release/examples/postgb_la_bench",
+        "--families",
+        "dense",
+        "--shapes",
+        "n2d8,n2d16,n3d4,n3d6,n3d8,n4d3,n4d4,n5d2,n5d3,n6d2,n7d2,n8d2",
+        "--per",
+        "8",
+        "--reps",
+        "7",
+        "--json",
+        "research/postgb_linear_stage_20261026/runs/R2-L2.json"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L2: output R2-L2.json sha256 = committed file",
+      "detail": [
+        "8049ae4b3ab03c8401cc5cc936f811b5f45fb283294fcca8384d9eaafc804b43",
+        "8049ae4b3ab03c8401cc5cc936f811b5f45fb283294fcca8384d9eaafc804b43"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L2: run stdout sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-L2: run stderr sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-L2: lscpu sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-L2: receipt commit is an ancestor of the snapshot",
+      "detail": "42bb4d54fb30cf04473d9e49983bb58762341058",
+      "ok": true
+    },
+    {
+      "check": "R2-L2: dirty_before only under cards/",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2-L3: receipt card_sha256 = committed card",
+      "ok": true
+    },
+    {
+      "check": "R2-L3: receipt completed",
+      "detail": "completed",
+      "ok": true
+    },
+    {
+      "check": "R2-L3: every command exit 0, one attempt, no timeout",
+      "detail": [
+        [
+          "git-clean",
+          0
+        ],
+        [
+          "output-absent",
+          0
+        ],
+        [
+          "mkdir-runs",
+          0
+        ],
+        [
+          "disk-record",
+          0
+        ],
+        [
+          "lscpu-record",
+          0
+        ],
+        [
+          "disk-before-run",
+          0
+        ],
+        [
+          "quiet-before-run",
+          0
+        ],
+        [
+          "run",
+          0
+        ]
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L3: git-clean, disk and lscpu records, quiet-CPU wait, then run",
+      "detail": [
+        "git-clean",
+        "output-absent",
+        "mkdir-runs",
+        "disk-record",
+        "lscpu-record",
+        "disk-before-run",
+        "quiet-before-run",
+        "run"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L3: card binds the bench and jv_cover pins",
+      "detail": [
+        "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+        "afa830fc99087f12978f1e072c16b3f6e164c99b2b15e17fd6a3a7cc92bb050f"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L3: card binds PROTOCOL.md at its committed sha256",
+      "ok": true
+    },
+    {
+      "check": "R2-L3: receipt run argv = card run argv",
+      "detail": [
+        "./target/release/examples/postgb_la_bench",
+        "--families",
+        "dense",
+        "--shapes",
+        "n2d32,n3d10",
+        "--per",
+        "8",
+        "--reps",
+        "7",
+        "--json",
+        "research/postgb_linear_stage_20261026/runs/R2-L3.json"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L3: output R2-L3.json sha256 = committed file",
+      "detail": [
+        "7c7e91836bfd2464de2c1fca435586323e4832bd31b2245d35c17def4d4da905",
+        "7c7e91836bfd2464de2c1fca435586323e4832bd31b2245d35c17def4d4da905"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L3: run stdout sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-L3: run stderr sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-L3: lscpu sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-L3: receipt commit is an ancestor of the snapshot",
+      "detail": "f5d5c6cf379a2966daa57c8b9c4777731937c56e",
+      "ok": true
+    },
+    {
+      "check": "R2-L3: dirty_before only under cards/",
+      "detail": [
+        "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L3.launcher.log"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L3: launcher log names the committed receipt's sha256",
+      "detail": "1250d7fcd49d740f270eae78d6eb5a32c19a8ff8f156cb632858b360db0a2387",
+      "ok": true
+    },
+    {
+      "check": "R2-L4: receipt card_sha256 = committed card",
+      "ok": true
+    },
+    {
+      "check": "R2-L4: receipt completed",
+      "detail": "completed",
+      "ok": true
+    },
+    {
+      "check": "R2-L4: every command exit 0, one attempt, no timeout",
+      "detail": [
+        [
+          "git-clean",
+          0
+        ],
+        [
+          "output-absent",
+          0
+        ],
+        [
+          "mkdir-runs",
+          0
+        ],
+        [
+          "disk-record",
+          0
+        ],
+        [
+          "lscpu-record",
+          0
+        ],
+        [
+          "disk-before-run",
+          0
+        ],
+        [
+          "quiet-before-run",
+          0
+        ],
+        [
+          "run",
+          0
+        ]
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L4: git-clean, disk and lscpu records, quiet-CPU wait, then run",
+      "detail": [
+        "git-clean",
+        "output-absent",
+        "mkdir-runs",
+        "disk-record",
+        "lscpu-record",
+        "disk-before-run",
+        "quiet-before-run",
+        "run"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L4: card binds the bench and jv_cover pins",
+      "detail": [
+        "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+        "afa830fc99087f12978f1e072c16b3f6e164c99b2b15e17fd6a3a7cc92bb050f"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L4: card binds PROTOCOL.md at its committed sha256",
+      "ok": true
+    },
+    {
+      "check": "R2-L4: receipt run argv = card run argv",
+      "detail": [
+        "./target/release/examples/postgb_la_bench",
+        "--families",
+        "dense",
+        "--shapes",
+        "n4d5,n5d4,n6d3",
+        "--per",
+        "8",
+        "--reps",
+        "7",
+        "--json",
+        "research/postgb_linear_stage_20261026/runs/R2-L4.json"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L4: output R2-L4.json sha256 = committed file",
+      "detail": [
+        "69d20a13e4b75e90d8bf0427798e7ab1c65b2273ea2d07cf1d0d27be10a537d8",
+        "69d20a13e4b75e90d8bf0427798e7ab1c65b2273ea2d07cf1d0d27be10a537d8"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L4: run stdout sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-L4: run stderr sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-L4: lscpu sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-L4: receipt commit is an ancestor of the snapshot",
+      "detail": "9a502a2019e37accdcba2ddc9ad4e35cb766731b",
+      "ok": true
+    },
+    {
+      "check": "R2-L4: dirty_before only under cards/",
+      "detail": [
+        "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L4.launcher.log"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L4: launcher log names the committed receipt's sha256",
+      "detail": "23393976e41a6232744581a586e74bd52a5725efda7f20c3bbcc8748c9899ce7",
+      "ok": true
+    },
+    {
+      "check": "R2-L5: receipt card_sha256 = committed card",
+      "ok": true
+    },
+    {
+      "check": "R2-L5: receipt completed",
+      "detail": "completed",
+      "ok": true
+    },
+    {
+      "check": "R2-L5: every command exit 0, one attempt, no timeout",
+      "detail": [
+        [
+          "git-clean",
+          0
+        ],
+        [
+          "output-absent",
+          0
+        ],
+        [
+          "mkdir-runs",
+          0
+        ],
+        [
+          "disk-record",
+          0
+        ],
+        [
+          "lscpu-record",
+          0
+        ],
+        [
+          "disk-before-run",
+          0
+        ],
+        [
+          "quiet-before-run",
+          0
+        ],
+        [
+          "run",
+          0
+        ]
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L5: git-clean, disk and lscpu records, quiet-CPU wait, then run",
+      "detail": [
+        "git-clean",
+        "output-absent",
+        "mkdir-runs",
+        "disk-record",
+        "lscpu-record",
+        "disk-before-run",
+        "quiet-before-run",
+        "run"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L5: card binds the bench and jv_cover pins",
+      "detail": [
+        "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+        "afa830fc99087f12978f1e072c16b3f6e164c99b2b15e17fd6a3a7cc92bb050f"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L5: card binds PROTOCOL.md at its committed sha256",
+      "ok": true
+    },
+    {
+      "check": "R2-L5: receipt run argv = card run argv",
+      "detail": [
+        "./target/release/examples/postgb_la_bench",
+        "--families",
+        "gaudry-s5",
+        "--p",
+        "101",
+        "--per",
+        "8",
+        "--reps",
+        "7",
+        "--json",
+        "research/postgb_linear_stage_20261026/runs/R2-L5.json"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L5: output R2-L5.json sha256 = committed file",
+      "detail": [
+        "3c972da2b66a567e4d8608d855e1b892fd6a065413821e10b80f8365451ebfc1",
+        "3c972da2b66a567e4d8608d855e1b892fd6a065413821e10b80f8365451ebfc1"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L5: run stdout sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-L5: run stderr sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-L5: lscpu sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-L5: receipt commit is an ancestor of the snapshot",
+      "detail": "3a0c24d0c6c77a6cf3b5c1699bacb42cac9549a9",
+      "ok": true
+    },
+    {
+      "check": "R2-L5: dirty_before only under cards/",
+      "detail": [
+        "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L5.launcher.log"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L5: launcher log names the committed receipt's sha256",
+      "detail": "ad703ee71d1d6d07dcf9739f0531e45eaa0da3c41e42a6bb147e30a03dcd7e7d",
+      "ok": true
+    },
+    {
+      "check": "R2-L6: receipt card_sha256 = committed card",
+      "ok": true
+    },
+    {
+      "check": "R2-L6: receipt completed",
+      "detail": "completed",
+      "ok": true
+    },
+    {
+      "check": "R2-L6: every command exit 0, one attempt, no timeout",
+      "detail": [
+        [
+          "git-clean",
+          0
+        ],
+        [
+          "output-absent",
+          0
+        ],
+        [
+          "mkdir-runs",
+          0
+        ],
+        [
+          "disk-record",
+          0
+        ],
+        [
+          "lscpu-record",
+          0
+        ],
+        [
+          "disk-before-run",
+          0
+        ],
+        [
+          "quiet-before-run",
+          0
+        ],
+        [
+          "run",
+          0
+        ]
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L6: git-clean, disk and lscpu records, quiet-CPU wait, then run",
+      "detail": [
+        "git-clean",
+        "output-absent",
+        "mkdir-runs",
+        "disk-record",
+        "lscpu-record",
+        "disk-before-run",
+        "quiet-before-run",
+        "run"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L6: card binds the bench and jv_cover pins",
+      "detail": [
+        "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+        "afa830fc99087f12978f1e072c16b3f6e164c99b2b15e17fd6a3a7cc92bb050f"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L6: card binds PROTOCOL.md at its committed sha256",
+      "ok": true
+    },
+    {
+      "check": "R2-L6: receipt run argv = card run argv",
+      "detail": [
+        "./target/release/examples/postgb_la_bench",
+        "--families",
+        "gaudry-s5",
+        "--p",
+        "13",
+        "--per",
+        "8",
+        "--reps",
+        "7",
+        "--json",
+        "research/postgb_linear_stage_20261026/runs/R2-L6.json"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L6: output R2-L6.json sha256 = committed file",
+      "detail": [
+        "a77d8fdf0a6b9f06eaa8a5d71aaefbb84bf7bf537ef45364e9d23f4a3490ab21",
+        "a77d8fdf0a6b9f06eaa8a5d71aaefbb84bf7bf537ef45364e9d23f4a3490ab21"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L6: run stdout sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-L6: run stderr sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-L6: lscpu sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-L6: receipt commit is an ancestor of the snapshot",
+      "detail": "ae3cd9eaa9d822d1be1fdccb736dcdba0183ec20",
+      "ok": true
+    },
+    {
+      "check": "R2-L6: dirty_before only under cards/",
+      "detail": [
+        "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L6.launcher.log"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L6: launcher log names the committed receipt's sha256",
+      "detail": "9f076c6b9085162ec3998caea16ca74ac78685ac8d42bd30859dbd5908456061",
+      "ok": true
+    },
+    {
+      "check": "R2-A1: receipt card_sha256 = committed card",
+      "ok": true
+    },
+    {
+      "check": "R2-A1: receipt completed",
+      "detail": "completed",
+      "ok": true
+    },
+    {
+      "check": "R2-A1: every command exit 0, one attempt, no timeout",
+      "detail": [
+        [
+          "git-clean",
+          0
+        ],
+        [
+          "output-absent",
+          0
+        ],
+        [
+          "mkdir-runs",
+          0
+        ],
+        [
+          "disk-record",
+          0
+        ],
+        [
+          "lscpu-record",
+          0
+        ],
+        [
+          "disk-before-run",
+          0
+        ],
+        [
+          "quiet-before-run",
+          0
+        ],
+        [
+          "run",
+          0
+        ]
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-A1: git-clean, disk and lscpu records, quiet-CPU wait, then run",
+      "detail": [
+        "git-clean",
+        "output-absent",
+        "mkdir-runs",
+        "disk-record",
+        "lscpu-record",
+        "disk-before-run",
+        "quiet-before-run",
+        "run"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-A1: card binds the bench and jv_cover pins",
+      "detail": [
+        "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+        "afa830fc99087f12978f1e072c16b3f6e164c99b2b15e17fd6a3a7cc92bb050f"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-A1: card binds PROTOCOL.md at its committed sha256",
+      "ok": true
+    },
+    {
+      "check": "R2-A1: receipt run argv = card run argv",
+      "detail": [
+        "./target/release/examples/postgb_la_bench",
+        "--families",
+        "jv-nagao,gaudry-s4,gaudry-d4,dense",
+        "--per",
+        "8",
+        "--reps",
+        "3",
+        "--arms",
+        "sparse,fast",
+        "--json",
+        "research/postgb_linear_stage_20261026/runs/R2-A1.json"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-A1: output R2-A1.json sha256 = committed file",
+      "detail": [
+        "d4e0d02fd6b0fef46e5c38431b363087ef5ce752b7770fb044afaa824ae5835e",
+        "d4e0d02fd6b0fef46e5c38431b363087ef5ce752b7770fb044afaa824ae5835e"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-A1: run stdout sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-A1: run stderr sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-A1: lscpu sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-A1: receipt commit is an ancestor of the snapshot",
+      "detail": "87bee78af0f5802bd212e968c0b4f52d361a8211",
+      "ok": true
+    },
+    {
+      "check": "R2-A1: dirty_before only under cards/",
+      "detail": [
+        "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-A1.launcher.log"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-A1: launcher log names the committed receipt's sha256",
+      "detail": "8eb0411986d336ceadcca7a80fe5bd87b4c92d02f14da4f6fa07be7f60e488a7",
+      "ok": true
+    },
+    {
+      "check": "R2-A2: receipt card_sha256 = committed card",
+      "ok": true
+    },
+    {
+      "check": "R2-A2: receipt completed",
+      "detail": "completed",
+      "ok": true
+    },
+    {
+      "check": "R2-A2: every command exit 0, one attempt, no timeout",
+      "detail": [
+        [
+          "git-clean",
+          0
+        ],
+        [
+          "output-absent",
+          0
+        ],
+        [
+          "mkdir-runs",
+          0
+        ],
+        [
+          "disk-record",
+          0
+        ],
+        [
+          "lscpu-record",
+          0
+        ],
+        [
+          "disk-before-run",
+          0
+        ],
+        [
+          "quiet-before-run",
+          0
+        ],
+        [
+          "run",
+          0
+        ]
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-A2: git-clean, disk and lscpu records, quiet-CPU wait, then run",
+      "detail": [
+        "git-clean",
+        "output-absent",
+        "mkdir-runs",
+        "disk-record",
+        "lscpu-record",
+        "disk-before-run",
+        "quiet-before-run",
+        "run"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-A2: card binds the bench and jv_cover pins",
+      "detail": [
+        "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+        "afa830fc99087f12978f1e072c16b3f6e164c99b2b15e17fd6a3a7cc92bb050f"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-A2: card binds PROTOCOL.md at its committed sha256",
+      "ok": true
+    },
+    {
+      "check": "R2-A2: receipt run argv = card run argv",
+      "detail": [
+        "./target/release/examples/postgb_la_bench",
+        "--families",
+        "gaudry-s5",
+        "--per",
+        "8",
+        "--reps",
+        "3",
+        "--arms",
+        "sparse,fast",
+        "--json",
+        "research/postgb_linear_stage_20261026/runs/R2-A2.json"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-A2: output R2-A2.json sha256 = committed file",
+      "detail": [
+        "95fc92bf2b90d766161d9797d3aac5de8a012b923b6141d3429ac9aff11b1b38",
+        "95fc92bf2b90d766161d9797d3aac5de8a012b923b6141d3429ac9aff11b1b38"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-A2: run stdout sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-A2: run stderr sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-A2: lscpu sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-A2: receipt commit is an ancestor of the snapshot",
+      "detail": "4a6102617de82416df51cde69a5ba7a577116d8b",
+      "ok": true
+    },
+    {
+      "check": "R2-A2: dirty_before only under cards/",
+      "detail": [
+        "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-A2.launcher.log"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-A2: launcher log names the committed receipt's sha256",
+      "detail": "718367317440f40a8e00f9d2c03b2bbe17947b50a586d9bcccaa0db6731a8423",
+      "ok": true
+    },
+    {
+      "check": "R2-D1: receipt card_sha256 = committed card",
+      "ok": true
+    },
+    {
+      "check": "R2-D1: receipt completed",
+      "detail": "completed",
+      "ok": true
+    },
+    {
+      "check": "R2-D1: every command exit 0, one attempt, no timeout",
+      "detail": [
+        [
+          "git-clean",
+          0
+        ],
+        [
+          "output-absent",
+          0
+        ],
+        [
+          "mkdir-runs",
+          0
+        ],
+        [
+          "disk-record",
+          0
+        ],
+        [
+          "lscpu-record",
+          0
+        ],
+        [
+          "disk-before-run",
+          0
+        ],
+        [
+          "quiet-before-run",
+          0
+        ],
+        [
+          "run",
+          0
+        ]
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-D1: git-clean, disk and lscpu records, quiet-CPU wait, then run",
+      "detail": [
+        "git-clean",
+        "output-absent",
+        "mkdir-runs",
+        "disk-record",
+        "lscpu-record",
+        "disk-before-run",
+        "quiet-before-run",
+        "run"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-D1: card binds the bench and jv_cover pins",
+      "detail": [
+        "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+        "afa830fc99087f12978f1e072c16b3f6e164c99b2b15e17fd6a3a7cc92bb050f"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-D1: card binds PROTOCOL.md at its committed sha256",
+      "ok": true
+    },
+    {
+      "check": "R2-D1: receipt run argv = card run argv",
+      "detail": [
+        "./target/release/examples/jv_cover",
+        "--exp",
+        "dlp",
+        "--sizes",
+        "53,101",
+        "--seeds",
+        "2",
+        "--rho-runs",
+        "4",
+        "--check-every",
+        "64",
+        "--json",
+        "research/postgb_linear_stage_20261026/runs/R2-D1.json"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-D1: output R2-D1.json sha256 = committed file",
+      "detail": [
+        "22a319d1f7cfe7b56de45338176fd1275373ca31aad101d8517562b8b4ae0c75",
+        "22a319d1f7cfe7b56de45338176fd1275373ca31aad101d8517562b8b4ae0c75"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-D1: run stdout sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-D1: run stderr sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-D1: lscpu sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-D1: receipt commit is an ancestor of the snapshot",
+      "detail": "7141e349195aaaa10cf7f0fbdf57e9c48e50457c",
+      "ok": true
+    },
+    {
+      "check": "R2-D1: dirty_before only under cards/",
+      "detail": [
+        "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-D1.launcher.log"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-D1: launcher log names the committed receipt's sha256",
+      "detail": "317b4152ecb36fed7524329cc135b426fde79c9f058b1fb5d0f5cef0ca4a2553",
+      "ok": true
+    },
+    {
+      "check": "R2-D2: receipt card_sha256 = committed card",
+      "ok": true
+    },
+    {
+      "check": "R2-D2: receipt completed",
+      "detail": "completed",
+      "ok": true
+    },
+    {
+      "check": "R2-D2: every command exit 0, one attempt, no timeout",
+      "detail": [
+        [
+          "git-clean",
+          0
+        ],
+        [
+          "output-absent",
+          0
+        ],
+        [
+          "mkdir-runs",
+          0
+        ],
+        [
+          "disk-record",
+          0
+        ],
+        [
+          "lscpu-record",
+          0
+        ],
+        [
+          "disk-before-run",
+          0
+        ],
+        [
+          "quiet-before-run",
+          0
+        ],
+        [
+          "run",
+          0
+        ]
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-D2: git-clean, disk and lscpu records, quiet-CPU wait, then run",
+      "detail": [
+        "git-clean",
+        "output-absent",
+        "mkdir-runs",
+        "disk-record",
+        "lscpu-record",
+        "disk-before-run",
+        "quiet-before-run",
+        "run"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-D2: card binds the bench and jv_cover pins",
+      "detail": [
+        "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+        "afa830fc99087f12978f1e072c16b3f6e164c99b2b15e17fd6a3a7cc92bb050f"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-D2: card binds PROTOCOL.md at its committed sha256",
+      "ok": true
+    },
+    {
+      "check": "R2-D2: receipt run argv = card run argv",
+      "detail": [
+        "./target/release/examples/jv_cover",
+        "--exp",
+        "dlp",
+        "--sizes",
+        "53,101",
+        "--seeds",
+        "2",
+        "--rho-runs",
+        "4",
+        "--check-every",
+        "64",
+        "--json",
+        "research/postgb_linear_stage_20261026/runs/R2-D2.json"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-D2: output R2-D2.json sha256 = committed file",
+      "detail": [
+        "f3f0af105465cabd92a2b792b0fd73ec7ee0bbb3ca2f41441aa74a60e4db57af",
+        "f3f0af105465cabd92a2b792b0fd73ec7ee0bbb3ca2f41441aa74a60e4db57af"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-D2: run stdout sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-D2: run stderr sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-D2: lscpu sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R2-D2: receipt commit is an ancestor of the snapshot",
+      "detail": "74a9a18fccbdd0dd0fe476e520f0f61a28724bab",
+      "ok": true
+    },
+    {
+      "check": "R2-D2: dirty_before only under cards/",
+      "detail": [
+        "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-D2.launcher.log"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-D2: launcher log names the committed receipt's sha256",
+      "detail": "d14c49510a0ad588ddc320b3cfc846815d3922879968df89e2cc4ceef955cffc",
+      "ok": true
+    },
+    {
+      "check": "R2-L2 started after R2-L1's receipt was committed (one card at a time)",
+      "detail": [
+        "42bb4d54fb30cf04473d9e49983bb58762341058",
+        "42bb4d54fb30cf04473d9e49983bb58762341058"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L3 started after R2-L2's receipt was committed (one card at a time)",
+      "detail": [
+        "f5d5c6cf379a2966daa57c8b9c4777731937c56e",
+        "f5d5c6cf379a2966daa57c8b9c4777731937c56e"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L4 started after R2-L3's receipt was committed (one card at a time)",
+      "detail": [
+        "9a502a2019e37accdcba2ddc9ad4e35cb766731b",
+        "9a502a2019e37accdcba2ddc9ad4e35cb766731b"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L5 started after R2-L4's receipt was committed (one card at a time)",
+      "detail": [
+        "3a0c24d0c6c77a6cf3b5c1699bacb42cac9549a9",
+        "3a0c24d0c6c77a6cf3b5c1699bacb42cac9549a9"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-L6 started after R2-L5's receipt was committed (one card at a time)",
+      "detail": [
+        "ae3cd9eaa9d822d1be1fdccb736dcdba0183ec20",
+        "ae3cd9eaa9d822d1be1fdccb736dcdba0183ec20"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-A1 started after R2-L6's receipt was committed (one card at a time)",
+      "detail": [
+        "87bee78af0f5802bd212e968c0b4f52d361a8211",
+        "87bee78af0f5802bd212e968c0b4f52d361a8211"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-A2 started after R2-A1's receipt was committed (one card at a time)",
+      "detail": [
+        "4a6102617de82416df51cde69a5ba7a577116d8b",
+        "4a6102617de82416df51cde69a5ba7a577116d8b"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-D1 started after R2-A2's receipt was committed (one card at a time)",
+      "detail": [
+        "7141e349195aaaa10cf7f0fbdf57e9c48e50457c",
+        "7141e349195aaaa10cf7f0fbdf57e9c48e50457c"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-D2 started after R2-D1's receipt was committed (one card at a time)",
+      "detail": [
+        "74a9a18fccbdd0dd0fe476e520f0f61a28724bab",
+        "74a9a18fccbdd0dd0fe476e520f0f61a28724bab"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-C: receipt card_sha256 = committed card",
+      "ok": true
+    },
+    {
+      "check": "R3-C: receipt completed",
+      "detail": "completed",
+      "ok": true
+    },
+    {
+      "check": "R3-C: every command exit 0, one attempt, no timeout",
+      "detail": [
+        [
+          "git-clean",
+          0
+        ],
+        [
+          "output-absent",
+          0
+        ],
+        [
+          "mkdir-runs",
+          0
+        ],
+        [
+          "disk-record",
+          0
+        ],
+        [
+          "lscpu-record",
+          0
+        ],
+        [
+          "disk-before-run",
+          0
+        ],
+        [
+          "quiet-before-run",
+          0
+        ],
+        [
+          "run",
+          0
+        ]
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-C: git-clean, disk and lscpu records, quiet-CPU wait, then run",
+      "detail": [
+        "git-clean",
+        "output-absent",
+        "mkdir-runs",
+        "disk-record",
+        "lscpu-record",
+        "disk-before-run",
+        "quiet-before-run",
+        "run"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-C: card binds the bench and jv_cover pins",
+      "detail": [
+        "06351d89429a1d50d5026e9bfe99c7299e25e3d15b0024b1c0b7cda4d686444b",
+        "a49184b0c25ae27538f083999459ca9c4cc88abf4f9c99cc06b007253b5feb85"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-C: card binds PROTOCOL.md at its committed sha256",
+      "ok": true
+    },
+    {
+      "check": "R3-C: receipt run argv = card run argv",
+      "detail": [
+        "./target/release/examples/postgb_la_bench",
+        "--families",
+        "jv-nagao,gaudry-s4,gaudry-d4,gaudry-s5,dense",
+        "--per",
+        "8",
+        "--reps",
+        "1",
+        "--arms",
+        "sparse,fast",
+        "--json",
+        "research/postgb_linear_stage_20261026/runs/R3-C.json"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-C: output R3-C.json sha256 = committed file",
+      "detail": [
+        "630ecf4136979328e8944aed7fe905099069210e42b174c42990a103baff776f",
+        "630ecf4136979328e8944aed7fe905099069210e42b174c42990a103baff776f"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-C: run stdout sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R3-C: run stderr sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R3-C: lscpu sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R3-C: receipt commit is an ancestor of the snapshot",
+      "detail": "2f756fe236230cb5c53d4810209649d7f03a3ead",
+      "ok": true
+    },
+    {
+      "check": "R3-C: dirty_before only under cards/",
+      "detail": [
+        "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-C.aborted-preflight.disk-start.stdout",
+        "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-C.aborted-preflight.launcher.log",
+        "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-C.aborted-preflight.lscpu.stdout",
+        "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-C.launcher.log",
+        "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-D1.aborted-preflight.disk-start.stdout",
+        "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-D1.aborted-preflight.launcher.log",
+        "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-D1.aborted-preflight.lscpu.stdout"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-C: launcher log names the committed receipt's sha256",
+      "detail": "639b2da55cf42e8a9b30eb43322b7e00264f36f4f0262e1bb8aa00ecc8ae42f5",
+      "ok": true
+    },
+    {
+      "check": "R3-D1: receipt card_sha256 = committed card",
+      "ok": true
+    },
+    {
+      "check": "R3-D1: receipt completed",
+      "detail": "completed",
+      "ok": true
+    },
+    {
+      "check": "R3-D1: every command exit 0, one attempt, no timeout",
+      "detail": [
+        [
+          "git-clean",
+          0
+        ],
+        [
+          "output-absent",
+          0
+        ],
+        [
+          "mkdir-runs",
+          0
+        ],
+        [
+          "disk-record",
+          0
+        ],
+        [
+          "lscpu-record",
+          0
+        ],
+        [
+          "disk-before-run",
+          0
+        ],
+        [
+          "quiet-before-run",
+          0
+        ],
+        [
+          "run",
+          0
+        ]
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-D1: git-clean, disk and lscpu records, quiet-CPU wait, then run",
+      "detail": [
+        "git-clean",
+        "output-absent",
+        "mkdir-runs",
+        "disk-record",
+        "lscpu-record",
+        "disk-before-run",
+        "quiet-before-run",
+        "run"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-D1: card binds the bench and jv_cover pins",
+      "detail": [
+        "06351d89429a1d50d5026e9bfe99c7299e25e3d15b0024b1c0b7cda4d686444b",
+        "a49184b0c25ae27538f083999459ca9c4cc88abf4f9c99cc06b007253b5feb85"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-D1: card binds PROTOCOL.md at its committed sha256",
+      "ok": true
+    },
+    {
+      "check": "R3-D1: receipt run argv = card run argv",
+      "detail": [
+        "./target/release/examples/jv_cover",
+        "--exp",
+        "dlp",
+        "--sizes",
+        "53,101",
+        "--seeds",
+        "2",
+        "--rho-runs",
+        "4",
+        "--check-every",
+        "64",
+        "--json",
+        "research/postgb_linear_stage_20261026/runs/R3-D1.json"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-D1: output R3-D1.instances.jsonl sha256 = committed file",
+      "detail": [
+        "fdeec87b64ca7ff19b31d4cc38ab4fd5aa67aa731c5a376ebf5806a1e6913242",
+        "fdeec87b64ca7ff19b31d4cc38ab4fd5aa67aa731c5a376ebf5806a1e6913242"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-D1: output R3-D1.json sha256 = committed file",
+      "detail": [
+        "3bd45f6891724a700d86744d63bf4e3bd4094a9fc73dd3b964badce911f0c885",
+        "3bd45f6891724a700d86744d63bf4e3bd4094a9fc73dd3b964badce911f0c885"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-D1: run stdout sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R3-D1: run stderr sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R3-D1: lscpu sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R3-D1: receipt commit is an ancestor of the snapshot",
+      "detail": "25ccc40c3e17ed94acae22352d55ddba147d1b8d",
+      "ok": true
+    },
+    {
+      "check": "R3-D1: dirty_before only under cards/",
+      "detail": [
+        "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-D1.launcher.log"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-D1: launcher log names the committed receipt's sha256",
+      "detail": "5f535d5c0a676d4910ba09a277492af4789b8ef3b80b61c50854c6b0383c5857",
+      "ok": true
+    },
+    {
+      "check": "R3-D2: receipt card_sha256 = committed card",
+      "ok": true
+    },
+    {
+      "check": "R3-D2: receipt completed",
+      "detail": "completed",
+      "ok": true
+    },
+    {
+      "check": "R3-D2: every command exit 0, one attempt, no timeout",
+      "detail": [
+        [
+          "git-clean",
+          0
+        ],
+        [
+          "output-absent",
+          0
+        ],
+        [
+          "mkdir-runs",
+          0
+        ],
+        [
+          "disk-record",
+          0
+        ],
+        [
+          "lscpu-record",
+          0
+        ],
+        [
+          "disk-before-run",
+          0
+        ],
+        [
+          "quiet-before-run",
+          0
+        ],
+        [
+          "run",
+          0
+        ]
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-D2: git-clean, disk and lscpu records, quiet-CPU wait, then run",
+      "detail": [
+        "git-clean",
+        "output-absent",
+        "mkdir-runs",
+        "disk-record",
+        "lscpu-record",
+        "disk-before-run",
+        "quiet-before-run",
+        "run"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-D2: card binds the bench and jv_cover pins",
+      "detail": [
+        "06351d89429a1d50d5026e9bfe99c7299e25e3d15b0024b1c0b7cda4d686444b",
+        "a49184b0c25ae27538f083999459ca9c4cc88abf4f9c99cc06b007253b5feb85"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-D2: card binds PROTOCOL.md at its committed sha256",
+      "ok": true
+    },
+    {
+      "check": "R3-D2: receipt run argv = card run argv",
+      "detail": [
+        "./target/release/examples/jv_cover",
+        "--exp",
+        "dlp",
+        "--sizes",
+        "53,101",
+        "--seeds",
+        "2",
+        "--rho-runs",
+        "4",
+        "--check-every",
+        "64",
+        "--json",
+        "research/postgb_linear_stage_20261026/runs/R3-D2.json"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-D2: output R3-D2.instances.jsonl sha256 = committed file",
+      "detail": [
+        "7a14981c718db9df5251e50180597638a224aa77f7c5c3fcd84db227a5fa47eb",
+        "7a14981c718db9df5251e50180597638a224aa77f7c5c3fcd84db227a5fa47eb"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-D2: output R3-D2.json sha256 = committed file",
+      "detail": [
+        "6281d22fa3daf7238587c69bb1d1357da07efc4b22fc2eac466e47553c9a3d44",
+        "6281d22fa3daf7238587c69bb1d1357da07efc4b22fc2eac466e47553c9a3d44"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-D2: run stdout sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R3-D2: run stderr sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R3-D2: lscpu sha256 = committed file",
+      "ok": true
+    },
+    {
+      "check": "R3-D2: receipt commit is an ancestor of the snapshot",
+      "detail": "dd1787532a2c121b6e570f6211c2b5fb55bcb980",
+      "ok": true
+    },
+    {
+      "check": "R3-D2: dirty_before only under cards/",
+      "detail": [
+        "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-D2.launcher.log"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-D2: launcher log names the committed receipt's sha256",
+      "detail": "f04f898a9446139bfe6aa0e5112e74f8f5f677273f79c9f6aa1c020de97d519d",
+      "ok": true
+    },
+    {
+      "check": "R3-D1 started after R3-C's receipt was committed (one card at a time)",
+      "detail": [
+        "25ccc40c3e17ed94acae22352d55ddba147d1b8d",
+        "25ccc40c3e17ed94acae22352d55ddba147d1b8d"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-D2 started after R3-D1's receipt was committed (one card at a time)",
+      "detail": [
+        "dd1787532a2c121b6e570f6211c2b5fb55bcb980",
+        "dd1787532a2c121b6e570f6211c2b5fb55bcb980"
+      ],
+      "ok": true
+    },
+    {
+      "check": "every R2 and R3 card ran on one host (host B)",
+      "detail": [
+        "Intel(R) Xeon(R) Processor @ 2.80GHz | L2 4 MiB (4 instances)"
+      ],
+      "ok": true
+    },
+    {
+      "check": "L1-L4 (host A) on a different host, beside only",
+      "detail": [
+        "Intel(R) Xeon(R) Processor @ 2.10GHz | L2 8 MiB (4 instances)"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R2-D1: env and argv as the protocol and amendment 3",
+      "detail": {
+        "argv": [
+          "./target/release/examples/jv_cover",
+          "--exp",
+          "dlp",
+          "--sizes",
+          "53,101",
+          "--seeds",
+          "2",
+          "--rho-runs",
+          "4",
+          "--check-every",
+          "64",
+          "--json",
+          "research/postgb_linear_stage_20261026/runs/R2-D1.json"
+        ],
+        "env": {
+          "JV_LIN": "sparse"
+        }
+      },
+      "ok": true
+    },
+    {
+      "check": "R2-D2: env and argv as the protocol and amendment 3",
+      "detail": {
+        "argv": [
+          "./target/release/examples/jv_cover",
+          "--exp",
+          "dlp",
+          "--sizes",
+          "53,101",
+          "--seeds",
+          "2",
+          "--rho-runs",
+          "4",
+          "--check-every",
+          "64",
+          "--json",
+          "research/postgb_linear_stage_20261026/runs/R2-D2.json"
+        ],
+        "env": {
+          "JV_LIN": "fast"
+        }
+      },
+      "ok": true
+    },
+    {
+      "check": "R3-D1: env and argv as the protocol and amendment 3",
+      "detail": {
+        "argv": [
+          "./target/release/examples/jv_cover",
+          "--exp",
+          "dlp",
+          "--sizes",
+          "53,101",
+          "--seeds",
+          "2",
+          "--rho-runs",
+          "4",
+          "--check-every",
+          "64",
+          "--json",
+          "research/postgb_linear_stage_20261026/runs/R3-D1.json"
+        ],
+        "env": {
+          "JV_DUMP_INSTANCE": "research/postgb_linear_stage_20261026/runs/R3-D1.instances.jsonl",
+          "JV_LIN": "sparse",
+          "JV_RHO_NEG": "1"
+        }
+      },
+      "ok": true
+    },
+    {
+      "check": "R3-D2: env and argv as the protocol and amendment 3",
+      "detail": {
+        "argv": [
+          "./target/release/examples/jv_cover",
+          "--exp",
+          "dlp",
+          "--sizes",
+          "53,101",
+          "--seeds",
+          "2",
+          "--rho-runs",
+          "4",
+          "--check-every",
+          "64",
+          "--json",
+          "research/postgb_linear_stage_20261026/runs/R3-D2.json"
+        ],
+        "env": {
+          "JV_DUMP_INSTANCE": "research/postgb_linear_stage_20261026/runs/R3-D2.instances.jsonl",
+          "JV_LIN": "fast",
+          "JV_RHO_NEG": "1"
+        }
+      },
+      "ok": true
+    },
+    {
+      "check": "R3-C: argv is amendment 3's command",
+      "detail": [
+        "./target/release/examples/postgb_la_bench",
+        "--families",
+        "jv-nagao,gaudry-s4,gaudry-d4,gaudry-s5,dense",
+        "--per",
+        "8",
+        "--reps",
+        "1",
+        "--arms",
+        "sparse,fast",
+        "--json",
+        "research/postgb_linear_stage_20261026/runs/R3-C.json"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3-C: run timeout 7000 s",
+      "detail": 7000,
+      "ok": true
+    },
+    {
+      "check": "R3-D1: run timeout 7000 s",
+      "detail": 7000,
+      "ok": true
+    },
+    {
+      "check": "R3-D2: run timeout 7000 s",
+      "detail": 7000,
+      "ok": true
+    },
+    {
+      "check": "R2-L1: run meta matches card argv and env",
+      "detail": {
+        "arms": "dense,sparse,fast",
+        "env": {},
+        "families": "jv-nagao,gaudry-s4,gaudry-d4",
+        "reps": 7,
+        "simd": "avx512f"
+      },
+      "ok": true
+    },
+    {
+      "check": "R2-L1: skipped list is empty",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2-L1: arms present (dense iff delta <= 1024), 7 rounds, median_ms = sorted(ms)[n/2]",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2-L2: run meta matches card argv and env",
+      "detail": {
+        "arms": "dense,sparse,fast",
+        "env": {},
+        "families": "dense",
+        "reps": 7,
+        "simd": "avx512f"
+      },
+      "ok": true
+    },
+    {
+      "check": "R2-L2: skipped list is empty",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2-L2: arms present (dense iff delta <= 1024), 7 rounds, median_ms = sorted(ms)[n/2]",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2-L3: run meta matches card argv and env",
+      "detail": {
+        "arms": "dense,sparse,fast",
+        "env": {},
+        "families": "dense",
+        "reps": 7,
+        "simd": "avx512f"
+      },
+      "ok": true
+    },
+    {
+      "check": "R2-L3: skipped list is empty",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2-L3: arms present (dense iff delta <= 1024), 7 rounds, median_ms = sorted(ms)[n/2]",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2-L4: run meta matches card argv and env",
+      "detail": {
+        "arms": "dense,sparse,fast",
+        "env": {},
+        "families": "dense",
+        "reps": 7,
+        "simd": "avx512f"
+      },
+      "ok": true
+    },
+    {
+      "check": "R2-L4: skipped list is empty",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2-L4: arms present (dense iff delta <= 1024), 7 rounds, median_ms = sorted(ms)[n/2]",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2-L5: run meta matches card argv and env",
+      "detail": {
+        "arms": "dense,sparse,fast",
+        "env": {},
+        "families": "gaudry-s5",
+        "reps": 7,
+        "simd": "avx512f"
+      },
+      "ok": true
+    },
+    {
+      "check": "R2-L5: skipped list is empty",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2-L5: arms present (dense iff delta <= 1024), 7 rounds, median_ms = sorted(ms)[n/2]",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2-L6: run meta matches card argv and env",
+      "detail": {
+        "arms": "dense,sparse,fast",
+        "env": {},
+        "families": "gaudry-s5",
+        "reps": 7,
+        "simd": "avx512f"
+      },
+      "ok": true
+    },
+    {
+      "check": "R2-L6: skipped list is empty",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2-L6: arms present (dense iff delta <= 1024), 7 rounds, median_ms = sorted(ms)[n/2]",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2-A1: run meta matches card argv and env",
+      "detail": {
+        "arms": "sparse,fast",
+        "env": {
+          "ZERO_DIM_LA_SIMD": "portable"
+        },
+        "families": "jv-nagao,gaudry-s4,gaudry-d4,dense",
+        "reps": 3,
+        "simd": "portable"
+      },
+      "ok": true
+    },
+    {
+      "check": "R2-A1: skipped list is empty",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2-A1: arms present (dense iff delta <= 1024), 3 rounds, median_ms = sorted(ms)[n/2]",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2-A2: run meta matches card argv and env",
+      "detail": {
+        "arms": "sparse,fast",
+        "env": {
+          "ZERO_DIM_LA_SIMD": "portable"
+        },
+        "families": "gaudry-s5",
+        "reps": 3,
+        "simd": "portable"
+      },
+      "ok": true
+    },
+    {
+      "check": "R2-A2: skipped list is empty",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2-A2: arms present (dense iff delta <= 1024), 3 rounds, median_ms = sorted(ms)[n/2]",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R3-C: run meta matches card argv and env",
+      "detail": {
+        "arms": "sparse,fast",
+        "env": {},
+        "families": "jv-nagao,gaudry-s4,gaudry-d4,gaudry-s5,dense",
+        "reps": 1,
+        "simd": "avx512f"
+      },
+      "ok": true
+    },
+    {
+      "check": "R3-C: skipped list is empty",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R3-C: arms present (dense iff delta <= 1024), 1 rounds, median_ms = sorted(ms)[n/2]",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2 main: exactly the protocol corpus, each system once (253)",
+      "detail": {
+        "extra": [],
+        "missing": [],
+        "n": 253
+      },
+      "ok": true
+    },
+    {
+      "check": "R2 ablation: exactly the protocol corpus, each system once (253)",
+      "detail": {
+        "extra": [],
+        "missing": [],
+        "n": 253
+      },
+      "ok": true
+    },
+    {
+      "check": "R3-C: exactly the protocol corpus, each system once (253)",
+      "detail": {
+        "extra": [],
+        "missing": [],
+        "n": 253
+      },
+      "ok": true
+    },
+    {
+      "check": "R2 gate: every arm agrees on every system",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2 gate: every dense-family planted point found",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2: solution counts equal across arms",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2: every constructed jv-nagao system has >= 1 solution",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R2 ablation agrees and matches the main runs' solution counts",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R3-C gate: solution sets equal R2's on every system (sols per arm, agree, delta, planted, give-up, fallback)",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "R3-C: the counter fix leaves the sparse arm's counts unchanged (equal to R2 at the same si)",
+      "detail": {
+        "same_si": 96,
+        "sparse_muls_equal": 96
+      },
+      "ok": true
+    },
+    {
+      "check": "R3-C: at the same si the fast arm's other counters (Krylov, BM, NF, read-out, delta, functionals, nnz, roots) equal R2's; only roots_muls moves",
+      "detail": {
+        "bad": [],
+        "equal": 96,
+        "roots_muls_changed": 95,
+        "same_si": 96
+      },
+      "ok": true
+    },
+    {
+      "check": "DLP: R2-D1, R2-D2, R3-D1, R3-D2 each cover (p, seed) = {53,101} x {1,2}",
+      "ok": true
+    },
+    {
+      "check": "R3 DLP sparse (53, 1): oracle, la and total muls rebuilt from parts; S = total/(c_add_E sqrt l); rho and rho_neg S = group_ops/sqrt l; S/rho, S/rho_neg",
+      "ok": true
+    },
+    {
+      "check": "R3 DLP sparse (53, 1): solved, correct, all 4 rho and 4 rho_neg runs correct, no timeouts or mismatches",
+      "ok": true
+    },
+    {
+      "check": "R3 DLP sparse (53, 1): relations, solved log, instance and plain rho runs equal R2-D; differing fields only the new rho_neg ones",
+      "detail": [
+        "rho_neg",
+        "rho_neg_s_mean",
+        "s_over_rho_neg"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3 DLP fast (53, 1): oracle, la and total muls rebuilt from parts; S = total/(c_add_E sqrt l); rho and rho_neg S = group_ops/sqrt l; S/rho, S/rho_neg",
+      "ok": true
+    },
+    {
+      "check": "R3 DLP fast (53, 1): solved, correct, all 4 rho and 4 rho_neg runs correct, no timeouts or mismatches",
+      "ok": true
+    },
+    {
+      "check": "R3 DLP fast (53, 1): relations, solved log, instance and plain rho runs equal R2-D; differing fields only lin_muls-derived counts and rho_neg",
+      "detail": [
+        "c_cov",
+        "lin_muls",
+        "oracle_muls",
+        "predicted_s_over_rho",
+        "relation_over_rho",
+        "rho_neg",
+        "rho_neg_s_mean",
+        "s",
+        "s_over_rho",
+        "s_over_rho_neg",
+        "total_muls"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3 DLP sparse (53, 2): oracle, la and total muls rebuilt from parts; S = total/(c_add_E sqrt l); rho and rho_neg S = group_ops/sqrt l; S/rho, S/rho_neg",
+      "ok": true
+    },
+    {
+      "check": "R3 DLP sparse (53, 2): solved, correct, all 4 rho and 4 rho_neg runs correct, no timeouts or mismatches",
+      "ok": true
+    },
+    {
+      "check": "R3 DLP sparse (53, 2): relations, solved log, instance and plain rho runs equal R2-D; differing fields only the new rho_neg ones",
+      "detail": [
+        "rho_neg",
+        "rho_neg_s_mean",
+        "s_over_rho_neg"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3 DLP fast (53, 2): oracle, la and total muls rebuilt from parts; S = total/(c_add_E sqrt l); rho and rho_neg S = group_ops/sqrt l; S/rho, S/rho_neg",
+      "ok": true
+    },
+    {
+      "check": "R3 DLP fast (53, 2): solved, correct, all 4 rho and 4 rho_neg runs correct, no timeouts or mismatches",
+      "ok": true
+    },
+    {
+      "check": "R3 DLP fast (53, 2): relations, solved log, instance and plain rho runs equal R2-D; differing fields only lin_muls-derived counts and rho_neg",
+      "detail": [
+        "c_cov",
+        "lin_muls",
+        "oracle_muls",
+        "predicted_s_over_rho",
+        "relation_over_rho",
+        "rho_neg",
+        "rho_neg_s_mean",
+        "s",
+        "s_over_rho",
+        "s_over_rho_neg",
+        "total_muls"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3 DLP sparse (101, 1): oracle, la and total muls rebuilt from parts; S = total/(c_add_E sqrt l); rho and rho_neg S = group_ops/sqrt l; S/rho, S/rho_neg",
+      "ok": true
+    },
+    {
+      "check": "R3 DLP sparse (101, 1): solved, correct, all 4 rho and 4 rho_neg runs correct, no timeouts or mismatches",
+      "ok": true
+    },
+    {
+      "check": "R3 DLP sparse (101, 1): relations, solved log, instance and plain rho runs equal R2-D; differing fields only the new rho_neg ones",
+      "detail": [
+        "rho_neg",
+        "rho_neg_s_mean",
+        "s_over_rho_neg"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3 DLP fast (101, 1): oracle, la and total muls rebuilt from parts; S = total/(c_add_E sqrt l); rho and rho_neg S = group_ops/sqrt l; S/rho, S/rho_neg",
+      "ok": true
+    },
+    {
+      "check": "R3 DLP fast (101, 1): solved, correct, all 4 rho and 4 rho_neg runs correct, no timeouts or mismatches",
+      "ok": true
+    },
+    {
+      "check": "R3 DLP fast (101, 1): relations, solved log, instance and plain rho runs equal R2-D; differing fields only lin_muls-derived counts and rho_neg",
+      "detail": [
+        "c_cov",
+        "lin_muls",
+        "oracle_muls",
+        "predicted_s_over_rho",
+        "relation_over_rho",
+        "rho_neg",
+        "rho_neg_s_mean",
+        "s",
+        "s_over_rho",
+        "s_over_rho_neg",
+        "total_muls"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3 DLP sparse (101, 2): oracle, la and total muls rebuilt from parts; S = total/(c_add_E sqrt l); rho and rho_neg S = group_ops/sqrt l; S/rho, S/rho_neg",
+      "ok": true
+    },
+    {
+      "check": "R3 DLP sparse (101, 2): solved, correct, all 4 rho and 4 rho_neg runs correct, no timeouts or mismatches",
+      "ok": true
+    },
+    {
+      "check": "R3 DLP sparse (101, 2): relations, solved log, instance and plain rho runs equal R2-D; differing fields only the new rho_neg ones",
+      "detail": [
+        "rho_neg",
+        "rho_neg_s_mean",
+        "s_over_rho_neg"
+      ],
+      "ok": true
+    },
+    {
+      "check": "R3 DLP fast (101, 2): oracle, la and total muls rebuilt from parts; S = total/(c_add_E sqrt l); rho and rho_neg S = group_ops/sqrt l; S/rho, S/rho_neg",
+      "ok": true
+    },
+    {
+      "check": "R3 DLP fast (101, 2): solved, correct, all 4 rho and 4 rho_neg runs correct, no timeouts or mismatches",
+      "ok": true
+    },
+    {
+      "check": "R3 DLP fast (101, 2): relations, solved log, instance and plain rho runs equal R2-D; differing fields only lin_muls-derived counts and rho_neg",
+      "detail": [
+        "c_cov",
+        "lin_muls",
+        "oracle_muls",
+        "predicted_s_over_rho",
+        "relation_over_rho",
+        "rho_neg",
+        "rho_neg_s_mean",
+        "s",
+        "s_over_rho",
+        "s_over_rho_neg",
+        "total_muls"
+      ],
+      "ok": true
+    },
+    {
+      "check": "rho_neg runs identical in both arms' processes at (Number(53), Number(1))",
+      "ok": true
+    },
+    {
+      "check": "rho_neg runs identical in both arms' processes at (Number(53), Number(2))",
+      "ok": true
+    },
+    {
+      "check": "rho_neg runs identical in both arms' processes at (Number(101), Number(1))",
+      "ok": true
+    },
+    {
+      "check": "rho_neg runs identical in both arms' processes at (Number(101), Number(2))",
+      "ok": true
+    },
+    {
+      "check": "rho band: IC (lower bound) above rho_neg (upper bound) on every instance at 0, 0.1 and 1 GAE",
+      "ok": true
+    },
+    {
+      "check": "own bootstrap CI (sparse/fast) above 1 in every family",
+      "ok": true
+    },
+    {
+      "check": "claimed bootstrap CIs within 5% of an independent StdRng bootstrap",
+      "detail": 8.406497460730975e-16,
+      "ok": true
+    },
+    {
+      "check": "every compared summary.json number matches its recomputation under its stated definition",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "every top-level summary.json block was recomputed",
+      "detail": [],
+      "ok": true
+    }
+  ],
+  "compared": 693,
+  "headline": [
+    {
+      "claimed": 19.983541554858274,
+      "name": "sparse_over_fast.dense.geomean",
+      "recomputed": 19.983541554858274,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 5.331117143273449,
+      "name": "sparse_over_fast.dense.min",
+      "recomputed": 5.331117143273449,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 43.60829094541874,
+      "name": "sparse_over_fast.dense.max",
+      "recomputed": 43.608290945418744,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 18.285024475710635,
+      "name": "sparse_over_fast.dense.ci95[0]",
+      "recomputed": 18.285024475710635,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 21.71378449752206,
+      "name": "sparse_over_fast.dense.ci95[1]",
+      "recomputed": 21.71378449752206,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.9919394953520604,
+      "name": "sparse_over_fast.dense.counted_ratio.min",
+      "recomputed": 0.9919394953520605,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 2.1419074866063763,
+      "name": "sparse_over_fast.dense.counted_ratio.max",
+      "recomputed": 2.1419074866063763,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.4185436655879755,
+      "name": "sparse_over_fast.dense.counted_ratio.geomean",
+      "recomputed": 1.4185436655879755,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 17.75725484720826,
+      "name": "sparse_over_fast.gaudry-d4.geomean",
+      "recomputed": 17.75725484720826,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0632290429832367,
+      "name": "sparse_over_fast.gaudry-d4.min",
+      "recomputed": 1.0632290429832367,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 23.798828495966987,
+      "name": "sparse_over_fast.gaudry-d4.max",
+      "recomputed": 23.79882849596699,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 13.715750009399498,
+      "name": "sparse_over_fast.gaudry-d4.ci95[0]",
+      "recomputed": 13.715750009399498,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 20.46527330555246,
+      "name": "sparse_over_fast.gaudry-d4.ci95[1]",
+      "recomputed": 20.46527330555246,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.8957528535901133,
+      "name": "sparse_over_fast.gaudry-d4.counted_ratio.min",
+      "recomputed": 0.8957528535901133,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.563712536385271,
+      "name": "sparse_over_fast.gaudry-d4.counted_ratio.max",
+      "recomputed": 1.563712536385271,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0487968511619823,
+      "name": "sparse_over_fast.gaudry-d4.counted_ratio.geomean",
+      "recomputed": 1.0487968511619825,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 7.125250080245272,
+      "name": "sparse_over_fast.gaudry-s4.geomean",
+      "recomputed": 7.125250080245272,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 5.870923118010149,
+      "name": "sparse_over_fast.gaudry-s4.min",
+      "recomputed": 5.870923118010148,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 8.969096132161066,
+      "name": "sparse_over_fast.gaudry-s4.max",
+      "recomputed": 8.969096132161068,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 6.8018922736344,
+      "name": "sparse_over_fast.gaudry-s4.ci95[0]",
+      "recomputed": 6.8018922736344,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 7.490165580544862,
+      "name": "sparse_over_fast.gaudry-s4.ci95[1]",
+      "recomputed": 7.490165580544862,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.1241951273867608,
+      "name": "sparse_over_fast.gaudry-s4.counted_ratio.min",
+      "recomputed": 1.1241951273867608,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.5380433719861557,
+      "name": "sparse_over_fast.gaudry-s4.counted_ratio.max",
+      "recomputed": 1.5380433719861555,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.262564128059665,
+      "name": "sparse_over_fast.gaudry-s4.counted_ratio.geomean",
+      "recomputed": 1.2625641280596647,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 45.50574223424722,
+      "name": "sparse_over_fast.gaudry-s5.geomean",
+      "recomputed": 45.50574223424722,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 41.5196484505976,
+      "name": "sparse_over_fast.gaudry-s5.min",
+      "recomputed": 41.5196484505976,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 47.38147481450196,
+      "name": "sparse_over_fast.gaudry-s5.max",
+      "recomputed": 47.38147481450196,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 42.77354774392785,
+      "name": "sparse_over_fast.gaudry-s5.ci95[0]",
+      "recomputed": 42.77354774392785,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 47.18696558110795,
+      "name": "sparse_over_fast.gaudry-s5.ci95[1]",
+      "recomputed": 47.18696558110795,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.7693416203852346,
+      "name": "sparse_over_fast.gaudry-s5.counted_ratio.min",
+      "recomputed": 0.7693416203852346,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.8878251758449233,
+      "name": "sparse_over_fast.gaudry-s5.counted_ratio.max",
+      "recomputed": 0.8878251758449233,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.8257383995415543,
+      "name": "sparse_over_fast.gaudry-s5.counted_ratio.geomean",
+      "recomputed": 0.8257383995415543,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 7.601670505589695,
+      "name": "sparse_over_fast.jv-nagao.geomean",
+      "recomputed": 7.601670505589695,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 5.797423899878038,
+      "name": "sparse_over_fast.jv-nagao.min",
+      "recomputed": 5.797423899878038,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 8.952661475379001,
+      "name": "sparse_over_fast.jv-nagao.max",
+      "recomputed": 8.952661475379001,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 7.428670323601741,
+      "name": "sparse_over_fast.jv-nagao.ci95[0]",
+      "recomputed": 7.428670323601741,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 7.7834625993169375,
+      "name": "sparse_over_fast.jv-nagao.ci95[1]",
+      "recomputed": 7.7834625993169375,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.983218994381864,
+      "name": "sparse_over_fast.jv-nagao.counted_ratio.min",
+      "recomputed": 0.9832189943818639,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.3191839323048264,
+      "name": "sparse_over_fast.jv-nagao.counted_ratio.max",
+      "recomputed": 1.3191839323048264,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.1294104344803366,
+      "name": "sparse_over_fast.jv-nagao.counted_ratio.geomean",
+      "recomputed": 1.1294104344803366,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 60.6112227684057,
+      "name": "dense_over_fast.dense.geomean",
+      "recomputed": 60.6112227684057,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 8.337407866284458,
+      "name": "dense_over_fast.dense.min",
+      "recomputed": 8.337407866284458,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 432.85903148417,
+      "name": "dense_over_fast.dense.max",
+      "recomputed": 432.8590314841701,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 51.228832253751555,
+      "name": "dense_over_fast.dense.ci95[0]",
+      "recomputed": 51.228832253751555,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 71.80300239881532,
+      "name": "dense_over_fast.dense.ci95[1]",
+      "recomputed": 71.80300239881532,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 109.3366935803696,
+      "name": "dense_over_fast.gaudry-d4.geomean",
+      "recomputed": 109.33669358036961,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.976479476432792,
+      "name": "dense_over_fast.gaudry-d4.min",
+      "recomputed": 0.9764794764327921,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 287.09125860994817,
+      "name": "dense_over_fast.gaudry-d4.max",
+      "recomputed": 287.09125860994806,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 69.41714468695375,
+      "name": "dense_over_fast.gaudry-d4.ci95[0]",
+      "recomputed": 69.41714468695375,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 144.02609383434066,
+      "name": "dense_over_fast.gaudry-d4.ci95[1]",
+      "recomputed": 144.02609383434066,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 14.556074788873534,
+      "name": "dense_over_fast.gaudry-s4.geomean",
+      "recomputed": 14.556074788873527,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 12.040053269761648,
+      "name": "dense_over_fast.gaudry-s4.min",
+      "recomputed": 12.040053269761646,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 16.440782804124773,
+      "name": "dense_over_fast.gaudry-s4.max",
+      "recomputed": 16.440782804124773,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 14.069511773376718,
+      "name": "dense_over_fast.gaudry-s4.ci95[0]",
+      "recomputed": 14.069511773376718,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 15.03741605126711,
+      "name": "dense_over_fast.gaudry-s4.ci95[1]",
+      "recomputed": 15.03741605126711,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 17.90585853858922,
+      "name": "dense_over_fast.jv-nagao.geomean",
+      "recomputed": 17.90585853858922,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 10.379924387934818,
+      "name": "dense_over_fast.jv-nagao.min",
+      "recomputed": 10.379924387934818,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 31.85753321224153,
+      "name": "dense_over_fast.jv-nagao.max",
+      "recomputed": 31.857533212241538,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 16.94200867914409,
+      "name": "dense_over_fast.jv-nagao.ci95[0]",
+      "recomputed": 16.94200867914409,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 19.006057522332345,
+      "name": "dense_over_fast.jv-nagao.ci95[1]",
+      "recomputed": 19.006057522332345,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 11.098829736400177,
+      "name": "ablation_sparse_over_portable_fast.dense.geomean",
+      "recomputed": 11.098829736400175,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 6.072591384539572,
+      "name": "ablation_sparse_over_portable_fast.dense.min",
+      "recomputed": 6.072591384539572,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 16.818463465833414,
+      "name": "ablation_sparse_over_portable_fast.dense.max",
+      "recomputed": 16.818463465833414,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 10.72860968273038,
+      "name": "ablation_sparse_over_portable_fast.dense.ci95[0]",
+      "recomputed": 10.728609682730381,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 11.466704772312283,
+      "name": "ablation_sparse_over_portable_fast.dense.ci95[1]",
+      "recomputed": 11.466704772312283,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 8.350329246349496,
+      "name": "ablation_sparse_over_portable_fast.gaudry-d4.geomean",
+      "recomputed": 8.350329246349496,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0532279215880072,
+      "name": "ablation_sparse_over_portable_fast.gaudry-d4.min",
+      "recomputed": 1.0532279215880072,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 10.368759718925151,
+      "name": "ablation_sparse_over_portable_fast.gaudry-d4.max",
+      "recomputed": 10.368759718925153,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 6.874329461633194,
+      "name": "ablation_sparse_over_portable_fast.gaudry-d4.ci95[0]",
+      "recomputed": 6.874329461633194,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 9.324825244498308,
+      "name": "ablation_sparse_over_portable_fast.gaudry-d4.ci95[1]",
+      "recomputed": 9.324825244498308,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 6.754034965815047,
+      "name": "ablation_sparse_over_portable_fast.gaudry-s4.geomean",
+      "recomputed": 6.754034965815047,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 5.66525812545784,
+      "name": "ablation_sparse_over_portable_fast.gaudry-s4.min",
+      "recomputed": 5.66525812545784,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 8.93382938993009,
+      "name": "ablation_sparse_over_portable_fast.gaudry-s4.max",
+      "recomputed": 8.93382938993009,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 6.433177439006943,
+      "name": "ablation_sparse_over_portable_fast.gaudry-s4.ci95[0]",
+      "recomputed": 6.433177439006943,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 7.122383961828196,
+      "name": "ablation_sparse_over_portable_fast.gaudry-s4.ci95[1]",
+      "recomputed": 7.122383961828196,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 9.62810955411547,
+      "name": "ablation_sparse_over_portable_fast.gaudry-s5.geomean",
+      "recomputed": 9.62810955411547,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 8.742956598907517,
+      "name": "ablation_sparse_over_portable_fast.gaudry-s5.min",
+      "recomputed": 8.742956598907515,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 10.469401983210604,
+      "name": "ablation_sparse_over_portable_fast.gaudry-s5.max",
+      "recomputed": 10.469401983210606,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 8.883270934250593,
+      "name": "ablation_sparse_over_portable_fast.gaudry-s5.ci95[0]",
+      "recomputed": 8.883270934250593,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 10.435400909436517,
+      "name": "ablation_sparse_over_portable_fast.gaudry-s5.ci95[1]",
+      "recomputed": 10.435400909436515,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 6.306296612015946,
+      "name": "ablation_sparse_over_portable_fast.jv-nagao.geomean",
+      "recomputed": 6.306296612015946,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 4.618426546604477,
+      "name": "ablation_sparse_over_portable_fast.jv-nagao.min",
+      "recomputed": 4.618426546604477,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 7.395489032021454,
+      "name": "ablation_sparse_over_portable_fast.jv-nagao.max",
+      "recomputed": 7.395489032021454,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 6.1270996022792374,
+      "name": "ablation_sparse_over_portable_fast.jv-nagao.ci95[0]",
+      "recomputed": 6.1270996022792374,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 6.4823081673072105,
+      "name": "ablation_sparse_over_portable_fast.jv-nagao.ci95[1]",
+      "recomputed": 6.4823081673072105,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.829321924139848,
+      "name": "portable_over_simd_fast.dense",
+      "recomputed": 1.829321924139848,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 2.1637098637966847,
+      "name": "portable_over_simd_fast.gaudry-d4",
+      "recomputed": 2.1637098637966847,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.04206399807421,
+      "name": "portable_over_simd_fast.gaudry-s4",
+      "recomputed": 1.0420639980742101,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 4.01268034004777,
+      "name": "portable_over_simd_fast.gaudry-s5",
+      "recomputed": 4.01268034004777,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.151864124747278,
+      "name": "portable_over_simd_fast.jv-nagao",
+      "recomputed": 1.151864124747278,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.93080369034499,
+      "name": "P2.spearman_rho",
+      "recomputed": 0.93080369034499,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.003952569169960474,
+      "name": "P3.gave_up_fraction",
+      "recomputed": 0.003952569169960474,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 97,
+      "name": "P4.counted_outside_25pct (R3 fast/sparse outside [0.75, 1.25])",
+      "recomputed": 97,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.7693416203852346,
+      "name": "P4.counted_ratio_range[0] (R3 sparse/fast)",
+      "recomputed": 0.7693416203852346,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 2.1419074866063763,
+      "name": "P4.counted_ratio_range[1] (R3 sparse/fast)",
+      "recomputed": 2.1419074866063763,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 731.5903153798725,
+      "name": "dlp[p=53,seed=1].s.sparse",
+      "recomputed": 731.5903153798725,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 663.9844807375855,
+      "name": "dlp[p=53,seed=1].s_over_rho.sparse",
+      "recomputed": 663.9844807375855,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1318.536233377482,
+      "name": "dlp[p=53,seed=1].s_over_rho_neg.sparse",
+      "recomputed": 1318.536233377482,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.55485036881078,
+      "name": "dlp[p=53,seed=1].rho_neg_s_mean.sparse",
+      "recomputed": 0.55485036881078,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 64813.04100699957,
+      "name": "dlp[p=53,seed=1].lin_ms.sparse",
+      "recomputed": 64813.04100699957,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 4032563426,
+      "name": "dlp[p=53,seed=1].lin_muls.sparse",
+      "recomputed": 4032563426.0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 727.1174163750129,
+      "name": "dlp[p=53,seed=1].s.fast",
+      "recomputed": 727.1174163750129,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 659.9249197227691,
+      "name": "dlp[p=53,seed=1].s_over_rho.fast",
+      "recomputed": 659.9249197227691,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1310.474782477762,
+      "name": "dlp[p=53,seed=1].s_over_rho_neg.fast",
+      "recomputed": 1310.474782477762,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.55485036881078,
+      "name": "dlp[p=53,seed=1].rho_neg_s_mean.fast",
+      "recomputed": 0.55485036881078,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 12785.308864000026,
+      "name": "dlp[p=53,seed=1].lin_ms.fast",
+      "recomputed": 12785.308864000026,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 3922354568,
+      "name": "dlp[p=53,seed=1].lin_muls.fast",
+      "recomputed": 3922354568.0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0061515498104268,
+      "name": "dlp[p=53,seed=1].s_ratio_sparse_over_fast",
+      "recomputed": 1.0061515498104268,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 5.069337135021867,
+      "name": "dlp[p=53,seed=1].lin_ms_ratio_sparse_over_fast",
+      "recomputed": 5.069337135021867,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 328.7944678377016,
+      "name": "dlp[p=53,seed=2].s.sparse",
+      "recomputed": 328.7944678377016,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 285.73162148464894,
+      "name": "dlp[p=53,seed=2].s_over_rho.sparse",
+      "recomputed": 285.73162148464894,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 509.7878254844944,
+      "name": "dlp[p=53,seed=2].s_over_rho_neg.sparse",
+      "recomputed": 509.78782548449436,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.6449633580896532,
+      "name": "dlp[p=53,seed=2].rho_neg_s_mean.sparse",
+      "recomputed": 0.6449633580896532,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 29546.73927199993,
+      "name": "dlp[p=53,seed=2].lin_ms.sparse",
+      "recomputed": 29546.73927199993,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1850552151,
+      "name": "dlp[p=53,seed=2].lin_muls.sparse",
+      "recomputed": 1850552151.0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 326.4508194390116,
+      "name": "dlp[p=53,seed=2].s.fast",
+      "recomputed": 326.4508194390116,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 283.6949252423078,
+      "name": "dlp[p=53,seed=2].s_over_rho.fast",
+      "recomputed": 283.6949252423078,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 506.15405564424833,
+      "name": "dlp[p=53,seed=2].s_over_rho_neg.fast",
+      "recomputed": 506.15405564424833,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.6449633580896532,
+      "name": "dlp[p=53,seed=2].rho_neg_s_mean.fast",
+      "recomputed": 0.6449633580896532,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 6166.4337749999995,
+      "name": "dlp[p=53,seed=2].lin_ms.fast",
+      "recomputed": 6166.4337749999995,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1792806416,
+      "name": "dlp[p=53,seed=2].lin_muls.fast",
+      "recomputed": 1792806416.0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0071791775640735,
+      "name": "dlp[p=53,seed=2].s_ratio_sparse_over_fast",
+      "recomputed": 1.0071791775640735,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 4.791544083679052,
+      "name": "dlp[p=53,seed=2].lin_ms_ratio_sparse_over_fast",
+      "recomputed": 4.791544083679052,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 224.4073373973037,
+      "name": "dlp[p=101,seed=1].s.sparse",
+      "recomputed": 224.4073373973037,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 151.3562030284246,
+      "name": "dlp[p=101,seed=1].s_over_rho.sparse",
+      "recomputed": 151.35620302842457,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 326.11038289147217,
+      "name": "dlp[p=101,seed=1].s_over_rho_neg.sparse",
+      "recomputed": 326.11038289147217,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.6881330652755858,
+      "name": "dlp[p=101,seed=1].rho_neg_s_mean.sparse",
+      "recomputed": 0.6881330652755858,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 161978.9489849989,
+      "name": "dlp[p=101,seed=1].lin_ms.sparse",
+      "recomputed": 161978.9489849989,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 8469015112,
+      "name": "dlp[p=101,seed=1].lin_muls.sparse",
+      "recomputed": 8469015112.0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 220.41995052599785,
+      "name": "dlp[p=101,seed=1].s.fast",
+      "recomputed": 220.41995052599782,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 148.6668268972968,
+      "name": "dlp[p=101,seed=1].s_over_rho.fast",
+      "recomputed": 148.6668268972968,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 320.3158831464134,
+      "name": "dlp[p=101,seed=1].s_over_rho_neg.fast",
+      "recomputed": 320.3158831464134,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.6881330652755858,
+      "name": "dlp[p=101,seed=1].rho_neg_s_mean.fast",
+      "recomputed": 0.6881330652755858,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 22610.960031999788,
+      "name": "dlp[p=101,seed=1].lin_ms.fast",
+      "recomputed": 22610.960031999788,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 7789106118,
+      "name": "dlp[p=101,seed=1].lin_muls.fast",
+      "recomputed": 7789106118.0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.018089954479123,
+      "name": "dlp[p=101,seed=1].s_ratio_sparse_over_fast",
+      "recomputed": 1.018089954479123,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 7.163736026942724,
+      "name": "dlp[p=101,seed=1].lin_ms_ratio_sparse_over_fast",
+      "recomputed": 7.163736026942724,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 365.46270063554863,
+      "name": "dlp[p=101,seed=2].s.sparse",
+      "recomputed": 365.46270063554863,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 292.5013745131734,
+      "name": "dlp[p=101,seed=2].s_over_rho.sparse",
+      "recomputed": 292.5013745131734,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 261.8094743221491,
+      "name": "dlp[p=101,seed=2].s_over_rho_neg.sparse",
+      "recomputed": 261.8094743221491,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.395910906516153,
+      "name": "dlp[p=101,seed=2].rho_neg_s_mean.sparse",
+      "recomputed": 1.395910906516153,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 220697.24506800057,
+      "name": "dlp[p=101,seed=2].lin_ms.sparse",
+      "recomputed": 220697.24506800057,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 13713620020,
+      "name": "dlp[p=101,seed=2].lin_muls.sparse",
+      "recomputed": 13713620020.0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 359.01900198904696,
+      "name": "dlp[p=101,seed=2].s.fast",
+      "recomputed": 359.01900198904696,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 287.34410208079464,
+      "name": "dlp[p=101,seed=2].s_over_rho.fast",
+      "recomputed": 287.34410208079464,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 257.19334974254855,
+      "name": "dlp[p=101,seed=2].s_over_rho_neg.fast",
+      "recomputed": 257.19334974254855,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.395910906516153,
+      "name": "dlp[p=101,seed=2].rho_neg_s_mean.fast",
+      "recomputed": 1.395910906516153,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 36489.656485999854,
+      "name": "dlp[p=101,seed=2].lin_ms.fast",
+      "recomputed": 36489.656485999854,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 12614871718,
+      "name": "dlp[p=101,seed=2].lin_muls.fast",
+      "recomputed": 12614871718.0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.017948071302082,
+      "name": "dlp[p=101,seed=2].s_ratio_sparse_over_fast",
+      "recomputed": 1.0179480713020819,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 6.04821383157379,
+      "name": "dlp[p=101,seed=2].lin_ms_ratio_sparse_over_fast",
+      "recomputed": 6.04821383157379,
+      "rel_tol": 1e-9
+    }
+  ],
+  "hosts": {
+    "L1": "Intel(R) Xeon(R) Processor @ 2.10GHz | L2 8 MiB (4 instances)",
+    "L2": "Intel(R) Xeon(R) Processor @ 2.10GHz | L2 8 MiB (4 instances)",
+    "L3": "Intel(R) Xeon(R) Processor @ 2.10GHz | L2 8 MiB (4 instances)",
+    "L4": "Intel(R) Xeon(R) Processor @ 2.10GHz | L2 8 MiB (4 instances)",
+    "R2-A1": "Intel(R) Xeon(R) Processor @ 2.80GHz | L2 4 MiB (4 instances)",
+    "R2-A2": "Intel(R) Xeon(R) Processor @ 2.80GHz | L2 4 MiB (4 instances)",
+    "R2-D1": "Intel(R) Xeon(R) Processor @ 2.80GHz | L2 4 MiB (4 instances)",
+    "R2-D2": "Intel(R) Xeon(R) Processor @ 2.80GHz | L2 4 MiB (4 instances)",
+    "R2-L1": "Intel(R) Xeon(R) Processor @ 2.80GHz | L2 4 MiB (4 instances)",
+    "R2-L2": "Intel(R) Xeon(R) Processor @ 2.80GHz | L2 4 MiB (4 instances)",
+    "R2-L3": "Intel(R) Xeon(R) Processor @ 2.80GHz | L2 4 MiB (4 instances)",
+    "R2-L4": "Intel(R) Xeon(R) Processor @ 2.80GHz | L2 4 MiB (4 instances)",
+    "R2-L5": "Intel(R) Xeon(R) Processor @ 2.80GHz | L2 4 MiB (4 instances)",
+    "R2-L6": "Intel(R) Xeon(R) Processor @ 2.80GHz | L2 4 MiB (4 instances)",
+    "R3-C": "Intel(R) Xeon(R) Processor @ 2.80GHz | L2 4 MiB (4 instances)",
+    "R3-D1": "Intel(R) Xeon(R) Processor @ 2.80GHz | L2 4 MiB (4 instances)",
+    "R3-D2": "Intel(R) Xeon(R) Processor @ 2.80GHz | L2 4 MiB (4 instances)"
+  },
+  "independence": "validation/vtool (Rust) written by the validator from PROTOCOL.md and amendments 1-3; examples/postgb_la_summary.rs was not read or run",
+  "independent": true,
+  "inputs_read_via": "git show <snapshot_commit>:<path>",
+  "mismatched": [],
+  "notes": [
+    {
+      "absent_counted_ratio": "dense_over_fast.dense"
+    },
+    {
+      "absent_counted_ratio": "dense_over_fast.gaudry-d4"
+    },
+    {
+      "absent_counted_ratio": "dense_over_fast.gaudry-s4"
+    },
+    {
+      "absent_counted_ratio": "dense_over_fast.jv-nagao"
+    },
+    {
+      "absent_counted_ratio": "ablation_sparse_over_portable_fast.dense"
+    },
+    {
+      "absent_counted_ratio": "ablation_sparse_over_portable_fast.gaudry-d4"
+    },
+    {
+      "absent_counted_ratio": "ablation_sparse_over_portable_fast.gaudry-s4"
+    },
+    {
+      "absent_counted_ratio": "ablation_sparse_over_portable_fast.gaudry-s5"
+    },
+    {
+      "absent_counted_ratio": "ablation_sparse_over_portable_fast.jv-nagao"
+    },
+    {
+      "absent_counted_ratio": "host_a_sparse_over_fast.dense"
+    },
+    {
+      "absent_counted_ratio": "host_a_sparse_over_fast.gaudry-d4"
+    },
+    {
+      "absent_counted_ratio": "host_a_sparse_over_fast.gaudry-s4"
+    },
+    {
+      "absent_counted_ratio": "host_a_sparse_over_fast.jv-nagao"
+    },
+    {
+      "absent_counted_ratio": "host_a_dense_over_fast.dense"
+    },
+    {
+      "absent_counted_ratio": "host_a_dense_over_fast.gaudry-d4"
+    },
+    {
+      "absent_counted_ratio": "host_a_dense_over_fast.gaudry-s4"
+    },
+    {
+      "absent_counted_ratio": "host_a_dense_over_fast.jv-nagao"
+    },
+    {
+      "P4_outside_25pct": {
+        "fast_over_sparse_direction": 97,
+        "sparse_over_fast_direction": 121
+      }
+    }
+  ],
+  "problems": [],
+  "raw_data": [
+    {
+      "path": "../runs/R2-L1.json",
+      "repo_path": "research/postgb_linear_stage_20261026/runs/R2-L1.json",
+      "sha256": "8ad1e7dade6ba91161412b4d6473a191816b9f7dc86c15d3b2babfef533cb69a"
+    },
+    {
+      "path": "../runs/R2-L2.json",
+      "repo_path": "research/postgb_linear_stage_20261026/runs/R2-L2.json",
+      "sha256": "8049ae4b3ab03c8401cc5cc936f811b5f45fb283294fcca8384d9eaafc804b43"
+    },
+    {
+      "path": "../runs/R2-L3.json",
+      "repo_path": "research/postgb_linear_stage_20261026/runs/R2-L3.json",
+      "sha256": "7c7e91836bfd2464de2c1fca435586323e4832bd31b2245d35c17def4d4da905"
+    },
+    {
+      "path": "../runs/R2-L4.json",
+      "repo_path": "research/postgb_linear_stage_20261026/runs/R2-L4.json",
+      "sha256": "69d20a13e4b75e90d8bf0427798e7ab1c65b2273ea2d07cf1d0d27be10a537d8"
+    },
+    {
+      "path": "../runs/R2-L5.json",
+      "repo_path": "research/postgb_linear_stage_20261026/runs/R2-L5.json",
+      "sha256": "3c972da2b66a567e4d8608d855e1b892fd6a065413821e10b80f8365451ebfc1"
+    },
+    {
+      "path": "../runs/R2-L6.json",
+      "repo_path": "research/postgb_linear_stage_20261026/runs/R2-L6.json",
+      "sha256": "a77d8fdf0a6b9f06eaa8a5d71aaefbb84bf7bf537ef45364e9d23f4a3490ab21"
+    },
+    {
+      "path": "../runs/R2-A1.json",
+      "repo_path": "research/postgb_linear_stage_20261026/runs/R2-A1.json",
+      "sha256": "d4e0d02fd6b0fef46e5c38431b363087ef5ce752b7770fb044afaa824ae5835e"
+    },
+    {
+      "path": "../runs/R2-A2.json",
+      "repo_path": "research/postgb_linear_stage_20261026/runs/R2-A2.json",
+      "sha256": "95fc92bf2b90d766161d9797d3aac5de8a012b923b6141d3429ac9aff11b1b38"
+    },
+    {
+      "path": "../runs/R2-D1.json",
+      "repo_path": "research/postgb_linear_stage_20261026/runs/R2-D1.json",
+      "sha256": "22a319d1f7cfe7b56de45338176fd1275373ca31aad101d8517562b8b4ae0c75"
+    },
+    {
+      "path": "../runs/R2-D2.json",
+      "repo_path": "research/postgb_linear_stage_20261026/runs/R2-D2.json",
+      "sha256": "f3f0af105465cabd92a2b792b0fd73ec7ee0bbb3ca2f41441aa74a60e4db57af"
+    },
+    {
+      "path": "../runs/L1.json",
+      "repo_path": "research/postgb_linear_stage_20261026/runs/L1.json",
+      "sha256": "465f88b644b2bc6cafdf5cb26be8ead062e4a176a75113e6595cd60a198ff89b"
+    },
+    {
+      "path": "../runs/L2.json",
+      "repo_path": "research/postgb_linear_stage_20261026/runs/L2.json",
+      "sha256": "6e82302b51efa84cb5d893c66dc5521074764ee39f15b02af863352f53eda445"
+    },
+    {
+      "path": "../runs/L3.json",
+      "repo_path": "research/postgb_linear_stage_20261026/runs/L3.json",
+      "sha256": "d1ff859ded9b22255525c5f5b7faa2d8b92b6de776828d51ffda253847134213"
+    },
+    {
+      "path": "../runs/L4.json",
+      "repo_path": "research/postgb_linear_stage_20261026/runs/L4.json",
+      "sha256": "ba39b8246de4317dbb8205c14e771deeca848300e2c89d521c5c41fc36d3d2e5"
+    },
+    {
+      "path": "../runs/R3-C.json",
+      "repo_path": "research/postgb_linear_stage_20261026/runs/R3-C.json",
+      "sha256": "630ecf4136979328e8944aed7fe905099069210e42b174c42990a103baff776f"
+    },
+    {
+      "path": "../runs/R3-D1.json",
+      "repo_path": "research/postgb_linear_stage_20261026/runs/R3-D1.json",
+      "sha256": "3bd45f6891724a700d86744d63bf4e3bd4094a9fc73dd3b964badce911f0c885"
+    },
+    {
+      "path": "../runs/R3-D2.json",
+      "repo_path": "research/postgb_linear_stage_20261026/runs/R3-D2.json",
+      "sha256": "6281d22fa3daf7238587c69bb1d1357da07efc4b22fc2eac466e47553c9a3d44"
+    },
+    {
+      "path": "../runs/R3-D1.instances.jsonl",
+      "repo_path": "research/postgb_linear_stage_20261026/runs/R3-D1.instances.jsonl",
+      "sha256": "fdeec87b64ca7ff19b31d4cc38ab4fd5aa67aa731c5a376ebf5806a1e6913242"
+    },
+    {
+      "path": "../runs/R3-D2.instances.jsonl",
+      "repo_path": "research/postgb_linear_stage_20261026/runs/R3-D2.instances.jsonl",
+      "sha256": "7a14981c718db9df5251e50180597638a224aa77f7c5c3fcd84db227a5fa47eb"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L1.yaml",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L1.yaml",
+      "sha256": "3e259a6e3c31d18e703ce4d6c672673584193f638a011b423afce7c463812e81"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L1.receipt.json",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L1.receipt.json",
+      "sha256": "0cdc2fc337ecb538be31f666dcf9eab58b2663e325e09610b25d58fdac662d1b"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L1.lscpu.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L1.lscpu.stdout",
+      "sha256": "35aff9c9dd67ea379067ea6d72263b3e9c6305b94cf02227c955888621eeca93"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L1.run.stderr",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L1.run.stderr",
+      "sha256": "23ef006bf4f97ba90fe6fe9f9b286f3fa6a2f1748aca36fff5c3b04ea500c8e1"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L1.run.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L1.run.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L2.yaml",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L2.yaml",
+      "sha256": "5817c9a4c53638224ef5efa198f2ec9646adf58d5656efa47c0c4352ea6b3ddf"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L2.receipt.json",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L2.receipt.json",
+      "sha256": "102c3bd30de5bef9201e266ee3a20768e5e52eabb0a751e4d441007a202fd4e9"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L2.lscpu.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L2.lscpu.stdout",
+      "sha256": "35aff9c9dd67ea379067ea6d72263b3e9c6305b94cf02227c955888621eeca93"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L2.run.stderr",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L2.run.stderr",
+      "sha256": "f35fb5400a4a24809d8eacc656bc90114eabbc7a767d4c554bef31762f62343f"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L2.run.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L2.run.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L3.yaml",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L3.yaml",
+      "sha256": "9eabd05afe87246a691368e465ff2abf802977b13a4529ac72c9a1ca867f6e02"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L3.receipt.json",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L3.receipt.json",
+      "sha256": "1250d7fcd49d740f270eae78d6eb5a32c19a8ff8f156cb632858b360db0a2387"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L3.lscpu.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L3.lscpu.stdout",
+      "sha256": "35aff9c9dd67ea379067ea6d72263b3e9c6305b94cf02227c955888621eeca93"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L3.run.stderr",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L3.run.stderr",
+      "sha256": "8bbde0c1fe8ced27983f7ec43dd8d324079b3bb33ba69dc753fcc50aff148324"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L3.run.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L3.run.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L4.yaml",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L4.yaml",
+      "sha256": "667c4cb16dc27b760d910536f85df38584a8bbfd5285b3e424ad03188c72c046"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L4.receipt.json",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L4.receipt.json",
+      "sha256": "23393976e41a6232744581a586e74bd52a5725efda7f20c3bbcc8748c9899ce7"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L4.lscpu.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L4.lscpu.stdout",
+      "sha256": "35aff9c9dd67ea379067ea6d72263b3e9c6305b94cf02227c955888621eeca93"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L4.run.stderr",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L4.run.stderr",
+      "sha256": "0247d493403fd29f1bbd02b12b0fa9d2a51285889eb6e3d6856af35e582c89a1"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L4.run.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L4.run.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L5.yaml",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L5.yaml",
+      "sha256": "97792d59c1fb51429d33ce44e5ac916dc405504442f95fdff437bd1f3a9831f7"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L5.receipt.json",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L5.receipt.json",
+      "sha256": "ad703ee71d1d6d07dcf9739f0531e45eaa0da3c41e42a6bb147e30a03dcd7e7d"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L5.lscpu.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L5.lscpu.stdout",
+      "sha256": "35aff9c9dd67ea379067ea6d72263b3e9c6305b94cf02227c955888621eeca93"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L5.run.stderr",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L5.run.stderr",
+      "sha256": "e56ffe5eed19d59e225d19286f6cf99669d79b8890dbb68ccdb34d0ec3f450e9"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L5.run.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L5.run.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L6.yaml",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L6.yaml",
+      "sha256": "fd90b94c948120acd7baf7820f593685feb6e4b495477f07b417888e1348121e"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L6.receipt.json",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L6.receipt.json",
+      "sha256": "9f076c6b9085162ec3998caea16ca74ac78685ac8d42bd30859dbd5908456061"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L6.lscpu.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L6.lscpu.stdout",
+      "sha256": "35aff9c9dd67ea379067ea6d72263b3e9c6305b94cf02227c955888621eeca93"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L6.run.stderr",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L6.run.stderr",
+      "sha256": "cd788a5bda45933ecd3eeaffa2f3b4876dae2d6eed79baf38434bc5305ff2a0a"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-L6.run.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L6.run.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-A1.yaml",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-A1.yaml",
+      "sha256": "1b16cb22267b00814337831c6827eb54bdb9a5079618221597f1635d22634de9"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-A1.receipt.json",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-A1.receipt.json",
+      "sha256": "8eb0411986d336ceadcca7a80fe5bd87b4c92d02f14da4f6fa07be7f60e488a7"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-A1.lscpu.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-A1.lscpu.stdout",
+      "sha256": "35aff9c9dd67ea379067ea6d72263b3e9c6305b94cf02227c955888621eeca93"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-A1.run.stderr",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-A1.run.stderr",
+      "sha256": "1e28c885ace88b610cf0af80ae37662dd83173cd3c2b80ebdb620224be25c2de"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-A1.run.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-A1.run.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-A2.yaml",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-A2.yaml",
+      "sha256": "5e56651f0e5ff48d9e09be69ee612f8200c57ba060ffde66057951e7453600cb"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-A2.receipt.json",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-A2.receipt.json",
+      "sha256": "718367317440f40a8e00f9d2c03b2bbe17947b50a586d9bcccaa0db6731a8423"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-A2.lscpu.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-A2.lscpu.stdout",
+      "sha256": "35aff9c9dd67ea379067ea6d72263b3e9c6305b94cf02227c955888621eeca93"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-A2.run.stderr",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-A2.run.stderr",
+      "sha256": "2a163e213a2fef1c39cde1d1654eb6b4ad829dcd1ccdb0fda64ba8db9ca4efee"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-A2.run.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-A2.run.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-D1.yaml",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-D1.yaml",
+      "sha256": "77c4a0e171452c087408e644d05d4cd4cf21983cd67bb46104d03416fe160bfc"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-D1.receipt.json",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-D1.receipt.json",
+      "sha256": "317b4152ecb36fed7524329cc135b426fde79c9f058b1fb5d0f5cef0ca4a2553"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-D1.lscpu.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-D1.lscpu.stdout",
+      "sha256": "35aff9c9dd67ea379067ea6d72263b3e9c6305b94cf02227c955888621eeca93"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-D1.run.stderr",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-D1.run.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-D1.run.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-D1.run.stdout",
+      "sha256": "3a8fb18c0a6b1b0530f187d97fc75018ce10d6945157215765db9ba763af3fbd"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-D2.yaml",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-D2.yaml",
+      "sha256": "359b93e7dc93d1083ccb42d0d68784a19da33504015c43357ec01b4e9a5f7b86"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-D2.receipt.json",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-D2.receipt.json",
+      "sha256": "d14c49510a0ad588ddc320b3cfc846815d3922879968df89e2cc4ceef955cffc"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-D2.lscpu.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-D2.lscpu.stdout",
+      "sha256": "35aff9c9dd67ea379067ea6d72263b3e9c6305b94cf02227c955888621eeca93"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-D2.run.stderr",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-D2.run.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R2-D2.run.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-D2.run.stdout",
+      "sha256": "6fecb2a2d179346fda7b95cfb286b95fb126c0825afa04206a18571bd688a0ec"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R3-C.yaml",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-C.yaml",
+      "sha256": "c45169881593db2387d0a8220a734966b63ffe6fadb2f0fe01cade73c36e6ccc"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R3-C.receipt.json",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-C.receipt.json",
+      "sha256": "639b2da55cf42e8a9b30eb43322b7e00264f36f4f0262e1bb8aa00ecc8ae42f5"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R3-C.lscpu.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-C.lscpu.stdout",
+      "sha256": "35aff9c9dd67ea379067ea6d72263b3e9c6305b94cf02227c955888621eeca93"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R3-C.run.stderr",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-C.run.stderr",
+      "sha256": "d033caf3e0d2badd14523bbdb5496f9ac26d7bbc93f7b80b7590dea07193bde0"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R3-C.run.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-C.run.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R3-D1.yaml",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-D1.yaml",
+      "sha256": "08b2f8f937a6afcdf0d85fba5495dfffcc018cbfb4fc3923762aa45f87db3166"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R3-D1.receipt.json",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-D1.receipt.json",
+      "sha256": "5f535d5c0a676d4910ba09a277492af4789b8ef3b80b61c50854c6b0383c5857"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R3-D1.lscpu.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-D1.lscpu.stdout",
+      "sha256": "35aff9c9dd67ea379067ea6d72263b3e9c6305b94cf02227c955888621eeca93"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R3-D1.run.stderr",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-D1.run.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R3-D1.run.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-D1.run.stdout",
+      "sha256": "d3a36a311df6636eaee6cfc6aea1da103f3bed2cf962934d05fc388797d77ba5"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R3-D2.yaml",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-D2.yaml",
+      "sha256": "cb609b1321adcdaac75fa778fb89af0c9aadaa538f9d0505cc7c2ceaeb4f0329"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R3-D2.receipt.json",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-D2.receipt.json",
+      "sha256": "f04f898a9446139bfe6aa0e5112e74f8f5f677273f79c9f6aa1c020de97d519d"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R3-D2.lscpu.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-D2.lscpu.stdout",
+      "sha256": "35aff9c9dd67ea379067ea6d72263b3e9c6305b94cf02227c955888621eeca93"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R3-D2.run.stderr",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-D2.run.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "../cards/CARD-postgb-la-20261026-R3-D2.run.stdout",
+      "repo_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-D2.run.stdout",
+      "sha256": "052873c97fbbbd9b4751bcd0bd950292e1e812c0df87757b3b8c45f58d55bf9e"
+    },
+    {
+      "path": "../PROTOCOL.md",
+      "repo_path": "research/postgb_linear_stage_20261026/PROTOCOL.md",
+      "sha256": "0689a650288d0947c26d3609e66d0712829ba8400920862f8c60d9a1df7b08cb"
+    },
+    {
+      "path": "../PROTOCOL_AMENDMENT_1.md",
+      "repo_path": "research/postgb_linear_stage_20261026/PROTOCOL_AMENDMENT_1.md",
+      "sha256": "60da371d5ca5e0dd9fbf7f89764e52ec5b903d0da92662abf0bb3f4f6279541a"
+    },
+    {
+      "path": "../PROTOCOL_AMENDMENT_2.md",
+      "repo_path": "research/postgb_linear_stage_20261026/PROTOCOL_AMENDMENT_2.md",
+      "sha256": "bd597cc67142307b226f875f9dfeb32310dd79d27f9151afd36c7a171c9e4bfe"
+    },
+    {
+      "path": "../PROTOCOL_AMENDMENT_3.md",
+      "repo_path": "research/postgb_linear_stage_20261026/PROTOCOL_AMENDMENT_3.md",
+      "sha256": "2f9b85402871e99d55a67f0ed60c71dfb647c39da1bb77b7a7e322820482a822"
+    },
+    {
+      "path": "../analysis/summary.json",
+      "repo_path": "research/postgb_linear_stage_20261026/analysis/summary.json",
+      "sha256": "ef9aae284eceddb7424b65833f5d469084fcb9a428f648691a5e4bc02feb60fc"
+    }
+  ],
+  "raw_data_paths_relative_to": "research/postgb_linear_stage_20261026/validation",
+  "recomputed": {
+    "P1_held": true,
+    "P2_spearman_rho": 0.93080369034499,
+    "P3_gave_up_fraction": 0.003952569169960474,
+    "P4": {
+      "counted_outside_25pct_fast_over_sparse": 97,
+      "counted_outside_25pct_fast_over_sparse_by_family": {
+        "dense": 85,
+        "gaudry-d4": 2,
+        "gaudry-s4": 8,
+        "gaudry-s5": 2,
+        "jv-nagao": 0
+      },
+      "counted_outside_25pct_sparse_over_fast": 121,
+      "counted_ratio_range_sparse_over_fast": [
+        0.7693416203852346,
+        2.1419074866063763
+      ],
+      "held": false,
+      "lin_ms_lower_every_run": true,
+      "logs_correct": true,
+      "s_within_10pct": true
+    },
+    "P5_held": true,
+    "ablation_sparse_over_portable_fast": {
+      "dense": {
+        "ci95": [
+          10.728609682730381,
+          11.466704772312283
+        ],
+        "counted_candidates": {
+          "A sparse/A fast (pre-fix counter)": {
+            "geomean": 1.2875648086670584,
+            "max": 1.8953747048627698,
+            "min": 0.9182660127471172
+          },
+          "R3 sparse/R3 fast": {
+            "geomean": 1.4185436655879757,
+            "max": 2.1419074866063763,
+            "min": 0.9919394953520605
+          }
+        },
+        "delta": [
+          32,
+          1024
+        ],
+        "geomean": 11.098829736400175,
+        "max": 16.818463465833414,
+        "median_ms": {
+          "fast": 10.078556,
+          "sparse": 109.447735
+        },
+        "min": 6.072591384539572,
+        "n": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "p": [
+          65521,
+          2147483647,
+          4294967291
+        ],
+        "systems": 153
+      },
+      "gaudry-d4": {
+        "ci95": [
+          6.874329461633194,
+          9.324825244498308
+        ],
+        "counted_candidates": {
+          "A sparse/A fast (pre-fix counter)": {
+            "geomean": 0.9293897504329962,
+            "max": 1.3577137625653246,
+            "min": 0.8036718853334038
+          },
+          "R3 sparse/R3 fast": {
+            "geomean": 1.0487968511619825,
+            "max": 1.563712536385271,
+            "min": 0.8957528535901133
+          }
+        },
+        "delta": [
+          512,
+          512
+        ],
+        "geomean": 8.350329246349496,
+        "max": 10.368759718925153,
+        "median_ms": {
+          "fast": 34.92817,
+          "sparse": 311.571126
+        },
+        "min": 1.0532279215880072,
+        "n": [
+          5
+        ],
+        "p": [
+          97,
+          1033,
+          4093
+        ],
+        "systems": 24
+      },
+      "gaudry-s4": {
+        "ci95": [
+          6.433177439006943,
+          7.122383961828196
+        ],
+        "counted_candidates": {
+          "A sparse/A fast (pre-fix counter)": {
+            "geomean": 0.9736189993412887,
+            "max": 1.223361675653256,
+            "min": 0.8437877104316762
+          },
+          "R3 sparse/R3 fast": {
+            "geomean": 1.2625641280596647,
+            "max": 1.5380433719861555,
+            "min": 1.1241951273867608
+          }
+        },
+        "delta": [
+          64,
+          64
+        ],
+        "geomean": 6.754034965815047,
+        "max": 8.93382938993009,
+        "median_ms": {
+          "fast": 0.33971,
+          "sparse": 2.204097
+        },
+        "min": 5.66525812545784,
+        "n": [
+          3
+        ],
+        "p": [
+          271,
+          1039,
+          8191
+        ],
+        "systems": 24
+      },
+      "gaudry-s5": {
+        "ci95": [
+          8.883270934250593,
+          10.435400909436515
+        ],
+        "counted_candidates": {
+          "A sparse/A fast (pre-fix counter)": {
+            "geomean": 0.8170005979087287,
+            "max": 0.8745154927722602,
+            "min": 0.7628406567857194
+          },
+          "R3 sparse/R3 fast": {
+            "geomean": 0.8257383995415543,
+            "max": 0.8878251758449233,
+            "min": 0.7693416203852346
+          }
+        },
+        "delta": [
+          4096,
+          4096
+        ],
+        "geomean": 9.62810955411547,
+        "max": 10.469401983210606,
+        "median_ms": {
+          "fast": 13124.855399,
+          "sparse": 136518.31808899998
+        },
+        "min": 8.742956598907515,
+        "n": [
+          4
+        ],
+        "p": [
+          13,
+          101
+        ],
+        "systems": 4
+      },
+      "jv-nagao": {
+        "ci95": [
+          6.1270996022792374,
+          6.4823081673072105
+        ],
+        "counted_candidates": {
+          "A sparse/A fast (pre-fix counter)": {
+            "geomean": 0.9332577991980155,
+            "max": 1.1012713722051732,
+            "min": 0.816544434857636
+          },
+          "R3 sparse/R3 fast": {
+            "geomean": 1.1294104344803366,
+            "max": 1.3191839323048264,
+            "min": 0.9832189943818639
+          }
+        },
+        "delta": [
+          64,
+          64
+        ],
+        "geomean": 6.306296612015946,
+        "max": 7.395489032021454,
+        "median_ms": {
+          "fast": 0.465296,
+          "sparse": 2.931257
+        },
+        "min": 4.618426546604477,
+        "n": [
+          6
+        ],
+        "p": [
+          53,
+          101,
+          251,
+          1009
+        ],
+        "systems": 48
+      }
+    },
+    "dense_over_fast": {
+      "dense": {
+        "ci95": [
+          51.228832253751555,
+          71.80300239881532
+        ],
+        "counted_candidates": {
+          "R2 dense/R2 fast": {
+            "geomean": 4.212983808112632,
+            "max": 14.173598774611477,
+            "min": 2.2097573005075932
+          },
+          "R2 dense/R3 fast": {
+            "geomean": 4.643130776398283,
+            "max": 16.02355346632814,
+            "min": 2.6400441934691874
+          },
+          "R2 sparse/R2 fast": {
+            "geomean": 1.2872020537041071,
+            "max": 1.8953747048627698,
+            "min": 0.9182754374022589
+          },
+          "R3 sparse/R3 fast": {
+            "geomean": 1.4185436655879755,
+            "max": 2.1419074866063763,
+            "min": 0.9919394953520605
+          }
+        },
+        "delta": [
+          32,
+          1024
+        ],
+        "geomean": 60.6112227684057,
+        "max": 432.8590314841701,
+        "median_ms": {
+          "dense": 275.233911,
+          "fast": 4.6402350000000006
+        },
+        "min": 8.337407866284458,
+        "n": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "p": [
+          65521,
+          2147483647,
+          4294967291
+        ],
+        "systems": 153
+      },
+      "gaudry-d4": {
+        "ci95": [
+          69.41714468695375,
+          144.02609383434066
+        ],
+        "counted_candidates": {
+          "R2 dense/R2 fast": {
+            "geomean": 5.6795849943548005,
+            "max": 16.322230745063766,
+            "min": 0.9572155859889916
+          },
+          "R2 dense/R3 fast": {
+            "geomean": 6.409292608629437,
+            "max": 18.520524141537244,
+            "min": 0.9572155859889916
+          },
+          "R2 sparse/R2 fast": {
+            "geomean": 0.9293897504329962,
+            "max": 1.3577137625653246,
+            "min": 0.8036718853334038
+          },
+          "R3 sparse/R3 fast": {
+            "geomean": 1.0487968511619825,
+            "max": 1.563712536385271,
+            "min": 0.8957528535901133
+          }
+        },
+        "delta": [
+          512,
+          512
+        ],
+        "geomean": 109.33669358036961,
+        "max": 287.09125860994806,
+        "median_ms": {
+          "dense": 1934.759022,
+          "fast": 16.501495000000002
+        },
+        "min": 0.9764794764327921,
+        "n": [
+          5
+        ],
+        "p": [
+          97,
+          1033,
+          4093
+        ],
+        "systems": 24
+      },
+      "gaudry-s4": {
+        "ci95": [
+          14.069511773376718,
+          15.03741605126711
+        ],
+        "counted_candidates": {
+          "R2 dense/R2 fast": {
+            "geomean": 2.235854157113531,
+            "max": 3.2552957177232407,
+            "min": 1.6898511200779185
+          },
+          "R2 dense/R3 fast": {
+            "geomean": 2.8993982823409237,
+            "max": 4.22798724146809,
+            "min": 2.2011628412765156
+          },
+          "R2 sparse/R2 fast": {
+            "geomean": 0.9736189993412887,
+            "max": 1.223361675653256,
+            "min": 0.8437877104316762
+          },
+          "R3 sparse/R3 fast": {
+            "geomean": 1.2625641280596647,
+            "max": 1.5380433719861555,
+            "min": 1.1241951273867608
+          }
+        },
+        "delta": [
+          64,
+          64
+        ],
+        "geomean": 14.556074788873527,
+        "max": 16.440782804124773,
+        "median_ms": {
+          "dense": 4.683124,
+          "fast": 0.31793899999999997
+        },
+        "min": 12.040053269761646,
+        "n": [
+          3
+        ],
+        "p": [
+          271,
+          1039,
+          8191
+        ],
+        "systems": 24
+      },
+      "jv-nagao": {
+        "ci95": [
+          16.94200867914409,
+          19.006057522332345
+        ],
+        "counted_candidates": {
+          "R2 dense/R2 fast": {
+            "geomean": 2.2251767380439706,
+            "max": 4.566882428982775,
+            "min": 1.5294296941675185
+          },
+          "R2 dense/R3 fast": {
+            "geomean": 2.692865603340701,
+            "max": 5.493729228420013,
+            "min": 1.841623236195886
+          },
+          "R2 sparse/R2 fast": {
+            "geomean": 0.9332577991980155,
+            "max": 1.1012713722051732,
+            "min": 0.816544434857636
+          },
+          "R3 sparse/R3 fast": {
+            "geomean": 1.1294104344803366,
+            "max": 1.3191839323048264,
+            "min": 0.9832189943818639
+          }
+        },
+        "delta": [
+          64,
+          64
+        ],
+        "geomean": 17.90585853858922,
+        "max": 31.857533212241538,
+        "median_ms": {
+          "dense": 7.533914,
+          "fast": 0.39534
+        },
+        "min": 10.379924387934818,
+        "n": [
+          6
+        ],
+        "p": [
+          53,
+          101,
+          251,
+          1009
+        ],
+        "systems": 48
+      }
+    },
+    "dlp": [
+      {
+        "fast": {
+          "correct": true,
+          "f4_ms_r2": 103461.36493099964,
+          "l": 5541095869,
+          "lin_ms_r2": 12785.308864000026,
+          "lin_muls": 3922354568,
+          "lin_muls_r2": 4593464878,
+          "relations": 31,
+          "rho_all_correct": true,
+          "rho_neg_runs": [
+            {
+              "correct": true,
+              "group_ops": 30019,
+              "s": 0.4032722968199264,
+              "seed": 1000,
+              "steps": 25438
+            },
+            {
+              "correct": true,
+              "group_ops": 26063,
+              "s": 0.3501277814723256,
+              "seed": 1001,
+              "steps": 21944
+            },
+            {
+              "correct": true,
+              "group_ops": 29153,
+              "s": 0.3916385378990411,
+              "seed": 1002,
+              "steps": 24580
+            },
+            {
+              "correct": true,
+              "group_ops": 79974,
+              "s": 1.074362859051827,
+              "seed": 1003,
+              "steps": 72163
+            }
+          ],
+          "rho_neg_s_mean": 0.55485036881078,
+          "rho_runs": [
+            {
+              "correct": true,
+              "group_ops": 72564,
+              "s": 0.9748176470382472,
+              "seed": 1000,
+              "steps": 69510
+            },
+            {
+              "correct": true,
+              "group_ops": 65695,
+              "s": 0.8825401758747815,
+              "seed": 1001,
+              "steps": 62668
+            },
+            {
+              "correct": true,
+              "group_ops": 96132,
+              "s": 1.2914278436288074,
+              "seed": 1002,
+              "steps": 93120
+            },
+            {
+              "correct": true,
+              "group_ops": 93680,
+              "s": 1.258487916522559,
+              "seed": 1003,
+              "steps": 90657
+            }
+          ],
+          "rho_s_mean": 1.1018183957660987,
+          "s": 727.1174163750129,
+          "s_over_rho": 659.9249197227691,
+          "s_over_rho_neg": 1310.474782477762,
+          "wall_ms_r2": 247467.850411
+        },
+        "lin_ms_ratio_sparse_over_fast": 5.069337135021867,
+        "p": 53,
+        "s_ratio_sparse_over_fast": 1.0061515498104268,
+        "seed": 1,
+        "sparse": {
+          "correct": true,
+          "f4_ms_r2": 99484.88456899996,
+          "l": 5541095869,
+          "lin_ms_r2": 64813.04100699957,
+          "lin_muls": 4032563426,
+          "lin_muls_r2": 4032563426,
+          "relations": 31,
+          "rho_all_correct": true,
+          "rho_neg_runs": [
+            {
+              "correct": true,
+              "group_ops": 30019,
+              "s": 0.4032722968199264,
+              "seed": 1000,
+              "steps": 25438
+            },
+            {
+              "correct": true,
+              "group_ops": 26063,
+              "s": 0.3501277814723256,
+              "seed": 1001,
+              "steps": 21944
+            },
+            {
+              "correct": true,
+              "group_ops": 29153,
+              "s": 0.3916385378990411,
+              "seed": 1002,
+              "steps": 24580
+            },
+            {
+              "correct": true,
+              "group_ops": 79974,
+              "s": 1.074362859051827,
+              "seed": 1003,
+              "steps": 72163
+            }
+          ],
+          "rho_neg_s_mean": 0.55485036881078,
+          "rho_runs": [
+            {
+              "correct": true,
+              "group_ops": 72564,
+              "s": 0.9748176470382472,
+              "seed": 1000,
+              "steps": 69510
+            },
+            {
+              "correct": true,
+              "group_ops": 65695,
+              "s": 0.8825401758747815,
+              "seed": 1001,
+              "steps": 62668
+            },
+            {
+              "correct": true,
+              "group_ops": 96132,
+              "s": 1.2914278436288074,
+              "seed": 1002,
+              "steps": 93120
+            },
+            {
+              "correct": true,
+              "group_ops": 93680,
+              "s": 1.258487916522559,
+              "seed": 1003,
+              "steps": 90657
+            }
+          ],
+          "rho_s_mean": 1.1018183957660987,
+          "s": 731.5903153798725,
+          "s_over_rho": 663.9844807375855,
+          "s_over_rho_neg": 1318.536233377482,
+          "wall_ms_r2": 248456.541303
+        }
+      },
+      {
+        "fast": {
+          "correct": true,
+          "f4_ms_r2": 46697.29297399982,
+          "l": 5541066061,
+          "lin_ms_r2": 6166.4337749999995,
+          "lin_muls": 1792806416,
+          "lin_muls_r2": 2091016220,
+          "relations": 33,
+          "rho_all_correct": true,
+          "rho_neg_runs": [
+            {
+              "correct": true,
+              "group_ops": 27403,
+              "s": 0.36813019999439217,
+              "seed": 2000,
+              "steps": 22721
+            },
+            {
+              "correct": true,
+              "group_ops": 68319,
+              "s": 0.9177932026937516,
+              "seed": 2001,
+              "steps": 61752
+            },
+            {
+              "correct": true,
+              "group_ops": 46751,
+              "s": 0.6280500302863857,
+              "seed": 2002,
+              "steps": 41080
+            },
+            {
+              "correct": true,
+              "group_ops": 49567,
+              "s": 0.6658799993840834,
+              "seed": 2003,
+              "steps": 43165
+            }
+          ],
+          "rho_neg_s_mean": 0.6449633580896532,
+          "rho_runs": [
+            {
+              "correct": true,
+              "group_ops": 98587,
+              "s": 1.324411634742442,
+              "seed": 2000,
+              "steps": 95560
+            },
+            {
+              "correct": true,
+              "group_ops": 151878,
+              "s": 2.040319618828168,
+              "seed": 2001,
+              "steps": 148914
+            },
+            {
+              "correct": true,
+              "group_ops": 36182,
+              "s": 0.4860667407290113,
+              "seed": 2002,
+              "steps": 33130
+            },
+            {
+              "correct": true,
+              "group_ops": 55981,
+              "s": 0.752045277009308,
+              "seed": 2003,
+              "steps": 52987
+            }
+          ],
+          "rho_s_mean": 1.1507108178272323,
+          "s": 326.4508194390116,
+          "s_over_rho": 283.6949252423078,
+          "s_over_rho_neg": 506.15405564424833,
+          "wall_ms_r2": 136432.91814899998
+        },
+        "lin_ms_ratio_sparse_over_fast": 4.791544083679052,
+        "p": 53,
+        "s_ratio_sparse_over_fast": 1.0071791775640735,
+        "seed": 2,
+        "sparse": {
+          "correct": true,
+          "f4_ms_r2": 44691.68948500012,
+          "l": 5541066061,
+          "lin_ms_r2": 29546.73927199993,
+          "lin_muls": 1850552151,
+          "lin_muls_r2": 1850552151,
+          "relations": 33,
+          "rho_all_correct": true,
+          "rho_neg_runs": [
+            {
+              "correct": true,
+              "group_ops": 27403,
+              "s": 0.36813019999439217,
+              "seed": 2000,
+              "steps": 22721
+            },
+            {
+              "correct": true,
+              "group_ops": 68319,
+              "s": 0.9177932026937516,
+              "seed": 2001,
+              "steps": 61752
+            },
+            {
+              "correct": true,
+              "group_ops": 46751,
+              "s": 0.6280500302863857,
+              "seed": 2002,
+              "steps": 41080
+            },
+            {
+              "correct": true,
+              "group_ops": 49567,
+              "s": 0.6658799993840834,
+              "seed": 2003,
+              "steps": 43165
+            }
+          ],
+          "rho_neg_s_mean": 0.6449633580896532,
+          "rho_runs": [
+            {
+              "correct": true,
+              "group_ops": 98587,
+              "s": 1.324411634742442,
+              "seed": 2000,
+              "steps": 95560
+            },
+            {
+              "correct": true,
+              "group_ops": 151878,
+              "s": 2.040319618828168,
+              "seed": 2001,
+              "steps": 148914
+            },
+            {
+              "correct": true,
+              "group_ops": 36182,
+              "s": 0.4860667407290113,
+              "seed": 2002,
+              "steps": 33130
+            },
+            {
+              "correct": true,
+              "group_ops": 55981,
+              "s": 0.752045277009308,
+              "seed": 2003,
+              "steps": 52987
+            }
+          ],
+          "rho_s_mean": 1.1507108178272323,
+          "s": 328.7944678377016,
+          "s_over_rho": 285.73162148464894,
+          "s_over_rho_neg": 509.78782548449436,
+          "wall_ms_r2": 135747.75986299998
+        }
+      },
+      {
+        "fast": {
+          "correct": true,
+          "f4_ms_r2": 227881.47459699752,
+          "l": 265379898941,
+          "lin_ms_r2": 22610.960031999788,
+          "lin_muls": 7789106118,
+          "lin_muls_r2": 9391496686,
+          "relations": 53,
+          "rho_all_correct": true,
+          "rho_neg_runs": [
+            {
+              "correct": true,
+              "group_ops": 494344,
+              "s": 0.9596110829598248,
+              "seed": 1000,
+              "steps": 463803
+            },
+            {
+              "correct": true,
+              "group_ops": 292134,
+              "s": 0.5670849127518195,
+              "seed": 1001,
+              "steps": 271096
+            },
+            {
+              "correct": true,
+              "group_ops": 517042,
+              "s": 1.0036720048300651,
+              "seed": 1002,
+              "steps": 481005
+            },
+            {
+              "correct": true,
+              "group_ops": 114448,
+              "s": 0.22216426056063396,
+              "seed": 1003,
+              "steps": 103918
+            }
+          ],
+          "rho_neg_s_mean": 0.6881330652755858,
+          "rho_runs": [
+            {
+              "correct": true,
+              "group_ops": 820156,
+              "s": 1.592071082800637,
+              "seed": 1000,
+              "steps": 816588
+            },
+            {
+              "correct": true,
+              "group_ops": 815636,
+              "s": 1.583296945570331,
+              "seed": 1001,
+              "steps": 812089
+            },
+            {
+              "correct": true,
+              "group_ops": 1029646,
+              "s": 1.998729049255684,
+              "seed": 1002,
+              "steps": 1026027
+            },
+            {
+              "correct": true,
+              "group_ops": 389700,
+              "s": 0.7564781589934211,
+              "seed": 1003,
+              "steps": 386105
+            }
+          ],
+          "rho_s_mean": 1.482643809155018,
+          "s": 220.41995052599782,
+          "s_over_rho": 148.6668268972968,
+          "s_over_rho_neg": 320.3158831464134,
+          "wall_ms_r2": 75673.62124800001
+        },
+        "lin_ms_ratio_sparse_over_fast": 7.163736026942724,
+        "p": 101,
+        "s_ratio_sparse_over_fast": 1.018089954479123,
+        "seed": 1,
+        "sparse": {
+          "correct": true,
+          "f4_ms_r2": 257699.55454599916,
+          "l": 265379898941,
+          "lin_ms_r2": 161978.9489849989,
+          "lin_muls": 8469015112,
+          "lin_muls_r2": 8469015112,
+          "relations": 53,
+          "rho_all_correct": true,
+          "rho_neg_runs": [
+            {
+              "correct": true,
+              "group_ops": 494344,
+              "s": 0.9596110829598248,
+              "seed": 1000,
+              "steps": 463803
+            },
+            {
+              "correct": true,
+              "group_ops": 292134,
+              "s": 0.5670849127518195,
+              "seed": 1001,
+              "steps": 271096
+            },
+            {
+              "correct": true,
+              "group_ops": 517042,
+              "s": 1.0036720048300651,
+              "seed": 1002,
+              "steps": 481005
+            },
+            {
+              "correct": true,
+              "group_ops": 114448,
+              "s": 0.22216426056063396,
+              "seed": 1003,
+              "steps": 103918
+            }
+          ],
+          "rho_neg_s_mean": 0.6881330652755858,
+          "rho_runs": [
+            {
+              "correct": true,
+              "group_ops": 820156,
+              "s": 1.592071082800637,
+              "seed": 1000,
+              "steps": 816588
+            },
+            {
+              "correct": true,
+              "group_ops": 815636,
+              "s": 1.583296945570331,
+              "seed": 1001,
+              "steps": 812089
+            },
+            {
+              "correct": true,
+              "group_ops": 1029646,
+              "s": 1.998729049255684,
+              "seed": 1002,
+              "steps": 1026027
+            },
+            {
+              "correct": true,
+              "group_ops": 389700,
+              "s": 0.7564781589934211,
+              "seed": 1003,
+              "steps": 386105
+            }
+          ],
+          "rho_s_mean": 1.482643809155018,
+          "s": 224.4073373973037,
+          "s_over_rho": 151.35620302842457,
+          "s_over_rho_neg": 326.11038289147217,
+          "wall_ms_r2": 121007.229161
+        }
+      },
+      {
+        "fast": {
+          "correct": true,
+          "f4_ms_r2": 374292.2038160043,
+          "l": 265380442529,
+          "lin_ms_r2": 36489.656485999854,
+          "lin_muls": 12614871718,
+          "lin_muls_r2": 15231211472,
+          "relations": 50,
+          "rho_all_correct": true,
+          "rho_neg_runs": [
+            {
+              "correct": true,
+              "group_ops": 941455,
+              "s": 1.827532501341654,
+              "seed": 2000,
+              "steps": 880094
+            },
+            {
+              "correct": true,
+              "group_ops": 750275,
+              "s": 1.4564179354765865,
+              "seed": 2001,
+              "steps": 703294
+            },
+            {
+              "correct": true,
+              "group_ops": 509440,
+              "s": 0.9889141355492216,
+              "seed": 2002,
+              "steps": 476363
+            },
+            {
+              "correct": true,
+              "group_ops": 675249,
+              "s": 1.3107790536971504,
+              "seed": 2003,
+              "steps": 630779
+            }
+          ],
+          "rho_neg_s_mean": 1.395910906516153,
+          "rho_runs": [
+            {
+              "correct": true,
+              "group_ops": 531554,
+              "s": 1.0318413638656778,
+              "seed": 2000,
+              "steps": 527948
+            },
+            {
+              "correct": true,
+              "group_ops": 1087236,
+              "s": 2.110519490181362,
+              "seed": 2001,
+              "steps": 1083644
+            },
+            {
+              "correct": true,
+              "group_ops": 456124,
+              "s": 0.8854182458449535,
+              "seed": 2002,
+              "steps": 452530
+            },
+            {
+              "correct": true,
+              "group_ops": 499685,
+              "s": 0.9699779362082144,
+              "seed": 2003,
+              "steps": 496095
+            }
+          ],
+          "rho_s_mean": 1.249439259025052,
+          "s": 359.01900198904696,
+          "s_over_rho": 287.34410208079464,
+          "s_over_rho_neg": 257.19334974254855,
+          "wall_ms_r2": 119276.988163
+        },
+        "lin_ms_ratio_sparse_over_fast": 6.04821383157379,
+        "p": 101,
+        "s_ratio_sparse_over_fast": 1.0179480713020819,
+        "seed": 2,
+        "sparse": {
+          "correct": true,
+          "f4_ms_r2": 362497.3760940035,
+          "l": 265380442529,
+          "lin_ms_r2": 220697.24506800057,
+          "lin_muls": 13713620020,
+          "lin_muls_r2": 13713620020,
+          "relations": 50,
+          "rho_all_correct": true,
+          "rho_neg_runs": [
+            {
+              "correct": true,
+              "group_ops": 941455,
+              "s": 1.827532501341654,
+              "seed": 2000,
+              "steps": 880094
+            },
+            {
+              "correct": true,
+              "group_ops": 750275,
+              "s": 1.4564179354765865,
+              "seed": 2001,
+              "steps": 703294
+            },
+            {
+              "correct": true,
+              "group_ops": 509440,
+              "s": 0.9889141355492216,
+              "seed": 2002,
+              "steps": 476363
+            },
+            {
+              "correct": true,
+              "group_ops": 675249,
+              "s": 1.3107790536971504,
+              "seed": 2003,
+              "steps": 630779
+            }
+          ],
+          "rho_neg_s_mean": 1.395910906516153,
+          "rho_runs": [
+            {
+              "correct": true,
+              "group_ops": 531554,
+              "s": 1.0318413638656778,
+              "seed": 2000,
+              "steps": 527948
+            },
+            {
+              "correct": true,
+              "group_ops": 1087236,
+              "s": 2.110519490181362,
+              "seed": 2001,
+              "steps": 1083644
+            },
+            {
+              "correct": true,
+              "group_ops": 456124,
+              "s": 0.8854182458449535,
+              "seed": 2002,
+              "steps": 452530
+            },
+            {
+              "correct": true,
+              "group_ops": 499685,
+              "s": 0.9699779362082144,
+              "seed": 2003,
+              "steps": 496095
+            }
+          ],
+          "rho_s_mean": 1.249439259025052,
+          "s": 365.46270063554863,
+          "s_over_rho": 292.5013745131734,
+          "s_over_rho_neg": 261.8094743221491,
+          "wall_ms_r2": 164311.09423999998
+        }
+      }
+    ],
+    "host_a_dense_over_fast": {
+      "dense": {
+        "ci95": [
+          21.756905758172188,
+          29.146112180714713
+        ],
+        "counted_candidates": {
+          "L dense/L fast (pre-fix counter)": {
+            "geomean": 4.144548594322052,
+            "max": 14.173598774611477,
+            "min": 2.2097573005075932
+          },
+          "L dense/R3 fast": {
+            "geomean": 4.58805699082197,
+            "max": 16.02355346632814,
+            "min": 2.6400441934691874
+          },
+          "L sparse/L fast (pre-fix counter)": {
+            "geomean": 1.30601963889205,
+            "max": 1.8953747048627698,
+            "min": 0.9182754374022589
+          },
+          "R2 sparse/R2 fast": {
+            "geomean": 1.30601963889205,
+            "max": 1.8953747048627698,
+            "min": 0.9182754374022589
+          }
+        },
+        "delta": [
+          32,
+          1024
+        ],
+        "geomean": 25.169329210069563,
+        "max": 133.2146472216129,
+        "median_ms": {
+          "dense": 81.451972,
+          "fast": 3.154469
+        },
+        "min": 4.7416556362465565,
+        "n": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "p": [
+          65521,
+          2147483647,
+          4294967291
+        ],
+        "systems": 142
+      },
+      "gaudry-d4": {
+        "ci95": [
+          33.8092166959777,
+          62.75382790215648
+        ],
+        "counted_candidates": {
+          "L dense/L fast (pre-fix counter)": {
+            "geomean": 5.6795849943548005,
+            "max": 16.322230745063766,
+            "min": 0.9572155859889916
+          },
+          "L dense/R3 fast": {
+            "geomean": 6.409292608629437,
+            "max": 18.520524141537244,
+            "min": 0.9572155859889916
+          },
+          "L sparse/L fast (pre-fix counter)": {
+            "geomean": 0.9293897504329962,
+            "max": 1.3577137625653246,
+            "min": 0.8036718853334038
+          },
+          "R2 sparse/R2 fast": {
+            "geomean": 0.9293897504329962,
+            "max": 1.3577137625653246,
+            "min": 0.8036718853334038
+          }
+        },
+        "delta": [
+          512,
+          512
+        ],
+        "geomean": 49.52927297897765,
+        "max": 116.27316500269048,
+        "median_ms": {
+          "dense": 596.259645,
+          "fast": 11.852483
+        },
+        "min": 1.0308702425562684,
+        "n": [
+          5
+        ],
+        "p": [
+          97,
+          1033,
+          4093
+        ],
+        "systems": 24
+      },
+      "gaudry-s4": {
+        "ci95": [
+          7.786765056993359,
+          8.32292598085873
+        ],
+        "counted_candidates": {
+          "L dense/L fast (pre-fix counter)": {
+            "geomean": 2.235854157113531,
+            "max": 3.2552957177232407,
+            "min": 1.6898511200779185
+          },
+          "L dense/R3 fast": {
+            "geomean": 2.8993982823409237,
+            "max": 4.22798724146809,
+            "min": 2.2011628412765156
+          },
+          "L sparse/L fast (pre-fix counter)": {
+            "geomean": 0.9736189993412887,
+            "max": 1.223361675653256,
+            "min": 0.8437877104316762
+          },
+          "R2 sparse/R2 fast": {
+            "geomean": 0.9736189993412887,
+            "max": 1.223361675653256,
+            "min": 0.8437877104316762
+          }
+        },
+        "delta": [
+          64,
+          64
+        ],
+        "geomean": 8.024100505397438,
+        "max": 10.566790270006921,
+        "median_ms": {
+          "dense": 1.7638790000000002,
+          "fast": 0.215546
+        },
+        "min": 7.098050248994176,
+        "n": [
+          3
+        ],
+        "p": [
+          271,
+          1039,
+          8191
+        ],
+        "systems": 24
+      },
+      "jv-nagao": {
+        "ci95": [
+          9.557354045464802,
+          10.571146788005219
+        ],
+        "counted_candidates": {
+          "L dense/L fast (pre-fix counter)": {
+            "geomean": 2.2251767380439706,
+            "max": 4.566882428982775,
+            "min": 1.5294296941675185
+          },
+          "L dense/R3 fast": {
+            "geomean": 2.692865603340701,
+            "max": 5.493729228420013,
+            "min": 1.841623236195886
+          },
+          "L sparse/L fast (pre-fix counter)": {
+            "geomean": 0.9332577991980155,
+            "max": 1.1012713722051732,
+            "min": 0.816544434857636
+          },
+          "R2 sparse/R2 fast": {
+            "geomean": 0.9332577991980155,
+            "max": 1.1012713722051732,
+            "min": 0.816544434857636
+          }
+        },
+        "delta": [
+          64,
+          64
+        ],
+        "geomean": 10.030507888223216,
+        "max": 16.445973688778864,
+        "median_ms": {
+          "dense": 2.883096,
+          "fast": 0.267354
+        },
+        "min": 6.696979230437838,
+        "n": [
+          6
+        ],
+        "p": [
+          53,
+          101,
+          251,
+          1009
+        ],
+        "systems": 48
+      }
+    },
+    "host_a_sparse_over_fast": {
+      "dense": {
+        "ci95": [
+          8.136404945099208,
+          9.421293493135044
+        ],
+        "counted_candidates": {
+          "L sparse/L fast (pre-fix counter)": {
+            "geomean": 1.30601963889205,
+            "max": 1.8953747048627698,
+            "min": 0.9182754374022589
+          },
+          "R3 sparse/R3 fast": {
+            "geomean": 1.445686754370427,
+            "max": 2.1419074866063763,
+            "min": 0.9919394953520605
+          }
+        },
+        "delta": [
+          32,
+          1024
+        ],
+        "geomean": 8.754526299327093,
+        "max": 18.62470814671622,
+        "median_ms": {
+          "fast": 3.154469,
+          "sparse": 30.795322
+        },
+        "min": 3.1782992880907237,
+        "n": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "p": [
+          65521,
+          2147483647,
+          4294967291
+        ],
+        "systems": 142
+      },
+      "gaudry-d4": {
+        "ci95": [
+          6.736245240792423,
+          9.040844765532828
+        ],
+        "counted_candidates": {
+          "L sparse/L fast (pre-fix counter)": {
+            "geomean": 0.9293897504329962,
+            "max": 1.3577137625653246,
+            "min": 0.8036718853334038
+          },
+          "R3 sparse/R3 fast": {
+            "geomean": 1.0487968511619825,
+            "max": 1.563712536385271,
+            "min": 0.8957528535901133
+          }
+        },
+        "delta": [
+          512,
+          512
+        ],
+        "geomean": 8.142576616359381,
+        "max": 10.131586142685245,
+        "median_ms": {
+          "fast": 11.852483,
+          "sparse": 101.705855
+        },
+        "min": 1.0748552002820946,
+        "n": [
+          5
+        ],
+        "p": [
+          97,
+          1033,
+          4093
+        ],
+        "systems": 24
+      },
+      "gaudry-s4": {
+        "ci95": [
+          3.6480586666172385,
+          3.948482502730756
+        ],
+        "counted_candidates": {
+          "L sparse/L fast (pre-fix counter)": {
+            "geomean": 0.9736189993412887,
+            "max": 1.223361675653256,
+            "min": 0.8437877104316762
+          },
+          "R3 sparse/R3 fast": {
+            "geomean": 1.2625641280596647,
+            "max": 1.5380433719861555,
+            "min": 1.1241951273867608
+          }
+        },
+        "delta": [
+          64,
+          64
+        ],
+        "geomean": 3.79070177537984,
+        "max": 4.534438848195538,
+        "median_ms": {
+          "fast": 0.215546,
+          "sparse": 0.789224
+        },
+        "min": 3.0914560581608512,
+        "n": [
+          3
+        ],
+        "p": [
+          271,
+          1039,
+          8191
+        ],
+        "systems": 24
+      },
+      "jv-nagao": {
+        "ci95": [
+          3.914939523854433,
+          4.112120118193245
+        ],
+        "counted_candidates": {
+          "L sparse/L fast (pre-fix counter)": {
+            "geomean": 0.9332577991980155,
+            "max": 1.1012713722051732,
+            "min": 0.816544434857636
+          },
+          "R3 sparse/R3 fast": {
+            "geomean": 1.1294104344803366,
+            "max": 1.3191839323048264,
+            "min": 0.9832189943818639
+          }
+        },
+        "delta": [
+          64,
+          64
+        ],
+        "geomean": 4.012966605486915,
+        "max": 5.039972237834248,
+        "median_ms": {
+          "fast": 0.267354,
+          "sparse": 1.08614
+        },
+        "min": 3.285730094294018,
+        "n": [
+          6
+        ],
+        "p": [
+          53,
+          101,
+          251,
+          1009
+        ],
+        "systems": 48
+      }
+    },
+    "portable_over_simd_fast": {
+      "dense": 1.829321924139848,
+      "gaudry-d4": 2.1637098637966847,
+      "gaudry-s4": 1.0420639980742101,
+      "gaudry-s5": 4.01268034004777,
+      "jv-nagao": 1.151864124747278
+    },
+    "sparse_over_fast": {
+      "dense": {
+        "ci95": [
+          18.285024475710635,
+          21.71378449752206
+        ],
+        "counted_candidates": {
+          "R2 sparse/R2 fast": {
+            "geomean": 1.2872020537041071,
+            "max": 1.8953747048627698,
+            "min": 0.9182754374022589
+          },
+          "R3 sparse/R3 fast": {
+            "geomean": 1.4185436655879755,
+            "max": 2.1419074866063763,
+            "min": 0.9919394953520605
+          }
+        },
+        "delta": [
+          32,
+          1024
+        ],
+        "geomean": 19.983541554858274,
+        "max": 43.608290945418744,
+        "median_ms": {
+          "fast": 4.6402350000000006,
+          "sparse": 104.055317
+        },
+        "min": 5.331117143273449,
+        "n": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "p": [
+          65521,
+          2147483647,
+          4294967291
+        ],
+        "systems": 153
+      },
+      "gaudry-d4": {
+        "ci95": [
+          13.715750009399498,
+          20.46527330555246
+        ],
+        "counted_candidates": {
+          "R2 sparse/R2 fast": {
+            "geomean": 0.9293897504329962,
+            "max": 1.3577137625653246,
+            "min": 0.8036718853334038
+          },
+          "R3 sparse/R3 fast": {
+            "geomean": 1.0487968511619825,
+            "max": 1.563712536385271,
+            "min": 0.8957528535901133
+          }
+        },
+        "delta": [
+          512,
+          512
+        ],
+        "geomean": 17.75725484720826,
+        "max": 23.79882849596699,
+        "median_ms": {
+          "fast": 16.501495000000002,
+          "sparse": 312.958741
+        },
+        "min": 1.0632290429832367,
+        "n": [
+          5
+        ],
+        "p": [
+          97,
+          1033,
+          4093
+        ],
+        "systems": 24
+      },
+      "gaudry-s4": {
+        "ci95": [
+          6.8018922736344,
+          7.490165580544862
+        ],
+        "counted_candidates": {
+          "R2 sparse/R2 fast": {
+            "geomean": 0.9736189993412887,
+            "max": 1.223361675653256,
+            "min": 0.8437877104316762
+          },
+          "R3 sparse/R3 fast": {
+            "geomean": 1.2625641280596647,
+            "max": 1.5380433719861555,
+            "min": 1.1241951273867608
+          }
+        },
+        "delta": [
+          64,
+          64
+        ],
+        "geomean": 7.125250080245272,
+        "max": 8.969096132161068,
+        "median_ms": {
+          "fast": 0.31793899999999997,
+          "sparse": 2.212465
+        },
+        "min": 5.870923118010148,
+        "n": [
+          3
+        ],
+        "p": [
+          271,
+          1039,
+          8191
+        ],
+        "systems": 24
+      },
+      "gaudry-s5": {
+        "ci95": [
+          42.77354774392785,
+          47.18696558110795
+        ],
+        "counted_candidates": {
+          "R2 sparse/R2 fast": {
+            "geomean": 0.8180219471611371,
+            "max": 0.8787116917235726,
+            "min": 0.7628406567857194
+          },
+          "R3 sparse/R3 fast": {
+            "geomean": 0.8257383995415543,
+            "max": 0.8878251758449233,
+            "min": 0.7693416203852346
+          }
+        },
+        "delta": [
+          4096,
+          4096
+        ],
+        "geomean": 45.50574223424722,
+        "max": 47.38147481450196,
+        "median_ms": {
+          "fast": 4848.751901,
+          "sparse": 229741.016079
+        },
+        "min": 41.5196484505976,
+        "n": [
+          4
+        ],
+        "p": [
+          13,
+          101
+        ],
+        "systems": 4
+      },
+      "jv-nagao": {
+        "ci95": [
+          7.428670323601741,
+          7.7834625993169375
+        ],
+        "counted_candidates": {
+          "R2 sparse/R2 fast": {
+            "geomean": 0.9332577991980155,
+            "max": 1.1012713722051732,
+            "min": 0.816544434857636
+          },
+          "R3 sparse/R3 fast": {
+            "geomean": 1.1294104344803366,
+            "max": 1.3191839323048264,
+            "min": 0.9832189943818639
+          }
+        },
+        "delta": [
+          64,
+          64
+        ],
+        "geomean": 7.601670505589695,
+        "max": 8.952661475379001,
+        "median_ms": {
+          "fast": 0.39534,
+          "sparse": 3.054797
+        },
+        "min": 5.797423899878038,
+        "n": [
+          6
+        ],
+        "p": [
+          53,
+          101,
+          251,
+          1009
+        ],
+        "systems": 48
+      }
+    }
+  },
+  "rho_reference": {
+    "ic_unpriced": "not emitted (F_p additions, hash lookups, F4 symbolic work); IC S at w > 0 is a lower bound",
+    "order": "rho_neg below both IC arms at every weight (IC lower bound > rho_neg upper bound)",
+    "order_holds_across_band": true,
+    "per_instance": [
+      {
+        "by_weight": {
+          "0": {
+            "ic_fast_lower_bound": 727.1174163750129,
+            "ic_fast_over_rho_neg_hi": 1310.474782477762,
+            "ic_fast_over_rho_neg_lo": 1310.474782477762,
+            "ic_sparse_lower_bound": 731.5903153798725,
+            "rho_neg_hi": 0.55485036881078,
+            "rho_neg_lo": 0.55485036881078
+          },
+          "0.1": {
+            "ic_fast_lower_bound": 727.1174163750129,
+            "ic_fast_over_rho_neg_hi": 788.6283811442481,
+            "ic_fast_over_rho_neg_lo": 912.4662183969358,
+            "ic_sparse_lower_bound": 731.5903153798725,
+            "rho_neg_hi": 0.9220025981312177,
+            "rho_neg_lo": 0.7968705051376559
+          },
+          "1": {
+            "ic_fast_lower_bound": 727.1174163750129,
+            "ic_fast_over_rho_neg_hi": 172.04290168494506,
+            "ic_fast_over_rho_neg_lo": 244.40496564634972,
+            "ic_sparse_lower_bound": 731.5903153798725,
+            "rho_neg_hi": 4.226372662015155,
+            "rho_neg_lo": 2.975051732079539
+          }
+        },
+        "fast_S": 727.1174163750129,
+        "fast_S_over_rho_neg": 1310.474782477762,
+        "p": 53,
+        "rho_S_mean": 1.1018183957660987,
+        "rho_neg_S_mean": 0.55485036881078,
+        "rho_neg_steps_over_sqrt_l": 0.4840402726537517,
+        "seed": 1,
+        "sparse_S": 731.5903153798725
+      },
+      {
+        "by_weight": {
+          "0": {
+            "ic_fast_lower_bound": 326.4508194390116,
+            "ic_fast_over_rho_neg_hi": 506.15405564424833,
+            "ic_fast_over_rho_neg_lo": 506.15405564424833,
+            "ic_sparse_lower_bound": 328.7944678377016,
+            "rho_neg_hi": 0.6449633580896532,
+            "rho_neg_lo": 0.6449633580896532
+          },
+          "0.1": {
+            "ic_fast_lower_bound": 326.4508194390116,
+            "ic_fast_over_rho_neg_hi": 304.2582993216965,
+            "ic_fast_over_rho_neg_lo": 351.6721292259431,
+            "ic_sparse_lower_bound": 328.7944678377016,
+            "rho_neg_hi": 1.072939736292454,
+            "rho_neg_lo": 0.9282817497012188
+          },
+          "1": {
+            "ic_fast_lower_bound": 326.4508194390116,
+            "ic_fast_over_rho_neg_hi": 66.28810290415646,
+            "ic_fast_over_rho_neg_lo": 93.85767585520065,
+            "ic_sparse_lower_bound": 328.7944678377016,
+            "rho_neg_hi": 4.9247271401176596,
+            "rho_neg_lo": 3.478147274205309
+          }
+        },
+        "fast_S": 326.4508194390116,
+        "fast_S_over_rho_neg": 506.15405564424833,
+        "p": 53,
+        "rho_S_mean": 1.1507108178272323,
+        "rho_neg_S_mean": 0.6449633580896532,
+        "rho_neg_steps_over_sqrt_l": 0.5666367832231312,
+        "seed": 2,
+        "sparse_S": 328.7944678377016
+      },
+      {
+        "by_weight": {
+          "0": {
+            "ic_fast_lower_bound": 220.41995052599782,
+            "ic_fast_over_rho_neg_hi": 320.3158831464134,
+            "ic_fast_over_rho_neg_lo": 320.3158831464134,
+            "ic_sparse_lower_bound": 224.4073373973037,
+            "rho_neg_hi": 0.6881330652755858,
+            "rho_neg_lo": 0.6881330652755858
+          },
+          "0.1": {
+            "ic_fast_lower_bound": 220.41995052599782,
+            "ic_fast_over_rho_neg_hi": 190.75105154821748,
+            "ic_fast_over_rho_neg_lo": 218.58716132813964,
+            "ic_sparse_lower_bound": 224.4073373973037,
+            "rho_neg_hi": 1.1555372761354383,
+            "rho_neg_lo": 1.0083847065249492
+          },
+          "1": {
+            "ic_fast_lower_bound": 220.41995052599782,
+            "ic_fast_over_rho_neg_hi": 41.106443444805805,
+            "ic_fast_over_rho_neg_lo": 56.65376739422437,
+            "ic_sparse_lower_bound": 224.4073373973037,
+            "rho_neg_hi": 5.3621751738741095,
+            "rho_neg_lo": 3.8906494777692187
+          }
+        },
+        "fast_S": 220.41995052599782,
+        "fast_S_over_rho_neg": 320.3158831464134,
+        "p": 101,
+        "rho_S_mean": 1.482643809155018,
+        "rho_neg_S_mean": 0.6881330652755858,
+        "rho_neg_steps_over_sqrt_l": 0.6405032824987266,
+        "seed": 1,
+        "sparse_S": 224.4073373973037
+      },
+      {
+        "by_weight": {
+          "0": {
+            "ic_fast_lower_bound": 359.01900198904696,
+            "ic_fast_over_rho_neg_hi": 257.19334974254855,
+            "ic_fast_over_rho_neg_lo": 257.19334974254855,
+            "ic_sparse_lower_bound": 365.46270063554863,
+            "rho_neg_hi": 1.395910906516153,
+            "rho_neg_lo": 1.395910906516153
+          },
+          "0.1": {
+            "ic_fast_lower_bound": 359.01900198904696,
+            "ic_fast_over_rho_neg_hi": 153.0354894302546,
+            "ic_fast_over_rho_neg_lo": 175.23714183086932,
+            "ic_sparse_lower_bound": 365.46270063554863,
+            "rho_neg_hi": 2.3459852569208706,
+            "rho_neg_lo": 2.048760886179913
+          },
+          "1": {
+            "ic_fast_lower_bound": 359.01900198904696,
+            "ic_fast_over_rho_neg_hi": 32.94763589464766,
+            "ic_fast_over_rho_neg_lo": 45.30545114807904,
+            "ic_sparse_lower_bound": 365.46270063554863,
+            "rho_neg_hi": 10.896654410563325,
+            "rho_neg_lo": 7.924410703153752
+          }
+        },
+        "fast_S": 359.01900198904696,
+        "fast_S_over_rho_neg": 257.19334974254855,
+        "p": 101,
+        "rho_S_mean": 1.249439259025052,
+        "rho_neg_S_mean": 1.395910906516153,
+        "rho_neg_steps_over_sqrt_l": 1.3056999593275198,
+        "seed": 2,
+        "sparse_S": 365.46270063554863
+      }
+    ],
+    "pooled": {
+      "0": {
+        "ic_fast_mean_S_lower_bound": 408.25179708226733,
+        "ic_fast_over_rho_neg_hi": 497.2831767282213,
+        "ic_fast_over_rho_neg_lo": 497.2831767282213,
+        "ic_sparse_mean_S_lower_bound": 412.5637053126066,
+        "rho_neg_mean_S_hi": 0.820964424673043,
+        "rho_neg_mean_S_lo": 0.820964424673043
+      },
+      "0.1": {
+        "ic_fast_mean_S_lower_bound": 408.25179708226733,
+        "ic_fast_over_rho_neg_hi": 297.1013601834902,
+        "ic_fast_over_rho_neg_lo": 341.4691515225902,
+        "ic_sparse_mean_S_lower_bound": 412.5637053126066,
+        "rho_neg_mean_S_hi": 1.374116216869995,
+        "rho_neg_mean_S_lo": 1.1955744618859343
+      },
+      "1": {
+        "ic_fast_mean_S_lower_bound": 408.25179708226733,
+        "ic_fast_over_rho_neg_hi": 64.26649848118635,
+        "ic_fast_over_rho_neg_lo": 89.39041052540834,
+        "ic_sparse_mean_S_lower_bound": 412.5637053126066,
+        "rho_neg_mean_S_hi": 6.352482346642563,
+        "rho_neg_mean_S_lo": 4.567064796801954
+      }
+    },
+    "pooled_by_p": {
+      "p101": {
+        "by_weight": {
+          "0": {
+            "ic_fast_mean_S_lower_bound": 289.7194762575224,
+            "ic_fast_over_rho_neg_hi": 278.03585738014783,
+            "ic_fast_over_rho_neg_lo": 278.03585738014783,
+            "rho_neg_mean_S_hi": 1.0420219858958695,
+            "rho_neg_mean_S_lo": 1.0420219858958695
+          },
+          "0.1": {
+            "ic_fast_mean_S_lower_bound": 289.7194762575224,
+            "ic_fast_over_rho_neg_hi": 165.48200019986183,
+            "ic_fast_over_rho_neg_lo": 189.53593636421357,
+            "rho_neg_mean_S_hi": 1.7507612665281544,
+            "rho_neg_mean_S_lo": 1.5285727963524312
+          },
+          "1": {
+            "ic_fast_mean_S_lower_bound": 289.7194762575224,
+            "ic_fast_over_rho_neg_hi": 35.638417236974426,
+            "ic_fast_over_rho_neg_lo": 49.04240381700536,
+            "rho_neg_mean_S_hi": 8.129414792218716,
+            "rho_neg_mean_S_lo": 5.907530090461486
+          }
+        },
+        "instances": 2,
+        "rho_neg_runs": 8
+      },
+      "p53": {
+        "by_weight": {
+          "0": {
+            "ic_fast_mean_S_lower_bound": 526.7841179070123,
+            "ic_fast_over_rho_neg_hi": 878.1098367125576,
+            "ic_fast_over_rho_neg_lo": 878.1098367125576,
+            "rho_neg_mean_S_hi": 0.5999068634502166,
+            "rho_neg_mean_S_lo": 0.5999068634502166
+          },
+          "0.1": {
+            "ic_fast_mean_S_lower_bound": 526.7841179070123,
+            "ic_fast_over_rho_neg_hi": 528.1196441792865,
+            "ic_fast_over_rho_neg_lo": 610.7102911403177,
+            "rho_neg_mean_S_hi": 0.9974711672118357,
+            "rho_neg_mean_S_lo": 0.8625761274194372
+          },
+          "1": {
+            "ic_fast_mean_S_lower_bound": 526.7841179070123,
+            "ic_fast_over_rho_neg_hi": 115.13023118472306,
+            "ic_fast_over_rho_neg_lo": 163.26293901488887,
+            "rho_neg_mean_S_hi": 4.575549901066408,
+            "rho_neg_mean_S_lo": 3.226599503142424
+          }
+        },
+        "instances": 2,
+        "rho_neg_runs": 8
+      }
+    },
+    "pooled_rho_neg_runs": 16,
+    "pooled_rho_neg_steps_over_sqrt_l": 0.7492200744257823,
+    "reference": "rho_e_neg (JV_RHO_NEG=1), same jv_cover process and Spec as the index calculus, after its clock",
+    "rho_neg_unpriced_bounds": "per step: 1 lookup + 1 insert + 1 partition hash; per candidate addition: 1 canonicalisation + 1 hash + 2 coefficient updates; u_lo = 5 steps, u_hi = 3 steps + 4 group_ops (derived from emitted steps and group_ops; the binary emits no unpriced counter)",
+    "theory_negation_rho_steps_over_sqrt_l": 0.8862269254527579,
+    "unit": "group additions on E(F_{p^6}) per sqrt(l): IC = counted F_p muls / (c_add_E sqrt l), c_add_E = measured F_p muls of one E addition; rho = counted group operations (additions and doublings, setup included) / sqrt(l)"
+  },
+  "schema": "postgb-la-validator-report/v2",
+  "snapshot_commit": "6f356f71ef8b5392fe27da22170b914e37109390",
+  "status": "pass",
+  "stochastic_ci_comparison": [
+    {
+      "claimed": 18.285024475710635,
+      "name": "sparse_over_fast.dense.ci95[0]",
+      "recomputed_own_bootstrap": 18.285024475710635,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 21.71378449752206,
+      "name": "sparse_over_fast.dense.ci95[1]",
+      "recomputed_own_bootstrap": 21.71378449752206,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 13.715750009399498,
+      "name": "sparse_over_fast.gaudry-d4.ci95[0]",
+      "recomputed_own_bootstrap": 13.715750009399498,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 20.46527330555246,
+      "name": "sparse_over_fast.gaudry-d4.ci95[1]",
+      "recomputed_own_bootstrap": 20.46527330555246,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 6.8018922736344,
+      "name": "sparse_over_fast.gaudry-s4.ci95[0]",
+      "recomputed_own_bootstrap": 6.8018922736344,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 7.490165580544862,
+      "name": "sparse_over_fast.gaudry-s4.ci95[1]",
+      "recomputed_own_bootstrap": 7.490165580544862,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 42.77354774392785,
+      "name": "sparse_over_fast.gaudry-s5.ci95[0]",
+      "recomputed_own_bootstrap": 42.77354774392785,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 47.18696558110795,
+      "name": "sparse_over_fast.gaudry-s5.ci95[1]",
+      "recomputed_own_bootstrap": 47.18696558110795,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 7.428670323601741,
+      "name": "sparse_over_fast.jv-nagao.ci95[0]",
+      "recomputed_own_bootstrap": 7.428670323601741,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 7.7834625993169375,
+      "name": "sparse_over_fast.jv-nagao.ci95[1]",
+      "recomputed_own_bootstrap": 7.7834625993169375,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 51.228832253751555,
+      "name": "dense_over_fast.dense.ci95[0]",
+      "recomputed_own_bootstrap": 51.228832253751555,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 71.80300239881532,
+      "name": "dense_over_fast.dense.ci95[1]",
+      "recomputed_own_bootstrap": 71.80300239881532,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 69.41714468695375,
+      "name": "dense_over_fast.gaudry-d4.ci95[0]",
+      "recomputed_own_bootstrap": 69.41714468695375,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 144.02609383434066,
+      "name": "dense_over_fast.gaudry-d4.ci95[1]",
+      "recomputed_own_bootstrap": 144.02609383434066,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 14.069511773376718,
+      "name": "dense_over_fast.gaudry-s4.ci95[0]",
+      "recomputed_own_bootstrap": 14.069511773376718,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 15.03741605126711,
+      "name": "dense_over_fast.gaudry-s4.ci95[1]",
+      "recomputed_own_bootstrap": 15.03741605126711,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 16.94200867914409,
+      "name": "dense_over_fast.jv-nagao.ci95[0]",
+      "recomputed_own_bootstrap": 16.94200867914409,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 19.006057522332345,
+      "name": "dense_over_fast.jv-nagao.ci95[1]",
+      "recomputed_own_bootstrap": 19.006057522332345,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 10.72860968273038,
+      "name": "ablation_sparse_over_portable_fast.dense.ci95[0]",
+      "recomputed_own_bootstrap": 10.728609682730381,
+      "rel_diff": 1.6557195125288367e-16
+    },
+    {
+      "claimed": 11.466704772312283,
+      "name": "ablation_sparse_over_portable_fast.dense.ci95[1]",
+      "recomputed_own_bootstrap": 11.466704772312283,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 6.874329461633194,
+      "name": "ablation_sparse_over_portable_fast.gaudry-d4.ci95[0]",
+      "recomputed_own_bootstrap": 6.874329461633194,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 9.324825244498308,
+      "name": "ablation_sparse_over_portable_fast.gaudry-d4.ci95[1]",
+      "recomputed_own_bootstrap": 9.324825244498308,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 6.433177439006943,
+      "name": "ablation_sparse_over_portable_fast.gaudry-s4.ci95[0]",
+      "recomputed_own_bootstrap": 6.433177439006943,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 7.122383961828196,
+      "name": "ablation_sparse_over_portable_fast.gaudry-s4.ci95[1]",
+      "recomputed_own_bootstrap": 7.122383961828196,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 8.883270934250593,
+      "name": "ablation_sparse_over_portable_fast.gaudry-s5.ci95[0]",
+      "recomputed_own_bootstrap": 8.883270934250593,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 10.435400909436517,
+      "name": "ablation_sparse_over_portable_fast.gaudry-s5.ci95[1]",
+      "recomputed_own_bootstrap": 10.435400909436515,
+      "rel_diff": 1.7022411068020661e-16
+    },
+    {
+      "claimed": 6.1270996022792374,
+      "name": "ablation_sparse_over_portable_fast.jv-nagao.ci95[0]",
+      "recomputed_own_bootstrap": 6.1270996022792374,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 6.4823081673072105,
+      "name": "ablation_sparse_over_portable_fast.jv-nagao.ci95[1]",
+      "recomputed_own_bootstrap": 6.4823081673072105,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 8.136404945099212,
+      "name": "host_a_sparse_over_fast.dense.ci95[0]",
+      "recomputed_own_bootstrap": 8.136404945099208,
+      "rel_diff": 4.366441570660026e-16
+    },
+    {
+      "claimed": 9.421293493135044,
+      "name": "host_a_sparse_over_fast.dense.ci95[1]",
+      "recomputed_own_bootstrap": 9.421293493135044,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 6.736245240792423,
+      "name": "host_a_sparse_over_fast.gaudry-d4.ci95[0]",
+      "recomputed_own_bootstrap": 6.736245240792423,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 9.040844765532828,
+      "name": "host_a_sparse_over_fast.gaudry-d4.ci95[1]",
+      "recomputed_own_bootstrap": 9.040844765532828,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 3.6480586666172385,
+      "name": "host_a_sparse_over_fast.gaudry-s4.ci95[0]",
+      "recomputed_own_bootstrap": 3.6480586666172385,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 3.948482502730756,
+      "name": "host_a_sparse_over_fast.gaudry-s4.ci95[1]",
+      "recomputed_own_bootstrap": 3.948482502730756,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 3.914939523854433,
+      "name": "host_a_sparse_over_fast.jv-nagao.ci95[0]",
+      "recomputed_own_bootstrap": 3.914939523854433,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 4.112120118193245,
+      "name": "host_a_sparse_over_fast.jv-nagao.ci95[1]",
+      "recomputed_own_bootstrap": 4.112120118193245,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 21.756905758172188,
+      "name": "host_a_dense_over_fast.dense.ci95[0]",
+      "recomputed_own_bootstrap": 21.756905758172188,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 29.146112180714713,
+      "name": "host_a_dense_over_fast.dense.ci95[1]",
+      "recomputed_own_bootstrap": 29.146112180714713,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 33.80921669597773,
+      "name": "host_a_dense_over_fast.gaudry-d4.ci95[0]",
+      "recomputed_own_bootstrap": 33.8092166959777,
+      "rel_diff": 8.406497460730975e-16
+    },
+    {
+      "claimed": 62.75382790215648,
+      "name": "host_a_dense_over_fast.gaudry-d4.ci95[1]",
+      "recomputed_own_bootstrap": 62.75382790215648,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 7.786765056993359,
+      "name": "host_a_dense_over_fast.gaudry-s4.ci95[0]",
+      "recomputed_own_bootstrap": 7.786765056993359,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 8.32292598085873,
+      "name": "host_a_dense_over_fast.gaudry-s4.ci95[1]",
+      "recomputed_own_bootstrap": 8.32292598085873,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 9.557354045464802,
+      "name": "host_a_dense_over_fast.jv-nagao.ci95[0]",
+      "recomputed_own_bootstrap": 9.557354045464802,
+      "rel_diff": 0.0
+    },
+    {
+      "claimed": 10.57114678800522,
+      "name": "host_a_dense_over_fast.jv-nagao.ci95[1]",
+      "recomputed_own_bootstrap": 10.571146788005219,
+      "rel_diff": 1.680382341692419e-16
+    }
+  ],
+  "tool": "validation/vtool recompute",
+  "unmatched": []
+}

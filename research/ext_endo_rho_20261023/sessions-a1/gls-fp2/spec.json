@@ -1,0 +1,103 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "ext endo rho 2026-10-23: GLS-psi rho on GLS twists over F_{p^2} (A=4) against negation rho",
+  "description": "PROTOCOL: research/ext_endo_rho_20261023/PROTOCOL.md. Same curves, targets and algorithm seeds for every arm. rho-plain is the positive control (A=1), rho-neg the reference (A=2), rho-neg-aa the A/A control, and the candidate is the endomorphism-orbit walk. canonicalisations_uncharged and endomorphism_applications_uncharged are unpriced native work, priced by the AGENTS.md 5a band at 0, 0.1 and 1 GAE.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "gls_fp2",
+        "p_bits": 14,
+        "seed": 1,
+        "max_cofactor": 64
+      },
+      {
+        "kind": "gls_fp2",
+        "p_bits": 14,
+        "seed": 2,
+        "max_cofactor": 64
+      },
+      {
+        "kind": "gls_fp2",
+        "p_bits": 14,
+        "seed": 3,
+        "max_cofactor": 64
+      },
+      {
+        "kind": "gls_fp2",
+        "p_bits": 16,
+        "seed": 1,
+        "max_cofactor": 64
+      },
+      {
+        "kind": "gls_fp2",
+        "p_bits": 16,
+        "seed": 2,
+        "max_cofactor": 64
+      },
+      {
+        "kind": "gls_fp2",
+        "p_bits": 16,
+        "seed": 3,
+        "max_cofactor": 64
+      },
+      {
+        "kind": "gls_fp2",
+        "p_bits": 18,
+        "seed": 1,
+        "max_cofactor": 64
+      },
+      {
+        "kind": "gls_fp2",
+        "p_bits": 18,
+        "seed": 2,
+        "max_cofactor": 64
+      },
+      {
+        "kind": "gls_fp2",
+        "p_bits": 18,
+        "seed": 3,
+        "max_cofactor": 64
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 202610230002
+  },
+  "arms": [
+    {
+      "name": "rho-plain",
+      "role": "control",
+      "method": {
+        "id": "rho.plain"
+      }
+    },
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-gls",
+      "role": "candidate",
+      "method": {
+        "id": "rho.gls"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "shuffle",
+    "seed": 202610230004,
+    "isolation_required": "L0",
+    "timeout_seconds": 3600
+  }
+}

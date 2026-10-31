@@ -1,0 +1,158 @@
+{
+  "status": "pass",
+  "cells": 9,
+  "candidate_scalar_sha256": "fa41d75e94826d552f2b5b85afb474fb63a9e6dfba94f26733e96308afb9bd74",
+  "base_sha256": {
+    "tower": "59f7759918713ec43a9b8b77a18e3c722c76a2b0d32da286e32e7f9b343bc9d8",
+    "small_a": "81acb054589dd2e8b55013d894e010aa9591af6db4f0ee940c7423e026170830",
+    "small_b": "81acb054589dd2e8b55013d894e010aa9591af6db4f0ee940c7423e026170830"
+  },
+  "source_sha256": {
+    "replay.json": "af1e776833b2fe2ad56bc0345a90976fd56caa98c44259c240ebf2072f1c4113",
+    "screen.py": "6ca47f18cda51fb2764eab4cc7db13a6d5d741e6c470b93cfef512cb6ea9f235",
+    "curve.rs": "e2f93cdf2ae409b069e6593faeacd90f913c6897257f274ba0468b1f16d0ec2f",
+    "params.rs": "39d4ee52166ab844f2da9e3daa656c9b9b3d8b621ea8baa6fd8408170acc01dd"
+  },
+  "rows": [
+    {
+      "rep": 0,
+      "arm": "tower",
+      "screen_seconds": 2.0996044169878587,
+      "base_prepare_seconds": 0.006149875000119209,
+      "process_seconds": 2.23080970798037,
+      "max_rss_kib_sampled": 33424
+    },
+    {
+      "rep": 0,
+      "arm": "small_a",
+      "screen_seconds": 1.794563624978764,
+      "base_prepare_seconds": 0.0051488750032149255,
+      "process_seconds": 2.0072154579975177,
+      "max_rss_kib_sampled": 32720
+    },
+    {
+      "rep": 0,
+      "arm": "small_b",
+      "screen_seconds": 1.729747707984643,
+      "base_prepare_seconds": 0.005141333007486537,
+      "process_seconds": 1.8166413749859203,
+      "max_rss_kib_sampled": 33504
+    },
+    {
+      "rep": 1,
+      "arm": "small_a",
+      "screen_seconds": 1.7522970829741098,
+      "base_prepare_seconds": 0.006313416000921279,
+      "process_seconds": 1.9783238749951124,
+      "max_rss_kib_sampled": 33408
+    },
+    {
+      "rep": 1,
+      "arm": "tower",
+      "screen_seconds": 2.343486166995717,
+      "base_prepare_seconds": 0.009186500014038756,
+      "process_seconds": 2.4206925420148764,
+      "max_rss_kib_sampled": 33280
+    },
+    {
+      "rep": 1,
+      "arm": "small_b",
+      "screen_seconds": 2.203128665976692,
+      "base_prepare_seconds": 0.008739125012652948,
+      "process_seconds": 2.4512479590193834,
+      "max_rss_kib_sampled": 33328
+    },
+    {
+      "rep": 2,
+      "arm": "small_a",
+      "screen_seconds": 2.1654409170150757,
+      "base_prepare_seconds": 0.005003582977224141,
+      "process_seconds": 2.405890541995177,
+      "max_rss_kib_sampled": 33520
+    },
+    {
+      "rep": 2,
+      "arm": "small_b",
+      "screen_seconds": 2.1601482080004644,
+      "base_prepare_seconds": 0.005628125014482066,
+      "process_seconds": 2.227642875019228,
+      "max_rss_kib_sampled": 33088
+    },
+    {
+      "rep": 2,
+      "arm": "tower",
+      "screen_seconds": 2.9056946669879835,
+      "base_prepare_seconds": 0.00617937499191612,
+      "process_seconds": 3.048944708018098,
+      "max_rss_kib_sampled": 32800
+    }
+  ],
+  "summaries": {
+    "tower": {
+      "screen_seconds": {
+        "median": 2.343486166995717,
+        "min": 2.0996044169878587,
+        "max": 2.9056946669879835
+      },
+      "base_prepare_seconds": {
+        "median": 0.00617937499191612,
+        "min": 0.006149875000119209,
+        "max": 0.009186500014038756
+      },
+      "process_seconds": {
+        "median": 2.4206925420148764,
+        "min": 2.23080970798037,
+        "max": 3.048944708018098
+      },
+      "max_rss_kib_sampled": {
+        "median": 33280,
+        "min": 32800,
+        "max": 33424
+      }
+    },
+    "small_a": {
+      "screen_seconds": {
+        "median": 1.794563624978764,
+        "min": 1.7522970829741098,
+        "max": 2.1654409170150757
+      },
+      "base_prepare_seconds": {
+        "median": 0.0051488750032149255,
+        "min": 0.005003582977224141,
+        "max": 0.006313416000921279
+      },
+      "process_seconds": {
+        "median": 2.0072154579975177,
+        "min": 1.9783238749951124,
+        "max": 2.405890541995177
+      },
+      "max_rss_kib_sampled": {
+        "median": 33408,
+        "min": 32720,
+        "max": 33520
+      }
+    },
+    "small_b": {
+      "screen_seconds": {
+        "median": 2.1601482080004644,
+        "min": 1.729747707984643,
+        "max": 2.203128665976692
+      },
+      "base_prepare_seconds": {
+        "median": 0.005628125014482066,
+        "min": 0.005141333007486537,
+        "max": 0.008739125012652948
+      },
+      "process_seconds": {
+        "median": 2.227642875019228,
+        "min": 1.8166413749859203,
+        "max": 2.4512479590193834
+      },
+      "max_rss_kib_sampled": {
+        "median": 33328,
+        "min": 33088,
+        "max": 33504
+      }
+    }
+  }
+}

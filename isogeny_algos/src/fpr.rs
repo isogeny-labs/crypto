@@ -76,6 +76,16 @@ impl FpR {
     }
 
     /// The generator z of F_p[z]/(modulus).
+    /// The monic modulus z^r - red(z), coefficients lowest first.
+    pub fn modulus(&self) -> Vec<u64> {
+        let mut m = vec![0u64; self.r + 1];
+        for &(k, c) in &self.nz {
+            m[k] = (self.p - c % self.p) % self.p;
+        }
+        m[self.r] = 1;
+        m
+    }
+
     pub fn gen(&self) -> ER {
         let mut z = [0u64; RMAX];
         z[1] = 1;

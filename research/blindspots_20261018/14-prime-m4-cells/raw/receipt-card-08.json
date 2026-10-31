@@ -1,0 +1,266 @@
+{
+  "card_id": "CARD-BLINDSPOT-14-08",
+  "card_path": "research/blindspots_20261018/14-prime-m4-cells/card-08.yaml",
+  "card_sha256": "42e610797f0a35a6fc858c374ce94db634e2a03012bdf43671268ee67fa45cdb",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "research/blindspots_20261018/14-prime-m4-cells/raw",
+        "target/blindspots-14/card-08"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-dirs",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-14/card-08/b14",
+        "examples/blindspots_14_prime_m4.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 6.195,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 6.195,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-14/card-08/b14",
+        "tdec",
+        "--bits",
+        "20",
+        "--arms",
+        "b",
+        "--bx",
+        "15",
+        "--targets",
+        "16",
+        "--bcap-madds",
+        "3000000000",
+        "--bcap-nnz",
+        "25000000",
+        "--bdeadline-s",
+        "60",
+        "--out",
+        "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b20-bx15.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 99.449,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tdec-b-b20-bx15",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b20-bx15.jsonl": "ec2234c603b31d39f39106c82e5878b7b2d500c253ee9fd131d21640f2f7dca7"
+      },
+      "seconds": 99.449,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ec2234c603b31d39f39106c82e5878b7b2d500c253ee9fd131d21640f2f7dca7",
+      "stdout_tail": [
+        "{\"kind\":\"cell\",\"bits\":20,\"p\":661603,\"a\":422772,\"b\":346249,\"n\":660917,\"B\":35,\"bx\":15,\"signed\":30,\"seed\":20261018}",
+        "{\"kind\":\"setup\",\"arm\":\"b\",\"bits\":20,\"B\":35,\"bx\":15,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":14467005},\"ms\":73.302,\"note\":\"S5 interpolated on 9^5 nodes; evaluation by resultants is uncounted setup\"}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":20,\"B\":35,\"bx\":15,\"target\":0,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":21,\"max_degree\":39,\"max_rows\":65336,\"max_cols\":108617,\"peak_nnz\":37220589,\"zero_rows\":181,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":452890132,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":452949181,\"ms\":6680.517}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":20,\"B\":35,\"bx\":15,\"target\":1,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":21,\"max_degree\":39,\"max_rows\":65336,\"max_cols\":108617,\"peak_nnz\":37220560,\"zero_rows\":181,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":452889918,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":452948967,\"ms\":5953.426}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":20,\"B\":35,\"bx\":15,\"target\":2,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":21,\"max_degree\":39,\"max_rows\":65336,\"max_cols\":108617,\"peak_nnz\":37220557,\"zero_rows\":181,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":452889813,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":452948862,\"ms\":5941.968}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":20,\"B\":35,\"bx\":15,\"target\":3,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":21,\"max_degree\":39,\"max_rows\":65336,\"max_cols\":108617,\"peak_nnz\":37220575,\"zero_rows\":181,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":452890031,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":452949080,\"ms\":6122.524}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":20,\"B\":35,\"bx\":15,\"target\":4,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":21,\"max_degree\":39,\"max_rows\":65336,\"max_cols\":108617,\"peak_nnz\":37220581,\"zero_rows\":181,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":452889843,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":452948892,\"ms\":6471.311}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":20,\"B\":35,\"bx\":15,\"target\":5,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":21,\"max_degree\":39,\"max_rows\":65336,\"max_cols\":108617,\"peak_nnz\":37220583,\"zero_rows\":181,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":452890004,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":452949053,\"ms\":5508.246}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":20,\"B\":35,\"bx\":15,\"target\":6,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":21,\"max_degree\":39,\"max_rows\":65336,\"max_cols\":108617,\"peak_nnz\":37220579,\"zero_rows\":181,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":452890146,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":452949195,\"ms\":5891.977}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":20,\"B\":35,\"bx\":15,\"target\":7,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":21,\"max_degree\":39,\"max_rows\":65336,\"max_cols\":108617,\"peak_nnz\":37220544,\"zero_rows\":181,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":452889899,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":452948948,\"ms\":5590.052}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":20,\"B\":35,\"bx\":15,\"target\":8,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":21,\"max_degree\":39,\"max_rows\":65336,\"max_cols\":108617,\"peak_nnz\":37220581,\"zero_rows\":181,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":452890160,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":452949209,\"ms\":6083.229}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":20,\"B\":35,\"bx\":15,\"target\":9,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":21,\"max_degree\":39,\"max_rows\":65336,\"max_cols\":108617,\"peak_nnz\":37220555,\"zero_rows\":181,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":452889907,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":452948956,\"ms\":6590.350}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":20,\"B\":35,\"bx\":15,\"target\":10,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":21,\"max_degree\":39,\"max_rows\":65336,\"max_cols\":108617,\"peak_nnz\":37220587,\"zero_rows\":181,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":452890135,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":452949184,\"ms\":6299.930}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":20,\"B\":35,\"bx\":15,\"target\":11,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":21,\"max_degree\":39,\"max_rows\":65336,\"max_cols\":108617,\"peak_nnz\":37220581,\"zero_rows\":181,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":452890127,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":452949176,\"ms\":6242.909}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":20,\"B\":35,\"bx\":15,\"target\":12,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":21,\"max_degree\":39,\"max_rows\":65336,\"max_cols\":108617,\"peak_nnz\":37220558,\"zero_rows\":181,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":452889462,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":452948511,\"ms\":6677.320}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":20,\"B\":35,\"bx\":15,\"target\":13,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":21,\"max_degree\":39,\"max_rows\":65336,\"max_cols\":108617,\"peak_nnz\":37220562,\"zero_rows\":181,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":452889521,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":452948570,\"ms\":6418.589}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":20,\"B\":35,\"bx\":15,\"target\":14,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":21,\"max_degree\":39,\"max_rows\":65336,\"max_cols\":108617,\"peak_nnz\":37220601,\"zero_rows\":181,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":452890186,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":452949235,\"ms\":6484.037}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":20,\"B\":35,\"bx\":15,\"target\":15,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":21,\"max_degree\":39,\"max_rows\":65336,\"max_cols\":108617,\"peak_nnz\":37220591,\"zero_rows\":181,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":452890176,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":452949225,\"ms\":6314.526}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-14/card-08/b14",
+        "tdec",
+        "--bits",
+        "24",
+        "--arms",
+        "b",
+        "--bx",
+        "29",
+        "--targets",
+        "16",
+        "--bcap-madds",
+        "3000000000",
+        "--bcap-nnz",
+        "25000000",
+        "--bdeadline-s",
+        "60",
+        "--out",
+        "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b24-bx29.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 86.294,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tdec-b-b24-bx29",
+      "index": 4,
+      "outputs": {
+        "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b24-bx29.jsonl": "ea2f719a63ccc4fb7ab3cd35cd45bf98b92739542f0abad13f9f7cddd08a2caa"
+      },
+      "seconds": 86.294,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ea2f719a63ccc4fb7ab3cd35cd45bf98b92739542f0abad13f9f7cddd08a2caa",
+      "stdout_tail": [
+        "{\"kind\":\"cell\",\"bits\":24,\"p\":10539323,\"a\":7836717,\"b\":8828358,\"n\":10542893,\"B\":66,\"bx\":29,\"signed\":58,\"seed\":20261018}",
+        "{\"kind\":\"setup\",\"arm\":\"b\",\"bits\":24,\"B\":66,\"bx\":29,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":14467005},\"ms\":55.099,\"note\":\"S5 interpolated on 9^5 nodes; evaluation by resultants is uncounted setup\"}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":24,\"B\":66,\"bx\":29,\"target\":0,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":16,\"max_degree\":53,\"max_rows\":47076,\"max_cols\":182282,\"peak_nnz\":29287429,\"zero_rows\":68,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":66584730,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":66643779,\"ms\":4974.094}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":24,\"B\":66,\"bx\":29,\"target\":1,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":16,\"max_degree\":53,\"max_rows\":47076,\"max_cols\":182282,\"peak_nnz\":29287429,\"zero_rows\":68,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":66584730,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":66643779,\"ms\":4561.959}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":24,\"B\":66,\"bx\":29,\"target\":2,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":16,\"max_degree\":53,\"max_rows\":47076,\"max_cols\":182282,\"peak_nnz\":29287393,\"zero_rows\":68,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":66584554,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":66643603,\"ms\":5053.687}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":24,\"B\":66,\"bx\":29,\"target\":3,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":16,\"max_degree\":53,\"max_rows\":47076,\"max_cols\":182282,\"peak_nnz\":29287427,\"zero_rows\":68,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":66584728,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":66643777,\"ms\":6505.019}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":24,\"B\":66,\"bx\":29,\"target\":4,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":16,\"max_degree\":53,\"max_rows\":47076,\"max_cols\":182282,\"peak_nnz\":29287429,\"zero_rows\":68,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":66584730,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":66643779,\"ms\":4921.925}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":24,\"B\":66,\"bx\":29,\"target\":5,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":16,\"max_degree\":53,\"max_rows\":47076,\"max_cols\":182282,\"peak_nnz\":29287429,\"zero_rows\":68,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":66584730,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":66643779,\"ms\":5727.044}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":24,\"B\":66,\"bx\":29,\"target\":6,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":16,\"max_degree\":53,\"max_rows\":47076,\"max_cols\":182282,\"peak_nnz\":29287429,\"zero_rows\":68,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":66584730,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":66643779,\"ms\":4982.852}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":24,\"B\":66,\"bx\":29,\"target\":7,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":16,\"max_degree\":53,\"max_rows\":47076,\"max_cols\":182282,\"peak_nnz\":29287429,\"zero_rows\":68,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":66584730,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":66643779,\"ms\":4864.581}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":24,\"B\":66,\"bx\":29,\"target\":8,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":16,\"max_degree\":53,\"max_rows\":47076,\"max_cols\":182282,\"peak_nnz\":29287429,\"zero_rows\":68,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":66584730,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":66643779,\"ms\":4750.771}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":24,\"B\":66,\"bx\":29,\"target\":9,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":16,\"max_degree\":53,\"max_rows\":47076,\"max_cols\":182282,\"peak_nnz\":29287429,\"zero_rows\":68,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":66584730,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":66643779,\"ms\":6801.925}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":24,\"B\":66,\"bx\":29,\"target\":10,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":16,\"max_degree\":53,\"max_rows\":47076,\"max_cols\":182282,\"peak_nnz\":29287429,\"zero_rows\":68,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":66584730,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":66643779,\"ms\":5101.792}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":24,\"B\":66,\"bx\":29,\"target\":11,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":16,\"max_degree\":53,\"max_rows\":47076,\"max_cols\":182282,\"peak_nnz\":29287429,\"zero_rows\":68,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":66584730,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":66643779,\"ms\":5018.568}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":24,\"B\":66,\"bx\":29,\"target\":12,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":16,\"max_degree\":53,\"max_rows\":47076,\"max_cols\":182282,\"peak_nnz\":29287429,\"zero_rows\":68,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":66584730,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":66643779,\"ms\":5802.146}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":24,\"B\":66,\"bx\":29,\"target\":13,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":16,\"max_degree\":53,\"max_rows\":47076,\"max_cols\":182282,\"peak_nnz\":29287429,\"zero_rows\":68,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":66584730,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":66643779,\"ms\":5583.833}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":24,\"B\":66,\"bx\":29,\"target\":14,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":16,\"max_degree\":53,\"max_rows\":47076,\"max_cols\":182282,\"peak_nnz\":29287429,\"zero_rows\":68,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":66584730,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":66643779,\"ms\":5706.588}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":24,\"B\":66,\"bx\":29,\"target\":15,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":16,\"max_degree\":53,\"max_rows\":47076,\"max_cols\":182282,\"peak_nnz\":29287429,\"zero_rows\":68,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":66584730,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":66643779,\"ms\":5698.924}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-14/card-08/b14"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.008,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.008,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-14/card-08"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "3d43c69d8bc7cde2c8f927b2bb17fd9adb6f1399",
+  "dirty_after": [
+    "esearch/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b24-bx29.jsonl",
+    "examples/blindspots_16_size_gated_oracle.rs",
+    "research/blindspots_20261018/14-prime-m4-cells/raw/card-08-tdec-b-b24-bx29.stderr.log"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

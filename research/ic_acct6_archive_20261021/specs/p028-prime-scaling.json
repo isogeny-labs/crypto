@@ -1,0 +1,681 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "sparse LA timing 2026-10-18, LA scaling with matrix size: structured-gauss vs the four deferred sparse relation matrices, prime-abscissa size 128..4096 on one 30-bit prime curve",
+  "description": "PROTOCOL: research/sparse_la_timing_20261018/PROTOCOL.md. Stage diagnostic for scaling with matrix size: one curve, one target set, factor-base size the only other variable. Per size the same nine IC arms as SPEC-fp4-p29 (suffix -NNNN = columns); rho-neg reference. Every arm shares the algorithm seed per workload. row_ops unpriced native work, priced by the 5a band.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 30,
+        "seed": 59297
+      }
+    ],
+    "targets_per_curve": 6,
+    "target_seed": 20261018
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "sg-0128",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=128",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "structured-gauss"
+        }
+      }
+    },
+    {
+      "name": "sg-aa-0128",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=128",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "structured-gauss"
+        }
+      }
+    },
+    {
+      "name": "ig-0128",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=128",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "igfr-0128",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=128",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "incremental-gauss-full-rank"
+        }
+      }
+    },
+    {
+      "name": "sparse-cado-0128",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=128",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "sparse-cado"
+        }
+      }
+    },
+    {
+      "name": "filter-wiedemann-0128",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=128",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "filter+wiedemann"
+        }
+      }
+    },
+    {
+      "name": "filter-lanczos-0128",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=128",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "filter+lanczos"
+        }
+      }
+    },
+    {
+      "name": "wiedemann-0128",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=128",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "wiedemann"
+        }
+      }
+    },
+    {
+      "name": "lanczos-0128",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=128",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "lanczos"
+        }
+      }
+    },
+    {
+      "name": "sg-0256",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=256",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "structured-gauss"
+        }
+      }
+    },
+    {
+      "name": "sg-aa-0256",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=256",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "structured-gauss"
+        }
+      }
+    },
+    {
+      "name": "ig-0256",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=256",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "igfr-0256",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=256",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "incremental-gauss-full-rank"
+        }
+      }
+    },
+    {
+      "name": "sparse-cado-0256",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=256",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "sparse-cado"
+        }
+      }
+    },
+    {
+      "name": "filter-wiedemann-0256",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=256",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "filter+wiedemann"
+        }
+      }
+    },
+    {
+      "name": "filter-lanczos-0256",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=256",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "filter+lanczos"
+        }
+      }
+    },
+    {
+      "name": "wiedemann-0256",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=256",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "wiedemann"
+        }
+      }
+    },
+    {
+      "name": "lanczos-0256",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=256",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "lanczos"
+        }
+      }
+    },
+    {
+      "name": "sg-0512",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=512",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "structured-gauss"
+        }
+      }
+    },
+    {
+      "name": "sg-aa-0512",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=512",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "structured-gauss"
+        }
+      }
+    },
+    {
+      "name": "ig-0512",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=512",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "igfr-0512",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=512",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "incremental-gauss-full-rank"
+        }
+      }
+    },
+    {
+      "name": "sparse-cado-0512",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=512",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "sparse-cado"
+        }
+      }
+    },
+    {
+      "name": "filter-wiedemann-0512",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=512",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "filter+wiedemann"
+        }
+      }
+    },
+    {
+      "name": "filter-lanczos-0512",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=512",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "filter+lanczos"
+        }
+      }
+    },
+    {
+      "name": "wiedemann-0512",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=512",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "wiedemann"
+        }
+      }
+    },
+    {
+      "name": "lanczos-0512",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=512",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "lanczos"
+        }
+      }
+    },
+    {
+      "name": "sg-1024",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=1024",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "structured-gauss"
+        }
+      }
+    },
+    {
+      "name": "sg-aa-1024",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=1024",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "structured-gauss"
+        }
+      }
+    },
+    {
+      "name": "ig-1024",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=1024",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "igfr-1024",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=1024",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "incremental-gauss-full-rank"
+        }
+      }
+    },
+    {
+      "name": "sparse-cado-1024",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=1024",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "sparse-cado"
+        }
+      }
+    },
+    {
+      "name": "filter-wiedemann-1024",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=1024",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "filter+wiedemann"
+        }
+      }
+    },
+    {
+      "name": "filter-lanczos-1024",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=1024",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "filter+lanczos"
+        }
+      }
+    },
+    {
+      "name": "wiedemann-1024",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=1024",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "wiedemann"
+        }
+      }
+    },
+    {
+      "name": "lanczos-1024",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=1024",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "lanczos"
+        }
+      }
+    },
+    {
+      "name": "sg-2048",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2048",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "structured-gauss"
+        }
+      }
+    },
+    {
+      "name": "sg-aa-2048",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2048",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "structured-gauss"
+        }
+      }
+    },
+    {
+      "name": "ig-2048",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2048",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "igfr-2048",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2048",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "incremental-gauss-full-rank"
+        }
+      }
+    },
+    {
+      "name": "sparse-cado-2048",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2048",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "sparse-cado"
+        }
+      }
+    },
+    {
+      "name": "filter-wiedemann-2048",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2048",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "filter+wiedemann"
+        }
+      }
+    },
+    {
+      "name": "filter-lanczos-2048",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2048",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "filter+lanczos"
+        }
+      }
+    },
+    {
+      "name": "wiedemann-2048",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2048",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "wiedemann"
+        }
+      }
+    },
+    {
+      "name": "lanczos-2048",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2048",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "lanczos"
+        }
+      }
+    },
+    {
+      "name": "sg-4096",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=4096",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "structured-gauss"
+        }
+      }
+    },
+    {
+      "name": "sg-aa-4096",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=4096",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "structured-gauss"
+        }
+      }
+    },
+    {
+      "name": "ig-4096",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=4096",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "igfr-4096",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=4096",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "incremental-gauss-full-rank"
+        }
+      }
+    },
+    {
+      "name": "sparse-cado-4096",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=4096",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "sparse-cado"
+        }
+      }
+    },
+    {
+      "name": "filter-wiedemann-4096",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=4096",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "filter+wiedemann"
+        }
+      }
+    },
+    {
+      "name": "filter-lanczos-4096",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=4096",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "filter+lanczos"
+        }
+      }
+    },
+    {
+      "name": "wiedemann-4096",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=4096",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "wiedemann"
+        }
+      }
+    },
+    {
+      "name": "lanczos-4096",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=4096",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "lanczos"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "shuffle",
+    "seed": 20261018,
+    "isolation_required": "L0",
+    "timeout_seconds": 900
+  }
+}

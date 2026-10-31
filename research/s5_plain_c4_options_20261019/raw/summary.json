@@ -1,0 +1,263 @@
+{
+  "source": "research/s5_plain_c4_options_20261019/raw/s5_p269_seed1.json",
+  "generic_source": "research/s5_plain_c4_options_20261019/raw/generic_d4-7.json",
+  "arms": [
+    {
+      "arm": "committed",
+      "n": 4,
+      "mean": {
+        "charpoly_muls": 70596716209.75,
+        "echelon_muls": 582502344575.5,
+        "eigenvector_muls": 13870976670.75,
+        "nf_muls": 546059256853.75,
+        "total_muls": 1213030597697.0
+      },
+      "ratio_of_means": 1.0,
+      "paired_ratios": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "paired_min": 1.0,
+      "paired_max": 1.0,
+      "log2_mean_c4": 40.141753080359024,
+      "bits_above_d_cubed": 4.141753080359024,
+      "agree": 4,
+      "solves": 4,
+      "first_solve_c4": null,
+      "replays": [
+        "Recorded",
+        "Recorded",
+        "Recorded",
+        "Recorded"
+      ],
+      "wall_s": [
+        184.417566291,
+        100.891391375,
+        101.687429541,
+        102.442606334
+      ],
+      "order": [
+        0,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "arm": "sparsest",
+      "n": 4,
+      "mean": {
+        "charpoly_muls": 70596716209.75,
+        "echelon_muls": 112256739096.25,
+        "eigenvector_muls": 13870976670.75,
+        "nf_muls": 111928058240.5,
+        "total_muls": 308653793604.5
+      },
+      "ratio_of_means": 3.9300686491847956,
+      "paired_ratios": [
+        3.7842969618806874,
+        3.9295910866910604,
+        3.9159513310674154,
+        4.107452846304543
+      ],
+      "paired_min": 3.7842969618806874,
+      "paired_max": 4.107452846304543,
+      "log2_mean_c4": 38.16719856711854,
+      "bits_above_d_cubed": 2.1671985671185396,
+      "agree": 4,
+      "solves": 4,
+      "first_solve_c4": null,
+      "replays": [
+        "Recorded",
+        "Recorded",
+        "Recorded",
+        "Recorded"
+      ],
+      "wall_s": [
+        219.418960167,
+        74.193836167,
+        74.046064417,
+        77.380701375
+      ],
+      "order": [
+        1,
+        0,
+        3,
+        2
+      ]
+    },
+    {
+      "arm": "sparsest+chains",
+      "n": 4,
+      "mean": {
+        "charpoly_muls": 49688902429.5,
+        "echelon_muls": 112256739096.25,
+        "eigenvector_muls": 437913341.5,
+        "nf_muls": 5199498158.25,
+        "total_muls": 167583153918.5
+      },
+      "ratio_of_means": 7.238380286642224,
+      "paired_ratios": [
+        7.264845342830419,
+        7.236924279873234,
+        7.2117188043598786,
+        7.239944652629426
+      ],
+      "paired_min": 7.2117188043598786,
+      "paired_max": 7.264845342830419,
+      "log2_mean_c4": 37.286086175019314,
+      "bits_above_d_cubed": 1.2860861750193138,
+      "agree": 4,
+      "solves": 4,
+      "first_solve_c4": null,
+      "replays": [
+        "Recorded",
+        "Recorded",
+        "Recorded",
+        "Recorded"
+      ],
+      "wall_s": [
+        203.371969833,
+        90.987482916,
+        89.510264708,
+        99.18607125
+      ],
+      "order": [
+        2,
+        1,
+        0,
+        3
+      ]
+    },
+    {
+      "arm": "sparsest+chains+replay",
+      "n": 3,
+      "mean": {
+        "charpoly_muls": 49689173573.333336,
+        "echelon_muls": 53359502820.0,
+        "eigenvector_muls": 291948862.0,
+        "nf_muls": 5206503631.666667,
+        "total_muls": 108547226278.33333
+      },
+      "ratio_of_means": 11.13232046960989,
+      "paired_ratios": [
+        15.162926646052718,
+        15.159010649716498,
+        7.239944523630385
+      ],
+      "paired_min": 7.239944523630385,
+      "paired_max": 15.162926646052718,
+      "log2_mean_c4": 36.659531904807366,
+      "bits_above_d_cubed": 0.6595319048073662,
+      "agree": 4,
+      "solves": 4,
+      "first_solve_c4": 168892083153.0,
+      "replays": [
+        "Recorded",
+        "Replayed",
+        "Replayed",
+        "FellBack"
+      ],
+      "wall_s": [
+        198.366492458,
+        43.146698333,
+        43.017279917,
+        91.054581375
+      ],
+      "order": [
+        3,
+        2,
+        1,
+        0
+      ]
+    }
+  ],
+  "generic": [
+    {
+      "equation_degree": 4,
+      "arm": "committed",
+      "c": 230017204.0,
+      "ratio_vs_committed": 1.0,
+      "planted_found": true
+    },
+    {
+      "equation_degree": 4,
+      "arm": "sparsest",
+      "c": 84490812.0,
+      "ratio_vs_committed": 2.7223931047082375,
+      "planted_found": true
+    },
+    {
+      "equation_degree": 4,
+      "arm": "sparsest+chains",
+      "c": 128670050.0,
+      "ratio_vs_committed": 1.787651469786481,
+      "planted_found": true
+    },
+    {
+      "equation_degree": 5,
+      "arm": "sparsest",
+      "c": 1121424559.0,
+      "ratio_vs_committed": 3.2608301759155607,
+      "planted_found": true
+    },
+    {
+      "equation_degree": 5,
+      "arm": "sparsest+chains",
+      "c": 1184977685.0,
+      "ratio_vs_committed": 3.0859442234981835,
+      "planted_found": true
+    },
+    {
+      "equation_degree": 5,
+      "arm": "committed",
+      "c": 3656775042.0,
+      "ratio_vs_committed": 1.0,
+      "planted_found": true
+    },
+    {
+      "equation_degree": 6,
+      "arm": "sparsest+chains",
+      "c": 7507818955.0,
+      "ratio_vs_committed": 4.726271716151152,
+      "planted_found": true
+    },
+    {
+      "equation_degree": 6,
+      "arm": "committed",
+      "c": 35483992377.0,
+      "ratio_vs_committed": 1.0,
+      "planted_found": true
+    },
+    {
+      "equation_degree": 6,
+      "arm": "sparsest",
+      "c": 10329203523.0,
+      "ratio_vs_committed": 3.435307698022207,
+      "planted_found": true
+    },
+    {
+      "equation_degree": 7,
+      "arm": "committed",
+      "c": 240274170220.0,
+      "ratio_vs_committed": 1.0,
+      "planted_found": true
+    },
+    {
+      "equation_degree": 7,
+      "arm": "sparsest",
+      "c": 68703179962.0,
+      "ratio_vs_committed": 3.4972787337194085,
+      "planted_found": true
+    },
+    {
+      "equation_degree": 7,
+      "arm": "sparsest+chains",
+      "c": 39599098799.0,
+      "ratio_vs_committed": 6.067667636569236,
+      "planted_found": true
+    }
+  ]
+}

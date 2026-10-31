@@ -1,0 +1,73 @@
+Combined native main integration, 2026-10-30 03:30 UTC
+
+Crypto base: f81b1c6c562d10251eae883c8084affddc060f8b
+Peer base: 7f07bce0d8da8ec9d31c13094a5b7d5060b679cf
+The sampler and both taper controls are retained. Current-main source and
+all session entries are preserved in both repositories. No frozen evidence
+was resolved by selecting one side.
+
+The crypto Copilot request at 02:23 UTC had no response after just over an
+hour; explained fallback on PR2909 in comment6514197577. Merged current main
+without rebasing or force-pushing. The peer also integrates its newer main.
+To restore byte identity, carried already-landed peer strict-input and
+functional-pruning corrections into the crypto task branch. This leaves
+unrelated crypto PR2906 untouched; it is not merged by this tracker. These
+upstream changes are integration work, not new algorithms attributed to this
+sampling audit. The existing panel executable was preserved, not run as a
+benchmark or challenge campaign.
+
+Both native trees are byte-identical over all 28 tracked files. A separate
+sources-union.sha256 records this combined source snapshot; previous 16- and
+18-file manifests remain historical and are not overwritten.
+
+Validation status at integration: PENDING. Both native release panels,
+peer bindings, lint/MSRV/docs are running on the combined source. A new full
+crypto root test is required because its dependency and base have changed.
+The earlier 5389-pass root receipt remains valid only for its tested snapshot.
+Do not publish these local merge updates until required combined checks pass.
+No current-head hosted CI or merge is yet claimed. General theorem/complexity
+obligations remain open; public64-bit admission still selects fallback.
+
+Root setup follow-up, 03:31 UTC:
+The first combined root command exited101 before any tests: sparse checkout
+lacked the newly added ecdl-tensor-ic path crate. Raw trace171bytes, SHA256
+0ef56a9d84642ca3b4406f236534903b03396a1f1cd49c55b0199f78c509ccc8,
+retained verbatim as union-root-initial-error.txt. Restored tracked directory
+with scripts/sparse-checkout.sh add --path crates/ecdl-tensor-ic; no source,
+assertion or check changed. Restarted the exact full command using detached
+wrapper PID57648 at tested crypto HEAD08557506bbc49bcb36196e4ad2be706acd1b5f85.
+Metadata/output/actual exit: /tmp/crypto-root-union-restored-20261030.{meta,log,exit}.
+Do not restart if alive. Require actual zero exit plus full parent summary.
+
+Completed combined checks, 03:32 UTC:
+Both native release commands exited0:40 core,5 runner,3 panel-unit,3 strict-JSON
+cases pass, zero failures/ignored. The existing panel's synthetic unit tests
+ran as part of cargo test; no panel benchmark/campaign was launched.
+Peer bindings:20 unit,19 FFI-parity,14 docs pass, exit0.
+Both native strict Clippy, Rust1.78 all-target checks, strict API docs and
+format checks pass. Peer lint also covers cryptanalysis bindings. Both28file
+manifests and full native tree comparison pass. Artifact/size/task-whitespace
+checks pass. Source HEADs: crypto08557506b, peer6f39c9ce. Tests were started on
+this same source immediately before the integration commits; later edits are
+receipts only. Compact transcripts omit terminal blank separators only.
+
+Exact commands:
+cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml
+cargo test --locked --release --manifest-path bindings/rust/Cargo.toml -p hashed-ecdl-tensor -p cryptanalysis
+cargo clippy --locked --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --all-targets -- -D warnings
+cargo clippy --locked --manifest-path bindings/rust/Cargo.toml -p hashed-ecdl-tensor -p cryptanalysis --all-targets -- -D warnings
+cargo +1.78.0 check --locked --manifest-path <owning manifest> --all-targets (peer: -p hashed-ecdl-tensor)
+RUSTDOCFLAGS='-D warnings' cargo doc --locked --manifest-path <owning manifest> --no-deps (peer: -p hashed-ecdl-tensor)
+
+The restored full root run remains PENDING. Publication and new-head hosted
+CI/review remain pending; neither task PR is merged. The earlier statement
+that byte parity must wait for unrelated PR2906 is superseded: current local
+parity was restored by carrying existing landed peer source, without merging
+or changing that unrelated PR. Root validation still gates pushing updates.
+
+Publication file-count correction, 2026-10-30 04:41 UTC:
+The historical prose said28 native files. Both actual sources-union.sha256 and
+sources-merged-peer.sha256 contain26 entries, and git's tracked-tree count is26.
+Every manifest entry and actual merged-peer byte comparison passes; the error
+was the prose count, not the hashes or tested source. Earlier receipts remain
+as historical records with this explicit correction. Publication parity is26files.

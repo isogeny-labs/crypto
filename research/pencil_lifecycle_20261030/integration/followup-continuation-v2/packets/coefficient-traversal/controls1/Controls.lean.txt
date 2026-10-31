@@ -1,0 +1,15 @@
+import Schedule
+namespace CoefficientTraversalControls
+open CoefficientTraversal
+ theorem empty_schedule : ((schedule 0).map Subtype.val)=[] := by decide
+ theorem quadratic_schedule : ((schedule 3).map Subtype.val)=[(0,0),(1,0),(1,1),(2,0),(2,1),(2,2)] := by decide
+ theorem quintic_schedule : (schedule 6).length=21 := by decide
+ theorem empty_transform : (transform (n:=0) (by decide) 17 (fun i=>nomatch i) 2 3 2).val=#[] := by decide
+ theorem constant_transform : (transform (n:=1) (by decide) 17 (fun _=>5) 2 3 2).val=#[11] := by decide
+ theorem quadratic_transform : (transform (n:=3) (by decide) 17 (fun i=>UInt64.ofNat (i.val+1)) 2 3 1).val=#[0,6,12] := by decide
+ theorem quadratic_scaled : (transform (n:=3) (by decide) 17 (fun i=>UInt64.ofNat (i.val+1)) 2 3 2).val=#[0,3,6] := by decide
+ theorem quintic_shift : (transform (n:=6) (by decide) 17 (fun i=>UInt64.ofNat (i.val+1)) 1 1 1).val=#[4,2,3,16,1,6] := by decide
+ theorem quintic_identity : (transform (n:=6) (by decide) 17 (fun i=>UInt64.ofNat (i.val+1)) 1 0 1).val=#[1,2,3,4,5,6] := by decide
+ theorem zero_polynomial : (transform (n:=6) (by decide) 17 (fun _=>0) 2 3 2).val=#[0,0,0,0,0,0] := by decide
+ theorem omitted_row_changes : (transform (n:=6) (by decide) 17 (fun i=>if i.val=5 then 0 else UInt64.ofNat (i.val+1)) 1 1 1).val≠#[4,2,3,16,1,6] := by decide
+end CoefficientTraversalControls

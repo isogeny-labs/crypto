@@ -1,0 +1,537 @@
+{
+  "config": {
+    "n": 1000,
+    "n_big": 100,
+    "n_pc": 300,
+    "only": "",
+    "rho_budget": 2097152,
+    "seed": 20261022,
+    "trial_bound": 1000000
+  },
+  "null": {
+    "F224s": {
+      "censored": 597,
+      "censored_cp95": [
+        0.5658500437648821,
+        0.6275771456440047
+      ],
+      "mean_hi": 8.901,
+      "mean_lo": 4.145,
+      "mean_mid": 4.742,
+      "mean_small": 2.395,
+      "n": 1000,
+      "overlap": 0
+    },
+    "F224u": {
+      "censored": 611,
+      "censored_cp95": [
+        0.5799927371976383,
+        0.6413516947282365
+      ],
+      "mean_hi": 8.999,
+      "mean_lo": 4.101,
+      "mean_mid": 4.712,
+      "mean_small": 2.372,
+      "n": 1000,
+      "overlap": 0
+    },
+    "R224s": {
+      "censored": 596,
+      "censored_cp95": [
+        0.5648408383493415,
+        0.6265922610801204
+      ],
+      "mean_hi": 8.588,
+      "mean_lo": 3.865,
+      "mean_mid": 4.462,
+      "mean_small": 2.125,
+      "n": 1000,
+      "overlap": 0
+    },
+    "R224u": {
+      "censored": 577,
+      "censored_cp95": [
+        0.545690607147989,
+        0.6078547556400777
+      ],
+      "mean_hi": 8.512,
+      "mean_lo": 3.895,
+      "mean_mid": 4.473,
+      "mean_small": 2.179,
+      "n": 1000,
+      "overlap": 0
+    },
+    "R256s": {
+      "censored": 663,
+      "censored_cp95": [
+        0.6327561887532298,
+        0.6922804941598024
+      ],
+      "mean_hi": 10.169,
+      "mean_lo": 3.842,
+      "mean_mid": 4.505,
+      "mean_small": 2.117,
+      "n": 1000,
+      "overlap": 0
+    },
+    "R256u": {
+      "censored": 658,
+      "censored_cp95": [
+        0.6276662332643472,
+        0.6874000715953523
+      ],
+      "mean_hi": 10.099,
+      "mean_lo": 3.89,
+      "mean_mid": 4.549,
+      "mean_small": 2.13,
+      "n": 1000,
+      "overlap": 0
+    },
+    "R384u": {
+      "censored": 80,
+      "censored_cp95": [
+        0.7081573109114387,
+        0.8733444478980448
+      ],
+      "mean_hi": 16.71,
+      "mean_lo": 4.16,
+      "mean_mid": 4.96,
+      "mean_small": 2.35,
+      "n": 100,
+      "overlap": 0
+    },
+    "R521u": {
+      "censored": 85,
+      "censored_cp95": [
+        0.7646924998510989,
+        0.913545614358352
+      ],
+      "mean_hi": 23.32,
+      "mean_lo": 4.1,
+      "mean_mid": 4.95,
+      "mean_small": 2.31,
+      "n": 100,
+      "overlap": 0
+    }
+  },
+  "positive_control": {
+    "first_flagged_k": 9,
+    "passed": true,
+    "pop_k2": {
+      "detected": true,
+      "n": 300,
+      "p": 8.094388638796826e-57,
+      "shift": 2.0503333333333336,
+      "z": 15.88465358521695
+    },
+    "pop_k4": {
+      "detected": true,
+      "n": 300,
+      "p": 3.626595108942622e-125,
+      "shift": 4.050333333333334,
+      "z": 23.79654397157109
+    }
+  },
+  "tests": [
+    {
+      "family": "primary",
+      "lower_le": 953,
+      "metric": "omega",
+      "midrank": 0.915,
+      "n": 1000,
+      "null": "R224u",
+      "p_max": 1.0,
+      "p_mid": 0.24775224775224775,
+      "p_min": 0.13586413586413587,
+      "target": "P-224",
+      "upper_ge": 123,
+      "verdict": "within the control distribution",
+      "x": [
+        7,
+        7,
+        7,
+        5
+      ]
+    },
+    {
+      "family": "primary",
+      "lower_le": 980,
+      "metric": "omega_small",
+      "midrank": 0.9555,
+      "n": 1000,
+      "null": "R224u",
+      "p_max": 0.13986013986013987,
+      "p_mid": 0.13986013986013987,
+      "p_min": 0.13986013986013987,
+      "target": "P-224",
+      "upper_ge": 69,
+      "verdict": "within the control distribution",
+      "x": [
+        7,
+        7,
+        7,
+        5
+      ]
+    },
+    {
+      "family": "primary",
+      "lower_le": 945,
+      "metric": "omega",
+      "midrank": 0.9,
+      "n": 1000,
+      "null": "F224u",
+      "p_max": 1.0,
+      "p_mid": 0.2917082917082917,
+      "p_min": 0.16183816183816183,
+      "target": "P-224",
+      "upper_ge": 145,
+      "verdict": "within the control distribution",
+      "x": [
+        7,
+        7,
+        7,
+        5
+      ]
+    },
+    {
+      "family": "primary",
+      "lower_le": 971,
+      "metric": "omega_small",
+      "midrank": 0.9455,
+      "n": 1000,
+      "null": "F224u",
+      "p_max": 0.16183816183816183,
+      "p_mid": 0.16183816183816183,
+      "p_min": 0.16183816183816183,
+      "target": "P-224",
+      "upper_ge": 80,
+      "verdict": "within the control distribution",
+      "x": [
+        7,
+        7,
+        7,
+        5
+      ]
+    },
+    {
+      "family": "primary",
+      "lower_le": 733,
+      "metric": "omega",
+      "midrank": 0.622,
+      "n": 1000,
+      "null": "R256u",
+      "p_max": 1.0,
+      "p_mid": 0.9790209790209791,
+      "p_min": 0.001998001998001998,
+      "target": "P-256",
+      "upper_ge": 489,
+      "verdict": "inconclusive: censoring",
+      "x": [
+        4,
+        5,
+        13,
+        2
+      ]
+    },
+    {
+      "family": "primary",
+      "lower_le": 639,
+      "metric": "omega_small",
+      "midrank": 0.502,
+      "n": 1000,
+      "null": "R256u",
+      "p_max": 1.0,
+      "p_mid": 1.0,
+      "p_min": 1.0,
+      "target": "P-256",
+      "upper_ge": 635,
+      "verdict": "within the control distribution",
+      "x": [
+        4,
+        5,
+        13,
+        2
+      ]
+    },
+    {
+      "family": "primary",
+      "lower_le": 753,
+      "metric": "omega",
+      "midrank": 0.6485,
+      "n": 1000,
+      "null": "R224u",
+      "p_max": 1.0,
+      "p_mid": 0.913086913086913,
+      "p_min": 0.6513486513486514,
+      "target": "brainpoolP224r1",
+      "upper_ge": 456,
+      "verdict": "within the control distribution",
+      "x": [
+        5,
+        5,
+        5,
+        3
+      ]
+    },
+    {
+      "family": "primary",
+      "lower_le": 827,
+      "metric": "omega_small",
+      "midrank": 0.7325,
+      "n": 1000,
+      "null": "R224u",
+      "p_max": 0.7252747252747253,
+      "p_mid": 0.7252747252747253,
+      "p_min": 0.7252747252747253,
+      "target": "brainpoolP224r1",
+      "upper_ge": 362,
+      "verdict": "within the control distribution",
+      "x": [
+        5,
+        5,
+        5,
+        3
+      ]
+    },
+    {
+      "family": "primary",
+      "lower_le": 511,
+      "metric": "omega",
+      "midrank": 0.396,
+      "n": 1000,
+      "null": "R256u",
+      "p_max": 1.0,
+      "p_mid": 1.0,
+      "p_min": 0.44755244755244755,
+      "target": "brainpoolP256r1",
+      "upper_ge": 719,
+      "verdict": "within the control distribution",
+      "x": [
+        4,
+        4,
+        4,
+        1
+      ]
+    },
+    {
+      "family": "primary",
+      "lower_le": 365,
+      "metric": "omega_small",
+      "midrank": 0.235,
+      "n": 1000,
+      "null": "R256u",
+      "p_max": 0.7312687312687313,
+      "p_mid": 0.7312687312687313,
+      "p_min": 0.7312687312687313,
+      "target": "brainpoolP256r1",
+      "upper_ge": 895,
+      "verdict": "within the control distribution",
+      "x": [
+        4,
+        4,
+        4,
+        1
+      ]
+    },
+    {
+      "family": "sensitivity_semicircle",
+      "lower_le": 961,
+      "metric": "omega",
+      "midrank": 0.9255,
+      "n": 1000,
+      "null": "R224s",
+      "p_max": 1.0,
+      "p_mid": 0.2217782217782218,
+      "p_min": 0.11988011988011989,
+      "target": "P-224",
+      "upper_ge": 110,
+      "verdict": "within the control distribution",
+      "x": [
+        7,
+        7,
+        7,
+        5
+      ]
+    },
+    {
+      "family": "sensitivity_semicircle",
+      "lower_le": 986,
+      "metric": "omega_small",
+      "midrank": 0.963,
+      "n": 1000,
+      "null": "R224s",
+      "p_max": 0.12187812187812187,
+      "p_mid": 0.12187812187812187,
+      "p_min": 0.12187812187812187,
+      "target": "P-224",
+      "upper_ge": 60,
+      "verdict": "within the control distribution",
+      "x": [
+        7,
+        7,
+        7,
+        5
+      ]
+    },
+    {
+      "family": "sensitivity_semicircle",
+      "lower_le": 927,
+      "metric": "omega",
+      "midrank": 0.8885,
+      "n": 1000,
+      "null": "F224s",
+      "p_max": 1.0,
+      "p_mid": 0.3016983016983017,
+      "p_min": 0.1998001998001998,
+      "target": "P-224",
+      "upper_ge": 150,
+      "verdict": "within the control distribution",
+      "x": [
+        7,
+        7,
+        7,
+        5
+      ]
+    },
+    {
+      "family": "sensitivity_semicircle",
+      "lower_le": 972,
+      "metric": "omega_small",
+      "midrank": 0.946,
+      "n": 1000,
+      "null": "F224s",
+      "p_max": 0.16183816183816183,
+      "p_mid": 0.16183816183816183,
+      "p_min": 0.16183816183816183,
+      "target": "P-224",
+      "upper_ge": 80,
+      "verdict": "within the control distribution",
+      "x": [
+        7,
+        7,
+        7,
+        5
+      ]
+    },
+    {
+      "family": "sensitivity_semicircle",
+      "lower_le": 735,
+      "metric": "omega",
+      "midrank": 0.634,
+      "n": 1000,
+      "null": "R256s",
+      "p_max": 1.0,
+      "p_mid": 0.935064935064935,
+      "p_min": 0.001998001998001998,
+      "target": "P-256",
+      "upper_ge": 467,
+      "verdict": "inconclusive: censoring",
+      "x": [
+        4,
+        5,
+        13,
+        2
+      ]
+    },
+    {
+      "family": "sensitivity_semicircle",
+      "lower_le": 642,
+      "metric": "omega_small",
+      "midrank": 0.5015,
+      "n": 1000,
+      "null": "R256s",
+      "p_max": 1.0,
+      "p_mid": 1.0,
+      "p_min": 1.0,
+      "target": "P-256",
+      "upper_ge": 639,
+      "verdict": "within the control distribution",
+      "x": [
+        4,
+        5,
+        13,
+        2
+      ]
+    },
+    {
+      "family": "sensitivity_semicircle",
+      "lower_le": 747,
+      "metric": "omega",
+      "midrank": 0.645,
+      "n": 1000,
+      "null": "R224s",
+      "p_max": 1.0,
+      "p_mid": 0.9150849150849151,
+      "p_min": 0.6493506493506493,
+      "target": "brainpoolP224r1",
+      "upper_ge": 457,
+      "verdict": "within the control distribution",
+      "x": [
+        5,
+        5,
+        5,
+        3
+      ]
+    },
+    {
+      "family": "sensitivity_semicircle",
+      "lower_le": 833,
+      "metric": "omega_small",
+      "midrank": 0.742,
+      "n": 1000,
+      "null": "R224s",
+      "p_max": 0.6993006993006993,
+      "p_mid": 0.6993006993006993,
+      "p_min": 0.6993006993006993,
+      "target": "brainpoolP224r1",
+      "upper_ge": 349,
+      "verdict": "within the control distribution",
+      "x": [
+        5,
+        5,
+        5,
+        3
+      ]
+    },
+    {
+      "family": "sensitivity_semicircle",
+      "lower_le": 533,
+      "metric": "omega",
+      "midrank": 0.4105,
+      "n": 1000,
+      "null": "R256s",
+      "p_max": 1.0,
+      "p_mid": 1.0,
+      "p_min": 0.4355644355644356,
+      "target": "brainpoolP256r1",
+      "upper_ge": 712,
+      "verdict": "within the control distribution",
+      "x": [
+        4,
+        4,
+        4,
+        1
+      ]
+    },
+    {
+      "family": "sensitivity_semicircle",
+      "lower_le": 361,
+      "metric": "omega_small",
+      "midrank": 0.233,
+      "n": 1000,
+      "null": "R256s",
+      "p_max": 0.7232767232767233,
+      "p_mid": 0.7232767232767233,
+      "p_min": 0.7232767232767233,
+      "target": "brainpoolP256r1",
+      "upper_ge": 895,
+      "verdict": "within the control distribution",
+      "x": [
+        4,
+        4,
+        4,
+        1
+      ]
+    }
+  ]
+}

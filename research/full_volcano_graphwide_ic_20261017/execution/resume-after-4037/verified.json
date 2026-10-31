@@ -1,0 +1,54 @@
+{
+  "schema": "volcano-resume-readback/v1",
+  "checked_utc": "2026-10-17T20:13:55.172771+00:00",
+  "pid": 97646,
+  "process_readback": "97646       1   97646 Ss   /workspace/volcano_ic_repaired_survey_20261017/volcano-ic-driver run /workspace/volcano_ic_repaired_survey_20261017 24823 259200 6442450944",
+  "native_status": {
+    "campaign": "/workspace/volcano_ic_repaired_survey_20261017",
+    "coverage": [
+      {
+        "graph": "mixed",
+        "state": "audited",
+        "vertices": 1357
+      },
+      {
+        "graph": "mixed",
+        "state": "queued",
+        "vertices": 8713
+      },
+      {
+        "graph": "three",
+        "state": "audited",
+        "vertices": 1338
+      },
+      {
+        "graph": "three",
+        "state": "queued",
+        "vertices": 5222
+      },
+      {
+        "graph": "three",
+        "state": "running",
+        "vertices": 1
+      },
+      {
+        "graph": "two",
+        "state": "audited",
+        "vertices": 1344
+      },
+      {
+        "graph": "two",
+        "state": "queued",
+        "vertices": 6848
+      }
+    ]
+  },
+  "log_tail": [
+    "1792268022656 RUN mixed-v1350 attempt 1",
+    "1792268024725 audited mixed-v1350: {\"exhausted\":2,\"verified\":14}",
+    "1792268024856 RUN two-v1341 attempt 1",
+    "1792268027148 audited two-v1341: {\"exhausted\":2,\"verified\":14}",
+    "1792268027260 RUN three-v1337 attempt 1"
+  ],
+  "scope": "Actual live separate session, PPID1 and new audited progress; no full queue completion or automatic upload claimed."
+}

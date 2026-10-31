@@ -1,0 +1,6 @@
+date_utc=2026-10-17T22:11:47Z
+library=liboqs 0.13.0 via oqs crate 0.11.0 (OQS_DIST_BUILD=1: AVX2/AVX-512 code paths chosen at run time; no OpenSSL)
+host=same VM as run-20261017T2022Z-kem-bench, idle apart from this run
+pinning=taskset -c 1, single thread
+method=each op timed individually until 2 s or 1000 ops (min 5); median and min in microseconds; two repetitions
+harness=crypto:research/eigen_seta_whitepaper_20261017/tools/pqkem_bench

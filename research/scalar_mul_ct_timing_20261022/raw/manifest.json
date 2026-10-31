@@ -1,0 +1,19 @@
+{
+  "schema": "scalar-mul-ct-timing-manifest/v1",
+  "protocol": "research/scalar_mul_ct_timing_20261022/PROTOCOL.md (committed in f7f455e7c before any recorded run)",
+  "before": {
+    "commit": "f7f455e7c",
+    "note": "main at 412b60289 plus this study's driver examples/scalar_mul_secret_timing.rs (only API present on main)",
+    "binary_sha256": "84862ca17ac905dd367553e74656889be76c9f63f43fe59464bfeee2ec277f63"
+  },
+  "after": {
+    "commit": "1dce1c654",
+    "note": "the fix to Point::scalar_mul_ct on branch claude/scalar-mul-secret-timing",
+    "binary_sha256": "82210b0708dca3f4f322e77f851c4f596206839e86f4f59860ccbd0026cd879c"
+  },
+  "command": "scripts/run_arms.sh <raw_dir> <before_binary> <after_binary>; each process: scalar_mul_secret_timing <label> 3",
+  "isolation": "tools/isolated_bench.py run --wait --cpus 3 (one reserved CPU, single thread); records in isolation.jsonl",
+  "rustc": "rustc 1.97.0 (2d8144b78 2026-07-07)",
+  "build": "cargo build --release (default profile)",
+  "host": "Intel Xeon @ 2.10 GHz, 4-vCPU KVM guest"
+}

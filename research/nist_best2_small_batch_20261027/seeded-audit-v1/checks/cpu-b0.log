@@ -1,0 +1,41 @@
+make: Entering directory '/workspace/scratch/1be74b80aad3/crypto/gpu/nist'
+g++ -O3 -std=c++17 -Wall -Wextra -Wno-unknown-pragmas -DRHO_BEST2=0 -I/tmp/best2-toolchain/usr/include -o test_cpu_b0 test_cpu.cpp
+test_cpu.cpp: In function ‘AP addref(AP, AP, const boost::multiprecision::cpp_int&, const boost::multiprecision::cpp_int&)’:
+test_cpu.cpp:36:2: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   36 |  if(A.inf)return B;if(B.inf)return A;
+      |  ^~
+test_cpu.cpp:36:20: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   36 |  if(A.inf)return B;if(B.inf)return A;
+      |                    ^~
+g++ -O3 -std=c++17 -Wall -Wextra -Wno-unknown-pragmas -DRHO_BEST2=0 -I/tmp/best2-toolchain/usr/include -o test_rho_b0 test_rho.cpp
+./test_cpu_b0
+P-256 Montgomery: 20000 random field pairs passed
+P-384 Montgomery: 20000 random field pairs passed
+P-256 Solinas: 20000 random field pairs passed
+P-384 Solinas: 20000 random field pairs passed
+P-256 point: Jacobian double + mixed add passed
+P-384 point: Jacobian double + mixed add passed
+ALL PASSED
+./test_rho_b0
+P-256: inversion + batch inverse (a*inv(a)=1) passed
+P-384: inversion + batch inverse (a*inv(a)=1) passed
+P-256: group laws + Jacobian seeding ladder == affine ladder passed
+P-384: group laws + Jacobian seeding ladder == affine ladder passed
+P-256: negation-map fold is a class function
+P-384: negation-map fold is a class function
+P-256: single-step walk ran 200 deterministic steps
+P-384: single-step walk ran 200 deterministic steps
+toy curve: nG=O and kG=Q verified
+batched stepper: 4453 DPs over 4000 iters, all valid abscissae
+batch step W-variant equivalence: 6/6 identical
+batch_inv_w vs batch_inv at W=2: 2000/2000 identical
+batch_inv_w vs batch_inv at W=4: 2000/2000 identical
+batch_inv_w vs batch_inv at W=8: 2000/2000 identical
+batch_inv_w vs batch_inv at W=16: 2000/2000 identical
+batch_inv_w vs batch_inv at W=32: 2000/2000 identical
+batch_inv_w vs batch_inv at W=64: 2000/2000 identical
+toy solve (fold 2): k=185340 after 2834 steps
+toy solve (fold 1): k=185340 after 5227 steps
+per-phase scalar replay: subtraction=0 escapes=1 skipped=2; infinity restart retained
+ALL PASSED
+make: Leaving directory '/workspace/scratch/1be74b80aad3/crypto/gpu/nist'

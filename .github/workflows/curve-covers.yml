@@ -1,44 +1,7 @@
 name: Curve cover certificates
 on:
-  pull_request:
-    paths:
-      - '.gitattributes'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - 'src/lib.rs'
-      - 'src/bin/curve_standards.rs'
-      - 'src/bin/curve_standards/**'
-      - 'src/bin/curve_cover_check.rs'
-      - 'src/bin/curve_cover_check/**'
-      - 'src/bin/hyperelliptic_cover.rs'
-      - 'src/bin/ecdlp_audit.rs'
-      - 'src/bin/ecdlp_audit/**'
-      - 'src/binary_ecc/**'
-      - 'src/prime_hyperelliptic/**'
-      - 'src/cryptanalysis/ecc2k130_guard.rs'
-      - 'src/cryptanalysis/mod.rs'
-      - 'src/hash/mod.rs'
-      - 'src/hash/sha256.rs'
-      - 'src/utils/**'
-      - 'docs/curves/**'
-      - 'docs/ecdlp-audit/**'
-      - 'docs/ECDLP_ATTACK_MATRIX.md'
-      - 'docs/ic/boundary_targets.json'
-      - 'docs/browser/**'
-      - 'scripts/build_lab_browser.py'
-      - 'scripts/test_build_lab_browser.py'
-      - 'scripts/test_cover_catalog.py'
-      - 'scripts/update_curve_standards.py'
-      - 'scripts/build_curve_registry.py'
-      - 'scripts/build_cover_transfer_assessments.mjs'
-      - 'research/cover_transfer_assessment_20261013/**'
-      - 'research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.md'
-      - 'research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.pdf'
-      - 'problems/catalog-cover-subgroup-certificates-incomplete.md'
-      - 'research/hyperelliptic_cover_infrastructure_20261006/evidence.json'
-      - 'research/hyperelliptic_cover_infrastructure_20261006/README.md'
-      - '.github/workflows/curve-covers.yml'
-      - '.github/workflows/release.yml'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:
@@ -67,10 +30,11 @@ on:
       - 'docs/browser/**'
       - 'scripts/build_lab_browser.py'
       - 'scripts/test_build_lab_browser.py'
-      - 'scripts/test_cover_catalog.py'
       - 'scripts/update_curve_standards.py'
       - 'scripts/build_curve_registry.py'
       - 'scripts/build_cover_transfer_assessments.mjs'
+      - 'scripts/catalog_snapshot.mjs'
+      - 'scripts/test_catalog_snapshot.mjs'
       - 'research/cover_transfer_assessment_20261013/**'
       - 'research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.md'
       - 'research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.pdf'
@@ -90,13 +54,42 @@ concurrency:
 
 jobs:
   certificates:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|curve-covers.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|curve-covers.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
+      # The full-history checkout no longer fits a hosted runner's disk
+      # (checkout fails mid-clone); free the unused SDKs first (as in #2385).
+      - name: Free runner disk
+        if: runner.environment == 'github-hosted'
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          df -h /
       - uses: actions/checkout@v4
         with:
           # verify-plan replays three immutable historical Git blobs.
           fetch-depth: 0
+          filter: blob:none
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/cover_transfer_assessment_20261013
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.98'
@@ -119,7 +112,6 @@ jobs:
       - run: cargo run --bin curve_standards -- --check
       - run: python3 scripts/update_curve_standards.py --check
       - run: cargo run --bin curve_cover_check -- --check
-      - run: python3 scripts/test_cover_catalog.py
       - name: Check sparse-safe lab-browser generation
         run: |
           python3 scripts/test_build_lab_browser.py
@@ -127,12 +119,66 @@ jobs:
 
   transfer-assessment:
     name: Cover transfer assessment
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|curve-covers.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|curve-covers.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      # The full-history checkout no longer fits a hosted runner's disk
+      # (checkout fails mid-clone); free the unused SDKs first (as in #2385).
+      - name: Free runner disk
+        if: runner.environment == 'github-hosted'
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          df -h /
       - uses: actions/checkout@v4
         with:
+          # Retain commit history for the declared catalog snapshot, but
+          # materialize only the assessment's exact source/evidence surface.
           fetch-depth: 0
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/*/
+            /.github/workflows/
+            /scripts/
+            /src/
+            /docs/curves/
+            /research/cover_transfer_assessment_20261013/
+            /research/hyperelliptic_cover_infrastructure_20261006/
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/cover_transfer_assessment_20261013
+      - name: Retain immutable inputs for local assessment replay
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: cover-transfer-replay-inputs
+          path: |
+            research/cover_transfer_assessment_20261013/cover_transfer_assessment_20261013.pdf
+            research/cover_transfer_assessment_20261013/typed_correspondence.png
+            research/cover_transfer_assessment_20261013/typed_transfer_context.png
+          if-no-files-found: error
+          retention-days: 7
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -141,8 +187,16 @@ jobs:
           python-version: '3.11'
       - name: Install the pinned Draft 2020-12 validator
         run: python -m pip install jsonschema==4.23.0
+      - name: Hydrate cover-transfer assessment figures
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull research/cover_transfer_assessment_20261013
       - name: Check deterministic catalog-wide assessment generation
-        run: node scripts/build_cover_transfer_assessments.mjs --check
+        run: |
+          node --test scripts/test_catalog_snapshot.mjs
+          node scripts/build_cover_transfer_assessments.mjs --check
       - name: Validate the assessment schema
         run: python -m jsonschema -i docs/curves/cover-transfer-assessments.json docs/curves/cover-transfer-assessment.schema.json
       - name: Verify typed map, subgroup, and evidence bindings
@@ -150,23 +204,57 @@ jobs:
 
   transfer-lemma:
     name: Cover transfer Lean lemma
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|curve-covers.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|curve-covers.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 25
     defaults:
       run:
         working-directory: research/cover_transfer_assessment_20261013/lean
     steps:
-      # The package needs only its own directory (mathlib comes from git); the
-      # full 8 GB checkout plus the mathlib cache no longer fits the runner disk.
+      # Ported from #2452 (codex/curve-registry-full-tree-20261023), whose run of
+      # this job passes: the sparse checkout alone still runs out of disk once
+      # the Mathlib cache unpacks, so reclaim the unused SDKs first.
+      - name: Reclaim hosted runner disk for the Mathlib proof cache
+        if: runner.environment == 'github-hosted'
+        working-directory: .
+        run: |
+          df -h .
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/local/share/powershell
+          df -h .
       - uses: actions/checkout@v4
         with:
-          sparse-checkout: research/cover_transfer_assessment_20261013/lean
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/cover_transfer_assessment_20261013/lean/**
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/cover_transfer_assessment_20261013
       - name: Build the conditional injectivity theorem and replay it in a fresh kernel
         uses: leanprover/lean-action@v1
         with:
           lake-package-directory: research/cover_transfer_assessment_20261013/lean
           auto-config: false
           use-mathlib-cache: true
+          use-github-cache: false
           build: true
           build-args: 'CoverTransfer'
           test: false

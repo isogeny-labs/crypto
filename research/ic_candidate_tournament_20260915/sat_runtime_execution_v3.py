@@ -202,8 +202,12 @@ def register(repository, output, *, module, action, arguments, timeout_seconds,
 def frozen_environment():
     # Isolation flags also disable user/site initialization. Keep a minimal
     # environment for the separately source-bound native toolchain/solver.
+    # setup-python needs its loader path on Linux: dropping it can load the
+    # system libpython into the same executable and change the sealed runtime.
+    # The complete interpreter inventory is still checked before and after use.
     result = {key: value for key, value in os.environ.items()
-              if key in ('PATH', 'HOME', 'TMPDIR', 'LANG', 'LC_ALL')}
+              if key in ('PATH', 'HOME', 'TMPDIR', 'LANG', 'LC_ALL',
+                         'LD_LIBRARY_PATH')}
     result.update(PYTHONDONTWRITEBYTECODE='1', PYTHONNOUSERSITE='1')
     return result
 

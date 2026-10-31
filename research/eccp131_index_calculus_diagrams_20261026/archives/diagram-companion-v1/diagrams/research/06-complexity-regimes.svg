@@ -1,0 +1,625 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="1040" viewBox="0 0 1600 1040" role="img" aria-labelledby="title6 desc6"><title id="title6">Complexity regimes: ambient group or target subgroup?</title><desc id="desc6">Compare asymptotic work exponents with the prime subgroup order n stated explicitly.</desc><defs>
+<marker id="r6ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="#192b3b"/></marker>
+<marker id="r6blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="#2864ad"/></marker>
+<marker id="r6green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="#087d68"/></marker>
+<marker id="r6purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="#7555a5"/></marker>
+</defs><style>text{font-family:DejaVu Sans,Arial,sans-serif}</style>
+<rect x="0" y="0" width="1600" height="1040" rx="0" fill="#f7f6f2" stroke="none" stroke-width="1.5" />
+<text x="56" y="45" font-size="14" font-weight="650" text-anchor="start" fill="#586879" letter-spacing="1.5" >INDEX CALCULUS · RESEARCH DIAGRAMS</text>
+<text x="1544" y="45" font-size="15" font-weight="400" text-anchor="end" fill="#586879"  >06 / 10</text>
+<text x="56" y="99" font-size="36" font-weight="700" text-anchor="start" fill="#192b3b"  >Complexity regimes: ambient group or target subgroup?</text>
+<text x="56" y="139" font-size="20" font-weight="400" text-anchor="start" fill="#586879"  >Compare asymptotic work exponents with the prime subgroup order n stated explicitly.</text>
+<rect x="56" y="171" width="1488" height="89" rx="18" fill="white" stroke="#d9dfe5" stroke-width="1.5" />
+<text x="82" y="204" font-size="13" font-weight="650" text-anchor="start" fill="#586879" letter-spacing="0.7" id="modeTag">DEFAULT: ECCp-131 EMBEDDINGS</text>
+<text x="82" y="241" font-size="24" font-weight="650" text-anchor="start" fill="#192b3b"  id="comparisonLabel">Same target: log₂ n ≈ log₂ q = 130.19</text>
+<rect x="1118" y="198" width="20" height="14" rx="3" fill="#2864ad" stroke="none" stroke-width="1.5" />
+<text x="1149" y="211" font-size="17" font-weight="400" text-anchor="start" fill="#586879"  >Rho on the target</text>
+<rect x="1335" y="198" width="20" height="14" rx="3" fill="#087d68" stroke="none" stroke-width="1.5" />
+<text x="1366" y="211" font-size="16" font-weight="400" text-anchor="start" fill="#586879"  >IC benchmark</text>
+<path d="M500.0 282 L500.0 763" fill="none" stroke="#d9dfe5" stroke-width="1" />
+<text x="500.0" y="797" font-size="16" font-weight="400" text-anchor="middle" fill="#586879"  >0</text>
+<path d="M682.6923076923076 282 L682.6923076923076 763" fill="none" stroke="#d9dfe5" stroke-width="1" />
+<text x="682.6923076923076" y="797" font-size="16" font-weight="400" text-anchor="middle" fill="#586879"  >50</text>
+<path d="M865.3846153846154 282 L865.3846153846154 763" fill="none" stroke="#d9dfe5" stroke-width="1" />
+<text x="865.3846153846154" y="797" font-size="16" font-weight="400" text-anchor="middle" fill="#586879"  >100</text>
+<path d="M1048.076923076923 282 L1048.076923076923 763" fill="none" stroke="#d9dfe5" stroke-width="1" />
+<text x="1048.076923076923" y="797" font-size="16" font-weight="400" text-anchor="middle" fill="#586879"  >150</text>
+<path d="M1230.7692307692307 282 L1230.7692307692307 763" fill="none" stroke="#d9dfe5" stroke-width="1" />
+<text x="1230.7692307692307" y="797" font-size="16" font-weight="400" text-anchor="middle" fill="#586879"  >200</text>
+<path d="M1413.4615384615386 282 L1413.4615384615386 763" fill="none" stroke="#d9dfe5" stroke-width="1" />
+<text x="1413.4615384615386" y="797" font-size="16" font-weight="400" text-anchor="middle" fill="#586879"  >250</text>
+<text x="80" y="318" font-size="22" font-weight="650" text-anchor="start" fill="#192b3b"  >Elliptic prime-field group</text>
+<text x="80" y="348" font-size="17" font-weight="400" text-anchor="start" fill="#586879"  id="orderLabel0">n≈q; ambient order ≈ q</text>
+<rect x="500" y="302" width="237.84253622440326" height="20" rx="5" fill="#2864ad" stroke="none" stroke-width="1.5" id="rhoBar0"/>
+<text x="749.8425362244033" y="319" font-size="18" font-weight="400" text-anchor="start" fill="#2864ad"  id="rhoText0">2^65.1</text>
+<text x="500" y="360" font-size="18" font-weight="400" text-anchor="start" fill="#586879"  >No established general prime-field IC improvement</text>
+<text x="80" y="440" font-size="22" font-weight="650" text-anchor="start" fill="#192b3b"  >Genus-2 hyperelliptic</text>
+<text x="80" y="470" font-size="17" font-weight="400" text-anchor="start" fill="#586879"  id="orderLabel1">n≈q; ambient order ≈ q²</text>
+<svg x="80" y="486" width="163.0" height="25.0" viewBox="0 0 163 25" aria-label="\widetilde O(q^{2-2/g})=\widetilde O(q)" >
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-26T14:19:38.068594</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="r6m48-figure_1">
+
+  <g id="r6m48-text_1">
+   <!-- $\widetilde O(q^{2-2/g})=\widetilde O(q)$ -->
+   <g style="fill: #586879" transform="translate(0 20) scale(0.2 -0.2)">
+    <defs>
+     <path id="r6m48-STIXSizeTwoSym-Regular-303" d="M -1274 4864
+L -1107 4864
+Q -1280 3891 -2560 3891
+Q -2861 3891 -3097 3916
+Q -3334 3942 -3484 3974
+Q -3635 4006 -4044 4102
+Q -4454 4198 -4806 4275
+Q -5741 4474 -6093 4474
+Q -7021 4474 -7206 3891
+L -7373 3891
+Q -7200 4864 -5997 4864
+Q -5414 4864 -3718 4474
+Q -2842 4269 -2400 4269
+Q -1421 4269 -1274 4864
+z
+" transform="scale(0.015625)"/>
+     <path id="r6m48-DejaVuSans-Oblique-4f" d="M 2919 4238
+Q 2400 4238 2003 3986
+Q 1606 3734 1313 3219
+Q 1125 2891 1026 2522
+Q 928 2153 928 1778
+Q 928 1128 1239 775
+Q 1550 422 2119 422
+Q 2631 422 3032 676
+Q 3434 931 3719 1434
+Q 3909 1772 4009 2142
+Q 4109 2513 4109 2881
+Q 4109 3528 3796 3883
+Q 3484 4238 2919 4238
+z
+M 2100 -91
+Q 1241 -91 748 418
+Q 256 928 256 1813
+Q 256 2319 448 2847
+Q 641 3375 978 3788
+Q 1375 4272 1862 4511
+Q 2350 4750 2938 4750
+Q 3794 4750 4287 4245
+Q 4781 3741 4781 2869
+Q 4781 2331 4593 1812
+Q 4406 1294 4056 872
+Q 3656 384 3173 146
+Q 2691 -91 2100 -91
+z
+" transform="scale(0.015625)"/>
+     <path id="r6m48-DejaVuSans-28" d="M 1984 4856
+Q 1566 4138 1362 3434
+Q 1159 2731 1159 2009
+Q 1159 1288 1364 580
+Q 1569 -128 1984 -844
+L 1484 -844
+Q 1016 -109 783 600
+Q 550 1309 550 2009
+Q 550 2706 781 3412
+Q 1013 4119 1484 4856
+L 1984 4856
+z
+" transform="scale(0.015625)"/>
+     <path id="r6m48-DejaVuSans-Oblique-71" d="M 2669 525
+Q 2438 222 2123 65
+Q 1809 -91 1428 -91
+Q 897 -91 595 267
+Q 294 625 294 1253
+Q 294 1759 480 2231
+Q 666 2703 1013 3078
+Q 1238 3322 1530 3453
+Q 1822 3584 2144 3584
+Q 2531 3584 2781 3431
+Q 3031 3278 3144 2969
+L 3244 3494
+L 3822 3494
+L 2888 -1319
+L 2309 -1319
+L 2669 525
+z
+M 891 1338
+Q 891 875 1084 633
+Q 1278 391 1644 391
+Q 2188 391 2572 911
+Q 2956 1431 2956 2175
+Q 2956 2625 2757 2864
+Q 2559 3103 2188 3103
+Q 1916 3103 1684 2976
+Q 1453 2850 1281 2606
+Q 1100 2350 995 2006
+Q 891 1663 891 1338
+z
+" transform="scale(0.015625)"/>
+     <path id="r6m48-DejaVuSans-32" d="M 1228 531
+L 3431 531
+L 3431 0
+L 469 0
+L 469 531
+Q 828 903 1448 1529
+Q 2069 2156 2228 2338
+Q 2531 2678 2651 2914
+Q 2772 3150 2772 3378
+Q 2772 3750 2511 3984
+Q 2250 4219 1831 4219
+Q 1534 4219 1204 4116
+Q 875 4013 500 3803
+L 500 4441
+Q 881 4594 1212 4672
+Q 1544 4750 1819 4750
+Q 2544 4750 2975 4387
+Q 3406 4025 3406 3419
+Q 3406 3131 3298 2873
+Q 3191 2616 2906 2266
+Q 2828 2175 2409 1742
+Q 1991 1309 1228 531
+z
+" transform="scale(0.015625)"/>
+     <path id="r6m48-DejaVuSans-2212" d="M 678 2272
+L 4684 2272
+L 4684 1741
+L 678 1741
+L 678 2272
+z
+" transform="scale(0.015625)"/>
+     <path id="r6m48-DejaVuSans-2f" d="M 1625 4666
+L 2156 4666
+L 531 -594
+L 0 -594
+L 1625 4666
+z
+" transform="scale(0.015625)"/>
+     <path id="r6m48-DejaVuSans-Oblique-67" d="M 3816 3500
+L 3219 434
+Q 3047 -456 2561 -893
+Q 2075 -1331 1253 -1331
+Q 950 -1331 690 -1286
+Q 431 -1241 206 -1147
+L 313 -588
+Q 525 -725 762 -790
+Q 1000 -856 1269 -856
+Q 1816 -856 2167 -557
+Q 2519 -259 2631 300
+L 2681 563
+Q 2441 288 2122 144
+Q 1803 0 1434 0
+Q 903 0 598 351
+Q 294 703 294 1319
+Q 294 1803 478 2267
+Q 663 2731 997 3091
+Q 1219 3328 1514 3456
+Q 1809 3584 2131 3584
+Q 2484 3584 2746 3420
+Q 3009 3256 3138 2956
+L 3238 3500
+L 3816 3500
+z
+M 2950 2216
+Q 2950 2641 2750 2872
+Q 2550 3103 2181 3103
+Q 1953 3103 1747 3012
+Q 1541 2922 1394 2759
+Q 1156 2491 1023 2127
+Q 891 1763 891 1375
+Q 891 944 1092 712
+Q 1294 481 1672 481
+Q 2219 481 2584 976
+Q 2950 1472 2950 2216
+z
+" transform="scale(0.015625)"/>
+     <path id="r6m48-DejaVuSans-29" d="M 513 4856
+L 1013 4856
+Q 1481 4119 1714 3412
+Q 1947 2706 1947 2009
+Q 1947 1309 1714 600
+Q 1481 -109 1013 -844
+L 513 -844
+Q 928 -128 1133 580
+Q 1338 1288 1338 2009
+Q 1338 2731 1133 3434
+Q 928 4138 513 4856
+z
+" transform="scale(0.015625)"/>
+     <path id="r6m48-DejaVuSans-3d" d="M 678 2906
+L 4684 2906
+L 4684 2381
+L 678 2381
+L 678 2906
+z
+M 678 1631
+L 4684 1631
+L 4684 1100
+L 678 1100
+L 678 1631
+z
+" transform="scale(0.015625)"/>
+    </defs>
+    <use xlink:href="#r6m48-STIXSizeTwoSym-Regular-303" transform="translate(91.910156 43.28125) scale(0.722151)"/>
+    <use xlink:href="#r6m48-DejaVuSans-Oblique-4f" transform="translate(0 0.34375)"/>
+    <use xlink:href="#r6m48-DejaVuSans-28" transform="translate(78.710938 0.34375)"/>
+    <use xlink:href="#r6m48-DejaVuSans-Oblique-71" transform="translate(117.724609 0.34375)"/>
+    <use xlink:href="#r6m48-DejaVuSans-32" transform="translate(185.851068 38.625) scale(0.7)"/>
+    <use xlink:href="#r6m48-DejaVuSans-2212" transform="translate(244.024896 38.625) scale(0.7)"/>
+    <use xlink:href="#r6m48-DejaVuSans-32" transform="translate(316.314935 38.625) scale(0.7)"/>
+    <use xlink:href="#r6m48-DejaVuSans-2f" transform="translate(360.851068 38.625) scale(0.7)"/>
+    <use xlink:href="#r6m48-DejaVuSans-Oblique-67" transform="translate(384.435052 38.625) scale(0.7)"/>
+    <use xlink:href="#r6m48-DejaVuSans-29" transform="translate(431.603021 0.34375)"/>
+    <use xlink:href="#r6m48-DejaVuSans-3d" transform="translate(490.099115 0.34375)"/>
+    <use xlink:href="#r6m48-STIXSizeTwoSym-Regular-303" transform="translate(685.280755 43.28125) scale(0.722151)"/>
+    <use xlink:href="#r6m48-DejaVuSans-Oblique-4f" transform="translate(593.370599 0.34375)"/>
+    <use xlink:href="#r6m48-DejaVuSans-28" transform="translate(672.081536 0.34375)"/>
+    <use xlink:href="#r6m48-DejaVuSans-Oblique-71" transform="translate(711.095208 0.34375)"/>
+    <use xlink:href="#r6m48-DejaVuSans-29" transform="translate(774.571771 0.34375)"/>
+   </g>
+  </g>
+ </g>
+</svg>
+<rect x="500" y="424" width="237.84253622440326" height="20" rx="5" fill="#2864ad" stroke="none" stroke-width="1.5" id="rhoBar1"/>
+<text x="749.8425362244033" y="441" font-size="18" font-weight="400" text-anchor="start" fill="#2864ad"  id="rhoText1">2^65.1</text>
+<rect x="500" y="461" width="475.6850724488065" height="20" rx="5" fill="#087d68" stroke="none" stroke-width="1.5" id="icBar1" opacity="0.55"/>
+<text x="987.6850724488065" y="478" font-size="18" font-weight="400" text-anchor="start" fill="#087d68"  id="icText1">2^130.2 †</text>
+<text x="80" y="562" font-size="22" font-weight="650" text-anchor="start" fill="#192b3b"  >Genus-3 hyperelliptic</text>
+<text x="80" y="592" font-size="17" font-weight="400" text-anchor="start" fill="#586879"  id="orderLabel2">n≈q; ambient order ≈ q³</text>
+<svg x="80" y="608" width="69.0" height="25.0" viewBox="0 0 69 25" aria-label="\widetilde O(q^{4/3})" >
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-26T14:19:38.094565</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="r6m49-figure_1">
+
+  <g id="r6m49-text_1">
+   <!-- $\widetilde O(q^{4/3})$ -->
+   <g style="fill: #586879" transform="translate(0 20) scale(0.2 -0.2)">
+    <defs>
+     <path id="r6m49-STIXSizeTwoSym-Regular-303" d="M -1274 4864
+L -1107 4864
+Q -1280 3891 -2560 3891
+Q -2861 3891 -3097 3916
+Q -3334 3942 -3484 3974
+Q -3635 4006 -4044 4102
+Q -4454 4198 -4806 4275
+Q -5741 4474 -6093 4474
+Q -7021 4474 -7206 3891
+L -7373 3891
+Q -7200 4864 -5997 4864
+Q -5414 4864 -3718 4474
+Q -2842 4269 -2400 4269
+Q -1421 4269 -1274 4864
+z
+" transform="scale(0.015625)"/>
+     <path id="r6m49-DejaVuSans-Oblique-4f" d="M 2919 4238
+Q 2400 4238 2003 3986
+Q 1606 3734 1313 3219
+Q 1125 2891 1026 2522
+Q 928 2153 928 1778
+Q 928 1128 1239 775
+Q 1550 422 2119 422
+Q 2631 422 3032 676
+Q 3434 931 3719 1434
+Q 3909 1772 4009 2142
+Q 4109 2513 4109 2881
+Q 4109 3528 3796 3883
+Q 3484 4238 2919 4238
+z
+M 2100 -91
+Q 1241 -91 748 418
+Q 256 928 256 1813
+Q 256 2319 448 2847
+Q 641 3375 978 3788
+Q 1375 4272 1862 4511
+Q 2350 4750 2938 4750
+Q 3794 4750 4287 4245
+Q 4781 3741 4781 2869
+Q 4781 2331 4593 1812
+Q 4406 1294 4056 872
+Q 3656 384 3173 146
+Q 2691 -91 2100 -91
+z
+" transform="scale(0.015625)"/>
+     <path id="r6m49-DejaVuSans-28" d="M 1984 4856
+Q 1566 4138 1362 3434
+Q 1159 2731 1159 2009
+Q 1159 1288 1364 580
+Q 1569 -128 1984 -844
+L 1484 -844
+Q 1016 -109 783 600
+Q 550 1309 550 2009
+Q 550 2706 781 3412
+Q 1013 4119 1484 4856
+L 1984 4856
+z
+" transform="scale(0.015625)"/>
+     <path id="r6m49-DejaVuSans-Oblique-71" d="M 2669 525
+Q 2438 222 2123 65
+Q 1809 -91 1428 -91
+Q 897 -91 595 267
+Q 294 625 294 1253
+Q 294 1759 480 2231
+Q 666 2703 1013 3078
+Q 1238 3322 1530 3453
+Q 1822 3584 2144 3584
+Q 2531 3584 2781 3431
+Q 3031 3278 3144 2969
+L 3244 3494
+L 3822 3494
+L 2888 -1319
+L 2309 -1319
+L 2669 525
+z
+M 891 1338
+Q 891 875 1084 633
+Q 1278 391 1644 391
+Q 2188 391 2572 911
+Q 2956 1431 2956 2175
+Q 2956 2625 2757 2864
+Q 2559 3103 2188 3103
+Q 1916 3103 1684 2976
+Q 1453 2850 1281 2606
+Q 1100 2350 995 2006
+Q 891 1663 891 1338
+z
+" transform="scale(0.015625)"/>
+     <path id="r6m49-DejaVuSans-34" d="M 2419 4116
+L 825 1625
+L 2419 1625
+L 2419 4116
+z
+M 2253 4666
+L 3047 4666
+L 3047 1625
+L 3713 1625
+L 3713 1100
+L 3047 1100
+L 3047 0
+L 2419 0
+L 2419 1100
+L 313 1100
+L 313 1709
+L 2253 4666
+z
+" transform="scale(0.015625)"/>
+     <path id="r6m49-DejaVuSans-2f" d="M 1625 4666
+L 2156 4666
+L 531 -594
+L 0 -594
+L 1625 4666
+z
+" transform="scale(0.015625)"/>
+     <path id="r6m49-DejaVuSans-33" d="M 2597 2516
+Q 3050 2419 3304 2112
+Q 3559 1806 3559 1356
+Q 3559 666 3084 287
+Q 2609 -91 1734 -91
+Q 1441 -91 1130 -33
+Q 819 25 488 141
+L 488 750
+Q 750 597 1062 519
+Q 1375 441 1716 441
+Q 2309 441 2620 675
+Q 2931 909 2931 1356
+Q 2931 1769 2642 2001
+Q 2353 2234 1838 2234
+L 1294 2234
+L 1294 2753
+L 1863 2753
+Q 2328 2753 2575 2939
+Q 2822 3125 2822 3475
+Q 2822 3834 2567 4026
+Q 2313 4219 1838 4219
+Q 1578 4219 1281 4162
+Q 984 4106 628 3988
+L 628 4550
+Q 988 4650 1302 4700
+Q 1616 4750 1894 4750
+Q 2613 4750 3031 4423
+Q 3450 4097 3450 3541
+Q 3450 3153 3228 2886
+Q 3006 2619 2597 2516
+z
+" transform="scale(0.015625)"/>
+     <path id="r6m49-DejaVuSans-29" d="M 513 4856
+L 1013 4856
+Q 1481 4119 1714 3412
+Q 1947 2706 1947 2009
+Q 1947 1309 1714 600
+Q 1481 -109 1013 -844
+L 513 -844
+Q 928 -128 1133 580
+Q 1338 1288 1338 2009
+Q 1338 2731 1133 3434
+Q 928 4138 513 4856
+z
+" transform="scale(0.015625)"/>
+    </defs>
+    <use xlink:href="#r6m49-STIXSizeTwoSym-Regular-303" transform="translate(91.910156 43.28125) scale(0.722151)"/>
+    <use xlink:href="#r6m49-DejaVuSans-Oblique-4f" transform="translate(0 0.34375)"/>
+    <use xlink:href="#r6m49-DejaVuSans-28" transform="translate(78.710938 0.34375)"/>
+    <use xlink:href="#r6m49-DejaVuSans-Oblique-71" transform="translate(117.724609 0.34375)"/>
+    <use xlink:href="#r6m49-DejaVuSans-34" transform="translate(185.851068 38.625) scale(0.7)"/>
+    <use xlink:href="#r6m49-DejaVuSans-2f" transform="translate(230.387201 38.625) scale(0.7)"/>
+    <use xlink:href="#r6m49-DejaVuSans-33" transform="translate(253.971185 38.625) scale(0.7)"/>
+    <use xlink:href="#r6m49-DejaVuSans-29" transform="translate(301.241693 0.34375)"/>
+   </g>
+  </g>
+ </g>
+</svg>
+<rect x="500" y="546" width="237.84253622440326" height="20" rx="5" fill="#2864ad" stroke="none" stroke-width="1.5" id="rhoBar2"/>
+<text x="749.8425362244033" y="563" font-size="18" font-weight="400" text-anchor="start" fill="#2864ad"  id="rhoText2">2^65.1</text>
+<rect x="500" y="583" width="634.2467632650753" height="20" rx="5" fill="#087d68" stroke="none" stroke-width="1.5" id="icBar2" opacity="0.55"/>
+<text x="1146.2467632650753" y="600" font-size="18" font-weight="400" text-anchor="start" fill="#087d68"  id="icText2">2^173.6 †</text>
+<text x="80" y="684" font-size="22" font-weight="650" text-anchor="start" fill="#192b3b"  >Genus-3 plane quartic</text>
+<text x="80" y="714" font-size="17" font-weight="400" text-anchor="start" fill="#586879"  id="orderLabel3">n≈q; ambient order ≈ q³</text>
+<svg x="80" y="730" width="45.0" height="25.0" viewBox="0 0 45 25" aria-label="\widetilde O(q)" >
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-26T14:19:38.108016</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="r6m50-figure_1">
+
+  <g id="r6m50-text_1">
+   <!-- $\widetilde O(q)$ -->
+   <g style="fill: #586879" transform="translate(0 20) scale(0.2 -0.2)">
+    <defs>
+     <path id="r6m50-STIXSizeTwoSym-Regular-303" d="M -1274 4864
+L -1107 4864
+Q -1280 3891 -2560 3891
+Q -2861 3891 -3097 3916
+Q -3334 3942 -3484 3974
+Q -3635 4006 -4044 4102
+Q -4454 4198 -4806 4275
+Q -5741 4474 -6093 4474
+Q -7021 4474 -7206 3891
+L -7373 3891
+Q -7200 4864 -5997 4864
+Q -5414 4864 -3718 4474
+Q -2842 4269 -2400 4269
+Q -1421 4269 -1274 4864
+z
+" transform="scale(0.015625)"/>
+     <path id="r6m50-DejaVuSans-Oblique-4f" d="M 2919 4238
+Q 2400 4238 2003 3986
+Q 1606 3734 1313 3219
+Q 1125 2891 1026 2522
+Q 928 2153 928 1778
+Q 928 1128 1239 775
+Q 1550 422 2119 422
+Q 2631 422 3032 676
+Q 3434 931 3719 1434
+Q 3909 1772 4009 2142
+Q 4109 2513 4109 2881
+Q 4109 3528 3796 3883
+Q 3484 4238 2919 4238
+z
+M 2100 -91
+Q 1241 -91 748 418
+Q 256 928 256 1813
+Q 256 2319 448 2847
+Q 641 3375 978 3788
+Q 1375 4272 1862 4511
+Q 2350 4750 2938 4750
+Q 3794 4750 4287 4245
+Q 4781 3741 4781 2869
+Q 4781 2331 4593 1812
+Q 4406 1294 4056 872
+Q 3656 384 3173 146
+Q 2691 -91 2100 -91
+z
+" transform="scale(0.015625)"/>
+     <path id="r6m50-DejaVuSans-28" d="M 1984 4856
+Q 1566 4138 1362 3434
+Q 1159 2731 1159 2009
+Q 1159 1288 1364 580
+Q 1569 -128 1984 -844
+L 1484 -844
+Q 1016 -109 783 600
+Q 550 1309 550 2009
+Q 550 2706 781 3412
+Q 1013 4119 1484 4856
+L 1984 4856
+z
+" transform="scale(0.015625)"/>
+     <path id="r6m50-DejaVuSans-Oblique-71" d="M 2669 525
+Q 2438 222 2123 65
+Q 1809 -91 1428 -91
+Q 897 -91 595 267
+Q 294 625 294 1253
+Q 294 1759 480 2231
+Q 666 2703 1013 3078
+Q 1238 3322 1530 3453
+Q 1822 3584 2144 3584
+Q 2531 3584 2781 3431
+Q 3031 3278 3144 2969
+L 3244 3494
+L 3822 3494
+L 2888 -1319
+L 2309 -1319
+L 2669 525
+z
+M 891 1338
+Q 891 875 1084 633
+Q 1278 391 1644 391
+Q 2188 391 2572 911
+Q 2956 1431 2956 2175
+Q 2956 2625 2757 2864
+Q 2559 3103 2188 3103
+Q 1916 3103 1684 2976
+Q 1453 2850 1281 2606
+Q 1100 2350 995 2006
+Q 891 1663 891 1338
+z
+" transform="scale(0.015625)"/>
+     <path id="r6m50-DejaVuSans-29" d="M 513 4856
+L 1013 4856
+Q 1481 4119 1714 3412
+Q 1947 2706 1947 2009
+Q 1947 1309 1714 600
+Q 1481 -109 1013 -844
+L 513 -844
+Q 928 -128 1133 580
+Q 1338 1288 1338 2009
+Q 1338 2731 1133 3434
+Q 928 4138 513 4856
+z
+" transform="scale(0.015625)"/>
+    </defs>
+    <use xlink:href="#r6m50-STIXSizeTwoSym-Regular-303" transform="translate(91.910156 43.28125) scale(0.722151)"/>
+    <use xlink:href="#r6m50-DejaVuSans-Oblique-4f" transform="translate(0 0.34375)"/>
+    <use xlink:href="#r6m50-DejaVuSans-28" transform="translate(78.710938 0.34375)"/>
+    <use xlink:href="#r6m50-DejaVuSans-Oblique-71" transform="translate(117.724609 0.34375)"/>
+    <use xlink:href="#r6m50-DejaVuSans-29" transform="translate(181.201172 0.34375)"/>
+   </g>
+  </g>
+ </g>
+</svg>
+<rect x="500" y="668" width="237.84253622440326" height="20" rx="5" fill="#2864ad" stroke="none" stroke-width="1.5" id="rhoBar3"/>
+<text x="749.8425362244033" y="685" font-size="18" font-weight="400" text-anchor="start" fill="#2864ad"  id="rhoText3">2^65.1</text>
+<rect x="500" y="705" width="475.6850724488065" height="20" rx="5" fill="#087d68" stroke="none" stroke-width="1.5" id="icBar3" opacity="0.55"/>
+<text x="987.6850724488065" y="722" font-size="18" font-weight="400" text-anchor="start" fill="#087d68"  id="icText3">2^130.2 †</text>
+<text x="975" y="837" font-size="20" font-weight="400" text-anchor="middle" fill="#586879"  >Exponent e in asymptotic work ≈ 2ᵉ</text>
+<rect x="56" y="866" width="1488" height="96" rx="18" fill="#fff4dd" stroke="none" stroke-width="1.5" />
+<text x="82" y="902" font-size="19" font-weight="400" text-anchor="start" fill="#a66a13"  id="costCaveat">† Ambient IC benchmark: split-Jacobian hypotheses and restricted-subgroup relation statistics must be rechecked.</text>
+<text x="82" y="937" font-size="19" font-weight="400" text-anchor="start" fill="#586879"  id="costExplanation">The target subgroup retains n≈q under the covers. Its rho exponent is therefore log₂(n)/2 in every row.</text>
+<path d="M56 988 L1544 988" fill="none" stroke="#d9dfe5" stroke-width="1.5" />
+<text x="56" y="1018" font-size="15" font-weight="400" text-anchor="start" fill="#586879"  >Fixed g; constants and logarithmic factors suppressed. Algorithmic hypotheses and operation costs differ; these are not runtime predictions.</text></svg>

@@ -1,0 +1,44 @@
+{
+  "schema": "research-construction-record/v1",
+  "lead": "kummer-operation-set-closure",
+  "status": "derived_unreviewed",
+  "runtime_executed": false,
+  "new_cohort_targets": 0,
+  "claims": [
+    {
+      "id": "adjacent-pair-closure",
+      "kind": "conditional_algebraic_derivation",
+      "transition": "R -> 2R+cG",
+      "labels": [
+        "2a+c mod r",
+        "2b mod r"
+      ]
+    },
+    {
+      "id": "branch-directed-pruning",
+      "kind": "source_derived_proposal",
+      "eager_repaired_calls": 3,
+      "candidate_repaired_calls": 2,
+      "measured_cost_ratio": null,
+      "identical_observations": false,
+      "preserved": "selected pair, labels and fallback trigger under stated preconditions"
+    }
+  ],
+  "sources": [
+    {
+      "path": "/home/ec2-user/crypto-pr2304-persist/research/kummer_differential_collector_20261022/src/main_labelled.rs",
+      "sha256": "21fab35ee3102fbf45bb7d1af40450b84cefba9fb0d071e8339f8741060a821b"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pr2304-persist/research/kummer_differential_collector_20261022/src/walk_impl_uncached.rs",
+      "sha256": "0bd17210577ba0107c28082318c91b8acc6b375760ba30c3761199a6ffd72ff7"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pr2304-persist/research/kummer_differential_collector_20261022/n19-labelled-fallback/VALIDATION.md",
+      "sha256": "48a77cd89f880eb3ddd92ab4d586aa194049e20dc455d1b24a22139bad59efea"
+    }
+  ],
+  "literature": [
+    "https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/recovery.pdf"
+  ]
+}
