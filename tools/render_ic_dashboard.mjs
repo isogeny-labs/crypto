@@ -346,6 +346,17 @@ const retainedPanels = [
     const marker = /(<script type="application\/json" id="progress-data">)[\s\S]*?(<\/script>)/;
     assert.ok(marker.test(html), 'Progress panel has no canonical data embed');
     html = html.replace(marker, (_, start, end) => start + progressRaw.toString('utf8') + end);
+    const timeline = JSON.parse(progressRaw);
+    const table = /(<summary>Every plotted point as a table<\/summary>[\s\S]*?<tbody>)[\s\S]*?(<\/table>)/;
+    assert.ok(table.test(html), 'Progress panel has no plotted-point table');
+    const rows = timeline.series.flatMap(series => series.points.map(point => {
+      assert.ok(Number.isFinite(point.value), `Invalid progress value: ${point.label}`);
+      const unit = point.unit ? `<br><small>${escape(point.unit)}</small>` : '';
+      // Keep each result's cost boundary, uncertainty and reference limitations
+      // beside its value; these are recorded descriptions, not new estimates.
+      return `<tr><td>${escape(point.date)}</td><td>${escape(series.label)}<br><small>${escape(series.note)}</small></td><td>${escape(point.label)}<br><small>${escape(point.detail)}</small></td><td class="n">${point.value}&times;${unit}</td><td>${escape(point.reference)}</td><td><span class="chip">${escape(point.class)}</span></td><td><a href="${escape(point.anchor)}">panel</a> &middot; <a href="${escape(point.source)}">source</a></td></tr>`;
+    })).join('\n');
+    html = html.replace(table, (_, start, end) => start + '\n' + rows + '\n</tbody>' + end);
   }
   return {id,label,html};
 });
