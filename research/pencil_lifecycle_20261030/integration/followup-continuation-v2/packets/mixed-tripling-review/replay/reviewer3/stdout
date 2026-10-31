@@ -1,0 +1,110 @@
+/var/tmp/pencil-tripling-independent-review-20261031-v1/replay/ReviewerControls.lean:9:1: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field (ZMod 3)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-tripling-independent-review-20261031-v1/replay/ReviewerControls.lean:11:40: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field (ZMod 3)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-tripling-independent-review-20261031-v1/replay/ReviewerControls.lean:11:1: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field (ZMod 3)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-tripling-independent-review-20261031-v1/replay/ReviewerControls.lean:11:11: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field (ZMod 3)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-tripling-independent-review-20261031-v1/replay/ReviewerControls.lean:9:14: error(lean.invalidDottedIdent): Invalid dotted identifier notation: The expected type of `.positiveCoincidence` could not be determined
+
+Hint: Using `Branch.positiveCoincidence would be unambiguous:
+  [apply] `Branch.positiveCoincidence`
+/var/tmp/pencil-tripling-independent-review-20261031-v1/replay/ReviewerControls.lean:10:2: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field (ZMod 3)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-tripling-independent-review-20261031-v1/replay/ReviewerControls.lean:10:28: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field (ZMod 3)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-tripling-independent-review-20261031-v1/replay/ReviewerControls.lean:26:40: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field (ZMod 5)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-tripling-independent-review-20261031-v1/replay/ReviewerControls.lean:26:1: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field (ZMod 5)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-tripling-independent-review-20261031-v1/replay/ReviewerControls.lean:26:11: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field (ZMod 5)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-tripling-independent-review-20261031-v1/replay/ReviewerControls.lean:25:2: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field (ZMod 5)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-tripling-independent-review-20261031-v1/replay/ReviewerControls.lean:25:28: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field (ZMod 5)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-tripling-independent-review-20261031-v1/replay/ReviewerControls.lean:34:10: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field (ZMod 2)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-tripling-independent-review-20261031-v1/replay/ReviewerControls.lean:34:88: error(lean.invalidDottedIdent): Invalid dotted identifier notation: The expected type of `.cancellation` could not be determined
+
+Hint: Using one of these would be unambiguous:
+  [apply] `Branch.cancellation`
+  [apply] `ProjectiveLawRuntime.Branch12.cancellation`
+theorem MixedTripling.source_repeated_preserves.{u_1} : ∀ {K : Type u_1} [inst : Field K] [inst_1 : DecidableEq K]
+  (a0 a1 a2 a3 : K) (a : WeightedAdd11.Input K) (b : D2 K),
+  a.z ≠ 0 →
+    a.w ≠ 0 →
+      b.z ≠ 0 →
+        b.w ≠ 0 →
+          validPoint (MixedGeneric.curve a0 a1 a2 a3) a →
+            validTwo (MixedGeneric.curve a0 a1 a2 a3) b →
+              rawK a b = 0 →
+                a.y * rawW3 b ≠ -(rawY3 a b * a.w) →
+                  a.x * (b.z * b.z) = (other a b).x →
+                    have c := rawOutput a1 a2 a3 a;
+                    classify a b = Branch.positiveCoincidence ∧
+                      2 ≠ 0 ∧ a.y ≠ 0 ∧ c.z ≠ 0 ∧ c.w ≠ 0 ∧ validTwo (MixedGeneric.curve a0 a1 a2 a3) c :=
+fun {K} [Field K] [DecidableEq K] a0 a1 a2 a3 a b haz haw hbz hbw ha hb hk hc he =>
+  And.casesOn (repeated_ready (MixedGeneric.curve a0 a1 a2 a3) a b haz haw hbz hbw ha hb hk hc he) fun h2 right =>
+    And.casesOn right fun hy right =>
+      And.casesOn right fun left right =>
+        And.casesOn right fun left right =>
+          have hp :=
+            Or.resolve_left
+              (shared_support_conclusions (MixedGeneric.curve a0 a1 a2 a3) a b haz haw hbz hbw ha hb hk).left hc;
+          ⟨Eq.mpr
+              (id
+                (congrFun'
+                  (congrArg Eq
+                    (Eq.trans
+                      (ite_congr
+                        (Eq.trans (congrFun' (congrArg Ne hk) 0)
+                          (Eq.trans (congrArg Not (eq_self 0)) not_true_eq_false))
+                        (fun a => Eq.refl Branch.common) fun a_1 =>
+                        ite_congr (Eq.refl (a.y * rawW3 b = -(rawY3 a b * a.w))) (fun a => Eq.refl Branch.cancellation)
+                          fun a_2 =>
+                          Eq.refl
+                            (if ¬a.y * rawW3 b = rawY3 a b * a.w then Branch.mismatch else Branch.positiveCoincidence))
+                      (ite_false Branch.common
+                        (if a.y * rawW3 b = -(rawY3 a b * a.w) then Branch.cancellation
+                        else
+                          if ¬a.y * rawW3 b = rawY3 a b * a.w then Branch.mismatch else Branch.positiveCoincidence))))
+                  Branch.positiveCoincidence))
+              (Eq.mpr (id (congrArg (fun _a => _a = Branch.positiveCoincidence) (if_neg hc)))
+                (of_eq_true
+                  (Eq.trans
+                    (congrFun'
+                      (congrArg Eq
+                        (ite_eq_right_of_eq_false Branch.mismatch Branch.positiveCoincidence
+                          (Eq.trans
+                            (congrArg Not
+                              (Eq.trans (congrFun' (congrArg Eq hp) (rawY3 a b * a.w)) (eq_self (rawY3 a b * a.w))))
+                            not_true_eq_false)))
+                      Branch.positiveCoincidence)
+                    (eq_self Branch.positiveCoincidence)))),
+            ⟨h2, ⟨hy, weighted_tripling_preserves a0 a1 a2 a3 a haz haw hy h2 ha⟩⟩⟩

@@ -49,4 +49,3 @@ No result in the proposed rank census proves a subexponential ECDLP algorithm. E
 ## State of evidence
 
 This package contains designs, controls, stop gates, a draft schema record, and the core E0 canonical-IR implementation. It contains no E1 measurements, no benchmark rows, and no frozen protocol. The protocol intentionally blocks data collection until the remaining E0 coverage, census binary and hashes, preflight, power justification, and final ladder are committed.
-

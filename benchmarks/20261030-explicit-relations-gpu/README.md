@@ -79,3 +79,34 @@ larger-base controls. This panel measures completion of the prescribed rung,
 not a global hardware maximum. Exact10-cell coverage passes; the canonical
 rectangular checker retains five findings. External comparison: not run in
 this configuration/admission panel. All earlier outcomes remain unchanged.
+
+The [affine-subtraction comparison](../../research/explicit_relations_affine_20261030/RESULTS.md)
+completed all 12 recoveries on one RTX 4090. Certificates and relation/query
+counts agree across both formulas and baseline repeats. The two 52-bit targets
+used 3.00% and 1.47% less cold solve time; the two 63-bit targets used 0.31% more
+and 1.37% less time. These are per-input L0 descriptions, not a uniform gain.
+The [two-page PDF](affine-v1-report.pdf), [SVG](affine-v1-scaling.svg), and
+[150-dpi PNG](affine-v1-scaling.png) retain every execution. Both pages were
+visually inspected after raw commit `c79bd38363f9` was pushed. Canonical schema
+and coverage checks passed with zero findings. Formula remains opt-in; next
+measure the costs within relation queries. No external-tool timing arm was
+prescribed for this formula-only comparison. Earlier records are unchanged.
+
+The [query-cost profile](../../research/explicit_relations_profile_20261031/RESULTS.md)
+replayed 240 queries in 30 cells with exact response equality on the same full
+63-bit tables. Lookup and normalization account for the largest instrumented
+block-cycle intervals; these shares include synchronization and cannot partition
+production wall time. The [two-page PDF](query-profile-v1-report.pdf),
+[SVG](query-profile-v1-stages.svg) and [150-dpi PNG](query-profile-v1-stages.png)
+are hash-bound diagnostic companions to the affine comparison, not a new speedup
+claim. All five v1 external-profiler setup failures are retained; a separate
+frozen supplement repairs their prerequisites without repeating the panel.
+
+The [profiler-only follow-up PDF](query-profile-v2-report.pdf) records two
+successful Nsight Systems traces: kernel coverage 99.10% / 98.70% of their
+first-to-last kernel spans, with exact replies preserved. Both Nsight Compute
+attempts were refused by provider hardware-counter permissions; no counters
+were estimated. [Seed101 graph](query-profile-v2-kernels-101.svg) and
+[seed202 graph](query-profile-v2-kernels-202.svg), plus corresponding PNGs,
+are byte/hash-bound presentation copies. Raw supplement was pushed as
+`5d4713f59fa3` before rendering; both PDF pages were visually inspected.

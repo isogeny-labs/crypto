@@ -1,6 +1,6 @@
 # E1 protocol: boundary-tensor rank census
 
-Status: **draft; do not collect affected data**  
+Status: **draft; do not collect affected data**
 Protocol ID: `EXP-tensor-boundary-rank-census-20261031`
 
 ## Question
@@ -167,4 +167,3 @@ The JSON record remains draft until all of these are present:
 - test-specific power/resolution justification for the `0.20` paired effect;
 - exact cut cap and final ladder;
 - protocol SHA-256, commit, freeze timestamp, and derived seed manifest.
-

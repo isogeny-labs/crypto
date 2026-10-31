@@ -129,4 +129,3 @@ was generated.
 | Runtime/power preflight | Not started |
 | E1 measurements | None |
 | Breakthrough or speedup claim | Not established |
-

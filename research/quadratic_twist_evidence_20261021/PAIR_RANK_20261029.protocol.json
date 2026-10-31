@@ -1,0 +1,385 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "QT-pair-rank-20261029",
+  "version": 1,
+  "created": "2026-10-29",
+  "repository": "crypto",
+  "study_dir": "research/quadratic_twist_evidence_20261021",
+  "authors": [
+    "Codex PR2381 research continuation"
+  ],
+  "links": {
+    "spec": "PAIR_RANK_20261029_PROTOCOL.md",
+    "prior": "reports/uniform-20261029/README.md",
+    "pilot": "Declared single-call calibration before freeze; logs contain rank1 in each arm. Main census/96bindings not yet executed. No criterion/input changed in response."
+  },
+  "question": "Do complete signed two-summand coefficient rows have rank equal to unordered decomposition count in the stated cyclic-prime census, and can an explicit symmetric-weight dependency kernel be checked in Lean?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "The finite complete census reports every query rank and unordered pair count, including losses.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "A general even/reflection symmetric-weight kernel over a prime cyclic group is checked with its written support/balance hypotheses; a generic matrix-rank binding is not assumed.",
+      "class": "theorem",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "cpp",
+      "role": "reference",
+      "description": "ordered signed pairs; exact finite prime census and96old actual point-row bindings",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "c++",
+            "-std=c++17",
+            "-O2",
+            "native/pair-rank.cpp",
+            "-lcrypto",
+            "-o",
+            "SCRATCH/producer"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "CARGO_BUILD_JOBS": "2"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "scope": "ordered signed pairs; exact finite prime census and96old actual point-row bindings"
+      }
+    },
+    {
+      "id": "rust",
+      "role": "candidate",
+      "description": "independent unordered pair/Euclidean-inverse/Gauss-Jordan arithmetic and same exact source inputs",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "native/pair-rank-audit/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "CARGO_BUILD_JOBS": "2"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "scope": "independent unordered pair/Euclidean-inverse/Gauss-Jordan arithmetic and same exact source inputs"
+      }
+    },
+    {
+      "id": "domain",
+      "role": "control_positive",
+      "description": "non-generator composite and coefficient-characteristic-two rank-loss examples; part of both native paths",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "native/pair-rank-audit/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "CARGO_BUILD_JOBS": "2"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "scope": "non-generator composite and coefficient-characteristic-two rank-loss examples; part of both native paths"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exhaustive deterministic integer/modular arithmetic, no stochastic/timing comparison or noise claim; independent reconstruction is the check."
+    },
+    "positive": {
+      "present": true,
+      "arm": "domain",
+      "expected_detection": "group9/m3/base1,2,4 overF101 and group7/base1/m2 overF2 both rank below unordered count",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Entire declared prime population is enumerated, including every failure; no sampled null or statistical detector."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "group_and_base",
+        "levels": [
+          "all declared primes",
+          "all size1..4 unsigned bases"
+        ]
+      },
+      {
+        "name": "implementation",
+        "levels": [
+          "C++",
+          "Rust"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "input order",
+        "treatment": "fixed",
+        "value": "lexicographic",
+        "how": "all primes,base sizes,subsets and nonzero query scalars enumerated by committed code"
+      },
+      {
+        "name": "implementation",
+        "treatment": "crossed",
+        "value": "C++ andRust",
+        "how": "independent ordered/unordered pair construction and modular elimination"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "host/toolchain recorded diagnostically, no time claims"
+      },
+      {
+        "name": "source bindings",
+        "treatment": "fixed",
+        "how": "committed source and old frozen JSON SHA256 checked by both native paths"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-check",
+        "arms": [
+          "cpp",
+          "rust"
+        ],
+        "differs_in": [
+          "implementation"
+        ],
+        "design": "absolute",
+        "threshold": "all exact native profiles/source/row bindings equal, zero verifier discrepancies"
+      }
+    ],
+    "aa_not_applicable": "Exact deterministic census; no timing/noise claim.",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Complete deterministic census; clock is not a metric.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        2381
+      ],
+      "nonce": null,
+      "note": "No randomness consumed; fixed dummy run identifier only."
+    },
+    "instance_sampling": {
+      "rule": "One complete deterministic census: primes3,5,7,11,13,17,19,23,29,31; all size1..min(4,(r-1)/2) subsets; all96frozen curve arms.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact outputs/arithmetic, all input rows public, no discretionary statistical classification.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Exhaustive fixed population, no p-value/test/power; rank losses retained rather than inferred absent from a sample."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 0.004,
+      "threads": 1,
+      "estimated_total_seconds": 600,
+      "measured_on": "Current local host; one declared r3/base1/query1 call per binary; bash time diagnostics {'cpp': 0.004, 'rust': 0.002}, millisecond report resolution.600s is hard upper budget, not inferred speed."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "rank_pair_defects",
+        "name": "query rank/count mismatches",
+        "unit": "queries",
+        "kind": "exact",
+        "definition": "Count nonzero target queries where modular row rank differs from unordered signed decomposition count; all failures retained.",
+        "source": "summary.json.rank_pair_defects",
+        "aggregation": "sum",
+        "resolution": "1query",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "cases",
+      "queries",
+      "rank_pair_defects",
+      "actual_arms",
+      "actual_queries"
+    ],
+    "record": [
+      "binary_sha256",
+      "cpu_model",
+      "kernel_release",
+      "threads"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": "none",
+    "placement": {
+      "cpus": 2,
+      "spot": false
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 600,
+    "checkpoint": {
+      "policy": "application",
+      "interval_seconds": 600,
+      "grace_seconds": 30,
+      "restore_validation": "manifest_sha256",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Complete fixed enumeration and96actual-arm bindings,or600sec command cap; overall iteration23:23-00:23UTC.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Any scientific source correction gets new committed revision and complete affected rerun; preserve failed original.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Source/input/semantic mismatch fails verification, never accepted as a scientific null.",
+    "A theorem failing elaboration/axiom gate is unproved; retain source/log."
+  ],
+  "decision_rule": {
+    "text": "Finite claim supported only if independent audit reconstructs every output/old row binding and rank/count defects are zero; otherwise retain exact losses. General theorem limited to statements actually kernel checked.",
+    "comparison_ids": [
+      "C-check"
+    ],
+    "threshold": "exact equality;0rank/count defects supports only declared finite population",
+    "statistic": "exact query counts and ranks",
+    "interval": "none; exhaustive finite population",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "integer rank minus pair count per query",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "refuted_within_scope",
+      "inconclusive",
+      "invalid_measurement"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/quadratic_twist_evidence_20261021/native/pair-rank-audit/main.rs",
+      "sha256": "674b86e6fb542bbd01b2eec8e20af409df373fca8dd53a720bdb0b28d1595ff1"
+    },
+    "inputs": [
+      "native/uniform-20261029/cases/index.json",
+      "PAIR_RANK_20261029_PROTOCOL.md"
+    ],
+    "outputs": [
+      "cases.tsv",
+      "bindings.tsv",
+      "domain-controls.tsv",
+      "summary.json",
+      "audit.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "rank and pair totals from recorded profiles plus dependency mechanism"
+    ],
+    "report_dir": "reports/pair-rank-20261029"
+  },
+  "inadmissible": [
+    "Claim generic matrix independence from the narrower symmetric-weight lemma without proving the actual matrix binding.",
+    "Claim stationary yield,collection-time,solver-degree,regularity or speed gain from empty-state rank.",
+    "Discard failures/change population after seeing results or modify frozen prior inputs."
+  ],
+  "literature": [
+    {
+      "ref": "crypto-autoresearcher:knowledge/findings/KN-FIND-007.md",
+      "provenance": "retrieved",
+      "claim": "Known raw-decomposition double count does not establish row independence.",
+      "verified_by": "git show pinned atlas; no novelty claim for raw conservation."
+    },
+    {
+      "ref": "reports/uniform-20261029/README.md",
+      "provenance": "internal",
+      "claim": "Fixed96actual curve/subgroup arm inputs and point/certificate provenance.",
+      "verified_by": "read frozen source and both old native paths."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "a89bfebc5982a78eea6c0fef40eb4a4b328206849bff69d4cf28e39787c82787",
+    "commit": "e9ccfc80a92a2142b4c1463c643b126b036cee2b",
+    "frozen_at": "2026-10-29T23:37:42Z",
+    "filed_before_affected_data": true
+  }
+}

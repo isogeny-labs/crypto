@@ -17,6 +17,8 @@ use tokio_postgres::types::ToSql;
 
 mod catalog;
 mod curves;
+mod mcp;
+mod results;
 mod sql;
 mod write;
 
@@ -191,6 +193,16 @@ pub fn router(state: Shared) -> Router {
         .route("/v1/curves/{reference}/transfers", get(curves::transfers))
         .route("/v1/curves/{reference}/covers", get(curves::covers))
         .route("/v1/curves/{reference}/traits", get(curves::traits))
+        .route("/v1/curves/{reference}/relations", get(curves::relations))
+        .route("/v1/curves/{reference}/endomorphisms", get(curves::endomorphisms))
+        .route("/v1/curves/{reference}/division-polynomials", get(curves::division_polynomials))
+        .route("/v1/curves/{reference}/measurements", get(results::curve_measurements))
+        .route("/v1/ic/leaderboard", get(results::leaderboard))
+        .route("/v1/ic/progress", get(results::progress))
+        .route("/v1/ic/boundary", get(results::boundary))
+        .route("/v1/benchmarks", get(results::benchmarks))
+        .route("/v1/ecbench/sessions", get(results::sessions))
+        .route("/v1/ecbench/sessions/{id}", get(results::session))
         .route("/v1/isogenies/{id}", get(catalog::isogeny))
         .route("/v1/isogeny-classes", get(catalog::classes))
         .route("/v1/isogeny-classes/{label}", get(catalog::class))
@@ -199,19 +211,28 @@ pub fn router(state: Shared) -> Router {
         .route("/v1/transfers", get(catalog::transfers))
         .route("/v1/polynomials/{sha256}", get(catalog::polynomial))
         .route("/v1/modular-polynomials", get(catalog::modular_polynomials))
+        .route("/v1/class-polynomials", get(catalog::class_polynomials))
+        .route("/v1/summation-polynomials", get(catalog::summation_polynomials))
         .route("/v1/sql", post(sql::run))
         .route_layer(middleware::from_fn_with_state(state.clone(), read_auth));
     let writes = Router::new()
         .route("/v1/evidence", post(write::evidence))
         .route("/v1/isogenies", post(write::isogeny))
         .route_layer(middleware::from_fn_with_state(state.clone(), write_auth));
-    Router::new()
+    let api: Router = Router::new()
         .route("/", get(index))
         .route("/healthz", get(healthz))
         .route("/openapi.yaml", get(openapi))
         .merge(reads)
         .merge(writes)
-        .layer(tower_http::trace::TraceLayer::new_for_http())
-        .layer(tower_http::cors::CorsLayer::permissive())
-        .with_state(state)
+        .with_state(state);
+    // MCP (streamable HTTP, JSON responses): each tool is a request to `api` itself.
+    let inner = api.clone();
+    api.route(
+        "/mcp",
+        post(move |headers: HeaderMap, body: axum::body::Bytes| mcp::handle(inner.clone(), headers, body))
+            .get(mcp::get_not_supported),
+    )
+    .layer(tower_http::trace::TraceLayer::new_for_http())
+    .layer(tower_http::cors::CorsLayer::permissive())
 }

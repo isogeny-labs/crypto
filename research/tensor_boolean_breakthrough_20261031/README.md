@@ -1,6 +1,6 @@
 # Tensor–Boolean breakthrough experiments
 
-Date: 2026-10-31  
+Date: 2026-10-31
 Status: experiment design complete; E0 core implemented; no affected measurements taken
 Repository baseline: `e3741fd5bbcc1f52a86be609587e7cf4ceeef566`
 
@@ -73,4 +73,3 @@ This hybrid requirement is a pre-freeze clarification of the original tag-only d
 - [`REPORT.md`](REPORT.md) — visual decision brief.
 - `report.pdf` — rendered report after validation.
 - [`VALIDATION.md`](VALIDATION.md) — generated-artifact and protocol checks.
-
