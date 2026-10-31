@@ -9,7 +9,7 @@ use std::time::{Duration, Instant};
 const NATIVE_WORK_MAX: u64 = 16_777_216;
 const NATIVE_BYTES_MAX: u64 = 64 * 1024 * 1024;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub(super) enum Stop {
     InvalidLimits,
     Overflow,
@@ -27,7 +27,7 @@ pub(super) enum Stop {
     Events,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub(super) enum Phase {
     Setup,
     Construction,
@@ -38,7 +38,8 @@ pub(super) enum Phase {
     Complete,
 }
 
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub(super) struct Reservation {
     pub work: u64,
     pub bytes: u64,
@@ -793,7 +794,8 @@ where
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub(super) struct OriginalLimits {
     native_work: u64,
     memory: u64,
@@ -6005,5 +6007,155 @@ mod native_capture_match_tests {
         .unwrap();
         assert_eq!(verified.records, 1);
         assert!(!verified.construction_complete_captured);
+    }
+}
+
+/// Allocation-free snapshot nested in the versioned terminal result.
+/// Saved modeled reservations and reported calls, not hardware instructions.
+#[derive(Clone, Copy, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SavedBudgetLedger {
+    original_limits: OriginalLimits,
+    phase: Phase,
+    first_stop: Option<Stop>,
+    native_reserved: Reservation,
+    checking_reserved_work: u64,
+    checking_reported_work: u64,
+    adapter_reserved_bytes: u64,
+    charged_trace_bytes: u64,
+    group_additions: u64,
+}
+impl Budget {
+    fn saved_ledger(&self) -> SavedBudgetLedger {
+        SavedBudgetLedger {
+            original_limits: self.original_limits(),
+            phase: self.phase,
+            first_stop: self.stopped,
+            native_reserved: self.native,
+            checking_reserved_work: self.checking_work,
+            checking_reported_work: self.checking_performed_work,
+            adapter_reserved_bytes: self.adapter_bytes,
+            charged_trace_bytes: self.trace_bytes,
+            group_additions: self.additions,
+        }
+    }
+}
+struct BudgetLedgerAssessment {
+    reported_work: u64,
+    reported_bytes: u64,
+    reported_over_limit: bool,
+    completion_eligible: bool,
+}
+fn verify_budget_ledger(
+    bytes: &[u8],
+    original: OriginalLimits,
+) -> Result<BudgetLedgerAssessment, String> {
+    if bytes.len() > 2048 {
+        return Err("terminal ledger exceeds cap".into());
+    }
+    let saved: SavedBudgetLedger =
+        serde_json::from_slice(bytes).map_err(|e| format!("strict terminal ledger: {e}"))?;
+    if saved.original_limits != original
+        || original.native_work == 0
+        || original.native_work > NATIVE_WORK_MAX
+        || original.memory == 0
+        || original.trace == 0
+        || original.additions == 0
+        || saved.checking_reported_work > saved.checking_reserved_work
+    {
+        return Err("terminal ledger identity or checking work mismatch".into());
+    }
+    let work = saved
+        .native_reserved
+        .work
+        .checked_add(saved.checking_reserved_work)
+        .ok_or("terminal work overflow")?;
+    let bytes = saved
+        .native_reserved
+        .bytes
+        .checked_add(saved.adapter_reserved_bytes)
+        .ok_or("terminal byte overflow")?;
+    let over = work > original.native_work
+        || bytes > original.memory
+        || saved.charged_trace_bytes > original.trace
+        || saved.group_additions > original.additions;
+    // A retained late native settlement may exceed remaining shared headroom.
+    // Preserve that reported fact, but never accept an uncensored completion.
+    if over && saved.first_stop.is_none() {
+        return Err("uncensored terminal resource excess".into());
+    }
+    Ok(BudgetLedgerAssessment {
+        reported_work: work,
+        reported_bytes: bytes,
+        reported_over_limit: over,
+        completion_eligible: !over && saved.first_stop.is_none() && saved.phase == Phase::Complete,
+    })
+}
+#[cfg(test)]
+mod terminal_ledger_tests {
+    use super::*;
+    fn check(b: &Budget) -> Result<BudgetLedgerAssessment, String> {
+        verify_budget_ledger(
+            &serde_json::to_vec(&b.saved_ledger()).unwrap(),
+            b.original_limits(),
+        )
+    }
+    #[test]
+    fn actual_native_reservations_roundtrip_without_claiming_pipeline_completion() {
+        let original = construction_tests::fixture();
+        let mut b = construction_tests::budget();
+        let result = construct_original(&original, &mut b, &mut |_, _| Ok(()));
+        assert!(result.output.is_some() && result.adapter_stop.is_none());
+        let a = check(&b).unwrap();
+        assert_eq!(a.reported_work, b.native.work + b.checking_work);
+        assert_eq!(a.reported_bytes, b.native.bytes + b.adapter_bytes);
+        assert!(!a.reported_over_limit && !a.completion_eligible);
+    }
+    #[test]
+    fn late_native_settlement_preserves_excess_and_first_stop() {
+        let mut b = construction_tests::budget();
+        b.begin_native(false, Instant::now()).unwrap();
+        b.reserve_checking(1, 0, Instant::now()).unwrap();
+        assert_eq!(b.fail::<()>(Stop::Observer), Err(Stop::Observer));
+        let final_native = Reservation {
+            work: b.phase_limits.work,
+            bytes: 0,
+        };
+        assert_eq!(b.settle_native_terminal(final_native), Err(Stop::Observer));
+        let a = check(&b).unwrap();
+        assert!(a.reported_over_limit && !a.completion_eligible);
+        assert_eq!(a.reported_work, final_native.work + 1);
+        assert_eq!(b.saved_ledger().first_stop, Some(Stop::Observer));
+        let mut saved = b.saved_ledger();
+        saved.first_stop = None;
+        assert!(
+            verify_budget_ledger(&serde_json::to_vec(&saved).unwrap(), b.original_limits())
+                .is_err()
+        );
+    }
+    #[test]
+    fn ledger_rejects_original_limit_changes_unknown_fields_and_integer_overflow() {
+        let b = construction_tests::budget();
+        let baseline = serde_json::to_value(b.saved_ledger()).unwrap();
+        for mutation in 0..5 {
+            let mut v = baseline.clone();
+            match mutation {
+                0 => v["original_limits"]["native_work"] = serde_json::json!(1),
+                1 => v["original_limits"]["extra"] = serde_json::json!(true),
+                2 => {
+                    v["native_reserved"]["work"] = serde_json::json!(u64::MAX);
+                    v["checking_reserved_work"] = serde_json::json!(1);
+                }
+                3 => v["checking_reported_work"] = serde_json::json!(1),
+                4 => v["native_reserved"]["extra"] = serde_json::json!(true),
+                _ => unreachable!(),
+            }
+            assert!(
+                verify_budget_ledger(&serde_json::to_vec(&v).unwrap(), b.original_limits())
+                    .is_err(),
+                "mutation {mutation}"
+            );
+        }
+        assert!(verify_budget_ledger(&vec![b' '; 2049], b.original_limits()).is_err());
     }
 }
