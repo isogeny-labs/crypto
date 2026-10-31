@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[2]
 TIMELINE = ROOT / "docs/ic/progress-timeline.json"
 SCOREBOARD = ROOT / "docs/index-calculus-scoreboard.html"
 SCRIPT = re.compile(r'(<script type="application/json" id="progress-data">).*?(</script>)', re.S)
-TABLE = re.compile(r'(<summary>Every plotted point as a table</summary>.*?<tbody>).*?(</tbody>)', re.S)
+TABLE = re.compile(r'(<summary>Every plotted point as a table</summary>.*?<tbody>).*?(</table>)', re.S)
 
 
 def point_rows(timeline: dict) -> str:
@@ -45,7 +45,10 @@ def synchronized(page: str, raw: str) -> str:
     if len(SCRIPT.findall(page)) != 1 or len(TABLE.findall(page)) != 1:
         raise ValueError("scoreboard must have one progress script and one point table")
     page = SCRIPT.sub(lambda m: m.group(1) + raw.rstrip() + m.group(2), page)
-    return TABLE.sub(lambda m: m.group(1) + point_rows(timeline) + m.group(2), page)
+    # Include the table terminator so rows left outside an older <tbody> are
+    # removed along with the stale body. Those rows are still counted by the
+    # site test and would otherwise duplicate canonical timeline points.
+    return TABLE.sub(lambda m: m.group(1) + point_rows(timeline) + "</tbody>" + m.group(2), page)
 
 
 def main() -> int:
