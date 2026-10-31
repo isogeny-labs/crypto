@@ -451,7 +451,7 @@ fn summarize(out: &str) {
             .unwrap_or(Value::Null);
         deg8.push(json!({"q": q, "curves": dc.len(),
             "t1_pass": dc.iter().filter(|r| r["t1_pass"] == true).count(),
-            "x_hyperelliptic": dc.iter().filter(|r| r["t1"]["fit_error"].as_str().map_or(false, |s| s.contains("hyperelliptic"))).count(),
+            "x_hyperelliptic": dc.iter().filter(|r| r["t1"]["fit_error"].as_str().is_some_and(|s| s.contains("hyperelliptic"))).count(),
             "t1f": {"maps": ds["t1f_twist_maps"], "agree": ds["t1f_agree"], "disagree": ds["t1f_disagree"], "not_applicable": ds["t1f_not_applicable"]}}));
         let rs_rows = read(&format!("route_s_q{q}.jsonl"));
         if let Some(sm) = rs_rows.iter().find(|r| r["rec"] == "summary") {
