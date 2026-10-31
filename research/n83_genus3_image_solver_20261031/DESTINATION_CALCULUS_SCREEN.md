@@ -1,7 +1,9 @@
 # Destination-calculus applicability screen
 
-Date: 2026-10-31  
-Source revision screened: `3f77530aacb4283ac5b2d48eed013984a6f5f315`  
+Date: 2026-10-31
+
+Source revision screened: `3f77530aacb4283ac5b2d48eed013984a6f5f315`
+
 Decision: **the standard genus-three hyperelliptic index calculus is not an
 applicable candidate solver for this transported image.**
 
