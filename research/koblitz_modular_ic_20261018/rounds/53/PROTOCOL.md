@@ -91,3 +91,18 @@ vanishing source equations and a unit Delta. Compile/audit separately under
 the pinned Lean limits. Actual arrays,trace semantics,localization,exceptional
 geometry and source-certificate fidelity are external obligations. No
 native_decide,axioms,sorry or trusted computation is allowed.
+
+## Normalized target packet, frozen before execution
+
+PACKET53 uses all3universal QR equations and G,N as a fixed monomial catalog,
+then evaluates them in the full generic rank64 source algebra. Both complete
+source/standard-basis inclusion products are checked. Reduce the saved V and
+torsion alpha witness separately before multiplication;verify the composed
+alpha inverse exactly. Use the accepted Tate coefficients to form
+lnew=(beta/alpha+s)/u,nnew=((beta/alpha)*r+gamma/alpha+q)/u³.
+Save coordinates before higher-power evaluation;verify target Delta unit.
+Cache exact modular powers,then evaluate every target monomial,requiring all5
+zero residuals. A changed intercept must give nonzero N coefficient. This is
+an exact native quotient-algebra evaluation,not a standalone expanded target
+source-membership witness or proper/F2 map certificate. All coefficients are
+generic F2(b,c);record caps and partials. Same1200s/4GiB/one-thread limits.
