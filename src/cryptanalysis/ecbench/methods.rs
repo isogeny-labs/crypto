@@ -5899,7 +5899,9 @@ fn solve_ic_binary(
         "mitm-frobenius" => Box::new(FrobeniusMitmOracle::new(ms, inst)),
         "mitm-frobenius-counted" => Box::new(FrobeniusMitmOracle::new_counted(ms, inst)),
         "mitm-frobenius-lazy-counted" => Box::new(FrobeniusMitmOracle::new_lazy_counted(ms, inst)),
-        "mitm-frobenius-layout-counted" => Box::new(FrobeniusMitmOracle::new_layout_counted(ms, inst)),
+        "mitm-frobenius-layout-counted" => {
+            Box::new(FrobeniusMitmOracle::new_layout_counted(ms, inst))
+        }
         "mitm-fiber" => Box::new(FiberMitmOracle::new(ms)),
         "mitm-frobenius-fiber" => Box::new(FiberFrobeniusMitmOracle::new(ms, inst)),
         "rootfind-mitm" => Box::new(RootfindMitmOracle::new(ms)),

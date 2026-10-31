@@ -72,7 +72,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/blindspots_20261018/01-fp2-gaudry-k2/raw research/ecbench_overhead_review_20261022/sessions research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst research/four_followups_20261021/results/matched research/four_followups_20261021/results/pencil-pilot research/ic_aimed_gather_20261023/aa2_20261029/runs research/kummer_coordinates_20261022/results research/kummer_differential_collector_20261022/results research/pencil_sparse_20261022/results research/postgb_linear_stage_20261026 research/projective_law_followup_20261022/results
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/blindspots_20261018/01-fp2-gaudry-k2/raw research/ecbench_generator_orbit_20261022/sessions research/ecbench_overhead_review_20261022/sessions research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst research/four_followups_20261021/results/matched research/four_followups_20261021/results/pencil-pilot research/ic_aimed_gather_20261023/aa2_20261029/runs research/kummer_coordinates_20261022/results research/kummer_differential_collector_20261022/results research/pencil_sparse_20261022/results research/postgb_linear_stage_20261026 research/projective_law_followup_20261022/results
       - name: Fetch the base tip
         if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.local_runner)
         env:
