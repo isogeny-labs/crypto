@@ -1,0 +1,122 @@
+{
+  "certificate_fields": [
+    "status",
+    "dreg_lower_bound",
+    "dreg_upper_bound",
+    "dreg_exact",
+    "positive_dimensional",
+    "source_sha256",
+    "candidate_id",
+    "factor_base_manifest_sha256",
+    "projection_certificates",
+    "linear_top_certificate"
+  ],
+  "content_binding": [
+    "Each candidate input index binds candidate ID and coordinate map.",
+    "Every candidate input record binds exact system source SHA-256 and the complete factor-base family manifest SHA-256.",
+    "Every factor-base manifest shard joins to the S3 file index by path, compressed bytes and SHA-256.",
+    "Every certificate is replayed in a fresh process and binds the unchanged system source SHA-256."
+  ],
+  "directory_tree": {
+    "S3_PERSISTENCE_INDEX.json": "Manifest of every source, input, equation, certificate, replay, summary and structural index object with S3 URI, byte count and SHA-256.",
+    "candidate-base-top-panel.json": "Aggregate 624-row table with candidate bit, family, m, target kind, source hash, base-manifest hash and exact/censored result.",
+    "candidate-inputs/spikeN/CASE_ID/input.json": "One source-bound input record for one family/m/target case.",
+    "candidate-inputs/spikeN/CASE_ID/system.sing": "Original unmodified Singular presentation generated from candidate-bound points and target; exact byte SHA-256 in input.json.",
+    "candidate-inputs/spikeN/inputs.json": "Array of 48 typed input records, ordered by family, m and target kind.",
+    "top-certificates/spikeN/CASE_ID.json": "Native certificate for the quotient by the original highest homogeneous component of every original equation.",
+    "top-certificates/spikeN/summary.json": "Per-candidate top certificate statuses and intervals.",
+    "top-replays/spikeN/replay-summary.json": "Fresh-process replay of every available certificate."
+  },
+  "input_record_fields": [
+    "id",
+    "arm",
+    "candidate_id",
+    "coordinate_bit_positions",
+    "family",
+    "n",
+    "m",
+    "ell",
+    "candidate_x_count",
+    "target_kind",
+    "target_distribution",
+    "target_x",
+    "target_y",
+    "n_vars",
+    "input_equations",
+    "field_modulus",
+    "curve_a",
+    "curve_b",
+    "source_sha256",
+    "factor_base_manifest_sha256",
+    "matched_original_inputs_sha256",
+    "points",
+    "witness",
+    "factor_base_membership"
+  ],
+  "panel": {
+    "base_reuse": "The exact complete family/r factor-base manifest is reused for m=2..9.",
+    "candidate_coordinate_bits": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39
+    ],
+    "candidate_ids": [
+      "spike27",
+      "spike28",
+      "spike29",
+      "spike30",
+      "spike31",
+      "spike32",
+      "spike33",
+      "spike34",
+      "spike35",
+      "spike36",
+      "spike37",
+      "spike38",
+      "spike39"
+    ],
+    "families": [
+      "koblitz",
+      "binary",
+      "prime"
+    ],
+    "m_values": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "n": 83,
+    "systems_per_candidate": 48,
+    "target_kinds": [
+      "planted",
+      "natural"
+    ],
+    "total_systems": 624
+  },
+  "purpose": "Structural contract for candidate PDP input systems, top-form degree-of-regularity certificates, replay records, and S3 custody.",
+  "retention": "Append-only. Failed jobs, partial source files, failed projections, censored outcomes, invalid predictions and prior model versions are retained.",
+  "s3_key_pattern": "runs/n83-pdp-top-factorbase-20261031-v1/{candidate_id}/{artifact_relative_path}",
+  "schema": "n83.factorbase-top-panel-format/v1",
+  "status": "format_contract_only; generated candidate input and certificate files are not present yet",
+  "value_semantics": {
+    "dreg_exact": "First degree d for which the graded quotient by the original highest homogeneous forms vanishes, only when the source-bound certificate proves equality.",
+    "finite_interval": "Certified lower and upper bounds; preserve both endpoints and the certificates.",
+    "positive_dimensional_top_ideal": "No finite vanishing degree for this quotient presentation; this is not infinite Castelnuovo-Mumford regularity.",
+    "unresolved": "No exact or finite interval certificate; timeout, missing proof or failed check stays explicit and is never converted into a label."
+  }
+}

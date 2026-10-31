@@ -1,0 +1,3612 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "N83-FACTOR-BASE-TOP-DREG-20261031",
+  "version": 1,
+  "created": "2026-10-31",
+  "repository": "crypto",
+  "study_dir": "research/n83_candidate_pdp_20261028",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "design": "TOP_DESIGN.md"
+  },
+  "question": "What source-bound top-form degree-of-regularity intervals follow for all 13 fixed coordinate-bit factor bases r=27..39 on the three N83 curves, for every m=2..9 and both retained target kinds?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "For each generated candidate PDP input, replayed certificates give exact values, finite intervals, positive-dimensional quotients, or unresolved outcomes for the first vanishing degree of the quotient by its original highest homogeneous forms.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "This top-form dreg table does not measure affine FFD/LFD, solving degree, CM regularity, solver cost, or ECDLP recovery; those remain separate datasets and claims.",
+      "class": "out_of_scope",
+      "decided_by": []
+    },
+    {
+      "id": "C3",
+      "text": "Candidate ranking is descriptive unless the pre-registered candidate-bit-held-out model protocol and its controls pass after all required labels are produced.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [],
+  "arms": [
+    {
+      "id": "spike27-koblitz",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike27 on the original koblitz curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike27",
+        "coordinate_bit": 27,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          27
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike27-binary",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike27 on the original binary curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike27",
+        "coordinate_bit": 27,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          27
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike27-prime",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike27 on the original prime curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike27",
+        "coordinate_bit": 27,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          27
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike28-koblitz",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike28 on the original koblitz curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike28",
+        "coordinate_bit": 28,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          28
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike28-binary",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike28 on the original binary curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike28",
+        "coordinate_bit": 28,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          28
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike28-prime",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike28 on the original prime curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike28",
+        "coordinate_bit": 28,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          28
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike29-koblitz",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike29 on the original koblitz curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike29",
+        "coordinate_bit": 29,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          29
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike29-binary",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike29 on the original binary curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike29",
+        "coordinate_bit": 29,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          29
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike29-prime",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike29 on the original prime curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike29",
+        "coordinate_bit": 29,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          29
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike30-koblitz",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike30 on the original koblitz curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike30",
+        "coordinate_bit": 30,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          30
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike30-binary",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike30 on the original binary curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike30",
+        "coordinate_bit": 30,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          30
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike30-prime",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike30 on the original prime curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike30",
+        "coordinate_bit": 30,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          30
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike31-koblitz",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike31 on the original koblitz curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike31",
+        "coordinate_bit": 31,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          31
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike31-binary",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike31 on the original binary curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike31",
+        "coordinate_bit": 31,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          31
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike31-prime",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike31 on the original prime curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike31",
+        "coordinate_bit": 31,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          31
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike32-koblitz",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike32 on the original koblitz curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike32",
+        "coordinate_bit": 32,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          32
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike32-binary",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike32 on the original binary curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike32",
+        "coordinate_bit": 32,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          32
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike32-prime",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike32 on the original prime curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike32",
+        "coordinate_bit": 32,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          32
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike33-koblitz",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike33 on the original koblitz curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike33",
+        "coordinate_bit": 33,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          33
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike33-binary",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike33 on the original binary curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike33",
+        "coordinate_bit": 33,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          33
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike33-prime",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike33 on the original prime curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike33",
+        "coordinate_bit": 33,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          33
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike34-koblitz",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike34 on the original koblitz curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike34",
+        "coordinate_bit": 34,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          34
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike34-binary",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike34 on the original binary curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike34",
+        "coordinate_bit": 34,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          34
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike34-prime",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike34 on the original prime curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike34",
+        "coordinate_bit": 34,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          34
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike35-koblitz",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike35 on the original koblitz curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike35",
+        "coordinate_bit": 35,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          35
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike35-binary",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike35 on the original binary curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike35",
+        "coordinate_bit": 35,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          35
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike35-prime",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike35 on the original prime curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike35",
+        "coordinate_bit": 35,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          35
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike36-koblitz",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike36 on the original koblitz curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike36",
+        "coordinate_bit": 36,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          36
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike36-binary",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike36 on the original binary curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike36",
+        "coordinate_bit": 36,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          36
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike36-prime",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike36 on the original prime curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike36",
+        "coordinate_bit": 36,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          36
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike37-koblitz",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike37 on the original koblitz curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike37",
+        "coordinate_bit": 37,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          37
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike37-binary",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike37 on the original binary curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike37",
+        "coordinate_bit": 37,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          37
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike37-prime",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike37 on the original prime curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike37",
+        "coordinate_bit": 37,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          37
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike38-koblitz",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike38 on the original koblitz curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike38",
+        "coordinate_bit": 38,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          38
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike38-binary",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike38 on the original binary curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike38",
+        "coordinate_bit": 38,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          38
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike38-prime",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike38 on the original prime curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike38",
+        "coordinate_bit": 38,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          38
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike39-koblitz",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike39 on the original koblitz curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike39",
+        "coordinate_bit": 39,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          39
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike39-binary",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike39 on the original binary curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike39",
+        "coordinate_bit": 39,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          39
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    },
+    {
+      "id": "spike39-prime",
+      "role": "candidate",
+      "description": "Complete candidate coordinate-bit spike39 on the original prime curve; reused across m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "top"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "top": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike39",
+        "coordinate_bit": 39,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          39
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "per-job final S3 index and family manifest SHA-256; protocol requires complete index and all 128 shard joins before generation"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact computations only; no clock or statistical comparison."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "No extra experimental arm: ten native tests verify successful and failed maps, original linear XOR certificates, duplicate/missing equations, wrong selector weights and inverse diagonal maps before production."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No null-population claim: retained nonzero top monomials invalidate projections; missing field equation and changed prime selectors must be rejected."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "coordinate_bit",
+        "levels": [
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39
+        ]
+      },
+      {
+        "name": "family",
+        "levels": [
+          "koblitz",
+          "binary",
+          "prime"
+        ]
+      },
+      {
+        "name": "m",
+        "levels": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "name": "target_kind",
+        "levels": [
+          "planted",
+          "natural"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source_and_binary",
+        "treatment": "fixed",
+        "how": "pdp.rs, top.rs and release binary hashes pinned in each arm; source commit is fixed"
+      },
+      {
+        "name": "coordinate_bit",
+        "treatment": "crossed",
+        "how": "All 13 fixed candidate domains r=27..39, each complete base reused across m"
+      },
+      {
+        "name": "family",
+        "treatment": "crossed",
+        "how": "All three original N83 curves retained"
+      },
+      {
+        "name": "m",
+        "treatment": "crossed",
+        "how": "All m=2..9 retained"
+      },
+      {
+        "name": "target_kind",
+        "treatment": "crossed",
+        "how": "Same deterministic planted tuple and original natural target reused across coordinate bits"
+      },
+      {
+        "name": "seed",
+        "treatment": "fixed",
+        "value": 20261027,
+        "how": "Frozen SplitMix family/m draw in pdp.rs"
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "Sequential native processes"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Record host, kernel, memory and Spot identity per output bundle; no timing claim"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "how": "Ascending candidate bit, family, m, target kind; exact computation only"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Frozen parser and certificate replay, no discretionary row exclusion"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-completion",
+        "arms": [
+          "baseline-koblitz",
+          "baseline-binary",
+          "baseline-prime",
+          "spike40-koblitz",
+          "spike40-binary",
+          "spike40-prime"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Source checks, each admitted projection/linear certificate, and fresh replay all pass; unresolved or failed cases remain explicit"
+      }
+    ],
+    "aa_not_applicable": "Exact non-timing computations",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Deterministic exhaustive candidate list; no timing or statistical comparison.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261027
+      ],
+      "nonce": null,
+      "note": "Candidate system generator reuses the fixed family/m SplitMix seed and low-26 planted support."
+    },
+    "instance_sampling": {
+      "rule": "All 624 planned presentations; 13 coordinate bits x 3 curve families x 8 m values x 2 target kinds.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact deterministic certificate production; candidate bit remains bound to source index.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 624,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "624 exact presentations in an exhaustive finite panel; no population inference or hypothesis test."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 86400,
+      "measured_on": "One full-day execution budget, not a runtime prediction."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "dreg_interval",
+        "name": "First vanishing degree of original highest-homogeneous-form quotient",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "Exact degree or certificate-derived lower and upper interval; positive-dimensional quotient has no finite value in this presentation.",
+        "source": "top summary rows and replayed per-case certificates",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "certificate_interval"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "dreg_lower_bound",
+        "name": "Certified lower bound",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "Strongest verified projection lower bound, or null if unavailable.",
+        "source": "top certificates summary",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "dreg_upper_bound",
+        "name": "Certified upper bound",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "Upper bound only where the original linear-top rank or exact structural certificate verifies it.",
+        "source": "top certificates summary",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "positive_dimensional",
+        "name": "Positive-dimensional quotient indicator",
+        "unit": "boolean",
+        "kind": "counted",
+        "definition": "The original top-form quotient does not vanish at a finite degree in this presentation.",
+        "source": "certificate status",
+        "aggregation": "per_row",
+        "resolution": "exact",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "dreg_lower_bound",
+      "dreg_upper_bound",
+      "dreg_exact",
+      "top_quotient_dimension_lower_bound",
+      "linear_top_rank"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "image_digest",
+      "source_revision",
+      "exit_code",
+      "stdout_sha256"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": "existing-spot-workspace",
+    "placement": {
+      "cpus": 1,
+      "memory": "8Gi",
+      "spot": true
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 86400,
+    "checkpoint": {
+      "policy": "immutable-per-candidate-output",
+      "interval_seconds": null,
+      "grace_seconds": 5,
+      "restore_validation": "fresh-process replay of every completed certificate",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "All 624 cases across r=27..39, all three families, m=2..9, both target kinds; complete candidate base index and 384 shard joins first; every top certificate replayed in a fresh process.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "86400-second outer execution budget, 8GiB, one process thread; upload immutable per-candidate inputs, certificates, replay records, summaries and indexes; no same-prefix retry; preserve partial outputs.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Source hash/presentation mismatch or failed replay invalidates certificate",
+    "Any surviving projected top monomial invalidates that candidate map",
+    "Unverified candidates and resource limits provide no mathematical bound",
+    "All elapsed times remain diagnostic,wall_valid=false"
+  ],
+  "decision_rule": {
+    "text": "Report exact per-input values, certified lower/upper intervals, positive-dimensional outcomes and all unresolved cases. Do not rank bases from point counts or from a single held-in-sample fit.",
+    "comparison_ids": [
+      "C1"
+    ],
+    "statistic": "Per-input first vanishing degree of the original highest-homogeneous-form quotient",
+    "interval": "Exact or certificate-derived only",
+    "multiple_comparison_correction": "none; no inferential population claim",
+    "effect_size_measure": "Per-input degree difference only when both endpoints are exact and matched on curve,m,target",
+    "verdict_vocabulary": [
+      "exact",
+      "finite_interval",
+      "positive_dimensional_top_ideal",
+      "unresolved",
+      "error",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "src/bin/top.rs",
+      "sha256": "2b22d880eb68ba304c8cca67fec0694c8987f1523436ef728bfa9ad39a621e7e"
+    },
+    "inputs": [
+      "13 candidate input indices, 624 original system.sing sources, complete per-candidate S3 file indexes and family manifests"
+    ],
+    "outputs": [
+      "624 certificate JSONs, 13 candidate summaries, 13 fresh-process replay summaries, one candidate-base-top-panel.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Certified regularity intervals and positive-dimensional status by m and family"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Reporting first-fall degree or last-fall degree as top-form regularity",
+    "Reporting final basis degree as solving degree",
+    "Equating top-form quotient vanishing with affine solving degree or CM regularity",
+    "Treating a positive-dimensional top ideal as infinite CM regularity",
+    "Using timeout or a failed projection as a degree bound",
+    "Omitting a curve family, coordinate bit, m value, or target kind",
+    "Inferring elite-base quality from point counts, one exact row, or training-set fit",
+    "Removing failed, partial, censored, or rejected predictions"
+  ],
+  "literature": [
+    {
+      "ref": "https://arxiv.org/html/1503.08001",
+      "provenance": "retrieved",
+      "claim": "Summation polynomial formulas and distinction between first fall and regularity",
+      "verified_by": "Primary HTML and original native quotient verifier read before implementation; TOP_DESIGN.md gives the exact scope"
+    },
+    {
+      "ref": "https://arxiv.org/html/2112.05579",
+      "provenance": "retrieved",
+      "claim": "Definitions of bounded multiplication closure and last fall degree; distinction from regularity",
+      "verified_by": "Primary HTML and original native quotient verifier read before implementation; TOP_DESIGN.md gives the exact scope"
+    }
+  ],
+  "amendments": [
+    {
+      "id": "A-source-pin",
+      "filed": "2026-10-28",
+      "filed_before_affected_data": true,
+      "reason": "The source commit had not finished when the first predata freeze read HEAD; no production was launched. Preserve that freeze and pin the completed source commit containing the prime map checker.",
+      "changes": [
+        "Instrument/source commit is94b5400d9cbd670a048307809e439c6859fa24a0; experimental cases, binary and analysis source bytes unchanged"
+      ],
+      "supersedes_fields": [
+        "arms[].instrument.commit",
+        "freeze.commit"
+      ]
+    }
+  ],
+  "extensions": {
+    "detailed_design": "TOP_DESIGN.md",
+    "file_layout": "TOP_FACTORBASE_FORMAT.json",
+    "system_generation": "src/bin/pdp.rs generate OUT BASES MATCHED_INPUTS spike27..spike39",
+    "matched_inputs": "evidence/pdp/baseline/inputs.json; required sha256 c9e5a0ff7e38e792c2cbfa196e6e6b7d5fc231bdc6d683784de8774f94afad4e",
+    "factor_base_generation_protocol": "protocol-factor-base-variants-v9-r29-39.json",
+    "factor_base_generation_protocol_sha256": "7276bd557a5625c358a4d063366a415a0265c078ffb2eddaa74dee40174529b2",
+    "candidate_ids": [
+      "spike27",
+      "spike28",
+      "spike29",
+      "spike30",
+      "spike31",
+      "spike32",
+      "spike33",
+      "spike34",
+      "spike35",
+      "spike36",
+      "spike37",
+      "spike38",
+      "spike39"
+    ],
+    "coordinate_bits": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39
+    ],
+    "coordinate_positions_by_candidate": {
+      "candidate_id": "spikeN",
+      "positions": "0..25 union {N}"
+    },
+    "base_reuse": "Each complete candidate family/r manifest is reused unchanged for m=2..9; the planted sample is drawn from the common low-26-coordinate support with fixed seed 20261027; original natural targets are retained.",
+    "base_manifest_binding": "At execution, record the final factor-base S3 file-index key, data/index.json sha256, and all three family manifest hashes from each candidate Job. Do not begin that candidate until the index says complete and all 384 shard-to-index joins pass.",
+    "candidate_model": "Not trained under this protocol. A separate candidate-bit-held-out training protocol must be frozen after exact/censored row schema and feature provenance are finalized.",
+    "case_count": 624,
+    "systems_per_candidate": 48,
+    "base_generation_job_name_rule": "Resolve each candidate_id to its frozen protocol-v9 Job and final S3 file index; retry attempts use fresh names and remain separate records.",
+    "candidate_bits_already_complete_at_freeze": [
+      "spike27",
+      "spike28",
+      "spike30"
+    ],
+    "candidate_bits_in_progress_at_freeze": [
+      "spike31",
+      "spike32"
+    ],
+    "candidate_bits_not_yet_complete_at_freeze": [
+      "spike29",
+      "spike33",
+      "spike34",
+      "spike35",
+      "spike36",
+      "spike37",
+      "spike38",
+      "spike39"
+    ],
+    "file_layout_sha256": "1a0adf396d41d160b49b5209b28cad70989d354fee9569dcea19f929f85955d5"
+  },
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "acf03636ae2e8038b2c5da0077f402ec70823cbcb67150dbb80db79eb6c46bdd",
+    "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+    "frozen_at": "2026-10-31T10:23:04Z",
+    "filed_before_affected_data": true
+  }
+}
