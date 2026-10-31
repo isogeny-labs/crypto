@@ -1,0 +1,242 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "QT-degree-failed-02-20261030",
+  "created": "2026-10-30T09:04:45Z",
+  "protocol": {
+    "path": "protocol-failed-02.json",
+    "sha256": "c2c8411deb95bfc90634b3bc98dbba0e09903b30cf5fc4377a673cb595783838",
+    "protocol_id": "QT-degree-qualified-F13-20261030",
+    "version": 2
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": null,
+    "role": "executor"
+  },
+  "source": {
+    "repo": "isogeny-labs/crypto",
+    "commit": "453dc881c6834c6b1be10b88375b6a5e52744e1e",
+    "dirty": false
+  },
+  "backend": "local",
+  "host": {
+    "path": null,
+    "sha256": null,
+    "class_id": null,
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": null
+    }
+  },
+  "arms": [
+    {
+      "id": "cpp",
+      "role": "reference",
+      "binary_sha256": null,
+      "commit": "453dc881c6834c6b1be10b88375b6a5e52744e1e"
+    },
+    {
+      "id": "rust",
+      "role": "candidate",
+      "binary_sha256": null,
+      "commit": "453dc881c6834c6b1be10b88375b6a5e52744e1e"
+    },
+    {
+      "id": "domain",
+      "role": "control_positive",
+      "binary_sha256": null,
+      "commit": "453dc881c6834c6b1be10b88375b6a5e52744e1e"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "failed-02-cpp",
+      "arm": "cpp",
+      "instance_id": "0",
+      "seed": 2381,
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "invalid implementation attempt,no admitted scientific result"
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "CPPcompleted288 but audit101 violates b3 contract;unaccepted;controls never ran."
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "CPPcompleted288 but audit101 violates b3 contract;unaccepted;controls never ran."
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "failed-02-rust",
+      "arm": "rust",
+      "instance_id": "0",
+      "seed": 2381,
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "invalid implementation attempt,no admitted scientific result"
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "CPPcompleted288 but audit101 violates b3 contract;unaccepted;controls never ran."
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "CPPcompleted288 but audit101 violates b3 contract;unaccepted;controls never ran."
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "failed-02-domain",
+      "arm": "domain",
+      "instance_id": "0",
+      "seed": 2381,
+      "replicate": 0,
+      "warmup": false,
+      "status": "cancelled",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "invalid implementation attempt,no admitted scientific result"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "CPPcompleted288 but audit101 violates b3 contract;unaccepted;controls never ran."
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "CPPcompleted288 but audit101 violates b3 contract;unaccepted;controls never ran."
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    }
+  ],
+  "flow": {
+    "planned": 3,
+    "attempted": 3,
+    "completed": 2,
+    "not_completed": 1,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": [
+      {
+        "rule": "CPPcompleted288 but audit101 violates b3 contract;unaccepted;controls never ran.",
+        "run_ids": [
+          "failed-02-cpp",
+          "failed-02-rust",
+          "failed-02-domain"
+        ]
+      }
+    ]
+  },
+  "files": [
+    {
+      "path": "runs.tar.xz",
+      "sha256": "688a5a4b19bd0f09ab396183e5d3cc68be67c49e9114e9ca93f42041ba658c06",
+      "bytes": 37124,
+      "kind": "raw"
+    },
+    {
+      "path": "RUNS.sha256.xz",
+      "sha256": "fb37c340677055aa4261723caea015ee87949409d7e14cabaddbb03427c628e0",
+      "bytes": 35984,
+      "kind": "raw"
+    },
+    {
+      "path": "archive-receipt.json",
+      "sha256": "e10c1dd105722ad9468acc489f9d417c773cdf10deec367ca6598d7d1842e8df",
+      "bytes": 549,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "source-failed-02.rs.txt",
+      "sha256": "a1ec55f427c8b61821b0fa9f0d8ab2d1e4b6507d59833b1dd29059ae05903fa1",
+      "bytes": 27355,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "failure scope",
+      "text": "CPPcompleted288 but audit101 violates b3 contract;unaccepted;controls never ran. Status describes accepted scientific execution,not a claim that the successful C++ compiler/producer process returned nonzero. Original argv/log/exits/source commit restore from raw archive."
+    }
+  ],
+  "reviews_dir": "reviews"
+}
