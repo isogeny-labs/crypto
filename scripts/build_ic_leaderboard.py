@@ -79,8 +79,8 @@ SOURCES = {
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
     "lazy_members": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
-    "lazy_columns2": "research/ecbench_lazy_columns2_20261018/figures/ratios.json",
     "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
+    "lazy_columns2": "research/ecbench_lazy_columns2_20261018/figures/ratios.json",
     "postgb_linear_stage": "research/postgb_linear_stage_20261026/analysis/summary.json",
     "ic_m2_linear_ladder": "research/ic_m2_linear_ladder_20261024/fit.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
@@ -840,25 +840,6 @@ def prime_base_size_component() -> dict:
             "validation": ("validated with caveats: replay certificate, validator report and the matched rho "
                            f"reference with the §5a band ({study}/VALIDATION.json)") if not errs else NOT_VALIDATED,
             "validated": not errs}
-
-
-def lazy_members_component() -> dict:
-    """The lazy orbit-member index of research/ecbench_lazy_orbit_members_20261018:
-    ratios copied from the study's saved ecbench comparisons (figures/ratios.json).
-    A component improvement of the Frobenius-folded pair table's set-up. The
-    ranked tables A-C keep the oracle each row was measured with."""
-    d = load(SOURCES["lazy_members"])
-    if d.get("schema") != "crypto.lazy_orbit_members/v1" or d.get("class") != "engineering":
-        raise SystemExit(f"{SOURCES['lazy_members']}: unexpected schema or class")
-    return {"rows": d["rows"], "unit": d["unit"], "class": d["class"], "note": d["note"],
-            "study": d["study"] + "/", "report": d["study"] + "/REPORT.pdf",
-            "source": SOURCES["lazy_members"], "validation": NOT_VALIDATED}
-
-
-NOT_VALIDATED = ("Validation standing: not validated under the 2026-10-19 gate. No replay certificate, "
-                 "validator report or §5a-banded matched-rho reference is filed for this study (no "
-                 "VALIDATION.json), so this is an engineering component, not a validated row, and its "
-                 "benchmarks/README.md row is withheld until it validates.")
 
 
 def lazy_members_component() -> dict:
