@@ -1,0 +1,37 @@
+status: completed
+
+card: CARD-BLINDSPOT-10-08-r2 (sha256 35a2b0f6a32771bda0ed390ad6c0be24035a9a6813dc9933b696bd5416325a5d)
+commit: 251594c3e618f3c8fd119e65dd201d28fe66e729
+receipt: research/blindspots_20261018/10-kernel-program-search/raw-r2/receipt-card-08-r2.json sha256 1658edccb8d447ea1769d12f41dff928642ed8bf78c8d673df1a0347107cbb46
+status: completed
+command 1 (make-bin-dir): ["mkdir", "-p", "target/blindspots-10/card-08-r2"] exit 0 (0.002 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (build): ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-C", "target-cpu=native", "-o", "target/blindspots-10/card-08-r2/b10", "examples/blindspots_10_kernel_search.rs"] exit 0 (6.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 3 (search-n31-c-a): ["prlimit", "--as=4294967296", "target/blindspots-10/card-08-r2/b10", "search", "--n", "31", "--ell", "9", "--arm", "c", "--state", "research/blindspots_20261018/10-kernel-program-search/raw-r2/state-1", "--budget", "256", "--max-new", "128"] exit 0 (264.953 s) succeeded
+  stdout sha256 de92227b157f540335dd4b1d548ba0a16ba70b4430aabcf7b925eeac420b6b76; last 20 lines:
+    eval 109 coset4-s2|lift1|stop0|root1|q0|sqt1|pm0|ab3|bt0|gc0        q01=  1.2466e3 phi=0.562 dom=false 890ms
+    eval 110 coset4-s1|lift1|stop0|root0|q1|sqt1|pm0|ab0|bt1|gc0        q01=  1.1301e3 phi=1.000 dom=false 1062ms
+    eval 111 sub-rand4|lift1|stop0|root1|q1|sqt1|pm1|ab0|bt0|gc0        q01=  2.7346e3 phi=1.000 dom=false 1629ms
+    eval 112 sub-low|lift0|stop1|root0|q2|sqt0|pm1|ab0|bt2|gc1          q01=  1.1675e4 phi=1.000 dom=false 7136ms
+    eval 113 affine-anti|lift0|stop0|root1|q2|sqt0|pm1|ab1|bt1|gc0      q01=       inf phi=0.000 dom=false 0ms
+    eval 114 coset4-s2|lift0|stop0|root2|q2|sqt0|pm0|ab1|bt0|gc0        q01=       inf phi=0.000 dom=true 415ms
+    eval 115 affine-anti|lift1|stop1|root2|q2|sqt0|pm0|ab2|bt0|gc0      q01=       inf phi=0.000 dom=false 0ms
+    eval 116 coset2-s2|lift1|stop0|root0|q2|sqt0|pm0|ab0|bt2|gc1        q01=  1.2718e3 phi=1.000 dom=false 1311ms
+    eval 117 affine-rand-s1|lift1|stop0|root2|q0|sqt0|pm0|ab1|bt0|gc0   q01=  6.9401e3 phi=0.969 dom=false 6239ms
+    eval 118 sub-rand4|lift1|stop1|root0|q1|sqt1|pm0|ab3|bt0|gc1        q01=  7.0912e2 phi=0.594 dom=false 542ms
+    eval 119 affine-aligned-s1|lift0|stop1|root0|q0|sqt0|pm1|ab0|bt0|gc1 q01=  3.4146e3 phi=1.000 dom=false 5575ms
+    eval 120 sub-rand1|lift1|stop0|root2|q2|sqt0|pm1|ab0|bt0|gc0        q01=       inf phi=0.000 dom=true 362ms
+    eval 121 affine-anti|lift0|stop0|root1|q1|sqt1|pm1|ab3|bt0|gc0      q01=       inf phi=0.000 dom=false 0ms
+    eval 122 ham-shift|lift0|stop0|root2|q2|sqt0|pm0|ab2|bt0|gc0        q01=       inf phi=0.000 dom=true 312ms
+    eval 123 sub-rand3|lift1|stop0|root1|q1|sqt1|pm0|ab4|bt2|gc0        q01=  9.9551e2 phi=0.375 dom=false 610ms
+    eval 124 sub-rand6|lift1|stop1|root2|q0|sqt1|pm1|ab2|bt0|gc0        q01=  7.6437e3 phi=0.844 dom=false 6250ms
+    eval 125 sub-low|lift0|stop1|root2|q1|sqt0|pm1|ab0|bt0|gc0          q01=       inf phi=0.000 dom=true 201ms
+    eval 126 geom-s3|lift1|stop0|root2|q0|sqt1|pm0|ab3|bt0|gc0          q01=  4.5841e3 phi=0.688 dom=false 3872ms
+    eval 127 sub-rand6|lift0|stop1|root1|q2|sqt0|pm0|ab4|bt0|gc0        q01=  5.9672e3 phi=0.250 dom=false 2103ms
+    best so far idx 99 affine-rand-s1|lift1|stop0|root0|q1|sqt0|pm1|ab4|bt1|gc0 q01=5.0293e2 (128 of 256 evaluations done)
+  output research/blindspots_20261018/10-kernel-program-search/raw-r2/state-1/n31-c.jsonl: e44de45a541abe821a69b50ba6e968480b8d2e46ebd9c89b212f44d4885ced59
+command 4 (remove-bin): ["rm", "-f", "target/blindspots-10/card-08-r2/b10"] exit 0 (0.008 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 5 (remove-bin-dir): ["rmdir", "target/blindspots-10/card-08-r2"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
