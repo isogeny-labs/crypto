@@ -1015,7 +1015,16 @@ pub fn generate_planted(config: &CaseConfig) -> Result<CaseData, String> {
         })
         .collect();
     case.public_instance["target"] = point_json(target);
-    case.public_instance["population"] = json!("planted-pdp-v1");
+    // Keep construction/population provenance out of the public instance.
+    // The natural constructor's sampling and factor-base trace describe the
+    // discarded target and point set, so they must not survive this override.
+    let public_object = case
+        .public_instance
+        .as_object_mut()
+        .ok_or("invalid public instance")?;
+    public_object.remove("population");
+    public_object.remove("sampling");
+    public_object.remove("construction_trace");
     case.factor_base = json!({"schema":"ml-ecdlp-factor-base/v1",
         "rule":"planted-known-log-subgroup/v1",
         "points":base_points.into_iter().map(point_json).collect::<Vec<_>>(),
@@ -1024,9 +1033,17 @@ pub fn generate_planted(config: &CaseConfig) -> Result<CaseData, String> {
         "negation_action":negation,
         "frobenius_action":frobenius,"frobenius_power":k,"orbits":orbits});
     case.private_witness["scalar"] = u(scalar);
+    case.private_witness
+        .as_object_mut()
+        .ok_or("invalid private witness")?
+        .remove("factor_base_membership_logs");
     let accepted_target_attempt = target_draws.len() - 1;
     case.private_witness["planted_construction"] = json!({
         "schema":"ml-dataset.planted-construction/v1",
+        "population":"planted-pdp-v1",
+        "preliminary_natural_constructor_run":true,
+        "preliminary_natural_constructor_cost":{"operation_counts":"unavailable","charge_required":true,
+            "scope":"curve/order/generator, discarded natural scalar and factor-base construction, and verification"},
         "config_sha256":super::digest(&serde_json::to_vec(config).map_err(|e| e.to_string())?),
         "base_draw_cap":base_cap,"target_draw_cap":128,
         "base_draws":base_draws,"target_draws":target_draws,
@@ -1052,6 +1069,9 @@ fn planted_rng(config: &CaseConfig, domain: &str) -> Result<StdRng, String> {
 /// reference group arithmetic. A constructed scalar is a known answer, never
 /// evidence that an ECDLP solver recovered it.
 pub fn verify_planted(config: &CaseConfig, case: &CaseData) -> Result<(), String> {
+    if config.factor_base_size == 0 || config.factor_base_size > 4096 {
+        return Err("invalid planted factor-base size".into());
+    }
     let public = &case.public_instance;
     let private = &case.private_witness;
     let base = &case.factor_base;
@@ -1059,15 +1079,23 @@ pub fn verify_planted(config: &CaseConfig, case: &CaseData) -> Result<(), String
         || public["n"].as_u64() != Some(config.n as u64)
         || public["m"].as_u64() != Some(config.m as u64)
         || public["twist"].as_bool() != Some(config.twist)
-        || public["population"] != "planted-pdp-v1"
+        || public.get("population").is_some()
+        || public.get("sampling").is_some()
+        || public.get("construction_trace").is_some()
     {
         return Err("planted public axes differ from config".into());
     }
     verify(public, private)?;
-    verify_factor_base(public, base)?;
+    verify_planted_factor_base(public, base)?;
     let record = &private["planted_construction"];
     let binding = super::digest(&serde_json::to_vec(config).map_err(|e| e.to_string())?);
     if record["schema"] != "ml-dataset.planted-construction/v1"
+        || record["population"] != "planted-pdp-v1"
+        || record["preliminary_natural_constructor_run"] != true
+        || record["preliminary_natural_constructor_cost"]
+            != json!({"operation_counts":"unavailable",
+            "charge_required":true,
+            "scope":"curve/order/generator, discarded natural scalar and factor-base construction, and verification"})
         || record["config_sha256"] != binding
         || record["base_draw_cap"].as_u64()
             != Some(
@@ -1580,6 +1608,15 @@ pub fn verify(public: &Value, private: &Value) -> Result<(), String> {
 }
 
 pub fn verify_factor_base(public: &Value, base: &Value) -> Result<(), String> {
+    if base["rule"] == "planted-known-log-subgroup/v1" {
+        return Err(
+            "planted factor base requires restricted witness replay via verify_planted".into(),
+        );
+    }
+    verify_natural_factor_base(public, base)
+}
+
+fn verify_planted_factor_base(public: &Value, base: &Value) -> Result<(), String> {
     if base["schema"] == "ml-ecdlp-factor-base/v1"
         && base["rule"] == "planted-known-log-subgroup/v1"
     {
@@ -1680,6 +1717,10 @@ pub fn verify_factor_base(public: &Value, base: &Value) -> Result<(), String> {
         }
         return Ok(());
     }
+    Err("invalid planted factor-base schema or policy".into())
+}
+
+fn verify_natural_factor_base(public: &Value, base: &Value) -> Result<(), String> {
     if base["schema"] != "ml-ecdlp-factor-base/v1"
         || base["rule"] != "small-x-prime-primary-projection-with-cyclic-membership"
     {
@@ -1864,7 +1905,13 @@ mod tests {
         cfg.m = 15; // Terms are sampled with replacement, even above base size.
         let natural = generate(&cfg).unwrap();
         let planted = generate_planted(&cfg).unwrap();
-        assert_eq!(planted.public_instance["population"], "planted-pdp-v1");
+        assert!(planted.public_instance.get("population").is_none());
+        assert!(planted.public_instance.get("sampling").is_none());
+        assert!(planted.public_instance.get("construction_trace").is_none());
+        assert_eq!(
+            planted.private_witness["planted_construction"]["population"],
+            "planted-pdp-v1"
+        );
         assert_eq!(
             natural.public_instance["population"],
             "unconditioned-uniform-nonzero-subgroup-scalar"
@@ -1883,6 +1930,10 @@ mod tests {
             serde_json::to_value(generate_planted(&cfg).unwrap()).unwrap()
         );
         verify_planted(&cfg, &planted).unwrap();
+        assert!(verify_factor_base(&planted.public_instance, &planted.factor_base).is_err());
+        let mut leaked = planted.clone();
+        leaked.public_instance["population"] = json!("planted-pdp-v1");
+        assert!(verify_planted(&cfg, &leaked).is_err());
         let mut wrong_sign = planted.clone();
         wrong_sign.private_witness["planted_construction"]["target_draws"][0]["terms"][0]["sign"] =
             json!(0);
