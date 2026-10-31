@@ -80,3 +80,27 @@ lean_lib PositiveDistinct
 
 @[default_target]
 lean_lib WordPositive
+
+@[default_target]
+lean_lib Tripling
+
+@[default_target]
+lean_lib WordTriple
+
+@[default_target]
+lean_lib Guard22
+
+@[default_target]
+lean_lib MixedDispatch
+
+@[default_target]
+lean_lib SameUMixed
+
+@[default_target]
+lean_lib WeightedExtract
+
+@[default_target]
+lean_lib WordDispatch
+
+@[default_target]
+lean_lib LocalSmooth

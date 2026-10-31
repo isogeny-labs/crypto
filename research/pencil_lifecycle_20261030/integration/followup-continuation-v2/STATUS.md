@@ -177,3 +177,31 @@ One pinned native build is running. A private owner-process BenchLock release pr
 
 ### Errors
 Earlier proof timeouts and the two corrected-source GPU lock failures remain retained; no result was removed or rerun to replace a failure.
+
+## 2026-10-31 02:28 UTC — tripling field and inherited-lock controls reviewed
+
+### What was done
+Tripling field proof passed independent source review, including six output expressions and F3/F5/F2 controls. Integrated its exact source; UInt64 bridge remains under producer checks. Independent retained-execution review verified all six admitted lock controls, nine probes and four zero-status child reaps. Applied the reviewed lock correction under T-1071; its primitive matches the tested block except blank lines removed by rustfmt. A bounded native supervisor is building/running affected GPU tests, then full-library, maintained Clippy and CLI checks if preceding stages pass.
+
+### Decisions made
+Preserve v1 helper as an unexecuted source-review failure (Rust forbids explicit destructor invocation); v2 uses a shared release method. Preserve actual failing GPU interleaving as unknown. The pinned b985 musl build continues as its original candidate; it predates the lock correction and must not be relabeled as the final changed source.
+
+### Open threads
+UInt64 tripling review, degree-two pair branch coverage, intended runtime qualification, final source/artifact bindings and prospective scientific admission. Updated neutral report is report-positive-tripling-lock/report.pdf with editable SVGs and index.json; 13 publication bindings checked.
+
+### Errors
+An initial aggregate readback reader assumed every binding used publication_manifest; some receipts use publication_path. Corrected the reader to accept the explicit alternatives; all 13 hashes match. Earlier software failures and proof attempts remain unchanged.
+
+## 2026-10-31 03:01 UTC — mixed dispatcher, nonsingularity and native checks
+
+### What was done
+Integrated independent field/UInt64 reviews for tripling and complete mixed-support dispatch, the degree-two ordered-guard proof, and same-u extraction. Local nonsingularity now proves the extracted ordinate is nonzero and the following doubling retains nonzero weight; the global coprimality bridge is separately under review. The corrected-source affected GPU tests passed 8/8 and full library suite passed 5,793 tests with zero failures and 128 ignored. Maintained Clippy remains active.
+
+### Decisions made
+Preserve the b985 musl build as a terminal candidate for its exact earlier source: binary SHA256 16b6eecd16e4cdc3c56bd733090ae80bb9b558f3f8b5dc449d5b8d3344d880d1. Its static ELF checks and two native preflight controls passed; its link map selects the Rust sysroot musl libc/CRT, independently reviewed. A final corrected-source rebuild must refresh the selected source inventory.
+
+### Open threads
+Independent global nonsingularity review, corrected-source Clippy/CLI checks, final source rebuild, reviewed runtime qualification and artifact bindings. Scientific cohort scope and campaign limits are unchanged; no new scientific payload was admitted.
+
+### Errors
+The source-only runtime-supervisor review found missing fixture-member verification, exception-path client cleanup, archive-kind checks and raw-inspect cleanup. A separate revised proposal is being prepared before execution. Earlier proof and software failures remain retained.
