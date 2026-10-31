@@ -181,6 +181,7 @@ if has analyze; then
   counted_dirs=$(ls -d "$SESS"/counted_n*"$TAG" | grep -v audit | tr '\n' ' ')
   timed_args=""; [ -z "$timed_dirs" ] || timed_args="--timed $(echo $timed_dirs | tr '\n' ' ')"
   opc=""; [ ! -e "$RAW/opcount.jsonl" ] || opc="--opcount $RAW/opcount.jsonl"
-  "$TOOL" analyze --counted $counted_dirs $timed_args --calibration "$RAW/calibrate.jsonl" $opc \
-      --memory "$RAW/memory.jsonl" --out "$RAW/summary.json" --markdown "$RAW/summary.md"
+  mem=""; [ ! -e "$RAW/memory.jsonl" ] || mem="--memory $RAW/memory.jsonl"
+  "$TOOL" analyze --counted $counted_dirs $timed_args --calibration "$RAW/calibrate.jsonl" $opc $mem \
+      --out "$RAW/summary.json" --markdown "$RAW/summary.md"
 fi
