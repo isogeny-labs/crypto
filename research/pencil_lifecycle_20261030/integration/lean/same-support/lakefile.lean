@@ -29,3 +29,21 @@ lean_lib UInt64Residue
 
 @[default_target]
 lean_lib InvariantBranches
+
+@[default_target]
+lean_lib NatClassifier
+
+@[default_target]
+lean_lib WordClassifier
+
+@[default_target]
+lean_lib CrossScaling
+
+@[default_target]
+lean_lib WordErrorExclusion
+
+@[default_target]
+lean_lib Constructor
+
+@[default_target]
+lean_lib Add11
