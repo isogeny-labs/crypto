@@ -3534,3 +3534,306 @@ mod signed_typed_event_tests {
             .is_empty());
     }
 }
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SavedWitnessPoint {
+    x: String,
+    y: String,
+}
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SavedSignedWitness {
+    summands: [SavedWitnessPoint; 3],
+    target: SavedWitnessPoint,
+    sum: SavedWitnessPoint,
+    replay_group_add_calls: u8,
+}
+#[derive(Debug, PartialEq, Eq)]
+pub(super) struct VerifiedSignedWitness {
+    indices: [u8; 3],
+    tuple: u8,
+}
+fn saved_witness_point(point: &SavedWitnessPoint) -> Result<(u64, u64), String> {
+    let word = |s: &str| -> Result<u64, String> {
+        if s.is_empty()
+            || s.len() > 20
+            || !s.bytes().all(|b| b.is_ascii_digit())
+            || (s.len() > 1 && s.starts_with('0'))
+        {
+            return Err("noncanonical signed-witness coordinate".into());
+        }
+        s.parse()
+            .map_err(|_| "signed-witness coordinate exceeds word".into())
+    };
+    Ok((word(&point.x)?, word(&point.y)?))
+}
+/// Independently replay saved witness bytes against validated original inputs.
+/// The caller separately authenticates the artifact's path, role, encoding,
+/// digest and capture commitment. This proves mathematics, not execution cost.
+pub(super) fn verify_signed_witness(
+    bytes: &[u8],
+    original: &MathInput,
+) -> Result<VerifiedSignedWitness, String> {
+    use crate::binary_ecc::{curve::point_add, BinaryPoint, F2mElement};
+    use num_traits::ToPrimitive;
+    if bytes.len() > SIGNED_WITNESS_BYTE_CAP {
+        return Err("signed witness exceeds byte cap".into());
+    }
+    let saved: SavedSignedWitness =
+        serde_json::from_slice(bytes).map_err(|e| format!("strict signed witness: {e}"))?;
+    if saved.replay_group_add_calls != 3
+        || saved_witness_point(&saved.target)? != original.target
+        || saved_witness_point(&saved.sum)? != original.target
+    {
+        return Err("signed witness target, sum or arity mismatch".into());
+    }
+    let mut indices = [0u8; 3];
+    let mut sum = BinaryPoint::Infinity;
+    for (i, p) in saved.summands.iter().enumerate() {
+        let point = saved_witness_point(p)?;
+        indices[i] = original
+            .signed
+            .iter()
+            .position(|&v| v == point)
+            .ok_or("signed witness summand outside original domain")? as u8;
+        let (x, y) = original.signed[indices[i] as usize];
+        let p = BinaryPoint::Affine {
+            x: F2mElement::from_words(&[x], original.curve.m),
+            y: F2mElement::from_words(&[y], original.curve.m),
+        };
+        sum = point_add(&original.curve, &sum, &p);
+    }
+    let actual = match sum {
+        BinaryPoint::Infinity => None,
+        BinaryPoint::Affine { x, y } => x.to_biguint().to_u64().zip(y.to_biguint().to_u64()),
+    };
+    if actual != Some(original.target) {
+        return Err("signed witness independent sum mismatch".into());
+    }
+    Ok(VerifiedSignedWitness {
+        indices,
+        tuple: indices[0] * 16 + indices[1] * 4 + indices[2],
+    })
+}
+
+/// Mathematical scope only. Durable receipt/stream matching and outer
+/// supervisor outcome checks must be supplied by the central artifact verifier.
+pub(super) struct VerifiedSignedMath {
+    prefix: PrefixAssessment,
+    witness: Option<VerifiedSignedWitness>,
+}
+impl VerifiedSignedMath {
+    fn negative_domain_verified(&self) -> bool {
+        self.prefix.all_tuples_acknowledged
+            && self.prefix.candidate_tuples.is_empty()
+            && self.witness.is_none()
+    }
+}
+pub(super) fn verify_signed_math(
+    replay_bytes: &[u8],
+    witness_bytes: Option<&[u8]>,
+    original: &MathInput,
+    binding: &crate::ml_dataset::capture::AttemptBinding,
+    public_sha256: &str,
+    factor_base_sha256: &str,
+    input_sha256: &str,
+    addition_limit: u64,
+) -> Result<VerifiedSignedMath, String> {
+    let prefix = verify_signed_replay(
+        replay_bytes,
+        original,
+        binding,
+        public_sha256,
+        factor_base_sha256,
+        input_sha256,
+        addition_limit,
+    )?;
+    let witness = witness_bytes
+        .map(|bytes| verify_signed_witness(bytes, original))
+        .transpose()?;
+    if let Some(witness) = &witness {
+        if !prefix.candidate_tuples.contains(&witness.tuple) {
+            return Err("saved witness is absent from the replayed signed prefix".into());
+        }
+    }
+    Ok(VerifiedSignedMath { prefix, witness })
+}
+
+#[cfg(test)]
+mod signed_witness_replay_tests {
+    use super::*;
+    fn witness() -> (MathInput, Vec<u8>, [u8; 3]) {
+        let mut original = construction_tests::fixture();
+        original.target = original.signed[0];
+        let mut budget = construction_tests::budget();
+        budget.begin_native(false, Instant::now()).unwrap();
+        budget.finish_native(Instant::now()).unwrap();
+        let prepared = prepare_signed(&original, &mut budget, false).unwrap();
+        let mut saved = None;
+        let result = enumerate_prepared_signed(prepared, &mut |_, _| Ok(()), &mut |w, b| {
+            let e = encode_signed_witness(w, b);
+            assert!(e.complete && e.stop.is_none());
+            saved = Some((e.bytes, w.indices));
+            Err(Stop::Observer)
+        });
+        assert!(result.first_receipt.is_none());
+        let (bytes, indices) = saved.unwrap();
+        (original, bytes, indices)
+    }
+    #[test]
+    fn saved_signed_witness_is_verified_without_producer_receipt_or_live_deadline() {
+        let (original, bytes, indices) = witness();
+        let v = verify_signed_witness(&bytes, &original).unwrap();
+        assert_eq!(v.indices, indices);
+        assert_eq!(v.tuple, indices[0] * 16 + indices[1] * 4 + indices[2]);
+    }
+    #[test]
+    fn signed_witness_replay_rejects_reencoded_semantic_and_schema_mutations() {
+        let (original, bytes, _) = witness();
+        let base: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+        for mutation in 0..11 {
+            let mut v = base.clone();
+            match mutation {
+                0 => {
+                    v["target"]["x"] = serde_json::json!((base["target"]["x"]
+                        .as_str()
+                        .unwrap()
+                        .parse::<u64>()
+                        .unwrap()
+                        ^ 1)
+                    .to_string())
+                }
+                1 => {
+                    v["sum"]["y"] = serde_json::json!((base["sum"]["y"]
+                        .as_str()
+                        .unwrap()
+                        .parse::<u64>()
+                        .unwrap()
+                        ^ 1)
+                    .to_string())
+                }
+                2 => v["summands"][0]["x"] = serde_json::json!(u64::MAX.to_string()),
+                3 => v["replay_group_add_calls"] = serde_json::json!(2),
+                4 => v["summands"][0]["x"] = serde_json::json!(1),
+                5 => {
+                    v["summands"][0]["x"] = serde_json::json!(format!(
+                        "0{}",
+                        base["summands"][0]["x"].as_str().unwrap()
+                    ))
+                }
+                6 => v["solver_completed"] = serde_json::json!(true),
+                7 => v["summands"][0]["extra"] = serde_json::json!(true),
+                8 => {
+                    v["summands"].as_array_mut().unwrap().pop();
+                }
+                9 => v["summands"][0] = serde_json::Value::Null,
+                10 => v["summands"][0]["x"] = serde_json::json!("18446744073709551616"),
+                _ => unreachable!(),
+            }
+            assert!(
+                verify_signed_witness(&serde_json::to_vec(&v).unwrap(), &original).is_err(),
+                "mutation {mutation}"
+            );
+        }
+        assert!(
+            verify_signed_witness(&vec![b' '; SIGNED_WITNESS_BYTE_CAP + 1], &original).is_err()
+        );
+    }
+    #[test]
+    fn signed_witness_replay_rejects_on_domain_points_with_wrong_group_sum() {
+        let (original, bytes, _) = witness();
+        let mut v: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+        let p = original.signed[0];
+        v["summands"] = serde_json::json!([
+            {"x":p.0.to_string(),"y":p.1.to_string()},
+            {"x":p.0.to_string(),"y":p.1.to_string()},
+            {"x":p.0.to_string(),"y":p.1.to_string()}]);
+        assert!(
+            verify_signed_witness(&serde_json::to_vec(&v).unwrap(), &original)
+                .unwrap_err()
+                .contains("sum mismatch")
+        );
+    }
+}
+
+#[cfg(test)]
+mod signed_math_pair_tests {
+    use super::*;
+    fn replay(original: &MathInput, positive: bool) -> (Vec<u8>, Option<Vec<u8>>) {
+        let mut b = construction_tests::budget();
+        b.begin_native(false, Instant::now()).unwrap();
+        b.finish_native(Instant::now()).unwrap();
+        let prepared = prepare_signed(original, &mut b, false).unwrap();
+        let mut witness = None;
+        let result = enumerate_prepared_signed(prepared, &mut |_, _| Ok(()), &mut |w, b| {
+            assert!(positive);
+            let e = encode_signed_witness(w, b);
+            assert!(e.complete && e.stop.is_none());
+            witness = Some(e.bytes);
+            Err(Stop::Observer)
+        });
+        assert_eq!(result.complete, !positive);
+        let saved = SavedSignedReplay {
+            schema: "crypto.ml-dataset.koblitz-m3-signed-prefix/v1".into(),
+            binding: matrix_tests::binding(),
+            public_sha256: "8".repeat(64),
+            factor_base_sha256: "9".repeat(64),
+            input_sha256: "a".repeat(64),
+            addition_limit: 16384,
+            performed_additions: result.enumeration_additions as usize,
+            acknowledged_additions: result.acknowledged.len(),
+            acknowledged: result.acknowledged,
+            unacknowledged: result.unacknowledged,
+        };
+        (serde_json::to_vec(&saved).unwrap(), witness)
+    }
+    fn check(
+        original: &MathInput,
+        prefix: &[u8],
+        witness: Option<&[u8]>,
+    ) -> Result<VerifiedSignedMath, String> {
+        verify_signed_math(
+            prefix,
+            witness,
+            original,
+            &matrix_tests::binding(),
+            &"8".repeat(64),
+            &"9".repeat(64),
+            &"a".repeat(64),
+            16384,
+        )
+    }
+    #[test]
+    fn complete_negative_math_and_partial_positive_witness_are_distinct() {
+        let original = construction_tests::fixture();
+        let (prefix, witness) = replay(&original, false);
+        assert!(witness.is_none());
+        assert!(check(&original, &prefix, None)
+            .unwrap()
+            .negative_domain_verified());
+        let mut positive = construction_tests::fixture();
+        positive.target = positive.signed[0];
+        let (prefix, witness) = replay(&positive, true);
+        let result = check(&positive, &prefix, witness.as_deref()).unwrap();
+        assert!(result.witness.is_some());
+        assert!(!result.prefix.all_tuples_acknowledged);
+        assert!(!result.negative_domain_verified());
+    }
+    #[test]
+    fn saved_witness_cannot_be_attached_before_its_candidate_prefix() {
+        let mut original = construction_tests::fixture();
+        original.target = original.signed[0];
+        let (prefix, witness) = replay(&original, true);
+        let mut saved: SavedSignedReplay = serde_json::from_slice(&prefix).unwrap();
+        saved.acknowledged.clear();
+        saved.unacknowledged = None;
+        saved.performed_additions = 0;
+        saved.acknowledged_additions = 0;
+        let bytes = serde_json::to_vec(&saved).unwrap();
+        assert!(check(&original, &bytes, witness.as_deref()).is_err());
+        assert!(!check(&original, &bytes, None)
+            .unwrap()
+            .negative_domain_verified());
+    }
+}
