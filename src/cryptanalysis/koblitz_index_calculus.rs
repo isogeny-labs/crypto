@@ -9254,8 +9254,8 @@ pub fn sat_decompose_chained_s3_frobenius_orbit_ordered(
 }
 
 /// The chained-S3 solver of [`sat_decompose_chained_s3`] and its
-/// Frobenius-orbit variants for any summand count `2..=9`, the range the
-/// encoder's identity-pattern mask holds. The `5..=6` entry points keep
+/// Frobenius-orbit variants for this adapter's admitted summand range `2..=9`.
+/// The legacy `4..=6` entry points keep
 /// their frozen admission; this one exists for summand sweeps. The same
 /// domain, field-replay and full curve-group checks apply to every model.
 pub fn sat_decompose_chained_s3_any_m(
@@ -9296,7 +9296,7 @@ fn sat_decompose_chained_s3_with_domain(
     frobenius_orbits: bool,
     order_first_pair: bool,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
-    if !(5..=6).contains(&m) {
+    if !(4..=6).contains(&m) {
         return (
             None,
             ChainS3Stats {
@@ -9329,7 +9329,7 @@ fn sat_decompose_chained_s3_checked(
         finite_domain_clause_count, frobenius_orbit_domain_size, ChainBuildError, ChainedS3Encoding,
     };
     let mut stats = ChainS3Stats::default();
-    if !(4..=6).contains(&m)
+    if !(2..=9).contains(&m)
         || limits.max_models == 0
         || limits.conflict_budget == 0
         || !kc.curve.is_on_curve(target)
@@ -16884,6 +16884,38 @@ mod tests {
             );
             assert!(out.is_none() && stats.exhausted && !stats.refuted);
             assert_eq!(stats.solver_calls, 0);
+        }
+    }
+
+    #[test]
+    fn chained_s3_adapters_preserve_distinct_admission_ranges() {
+        let kc = KoblitzCurve::new(0, 7).unwrap();
+        let BinaryPoint::Affine { x, .. } = kc.generator() else {
+            panic!("generator is affine");
+        };
+        let fb = build_explicit_frobenius_orbit_factor_base(&kc, std::slice::from_ref(x)).unwrap();
+        let limits = ChainS3Limits {
+            max_variables: 1,
+            max_domain_clauses: 100_000,
+            max_models: 1,
+            conflict_budget: 1,
+        };
+        for m in 2..=9 {
+            let (_, sweep) =
+                sat_decompose_chained_s3_any_m(&kc, &fb, kc.generator(), m, limits, false, false);
+            assert!(sweep.domain_clauses > 0, "m={m}: {sweep:?}");
+            assert!(sweep.exhausted && !sweep.refuted);
+            assert_eq!(sweep.solver_calls, 0);
+            let (_, legacy) = sat_decompose_chained_s3(&kc, &fb, kc.generator(), m, limits);
+            assert_eq!(legacy.domain_clauses > 0, (4..=6).contains(&m));
+            assert_eq!(legacy.solver_calls, 0);
+        }
+        for m in [0, 1, 10, 15] {
+            let (_, rejected) =
+                sat_decompose_chained_s3_any_m(&kc, &fb, kc.generator(), m, limits, false, false);
+            assert!(rejected.exhausted && !rejected.refuted);
+            assert_eq!(rejected.domain_clauses, 0);
+            assert_eq!(rejected.solver_calls, 0);
         }
     }
 

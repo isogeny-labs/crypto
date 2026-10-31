@@ -14,18 +14,20 @@ name: ic-leaderboard
 # adds an input runs it.
 
 on:
-  # Not a pull-request check. The merge set is gate, size, and artifacts.
-  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:
+      - 'research/prime_base_oracle_tuning_20261029/**'
+      - 'backlog/XP-20261016-prime-base-oracle-tuning/PROTOCOL.md'
+      - 'AGENTS.md'
       - 'scripts/build_ic_leaderboard.py'
+      - 'scripts/check_ic_dashboard_coverage.mjs'
       - 'scripts/check_ic_leaderboard_paths.py'
       - 'scripts/test_check_ic_leaderboard_paths.py'
       - 'scripts/test_build_ic_leaderboard.py'
-      - 'scripts/test_leaderboard_sparse_component_inputs.py'
       - 'scripts/curve_id.py'
       - 'docs/ic-leaderboard.html'
+      - 'docs/ic-leaderboard/**'
       - 'docs/ic/LEADERBOARD.md'
       - 'docs/ic/leaderboard.json'
       - 'research/notes/index-calculus/RESEARCH_IC_BOUNDARY_LEDGER.md'
@@ -44,15 +46,12 @@ on:
       - 'docs/curves/ic/curves.schema.json'
       - 'research/ic_descent_20260930/runs-isolated/main/**'
       - 'research/ic_single_target_20260930/runs/**'
-      - 'research/ic_tool_program/rule/v3/runs/**'
       - 'research/ic_tool_program/rule/v7/analysis.json'
       - 'research/ic_tool_program/rule/v7/replay-certificate.json'
       - 'research/ic_tool_program/rule/v7/validator-report.json'
       - 'research/ic_tool_program/rule/v7/runs/**'
       - 'research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json'
       - 'research/jv_sieve_strong_rho_20261019/summary.json'
-      - 'research/ic_cover_weakclass_20261023/**'
-      - 'research/ic_d4_char2_lever_20261023/**'
       - 'research/jv_sieve_strong_rho_20261019/review-20261020/**'
       - 'research/ecbench_n37_rank_columns_20261004/RESULT.json'
       - 'research/ecbench_n37_k8_k16_20261004/DECISION.json'
@@ -72,21 +71,12 @@ on:
       - 'research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json'
       - 'research/ecbench_frontier_20261013/frontier-data.json'
       - 'research/ecbench_rho_optimized_20261014/RESULT.json'
-      - 'research/20261016-n83-precomputed-rho-control/records/run-38855595549/k600/analysis.json'
-      - 'research/20261016-n83-precomputed-rho-control/records/run-38878565324/k600/analysis.json'
-      - 'research/20261016-n83-precomputed-rho-control/records/run-38878565324/k3300/analysis.json'
-      - 'research/three_leads_e2e_20261018/results/dashboard.json'
-      - 'research/three_leads_e2e_20261018/results/retired-instruction-summary.json'
       - 'research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json'
       - 'research/la_engines_20261014/summary.json'
       - 'research/ecbench_lazy_orbit_members_20261018/figures/ratios.json'
+      - 'research/ecbench_lazy_columns2_20261018/figures/ratios.json'
       - 'research/jv_cover_sparse_fglm_20261018/summary.json'
       - 'research/ic_m2_linear_ladder_20261024/fit.json'
-      - 'benchmarks/20261018-wide-producer-engineering/summary.json'
-      - 'benchmarks/20261019-t20-n73-k600-e2e/summary.json'
-      - 'benchmarks/20261020-t21-wide-producer-arithmetic/summary.json'
-      - 'research/ic_techniques_20261012/sixsum_extraction/resolvent_summary.json'
-      - 'benchmarks/20261018-f4-gf2-port/summary.json'
       - 'research/ic_oracle_setup_blocked_20261020/RESULT.json'
       - 'research/ic_planner_validation_20261020/analysis/summary.json'
       - 'research/ic_planner_validation_20261020/specs/*.json'
@@ -102,20 +92,15 @@ on:
       - 'research/n83_e2e_final_holdout_20261016/selection.json'
       - 'research/n83_e2e_final_holdout_20261016/validated_rows.json'
       - 'research/n83_e2e_finalist_results_20261017/plot_data.json'
-      - 'research/pencil_sparse_20261022/**'
-      - 'research/projective_law_followup_20261022/**'
-      - 'research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst'
-      - 'research/kummer_coordinates_20261022/**'
-      - 'research/kummer_differential_collector_20261022/**'
-      - 'research/prime_base_oracle_tuning_20261029/**'
-      - 'backlog/XP-20261016-prime-base-oracle-tuning/PROTOCOL.md'
       - '.github/workflows/ic-leaderboard.yml'
       - 'scripts/build_lab_browser.py'
+      - 'scripts/test_build_lab_browser.py'
       - 'docs/browser/**'
       - 'research/ecbench_*/sessions/**'
       - 'research/full_volcano_graphwide_ic_*/execution/campaigns/**'
       - 'research/ic_candidate_tournament_20260915/runs/**'
       - 'docs/ic/**'
+      - 'docs/curves/**'
       - 'scripts/validation_gate.py'
       - 'research/**/VALIDATION.json'
       - 'research/validation_sweep_20261019/**'
@@ -129,16 +114,16 @@ on:
 permissions:
   contents: read
 
-# A newer push to the same pull request cancels this workflow's run for the older commit.
-# Every other event (push, schedule, dispatch) gets a group of its own and is never cancelled.
+# This workflow runs on main pushes and manual dispatches.
+# Give each validation its own group so concurrent runs stay independent.
 concurrency:
-  group: ${{ github.event_name == 'pull_request' && github.workflow_ref || format('run-{0}', github.run_id) }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ${{ format('run-{0}', github.run_id) }}
+  cancel-in-progress: false
 
 jobs:
   current:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-leaderboard.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-leaderboard.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
-    timeout-minutes: 10
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - name: Pull store data this workflow reads (tools/artifacts)
@@ -160,7 +145,9 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/bitop_ladder_20261019 research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst research/four_followups_20261021/results/pencil-pilot research/hec_bitop_20261020 research/ic_aimed_gather_20261023 research/ic_cover_weakclass_20261023 research/ic_d4_char2_lever_20261023 research/kummer_coordinates_20261022 research/kummer_differential_collector_20261022 research/n83_e2e_finalist_results_20261017 research/pencil_sparse_20261022 research/postgb_linear_stage_20261026 research/prime_base_oracle_tuning_20261029 research/projective_law_followup_20261022 research/quartic_n4_20261019 research/quartic_n4v2_20261020 research/three_leads_e2e_20261018/results research/twist_index_calculus_20261020 research/validation_sweep_20261019
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/bitop_ladder_20261019 research/ecbench_lazy_columns2_20261018/figures research/ecbench_lazy_orbit_members_20261018/figures research/f4_fp_ic_effect_20261018 research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst research/four_followups_20261021/results/pencil-pilot research/hec_bitop_20261020 research/ic_aimed_gather_20261023 research/ic_cover_weakclass_20261023 research/ic_d4_char2_lever_20261023 research/kummer_coordinates_20261022 research/kummer_differential_collector_20261022 research/n83_e2e_finalist_results_20261017 research/notes/ecc2k130 research/pencil_sparse_20261022 research/postgb_linear_stage_20261026 research/prime_base_oracle_tuning_20261029 research/projective_law_followup_20261022 research/quartic_n4_20261019 research/quartic_n4v2_20261020 research/three_leads_e2e_20261018/results research/twist_index_calculus_20261020 research/validation_sweep_20261019
+      - name: Curve search, priced rows, sources and timeline agree (AGENTS.md §7d)
+        run: node scripts/check_ic_dashboard_coverage.mjs
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
