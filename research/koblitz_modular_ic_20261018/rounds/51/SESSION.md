@@ -13,3 +13,25 @@ degree32 field,with source lifts and fifth/tenth iterates. Then freeze nu
 transport and all32 localized module lifts. The QR7 extension of marked23
 and the132-section RR intersection remain separate construction lanes.
 No source-only elliptic identity will count as completed normal-chart gluing.
+
+Continuation reconciliation: PR2995 at18ce6ba68 has all six checks passed.
+Diem still deadline-expired50/52,pendingfalse,launchernull. No cloud or
+managed generator restarted. Existing overlap-lean51-01 compiled exit0;
+its original axiom audit is still active,so no second math job admitted yet.
+
+Accepted native attempts so far: diamond51-01,glue-prep51-01,
+glue-forward51-01,glue-reverse51-01. Each has exit0,its required exact marker,
+and no question-mark errors. The latter pair checks all32 H_i/D generators
+under the actual first/ninth diamond maps,with clearing h0^62/h1^62,
+complete field reconstruction and complete PID products/corruption controls.
+The direct numerator pole bound62 improves the conservative donor-lift
+bound454;the deterministic minimum was frozen before either direction run.
+Fresh independent gluing substitution checker frozen atd86f722a8,not run yet.
+
+Archived R22 universal certificate recovered by fresh correct-bucket GET:
+raw f5cbf0fc344cd2770e2ef3bda233c7a0d5d37c9992f352327e59e383f0a2d01a.
+Selected files checked against the sealed R22 member manifest. Its coefficient
+field is F2(b,c),so transport to marked23 is applicable after denominator
+checks. Universal polynomial clearing and explicit F4/F2 twist descent are
+now frozen;no old Groebner producer is repeated. Marked23 degree112 remains
+prospective,with field primality and selected991 action separate obligations.

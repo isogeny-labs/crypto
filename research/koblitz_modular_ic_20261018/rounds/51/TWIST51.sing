@@ -15,7 +15,7 @@ for(i51=1;i51<=2;i51++){if(subst(twistedGB51[i51],g,0)!=twistedGB51[i51]){ERROR(
 matrix transportedF51=reduce(twistMap51(F51),gamma51);matrix transportedB51=reduce(twistMap51(B51),gamma51);
 if(reduce(matrix(twistedQR51)*transportedF51-matrix(twistedGB51),gamma51)!=0 || reduce(matrix(twistedGB51)*transportedB51-twistedD51^2*matrix(twistedQR51),gamma51)!=0){ERROR("TWIST51_FULL_F4_PRODUCTS");quit;}
 matrix descendedF51=subst(transportedF51,g,0);matrix descendedB51=subst(transportedB51,g,0);
-matrix gammaF51=(transportedF51-descendedF51)/g;matrix gammaB51=(transportedB51-descendedB51)/g;
+matrix gammaF51=subst(transportedF51,g,1)+descendedF51;matrix gammaB51=subst(transportedB51,g,1)+descendedB51;
 if(matrix(twistedQR51)*descendedF51!=matrix(twistedGB51) || matrix(twistedGB51)*descendedB51!=twistedD51^2*matrix(twistedQR51)){ERROR("TWIST51_FULL_F2_PRODUCTS");quit;}
 if(matrix(twistedQR51)*gammaF51!=0 || matrix(twistedGB51)*gammaB51!=0){ERROR("TWIST51_GAMMA_SYZYGIES");quit;}
 matrix bad51=descendedF51;bad51[1,1]=bad51[1,1]+1;
