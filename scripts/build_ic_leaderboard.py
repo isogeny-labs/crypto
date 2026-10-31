@@ -725,10 +725,14 @@ def roster(names: Names, measured: set[str]) -> list[dict]:
     for c in names.reg["curves"]:
         p = c["params"]
         if c["family"] == "prime":
-            field = f"GF(p), p = {p['p']}" if len(p["p"]) < 40 else f"GF(p), {int(p['p']).bit_length()}-bit p"
-            coeff = f"a = {p['a']}, b = {p['b']}" if len(p["p"]) < 40 else "standard coefficients"
+            p_text = str(p["p"])
+            field = f"GF(p), p = {p_text}" if len(p_text) < 40 else f"GF(p), {int(p_text).bit_length()}-bit p"
+            coeff = f"a = {p['a']}, b = {p['b']}" if len(p_text) < 40 else "standard coefficients"
         elif c["family"] == "extension":
-            field = f"GF({p['p']}^{p['k']})"
+            degree = p.get("k", p.get("degree"))
+            if degree is None:
+                raise ValueError(f"extension curve {c['slug']} has no field degree")
+            field = f"GF({p['p']}^{degree})"
             coeff = f"a = {p['a']}, b = {p['b']}"
         else:
             m = p.get("n", p.get("m"))
