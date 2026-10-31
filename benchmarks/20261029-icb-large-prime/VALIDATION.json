@@ -1,0 +1,38 @@
+{
+ "note": "One- and two-large-prime collectors on the Koblitz compact-orbit m=3 Frobenius pair-table pipeline (ic.pipeline, mitm-frobenius-counted), n = 53 and 61, against the plain table at equal and optimal envelope and the strong signed-Frobenius rho. A component result inside the classic single-target pipeline in counted GAE, not a leaderboard row: the Table A recipe is a different pipeline and unit. The schema's `ic` band slot carries the best large-prime arm at n = 53 (lp2-k40-c10); the matched rho reference is the session's own rho.signed_frobenius_strong arm.",
+ "replay_certificate": {
+  "path": "../../research/icb_large_prime_n53_n61_20261029/replay-certificate.json",
+  "sha256": "b39236a3fbd22fac4bddfd2bb55dbfe09af728825518a5266f98405662094f49"
+ },
+ "rho_reference": {
+  "band_source": "../../research/icb_large_prime_n53_n61_20261029/band/n53-all.json (ic.pipeline mitm-frobenius-counted:m=3,large_primes=2 with 40 columns and a domain of 10 x |F|, K_0 at n = 53, 2 sessions of 8 workloads x 2 rounds)",
+  "binary_or_process": "ecbench release build of this branch; every arm of a session runs in that session's binary",
+  "gae_band": {
+   "0": {
+    "ic": 3.8561917203608553,
+    "rho": 0.12937890889726217
+   },
+   "0.1": {
+    "ic": 4.831616354307981,
+    "rho": 0.15519928928239643
+   },
+   "1": {
+    "ic": 13.61043805983212,
+    "rho": 0.38758271274860484
+   }
+  },
+  "kind": "negation_frobenius",
+  "matches_protocol": true,
+  "order_holds_across_band": true,
+  "protocol": "each spec's rho.signed_frobenius_strong reference arm (role reference), run in every session on the same curve, targets and rounds as the candidate arms; Koblitz curve, so the signed Frobenius orbit (A = 2n) is the strongest symmetry available",
+  "same_binary_or_process": true,
+  "same_unit": true,
+  "strongest_available": true,
+  "unit": "ecbench.gae (counted group operations, S = GAE/sqrt(r))"
+ },
+ "schema": "validation-gate/v1",
+ "validator_report": {
+  "path": "../../research/icb_large_prime_n53_n61_20261029/validator-report.json",
+  "sha256": "052fbba456c3190b1d6afd6e3d4051f0598e5a5f00099a73d85fa4db36bc49a7"
+ }
+}
