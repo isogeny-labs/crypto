@@ -21,3 +21,7 @@ fig.suptitle('No 16-cycle in the complete QR₇ action',fontsize=16,fontweight='
 fig.text(.18,.86,'336 SL₂ matrices; all 1,008 square-determinant normalizations checked.',fontsize=11)
 fig.text(.18,.035,'Exact enumeration; longest cycle 14. Source: fiber51-01/native.log.',fontsize=10)
 fig.savefig(h/'cycles51.svg',metadata={'Date':None});plt.close(fig)
+
+# Canonicalize generated SVG whitespace without changing path tokens.
+p=h/"cycles51.svg"
+p.write_text("\n".join(line.rstrip() for line in p.read_text().splitlines())+"\n")
