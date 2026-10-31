@@ -14,6 +14,7 @@ database.
 | `census-f2m` | `m01` … `m10` | Every ordinary curve y² + xy = x³ + ax² + b over GF(2^m), m ≤ 10. a ∈ {0, the least trace-1 element}, b ≠ 0, over the modulus that ICV1 prescribes. |
 | `crypto-prime` | `rand-032` … `rand-256`, `cm-032` … `cm-256` | Random prime-order curves (SEA with early abort) at 11 sizes and their quadratic twists. CM curves for the nine class-number-one discriminants, with all their twists and cofactor/subgroup data. |
 | `pairing` | `<family>-<bits>` | BN, BLS12, BLS24, KSS16 and KSS18 curves at 160–512 bits from the family polynomials, three per size, with r, the cofactor, a generator and the embedding degree. |
+| `isogenies` | `census-p0005` … `census-p1021`, `from-<set>.<unit>` | Every F_p-rational ℓ-isogeny (ℓ = 2, 3, 5) of every F_p census curve, which gives the complete ℓ-isogeny graphs. Also the ℓ-neighbours of the crypto and pairing curves, each written as a curve record followed by its edge. Edges are plain Vélu: `isogenies_prime_degree` can compose with an isomorphism, so the isogeny is rebuilt from its kernel. The target is the census representative, reached by (a w², b w³). |
 | `genus2` | `b05` … `b32` | Random genus-2 curves y² = f(x), f a monic squarefree quintic, over primes of 5–32 bits. Each has L(T), #J, #C and the Igusa–Clebsch invariants. |
 
 The ICV1 identity is never taken from Sage: the importer rebuilds the model

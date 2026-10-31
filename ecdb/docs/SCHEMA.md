@@ -293,7 +293,9 @@ every record re-verified by `ecdb import generated` before insertion (deployed c
 | `pairing` | 98 BN, BLS12, BLS24, KSS16 and KSS18 curves at 160–512 bits with r, cofactor, generator and the verified minimal embedding degree (`pairing_data`) |
 | `genus2` | 2,160 random genus-2 Jacobians over 5–32-bit primes: L(T), #J, #C (recounted for p < 2^14), Igusa–Clebsch invariants |
 
-No record was refused. The full run in a 4-CPU container took under an hour.
+| `isogenies` | 485,291 Vélu isogenies, ℓ = 2, 3, 5 (161,208 / 161,927 / 162,156). These are every F_p-rational ℓ-isogeny of every `census-fp` curve, so the stored ℓ-isogeny graphs over F_p, p < 2^10, are complete. They also include the ℓ-neighbours of the crypto and pairing curves, with 2,953 neighbour curves (family `isogeny-neighbour`). For each edge the importer checks that the kernel divides ψ_ℓ, recomputes the Vélu/Kohel codomain, and checks that the target is reached by (a w², b w³) with w a square |
+
+No record was refused. The full run in a 4-CPU container took under an hour; ecdb then held 222,481 curves and 485,769 isogenies (2.25 GB).
 
 These tables exist and still wait for a producer:
 

@@ -40,6 +40,10 @@ It holds:
   - family `genus2-random`: genus-2 Jacobians.
 
   Filter by `family` to keep a census from swamping a search.
+- 485,291 verified Vélu isogenies (ℓ = 2, 3, 5): the complete ℓ-isogeny
+  graphs over every F_p with p < 2^10, and the ℓ-neighbours of the crypto
+  and pairing curves. Walk them with `ecdb_curve_detail part=graph` or
+  `GET /v1/curves/{ref}/graph?ell=&depth=`.
 
 The design and the full table list are in [`SCHEMA.md`](SCHEMA.md). The
 routes are in [`../openapi.yaml`](../openapi.yaml).
