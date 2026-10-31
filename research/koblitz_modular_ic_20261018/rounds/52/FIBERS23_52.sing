@@ -1,0 +1,72 @@
+execute(read("../../source-data/marked23-field51.sing"));
+string fText52=string(f23);string bText52=string(b23);string cText52=string(c23);
+list denominatorTexts52;poly rem52=b23;int denominatorCount52=0;
+while(rem52!=0){denominatorCount52++;denominatorTexts52[denominatorCount52]=string(denominator(leadcoef(rem52)));rem52=rem52-lead(rem52);}
+rem52=c23;
+while(rem52!=0){denominatorCount52++;denominatorTexts52[denominatorCount52]=string(denominator(leadcoef(rem52)));rem52=rem52-lead(rem52);}
+ring checkField52=2,(a),dp;
+list irreducibles7_52=factorize(a^7+a+1);list irreducibles8_52=factorize(a^8+a^4+a^3+a+1);
+ideal f7_52=irreducibles7_52[1];ideal f8_52=irreducibles8_52[1];
+if(size(f7_52)!=2 || deg(f7_52[2])!=7 || size(f8_52)!=2 || deg(f8_52[2])!=8){ERROR("FIBERS23_52_COEFFICIENT_FIELDS");quit;}
+int branch52;int count88_52=0;int count214_52=0;int odd7_52=0;int smooth7_52=0;int smooth8_52=0;int totalPackets52=0;
+link out52="ASCII:w fibers23-certificate52.sing";open(out52);
+write(out52,"// Each field block is independently parseable; full factorizations are retained.");
+for(branch52=0;branch52<=1;branch52++){
+ if(branch52==0){ring fiber52=(2,a),(l,y),lp;minpoly=a^7+a+1;int extension52=7;int order52=128;}
+ else{ring fiber52=(2,a),(l,y),lp;minpoly=a^8+a^4+a^3+a+1;int extension52=8;int order52=256;}
+ short=0;
+ proc element52(int code){number value=0;int pos=0;while(code>0){value=value+(code%2)*a^pos;code=code div 2;pos++;}return(value);}
+ proc pattern52(ideal factors,intvec powers){
+  if(size(factors)!=3 || powers[2]!=1 || powers[3]!=1){return(0);}
+  int d1=deg(factors[2]);int d2=deg(factors[3]);
+  if(d1==8 && d2==8){return(88);}
+  if((d1==2 && d2==14) || (d1==14 && d2==2)){return(214);}
+  return(0);
+ }
+ ideal planted88_52=l^8,l^8+l+1;ideal planted214_52=l^2,l^14+l+1;
+ ideal control88_52=1,planted88_52;ideal control214_52=1,planted214_52;intvec controlPowers52=1,1,1;
+ if(pattern52(control88_52,controlPowers52)!=88 || pattern52(control214_52,controlPowers52)!=214){ERROR("FIBERS23_52_PATTERN_POSITIVE_CONTROLS");quit;}
+ list controlFactors52=factorize(l*(l+1));ideal controlPolys52=controlFactors52[1];intvec controlExponents52=controlFactors52[2];
+ if(size(controlPolys52)!=3 || deg(controlPolys52[2])!=1 || deg(controlPolys52[3])!=1 || pattern52(controlPolys52,controlExponents52)!=0){ERROR("FIBERS23_52_FACTOR_AND_NEGATIVE_CONTROL");quit;}
+ write(out52,"ring field"+string(extension52)+"Certificate52=(2,a),(l,y),lp;minpoly="+string(minpoly)+";short=0;");
+ int code52;int badDenominator52;int d52;int fi52;int gi52;int rootIndex52=0;int patternCode52;int degreeSum52;
+ number x;number currentDenominator52;number root52;number bValue52;number cValue52;number A52;number Delta52;
+ poly f52;poly b52;poly c52;poly G52;poly rebuilt52;poly baseRebuilt52;poly specialized52;
+ list baseFactors52;list factors52;ideal basePolys52;ideal polys52;intvec basePowers52;intvec powers52;intvec degrees52;
+ for(code52=0;code52<order52;code52++){
+  x=element52(code52);if(x^order52!=x){ERROR("FIBERS23_52_COEFFICIENT_FROBENIUS");quit;}
+  badDenominator52=0;
+  for(d52=1;d52<=denominatorCount52;d52++){execute("currentDenominator52="+denominatorTexts52[d52]+";");if(currentDenominator52==0){badDenominator52=1;}}
+  if(badDenominator52==1){continue;}
+  execute("f52="+fText52+";b52="+bText52+";c52="+cText52+";");
+  if(deg(f52)!=7 || leadcoef(f52)!=1){ERROR("FIBERS23_52_MONIC_BASE_SPECIALIZATION");quit;}
+  baseFactors52=factorize(f52);basePolys52=baseFactors52[1];basePowers52=baseFactors52[2];baseRebuilt52=1;
+  for(fi52=1;fi52<=size(basePolys52);fi52++){baseRebuilt52=baseRebuilt52*basePolys52[fi52]^basePowers52[fi52];}
+  if(baseRebuilt52!=f52){ERROR("FIBERS23_52_BASE_FACTOR_PRODUCT");quit;}
+  for(fi52=2;fi52<=size(basePolys52);fi52++){
+   if(deg(basePolys52[fi52])!=1){continue;}
+   root52=leadcoef(subst(basePolys52[fi52],y,0))/leadcoef(basePolys52[fi52]);
+   if(subst(f52,y,root52)!=0 || subst(diff(f52,y),y,root52)==0){continue;}
+   if(extension52==7){smooth7_52++;}else{smooth8_52++;}
+   bValue52=leadcoef(subst(b52,y,root52));cValue52=leadcoef(subst(c52,y,root52));A52=1+cValue52;
+   Delta52=bValue52^3*(bValue52+cValue52*A52^3);
+   if(A52*Delta52==0){continue;}
+   G52=l^16+A52^8*l^8+Delta52*l^4+A52^3*Delta52*l+bValue52^4*(bValue52^4+bValue52*cValue52*A52^3+cValue52^2*A52^4)+A52^16;
+   if(deg(G52)!=16 || leadcoef(G52)!=1 || gcd(G52,diff(G52,l))!=1){ERROR("FIBERS23_52_MONIC_SEPARABLE_PACKET");quit;}
+   factors52=factorize(G52);polys52=factors52[1];powers52=factors52[2];rebuilt52=1;degreeSum52=0;degrees52=0;
+   for(gi52=1;gi52<=size(polys52);gi52++){
+    rebuilt52=rebuilt52*polys52[gi52]^powers52[gi52];
+    if(gi52>1){degreeSum52=degreeSum52+deg(polys52[gi52])*powers52[gi52];degrees52[gi52-1]=deg(polys52[gi52]);if(extension52==7 && deg(polys52[gi52])%2==1){odd7_52++;}}
+   }
+   if(rebuilt52!=G52 || degreeSum52!=16){ERROR("FIBERS23_52_COMPLETE_PACKET_FACTOR_PRODUCT");quit;}
+   patternCode52=pattern52(polys52,powers52);if(patternCode52==88){count88_52++;}if(patternCode52==214){count214_52++;}
+   rootIndex52++;totalPackets52++;
+   string suffix52=string(extension52)+"_"+string(rootIndex52);
+   write(out52,"number x"+suffix52+"="+string(x)+";number y"+suffix52+"="+string(root52)+";number b"+suffix52+"="+string(bValue52)+";number c"+suffix52+"="+string(cValue52)+";poly G"+suffix52+"="+string(G52)+";ideal factors"+suffix52+"="+string(polys52)+";intvec powers"+suffix52+"="+string(powers52)+";");
+   print("FIBERS23_52_ROW m="+string(extension52)+" xcode="+string(code52)+" y="+string(root52)+" degrees="+string(degrees52)+" pattern="+string(patternCode52));
+  }
+ }
+}
+close(out52);
+print("FIBERS23_52_RESULT good_packet_fibers="+string(totalPackets52)+" patterns88="+string(count88_52)+" patterns214="+string(count214_52)+" smooth_base7="+string(smooth7_52)+" smooth_base8="+string(smooth8_52)+" odd_degree7_packet_factors="+string(odd7_52));
+print("FIBERS23_52_ALL_CHECKS_PASS");quit;
