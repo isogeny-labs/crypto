@@ -21,4 +21,15 @@ theorem ideals_eq_of_unit_scaled_inclusions {R : Type*} [CommRing R]
   · intro x hx
     exact mem_of_unit_mul_mem I (hd.pow 2) (hJI x hx)
 
+/-- The native packet test checks three doublings. This is its group consequence;
+actual point coordinates and the group-law identification remain external. -/
+theorem seven_nsmul_zero_of_eight {G : Type*} [AddGroup G] (P : G)
+    (h : (8 : ℕ) • P = P) : (7 : ℕ) • P = 0 := by
+  have hcancel : (7 : ℕ) • P + P = 0 + P := by
+    calc
+      (7 : ℕ) • P + P = (7 + 1 : ℕ) • P := by simp only [add_nsmul, one_nsmul]
+      _ = P := h
+      _ = 0 + P := by simp only [zero_add]
+  exact add_right_cancel hcancel
+
 end Specialize51

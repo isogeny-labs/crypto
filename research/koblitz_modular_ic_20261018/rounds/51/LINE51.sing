@@ -1,0 +1,39 @@
+execute(read("../universal51-01/universal-polynomial51.sing"));
+if(matrix(qr51)*F51!=matrix(generic51) || matrix(generic51)*B51!=D51^2*matrix(qr51)){ERROR("LINE51_ACTUAL_ORDINARY_QR_DONOR");quit;}
+ring lineSource51=(2,b,c),(r,n,l),lp;short=0;
+map ordinaryMap51=universalPolynomialCertificate51,n,l,b,c;
+poly G51=ordinaryMap51(G51);poly N51=ordinaryMap51(N51);poly A51=1+c;
+poly cubic51=r^3+(b+l^2+A51*l)*r^2+(A51*n+b*l)*r+n^2+b*n;
+if(cubic51!=(l*r+n)^2+A51*r*(l*r+n)+b*(l*r+n)+r^3+b*r^2){ERROR("LINE51_FULL_LINE_CURVE_INTERSECTION");quit;}
+ideal source51=G51,N51,cubic51;ideal standard51=std(source51);
+if(vdim(standard51)!=48){ERROR("LINE51_SOURCE_DIMENSION");quit;}
+proc normal51(poly a){return(reduce(a,standard51));}
+poly den51=A51*r+b;poly slope51=r^2+A51*(l*r+n);
+poly doubleX51=slope51^2+A51*slope51*den51+b*den51^2;
+poly doubleY51=slope51*(r*den51^2+doubleX51)+(l*r+n+b)*den51^3+A51*doubleX51*den51;
+poly lineResidual51=doubleY51+l*doubleX51*den51+n*den51^3;
+matrix lineLift51=lift(source51,ideal(lineResidual51));
+if(matrix(source51)*lineLift51!=matrix(ideal(lineResidual51))){ERROR("LINE51_FULL_DOUBLING_LINE_PRODUCT");quit;}
+matrix denominatorLift51=lift(ideal(G51,N51,cubic51,den51),ideal(1));
+poly derivative51=diff(cubic51,r);matrix derivativeLift51=lift(ideal(G51,N51,cubic51,derivative51),ideal(1));
+if(matrix(ideal(G51,N51,cubic51,den51))*denominatorLift51!=matrix(ideal(1)) || matrix(ideal(G51,N51,cubic51,derivative51))*derivativeLift51!=matrix(ideal(1))){ERROR("LINE51_FULL_DENOMINATOR_OR_SEPARABILITY_UNIT");quit;}
+poly rDouble51=normal51(doubleX51*denominatorLift51[4,1]^2);
+map doubling51=lineSource51,rDouble51,n,l;
+ideal mappedSource51=doubling51(source51);int i51;
+for(i51=1;i51<=3;i51++){if(normal51(mappedSource51[i51])!=0){ERROR("LINE51_DOUBLING_PRESERVES_ACTUAL_SOURCE");quit;}}
+poly second51=normal51(doubling51(rDouble51));poly third51=normal51(doubling51(second51));
+if(third51!=r){ERROR("LINE51_THREE_DOUBLINGS_IDENTITY");quit;}
+poly chordDen51=rDouble51+r;matrix chordLift51=lift(ideal(G51,N51,cubic51,chordDen51),ideal(1));
+if(matrix(ideal(G51,N51,cubic51,chordDen51))*chordLift51!=matrix(ideal(1))){ERROR("LINE51_FULL_CHORD_RECOVERY_UNIT");quit;}
+if(normal51(lineResidual51+den51^3)==0){ERROR("LINE51_CHANGED_LINE_INTERCEPT_ACCEPTED");quit;}
+map sign51=lineSource51,r,n+b,l+A51;
+poly signedG51=sign51(G51);poly signedN51=sign51(N51);poly signedCubic51=sign51(cubic51);
+if(signedG51!=G51 || signedN51!=N51 || signedCubic51!=cubic51){ERROR("LINE51_ACTUAL_SIGN_PACKET_MATCH");quit;}
+link out51="ASCII:w qr-line-certificate51.sing";open(out51);
+write(out51,"ring QRlineCertificate51=(2,b,c),(r,n,l),lp;short=0;ideal source51="+string(source51)+";poly residual51="+string(lineResidual51)+";poly den51="+string(den51)+";poly derivative51="+string(derivative51)+";poly chordDen51="+string(chordDen51)+";poly rDouble51="+string(rDouble51)+";poly second51="+string(second51)+";poly third51="+string(third51)+";matrix lineLift51[3][1];matrix denominatorLift51[4][1];matrix derivativeLift51[4][1];matrix chordLift51[4][1];");
+for(i51=1;i51<=3;i51++){write(out51,"lineLift51["+string(i51)+",1]="+string(lineLift51[i51,1])+";");}
+for(i51=1;i51<=4;i51++){write(out51,"denominatorLift51["+string(i51)+",1]="+string(denominatorLift51[i51,1])+";derivativeLift51["+string(i51)+",1]="+string(derivativeLift51[i51,1])+";chordLift51["+string(i51)+",1]="+string(chordLift51[i51,1])+";");}close(out51);
+execute(read("qr-line-certificate51.sing"));
+if(matrix(source51)*lineLift51!=matrix(ideal(residual51)) || matrix(ideal(source51[1],source51[2],source51[3],den51))*denominatorLift51!=matrix(ideal(1)) || matrix(ideal(source51[1],source51[2],source51[3],derivative51))*derivativeLift51!=matrix(ideal(1)) || matrix(ideal(source51[1],source51[2],source51[3],chordDen51))*chordLift51!=matrix(ideal(1))){ERROR("LINE51_RELOADED_FULL_PRODUCTS");quit;}
+print("LINE51_RESULT ordinary_QR_packet_degree=16 point_root_algebra_dimension=48 line_intersection_degree=3 complete_doubling_line_product=true complete_unit_products=3 cubic_separable=true doubling_source_compatible=true three_doublings_identity=true inverse_chord_recovery_unit=true exact_sign_match=true changed_intercept_rejected=true serialized_full_products_rechecked=4");
+print("LINE51_ALL_CHECKS_PASS");quit;

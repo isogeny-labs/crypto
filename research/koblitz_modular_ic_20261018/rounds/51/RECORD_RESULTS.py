@@ -3,7 +3,7 @@ from pathlib import Path
 from collections import Counter
 import json, hashlib, re, html
 h=Path(__file__).resolve().parent
-markers={'diamond':'DIAMOND51_ALL_CHECKS_PASS','glue-prep':'GLUE_PREP51_ALL_CHECKS_PASS','glue-forward':'GLUE51_ALL_CHECKS_PASS','glue-reverse':'GLUE51_ALL_CHECKS_PASS','glue-reload':'GLUE_RELOAD51_ALL_CHECKS_PASS','universal':'UNIVERSAL51_ALL_CHECKS_PASS','twist':'TWIST51_ALL_CHECKS_PASS','base23':'BASE23_51_ALL_CHECKS_PASS','base23-struct':'BASE23_STRUCT51_ALL_CHECKS_PASS','fiber':'FIBER51_ALL_CHECKS_PASS','hecke3-':'HECKE3_51_ALL_CHECKS_PASS'}
+markers={'diamond':'DIAMOND51_ALL_CHECKS_PASS','glue-prep':'GLUE_PREP51_ALL_CHECKS_PASS','glue-forward':'GLUE51_ALL_CHECKS_PASS','glue-reverse':'GLUE51_ALL_CHECKS_PASS','glue-reload':'GLUE_RELOAD51_ALL_CHECKS_PASS','universal':'UNIVERSAL51_ALL_CHECKS_PASS','twist':'TWIST51_ALL_CHECKS_PASS','base23':'BASE23_51_ALL_CHECKS_PASS','base23-struct':'BASE23_STRUCT51_ALL_CHECKS_PASS','fiber':'FIBER51_ALL_CHECKS_PASS','hecke3-':'HECKE3_51_ALL_CHECKS_PASS','line':'LINE51_ALL_CHECKS_PASS'}
 rows=[]
 for p in sorted((h/'runs').iterdir()):
     if not p.is_dir(): continue
@@ -11,7 +11,7 @@ for p in sorted((h/'runs').iterdir()):
     if (p/'compile.exit').exists():
         row.update(kind='Lean',compile_exit=int((p/'compile.exit').read_text()),audit_exit=int((p/'audit.exit').read_text()) if (p/'audit.exit').exists() else None)
         expected_root='Specialize51' if p.name.startswith('specialize-lean51-') else 'Overlap51'
-        expected_count=2 if expected_root=='Specialize51' else 5
+        expected_count=3 if expected_root=='Specialize51' else 5
         row.update(audited_theorems=expected_count,root=expected_root)
         if row['compile_exit']!=0: row['status']='rejected'
         elif row['audit_exit'] is not None:

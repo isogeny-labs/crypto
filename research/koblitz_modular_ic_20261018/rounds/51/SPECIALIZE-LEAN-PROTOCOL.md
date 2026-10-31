@@ -13,3 +13,9 @@ Same original manual authorization,-j1,-M4096,1200s separately for compile
 and audit,no virtual-memory cap,serialized with native math. Preserve all
 failures. Strict compile0/audit0,two declarations,zero failing/trusted and
 no native_decide. Do not recompile the accepted five-theorem Overlap51 module.
+
+Before any compilation,add a third declaration:in an additive group,8P=P
+implies7P=0 by cancellation. This is the group consequence of the proposed
+three-doublings packet test;it does not formalize the actual native point
+coordinates or full elliptic group law. Expected audit count is now3,not2;
+all other pins,caps and trust criteria are unchanged.
