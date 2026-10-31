@@ -1,0 +1,91 @@
+ring relativeField50=(2,u),(t,v),dp;short=0;
+map relativeScale50=rationalCandidate50,t/u^4;
+poly relativeA50=relativeScale50(a50);poly relativeB50=relativeScale50(b50);
+poly relativeQ50=relativeA50+relativeB50*v;
+if(lead(relativeQ50)!=t^16){ERROR("RELATIVE50_MONIC_DEGREE16");quit;}
+int term50;
+for(term50=1;term50<=size(relativeQ50);term50++){if(denominator(leadcoef(relativeQ50[term50]))!=1){ERROR("RELATIVE50_NOT_INTEGRAL");quit;}}
+link finiteOut50="ASCII:w relative-finite50.sing";open(finiteOut50);
+write(finiteOut50,"ring relativeFinite50=2,(t,v,u),wp(4,2,1);short=0;ideal relativeIdeal50;relativeIdeal50[1]=v^2+v+u^3+u;relativeIdeal50[2]="+string(relativeQ50)+";poly relativeB50="+string(relativeB50)+";");close(finiteOut50);
+execute(read("relative-finite50.sing"));
+if(lead(relativeIdeal50[1])!=v^2 || lead(relativeIdeal50[2])!=t^16){ERROR("RELATIVE50_WEIGHTED_LEADS");quit;}
+map planeEmbed50=integralCandidate50,t,u;
+ideal planeEquation50=planeEmbed50(candidateIdeal50);
+if(planeEquation50[1]!=relativeIdeal50[2]^2+relativeB50*relativeIdeal50[2]+relativeB50^2*relativeIdeal50[1]){ERROR("RELATIVE50_FINITE_NORM_PRODUCT");quit;}
+ring relativeProbe50=(2,u),(t,v),dp;
+map relativeGeneric50=relativeFinite50,t,v,u;
+ideal relativeGenericIdeal50=std(relativeGeneric50(relativeIdeal50));
+if(vdim(relativeGenericIdeal50)!=32){ERROR("RELATIVE50_GENERIC_DEGREE");quit;}
+print("RELATIVE50_STAGE finite_integral_model_exported=true generic_degree=32 infinity_begin=true");
+ring relativeInfinityField50=(2,z),(T,V),dp;short=0;
+map relativeInfinitySub50=relativeFinite50,T/z^4,V/z^2,1/z;
+ideal relativeInfinityImage50=relativeInfinitySub50(relativeIdeal50);
+poly infinityE50=z^4*relativeInfinityImage50[1];poly infinityQ50=z^64*relativeInfinityImage50[2];
+if(infinityE50!=V^2+z^2*V+z+z^3 || lead(infinityQ50)!=T^16){ERROR("RELATIVE50_INFINITY_MONIC");quit;}
+for(term50=1;term50<=size(infinityQ50);term50++){if(denominator(leadcoef(infinityQ50[term50]))!=1){ERROR("RELATIVE50_INFINITY_NOT_INTEGRAL");quit;}}
+link infinityOut50="ASCII:w relative-infinity50.sing";open(infinityOut50);
+write(infinityOut50,"ring relativeInfinity50=2,(T,V,z),wp(4,2,1);short=0;ideal relativeInfinityIdeal50;relativeInfinityIdeal50[1]="+string(infinityE50)+";relativeInfinityIdeal50[2]="+string(infinityQ50)+";");close(infinityOut50);
+execute(read("relative-infinity50.sing"));
+if(lead(relativeInfinityIdeal50[1])!=V^2 || lead(relativeInfinityIdeal50[2])!=T^16){ERROR("RELATIVE50_INFINITY_WEIGHTED_LEADS");quit;}
+poly relativeInfinityA50=subst(relativeInfinityIdeal50[2],V,0);
+poly relativeInfinityB50=(relativeInfinityIdeal50[2]+relativeInfinityA50)/V;
+if(subst(relativeInfinityB50,V,0)!=relativeInfinityB50){ERROR("RELATIVE50_INFINITY_LINEAR_V");quit;}
+map infinityPlaneEmbed50=infinityIntegral50,T,z;
+ideal infinityPlaneEquation50=infinityPlaneEmbed50(infinityIdeal50);
+if(infinityPlaneEquation50[1]!=relativeInfinityIdeal50[2]^2+z^2*relativeInfinityB50*relativeInfinityIdeal50[2]+relativeInfinityB50^2*relativeInfinityIdeal50[1]){ERROR("RELATIVE50_INFINITY_NORM_PRODUCT");quit;}
+ring relativeInfinityProbe50=(2,z),(T,V),dp;
+map relativeInfinityGeneric50=relativeInfinity50,T,V,z;
+ideal relativeInfinityGenericIdeal50=std(relativeInfinityGeneric50(relativeInfinityIdeal50));
+if(vdim(relativeInfinityGenericIdeal50)!=32){ERROR("RELATIVE50_INFINITY_GENERIC_DEGREE");quit;}
+ring relativeFiniteOverlap50=2,(t,v,u,s),dp;short=0;
+map finiteEmbed50=relativeFinite50,t,v,u;
+ideal finiteEquations50=finiteEmbed50(relativeIdeal50);
+map inverseChart50=relativeInfinity50,t*s^4,v*s^2,s;
+ideal infinityAtFinite50=inverseChart50(relativeInfinityIdeal50);
+poly finiteUnit50=u*s+1;
+ideal finiteCoordinates50=t,v,u,s;
+intvec powers50=4,64;int index50;
+link overlapOut50="ASCII:w relative-overlap50.sing";open(overlapOut50);
+write(overlapOut50,"ring relativeFiniteOverlapCertificate50=2,(t,v,u,s),dp;poly unit50=u*s+1;ideal differences50;ideal quotients50;");
+poly difference50;poly quotient50;
+for(index50=1;index50<=2;index50++){
+ difference50=infinityAtFinite50[index50]+s^powers50[index50]*finiteEquations50[index50];quotient50=difference50/finiteUnit50;
+ if(quotient50*finiteUnit50!=difference50){ERROR("RELATIVE50_FINITE_EQUATION_OVERLAP");quit;}
+ write(overlapOut50,"differences50["+string(index50)+"]="+string(difference50)+";quotients50["+string(index50)+"]="+string(quotient50)+";");
+}
+ring relativeInfinityOverlap50=2,(T,V,z,r),dp;short=0;
+map infinityEmbed50=relativeInfinity50,T,V,z;
+ideal infinityEquations50=infinityEmbed50(relativeInfinityIdeal50);
+map forwardChart50=relativeFinite50,T*r^4,V*r^2,r;
+ideal finiteAtInfinity50=forwardChart50(relativeIdeal50);
+poly infinityUnit50=z*r+1;ideal infinityCoordinates50=T,V,z,r;
+map forwardOverlap50=relativeFiniteOverlap50,T*r^4,V*r^2,r,z;
+ideal forwardCoordinates50=forwardOverlap50(finiteCoordinates50);
+if(forwardOverlap50(finiteUnit50)!=infinityUnit50){ERROR("RELATIVE50_FORWARD_UNIT");quit;}
+setring relativeFiniteOverlap50;
+map reverseOverlap50=relativeInfinityOverlap50,t*s^4,v*s^2,s,u;
+ideal reverseCoordinates50=reverseOverlap50(infinityCoordinates50);
+ideal finiteComposition50=reverseOverlap50(forwardCoordinates50);
+if(reverseOverlap50(infinityUnit50)!=finiteUnit50){ERROR("RELATIVE50_REVERSE_UNIT");quit;}
+for(index50=1;index50<=4;index50++){
+ difference50=finiteComposition50[index50]+finiteCoordinates50[index50];quotient50=difference50/finiteUnit50;
+ if(quotient50*finiteUnit50!=difference50){ERROR("RELATIVE50_FINITE_COORDINATE_OVERLAP");quit;}
+ write(overlapOut50,"differences50["+string(index50+2)+"]="+string(difference50)+";quotients50["+string(index50+2)+"]="+string(quotient50)+";");
+}
+setring relativeInfinityOverlap50;
+write(overlapOut50,"ring relativeInfinityOverlapCertificate50=2,(T,V,z,r),dp;poly unit50=z*r+1;ideal differences50;ideal quotients50;");
+poly difference50;poly quotient50;
+for(index50=1;index50<=2;index50++){
+ difference50=finiteAtInfinity50[index50]+r^powers50[index50]*infinityEquations50[index50];quotient50=difference50/infinityUnit50;
+ if(quotient50*infinityUnit50!=difference50){ERROR("RELATIVE50_INFINITY_EQUATION_OVERLAP");quit;}
+ write(overlapOut50,"differences50["+string(index50)+"]="+string(difference50)+";quotients50["+string(index50)+"]="+string(quotient50)+";");
+}
+ideal infinityComposition50=forwardOverlap50(reverseCoordinates50);
+for(index50=1;index50<=4;index50++){
+ difference50=infinityComposition50[index50]+infinityCoordinates50[index50];quotient50=difference50/infinityUnit50;
+ if(quotient50*infinityUnit50!=difference50){ERROR("RELATIVE50_INFINITY_COORDINATE_OVERLAP");quit;}
+ write(overlapOut50,"differences50["+string(index50+2)+"]="+string(difference50)+";quotients50["+string(index50+2)+"]="+string(quotient50)+";");
+}
+close(overlapOut50);
+print("RELATIVE50_RESULT charts=2 quadratic_base_degree=2 relative_monic_degree=16 generic_degree=32 plane_norm_products=2 overlap_products=12 unit_maps=2 integral_v_adjoined=true");
+print("RELATIVE50_ALL_CHECKS_PASS");quit;

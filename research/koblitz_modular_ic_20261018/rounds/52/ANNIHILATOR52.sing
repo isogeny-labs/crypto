@@ -1,0 +1,26 @@
+execute(read("../closure52-02/closure-certificate52.sing"));
+setring closureCertificate52;short=0;option(redSB);
+module M52=std(module(final52));matrix identity52[32][32];int i52;
+for(i52=1;i52<=32;i52++){identity52[i52,i52]=1;}
+if(vdim(M52)!=180 || determinant52!=u^60*(u+1)^120){ERROR("ANNIHILATOR52_DONOR_SHAPE");quit;}
+matrix toStandard52=lift(module(final52),M52);matrix fromStandard52=lift(M52,module(final52));
+if(final52*toStandard52!=matrix(M52) || matrix(M52)*fromStandard52!=final52){ERROR("ANNIHILATOR52_FULL_STANDARD_PRODUCTS");quit;}
+if(size(reduce(module(determinant52*identity52),M52))!=0){ERROR("ANNIHILATOR52_POSITIVE_BOUND");quit;}
+int a52=0;int b52=60;int mid52;
+while(a52<b52){mid52=(a52+b52) div 2;if(size(reduce(module(u^mid52*(u+1)^120*identity52),M52))==0){b52=mid52;}else{a52=mid52+1;}}
+int exponentZero52=a52;a52=0;b52=120;
+while(a52<b52){mid52=(a52+b52) div 2;if(size(reduce(module(u^60*(u+1)^mid52*identity52),M52))==0){b52=mid52;}else{a52=mid52+1;}}
+int exponentOne52=a52;poly annihilator52=u^exponentZero52*(u+1)^exponentOne52;
+matrix recovery52=lift(module(final52),module(annihilator52*identity52));
+if(final52*recovery52!=annihilator52*identity52){ERROR("ANNIHILATOR52_FULL_RECOVERY_PRODUCT");quit;}
+module zeroRemainder52;module oneRemainder52;
+if(exponentZero52>0){zeroRemainder52=reduce(module(u^(exponentZero52-1)*(u+1)^120*identity52),M52);if(size(zeroRemainder52)==0){ERROR("ANNIHILATOR52_ZERO_MINIMALITY");quit;}}
+if(exponentOne52>0){oneRemainder52=reduce(module(u^60*(u+1)^(exponentOne52-1)*identity52),M52);if(size(oneRemainder52)==0){ERROR("ANNIHILATOR52_ONE_MINIMALITY");quit;}}
+matrix bad52=recovery52;bad52[1,1]=bad52[1,1]+1;
+if(final52*bad52==annihilator52*identity52){ERROR("ANNIHILATOR52_RECOVERY_CORRUPTION_ACCEPTED");quit;}
+link out52="ASCII:w annihilator-certificate52.sing";open(out52);
+write(out52,"ring annihilatorCertificate52=2,(u),(c,dp);short=0;int exponentZero52="+string(exponentZero52)+";int exponentOne52="+string(exponentOne52)+";poly annihilator52="+string(annihilator52)+";module standard52="+string(M52)+";module zeroRemainder52="+string(zeroRemainder52)+";module oneRemainder52="+string(oneRemainder52)+";");
+proc dump52(link out,string name,matrix A){int r;int c;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");for(r=1;r<=nrows(A);r++){for(c=1;c<=ncols(A);c++){if(A[r,c]!=0){write(out,name+"["+string(r)+","+string(c)+"]="+string(A[r,c])+";");}}}}
+dump52(out52,"final52",final52);dump52(out52,"recovery52",recovery52);dump52(out52,"toStandard52",toStandard52);dump52(out52,"fromStandard52",fromStandard52);close(out52);
+print("ANNIHILATOR52_RESULT zero_exponent="+string(exponentZero52)+" one_exponent="+string(exponentOne52)+" full32_recovery_product=true both_local_minimality_remainders_retained=true changed_recovery_rejected=true");
+print("ANNIHILATOR52_ALL_CHECKS_PASS");quit;

@@ -1,0 +1,84 @@
+ring polynomialOverlap51=2,(z,V),dp;short=0;
+poly E51=V^2+z^2*V+z+z^3;poly h051=z+V;poly h151=z+V+z^2;
+poly q051=1+z+z^2+z*V;poly q151=1+z+z^2+z^3+z*V;
+if(h051^2+z*q051!=E51 || h151^2+z*q151!=E51 || h051*h151+z*(z+1)!=E51){ERROR("DIAMOND51_POLYNOMIAL_OVERLAP_IDENTITIES");quit;}
+link overlapOut51="ASCII:w polynomial-overlap51.sing";open(overlapOut51);
+write(overlapOut51,"ring polynomialOverlapCertificate51=2,(z,V),dp;poly E51="+string(E51)+";poly h051="+string(h051)+";poly h151="+string(h151)+";poly q051="+string(q051)+";poly q151="+string(q151)+";");close(overlapOut51);
+ring diamondField51=(2,u),(l,v),dp;short=0;option(redSB);
+map sourceInitial51=relativeInfinity50,l,v,u;
+ideal actualSource51=sourceInitial51(relativeInfinityIdeal50);ideal actualStd51=std(actualSource51);
+ideal baseStd51=std(ideal(actualSource51[1]));
+if(actualSource51[1]!=v^2+u^2*v+u+u^3 || vdim(actualStd51)!=32){ERROR("DIAMOND51_ACTUAL_SOURCE_SHAPE");quit;}
+link inverseOut51="ASCII:w quadratic-inverses51.sing";open(inverseOut51);
+write(inverseOut51,"ring inverseCertificate51=(2,u),(l,v),dp;ideal inputs51;ideal inverses51;ideal norms51;ideal normMultipliers51;");int inverseCount51=0;
+proc br51(poly a){return(reduce(a,baseStd51));}
+proc bi51(poly a){
+ a=br51(a);
+ if(a==0 || subst(a,l,0)!=a){ERROR("DIAMOND51_BASE_INVERSE_INPUT");return(poly(0));}
+ poly aa=subst(a,v,0);poly bb=(a+aa)/v;
+ if(subst(bb,v,0)!=bb){ERROR("DIAMOND51_BASE_NOT_LINEAR");return(poly(0));}
+ poly conjugate=aa+bb*(v+u^2);
+ poly localNorm51=aa^2+u^2*aa*bb+(u+u^3)*bb^2;
+ if(localNorm51==0 || localNorm51!=leadcoef(localNorm51) || a*conjugate+localNorm51!=bb^2*actualSource51[1]){ERROR("DIAMOND51_FULL_NORM_PRODUCT");return(poly(0));}
+ poly answer=conjugate/leadcoef(localNorm51);
+ if(br51(a*answer)!=1 || br51(a*(answer+1))==1){ERROR("DIAMOND51_BASE_INVERSE_CONTROL");return(poly(0));}
+ inverseCount51++;
+ write(inverseOut51,"inputs51["+string(inverseCount51)+"]="+string(a)+";inverses51["+string(inverseCount51)+"]="+string(answer)+";norms51["+string(inverseCount51)+"]="+string(localNorm51)+";normMultipliers51["+string(inverseCount51)+"]="+string(bb^2)+";");
+ return(answer);
+}
+poly originalU51=1/u;poly originalV51=v/u^2;
+poly rOriginal51=(originalU51+1)*originalV51+1;poly cOriginal51=rOriginal51+originalU51^3;
+poly b51=br51(u^7*rOriginal51*cOriginal51);poly c51=br51(u^4*cOriginal51);
+poly scaledR51=(1+u)*v+u^3;
+if(b51!=br51(u*scaledR51*(scaledR51+1)) || c51!=br51(u*(scaledR51+1)) || br51(1+c51)==0){ERROR("DIAMOND51_TATE_SCALING");quit;}
+proc step51(list images){
+ poly oldL=images[1];poly oldV=images[2];poly oldZ=images[3];
+ poly inverseH=bi51(oldZ+oldV);
+ poly newZ=inverseH;poly newV=br51((oldV+oldZ*oldV+oldZ^2)*inverseH^2);
+ poly rr=br51((1+oldZ)*oldV+oldZ^3);
+ poly bb=br51(oldZ*rr*(rr+1));poly cc=br51(oldZ*(rr+1));
+ poly kk=br51(bb+(1+cc)*cc);poly inverseC=bi51(cc);
+ if(kk==0){ERROR("DIAMOND51_ZERO_K");return(list());}
+ poly newL=br51(kk*inverseC^3*oldL+kk^2*inverseC^4);
+ poly constantL=subst(newL,l,0);poly linearL=(newL+constantL)/l;
+ if(linearL==0 || subst(linearL,l,0)!=linearL){ERROR("DIAMOND51_NOT_AFFINE_LAMBDA");return(list());}
+ return(list(newL,newV,newZ));
+}
+link iterateOut51="ASCII:w diamond-iterates51.sing";open(iterateOut51);
+write(iterateOut51,"// Native u means z=1/original_u; l=lambda,v=V.");
+write(iterateOut51,"ring diamondIteratesCertificate51=(2,u),(l,v),dp;list images51;");
+list current51=l,v,u;list forward51;list inverse51;int iteration51;
+for(iteration51=1;iteration51<=10;iteration51++){
+ current51=step51(current51);
+ if(size(current51)!=3){ERROR("DIAMOND51_ITERATE_SHAPE");quit;}
+ write(iterateOut51,"images51["+string(iteration51)+"]=list(poly("+string(current51[1])+"),poly("+string(current51[2])+"),poly("+string(current51[3])+"));");
+ if(iteration51==1){forward51=current51;}
+ if(iteration51==2 && br51(current51[3]+u)==0){ERROR("DIAMOND51_SQUARE_BASE_IDENTITY");quit;}
+ if(iteration51==5 && (br51(current51[1]+l+1+c51)!=0 || br51(current51[2]+v)!=0 || br51(current51[3]+u)!=0)){ERROR("DIAMOND51_FIFTH_NOT_SIGN");quit;}
+ if(iteration51==9){inverse51=current51;}
+ print("DIAMOND51_ITERATE index="+string(iteration51)+" affine_lambda=true quadratic_base=true");
+}
+close(iterateOut51);close(inverseOut51);
+if(br51(current51[1]+l)!=0 || br51(current51[2]+v)!=0 || br51(current51[3]+u)!=0){ERROR("DIAMOND51_TENTH_NOT_IDENTITY");quit;}
+if(br51((forward51[3]+forward51[2]+forward51[3]^2)*u+1)!=0 || br51((inverse51[3]+inverse51[2])*u+1)!=0){ERROR("DIAMOND51_OVERLAP_UNIT_IMAGES");quit;}
+link mapOut51="ASCII:w diamond-maps51.sing";open(mapOut51);
+write(mapOut51,"ring diamondMapsCertificate51=(2,u),(l,v),dp;ideal actualSource51;");
+int entry51;int case51;int row51;list chosen51;ideal mapped51;matrix lift51;
+for(entry51=1;entry51<=2;entry51++){write(mapOut51,"actualSource51["+string(entry51)+"]="+string(actualSource51[entry51])+";");}
+for(case51=1;case51<=2;case51++){
+ if(case51==1){chosen51=forward51;}else{chosen51=inverse51;}
+ map sourceMap51=relativeInfinity50,chosen51[1],chosen51[2],chosen51[3];
+ mapped51=sourceMap51(relativeInfinityIdeal50);lift51=lift(actualSource51,mapped51);
+ if(matrix(actualSource51)*lift51!=matrix(mapped51)){ERROR("DIAMOND51_FULL_SOURCE_MAP_PRODUCT");quit;}
+ map corrupt51=relativeInfinity50,chosen51[1],chosen51[2],chosen51[3]+1;
+ if(size(reduce(corrupt51(relativeInfinityIdeal50),actualStd51))==0){ERROR("DIAMOND51_CORRUPTED_MAP_ACCEPTED");quit;}
+ write(mapOut51,"ideal imagesCase51_"+string(case51)+";matrix liftCase51_"+string(case51)+"[2][2];");
+ for(entry51=1;entry51<=2;entry51++){
+  write(mapOut51,"imagesCase51_"+string(case51)+"["+string(entry51)+"]="+string(mapped51[entry51])+";");
+  for(row51=1;row51<=2;row51++){write(mapOut51,"liftCase51_"+string(case51)+"["+string(row51)+","+string(entry51)+"]="+string(lift51[row51,entry51])+";");}
+ }
+ print("DIAMOND51_SOURCE_MAP case="+string(case51)+" full_source_products=2 corruption_rejected=true");
+}
+close(mapOut51);
+print("DIAMOND51_RESULT source_generic_degree=32 polynomial_overlap_products=3 actual_source_maps=2 full_source_products=4 fifth_iterate_sign=true tenth_iterate_identity=true overlap_unit_images=true normalized_generator_regularities_pending=true");
+print("DIAMOND51_ALL_CHECKS_PASS");quit;

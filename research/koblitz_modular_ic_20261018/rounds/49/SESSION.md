@@ -45,3 +45,6 @@ gate log and historical runner identity retained. Fresh lean49-03 passed
 compile/audit. Plane decomposition timeout remains an incomplete exact
 computation, not a geometric impossibility or mathematical null. No cap
 increase, new EKS job, duplicate Diem/freezer restart, merge or agent launch.
+
+## Final terminal receipts
+All13attempts terminal:4accepted native,6rejected native (4wallcaps and2native-error runs),1accepted Lean workflow,1rejected Lean compile and1rejected precompiler checkpoint admission. No source normalP call reached and no affine normalization output exists. Generic prime equality is accepted. Corrected FGLM reached a degree32 shape but timed out before full identities and before exporting candidate coefficients. Direct lambda timed out with no completed result or intermediate stage log. No monic integral lambda model or source presentation is accepted. Both Lean lemmas compile/audit0;2audited declarations,0failing/trusted. Shared-host CPU co-tenancy makes wallcaps censored, not performance/feasibility bounds. Frozen lambda normalizer/verifier were not run because their producer did not pass.

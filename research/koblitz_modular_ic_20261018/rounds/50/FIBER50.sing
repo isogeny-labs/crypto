@@ -1,0 +1,31 @@
+setring relativeFinite50;short=0;
+poly fiberFactor50=t^2+t+1;
+map planeIntoRelative50=integralCandidate50,t,u;
+ideal planeInside50=planeIntoRelative50(candidateIdeal50);
+if(subst(relativeIdeal50[1],u,1)!=v^2+v || subst(relativeIdeal50[2],u,1)!=fiberFactor50^8 || subst(planeInside50[1],u,1)!=fiberFactor50^16){ERROR("FIBER50_COMPLETE_FIBER_FACTORS");quit;}
+poly primitiveB50=relativeB50;poly originalA50=subst(relativeIdeal50[2],v,0);
+int contentPower50=0;int previousDegree50;
+if(primitiveB50==0 || subst(primitiveB50,v,0)!=primitiveB50){ERROR("FIBER50_DENOMINATOR_SHAPE");quit;}
+while(subst(primitiveB50,u,1)==0){
+ previousDegree50=deg(primitiveB50);primitiveB50=primitiveB50/(u+1);contentPower50++;
+ if(deg(primitiveB50)>=previousDegree50){ERROR("FIBER50_CONTENT_DEGREE_DROP");quit;}
+}
+poly saturationParameter50=(u+1)^contentPower50;
+poly saturationWitness50=primitiveB50*v;
+if(saturationParameter50*primitiveB50!=relativeB50 || saturationParameter50*saturationWitness50+originalA50!=relativeIdeal50[2]){ERROR("FIBER50_FULL_SATURATION_IDENTITY");quit;}
+if(saturationParameter50*(saturationWitness50+1)+originalA50==relativeIdeal50[2]){ERROR("FIBER50_CORRUPTED_IDENTITY_ACCEPTED");quit;}
+link fiberOut50="ASCII:w parameter-saturation50.sing";open(fiberOut50);
+write(fiberOut50,"ring parameterSaturation50=2,(t,v,u),wp(4,2,1);short=0;int contentPower50="+string(contentPower50)+";poly parameter50="+string(saturationParameter50)+";poly witness50="+string(saturationWitness50)+";poly planeNumerator50="+string(originalA50)+";poly sourceGenerator50="+string(relativeIdeal50[2])+";");close(fiberOut50);
+setring boundaryCertificate50;
+int conjugate50;int separated50=1;poly root50;poly value050;poly value150;
+for(conjugate50=0;conjugate50<2;conjugate50++){
+ root50=point0[3*conjugate50+1];
+ map eval050=relativeFinite50,root50,0,1;map eval150=relativeFinite50,root50,1,1;
+ ideal residual050=eval050(relativeIdeal50);ideal residual150=eval150(relativeIdeal50);
+ if(size(residual050)!=0 || size(residual150)!=0){ERROR("FIBER50_SOURCE_RECHECK");quit;}
+ value050=eval050(saturationWitness50);value150=eval150(saturationWitness50);
+ if(value050==value150){separated50=0;}
+ print("FIBER50_PAIR conjugate="+string(conjugate50)+" witness0="+string(value050)+" witness1="+string(value150));
+}
+print("FIBER50_RESULT plane_fiber_exponent=16 refined_fiber_exponent=8 content_power="+string(contentPower50)+" full_source_product=true witness_separated="+string(separated50));
+print("FIBER50_ALL_CHECKS_PASS");quit;
