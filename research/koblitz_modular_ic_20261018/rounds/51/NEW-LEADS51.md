@@ -117,3 +117,10 @@ integral,and nu51-01 independently verifies the entire32-entry normal-module
 lift. This is actual exceptional-denominator cancellation,under the retained
 normal-RR identification;its precise pole orders at the omitted fibers remain
 part of the complete RR geometry task.
+
+Module choice for the projector matters:use a compatible integral Hecke
+module or the odd target-prime Tate module. A matrix only onF2 differentials
+cannot certify an integral projector scalar or separate +/− sign eigenspaces
+in characteristic2. This is a concrete model dependency,not a completed
+Hecke action computation. The explicit curve correspondence and its module
+action must be bound by actual certificates before any Smith result is used.
