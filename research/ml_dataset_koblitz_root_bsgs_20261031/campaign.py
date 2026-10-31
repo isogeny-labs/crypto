@@ -314,7 +314,9 @@ def git_ready_checkpoint(index):
         write_json(saved, content)
 
 
-def run():
+def run(max_new_cells):
+    if max_new_cells is None or not 1 <= max_new_cells <= 16:
+        raise RuntimeError("run requires --max-new-cells in 1..16")
     admission_receipt = admission()
     ROOT.mkdir(mode=0o700, parents=True, exist_ok=True)
     os.chmod(ROOT, 0o700)
@@ -330,6 +332,7 @@ def run():
     if admitted.get("protocol_file_sha256") != HASHES[HERE / "protocol.json"] or admitted.get("plan_sha256") != HASHES[HERE / "plan.json"]:
         raise RuntimeError("existing campaign admission binds different frozen inputs")
     deadline_ns = int(admitted["campaign_started_unix_ns"]) + 12 * 3600 * 10 ** 9
+    processed = 0
     for index in range(16):
         shard = ROOT / f"shard-{index:02d}"
         cell_receipt = ROOT / "custody" / f"shard-{index:02d}-published.json"
@@ -341,6 +344,10 @@ def run():
                 raise RuntimeError(f"published shard {index} has a local custody mismatch")
             git_ready_checkpoint(index)
             continue
+        if processed >= max_new_cells:
+            print(json.dumps({"planned": 16, "new_or_resumed_cells_processed": processed,
+                              "complete": False, "stop_reason": "between_cell_wave_limit"}), flush=True)
+            return
         if time.time_ns() > deadline_ns:
             raise RuntimeError("12-hour campaign admission ceiling reached")
         shard.mkdir(exist_ok=True)
@@ -348,6 +355,7 @@ def run():
         status = finalize(shard, index)
         receipt = custody(shard, index, status)
         git_ready_checkpoint(index)
+        processed += 1
         print(json.dumps({"index": index, "verified_and_exported": status["verified_and_exported"], "root_certificate_promoted": status["root_certificate_promoted"], "root_positive_pdp_promoted": status["root_positive_pdp_promoted"], "ecdlp_solve_promoted": status["ecdlp_solve_promoted"], "archive_sha256": receipt["archive_sha256"], "fresh_get": True}), flush=True)
     print(json.dumps({"planned": 16, "custody_receipts": 16, "complete": True}), flush=True)
 
@@ -355,12 +363,14 @@ def run():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("mode", choices=["check", "run"])
+    parser.add_argument("--max-new-cells", type=int,
+                        help="Required for run: at most this many unpublished cells, including resumed finalizations; stop only after each cell custody checkpoint")
     args = parser.parse_args()
     try:
         if args.mode == "check":
             print(json.dumps(admission(), sort_keys=True))
         else:
-            run()
+            run(args.max_new_cells)
     except Exception as exc:
         print(f"campaign stopped: {exc}", file=sys.stderr)
         sys.exit(1)
