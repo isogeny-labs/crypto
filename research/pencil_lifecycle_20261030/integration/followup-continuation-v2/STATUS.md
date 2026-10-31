@@ -149,3 +149,31 @@ Full library and CLI checks; sparse source closure review, isolated musl build a
 
 ### Errors
 Initial source-wrapper root validation bypassed failure receipt creation; additive v2 moved the same assertion inside receipt supervision, and an invalid-root control now retains its failure receipt. All historical failures remain recorded.
+
+## 2026-10-31 02:18 UTC — isolated source verified and lock failures retained
+
+### What was done
+The reviewed sparse source selection materialized at pinned commit b985ddb30b46abbd9a050e5753c7e301f40b07f6. All 5,905 selected file hashes, tracked cleanliness and absence of untracked inputs passed. One isolated musl build started under the reviewed wrapper, with a 3,600-second cap. Positive shared-support field composition passed independent review; word composition passed producer proof, fixture and axiom checks and is under independent review.
+
+### Decisions made
+Keep native build qualification separate from scientific execution. Preserve the two new full-suite failures and investigate before another suite run. Existing Docker access works through the recorded noninteractive route; the exact upstream image reference is absent locally.
+
+### Open threads
+Independent positive word review, repeated-support branch construction, native build and runtime qualification, lock-release proposal, current-head software checks and PR delivery. No scientific campaign was admitted.
+
+### Errors
+The corrected-source full library suite returned exit 101: 5,791 passed, 2 GPU lock failures, 128 ignored. The failure messages discard the underlying errno; inherited-descriptor contention is established only by the separately retained barrier control, not by these panic messages. The supervisor therefore did not run its final CLI build.
+
+## 2026-10-31 02:20 UTC — positive word review integrated
+
+### What was done
+Independent positive-word review replayed the main proof, full-premise nonunit F7 fixture, four-declaration axiom readback and boundary controls, all exit0. All83 producer files and13 declared dependencies matched before and after. The exact reviewed field and word modules are now canonical sources with25 registered targets; configuration check passed (exit0).
+
+### Decisions made
+The restricted dispatcher outside-branch None marker remains distinct from production behavior. The repeated-support tripling branch is a separate construction now underway.
+
+### Open threads
+One pinned native build is running. A private owner-process BenchLock release proposal is under independent review; deterministic test implementation is being prepared. Scientific artifact/runtime admission and full-cohort execution remain pending.
+
+### Errors
+Earlier proof timeouts and the two corrected-source GPU lock failures remain retained; no result was removed or rerun to replace a failure.

@@ -74,3 +74,9 @@ lean_lib MixedGeneric
 
 @[default_target]
 lean_lib WordGeneric
+
+@[default_target]
+lean_lib PositiveDistinct
+
+@[default_target]
+lean_lib WordPositive
