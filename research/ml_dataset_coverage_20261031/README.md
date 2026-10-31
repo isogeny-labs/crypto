@@ -45,3 +45,18 @@ python3 research/ml_dataset_coverage_20261031/build_coverage.py
 python3 research/ml_dataset_coverage_20261031/audit_prime_twists.py \
   --archives /var/tmp/ml-dataset-local-campaign-20261031/archives
 ```
+
+# Version 4 update
+
+`build_coverage_v4.py` binds the immutable version 3 snapshot to the checked
+version 4 inventory and sixteen Koblitz47 checkpoints. `coverage-v4.json`
+records **168 retained receipts** at field sizes 23, 47, and 61. Koblitz
+enumeration now has eight receipts and Koblitz F6 has ten; `pkm` remains
+unobserved. Both twists are represented in the new Koblitz campaign. The
+size band 48 through 60 and requested arities other than 2 and 4 still have
+no retained receipts. Counts are campaign receipts, not unique key identities.
+
+```sh
+python3 research/ml_dataset_inventory_20261031/build_inventory_v4.py
+python3 research/ml_dataset_coverage_20261031/build_coverage_v4.py
+```

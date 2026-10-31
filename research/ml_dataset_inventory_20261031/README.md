@@ -55,3 +55,20 @@ receipts, 93 independent scalar solves, five checker-receipted official exports,
 80 completed export rows, and eight censored rows. The prime61 pilot contributes
 two verified enumeration artifacts and two root timeouts across both twists,
 with zero scalar solves. The earlier inventory files remain unchanged.
+
+# Version 4 update
+
+`build_inventory_v4.py` appends the sixteen-cell Koblitz47 m=4
+F6/enumeration campaign. `inventory-v4.json` binds its protocol, plan,
+sixteen custody checkpoints, independent 512-artifact archive audit, two-object
+fresh S3 readback sample, official export receipt, and phase cost projection.
+It reports **168 retained receipts**, **93 independent scalar solves**, six
+checker-receipted official exports with 96 completed rows and eight censored
+rows, and ten retained F6 pair domains. The new campaign adds eight F6
+pair-domain and eight bounded enumeration artifacts across both twists. Its
+calling-thread instruction samples are retained as scoped raw observations;
+none qualifies as a whole-worker instruction-to-solve training label.
+
+```sh
+python3 research/ml_dataset_inventory_20261031/build_inventory_v4.py
+```
