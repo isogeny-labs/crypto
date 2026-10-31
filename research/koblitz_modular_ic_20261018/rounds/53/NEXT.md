@@ -37,3 +37,12 @@
 Every new mathematical stage must freeze its own inputs/protocol before data,
 keep4GiBvirtual/1200s/one native thread and serialize with Lean. No new EKS,
 Diem/freezer restart,Conductor claim,delegation,merge or auto-merge change.
+
+If direct multivariate target evaluation caps,retain its saved coordinates and
+all prefix checks. A separately frozen evaluator can use Frobenius squaring
+for even powers and the retained universal QR/G,N syzygies:check targetG,N
+and a targetD_QRunit,then transport all3QRidentities through that ring map.
+This avoids evaluating every cleared QRmonomial independently. It is a new
+exact checking strategy,not evidence from the capped method. The actual
+degree8level11base route remains available to reduce coefficient growth.
+Never edit a runner while its driver is live;wait for terminal reconciliation.

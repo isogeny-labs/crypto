@@ -27,4 +27,31 @@ if(quarticMember53){dump53(out53,"quarticLift53",quarticLift53);}
 close(out53);
 print("SUPER53_GROEBNER_BASIS");print(gb53);
 print("SUPER53_RESULT dimension="+string(dimension53)+" Jacobian_unit="+string(smooth53)+" quartic_member="+string(quarticMember53)+" compact_N_zero="+string(N53==0));
+// Independently specialize the original equations at the actual fA point.
+ring actualSuper53=(2,a),(n,l),lp;minpoly=a^5+a^2+1;short=0;
+number vValue53=(1+a^4+a)/(a+a^2);number rValue53=(1+a)*vValue53+a^3;
+number bValue53=1+1/a;
+require53(vValue53^2+a^2*vValue53+a+a^3==0,"SUPER53_ACTUAL_BASE_POINT");
+require53(a*(rValue53+1)==1 && a*rValue53*(rValue53+1)==bValue53 && bValue53!=0,"SUPER53_ACTUAL_TATE_POINT");
+map actualMap53=universalPolynomialCertificate51,n,l,bValue53,1;
+ideal actualSource53=actualMap53(qr51);poly actualG53=actualMap53(G51);poly actualN53=actualMap53(N51);
+poly actualQuartic53=l^4+bValue53*l+bValue53^2;
+require53(actualG53==actualQuartic53^4 && diff(actualQuartic53,l)==bValue53,"SUPER53_ACTUAL_QUARTIC");
+ideal actualGB53=std(actualSource53);int actualDimension53=vdim(actualGB53);
+matrix actualForward53=lift(actualSource53,actualGB53);matrix actualReverse53=lift(actualGB53,actualSource53);
+require53(matrix(actualSource53)*actualForward53==matrix(actualGB53) && matrix(actualGB53)*actualReverse53==matrix(actualSource53),"SUPER53_ACTUAL_IDEAL_PRODUCTS");
+ideal actualMinors53=minor(jacob(actualSource53),2);ideal actualAugmented53=actualSource53,actualMinors53;
+int actualSmooth53=(reduce(poly(1),std(actualAugmented53))==0);
+int actualQuarticMember53=(reduce(actualQuartic53,actualGB53)==0);
+matrix actualSmoothLift53;matrix actualQuarticLift53;
+if(actualSmooth53){actualSmoothLift53=lift(actualAugmented53,ideal(1));require53(matrix(actualAugmented53)*actualSmoothLift53==matrix(ideal(1)),"SUPER53_ACTUAL_JACOBIAN_PRODUCT");}
+if(actualQuarticMember53){actualQuarticLift53=lift(actualSource53,ideal(actualQuartic53));require53(matrix(actualSource53)*actualQuarticLift53==matrix(ideal(actualQuartic53)),"SUPER53_ACTUAL_QUARTIC_PRODUCT");}
+link actualOut53="ASCII:w actual-supersingular-certificate53.sing";
+write(actualOut53,"ring actualSupersingularCertificate53=(2,a),(n,l),lp;minpoly=a^5+a^2+1;short=0;ideal source53="+string(actualSource53)+";ideal gb53="+string(actualGB53)+";ideal minors53="+string(actualMinors53)+";poly quartic53="+string(actualQuartic53)+";int dimension53="+string(actualDimension53)+";int smooth53="+string(actualSmooth53)+";int quarticMember53="+string(actualQuarticMember53)+";");
+dump53(actualOut53,"forward53",actualForward53);dump53(actualOut53,"reverse53",actualReverse53);
+if(actualSmooth53){dump53(actualOut53,"smoothLift53",actualSmoothLift53);}
+if(actualQuarticMember53){dump53(actualOut53,"quarticLift53",actualQuarticLift53);}
+close(actualOut53);print("SUPER53_ACTUAL_BASIS");print(actualGB53);
+print("SUPER53_ACTUAL_QUARTIC_FACTORS");print(factorize(actualQuartic53));
+print("SUPER53_ACTUAL_RESULT dimension="+string(actualDimension53)+" Jacobian_unit="+string(actualSmooth53)+" quartic_member="+string(actualQuarticMember53)+" compact_N_zero="+string(actualN53==0));
 print("SUPERSINGULAR53_ALL_CHECKS_PASS");quit;

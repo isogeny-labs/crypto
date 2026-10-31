@@ -128,3 +128,15 @@ generic c=1fiber overF2(b),not yet its actual fAresidue-field specialization
 or completed local-ring identification. Same native limits and serialization.
 Prior source review:R51CM.md,UNIVERSAL51/LINE51and the retained universal
 certificate;reuse established QR-line and Jacobian methods,no novelty claim.
+
+Before this fiber job is admitted,extend it to the actual residue field
+F32=F2[a]/(a5+a²+1). Verify the exact original base point
+V=(1+a4+a)/(a+a²),R=(1+a)V+a³,c=1,b=1+1/a and nonzero b.
+Map the original3QRpolynomials directly into this field,without specializing
+generic rational witness denominators. Repeat both ideal products,Jacobian
+unit and quartic-membership checks;save all witnesses and actual quartic
+factorization. Actual dimension16/smoothness remain outcomes,not prerequisites.
+For the trace-discriminant interpretation also read primary Stacks0BJF:
+https://stacks.math.columbia.edu/tag/0BJF . The finite-locally-free premise
+is the retained full rank32normal algebra;unit discriminant implies etale
+after localization. No completed-subring identification follows solely from it.

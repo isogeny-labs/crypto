@@ -25,7 +25,10 @@ Scientific source `{meta['source_revision']}`;{meta['source_pins']}scientific so
 All accepted and rejected attempts,and the compiled Lean artifacts are retained.
 The conditional PUT targets setec-astronomy-artifacts/store. A fresh direct
 GetObject,all member hashes and byte-identical deterministic repack pass.
-Historical Git source bytes and terminal receipts are verified separately.
+Valid completed workflows have historical Git input pins. Packet53-01 has
+invalid intermediate custody after an interrupted live-runner edit;it is
+retained as rejected evidence and excluded from valid executed-byte pins.
+See results.json and PROOF_MAP.md for the complete exception.
 
 ```bash
 ARTIFACTS_REMOTE=s3://setec-astronomy-artifacts/store python3 tools/artifacts/artifacts.py pull research/koblitz_modular_ic_20261018/rounds/53
