@@ -234,3 +234,7 @@ need AWS credentials that can read and write the prefix.
 
 The bucket is encrypted (SSE-S3) and blocks public access.  Versioning is
 off; write-once keys make it unnecessary for these objects.
+
+## 2026-10-18 Fp4 candidate metadata correction
+
+Four Fp4 constructor records were temporarily appended here without an upstream catalog update or canonical ICV1 registration. This living mirror now again matches cryptanalysis `main`; its existing lock is unchanged. Their exact appended bytes and computed identities are preserved in the [research-only erratum](../../../research/ideas_execution_20261018/fp4_metadata_erratum/README.md). They are unregistered candidate provenance, not catalog entries. No frozen plan, EC1 preimage, run manifest or prior evidence was rewritten.

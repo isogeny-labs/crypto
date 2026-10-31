@@ -1,0 +1,39 @@
+
+-- Polynomial validity composition; source-fidelity review of MixedGeneric is separate.
+theorem generic_word_preserves (p : UInt64) [Fact p.toNat.Prime]
+ (a0 a1 a2 : ZMod p.toNat) (a3 : UInt64) (a : WordD1) (b : WeightedWord)
+ (hfive : 5≤p.toNat) (hbound : p.toNat<2^31)
+ (ha : a.canonical p) (hb : b.canonical p) (h3 : a3.toNat<p.toNat)
+ (haz : a.z ≠ 0) (haw : a.w ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0)
+ (hva : a.normalizedValid p (MixedGeneric.curve a0 a1 a2 (a3.toNat:ZMod p.toNat)))
+ (hvb : b.normalizedValid p (MixedGeneric.curve a0 a1 a2 (a3.toNat:ZMod p.toNat)))
+ (hk : MixedGeneric.genericK (a.decode p) (b.decodeTwo p) ≠ 0) :
+ let c := (genericWords p a b a3).payload
+ genericWordDispatch p a b a3=some c ∧ c.canonical p ∧ c.z≠0 ∧ c.w≠0 ∧
+ c.normalizedValid p (MixedGeneric.curve a0 a1 a2 (a3.toNat:ZMod p.toNat)) := by
+ have hp : 0<p.toNat := by omega
+ have az : (a.decode p).z ≠ 0 := canonical_word_nonzero p a.z hp ha.2.2.1 haz
+ have aw : (a.decode p).w ≠ 0 := canonical_word_nonzero p a.w hp ha.2.2.2 haw
+ have bz : (b.decodeTwo p).z ≠ 0 := canonical_word_nonzero p b.z hp hb.2.2.2.2.1 hbz
+ have bw : (b.decodeTwo p).w ≠ 0 := canonical_word_nonzero p b.w hp hb.2.2.2.2.2 hbw
+ obtain ⟨_,hc,_,hd⟩ := generic_word_decode p hfive hbound a b a3 ha hb h3
+ obtain ⟨fz,fw,fv⟩ := MixedGeneric.weighted_generic_preserves a0 a1 a2
+   (a3.toNat:ZMod p.toNat) (a.decode p) (b.decodeTwo p) az aw bz bw hk hva hvb
+ have hkword : (genericWords p a b a3).k≠0 := by
+  intro hz
+  exact hk ((generic_guard_decode p hfive hbound a b a3 ha hb h3).mp hz)
+ have hcz : ((genericWords p a b a3).payload.decodeTwo p).z≠0 := by rw [hd]; exact fz
+ have hcw : ((genericWords p a b a3).payload.decodeTwo p).w≠0 := by rw [hd]; exact fw
+ refine ⟨by simp [genericWordDispatch,hkword],hc,?_,?_,?_⟩
+ · intro he
+   apply hcz
+   change (((genericWords p a b a3).payload.z).toNat:ZMod p.toNat)=0
+   rw [he]; simp
+ · intro he
+   apply hcw
+   change (((genericWords p a b a3).payload.w).toNat:ZMod p.toNat)=0
+   rw [he]; simp
+ · change MixedCancellation.validTwo (MixedGeneric.curve a0 a1 a2 (a3.toNat:ZMod p.toNat))
+     ((genericWords p a b a3).payload.decodeTwo p)
+   rw [hd]
+   exact fv
