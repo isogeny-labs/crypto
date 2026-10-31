@@ -5583,7 +5583,18 @@ struct NativeBoundaryView<'a> {
     capture_sequence: u64,
     event: &'a NativeBoundary,
 }
+/// Producer-origin acknowledgement of the exact ordered native projection.
+/// This is not a root-storage receipt or an independently anchored work ledger.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct NativeProjectionReceipt {
+    binding_sha256: [u8; 32],
+    acknowledged_records: u64,
+    last_capture_sequence: u64,
+    payload_bytes: u64,
+}
 struct BoundNativeEvents<'a> {
+    projection: NativeProjectionReceipt,
     binding_digest: [u8; 64],
     limits: &'a crate::ml_dataset::capture::CaptureLimits,
     buffer: crate::ml_dataset::capture::TypedEventBuffer,
@@ -5609,6 +5620,9 @@ impl<'a> BoundNativeEvents<'a> {
             .or_else(|_| budget.fail(Stop::InvalidLimits))?;
         let mut binding_digest = [0; 64];
         binding_digest.copy_from_slice(digest.as_bytes());
+        let mut projection_binding = [0; 32];
+        hex::decode_to_slice(&digest, &mut projection_binding)
+            .or_else(|_| budget.fail(Stop::InvalidLimits))?;
         let wire = TypedEventBuffer::requested_bytes(NATIVE_BOUNDARY_CAP as u64)
             .or_else(|_| budget.fail(Stop::Overflow))?;
         let canonical_cap = NATIVE_BOUNDARY_RECORDS
@@ -5634,6 +5648,12 @@ impl<'a> BoundNativeEvents<'a> {
         let buffer = TypedEventBuffer::try_new(NATIVE_BOUNDARY_CAP as u64, wire)
             .or_else(|_| budget.fail(Stop::Allocation))?;
         Ok(Self {
+            projection: NativeProjectionReceipt {
+                binding_sha256: projection_binding,
+                acknowledged_records: 0,
+                last_capture_sequence: 0,
+                payload_bytes: 0,
+            },
             binding_digest,
             limits,
             buffer,
@@ -5759,6 +5779,10 @@ impl<'a> BoundNativeEvents<'a> {
         self.pending = None;
         self.acknowledged += 1;
         *global += 1;
+        // Fixed metadata only; covered by the existing per-event setup tariff.
+        self.projection.acknowledged_records = self.acknowledged;
+        self.projection.last_capture_sequence = *global as u64;
+        self.projection.payload_bytes = self.canonical.len() as u64;
         self.encoded_capture_bytes += self.buffer.encoded_len() as u64;
         let _ = budget.check(Instant::now());
         Ok(())
@@ -8371,6 +8395,7 @@ mod canonical_component_tests {
 /// allocation, serialization, publication, or budget reset. Its caller owns
 /// admission of any storage I/O and must preserve an existing witness receipt.
 struct RetainedArtifact<'a> {
+    native_projection: Option<NativeProjectionReceipt>,
     path: &'static str,
     role: &'static str,
     encoding: &'static str,
@@ -8392,6 +8417,14 @@ impl CanonicalPipelineRun<'_> {
                 encoding: slot.2,
                 bytes,
                 publication,
+                native_projection: if slot.0 == KOBLITZ_SLOTS[1].0 {
+                    self.pipeline
+                        .as_ref()
+                        .and_then(|p| p.native.events.as_ref())
+                        .map(|e| e.projection)
+                } else {
+                    None
+                },
             })
         };
         if let Some(run) = &self.pipeline {
@@ -9095,6 +9128,7 @@ fn parent_artifact_path(path: &'static str) -> &'static str {
         .map_or(path, |(_, flat)| *flat)
 }
 struct OwnedRetainedArtifact {
+    native_projection: Option<NativeProjectionReceipt>,
     storage_attempted: bool,
     storage_admitted: bool,
     storage_quote: Option<RetentionQuote>,
@@ -9209,6 +9243,7 @@ fn take_parent_artifacts(
                     bytes: Vec::new(),
                 },
                 publication: a.publication,
+                native_projection: a.native_projection,
             });
             Ok::<(), Stop>(())
         })?;
@@ -9533,6 +9568,19 @@ fn persist_parent_artifacts(
                 }
                 // The producer already acknowledged this dedicated publication.
                 // Never pass it through the generic payload route.
+                item.capture_acknowledged = true;
+            } else if let Some(projection) = item.native_projection {
+                if item.logical_path != KOBLITZ_SLOTS[1].0
+                    || item.payload.role != KOBLITZ_SLOTS[1].1
+                    || item.payload.encoding != KOBLITZ_SLOTS[1].2
+                    || projection.payload_bytes != item.payload.bytes.len() as u64
+                    || hex::encode(projection.binding_sha256) != binding.digest()?
+                {
+                    return Err("native projection owner identity changed".into());
+                }
+                // These bytes were already committed as typed native events.
+                // No second generic live payload file or payload event is made.
+                // Root storage below remains an actual, separately charged write.
                 item.capture_acknowledged = true;
             } else {
                 super::live_borrowed_payload(
@@ -9863,6 +9911,7 @@ const PARENT_DELIVERY_SLOT: (&str, &str, &str) = (
 const PARENT_DELIVERY_CAP: usize = 16 * 1024;
 #[derive(serde::Serialize)]
 struct ParentItemView<'a> {
+    native_projection: Option<NativeProjectionReceipt>,
     logical_path: &'a str,
     path: &'a str,
     role: &'a str,
@@ -9890,6 +9939,7 @@ impl serde::Serialize for ParentItems<'_> {
             capture_acknowledged: a.capture_acknowledged,
             root_artifact: a.root_artifact.as_ref(),
             dedicated_publication: a.publication.is_some(),
+            native_projection: a.native_projection,
         }))
     }
 }
@@ -9998,6 +10048,8 @@ impl ParentDeliveryFile {
 #[derive(serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 struct SavedParentItem {
+    #[serde(default)]
+    native_projection: Option<NativeProjectionReceipt>,
     logical_path: String,
     path: String,
     role: String,
@@ -10026,6 +10078,69 @@ struct SavedParentDelivery {
     persistence_error: Option<String>,
     items: Vec<SavedParentItem>,
     delivery_complete: bool,
+}
+/// Outer replay: authenticate capture before accepting this digest. Extraction
+/// is checked against parsed payload, never used as an external JSON validator.
+fn verify_native_projection_receipt(
+    dir: &std::path::Path,
+    binding: &crate::ml_dataset::capture::AttemptBinding,
+    capture: &crate::ml_dataset::capture::CaptureLimits,
+    receipt: &NativeProjectionReceipt,
+) -> Result<String, String> {
+    use sha2::{Digest, Sha256};
+    if hex::encode(receipt.binding_sha256) != binding.digest()?
+        || receipt.acknowledged_records > NATIVE_BOUNDARY_RECORDS as u64
+        || receipt.payload_bytes > (NATIVE_BOUNDARY_RECORDS * NATIVE_BOUNDARY_CAP) as u64
+    {
+        return Err("native projection receipt identity/cap mismatch".into());
+    }
+    let mut hash = Sha256::new();
+    let mut count = 0u64;
+    let mut bytes = 0u64;
+    let mut last = 0u64;
+    let checked = crate::ml_dataset::capture::verify_live_committed_prefix_visit(
+        dir,
+        binding,
+        capture,
+        &mut |line| {
+            let row: crate::ml_dataset::capture::EventRecord =
+                serde_json::from_slice(line).map_err(|e| e.to_string())?;
+            if row.event["kind"] != "koblitz_m3_native" {
+                return Ok(());
+            }
+            let parsed: SavedNativeCaptureEvent = serde_json::from_value(row.event.clone())
+                .map_err(|e| format!("strict projected native event: {e}"))?;
+            let payload = native_capture_payload(line)
+                .map_err(|s| format!("native projection wire: {s:?}"))?;
+            let value: serde_json::Value =
+                serde_json::from_slice(payload).map_err(|e| e.to_string())?;
+            count = count.checked_add(1).ok_or("projection count overflow")?;
+            if value != row.event["payload"]
+                || parsed.payload.schema != "crypto.ml-dataset.koblitz-m3-events/v1"
+                || parsed.payload.binding_sha256 != binding.digest()?
+                || parsed.payload.sequence != count
+                || parsed.payload.capture_sequence != row.sequence
+                || row.sequence <= last
+            {
+                return Err("native projection sequence/payload mismatch".into());
+            }
+            bytes = bytes
+                .checked_add(payload.len() as u64 + 1)
+                .ok_or("projection bytes overflow")?;
+            hash.update(payload);
+            hash.update(b"\n");
+            last = row.sequence;
+            Ok(())
+        },
+    )?;
+    if checked.is_none()
+        || count != receipt.acknowledged_records
+        || last != receipt.last_capture_sequence
+        || bytes != receipt.payload_bytes
+    {
+        return Err("native projection receipt differs from authenticated stream".into());
+    }
+    Ok(hex::encode(hash.finalize()))
 }
 #[derive(Debug)]
 struct VerifiedParentDelivery {
@@ -10182,6 +10297,7 @@ fn verify_parent_delivery(
             || a.bytes > 8 * 1024 * 1024
             || previous_rank.is_some_and(|p| rank <= p)
             || a.dedicated_publication != (path == "pdp-witness.json")
+            || a.native_projection.is_some() && path != KOBLITZ_SLOTS[1].0
         {
             return Err("parent artifact identity/order mismatch".into());
         }
@@ -10250,7 +10366,17 @@ fn verify_parent_delivery(
             .iter()
             .filter(|(_, p)| p.path == format!("payloads/{path}"))
             .collect();
-        if a.capture_acknowledged || a.dedicated_publication {
+        let projected_digest = if let Some(receipt) = &a.native_projection {
+            if !committed.is_empty() || receipt.payload_bytes != a.bytes {
+                return Err("native projection duplicated as generic payload".into());
+            }
+            Some(verify_native_projection_receipt(
+                dir, binding, capture, receipt,
+            )?)
+        } else {
+            None
+        };
+        if (a.capture_acknowledged || a.dedicated_publication) && projected_digest.is_none() {
             if committed.len() != 1 {
                 return Err("parent acknowledgement lacks unique capture".into());
             }
@@ -10277,7 +10403,10 @@ fn verify_parent_delivery(
                 || root.role != role
                 || root.encoding != encoding
                 || root.bytes != a.bytes
-                || root.sha256 != committed[0].1.sha256
+                || Some(root.sha256.as_str())
+                    != projected_digest
+                        .as_deref()
+                        .or_else(|| committed.first().map(|p| p.1.sha256.as_str()))
             {
                 return Err("parent root differs from capture".into());
             }
@@ -11355,13 +11484,13 @@ pub(super) fn run_verified_worker_entry(
     // modeled work/bytes, never a retired hardware instruction count.
     budget
         .reserve_checking(
-            32 * 64 * 1024 + 65536,
+            32 * 32 * 1024 + 65536 + WORKER_TERMINAL_GUARD_WORK,
             2 * 1024 * 1024 + 128 * 1024,
             Instant::now(),
         )
         .map_err(|s| format!("Koblitz output admission: {s:?}"))?;
     budget
-        .reserve_trace(4 * 64 * 1024 + 4096, Instant::now())
+        .reserve_trace(4 * 32 * 1024 + 4096, Instant::now())
         .map_err(|s| format!("Koblitz terminal capture admission: {s:?}"))?;
     let mut receipts = super::WorkerStoredReceipts::admit(original, 12, |work, bytes| {
         budget
@@ -12364,6 +12493,164 @@ mod worker_central_replay_tests {
     }
 }
 
+// The 32 KiB reservation is scoped to run_verified_worker_entry's closed
+// constructors: fixed scalar keys, static diagnostic fields, <=12 fixed-identity
+// root descriptors and two fixed errors. These guards detect schema drift before
+// capture cloning/publication. Arbitrary Values injected into this private helper
+// are outside that constructor proof; preserve them intact on invariant failure.
+const WORKER_TERMINAL_CAP: usize = 32 * 1024;
+const WORKER_TERMINAL_GUARD_WORK: u64 = 8 * WORKER_TERMINAL_CAP as u64 + 4096;
+
+/// Counts encoded bytes without allocating an encoded copy. Refuses a write
+/// before exceeding the cap; a partial count is never treated as valid JSON.
+struct WorkerTerminalCounter {
+    bytes: usize,
+    cap: usize,
+}
+impl std::io::Write for WorkerTerminalCounter {
+    fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+        let next = self
+            .bytes
+            .checked_add(bytes.len())
+            .filter(|n| *n <= self.cap)
+            .ok_or_else(|| {
+                std::io::Error::new(std::io::ErrorKind::InvalidData, "worker terminal cap")
+            })?;
+        self.bytes = next;
+        Ok(bytes.len())
+    }
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
+    }
+}
+fn worker_terminal_encoded_size(value: &impl serde::Serialize, cap: usize) -> Result<usize, Stop> {
+    let mut counter = WorkerTerminalCounter { bytes: 0, cap };
+    serde_json::to_writer(&mut counter, value).map_err(|_| Stop::Serialization)?;
+    Ok(counter.bytes)
+}
+fn worker_terminal_ascii(s: &str, max: usize) -> bool {
+    s.len() <= max
+        && s.bytes()
+            .all(|b| (0x20..=0x7e).contains(&b) && b != b'"' && b != b'\\')
+}
+fn worker_terminal_scalar(v: &serde_json::Value) -> bool {
+    match v {
+        serde_json::Value::Null | serde_json::Value::Bool(_) => true,
+        serde_json::Value::Number(n) => n.as_u64().is_some(),
+        serde_json::Value::String(s) => worker_terminal_ascii(s, 128),
+        _ => false,
+    }
+}
+/// Fixed-depth diagnostic tree. Counts every object entry, not just leaves.
+fn worker_terminal_diagnostic(v: &serde_json::Value, depth: usize, entries: &mut usize) -> bool {
+    if let Some(s) = v.as_str() {
+        return worker_terminal_ascii(s, 64);
+    }
+    if worker_terminal_scalar(v) {
+        return true;
+    }
+    let Some(object) = v.as_object() else {
+        return false;
+    };
+    if depth == 0 || object.len() > 32 {
+        return false;
+    }
+    for (key, value) in object {
+        *entries += 1;
+        if *entries > 32
+            || !worker_terminal_ascii(key, 48)
+            || !worker_terminal_diagnostic(value, depth - 1, entries)
+        {
+            return false;
+        }
+    }
+    true
+}
+fn worker_terminal_receipt(v: &serde_json::Value) -> bool {
+    let Some(object) = v.as_object() else {
+        return false;
+    };
+    if object.len() != 5 {
+        return false;
+    }
+    let (Some(path), Some(role), Some(encoding), Some(sha)) = (
+        v["path"].as_str(),
+        v["role"].as_str(),
+        v["encoding"].as_str(),
+        v["sha256"].as_str(),
+    ) else {
+        return false;
+    };
+    let known = KOBLITZ_SLOTS
+        .iter()
+        .chain(std::iter::once(&PARENT_DELIVERY_SLOT))
+        .any(|&(p, r, e)| path == p && role == r && encoding == e)
+        || (path == "pdp-witness.json"
+            && role == "independently-verified-pdp"
+            && encoding == "json")
+        || (RAW_RETENTION_NAMES.iter().any(|(_, p)| path == *p)
+            && role == "unregistered-partial-artifact"
+            && encoding == "native");
+    known
+        && worker_terminal_ascii(path, 128)
+        && worker_terminal_ascii(role, 128)
+        && worker_terminal_ascii(encoding, 128)
+        && sha.len() == 64
+        && sha.bytes().all(|b| b.is_ascii_hexdigit())
+        && v["bytes"].as_u64().is_some()
+        && worker_terminal_encoded_size(v, 1024).is_ok()
+}
+/// Conservative bound:12674 base +12302 receipts +4096 diagnostic +512 errors
+/// +512 finalization/wrapper =30096 <32768. All traversals have structural bounds.
+/// Guard before cloning. The final count independently checks schema growth.
+fn guard_worker_terminal(v: &serde_json::Value) -> Result<usize, Stop> {
+    let object = v.as_object().ok_or(Stop::Serialization)?;
+    if object.len() > 64 {
+        return Err(Stop::Serialization);
+    }
+    for (key, value) in object {
+        if !worker_terminal_ascii(key, 64) {
+            return Err(Stop::Serialization);
+        }
+        let valid = match key.as_str() {
+            "unregistered_root_acknowledgements" => value
+                .as_array()
+                .is_some_and(|rows| rows.len() <= 12 && rows.iter().all(worker_terminal_receipt)),
+            "failed_parent_storage" => {
+                let mut entries = 0;
+                worker_terminal_diagnostic(value, 4, &mut entries)
+                    && worker_terminal_encoded_size(value, 4096).is_ok()
+            }
+            "live_persistence_errors" => value.as_array().is_some_and(|errors| {
+                errors.len() <= 2
+                    && errors.iter().all(|error| {
+                        matches!(
+                            error.as_str(),
+                            Some(
+                                "Koblitz retention or receipt handoff incomplete"
+                                    | "Koblitz final capture delivery incomplete"
+                            )
+                        )
+                    })
+                    && worker_terminal_encoded_size(value, 512).is_ok()
+            }),
+            "capture_finalization" => {
+                value.as_object().is_some_and(|fields| {
+                    fields.len() == 5
+                        && fields.iter().all(|(key, value)| {
+                            worker_terminal_ascii(key, 64) && worker_terminal_scalar(value)
+                        })
+                }) && worker_terminal_encoded_size(value, 256).is_ok()
+            }
+            _ => worker_terminal_scalar(value),
+        };
+        if !valid {
+            return Err(Stop::Serialization);
+        }
+    }
+    worker_terminal_encoded_size(v, WORKER_TERMINAL_CAP)
+}
+
 /// Dedicated capture proves a retained witness; ordinary PDP/certificate labels
 /// additionally require its canonical root to be accepted by the worker registry.
 fn apply_worker_witness_claims(
@@ -12396,6 +12683,10 @@ fn finalize_worker_capture(
     let mut finish_acknowledged = false;
     if now() >= budget.deadline {
         stop = Some(Stop::Deadline);
+    } else if guard_worker_terminal(outcome).is_err() {
+        // No clone, event or finish on a failed invariant. Preserve the complete
+        // input Value and moved receipts for failure custody, never truncate.
+        stop = Some(Stop::Serialization);
     } else {
         // This bounded clone/assembly is covered by the entry's terminal tariff.
         let mut pending = outcome.clone();
@@ -12406,6 +12697,8 @@ fn finalize_worker_capture(
         let frame = json!({"kind":"solver_return","snapshot_boundary":"before-capture-finalization","outcome":pending,"error":null});
         if now() >= budget.deadline {
             stop = Some(Stop::Deadline);
+        } else if worker_terminal_encoded_size(&frame, WORKER_TERMINAL_CAP).is_err() {
+            stop = Some(Stop::Serialization);
         } else {
             event_attempted = true;
             match event(&frame) {
@@ -12464,6 +12757,31 @@ fn finalize_worker_capture(
         "finish_attempted":finish_attempted,"finish_acknowledged":finish_acknowledged,
         "stop":stop
     });
+    // A final count covers fields added after capture finish. No second capture
+    // or storage attempt is allowed. A current-constructor outcome is bounded;
+    // a schema invariant failure remains an explicit censored retained Value.
+    if guard_worker_terminal(outcome).is_err() {
+        budget.stopped.get_or_insert(Stop::Serialization);
+        outcome["first_stop"] = json!(budget.stopped);
+        // Preserve the first finalization stop (especially an expired-entry
+        // Deadline). Central replay binds first_stop to pre_stop.or(stop).
+        if outcome["capture_finalization"]["stop"].is_null() {
+            outcome["capture_finalization"]["stop"] = json!(Stop::Serialization);
+        }
+        // Do not add a separate error to a rejected shape: its byte allowance
+        // is not established. Preserve the complete original diagnostic Value.
+        outcome["status"] = json!("partial");
+        for key in [
+            "solver_completed",
+            "exhaustive_no_decomposition",
+            "group_domain_complete",
+            "native_backend_invoked",
+            "algebra_completed",
+            "native_statistics_complete",
+        ] {
+            outcome[key] = false.into();
+        }
+    }
 }
 
 #[cfg(test)]
@@ -12983,5 +13301,446 @@ mod positive_original_bound_worker_tests {
                 );
             }
         }
+    }
+}
+#[cfg(test)]
+mod native_projection_custody_controls {
+    use super::*;
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix::Engine;
+    #[test]
+    fn root_only_projection_preserves_exact_bytes_and_rejects_receipt_mutations() {
+        for engine in [Engine::F4Macaulay, Engine::F5KoszulFrobenius] {
+            for collision in [false, true] {
+                let binding = matrix_tests::binding();
+                let limits = crate::ml_dataset::capture::capture_limits(16).unwrap();
+                let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+                let root = sink.dir.parent().unwrap();
+                let original = construction_tests::fixture();
+                let mut budget = construction_tests::budget();
+                let mut delivery = ParentDeliveryFile::admit(&mut budget).unwrap();
+                let mut global = 0;
+                let mut run = run_canonical_pipeline(
+                    &original,
+                    &binding,
+                    &limits,
+                    &"8".repeat(64),
+                    &"9".repeat(64),
+                    engine,
+                    3,
+                    &mut budget,
+                    &mut global,
+                    &mut |_, _, _| Ok(()),
+                );
+                let expected = run
+                    .pipeline
+                    .as_ref()
+                    .unwrap()
+                    .native
+                    .events
+                    .as_ref()
+                    .unwrap()
+                    .canonical
+                    .clone();
+                if collision {
+                    std::fs::write(root.join(KOBLITZ_SLOTS[1].0), b"collision").unwrap();
+                }
+                let mut parent = ParentRetention::begin(&mut budget).unwrap();
+                let mut owned = take_parent_artifacts(&mut run, &mut parent).value.unwrap();
+                let result =
+                    persist_parent_artifacts(&mut owned, &mut parent, root, &binding, &limits);
+                assert_eq!(result.is_ok(), !collision);
+                let item = owned
+                    .items
+                    .iter()
+                    .find(|a| a.logical_path == KOBLITZ_SLOTS[1].0)
+                    .unwrap();
+                assert!(
+                    item.storage_attempted && item.storage_admitted && item.capture_acknowledged
+                );
+                assert_eq!(item.root_artifact.is_some(), !collision);
+                assert_eq!(item.payload.bytes, expected);
+                assert!(!sink.dir.join("payloads").join(KOBLITZ_SLOTS[1].0).exists());
+                let receipt = item.native_projection.unwrap();
+                let digest =
+                    verify_native_projection_receipt(root, &binding, &limits, &receipt).unwrap();
+                assert_eq!(digest, crate::ml_dataset::digest(&expected));
+                assert_eq!(
+                    std::fs::read(root.join(KOBLITZ_SLOTS[1].0)).unwrap(),
+                    if collision {
+                        b"collision".to_vec()
+                    } else {
+                        expected
+                    }
+                );
+                if collision {
+                    assert_eq!(owned.retention_stop, Some(Stop::Observer));
+                }
+                let prefix = crate::ml_dataset::capture::verify_live_committed_prefix(
+                    root, &binding, &limits,
+                )
+                .unwrap()
+                .unwrap();
+                assert!(!prefix
+                    .payloads
+                    .iter()
+                    .any(|(_, a)| a.path == format!("payloads/{}", KOBLITZ_SLOTS[1].0)));
+                delivery.finish(&owned, &parent, &binding, root).unwrap();
+                let mut artifacts: Vec<_> = owned
+                    .items
+                    .iter()
+                    .filter_map(|a| a.root_artifact.clone())
+                    .collect();
+                artifacts.push(delivery.artifact.clone().unwrap());
+                let check = |artifacts: &[_]| {
+                    verify_parent_delivery(
+                        root,
+                        artifacts,
+                        &binding,
+                        &limits,
+                        parent.budget.original_limits(),
+                        owned.ledger_before_owners,
+                    )
+                };
+                assert_eq!(check(&artifacts).unwrap().delivery_complete, !collision);
+                let path = root.join(PARENT_DELIVERY_SLOT.0);
+                let saved = std::fs::read(&path).unwrap();
+                let base: serde_json::Value = serde_json::from_slice(&saved).unwrap();
+                if !collision {
+                    // Same-length corruption must fail root readback even though
+                    // receipt, parent JSON and registered root hash are unchanged.
+                    let root_path = root.join(KOBLITZ_SLOTS[1].0);
+                    let actual = std::fs::read(&root_path).unwrap();
+                    let mut corrupt = actual.clone();
+                    corrupt[0] ^= 1;
+                    std::fs::write(&root_path, &corrupt).unwrap();
+                    assert_eq!(actual.len(), corrupt.len());
+                    assert!(check(&artifacts).is_err());
+                    std::fs::write(&root_path, &actual).unwrap();
+                    assert!(check(&artifacts).is_ok());
+                }
+                for mode in 0..5 {
+                    let mut forged = base.clone();
+                    let items = forged["items"].as_array_mut().unwrap();
+                    let at = items
+                        .iter()
+                        .position(|a| a["path"] == KOBLITZ_SLOTS[1].0)
+                        .unwrap();
+                    match mode {
+                        0 => {
+                            items[at]["native_projection"]["binding_sha256"][0] =
+                                (receipt.binding_sha256[0] ^ 1).into()
+                        }
+                        1 => {
+                            items[at]["native_projection"]["acknowledged_records"] =
+                                (receipt.acknowledged_records + 1).into()
+                        }
+                        2 => {
+                            items[at]["native_projection"]["last_capture_sequence"] =
+                                (receipt.last_capture_sequence + 1).into()
+                        }
+                        3 => {
+                            items[at]["native_projection"]["payload_bytes"] =
+                                (receipt.payload_bytes + 1).into()
+                        }
+                        _ => items[at]["native_projection"] = serde_json::Value::Null,
+                    }
+                    let bytes = serde_json::to_vec(&forged).unwrap();
+                    std::fs::write(&path, &bytes).unwrap();
+                    let mut rehashed = artifacts.clone();
+                    let a = rehashed
+                        .iter_mut()
+                        .find(|a| a.path == PARENT_DELIVERY_SLOT.0)
+                        .unwrap();
+                    a.sha256 = crate::ml_dataset::digest(&bytes);
+                    a.bytes = bytes.len() as u64;
+                    assert!(
+                        check(&rehashed).is_err(),
+                        "mutation {mode}, collision {collision}"
+                    );
+                }
+                std::fs::write(&path, &saved).unwrap();
+                if !collision {
+                    // A valid generic publication is still a forbidden duplicate
+                    // origin for this dedicated producer receipt.
+                    let bytes = std::fs::read(root.join(KOBLITZ_SLOTS[1].0)).unwrap();
+                    super::super::live_borrowed_payload(
+                        KOBLITZ_SLOTS[1].0,
+                        KOBLITZ_SLOTS[1].1,
+                        KOBLITZ_SLOTS[1].2,
+                        &bytes,
+                    )
+                    .unwrap();
+                    assert!(check(&artifacts).is_err());
+                }
+                // Once failed, parent storage must not retry or overwrite.
+                if collision {
+                    assert_eq!(
+                        persist_parent_artifacts(&mut owned, &mut parent, root, &binding, &limits),
+                        Err(Stop::Observer)
+                    );
+                    assert_eq!(
+                        std::fs::read(root.join(KOBLITZ_SLOTS[1].0)).unwrap(),
+                        b"collision"
+                    );
+                }
+            }
+        }
+    }
+    #[test]
+    fn empty_acknowledged_projection_excludes_partially_encoded_unacknowledged_event() {
+        let binding = matrix_tests::binding();
+        let limits = crate::ml_dataset::capture::capture_limits(16).unwrap();
+        let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let root = sink.dir.parent().unwrap();
+        let mut budget = construction_tests::budget();
+        let mut events = BoundNativeEvents::new(&binding, &limits, &mut budget).unwrap();
+        let initial = events.projection;
+        assert_eq!(
+            verify_native_projection_receipt(root, &binding, &limits, &initial).unwrap(),
+            crate::ml_dataset::digest(b"")
+        );
+        // The event envelope trace admission succeeds. Only one byte remains
+        // for the separate canonical copy, forcing precommit refusal after a
+        // real retained prefix. No live event can have been acknowledged.
+        budget.trace_limit = budget.trace_bytes + NATIVE_BOUNDARY_CAP as u64 + 1;
+        let mut global = 0;
+        assert!(events
+            .emit(
+                NativeBoundary::Construction {
+                    stage: ConstructionBoundaryStage::Begin,
+                    reserved: Default::default(),
+                },
+                &mut budget,
+                &mut global
+            )
+            .is_err());
+        assert!(events.pending.is_some());
+        assert!(!events.pending_bytes.is_empty());
+        assert!(events.canonical.is_empty());
+        assert_eq!(global, 0);
+        assert_eq!(events.projection, initial);
+        assert_eq!(
+            verify_native_projection_receipt(root, &binding, &limits, &events.projection).unwrap(),
+            crate::ml_dataset::digest(b"")
+        );
+        let mut forged = events.projection;
+        forged.payload_bytes = events.pending_bytes.len() as u64;
+        assert!(verify_native_projection_receipt(root, &binding, &limits, &forged).is_err());
+    }
+    #[test]
+    fn late_root_only_write_returns_actual_artifact_acknowledgement() {
+        let binding = matrix_tests::binding();
+        let limits = crate::ml_dataset::capture::capture_limits(16).unwrap();
+        let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let root = sink.dir.parent().unwrap();
+        let mut budget = construction_tests::budget();
+        let mut events = BoundNativeEvents::new(&binding, &limits, &mut budget).unwrap();
+        let mut global = 0;
+        events
+            .emit(
+                NativeBoundary::Construction {
+                    stage: ConstructionBoundaryStage::Begin,
+                    reserved: Default::default(),
+                },
+                &mut budget,
+                &mut global,
+            )
+            .unwrap();
+        budget.phase = Phase::Complete;
+        let deadline = budget.deadline;
+        let quote =
+            quote_parent_storage_length(events.canonical.len() as u64, false, &limits).unwrap();
+        let mut parent = ParentRetention::begin(&mut budget).unwrap();
+        let call = parent.execute_with_clock(
+            quote,
+            Instant::now(),
+            || {
+                crate::ml_dataset::storage::write_bytes(
+                    root,
+                    KOBLITZ_SLOTS[1].0,
+                    KOBLITZ_SLOTS[1].1,
+                    KOBLITZ_SLOTS[1].2,
+                    &events.canonical,
+                )
+            },
+            || deadline,
+        );
+        assert_eq!(call.stop, Some(Stop::Deadline));
+        assert!(call.error.is_none());
+        let artifact = call.value.expect("acknowledged write survives late clock");
+        assert_eq!(
+            artifact.sha256,
+            verify_native_projection_receipt(root, &binding, &limits, &events.projection).unwrap()
+        );
+        assert_eq!(
+            std::fs::read(root.join(&artifact.path)).unwrap(),
+            events.canonical
+        );
+        assert!(!sink.dir.join("payloads").join(&artifact.path).exists());
+        assert_eq!(parent.stop, Some(Stop::Deadline));
+    }
+}
+
+#[cfg(test)]
+mod worker_terminal_cap_controls {
+    use super::*;
+    use serde_json::json;
+    #[test]
+    fn maximal_counters_diagnostics_stops_phases_and_twelve_receipts_fit() {
+        let stops = [
+            Stop::InvalidLimits,
+            Stop::Overflow,
+            Stop::Deadline,
+            Stop::Phase,
+            Stop::Nonmonotone,
+            Stop::Work,
+            Stop::Bytes,
+            Stop::Trace,
+            Stop::Additions,
+            Stop::Observer,
+            Stop::NativeFailure,
+            Stop::Allocation,
+            Stop::Serialization,
+            Stop::Events,
+        ];
+        let phases = [
+            Phase::Setup,
+            Phase::Construction,
+            Phase::Constructed,
+            Phase::Matrix,
+            Phase::MatrixComplete,
+            Phase::Extraction,
+            Phase::Complete,
+        ];
+        for stop in stops {
+            for phase in phases {
+                let mut ledger = Budget::new(
+                    10000,
+                    64 * 1024 * 1024,
+                    16 * 1024 * 1024,
+                    Instant::now() + Duration::from_secs(30),
+                    Instant::now(),
+                )
+                .unwrap()
+                .saved_ledger();
+                ledger.phase = phase;
+                ledger.first_stop = Some(stop);
+                ledger.native_reserved = Reservation {
+                    work: u64::MAX,
+                    bytes: u64::MAX,
+                };
+                ledger.checking_reserved_work = u64::MAX;
+                ledger.checking_reported_work = u64::MAX;
+                ledger.adapter_reserved_bytes = u64::MAX;
+                ledger.charged_trace_bytes = u64::MAX;
+                ledger.group_additions = u64::MAX;
+                let receipt = json!({"path":KOBLITZ_SLOTS[0].0,"role":KOBLITZ_SLOTS[0].1,
+                "encoding":"json","sha256":"f".repeat(64),"bytes":u64::MAX});
+                let mut outcome = json!({"first_stop":stop,
+                "unregistered_root_acknowledgements":vec![receipt;12],
+                "failed_parent_storage":{"logical_path":"partial/koblitz-m3-native-event.raw",
+                    "payload_bytes":u64::MAX,"quote":{"work":u64::MAX,"bytes":u64::MAX,"trace":u64::MAX},
+                    "ledger_after_attempt":ledger,"remaining_shared_work_after_attempt":u64::MAX},
+                "live_persistence_errors":["Koblitz retention or receipt handoff incomplete",
+                    "Koblitz final capture delivery incomplete"],
+                "capture_finalization":{"event_attempted":true,"event_acknowledged":true,
+                    "finish_attempted":true,"finish_acknowledged":true,"stop":stop}});
+                // Fill every remaining top-level slot with the maximum scalar size.
+                for i in 0..59 {
+                    outcome[format!("{:064}", i)] = json!("x".repeat(128));
+                }
+                assert_eq!(outcome.as_object().unwrap().len(), 64);
+                assert!(guard_worker_terminal(&outcome).unwrap() < WORKER_TERMINAL_CAP);
+                let frame = json!({"kind":"solver_return","snapshot_boundary":"before-capture-finalization",
+                "outcome":outcome,"error":null});
+                assert!(worker_terminal_encoded_size(&frame, WORKER_TERMINAL_CAP).is_ok());
+            }
+        }
+    }
+    #[test]
+    fn cap_shape_and_identity_refuse_without_mutation() {
+        let good = json!({"unregistered_root_acknowledgements":[{"path":KOBLITZ_SLOTS[0].0,
+            "role":KOBLITZ_SLOTS[0].1,"encoding":"json","sha256":"a".repeat(64),"bytes":u64::MAX}]});
+        assert!(guard_worker_terminal(&good).is_ok());
+        for mutation in 0..4 {
+            let mut bad = good.clone();
+            match mutation {
+                0 => bad["unregistered_root_acknowledgements"][0]["path"] = json!("unknown.json"),
+                1 => bad["diagnostic"] = json!("x".repeat(129)),
+                2 => bad["diagnostic"] = json!("escaped\ntext"),
+                _ => bad["unregistered_root_acknowledgements"][0]["sha256"] = json!("z".repeat(64)),
+            }
+            let before = bad.clone();
+            assert!(guard_worker_terminal(&bad).is_err());
+            assert_eq!(bad, before);
+        }
+        assert!(worker_terminal_encoded_size(&good, 1).is_err());
+        assert!(worker_terminal_encoded_size(&good, 1024).is_ok());
+    }
+    #[test]
+    fn invariant_failure_keeps_acknowledgements_and_diagnostic_without_capture() {
+        let entry = Instant::now();
+        let mut budget = Budget::new(
+            10000,
+            64 * 1024 * 1024,
+            16 * 1024 * 1024,
+            entry + Duration::from_secs(30),
+            entry,
+        )
+        .unwrap();
+        budget.stopped = Some(Stop::Work);
+        let roots = json!([{"path":"unknown.json","role":"full unchanged rejected root",
+            "sha256":"f".repeat(64),"encoding":"json","bytes":u64::MAX}]);
+        let diagnostic = "x".repeat(129);
+        let mut outcome = json!({"unregistered_root_acknowledgements":roots,
+            "diagnostic":diagnostic,"solver_completed":true});
+        let before = budget.saved_ledger();
+        finalize_worker_capture(
+            &mut outcome,
+            &mut budget,
+            || entry,
+            |_| panic!("must not publish rejected outcome"),
+            || panic!("must not finish rejected outcome"),
+        );
+        assert_eq!(outcome["unregistered_root_acknowledgements"], roots);
+        assert_eq!(outcome["diagnostic"], diagnostic);
+        assert_eq!(outcome["solver_completed"], false);
+        assert_eq!(budget.stopped, Some(Stop::Work));
+        assert_eq!(budget.saved_ledger(), before);
+        assert_eq!(
+            outcome["capture_finalization"]["stop"],
+            json!(Stop::Serialization)
+        );
+    }
+    #[test]
+    fn expired_malformed_output_preserves_deadline_for_central_finalization_check() {
+        let entry = Instant::now();
+        let mut budget = Budget::new(
+            10000,
+            64 * 1024 * 1024,
+            16 * 1024 * 1024,
+            entry + Duration::from_secs(30),
+            entry,
+        )
+        .unwrap();
+        let deadline = budget.deadline;
+        let mut outcome = json!({"diagnostic":"x".repeat(WORKER_TERMINAL_CAP+1),
+            "solver_completed":true});
+        let original = outcome["diagnostic"].clone();
+        finalize_worker_capture(
+            &mut outcome,
+            &mut budget,
+            || deadline,
+            |_| panic!("expired event"),
+            || panic!("expired finish"),
+        );
+        assert_eq!(outcome["diagnostic"], original);
+        assert_eq!(outcome["first_stop"], json!(Stop::Deadline));
+        assert_eq!(
+            outcome["capture_finalization"]["stop"],
+            json!(Stop::Deadline)
+        );
+        assert_eq!(outcome["solver_completed"], false);
+        verify_reported_capture_finalization(&outcome).unwrap();
     }
 }
