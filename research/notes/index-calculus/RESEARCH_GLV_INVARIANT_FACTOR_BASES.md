@@ -3415,3 +3415,77 @@ also an accounting effect, is main's change of 2026-10-24 (§9.29): charging the
 every matched rho of these curves by `0.13`–`0.78 %` in the other direction.
 
 **Unit tests (E27–E30), run in one build at the end of the session:** recorded in the session log and the PR.
+
+### 9.33 E27–E30 validated: errata, and a §5a qualification on E29's reference
+
+*2026-10-31.*  Each experiment was replayed by an independent validator from a fresh build of its recorded binary
+commit, every non-timing field compared, and its headline figures recomputed by a tool that shares no producer
+code (operation counts only; local container, no wall time admitted).  §9.29–§9.32 stand as recorded; the
+following are additive corrections.
+
+| | evidence | replay | headline figures | gate |
+|:--|:--|:--|:--|:--|
+| E27 | `research/e27_walk_20261030/` (`VAL-20261031-e27a1c`) | 11/11 runs, 23,144 fields identical | 59 agree | **valid** |
+| E28 | `research/e28_tau_20261030/` | 12 records, 8,690 fields identical | 224/226 agree | **refused**: end-to-end `S` is a model |
+| E29 | `research/e29_twists_20261030/` | 6 records, 26,124 fields identical | 265/265 agree | not submitted: no index-calculus cost |
+| E30 | `research/e30_invariants_lite_20261030/` | 11 records, 12,281 fields identical | 174/174 agree | **valid** |
+
+E27 and E30 are on the IC leaderboard as a reference correction and an accounting audit.  E28 and E29 are named
+there as not shown.  Their measured stages are verified; their deciding quantities are models.
+
+**E27 errata** (none changes a verdict):
+
+1. §9.29 Stage W, "(i)/(ii) ≈ 1.27" holds for the `⟨±ψ⟩` walk (`1.265`–`1.283`); the negation walk is
+   `1.230`–`1.241`.  The registered quantity (i)/(iii) reproduces exactly.
+2. §9.29, "batching the IC side's inversions could save at most `0.127`–`0.170 %`" is the saving at the walk's
+   measured batch share.  The upper bound under the batch cost `3(m−1)+16` is `0.130`–`0.180 %` of `S`.
+3. In `experiments/32_walk_karatsuba/e2e_chain_karatsuba_p*s*.json`, `rho_matched_muls` is walk (ii)
+   (Karatsuba, unbatched) *with* the `[d]G` check, and `ratio` is `S` over that.  Neither is E27's distance,
+   which uses walk (iii) without the check.  Read from those records, the distance is understated at `0` GAE by
+   `1.137`–`1.166×`.  The records are not changed; this note and the leaderboard use walk (iii).
+
+**E28 errata** (none changes a verdict):
+
+1. §9.30 A2, by size: `1.77`, `2.39` are `1.78`, `2.40` (geometric means of rounded per-curve values were
+   printed).  All stay in `[1.4, 4.0]`, and `p = 101` stays above `4.0` (`4.287`).
+2. §9.30 G2.103, "`≥ 52×` at 197" is `51.6×`.
+3. §9.30, "`≥ 7·10⁵×` the matched rho in E25's arithmetic": the least row is `6.99·10⁵×`.  Against the
+   strongest walk (iii) every row is `≥ 1.02·10⁶×`.
+4. §9.30 G2.103, "≈ 100 between medians" is `60`–`112×` depending on which E31 solver-A rows are pooled (arm A
+   `59.9`, all 20 rows `79.6`, arm B `111.5`).
+5. The registered A2 model prices each call at the control's *median* `C`; E19's measured `S` is priced at the
+   mean.  Applied to E19's own rows the median formula under-prices them by `1.03`–`1.17×`, so E28's modelled
+   `S` is optimistic.  With E28's 3-call mean, E19/E28 by size becomes `1.48`, `4.20`, `2.40`, `1.82`, `3.02`.
+   G2.103's falsifications, including the `≥ 10×` failure at `p = 149`, stand under either pricing.
+
+The control deviation of §9.30 (30 uniform targets had no decomposition, so the registered agreement check was
+vacuous; 30 decomposable targets added) is disclosed and adequate.  The uniform calls are a negative control
+(≈ 0.45 decomposable expected), and the added calls match the oracle's decomposition sets exactly; three calls
+per curve is a small sample.  The validator confirmed independently that `⟨±ψ⟩` is the largest fold on all 40
+curves (`j ∈ F_{p²} \ F_p`, `Aut(E) = {±1}`, `ψ² = −1`).  So walk (iii) is the strongest reference; §9.30's
+headline uses walk (i).
+
+**E29 erratum and §5a qualification.**  §9.31's "the matched reference stays the order-6 walk" and "E18's
+`ψ`-arm distances stand" hold **at 0 GAE only**.  With one native operation per walk step priced (E27's
+convention), the pooled order-6/order-24 cost ratio is:
+
+| arithmetic | 0 GAE | 0.1 GAE | 1 GAE |
+|:--|--:|--:|--:|
+| schoolbook | `0.962` | `0.996` | `1.205` |
+| Karatsuba | `0.884` | `0.927` | `1.172` |
+
+At `1` GAE the order-24 walk is cheaper on 7 of 8 curves.  The order of the two walks changes inside the band,
+so neither is the stronger reference across it.  The order-24 walk also has unemitted per-step work (12
+candidate comparisons) that the band does not price, so the ranking is **unresolved, not reversed**.  E18's
+`ψ`-arm distances are lower bounds at `1` GAE: a cheaper rho there lengthens them.  The kill
+test was re-derived on the canonical models `y² = x³ + b₀t³`: `⟨λ, λ_ω, −1⟩` has order 24 on all 8 curves and
+`n` equals E18's.  E18's own coefficients are not in the records, so "order 24 in E18's normalisation" rests on
+the replayed binary check.
+
+**E30 erratum.**  §9.32's "about one in seven of its counted products is trivial" cannot be checked: product
+counts are not emitted.  The `F_{p⁴}`-priced phases are `1.53`–`1.90 %` of `S` ("≈ 2 %"), and the saving is
+`0.164`–`0.202` of their multiplications.
+
+**Where the line stands.**  Against the strengthened walk (iii), the `k = 4` `V₄`/GLS line with E31's solver A
+is `6.39·10³`–`4.06·10⁵×` rho at `0` GAE, rho ahead at every weight.  The modelled handover (`2^{88}`–`2^{90}`) is
+an extrapolation from `p = 101`–`521` (`22`–`32`-bit `n`), and every `S` above is `≥ 99 %` solve.
