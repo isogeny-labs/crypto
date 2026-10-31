@@ -82,6 +82,7 @@ SOURCES = {
     "glv_gls": "research/glv_gls_v4_20261018/summary.json",
     "glv_e31": "research/e31_chain_solve_20261024/summary.json",
     "glv_e27": "experiments/32_walk_karatsuba/summary.json",
+    "glv_e30": "experiments/35_invariants_lite/summary.json",
     "lazy_members": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
     "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
     "postgb_linear_stage": "research/postgb_linear_stage_20261026/analysis/summary.json",
@@ -891,6 +892,12 @@ def k4_v4_component() -> dict:
             or gate.check_evidence_dir(REPO / e27_study, REPO)):
         raise SystemExit("review the E27 walk summary and its VALIDATION.json before updating the leaderboard")
     span = lambda key, i: [min(z[key][i] for z in e27["rows"]), max(z[key][i] for z in e27["rows"])]
+    e30 = load(SOURCES["glv_e30"])
+    e30_study = "research/e30_invariants_lite_20261030"
+    if (e30.get("experiment") != "e30" or not all(z["other_fields_equal"] for z in e30["rows"])
+            or gate.check_evidence_dir(REPO / e30_study, REPO)):
+        raise SystemExit("review the E30 audit summary and its VALIDATION.json before updating the leaderboard")
+    span30 = lambda f: [min(f(z) for z in e30["rows"]), max(f(z) for z in e30["rows"])]
     return {**sm, "source": SOURCES["glv_k4"],
             "report": "research/glv_k4_pipeline_d4_20261017/REPORT.pdf",
             "gls": {**gls, "source": SOURCES["glv_gls"],
@@ -920,7 +927,15 @@ def k4_v4_component() -> dict:
                     "dist_new": [span("dist_new", i) for i in range(3)],
                     "rows": [{k: z[k] for k in ("p", "seed", "arm", "S_A", "S_AK", "rho_e25", "rho_e27",
                                                 "dist_old", "dist_new", "growth")}
-                             for z in e27["rows"]]}}
+                             for z in e27["rows"]]},
+            "e30": {"source": SOURCES["glv_e30"],
+                    "report": f"{e30_study}/REPORT.pdf",
+                    "validation": f"{e30_study}/VALIDATION.json",
+                    "share": span30(lambda z: 100 * z["saving_share"]),
+                    "change": [span30(lambda z, i=i: 100 * z["distance_change"][i]) for i in range(3)],
+                    "rows": [{k: z[k] for k in ("p", "seed", "arm", "S_K", "saving", "saving_share",
+                                                "walk_saving", "distance_change")}
+                             for z in e30["rows"]]}}
 
 def postgb_linear_stage_component() -> dict:
     """The linear stage after F4 across Gröbner-basis corpora, from
@@ -3009,6 +3024,18 @@ def markdown(doc: dict) -> str:
                  f"{z['rho_e27']:.4g} | {z['dist_old'][0]:.3e} → {z['dist_new'][0]:.3e} | "
                  f"{z['growth'][0]:.3f}, {z['growth'][1]:.3f}, {z['growth'][2]:.3f} |")
     L.append("")
+    e = k["e30"]
+    P2 = lambda r, f="{:.3f}": f"{f.format(r[0])} to {f.format(r[1])} %"
+    L += [("Trivial products repriced (E30, accounting). An audit of E27's records reprices every F_p multiplication by 0, 1 or an F_p element inside an F_p⁴ product at what it would really cost: such products are {s} of S on the index-calculus side and at most 0.0002 % of the walk, so the distance to the matched rho changes by {c0} at 0 GAE, {c1} at 0.1 and {c2} at 1. Every other field reproduces E27's. Class: accounting, not an improvement; validated (independent replay, note §9.28 and §9.32). E28 (ψ fold on E19's τ_T line) and E29 (order-24 twist action on E18's j = 0 line) were replayed and their measured stages verified, but are not shown: E28's end-to-end S is a model and E29 has no index-calculus cost, so neither can pass the validation gate (note §9.30–§9.31; research/e28_tau_20261030, research/e29_twists_20261030).").format(s=P2(e["share"]), c0=P2(e["change"][0]), c1=P2(e["change"][1], "{:.4f}"), c2=P2(e["change"][2], "{:.4f}"))
+          + f" Read the [report](../../{e['report']}), [summary](../../{e['source']}) and "
+            f"[validation](../../{e['validation']}).", "",
+          "| p | seed | arm | S (E27) | trivial-product saving | share of S | walk saving | distance change (0, 0.1, 1 GAE) |",
+          "|--:|--:|:--|--:|--:|--:|--:|:--|"]
+    for z in e["rows"]:
+        L.append(f"| {z['p']} | {z['seed']} | {z['arm']} | {z['S_K']:.3e} | {z['saving']:.3e} | "
+                 f"{100 * z['saving_share']:.3f} % | {z['walk_saving']:.3g} | "
+                 + ", ".join(f"{100 * x:.4f} %" for x in z["distance_change"]) + " |")
+    L.append("")
     return "\n".join(L) + "\n"
 
 
@@ -4189,6 +4216,19 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{z["S_AK"]:.3e}</td><td>{z["rho_e25"]:.4g}</td><td>{z["rho_e27"]:.4g}</td>'
                  f'<td>{z["dist_old"][0]:.3e} → {z["dist_new"][0]:.3e}</td>'
                  f'<td>{z["growth"][0]:.3f}, {z["growth"][1]:.3f}, {z["growth"][2]:.3f}</td></tr>')
+    P.append('</tbody></table></div>' + gh(e["source"], 'Frozen study summary') + ' · '
+             + gh(e["validation"], 'Validation'))
+    e = k["e30"]
+    P2 = lambda r, f="{:.3f}": f"{f.format(r[0])} to {f.format(r[1])} %"
+    P.append('<h3>Trivial products repriced (E30)</h3><p>' + esc(("Trivial products repriced (E30, accounting). An audit of E27's records reprices every F_p multiplication by 0, 1 or an F_p element inside an F_p⁴ product at what it would really cost: such products are {s} of S on the index-calculus side and at most 0.0002 % of the walk, so the distance to the matched rho changes by {c0} at 0 GAE, {c1} at 0.1 and {c2} at 1. Every other field reproduces E27's. Class: accounting, not an improvement; validated (independent replay, note §9.28 and §9.32). E28 (ψ fold on E19's τ_T line) and E29 (order-24 twist action on E18's j = 0 line) were replayed and their measured stages verified, but are not shown: E28's end-to-end S is a model and E29 has no index-calculus cost, so neither can pass the validation gate (note §9.30–§9.31; research/e28_tau_20261030, research/e29_twists_20261030).").format(s=P2(e["share"]), c0=P2(e["change"][0]), c1=P2(e["change"][1], "{:.4f}"), c2=P2(e["change"][2], "{:.4f}"))) + '</p>'
+             '<div class="scroll"><table><thead><tr><th>p</th><th>seed</th><th>arm</th><th>S (E27)</th>'
+             '<th>trivial-product saving</th><th>share of S</th><th>walk saving</th>'
+             '<th>distance change (0, 0.1, 1 GAE)</th></tr></thead><tbody>')
+    for z in e["rows"]:
+        P.append(f'<tr><td>{z["p"]}</td><td>{z["seed"]}</td><td>{z["arm"]}</td><td>{z["S_K"]:.3e}</td>'
+                 f'<td>{z["saving"]:.3e}</td><td>{100 * z["saving_share"]:.3f} %</td>'
+                 f'<td>{z["walk_saving"]:.3g}</td><td>'
+                 + ", ".join(f"{100 * x:.4f} %" for x in z["distance_change"]) + '</td></tr>')
     P.append('</tbody></table></div>' + gh(e["source"], 'Frozen study summary') + ' · '
              + gh(e["validation"], 'Validation') + '</section>')
     b = doc["bitop_prime_ladder"]

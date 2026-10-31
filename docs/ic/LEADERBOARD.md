@@ -779,6 +779,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/glv_gls_v4_20261018/summary.json` — sha256 `c8de6d58008176d6…`
 - `research/e31_chain_solve_20261024/summary.json` — sha256 `0ebac1878e112a7d…`
 - `experiments/32_walk_karatsuba/summary.json` — sha256 `b20666d943bd0c3e…`
+- `experiments/35_invariants_lite/summary.json` — sha256 `62eb026c0dd363a6…`
 - `research/ecbench_lazy_orbit_members_20261018/figures/ratios.json` — sha256 `c86743775097e0e1…`
 - `research/jv_cover_sparse_fglm_20261018/summary.json` — sha256 `4217cb1de3458ee8…`
 - `research/postgb_linear_stage_20261026/analysis/summary.json` — sha256 `ef9aae284eceddb7…`
@@ -992,4 +993,29 @@ The matched walk made stronger (E27, reference correction). Karatsuba F_p⁴ pro
 | 397 | 1 | B | 1.628e+10 | 1.619e+10 | 3.687e+06 | 2.533e+06 | 4.415e+03 → 6.392e+03 | 1.448, 1.415, 1.236 |
 | 397 | 2 | A | 5.151e+10 | 5.123e+10 | 3.302e+06 | 2.268e+06 | 1.560e+04 → 2.258e+04 | 1.448, 1.416, 1.238 |
 | 397 | 2 | B | 2.217e+10 | 2.204e+10 | 3.302e+06 | 2.268e+06 | 6.713e+03 → 9.719e+03 | 1.448, 1.416, 1.238 |
+
+Trivial products repriced (E30, accounting). An audit of E27's records reprices every F_p multiplication by 0, 1 or an F_p element inside an F_p⁴ product at what it would really cost: such products are 0.309 to 0.313 % of S on the index-calculus side and at most 0.0002 % of the walk, so the distance to the matched rho changes by -0.313 to -0.309 % at 0 GAE, -0.0855 to -0.0838 % at 0.1 and -0.0114 to -0.0110 % at 1. Every other field reproduces E27's. Class: accounting, not an improvement; validated (independent replay, note §9.28 and §9.32). E28 (ψ fold on E19's τ_T line) and E29 (order-24 twist action on E18's j = 0 line) were replayed and their measured stages verified, but are not shown: E28's end-to-end S is a model and E29 has no index-calculus cost, so neither can pass the validation gate (note §9.30–§9.31; research/e28_tau_20261030, research/e29_twists_20261030). Read the [report](../../research/e30_invariants_lite_20261030/REPORT.pdf), [summary](../../experiments/35_invariants_lite/summary.json) and [validation](../../research/e30_invariants_lite_20261030/VALIDATION.json).
+
+| p | seed | arm | S (E27) | trivial-product saving | share of S | walk saving | distance change (0, 0.1, 1 GAE) |
+|--:|--:|:--|--:|--:|--:|--:|:--|
+| 101 | 1 | A | 2.696e+10 | 8.325e+07 | 0.309 % | 0.562 | -0.3086 %, -0.0838 %, -0.0110 % |
+| 101 | 1 | B | 1.383e+10 | 4.293e+07 | 0.310 % | 0.562 | -0.3102 %, -0.0840 %, -0.0110 % |
+| 101 | 2 | A | 9.818e+09 | 3.046e+07 | 0.310 % | 0 | -0.3103 %, -0.0842 %, -0.0111 % |
+| 101 | 2 | B | 4.660e+09 | 1.443e+07 | 0.310 % | 0 | -0.3096 %, -0.0841 %, -0.0111 % |
+| 149 | 1 | A | 2.290e+11 | 7.142e+08 | 0.312 % | 1.12 | -0.3117 %, -0.0846 %, -0.0111 % |
+| 149 | 1 | B | 8.600e+10 | 2.678e+08 | 0.311 % | 1.12 | -0.3112 %, -0.0846 %, -0.0111 % |
+| 149 | 2 | A | 3.956e+10 | 1.229e+08 | 0.311 % | 0 | -0.3106 %, -0.0846 %, -0.0112 % |
+| 149 | 2 | B | 2.235e+10 | 6.931e+07 | 0.310 % | 0 | -0.3101 %, -0.0846 %, -0.0112 % |
+| 197 | 1 | A | 3.336e+10 | 1.035e+08 | 0.310 % | 0 | -0.3102 %, -0.0849 %, -0.0113 % |
+| 197 | 1 | B | 2.475e+10 | 7.667e+07 | 0.310 % | 0 | -0.3098 %, -0.0848 %, -0.0113 % |
+| 197 | 2 | A | 1.714e+10 | 5.324e+07 | 0.311 % | 0 | -0.3107 %, -0.0850 %, -0.0113 % |
+| 197 | 2 | B | 1.012e+10 | 3.145e+07 | 0.311 % | 0 | -0.3108 %, -0.0850 %, -0.0113 % |
+| 269 | 1 | A | 5.329e+10 | 1.663e+08 | 0.312 % | 0 | -0.3121 %, -0.0853 %, -0.0113 % |
+| 269 | 1 | B | 3.069e+10 | 9.575e+07 | 0.312 % | 0 | -0.3120 %, -0.0853 %, -0.0113 % |
+| 269 | 2 | A | 1.978e+10 | 6.192e+07 | 0.313 % | 0 | -0.3131 %, -0.0855 %, -0.0113 % |
+| 269 | 2 | B | 9.774e+09 | 3.059e+07 | 0.313 % | 0 | -0.3130 %, -0.0855 %, -0.0113 % |
+| 397 | 1 | A | 2.793e+10 | 8.662e+07 | 0.310 % | 0 | -0.3102 %, -0.0854 %, -0.0114 % |
+| 397 | 1 | B | 1.619e+10 | 5.030e+07 | 0.311 % | 0 | -0.3107 %, -0.0855 %, -0.0114 % |
+| 397 | 2 | A | 5.123e+10 | 1.590e+08 | 0.310 % | 0 | -0.3104 %, -0.0854 %, -0.0114 % |
+| 397 | 2 | B | 2.204e+10 | 6.842e+07 | 0.310 % | 0 | -0.3104 %, -0.0854 %, -0.0114 % |
 
