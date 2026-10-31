@@ -23,3 +23,11 @@ proper saturation or selected991 action. The separate original expanded
 coefficient gate stays recorded at its actual outcome. Same manual local
 scope,seed51,one thread,4GiB virtual/1200s,serialized jobs. Exit0,no question
 marks and BASE23_STRUCT51_ALL_CHECKS_PASS;preserve every partial output/cap.
+
+Repair after rejected base23-struct51-01: raw quotient expressions failed
+the base-unit and normalized-nu equality gates before a late marker. Preserve
+the candidate dimension112 output but do not accept that attempt. The repair
+uses explicit ambient reductions by f23 at every base power/product and for
+G,N/normalized N. Require a full polynomial identity
+C*N_normalized+N_raw=f23*quotient and reject an altered constant. No implicit
+quotient-representation equality is used for these unit/normalization gates.
