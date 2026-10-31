@@ -439,6 +439,24 @@ struct TypedEventRecord<'a, T: Serialize + ?Sized> {
     event: TypedSolverEvent<'a, T>,
 }
 
+#[cfg(test)]
+pub(super) fn maximum_sequence_typed_wire<T: Serialize + ?Sized>(
+    kind: TypedEventKind,
+    payload: &T,
+) -> Vec<u8> {
+    let digest = "f".repeat(64);
+    let record = TypedEventRecord {
+        schema: EVENT_SCHEMA,
+        binding_sha256: &digest,
+        sequence: u64::MAX,
+        previous_event_sha256: &digest,
+        event: TypedSolverEvent { kind, payload },
+    };
+    let mut bytes = serde_json::to_vec(&record).unwrap();
+    bytes.push(b'\n');
+    bytes
+}
+
 // Dedicated bounded first-witness publication; not a dispatched solver profile.
 const WITNESS_PATH: &str = "payloads/pdp-witness.json";
 const WITNESS_ROLE: &str = "independently-verified-pdp";
@@ -1515,10 +1533,30 @@ impl CaptureEmitter {
         buffer: &mut TypedEventBuffer,
         before_commit: &mut impl FnMut(&[u8]) -> Result<(), CaptureError>,
     ) -> Result<(), CaptureError> {
+        self.event_typed_precommit_with_limit(kind, payload, buffer, usize::MAX, before_commit)
+    }
+
+    /// Enforce a caller's smaller per-event encoding ceiling in both passes.
+    /// This changes no storage allocation or committed capture allowance. A
+    /// refused encoding cannot invoke the precommit callback or mutate the head.
+    pub(super) fn event_typed_precommit_with_limit<T: Serialize + ?Sized>(
+        &mut self,
+        kind: TypedEventKind,
+        payload: &T,
+        buffer: &mut TypedEventBuffer,
+        event_cap: usize,
+        before_commit: &mut impl FnMut(&[u8]) -> Result<(), CaptureError>,
+    ) -> Result<(), CaptureError> {
         self.ready()?;
         buffer.bytes.clear();
         let result = (|| {
-            let limit = buffer.limit.min(self.limits.max_event_bytes as usize);
+            let limit = buffer
+                .limit
+                .min(self.limits.max_event_bytes as usize)
+                .min(event_cap);
+            if limit == 0 {
+                return Err(CaptureError::LimitReached(CaptureStop::EventLimit));
+            }
             let record = TypedEventRecord {
                 schema: EVENT_SCHEMA,
                 binding_sha256: &self.head.binding_sha256,
@@ -2345,6 +2383,50 @@ mod tests {
 
     fn typed_buffer(cap: u64) -> TypedEventBuffer {
         TypedEventBuffer::try_new(cap, TypedEventBuffer::requested_bytes(cap).unwrap()).unwrap()
+    }
+
+    #[test]
+    fn typed_per_event_ceiling_refuses_before_callback_and_commit() {
+        let payload = serde_json::json!({"bounded": 12345});
+        let first = Fixture::new();
+        let mut emitter = first.emitter();
+        let mut buffer = typed_buffer(1024);
+        emitter
+            .event_typed_precommit_with_limit(
+                TypedEventKind::KoblitzM3Native,
+                &payload,
+                &mut buffer,
+                1024,
+                &mut |_| Ok(()),
+            )
+            .unwrap();
+        let exact = buffer.encoded_len();
+        assert!(exact < 1024);
+        for cap in [0, exact - 1, exact] {
+            let fixture = Fixture::new();
+            let mut emitter = fixture.emitter();
+            let mut buffer = typed_buffer(1024);
+            let mut called = false;
+            let result = emitter.event_typed_precommit_with_limit(
+                TypedEventKind::KoblitzM3Native,
+                &payload,
+                &mut buffer,
+                cap,
+                &mut |_| {
+                    called = true;
+                    Ok(())
+                },
+            );
+            assert_eq!(result.is_ok(), cap == exact);
+            assert_eq!(called, cap == exact);
+            assert_eq!(emitter.committed_event_count(), u64::from(cap == exact));
+            assert_eq!(
+                std::fs::read(fixture.live().join("events.jsonl"))
+                    .unwrap()
+                    .len(),
+                if cap == exact { exact } else { 0 }
+            );
+        }
     }
 
     #[test]

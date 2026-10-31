@@ -5557,6 +5557,17 @@ fn verify_boundary_stream(
 }
 
 const NATIVE_BOUNDARY_CAP: usize = 2048;
+// Whole live envelope, including both hashes, all sequence fields and newline.
+// Fixed ASCII enum names and u64 decimal maxima bound construction at 632
+// bytes and the longest matrix variant below 1408. Exhaustive variant controls
+// exercise the actual capture encoder at numeric maxima. Both serialization
+// passes enforce this ceiling, so schema growth fails before capture mutation.
+fn native_boundary_encoding_cap(event: &NativeBoundary) -> usize {
+    match event {
+        NativeBoundary::Construction { .. } => 640,
+        NativeBoundary::Matrix { .. } => 1408,
+    }
+}
 const NATIVE_BOUNDARY_RECORDS: usize = 4096;
 #[derive(Clone, Copy)]
 struct PendingNativeBoundary {
@@ -5659,7 +5670,8 @@ impl<'a> BoundNativeEvents<'a> {
         // Typed capture encoding retains its existing 8-per-byte model. The
         // canonical payload is now copied from that encoding (1 per byte),
         // eliminating the separate 8-per-byte canonical serialization pass.
-        budget.reserve_checking(1024 + 9 * NATIVE_BOUNDARY_CAP as u64, 4096, Instant::now())?;
+        let encoding_cap = native_boundary_encoding_cap(&event);
+        budget.reserve_checking(1024 + 9 * encoding_cap as u64, 4096, Instant::now())?;
         let identity = super::LIVE_SINK.with(|slot| match slot.borrow().as_ref() {
             Some(super::EventSink::Bound(sink)) => sink.verify_digest_limits_at_count(
                 &self.binding_digest,
@@ -5682,10 +5694,11 @@ impl<'a> BoundNativeEvents<'a> {
             event: &snapshot.event,
         };
         let captured = super::LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
-            Some(super::EventSink::Bound(sink)) => sink.event_typed_precommit(
+            Some(super::EventSink::Bound(sink)) => sink.event_typed_precommit_with_limit(
                 crate::ml_dataset::capture::TypedEventKind::KoblitzM3Native,
                 &view,
                 &mut self.buffer,
+                encoding_cap,
                 &mut |wire| {
                     use crate::ml_dataset::capture::CaptureError;
                     let payload = match native_capture_payload(wire) {
@@ -5764,6 +5777,94 @@ mod native_boundary_emitter_tests {
             ),
         }
     }
+    #[test]
+    fn native_encoding_caps_cover_all_variants_at_numeric_maxima() {
+        use crate::ml_dataset::capture::{maximum_sequence_typed_wire, TypedEventKind};
+        use ConstructionBoundaryStage as C;
+        use MatrixBoundaryStage as M;
+        let reserved = native_matrix::Reservation {
+            work: u64::MAX,
+            bytes: u64::MAX,
+        };
+        let counters = native_matrix::Counters {
+            main_attempts: u64::MAX,
+            nonempty_rows: u64::MAX,
+            selected_rows: u64::MAX,
+            pruned_nonempty_rows: u64::MAX,
+            criterion_attempts: u64::MAX,
+            criterion_rows: u64::MAX,
+            criterion_zero_reductions: u64::MAX,
+            koszul_pruned: u64::MAX,
+            frobenius_pruned: u64::MAX,
+            criterion_word_xors: u64::MAX,
+            reduction_word_xors: u64::MAX,
+            attempted_events: u64::MAX,
+            acknowledged_events: u64::MAX,
+            dynamic_layout_bytes: u64::MAX,
+            allocation_requests: u64::MAX,
+        };
+        let construction = [
+            C::Begin,
+            C::Table,
+            C::Selector,
+            C::Add,
+            C::Square,
+            C::Product,
+            C::Coordinates,
+            C::Complete,
+        ]
+        .map(|stage| NativeBoundary::Construction { stage, reserved });
+        let matrix = [
+            M::Begin,
+            M::CriterionLevel { level: u32::MAX },
+            M::CriterionCandidate {
+                generator: usize::MAX,
+                multiplier: u8::MAX,
+                frobenius: false,
+            },
+            M::CriterionCandidate {
+                generator: usize::MAX,
+                multiplier: u8::MAX,
+                frobenius: true,
+            },
+            M::MainCandidate {
+                generator: usize::MAX,
+                multiplier: u8::MAX,
+            },
+            M::Pack,
+            M::Reduce,
+            M::Readback,
+            M::Finish,
+        ]
+        .map(|stage| NativeBoundary::Matrix {
+            stage,
+            reserved,
+            counters,
+        });
+        let digest = "f".repeat(64);
+        for event in construction.into_iter().chain(matrix) {
+            let view = NativeBoundaryView {
+                schema: "crypto.ml-dataset.koblitz-m3-events/v1",
+                binding_sha256: &digest,
+                sequence: u64::MAX,
+                capture_sequence: u64::MAX,
+                event: &event,
+            };
+            let wire = maximum_sequence_typed_wire(TypedEventKind::KoblitzM3Native, &view);
+            assert!(
+                wire.len() <= native_boundary_encoding_cap(&event),
+                "variant {event:?}: {} bytes exceeds {}",
+                wire.len(),
+                native_boundary_encoding_cap(&event)
+            );
+            let mut canonical = serde_json::to_vec(&view).unwrap();
+            canonical.push(b'\n');
+            let mut extracted = native_capture_payload(&wire).unwrap().to_vec();
+            extracted.push(b'\n');
+            assert_eq!(extracted, canonical);
+        }
+    }
+
     #[test]
     fn native_callbacks_are_bound_to_the_actual_capture_stream() {
         for engine in [
