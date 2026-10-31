@@ -1,0 +1,24 @@
+{
+  "schema": "software.prospective-source-review/v1",
+  "status": "helper_revision_required",
+  "independent_patch_review": true,
+  "prior_mechanism_authorship_disclosed": true,
+  "native_execution": false,
+  "hash_entries_verified": 13,
+  "extraction_exact": true,
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocking_helper_compilation",
+      "location": "helper.rs C4 child_holding",
+      "detail": "Explicit Drop::drop call prohibited by Rust E0040; source-only finding."
+    },
+    {
+      "id": "F2",
+      "severity": "coverage_limit",
+      "detail": "Non-WouldBlock acquisition-error branch and wait=true not exercised by fixed controls."
+    }
+  ],
+  "original_failure_cause": "unproved",
+  "scientific_cost_ratio": null
+}

@@ -1,0 +1,28 @@
+{
+  "schema": "ideas.targets-prime.protocol/v1",
+  "frozen_before_execution": true,
+  "seed": 20261018,
+  "language": "C++20, no Python research execution",
+  "budget": {"single_process": true, "maximum_memory_mib": 512, "operation_only_no_wall_time_claim": true},
+  "item_1": {
+    "requested": "Four-or-more-size F_p2 paired ecbench ladder, 2-torsion, Q-curve folding, double large primes, FourQ extrapolation",
+    "executed_diagnostic": "Random short-Weierstrass F_p2 fixtures with a specified rational 2-torsion point; cofactor-projected x-in-F_p base, two-sum table oracle and counted negation-folded Pollard rho on the identical public known-answer target",
+    "primes": [17,29,43,61], "seeds": [1,2,3,4,5,6],
+    "curve_selection": "First nonsingular seeded a,e with b=-e^3-ae and largest prime subgroup r>=p, cofactor even; at most 512 candidate curves",
+    "target": "seeded k in [1,r), Q=kG; k is withheld from oracle and rho, used only to verify answers",
+    "rho": "16-entry r-adding random walk; a collision table indexes points modulo negation while the walk itself remains unfolded, avoiding canonical-walk two-cycles; <=32 restarts and <=100000 steps per restart. Collision-table entries are reported; this is not constant-memory Floyd rho.",
+    "not_discharged": ["ecbench registration", "Gaudry algebraic oracle", "Q-curve or GLS endomorphism certification", "2LP", "FourQ extrapolation", "full IC relation collection and extraction"]
+  },
+  "item_14": {
+    "requested": "Genuine prime-field m>=4 constrained multivariate decomposition cost cells",
+    "primes": [251,509,1021,2039,4093], "seeds": [1,2,3], "arity": 4,
+    "factor_base": "All curve points with integer abscissa 0<=x<B, B=ceil(p^(1/5)); both signs; prime-order curve selected by exact point count",
+    "targets_per_curve": {"natural": 32,"planted_positive_control": 1},
+    "solver": "Ordered two-plus-two point MITM; every outcome compared with independent exhaustive ordered four-point enumeration",
+    "system": "Full multivariate chained S3 presentation with x1,x2,x3,x4,u,v; include both finite intermediate and cancelling-pair exceptional branches; factor-base membership polynomial in every xi",
+    "certificate": "Every hit includes the four actual curve points, independent sum verification, factor-base bounds and chained-S3 checks including exceptional-branch classification",
+    "not_discharged": ["Coppersmith/lattice small-root solver", "true Groebner solving degree", "deployed-size extrapolation", "full ECDLP pipeline"]
+  },
+  "accounting": "Separate curve/subgroup construction, factor-base construction, table setup, target-online operations and verification. Count group-operation calls and finite-field multiplication/inversion calls; these remain separate units. No group/field conversion or speedup claim.",
+  "failures": "Preserve construction failures, bounded rho failures, empty bases and zero natural yield. Reject any certificate or independent-oracle disagreement."
+}

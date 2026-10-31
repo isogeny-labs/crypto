@@ -1,0 +1,24 @@
+/var/tmp/pencil-add11-word-validity-20261031-v1/Controls.lean:24:12: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  HDiv (ZMod 7) (ZMod (UInt64.toNat 7)) (ZMod 7)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-add11-word-validity-20261031-v1/Controls.lean:26:33: error: Expected type must not contain metavariables
+  ?m.221 ≠ 0
+/var/tmp/pencil-add11-word-validity-20261031-v1/Controls.lean:28:12: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  HDiv (ZMod 7) (ZMod (UInt64.toNat 7)) (ZMod 7)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-add11-word-validity-20261031-v1/Controls.lean:30:33: error: Expected type must not contain metavariables
+  ?m.289 ≠ 0
+/var/tmp/pencil-add11-word-validity-20261031-v1/Controls.lean:34:10: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  HDiv (ZMod 7) (ZMod (UInt64.toNat 7)) (ZMod (UInt64.toNat 7))
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-add11-word-validity-20261031-v1/Controls.lean:36:7: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  0 / ?a
+in the target expression
+  0 / 2 ^ 2 ≠ 2 / 3 ^ 2
+
+case hx
+he : 3 ^ 2 = 2
+⊢ 0 / 2 ^ 2 ≠ 2 / 3 ^ 2

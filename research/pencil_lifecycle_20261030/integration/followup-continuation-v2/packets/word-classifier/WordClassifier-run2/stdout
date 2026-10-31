@@ -1,0 +1,15 @@
+/var/tmp/pencil-word-classifier-v2-20261031/WordClassifier.lean:18:66: error: unsolved goals
+p a b : UInt64
+hp : 0 < p.toNat
+hbound : p.toNat < 2 ^ 31
+ha : a.toNat < p.toNat
+hn : (wordNeg p b).toNat < p.toNat
+hsum : a.toNat + (wordNeg p b).toNat < 2 ^ 64
+⊢ (a.toNat + residueNeg p.toNat b.toNat) % 2 ^ 64 % p.toNat = (a.toNat + residueNeg p.toNat b.toNat) % p.toNat
+/var/tmp/pencil-word-classifier-v2-20261031/WordClassifier.lean:23:58: warning: This simp argument is unused:
+  Nat.mod_eq_of_lt hsum
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [wordSub, UInt64.toNat_mod, UInt64.toNat_add, wordNeg_value p b hp, residueSub]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
