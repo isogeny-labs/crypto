@@ -4751,3 +4751,281 @@ mod terminal_native_settlement_tests {
         }
     }
 }
+
+/// Mathematical and witness-publication component of canonical cell replay.
+/// The caller supplies a sealed, non-mutating cell and admitted original manifest.
+/// Result/event semantics, aggregate resources, original-run admission and outer
+/// supervisor claims are separate mandatory gates before any final label.
+pub(super) struct VerifiedCanonicalMath {
+    group: VerifiedGroupReplay,
+    witness_publication_sequence: Option<u64>,
+}
+pub(super) fn verify_canonical_math_files(
+    dir: &std::path::Path,
+    artifacts: &[crate::ml_dataset::types::Artifact],
+    original: &MathInput,
+    binding: &crate::ml_dataset::capture::AttemptBinding,
+    capture_limits: &crate::ml_dataset::capture::CaptureLimits,
+    limits: OriginalLimits,
+    public_sha256: &str,
+    factor_base_sha256: &str,
+) -> Result<VerifiedCanonicalMath, String> {
+    use super::prime_f4_wide::{artifact, read_bounded};
+    use crate::ml_dataset::storage;
+    require_canonical_slots(artifacts)?;
+    for path in ["live/committed.json", "live/events.jsonl"] {
+        if artifacts.iter().filter(|a| a.path == path).count() != 1 {
+            return Err(format!(
+                "Koblitz capture root lacks unique manifest binding: {path}"
+            ));
+        }
+    }
+    // The caller has bounded/admitted the original manifest. Verify every
+    // referenced file before deriving meaning from any canonical payload.
+    storage::verify_manifest(dir, artifacts)?;
+    let read = |path: &str, role: &str, encoding: &str, cap: usize| -> Result<Vec<u8>, String> {
+        let expected =
+            artifact(artifacts, path, role, encoding, true)?.ok_or("missing canonical file")?;
+        let bytes = read_bounded(dir, path, cap)?;
+        if bytes.len() as u64 != expected.bytes || super::digest(&bytes) != expected.sha256 {
+            return Err(format!("canonical bytes differ from manifest: {path}"));
+        }
+        Ok(bytes)
+    };
+    let input = read(
+        "koblitz-m3-input.json",
+        "restricted-koblitz-m3-original-equations/v1",
+        "json",
+        INPUT_BYTE_CAP,
+    )?;
+    verify_original_input(
+        &input,
+        original,
+        binding,
+        public_sha256,
+        factor_base_sha256,
+        limits,
+    )?;
+    let input_sha256 = super::digest(&input);
+    let group_bytes = read(
+        "koblitz-m3-group-replay.json",
+        "restricted-koblitz-m3-group-replay/v1",
+        "json",
+        SIGNED_REPLAY_BYTE_CAP,
+    )?;
+    let witness_artifact = artifact(
+        artifacts,
+        "pdp-witness.json",
+        "independently-verified-pdp",
+        "json",
+        false,
+    )?;
+    let witness = witness_artifact
+        .map(|_| {
+            read(
+                "pdp-witness.json",
+                "independently-verified-pdp",
+                "json",
+                SIGNED_WITNESS_BYTE_CAP,
+            )
+        })
+        .transpose()?;
+    let group = verify_group_replay(
+        &group_bytes,
+        witness.as_deref(),
+        original,
+        binding,
+        public_sha256,
+        factor_base_sha256,
+        &input_sha256,
+        limits.additions,
+    )?;
+    let envelope: SavedGroupReplay = serde_json::from_slice(&group_bytes)
+        .map_err(|e| format!("strict canonical group replay: {e}"))?;
+    let signed = serde_json::to_vec(&envelope.signed).map_err(|e| e.to_string())?;
+    let custody = verify_signed_capture(dir, &signed, binding, capture_limits)?;
+    let published = custody
+        .payloads
+        .iter()
+        .filter(|(_, a)| {
+            a.path == "payloads/pdp-witness.json" || a.role == "independently-verified-pdp"
+        })
+        .collect::<Vec<_>>();
+    let witness_publication_sequence = match witness_artifact {
+        None => {
+            if !published.is_empty() {
+                return Err("published Koblitz witness lacks canonical identity".into());
+            }
+            None
+        }
+        Some(expected) => {
+            if published.len() != 1 {
+                return Err("canonical Koblitz witness lacks unique publication".into());
+            }
+            let (sequence, actual) = published[0];
+            if actual.path != "payloads/pdp-witness.json"
+                || actual.role != expected.role
+                || actual.encoding != expected.encoding
+                || actual.sha256 != expected.sha256
+                || actual.bytes != expected.bytes
+            {
+                return Err("Koblitz witness differs from authenticated publication".into());
+            }
+            Some(*sequence)
+        }
+    };
+    Ok(VerifiedCanonicalMath {
+        group,
+        witness_publication_sequence,
+    })
+}
+
+#[cfg(test)]
+mod canonical_math_file_tests {
+    use super::*;
+    use crate::ml_dataset::{
+        capture::{capture_limits, AttemptBinding},
+        types::Artifact,
+    };
+    fn manifest(root: &std::path::Path, names: &[(&str, &str, &str)]) -> Vec<Artifact> {
+        names
+            .iter()
+            .map(|(path, role, encoding)| {
+                let bytes = std::fs::read(root.join(path)).unwrap();
+                Artifact {
+                    path: (*path).into(),
+                    role: (*role).into(),
+                    encoding: (*encoding).into(),
+                    bytes: bytes.len() as u64,
+                    sha256: super::super::digest(&bytes),
+                }
+            })
+            .collect()
+    }
+    #[test]
+    fn canonical_math_joins_actual_input_prefix_and_published_witness() {
+        let binding: AttemptBinding = matrix_tests::binding();
+        let capture = capture_limits(16).unwrap();
+        let fixture = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let root = fixture.dir.parent().unwrap();
+        let mut original = construction_tests::fixture();
+        original.target = original.signed[0];
+        let mut budget = construction_tests::budget();
+        let limits = budget.original_limits();
+        let output = construct_original(&original, &mut budget, &mut |_, _| Ok(()))
+            .output
+            .unwrap();
+        let mut input_bytes = Vec::new();
+        let input = persist_original(
+            &original,
+            &output,
+            &mut budget,
+            &binding,
+            &"8".repeat(64),
+            &"9".repeat(64),
+            &mut |bytes, _| {
+                input_bytes = bytes.to_vec();
+                Ok(())
+            },
+        )
+        .unwrap();
+        drop(input);
+        std::fs::write(root.join("koblitz-m3-input.json"), &input_bytes).unwrap();
+        let mut events = BoundSignedEvents::new(&binding, &capture, &mut budget).unwrap();
+        let mut publisher = BoundSignedPublisher::new(&binding, &capture, &budget);
+        let prepared = prepare_signed(&original, &mut budget, false).unwrap();
+        let global = std::cell::RefCell::new(0usize);
+        let result = enumerate_prepared_signed(
+            prepared,
+            &mut |e, b| events.emit(e, b, &mut global.borrow_mut()),
+            &mut |w, b| publisher.publish(w, b, &mut global.borrow_mut()),
+        );
+        assert!(result.complete, "{:?}", result.stop);
+        let group = SavedGroupReplay {
+            schema: "crypto.ml-dataset.koblitz-m3-group-replay/v1".into(),
+            signed: SavedSignedReplay {
+                schema: "crypto.ml-dataset.koblitz-m3-signed-prefix/v1".into(),
+                binding: binding.clone(),
+                public_sha256: "8".repeat(64),
+                factor_base_sha256: "9".repeat(64),
+                input_sha256: super::super::digest(&input_bytes),
+                addition_limit: limits.additions,
+                performed_additions: result.enumeration_additions as usize,
+                acknowledged_additions: result.acknowledged.len(),
+                acknowledged: result.acknowledged,
+                unacknowledged: result.unacknowledged,
+            },
+            reported_witness_check_additions: result.witness_check_additions as u8,
+            reported_total_additions: result.enumeration_additions + result.witness_check_additions,
+        };
+        std::fs::write(
+            root.join("koblitz-m3-group-replay.json"),
+            serde_json::to_vec(&group).unwrap(),
+        )
+        .unwrap();
+        // These two artifact identities are required here; their semantics are
+        // deliberately outside this mathematical component's claim.
+        std::fs::write(root.join("koblitz-m3-result.json"), b"{}").unwrap();
+        std::fs::write(root.join("koblitz-m3-events.jsonl"), b"").unwrap();
+        std::fs::copy(
+            fixture.dir.join("payloads/pdp-witness.json"),
+            root.join("pdp-witness.json"),
+        )
+        .unwrap();
+        let mut names = KOBLITZ_SLOTS.to_vec();
+        names.extend([
+            ("pdp-witness.json", "independently-verified-pdp", "json"),
+            (
+                "live/committed.json",
+                "unregistered-partial-artifact",
+                "native",
+            ),
+            (
+                "live/events.jsonl",
+                "unregistered-partial-artifact",
+                "native",
+            ),
+        ]);
+        let artifacts = manifest(root, &names);
+        let check = |a: &[Artifact]| {
+            verify_canonical_math_files(
+                root,
+                a,
+                &original,
+                &binding,
+                &capture,
+                limits,
+                &"8".repeat(64),
+                &"9".repeat(64),
+            )
+        };
+        let verified = check(&artifacts).unwrap();
+        assert!(verified.group.math.witness.is_some());
+        assert!(verified.witness_publication_sequence.is_some());
+        assert!(verified.group.math.prefix.all_tuples_acknowledged);
+        let without = artifacts
+            .iter()
+            .filter(|a| a.path != "pdp-witness.json")
+            .cloned()
+            .collect::<Vec<_>>();
+        assert!(check(&without)
+            .err()
+            .unwrap()
+            .contains("lacks canonical identity"));
+        let without = artifacts
+            .iter()
+            .filter(|a| a.path != "live/committed.json")
+            .cloned()
+            .collect::<Vec<_>>();
+        assert!(check(&without).err().unwrap().contains("capture root"));
+        // Rehash a byte-distinct but mathematically identical canonical witness.
+        // File hashing and group arithmetic pass; publication identity must fail.
+        let mut witness = std::fs::read(root.join("pdp-witness.json")).unwrap();
+        witness.push(b' ');
+        std::fs::write(root.join("pdp-witness.json"), witness).unwrap();
+        assert!(check(&manifest(root, &names))
+            .err()
+            .unwrap()
+            .contains("differs from authenticated publication"));
+    }
+}
