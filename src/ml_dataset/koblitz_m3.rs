@@ -3344,7 +3344,7 @@ struct SignedEventView<'a> {
     progress: &'a SignedPrefix,
 }
 pub(super) struct BoundSignedEvents<'a> {
-    binding: &'a crate::ml_dataset::capture::AttemptBinding,
+    binding_digest: [u8; 64],
     limits: &'a crate::ml_dataset::capture::CaptureLimits,
     buffer: crate::ml_dataset::capture::TypedEventBuffer,
     acknowledged: u64,
@@ -3357,13 +3357,20 @@ impl<'a> BoundSignedEvents<'a> {
         budget: &mut Budget,
     ) -> Result<Self, Stop> {
         use crate::ml_dataset::capture::TypedEventBuffer;
+        budget.reserve_checking(64 * 1024, 4096, Instant::now())?;
+        if binding.validate().is_err() || limits.validate().is_err() {
+            return budget.fail(Stop::InvalidLimits);
+        }
+        let digest = binding.digest().map_err(|_| Stop::InvalidLimits)?;
+        let mut binding_digest = [0u8; 64];
+        binding_digest.copy_from_slice(digest.as_bytes());
         let bytes =
             TypedEventBuffer::requested_bytes(SIGNED_EVENT_CAP).map_err(|_| Stop::InvalidLimits)?;
         budget.reserve_bytes(bytes, Instant::now())?;
         let buffer =
             TypedEventBuffer::try_new(SIGNED_EVENT_CAP, bytes).map_err(|_| Stop::Allocation)?;
         Ok(Self {
-            binding,
+            binding_digest,
             limits,
             buffer,
             acknowledged: 0,
@@ -3379,14 +3386,14 @@ impl<'a> BoundSignedEvents<'a> {
         if *global >= 4096 {
             return budget.fail(Stop::Events);
         }
-        // Identity hashing plus bounded two-pass event encoding. Work/trace
+        // Cached identity comparison plus bounded two-pass encoding. Work/trace
         // reservations are explicit model bounds; actual encoded bytes below
         // are recorded only after the emitter acknowledges the event.
-        budget.reserve_checking(64 * 1024 + 8 * SIGNED_EVENT_CAP, 4096, Instant::now())?;
+        budget.reserve_checking(1024 + 8 * SIGNED_EVENT_CAP, 4096, Instant::now())?;
         budget.reserve_trace(SIGNED_EVENT_CAP, Instant::now())?;
         let identity = super::LIVE_SINK.with(|slot| match slot.borrow().as_ref() {
             Some(super::EventSink::Bound(sink)) => {
-                sink.verify_attempt_limits(self.binding, self.limits)
+                sink.verify_digest_limits(&self.binding_digest, self.limits)
             }
             _ => Err("Koblitz typed event requires admitted bound sink".into()),
         });

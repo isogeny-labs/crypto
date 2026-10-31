@@ -1268,11 +1268,24 @@ impl CaptureEmitter {
         limits: &CaptureLimits,
     ) -> Result<(), String> {
         binding.validate()?;
+        self.verify_digest_limits(binding.digest()?.as_bytes(), limits)
+    }
+
+    /// Compare a previously admitted original binding digest without encoding
+    /// and hashing the unchanged binding again for every bounded event.
+    pub(super) fn verify_digest_limits(
+        &self,
+        binding_digest: &[u8],
+        limits: &CaptureLimits,
+    ) -> Result<(), String> {
         limits.validate()?;
         if self.failed || self.head.stop.is_some() {
             return Err("capture sink already refused further work".into());
         }
-        if self.head.binding_sha256 != binding.digest()? || &self.limits != limits {
+        if binding_digest.len() != 64
+            || self.head.binding_sha256.as_bytes() != binding_digest
+            || &self.limits != limits
+        {
             return Err("capture sink differs from original execution attempt or limits".into());
         }
         Ok(())
