@@ -2,6 +2,10 @@
 #include "host.hpp"
 #include "negative-filter.hpp"
 #include <cstdio>
+#include <cstdlib>
+#if defined(ER_QUERY_PROFILE) && (!defined(ER_QUERY_PERSISTENT) || !defined(ER_RIGHT_FULL_CACHE) || !defined(ER_AFFINE_QUERY))
+#error "ER_QUERY_PROFILE requires persistent full-cache affine queries"
+#endif
 #include <cuda_runtime.h>
 #ifdef ER_QUERY_PERSISTENT
 #include <cuda/atomic>
@@ -32,7 +36,7 @@ struct FieldProduct {
 #endif
 // One inversion per block, including partially active blocks and infinity.
 // Infinity and inactive lanes contribute 1. No lane may skip a barrier.
-__device__ Point normalize_block(Curve c, Jac p) {
+__device__ U inverse_block(Curve c, Jac p) {
 #ifdef ER_NORMALIZE_SCAN_REFERENCE
   // Retained only for matched baseline builds and differential tests.
   __shared__ U prefix[BLOCK], suffix[BLOCK], inverse;
@@ -54,7 +58,7 @@ __device__ Point normalize_block(Curve c, Jac p) {
   __syncthreads();
   U iz = c.mul(inverse, c.mul(t ? prefix[t - 1] : c.f.one,
                               t + 1 < BLOCK ? suffix[t + 1] : c.f.one));
-  return c.affine(p, iz);
+  return iz;
 #elif defined(ER_NORMALIZE_CUB_REFERENCE)
   // External work-efficient scan reference, with the same inversion and
   // affine conversion as both native implementations.
@@ -73,7 +77,7 @@ __device__ Point normalize_block(Curve c, Jac p) {
                               FieldProduct{c});
   reverse[BLOCK - 1 - t] = suffix;
   __syncthreads();
-  return c.affine(p, c.mul(inverse, c.mul(prefix, reverse[t])));
+  return c.mul(inverse, c.mul(prefix, reverse[t]));
 #else
   // Product tree: BLOCK-1 multiplies up, 2*(BLOCK-1) down. The previous
   // two inclusive scans used 2*BLOCK*log2(BLOCK)+2*BLOCK multiplies.
@@ -101,8 +105,11 @@ __device__ Point normalize_block(Curve c, Jac p) {
     }
     __syncthreads();
   }
-  return c.affine(p, tree[BLOCK + t]);
+  return tree[BLOCK + t];
 #endif
+}
+__device__ Point normalize_block(Curve c, Jac p) {
+  return c.affine(p, inverse_block(c, p));
 }
 #if defined(ER_DENSE_ROWS)
 using DeviceRow = DenseRow;
@@ -369,6 +376,9 @@ __global__ void search_right_persistent(
   if (!threadIdx.x)
     atomicAdd(result + 2, static_cast<unsigned long long>(visited));
 }
+#ifdef ER_QUERY_PROFILE
+#include "query-profile.cuh"
+#endif
 // Resolve the minimum duplicate left ID only after the right minimum is final.
 // Keeping two IDs separate avoids a potentially overflowing packed product.
 __global__ void resolve_persistent_winner(
@@ -452,6 +462,9 @@ class DeviceBackend {
 #ifdef ER_RIGHT_FULL_CACHE
   thrust::device_vector<CachedPoint> right_full;
   U right_cache_limit = UINT64_MAX;
+#endif
+#ifdef ER_QUERY_PROFILE
+  thrust::device_vector<QueryProfile> profile;
 #endif
   unsigned prefix_shift = 0;
   thrust::device_vector<unsigned long long> winner;
@@ -714,11 +727,52 @@ public:
     if (p.right) {
       cuda_check(cudaMemsetAsync(data(winner), 0xff, 2 * sizeof(U)));
       cuda_check(cudaMemsetAsync(data(winner) + 2, 0, sizeof(U)));
+#ifdef ER_QUERY_PROFILE
+      const char *mode = std::getenv("ER_PROFILE_MODE");
+      const bool staged = mode && std::string(mode) == "stages";
+      const unsigned grid = std::min(persistent_grid, blocks(p.right));
+      if (staged && !partials.full)
+        throw std::runtime_error("profile requires complete right cache");
+      cudaEvent_t begin, finish;
+      cuda_check(cudaEventCreate(&begin));
+      cuda_check(cudaEventCreate(&finish));
+      if (staged)
+        profile.resize(grid);
+      cuda_check(cudaEventRecord(begin));
+      if (staged)
+        search_right_profile<<<grid, BLOCK>>>(
+            c, target, p.right, data(rows), p.left, data(winner),
+            prefixes.empty() ? nullptr : data(prefixes), prefix_shift,
+            partials, data(profile));
+      else
+#endif
       search_right_persistent<<<std::min(persistent_grid, blocks(p.right)), BLOCK>>>(
           c, p.view(data(points)), p.split, target, p.right, data(rows), p.left,
           data(winner), prefixes.empty() ? nullptr : data(prefixes), prefix_shift,
           partials);
       cuda_check(cudaGetLastError());
+#ifdef ER_QUERY_PROFILE
+      cuda_check(cudaEventRecord(finish));
+      cuda_check(cudaEventSynchronize(finish));
+      float elapsed = 0;
+      cuda_check(cudaEventElapsedTime(&elapsed, begin, finish));
+      cuda_check(cudaEventDestroy(begin));
+      cuda_check(cudaEventDestroy(finish));
+      QueryProfile total{};
+      if (staged) {
+        std::vector<QueryProfile> host(grid);
+        cuda_check(cudaMemcpy(host.data(), data(profile), grid * sizeof(QueryProfile),
+                              cudaMemcpyDeviceToHost));
+        for (const auto &row : host)
+          total += row;
+      }
+      std::fprintf(stderr,
+          "PROFILE mode=%s kernel_ms=%.9g tiles=%llu rows=%llu load_convert=%llu "
+          "subtract=%llu normalize=%llu affine_out=%llu lookup=%llu empty=%llu\n",
+          staged ? "stages" : "stock", double(elapsed), total.tiles, total.rows,
+          total.cycles[0], total.cycles[1], total.cycles[2], total.cycles[3],
+          total.cycles[4], total.cycles[5]);
+#endif
       resolve_persistent_winner<<<1, BLOCK>>>(
           c, p.view(data(points)), p.split, target, data(rows), p.left,
           data(winner), prefixes.empty() ? nullptr : data(prefixes), prefix_shift,

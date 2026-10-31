@@ -663,6 +663,46 @@ def explicit_gpu_frontier(ref, since, study="research/explicit_relations_e2e_202
                      source=f"{directory}/frontier.txt@{revision}")
 
 
+
+def explicit_gpu_profile(ref, since):
+    """Committed diagnostic coverage only; no recovery or timing promotion."""
+    study = "research/explicit_relations_profile_20261031"
+    revision = _git("rev-parse", ref).strip()[:12]
+    for version in (1, 2):
+        path = f"{study}/results-v{version}/export.json"
+        text = show(ref, path)
+        if text is None:
+            continue
+        export = json.loads(text)
+        date = export.get("created", "")[:10]
+        if len(date) != 10 or date < since:
+            continue
+        runs = export.get("runs", [])
+        if len(runs) != export.get("flow", {}).get("attempted"):
+            raise ValueError(f"inconsistent GPU profile coverage: {path}")
+        verified = [r for r in runs if r.get("status") == "succeeded" and
+                    r.get("verification", {}).get("status") == "verified"]
+        if version == 1:
+            samples = (
+                ("verified_cells", len(verified), "byte-exact query replay cells"),
+                ("verified_queries", sum(r["measurements"]["counted"]["verified_queries"]
+                                         for r in verified), "byte-exact query replies"),
+            )
+        else:
+            samples = (
+                ("timeline_profiles", sum(r["arm"] == "t" for r in verified),
+                 "successful Nsight Systems traces"),
+                ("counter_unavailable", sum(r["measurements"]["counters"].get("native_status")
+                                             == "unsupported" for r in runs),
+                 "retained unavailable hardware-counter profiles"),
+            )
+        for suffix, value, label in samples:
+            emit(f"gpu.explicit_relations.profile.v{version}.{suffix}", value,
+                 date=date, problem="gpu-query-diagnostics", unit="count",
+                 better="neutral", label=f"GPU profile v{version}: {label}; fixed prefixes",
+                 source=f"{path}@{revision}")
+
+
 def main():
     a = args()
     jacobian_catalog(a.ref, a.since)
@@ -695,6 +735,7 @@ def main():
     explicit_gpu_frontier(a.ref, a.since)
     explicit_gpu_frontier(a.ref, a.since, "research/explicit_relations_affine_20261030",
                           "gpu.explicit_relations.affine")
+    explicit_gpu_profile(a.ref, a.since)
 
 if __name__ == "__main__":
     main()
