@@ -132,7 +132,7 @@ Against the lazy orbit IC (the section above): `mitm-frobenius-layout-counted` n
 
 [Report](../../research/ecbench_generator_orbit_20261022/REPORT.pdf) · [study](../../research/ecbench_generator_orbit_20261022/) · [data](../../research/ecbench_generator_orbit_20261022/figures/summary.json). At n = 29 (c = 1) the IC arm is below rho-frob at every band weight; at one column the pipeline is a Frobenius-folded baby-step giant-step and the crossing rests on rho-frob's fixed set-up at log₂ r = 15.4, so it is not "faster than rho": the gap grows with r. At n = 19 no pinned calibration row exists and the band does not re-price the IC natives.
 
-Validation standing: validated under the 2026-10-19 gate (VALIDATION.json in the study directory: replay certificate, validator report, §5a-banded rho-frob reference).
+Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates. Gate: validator report raw_data sessions/a1-n29/records.jsonl: sessions/a1-n29/records.jsonl is not a file; validator report raw_data sessions/a0-n13/records.jsonl: sessions/a0-n13/records.jsonl is not a file; validator report raw_data sessions/a1-n17/records.jsonl: sessions/a1-n17/records.jsonl is not a file; validator report raw_data sessions/a0-n19/records.jsonl: sessions/a0-n19/records.jsonl is not a file; validator report raw_data sessions/a0-n23/records.jsonl: sessions/a0-n23/records.jsonl is not a file; validator report raw_data sessions/a0-n31/records.jsonl: sessions/a0-n31/records.jsonl is not a file; validator report raw_data sessions/a0-n37/records.jsonl: sessions/a0-n37/records.jsonl is not a file.
 
 ## Component tuning: two orbit columns under the lazy oracle (2026-10-18, engineering)
 
@@ -788,7 +788,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
 - `research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `c810d351d86e3b09…`
 - `research/ic_rho_reference_20260923/analysis.json` — sha256 `6fd61dd71a33b809…`
-- `docs/ic/progress-timeline.json` — sha256 `c28c21260d1bc66f…`
+- `docs/ic/progress-timeline.json` — sha256 `ba117406cc0d4448…`
 - `research/ic_candidate_tournament_20260915/runs/round-0026/measurements.json` — sha256 `0a2b51a5051bd518…`
 - `research/ic_exponent_20260926/analysis.json` — sha256 `744fd51ea01f1046…`
 - `research/ic_constructions_20260926/analysis.json` — sha256 `e0758400806dc97f…`
@@ -861,7 +861,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/n83_e2e_final_holdout_20261016/validated_rows.json` — sha256 `b296172d92739c4d…`
 - `research/n83_e2e_final_holdout_20261016/selection.json` — sha256 `860d24e60baa552d…`
 - `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
-- `docs/curves/registry.json` — sha256 `88390d7b472098e3…`
+- `docs/curves/registry.json` — sha256 `6077a525a6ef0d69…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `0bbdf920814f5946…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_v1.json` — sha256 `af8cfaf233c6b992…`
