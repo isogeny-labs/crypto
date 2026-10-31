@@ -188,6 +188,61 @@ static void field_boundary_checks() {
     }
   }
 }
+#ifdef ER_NEGATIVE_FILTER
+__global__ void check_filtered(const DeviceRow *rows, U size,
+                                const Point *queries, U count, U *answers,
+                                NegativeFilter filter) {
+  U i = U(blockIdx.x) * BLOCK + threadIdx.x;
+  RightPartials partials;
+  partials.filter = filter;
+  if (i < count)
+    answers[i] = relation_lookup(rows, size, queries[i], nullptr, 0, partials);
+}
+static void negative_filter_boundaries() {
+  Curve c = curve(65521, 0, 7);
+  std::vector<Row> full{{Point{}, 9}, {Point{}, 2}};
+  std::vector<Point> queries{Point{}};
+  for (U x = 0; x < c.f.p; ++x) {
+    Point q;
+    if (!c.lift(x, 0, q)) continue;
+    for (Point point : {q, c.neg(q)}) {
+      queries.push_back(point);
+      if (x % 13 == 0)
+        for (U id : {U(9), U(2), U(UINT32_MAX)}) full.push_back({point, id});
+    }
+  }
+  std::sort(full.begin(), full.end(), RowLess{});
+  std::vector<DeviceRow> rows;
+  for (const auto &r : full) rows.push_back(device_row(r.point, r.id));
+  std::sort(rows.begin(), rows.end(), DeviceRowLess{});
+  thrust::device_vector<DeviceRow> drows(rows.begin(), rows.end());
+  thrust::device_vector<Point> dqueries(queries.begin(), queries.end());
+  thrust::device_vector<U> answers(queries.size());
+  const U words = filter_word_count(rows.size());
+  thrust::device_vector<unsigned long long> bits(words, 0);
+  build_negative_filter<<<(rows.size() + BLOCK - 1) / BLOCK, BLOCK>>>(
+      data(drows), rows.size(), data(bits), words - 1);
+  cuda_check(cudaGetLastError());
+  for (unsigned mode = 0; mode < 3; ++mode) {
+    if (mode == 1)
+      cuda_check(cudaMemsetAsync(data(bits), 0xff, words * sizeof(U)));
+    NegativeFilter filter{mode == 2 ? nullptr : data(bits), words - 1};
+    check_filtered<<<(queries.size() + BLOCK - 1) / BLOCK, BLOCK>>>(
+        data(drows), rows.size(), data(dqueries), queries.size(), data(answers), filter);
+    cuda_check(cudaGetLastError());
+    std::vector<U> got(queries.size());
+    cuda_check(cudaMemcpy(got.data(), data(answers), got.size() * sizeof(U),
+                          cudaMemcpyDeviceToHost));
+    U misses = 0;
+    for (size_t i = 0; i < queries.size(); ++i) {
+      U expected = lookup(full.data(), full.size(), queries[i]);
+      require(got[i] == expected);
+      misses += expected == UINT64_MAX;
+    }
+    require(misses > 0); // Saturation forces false positives through exact lookup.
+  }
+}
+#endif
 int main() {
   try {
     field_boundary_checks();
@@ -213,6 +268,9 @@ int main() {
     require(U(DenseRow(0, UINT32_MAX).id) != UINT64_MAX);
     wide_prefix_boundaries(62);
     wide_prefix_boundaries(63);
+#ifdef ER_NEGATIVE_FILTER
+    negative_filter_boundaries();
+#endif
     require(!packed_winner_fits(0, 1));
     require(packed_winner_fits(1, UINT64_MAX));
     require(packed_winner_fits(UINT64_MAX, 1));
@@ -239,6 +297,24 @@ int main() {
       if (c.lift(x, 0, q))
         ps.push_back(q);
     }
+    // Exercise every enlarged slot boundary with exact CPU witnesses, tails,
+    // empty reprepare and the same device storage used by each build variant.
+    for (unsigned slots : {9u, 10u, MAX_SLOTS}) {
+      std::vector<std::vector<Point>> bases(slots, {ps[0], ps[1]});
+      Plan p = plan(c, bases, 4096);
+      require(p.slots == slots && p.offsets[slots] == 2 * slots);
+      DeviceBackend device(c, 4096, 17);
+      HostBackend host(c, 4096, 17);
+      device.prepare(p); host.prepare(p);
+      for (Point target : {Point{}, ps[0], ps[1], ps.back()}) {
+        auto got = device.find(target, 8192), expected = host.find(target, 8192);
+        require(got.found == expected.found && got.indices == expected.indices);
+        if (got.found) require(got.indices.size() == slots);
+      }
+      bases.back().clear();
+      device.prepare(plan(c, bases, 4096));
+      require(!device.find(Point{}, 0).found);
+    }
     // Exercise automatic index admission and rebuilding through the public
     // backend, including a table with >=4096 rows and a partial query block.
     Curve wide = curve(65521, 0, 7);
@@ -248,6 +324,39 @@ int main() {
       if (wide.lift(x, 0, q))
         base.push_back(q);
     }
+#if defined(ER_QUERY_CACHED) && defined(ER_RIGHT_FULL_CACHE)
+    // Three right slots and >=4096 combinations activate partial reuse.
+    // Force full-cache refusal independently of the available GPU memory.
+    {
+      std::vector<std::vector<Point>> bases(4);
+      bases[0] = {base.front()};
+      for (unsigned j = 1; j < 4; ++j)
+        bases[j].assign(base.begin() + j, base.begin() + j + 17);
+      Plan p = plan(wide, bases, 8192);
+      p.split = 1; p.left = 1; p.right = 17 * 17 * 17;
+      DeviceBackend cached(wide, 8192, 512), fallback(wide, 8192, 512, 0);
+      HostBackend host(wide, 8192, 512);
+      cached.prepare(p); fallback.prepare(p); host.prepare(p);
+      require(cached.cached_right_rows() == p.right);
+      require(fallback.cached_right_rows() == 0);
+      require(fallback.cached_partial_rows() == 17 + 17 * 17);
+      require(cached.cached_partial_rows() == 17 + 17 * 17);
+      for (Point target : {base.front(), Point{}, base.back(),
+                           wide.affine(tuple_sum(wide, p.view(p.points.data()),
+                                                 0, p.slots, p.right - 1))}) {
+        auto expected = host.find(target, p.left + p.right);
+        for (auto *device : {&cached, &fallback}) {
+          auto got = device->find(target, p.left + p.right);
+          require(got.found == expected.found && got.indices == expected.indices);
+        }
+      }
+      fallback.prepare(Plan{});
+      require(!fallback.find(Point{}, 0).found);
+      fallback.prepare(p);
+      require(fallback.find(base.back(), p.left + p.right).indices ==
+              host.find(base.back(), p.left + p.right).indices);
+    }
+#endif
 #ifdef ER_QUERY_PERSISTENT
     // Force multiple grid strides, a partial final tile, late minima, complete
     // misses and reset ordering. The check target caps the grid at two blocks.
@@ -340,6 +449,9 @@ int main() {
           base.assign(ps.begin(), ps.begin() + size);
         Plan p = plan(c, bases, 4096);
         device.prepare(p);
+#ifdef ER_NEGATIVE_FILTER
+        require(device.negative_filter_bytes() == filter_word_count(p.left) * sizeof(U));
+#endif
         host.prepare(p);
         for (Point target : {ps.front(), Point{}, ps.back(), ps.front()}) {
           Result got = device.find(target, p.left + p.right);

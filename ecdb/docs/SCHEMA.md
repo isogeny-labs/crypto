@@ -267,22 +267,18 @@ the import's own checks.
 | level and Jacobian certificates | 19 + 1 certificates |
 | derived in SQL | 21,080 automorphism groups (79 C6, 14 C4), 21,082 attack-surface rows, 21,080 Frobenius endomorphisms, 73 subfield-tau records with their endomorphisms |
 | an LMFDB `av_fq_isog` export (optional) | label recomputed from the polynomial and required to match: 10 sample rows matched |
+| `enrich` (computed in Rust from the rows above) | 8 modular polynomials Phi_l (l = 2..19, over Z, sparse, both orders of each coefficient); 13 Hilbert class polynomials H_D for the class-number-one discriminants, each checked against every curve with that j (409 checks, 0 failed); Semaev S_2 and S_3, generic in (a, b), S_3 checked to vanish on sums; 84,320 division polynomials psi_2..psi_5 over prime fields (84,191 distinct after content addressing, which shares them between curves with the same model), checked to vanish exactly on the torsion points of small test curves; 93 GLV endomorphisms (j = 0 and 1728), 55 with the eigenvalue checked on the recorded generator and a reduced decomposition lattice (secp256k1: components of 129 bits); 471 relations (245 quadratic twists, 219 isomorphisms, 7 birational model changes); 1,126 cyclic group structures (628 proved, 498 probable; 1,756 left undecided because gcd(n, q - 1) does not settle them); 21,080 p-adic rows (p-rank, Hasse invariant) |
 
-These tables exist and wait for a producer:
+The import re-runs idempotently. Against a local Postgres 16 it takes about 13 s.
 
-- `division_polynomial`, `modular_polynomial`, `summation_polynomial` and
-  `class_polynomial`, with `polynomial` and `artifact` for the large ones
-  (the repository's Phi_l and Semaev tooling);
+These tables exist and still wait for a producer:
+
 - `geometric_invariant` (Igusa invariants of the cover curves);
-- `endomorphism` rows for GLV maps and `scalar_decomposition`
-  (`docs/endomorphism-rules.md` producers);
-- `group_structure` and `p_adic_invariants`;
-- `curve_relation` (twist pairs, and the Montgomery / Edwards model pairs
-  above);
 - `isogeny_volcano` (the volcano tools);
 - `curve_global_data`, `curve_local_data` and `galois_image` (the LMFDB
   `ec_curvedata` / `ec_nfcurves` exports);
-- `field_embedding` (the subfield constructions).
+- `field_embedding` (the subfield constructions);
+- division polynomials over binary and extension fields, and l > 5.
 
 ## 6. Query recipes
 
@@ -388,13 +384,11 @@ FROM trait_record t JOIN curve c ON c.id = t.curve_id WHERE c.family = 'koblitz'
 
 ## 9. Next steps
 
-1. Producers for the empty tables listed in section 5, starting with division
-   and modular polynomials (`polynomial` plus S3 artifacts) and GLV
-   endomorphisms with eigenvalues.
-2. Typed twist and model-change relations from explicit maps, not from shared
-   j.
+1. Producers for the tables section 5 still lists as empty, and division
+   polynomials beyond prime fields and l = 5.
+2. Twist relations for j = 0 and 1728 (sextic and quartic twists), which need
+   the twisting cocycle rather than j and the trace alone.
 3. LMFDB `ec_curvedata` / `g2c_curves` importers into the global and genus-2
    invariant tables, with `external_label.match_status` kept `unknown` until
    a model match is proved.
-4. An MCP wrapper over the same endpoints for agent runtimes that prefer
-   tools to HTTP.
+4. Done: the MCP endpoint `POST /mcp` (see `docs/AGENTS.md`).
