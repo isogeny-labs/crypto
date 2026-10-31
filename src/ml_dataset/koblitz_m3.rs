@@ -2152,9 +2152,9 @@ mod signed_binding_tests {
 }
 /// Checked mathematical candidate. Durable custody is a separate publication.
 pub(super) struct CheckedSignedWitness {
-    pub indices: [u8; 3],
-    pub points: [(u64, u64); 3],
-    pub target: (u64, u64),
+    indices: [u8; 3],
+    points: [(u64, u64); 3],
+    target: (u64, u64),
 }
 
 pub(super) struct SignedEnumeration {
@@ -2243,6 +2243,10 @@ fn enumerate_signed(
                     let points = indices.map(|i| original.signed[i]);
                     let mut reference = BinaryPoint::Infinity;
                     for (x, y) in points {
+                        budget.reserve_bytes(
+                            reference_add_requested_bytes(original.curve.m)?,
+                            Instant::now(),
+                        )?;
                         let point = BinaryPoint::Affine {
                             x: F2mElement::from_words(&[x], original.curve.m),
                             y: F2mElement::from_words(&[y], original.curve.m),
@@ -2869,5 +2873,224 @@ mod checking_budget_tests {
         assert_eq!(r.stop, Some(Stop::Nonmonotone));
         assert_eq!(b.checking_work, b.native_work_limit);
         assert_eq!(b.adapter_bytes, b.memory_limit);
+    }
+}
+/// Requested-object/word reservation for one general binary point addition at
+/// the admitted one-word field sizes. This is neither RSS nor compiler-frame
+/// size. See the source audit stored with this increment.
+fn reference_add_requested_bytes(n: u32) -> Result<u64, Stop> {
+    if !((23..=31).contains(&n) || (47..=61).contains(&n)) {
+        return Err(Stop::InvalidLimits);
+    }
+    // <=22 field-result allocations in Itoh-Tsujii, <=40 including the
+    // surrounding point formulas and point construction; reserve64 layouts.
+    // Six inversion bits fit capacity8; include both4/8 allocation requests.
+    // with_scratch uses20 stack words. Allow final BigUint coordinate views.
+    Ok(
+        64 * (std::mem::size_of::<crate::binary_ecc::F2mElement>() as u64 + 8)
+            + (4 + 8) * std::mem::size_of::<u32>() as u64
+            + 20 * 8
+            + 4 * (std::mem::size_of::<num_bigint::BigUint>() as u64 + 16),
+    )
+}
+
+#[cfg(test)]
+mod reference_scratch_tests {
+    use super::*;
+    #[test]
+    fn reference_storage_is_admitted_before_independent_addition() {
+        let mut original = construction_tests::fixture();
+        original.target = original.signed[0];
+        let now = Instant::now();
+        // Admit kernel and enumeration storage exactly, leaving no reference
+        // scratch. The first positive match must stop before a reference add.
+        let bytes = signed_setup_bytes(original.curve.m).unwrap()
+            + (192 * std::mem::size_of::<SignedPrefix>()) as u64;
+        let mut b = Budget::new(16384, bytes, 1 << 20, now + Duration::from_secs(20), now).unwrap();
+        b.begin_native(false, now).unwrap();
+        b.finish_native(now).unwrap();
+        let prepared = prepare_signed(&original, &mut b, false).unwrap();
+        let result = enumerate_prepared_signed(prepared, &mut |_, _| Ok(()), &mut |_, _| {
+            panic!("unadmitted reference check published")
+        });
+        assert_eq!(result.stop, Some(Stop::Bytes));
+        assert_eq!(result.witness_check_additions, 0);
+        assert!(result.unacknowledged.unwrap().matches_target);
+        assert!(result.first_receipt.is_none());
+    }
+    #[test]
+    fn reference_storage_bounds_cover_only_the_admitted_word_fields() {
+        for n in [23, 31, 47, 53, 61] {
+            assert!(reference_add_requested_bytes(n).unwrap() > 512);
+        }
+        for n in [0, 22, 32, 46, 62, 128] {
+            assert_eq!(reference_add_requested_bytes(n), Err(Stop::InvalidLimits));
+        }
+    }
+}
+const SIGNED_WITNESS_BYTE_CAP: usize = 1024;
+
+/// Decimal strings match the established binary PDP witness schema. All u64
+/// formatting fits this stack buffer, with no intermediate String allocation.
+#[derive(Clone, Copy)]
+struct DecimalWord(u64);
+impl serde::Serialize for DecimalWord {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let mut bytes = [b'0'; 20];
+        let mut n = self.0;
+        let mut start = bytes.len();
+        loop {
+            start -= 1;
+            bytes[start] = b'0' + (n % 10) as u8;
+            n /= 10;
+            if n == 0 {
+                break;
+            }
+        }
+        let text = std::str::from_utf8(&bytes[start..]).map_err(serde::ser::Error::custom)?;
+        serializer.serialize_str(text)
+    }
+}
+#[derive(Clone, Copy, serde::Serialize)]
+struct DecimalPoint {
+    x: DecimalWord,
+    y: DecimalWord,
+}
+impl From<(u64, u64)> for DecimalPoint {
+    fn from((x, y): (u64, u64)) -> Self {
+        Self {
+            x: DecimalWord(x),
+            y: DecimalWord(y),
+        }
+    }
+}
+#[derive(serde::Serialize)]
+struct SignedWitnessView {
+    summands: [DecimalPoint; 3],
+    target: DecimalPoint,
+    sum: DecimalPoint,
+    replay_group_add_calls: u8,
+}
+pub(super) struct WitnessEncoding {
+    pub bytes: Vec<u8>,
+    pub complete: bool,
+    pub stop: Option<Stop>,
+}
+
+/// Only CheckedSignedWitness values from independent group verification may
+/// enter. Original attempt identity is supplied by the bound capture sink.
+/// Complete serialization is not durable publication or a completed search.
+pub(super) fn encode_signed_witness(
+    witness: &CheckedSignedWitness,
+    budget: &mut Budget,
+) -> WitnessEncoding {
+    let mut bytes = Vec::new();
+    // The bounded decimal/JSON traversal is pre-admitted under the shared
+    // checking-work model; this is not a hardware instruction count.
+    if let Err(stop) = budget.reserve_checking(
+        8 * SIGNED_WITNESS_BYTE_CAP as u64,
+        SIGNED_WITNESS_BYTE_CAP as u64,
+        Instant::now(),
+    ) {
+        return WitnessEncoding {
+            bytes,
+            complete: false,
+            stop: Some(stop),
+        };
+    }
+    if bytes.try_reserve_exact(SIGNED_WITNESS_BYTE_CAP).is_err() {
+        let stop = *budget.stopped.get_or_insert(Stop::Allocation);
+        return WitnessEncoding {
+            bytes,
+            complete: false,
+            stop: Some(stop),
+        };
+    }
+    let view = SignedWitnessView {
+        summands: witness.points.map(DecimalPoint::from),
+        target: witness.target.into(),
+        sum: witness.target.into(),
+        replay_group_add_calls: 3,
+    };
+    let mut writer = InputWriter {
+        bytes,
+        capacity: SIGNED_WITNESS_BYTE_CAP,
+        budget,
+    };
+    let complete = serde_json::to_writer(&mut writer, &view).is_ok();
+    if !complete {
+        writer.budget.stopped.get_or_insert(Stop::Serialization);
+    }
+    let stop = writer.budget.check(Instant::now()).err();
+    WitnessEncoding {
+        bytes: writer.bytes,
+        complete,
+        stop,
+    }
+}
+
+#[cfg(test)]
+mod signed_witness_encoding_tests {
+    use super::*;
+    #[test]
+    fn decimal_words_roundtrip_zero_and_largest_machine_word_as_strings() {
+        for n in [0, 1, (1u64 << 61) - 1, u64::MAX] {
+            let bytes = serde_json::to_vec(&DecimalWord(n)).unwrap();
+            let value: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+            assert_eq!(value.as_str().unwrap(), n.to_string());
+        }
+    }
+    #[test]
+    fn checked_witness_payload_matches_existing_group_encoding() {
+        use crate::binary_ecc::{BinaryPoint, F2mElement};
+        let mut original = construction_tests::fixture();
+        original.target = original.signed[0];
+        let mut b = construction_tests::budget();
+        b.begin_native(false, Instant::now()).unwrap();
+        b.finish_native(Instant::now()).unwrap();
+        let prepared = prepare_signed(&original, &mut b, false).unwrap();
+        let mut saved = None;
+        let result = enumerate_prepared_signed(prepared, &mut |_, _| Ok(()), &mut |w, b| {
+            let encoding = encode_signed_witness(w, b);
+            assert!(encoding.complete);
+            assert!(encoding.stop.is_none());
+            let point = |(x, y)| {
+                super::super::Element::Binary(BinaryPoint::Affine {
+                    x: F2mElement::from_words(&[x], original.curve.m),
+                    y: F2mElement::from_words(&[y], original.curve.m),
+                })
+                .json()
+            };
+            let expected = serde_json::json!({"summands":w.points.map(point),"target":point(w.target),
+                "sum":point(w.target),"replay_group_add_calls":3});
+            assert_eq!(
+                serde_json::from_slice::<serde_json::Value>(&encoding.bytes).unwrap(),
+                expected
+            );
+            saved = Some(encoding);
+            // This control stops before publication; encoding alone is not a receipt.
+            Err(Stop::Observer)
+        });
+        assert!(saved.unwrap().complete);
+        assert!(result.first_receipt.is_none());
+        assert!(!result.complete);
+        assert_eq!(result.stop, Some(Stop::Observer));
+    }
+    #[test]
+    fn witness_encoding_retains_partial_bytes_when_trace_allowance_expires() {
+        let witness = CheckedSignedWitness {
+            indices: [0, 0, 0],
+            points: [(1, 2); 3],
+            target: (3, 4),
+        };
+        let mut b = construction_tests::budget();
+        b.trace_limit = 16;
+        let result = encode_signed_witness(&witness, &mut b);
+        assert!(!result.complete);
+        assert_eq!(result.stop, Some(Stop::Trace));
+        assert!(result.bytes.len() <= 16);
+        assert!(!result.bytes.is_empty());
+        assert_eq!(b.trace_bytes, result.bytes.len() as u64);
+        assert_eq!(b.adapter_bytes, SIGNED_WITNESS_BYTE_CAP as u64);
     }
 }

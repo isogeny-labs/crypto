@@ -1,0 +1,9 @@
+# Requested storage bound for the original general binary witness checker
+
+Scope: binary_ecc::curve::point_add and point_double, F2mElement arithmetic, original fields n23..31 or n47..61. This is a conservative requested-object/backing-word reservation, not a process RSS, allocator-overhead, compiler-frame, or retired-instruction measurement.
+
+At n<=61, canonical F2mElement values have one u64 backing word. mul and square allocate one result, and with_scratch uses its fixed 20-word stack buffer. square_k_times clones one result and reuses that backing word across its loop. flt_inverse uses at most six bits of n-1, so at most five expansion steps. Each step allocates at most four field results (shifted clone, multiply, optional square and multiply); initial beta and final square bring that to <=22. Its bit vector requests capacities4 then8, charged cumulatively as48 bytes.
+
+The surrounding normal-add/double formulas require fewer than18 further one-word results; operand construction and final coordinate views are included with slack by reserving64 F2mElement layouts and64 backing words, the inversion-bit vector requests,20 scratch words, and four BigUint layouts with16-byte backing allowances. Charge the full reservation immediately before each of the three independently checked additions; do not refund earlier reservations. The first refusal must happen before point construction/addition and must preserve the candidate enumeration event without fabricating a checked witness.
+
+This bound depends on the current one-word arithmetic implementation; broader fields are rejected by the admission helper. Carry source hashes for binary_ecc/curve.rs and f2m.rs with validation. Historical replay remains independently bounded by its 192-event cap and is outside the producer attempt budget. Original curve/factor-base admission and its requested storage remain a separate setup audit; this increment does not certify all adapter allocations.
