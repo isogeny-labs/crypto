@@ -40,20 +40,20 @@ for(branch52=0;branch52<=1;branch52++){
   x=element52(code52);if(x^order52!=x){ERROR("FIBERS23_52_COEFFICIENT_FROBENIUS");quit;}
   badDenominator52=0;
   for(d52=1;d52<=denominatorCount52;d52++){execute("currentDenominator52="+denominatorTexts52[d52]+";");if(currentDenominator52==0){badDenominator52=1;}}
-  if(badDenominator52==1){continue;}
+  if(badDenominator52==1){code52++;continue;}
   execute("f52="+fText52+";b52="+bText52+";c52="+cText52+";");
   if(deg(f52)!=7 || leadcoef(f52)!=1){ERROR("FIBERS23_52_MONIC_BASE_SPECIALIZATION");quit;}
   baseFactors52=factorize(f52);basePolys52=baseFactors52[1];basePowers52=baseFactors52[2];baseRebuilt52=1;
   for(fi52=1;fi52<=size(basePolys52);fi52++){baseRebuilt52=baseRebuilt52*basePolys52[fi52]^basePowers52[fi52];}
   if(baseRebuilt52!=f52){ERROR("FIBERS23_52_BASE_FACTOR_PRODUCT");quit;}
   for(fi52=2;fi52<=size(basePolys52);fi52++){
-   if(deg(basePolys52[fi52])!=1){continue;}
+   if(deg(basePolys52[fi52])!=1){fi52++;continue;}
    root52=leadcoef(subst(basePolys52[fi52],y,0))/leadcoef(basePolys52[fi52]);
-   if(subst(f52,y,root52)!=0 || subst(diff(f52,y),y,root52)==0){continue;}
+   if(subst(f52,y,root52)!=0 || subst(diff(f52,y),y,root52)==0){fi52++;continue;}
    if(extension52==7){smooth7_52++;}else{smooth8_52++;}
    bValue52=leadcoef(subst(b52,y,root52));cValue52=leadcoef(subst(c52,y,root52));A52=1+cValue52;
    Delta52=bValue52^3*(bValue52+cValue52*A52^3);
-   if(A52*Delta52==0){continue;}
+   if(A52*Delta52==0){fi52++;continue;}
    G52=l^16+A52^8*l^8+Delta52*l^4+A52^3*Delta52*l+bValue52^4*(bValue52^4+bValue52*cValue52*A52^3+cValue52^2*A52^4)+A52^16;
    if(deg(G52)!=16 || leadcoef(G52)!=1 || gcd(G52,diff(G52,l))!=1){ERROR("FIBERS23_52_MONIC_SEPARABLE_PACKET");quit;}
    factors52=factorize(G52);polys52=factors52[1];powers52=factors52[2];rebuilt52=1;degreeSum52=0;degrees52=0;

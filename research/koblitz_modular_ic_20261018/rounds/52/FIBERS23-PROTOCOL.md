@@ -38,3 +38,12 @@ comparison,statistics,power,A/A or randomization; fixed exhaustive finite set.
 
 Before first run: bind the polynomial formula byte-for-byte algebraically
 to the accepted R51 universal twisted G before any finite specialization.
+
+Before02:01 was manually terminated(SIGTERM143),not capped,after diagnosis
+of a deterministic loop at excluded x=0. Singular continue skips the for
+increment (official source doc/tricks.doc Behavior of continue,reviewed
+2026-10-31: https://raw.githubusercontent.com/Singular/Singular/spielwiese/doc/tricks.doc).
+Add explicit increments before all four continue paths. Preserve01 log,partial
+certificate and elapsed receipt. Scope and bounds unchanged; no scientific
+inference from01. A diagnosed nonadvancing loop may be aborted as a failed
+attempt; observation timeout alone is not a reason to stop a process.
