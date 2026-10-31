@@ -174,7 +174,7 @@
       {
         "name": "tool_versions",
         "treatment": "measured",
-        "how": "Install gawk and Nsight Systems from configured NVIDIA apt repository; record package versions and profiler identities. Image supplies ncu when available."
+        "how": "Install gawk and pinned cuda-nsight-systems-13-2=13.2.2-1 and cuda-nsight-compute-13-2=13.2.2-1 from configured NVIDIA CUDA apt repository; record resolved dependency versions. Official repository Packages.gz checked before launch."
       },
       {
         "name": "order",
@@ -395,10 +395,10 @@
     }
   ],
   "freeze": {
-    "status": "draft",
-    "protocol_sha256": null,
-    "commit": null,
-    "frozen_at": null,
-    "filed_before_affected_data": false
+    "status": "frozen",
+    "protocol_sha256": "4dc4c0560a8af2ad967d99c9f1d08526eb676e435b12ef658a174e093eba869e",
+    "commit": "b50e30d47458881eba10d802b7f972a9f56541bd",
+    "frozen_at": "2026-10-31T07:44:11Z",
+    "filed_before_affected_data": true
   }
 }
