@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "title": "Index-calculus boundary ledger",
-  "updated": "2026-10-31T08:15:29Z",
+  "updated": "2026-10-31T16:12:59Z",
   "claim_hygiene": "Public synthetic / known-answer fixtures only. Primary vs_rho claims use exactly one unseen target paired on the identical public point and resource envelope. Headline time is verified online wall after reusable IC preparation; exclude process launch, input loading, target generation, and target-independent setup. Multi-target averages, batch throughput, and shared-table amortization are secondary only and require a separate declared question after the primary one-target result. Never combine best component costs from different runs into a synthetic win. A new CPU wall-time speedup requires a qualifying host-isolation receipt; rows without one remain exploratory. Raw IC probes and rho walk steps use different units. An equal-budget precomputed-rho or multi-target study is secondary and cannot replace the one-target rho pair.",
   "ffd_vs_rank_la": "FFD / degree_of_regularity apply to Boolean Macaulay / Gröbner algebra of Semaev (decomposition). Relation-matrix LA over F_r is stage rank; never conflate the two.",
   "stages": [
@@ -1536,24 +1536,23 @@
             ]
           },
           "next_target": {
-            "summary": "The n=61 a=0 one-target online pair is landed with a CPU-isolation receipt and cross-host corroboration. Retain the audited n=71/n=73/n=83 rows and their missing-field failures. Next: extend the isolated-host protocol to n=71 and n=83 with the same five-phase online interval and taskset receipt, then a Bernstein-Lange rho reference arm at n=61 and above.",
+            "summary": "The n=61 a=0 one-target online pair is landed with a CPU-isolation receipt and cross-host corroboration, and the first n=71 single-target online rung is landed as PENDING_INDEPENDENT_VALIDATION (unpinned host). Next: a taskset-pinned or second-host replay of the n=71 rung with the same five-phase online interval for promotion; the same for the n=83 rung (20261014T122948Z-289481dc5c); then a Bernstein-Lange rho reference arm at n=61 and above.",
             "acceptance_gates": [
               "exactly one previously unseen public target and the identical point in IC and rho",
-              "complete candidate, workload, and run provenance with independent scalar replay",
-              "five exclusive IC online phase costs and the exact rho online interval",
-              "matching resource envelope and a qualifying host-isolation receipt for a CPU wall-time speedup",
-              "claim-check PASS before ledger promotion; preserve failed or incomplete rows",
-              "report rho_online_ms / IC_online_ms only for verified, qualifying pairs",
-              "multi-target, projected-rho, and precomputed-rho results remain separately labeled secondary studies"
-            ],
-            "historical_secondary_note": "Parallel guided rank changes reusable preparation. Host load cannot be assumed to affect both arms equally.",
-            "projection_class_research_target": "Extend the a=1 arm past n=83: n=97 a=0 (r ~ 2^95, cofactor 4) needs a rho projection-class rung (online rho ~ 2^44 steps is not wall-runnable); n=107/109/113 a=1 (r ~ 2^107-2^112, cofactor 2) and n=127 a=1 (r ~ 2^115, cofactor 7114) are the u128-ceiling rungs, also projection-class. ECC2K-130 itself (n=131 a=0, r ~ 2^129.6) additionally needs u256 field words, an implicit S3 index, and 130-bit sparse LA; 4-sum total-work parity with rho is not reachable there (see RESEARCH_ECC2K130_IC_FEASIBILITY.md) — the 5-sum relation shape is the top unexplored lever."
+              "complete candidate, workload, certificate, and host provenance",
+              "five exclusive IC online phases and the exact rho online interval",
+              "taskset-pinned CPU or independent second host; both scalars independently verified",
+              "identical candidate manifest across hosts",
+              "incomplete measurement_schema fields fail closed"
+            ]
           },
           "evidence": [
             "experiments/koblitz-single-target-n83-20261006/claim_report_vs_rho.json",
             "experiments/koblitz-single-target-n83-20261006/frozen/fixture.json",
             "experiments/koblitz-single-target-n73-20261003/claim_report_vs_rho.json",
-            "research/sat_factor_base_review_20260908/autolab/runs_manual/koblitz_parallel_rank_n73_20261005/"
+            "research/sat_factor_base_review_20260908/autolab/runs_manual/koblitz_parallel_rank_n73_20261005/",
+            "research/sat_factor_base_review_20260908/autolab/runs/20261031T071642Z-140c04e457/state.json",
+            "research/sat_factor_base_review_20260908/autolab/runs/20261031T071642Z-140c04e457/artifacts/single_target_summary.json"
           ],
           "history": [
             {
@@ -2330,6 +2329,49 @@
               "recorded": "2026-09-12-pre-shared-log-record",
               "summary": "n=37 process-wall crossover at 1,024 targets; n=53 direct stack improved over 30x but remains above fresh rho",
               "verdict": "N37_DIRECT_1024_PROCESS_WALL_IC_OVER_RHO_WIN__N53_NO_CROSSOVER"
+            },
+            {
+              "recorded": "2026-10-31-n71-single-target-first-rung-pending",
+              "summary": "First a=0 n=71 single-target online rung (2026-10-31, autolab run 20261031T071642Z-140c04e457): compact-orbit IC (K=600 tuned over candidates 200/600 on 1 disjoint one-target tune workload) vs strong rho rung 3 on the identical public point per workload; 16 one-target workloads on an unpinned arm64 macOS host (Apple M4 Pro, 14 CPUs); claim-check PASS 16/16; median online speedup 6.12x (bootstrap 95% CI 4.00-11.89, range 0.29-294.90); cold ratio median 177.7 (reusable setup outside the online interval); both scalars verified; status PENDING_INDEPENDENT_VALIDATION — not a promotion: no taskset-pinned second host yet",
+              "metrics": {
+                "n": 71,
+                "a": 0,
+                "target_count": 1,
+                "timing_class": "single_target_online",
+                "curve_id": "EC1N71Ce0hac1355ef3db6",
+                "K": 600,
+                "k_candidates": [
+                  200,
+                  600
+                ],
+                "workloads": 16,
+                "claim_check": "PASS 16/16",
+                "median_online_speedup": 6.122,
+                "median_95ci_bootstrap": [
+                  3.9984897683181506,
+                  11.894407189299415
+                ],
+                "online_speedup_range": [
+                  0.2926882592321631,
+                  294.9006019857314
+                ],
+                "cold_ratio_median": 177.74,
+                "candidate_id": "IC1N71Ckb0fb85200PDP4s3rootindexRCguidedLAdenseTDsingleISO0h6367473b54e6",
+                "candidate_manifest_sha256": "6367473b54e6406fadd6ea3ba7496c61433557d4795f12fe2c391bc4a0835c8f",
+                "hosts": [
+                  {
+                    "host_id": "arm64 macOS (Adams-MacBook-Pro.local, Apple M4 Pro, 14 CPUs), unpinned",
+                    "run_id": "20261031T071642Z-140c04e457",
+                    "git_head": "d51b908a77574e8d7ac7aa2cb3332961578cade8",
+                    "claim_check": "PASS 16/16"
+                  }
+                ],
+                "paired_same_public_point": true,
+                "ic_scalar_verified": true,
+                "rho_scalar_verified": true,
+                "status": "PENDING_INDEPENDENT_VALIDATION",
+                "claim_boundary": "constant-factor win only, no asymptotic sub-rho claim"
+              }
             }
           ],
           "accounting_non_claims_20261008": "The retained n=41 through n=83 rows pair one public target per rung. Repeated runs on the same point measure timing variation, not the distribution across targets. The historical online wall ratios have no qualifying host-isolation receipt and are exploratory. IC probes and rho walk steps are distinct counters; their quotient is not an operation-count speedup. Guided-rank mean probes follow a different query policy and do not establish a target-luck factor. A precomputed-rho comparator has not been measured; any such equal-budget study is secondary to the required one-target rho pair.",
