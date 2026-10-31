@@ -10179,3 +10179,276 @@ fn verify_parent_delivery(
         capture_acknowledgements: acknowledgements,
     })
 }
+
+// Draft for insertion in koblitz_m3.rs after the current shared-worker test gate.
+// Native source review: F2mElement::from_bit_positions uses inline Words for
+// n<=61; it avoids temporary BigUint digit vectors. Worker verification already
+// checks irreducibility, curve/order, subgroup and factor-base mathematics.
+fn decode_verified_worker_math(
+    token: &super::VerifiedWorkerOriginal<'_>,
+    budget: &mut Budget,
+) -> Result<MathInput, Stop> {
+    use crate::binary_ecc::{BinaryCurve, BinaryPoint, F2mElement, IrreduciblePoly};
+    use num_bigint::BigUint;
+    // Fixed modeled admission: bounded JSON lookups, <=20 digit decimal words,
+    // <=61 exponents, <=8 signed points, <=4 field-element bit scans. This is
+    // a checking tariff, not a retired-instruction measurement.
+    const WORK: u64 = 8192;
+    let bytes = (std::mem::size_of::<MathInput>()
+        + 2 * std::mem::size_of::<BinaryCurve>()
+        + 4 * std::mem::size_of::<BigUint>()
+        + 4 * std::mem::size_of::<F2mElement>()
+        + 3 * 61 * std::mem::size_of::<u32>()
+        + 16 * std::mem::size_of::<(u64, u64)>()
+        + 64) as u64;
+    budget.reserve_checking(WORK, bytes, Instant::now())?;
+    let decoded = (|| {
+        let c = token.config;
+        let p = token.public;
+        let base = token.factor_base;
+        if token.binding.is_none()
+            || c.family != "koblitz"
+            || c.m != 3
+            || !((23..=31).contains(&c.n) || (47..=61).contains(&c.n))
+            || token.public_bytes > 64 * 1024
+            || token.factor_base_bytes > 128 * 1024
+            || p["family"] != "koblitz"
+            || p["n"].as_u64() != Some(c.n as u64)
+            || p["m"].as_u64() != Some(3)
+            || p["twist"].as_bool() != Some(c.twist)
+            || base["requested_size"].as_u64() != Some(c.factor_base_size as u64)
+            || p["field"]["degree"].as_u64() != Some(c.n as u64)
+            || p["field"]["characteristic"] != "2"
+        {
+            return Err(Stop::InvalidLimits);
+        }
+        fn word(v: &serde_json::Value) -> Result<u64, Stop> {
+            let s = v.as_str().ok_or(Stop::InvalidLimits)?;
+            if s.is_empty() || s.len() > 20 || (s.len() > 1 && s.as_bytes()[0] == b'0') {
+                return Err(Stop::InvalidLimits);
+            }
+            s.bytes().try_fold(0u64, |n, b| {
+                if !b.is_ascii_digit() {
+                    return Err(Stop::InvalidLimits);
+                }
+                n.checked_mul(10)
+                    .and_then(|n| n.checked_add((b - b'0') as u64))
+                    .ok_or(Stop::InvalidLimits)
+            })
+        }
+        let q = 1u64 << c.n;
+        let point = |v: &serde_json::Value| -> Result<(u64, u64), Stop> {
+            let x = word(&v["x"])?;
+            let y = word(&v["y"])?;
+            if x >= q || y >= q {
+                return Err(Stop::InvalidLimits);
+            }
+            Ok((x, y))
+        };
+        let a = word(&p["curve"]["a"])?;
+        if a >= q || word(&p["curve"]["b"])? != 1 {
+            return Err(Stop::InvalidLimits);
+        }
+        let generator = point(&p["generator"])?;
+        let target = point(&p["target"])?;
+        let order = word(&p["curve"]["subgroup_order"])?;
+        let cofactor = word(&p["curve"]["cofactor"])?;
+        let rows = base["points"].as_array().ok_or(Stop::InvalidLimits)?;
+        if rows.is_empty() || rows.len() > 4 {
+            return Err(Stop::InvalidLimits);
+        }
+        let mut points = [(0u64, 0u64); 8];
+        let mut count = 0;
+        for row in rows {
+            let (x, y) = point(row)?;
+            for value in [(x, y), (x, x ^ y)] {
+                if !points[..count].contains(&value) {
+                    points[count] = value;
+                    count += 1;
+                }
+            }
+        }
+        if count != 4 {
+            return Err(Stop::InvalidLimits);
+        }
+        points[..count].sort_unstable();
+        let signed = [points[0], points[1], points[2], points[3]];
+        if signed[0].0 != signed[1].0
+            || signed[2].0 != signed[3].0
+            || signed[0].0 == signed[2].0
+            || signed[0].1 ^ signed[0].0 != signed[1].1
+            || signed[2].1 ^ signed[2].0 != signed[3].1
+        {
+            return Err(Stop::InvalidLimits);
+        }
+        let terms = p["field"]["irreducible_low_terms"]
+            .as_array()
+            .ok_or(Stop::InvalidLimits)?;
+        if terms.is_empty() || terms.len() > 61 {
+            return Err(Stop::InvalidLimits);
+        }
+        let mut low_terms = Vec::new();
+        low_terms
+            .try_reserve_exact(terms.len())
+            .map_err(|_| Stop::Allocation)?;
+        for term in terms {
+            let value = term.as_u64().ok_or(Stop::InvalidLimits)?;
+            if value >= c.n as u64 || low_terms.contains(&(value as u32)) {
+                return Err(Stop::InvalidLimits);
+            }
+            low_terms.push(value as u32);
+        }
+        low_terms.sort_unstable();
+        let element = |value: u64| {
+            let mut positions = [0u32; 61];
+            let mut count = 0;
+            for bit in 0..c.n {
+                if value & (1u64 << bit) != 0 {
+                    positions[count] = bit;
+                    count += 1;
+                }
+            }
+            F2mElement::from_bit_positions(&positions[..count], c.n)
+        };
+        Ok(MathInput {
+            curve: Box::new(BinaryCurve {
+                m: c.n,
+                irreducible: IrreduciblePoly {
+                    degree: c.n,
+                    low_terms,
+                },
+                a: element(a),
+                b: element(1),
+                generator: BinaryPoint::Affine {
+                    x: element(generator.0),
+                    y: element(generator.1),
+                },
+                order: BigUint::from(order),
+                cofactor: BigUint::from(cofactor),
+            }),
+            target,
+            codes: [signed[0].0, signed[2].0],
+            signed,
+        })
+    })();
+    match decoded {
+        Ok(value) => {
+            budget.check(Instant::now())?;
+            Ok(value)
+        }
+        Err(stop) => budget.fail(stop),
+    }
+}
+
+#[cfg(test)]
+mod worker_math_decode_tests {
+    use super::super::verified_worker_original_tests::Fixture;
+    use super::*;
+    fn budget(config: &crate::ml_dataset::types::CaseConfig) -> Budget {
+        let now = Instant::now();
+        Budget::new(
+            config.work_limit,
+            512 << 20,
+            16 << 20,
+            now + Duration::from_secs(20),
+            now,
+        )
+        .unwrap()
+    }
+    #[test]
+    fn worker_math_decode_matches_independent_original_replay_for_sizes_and_twists() {
+        for n in [23, 31, 47, 53, 61] {
+            for twist in [false, true] {
+                let f = Fixture::with_shape(n, twist, 4);
+                let mut registry = Vec::new();
+                let token = super::super::verify_and_store_worker_originals(
+                    &f.config,
+                    &f.case,
+                    &f.root,
+                    Some(&f.binding),
+                    &mut registry,
+                )
+                .unwrap();
+                token
+                    .matches_bound(&f.config, &f.case, &f.root.join("live"), &f.binding)
+                    .unwrap();
+                let mut b = budget(&f.config);
+                let decoded = decode_verified_worker_math(&token, &mut b).unwrap();
+                let replay = original_math(&f.config, &f.case).unwrap();
+                assert_eq!(decoded.target, replay.target);
+                assert_eq!(decoded.codes, replay.codes);
+                assert_eq!(decoded.signed, replay.signed);
+                assert_eq!(decoded.curve.m, replay.curve.m);
+                assert_eq!(
+                    decoded.curve.irreducible.low_terms,
+                    replay.curve.irreducible.low_terms
+                );
+                assert_eq!(decoded.curve.a, replay.curve.a);
+                assert_eq!(decoded.curve.b, replay.curve.b);
+                assert_eq!(decoded.curve.generator, replay.curve.generator);
+                assert_eq!(decoded.curve.order, replay.curve.order);
+                assert_eq!(decoded.curve.cofactor, replay.curve.cofactor);
+                assert_eq!(b.checking_work, 8192);
+                assert_eq!(b.native, Reservation::default());
+                assert_eq!(b.trace_bytes, 0);
+            }
+        }
+    }
+    #[test]
+    fn worker_math_decode_reserves_before_work_and_preserves_original_stops() {
+        let f = Fixture::with_shape(23, false, 4);
+        let mut registry = Vec::new();
+        let token = super::super::verify_and_store_worker_originals(
+            &f.config,
+            &f.case,
+            &f.root,
+            Some(&f.binding),
+            &mut registry,
+        )
+        .unwrap();
+        let mut full = budget(&f.config);
+        decode_verified_worker_math(&token, &mut full).unwrap();
+        let bytes = full.adapter_bytes;
+        let mut exact = budget(&f.config);
+        exact.checking_work = exact.native_work_limit - 8192;
+        exact.adapter_bytes = exact.memory_limit - bytes;
+        assert!(decode_verified_worker_math(&token, &mut exact).is_ok());
+        for case in 0..3 {
+            let mut b = budget(&f.config);
+            let expected = match case {
+                0 => {
+                    b.checking_work = b.native_work_limit - 8191;
+                    Stop::Work
+                }
+                1 => {
+                    b.adapter_bytes = b.memory_limit - bytes + 1;
+                    Stop::Bytes
+                }
+                _ => {
+                    b.construction_deadline = Instant::now() - Duration::from_secs(1);
+                    Stop::Deadline
+                }
+            };
+            let before = (b.checking_work, b.adapter_bytes);
+            assert!(matches!(decode_verified_worker_math(&token,&mut b),Err(s) if s==expected));
+            assert_eq!((b.checking_work, b.adapter_bytes), before);
+            assert_eq!(b.stopped, Some(expected));
+            assert_eq!(b.native, Reservation::default());
+            assert_eq!(b.trace_bytes, 0);
+        }
+        let unbound = super::super::verify_and_store_worker_originals(
+            &f.config,
+            &f.case,
+            &f.root,
+            None,
+            &mut registry,
+        )
+        .unwrap();
+        let mut b = budget(&f.config);
+        assert!(matches!(
+            decode_verified_worker_math(&unbound, &mut b),
+            Err(Stop::InvalidLimits)
+        ));
+        assert_eq!(b.stopped, Some(Stop::InvalidLimits));
+    }
+}

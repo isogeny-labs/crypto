@@ -5951,14 +5951,17 @@ mod bounded_witness_bridge_tests {
 mod verified_worker_original_tests {
     use super::*;
     use crate::ml_dataset::{self as dataset, storage};
-    struct Fixture {
-        root: PathBuf,
-        config: CaseConfig,
-        case: CaseData,
-        binding: AttemptBinding,
+    pub(super) struct Fixture {
+        pub(super) root: PathBuf,
+        pub(super) config: CaseConfig,
+        pub(super) case: CaseData,
+        pub(super) binding: AttemptBinding,
     }
     impl Fixture {
         fn new() -> Self {
+            Self::with_shape(23, false, 2)
+        }
+        pub(super) fn with_shape(n: u32, twist: bool, factor_base_size: usize) -> Self {
             let nonce = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
@@ -5972,7 +5975,7 @@ mod verified_worker_original_tests {
             let bytes = serde_json::to_vec(&protocol).unwrap();
             let plan = dataset::DatasetPlan {
                 schema: "crypto.ml-dataset.plan/v1".into(),
-                field_sizes: vec![23],
+                field_sizes: vec![n],
                 arities: vec![3],
                 families: vec!["koblitz".into()],
                 solvers: vec!["enumerate".into()],
@@ -5980,7 +5983,7 @@ mod verified_worker_original_tests {
                 generators: 1,
                 keys: 1,
                 seed: 42,
-                factor_base_size: 2,
+                factor_base_size,
                 degree_bound: 3,
                 work_limit: 100,
                 twists: true,
@@ -5988,7 +5991,9 @@ mod verified_worker_original_tests {
                 split_rule: "curve-twist-component-sha256-v1".into(),
             };
             let hash = plan.binding_sha256().unwrap();
-            let config = plan.cell(0).unwrap();
+            let index = u64::from(twist);
+            let config = plan.cell(index).unwrap();
+            assert_eq!(config.twist, twist);
             storage::write_json(&root,"run.json","run",&json!({"schema":"crypto.ml-dataset.run/v1","plan_sha256":hash,"source_commit":"a".repeat(40),"binary_sha256":"b".repeat(64)})).unwrap();
             storage::write_json(&root, "plan.json", "plan", &plan).unwrap();
             storage::write_json(&root, "config.json", "config", &config).unwrap();
@@ -5996,7 +6001,7 @@ mod verified_worker_original_tests {
                 &root,
                 "attempt.json",
                 "attempt",
-                &json!({"schema":"crypto.ml-dataset.attempt/v1","cell_index":0,"plan_sha256":hash}),
+                &json!({"schema":"crypto.ml-dataset.attempt/v1","cell_index":index,"plan_sha256":hash}),
             )
             .unwrap();
             storage::write_bytes(&root, "protocol.json", "protocol", "json", &bytes).unwrap();
