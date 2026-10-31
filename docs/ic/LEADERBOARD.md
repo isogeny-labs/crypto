@@ -33,6 +33,14 @@ The [canonical timeline](../index-calculus-scoreboard.html#lab-progress) shows t
 | 2026-10-17 | [n83 K1107/root11 sixteen-point cold factor-base frontier](https://github.com/aburan28/crypto/blob/main/research/n83_e2e_finalist_results_20261017/RESULT.md) | 47.1× | matched | Tier 1 cloud-instance cold IC / same-point rho online wall |
 | 2026-10-20 | [k = 5 2-torsion Edwards route, F4 trace replay, complete DLP at p = 61 (ell = 2^27.7)](https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md) | 1,236,267× | matched | F_p multiplications |
 
+**Correction 2026-10-31 (R3 verification of the E4 leaderboard audit; progress rows 2026-09-16, 09-21, 09-29, 10-01, 10-03, 10-04, 10-15, 10-20).** Checked against the cited comparison files and `docs/ic/progress-timeline.json`. Nothing was re-run.
+
+- **Tournament rounds 0007, 0019, 0025 (2026-09-16, 09-21, 09-29).** The values (0.738, 0.675, 1.356) are IC over rho in the worker rho's **instructions**, a non-GAE unit that the timeline detail states. The unit column does not, and these are not comparable with the S rows.
+- **Koblitz descent, best size 2^38.0 (2026-10-01).** The 2× shown is the superseded §23 figure (1.98×, rounded). The current figure on the same cell is **3.97×** (Table A, v7, `icv1-f2m57-tm747311035-c1f545af`, clock units, Table A below). Corrected value: 3.97×.
+- **ecbench baseline, f2m17 `ic-frob-m2` (2026-10-03).** The 4.3× is a quotient of two runs that both carry `lower_bound: true` (`research/ecbench_all_candidates_20261003/sessions/koblitz/comparisons/rho-strong__ic-frob-m2.json`; f2m17 per-pair ratios 4.20 to 4.47). 48 of 96 IC runs errored, and the IC records carry `*_uncharged` counters. **Unpriceable: lower bound only.**
+- **Pair claw, best cell f2m43 (2026-10-04).** The 1.85× (README table, `research/ecbench_pair_claw_20261003/README.md`) comes from comparisons with `lower_bound: true` on both arms, with 1,152 uncharged inserts and 1,152 uncharged lookups. There is no calibration row for this curve. **Unpriceable: lower bound only.**
+- **Joux-Vitse n = 5 (2026-10-15, 68,183,174×) and k = 5 Edwards (2026-10-20, 1,236,267×).** These are F_p-multiplication ratios. Table D states that the Joux-Vitse comparison is withheld, so neither figure is a comparable IC/rho value and neither should be read as a speed-up.
+
 ## Native candidate tournament, round 0026 (separate Ir unit)
 
 [Frozen per-cell data](../../research/ic_candidate_tournament_20260915/runs/round-0026/measurements.json) and [full result](../../research/ic_candidate_tournament_20260915/runs/round-0026/REPORT.md) retain all arms and the exact ICV1 curve identities. One target is charged cold per job. The selected `batch16` configuration improves the incumbent, but its matched worker rho is still cheaper on every curve; this rho is not qualified as globally strongest. The factor base was fixed within each paired arm, so this panel does not choose a new base. `2^x Ir` is guest instructions, with no measured curve-addition conversion. The hosted wall times lack core-reservation and contention receipts, so the native wall condition is unqualified and promotion awaits an isolated new round. The rank floor is the deliberately weak `Ir >= K`; no scaling exponent was promoted.
@@ -300,6 +308,12 @@ The preregistered one-target workload `f6d79f6dd9f2` on `icv1-f2m9-tm5-4a3ea183`
 | 19 | `icv1-f2m19-t797-b6cf2467` | 8 | 3.134 | 1.582 | 2090.849 | 0.433 |
 | 23 | `icv1-f2m23-t5197-69e76b73` | 8 | 1.046 | 2.091 | 2.721 | 0.000 |
 
+**Correction 2026-10-31 (R3 verification of the E4 leaderboard audit; rows L1 to L6).** The solver word XORs in these rows are counted but unpriced (records carry `solver_word_XORs ... uncharged`; `pinned_sensitivity` is null for m = 19 and m = 23). Repriced under the K13 rule: per target, S_priced = S + word XORs × ns_per_word_xor / sqrt(r), with the ratio pinned for the same curve in `docs/ic/calibration.json`. Medians over 8 targets, ranges in brackets, from `research/f6_ic_ecbench_ladder_20261005/sessions/`.
+
+- **m = 13** (`icv1-f2m13-t181-515ee569`; K_0 / GF(2^13), ratio 0.002304; r = 2003; rho S 14.713). Inherited F4: per-target median 326.76 [231.3, 441.1], which reproduces `pinned_sensitivity` at `ANALYSIS.json:98` (median-of-medians 16.68 + 6.01e6 × 0.002304 / 44.75 = 326.3). S/rho = **22.2**, not 1.105. F6-IC: per-target median 1052.45 [731.5, 1486.6] (`ANALYSIS.json:124`). S/rho = **71.5**, not 54.75.
+- **m = 23** (`icv1-f2m23-t5197-69e76b73`; K_0 / GF(2^23), ratio 0.001164 from `calibration.json`; r = 2,095,853; rho S 1.046). Inherited F4: 2.14 + 1.063e10 × 0.001164 / 1447.7 = **8,549** [7,780, 8,801]; S/rho ≈ 8,170 (ratio of medians; 7,760 as the median of per-target ratios). F6-IC: 2.80 + 1.063e10 × 0.001164 / 1447.7 = **8,550** [7,780, 8,801]; S/rho ≈ 8,170. That ratio was measured under load on a laptop host (its `calibration.json` note), so treat these as indicative until it is re-pinned. The m = 23 word-XOR medians are about 19 times the m = 19 medians (1.06e10 against 5.5e8), not 1,000 times.
+- **m = 19** (`icv1-f2m19-t797-b6cf2467`; K_0 / GF(2^19)). `calibration.json` has no pinned ratio for this curve (its K_1 / GF(2^19) entry is a different curve with a = 1). Rows L3 and L4 are **unpriceable: lower bound only**.
+
 ## F4, F5 and F6-IC on Koblitz and generic binary curves, outside tables A–C
 
 Matrix F4, matrix F5, inherited F4 and F6-IC through `pdp3-binary` on eight public one-target workloads per cell, beside same-target rho. IC `S` is a lower bound (solver word XORs unpriced; F6-IC's geometric additions charged). `W` is counted solver word XORs. Prime curves have no algebraic oracle in `ecbench`. Read the [analysis](../../research/f4_f5_f6_cross_family_20261011/ANALYSIS.json).
@@ -321,6 +335,10 @@ Matrix F4, matrix F5, inherited F4 and F6-IC through `pdp3-binary` on eight publ
 | matrix-f5 | 74870.490 [53415.390, 96624.052] | no | — |
 | rho-negation | 2.290 [1.788, 3.419] | yes | 2.290 |
 | rho-strong | 14.318 [13.603, 14.341] | yes | 14.318 |
+
+**Correction 2026-10-31 (R3 verification of the E4 leaderboard audit; rows X1 to X8).** X1 (K13 inherited F4, 16.285) is already corrected above (630.859 on main). The K13 correction table also covers F6-IC, 1571.201 [1187.260, 2063.759] against 1161.733 archived, so X2 is covered. Archived-count check for X2: 1161.73 + 9,097,648 × 0.002304 / 44.75 = 1630, against the rerun 1571; the rerun stands. For K13 inherited F4 the same archived-count check gives 16.29 + 11,122,152 × 0.002304 / 44.75 = 589, against the rerun 631.
+
+Binary m = 13 (`icv1-f2m13-tm9-6863a838`, r = 1367; rows X3, X4) and binary m = 19 (`icv1-f2m19-tm649-a9133fe6`, r = 262469; rows X7, X8), and K_0 / GF(2^19) (`icv1-f2m19-t797-b6cf2467`; rows X5, X6): the solver word XORs are counted but unpriced (`solver_word_XORs ... uncharged` in `research/f4_f5_f6_cross_family_20261011/sessions/`), and `docs/ic/calibration.json` has no pinned ratio for any of these curves. Its word-XOR ratios cover K_0 at GF(2^13, 15, 23, 31, 37, 39, 41), K_1 at GF(2^11, 17, 19, 23, 29) and random binary n15 to n27 only. These rows are **unpriceable: lower bound only**. Per-target word-XOR medians are 8.7e6 to 6.7e8 (`ANALYSIS.json`).
 
 ## n41/n53 shared-rank counted panel, outside tables A–C
 
