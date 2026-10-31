@@ -1,4 +1,17 @@
-# Prime-field factor bases: degree reduction remains an open goal
+# Prime-field factor bases: certificates and a secant degree reduction
+
+## Positive secant/graph continuation, 2026-10-31
+
+A subsequent [split-graph theorem](SECANT_GRAPH.md) derives a strict
+presentation-specific homogeneous degree reduction: a degree-d completely
+split graph gives degree d+1 versus 2d+1 in the exact dense two-summand
+system. The explicit four-abscissa fixture has degree **5 to 3**, while its
+matched nongraph control has secant degree **4**. All four sign branches are
+retained. Exact upper identities and lower witnesses certify the quadratic
+top ideal; the secant/group polynomial identity is also checked over Z.
+External novelty, full formalization, F4 solving degree, natural yield and
+performance remain open. The original round below and its verification
+records remain historical. See [the continuation artifacts](secant/README.md).
 
 Date: 2026-10-31. The requested result is a genuinely novel factor-base degree
 reduction for a prime-field elliptic curve. **This round has not established

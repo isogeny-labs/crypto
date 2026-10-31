@@ -62,3 +62,17 @@ established. The complete compact shifted-fiber exporter and iterative F4
 comparison remain to be implemented; the dense two-summand homogeneous metric
 is fixed at B+1 and cannot supply the requested set-only win. A local smoke
 run is not proposed as a substitute for that positive mathematical result.
+
+2026-10-31, secant/graph continuation: a separate
+[two-summand degree theorem](../research/prime_factor_base_degree_20261031/SECANT_GRAPH.md)
+now derives homogeneous top-ideal degree d+1 for completely split degree-d
+graphs, versus 2d+1 for dense membership/S3. The explicit quadratic fixture
+has certified degree 3 versus dense degree 5, with a matched nongraph secant
+control at degree 4. All four sign branches are retained. Exact integer
+identity checking, cubic upper identities, quadratic lower dual witnesses,
+and a Lean exponent theorem are available. This is a positive component
+result, not completion of the original novelty or experimental requirement.
+Independent novelty review, actual F4 traces, complete all-target/group
+comparison, base construction/scaling and end-to-end costs remain open.
+The unchanged S3 checkpoint gate was retried and still lacks an upload route;
+no experimental panel was launched or relabeled as a development test.

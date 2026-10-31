@@ -1,5 +1,26 @@
 # Prime bivariate certificate and pilot exporter
 
+The separate `secant-graph-certificate` binary supports the new
+[split-graph degree theorem](../SECANT_GRAPH.md). It reuses the repository
+identity certificate implementation, checks the secant identity by exact
+integer expansion, checks upper/lower homogeneous-degree certificates, and
+exports complete four-branch secant inputs. It does not run an F4 solver.
+
+```sh
+secant-graph-certificate verify ../secant/identity.json
+secant-graph-certificate check-degrees ../secant/homogeneous-degree.json
+# Write-once artifact issuers/exporters:
+secant-graph-certificate seal NEW-IDENTITY.json
+secant-graph-certificate degrees NEW-DEGREE-CERTIFICATE.json
+secant-graph-certificate fixture NEW-FIXTURE.json
+secant-graph-certificate systems 10 6 NEW-COMPLETE-SYSTEMS.json
+```
+
+The degree certificate proves degree three for the fixed quadratic top ideal
+over F17 in all four sign branches. It is distinct from this package's existing
+bivariate bounded-refutation metric, described below. The general degree-d
+claim and the complete group/polynomial bridges are stated in the theorem.
+
 ```sh
 cargo test --release --locked --manifest-path research/prime_factor_base_degree_20261031/native/Cargo.toml
 cargo build --release --locked --manifest-path research/prime_factor_base_degree_20261031/native/Cargo.toml

@@ -288,6 +288,19 @@ mod tests {
         assert_eq!(curve_points(&s).len() + 1, 19);
         assert_eq!(point_add(&s, Some((5, 1)), Some((5, 1))), Some((6, 3)));
         assert_eq!(point_add(&s, Some((5, 1)), Some((5, 16))), None);
+        // Fixed known-answer replay for the secant/graph proof fixture.
+        // These supplied multiples also bind its nongraph-control argument.
+        let mut multiple = None;
+        for k in 1..=19 {
+            multiple = point_add(&s, multiple, Some((5, 1)));
+            match k {
+                3 => assert_eq!(multiple, Some((10, 6))),
+                7 => assert_eq!(multiple, Some((0, 6))),
+                13 => assert_eq!(multiple, Some((16, 4))),
+                19 => assert_eq!(multiple, None),
+                _ => {}
+            }
+        }
     }
     #[test]
     fn candidate_lift_filter_and_membership() {
