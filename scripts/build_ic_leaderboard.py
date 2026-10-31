@@ -837,8 +837,10 @@ def prime_base_size_component() -> dict:
     return {"rows": rows, "class": "engineering", "study": study + "/", "report": study + "/README.pdf",
             "second_host": second_host,
             "unit": "S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation",
-            "validation": ("validated with caveats: replay certificate, validator report and the matched rho "
-                           f"reference with the §5a band ({study}/VALIDATION.json)") if not errs else NOT_VALIDATED,
+            "validation": ("Validated with caveats: replay certificate, validator report and the matched rho "
+                           f"reference with the §5a band are filed in `{study}/VALIDATION.json`. The promoted "
+                           "result is the 20-bit `N=45` engineering baseline only; it is one curve, counted "
+                           "pricing-band evidence, and not a scaling or wall-time claim.") if not errs else NOT_VALIDATED,
             "validated": not errs}
 
 
