@@ -21,8 +21,24 @@ does not share code with it.
 | 1. Factor-base selection | `relation.rs` `new_factor_bases`, `new_affine_factor_bases`, `new_windowed_factor_bases` | m random hashed membership predicates, each with \|F_i\| ≈ (2r)^(1/m). There is no notion of smoothness. The default hash is keyed SHA-256. The gadget path uses a random affine hash, A ∈ F_i iff (α_i x + β_i y + γ_i) mod p < U_i, because that is cheap to check with low-degree gadgets. A coordinate window can be added: A ∈ F_i iff x(A) < p>>k as well (see below). |
 | 2. Relation finding | `relation.rs` `relation_network`, `tensor.rs` | `[u]P+[v]Q = A_1+…+A_m` is encoded as a Boolean tensor network with (2m−1)(2b+1) edges. |
 | Counting → search | `tensor.rs` `find_witness` | Self-reduction fixes one bit at a time, so any **counting** solver works. |
-| 3. Linear algebra | `linalg.rs` | Left-kernel vector mod r by Gaussian elimination |
+| 3. Linear algebra | `linalg.rs` | Left-kernel vector mod r by sparse Gaussian elimination (`left_kernel_vector_sparse`, used by the solver); `left_kernel_vector` is the dense reference |
 | 4. Extraction | `solver.rs` | ξ = −U/V, always checked against `[ξ]P == Q`; an unverified answer is never returned. |
+
+Relation search has two elimination orders. The default contracts the
+network forward, which costs |F_1| x ... x |F_m|. `Solver::mitm` instead
+contracts it from both ends toward the middle (`relation::mitm_find_relation`):
+it enumerates the first half of the factor bases into a table keyed by the
+partial sum and looks up the complement from the second half. That is about
+2 sqrt(2r) point additions per attempt instead of 2r — the same network and the
+same set of solutions, only a different elimination order, returning one
+witness rather than a count. `ecdldemo -mitm` selects it.
+
+With meet-in-the-middle, relation search is also parallel: the solver draws a
+batch of targets in order, evaluates them on `Solver::threads` workers
+(`ecdldemo -threads N`, 0 = one per core), and keeps the hits in target order,
+so the outcome does not depend on the thread count. Only the scalar draws stay
+sequential. While an `opcount` tally is active the search stays on one thread,
+because the tally is thread-local.
 
 Counters sit behind the `Counter` trait: `SparseContractor` (exact,
 vertex-by-vertex, sums out each edge once no later vertex uses it),
@@ -59,6 +75,12 @@ enumerating the group:
   degree.
 - The gadget relation network takes its hint candidates from the window, so a
   relation search never touches a point outside it.
+- The window does not need gadgets. The solver applies it whenever
+  `window_bits > 0`, and the meet-in-the-middle path uses it too; it is a
+  constraint on the affine hash, not on how relations are encoded.
+
+Listing cost at b = 24 (p = 8388617, m = 2), measured: k = 0 takes 859 ms and
+evaluates a hash per group point; k = 8 takes 12 ms and holds the same |F_i|.
 
 `ecdlscale` prints the same table as the Go command, byte for byte:
 

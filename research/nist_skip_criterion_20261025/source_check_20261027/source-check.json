@@ -1,0 +1,76 @@
+{
+  "schema": "historical-source-recheck/v1",
+  "date_utc": "2026-10-27",
+  "source_commit": "c8c94dd11a9cb908c761e823e6df2e63fd2b0806",
+  "purpose": "Look for original visitation/acceptance evidence or a source-supported complete skip criterion; no new numerical comparison",
+  "web_queries": [
+    "\"NIST\" \"skipped\" \"Reiter\" curves",
+    "\"seeds-solved\" \"skipped\"",
+    "\"ECDSA\" \"curve origins\" \"skipped\"",
+    "\"NIST\" \"skipped curves\" \"criterion\" -\"Claude reveals\" -\"reveals ECDSA\"",
+    "\"NIST\" \"skipped\" curves after:2026-10-20",
+    "\"Bob Reiter\" \"curve\" generator source code"
+  ],
+  "primary_pages": [
+    {
+      "url": "https://www.anthropic.com/research/ecdsa-curve-origins",
+      "finding": "Open questions still state no explanation for omitted viable candidates"
+    },
+    {
+      "url": "https://words.filippo.io/seeds-solved/",
+      "finding": "Reports order-bit-width screen and still-unexplained additional omissions"
+    },
+    {
+      "url": "https://www.mail-archive.com/tls%40ietf.org/msg25031.html",
+      "finding": "Alternative process explanations are hypotheses, no original decision record"
+    },
+    {
+      "url": "https://www.mail-archive.com/tls@ietf.org/index.html",
+      "finding": "Thread index inspected; no additional seed-decision record retrieved"
+    }
+  ],
+  "repository_search": {
+    "repositories": [
+      "isogeny-labs/crypto",
+      "isogeny-labs/crypto-autoresearcher"
+    ],
+    "file_queries": [
+      "Reiter",
+      "original acceptance log"
+    ],
+    "topn": 10,
+    "scope": "Indexed default branches, not exhaustive historical refs",
+    "issue_query": "org:isogeny-labs NIST skipped",
+    "issue_results": 0
+  },
+  "prior_reports": [
+    {
+      "path": "sources/original-draft-report.md",
+      "repository": "isogeny-labs/crypto-autoresearcher",
+      "commit": "351c9c021c7be044ade54dc7e352b33d3a772244",
+      "upstream_path": "research/nist_seed_1997_original_draft_20261023/report.md",
+      "git_blob": "13ab89562a8b2d96fe7b88d6aca9b8f71331b215"
+    },
+    {
+      "path": "sources/acceptance-report.md",
+      "repository": "isogeny-labs/crypto-autoresearcher",
+      "commit": "351c9c021c7be044ade54dc7e352b33d3a772244",
+      "upstream_path": "research/nist_seed_1997_acceptance_20261024/report.md",
+      "git_blob": "408d2e9a04540b6791a63ca812afde842e1a4586"
+    }
+  ],
+  "results": {
+    "original_caller_or_decision_record_retrieved": false,
+    "supported_complete_criterion_found": false,
+    "new_scientific_execution": false,
+    "original_records_supplied": false,
+    "prior_arithmetic_recomputed": false,
+    "goal_status": "Unresolved; missing historical decision evidence, not proof of nonexistence"
+  },
+  "limitations": [
+    "Search results and repository indexes are incomplete",
+    "Eligible stream positions do not certify original visits or rejections",
+    "Prior reports retain original provenance and were read, not independently rerun",
+    "This check does not exclude undiscovered mechanisms or expensive intermediate advantages"
+  ]
+}

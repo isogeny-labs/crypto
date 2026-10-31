@@ -89,7 +89,12 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - run: cargo build --release --bin backlog --bin backlog_check_aux2t
       - name: Fetch main's history (no blobs) for the merged-commit check
-        run: git fetch --no-tags --filter=blob:none origin +refs/heads/main:refs/remotes/origin/main
+        run: |
+          history_args=()
+          if [ "$(git rev-parse --is-shallow-repository)" = true ]; then
+            history_args+=(--unshallow)
+          fi
+          git fetch "${history_args[@]}" --no-tags --filter=blob:none --recurse-submodules=no origin +refs/heads/main:refs/remotes/origin/main
       - name: Every card validates; ready cards pin a commit on main
         run: ./target/release/backlog validate --all --merged-into origin/main
       - name: Unit and integration tests (cairn lab tests skip here, loudly; the lab job runs them)

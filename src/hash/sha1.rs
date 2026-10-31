@@ -112,6 +112,69 @@ pub fn sha1(data: &[u8]) -> [u8; 20] {
     out
 }
 
+/// Incremental SHA-1 for files that should not be buffered in memory.
+#[derive(Clone)]
+pub struct Sha1 {
+    state: [u32; 5],
+    block: [u8; 64],
+    filled: usize,
+    length: u64,
+}
+
+impl Default for Sha1 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Sha1 {
+    pub fn new() -> Self {
+        Self {
+            state: H0,
+            block: [0; 64],
+            filled: 0,
+            length: 0,
+        }
+    }
+
+    pub fn update(&mut self, mut data: &[u8]) {
+        self.length = self.length.wrapping_add(data.len() as u64);
+        if self.filled > 0 {
+            let take = data.len().min(64 - self.filled);
+            self.block[self.filled..self.filled + take].copy_from_slice(&data[..take]);
+            self.filled += take;
+            data = &data[take..];
+            if self.filled < 64 {
+                return;
+            }
+            sha1_compress(&mut self.state, &self.block);
+            self.filled = 0;
+        }
+        let whole = data.len() - data.len() % 64;
+        for block in data[..whole].chunks_exact(64) {
+            sha1_compress(&mut self.state, block);
+        }
+        self.filled = data.len() - whole;
+        self.block[..self.filled].copy_from_slice(&data[whole..]);
+    }
+
+    pub fn finalize(mut self) -> [u8; 20] {
+        let mut tail = [0u8; 128];
+        tail[..self.filled].copy_from_slice(&self.block[..self.filled]);
+        tail[self.filled] = 0x80;
+        let end = if self.filled < 56 { 64 } else { 128 };
+        tail[end - 8..end].copy_from_slice(&self.length.wrapping_mul(8).to_be_bytes());
+        for block in tail[..end].chunks_exact(64) {
+            sha1_compress(&mut self.state, block);
+        }
+        let mut out = [0u8; 20];
+        for (i, word) in self.state.iter().enumerate() {
+            out[i * 4..i * 4 + 4].copy_from_slice(&word.to_be_bytes());
+        }
+        out
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -157,5 +220,22 @@ mod tests {
             sha1(&msg).as_slice(),
             h("34aa973cd4c4daa4f61eeb2bdbad27316534016f").as_slice(),
         );
+    }
+
+    #[test]
+    fn streaming_matches_one_shot_at_padding_and_read_boundaries() {
+        for size in [
+            0, 1, 55, 56, 63, 64, 65, 119, 120, 4096, 65535, 65536, 65537,
+        ] {
+            let message: Vec<u8> = (0..size).map(|i| (i * 37) as u8).collect();
+            let expected = sha1(&message);
+            for chunk_size in [1, 7, 64, 1000, 65536] {
+                let mut state = Sha1::new();
+                for chunk in message.chunks(chunk_size) {
+                    state.update(chunk);
+                }
+                assert_eq!(state.finalize(), expected, "size={size} chunk={chunk_size}");
+            }
+        }
     }
 }

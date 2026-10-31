@@ -9,9 +9,11 @@ use rand::rngs::StdRng;
 use crate::curve::{Curve, Point, INFINITY};
 use crate::field::{add_mod, inv_mod, mul_mod, rand_below, sub_mod};
 use crate::gadgets::{bits_uint, concat, Arith, ArithRef};
-use crate::linalg::left_kernel_vector;
+use crate::linalg::left_kernel_vector_sparse;
 use crate::pointgadget::gadget_relation_network;
-use crate::relation::{new_factor_bases, new_windowed_factor_bases, relation_network, FactorBases};
+use crate::relation::{
+    mitm_find_relation, new_factor_bases, new_windowed_factor_bases, relation_network, FactorBases,
+};
 use crate::tensor::{find_witness, Counter, Network, NetworkStats};
 use crate::{Error, Result};
 
@@ -53,13 +55,97 @@ pub struct Solver {
     /// e.g. DFSCounter.
     pub gadgets: bool,
     /// WindowBits > 0 (with `gadgets`) adds the coordinate window x < p >> k
-    /// to every factor base; see `new_windowed_factor_bases`.
+    /// to every factor base (with or without `gadgets`); see
+    /// `new_windowed_factor_bases`.
     pub window_bits: usize,
+    /// Mitm finds relations by meeting in the middle (`mitm_find_relation`)
+    /// instead of contracting the network forward. It performs about
+    /// sqrt(2r) point additions per attempt instead of r and does not use the
+    /// counter.
+    pub mitm: bool,
+    /// Threads bounds the relation-search workers when `mitm` is set and no
+    /// `opcount` tally is running. 0 means one per available core, 1 forces
+    /// the sequential path. The results do not depend on it.
+    pub threads: usize,
     /// Logf, if set, receives progress messages (already formatted; Go passes
     /// format + args).
     pub logf: Option<Box<dyn Fn(&str)>>,
 
     pub(crate) arith: Option<ArithRef>,
+}
+
+/// mitm_relation finds one decomposition of r and checks it: membership in
+/// each F_i, every point on the curve, and the sum. Pure, so it can run on
+/// worker threads.
+fn mitm_relation(c: &Curve, fb: &FactorBases, r: Point) -> Result<Option<Relation>> {
+    let pts = match mitm_find_relation(c, fb, r) {
+        None => return Ok(None),
+        Some(pts) => pts,
+    };
+    let mut rel = Relation::default();
+    let mut sum = INFINITY;
+    for (i, pt) in pts.iter().enumerate() {
+        if !c.on_curve(*pt) || !fb.member(i, *pt) {
+            return Err(Error::new("ecdl: mitm returned an invalid witness"));
+        }
+        rel.points.push(*pt);
+        sum = c.add(sum, *pt);
+    }
+    if sum != r {
+        return Err(Error::new(
+            "ecdl: mitm returned a witness that does not sum to the target",
+        ));
+    }
+    Ok(Some(rel))
+}
+
+/// parallel_mitm evaluates one target per element, keeping the results aligned
+/// with the targets. The targets are fixed before dispatch, so the outcome
+/// does not depend on the thread count.
+fn parallel_mitm(
+    c: &Curve,
+    fb: &FactorBases,
+    targets: &[(u64, u64, Point)],
+    workers: usize,
+    q: Point,
+) -> Result<Vec<Option<Relation>>> {
+    let n = targets.len();
+    let mut out: Vec<Option<Relation>> = vec![None; n];
+    let chunk = n.div_ceil(workers.max(1)).max(1);
+    let mut rest: &mut [Option<Relation>] = &mut out;
+    let mut start = 0;
+    let failure = std::thread::scope(|scope| {
+        let mut handles = Vec::new();
+        while start < n {
+            let end = (start + chunk).min(n);
+            let (head, tail) = rest.split_at_mut(end - start);
+            rest = tail;
+            let slice = &targets[start..end];
+            handles.push(scope.spawn(move || -> Result<()> {
+                for (slot, (u, v, _)) in head.iter_mut().zip(slice) {
+                    let r = c.add(c.mul(*u, c.g), c.mul(*v, q));
+                    *slot = mitm_relation(c, fb, r)?;
+                }
+                Ok(())
+            }));
+            start = end;
+        }
+        let mut failure: Option<Error> = None;
+        for h in handles {
+            match h.join() {
+                Ok(Ok(())) => {}
+                Ok(Err(e)) => failure = failure.or(Some(e)),
+                Err(_) => {
+                    failure = failure.or(Some(Error::new("ecdl: relation worker panicked")));
+                }
+            }
+        }
+        failure
+    });
+    match failure {
+        Some(e) => Err(e),
+        None => Ok(out),
+    }
 }
 
 impl Solver {
@@ -74,6 +160,8 @@ impl Solver {
             max_restarts: 0,
             gadgets: false,
             window_bits: 0,
+            mitm: false,
+            threads: 0,
             logf: None,
             arith: None,
         }
@@ -116,7 +204,10 @@ impl Solver {
 
             // Step 1: factor-base selection.
             crate::opcount::set_phase("factor_base");
-            let fb = if self.gadgets {
+            // The coordinate window is a membership constraint on an affine
+            // hash, so it applies whether or not the relation search uses
+            // gadgets: it only changes how the sets are built and checked.
+            let fb = if self.gadgets || self.window_bits > 0 {
                 new_windowed_factor_bases(&c, self.m, &mut self.rng, self.window_bits)
             } else {
                 new_factor_bases(&c, self.m, &mut self.rng)
@@ -133,7 +224,49 @@ impl Solver {
 
             // Step 2: relation finding by tensor contraction.
             let mut rels: Vec<Relation> = Vec::with_capacity(need);
+            let workers = self.worker_count();
             while rels.len() < need {
+                if self.mitm && !crate::opcount::active() {
+                    // Draw the targets first, in order, so the batch is the
+                    // same whatever the thread count; then evaluate them in
+                    // parallel and keep the hits in target order.
+                    let remaining = need - rels.len();
+                    // The batch depends only on the remaining count, so every
+                    // thread count draws the same targets.
+                    let batch = (remaining * 4).clamp(1, 2048);
+                    // Only the scalar draws are sequential; the target
+                    // [u]P + [v]Q is computed inside the workers.
+                    let mut targets: Vec<(u64, u64, Point)> = Vec::with_capacity(batch);
+                    for _ in 0..batch {
+                        let u = rand_below(&mut self.rng, r);
+                        let v = rand_below(&mut self.rng, r);
+                        targets.push((u, v, Point::default()));
+                    }
+                    st.attempts += batch;
+                    crate::opcount::set_phase("relation_search");
+                    let found = match parallel_mitm(&c, &fb, &targets, workers, q) {
+                        Ok(f) => f,
+                        Err(e) => return (Err(e), st),
+                    };
+                    for ((u, v, _), rel) in targets.into_iter().zip(found) {
+                        let mut rel = match rel {
+                            None => continue,
+                            Some(rel) => rel,
+                        };
+                        rel.u = u;
+                        rel.v = v;
+                        rels.push(rel);
+                    }
+                    if rels.len().is_multiple_of(50) {
+                        self.logf(&format!(
+                            "  {}/{} relations after {} attempts",
+                            rels.len(),
+                            need,
+                            st.attempts
+                        ));
+                    }
+                    continue;
+                }
                 st.attempts += 1;
                 let u = rand_below(&mut self.rng, r);
                 let v = rand_below(&mut self.rng, r);
@@ -175,7 +308,7 @@ impl Solver {
                 }
                 rows.push(row);
             }
-            let coef = match left_kernel_vector(&rows, fb.points.len(), r) {
+            let coef = match left_kernel_vector_sparse(&rows, fb.points.len(), r) {
                 Some(c) => c,
                 None => {
                     return (
@@ -216,12 +349,26 @@ impl Solver {
 
     /// findRelation looks for A_i in F_i with A_1 + ... + A_m = R, returning
     /// `None` if the contraction counts no solutions.
+    /// worker_count is the number of relation-search threads to use.
+    fn worker_count(&self) -> usize {
+        if self.threads > 0 {
+            return self.threads;
+        }
+        std::thread::available_parallelism()
+            .map(|n| n.get())
+            .unwrap_or(1)
+            .min(32)
+    }
+
     pub(crate) fn find_relation(
         &mut self,
         fb: &FactorBases,
         r: Point,
     ) -> Result<(Option<Relation>, NetworkStats)> {
         let c = self.curve;
+        if self.mitm {
+            return Ok((mitm_relation(&c, fb, r)?, NetworkStats::default()));
+        }
         let net: Network;
         let a: Vec<Vec<usize>>;
         let decode: Box<dyn Fn(&[bool]) -> Option<Point>>;

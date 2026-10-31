@@ -4,7 +4,7 @@
 - **Kind:** correctness/complexity validation, conditional external theorem
 - **Affected work:** [native implementation](../docs/hashed-ecdl.md)
 - **Next action owner:** unassigned independent reviewer
-- **Last updated:** 2026-10-29
+- **Last updated:** 2026-10-30
 
 ## Problem
 
@@ -40,6 +40,16 @@ Explicit work policies can terminate a run with an unknown result.
   not mathematical impossibility or evidence that the theorem is false.
 - No timing, sub-rho result, security conclusion or practical attack follows
   from these development tests.
+- Follow-up software controls add exact prefix sampling (including the
+  nonparsimonious 1:2 projection case) and nine direct-versus-forced recursive
+  comparisons retaining both taper levels. See the
+  [sampling audit](../docs/hashed-ecdl-audit-20261029/README.md).
+  These bounded checks leave the general obligations below open.
+- The follow-up source review makes the representation boundary explicit:
+  on a 64-bit build lambda is at most 64, so root_u=lambda/131072 is zero
+  for every publicly representable graph. Public calls therefore select a
+  finite-size fallback; only forced private controls enter the recursive
+  kernel. This is not a counterexample to the external asymptotic theorem.
 
 ## Obligations
 
@@ -67,6 +77,47 @@ reconsidered. A practical timing study is a separate requested experiment with
 the existing compute, checkpoint, external-reference and measurement gates.
 
 ## Resolution and history
+
+2026-10-30 program assessment and theorem-bridge source review: the
+[dated assessment](../research/hashed_ecdl_leads_20261030/README.md) and
+[interface map](../research/hashed_ecdl_leads_20261030/BRIDGE.md) distinguish
+fixed-width formal counting endpoints from the required general implicit
+tensor statement. The native packet representation has no nested parent
+evaluator callback; coefficient extraction, preparation, mode enumeration,
+retained data and aggregate bit costs remain general audit obligations.
+This is source inspection, without a Lean/kernel check, experiment, new
+theorem, smaller-packet proof or performance claim. Status stays open.
+
+2026-10-30 checked hash-prime follow-up: retained verified auxiliary prime facts
+through factor-base construction and replay, with an optional explicit fixed
+modulus permitted by source section 3. Official p/r/target and a 132-bit s pass
+preflight under the original two-million-step policy. Six targeted development
+controls cover the 65-bit boundary, missing proofs, limits and fixed-modulus
+replay. See [the additive report](../research/hashed_ecdl_hash_prime_20261030/README.md).
+The default uncertified >u64 AKS path, finite-size contraction guard, independent
+general audit and both challenge solve requirements remain open. This is a
+specific setup fix, without a general fast-primality or runtime claim.
+
+2026-10-30 Hexagon integration: the
+[subject review](../research/hexagon_cscc_20261030/README.md) adds a divisor-prefix
+factoring reduction and an exhaustive local-cost profile reference in both
+native tensor checkouts. The factoring reduction uses the existing OpenAI-based
+counter; the Hexagon authors instead re-prove the Anthropic engine. Their Lean
+statement, compilers and stronger conjecture are not local verification of this
+Rust implementation. The general audit above remains open. The weighted
+reference does not establish a recursive coefficient-algebra extension.
+
+2026-10-30 finite-size implementation follow-up: opt-in selector-domain
+witnesses and graphs, schoolbook encodings, checked exact cutsets/elimination,
+partial-relation provenance and binary XOR/Frobenius domains are implemented.
+See the [scoped receipt](../research/hashed_ecdl_finite_size_20261030/implementation/README.md).
+Local structural plan admission is not a smaller-parameter proof of the source
+packet transformation. Its packing, coefficient coverage, precision,
+reconstruction, shrink and cost obligations remain open; the original guards
+are unchanged. No new general theorem or Lean proof is claimed. Earlier S3
+upload/readback succeeded, superseding the historical upload blocker below;
+authenticated native image/execution and scientific measurement admission
+remain unverified. Neither challenge solve nor the independent audit is closed.
 
 2026-10-30 engineering follow-up: [native exact-primality and witness changes](../research/hashed_ecdl_speed_20261029/README.md)
 pass bounded correctness controls and preserve complete seeded certificates.

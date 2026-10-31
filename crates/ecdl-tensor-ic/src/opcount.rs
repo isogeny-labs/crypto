@@ -42,6 +42,13 @@ pub fn take() -> BTreeMap<String, u64> {
     TALLY.with(|t| t.borrow_mut().take().map(|t| t.counts).unwrap_or_default())
 }
 
+/// Reports whether a tally is running on this thread. Work that would be
+/// dispatched to other threads must stay sequential while it is true, since
+/// the tally is thread-local.
+pub fn active() -> bool {
+    TALLY.with(|t| t.borrow().is_some())
+}
+
 /// Names the phase that later counts belong to.
 pub fn set_phase(phase: &'static str) {
     TALLY.with(|t| {

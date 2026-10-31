@@ -1,0 +1,19 @@
+import Add11
+open Polynomial Add11Distinct
+noncomputable abbrev curve : Polynomial ℚ := X^5-X+1
+lemma valid0 : (X-C (0:ℚ)) ∣ curve-(C (1:ℚ))^2 := by
+  refine ⟨X^4-1,?_⟩
+  norm_num [curve]
+  ring
+lemma valid1 : (X-C (1:ℚ)) ∣ curve-(C (1:ℚ))^2 := by
+  refine ⟨X^4+X^3+X^2+X,?_⟩
+  norm_num [curve]
+  ring
+example : (1:ℚ) ≠ 0 ∧ (0:ℚ)-1 ≠ 0 ∧
+    (X^2+C (-(0+1)/(1:ℚ)^2)*X+C (0*1/(1:ℚ)^4)) ∣
+      curve-(C ((1-1)/((1:ℚ)^3*(0-1)))*X+C ((0*1-1*1)/((1:ℚ)^5*(0-1))))^2 := by
+  exact distinct_output_invariant curve 0 1 1 1 (by norm_num) valid0 valid1
+example : classify (0:ℚ) 1 1 1 = .distinct := by norm_num [classify]
+example : classify (0:ℚ) 0 0 0 = .inverse := by norm_num [classify]
+example : classify (0:ℚ) 1 0 1 = .doubling := by norm_num [classify]
+example : (0:ℚ)-(0:ℚ) = 0 := by norm_num

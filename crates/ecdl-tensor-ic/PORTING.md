@@ -145,10 +145,14 @@ Design choices:
 | `AffineHash(i,pt)` | `fn affine_hash(&self, i: usize, pt: Point) -> u64` |
 | `Member(i,pt)` | `fn member(&self, i: usize, pt: Point) -> bool` (sha2::Sha256) |
 | `RelationNetwork(c,fb,R)` | `fn relation_network(c: &Curve, fb: &FactorBases, r: Point) -> (Network, Vec<Vec<usize>>)` |
+| (new, Rust only) | `fn mitm_find_relation(c: &Curve, fb: &FactorBases, r: Point, ...) -> Option<Vec<Point>>`: meet-in-the-middle elimination order; `Solver::mitm`, `ecdldemo -mitm`; `Solver::threads` / `ecdldemo -threads N` for parallel search, disabled while `opcount::active()` |
 
 ### `linalg` (linalg.go)
-`LeftKernelVector(rows []map[int]uint64, ncols int, r uint64) ([]uint64, bool)`
--> `fn left_kernel_vector(rows: &[HashMap<usize,u64>], ncols: usize, r: u64) -> Option<Vec<u64>>`.
+
+| Go | Rust |
+|---|---|
+| `LeftKernelVector(rows []map[int]uint64, ncols int, r uint64) ([]uint64, bool)` | `fn left_kernel_vector(...) -> Option<Vec<u64>>` (dense reference, same contract) |
+| (Rust only) | `fn left_kernel_vector_sparse(...)`, used by the solver: sorted sparse rows, smallest-first pivots, deterministic |
 
 ### `solver` (solver.go)
 | Go | Rust |
