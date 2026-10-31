@@ -253,6 +253,30 @@ impl<O: FnMut(Event) -> Result<(), ()>> Gate<'_, O> {
         }
         Ok(FieldSum(out))
     }
+    /// Rows f,z*f,... in the SAME original polynomial basis. The table was
+    /// constructed by this Gate; reduced[n-1][1] is z^n modulo the modulus.
+    /// This replaces n dense coefficient scans with n fixed shift/reductions.
+    /// Caller pre-admits eight modeled primitive/control steps per row at the
+    /// unchanged32 coefficient; allocation and observer stages remain outside.
+    fn fill_multiplier_row(
+        &self,
+        row: &mut [u64],
+        mut coefficient: u64,
+        st: &FieldStructure,
+    ) -> Result<(), Stop> {
+        let n = st.n;
+        debug_assert!((2..=61).contains(&n));
+        debug_assert_eq!(row.len(), n as usize);
+        let mask = (1u64 << n) - 1;
+        let tail = st.reduced[n as usize - 1][1];
+        for output in row {
+            self.check()?;
+            *output = coefficient;
+            let carry = 0u64.wrapping_sub(coefficient >> (n - 1));
+            coefficient = ((coefficient << 1) & mask) ^ (tail & carry);
+        }
+        Ok(())
+    }
     fn mul(&mut self, a: &FieldSum, b: &FieldSum, st: &FieldStructure) -> Result<FieldSum, Stop> {
         let n = st.n as usize;
         let q = a.0.len().checked_mul(b.0.len()).ok_or(Stop::Overflow)?;
@@ -260,21 +284,14 @@ impl<O: FnMut(Event) -> Result<(), ()>> Gate<'_, O> {
             return Err(Stop::PairLimit);
         }
         let l = q.max(2).next_power_of_two().trailing_zeros() as usize;
-        let work = 32 * (b.0.len() * n * n + q * (n + 1) + q * l + q + 1) as u64;
+        let work = 32 * (8 * b.0.len() * n + q * (n + 1) + q * l + q + 1) as u64;
         let bytes = (2 * size_of::<(Mask, u64)>() * (q + 1) + 16 * b.0.len() * n + 512) as u64;
         self.admit(work, bytes, Stage::Product)?;
         let mut out = self.vec(q)?;
         let mut rows = self.vec(b.0.len() * n)?;
         rows.resize(b.0.len() * n, 0u64);
         for (row, &(_, f)) in rows.chunks_exact_mut(n).zip(&b.0) {
-            self.check()?;
-            for (r, reduced) in row.iter_mut().zip(&st.reduced) {
-                let mut bits = f;
-                while bits != 0 {
-                    *r ^= reduced[bits.trailing_zeros() as usize];
-                    bits &= bits - 1;
-                }
-            }
+            self.fill_multiplier_row(row, f, st)?;
         }
         for &(s, f) in &a.0 {
             self.check()?;
@@ -465,7 +482,7 @@ mod tests {
     }
     #[test]
     fn bounded_s4_k2_requested_degrees_match_scalar_and_resultant() {
-        for n in [23, 31, 47, 53, 61] {
+        for n in (23..=31).chain(47..=61) {
             let irr = find_irreducible(n).unwrap();
             let gf = Gf2::new(&irr);
             let domain = [(1u64 << (n - 2)) | 5, (1u64 << (n - 1)) | 3];
@@ -540,7 +557,7 @@ mod tests {
     #[test]
     fn bounded_s4_canonical_coordinates_equal_legacy_builder() {
         use super::super::{sym_semaev_s4, SymElement};
-        for n in [23, 31, 47, 53, 61] {
+        for n in (23..=31).chain(47..=61) {
             let irr = find_irreducible(n).unwrap();
             let st = FieldStructure::new(n, &irr);
             let domain = [(1u64 << (n - 2)) | 5, (1u64 << (n - 1)) | 3];
@@ -832,5 +849,225 @@ mod tests {
         assert!(matches!(gate.mul(&a, &a, &st), Err(Stop::PairLimit)));
         assert_eq!(gate.reserved, Reserved::default());
         assert_eq!(calls, 0);
+    }
+}
+
+#[cfg(test)]
+mod multiplier_recurrence_controls {
+    use super::*;
+    use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+    use std::time::Duration;
+    fn dense_reference(coefficient: u64, st: &FieldStructure) -> Vec<u64> {
+        st.reduced
+            .iter()
+            .map(|reduced| {
+                let mut bits = coefficient;
+                let mut result = 0;
+                while bits != 0 {
+                    result ^= reduced[bits.trailing_zeros() as usize];
+                    bits &= bits - 1;
+                }
+                result
+            })
+            .collect()
+    }
+    fn check_rows(irr: &IrreduciblePoly) {
+        let n = irr.degree;
+        let st = FieldStructure::new(n, irr);
+        let mut observed = Vec::new();
+        let mut observer = |e: Event| {
+            observed.push(e.stage);
+            Ok(())
+        };
+        let gate = Gate {
+            limits: Limits::default(),
+            reserved: Reserved::default(),
+            deadline: Instant::now() + Duration::from_secs(30),
+            observer: &mut observer,
+        };
+        let mut coefficients = vec![0, 1, (1u64 << n) - 1, (1u64 << (n - 1)) | 3, 5, 5];
+        coefficients.extend((0..n).map(|i| 1u64 << i));
+        for coefficient in coefficients {
+            let mut actual = vec![0; n as usize];
+            gate.fill_multiplier_row(&mut actual, coefficient, &st)
+                .unwrap();
+            assert_eq!(
+                actual,
+                dense_reference(coefficient, &st),
+                "n={n},f={coefficient}"
+            );
+        }
+        assert!(observed.is_empty()); // helper does not insert/remove observer events
+    }
+    #[test]
+    fn recurrence_matches_dense_table_on_every_requested_degree_and_quotient_edges() {
+        for n in (23..=31).chain(47..=61) {
+            check_rows(&find_irreducible_sparse(n).unwrap());
+        }
+        // Multiplication recurrence is a quotient identity; these dense/sparse
+        // edge moduli are NOT all claimed irreducible or admitted curve models.
+        for n in [2, 3, 23, 61] {
+            check_rows(&IrreduciblePoly {
+                degree: n,
+                low_terms: (0..n).collect(),
+            });
+            check_rows(&IrreduciblePoly {
+                degree: n,
+                low_terms: vec![0, n - 1],
+            });
+        }
+    }
+    #[test]
+    fn product_quote_observer_and_original_limit_refusals_preserve_order() {
+        let irr = find_irreducible_sparse(61).unwrap();
+        let st = FieldStructure::new(61, &irr);
+        let mut left = vec![
+            (0 as Mask, 7),
+            (1 as Mask, 7),
+            (2 as Mask, (1u64 << 60) | 3),
+        ];
+        let mut right = vec![(0 as Mask, 5), (1 as Mask, 5)];
+        let canonical = |v: &mut Vec<(Mask, u64)>| {
+            v.sort_unstable_by_key(|&(m, _)| std::cmp::Reverse(mono_key(F2BoolMono::from_mask(m))))
+        };
+        canonical(&mut left);
+        canonical(&mut right);
+        let a = FieldSum(left);
+        let b = FieldSum(right);
+        let q = a.0.len() * b.0.len();
+        let l = q.max(2).next_power_of_two().trailing_zeros() as usize;
+        let work = 32 * (8 * b.0.len() * 61 + q * 62 + q * l + q + 1) as u64;
+        let bytes = (2 * size_of::<(Mask, u64)>() * (q + 1) + 16 * b.0.len() * 61 + 512) as u64;
+        for mode in 0..5 {
+            let mut events = Vec::new();
+            let mut observer = |e: Event| {
+                events.push(e);
+                if mode == 3 {
+                    Err(())
+                } else {
+                    Ok(())
+                }
+            };
+            let mut gate = Gate {
+                limits: Limits {
+                    work: if mode == 1 { work - 1 } else { work },
+                    bytes: if mode == 2 { bytes - 1 } else { bytes },
+                },
+                reserved: Reserved::default(),
+                deadline: if mode == 4 {
+                    Instant::now() - Duration::from_secs(1)
+                } else {
+                    Instant::now() + Duration::from_secs(30)
+                },
+                observer: &mut observer,
+            };
+            let result = gate.mul(&a, &b, &st);
+            let reserved = gate.reserved;
+            drop(gate);
+            match mode {
+                0 => {
+                    let got = result.unwrap();
+                    let mut terms = Vec::new();
+                    for &(s, f) in &a.0 {
+                        for &(t, g) in &b.0 {
+                            let row = dense_reference(g, &st);
+                            let mut bits = f;
+                            let mut c = 0;
+                            while bits != 0 {
+                                c ^= row[bits.trailing_zeros() as usize];
+                                bits &= bits - 1;
+                            }
+                            terms.push((s | t, c));
+                        }
+                    }
+                    let mut observer = |_: Event| Ok(());
+                    let reference = Gate {
+                        limits: Limits::default(),
+                        reserved: Reserved::default(),
+                        deadline: Instant::now() + Duration::from_secs(30),
+                        observer: &mut observer,
+                    }
+                    .finish_sum(terms)
+                    .unwrap();
+                    assert_eq!(got.0, reference.0);
+                    assert_eq!(reserved, Reserved { work, bytes });
+                    assert_eq!(events.len(), 1);
+                    assert_eq!(events[0].stage, Stage::Product);
+                    assert_eq!(events[0].reserved, reserved);
+                }
+                1 | 2 | 4 => {
+                    assert_eq!(
+                        result.err().unwrap(),
+                        match mode {
+                            1 => Stop::WorkLimit,
+                            2 => Stop::ByteLimit,
+                            _ => Stop::Deadline,
+                        }
+                    );
+                    assert_eq!(reserved, Reserved::default());
+                    assert!(events.is_empty());
+                }
+                _ => {
+                    assert_eq!(result.err().unwrap(), Stop::Observer);
+                    assert_eq!(reserved, Reserved { work, bytes });
+                    assert_eq!(events.len(), 1);
+                }
+            }
+        }
+    }
+    #[test]
+    fn every_product_observer_stop_preserves_expression_event_position() {
+        let irr = find_irreducible_sparse(61).unwrap();
+        let domain = [5, (1u64 << 60) | 3];
+        let mut full = Vec::new();
+        build(
+            &irr,
+            1,
+            &domain,
+            37,
+            Limits::default(),
+            Instant::now() + Duration::from_secs(30),
+            &mut |event| {
+                full.push(event);
+                Ok(())
+            },
+        )
+        .unwrap();
+        assert_eq!(full.len(), 49);
+        assert_eq!(
+            full.iter().filter(|e| e.stage == Stage::Product).count(),
+            17
+        );
+        for (position, expected) in full
+            .iter()
+            .enumerate()
+            .filter(|(_, e)| e.stage == Stage::Product)
+        {
+            let mut prefix = Vec::new();
+            let failure = build(
+                &irr,
+                1,
+                &domain,
+                37,
+                Limits::default(),
+                Instant::now() + Duration::from_secs(30),
+                &mut |event| {
+                    prefix.push(event);
+                    if prefix.len() == position + 1 {
+                        Err(())
+                    } else {
+                        Ok(())
+                    }
+                },
+            )
+            .unwrap_err();
+            assert_eq!(failure.stop, Stop::Observer);
+            assert_eq!(failure.reserved, expected.reserved);
+            assert_eq!(prefix.len(), position + 1);
+            for (actual, expected) in prefix.iter().zip(&full) {
+                assert_eq!(actual.stage, expected.stage);
+                assert_eq!(actual.reserved, expected.reserved);
+            }
+        }
     }
 }
