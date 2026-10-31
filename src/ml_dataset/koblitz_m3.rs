@@ -6778,3 +6778,426 @@ mod terminal_encoding_tests {
         assert_eq!(b.stopped, Some(Stop::Trace));
     }
 }
+
+#[derive(serde::Serialize)]
+struct SignedReplayView<'a> {
+    schema: &'static str,
+    binding: &'a crate::ml_dataset::capture::AttemptBinding,
+    public_sha256: &'a str,
+    factor_base_sha256: &'a str,
+    input_sha256: &'a str,
+    addition_limit: u64,
+    performed_additions: u64,
+    acknowledged_additions: usize,
+    acknowledged: &'a [SignedPrefix],
+    unacknowledged: &'a Option<SignedPrefix>,
+}
+#[derive(serde::Serialize)]
+struct GroupReplayView<'a> {
+    schema: &'static str,
+    signed: SignedReplayView<'a>,
+    reported_witness_check_additions: u64,
+    reported_total_additions: u64,
+}
+#[derive(serde::Serialize)]
+struct ConstructionResultView {
+    output_retained: bool,
+    reserved: Reservation,
+    native_stop: Option<&'static str>,
+    adapter_stop: Option<Stop>,
+}
+fn construction_result_view(c: &Construction) -> ConstructionResultView {
+    use crate::cryptanalysis::koblitz_groebner::bounded_s4::Stop as S;
+    let reserved = c
+        .output
+        .as_ref()
+        .map(|o| o.reserved)
+        .or_else(|| c.native_failure.as_ref().map(|f| f.reserved))
+        .unwrap_or_default();
+    let native_stop = c.native_failure.as_ref().map(|f| match f.stop {
+        S::InvalidInput => "InvalidInput",
+        S::WorkLimit => "WorkLimit",
+        S::ByteLimit => "ByteLimit",
+        S::SupportLimit => "SupportLimit",
+        S::PairLimit => "PairLimit",
+        S::Allocation => "Allocation",
+        S::Overflow => "Overflow",
+        S::Deadline => "Deadline",
+        S::Observer => "Observer",
+    });
+    ConstructionResultView {
+        output_retained: c.output.is_some(),
+        reserved: Reservation {
+            work: reserved.work,
+            bytes: reserved.bytes,
+        },
+        native_stop,
+        adapter_stop: c.adapter_stop,
+    }
+}
+#[derive(serde::Serialize)]
+struct SignedResultView {
+    reported_complete: bool,
+    first_stop: Option<Stop>,
+    enumeration_additions: u64,
+    witness_check_additions: u64,
+    acknowledged_additions: usize,
+    has_unacknowledged_addition: bool,
+}
+#[derive(serde::Serialize)]
+struct ReceiptView {
+    commit: &'static str,
+    provenance: &'static str,
+    payload_sha256_bytes: [u8; 32],
+    payload_bytes: u64,
+    sequence: Option<u64>,
+}
+fn receipt_view(r: crate::ml_dataset::capture::WitnessReceipt) -> ReceiptView {
+    use crate::ml_dataset::capture::{WitnessCommit as C, WitnessProvenance as P};
+    ReceiptView {
+        commit: match r.commit {
+            C::NewCommit => "NewCommit",
+            C::AlreadyCommitted => "AlreadyCommitted",
+        },
+        provenance: match r.provenance {
+            P::Dedicated => "Dedicated",
+            P::LegacyAdopted => "LegacyAdopted",
+        },
+        payload_sha256_bytes: r.payload_sha256,
+        payload_bytes: r.payload_bytes,
+        sequence: r.sequence,
+    }
+}
+#[derive(serde::Serialize)]
+struct PersistenceResultView<'a> {
+    reason: &'a str,
+    serialized_complete: bool,
+    retained_bytes: usize,
+}
+#[derive(serde::Serialize)]
+struct CanonicalResultView<'a> {
+    schema: &'static str,
+    binding: &'a crate::ml_dataset::capture::AttemptBinding,
+    public_sha256: &'a str,
+    factor_base_sha256: &'a str,
+    input_sha256: Option<&'a str>,
+    engine: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Engine,
+    degree: u32,
+    ledger_before_terminal_encoding: &'a SavedBudgetLedger,
+    construction: Option<ConstructionResultView>,
+    matrix: Option<&'a crate::cryptanalysis::koblitz_groebner::bounded_matrix::Report>,
+    signed: Option<SignedResultView>,
+    witness_receipt: Option<ReceiptView>,
+    input_persistence_failure: Option<PersistenceResultView<'a>>,
+    native_capture_acknowledged: u64,
+    signed_capture_acknowledged: u64,
+    capture_count_before_artifact_publication: usize,
+    pending_native: Option<NativeBoundaryView<'a>>,
+    pending_native_encoding: &'a [u8],
+    group_replay_encoded: bool,
+    group_replay_encoding_stop: Option<Stop>,
+    first_fall_degree: Option<u64>,
+    last_fall_degree: Option<u64>,
+    retired_hardware_instructions: Option<u64>,
+}
+struct CanonicalPipelineRun<'a> {
+    pipeline: Option<BoundPipelineRun<'a>>,
+    input_sha256: Option<String>,
+    group: Option<TerminalEncoding>,
+    result: Option<TerminalEncoding>,
+    admission_stop: Option<Stop>,
+}
+fn run_canonical_pipeline<'a>(
+    original: &MathInput,
+    binding: &'a crate::ml_dataset::capture::AttemptBinding,
+    limits: &'a crate::ml_dataset::capture::CaptureLimits,
+    public_sha256: &str,
+    factor_base_sha256: &str,
+    engine: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Engine,
+    degree: u32,
+    budget: &mut Budget,
+    global: &mut usize,
+    persist: &mut impl FnMut(&[u8], &mut Budget) -> Result<(), String>,
+) -> CanonicalPipelineRun<'a> {
+    let mut out = CanonicalPipelineRun {
+        pipeline: None,
+        input_sha256: None,
+        group: None,
+        result: None,
+        admission_stop: None,
+    };
+    let admission = (|| {
+        budget.reserve_bytes(
+            std::mem::size_of::<CanonicalPipelineRun<'_>>() as u64,
+            Instant::now(),
+        )?;
+        out.group = Some(TerminalEncoding::admit(64 * 1024, budget)?);
+        out.result = Some(TerminalEncoding::admit(64 * 1024, budget)?);
+        Ok::<(), Stop>(())
+    })();
+    if let Err(stop) = admission {
+        out.admission_stop = Some(stop);
+        return out;
+    }
+    out.pipeline = Some(run_bound_pipeline(
+        original,
+        binding,
+        limits,
+        public_sha256,
+        factor_base_sha256,
+        engine,
+        degree,
+        budget,
+        global,
+        &mut |bytes, b| {
+            b.reserve_checking(1024 + bytes.len() as u64 * 8, 4096, Instant::now())
+                .map_err(|s| format!("input digest reservation: {s:?}"))?;
+            out.input_sha256 = Some(crate::ml_dataset::digest(bytes));
+            persist(bytes, b)
+        },
+    ));
+    let run = out.pipeline.as_ref().unwrap();
+    let group = out.group.as_mut().unwrap();
+    if let (Some(signed), Some(input_sha)) = (&run.signed, out.input_sha256.as_deref()) {
+        let view = GroupReplayView {
+            schema: "crypto.ml-dataset.koblitz-m3-group-replay/v1",
+            signed: SignedReplayView {
+                schema: "crypto.ml-dataset.koblitz-m3-signed-prefix/v1",
+                binding,
+                public_sha256,
+                factor_base_sha256,
+                input_sha256: input_sha,
+                addition_limit: run.ledger.original_limits.additions,
+                performed_additions: signed.enumeration_additions,
+                acknowledged_additions: signed.acknowledged.len(),
+                acknowledged: &signed.acknowledged,
+                unacknowledged: &signed.unacknowledged,
+            },
+            reported_witness_check_additions: signed.witness_check_additions,
+            reported_total_additions: run.ledger.group_additions,
+        };
+        let _ = group.encode(&view);
+    }
+    let native = run.native.events.as_ref();
+    let pending_native = native.and_then(|e| {
+        e.pending.as_ref().map(|p| NativeBoundaryView {
+            schema: "crypto.ml-dataset.koblitz-m3-events/v1",
+            binding_sha256: std::str::from_utf8(&e.binding_digest)
+                .expect("validated cached digest"),
+            sequence: p.sequence,
+            capture_sequence: p.capture_sequence,
+            event: &p.event,
+        })
+    });
+    let view = CanonicalResultView {
+        schema: "crypto.ml-dataset.koblitz-m3-result/v1",
+        binding,
+        public_sha256,
+        factor_base_sha256,
+        input_sha256: out.input_sha256.as_deref(),
+        engine,
+        degree,
+        ledger_before_terminal_encoding: &run.ledger,
+        construction: run
+            .native
+            .construction
+            .as_ref()
+            .map(construction_result_view),
+        matrix: run.native.matrix.as_ref().and_then(|m| m.report.as_ref()),
+        signed: run.signed.as_ref().map(|s| SignedResultView {
+            reported_complete: s.complete,
+            first_stop: s.stop,
+            enumeration_additions: s.enumeration_additions,
+            witness_check_additions: s.witness_check_additions,
+            acknowledged_additions: s.acknowledged.len(),
+            has_unacknowledged_addition: s.unacknowledged.is_some(),
+        }),
+        witness_receipt: run
+            .publisher
+            .as_ref()
+            .and_then(|p| p.receipt)
+            .map(receipt_view),
+        input_persistence_failure: run.native.persistence_failure.as_ref().map(|f| {
+            PersistenceResultView {
+                reason: &f.reason,
+                serialized_complete: f.serialized_complete,
+                retained_bytes: f.bytes.len(),
+            }
+        }),
+        native_capture_acknowledged: native.map_or(0, |e| e.acknowledged),
+        signed_capture_acknowledged: run.signed_events.as_ref().map_or(0, |e| e.acknowledged),
+        capture_count_before_artifact_publication: *global,
+        pending_native,
+        pending_native_encoding: native.map_or(&[], |e| e.pending_bytes.as_slice()),
+        group_replay_encoded: group.complete,
+        group_replay_encoding_stop: group.stop,
+        first_fall_degree: None,
+        last_fall_degree: None,
+        retired_hardware_instructions: None,
+    };
+    let _ = out.result.as_mut().unwrap().encode(&view);
+    out
+}
+#[cfg(test)]
+mod canonical_record_producer_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native;
+    use crate::ml_dataset::capture::capture_limits;
+    #[test]
+    fn canonical_group_bytes_pass_existing_independent_replay_for_both_engines() {
+        for engine in [
+            native::Engine::F4Macaulay,
+            native::Engine::F5KoszulFrobenius,
+        ] {
+            for positive in [false, true] {
+                let binding = matrix_tests::binding();
+                let limits = capture_limits(16).unwrap();
+                let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+                let mut original = construction_tests::fixture();
+                if positive {
+                    original.target = original.signed[0];
+                }
+                let mut budget = construction_tests::budget();
+                let mut global = 0;
+                let run = run_canonical_pipeline(
+                    &original,
+                    &binding,
+                    &limits,
+                    &"8".repeat(64),
+                    &"9".repeat(64),
+                    engine,
+                    3,
+                    &mut budget,
+                    &mut global,
+                    &mut |_, _| Ok(()),
+                );
+                assert!(run.admission_stop.is_none());
+                let group = run.group.as_ref().unwrap();
+                let result = run.result.as_ref().unwrap();
+                assert!(
+                    group.complete && result.complete,
+                    "{:?} {:?}",
+                    group.stop,
+                    result.stop
+                );
+                let witness = if positive {
+                    Some(std::fs::read(sink.dir.join("payloads/pdp-witness.json")).unwrap())
+                } else {
+                    None
+                };
+                let verified = verify_group_replay(
+                    &group.bytes,
+                    witness.as_deref(),
+                    &original,
+                    &binding,
+                    &"8".repeat(64),
+                    &"9".repeat(64),
+                    run.input_sha256.as_deref().unwrap(),
+                    budget.addition_limit,
+                )
+                .unwrap();
+                assert!(verified.math.prefix.all_tuples_acknowledged);
+                assert_eq!(verified.math.witness.is_some(), positive);
+                let saved: SavedGroupReplay = serde_json::from_slice(&group.bytes).unwrap();
+                verify_signed_capture(
+                    sink.dir.parent().unwrap(),
+                    &serde_json::to_vec(&saved.signed).unwrap(),
+                    &binding,
+                    &limits,
+                )
+                .unwrap();
+                let record: serde_json::Value = serde_json::from_slice(&result.bytes).unwrap();
+                assert_eq!(record["schema"], "crypto.ml-dataset.koblitz-m3-result/v1");
+                assert_eq!(record["signed"]["reported_complete"], true);
+                assert_eq!(record["capture_count_before_artifact_publication"], global);
+                assert!(
+                    record["first_fall_degree"].is_null()
+                        && record["last_fall_degree"].is_null()
+                        && record["retired_hardware_instructions"].is_null()
+                );
+                assert_eq!(
+                    record["ledger_before_terminal_encoding"]["first_stop"],
+                    serde_json::Value::Null
+                );
+                assert!(
+                    group.performed_work <= group.reserved_work
+                        && result.performed_work <= result.reserved_work
+                );
+            }
+        }
+    }
+    #[test]
+    fn persisted_diagnostic_retains_failed_input_without_claiming_signed_completion() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let _sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let original = construction_tests::fixture();
+        let mut budget = construction_tests::budget();
+        let mut global = 0;
+        let run = run_canonical_pipeline(
+            &original,
+            &binding,
+            &limits,
+            &"8".repeat(64),
+            &"9".repeat(64),
+            native::Engine::F4Macaulay,
+            3,
+            &mut budget,
+            &mut global,
+            &mut |_, _| Err("selected persistence failure".into()),
+        );
+        assert_eq!(budget.stopped, Some(Stop::Observer));
+        assert!(!run.group.as_ref().unwrap().attempted);
+        let result = run.result.as_ref().unwrap();
+        assert!(result.complete);
+        let record: serde_json::Value = serde_json::from_slice(&result.bytes).unwrap();
+        assert!(record["signed"].is_null() && record["matrix"].is_null());
+        assert_eq!(
+            record["ledger_before_terminal_encoding"]["first_stop"],
+            "Observer"
+        );
+        assert_eq!(
+            record["input_persistence_failure"]["serialized_complete"],
+            true
+        );
+        assert_eq!(record["group_replay_encoded"], false);
+        assert!(!run
+            .pipeline
+            .as_ref()
+            .unwrap()
+            .native
+            .persistence_failure
+            .as_ref()
+            .unwrap()
+            .bytes
+            .is_empty());
+    }
+    #[test]
+    fn terminal_admission_failure_prevents_native_and_signed_work() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let original = construction_tests::fixture();
+        let mut budget = construction_tests::budget();
+        budget.trace_limit = 64 * 1024 - 1;
+        let mut global = 0;
+        let mut called = false;
+        let run = run_canonical_pipeline(
+            &original,
+            &binding,
+            &limits,
+            &"8".repeat(64),
+            &"9".repeat(64),
+            native::Engine::F4Macaulay,
+            3,
+            &mut budget,
+            &mut global,
+            &mut |_, _| {
+                called = true;
+                Ok(())
+            },
+        );
+        assert_eq!(run.admission_stop, Some(Stop::Trace));
+        assert!(run.pipeline.is_none() && !called);
+        assert_eq!(global, 0);
+    }
+}
