@@ -509,6 +509,8 @@ Curves of higher genus and the transfers are described in
 | `claw.pair_table` | the known-log base's seed scalar multiplications, every table addition `P_i + F_b`, both query additions `Q − (F_k + F_l)`, the addition that rebuilds a hit's table sum; phases `base`, `table`, `search`, `recover` | Frobenius maps, canonicalisations, table inserts and probes |
 | `ic.pipeline` | factor base, oracle set-up (pair tables), relation trials, linear algebra, verification, each a phase; native work (lookups, row operations, square roots, Artin–Schreier solves, …) at the pinned ratio where the repository has one | native work with no pinned ratio for this curve; algebraic-solver operations |
 | `ic.pipeline_counted` | the same pipeline with the relation phase charge rebuilt from counted work and pinned conversions for deterministic SAT/PDP replays | algebraic-solver operations without a pinned conversion, including SAT conflicts; these runs remain lower bounds |
+| `ic.orbit_rank_v1` | cofactor projection, direct or signed-Frobenius quotient pair-table additions, ordinary `aG+bQ` queries, and independent full-point relation checks; every scalar multiplication uses its actual additions/doublings | raw-x lifting, Frobenius maps, canonicalisations, table inserts/probes and modular rank operations; all native work remains unpriced |
+| `ic.hyperelliptic` | Jacobian operations: the factor-base walk's step precomputation (`setup`), every relation-search step (`relations`), verification | the smoothness oracle's `F_p` multiplications, elimination row operations (phase `linear_algebra`, 0 GAE); priced across the §5a band |
 | `ic.known_log_mitm2_v1` | every known-log base scalar multiplication, folded pair-table addition, failed query, pair witness check and final scalar verification; separate setup and five online phases | base sampling and indexing, table insertions and probes, negations and scalar combinations; native work is counted and unpriced |
 | `ic.tensor_contraction_v1` | every non-trivial point addition and doubling (neither input O) the toy tensor-contraction index calculus of `crates/ecdl-tensor-ic` performs, from the crate's per-phase tally: the relation targets `[u]P + [v]Q` (`relation_target`), every point addition evaluated inside the exact sparse contraction and the witness check (`relation_search`), the final `[ξ]P = Q` check (`recovery_check`); `factor_base` and `linear_algebra` charge 0. Prime-order curves only (cofactor 1) | contraction-table rows (`relation_search.contraction_rows_uncharged`), the factor-base listing, which enumerates the group (`factor_base.fb_points_listed_uncharged`) and evaluates every SHA-256 membership hash (`factor_base.fb_membership_evals_uncharged`), and elimination multiplications mod r (`linear_algebra.linalg_mulmod_uncharged`); priced across the §5a band. Exponential by construction: no [Ope26] solver |
 | `ic.hyperelliptic` | Jacobian operations: the factor-base walk's step precomputation (`setup`), every relation-search step (`relations`). Not the verification: `d1.scalar_mul(k)` runs twice on a success and increments no counter (frozen; the older text of this row said it was charged) | the smoothness oracle's `F_p` multiplications, elimination row operations (phase `linear_algebra`, 0 GAE); priced across the §5a band. The factor-base scan's `F_p` work (`f(x)` and a square root at every `x` it visits) is not tallied at all |
@@ -605,6 +607,21 @@ records identical trajectories and counts over 240 matched pairs and a
 complete-solve Callgrind ratio of 0.802155 against the same-binary legacy
 path. That is implementation evidence in `callgrind.Ir`; it does not change
 the generic-group floor or turn uncharged canonicalization into charged GAE.
+`ic.orbit_rank_v1` keeps factor-base logarithms unknown and collects modular
+relations until the public target's column is pinned. It uses the same collector
+with one-word and wide field/scalar types, including the exact registered E0
+degree83 subgroup. All search parameters are required; a pair-visit or query cap
+returns exhausted with its work preserved. Direct and quotient tables bind the
+same base identity. A quotient descriptor is an enumerated phase witness, not a
+compact algebraic correspondence. The [frozen follow-up](../../research/ecbench_leads_20261015/PROTOCOL-v1.md)
+records the positive narrow controls and unsuccessful ordinary N83 queries.
+The legacy wide-refusal text remains unchanged for historical replay.
+
+The versioned binary plug-ins `pdp3-koblitz-v2` and `pdp3-binary-v2` report the
+actual chained S3 layout: `m*ell+(m-2)*n` Boolean variables and `(m-1)*n`
+coordinate equations. Old plug-in IDs retain their previous informational shape
+and exact counted behavior. Correct shape metadata does not establish a solving
+degree bound; see the [constructed and paired controls](../../research/ecbench_leads_20261015/results.json).
 
 `ic.pipeline` defaults to `linalg=incremental-gauss`, which stops when the
 target scalar is pinned; the factor-base logs can still be underdetermined.
