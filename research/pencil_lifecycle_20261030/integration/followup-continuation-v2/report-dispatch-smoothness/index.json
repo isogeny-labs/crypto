@@ -1,0 +1,145 @@
+{
+  "schema": "research.component_snapshot/v1",
+  "utc": "2026-10-31T03:04:14.746381+00:00",
+  "components": [
+    {
+      "component": "Mixed dispatcher / field",
+      "status": "reviewed_at_stated_scope",
+      "claim": "Original point/divisor polynomial validity and four nonzero weights over a field imply a valid nonzero-weight Some payload in every degree1+2 branch; explicit and nested None branches excluded.",
+      "producer_path": "/var/tmp/pencil-mixed-dispatch-field-20261031-v1",
+      "producer_manifest_sha256": "ef7216066ea3ae4f3eee9080624a00bb69c561326e6a70090203ac179f78847e",
+      "review_path": "/var/tmp/pencil-mixed-dispatch-independent-review-20261031-v1",
+      "review_manifest_sha256": "e974a9237adec29fdb2dfbab976d2e622d7ce738bab1ccf34de6f6dc98efdb19",
+      "publication_producer": "../packets/mixed-dispatch-field",
+      "publication_review": "../packets/mixed-dispatch-field-review",
+      "cost_ratio": null
+    },
+    {
+      "component": "Mixed dispatcher / UInt64",
+      "status": "reviewed_at_stated_scope",
+      "claim": "Prime 5<=p<2^31, canonical inputs/curve coefficients, n=1 and tables=None, four nonzero weights and original normalized validity imply canonical valid payload in literal source order.",
+      "producer_path": "/var/tmp/pencil-mixed-dispatch-word-20261031-v1",
+      "producer_manifest_sha256": "c97fd08e6061bfc1f831af5f52c6246062c9e60074e7a98ab393192e471b1339",
+      "review_path": "/var/tmp/pencil-mixed-dispatch-word-independent-review-20261031-v1",
+      "review_manifest_sha256": "354206e43b72c7e2c0424b0fc7a007dcf6a713ce632d9833deb41d4203548e1e",
+      "publication_producer": "../packets/mixed-dispatch-word",
+      "publication_review": "../packets/mixed-dispatch-word-review",
+      "cost_ratio": null
+    },
+    {
+      "component": "Repeated-support tripling / field",
+      "status": "reviewed_at_stated_scope",
+      "claim": "Original mixed-input validity and the repeated positive-support guards establish nonzero output weights and polynomial validity for the literal tripling payload.",
+      "producer_path": "/var/tmp/pencil-mixed-tripling-20261031-v1",
+      "producer_manifest_sha256": "d83f9952969ddbec8c6ec4ceac3193e3b3ebee1712af3d63d02bd9c84fec2da1",
+      "review_path": "/var/tmp/pencil-tripling-independent-review-20261031-v1",
+      "review_manifest_sha256": "805f405fbf52196fc7851245e8d596f01d6d725bb01f9ce3f7b40774111f1db7",
+      "publication_producer": "../packets/mixed-tripling",
+      "publication_review": "../packets/mixed-tripling-review",
+      "cost_ratio": null
+    },
+    {
+      "component": "Repeated-support tripling / UInt64",
+      "status": "reviewed_at_stated_scope",
+      "claim": "Canonical input and prime bounds as above; raw constants 5,8,10 handled by explicit no-overflow/reduction correspondence, including p=5 and p=7. Scoped Some and validity composition.",
+      "producer_path": "/var/tmp/pencil-tripling-word-20261031-v1",
+      "producer_manifest_sha256": "968e72efdf38ab5f5c7d33dbf2d8d98c22dd8096af8744d933cc9a8252556caa",
+      "review_path": "/var/tmp/pencil-tripling-word-independent-review-20261031-v1",
+      "review_manifest_sha256": "04a690b1a2d3312e11389dd30ea0b06b4e9752f86f0948c975b5efc404c80ed7",
+      "publication_producer": "../packets/mixed-tripling-word",
+      "publication_review": "../packets/mixed-tripling-word-review",
+      "cost_ratio": null
+    },
+    {
+      "component": "Degree2 equal-arm guard exclusion",
+      "status": "reviewed_at_stated_scope",
+      "claim": "Over a field with 2!=0, crossed ordinate equality and earlier inverse guard false exclude the nested b=0,s=0 identity arm. Does not exclude direct-call identity or prove doubling output validity.",
+      "producer_path": "/var/tmp/pencil-degree22-guards-20261031-v1",
+      "producer_manifest_sha256": "aeb4b2368091419f1c06be4f67580abd5e6c1e57ff789d3874513713290cc717",
+      "review_path": "/var/tmp/pencil-degree22-guard-independent-review-20261031-v1",
+      "review_manifest_sha256": "08c15ed5268986dbca783852e9576e9557a4061624023b9cf9ad2dc01d3b9378",
+      "publication_producer": "../packets/degree22-guards",
+      "publication_review": "../packets/degree22-guards-review",
+      "cost_ratio": null
+    },
+    {
+      "component": "Same-u extracted point",
+      "status": "reviewed_at_stated_scope",
+      "claim": "Original two Mumford divisibilities, noninverse and nonzero slope difference give a valid extracted point. Four nonzero weights connect the exact field expression to normalized coordinates. Singular zero-ordinate example retained.",
+      "producer_path": "/var/tmp/pencil-sameu-mixed-point-20261031-v1",
+      "producer_manifest_sha256": "b3fe7fc691f3e0bdcfc98b9c9424a5ac121e0706e46f357728fee32604baeb01",
+      "review_path": "/var/tmp/pencil-same-u-extracted-independent-review-20261031-v1",
+      "review_manifest_sha256": "f955299d560c8196d042505c5445a31860b6efbd1481a381f8aadf1b473c81c3",
+      "publication_producer": "../packets/sameu-mixed-point",
+      "publication_review": "../packets/sameu-mixed-point-review",
+      "cost_ratio": null
+    },
+    {
+      "component": "Local nonsingularity bridge",
+      "status": "reviewed_at_stated_scope",
+      "claim": "Zero extracted ordinate forces a square factor and simultaneous value/derivative zero. Explicit local exclusion gives ordinate nonzero; with 2!=0 and four nonzero weights, subsequent doubling yields valid nonzero-weight output.",
+      "producer_path": "/var/tmp/pencil-sameu-local-smooth-20261031-v1",
+      "producer_manifest_sha256": "dcdfb251c504701897649d1867d08160c68163b3d63895c94c57e83b658d99f5",
+      "review_path": "/var/tmp/pencil-sameu-nonsingularity-independent-review-20261031-v1",
+      "review_manifest_sha256": "3d2510dd8ce9be3e863b554805c15c65e3788eb4d893824a3aa44a53fffecc56",
+      "publication_producer": "../packets/sameu-local-smooth",
+      "publication_review": "../packets/sameu-local-smooth-review",
+      "cost_ratio": null
+    },
+    {
+      "component": "Global coprimality bridge",
+      "status": "reviewed_at_stated_scope",
+      "claim": "IsCoprime f f.derivative supplies Bezout exclusion at every x, then the local premise and nonzero extracted ordinate. Arbitrary field; characteristic-five controls pass; not a geometric characteristic-two smoothness assertion.",
+      "producer_path": "/var/tmp/pencil-sameu-global-smooth-20261031-v1",
+      "producer_manifest_sha256": "e1b420f0327113a29b62442cd9f25ada7454de75c647af1a017921264e85b479",
+      "review_path": "/var/tmp/pencil-global-smooth-independent-review-20261031-v1",
+      "review_manifest_sha256": "64a6f5a64dbd4ea2dc1d217c279b233a25308e62fa805c996f35877cd6a740db",
+      "publication_producer": "../packets/sameu-global-smooth",
+      "publication_review": "../packets/sameu-global-smooth-review",
+      "cost_ratio": null
+    }
+  ],
+  "software": [
+    {
+      "component": "full library",
+      "status": "passed",
+      "result": "5793 passed; 0 failed; 128 ignored",
+      "receipt_path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/preflight-review/owner-lock-software-checks/full-lib/receipt.json",
+      "receipt_sha256": "61e07350b245d51112ef33c3aef6012ffef83a4e5588bdcb5b7b8923b37578ba",
+      "stdout_sha256": "330e84eb0a4129715fbe936c24dfbca8332215e5ba6f554b86952f9ce54e5303",
+      "sources_unchanged": true
+    },
+    {
+      "component": "affected GPU tests",
+      "status": "passed",
+      "result": "8 passed; 0 failed; 0 ignored",
+      "receipt_path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/preflight-review/owner-lock-software-checks/gpu-touched/receipt.json",
+      "receipt_sha256": "702ee26bcffff186cab0060fa05731795be6cffab5291144d42397cb94f2d7b3",
+      "stdout_sha256": "08e88aa25849d351ff50ff579f11c5a05b8ee8ba4d4ae75fcf43b083ea2ab44d",
+      "sources_unchanged": true
+    },
+    {
+      "component": "maintained Clippy",
+      "status": "pending_no_terminal_receipt",
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/preflight-review/owner-lock-software-checks/maintained-clippy"
+    },
+    {
+      "component": "final-source CLI build",
+      "status": "pending_no_terminal_receipt",
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/preflight-review/owner-lock-software-checks/ecbench-build"
+    }
+  ],
+  "retained_static_candidate": {
+    "path": "/var/tmp/pencil-musl-native-provenance-review-20261031-v1",
+    "manifest_sha256": "b630dceaaf722596e4a56f0068534b1101a86d74b10889494fa9b9116b42b3ab",
+    "scope": "Retained b985 static binary and static CLI checks; not final source qualification."
+  },
+  "limitations": [
+    "Formal results prove expression values and polynomial validity at their stated branch scope, not class sums, compiler execution, counter preservation or complete degree2+2 dispatch.",
+    "Producer and reviewer failed proof/import/numeral/timeout attempts remain in linked packets. Earlier GPU lock failures remain retained; later passing software receipts do not establish their source-level cause.",
+    "Reviewers disclose authorship of imported components. Kernel readback is accompanied by scoped source review; cached dependency objects were not all rebuilt.",
+    "All new full-cohort cost ratios are null; no scientific cohort was run for this snapshot. Existing scientific campaign limits are unchanged."
+  ],
+  "new_full_cohort_cost_ratio": null,
+  "scientific_trials": 0
+}

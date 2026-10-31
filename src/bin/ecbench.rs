@@ -63,6 +63,13 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Cmd {
+    /// Check pinned diagnostic metadata without launching work.
+    DiagnosticPreflight {
+        #[arg(long)]
+        request: PathBuf,
+        #[arg(long)]
+        request_sha256: String,
+    },
     /// Push, pull and index large files (factor bases, tables) in the object store.
     Store(crypto_lib::store::cli::StoreArgs),
     /// Run the existing CUDA ECC binary as a separately labelled GPU stage.
@@ -238,6 +245,9 @@ enum Cmd {
     },
     /// Run a session.
     Run {
+        /// Explicit diagnostic launch provenance (producer activation pending).
+        #[arg(long)]
+        diagnostic_launch: Option<PathBuf>,
         /// An `ecbench.spec/v1` file; `plan` shows what it expands to.
         #[arg(long)]
         spec: PathBuf,
@@ -906,6 +916,18 @@ fn emit_claim(
 
 fn run(cli: Cli) -> Result<ExitCode, String> {
     match cli.cmd {
+        Cmd::DiagnosticPreflight {
+            request,
+            request_sha256,
+        } => {
+            let path = request.to_str().ok_or("request path must be UTF-8")?;
+            print_json(
+                &crypto_lib::cryptanalysis::ecbench::diagnostic_file_adapter::check_file(
+                    path,
+                    &request_sha256,
+                )?,
+            )?;
+        }
         Cmd::Store(args) => crypto_lib::store::cli::run(&args)?,
         Cmd::Work {
             sessions,
@@ -1262,6 +1284,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             }
         }
         Cmd::Run {
+            diagnostic_launch,
             spec: path,
             out,
             cpus,
@@ -1284,6 +1307,10 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 req = isolation::CpuRequest::None;
             }
             let opts = runner::RunOptions {
+                diagnostic_launch: diagnostic_launch
+                    .as_deref()
+                    .map(crypto_lib::cryptanalysis::ecbench::diagnostic_launch::DiagnosticLaunch::load)
+                    .transpose()?,
                 cpus: req,
                 lock_path: lock,
                 wait_for_lock: wait,
@@ -2219,6 +2246,8 @@ fn profile_input(path: &Path, seq: u64) -> Result<record::ChildInput, String> {
     let w = &p.workloads[ex.workload];
     Ok(record::ChildInput {
         schema: record::CHILD_INPUT_SCHEMA.into(),
+        diagnostics: None,
+        diagnostic_lifecycle: None,
         curve: workload::CurveSpec::explicit(p.instance(ex.workload))
             .unwrap_or_else(|| w.curve_spec.clone()),
         target_seed: w.target_seed,
