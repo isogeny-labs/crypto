@@ -8,3 +8,8 @@ are external; the formal statements certify range invariance from an
 intertwining product,two-inclusion range equality,containment of every
 adjunction stage in any invariant containing module,and the stability test.
 No native result is asserted as a Lean theorem here.
+
+Before second compile: first source reports missing range import and an
+elaboration error in the sup inclusion. Import Submodule.Range and give the
+inclusion its full module type. Preserve first compile receipt; same four
+mathematical propositions and toolchain.

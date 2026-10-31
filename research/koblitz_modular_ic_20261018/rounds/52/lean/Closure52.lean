@@ -1,4 +1,4 @@
-import Mathlib.Algebra.Module.Submodule.Map
+import Mathlib.Algebra.Module.Submodule.Range
 
 namespace Closure52
 
@@ -45,7 +45,7 @@ theorem next_eq_iff_stable (f : M →ₗ[R] M) (S : Submodule R M) :
     S ⊔ S.map f = S ↔ ∀ x ∈ S, f x ∈ S := by
   constructor
   · intro h x hx
-    have hi : f x ∈ S ⊔ S.map f := le_sup_right (show f x ∈ S.map f from ⟨x, hx, rfl⟩)
+    have hi : f x ∈ S ⊔ S.map f := (show S.map f ≤ S ⊔ S.map f from le_sup_right) ⟨x, hx, rfl⟩
     simpa only [h] using hi
   · intro h
     apply le_antisymm
