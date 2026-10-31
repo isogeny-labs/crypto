@@ -1,0 +1,141 @@
+import WeightedAdd11
+set_option autoImplicit false
+namespace MixedCancellation
+open Polynomial
+variable {K : Type*} [Field K]
+
+noncomputable def support (q r : K) : K[X] := X^2+C q*X+C r
+noncomputable def ordinate (s t : K) : K[X] := C s*X+C t
+
+theorem support_factor (x q r : K) (hx : x^2+q*x+r=0) :
+ support q r = (X-C x)*(X-C (-q-x)) := by
+ have hr : r= -x^2-q*x := by
+  calc
+   r = (x^2+q*x+r)-(x^2+q*x) := by ring
+   _ = -x^2-q*x := by rw [hx]; ring
+ rw [support,hr]
+ simp only [C_sub,C_neg,C_add,C_pow,C_mul]
+ ring
+
+theorem linear_ordinate (x s t : K) :
+ (X-C x) ∣ (ordinate s t)^2-(C (s*x+t))^2 := by
+ refine ⟨C s*(ordinate s t+C (s*x+t)),?_⟩
+ simp only [ordinate,C_add,C_mul]
+ ring
+
+theorem extracted_valid (f : K[X]) (x q r s t : K)
+ (hx : x^2+q*x+r=0) (hv : support q r ∣ f-(ordinate s t)^2) :
+ (X-C x) ∣ f-(C (s*x+t))^2 ∧
+ (X-C (-q-x)) ∣ f-(C (s*(-q-x)+t))^2 := by
+ rw [support_factor x q r hx] at hv
+ have h1 := dvd_trans (dvd_mul_right (X-C x) (X-C (-q-x))) hv
+ have h2 := dvd_trans (dvd_mul_left (X-C (-q-x)) (X-C x)) hv
+ constructor
+ · convert dvd_add h1 (linear_ordinate x s t) using 1 <;> ring
+ · convert dvd_add h2 (linear_ordinate (-q-x) s t) using 1 <;> ring
+
+theorem ordinate_alternatives (f : K[X]) (x y q r s t : K)
+ (hx : x^2+q*x+r=0) (hp : (X-C x) ∣ f-(C y)^2)
+ (hv : support q r ∣ f-(ordinate s t)^2) : y= -(s*x+t) ∨ y=s*x+t := by
+ have he := (extracted_valid f x q r s t hx hv).1
+ have hd := dvd_sub hp he
+ have hid : (f-(C y)^2)-(f-(C (s*x+t))^2) = C ((s*x+t)^2-y^2) := by
+  simp only [C_sub,C_pow]; ring
+ rw [hid] at hd
+ have hdeg : (X-C x : K[X]).natDegree=1 := by simp
+ have hzero := eq_zero_of_dvd_of_natDegree_lt hd (by rw [hdeg,natDegree_C]; decide)
+ have hs : (s*x+t)^2-y^2=0 := by simpa only [coeff_C_zero,coeff_zero] using congrArg (fun p : K[X] => p.coeff 0) hzero
+ have hf : (y+(s*x+t))*(y-(s*x+t))=0 := by
+  calc
+   _ = -((s*x+t)^2-y^2) := by ring
+   _ = 0 := by rw [hs]; simp
+ rcases mul_eq_zero.mp hf with hm | hp
+ · left; exact eq_neg_of_add_eq_zero_left hm
+ · right; exact sub_eq_zero.mp hp
+
+structure D2 (K : Type*) where
+ q : K
+ r : K
+ s : K
+ t : K
+ z : K
+ w : K
+
+def nq (b : D2 K) := b.q/b.z^2
+def nr (b : D2 K) := b.r/b.z^4
+def ns (b : D2 K) := b.s/(b.z^3*b.w)
+def nt (b : D2 K) := b.t/(b.z^5*b.w)
+def rawK (a : WeightedAdd11.Input K) (b : D2 K) : K :=
+ ((b.q*((a.x*(b.z*b.z))*(a.z*a.z))+(a.x*a.x)*((b.z*b.z)*(b.z*b.z)))+
+ b.r*((a.z*a.z)*(a.z*a.z)))*a.w
+def rawY3 (a : WeightedAdd11.Input K) (b : D2 K) : K :=
+ b.s*(((a.z*a.z)*a.z)*(a.x*(b.z*b.z)))+b.t*(((a.z*a.z)*(a.z*a.z))*a.z)
+def rawW3 (b : D2 K) : K := (((b.z*b.z)*(b.z*b.z))*b.z)*b.w
+def other (a : WeightedAdd11.Input K) (b : D2 K) : WeightedAdd11.Input K :=
+ let x4 := -(b.q*(a.z*a.z))-a.x*(b.z*b.z)
+ ⟨x4,b.s*(((a.z*a.z)*a.z)*x4)+b.t*(((a.z*a.z)*(a.z*a.z))*a.z),a.z*b.z,b.w⟩
+
+theorem scales (a : WeightedAdd11.Input K) (b : D2 K)
+ (haz : a.z ≠ 0) (haw : a.w ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0) :
+ rawK a b = a.z^4*b.z^4*a.w*((WeightedAdd11.nx a)^2+nq b*WeightedAdd11.nx a+nr b) ∧
+ a.y*rawW3 b = (a.z^5*b.z^5*a.w*b.w)*WeightedAdd11.ny a ∧
+ rawY3 a b*a.w = (a.z^5*b.z^5*a.w*b.w)*(ns b*WeightedAdd11.nx a+nt b) ∧
+ WeightedAdd11.nx (other a b) = -nq b-WeightedAdd11.nx a ∧
+ WeightedAdd11.ny (other a b) = ns b*(-nq b-WeightedAdd11.nx a)+nt b := by
+ dsimp [rawK,rawY3,rawW3,other,WeightedAdd11.nx,WeightedAdd11.ny,nq,nr,ns,nt]
+ constructor
+ · field_simp <;> ring
+ constructor
+ · field_simp <;> ring
+ constructor
+ · field_simp <;> ring
+ constructor <;> field_simp <;> ring
+def validPoint (f : K[X]) (a : WeightedAdd11.Input K) : Prop :=
+ (X-C (WeightedAdd11.nx a)) ∣ f-(C (WeightedAdd11.ny a))^2
+def validTwo (f : K[X]) (b : D2 K) : Prop :=
+ support (nq b) (nr b) ∣ f-(ordinate (ns b) (nt b))^2
+
+theorem shared_support_conclusions (f : K[X]) (a : WeightedAdd11.Input K) (b : D2 K)
+ (haz : a.z ≠ 0) (haw : a.w ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0)
+ (ha : validPoint f a) (hb : validTwo f b) (hk : rawK a b=0) :
+ (a.y*rawW3 b = -(rawY3 a b*a.w) ∨ a.y*rawW3 b = rawY3 a b*a.w) ∧
+ (other a b).z ≠ 0 ∧ (other a b).w ≠ 0 ∧ validPoint f (other a b) := by
+ obtain ⟨hK,hL,hR,hx4,hy4⟩ := scales a b haz haw hbz hbw
+ have hscale : a.z^4*b.z^4*a.w ≠ 0 := mul_ne_zero (mul_ne_zero (pow_ne_zero 4 haz) (pow_ne_zero 4 hbz)) haw
+ rw [hK] at hk
+ have hx := (mul_eq_zero.mp hk).resolve_left hscale
+ have halt := ordinate_alternatives f (WeightedAdd11.nx a) (WeightedAdd11.ny a) (nq b) (nr b) (ns b) (nt b) hx ha hb
+ have hout := (extracted_valid f (WeightedAdd11.nx a) (nq b) (nr b) (ns b) (nt b) hx hb).2
+ refine ⟨?_,mul_ne_zero haz hbz,hbw,?_⟩
+ · rw [hL,hR]
+   rcases halt with hn | hp
+   · left; rw [hn,mul_neg]
+   · right; rw [hp]
+ · unfold validPoint
+   rw [hx4,hy4]
+   exact hout
+
+inductive Branch | common | cancellation | mismatch | positiveCoincidence
+ deriving DecidableEq
+
+def classify [DecidableEq K] (a : WeightedAdd11.Input K) (b : D2 K) : Branch :=
+ if rawK a b ≠ 0 then .common
+ else if a.y*rawW3 b = -(rawY3 a b*a.w) then .cancellation
+ else if a.y*rawW3 b ≠ rawY3 a b*a.w then .mismatch else .positiveCoincidence
+
+theorem mismatch_excluded [DecidableEq K] (f : K[X]) (a : WeightedAdd11.Input K) (b : D2 K)
+ (haz : a.z ≠ 0) (haw : a.w ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0)
+ (ha : validPoint f a) (hb : validTwo f b) : classify a b ≠ .mismatch := by
+ by_cases hk : rawK a b=0
+ · have hh := (shared_support_conclusions f a b haz haw hbz hbw ha hb hk).1
+   rcases hh with hn | hp <;> simp [classify,hk,*]
+ · simp [classify,hk]
+
+theorem cancellation_preserves [DecidableEq K] (f : K[X]) (a : WeightedAdd11.Input K) (b : D2 K)
+ (haz : a.z ≠ 0) (haw : a.w ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0)
+ (ha : validPoint f a) (hb : validTwo f b) (hk : rawK a b=0)
+ (hc : a.y*rawW3 b = -(rawY3 a b*a.w)) :
+ classify a b = .cancellation ∧ (other a b).z ≠ 0 ∧ (other a b).w ≠ 0 ∧ validPoint f (other a b) := by
+ exact ⟨by simp [classify,hk,hc],(shared_support_conclusions f a b haz haw hbz hbw ha hb hk).2⟩
+
+end MixedCancellation

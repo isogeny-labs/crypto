@@ -1,0 +1,67 @@
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Identify.lean:24:1: error: Tactic `rfl` failed: The left-hand side
+  (List.map (fun e => term e.1 e.2 (c e.1) a b s)
+        (List.flatMap (fun k => List.map (fun j => (k, j)) (List.range k) ++ List.map (fun j => (k, j)) [k])
+          (List.range n))).sum +
+    (∑ i ∈ Finset.range n, ((fun e => term e.1 e.2 (c e.1) a b s) ∘ fun j => (n, j)) i +
+      (List.map ((fun e => term e.1 e.2 (c e.1) a b s) ∘ fun j => (n, j)) [n]).sum)
+is not definitionally equal to the right-hand side
+  (List.map (fun e => term e.1 e.2 (c e.1) a b s)
+        (List.flatMap (fun k => List.map (fun j => (k, j)) (List.range k) ++ List.map (fun j => (k, j)) [k])
+          (List.range n))).sum +
+    row n (c n) a b s
+
+K : Type u_1
+inst✝ : Field K
+c : ℕ → K
+a b s : K
+n : ℕ
+⊢ (List.map (fun e => term e.1 e.2 (c e.1) a b s)
+          (List.flatMap (fun k => List.map (fun j => (k, j)) (List.range k) ++ List.map (fun j => (k, j)) [k])
+            (List.range n))).sum +
+      (∑ i ∈ Finset.range n, ((fun e => term e.1 e.2 (c e.1) a b s) ∘ fun j => (n, j)) i +
+        (List.map ((fun e => term e.1 e.2 (c e.1) a b s) ∘ fun j => (n, j)) [n]).sum) =
+    (List.map (fun e => term e.1 e.2 (c e.1) a b s)
+          (List.flatMap (fun k => List.map (fun j => (k, j)) (List.range k) ++ List.map (fun j => (k, j)) [k])
+            (List.range n))).sum +
+      row n (c n) a b s
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Identify.lean:44:56: error: Type mismatch: After simplification, term
+  hm
+ has type
+  @Eq K[X] (List.map ((fun e => term e.1 e.2 (c e.1) a b s) ∘ Subtype.val) (schedule n)).sum
+    (List.map (fun e => term e.1 e.2 (c e.1) a b s)
+        (List.flatMap (fun k => List.map (fun j => (k, j)) (List.range (k + 1))) (List.range n))).sum
+but is expected to have type
+  @Eq K[X] (List.map (fun e => term (↑e).1 (↑e).2 (c (↑e).1) a b s) (schedule n)).sum
+    (List.map (fun e => term e.1 e.2 (c e.1) a b s)
+        (List.flatMap (fun k => List.map (fun j => (k, j)) (List.range (k + 1))) (List.range n))).sum
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Identify.lean:54:31: error: unsolved goals
+n : ℕ
+p : UInt64
+inst✝ : Fact (Nat.Prime p.toNat)
+c : Fin n → UInt64
+a b s : UInt64
+e : Event n
+i : Fin n
+⊢ (if ↑i = (↑e).2 then
+      ↑(c ⟨(↑e).1, ⋯⟩).toNat * (↑((↑e).1.choose (↑e).2) * (↑a.toNat ^ (↑e).2 * ↑b.toNat ^ ((↑e).1 - (↑e).2))) *
+        (↑s.toNat)⁻¹
+    else 0) =
+    (↑(c ⟨(↑e).1, ⋯⟩).toNat * (↑((↑e).1.choose (↑e).2) * (↑a.toNat ^ (↑e).2 * ↑b.toNat ^ ((↑e).1 - (↑e).2))) *
+            C (↑s.toNat)⁻¹ *
+          X ^ (↑e).2).coeff
+      ↑i
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Identify.lean:55:45: warning: This simp argument is unused:
+  coeff_C_mul
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [term, contribution, extend, e.property.1, coeff_X_pow, eq_comm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Identify.lean:55:57: warning: This simp argument is unused:
+  coeff_X_pow
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [term, contribution, extend, e.property.1, coeff_C_mul, eq_comm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Identify.lean:78:68: error: unexpected token ')'; expected term

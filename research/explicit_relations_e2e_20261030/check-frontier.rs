@@ -9,7 +9,8 @@ fn check(raw: &str, version: u32) -> Result<(), String> {
         3 => (20..=56).step_by(4).collect(),
         4 => vec![48, 52, 56, 58, 60],
         5 | 7 | 8 => vec![52, 56, 58, 60],
-        9 | 11 | 12 => vec![52, 61, 62],
+        9 | 11 | 12 | 13 => vec![52, 61, 62],
+        14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 => vec![52, 63],
         _ => return Err("version has no completed frontier contract".into()),
     };
     let mut lines = raw.lines();
@@ -72,8 +73,9 @@ fn check(raw: &str, version: u32) -> Result<(), String> {
             .get(bits)
             .ok_or("premature truncation without recorded stopping condition")?;
         let arms: &[&str] = match version {
-            11 if *bits == 52 => &["b", "u", "v", "x"],
-            11 => &["v"],
+            11 | 13 | 14 | 17 | 18 | 19 | 20 | 21 if *bits == 52 => &["b", "u", "v", "x"],
+            11 | 13 | 14 | 20 | 21 => &["v"],
+            17 | 18 | 19 => &["u", "v"],
             3 if *bits <= 24 => &["h", "u", "x"],
             3 => &["u", "x"],
             _ if *bits <= 52 => &["b", "u", "x"],
@@ -118,11 +120,44 @@ fn regression_controls(raw: &str, version: u32) {
         .filter(|(i, s)| *i == 0 || s.split(',').nth(1) == Some(first))
         .map(|(_, s)| s.clone())
         .collect();
+    if prefix
+        .iter()
+        .skip(1)
+        .all(|s| s.split(',').nth(5) == Some("succeeded"))
+    {
+        assert_eq!(
+            check(&prefix.join("\n"), version).unwrap_err(),
+            "premature truncation without recorded stopping condition"
+        );
+    } else {
+        // An incomplete first rung is a valid terminal record, not truncation.
+        check(&prefix.join("\n"), version).unwrap();
+    }
+    let mut stopped_prefix = prefix.clone();
+    let mut limited: Vec<_> = stopped_prefix[1].split(',').map(str::to_owned).collect();
+    limited[5] = "limited".into();
+    limited[6] = "not_run".into();
+    limited[7] = "0".into();
+    stopped_prefix[1] = limited.join(",");
+    check(&stopped_prefix.join("\n"), version).unwrap();
+    // Even one cell beyond that complete but unsuccessful rung is forbidden.
+    let mut after_stop = stopped_prefix;
+    let mut later: Vec<_> = rows[1].split(',').map(str::to_owned).collect();
+    later[1] = match version {
+        3 => "24",
+        4 => "52",
+        5 | 7 | 8 => "56",
+        9 | 11 | 12 | 13 => "61",
+        14..=21 => "63",
+        _ => unreachable!(),
+    }
+    .into();
+    after_stop.push(later.join(","));
     assert_eq!(
-        check(&prefix.join("\n"), version).unwrap_err(),
-        "premature truncation without recorded stopping condition"
+        check(&after_stop.join("\n"), version).unwrap_err(),
+        "execution beyond frozen stopping rule"
     );
-    for (column, replacement) in [(2, "999"), (3, "9"), (4, "true"), (0, "z"), (6, "not_run")] {
+    for (column, replacement) in [(2, "999"), (3, "9"), (4, "true"), (0, "z"), (6, "invalid")] {
         let mut corrupt = rows.clone();
         let mut values: Vec<_> = corrupt[1].split(',').map(str::to_owned).collect();
         values[column] = replacement.into();
@@ -141,6 +176,6 @@ fn main() {
         let raw = fs::read_to_string(&pair[1]).unwrap();
         check(&raw, version).unwrap();
         regression_controls(&raw, version);
-        println!("PASS v{version} {}: exact cells, seeds, replicates, outcomes and full plan or recorded stop; rejects duplicate, missing cell, truncated successful prefix, wrong seed/replicate/warmup/arm/verification",pair[1]);
+        println!("PASS v{version} {}: exact cells, seeds, replicates, outcomes and full plan or recorded stop; accepts first-rung limit; rejects duplicate, missing cell, truncated successful prefix, continuation after stop, wrong seed/replicate/warmup/arm/verification",pair[1]);
     }
 }
