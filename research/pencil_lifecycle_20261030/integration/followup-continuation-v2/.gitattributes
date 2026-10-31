@@ -12,3 +12,8 @@ packets/**/report.log -whitespace
 preflight-review/**/stdout -whitespace
 packets/**/*.stdout -whitespace
 packets/benchlock-controls-*/benchlock.rs whitespace=-blank-at-eof
+
+# Preserve byte-exact linker maps, including linker-emitted padding.
+packets/preexec-native-execution/*.map -whitespace
+packets/assembly-execution/005-build-base/stderr -whitespace
+packets/runtime-recovery-execution/008-build-runtime/stderr -whitespace

@@ -104,3 +104,15 @@ lean_lib WordDispatch
 
 @[default_target]
 lean_lib LocalSmooth
+
+@[default_target]
+lean_lib GlobalSmooth
+
+@[default_target]
+lean_lib ZeroSlope
+
+@[default_target]
+lean_lib SameUComposition
+
+@[default_target]
+lean_lib WordSameU

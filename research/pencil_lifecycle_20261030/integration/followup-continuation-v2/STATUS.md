@@ -205,3 +205,27 @@ Independent global nonsingularity review, corrected-source Clippy/CLI checks, fi
 
 ### Errors
 The source-only runtime-supervisor review found missing fixture-member verification, exception-path client cleanup, archive-kind checks and raw-inspect cleanup. A separate revised proposal is being prepared before execution. Earlier proof and software failures remain retained.
+
+## 2026-10-31 03:10 UTC — source freeze and local parent acquisition
+
+### What was done
+Committed reviewed dispatch, local nonsingularity and owner-lock correction as 3c592af96f3916fef3403e4cf173f22b6f7ef536. Maintained Clippy passed at 03:09:06 UTC with source hashes unchanged; CLI build is the final active supervisor stage. One prospectively source-reviewed public parent acquisition verified local image sha256:f88bac9411086e0c87b0a1ff6a2d211897548182f86d5db16d02b9cfc38a6eaf against the exact pinned AWS CLI digest, linux/amd64 and empty OnBuild.
+
+### Decisions made
+Explicit parent acquisition is an additive local preparation amendment; image assembly still excludes implicit pulls. No login, image publication, controller change or scientific execution occurred. Final source selection is reviewed separately from the original b985 candidate.
+
+### Open threads
+Bounded source refresh/rebuild, independently reviewed runtime supervisor/gate, prospective scientific admission and PR update. The newest aggregate PDF is report-dispatch-smoothness/report.pdf, with editable report.svg and standardized index.json.
+
+### Errors
+Supervisor v2 retained a signal window around subprocess creation; v3 defers termination signals and marks uncertainty before launch. Source-refresh command timeout receipt handling was corrected before execution. Prior snapshots retain their original pending statuses.
+
+### 2026-10-31T03:36:54.849404+00:00 — independently reviewed same-u word composition
+
+SameUComposition and WordSameU are integrated with their producer and independent-review packets. All 82 WordSameU bindings matched around fresh replay. The 37-target Lake configuration compiles. Final corrected-source static binary d0e2d1426115f5efecced07c298d691e1bcc7d5378015f992edc615dc9384f5b passed provenance review; actual libc/CRT come from Rust 1.99.1 self-contained assets, and retained native dependencies were reused. Local base assembly client exited 0 but IID read failed with PermissionError; scoped readback identifies the existing image. Runtime-only recovery is being designed without repeating that base build. Current aggregate: packets/components-progress/index.json.
+
+### Runtime outcome 2026-10-31T07:11:16.773616+00:00
+
+Runtime-only recovery completed using the existing base plus one runtime build. [Outcome PDF](packets/runtime-outcome/report.pdf), [diagram](packets/runtime-outcome/flow.svg), [standardized record](packets/runtime-outcome/status.json). Q0 passed. Q1 produced expected output and observed pids.max=1 before exec, then failed the strict writable-layer check: added /fixtures, /qualification and /qualification/exec-gate. Q1 is not a passed case; qualification remains incomplete. Cleanup completed; no scientific payload launched. All sub-agents subsequently hit their usage limit; unfinished BZero proof controls/review remain private and are not promoted.
+
+At 2026-10-31T07:14:23.744041+00:00, the 2026-10-31 06:00 UTC scientific campaign deadline is expired. No scientific payload was launched in this continuation. The budget record remains unchanged; a future scientific admission needs a new explicit envelope as well as the unresolved technical reviews.

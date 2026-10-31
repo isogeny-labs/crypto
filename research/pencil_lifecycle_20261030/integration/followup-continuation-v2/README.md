@@ -47,4 +47,26 @@ The boxed-request full-library check ended with 5,791 passing tests, two GPU loc
 
 The canonical project now registers 32 targets, with a passing configuration check. Further reviewed components are the [field dispatcher aggregate](packets/mixed-dispatch-field-review/review.pdf), [UInt64 dispatcher aggregate](packets/mixed-dispatch-word-review/report.pdf), [degree-two ordered-guard exclusion](packets/degree22-guards-review/report.pdf), and [same-support extraction](packets/sameu-mixed-point-review/report.pdf). The extraction packet preserves a singular counterexample showing that input validity alone does not establish the next doubling's nonzero weight.
 
-[Native candidate provenance review](packets/musl-native-provenance-review/report.pdf) binds the actual Rust self-contained CRT/libc paths and the retained static CLI checks. The candidate's positive request exited0 and its wrong-digest control exited2; the reviewer independently recomputed5,251,028 loaded bytes. The corrected-source GPU check separately passed all8 tests; the full library suite is in progress.
+[Native candidate provenance review](packets/musl-native-provenance-review/report.pdf) binds the actual Rust self-contained CRT/libc paths and the retained static CLI checks. The candidate's positive request exited0 and its wrong-digest control exited2; the reviewer independently recomputed5,251,028 loaded bytes. The corrected-source GPU check separately passed all8 tests; the full library suite then passed 5,793 tests with zero failures and 128 ignored tests.
+
+Latest aggregate snapshot (03:04 UTC): [PDF](report-dispatch-smoothness/report.pdf), [editable diagram](report-dispatch-smoothness/report.svg), [standardized index](report-dispatch-smoothness/index.json). Eight producer/review pairs are bound separately from software validation. Maintained Clippy and the CLI build were pending at this snapshot.
+
+Global-to-local nonsingularity: [producer PDF](packets/sameu-global-smooth/report.pdf), [independent review](packets/sameu-global-smooth-review/report.pdf). Evaluating an explicit coprimality certificate excludes a common root of the polynomial and its derivative over an arbitrary field. The extracted ordinate conclusion retains its local extraction premises. No squarefree-to-separable implication or characteristic-two geometric smoothness claim is made.
+
+Runtime preparation: [supervisor v1 review](packets/runtime-supervisor-review-v1/report.pdf) records six source issues before execution; [v2 proposal](packets/runtime-supervisor-v2/PLAN.md) supplies additive corrections and remains under review. The [local builder routing review](packets/image-routing-review/REVIEW.md) preserves exact parent-image and route checks before assembly.
+
+The expanded canonical project registers 34 Lean targets; its [configuration check](packets/lake-config-global/lakefile-run4/receipt.json) passed. This configuration check is separate from each theorem module's retained independent proof/readback.
+
+The [completed corrected-source software summary](preflight-review/owner-lock-software-summary.json) records all four stages passing: affected GPU tests, full library, maintained Clippy and CLI build. Source hashes remained unchanged in each stage. The earlier full-suite failures remain retained. The isolated 3c592af source refresh separately matched all 5,909 selected files before admitting one bounded static rebuild; that build is still active at this update.
+
+## Reviewed same-u composition and current software snapshot
+
+[Neutral PDF](packets/components-progress/report.pdf), [editable diagram](packets/components-progress/flow.svg), and [standardized result index](packets/components-progress/index.json) bind the independently reviewed field and UInt64 same-u compositions, final static binary and four terminal software checks. The canonical Lean project now registers 37 targets; its configuration check passed.
+
+The local base-image build returned exit 0, followed by a permission failure reading the root-owned IID file. Exact owned-image readback is retained; runtime assembly and qualification are pending. The [continuation ledger](packets/continuation-reconciliation/remaining-binding-ledger.json) preserves all 1,260 targets and null remaining worker allowance. No scientific cohort was launched.
+
+### Runtime outcome 2026-10-31T07:11:16.773616+00:00
+
+Runtime-only recovery completed using the existing base plus one runtime build. [Outcome PDF](packets/runtime-outcome/report.pdf), [diagram](packets/runtime-outcome/flow.svg), [standardized record](packets/runtime-outcome/status.json). Q0 passed. Q1 produced expected output and observed pids.max=1 before exec, then failed the strict writable-layer check: added /fixtures, /qualification and /qualification/exec-gate. Q1 is not a passed case; qualification remains incomplete. Cleanup completed; no scientific payload launched. All sub-agents subsequently hit their usage limit; unfinished BZero proof controls/review remain private and are not promoted.
+
+At 2026-10-31T07:14:23.675625+00:00, the 2026-10-31 06:00 UTC scientific campaign deadline is expired. No scientific payload was launched in this continuation. The budget record remains unchanged; a future scientific admission needs a new explicit envelope as well as the unresolved technical reviews.
