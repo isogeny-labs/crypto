@@ -1,0 +1,99 @@
+{
+ "beat_id": "prime.end_to_end_dlp.j0_28bit",
+ "claim_boundary": "synthetic_known_answer",
+ "claim_boundary_non_claims": [
+  "not key recovery on deployed curves",
+  "not asymptotic sub-rho",
+  "not a vs_rho claim (IC wall exceeds rho wall at this size)",
+  "not ledger promotion until independent validation"
+ ],
+ "created_at": "2026-10-31T17:07:22.351694+00:00",
+ "curve": "j0-bench-28bit",
+ "curve_params": {
+  "p": 268435147,
+  "a": 0,
+  "b": 3,
+  "n": 268402669,
+  "h": 1,
+  "generator": [
+   1,
+   2
+  ],
+  "provenance": "sage-constructed: p prime with p = 1 mod 3, #E prime, generator order = #E (verified in sage); note all j=0 orders over a given p = 1 mod 3 lie in a small unit orbit, so p was searched until one orbit order is prime"
+ },
+ "evidence_paths": [
+  "research/sat_factor_base_review_20260908/autolab/runs_manual/prime_j0_e2e_28bit_20261031/ka_28bit_seed20261111.json",
+  "research/sat_factor_base_review_20260908/autolab/runs_manual/prime_j0_e2e_28bit_20261031/ka_28bit_seed20261112.json",
+  "research/sat_factor_base_review_20260908/autolab/runs_manual/prime_j0_e2e_28bit_20261031/ka_28bit_seed20261113.json"
+ ],
+ "executable_or_source_hash": {
+  "source_j0_stage_ladder": "e6e17505bc9d644502e4853899be90950ddfdbabf89278c5cff10af8f163639d",
+  "source_bench_curves": "35a0e66e19e6877fc7128439935970512b13c7cb1942420cdb16e7dcdf1ccd0e"
+ },
+ "host_id": {
+  "node": "Adams-MacBook-Pro.local",
+  "platform": "macOS-26.6-arm64-arm-64bit",
+  "cpu": "Apple M4 Pro"
+ },
+ "ic_agrees_rho": true,
+ "recovered_d_verified": true,
+ "regime": "prime",
+ "n_or_bits": 28,
+ "policy": {
+  "target_orbits": 40,
+  "extra_relations": 8,
+  "max_relation_attempts": 64,
+  "max_trials_per_relation": 1000000,
+  "rho_steps_cap": 4194304,
+  "note": "frozen ladder policy, unchanged from the 20/24-bit rungs"
+ },
+ "resource_caps": {},
+ "schema_version": 2,
+ "seeds": {
+  "target_seeds": [
+   "20261111",
+   "20261112",
+   "20261113"
+  ]
+ },
+ "stage": "end_to_end_dlp",
+ "stage_timers": {
+  "seed20261111": {
+   "factor_base_ms": 0.325209,
+   "relations_ms": 1470016.299208,
+   "linear_algebra_ms": 0.04075,
+   "verify_ms": 0.009792,
+   "rho_ms": 6089.930791999999
+  },
+  "seed20261112": {
+   "factor_base_ms": 0.360083,
+   "relations_ms": 1786017.949708,
+   "linear_algebra_ms": 0.104791,
+   "verify_ms": 0.016292,
+   "rho_ms": 284.754458
+  },
+  "seed20261113": {
+   "factor_base_ms": 0.31208400000000003,
+   "relations_ms": 1794048.861667,
+   "linear_algebra_ms": 0.033125,
+   "verify_ms": 0.015083,
+   "rho_ms": 1653.7511249999998
+  }
+ },
+ "relations": {
+  "collected": [
+   48,
+   48,
+   48
+  ],
+  "trials_per_relation_median": [
+   51086.0,
+   49496.0,
+   61895.0
+  ],
+  "trials_total": 11647252,
+  "attempts_exhausted": 0
+ },
+ "task_id": "TASK-IC-BOUNDARY-AUTOLAB-20260910",
+ "gate_note": "3 deterministic seeds, all recovered, verified, and rho-agreeing (>=3 seeds satisfies the past-24-bits gate)"
+}

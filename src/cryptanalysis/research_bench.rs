@@ -704,6 +704,21 @@ pub fn bench_curves_j0() -> Vec<(u32, CurveParams)> {
                 h: 1,
             },
         ),
+        // Sage-verified: p = 268435147 (prime, p ≡ 1 mod 3), b = 3,
+        // #E = 268402669 (prime), generator (1, 2); j=0 since a = 0.
+        (
+            28, // n = 268402669
+            CurveParams {
+                name: "j0-bench-28bit",
+                p: BigUint::from(268435147u32),
+                a: BigUint::zero(),
+                b: BigUint::from(3u32),
+                gx: BigUint::from(1u32),
+                gy: BigUint::from(2u32),
+                n: BigUint::from(268402669u32),
+                h: 1,
+            },
+        ),
     ]
 }
 

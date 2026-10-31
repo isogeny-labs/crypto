@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "title": "Index-calculus boundary ledger",
-  "updated": "2026-10-31T16:12:59Z",
+  "updated": "2026-10-31T17:07:27Z",
   "claim_hygiene": "Public synthetic / known-answer fixtures only. Primary vs_rho claims use exactly one unseen target paired on the identical public point and resource envelope. Headline time is verified online wall after reusable IC preparation; exclude process launch, input loading, target generation, and target-independent setup. Multi-target averages, batch throughput, and shared-table amortization are secondary only and require a separate declared question after the primary one-target result. Never combine best component costs from different runs into a synthetic win. A new CPU wall-time speedup requires a qualifying host-isolation receipt; rows without one remain exploratory. Raw IC probes and rho walk steps use different units. An equal-budget precomputed-rho or multi-target study is secondary and cannot replace the one-target rho pair.",
   "ffd_vs_rank_la": "FFD / degree_of_regularity apply to Boolean Macaulay / Gröbner algebra of Semaev (decomposition). Relation-matrix LA over F_r is stage rank; never conflate the two.",
   "stages": [
@@ -2370,7 +2370,9 @@
                 "ic_scalar_verified": true,
                 "rho_scalar_verified": true,
                 "status": "PENDING_INDEPENDENT_VALIDATION",
-                "claim_boundary": "constant-factor win only, no asymptotic sub-rho claim"
+                "claim_boundary": "constant-factor win only, no asymptotic sub-rho claim",
+                "reproduce_command": "python3 research/sat_factor_base_review_20260908/autolab/boundary_autolab.py launch-single --beat koblitz.compact_orbit.n71_single_target --workloads 16",
+                "method_note": "docs/ic/N71_SINGLE_TARGET_METHOD_20261031.md"
               }
             }
           ],
@@ -2567,60 +2569,60 @@
         "end_to_end_dlp": {
           "status": "record",
           "current": {
-            "summary": "j=0 known-answer IC at 24 bits (j0-bench-24bit, sage-constructed p=16777213, prime order n=16770451) recovers d with [d]G=Q, matches the validation-only sidecar, and agrees with rho on the identical public point for all 3 deterministic seeds (20261031/20261101/20261102); split stage timers (factor_base -> relations -> LA -> verify) unchanged from the 20-bit rung policy (orbits 40, extra 8, 1M trial cap); IC wall 97.4-123.0 s vs rho 75-100 ms (still no vs_rho crossover, gap widens with size); median trials/relation 3739.0-3955.5, matching the ~x16 per +4 bits 2-decomposition yield law (171.5 at 20 bits); prior 20-bit rung and a=-3 ladder (16/20/24 bits) retained in history",
+            "summary": "j=0 known-answer IC at 28 bits (j0-bench-28bit, sage-constructed p=268435147, prime order n=268402669; p searched over the j=0 unit-orbit order constraint) recovers d with [d]G=Q, matches the validation-only sidecar, and agrees with rho on the identical public point for all 3 deterministic seeds (20261111/20261112/20261113); split stage timers unchanged from the 20/24-bit rung policy (orbits 40, extra 8, 1M trial cap, rho cap 4,194,304); IC wall 1,470-1,794 s vs rho 285-6,090 ms (no vs_rho crossover; rho walk variance visible across seeds); median trials/relation 49,496-61,895, tracking the ~x16 per +4 bits 2-decomposition yield law (3.7-4.0k at 24 bits); prior 24-bit rung and a=-3 ladder retained in history",
             "metrics": {
-              "n_or_bits": 24,
-              "curve": "j0-bench-24bit",
+              "n_or_bits": 28,
+              "curve": "j0-bench-28bit",
               "recovered_d_verified": true,
               "ic_agrees_rho": true,
               "ic_matches_truth": true,
               "claim_boundary": "public_synthetic_known_answer",
               "target_orbits": 40,
               "ic_wall_ms_range": [
-                97377.629833,
-                123021.76383299999
+                1470018.006708,
+                1794049.5684170001
               ],
               "rho_wall_ms_range": [
-                75.296084,
-                99.843833
+                284.754458,
+                6089.930791999999
               ],
               "trials_per_relation_median_range": [
-                3739.0,
-                3955.5
+                49496.0,
+                61895.0
               ],
               "relations_collected": [
                 48,
                 48,
                 48
               ],
-              "stage_timers": "split per seed in claim_draft_24bit.json",
               "seeds": [
-                "20261031",
-                "20261101",
-                "20261102"
+                "20261111",
+                "20261112",
+                "20261113"
               ],
               "host_id": {
                 "node": "Adams-MacBook-Pro.local",
-                "platform": "macOS-26.6-arm64-arm-64bit"
+                "platform": "macOS-26.6-arm64-arm-64bit",
+                "cpu": "Apple M4 Pro"
               }
             },
-            "verdict": "PRIME_J0_24BIT_STAGED_KNOWN_ANSWER_3SEED"
+            "verdict": "PRIME_J0_28BIT_STAGED_KNOWN_ANSWER_3SEED"
           },
           "next_target": {
-            "summary": "Extend the j=0 staged ladder to 28+ bits and the a=-3 ladder to 28-32 bits with the same split timers and rho agreement control; measure where 2-decomposition relation yield (trials/relation ~ x16 per +4 bits) forces 3-decomposition (S4) relation search",
+            "summary": "Extend the j=0 staged ladder to 32+ bits and the a=-3 ladder to 28-32 bits with the same split timers and rho agreement control; measure where 2-decomposition relation yield (trials/relation ~ x16 per +4 bits) forces 3-decomposition (S4) relation search",
             "acceptance_gates": [
               "[d]G = Q verified in-process and by sidecar",
               "split stage timers present (factor_base -> relations -> LA -> verify)",
               "rho agreement control on the identical public point",
-              "independent replay on a second host or >=3 seeds for any size past 24 bits"
+              "independent replay on a second host or >=3 seeds for any size past 28 bits"
             ]
           },
           "evidence": [
+            "research/sat_factor_base_review_20260908/autolab/runs_manual/prime_j0_e2e_28bit_20261031/claim_draft_28bit.json",
+            "research/sat_factor_base_review_20260908/autolab/runs_manual/prime_j0_e2e_28bit_20261031/ka_28bit_seed20261111.json",
+            "research/sat_factor_base_review_20260908/autolab/runs_manual/prime_j0_e2e_28bit_20261031/ka_28bit_seed20261112.json",
+            "research/sat_factor_base_review_20260908/autolab/runs_manual/prime_j0_e2e_28bit_20261031/ka_28bit_seed20261113.json",
             "research/sat_factor_base_review_20260908/autolab/runs_manual/prime_j0_e2e_24bit_20261031/claim_draft_24bit.json",
-            "research/sat_factor_base_review_20260908/autolab/runs_manual/prime_j0_e2e_24bit_20261031/ka_24bit_seed20261031.json",
-            "research/sat_factor_base_review_20260908/autolab/runs_manual/prime_j0_e2e_24bit_20261031/ka_24bit_seed20261101.json",
-            "research/sat_factor_base_review_20260908/autolab/runs_manual/prime_j0_e2e_24bit_20261031/ka_24bit_seed20261102.json",
-            "research/sat_factor_base_review_20260908/autolab/runs_manual/prime_j0_e2e_20bit_20261005/claim_draft_20bit.json",
             "examples/j0_stage_ladder.rs"
           ],
           "history": [
@@ -2728,6 +2730,46 @@
                     505.5
                   ],
                   "all_verified_and_agree_rho": true
+                }
+              }
+            },
+            {
+              "recorded": "2026-10-31-pre-28bit-rung",
+              "summary": "j=0 known-answer IC at 24 bits (j0-bench-24bit, sage-constructed p=16777213, prime order n=16770451) recovers d with [d]G=Q, matches the validation-only sidecar, and agrees with rho on the identical public point for all 3 deterministic seeds (20261031/20261101/20261102); split stage timers (factor_base -> relations -> LA -> verify) unchanged from the 20-bit rung policy (orbits 40, extra 8, 1M trial cap); IC wall 97.4-123.0 s vs rho 75-100 ms (still no vs_rho crossover, gap widens with size); median trials/relation 3739.0-3955.5, matching the ~x16 per +4 bits 2-decomposition yield law (171.5 at 20 bits); prior 20-bit rung and a=-3 ladder (16/20/24 bits) retained in history",
+              "metrics": {
+                "n_or_bits": 24,
+                "curve": "j0-bench-24bit",
+                "recovered_d_verified": true,
+                "ic_agrees_rho": true,
+                "ic_matches_truth": true,
+                "claim_boundary": "public_synthetic_known_answer",
+                "target_orbits": 40,
+                "ic_wall_ms_range": [
+                  97377.629833,
+                  123021.76383299999
+                ],
+                "rho_wall_ms_range": [
+                  75.296084,
+                  99.843833
+                ],
+                "trials_per_relation_median_range": [
+                  3739.0,
+                  3955.5
+                ],
+                "relations_collected": [
+                  48,
+                  48,
+                  48
+                ],
+                "stage_timers": "split per seed in claim_draft_24bit.json",
+                "seeds": [
+                  "20261031",
+                  "20261101",
+                  "20261102"
+                ],
+                "host_id": {
+                  "node": "Adams-MacBook-Pro.local",
+                  "platform": "macOS-26.6-arm64-arm-64bit"
                 }
               }
             }
