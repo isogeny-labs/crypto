@@ -1,0 +1,83 @@
+# R53 exact trace geometry and normalized Hecke construction
+
+## Verified trace and discriminant calculation
+
+`discrim53-02` is accepted: exit0, exact terminal marker, no native error
+lines. It uses all528 retained normal multiplication columns, not a selected
+sample. All32normal-generator traces agree with the independently reconstructed
+degree16 companion traces and quadratic base trace. The complete1024-entry
+identity is
+
+\[
+ M_0^t\operatorname{Gram}_B M_0=\operatorname{Gram}_{\rm power}.
+\]
+
+The actual source is the retained quadratic equation
+\(V^2+z^2V+z+z^3=0\) and the retained monic degree16 lambda equation.
+Its derivative is checked against \(A^3\Delta\), with
+\(R=(1+z)V+z^3,\ b=zR(R+1),\ c=z(R+1),\ A=1+c\),
+\(\Delta=b^3(b+cA^3)\). The full source embedding products agree across
+the compact PID, multiplication-table and closure certificates. Changed Gram
+and trace entries are detected.
+
+All eight predictions matched, with
+
+\[
+ f_A=z^5+z^2+1,\qquad f_C=z^5+z^3+z^2+z+1.
+\]
+
+| Exact computed quantity | Factorization |
+|---|---|
+| \(\operatorname{Norm}(A)\) | \(f_A\) |
+| \(\operatorname{Norm}(\Delta)\) | \(z^{11}(z+1)^{22}f_C\) |
+| \(\operatorname{disc}(B)\) | \(z^{76}(z+1)^{24}f_C^{12}\) |
+| \(\det M_0\) | \(z^{82}(z+1)^{164}f_A^{24}f_C^2\) |
+| \(\det M_1\) | \(z^{60}(z+1)^{120}f_A^8\) |
+| \(\det M_2\) | \(z^{60}(z+1)^{120}f_A^4\) |
+| \(\det M_3\) | \(z^{60}(z+1)^{120}\) |
+
+Both full discriminant identities pass:
+\[
+ \operatorname{disc}_{\rm power}
+ =z^{64}\operatorname{Norm}(A)^{48}\operatorname{Norm}(\Delta)^{16}
+ =(\det M_0)^2\operatorname{disc}(B).
+\]
+
+Consequently the index lengths376,220,200,180 now have their exact supports.
+The second and third adjunctions remove lengths20and20 solely over the
+degree5prime \(f_A\); the final defect is entirely at z0and1. The first
+adjunction removes the fA exponent24to8, the fC exponent2to0, and the z/z+1
+exponents82/164to60/120. These are measured module statements. They do not
+identify the completed local subrings. Matching the proposed (7,11)cusp
+model still requires actual branch valuations and residue-field descent.
+
+The table-derived Gram certificate, independent source Gram, all31universal
+companion traces, source equation, normal traces and four determinants are
+retained in raw output. `discrim53-01` is rejected: missing matrix-helper
+library and unallocated ideal entries caused cascading errors; it was stopped
+with SIGTERM. Its handler returned0, but the strict error/marker gate rejected
+it. Attempt02 corrects those implementation errors and passes.
+
+## Construction stages
+
+The separately frozen `ALPHAUNIT53.sing` composes saved torsion membership
+and coprime-kernel Bezout products to address the actual image-line denominator.
+`TATE53.sing` then constructs the generic marked Tate normalization. Their
+outcomes are pending; a frozen proposed formula is not a verified map.
+
+`lean/Transfer53.lean` supplies the determinant-change and composed unit
+implications. Compilation/audit and native semantic binding are recorded
+separately. No actual completed local-ring, target QR/F2 map or subgroup
+action is asserted here before its respective check.
+
+## Sources and premises
+
+Retained R50 normal RR algebra, R51 compact PID/line/collision/isogeny
+certificates, and R52 complete nu-adjunction certificates are the source
+inputs, pinned in `donors.json`. Established model conventions were reviewed
+in [Sage's isogeny documentation](https://doc.sagemath.org/html/en/reference/arithmetic_curves/sage/schemes/elliptic_curves/ell_curve_isogeny.html)
+and the function-field/proper-curve correspondence in
+[Stacks 0BXX](https://stacks.math.columbia.edu/tag/0BXX). These sources inform
+the generic coordinate normalization and its proper-model obligations; they
+do not provide the specific native arrays. No novelty claim is made for
+trace pairings, tower discriminants or Tate normalization.
