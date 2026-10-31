@@ -659,6 +659,35 @@ def koblitz_integral_chart_transfers(ref, since):
                  source=f"{path}@{commit}")
 
 
+
+def koblitz_normal_closure52(ref, since):
+    """Neutral exact closure, finite factor-certificate and local-model counters."""
+    path = "research/koblitz_modular_ic_20261018/rounds/52/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        counts = json.loads(text).get("construction_counts", {})
+        for key, unit, label in (
+            ("normal_chart_rank", "module rank", "Complete retained normal-chart module rank"),
+            ("source_index_length", "F2 dimensions", "Source lattice index before adjoining actual nu"),
+            ("nu_adjoined_index_length", "F2 dimensions", "Exact remaining index after stable complete nu adjunction"),
+            ("nu_closure_extensions", "complete module extensions", "Extensions before verified nu stability"),
+            ("least_zero_exponent", "scalar denominator exponents", "Least z exponent in residual cokernel annihilator"),
+            ("least_one_exponent", "scalar denominator exponents", "Least z plus one exponent in residual cokernel annihilator"),
+            ("local_filtration_levels", "complete module levels", "All local filtration levels with both matrix products"),
+            ("candidate_semigroup_gaps", "numerical semigroup gaps", "Candidate 7,11 model gaps; actual local-ring identification separate"),
+            ("candidate_semigroup_conductor", "numerical semigroup conductor", "Candidate 7,11 model conductor; actual local-ring identification separate"),
+            ("large_good_packet_fibers", "finite fibers", "Complete good source specializations over fields1024 and2048"),
+            ("large_patterns88", "finite factorization certificates", "Good larger fibers with factor degrees8 and8"),
+            ("large_patterns214", "finite factorization certificates", "Good larger fibers with factor degrees2 and14"),
+            ("large_odd_degree11_packet_factors", "irreducible factors", "Odd degree packet factors over field2048"),
+            ("fresh_verified_packet_fibers", "fresh checked finite fibers", "All stored source specializations and irreducible factors rechecked"),
+            ("generic_norm_line_maps", "generic line maps", "Full degree3 isogeny line norm and sign products"),
+            ("audited_unique_theorems", "audited declarations", "Unique R52 module and polynomial implications; source premises external"),
+        ):
+            emit("koblitz_modular.geometry52_" + key, counts.get(key), date=date,
+                 problem=P_IC, unit=unit, better="neutral", label=label,
+                 source=f"{path}@{commit}")
+
+
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
     path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
@@ -773,6 +802,7 @@ def main():
     koblitz_affine_normalization(a.ref, a.since)
     koblitz_checked_source_geometry(a.ref, a.since)
     koblitz_integral_chart_transfers(a.ref, a.since)
+    koblitz_normal_closure52(a.ref, a.since)
 
 if __name__ == "__main__":
     main()
