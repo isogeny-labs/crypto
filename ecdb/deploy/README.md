@@ -16,7 +16,8 @@ agents ──HTTPS──▶ Lambda function URL ─▶ ecdb-api (VPC) ──TLS 
     handshake and tool list are open, and tool calls need the token.
   - `ecdb-admin` has no URL. Each invocation runs one action:
     `{"action": "status" | "migrate" | "bootstrap_roles"}` or
-    `{"action": "import", "what": "registry" | "walks" | "traits" | "covers" | "transfers" | "certificates" | "derived" | "enrich" | "all"}`.
+    `{"action": "import", "what": "registry" | "walks" | "traits" | "covers" | "transfers" | "certificates" | "siblings" | "derived" | "enrich" | "results" | "ecbench" | "all"}`,
+    or `{"action": "import_pack", "name": "ecbench", "data": "<base64 of one gzipped pack part>"}`.
 - **Network.**
   - Lambda security group `ecdb-lambda`: egress only to 5432 on `ecdb-rds`.
   - RDS security group `ecdb-rds`: ingress only from `ecdb-lambda`.
@@ -55,9 +56,17 @@ ecdb/deploy/build-lambda.sh /tmp/ecdb-lambda.zip     # static musl build + gzipp
 AWS_REGION=us-west-2 ecdb/deploy/deploy-aws.sh /tmp/ecdb-lambda.zip
 ```
 
+`build-lambda.sh` also runs `ecdb pack`:
+
+- the `benchmarks/` index and the sibling checkouts' files (expected beside
+  this checkout) go into the zip under `data/`;
+- the ecbench sessions pack to about 70 MB gzipped, over Lambda's 50 MB
+  direct-upload limit, so they go to `<zip>.ecbench/` as parts of about
+  2 MB.
+
 `deploy-aws.sh` is idempotent: it reuses resources by name, updates function
 code and configuration, then runs migrate, bootstrap_roles, every importer,
-and status. Re-running it after a catalogue change re-imports; imports are
+one `import_pack` invocation per ecbench part, and status. Re-running it after a catalogue change re-imports; imports are
 idempotent. `ECDB_SKIP_IMPORT=1` skips the import. The first run waits about
 10 minutes for RDS to become available.
 

@@ -12,9 +12,13 @@ use tokio_postgres::Client;
 pub mod certs;
 pub mod covers;
 pub mod derive;
+pub mod ecbench;
 pub mod enrich;
 pub mod lmfdb;
+pub mod pack;
 pub mod registry;
+pub mod results;
+pub mod siblings;
 pub mod traits;
 pub mod transfers;
 pub mod walks;
@@ -43,6 +47,18 @@ impl Ctx<'_> {
     }
 
     pub async fn source(&self, rel_path: &str, sha256: &str, title: &str) -> Result<i64> {
+        self.source_in(&self.repository, rel_path, sha256, self.git_commit.as_deref(), title).await
+    }
+
+    /// A pinned file of any repository (the sibling importers' sources).
+    pub async fn source_in(
+        &self,
+        repository: &str,
+        rel_path: &str,
+        sha256: &str,
+        git_commit: Option<&str>,
+        title: &str,
+    ) -> Result<i64> {
         let row = self
             .client
             .query_one(
@@ -56,7 +72,7 @@ impl Ctx<'_> {
                   WHERE kind = 'repository_file' AND repository = $2 AND path = $3
                     AND sha256::text = $5 AND uri IS NULL
                  LIMIT 1",
-                &[&title, &self.repository, &rel_path, &self.git_commit, &sha256],
+                &[&title, &repository, &rel_path, &git_commit, &sha256],
             )
             .await?;
         Ok(row.get(0))
@@ -181,6 +197,12 @@ pub enum Selection {
     Certificates,
     Derived,
     Enrich,
+    /// The IC leaderboard, progress timeline, boundary ledger and benchmarks/ index.
+    Results,
+    /// Every ecbench session with its runs and comparisons.
+    Ecbench,
+    /// The sibling repositories' curve records, dataset curves and measurements.
+    Siblings,
 }
 
 /// Run the selected importers; `walk_files` overrides the default walk outputs.
@@ -206,11 +228,23 @@ pub async fn run(ctx: &Ctx<'_>, what: Selection, walk_files: Option<Vec<String>>
     if all || what == Selection::Certificates {
         reports.extend(certs::import(ctx).await?);
     }
+    if all || what == Selection::Siblings {
+        reports.push(siblings::import(ctx).await?);
+    }
     if all || what == Selection::Derived {
         reports.push(derive::import(ctx).await?);
     }
     if all || what == Selection::Enrich {
         reports.push(enrich::import(ctx).await?);
+    }
+    if all || what == Selection::Results {
+        reports.push(results::leaderboard(ctx).await?);
+        reports.push(results::progress(ctx).await?);
+        reports.push(results::boundary(ctx).await?);
+        reports.push(results::benchmarks(ctx).await?);
+    }
+    if all || what == Selection::Ecbench {
+        reports.push(ecbench::import(ctx).await?);
     }
     Ok(reports)
 }

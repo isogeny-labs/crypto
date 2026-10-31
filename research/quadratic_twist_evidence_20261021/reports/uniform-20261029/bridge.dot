@@ -1,0 +1,8 @@
+digraph G {
+graph [rankdir=LR,bgcolor="white",pad=.12]; node [shape=box,fontname="Helvetica",fontsize=10,style="rounded,filled",fillcolor="#eef4fb"]; edge [fontname="Helvetica",fontsize=9];
+a [label="Frozen 96 arms\n896 source targets"];
+b [label="Original / reduced S3\nActual points and witnesses"];
+c [label="Independent Rust replay\n536 reachable spaces"];
+d [label="13 altered controls rejected\n22 backend tests passed"];
+a->b->c->d;
+}

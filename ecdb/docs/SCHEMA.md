@@ -271,6 +271,17 @@ the import's own checks.
 
 The import re-runs idempotently. Against a local Postgres 16 it takes about 13 s.
 
+Migration `0009` adds measured results and the sibling repositories' records.
+
+| Source | Rows |
+|:--|:--|
+| `docs/ic/leaderboard.json` | 3 families (`ic_family`: unit, reference, floor), 28 priced curves (`ic_board_row`, every one linked to its curve), 122 recipes (`ic_recipe`, phase split), the other 47 sections verbatim (`ic_leaderboard_section`) |
+| `docs/ic/progress-timeline.json` | 16 series, 94 points |
+| `docs/ic/boundary_targets.json` | 18 records (3 regimes × 6 stages), each with its next target and acceptance gates |
+| `benchmarks/` | 385 directories: 132 admitted, 26 in the archive, 227 unlisted, each with its `VALIDATION.json` when present |
+| every ecbench session in the checkout | 1,103 `ecbench.session/v1` sessions (1,127 session files; 20 of other schemas skipped; 4 duplicates), 543,290 runs (531,149 linked to a curve by slug), 1,082 paired comparisons, replay-audit summaries; `v_ecbench_arm` aggregates per session, arm and curve |
+| the sibling checkouts (`src/import/siblings.rs`) | 10,760 `external_curve_record` rows, 9,238 of them linked (by EC1, curve_uid, ICV1 slug, computed ICV1 or a unique standard name); 9,189 prime-field dataset curves imported as curves (family `dataset`, ICV1 computed from p, a, b and #E); 24,096 `measurement` rows; 1,169 singular rows, the producers' negative controls, counted and skipped |
+
 These tables exist and still wait for a producer:
 
 - `geometric_invariant` (Igusa invariants of the cover curves);

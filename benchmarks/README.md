@@ -43,6 +43,15 @@ remains outside this table pending validation admission.
 The [retained cross-layout screen](N83_CROSSLAYOUT_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
+The [31 October gap80 native-helper and partial-tile diagnostics](20261031-gap80-native-diagnostic/)
+retain documentary run/results PDFs and SVG/PNG copies. Historical medians
+were 0.469961 → 0.395023 s and 2.453493 → 2.087622 s for native helper
+degrees 4,096/16,384 (seven unpinned pairs), and 3.735434 → 3.431381 s for
+one repeated partial tile (three CPU-0 pairs). These remain outside the
+admitted table: no independent timing replay, matched rho reference or
+completed 80-bit isogeny is supplied. The linked study preserves the native
+code and historical Sage provenance without promoting a benchmark row.
+
 The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
@@ -231,6 +240,8 @@ The [prime-field 5-sum table study](20261029-prime-ksum-k5/README.md) ([report](
 The [prime-field precomputation regime study](20261029-prime-precompute-regime/README.md) ([report](20261029-prime-precompute-regime/report.pdf), [graph](20261029-prime-precompute-regime/amortised.svg)) is a control and accounting study, not an improvement, and has no results row. At equal memory on the 40-bit curve, preprocessing rho's online cost is 142–229× below the known-log k = 4 table's and its precomputation 333–339× dearer (crossover 9.5–14.3 k targets). The equal-precomputation arm overshot its precomputation by 3.85×, and its ranking is unresolved.
 
 The [prime-field k-sum vs incumbent study](20261029-prime-ksum-vs-incumbent/README.md) ([report](20261029-prime-ksum-vs-incumbent/report.pdf), [graph](20261029-prime-ksum-vs-incumbent/ratio.svg)) is not admitted to the results table until it has an independent-host replay and its own `VALIDATION.json`. On the four holdout curves, targets and seeds of `prime_base_oracle_tuning_20261029` (48 targets × 2 rounds, 3,456 verified runs, replay-all audited; the incumbent arm and rho-neg reproduce its recorded means exactly), the k = 5 sum table costs 0.70×, 0.45×, 0.33× and 0.22× the mitm incumbent at 20, 24, 28 and 32 bits, below 1 at every band weight. Track: generic decomposition (bounded by √r; cannot beat rho): a same-instance ranking of two generic recipes. Still 5.4–7.3× rho and 6.6–7.4× BSGS on these curves.
+
+The [prime-field k-sum tables against a tuned mitm incumbent](20261030-prime-ksum-pooled/README.md) ([report](20261030-prime-ksum-pooled/report.pdf), [graph](20261030-prime-ksum-pooled/ratio.svg)) is not admitted to the results table until it has an independent-host replay and its own `VALIDATION.json`. On 16 fresh prime-order curves (4 a size, 20 to 32 bits, 13,824 verified runs, replay-all audited), with the incumbent re-tuned on separate train curves by the same rule, the k = 5 sum table costs 0.70×, 0.45×, 0.32× and 0.22× the tuned incumbent at w = 0, below it on every curve and at every band weight; toy-tier exponent 0.496 against 0.635. Track: generic decomposition (bounded by √r; cannot beat rho): a ranking of generic recipes on the same instances. Still 5.8–7.3× rho and 6.5–7.6× BSGS. External comparison: not run (no external ECDLP tool was timed; outstanding: PARI/GP `elllog` on the same targets and published rho timings, labelled "published, not reproduced"; the reference tool is an owner decision).
 
 
 The [n = 3 Tian route study](20261024-tian-n3-quartic-ic/) is not admitted to the results table until it has its own `VALIDATION.json`. It measures double-large-prime index calculus on generic plane-quartic Jacobians against Pollard rho, in the same process, at `q` = 127–8191, with 52/52 answers verified. With native work at 0 the index calculus needs 180–340 group additions against rho's 5,000–300,000. At 0.1 and 1 GAE its dense linear algebra, growing like `q^1.4`, makes it 0.7–32× rho, so the ranking is unresolved at every `q`. The study also finds plane-quartic Jacobians in the isogeny class of every Theorem-4-flagged prime-order `E/F_{q³}` at `q` ≤ 17 (26/26). This is not an end-to-end attack: no isogeny was computed. Source: [`research/tian_n3_quartic_route_20261024`](../research/tian_n3_quartic_route_20261024/REPORT.md).
