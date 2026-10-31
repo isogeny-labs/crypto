@@ -24,3 +24,10 @@ must retain one-attempt markers, native verify/report/strict-export results,
 restricted archives, content-addressed S3 PUTs and fresh GET/hash receipts.
 This campaign extends size/arity/method coverage; it does not replace the
 requested full matrix.
+
+The completed run is documented in [report/run.md](report/run.md), with an
+[outcome chart](report/outcomes.svg) and [PDF](report/run.pdf). The
+[independent audit](AUDIT.json) rehashes all 16 archives and their native
+artifacts. [Cost observations](cost-observations.jsonl) preserve each phase's
+raw PMU readings and eligibility flags without promoting partial instruction
+counts to whole-worker labels.
