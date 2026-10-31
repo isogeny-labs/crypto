@@ -1,0 +1,1271 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "crypto-hashed-ecdl-counts-20261031",
+  "version": 1,
+  "created": "2026-10-31",
+  "repository": "crypto",
+  "study_dir": "research/hashed_ecdl_counts_20261031",
+  "authors": [
+    "Claude Code workflow subagent (owner request 2026-10-31: counted-S-only amendment of the hashed/tensor ECDL vs rho panels)"
+  ],
+  "links": {
+    "specs": "crypto:research/hashed_ecdl_counts_20261031/spec-C-tensor-counts.json (track C) and crypto:research/hashed_ecdl_counts_20261031/spec-B-hashed-native-counts.json (track B)",
+    "supersedes_for_counted_S": "C: crypto:docs/ecbench/specs/tensor-ic-vs-rho.json (sha256 6735b6e5ba6d3dcb8e6e950aac41a2ec5b919e9be720681402f2f12c4964be25), crypto:docs/ecbench/specs/tensor-ic-vs-rho-16.json (434908fc3ff35268966f1950013c5a3dfa6d585ac3f8e3f8f8deaf2213dd325e), protocol crypto-ecdl-tensor-ic-speed-20261030 (research/ecdl_tensor_ic_speed_20261030/protocol.json, e08cf82b4bf1c667ad3072e75952aa058cbf77ef5b6c6b7bde556f2f8ef0cebf, frozen 40626d71...). B: HASHED-NATIVE-ECBENCH-20261030-FEASIBILITY-v2 at 3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d (spec 42027268bb4b88355d6d69be9bcec6a0c76680cb81eb67ea5893c8c019e300f1, protocol 1ff4c768502999bec2ec4f202b94cefc0b416c7f57348a2f3e8dc63a82de63f3), copied byte-identical under frozen-source/. All originals stay frozen and unchanged; their wall-time claims remain open, not answered here.",
+    "lead": "crypto-autoresearcher:knowledge/leads/ecdlp/exotic/ LEAD-EXO-hashed-factor-base-tensor-ecdl",
+    "implementation": "C: crates/ecdl-tensor-ic and ic.tensor_contraction_v1 in src/cryptanalysis/ecbench/methods.rs at 4df337e64d59bbe0145c204048ab1dc69a43c187. B: crates/hashed-ecdl-tensor through src/cryptanalysis/ecbench/hashed_native.rs at 3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d",
+    "caveat": "On 64-bit builds lambda <= 64, so root_u = lambda/131072 = 0 and public inputs take the finite-size fallback. Nothing here exercises the recursive subexponential kernel. ic.tensor_contraction_v1 is an exponential toy (protocol H1).",
+    "isolation_reason": "L0 ('recorded') is the level ecbench documents as sufficient for operation counts, which do not depend on contention; it is the lowest level the spec schema accepts. The EKS L2 gate refuses these panels because rho solves at 10-16 bits take under 1 ms (MIN_SOLVE_WALL_NS_V3 = 1,000,000 ns grades them L1; run gh-41008826427-1: 176/192 L1; exit 42). A counts-only session needs no wall isolation. Run with `ecbench run --cpus none` (L0 by construction) and a per-track --lock path if the tracks run concurrently.",
+    "order_note": "spec orders are alternate_measured (C) and shuffle (B); the schema field above is the nearest enum and has no effect on counted S",
+    "execution_preconditions": [
+      "resume checkpoint pushed and gated (scripts/checkpoint.sh init, push, gate) before any launcher",
+      "free disk for two release builds (the drafting host had about 100-200 MB free on / on 2026-10-31, which blocks both builds)",
+      "binary C built at 4df337e64d59bbe0145c204048ab1dc69a43c187, binary B built at 3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d, sha256 and rustc -vV recorded",
+      "ecbench plan on each spec reproduces 128 (C) and 288 (B) measured executions"
+    ],
+    "gap_wording": "every row's gap to rho is reported as distance remaining, never as pass/fail"
+  },
+  "question": "On the registered bench-roster prime curves of 10, 12, 14 and 16 bits, what do ic.tensor_contraction_v1 (m = 2) and the four native hashed-base backends of ic.hashed_native_v1 cost in ecbench's counted unit S, how far is each from the matched rho.negation reference (distance remaining, per curve, across the AGENTS.md 5a pricing band), and how does median S scale with r? Counted S only; no wall time.",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Every planned execution of both specs is retained: verified scalar, or an explicit wrong_answer/timeout/exhausted/error outcome; a budget limit is unknown, never a nonexistence result.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Track C, per curve: the paired ratio of summed S, tensor-m2 over rho-neg (the distance remaining to rho), with its paired bootstrap interval and the 5a band.",
+      "class": "comparative",
+      "decided_by": [
+        "C-rho"
+      ],
+      "if_supported": "a measured counted-S gap to rho on these four toy curves",
+      "if_not_supported": "no ranking on that curve; the ratio is still reported as the distance remaining"
+    },
+    {
+      "id": "C3",
+      "text": "Track C, per curve: the paired ratio of summed S, tensor-m2 over ic-mitm (the current prime-curve IC baseline), with the 5a band. A ratio below 1 across the band would be an improvement over the IC baseline on that curve.",
+      "class": "comparative",
+      "decided_by": [
+        "C-ic"
+      ],
+      "if_supported": "a measured counted-S difference from the IC baseline on these curves",
+      "if_not_supported": "no ranking against the IC baseline"
+    },
+    {
+      "id": "C4",
+      "text": "Log-log slope of median S (and of median total GAE) against log2 r for every arm with all 8 rows verified on at least three sizes, reported descriptively with its points and a target-resampled bootstrap interval.",
+      "class": "heuristic_estimate",
+      "decided_by": [],
+      "if_supported": "a fitted exponent on four toy sizes, labelled an extrapolation outside them",
+      "if_not_supported": "fewer than three complete sizes: points only"
+    },
+    {
+      "id": "C5",
+      "text": "Track B, per curve and native backend: the paired ratio of summed S lower bound over rho-neg, with the 5a band, only on curves where that backend verified all 8 targets. Native S is a lower bound, so only 'costs more than rho' can be concluded; a ratio interval below 1 is reported as unranked.",
+      "class": "comparative",
+      "decided_by": [
+        "B-rho-source",
+        "B-rho-selectors",
+        "B-rho-width",
+        "B-rho-partial"
+      ],
+      "if_supported": "a counted lower-bound gap to rho on these curves",
+      "if_not_supported": "incomplete or below-1: census and descriptive ratio only, no ranking"
+    },
+    {
+      "id": "C6",
+      "text": "Track B, per curve: native-source against native-selectors on complete verified pairs, with the 5a band (the original protocol's exploratory comparison).",
+      "class": "comparative",
+      "decided_by": [
+        "B-source-selectors"
+      ],
+      "if_supported": "a backend difference in counted lower-bound S on these curves",
+      "if_not_supported": "no ranking"
+    },
+    {
+      "id": "C7",
+      "text": "Determinism: rho-neg and rho-neg-aa (both tracks) and native-selectors and native-selectors-aa (track B) share each (workload, round) algorithm seed, so their S must be identical row by row, and ecbench verify --replay-all must reproduce every row.",
+      "class": "exact_computation",
+      "decided_by": [
+        "C-aa",
+        "B-aa-rho",
+        "B-aa-selectors"
+      ]
+    },
+    {
+      "id": "C8",
+      "text": "Wall time, speedups, asymptotic or subexponential behaviour, deployed-size curves, challenge scalars and full arithmetic pricing of the native arms are outside this protocol.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "The tensor arm costs far more than rho in S on every curve, and the gap grows with r (carried unchanged from crypto-ecdl-tensor-ic-speed-20261030).",
+      "mechanism": "Each relation is found by exact contraction costing about |F_1||F_2| ~ 2r point additions, and N + 1 ~ 2(2r)^(1/2) relations are needed, so total GAE grows like r^(3/2) and S = GAE/sqrt(r) like r; rho's S is about 1 (total GAE like sqrt(r)).",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "s",
+          "direction": "higher",
+          "minimum_effect": "tensor-m2/rho-neg ratio interval above 1 on every curve, increasing from 10 to 16 bits",
+          "provenance": {
+            "written_at": "2026-10-30",
+            "data_seen": [
+              {
+                "path": "crypto:docs/session-logs/2026-10-30.md",
+                "measured": "descriptive wall time of single ic tensor demo solves on a contended host (12 bits 3 s, 14 bits 21 s, 16 bits 417 s), used only to size the run; no S count"
+              },
+              {
+                "path": "local development smoke session ECBS1hd9fc33ad31ac (not committed; recorded in docs/session-logs/2026-10-30.md)",
+                "measured": "S of rho-neg, ic-mitm and tensor-m2 on the 10- and 12-bit roster curves, 2 targets each, at L0; seen by the 2026-10-30 author after P1 and P2 were written; not read by the 2026-10-31 drafting session"
+              },
+              {
+                "path": "EKS run gh-41008826427-1 l2-gate.json (cited in the main session's .resume/RESUME.md)",
+                "measured": "isolation-level census only (176/192 records L1); the 2026-10-31 drafting session read no S value from it"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "decisive"
+        },
+        {
+          "id": "P2",
+          "metric": "s",
+          "direction": "higher",
+          "minimum_effect": "log-log slope of tensor-m2 median S against log2 r between 0.7 and 1.3 (expected 1 for m = 2; total GAE slope about 1.5)",
+          "provenance": {
+            "written_at": "2026-10-30",
+            "data_seen": [
+              {
+                "path": "crypto:docs/session-logs/2026-10-30.md",
+                "measured": "descriptive wall time of single ic tensor demo solves on a contended host (12 bits 3 s, 14 bits 21 s, 16 bits 417 s), used only to size the run; no S count"
+              },
+              {
+                "path": "local development smoke session ECBS1hd9fc33ad31ac (not committed; recorded in docs/session-logs/2026-10-30.md)",
+                "measured": "S of rho-neg, ic-mitm and tensor-m2 on the 10- and 12-bit roster curves, 2 targets each, at L0; seen by the 2026-10-30 author after P1 and P2 were written; not read by the 2026-10-31 drafting session"
+              },
+              {
+                "path": "EKS run gh-41008826427-1 l2-gate.json (cited in the main session's .resume/RESUME.md)",
+                "measured": "isolation-level census only (176/192 records L1); the 2026-10-31 drafting session read no S value from it"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "calibration"
+        },
+        {
+          "id": "P3",
+          "metric": "total_gae",
+          "direction": "equal_within",
+          "minimum_effect": "log-log slope of rho-neg median total GAE against log2 r between 0.35 and 0.65 (expected 0.5, i.e. S roughly flat in r); written 2026-10-31 as the rho half of P1/P2",
+          "provenance": {
+            "written_at": "2026-10-31",
+            "data_seen": [
+              {
+                "path": "crypto:docs/session-logs/2026-10-30.md",
+                "measured": "descriptive wall time of single ic tensor demo solves on a contended host (12 bits 3 s, 14 bits 21 s, 16 bits 417 s), used only to size the run; no S count"
+              },
+              {
+                "path": "EKS run gh-41008826427-1 l2-gate.json (cited in the main session's .resume/RESUME.md)",
+                "measured": "isolation-level census only (176/192 records L1); the 2026-10-31 drafting session read no S value from it"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "calibration"
+        }
+      ]
+    },
+    {
+      "id": "H2",
+      "statement": "With root_u = 0 every native hashed backend runs the finite-size fallback, so on every curve where a backend verifies all 8 targets its summed S lower bound exceeds rho-neg's at every 5a weight.",
+      "mechanism": "No recursive subexponential kernel is reached at lambda <= 64; the fallback's bounded searches and checked group calls are exponential in the curve size, while rho needs about sqrt(pi r/4) additions.",
+      "predictions": [
+        {
+          "id": "P4",
+          "metric": "s",
+          "direction": "higher",
+          "minimum_effect": "native/rho-neg ratio interval above 1 at weights 0, 0.1 and 1 on every complete (backend, curve) cell",
+          "provenance": {
+            "written_at": "2026-10-31",
+            "data_seen": [
+              {
+                "path": "crypto:docs/session-logs/2026-10-30.md",
+                "measured": "descriptive wall time of single ic tensor demo solves on a contended host (12 bits 3 s, 14 bits 21 s, 16 bits 417 s), used only to size the run; no S count"
+              },
+              {
+                "path": "EKS run gh-41008826427-1 l2-gate.json (cited in the main session's .resume/RESUME.md)",
+                "measured": "isolation-level census only (176/192 records L1); the 2026-10-31 drafting session read no S value from it"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "decisive"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "C.rho-neg",
+      "role": "reference",
+      "description": "rho.negation, the matched rho reference [spec-C-tensor-counts.json]",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4df337e64d59bbe0145c204048ab1dc69a43c187",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "source": "origin/main 4df337e64d59bbe0145c204048ab1dc69a43c187",
+          "profile": "release",
+          "note": "binary sha256 recorded at build time in session.json; S does not depend on codegen and ecbench verify --replay-all re-derives every row"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation",
+        "spec_arm": "rho-neg"
+      }
+    },
+    {
+      "id": "C.ic-mitm",
+      "role": "baseline",
+      "description": "ic.pipeline prime-abscissa:size=32, mitm:negation_folded=1 (current prime-curve IC baseline) [spec-C-tensor-counts.json]",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4df337e64d59bbe0145c204048ab1dc69a43c187",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "source": "origin/main 4df337e64d59bbe0145c204048ab1dc69a43c187",
+          "profile": "release",
+          "note": "binary sha256 recorded at build time in session.json; S does not depend on codegen and ecbench verify --replay-all re-derives every row"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=32",
+        "oracle": "mitm:negation_folded=1",
+        "spec_arm": "ic-mitm"
+      },
+      "same_instrument_as": "C.rho-neg"
+    },
+    {
+      "id": "C.tensor-m2",
+      "role": "candidate",
+      "description": "ic.tensor_contraction_v1, m = 2 SHA-256 hashed factor bases (exponential toy) [spec-C-tensor-counts.json]",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4df337e64d59bbe0145c204048ab1dc69a43c187",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "source": "origin/main 4df337e64d59bbe0145c204048ab1dc69a43c187",
+          "profile": "release",
+          "note": "binary sha256 recorded at build time in session.json; S does not depend on codegen and ecbench verify --replay-all re-derives every row"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.tensor_contraction_v1",
+        "m": "2",
+        "spec_arm": "tensor-m2"
+      },
+      "same_instrument_as": "C.rho-neg"
+    },
+    {
+      "id": "C.rho-neg-aa",
+      "role": "control_aa",
+      "description": "rho.negation under a second arm name; shares the per-(workload, round) algorithm seed with C.rho-neg, so in counted S it is a determinism/replay control (expected identical S row by row), not a noise floor [spec-C-tensor-counts.json]",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4df337e64d59bbe0145c204048ab1dc69a43c187",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "source": "origin/main 4df337e64d59bbe0145c204048ab1dc69a43c187",
+          "profile": "release",
+          "note": "binary sha256 recorded at build time in session.json; S does not depend on codegen and ecbench verify --replay-all re-derives every row"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation",
+        "spec_arm": "rho-neg-aa"
+      },
+      "same_instrument_as": "C.rho-neg"
+    },
+    {
+      "id": "B.rho-neg",
+      "role": "reference",
+      "description": "rho.negation, the matched rho reference [spec-B-hashed-native-counts.json]",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d",
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "source": "origin/codex/hashed-ecdl-ecbench-e2e 3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d (ic.hashed_native_v1 is not on main)",
+          "profile": "release; the frozen build line above when toolchain 1.99.1 and the musl target are installable; otherwise `cargo build --locked --release --no-default-features --bin ecbench` with the host stable toolchain (cargo 1.97 on the drafting host) and `rustc -vV` recorded as a declared deviation; counted S is codegen-independent and replay-all checks it"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation",
+        "spec_arm": "rho-neg"
+      }
+    },
+    {
+      "id": "B.rho-neg-aa",
+      "role": "control_aa",
+      "description": "rho.negation repeat; same shared seed, so a determinism control in S [spec-B-hashed-native-counts.json]",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d",
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "source": "origin/codex/hashed-ecdl-ecbench-e2e 3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d (ic.hashed_native_v1 is not on main)",
+          "profile": "release; the frozen build line above when toolchain 1.99.1 and the musl target are installable; otherwise `cargo build --locked --release --no-default-features --bin ecbench` with the host stable toolchain (cargo 1.97 on the drafting host) and `rustc -vV` recorded as a declared deviation; counted S is codegen-independent and replay-all checks it"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation",
+        "spec_arm": "rho-neg-aa"
+      },
+      "same_instrument_as": "B.rho-neg"
+    },
+    {
+      "id": "B.rho-neg-v2",
+      "role": "control_positive",
+      "description": "rho.negation_v2, complete positive control: must recover and verify every public target [spec-B-hashed-native-counts.json]",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d",
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "source": "origin/codex/hashed-ecdl-ecbench-e2e 3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d (ic.hashed_native_v1 is not on main)",
+          "profile": "release; the frozen build line above when toolchain 1.99.1 and the musl target are installable; otherwise `cargo build --locked --release --no-default-features --bin ecbench` with the host stable toolchain (cargo 1.97 on the drafting host) and `rustc -vV` recorded as a declared deviation; counted S is codegen-independent and replay-all checks it"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation_v2",
+        "spec_arm": "rho-neg-v2"
+      },
+      "same_instrument_as": "B.rho-neg"
+    },
+    {
+      "id": "B.native-source",
+      "role": "baseline",
+      "description": "ic.hashed_native_v1 backend=source (unmodified source reduction entry) [spec-B-hashed-native-counts.json]",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d",
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "source": "origin/codex/hashed-ecdl-ecbench-e2e 3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d (ic.hashed_native_v1 is not on main)",
+          "profile": "release; the frozen build line above when toolchain 1.99.1 and the musl target are installable; otherwise `cargo build --locked --release --no-default-features --bin ecbench` with the host stable toolchain (cargo 1.97 on the drafting host) and `rustc -vV` recorded as a declared deviation; counted S is codegen-independent and replay-all checks it"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.hashed_native_v1",
+        "backend": "source",
+        "spec_arm": "native-source",
+        "m": "2",
+        "trials": "16",
+        "columns": "4096",
+        "steps": "5000000",
+        "vector": "2000000",
+        "bits": "1000000",
+        "threshold": "32",
+        "derive_last": "1",
+        "smallest_first": "1",
+        "cache_entries": "4096",
+        "rank": "16",
+        "slices": "16",
+        "outer_multiplier": "2",
+        "attempts": "4096"
+      },
+      "same_instrument_as": "B.rho-neg"
+    },
+    {
+      "id": "B.native-selectors",
+      "role": "candidate",
+      "description": "ic.hashed_native_v1 backend=selectors [spec-B-hashed-native-counts.json]",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d",
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "source": "origin/codex/hashed-ecdl-ecbench-e2e 3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d (ic.hashed_native_v1 is not on main)",
+          "profile": "release; the frozen build line above when toolchain 1.99.1 and the musl target are installable; otherwise `cargo build --locked --release --no-default-features --bin ecbench` with the host stable toolchain (cargo 1.97 on the drafting host) and `rustc -vV` recorded as a declared deviation; counted S is codegen-independent and replay-all checks it"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.hashed_native_v1",
+        "backend": "selectors",
+        "spec_arm": "native-selectors",
+        "m": "2",
+        "trials": "16",
+        "columns": "4096",
+        "steps": "5000000",
+        "vector": "2000000",
+        "bits": "1000000",
+        "threshold": "32",
+        "derive_last": "1",
+        "smallest_first": "1",
+        "cache_entries": "4096",
+        "rank": "16",
+        "slices": "16",
+        "outer_multiplier": "2",
+        "attempts": "4096"
+      },
+      "same_instrument_as": "B.rho-neg"
+    },
+    {
+      "id": "B.native-selectors-aa",
+      "role": "control_aa",
+      "description": "ic.hashed_native_v1 backend=selectors repeat; same shared seed, so a determinism control in S [spec-B-hashed-native-counts.json]",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d",
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "source": "origin/codex/hashed-ecdl-ecbench-e2e 3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d (ic.hashed_native_v1 is not on main)",
+          "profile": "release; the frozen build line above when toolchain 1.99.1 and the musl target are installable; otherwise `cargo build --locked --release --no-default-features --bin ecbench` with the host stable toolchain (cargo 1.97 on the drafting host) and `rustc -vV` recorded as a declared deviation; counted S is codegen-independent and replay-all checks it"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.hashed_native_v1",
+        "backend": "selectors",
+        "spec_arm": "native-selectors-aa",
+        "m": "2",
+        "trials": "16",
+        "columns": "4096",
+        "steps": "5000000",
+        "vector": "2000000",
+        "bits": "1000000",
+        "threshold": "32",
+        "derive_last": "1",
+        "smallest_first": "1",
+        "cache_entries": "4096",
+        "rank": "16",
+        "slices": "16",
+        "outer_multiplier": "2",
+        "attempts": "4096"
+      },
+      "same_instrument_as": "B.rho-neg"
+    },
+    {
+      "id": "B.native-width",
+      "role": "candidate",
+      "description": "ic.hashed_native_v1 backend=width [spec-B-hashed-native-counts.json]",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d",
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "source": "origin/codex/hashed-ecdl-ecbench-e2e 3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d (ic.hashed_native_v1 is not on main)",
+          "profile": "release; the frozen build line above when toolchain 1.99.1 and the musl target are installable; otherwise `cargo build --locked --release --no-default-features --bin ecbench` with the host stable toolchain (cargo 1.97 on the drafting host) and `rustc -vV` recorded as a declared deviation; counted S is codegen-independent and replay-all checks it"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.hashed_native_v1",
+        "backend": "width",
+        "spec_arm": "native-width",
+        "m": "2",
+        "trials": "16",
+        "columns": "4096",
+        "steps": "5000000",
+        "vector": "2000000",
+        "bits": "1000000",
+        "threshold": "32",
+        "derive_last": "1",
+        "smallest_first": "1",
+        "cache_entries": "4096",
+        "rank": "16",
+        "slices": "16",
+        "outer_multiplier": "2",
+        "attempts": "4096"
+      },
+      "same_instrument_as": "B.rho-neg"
+    },
+    {
+      "id": "B.native-partial",
+      "role": "candidate",
+      "description": "ic.hashed_native_v1 backend=partial [spec-B-hashed-native-counts.json]",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d",
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "source": "origin/codex/hashed-ecdl-ecbench-e2e 3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d (ic.hashed_native_v1 is not on main)",
+          "profile": "release; the frozen build line above when toolchain 1.99.1 and the musl target are installable; otherwise `cargo build --locked --release --no-default-features --bin ecbench` with the host stable toolchain (cargo 1.97 on the drafting host) and `rustc -vV` recorded as a declared deviation; counted S is codegen-independent and replay-all checks it"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.hashed_native_v1",
+        "backend": "partial",
+        "spec_arm": "native-partial",
+        "m": "2",
+        "trials": "16",
+        "columns": "4096",
+        "steps": "5000000",
+        "vector": "2000000",
+        "bits": "1000000",
+        "threshold": "32",
+        "derive_last": "1",
+        "smallest_first": "1",
+        "cache_entries": "4096",
+        "rank": "16",
+        "slices": "16",
+        "outer_multiplier": "2",
+        "attempts": "4096"
+      },
+      "same_instrument_as": "B.rho-neg"
+    },
+    {
+      "id": "B.ic-mitm",
+      "role": "baseline",
+      "description": "ic.pipeline prime-abscissa:size=32, mitm:negation_folded=1, built from the B commit [spec-B-hashed-native-counts.json]",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d",
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "source": "origin/codex/hashed-ecdl-ecbench-e2e 3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d (ic.hashed_native_v1 is not on main)",
+          "profile": "release; the frozen build line above when toolchain 1.99.1 and the musl target are installable; otherwise `cargo build --locked --release --no-default-features --bin ecbench` with the host stable toolchain (cargo 1.97 on the drafting host) and `rustc -vV` recorded as a declared deviation; counted S is codegen-independent and replay-all checks it"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=32",
+        "oracle": "mitm:negation_folded=1",
+        "spec_arm": "ic-mitm"
+      },
+      "same_instrument_as": "B.rho-neg"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "B.rho-neg-v2",
+      "expected_detection": "Track B: rho.negation_v2 must recover and independently verify every public target; it checks workload and harness. Track C has no separate positive arm: every C workload is planted and the harness checks [k]G = Q on every row, so a miss is a wrong_answer row.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "a cost comparison between methods on the same instances asserts nothing about a null population; every target has a logarithm"
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "method",
+        "levels": [
+          "rho.negation",
+          "rho.negation_v2",
+          "ic.pipeline",
+          "ic.tensor_contraction_v1",
+          "ic.hashed_native_v1"
+        ]
+      },
+      {
+        "name": "native_backend",
+        "levels": [
+          "source",
+          "selectors",
+          "width",
+          "partial"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "track",
+        "treatment": "fixed",
+        "value": "C (spec-C, binary from origin/main 4df337e64d59bbe0145c204048ab1dc69a43c187) and B (spec-B, binary from 3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d)",
+        "how": "separate sessions; no comparison crosses tracks, because binary and targets differ"
+      },
+      {
+        "name": "curve",
+        "treatment": "crossed",
+        "value": "prime_roster 10, 12, 14, 16 in both tracks (registered ICV1 slugs icv1-fp10-t5-192cb216, icv1-fp12-t19-d4a315df, icv1-fp14-tm43-158b6914, icv1-fp16-t351-d433f24e per the C protocol)",
+        "how": "every arm runs every curve; comparisons are per curve"
+      },
+      {
+        "name": "targets",
+        "treatment": "fixed",
+        "value": "C: target_seed 20261030, 8 planted targets per curve (as the frozen C specs). B: target_seed 2026103001, 8 public targets per curve, hash_to_subgroup_v1",
+        "how": "the spec's target law, independent of arm"
+      },
+      {
+        "name": "binary",
+        "treatment": "fixed",
+        "value": "one ecbench binary per track; sha256 recorded in session.json",
+        "how": "C built at 4df337e64d59bbe0145c204048ab1dc69a43c187; B built at 3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d; the build commit is recorded in the session receipt"
+      },
+      {
+        "name": "toolchain",
+        "treatment": "fixed",
+        "value": "recorded rustc -vV per binary",
+        "how": "counted S is codegen-independent; replay-all re-derives every row"
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "RAYON_NUM_THREADS=1 OMP_NUM_THREADS=1"
+      },
+      {
+        "name": "algorithm_seed",
+        "treatment": "randomized",
+        "how": "harness-derived per (workload, round) from measurement.seed (C 20261030, B 2026103002), shared by every arm; with warmup 0 the single measured round uses seed index 0, which no measured round of the frozen originals used"
+      },
+      {
+        "name": "arm_order",
+        "treatment": "randomized",
+        "how": "C alternate_measured, B shuffle; arm order does not affect counted S"
+      },
+      {
+        "name": "host_load",
+        "treatment": "measured",
+        "how": "recorded per row at L0; affects wall time only, which is not a metric here"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-rho",
+        "arms": [
+          "C.rho-neg",
+          "C.tensor-m2"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-ic",
+        "arms": [
+          "C.ic-mitm",
+          "C.tensor-m2"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-rho-ic",
+        "arms": [
+          "C.rho-neg",
+          "C.ic-mitm"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "C.rho-neg",
+          "C.rho-neg-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "B-rho-source",
+        "arms": [
+          "B.rho-neg",
+          "B.native-source"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "B-rho-selectors",
+        "arms": [
+          "B.rho-neg",
+          "B.native-selectors"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "B-rho-width",
+        "arms": [
+          "B.rho-neg",
+          "B.native-width"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "B-rho-partial",
+        "arms": [
+          "B.rho-neg",
+          "B.native-partial"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "B-rho-ic",
+        "arms": [
+          "B.rho-neg",
+          "B.ic-mitm"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "B-source-selectors",
+        "arms": [
+          "B.native-source",
+          "B.native-selectors"
+        ],
+        "differs_in": [
+          "native_backend"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "B-aa-rho",
+        "arms": [
+          "B.rho-neg",
+          "B.rho-neg-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "B-aa-selectors",
+        "arms": [
+          "B.native-selectors",
+          "B.native-selectors-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "B-pos",
+        "arms": [
+          "B.rho-neg",
+          "B.rho-neg-v2"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": "C: alternate_measured over one round, which ecbench warns it cannot balance; B: shuffle. Counted S does not depend on order, so balance is irrelevant to the primary metric",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "ecbench derives algorithm_seed = derive_u64('ecbench.algorithm_seed', [measurement.seed, workload_id, round]) (C seed 20261030, B seed 2026103002), shared by every arm of a (workload, round); targets from target_seed"
+    },
+    "instance_sampling": {
+      "rule": "C: 8 planted targets per curve from target_seed 20261030; B: 8 public targets per curve from target_seed 2026103001",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "not masked: ecbench names arms by method; the decision rule is fixed here before data",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 64,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "paired_bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 32,
+      "correction": "holm",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Family: C-rho, C-ic (4 curves each) + B-rho-{source,selectors,width,partial,ic} and B-source-selectors (4 curves each) = 32 per-curve tests. 8 paired targets per curve; the paired bootstrap resamples targets. One round: S is a deterministic function of (workload, algorithm seed) and exactly replayable, so repeating a round with the same seed adds nothing; further rounds would add new walk seeds per target (more power), which the expected H1 effect does not need and the 16-bit tensor cells (about 417 s each) make expensive. Warmup 0: warm-up rounds are unmeasured and only remove one-time wall costs, which counted S does not see; 0 is the minimum ecbench accepts (rounds must be >= 1). C-rho-ic and B-pos are reported but are not in the family."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 120,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 8700,
+      "measured_on": "Scaled from the 2026-10-30 session-log sizing (contended host): tensor solve 12 bits 3 s, 14 bits 21 s, 16 bits about 417 s; 10 bits assumed <= 1 s. Track C: tensor 8 x (1 + 3 + 21 + 417) s ~ 3540 s, of which the 16-bit cells are ~3340 s (0.93 h, under the 2.5 h split threshold, so 16 bits stays in spec-C); rho, rho-aa and ic-mitm 96 rows at ~1 s each; C total ~3.7e3 s (~1.0 h). Track B: 288 executions; worst case every native row (160) runs to its 30 s budget, 4800 s, plus 128 sub-second rows; B upper bound ~4.9e3 s (~1.4 h). Sequential worst case ~8.7e3 s (2.4 h); the two tracks may run concurrently on separate CPUs of the 4 vCPU host (counts are contention-independent), about 1.4 h wall. Within a spec ecbench executes curves in order 10, 12, 14, 16, so the smaller sizes finish first."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "s",
+        "name": "S",
+        "unit": "total group-addition equivalents / sqrt(r)",
+        "kind": "counted",
+        "definition": "every phase charged in ecbench.gae divided by sqrt(r); a lower bound for the native arms, whose arithmetic is not completely priced",
+        "source": "records.jsonl cost.s",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE / sqrt(r)",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "total_gae",
+        "name": "total counted GAE",
+        "unit": "group-addition equivalents",
+        "kind": "counted",
+        "definition": "cost.total_gae, all phases",
+        "source": "records.jsonl cost.total_gae",
+        "aggregation": "median",
+        "resolution": "1 GAE",
+        "uncertainty": "bootstrap_ci95"
+      },
+      {
+        "id": "unpriced",
+        "name": "unpriced native work",
+        "unit": "operations",
+        "kind": "counted",
+        "definition": "every *_uncharged counter on every arm, rho included, priced at 0, 0.1 and 1 GAE per operation for the 5a band (ecbench band --weights 0,0.1,1; ecbench compare --weight w)",
+        "source": "records.jsonl counters",
+        "aggregation": "median",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "outcome",
+        "name": "outcome census",
+        "unit": "rows",
+        "kind": "exact",
+        "definition": "count of verified / wrong_answer / timeout / exhausted / error rows per arm and curve, with the exclusive phase where incomplete native attempts stopped",
+        "source": "records.jsonl outcome.status, phases",
+        "aggregation": "sum",
+        "resolution": "1 row",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "factor_base.fb_points_listed_uncharged",
+      "factor_base.fb_membership_evals_uncharged",
+      "relation_search.contraction_rows_uncharged",
+      "linear_algebra.linalg_mulmod_uncharged",
+      "*.native_meter_attempts_uncharged",
+      "native_steps",
+      "selector_decodes",
+      "selector_cache_hits",
+      "derived_checks",
+      "functional_assignments",
+      "edge_assignments",
+      "witness_searches"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "build_commit",
+      "rustc_version",
+      "env_class_id",
+      "isolation.level",
+      "run_cpu",
+      "threads"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "placement": {
+      "host": "drafting host: 4 vCPU, 15 GiB, cargo 1.97",
+      "cpus": 4,
+      "spot": false
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 14400,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "fixed design: C 4 arms x 32 workloads x 1 round = 128 executions; B 9 arms x 32 workloads x 1 round = 288 executions; no warm-up; then stop",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "per-execution budgets are the specs' (C 1800 s, B 30 s and every native call's 5M-step bound); a row that hits them is retained as unknown/exhausted, never rerun with a larger budget",
+      "kind": "budget",
+      "preregistered": true
+    },
+    {
+      "rule": "a row whose answer does not verify stops nothing and is recorded as wrong_answer",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "a row with outcome.status other than verified is excluded from ratios and slopes and reported in the census",
+    "a track whose ecbench verify --replay-all is not OK with every replay identical yields no result",
+    "a determinism control (C-aa, B-aa-rho, B-aa-selectors) with any row whose S differs from its partner invalidates that track's counted results",
+    "B is invalid if B.rho-neg-v2 fails to verify any target",
+    "any wall-time number from these sessions is descriptive host timing and is never reported as a result"
+  ],
+  "decision_rule": {
+    "text": "Per curve, the gap of arm X to rho is R = sum S(X) / sum S(rho-neg) over the 8 paired targets, reported as the distance remaining (R and log2 R) with a 95% paired bootstrap interval (ecbench compare, 4000 resamples, seed 20261002), at weights 0, 0.1 and 1 GAE per unpriced operation on every arm, rho included. X is ranked above (more expensive than) or below rho on a curve only when the Holm-adjusted interval excludes 1 on the same side at all three weights (ecbench band --ranks); otherwise no ranking. For native arms (lower-bound S) only R > 1 can be ranked. Ratios need all 8 rows of both arms verified on that curve; otherwise the census and a descriptive completed-row ratio flagged incomplete. C3 below 1 across the band would count as a measured improvement over the IC baseline; it is not expected. Slopes are OLS of log2 median S on log2 r over complete sizes, intervals by resampling targets within size.",
+    "comparison_ids": [
+      "C-rho",
+      "C-ic",
+      "B-rho-source",
+      "B-rho-selectors",
+      "B-rho-width",
+      "B-rho-partial",
+      "B-rho-ic",
+      "B-source-selectors"
+    ],
+    "threshold": "Holm-adjusted paired-bootstrap ratio interval excludes 1 on the same side at weights 0, 0.1 and 1",
+    "statistic": "ratio of summed S over paired targets per curve, candidate over reference (ecbench compare)",
+    "interval": "paired bootstrap over the 8 targets per curve, 95%",
+    "multiple_comparison_correction": "holm",
+    "effect_size_measure": "ratio of summed S per curve (distance remaining to rho), and log-log slope",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "no_ranking",
+      "incomplete_unknown",
+      "invalid_measurement",
+      "not_attempted"
+    ]
+  },
+  "analysis_plan": {
+    "script": null,
+    "inputs": [
+      "C session/records.jsonl and session.json",
+      "B session/records.jsonl and session.json",
+      "build receipts (commit, binary sha256, rustc -vV)"
+    ],
+    "outputs": [
+      "ecbench verify --dir SESSION --replay-all --exit-code (each track)",
+      "ecbench table --dir SESSION",
+      "ecbench band --dir SESSION --weights 0,0.1,1 --ranks --json band.json",
+      "C: ecbench compare --dir C --a rho-neg --b tensor-m2 --save; --a ic-mitm --b tensor-m2; --a rho-neg --b ic-mitm; --a rho-neg --b rho-neg-aa; each also with --weight 0.1 and --weight 1",
+      "B: ecbench compare --dir B --a rho-neg --b {native-source,native-selectors,native-width,native-partial,ic-mitm,rho-neg-v2} --save; --a native-source --b native-selectors; A/A pairs; each also with --weight 0.1 and --weight 1; incomplete stays incomplete (no --allow-interrupted)",
+      "medians per arm per curve; log-log slopes with target-resampled intervals; census of unknown/exhausted cells",
+      "experiment_protocol.py from-ecbench then check-export (experiment.export/v1)"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "median S per arm against log2 r with intervals, both tracks, rho as the reference line",
+      "per-curve distance remaining to rho (log2 R) at the three 5a weights",
+      "census of verified/unknown/exhausted cells per arm and curve"
+    ],
+    "report_dir": "research/hashed_ecdl_counts_20261031/reports"
+  },
+  "inadmissible": [
+    "reporting any runtime, wall-time or speedup number from these sessions as a result",
+    "changing workloads, seeds, arm parameters, budgets, unit or accounting after seeing results",
+    "dropping unknown/exhausted/timeout cells, or ranking a successful-only subset as the full solve",
+    "treating native lower-bound S below rho as a ranking",
+    "reading toy-size counts as evidence about deployed curves or about the subexponential kernel (root_u = 0 here)",
+    "calling relabelling or accounting changes improvements",
+    "editing the frozen originals instead of filing this superseding protocol"
+  ],
+  "literature": [
+    {
+      "ref": "crypto:docs/ecbench/README.md",
+      "provenance": "internal",
+      "claim": "S, the L0-L3 levels (L0 enough for operation counts), paired compare and band",
+      "verified_by": "this protocol's drafting session read the isolation table at origin/main 4df337e64"
+    },
+    {
+      "ref": "crypto:src/cryptanalysis/ecbench/spec.rs",
+      "provenance": "internal",
+      "claim": "rounds >= 1 required, warmup default 1 but 0 accepted, isolation_required L0 accepted, algorithm seed shared by every arm per (workload, round)",
+      "verified_by": "source read at 4df337e64"
+    },
+    {
+      "ref": "crypto:src/cryptanalysis/ecbench/record.rs MIN_SOLVE_WALL_NS_V3",
+      "provenance": "internal",
+      "claim": "solves under 1,000,000 ns cannot earn L2",
+      "verified_by": "source read at 4df337e64"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": true
+  }
+}
