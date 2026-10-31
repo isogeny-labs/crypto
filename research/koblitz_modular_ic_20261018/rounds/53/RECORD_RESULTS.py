@@ -8,6 +8,13 @@ for d in sorted((h/'runs').iterdir()):
  if not d.is_dir():continue
  rev=(d/'source-revision.txt').read_text().strip()
  row={'attempt':d.name,'source_revision':rev}
+ if (d/'interrupted.json').exists():
+  row.update(kind='Singular',status='rejected',native_exit=None,error_count=0,
+             interruption=json.loads((d/'interrupted.json').read_text()),
+             input_pin_status='invalid intermediate custody; retained files only',
+             retained_sha256={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in d.iterdir() if p.is_file()})
+  rows.append(row)
+  continue
  if (d/'input.sing').exists():
   code=int((d/'exit.txt').read_text());log=(d/'native.log').read_text()
   markers=re.findall(r'print\("([A-Z0-9_]+_ALL_CHECKS_PASS)"\)',(d/'input.sing').read_text());assert len(markers)==1
