@@ -4262,6 +4262,23 @@ fn verify_slot_identities(artifacts: &[crate::ml_dataset::types::Artifact]) -> R
     for a in artifacts {
         let live = a.path.strip_prefix("live/payloads/");
         let path = live.unwrap_or(&a.path);
+        if path == PARENT_DELIVERY_SLOT.0 {
+            let raw = a.role == "unregistered-partial-artifact" && a.encoding == "native";
+            if artifacts
+                .iter()
+                .filter(|other| other.path == a.path)
+                .count()
+                != 1
+                || (!raw
+                    && (live.is_some()
+                        || a.role != PARENT_DELIVERY_SLOT.1
+                        || a.encoding != PARENT_DELIVERY_SLOT.2))
+            {
+                return Err("invalid parent delivery artifact identity".into());
+            }
+            continue;
+        }
+
         if RAW_RETENTION_NAMES.iter().any(|(_, flat)| *flat == path) {
             if a.role != "unregistered-partial-artifact"
                 || a.encoding != "native"
@@ -6062,7 +6079,7 @@ mod native_capture_match_tests {
 
 /// Allocation-free snapshot nested in the versioned terminal result.
 /// Saved modeled reservations and reported calls, not hardware instructions.
-#[derive(Clone, Copy, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 struct SavedBudgetLedger {
     original_limits: OriginalLimits,
@@ -7635,6 +7652,7 @@ mod terminal_result_reader_tests {
 }
 
 struct VerifiedCanonicalComponents {
+    producer_ledger: SavedBudgetLedger,
     math: VerifiedCanonicalMath,
     native_boundaries: usize,
     reported_group_complete: bool,
@@ -7845,6 +7863,7 @@ fn verify_canonical_components(
         _ => return Err("terminal witness presence differs from authenticated publication".into()),
     }
     Ok(VerifiedCanonicalComponents {
+        producer_ledger: r.ledger_before_terminal_encoding,
         math,
         native_boundaries: captured.records,
         reported_group_complete: signed.reported_complete,
@@ -7858,6 +7877,7 @@ mod canonical_component_tests {
     use crate::ml_dataset::{capture::capture_limits, types::Artifact};
     fn manifest(root: &std::path::Path, positive: bool) -> Vec<Artifact> {
         let mut names = KOBLITZ_SLOTS.to_vec();
+        names.push(PARENT_DELIVERY_SLOT);
         names.extend([
             (
                 "live/committed.json",
@@ -7908,6 +7928,7 @@ mod canonical_component_tests {
                     budget.addition_limit = 2;
                 }
                 let limits = budget.original_limits();
+                let mut delivery = ParentDeliveryFile::admit(&mut budget).unwrap();
                 let mut global = 0;
                 let mut run = run_canonical_pipeline(
                     &original,
@@ -7953,6 +7974,7 @@ mod canonical_component_tests {
                     assert_eq!(witness_events(std::str::from_utf8(&before).unwrap()), 1);
                     assert_eq!(witness_events(&after), 1);
                 }
+                delivery.finish(&owners, &parent, &binding, root).unwrap();
                 let check = || {
                     verify_canonical_components(
                         root,
@@ -7968,6 +7990,55 @@ mod canonical_component_tests {
                     )
                 };
                 let verified = check().unwrap();
+                let delivery_check = || {
+                    verify_parent_delivery(
+                        root,
+                        &manifest(root, positive),
+                        &binding,
+                        &capture,
+                        limits,
+                        verified.producer_ledger,
+                    )
+                };
+                let delivered = delivery_check().unwrap();
+                assert!(delivered.delivery_complete);
+                assert_eq!(delivered.root_artifacts, owners.items.len());
+                assert_eq!(delivered.capture_acknowledgements, owners.items.len());
+                let parent_bytes = std::fs::read(root.join(PARENT_DELIVERY_SLOT.0)).unwrap();
+                let parent_json: serde_json::Value = serde_json::from_slice(&parent_bytes).unwrap();
+                for mutation in 0..9 {
+                    let mut forged = parent_json.clone();
+                    match mutation {
+                        0 => {
+                            forged["after"]["checking_reserved_work"] = serde_json::json!(
+                                parent_json["after"]["checking_reserved_work"]
+                                    .as_u64()
+                                    .unwrap()
+                                    + 1
+                            )
+                        }
+                        1 => forged["items"][0]["quote"]["work"] = serde_json::json!(0),
+                        2 => forged["items"][0]["capture_acknowledged"] = serde_json::json!(false),
+                        3 => {
+                            forged["items"][0]["root_artifact"]["sha256"] =
+                                serde_json::json!("0".repeat(64))
+                        }
+                        4 => forged["items"][0]["admitted"] = serde_json::json!(false),
+                        5 => forged["delivery_complete"] = serde_json::json!(false),
+                        6 => forged["before"]["phase"] = serde_json::json!("Setup"),
+                        7 => forged["owner_quote"]["bytes"] = serde_json::json!(0),
+                        _ => forged["unknown"] = serde_json::json!(true),
+                    }
+                    std::fs::write(
+                        root.join(PARENT_DELIVERY_SLOT.0),
+                        serde_json::to_vec(&forged).unwrap(),
+                    )
+                    .unwrap();
+                    assert!(delivery_check().is_err(), "parent mutation {mutation}");
+                }
+                std::fs::write(root.join(PARENT_DELIVERY_SLOT.0), &parent_bytes).unwrap();
+                assert!(delivery_check().unwrap().delivery_complete);
+
                 assert_eq!(verified.math.group.math.witness.is_some(), positive);
                 assert_eq!(verified.reported_group_complete, scenario != 2);
                 assert!(verified.native_boundaries > 0);
@@ -8496,7 +8567,8 @@ fn verify_outer_outcome(
     })
 }
 
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 struct RetentionQuote {
     work: u64,
     bytes: u64,
@@ -8831,6 +8903,9 @@ fn parent_artifact_path(path: &'static str) -> &'static str {
         .map_or(path, |(_, flat)| *flat)
 }
 struct OwnedRetainedArtifact {
+    storage_attempted: bool,
+    storage_admitted: bool,
+    storage_quote: Option<RetentionQuote>,
     logical_path: &'static str,
     capture_acknowledged: bool,
     root_artifact: Option<crate::ml_dataset::types::Artifact>,
@@ -8838,6 +8913,8 @@ struct OwnedRetainedArtifact {
     publication: Option<crate::ml_dataset::capture::WitnessReceipt>,
 }
 struct ParentArtifacts {
+    ledger_before_owners: SavedBudgetLedger,
+    owner_quote: RetentionQuote,
     items: Vec<OwnedRetainedArtifact>,
     payload_bytes: u64,
     persistence_error: Option<String>,
@@ -8853,10 +8930,15 @@ fn quote_artifact_owners(run: &CanonicalPipelineRun<'_>) -> Result<OwnerQuote, S
     if run.artifacts_taken {
         return Err(Stop::Phase);
     }
+    if std::mem::size_of::<ParentArtifacts>() > 512
+        || std::mem::size_of::<OwnedRetainedArtifact>() > 512
+    {
+        return Err(Stop::Bytes);
+    }
     let mut out = OwnerQuote {
         resources: RetentionQuote {
             work: 512,
-            bytes: std::mem::size_of::<ParentArtifacts>() as u64,
+            bytes: 512,
             trace: 0,
         },
         count: 0,
@@ -8872,7 +8954,7 @@ fn quote_artifact_owners(run: &CanonicalPipelineRun<'_>) -> Result<OwnerQuote, S
         out.resources.bytes = out
             .resources
             .bytes
-            .checked_add(std::mem::size_of::<OwnedRetainedArtifact>() as u64)
+            .checked_add(512)
             .and_then(|n| n.checked_add(identity))
             .ok_or(Stop::Overflow)?;
         out.resources.work = out
@@ -8913,6 +8995,7 @@ fn take_parent_artifacts(
             }
         }
     };
+    let ledger_before_owners = parent.budget.saved_ledger();
     parent.execute(quote.resources, || {
         let mut items = Vec::new();
         items
@@ -8921,6 +9004,9 @@ fn take_parent_artifacts(
         run.visit_retained_artifacts(|a| {
             items.push(OwnedRetainedArtifact {
                 logical_path: a.path,
+                storage_attempted: false,
+                storage_admitted: false,
+                storage_quote: None,
                 capture_acknowledged: false,
                 root_artifact: None,
                 payload: crate::ml_dataset::types::ArtifactPayload {
@@ -9004,6 +9090,8 @@ fn take_parent_artifacts(
         }
         run.artifacts_taken = true;
         Ok(ParentArtifacts {
+            ledger_before_owners,
+            owner_quote: quote.resources,
             items,
             payload_bytes: quote.payload_bytes,
             persistence_error: None,
@@ -9151,9 +9239,18 @@ fn quote_parent_storage(
     item: &OwnedRetainedArtifact,
     limits: &crate::ml_dataset::capture::CaptureLimits,
 ) -> Result<RetentionQuote, Stop> {
+    quote_parent_storage_length(
+        item.payload.bytes.len() as u64,
+        item.publication.is_some(),
+        limits,
+    )
+}
+fn quote_parent_storage_length(
+    len: u64,
+    witness: bool,
+    limits: &crate::ml_dataset::capture::CaptureLimits,
+) -> Result<RetentionQuote, Stop> {
     limits.validate().map_err(|_| Stop::InvalidLimits)?;
-    let len = item.payload.bytes.len() as u64;
-    let witness = item.publication.is_some();
     let metadata = if witness {
         0
     } else {
@@ -9209,7 +9306,10 @@ fn persist_parent_artifacts(
                 return Err(stop);
             }
         };
+        item.storage_attempted = true;
+        item.storage_quote = Some(quote);
         let call = parent.execute(quote, || {
+            item.storage_admitted = true;
             if item.payload.path != parent_artifact_path(item.logical_path) {
                 return Err("parent artifact identity changed".into());
             }
@@ -9271,6 +9371,7 @@ mod parent_storage_tests {
         let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
         let original = construction_tests::fixture();
         let mut budget = construction_tests::budget();
+        let mut delivery = ParentDeliveryFile::admit(&mut budget).unwrap();
         let mut global = 0;
         let mut run = run_canonical_pipeline(
             &original,
@@ -9311,6 +9412,26 @@ mod parent_storage_tests {
             raw.payload.bytes
         );
         assert!(!sink.dir.parent().unwrap().join(KOBLITZ_SLOTS[0].0).exists());
+        delivery
+            .finish(&owned, &parent, &binding, sink.dir.parent().unwrap())
+            .unwrap();
+        let mut all: Vec<_> = owned
+            .items
+            .iter()
+            .filter_map(|a| a.root_artifact.clone())
+            .collect();
+        all.push(delivery.artifact.clone().unwrap());
+        let verified = verify_parent_delivery(
+            sink.dir.parent().unwrap(),
+            &all,
+            &binding,
+            &limits,
+            parent.budget.original_limits(),
+            owned.ledger_before_owners,
+        )
+        .unwrap();
+        assert!(verified.delivery_complete); // Complete raw delivery, not producer completion.
+
         let artifacts: Vec<_> = owned
             .items
             .iter()
@@ -9334,6 +9455,7 @@ mod parent_storage_tests {
         let root = sink.dir.parent().unwrap();
         let original = construction_tests::fixture();
         let mut budget = construction_tests::budget();
+        let mut delivery = ParentDeliveryFile::admit(&mut budget).unwrap();
         let mut global = 0;
         let mut run = run_canonical_pipeline(
             &original,
@@ -9375,6 +9497,20 @@ mod parent_storage_tests {
             Err(Stop::Observer)
         );
         assert_eq!(parent.budget.checking_work, work);
+        delivery.finish(&owned, &parent, &binding, root).unwrap();
+        let artifacts = vec![delivery.artifact.clone().unwrap()];
+        let verified = verify_parent_delivery(
+            root,
+            &artifacts,
+            &binding,
+            &limits,
+            parent.budget.original_limits(),
+            owned.ledger_before_owners,
+        )
+        .unwrap();
+        assert!(!verified.delivery_complete);
+        assert_eq!(verified.capture_acknowledgements, 1);
+        assert_eq!(verified.root_artifacts, 0);
     }
     #[test]
     fn wrong_attempt_or_no_headroom_prevents_all_storage() {
@@ -9513,4 +9649,416 @@ mod native_payload_reuse_tests {
             .unwrap()
             .is_empty());
     }
+}
+
+const PARENT_DELIVERY_SLOT: (&str, &str, &str) = (
+    "koblitz-m3-parent-delivery.json",
+    "restricted-koblitz-m3-parent-delivery/v1",
+    "json",
+);
+const PARENT_DELIVERY_CAP: usize = 16 * 1024;
+#[derive(serde::Serialize)]
+struct ParentItemView<'a> {
+    logical_path: &'a str,
+    path: &'a str,
+    role: &'a str,
+    encoding: &'a str,
+    bytes: u64,
+    attempted: bool,
+    admitted: bool,
+    quote: Option<RetentionQuote>,
+    capture_acknowledged: bool,
+    root_artifact: Option<&'a crate::ml_dataset::types::Artifact>,
+    dedicated_publication: bool,
+}
+struct ParentItems<'a>(&'a [OwnedRetainedArtifact]);
+impl serde::Serialize for ParentItems<'_> {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        s.collect_seq(self.0.iter().map(|a| ParentItemView {
+            logical_path: a.logical_path,
+            path: &a.payload.path,
+            role: &a.payload.role,
+            encoding: &a.payload.encoding,
+            bytes: a.payload.bytes.len() as u64,
+            attempted: a.storage_attempted,
+            admitted: a.storage_admitted,
+            quote: a.storage_quote,
+            capture_acknowledged: a.capture_acknowledged,
+            root_artifact: a.root_artifact.as_ref(),
+            dedicated_publication: a.publication.is_some(),
+        }))
+    }
+}
+#[derive(serde::Serialize)]
+struct ParentDeliveryView<'a> {
+    schema: &'static str,
+    snapshot_boundary: &'static str,
+    binding: &'a crate::ml_dataset::capture::AttemptBinding,
+    before: SavedBudgetLedger,
+    after: SavedBudgetLedger,
+    owner_quote: RetentionQuote,
+    payload_bytes: u64,
+    parent_stop: Option<Stop>,
+    persistence_error: Option<&'a str>,
+    items: ParentItems<'a>,
+    delivery_complete: bool,
+}
+struct ParentDeliveryFile {
+    encoding: TerminalEncoding,
+    attempted: bool,
+    artifact: Option<crate::ml_dataset::types::Artifact>,
+    stop: Option<Stop>,
+    error: Option<String>,
+}
+impl ParentDeliveryFile {
+    fn admit(budget: &mut Budget) -> Result<Self, Stop> {
+        // Root-only terminal storage is reserved before the producer. It cannot
+        // use a fresh allowance to bypass a stopped parent session.
+        budget.reserve_checking(
+            32 * PARENT_DELIVERY_CAP as u64 + 65536,
+            2 * 1024 * 1024 + 16384 + std::mem::size_of::<Self>() as u64,
+            Instant::now(),
+        )?;
+        budget.reserve_trace(2 * PARENT_DELIVERY_CAP as u64 + 4096, Instant::now())?;
+        Ok(Self {
+            encoding: TerminalEncoding::admit(PARENT_DELIVERY_CAP, budget)?,
+            attempted: false,
+            artifact: None,
+            stop: None,
+            error: None,
+        })
+    }
+    fn finish(
+        &mut self,
+        owned: &ParentArtifacts,
+        parent: &ParentRetention<'_>,
+        binding: &crate::ml_dataset::capture::AttemptBinding,
+        root: &std::path::Path,
+    ) -> Result<(), Stop> {
+        if self.attempted {
+            return Err(self.stop.unwrap_or(Stop::Phase));
+        }
+        self.attempted = true;
+        let parent_stop = owned.retention_stop.or(parent.stop);
+        let complete = parent_stop.is_none()
+            && owned.persistence_error.is_none()
+            && !owned.items.is_empty()
+            && owned
+                .items
+                .iter()
+                .all(|a| a.capture_acknowledged && a.root_artifact.is_some());
+        let view = ParentDeliveryView {
+            schema: "crypto.ml-dataset.koblitz-m3-parent-delivery/v1",
+            snapshot_boundary: "before-parent-record-encoding-and-storage",
+            binding,
+            before: owned.ledger_before_owners,
+            after: parent.budget.saved_ledger(),
+            owner_quote: owned.owner_quote,
+            payload_bytes: owned.payload_bytes,
+            parent_stop,
+            persistence_error: owned.persistence_error.as_deref(),
+            items: ParentItems(&owned.items),
+            delivery_complete: complete,
+        };
+        if let Err(stop) = self.encoding.encode(&view) {
+            self.stop = Some(stop);
+            return Err(stop);
+        }
+        if Instant::now() >= self.encoding.deadline {
+            self.stop = Some(Stop::Deadline);
+            return Err(Stop::Deadline);
+        }
+        match crate::ml_dataset::storage::write_bytes(
+            root,
+            PARENT_DELIVERY_SLOT.0,
+            PARENT_DELIVERY_SLOT.1,
+            PARENT_DELIVERY_SLOT.2,
+            &self.encoding.bytes,
+        ) {
+            Ok(a) => self.artifact = Some(a),
+            Err(e) => {
+                self.error = Some(e);
+                self.stop = Some(Stop::Observer);
+                return Err(Stop::Observer);
+            }
+        }
+        if Instant::now() >= self.encoding.deadline {
+            self.stop = Some(Stop::Deadline);
+            return Err(Stop::Deadline);
+        }
+        Ok(())
+    }
+}
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SavedParentItem {
+    logical_path: String,
+    path: String,
+    role: String,
+    encoding: String,
+    bytes: u64,
+    attempted: bool,
+    admitted: bool,
+    quote: Option<RetentionQuote>,
+    capture_acknowledged: bool,
+    root_artifact: Option<crate::ml_dataset::types::Artifact>,
+    dedicated_publication: bool,
+}
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SavedParentDelivery {
+    schema: String,
+    snapshot_boundary: String,
+    binding: crate::ml_dataset::capture::AttemptBinding,
+    before: SavedBudgetLedger,
+    after: SavedBudgetLedger,
+    owner_quote: RetentionQuote,
+    payload_bytes: u64,
+    parent_stop: Option<Stop>,
+    persistence_error: Option<String>,
+    items: Vec<SavedParentItem>,
+    delivery_complete: bool,
+}
+#[derive(Debug)]
+struct VerifiedParentDelivery {
+    delivery_complete: bool,
+    root_artifacts: usize,
+    capture_acknowledgements: usize,
+}
+/// Admission and original mathematical replay supply expected_before. This
+/// verifier authenticates delivery/accounting, not producer instruction counts.
+fn verify_parent_delivery(
+    dir: &std::path::Path,
+    artifacts: &[crate::ml_dataset::types::Artifact],
+    binding: &crate::ml_dataset::capture::AttemptBinding,
+    capture: &crate::ml_dataset::capture::CaptureLimits,
+    original: OriginalLimits,
+    expected_before: SavedBudgetLedger,
+) -> Result<VerifiedParentDelivery, String> {
+    use super::prime_f4_wide::{artifact, read_bounded};
+    let file = artifact(
+        artifacts,
+        PARENT_DELIVERY_SLOT.0,
+        PARENT_DELIVERY_SLOT.1,
+        PARENT_DELIVERY_SLOT.2,
+        true,
+    )?
+    .ok_or("missing parent delivery record")?;
+    let bytes = read_bounded(dir, PARENT_DELIVERY_SLOT.0, PARENT_DELIVERY_CAP)?;
+    if file.bytes != bytes.len() as u64 || file.sha256 != crate::ml_dataset::digest(&bytes) {
+        return Err("parent delivery file hash mismatch".into());
+    }
+    let r: SavedParentDelivery =
+        serde_json::from_slice(&bytes).map_err(|e| format!("strict parent delivery: {e}"))?;
+    if r.schema != "crypto.ml-dataset.koblitz-m3-parent-delivery/v1"
+        || r.snapshot_boundary != "before-parent-record-encoding-and-storage"
+        || &r.binding != binding
+        || r.before != expected_before
+        || r.items.len() > 10
+    {
+        return Err("parent delivery original identity mismatch".into());
+    }
+    for ledger in [r.before, r.after] {
+        verify_budget_ledger(
+            &serde_json::to_vec(&ledger).map_err(|e| e.to_string())?,
+            original,
+        )?;
+    }
+    if r.before.phase != r.after.phase
+        || r.before.first_stop != r.after.first_stop
+        || r.before.native_reserved != r.after.native_reserved
+        || r.before.group_additions != r.after.group_additions
+        || r.before.checking_reported_work != r.after.checking_reported_work
+    {
+        return Err("parent changed producer state".into());
+    }
+    let prefix = crate::ml_dataset::capture::verify_live_committed_prefix(dir, binding, capture)?
+        .ok_or("missing original capture prefix")?;
+    let mut owner = RetentionQuote {
+        work: 512,
+        bytes: 512,
+        trace: 0,
+    };
+    let mut charged = RetentionQuote::default();
+    let mut payload_total = 0u64;
+    let mut previous_rank = None;
+    let mut uncompleted = false;
+    let mut roots = 0usize;
+    let mut acknowledgements = 0usize;
+    for a in &r.items {
+        let (path, role, encoding, rank) = match a.logical_path.as_str() {
+            "koblitz-m3-input.json" => (
+                KOBLITZ_SLOTS[0].0,
+                KOBLITZ_SLOTS[0].1,
+                KOBLITZ_SLOTS[0].2,
+                0,
+            ),
+            "koblitz-m3-events.jsonl" => (
+                KOBLITZ_SLOTS[1].0,
+                KOBLITZ_SLOTS[1].1,
+                KOBLITZ_SLOTS[1].2,
+                1,
+            ),
+            "koblitz-m3-result.json" => (
+                KOBLITZ_SLOTS[2].0,
+                KOBLITZ_SLOTS[2].1,
+                KOBLITZ_SLOTS[2].2,
+                5,
+            ),
+            "koblitz-m3-group-replay.json" => (
+                KOBLITZ_SLOTS[3].0,
+                KOBLITZ_SLOTS[3].1,
+                KOBLITZ_SLOTS[3].2,
+                4,
+            ),
+            "pdp-witness.json" => ("pdp-witness.json", "independently-verified-pdp", "json", 3),
+            other => {
+                let index = RAW_RETENTION_NAMES
+                    .iter()
+                    .position(|(logical, _)| *logical == other)
+                    .ok_or("unknown parent artifact identity")?;
+                (
+                    RAW_RETENTION_NAMES[index].1,
+                    "unregistered-partial-artifact",
+                    "native",
+                    [0, 2, 3, 4, 5][index],
+                )
+            }
+        };
+        if a.path != path
+            || a.role != role
+            || a.encoding != encoding
+            || a.bytes > 8 * 1024 * 1024
+            || previous_rank.is_some_and(|p| rank <= p)
+            || a.dedicated_publication != (path == "pdp-witness.json")
+        {
+            return Err("parent artifact identity/order mismatch".into());
+        }
+        previous_rank = Some(rank);
+        let identities = (path.len() + role.len() + encoding.len()) as u64;
+        owner.work = owner
+            .work
+            .checked_add(512 + 8 * identities)
+            .ok_or("owner work overflow")?;
+        owner.bytes = owner
+            .bytes
+            .checked_add(512 + identities)
+            .ok_or("owner bytes overflow")?;
+        payload_total = payload_total
+            .checked_add(a.bytes)
+            .ok_or("payload sum overflow")?;
+        if a.attempted != a.quote.is_some()
+            || a.admitted && !a.attempted
+            || a.capture_acknowledged && !a.admitted
+            || a.root_artifact.is_some() && !a.capture_acknowledged
+            || uncompleted && a.attempted
+        {
+            return Err("parent acknowledgement order mismatch".into());
+        }
+        if a.attempted {
+            let quote = quote_parent_storage_length(a.bytes, a.dedicated_publication, capture)
+                .map_err(|s| format!("storage quote: {s:?}"))?;
+            if a.quote != Some(quote) {
+                return Err("parent storage quote mismatch".into());
+            }
+            if a.admitted {
+                charged.work = charged
+                    .work
+                    .checked_add(quote.work)
+                    .ok_or("parent work overflow")?;
+                charged.bytes = charged
+                    .bytes
+                    .checked_add(quote.bytes)
+                    .ok_or("parent memory overflow")?;
+                charged.trace = charged
+                    .trace
+                    .checked_add(quote.trace)
+                    .ok_or("parent trace overflow")?;
+            }
+        }
+        if a.root_artifact.is_none() {
+            uncompleted = true;
+        }
+        let committed: Vec<_> = prefix
+            .payloads
+            .iter()
+            .filter(|(_, p)| p.path == format!("payloads/{path}"))
+            .collect();
+        if a.capture_acknowledged || a.dedicated_publication {
+            if committed.len() != 1 {
+                return Err("parent acknowledgement lacks unique capture".into());
+            }
+            let p = &committed[0].1;
+            if p.role != role || p.encoding != encoding || p.bytes != a.bytes {
+                return Err("parent capture identity mismatch".into());
+            }
+        }
+        if a.capture_acknowledged {
+            acknowledgements += 1;
+        }
+        if let Some(root) = &a.root_artifact {
+            if root.path != path
+                || root.role != role
+                || root.encoding != encoding
+                || root.bytes != a.bytes
+                || root.sha256 != committed[0].1.sha256
+            {
+                return Err("parent root differs from capture".into());
+            }
+            let registered = artifact(artifacts, path, role, encoding, true)?
+                .ok_or("parent root missing from manifest")?;
+            if registered != root {
+                return Err("parent root differs from manifest".into());
+            }
+            crate::ml_dataset::storage::check_file(
+                &crate::ml_dataset::storage::contained_path(dir, path, false)?,
+                &root.sha256,
+                root.bytes,
+            )?;
+            roots += 1;
+        }
+    }
+    if owner != r.owner_quote || payload_total != r.payload_bytes {
+        return Err("parent owner quote mismatch".into());
+    }
+    let work = r
+        .before
+        .checking_reserved_work
+        .checked_add(owner.work)
+        .and_then(|n| n.checked_add(charged.work))
+        .ok_or("parent ledger work overflow")?;
+    let memory = r
+        .before
+        .adapter_reserved_bytes
+        .checked_add(owner.bytes)
+        .and_then(|n| n.checked_add(charged.bytes))
+        .ok_or("parent ledger memory overflow")?;
+    let trace = r
+        .before
+        .charged_trace_bytes
+        .checked_add(owner.trace)
+        .and_then(|n| n.checked_add(charged.trace))
+        .ok_or("parent ledger trace overflow")?;
+    if work != r.after.checking_reserved_work
+        || memory != r.after.adapter_reserved_bytes
+        || trace != r.after.charged_trace_bytes
+    {
+        return Err("parent cumulative ledger mismatch".into());
+    }
+    if r.persistence_error.is_some() && r.parent_stop != Some(Stop::Observer) {
+        return Err("parent error/stop mismatch".into());
+    }
+    let complete = r.parent_stop.is_none()
+        && r.persistence_error.is_none()
+        && !r.items.is_empty()
+        && roots == r.items.len()
+        && acknowledgements == r.items.len();
+    if complete != r.delivery_complete {
+        return Err("parent delivery completion mismatch".into());
+    }
+    Ok(VerifiedParentDelivery {
+        delivery_complete: complete,
+        root_artifacts: roots,
+        capture_acknowledgements: acknowledgements,
+    })
 }
