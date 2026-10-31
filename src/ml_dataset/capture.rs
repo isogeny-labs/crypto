@@ -1497,6 +1497,19 @@ impl CaptureEmitter {
         payload: &T,
         buffer: &mut TypedEventBuffer,
     ) -> Result<(), CaptureError> {
+        self.event_typed_precommit(kind, payload, buffer, &mut |_| Ok(()))
+    }
+
+    /// Inspect/reuse the complete internal encoding before durable publication.
+    /// Callback refusal leaves the head unchanged and does not poison the sink:
+    /// no capture I/O has happened. Encoded bytes alone are not an acknowledgement.
+    pub(super) fn event_typed_precommit<T: Serialize + ?Sized>(
+        &mut self,
+        kind: TypedEventKind,
+        payload: &T,
+        buffer: &mut TypedEventBuffer,
+        before_commit: &mut impl FnMut(&[u8]) -> Result<(), CaptureError>,
+    ) -> Result<(), CaptureError> {
         self.ready()?;
         buffer.bytes.clear();
         let result = (|| {
@@ -1536,6 +1549,7 @@ impl CaptureEmitter {
         if let Err(error) = result {
             return Err(self.reject(error));
         }
+        before_commit(&buffer.bytes)?;
         self.commit_event(
             &buffer.bytes,
             self.head.payload_count,

@@ -5639,9 +5639,10 @@ impl<'a> BoundNativeEvents<'a> {
         {
             return budget.fail(Stop::Events);
         }
-        // Separate canonical serialization and typed wire serialization, using
-        // the existing checking-work/identity metadata reservation convention.
-        budget.reserve_checking(1024 + 16 * NATIVE_BOUNDARY_CAP as u64, 4096, Instant::now())?;
+        // Typed capture encoding retains its existing 8-per-byte model. The
+        // canonical payload is now copied from that encoding (1 per byte),
+        // eliminating the separate 8-per-byte canonical serialization pass.
+        budget.reserve_checking(1024 + 9 * NATIVE_BOUNDARY_CAP as u64, 4096, Instant::now())?;
         let identity = super::LIVE_SINK.with(|slot| match slot.borrow().as_ref() {
             Some(super::EventSink::Bound(sink)) => sink.verify_digest_limits_at_count(
                 &self.binding_digest,
@@ -5663,30 +5664,62 @@ impl<'a> BoundNativeEvents<'a> {
             capture_sequence: snapshot.capture_sequence,
             event: &snapshot.event,
         };
-        let bytes = std::mem::take(&mut self.pending_bytes);
-        let mut writer = InputWriter {
-            bytes,
-            capacity: NATIVE_BOUNDARY_CAP,
-            budget,
-        };
-        let encoded =
-            serde_json::to_writer(&mut writer, &view).is_ok() && writer.write_all(b"\n").is_ok();
-        self.pending_bytes = writer.bytes;
-        if !encoded {
-            return budget.fail(Stop::Serialization);
-        }
-        if self.pending_bytes.len()
-            > NATIVE_BOUNDARY_RECORDS * NATIVE_BOUNDARY_CAP - self.canonical.len()
-        {
-            return budget.fail(Stop::Trace);
-        }
-        if super::live_typed_event(
-            crate::ml_dataset::capture::TypedEventKind::KoblitzM3Native,
-            &view,
-            &mut self.buffer,
-        )
-        .is_err()
-        {
+        let captured = super::LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+            Some(super::EventSink::Bound(sink)) => sink.event_typed_precommit(
+                crate::ml_dataset::capture::TypedEventKind::KoblitzM3Native,
+                &view,
+                &mut self.buffer,
+                &mut |wire| {
+                    use crate::ml_dataset::capture::CaptureError;
+                    let payload = match native_capture_payload(wire) {
+                        Ok(payload) => payload,
+                        Err(stop) => {
+                            let _ = budget.fail::<()>(stop);
+                            return Err(CaptureError::Integrity(
+                                "native payload extraction failed".into(),
+                            ));
+                        }
+                    };
+                    let bytes = std::mem::take(&mut self.pending_bytes);
+                    let mut writer = InputWriter {
+                        bytes,
+                        capacity: NATIVE_BOUNDARY_CAP,
+                        budget,
+                    };
+                    // Preserve any byte prefix that fits the original trace
+                    // allowance before refusing the remaining unacknowledged copy.
+                    let prefix = payload.len().min(
+                        writer
+                            .budget
+                            .trace_limit
+                            .saturating_sub(writer.budget.trace_bytes)
+                            as usize,
+                    );
+                    let encoded = writer.write_all(&payload[..prefix]).is_ok()
+                        && writer.write_all(&payload[prefix..]).is_ok()
+                        && writer.write_all(b"\n").is_ok();
+                    self.pending_bytes = writer.bytes;
+                    if !encoded {
+                        return Err(CaptureError::Integrity(
+                            "canonical boundary retention refused".into(),
+                        ));
+                    }
+                    if self.pending_bytes.len()
+                        > NATIVE_BOUNDARY_RECORDS * NATIVE_BOUNDARY_CAP - self.canonical.len()
+                    {
+                        let _ = budget.fail::<()>(Stop::Trace);
+                        return Err(CaptureError::Integrity(
+                            "canonical boundary capacity exhausted".into(),
+                        ));
+                    }
+                    Ok(())
+                },
+            ),
+            _ => Err(crate::ml_dataset::capture::CaptureError::Integrity(
+                "native boundary requires bound capture".into(),
+            )),
+        });
+        if captured.is_err() {
             return budget.fail(Stop::Observer);
         }
         // All storage was pre-admitted. Acknowledgement survives a later clock
@@ -9393,5 +9426,91 @@ mod parent_storage_tests {
             assert!(!root.join(KOBLITZ_SLOTS[0].0).exists());
             assert!(!sink.dir.join("payloads").join(KOBLITZ_SLOTS[0].0).exists());
         }
+    }
+}
+
+/// Extract the final payload of our trusted capture encoder without reparsing or
+/// reserializing it. This is only used on event_typed's complete internal buffer,
+/// never as a validator for arbitrary external JSON.
+fn native_capture_payload(wire: &[u8]) -> Result<&[u8], Stop> {
+    const MARKER: &[u8] = b"\"event\":{\"kind\":\"koblitz_m3_native\",\"payload\":";
+    let end = wire.strip_suffix(b"}}\n").ok_or(Stop::Serialization)?;
+    let start = end
+        .windows(MARKER.len())
+        .position(|w| w == MARKER)
+        .ok_or(Stop::Serialization)?
+        + MARKER.len();
+    let payload = end.get(start..).ok_or(Stop::Serialization)?;
+    if payload.first() != Some(&b'{') || payload.last() != Some(&b'}') {
+        return Err(Stop::Serialization);
+    }
+    Ok(payload)
+}
+#[cfg(test)]
+mod native_payload_reuse_tests {
+    use super::*;
+    use crate::ml_dataset::capture::capture_limits;
+    #[test]
+    fn reused_canonical_bytes_equal_original_typed_serialization() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let _sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let mut budget = construction_tests::budget();
+        let mut events = BoundNativeEvents::new(&binding, &limits, &mut budget).unwrap();
+        let mut global = 0;
+        let event = NativeBoundary::Construction {
+            stage: ConstructionBoundaryStage::Begin,
+            reserved: Default::default(),
+        };
+        let digest = binding.digest().unwrap();
+        let view = NativeBoundaryView {
+            schema: "crypto.ml-dataset.koblitz-m3-events/v1",
+            binding_sha256: &digest,
+            sequence: 1,
+            capture_sequence: 1,
+            event: &event,
+        };
+        let mut expected = serde_json::to_vec(&view).unwrap();
+        expected.push(b'\n');
+        events.emit(event, &mut budget, &mut global).unwrap();
+        assert_eq!(events.canonical, expected);
+        assert_eq!(global, 1);
+    }
+    #[test]
+    fn precommit_refusal_keeps_head_unchanged_and_does_not_poison_sink() {
+        use crate::ml_dataset::capture::{CaptureError, TypedEventBuffer, TypedEventKind};
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let before = std::fs::read(sink.dir.join("committed.json")).unwrap();
+        let mut buffer =
+            TypedEventBuffer::try_new(2048, TypedEventBuffer::requested_bytes(2048).unwrap())
+                .unwrap();
+        let mut calls = 0;
+        super::super::LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut().unwrap() {
+            super::super::EventSink::Bound(sink) => {
+                let result = sink.event_typed_precommit(
+                    TypedEventKind::KoblitzM3Native,
+                    &serde_json::json!({"test":1}),
+                    &mut buffer,
+                    &mut |wire| {
+                        calls += 1;
+                        assert!(wire.ends_with(b"\n"));
+                        Err(CaptureError::Integrity("selected precommit refusal".into()))
+                    },
+                );
+                assert!(result.is_err());
+                sink.verify_attempt_limits(&binding, &limits).unwrap();
+            }
+            _ => panic!("expected bound sink"),
+        });
+        assert_eq!(calls, 1);
+        assert_eq!(
+            std::fs::read(sink.dir.join("committed.json")).unwrap(),
+            before
+        );
+        assert!(std::fs::read(sink.dir.join("events.jsonl"))
+            .unwrap()
+            .is_empty());
     }
 }
