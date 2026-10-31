@@ -1,0 +1,56 @@
+/var/tmp/pencil-coefficient-array-20261031-v1/Storage.lean:19:55: error: unsolved goals
+xs : Array UInt64
+i j : ℕ
+v : UInt64
+hi : i < xs.size
+hj : j < xs.size
+hne : i ≠ j
+⊢ (xs.set j v hj)[i] = xs[i]
+/var/tmp/pencil-coefficient-array-20261031-v1/Storage.lean:19:68: warning: This simp argument is unused:
+  hne
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [put, Ne.symm hne]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-coefficient-array-20261031-v1/Storage.lean:19:72: warning: This simp argument is unused:
+  Ne.symm hne
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [put, hne]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-coefficient-array-20261031-v1/Storage.lean:28:3: error: Type mismatch: After simplification, term
+  hc i hi'
+ has type
+  xs[i].toNat < p.toNat
+but is expected to have type
+  (xs.set j v hj)[i].toNat < p.toNat
+/var/tmp/pencil-coefficient-array-20261031-v1/Storage.lean:60:1: error: unsolved goals
+case neg
+p : UInt64
+inst✝ : Fact (Nat.Prime p.toNat)
+xs : Array UInt64
+c a b s : UInt64
+k j : Fin 6
+hidx : ↑j < xs.size
+hj : ↑j ≤ ↑k
+hp : 1 < p.toNat
+hb : p.toNat < 2 ^ 31
+hxs : Canonical p xs
+hc : c.toNat < p.toNat
+ha : a.toNat < p.toNat
+hbeta : b.toNat < p.toNat
+hs : s.toNat < p.toNat
+hn : s ≠ 0
+i : ℕ
+hi : i < xs.size
+he : ¬i = ↑j
+⊢ ↑(xs.set (↑j) (updateWord p xs[↑j] c a b (inverseGenerator p s) k j) hidx)[i].toNat = ↑xs[i].toNat
+/var/tmp/pencil-coefficient-array-20261031-v1/Storage.lean:60:23: warning: This simp argument is unused:
+  Ne.symm he
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [update, put, he]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

@@ -40,6 +40,16 @@ Explicit work policies can terminate a run with an unknown result.
   not mathematical impossibility or evidence that the theorem is false.
 - No timing, sub-rho result, security conclusion or practical attack follows
   from these development tests.
+- Follow-up software controls add exact prefix sampling (including the
+  nonparsimonious 1:2 projection case) and nine direct-versus-forced recursive
+  comparisons retaining both taper levels. See the
+  [sampling audit](../docs/hashed-ecdl-audit-20261029/README.md).
+  These bounded checks leave the general obligations below open.
+- The follow-up source review makes the representation boundary explicit:
+  on a 64-bit build lambda is at most 64, so root_u=lambda/131072 is zero
+  for every publicly representable graph. Public calls therefore select a
+  finite-size fallback; only forced private controls enter the recursive
+  kernel. This is not a counterexample to the external asymptotic theorem.
 
 ## Obligations
 
@@ -67,6 +77,16 @@ reconsidered. A practical timing study is a separate requested experiment with
 the existing compute, checkpoint, external-reference and measurement gates.
 
 ## Resolution and history
+
+2026-10-30 program assessment and theorem-bridge source review: the
+[dated assessment](../research/hashed_ecdl_leads_20261030/README.md) and
+[interface map](../research/hashed_ecdl_leads_20261030/BRIDGE.md) distinguish
+fixed-width formal counting endpoints from the required general implicit
+tensor statement. The native packet representation has no nested parent
+evaluator callback; coefficient extraction, preparation, mode enumeration,
+retained data and aggregate bit costs remain general audit obligations.
+This is source inspection, without a Lean/kernel check, experiment, new
+theorem, smaller-packet proof or performance claim. Status stays open.
 
 2026-10-30 checked hash-prime follow-up: retained verified auxiliary prime facts
 through factor-base construction and replay, with an optional explicit fixed

@@ -36,6 +36,7 @@ use crate::cryptanalysis::ecbench::hyper_ic::{self, HyperIcParams};
 use crate::cryptanalysis::ecbench::koblitz_descent::{
     self as koblitz_descent, DescentParams as KoblitzDescentParams,
 };
+use crate::cryptanalysis::ecbench::negation_strong::NegStrongParams;
 use crate::cryptanalysis::ecbench::wordram_price;
 use crate::cryptanalysis::ecbench::workload::{CurveFacts, Instance, WideInstance};
 use crate::cryptanalysis::ecbench_large_prime::{
@@ -253,6 +254,26 @@ const STRONG_PARAMS: &[ParamDecl] = &[
         name: "step_cap_factor",
         default: Some("2000"),
         help: "give up after this multiple of the ideal step count",
+    },
+];
+
+/// `rho.negation_strong`: the walk's shape changes the search, so neither
+/// has a default.
+const NEG_STRONG_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "lanes",
+        default: None,
+        help: "walks stepped in lockstep: the batch-inversion width (1 to 4096)",
+    },
+    ParamDecl {
+        name: "dp_bits",
+        default: None,
+        help: "distinguished-point bits (1 to 39), or `auto`: round(log2(√(πr/4))/2) from 1 to 20",
+    },
+    ParamDecl {
+        name: "step_cap_factor",
+        default: Some("64"),
+        help: "give up after this multiple of √(πr/4) walk steps (at least 10⁶)",
     },
 ];
 
@@ -514,6 +535,14 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ic_boundary::rho_walk_with(NegationClasses, RhoWalk::negation())",
             applies: Applies::Any,
             params: RHO_PARAMS,
+        },
+        MethodDecl {
+            id: "rho.negation_strong",
+            family: "rho",
+            summary: "strong negation-map rho on {P, −P} (A = 2) over F_(2^m)^4 (f2m4_torsion only): 32-jump additive walk, fruitless-cycle escape by doubling, distinguished points, `lanes` walks with one Montgomery-batched F_(q^4) inversion a step; every F_q multiplication counted (inversions, starts, escapes, checks) and each canonicalisation charged one, GAE = F_q multiplications / fq_muls_per_add (ic.pipeline's divisor on that curve); expected S ≈ √(π/4)·(F_q muls a step / fq_muls_per_add)",
+            entry: "ecbench::negation_strong::NegStrongRho::solve",
+            applies: Applies::Any,
+            params: NEG_STRONG_PARAMS,
         },
         MethodDecl {
             id: "rho.multitarget_pooled",
@@ -1282,7 +1311,7 @@ pub fn expected_s(id: &str, a_available: u32) -> Option<f64> {
     use std::f64::consts::PI;
     match id {
         "rho.frozen_reference" | "rho.plain" => Some((PI / 2.0).sqrt()),
-        "rho.negation" | "rho.negation_v2" => Some((PI / 4.0).sqrt()),
+        "rho.negation" | "rho.negation_v2" | "rho.negation_strong" => Some((PI / 4.0).sqrt()),
         "rho.cubic" | "rho.cubic_v2" => Some((PI / 12.0).sqrt()),
         "rho.quartic" | "rho.quartic_v2" | "rho.gls" => Some((PI / 8.0).sqrt()),
         "rho.frobenius_orbit" => Some((PI / 12.0).sqrt()),
@@ -2277,6 +2306,12 @@ fn solve_generic<G: CountedGroup>(
     Ok(rep)
 }
 
+/// A `u128` order on a one-word path: the wide curves route to
+/// `ic_wide` before they get here.
+fn one_word(v: u128) -> Result<u64, String> {
+    u64::try_from(v).map_err(|_| format!("{v} needs the wide (u128) path"))
+}
+
 fn parse_hex_wide(s: &str) -> Result<u128, String> {
     u128::from_str_radix(s.trim_start_matches("0x"), 16).map_err(|_| format!("bad hex `{s}`"))
 }
@@ -2342,6 +2377,13 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
             "`ic.k4_gaudry` runs on fp4_translation curves only; {} is {}",
             curve.slug, curve.family
         ));
+    }
+    if id == NEG_STRONG {
+        if !matches!(inst, Instance::F2m4(_)) {
+            return Err(neg_strong_refusal(curve));
+        }
+        neg_strong_params(m, 2)?;
+        return Ok(());
     }
     match inst {
         Instance::Prime(i) if id == super::aps::ID => super::aps::applicable(m, i),
@@ -2561,6 +2603,15 @@ pub fn solve_measured(
     let mut rep = if let Instance::Wide(wi) = inst {
         let (tx, ty) = (parse_hex_wide(&target[0])?, parse_hex_wide(&target[1])?);
         solve_wide(m, wi, tx, ty, seed)?
+    } else if let Instance::F2m4(i) = inst {
+        let (tx, ty) = (parse_hex_wide(&target[0])?, parse_hex_wide(&target[1])?);
+        if u64::try_from(i.r).is_err() {
+            // `m ≥ 16` with a small cofactor: the subgroup order needs two
+            // words; the u128 implementations (`ic_wide`, `rho_wide`).
+            solve_f2m4_wide(m, i, curve, tx, ty, seed)?
+        } else {
+            solve_inner(m, inst, curve, d, tx as u64, ty as u64, seed)?
+        }
     } else if matches!(
         inst,
         Instance::Genus2(_) | Instance::Quartic(_) | Instance::Ghs(_)
@@ -2657,6 +2708,18 @@ fn solve_inner(
             curve.slug, curve.family
         ));
     }
+    if m.id == NEG_STRONG {
+        let Instance::F2m4(i) = inst else {
+            return Err(neg_strong_refusal(curve));
+        };
+        let f = &i.curve.f;
+        let target = PtB {
+            x: f.unpack(u128::from(tx)),
+            y: f.unpack(u128::from(ty)),
+            inf: false,
+        };
+        return solve_neg_strong(m, i, target, seed);
+    }
     match (inst, d.family) {
         (Instance::Prime(i), _) if m.id == super::aps::ID => {
             super::aps::solve(m, i, PrimePoint::affine(tx, ty), seed)
@@ -2737,8 +2800,8 @@ fn solve_inner(
         (Instance::F2m4(i), "ic") if m.id == "ic.pipeline" => {
             let f = &i.curve.f;
             let target = PtB {
-                x: f.unpack(tx),
-                y: f.unpack(ty),
+                x: f.unpack(u128::from(tx)),
+                y: f.unpack(u128::from(ty)),
                 inf: false,
             };
             solve_ic_f2m4(m, i, curve, target, seed)
@@ -2932,11 +2995,11 @@ fn solve_inner(
         (Instance::F2m4(i), _) => {
             let f = &i.curve.f;
             let target = PtB {
-                x: f.unpack(tx),
-                y: f.unpack(ty),
+                x: f.unpack(u128::from(tx)),
+                y: f.unpack(u128::from(ty)),
                 inf: false,
             };
-            solve_generic(m, &i.curve, i.generator, target, i.r, seed)
+            solve_generic(m, &i.curve, i.generator, target, one_word(i.r)?, seed)
         }
         (Instance::Wide(_), _)
         | (Instance::Fp4(_), _)
@@ -5518,6 +5581,158 @@ fn solve_ic_fp4(
 /// `gaudry-d4-bin`, priced as [`solve_ic_fp4`] prices its curve: the
 /// oracle's `F_q` multiplications at the curve's own multiplications per
 /// addition, lifts at their measured count, row operations at one each.
+/// The strong negation-map rho's id.
+pub const NEG_STRONG: &str = "rho.negation_strong";
+
+fn neg_strong_refusal(curve: &CurveFacts) -> String {
+    format!(
+        "`{NEG_STRONG}` runs on f2m4_torsion curves (over F_(2^m)^4) only; {} is {}",
+        curve.slug, curve.family
+    )
+}
+
+/// `lanes`, `dp_bits` and `step_cap_factor` of a `rho.negation_strong`
+/// method, `dp_bits = auto` resolved on a subgroup of order `r`.
+fn neg_strong_params(m: &ResolvedMethod, r: u64) -> Result<NegStrongParams, String> {
+    use super::negation_strong::{auto_dp_bits, ideal_steps};
+    let lanes = param_u64(m, "lanes")?;
+    if !(1..=4096).contains(&lanes) {
+        return Err(format!("`lanes` must be in 1..=4096, not {lanes}"));
+    }
+    let dp_bits = match m.params["dp_bits"].as_str() {
+        "auto" => auto_dp_bits(ideal_steps(r)),
+        _ => {
+            let v = param_u64(m, "dp_bits")?;
+            if !(1..=39).contains(&v) {
+                return Err(format!("`dp_bits` must be in 1..=39 or `auto`, not {v}"));
+            }
+            v as u32
+        }
+    };
+    Ok(NegStrongParams {
+        lanes: lanes as usize,
+        dp_bits,
+        step_cap_factor: param_u64(m, "step_cap_factor")?,
+    })
+}
+
+/// `rho.negation_strong` on a curve over `F_{(2^m)^4}`: every phase in
+/// counted `F_q` multiplications over the curve's `fq_muls_per_add`, the
+/// divisor [`solve_ic_f2m4`] prices the IC pipeline with.
+fn solve_neg_strong(
+    m: &ResolvedMethod,
+    inst: &BinCurve,
+    target: PtB,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    use super::negation_strong::{NegStrongRho, CANON_FQ_MULS, JUMPS};
+    if inst.curve.f.f.m > 16 {
+        return Err("rho.negation_strong requires a one-word packed point key".into());
+    }
+    let r = u64::try_from(inst.r)
+        .map_err(|_| "rho.negation_strong supports subgroup orders through u64".to_string())?;
+    let params = neg_strong_params(m, r)?;
+    if !inst.curve.on_curve(&target) {
+        return Err("the target is not on the curve".into());
+    }
+    let rho = NegStrongRho::new(inst);
+    // Measured before the clock, on the curve's own counter (as solve_ic_f2m4
+    // measures it); the counter is read in differences, so this does not
+    // reach the solve's counts.
+    let per_add = rho.fq_muls_per_add();
+    let t = Instant::now();
+    measurement::begin_online(Phase::RhoSolve);
+    let o = rho.solve(target, seed, &params);
+    measurement::end_online();
+    let wall = t.elapsed().as_nanos() as u64;
+    let div = per_add as f64;
+    let canon_muls = o.canonicalisations * CANON_FQ_MULS;
+    let phase = |name: &str, adds: u64, scalar_mults: u64, muls: u64| PhaseRecord {
+        name: name.into(),
+        adds,
+        scalar_mults,
+        gae: muls as f64 / div,
+        native: [("fq_muls".to_string(), muls)].into_iter().collect(),
+        ..Default::default()
+    };
+    let check_mults = u64::from(o.scalar.is_some()) + o.failed_collisions;
+    let phases = vec![
+        phase("setup", 0, JUMPS as u64 + 2, o.setup_fq_muls),
+        phase(
+            "search",
+            o.walk_steps + o.start_additions + o.escapes,
+            0,
+            o.search_fq_muls,
+        ),
+        phase("canonicalisation", 0, 0, canon_muls),
+        phase("check", 0, check_mults, o.check_fq_muls),
+    ];
+    let total_gae: f64 = phases.iter().map(|p| p.gae).sum();
+    let mut counters = BTreeMap::new();
+    for (k, v) in [
+        ("fq_muls", o.charged_fq_muls()),
+        ("fq_muls_per_add", per_add),
+        ("fq_muls_setup", o.setup_fq_muls),
+        ("fq_muls_search", o.search_fq_muls),
+        ("fq_muls_check", o.check_fq_muls),
+        ("fq_muls_canonicalisation", canon_muls),
+        ("canonicalisations", o.canonicalisations),
+        ("inversions", o.inversions),
+        ("batch_inversions", o.batch_inversions),
+        ("walk_steps", o.walk_steps),
+        ("unbatched_steps", o.unbatched_steps),
+        ("walks", o.walks),
+        ("start_additions", o.start_additions),
+        ("fruitless_escapes", o.escapes),
+        ("capped_walks", o.capped_walks),
+        ("wasted_merges", o.wasted_merges),
+        ("failed_collisions", o.failed_collisions),
+        ("table_entries", o.table_entries),
+        ("scalar_multiplications", o.scalar_multiplications),
+        ("partition_hashes_uncharged", o.partition_hashes),
+        ("dp_tests_uncharged", o.dp_tests),
+        ("table_queries_uncharged", o.table_queries),
+        ("table_inserts_uncharged", o.table_inserts),
+    ] {
+        counters.insert(k.to_string(), v);
+    }
+    let detail = json!({
+        "reference": "ecbench::negation_strong: negation-map rho with distinguished points, Montgomery-batched inversion and charged canonicalisation (red-team replication plan, research/gaudry_k4_char2_redteam_20261026/REPORT.md §3)",
+        "unit": "counted F_q multiplications (Gf2q::muls) / fq_muls_per_add",
+        "fq_muls_per_add": per_add,
+        "canonicalisation_charge_fq_muls": CANON_FQ_MULS,
+        "canonicalisation_rule": "representative of {P, −P} with the smaller packed ordinate of y and x + y: four F_q additions and one comparison, charged one F_q multiplication (an upper bound)",
+        "jumps": JUMPS,
+        "lanes": params.lanes,
+        "dp_bits": params.dp_bits,
+        "step_cap_factor": params.step_cap_factor,
+        "ideal_steps": o.ideal_steps,
+        "fq_muls_per_step": if o.walk_steps > 0 {
+            Some((o.search_fq_muls + canon_muls) as f64 / o.walk_steps as f64)
+        } else {
+            None
+        },
+    });
+    Ok(SolveReport {
+        recovered: o.scalar.map(u128::from),
+        exhausted: o.scalar.is_none(),
+        phases,
+        total_gae,
+        automorphisms_used: 2,
+        unpriced: unpriced_of(&counters),
+        counters,
+        deterministic: true,
+        nondeterminism: vec![],
+        solve_wall_ns: wall,
+        factor_base: None,
+        detail,
+        online: None,
+        online_error: None,
+        solver: None,
+        field_ops: None,
+    })
+}
+
 fn solve_ic_f2m4(
     m: &ResolvedMethod,
     inst: &BinCurve,
@@ -5566,9 +5781,9 @@ fn solve_ic_f2m4(
         group: c,
         generator: inst.generator,
         target,
-        r: inst.r,
-        cofactor: inst.cofactor,
-        group_order: inst.group_order,
+        r: one_word(inst.r)?,
+        cofactor: one_word(inst.cofactor)?,
+        group_order: one_word(inst.group_order)?,
         name: curve.slug.clone(),
         field_degree: None,
     };
@@ -5601,6 +5816,148 @@ fn solve_ic_f2m4(
         |q| CountedGroup::key(c, q),
     )?;
     Ok(ic_report(m, rep, &calib, Some(facts), wall, 2))
+}
+
+/// A curve over `F_{(2^m)^4}` whose subgroup order needs two words
+/// (`m ≥ 16`): `rho.negation` and `ic.pipeline` through `ic_wide`, the
+/// same algorithms at `u128` (its tests pin them to the one-word code).
+fn solve_f2m4_wide(
+    m: &ResolvedMethod,
+    inst: &BinCurve,
+    curve: &CurveFacts,
+    tx: u128,
+    ty: u128,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    use crate::cryptanalysis::ic_wide::{rho_negation, run_f2m4};
+    let f = &inst.curve.f;
+    let target = PtB {
+        x: f.unpack(tx),
+        y: f.unpack(ty),
+        inf: false,
+    };
+    let r = inst.r;
+    match m.id.as_str() {
+        "rho.negation" => {
+            let multiple = param_u64(m, "cap_multiple")? as f64;
+            let cap = (crate::cryptanalysis::ic_boundary::generic_floor_ops(r as f64, 1.0)
+                * multiple) as u64
+                + 4096;
+            let t = Instant::now();
+            measurement::begin_online(Phase::RhoSolve);
+            let (res, d) =
+                rho_negation::<crate::cryptanalysis::gaudry_quartic_bin::CurveB, u128>(&inst.curve, inst.generator, target, r, seed, cap);
+            measurement::end_online();
+            let fops = field_ops_of(&inst.curve, &[res.group_ops]);
+            let mut rep = rho_report(res, t.elapsed().as_nanos() as u64, fops);
+            rep.recovered = d;
+            rep.exhausted = d.is_none();
+            Ok(rep)
+        }
+        "ic.pipeline" => {
+            let (spec, fb_name, or_name) = pipeline_spec(m, seed)?;
+            if fb_name != "bin-t-line" || or_name != "gaudry-d4-bin" {
+                return Err("on a wide curve over F_(2^m)^4 only bin-t-line + gaudry-d4-bin run".into());
+            }
+            let mut oracle = bin_oracle(&spec, inst, seed)?;
+            let c = &inst.curve;
+            // The one-word fields are not read on this path (the base and
+            // the oracle ignore them); r and h travel as u128.
+            let ctx = InstanceCtx {
+                group: c,
+                generator: inst.generator,
+                target,
+                r: 0,
+                cofactor: 0,
+                group_order: 0,
+                name: curve.slug.clone(),
+                field_degree: None,
+            };
+            let per_add = fq_muls_per_add(c) as f64;
+            let calib = Calibration {
+                ns_per_add: per_add,
+                ns_per_double: per_add,
+                ns_per_row_op: 1.0,
+                ns_per_lookup: 1.0,
+                ns_per_sqrt: Some(f2m4_lift_muls(inst)),
+                pinned_units: vec![
+                    "ns_per_double".into(),
+                    "ns_per_row_op".into(),
+                    "ns_per_lookup".into(),
+                    "ns_per_sqrt".into(),
+                ],
+                ..Default::default()
+            };
+            let t = Instant::now();
+            let run = run_f2m4::<u128>(&ctx, inst, &spec, &mut oracle, r, inst.cofactor, &calib)?;
+            let wall = t.elapsed().as_nanos() as u64;
+            let mut scratch = GroupOps::default();
+            let base = TLineBase { curve: inst };
+            let fb = base.build(&ctx, &spec.factor_base_params, &mut scratch)?;
+            let facts = factor_base_facts(
+                &curve.slug,
+                &m.params["factor_base"],
+                &spec.factor_base_params,
+                &fb,
+                |q| CountedGroup::key(c, q),
+            )?;
+            let mut rep = ic_report(m, run.report, &calib, Some(facts), wall, 2);
+            rep.recovered = run.recovered;
+            rep.exhausted = run.recovered.is_none();
+            Ok(rep)
+        }
+        other => Err(format!(
+            "`{other}` has no implementation past one word on a curve over F_(2^m)^4; rho.negation and ic.pipeline do"
+        )),
+    }
+}
+
+/// `gaudry-d4-bin`'s parameters, checked, as an oracle on `inst`; shared
+/// by the one-word and the wide pipelines.
+fn bin_oracle<'a>(
+    spec: &crate::cryptanalysis::ic_framework::PipelineSpec,
+    inst: &'a BinCurve,
+    seed: u64,
+) -> Result<BinD4Oracle<'a>, String> {
+    let macaulay = spec.oracle_params.u64("macaulay")?;
+    let macaulay = u8::try_from(macaulay)
+        .ok()
+        .filter(|&d| d >= 2)
+        .ok_or_else(|| {
+            format!("gaudry-d4-bin: macaulay is a degree from 2 to 255, not {macaulay}")
+        })?;
+    let flag = |k: &str| -> Result<bool, String> {
+        match spec.oracle_params.u64_or(k, 0)? {
+            0 => Ok(false),
+            1 => Ok(true),
+            v => Err(format!("gaudry-d4-bin: {k} is 0 or 1, not {v}")),
+        }
+    };
+    let frobenius = flag("frobenius")?;
+    let opts = BinOptions {
+        weighted: flag("weighted")? || frobenius,
+        frobenius,
+        sparsest: flag("sparsest")?,
+        replay: flag("replay")?,
+        frob_roots: flag("frob_roots")?,
+    };
+    let mut oracle = BinD4Oracle::new(inst, macaulay, seed, opts);
+    oracle.charge_unsolved = flag("charge_unsolved")?;
+    let large_primes = spec.oracle_params.u64_or("large_primes", 0)?;
+    if large_primes > 2 {
+        return Err(format!(
+            "gaudry-d4-bin: large_primes is 0, 1 or 2, not {large_primes}"
+        ));
+    }
+    let small_permille = spec.oracle_params.u64_or("small_permille", 1000)?;
+    if !(1..=1000).contains(&small_permille) {
+        return Err(format!(
+            "gaudry-d4-bin: small_permille is 1 to 1000, not {small_permille}"
+        ));
+    }
+    oracle.lp.max_large = large_primes as u8;
+    oracle.lp.small_permille = small_permille;
+    Ok(oracle)
 }
 
 /// `F_q` multiplications in one lift (`lift_x`) of a random abscissa
@@ -6399,7 +6756,10 @@ pub fn dump_factor_base(
     if let Instance::Wide(_) = &inst {
         return Err("no factor-base plug-in runs on a wide (n > 62) curve yet".into());
     }
-    if let Instance::Fp4(_) = &inst {
+    if matches!(
+        &inst,
+        Instance::Fp4(_) | Instance::Fp4Torsion(_) | Instance::F2m4(_)
+    ) {
         return Err("no factor-base plug-in runs on E(F_p⁴); ic.k4_gaudry builds its own".into());
     }
     if let Instance::Ghs(_) = &inst {
@@ -8534,6 +8894,94 @@ mod accounting_tests {
         assert!(strong.is_ok(), "{strong:?}");
         let wordram = plan_arm(kob, "rho.signed_frobenius_strong_wordram", json!({}));
         assert!(wordram.is_ok(), "{wordram:?}");
+    }
+}
+
+#[cfg(test)]
+mod neg_strong_tests {
+    use super::*;
+    use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+    fn method(id: &str, params: &[(&str, &str)]) -> ResolvedMethod {
+        resolve(&MethodSpec {
+            id: id.into(),
+            params: params
+                .iter()
+                .map(|(k, v)| (k.to_string(), v.to_string()))
+                .collect(),
+        })
+        .unwrap()
+    }
+
+    fn f2m4(m: u32, seed: u64) -> (Instance, CurveFacts) {
+        let spec = CurveSpec::F2m4Torsion {
+            m,
+            seed,
+            max_cofactor: 16,
+        };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        (inst, facts)
+    }
+
+    #[test]
+    fn recovers_and_agrees_with_rho_negation_over_several_seeds() {
+        let strong = method(NEG_STRONG, &[("lanes", "8"), ("dp_bits", "auto")]);
+        let plain = method("rho.negation", &[]);
+        for m in 4..=6u32 {
+            let (inst, facts) = f2m4(m, 1);
+            applicable(&strong, &inst, &facts).unwrap();
+            for seed in 0..4u64 {
+                let k = (17 + 1009 * u128::from(seed) + u128::from(m)) % facts.r;
+                let target = inst.mul_generator_hex(k).unwrap();
+                let a = solve(&strong, &inst, &facts, &target, seed).unwrap();
+                let b = solve(&plain, &inst, &facts, &target, seed).unwrap();
+                assert_eq!(a.recovered, Some(k), "m = {m}, seed {seed}");
+                assert_eq!(a.recovered, b.recovered, "m = {m}, seed {seed}");
+                let sum: f64 = a.phases.iter().map(|p| p.gae).sum();
+                assert_eq!(sum, a.total_gae);
+                let per_add = a.counters["fq_muls_per_add"] as f64;
+                let charged = a.counters["fq_muls"] as f64;
+                assert!((a.total_gae - charged / per_add).abs() <= 1e-9 * a.total_gae);
+                assert_eq!(
+                    a.counters["fq_muls"],
+                    a.counters["fq_muls_setup"]
+                        + a.counters["fq_muls_search"]
+                        + a.counters["fq_muls_check"]
+                        + a.counters["fq_muls_canonicalisation"]
+                );
+                assert!(a
+                    .unpriced
+                    .contains(&"partition_hashes_uncharged".to_string()));
+                // Replays bit for bit.
+                let again = solve(&strong, &inst, &facts, &target, seed).unwrap();
+                assert_eq!(a.counters, again.counters);
+                assert_eq!(a.total_gae, again.total_gae);
+            }
+        }
+    }
+
+    #[test]
+    fn refuses_other_curves_and_bad_parameters() {
+        let strong = method(NEG_STRONG, &[("lanes", "8"), ("dp_bits", "auto")]);
+        let spec = CurveSpec::PrimeSearch {
+            bits: 14,
+            seed: 59297,
+        };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        assert!(applicable(&strong, &inst, &facts).is_err());
+        let (inst, facts) = f2m4(4, 1);
+        let bad = method(NEG_STRONG, &[("lanes", "0"), ("dp_bits", "4")]);
+        assert!(applicable(&bad, &inst, &facts).is_err());
+        let bad = method(NEG_STRONG, &[("lanes", "4"), ("dp_bits", "0")]);
+        assert!(applicable(&bad, &inst, &facts).is_err());
+        // No default for the walk's shape.
+        assert!(resolve(&MethodSpec {
+            id: NEG_STRONG.into(),
+            params: BTreeMap::new(),
+        })
+        .is_err());
     }
 }
 
