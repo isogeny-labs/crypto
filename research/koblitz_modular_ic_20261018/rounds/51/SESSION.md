@@ -85,3 +85,10 @@ coefficients are polynomial,and the complete32-entry PID lift passes with
 corruption rejection:normal_chart_member=1,obstruction_code=0. This certifies
 actual finite-z chart denominator cancellation. Diamondnu transport is still
 separate. line51-01 admitted next for the source-bound ordinary packet test.
+
+line51-01 accepted exit0/noerrors/exactmarker. The actual ordinary QR packet
+is identified as the line y=lambda*x+nu:root algebra48,separable cubic,
+full doubling-line product,3unit products,source-compatible doubling,
+three doublings identity,chord recovery unit,exact sign action,changed
+intercept rejection,monic degree24 point annihilator and5fresh serialized
+full products. collision51-01 admitted next for the3/7denominator geometry.

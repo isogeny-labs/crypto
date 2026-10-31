@@ -23,6 +23,30 @@ for p in sorted((h/'runs').iterdir()):
         row['status']='accepted' if row['native_exit']==0 and not errors and marker in log.splitlines() else 'rejected'
     rows.append(row)
 result={'scope':'R51 actual chart maps and larger marked23 QR construction','status_counts':dict(Counter(r['status'] for r in rows)),'runs':rows,'retained_source_field_degree':32,'normalization_generators_per_direction':32,'directional_regularity_certificates':64,'clearing_power':62,'lean_theorems':sum({x['root']:x['audited_theorems'] for x in rows if x['status']=='accepted' and x.get('kind')=='Lean'}.values()),'scope_limits':['native arrays and RR/open-cover premises are not encoded in Lean','marked23 quotient dimension is not primality','selected modular-factor action and polarized embedding remain separate']}
+accepted={row['attempt'] for row in rows if row['status']=='accepted'}
+def native_value(attempt,key):
+    if attempt not in accepted:return None
+    match=re.search(r'(?<![A-Za-z_])'+re.escape(key)+r'=(\d+)(?![0-9])',(h/'runs'/attempt/'native.log').read_text())
+    assert match,(attempt,key)
+    return int(match.group(1))
+counts={
+ 'localized_generator_compatibilities':64 if 'glue-reload51-01' in accepted else None,
+ 'localized_normal_chart_maps':2 if 'glue-reload51-01' in accepted else None,
+ 'universal_certificate_denominator_degree':native_value('universal51-01','denominator_degree'),
+ 'structured_marked23_algebra_dimension':native_value('base23-struct51-03','F2x_algebra_dimension'),
+ 'structured_marked23_source_equations':native_value('base23-struct51-03','complete_coupled_source_equations'),
+ 'integral_nu_normal_chart_coordinates':native_value('nu51-01','normal_chart_member'),
+ 'QR_square_determinant_actions':native_value('fiber51-01','QR_determinant_matrices'),
+ 'QR_largest_cycle':native_value('fiber51-01','longest_cycle'),
+ 'Hecke3_kernel_parameter_degree':native_value('hecke3-51-01','kernel_parameter_degree'),
+ 'Hecke3_isogeny_degree':native_value('hecke3-51-01','isogeny_X_degree'),
+ 'ordinary_QR_point_algebra_dimension':native_value('line51-01','point_root_algebra_dimension'),
+ 'coprime_kernel_Bezout_Delta_exponent':16 if 'collision51-01' in accepted else None,
+ 'nu_diamond_PID_entries':native_value('diamond-nu51-01','complete_transport_PID_entries'),
+ 'nu_diamond_clearing_power':native_value('diamond-nu51-01','normal_chart_clearing_power'),
+ 'audited_unique_theorems':result['lean_theorems'],
+}
+result['construction_counts']=counts
 (h/'results.json').write_text(json.dumps(result,indent=2)+'\n')
 state={k:next((r['status'] for r in reversed(rows) if r['attempt'].startswith(k+'51-') or (k=='base23' and r['attempt'].startswith('base23-51-'))),'prepared') for k in markers}
 if any(x['attempt'].startswith('base23-struct51-') and x['status']=='accepted' for x in rows): state['base23']='accepted'
@@ -36,7 +60,7 @@ svg += [f'<text x="24" y="407" font-size="15">{result["lean_theorems"]} unique a
 (h/'round51.svg').write_text('\n'.join(svg)+'\n')
 def text(s): return 'text('+json.dumps(s)+')'
 tr=[]
-for r in rows: tr += [text(r['attempt']),text(r['status']),text('compile '+str(r['compile_exit'])+', audit '+str(r['audit_exit']) if r.get('kind')=='Lean' else 'exit '+str(r.get('native_exit','pending')))]
+for r in rows: tr += [text(r['attempt']),text(r['status']),text('compile '+str(r['compile_exit'])+', audit '+str(r['audit_exit']) if r.get('kind')=='Lean' else 'exit '+str(r.get('native_exit','pending'))+('; '+str(len(r['error_lines']))+' error(s)' if r.get('error_lines') else ''))]
 typ='''#set page(paper: "a4", margin: 15mm)
 #set text(size: 10pt)
 = R51: explicit normalization-generator maps and QR transport
@@ -67,5 +91,6 @@ primality or a selected order991 action. The finite-group stage checks whether
 an irreducible degree16 ordinary fiber can be an appropriate test at all.
 See the frozen stage protocols and NEXT.md for acceptance dependencies.
 '''
+if result['lean_theorems']>5: typ += '\nSpecialize51 adds four audited declarations: denominator-unit cancellation,scaled ideal equality,the three-doubling group consequence,and the exact line intersection identity. Actual native inputs remain external premises.\n'
 (h/'report.typ').write_text(typ)
 print(json.dumps(result['status_counts']))

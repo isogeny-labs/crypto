@@ -84,3 +84,36 @@ exact lattice obstruction and investigate joint Hecke/Frobenius/diamond
 saturation. If it is a unit mod11,compose with the required factor/sign
 selection and test actual divisor images. This gives T3 a useful role while
 keeping a3=0 explicit. No coefficient-box or inferred nonzero-action claim.
+
+## 5. The actual QR packet is a line: native construction now accepted
+
+LINE51 identifies the ordinary universal variables exactly as line slope and
+intercept. Intersect y=lambda*x+nu with the Tate cubic:
+
+    x³+(b+lambda²+(1+c)lambda)x²+((1+c)nu+b lambda)x+nu²+b nu.
+
+Over the actual degree16 QR algebra,this gives a separable degree3 root
+algebra of dimension48. Full native products certify that doubling preserves
+the line,three doublings are identity,the tangent/chord denominators are
+units,and the sign action is exactly lambda->lambda+1+c,nu->nu+b. An explicit
+monic degree24 point polynomial has a full source-ideal membership certificate.
+All five serialized products recheck. The elementary group consequence8P=P
+implies7P=0 is included in the pending new Lean module;the actual native
+coordinate identities are not encoded in Lean.
+
+This unlocks a direct packet construction for Hecke3. In the cubic root
+algebra,map each point through the accepted Velu3 functions. Recover a line
+Y_image=Lambda*X_image+Nu by its three coefficient equations,then transform
+that line under the Tate normalization of the marked point. Verify all
+coefficients and the original QR equations,including the quadratic gamma
+untwist;use alternate chord coefficients for exceptional branches. No search
+for a lambda/nu rational-function ansatz is required.
+
+The same identification explains the independent actual-nu membership result:
+lambda has a monic degree16 equation,the point x has a monic degree24 equation,
+and y satisfies the monic curve equation;nu=y-lambda*x is therefore integral
+over the Tate coefficient ring. On the actual level77 finite-z chart,b,c are
+integral,and nu51-01 independently verifies the entire32-entry normal-module
+lift. This is actual exceptional-denominator cancellation,under the retained
+normal-RR identification;its precise pole orders at the omitted fibers remain
+part of the complete RR geometry task.
