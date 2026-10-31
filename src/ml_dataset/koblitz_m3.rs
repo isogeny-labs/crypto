@@ -70,6 +70,7 @@ pub(super) struct Budget {
     trace_bytes: u64,
     additions: u64,
     stopped: Option<Stop>,
+    retention_started: bool,
 }
 
 impl Budget {
@@ -108,6 +109,7 @@ impl Budget {
             trace_bytes: 0,
             additions: 0,
             stopped: None,
+            retention_started: false,
         })
     }
 
@@ -8415,4 +8417,310 @@ fn verify_outer_outcome(
         solver_completed: completed,
         retained_witness_verified: witness,
     })
+}
+
+#[derive(Clone, Copy, Debug, Default)]
+struct RetentionQuote {
+    work: u64,
+    bytes: u64,
+    trace: u64,
+}
+/// Exclusive post-producer retention session. Charges stay in the original
+/// ledger. No stop/deadline/phase reset and no fresh native allowance is granted.
+struct ParentRetention<'a> {
+    budget: &'a mut Budget,
+    stop: Option<Stop>,
+}
+struct RetentionCall<T, E> {
+    value: Option<T>,
+    error: Option<E>,
+    stop: Option<Stop>,
+}
+impl<'a> ParentRetention<'a> {
+    fn begin(budget: &'a mut Budget) -> Result<Self, Stop> {
+        if budget.retention_started || (budget.phase != Phase::Complete && budget.stopped.is_none())
+        {
+            return Err(Stop::Phase);
+        }
+        budget.retention_started = true;
+        Ok(Self { budget, stop: None })
+    }
+    /// Transactionally reserve all dimensions before the parent action. A late
+    /// native settlement can exceed limits; checked sums reject it safely.
+    fn admit(&mut self, quote: RetentionQuote, now: Instant) -> Result<(), Stop> {
+        if let Some(stop) = self.stop {
+            return Err(stop);
+        }
+        let result = (|| {
+            if now >= self.budget.deadline {
+                return Err(Stop::Deadline);
+            }
+            let checking = self
+                .budget
+                .checking_work
+                .checked_add(quote.work)
+                .ok_or(Stop::Overflow)?;
+            let work = self
+                .budget
+                .native
+                .work
+                .checked_add(checking)
+                .ok_or(Stop::Overflow)?;
+            let adapter = self
+                .budget
+                .adapter_bytes
+                .checked_add(quote.bytes)
+                .ok_or(Stop::Overflow)?;
+            let bytes = self
+                .budget
+                .native
+                .bytes
+                .checked_add(adapter)
+                .ok_or(Stop::Overflow)?;
+            let trace = self
+                .budget
+                .trace_bytes
+                .checked_add(quote.trace)
+                .ok_or(Stop::Overflow)?;
+            if work > self.budget.native_work_limit {
+                return Err(Stop::Work);
+            }
+            if bytes > self.budget.memory_limit {
+                return Err(Stop::Bytes);
+            }
+            if trace > self.budget.trace_limit {
+                return Err(Stop::Trace);
+            }
+            self.budget.checking_work = checking;
+            self.budget.adapter_bytes = adapter;
+            self.budget.trace_bytes = trace;
+            Ok(())
+        })();
+        if let Err(stop) = result {
+            self.stop = Some(stop);
+        }
+        result
+    }
+    fn execute<T, E>(
+        &mut self,
+        quote: RetentionQuote,
+        action: impl FnOnce() -> Result<T, E>,
+    ) -> RetentionCall<T, E> {
+        self.execute_with_clock(quote, Instant::now(), action, Instant::now)
+    }
+    fn execute_with_clock<T, E>(
+        &mut self,
+        quote: RetentionQuote,
+        before: Instant,
+        action: impl FnOnce() -> Result<T, E>,
+        after: impl FnOnce() -> Instant,
+    ) -> RetentionCall<T, E> {
+        if let Err(stop) = self.admit(quote, before) {
+            return RetentionCall {
+                value: None,
+                error: None,
+                stop: Some(stop),
+            };
+        }
+        // Preserve acknowledgement before observing the return-time clock.
+        // A failed or late operation still consumes its complete reservation.
+        let (value, error) = match action() {
+            Ok(value) => (Some(value), None),
+            Err(error) => {
+                self.stop = Some(Stop::Observer);
+                (None, Some(error))
+            }
+        };
+        if after() >= self.budget.deadline && self.stop.is_none() {
+            self.stop = Some(Stop::Deadline);
+        }
+        RetentionCall {
+            value,
+            error,
+            stop: self.stop,
+        }
+    }
+}
+#[cfg(test)]
+mod parent_retention_admission_tests {
+    use super::*;
+    #[test]
+    fn stopped_producer_keeps_original_stop_phase_deadline_and_cumulative_charges() {
+        let mut b = construction_tests::budget();
+        b.stopped = Some(Stop::Observer);
+        let phase = b.phase;
+        let deadline = b.deadline;
+        let before = (b.checking_work, b.adapter_bytes, b.trace_bytes);
+        let mut parent = ParentRetention::begin(&mut b).unwrap();
+        let r = parent.execute(
+            RetentionQuote {
+                work: 7,
+                bytes: 11,
+                trace: 13,
+            },
+            || Ok::<_, ()>("saved"),
+        );
+        assert_eq!(r.value, Some("saved"));
+        assert!(r.error.is_none() && r.stop.is_none());
+        assert_eq!(parent.budget.stopped, Some(Stop::Observer));
+        assert_eq!(parent.budget.phase, phase);
+        assert_eq!(parent.budget.deadline, deadline);
+        assert_eq!(
+            (
+                parent.budget.checking_work,
+                parent.budget.adapter_bytes,
+                parent.budget.trace_bytes
+            ),
+            (before.0 + 7, before.1 + 11, before.2 + 13)
+        );
+        drop(parent);
+        assert!(matches!(ParentRetention::begin(&mut b), Err(Stop::Phase)));
+        assert_eq!(b.check(Instant::now()), Err(Stop::Observer));
+    }
+    #[test]
+    fn exact_and_one_over_admission_is_transactional_and_cannot_restart() {
+        for dimension in 0..3 {
+            let mut b = construction_tests::budget();
+            b.phase = Phase::Complete;
+            b.native.work = 2;
+            b.checking_work = 3;
+            b.native_work_limit = 12;
+            b.native.bytes = 5;
+            b.adapter_bytes = 7;
+            b.memory_limit = 23;
+            b.trace_bytes = 17;
+            b.trace_limit = 30;
+            let mut parent = ParentRetention::begin(&mut b).unwrap();
+            parent
+                .admit(
+                    RetentionQuote {
+                        work: 7,
+                        bytes: 11,
+                        trace: 13,
+                    },
+                    Instant::now(),
+                )
+                .unwrap();
+            let before = (
+                parent.budget.checking_work,
+                parent.budget.adapter_bytes,
+                parent.budget.trace_bytes,
+            );
+            let mut q = RetentionQuote::default();
+            match dimension {
+                0 => q.work = 1,
+                1 => q.bytes = 1,
+                _ => q.trace = 1,
+            };
+            let expected = [Stop::Work, Stop::Bytes, Stop::Trace][dimension];
+            assert_eq!(parent.admit(q, Instant::now()), Err(expected));
+            assert_eq!(
+                (
+                    parent.budget.checking_work,
+                    parent.budget.adapter_bytes,
+                    parent.budget.trace_bytes
+                ),
+                before
+            );
+            assert_eq!(
+                parent.admit(RetentionQuote::default(), Instant::now()),
+                Err(expected)
+            );
+            assert_eq!(parent.budget.stopped, None);
+            assert_eq!(parent.budget.phase, Phase::Complete);
+        }
+    }
+    #[test]
+    fn deadline_failure_and_late_acknowledgement_preserve_exact_evidence() {
+        let mut b = construction_tests::budget();
+        assert!(matches!(ParentRetention::begin(&mut b), Err(Stop::Phase)));
+        b.phase = Phase::Complete;
+        let deadline = b.deadline;
+        let mut parent = ParentRetention::begin(&mut b).unwrap();
+        let r = parent.execute_with_clock(
+            RetentionQuote {
+                work: 7,
+                bytes: 11,
+                trace: 13,
+            },
+            Instant::now(),
+            || Ok::<_, ()>(42),
+            || deadline,
+        );
+        assert_eq!(r.value, Some(42));
+        assert_eq!(r.stop, Some(Stop::Deadline));
+        let before = parent.budget.checking_work;
+        let r = parent.execute(
+            RetentionQuote {
+                work: 1,
+                ..Default::default()
+            },
+            || -> Result<(), ()> { panic!("post-stop I/O") },
+        );
+        assert_eq!(r.stop, Some(Stop::Deadline));
+        assert_eq!(parent.budget.checking_work, before);
+        let mut b = construction_tests::budget();
+        b.stopped = Some(Stop::Bytes);
+        let deadline = b.deadline;
+        let mut parent = ParentRetention::begin(&mut b).unwrap();
+        let r = parent.execute_with_clock(
+            RetentionQuote {
+                work: 1,
+                ..Default::default()
+            },
+            deadline,
+            || -> Result<(), ()> { panic!("expired I/O") },
+            Instant::now,
+        );
+        assert_eq!(r.stop, Some(Stop::Deadline));
+        assert_eq!(parent.budget.checking_work, 0);
+        assert_eq!(parent.budget.stopped, Some(Stop::Bytes));
+    }
+    #[test]
+    fn failed_io_overflow_and_late_native_excess_never_refund_or_wrap() {
+        let mut b = construction_tests::budget();
+        b.phase = Phase::Complete;
+        let mut parent = ParentRetention::begin(&mut b).unwrap();
+        let r = parent.execute(
+            RetentionQuote {
+                work: 7,
+                bytes: 11,
+                trace: 13,
+            },
+            || Err::<(), _>("selected I/O failure"),
+        );
+        assert_eq!(r.error, Some("selected I/O failure"));
+        assert!(r.value.is_none());
+        assert_eq!(r.stop, Some(Stop::Observer));
+        assert_eq!(
+            (
+                parent.budget.checking_work,
+                parent.budget.adapter_bytes,
+                parent.budget.trace_bytes
+            ),
+            (7, 11, 13)
+        );
+        for overflow in [false, true] {
+            let mut b = construction_tests::budget();
+            b.stopped = Some(Stop::NativeFailure);
+            b.native.work = if overflow {
+                u64::MAX
+            } else {
+                b.native_work_limit + 1
+            };
+            let mut parent = ParentRetention::begin(&mut b).unwrap();
+            assert_eq!(
+                parent.admit(
+                    RetentionQuote {
+                        work: 1,
+                        ..Default::default()
+                    },
+                    Instant::now()
+                ),
+                Err(if overflow { Stop::Overflow } else { Stop::Work })
+            );
+            assert_eq!(parent.budget.checking_work, 0);
+            assert_eq!(parent.budget.stopped, Some(Stop::NativeFailure));
+        }
+    }
 }
