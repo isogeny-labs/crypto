@@ -3256,6 +3256,8 @@ pub(super) fn run_chain_cli(
     run_dir: &Path,
     frobenius_orbits: bool,
     order_first_pair: bool,
+    karatsuba: bool,
+    shallow_karatsuba: bool,
 ) -> Result<Value> {
     if ![64, 256, 600].contains(&columns) && !V2_SIZES.contains(&columns)
         || !fixture_root.join("probe-corpus.json").is_file()
@@ -3282,6 +3284,8 @@ pub(super) fn run_chain_cli(
         || memory_mib < 128
         || memory_mib > 65536
         || (order_first_pair && !frobenius_orbits)
+        || (karatsuba && frobenius_orbits)
+        || (karatsuba && shallow_karatsuba)
     {
         return Err(
             "primary chained-S3 search caps or base selection outside supported domain".into(),
@@ -3298,11 +3302,20 @@ pub(super) fn run_chain_cli(
         source_commit,
         source_attestation_mode,
     };
-    let strategy = match (frobenius_orbits, order_first_pair) {
-        (false, false) => "chain-s3",
-        (true, false) => "orbit-chain-s3",
-        (true, true) => "ordered-orbit-chain-s3",
-        (false, true) => unreachable!("checked above"),
+    let strategy = match (
+        frobenius_orbits,
+        order_first_pair,
+        karatsuba,
+        shallow_karatsuba,
+    ) {
+        (false, false, false, false) => "chain-s3",
+        (false, false, true, false) => "chain-s3-karatsuba",
+        (false, false, false, true) => "chain-s3-shallow-karatsuba",
+        (true, false, false, false) => "orbit-chain-s3",
+        (true, false, false, true) => "orbit-chain-s3-shallow-karatsuba",
+        (true, true, false, false) => "ordered-orbit-chain-s3",
+        (true, true, false, true) => "ordered-orbit-chain-s3-shallow-karatsuba",
+        _ => unreachable!("checked above"),
     };
     run_with_config(
         root,
@@ -3340,12 +3353,29 @@ fn run_with_config(
                     .into(),
             )
         }
+        "chain-s3" if chain.is_some() && (5..=6).contains(&m) => DecompositionStrategy::ChainedS3,
+        "chain-s3-karatsuba" if chain.is_some() && (5..=6).contains(&m) => {
+            DecompositionStrategy::ChainedS3Karatsuba
+        }
+        "chain-s3-shallow-karatsuba" if chain.is_some() && (5..=6).contains(&m) => {
+            DecompositionStrategy::ChainedS3ShallowKaratsuba
+        }
+        "orbit-chain-s3" if chain.is_some() && (5..=6).contains(&m) => {
+            DecompositionStrategy::ChainedS3FrobeniusOrbit
+        }
+        "orbit-chain-s3-shallow-karatsuba" if chain.is_some() && (5..=6).contains(&m) => {
+            DecompositionStrategy::ChainedS3FrobeniusOrbitShallowKaratsuba
+        }
+        "ordered-orbit-chain-s3" if chain.is_some() && (5..=6).contains(&m) => {
         "chain-s3" if chain.is_some() && (4..=6).contains(&m) => DecompositionStrategy::ChainedS3,
         "orbit-chain-s3" if chain.is_some() && (4..=6).contains(&m) => {
             DecompositionStrategy::ChainedS3FrobeniusOrbit
         }
         "ordered-orbit-chain-s3" if chain.is_some() && (4..=6).contains(&m) => {
             DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered
+        }
+        "ordered-orbit-chain-s3-shallow-karatsuba" if chain.is_some() && (5..=6).contains(&m) => {
+            DecompositionStrategy::ChainedS3FrobeniusOrbitOrderedShallowKaratsuba
         }
         _ => return Err("unsupported or unguarded primary strategy".into()),
     };

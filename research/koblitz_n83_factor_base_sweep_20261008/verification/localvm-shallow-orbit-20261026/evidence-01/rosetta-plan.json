@@ -1,0 +1,67 @@
+{
+  "aggregate_outer_cap_seconds": 1120,
+  "binary": "/Volumes/SSD990/llm/tmp/n83-karatsuba-linux-target/x86_64-unknown-linux-musl/release/examples/koblitz_n83_factor_base_export",
+  "binary_sha256": "a1d29a516aafd247c352e6de24a85927a7c0f5b4e403ad6f39e4eb993ffc6967",
+  "claim_scope": "stage_diagnostic_only",
+  "conflict_budget_per_arm": 5000,
+  "cpus": 1,
+  "curve": "icv1-f2m83-tm6151469093347-debefd74",
+  "domain_encoding": "frobenius_orbit_phase",
+  "fixture_dir": "/Volumes/SSD990/cryptanalysis/.worktrees/n83-karatsuba-s3/research/koblitz_n83_factor_base_sweep_20261008/pilot-01",
+  "fixture_sha256": {
+    "probe-corpus.json": "760ae5c2e88615152e2569653a0e0c0cf3b2f84691f2b0731247f9ee3759dcbd",
+    "probe-validation.json": "1c6d3a45c8b4654ff208751258fa2e34f0cc60e1c30ba48e9214db62be60472f"
+  },
+  "max_domain_clauses": 1000000,
+  "max_models": 32,
+  "max_trials_per_arm": 1,
+  "max_variables": 150000,
+  "memory_mib": 4096,
+  "network": "none",
+  "ordered_first_pair": false,
+  "outer_wall_seconds_per_arm": 280,
+  "panels": {
+    "1182": {
+      "object_path": "/Volumes/SSD990/llm/tmp/n83-shallow-orbit-panel-k1182-20261026/objects/76e1cbe4ea5a9d26e5b24a2d27f9401271dc471846529190a0416d8e09837a92.jsonl.gz",
+      "object_sha256": "eb342b574e244e1e67e8e78c805f33ee88edcdb4f3a14d4114e6f413beede380",
+      "panel_dir": "/Volumes/SSD990/llm/tmp/n83-shallow-orbit-panel-k1182-20261026",
+      "point_set_blake3": "429cde4bc514bf1026e4993e269192f858cb7410ade777178a1c0db7dbf0001a",
+      "points": 196212,
+      "policy": "public_x_hash",
+      "seed": 2026100801
+    },
+    "2048": {
+      "object_path": "/Volumes/SSD990/llm/tmp/n83-shallow-orbit-panel-k2048-20261026/objects/82990cda5d57b1c4c4b635673a881ad233c24f707e7ac644a11478aeddddf851.jsonl.gz",
+      "object_sha256": "aacb62784dee0c9f5e06328dbb85a4b6a1c7243e778328da82900e7284f3a74a",
+      "panel_dir": "/Volumes/SSD990/llm/tmp/n83-shallow-orbit-panel-k2048-20261026",
+      "point_set_blake3": "d528f5828a05a00add4252212bc909ece481f33093e4074ff7dd8c6a51d3c97e",
+      "points": 339968,
+      "policy": "public_x_hash",
+      "seed": 2026100801
+    }
+  },
+  "schedule": [
+    {
+      "columns": 1182,
+      "kernel": "schoolbook"
+    },
+    {
+      "columns": 2048,
+      "kernel": "shallow_karatsuba"
+    },
+    {
+      "columns": 1182,
+      "kernel": "shallow_karatsuba"
+    },
+    {
+      "columns": 2048,
+      "kernel": "schoolbook"
+    }
+  ],
+  "schema": "n83.shallow-orbit-first-pair-plan/v1",
+  "selected_best_total_runtime_ms": null,
+  "source_commit": "88893c8deb6fa19e490c945f5d89d2a7220bf8c8",
+  "status": "READY_FOR_GUARDED_HOST",
+  "summands": 5,
+  "swap_mib": 0
+}
