@@ -483,7 +483,13 @@ where
     );
     match result {
         Ok(output) => {
-            let adapter_stop = budget.finish_native(Instant::now()).err();
+            let adapter_stop = budget
+                .settle_native_terminal(Reservation {
+                    work: output.reserved.work,
+                    bytes: output.reserved.bytes,
+                })
+                .and_then(|()| budget.finish_native(Instant::now()))
+                .err();
             Construction {
                 output: Some(output),
                 native_failure: None,
@@ -491,10 +497,13 @@ where
             }
         }
         Err(failure) => {
-            let adapter_stop = budget.stopped;
-            // Keep the precise native cause in the report; seal the shared
-            // ledger so a caller cannot run a matrix after failed construction.
-            let _ = budget.fail::<()>(Stop::NativeFailure);
+            let _ = budget.settle_native_terminal(Reservation {
+                work: failure.reserved.work,
+                bytes: failure.reserved.bytes,
+            });
+            // Preserve the final native reservation and precise failure while
+            // preventing any later phase from treating this return as success.
+            let adapter_stop = Some(*budget.stopped.get_or_insert(Stop::NativeFailure));
             Construction {
                 output: None,
                 native_failure: Some(failure),
@@ -764,8 +773,14 @@ where
             )
         }
     };
+    let settlement = budget.settle_native_terminal(Reservation {
+        work: report.reserved.work,
+        bytes: report.reserved.bytes,
+    });
     let adapter_stop = if report.stop == native::Stop::Complete && report.native_step_complete {
-        budget.finish_native(Instant::now()).err()
+        settlement
+            .and_then(|()| budget.finish_native(Instant::now()))
+            .err()
     } else {
         // Preserve an earlier observer/deadline failure, otherwise expose the
         // native failure recorded in the sticky ledger to the pipeline caller.
@@ -1479,7 +1494,11 @@ mod construction_tests {
         let result = construct_original(&input, &mut capped, &mut |_, _| Ok(()));
         assert!(result.output.is_none());
         assert_eq!(result.native_failure.unwrap().stop, native::Stop::WorkLimit);
-        assert_eq!(result.adapter_stop, None);
+        assert_eq!(result.adapter_stop, Some(Stop::NativeFailure));
+        assert_eq!(
+            capped.native.work,
+            result.native_failure.unwrap().reserved.work
+        );
         assert_eq!(
             capped.begin_native(true, Instant::now()),
             Err(Stop::NativeFailure)
@@ -4559,6 +4578,176 @@ mod matrix_report_replay_tests {
                 limits
             )
             .is_err());
+        }
+    }
+}
+
+impl Budget {
+    /// Reconcile an actual terminal native snapshot without consulting time or
+    /// reopening a stopped phase. Valid reservations survive an earlier failure.
+    fn settle_native_terminal(&mut self, current: Reservation) -> Result<(), Stop> {
+        if !matches!(self.phase, Phase::Construction | Phase::Matrix) {
+            return self.fail(Stop::Phase);
+        }
+        if current.work < self.phase_native.work || current.bytes < self.phase_native.bytes {
+            return self.fail(Stop::Nonmonotone);
+        }
+        if current.work > self.phase_limits.work {
+            return self.fail(Stop::Work);
+        }
+        if current.bytes > self.phase_limits.bytes {
+            return self.fail(Stop::Bytes);
+        }
+        let Some(work) = self
+            .native
+            .work
+            .checked_add(current.work - self.phase_native.work)
+        else {
+            return self.fail(Stop::Overflow);
+        };
+        let Some(bytes) = self
+            .native
+            .bytes
+            .checked_add(current.bytes - self.phase_native.bytes)
+        else {
+            return self.fail(Stop::Overflow);
+        };
+        // Keep a valid native report even if callback reservations consumed the
+        // aggregate headroom. That discrepancy is a failure, never a refund.
+        self.native = Reservation { work, bytes };
+        self.phase_native = current;
+        if work
+            .checked_add(self.checking_work)
+            .is_none_or(|total| total > self.native_work_limit)
+        {
+            return self.fail(Stop::Work);
+        }
+        if bytes
+            .checked_add(self.adapter_bytes)
+            .is_none_or(|total| total > self.memory_limit)
+        {
+            return self.fail(Stop::Bytes);
+        }
+        match self.stopped {
+            Some(stop) => Err(stop),
+            None => Ok(()),
+        }
+    }
+}
+#[cfg(test)]
+mod terminal_native_settlement_tests {
+    use super::*;
+    fn running() -> Budget {
+        let mut b = construction_tests::budget();
+        b.begin_native(false, Instant::now()).unwrap();
+        b
+    }
+    #[test]
+    fn terminal_delta_survives_deadline_and_observer_stop_without_restarting() {
+        for stop in [Stop::Deadline, Stop::Observer] {
+            let mut b = running();
+            b.observe(Reservation { work: 2, bytes: 3 }, Instant::now())
+                .unwrap();
+            b.stopped = Some(stop);
+            b.deadline = Instant::now();
+            b.construction_deadline = Instant::now();
+            let final_snapshot = Reservation { work: 7, bytes: 11 };
+            assert_eq!(b.settle_native_terminal(final_snapshot), Err(stop));
+            assert_eq!(b.native, final_snapshot);
+            assert_eq!(b.settle_native_terminal(final_snapshot), Err(stop));
+            assert_eq!(b.native, final_snapshot);
+            assert_eq!(b.finish_native(Instant::now()), Err(stop));
+            assert_eq!(b.begin_native(true, Instant::now()), Err(stop));
+        }
+    }
+    #[test]
+    fn terminal_snapshot_rejects_regression_permit_overflow_and_integer_overflow() {
+        let mut b = running();
+        b.observe(Reservation { work: 2, bytes: 3 }, Instant::now())
+            .unwrap();
+        assert_eq!(
+            b.settle_native_terminal(Reservation { work: 1, bytes: 3 }),
+            Err(Stop::Nonmonotone)
+        );
+        assert_eq!(b.native, Reservation { work: 2, bytes: 3 });
+        let mut b = running();
+        let work = b.phase_limits.work + 1;
+        assert_eq!(
+            b.settle_native_terminal(Reservation { work, bytes: 0 }),
+            Err(Stop::Work)
+        );
+        assert_eq!(b.native, Reservation::default());
+        let mut b = running();
+        let bytes = b.phase_limits.bytes + 1;
+        assert_eq!(
+            b.settle_native_terminal(Reservation { work: 0, bytes }),
+            Err(Stop::Bytes)
+        );
+        assert_eq!(b.native, Reservation::default());
+        let mut b = running();
+        b.native.work = u64::MAX;
+        assert_eq!(
+            b.settle_native_terminal(Reservation { work: 1, bytes: 0 }),
+            Err(Stop::Overflow)
+        );
+        assert_eq!(b.native.work, u64::MAX);
+    }
+    #[test]
+    fn terminal_headroom_conflict_retains_report_and_stops_later_work() {
+        for memory in [false, true] {
+            let mut b = running();
+            if memory {
+                b.adapter_bytes = b.memory_limit - 1;
+            } else {
+                b.checking_work = b.native_work_limit - 1;
+            }
+            let current = Reservation { work: 2, bytes: 2 };
+            let expected = if memory { Stop::Bytes } else { Stop::Work };
+            assert_eq!(b.settle_native_terminal(current), Err(expected));
+            assert_eq!(b.native, current);
+            assert_eq!(b.reserve_bytes(1, Instant::now()), Err(expected));
+            assert_eq!(b.settle_native_terminal(current), Err(expected));
+            assert_eq!(b.native, current);
+        }
+    }
+    #[test]
+    fn actual_native_failure_before_begin_callback_is_charged_for_both_engines() {
+        use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native;
+        use crate::cryptanalysis::pq_groebner_f2::F2BoolMono;
+        for engine in [
+            native::Engine::F4Macaulay,
+            native::Engine::F5KoszulFrobenius,
+        ] {
+            let original = construction_tests::fixture();
+            let mut b = construction_tests::budget();
+            let mut output = construct_original(&original, &mut b, &mut |_, _| Ok(()))
+                .output
+                .unwrap();
+            // Deliberately noncanonical native input: entry admission precedes
+            // this validation, so its reservation has no Begin callback.
+            output.equations[0].terms = vec![F2BoolMono::one(), F2BoolMono::one()];
+            let before = b.native;
+            let input = persist_original(
+                &original,
+                &output,
+                &mut b,
+                &matrix_tests::binding(),
+                &"8".repeat(64),
+                &"9".repeat(64),
+                &mut |_, _| Ok(()),
+            )
+            .unwrap();
+            let result = matrix_step(input, engine, 3, &mut |_, _| panic!("unexpected callback"));
+            let report = result.report.unwrap();
+            assert_eq!(report.stop, native::Stop::InvalidInput);
+            assert!(report.reserved.work > 0 && report.reserved.bytes > 0);
+            assert_eq!(b.native.work, before.work + report.reserved.work);
+            assert_eq!(b.native.bytes, before.bytes + report.reserved.bytes);
+            assert_eq!(result.adapter_stop, Some(Stop::NativeFailure));
+            assert_eq!(
+                b.begin_extraction(true, Instant::now()),
+                Err(Stop::NativeFailure)
+            );
         }
     }
 }
