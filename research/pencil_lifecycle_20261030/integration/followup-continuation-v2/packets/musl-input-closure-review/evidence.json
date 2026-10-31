@@ -1,0 +1,170 @@
+{
+  "manifests": [
+    {
+      "path": "Cargo.toml",
+      "sha256": "26d916b370a5669ff278cb65e0fb9aad03f3bf7ab2b0b3358a2d5c5b0c2db50c",
+      "paths": [
+        {
+          "name": "hashed-ecdl-tensor",
+          "path": "crates/hashed-ecdl-tensor/Cargo.toml",
+          "optional": false
+        },
+        {
+          "name": "ecdl-tensor-ic",
+          "path": "crates/ecdl-tensor-ic/Cargo.toml",
+          "optional": false
+        },
+        {
+          "name": "pencil-symbolic-graph",
+          "path": "research/pencil_large_prime_20261029/Cargo.toml",
+          "optional": false
+        },
+        {
+          "name": "factor-base",
+          "path": "tools/factor-base/Cargo.toml",
+          "optional": false
+        },
+        {
+          "name": "volcano-cli",
+          "path": "tools/volcano-cli/Cargo.toml",
+          "optional": false
+        },
+        {
+          "name": "isogeny_algos",
+          "path": "isogeny_algos/Cargo.toml",
+          "optional": false
+        }
+      ]
+    },
+    {
+      "path": "isogeny_algos/Cargo.toml",
+      "sha256": "1f546fbad9ccae02f2347fa23b29a63d8b4850c81779084323648ee7168d710d",
+      "paths": []
+    },
+    {
+      "path": "tools/volcano-cli/Cargo.toml",
+      "sha256": "5edd95d84ab81207dbff2086981f5a9cea980a0fc6d1ca81efbff34e98d46cae",
+      "paths": [
+        {
+          "name": "isogeny_algos",
+          "path": "isogeny_algos/Cargo.toml",
+          "optional": false
+        }
+      ]
+    },
+    {
+      "path": "tools/factor-base/Cargo.toml",
+      "sha256": "0e66f1f9753c2440d75ff8459502c43bb16bc3456102fad0c2d859199ba1e00f",
+      "paths": []
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/Cargo.toml",
+      "sha256": "4b9c7c3b6f58fc1f4378806b9a60fd2e879dd19f905a3541e92b5916b80a6ed9",
+      "paths": [
+        {
+          "name": "five-leads-study",
+          "path": "research/five_leads_e2e_20261019/native/Cargo.toml",
+          "optional": true
+        }
+      ]
+    },
+    {
+      "path": "research/five_leads_e2e_20261019/native/Cargo.toml",
+      "sha256": "ff698c89bad7e55b86b7f130a4739ddc6192d647b5dea2e94e01c8eb1da27ec2",
+      "paths": []
+    },
+    {
+      "path": "crates/ecdl-tensor-ic/Cargo.toml",
+      "sha256": "9e07d0abb3a40193427c14a4990c4ff9654155196009a840d1b983b1c6c6b6b0",
+      "paths": []
+    },
+    {
+      "path": "crates/hashed-ecdl-tensor/Cargo.toml",
+      "sha256": "4468c86b8a971e1ae62390a7b098e5da922d91c7a4a4b21741e19344a1d2e1bb",
+      "paths": []
+    }
+  ],
+  "build_scripts": [
+    {
+      "path": "build.rs",
+      "present": false,
+      "text": null
+    },
+    {
+      "path": "isogeny_algos/build.rs",
+      "present": false,
+      "text": null
+    },
+    {
+      "path": "tools/volcano-cli/build.rs",
+      "present": false,
+      "text": null
+    },
+    {
+      "path": "tools/factor-base/build.rs",
+      "present": false,
+      "text": null
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/build.rs",
+      "present": false,
+      "text": null
+    },
+    {
+      "path": "research/five_leads_e2e_20261019/native/build.rs",
+      "present": false,
+      "text": null
+    },
+    {
+      "path": "crates/ecdl-tensor-ic/build.rs",
+      "present": false,
+      "text": null
+    },
+    {
+      "path": "crates/hashed-ecdl-tensor/build.rs",
+      "present": false,
+      "text": null
+    }
+  ],
+  "configs": [
+    {
+      "path": "/home/ec2-user/.cargo/config",
+      "present": false
+    },
+    {
+      "path": "/home/ec2-user/.cargo/config.toml",
+      "present": false
+    },
+    {
+      "path": "/.cargo/config",
+      "present": false
+    },
+    {
+      "path": "/.cargo/config.toml",
+      "present": false
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/.cargo/config",
+      "present": false
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/.cargo/config.toml",
+      "present": false
+    },
+    {
+      "path": "/home/.cargo/config",
+      "present": false
+    },
+    {
+      "path": "/home/.cargo/config.toml",
+      "present": false
+    }
+  ],
+  "lock": {
+    "sha256": "b8698075f4e273fb9b3b290d928fbc9fa94092f8ec277e91023ed6974d242093",
+    "source_kinds": [
+      "local",
+      "registry+https://github.com/rust-lang/crates.io-index"
+    ]
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "attempted": 4,
+  "first_index": 15,
+  "independent_ecdlp_solves": 2,
+  "last_index": 18,
+  "native_status_counts": {
+    "partial": 1,
+    "timeout": 1,
+    "verified": 2
+  },
+  "note": "Bounded exact administrative wave; no timing or method comparison.",
+  "planned_total": 48,
+  "restricted_s3_fresh_get": 4,
+  "rows": [
+    {
+      "archive_sha256": "e60c6e28aa59ed0f70e9b79d0abe6bf8da5bc7789e2a2827b4439f7d1004ce8a",
+      "checkpoint_sha256": "c99aa514c6f89a2966951ba722ecf7c447235f8198e8720e66dc9a51014ad99a",
+      "ecdlp_solve_promoted": false,
+      "index": 15,
+      "method_artifact_verified": true,
+      "native_status": "partial",
+      "solver": "weil",
+      "twist": false
+    },
+    {
+      "archive_sha256": "c0e33fd415739bf0e731fa96c1627fe1324114681e6806f5db1c39f967747bf4",
+      "checkpoint_sha256": "b531f2093cc0daaa0c7a4cf8efcc452d13798231b2f76b47629b06668c2d5969",
+      "ecdlp_solve_promoted": true,
+      "index": 16,
+      "method_artifact_verified": true,
+      "native_status": "verified",
+      "solver": "double-large-prime",
+      "twist": false
+    },
+    {
+      "archive_sha256": "1c80769b8d5a97e765a46072463e91acb4a12f8fa947d589c3b0dc0b76544815",
+      "checkpoint_sha256": "fe171ca39a32c95f752dfc329a2ee79f2775e3bc9a2fbd9f6f42e1b0cf661739",
+      "ecdlp_solve_promoted": true,
+      "index": 17,
+      "method_artifact_verified": true,
+      "native_status": "verified",
+      "solver": "bsgs",
+      "twist": false
+    },
+    {
+      "archive_sha256": "edb7c96a5d40bafe369a203719cb5762cbc2f7aba98de65a2720a9740ae30802",
+      "checkpoint_sha256": "8a3dcca367daca11aa9868971d2dce69eaae3775fa9457103c5868a8a3fdd9f9",
+      "ecdlp_solve_promoted": false,
+      "index": 18,
+      "method_artifact_verified": false,
+      "native_status": "timeout",
+      "solver": "sat",
+      "twist": true
+    }
+  ],
+  "schema": "ml-dataset.binary-methods-wave/v1",
+  "verified_and_exported": 4
+}
