@@ -19,9 +19,11 @@ slower in every unit or that every curve family has the same boundary:
   Crossbred, XL, Buchberger, and exhaustive search;
 - current whole-pipeline IC results remain above matched rho on every admitted
   prime, random-binary, and Koblitz cell;
-- F5 and F6 can reduce their own native solver work without moving the E2E
-  frontier because relation generation, closure, setup, and unpriced work still
-  dominate;
+- on the historical F4/F5/F6 experiment binary, F5 and F6 reduce native solver
+  work without moving the E2E frontier because relation generation, closure,
+  setup, and unpriced work still dominate. A fresh current-binary audit
+  reproduces only 72/144 deterministic rows, so those historical counts are
+  not relabelled as current-source measurements;
 - prime `rootfind-subtract` is a generic table/search algorithm bounded by the
   square-root frontier.  It is not evidence of an algebraic sub-square-root
   attack;
@@ -68,6 +70,7 @@ and GAE do not become comparable merely because they are numbers.
 | `PROTOCOL.md` / `protocol.json` | frozen comparison rules and machine-readable protocol |
 | `specs/` | L2 ECBench specs for the best prime and Koblitz cells and their rho A/A controls |
 | `execution/` | exact build, EKS request, checkpoint, and current blocker receipts |
+| `establishment/` | executable claim certificate and fresh all-replay receipts |
 | `REPORT.md` / `REPORT.pdf` | comprehensive frontier and bottleneck report |
 
 ## Execution status
@@ -77,8 +80,14 @@ The source builds locally as release binary SHA-256
 with Rust 1.99.1.  Local execution is limited to spec validation,
 correctness, and counted-operation preflight.  This workspace has no AWS CLI,
 no AWS identity, no Iso Lab connector, and an invalid GitHub token, so it
-cannot submit the frozen EKS run or publish a PR.  That infrastructure failure
+cannot freeze and submit the prepared EKS run or publish a PR.  That infrastructure failure
 is retained in `execution/BLOCKER.md`; no local wall result is substituted.
+
+The follow-up establishment audit passed 19/19 cross-artifact checks. The
+optimized-rho session reproduced 720/720 deterministic rows with the current
+binary. The historical F4/F5/F6 sessions reproduced 72/144, with all failures
+retained in `establishment/receipts/`; this narrows those solver claims to the
+original measured binary until the prepared current-source campaign runs.
 
 ## Reproduction
 

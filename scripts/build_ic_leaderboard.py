@@ -75,6 +75,7 @@ SOURCES = {
     "f6_small_cold_replay": "research/f6_ic_geometric_closure_20261003/small_cold/replay-certificate.json",
     "f6_ecbench_ladder": "research/f6_ic_ecbench_ladder_20261005/ANALYSIS.json",
     "f4_f5_f6_cross_family": "research/f4_f5_f6_cross_family_20261011/ANALYSIS.json",
+    "frontier_establishment": "research/ecbench_e2e_frontier_20261031/establishment/certificate.json",
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
@@ -1617,6 +1618,17 @@ def build(allow_unvalidated: bool = False) -> dict:
     cross = load(SOURCES["f4_f5_f6_cross_family"])
     if cross["schema"] != "f4f5f6-cross-family-analysis/v1":
         raise SystemExit("review the F4/F5/F6 cross-family analysis before updating the leaderboard")
+    establishment = load(SOURCES["frontier_establishment"])
+    current_replay = establishment.get("gates", {}).get("f4_f5_f6", {}).get(
+        "current_binary_all_replay", {})
+    replay_total = current_replay.get("total", {})
+    rho_replay = establishment.get("gates", {}).get("rho_optimization", {}).get(
+        "current_binary_replays", {})
+    if (establishment.get("schema") != "ecbench.frontier-establishment/v1"
+            or establishment.get("all_artifact_consistency_checks_passed") is not True
+            or replay_total != {"candidates": 144, "failures": 72, "reproduced": 72}
+            or rho_replay != {"candidates": 720, "reproduced": 720}):
+        raise SystemExit("review the 2026-10-31 frontier establishment certificate before updating the leaderboard")
 
     def med(arms: dict, arm: str, field: str):
         v = (arms.get(arm) or {}).get(field)
@@ -1645,6 +1657,13 @@ def build(allow_unvalidated: bool = False) -> dict:
         "source": SOURCES["f4_f5_f6_cross_family"],
         "class": "relabelling; stage diagnostic with solver word XORs unpriced (S is a lower bound)",
         "rows": cross_rows,
+        "current_binary_replay": {
+            "source": SOURCES["frontier_establishment"],
+            "auditor_binary_sha256": establishment["source_identity"]["auditor_binary_sha256"],
+            "status": establishment["gates"]["f4_f5_f6"]["status"],
+            "cells": current_replay["cells"],
+            "total": replay_total,
+        },
         "online_speedup": None,
         "fully_priced_cold_speedup": None,
     }
@@ -2508,8 +2527,13 @@ def markdown(doc: dict) -> str:
           "Matrix F4, matrix F5, inherited F4 and F6-IC through `pdp3-binary` on eight public "
           "one-target workloads per cell, beside same-target rho. IC `S` is a lower bound "
           "(solver word XORs unpriced; F6-IC's geometric additions charged). `W` is counted "
-          "solver word XORs. Prime curves have no algebraic oracle in `ecbench`. "
-          f"Read the [analysis](../../{y['source']}).", "",
+          "solver word XORs. Prime curves have no algebraic oracle in `ecbench`. These rows "
+          "remain bound to their historical binary: a 2026-10-31 current-binary all-replay "
+          f"audit reproduced {y['current_binary_replay']['total']['reproduced']}/"
+          f"{y['current_binary_replay']['total']['candidates']} deterministic rows; the other "
+          f"{y['current_binary_replay']['total']['failures']} changed counted phase work. "
+          f"Read the [historical analysis](../../{y['source']}) and "
+          f"[current-binary replay certificate](../../{y['current_binary_replay']['source']}).", "",
           "| family | m | curve | base points | rho-negation S | strong rho S | inherited F4 S | F6-IC S "
           "| W F5/F4 | W F4 matrix/inherited | median log2(W inh/W F6) |",
           "|:--|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|"]
@@ -3377,8 +3401,14 @@ def page(doc: dict, standalone: bool) -> str:
              '<p>Matrix F4, matrix F5, inherited F4 and F6-IC through <code>pdp3-binary</code> on eight public '
              'one-target workloads per cell, beside same-target rho. IC S is a lower bound: solver word XORs '
              'are unpriced and F6-IC\'s geometric additions are charged. W is counted solver word XORs. '
-             'Prime curves have no algebraic oracle in <code>ecbench</code>. '
-             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(y["source"])}">Analysis</a>.</p>')
+             'Prime curves have no algebraic oracle in <code>ecbench</code>. These rows remain bound to their '
+             'historical binary: a 2026-10-31 current-binary all-replay audit reproduced '
+             f'{y["current_binary_replay"]["total"]["reproduced"]}/'
+             f'{y["current_binary_replay"]["total"]["candidates"]} deterministic rows; the other '
+             f'{y["current_binary_replay"]["total"]["failures"]} changed counted phase work. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(y["source"])}">Historical analysis</a> · '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(y["current_binary_replay"]["source"])}">'
+             'current-binary replay certificate</a>.</p>')
     P.append('<table><thead><tr><th>Family</th><th>m</th><th>Curve</th><th>Base points</th><th>Rho-negation S</th>'
              '<th>Strong rho S</th><th>Inherited F4 S</th><th>F6-IC S</th><th>W F5/F4</th>'
              '<th>W matrix F4/inherited</th><th>Median log₂(W inh/W F6)</th></tr></thead><tbody>')

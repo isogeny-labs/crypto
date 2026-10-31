@@ -46,7 +46,7 @@ clear:
 2. **One restricted curve family is IC-led.** The plane-quartic attack on the
    special GHS-weak family $E_0/\mathbb F_{q^3}$, with
    $\#E_0(\mathbb F_{q^3})=4\ell$, is below matched rho in its own cold,
-   one-target comparison. The older B0 arm crosses below rho at $q=4051$;
+   one-target comparison. The earlier N4 B0 arm crosses below rho at $q=4051$;
    the N4-v2 double-large-prime arm reaches 0.00523× negation-map rho at
    $q=2{,}097{,}091$. This is a real restricted-family result. It is **not** a
    generic-curve, standard-curve, prime-order $E/\mathbb F_{q^3}$, or
@@ -57,12 +57,14 @@ clear:
    incumbent at native-operation prices $w=0,0.1,1$. It still costs 7.95,
    8.24, and 9.62 times matched `rho.negation`. The result was reproduced on a
    second L2 EKS host, but covers one curve and gives no exponent.
-4. **F5 and F6 improve local solver work without improving E2E ECDLP cost.** F5
+4. **F5 and F6 improve local solver work without improving E2E ECDLP cost on
+   the historical experiment binary.** F5
    uses 0.641–0.647 of matrix F4's word work at degree 13. F6 uses roughly
    0.77–0.82 of inherited-F4 word work and shortens the relation phase by
    1.7–1.9×, but its charged closure/addition work makes its whole-pipeline
    lower-bound cost 64.6–1,352.6× inherited F4 and 399–4,883× rho on the tested
-   cells.
+   cells. A fresh current-binary all-replay audit reproduces only 72/144 rows,
+   so these numbers remain bound to the original measured binary.
 5. **The optimized rho comparison is materially stronger at the implementation
    level.** The trajectory-identical signed-Frobenius rho path uses 0.802155 of
    the same-binary legacy Callgrind instructions, a 1.246642× speedup, while
@@ -78,6 +80,13 @@ This report is an evidence synthesis at source commit
 as measurements. The exact current-source EKS campaign is prepared, but no
 authenticated AWS/Iso Lab route is available in this workspace; consequently,
 there is no fresh 2026-10-31 wall-time leaderboard.
+
+A follow-up executable establishment audit passes 19/19 artifact-consistency
+checks. It recomputes the decisive ratios, verifies all 30 retained Callgrind
+files, reproduces 720/720 optimized-rho rows with the current binary, and
+retains a new F4/F5/F6 compatibility failure (72/144 rows reproduce). A pass
+means the versioned evidence statements agree; it does not turn the draft EKS
+campaign into data.
 
 ## Boundary by domain
 
@@ -312,7 +321,7 @@ enumeration hidden outside the interval.
 
 ![The GHS-weak curve family has its own, separate frontier.](figures/ghs-weak-frontier.png){width=92%}
 
-The B0 arm crosses below plain rho at $q=4051$, where its ratio is 0.735
+The earlier N4 B0 arm crosses below plain rho at $q=4051$, where its ratio is 0.735
 [0.662, 0.816] at $w=0$, and falls to 0.122 [0.0987, 0.157] by
 $q=262111$. N4-v2 adds double large primes, structured Gaussian elimination,
 and block Lanczos; its DL arm reaches 0.00456× plain rho and 0.00523×
@@ -344,6 +353,15 @@ R19. Matrix F4/F5 at m=19 hit the retained 1,800-second timeout. At m=13:
 | K19 | timeout | timeout | unknown | 6.70e8 | 5.19e8 |
 | R19 | timeout | timeout | unknown | 7.15e8 | 5.62e8 |
 
+These are historical-binary measurements. The 2026-10-31 current-binary
+`verify --replay-all` audit preserves every failure: K13 reproduces 16/48,
+R13 32/40, K19 16/32, and R19 8/24 deterministic rows. The X19 timeout control
+passes integrity but has zero replayable successful rows. In total, 72/144
+rows reproduce and 72 differ; K13 differences include total GAE, phase GAE,
+and unpriced accounting. Stored record integrity and original verification
+still pass. Therefore the table establishes the ordering for the measured
+October 11 binary, not for the current implementation.
+
 F5's signature criterion removes about a third of matrix F4's elimination
 work on the same tree. Inherited F4 is roughly 199–222× cheaper than matrix F4
 on the m=13 systems. F6 further reduces word work and relation wall time, but
@@ -352,9 +370,10 @@ common priced pipeline.
 
 ![Backend-local savings and whole-pipeline cost move in opposite directions.](figures/solver-tradeoff.png){width=100%}
 
-The frontier rule follows directly: F5 and F6 are component leaders in their
-native scopes, while inherited F4 remains the best of these four in the common
-E2E lower-bound (S). None beats rho.
+The versioned frontier rule follows directly: on that measured binary, F5 and
+F6 are component leaders in their native scopes, while inherited F4 is best of
+these four in the common E2E lower-bound (S), and none beats rho. A new
+current-source ranking requires the prepared all-backend rerun.
 
 ## SAT-CDCL
 
@@ -422,7 +441,10 @@ recovered scalar, counters, and GAE while reducing implementation instructions:
 
 The implementation win comes from paired coordinate maps, fixed common byte
 shapes, and shared coefficient reduction. It does not change the mathematical
-rho operations boundary. The old L0 wall ratio is not promoted.
+rho operations boundary. A fresh audit hash-checks all 30 raw Callgrind files
+and independently recomputes 1,995,304,985 legacy versus 1,600,543,701
+optimized instructions; the current binary also reproduces all 720 measured
+deterministic rows. The old L0 wall ratio is not promoted.
 
 For the new campaign:
 
@@ -439,7 +461,7 @@ For the new campaign:
 |:--|:--|:--|:--|
 | Relation probability / trials | prime and binary IC gaps grow across several ladders | solver improvements do not change the probability of a useful decomposition | algebraic factor-base constraint inside the system; four-size E2E sweep |
 | Factor-base and pair-table setup | 98.7–99.6% of central cold Koblitz rows; $O(|F|^2)$ pair materialization | online-only improvements disappear when one target pays setup | cold primary result; equal-advice online secondary result |
-| F6 closure additions | 64.6–1,352.6× inherited F4 in lower-bound S | local word-XOR savings are overwhelmed by exact group work | price closure and solver in one common unit; change closure algorithm, not label |
+| F6 closure additions | historical binary: 64.6–1,352.6× inherited F4 in lower-bound S; current replay 72/144 overall | local word-XOR savings are overwhelmed by exact group work, while current counts need remeasurement | price closure and solver in one common unit; rerun current source; change closure algorithm, not label |
 | Matrix F4/F5 scale | m=19 matrix arms time out at 1,800 s | symbolic preprocessing and matrix construction explode before useful scaling | memory/degree receipts and retained timeout curve |
 | Solver-counter mismatch | XORs, conflicts, vector steps, multiply-adds | cross-solver ratios lack semantic equality | E2E wall or complete common pricing; native counters remain diagnostics |
 | Linear algebra | large stage-only speedups, small E2E changes in several pipelines | relation collection and setup dominate | measure phase share before further LA work |
@@ -489,7 +511,7 @@ solver program, not a demonstrated break. Claims about standard curves remain
 bounded by generic algorithms and external cryptanalytic knowledge, not by
 extrapolating toy ECBench fits.
 
-# Frozen fresh campaign
+# Prepared fresh campaign
 
 The prepared campaign contains nine independent L2 jobs. Each has eight
 targets, one warmup, six measured rounds with balanced arm order, replay-all,
@@ -551,7 +573,7 @@ The performance frontier is now explicit:
 
 The highest-value next work is therefore:
 
-1. execute the already frozen L2 campaign on the exact source;
+1. bind the exact image, freeze the prepared protocol, and execute its L2 campaign;
 2. implement the missing prime factor-base-constrained algebraic arm;
 3. attack relation yield and cold setup before further optimizing stages that
    are already a small share;
@@ -576,6 +598,7 @@ sources are:
 - [literature and prior-evidence ledger](LITERATURE.md);
 - [live implementation coverage](COVERAGE.md);
 - [campaign protocol](PROTOCOL.md).
+- [executable establishment certificate](establishment/README.md).
 
 Primary mathematical references used to set the boundary include Shoup's
 generic-group lower bound (EUROCRYPT 1997,
