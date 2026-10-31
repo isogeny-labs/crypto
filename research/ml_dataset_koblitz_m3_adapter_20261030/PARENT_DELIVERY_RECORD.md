@@ -31,7 +31,11 @@ No root acknowledgement may precede admission and capture acknowledgement.
 Six actual F4/F5 positive/negative/capped fixtures write and verify the record.
 Rehashed mutations cover ledger totals, storage quotes, capture acknowledgement,
 root hash, admission flags, completion, producer phase, ownership bytes and
-unknown fields. Genuine failed-input and root-collision controls also write and
+unknown fields. A tenth mutation per fixture removes an artifact and subtracts
+its ownership, storage and trace charges consistently. The reader binds row
+presence to canonical manifest entries and requires the full canonical inventory
+for an unstopped completed producer, including a committed witness when present.
+This closes omission attacks that arithmetic-only checks cannot detect. Genuine failed-input and root-collision controls also write and
 verify their delivery records. A complete raw delivery preserves the producer's
 failure; a root collision preserves one capture acknowledgement and zero root
 acknowledgements without claiming complete delivery.

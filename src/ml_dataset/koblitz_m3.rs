@@ -2152,7 +2152,7 @@ mod signed_binding_tests {
         };
         let empty = check(&serde_json::to_vec(&original_value).unwrap()).unwrap();
         assert!(!empty.all_tuples_acknowledged);
-        for mutation in 0..9 {
+        for mutation in 0..10 {
             let mut v = original_value.clone();
             match mutation {
                 0 => v["schema"] = serde_json::json!("wrong"),
@@ -8006,7 +8006,7 @@ mod canonical_component_tests {
                 assert_eq!(delivered.capture_acknowledgements, owners.items.len());
                 let parent_bytes = std::fs::read(root.join(PARENT_DELIVERY_SLOT.0)).unwrap();
                 let parent_json: serde_json::Value = serde_json::from_slice(&parent_bytes).unwrap();
-                for mutation in 0..9 {
+                for mutation in 0..10 {
                     let mut forged = parent_json.clone();
                     match mutation {
                         0 => {
@@ -8027,7 +8027,44 @@ mod canonical_component_tests {
                         5 => forged["delivery_complete"] = serde_json::json!(false),
                         6 => forged["before"]["phase"] = serde_json::json!("Setup"),
                         7 => forged["owner_quote"]["bytes"] = serde_json::json!(0),
-                        _ => forged["unknown"] = serde_json::json!(true),
+                        8 => forged["unknown"] = serde_json::json!(true),
+                        9 => {
+                            let removed = forged["items"].as_array_mut().unwrap().remove(0);
+                            let identity: u64 = ["path", "role", "encoding"]
+                                .iter()
+                                .map(|k| removed[k].as_str().unwrap().len() as u64)
+                                .sum();
+                            let owner_work = 512 + 8 * identity;
+                            let owner_bytes = 512 + identity;
+                            for (section, key, delta) in [
+                                ("owner_quote", "work", owner_work),
+                                ("owner_quote", "bytes", owner_bytes),
+                                (
+                                    "after",
+                                    "checking_reserved_work",
+                                    owner_work + removed["quote"]["work"].as_u64().unwrap(),
+                                ),
+                                (
+                                    "after",
+                                    "adapter_reserved_bytes",
+                                    owner_bytes + removed["quote"]["bytes"].as_u64().unwrap(),
+                                ),
+                                (
+                                    "after",
+                                    "charged_trace_bytes",
+                                    removed["quote"]["trace"].as_u64().unwrap(),
+                                ),
+                            ] {
+                                forged[section][key] = serde_json::json!(
+                                    forged[section][key].as_u64().unwrap() - delta
+                                );
+                            }
+                            forged["payload_bytes"] = serde_json::json!(
+                                forged["payload_bytes"].as_u64().unwrap()
+                                    - removed["bytes"].as_u64().unwrap()
+                            );
+                        }
+                        _ => unreachable!(),
                     }
                     std::fs::write(
                         root.join(PARENT_DELIVERY_SLOT.0),
@@ -9874,6 +9911,38 @@ fn verify_parent_delivery(
     }
     let prefix = crate::ml_dataset::capture::verify_live_committed_prefix(dir, binding, capture)?
         .ok_or("missing original capture prefix")?;
+    // Bind inventory independently of the claimed sums. Otherwise removing a
+    // row and subtracting its charges can forge a complete delivery.
+    let has_row = |path: &str, role: &str, encoding: &str| {
+        r.items
+            .iter()
+            .any(|a| a.path == path && a.role == role && a.encoding == encoding)
+    };
+    for a in artifacts {
+        let canonical = KOBLITZ_SLOTS.iter().any(|&(path, role, encoding)| {
+            a.path == path && a.role == role && a.encoding == encoding
+        }) || (a.path == "pdp-witness.json"
+            && a.role == "independently-verified-pdp"
+            && a.encoding == "json");
+        if canonical && !has_row(&a.path, &a.role, &a.encoding) {
+            return Err("parent inventory omits registered artifact".into());
+        }
+    }
+    if expected_before.phase == Phase::Complete && expected_before.first_stop.is_none() {
+        for &(path, role, encoding) in &KOBLITZ_SLOTS {
+            if !has_row(path, role, encoding) {
+                return Err("parent inventory omits completed producer artifact".into());
+            }
+        }
+        if prefix
+            .payloads
+            .iter()
+            .any(|(_, p)| p.path == "payloads/pdp-witness.json")
+            && !has_row("pdp-witness.json", "independently-verified-pdp", "json")
+        {
+            return Err("parent inventory omits committed witness".into());
+        }
+    }
     let mut owner = RetentionQuote {
         work: 512,
         bytes: 512,
