@@ -1,4 +1,5 @@
 import Mathlib.RingTheory.Ideal.Basic
+import Mathlib.Tactic.Ring
 
 namespace Specialize51
 
@@ -31,5 +32,15 @@ theorem seven_nsmul_zero_of_eight {G : Type*} [AddGroup G] (P : G)
       _ = P := h
       _ = 0 + P := by simp only [zero_add]
   exact add_right_cancel hcancel
+
+/-- The exact line/curve intersection polynomial used by the native packet test. -/
+theorem line_intersection_identity {K : Type*} [CommRing K]
+    (A b l n r : K) (h2 : (2 : K) = 0) :
+    (l*r+n)^2+A*r*(l*r+n)+b*(l*r+n)+r^3+b*r^2 =
+      r^3+(b+l^2+A*l)*r^2+(A*n+b*l)*r+n^2+b*n := by
+  calc
+    _ = (r^3+(b+l^2+A*l)*r^2+(A*n+b*l)*r+n^2+b*n)
+        +(2:K)*(l*r*n) := by ring
+    _ = _ := by rw [h2, zero_mul, add_zero]
 
 end Specialize51

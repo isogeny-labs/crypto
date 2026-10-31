@@ -1,0 +1,60 @@
+execute(read("../../source-data/compact-pid51.sing"));
+execute(read("../../source-data/compact-field51.sing"));
+execute(read("../../source-data/relative-infinity50.sing"));
+execute(read("../twist51-02/universal-twisted51.sing"));
+setring compactField51;short=0;
+map retainedSource51=relativeInfinity50,l,v,u;ideal source51=retainedSource51(relativeInfinityIdeal50);
+ideal baseStandard51=std(ideal(source51[1]));proc normal51(poly a){return(reduce(a,baseStandard51));}
+poly R51=(1+u)*v+u^3;poly b51=normal51(u*R51*(R51+1));poly c51=normal51(u*(R51+1));
+map universal51=universalTwistedCertificate51,0,l,b51,c51;
+poly mappedG51=universal51(G51);poly mappedN51=normal51(universal51(N51));
+poly gResidual51=mappedG51+source51[2];matrix gLift51=lift(ideal(source51[1]),ideal(gResidual51));
+if(source51[1]*gLift51[1,1]!=gResidual51){ERROR("NU51_FULL_ACTUAL_LAMBDA_SOURCE_BINDING");quit;}
+poly C51=normal51((1+c51)^2*b51^3*(b51+c51*(1+c51)^3));
+poly alpha51=subst(C51,v,0);poly beta51=(C51+alpha51)/v;
+if(subst(C51,l,0)!=C51 || subst(beta51,v,0)!=beta51){ERROR("NU51_COEFFICIENT_SHAPE");quit;}
+poly conjugate51=alpha51+beta51*(v+u^2);
+poly norm51=alpha51^2+u^2*alpha51*beta51+(u+u^3)*beta51^2;
+if(norm51==0 || norm51!=leadcoef(norm51) || C51*conjugate51+norm51!=beta51^2*source51[1]){ERROR("NU51_FULL_QUADRATIC_NORM");quit;}
+poly inverse51=conjugate51/leadcoef(norm51);poly nu51=normal51(mappedN51*inverse51);
+if(normal51(C51*inverse51)!=1 || normal51(C51*(inverse51+1))==1){ERROR("NU51_INVERSE_OR_CORRUPTION");quit;}
+poly nuResidual51=C51*nu51+mappedN51;matrix nuLift51=lift(ideal(source51[1]),ideal(nuResidual51));
+if(source51[1]*nuLift51[1,1]!=nuResidual51 || normal51(C51*(nu51+1)+mappedN51)==0){ERROR("NU51_FULL_RECOVERY_PRODUCT");quit;}
+map pidField51=compactPid51,u;poly D51=pidField51(commonDenominator51);
+poly remaining51=D51*nu51;vector coefficients51=0;intvec exponents51;int position51;int allIntegral51=1;int row51;number coefficient51;ideal coefficientDenominators51;
+while(remaining51!=0){
+ exponents51=leadexp(remaining51);
+ if(exponents51[1]>=16 || exponents51[2]>=2){ERROR("NU51_FIELD_BASIS_SHAPE");quit;}
+ position51=exponents51[1]+16*exponents51[2]+1;coefficient51=leadcoef(remaining51);
+ if(denominator(coefficient51)!=1){allIntegral51=0;}
+ coefficientDenominators51[position51]=denominator(coefficient51);
+ coefficients51=coefficients51+coefficient51*gen(position51);remaining51=remaining51-lead(remaining51);
+}
+poly reconstruction51=0;
+for(row51=1;row51<=32;row51++){reconstruction51=reconstruction51+coefficients51[row51]*l^((row51-1)%16)*v^((row51-1) div 16);}
+if(reconstruction51!=D51*nu51){ERROR("NU51_FULL_FIELD_VECTOR");quit;}
+link fieldOut51="ASCII:w nu-field-certificate51.sing";open(fieldOut51);
+write(fieldOut51,"ring nuFieldCertificate51=(2,u),(l,v),dp;short=0;ideal source51="+string(source51)+";poly C51="+string(C51)+";poly inverse51="+string(inverse51)+";poly norm51="+string(norm51)+";poly conjugate51="+string(conjugate51)+";poly beta51="+string(beta51)+";poly nu51="+string(nu51)+";poly numerator51="+string(mappedN51)+";poly nuResidual51="+string(nuResidual51)+";poly nuQuotient51="+string(nuLift51[1,1])+";poly gResidual51="+string(gResidual51)+";poly gQuotient51="+string(gLift51[1,1])+";poly D51="+string(D51)+";vector coefficients51="+string(coefficients51)+";ideal coefficientDenominators51="+string(coefficientDenominators51)+";int allIntegral51="+string(allIntegral51)+";");close(fieldOut51);
+string targetString51=string(coefficients51);int member51=0;int obstruction51=1;
+if(allIntegral51==1){
+ setring compactPid51;execute("vector target51="+targetString51+";");
+ module oneTarget51=target51;module stdBasis51=std(basis51);module remainder51=reduce(oneTarget51,stdBasis51);
+ link pidOut51="ASCII:w nu-pid-certificate51.sing";open(pidOut51);
+ write(pidOut51,"ring nuPidCertificate51=2,(u),(c,dp);short=0;vector target51="+targetString51+";matrix H51="+string(matrix(basis51))+";");
+ if(size(remainder51)==0){
+  matrix lift51=lift(basis51,oneTarget51);matrix H51=matrix(basis51);matrix targetMatrix51[32][1];
+  for(row51=1;row51<=32;row51++){targetMatrix51[row51,1]=target51[row51];}
+  if(nrows(lift51)!=32 || ncols(lift51)!=1 || H51*lift51!=targetMatrix51){ERROR("NU51_FULL_32_ENTRY_PID_LIFT");quit;}
+  matrix bad51=lift51;bad51[1,1]=bad51[1,1]+1;
+  if(H51*bad51==targetMatrix51){ERROR("NU51_PID_CORRUPTION_ACCEPTED");quit;}
+  member51=1;obstruction51=0;write(pidOut51,"matrix lift51[32][1];");
+  for(row51=1;row51<=32;row51++){write(pidOut51,"lift51["+string(row51)+",1]="+string(lift51[row51,1])+";");}
+ }else{
+  obstruction51=2;matrix toStd51=lift(basis51,stdBasis51);matrix fromStd51=lift(stdBasis51,basis51);
+  if(matrix(basis51)*toStd51!=matrix(stdBasis51) || matrix(stdBasis51)*fromStd51!=matrix(basis51)){ERROR("NU51_NONMEMBERSHIP_STD_BRIDGES");quit;}
+  write(pidOut51,"module remainder51="+string(remainder51)+";");
+ }
+ close(pidOut51);
+}
+print("NU51_RESULT actual_nu_recovered=true full_quadratic_norm=true full_nu_and_lambda_source_products=2 complete_field_vector_entries=32 integral_coefficients="+string(allIntegral51)+" normal_chart_member="+string(member51)+" obstruction_code="+string(obstruction51)+" PID_coordinate_transport_not_yet_tested=true");
+print("NU51_ALL_CHECKS_PASS");quit;

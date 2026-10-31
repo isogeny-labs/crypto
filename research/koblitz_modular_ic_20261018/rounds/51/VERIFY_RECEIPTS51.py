@@ -4,7 +4,7 @@ import hashlib,json,subprocess
 h=Path(__file__).resolve().parent; repo=h.parents[3]
 r=json.loads((h/'results.json').read_text())
 assert all(x['status'] in ('accepted','rejected') for x in r['runs']), 'native work remains active'
-paths={'diamond51':'source-data/diamond-input51.sing','glue-prep51':'source-data/glue-prep-input51.sing','glue-forward51':'source-data/glue-direction1-input51.sing','glue-reverse51':'source-data/glue-direction2-input51.sing','glue-reload51':'source-data/glue-reload-input51.sing','universal51':'UNIVERSAL51.sing','line51':'LINE51.sing','twist51':'TWIST51.sing','base23-51':'BASE23_51.sing','base23-struct51':'BASE23_STRUCT51.sing','fiber51':'FIBER51.rs','hecke3-51':'HECKE3_51.sing','overlap-lean51':'lean/Overlap51.lean','specialize-lean51':'lean/Specialize51.lean'}
+paths={'diamond51':'source-data/diamond-input51.sing','glue-prep51':'source-data/glue-prep-input51.sing','glue-forward51':'source-data/glue-direction1-input51.sing','glue-reverse51':'source-data/glue-direction2-input51.sing','glue-reload51':'source-data/glue-reload-input51.sing','universal51':'UNIVERSAL51.sing','line51':'LINE51.sing','nu51':'NU51.sing','twist51':'TWIST51.sing','base23-51':'BASE23_51.sing','base23-struct51':'BASE23_STRUCT51.sing','fiber51':'FIBER51.rs','hecke3-51':'HECKE3_51.sing','overlap-lean51':'lean/Overlap51.lean','specialize-lean51':'lean/Specialize51.lean'}
 checks=[]
 for row in r['runs']:
     p=h/'runs'/row['attempt']; rev=(p/'source-revision.txt').read_text().strip()
