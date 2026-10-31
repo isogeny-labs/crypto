@@ -1,0 +1,39 @@
+{
+  "degrees": [
+    {
+      "cells": [],
+      "degree": 11,
+      "log2_rho": 2.596032255417511,
+      "minimum_viable_arity": null,
+      "minimum_viable_arity_without_frobenius": null,
+      "stable_dimensions_note": "Frobenius-stable dimensions are the subset sums of the cyclotomic coset sizes; a dimension outside them is still a legal factor base, it simply forfeits the orbit quotient."
+    }
+  ],
+  "elapsed_seconds": 0.001448708,
+  "evidence_scope": "analytic_cost_model",
+  "frobenius_orbit_quotient_credited": true,
+  "limitations": [
+    "No imported target was used.",
+    "A verdict under a cost model, not an attack and not a lower bound on ECDLP.",
+    "Sparse linear algebra is charged at m*D^2. A method with a materially lower exponent would relax the gate on the factor-base dimension and could revive arity 3.",
+    "Forming the descended system is charged at one operation per ANF monomial. That binds every method which materialises the system -- Groebner, WDSat, CNF-SAT, crossbred, msolve -- but not one that never materialises it.",
+    "Decompositions are assumed to behave like uniform random m-multisets of the factor base, the standard heuristic of this literature.",
+    "Polylog factors are dropped on both sides, so the comparison is fair to within them but not to within constants.",
+    "Orbit reduction is computed for odd prime degrees; composite degrees are charged with no orbit quotient rather than with a wrong one."
+  ],
+  "operation": "budget",
+  "resources": {
+    "cpu_seconds": 0.004572,
+    "peak_rss_bytes": 6127616,
+    "scope": "process counters sampled before report emission; peak resident memory, not allocated bytes"
+  },
+  "schema_version": 1,
+  "scope": "Exact arithmetic under the declared cost model: relation collection and sparse linear algebra charged against the same rho budget, inverted for what one decomposition may spend. No curve is constructed, no decomposition is attempted and no discrete logarithm is solved.",
+  "software": {
+    "arch": "aarch64",
+    "binary_blake3": "c0fef707972df911ba6134ad2fcb67f175a84ce9232eb9d3955b2ee9ebba18b3",
+    "os": "macos",
+    "version": "0.1.0"
+  },
+  "status": "complete"
+}

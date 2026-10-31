@@ -51,6 +51,8 @@ SELF = {"docs/curves/ICV1.md", "docs/curves/README.md", "scripts/check_curve_nam
         "scripts/build_curve_registry.py", "scripts/curve_id.py",
         "src/cryptanalysis/curve_id.rs", "src/cryptanalysis/curve_aliases.json", "tests/curve_id.rs",
         "examples/curve_id_generated.rs",
+        # ecdb flags registry aliases that are retired forms (is_retired_name).
+        "ecdb/src/math.rs",
         # Generated alias tables: their "also called" column lists the
         # legacy spellings on purpose.
         "docs/ic-leaderboard.html", "docs/ic/LEADERBOARD.md"}
@@ -78,14 +80,10 @@ ARCHIVED_LABELS = {
             "K_1 / 2^17": "icv1-f2m17-tm101-00378d4e",
         },
     },
-    # A frozen source snapshot retains these literal legacy fixtures. Its
-    # digest is recorded in the study's frozen-baseline.sha256 manifest.
-    "research/f4_f5_boolean_runtime_20261019/frozen-baseline/src/cryptanalysis/ic_boundary.rs": {
-        "sha256": "4d3f66663e1b5ca72053461957e5448a68553828692bab47d91287be7a226fc1",
+    "research/ideas_execution_20261018/oracle_integration/PROTOCOL.md": {
+        "sha256": "799dfb71a8aa125c699415c52a31076923d9d2a2ae752af06e014b0ebcdc7530",
         "labels": {
-            "K_0/F_2^15": "icv1-f2m15-tm275-2d22ff5d",
-            "bench-12bit": "icv1-fp12-t19-d4a315df",
-            "generated-24bit-10935329": "icv1-fp24-t1577-77336155",
+            "K_0/GF(2^7)": "icv1-f2m7-t13-616700dd",
         },
     },
     # Two unregistered curve IDs are retained in this frozen Certicom

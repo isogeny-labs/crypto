@@ -1,0 +1,65 @@
+{
+  "schema": "owner-current-library-validation-v1",
+  "source_commit": "60e6943d31dc57ab509b37a5f62cba2f134d8b74",
+  "base_commit": "8eef1252714097e0b8279c0bf55b82ed9e49943d",
+  "recorded_at": "2026-10-27T00:51:17.934050+00:00",
+  "command": "CARGO_HOME=/workspace/native-rust/cargo RUSTUP_HOME=/workspace/native-rust/rustup CARGO_TARGET_DIR=/workspace/native-smallroot-owner-current-target CARGO_BUILD_JOBS=2 /workspace/native-rust/cargo/bin/cargo test --release --lib --locked -- --test-threads=2",
+  "full_run": {
+    "exit_code": 101,
+    "passed": 4888,
+    "failed": 6,
+    "ignored": 121,
+    "duration_seconds": 1290.51,
+    "log": "/workspace/smallroot-session/native-owner-current-cargo-attempt9-60e694.log",
+    "sha256": "b37a4217610b6d40aa72004ef36b170bac669545f389b6bc218f7f6c2cd38636",
+    "bytes": 431104
+  },
+  "src_tree_base_and_head": "6f82e102c66eda913a81a1e20c29a79366b0c597",
+  "tests_tree_base_and_head": "d2aa1e178ab14f5881081e2bbcb7c8ec628bdd37",
+  "cargo_and_rust_diff_empty": true,
+  "runtime_fixture_restored_exactly": {
+    "records.jsonl": "f472593e221281ce1c09f63005ad0a2abfcbada7",
+    "expected.jsonl": "bc2628414e437211b824cdedf36a55c568602bfb"
+  },
+  "affected_test_replays": [
+    {
+      "log": "/workspace/smallroot-session/current-library-replays-60e694/cryptanalysis_ecbench_compare_tests_weighted_comparison_prices_verified_pairs_and_records_weight_identity.log",
+      "sha256": "00624290da70852e4c20ff0496a901740d1810d0f79bea481ca3493cf62a0325",
+      "bytes": 827,
+      "exit_code": 101
+    },
+    {
+      "log": "/workspace/smallroot-session/current-library-replays-60e694/cryptanalysis_ecbench_hyper_ic_tests_ecbench_recovers_planted_logs_on_thread_jacobians.log",
+      "sha256": "074fd7635e96aad5c55ca9219a7f0d9a25d77a1238888763eb6aaea1b1625887",
+      "bytes": 800,
+      "exit_code": 101
+    },
+    {
+      "log": "/workspace/smallroot-session/current-library-replays-60e694/cryptanalysis_ecbench_hyper_ic_tests_ecbench_runs_are_deterministic_in_the_seed.log",
+      "sha256": "52b0d97b45338fdb23816a73347a9f1767aec7fdc6b020a51140ad8749f64a28",
+      "bytes": 772,
+      "exit_code": 101
+    },
+    {
+      "log": "/workspace/smallroot-session/current-library-replays-60e694/cryptanalysis_ecbench_hyper_ic_tests_ic_hyperelliptic_is_refused_off_jacobians_and_other_ic_on_them.log",
+      "sha256": "60a5c301ac2924ccd80a36f7c09a66ed75d4484cacfadeddb42d40a6e047ba1b",
+      "bytes": 852,
+      "exit_code": 101
+    },
+    {
+      "log": "/workspace/smallroot-session/current-library-replays-60e694/cryptanalysis_ecbench_work_tests_fixture_records_reprice_to_their_committed_blocks.log",
+      "sha256": "aeb23afe1de0483292c29cda6452f6979b115c3ddcb686f7134c26c5c4ac5547",
+      "bytes": 214,
+      "exit_code": 0
+    },
+    {
+      "log": "/workspace/smallroot-session/current-library-replays-60e694/pqc_hawk_tests_naive_forgery_fails.log",
+      "sha256": "6494ceac5d87ba24f7d865144dd707cfb02e20040546b88182593e36cde8faf8",
+      "bytes": 165,
+      "exit_code": 0
+    }
+  ],
+  "replay_interpretation": "Fixture test passed after byte-exact restoration; four comparison/parameter failures reproduced; HAWK test passed once, original failure retained. No full-run PASS or HAWK fix claimed.",
+  "publication_basis": "AGENTS.md662-670: failures in untouched services are reported with evidence; no unrelated code repair or merge waiver.",
+  "scientific_panel_cases_run": 0
+}

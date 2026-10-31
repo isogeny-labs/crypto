@@ -1,0 +1,191 @@
+{
+  "alternative": {
+    "actual_target_small_tile_check": {
+      "backends": [
+        "sage",
+        "flint",
+        "prime"
+      ],
+      "degree": "576460755499654231",
+      "field": "2990824833105251809312850774942586406637913479771",
+      "independent_explicit_roots": 128,
+      "noninvertible_polynomial_negative_control": true,
+      "scope": "Actual 60-bit kernel; a small tile checked against direct enumeration. Not a complete isogeny evaluation.",
+      "sources": {
+        "blocked_velu.py": "d33490b42231c4aa72b6e428b2150a1bee716edaf3b5b4204564cd5379a2e189",
+        "libprime_poly_trace.so": "3ce335004d7a629d947106543c74c6a011fdaa18e98277902f90e9b066010feb",
+        "prime_poly_trace.c": "cb14c4d1a9708e0942e93b08abc7f499647237920d13fdb2f94ba978033ef42a",
+        "prime_poly_trace.py": "f0ee1b0ce096a7c7813ef08ccc97cdc109bdd84cc0af80b2c4bd3b1e8b2bfe5e"
+      },
+      "status": "pass",
+      "tile_dimension": 8
+    },
+    "complete_fixture_comparisons": {
+      "fixtures": [
+        {
+          "backend": "sage",
+          "block": 2,
+          "degree": "19",
+          "exact_match_to_traditional_velu": true,
+          "p": 71,
+          "points": 6,
+          "wall_seconds": 0.006367414999886023
+        },
+        {
+          "backend": "flint",
+          "block": 2,
+          "degree": "19",
+          "exact_match_to_traditional_velu": true,
+          "p": 71,
+          "points": 6,
+          "wall_seconds": 0.025291491999951177
+        },
+        {
+          "backend": "prime",
+          "block": 2,
+          "degree": "19",
+          "exact_match_to_traditional_velu": true,
+          "p": 71,
+          "points": 6,
+          "wall_seconds": 0.003348344999949404
+        },
+        {
+          "backend": "sage",
+          "block": 17,
+          "degree": "10009",
+          "exact_match_to_traditional_velu": true,
+          "p": 6666679,
+          "points": 6,
+          "wall_seconds": 0.10783709099996486
+        },
+        {
+          "backend": "flint",
+          "block": 17,
+          "degree": "10009",
+          "exact_match_to_traditional_velu": true,
+          "p": 6666679,
+          "points": 6,
+          "wall_seconds": 0.08899932300005275
+        },
+        {
+          "backend": "prime",
+          "block": 17,
+          "degree": "10009",
+          "exact_match_to_traditional_velu": true,
+          "p": 6666679,
+          "points": 6,
+          "wall_seconds": 0.0934580079999705
+        }
+      ],
+      "scope": "Complete small-fixture coefficient and non-kernel point agreement; no 60-bit map claim.",
+      "status": "pass"
+    },
+    "description": "Streaming polynomial products and bounded I/J tiles; exact log-norm jets computed with prime-field FLINT routines.",
+    "full_target_maps_completed": 0,
+    "largest_completed_target_tile": {
+      "I_size": 379625064,
+      "J_size": 379625063,
+      "backend": "prime",
+      "block_size": 131072,
+      "degree": "576460755499654231",
+      "leftover_size": 75069051,
+      "partial_log_jets": [
+        [
+          "337058476480526667756845386880667078770246991196",
+          "2208811508264934486384181608459550352981687410848",
+          "1065060156944004349426932480299050019518259575890"
+        ],
+        [
+          "1080014156396172441733072238351067436008447984057",
+          "5845273886442517237972336871549800430089566106",
+          "2732854519597706412839690616663733710246472171287"
+        ],
+        [
+          "1786141981472620187573850474996939279544300168079",
+          "2710759466491991574622900661755021342779907953215",
+          "1391651307165654424517046696648150723400887628553"
+        ]
+      ],
+      "peak_rss_kib": 1100344,
+      "rectangular_tiles_at_this_block_size": 8392609,
+      "scope": "One actual tile at the exact 60-bit kernel. Full quotient and map not computed. Not an end-to-end runtime estimate.",
+      "status": "partial_tile_only",
+      "wall_seconds": 178.43482041999982
+    },
+    "scaling_status": "Memory reduction demonstrated on bounded tiles. End-to-end feasibility not demonstrated. No completed 60-bit map or end-to-end speedup is claimed.",
+    "uncomputed_work": "All remaining rectangular tiles and leftover roots must contribute before quotient coefficients or complete point images can be recovered."
+  },
+  "created_utc": "2026-10-31T05:29:48.962344+00:00",
+  "environment": {
+    "conda_lock": "sage_environment_explicit.txt",
+    "historical_note": "The old dataset is not part of this fresh workspace; exact 60-bit parameters were reconstructed from the conversation.",
+    "old_workspace_artifacts_present": false,
+    "pip_requirements": "pip_requirements.txt",
+    "sage": "10.9"
+  },
+  "goal_complete": false,
+  "next_obligation": "A method with feasible total work and memory must complete every required sum or otherwise construct the quotient and non-kernel images; preserve the 60-bit target.",
+  "parameters_file": "source_final/gap60_parameters.json",
+  "prime_gap": "576460755499654231",
+  "prime_gap_bits": 60,
+  "requested_goal": "Prime conductor gap of at least 60 bits crossed by an explicitly evaluated ordinary elliptic-curve isogeny, with matched endpoint ECDLP trials.",
+  "requirements": [
+    {
+      "evidence": "sage_certificate/worker_receipt.json",
+      "requirement": "Proven field and 60-bit prime, ordinary CM source, rational kernel and conductor argument",
+      "status": "verified"
+    },
+    {
+      "blocker": "Standard Sage path raised MemoryError; its xJ list alone exceeds host memory.",
+      "evidence": "explicit_attempt_001/worker_receipt.json",
+      "requirement": "Explicit quotient equation",
+      "status": "not_obtained"
+    },
+    {
+      "blocker": "Complete quotient and all required sums remain uncomputed.",
+      "requirement": "Non-kernel point images on complete 60-bit isogeny",
+      "status": "not_obtained"
+    },
+    {
+      "blocker": "Destination curve and transported base are not available.",
+      "requirement": "Matched endpoint ECDLP measurements",
+      "status": "not_attempted"
+    }
+  ],
+  "schema": "gap60-recovery-results-v1",
+  "source_ECDLP_worker_check": {
+    "expected_scalar": "1234567",
+    "returned_scalar": "1234567",
+    "scope": "One source-only synthetic 41-bit-subgroup solve. Not a matched-endpoint experiment."
+  },
+  "sources": {
+    "blocked_velu.py": "d33490b42231c4aa72b6e428b2150a1bee716edaf3b5b4204564cd5379a2e189",
+    "build_prime_poly.sh": "724592183c54b1f0fd5b392acf80cf541e3f2b236d602f94b5b5730447c7679c",
+    "gap60_parameters.json": "5b51d49ca449954b7ea374afbe2f497ed558f1c74469e014d15a37d1ea2ab711",
+    "libprime_poly_trace.so": "3ce335004d7a629d947106543c74c6a011fdaa18e98277902f90e9b066010feb",
+    "prime_poly_trace.c": "cb14c4d1a9708e0942e93b08abc7f499647237920d13fdb2f94ba978033ef42a",
+    "prime_poly_trace.py": "f0ee1b0ce096a7c7813ef08ccc97cdc109bdd84cc0af80b2c4bd3b1e8b2bfe5e",
+    "run_capture.py": "f4a95b93cd708753849e4806063b2cd5a9133edf4998911e736417c470cc023d",
+    "run_gap60.py": "564207a059427bfaa94ad0b1fe04e2058ad2047c710f8916de3431b64cf78c54",
+    "summarize_gap60.py": "f0b16068bf6a02db60633e94071a8875878f45ca1aa9834c27f9f2c8f6c0b020",
+    "verify_gap60_blocks.py": "4a56495db482e3e42f369740c6fa45d3626b462cf553362f9e5eb8e85ea626d9"
+  },
+  "standard_attempt": {
+    "address_space_budget_GiB": 8,
+    "bound_scope": "Implementation-specific lower bound for distinct coordinate objects plus list pointers; excludes GMP limb storage, list over-allocation, points, product trees, and other elliptic polynomial. Not a lower bound for every isogeny algorithm.",
+    "exception": "MemoryError()",
+    "exit_status": 1,
+    "failure_phase": "construct_quotient",
+    "host_GiB": 16.0,
+    "minimum_coordinate_list_GiB": 22.627417027950287,
+    "observed_peak_RSS_KiB": 6989484,
+    "outer_wall_seconds": 443.168113327
+  },
+  "status": "partial_with_memory_and_implementation_scaling_blockers",
+  "verification_limits": [
+    "CM/volcano structural argument and executable arithmetic checks, not proof-assistant certification.",
+    "Some diagnostic timings overlapped the standard attempt; no controlled backend speedup claim.",
+    "Source/kernel certification and partial polynomial sums do not constitute a fully evaluated isogeny.",
+    "The memory obstruction is specific to the standard Sage implementation, not a mathematical impossibility result."
+  ]
+}
