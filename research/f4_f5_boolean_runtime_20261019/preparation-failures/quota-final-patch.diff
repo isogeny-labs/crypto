@@ -1,0 +1,745 @@
+diff --git a/examples/f4_f5_boolean_perf.rs b/examples/f4_f5_boolean_perf.rs
+index f75e236a6..07430b7a5 100644
+--- a/examples/f4_f5_boolean_perf.rs
++++ b/examples/f4_f5_boolean_perf.rs
+@@ -17,7 +17,7 @@ use crypto_lib::cryptanalysis::{
+         groebner_decompose_f6_ic_pair_index, KoblitzCurve, PairSumTable,
+     },
+     matrix_f5_f2::{canonical_row_space_fingerprint, matrix_f5_f2_timed},
+-    mq_fes::{gray_incremental_find_all, moebius_find_all, QuadraticForm},
++    mq_fes::{gray_find_all_wide, gray_incremental_find_all, moebius_find_all, QuadraticForm},
+     mq_monica::monica_find_all,
+     pq_f4_f2::{groebner_basis_f4, solutions_from_reduced_basis},
+     pq_groebner_f2::F2BoolPoly,
+@@ -171,6 +171,10 @@ fn main() {
+                 "input_digest":input,"random":flag("--random","0")=="1"});
+             row["table_write_once"] =
+                 json!(std::env::var("KIC_GF2_WRITE_TABLE_ONCE").as_deref() == Ok("1"));
++            row["vector_tables"] =
++                json!(std::env::var("KIC_GF2_VECTOR_TABLES").as_deref() == Ok("1"));
++            row["scalar_generalized"] =
++                json!(std::env::var("KIC_GENERALIZED_SCALAR_GRAY").as_deref() == Ok("1"));
+             if arm.starts_with("matrix-") {
+                 let started = Instant::now();
+                 profile_start();
+@@ -394,7 +398,7 @@ fn main() {
+                         solutions_from_reduced_basis(&gb, sys.n_vars, sys.n_vars, &mut 0)
+                             .expect("reduced basis")
+                     }
+-                    "roots-moebius" | "roots-gray" | "roots-monica" => {
++                    "roots-moebius" | "roots-gray" | "roots-wide" | "roots-monica" => {
+                         let forms: Vec<_> = sys
+                             .equations
+                             .iter()
+@@ -403,6 +407,16 @@ fn main() {
+                         match arm.as_str() {
+                             "roots-moebius" => moebius_find_all(&forms, usize::MAX).unwrap(),
+                             "roots-gray" => gray_incremental_find_all(&forms, usize::MAX).unwrap(),
++                            "roots-wide" => {
++                                if let Some((roots, lanes)) = gray_find_all_wide(&forms, usize::MAX)
++                                {
++                                    row["wide_lanes"] = json!(lanes);
++                                    roots
++                                } else {
++                                    row["wide_lanes"] = json!(0);
++                                    gray_incremental_find_all(&forms, usize::MAX).unwrap()
++                                }
++                            }
+                             _ => monica_find_all(&forms, usize::MAX).unwrap(),
+                         }
+                     }
+diff --git a/src/cryptanalysis/gf2_elim.rs b/src/cryptanalysis/gf2_elim.rs
+index a84d8533a..68169b3a0 100644
+--- a/src/cryptanalysis/gf2_elim.rs
++++ b/src/cryptanalysis/gf2_elim.rs
+@@ -69,6 +69,11 @@ fn write_table_once_enabled() -> bool {
+     *ENABLED.get_or_init(|| std::env::var("KIC_GF2_WRITE_TABLE_ONCE").as_deref() == Ok("1"))
+ }
+ 
++fn vector_tables_enabled() -> bool {
++    static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
++    *ENABLED.get_or_init(|| std::env::var("KIC_GF2_VECTOR_TABLES").as_deref() == Ok("1"))
++}
++
+ /// Build only addressable entries, initializing each exactly once. The
+ /// previous entry `g & (g - 1)` is always below `g`, so every read observes
+ /// an initialized entry. The last table can be shorter than `table_size`:
+@@ -81,6 +86,7 @@ fn build_tables_once(
+     range: std::ops::Range<usize>,
+     table: &mut Vec<u64>,
+     word_ops: &mut u64,
++    simd: SimdKind,
+ ) {
+     let suffix = range.len();
+     let table_size = 1usize << bits;
+@@ -99,14 +105,13 @@ fn build_tables_once(
+         for g in 1usize..(1 << group_len) {
+             let prev = g & (g - 1);
+             let src = &matrix[block_start + t * bits + g.trailing_zeros() as usize][range.clone()];
+-            for (i, &word) in src.iter().enumerate() {
+-                // SAFETY: `prev < g` names an initialized earlier entry
+-                // of this table. Destination and source entries are disjoint
+-                // and every destination index is strictly below `len`.
+-                unsafe {
+-                    let old = out.add(base + prev * suffix + i).read();
+-                    out.add(base + g * suffix + i).write(old ^ word);
+-                }
++            // SAFETY: `prev < g` is initialized, the destination is disjoint,
++            // and reserve covers both entries. ISA was checked by simd_kind.
++            // The output remains raw storage until every word is written.
++            unsafe {
++                let dst = out.add(base + g * suffix);
++                let previous = out.add(base + prev * suffix);
++                write_table_entry(dst, previous, src, simd);
+             }
+             *word_ops += suffix as u64;
+         }
+@@ -116,6 +121,54 @@ fn build_tables_once(
+     unsafe { table.set_len(len) };
+ }
+ 
++/// Initialize an entry without forming a reference to uninitialized u64s.
++unsafe fn write_table_entry(dst: *mut u64, previous: *const u64, src: &[u64], simd: SimdKind) {
++    #[cfg(target_arch = "x86_64")]
++    match simd {
++        SimdKind::Avx512 => return write_table_entry_avx512(dst, previous, src),
++        SimdKind::Avx2 => return write_table_entry_avx2(dst, previous, src),
++        SimdKind::Scalar => {}
++    }
++    let _ = simd;
++    for (i, &word) in src.iter().enumerate() {
++        dst.add(i).write(previous.add(i).read() ^ word);
++    }
++}
++
++#[cfg(target_arch = "x86_64")]
++#[target_feature(enable = "avx2")]
++unsafe fn write_table_entry_avx2(dst: *mut u64, previous: *const u64, src: &[u64]) {
++    use std::arch::x86_64::*;
++    let mut i = 0;
++    while i + 4 <= src.len() {
++        let a = _mm256_loadu_si256(previous.add(i).cast());
++        let b = _mm256_loadu_si256(src.as_ptr().add(i).cast());
++        _mm256_storeu_si256(dst.add(i).cast(), _mm256_xor_si256(a, b));
++        i += 4;
++    }
++    while i < src.len() {
++        dst.add(i).write(previous.add(i).read() ^ src[i]);
++        i += 1;
++    }
++}
++
++#[cfg(target_arch = "x86_64")]
++#[target_feature(enable = "avx512f")]
++unsafe fn write_table_entry_avx512(dst: *mut u64, previous: *const u64, src: &[u64]) {
++    use std::arch::x86_64::*;
++    let mut i = 0;
++    while i + 8 <= src.len() {
++        let a = _mm512_loadu_si512(previous.add(i).cast());
++        let b = _mm512_loadu_si512(src.as_ptr().add(i).cast());
++        _mm512_storeu_si512(dst.add(i).cast(), _mm512_xor_si512(a, b));
++        i += 8;
++    }
++    while i < src.len() {
++        dst.add(i).write(previous.add(i).read() ^ src[i]);
++        i += 1;
++    }
++}
++
+ /// Largest pattern width of one Gray-code table.
+ const MAX_TABLE_BITS: usize = 8;
+ 
+@@ -783,6 +836,11 @@ fn clear_block(
+             first_word..end_word,
+             table,
+             word_ops,
++            if vector_tables_enabled() {
++                simd
++            } else {
++                SimdKind::Scalar
++            },
+         );
+     } else {
+         if !reuse_table {
+@@ -1075,40 +1133,54 @@ mod tests {
+         let mut table = vec![u64::MAX; 200_000];
+         for bits in 1..=8 {
+             for pivots in 1..=4 * bits {
+-                for suffix in [1, 2, 7, 133] {
++                for suffix in [1, 2, 3, 4, 5, 7, 8, 9, 15, 16, 17, 31, 32, 33, 133] {
+                     let matrix: Vec<Vec<u64>> = (0..pivots + 3)
+                         .map(|_| (0..suffix + 4).map(|_| rng.gen()).collect())
+                         .collect();
+                     let mut ops = 17;
+-                    build_tables_once(
+-                        &matrix,
+-                        3,
+-                        pivots,
+-                        bits,
+-                        2..suffix + 2,
+-                        &mut table,
+-                        &mut ops,
+-                    );
+-                    let tables = pivots.div_ceil(bits);
+-                    let size = 1usize << bits;
+-                    let expected_len =
+-                        ((tables - 1) * size + (1 << (pivots - (tables - 1) * bits))) * suffix;
+-                    assert_eq!(table.len(), expected_len);
+-                    let mut expected_ops = 17;
+-                    for t in 0..tables {
+-                        let group = bits.min(pivots - t * bits);
+-                        for g in 0..1usize << group {
+-                            for i in 0..suffix {
+-                                let expected = (0..group)
+-                                    .filter(|&j| g >> j & 1 != 0)
+-                                    .fold(0, |acc, j| acc ^ matrix[3 + t * bits + j][i + 2]);
+-                                assert_eq!(table[(t * size + g) * suffix + i], expected);
++                    let mut variants = vec![SimdKind::Scalar];
++                    #[cfg(target_arch = "x86_64")]
++                    {
++                        if std::is_x86_feature_detected!("avx2") {
++                            variants.push(SimdKind::Avx2);
++                        }
++                        if std::is_x86_feature_detected!("avx512f") {
++                            variants.push(SimdKind::Avx512);
++                        }
++                    }
++                    for simd in variants {
++                        build_tables_once(
++                            &matrix,
++                            3,
++                            pivots,
++                            bits,
++                            2..suffix + 2,
++                            &mut table,
++                            &mut ops,
++                            simd,
++                        );
++                        let tables = pivots.div_ceil(bits);
++                        let size = 1usize << bits;
++                        let expected_len =
++                            ((tables - 1) * size + (1 << (pivots - (tables - 1) * bits))) * suffix;
++                        assert_eq!(table.len(), expected_len);
++                        let mut expected_ops = 17;
++                        for t in 0..tables {
++                            let group = bits.min(pivots - t * bits);
++                            for g in 0..1usize << group {
++                                for i in 0..suffix {
++                                    let expected = (0..group)
++                                        .filter(|&j| g >> j & 1 != 0)
++                                        .fold(0, |acc, j| acc ^ matrix[3 + t * bits + j][i + 2]);
++                                    assert_eq!(table[(t * size + g) * suffix + i], expected);
++                                }
+                             }
++                            expected_ops += ((1u64 << group) - 1) * suffix as u64;
+                         }
+-                        expected_ops += ((1u64 << group) - 1) * suffix as u64;
++                        assert_eq!(ops, expected_ops);
++                        table.fill(u64::MAX);
++                        ops = 17;
+                     }
+-                    assert_eq!(ops, expected_ops);
+-                    table.fill(u64::MAX);
+                 }
+             }
+         }
+diff --git a/src/cryptanalysis/ic_boundary.rs b/src/cryptanalysis/ic_boundary.rs
+index f71ebdcd7..95e3e384c 100644
+--- a/src/cryptanalysis/ic_boundary.rs
++++ b/src/cryptanalysis/ic_boundary.rs
+@@ -4847,6 +4847,69 @@ impl PairTable {
+         }
+     }
+ 
++    /// The folded table with a caller-provided ordered batch adder. Each
++    /// chunk holds at most256 pairs with the same first point. Insertion
++    /// order, keys and first witnesses match `build_negation_folded` exactly.
++    /// The callback appends one sum per operand and charges every addition.
++    pub(crate) fn build_negation_folded_with<G: CountedGroup>(
++        g: &G,
++        fb: &FactorBase<G::Elt>,
++        mut add_many: impl FnMut(&mut GroupOps, G::Elt, &[G::Elt], &mut Vec<G::Elt>),
++    ) -> Self {
++        const CHUNK: usize = 256;
++        let start = Instant::now();
++        let groups: Vec<&Vec<usize>> = fb
++            .abscissa_list
++            .iter()
++            .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
++            .collect();
++        let mut ops = GroupOps::default();
++        let mut map: FastMap<(u32, u32)> = fast_map(groups.len() * groups.len() + 1);
++        let mut indices = Vec::with_capacity(CHUNK);
++        let mut points = Vec::with_capacity(CHUNK);
++        let mut sums = Vec::with_capacity(CHUNK);
++        let mut flush = |i: usize, indices: &[usize], points: &[G::Elt], sums: &mut Vec<G::Elt>| {
++            sums.clear();
++            add_many(&mut ops, fb.points[i], points, sums);
++            assert_eq!(
++                sums.len(),
++                indices.len(),
++                "one ordered sum per batch operand"
++            );
++            for (&j, s) in indices.iter().zip(sums.iter()) {
++                if !g.is_identity(s) {
++                    map.entry(g.key(s) >> 1).or_insert((i as u32, j as u32));
++                }
++            }
++        };
++        for ai in 0..groups.len() {
++            let i = groups[ai][0];
++            for group in groups.iter().skip(ai) {
++                for &j in group.iter() {
++                    indices.push(j);
++                    points.push(fb.points[j]);
++                    if indices.len() == CHUNK {
++                        flush(i, &indices, &points, &mut sums);
++                        indices.clear();
++                        points.clear();
++                    }
++                }
++            }
++            if !indices.is_empty() {
++                flush(i, &indices, &points, &mut sums);
++                indices.clear();
++                points.clear();
++            }
++        }
++        Self {
++            kind: "negation_folded",
++            entries: map.len() as u64,
++            map,
++            build_ops: ops,
++            build_wall_ns: start.elapsed().as_nanos() as u64,
++        }
++    }
++
+     /// Prime-field version of the same folded table. A row shares one
+     /// inversion across its doubling and all later abscissae; each signed
+     /// pair uses the same inverse. Only the sum's x coordinate is needed
+@@ -10044,6 +10107,63 @@ mod tests {
+         assert!(batch.build_ops.field_ops.invs < scalar.build_ops.field_ops.invs);
+     }
+ 
++    #[test]
++    fn folded_callback_batches_preserve_every_key_witness_and_group_charge() {
++        use crate::cryptanalysis::ic_framework::rootfind::PairedAdd;
++        fn check<G: PairedAdd>(g: &G, fb: &FactorBase<G::Elt>) {
++            let scalar = PairTable::build_negation_folded(g, fb);
++            let mut counters = OracleCounters::default();
++            let batched = PairTable::build_negation_folded_with(g, fb, |ops, p, qs, out| {
++                g.add_many(ops, &mut counters, p, qs, out);
++            });
++            assert_eq!(scalar.map, batched.map, "first witness for every sum key");
++            assert_eq!(scalar.entries, batched.entries);
++            assert_eq!(scalar.kind, batched.kind);
++            assert_eq!(scalar.build_ops.adds, batched.build_ops.adds);
++            assert_eq!(scalar.build_ops.doubles, batched.build_ops.doubles);
++            assert_eq!(scalar.build_ops, batched.build_ops, "complete group ledger");
++            let mut ops = GroupOps::default();
++            let mut lookups = 0;
++            for i in 0..fb.points.len().min(16) {
++                for &p in &fb.points {
++                    let target = g.add(&mut ops, fb.points[i], p);
++                    assert_eq!(
++                        scalar.probe(g, fb, &mut ops, &mut lookups, target),
++                        batched.probe(g, fb, &mut ops, &mut lookups, target)
++                    );
++                }
++            }
++        }
++        let inst = koblitz_instance(1, 17).unwrap();
++        let g = BinaryGroup(&inst.fast);
++        for bits in [3, 7, 9] {
++            let points = (0..1 << bits)
++                .flat_map(|x| inst.points_with_x(x))
++                .collect::<Vec<_>>();
++            assert!(
++                points.iter().any(|p| p.x == 0),
++                "include the self-negative2-torsion point"
++            );
++            let n = points.len();
++            let fb = FactorBase::from_column_map(
++                "explicit binary batch control".into(),
++                points,
++                (0..n).collect(),
++                vec![1; n],
++                n,
++                |p| p.pack(),
++                |p| g.neg(*p).pack(),
++                |p| p.x,
++            )
++            .unwrap();
++            check(&g, &fb);
++        }
++        let prime = prime_instance_for(18, 7);
++        for size in [1, 24, 140] {
++            check(&prime.curve, &prime_factor_base(&prime, size));
++        }
++    }
++
+     #[test]
+     fn native_prime_walk_preserves_point_and_coefficient_stream() {
+         let inst = roster_prime_instance(14).unwrap();
+diff --git a/src/cryptanalysis/ic_framework/rootfind.rs b/src/cryptanalysis/ic_framework/rootfind.rs
+index af1589612..879459273 100644
+--- a/src/cryptanalysis/ic_framework/rootfind.rs
++++ b/src/cryptanalysis/ic_framework/rootfind.rs
+@@ -163,6 +163,7 @@ pub struct RootfindMitmOracle<E> {
+     m: u32,
+     table: Option<PairTable>,
+     reps: Option<Reps<E>>,
++    batch_setup: bool,
+ }
+ 
+ impl<E> RootfindMitmOracle<E> {
+@@ -171,6 +172,7 @@ impl<E> RootfindMitmOracle<E> {
+             m,
+             table: None,
+             reps: None,
++            batch_setup: false,
+         }
+     }
+ }
+@@ -204,6 +206,10 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindMitmOracle<G::Elt> {
+                 "full_table",
+                 "1 to build every i ≤ j pair instead of one pair per orbit under negation",
+             ),
++            (
++                "batch_setup",
++                "1 to batch256 additions while building the folded pair table",
++            ),
+         ]
+     }
+ 
+@@ -217,8 +223,16 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindMitmOracle<G::Elt> {
+         if !matches!(self.m, 2 | 3) {
+             return Err(format!("rootfind-mitm runs at m = 2 or 3, not {}", self.m));
+         }
++        self.batch_setup = !params.flag("full_table")
++            && (params.flag("batch_setup")
++                || std::env::var("KIC_ROOTFIND_BATCH_SETUP").as_deref() == Ok("1"));
+         let table = if params.flag("full_table") {
+             PairTable::build(ctx.group, fb)
++        } else if self.batch_setup {
++            let mut counters = OracleCounters::default();
++            PairTable::build_negation_folded_with(ctx.group, fb, |ops, p, qs, out| {
++                ctx.group.add_many(ops, &mut counters, p, qs, out);
++            })
+         } else {
+             PairTable::build_negation_folded(ctx.group, fb)
+         };
+@@ -230,6 +244,9 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindMitmOracle<G::Elt> {
+ 
+     fn setup_native(&self) -> BTreeMap<String, u64> {
+         let mut counts = BTreeMap::new();
++        if self.batch_setup {
++            counts.insert("pair_table_batch_setup".into(), 1);
++        }
+         if let Some(table) = &self.table {
+             counts.insert("pair_table_entries".into(), table.entries);
+         }
+@@ -381,10 +398,22 @@ mod tests {
+         let mut ops = GroupOps::default();
+         let mut mitm = MitmOracle::new(3);
+         let mut rf_mitm = RootfindMitmOracle::new(3);
++        let mut rf_batch = RootfindMitmOracle::new(3);
++        let mut scalar_m2 = RootfindMitmOracle::new(2);
++        let mut batch_m2 = RootfindMitmOracle::new(2);
+         let mut rf_pairs = RootfindPairsOracle::new(3);
+         let (_, folded) = Params::parse_spec("mitm:negation_folded=1").unwrap();
+         mitm.prepare(ctx, fb, &folded, &mut ops).unwrap();
+         rf_mitm.prepare(ctx, fb, &params, &mut ops).unwrap();
++        let (_, batch_params) = Params::parse_spec("rootfind-mitm:batch_setup=1").unwrap();
++        rf_batch.prepare(ctx, fb, &batch_params, &mut ops).unwrap();
++        scalar_m2.prepare(ctx, fb, &params, &mut ops).unwrap();
++        batch_m2.prepare(ctx, fb, &batch_params, &mut ops).unwrap();
++        assert_eq!(
++            <RootfindMitmOracle<G::Elt> as DecompositionOracle<G>>::setup_native(&rf_batch)
++                ["pair_table_batch_setup"],
++            1
++        );
+         rf_pairs.prepare(ctx, fb, &params, &mut ops).unwrap();
+         let (mut found, mut refuted) = (0, 0);
+         for &t in targets {
+@@ -401,6 +430,19 @@ mod tests {
+             let a = mitm.decompose(ctx, fb, &mut o1, &mut c1, t);
+             let b = rf_mitm.decompose(ctx, fb, &mut o2, &mut c2, t);
+             let c = rf_pairs.decompose(ctx, fb, &mut o3, &mut c3, t);
++            let (mut ob, mut cb) = (GroupOps::default(), OracleCounters::default());
++            let d = rf_batch.decompose(ctx, fb, &mut ob, &mut cb, t);
++            assert_eq!(b, d, "batch preparation must preserve the exact m3 witness");
++            assert_eq!(o2.adds, ob.adds, "query additions must stay identical");
++            let (mut os, mut cs) = (GroupOps::default(), OracleCounters::default());
++            let (mut ot, mut ct) = (GroupOps::default(), OracleCounters::default());
++            let m2a = scalar_m2.decompose(ctx, fb, &mut os, &mut cs, t);
++            let m2b = batch_m2.decompose(ctx, fb, &mut ot, &mut ct, t);
++            assert_eq!(
++                m2a, m2b,
++                "batch preparation must preserve the exact m2 witness"
++            );
++            assert_eq!(os.adds, ot.adds);
+             assert_eq!(a.is_some(), b.is_some(), "verdicts differ on a target");
+             assert_eq!(a.is_some(), c.is_some(), "the memoryless verdict differs");
+             for w in [a.as_ref(), b.as_ref(), c.as_ref()].into_iter().flatten() {
+diff --git a/tools/generalized-rootfinder/README.md b/tools/generalized-rootfinder/README.md
+index 23f1d519c..3102e9d06 100644
+--- a/tools/generalized-rootfinder/README.md
++++ b/tools/generalized-rootfinder/README.md
+@@ -5,6 +5,9 @@ archived in `research/generalized_rootfinding_20261016/historical/rootfinder`.
+ It does not use Python. All returned tuples retain their original variable
+ coordinates. Complete enumeration, component meet-in-the-middle and the native
+ Boolean quadratic route return exact counts independently of the output cap.
++Supported Boolean systems use the existing AVX2/AVX-512 Gray kernel when
++available, with scalar fallback and full original-equation verification.
++`KIC_GENERALIZED_SCALAR_GRAY=1` forces scalar enumeration for comparisons.
+ 
+ ```sh
+ cargo run --release --manifest-path tools/generalized-rootfinder/Cargo.toml -- \
+diff --git a/tools/generalized-rootfinder/src/solver.rs b/tools/generalized-rootfinder/src/solver.rs
+index 0830a4597..38194382c 100644
+--- a/tools/generalized-rootfinder/src/solver.rs
++++ b/tools/generalized-rootfinder/src/solver.rs
+@@ -49,19 +49,21 @@ pub struct Search {
+ 
+ pub fn evaluate(f: &Field, e: &Equation, x: &[N]) -> N {
+     e.iter().fold(N::zero(), |sum, t| {
+-        f.add(
+-            &sum,
+-            &t.powers
+-                .iter()
+-                .zip(x)
+-                .fold(t.coefficient.clone(), |a, (&p, x)| {
+-                    if p == 0 {
+-                        a
+-                    } else {
+-                        f.mul(&a, &f.pow(x, &N::from(p)))
+-                    }
+-                }),
+-        )
++        let mut term = t.coefficient.clone();
++        for (&p, x) in t.powers.iter().zip(x) {
++            if p == 0 || x.is_one() {
++                continue;
++            }
++            if x.is_zero() {
++                return sum;
++            }
++            term = if p == 1 {
++                f.mul(&term, x)
++            } else {
++                f.mul(&term, &f.pow(x, &N::from(p)))
++            };
++        }
++        f.add(&sum, &term)
+     })
+ }
+ fn add_solution(out: &mut Search, x: Vec<N>, limit: usize) -> Result<()> {
+@@ -173,7 +175,7 @@ pub fn search(
+         && (1u64 << n) <= limits.max_work
+     {
+         use crypto_lib::cryptanalysis::{
+-            mq_fes::{gray_incremental_find_all, QuadraticForm},
++            mq_fes::{gray_find_all_wide, gray_incremental_find_all, QuadraticForm},
+             pq_groebner_f2::{F2BoolMono, F2BoolPoly},
+         };
+         let mut binary = Vec::new();
+@@ -225,8 +227,18 @@ pub fn search(
+                 .iter()
+                 .map(|p| QuadraticForm::from_poly(p).unwrap())
+                 .collect::<Vec<_>>();
+-            gray_incremental_find_all(&forms, usize::MAX)
+-                .ok_or("native Boolean backend refused input")?
++            if std::env::var("KIC_GENERALIZED_SCALAR_GRAY").as_deref() != Ok("1") {
++                if let Some((roots, _)) = gray_find_all_wide(&forms, usize::MAX) {
++                    out.method = "native_boolean_gray_wide".into();
++                    roots
++                } else {
++                    gray_incremental_find_all(&forms, usize::MAX)
++                        .ok_or("native Boolean backend refused input")?
++                }
++            } else {
++                gray_incremental_find_all(&forms, usize::MAX)
++                    .ok_or("native Boolean backend refused input")?
++            }
+         };
+         for bits in candidates {
+             let x = (0..n).map(|i| N::from((bits >> i) & 1)).collect::<Vec<_>>();
+@@ -630,11 +642,16 @@ pub fn solve_json(problem: &Value, limits: &Limits) -> Result<Value> {
+         return Err("duplicate variable".into());
+     }
+     let n = variables.len();
+-    let raw = problem
+-        .get("equations")
+-        .cloned()
+-        .unwrap_or_else(|| json!([problem["f"]]));
+-    let equations = normalize(&f, &raw, n)?;
++    // Borrow the sparse tree: cloning it allocates every powers vector and
++    // JSON object before normalization, even though parsing is read-only.
++    let fallback;
++    let raw = if let Some(raw) = problem.get("equations") {
++        raw
++    } else {
++        fallback = json!([problem["f"]]);
++        &fallback
++    };
++    let equations = normalize(&f, raw, n)?;
+     let domain = match domain(&f, &problem["L"], limits) {
+         Ok(d) => d,
+         Err(reason) => {
+diff --git a/tools/generalized-rootfinder/src/tests.rs b/tools/generalized-rootfinder/src/tests.rs
+index a73f96d20..f54989557 100644
+--- a/tools/generalized-rootfinder/src/tests.rs
++++ b/tools/generalized-rootfinder/src/tests.rs
+@@ -258,6 +258,151 @@ fn native_boolean_and_component_mitm_return_every_original_tuple() {
+         vec![vec![N::zero(), N::zero()]]
+     );
+ }
++
++#[test]
++fn optimized_evaluation_preserves_zero_one_and_higher_power_semantics() {
++    for f in [p(2), p(5), binary(3, 11)] {
++        let q = f.order.to_u64_digits()[0];
++        let equations = vec![
++            Term {
++                coefficient: N::from(q - 1),
++                powers: vec![0, 3, 2],
++            },
++            Term {
++                coefficient: N::one(),
++                powers: vec![5, 0, 1],
++            },
++            Term {
++                coefficient: N::from(2u8) % &f.order,
++                powers: vec![1, 4, 0],
++            },
++            Term {
++                coefficient: N::one(),
++                powers: vec![0, 0, 0],
++            },
++        ];
++        for a in 0..q {
++            for b in 0..q {
++                for c in 0..q {
++                    let x = [N::from(a), N::from(b), N::from(c)];
++                    // Independent field-power definition, including 0^0 = 1.
++                    let mut reference = N::zero();
++                    for t in &equations {
++                        let mut v = t.coefficient.clone();
++                        for (&power, x) in t.powers.iter().zip(&x) {
++                            v = f.mul(&v, &f.pow(x, &N::from(power)));
++                        }
++                        reference = f.add(&reference, &v);
++                    }
++                    assert_eq!(solver::evaluate(&f, &equations, &x), reference);
++                }
++            }
++        }
++    }
++}
++
++#[test]
++fn wide_dispatch_preserves_all_roots_and_checks_unpacked_equations() {
++    for n in [8usize, 10, 12] {
++        for many in [false, true] {
++            let f = binary(3, 11);
++            let mut equations = Vec::new();
++            for j in 0..if many { 70 } else { 7 } {
++                let mut powers = vec![0; n];
++                if many {
++                    // First64 packed equations constrain only x0. Later
++                    // equations constrain x1 and must still be verified.
++                    powers[usize::from(j >= 64)] = 1 + (j % 3) as u32;
++                } else {
++                    powers[j % n] = 1 + (j % 3) as u32;
++                    powers[(j + 3) % n] = 2;
++                }
++                let coefficient = 1u8 << (j % 3);
++                let planted = 0b1010_0110_1101u64;
++                let constant = if powers
++                    .iter()
++                    .enumerate()
++                    .all(|(i, &p)| p == 0 || planted >> i & 1 == 1)
++                {
++                    coefficient
++                } else {
++                    0
++                };
++                equations.push(vec![
++                    Term {
++                        coefficient: N::from(coefficient),
++                        powers,
++                    },
++                    Term {
++                        coefficient: N::from(constant),
++                        powers: vec![0; n],
++                    },
++                ]);
++            }
++            // A Boolean polynomial can cancel terms with different exponents.
++            let mut a = vec![0; n];
++            a[0] = 1;
++            let mut b = a.clone();
++            b[0] = 2;
++            equations.push(vec![
++                Term {
++                    coefficient: N::one(),
++                    powers: a,
++                },
++                Term {
++                    coefficient: N::one(),
++                    powers: b,
++                },
++            ]);
++            let mut expected = Vec::new();
++            for bits in 0..1u64 << n {
++                if equations.iter().all(|e| {
++                    let mut coefficient = 0u64;
++                    for t in e {
++                        if t.powers
++                            .iter()
++                            .enumerate()
++                            .all(|(i, &p)| p == 0 || bits >> i & 1 == 1)
++                        {
++                            coefficient ^=
++                                t.coefficient.to_u64_digits().first().copied().unwrap_or(0);
++                        }
++                    }
++                    coefficient == 0
++                }) {
++                    expected.push((0..n).map(|i| N::from(bits >> i & 1)).collect::<Vec<_>>());
++                }
++            }
++            expected.sort();
++            assert!(!expected.is_empty());
++            let limits = Limits {
++                max_work: 1 << n,
++                max_solutions: usize::MAX,
++                ..Default::default()
++            };
++            let got =
++                solver::search(&f, &equations, n, &domain(2), &limits, "native_boolean").unwrap();
++            assert!(got.complete);
++            assert_eq!(got.count, Some(expected.len() as u64));
++            assert_eq!(got.solutions, expected);
++            let capped = solver::search(
++                &f,
++                &equations,
++                n,
++                &domain(2),
++                &Limits {
++                    max_solutions: 3,
++                    ..limits
++                },
++                "native_boolean",
++            )
++            .unwrap();
++            assert_eq!(capped.count, Some(expected.len() as u64));
++            assert_eq!(capped.solutions.len(), 3.min(expected.len()));
++            assert!(capped.solutions.iter().all(|x| expected.contains(x)));
++        }
++    }
++}
+ #[test]
+ fn truncation_and_budget_failures_cannot_masquerade_as_complete_empty_sets() {
+     let input = json!({"field":{"kind":"prime","characteristic":3},"variables":["x","y"],"equations":[[]],"L":{"coefficients":[0]}});

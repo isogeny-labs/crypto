@@ -1,0 +1,102 @@
+    Finished `release` profile [optimized] target(s) in 0.06s
+     Running tests/backlog_cli.rs (/home/ec2-user/crypto-boolean-perf-target/release/deps/backlog_cli-e3e9eb6f18bd8c73)
+
+running 15 tests
+test list_orders_by_funding_then_id_including_unfunded_drafts ... ok
+test an_unsupported_cairn_version_is_refused ... ok
+test the_p192_cards_checker_pins_t_48 ... ok
+test the_committed_cards_validate ... FAILED
+test new_scaffolds_a_draft_that_validates_and_refuses_to_leave_draft_with_todos ... ok
+test the_stop_rule_fails_closed_on_a_missing_lab ... ok
+test cairn_post_is_a_dry_run_by_default_and_refuses_a_blocked_checker_or_a_lab_task ... ok
+test ids_are_checked_on_every_subcommand ... ok
+test cairn_post_refuses_plain_http_nodes ... ok
+test the_checker_binary_exit_codes ... ok
+test concurrent_claims_resolve_to_one_holder_after_sync ... ok
+test a_conflicted_found_still_stops_every_runner ... ok
+test publish_claim_exec_release_and_status_round_trip ... ok
+test first_success_found_is_set_only_on_a_checked_published_artifact ... ok
+test every_seed_card_publishes_unchanged ... FAILED
+
+failures:
+
+---- the_committed_cards_validate stdout ----
+"/home/ec2-user/crypto-boolean-perf-target/release/backlog" "--root" "/home/ec2-user/crypto-boolean-perf" "validate" "--all" "--no-git" exited Some(1)
+stdout:
+XP-20261015-conductor-96-point-maps: ok
+XP-20261015-conductor-complete-cost: ok
+XP-20261015-conductor-coordinate-seeds: ok
+XP-20261015-conductor-d43-replication: ok
+XP-20261015-conductor-original96-floor: ok
+XP-20261015-conductor-prime-field-pdp: ok
+XP-20261015-kummer-p224-depth: ok
+XP-20261015-p192-isogeny-aux-search-t48: ok
+XP-20261015-pkm-m3-n21-m4-n20: ok
+XP-20261015-shape-g1-frozen-cells: ok
+XP-20261016-conductor-dose-response: ok
+XP-20261016-conductor-interleaved-crossover: ok
+XP-20261016-conductor-orbit-overlap: ok
+XP-20261016-conductor-rho-partition-control: ok
+XP-20261016-conductor-yield-distribution: ok
+XP-20261016-prime-base-oracle-tuning: ok
+  warning: cairn.env.recipe: still TODO
+  warning: run.argv[0]: still TODO
+XP-20261016-prime61-horizontal-class: ok
+XP-20261016-screenshot-factor-base-port: ok
+XP-20261017-full-volcano-graphwide-ic: ok
+  warning: cairn.env.recipe: still TODO
+XP-20261017-quintic-support-frobenius: FAILED
+  error: outputs.verify: placeholder {artifact} in "{artifact}" has no value
+1 of 20 cards failed
+
+stderr:
+
+
+thread 'the_committed_cards_validate' (1017120) panicked at tests/backlog_cli.rs:67:5:
+XP-20261015-conductor-96-point-maps: ok
+XP-20261015-conductor-complete-cost: ok
+XP-20261015-conductor-coordinate-seeds: ok
+XP-20261015-conductor-d43-replication: ok
+XP-20261015-conductor-original96-floor: ok
+XP-20261015-conductor-prime-field-pdp: ok
+XP-20261015-kummer-p224-depth: ok
+XP-20261015-p192-isogeny-aux-search-t48: ok
+XP-20261015-pkm-m3-n21-m4-n20: ok
+XP-20261015-shape-g1-frozen-cells: ok
+XP-20261016-conductor-dose-response: ok
+XP-20261016-conductor-interleaved-crossover: ok
+XP-20261016-conductor-orbit-overlap: ok
+XP-20261016-conductor-rho-partition-control: ok
+XP-20261016-conductor-yield-distribution: ok
+XP-20261016-prime-base-oracle-tuning: ok
+  warning: cairn.env.recipe: still TODO
+  warning: run.argv[0]: still TODO
+XP-20261016-prime61-horizontal-class: ok
+XP-20261016-screenshot-factor-base-port: ok
+XP-20261017-full-volcano-graphwide-ic: ok
+  warning: cairn.env.recipe: still TODO
+XP-20261017-quintic-support-frobenius: FAILED
+  error: outputs.verify: placeholder {artifact} in "{artifact}" has no value
+1 of 20 cards failed
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- every_seed_card_publishes_unchanged stdout ----
+"/home/ec2-user/crypto-boolean-perf-target/release/backlog" "--root" "/home/ec2-user/crypto-boolean-perf" "cairn-publish" "XP-20261017-quintic-support-frobenius" "--lab" "/home/ec2-user/crypto-boolean-validation-20261019/tmp/backlog-it-1017089-publish-all/A" "--identity" "/home/ec2-user/crypto-boolean-validation-20261019/tmp/backlog-it-1017089-publish-all/one.identity.json" exited Some(2)
+stdout:
+
+stderr:
+backlog: XP-20261017-quintic-support-frobenius does not validate (error: outputs.verify: placeholder {artifact} in "{artifact}" has no value); run `backlog validate XP-20261017-quintic-support-frobenius`
+
+
+thread 'every_seed_card_publishes_unchanged' (1017104) panicked at tests/backlog_cli.rs:847:9:
+XP-20261017-quintic-support-frobenius
+
+
+failures:
+    every_seed_card_publishes_unchanged
+    the_committed_cards_validate
+
+test result: FAILED. 13 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.90s
+
+error: test failed, to rerun pass `--test backlog_cli`

@@ -1,0 +1,22 @@
+   Compiling crypto v0.1.0 (/home/ec2-user/crypto-boolean-perf)
+    Finished `release` profile [optimized] target(s) in 2m 14s
+     Running unittests src/lib.rs (/home/ec2-user/crypto-boolean-perf-target/release/deps/crypto_lib-85c62367deb6e665)
+
+running 1 test
+test cryptanalysis::koblitz_index_calculus::tests::full_pair_table_single_worker_matches_parallel_entries_and_budgets ... FAILED
+
+failures:
+
+---- cryptanalysis::koblitz_index_calculus::tests::full_pair_table_single_worker_matches_parallel_entries_and_budgets stdout ----
+
+thread 'cryptanalysis::koblitz_index_calculus::tests::full_pair_table_single_worker_matches_parallel_entries_and_budgets' (638232) panicked at src/cryptanalysis/koblitz_index_calculus.rs:14625:46:
+called `Option::unwrap()` on a `None` value
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    cryptanalysis::koblitz_index_calculus::tests::full_pair_table_single_worker_matches_parallel_entries_and_budgets
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 4531 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`
