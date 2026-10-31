@@ -1,0 +1,49 @@
+[package]
+name = "pencil-sparse-study"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+five-leads-study = { path = "../five_leads_e2e_20261019/native" }
+serde_json = "1"
+serde = { version = "1", features = ["derive"] }
+
+[[bin]]
+name = "pencil-sparse"
+path = "src/bin/pencil_sparse.rs"
+
+[[bin]]
+name = "price-sparse"
+path = "src/bin/price_sparse.rs"
+
+[[bin]]
+name = "validate-sparse"
+path = "src/bin/validate_sparse.rs"
+
+[[bin]]
+name = "compare-sparse"
+path = "src/bin/compare_sparse.rs"
+
+[[bin]]
+name = "check-rho-symmetry"
+path = "src/bin/check_rho_symmetry.rs"
+
+[[bin]]
+name = "summarize-sparse"
+path = "src/bin/summarize_sparse.rs"
+
+[[bin]]
+name = "cap-process-status"
+path = "src/bin/cap_process_status.rs"
+
+[[bin]]
+name = "audit-stream"
+path = "../pencil_markowitz_20261022/native/audit_stream.rs"
+
+[[bin]]
+name = "summarize-markowitz"
+path = "../pencil_markowitz_20261022/native/summarize_markowitz.rs"
+
+[[bin]]
+name = "package-markowitz"
+path = "../pencil_markowitz_20261022/native/package_markowitz.rs"

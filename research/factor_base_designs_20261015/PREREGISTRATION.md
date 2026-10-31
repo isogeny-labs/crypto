@@ -1175,3 +1175,394 @@ not nested), so their `b` is not monotone in `ℓ` and can repeat
 defines them, and it is read as such in the report. After the rows, the
 analysis harness gained the printed marks for P6, P7 and P8; no rule R1–R7
 changed.
+
+### Amendment 12, 2026-10-21: the two m = 4 cells on a 64 GiB host (H64-A0, H64-A11), before any of their rows
+
+**Numbering note, 2026-10-26 (renames only; changes no rule, threshold, prediction, row or byte of any record).** This amendment was registered and run as “Amendment 7” with cells X1 and X2 (run records `runs/X1-A0-m4-t4.*`, `runs/X2-A11-m4-t5.*`, runner `scripts/run_amendment7.sh`, flag `analyze --amendment7`). `main` meanwhile gained its own Amendments 7 and 8 and its own X1 cell, so on merging `main` it is renumbered **Amendment 12** with cells **H64-A0** (was X1) and **H64-A11** (was X2); files are renamed with `git mv` to `runs/H64-A0-m4-t4.*`, `runs/H64-A11-m4-t5.*`, `scripts/run_amendment12.sh`, flag `--amendment12`. The renamed records are byte-identical inside, so they still name the old cells: the instance logs, `*.dmesg.txt` and `*.preflight.txt` say X1 or X2. The raw outputs remain under the old S3 prefix `s3://crypto-autoresearcher/lab-results/factor-base-designs-a7/fab81e175/`, whose keys are unchanged.
+
+Registered after Amendment 6's run (`reports/run-20261019T1740Z`) and before
+any H64-A0 or H64-A11 row exists. It adds two cells. It changes no existing row,
+verdict, threshold or prediction. Instrument, seeds, the completed-cell rule,
+σ, κ, R1 and R2 are unchanged. L1, L2 and L2r stay as recorded. The only
+changes are the host and the memory limit.
+
+**Why.** Amendments 5 and 6 left both open m = 4 cells *not measurable* on the
+15 GB containers: A0 at t = 4 died at about 12.9 GB resident, and A11 at
+t = 5 died at the 14.0 GB cgroup limit. Neither result says whether either
+cell completes with more memory. The owner approved a larger host on
+2026-10-21. The independent lab runner is still not reachable from these
+containers.
+
+- **Host.** Two AWS EC2 `r7i.2xlarge` instances (64 GiB, 8 vCPU) in
+  us-west-2, Ubuntu 24.04, one per cell, otherwise idle. Each runs
+  `scripts/run_amendment12.sh` as root. The script needs no checkout. The
+  binary is a release build of `examples/fb_designs_slope.rs` at the commit
+  that adds this amendment, built in the session container (glibc 2.39, as on
+  the AMI). It is stamped through `FB_DESIGNS_COMMIT`, and its sha256 is
+  recorded. Each instance has a hard 9 h cap: it terminates itself at
+  boot + 540 min. Operation counts depend only on code, seed and system, never
+  on the host, so X rows are comparable with C2's on `field_ops`, D and
+  `max_cols`. Wall times are not comparable across hosts and are descriptive.
+- **Pre-flight and limit** (Amendment 6's rule, without the 14.5 GB cap).
+  Record `MemTotal`, the shell's memory-cgroup limit and `nproc` in
+  `runs/<cell>.preflight.txt`. Then set
+  `V = min(cgroup_limit_kB − 524288, MemTotal_kB − 524288)` kB. A cgroup
+  limit at or above `MemTotal`, or `max`, counts as none. If no cgroup file is
+  readable, the script does not run.
+- **H64-A0, A0 m = 4, t = 4, p₁.** The same two planted systems as C2 and L1 (the
+  seeds are unchanged, so the systems are identical):
+  `run --arms A0 --m 4 --t-min 4 --t-max 4 --budget 14400 --grace 600 --vmem-kb V --file 'H64-{arm}-m4-t4'`.
+- **H64-A11, A11 m = 4, t = 5, p₁.** The same two planted systems as L2 and L2r:
+  `run --arms A11 --m 4 --t-min 5 --t-max 5 --budget 14400 --grace 600 --vmem-kb V --file 'H64-{arm}-m4-t5'`.
+- One system at a time on each host. Each row records `field_ops`,
+  `max_cols`, D, wall time, `ulimit_v_kb` and `peak_rss_kb`. **Attribution**
+  is Amendment 6's check: the kernel OOM lines (or "none") go to
+  `runs/<cell>.dmesg.txt`. A system's limit is attributable only if its row
+  is a `ulimit -v` malloc failure or a timeout and the kernel log has no OOM
+  kill for it. A system cut off by the 9 h instance cap leaves no row and is
+  reported as *not decided (instance cap)*.
+- **Identity.** The analysis checks that H64-A0's systems equal C2's and L1's,
+  and H64-A11's equal L2's and L2r's, on the same fields as Amendment 6.
+
+**Decision rules, fixed now.** R1 and R2 as in Amendment 5, with the limit
+"V kB on the X host and 4 h":
+- **R1.** If both H64-A0 systems complete: *survives* if A11's C2 t = 4 mean
+  `field_ops` is below H64-A0's mean, *crossed* otherwise. A0's m = 4 series then
+  gains its third cell, and its σ and κ verdicts are computed. If H64-A0 does not
+  complete: *A0 not measurable at t = 4 within V kB and 4 h*, with the
+  binding limit (memory or time) and the partial values.
+- **R2.** If both H64-A11 systems complete, the cell joins A11's m = 4 series as a
+  fourth point, and σ and κ are recomputed with their verdicts. If not: *A11
+  not measurable at m = 4, t = 5 within V kB and 4 h*, with the binding limit,
+  and the 3-cell verdicts stand.
+- The binding limit of every incomplete system is reported, memory or time.
+  That is the question this amendment can answer even if neither cell
+  completes.
+
+**Predictions** (from extrapolating each arm's completed cells, made before
+any row):
+- H64-A0: A0's `field_ops` grew ×1750 from t = 2 to t = 3. Another ×1750 step
+  puts t = 4 at about 2·10¹⁴. At C2's A11 rate (about 8.4·10⁸ field ops/s),
+  that is about 66 h. So H64-A0 **does not complete**. Its binding limit is
+  **time** (a timeout at 14400 s) if A0's t = 4 working set fits in 64 GiB.
+  We predict it fits: L1 reached 12.9 GB at 540 s.
+- H64-A11: κ = 14.9 bits per base bit puts A11 at t = 5 at about 2·10¹⁶
+  `field_ops`. So H64-A11 **does not complete**. Its binding limit is
+  **memory**: L2 reached 14.0 GB in under 110 s, and resident size growing
+  at that rate passes 64 GiB well inside 4 h.
+- Neither outcome would change a recorded verdict.
+
+### Amendment 13, 2026-10-21: the two m = 4 cells on the EKS high-memory runner (K8S-A0, K8S-A11), before any of their rows
+
+**Numbering note, 2026-10-26 (renames only; changes no rule, threshold, prediction or row).** This amendment was registered as “Amendment 8” with cells E1 and E2, runner `scripts/run_amendment8.sh` and flag `analyze --amendment8`. `main` has its own Amendment 8 and its own E1 cell (twisted Edwards), so on merging `main` it is renumbered **Amendment 13** with cells **K8S-A0** (was E1) and **K8S-A11** (was E2); the runner is `scripts/run_amendment13.sh`, the flag `--amendment13`, the row prefixes `K8S-A0-` and `K8S-A11-`, and the workflow artifact `fb-designs-amendment13-<cell>-<run_id>-<attempt>`. The amendment it builds on, registered as “Amendment 7” with cells X1 and X2, is now Amendment 12 with cells H64-A0 and H64-A11. No E row, K8S row or workflow run exists, so no record or artifact carries an old name.
+
+
+Registered after Amendment 12's run (`reports/run-20261021T0056Z`) and before
+any K8S-A0 or K8S-A11 row exists. It adds two cells. It changes no existing row,
+verdict, threshold or prediction. Instrument, seeds, the completed-cell rule,
+σ, κ, R1 and R2 are unchanged. Amendment 12's limit rule and analysis carry
+over. The changes are the host, the memory limit, the attribution record and
+how the run is started. The run waits for capacity: it is dispatched by hand
+when the EKS cluster can place a high-memory Spot node.
+
+**Why.** Amendment 12 left both open m = 4 cells *not measurable within
+64 GB*. Both cells were memory-bound in both systems: A0 at t = 4 was stopped
+at 1874–1916 s, and A11 at t = 5 at 6011–6024 s. The repository's EKS cluster
+runs a high-memory GitHub Actions runner with nearly twice that memory. The
+owner asked on 2026-10-21 for the experiment, tools and code versions to be
+set up in a PR and run there when a Spot instance is available.
+
+- **Host.** The `crypto-eks-highmem` ARC runner scale set on the `isolab` EKS
+  cluster (`taskq/deploy/eks-karpenter/arc/`). This is a Karpenter Spot node
+  from the R/M families. The runner pod requests 16 CPU and 112 GiB, with a
+  pod memory limit of **120 GiB**. At most one runner exists at a time. The
+  runner image is pinned by digest in
+  `taskq/deploy/eks-karpenter/arc/highmem-values.yaml` at the dispatched
+  commit. Each cell runs on an otherwise idle pod, and the two cells run one
+  after the other.
+- **How it runs.** `.github/workflows/fb-designs-m4-highmem.yml`, started by
+  `workflow_dispatch`. Each cell is one job:
+  - check out the dispatched commit;
+  - refuse to run if the pod's `memory.max` is below 112 GiB;
+  - build `cargo build --locked --release --example fb_designs_slope` with
+    the image's toolchain;
+  - run `scripts/run_amendment13.sh CELL BINARY OUT`;
+  - upload `OUT` as a workflow artifact, kept for 90 days.
+
+  Rows are committed by hand from the artifact, together with the run id and
+  the artifact name.
+- **Tool and code versions, recorded per cell in
+  `runs/<cell>.preflight.txt`:**
+  - the commit (`FB_DESIGNS_COMMIT` = the dispatched SHA) and the binary's
+    sha256;
+  - `rustc --version` and `cargo --version`;
+  - the runner image digest;
+  - the runner name;
+  - `MemTotal`, the cgroup path and limit, and `nproc`;
+  - the kernel version, the DMI product name and the CPU model.
+
+  Operation counts depend only on code, seed and system, so E rows are
+  comparable with C2's, H64-A0's and H64-A11's on `field_ops`, D and `max_cols`. Wall
+  times are descriptive only.
+- **Limit.** `V = min(cgroup_limit_kB − 524288, MemTotal_kB − 524288)` kB, as
+  in Amendments 6 and 7. With the 120 GiB pod limit this is
+  125 829 120 − 524 288 = **125 304 832 kB**, unless the pre-flight reads a
+  different value. In that case the formula is used and the value recorded.
+- **K8S-A0, A0 m = 4, t = 4, p₁.** The same two planted systems as C2, L1 and H64-A0:
+  `run --arms A0 --m 4 --t-min 4 --t-max 4 --budget 14400 --grace 600 --vmem-kb V --file 'K8S-{arm}-m4-t4'`.
+- **K8S-A11, A11 m = 4, t = 5, p₁.** The same two planted systems as L2, L2r and
+  H64-A11:
+  `run --arms A11 --m 4 --t-min 5 --t-max 5 --budget 14400 --grace 600 --vmem-kb V --file 'K8S-{arm}-m4-t5'`.
+- **Attribution.** A pod normally cannot read the kernel log, so
+  `run_amendment13.sh` records the job cgroup's OOM-kill counter
+  (`memory.events`, or `memory.oom_control` under cgroup v1). It reads the
+  counter before and after the run. For a readable kernel log, the runner
+  takes a non-mutating pre-run snapshot and records only new OOM lines from a
+  post-run snapshot; it never clears the shared node ring buffer. The counter
+  and any new OOM lines go to `runs/<cell>.oom.txt`. A system's limit is
+  attributable only if:
+  - its row is a `ulimit -v` malloc failure, a timeout or ok; and
+  - the record shows no OOM kill during the run.
+
+  A counter that cannot be read does not count as a kill. The malloc-failure
+  row is itself the address-space limit's signature, because the cgroup OOM
+  killer sends SIGKILL instead.
+- **Spot interruption.** A job cut off by Spot reclaim, or by the 540-minute
+  job timeout, may leave no artifact. That attempt is recorded in the report
+  with its run id and is *not decided*. The cell is then re-dispatched whole,
+  and the systems are deterministic. A cell's rows all come from one attempt.
+- **Identity.** `analyze --amendment13` checks that K8S-A0's systems equal C2's,
+  L1's and H64-A0's, and K8S-A11's equal L2's, L2r's and H64-A11's.
+
+**Decision rules, fixed now.** These are Amendment 12's rules with the limit
+"V kB on the EKS high-memory runner and 4 h":
+- **R1.** If both K8S-A0 systems complete: *survives* if A11's C2 t = 4 mean
+  `field_ops` is below K8S-A0's mean, *crossed* otherwise. A0's m = 4 series then
+  gains its third cell, and its σ and κ verdicts are computed. If K8S-A0 does not
+  complete: *A0 not measurable at t = 4 within V kB and 4 h*, with the
+  binding limit and the partial values.
+- **R2.** If both K8S-A11 systems complete, the cell joins A11's m = 4 series as a
+  fourth point, and σ and κ are recomputed with their verdicts. If not: *A11
+  not measurable at m = 4, t = 5 within V kB and 4 h*, with the binding limit,
+  and the 3-cell verdicts stand.
+- If any limit is not attributable, the outcome is *not decided*, with the
+  reason.
+
+**Predictions** (made before any row). Each comes from a power law
+peak RSS ∝ (wall time)^β fitted through each cell's two measured stops. Those
+stops are on different hosts, so the fit is a rough guide:
+- K8S-A0: L1 reached 12.9 GB at 528 s and H64-A0 60.7 GB at 1895 s (means of the two
+  systems), so β ≈ 1.22. That reaches 125 GB at about 3450 s. So K8S-A0
+  **does not complete** and its binding limit is **memory**, near 3450 s.
+- K8S-A11: L2r reached 13.3 GB at 131 s and H64-A11 62.9 GB at 6018 s, so β ≈ 0.41.
+  That reaches 125 GB only at about 33 000 s, and gives about 90 GB at
+  14 400 s. So K8S-A11 **does not complete** and its binding limit is **time**, a
+  timeout at 14 400 s with peak RSS around 90 GB.
+- Neither outcome would change a recorded verdict. An K8S-A11 timeout would be
+  the first time-bound m = 4 stop in this study.
+
+### Amendment 14, 2026-10-26: the two `m = 4` cells on a 256 GiB EC2 host (R256-A0, R256-A11), before any of their rows
+
+Registered after Amendments 12 and 13 and before any R256 row exists. It adds
+two cells. It changes no existing row, verdict, threshold or prediction.
+Instrument, seeds, the completed-cell rule, σ, κ, R1 and R2 are unchanged.
+Amendment 13 stays registered as written. It has no rows.
+
+**Why.** Amendment 12 left both open cells *not measurable within 64 GB*: all
+four systems were stopped by `ulimit -v`, A0 at `t = 4` at 1874–1916 s and A11
+at `t = 5` at 6011–6024 s. Amendment 13 registered them on the EKS
+high-memory runner. That run could not start. The ARC controller registers
+its scale set with the token in `arc-github-auth`, and after the repository
+moved to `isogeny-labs/crypto` GitHub answers that call with 404
+(controller log, 2026-10-26, `POST /repos/isogeny-labs/crypto/actions/runners/registration-token`),
+so no listener exists and the queued workflow run never got a runner. The
+owner decided not to replace the token. The owner approved a larger EC2 host
+on 2026-10-26: one `r7i.8xlarge`, up to about 17 h, about $35.
+
+- **Host.** One AWS EC2 `r7i.8xlarge` (32 vCPU, 256 GiB) in us-west-2, Ubuntu
+  24.04, on demand, otherwise idle, with no memory cgroup limit. The two cells
+  run one after the other, R256-A0 first, with
+  `scripts/run_amendment14.sh CELL BINARY OUT`. The instance terminates itself
+  when both cells end, and at a hard cap of 16 h in any case.
+- **Build.** On the instance, from a source archive of the commit that adds
+  this amendment, with `cargo build --release --example fb_designs_slope`. The
+  pre-flight records `rustc` and `cargo` versions, the commit
+  (`FB_DESIGNS_COMMIT`) and the binary's sha256. A failed build ends the
+  instance before any cell runs and leaves no row. Operation counts depend
+  only on code, seed and system, so rows compare with C2, L1 and H64 on
+  `field_ops`, D and `max_cols`. Wall times are descriptive only.
+- **Limit.** `V = min(cgroup_limit_kB − 524288, MemTotal_kB − 524288)` kB as in
+  Amendments 6, 12 and 13. With no cgroup limit this is `MemTotal − 524288`,
+  about 258.6 GB for this instance type (estimated from the 64 GiB host's
+  `MemTotal`, to be read in the pre-flight).
+- **R256-A0, A0 m = 4, t = 4, p₁.** The same two planted systems as C2, L1 and
+  H64-A0:
+  `run --arms A0 --m 4 --t-min 4 --t-max 4 --budget 14400 --grace 600 --vmem-kb V --file 'R256-{arm}-m4-t4'`.
+- **R256-A11, A11 m = 4, t = 5, p₁.** The same two planted systems as L2, L2r
+  and H64-A11:
+  `run --arms A11 --m 4 --t-min 5 --t-max 5 --budget 14400 --grace 600 --vmem-kb V --file 'R256-{arm}-m4-t5'`.
+- **Attribution** is Amendment 13's: `runs/<cell>.oom.txt` holds the job
+  cgroup's OOM-kill counter before and after the run, and the kernel log's OOM
+  lines when it is readable (as root on EC2 it is). A system's limit is
+  attributable only if its row is a `ulimit -v` malloc failure, a timeout or
+  ok, and the record shows no OOM kill. An unreadable counter is not a kill.
+- **Failure of the host.** An instance that ends before both cells finish
+  (hardware failure, the 16 h cap) leaves the unfinished cell *not decided*,
+  with the pushed progress files as the only record. A cell's rows all come
+  from one attempt.
+- **Identity.** `analyze --amendment14` checks that the R256 systems equal
+  C2's, L1's and H64's (A0), and L2's, L2r's and H64's (A11).
+
+**Decision rules, fixed now.** Amendment 13's, with the limit "V kB on the EC2
+host and 4 h". R1: if both R256-A0 systems complete, A11's C2 `t = 4` mean
+`field_ops` against R256-A0's mean decides *survives* or *crossed*, and A0's
+`m = 4` series gains its third cell. If not: *A0 not measurable at `t = 4`
+within V kB and 4 h*, with the binding limit and the partial values. R2: if
+both R256-A11 systems complete, the cell joins A11's `m = 4` series as a
+fourth point and σ and κ are recomputed. If not: *A11 not measurable at
+`m = 4`, `t = 5` within V kB and 4 h*, with the binding limit, and the 3-cell
+verdicts stand. A limit that is not attributable makes the outcome *not
+decided*, with the reason.
+
+**Predictions** (made before any row), by the same power law of peak RSS in
+wall time through each cell's two measured stops as Amendment 13, which are
+on different hosts, so the fit is rough:
+- R256-A0: L1 reached 12.9 GB at 527 s and H64-A0 60.7 GB at 1895 s (means),
+  so the exponent is 1.21. Peak RSS reaches 97 % of V (about 251 GB) at about
+  6100 s. R256-A0 **does not complete**, and its binding limit is **memory**,
+  near 6100 s.
+- R256-A11: L2r reached 13.3 GB at 131 s and H64-A11 62.9 GB at 6018 s, so the
+  exponent is 0.41. That gives about 90 GB at 14 400 s and reaches 250 GB only
+  at about 180 000 s. R256-A11 **does not complete**, and its binding limit is
+  **time**, a timeout at 14 400 s with peak RSS near 90 GB.
+- Neither outcome would change a recorded verdict. If R256-A0 runs out of
+  memory at 256 GiB too, that is the first result that rules out a working set
+  under about 258 GB for A0 at `t = 4`. (An allocation failure under
+  `ulimit -v` bounds the address space, not the resident set, as the review
+  of Amendment 12 recorded.)
+- Worst-case wall time is about 11.7 h (A0 about 2 × 6100 s, A11 up to
+  2 × 15 000 s).
+
+**Note on the host, 2026-10-26 (changes no cell, limit, rule or prediction).**
+The paragraph above says the instance is "on demand". The account policy
+`SpotOnlyEC2Launch` (updated 2026-10-22) denies on-demand launches, so the
+instance is a **Spot** instance instead: one-time request, interruption
+behaviour terminate, same type and size. Recent Spot prices for the type in
+us-west-2 are about $0.76 to $1.07 per hour, below the approved cost. A Spot
+reclaim ends the instance and leaves the unfinished cell *not decided* (see
+"Failure of the host"); a system's row is written when that system ends, so
+rows already pushed stay. This note was committed before any R256 row exists.
+
+### Amendment 15, 2026-10-26: checkpointed F4 and an auto-resuming host for the R256 cells, before any R256 row
+
+Registered after Amendment 14 and before any R256 row exists. It changes no
+cell, seed, instrument, limit, decision rule, prediction or counted quantity.
+It changes how the two Amendment 14 cells are run, because the way Amendment
+14 ran them lost work.
+
+**What happened to the first attempts** (no attempt produced a row; recorded
+here and not removed). Instance `i-0acb1955…` and `i-086260fb…` failed in the
+build (a path dependency missing from the source archive; then no
+`libssl-dev`). Instance `i-0f4703b6…` built and ran R256-A0 from 18:37Z; AWS
+reclaimed the Spot host at about 19:50Z (reason "no Spot capacity"), after
+about 73 min of A0 and before any row. The binary had no way to resume, so
+that work is lost. Instance `i-0d3eaa94…` (one-time Spot request, same binary)
+was launched at 20:11Z and had run R256-A0 for about 20 min with no row when this amendment superseded it; it was terminated.
+
+**The mechanism.**
+- `f4_fp::F4Options::checkpointing(path, every)` (in `src/cryptanalysis/f4_fp.rs`)
+  writes, at the top of a step once `every` has passed since the last write,
+  the state that survives a step: the basis and its liveness flags, the pending
+  and over-the-bound pairs, the step counters, the field operations and the
+  time spent so far. The write is atomic (temporary file, sync, rename; the
+  previous file is kept as `.prev`) and carries a checksum and the identity of
+  the run (system, field, options). A later call with the same system finds
+  the file, verifies it in full, refuses another system's, falls back to
+  `.prev` if the newest file is corrupt, and continues from it. A step in
+  flight when the process dies is redone. Options are unchanged when
+  `checkpointing` is not called.
+- The study binary (`run --checkpoint-every SECONDS`) gives each child system a
+  checkpoint path. On resume the F4 deadline counts the time already spent: the
+  budget of 14 400 s is F4 compute time summed over segments, and downtime
+  between segments is not in it. The parent's hard limit is `budget + grace`
+  minus the time already spent. A row gains `segments` (processes that worked
+  on the system) and `ckpt_carried_s` (time already spent when the last segment
+  started). `time` is the total over segments; `process_wall_s` is the last
+  segment's. `peak_rss_kb` is the maximum over segments; a segment that was
+  killed contributes its peak up to its last 10 s sample, so for it the value
+  is a lower bound.
+- The row of a system that has been killed and resumed is the row of the
+  uninterrupted system for every counted field. This is tested, not argued:
+  `tests/f4_checkpoint_resume.rs` stops and resumes runs of random systems over
+  three primes at several steps, including twice in a row, and compares the
+  basis, `steps`, `max_rows`, `max_cols`, the solving degrees and `field_ops`
+  with the plain run (and mutating the carried field operations makes it fail).
+  On the host, before any cell, `scripts/selftest_checkpoint.sh` runs A0 `m = 3`,
+  `t = 4` plain, then with a checkpoint every second and two `SIGKILL`s, and
+  requires the same counted fields and at least two segments. A failure ends the
+  instance with no cell run.
+- Checkpoint writes cost wall time, which is in `time`, and no field
+  operations. Their cost at this system's size is not known before the run and
+  is reported with the rows. Writing every 600 s bounds what a reclaim loses to
+  about 600 s plus one step's remaining work, unless a single step is longer
+  than that, in which case it loses that step.
+
+**The host.** The same `r7i.8xlarge` in us-west-2, now under a *persistent*
+Spot request valid for 40 h, interruption behaviour *stop* (AWS does not allow
+*terminate* on a persistent request). A reclaimed host is stopped, keeping its
+disk, and restarted by the request when capacity returns; a systemd service
+re-runs the run script at every boot, so the local checkpoint and rows are
+used where they exist. A replacement on a fresh disk (the 16 h cap per boot
+terminates the instance) downloads the checkpoint and the rows from S3
+(`s3://crypto-autoresearcher/lab-results/factor-base-designs-a14/<commit>-ckpt/state/out`,
+synced from the host every 5 min) and the binary built on the first host
+(same sha256, so every segment runs the same code). Either way the script
+`scripts/run_amendment15.sh` skips a cell that already has its row and resumes
+one that does not. Pre-flight and OOM records are appended, one section
+per segment. The instance holds temporary credentials (a 36 h federated token)
+that can only read and write that S3 prefix and cancel Spot requests; when both
+cells have rows it uploads, cancels its request and halts.
+
+**Amendment 14's "Failure of the host" is replaced for the R256 cells:** a
+reclaim no longer leaves a cell *not decided*. A cell is *not decided* only if
+it has no row when the request expires (40 h), if the self-test fails, or if
+the segments disagree on `V_kB` (the analysis compares the pre-flight
+sections). "A cell's rows all come from one attempt" now reads: a system's row
+comes from one system's chain of segments, resumed from its own checkpoints.
+
+**Unchanged:** the two cells and their commands (plus `--checkpoint-every`),
+the limit rule, the attribution rule, the identity checks, R1, R2 and the
+predictions of Amendment 14 (none of them depends on the number of
+segments). No prediction is made for the number of reclaims.
+
+### Amendment 15, erratum and results note, 2026-10-27 (after the rows; changes no rule, threshold, prediction or row)
+
+The rows of R256-A0 and R256-A11 are in `runs/` and `reports/run-20261027T1318Z/REPORT.pdf` reports them. Four things the amendment text above gets wrong or leaves out:
+- It says the 16 h cap per boot terminates the instance. With interruption behaviour *stop* it stops it; the instance's own terminate call did not take effect either, and stopped instances were terminated by hand.
+- `run_amendment15.sh` as first committed skipped a cell as soon as it had any row. A host reclaimed during A0's second target never resumed it; the target was run afterwards with the fixed script (commit `dfe40db2c`, `--first-target`). No row depends on the skipped attempt.
+- The V spread: the six A0 segments computed V from their own MemTotal and range over 259 227 456--259 227 476 kB. The amendment's "segments that disagree on V make a cell not decided" is not applied, because the spread is 20 kB of MemTotal rounding on one instance type, no limit was reached, and no row depends on V. It is reported as a deviation from the letter of the rule.
+- The Amendment 14 scorecard in `analyze --amendment14` prints "held" for R256-A11 because it checks completion and limit only; the amendment's memory figure (about 90 GB) did not hold (223.0 and 216.9 GB). The report scores both parts separately.
+
+Outcome under the registered rules: R1 survives (A11 below A0 at t = 4); A0 at m = 4 has three completed cells, κ = 9.477, σ = 0.5, cost-unfavourable; R2: A11 at t = 5 is not measurable within V and 4 h, binding limit time, and the three-cell verdict (κ = 14.886, σ = 1.5, cost-unfavourable) stands. R256-A0's prediction did not hold (both systems completed, 121 GB).
+
+### Amendment 16, 2026-10-27: snapshots inside a step (tooling; no cell, row, rule, threshold or prediction changes)
+
+Registered after the R256 rows. It adds a capability to the F4 engine and the study binary and changes no existing row or verdict. No R256 row used it.
+
+**Why.** In the R256 run four of the seven A0 segments were lost entirely to Spot reclaims because no checkpoint existed yet: a checkpoint is written only at the top of a step, and the first one of a system appeared about 90 min in (one early step lasted most of that); later steps took 17 to 23 min each. Writing at step tops cannot protect a step that is itself an hour long.
+
+**What.** `F4Options::checkpointing_in_step(every)` (`--checkpoint-in-step-every SECONDS` on `run`, off by default). In the wide arithmetic (`p > 2^16`, which includes p#sub[1]) without weights and without `max_pairs_per_step`, the dense row reduction of a step shows its position to a hook at column boundaries (forward phase) and before each back-substitution row (backward phase). Once `every` has passed since the last snapshot the hook writes (1) the loop-top state of the step, as an ordinary checkpoint, unless one for this step top is already there, and (2) `path.rref`: the partly reduced dense matrix, the pivots, the position, and the field operations and time spent so far, bound to the loop-top checkpoint by its step counter and elapsed time, with a checksum. A resumed run loads the loop-top checkpoint, then the snapshot if it belongs to it, re-derives the step's pairs, symbolic preprocessing and matrix shape deterministically, skips the reducer pass and the finished part of the reduction, and continues; its field operations continue from the snapshot's. Anything else (no snapshot, a snapshot of another step, a corrupt one) resumes from the loop-top state and redoes the step. A snapshot is the size of the dense matrix (tens of GB for the large steps), written atomically (temporary file, sync, rename), and counts in the run's wall time and so in the F4 budget.
+
+**Evidence.** `tests/f4_checkpoint_resume.rs` now also stops runs inside the reduction (forward and back-substitution phases, after 1 to 40 snapshots, and after a step-top stop followed by an in-step stop) and compares the basis, steps, matrix sizes and `field_ops` with the uninterrupted run: all equal. Dropping the restored field operations, or recomputing the reducer pass on resume, makes it fail. `scripts/selftest_checkpoint.sh` now runs a second kill-and-resume chain with `--checkpoint-in-step-every 1` on the host, before any cell, and requires the same counted fields.
+
+**Not measured, and why it matters.** The size of the dense snapshots and the time to write and read them at the scale of A0 m = 4, t = 4 or A11 m = 4, t = 5 (the largest matrices measured: A0 about 1.6 × 10#super[5] rows by 1.7 × 10#super[5] columns, A11 about 4.5 × 10#super[5] by 4.8 × 10#super[5]): no run has used it at that scale, so the overhead against the F4 budget is unknown, and a snapshot of 50 to 100 GB every 15 min would be a substantial one. A later run that uses the option must register its interval and report the measured size and time with its rows. Not covered: the narrow arithmetic, weights, `max_pairs_per_step`, traces, and the tower engine; a reclaim during the symbolic preprocessing or matrix build of a step (which is redone) still loses that part.
+
+**Validation run V16, registered before its rows (2026-10-27).** A new experiment, in `runs/V16-*`, not part of Amendment 14's cells, run on one `r7i.8xlarge` Spot host (same type as R256) under the persistent request of Amendment 15, to verify what the tests cannot: that the study binary builds, and what snapshots do at scale.
+- *System:* A0, m = 4, t = 4, p#sub[1], target 0: the system of R256-A0 target 0 (cell seed 18358879315, target seed 18358879571). Command: `scripts/run_v16.sh`, i.e. `run --arms A0 --m 4 --t-min 4 --t-max 4 --targets 1 --budget 14400 --grace 600 --vmem-kb V --checkpoint-every 600 --checkpoint-in-step-every 900`, after the host's self-test (which now includes the in-step chain) has passed.
+- *Deliberate kill:* once `V16-A0-m4-t4.t4.k0.ckpt.rref` exists and is at least 20 GB, the host waits 60 s and sends SIGKILL to the study process (parent and child); the run script is then called again and must resume. One kill; reclaims by AWS may add more and are reported.
+- *Pass criterion:* the final row's counted fields equal R256-A0 target 0's: D 7, steps 60, max_rows 159 661, max_cols 167 726, basis_len 53, field_ops 32 354 122 772 019, status ok. Any difference means in-step resume is not exact at scale, which is reported as a failure of the capability, not of any row.
+- *Measured and reported, not predicted to a rule:* size and write time of each in-step snapshot and of each loop-top checkpoint (from the log), the time to read a snapshot on resume and to re-derive the step, the F4 time of the row against R256-A0's 7 650 s (the overhead of snapshots), peak RSS against 121 GB.
+- *Prediction (guesses, stated so they can be scored):* the counted fields equal; a dense snapshot is 40--90 GB and takes 40--100 s to write on the 1000 MiB/s volume; the overhead over R256-A0's F4 time is 10--30 %; the row completes within the 14 400 s budget.
+- *If the run is lost* (build failure, quota, no capacity for hours) it is reported as not run.
+
+**Validation run V16, result (2026-10-27, after the rows; changes no rule, threshold or prediction).** Report `reports/run-20261027T1710Z/REPORT.pdf`; rows `runs/V16-*`. The study binary built on the host. The run was killed once inside step 50's dense reduction (28.9 GB snapshot) and resumed from it; the final row equals R256-A0 target 0 in every counted field (D 7, 60 steps, 159 661 × 167 726, basis 53, `field_ops` 32 354 122 772 019): the pass criterion is met. Scored guesses: equal counted fields held; the dense snapshot size and time guess (40--90 GB, 40--100 s) did not hold for two of three snapshots (28.9, 20.5 and 44.3 GB; 34.5, 27.5 and 47.6 s; none from the largest steps); overhead 10--30 % held (+17.9 % of F4 time against R256-A0 target 0, not decomposed); completion within the budget held (9 016 s). Not verified: snapshots of the largest steps, resume from the backward phase at this scale, a kill during preprocessing or matrix build, and the read time on resume (not logged). A resumed run rewrote the step-top checkpoint it had just read (27 s).

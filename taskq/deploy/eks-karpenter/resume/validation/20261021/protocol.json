@@ -1,0 +1,21 @@
+{
+  "schema": "isolab.recovery-probe.protocol/v1",
+  "purpose": "Test process RAM plus CSI volume snapshot on a replacement EKS Spot worker; not benchmark performance",
+  "criu_version": "4.2.1",
+  "kernel": "6.18.54-121.166.amzn2023.x86_64",
+  "containerd": "2.3.5+unknown",
+  "instance_type": "c8a.2xlarge",
+  "fixture": "Rust SHA-256 chain: state starts at 32 zero bytes; each iteration hashes prior 32 bytes followed by little-endian u64 index; never reads progress files",
+  "iterations": 1048576,
+  "deadline_utc": "2026-10-21T06:00:00Z",
+  "acceptance": [
+    "CRIU checkpoint succeeds with CPU compatibility checks",
+    "Frozen filesystem snapshot reaches readyToUse before original process is removed",
+    "Original pod is stopped and original EC2 worker is terminated before restoring",
+    "Replacement pod and EC2 worker identities differ",
+    "Process resumes above zero with one start record and strictly increasing progress",
+    "Independent native replay verifies every SHA-256 progress record through completion",
+    "Checkpoint data stays private and encrypted; report contains no raw memory",
+    "Original experiment L2 admission remains unchanged; this probe makes no benchmark-validity claim"
+  ]
+}

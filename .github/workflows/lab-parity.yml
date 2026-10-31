@@ -1,0 +1,31 @@
+name: lab-parity
+
+# The cross-repository contract (crypto-autoresearcher:docs/lab-contract.md):
+# every skill resolves on both agent surfaces, every shared file matches
+# docs/shared-code.lock.json, and every validation/v1 record is well formed.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lab-parity-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  parity:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Skills surfaces
+        run: python3 tools/check_skills_parity.py
+      - name: Shared-code lock
+        run: python3 tools/check_lab_parity.py --repo crypto
+      - name: Validation record validator
+        run: python3 tools/test_validate_validation_json.py

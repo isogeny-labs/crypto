@@ -150,12 +150,34 @@ arm before any comparative statement. Blockers are recorded as named
 problems (\art{problems/}) with exit criteria rather than silently dropped.
 Measurement code is native (Rust); Python only lays out recorded values.
 
+\paragraph{Generic baselines.} The rho, BSGS and Pohlig--Hellman
+references were engineered alongside index calculus, which is why each
+round's distance is quoted against the strongest reference at the time. On
+Koblitz curves the strong signed-Frobenius rho fell from 1{,}196 to 679.7
+instructions per step over four rounds with no established native-time gain
+(\S\ref{sec:ladder2}). On hyperelliptic Jacobians a negation fold and hash mixing each fell short
+of their registered gains, and full-width branch coefficients showed that
+the earlier 8-bit reference walk had been slow at large $N$
+(\art{benchmarks/20261018-hec-rho-negation/},
+\art{benchmarks/20261019-hec-rho-branch-width/}).
+Generic DLP fixes cut Pohlig--Hellman steps $26.6\times$ and BSGS time
+$1.3$--$2.0\times$, and the candidates run at $0.020$--$0.167$ of PARI's
+\texttt{elllog} time, in shared-host wall time the validation sweep left
+unvalidated (\art{research/generic_dlp_memory_parallelism_20261017/}).
+
 \subsection{Corrections the accounting forced}\label{sec:corrections}
 
 Building the harness and the ledger exposed errors in earlier claims,
 including our own. We list them because they change how earlier numbers
 must be read.
 \begin{enumerate}
+\item \emph{Results below rho that reversed against a stronger rho}
+  (September; \S\ref{sec:koblitz-strong}). A tournament candidate at
+  $0.5347$ of rho's instructions lost all five cells once rho used the same
+  canonical form (\art{research/ic_triple_counted_20260923/}); an orbit-DLP
+  ratio of $0.2403$ became $1.923$ against a strengthened rho and was
+  withdrawn; a compact-orbit batch lead of $0.309$ reversed against a
+  batched-inversion rho.
 \item \emph{Online Koblitz ratios relabelled} (7--8 October,
   \art{docs/ic/PLAN_IC_ACCOUNTING_FIXES_20261007.md}). Same-point online
   ratios of $124.85\times$ ($n=61$), $2{,}864.1\times$ ($n=71$),
@@ -186,8 +208,13 @@ must be read.
   unchanged. The failed receipt is kept; the F4 stage comparison is
   historical until the drift is explained. A replay of the same session on
   current \texttt{main} (20 October) matches only 72/168, with mismatches
-  in all four IC arms, root finding included; that regression is open, and
-  the session's root-finder rows rest on the original receipt.
+  in all four IC arms, root finding included. The cause was then isolated:
+  an x86-only BMI2 rewrite in inherited F4 counts word XORs differently from
+  the portable path; with it disabled the replay is 168/168 on x86 and on
+  emulated aarch64
+  (\art{research/validation_sweep_20261019/D-known-issues/item1_cross_isa_20261020/RESULT.md}).
+  F4 counts are comparable across instruction sets only when the path is
+  stated, which the method identity does not yet record.
 \item \emph{A soundness bug} (\art{docs/ic/GROEBNER_F4F5F6_AUDIT_20261010.md}
   \S2.1): a degree-bounded \texttt{f4\_fp::solve} could certify solutions
   of an inconsistent system (over $\FF_5$, $\{x^3+1,xy-1,x+y\}$ returned
@@ -195,7 +222,8 @@ must be read.
 \item \emph{F6-IC charged cost} (\S\ref{sec:groebner}): a stage win in
   word XORs became a $64.6$--$1{,}353\times$ loss in charged $S$ once its
   batched geometry was counted---recorded as an accounting result, not an
-  advance.
+  advance. With inherited F4's own word XORs priced the $m=13$ loss is about
+  $2.5\times$ (\S\ref{sec:groebner}).
 \item \emph{Lopsided pricing} (\S\ref{sec:band}): comparisons of a
   calibration-priced index calculus with a lower-bound rho. On the
   frontier campaign's train panel at Koblitz $n=13$ the compact-orbit arm,
@@ -205,4 +233,25 @@ must be read.
   \art{research/ic_frontier_campaign_20261015/select/SELECTION.md}): below
   rho with native work free, above it otherwise, so the pair is unresolved
   inside the band rather than a win for either side.
+\item \emph{Wall-time figures recomputed} (validation sweep). Recomputing
+  from the committed per-target records gives $2{,}321\times$ for the
+  $\ell=12$ binary MITM oracle (quoted $2{,}187\times$), $98.1\times$ for its
+  $\ell=8$ run 3 (quoted $100.7\times$), and $6.08\times$ and 6.14\,s for the
+  quartic solve at $d=6$ (quoted $6.4\times$ and 5.9\,s); all are shared-host
+  wall times left unvalidated, and the counted evidence behind them stands
+  (\art{research/validation_sweep_20261019/B-benchmarks/VERDICT_TABLE.md}).
+\item \emph{An unmatched rho reference} (21--24 October). The Koblitz
+  leaderboard's rule v3 priced its rho as built rather than at the canonical
+  batched step. Re-pricing rho in the same process raised the cold distance
+  $1.76$--$1.94\times$, to $9.9$--$43\times$
+  (\art{research/ic_tool_program/rule/v4/README.md}); the ledger's rule v8,
+  matching the reference its own way, raised it $1.30$--$1.58\times$ and found
+  that an apparent flattening of the gap's slope was mostly this artefact
+  (\art{papers/ecdlp-ic-improvement-ledger/}). The same week withdrew a
+  volcano-crater claim (IC 22--25\% cheaper) whose reference should have been
+  the cubic-automorphism rho, against which IC is $84.9\times$ rho, and marked
+  the plane-quartic $S$ values unverified because their degree-3 reduction
+  merges distinct classes. Canonical $\mathrm{Pic}^0$ keys later separated
+  those classes, and a re-run found that the earlier toy logarithms came from
+  enumerating the subgroup (\S\ref{sec:transfer}).
 \end{enumerate}

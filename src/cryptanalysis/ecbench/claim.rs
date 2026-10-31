@@ -27,6 +27,7 @@ use serde_json::{json, Map, Value};
 use crate::cryptanalysis::ecbench::audit::{audit, AuditReport};
 use crate::cryptanalysis::ecbench::canonical::sha256_hex;
 use crate::cryptanalysis::ecbench::host::{self, HostCapsule};
+use crate::cryptanalysis::ecbench::koblitz_descent;
 use crate::cryptanalysis::ecbench::methods::{dump_factor_base, FactorBaseFacts, ResolvedMethod};
 use crate::cryptanalysis::ecbench::record::Record;
 use crate::cryptanalysis::ecbench::runner::{read_records, read_session, PlanDoc, Session};
@@ -345,6 +346,10 @@ impl Implementation {
                     h(include_bytes!("../ic_framework/plugins.rs")),
                 ),
                 (
+                    "ic_explicit_x".into(),
+                    h(include_bytes!("../ic_framework/explicit_base.rs")),
+                ),
+                (
                     "ic_solvers".into(),
                     h(include_bytes!("../ic_framework/solvers.rs")),
                 ),
@@ -370,6 +375,23 @@ impl Implementation {
                 "shared_rank".into(),
                 sha256_hex(include_bytes!("../ic_framework/shared_rank.rs")),
             ));
+        }
+        if id == "ic.koblitz_descent" {
+            // The pipeline, the library stages it assembles and the
+            // operation counters that charge them.
+            for (role, bytes) in [
+                ("koblitz_descent", &include_bytes!("koblitz_descent.rs")[..]),
+                (
+                    "koblitz_index_calculus",
+                    &include_bytes!("../koblitz_index_calculus.rs")[..],
+                ),
+                (
+                    "group_op_count",
+                    &include_bytes!("../group_op_count.rs")[..],
+                ),
+            ] {
+                imp.components.push((role.into(), sha256_hex(bytes)));
+            }
         }
         imp
     }
@@ -412,6 +434,9 @@ fn method_record(
     if m.id == "ic.shared_rank" {
         return shared_rank_method_record(m, kb, fb, columns, imp);
     }
+    if m.id == "ic.koblitz_descent" {
+        return koblitz_descent_method_record(m, kb, fb, columns, imp);
+    }
     let p = &m.params;
     let (oracle, oparams) = p
         .get("oracle")
@@ -437,6 +462,7 @@ fn method_record(
             .unwrap_or("incremental-gauss"),
     );
     let algebraic = oracle == "descent-algebraic";
+    let pkm = oracle == "pkm-semaev";
     let manifest = id_sha256(&imp.json())?;
     Ok(json!({
         "isogeny": "none",
@@ -445,7 +471,7 @@ fn method_record(
             "construction": {
                 "family": fb.family,
                 "params": fb.params,
-                "builder": "ic_framework::plugins",
+                "builder": if fb.family == "explicit-x" { "ic_framework::explicit_base" } else { "ic_framework::plugins" },
                 "points_sha256": fb.points_sha256,
                 "solver_columns": columns.json(),
             },
@@ -454,14 +480,14 @@ fn method_record(
         "point_decomposition": {
             "summands": summands,
             "solver": solver_code,
-            "summation_polynomial": if algebraic { "Semaev summation polynomial, Weil-descended over the base subspace" } else { "none: exact table lookup of point sums" },
-            "encoding": if algebraic { format!("boolean system for solver {solver}") } else { format!("pair table ({oracle})") },
-            "equation_order": if algebraic { "solver default" } else { "not applicable" },
-            "monomial_order": if algebraic { "solver default" } else { "not applicable" },
-            "internal_matrix_kernel": if algebraic { "solver default" } else { "not applicable" },
+            "summation_polynomial": if pkm { "Semaev summation polynomial S_(m+1) over F_p, each x_i on the base's Kummer tower (x/g)^(2^t) = 1 (PKM)" } else if algebraic { "Semaev summation polynomial, Weil-descended over the base subspace" } else { "none: exact table lookup of point sums" },
+            "encoding": if pkm { format!("F_p system in the tower quotient ring ({oracle}:{oparams})") } else if algebraic { format!("boolean system for solver {solver}") } else { format!("pair table ({oracle})") },
+            "equation_order": if pkm { "summation equations, then towers" } else if algebraic { "solver default" } else { "not applicable" },
+            "monomial_order": if pkm { "grevlex, tower variables first" } else if algebraic { "solver default" } else { "not applicable" },
+            "internal_matrix_kernel": if pkm { "f4_fp_tower Faugère–Lachartre elimination" } else if algebraic { "solver default" } else { "not applicable" },
             "limits": format!("max_trials={}, solver_budget_seconds={}", p.get("max_trials").map(String::as_str).unwrap_or("?"), p.get("solver_budget_seconds").map(String::as_str).unwrap_or("0")),
             "cache_policy": "tables built per run (cold)",
-            "source_sha256": imp.sha("ic_plugins"),
+            "source_sha256": if pkm { sha256_hex(include_bytes!("../ic_framework/pkm_semaev.rs")) } else { imp.sha("ic_plugins") },
         },
         "relation_collection": {
             "collector": collector,
@@ -568,6 +594,81 @@ fn shared_rank_method_record(
             "success_rule": "exact witness sum and [d]G = Q",
             "stop_rule": "first verified m3 decomposition or target attempt cap",
             "source_sha256": imp.sha("shared_rank"),
+        },
+        "implementation": {
+            "source_manifest_sha256": manifest,
+            "components": imp.json(),
+            "flags": {"ecbench_method_id": m.method_id, "params": p},
+        },
+    }))
+}
+
+/// The method record of `ic.koblitz_descent`: the ledger §23 recipe.
+fn koblitz_descent_method_record(
+    m: &ResolvedMethod,
+    kb: &Kb,
+    fb: &FactorBaseFacts,
+    columns: &ColumnMap,
+    imp: &Implementation,
+) -> Result<Value, String> {
+    if fb.family != "subgroup-orbits" || imp.sha("koblitz_descent").is_empty() {
+        return Err("ic.koblitz_descent needs its subgroup-orbit base and source hash".into());
+    }
+    let p = &m.params;
+    let manifest = id_sha256(&imp.json())?;
+    Ok(json!({
+        "isogeny": "none",
+        "endomorphism": {"order_conductor": null, "frobenius_order_conductor": null, "volcano_levels": []},
+        "factor_base": {
+            "construction": {
+                "family": fb.family,
+                "params": fb.params,
+                "builder": "koblitz_index_calculus::build_subgroup_orbit_factor_base_with_cost",
+                "points_sha256": fb.points_sha256,
+                "solver_columns": columns.json(),
+            },
+            "nominal_bound": fb.signed_points,
+        },
+        "point_decomposition": {
+            "summands": 3,
+            "solver": "pairtable",
+            "summation_polynomial": "none: exact point-sum table lookup",
+            "encoding": "signed-Frobenius folded pair-sum table, m = 3 aimed window scan",
+            "equation_order": "not applicable",
+            "monomial_order": "not applicable",
+            "internal_matrix_kernel": "not applicable",
+            "limits": format!("collection_window={}, max_trials={}", p["collection_window"], p["max_trials"]),
+            "cache_policy": "target-independent table built once per solve before the online target",
+            "source_sha256": imp.sha("koblitz_index_calculus"),
+        },
+        "relation_collection": {
+            "collector": "walk",
+            "query_distribution": "walked runs of 64 probes [a]G, anchors keyed by (seed, run); public target excluded",
+            "query_rule": format!("aimed at uncovered columns (collection_aim={}), seed={}, unit_trials={}, units={}, max_units={}", p["collection_aim"], p["seed"], p["unit_trials"], p["units"], p["max_units"]),
+            "filtering": "exact m3 witnesses re-checked in the group",
+            "verification": "every relation re-added as a point sum against [a]G before it enters the matrix",
+            "duplicates": "dropped by (a, sorted points)",
+            "dependencies": "sparse filter then block Wiedemann; every column log checked as a point",
+            "stop_rule": "coverage and a verified solve, else extend by one unit up to max_units",
+            "source_sha256": imp.sha("koblitz_index_calculus"),
+        },
+        "relation_linear_algebra": {
+            "solver": "sparse-filter-block-wiedemann",
+            "modulus": kb.r,
+            "matrix_construction": "one target-blind row per verified [a]G relation over projected signed-orbit columns",
+            "orbit_quotient": "sign-and-Frobenius",
+            "rank_criterion": "solve verified: every column log [x_o]G = R_o",
+            "block_parameters": "SparseSolveOptions::default()",
+            "preconditioner": "none",
+            "source_sha256": imp.sha("koblitz_index_calculus"),
+        },
+        "target_descent": {
+            "method": "pdp",
+            "policy": format!("64 walks [a0 + j·stride]G + [b]Q stepped by G, m = {} pair-table lookups", p["descent_summands"]),
+            "recursive_solvers": "none",
+            "success_rule": "exact witness sum and [d]G = Q",
+            "stop_rule": "first verified decomposition or max_trials",
+            "source_sha256": imp.sha("koblitz_descent"),
         },
         "implementation": {
             "source_manifest_sha256": manifest,
@@ -1062,23 +1163,39 @@ fn build_from_session(
         .factor_base
         .as_ref()
         .ok_or("the IC run reports no factor base")?;
-    let fb_spec = ic
-        .method
-        .params
-        .get("factor_base")
-        .ok_or("ic.pipeline without a factor base")?;
-    let dump = dump_factor_base(&pw.curve_spec, fb_spec)?;
-    if dump.factor_base.fb_id != fbf.fb_id {
+    let (rebuilt, points): (FactorBaseFacts, Vec<(u64, u64)>) =
+        if ic.method.id == "ic.koblitz_descent" {
+            // Its base is a `subgroup_orbits` selection the method makes
+            // itself, from `factor_base_points` and `seed`.
+            let kc = bi
+                .koblitz
+                .as_ref()
+                .ok_or("ic.koblitz_descent needs a Koblitz instance")?;
+            let run_seed: u64 = ic
+                .algorithm_seed
+                .parse()
+                .map_err(|_| "bad algorithm seed")?;
+            koblitz_descent::rebuild_factor_base(&w.curve.slug, kc, &ic.method.params, run_seed)?
+        } else {
+            let fb_spec = ic
+                .method
+                .params
+                .get("factor_base")
+                .ok_or("ic.pipeline without a factor base")?;
+            let dump = dump_factor_base(&pw.curve_spec, fb_spec)?;
+            let points = dump
+                .points
+                .iter()
+                .map(|p| Ok((hex(&p.x)?, hex(&p.y)?)))
+                .collect::<Result<_, String>>()?;
+            (dump.factor_base, points)
+        };
+    if rebuilt.fb_id != fbf.fb_id {
         return Err(format!(
             "the rebuilt factor base {} is not the run's {}",
-            dump.factor_base.fb_id, fbf.fb_id
+            rebuilt.fb_id, fbf.fb_id
         ));
     }
-    let points: Vec<(u64, u64)> = dump
-        .points
-        .iter()
-        .map(|p| Ok((hex(&p.x)?, hex(&p.y)?)))
-        .collect::<Result<_, String>>()?;
     let (inventory, columns) = factor_base_inventory(&kb, &points, fbf.columns)?;
     let imp = Implementation::for_method(&ic.method.id);
     let method = method_record(&ic.method, &kb, fbf, &columns, &imp)?;
@@ -1161,6 +1278,11 @@ fn build_from_session(
                 || p.name == "oracle_setup"
                 || (ic.method.id == "ic.shared_rank"
                     && matches!(p.name.as_str(), "relations" | "linear_algebra" | "verify"))
+                || (ic.method.id == "ic.koblitz_descent"
+                    && matches!(
+                        p.name.as_str(),
+                        "relations" | "linear_algebra" | "descent_setup"
+                    ))
         })
         .filter_map(|p| p.wall_ns)
         .sum();
@@ -2354,6 +2476,70 @@ mod tests {
             .collect();
         let err = factor_base_inventory(&kb, &points, dump.factor_base.columns).unwrap_err();
         assert!(err.contains("signed Frobenius"), "{err}");
+    }
+
+    /// `ic.koblitz_descent`'s candidate record binds its own sources, and
+    /// the base a claim rebuilds is the one a run reports.
+    #[test]
+    fn a_koblitz_descent_claim_rebuilds_its_base_and_binds_its_sources() {
+        use crate::cryptanalysis::ecbench::methods::{resolve, solve, MethodSpec};
+        use crate::cryptanalysis::ecbench::workload::CurveSpec;
+        let spec = CurveSpec::Koblitz { a: 0, n: 23 };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let Instance::Binary(bi) = &inst else {
+            unreachable!()
+        };
+        let m = resolve(&MethodSpec {
+            id: "ic.koblitz_descent".into(),
+            params: [
+                ("descent_summands", "2"),
+                ("collection_window", "64"),
+                ("factor_base_points", "256"),
+                ("unit_trials", "64"),
+                ("units", "1"),
+                ("max_trials", "100000"),
+                ("seed", "7"),
+            ]
+            .into_iter()
+            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .collect(),
+        })
+        .unwrap();
+        let target = bi.fast.mul_u64(bi.generator, 4242);
+        let rep = solve(
+            &m,
+            &inst,
+            &facts,
+            &[format!("0x{:x}", target.x), format!("0x{:x}", target.y)],
+            1,
+        )
+        .unwrap();
+        assert_eq!(rep.recovered, Some(4242));
+        let run_fb = rep.factor_base.clone().unwrap();
+        let kc = bi.koblitz.as_ref().unwrap();
+        let (rebuilt, points) =
+            koblitz_descent::rebuild_factor_base(&facts.slug, kc, &m.params, 1).unwrap();
+        assert_eq!(rebuilt, run_fb);
+        let kb = Kb::of(bi).unwrap();
+        let (_, columns) = factor_base_inventory(&kb, &points, rebuilt.columns).unwrap();
+        let imp = Implementation::for_method("ic.koblitz_descent");
+        for role in [
+            "koblitz_descent",
+            "koblitz_index_calculus",
+            "group_op_count",
+        ] {
+            assert_eq!(imp.sha(role).len(), 64, "{role}");
+        }
+        assert!(Implementation::for_method("ic.pipeline")
+            .sha("koblitz_descent")
+            .is_empty());
+        let record = method_record(&m, &kb, &rebuilt, &columns, &imp).unwrap();
+        assert_eq!(record["point_decomposition"]["summands"], 3);
+        assert_eq!(
+            record["target_descent"]["source_sha256"],
+            json!(imp.sha("koblitz_descent"))
+        );
     }
 
     /// The inputs identity.py needs for the cross-check, and this port's

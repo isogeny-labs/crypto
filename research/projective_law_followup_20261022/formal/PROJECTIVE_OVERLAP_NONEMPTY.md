@@ -1,0 +1,9 @@
+# Actual weighted-Proj chart overlap: checked point
+
+`WeightedProjOverlapNonempty.actual_x_z_overlap_nonempty` constructs, for every field `K` and coefficients `a3 a2 a1 a0 : K`, a point of the **actual weighted-Proj curve** lying in both its X- and Z-basic opens. It assumes no separability condition. Pinned Lean 4.34.1 exited 0, and direct `#print axioms` lists only `propext`, `Classical.choice`, and `Quot.sound`. The exact source and compiler output accompany this packet.
+
+The witness is the image of the zero prime of the infinity-chart domain. The preceding checked theorem `WeightedProjIntegral.infinity_chart_z_ne_zero` puts that prime in `D(zbar)`. The previously checked `WeightedProjCrossChart.x_preimage_z` identifies `D(zbar)` with the preimage of the actual Proj Z-open under the infinity chart map. The chart map also lands in the Proj X-open by its definition.
+
+This point-level theorem closes the nonempty-overlap prerequisite identified in `PROJECTIVE_INTEGRAL.md`. It does **not** itself produce a whole-curve `IsIntegral` instance. The remaining formal step is to transport chart-domain properties through the two scheme isomorphisms, use `WeightedProjCover.two_basic_opens_cover` with `PreirreducibleSpace.of_isOpenCover` and `IsReduced.of_openCover`, then combine them with `isIntegral_of_irreducibleSpace_of_isReduced`. The affine chart domain currently requires separability of the quintic. Global principal divisors, Pic0 class transport, and compiled runtime semantics remain open.
+
+Sources checked before implementation: repository `PROJECTIVE_INTEGRAL.md`, `WeightedProjCrossChart.lean`, `Common22PrincipalOpenSpec.lean`, and pinned Mathlib `AlgebraicGeometry/FunctionField.lean`, `Topology/Sets/OpenCover.lean`, and `AlgebraicGeometry/Properties.lean`. These supplied the existing overlap preimage equality and the precise future gluing APIs. No novelty or performance claim is made. No DLP experiments or cost measurements were run.

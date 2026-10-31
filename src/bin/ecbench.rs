@@ -35,6 +35,8 @@
 mod pdp3_koblitz;
 #[path = "ecbench/pdp_split_oracle.rs"]
 mod pdp_split_oracle;
+#[path = "ecbench/structured_s4.rs"]
+mod structured_s4;
 
 use std::io::Write as _;
 use std::path::{Path, PathBuf};
@@ -61,6 +63,13 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Cmd {
+    /// Check pinned diagnostic metadata without launching work.
+    DiagnosticPreflight {
+        #[arg(long)]
+        request: PathBuf,
+        #[arg(long)]
+        request_sha256: String,
+    },
     /// Push, pull and index large files (factor bases, tables) in the object store.
     Store(crypto_lib::store::cli::StoreArgs),
     /// Run the existing CUDA ECC binary as a separately labelled GPU stage.
@@ -89,6 +98,7 @@ enum Cmd {
     },
     /// Run CUDA BSGS on a frozen EC Bench workload and verify its scalar here.
     GpuMatch {
+        /// A built gpu/ecc/bench CUDA binary (snapshotted into `--out`).
         #[arg(long)]
         binary: PathBuf,
         /// One workload JSON exported from `ecbench plan --json` or a session.
@@ -97,8 +107,10 @@ enum Cmd {
         /// A new directory for the binary snapshot, raw streams and receipt.
         #[arg(long)]
         out: PathBuf,
+        /// Watchdog limit for the GPU solve.
         #[arg(long, default_value_t = 600)]
         timeout_seconds: u64,
+        /// The program that samples GPU clocks and power during the solve.
         #[arg(long, default_value = "nvidia-smi")]
         telemetry_binary: PathBuf,
         /// The shared benchmark lock; a GPU solve is timed work.
@@ -116,20 +128,70 @@ enum Cmd {
     },
     /// Recheck a GPU receipt, raw streams, workload and scalar without a GPU.
     GpuMatchVerify {
+        /// The `--out` directory of a `gpu-match` run.
         #[arg(long)]
         dir: PathBuf,
     },
     /// Check A/A interval coverage and false admissions across quiet and contended sessions.
     Calibrate {
+        /// Sessions run on a quiet host (A/A arms whose intervals should cover 1).
         #[arg(long, num_args = 1..)]
         quiet: Vec<PathBuf>,
+        /// Sessions run under deliberate contention (whose wall results should not be admitted).
         #[arg(long, num_args = 1..)]
         contended: Vec<PathBuf>,
+        /// Write the calibration report here (it is also printed).
         #[arg(long)]
         out: PathBuf,
     },
+    /// Price every record of the given session directories in bitop/v1
+    /// (docs/units/BITOPS.md): one JSON line per record on stdout.
+    Work {
+        #[arg(num_args = 1.., required = true)]
+        sessions: Vec<PathBuf>,
+        /// The unit: `bitop/v1` (the default) or `bitop/v2`, the same
+        /// gates plus the declared memory term and the area-time
+        /// product (docs/units/BITOPS.md, "bitop/v2: memory").
+        #[arg(long)]
+        unit: Option<String>,
+        /// Only verified, non-warm-up records.
+        #[arg(long)]
+        counted: bool,
+        /// One line per method configuration and curve family instead of
+        /// per record: runs, curves, the log2 r range, how many runs are
+        /// completely priced, the median ratio to the floor, and the union
+        /// of what the incomplete ones miss.
+        #[arg(long)]
+        summary: bool,
+    },
+    /// Print the bitop/v1 test vectors (docs/units/bitop-v1.vectors.json),
+    /// or with `--unit bitop/v2` the bitop/v2 entry widths
+    /// (docs/units/bitop-v2.vectors.json).
+    BitopVectors {
+        #[arg(long)]
+        unit: Option<String>,
+    },
+    /// Amortise an arm against a rho arm on the same curves, in bitop/v1:
+    /// per curve, the mean reusable and per-target gates of each, their
+    /// cost for T targets (rho as one walk that keeps its table, Kuhn and
+    /// Struik), and the window of target counts in which the arm costs no
+    /// more (batch rho grows like sqrt(T), so a win is a window, not a
+    /// threshold).
+    Amortize {
+        #[arg(long, num_args = 1.., required = true)]
+        dir: Vec<PathBuf>,
+        #[arg(long)]
+        arm: String,
+        /// The rho arm to amortise against.
+        #[arg(long)]
+        reference: String,
+        /// Search break-even up to 2^this many targets.
+        #[arg(long, default_value_t = 40)]
+        limit_log2: u32,
+    },
     /// List every method with its parameters.
     Methods {
+        /// Print JSON instead of a table.
         #[arg(long)]
         json: bool,
     },
@@ -164,18 +226,29 @@ enum Cmd {
     },
     /// Print the host capsule.
     Host {
+        /// Print the capsule as JSON.
         #[arg(long)]
         json: bool,
     },
     /// Validate a spec and print what it expands to.
     Plan {
+        /// An `ecbench.spec/v1` file.
         #[arg(long)]
         spec: PathBuf,
+        /// Print the whole plan (workloads, arms, every execution) as JSON.
         #[arg(long)]
         json: bool,
+        /// Print the session's `plan.json` document, byte for byte as `run`
+        /// writes it.
+        #[arg(long, conflicts_with = "json")]
+        doc: bool,
     },
     /// Run a session.
     Run {
+        /// Explicit diagnostic launch provenance (producer activation pending).
+        #[arg(long)]
+        diagnostic_launch: Option<PathBuf>,
+        /// An `ecbench.spec/v1` file; `plan` shows what it expands to.
         #[arg(long)]
         spec: PathBuf,
         /// A new directory; `${VAR}` is expanded from the environment.
@@ -185,6 +258,7 @@ enum Cmd {
         /// placement, e.g. isolab's), none (record only, L0), or a list.
         #[arg(long, default_value = "auto")]
         cpus: String,
+        /// The shared benchmark lock: one timed session per host at a time.
         #[arg(long, default_value = isolation::DEFAULT_LOCK)]
         lock: String,
         /// Queue behind another benchmark holding the lock.
@@ -193,12 +267,16 @@ enum Cmd {
         /// Record a busy preflight and continue; every run stays below L2.
         #[arg(long)]
         allow_busy: bool,
+        /// Seconds the preflight watches the reserved CPUs before starting.
         #[arg(long, default_value_t = 2.0)]
         settle: f64,
+        /// Busy fraction of a reserved CPU above which the host is not quiet.
         #[arg(long, default_value_t = 0.10)]
         max_other_cpu: f64,
+        /// PSI `some avg10` ceiling, percent, above which the host is not quiet.
         #[arg(long, default_value_t = 5.0)]
         max_psi: f64,
+        /// Print only the final summary line.
         #[arg(long)]
         quiet: bool,
     },
@@ -207,10 +285,24 @@ enum Cmd {
     Exec,
     /// Export one exact measured-child input from a frozen spec and sequence.
     ProfileInput {
+        /// The session's frozen spec.
         #[arg(long)]
         spec: PathBuf,
+        /// The execution's sequence number (`seq` in its record).
         #[arg(long)]
         seq: u64,
+    },
+    /// Replay planned executions of a spec under Callgrind and set each
+    /// solve's instructions beside its bitop/v1 work (docs/units/BITOPS.md,
+    /// "What the unit leaves out"): one JSON line per sequence number.
+    AuditIr {
+        #[arg(long)]
+        spec: PathBuf,
+        #[arg(long, num_args = 1.., required = true)]
+        seq: Vec<u64>,
+        /// A directory for the inputs, outputs and Callgrind parts.
+        #[arg(long)]
+        out: PathBuf,
     },
     /// Sum the Callgrind Ir parts inside the solve markers.
     CallgrindIr {
@@ -224,16 +316,29 @@ enum Cmd {
         #[arg(long)]
         prefix: PathBuf,
     },
-    /// Audit a session from its own files.
+    /// Audit a session from its own files.  Exits 1 when the audit finds a
+    /// problem (and 2 when it cannot be run at all), so a failed audit
+    /// fails whatever calls it; a receipt is printed either way.
     Verify {
+        /// The session directory (`session.json`, `records.jsonl`, …).
         #[arg(long)]
         dir: String,
-        /// Re-execute this many measured runs and require identical counts.
+        /// Re-execute this many measured runs, drawn at random from the
+        /// deterministic ones, and require identical counts.
         #[arg(long, default_value_t = 0)]
         replay: usize,
         /// Re-execute every measured deterministic run.
         #[arg(long)]
         replay_all: bool,
+        /// The auditor's randomness for the `--replay N` draw (default: a
+        /// seed from the operating system's entropy).  Recorded in the
+        /// receipt; the same seed on the same session draws the same runs.
+        #[arg(long)]
+        replay_seed: Option<u64>,
+        /// Also re-execute the run with this sequence number (repeatable),
+        /// beside any sample.
+        #[arg(long = "replay-seq")]
+        replay_seq: Vec<u64>,
         /// Accept a session marked `interrupted`: every integrity check
         /// still applies, but not "every planned execution recorded".
         #[arg(long)]
@@ -241,23 +346,29 @@ enum Cmd {
         /// Write the receipt here (it is also printed).
         #[arg(long)]
         out: Option<PathBuf>,
-        /// Exit 1 when the audit finds a problem (isolab's verify contract).
-        #[arg(long)]
+        /// Accepted for compatibility and ignored: a failed audit always
+        /// exits 1.
+        #[arg(long, hide = true)]
         exit_code: bool,
     },
     /// Compare arm B against arm A.
     Compare {
+        /// The session directory.
         #[arg(long)]
         dir: PathBuf,
+        /// The baseline arm's name (the ratio's denominator).
         #[arg(long)]
         a: String,
+        /// The candidate arm's name (the ratio's numerator).
         #[arg(long)]
         b: String,
         /// B's session, when it is another one (operations only).
         #[arg(long)]
         b_dir: Option<PathBuf>,
+        /// Bootstrap resamples for the intervals.
         #[arg(long, default_value_t = 4000)]
         resamples: usize,
+        /// Bootstrap seed; the same seed gives the same intervals.
         #[arg(long, default_value_t = 20261002)]
         seed: u64,
         /// Price each run at this many GAE per unpriced native operation
@@ -267,6 +378,7 @@ enum Cmd {
         /// Save to <dir>/comparisons/<a>__<b>.json (weighted names include their identity).
         #[arg(long)]
         save: bool,
+        /// Print the whole comparison as JSON instead of the verdict.
         #[arg(long)]
         json: bool,
         /// Compare a session whose status is not `complete` (recorded in
@@ -303,8 +415,10 @@ enum Cmd {
     },
     /// Resource vectors for all measured attempts; no invented SAT/GAE conversion.
     Resources {
+        /// The session directory.
         #[arg(long)]
         dir: PathBuf,
+        /// Write the vectors here instead of standard output.
         #[arg(long)]
         out: Option<PathBuf>,
     },
@@ -316,6 +430,7 @@ enum Cmd {
         /// A factor-base plug-in spec, e.g. 'koblitz-orbit:divisor=1'.
         #[arg(long)]
         factor_base: String,
+        /// Write the factor base here instead of standard output.
         #[arg(long)]
         out: Option<PathBuf>,
     },
@@ -339,6 +454,7 @@ enum Cmd {
         /// Instrument tag (default ecbench.ic_pipeline/v1).
         #[arg(long, default_value = "ecbench.ic_pipeline/v1")]
         instrument: String,
+        /// Write the sealed identity here instead of standard output.
         #[arg(long)]
         out: Option<PathBuf>,
     },
@@ -355,6 +471,7 @@ enum Cmd {
     },
     /// An isolab.job/v1 that runs a spec on an independent lab worker.
     IsolabJob {
+        /// The spec the worker runs.
         #[arg(long)]
         spec: PathBuf,
         /// Upload this binary (built for the worker's architecture).
@@ -363,18 +480,26 @@ enum Cmd {
         /// Or build from this repository at `--commit` on the worker.
         #[arg(long, requires = "commit")]
         git_url: Option<String>,
+        /// The commit `--git-url` is built at.
         #[arg(long)]
         commit: Option<String>,
+        /// The isolab worker pool.
         #[arg(long, default_value = "default")]
         pool: String,
+        /// Whole cores to reserve on one NUMA node.
         #[arg(long, default_value_t = 2)]
         cpus: u32,
+        /// Memory limit for the job.
         #[arg(long)]
         memory_mb: Option<u64>,
+        /// Container image to run in (isolab's default when absent).
         #[arg(long)]
         image: Option<String>,
+        /// isolab's fidelity policy: strict, standard or best_effort.
         #[arg(long, default_value = "strict")]
         policy: String,
+        /// Job time limit; never below what the plan needs (executions ×
+        /// the spec's per-run timeout, plus 10 minutes), which 0 selects.
         #[arg(long, default_value_t = 0)]
         timeout_seconds: u64,
     },
@@ -427,6 +552,10 @@ enum BoundCmd {
         resamples: usize,
         #[arg(long, default_value_t = bounds::SEED)]
         seed: u64,
+        /// Fit in this unit instead of the records' own: `bitop/v1` or
+        /// `bitop/v2` (docs/units/BITOPS.md).
+        #[arg(long)]
+        unit: Option<String>,
         /// Fit the band-priced cost at this weight in GAE per native
         /// operation (AGENTS.md §5a) instead of the charged cost.
         #[arg(long)]
@@ -660,7 +789,8 @@ enum ClaimCmd {
 enum DbCmd {
     /// Print the schema.
     Schema,
-    /// Print SQL for session directories, comparison files and factor-base dumps.
+    /// Print SQL for session directories, comparison files, factor-base dumps and
+    /// the store index (`store/index.json`). A `store:NAME` path is fetched first.
     Sql {
         #[arg(required = true)]
         paths: Vec<PathBuf>,
@@ -675,10 +805,12 @@ fn binary_plugins() -> crypto_lib::cryptanalysis::ecbench::methods::BinaryPlugin
         base: |name, instance| {
             (pdp3_koblitz::plugins().base)(name, instance)
                 .or_else(|| pdp_split_oracle::base(name, instance))
+                .or_else(|| structured_s4::base(name, instance))
         },
         oracle: |name, summands, instance| {
             (pdp3_koblitz::plugins().oracle)(name, summands, instance)
                 .or_else(|| pdp_split_oracle::oracle(name, summands, instance))
+                .or_else(|| structured_s4::oracle(name, summands, instance))
         },
     }
 }
@@ -756,7 +888,164 @@ fn emit_claim(
 
 fn run(cli: Cli) -> Result<ExitCode, String> {
     match cli.cmd {
+        Cmd::DiagnosticPreflight {
+            request,
+            request_sha256,
+        } => {
+            let path = request.to_str().ok_or("request path must be UTF-8")?;
+            print_json(
+                &crypto_lib::cryptanalysis::ecbench::diagnostic_file_adapter::check_file(
+                    path,
+                    &request_sha256,
+                )?,
+            )?;
+        }
         Cmd::Store(args) => crypto_lib::store::cli::run(&args)?,
+        Cmd::Work {
+            sessions,
+            unit,
+            counted,
+            summary,
+        } => {
+            use std::io::Write;
+            let v2 = match unit.as_deref() {
+                None | Some(crypto_lib::cryptanalysis::bitops::UNIT) => false,
+                Some(crypto_lib::cryptanalysis::bitops::UNIT_V2) => true,
+                Some(u) => return Err(format!("no unit `{u}`; work knows bitop/v1 and bitop/v2")),
+            };
+            if v2 && summary {
+                return Err(
+                    "--summary is in bitop/v1 only; price the records in bitop/v2 one by one"
+                        .into(),
+                );
+            }
+            let stdout = std::io::stdout();
+            let mut out = stdout.lock();
+            if summary {
+                let groups =
+                    crypto_lib::cryptanalysis::ecbench::work::summarise(&sessions, counted)?;
+                for g in groups {
+                    writeln!(
+                        out,
+                        "{}",
+                        serde_json::to_string(&g).map_err(|e| e.to_string())?
+                    )
+                    .map_err(|e| e.to_string())?;
+                }
+                return Ok(ExitCode::SUCCESS);
+            }
+            for dir in &sessions {
+                let records = crypto_lib::cryptanalysis::ecbench::runner::read_records(dir)
+                    .map_err(|e| format!("{}: {e}", dir.display()))?;
+                for r in records {
+                    if counted && !r.counts() {
+                        continue;
+                    }
+                    let line = if v2 {
+                        let line = crypto_lib::cryptanalysis::ecbench::work::work_line_v2(&r);
+                        serde_json::to_string(&line).map_err(|e| e.to_string())?
+                    } else {
+                        let line = crypto_lib::cryptanalysis::ecbench::work::work_line(&r);
+                        serde_json::to_string(&line).map_err(|e| e.to_string())?
+                    };
+                    writeln!(out, "{line}").map_err(|e| e.to_string())?;
+                }
+            }
+        }
+        Cmd::BitopVectors { unit } => match unit.as_deref() {
+            None | Some(crypto_lib::cryptanalysis::bitops::UNIT) => {
+                print_json(&crypto_lib::cryptanalysis::bitops::vectors())?
+            }
+            Some(crypto_lib::cryptanalysis::bitops::UNIT_V2) => {
+                print_json(&crypto_lib::cryptanalysis::bitops::vectors_v2())?
+            }
+            Some(u) => {
+                return Err(format!(
+                    "no unit `{u}`; the vectors are bitop/v1 and bitop/v2"
+                ))
+            }
+        },
+        Cmd::Amortize {
+            dir,
+            arm,
+            reference,
+            limit_log2,
+        } => {
+            use crypto_lib::cryptanalysis::ecbench::work;
+            // (curve, arm) -> (reusable, per-target) gates of each verified run.
+            let mut by: std::collections::BTreeMap<(String, String), Vec<(f64, f64, bool)>> =
+                Default::default();
+            let mut log2_r: std::collections::BTreeMap<String, f64> = Default::default();
+            for d in &dir {
+                for r in crypto_lib::cryptanalysis::ecbench::runner::read_records(d)
+                    .map_err(|e| format!("{}: {e}", d.display()))?
+                {
+                    if !r.counts() || (r.arm != arm && r.arm != reference) {
+                        continue;
+                    }
+                    let w = match &r.work {
+                        Some(w) if !w.reusable_bitops.is_empty() => w.clone(),
+                        _ => work::price_record(&r)?,
+                    };
+                    let f = |s: &str| s.parse::<f64>().unwrap_or(f64::NAN);
+                    log2_r.insert(
+                        r.workload.curve.slug.clone(),
+                        (r.workload.curve.r as f64).log2(),
+                    );
+                    by.entry((r.workload.curve.slug.clone(), r.arm.clone()))
+                        .or_default()
+                        .push((f(&w.reusable_bitops), f(&w.per_target_bitops), w.complete));
+                }
+            }
+            let mean = |v: &[(f64, f64, bool)]| {
+                let n = v.len() as f64;
+                (
+                    v.iter().map(|x| x.0).sum::<f64>() / n,
+                    v.iter().map(|x| x.1).sum::<f64>() / n,
+                    v.iter().all(|x| x.2),
+                )
+            };
+            let mut rows = Vec::new();
+            for (slug, lr) in &log2_r {
+                let (Some(a), Some(b)) = (
+                    by.get(&(slug.clone(), arm.clone())),
+                    by.get(&(slug.clone(), reference.clone())),
+                ) else {
+                    continue;
+                };
+                let (ra, pa, ca) = mean(a);
+                let (rb, pb, cb) = mean(b);
+                let at = |t: u64| {
+                    serde_json::json!({
+                        "targets": t,
+                        "arm_bitops": ra + t as f64 * pa,
+                        "rho_bitops": rb + pb * work::batch_rho_factor(t),
+                    })
+                };
+                let at_rows: Vec<serde_json::Value> = [1u64, 16, 256, 4096, 1 << 16, 1 << 20]
+                    .into_iter()
+                    .map(at)
+                    .collect();
+                rows.push(serde_json::json!({
+                    "curve": slug,
+                    "log2_r": lr,
+                    "arm": {"runs": a.len(), "reusable_bitops": ra, "per_target_bitops": pa, "complete": ca},
+                    "reference": {"runs": b.len(), "reusable_bitops": rb, "per_target_bitops": pb, "complete": cb},
+                    "cold_ratio": (ra + pa) / (rb + pb),
+                    "per_target_ratio": pa / pb,
+                    "break_even_window": work::break_even_window(ra, pa, rb, pb, limit_log2),
+                    "at": at_rows,
+                }));
+            }
+            print_json(&serde_json::json!({
+                "schema": "ecbench.amortize/v1",
+                "unit": crypto_lib::cryptanalysis::bitops::UNIT,
+                "arm": arm,
+                "reference": reference,
+                "model": "arm: reusable once + per_target each; rho: reusable once + per_target * sum_{k<T} C(2k,k)/4^k (Kuhn-Struik, no detection lag)",
+                "curves": rows,
+            }))?;
+        }
         Cmd::Methods { json } => {
             if json {
                 let v: Vec<_> = methods::registry()
@@ -902,13 +1191,25 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 }
             }
         }
-        Cmd::Plan { spec: path, json } => {
+        Cmd::Plan {
+            spec: path,
+            json,
+            doc,
+        } => {
             let text = read(&path)?;
             let p = spec::plan(spec::Spec::from_json(&text)?)?;
             for w in &p.warnings {
                 eprintln!("ecbench: warning: {w}");
             }
-            if json {
+            if doc {
+                print_json(&runner::PlanDoc {
+                    schema: "ecbench.plan/v1".into(),
+                    spec_id: p.spec_id.clone(),
+                    arms: p.arms.clone(),
+                    workloads: p.workloads.clone(),
+                    executions: p.executions.clone(),
+                })?;
+            } else if json {
                 print_json(&serde_json::json!({
                     "spec_id": p.spec_id, "spec_sha256": p.spec_sha256,
                     "arms": p.arms, "workloads": p.workloads, "executions": p.executions.len(),
@@ -944,7 +1245,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 let unregistered: Vec<_> = p
                     .workloads
                     .iter()
-                    .filter(|w| !w.curve.registered)
+                    // A Jacobian (`jcv1-…`) has no ICV1 identity and no
+                    // registry entry to make; only elliptic slugs count.
+                    .filter(|w| !w.curve.registered && w.curve.slug.starts_with("icv1-"))
                     .map(|w| &w.curve.slug)
                     .collect();
                 if !unregistered.is_empty() {
@@ -953,6 +1256,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             }
         }
         Cmd::Run {
+            diagnostic_launch,
             spec: path,
             out,
             cpus,
@@ -975,6 +1279,10 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 req = isolation::CpuRequest::None;
             }
             let opts = runner::RunOptions {
+                diagnostic_launch: diagnostic_launch
+                    .as_deref()
+                    .map(crypto_lib::cryptanalysis::ecbench::diagnostic_launch::DiagnosticLaunch::load)
+                    .transpose()?,
                 cpus: req,
                 lock_path: lock,
                 wait_for_lock: wait,
@@ -1029,31 +1337,22 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             );
         }
         Cmd::ProfileInput { spec: path, seq } => {
-            let source =
-                std::fs::read_to_string(&path).map_err(|e| format!("{}: {e}", path.display()))?;
-            let p = spec::plan(spec::Spec::from_json(&source)?)?;
-            let ex = p
-                .executions
-                .get(usize::try_from(seq).map_err(|_| "sequence does not fit usize")?)
-                .filter(|ex| ex.seq == seq)
-                .ok_or_else(|| format!("sequence {seq} is not in the plan"))?;
-            let arm = &p.arms[ex.arm];
-            let w = &p.workloads[ex.workload];
-            let input = record::ChildInput {
-                schema: record::CHILD_INPUT_SCHEMA.into(),
-                curve: w.curve_spec.for_child(p.instance(ex.workload)),
-                target_seed: w.target_seed,
-                target_index: w.target_index,
-                target_kind: w.kind(),
-                expected_workload_id: w.workload_id.clone(),
-                method: methods::MethodSpec {
-                    id: arm.method.id.clone(),
-                    params: arm.method.params.clone(),
-                },
-                expected_method_id: arm.method.method_id.clone(),
-                algorithm_seed: ex.algorithm_seed,
-            };
-            print_json(&input)?;
+            print_json(&profile_input(&path, seq)?)?;
+        }
+        Cmd::AuditIr {
+            spec: path,
+            seq,
+            out,
+        } => {
+            std::fs::create_dir_all(&out).map_err(|e| format!("{}: {e}", out.display()))?;
+            let me = std::env::current_exe().map_err(|e| e.to_string())?;
+            for s in seq {
+                let line = audit_ir_one(&me, &path, s, &out)?;
+                println!(
+                    "{}",
+                    serde_json::to_string(&line).map_err(|e| e.to_string())?
+                );
+            }
         }
         Cmd::CallgrindIr { prefix } => {
             print_json(&callgrind::solve_ir(&prefix)?)?;
@@ -1065,19 +1364,25 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             dir,
             replay,
             replay_all,
+            replay_seed,
+            replay_seq,
             allow_interrupted,
             out,
-            exit_code,
+            exit_code: _,
         } => {
             let dir = PathBuf::from(isolab::expand_env(&dir)?);
-            let rep = audit::audit_with(
+            let rep = audit::audit_opts(
                 &dir,
-                if replay_all {
-                    audit::REPLAY_ALL
-                } else {
-                    replay
+                &audit::AuditOptions {
+                    replay: if replay_all {
+                        audit::REPLAY_ALL
+                    } else {
+                        replay
+                    },
+                    replay_seed,
+                    replay_seqs: replay_seq,
+                    allow_interrupted,
                 },
-                allow_interrupted,
             )?;
             let text = serde_json::to_string_pretty(&rep).map_err(|e| e.to_string())? + "\n";
             if let Some(o) = out {
@@ -1085,6 +1390,15 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 eprintln!("receipt sha256 {}", canonical::sha256_hex(text.as_bytes()));
             }
             print!("{text}");
+            for w in &rep.warnings {
+                eprintln!("warning: {w}");
+            }
+            if let Some(seed) = rep.replay_seed {
+                eprintln!(
+                    "replay seed {seed} ({} eligible runs)",
+                    rep.replay_candidates.unwrap_or(0)
+                );
+            }
             eprintln!(
                 "audit {}: {} records, {} verified, {} replays reproduced, {} problems",
                 if rep.ok { "OK" } else { "FAILED" },
@@ -1093,6 +1407,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 rep.replays.iter().filter(|r| r.reproduced).count(),
                 rep.problems.len()
             );
+            for problem in rep.problems.iter().take(20) {
+                eprintln!("problem: {problem}");
+            }
             if rep.records_bound == Some(false) && rep.interruption.is_some() {
                 eprintln!(
                     "warning: interruption {}: records_bound false (no records hash binds \
@@ -1100,8 +1417,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     rep.interruption.as_deref().unwrap_or("")
                 );
             }
-            if exit_code && !rep.ok {
-                return Ok(ExitCode::from(1));
+            if rep.exit_status() != 0 {
+                return Ok(ExitCode::from(rep.exit_status()));
             }
         }
         Cmd::GpuStage {
@@ -1455,8 +1772,29 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
         Cmd::Db { cmd } => match cmd {
             DbCmd::Schema => print!("{}", db::SCHEMA_SQL),
             DbCmd::Sql { paths } => {
-                let refs: Vec<&Path> = paths.iter().map(|p| p.as_path()).collect();
-                print!("{}", db::sql(&refs)?);
+                // `store:NAME` and `sha256:DIGEST` fetch (and verify) the
+                // object first, so stored factor-base dumps load as they are.
+                let resolved: Vec<PathBuf> = paths
+                    .iter()
+                    .map(|p| crypto_lib::store::resolve_path(p))
+                    .collect::<Result<_, _>>()?;
+                let refs: Vec<&Path> = resolved.iter().map(|p| p.as_path()).collect();
+                let batch = db::sql_batch(&refs);
+                print!("{}", batch.sql);
+                // A refused path (tampered, unreadable, not ecbench) loads
+                // nothing and does not stop the rest; the exit status says
+                // the load was not complete.
+                for (path, why) in &batch.refused {
+                    eprintln!("db sql: skipped {}: {why}", path.display());
+                }
+                if !batch.refused.is_empty() {
+                    eprintln!(
+                        "db sql: {} of {} paths were skipped; the SQL above omits them",
+                        batch.refused.len(),
+                        refs.len()
+                    );
+                    return Ok(ExitCode::from(1));
+                }
             }
         },
         Cmd::IsolabJob {
@@ -1505,6 +1843,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 root,
                 resamples,
                 seed,
+                unit,
                 weight,
                 param_rule,
                 fit_version,
@@ -1522,6 +1861,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         curves: curve,
                         resamples,
                         seed,
+                        unit,
                         weight,
                         param_rule,
                         fit_version,
@@ -1757,8 +2097,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                             return Err(format!(
                                 "commitment {} is dated {} ms, in the future",
                                 cm.commitment_id, cm.committed_unix_ms
-                            )
-                            .into());
+                            ));
                         }
                         let epoch = challenge::epoch_from(&c, &cm, &b)?;
                         (challenge::spec_for_committed(&c, &m, &cm, &b)?, epoch)
@@ -1866,6 +2205,110 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
     Ok(ExitCode::SUCCESS)
 }
 
+/// The exact measured-child input of `seq` in the spec at `path`.
+fn profile_input(path: &Path, seq: u64) -> Result<record::ChildInput, String> {
+    let source = std::fs::read_to_string(path).map_err(|e| format!("{}: {e}", path.display()))?;
+    let p = spec::plan(spec::Spec::from_json(&source)?)?;
+    let ex = p
+        .executions
+        .get(usize::try_from(seq).map_err(|_| "sequence does not fit usize")?)
+        .filter(|ex| ex.seq == seq)
+        .ok_or_else(|| format!("sequence {seq} is not in the plan"))?;
+    let arm = &p.arms[ex.arm];
+    let w = &p.workloads[ex.workload];
+    Ok(record::ChildInput {
+        schema: record::CHILD_INPUT_SCHEMA.into(),
+        diagnostics: None,
+        diagnostic_lifecycle: None,
+        curve: workload::CurveSpec::explicit(p.instance(ex.workload))
+            .unwrap_or_else(|| w.curve_spec.clone()),
+        target_seed: w.target_seed,
+        target_index: w.target_index,
+        target_kind: w.kind(),
+        expected_workload_id: w.workload_id.clone(),
+        method: methods::MethodSpec {
+            id: arm.method.id.clone(),
+            params: arm.method.params.clone(),
+        },
+        expected_method_id: arm.method.method_id.clone(),
+        algorithm_seed: ex.algorithm_seed,
+    })
+}
+
+/// One execution under Callgrind, priced.
+fn audit_ir_one(
+    me: &Path,
+    spec_path: &Path,
+    seq: u64,
+    out: &Path,
+) -> Result<serde_json::Value, String> {
+    use crypto_lib::cryptanalysis::ecbench::work;
+    use std::io::Write;
+    let input = profile_input(spec_path, seq)?;
+    let input_text = serde_json::to_string(&input).map_err(|e| e.to_string())?;
+    std::fs::write(out.join(format!("{seq}.input.json")), &input_text)
+        .map_err(|e| e.to_string())?;
+    let prefix = out.join(format!("{seq}.callgrind"));
+    let mut child = std::process::Command::new("valgrind")
+        .args(["--tool=callgrind", "--cache-sim=no", "--branch-sim=no"])
+        .arg(format!("--callgrind-out-file={}", prefix.display()))
+        .arg(me)
+        .arg("exec")
+        .env("ECBENCH_CALLGRIND_SOLVE", "1")
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .map_err(|e| format!("valgrind: {e}"))?;
+    child
+        .stdin
+        .take()
+        .expect("piped")
+        .write_all(input_text.as_bytes())
+        .map_err(|e| e.to_string())?;
+    let output = child.wait_with_output().map_err(|e| e.to_string())?;
+    std::fs::write(out.join(format!("{seq}.output.json")), &output.stdout)
+        .map_err(|e| e.to_string())?;
+    let child_out: record::ChildOutput =
+        serde_json::from_slice(&output.stdout).map_err(|e| format!("child output: {e}"))?;
+    let report = child_out
+        .report
+        .ok_or_else(|| format!("seq {seq}: {}", child_out.error.unwrap_or_default()))?;
+    let (w, _) = workload::Workload::build(
+        &input.curve,
+        input.target_seed,
+        input.target_index,
+        input.target_kind,
+    )?;
+    let ir = callgrind::solve_ir(&prefix)?;
+    let block = work::price(&work::Priceable {
+        method_id: &input.method.id,
+        method_params: &input.method.params,
+        curve: &w.curve,
+        phases: &report.phases,
+        counters: &report.counters,
+        solver: report.solver.as_ref(),
+    })?;
+    let bitops: f64 = block.bitops.parse().unwrap_or(f64::NAN);
+    Ok(serde_json::json!({
+        "schema": "ecbench.audit_ir/v1",
+        "seq": seq,
+        "method": input.method.id,
+        "params": input.method.params,
+        "curve": w.curve.slug,
+        "family": w.curve.family,
+        "log2_r": (w.curve.r as f64).log2(),
+        "recovered": report.recovered.map(|x| x.to_string()),
+        "solve_ir": ir.solve_ir,
+        "bitops": block.bitops,
+        "ir_per_kilo_bitop": ir.solve_ir as f64 / bitops * 1000.0,
+        "total_gae": report.total_gae,
+        "ir_per_gae": ir.solve_ir as f64 / report.total_gae,
+        "work": block,
+        "ir_parts": ir.parts,
+    }))
+}
+
 fn write_or_print(out: Option<&Path>, text: &str) -> Result<(), String> {
     match out {
         Some(o) => {
@@ -1931,8 +2374,8 @@ fn band_cmd(
 }
 
 fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
-    println!("| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels |");
-    println!("|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|");
+    println!("| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels | flags |");
+    println!("|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|---|");
     for d in dirs {
         let s = runner::read_session(d)?;
         let recs = runner::read_records(d)?;
@@ -2051,8 +2494,26 @@ fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
                         _ => "",
                     }
                 );
+                // Fixed set-up above a tenth of S, or r below the calibrated
+                // range (README §7, "The strong reference"), over the
+                // verified runs the mean S is taken from.
+                let flags = any
+                    .map(|r| {
+                        let runs: Vec<(&[methods::PhaseRecord], f64)> = mine
+                            .iter()
+                            .filter(|r| r.counts())
+                            .filter_map(|r| Some((r.phases.as_slice(), r.cost.total_gae?)))
+                            .collect();
+                        methods::pooled_row_flags(
+                            &r.workload.curve.family,
+                            (r.workload.curve.r as f64).log2(),
+                            &arm.method.family,
+                            &runs,
+                        )
+                    })
+                    .unwrap_or_default();
                 println!(
-                    "| {} | {} | {} | {} | {:.2} | {}/{} | {} | {} | {} | {} | {} | {} | {} | {} | {} |",
+                    "| {} | {} | {} | {} | {:.2} | {}/{} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} |",
                     s.session_id,
                     arm.name,
                     arm.method.id,
@@ -2087,6 +2548,11 @@ fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
                         .map(|(k, v)| format!("{k}×{v}"))
                         .collect::<Vec<_>>()
                         .join(" "),
+                    if flags.is_empty() {
+                        "–".to_string()
+                    } else {
+                        flags.join("; ")
+                    },
                 );
             }
         }

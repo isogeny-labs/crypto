@@ -1,11 +1,10 @@
 name: Envoy FPGA crypto
 
 on:
-  pull_request:
-    paths:
-      - integrations/envoy-fpga-crypto/**
-      - .github/workflows/envoy-fpga-crypto.yml
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
+    branches: [main]
     paths:
       - integrations/envoy-fpga-crypto/**
       - .github/workflows/envoy-fpga-crypto.yml
@@ -19,7 +18,7 @@ concurrency:
 
 jobs:
   host-and-rtl:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|envoy-fpga-crypto.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|envoy-fpga-crypto.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 20
     defaults:
       run:

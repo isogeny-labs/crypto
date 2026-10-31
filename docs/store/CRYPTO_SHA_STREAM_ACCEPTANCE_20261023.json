@@ -1,0 +1,67 @@
+{
+  "schema": "crypto.sha-family-stream-s3-acceptance/v1",
+  "checked_at_utc": "2026-10-24T04:07:21.395593+00:00",
+  "source_commit": "979fd37471a9ccc5d23e7e3b63c9709496795f50",
+  "binary_sha256": "b9cc06b8da10d090bea8d93e3b094c56817fb47d4f42a954ff218456561d4114",
+  "bucket": "setec-astronomy-artifacts",
+  "region": "us-east-2",
+  "aws_profile": "ecc-challenges-new",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/20261024T040715Z-d7340648",
+  "logical_name": "evidence/sha-family-stream/20261024T040715Z-d7340648/input.bin",
+  "object": {
+    "key": "ic/v1/acceptance/20261024T040715Z-d7340648/sha256/58/588f63505ca941a4325eb1b365238720537c676bad4c8c8223b70dfb58dcb5a9",
+    "sha256": "588f63505ca941a4325eb1b365238720537c676bad4c8c8223b70dfb58dcb5a9",
+    "bytes": 1048577
+  },
+  "checks": {
+    "local_hashlib_comparisons": 119,
+    "local_boundary_sizes": [
+      0,
+      1,
+      55,
+      56,
+      63,
+      64,
+      65,
+      111,
+      112,
+      127,
+      128,
+      129,
+      65535,
+      65536,
+      65537,
+      1048577
+    ],
+    "local_large_file_bytes": 8388745,
+    "local_large_file_sha256": "5dfc55cb2e11521c0b51703db1a08d90df227c003e21592de6d952e726790cfb",
+    "remote_download_status": "bytes_ok",
+    "fresh_cache_sha_family_matches_hashlib": [
+      "sha1",
+      "sha224",
+      "sha256",
+      "sha384",
+      "sha512",
+      "sha512-224",
+      "sha512-256"
+    ],
+    "digest_reference_sha512_256_match": true,
+    "fresh_cache_pull_sha256_match": true,
+    "exact_objects_deleted": 1,
+    "prefix_empty_after_cleanup": true,
+    "cleanup_errors": []
+  },
+  "limits": {
+    "streaming_scope": "SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA-512/224, SHA-512/256, SHA-3, SHAKE, BLAKE3 file inputs; other hashes still buffer whole files",
+    "independent_reference": "Python hashlib/OpenSSL for the seven new SHA family file paths"
+  },
+  "validation": {
+    "release_crypto_binary_tests_passed": 27,
+    "release_crypto_binary_tests_failed": 0,
+    "release_library_tests_passed": 4491,
+    "release_library_tests_failed": 0,
+    "release_library_tests_ignored": 119,
+    "rustfmt_check": "passed",
+    "git_diff_check": "passed"
+  }
+}

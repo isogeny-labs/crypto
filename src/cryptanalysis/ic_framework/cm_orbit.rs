@@ -350,6 +350,8 @@ impl FactorBaseBuilder<PrimeCurve> for CmOrbitBase<'_> {
             point_index: fast_map(4 * columns * length),
             cost: PhaseCost::default(),
             subspace_basis: None,
+            frobenius_orbit_layout: None,
+            known_logs: None,
         };
         let mut seen = HashSet::new();
         let mut x = 1;

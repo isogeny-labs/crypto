@@ -3,13 +3,14 @@ name: ecbench
 #
 # Unit and integration tests run on every change.  Then a real session
 # runs on Linux as root, so the paths a laptop cannot exercise are
-# exercised here: whole-core reservation, eviction, pinning between fork
+# exercised here: inherited-cpuset reservation, eviction, pinning between fork
 # and exec, the kernel's tick, steal and PSI counters, and the grading
 # that reads them.  The job requires every measured child to report the
 # run CPU as its whole affinity mask and to start and finish on it, and
 # the audit's replays to reproduce exactly.  A hosted runner is a shared
 # VM, so its records are expected to stop at L1 (steal and frequency are
-# outside a guest's control); the job checks the machinery, never the
+# outside a guest's control); some hosted cpusets contain no whole nonzero
+# core and grade lower. The job checks the machinery, never the
 # numbers.
 #
 # PRs validate every historical session hash/seal/answer without rerunning
@@ -33,27 +34,37 @@ name: ecbench
 #
 # The sessions under research/ecbench_*/sessions, the binary-curve
 # comparison, and the n37 compact-orbit note sessions are also re-audited
-# in the weekly/manual lane with every measured run replayed: their counts
+# in the manual exhaustive lane with every measured run replayed: their counts
 # were recorded on another host and architecture and must reproduce here
 # bit for bit, so a change that alters what a registered method counts
 # fails here.
 on:
   pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
   merge_group:
+  push:
+    branches: [main]
   workflow_dispatch:
+  # The weekly lane the header and the schedule-gated steps describe
+  # (sheriff SHF-20261028-0f3f64, PPN-6): Sunday 05:37 UTC, off the hour.
+  # A scheduled event selects every scope (ci-scope.mjs).
   schedule:
-    - cron: "37 1 * * 0"
+    - cron: "37 5 * * 0"
 permissions:
   contents: read
 concurrency:
-  group: ecbench-${{ github.ref }}
+  # The weekly lane runs for hours on main; its own group keeps it from
+  # holding up or displacing push runs on main.
+  group: ecbench-${{ github.event_name == 'schedule' && 'schedule' || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 defaults:
   run:
     shell: bash
 jobs:
   scope:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
       contents: read
@@ -76,6 +87,7 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /.github/scripts/
             /build.rs
             /rustfmt.toml
@@ -96,7 +108,7 @@ jobs:
   factor-base-sweep:
     name: factor-base sweep CLI
     needs: scope
-    if: always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false')
+    if: always() && !cancelled() && !github.event.pull_request.draft && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false')
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
@@ -113,6 +125,7 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /Cargo.toml
             /Cargo.lock
             /.cargo/
@@ -124,6 +137,7 @@ jobs:
             /tests/
             /examples/
             /benches/
+            /tools/factor-base/
             /tools/volcano-cli/
             /isogeny_algos/
             /docs/
@@ -141,7 +155,7 @@ jobs:
       - name: Native shape, polynomial and progress comparison unit tests
         run: cargo test --locked --release --bin factor-base-sweep
       - name: Actual CLI witnesses, caps, interruption, resume and corruption
-        run: cargo test --locked --release --test factor_base_sweep_cli -- --test-threads=1
+        run: cargo test --locked --release --test factor_base_sweep_cli --test factor_base_profile_cli -- --test-threads=1
       - name: Independent native shape audit tests and strict lint
         env:
           CARGO_TARGET_DIR: ${{ github.workspace }}/target
@@ -170,12 +184,12 @@ jobs:
           cmp "$replay/runs/guard-coverage.json" "$replay/guard-coverage.json"
 
   harness:
-    if: always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false')
+    if: always() && !cancelled() && !github.event.pull_request.draft && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false')
     needs: scope
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    runs-on: ubuntu-24.04
     # Keep the exhaustive scientific audit's existing 300-minute budget in
     # the weekly/manual lane; ordinary PR validation is bounded at 45 minutes.
-    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 45 || 300 }}
+    timeout-minutes: ${{ (github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'merge_group') && 45 || 300 }}
     steps:
       - name: Require successful scope classification
         if: needs.scope.result != 'success'
@@ -184,11 +198,13 @@ jobs:
           exit 1
       - uses: actions/checkout@v4
         with:
-          fetch-depth: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 1 || 0 }}
+          fetch-depth: ${{ (github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'merge_group') && 1 || 0 }}
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /Cargo.toml
+            /tools/factor-base/
             /tools/volcano-cli/
             /isogeny_algos/
             /Cargo.lock
@@ -206,9 +222,12 @@ jobs:
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
             /research/ecbench_*/
+            /research/ic_tool_program/rule/v8/runs/*/T01.params.json
             /research/ghs_curve_comparison_20261009/
             /research/notes/ecc2k130/cold_compact_orbit_ic_20261003/
             /research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/
+            /tools/artifacts/
+            /.artifacts/
       # Sessions are found by schema, wherever they live: check out every
       # directory holding a session.json (tree only, no blobs needed to
       # list them), then keep those whose session.json is an ecbench
@@ -228,6 +247,28 @@ jobs:
           done
           test -s "$list" || { echo '::error::no committed ecbench sessions found'; exit 1; }
           echo "$(wc -l < "$list") committed ecbench sessions (by schema)" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Pull every discovered committed session from the artifact store
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          mapfile -t artifact_sessions < "$RUNNER_TEMP/ecbench-sessions.txt"
+          test "${#artifact_sessions[@]}" -gt 0
+          python3 tools/artifacts/artifacts.py pull --jobs 16 "${artifact_sessions[@]}"
       - name: Materialize compile-time inputs without unrelated archives
         run: node .github/scripts/ci-scope.mjs --materialize
       - name: Committed sessions are evidence and are never edited
@@ -262,7 +303,7 @@ jobs:
       - name: Unit tests
         run: cargo test --release --lib ecbench
       - name: Integration tests
-        run: cargo test --release --test ecbench
+        run: cargo test --release --test ecbench --test aps_ecbench
       - name: Exact n-1 and large-prime integration tests
         run: cargo test --release --test ecbench_large_prime
       - name: Build
@@ -452,6 +493,22 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Audit with replays
         run: ./target/release/ecbench verify --dir "$RUNNER_TEMP/prime" --replay 8 --exit-code --out "$RUNNER_TEMP/prime-audit.json" > /dev/null
+      # The pre-2026-10-18 class set-up reconstruction is admitted only for
+      # the producer binaries in audit::PRE_CLASS_SETUP_BINARIES; these
+      # sessions are outside the weekly all-run replay, so replay a sample
+      # of each here and require that the reconstruction was what passed.
+      # (docs/ecbench/CLASS_SETUP_AUDIT.md; the negative controls are in
+      # tests/ecbench.rs.)
+      - name: Pre-fix quartic and cubic records replay under the closed producer list
+        run: |
+          for d in research/prime_rho_automorphism_20261015/sessions/quartic \
+            research/prime_rho_automorphism_20261015/sessions/cubic \
+            research/drastic_prime_conductor_gap_round2_20261012/sessions/d3-ell1016839-cubic \
+            research/drastic_prime_conductor_gap_round3_20261012/sessions/d4-ell1016839-auto; do
+            ./target/release/ecbench verify --dir "$d" --replay 8 --exit-code --out "$RUNNER_TEMP/class-setup.json" > /dev/null
+            jq -e '[.replays[].detail] | any(startswith("identical (pre-2026-10-18 phase accounting"))' \
+              "$RUNNER_TEMP/class-setup.json" > /dev/null
+          done
       - name: Compare and tabulate
         run: |
           ./target/release/ecbench compare --dir "$RUNNER_TEMP/prime" --a rho-neg --b bsgs-neg | tee -a "$GITHUB_STEP_SUMMARY"
@@ -513,9 +570,9 @@ jobs:
           if-no-files-found: ignore
 
   evidence_audit_pr:
-    if: (github.event_name == 'pull_request' || github.event_name == 'merge_group') && needs.scope.outputs.ecbench_replay != 'false'
+    if: ${{ !github.event.pull_request.draft && (github.event_name == 'pull_request' || github.event_name == 'merge_group') && needs.scope.outputs.ecbench_replay != 'false' }}
     needs: [scope, harness]
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     # The whole audit no longer fits one 2-vCPU hosted runner inside the PR
     # cap: a shard of 273 MB of (decompressed) records took 15 min there, and
@@ -538,6 +595,8 @@ jobs:
             /research/ghs_curve_comparison_20261009/
             /research/notes/ecc2k130/cold_compact_orbit_ic_20261003/
             /research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/
+            /tools/artifacts/
+            /.artifacts/
       - name: Check out and list every committed ecbench session
         run: |
           list="$RUNNER_TEMP/ecbench-sessions.txt"
@@ -553,6 +612,28 @@ jobs:
           done
           test -s "$list" || { echo '::error::no committed ecbench sessions found'; exit 1; }
           echo "$(wc -l < "$list") committed ecbench sessions (by schema)" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Pull every discovered committed session from the artifact store
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          mapfile -t artifact_sessions < "$RUNNER_TEMP/ecbench-sessions.txt"
+          test "${#artifact_sessions[@]}" -gt 0
+          python3 tools/artifacts/artifacts.py pull --jobs 16 "${artifact_sessions[@]}"
       - uses: actions/download-artifact@v4
         with:
           name: ecbench-pr-audit-bin
@@ -566,4 +647,4 @@ jobs:
         run: |
           chmod +x target/release/ecbench
           bash .github/scripts/ecbench-audit-sessions.sh "$RUNNER_TEMP/ecbench-sessions.txt"
-          echo 'PR evidence validation: every committed ecbench session with complete inputs (by schema) hash/seal/answer audited; four hash-pinned scratch sessions lacking spec/host capsules remain incomplete. Fresh smoke sessions exercise deterministic replay; exhaustive historical replay belongs to the weekly/manual lane.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'PR evidence validation: every committed ecbench session with complete inputs (by schema) hash/seal/answer audited; four hash-pinned scratch sessions lacking spec/host capsules remain incomplete. Fresh smoke sessions exercise deterministic replay; exhaustive historical replay belongs to the manual exhaustive lane.' >> "$GITHUB_STEP_SUMMARY"

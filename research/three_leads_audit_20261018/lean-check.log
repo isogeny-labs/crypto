@@ -1,0 +1,51 @@
+TraceKernel.lean:17:6: error(lean.unknownIdentifier): Unknown identifier `hadd`
+TraceKernel.lean:16:29: error: unsolved goals
+G : Type
+add : G → G → G
+bit : G → Bool
+p q : G
+h : bit p = bit q
+⊢ bit (add p q) = false
+TraceKernel.lean:23:18: error(lean.unknownIdentifier): Unknown identifier `hzero`
+TraceKernel.lean:27:21: error(lean.unknownIdentifier): Unknown identifier `hadd`
+TraceKernel.lean:28:8: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  bit (mult zero add (2 * n) p)
+in the target expression
+  bit (add (add (mult zero add (2 * n) p) p) p) = false
+
+case succ
+G : Type
+zero : G
+add : G → G → G
+bit : G → Bool
+p : G
+n : Nat
+ih : bit (mult zero add (2 * n) p) = false
+hn : 2 * (n + 1) = 2 * n + 1 + 1
+⊢ bit (add (add (mult zero add (2 * n) p) p) p) = false
+TraceKernel.lean:33:19: error(lean.unknownIdentifier): Unknown identifier `hadd`
+TraceKernel.lean:34:30: error(lean.unknownIdentifier): Unknown identifier `hzero`
+TraceKernel.lean:34:36: error(lean.unknownIdentifier): Unknown identifier `hadd`
+TraceKernel.lean:32:45: error: unsolved goals
+G : Type
+zero : G
+add : G → G → G
+bit : G → Bool
+p : G
+n : Nat
+⊢ bit (add (mult zero add (2 * n) p) p) = bit p
+TraceKernel.lean:39:35: error(lean.unknownIdentifier): Unknown identifier `hzero`
+TraceKernel.lean:39:41: error(lean.unknownIdentifier): Unknown identifier `hadd`
+TraceKernel.lean:38:65: error: unsolved goals
+G : Type
+zero : G
+add : G → G → G
+bit : G → Bool
+p : G
+n : Nat
+horder : mult zero add (2 * n + 1) p = zero
+⊢ bit p = false
+'TraceKernel.same_coset_pair' depends on axioms: [sorryAx]
+'TraceKernel.trace_even' depends on axioms: [sorryAx]
+'TraceKernel.trace_odd' depends on axioms: [sorryAx]
+'TraceKernel.odd_order_in_kernel' depends on axioms: [sorryAx]

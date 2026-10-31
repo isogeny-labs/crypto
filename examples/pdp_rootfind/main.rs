@@ -50,6 +50,9 @@ mod kernel;
 #[allow(dead_code)]
 #[path = "../pdp_speedup/lanes_x86.rs"]
 mod lanes_x86;
+#[allow(dead_code)]
+#[path = "../pdp_speedup/mitm.rs"]
+mod mitm;
 
 mod analyze;
 mod binrf;

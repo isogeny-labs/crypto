@@ -1,0 +1,70 @@
+\chapter{Artefacts}\label{app:artefacts}
+
+Every number in this treatise is copied from a committed artefact. The
+treatise ran one re-verification (\S\ref{sec:fd-binary}) and no new
+measurement. Artefact paths are relative to the \texttt{crypto} repository
+unless prefixed \texttt{crypto-autoresearcher:}.
+
+\paragraph{Companion documents.}
+\begin{itemize}
+\item \art{papers/ecdlp-index-calculus-program/}~\cite{icprogram2026} is
+  the chronological record, with study catalogues for both repositories
+  (about 1{,}400 directories) and the list of open pull requests. Where this
+  treatise reuses its chapters (background, literature, measurement, root
+  finding, Gröbner engines, Koblitz, binary and prime curves, transfers,
+  frontier, open problems), the text is that record's as of 26 October,
+  updated where later evidence changed a number.
+\item \art{papers/ecdlp-ic-improvement-ledger/}~\cite{icledger2026} is the
+  ratchet of incumbents to 23 October.
+\item \art{research/paper_opportunities_20261029/} is the assessment that
+  identified the fall-degree results of Chapter~\ref{ch:falldegree} as the
+  programme's strongest theory, and that holds the certificate
+  re-verification.
+\end{itemize}
+
+\paragraph{Theory (Part~\ref{part:theory}).}
+\begin{itemize}
+\item \art{crypto-autoresearcher:papers/semaev-conservation-specialization/}
+  (Chapter~\ref{ch:cover}).
+\item \art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/}:
+  \texttt{theorem-dossier.md}, \texttt{results/}, and \texttt{verify/}
+  (\texttt{cert\_check.py}, \texttt{b\_sweep.py}).
+\item \art{research/guarded_fall_degree_20261028/}: \texttt{proofs/},
+  \texttt{extensions/}, \texttt{native/}, \texttt{formal/}.
+\item \art{research/prime_fall_degree_20261027/DERIVED.md}.
+\item \art{crypto-autoresearcher:papers/nagao-lemma4-note/} and
+  \art{crypto-autoresearcher:docs/reports/2026-10-22-semaev-first-fall-replay/}.
+\item \art{crypto-autoresearcher:knowledge/leads/ecdlp/} (Chapter~\ref{ch:obstructions}),
+  \art{research/twist_obstruction_20261026/} and
+  \art{research/lift_dense_factor_base_20261027/}.
+\end{itemize}
+
+\paragraph{The summer record (Chapter~\ref{ch:summer}).}
+\begin{itemize}
+\item \art{research/ecdlp_jul_sep_index_20261029/}: \texttt{INDEX.json},
+  \texttt{INDEX.tsv}, \texttt{SUMMARY.json}, \texttt{build\_index.py}.
+  Each row cites its \art{crypto-autoresearcher:ledger/decisions/} file
+  and the \texttt{experiments/EXP-*/runs/} directories of its targets.
+\end{itemize}
+
+\paragraph{Late measurements (Chapters~\ref{ch:extension}--\ref{ch:audit}).}
+\begin{itemize}
+\item \art{research/gaudry_k4_char2_redteam_20261026/REPORT.md}.
+\item \art{research/quartic_n4v2_20261020/} and \art{research/ghs3_vs_rho_20261023/}.
+\item \art{research/prime_ksum_table_20261028/} and
+  \art{research/prime_base_oracle_tuning_20261029/}.
+\item \art{research/prime_ic_program_20261029/}.
+\item \art{research/n83_k1107_bl_reproduction_20261028/}.
+\item \art{research/ghs_q16_genus3_subcovers_20261028/}.
+\item \art{research/postgb_linear_stage_20261026/}.
+\item \art{research/ic_validation_gate_20261024/}, \art{docs/ic/LEADERBOARD.md}
+  and \art{docs/ic/leaderboard.json}.
+\end{itemize}
+
+\paragraph{Figures.} The figures of the programme record and the ledger are
+copied with their data (\art{figures/data-program.json},
+\art{figures/data-ledger.json}); their plotting scripts live in those
+papers' directories. The new figures (fall degrees, weak families) are
+rendered by \art{figures/make_fig_fall_degrees.py} and
+\art{figures/make_fig_weak.py} from \art{figures/data-new.json}. That file
+holds recorded values only, each with its source.

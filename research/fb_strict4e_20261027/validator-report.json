@@ -1,0 +1,28 @@
+{
+  "status": "pass",
+  "independent": false,
+  "method": "validate.sh recomputes D=log2(sum S_prefix/sum S_strict) per (n,l,seed) straight from sessions/*/records.jsonl (measured, non-warmup rounds, cost.s) and pools by mean over seeds then cells; the claim comes from ecbench compare (summary/pairs.tsv) via pool.sh",
+  "raw_data": [
+    {
+      "path": "sessions/n13/records.jsonl",
+      "sha256": "02967ee1bc26932a0235829ada048fdee3b3599453ce93dda08602d1afa8d70f"
+    },
+    {
+      "path": "sessions/n19/records.jsonl",
+      "sha256": "5c7b4983623346715a7001e8f51c813436a9dc123d10e10cae0f0fc393b5dfc7"
+    },
+    {
+      "path": "sessions/n23/records.jsonl",
+      "sha256": "2aebe4795dc01f93c78280ee88b58d85e39c155ad2fb4ba2a194a7b4d0f4c7bc"
+    }
+  ],
+  "headline": [
+    {
+      "name": "pooled_D_w0_bits",
+      "claimed": 2.1055,
+      "recomputed": 2.1055207301,
+      "rel_tol": 0.0001
+    }
+  ],
+  "independence_basis": "Not independent: validate.sh was written and run by the same agent that produced the result. The coordinating session re-ran it and got the same 2.1055, which is a reproduction with the producer's script, not an independent validation. An independent validator (separate reviewer, own script) is still owed before any row is admitted."
+}

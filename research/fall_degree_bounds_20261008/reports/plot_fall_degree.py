@@ -8,7 +8,7 @@ def rows(pat):
     for f in sorted(glob.glob(os.path.join(D, pat))):
         out += [json.loads(l) for l in open(f) if l.strip().startswith('{')]
     return out
-fig, (a1, a2, a3) = plt.subplots(1, 3, figsize=(19, 4.8))
+fig, (a1, a2, a3, a4) = plt.subplots(1, 4, figsize=(25, 4.8))
 # panel 1: m = 2, d_F against n (Sage TABLE.md n <= 16 medians; native E3 draws)
 sage = {8: 3, 10: 3, 12: 3, 14: 3, 16: 3}  # TABLE.md / RESULTS.md E2 Semaev medians (random base)
 dreg = {8: 3, 10: 4, 12: 4, 14: 4, 16: 5, 18: 5, 20: 5, 22: 5}
@@ -72,5 +72,18 @@ ax4.axhline(64, color='#2f855a', lw=0.8); ax4.text(31, 72, 'large-host tier: ≥
 ax4.set_yscale('log'); ax4.set_ylabel('GiB'); ax4.legend(fontsize=7, loc='lower right')
 a3.set_yscale('log'); a3.set_xlabel('N (Boolean unknowns)'); a3.set_ylabel('degree-4 closure wall time, s (4 threads)'); a3.grid(alpha=0.3)
 a3.set_title('hky_par: recorded closure time (points) and dense-memory wall (dashed)', fontsize=9)
+# panel 4: E8, d_F against m at fixed (n, l); points jittered, medians as lines
+e8 = rows('e8/E8_*.jsonl')
+import statistics
+for (n, ell), col in {(8, 2): '#2b6cb0', (6, 2): '#c05621'}.items():
+    pts = [(r['m'], r['d_f'] if r['d_f'] is not None else r['d_f_at_least']) for r in e8 if (r['n'], r['ell']) == (n, ell)]
+    pts += [(r['m'], r['d_f']) for r in e7 if (r['n'], r['ell']) == (n, ell)]
+    off = -0.08 if n == 8 else 0.08
+    a4.scatter([p[0] + off for p in pts], [p[1] for p in pts], color=col, s=26, alpha=0.7, label=f'({n}, {ell}) draws')
+    ms = sorted({p[0] for p in pts})
+    low = lambda v: sorted(v)[(len(v) + 1) // 2 - 1]
+    a4.plot(ms, [low([y for x, y in pts if x == m]) for m in ms], '-', color=col, lw=1.2)
+a4.set_xlabel('m (summands)'); a4.set_ylabel('d_F'); a4.set_ylim(1.5, 5.5); a4.grid(alpha=0.3); a4.legend(fontsize=7)
+a4.set_title('E8: d_F against m at fixed (n, ℓ); lines = lower medians', fontsize=9)
 fig.suptitle('Huang–Kosters–Yeo last fall degree of Weil-descended Semaev systems (research/fall_degree_bounds_20261008)', fontsize=10)
 fig.tight_layout(); fig.savefig(sys.argv[2])

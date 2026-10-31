@@ -7,10 +7,12 @@ name: reports-s3
 #   s3://<bucket>/reports/<repository>/_manifests/<commit>.json
 # Sessions never upload; this job does, on the merge.  docs/reports-s3.md
 # says how to configure it:
-#   vars.REPORTS_S3_BUCKET    bucket (default crypto-autoresearcher)
-#   vars.REPORTS_AWS_REGION   region (default us-west-2)
+#   vars.REPORTS_S3_BUCKET    bucket (default setec-astronomy-artifacts)
+#   vars.REPORTS_AWS_REGION   region (default us-east-2)
 #   vars.REPORTS_S3_ROLE_ARN  an IAM role this repository's OIDC token may
 #                             assume (used first), else
+#   secrets.ARTIFACTS_AWS_ACCESS_KEY_ID and
+#   secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY (the artifact-store keys), else
 #   secrets.AWS_ACCESS_KEY_ID and secrets.AWS_SECRET_ACCESS_KEY
 # With neither it uploads nothing and says so in a notice: a missing
 # configuration never turns main red.  Credentials that cannot write the
@@ -37,13 +39,13 @@ concurrency:
 
 jobs:
   upload:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|reports-s3.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|reports-s3.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|reports-s3.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|reports-s3.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 45
     env:
-      BUCKET: ${{ vars.REPORTS_S3_BUCKET || 'crypto-autoresearcher' }}
-      AWS_REGION: ${{ vars.REPORTS_AWS_REGION || 'us-west-2' }}
+      BUCKET: ${{ vars.REPORTS_S3_BUCKET || 'setec-astronomy-artifacts' }}
+      AWS_REGION: ${{ vars.REPORTS_AWS_REGION || 'us-east-2' }}
       ROLE_ARN: ${{ vars.REPORTS_S3_ROLE_ARN }}
-      KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID || secrets.AWS_ACCESS_KEY_ID }}
       PREFIX: reports/${{ github.event.repository.name }}
     steps:
       - name: Which credentials
@@ -53,7 +55,7 @@ jobs:
           elif [ -n "$KEY_ID" ]; then mode=keys
           else
             mode=none
-            echo "::notice::No S3 credentials (vars.REPORTS_S3_ROLE_ARN or secrets.AWS_ACCESS_KEY_ID): no report was uploaded. See docs/reports-s3.md."
+            echo "::notice::No S3 credentials (vars.REPORTS_S3_ROLE_ARN or secrets.ARTIFACTS_AWS_ACCESS_KEY_ID / secrets.AWS_ACCESS_KEY_ID): no report was uploaded. See docs/reports-s3.md."
           fi
           echo "mode=$mode" >> "$GITHUB_OUTPUT"
           echo "credentials: $mode" >> "$GITHUB_STEP_SUMMARY"
@@ -68,6 +70,14 @@ jobs:
             /docs/ic/measurement/reports/
             /research/**/reports/
             /research/**/*.pdf
+            /tools/artifacts/
+            /.artifacts/config.json
+      - name: Install the pinned artifact-store CLI
+        if: steps.creds.outputs.mode != 'none'
+        run: |
+          python3 -m venv "$RUNNER_TEMP/reports-awscli"
+          "$RUNNER_TEMP/reports-awscli/bin/python" -m pip install --disable-pip-version-check awscli==1.46.2
+          echo "$RUNNER_TEMP/reports-awscli/bin" >> "$GITHUB_PATH"
 
       - uses: aws-actions/configure-aws-credentials@v4
         if: steps.creds.outputs.mode == 'role'
@@ -78,11 +88,11 @@ jobs:
       - uses: aws-actions/configure-aws-credentials@v4
         if: steps.creds.outputs.mode == 'keys'
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID || secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY || secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Upload this push's reports
+      - name: Select this push's report inputs
         if: steps.creds.outputs.mode != 'none'
         env:
           BEFORE: ${{ github.event.before }}
@@ -97,6 +107,19 @@ jobs:
           else
             git ls-files -z -- "${specs[@]}" > files.z
           fi
+      - name: Pull the selected report inputs (tools/artifacts)
+        if: steps.creds.outputs.mode != 'none'
+        run: |
+          set -euo pipefail
+          mapfile -d '' -t report_files < files.z
+          if [ "${#report_files[@]}" -gt 0 ]; then
+            python3 tools/artifacts/artifacts.py pull --jobs 16 "${report_files[@]}"
+          fi
+
+      - name: Upload this push's reports
+        if: steps.creds.outputs.mode != 'none'
+        run: |
+          set -euo pipefail
           : > manifest.jsonl
           echo "### Reports uploaded to s3://$BUCKET/$PREFIX/" >> "$GITHUB_STEP_SUMMARY"
           while IFS= read -r -d '' f; do

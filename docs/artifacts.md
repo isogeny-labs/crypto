@@ -48,6 +48,13 @@ outside the data trees name by path, and generated files regenerated on most
 PRs (`docs/browser/data.json`, the large `docs/curves/` registries,
 `docs/curves/cover-links.yaml`).
 
+PDFs stay in Git (owner decision, 2026-10-26): `policy.keep` holds `*.pdf`,
+so a report PDF of any size is committed directly, never pushed to the store,
+and `check` never flags one. The 10 MiB `large-files` gate still applies to
+them. PDFs moved to the store before this rule keep their manifests until
+someone restores them with `pull` and commits the file in place of the
+pointer.
+
 `artifacts.py plan [PATH ...]` lists the tracked files the policy would move;
 `artifacts.py check BASE [HEAD]` is the PR gate: it fails on added or modified
 tracked files that belong in the store.
@@ -57,6 +64,22 @@ tracked files that belong in the store.
 - `.github/workflows/artifacts.yml` runs the tool's tests, `check HEAD^1 HEAD`
   and `wire_workflows.py --check` on every pull request. The `large-file-ok`
   label turns the check into a warning, as for `large-files`.
+- `.github/workflows/artifact-autofix.yml` runs when a same-repository PR is
+  opened or updated. It compares the PR's changed files with its merge base,
+  uploads policy-selected data under SHA-256, downloads each object again to
+  check its complete bytes, then commits the `.artifacts.json` and `.gitignore`
+  pointers and removes those files from the PR branch. It runs the artifact
+  tool and policy from the trusted base commit and refuses a PR that changes
+  `.artifacts/config.json`. Fork PRs are skipped because they cannot receive
+  the store secrets or a write token. A concurrent branch update makes its
+  normal push fail; it never force-pushes. Its own follow-up PR event sees no
+  changed data and makes no commit. If upload, replay or push fails, the PR
+  stays open for manual repair and the ordinary `artifacts` check stays red.
+  The repository secret `ARTIFACT_AUTOFIX_PUSH_TOKEN` must be a fine-grained
+  token or GitHub App token limited to this repository with Contents: write;
+  the workflow fails before upload if it is absent. GitHub's built-in
+  `GITHUB_TOKEN` would suppress normal CI on the bot's new commit. Branch
+  protection must allow this token's principal to push to source branches.
 - A workflow that reads moved data needs a pull step after its
   `actions/checkout`. `python3 tools/artifacts/wire_workflows.py` inserts it
   (and adds `tools/artifacts` to a sparse checkout); `--check` fails when one
@@ -80,6 +103,13 @@ One PR, in this order:
 3. `wire_workflows.py` to add the pull steps.
 4. Commit the manifests, `.gitignore` blocks, deleted data files and workflow
    edits together.
+
+For a same-repository PR, `artifact-autofix` performs the upload, byte replay
+and commit automatically after it is installed on the default branch. The
+manual sequence remains available for fork PRs, policy changes and failed
+automation. `artifacts.py migrate BASE [HEAD] --dry-run` previews the exact
+changed-file selection; without `--dry-run` it stages the verified migration
+but leaves the commit to the caller.
 
 Against `origin/main` with the current keep list, `plan` selects 5579 files,
 6,816.3 MB of 8,458.2 MB tracked; the tip tree drops to about 1,642 MB.

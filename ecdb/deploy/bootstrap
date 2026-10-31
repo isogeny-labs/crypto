@@ -1,0 +1,4 @@
+#!/bin/sh
+# Lambda custom-runtime entry point. ECDB_LAMBDA_MODE is api or admin;
+# everything else (database URLs, tokens, CA file) comes from the environment.
+exec "${LAMBDA_TASK_ROOT:-$(dirname "$0")}/ecdb" lambda "${ECDB_LAMBDA_MODE:-api}"

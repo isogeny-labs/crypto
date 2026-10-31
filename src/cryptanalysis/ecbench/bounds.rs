@@ -321,6 +321,16 @@ pub struct Fit {
     /// At least [`MIN_SIZES_FOR_SCALING`] sizes: the exponent is a result,
     /// not a description.
     pub scaling_claim: bool,
+    /// In `bitop/v1` only: the exponent of `bitops / gates(addition) =
+    /// C·r^α`, the cost in additions of the curve at each size.  Raw gates
+    /// grow with the field's arithmetic, about `(log r)²`, on top of the
+    /// algorithm's own exponent; dividing by one addition's gates at each
+    /// size takes that out, so a generic method's exponent is ½ here.
+    /// Absent outside `bitop/v1`, so earlier bounds keep their bytes.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub alpha_in_additions: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub alpha_in_additions_ci95: Option<(f64, f64)>,
 }
 
 /// The constant at the declared exponent.
@@ -411,6 +421,11 @@ pub struct FitOptions {
     pub curves: Vec<String>,
     pub resamples: usize,
     pub seed: u64,
+    /// `bitop/v1` fits the arm in bit operations (`ecbench::work`); absent
+    /// fits it in the unit its records carry.  Absent is not written, so a
+    /// bound fitted before the option existed re-derives byte for byte.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub unit: Option<String>,
     /// Fit the band-priced cost at this weight (GAE per native operation,
     /// AGENTS.md §5a, [`super::band`]) instead of the charged cost.  The
     /// domain's unit then names the weight, so the bound never shares an
@@ -448,6 +463,7 @@ impl Default for FitOptions {
             curves: vec![],
             resamples: RESAMPLES,
             seed: SEED,
+            unit: None,
             weight: None,
             param_rule: None,
             fit_version: FIT_VERSION,
@@ -1055,6 +1071,34 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
     let unverified_before_filter = recs.iter().filter(|r| !r.counts()).count();
     let runs_before_filter = recs.len();
 
+    if opts.unit.is_some() && opts.weight.is_some() {
+        return Err(
+            "--unit and --weight exclude each other: bitop/v1 prices every operation, \
+             so there is no unpriced work for a band to weigh"
+                .into(),
+        );
+    }
+    match opts.unit.as_deref() {
+        None => {}
+        Some(crate::cryptanalysis::bitops::UNIT) => {
+            recs = recs
+                .iter()
+                .map(crate::cryptanalysis::ecbench::work::bitop_view)
+                .collect::<Result<_, _>>()?;
+        }
+        Some(crate::cryptanalysis::bitops::UNIT_V2) => {
+            recs = recs
+                .iter()
+                .map(crate::cryptanalysis::ecbench::work::bitop_v2_view)
+                .collect::<Result<_, _>>()?;
+        }
+        Some(u) => {
+            return Err(format!(
+                "no unit `{u}`; the fitter knows bitop/v1 and bitop/v2"
+            ))
+        }
+    }
+
     // Filters: named curves, then tier.
     if !opts.curves.is_empty() {
         recs.retain(|r| opts.curves.contains(&r.workload.curve.slug));
@@ -1279,12 +1323,46 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
     } else {
         power_law(&strata, opts.resamples, opts.seed)
     };
+    // The same fit in additions, in bitop/v1: each run's gates over one
+    // affine addition's gates on its curve.
+    let (alpha_add, alpha_add_ci) = if crate::cryptanalysis::bitops::is_bitop_unit(&domain.unit) {
+        let add_strata: Vec<Vec<(f64, f64)>> = sizes
+            .iter()
+            .map(|row| {
+                verified
+                    .iter()
+                    .filter(|r| r.workload.curve.slug == row.slug)
+                    .filter_map(|r| {
+                        let w = r.work.as_ref()?;
+                        let add = w
+                            .widths
+                            .gates(crate::cryptanalysis::bitops::Prim::GroupAdd)
+                            .ok()? as f64;
+                        let g = r.cost.total_gae?;
+                        (g > 0.0).then(|| ((row.r as f64).ln(), (g / add).ln()))
+                    })
+                    .collect()
+            })
+            .collect();
+        let (a, ci, _, _, _) = if v2 {
+            power_law_v2(&add_strata, opts.resamples, opts.seed)
+        } else {
+            power_law(&add_strata, opts.resamples, opts.seed)
+        };
+        (a, ci)
+    } else {
+        (None, None)
+    };
     let declared_alpha = expected_s(&method.id, sizes[0].automorphisms_available).map(|_| 0.5);
     let scaling_claim =
         n_sizes >= MIN_SIZES_FOR_SCALING && alpha.is_some() && (!v2 || alpha_ci.is_some());
     let fit = Fit {
         size_parameter: "r".into(),
-        model: "gae = C * r^alpha".into(),
+        model: if crate::cryptanalysis::bitops::is_bitop_unit(&domain.unit) {
+            "bitops = C * r^alpha".into()
+        } else {
+            "gae = C * r^alpha".into()
+        },
         points: strata.iter().map(|s| s.len() as u64).sum(),
         sizes: n_sizes as u64,
         alpha,
@@ -1298,6 +1376,8 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
             _ => None,
         },
         scaling_claim,
+        alpha_in_additions: alpha_add,
+        alpha_in_additions_ci95: alpha_add_ci,
     };
     let none = || Estimate {
         value: f64::NAN,
@@ -1534,7 +1614,19 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
     let mut unpriced: Vec<String> = recs.iter().flat_map(|r| r.cost.unpriced.clone()).collect();
     unpriced.sort();
     unpriced.dedup();
-    let mut admissible = unverified == 0 && audits.iter().all(|a| a.ok);
+    // In bitop/v1 a bound must account for every gate, and in bitop/v2 for
+    // every structure held: a lower bound ranks nothing against a complete
+    // one, so it is inadmissible, with what it misses named
+    // (docs/units/BITOPS.md).
+    let incomplete_bitops = crate::cryptanalysis::bitops::is_bitop_unit(&domain.unit) && bounded;
+    if incomplete_bitops {
+        reasons.push(format!(
+            "{} pricing is incomplete (missing: {}); a lower bound is not admissible in this unit",
+            domain.unit,
+            unpriced.join(", ")
+        ));
+    }
+    let mut admissible = unverified == 0 && audits.iter().all(|a| a.ok) && !incomplete_bitops;
     if v2 {
         // The refusals of fit version 2 (README §3a).  Each is a reason and
         // each makes the bound inadmissible; none changes a figure.
@@ -2157,9 +2249,9 @@ mod tests {
         let src = repo().join(CANDIDATES).join("sessions/prime");
         let audit = repo().join(CANDIDATES).join("audit-prime.json");
         let good = fit(
-            &[src.clone()],
+            std::slice::from_ref(&src),
             "rho-neg",
-            &[audit.clone()],
+            std::slice::from_ref(&audit),
             FitOptions::default(),
         )
         .unwrap();
@@ -2167,10 +2259,16 @@ mod tests {
         assert_eq!(good.fit_version(), FIT_VERSION);
         assert!(good.tail.is_some());
         // Zero audits: version 1 admitted it; version 2 does not.
-        assert!(fit(&[src.clone()], "rho-neg", &[], v1())
+        assert!(fit(std::slice::from_ref(&src), "rho-neg", &[], v1())
             .unwrap()
             .admissible());
-        let none = fit(&[src.clone()], "rho-neg", &[], FitOptions::default()).unwrap();
+        let none = fit(
+            std::slice::from_ref(&src),
+            "rho-neg",
+            &[],
+            FitOptions::default(),
+        )
+        .unwrap();
         assert!(!none.admissible());
         assert!(none
             .admissibility
@@ -2179,9 +2277,9 @@ mod tests {
             .any(|r| r.contains("no passing audit")));
         // A free resample count is recorded and is not admissible.
         let few = fit(
-            &[src.clone()],
+            std::slice::from_ref(&src),
             "rho-neg",
-            &[audit.clone()],
+            std::slice::from_ref(&audit),
             FitOptions {
                 resamples: 100,
                 ..Default::default()
@@ -2201,14 +2299,20 @@ mod tests {
             // The audit names the original session id; the copy keeps it.
             vec![audit.clone()]
         };
-        let old = fit(&[interrupted.clone()], "rho-neg", &aud_ok(), v1()).unwrap();
+        let old = fit(
+            std::slice::from_ref(&interrupted),
+            "rho-neg",
+            &aud_ok(),
+            v1(),
+        )
+        .unwrap();
         assert!(
             old.admissible(),
             "version 1 hole: {:?}",
             old.admissibility.reasons
         );
         let new = fit(
-            &[interrupted.clone()],
+            std::slice::from_ref(&interrupted),
             "rho-neg",
             &aud_ok(),
             FitOptions::default(),
@@ -2238,13 +2342,25 @@ mod tests {
             fit_version: version,
             ..Default::default()
         };
-        let old = fit(&[src.clone()], "ic-frob-m2", &[audit.clone()], opts(1)).unwrap();
+        let old = fit(
+            std::slice::from_ref(&src),
+            "ic-frob-m2",
+            std::slice::from_ref(&audit),
+            opts(1),
+        )
+        .unwrap();
         assert!(
             old.admissible(),
             "version 1 hole: {:?}",
             old.admissibility.reasons
         );
-        let new = fit(&[src.clone()], "ic-frob-m2", &[audit.clone()], opts(2)).unwrap();
+        let new = fit(
+            std::slice::from_ref(&src),
+            "ic-frob-m2",
+            std::slice::from_ref(&audit),
+            opts(2),
+        )
+        .unwrap();
         assert!(!new.admissible());
         assert!(new
             .admissibility
@@ -2268,8 +2384,20 @@ mod tests {
             fit_version: version,
             ..Default::default()
         };
-        let old = fit(&[src.clone()], "rho-neg", &[audit.clone()], o(1)).unwrap();
-        let new = fit(&[src.clone()], "rho-neg", &[audit.clone()], o(2)).unwrap();
+        let old = fit(
+            std::slice::from_ref(&src),
+            "rho-neg",
+            std::slice::from_ref(&audit),
+            o(1),
+        )
+        .unwrap();
+        let new = fit(
+            std::slice::from_ref(&src),
+            "rho-neg",
+            std::slice::from_ref(&audit),
+            o(2),
+        )
+        .unwrap();
         assert_eq!(old.constant.ratio_to_floor.ci_method, "within");
         assert_eq!(new.constant.ratio_to_floor.ci_method, "cluster");
         // Same point estimate, a different (workload-clustered) interval.
@@ -2284,7 +2412,13 @@ mod tests {
     fn version_2_sizes_carry_the_axes_and_the_pricing_band() {
         let src = repo().join(CANDIDATES).join("sessions/prime");
         let audit = repo().join(CANDIDATES).join("audit-prime.json");
-        let b = fit(&[src.clone()], "bsgs-neg", &[audit], FitOptions::default()).unwrap();
+        let b = fit(
+            std::slice::from_ref(&src),
+            "bsgs-neg",
+            &[audit],
+            FitOptions::default(),
+        )
+        .unwrap();
         for s in &b.sizes {
             assert!(s.axes.contains_key("memory") && s.axes.contains_key("uncharged"));
             assert_eq!(s.band.len(), BAND_WEIGHTS.len());

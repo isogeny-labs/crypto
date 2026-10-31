@@ -1,0 +1,708 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "SECANT-GRAPH-PARALLEL-20261031",
+  "version": 1,
+  "created": "2026-10-31",
+  "repository": "crypto",
+  "study_dir": "research/prime_factor_base_degree_20261031/parallel_20261031",
+  "authors": [
+    "parent coordinator",
+    "independent mathematical reviewer"
+  ],
+  "links": {
+    "prior_pr": "https://github.com/isogeny-labs/crypto/pull/3021",
+    "theorem": "../SECANT_GRAPH.md",
+    "specs": [
+      "audit/protocol.json",
+      "ladder/spec.json",
+      "f4/README.md"
+    ]
+  },
+  "question": "Do split-graph systems preserve every toy relation, lower actual F4 handled degree and width at matched cardinality, and construct complete d=3,4,5 bases across fixed prospective fields?",
+  "claims": [
+    {
+      "id": "correctness",
+      "text": "Complete model and dense roots equal independent signed group references on every completed target.",
+      "class": "exact_computation",
+      "decided_by": [
+        "correctness-check"
+      ]
+    },
+    {
+      "id": "degree",
+      "text": "Compare actual F4 handled degree and width for graph/control and secant/dense at matched cardinality.",
+      "class": "comparative",
+      "decided_by": [
+        "base-comparison",
+        "encoding-comparison"
+      ],
+      "if_supported": "Report the exact observed scope, branch costs and failures; no timing or asymptotic inference.",
+      "if_not_supported": "Retain null/regression; homogeneous degree cannot fill measured F4 fields."
+    },
+    {
+      "id": "construction",
+      "text": "Attempt all nine prospective field/degree construction cells and verify every successful base has exactly 2d rational abscissae.",
+      "class": "exact_computation",
+      "decided_by": [
+        "construction-check"
+      ]
+    },
+    {
+      "id": "scope",
+      "text": "External novelty, P256/17-term applicability and ECDLP parity are outside these measurements.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "graph-secant",
+      "role": "candidate",
+      "description": "Complete split graph, three variables, all four sign branches.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "de5a3cfdc6bfd4744a15fa301a1a0b21c872e1b1",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/prime_factor_base_degree_20261031/parallel_20261031/f4/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "0a599661962cc4edc247b84d745cf3126ca04f324296cdc51aed3f4e4d72af42",
+        "flags": {
+          "driver_sha256": "9f6097cede0a27aeafa2896f0eb688bc0d494d25e54d3ecb196ec28fe48a76b8",
+          "solver_revision": "3672113ee2c696a2ac9c637636e0f7214f500ba1",
+          "linear_algebra": "exact_sparse_mode2",
+          "random_seed": "315",
+          "source_lock": "source-lock.json"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "branches": 4
+      }
+    },
+    {
+      "id": "graph-dense",
+      "role": "baseline",
+      "description": "Identical graph point set; exact dense membership and S3; two variables.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "de5a3cfdc6bfd4744a15fa301a1a0b21c872e1b1",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/prime_factor_base_degree_20261031/parallel_20261031/f4/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "0a599661962cc4edc247b84d745cf3126ca04f324296cdc51aed3f4e4d72af42",
+        "flags": {
+          "driver_sha256": "9f6097cede0a27aeafa2896f0eb688bc0d494d25e54d3ecb196ec28fe48a76b8",
+          "solver_revision": "3672113ee2c696a2ac9c637636e0f7214f500ba1",
+          "linear_algebra": "exact_sparse_mode2",
+          "random_seed": "315",
+          "source_lock": "source-lock.json"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "variables": 2
+      }
+    },
+    {
+      "id": "control-secant",
+      "role": "control_negative",
+      "description": "Matched-size control; explicit exact membership retained in all four secant branches.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "de5a3cfdc6bfd4744a15fa301a1a0b21c872e1b1",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/prime_factor_base_degree_20261031/parallel_20261031/f4/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "0a599661962cc4edc247b84d745cf3126ca04f324296cdc51aed3f4e4d72af42",
+        "flags": {
+          "driver_sha256": "9f6097cede0a27aeafa2896f0eb688bc0d494d25e54d3ecb196ec28fe48a76b8",
+          "solver_revision": "3672113ee2c696a2ac9c637636e0f7214f500ba1",
+          "linear_algebra": "exact_sparse_mode2",
+          "random_seed": "315",
+          "source_lock": "source-lock.json"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "branches": 4
+      }
+    },
+    {
+      "id": "control-dense",
+      "role": "reference",
+      "description": "The same control in dense membership plus S3, two variables.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "de5a3cfdc6bfd4744a15fa301a1a0b21c872e1b1",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/prime_factor_base_degree_20261031/parallel_20261031/f4/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "0a599661962cc4edc247b84d745cf3126ca04f324296cdc51aed3f4e4d72af42",
+        "flags": {
+          "driver_sha256": "9f6097cede0a27aeafa2896f0eb688bc0d494d25e54d3ecb196ec28fe48a76b8",
+          "solver_revision": "3672113ee2c696a2ac9c637636e0f7214f500ba1",
+          "linear_algebra": "exact_sparse_mode2",
+          "random_seed": "315",
+          "source_lock": "source-lock.json"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "variables": 2
+      }
+    },
+    {
+      "id": "known-positive",
+      "role": "control_positive",
+      "description": "Supplied G+G=2G and G+2G=3G through the same exporter and verifier.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "de5a3cfdc6bfd4744a15fa301a1a0b21c872e1b1",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/prime_factor_base_degree_20261031/parallel_20261031/f4/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "0a599661962cc4edc247b84d745cf3126ca04f324296cdc51aed3f4e4d72af42",
+        "flags": {
+          "driver_sha256": "9f6097cede0a27aeafa2896f0eb688bc0d494d25e54d3ecb196ec28fe48a76b8",
+          "solver_revision": "3672113ee2c696a2ac9c637636e0f7214f500ba1",
+          "linear_algebra": "exact_sparse_mode2",
+          "random_seed": "315",
+          "source_lock": "source-lock.json"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "targets": [
+          [
+            6,
+            3
+          ],
+          [
+            10,
+            6
+          ]
+        ]
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Primary degrees and native counts are deterministic exact metrics. No timing inference; local clocks diagnostic only. A future timed claim needs L2 and A/A."
+    },
+    "positive": {
+      "present": true,
+      "arm": "known-positive",
+      "expected_detection": "Accept supplied secant/tangent roots and group replay; reject off-curve data.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "control-secant",
+      "null_population": {
+        "description": "Fixed toy nongraph control and ladder low-x/hash same-cardinality rational abscissae.",
+        "generator": "Frozen audit/protocol.json and ladder/spec.json; independent of target outcomes.",
+        "n": 3,
+        "why_n": "One toy control and two deterministic ladder recipes; finite descriptive comparison, no statistical population claim.",
+        "matched_on": [
+          "curve",
+          "cardinality",
+          "sign coverage",
+          "target population",
+          "solver",
+          "threads",
+          "caps"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "base_geometry",
+        "levels": [
+          "split-graph",
+          "control"
+        ]
+      },
+      {
+        "name": "presentation",
+        "levels": [
+          "secant",
+          "dense"
+        ]
+      },
+      {
+        "name": "field",
+        "levels": [
+          17,
+          83,
+          101,
+          127
+        ]
+      },
+      {
+        "name": "graph_degree",
+        "levels": [
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "source-lock.json",
+        "how": "Freeze source/spec/binary SHA256 and external solver revision before affected data."
+      },
+      {
+        "name": "curve",
+        "treatment": "crossed",
+        "value": "fixed toy and prospective fields83,101,127",
+        "how": "First qualifying hash-proposal prime-order ordinary curve; no success-conditioned replacement."
+      },
+      {
+        "name": "targets",
+        "treatment": "fixed",
+        "value": "complete affine point populations; identity separate",
+        "how": "Never choose targets by solver results."
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "Native/F4 thread fixed and external time/address-space bounds."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Record CPU/cgroup/RSS and clocks; no qualified timing inference."
+      },
+      {
+        "name": "arm_order",
+        "treatment": "fixed",
+        "how": "Deterministic producer order, all branches charged."
+      },
+      {
+        "name": "analyst",
+        "treatment": "measured",
+        "how": "Independent theorem/instrument review; no novelty certificate."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "correctness-check",
+        "arms": [
+          "graph-secant",
+          "graph-dense",
+          "control-secant",
+          "control-dense"
+        ],
+        "differs_in": [
+          "encoding versus independent complete group reference"
+        ],
+        "design": "absolute",
+        "threshold": "zero false positives and negatives"
+      },
+      {
+        "id": "base-comparison",
+        "arms": [
+          "graph-secant",
+          "control-secant"
+        ],
+        "differs_in": [
+          "base_geometry"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "encoding-comparison",
+        "arms": [
+          "graph-secant",
+          "graph-dense"
+        ],
+        "differs_in": [
+          "presentation"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "construction-check",
+        "arms": [
+          "graph-secant"
+        ],
+        "differs_in": [
+          "field",
+          "graph_degree"
+        ],
+        "design": "factorial",
+        "reason": "Every one of nine prospective cells and all rejected proposals retained."
+      }
+    ],
+    "aa_not_applicable": "No timed primary inference.",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Exact finite deterministic comparisons; clocks cannot decide a claim.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        315
+      ],
+      "nonce": null,
+      "note": "Domain-separated hash proposal ordering frozen before data."
+    },
+    "instance_sampling": {
+      "rule": "All toy targets. Fields83,101,127 and degrees3,4,5; first qualifying independently proposed curve and first complete graph within fixed caps.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Algebraic presentations visibly differ; exact references and frozen inclusion rules decide outcomes.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 18,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "18 fixed toy target instances per arm. The separate ladder has9 prospective field/degree construction cells; nested F4 systems include every affine target on the independently selected curves and all four sign branches. Report these populations separately, retaining every failed construction/timeout. No pooled sample size, inferential p-value or effect-power claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": null
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "errors",
+        "name": "FP/FN",
+        "unit": "errors",
+        "kind": "exact",
+        "definition": "Complete roots versus independent group references, including doubles and every sign branch.",
+        "source": "audit cells and F4 verifier",
+        "aggregation": "sum",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "handled-degree",
+        "name": "F4 maximum handled degree",
+        "unit": "total degree",
+        "kind": "exact",
+        "definition": "max(input-generator degree, actual selected F4 matrix degree); final basis/homogeneous degrees separate.",
+        "source": "native F4 record",
+        "aggregation": "distribution",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "matrix-width",
+        "name": "F4 matrix width",
+        "unit": "columns/rows",
+        "kind": "counted",
+        "definition": "Actual solver matrix maxima; branch work all charged; missing metrics null.",
+        "source": "stock neogb trace",
+        "aggregation": "distribution",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "construction-work",
+        "name": "Construction attempts and operations",
+        "unit": "attempts/field operations",
+        "kind": "counted",
+        "definition": "All curve/order/interpolation/splitting proposals, rejected work and phase exclusions.",
+        "source": "ladder attempt/phase records",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "yield",
+        "name": "Natural yield",
+        "unit": "verified relations / target population",
+        "kind": "rate",
+        "definition": "All targets and branches with ordered/unordered/row deduplication separately.",
+        "source": "exact group references",
+        "aggregation": "distribution",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "rss",
+        "name": "Peak RSS",
+        "unit": "bytes",
+        "kind": "derived",
+        "definition": "Observed process high water when available; not exact materialized-list storage.",
+        "source": "OS/CAS trace",
+        "aggregation": "max",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "clock",
+        "name": "Diagnostic clock",
+        "unit": "seconds",
+        "kind": "timed",
+        "definition": "Operational shared-host clocks, with startup/exclusions identified; no speedup claim.",
+        "source": "raw operational trace",
+        "aggregation": "per_row",
+        "resolution": null,
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "assignment counts",
+      "native field/group phases",
+      "F4 actual pair/matrix degree, rows,columns",
+      "construction/rejections"
+    ],
+    "record": [
+      "source",
+      "hashes",
+      "solver revision",
+      "spec",
+      "exit",
+      "CPU/cgroup",
+      "RSS",
+      "failures",
+      "partial outputs"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "logical_cpus_per_track": 1,
+      "address_space_bytes_per_track": 2147483648,
+      "max_concurrent_tracks": 3,
+      "paid_resources": false,
+      "admission": "Owner go-ahead received after concrete bounded-local request; S3 gate remains failed. Separate per-track receipts must bind this protocol/spec and runtime checkout."
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 1800,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Audit: all36 finite arm-target cells,4*17^3 model assignments and17^2 dense assignments per cell;120s cap.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Ladder: all9 fields/degrees;256 curve and512 graph proposal caps;120s internal,180s outer.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "F4:10s child timeout and1800s outer panel cap; all partial failures retained; no favorable rerun.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "FP/FN or missed positive control prevents an affected correctness/degree benefit claim.",
+    "Missing/censored cells are not successes; homogeneous theorem never fills measured F4 fields.",
+    "Local clocks do not support speedup inference.",
+    "Incomplete field counters prevent a complete operation-cost claim."
+  ],
+  "decision_rule": {
+    "text": "First complete exact correctness and positive controls. Report per-target/branch handled-degree and width differences, charging every branch and failed attempt. Report all9 construction cells and work. Lower degree alone does not establish lower relation cost.",
+    "comparison_ids": [
+      "correctness-check",
+      "base-comparison",
+      "encoding-comparison",
+      "construction-check"
+    ],
+    "threshold": "zero completed-case correctness errors; strict degree drops reported only at observed scope",
+    "statistic": "complete finite distributions and paired differences",
+    "interval": "none; exact finite counts with censored outcomes retained",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "per-cell degree difference; actual matrix/operation counts and exact yield denominator",
+    "verdict_vocabulary": [
+      "verified_complete_within_scope",
+      "degree_reduction_within_scope",
+      "degree_null_within_scope",
+      "regression_within_scope",
+      "invalid_correctness",
+      "incomplete",
+      "blocked"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/prime_factor_base_degree_20261031/parallel_20261031/analysis/main.rs",
+      "sha256": "563fb924fb0969db6ccba4f20a1b70908fbcced7a1f6d351bd2b12b483da0f46"
+    },
+    "inputs": [
+      "audit cells",
+      "F4 inputs/traces/records",
+      "ladder attempts/curves/cells"
+    ],
+    "outputs": [
+      "results.json",
+      "RESULTS.md",
+      "illustrated PDF",
+      "independent review"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "F4 degrees and widths",
+      "construction work by field and degree",
+      "exact yield"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Research launch before genuine checkpoint/backend admission or explicit named owner exception.",
+    "Discarded branches, target failures, construction rejects, duplicates or unsupported metrics.",
+    "Conflating input, homogeneous, final basis and actual F4 degrees.",
+    "Success-conditioned curve replacement, resource expansion or P256/rho/novelty extrapolation."
+  ],
+  "literature": [
+    {
+      "ref": "../SECANT_GRAPH.md",
+      "provenance": "internal",
+      "claim": "Exact model, theorem, all signs and fixed control.",
+      "verified_by": "parent and independent reviewer"
+    },
+    {
+      "ref": "https://people.maths.ox.ac.uk/petit/files/16PKC_primeECDLP.pdf",
+      "provenance": "retrieved",
+      "claim": "Prime-field membership presentation antecedents.",
+      "verified_by": "component study"
+    },
+    {
+      "ref": "https://math.mit.edu/classes/18.783/2023/LectureNotes2.pdf",
+      "provenance": "retrieved",
+      "claim": "Group law and tangent/vertical exceptions.",
+      "verified_by": "component study and audit"
+    },
+    {
+      "ref": "https://github.com/algebraic-solving/msolve",
+      "provenance": "retrieved",
+      "claim": "Pinned stock neogb F4 implementation; adapter exposes trace, not full msolve CLI.",
+      "verified_by": "F4 track"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "b36100e3394ba1837876a2b52ab5a570548f5b406b207a2108a91003953b9618",
+    "commit": "de5a3cfdc6bfd4744a15fa301a1a0b21c872e1b1",
+    "frozen_at": "2026-10-31T20:09:09.389Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "track_limits": {
+      "audit_seconds": 120,
+      "f4_seconds": 1800,
+      "f4_child_seconds": 10,
+      "ladder_internal_seconds": 120,
+      "ladder_outer_seconds": 180
+    },
+    "approval_status": "authorized_bounded_local_exception",
+    "nested_population": "Curve group counts determine all-target ladder export size independently of solver outcomes; report nested F4 flow separately."
+  }
+}

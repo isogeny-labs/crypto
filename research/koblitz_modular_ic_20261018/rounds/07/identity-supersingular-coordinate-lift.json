@@ -1,0 +1,290 @@
+{
+  "id": "IDC1h9c84bbd67b8b148a",
+  "independence": "same-agent issuer and separate128 evaluation checks; direct universal Lean identities",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": {
+    "kind": "lean4",
+    "path": "research/koblitz_modular_ic_20261018/lean/KoblitzRound07.lean",
+    "sha256": "5134bf37042f4bc93069ed0be9a1bbf30c32a0e7e2e5fd3c67ddf0bb81943d97"
+  },
+  "schema": "identity.certificate/v1",
+  "seed": 2026101908,
+  "statement": {
+    "degree_bound": 3,
+    "lhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "y",
+                      "op": "var"
+                    },
+                    {
+                      "args": "r",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "y",
+                      "op": "var"
+                    },
+                    {
+                      "args": "r",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "add"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": "y",
+                  "op": "var"
+                },
+                {
+                  "args": "r",
+                  "op": "var"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "add"
+        },
+        {
+          "args": [
+            {
+              "args": -1,
+              "op": "const"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "X",
+                      "op": "var"
+                    },
+                    {
+                      "args": "X",
+                      "op": "var"
+                    },
+                    {
+                      "args": "X",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": "X",
+                  "op": "var"
+                },
+                {
+                  "args": "c",
+                  "op": "var"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "name": "supersingular-coordinate-lift",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "y",
+                      "op": "var"
+                    },
+                    {
+                      "args": "y",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": "y",
+                  "op": "var"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": -1,
+                  "op": "const"
+                },
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "x",
+                          "op": "var"
+                        },
+                        {
+                          "args": "x",
+                          "op": "var"
+                        },
+                        {
+                          "args": "x",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": "x",
+                      "op": "var"
+                    },
+                    {
+                      "args": "c",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "add"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        },
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "x",
+                      "op": "var"
+                    },
+                    {
+                      "args": "x",
+                      "op": "var"
+                    },
+                    {
+                      "args": "x",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": "x",
+                  "op": "var"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "r",
+                      "op": "var"
+                    },
+                    {
+                      "args": "r",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": "r",
+                  "op": "var"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": -1,
+                  "op": "const"
+                },
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "X",
+                          "op": "var"
+                        },
+                        {
+                          "args": "X",
+                          "op": "var"
+                        },
+                        {
+                          "args": "X",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": "X",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "add"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        },
+        {
+          "args": [
+            {
+              "args": 2,
+              "op": "const"
+            },
+            {
+              "args": "y",
+              "op": "var"
+            },
+            {
+              "args": "r",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "source": "KoblitzRound07.cofactor_coordinate_lift: exact integer identity; specific polynomial masks and characteristic2 implication separately kernel checked",
+    "variables": [
+      "x",
+      "y",
+      "X",
+      "r",
+      "c"
+    ]
+  },
+  "value_digest": "fbf880986dce7bbcd364a0af09c982b3fe3d2a8bcf9b61cfde44a07b54a03e12"
+}

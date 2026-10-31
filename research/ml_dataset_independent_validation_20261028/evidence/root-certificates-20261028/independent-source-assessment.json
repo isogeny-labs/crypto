@@ -1,0 +1,111 @@
+{
+  "schema": "read-only-source-review/v1",
+  "reviewed_at_utc": "2026-10-28T15:19:05.073419+00:00",
+  "reviewer": "producer_lineage",
+  "commit": "25e863fe6075d7bac795ee62680b72c123ba0f33",
+  "worktree": "/home/ec2-user/crypto-ml-consumer-root-certificates-20261028",
+  "scope": "Independent consumer finite-field root certificates and audit/export binding",
+  "finding_count": 0,
+  "actionable_findings": [],
+  "conclusion": "No actionable source defect identified within reviewed scope; not a compilation, runtime, CI, merge or experiment verdict.",
+  "compilation_performed": false,
+  "tests_performed": false,
+  "fixtures_generated": false,
+  "cloud_queries_performed": false,
+  "repository_edits_performed": false,
+  "producer_comparisons": [
+    {
+      "commit": "d79f658f7a0a83e2f75f4cb6f0d1f7542d0e6b83",
+      "paths": [
+        "src/ml_dataset/binary_roots.rs",
+        "src/ml_dataset/solvers.rs"
+      ]
+    },
+    {
+      "commit": "d71ec2ef5ab9b7f2a038f61c941af10297a775ad",
+      "paths": [
+        "src/ml_dataset/solvers.rs"
+      ]
+    }
+  ],
+  "source_identities": [
+    {
+      "path": "research/ml_dataset_independent_validation_20261028/ROOT_CERTIFICATE_DESIGN.md",
+      "git_blob": "8b04380ede122933048c3ff6fbb0310da5bd9cbd",
+      "bytes": 4876,
+      "sha256": "34c59b9b87c681df94afba7c8f68c0d85f69d92fdbf5970e7bfb3f2201d53e9e"
+    },
+    {
+      "path": "research/ml_dataset_independent_validation_20261028/native/src/roots.rs",
+      "git_blob": "7b526075a04a755a3f657852738f1ba41f45f741",
+      "bytes": 56990,
+      "sha256": "c9cfd4ab2710c98074643e01522e548289c9a5247391376329896c74ebc7faeb"
+    },
+    {
+      "path": "research/ml_dataset_independent_validation_20261028/native/src/arithmetic.rs",
+      "git_blob": "14087101039ee5c86d86cfb786e38c8734ec939c",
+      "bytes": 44525,
+      "sha256": "4bce83a9e5757f78eb5a3e1779ce558de89b294ce32729daed84fcdc5ba691a1"
+    },
+    {
+      "path": "research/ml_dataset_independent_validation_20261028/native/src/audit.rs",
+      "git_blob": "84e914c0c7d4bd3afaf3752e1bf2a5e5497093ee",
+      "bytes": 53065,
+      "sha256": "f6b4a1b8eaa5031cdb0604b3d7be12135764e3e38e2bc75e0f07948e0828f71d"
+    },
+    {
+      "path": "research/ml_dataset_independent_validation_20261028/native/src/common.rs",
+      "git_blob": "5168c9b4bc8786f1a6baa960c8c298912ab44143",
+      "bytes": 11573,
+      "sha256": "58bece43248e8a35de26f9b8fa6a26a4217e12fab46b8873de751a46397f1671"
+    },
+    {
+      "path": "research/ml_dataset_independent_validation_20261028/native/src/policy.rs",
+      "git_blob": "cfd29eaeab8c44c1fcaf1c52f242ed29aaec4fe2",
+      "bytes": 18071,
+      "sha256": "e5b12599b1fed3e0025dc512f299f1b1169563505fc6882742a86a22bf943f44"
+    },
+    {
+      "path": "research/ml_dataset_independent_validation_20261028/native/src/lib.rs",
+      "git_blob": "4a2209f06a92173c658faab4faf2c3a77d11ce14",
+      "bytes": 177,
+      "sha256": "072b932b169c1242ffd344a109ac7bafeb4f916b66a1a3c20e75fe57ba556010"
+    },
+    {
+      "path": "research/ml_dataset_independent_validation_20261028/native/src/main.rs",
+      "git_blob": "79a7d8cfcdc1bcd605fc9aacfe159f2a9cc77ddb",
+      "bytes": 4414,
+      "sha256": "6dbfd734e6c383497ffc64cf1b20a89b3f59743579aa236ce8596fec1555df55"
+    },
+    {
+      "path": "research/ml_dataset_independent_validation_20261028/native/tests/saved_roots.rs",
+      "git_blob": "4410ff5467eae77cf21f852b77cc6ce44067e684",
+      "bytes": 8155,
+      "sha256": "82c1f7258669f3f3125e7ad783b5c92ca8fa8d0c72e59222a4d2ec049b436949"
+    },
+    {
+      "path": "research/ml_dataset_independent_validation_20261028/native/tests/producer_policies.rs",
+      "git_blob": "bae6f35386d8ee9fca96ada28c72406ab8879b55",
+      "bytes": 11953,
+      "sha256": "b5f3de292b9f5bd356249545841828108ba2d8f0bb3284816c9a018f0a89bab6"
+    }
+  ],
+  "verification_limits": [
+    "Arithmetic checks are opt-in for dataset audit; no arithmetic label is granted when disabled.",
+    "Completed distinct polynomial root sets do not imply full solver execution, actual operation costs, UNSAT, subgroup order or factor-base construction.",
+    "Most non-field intermediate event payloads and separately persisted intermediate artifacts are not independently replayed.",
+    "Prime v1 lacks full public/base/config object hashes; binary v1 verifies sorted-Value hashes.",
+    "No tests or interoperability fixtures were executed by this reviewer."
+  ],
+  "primary_sources": [
+    {
+      "url": "https://shoup.net/ntb/ntb-v2.pdf",
+      "sections": [
+        "Theorem 17.2",
+        "Theorem 19.6",
+        "Theorem 19.10"
+      ],
+      "relevance": "Polynomial Euclidean algorithm and distinct finite-field roots via gcd(f, X^q-X)."
+    }
+  ]
+}

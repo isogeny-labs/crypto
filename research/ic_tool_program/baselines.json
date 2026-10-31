@@ -1,6 +1,604 @@
 {
  "what_this_is": "The ic tool programme's baseline ledger as data (IC_TOOL_PROGRAM.md §7). Each accepted round appends a baseline; none is ever edited.",
  "unit": "S = time / (unit_ns × √r); unit_ns is v0's median batched addition at each size, pinned from R01 (IC_TOOL_PROGRAM.md §5)",
+ "pinned_r10": {
+  "what_this_is": "Repair R10 (docs/audits/REPAIR_FRAMEWORK_20261016.md): the incumbent each IC round must compare against, per curve family and size, pinned 2026-10-19 from main at cb2ec6873. From this pin on, a round names the entry below (track and size) as its incumbent; it never picks its own. An accepted round appends a new entry to its track; no entry is edited. The baselines array below stays the ic tool programme's own ledger.",
+  "pinned": "2026-10-19",
+  "main_at": "cb2ec6873",
+  "report": "research/ic_tool_program/ledger/r10-20261019/README.md",
+  "derivation": "research/ic_tool_program/ledger/r10-20261019/rerate.sh (jq and awk over the committed raw records; nothing re-run)",
+  "rules": [
+   "Cost: a candidate's paired ratio is taken against the pinned configuration of its track at each size it measures, on the same instances; a round that cannot run the pinned configuration says so and is reported as unmatched.",
+   "Exponent: where a track pins an exponent reference, a fitted-exponent claim is stated against it over the same range.",
+   "Distance to rho: every row carries the gap to the matched rho named in its entry; the gap is the distance remaining, not a gate (AGENTS.md, success criterion).",
+   "Units: s_cold, s_setup and s_online are in each entry's own unit, named in its unit field. Only the suite track and kob-orbit-v1's s_*_ledger fields use the ledger's S (unit_ns × √r); a cross-host value in that unit is marked as such and never ranks two arms."
+  ],
+  "per_curve_best": {
+   "note": "Where two pipelines run on the same ICV1 curve, the curve's best measured IC is the one with the smaller gap to its own matched rho. On k0n41, k0n53 and k0n61 that is the ic tool programme's pipeline, not the compact-orbit example (kob-orbit-v1): 7.66 / 13.24 / 20.97 times rho cold at rule v3 on main against 9.5 / 24.9 / 48.4 for the compact-orbit default (cross-run wall against item 09's strong rho).",
+   "suite_sizes": "baselines[] v3 (R07, 995ea207) on main; rule v3 for the one-target cold comparison (research/ic_tool_program/rule/v3/analysis.json). Open PRs #1978/#2277 append v4-v8 (R10, R06, R08, R11, R12) and rule v7 (3.43-11.51 times rho cold); they become the pin for these sizes when merged, by appending to baselines[] as the programme's rule already requires.",
+   "rule_v3_one_target": [
+    {
+     "curve_alias": "icv1-f2m41-tm2308219-7f48b14a",
+     "ec1": "EC1N41Ce0he09550ab560a",
+     "log2_r": 39.0,
+     "s_cold": 11.169,
+     "s_setup": 11.049,
+     "s_online": 0.1206,
+     "s_rho": 1.4587,
+     "rho_gap_cold": 7.657,
+     "rho_gap_cold_ci": [
+      6.9,
+      8.613
+     ]
+    },
+    {
+     "curve_alias": "icv1-f2m53-tm56619371-dac20a85",
+     "ec1": "EC1N53Ce0hb097de99be9a",
+     "log2_r": 44.26,
+     "s_cold": 16.976,
+     "s_setup": 16.919,
+     "s_online": 0.0576,
+     "s_rho": 1.2821,
+     "rho_gap_cold": 13.241,
+     "rho_gap_cold_ci": [
+      11.755,
+      15.013
+     ]
+    },
+    {
+     "curve_alias": "icv1-f2m61-t158598901-ab42b6c5",
+     "ec1": "EC1N61Ce0hd8c15448081e",
+     "log2_r": 47.21,
+     "s_cold": 24.932,
+     "s_setup": 24.853,
+     "s_online": 0.0788,
+     "s_rho": 1.1889,
+     "rho_gap_cold": 20.97
+    }
+   ]
+  },
+  "tracks": [
+   {
+    "baseline": "g3ghs-v1",
+    "track": "genus-3 index calculus after cubic GHS (Weil descent of E0(F_{q^3}) to a genus-3 Jacobian over F_q); instance chain: test curves 0-2, q the next prime above 2^b, seed 20261014; curves 3-4 at 2^18..2^21 from round 2b on",
+    "round": "ic_improve round 4 item 01 (C4) at 2^13..2^22; round 4 C1 at 2^12; round 2 item 01 frozen lpsgewd at 2^10..2^11 (round 4 did not run them)",
+    "class": "engineering",
+    "commit": "225211fef",
+    "built_from": "225211fefd5b02c43685f8e018aaa767c92bc0cb",
+    "binary_sha256": "9f4cb96628bda3cc3a29e497b05e645063279dbb4cecbcfdee181dc411abefd0",
+    "binary_sha256_by_size": {
+     "10-11": "0a724dc8adf214263f4e0e5dcde87ea85ef194546cce60145a2e91c58ea68384 (ic_improve2_01_genus3_linalg at 73cd17529, landed 14e82cf7d)",
+     "12-22": "9f4cb96628bda3cc3a29e497b05e645063279dbb4cecbcfdee181dc411abefd0 (ic_improve4_01_genus3_rel; landed 225211fef)"
+    },
+    "host": {
+     "description": "shared Linux VM (6.18.44-fc-v114 at round 2), 4 vCPU, 15 GB, isolation L0; CPU model not recorded",
+     "rustc": "rustc 1.98.1 (48a229cea 2026-09-01) at round 4; 1.97.0 at round 2",
+     "jobs": "single-threaded, 4.5 GB cap at round 4"
+    },
+    "source": "research/ic_improve4_20261015/01-genus3-relations/results/run/ (round 4), research/ic_improve_20261015/01-genus3-linalg/results/run/ (round 2 item 01)",
+    "selection": {
+     "10-11": "examples/ic_improve2_01_genus3_linalg --kappa 2 --cx 8 --streams main --las lpsgewd (arm main:lpsgewd)",
+     "12": "examples/ic_improve4_01_genus3_rel --kappa k_R2(b) --cx 16 --streams r2 --las lpsgebw2@16 (arm r2:lpsgebw2+C1: field-level splitting test)",
+     "13-22": "examples/ic_improve4_01_genus3_rel --kappa exp(0.3478 - 0.1916 (b - 20)) --streams c4 --walks 32 --las lpsgebw2o100c@16 (arm c4:lpsgebw2o100c+C1C2: C1 + 32 lockstep walks + 100% oversampling, clique removal, SGE, block Wiedemann (2,1))"
+    },
+    "unit": "F_q-multiplication equivalents per complete solve, M_q + ceil(log2 q) I_q + M_ell with c_ell = 1, geometric mean over curves 0-2 (not divided by √r); additions, mod-ell inversions, ±1 SGE products and large-prime bookkeeping are not charged",
+    "exponent_reference": {
+     "note": "No arm is lowest in both cost and fitted exponent. A fitted-exponent claim is stated against the lowest fit over the same range:",
+     "12..21": "1.3711, round 2 item 01 exploratory tuned:lpsgewd (kappa 1.41)",
+     "16..21": "1.3696, round 4 w:lpsgebw2+C1C2",
+     "16..22": "1.3679, round 4 w:lpsgebw2+C1C2",
+     "pinned_C4_fit": {
+      "12..21": 1.3929,
+      "12..22": 1.3971,
+      "16..22": 1.4125
+     }
+    },
+    "rho": "round 1's rho on E0(F_{q^3}) with the negation map and 64 random multipliers, the only rho on the chain instances, 2^10..2^20 (examples/ic_improve_04_genus3_2lp, arm rho; 2 targets a curve, 1 at 2^19-2^20); rho_gap_cold = IC / rho, ratio of geometric means over curves 0-2, counted unit only (AGENTS.md §5a band not applied: IC's uncharged work is listed in unit)",
+    "measured": "test curves 0-2, every logarithm verified; geometric means and fits from rerate.sh",
+    "sizes": [
+     {
+      "size": "q2^10",
+      "q": 1031,
+      "arm": "main:lpsgewd",
+      "s_cold": 1849800.0,
+      "s_relation": 1765800.0,
+      "s_linear_algebra": 83954.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": 843390.0,
+      "rho_gap_cold": 2.193
+     },
+     {
+      "size": "q2^11",
+      "q": 2053,
+      "arm": "main:lpsgewd",
+      "s_cold": 4278800.0,
+      "s_relation": 3966000.0,
+      "s_linear_algebra": 312310.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": 2379700.0,
+      "rho_gap_cold": 1.798
+     },
+     {
+      "size": "q2^12",
+      "q": 4099,
+      "arm": "r2:lpsgebw2+C1",
+      "s_cold": 3966000.0,
+      "s_relation": 2868600.0,
+      "s_linear_algebra": 1096800.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": 7206400.0,
+      "rho_gap_cold": 0.55
+     },
+     {
+      "size": "q2^13",
+      "q": 8209,
+      "arm": "c4:lpsgebw2o100c+C1C2",
+      "s_cold": 11414000.0,
+      "s_relation": 9730000.0,
+      "s_linear_algebra": 1679200.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": 14421000.0,
+      "rho_gap_cold": 0.791
+     },
+     {
+      "size": "q2^14",
+      "q": 16411,
+      "arm": "c4:lpsgebw2o100c+C1C2",
+      "s_cold": 23162000.0,
+      "s_relation": 16984000.0,
+      "s_linear_algebra": 6172600.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": 69600000.0,
+      "rho_gap_cold": 0.333
+     },
+     {
+      "size": "q2^15",
+      "q": 32771,
+      "arm": "c4:lpsgebw2o100c+C1C2",
+      "s_cold": 62462000.0,
+      "s_relation": 38650000.0,
+      "s_linear_algebra": 23808000.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": 152610000.0,
+      "rho_gap_cold": 0.409
+     },
+     {
+      "size": "q2^16",
+      "q": 65537,
+      "arm": "c4:lpsgebw2o100c+C1C2",
+      "s_cold": 196340000.0,
+      "s_relation": 119540000.0,
+      "s_linear_algebra": 76792000.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": 617700000.0,
+      "rho_gap_cold": 0.318
+     },
+     {
+      "size": "q2^17",
+      "q": 131101,
+      "arm": "c4:lpsgebw2o100c+C1C2",
+      "s_cold": 502210000.0,
+      "s_relation": 261050000.0,
+      "s_linear_algebra": 241160000.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": 829920000.0,
+      "rho_gap_cold": 0.605
+     },
+     {
+      "size": "q2^18",
+      "q": 262147,
+      "arm": "c4:lpsgebw2o100c+C1C2",
+      "s_cold": 1362800000.0,
+      "s_relation": 709400000.0,
+      "s_linear_algebra": 653380000.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": 2705800000.0,
+      "rho_gap_cold": 0.504
+     },
+     {
+      "size": "q2^19",
+      "q": 524309,
+      "arm": "c4:lpsgebw2o100c+C1C2",
+      "s_cold": 3689500000.0,
+      "s_relation": 2023400000.0,
+      "s_linear_algebra": 1666100000.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": 15060000000.0,
+      "rho_gap_cold": 0.245
+     },
+     {
+      "size": "q2^20",
+      "q": 1048583,
+      "arm": "c4:lpsgebw2o100c+C1C2",
+      "s_cold": 9756000000.0,
+      "s_relation": 5783800000.0,
+      "s_linear_algebra": 3972100000.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": 19914000000.0,
+      "rho_gap_cold": 0.49
+     },
+     {
+      "size": "q2^21",
+      "q": 2097169,
+      "arm": "c4:lpsgebw2o100c+C1C2",
+      "s_cold": 25725000000.0,
+      "s_relation": 16813000000.0,
+      "s_linear_algebra": 8911800000.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": null,
+      "rho_gap_cold": null
+     },
+     {
+      "size": "q2^22",
+      "q": 4194319,
+      "arm": "c4:lpsgebw2o100c+C1C2",
+      "s_cold": 68722000000.0,
+      "s_relation": 49773000000.0,
+      "s_linear_algebra": 18949000000.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": null,
+      "rho_gap_cold": null
+     }
+    ],
+    "setup_online": "not split: each solve is one target, relation collection and linear algebra both run per solve; s_relation and s_linear_algebra are the recorded phases",
+    "not_pinned": "04b-genus3-2lp-rebalance runs on other instances (largest prime below 2^k, seed 20261016) in another unit, and its rho is a walk on Jac(C) at about 290 F_q multiplications a step against about 75 on E0; it is not on this chain"
+   },
+   {
+    "baseline": "kob-orbit-v1",
+    "track": "compact-orbit Koblitz IC, examples/koblitz_orbit_dlp_fast_online.rs, a = 0, n = 41/53/61 (the ledger's own k0n41/k0n53/k0n61 curves: r and log2 r agree)",
+    "round": "ic_improve round 2 item 02 (free relations, default on) with the tuned K default",
+    "class": "engineering",
+    "commit": "e15ef5dfe",
+    "built_from": "e15ef5dfe0955a9f4a113146bf6a05aeaece04e3 (tuned K default) over 80184d522135030da39afa6041d728211775e178 (free relations on by default)",
+    "binary_sha256": "31ba59457b592512e3beca03ed7e6c75fb92b06226435884b9acf266483c29c2",
+    "binary_note": "the measured default-on binary (research/ic_improve_20261015/02-freerel-production/data/binaries.sha256, 'final'); e15ef5dfe only fills K when construct: omits it, checked identical to an explicit K at n = 41 (8/8); no rebuild hash at e15ef5dfe was recorded",
+    "host": {
+     "description": "shared 4-vCPU Linux container, load average 3-13, isolation L0; CPU model not recorded",
+     "jobs": "single-threaded, nice, prlimit --as=3221225472"
+    },
+    "source": "research/ic_improve_20261015/02-freerel-production/data/rows.csv (held-out test rows)",
+    "selection": "construct:<n>:0 with K omitted (K = 125 / 280 / 500); free relations on (KIC_FREE_RELATIONS unset); KIC_PAIR_SYMMETRY, KIC_ROOT_BLOOM and KIC_RANK_PROBE_CAP unset",
+    "unit": "s_cold, s_setup, s_online: counted S3 root solves for one complete solve and one target (index + harvest + rank = setup; target probes = online), mean over seeds; wall_ms beside; s_*_ledger: the same wall in the ledger's S with v0's unit_ns for the same curve, cross-host",
+    "rho": "matched no-table rho: item 09's strong rho (rung 3, 32 lanes, empty table) on the same curves (research/ic_next10_20261014/09-equal-advice/results.json, plain_strong_rho), cross-run, not paired; precomputed (Bernstein-Lange) rho: item 09's bl_level0 online with less advice than IC's peak RSS",
+    "measured": "held-out seeds 1-16 (n = 41, 53) and 1-12 (n = 61), 8 targets each, every target verified ([d]G = Q, item 09's scalars)",
+    "sizes": [
+     {
+      "size": "k0n41",
+      "curve_alias": "icv1-f2m41-tm2308219-7f48b14a",
+      "ec1": "EC1N41Ce0he09550ab560a",
+      "log2_r": 39.0,
+      "K": 125,
+      "s_cold": 1306331,
+      "s_setup": 1302885,
+      "s_online": 3446,
+      "wall_ms_cold": 1434.9,
+      "wall_ms_setup": 1431.4,
+      "wall_ms_online": 3.52,
+      "s_cold_ledger": 79.16,
+      "s_setup_ledger": 78.97,
+      "s_online_ledger": 0.194,
+      "rho_wall_ms": 151.18,
+      "rho_gap_cold_wall": 9.49,
+      "bl_online_ms": 0.1338,
+      "gap_online_vs_precomputed_rho": 26.3
+     },
+     {
+      "size": "k0n53",
+      "curve_alias": "icv1-f2m53-tm56619371-dac20a85",
+      "ec1": "EC1N53Ce0hb097de99be9a",
+      "log2_r": 44.259,
+      "K": 280,
+      "s_cold": 10779450,
+      "s_setup": 10749215,
+      "s_online": 30234,
+      "wall_ms_cold": 14130.8,
+      "wall_ms_setup": 14091.5,
+      "wall_ms_online": 39.31,
+      "s_cold_ledger": 102.97,
+      "s_setup_ledger": 102.68,
+      "s_online_ledger": 0.286,
+      "rho_wall_ms": 566.84,
+      "rho_gap_cold_wall": 24.93,
+      "bl_online_ms": 1.0545,
+      "gap_online_vs_precomputed_rho": 37.3
+     },
+     {
+      "size": "k0n61",
+      "curve_alias": "icv1-f2m61-t158598901-ab42b6c5",
+      "ec1": "EC1N61Ce0hd8c15448081e",
+      "log2_r": 47.211,
+      "K": 500,
+      "s_cold": 36666657,
+      "s_setup": 36628265,
+      "s_online": 38392,
+      "wall_ms_cold": 58899.0,
+      "wall_ms_setup": 58833.2,
+      "wall_ms_online": 65.81,
+      "s_cold_ledger": 149.24,
+      "s_setup_ledger": 149.07,
+      "s_online_ledger": 0.167,
+      "rho_wall_ms": 1216.99,
+      "rho_gap_cold_wall": 48.4,
+      "bl_online_ms": 6.5143,
+      "gap_online_vs_precomputed_rho": 10.1
+     }
+    ],
+    "curve_best": "not the best IC on these curves: the ic tool programme's pipeline (per_curve_best) is 7.66 / 13.24 / 20.97 times rho cold at rule v3 against 9.49 / 24.93 / 48.40 here. Rounds that change this pipeline compare against this entry and report the curve's gap beside it.",
+    "n83": "the n = 83 control (R1, bb023d5d7) ran the wide u128 path at a = 1 with explicit K, where free relations do not run and the K default has no entry; this entry does not change R1"
+   },
+   {
+    "baseline": "kgb-harvest-v1",
+    "track": "Koblitz Groebner decomposition oracle (src/cryptanalysis/koblitz_groebner.rs), linear-row harvest, pipeline systems pipe-n<N>-l<l>-m<m> under InheritedF4 d3: a stage component, not a complete solve",
+    "round": "ic_improve round 3 item 02 (root-rank gate, the default), except (17,9) m2 where harvest off is the best measured",
+    "class": "engineering",
+    "commit": "9e69f57ef",
+    "built_from": "9e69f57ef7fb763dafde09cb80d1a058556efc5e",
+    "binary_sha256": null,
+    "binary_note": "not recorded by the round",
+    "host": {
+     "description": "shared 4-vCPU Linux container, isolation L0; CPU model not recorded; five A/A intervals exclude 1 (0.915-1.038)",
+     "jobs": "single-threaded, nice, prlimit --as=6e9"
+    },
+    "source": "research/ic_improve3_20261015/02-harvest-gate/runs/fit_test.jsonl (held-out test, 124 prod rows)",
+    "selection": "KIC_LINEAR_HARVEST unset = root,gpv=0.9607,rank=331 (LINEAR_HARVEST_DEFAULT, koblitz_groebner.rs:5720); at (17,9) m2 KIC_LINEAR_HARVEST=0",
+    "unit": "median thread CPU seconds per production decomposition (groebner_decompose, node budget 4096, first lifting root)",
+    "rho": "none: a component; its pipeline's distance to rho is the complete solve's",
+    "engine_drift": "d72e8b04d (#2043, 2026-10-17) made F6-IC gate-first the default after this round (1.56-2.12 times less CPU reported); these prod figures predate it and are not re-measured, so a round on this track first re-measures this entry on its own head",
+    "sizes": [
+     {
+      "size": "(13,4) m3",
+      "config": "default",
+      "s_online": 0.00323
+     },
+     {
+      "size": "(17,6) m3",
+      "config": "default",
+      "s_online": 0.0234
+     },
+     {
+      "size": "(17,9) m2",
+      "config": "off (KIC_LINEAR_HARVEST=0)",
+      "s_online": 0.00224,
+      "default_s_online": 0.00241,
+      "off_over_default": "0.872 [0.771, 0.988] (fit_test.jsonl:102)"
+     },
+     {
+      "size": "(19,10) m2",
+      "config": "default (CPU matches off; word operations favour off 0.807)",
+      "s_online": 0.00268
+     },
+     {
+      "size": "(19,7) m3",
+      "config": "default",
+      "s_online": 0.0395
+     },
+     {
+      "size": "(23,12) m2",
+      "config": "default",
+      "s_online": 0.00973
+     },
+     {
+      "size": "(23,8) m3",
+      "config": "default",
+      "s_online": 0.243
+     },
+     {
+      "size": "(29,10) m3",
+      "config": "default",
+      "s_online": 1.965
+     },
+     {
+      "size": "(29,15) m2",
+      "config": "default",
+      "s_online": 0.0544
+     },
+     {
+      "size": "(31,10) m3",
+      "config": "default",
+      "s_online": 2.072
+     },
+     {
+      "size": "(31,16) m2",
+      "config": "default",
+      "s_online": 0.1852
+     },
+     {
+      "size": "(37,19) m2",
+      "config": "default",
+      "s_online": 0.502
+     }
+    ]
+   },
+   {
+    "baseline": "d4fp4-v1",
+    "track": "k = 4 index calculus on E(F_{p^4}), D4-symmetric decomposition (y-line), odd p = 101..1601, three curves a size (seeds 1-3)",
+    "round": "ic_improve round 2 item 04 (first-dependency stop d4-ed, ecbench base yline-d4-ed)",
+    "class": "engineering",
+    "commit": "d3d4f191a",
+    "built_from": "d3d4f191a85af0399b94d12ac049382e47fac2f0 (landed in f2c9202ca, #1862)",
+    "binary_sha256": "9c4210f817f1d98a9ff97cdf7b6188db17b97e202bbacc0b9a7714a4c7f00c0f",
+    "binary_note": "the ecbench session binary (research/ic_improve_20261015/04-d4-2lp-fix/ecbench/session-20261015-d4-ed/session.json)",
+    "host": {
+     "description": "Claude Code cloud container, Intel Xeon @ 2.10 GHz, 4 logical CPUs, 15-16 GiB, shared (load 4-13); ecbench L0, no wall claim"
+    },
+    "source": "research/ic_improve_20261015/04-d4-2lp-fix/raw/summary.json (27 held-out curves)",
+    "selection": "examples/ic_improve2_04_d4_2lp_fix arm d4-ed; ecbench ic.k4_gaudry {base=yline-d4-ed, lp=0, c4=2.54e10}",
+    "unit": "S = charged GAE / √r (one E(F_{p^4}) addition = 97 F_p multiplications); each decomposition charged C4 = 2.54e10 F_p multiplications; the enumeration oracle is uncharged, so setup is not split and the relation phase is about all of S",
+    "rho": "rho with the negation map, S in the same unit, per curve (rho_neg_S_reference); rho_gap_cold = IC S / rho S, geometric mean over the three curves",
+    "measured": "189/189 logarithms verified; per-size geometric means from rerate.sh",
+    "sizes": [
+     {
+      "size": "p101",
+      "p": 101,
+      "s_cold": 168500000.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": 1.2551,
+      "rho_gap_cold": 134250000.0
+     },
+     {
+      "size": "p181",
+      "p": 181,
+      "s_cold": 78360000.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": 1.1416,
+      "rho_gap_cold": 68640000.0
+     },
+     {
+      "size": "p269",
+      "p": 269,
+      "s_cold": 52080000.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": 0.9624,
+      "rho_gap_cold": 54115000.0
+     },
+     {
+      "size": "p397",
+      "p": 397,
+      "s_cold": 35465000.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": 0.9859,
+      "rho_gap_cold": 35972000.0
+     },
+     {
+      "size": "p521",
+      "p": 521,
+      "s_cold": 20462000.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": 0.9716,
+      "rho_gap_cold": 21060000.0
+     },
+     {
+      "size": "p769",
+      "p": 769,
+      "s_cold": 17154000.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": 0.8807,
+      "rho_gap_cold": 19477000.0
+     },
+     {
+      "size": "p1033",
+      "p": 1033,
+      "s_cold": 11888000.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": 0.912,
+      "rho_gap_cold": 13034000.0
+     },
+     {
+      "size": "p1301",
+      "p": 1301,
+      "s_cold": 9351400.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": 0.828,
+      "rho_gap_cold": 11294000.0
+     },
+     {
+      "size": "p1601",
+      "p": 1601,
+      "s_cold": 6765400.0,
+      "s_setup": null,
+      "s_online": null,
+      "s_rho": 1.0791,
+      "rho_gap_cold": 6269400.0
+     }
+    ],
+    "not_combined": "two better components are measured but never together with this stop: d4-ed-all (0.9953 [0.9912, 0.9983] of d4-ed, exploratory, not frozen) and the D4 solve of research/gaudry_quartic_d4_cost_20261014 (#1792, 02edd64fb: C4 6.9e7-8.5e7, 311-370 times below 2.54e10; oracle gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1). Until a round measures them together this entry is the pin, and the cheaper C4 is a stage result."
+   },
+   {
+    "baseline": "la-engine-v1",
+    "track": "IC linear-algebra engine (filter + block Wiedemann), synthetic m = 3 relation matrices over a 62-bit prime: a stage component (leaderboard section outside tables A-C, docs/ic/leaderboard.json .linear_algebra_component)",
+    "round": "research/la_engines_20261014 amendment 5",
+    "class": "engineering",
+    "commit": "ae8ac7df9",
+    "built_from": "ae8ac7df98b9b62bdcdc9cbd8a5d88d8fdff98e2 (#1874); filter ported in dca78f544, ic logs default in 706aa9191",
+    "binary_sha256": null,
+    "binary_note": "not recorded in the leaderboard rows",
+    "host": {
+     "description": "4-vCPU Intel Xeon @ 2.80 GHz, shared, L0; 4 threads"
+    },
+    "source": "research/la_engines_20261014/summary.json (amend5 medians of 3 seeds), raw/grid_amend5.jsonl (134 of 135 verified)",
+    "selection": "legacy filter below 4,096 columns; CADO-style filter (cado-bw) from 8,192; tie at 4,096",
+    "unit": "solve_s, seconds from relations in to verified logarithms out, median of 3 seeds",
+    "rho": "none: a component",
+    "default_mismatch": "ic logs defaults to --filter-strategy cado (src/bin/ic/experiment.rs:580), which is the slower filter below 4,096 columns, where every real IC matrix in the repository lies (largest about 600 columns); repair R11",
+    "sizes": [
+     {
+      "size": "1024 cols",
+      "config": "legacy-bw",
+      "s_online": 0.00497,
+      "other": "cado-bw 0.0121"
+     },
+     {
+      "size": "2048 cols",
+      "config": "legacy-bw",
+      "s_online": 0.0127,
+      "other": "cado-bw 0.0202"
+     },
+     {
+      "size": "4096 cols",
+      "config": "tie",
+      "s_online": 0.0334,
+      "other": "legacy-bw 0.0343"
+     },
+     {
+      "size": "8192 cols",
+      "config": "cado-bw",
+      "s_online": 0.0762,
+      "other": "legacy-bw 0.113"
+     },
+     {
+      "size": "16384 cols",
+      "config": "cado-bw",
+      "s_online": 0.151,
+      "other": "legacy-bw 0.384"
+     },
+     {
+      "size": "65536 cols",
+      "config": "cado-bw",
+      "s_online": 1.29,
+      "other": "legacy-bw 4.47"
+     },
+     {
+      "size": "131072 cols",
+      "config": "cado-bw",
+      "s_online": 3.8,
+      "other": "legacy-bw 18.2"
+     },
+     {
+      "size": "262144 cols",
+      "config": "cado-bw",
+      "s_online": 8.35,
+      "other": "legacy-bw 86.6; CADO-NFS 14.7"
+     }
+    ]
+   }
+  ],
+  "not_pinned": [
+   "Koblitz decomposition oracle on barrel (sigma-symmetric) systems: the equivariant pass (ic_improve 02) and the fall-row gate (ic_improve2 03). Production never builds these systems and the gate never fires on pipeline systems; the best measured per barrel size is recorded in the report, not pinned.",
+   "ic_next10 items 02-06 and 08-10: negative, instrument or audit results with no IC configuration to pin; items 01 (k = 4) and 07 (genus 3) are superseded by d4fp4-v1 and g3ghs-v1.",
+   "k = 4 D4 in characteristic 2 (research/gaudry_quartic_d4_char2_20261015) and the p = 29 end-to-end runs of #1792: single-study configurations, not a round chain; cited in the report."
+  ]
+ },
  "baselines": [
   {
    "baseline": "v0",

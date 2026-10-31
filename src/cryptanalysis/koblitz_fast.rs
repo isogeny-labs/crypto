@@ -20,6 +20,7 @@
 use num_bigint::BigUint;
 
 use crate::binary_ecc::{BinaryCurve, BinaryPoint, F2mElement};
+use crate::cryptanalysis::group_op_count;
 use crate::cryptanalysis::semaev_decomp::Gf2;
 
 /// A point with single-word coordinates, or `O`.
@@ -163,7 +164,11 @@ impl FastCurve {
 
     /// `[2]P`.
     pub fn double(&self, p: FastPoint) -> FastPoint {
-        if p.infinity || p.x == 0 {
+        if p.infinity {
+            return FastPoint::INFINITY;
+        }
+        group_op_count::count_doubles(1);
+        if p.x == 0 {
             return FastPoint::INFINITY;
         }
         let f = &self.field;
@@ -199,10 +204,12 @@ impl FastCurve {
         }
         if p.x == q.x {
             if p.y ^ q.y == p.x {
+                group_op_count::count_adds(1);
                 return FastPoint::INFINITY;
             }
             return self.double(p);
         }
+        group_op_count::count_adds(1);
         let f = &self.field;
         let lambda = f.mul(p.y ^ q.y, f.inv(p.x ^ q.x));
         self.add_with_lambda(p, q, lambda)
@@ -269,6 +276,7 @@ impl FastCurve {
         f.batch_inv(&mut scratch.dens, &mut scratch.acc);
         let mut double_p: Option<FastPoint> = None;
         out.reserve(qs.len());
+        let mut sums = 0u64;
         for (q, &inv) in qs.iter().zip(&scratch.dens) {
             if inv == 0 {
                 let sum = if p.infinity {
@@ -276,16 +284,21 @@ impl FastCurve {
                 } else if q.infinity {
                     p
                 } else if p.y ^ q.y == p.x {
+                    sums += 1;
                     FastPoint::INFINITY
                 } else {
+                    // Computed once and reused: one doubling, counted
+                    // inside `double`.
                     *double_p.get_or_insert_with(|| self.double(p))
                 };
                 out.push(sum);
                 continue;
             }
+            sums += 1;
             let lambda = f.mul(p.y ^ q.y, inv);
             out.push(self.add_with_lambda(p, *q, lambda));
         }
+        group_op_count::count_adds(sums);
     }
 
     /// [`Self::add_many`] without the ordinates: each sum's `x` and `O`
@@ -299,6 +312,25 @@ impl FastCurve {
     /// admits, so computing `y` for the rest is a multiplication per
     /// point spent on nothing.
     pub fn add_many_lazy(
+        &self,
+        p: FastPoint,
+        qs: &[FastPoint],
+        out: &mut Vec<FastPoint>,
+        lambdas: &mut Vec<u64>,
+        scratch: &mut BatchScratch,
+    ) {
+        let first = lambdas.len();
+        self.add_many_lazy_dispatch(p, qs, out, lambdas, scratch);
+        // Every sum with a slope is one addition; a sum completed on the
+        // spot (`LAZY_DONE`) went through `add`, which counted it.
+        let sums = lambdas[first..]
+            .iter()
+            .filter(|&&l| l != Self::LAZY_DONE)
+            .count();
+        group_op_count::count_adds(sums as u64);
+    }
+
+    fn add_many_lazy_dispatch(
         &self,
         p: FastPoint,
         qs: &[FastPoint],
@@ -343,7 +375,12 @@ impl FastCurve {
     ) -> bool {
         #[cfg(target_arch = "x86_64")]
         if let Some(simd) = &self.simd {
-            return simd.add_many_lazy_soa(self, p, qx, qy, x3, lambdas, scratch);
+            let done = simd.add_many_lazy_soa(self, p, qx, qy, x3, lambdas, scratch);
+            if done {
+                // All or nothing: every addend's sum was formed.
+                group_op_count::count_adds(qx.len() as u64);
+            }
+            return done;
         }
         let _ = (p, qx, qy, x3, lambdas, scratch);
         false
@@ -493,14 +530,17 @@ impl FastCurve {
         }));
         f.batch_inv(&mut scratch.dens, &mut scratch.acc);
         out.reserve(ps.len());
+        let mut sums = 0u64;
         for ((p, q), &inv) in ps.iter().zip(qs).zip(&scratch.dens) {
             if inv == 0 {
                 out.push(self.add(*p, *q));
                 continue;
             }
+            sums += 1;
             let lambda = f.mul(p.y ^ q.y, inv);
             out.push(self.add_with_lambda(*p, *q, lambda));
         }
+        group_op_count::count_adds(sums);
     }
 
     /// `[k]P` by double-and-add.
@@ -508,6 +548,7 @@ impl FastCurve {
         if k == 0 || p.infinity {
             return FastPoint::INFINITY;
         }
+        group_op_count::count_scalar_mults(1);
         self.ladder(p, 64 - k.leading_zeros() as u64, |i| (k >> i) & 1 == 1)
     }
 
@@ -517,6 +558,7 @@ impl FastCurve {
         if bits == 0 || p.infinity {
             return FastPoint::INFINITY;
         }
+        group_op_count::count_scalar_mults(1);
         self.ladder(p, bits, |i| k.bit(i))
     }
 
@@ -575,6 +617,7 @@ impl FastCurve {
         if p.z == 0 {
             return LdPoint::INFINITY;
         }
+        group_op_count::count_doubles(1);
         let f = &self.field;
         let x2 = f.sqr(p.x);
         let z2 = f.sqr(p.z);
@@ -618,9 +661,11 @@ impl FastCurve {
             return if a_ == 0 {
                 self.ld_double(affine_q)
             } else {
+                group_op_count::count_adds(1);
                 LdPoint::INFINITY
             };
         }
+        group_op_count::count_adds(1);
         let c = f.mul(b_, p.z);
         let z3 = f.sqr(c);
         let ac = match self.a {
@@ -654,6 +699,7 @@ impl FastCurve {
         if p.infinity {
             return p;
         }
+        group_op_count::count_frobenius_maps(2);
         FastPoint::affine(self.field.sqr_k(p.x, k), self.field.sqr_k(p.y, k))
     }
 }
@@ -685,6 +731,8 @@ pub struct FrobeniusCanon {
     /// `tables[i][b]`: the normal coordinates of the field element whose
     /// `i`-th byte is `b` and whose other bytes are zero.
     tables: Vec<[u64; 256]>,
+    /// What [`FrobeniusCanon::new`] did, for a caller that counts it.
+    build: CanonBuildWork,
     /// The same map as GFNI affine matrices, for [`Self::coords16_gfni`]:
     /// `gfni[i]`'s lane `k` is the 8 × 8 block from byte `i` of the field
     /// element to byte `k` of its coordinates.
@@ -692,6 +740,16 @@ pub struct FrobeniusCanon {
     /// The inverse map, normal coordinates to field element, as GFNI
     /// affine matrices in the same layout, for [`Self::frobenius_reps`].
     gfni_back: [[u64; 8]; 8],
+}
+
+/// The work of building a [`FrobeniusCanon`]: the normal-element search
+/// (`n` squarings per candidate, a Gauss–Jordan inversion over `F_2`)
+/// and the byte tables.  `word_ops` counts single-word steps (a bit
+/// gather, a test, an XOR, a swap); `field_sqrs` the squarings.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct CanonBuildWork {
+    pub word_ops: u64,
+    pub field_sqrs: u64,
 }
 
 impl FrobeniusCanon {
@@ -703,6 +761,7 @@ impl FrobeniusCanon {
             return None;
         }
         let mask = (1u64 << n) - 1;
+        let mut build = CanonBuildWork::default();
         // A normal element: one whose Frobenius orbit is a basis.
         let mut inverse = None;
         let mut basis_columns: Vec<u64> = Vec::new();
@@ -722,7 +781,8 @@ impl FrobeniusCanon {
                     c
                 })
                 .collect();
-            if let Some(inv) = invert_f2(&columns, n) {
+            build.field_sqrs += u64::from(n);
+            if let Some(inv) = invert_f2(&columns, n, &mut build.word_ops) {
                 inverse = Some(inv);
                 basis_columns = columns;
                 break;
@@ -734,7 +794,11 @@ impl FrobeniusCanon {
         let by_bit: Vec<u64> = (0..n)
             .map(|j| (0..n).fold(0u64, |acc, i| acc | (((inverse[i as usize] >> j) & 1) << i)))
             .collect();
+        // The transpose: `n²` bit gathers.
+        build.word_ops += u64::from(n) * u64::from(n);
         let bytes = n.div_ceil(8) as usize;
+        // Each table slot tests eight bits and XORs the set ones in.
+        build.word_ops += bytes as u64 * 256 * 8;
         let tables: Vec<[u64; 256]> = (0..bytes)
             .map(|bi| {
                 let mut table = [0u64; 256];
@@ -770,9 +834,15 @@ impl FrobeniusCanon {
             n,
             mask,
             tables,
+            build,
             gfni,
             gfni_back,
         })
+    }
+
+    /// The work [`new`](Self::new) did building this instance.
+    pub fn build_work(&self) -> CanonBuildWork {
+        self.build
     }
 
     /// [`Self::coords`] of sixteen words at once, by GFNI.
@@ -1031,6 +1101,7 @@ impl FrobeniusCanon {
     pub fn frobenius_reps(&self, xs: &[u64], ys: &[u64], out: &mut Vec<(u64, u64, u32)>) {
         assert_eq!(xs.len(), ys.len());
         assert!(self.frobenius_reps_available());
+        group_op_count::count_canonicalisations(xs.len() as u64);
         out.clear();
         #[cfg(target_arch = "x86_64")]
         for (cx, cy) in xs.chunks(16).zip(ys.chunks(16)) {
@@ -1058,6 +1129,7 @@ impl FrobeniusCanon {
     /// element outside it.
     #[inline]
     pub fn canon(&self, x: u64) -> u64 {
+        group_op_count::count_canonicalisations(1);
         self.least_rotation(self.coords(x)).0
     }
 
@@ -1092,6 +1164,7 @@ impl FrobeniusCanon {
     /// power: `coords(x') = rotl^{t − t'}(coords(x))`, so `x' = x^{2^{t − t'}}`.
     #[inline]
     pub fn canon_with_shift(&self, x: u64) -> (u64, u32) {
+        group_op_count::count_canonicalisations(1);
         self.least_rotation(self.coords(x))
     }
 
@@ -1256,6 +1329,16 @@ impl FrobeniusCanon {
     /// [`Self::canon_many`] overwriting its input: every `x` becomes
     /// [`Self::canon`]`(x)`.
     pub fn canon_in_place(&self, xs: &mut [u64]) {
+        // Whole chunks are counted here; the remainder goes through
+        // `canon`, which counts itself.
+        #[cfg(target_arch = "x86_64")]
+        if canon_simd_enabled() {
+            group_op_count::count_canonicalisations((xs.len() / 16 * 16) as u64);
+        } else {
+            group_op_count::count_canonicalisations((xs.len() / 8 * 8) as u64);
+        }
+        #[cfg(not(target_arch = "x86_64"))]
+        group_op_count::count_canonicalisations((xs.len() / 8 * 8) as u64);
         #[cfg(target_arch = "x86_64")]
         if canon_simd_enabled() {
             let funnel = canon_funnel_enabled();
@@ -1589,20 +1672,29 @@ unsafe fn least_rotation16_funnel_avx512(c: &[u64; 16], n: u32) -> [u64; 16] {
 
 /// Invert an `n × n` matrix over `F_2` given as its columns, returning
 /// the rows of the inverse; `None` when the columns are dependent.
-fn invert_f2(columns: &[u64], n: u32) -> Option<Vec<u64>> {
+/// `ops` counts single-word steps: the `n²` bit gathers of the
+/// transpose, the pivot search's tests, the two swaps, and per column a
+/// test of every row and two XORs per row it clears.
+fn invert_f2(columns: &[u64], n: u32, ops: &mut u64) -> Option<Vec<u64>> {
     // Row `i` carries, in bit `k`, the `i`-th bit of column `k`.
     let mut a: Vec<u64> = (0..n)
         .map(|i| (0..n).fold(0u64, |acc, k| acc | (((columns[k as usize] >> i) & 1) << k)))
         .collect();
+    *ops += u64::from(n) * u64::from(n);
     let mut inv: Vec<u64> = (0..n).map(|i| 1u64 << i).collect();
     for c in 0..n as usize {
-        let pivot = (c..n as usize).find(|&r| (a[r] >> c) & 1 == 1)?;
+        let pivot = (c..n as usize).find(|&r| {
+            *ops += 1;
+            (a[r] >> c) & 1 == 1
+        })?;
         a.swap(c, pivot);
         inv.swap(c, pivot);
+        *ops += 2 + u64::from(n);
         for r in 0..n as usize {
             if r != c && (a[r] >> c) & 1 == 1 {
                 a[r] ^= a[c];
                 inv[r] ^= inv[c];
+                *ops += 2;
             }
         }
     }
@@ -1810,6 +1902,12 @@ mod simd512 {
                     &mut lambdas[l0..],
                 )
             };
+            if !ok {
+                // The forward pass ran over every lane before the
+                // degenerate sum was seen; the caller redoes the sums on
+                // the scalar path, which counts them as additions.
+                crate::cryptanalysis::group_op_count::count_declined_lanes(len as u64);
+            }
             let keep = if ok { len } else { 0 };
             x3.truncate(x0 + keep);
             lambdas.truncate(l0 + keep);
@@ -2187,6 +2285,7 @@ mod tests {
                 n,
                 mask,
                 tables: Vec::new(),
+                build: CanonBuildWork::default(),
                 gfni: [[0; 8]; 8],
                 gfni_back: [[0; 8]; 8],
             };
@@ -2256,6 +2355,7 @@ mod tests {
                 n,
                 mask,
                 tables: Vec::new(),
+                build: CanonBuildWork::default(),
                 gfni: [[0; 8]; 8],
                 gfni_back: [[0; 8]; 8],
             };

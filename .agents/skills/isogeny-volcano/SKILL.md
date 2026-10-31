@@ -16,7 +16,7 @@ draws recorded values.
 |:--|:--|:--|
 | binary | `target/release/volcano-rho` (`src/bin/volcano_rho.rs`) | `build/ca volcano` (`ca_volcano.h`, `src/volcano.c`) |
 | curve | `--curve P,A,B [--order N]`, or a search: `--bits --depth --crater any\|split\|inert\|ramified --max-cofactor` | `--p P --a A --b B [--order N]` |
-| rho | built-in single-walker 32-adding DP walk, no negation map; or `--engine ca --ca PATH [--ca-arg ...]` | `ca_rho_solve` in-process (negation map on; `--no-negation`, `--threads`, `--dp-bits`, `--r`) |
+| rho | built-in single-walker 32-adding DP walk on `{R, −R}` (negation map, look-ahead, cycle escape; `--negation off` for the walk on points used before 2026-10-20); or `--engine ca --ca PATH [--ca-arg ...]` | `ca_rho_solve` in-process (negation map on; `--no-negation`, `--threads`, `--dp-bits`, `--r`) |
 | output | `--out DIR`: `results.json`, `trials.csv`, `instances.jsonl` | JSON on stdout, table on stderr, `--trials-out CSV`, `--diagram FILE` |
 | graphs | `research/isogeny-volcano-rho/plot.py DIR` (writes `volcano.diagram.json` and the SVG/PNGs) | `--diagram` writes `volcano-diagram/v1` input (`plot_ca.py` turns it into v2) |
 

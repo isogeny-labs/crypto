@@ -33,7 +33,9 @@ use rand::{Rng, SeedableRng};
 use serde::Serialize;
 
 use super::gaudry_cubic::mm;
+use super::jv_bitops::{self, JvTally, Kind, OpTally, Phase};
 use super::jv_cover::{generate_spec, unit_costs, Ctx, EllE, Fld, Fq3, PtE6, Spec, E2, E6};
+use super::jv_isogeny_walk::Challenge;
 use super::residual_walk::{inv_mod, mix64};
 
 type X6 = [u64; 6];
@@ -88,6 +90,40 @@ pub struct OpCounts {
 }
 
 impl OpCounts {
+    /// The counts accrued since `before` (field by field).
+    pub fn since(&self, before: &OpCounts) -> OpCounts {
+        OpCounts {
+            mul: self.mul - before.mul,
+            sq: self.sq - before.sq,
+            inv: self.inv - before.inv,
+            walk_adds: self.walk_adds - before.walk_adds,
+            dbl_adds: self.dbl_adds - before.dbl_adds,
+            setup_adds: self.setup_adds - before.setup_adds,
+            fp_adds: self.fp_adds - before.fp_adds,
+            canon_cmp: self.canon_cmp - before.canon_cmp,
+            hash: self.hash - before.hash,
+            dp_check: self.dp_check - before.dp_check,
+            scalar_ops: self.scalar_ops - before.scalar_ops,
+            table_ops: self.table_ops - before.table_ops,
+            cycle_cmp: self.cycle_cmp - before.cycle_cmp,
+        }
+    }
+    /// Add `d` field by field.
+    pub fn accumulate(&mut self, d: &OpCounts) {
+        self.mul += d.mul;
+        self.sq += d.sq;
+        self.inv += d.inv;
+        self.walk_adds += d.walk_adds;
+        self.dbl_adds += d.dbl_adds;
+        self.setup_adds += d.setup_adds;
+        self.fp_adds += d.fp_adds;
+        self.canon_cmp += d.canon_cmp;
+        self.hash += d.hash;
+        self.dp_check += d.dp_check;
+        self.scalar_ops += d.scalar_ops;
+        self.table_ops += d.table_ops;
+        self.cycle_cmp += d.cycle_cmp;
+    }
     pub fn native(&self) -> u64 {
         self.canon_cmp
             + self.hash
@@ -154,6 +190,9 @@ struct Arith {
     a2: X6,
     a4: X6,
     c: OpCounts,
+    /// canonicalisations that flipped the point (their 6 `fp_adds` are a
+    /// charge of `c`, not work: the negation was computed by the compare)
+    flips: u64,
 }
 
 impl Arith {
@@ -421,29 +460,111 @@ fn collision_scalar(n: u64, same_y: bool, a: u64, b: u64, a2: u64, b2: u64) -> O
     (den != 0).then(|| mm(num, inv_mod(den, n), n))
 }
 
+/// A curve `y² = x³ + a₂x² + a₄x + a₆` over `F_{p⁶}` (`a₆` never enters
+/// the affine group law) with `G` of prime order `l` and `Q = [d]G`: the
+/// instance a run walks on.  `d` is the planted answer, read only to report
+/// correctness.
+#[derive(Clone, Debug)]
+pub struct CurveInstance {
+    pub p: u64,
+    pub l: u64,
+    pub d: u64,
+    pub a2: E6,
+    pub a4: E6,
+    pub g: PtE6,
+    pub q: PtE6,
+}
+
+impl CurveInstance {
+    /// The weak curve `y² = x(x − α)(x − σα)` of a [`Spec`].
+    pub fn from_spec(spec: &Spec) -> CurveInstance {
+        let f = Fq3::new(spec.p);
+        let ec = EllE::new(&f, &spec.alpha);
+        CurveInstance {
+            p: spec.p,
+            l: spec.l,
+            d: spec.d,
+            a2: ec.a2,
+            a4: ec.a4,
+            g: spec.g,
+            q: spec.q,
+        }
+    }
+
+    /// The challenge curve `y² = (x − e₀)(x − e₁)(x − e₂)` of ledger §18
+    /// with its `G`, `Q`, moved by `x ↦ x − e₀` onto `y² = x³ + a₂x² + a₄x`
+    /// (an isomorphism: the logarithm is unchanged).
+    pub fn from_challenge(ch: &Challenge) -> CurveInstance {
+        let p = ch.spec0.p;
+        let f = Fq3::new(p);
+        let e = &ch.curve.e;
+        let u = f.sub(&e[1], &e[0]);
+        let v = f.sub(&e[2], &e[0]);
+        let pt = |x: &E6, y: &E6| PtE6 {
+            x: f.sub(x, &e[0]),
+            y: *y,
+            inf: false,
+        };
+        CurveInstance {
+            p,
+            l: ch.spec0.l,
+            d: ch.spec0.d,
+            a2: f.neg(&f.add(&u, &v)),
+            a4: f.mul(&u, &v),
+            g: pt(&ch.g.0, &ch.g.1),
+            q: pt(&ch.q.0, &ch.q.1),
+        }
+    }
+}
+
+/// What a run did beyond [`StrongRun`]: the operations of its set-up (the
+/// multipliers, start points and restarts' linear combinations), the RNG
+/// draws, the canonicalisations that flipped a point, the collision solves,
+/// and the scalar it returned.
+#[derive(Clone, Debug, Default)]
+struct Extra {
+    setup: OpCounts,
+    rng_draws: u64,
+    flips: u64,
+    collision_solves: u64,
+    found: Option<u64>,
+}
+
 /// One run of an arm on the instance `(p, instance_seed)`.
 pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun {
     validate_options(o).expect("invalid strong rho options");
     let start = Instant::now();
-    let p = spec.p;
-    let n = spec.l;
-    let f = Fq3::new(p);
-    let ec = EllE::new(&f, &spec.alpha);
     let c_e = {
         let ctx = Ctx::new(spec);
         unit_costs(spec, &ctx).0
     };
+    strong_rho_core(&CurveInstance::from_spec(spec), c_e, seed, run, o, start).0
+}
+
+fn strong_rho_core(
+    inst: &CurveInstance,
+    c_e: f64,
+    seed: u64,
+    run: u64,
+    o: StrongOpts,
+    start: Instant,
+) -> (StrongRun, Extra) {
+    let p = inst.p;
+    let n = inst.l;
+    let f = Fq3::new(p);
+    let mut ex = Extra::default();
     let mut ar = Arith {
         r: Red::new(p),
         p,
         w: f.f.w,
         s: f.s.0,
-        a2: to_x6(&ec.a2),
-        a4: to_x6(&ec.a4),
+        a2: to_x6(&inst.a2),
+        a4: to_x6(&inst.a4),
         c: OpCounts::default(),
+        flips: 0,
     };
-    let g = to_pt(&spec.g);
-    let q = to_pt(&spec.q);
+    let g = to_pt(&inst.g);
+    let q = to_pt(&inst.q);
     let mut rng = StdRng::seed_from_u64(
         seed.wrapping_mul(0x9E37_79B9_7F4A_7C15)
             ^ run.wrapping_mul(0xD1B5_4A32_D192_ED03)
@@ -451,23 +572,27 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
     );
     // setup counted into setup_adds: take the delta of group operations
     let mut setup_ops = 0u64;
-    let lin_comb = |ar: &mut Arith, a: u64, b: u64, setup_ops: &mut u64| -> Option<Pt> {
-        let before = ar.c.dbl_adds;
-        let ga = ar.mul_scalar(&g, a);
-        let qb = ar.mul_scalar(&q, b);
-        // group operations of the scalar multiplications: count add_full calls
-        // through the muls they used is not needed; count by doubling + adds
-        let r = match (ga, qb) {
-            (Some(x), Some(y)) => ar.add_full(&x, &y),
-            (x, None) | (None, x) => x,
+    let lin_comb =
+        |ar: &mut Arith, a: u64, b: u64, setup_ops: &mut u64, setup: &mut OpCounts| -> Option<Pt> {
+            let c0 = ar.c.clone();
+            let before = ar.c.dbl_adds;
+            let ga = ar.mul_scalar(&g, a);
+            let qb = ar.mul_scalar(&q, b);
+            // group operations of the scalar multiplications: count add_full calls
+            // through the muls they used is not needed; count by doubling + adds
+            let r = match (ga, qb) {
+                (Some(x), Some(y)) => ar.add_full(&x, &y),
+                (x, None) | (None, x) => x,
+            };
+            *setup_ops += (ar.c.dbl_adds - before) + (a.count_ones() + b.count_ones()) as u64 + 1;
+            setup.accumulate(&ar.c.since(&c0));
+            r
         };
-        *setup_ops += (ar.c.dbl_adds - before) + (a.count_ones() + b.count_ones()) as u64 + 1;
-        r
-    };
     let mults: Vec<(u64, u64, Pt)> = (0..o.r)
         .map(|_| loop {
             let (al, be) = (rng.gen_range(0..n), rng.gen_range(1..n));
-            if let Some(pt) = lin_comb(&mut ar, al, be, &mut setup_ops) {
+            ex.rng_draws += 2;
+            if let Some(pt) = lin_comb(&mut ar, al, be, &mut setup_ops, &mut ex.setup) {
                 break (al, be, pt);
             }
         })
@@ -483,6 +608,7 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
         } else {
             ar.c.fp_adds += 6;
             ar.c.scalar_ops += 2;
+            ar.flips += 1;
             (Pt { x: pt.x, y: ny }, (n - a) % n, (n - b) % n)
         }
     };
@@ -495,23 +621,25 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
     let (mut restarts, mut cycles_found, mut self_coll) = (0u64, 0u64, 0u64);
     let mut capped = false;
 
-    let new_walker = |ar: &mut Arith, rng: &mut StdRng, setup_ops: &mut u64| -> Walker {
-        loop {
-            let (a, b) = (rng.gen_range(0..n), rng.gen_range(1..n));
-            if let Some(pt) = lin_comb(ar, a, b, setup_ops) {
-                let (pt, a, b) = canon(ar, pt, a, b);
-                return Walker {
-                    pt,
-                    a,
-                    b,
-                    tail: 0,
-                    hist: Default::default(),
-                };
+    let new_walker =
+        |ar: &mut Arith, rng: &mut StdRng, setup_ops: &mut u64, ex: &mut Extra| -> Walker {
+            loop {
+                let (a, b) = (rng.gen_range(0..n), rng.gen_range(1..n));
+                ex.rng_draws += 2;
+                if let Some(pt) = lin_comb(ar, a, b, setup_ops, &mut ex.setup) {
+                    let (pt, a, b) = canon(ar, pt, a, b);
+                    return Walker {
+                        pt,
+                        a,
+                        b,
+                        tail: 0,
+                        hist: Default::default(),
+                    };
+                }
             }
-        }
-    };
+        };
     let mut ws: Vec<Walker> = (0..o.batch)
-        .map(|_| new_walker(&mut ar, &mut rng, &mut setup_ops))
+        .map(|_| new_walker(&mut ar, &mut rng, &mut setup_ops, &mut ex))
         .collect();
     'main: loop {
         // choose multipliers; collect the batch of x-differences
@@ -571,7 +699,7 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
             let Some(npt) = next else {
                 // infinity: restart this walker
                 restarts += 1;
-                ws[i] = new_walker(&mut ar, &mut rng, &mut setup_ops);
+                ws[i] = new_walker(&mut ar, &mut rng, &mut setup_ops, &mut ex);
                 continue;
             };
             let (mut npt, mut a, mut b) = canon(&mut ar, npt, a, b);
@@ -621,6 +749,7 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
             if (h >> 20) & mask == 0 {
                 ar.c.table_ops += 1;
                 if let Some(&(y2, a2, b2)) = table.get(&npt.x) {
+                    ex.collision_solves += 1;
                     if let Some(scalar) = collision_scalar(n, npt.y == y2, ws[i].a, ws[i].b, a2, b2)
                     {
                         found = Some(scalar);
@@ -628,14 +757,14 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
                     }
                     self_coll += 1;
                     restarts += 1;
-                    ws[i] = new_walker(&mut ar, &mut rng, &mut setup_ops);
+                    ws[i] = new_walker(&mut ar, &mut rng, &mut setup_ops, &mut ex);
                     continue;
                 }
                 table.insert(npt.x, (npt.y, ws[i].a, ws[i].b));
                 ws[i].tail = 0;
             } else if ws[i].tail > tail_cap {
                 restarts += 1;
-                ws[i] = new_walker(&mut ar, &mut rng, &mut setup_ops);
+                ws[i] = new_walker(&mut ar, &mut rng, &mut setup_ops, &mut ex);
             }
         }
         if steps > cap {
@@ -649,7 +778,7 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
     let mh = ar.c.muls(&ph);
     let mt = ar.c.muls(&TUNED);
     let extra = (ar.c.fp_adds + ar.c.native()) as f64;
-    StrongRun {
+    let run_report = StrongRun {
         p,
         seed,
         run,
@@ -670,11 +799,14 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
         cycles_found,
         self_collisions: self_coll,
         dps: table.len() as u64,
-        correct: found == Some(spec.d),
+        correct: found == Some(inst.d),
         capped,
         ops: ar.c,
         wall_ms: start.elapsed().as_secs_f64() * 1e3,
-    }
+    };
+    ex.flips = ar.flips;
+    ex.found = found;
+    (run_report, ex)
 }
 
 fn validate_options(o: StrongOpts) -> Result<(), &'static str> {
@@ -688,6 +820,165 @@ fn validate_options(o: StrongOpts) -> Result<(), &'static str> {
         return Err("dp_bits must be at most 44");
     }
     Ok(())
+}
+
+/// A run of [`strong_rho`] on any [`CurveInstance`] (the challenge curve of
+/// ledger §18, say), with what `bitop/v1` pricing needs besides
+/// [`StrongRun`]: the set-up's own operations, the RNG draws, the flips, the
+/// collision solves, and the verification `[d′]G = Q` of the returned
+/// scalar on the instance's curve (counted apart, in `verify`).
+#[derive(Clone, Debug, Serialize)]
+pub struct CountedRun {
+    pub run: StrongRun,
+    pub setup: OpCounts,
+    pub verify: OpCounts,
+    pub rng_draws: u64,
+    pub flips: u64,
+    pub collision_solves: u64,
+    pub verified: bool,
+}
+
+/// [`strong_rho`] on `inst`, counted for `bitop/v1` ([`rho_tally`]).  Its
+/// [`StrongRun`] is priced in the harness unit as `strong_rho`'s is.
+pub fn strong_rho_counted(inst: &CurveInstance, seed: u64, run: u64, o: StrongOpts) -> CountedRun {
+    validate_options(o).expect("invalid strong rho options");
+    let start = Instant::now();
+    let ph = harness_prices(inst.p);
+    let c_e = 2.0 * ph.mul + ph.sq + ph.inv;
+    let (r, ex) = strong_rho_core(inst, c_e, seed, run, o, start);
+    // the attacker checks the scalar it found: [d′]G = Q on the curve
+    let f = Fq3::new(inst.p);
+    let mut ar = Arith {
+        r: Red::new(inst.p),
+        p: inst.p,
+        w: f.f.w,
+        s: f.s.0,
+        a2: to_x6(&inst.a2),
+        a4: to_x6(&inst.a4),
+        c: OpCounts::default(),
+        flips: 0,
+    };
+    let (g, q) = (to_pt(&inst.g), to_pt(&inst.q));
+    let verified = ex
+        .found
+        .and_then(|k| ar.mul_scalar(&g, k))
+        .is_some_and(|pt| pt.x == q.x && pt.y == q.y);
+    CountedRun {
+        run: r,
+        setup: ex.setup,
+        verify: ar.c,
+        rng_draws: ex.rng_draws,
+        flips: ex.flips,
+        collision_solves: ex.collision_solves,
+        verified,
+    }
+}
+
+/// The `bitop/v1` primitives of one `F_{q³}` product, squaring and
+/// inversion of the harness's own arithmetic (`jv_cover::Fq3`, which the
+/// index-calculus arm runs on), counted by the `jv_bitops` hooks.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct Fq3Prims {
+    pub mul: OpTally,
+    pub sq: OpTally,
+    pub inv: OpTally,
+}
+
+/// Count [`Fq3Prims`] at `p` on this thread.  Counting must be on
+/// (`jv_bitops::enable`); this thread claims its tally.  Every operation is
+/// data-independent (no early exits), so one call of each is the price.
+pub fn measure_fq3_prims(p: u64, l: u64) -> Fq3Prims {
+    assert!(jv_bitops::enabled(), "jv_bitops counting is off");
+    jv_bitops::claim();
+    jv_bitops::set_moduli(p, l);
+    let f = Fq3::new(p);
+    let mut rng = StdRng::seed_from_u64(5);
+    let (a, b) = loop {
+        let a = f.random(&mut rng);
+        let b = f.random(&mut rng);
+        if a != E6::ZERO && b != E6::ZERO {
+            break (a, b);
+        }
+    };
+    let _g = jv_bitops::enter(Phase::Harness);
+    let one = |op: &dyn Fn()| -> OpTally {
+        let before = jv_bitops::snapshot();
+        op();
+        jv_bitops::snapshot().since(&before).total()
+    };
+    Fq3Prims {
+        mul: one(&|| {
+            std::hint::black_box(f.mul(&a, &b));
+        }),
+        sq: one(&|| {
+            std::hint::black_box(f.sq(&a));
+        }),
+        inv: one(&|| {
+            std::hint::black_box(f.inv(&a));
+        }),
+    }
+}
+
+/// `c`'s `F_{q³}` operations at the harness's prices plus its group-law
+/// `F_p` additions.
+fn add_arith(t: &mut OpTally, c: &OpCounts, pr: &Fq3Prims) {
+    for k in Kind::ALL {
+        let i = k as usize;
+        t.counts[i] += c.mul * pr.mul.counts[i] + c.sq * pr.sq.counts[i] + c.inv * pr.inv.counts[i];
+    }
+    t.counts[Kind::FieldAdd as usize] += c.fp_adds;
+}
+
+/// A counted run in `bitop/v1` primitives, by phase.
+///
+/// * every `F_{q³}` product, squaring and inversion at the primitives the
+///   harness's own `Fq3` executes ([`measure_fq3_prims`]); the group law's
+///   `F_p` additions as counted (`fp_adds`), less the six a flip is charged
+///   in `fp_adds` without computing them;
+/// * a canonicalisation: the negation of `y` it computes (6 `field_add`)
+///   and the compare (1 `word_op`); a scalar update: 1 `modr_add`; a
+///   fruitless-cycle compare: 1 `word_op`;
+/// * a hash of `x` (6 coordinates): 6 `word_op`s, the walk's (branch,
+///   history) in the walk, the distinguished-point hash in collision
+///   detection with its test (1 `word_op`); a table operation (a lookup
+///   and, unless it collides, an insert): 2 `hash_probe`s and their keys'
+///   6 words each; a collision solve: 1 `modr_inv`, 1 `modr_mul`, 3
+///   `modr_add`;
+/// * an RNG draw: 1 `word_op` (precomputation);
+/// * verification: its scalar multiplication and the 12-word compare.
+pub fn rho_tally(cr: &CountedRun, pr: &Fq3Prims) -> JvTally {
+    let mut t = JvTally::default();
+    let tot = &cr.run.ops;
+    let walk = tot.since(&cr.setup);
+    {
+        let pre = t.phase_mut(Phase::RhoPrecompute);
+        add_arith(pre, &cr.setup, pr);
+        pre.counts[Kind::WordOp as usize] += cr.rng_draws;
+        pre.rng_words += cr.rng_draws;
+    }
+    {
+        let w = t.phase_mut(Phase::RhoWalk);
+        add_arith(w, &walk, pr);
+        w.counts[Kind::FieldAdd as usize] -= 6 * cr.flips;
+        w.counts[Kind::FieldAdd as usize] += 6 * walk.canon_cmp;
+        w.counts[Kind::WordOp as usize] +=
+            walk.canon_cmp + walk.cycle_cmp + 6 * (walk.hash - walk.dp_check);
+        w.counts[Kind::ModrAdd as usize] += walk.scalar_ops;
+    }
+    {
+        let c = t.phase_mut(Phase::RhoCollision);
+        c.counts[Kind::WordOp as usize] += walk.dp_check + 6 * walk.dp_check + 12 * walk.table_ops;
+        c.counts[Kind::HashProbe as usize] += 2 * walk.table_ops;
+        c.counts[Kind::ModrInv as usize] += cr.collision_solves;
+        c.counts[Kind::ModrMul as usize] += cr.collision_solves;
+        c.counts[Kind::ModrAdd as usize] += 3 * cr.collision_solves;
+    }
+    {
+        let v = t.phase_mut(Phase::RhoVerification);
+        add_arith(v, &cr.verify, pr);
+        v.counts[Kind::WordOp as usize] += 12;
+    }
+    t
 }
 
 pub fn run_strong_rho(p: u64, seed: u64, run: u64, o: StrongOpts) -> StrongRun {
@@ -779,6 +1070,7 @@ mod tests {
             a2: to_x6(&ec.a2),
             a4: to_x6(&ec.a4),
             c: OpCounts::default(),
+            flips: 0,
         };
         for _ in 0..200 {
             let a = f.random(&mut rng);
@@ -797,6 +1089,80 @@ mod tests {
             let h2 = ec.add(&ec.mul(&spec.g, k), &spec.q);
             let n = ar.mul_scalar(&g, k).unwrap();
             assert_eq!(ar.add_full(&n, &q).unwrap().y, to_x6(&h2.y));
+        }
+    }
+
+    #[test]
+    fn fq3_prims_are_the_harness_arithmetic() {
+        // `jv_bitops` is process-wide; other tests' threads only add to its
+        // foreign counter, never to this thread's tally
+        jv_bitops::enable(true);
+        let pr = measure_fq3_prims(101, 1_000_003);
+        // nine F_q products and two by s, each 5 products and 2 additions,
+        // plus 11 F_q additions of 2
+        assert_eq!(pr.mul.get(Kind::FieldMul), 55);
+        assert_eq!(pr.mul.get(Kind::FieldAdd), 44);
+        assert_eq!(pr.sq, pr.mul);
+        // two Frobenius (2 F_q products each), two F_{q³} products, the F_q
+        // inversion (5 products, a subtraction and a negation, one F_p
+        // inversion), the scaling (3 F_q products): 150 products as the
+        // legacy unit's 166 = 150 + 16 says
+        assert_eq!(pr.inv.get(Kind::FieldMul), 150);
+        assert_eq!(pr.inv.get(Kind::FieldAdd), 104);
+        assert_eq!(pr.inv.get(Kind::FieldInv), 1);
+        assert_eq!(pr.mul.get(Kind::ModrMul) + pr.inv.get(Kind::HashProbe), 0);
+    }
+
+    #[test]
+    fn counted_runs_match_the_uncounted_run_and_verify() {
+        jv_bitops::enable(true);
+        let p = 53;
+        for (neg, batch) in [(false, 1), (true, 8)] {
+            let o = StrongOpts {
+                negation: neg,
+                batch,
+                dp_bits: 4,
+                r: 64,
+            };
+            let spec = generate_spec(p, 2);
+            let plain = strong_rho(&spec, 2, 0, o);
+            let counted = strong_rho_counted(&CurveInstance::from_spec(&spec), 2, 0, o);
+            assert_eq!(plain.steps, counted.run.steps);
+            assert_eq!(plain.ops.mul, counted.run.ops.mul);
+            assert_eq!(plain.ops.hash, counted.run.ops.hash);
+            assert!(counted.run.correct && counted.verified);
+            assert!(counted.setup.mul > 0 && counted.setup.mul < counted.run.ops.mul);
+            assert!(counted.verify.inv > 0);
+            let pr = measure_fq3_prims(p, spec.l);
+            let t = rho_tally(&counted, &pr);
+            let w = jv_bitops::widths(p, spec.l);
+            for ph in Phase::RHO {
+                assert!(t.phase(ph).bitops(&w).unwrap() > 0, "{ph:?}");
+            }
+            // the walk's products are the run's less the set-up's
+            let walk = counted.run.ops.since(&counted.setup);
+            assert_eq!(
+                t.phase(Phase::RhoWalk).get(Kind::FieldMul),
+                walk.mul * 55 + walk.sq * 55 + walk.inv * 150
+            );
+        }
+    }
+
+    #[test]
+    fn rho_on_the_challenge_curve_recovers_the_planted_logarithm() {
+        use crate::cryptanalysis::jv_isogeny_walk::challenge_instance;
+        let ch = challenge_instance(53, 1, 8, &[3, 5, 7]).expect("challenge");
+        let inst = CurveInstance::from_challenge(&ch);
+        assert_ne!(inst.a2, CurveInstance::from_spec(&ch.spec0).a2);
+        for (neg, batch) in [(false, 1), (true, 8)] {
+            let o = StrongOpts {
+                negation: neg,
+                batch,
+                dp_bits: 4,
+                r: 64,
+            };
+            let r = strong_rho_counted(&inst, 9, 0, o);
+            assert!(r.run.correct && r.verified, "neg {neg}");
         }
     }
 

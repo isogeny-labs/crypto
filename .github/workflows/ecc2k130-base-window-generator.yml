@@ -1,14 +1,8 @@
 name: ECC2K-130 base-window generator controls
 
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/ecc2k130-base-window-generator.yml'
-      - 'examples/koblitz_base_window.rs'
-      - 'research/notes/ecc2k130/base_window_screen_20261001/**'
-      - '.github/scripts/frozen_source_selector.py'
-      - '.github/scripts/test_frozen_source_selector.py'
-      - '.github/scripts/run_frozen_generator_test.py'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:
@@ -28,7 +22,7 @@ concurrency:
 
 jobs:
   parity:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-base-window-generator.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-base-window-generator.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-base-window-generator.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-base-window-generator.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -37,6 +31,7 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /Cargo.toml
             /tools/volcano-cli/
             /isogeny_algos/

@@ -16,7 +16,7 @@
       "freshness": {
         "status": "supported",
         "scope": "the exact input registry for all 15,791 assessed map rows",
-        "rationale": "The digest is computed from the current file and every membership is joined through its model hash.",
+        "rationale": "The digest binds the catalog_commit snapshot and every membership is joined through its model hash; later live-catalog additions are outside this assessment.",
         "evidence_refs": [
           "docs/curves/registry.json"
         ]
@@ -50,7 +50,7 @@
     },
     {
       "path": "docs/curves/cover-transfer-assessment.schema.json",
-      "sha256": "4ab7679502a6c7c9c76dd139037ab74d8cf15aacd3711e42323c9c1c6bf9983c",
+      "sha256": "131e4867835bcc5cb465645d398acad5f14f8f2320f97b52b6dd95ab0cb6cc7c",
       "role": "machine-readable v2 ledger contract",
       "freshness": {
         "status": "supported",
@@ -63,7 +63,7 @@
     },
     {
       "path": "scripts/build_cover_transfer_assessments.mjs",
-      "sha256": "52384ecfb2d3e6a56febce0b465f7cb944c6097ab16b59de81b2c4a912aa1eaf",
+      "sha256": "6bc2bf57d51b2f395cbb991417b29689d25908841a31cdf3bb810b925db670aa",
       "role": "deterministic catalog-wide ledger generator",
       "freshness": {
         "status": "supported",
@@ -128,7 +128,7 @@
     },
     {
       "path": "src/bin/hyperelliptic_cover.rs",
-      "sha256": "0e99ca0fd9eaee74d6b5214b47b725afcbe9c45d9b88be8efe742540e2d28191",
+      "sha256": "87f28d033fba5f8ec906bd04f1b3b68dc9a24ebd03d1582dfb7e7159ce548328",
       "role": "standalone CLI and native binary subgroup batch certificate",
       "freshness": {
         "status": "supported",
@@ -182,7 +182,7 @@
     },
     {
       "path": "src/binary_ecc/hyperelliptic.rs",
-      "sha256": "09ce8a689aa8e190f51c871f9e94467271ea731b9629f69d322ae716de507c5c",
+      "sha256": "435ed5ad5b67c51ee8d73735498bd35fe45890f35225bccc932c6873971ecdfd",
       "role": "one-infinity binary Jacobian implementation",
       "freshness": {
         "status": "supported",
@@ -195,7 +195,7 @@
     },
     {
       "path": "src/prime_hyperelliptic/curve.rs",
-      "sha256": "7a769bfb7abfe92ce06da7c02340f2a2426827d8066ebef510375149b8c3d5ad",
+      "sha256": "c85d455f98b52f6310f929d17443914e1f60a813926ec47a9d99cc8aa20a8aca",
       "role": "odd-prime one-infinity Jacobian model boundary",
       "freshness": {
         "status": "supported",
@@ -208,7 +208,7 @@
     },
     {
       "path": "Cargo.toml",
-      "sha256": "9e10bcc89120fb7bcc1bf7aabab420b03076b3c5549ebce465b438cc5661137b",
+      "sha256": "c2403d6a6e9e1bd2e937c78cac9e9d4343fb8a086892bc588b297ac5903fa242",
       "role": "exact implementation-version dependency: Cargo.toml",
       "freshness": {
         "status": "supported",
@@ -221,7 +221,7 @@
     },
     {
       "path": "Cargo.lock",
-      "sha256": "c2c0049f265e78432b79c5fe14a7ce6668cd44c3816012256dfcd7b40e5f4f6d",
+      "sha256": "6941f5e8809ae9b52e879f6e7b7c6bf81da51b3ab986b32fd8bad8b0e2f4ccf9",
       "role": "exact implementation-version dependency: Cargo.lock",
       "freshness": {
         "status": "supported",
@@ -234,7 +234,7 @@
     },
     {
       "path": ".github/workflows/curve-covers.yml",
-      "sha256": "3ec623e95612c573dd458628c3be7322367b470075f0f70270eafe817d1330de",
+      "sha256": "f8dad0c1a0fa591f71da34589e8bc30ea9493b5c6825a62b5281e86168ce658c",
       "role": "exact implementation-version dependency: .github/workflows/curve-covers.yml",
       "freshness": {
         "status": "supported",
@@ -247,7 +247,7 @@
     },
     {
       "path": ".github/workflows/release.yml",
-      "sha256": "4e01845b31d3e639cbb878ef4a3de1dffce8f57fcf5b18d8d12c03a4486e2b1c",
+      "sha256": "de2c6cb85cb16bba4313e75097fe3959b3b1088c3f5dbe6d7d952bf346ba9aae",
       "role": "exact implementation-version dependency: .github/workflows/release.yml",
       "freshness": {
         "status": "supported",
@@ -260,7 +260,7 @@
     },
     {
       "path": "src/lib.rs",
-      "sha256": "439b325406413cb870a09a1e22d9e033ceb19144613d5e13d098432c72b974e8",
+      "sha256": "07b85a605c639ec6926150c642f038f5291e33fd15395acb2ac3a2db649e826e",
       "role": "exact implementation-version dependency: src/lib.rs",
       "freshness": {
         "status": "supported",
@@ -273,7 +273,7 @@
     },
     {
       "path": "src/binary_ecc/mod.rs",
-      "sha256": "01b56dcb61082d685cbf79c0fabb36f740b3726b7ae9fb3de57944034056ba6f",
+      "sha256": "675e38fc43ba81c829c9991d1f3982bc3b459b7b704b14e0916e1c9bee6096a9",
       "role": "exact implementation-version dependency: src/binary_ecc/mod.rs",
       "freshness": {
         "status": "supported",
@@ -286,7 +286,7 @@
     },
     {
       "path": "src/binary_ecc/f2m.rs",
-      "sha256": "cd25cffcb1d904be8fd8da059f4f0379c1bb60e566592f741e5ca3ee68223548",
+      "sha256": "34cdc7cccfe6b4e543e3ba3f9ea122b0cfa326ba6893c31e9e0683df4b3b8d77",
       "role": "exact implementation-version dependency: src/binary_ecc/f2m.rs",
       "freshness": {
         "status": "supported",
@@ -312,7 +312,7 @@
     },
     {
       "path": "src/binary_ecc/curve.rs",
-      "sha256": "ceb94d849e17ec0ae678463f2d8a0a3f970f6de6713003abf0544395eb1dcd62",
+      "sha256": "936e2061e4c51ee91b7afef8e3ef4fdb2b82fa5b48b988d9001cc958f05310e9",
       "role": "exact implementation-version dependency: src/binary_ecc/curve.rs",
       "freshness": {
         "status": "supported",
@@ -325,7 +325,7 @@
     },
     {
       "path": "src/cryptanalysis/mod.rs",
-      "sha256": "14db814303251fd9351dffee7b131a2ec4e803459c3652c70023976c1694dde5",
+      "sha256": "8aab93278ea95042a50a837f99c908a89b31f35dcb91a2b7166e349140fdbc8b",
       "role": "exact implementation-version dependency: src/cryptanalysis/mod.rs",
       "freshness": {
         "status": "supported",
@@ -377,7 +377,7 @@
     },
     {
       "path": "src/prime_hyperelliptic/mod.rs",
-      "sha256": "b6906f75b4d0eb6b7ac406a0fca1b2cef1786a528d4aedbab414e9fa1e7f7662",
+      "sha256": "c95770e3095f8d10e25a02fa3ad1cfaf9d18d4042221af6022c016768b6e838d",
       "role": "exact implementation-version dependency: src/prime_hyperelliptic/mod.rs",
       "freshness": {
         "status": "supported",
@@ -403,7 +403,7 @@
     },
     {
       "path": "src/prime_hyperelliptic/fp_poly.rs",
-      "sha256": "b5d1a1ba5e95d8d0dd06b71757567fb559adbdd09b1ab623ae76e0049ee593c2",
+      "sha256": "20bba7310673b1591d1f8c2dc1b6bf851e9a310801a803d31bf7a6bb1e189f44",
       "role": "exact implementation-version dependency: src/prime_hyperelliptic/fp_poly.rs",
       "freshness": {
         "status": "supported",
@@ -416,7 +416,7 @@
     },
     {
       "path": "src/utils/mod.rs",
-      "sha256": "82c884f6ef62303d03796e1fbb6b18c16c1d4cf5923ab23ab6fee8655e5d25b8",
+      "sha256": "f2e3414962f6a06fbacacae5b01ba020fa95d6cf05074a256ed70d8522619400",
       "role": "exact implementation-version dependency: src/utils/mod.rs",
       "freshness": {
         "status": "supported",
@@ -443,22 +443,23 @@
     },
     {
       "path": "docs/curves/jacobian-transfers.json",
-      "sha256": "616c2fa7a51bb3402f8f7305ee17cdc71046fda8209d8046184611133bb6a345",
+      "sha256": "eaf635a2a52cc7f595635bd9f967697de074cae38364bf7c032b254ff615aada",
       "role": "legacy formula-screen inventory; not a transfer certificate",
       "freshness": {
         "status": "refuted",
         "scope": "claim that this inventory is current for the 15,791-row registry",
-        "rationale": "It pins an older registry, omits current slugs, and contains modeled routes without exact HC1/CV1 subgroup certificates.",
+        "rationale": "At source_commit it pins an older registry and omits assessment slugs. This historical finding does not describe the refreshed live inventory; modeled routes remain distinct from exact HC1/CV1 subgroup certificates.",
         "evidence_refs": [
           "docs/curves/jacobian-transfers.json",
           "docs/curves/JACOBIAN_TRANSFERS.md"
         ],
         "obligation_id": "refresh_formula_inventory"
-      }
+      },
+      "source_commit": "0c82a7dd1d1e6e3c847b49f8446d29d405beb0c5"
     },
     {
       "path": "docs/curves/JACOBIAN_TRANSFERS.md",
-      "sha256": "47b619f17e9fe913170edb3b8bf8ab2ed806be5d330514d8303e91edc07eeb36",
+      "sha256": "783b799ba36e5543f08b65cc92526336928d20002bdd52de13dd852d4531b0b4",
       "role": "legacy formula-screen documentation pinned for the stale-inventory finding",
       "freshness": {
         "status": "supported",
@@ -484,7 +485,7 @@
     },
     {
       "path": "docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md",
-      "sha256": "11ec473c831fceb2d54f9c9b775b12e0c61202284e0d1864d7db42704196fefa",
+      "sha256": "dd3abdd298ef01d466a7f75623cf53f88705e9a10fb55c3b803fa9030fb4d320",
       "role": "standalone CLI and supported-model documentation",
       "freshness": {
         "status": "supported",
@@ -523,7 +524,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/lean/README.md",
-      "sha256": "d6f79fe6701a95f6fb81a835768aec594097261dfc434efd7ca4bb6774ff9abc",
+      "sha256": "859789a7a0eaf151cbff0c5352d06adbb783e971656d71a66aa30b8773f2dbf0",
       "role": "Lean package execution boundary and non-implication record",
       "freshness": {
         "status": "supported",
@@ -536,7 +537,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/verify_assessment.mjs",
-      "sha256": "46189cb93ee773bca24a6c6cb49a632144bff59a71472383a172e18152e0be32",
+      "sha256": "e09e3d7511d0d18e52941b8f8f1fa18409f4b473e71935e18b95806b66fc372c",
       "role": "independent catalog-wide assessment verifier",
       "freshness": {
         "status": "supported",
@@ -548,8 +549,21 @@
       }
     },
     {
+      "path": "scripts/catalog_snapshot.mjs",
+      "sha256": "3eede268f12e1092dcea14ad90ae6e9d91fba6ebd97173a09d6022f48bbb2fde",
+      "role": "exact dated-catalog input selector; Git failures never fall back to live inputs",
+      "freshness": {
+        "status": "supported",
+        "scope": "byte identity of this assessment artifact at the generated-ledger revision",
+        "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
+        "evidence_refs": [
+          "scripts/catalog_snapshot.mjs"
+        ]
+      }
+    },
+    {
       "path": "research/cover_transfer_assessment_20261013/set_pdf_metadata.py",
-      "sha256": "931ff983a3ee710a23c5d7a1963ddfc878e3b51aa4a88cfedfb71044de80f2e1",
+      "sha256": "13684bca3d83dcc46a1b700de8e75563e7b97c647bd334a65d5a2ebebaf4fddb",
       "role": "PDF coverage-marker metadata normalization source",
       "freshness": {
         "status": "supported",
@@ -562,7 +576,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/README.md",
-      "sha256": "8df51cc443a4eeb5e7c4311f96ce34bfe6349cf9e6f112b41391af48edb14507",
+      "sha256": "cd7f68549bd1c18e92fcfdb484ab203a142137a2c4d83a41f3fc0e056b3e1d29",
       "role": "source-linked catalog-wide assessment report",
       "freshness": {
         "status": "supported",
@@ -601,7 +615,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_correspondence.svg",
-      "sha256": "9b941169f30617d17f2dc389fcaca0cd519d32990abc9a1ecacf8ce8e3716f29",
+      "sha256": "ca786ebdb2af1390590e0c3914726c863fdae8cc5774d3b4b20feb39313114ff",
       "role": "rendered assessment diagram in SVG format",
       "freshness": {
         "status": "supported",
@@ -614,7 +628,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_correspondence.png",
-      "sha256": "336ce89c92a851cb150fd9c80a2c0e51eca46204d1d39f10148bc23c638e65d3",
+      "sha256": "ef9706f9eed85056d3d76477652e8d90e01ac9671e0fc3b6d524b13937208b2a",
       "role": "rendered assessment diagram in PNG format",
       "freshness": {
         "status": "supported",
@@ -640,7 +654,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.svg",
-      "sha256": "110d9596fa1f9c5d2a7ef283f87e1434193a707707e4eee40c5c2b38fa8481d5",
+      "sha256": "3e1a0615b696f604b262d9a47284cf1bb8d3faf93a259ebb0c01242bac67448c",
       "role": "rendered typed transfer-context diagram in SVG format",
       "freshness": {
         "status": "supported",
@@ -653,7 +667,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.png",
-      "sha256": "d534f36f429c1f9dc5404507c5f793d442048824d831f14f75bd1df721c0b54a",
+      "sha256": "8e1b4f6ab3b2310046cfc1719953df4d8f13f8acd0617b544ce64e179ea41aff",
       "role": "rendered typed transfer-context diagram in PNG format",
       "freshness": {
         "status": "supported",
@@ -666,7 +680,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/cover_transfer_assessment_20261013.pdf",
-      "sha256": "841619ee7e0271bd959ddea26c322b7a43f6c4348ca220106bbb71469d3922f9",
+      "sha256": "ab2d8b7a9c002e9ce124e22bc2c04f4b96129f88091b65b3ab0dddb67af3efc1",
       "role": "rendered catalog-wide assessment PDF",
       "freshness": {
         "status": "supported",

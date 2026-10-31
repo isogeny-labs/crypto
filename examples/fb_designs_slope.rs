@@ -1866,10 +1866,30 @@ fn measure(eqs: &[Pol], n: usize, p: u64, sol: &[u64], budget: Duration) -> Valu
         .map(|e| e.to_poly(p))
         .filter(|f| !f.is_empty())
         .collect();
-    let opts = F4Options::new(Ordering::Grevlex, max_degree).with_budget(budget);
+    let mut opts = F4Options::new(Ordering::Grevlex, max_degree).with_budget(budget);
+    // Amendment 15: `run --checkpoint-every` has the child write its F4 state
+    // to `FB_CKPT` and resume from it. The F4 deadline counts the time already
+    // spent, and the time below is the run's total, not this process's.
+    let ckpt = std::env::var_os("FB_CKPT").map(std::path::PathBuf::from);
+    if let Some(path) = &ckpt {
+        let every = std::env::var("FB_CKPT_EVERY_S")
+            .ok()
+            .and_then(|s| s.parse().ok())
+            .unwrap_or(300);
+        opts = opts.checkpointing(path.clone(), Duration::from_secs(every));
+        // Amendment 16: also snapshot a long step's dense reduction
+        if let Some(step_every) = std::env::var("FB_CKPT_STEP_EVERY_S")
+            .ok()
+            .and_then(|s| s.parse::<u64>().ok())
+            .filter(|&s| s > 0)
+        {
+            opts = opts.checkpointing_in_step(Duration::from_secs(step_every));
+        }
+    }
     let started = Instant::now();
     let r = f4_fp::f4(&input, n, p, &opts);
-    let wall = started.elapsed().as_secs_f64();
+    let carried = r.resumed_ms / 1e3;
+    let wall = started.elapsed().as_secs_f64() + carried;
     let planted_ok = !r.inconsistent && r.basis.iter().all(|f| f4_fp::eval(f, sol, p) == 0);
     let status = if r.timed_out {
         "timeout"
@@ -1883,7 +1903,7 @@ fn measure(eqs: &[Pol], n: usize, p: u64, sol: &[u64], budget: Duration) -> Valu
         "planted_violation" => Value::from("the planted solution fails F4's basis"),
         _ => Value::Null,
     };
-    json!({
+    let mut row = json!({
         "input_degrees": d_in,
         "max_degree_bound": max_degree,
         "D": r.solving_degree_max,
@@ -1905,7 +1925,11 @@ fn measure(eqs: &[Pol], n: usize, p: u64, sol: &[u64], budget: Duration) -> Valu
         "planted_ok": planted_ok,
         "status": status,
         "failure_reason": reason,
-    })
+    });
+    if ckpt.is_some() {
+        merge(&mut row, &json!({"ckpt_carried_s": carried}));
+    }
+    row
 }
 
 /// Amendment 6: an A0 system on the sparse tower engine. The Kummer
@@ -2080,6 +2104,13 @@ fn one(
     merge(&mut built, &json!({"phase": "built"}));
     println!("{built}");
     std::io::stdout().flush().ok();
+    let segments = std::env::var("FB_CKPT").ok().map(|c| {
+        assert!(
+            !tower,
+            "checkpointing is for the F4 engine, not the tower engine"
+        );
+        track_segments(&c)
+    });
     let r = if tower {
         assert_eq!(arm, Arm::A0, "the tower engine runs A0 only (Amendment 6)");
         measure_tower(&eqs, n, m, t, prime_of(prime), &sol, budget)
@@ -2087,7 +2118,60 @@ fn one(
         measure(&eqs, n, prime_of(prime), &sol, budget)
     };
     merge(&mut row, &r);
+    if let Some(sg) = segments {
+        merge(&mut row, &json!({"segments": sg}));
+    }
     row
+}
+
+/// The sidecar of a checkpointed system: `{"segments", "peak_rss_kb"}`,
+/// outliving the processes that wrote it (as the checkpoint does).
+fn read_sidecar(ckpt: &str) -> (u64, u64) {
+    std::fs::read_to_string(format!("{ckpt}.peak"))
+        .ok()
+        .and_then(|s| serde_json::from_str::<Value>(&s).ok())
+        .map_or((0, 0), |v| {
+            (
+                v["segments"].as_u64().unwrap_or(0),
+                v["peak_rss_kb"].as_u64().unwrap_or(0),
+            )
+        })
+}
+
+/// Count this process as one more segment of the system and keep sampling
+/// its peak resident set (`VmHWM`) into the sidecar every 10 s, so a segment
+/// the host kills still leaves its peak (up to the last sample). Returns the
+/// segment number.
+fn track_segments(ckpt: &str) -> u64 {
+    let (segments, _) = read_sidecar(ckpt);
+    let segment = segments + 1;
+    let ckpt = ckpt.to_string();
+    let write = move |segment: u64| {
+        let hwm = std::fs::read_to_string("/proc/self/status")
+            .ok()
+            .and_then(|s| {
+                s.lines()
+                    .find(|l| l.starts_with("VmHWM:"))
+                    .and_then(|l| l.split_whitespace().nth(1)?.parse::<u64>().ok())
+            })
+            .unwrap_or(0);
+        let peak = hwm.max(read_sidecar(&ckpt).1);
+        let tmp = format!("{ckpt}.peak.tmp");
+        if std::fs::write(
+            &tmp,
+            json!({"segments": segment, "peak_rss_kb": peak}).to_string(),
+        )
+        .is_ok()
+        {
+            std::fs::rename(&tmp, format!("{ckpt}.peak")).ok();
+        }
+    };
+    write(segment);
+    std::thread::spawn(move || loop {
+        std::thread::sleep(Duration::from_secs(10));
+        write(segment);
+    });
+    segment
 }
 
 /// Two systems are the same when every equation has the same terms.
@@ -2265,6 +2349,11 @@ fn build_system(
 // ── The driver: one child process per system ───────────────────────
 
 fn git_commit() -> String {
+    // A binary run outside a checkout (a remote host) is stamped by the
+    // runner script, which also records the binary's sha256.
+    if let Ok(c) = std::env::var("FB_DESIGNS_COMMIT") {
+        return c;
+    }
     let head = Command::new("git")
         .args(["rev-parse", "HEAD"])
         .output()
@@ -2332,15 +2421,45 @@ struct RunArgs {
     /// Amendment 11: the first target index to run (0 unless a later target
     /// is run on its own, after an earlier one).
     first_target: usize,
+    /// Amendment 15: seconds between F4 checkpoints of a system; 0 is off.
+    ckpt_every: u64,
+    /// Amendment 16: seconds between snapshots inside a step; 0 is off.
+    ckpt_step_every: u64,
 }
 
 /// Run one system in a child under `ulimit -v` and a hard wall limit of
 /// budget + grace; the row, or a failure row with its reason.
 // The child is reaped by `wait4`, which clippy cannot see.
 #[allow(clippy::zombie_processes)]
-fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File) -> Value {
+fn run_child(
+    a: &RunArgs,
+    arm: Arm,
+    m: usize,
+    t: usize,
+    k: usize,
+    ckpt: Option<&str>,
+    log: &mut File,
+) -> Value {
     let exe = std::env::current_exe().expect("current exe");
-    let mut child = Command::new("sh")
+    // A checkpoint left by a host that died: the budget is what remains.
+    let carried = ckpt
+        .and_then(|c| f4_fp::checkpoint_elapsed(std::path::Path::new(c)))
+        .map_or(0, |d| d.as_secs());
+    if let Some(c) = ckpt {
+        let (segments, _) = read_sidecar(c);
+        writeln!(
+            log,
+            "-- checkpoint {c}: {carried} s of the budget already spent, {segments} earlier segment(s)"
+        )
+        .ok();
+    }
+    let mut cmd = Command::new("sh");
+    if let Some(c) = ckpt {
+        cmd.env("FB_CKPT", c)
+            .env("FB_CKPT_EVERY_S", a.ckpt_every.to_string())
+            .env("FB_CKPT_STEP_EVERY_S", a.ckpt_step_every.to_string());
+    }
+    let mut child = cmd
         .arg("-c")
         .arg(format!("ulimit -v {} && exec \"$0\" \"$@\"", a.vmem_kb))
         .arg(&exe)
@@ -2399,13 +2518,27 @@ fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File
         out.read_to_string(&mut s).ok();
         s
     });
+    // The child's stderr goes to the log as it is written, so a segment that
+    // the host kills still leaves its checkpoint lines there.
+    let mut err_log = log.try_clone().expect("clone the log");
     let err_t = std::thread::spawn(move || {
         let mut s = String::new();
-        err.read_to_string(&mut s).ok();
+        let mut buf = [0u8; 4096];
+        loop {
+            match err.read(&mut buf) {
+                Ok(0) | Err(_) => break,
+                Ok(n) => {
+                    let chunk = String::from_utf8_lossy(&buf[..n]);
+                    s.push_str(&chunk);
+                    err_log.write_all(chunk.as_bytes()).ok();
+                    err_log.flush().ok();
+                }
+            }
+        }
         s
     });
     let started = Instant::now();
-    let limit = Duration::from_secs(a.budget + a.grace);
+    let limit = Duration::from_secs((a.budget + a.grace).saturating_sub(carried).max(a.grace));
     let mut killed = false;
     // `wait4` rather than `try_wait`, so the child's own peak resident set
     // (`ru_maxrss`, kB on Linux) comes back with its status. The `sh`
@@ -2426,13 +2559,14 @@ fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File
         }
         std::thread::sleep(Duration::from_millis(200));
     };
-    let peak_rss_kb = ru.ru_maxrss as u64;
+    let mut peak_rss_kb = ru.ru_maxrss as u64;
+    if let Some(c) = ckpt {
+        // earlier segments' peaks are in the sidecar
+        peak_rss_kb = peak_rss_kb.max(read_sidecar(c).1);
+    }
     let wall = started.elapsed().as_secs_f64();
     let stdout = out_t.join().unwrap_or_default();
     let stderr = err_t.join().unwrap_or_default();
-    if !stderr.is_empty() {
-        write!(log, "{stderr}").ok();
-    }
     let rows: Vec<Value> = stdout
         .lines()
         .filter_map(|l| serde_json::from_str(l).ok())
@@ -2486,6 +2620,20 @@ fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File
         &json!({"process_wall_s": wall, "budget_s": a.budget, "ulimit_v_kb": a.vmem_kb,
                 "peak_rss_kb": peak_rss_kb}),
     );
+    if let Some(c) = ckpt {
+        // the system has its row: its checkpoint and sidecar are spent
+        for ext in [
+            "",
+            ".prev",
+            ".tmp",
+            ".rref",
+            ".rref.tmp",
+            ".peak",
+            ".peak.tmp",
+        ] {
+            std::fs::remove_file(format!("{c}{ext}")).ok();
+        }
+    }
     row
 }
 
@@ -2525,7 +2673,8 @@ fn run(a: &RunArgs) {
             for t in a.t_min..=a.t_max {
                 let mut all_ok = true;
                 for k in a.first_target..a.first_target + a.targets {
-                    let mut row = run_child(a, arm, m, t, k, &mut log);
+                    let ckpt = (a.ckpt_every > 0).then(|| format!("{base}.t{t}.k{k}.ckpt"));
+                    let mut row = run_child(a, arm, m, t, k, ckpt.as_deref(), &mut log);
                     merge(&mut row, &json!({"git_commit": commit, "host": host}));
                     let line = format!(
                         "{:4} m={m} t={t:2} target={k} b={:.3} |V|={} n_vars={} n_eqs={} D={} reached={} {:.1} s {}{}",
@@ -3160,6 +3309,13 @@ impl Cell2 {
 fn group_of(file: &str) -> &str {
     if file.starts_with("L2r-") {
         return "L2r";
+    }
+    for g in [
+        "H64-A0", "H64-A11", "K8S-A0", "K8S-A11", "R256-A0", "R256-A11",
+    ] {
+        if file.starts_with(&format!("{g}-")) {
+            return g;
+        }
     }
     match file.get(..3) {
         Some(
@@ -4282,8 +4438,10 @@ fn admit_tower(dir: &str, out: &str, prime: usize) -> bool {
             distinct: c["distinct_targets"] == true,
             tower: true,
             first_target: 0,
+            ckpt_every: 0,
+            ckpt_step_every: 0,
         };
-        let mut row = run_child(&a, Arm::A0, m, t, k, &mut log);
+        let mut row = run_child(&a, Arm::A0, m, t, k, None, &mut log);
         let same = row["status"] == "ok"
             && row["D"] == c["D"]
             && row["inconsistent"] == false
@@ -4398,8 +4556,10 @@ fn replay(dir: &str, out: &str, groups: &[&str], prime: Option<usize>, only_prim
             distinct: c["distinct_targets"] == true,
             tower: c["engine"] == "f4_fp_tower",
             first_target: 0,
+            ckpt_every: 0,
+            ckpt_step_every: 0,
         };
-        let mut row = run_child(&a, arm, m, t, k, &mut log);
+        let mut row = run_child(&a, arm, m, t, k, None, &mut log);
         let fields = ["D", "max_cols", "max_rows", "steps"];
         let same = row["status"] == "ok" && fields.iter().all(|x| row[*x] == c[*x]);
         total += 1;
@@ -5326,6 +5486,537 @@ fn analyze6(dir: &str) {
     );
 }
 
+// A legacy "no OOM lines" sentinel does not prove that dmesg succeeded.
+fn verified_kernel_capture(text: &str) -> bool {
+    text.lines().next() == Some("capture_status ok")
+}
+
+fn kernel_oom_lines(text: &str) -> Vec<&str> {
+    text.lines()
+        .filter(|line| {
+            let line = line.to_ascii_lowercase();
+            [
+                "killed process",
+                "oom-killer",
+                "oom-kill",
+                "out of memory",
+                "memory: usage",
+            ]
+            .iter()
+            .any(|marker| line.contains(marker))
+        })
+        .collect()
+}
+
+#[cfg(test)]
+mod kernel_capture_tests {
+    use super::{kernel_oom_lines, verified_kernel_capture};
+
+    #[test]
+    fn rejects_missing_failed_and_legacy_capture_receipts() {
+        for text in [
+            "",
+            "capture_status failed\n",
+            "no kernel OOM lines for H64-A0\n",
+            "[1.0] booted\n",
+        ] {
+            assert!(!verified_kernel_capture(text));
+        }
+        assert!(verified_kernel_capture("capture_status ok\n[1.0] booted\n"));
+    }
+
+    #[test]
+    fn recognizes_oom_events_without_a_killed_process_line() {
+        for message in [
+            "invoked oom-killer",
+            "Memory cgroup out of memory",
+            "Out of memory",
+            "oom-kill: constraint=CONSTRAINT_MEMCG",
+            "memory: usage 100 limit 100",
+            "Killed process 42",
+        ] {
+            let text = format!("capture_status ok\n{message}\n");
+            assert_eq!(kernel_oom_lines(&text).len(), 1, "{message}");
+        }
+        assert!(kernel_oom_lines("capture_status ok\n[1.0] booted\n").is_empty());
+    }
+}
+
+/// One re-run of the two open m = 4 cells on a larger host: Amendment 12 (H64-A0,
+/// H64-A11 on a 64 GiB EC2 host) and Amendment 13 (K8S-A0, K8S-A11 on the EKS high-memory
+/// runner).
+struct M4Host {
+    amendment: u32,
+    /// Row-group prefixes of the A0 t = 4 and A11 t = 5 cells.
+    a0: &'static str,
+    a11: &'static str,
+    host: &'static str,
+    /// The OOM record beside each cell's rows: `dmesg.txt` (kernel log) or
+    /// `oom.txt` (job cgroup counters, then the kernel log if readable).
+    oom_ext: &'static str,
+    /// The registered prediction for each cell: its text and the binding
+    /// limit it names.
+    a0_prediction: (&'static str, &'static str),
+    a11_prediction: (&'static str, &'static str),
+}
+
+const AMENDMENT12: M4Host = M4Host {
+    amendment: 12,
+    a0: "H64-A0",
+    a11: "H64-A11",
+    host: "a 64 GiB host",
+    oom_ext: "dmesg.txt",
+    a0_prediction: (
+        "A0 does not complete; binding limit time (a timeout at 14400 s)",
+        "time",
+    ),
+    a11_prediction: ("A11 does not complete; binding limit memory", "memory"),
+};
+
+const AMENDMENT13: M4Host = M4Host {
+    amendment: 13,
+    a0: "K8S-A0",
+    a11: "K8S-A11",
+    host: "the EKS high-memory runner",
+    oom_ext: "oom.txt",
+    a0_prediction: ("A0 does not complete; binding limit memory", "memory"),
+    a11_prediction: (
+        "A11 does not complete; binding limit time (a timeout at 14400 s)",
+        "time",
+    ),
+};
+
+const AMENDMENT14: M4Host = M4Host {
+    amendment: 14,
+    a0: "R256-A0",
+    a11: "R256-A11",
+    host: "a 256 GiB EC2 host",
+    oom_ext: "oom.txt",
+    a0_prediction: ("A0 does not complete; binding limit memory", "memory"),
+    a11_prediction: (
+        "A11 does not complete; binding limit time (a timeout at 14400 s)",
+        "time",
+    ),
+};
+
+/// The pre-flight and OOM record beside each cell's rows, the attribution
+/// check, identity with the earlier attempts, R1 and R2, the binding limit of
+/// every incomplete system, and the predictions (Amendment 6's limit rule
+/// without the 14.5 GB cap).
+fn analyze_m4_host(dir: &str, sp: &M4Host) {
+    let rows = read_rows(dir);
+    let group = |g: &'static str| -> Vec<&Value> {
+        rows.iter()
+            .filter(|(f, _)| group_of(f) == g)
+            .map(|(_, r)| r)
+            .collect()
+    };
+    let (c1, c2, l1, l2, e0, e11) = (
+        group("C1"),
+        group("C2"),
+        group("L1"),
+        group("L2"),
+        group(sp.a0),
+        group(sp.a11),
+    );
+    println!(
+        "Factor-base designs, Amendment {} ({}, {} on {}): rows from {dir}",
+        sp.amendment, sp.a0, sp.a11, sp.host
+    );
+    println!("(V = min(cgroup_kB − 524288, MemTotal_kB − 524288). A system's limit is attributable only if its");
+    if sp.oom_ext == "dmesg.txt" {
+        println!(" row is a ulimit -v malloc failure or timeout, kernel capture succeeded, and no OOM event was recorded.");
+    } else {
+        println!(" row is a ulimit -v malloc failure or a timeout and the kernel log beside the rows has no OOM kill.");
+    }
+    println!(
+        " Operation counts are host-independent; wall times and peak_rss_kb are descriptive only.)"
+    );
+
+    let read = |f: &str| std::fs::read_to_string(format!("{dir}/{f}")).ok();
+    let ident = [
+        "cell_seed",
+        "target_seed",
+        "n_vars",
+        "n_eqs",
+        "planted_x",
+        "x_r",
+        "curve",
+        "set",
+    ];
+    let same_as = |rs: &[&Value], prior: &[&Value]| -> usize {
+        rs.iter()
+            .filter(|r| {
+                prior
+                    .iter()
+                    .any(|c| c["target"] == r["target"] && ident.iter().all(|k| c[*k] == r[*k]))
+            })
+            .count()
+    };
+    let done = |rs: &[&Value]| {
+        rs.len() == 2
+            && rs
+                .iter()
+                .all(|r| r["status"] == "ok" && r["field_ops"].is_u64())
+    };
+    let mean_ops = |rs: &[&Value]| {
+        rs.iter()
+            .map(|r| r["field_ops"].as_u64().unwrap_or(0) as f64)
+            .sum::<f64>()
+            / rs.len() as f64
+    };
+
+    // One cell: pre-flight, rows with their binding limit and attribution.
+    // Returns (attributable for every row, binding limits).
+    let cell = |title: &str, name: &str, rs: &[&Value]| -> (bool, Vec<&'static str>) {
+        println!();
+        println!("════ {title}");
+        match read(&format!("{name}.preflight.txt")) {
+            Some(p) => {
+                for l in p.lines() {
+                    println!("  pre-flight: {l}");
+                }
+            }
+            None => println!("  pre-flight: MISSING (runs/{name}.preflight.txt)"),
+        }
+        let ext = sp.oom_ext;
+        let dmesg = read(&format!("{name}.{ext}"));
+        let mut kills: Vec<String> = kernel_oom_lines(dmesg.as_deref().unwrap_or(""))
+            .iter()
+            .map(|line| (*line).to_string())
+            .collect();
+        // The job cgroup's OOM-kill counter, before and after the run.
+        let counter = |key: &str| -> Option<u64> {
+            dmesg
+                .as_deref()?
+                .lines()
+                .find_map(|l| l.strip_prefix(key))
+                .and_then(|v| v.trim().parse().ok())
+        };
+        let cgroup = match (
+            counter("cgroup_oom_kill_before "),
+            counter("cgroup_oom_kill_after "),
+        ) {
+            (Some(b), Some(a)) => Some(a.saturating_sub(b)),
+            _ => None,
+        };
+        // Amendment 12 records a verified dmesg sentinel. Amendment 13 records
+        // the job cgroup counters even when the node kernel log is unreadable.
+        let capture_ok = if ext == "oom.txt" {
+            cgroup.is_some()
+        } else {
+            dmesg.as_deref().is_some_and(verified_kernel_capture)
+        };
+        if let Some(n) = cgroup.filter(|n| *n > 0) {
+            kills.push(format!(
+                "job cgroup memory.events: {n} oom_kill during the run"
+            ));
+        }
+        println!(
+            "  {} (runs/{name}.{ext}): {}",
+            if ext == "oom.txt" {
+                "OOM record"
+            } else {
+                "kernel log"
+            },
+            match &dmesg {
+                None => "MISSING".to_string(),
+                Some(_) => format!(
+                    "{} {}; capture {}",
+                    kills.len(),
+                    if ext == "dmesg.txt" {
+                        "OOM event lines"
+                    } else {
+                        "OOM events"
+                    },
+                    if capture_ok { "verified" } else { "UNVERIFIED" }
+                ),
+            }
+        );
+        if ext == "oom.txt" {
+            println!(
+                "  job cgroup oom_kill during the run: {}",
+                cgroup.map_or("unreadable".to_string(), |n| n.to_string())
+            );
+        }
+        for k in &kills {
+            println!("    {k}");
+        }
+        if rs.is_empty() {
+            println!("  no rows");
+        }
+        let mut all_attr = rs.len() == 2;
+        let mut limits = Vec::new();
+        for r in rs {
+            let why = r["failure_reason"].as_str().unwrap_or("");
+            let v = r["ulimit_v_kb"].as_u64().unwrap_or(0);
+            let ok = r["status"] == "ok";
+            let malloc = why.contains(&format!("memory allocation failed under ulimit -v {v}"));
+            let timeout = r["status"] == "timeout";
+            let attr = capture_ok && kills.is_empty() && (ok || timeout || malloc);
+            all_attr &= attr;
+            let lim = if ok {
+                "none (completed)"
+            } else if malloc {
+                "memory"
+            } else if timeout {
+                "time"
+            } else {
+                "other"
+            };
+            limits.push(lim);
+            println!(
+                "  {} t={} target {}: status {}, D {}, max_cols {}, field_ops {}, time {:.1} s, peak_rss_kb {}, ulimit_v_kb {}, budget {} s{}  →  limit {lim}, {}",
+                r["arm"].as_str().unwrap_or("?"),
+                r["t"],
+                r["target"],
+                r["status"].as_str().unwrap_or("?"),
+                r["D"],
+                r["max_cols"],
+                r["field_ops"],
+                r["time"].as_f64().unwrap_or(f64::NAN),
+                r["peak_rss_kb"],
+                r["ulimit_v_kb"],
+                r["budget_s"],
+                r["failure_reason"].as_str().map(|s| format!(" ({s})")).unwrap_or_default(),
+                if attr { "attributable" } else { "NOT ATTRIBUTABLE" }
+            );
+        }
+        (all_attr, limits)
+    };
+
+    let (a0_attr, a0_lim) = cell(
+        &format!(
+            "{}: A0 m = 4, t = 4, p1, budget 14400 s + grace 600 s",
+            sp.a0
+        ),
+        &format!("{}-m4-t4", sp.a0),
+        &e0,
+    );
+    let a0_c2 = of_arm(&c2, "A0");
+    println!(
+        "  identity: {} of {} {} systems match C2's A0 systems, {} match L1's (cell_seed, target_seed, n_vars, n_eqs, planted_x, x_r, curve, set)",
+        same_as(&e0, &a0_c2),
+        e0.len(),
+        sp.a0,
+        same_as(&e0, &l1)
+    );
+    // Amendment 13 onward: the 64 GiB attempt (Amendment 12) is a prior one too.
+    let (x1, x2) = if sp.amendment >= 13 {
+        (group("H64-A0"), group("H64-A11"))
+    } else {
+        (Vec::new(), Vec::new())
+    };
+    if sp.amendment >= 13 {
+        println!(
+            "  identity: {} of {} {} systems match H64-A0's",
+            same_as(&e0, &x1),
+            e0.len(),
+            sp.a0
+        );
+    }
+    for r in a0_c2.iter().chain(l1.iter()).chain(x1.iter()) {
+        println!(
+            "  prior attempt A0 t=4 target {}: {} at {:.1} s under ulimit -v {}, peak_rss_kb {}",
+            r["target"],
+            r["status"].as_str().unwrap_or("?"),
+            r["time"].as_f64().unwrap_or(f64::NAN),
+            r["ulimit_v_kb"],
+            r["peak_rss_kb"]
+        );
+    }
+    let (a11_attr, a11_lim) = cell(
+        &format!(
+            "{}: A11 m = 4, t = 5, p1, budget 14400 s + grace 600 s",
+            sp.a11
+        ),
+        &format!("{}-m4-t5", sp.a11),
+        &e11,
+    );
+    let l2r: Vec<&Value> = group("L2r");
+    println!(
+        "  identity: {} of {} {} systems match L2's systems, {} match L2r's",
+        same_as(&e11, &l2),
+        e11.len(),
+        sp.a11,
+        same_as(&e11, &l2r)
+    );
+    if sp.amendment >= 13 {
+        println!(
+            "  identity: {} of {} {} systems match H64-A11's",
+            same_as(&e11, &x2),
+            e11.len(),
+            sp.a11
+        );
+    }
+    for r in l2.iter().chain(l2r.iter()).chain(x2.iter()) {
+        println!(
+            "  prior attempt A11 t=5 target {}: {} at {:.1} s under ulimit -v {}, peak_rss_kb {}",
+            r["target"],
+            r["status"].as_str().unwrap_or("?"),
+            r["time"].as_f64().unwrap_or(f64::NAN),
+            r["ulimit_v_kb"],
+            r["peak_rss_kb"]
+        );
+    }
+
+    let f4 = |a: &str| -> Vec<&Value> {
+        c1.iter()
+            .copied()
+            .filter(|r| {
+                r["arm"] == a
+                    && r["m"] == 4
+                    && r["replay_of"]
+                        .as_str()
+                        .is_some_and(|f| f.starts_with("F4-"))
+            })
+            .collect()
+    };
+    let a0: Vec<&Value> = f4("A0").into_iter().chain(e0.iter().copied()).collect();
+    let a11: Vec<&Value> = f4("A11")
+        .into_iter()
+        .chain(of_arm(&c2, "A11"))
+        .chain(e11.iter().copied())
+        .collect();
+    println!();
+    println!("════ σ and κ at m = 4, p1");
+    let (n0, s0, k0) = show4(
+        &format!("A0 m = 4 p1 (F4 via C1, {}'s t = 4 cell)", sp.a0),
+        4,
+        &cells4(a0.into_iter()),
+    );
+    let (n11, s11, k11) = show4(
+        &format!(
+            "A11 m = 4 p1 (F4 via C1, C2's t = 4 cell, {}'s t = 5 cell)",
+            sp.a11
+        ),
+        4,
+        &cells4(a11.into_iter()),
+    );
+    let fmt_k = |k: Option<f64>| k.map_or("-".into(), |x| format!("{x:.3}"));
+    let fmt_s = |s: Option<f64>| s.map_or("-".into(), |x| format!("{x:.4}"));
+    let v_of = |rs: &[&Value]| {
+        rs.first()
+            .and_then(|r| r["ulimit_v_kb"].as_u64())
+            .unwrap_or(0)
+    };
+    let binding = |l: &[&str]| {
+        let mut l: Vec<&str> = l
+            .iter()
+            .copied()
+            .filter(|x| !x.starts_with("none"))
+            .collect();
+        l.dedup();
+        l.join(",")
+    };
+
+    println!();
+    println!("════ R1: does A11's constant factor survive at m = 4, t = 4?");
+    let a11_t4 = of_arm(&c2, "A11");
+    if e0.len() < 2 {
+        println!("  R1: NOT DECIDED ({} has {} of 2 rows)", sp.a0, e0.len());
+    } else if done(&e0) && done(&a11_t4) {
+        let (x, y) = (mean_ops(&a11_t4), mean_ops(&e0));
+        println!(
+            "  A11 t = 4 (C2) mean field_ops {x:.0} (log₂ {:.3}); A0 t = 4 ({}) mean field_ops {y:.0} (log₂ {:.3})",
+            x.log2(),
+            sp.a0,
+            y.log2()
+        );
+        println!(
+            "  R1: {}",
+            if x < y {
+                "SURVIVES (A11 below A0)"
+            } else {
+                "CROSSED (A11 not below A0)"
+            }
+        );
+    } else if a0_attr {
+        println!(
+            "  R1: A0 NOT MEASURABLE AT t = 4 WITHIN {} kB AND 4 h (binding limit: {}); no cost comparison",
+            v_of(&e0),
+            binding(&a0_lim)
+        );
+    } else {
+        println!(
+            "  R1: NOT DECIDED ({}; see {} above)",
+            if sp.oom_ext == "dmesg.txt" {
+                "comparison incomplete or limit attribution unverified"
+            } else {
+                "a limit is not attributable"
+            },
+            sp.a0
+        );
+    }
+    println!(
+        "  A0 m = 4: {n0} completed cells: κ = {} ({}), σ = {} ({})",
+        fmt_k(k0),
+        kappa_verdict(n0, k0, 4),
+        fmt_s(s0),
+        verdict(n0, s0)
+    );
+
+    println!();
+    println!("════ R2: A11 at m = 4, t = 5");
+    if e11.len() < 2 {
+        println!("  R2: NOT DECIDED ({} has {} of 2 rows)", sp.a11, e11.len());
+    } else if done(&e11) {
+        println!(
+            "  {} completed: the {n11}-cell series gives κ = {} ({}), σ = {} ({})",
+            sp.a11,
+            fmt_k(k11),
+            kappa_verdict(n11, k11, 4),
+            fmt_s(s11),
+            verdict(n11, s11)
+        );
+    } else if a11_attr {
+        println!(
+            "  R2: A11 NOT MEASURABLE AT m = 4, t = 5 WITHIN {} kB AND 4 h (binding limit: {}); the {n11}-cell verdicts stand: κ = {} ({}), σ = {} ({})",
+            v_of(&e11),
+            binding(&a11_lim),
+            fmt_k(k11),
+            kappa_verdict(n11, k11, 4),
+            fmt_s(s11),
+            verdict(n11, s11)
+        );
+    } else {
+        println!(
+            "  R2: NOT DECIDED (a limit is not attributable; see {} above)",
+            sp.a11
+        );
+    }
+
+    println!();
+    println!("════ Predictions scorecard (Amendment {})", sp.amendment);
+    let score = |rs: &[&Value], lim: &[&str], attr: bool, want: &str| {
+        if rs.len() < 2 {
+            "not decided"
+        } else if done(rs) {
+            "did not hold (completed)"
+        } else if !attr {
+            "not decided (limit not attributable)"
+        } else if lim.iter().all(|l| *l == want) {
+            "held"
+        } else {
+            "did not hold (did not complete, but the binding limit was not the predicted one)"
+        }
+    };
+    println!(
+        "  {}: {}: limits [{}]  →  {}",
+        sp.a0,
+        sp.a0_prediction.0,
+        a0_lim.join(", "),
+        score(&e0, &a0_lim, a0_attr, sp.a0_prediction.1)
+    );
+    println!(
+        "  {}: {}: limits [{}]  →  {}",
+        sp.a11,
+        sp.a11_prediction.0,
+        a11_lim.join(", "),
+        score(&e11, &a11_lim, a11_attr, sp.a11_prediction.1)
+    );
+}
+
 // ── Arguments ──────────────────────────────────────────────────────
 
 /// Compare two row files system by system, keyed by (arm, m, t, target):
@@ -5511,6 +6202,9 @@ fn main() {
                 distinct: args.iter().any(|a| a == "--distinct-targets"),
                 tower: flag(&args, "--engine").is_some_and(|e| e == "tower"),
                 first_target: flag(&args, "--first-target").map_or(0, |s| s.parse().unwrap()),
+                ckpt_every: flag(&args, "--checkpoint-every").map_or(0, |s| s.parse().unwrap()),
+                ckpt_step_every: flag(&args, "--checkpoint-in-step-every")
+                    .map_or(0, |s| s.parse().unwrap()),
             };
             assert!(a.t_min >= 2, "t starts at 2");
             let two = (prime_of(a.prime) - 1).trailing_zeros() as usize;
@@ -5528,7 +6222,13 @@ fn main() {
         }
         "analyze" => {
             let dir = args.get(1).expect("a runs directory");
-            if args.iter().any(|a| a == "--amendment6") {
+            if args.iter().any(|a| a == "--amendment14") {
+                analyze_m4_host(dir, &AMENDMENT14);
+            } else if args.iter().any(|a| a == "--amendment13") {
+                analyze_m4_host(dir, &AMENDMENT13);
+            } else if args.iter().any(|a| a == "--amendment12") {
+                analyze_m4_host(dir, &AMENDMENT12);
+            } else if args.iter().any(|a| a == "--amendment6") {
                 analyze6(dir);
             } else if args.iter().any(|a| a == "--amendment5") {
                 analyze5(dir);

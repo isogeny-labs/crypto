@@ -1,0 +1,9 @@
+# Software validation bindings and local raw receipts
+
+The structured source/input bindings here are published metadata. The exact raw command archive is **local only**, not admitted or uploaded: `/workspace/fb-excess-validation-20261026/checks.tar.xz`, 73,608 bytes, SHA256 `fb2b6e1f4c4283f82f2ef7e33cddbb3b9774d6003e6c1892a9f7f02afd7b4982`. The user forbids S3 operations and the repository requires archives above64KiB to use its artifact store. No exception, remote URI, artifact manifest or publication success is fabricated.
+
+All65 archive member hashes pass; repacking the extracted tree with deterministic GNU tar/xz yields identical bytes. `LOCAL_CHECKS.json` is a local status receipt, not `.artifacts.json`. `CHECKS_SHA256SUMS` checks the extracted `checks/` tree. From an extraction directory, run `tar -xJf /workspace/fb-excess-validation-20261026/checks.tar.xz`, then `sha256sum -c <checkout>/research/factor_base_excess_20261026/validation/CHECKS_SHA256SUMS`.
+
+The archive retains native unit/build/subprocess/lint outputs, failed full-library attempt and resource-stop record, exact commands, fixture-restoration retries, scope/naming diagnostics, checkpoint refusal and raw whitespace advisories. Raw bytes were not normalized or exempted. Binaries, SDK/target trees, rendered inspection PNGs and the stopped optional global naming inventory remain external. The initial inventory/diff tool output was truncated; no complete original transcript is claimed.
+
+These are software diagnostics, not a research run tree or new solver measurements. No experiment panel ran. Read ../VALIDATION.md for pass/failure scopes. Original external directory: `/workspace/fb-excess-validation-20261026`. Input manifests and command paths retain actual worktree paths. The direct Clippy command was corrected to supply libc and reproduce existing Cargo.toml lint settings; it does not suppress the failed Cargo-wide check.

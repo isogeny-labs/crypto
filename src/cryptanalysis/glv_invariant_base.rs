@@ -1153,12 +1153,38 @@ pub fn poly_roots_fp(f: &[u64], p: u64, seed: u64) -> Vec<u64> {
 
 /// [`poly_roots_fp`] with its `F_p` multiplications added to `muls`.
 pub fn poly_roots_fp_counted(f: &[u64], p: u64, seed: u64, muls: &mut u64) -> Vec<u64> {
+    poly_roots_fp_counted_until(f, p, seed, muls, None)
+        .expect("root extraction without a deadline cannot time out")
+}
+
+/// The same exact rational roots, or `None` when the shared deadline expires.
+/// In particular, an interrupted randomized split is never an empty root set.
+/// Requires a prime modulus. The arithmetic and deterministic split stream are
+/// shared with [`poly_roots_fp_counted`]; counts before cancellation are kept.
+pub fn poly_roots_fp_counted_until(
+    f: &[u64],
+    p: u64,
+    seed: u64,
+    muls: &mut u64,
+    deadline: Option<std::time::Instant>,
+) -> Option<Vec<u64>> {
+    let expired = || deadline.is_some_and(|d| std::time::Instant::now() >= d);
+    if expired() {
+        return None;
+    }
     let f = poly_trim(f.to_vec());
     if f.len() <= 1 {
-        return Vec::new();
+        return Some(Vec::new());
+    }
+    if p == 2 {
+        return Some(
+            (0..2)
+                .filter(|&x| f.iter().rev().fold(0, |v, &c| (v * x + c) % 2) == 0)
+                .collect(),
+        );
     }
     if f.len() == 2 {
-        return vec![negm(mulm(f[0], inv_mod(f[1], p), p), p)];
+        return Some(vec![negm(mulm(f[0], inv_mod(f[1], p), p), p)]);
     }
     // x^p − x mod f
     let xp = poly_powmod(&[0, 1], p, &f, p, muls);
@@ -1172,6 +1198,9 @@ pub fn poly_roots_fp_counted(f: &[u64], p: u64, seed: u64, muls: &mut u64) -> Ve
     let mut out = Vec::new();
     let mut stack = vec![g];
     while let Some(h) = stack.pop() {
+        if expired() {
+            return None;
+        }
         match h.len() {
             0 | 1 => {}
             2 => out.push(negm(mulm(h[0], inv_mod(h[1], p), p), p)),
@@ -1211,7 +1240,11 @@ pub fn poly_roots_fp_counted(f: &[u64], p: u64, seed: u64, muls: &mut u64) -> Ve
     }
     out.sort_unstable();
     out.dedup();
-    out
+    if expired() {
+        None
+    } else {
+        Some(out)
+    }
 }
 
 // ── Degree-2 CM endomorphisms by Vélu (type C) ─────────────────────

@@ -1,12 +1,15 @@
 name: icx engine (multi-arch)
 
 # Builds and tests the `icx` index-calculus engine and its standardized-curve
-# catalog on x86-64, Linux aarch64, and Apple silicon, and runs the binary
-# against every curve in the catalog. This is the completion gate for
-# "run icx against every standardized curve" across architectures.
+# catalog on x86-64 Linux and runs the binary against every curve in the
+# catalog. The Linux aarch64 and Apple-silicon legs were dropped on 2026-10-26:
+# every job runs on ubuntu-latest only (owner decision, runner cost).
 
 on:
-  pull_request:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
     paths:
       - "src/bin/icx.rs"
       - "src/bin/icx/**"
@@ -42,8 +45,8 @@ permissions:
 # A newer push to the same pull request cancels this workflow's run for the older commit.
 # Every other event (push, schedule, dispatch) gets a group of its own and is never cancelled.
 concurrency:
-  group: ${{ github.event_name == 'pull_request' && github.workflow_ref || format('run-{0}', github.run_id) }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ${{ github.event_name == 'push' && github.workflow_ref || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 
 jobs:
   build-and-run:
@@ -54,17 +57,14 @@ jobs:
         include:
           - runner: ubuntu-latest
             arch: linux-x86_64
-          - runner: ubuntu-24.04-arm
-            arch: linux-aarch64
-          - runner: macos-14
-            arch: macos-arm64
-    runs-on: ${{ matrix.runner }}
-    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|icx-engine.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|icx-engine.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: ${{ github.event_name == 'push' && 25 || 30 }}
     steps:
       - uses: actions/checkout@v4
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /.github/scripts/
             /Cargo.toml
             /tools/volcano-cli/
@@ -141,14 +141,11 @@ jobs:
       - name: GPU FES — drive the worker from icx (subprocess offload path)
         run: |
           ./target/release/icx fes --n 18 --m 20 --seed 1 --worker gpu/fes/fes_solve
-      - name: GPU FES kernel — Metal worker compile-check (Apple silicon)
-        if: matrix.arch == 'macos-arm64'
-        run: make -C gpu/fes metal-worker
 
   gpu-fes-cuda:
     name: GPU FES CUDA compile-check
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|icx-engine.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|icx-engine.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
-    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|icx-engine.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|icx-engine.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: ${{ github.event_name == 'push' && 25 || 30 }}
     env:
       CUDA_PKG_VERSION: 12-8
       CUDA_DIR_VERSION: "12.8"
@@ -161,7 +158,8 @@ jobs:
       - name: Install nvcc (compiler + CUDA headers only)
         run: |
           distro="ubuntu$(lsb_release -rs | tr -d .)"
-          curl -fsSL -o /tmp/cuda-keyring.deb \
+          curl -fsSL --retry 3 --retry-all-errors --connect-timeout 15 --max-time 90 \
+            -o /tmp/cuda-keyring.deb \
             "https://developer.download.nvidia.com/compute/cuda/repos/$distro/x86_64/cuda-keyring_1.1-1_all.deb"
           sudo dpkg -i /tmp/cuda-keyring.deb
           sudo apt-get update -qq

@@ -1,0 +1,66 @@
+{
+  "schema": "crypto.ml-dataset.software-validation/v1",
+  "recorded_utc": "2026-10-28T17:03:45.705122+00:00",
+  "source_commit": "23b3c0e527d621aebf6532db61744fab77867f48",
+  "scope": "Completed software validation of23b3 implementation; later documentation/evidence commits preserve src/Cargo/build.rs bytes",
+  "focused_dataset_tests": {
+    "source_commit": "1bee3b9f73497c0ef9ca3fe24fa5720feaa4f20c",
+    "passed": 105,
+    "failed": 0,
+    "ignored": 1,
+    "difference_to_reviewed_source": "Formatting only in Store::open_with_backend"
+  },
+  "strict_clippy": "passed Rust1.98",
+  "changed_file_rustfmt": "passed",
+  "release_build": "passed",
+  "cli_checks": {
+    "passed": 19,
+    "failed": 0
+  },
+  "operator_dry_admission": {
+    "cases": 7,
+    "expected_decisions_matched": 7,
+    "real_ledger_or_grant_created": false
+  },
+  "container_preflight": "passed UID1000 network none read-only root; no cloud permission verification",
+  "binary_sha256": "45033ec8a975ab14818e989ffe29842e8558dd556f9dfde5229e12a423faa179",
+  "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:47931cf8d0703fc292dec97efedc23c6305a86901d463cae8a17bb3668060805",
+  "image_pushed_and_described": true,
+  "full_library_status": "passed",
+  "archive_readback": {
+    "receipt": "remote-readback-final.json",
+    "sha256": "5c80f16330a7fb32ae2fc4f636bbb6c8c408acb45b628ef6cf934f6794708cbb",
+    "artifact_references": 40,
+    "bytes": 42909776,
+    "fresh_s3_get_hash_verified": true,
+    "verification_timing": "37 objects in immutable initial receipt plus3 final test/readback objects"
+  },
+  "verified_cloud_dataset_cells": 0,
+  "scientific_or_performance_evidence": false,
+  "open_issues": [
+    "canonical parsed-plan digest not yet exposed by preflight; additive correction awaits active T755 scope",
+    "worker IAM proposal unapplied pending human answer",
+    "actual-UID grant startup gate and finite resource-lifetime launch adapter missing",
+    "prior campaign obligations and actual resource admission not reconciled"
+  ],
+  "library": {
+    "passed": 5105,
+    "failed": 0,
+    "ignored": 123,
+    "process_exit_code_observed": 0,
+    "dataset_tests_passed": 105,
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "--lib",
+      "--locked",
+      "--",
+      "--test-threads=2"
+    ],
+    "test_duration_seconds_diagnostic": 823.13,
+    "receipt": "full-library-tests-23b3c0e-retry.receipt.json",
+    "source_readback": "all retained source hashes matched; subsequent commits have no src/Cargo/build.rs changes"
+  },
+  "coordination_request": "https://github.com/isogeny-labs/crypto/pull/2790#issuecomment-6475281809"
+}

@@ -1,0 +1,13 @@
+digraph control_timeline {
+  graph [rankdir=LR, fontname="Helvetica", label="N83 D18 attempt 5: constructed control and terminal gate", labelloc=t];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fillcolor="#e8f2ff"];
+  input [label="Fresh D18 S3 GET\n160,747,529 bytes\nfull-object checksums", fillcolor="#e4f4e8"];
+  gate [label="Host gate passes\nload 21.65 <= 24\nswapouts unchanged", fillcolor="#e4f4e8"];
+  imported [label="Checked import\n85.564 s"];
+  model [label="Construct formula\n0.153 s\n329,808 variables"];
+  search [label="Constructed SAT\n0.352 s; 1 conflict", fillcolor="#e4f4e8"];
+  replay [label="Separate native group, row\nand model replay PASS", fillcolor="#e4f4e8"];
+  wrapper [label="time -l exits 1\nkern.clockrate denied", fillcolor="#ffe8de"];
+  held [label="Natural arm held\ncold total unset", fillcolor="#eeeeee"];
+  input -> gate -> imported -> model -> search -> replay -> wrapper -> held;
+}

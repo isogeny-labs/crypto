@@ -1,0 +1,76 @@
+import Mathlib.RingTheory.MvPolynomial.WeightedHomogeneous
+
+/-!
+# Weighted projective genus-2 equation
+
+This is the exact degree-six equation proposed for the weighted `Proj` target.
+It establishes homogeneity of the equation and its principal ideal. The
+graded quotient, `Proj` chart isomorphisms, cover, and gluing comparison are
+separate proof obligations.
+-/
+
+set_option autoImplicit false
+noncomputable section
+
+namespace Common22WeightedProjHead
+
+open MvPolynomial
+
+attribute [local instance] MvPolynomial.weightedGradedAlgebra
+
+variable {K : Type*} [Field K]
+
+abbrev Poly (K : Type*) [CommRing K] := MvPolynomial (Fin 3) K
+
+def weights : Fin 3 → ℕ
+  | 0 => 1
+  | 1 => 3
+  | 2 => 1
+
+def equation (a3 a2 a1 a0 : K) : Poly K :=
+  X 1 ^ 2 - (X 0 ^ 5 * X 2 + C a3 * (X 0 ^ 3 * X 2 ^ 3) +
+    C a2 * (X 0 ^ 2 * X 2 ^ 4) + C a1 * (X 0 * X 2 ^ 5) + C a0 * X 2 ^ 6)
+
+theorem equation_weighted_homogeneous (a3 a2 a1 a0 : K) :
+    IsWeightedHomogeneous weights (equation a3 a2 a1 a0) 6 := by
+  have hX : IsWeightedHomogeneous weights (X (0 : Fin 3) : Poly K) 1 := by
+    simpa [weights] using (isWeightedHomogeneous_X (R := K) weights (0 : Fin 3))
+  have hY : IsWeightedHomogeneous weights (X (1 : Fin 3) : Poly K) 3 := by
+    simpa [weights] using (isWeightedHomogeneous_X (R := K) weights (1 : Fin 3))
+  have hZ : IsWeightedHomogeneous weights (X (2 : Fin 3) : Poly K) 1 := by
+    simpa [weights] using (isWeightedHomogeneous_X (R := K) weights (2 : Fin 3))
+  have hY2 : IsWeightedHomogeneous weights (X (1 : Fin 3) ^ 2 : Poly K) 6 := by
+    simpa using hY.pow 2
+  have hX5Z : IsWeightedHomogeneous weights
+      (X (0 : Fin 3) ^ 5 * X (2 : Fin 3) : Poly K) 6 := by
+    simpa using (hX.pow 5).mul hZ
+  have hX3Z3 : IsWeightedHomogeneous weights
+      (X (0 : Fin 3) ^ 3 * X (2 : Fin 3) ^ 3 : Poly K) 6 := by
+    simpa using (hX.pow 3).mul (hZ.pow 3)
+  have hX2Z4 : IsWeightedHomogeneous weights
+      (X (0 : Fin 3) ^ 2 * X (2 : Fin 3) ^ 4 : Poly K) 6 := by
+    simpa using (hX.pow 2).mul (hZ.pow 4)
+  have hXZ5 : IsWeightedHomogeneous weights
+      (X (0 : Fin 3) * X (2 : Fin 3) ^ 5 : Poly K) 6 := by
+    simpa using hX.mul (hZ.pow 5)
+  have hZ6 : IsWeightedHomogeneous weights (X (2 : Fin 3) ^ 6 : Poly K) 6 := by
+    simpa using hZ.pow 6
+  exact hY2.sub (((hX5Z.add (hX3Z3.C_mul a3)).add
+    (hX2Z4.C_mul a2)).add (hXZ5.C_mul a1) |>.add (hZ6.C_mul a0))
+
+def relationIdeal (a3 a2 a1 a0 : K) : Ideal (Poly K) :=
+  Ideal.span {equation a3 a2 a1 a0}
+
+theorem relationIdeal_homogeneous (a3 a2 a1 a0 : K) :
+    (relationIdeal a3 a2 a1 a0).IsHomogeneous
+      (weightedHomogeneousSubmodule K weights) := by
+  apply Ideal.homogeneous_span
+  intro x hx
+  have heq : x = equation a3 a2 a1 a0 := by simpa using hx
+  subst x
+  exact ⟨6, equation_weighted_homogeneous a3 a2 a1 a0⟩
+
+#print axioms equation_weighted_homogeneous
+#print axioms relationIdeal_homogeneous
+
+end Common22WeightedProjHead

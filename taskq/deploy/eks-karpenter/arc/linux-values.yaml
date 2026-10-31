@@ -1,8 +1,8 @@
-githubConfigUrl: https://github.com/aburan28/crypto
+githubConfigUrl: https://github.com/isogeny-labs/crypto
 githubConfigSecret: arc-github-auth
 runnerScaleSetName: crypto-eks-linux
 minRunners: 0
-maxRunners: 11
+maxRunners: 7
 containerMode:
   type: dind
 controllerServiceAccount:
@@ -36,7 +36,8 @@ template:
         command: ["/home/runner/run.sh"]
         resources:
           requests:
-            cpu: "4"
+            # Two runner/Docker pairs fit an 8-vCPU R node after reservations.
+            cpu: 2800m
             memory: 24Gi
             ephemeral-storage: 10Gi
           limits:

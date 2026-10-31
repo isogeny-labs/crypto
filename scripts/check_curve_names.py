@@ -51,6 +51,8 @@ SELF = {"docs/curves/ICV1.md", "docs/curves/README.md", "scripts/check_curve_nam
         "scripts/build_curve_registry.py", "scripts/curve_id.py",
         "src/cryptanalysis/curve_id.rs", "src/cryptanalysis/curve_aliases.json", "tests/curve_id.rs",
         "examples/curve_id_generated.rs",
+        # ecdb flags registry aliases that are retired forms (is_retired_name).
+        "ecdb/src/math.rs",
         # Generated alias tables: their "also called" column lists the
         # legacy spellings on purpose.
         "docs/ic-leaderboard.html", "docs/ic/LEADERBOARD.md"}
@@ -78,7 +80,56 @@ ARCHIVED_LABELS = {
             "K_1 / 2^17": "icv1-f2m17-tm101-00378d4e",
         },
     },
+    "research/ideas_execution_20261018/oracle_integration/PROTOCOL.md": {
+        "sha256": "799dfb71a8aa125c699415c52a31076923d9d2a2ae752af06e014b0ebcdc7530",
+        "labels": {
+            "K_0/GF(2^7)": "icv1-f2m7-t13-616700dd",
+        },
+    },
+    # Two unregistered curve IDs are retained in this frozen Certicom
+    # experiment and its generated mirrors. Permit only these exact bytes;
+    # new prose or regenerated artifacts must resolve through the registry.
+    "docs/ic/CERTICOM131_IC_PROGRAM.md": {
+        "sha256": "d71d901ba22434af1319fd2444a737a0a203a1077d0de571186d16f98343767f",
+        "labels": {},
+        "slugs": {
+            "icv1-fp30-t49927-d70f5de2",
+            "icv1-fp131-t29529377007934231835-9681b699",
+        },
+    },
+    # The scoreboard page is no longer listed: it changes with every dashboard
+    # update, so a byte pin on it went stale, and its one unregistered slug
+    # (the fp30 curve) is now in the registry and resolves there.
+    "research/certicom131_ic_program_20261020/README.md": {
+        "sha256": "ea6d90006f2bf0d208609c19de030eec1e653bed54288ffbb9efce9b9264c02c",
+        "labels": {},
+        "slugs": {
+            "icv1-fp30-t49927-d70f5de2",
+            "icv1-fp131-t29529377007934231835-9681b699",
+        },
+    },
+    "research/certicom131_ic_program_20261020/pkm_ext/tables/p30.table.md": {
+        "sha256": "70872ddbc43345886c198e7c6f495850057ea1007ad2e90483e07512b8b33e8a",
+        "labels": {},
+        "slugs": {"icv1-fp30-t49927-d70f5de2"},
+    },
 }
+
+# This first subfield-FP3 session predates registry registration. Its result
+# table is kept as frozen evidence; only this exact rendering may retain its
+# unregistered ICV1 slugs. A changed file is linted normally.
+ARCHIVED_UNREGISTERED_SLUGS = {
+    "research/ext_endo_rho_20261023/sessions/subfield-fp3.table.md":
+        "c7275bc7b32a9ea2facb598b0235c7cc7e0ff158a7836378511dffd3a08474d7",
+    # The original GLS run is retained under the frozen item-1 protocol.
+    "research/ext_endo_rho_20261023/sessions/gls-fp2.table.md":
+        "ed5cd55f79930f71095f1f0661d0236ec00bc6e85e1c6093a447db75619362b7",
+}
+
+
+def archived_unregistered_slug_file(rel: str, text: str) -> bool:
+    expected = ARCHIVED_UNREGISTERED_SLUGS.get(rel)
+    return expected is not None and hashlib.sha256(text.encode()).hexdigest() == expected
 
 
 def archived_label(rel: str, text: str, found: str, replacement: str | None) -> bool:
@@ -265,8 +316,11 @@ def lint(res: Resolver, pins: dict[str, set[str]], fix: bool) -> list[str]:
             line = text.count("\n", 0, a) + 1
             hint = f" (write {repl})" if repl else " (not in the registry)"
             problems.append(f"{rel}:{line}: retired curve name {found!r}{hint}")
+        allow_archived_slugs = archived_unregistered_slug_file(rel, text)
         for m in SLUG.finditer(text):
-            if m.group(0) not in res.slugs and not archived_slug(rel, text, m.group(0)):
+            if (m.group(0) not in res.slugs
+                    and not archived_slug(rel, text, m.group(0))
+                    and not allow_archived_slugs):
                 line = text.count("\n", 0, m.start()) + 1
                 problems.append(f"{rel}:{line}: {m.group(0)} is not in docs/curves/registry.json")
     if fix:

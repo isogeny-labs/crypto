@@ -53,6 +53,7 @@ on:
         type: boolean
         default: false
   pull_request:
+    branches: [main]
     types: [labeled]
 
 # One queue per repository. A new sweep waits for the running one; GitHub
@@ -84,7 +85,7 @@ jobs:
     if: >-
       vars.AUTOFIX_PAUSED != 'true' &&
       (github.event_name != 'pull_request' || github.event.label.name == 'autofix')
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|autofix-queue.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|autofix-queue.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|autofix-queue.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|autofix-queue.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 15
     permissions:
       contents: read
@@ -102,6 +103,14 @@ jobs:
           filter: blob:none
           sparse-checkout: .github/scripts
           persist-credentials: true # triage fetches PR refs for `git merge-tree`
+
+      - name: Install GitHub CLI when absent from the runner
+        run: |
+          if ! command -v gh >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends gh
+          fi
+          gh --version
 
       - name: Ensure labels exist
         env:
@@ -140,7 +149,7 @@ jobs:
     needs: triage
     if: needs.triage.outputs.count != '' && needs.triage.outputs.count != '0'
     name: "#${{ matrix.pr.number }} (${{ matrix.pr.tier }})"
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|autofix-queue.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|autofix-queue.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|autofix-queue.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|autofix-queue.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 75
     strategy:
       max-parallel: 1
@@ -162,6 +171,14 @@ jobs:
       FAILING: ${{ toJSON(matrix.pr.failing) }}
       HAS_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
     steps:
+      - name: Install GitHub CLI when absent from the runner
+        run: |
+          if ! command -v gh >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends gh
+          fi
+          gh --version
+
       - name: Require ANTHROPIC_API_KEY
         if: env.HAS_KEY != 'true'
         run: |

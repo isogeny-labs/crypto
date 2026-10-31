@@ -1,0 +1,76 @@
+{
+  "files": [
+    {
+      "bits": 16,
+      "failed_candidate_rows": 0,
+      "failure_codes": [],
+      "p": 739,
+      "path": "research/pencil_sparse_20261022/results/p739-peel.jsonl",
+      "replay": "research/pencil_sparse_20261022/results/replay/p739-peel.jsonl",
+      "replay_equivalence": "nonwall_equal",
+      "replay_rows": 60,
+      "solver_mode": "peel",
+      "targets": 60,
+      "verified_candidate_rows": 60
+    },
+    {
+      "bits": 16,
+      "failed_candidate_rows": 0,
+      "failure_codes": [],
+      "p": 739,
+      "path": "research/pencil_markowitz_20261022/results/p739-markowitz.jsonl",
+      "replay": "research/pencil_markowitz_20261022/results/replay/p739-markowitz.jsonl",
+      "replay_equivalence": "nonwall_equal",
+      "replay_rows": 60,
+      "solver_mode": "markowitz",
+      "targets": 60,
+      "verified_candidate_rows": 60
+    },
+    {
+      "bits": 32,
+      "failed_candidate_rows": 1,
+      "failure_codes": [
+        "sparse_matrix_cap"
+      ],
+      "p": 186379,
+      "path": "research/pencil_markowitz_20261022/results/p186379-markowitz-t0.jsonl",
+      "replay": "research/pencil_markowitz_20261022/results/replay/p186379-markowitz-t0.jsonl",
+      "replay_equivalence": "nonwall_equal",
+      "replay_rows": 1,
+      "solver_mode": "markowitz",
+      "targets": 1,
+      "verified_candidate_rows": 0
+    }
+  ],
+  "headline": [
+    {
+      "claimed": 1.204855074770064,
+      "name": "p739-markowitz-vs-peel.json/candidate_over_baseline",
+      "recomputed": 1.204855074770064,
+      "rel_tol": 1e-10
+    },
+    {
+      "claimed": 13.99482210594926,
+      "name": "p739-markowitz-vs-peel.json/candidate_over_rho",
+      "recomputed": 13.99482210594926,
+      "rel_tol": 1e-10
+    }
+  ],
+  "independent": true,
+  "method": "independent native source multiplication, raw/replay equality after wall removal and pre-peel online zero/default metadata normalization, all-cell arithmetic recomputation",
+  "missing_replays": [],
+  "paired_comparison_cells_checked": 36,
+  "price_cells_below_rho": 0,
+  "price_cells_checked": 4320,
+  "raw_data": [
+    "../pencil_sparse_20261022/results/p739-peel.jsonl",
+    "results/p739-markowitz.jsonl",
+    "results/p186379-markowitz-t0.jsonl"
+  ],
+  "replay_rows_checked": 124,
+  "schema": "pencil-sparse-validation/v1",
+  "source_scalars_checked": 241,
+  "status": "pass",
+  "total_cells": 4356,
+  "unpriced_cells": 36
+}

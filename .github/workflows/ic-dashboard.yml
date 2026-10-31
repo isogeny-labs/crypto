@@ -1,17 +1,14 @@
 name: IC dashboard presentation
 
 on:
-  pull_request:
-    paths:
-      - 'docs/index-calculus-scoreboard.html'
-      - 'docs/ic/dashboard-overview*'
-      - 'tools/*ic_dashboard*.mjs'
-      - '.github/workflows/ic-dashboard.yml'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:
       - 'docs/index-calculus-scoreboard.html'
       - 'docs/ic/dashboard-overview*'
+      - 'docs/ic/three-leads-e2e-panel.html'
       - 'tools/*ic_dashboard*.mjs'
       - '.github/workflows/ic-dashboard.yml'
   workflow_dispatch:
@@ -29,7 +26,7 @@ jobs:
   overview:
     # Not routed to crypto-eks: the browser check needs Chrome and its system
     # libraries, and that runner image has no browser and no apt-get install.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4

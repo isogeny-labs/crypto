@@ -1,0 +1,10 @@
+Replay after the wide-vars type fix to examples/dreg_invariant.rs (2026-10-29).
+
+The scored runs used the dreg_invariant binary in runs/binary.sha256. The
+review fix changed only the monomial-mask types (u64 -> the library's Mask,
+equal to u64 in the default build), which changes the binary hash. The
+rebuilt binary, SHA-256
+30ccb4627ac20e494f5271deaa53c958a511f2754724cd4e06317d144de97725
+replayed all 22 dense degree-3 Q and R runs (8 + 8 unsatisfiable, 6
+satisfiable) with the same flags as run.sh. Every output equals its committed
+record on every field except "secs" (22 of 22).

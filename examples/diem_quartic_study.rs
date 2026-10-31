@@ -51,15 +51,89 @@ fn path(name: &str) -> String {
     format!("{}/{}", DIR, name)
 }
 
-fn read_jsonl(name: &str) -> Vec<Value> {
-    match fs::read_to_string(path(name)) {
-        Ok(s) => s
-            .lines()
-            .filter(|l| !l.trim().is_empty())
-            .filter_map(|l| serde_json::from_str(l).ok())
-            .collect(),
-        Err(_) => vec![],
+fn parse_jsonl(name: &str, bytes: &[u8]) -> Vec<Value> {
+    assert!(!bytes.is_empty(), "{name}: empty JSONL file");
+    assert!(
+        bytes.ends_with(b"\n"),
+        "{name}: incomplete final JSONL line"
+    );
+    let s = std::str::from_utf8(bytes).unwrap_or_else(|e| panic!("{name}: invalid UTF-8: {e}"));
+    s.lines()
+        .enumerate()
+        .map(|(n, line)| {
+            assert!(!line.trim().is_empty(), "{name}: blank line {}", n + 1);
+            serde_json::from_str(line)
+                .unwrap_or_else(|e| panic!("{name}: invalid JSON on line {}: {e}", n + 1))
+        })
+        .collect()
+}
+
+// Cell and calibration files may not exist before their first append. Any
+// other read error, or a corrupt existing line, must stop a run or fit.
+fn read_optional_jsonl(name: &str) -> Vec<Value> {
+    match fs::read(path(name)) {
+        Ok(bytes) => parse_jsonl(name, &bytes),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => vec![],
+        Err(e) => panic!("{}: {e}", path(name)),
     }
+}
+
+fn read_optional_jsonl_locked(lock: &Mutex<()>, name: &str) -> Vec<Value> {
+    let _guard = lock.lock().unwrap();
+    read_optional_jsonl(name)
+}
+
+fn validate_frozen_bytes(
+    bytes: &[u8],
+    manifest: &[u8],
+    grid: &[(u32, u32)],
+) -> HashMap<(u32, u32), Value> {
+    let expected = format!("{}  instances.jsonl\n", checkpoint::digest(bytes));
+    assert_eq!(
+        manifest,
+        expected.as_bytes(),
+        "frozen instance SHA manifest differs"
+    );
+    let rows = parse_jsonl("instances.jsonl", bytes);
+    assert_eq!(rows.len(), grid.len(), "frozen instance grid is incomplete");
+    let mut by_key = HashMap::with_capacity(grid.len());
+    for (row, &(k, idx)) in rows.into_iter().zip(grid) {
+        assert_eq!(row["k"].as_u64(), Some(k as u64), "frozen k/order differs");
+        assert_eq!(
+            row["idx"].as_u64(),
+            Some(idx as u64),
+            "frozen idx/order differs"
+        );
+        assert!(
+            by_key.insert((k, idx), row).is_none(),
+            "duplicate frozen key"
+        );
+    }
+    by_key
+}
+
+fn validate_frozen_files(
+    instances: std::io::Result<Vec<u8>>,
+    manifest: std::io::Result<Vec<u8>>,
+    grid: &[(u32, u32)],
+) -> HashMap<(u32, u32), Value> {
+    let bytes = instances.expect("complete frozen instances.jsonl required before cells or fit");
+    let manifest = manifest.expect("FROZEN.sha256 required before cells or fit");
+    validate_frozen_bytes(&bytes, &manifest, grid)
+}
+
+fn frozen_instances() -> HashMap<(u32, u32), Value> {
+    let mut grid = Vec::new();
+    for k in KMIN..=KMAX {
+        for idx in 0..n_inst(k) {
+            grid.push((k, idx));
+        }
+    }
+    validate_frozen_files(
+        fs::read(path("instances.jsonl")),
+        fs::read(path("FROZEN.sha256")),
+        &grid,
+    )
 }
 
 fn append(lock: &Mutex<()>, name: &str, line: &str) {
@@ -252,41 +326,65 @@ fn predict(points: &[(u32, f64)], k_new: u32) -> Option<f64> {
 struct Shared {
     lock: Mutex<()>,
     kmax: u32,
+    instances: HashMap<(u32, u32), Value>,
 }
 
 fn run_instance(sh: &Shared, k: u32, i: u32, only_rho: bool, only_ic: bool) {
-    let inst_rec = read_jsonl("instances.jsonl")
-        .into_iter()
-        .find(|r| fval(r, "k") as u32 == k && fval(r, "idx") as u32 == i);
+    let inst_rec = sh
+        .instances
+        .get(&(k, i))
+        .expect("selected cell has no frozen instance row");
     let inst = gen_instance(k, i);
-    if let Some(r) = &inst_rec {
+    let expected = serde_json::json!({
+        "k": k,
+        "idx": i,
+        "q": inst.q,
+        "ka": inst.kf.a,
+        "kb": inst.kf.b,
+        "ub": inst.ub,
+        "uc": inst.uc,
+        "quartic": inst.quartic,
+        "order": inst.order,
+        "h": inst.h,
+        "ell": inst.ell,
+        "candidates": inst.candidates,
+        "rejects": inst.rejects,
+    });
+    for (key, value) in expected.as_object().unwrap() {
         assert_eq!(
-            r["ell"].as_u64().unwrap(),
-            inst.ell,
-            "regenerated instance differs from the frozen list"
+            inst_rec.get(key.as_str()),
+            Some(value),
+            "regenerated {key} differs from frozen instance ({k},{i})"
         );
     }
-    let done_rho: HashSet<(u32, u32, u32)> = read_jsonl("rho_cells.jsonl")
-        .iter()
-        .map(|r| {
-            (
-                fval(r, "k") as u32,
-                fval(r, "idx") as u32,
-                fval(r, "run") as u32,
-            )
-        })
-        .collect();
-    let done_ic: HashSet<(u32, u32, String, u32)> = read_jsonl("ic_cells.jsonl")
-        .iter()
-        .map(|r| {
-            (
-                fval(r, "k") as u32,
-                fval(r, "idx") as u32,
-                sval(r, "arm").to_string(),
-                fval(r, "kappa") as u32,
-            )
-        })
-        .collect();
+    assert_eq!(
+        inst_rec["trace"].to_string(),
+        inst.trace.to_string(),
+        "regenerated trace differs from frozen instance ({k},{i})"
+    );
+    let done_rho: HashSet<(u32, u32, u32)> =
+        read_optional_jsonl_locked(&sh.lock, "rho_cells.jsonl")
+            .iter()
+            .map(|r| {
+                (
+                    fval(r, "k") as u32,
+                    fval(r, "idx") as u32,
+                    fval(r, "run") as u32,
+                )
+            })
+            .collect();
+    let done_ic: HashSet<(u32, u32, String, u32)> =
+        read_optional_jsonl_locked(&sh.lock, "ic_cells.jsonl")
+            .iter()
+            .map(|r| {
+                (
+                    fval(r, "k") as u32,
+                    fval(r, "idx") as u32,
+                    sval(r, "arm").to_string(),
+                    fval(r, "kappa") as u32,
+                )
+            })
+            .collect();
     // inversion price (once per instance, recorded)
     let rinv = measure_rho_inv(inst.q, 1_000_000);
     append(
@@ -303,7 +401,7 @@ fn run_instance(sh: &Shared, k: u32, i: u32, only_rho: bool, only_ic: bool) {
             if done_rho.contains(&(k, i, run)) {
                 continue;
             }
-            let rows = read_jsonl("rho_cells.jsonl");
+            let rows = read_optional_jsonl_locked(&sh.lock, "rho_cells.jsonl");
             let pts: Vec<(u32, f64)> = rows
                 .iter()
                 .filter(|r| fval(r, "ok") == 1.0)
@@ -334,7 +432,7 @@ fn run_instance(sh: &Shared, k: u32, i: u32, only_rho: bool, only_ic: bool) {
             if done_ic.contains(&(k, i, arm.name().to_string(), kappa as u32)) {
                 continue;
             }
-            let rows = read_jsonl("ic_cells.jsonl");
+            let rows = read_optional_jsonl_locked(&sh.lock, "ic_cells.jsonl");
             let same: Vec<&Value> = rows
                 .iter()
                 .filter(|r| {
@@ -433,6 +531,8 @@ fn cmd_cells(args: &[String]) {
         }
         j += 1;
     }
+    // The protocol requires the complete published list before any cost cell.
+    let instances = frozen_instances();
     let mut tasks: Vec<(u32, u32)> = vec![];
     for k in kmin..=kmax {
         for i in 0..n_inst(k) {
@@ -444,6 +544,7 @@ fn cmd_cells(args: &[String]) {
     let sh = Arc::new(Shared {
         lock: Mutex::new(()),
         kmax,
+        instances,
     });
     let mut hs = vec![];
     for _ in 0..workers {
@@ -572,7 +673,8 @@ fn fit_series(s: &Series, seed: u64) -> Option<FitOut> {
 }
 
 fn cmd_fit() {
-    let calib = read_jsonl("calib.jsonl");
+    let _instances = frozen_instances();
+    let calib = read_optional_jsonl("calib.jsonl");
     let mut rinv_k: HashMap<u32, Vec<f64>> = HashMap::new();
     for c in &calib {
         rinv_k
@@ -584,8 +686,8 @@ fn cmd_fit() {
         let mut v = rinv_k.get(&k).cloned().unwrap_or(vec![]);
         quantile(&mut v, 0.5)
     };
-    let rho = read_jsonl("rho_cells.jsonl");
-    let ic = read_jsonl("ic_cells.jsonl");
+    let rho = read_optional_jsonl("rho_cells.jsonl");
+    let ic = read_optional_jsonl("ic_cells.jsonl");
     let wells = [("w9", 9.0f64), ("w1", 1.0f64)];
     let mut series: HashMap<String, Series> = HashMap::new();
     let mut unpriced_rho: HashMap<u32, Vec<f64>> = HashMap::new(); // per k, per run
@@ -689,7 +791,7 @@ fn cmd_fit() {
     for (si, n) in names.iter().enumerate() {
         if let Some(f) = fit_series(&series[n], 0xF17 + si as u64) {
             fj.push(format!(
-                "\"{}\":{{\"intercept\":{},\"slope\":{},\"se\":{},\"ci_lo\":{},\"ci_hi\":{},\"n_k\":{},\"ks\":{}}}",
+                "\"{}\":{{\"intercept\":{},\"slope\":{},\"se\":{},\"ci_lo\":{},\"ci_hi\":{},\"n_k\":{},\"ks\":[{}]}}",
                 n,
                 f.a,
                 f.b,
@@ -697,7 +799,7 @@ fn cmd_fit() {
                 f.lo,
                 f.hi,
                 f.n_k,
-                format_args!("[{}]", f.ks.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(","))
+                f.ks.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(",")
             ));
             fits.insert(n.clone(), f);
         }
@@ -847,5 +949,60 @@ fn main() {
         "cells" => cmd_cells(&args[2..]),
         "fit" => cmd_fit(),
         _ => eprintln!("usage: diem_quartic_study gen | gen-status | cells [--kmin K --kmax K --workers N --rho-only --ic-only] | fit"),
+    }
+}
+
+#[cfg(test)]
+mod freeze_guard_tests {
+    use super::*;
+
+    fn manifest(bytes: &[u8]) -> Vec<u8> {
+        format!("{}  instances.jsonl\n", checkpoint::digest(bytes)).into_bytes()
+    }
+
+    #[test]
+    fn jsonl_rejects_malformed_and_blank_rows() {
+        assert!(std::panic::catch_unwind(|| parse_jsonl("x", b"")).is_err());
+        assert!(std::panic::catch_unwind(|| parse_jsonl("x", b"{\"k\":8}\nnot-json\n")).is_err());
+        assert!(std::panic::catch_unwind(|| parse_jsonl("x", b"{\"k\":8}\n\n")).is_err());
+        assert!(std::panic::catch_unwind(|| parse_jsonl("x", b"{\"k\":8}")).is_err());
+        assert!(std::panic::catch_unwind(|| parse_jsonl("x", b"\xff\n")).is_err());
+    }
+
+    #[test]
+    fn frozen_list_requires_digest_and_complete_ordered_grid() {
+        let grid = [(8, 0), (8, 1)];
+        let complete = b"{\"k\":8,\"idx\":0}\n{\"k\":8,\"idx\":1}\n";
+        assert_eq!(
+            validate_frozen_bytes(complete, &manifest(complete), &grid).len(),
+            2
+        );
+        let rejects = |bytes: &[u8], sha: &[u8]| {
+            assert!(std::panic::catch_unwind(|| validate_frozen_bytes(bytes, sha, &grid)).is_err());
+        };
+        rejects(complete, b"wrong digest  instances.jsonl\n");
+        let short = b"{\"k\":8,\"idx\":0}\n";
+        rejects(short, &manifest(short));
+        let duplicate = b"{\"k\":8,\"idx\":0}\n{\"k\":8,\"idx\":0}\n";
+        rejects(duplicate, &manifest(duplicate));
+        let reversed = b"{\"k\":8,\"idx\":1}\n{\"k\":8,\"idx\":0}\n";
+        rejects(reversed, &manifest(reversed));
+        let malformed = b"{\"k\":8,\"idx\":0}\nnot-json\n";
+        rejects(malformed, &manifest(malformed));
+    }
+
+    #[test]
+    fn frozen_list_requires_both_files() {
+        let grid = [(8, 0)];
+        let complete = b"{\"k\":8,\"idx\":0}\n";
+        let missing = || std::io::Error::from(std::io::ErrorKind::NotFound);
+        assert!(std::panic::catch_unwind(|| {
+            validate_frozen_files(Err(missing()), Ok(manifest(complete)), &grid)
+        })
+        .is_err());
+        assert!(std::panic::catch_unwind(|| {
+            validate_frozen_files(Ok(complete.to_vec()), Err(missing()), &grid)
+        })
+        .is_err());
     }
 }

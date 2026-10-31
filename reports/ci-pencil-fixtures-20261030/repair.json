@@ -1,0 +1,45 @@
+{
+  "observed_at": "2026-10-30T04:04:52.900619+00:00",
+  "base": "ac60ab732e71a040a9ead9282c3469c7e25b426d",
+  "original_failure": {
+    "run": 40994881625,
+    "job": 123865581407,
+    "failed_test": "reviewed_frozen_v5_admits_exact_metadata_only_v6_diagnostic",
+    "result": "53passed/1failed; unwrap No such file or directory at fixture parent protocol load"
+  },
+  "cause": "Workflow non-cone sparse checkout omitted three directories read by unchanged native tests. The existing artifact pull cannot create ordinary Git files outside checkout.",
+  "repair": "Add exactly those three directories to checkout and push path filters; same toolchain, commands, timeouts, matrix, artifact pull, permissions and scientific source.",
+  "primary_source": {
+    "url": "https://github.com/actions/checkout/blob/v4/README.md",
+    "finding": "Sparse checkout materializes configured newline-separated paths; non-cone mode supports exact paths."
+  },
+  "frozen_fixtures_unchanged": {
+    "research/pencil_large_prime_20261029/protocol_draft/first_gate_p739_infrastructure_retry_20261030/protocol.json": {
+      "bytes": 78955,
+      "sha256": "7d9f3a299c8d2e39f0a7b69aaab34a922dcc192102ab8d0ee1971ab6e635efee"
+    },
+    "research/pencil_large_prime_20261029/validation/gate60_analysis_20261029/analysis-support.sha256": {
+      "bytes": 1702,
+      "sha256": "9618895ede7542e314167822e25ad1ecaf1bdc9da6da84cceb2499ec8a1acb24"
+    },
+    "research/pencil_large_prime_20261029/validation/gate60_analysis_20261029/binaries.sha256": {
+      "bytes": 463,
+      "sha256": "581f4f3f103f3c69af738189f7811eda12d7ae0653fc87e4fe2d64f3288e5742"
+    },
+    "research/pencil_large_prime_20261029/validation/analysis_provenance_erratum_20261030/reconciled-build-receipt.json": {
+      "bytes": 2742,
+      "sha256": "07e7359d4adfe9b8ab74ba19b313c534f9962f756209ea9059b9f65ac0fb3523"
+    }
+  },
+  "validation": {
+    "native_unit": 54,
+    "native_unit_failed": 0,
+    "additional_integration_pass": 5,
+    "integration_existing_ignored": 1,
+    "cargo_exit_code": 0,
+    "strict_all_target_lint": "passed",
+    "format": "passed"
+  },
+  "limitation": "No research protocol edit, new experiment, new observation, altered admission threshold or skipped test.",
+  "premerge_coverage": "Add pull_request with the exact same branches/path filters as push, following existing ecdl-tensor-ic native workflow. Original push/merge_group/manual behavior and validation commands preserved."
+}

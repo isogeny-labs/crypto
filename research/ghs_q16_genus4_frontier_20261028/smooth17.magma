@@ -1,0 +1,34 @@
+SetSeed(20261028); F2:=GF(2); P<X>:=PolynomialRing(F2);
+K<w>:=ext<F2|X^12+X^7+X^6+X^5+X^3+X+1>;
+k:=FiniteField(2,4); Embed(k,K);
+E:=EllipticCurve([K|1,w^5,0,0,1+w+w^3]);
+G:=E![w^2+w^5+w^8+w^11,1+w+w^4+w^5+w^6+w^7+w^8+w^9+w^10+w^11];
+assert #E eq 3978 and G ne E!0 and 17*G eq E!0;
+g4:=0; g6:=0; g7:=0; errors:=0;
+for i in [0..4094] do
+  try
+    genus:=WeilDescentGenus(E,k,w^i);
+    if genus eq 4 then
+      C,h:=WeilDescent(E,k,w^i); D:=h(G);
+      assert D ne Jacobian(C)!0 and 17*D eq Jacobian(C)!0;
+      split_count:=0;
+      for j in [1..16] do
+        u:=(j*D)[1]; factors:=Factorization(u);
+        if Degree(u) ge 3 and
+           &and[Degree(t[1]) eq 1 and t[2] eq 1:t in factors] then
+          split_count+:=1;
+        end if;
+      end for;
+      assert split_count eq 0;
+      g4+:=1;
+    elif genus eq 6 then g6+:=1;
+    elif genus eq 7 then g7+:=1;
+    else assert false;
+    end if;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert g4 eq 30 and g6 eq 450 and g7 eq 3585 and errors eq 30;
+print "GENUS4_PARAMS",g4,"ALL_ZERO_SPLIT",true,"GENUS6",g6,"GENUS7",g7,
+      "REJECTIONS",errors;

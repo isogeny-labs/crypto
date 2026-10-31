@@ -1,0 +1,68 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp32-t7319-90da43e9 | 32.00 | ic-ksum4 | 32/32 | 7.926 | 8.786 | 16.526 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | kl-ksum4 | 32/32 | 3.827 | 4.201 | 7.573 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | pre-eqP | 32/32 | 13.020 | 14.321 | 26.027 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | pre-eqS | 32/32 | 824.579 | 907.650 | 1655.295 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | rho-neg | 32/32 | 0.785 | 0.863 | 1.563 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | rho-neg-aa | 32/32 | 0.785 | 0.863 | 1.563 | — |
+| icv1-fp36-t454193-44a20818 | 36.00 | ic-ksum4 | 32/32 | 9.827 | 10.921 | 20.771 | — |
+| icv1-fp36-t454193-44a20818 | 36.00 | kl-ksum4 | 32/32 | 4.468 | 4.904 | 8.827 | — |
+| icv1-fp36-t454193-44a20818 | 36.00 | pre-eqP | 32/32 | 9.535 | 10.488 | 19.066 | — |
+| icv1-fp36-t454193-44a20818 | 36.00 | pre-eqS | 32/32 | 693.504 | 763.373 | 1392.201 | — |
+| icv1-fp36-t454193-44a20818 | 36.00 | rho-neg | 32/32 | 0.853 | 0.938 | 1.704 | — |
+| icv1-fp36-t454193-44a20818 | 36.00 | rho-neg-aa | 32/32 | 0.853 | 0.938 | 1.704 | — |
+| icv1-fp40-tm924137-0ecaaeb9 | 40.00 | ic-ksum4 | 16/16 | 11.518 | 12.820 | 24.537 | — |
+| icv1-fp40-tm924137-0ecaaeb9 | 40.00 | kl-ksum4 | 16/16 | 5.131 | 5.639 | 10.213 | — |
+| icv1-fp40-tm924137-0ecaaeb9 | 40.00 | pre-eqP | 16/16 | 19.633 | 21.596 | 39.265 | — |
+| icv1-fp40-tm924137-0ecaaeb9 | 40.00 | pre-eqS | 16/16 | 1668.035 | 1835.465 | 3342.342 | — |
+| icv1-fp40-tm924137-0ecaaeb9 | 40.00 | rho-neg | 16/16 | 0.926 | 1.019 | 1.852 | — |
+| icv1-fp40-tm924137-0ecaaeb9 | 40.00 | rho-neg-aa | 16/16 | 0.926 | 1.019 | 1.852 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp32-t7319-90da43e9 | ic-ksum4 vs kl-ksum4 | kl-ksum4 < ic-ksum4 |
+| icv1-fp32-t7319-90da43e9 | ic-ksum4 vs pre-eqP | ic-ksum4 < pre-eqP |
+| icv1-fp32-t7319-90da43e9 | ic-ksum4 vs pre-eqS | ic-ksum4 < pre-eqS |
+| icv1-fp32-t7319-90da43e9 | ic-ksum4 vs rho-neg | rho-neg < ic-ksum4 |
+| icv1-fp32-t7319-90da43e9 | ic-ksum4 vs rho-neg-aa | rho-neg-aa < ic-ksum4 |
+| icv1-fp32-t7319-90da43e9 | kl-ksum4 vs pre-eqP | kl-ksum4 < pre-eqP |
+| icv1-fp32-t7319-90da43e9 | kl-ksum4 vs pre-eqS | kl-ksum4 < pre-eqS |
+| icv1-fp32-t7319-90da43e9 | kl-ksum4 vs rho-neg | rho-neg < kl-ksum4 |
+| icv1-fp32-t7319-90da43e9 | kl-ksum4 vs rho-neg-aa | rho-neg-aa < kl-ksum4 |
+| icv1-fp32-t7319-90da43e9 | pre-eqP vs pre-eqS | pre-eqP < pre-eqS |
+| icv1-fp32-t7319-90da43e9 | pre-eqP vs rho-neg | rho-neg < pre-eqP |
+| icv1-fp32-t7319-90da43e9 | pre-eqP vs rho-neg-aa | rho-neg-aa < pre-eqP |
+| icv1-fp32-t7319-90da43e9 | pre-eqS vs rho-neg | rho-neg < pre-eqS |
+| icv1-fp32-t7319-90da43e9 | pre-eqS vs rho-neg-aa | rho-neg-aa < pre-eqS |
+| icv1-fp32-t7319-90da43e9 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp36-t454193-44a20818 | ic-ksum4 vs kl-ksum4 | kl-ksum4 < ic-ksum4 |
+| icv1-fp36-t454193-44a20818 | ic-ksum4 vs pre-eqP | pre-eqP < ic-ksum4 |
+| icv1-fp36-t454193-44a20818 | ic-ksum4 vs pre-eqS | ic-ksum4 < pre-eqS |
+| icv1-fp36-t454193-44a20818 | ic-ksum4 vs rho-neg | rho-neg < ic-ksum4 |
+| icv1-fp36-t454193-44a20818 | ic-ksum4 vs rho-neg-aa | rho-neg-aa < ic-ksum4 |
+| icv1-fp36-t454193-44a20818 | kl-ksum4 vs pre-eqP | kl-ksum4 < pre-eqP |
+| icv1-fp36-t454193-44a20818 | kl-ksum4 vs pre-eqS | kl-ksum4 < pre-eqS |
+| icv1-fp36-t454193-44a20818 | kl-ksum4 vs rho-neg | rho-neg < kl-ksum4 |
+| icv1-fp36-t454193-44a20818 | kl-ksum4 vs rho-neg-aa | rho-neg-aa < kl-ksum4 |
+| icv1-fp36-t454193-44a20818 | pre-eqP vs pre-eqS | pre-eqP < pre-eqS |
+| icv1-fp36-t454193-44a20818 | pre-eqP vs rho-neg | rho-neg < pre-eqP |
+| icv1-fp36-t454193-44a20818 | pre-eqP vs rho-neg-aa | rho-neg-aa < pre-eqP |
+| icv1-fp36-t454193-44a20818 | pre-eqS vs rho-neg | rho-neg < pre-eqS |
+| icv1-fp36-t454193-44a20818 | pre-eqS vs rho-neg-aa | rho-neg-aa < pre-eqS |
+| icv1-fp36-t454193-44a20818 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp40-tm924137-0ecaaeb9 | ic-ksum4 vs kl-ksum4 | kl-ksum4 < ic-ksum4 |
+| icv1-fp40-tm924137-0ecaaeb9 | ic-ksum4 vs pre-eqP | ic-ksum4 < pre-eqP |
+| icv1-fp40-tm924137-0ecaaeb9 | ic-ksum4 vs pre-eqS | ic-ksum4 < pre-eqS |
+| icv1-fp40-tm924137-0ecaaeb9 | ic-ksum4 vs rho-neg | rho-neg < ic-ksum4 |
+| icv1-fp40-tm924137-0ecaaeb9 | ic-ksum4 vs rho-neg-aa | rho-neg-aa < ic-ksum4 |
+| icv1-fp40-tm924137-0ecaaeb9 | kl-ksum4 vs pre-eqP | kl-ksum4 < pre-eqP |
+| icv1-fp40-tm924137-0ecaaeb9 | kl-ksum4 vs pre-eqS | kl-ksum4 < pre-eqS |
+| icv1-fp40-tm924137-0ecaaeb9 | kl-ksum4 vs rho-neg | rho-neg < kl-ksum4 |
+| icv1-fp40-tm924137-0ecaaeb9 | kl-ksum4 vs rho-neg-aa | rho-neg-aa < kl-ksum4 |
+| icv1-fp40-tm924137-0ecaaeb9 | pre-eqP vs pre-eqS | pre-eqP < pre-eqS |
+| icv1-fp40-tm924137-0ecaaeb9 | pre-eqP vs rho-neg | rho-neg < pre-eqP |
+| icv1-fp40-tm924137-0ecaaeb9 | pre-eqP vs rho-neg-aa | rho-neg-aa < pre-eqP |
+| icv1-fp40-tm924137-0ecaaeb9 | pre-eqS vs rho-neg | rho-neg < pre-eqS |
+| icv1-fp40-tm924137-0ecaaeb9 | pre-eqS vs rho-neg-aa | rho-neg-aa < pre-eqS |
+| icv1-fp40-tm924137-0ecaaeb9 | rho-neg vs rho-neg-aa | unresolved inside the band |

@@ -1,0 +1,115 @@
+{
+ "arms": [
+  {
+   "method": {
+    "id": "rho.three_leads_plain_v1",
+    "params": {
+     "trial_cap": "403100"
+    }
+   },
+   "name": "rho_plain",
+   "role": "candidate"
+  },
+  {
+   "method": {
+    "id": "rho.three_leads_negation_v1",
+    "params": {
+     "trial_cap": "403100"
+    }
+   },
+   "name": "rho_neg",
+   "role": "reference"
+  },
+  {
+   "method": {
+    "id": "rho.three_leads_jacobian_v1",
+    "params": {
+     "trial_cap": "403100"
+    }
+   },
+   "name": "jac_rho",
+   "role": "candidate"
+  },
+  {
+   "method": {
+    "id": "ic.three_leads_genus2_v2",
+    "params": {
+     "independent": "0",
+     "trial_cap": "403100",
+     "unique_relations": "1"
+    }
+   },
+   "name": "genus_ic",
+   "role": "candidate"
+  },
+  {
+   "method": {
+    "id": "ic.three_leads_genus2_choice2_v1",
+    "params": {
+     "trial_cap": "403100"
+    }
+   },
+   "name": "genus_choice2",
+   "role": "candidate"
+  }
+ ],
+ "description": "Frozen exact-order targets; incumbent v2, two-choice candidate, source rho controls; complete cold operation counts; L0 walls unqualified",
+ "label": "five-leads-choice2-order-genus-20",
+ "measurement": {
+  "isolation_required": "L2",
+  "order": "shuffle",
+  "rounds": 1,
+  "seed": 2026101801,
+  "timeout_seconds": 1200,
+  "warmup": 0
+ },
+ "schema": "ecbench.spec/v1",
+ "workloads": {
+  "curves": [
+   {
+    "a": 9527263,
+    "b": 3530983,
+    "family": "scholten",
+    "group_order": 11365616,
+    "gx": 3788128,
+    "gy": 1005502,
+    "kind": "three_leads",
+    "modulus": 1,
+    "n": 2,
+    "p": 3371,
+    "parameter": 0,
+    "r": 710351
+   },
+   {
+    "a": 2233623,
+    "b": 3116489,
+    "family": "scholten",
+    "group_order": 12439408,
+    "gx": 9778563,
+    "gy": 2738584,
+    "kind": "three_leads",
+    "modulus": 1,
+    "n": 2,
+    "p": 3527,
+    "parameter": 0,
+    "r": 777463
+   },
+   {
+    "a": 6140486,
+    "b": 986453,
+    "family": "scholten",
+    "group_order": 15446512,
+    "gx": 5559718,
+    "gy": 5303172,
+    "kind": "three_leads",
+    "modulus": 1,
+    "n": 2,
+    "p": 3931,
+    "parameter": 0,
+    "r": 965407
+   }
+  ],
+  "target_seed": 202610181260,
+  "targets_per_curve": 60
+ }
+}

@@ -1,0 +1,62 @@
+{
+  "schema": "lean-publication-integration-verification/v1",
+  "verification_date": "2026-10-29",
+  "completed_utc": "2026-10-29T19:30:45.570Z",
+  "purpose": "Current-source validation and Git publication of PR 2859; no new mathematical scope or experiment",
+  "validation_commit": "f46343729454468b1979d6d686ff008b60b2d14a",
+  "main_integration_commit": "c5304b5c6e1faa05c853f25c442838c727b2d081",
+  "integrated_main": "7ba258ea2e209f4c391f3ecc0c426d2d2c832d6b",
+  "source_bindings": {
+    "src": "6796d63d91c3dff4e5a5e7c3bc55079e51a93db5",
+    "cargo_toml": "37727ebbd8370f6604d842d2b421078bae46a08e",
+    "cargo_lock": "54dcf6ba8d4fac7aa670870730448a9bd18ec319"
+  },
+  "published_predecessor": "ef3918c361d5b68d4901e39c3d3390e3b230158a",
+  "prior_successful_library_receipt": "../publication-integration-20261029/verification.json",
+  "prior_proof_validation": "../complete-exact-pair-validation/verification.json",
+  "proof_preservation": {
+    "guarded_study_tree_at_both_heads": "749dae9ef71bb63aac46916653933e859b3b61a6",
+    "all_prior_source_receipt_and_fixture_bytes_unchanged": true,
+    "source_recheck": "proof-source-recheck.log",
+    "exit_code": 0,
+    "log_sha256": "c1b56adc1c044b0d0694699a9be77dacf94e6fcc8e1ff238691d5db44117ab99"
+  },
+  "inherited_main_note": "Main ML graph-export journal records a failed default-parallel configuration and a passing complete serialized configuration with Rayon threads 8. This retry uses that complete configuration without filters or new ignores; the interrupted four-thread attempt remains unaccepted.",
+  "library": {
+    "command": "RAYON_NUM_THREADS=8 cargo test --release --lib --locked -- --test-threads=1",
+    "exit_code": 0,
+    "declared_outer_tests": 5384,
+    "passed": 5261,
+    "failed": 0,
+    "ignored": 123,
+    "measured": 0,
+    "filtered_out": 0,
+    "seconds_reported_by_test_runner": 1896.34,
+    "binary": "target/release/deps/crypto_lib-736382a8cfddd63f",
+    "binary_sha256": "ba7d7a23f6547e191e3475f48e35641d99cfe3ce8d93b48625d6eeb1b2c020de",
+    "raw_bytes": 466679,
+    "raw_sha256": "ddc59eaaadfd8b2392026225d8c9141da9a98a42904be6940bafc31d071592ef",
+    "lossless_archive_bytes": 74272,
+    "lossless_archive_sha256": "7c2b96954ed5a0aabffbf88a8f4aa8ecce7dd1c5dea131f7acca3e496fb4127f",
+    "archive_round_trip_verified": true,
+    "raw_retention": "Full development output and lossless archive retained locally at /workspace/scratch/lean-complete-refresh-serialized-20261029/library.log.xz; no scientific result is inferred",
+    "committed_excerpt": "library-summary.txt",
+    "performance_claim": false
+  },
+  "interrupted_attempt": {
+    "metadata": "interrupted.json",
+    "raw_lossless_archive": "interrupted-library.log.xz",
+    "archive_bytes": 49152,
+    "archive_sha256": "8f1f90e7761393b437e0870df04b5874c0dd8edf47239af04e506a0bc3e8b25b",
+    "archive_round_trip_verified": true,
+    "accepted_as_pass": false,
+    "kernel_wait_status": 9,
+    "termination_signal": 9,
+    "supervisor_exit_receipt_present": false,
+    "outer_suite_summary_present": false,
+    "cause_not_established": true
+  },
+  "fresh_kernel_replays": "The thirteen earlier fresh kernel replays remain bound to unchanged sources/dependencies; no new replay is claimed.",
+  "scientific_experiment": false,
+  "performance_claim": false
+}

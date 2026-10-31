@@ -1,6 +1,9 @@
-# Extend older actionlint runner catalogues with this documented GitHub-hosted
-# Intel label: https://docs.github.com/en/actions/reference/runners/github-hosted-runners
-# This validates the exact label without suppressing runner-label diagnostics.
+# Jobs default to the GitHub-hosted ubuntu-latest runner (owner decision,
+# 2026-10-26) and opt into the isolab EKS Spot runner scale sets
+# (taskq/deploy/eks-karpenter/arc/README.md) through repository variables.
 self-hosted-runner:
   labels:
-    - macos-15-intel
+    - crypto-eks-linux
+    - crypto-eks-highmem
+    - crypto-eks-xmem
+    - crypto-eks-xmem1t

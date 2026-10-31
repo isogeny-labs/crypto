@@ -101,26 +101,56 @@ if ! sage_works; then
   fi
   export MAMBA_ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-$HOME/.local/share/micromamba}"
   sage_prefix="$MAMBA_ROOT_PREFIX/envs/sage"
-  if [[ -d "$sage_prefix/conda-meta" ]]; then
-    micromamba install -y -p "$sage_prefix" -c conda-forge sage
+  # The full `sage` metapackage (386 packages, 1.45 GB to download, several GB
+  # extracted: openjdk, jmol, gcc, Jupyter) overflows the cloud disk allowance
+  # once the repositories are cloned. `sagelib` plus `maxima` provides bin/sage
+  # and the libraries this repository uses (156 packages, about 0.65 GB).
+  read -r -a sage_packages <<< "${SAGE_CONDA_PACKAGES:-sagelib maxima}"
+  mkdir -p "$MAMBA_ROOT_PREFIX"
+  free_kb="$(df -Pk "$MAMBA_ROOT_PREFIX" | awk 'NR == 2 {print $4}')"
+  need_kb=$(( ${SAGE_MIN_FREE_GB:-4} * 1024 * 1024 ))
+  if (( free_kb < need_kb )); then
+    echo "Only $(( free_kb / 1024 )) MiB free; SageMath needs ${SAGE_MIN_FREE_GB:-4} GiB. Skipping it." >&2
   else
-    micromamba create -y -p "$sage_prefix" -c conda-forge sage
+    if [[ -d "$sage_prefix/conda-meta" ]]; then
+      mamba_action=install
+    else
+      mamba_action=create
+    fi
+    if micromamba "$mamba_action" -y -p "$sage_prefix" -c conda-forge "${sage_packages[@]}"; then
+      # Installed files are hard links into the package cache, so this only
+      # frees the downloaded archives.
+      micromamba clean -a -y >/dev/null || true
+      # Activate the conda environment for each invocation instead of calling
+      # its Sage executable through a bare symlink.
+      micromamba_path="$(command -v micromamba)"
+      sage_wrapper="$(mktemp "$bin_dir/.sage.XXXXXX")"
+      printf '#!/usr/bin/env bash\nexport MAMBA_ROOT_PREFIX=%q\nexec %q run -p %q %q "$@"\n' \
+        "$MAMBA_ROOT_PREFIX" "$micromamba_path" "$sage_prefix" "$sage_prefix/bin/sage" > "$sage_wrapper"
+      chmod 755 "$sage_wrapper"
+      mv -f "$sage_wrapper" "$bin_dir/sage"
+      hash -r
+    else
+      # Free the disk, but keep an environment this run did not create.
+      echo "micromamba could not install SageMath; removing the partial download" >&2
+      rm -rf "$MAMBA_ROOT_PREFIX/pkgs"
+      if [[ "$mamba_action" == create ]]; then
+        rm -rf "$sage_prefix"
+      fi
+    fi
   fi
-  # Activate the conda environment for each invocation instead of calling
-  # its Sage executable through a bare symlink.
-  micromamba_path="$(command -v micromamba)"
-  sage_wrapper="$(mktemp "$bin_dir/.sage.XXXXXX")"
-  printf '#!/usr/bin/env bash\nexport MAMBA_ROOT_PREFIX=%q\nexec %q run -p %q %q "$@"\n' \
-    "$MAMBA_ROOT_PREFIX" "$micromamba_path" "$sage_prefix" "$sage_prefix/bin/sage" > "$sage_wrapper"
-  chmod 755 "$sage_wrapper"
-  mv -f "$sage_wrapper" "$bin_dir/sage"
-  hash -r
 fi
 
+# Sage is optional for a cloud session: without it the remaining tools still
+# install. Set SAGE_REQUIRED=1 to fail setup instead.
 if ! sage_works; then
-  echo "SageMath installation finished, but its finite-field check failed:" >&2
-  sage -c 'assert GF(256).cardinality() == 256' >&2 || true
-  exit 1
+  echo "WARNING: SageMath is unavailable or failed its finite-field check." >&2
+  if command -v sage >/dev/null 2>&1; then
+    sage -c 'assert GF(256).cardinality() == 256' >&2 || true
+  fi
+  if [[ "${SAGE_REQUIRED:-0}" == 1 ]]; then
+    exit 1
+  fi
 fi
 
 if ! command -v cargo >/dev/null 2>&1; then
@@ -164,7 +194,7 @@ if [[ -f "$repo_dir/Cargo.toml" ]]; then
 fi
 
 echo "Installed tools:"
-sage --version
+sage --version || echo "sage: not installed"
 go version
 cargo --version
 conductor version

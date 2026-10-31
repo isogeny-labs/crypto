@@ -10,8 +10,13 @@
 //!   [`counted_fp::OpCounter`].  [`counted_fp::PrimeField::new`] counts
 //!   nothing (a zero-sized counter, free); [`counted_fp::PrimeField::counted`]
 //!   counts multiplications `M` and inversions `I`.
-//! * [`poly`]: Karatsuba multiplication, Newton reciprocal, remainder by a
-//!   monic divisor, balanced products, product and remainder trees.
+//!   NTT products count word multiplications `W` separately (converted at
+//!   one `M` each, see [`ntt`]).
+//! * [`poly`]: Karatsuba or NTT multiplication (chosen per field by
+//!   [`counted_fp::PolyMul`]), Newton reciprocal, remainder by a monic
+//!   divisor, balanced products, product and remainder trees.
+//! * [`ntt`]: three-prime NTT multiplication with CRT reconstruction for any
+//!   `p < 2^63`.
 //! * [`montgomery`]: x-only Montgomery `xDBL`, `xADD`, ladder (generic over
 //!   [`montgomery::FieldArith`]), batch normalisation, `j`.
 //! * [`velu`]: `O(ℓ)` Vélu for odd prime `ℓ` (Costello–Hisil images,
@@ -23,8 +28,10 @@
 //! Scope and limits: prime fields only (no `F_{p^k}` type; the x-only
 //! formulas are generic so one can be added), `p < 2^63`, kernels generated
 //! by an `F_p`-rational x-coordinate.  Polynomial multiplication is
-//! Karatsuba; NTT/FFT multiplication (needed for the asymptotic `Õ(√ℓ)` of
-//! √élu) is a follow-up.  The existing library pieces this complements:
+//! Karatsuba below [`poly::NTT_THRESHOLD`] coefficients and the NTT above
+//! it by default ([`counted_fp::PolyMul::Auto`]);
+//! [`counted_fp::PolyMul::Karatsuba`] reproduces the round-4 arithmetic and
+//! counts.  The existing library pieces this complements:
 //! `crate::cryptanalysis::isogeny_walk::kernel` (odd-degree codomains from
 //! a kernel polynomial over a 256-bit field, used by the tests here as an
 //! independent check), `crate::isogeny::velu` (brute-force toy Vélu),
@@ -33,6 +40,7 @@
 
 pub mod counted_fp;
 pub mod montgomery;
+pub mod ntt;
 pub mod poly;
 pub mod small_degree;
 pub mod sqrt_velu;
@@ -41,7 +49,7 @@ pub mod velu;
 #[cfg(test)]
 mod tests;
 
-pub use counted_fp::{NoCount, OpCounter, OpCounts, OpTally, PrimeField};
+pub use counted_fp::{NoCount, OpCounter, OpCounts, OpTally, PolyMul, PrimeField};
 pub use montgomery::{MontgomeryCurve, XZ};
 pub use small_degree::{ShortWeierstrass, SmallIsogeny, WPoint};
 pub use sqrt_velu::{sqrt_velu, SqrtVeluShape};

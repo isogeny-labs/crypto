@@ -13,6 +13,8 @@ name: Rust lint
 
 on:
   pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
   merge_group:
   push:
     branches: [main]
@@ -23,7 +25,8 @@ permissions:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # Merges land minutes apart; cancelling would leave most main pushes unlinted.
+  cancel-in-progress: ${{ github.event_name != 'push' }}
 
 env:
   CARGO_TERM_COLOR: always
@@ -33,7 +36,8 @@ env:
 
 jobs:
   scope:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|rust-lint.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|rust-lint.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
       contents: read
@@ -57,6 +61,7 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /.github/scripts/
             /build.rs
             /rustfmt.toml
@@ -79,13 +84,20 @@ jobs:
             CI_BASE="$(git rev-parse HEAD^1)"
             export CI_BASE
           fi
+          # A push to main lints the whole tree. Diffing against the previous
+          # push skipped clippy whenever a Rust merge's run was superseded by a
+          # later non-Rust merge, so lint regressions reached main unchecked.
+          if [ "$CI_EVENT" = push ]; then
+            CI_BASE=
+            export CI_BASE
+          fi
           node .github/scripts/ci-scope.mjs
 
   fmt:
     needs: scope
     name: rustfmt (changed files)
-    if: always() && !cancelled() && github.event_name == 'pull_request' && (needs.scope.result != 'success' || needs.scope.outputs.rust_fmt != 'false')
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|rust-lint.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|rust-lint.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    if: always() && !cancelled() && !github.event.pull_request.draft && github.event_name == 'pull_request' && (needs.scope.result != 'success' || needs.scope.outputs.rust_fmt != 'false')
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: Require successful scope classification
@@ -99,6 +111,7 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /.github/scripts/
             /build.rs
             /rustfmt.toml
@@ -109,6 +122,8 @@ jobs:
             /examples/
             /benches/
             /cd_attack/
+      - name: Materialize Rust module dependencies without research archives
+        run: node .github/scripts/ci-scope.mjs --materialize
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ env.RUST_TOOLCHAIN }}
@@ -153,10 +168,10 @@ jobs:
           exit $bad
 
   clippy:
-    if: always() && !cancelled()
+    if: always() && !cancelled() && !github.event.pull_request.draft
     needs: scope
     name: clippy (${{ matrix.crate }})
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|rust-lint.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|rust-lint.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -185,7 +200,9 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /Cargo.toml
+            /tools/factor-base/
             /tools/volcano-cli/
             /isogeny_algos/
             /Cargo.lock

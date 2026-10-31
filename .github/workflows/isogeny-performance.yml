@@ -1,15 +1,12 @@
 name: isogeny-performance
 
 on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   # Run the research campaign on its feature branch even while an unrelated
   # benchmark-index conflict prevents pull_request workflows from starting.
   push:
     branches: ['codex/isogeny-performance-20261014']
-    paths:
-      - 'isogeny_algos/**'
-      - 'research/isogeny_performance_20261014/**'
-      - '.github/workflows/isogeny-performance.yml'
-  pull_request:
     paths:
       - 'isogeny_algos/**'
       - 'research/isogeny_performance_20261014/**'
@@ -37,11 +34,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Pull requests run the exact-output smoke on three CPUs; the Intel
-        # macOS runner needs about 25 minutes just to build the three binaries,
-        # so it joins the full campaign on push and workflow_dispatch only.
-        runner: ${{ fromJSON(github.event_name == 'pull_request' && '["ubuntu-24.04","ubuntu-24.04-arm","macos-15"]' || '["ubuntu-24.04","ubuntu-24.04-arm","macos-15","macos-15-intel"]') }}
-    runs-on: ${{ matrix.runner }}
+        # ubuntu-latest only (owner decision 2026-10-26, runner cost): the
+        # ubuntu-24.04-arm, macos-15 and macos-15-intel CPUs were dropped.
+        runner: [ubuntu-latest]
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|isogeny-performance.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|isogeny-performance.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     # Pull requests: build the frozen binaries and check exact outputs and
     # repeatable counts within the routine 25 minute budget. The twenty-run
     # timing campaigns and legacy-family census (three binaries, two

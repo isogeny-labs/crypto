@@ -7,7 +7,7 @@
     "NIST seed provenance research"
   ],
   "status": "draft",
-  "status_note": "Draft, unqueued. Resume the R05 relation checkpoint after required store publication. Ready promotion also requires a merged source pin, compatible selected lab and binary-bound native timeout controls for the patched tool.",
+  "status_note": "Draft, unqueued. Bind the completed R06 checkpoint after required artifact-store publication; retain the validated native binary requirement and select a merged implementation pin and compatible lab. R07 filtering confirms more collection is needed. The actual local R08 allocation is separate.",
   "blocked_on": [],
   "links": {
     "lead": "backlog/XP-20261022-nist-p256-nfs-resume/README.md",
@@ -16,7 +16,9 @@
       "problems/nist-extension-twist-composite-cofactors.md",
       "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R04-20261022/README.md",
       "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R05-20261022/README.md",
-      "research/nist_skipped_curve_dissection_20261021/factorization/native-timeout-diagnostic-20261023/README.md"
+      "research/nist_skipped_curve_dissection_20261021/factorization/native-timeout-diagnostic-20261023/README.md",
+      "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R06-20261023/README.md",
+      "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R07-20261025/README.md"
     ],
     "prs": [
       2379
@@ -26,12 +28,12 @@
   "decision_value": "A prime-certified split refines the only unresolved DiSSECT target. Native state progress without factors is reported separately; an incomplete or failed run leaves the mathematical requirement open and informs the next allocation.",
   "protocol": {
     "path": "PROTOCOL.md",
-    "blob": "8da492df891365d6b6dd8d48d43b5edebc4f2bcd"
+    "blob": "32c9c31248a0c4129117994164813d627de7c36f"
   },
   "code": {
     "repo": "crypto",
     "commit": null,
-    "branch": "codex/nist-skipped-curve-jobs",
+    "branch": "codex/nist-r06-factorization-results-20261025",
     "build": []
   },
   "resources": {
@@ -55,7 +57,7 @@
     "env": {
       "GP_BIN": "gp",
       "GNFS_BIN_DIR": "/opt/yafu/factor/lasieve5_64/bin",
-      "NIST_FACTOR_CHECKPOINT": "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R05-20261022/runs.tar.xz",
+      "NIST_FACTOR_CHECKPOINT": "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R06-20261023/runs.tar.xz",
       "NFS_POLY_BATCH": "120",
       "YAFU_PATCHED_BIN": "/opt/yafu-timeout-fix/yafu",
       "YAFU_TIMEOUT_CONTROL_DIR": "/opt/yafu-timeout-fix/native-controls"
@@ -92,7 +94,7 @@
     "ttl_s": 7200,
     "env": {
       "name": "nist-yafu-c7d902-pari217",
-      "recipe": "Build pinned YAFU c7d90283972820f99b3b4920bfc1eff05c1f6342 with AVX2/BMI2, GMP and matching libecm 7.0.6 headers; make bundled native lattice sievers executable. Install PARI/GP 2.17.2, Bash, jq, ripgrep, GNU coreutils, xz and util-linux. Verify archive checksum and executable hashes; use compatible AVX2/BMI2 hardware. Pin the selected environment before ready promotion. Apply the recorded timeout-printf.patch, rebuild and run the bounded original-versus-patched native controls. Supply the exact validated executable and its binary-bound control summary at the card paths. Materialize the unchanged R05 checkpoint and sibling checksum after actual artifact-store publication; no remote object is currently claimed."
+      "recipe": "Build pinned YAFU c7d90283972820f99b3b4920bfc1eff05c1f6342 with AVX2/BMI2, GMP and matching libecm 7.0.6 headers; make bundled native lattice sievers executable. Install PARI/GP 2.17.2, Bash, jq, ripgrep, GNU coreutils, xz and util-linux. Verify archive checksum and executable hashes; use compatible AVX2/BMI2 hardware. Pin the selected environment before ready promotion. Apply the recorded timeout-printf.patch, rebuild and run the bounded original-versus-patched native controls. Supply the exact validated executable and its binary-bound control summary at the card paths. Materialize the unchanged R06 checkpoint and sibling checksum after actual publication to the configured setec-astronomy artifact store; no remote object is currently claimed."
     },
     "exec": {
       "cpus": 2,

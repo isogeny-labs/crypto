@@ -1,0 +1,112 @@
+{
+  "card_id": "CARD-f4-harvest-remeasure-20261024-6",
+  "card_path": "research/f4_harvest_remeasure_20261024/cards/CARD-f4-harvest-remeasure-20261024-6.yaml",
+  "card_sha256": "2fbe9ed3fa771a45c53e19c54108bc0d3b5fc13f9256c7cbaf27fb3dae76ef6e",
+  "commands": [
+    {
+      "argv": [
+        "/home/user/tgt/release/ecbench",
+        "verify",
+        "--dir",
+        "research/f4_harvest_remeasure_20261024/sessions/K0n19",
+        "--replay-all",
+        "--exit-code",
+        "--out",
+        "research/f4_harvest_remeasure_20261024/audits/K0n19.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 485.728,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-k0n19",
+      "index": 1,
+      "outputs": {
+        "research/f4_harvest_remeasure_20261024/audits/K0n19.audit.json": "644c9c412cdd0389d9529f8eebb355aa69dff20b766ec4841fbf668bd06c75d2"
+      },
+      "seconds": 485.728,
+      "stderr_sha256": "a06240f4b5d8dcb67dd57d1eea6995645e7c1913294437951a330f510b920259",
+      "stderr_tail": [
+        "receipt sha256 644c9c412cdd0389d9529f8eebb355aa69dff20b766ec4841fbf668bd06c75d2",
+        "audit OK: 144 records, 144 verified, 144 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "644c9c412cdd0389d9529f8eebb355aa69dff20b766ec4841fbf668bd06c75d2",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 143,",
+        "      \"record_id\": \"ECR1h23a19a5fbd49\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"20ec1175238bdf1f6def6265e16518c1f8dc570f7b0365b93fc1d31180d9cb2a\",",
+        "    \"plan.json\": \"02be94be245d8935c267833dca7ebd0b6958c88f4a7c061a6d70211367564da7\",",
+        "    \"records.jsonl\": \"5e4e6200a033330d2cf57143b5367cc224edc3037846c0af0299b2cd594351bd\",",
+        "    \"session.json\": \"3098182d1de98003dc81f595e997b9edbb8456e5efb704f81ad8f398cc1896e2\",",
+        "    \"spec.json\": \"dfbdfbfac07778f63f6ef4d94e392e18221169c736b39d2253a030c465f087e5\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"aa246d23df49391ccb13e0a659f10a6cd77e4677bb0c04331c2cbbefe8c9a2db\",",
+        "  \"auditor_env_class_id\": \"ECBENV3h83a865bb2efe\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h81c2f17c5afa\",",
+        "  \"audited_unix_ms\": 1792881692757",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 1,
+  "commit": "a3c8f17494755aea34c070374b94b7ae4250b1f3",
+  "dirty_after": [
+    "research/f4_harvest_remeasure_20261024/audits/K0n19.audit.json",
+    "research/f4_harvest_remeasure_20261024/cards/CARD-f4-harvest-remeasure-20261024-6.verify-k0n19.stdout"
+  ],
+  "dirty_before": [
+    "research/f4_harvest_remeasure_20261024/audits/K0n13.audit.json",
+    "research/f4_harvest_remeasure_20261024/audits/K1n11.audit.json",
+    "research/f4_harvest_remeasure_20261024/audits/K1n17.audit.json",
+    "research/f4_harvest_remeasure_20261024/audits/K1n19.audit.json",
+    "research/f4_harvest_remeasure_20261024/cards/CARD-f4-harvest-remeasure-20261024-3.run-k1n11.stdout",
+    "research/f4_harvest_remeasure_20261024/cards/CARD-f4-harvest-remeasure-20261024-3.run-k1n17.stdout",
+    "research/f4_harvest_remeasure_20261024/cards/CARD-f4-harvest-remeasure-20261024-3.run-k1n19.stdout",
+    "research/f4_harvest_remeasure_20261024/cards/CARD-f4-harvest-remeasure-20261024-3.verify-k0n13.stdout",
+    "research/f4_harvest_remeasure_20261024/cards/CARD-f4-harvest-remeasure-20261024-3.verify-k1n11.stdout",
+    "research/f4_harvest_remeasure_20261024/cards/CARD-f4-harvest-remeasure-20261024-3.verify-k1n17.stdout",
+    "research/f4_harvest_remeasure_20261024/cards/CARD-f4-harvest-remeasure-20261024-4.receipt.json",
+    "research/f4_harvest_remeasure_20261024/cards/CARD-f4-harvest-remeasure-20261024-4.verify-k1n19.stdout",
+    "research/f4_harvest_remeasure_20261024/cards/CARD-f4-harvest-remeasure-20261024-4.yaml",
+    "research/f4_harvest_remeasure_20261024/cards/CARD-f4-harvest-remeasure-20261024-5.receipt.json",
+    "research/f4_harvest_remeasure_20261024/cards/CARD-f4-harvest-remeasure-20261024-5.run-k0n19.stdout",
+    "research/f4_harvest_remeasure_20261024/cards/CARD-f4-harvest-remeasure-20261024-5.yaml",
+    "research/f4_harvest_remeasure_20261024/cards/CARD-f4-harvest-remeasure-20261024-6.yaml",
+    "research/f4_harvest_remeasure_20261024/sessions/K0n19/host.json",
+    "research/f4_harvest_remeasure_20261024/sessions/K0n19/plan.json",
+    "research/f4_harvest_remeasure_20261024/sessions/K0n19/records.jsonl",
+    "research/f4_harvest_remeasure_20261024/sessions/K0n19/session.json",
+    "research/f4_harvest_remeasure_20261024/sessions/K0n19/spec.json",
+    "research/f4_harvest_remeasure_20261024/sessions/K1n11/host.json",
+    "research/f4_harvest_remeasure_20261024/sessions/K1n11/plan.json",
+    "research/f4_harvest_remeasure_20261024/sessions/K1n11/records.jsonl",
+    "research/f4_harvest_remeasure_20261024/sessions/K1n11/session.json",
+    "research/f4_harvest_remeasure_20261024/sessions/K1n11/spec.json",
+    "research/f4_harvest_remeasure_20261024/sessions/K1n17/host.json",
+    "research/f4_harvest_remeasure_20261024/sessions/K1n17/plan.json",
+    "research/f4_harvest_remeasure_20261024/sessions/K1n17/records.jsonl",
+    "research/f4_harvest_remeasure_20261024/sessions/K1n17/session.json",
+    "research/f4_harvest_remeasure_20261024/sessions/K1n17/spec.json",
+    "research/f4_harvest_remeasure_20261024/sessions/K1n19/host.json",
+    "research/f4_harvest_remeasure_20261024/sessions/K1n19/plan.json",
+    "research/f4_harvest_remeasure_20261024/sessions/K1n19/records.jsonl",
+    "research/f4_harvest_remeasure_20261024/sessions/K1n19/session.json",
+    "research/f4_harvest_remeasure_20261024/sessions/K1n19/spec.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

@@ -1,0 +1,14 @@
+id,status,source_declaration,required_hypotheses_or_input,next_obligation
+global_smooth,existing_checked,WeightedProjSmoothFinal.smooth,perfect field; 2 nonzero; quintic squarefree,connect to concrete divisor construction
+properness,existing_checked,WeightedProjBase.weightedProj_proper_over_K,field K,connect to concrete divisor construction
+source_norm,existing_checked,Common22SourceHead.source_curve_eq,valid Mumford congruences; determinant nonzero,form rational function and global divisor
+residual_congruence,existing_checked,Common22Residual.returned_v_cleared,commutative ring,identify returned effective divisor with residual zero locus
+rational_nonbranch_order,existing_checked,WeightedProjNonbranchNormTransport.projective_norm_order,separable quintic; point equation; 2y nonzero; b nonzero; explicit norm; chosen nonunit,extend order and selection to all closed points
+rational_branch_order,existing_checked,WeightedProjSourceBranchActualQuintic.source_style_actual_quintic_branch_zero_order_of_separable,separable quintic; simple rational branch; valid inputs; support root,extend branch multiplicities to nonrational points
+infinity_local,existing_checked,WeightedProjInfinityDVR.projectiveZ_order_two,field K,specialize source function and pole valuation
+conditional_poles,existing_checked,Common22FractionPole.unit_chart_pole; Common22FractionPole.linear_chart_pole,supplied valuation; unit and cleared-interpolant hypotheses,prove supplied hypotheses in actual infinity stalk for both degree branches
+abstract_class,existing_checked,ProjectiveLawRuntime.residual_represents_input,supplied PrincipalClassInterface; principal input plus residual,construct concrete curve-specific interface and principal premise
+closed_point_divisor,open,,function field; all closed-point DVRs; finite support,define concrete divisor and principal map
+global_divisor_equality,open,,input and residual divisor representation; all local orders; infinity poles,prove divisor of source-style function equals input plus residual minus infinity
+degree_zero_pic0,open,,concrete principal quotient and degree map; returned pair identification,derive class equation for actual curve
+compiled_runtime_link,open,,source-to-Lean field and branch semantics,prove compiled returned pair matches proof-side representation

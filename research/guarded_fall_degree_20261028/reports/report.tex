@@ -1,0 +1,189 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,landscape,margin=0.65in]{geometry}
+\usepackage{amsmath,amssymb,graphicx,booktabs,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5em}
+\begin{document}
+\begin{center}
+{\Large Guarded summation-polynomial fall degrees}\par
+{\small Study report, 28--29 October 2026. Derived bounds and development checks; no performance claim.}
+\end{center}
+
+Let $S$ be $B$ distinct rational affine-point abscissas, $g(T)=\prod_{s\in S}(T-s)$,
+and $r=x(R)$ for an affine rational target. The ordinary polynomial-ring inputs are
+\[
+g(x),\quad g(y),\quad g(z),\quad S_3(x,y,u),\quad S_3(u,z,r),\quad v(x-y)-1.
+\]
+Both point signs are allowed. The guard requires distinct first abscissas.
+Every degree below is ordinary total degree with explicit membership equations.
+The first-fall convention is homogeneous-top syzygies modulo Koszul syzygies.
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Setting, unsatisfiable instances & First fall & Last fall \\
+\midrule
+Short Weierstrass, characteristic $>3$, $B=3$ & $4$ & $5$ \\
+Same model, $B\ge3$ & $B+1$ & $\max(5,B+1)\le d_F\le3B-4$ \\
+Ordinary binary, $B=3$, $g(T)=T^3+c$ & $4$ & $4$ \\
+Ordinary binary, $B=3$, other split cubics & $4$ & $5$ \\
+Ordinary binary, $B\ge4$ & $B+1$ & $B+1\le d_F\le3B-4$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The binary curve is $Y^2+XY=X^3+a_2X^2+a_6$, $a_6\ne0$.
+Its cube-orbit exception requires even extension degree, so the pair is $(4,5)$
+for all three-abscissa unsatisfiable instances over $\mathbb F_{2^n}$ with odd $n$.
+The growing lower bound depends on the degree-$B$ membership input and gives
+no lower bound in the variable count of a fixed-degree Boolean encoding.
+
+\textbf{Direct Boolean upper bound.} For the binary two-$S_3$ chain with one
+shared $u$, three linear $\ell$-bit base embeddings, and every Boolean bit
+equation explicit, $d_F\le3\ell+1$ for $\ell\ge1$, independently of $n$.
+This holds with or without the inverse guard, without rational-lift assumptions.
+Fixing the base bits leaves an affine auxiliary system; staged assignment
+indicators localize its contradiction. Proof size may be exponential.
+
+\textbf{Method.} Staged multiplication and cubic reduction normalize two
+quadratic fibres, then derive their scalar resultant within degree five.
+Finite-grid inversion yields $1$. Characteristic two uses a Frobenius identity
+instead of division by two. Closed separating superspaces give the lower bounds.
+An exact triple-selector partition lifts local proofs to growing cardinality.
+
+\textbf{Verification boundary.} Native sparse replay checks the compact historical
+proof DAGs against separately supplied inputs. Native binary-field arithmetic and
+the pinned cube-orbit fixture have development unit checks; no new field/base/target
+sweep or timing measurement was run. Lean checks only the declarations and
+hypotheses listed in \texttt{formal/PROOF\_MAP.json}. Ordinary closure and the
+exact prime-field guarded three-abscissa pair $(4,5)$ are now formalized,
+including the degree-five construction, rational-root/unit-ideal bridge,
+uniform lower obstruction and graded top-syzygy/Koszul definition.
+
+\textbf{Prior work.} The checked sources are Huang--Kosters--Yang--Yeo,
+\href{https://arxiv.org/abs/1505.02532}{1505.02532}; Caminata--Gorla,
+\href{https://arxiv.org/abs/2112.05579}{2112.05579}; Semaev,
+\href{https://arxiv.org/abs/1504.01175}{1504.01175}; and Kosters--Yeo,
+\href{https://arxiv.org/abs/1503.08001}{1503.08001}. Assumptions and repository
+links are in \texttt{SOURCES.md}. No literature-priority claim is made.
+
+\newpage
+\begin{center}
+{\Large Proof dependencies and unresolved transfer}\par
+\vspace{0.5em}
+\includegraphics[width=0.99\linewidth,height=0.67\textheight,keepaspectratio]{proof-dependencies-diagram.pdf}
+\end{center}
+
+Solid arrows denote dependencies in the written arguments. The dashed arrow is
+an unresolved lower-bound transfer, not a proved implication. The Lean box
+certifies the complete original prime-field guarded three-abscissa exact pair;
+native replay certifies finite proof operations only. See
+\texttt{formal/complete-exact-pair.md} for the full statement and checked chain.
+
+The existing E12 Boolean Weil-descent records are unchanged. Its completed cell
+retains labels $\ge5,4,\ge5,4$, a frozen lower median of $4$, and a separate
+independent closure-replay gap. The present coefficient-field theorems do not
+close that gap. The direct Boolean upper theorem requires a separate encoding
+audit before application to that ledger. No performance or security claim follows.
+
+\textbf{Reproducible records.} See \texttt{README.md}, the proof files,
+\texttt{native/validation/}, \texttt{identities/}, and \texttt{formal/}.
+The editable diagram source is \texttt{reports/proof-dependencies.dot}.
+Historical Python sources are preserved as provenance, not as an execution path.
+
+\newpage
+\begin{center}
+{\Large Large standard-curve applications}\par
+{\small Fixed public correctness fixtures; exact integer arithmetic, no timing comparison.}
+
+\begin{tabular}{lrrrl}
+\toprule
+Standard curve & Field bits & Replayed DAG nodes & Maximum degree & Point/input recheck \\
+\midrule
+secp256k1 & 256 & 413 & 5 & accepted \\
+secp256r1 / P-256 & 256 & 415 & 5 & accepted \\
+secp384r1 / P-384 & 384 & 415 & 5 & accepted \\
+secp521r1 / P-521 & 521 & 415 & 5 & accepted \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Every fixture uses $S=\{x(G),x(2G),x(4G)\}$ and $R=16G$. Rechecking the
+nonzero public multiples $G,\ldots,28G$ excludes both target signs by an
+integer scalar bound. OpenSSL 3.5.7 independently matches all 112 public points
+and the curve parameters. Producer and sparse replay use separate polynomial
+implementations; numeric JSON never passes through floating point.
+
+\begin{center}
+\includegraphics[width=0.99\linewidth,height=0.44\textheight,keepaspectratio]{../extensions/large_curves/coverage.pdf}
+\end{center}
+
+Degree-five refutations are replayed computations. Exact pair $(4,5)$ also
+uses the uniform lower/first-fall proofs, not a new degree-four closure.
+The five-variable, three-abscissa model is fixed; no full-DLP cost is measured.
+The large binary curves have theorem coverage only in this extension.
+
+\textbf{Sources and records.} \href{https://www.secg.org/sec2-v2.pdf}{SEC2 v2.0},
+Sections 2.4--2.6; \texttt{extensions/large\_curves/README.md}, the pinned
+parameter snapshot, and per-curve input/witness/DAG/replay records.
+Prime-field interpretation assumes the standard field primes. Fixture-specific
+curve-provenance and group-order arguments remain
+outside the Lean claim. The uniform conditional degree theorem is now
+Lean-checked; fixture-specific primality and UNSAT witnesses are not
+independently kernel-certified by that theorem.
+
+\newpage
+\begin{center}
+{\Large Prime-field bit restrictions: a size-independent upper bound}
+\end{center}
+
+Let $p>3$, let the curve be nonsingular, and use three blocks of $\ell\ge1$
+Boolean-constrained base variables. Each coordinate lookup has degree at most
+$\ell$ and takes every Boolean assignment to a rational point abscissa.
+Encode $u$ and optional $v$ by independent $n$-bit integer maps onto
+$\mathbb F_p$, with $2^n\ge p$. The coefficient field remains $\mathbb F_p$.
+Include every bit equation $W^2-W$ and supply the multilinear normal forms of
+the two summation equations and optional inverse guard.
+
+\[
+\boxed{\text{UNSAT}\quad\Longrightarrow\quad d_F\le3\ell+2.}
+\]
+
+The cap is independent of the modulus size and of $n$. It depends on the
+exact generating presentation; it is not a theorem for a $\mathbb F_2$
+carry-circuit implementation of prime-field arithmetic.
+
+\textbf{Degree accounting.} Put $L=3\ell$. Each normalized equation has
+base support $s_i\le2\ell$ and auxiliary degree at most two. Multiply by
+assignment-indicator factors on its support, reducing Boolean powers after
+each step. Every reduced row has degree at most $s_i+2$; a next factor costs
+at most $s_i+3\le L+2$. The complementary factors then give the fully
+localized equation within $L+2$.
+
+After fixing the base assignment, rational point lifts make the first
+quadratic's roots rational. The equal-abscissa case is linear or a nonzero
+constant; an active inverse guard excludes it directly. Unsatisfiability
+therefore gives coprime univariate polynomials of degree at most two.
+Their constant refutation needs degree at most two: a monic difference gives
+$u-\alpha$, and subtracting its linear multiples from the quadratic leaves
+its nonzero value at $\alpha$. Carrying the assignment indicator throughout
+costs at most $L+2$. Summing all indicators gives the exact identity $1$.
+
+\textbf{Raw inputs.} If the supplied substitutions have maximum degree
+$d_{\rm raw}$, normalizing them first gives
+\[
+d_F\le\max(3\ell+2,d_{\rm raw}).
+\]
+Arbitrary multilinear lookups have $d_{\rm raw}\le4\ell$; affine lookups
+have $d_{\rm raw}\le4$ and retain the $3\ell+2$ bound.
+
+\textbf{Limits.} Lookup tables and the proof may have exponentially many
+terms or rows. No first-fall equality, growing lower bound, exact degree,
+runtime gain, general ceiling five, or E12 certification follows.
+Eight local algebraic dependencies pass Lean build and fresh kernel replay,
+including the explicit discriminant/diagonal branch and quadratic cancellation.
+The complete filtered-closure theorem is not Lean formalized.
+The full statement and all edge cases are in
+\texttt{extensions/large\_curves/prime\_bit\_restricted\_upper.txt}.
+\end{document}

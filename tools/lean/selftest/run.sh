@@ -24,6 +24,20 @@ for f in "$here"/pass/*.lean "$here"/fail/*.lean; do
     echo "WRONG expected $want matching /$expect/, got $got: $(basename "$f")"; cat /tmp/lean-selftest.$$; bad=1
   fi
 done
+# A Lake default target can omit a registered Lean module. The gate must
+# explicitly build and audit the omitted tracked source before passing.
+for project in "$rel/project-omitted" "./$rel/project-omitted" "$rel/project-omitted/" "$rel/project-quoted"; do
+  LEAN_GATE_TRUSTED="$here/trusted-native.txt" "$gate" "$project" > /tmp/lean-selftest.$$ 2>&1
+  rc=$?
+  if [ "$rc" -eq 1 ] && grep -q 'FAIL_audit' /tmp/lean-selftest.$$ && \
+     grep -q 'sorryAx' /tmp/lean-selftest.$$; then
+    echo "ok    fail  $project (tracked source audited)"
+  else
+    echo "WRONG $project: expected FAIL_audit for sorryAx, got exit $rc"
+    cat /tmp/lean-selftest.$$
+    bad=1
+  fi
+done
 rm -f /tmp/lean-selftest.$$
 [ $bad -eq 0 ] && echo "gate self-test passed" || echo "gate self-test FAILED"
 exit $bad
