@@ -18,3 +18,9 @@ Same original manual authorization,-j1,-M4096,1200s separately for compile
 and audit,no virtual-memory cap,serialized with native math. Preserve every
 failure. Strict compile0/audit0,six declarations,zero failing/trusted and no
 native_decide. All toolchain and dependency pins remain unchanged.
+
+Audit inventory:all six named mathematical declarations must individually
+report ok. Any compiler-generated equation declarations are also audited
+and counted separately in audit_total_declarations;they do not increase the
+six-claim scientific count. Every in-scope declaration must have zero failing
+and zero trusted status. This inventory rule is frozen before compilation.

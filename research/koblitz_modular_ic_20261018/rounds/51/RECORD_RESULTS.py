@@ -15,7 +15,12 @@ for p in sorted((h/'runs').iterdir()):
         row.update(audited_theorems=expected_count,root=expected_root)
         if row['compile_exit']!=0: row['status']='rejected'
         elif row['audit_exit'] is not None:
-            row['status']='accepted' if row['audit_exit']==0 and f'audited {expected_count} theorems in [{expected_root}]; 0 failing, 0 trusted (native_decide)' in (p/'audit.log').read_text() else 'rejected'
+            audit=(p/'audit.log').read_text()
+            summary=re.search(r'audited (\d+) theorems in \['+expected_root+r'\]; 0 failing, 0 trusted \(native_decide\)',audit)
+            named={'Overlap51':['first_square_identity','second_square_identity','overlap_norm_identity','localized_base_inverse','inverse_maps_of_compatible_embeddings'],'Specialize51':['mem_of_unit_mul_mem','ideals_eq_of_unit_scaled_inclusions','seven_nsmul_zero_of_eight','line_intersection_identity','quartic_difference_identity','cross_kernel_denominator_inverse']}[expected_root]
+            names_pass=all(re.search(r'^ok +'+re.escape(expected_root+'.'+name)+r' +',audit,re.M) for name in named)
+            row['audit_total_declarations']=int(summary.group(1)) if summary else None
+            row['status']='accepted' if row['audit_exit']==0 and summary and names_pass and row['audit_total_declarations']>=expected_count else 'rejected'
     elif (p/'exit.txt').exists():
         log=(p/'native.log').read_text();marker=next(v for k,v in markers.items() if p.name.startswith(k+'51-') or (k=='base23' and p.name.startswith('base23-51-')))
         errors=re.findall(r'^ *\?.*$',log,re.M)
