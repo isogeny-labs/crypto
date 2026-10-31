@@ -18,3 +18,14 @@ published arm's solver. Question: does the lab arm's lead over the published-met
 - **Per-metric verdict**: *growing* if the 95 % CI of the slope d ln(ratio)/dn lies entirely above 0; *shrinking* if entirely below 0; *flat* only if the whole CI lies inside the band [-0.10, +0.10] per bit of n
   (x1.5 per 4 bits); otherwise *undecided*. (R2's wording was "CI contains 0 and half-width <= 0.1", which is looser; the verdict is also stated under that wording if it differs.)
 - **Overall verdict**: the common per-metric verdict if the two agree; otherwise *undecided* (with the direction of the point estimates described, not voted).
+
+## Amendment 1 (written after the l = 3..7 sessions and the l = 8 sessions at n = 9..13 had been measured, before any l >= 9 session was run)
+
+The l = 3..7 grid above turned out not to bracket WDSat's optimum at the larger cells: in first-solution mode a larger base makes the system trivially satisfiable with many solutions, and the
+per-system cost falls with l again (n = 11: best at the grid edge or beyond; n = 13: l = 8 beats l = 7 by 15x). The R2 lab sweeps go to an interior minimum, so the WDSat sweep is continued the same way.
+
+- **Fit A (pre-fixed grid, the verdict under the rule above)**: published arm = best of l in {3..7}. Unchanged.
+- **Fit B (extended grid, same rule applied unchanged)**: published arm = best over l in {3..L}, where L is extended per cell until the whole-run cost at two consecutive larger l is above the best seen (an interior optimum, as for the lab arm), or l = n.
+  Cells whose optimum is already interior inside {3..8} (K_1 n = 9: l = 3 is the lowest valid l; K_0 n = 9: l = 6) are not extended. Fit B is post hoc in its grid and is reported next to A with its own verdict by the same CI rule; the overall verdict
+  states both and says which one the pre-fixed rule decides.
+- Everything else (cells, targets, pricing, ratio definition, eligibility, band) is unchanged. No l >= 9 brute-force root cross-check is done (2^27 triples); the ecbench `[d]G = Q` verification on every record and the zero-lift-failure count stand in.
