@@ -1,0 +1,2 @@
+Initial hash reader assumed flat manifest; producer wraps entries in files. FileNotFoundError path/files occurred before source copying/Lean invocation. Three subsequent python commands had absent check.py, so no native compiler ran. Corrected reader retains this observation.
+Second reader used files wrapper but did not extract nested sha256/bytes metadata; assertion failed comparing digest with metadata object before Lean invocation.

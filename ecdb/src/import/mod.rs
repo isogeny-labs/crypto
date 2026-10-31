@@ -12,6 +12,7 @@ use tokio_postgres::Client;
 pub mod certs;
 pub mod covers;
 pub mod derive;
+pub mod enrich;
 pub mod lmfdb;
 pub mod registry;
 pub mod traits;
@@ -85,18 +86,27 @@ impl Ctx<'_> {
 /// Lambda package ships the catalogues compressed). The recorded SHA-256 is
 /// always that of the uncompressed bytes, so it matches the repository file.
 pub fn read_json(path: &Path, rel_path: &str) -> Result<Input> {
-    let gz = PathBuf::from(format!("{}.gz", path.display()));
-    let bytes = if !path.exists() && gz.exists() {
-        let mut out = Vec::new();
-        std::io::Read::read_to_end(&mut flate2::read::GzDecoder::new(std::fs::File::open(&gz)?), &mut out)
-            .with_context(|| format!("decompressing {}", gz.display()))?;
-        out
-    } else {
-        std::fs::read(path).with_context(|| format!("reading {}", path.display()))?
-    };
+    let bytes = read_bytes(path)?;
     let sha256 = hex::encode(<sha2::Sha256 as sha2::Digest>::digest(&bytes));
     let doc = serde_json::from_slice(&bytes).with_context(|| format!("parsing {}", path.display()))?;
     Ok(Input { rel_path: rel_path.to_string(), sha256, doc })
+}
+
+/// The bytes of `path`, or of its gzip copy `<path>.gz` when only that exists.
+pub fn read_bytes(path: &Path) -> Result<Vec<u8>> {
+    let gz = PathBuf::from(format!("{}.gz", path.display()));
+    if !path.exists() && gz.exists() {
+        let mut out = Vec::new();
+        std::io::Read::read_to_end(&mut flate2::read::GzDecoder::new(std::fs::File::open(&gz)?), &mut out)
+            .with_context(|| format!("decompressing {}", gz.display()))?;
+        Ok(out)
+    } else {
+        std::fs::read(path).with_context(|| format!("reading {}", path.display()))
+    }
+}
+
+pub fn read_text(path: &Path) -> Result<String> {
+    Ok(String::from_utf8(read_bytes(path)?)?)
 }
 
 /// Run `sql` once per batch with `$1` = jsonb array of rows and `$2` = provenance id.
@@ -170,6 +180,7 @@ pub enum Selection {
     Transfers,
     Certificates,
     Derived,
+    Enrich,
 }
 
 /// Run the selected importers; `walk_files` overrides the default walk outputs.
@@ -197,6 +208,9 @@ pub async fn run(ctx: &Ctx<'_>, what: Selection, walk_files: Option<Vec<String>>
     }
     if all || what == Selection::Derived {
         reports.push(derive::import(ctx).await?);
+    }
+    if all || what == Selection::Enrich {
+        reports.push(enrich::import(ctx).await?);
     }
     Ok(reports)
 }

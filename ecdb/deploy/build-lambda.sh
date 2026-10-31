@@ -21,7 +21,7 @@ install -m 0755 "$here/bootstrap" "$pkg/bootstrap"
 curl -fsS -o "$pkg/rds-ca.pem" https://truststore.pki.rds.amazonaws.com/us-west-2/us-west-2-bundle.pem
 git -C "$repo" rev-parse HEAD > "$pkg/SOURCE_COMMIT"
 
-# The inputs `ecdb import all` reads (src/import/*.rs); read_json takes <file>.gz.
+# The inputs `ecdb import all` reads (src/import/*.rs); read_bytes takes <file>.gz.
 inputs=(
   docs/curves/registry.json docs/curves/traits.json docs/curves/covers.json
   docs/curves/jacobian-transfers.json docs/curves/level-certificates.json docs/curves/jacobian-certificates.json
@@ -31,6 +31,7 @@ inputs=(
   research/prime61_isogeny_20261016/one-hop-l13/isogeny_routes.json
   research/prime61_isogeny_20261016/one-hop-l61/isogeny_routes.json
   docs/ic/fixtures/current_head_prime_route_20261024/isogeny_routes.json
+  src/cryptanalysis/curve_traits/modular_polynomials.txt
 )
 for f in "${inputs[@]}"; do
   mkdir -p "$pkg/data/$(dirname "$f")"
