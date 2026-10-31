@@ -134,6 +134,7 @@ pub mod coleman_integration;
 pub mod coordinate_descent;
 pub mod coordinate_quotients;
 pub mod coordinate_search;
+pub mod cover_catalog;
 pub mod crossbred;
 pub mod curve_catalog;
 pub mod curve_construction;
