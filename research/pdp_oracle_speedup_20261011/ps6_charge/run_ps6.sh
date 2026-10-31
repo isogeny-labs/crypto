@@ -2,7 +2,7 @@
 # PS-6: charge the pairs-and-solve kernels in the counted unit and compare (protocols/PS-6.md).
 # Committed before any PS-6 session ran.  Every heavy step goes through the shared benchmark lock.
 #
-#   PS6_STAGES   space-separated subset of: build tests manifest counted reaudit calibrate opcount memory timed analyze
+#   PS6_STAGES   space-separated subset of: build tests manifest counted reaudit calibrate memory timed analyze
 #                (default: all, in that order)
 #   PS6_RUNGS    default "15 18 21 24 27"
 #   PS6_CPU      the core the calibration pins to (tools/isolated_bench.py run), default 3
@@ -21,7 +21,7 @@ RAW=$R/raw
 SESS=$RAW/sessions
 LOGS=$RAW/logs
 TAG=${PS6_TAG:-}
-STAGES=${PS6_STAGES:-build tests manifest counted reaudit calibrate opcount memory timed analyze}
+STAGES=${PS6_STAGES:-build tests manifest counted reaudit calibrate memory timed analyze}
 RUNGS=${PS6_RUNGS:-15 18 21 24 27}
 CPU=${PS6_CPU:-3}
 ECB=target/release/ecbench
@@ -126,20 +126,6 @@ if has calibrate; then
       "$TOOL" calibrate --out "$RAW/calibrate.jsonl" --rungs "$(echo $RUNGS | tr ' ' ',')" --reps 11 2>&1 | tee "$LOGS/calibrate.log"
 fi
 
-if has opcount; then
-  # Counted field operations (carry-less multiplies, products, squarings, inversions) of the baseline's
-  # pair loop and the kernel's on the same targets: the feature `pdp-opcount` of semaev_decomp, a
-  # different build of the library, in the same target directory (its artifacts sit beside the others;
-  # the binary is copied out because it has the same output name), then the normal build is restored.
-  if [ ! -e "$RAW/opcount.jsonl" ]; then
-    $BUSY cargo build --release --bin ps6_tool --features pdp-opcount 2>&1 | tail -2
-    cp "$TOOL" "$LOGS/ps6_tool_opcount"
-    $BUSY cargo build --release --bin ps6_tool 2>&1 | tail -1
-    $BUSY "$LOGS/ps6_tool_opcount" opcount --out "$RAW/opcount.jsonl" --rungs "$(echo $RUNGS | tr ' ' ',')" --targets 64
-    rm -f "$LOGS/ps6_tool_opcount"
-  fi
-fi
-
 if has memory; then
   [ -e "$RAW/memory.jsonl" ] || {
     for n in $RUNGS; do
@@ -180,8 +166,7 @@ if has analyze; then
   [ -z "$timed_dirs" ] || "$ECB" table --dir $timed_dirs > "$RAW/table_timed.txt" 2>&1 || true
   counted_dirs=$(ls -d "$SESS"/counted_n*"$TAG" | grep -v audit | tr '\n' ' ')
   timed_args=""; [ -z "$timed_dirs" ] || timed_args="--timed $(echo $timed_dirs | tr '\n' ' ')"
-  opc=""; [ ! -e "$RAW/opcount.jsonl" ] || opc="--opcount $RAW/opcount.jsonl"
   mem=""; [ ! -e "$RAW/memory.jsonl" ] || mem="--memory $RAW/memory.jsonl"
-  "$TOOL" analyze --counted $counted_dirs $timed_args --calibration "$RAW/calibrate.jsonl" $opc $mem \
+  "$TOOL" analyze --counted $counted_dirs $timed_args --calibration "$RAW/calibrate.jsonl" $mem \
       --out "$RAW/summary.json" --markdown "$RAW/summary.md"
 fi

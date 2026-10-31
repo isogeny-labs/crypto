@@ -49,6 +49,8 @@
 | mitm / rho-negation | 27.57 | 25.70 | 15.93 | A above B at every weight |
 | mitm-negfold / rho-negation | 26.73 | 24.91 | 15.45 | A above B at every weight |
 
+Verdict parity (baseline, group-law and audit arms): 16 of 16 (workload, round) groups have identical targets tried, relations found, matrix rank and recovered scalar; the audit arm compared 1720 witnesses with the baseline's and found 0 mismatches; 3 degenerate targets went to the baseline.
+
 Conversions at this rung (GAE per pair): baseline pair pinned 3.023; baseline pair measured here 1.769; kernel pair / baseline pair time 0.2645 (min 0.2112, max 0.3104), so anchored kernel pair 0.7994; kernel pair over a measured addition 0.4742 (min 0.3753, max 0.5611).
 
 ## n = 18 (l = 6), icv1-f2m18-t393-d2c04152 , r = 2^15.00, floor S = 0.8862; session ECBS1h9c1f6e592bd2
@@ -99,6 +101,8 @@ Conversions at this rung (GAE per pair): baseline pair pinned 3.023; baseline pa
 | s4-baseline / rho-negation | 1544 | 1431 | 861.9 | A above B at every weight |
 | mitm / rho-negation | 33.46 | 31.00 | 18.67 | A above B at every weight |
 | mitm-negfold / rho-negation | 30.58 | 28.34 | 17.07 | A above B at every weight |
+
+Verdict parity (baseline, group-law and audit arms): 16 of 16 (workload, round) groups have identical targets tried, relations found, matrix rank and recovered scalar; the audit arm compared 1762 witnesses with the baseline's and found 0 mismatches; 1 degenerate targets went to the baseline.
 
 Conversions at this rung (GAE per pair): baseline pair pinned 2.899; baseline pair measured here 1.737; kernel pair / baseline pair time 0.1770 (min 0.1644, max 0.1990), so anchored kernel pair 0.5132; kernel pair over a measured addition 0.3221 (min 0.2764, max 0.3510).
 
@@ -151,6 +155,8 @@ Conversions at this rung (GAE per pair): baseline pair pinned 2.899; baseline pa
 | mitm / rho-negation | 56.37 | 51.83 | 30.05 | A above B at every weight |
 | mitm-negfold / rho-negation | 53.58 | 49.27 | 28.56 | A above B at every weight |
 
+Verdict parity (baseline, group-law and audit arms): 16 of 16 (workload, round) groups have identical targets tried, relations found, matrix rank and recovered scalar; the audit arm compared 6582 witnesses with the baseline's and found 0 mismatches; 0 degenerate targets went to the baseline.
+
 Conversions at this rung (GAE per pair): baseline pair pinned 2.815; baseline pair measured here 1.735; kernel pair / baseline pair time 0.1367 (min 0.1201, max 0.1461), so anchored kernel pair 0.3850; kernel pair over a measured addition 0.2412 (min 0.2170, max 0.2546).
 
 ## n = 24 (l = 8), icv1-f2m24-tm3047-2d0c0e8c , r = 2^21.00, floor S = 0.8862; session ECBS1h08f67a4fa7eb
@@ -201,6 +207,8 @@ Conversions at this rung (GAE per pair): baseline pair pinned 2.815; baseline pa
 | s4-baseline / rho-negation | 14806 | 13574 | 7761 | A above B at every weight |
 | mitm / rho-negation | 72.88 | 66.81 | 38.20 | A above B at every weight |
 | mitm-negfold / rho-negation | 62.81 | 57.58 | 32.92 | A above B at every weight |
+
+Verdict parity (baseline, group-law and audit arms): 16 of 16 (workload, round) groups have identical targets tried, relations found, matrix rank and recovered scalar; the audit arm compared 5967 witnesses with the baseline's and found 0 mismatches; 0 degenerate targets went to the baseline.
 
 Conversions at this rung (GAE per pair): baseline pair pinned 2.857; baseline pair measured here 1.622; kernel pair / baseline pair time 0.1069 (min 0.1029, max 0.1586), so anchored kernel pair 0.3055; kernel pair over a measured addition 0.1743 (min 0.1567, max 0.2533).
 
@@ -253,6 +261,8 @@ Conversions at this rung (GAE per pair): baseline pair pinned 2.857; baseline pa
 | mitm / rho-negation | 180.8 | 165.4 | 93.80 | A above B at every weight |
 | mitm-negfold / rho-negation | 167.3 | 153.1 | 86.84 | A above B at every weight |
 
+Verdict parity (baseline, group-law and audit arms): 8 of 8 (workload, round) groups have identical targets tried, relations found, matrix rank and recovered scalar; the audit arm compared 11907 witnesses with the baseline's and found 0 mismatches; 0 degenerate targets went to the baseline.
+
 Conversions at this rung (GAE per pair): baseline pair pinned 3.090; baseline pair measured here 1.728; kernel pair / baseline pair time 0.0878 (min 0.0802, max 0.1240), so anchored kernel pair 0.2713; kernel pair over a measured addition 0.1528 (min 0.1405, max 0.2176).
 
 ## Exponent fits (total operations T = S sqrt(r) proportional to r^e; S / floor proportional to r^(e - 1/2))
@@ -297,6 +307,21 @@ Conversions at this rung (GAE per pair): baseline pair pinned 3.090; baseline pa
 | s4-grouplaw [w = 0 (recorded)] minus baseline | -0.627 | [-0.634, -0.623] | 1.000 |
 | s4-grouplaw [w = 0.1] minus baseline | -0.168 | [-0.172, -0.165] | 1.000 |
 | s4-grouplaw [w = 1] minus baseline | -0.027 | [-0.028, -0.026] | 1.000 |
+
+## Memory (not in S)
+
+| n | l | fold | signed points | table entries | RSS growth of the build, MiB | bytes per entry | build adds |
+|--:|--:|:--|--:|--:|--:|--:|--:|
+| 15 | 5 | full | 30 | 220 | 0.0 | 0.000 | 465 |
+| 15 | 5 | negation | 30 | 220 | 0.0 | 0.000 | 240 |
+| 18 | 6 | full | 64 | 1016 | 0.0 | 0.000 | 2080 |
+| 18 | 6 | negation | 64 | 1016 | 0.0 | 0.000 | 1056 |
+| 21 | 7 | full | 122 | 3721 | 0.1 | 38.53 | 7503 |
+| 21 | 7 | negation | 122 | 3721 | 0.1 | 38.53 | 3782 |
+| 24 | 8 | full | 274 | 18711 | 0.5 | 29.99 | 37675 |
+| 24 | 8 | negation | 274 | 18711 | 0.5 | 29.99 | 18906 |
+| 27 | 9 | full | 526 | 69118 | 2.1 | 32.30 | 138601 |
+| 27 | 9 | negation | 526 | 69118 | 2.1 | 32.30 | 69432 |
 
 ## Timed sessions (wall time of the solve, per run; descriptive unless the comparison says admitted)
 

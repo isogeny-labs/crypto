@@ -80,16 +80,6 @@ enum Cmd {
         #[arg(long, default_value_t = 3_000_000)]
         min_pairs: u64,
     },
-    /// Count field operations of the baseline loop and the kernel on the same targets
-    /// (needs a build with `--features pdp-opcount`).
-    Opcount {
-        #[arg(long)]
-        out: PathBuf,
-        #[arg(long, value_delimiter = ',', default_value = "15,18,21,24,27")]
-        rungs: Vec<u32>,
-        #[arg(long, default_value_t = 64)]
-        targets: usize,
-    },
     /// Build the repository's pair table for one rung and report its memory.
     Memory {
         #[arg(long)]
@@ -114,6 +104,10 @@ enum Cmd {
         counted: Vec<PathBuf>,
         #[arg(long)]
         summary: PathBuf,
+        /// The gate's evidence directory (`benchmarks/<entry>/`): raw_data paths are written
+        /// relative to it, as the gate resolves them.
+        #[arg(long)]
+        evidence_dir: PathBuf,
         #[arg(long)]
         out: PathBuf,
     },
@@ -138,9 +132,6 @@ enum Cmd {
         timed: Vec<PathBuf>,
         #[arg(long)]
         calibration: PathBuf,
-        /// `ps6_tool opcount` output, for the count-based conversion.
-        #[arg(long)]
-        opcount: Option<PathBuf>,
         #[arg(long)]
         memory: Option<PathBuf>,
         #[arg(long)]
@@ -170,17 +161,13 @@ fn run(cli: Cli) -> Result<(), String> {
             reps,
             min_pairs,
         } => calibrate(&out, &rungs, reps, min_pairs),
-        Cmd::Opcount {
-            out,
-            rungs,
-            targets,
-        } => opcount(&out, &rungs, targets),
         Cmd::Certify { sessions, out } => certify(&sessions, &out),
         Cmd::Validate {
             counted,
             summary,
+            evidence_dir,
             out,
-        } => validate(&counted, &summary, &out),
+        } => validate(&counted, &summary, &evidence_dir, &out),
         Cmd::GateJson {
             summary,
             certificate,
@@ -193,7 +180,6 @@ fn run(cli: Cli) -> Result<(), String> {
             counted,
             timed,
             calibration,
-            opcount,
             memory,
             out,
             markdown,
@@ -202,7 +188,6 @@ fn run(cli: Cli) -> Result<(), String> {
             &counted,
             &timed,
             &calibration,
-            opcount.as_deref(),
             memory.as_deref(),
             &out,
             &markdown,
@@ -254,50 +239,6 @@ fn rung_targets(inst: &BinaryInstance, l: u32, want: usize, rng: &mut StdRng) ->
         }
     }
     targets
-}
-
-// ── opcount ───────────────────────────────────────────────────────
-
-#[cfg(feature = "pdp-opcount")]
-fn opcount(out: &Path, rungs: &[u32], want: usize) -> Result<(), String> {
-    use crypto_lib::cryptanalysis::semaev_decomp::opcount as oc;
-    let mut rows = Vec::new();
-    for &n in rungs {
-        let inst = ledger_instance(n)?;
-        let (l, basis, _fb, base) = rung_parts(&inst);
-        let baseline = SubspaceOracle::new(&basis, inst.b, &inst.gf);
-        let mut kernel = Kernel::new(&inst.gf, inst.a, l, base);
-        let mut rng = StdRng::seed_from_u64(0x0C0C_0C0C ^ n as u64);
-        let targets = rung_targets(&inst, l, want, &mut rng);
-        oc::reset();
-        let mut s4_pairs = 0u64;
-        for &(x, _) in &targets {
-            s4_pairs += baseline.decompose(x, &inst.gf).1;
-        }
-        let cb = oc::snapshot();
-        oc::reset();
-        let mut gl_pairs = 0u64;
-        for &p in &targets {
-            gl_pairs += kernel.first(p).1.pairs;
-        }
-        let ck = oc::snapshot();
-        let per = |c: u64, p: u64| c as f64 / p as f64;
-        rows.push(json!({
-            "kind": "opcount", "n": n, "l": l, "targets": targets.len(),
-            "baseline_pairs": s4_pairs, "kernel_pairs": gl_pairs,
-            "baseline_counts": serde_json::from_str::<Value>(&cb.json()).map_err(|e| e.to_string())?,
-            "kernel_counts": serde_json::from_str::<Value>(&ck.json()).map_err(|e| e.to_string())?,
-            "baseline_pclmul_per_pair": per(cb.pclmul(), s4_pairs),
-            "kernel_pclmul_per_pair": per(ck.pclmul(), gl_pairs),
-            "kernel_over_baseline_pclmul_per_pair": per(ck.pclmul(), gl_pairs) / per(cb.pclmul(), s4_pairs),
-        }));
-    }
-    write_jsonl(out, &rows)
-}
-
-#[cfg(not(feature = "pdp-opcount"))]
-fn opcount(_out: &Path, _rungs: &[u32], _want: usize) -> Result<(), String> {
-    Err("rebuild with --features pdp-opcount: this build counts nothing".into())
 }
 
 // ── calibrate ─────────────────────────────────────────────────────
@@ -625,9 +566,6 @@ enum Conv {
     Est,
     /// Each kernel pair priced at its measured time over a measured group addition.
     EstAdd,
-    /// Each kernel pair priced at the pinned baseline-pair price times the counted
-    /// carry-less-multiply ratio per pair (deterministic; needs the opcount build).
-    EstClmul,
 }
 
 impl Conv {
@@ -649,7 +587,6 @@ impl Conv {
             Conv::Pairs => "pair-count (kernel pair = baseline pair)",
             Conv::Est => "anchored estimate",
             Conv::EstAdd => "add-ratio estimate",
-            Conv::EstClmul => "clmul-count estimate",
         }
     }
 }
@@ -665,8 +602,6 @@ struct Calib {
     gl_over_s4: f64,
     gl_over_s4_min: f64,
     gl_over_s4_max: f64,
-    /// Counted carry-less multiplies per kernel pair over per baseline pair.
-    clmul_ratio: Option<f64>,
 }
 
 /// Per-workload value of an arm: S (or total ops) under a convention, the
@@ -683,9 +618,6 @@ fn value(rung: &Rung, arm: &str, conv: Conv, cal: &Calib, ops: bool, wl: &str) -
                 Conv::Pairs => r.solver_ops as f64 * cal.c_s4_pinned,
                 Conv::Est => r.solver_ops as f64 * cal.c_s4_pinned * cal.gl_over_s4,
                 Conv::EstAdd => r.solver_ops as f64 * cal.c_gl,
-                Conv::EstClmul => {
-                    r.solver_ops as f64 * cal.c_s4_pinned * cal.clmul_ratio.unwrap_or(f64::NAN)
-                }
             };
             let total = r.total_ops + extra_ops;
             if ops {
@@ -753,7 +685,6 @@ fn analyze(
     counted: &[PathBuf],
     timed: &[PathBuf],
     calibration: &Path,
-    opcount_file: Option<&Path>,
     memory_file: Option<&Path>,
     out: &Path,
     markdown: &Path,
@@ -790,24 +721,8 @@ fn analyze(
                 gl_over_s4: g("gl_over_s4_ns_median")?,
                 gl_over_s4_min: g("gl_over_s4_ns_min")?,
                 gl_over_s4_max: g("gl_over_s4_ns_max")?,
-                clmul_ratio: None,
             },
         );
-    }
-    if let Some(p) = opcount_file {
-        for line in std::fs::read_to_string(p)
-            .map_err(|e| format!("{}: {e}", p.display()))?
-            .lines()
-        {
-            let v: Value = serde_json::from_str(line).map_err(|e| e.to_string())?;
-            if v["kind"] != "opcount" {
-                continue;
-            }
-            let n = v["n"].as_u64().ok_or("opcount n")? as u32;
-            if let Some(c) = cal.get_mut(&n) {
-                c.clmul_ratio = v["kernel_over_baseline_pclmul_per_pair"].as_f64();
-            }
-        }
     }
     let mem: Vec<Value> = match memory_file {
         Some(p) => std::fs::read_to_string(p)
@@ -824,7 +739,6 @@ fn analyze(
     let gl = "s4-grouplaw";
     let mitm = "mitm";
     let mitm_nf = "mitm-negfold";
-    let have_clmul = !cal.is_empty() && cal.values().all(|c| c.clmul_ratio.is_some());
     let mut arm_list: Vec<(&str, Conv)> = Vec::new();
     for arm in [rho, base, gl, mitm, mitm_nf] {
         for conv in [Conv::Lb, Conv::B01, Conv::B1] {
@@ -832,15 +746,9 @@ fn analyze(
         }
         if arm == gl {
             // Further points, never a replacement for the band (AGENTS.md section 5a).
-            arm_list.extend([
-                (gl, Conv::Pairs),
-                (gl, Conv::Est),
-                (gl, Conv::EstAdd),
-                (gl, Conv::EstClmul),
-            ]);
+            arm_list.extend([(gl, Conv::Pairs), (gl, Conv::Est), (gl, Conv::EstAdd)]);
         }
     }
-    arm_list.retain(|(_, c)| *c != Conv::EstClmul || have_clmul);
     let label = |a: &str, c: Conv| -> String { format!("{a} [{}]", c.name()) };
 
     let mut rung_json = Vec::new();
@@ -1343,6 +1251,7 @@ fn certify(sessions: &[PathBuf], out: &Path) -> Result<(), String> {
     let (mut checked, mut negatives, mut curves_ok) = (0u64, 0u64, 0u64);
     let mut receipts = Vec::new();
     let mut seen_curves: BTreeMap<String, bool> = BTreeMap::new();
+    let mut instances: BTreeMap<(u32, u64, u64), BinaryInstance> = BTreeMap::new();
     for dir in sessions {
         let session = read_session(dir)?;
         let recs = read_records(dir)?;
@@ -1372,8 +1281,13 @@ fn certify(sessions: &[PathBuf], out: &Path) -> Result<(), String> {
                 ));
                 continue;
             };
-            let inst = random_binary_instance(n, seed, max_cofactor)
-                .ok_or(format!("no curve for n = {n}"))?;
+            // Building a curve counts its points (2^n steps): once per curve, not per record.
+            if !instances.contains_key(&(n, seed, max_cofactor)) {
+                let built = random_binary_instance(n, seed, max_cofactor)
+                    .ok_or(format!("no curve for n = {n}"))?;
+                instances.insert((n, seed, max_cofactor), built);
+            }
+            let inst = &instances[&(n, seed, max_cofactor)];
             let gf = &inst.gf;
             let g = (
                 hex_u64(&r.workload.curve.generator[0])?,
@@ -1564,7 +1478,12 @@ fn recompute_unpriced(r: &Record) -> f64 {
         .unwrap_or(0) as f64
 }
 
-fn validate(counted: &[PathBuf], summary: &Path, out: &Path) -> Result<(), String> {
+fn validate(
+    counted: &[PathBuf],
+    summary: &Path,
+    evidence_dir: &Path,
+    out: &Path,
+) -> Result<(), String> {
     let sum: Value = serde_json::from_str(
         &std::fs::read_to_string(summary).map_err(|e| format!("{}: {e}", summary.display()))?,
     )
@@ -1576,7 +1495,7 @@ fn validate(counted: &[PathBuf], summary: &Path, out: &Path) -> Result<(), Strin
     let (mut records_checked, mut totals_equal) = (0u64, 0u64);
     for dir in counted {
         let recs = read_records(dir)?;
-        raw_data.push(json!({"path": dir.join("records.jsonl"), "sha256": sha256_file(&dir.join("records.jsonl"))?}));
+        raw_data.push(json!({"path": pathdiff(&dir.join("records.jsonl"), evidence_dir), "sha256": sha256_file(&dir.join("records.jsonl"))?}));
         for r in recs.iter().filter(|r| r.counts()) {
             let slug = &r.workload.curve.slug;
             let ratios = pinned_ratios(slug);
