@@ -5593,6 +5593,153 @@ struct NativeProjectionReceipt {
     last_capture_sequence: u64,
     payload_bytes: u64,
 }
+// Call only after explicitly reserving calculator work/stack. This computes
+// lengths, never JSON, and does not invoke Serialize or allocate.
+fn native_decimal_len(value: u64) -> usize {
+    // Upper-bound search over the nineteen nontrivial decimal thresholds.
+    // At most five comparisons, independent of the integer's digit width.
+    const POWERS: [u64; 19] = [
+        10,
+        100,
+        1000,
+        10000,
+        100000,
+        1000000,
+        10000000,
+        100000000,
+        1000000000,
+        10000000000,
+        100000000000,
+        1000000000000,
+        10000000000000,
+        100000000000000,
+        1000000000000000,
+        10000000000000000,
+        100000000000000000,
+        1000000000000000000,
+        10000000000000000000,
+    ];
+    let (mut low, mut high) = (0usize, POWERS.len());
+    while low < high {
+        let mid = (low + high) / 2;
+        if value < POWERS[mid] {
+            high = mid;
+        } else {
+            low = mid + 1;
+        }
+    }
+    low + 1
+}
+fn native_exact_wire_len(
+    event: &NativeBoundary,
+    sequence: u64,
+    capture_sequence: u64,
+) -> Result<usize, Stop> {
+    const _: () = assert!(std::mem::size_of::<usize>() >= 4 && std::mem::size_of::<usize>() <= 8);
+    // Include empty numeric/value positions in the fixed fragments. Hash values
+    // are 64 ASCII hex bytes and therefore cannot require JSON escaping.
+    let reserved_len = |r: &crate::cryptanalysis::koblitz_groebner::bounded_matrix::Reservation| {
+        r#"{"work":,"bytes":}"#.len() + native_decimal_len(r.work) + native_decimal_len(r.bytes)
+    };
+    let stage_len = |s: &MatrixBoundaryStage| match s {
+        MatrixBoundaryStage::Begin => r#""Begin""#.len(),
+        MatrixBoundaryStage::Pack => r#""Pack""#.len(),
+        MatrixBoundaryStage::Reduce => r#""Reduce""#.len(),
+        MatrixBoundaryStage::Readback => r#""Readback""#.len(),
+        MatrixBoundaryStage::Finish => r#""Finish""#.len(),
+        MatrixBoundaryStage::CriterionLevel { level } => {
+            r#"{"CriterionLevel":{"level":}}"#.len() + native_decimal_len(u64::from(*level))
+        }
+        MatrixBoundaryStage::CriterionCandidate {
+            generator,
+            multiplier,
+            frobenius,
+        } => {
+            r#"{"CriterionCandidate":{"generator":,"multiplier":,"frobenius":}}"#.len()
+                + native_decimal_len(*generator as u64)
+                + native_decimal_len(u64::from(*multiplier))
+                + if *frobenius { 4 } else { 5 }
+        }
+        MatrixBoundaryStage::MainCandidate {
+            generator,
+            multiplier,
+        } => {
+            r#"{"MainCandidate":{"generator":,"multiplier":}}"#.len()
+                + native_decimal_len(*generator as u64)
+                + native_decimal_len(u64::from(*multiplier))
+        }
+    };
+    let event_len = match event {
+        NativeBoundary::Construction { stage, reserved } => {
+            let name = match stage {
+                ConstructionBoundaryStage::Begin => "Begin",
+                ConstructionBoundaryStage::Table => "Table",
+                ConstructionBoundaryStage::Selector => "Selector",
+                ConstructionBoundaryStage::Add => "Add",
+                ConstructionBoundaryStage::Square => "Square",
+                ConstructionBoundaryStage::Product => "Product",
+                ConstructionBoundaryStage::Coordinates => "Coordinates",
+                ConstructionBoundaryStage::Complete => "Complete",
+            };
+            r#"{"phase":"construction","stage":,"reserved":}"#.len()
+                + name.len()
+                + 2
+                + reserved_len(reserved)
+        }
+        NativeBoundary::Matrix {
+            stage,
+            reserved,
+            counters,
+        } => {
+            let counters_len = r#"{"main_attempts":,"nonempty_rows":,"selected_rows":,"pruned_nonempty_rows":,"criterion_attempts":,"criterion_rows":,"criterion_zero_reductions":,"koszul_pruned":,"frobenius_pruned":,"criterion_word_xors":,"reduction_word_xors":,"attempted_events":,"acknowledged_events":,"dynamic_layout_bytes":,"allocation_requests":}"#.len()
+                + native_counter_values(*counters).into_iter().map(native_decimal_len).sum::<usize>();
+            r#"{"phase":"matrix","stage":,"reserved":,"counters":}"#.len()
+                + stage_len(stage)
+                + reserved_len(reserved)
+                + counters_len
+        }
+    };
+    let payload_len = r#"{"schema":"crypto.ml-dataset.koblitz-m3-events/v1","binding_sha256":"","sequence":,"capture_sequence":,"event":}"#.len()
+        + 64 + native_decimal_len(sequence) + native_decimal_len(capture_sequence) + event_len;
+    let wire_len = r#"{"schema":"crypto.ml-dataset.live-event/v2","binding_sha256":"","sequence":,"previous_event_sha256":"","event":{"kind":"koblitz_m3_native","payload":}}"#.len()
+        + 128 + native_decimal_len(capture_sequence) + payload_len + 1;
+    // Bound all arithmetic by small fixed enums/numbers before returning a
+    // trusted length. Finite u64 digits and closed schema make overflow
+    // impossible on supported usize widths, independent of the data values.
+    if wire_len > native_boundary_encoding_cap(event) || wire_len == 0 {
+        return Err(Stop::Serialization);
+    }
+    Ok(wire_len)
+}
+
+// Closed admitted payload type: only this module can construct it. Capture's
+// specialized API cannot accept arbitrary Serialize or user-supplied lengths.
+pub(in crate::ml_dataset) struct AdmittedKoblitzNative<'a> {
+    view: NativeBoundaryView<'a>,
+    expected_wire_bytes: usize,
+    #[cfg(test)]
+    serializations: std::cell::Cell<usize>,
+}
+impl serde::Serialize for AdmittedKoblitzNative<'_> {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        #[cfg(test)]
+        self.serializations.set(self.serializations.get() + 1);
+        serde::Serialize::serialize(&self.view, serializer)
+    }
+}
+impl AdmittedKoblitzNative<'_> {
+    pub(in crate::ml_dataset) fn expected_wire_bytes(&self) -> usize {
+        self.expected_wire_bytes
+    }
+    pub(in crate::ml_dataset) fn capture_sequence(&self) -> u64 {
+        self.view.capture_sequence
+    }
+}
+// Model: <=22 widths *5 threshold iterations *7 scalar steps, plus <=254
+// fixed literal/variant/sum operations. This is not a hardware instruction count.
+const NATIVE_LENGTH_WORK: u64 = 1024;
+const NATIVE_LENGTH_BYTES: u64 = 256;
+
 struct BoundNativeEvents<'a> {
     projection: NativeProjectionReceipt,
     binding_digest: [u8; 64],
@@ -5690,8 +5837,12 @@ impl<'a> BoundNativeEvents<'a> {
         // Typed capture encoding retains its existing 8-per-byte model. The
         // canonical payload is now copied from that encoding (1 per byte),
         // eliminating the separate 8-per-byte canonical serialization pass.
-        let encoding_cap = native_boundary_encoding_cap(&event);
-        budget.reserve_checking(1024 + 9 * encoding_cap as u64, 4096, Instant::now())?;
+        budget.reserve_checking(NATIVE_LENGTH_WORK, NATIVE_LENGTH_BYTES, Instant::now())?;
+        let exact_wire =
+            native_exact_wire_len(&event, snapshot.sequence, snapshot.capture_sequence)
+                .or_else(|s| budget.fail(s))?;
+        // Keep the same coefficients; bound the actual one-pass serialization.
+        budget.reserve_checking(1024 + 9 * exact_wire as u64, 4096, Instant::now())?;
         let identity = super::LIVE_SINK.with(|slot| match slot.borrow().as_ref() {
             Some(super::EventSink::Bound(sink)) => sink.verify_digest_limits_at_count(
                 &self.binding_digest,
@@ -5713,13 +5864,15 @@ impl<'a> BoundNativeEvents<'a> {
             capture_sequence: snapshot.capture_sequence,
             event: &snapshot.event,
         };
+        let admitted = AdmittedKoblitzNative {
+            view,
+            expected_wire_bytes: exact_wire,
+            #[cfg(test)]
+            serializations: std::cell::Cell::new(0),
+        };
         let captured = super::LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
-            Some(super::EventSink::Bound(sink)) => sink.event_typed_precommit_with_limit(
-                crate::ml_dataset::capture::TypedEventKind::KoblitzM3Native,
-                &view,
-                &mut self.buffer,
-                encoding_cap,
-                &mut |wire| {
+            Some(super::EventSink::Bound(sink)) => {
+                sink.event_koblitz_native_precommit(&admitted, &mut self.buffer, &mut |wire| {
                     use crate::ml_dataset::capture::CaptureError;
                     let payload = match native_capture_payload(wire) {
                         Ok(payload) => payload,
@@ -5763,8 +5916,8 @@ impl<'a> BoundNativeEvents<'a> {
                         ));
                     }
                     Ok(())
-                },
-            ),
+                })
+            }
             _ => Err(crate::ml_dataset::capture::CaptureError::Integrity(
                 "native boundary requires bound capture".into(),
             )),
@@ -5875,6 +6028,10 @@ mod native_boundary_emitter_tests {
                 event: &event,
             };
             let wire = maximum_sequence_typed_wire(TypedEventKind::KoblitzM3Native, &view);
+            assert_eq!(
+                wire.len(),
+                native_exact_wire_len(&event, u64::MAX, u64::MAX).unwrap()
+            );
             assert!(
                 wire.len() <= native_boundary_encoding_cap(&event),
                 "variant {event:?}: {} bytes exceeds {}",
@@ -11484,13 +11641,13 @@ pub(super) fn run_verified_worker_entry(
     // modeled work/bytes, never a retired hardware instruction count.
     budget
         .reserve_checking(
-            32 * 32 * 1024 + 65536 + WORKER_TERMINAL_GUARD_WORK,
+            32 * WORKER_TERMINAL_CAP as u64 + 65536 + WORKER_TERMINAL_GUARD_WORK,
             2 * 1024 * 1024 + 128 * 1024,
             Instant::now(),
         )
         .map_err(|s| format!("Koblitz output admission: {s:?}"))?;
     budget
-        .reserve_trace(4 * 32 * 1024 + 4096, Instant::now())
+        .reserve_trace(4 * WORKER_TERMINAL_CAP as u64 + 4096, Instant::now())
         .map_err(|s| format!("Koblitz terminal capture admission: {s:?}"))?;
     let mut receipts = super::WorkerStoredReceipts::admit(original, 12, |work, bytes| {
         budget
@@ -12493,12 +12650,12 @@ mod worker_central_replay_tests {
     }
 }
 
-// The 32 KiB reservation is scoped to run_verified_worker_entry's closed
+// The 8 KiB reservation is scoped to run_verified_worker_entry's closed
 // constructors: fixed scalar keys, static diagnostic fields, <=12 fixed-identity
 // root descriptors and two fixed errors. These guards detect schema drift before
 // capture cloning/publication. Arbitrary Values injected into this private helper
 // are outside that constructor proof; preserve them intact on invariant failure.
-const WORKER_TERMINAL_CAP: usize = 32 * 1024;
+const WORKER_TERMINAL_CAP: usize = 8 * 1024;
 const WORKER_TERMINAL_GUARD_WORK: u64 = 8 * WORKER_TERMINAL_CAP as u64 + 4096;
 
 /// Counts encoded bytes without allocating an encoded copy. Refuses a write
@@ -12533,39 +12690,165 @@ fn worker_terminal_ascii(s: &str, max: usize) -> bool {
         && s.bytes()
             .all(|b| (0x20..=0x7e).contains(&b) && b != b'"' && b != b'\\')
 }
-fn worker_terminal_scalar(v: &serde_json::Value) -> bool {
-    match v {
-        serde_json::Value::Null | serde_json::Value::Bool(_) => true,
-        serde_json::Value::Number(n) => n.as_u64().is_some(),
-        serde_json::Value::String(s) => worker_terminal_ascii(s, 128),
-        _ => false,
-    }
+#[derive(Clone, Copy)]
+enum WorkerTerminalKind {
+    Bool,
+    U64,
+    Null,
+    Stop,
+    Fixed(&'static str),
+    Status,
 }
-/// Fixed-depth diagnostic tree. Counts every object entry, not just leaves.
-fn worker_terminal_diagnostic(v: &serde_json::Value, depth: usize, entries: &mut usize) -> bool {
-    if let Some(s) = v.as_str() {
-        return worker_terminal_ascii(s, 64);
-    }
-    if worker_terminal_scalar(v) {
-        return true;
-    }
-    let Some(object) = v.as_object() else {
-        return false;
-    };
-    if depth == 0 || object.len() > 32 {
-        return false;
-    }
-    for (key, value) in object {
-        *entries += 1;
-        if *entries > 32
-            || !worker_terminal_ascii(key, 48)
-            || !worker_terminal_diagnostic(value, depth - 1, entries)
-        {
-            return false;
-        }
-    }
-    true
+const WORKER_TERMINAL_SCALARS: &[(&str, WorkerTerminalKind)] = &[
+    (
+        "adapter_id",
+        WorkerTerminalKind::Fixed("koblitz-m3-native-v1"),
+    ),
+    (
+        "strategy",
+        WorkerTerminalKind::Fixed("koblitz-m3-native-v1"),
+    ),
+    ("status", WorkerTerminalKind::Status),
+    ("solver_completed", WorkerTerminalKind::Bool),
+    ("pdp_witness_verified", WorkerTerminalKind::Bool),
+    ("retained_pdp_witness_verified", WorkerTerminalKind::Bool),
+    ("certificate_durably_persisted", WorkerTerminalKind::Bool),
+    ("group_domain_complete", WorkerTerminalKind::Bool),
+    ("exhaustive_no_decomposition", WorkerTerminalKind::Bool),
+    ("native_backend_invoked", WorkerTerminalKind::Bool),
+    ("algebra_completed", WorkerTerminalKind::Bool),
+    ("native_statistics_complete", WorkerTerminalKind::Bool),
+    ("first_fall_degree", WorkerTerminalKind::Null),
+    ("last_fall_degree", WorkerTerminalKind::Null),
+    ("retired_hardware_instructions", WorkerTerminalKind::Null),
+    ("fall_degree_verified", WorkerTerminalKind::Bool),
+    ("exact_instruction_count_verified", WorkerTerminalKind::Bool),
+    ("operation_trajectory_verified", WorkerTerminalKind::Bool),
+    ("full_execution_trace_verified", WorkerTerminalKind::Bool),
+    ("independent_derivation_verified", WorkerTerminalKind::Bool),
+    ("adapter_reserved_native_work", WorkerTerminalKind::U64),
+    ("adapter_reserved_checking_work", WorkerTerminalKind::U64),
+    ("adapter_reserved_bytes", WorkerTerminalKind::U64),
+    ("native_reserved_bytes", WorkerTerminalKind::U64),
+    ("charged_trace_bytes", WorkerTerminalKind::U64),
+    ("performed_group_additions", WorkerTerminalKind::U64),
+    ("first_stop", WorkerTerminalKind::Stop),
+    ("parent_delivery_complete", WorkerTerminalKind::Bool),
+    ("parent_retention_stop", WorkerTerminalKind::Stop),
+    ("parent_owner_transfer_stop", WorkerTerminalKind::Stop),
+    ("parent_delivery_stop", WorkerTerminalKind::Stop),
+    (
+        "parent_diagnostic_scope",
+        WorkerTerminalKind::Fixed(
+            "actual parent attempt identity and modeled reservation; producer first_stop unchanged",
+        ),
+    ),
+    (
+        "capture_finalization_clock_verified",
+        WorkerTerminalKind::Bool,
+    ),
+    ("pre_finalization_first_stop", WorkerTerminalKind::Stop),
+    (
+        "completion_pending_capture_finish",
+        WorkerTerminalKind::Bool,
+    ),
+];
+fn worker_terminal_stop(v: &serde_json::Value) -> bool {
+    v.is_null()
+        || matches!(
+            v.as_str(),
+            Some(
+                "InvalidLimits"
+                    | "Overflow"
+                    | "Deadline"
+                    | "Phase"
+                    | "Nonmonotone"
+                    | "Work"
+                    | "Bytes"
+                    | "Trace"
+                    | "Additions"
+                    | "Observer"
+                    | "NativeFailure"
+                    | "Allocation"
+                    | "Serialization"
+                    | "Events"
+            )
+        )
 }
+fn worker_terminal_named_object(
+    v: &serde_json::Value,
+    keys: &[&str],
+    check: impl Fn(&str, &serde_json::Value) -> bool,
+) -> bool {
+    v.as_object().is_some_and(|o| {
+        o.len() == keys.len()
+            && o.iter()
+                .all(|(k, v)| keys.contains(&k.as_str()) && check(k, v))
+    })
+}
+fn worker_terminal_numbers(v: &serde_json::Value, keys: &[&str]) -> bool {
+    worker_terminal_named_object(v, keys, |_, v| v.as_u64().is_some())
+}
+fn worker_terminal_diagnostic(v: &serde_json::Value) -> bool {
+    v.is_null()
+        || (worker_terminal_named_object(
+            v,
+            &[
+                "logical_path",
+                "payload_bytes",
+                "quote",
+                "ledger_after_attempt",
+                "remaining_shared_work_after_attempt",
+            ],
+            |k, v| match k {
+                "logical_path" => v.as_str().is_some_and(|p| {
+                    KOBLITZ_SLOTS.iter().any(|s| s.0 == p)
+                        || RAW_RETENTION_NAMES.iter().any(|(logical, _)| *logical == p)
+                        || p == "pdp-witness.json"
+                }),
+                "payload_bytes" => v.as_u64().is_some(),
+                "remaining_shared_work_after_attempt" => v.is_null() || v.as_u64().is_some(),
+                "quote" => worker_terminal_numbers(v, &["work", "bytes", "trace"]),
+                "ledger_after_attempt" => worker_terminal_named_object(
+                    v,
+                    &[
+                        "original_limits",
+                        "phase",
+                        "first_stop",
+                        "native_reserved",
+                        "checking_reserved_work",
+                        "checking_reported_work",
+                        "adapter_reserved_bytes",
+                        "charged_trace_bytes",
+                        "group_additions",
+                    ],
+                    |k, v| match k {
+                        "original_limits" => worker_terminal_numbers(
+                            v,
+                            &["native_work", "memory", "trace", "additions"],
+                        ),
+                        "native_reserved" => worker_terminal_numbers(v, &["work", "bytes"]),
+                        "phase" => matches!(
+                            v.as_str(),
+                            Some(
+                                "Setup"
+                                    | "Construction"
+                                    | "Constructed"
+                                    | "Matrix"
+                                    | "MatrixComplete"
+                                    | "Extraction"
+                                    | "Complete"
+                            )
+                        ),
+                        "first_stop" => worker_terminal_stop(v),
+                        _ => v.as_u64().is_some(),
+                    },
+                ),
+                _ => false,
+            },
+        ) && worker_terminal_encoded_size(v, 1024).is_ok())
+}
+
 fn worker_terminal_receipt(v: &serde_json::Value) -> bool {
     let Some(object) = v.as_object() else {
         return false;
@@ -12598,14 +12881,16 @@ fn worker_terminal_receipt(v: &serde_json::Value) -> bool {
         && sha.len() == 64
         && sha.bytes().all(|b| b.is_ascii_hexdigit())
         && v["bytes"].as_u64().is_some()
-        && worker_terminal_encoded_size(v, 1024).is_ok()
+        && worker_terminal_encoded_size(v, 256).is_ok()
 }
-/// Conservative bound:12674 base +12302 receipts +4096 diagnostic +512 errors
-/// +512 finalization/wrapper =30096 <32768. All traversals have structural bounds.
-/// Guard before cloning. The final count independently checks schema growth.
+/// Closed constructor maxima:35 scalar keys +4 nested keys; fixed roots <=256
+/// bytes each (actual longest215), diagnostic <=1024 (actual max769). Exact
+/// worst-case outcome5071 and wrapper5169 bytes. Even replacing these exact
+/// receipt/diagnostic lengths with caps gives 5916 <8192. No arbitrary keys or
+/// string scalar values are admitted. Recheck these counts on schema changes.
 fn guard_worker_terminal(v: &serde_json::Value) -> Result<usize, Stop> {
     let object = v.as_object().ok_or(Stop::Serialization)?;
-    if object.len() > 64 {
+    if object.len() > WORKER_TERMINAL_SCALARS.len() + 4 {
         return Err(Stop::Serialization);
     }
     for (key, value) in object {
@@ -12616,11 +12901,7 @@ fn guard_worker_terminal(v: &serde_json::Value) -> Result<usize, Stop> {
             "unregistered_root_acknowledgements" => value
                 .as_array()
                 .is_some_and(|rows| rows.len() <= 12 && rows.iter().all(worker_terminal_receipt)),
-            "failed_parent_storage" => {
-                let mut entries = 0;
-                worker_terminal_diagnostic(value, 4, &mut entries)
-                    && worker_terminal_encoded_size(value, 4096).is_ok()
-            }
+            "failed_parent_storage" => worker_terminal_diagnostic(value),
             "live_persistence_errors" => value.as_array().is_some_and(|errors| {
                 errors.len() <= 2
                     && errors.iter().all(|error| {
@@ -12635,14 +12916,37 @@ fn guard_worker_terminal(v: &serde_json::Value) -> Result<usize, Stop> {
                     && worker_terminal_encoded_size(value, 512).is_ok()
             }),
             "capture_finalization" => {
-                value.as_object().is_some_and(|fields| {
-                    fields.len() == 5
-                        && fields.iter().all(|(key, value)| {
-                            worker_terminal_ascii(key, 64) && worker_terminal_scalar(value)
-                        })
-                }) && worker_terminal_encoded_size(value, 256).is_ok()
+                worker_terminal_named_object(
+                    value,
+                    &[
+                        "event_attempted",
+                        "event_acknowledged",
+                        "finish_attempted",
+                        "finish_acknowledged",
+                        "stop",
+                    ],
+                    |key, value| {
+                        if key == "stop" {
+                            worker_terminal_stop(value)
+                        } else {
+                            value.is_boolean()
+                        }
+                    },
+                ) && worker_terminal_encoded_size(value, 256).is_ok()
             }
-            _ => worker_terminal_scalar(value),
+            _ => WORKER_TERMINAL_SCALARS
+                .iter()
+                .find(|(name, _)| *name == key)
+                .is_some_and(|(_, kind)| match kind {
+                    WorkerTerminalKind::Bool => value.is_boolean(),
+                    WorkerTerminalKind::U64 => value.as_u64().is_some(),
+                    WorkerTerminalKind::Null => value.is_null(),
+                    WorkerTerminalKind::Stop => worker_terminal_stop(value),
+                    WorkerTerminalKind::Fixed(expected) => value.as_str() == Some(*expected),
+                    WorkerTerminalKind::Status => {
+                        matches!(value.as_str(), Some("verified" | "partial"))
+                    }
+                }),
         };
         if !valid {
             return Err(Stop::Serialization);
@@ -13623,6 +13927,12 @@ mod worker_terminal_cap_controls {
                 )
                 .unwrap()
                 .saved_ledger();
+                ledger.original_limits = OriginalLimits {
+                    native_work: u64::MAX,
+                    memory: u64::MAX,
+                    trace: u64::MAX,
+                    additions: u64::MAX,
+                };
                 ledger.phase = phase;
                 ledger.first_stop = Some(stop);
                 ledger.native_reserved = Reservation {
@@ -13634,7 +13944,7 @@ mod worker_terminal_cap_controls {
                 ledger.adapter_reserved_bytes = u64::MAX;
                 ledger.charged_trace_bytes = u64::MAX;
                 ledger.group_additions = u64::MAX;
-                let receipt = json!({"path":KOBLITZ_SLOTS[0].0,"role":KOBLITZ_SLOTS[0].1,
+                let receipt = json!({"path":PARENT_DELIVERY_SLOT.0,"role":PARENT_DELIVERY_SLOT.1,
                 "encoding":"json","sha256":"f".repeat(64),"bytes":u64::MAX});
                 let mut outcome = json!({"first_stop":stop,
                 "unregistered_root_acknowledgements":vec![receipt;12],
@@ -13645,11 +13955,17 @@ mod worker_terminal_cap_controls {
                     "Koblitz final capture delivery incomplete"],
                 "capture_finalization":{"event_attempted":true,"event_acknowledged":true,
                     "finish_attempted":true,"finish_acknowledged":true,"stop":stop}});
-                // Fill every remaining top-level slot with the maximum scalar size.
-                for i in 0..59 {
-                    outcome[format!("{:064}", i)] = json!("x".repeat(128));
+                for (key, kind) in WORKER_TERMINAL_SCALARS {
+                    outcome[*key] = match kind {
+                        WorkerTerminalKind::Bool => json!(false),
+                        WorkerTerminalKind::U64 => json!(u64::MAX),
+                        WorkerTerminalKind::Null => serde_json::Value::Null,
+                        WorkerTerminalKind::Stop => json!(stop),
+                        WorkerTerminalKind::Fixed(s) => json!(s),
+                        WorkerTerminalKind::Status => json!("verified"),
+                    };
                 }
-                assert_eq!(outcome.as_object().unwrap().len(), 64);
+                assert_eq!(outcome.as_object().unwrap().len(), 39);
                 assert!(guard_worker_terminal(&outcome).unwrap() < WORKER_TERMINAL_CAP);
                 let frame = json!({"kind":"solver_return","snapshot_boundary":"before-capture-finalization",
                 "outcome":outcome,"error":null});
@@ -13742,5 +14058,297 @@ mod worker_terminal_cap_controls {
         );
         assert_eq!(outcome["solver_completed"], false);
         verify_reported_capture_finalization(&outcome).unwrap();
+    }
+}
+#[cfg(test)]
+mod native_single_pass_controls {
+    use super::*;
+    use crate::ml_dataset::capture::{CaptureError, TypedEventBuffer, TypedEventKind};
+    #[test]
+    fn threshold_widths_are_exact_at_every_decimal_transition() {
+        let mut values = vec![0, 1, 9, 10, u64::MAX];
+        for exponent in 1..=19 {
+            let power = 10u64.pow(exponent);
+            values.extend([power - 1, power, power + 1]);
+        }
+        for value in values {
+            assert_eq!(
+                native_decimal_len(value),
+                value.to_string().len(),
+                "{value}"
+            );
+        }
+    }
+    #[test]
+    fn actual_specialized_encoding_is_identical_and_invokes_serializer_once() {
+        let binding = matrix_tests::binding();
+        let limits = crate::ml_dataset::capture::capture_limits(16).unwrap();
+        let digest = binding.digest().unwrap();
+        let event = NativeBoundary::Construction {
+            stage: ConstructionBoundaryStage::Begin,
+            reserved: Default::default(),
+        };
+        let make_view = || NativeBoundaryView {
+            schema: "crypto.ml-dataset.koblitz-m3-events/v1",
+            binding_sha256: &digest,
+            sequence: 1,
+            capture_sequence: 1,
+            event: &event,
+        };
+        let exact = native_exact_wire_len(&event, 1, 1).unwrap();
+        let mut expected = Vec::new();
+        {
+            let _sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+            let mut buffer =
+                TypedEventBuffer::try_new(2048, TypedEventBuffer::requested_bytes(2048).unwrap())
+                    .unwrap();
+            super::super::LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut().unwrap() {
+                super::super::EventSink::Bound(sink) => sink
+                    .event_typed_precommit(
+                        TypedEventKind::KoblitzM3Native,
+                        &make_view(),
+                        &mut buffer,
+                        &mut |wire| {
+                            expected.extend_from_slice(wire);
+                            Ok(())
+                        },
+                    )
+                    .unwrap(),
+                _ => panic!("expected bound sink"),
+            });
+        }
+        assert_eq!(expected.len(), exact);
+        for mode in 0..6 {
+            let fixture = bound_signed_publisher_tests::SinkFixture::new(&binding);
+            let mut view = make_view();
+            if mode == 3 {
+                view.capture_sequence += 1;
+            }
+            let admitted = AdmittedKoblitzNative {
+                view,
+                expected_wire_bytes: match mode {
+                    1 => exact - 1,
+                    2 => exact + 1,
+                    _ => exact,
+                },
+                serializations: std::cell::Cell::new(0),
+            };
+            let capacity = if mode == 5 { exact - 1 } else { 2048 } as u64;
+            let mut buffer = TypedEventBuffer::try_new(
+                capacity,
+                TypedEventBuffer::requested_bytes(capacity).unwrap(),
+            )
+            .unwrap();
+            let mut callbacks = 0;
+            let mut actual = Vec::new();
+            super::super::LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut().unwrap() {
+                super::super::EventSink::Bound(sink) => {
+                    let result =
+                        sink.event_koblitz_native_precommit(&admitted, &mut buffer, &mut |wire| {
+                            callbacks += 1;
+                            actual.extend_from_slice(wire);
+                            if mode == 4 {
+                                Err(CaptureError::Integrity("selected refusal".into()))
+                            } else {
+                                Ok(())
+                            }
+                        });
+                    assert_eq!(result.is_ok(), mode == 0);
+                    assert_eq!(sink.committed_event_count(), u64::from(mode == 0));
+                }
+                _ => panic!("expected bound sink"),
+            });
+            assert_eq!(
+                admitted.serializations.get(),
+                usize::from(mode != 3 && mode != 5)
+            );
+            assert_eq!(callbacks, usize::from(mode == 0 || mode == 4));
+            if mode == 0 || mode == 4 {
+                assert_eq!(actual, expected);
+            }
+            let len = std::fs::metadata(fixture.dir.join("events.jsonl"))
+                .unwrap()
+                .len();
+            assert_eq!(len, if mode == 0 { exact as u64 } else { 0 });
+        }
+        let _ = limits;
+    }
+    #[test]
+    fn calculator_and_serialization_refusals_keep_exact_charges_and_no_capture() {
+        for allowance in [NATIVE_LENGTH_WORK - 1, NATIVE_LENGTH_WORK] {
+            let binding = matrix_tests::binding();
+            let limits = crate::ml_dataset::capture::capture_limits(16).unwrap();
+            let fixture = bound_signed_publisher_tests::SinkFixture::new(&binding);
+            let mut budget = construction_tests::budget();
+            let mut events = BoundNativeEvents::new(&binding, &limits, &mut budget).unwrap();
+            let before = budget.checking_work;
+            budget.native_work_limit = budget.native.work + before + allowance;
+            let mut global = 0;
+            assert_eq!(
+                events.emit(
+                    NativeBoundary::Construction {
+                        stage: ConstructionBoundaryStage::Begin,
+                        reserved: Default::default(),
+                    },
+                    &mut budget,
+                    &mut global
+                ),
+                Err(Stop::Work)
+            );
+            assert_eq!(
+                budget.checking_work - before,
+                if allowance == NATIVE_LENGTH_WORK {
+                    NATIVE_LENGTH_WORK
+                } else {
+                    0
+                }
+            );
+            assert_eq!(global, 0);
+            assert_eq!(events.projection.acknowledged_records, 0);
+            assert!(events.canonical.is_empty());
+            assert_eq!(
+                std::fs::metadata(fixture.dir.join("events.jsonl"))
+                    .unwrap()
+                    .len(),
+                0
+            );
+        }
+    }
+    #[test]
+    fn every_variant_matches_serializer_at_zero_max_and_decimal_boundaries() {
+        use crate::cryptanalysis::koblitz_groebner::bounded_matrix::{Counters, Reservation};
+        use ConstructionBoundaryStage as C;
+        use MatrixBoundaryStage as M;
+        let mut values = vec![0, 1, u64::MAX];
+        for exp in 1..=19 {
+            let p = 10u64.pow(exp);
+            values.extend([p - 1, p, p + 1]);
+        }
+        let digest = "f".repeat(64);
+        for value in values {
+            let reserved = Reservation {
+                work: value,
+                bytes: value,
+            };
+            let counters = Counters {
+                main_attempts: value,
+                nonempty_rows: value,
+                selected_rows: value,
+                pruned_nonempty_rows: value,
+                criterion_attempts: value,
+                criterion_rows: value,
+                criterion_zero_reductions: value,
+                koszul_pruned: value,
+                frobenius_pruned: value,
+                criterion_word_xors: value,
+                reduction_word_xors: value,
+                attempted_events: value,
+                acknowledged_events: value,
+                dynamic_layout_bytes: value,
+                allocation_requests: value,
+            };
+            let construction = [
+                C::Begin,
+                C::Table,
+                C::Selector,
+                C::Add,
+                C::Square,
+                C::Product,
+                C::Coordinates,
+                C::Complete,
+            ]
+            .map(|stage| NativeBoundary::Construction { stage, reserved });
+            let matrix = [
+                M::Begin,
+                M::Pack,
+                M::Reduce,
+                M::Readback,
+                M::Finish,
+                M::CriterionLevel {
+                    level: value as u32,
+                },
+                M::CriterionCandidate {
+                    generator: value as usize,
+                    multiplier: value as u8,
+                    frobenius: false,
+                },
+                M::CriterionCandidate {
+                    generator: value as usize,
+                    multiplier: value as u8,
+                    frobenius: true,
+                },
+                M::MainCandidate {
+                    generator: value as usize,
+                    multiplier: value as u8,
+                },
+            ]
+            .map(|stage| NativeBoundary::Matrix {
+                stage,
+                reserved,
+                counters,
+            });
+            for event in construction.into_iter().chain(matrix) {
+                let view = NativeBoundaryView {
+                    schema: "crypto.ml-dataset.koblitz-m3-events/v1",
+                    binding_sha256: &digest,
+                    sequence: value,
+                    capture_sequence: value,
+                    event: &event,
+                };
+                let wire =
+                    crate::ml_dataset::capture::native_single_pass_reference_wire(value, &view);
+                assert_eq!(
+                    native_exact_wire_len(&event, value, value).unwrap(),
+                    wire.len(),
+                    "{event:?}, sequence {value}"
+                );
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod worker_terminal_closed_schema_controls {
+    use super::*;
+    use serde_json::json;
+    #[test]
+    fn every_fixed_root_identity_has_full_digest_length_and_fits_256() {
+        let mut slots = KOBLITZ_SLOTS.to_vec();
+        slots.push(PARENT_DELIVERY_SLOT);
+        slots.push(("pdp-witness.json", "independently-verified-pdp", "json"));
+        slots.extend(
+            RAW_RETENTION_NAMES
+                .iter()
+                .map(|(_, p)| (*p, "unregistered-partial-artifact", "native")),
+        );
+        assert_eq!(slots.len(), 11);
+        let mut max = 0;
+        for (path, role, encoding) in slots {
+            let value = json!({"path":path,"role":role,"encoding":encoding,"sha256":"f".repeat(64),"bytes":u64::MAX});
+            assert!(worker_terminal_receipt(&value));
+            max = max.max(worker_terminal_encoded_size(&value, 256).unwrap());
+            let original = value.clone();
+            let outcome = json!({"unregistered_root_acknowledgements":vec![value;12]});
+            assert!(guard_worker_terminal(&outcome).is_ok());
+            assert_eq!(outcome["unregistered_root_acknowledgements"][11], original);
+        }
+        assert_eq!(max, 215);
+    }
+    #[test]
+    fn closed_keys_and_typed_values_reject_drift_without_mutation() {
+        for bad in [
+            json!({"unexpected":true}),
+            json!({"status":"worker_failed"}),
+            json!({"first_stop":"invented"}),
+            json!({"adapter_reserved_bytes":-1}),
+            json!({"first_fall_degree":4}),
+            json!({"strategy":"another"}),
+            json!({"solver_completed":"true"}),
+            json!({"failed_parent_storage":{"logical_path":"unknown"}}),
+        ] {
+            let original = bad.clone();
+            assert!(guard_worker_terminal(&bad).is_err());
+            assert_eq!(bad, original);
+        }
     }
 }

@@ -1600,6 +1600,66 @@ impl CaptureEmitter {
         )
     }
 
+    /// One serialization for the private, original-budget-admitted native view.
+    /// The exact length is independently calculated from its closed Rust schema.
+    pub(super) fn event_koblitz_native_precommit(
+        &mut self,
+        payload: &super::solvers::AdmittedKoblitzNative<'_>,
+        buffer: &mut TypedEventBuffer,
+        before_commit: &mut impl FnMut(&[u8]) -> Result<(), CaptureError>,
+    ) -> Result<(), CaptureError> {
+        self.ready()?;
+        buffer.bytes.clear();
+        let result = (|| {
+            let expected = payload.expected_wire_bytes();
+            let sequence = self
+                .head
+                .event_count
+                .checked_add(1)
+                .ok_or_else(|| CaptureError::Integrity("event sequence overflow".into()))?;
+            if sequence != payload.capture_sequence() {
+                return Err(CaptureError::Integrity(
+                    "admitted native capture sequence differs from head".into(),
+                ));
+            }
+            if expected == 0 || expected > buffer.limit.min(self.limits.max_event_bytes as usize) {
+                return Err(CaptureError::LimitReached(CaptureStop::EventLimit));
+            }
+            let record = TypedEventRecord {
+                schema: EVENT_SCHEMA,
+                binding_sha256: &self.head.binding_sha256,
+                sequence,
+                previous_event_sha256: &self.head.last_event_sha256,
+                event: TypedSolverEvent {
+                    kind: TypedEventKind::KoblitzM3Native,
+                    payload,
+                },
+            };
+            self.check_reservation(expected, self.head.payload_count, self.head.payload_bytes)?;
+            let mut writer = AdmittedEventBytes {
+                bytes: &mut buffer.bytes,
+                limit: expected - 1,
+            };
+            serde_json::to_writer(&mut writer, &record).map_err(typed_encoding_error)?;
+            if writer.bytes.len() != expected - 1 {
+                return Err(CaptureError::Integrity(
+                    "native encoding differs from exact admission".into(),
+                ));
+            }
+            writer.bytes.push(b'\n');
+            Ok(())
+        })();
+        if let Err(error) = result {
+            return Err(self.reject(error));
+        }
+        before_commit(&buffer.bytes)?;
+        self.commit_event(
+            &buffer.bytes,
+            self.head.payload_count,
+            self.head.payload_bytes,
+        )
+    }
+
     pub fn payload(&mut self, payload: &ArtifactPayload) -> Result<(), CaptureError> {
         self.payload_parts(
             &payload.path,
@@ -3818,4 +3878,25 @@ mod tests {
         assert!(!g.live().join("payloads/pdp-witness.json").exists());
         assert_eq!(emitter.head.payload_count, 0);
     }
+}
+
+#[cfg(test)]
+pub(super) fn native_single_pass_reference_wire<T: serde::Serialize + ?Sized>(
+    sequence: u64,
+    payload: &T,
+) -> Vec<u8> {
+    let digest = "f".repeat(64);
+    let record = TypedEventRecord {
+        schema: EVENT_SCHEMA,
+        binding_sha256: &digest,
+        sequence,
+        previous_event_sha256: &digest,
+        event: TypedSolverEvent {
+            kind: TypedEventKind::KoblitzM3Native,
+            payload,
+        },
+    };
+    let mut bytes = serde_json::to_vec(&record).unwrap();
+    bytes.push(b'\n');
+    bytes
 }

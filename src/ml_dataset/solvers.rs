@@ -16,6 +16,7 @@ use std::time::{Duration, Instant};
 // context, and central semantic replay gate the native profile.
 #[path = "koblitz_m3.rs"]
 mod koblitz_m3;
+pub(in crate::ml_dataset) use koblitz_m3::AdmittedKoblitzNative;
 
 #[path = "prime_f4_wide.rs"]
 mod prime_f4_wide;
