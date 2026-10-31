@@ -5709,7 +5709,9 @@ mod native_boundary_emitter_tests {
             let mut events = BoundNativeEvents::new(&binding, &limits, &mut budget).unwrap();
             let mut global = 0;
             let construction = construct_original(&original, &mut budget, &mut |event, b| {
-                events.emit(NativeBoundary::construction(event), b, &mut global)
+                events
+                    .emit(NativeBoundary::construction(event), b, &mut global)
+                    .map_err(|_| ())
             });
             assert_eq!(construction.adapter_stop, None);
             let output = construction.output.unwrap();
@@ -5724,7 +5726,9 @@ mod native_boundary_emitter_tests {
             )
             .unwrap();
             let step = matrix_step(input, engine, 3, &mut |event, b| {
-                events.emit(NativeBoundary::matrix(event), b, &mut global)
+                events
+                    .emit(NativeBoundary::matrix(event), b, &mut global)
+                    .map_err(|_| ())
             });
             assert_eq!(step.adapter_stop, None);
             let assessment = verify_boundary_stream(
