@@ -1,0 +1,61 @@
+{
+  "schema": "n83.factor-base-attempt-terminal/v1",
+  "observed_at": "2026-10-31T01:44:36.174678+00:00",
+  "job": {
+    "name": "n83-fb-variants-r27-20261031-r1",
+    "uid": "7e58d2f7-b5e8-42d6-a236-1b90d237d6c3",
+    "state": "failed",
+    "created_at": "2026-10-31T01:17:32Z",
+    "finished_at": "2026-10-31T01:40:51Z",
+    "condition": {
+      "lastProbeTime": "2026-10-31T01:40:51Z",
+      "lastTransitionTime": "2026-10-31T01:40:51Z",
+      "message": "Job has reached the specified backoff limit",
+      "reason": "BackoffLimitExceeded",
+      "status": "True",
+      "type": "Failed"
+    }
+  },
+  "pod": {
+    "name": "n83-fb-variants-r27-20261031-r1-qdvl2",
+    "uid": "f177e8cb-8e13-43fe-8d38-e7c1e3ca2b5d",
+    "node": "ip-10-84-44-164.us-east-2.compute.internal",
+    "phase": "Failed",
+    "container_exit_code": 1,
+    "container_started_at": "2026-10-31T01:40:48Z",
+    "container_finished_at": "2026-10-31T01:40:48Z"
+  },
+  "failure_class": "source download failed before factor-base producer started",
+  "cause": "worker role isolab-job cannot s3:ListBucket in setec-astronomy-artifacts; host had uploaded source bundle there, but EKS worker role is scoped to job results bucket/prefix",
+  "producer_started": false,
+  "factor_base_rows_generated": false,
+  "results_api": {
+    "uri": "s3://isolab-results-104186811093-us-east-2/runs/n83-fb-variants-r27-20261031-r1/",
+    "object_count": 0
+  },
+  "failed_scheduling_events": [
+    {
+      "type": "Warning",
+      "reason": "FailedScheduling",
+      "message": "0/3 nodes are available: 1 node(s) didn't match pod anti-affinity rules, 2 node(s) didn't match Pod's node affinity/selector. no new claims to deallocate, preemption: 0/3 nodes are available: 1 No preemption victims found for incoming pod, 2 Preemption is not helpful for scheduling.",
+      "first_seen": "2026-10-31T01:17:32Z",
+      "last_seen": "2026-10-31T01:38:02Z",
+      "count": 5
+    },
+    {
+      "type": "Warning",
+      "reason": "FailedScheduling",
+      "message": "Failed to schedule pod, node limits have been exhausted for nodepool (NodePool=gha-on-demand-extra); node limits have been exhausted for nodepool (NodePool=gha-on-demand); node limits have been exhausted for nodepool (NodePool=gha-gates); node limits have been exhausted for nodepool (NodePool=cpu-spot); node limits have been exhausted for nodepool (NodePool=cpu-l2-spot)",
+      "first_seen": "2026-10-31T01:17:33Z",
+      "last_seen": "2026-10-31T01:37:43Z",
+      "count": 5
+    }
+  ],
+  "retry_policy": "No retry under the same immutable attempt. A new attempt requires a protocol amendment using the job-scoped results bucket for source and output.",
+  "raw_api_files": [
+    "job-api.json",
+    "pod-api.json",
+    "events-api.json"
+  ],
+  "format": "R27_TERMINAL_FORMAT.json"
+}

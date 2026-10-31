@@ -1,0 +1,234 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "count": 5,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-31T01:17:32Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "n83-fb-variants-r27-20261031-r1-qdvl2",
+                "namespace": "isolab",
+                "resourceVersion": "7867170",
+                "uid": "f177e8cb-8e13-43fe-8d38-e7c1e3ca2b5d"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-31T01:38:02Z",
+            "message": "0/3 nodes are available: 1 node(s) didn't match pod anti-affinity rules, 2 node(s) didn't match Pod's node affinity/selector. no new claims to deallocate, preemption: 0/3 nodes are available: 1 No preemption victims found for incoming pod, 2 Preemption is not helpful for scheduling.",
+            "metadata": {
+                "creationTimestamp": "2026-10-31T01:17:32Z",
+                "name": "n83-fb-variants-r27-20261031-r1-qdvl2.18e37865253648f9",
+                "namespace": "isolab",
+                "resourceVersion": "7873408",
+                "uid": "8f461e53-f002-411f-b6b9-e623ad9db379"
+            },
+            "reason": "FailedScheduling",
+            "reportingComponent": "default-scheduler",
+            "reportingInstance": "",
+            "source": {
+                "component": "default-scheduler"
+            },
+            "type": "Warning"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 5,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-31T01:17:33Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "n83-fb-variants-r27-20261031-r1-qdvl2",
+                "namespace": "isolab",
+                "resourceVersion": "7867172",
+                "uid": "f177e8cb-8e13-43fe-8d38-e7c1e3ca2b5d"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-31T01:37:43Z",
+            "message": "Failed to schedule pod, node limits have been exhausted for nodepool (NodePool=gha-on-demand-extra); node limits have been exhausted for nodepool (NodePool=gha-on-demand); node limits have been exhausted for nodepool (NodePool=gha-gates); node limits have been exhausted for nodepool (NodePool=cpu-spot); node limits have been exhausted for nodepool (NodePool=cpu-l2-spot)",
+            "metadata": {
+                "creationTimestamp": "2026-10-31T01:17:33Z",
+                "name": "n83-fb-variants-r27-20261031-r1-qdvl2.18e37865777f8c18",
+                "namespace": "isolab",
+                "resourceVersion": "7873312",
+                "uid": "4ff78938-55a9-4f76-8ecc-f1c9561f6aeb"
+            },
+            "reason": "FailedScheduling",
+            "reportingComponent": "karpenter",
+            "reportingInstance": "",
+            "source": {
+                "component": "karpenter"
+            },
+            "type": "Warning"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-31T01:40:46Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "n83-fb-variants-r27-20261031-r1-qdvl2",
+                "namespace": "isolab",
+                "resourceVersion": "7867172",
+                "uid": "f177e8cb-8e13-43fe-8d38-e7c1e3ca2b5d"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-31T01:40:46Z",
+            "message": "Successfully assigned isolab/n83-fb-variants-r27-20261031-r1-qdvl2 to ip-10-84-44-164.us-east-2.compute.internal",
+            "metadata": {
+                "creationTimestamp": "2026-10-31T01:40:46Z",
+                "name": "n83-fb-variants-r27-20261031-r1-qdvl2.18e379a9d4a526f7",
+                "namespace": "isolab",
+                "resourceVersion": "7874243",
+                "uid": "c2f860a7-d19e-4ca6-aace-12bc383bfce3"
+            },
+            "reason": "Scheduled",
+            "reportingComponent": "default-scheduler",
+            "reportingInstance": "",
+            "source": {
+                "component": "default-scheduler"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-31T01:40:47Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "fieldPath": "spec.containers{task}",
+                "kind": "Pod",
+                "name": "n83-fb-variants-r27-20261031-r1-qdvl2",
+                "namespace": "isolab",
+                "resourceVersion": "7874241",
+                "uid": "f177e8cb-8e13-43fe-8d38-e7c1e3ca2b5d"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-31T01:40:47Z",
+            "message": "Pulling image \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:c044fe7656fffe45a5ced4b7b5c6ebe6cdd4ada5815fe254c6e657fe92535fa2\"",
+            "metadata": {
+                "creationTimestamp": "2026-10-31T01:40:47Z",
+                "name": "n83-fb-variants-r27-20261031-r1-qdvl2.18e379a9fc51b10b",
+                "namespace": "isolab",
+                "resourceVersion": "7874249",
+                "uid": "5a53fd81-ac58-486b-9050-c5d1dea055a9"
+            },
+            "reason": "Pulling",
+            "reportingComponent": "kubelet",
+            "reportingInstance": "ip-10-84-44-164.us-east-2.compute.internal",
+            "source": {
+                "component": "kubelet",
+                "host": "ip-10-84-44-164.us-east-2.compute.internal"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-31T01:40:48Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "fieldPath": "spec.containers{task}",
+                "kind": "Pod",
+                "name": "n83-fb-variants-r27-20261031-r1-qdvl2",
+                "namespace": "isolab",
+                "resourceVersion": "7874241",
+                "uid": "f177e8cb-8e13-43fe-8d38-e7c1e3ca2b5d"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-31T01:40:48Z",
+            "message": "Successfully pulled image \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:c044fe7656fffe45a5ced4b7b5c6ebe6cdd4ada5815fe254c6e657fe92535fa2\" in 512ms (512ms including waiting). Image size: 148784449 bytes.",
+            "metadata": {
+                "creationTimestamp": "2026-10-31T01:40:48Z",
+                "name": "n83-fb-variants-r27-20261031-r1-qdvl2.18e379aa1ad8e547",
+                "namespace": "isolab",
+                "resourceVersion": "7874262",
+                "uid": "813c621b-a140-43e2-8835-25c4d84669d1"
+            },
+            "reason": "Pulled",
+            "reportingComponent": "kubelet",
+            "reportingInstance": "ip-10-84-44-164.us-east-2.compute.internal",
+            "source": {
+                "component": "kubelet",
+                "host": "ip-10-84-44-164.us-east-2.compute.internal"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-31T01:40:48Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "fieldPath": "spec.containers{task}",
+                "kind": "Pod",
+                "name": "n83-fb-variants-r27-20261031-r1-qdvl2",
+                "namespace": "isolab",
+                "resourceVersion": "7874241",
+                "uid": "f177e8cb-8e13-43fe-8d38-e7c1e3ca2b5d"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-31T01:40:48Z",
+            "message": "Container created",
+            "metadata": {
+                "creationTimestamp": "2026-10-31T01:40:48Z",
+                "name": "n83-fb-variants-r27-20261031-r1-qdvl2.18e379aa1b70f414",
+                "namespace": "isolab",
+                "resourceVersion": "7874263",
+                "uid": "c9abec26-7a90-4c25-b00e-5be1382b347c"
+            },
+            "reason": "Created",
+            "reportingComponent": "kubelet",
+            "reportingInstance": "ip-10-84-44-164.us-east-2.compute.internal",
+            "source": {
+                "component": "kubelet",
+                "host": "ip-10-84-44-164.us-east-2.compute.internal"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-31T01:40:48Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "fieldPath": "spec.containers{task}",
+                "kind": "Pod",
+                "name": "n83-fb-variants-r27-20261031-r1-qdvl2",
+                "namespace": "isolab",
+                "resourceVersion": "7874241",
+                "uid": "f177e8cb-8e13-43fe-8d38-e7c1e3ca2b5d"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-31T01:40:48Z",
+            "message": "Container started",
+            "metadata": {
+                "creationTimestamp": "2026-10-31T01:40:48Z",
+                "name": "n83-fb-variants-r27-20261031-r1-qdvl2.18e379aa20a26ae5",
+                "namespace": "isolab",
+                "resourceVersion": "7874264",
+                "uid": "b571fcaf-91ed-4530-91f4-6440a87cde0d"
+            },
+            "reason": "Started",
+            "reportingComponent": "kubelet",
+            "reportingInstance": "ip-10-84-44-164.us-east-2.compute.internal",
+            "source": {
+                "component": "kubelet",
+                "host": "ip-10-84-44-164.us-east-2.compute.internal"
+            },
+            "type": "Normal"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
