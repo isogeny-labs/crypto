@@ -1,0 +1,307 @@
+{
+  "card_id": "CARD-BLINDSPOT-05-02",
+  "card_path": "research/blindspots_20261018/05-elimination-orders/card-02.yaml",
+  "card_sha256": "265e7f4a7d3976e65509ca988c7a53aaa33d152b8002d9ba5de649ef1df6281a",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-05/card-02"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-05/card-02/b05",
+        "examples/blindspots_05_elimination_orders.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 4.439,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 4.439,
+      "stderr_sha256": "68c726b2922de2b59f9658ee1bf338ad10c01ad3911f3a25af38414155bbe22c",
+      "stderr_tail": [
+        "    |",
+        "458 | fn poly_degree(p: &Poly) -> u32 {",
+        "    |    ^^^^^^^^^^^",
+        "",
+        "warning: field `nv` is never read",
+        "   --> examples/blindspots_05_elimination_orders.rs:549:5",
+        "    |",
+        "548 | struct Order {",
+        "    |        ----- field in this struct",
+        "549 |     nv: usize,",
+        "    |     ^^",
+        "",
+        "warning: constant `FIXED_ARMS` is never used",
+        "    --> examples/blindspots_05_elimination_orders.rs:1334:7",
+        "     |",
+        "1334 | const FIXED_ARMS: [&str; 6] = [\"grevlex\", \"blkLI\", \"blkIL\", \"wdeg\", \"mindeg\", \"tw\"];",
+        "     |       ^^^^^^^^^^",
+        "",
+        "warning: 4 warnings emitted",
+        ""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-05/card-02/b05",
+        "run",
+        "--draws",
+        "research/blindspots_20261018/05-elimination-orders/draws.tsv",
+        "--cell",
+        "c17-4-3",
+        "--targets",
+        "0-7",
+        "--arms",
+        "grevlex",
+        "wdeg",
+        "blkIL",
+        "mindeg",
+        "tw",
+        "mindeg-rev",
+        "tw-rev",
+        "rand0",
+        "rand1",
+        "rand2",
+        "rand3",
+        "rand4",
+        "rand5",
+        "rand6",
+        "rand7",
+        "--time-limit",
+        "60",
+        "--total-limit",
+        "200"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 4.807,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "main-c17-4-3",
+      "index": 3,
+      "outputs": {},
+      "seconds": 4.807,
+      "stderr_sha256": "4f47d1027ae7a5462893b4e26737cf7c89ab682b283a8dda1dba8e3090274f03",
+      "stderr_tail": [
+        "c17-4-3 t0 grevlex: refuted D=4 steps=8 touches=251772306 0.5s",
+        "c17-4-3 t1 grevlex: refuted D=4 steps=8 touches=341047593 0.6s",
+        "c17-4-3 t2 grevlex: refuted D=4 steps=8 touches=348513255 0.9s",
+        "c17-4-3 t3 grevlex: refuted D=4 steps=8 touches=249875306 0.5s",
+        "c17-4-3 t4 grevlex: refuted D=4 steps=8 touches=252431093 0.5s",
+        "c17-4-3 t5 grevlex: refuted D=4 steps=8 touches=241450898 0.5s",
+        "c17-4-3 t6 grevlex: refuted D=4 steps=8 touches=253086291 0.5s",
+        "c17-4-3 t7 grevlex: refuted D=4 steps=9 touches=345110873 0.8s"
+      ],
+      "stdout_sha256": "985004728ff32612eb9a46f53c220d41419bc95a779ad0c1c33e28db0328377b",
+      "stdout_tail": [
+        "{\"cell\":\"c17-4-3\",\"m\":3,\"n\":17,\"ell\":4,\"nv\":29,\"target\":0,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":8,\"pairs_sel\":8063,\"pairs_gen\":10844,\"rows_max\":18941,\"cols_max\":16707,\"rc_max\":316447287,\"nnz_max\":1149555,\"cols_sum\":33676,\"rows_sum\":32927,\"touches\":251772306,\"build\":1994886,\"elim\":242882848,\"back\":6894572,\"zero_red\":6347,\"new_elems\":1716,\"g_size\":1750,\"ms\":509.6,\"ms_sym\":28.4,\"ms_elim\":386.9,\"ms_back\":15.3,\"ms_add\":49.5,\"rss_kb\":17368,\"step_rows\":[16,33,596,741,8603,330,3667,18941],\"step_cols\":[89,104,1419,1040,11516,186,2615,16707],\"pg_edges\":374,\"pg_pairs\":406,\"width_mindeg\":24,\"width_minfill\":24}",
+        "{\"cell\":\"c17-4-3\",\"m\":3,\"n\":17,\"ell\":4,\"nv\":29,\"target\":1,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":8,\"pairs_sel\":10206,\"pairs_gen\":14387,\"rows_max\":20765,\"cols_max\":18941,\"rc_max\":393309865,\"nnz_max\":2127861,\"cols_sum\":35820,\"rows_sum\":36458,\"touches\":341047593,\"build\":2987787,\"elim\":328392996,\"back\":9666810,\"zero_red\":8319,\"new_elems\":1887,\"g_size\":1921,\"ms\":627.5,\"ms_sym\":37.6,\"ms_elim\":474.2,\"ms_back\":14.2,\"ms_add\":64.1,\"rss_kb\":24768,\"step_rows\":[16,35,597,787,8461,5287,20765,510],\"step_cols\":[89,106,1419,1086,11444,2480,18941,255],\"pg_edges\":374,\"pg_pairs\":406,\"width_mindeg\":24,\"width_minfill\":24}",
+        "{\"cell\":\"c17-4-3\",\"m\":3,\"n\":17,\"ell\":4,\"nv\":29,\"target\":2,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":8,\"pairs_sel\":10229,\"pairs_gen\":14407,\"rows_max\":20808,\"cols_max\":18984,\"rc_max\":395019072,\"nnz_max\":2126106,\"cols_sum\":35936,\"rows_sum\":36698,\"touches\":348513255,\"build\":2986137,\"elim\":335720397,\"back\":9806721,\"zero_red\":8341,\"new_elems\":1888,\"g_size\":1922,\"ms\":863.4,\"ms_sym\":50.3,\"ms_elim\":675.7,\"ms_back\":16.0,\"ms_add\":72.1,\"rss_kb\":25436,\"step_rows\":[16,36,599,784,8672,5304,20808,479],\"step_cols\":[89,107,1419,1083,11550,2495,18984,209],\"pg_edges\":374,\"pg_pairs\":406,\"width_mindeg\":24,\"width_minfill\":24}",
+        "{\"cell\":\"c17-4-3\",\"m\":3,\"n\":17,\"ell\":4,\"nv\":29,\"target\":3,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":8,\"pairs_sel\":8041,\"pairs_gen\":10874,\"rows_max\":18828,\"cols_max\":16604,\"rc_max\":312620112,\"nnz_max\":1144841,\"cols_sum\":33794,\"rows_sum\":33041,\"touches\":249875306,\"build\":1992861,\"elim\":241362691,\"back\":6519754,\"zero_red\":6336,\"new_elems\":1705,\"g_size\":1739,\"ms\":495.7,\"ms_sym\":30.2,\"ms_elim\":368.5,\"ms_back\":11.2,\"ms_add\":54.2,\"rss_kb\":25436,\"step_rows\":[16,36,595,775,8760,339,3692,18828],\"step_cols\":[89,107,1419,1074,11677,195,2629,16604],\"pg_edges\":374,\"pg_pairs\":406,\"width_mindeg\":24,\"width_minfill\":24}",
+        "{\"cell\":\"c17-4-3\",\"m\":3,\"n\":17,\"ell\":4,\"nv\":29,\"target\":4,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":8,\"pairs_sel\":8061,\"pairs_gen\":10904,\"rows_max\":18803,\"cols_max\":16579,\"rc_max\":311734937,\"nnz_max\":1132160,\"cols_sum\":33765,\"rows_sum\":32995,\"touches\":252431093,\"build\":1988012,\"elim\":244135459,\"back\":6307622,\"zero_red\":6353,\"new_elems\":1708,\"g_size\":1742,\"ms\":463.6,\"ms_sym\":27.4,\"ms_elim\":345.5,\"ms_back\":10.5,\"ms_add\":50.7,\"rss_kb\":25436,\"step_rows\":[16,35,597,786,8778,332,3648,18803],\"step_cols\":[89,106,1419,1085,11711,188,2588,16579],\"pg_edges\":374,\"pg_pairs\":406,\"width_mindeg\":24,\"width_minfill\":24}",
+        "{\"cell\":\"c17-4-3\",\"m\":3,\"n\":17,\"ell\":4,\"nv\":29,\"target\":5,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":8,\"pairs_sel\":8063,\"pairs_gen\":10851,\"rows_max\":18139,\"cols_max\":15905,\"rc_max\":288500795,\"nnz_max\":1146955,\"cols_sum\":32926,\"rows_sum\":32143,\"touches\":241450898,\"build\":1990554,\"elim\":233016089,\"back\":6444255,\"zero_red\":6345,\"new_elems\":1718,\"g_size\":1752,\"ms\":486.7,\"ms_sym\":41.1,\"ms_elim\":340.9,\"ms_back\":10.9,\"ms_add\":57.1,\"rss_kb\":25436,\"step_rows\":[15,36,596,787,8530,344,3696,18139],\"step_cols\":[88,107,1418,1086,11477,200,2645,15905],\"pg_edges\":374,\"pg_pairs\":406,\"width_mindeg\":24,\"width_minfill\":24}",
+        "{\"cell\":\"c17-4-3\",\"m\":3,\"n\":17,\"ell\":4,\"nv\":29,\"target\":6,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":8,\"pairs_sel\":8059,\"pairs_gen\":10928,\"rows_max\":18617,\"cols_max\":16393,\"rc_max\":305188481,\"nnz_max\":1121332,\"cols_sum\":33745,\"rows_sum\":32973,\"touches\":253086291,\"build\":1985997,\"elim\":244858154,\"back\":6242140,\"zero_red\":6352,\"new_elems\":1707,\"g_size\":1741,\"ms\":537.0,\"ms_sym\":29.3,\"ms_elim\":399.3,\"ms_back\":11.6,\"ms_add\":66.3,\"rss_kb\":25436,\"step_rows\":[16,32,596,775,8860,346,3731,18617],\"step_cols\":[89,103,1419,1074,11793,202,2672,16393],\"pg_edges\":374,\"pg_pairs\":406,\"width_mindeg\":24,\"width_minfill\":24}",
+        "{\"cell\":\"c17-4-3\",\"m\":3,\"n\":17,\"ell\":4,\"nv\":29,\"target\":7,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":9,\"pairs_sel\":9873,\"pairs_gen\":14123,\"rows_max\":20664,\"cols_max\":18852,\"rc_max\":389557728,\"nnz_max\":2044833,\"cols_sum\":36511,\"rows_sum\":36823,\"touches\":345110873,\"build\":2906551,\"elim\":333398586,\"back\":8805736,\"zero_red\":7997,\"new_elems\":1876,\"g_size\":1910,\"ms\":811.9,\"ms_sym\":49.7,\"ms_elim\":604.2,\"ms_back\":15.7,\"ms_add\":77.3,\"rss_kb\":25436,\"step_rows\":[16,35,594,784,8690,189,5382,20664,469],\"step_cols\":[89,106,1419,1083,11669,190,2883,18852,220],\"pg_edges\":374,\"pg_pairs\":406,\"width_mindeg\":24,\"width_minfill\":24}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-05/card-02/b05",
+        "run",
+        "--draws",
+        "research/blindspots_20261018/05-elimination-orders/draws.tsv",
+        "--cell",
+        "c17-4-3",
+        "--targets",
+        "0-1",
+        "--arms",
+        "blkLI",
+        "--time-limit",
+        "40",
+        "--total-limit",
+        "100"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 80.145,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "blkli-c17-4-3",
+      "index": 4,
+      "outputs": {},
+      "seconds": 80.145,
+      "stderr_sha256": "91e6c8279f3a0c3c94ce4f2b95c029493dc2e35b5788fbc513bcfea1c72f50ff",
+      "stderr_tail": [
+        "c17-4-3 t0 blkLI: timelimit D=5 steps=6 touches=4737983254 40.1s",
+        "c17-4-3 t1 blkLI: timelimit D=5 steps=6 touches=4743817305 40.0s"
+      ],
+      "stdout_sha256": "5641535c8d41bf98d9e89255a7b44c8a2db6f4ef1d32b0816c0a13e69547652a",
+      "stdout_tail": [
+        "{\"cell\":\"c17-4-3\",\"m\":3,\"n\":17,\"ell\":4,\"nv\":29,\"target\":0,\"arm\":\"blkLI\",\"solutions\":0,\"status\":\"timelimit\",\"d_mat\":5,\"d_sel\":5,\"steps\":6,\"pairs_sel\":13092,\"pairs_gen\":38896,\"rows_max\":3690,\"cols_max\":9240,\"rc_max\":34095600,\"nnz_max\":9289927,\"cols_sum\":16156,\"rows_sum\":6416,\"touches\":4737983254,\"build\":6074270,\"elim\":3418081744,\"back\":1313827240,\"zero_red\":845,\"new_elems\":3341,\"g_size\":3375,\"ms\":40082.4,\"ms_sym\":290.7,\"ms_elim\":4508.2,\"ms_back\":1874.0,\"ms_add\":335.5,\"rss_kb\":216964,\"step_rows\":[16,31,373,1768,538,3690],\"step_cols\":[89,103,792,2382,3550,9240],\"pg_edges\":374,\"pg_pairs\":406,\"width_mindeg\":24,\"width_minfill\":24}",
+        "{\"cell\":\"c17-4-3\",\"m\":3,\"n\":17,\"ell\":4,\"nv\":29,\"target\":1,\"arm\":\"blkLI\",\"solutions\":0,\"status\":\"timelimit\",\"d_mat\":5,\"d_sel\":5,\"steps\":6,\"pairs_sel\":13641,\"pairs_gen\":39320,\"rows_max\":3693,\"cols_max\":9243,\"rc_max\":34134399,\"nnz_max\":9281711,\"cols_sum\":16147,\"rows_sum\":6406,\"touches\":4743817305,\"build\":6127213,\"elim\":3435614264,\"back\":1302075828,\"zero_red\":844,\"new_elems\":3341,\"g_size\":3375,\"ms\":40037.3,\"ms_sym\":294.5,\"ms_elim\":4709.8,\"ms_back\":1773.3,\"ms_add\":332.3,\"rss_kb\":220932,\"step_rows\":[16,30,361,1768,538,3693],\"step_cols\":[89,102,781,2382,3550,9243],\"pg_edges\":374,\"pg_pairs\":406,\"width_mindeg\":24,\"width_minfill\":24}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-05/card-02/b05"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-05/card-02"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "6f1acb018185dc9ccbf664e76ab7461b60e90203",
+  "dirty_after": [
+    "research/blindspots_20261018/02-deployed-binary-pricing/raw/relay-1.txt",
+    "research/blindspots_20261018/02-deployed-binary-pricing/raw/relay-2.txt",
+    "research/blindspots_20261018/04-presentation-search/raw/card-02-aa-cell1.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-02-aa-cell1.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-02-aa-cell2.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-02-aa-cell2.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-02-aa-cell3.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-02-aa-cell3.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-02-aa-cell4.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-02-aa-cell4.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-02-build.stderr.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-02-build.stdout.log",
+    "research/blindspots_20261018/04-presentation-search/raw/receipt-card-02.json",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-02-blkli-c17-4-3.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-02-blkli-c17-4-3.stdout.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-02-build.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-02-build.stdout.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-02-main-c17-4-3.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-02-main-c17-4-3.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u2.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u2.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u3.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u3.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-13-4-4-i06u0.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-13-4-4-i06u0.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-sat-13-4-4-d0.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-sat-13-4-4-d0.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/receipt-card-02.json"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u2.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u2.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u3.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u3.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-13-4-4-i06u0.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-13-4-4-i06u0.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-sat-13-4-4-d0.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-sat-13-4-4-d0.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/receipt-card-02.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}
