@@ -83,8 +83,35 @@ with inverse numerator \(Vz_0\) and denominator \(\Delta^{16}\). The full
 specializations require the registered coefficient denominators as well as
 Delta to remain invertible. This composition avoids a new inversion search.
 
-`TATE53.sing` constructs the generic marked Tate normalization. Its outcome
-is pending; its frozen proposed formula is not yet a verified map.
+`tate53-03` is accepted:exit0,exact marker,no native error lines. It maps the
+original marked origin through the accepted degree3quotient to (r,q),then
+constructs
+
+\[
+ h=Ar+b,\quad s=(r^2+a_4+Aq)/h,\quad D_2=b+r+s^2+As,\quad u=h/D_2.
+\]
+
+All four units t,h,D2,u have explicit psi3Bezout products. The point equation
+has a full source product. With
+
+\[
+ X=u^2x+r,\qquad Y=u^3y+su^2x+q,
+ \qquad b'=D_2/u^2=h/u^3,\quad A'=A/u,\quad c'=1+A',
+\]
+
+the full substituted old-curve equation plus
+\(u^6(y^2+A'xy+b'y+x^3+b'x^2)\) is its saved explicit psi3multiple.
+A changed x coefficient has nonzero remainder. Thus the marked generic
+quotient is now explicitly in the required Tate form. Specializations need
+the registered t,h,D2,u and coefficient denominators. Target QR/F2 descent
+and the actual level11 map are separate next checks.
+
+Tate attempt01failed a source-ring indexed expression import. Attempt02
+passed reduced identities but failed serialization by direct polynomial slash
+division;it finished before a proposed SIGTERM. Attempt03uses explicit ideal
+lifts and verifies their full products. Every partial and rejected attempt is
+retained. `PACKET53.sing` is frozen to evaluate all5target equations in the
+complete rank64source algebra;its outcome is pending.
 
 `lean/Transfer53.lean` supplies the determinant-change and composed unit
 implications. Compilation/audit and native semantic binding are recorded
