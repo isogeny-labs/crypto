@@ -1,0 +1,118 @@
+// Complete fixed-algebra trace experiment. Predictions are reported, not assumed.
+proc require53(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump53(link out,string name,matrix A){
+ int i;int j;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");
+ for(i=1;i<=nrows(A);i++){for(j=1;j<=ncols(A);j++){if(A[i,j]!=0){write(out,name+"["+string(i)+","+string(j)+"]="+string(A[i,j])+";");}}}
+}
+execute(read("../../../52/source-data/compact-pid51.sing"));
+matrix H53=matrix(basis51);matrix M053=sourceLift51;poly D53=commonDenominator51;
+execute(read("../../../52/source-data/rr-table50.sing"));
+intmat pairs53=parents50;
+execute(read("../../../52/runs/closure52-02/closure-certificate52.sing"));
+execute(read("../../../52/source-data/relative-infinity50.sing"));
+ring genericTrace53=2,(a8,a4,a1,a0),dp;short=0;
+matrix companion53[16][16];int i53;int j53;int k53;
+for(i53=1;i53<16;i53++){companion53[i53+1,i53]=1;}
+companion53[9,16]=a8;companion53[5,16]=a4;
+companion53[2,16]=a1;companion53[1,16]=a0;
+matrix power53=unitmat(16);ideal genericTraces53;
+for(k53=0;k53<=30;k53++){
+ poly tr53=0;for(i53=1;i53<=16;i53++){tr53=tr53+power53[i53,i53];}
+ genericTraces53[k53+1]=tr53;power53=power53*companion53;
+}
+for(k53=1;k53<=15;k53++){require53(genericTraces53[k53]==0,"TRACE53_EARLY");}
+require53(genericTraces53[16]==a1,"TRACE53_DERIVATIVE");
+link genericOut53="ASCII:w generic-traces53.sing";
+write(genericOut53,"ring genericTraceCertificate53=2,(a8,a4,a1,a0),dp;short=0;ideal traces53="+string(genericTraces53)+";");
+dump53(genericOut53,"companion53",companion53);close(genericOut53);
+ring actual53=2,(l,v,u),wp(4,2,1);short=0;
+map sourceMap53=relativeInfinity50,l,v,u;
+ideal source53=sourceMap53(relativeInfinityIdeal50);
+poly E53=source53[1];ideal baseGB53=std(ideal(E53));
+poly R53=(1+u)*v+u^3;
+poly b53=u*R53*(R53+1);poly c53=u*(R53+1);
+poly A53=reduce(1+c53,baseGB53);
+poly delta53=reduce(b53^3*(b53+c53*(1+c53)^3),baseGB53);
+poly C53=reduce(A53^3*delta53,baseGB53);
+ideal coefficients53;poly term53;int exponent53;int index53;
+poly rest53=source53[2];
+while(rest53!=0){
+ term53=lead(rest53);exponent53=leadexp(term53)[1];
+ index53=0;
+ if(exponent53==16){index53=1;}if(exponent53==8){index53=2;}
+ if(exponent53==4){index53=3;}if(exponent53==1){index53=4;}
+ if(exponent53==0){index53=5;}
+ require53(index53>0,"TRACE53_ADDITIVE_EXPONENT");
+ coefficients53[index53]=coefficients53[index53]+term53/l^exponent53;
+ rest53=rest53-term53;
+}
+require53(coefficients53[1]==1,"TRACE53_MONIC");
+require53(reduce(coefficients53[4]+C53,baseGB53)==0,"TRACE53_TATE_DERIVATIVE");
+map tracesMap53=genericTrace53,coefficients53[2],coefficients53[3],coefficients53[4],coefficients53[5];
+ideal traces53=tracesMap53(genericTraces53);
+matrix powerGram53[32][32];int ei53;int ej53;int vi53;int vj53;
+poly reduced53;poly scalar53;
+for(i53=1;i53<=32;i53++){for(j53=1;j53<=32;j53++){
+ ei53=(i53-1)%16;ej53=(j53-1)%16;vi53=(i53-1) div 16;vj53=(j53-1) div 16;
+ reduced53=reduce(traces53[ei53+ej53+1]*v^(vi53+vj53),baseGB53);
+ scalar53=u^2*diff(reduced53,v);
+ require53(diff(scalar53,l)==0 && diff(scalar53,v)==0,"TRACE53_SCALAR");
+ powerGram53[i53,j53]=scalar53;
+}}
+poly normA53=reduce(A53*subst(A53,v,v+u^2),baseGB53);
+poly normDelta53=reduce(delta53*subst(delta53,v,v+u^2),baseGB53);
+poly C053=subst(C53,v,0);poly C153=diff(C53,v);
+link actualOut53="ASCII:w actual-source53.sing";
+write(actualOut53,"ring actualSourceCertificate53=2,(l,v,u),wp(4,2,1);short=0;ideal source53="+string(source53)+";poly A53="+string(A53)+";poly delta53="+string(delta53)+";poly C53="+string(C53)+";poly normA53="+string(normA53)+";poly normDelta53="+string(normDelta53)+";");
+dump53(actualOut53,"powerGram53",powerGram53);close(actualOut53);
+ring pid53=2,(u),(c,dp);short=0;
+map compactMap53=compactPid51,u;matrix H53=compactMap53(H53);matrix M053=compactMap53(M053);poly D53=compactMap53(D53);
+map tableMap53=tablePidCertificate50,u;matrix table53=tableMap53(table50);matrix tableLift53=tableMap53(sourceLift50);
+map closureMap53=closureCertificate52,u;
+matrix M153=closureMap53(basis1_52);matrix M253=closureMap53(basis2_52);matrix M353=closureMap53(basis3_52);
+matrix initial53=closureMap53(initial52);
+map actualMap53=actual53,0,0,u;
+matrix powerGram53=actualMap53(powerGram53);
+poly normA53=actualMap53(normA53);poly normDelta53=actualMap53(normDelta53);
+poly C053=actualMap53(C053);poly C153=actualMap53(C153);
+require53(H53*M053==D53*unitmat(32),"TRACE53_SOURCE_EMBEDDING");
+require53(M053==tableLift53 && M053==initial53,"TRACE53_EMBEDDING_DONORS");
+intmat lookup53[32][32];
+for(k53=1;k53<=528;k53++){lookup53[pairs53[k53,1],pairs53[k53,2]]=k53;lookup53[pairs53[k53,2],pairs53[k53,1]]=k53;}
+poly scalar53;matrix normalTraces53[1][32];matrix gram53[32][32];
+for(k53=1;k53<=32;k53++){for(i53=1;i53<=32;i53++){normalTraces53[1,k53]=normalTraces53[1,k53]+table53[i53,lookup53[i53,k53]];}}
+for(i53=1;i53<=32;i53++){for(j53=1;j53<=32;j53++){for(k53=1;k53<=32;k53++){
+ gram53[i53,j53]=gram53[i53,j53]+normalTraces53[1,k53]*table53[k53,lookup53[i53,j53]];
+}}}
+for(i53=1;i53<=32;i53++){
+ scalar53=u^2*(H53[16,i53]*C153+H53[32,i53]*C053+u^2*H53[32,i53]*C153);
+ require53(D53*normalTraces53[1,i53]==scalar53,"TRACE53_NORMAL_TRACE");
+}
+require53(transpose(M053)*gram53*M053==powerGram53,"TRACE53_FULL_GRAM_BINDING");
+matrix corrupt53=gram53;corrupt53[1,1]=corrupt53[1,1]+1;
+require53(transpose(M053)*corrupt53*M053!=powerGram53,"TRACE53_NEGATIVE_GRAM");
+require53(D53*(normalTraces53[1,1]+1)!=D53*normalTraces53[1,1],"TRACE53_NEGATIVE_TRACE");
+print("TRACE53_FULL_BINDINGS_PASS");
+link out53="ASCII:w discriminant-certificate53.sing";
+write(out53,"ring discriminantCertificate53=2,(u),(c,dp);short=0;");
+dump53(out53,"gram53",gram53);dump53(out53,"powerGram53",powerGram53);
+dump53(out53,"normalTraces53",normalTraces53);dump53(out53,"sourceLift53",M053);
+poly det053=det(M053);poly det153=det(M153);poly det253=det(M253);poly det353=det(M353);
+poly disc53=det(gram53);poly powerDisc53=det(powerGram53);
+require53(powerDisc53==u^64*normA53^48*normDelta53^16,"TRACE53_TOWER_DISCRIMINANT");
+require53(powerDisc53==det053^2*disc53,"TRACE53_DISCRIMINANT_CHANGE");
+poly fA53=u^5+u^2+1;poly cuspPart53=u^11*(u+1)^22;
+poly fC53=normDelta53/cuspPart53;
+int cuspExact53=(fC53*cuspPart53==normDelta53);
+intvec matches53=(normA53==fA53),cuspExact53,(deg(fC53)==5),
+ (disc53==u^76*(u+1)^24*fC53^12),
+ (det053==u^82*(u+1)^164*fA53^24*fC53^2),
+ (det153==u^60*(u+1)^120*fA53^8),
+ (det253==u^60*(u+1)^120*fA53^4),
+ (det353==u^60*(u+1)^120);
+write(out53,"poly normA53="+string(normA53)+";poly normDelta53="+string(normDelta53)+";poly fC53="+string(fC53)+";poly disc53="+string(disc53)+";poly powerDisc53="+string(powerDisc53)+";poly det053="+string(det053)+";poly det153="+string(det153)+";poly det253="+string(det253)+";poly det353="+string(det353)+";intvec matches53="+string(matches53)+";");close(out53);
+print("normA");print(factorize(normA53));print("normDelta");print(factorize(normDelta53));
+print("normalDiscriminant");print(factorize(disc53));print("sourceDeterminants");
+print(factorize(det053));print(factorize(det153));print(factorize(det253));print(factorize(det353));
+print("predictionMatches");print(matches53);
+print("DISCRIM53_ALL_CHECKS_PASS");quit;
