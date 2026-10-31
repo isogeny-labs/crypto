@@ -5842,3 +5842,168 @@ mod native_boundary_emitter_tests {
         assert_eq!(budget.stopped, Some(Stop::Bytes));
     }
 }
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SavedNativeCaptureEvent {
+    kind: String,
+    payload: SavedBoundaryRecord,
+}
+/// Canonical bytes are borrowed from the sealed artifact; matching adds no
+/// second retained stream. Return observations only after full custody succeeds.
+fn verify_native_capture(
+    cell: &std::path::Path,
+    canonical: &[u8],
+    binding: &crate::ml_dataset::capture::AttemptBinding,
+    limits: &crate::ml_dataset::capture::CaptureLimits,
+    equations: usize,
+    engine: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Engine,
+    degree: u32,
+) -> Result<BoundaryStreamAssessment, String> {
+    let digest = binding.digest()?;
+    let assessment = verify_boundary_stream(canonical, &digest, equations, engine, degree)?;
+    let mut records = canonical.split_inclusive(|b| *b == b'\n');
+    let mut matched = 0;
+    let custody = crate::ml_dataset::capture::verify_live_committed_prefix_visit(
+        cell,
+        binding,
+        limits,
+        &mut |line| {
+            let row: crate::ml_dataset::capture::EventRecord =
+                serde_json::from_slice(line).map_err(|e| format!("native capture record: {e}"))?;
+            if row.event["kind"] != "koblitz_m3_native" {
+                return Ok(());
+            }
+            let event: SavedNativeCaptureEvent = serde_json::from_value(row.event)
+                .map_err(|e| format!("strict native capture event: {e}"))?;
+            let bytes = records.next().ok_or("extra native capture event")?;
+            let expected =
+                decode_boundary_record(bytes, &digest, matched + 1, equations, engine, degree)?;
+            if event.kind != "koblitz_m3_native"
+                || event.payload.schema != expected.schema
+                || event.payload.binding_sha256 != expected.binding_sha256
+                || event.payload.sequence != expected.sequence
+                || event.payload.capture_sequence != expected.capture_sequence
+                || event.payload.capture_sequence != row.sequence
+                || event.payload.event != expected.event
+            {
+                return Err("native canonical record differs from authenticated capture".into());
+            }
+            matched += 1;
+            Ok(())
+        },
+    )?;
+    if custody.is_none() || records.next().is_some() || matched as usize != assessment.records {
+        return Err("missing committed native capture records".into());
+    }
+    Ok(assessment)
+}
+
+#[cfg(test)]
+mod native_capture_match_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native;
+    use crate::ml_dataset::capture::capture_limits;
+    #[test]
+    fn native_capture_rejects_reencoded_canonical_mutations_and_missing_watermark() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let mut budget = construction_tests::budget();
+        let original = construction_tests::fixture();
+        let mut events = BoundNativeEvents::new(&binding, &limits, &mut budget).unwrap();
+        let mut global = 0;
+        // Non-native capture records consume the same sequence space.
+        super::super::live_event(&serde_json::json!({"kind":"adapter_control"})).unwrap();
+        global += 1;
+        let construction = construct_original(&original, &mut budget, &mut |event, b| {
+            events
+                .emit(NativeBoundary::construction(event), b, &mut global)
+                .map_err(|_| ())
+        });
+        assert_eq!(construction.adapter_stop, None);
+        let check = |bytes: &[u8]| {
+            verify_native_capture(
+                sink.dir.parent().unwrap(),
+                bytes,
+                &binding,
+                &limits,
+                23,
+                native::Engine::F4Macaulay,
+                3,
+            )
+        };
+        let verified = check(&events.canonical).unwrap();
+        assert!(verified.construction_complete_captured);
+        assert!(!verified.matrix_finish_captured);
+        assert_eq!(verified.last_capture_sequence as usize, global);
+        let rows = events
+            .canonical
+            .split_inclusive(|b| *b == b'\n')
+            .collect::<Vec<_>>();
+        assert!(check(&rows[..rows.len() - 1].concat()).is_err());
+        assert!(check(b"").is_err());
+        for mutation in 0..3 {
+            let mut changed = Vec::new();
+            for (i, line) in rows.iter().enumerate() {
+                let mut value: serde_json::Value = serde_json::from_slice(line).unwrap();
+                match mutation {
+                    // Still an increasing sequence, but no longer the capture sequence.
+                    0 => value["capture_sequence"] = serde_json::json!(i + 1),
+                    1 if i + 1 == rows.len() => {
+                        value["event"]["reserved"]["work"] = serde_json::json!(
+                            value["event"]["reserved"]["work"].as_u64().unwrap() + 1
+                        )
+                    }
+                    2 if i == 0 => value["unexpected"] = serde_json::json!(true),
+                    _ => {}
+                }
+                serde_json::to_writer(&mut changed, &value).unwrap();
+                changed.push(b'\n');
+            }
+            assert!(check(&changed).is_err(), "mutation {mutation}");
+        }
+        let head = sink.dir.join("committed.json");
+        let saved = std::fs::read(&head).unwrap();
+        std::fs::remove_file(&head).unwrap();
+        assert!(check(&events.canonical).is_err());
+        std::fs::write(head, saved).unwrap();
+        assert!(check(&events.canonical).is_ok());
+    }
+    #[test]
+    fn capture_acknowledgement_survives_native_observer_deadline_failure() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let mut budget = construction_tests::budget();
+        let original = construction_tests::fixture();
+        let mut events = BoundNativeEvents::new(&binding, &limits, &mut budget).unwrap();
+        let mut global = 0;
+        let result = construct_original(&original, &mut budget, &mut |event, b| {
+            events
+                .emit(NativeBoundary::construction(event), b, &mut global)
+                .map_err(|_| ())?;
+            // Deterministic deadline fault after a real durable acknowledgement.
+            b.deadline = Instant::now();
+            b.construction_deadline = b.deadline;
+            Ok(())
+        });
+        assert_eq!(result.adapter_stop, Some(Stop::Deadline));
+        assert!(result.output.is_none());
+        assert_eq!(events.acknowledged, 1);
+        assert_eq!(global, 1);
+        assert!(events.pending.is_none());
+        let verified = verify_native_capture(
+            sink.dir.parent().unwrap(),
+            &events.canonical,
+            &binding,
+            &limits,
+            23,
+            native::Engine::F4Macaulay,
+            3,
+        )
+        .unwrap();
+        assert_eq!(verified.records, 1);
+        assert!(!verified.construction_complete_captured);
+    }
+}
