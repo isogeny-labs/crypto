@@ -1,0 +1,99 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "IC R1 (2026-10-31): plain vs D4 vs 2LP vs D4+2LP, k=4 IC on E(F_p^4), filter + Wiedemann, full-rank completion [p=1033 slice of SPEC-r1.json]",
+ "description": "Counted operations only. PROTOCOL: research/ic_r1_d4_2lp_p4_20261031/PROTOCOL.md. ic.k4_gaudry: each trial charged the algebraic solve's measured c4 (x-line S4 1.213e12, D4 2.54e10 Fp mults, /97 per GAE); relation oracle (exact enumeration) counted uncharged, so S is a lower bound. Linear algebra: CADO-style filter to a square core then Wiedemann, accepted only when [d]G=Q (full-rank rule: first attempt at small+1 full relations, then +5 percent). 2LP frozen at lp_exponent 0.95 (item ic_improve_20261014/01 tuning), not retuned. Reference arm rho.negation on the same group.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "fp4_translation",
+    "p": 1033,
+    "seed": 1
+   },
+   {
+    "kind": "fp4_translation",
+    "p": 1033,
+    "seed": 2
+   },
+   {
+    "kind": "fp4_translation",
+    "p": 1033,
+    "seed": 3
+   }
+  ],
+  "targets_per_curve": 2,
+  "target_seed": 20261031
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "plain",
+   "role": "baseline",
+   "method": {
+    "id": "ic.k4_gaudry",
+    "params": {
+     "base": "xline",
+     "large_primes": "0",
+     "lp_exponent": "0.75",
+     "c4": "1.213e12",
+     "trial_cap": "2000"
+    }
+   }
+  },
+  {
+   "name": "d4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.k4_gaudry",
+    "params": {
+     "base": "yline-d4",
+     "large_primes": "0",
+     "lp_exponent": "0.75",
+     "c4": "2.540e10",
+     "trial_cap": "2000"
+    }
+   }
+  },
+  {
+   "name": "2lp",
+   "role": "candidate",
+   "method": {
+    "id": "ic.k4_gaudry",
+    "params": {
+     "base": "xline",
+     "large_primes": "2",
+     "lp_exponent": "0.95",
+     "c4": "1.213e12",
+     "trial_cap": "2000"
+    }
+   }
+  },
+  {
+   "name": "d4-2lp",
+   "role": "candidate",
+   "method": {
+    "id": "ic.k4_gaudry",
+    "params": {
+     "base": "yline-d4-lp",
+     "large_primes": "2",
+     "lp_exponent": "0.95",
+     "c4": "2.540e10",
+     "trial_cap": "2000"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "shuffle",
+  "seed": 20261031,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}
