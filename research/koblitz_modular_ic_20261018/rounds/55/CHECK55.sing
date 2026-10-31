@@ -2,6 +2,7 @@ LIB "linalg.lib";
 proc require55(int ok,string tag){if(!ok){ERROR(tag);quit;}}
 execute(read("../quotient55-02/source-annihilator55.sing"));
 matrix scalar55[32][32];int i55;int j55;int k55;
+require55(reduce(u^32+u,std(ideal(f55)))==0 && gcd(f55,u^2+u)==1,"CHECK55_BASE_FIELD_RABIN");
 for(i55=1;i55<=32;i55++){scalar55[i55,i55]=f55;}
 require55(A55*conjugate55==scalar55 && conjugate55*A55==scalar55,"CHECK55_SAVED_FULL_ANNIHILATOR");
 matrix binaryRebuilt55[160][160];poly entry55;intvec ex55;int column55;int row55;ideal fGB55=std(ideal(f55));
@@ -26,7 +27,7 @@ for(i55=1;i55<=4;i55++){
  for(j55=1;j55<=4;j55++){require55(reduce(idempotents55[1,i55],std(ideal(norms55[j55])))==(i55==j55),"CHECK55_ALL_CRT_RESIDUES");}
 }
 require55(reduce(sum55+1,normGB55)==0,"CHECK55_PARTITION_UNITY");
-matrix evaluation55Replay[80][160];
+poly entry55;matrix evaluation55Replay[80][160];
 for(k55=0;k55<5;k55++){for(j55=1;j55<=32;j55++){
  column55=32*k55+j55;entry55=reduce(rho55^k55*values55[1,j55],normGB55);
  while(entry55!=0){ex55=leadexp(entry55);evaluation55Replay[ex55[1]+1,column55]=leadcoef(entry55);entry55=entry55-lead(entry55);}

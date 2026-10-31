@@ -86,3 +86,6 @@ Diagnostic01passed:V,I,residual32x32 but R32x64;scalar polynomial expressions ca
 
 ## Serialized checker
 After attempt02 accepted,freeze CHECK55and pin its two arrays. Fresh invocation rechecks both annihilator products,all25600binary entries,all12800evaluation entries,all fullrecovery products/ranks,allCRT Bezout/residues,all128point values and all528sourceproducts. Changed recovery must fail. Same limits;no new candidate or performance comparison. This checker reconstructs serialized evidence and is not a producer rerun.
+
+## Checker02 repair and base field check
+Check55-01rejected:entry55was declared only in source ring and undefined after switching to CRT ring,so evaluation expansion skipped. Retain all errors/late marker. Declare ring-local polynomial in CRT and freeze freshcheck55-02. Also explicitly recheck degree5base irreducibility by u32+u=0modf_A and gcd(f_A,u²+u)=1;this supplies the exactannihilator field premise rather than relying on a declared minpoly. All previous required checks unchanged.
