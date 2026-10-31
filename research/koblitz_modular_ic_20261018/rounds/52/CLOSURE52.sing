@@ -9,6 +9,9 @@ execute(read("../../source-data/relative-infinity50.sing"));
 setring compactPid51;short=0;option(redSB);
 map nuMap52=nuPidCertificate51,u;map tableMap52=tablePidCertificate50,u;map productMap52=productPidCertificate50,u;
 matrix H52=matrix(basis51);matrix nuH52=nuMap52(H51);matrix nc52=nuMap52(lift51);
+matrix targetMatrix52[32][1];vector targetVector52=nuMap52(target51);int targetRow52;
+for(targetRow52=1;targetRow52<=32;targetRow52++){targetMatrix52[targetRow52,1]=targetVector52[targetRow52];}
+if(H52*nc52!=targetMatrix52){ERROR("CLOSURE52_NU_PID_COORDINATES");quit;}
 matrix table52=tableMap52(table50);matrix embedding52=tableMap52(sourceLift50);
 module products52=productMap52(productNumerators50);
 intmat parents52=tableParents52;
@@ -46,6 +49,9 @@ for(j52=1;j52<=32;j52++){
 }
 matrix actionLifts52=lift(source52,actionResiduals52);
 if(matrix(source52)*actionLifts52!=matrix(actionResiduals52)){ERROR("CLOSURE52_FULL_ACTION_SOURCE_PRODUCTS");quit;}
+link fieldOut52="ASCII:w action-field-certificate52.sing";open(fieldOut52);
+write(fieldOut52,"ring actionFieldCertificate52=2,(l,v,u),wp(4,2,1);short=0;ideal source52="+string(source52)+";ideal actionResiduals52="+string(actionResiduals52)+";matrix actionLifts52[2][32];");
+for(j52=1;j52<=32;j52++){for(i52=1;i52<=2;i52++){if(actionLifts52[i52,j52]!=0){write(fieldOut52,"actionLifts52["+string(i52)+","+string(j52)+"]="+string(actionLifts52[i52,j52])+";");}}}close(fieldOut52);
 // Bind the recovered numerator to the original R51 field certificate as well.
 setring nuFieldCertificate51;
 map mappedPid52=nuPidCertificate51,u;

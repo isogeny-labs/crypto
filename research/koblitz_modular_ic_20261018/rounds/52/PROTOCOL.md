@@ -53,3 +53,6 @@ arrays are global in Singular and cannot be imported with imap from a ring.
 Copy both parent arrays immediately after loading each donor and compare
 both complete528-entry parent lists. All downstream output of01 is invalid.
 No mathematical scope,controls or limit changed.
+
+Before02 also add the explicit H*nuCoordinates=target product and serialize
+all32 action residuals and their full two-equation source lifts.
