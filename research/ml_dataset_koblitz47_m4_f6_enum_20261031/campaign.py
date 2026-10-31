@@ -129,7 +129,7 @@ def admission():
     repo = HERE.parents[1]
     for path in (HERE / "protocol.json", HERE / "plan.json"):
         relative = path.relative_to(repo)
-        committed = subprocess.check_output(["git", "show", "HEAD:" + str(relative)], cwd=repo, timeout=30)
+        committed = subprocess.check_output(["git", "show", "HEAD:" + str(relative)], cwd=repo, timeout=120)
         if hashlib.sha256(committed).hexdigest() != HASHES[path] or digest(path) != HASHES[path]:
             raise RuntimeError(f"pre-data Git commit does not bind pinned {relative}")
     plan = json.loads((HERE / "plan.json").read_text())
