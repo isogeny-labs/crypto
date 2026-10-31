@@ -40,8 +40,9 @@ files relative to `historical/evidence/`. The source archive was made by:
 git -C /workspace/github-export archive --format=tar --prefix=historical/ b6666f5058260f602070c06d1f56d03979295dec | xz -6 -T1 > source-and-evidence.tar.xz
 ```
 
-The complete loose mirror is on the `codex/prime-conductor-gap60-archive-20261031`
-branch of [aburan28/isogeny-labs](https://github.com/aburan28/isogeny-labs/tree/codex/prime-conductor-gap60-archive-20261031/archives/prime-conductor-gap60).
+The destination is [isogeny-labs/crypto](https://github.com/isogeny-labs/crypto).
+The archive contains the complete prepared source and evidence tree; its
+publication does not change the Isogeny Labs website or generated pages.
 
 ## Report and scope
 
