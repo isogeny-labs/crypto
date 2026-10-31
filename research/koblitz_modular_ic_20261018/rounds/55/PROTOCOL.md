@@ -77,3 +77,6 @@ no virtual cap. No native_decide,sorry or new axiom.
 Canonical cross-repository protocol schema/checker remain absent from the selected
 Git indexes;this full manual experiment.protocol/v1 record makes no canonical
 schema-validation claim. No ledger promotion or official evidence decision.
+
+## Preserved attempt01 and diagnostic02
+Attempt01 rejected:base equation fails and intermediate R has32x64shape;later undefined matrices/late marker provide no evidence. Freeze DIAG55for dimensions and scalar multiplication diagnostics only,using same native limits. No revised mathematical prediction accepted. Diagnostic success marker DIAG55_ALL_CHECKS_PASS only means dimension probes executed.
