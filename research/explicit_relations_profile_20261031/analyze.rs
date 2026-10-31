@@ -42,7 +42,24 @@ fn main() {
                     expected,
                     "outcome mismatch: {id}"
                 );
+                assert_eq!(
+                    fs::read_to_string(out.join(format!("{id}.exit"))).unwrap(),
+                    "0\n"
+                );
                 let log = fs::read_to_string(out.join(format!("{id}.stderr"))).unwrap();
+                let tables: Vec<_> = log.lines().filter(|l| l.starts_with("TABLE ")).collect();
+                assert_eq!(tables.len(), 1, "expected one unchanged table per prefix");
+                let table = fields(tables[0]);
+                assert_eq!(table["right_cache_rows"], table["right"]);
+                assert!(table["filter_bytes"].parse::<u64>().unwrap() > 0);
+                let capture =
+                    fs::read_to_string(out.join(format!("{seed}.capture.stderr"))).unwrap();
+                let prior_table =
+                    fields(capture.lines().find(|l| l.starts_with("TABLE ")).unwrap());
+                for key in ["left", "right", "bins", "row_width", "filter_bytes"] {
+                    assert_eq!(table[key], prior_table[key], "layout mismatch: {id}");
+                }
+
                 let records: Vec<_> = log.lines().filter(|l| l.starts_with("PROFILE ")).collect();
                 assert_eq!(records.len(), 8, "missing profile records: {id}");
                 let relations: Vec<_> = log
@@ -58,7 +75,7 @@ fn main() {
                     round_ms[ai] += time;
                     write!(
                         csv,
-                        "{seed},{round},{arm},{qi},{time},{} ,{}",
+                        "{seed},{round},{arm},{qi},{time},{},{}",
                         f["tiles"], f["rows"]
                     )
                     .unwrap();
