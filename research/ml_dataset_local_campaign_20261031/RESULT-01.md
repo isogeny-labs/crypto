@@ -1,8 +1,9 @@
 # Completed prime n23 BSGS 64-cell campaign
 
-The separately frozen `experiment.protocol/v1` campaign completed its exact
-64-cell fixed population on local XFS. The official protocol checker reported
-zero findings before generation. The draft was filed at
+The native campaign completed its exact 64-cell fixed population on local XFS.
+The separately frozen `experiment.protocol/v1` record passed the official
+protocol checker with zero findings before generation, but the post-run export
+audit found a sample-size mismatch described below. The draft was filed at
 `850055f73953d2adca7a403e237ce74dcc47147a`, frozen protocol and bound native
 plan were committed at `cd7ee385d0f9`, and the final controller at
 `74741a06973d6d317c19df48d4a55551d21a6f10`. Native preflight before launch
@@ -30,6 +31,19 @@ and strict export rows. It separately streamed both S3 objects for sample
 indices 0, 31, and 63; all six downloads matched their recorded SHA-256
 hashes. For the other 61 pairs, the S3 conclusion rests on the producer's
 saved fresh-GET receipts.
+
+The frozen protocol defines two twist arms, describes 32 cells in each, but
+sets `sample_size.instances=64`. The official `experiment.export/v1` checker
+interprets that value **per arm** and requires 128 measured rows and 64 shared
+instance IDs per arm. The native plan and actual run have 64 cells, 32 per arm.
+The 64 genuine rows can be paired as 32 shared instance IDs, but a truthful
+export cannot pass against the immutable original protocol. This is a
+post-run protocol-accounting finding, not a missing native cell. No rows were
+fabricated, no original protocol was rewritten, and no checker-passing unified
+experiment export is claimed. An after-data correction would be descriptive;
+the current official freezer and export checker reject such amendments as
+decisive evidence. The cell-level native reports and strict dataset exports
+remain available for analysis under this explicit limitation.
 
 The XFS admission floor caused three safe stops before new attempts. The
 controller resumed from its retained manifests and S3 receipts without
