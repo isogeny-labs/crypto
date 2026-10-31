@@ -1,0 +1,21 @@
+/var/tmp/pencil-weighted-doubling-invariant-20261031-v1/Doubling.lean:6:4: error(lean.dependsOnNoncomputable): failed to compile definition, consider marking it as 'noncomputable' because it depends on 'instAdd', which is 'noncomputable'
+/var/tmp/pencil-weighted-doubling-invariant-20261031-v1/Doubling.lean:14:54: warning: This simp argument is unused:
+  C_neg
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [curve, value, deriv, C_add, C_sub, C_mul, C_pow, map_ofNat]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/var/tmp/pencil-weighted-doubling-invariant-20261031-v1/Doubling.lean:22:66: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+a0 a1 a2 a3 x y : K
+hp : value a0 a1 a2 a3 x = y ^ 2
+hy : 2 * y ≠ 0
+⊢ deriv a1 a2 a3 x - deriv a1 a2 a3 x * y * y⁻¹ * 2⁻¹ * 2 = 0

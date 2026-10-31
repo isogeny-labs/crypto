@@ -1,0 +1,19 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage[T1]{fontenc}
+\begin{document}
+\section*{Additive retry clarification review}
+31 October 2026 UTC. Original proposal and original independent review remain unchanged. Source and parent hash bindings match.
+
+\textbf{Clarified eligibility.} Initial attempt plus at most one retry; no process, owner or request reset. Positive authenticated owner/controller receipts must establish that the payload never started. Missing output, rows, receipts, an exec error or Job/Pod status alone is insufficient. Started/uncertain-spawn payloads, post-spawn failure, preemption, restore, unknown timeout, scientific timeout/cap or wrong answer fail closed.
+
+\textbf{Preserved limits.} Eligibility is not admission. Live-owner reconciliation, unchanged inputs/instrument, remaining authenticated ledger and frozen bindings remain required. All partial work, failures, controls, warmups, replay, diagnostics, owner work, collection/recovery and active reporting remain charged. Unknown accounting blocks admission. The 25,200-second ceiling and 06:00 UTC deadline remain unchanged.
+
+\textbf{Counter scope still needs precision.} The addendum attaches the counter to the same exact prepared execution. This could mean two attempts per each of 18 gate slots, rather than two for the whole gate/controller request. Bind the intended unit to actual launcher semantics: whole gate, worker job or individual prepared execution. This review does not infer the broader allowance. The precise authenticated launch boundary and receipt verifier also remain source-binding obligations.
+
+\textbf{Scientific boundary.} The changed-instrument gate remains expressly unapproved. This clarification does not reopen the known C1 stop. All original failures and full cohort/gate denominators remain retained. The collection reserve is a scheduling proposal, not a measured duration or completion guarantee.
+
+\textbf{Disposition.} The never-started, failclosed and accounting clarification is supported as document wording. Counter granularity and actual enforcement remain pre-freeze obligations. No canonical freeze, execution admission, build, scientific run or cloud action was performed.
+
+Evidence: review.json, custody.json, prospective PLAN.md and overview.svg. This packet is an additive review; it modifies neither preceding proposal nor preceding review.
+\end{document}

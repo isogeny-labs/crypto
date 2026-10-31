@@ -1,0 +1,29 @@
+Complete crypto root regression receipt, 2026-10-30
+
+Command: cargo test --locked --release --lib
+Working directory: /workspace/crypto
+Tested HEAD: 6c11977e1546dd9cc0556aa1fe2e227cafe979da
+Started: 2026-10-30T01:16:30Z
+Finished: 2026-10-30T02:01:21Z
+Actual wrapper exit: 0
+
+Final parent summary (not an embedded filtered child summary):
+test result: ok. 5389 passed; 0 failed; 123 ignored; 0 measured; 0 filtered out; finished in 2690.31s
+
+The final previously outstanding test also completed successfully:
+cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies
+
+Raw output: /tmp/crypto-root-tests-detached-20261030.log
+Bytes: 482358
+SHA-256: b9ec2caab3af5e1112392f8a3255964de5951ee16d2691223dc3a3b7afc3c06a
+Exit receipt: /tmp/crypto-root-tests-detached-20261030.exit
+Metadata receipt: /tmp/crypto-root-tests-detached-20261030.meta
+Remote durability: NOT_UPLOADED (local raw output and runtime receipts).
+
+The full suite ran after restoring the documented sparse runtime fixtures.
+No test, assertion, ignored-test annotation, check or source changed to obtain
+this result. Later changes through publication are evidence/documentation only.
+The 123 ignored cases are existing suite exclusions, not new quarantines.
+Earlier failed/incomplete attempts remain in validation.txt and
+root-regression-recovery.txt; none is relabelled as a pass.
+This development correctness run supplies no benchmark or theorem evidence.
