@@ -26,6 +26,10 @@ already hold the exact counts and the solving degrees.
   scheme degree is still at least `B`. Two atlas leads hold it: the PKM tower
   (`open_blocked`) and the digit presentation (`open_next_step`). The figure plots the
   solving degrees the tower thread recorded.
+- **Related record on main.** `research/prime_factor_base_degree_20261031` landed while this note
+  was written. It restates the yield identity for `m = 2` (equal-size bases have the same total
+  ordered yield `K²−K`) and adds a presentation-level constant-factor degree reduction at toy
+  scale; §5 places it.
 
 ## 1. Claim classes
 
@@ -109,6 +113,7 @@ copied into `evidence.json` with their sections.
 | maximum count | fires for concentrated bases, which lose coverage | §2 here; `KN-FIND-007` | not applicable |
 | scheme degree of a size-`B` description | `≥ B`, scoped theorem | `IDEA-20260801-021`; `KN-OPEN-020` | a description whose cost is not charged by intersection degree |
 | coverage of structured bases | within about 1% of random for the untyped geometries (`EV-FBG-001`); the lead record adds 13 families at `N = 2^24 … 2^26` within 0.0003 bits at `m = 2`, from an external repository the atlas check does not resolve. Headroom exists but is a constant: a Bose–Chowla Sidon base reaches 1.1071, the ceiling is about +54%, and the gain per relation is at most 1.582 (`KN-FIND-007`) | `LEAD-ICP-algebraic-membership-factor-base` | a coverage excess that grows with `N` |
+| per-equation degree, split-graph secant presentation, `m = 2` | positive at toy scale: homogeneous degree `d+1` against `2d+1` for a base of size `2d` (Lean-checked for the monomial-coverage core, written proof for the group-law bridge); observed handled F4 degree lower than matched secant and dense arms over `F_17 … F_127`, e.g. 3 against 4 and 6 at graph degree 2; a factor 2, at fixed base size | `research/prime_factor_base_degree_20261031` (`THEORY.md`, `SECANT_GRAPH.md`, `parallel_20261031/RESULTS.md`) | its own open items: F4 solving degree at scale, natural yield, field-operation cost, literature novelty |
 | per-equation degree, PKM tower | `open_blocked` | `LEAD-ICP-pkm-tower-algebraic-oracle` | `t = 12 … 14` at `m = 2`; `m = 4`, `N = 20` (240–380 GB) |
 | per-equation degree, digit presentation | `open_next_step`; first fall degree equals a curve-free null | `LEAD-ICP-digit-presentation-solving-degree`; `EV-PFDR-1394a4` (toy tier; not a solving degree) | the ladder over `s = 2 … 8` with blocking controls |
 
@@ -149,6 +154,8 @@ solver costs at least `B^{m−1}`, is the solving-degree question of §3, not a 
 - Sibling `crypto-autoresearcher` at `bb835c7787`: the lead atlas README and the leads
   `LEAD-ICP-algebraic-membership-factor-base`, `-digit-presentation-solving-degree` and
   `-pkm-tower-algebraic-oracle` (head); `IDEA-20260801-021` (statement, Theorems 1, 1G and 2);
+  in this repository, `research/prime_factor_base_degree_20261031` (`README.md`, `THEORY.md`, the
+  head of `parallel_20261031/RESULTS.md`; read after merging main, not the proof files);
   `KN-OPEN-020`; `KN-FIND-007` (statement and consequences); `EV-FBG-001` (observations);
   `EV-PFDR-1394a4` (head).
 - External: Petit, Kosters, Messeng, PKC 2016, from the authors' PDF text (introduction, §3.1, §5):

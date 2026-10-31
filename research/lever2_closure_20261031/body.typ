@@ -6,6 +6,7 @@
 - #strong[Derived.] On the maximum it fires for the wrong bases. The small-multiples base `{kP : 1 ≤ k ≤ B}` has a target with exactly `B = B^{m−1}` ordered representations at `m = 2` and `3/4·B^{m−1}` at `m = 3` (exact enumeration at `B = 100`: 100 and 7,500 of 10,000). Its coverage is far below a random base\'s: the recorded ratio is 0.0021 at `N ≈ 2^18` with a concentration statistic of 1224× (`KN-FIND-007`, consequence 3).
 - #strong[Checked.] `EV-FBG-001` counted exactly over the complete target space in 288 cells (`N ≈ 2^14 … 2^18`, `m = 3`, 12 prime-order curves): the exact mean differs from `C(B+2,3)/N` by 0 in all 144 cells of the three untyped geometries, and the exact coverage ratio to the matched random base stays within about 1%.
 - #strong[Mapped.] What is left of \"sub-`B` degree\" is the per-equation degree of a presentation whose scheme degree is still at least `B`. Two atlas leads hold it: the PKM tower (`open_blocked`) and the digit presentation (`open_next_step`). The figure plots the solving degrees the tower thread recorded.
+- #strong[Related record on main.] `research/prime_factor_base_degree_20261031` landed while this note was written. It restates the yield identity for `m = 2` (equal-size bases have the same total ordered yield `K²−K`) and adds a presentation-level constant-factor degree reduction at toy scale; §5 places it.
 
 == 1. Claim classes
 #align(center)[#table(
@@ -99,6 +100,10 @@ The count is also not what separates the extension-field case from `F_p`. Over `
   [within about 1% of random for the untyped geometries (`EV-FBG-001`); the lead record adds 13 families at `N = 2^24 … 2^26` within 0.0003 bits at `m = 2`, from an external repository the atlas check does not resolve. Headroom exists but is a constant: a Bose–Chowla Sidon base reaches 1.1071, the ceiling is about +54%, and the gain per relation is at most 1.582 (`KN-FIND-007`)],
   [`LEAD-ICP-algebraic-membership-factor-base`],
   [a coverage excess that grows with `N`],
+  [per-equation degree, split-graph secant presentation, `m = 2`],
+  [positive at toy scale: homogeneous degree `d+1` against `2d+1` for a base of size `2d` (Lean-checked for the monomial-coverage core, written proof for the group-law bridge); observed handled F4 degree lower than matched secant and dense arms over `F_17 … F_127`, e.g. 3 against 4 and 6 at graph degree 2; a factor 2, at fixed base size],
+  [`research/prime_factor_base_degree_20261031` (`THEORY.md`, `SECANT_GRAPH.md`, `parallel_20261031/RESULTS.md`)],
+  [its own open items: F4 solving degree at scale, natural yield, field-operation cost, literature novelty],
   [per-equation degree, PKM tower],
   [`open_blocked`],
   [`LEAD-ICP-pkm-tower-algebraic-oracle`],
@@ -120,7 +125,7 @@ The count is also not what separates the extension-field case from `F_p`. Over `
 
 == 8. Sources checked and scope
 - Repository: the program note (§0, §2.3, §2.4, §4, §5); `RESEARCH_PKM_TOWER_ORACLE.md` (summary, §2.4, §3, §10.2, §11.7, §17, round summaries of §12–§16); the head of `RESEARCH_INDEX_CALCULUS_FACTOR_BASE.md`; the module headers of `pkm_criterion.rs`, `prime_small_x.rs`, `f4_fp_tower.rs`, `ic_framework/prime_tower.rs` and `examples/pkm_tower_pilot.rs`; `research/prime_fall_degree_20261027` (preregistration, Amendments 6 and 7, headings of `DERIVED.md`).
-- Sibling `crypto-autoresearcher` at `bb835c7787`: the lead atlas README and the leads `LEAD-ICP-algebraic-membership-factor-base`, `-digit-presentation-solving-degree` and `-pkm-tower-algebraic-oracle` (head); `IDEA-20260801-021` (statement, Theorems 1, 1G and 2); `KN-OPEN-020`; `KN-FIND-007` (statement and consequences); `EV-FBG-001` (observations); `EV-PFDR-1394a4` (head).
+- Sibling `crypto-autoresearcher` at `bb835c7787`: the lead atlas README and the leads `LEAD-ICP-algebraic-membership-factor-base`, `-digit-presentation-solving-degree` and `-pkm-tower-algebraic-oracle` (head); `IDEA-20260801-021` (statement, Theorems 1, 1G and 2); in this repository, `research/prime_factor_base_degree_20261031` (`README.md`, `THEORY.md`, the head of `parallel_20261031/RESULTS.md`; read after merging main, not the proof files); `KN-OPEN-020`; `KN-FIND-007` (statement and consequences); `EV-FBG-001` (observations); `EV-PFDR-1394a4` (head).
 - External: Petit, Kosters, Messeng, PKC 2016, from the authors\' PDF text (introduction, §3.1, §5): the factor base is the zero set of a composition of low-degree maps, Semaev\'s base is `L(x) = ∏_{α<B}(x − α)`, and the asymptotic complexity is stated as open. Amadori, Pintore, Sala (ePrint 2017/609), Yokoyama, Yasuda, Takahashi, Kogure (J. Math. Cryptol. 2020), Huang, Kosters, Yeo (CRYPTO 2015) and the Galbraith–Gaudry survey were read at abstract level only: the ePrint PDF returned 403 and the others were not retrieved in full.
 - Not done: `tools/lead_atlas.py --match` was not run (the sibling worktree here is stale); the lead files were read directly from `origin/main`. Theorems 3 and 4 and later sections of the bounded-degree theorem record were not read.
 
