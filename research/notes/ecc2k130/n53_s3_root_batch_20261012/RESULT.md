@@ -1,6 +1,6 @@
 # N53 fixed-useful-base S3 root batching: nine verified single-target pairs
 
-**Status:** engineering result in source-level root operations; shared-host
+**Status:** diagnostic result in source-level root operations; shared-host
 wall measurements are L0 diagnostics. The frozen
 [protocol](PROTOCOL.md), [inputs and hashes](FROZEN.json),
 [native pair analysis](ANALYSIS.json), and
@@ -15,7 +15,7 @@ is retained separately.
 
 The control and candidate used the same constructed K220 base of 23,320
 points and 220 signed-Frobenius columns on
-`EC1N53Ce0hb097de99be9a`, subgroup order 21,044,858,204,113. The three
+`icv1-f2m53-tm56619371-dac20a85`, subgroup order 21,044,858,204,113. The three
 public target seeds, three rank seeds per target, rho seeds, and cell order
 were committed before timing. All 27 fresh processes completed within the
 90-second and 16-GiB caps. The nine control/candidate pairs each reached
@@ -36,8 +36,8 @@ speed comparison on this shared host.
 | Variant / reference | Cold process, median paired ratio | Target-online, median paired ratio | Correctness | Class |
 |:--|--:|--:|:--|:--|
 | control / strong rho, same Q | 78.146 [44.220, 92.602] | 0.490 [0.168, 0.763] | 9/9 replayed | baseline diagnostic |
-| batch / strong rho, same Q | 52.586 [33.179, 64.668] | 0.378 [0.103, 0.442] | 9/9 replayed | engineering, L0 diagnostic |
-| batch / control, same Q and rank seed | 0.738 [0.714, 0.750] | 0.612 [0.569, 0.903] | 9/9 exact pairs | engineering |
+| batch / strong rho, same Q | 52.586 [33.179, 64.668] | 0.378 [0.103, 0.442] | 9/9 replayed | diagnostic, L0 |
+| batch / control, same Q and rank seed | 0.738 [0.714, 0.750] | 0.612 [0.569, 0.903] | 9/9 exact pairs | diagnostic |
 
 Ratios are unitless, from in-process milliseconds. Brackets are descriptive
 95% target-block bootstrap intervals: 10,000 deterministic resamples of the

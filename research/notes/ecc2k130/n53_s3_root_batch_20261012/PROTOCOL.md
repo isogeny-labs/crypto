@@ -1,6 +1,6 @@
 # N53 fixed-useful-base S3 root-batch experiment: frozen protocol
 
-**Question.** On the `a=0` Koblitz curve `EC1N53Ce0hb097de99be9a`
+**Question.** On the `a=0` Koblitz curve `icv1-f2m53-tm56619371-dac20a85`
 (`GF(2)[x]/(x^53+x^6+x^2+x+1)`, prime subgroup order
 `21044858204113`), does batching inversions in the *second* S3 root call
 reduce charged rank and target work while preserving the exact useful rows?
