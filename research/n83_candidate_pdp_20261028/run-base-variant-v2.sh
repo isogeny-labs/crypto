@@ -134,7 +134,14 @@ cp "$study/RUN_OUTPUT_FORMAT.json" "$out/"
 cp "$study/run-base-variant-v2.sh" "$out/runner.sh"
 cp "$binary" "$out/instrument"
 uname -a > "$out/host.txt"
-lscpu >> "$out/host.txt"
+if command -v lscpu >/dev/null 2>&1; then
+  lscpu >> "$out/host.txt"
+elif [[ -r /proc/cpuinfo ]]; then
+  printf 'lscpu unavailable; /proc/cpuinfo follows\n' >> "$out/host.txt"
+  cat /proc/cpuinfo >> "$out/host.txt"
+else
+  printf 'lscpu and /proc/cpuinfo unavailable\n' >> "$out/host.txt"
+fi
 "$binary" selfcheck > "$out/selfcheck.json" 2> "$out/selfcheck.expected-negative-controls.log"
 upload
 (while sleep 30; do upload; done) &
