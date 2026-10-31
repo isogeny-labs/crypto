@@ -81,7 +81,7 @@ roots,two of which are F32 rational.
 Ordinary nu is descended nu+b*zeta at A=0,where zeta^2+zeta+1=0.
 Elimination and both full augmented-ideal products certify descent. The
 descended quotient has dimension16,Jacobian unit,and leading monomials
-lambda^4 and nu^4. Its standard monomials are lambda^i*nu^j for 0<=i,j<4.
+lambda^4 and nu^4. Its standard monomials are lambda^i*nu^j for i,j = 0,1,2,3.
 Thus nu separates four points over each geometric lambda root. The ordinary
 and twisted nu equations differ;both are retained,without identifying them.
 
@@ -108,7 +108,7 @@ bnew=D2/u^2=h/u^3 and Anew=A/u. See CM.md for actual terminal acceptance.
 
 == Complete terminal attempt ledger
 '''
-source+='#table(columns:(1.2fr,.65fr,2fr),inset:5pt,'+','.join('['+t(s)+']' for s in ['Attempt','Result','Native / Lean receipt']+rows)+')\n'
+source+='#table(columns:(1.2fr,.65fr,2fr),inset:5pt,'+','.join('[#'+t(s)+']' for s in ['Attempt','Result','Native / Lean receipt']+rows)+')\n'
 source+='''
 Every failed implementation attempt is retained, including late markers after
 errors. Exact native limits: seed53,one thread,4GiBvirtual,1200s. No accepted
@@ -141,5 +141,19 @@ isogeny model conventions: Sage elliptic-curve isogeny documentation.
 Proper/function-field correspondence: Stacks Project tag0BXX. No novelty
 claim is made for trace pairings,Bezout composition or Tate normalization.
 '''
+for old,new in {
+ 'dimension16':'dimension 16','dimension64':'dimension 64','All12':'All 12',
+ '6accepted':'6 accepted','6rejected':'6 rejected','24valid':'24 valid',
+ '1200second':'1200 second','78KiB':'78 KiB','seed53,one':'seed 53, one',
+ 'thread,4GiBvirtual,1200s':'thread, 4 GiB virtual, 1200 s',
+ 'uses4.34.1,pinned':'uses 4.34.1, pinned','mathlibd13f23b':'mathlib d13f23b',
+ 'for i,j':'for i, j','4x4basis':'4 by 4 basis','the5':'the five',
+ 'the3':'the three','all3':'all three','all5':'all five',
+ 'F2(b)':'F2(b)','actualF32':'actual F32','degree8level11base':'degree-8 level-11 base',
+ 'degree8level11':'degree-8 level-11','R50complete':'R50 complete',
+ 'R51line':'R51 line','R52complete':'R52 complete','QR/G,Nsyzygies':'QR/G,N syzygies'
+}.items():source=source.replace(old,new)
+# Plain prose punctuation; protect Typst commands and raw formulas.
+source='\n'.join(line if line.startswith('#') else line.replace(',', ', ').replace(';', '; ').replace(':', ': ').replace(',  ', ', ').replace(';  ', '; ').replace(':  ', ': ') for line in source.splitlines())+'\n'
 (h/'report.typ').write_text(source);typst.compile(str(h/'report.typ'),output=str(h/'report.pdf'))
 print(json.dumps({'pdf_bytes':(h/'report.pdf').stat().st_size,'terminal_attempts':len(r['runs'])}))
