@@ -1417,6 +1417,13 @@ pub fn points_with_x_fast(curve: &FastCurve, x: &F2mElement) -> Vec<BinaryPoint>
     }
     let inverse = field.inv(coordinate);
     let rhs = coordinate ^ curve.a ^ field.mul(curve.b, field.sqr(inverse));
+    if crate::cryptanalysis::koblitz_fast::cached_point_lifts_enabled() {
+        let Some(root) = curve.half_trace_root_cached(rhs) else {
+            return Vec::new();
+        };
+        let point = FastPoint::affine(coordinate, field.mul(coordinate, root));
+        return vec![curve.lower(point), curve.lower(curve.neg(point))];
+    }
     let mut root = rhs;
     let mut power = rhs;
     for _ in 0..(curve.n - 1) / 2 {
@@ -15246,6 +15253,13 @@ mod tests {
                         points_with_x_fast(&fast, &x),
                         points_with_x(&curve, &x),
                         "ordered roots at n={n}, a={a}, b={b}, x={bits}",
+                    );
+                    assert_eq!(
+                        crate::cryptanalysis::koblitz_fast::with_cached_point_lifts(true, || {
+                            points_with_x_fast(&fast, &x)
+                        }),
+                        points_with_x(&curve, &x),
+                        "cached ordered roots at n={n}, a={a}, b={b}, x={bits}",
                     );
                 }
             }

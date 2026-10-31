@@ -1,0 +1,44 @@
+<!doctype html><html lang="en"><meta charset="utf-8">
+<title>Native Koblitz cached lifting — implementation status</title>
+<style>@page{size:A4;margin:16mm}body{font:12px/1.5 sans-serif;color:#182332}h1{font-size:23px}h2{font-size:15px}img{width:100%}code{font-size:10px;overflow-wrap:anywhere}.status{padding:12px;background:#fff0dc}li{margin-bottom:5px}a{color:#165c7b}</style>
+<h1>Native Koblitz cached lifting</h1>
+<p>2026-10-30 · Engineering implementation candidate · Generic decomposition track</p>
+<p class="status"><b>Measurement pending.</b> The native baseline was built before edits.
+The session's mandatory S3 checkpoint upload failed because no approved uploader
+is configured. Actions preparation run 41082358257 also failed because its upload
+secret is absent; build and experiment jobs were skipped. No native speed ratio is claimed.</p>
+<img src="pipeline.svg" alt="Rust pipeline and measurement admission status">
+<h2>What changed</h2>
+<p>Lazy, curve-local, shared byte tables evaluate the existing odd-degree halftrace.
+The opt-in factor-base parameter <code>halftrace_tables=1</code> preserves the exact
+first root, ordered points, signed orbit maps and existing relation/LA machinery.
+Default recipes retain the prior point-lifting implementation.</p>
+<h2>Verification contract</h2>
+<p>Native tests compare exhaustive small-field roots and sampled wider roots with
+the generic field definition, check cache sharing and field separation, and test
+scope restoration. The existing point-order test includes generic coefficients.
+A native integration fixture compares two- and three-summand known-answer solves.
+The original full release suite completed with 5447 passes, zero failures and
+123 existing ignored tests; final-source filters and strict Clippy pass separately.
+Later main merges expose successive upstream syntax errors and are not validated by those
+older passes. Development elapsed times are not performance measurements.</p>
+<h2>Frozen measurement and limits</h2>
+<p>The spec uses eight independent one-target workloads on the existing registered
+degree-31 Koblitz curve, matched baseline/candidate bases and strong-rho and IC
+A/A controls. Six measured alternating rounds and one warmup require L2 EKS Spot
+admission and independent scalar replay. Cache setup is inside the cold cost.</p>
+<p>Degree 31 has ord<sub>31</sub>(2)=5; it does not discharge the degree-83 confidence
+gate or establish scaling to ECC2K-130. Coarse Artin–Schreier solve counts alone
+do not price the optimization. External arithmetic comparisons remain unmeasured.</p>
+<h2>Source-linked record</h2>
+<p>Baseline: <code>3b34d504bc13ce668e86d8e68cdf57e3fbaba89a</code>.<br>
+Implementation: <code>src/cryptanalysis/koblitz_fast.rs</code>,
+<code>koblitz_index_calculus.rs</code>, and <code>ic_framework/plugins.rs</code>.<br>
+Scientific source pin: <code>7c58661935b79153ff74c1208d0592aa56ed04a1</code>.<br>
+See <a href="README.md">README.md</a>, <a href="PROTOCOL.md">PROTOCOL.md</a>,
+<a href="protocol.json">prospectively frozen protocol.json</a>,
+<a href="spec.json">spec.json</a>, <a href="BASELINE.txt">BASELINE.txt</a>, and
+<a href="../../problems/native-koblitz-measurement-access.md">the access problem record</a>.
+SEC 1 v2.0 §2.3.4 supplies the binary point-recovery contract; existing native
+trace/halftrace implementations supply the linear-map precedent.</p>
+</html>

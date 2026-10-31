@@ -15,6 +15,10 @@ on:
         description: Publish pinned image receipts without submitting any experiment
         type: boolean
         default: false
+      checkpoint_only:
+        description: Upload the study resume checkpoint only; do not build or launch an experiment
+        type: boolean
+        default: false
       spec_path:
         description: Repository ecbench.spec/v1 JSON file at the tested commit
         type: string
@@ -46,7 +50,58 @@ on:
 permissions:
   contents: read
 jobs:
+  checkpoint:
+    if: github.event_name == 'workflow_dispatch' && inputs.checkpoint_only
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Validate the checkpoint source and study path
+        id: request
+        shell: bash
+        env:
+          SOURCE_REVISION: ${{ inputs.source_revision }}
+          SPEC_PATH: ${{ inputs.spec_path }}
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_REVISION" =~ ^[a-f0-9]{40}$ ]]
+          [[ "$SPEC_PATH" =~ ^[a-zA-Z0-9_./-]+\.json$ && "$SPEC_PATH" != /* && "/$SPEC_PATH/" != *"/../"* ]]
+          study_dir=$(dirname -- "$SPEC_PATH")
+          [[ "$study_dir" != . ]]
+          printf 'study_dir=%s\n' "$study_dir" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ inputs.source_revision }}
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /scripts/
+            /${{ steps.request.outputs.study_dir }}/
+      - name: Upload the source-pinned resume checkpoint
+        shell: bash
+        env:
+          CHECKPOINT_UPLOAD_TOKEN: ${{ secrets.CHECKPOINT_UPLOAD_TOKEN }}
+          STUDY_DIR: ${{ steps.request.outputs.study_dir }}
+          SPEC_PATH: ${{ inputs.spec_path }}
+          SOURCE_REVISION: ${{ inputs.source_revision }}
+        run: |
+          set -euo pipefail
+          test -n "$CHECKPOINT_UPLOAD_TOKEN" || { echo 'Approved CHECKPOINT_UPLOAD_TOKEN secret is not configured.' >&2; exit 1; }
+          test -f "$SPEC_PATH"
+          test -f "$STUDY_DIR/RESUME.md"
+          [[ $(git rev-parse HEAD) == "$SOURCE_REVISION" ]]
+          # Checkout fetched this immutable commit from origin. Anchor that
+          # published source so a shallow checkout does not bundle its tree.
+          git update-ref refs/remotes/origin/checkpoint-source "$SOURCE_REVISION"
+          mkdir -p .resume
+          cp -- "$STUDY_DIR/RESUME.md" .resume/RESUME.md
+          # Explicitly include already-pushed study records in the checkpoint.
+          mkdir -p .resume-study
+          cp -- "$STUDY_DIR"/PROTOCOL.md "$SPEC_PATH" .resume-study/
+          if test -f "$STUDY_DIR/protocol.json"; then cp -- "$STUDY_DIR/protocol.json" .resume-study/; fi
+          scripts/checkpoint.sh gate
+          printf 'Source-pinned study checkpoint uploaded. No experiment was launched.\n' >> "$GITHUB_STEP_SUMMARY"
   contracts:
+    if: ${{ !inputs.checkpoint_only }}
     runs-on: ${{ (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && vars.ISOLAB_BUILD_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 10
     steps:
@@ -97,7 +152,7 @@ jobs:
             1048576 taskq/deploy/eks-karpenter/resume/validation/20261021/progress-before.log
   build:
     needs: contracts
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && !inputs.checkpoint_only
     runs-on: ${{ (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && vars.ISOLAB_BUILD_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 60
     permissions:
@@ -168,7 +223,7 @@ jobs:
           compression-level: 0
   experiment:
     needs: build
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && !inputs.checkpoint_only
     runs-on: ${{ (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && vars.ISOLAB_ACTIONS_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 150
     permissions:
