@@ -51,6 +51,8 @@ SELF = {"docs/curves/ICV1.md", "docs/curves/README.md", "scripts/check_curve_nam
         "scripts/build_curve_registry.py", "scripts/curve_id.py",
         "src/cryptanalysis/curve_id.rs", "src/cryptanalysis/curve_aliases.json", "tests/curve_id.rs",
         "examples/curve_id_generated.rs",
+        # ecdb flags registry aliases that are retired forms (is_retired_name).
+        "ecdb/src/math.rs",
         # Generated alias tables: their "also called" column lists the
         # legacy spellings on purpose.
         "docs/ic-leaderboard.html", "docs/ic/LEADERBOARD.md"}
