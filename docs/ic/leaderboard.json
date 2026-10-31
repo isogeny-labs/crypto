@@ -98,6 +98,10 @@
    "path": "research/f4_f5_f6_cross_family_20261011/ANALYSIS.json",
    "sha256": "143247c6b81d3539bcecbb461d8df2db17baccd47f97c799f39334d83f6fba1b"
   },
+  "frontier_establishment": {
+   "path": "research/ecbench_e2e_frontier_20261031/establishment/certificate.json",
+   "sha256": "fb5759832dd0f80a8b1139633c5fe9ea7d7838715bc07947422fd9f5abf93c25"
+  },
   "n41_n53_counted": {
    "path": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
    "sha256": "fe55908f837840eeee173cfeae463368bb272e3c65ef03fa2b66efeead769331"
@@ -13749,6 +13753,63 @@
     "f6_verdict": "F6-IC saves solver work"
    }
   ],
+  "current_binary_replay": {
+   "source": "research/ecbench_e2e_frontier_20261031/establishment/certificate.json",
+   "auditor_binary_sha256": "91f5895637501c6de257bbaf3afc9cbc2c0f5e964964d3dc4fc3bf78a427d96b",
+   "status": "historical_binary_result_established; current_source_result_not_established",
+   "cells": {
+    "K13": {
+     "failures": 32,
+     "ok": false,
+     "receipt_sha256": "d22657138fbb26a99a5b48a3da852e7fef03ab1b728c10d4704d184599501154",
+     "records": 48,
+     "replay_candidates": 48,
+     "reproduced": 16,
+     "verified_records": 48
+    },
+    "K19": {
+     "failures": 16,
+     "ok": false,
+     "receipt_sha256": "10f6dbb4f2d3e2e3790d013d8f121d22c2c33d389f4f55172f2b997bd79b7684",
+     "records": 32,
+     "replay_candidates": 32,
+     "reproduced": 16,
+     "verified_records": 32
+    },
+    "R13": {
+     "failures": 8,
+     "ok": false,
+     "receipt_sha256": "9cedda97fe20de7c1d1e86a688643ffe62f6c3e5a255cf00c22bdcd0f5ad9f7f",
+     "records": 40,
+     "replay_candidates": 40,
+     "reproduced": 32,
+     "verified_records": 40
+    },
+    "R19": {
+     "failures": 16,
+     "ok": false,
+     "receipt_sha256": "127ee48abe5a7e58ccbac370eff645fa8dcbad3a6353a9db3b94ed910c79969f",
+     "records": 24,
+     "replay_candidates": 24,
+     "reproduced": 8,
+     "verified_records": 24
+    },
+    "X19": {
+     "failures": 0,
+     "ok": true,
+     "receipt_sha256": "59cbdfc7472a0b8a829bb38e284679933c6b6abbffc59c56c97cb62a657eb13e",
+     "records": 4,
+     "replay_candidates": 0,
+     "reproduced": 0,
+     "verified_records": 0
+    }
+   },
+   "total": {
+    "candidates": 144,
+    "failures": 72,
+    "reproduced": 72
+   }
+  },
   "online_speedup": null,
   "fully_priced_cold_speedup": null
  },
@@ -311988,8 +312049,8 @@
   "report": "research/prime_base_oracle_tuning_20261029/README.pdf",
   "second_host": "Second-host replay (PROTOCOL.md §13): the 20-bit holdout re-executed on isolab-eks (L2, another host class and ecbench build); 1008 of 1008 original records identical in every counted and band-priced field. Over its 5 rounds, selected ÷ incumbent 0.836 / 0.817 / 0.746 at w = 0 / 0.1 / 1 (240 pairs); report research/prime_base_oracle_tuning_20261029/second-host/README.pdf.",
   "unit": "S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation",
-  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.",
-  "validated": false
+  "validation": "Validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band are filed in `research/prime_base_oracle_tuning_20261029/VALIDATION.json`. The promoted result is the 20-bit `N=45` engineering baseline only; it is one curve, counted pricing-band evidence, and not a scaling or wall-time claim.",
+  "validated": true
  },
  "lazy_members_component": {
   "rows": [

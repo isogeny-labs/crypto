@@ -2264,6 +2264,20 @@ def launch(arguments: argparse.Namespace) -> dict[str, Any]:
                      and row.get("online_target_count") == 1),
                     None,
                 )
+                if direct_online is None:
+                    # Producers on main no longer emit `online_target_count`
+                    # (the field is absent from every example).  Accept exactly
+                    # one `relation_rank_summary` row that carries the published
+                    # scalar, so the rho pairing below is unchanged and still
+                    # fail-closed on ambiguity.  The absence is recorded.
+                    candidates = [
+                        row for row in direct_rows
+                        if row.get("kind") == "relation_rank_summary"
+                        and isinstance(row.get("published_fixture_scalar"), int)
+                    ]
+                    if len(candidates) == 1:
+                        direct_online = candidates[0]
+                        commands["online_target_count_absent"] = True
                 if direct_online is not None:
                     rho_fixed_target_scalar = direct_online.get("published_fixture_scalar")
                 if isinstance(rho_fixed_target_scalar, int):
