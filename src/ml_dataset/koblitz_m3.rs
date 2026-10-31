@@ -6245,7 +6245,7 @@ fn run_native_phases<'a>(
     degree: u32,
     budget: &mut Budget,
     global: &mut usize,
-    persist: &mut impl FnMut(&[u8], &mut Budget) -> Result<(), String>,
+    persist: &mut impl FnMut(&[u8], &mut Budget, &mut usize) -> Result<(), String>,
 ) -> NativePhaseRun<'a> {
     let mut out = NativePhaseRun {
         construction: None,
@@ -6283,7 +6283,7 @@ fn run_native_phases<'a>(
             binding,
             public_sha256,
             factor_base_sha256,
-            persist,
+            &mut |bytes, b| persist(bytes, b, global),
         ) {
             Ok(input) => input,
             Err(failure) => {
@@ -6335,7 +6335,7 @@ mod native_phase_driver_tests {
                 3,
                 &mut budget,
                 &mut global,
-                &mut |bytes, _| {
+                &mut |bytes, _, _| {
                     persisted = bytes.to_vec();
                     Ok(())
                 },
@@ -6386,7 +6386,7 @@ mod native_phase_driver_tests {
             3,
             &mut budget,
             &mut global,
-            &mut |_, _| Err("selected persistence failure".into()),
+            &mut |_, _, _| Err("selected persistence failure".into()),
         );
         assert_eq!(run.ledger.first_stop, Some(Stop::Observer));
         assert!(run.matrix.is_none());
@@ -6415,7 +6415,7 @@ mod native_phase_driver_tests {
             3,
             &mut budget,
             &mut global,
-            &mut |_, _| {
+            &mut |_, _, _| {
                 persistence_called = true;
                 Ok(())
             },
@@ -6447,7 +6447,7 @@ fn run_bound_pipeline<'a>(
     degree: u32,
     budget: &mut Budget,
     global: &mut usize,
-    persist: &mut impl FnMut(&[u8], &mut Budget) -> Result<(), String>,
+    persist: &mut impl FnMut(&[u8], &mut Budget, &mut usize) -> Result<(), String>,
 ) -> BoundPipelineRun<'a> {
     let native = run_native_phases(
         original,
@@ -6539,7 +6539,7 @@ mod bound_pipeline_tests {
                     3,
                     &mut budget,
                     &mut global,
-                    &mut |_, _| Ok(()),
+                    &mut |_, _, _| Ok(()),
                 );
                 assert_eq!(run.ledger.first_stop, None);
                 assert_eq!(run.native.ledger.phase, Phase::MatrixComplete);
@@ -6607,7 +6607,7 @@ mod bound_pipeline_tests {
             3,
             &mut budget,
             &mut global,
-            &mut |_, _| Ok(()),
+            &mut |_, _, _| Ok(()),
         );
         assert_eq!(run.ledger.first_stop, Some(Stop::Additions));
         assert_eq!(run.native.ledger.phase, Phase::MatrixComplete);
@@ -6656,7 +6656,7 @@ mod bound_pipeline_tests {
             3,
             &mut budget,
             &mut global,
-            &mut |_, _| Err("selected persistence failure".into()),
+            &mut |_, _, _| Err("selected persistence failure".into()),
         );
         assert_eq!(run.ledger.first_stop, Some(Stop::Observer));
         assert!(run.signed.is_none() && run.signed_events.is_none() && run.publisher.is_none());
@@ -6983,7 +6983,7 @@ fn run_canonical_pipeline<'a>(
     degree: u32,
     budget: &mut Budget,
     global: &mut usize,
-    persist: &mut impl FnMut(&[u8], &mut Budget) -> Result<(), String>,
+    persist: &mut impl FnMut(&[u8], &mut Budget, &mut usize) -> Result<(), String>,
 ) -> CanonicalPipelineRun<'a> {
     let mut out = CanonicalPipelineRun {
         artifacts_taken: false,
@@ -7016,11 +7016,11 @@ fn run_canonical_pipeline<'a>(
         degree,
         budget,
         global,
-        &mut |bytes, b| {
+        &mut |bytes, b, global| {
             b.reserve_checking(1024 + bytes.len() as u64 * 8, 4096, Instant::now())
                 .map_err(|s| format!("input digest reservation: {s:?}"))?;
             out.input_sha256 = Some(crate::ml_dataset::digest(bytes));
-            persist(bytes, b)
+            persist(bytes, b, global)
         },
     ));
     let run = out.pipeline.as_ref().unwrap();
@@ -7136,7 +7136,7 @@ mod canonical_record_producer_tests {
                     3,
                     &mut budget,
                     &mut global,
-                    &mut |_, _| Ok(()),
+                    &mut |_, _, _| Ok(()),
                 );
                 assert!(run.admission_stop.is_none());
                 let group = run.group.as_ref().unwrap();
@@ -7211,7 +7211,7 @@ mod canonical_record_producer_tests {
             3,
             &mut budget,
             &mut global,
-            &mut |_, _| Err("selected persistence failure".into()),
+            &mut |_, _, _| Err("selected persistence failure".into()),
         );
         assert_eq!(budget.stopped, Some(Stop::Observer));
         assert!(!run.group.as_ref().unwrap().attempted);
@@ -7258,7 +7258,7 @@ mod canonical_record_producer_tests {
             3,
             &mut budget,
             &mut global,
-            &mut |_, _| {
+            &mut |_, _, _| {
                 called = true;
                 Ok(())
             },
@@ -7550,7 +7550,7 @@ mod terminal_result_reader_tests {
             3,
             &mut budget,
             &mut global,
-            &mut |_, _| {
+            &mut |_, _, _| {
                 if mode == 1 {
                     Err("selected I/O failure".into())
                 } else {
@@ -7940,7 +7940,7 @@ mod canonical_component_tests {
                     3,
                     &mut budget,
                     &mut global,
-                    &mut |_, _| Ok(()),
+                    &mut |_, _, _| Ok(()),
                 );
                 assert!(
                     run.group.as_ref().unwrap().complete && run.result.as_ref().unwrap().complete
@@ -8401,7 +8401,7 @@ mod retained_artifact_tests {
                 3,
                 &mut budget,
                 &mut global,
-                &mut |_, _| Ok(()),
+                &mut |_, _, _| Ok(()),
             );
             let mut identities = Vec::new();
             run.visit_retained_artifacts::<()>(|a| {
@@ -8487,7 +8487,7 @@ mod retained_artifact_tests {
             3,
             &mut budget,
             &mut global,
-            &mut |_, _| Err("selected storage failure".into()),
+            &mut |_, _, _| Err("selected storage failure".into()),
         );
         let mut paths = Vec::new();
         failed
@@ -8517,7 +8517,7 @@ mod retained_artifact_tests {
             3,
             &mut budget,
             &mut global,
-            &mut |_, _| Ok(()),
+            &mut |_, _, _| Ok(()),
         );
         // Selection controls: retain real bytes while withholding completion or
         // publication evidence. Neither flag alone may promote a raw artifact.
@@ -9211,7 +9211,7 @@ mod parent_artifact_owner_tests {
                 3,
                 &mut budget,
                 &mut global,
-                &mut |_, _| {
+                &mut |_, _, _| {
                     if scenario == 2 {
                         Err("selected input I/O failure".into())
                     } else {
@@ -9281,7 +9281,7 @@ mod parent_artifact_owner_tests {
             3,
             &mut budget,
             &mut global,
-            &mut |_, _| Ok(()),
+            &mut |_, _, _| Ok(()),
         );
         let before = run.result.as_ref().unwrap().bytes.as_ptr();
         let len = run.result.as_ref().unwrap().bytes.len();
@@ -9468,7 +9468,7 @@ mod parent_storage_tests {
             3,
             &mut budget,
             &mut global,
-            &mut |_, _| Err("selected input persistence failure".into()),
+            &mut |_, _, _| Err("selected input persistence failure".into()),
         );
         let mut parent = ParentRetention::begin(&mut budget).unwrap();
         let mut owned = take_parent_artifacts(&mut run, &mut parent).value.unwrap();
@@ -9552,7 +9552,7 @@ mod parent_storage_tests {
             3,
             &mut budget,
             &mut global,
-            &mut |_, _| Ok(()),
+            &mut |_, _, _| Ok(()),
         );
         let mut parent = ParentRetention::begin(&mut budget).unwrap();
         let mut owned = take_parent_artifacts(&mut run, &mut parent).value.unwrap();
@@ -9617,7 +9617,7 @@ mod parent_storage_tests {
                 3,
                 &mut budget,
                 &mut global,
-                &mut |_, _| Ok(()),
+                &mut |_, _, _| Ok(()),
             );
             let mut parent = ParentRetention::begin(&mut budget).unwrap();
             let mut owned = take_parent_artifacts(&mut run, &mut parent).value.unwrap();
@@ -10453,5 +10453,258 @@ mod worker_math_decode_tests {
             Err(Stop::InvalidLimits)
         ));
         assert_eq!(b.stopped, Some(Stop::InvalidLimits));
+    }
+}
+
+/// One original-input publication attempt before matrix execution. Receipts are
+/// retained before post-call deadline checks; root storage follows capture.
+struct PreMatrixInputStore<'a> {
+    root: &'a std::path::Path,
+    limits: &'a crate::ml_dataset::capture::CaptureLimits,
+    binding_digest: [u8; 64],
+    attempted: bool,
+    capture_acknowledged: bool,
+    capture_sequence: Option<u64>,
+    root_artifact: Option<crate::ml_dataset::types::Artifact>,
+    stop: Option<Stop>,
+    error: Option<String>,
+}
+impl<'a> PreMatrixInputStore<'a> {
+    fn new(
+        root: &'a std::path::Path,
+        binding: &crate::ml_dataset::capture::AttemptBinding,
+        limits: &'a crate::ml_dataset::capture::CaptureLimits,
+        budget: &mut Budget,
+    ) -> Result<Self, Stop> {
+        budget.reserve_checking(
+            4096,
+            std::mem::size_of::<Self>() as u64 + 4096,
+            Instant::now(),
+        )?;
+        let digest = binding
+            .digest()
+            .map_err(|_| Stop::InvalidLimits)
+            .or_else(|s| budget.fail(s))?;
+        let mut binding_digest = [0; 64];
+        binding_digest.copy_from_slice(digest.as_bytes());
+        Ok(Self {
+            root,
+            limits,
+            binding_digest,
+            attempted: false,
+            capture_acknowledged: false,
+            capture_sequence: None,
+            root_artifact: None,
+            stop: None,
+            error: None,
+        })
+    }
+    fn publish(
+        &mut self,
+        bytes: &[u8],
+        budget: &mut Budget,
+        global: &mut usize,
+    ) -> Result<(), String> {
+        self.publish_with_finish_time(bytes, budget, global, Instant::now)
+    }
+    fn publish_with_finish_time(
+        &mut self,
+        bytes: &[u8],
+        budget: &mut Budget,
+        global: &mut usize,
+        finish_time: impl FnOnce() -> Instant,
+    ) -> Result<(), String> {
+        if self.attempted {
+            return Err("original input publication already attempted".into());
+        }
+        self.attempted = true;
+        let result = (|| {
+            if budget.phase != Phase::Constructed {
+                return budget
+                    .fail::<()>(Stop::Phase)
+                    .map_err(|s| format!("input phase: {s:?}"));
+            }
+            if bytes.len() > INPUT_BYTE_CAP {
+                return budget
+                    .fail::<()>(Stop::Bytes)
+                    .map_err(|s| format!("input bytes: {s:?}"));
+            }
+            let next = global
+                .checked_add(1)
+                .ok_or("input capture sequence overflow")?;
+            let quote = quote_parent_storage_length(bytes.len() as u64, false, self.limits)
+                .map_err(|s| format!("input storage quote: {s:?}"))?;
+            budget
+                .reserve_checking(quote.work, quote.bytes, Instant::now())
+                .map_err(|s| format!("input storage admission: {s:?}"))?;
+            budget
+                .reserve_trace(quote.trace, Instant::now())
+                .map_err(|s| format!("input storage trace: {s:?}"))?;
+            super::LIVE_SINK.with(|slot| match slot.borrow().as_ref() {
+                Some(super::EventSink::Bound(sink)) => sink.verify_digest_limits_at_count(
+                    &self.binding_digest,
+                    self.limits,
+                    *global as u64,
+                ),
+                _ => Err("original input requires bound capture".into()),
+            })?;
+            super::live_borrowed_payload(
+                KOBLITZ_SLOTS[0].0,
+                KOBLITZ_SLOTS[0].1,
+                KOBLITZ_SLOTS[0].2,
+                bytes,
+            )?;
+            self.capture_acknowledged = true;
+            self.capture_sequence = Some(next as u64);
+            *global = next;
+            super::LIVE_SINK.with(|slot| match slot.borrow().as_ref() {
+                Some(super::EventSink::Bound(sink)) => sink.verify_digest_limits_at_count(
+                    &self.binding_digest,
+                    self.limits,
+                    *global as u64,
+                ),
+                _ => Err("original input capture disappeared".into()),
+            })?;
+            budget
+                .check(Instant::now())
+                .map_err(|s| format!("input root deadline: {s:?}"))?;
+            self.root_artifact = Some(crate::ml_dataset::storage::write_bytes(
+                self.root,
+                KOBLITZ_SLOTS[0].0,
+                KOBLITZ_SLOTS[0].1,
+                KOBLITZ_SLOTS[0].2,
+                bytes,
+            )?);
+            budget
+                .check(finish_time())
+                .map_err(|s| format!("input stored after deadline: {s:?}"))?;
+            Ok::<(), String>(())
+        })();
+        if let Err(error) = &result {
+            if budget.stopped.is_none() {
+                let _ = budget.observer_failed();
+            }
+            self.stop = budget.stopped;
+            self.error = Some(error.clone());
+        }
+        result
+    }
+}
+
+#[cfg(test)]
+mod pre_matrix_input_store_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix::Engine;
+    #[test]
+    fn input_is_stored_before_both_matrix_engines_and_failures_preserve_acknowledgements() {
+        for engine in [Engine::F4Macaulay, Engine::F5KoszulFrobenius] {
+            for mode in 0..6 {
+                let binding = matrix_tests::binding();
+                let limits = crate::ml_dataset::capture::capture_limits(16).unwrap();
+                let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+                let root = sink.dir.parent().unwrap();
+                if mode == 1 {
+                    std::fs::write(root.join(KOBLITZ_SLOTS[0].0), b"root collision").unwrap();
+                }
+                if mode == 2 {
+                    std::fs::write(
+                        sink.dir.join("payloads").join(KOBLITZ_SLOTS[0].0),
+                        b"capture collision",
+                    )
+                    .unwrap();
+                }
+                let original = construction_tests::fixture();
+                let mut budget = construction_tests::budget();
+                let mut wrong = binding.clone();
+                if mode == 4 {
+                    wrong.cell_index += 1;
+                }
+                let mut storage =
+                    PreMatrixInputStore::new(root, &wrong, &limits, &mut budget).unwrap();
+                let late = budget.deadline + Duration::from_secs(1);
+                let mut global = 0;
+                let run = run_native_phases(
+                    &original,
+                    &binding,
+                    &limits,
+                    &"8".repeat(64),
+                    &"9".repeat(64),
+                    engine,
+                    3,
+                    &mut budget,
+                    &mut global,
+                    &mut |bytes, b, g| {
+                        if mode == 5 {
+                            let quote =
+                                quote_parent_storage_length(bytes.len() as u64, false, &limits)
+                                    .unwrap();
+                            b.checking_work = b.native_work_limit - b.native.work - quote.work + 1;
+                        }
+                        if mode == 3 {
+                            storage.publish_with_finish_time(bytes, b, g, || late)
+                        } else {
+                            storage.publish(bytes, b, g)
+                        }
+                    },
+                );
+                assert!(storage.attempted);
+                assert_eq!(run.matrix.is_some(), mode == 0, "mode {mode} {engine:?}");
+                assert_eq!(storage.root_artifact.is_some(), mode == 0 || mode == 3);
+                assert_eq!(storage.capture_acknowledged, matches!(mode, 0 | 1 | 3));
+                if mode == 0 {
+                    assert!(
+                        run.matrix
+                            .as_ref()
+                            .unwrap()
+                            .report
+                            .as_ref()
+                            .unwrap()
+                            .native_step_complete
+                    );
+                    let bytes = std::fs::read(root.join(KOBLITZ_SLOTS[0].0)).unwrap();
+                    assert_eq!(bytes, run.matrix.as_ref().unwrap().original_bytes);
+                    let captured = verify_native_capture(
+                        root,
+                        &run.events.as_ref().unwrap().canonical,
+                        &binding,
+                        &limits,
+                        23,
+                        engine,
+                        3,
+                    )
+                    .unwrap();
+                    assert!(
+                        captured.construction_complete_captured && captured.matrix_finish_captured
+                    );
+                    assert_eq!(captured.records + 1, global);
+                } else {
+                    assert!(
+                        run.persistence_failure
+                            .as_ref()
+                            .unwrap()
+                            .serialized_complete
+                    );
+                    assert_eq!(
+                        budget.stopped,
+                        Some(if mode == 3 {
+                            Stop::Deadline
+                        } else if mode == 5 {
+                            Stop::Work
+                        } else {
+                            Stop::Observer
+                        })
+                    );
+                }
+                if mode == 1 {
+                    assert_eq!(
+                        std::fs::read(root.join(KOBLITZ_SLOTS[0].0)).unwrap(),
+                        b"root collision"
+                    );
+                }
+                let before = global;
+                assert!(storage.publish(b"retry", &mut budget, &mut global).is_err());
+                assert_eq!(global, before);
+            }
+        }
     }
 }
