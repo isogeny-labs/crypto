@@ -82,3 +82,24 @@ Primitive attempt01is rejected:degree is a reserved Singular name in the
 Rabin helper. Its native errors skipped the point checks;late output does not
 validate any hypothesis. Rename local identifiers only before attempt02;
 keep the source equations,factors,metrics,limits and decision rules unchanged.
+
+## Flat binary residue-field and serialized-evaluator stage
+
+FROBFIBER54attempt02accepted:4quartic prime factors,4distinct irreducible
+F2norms of degree20,2112complete RR products,Frob32²=sign,Frob32⁴=I,
+trace rank4,sign difference rank8 and anti-trace product0. Keep this finite
+family obstruction separate from global target-factor or collector ranks.
+
+FLATPOINTS54uses every saved point and quotient witness. Independently check
+the quartic Rabin identities and all528source RR products per point,including
+unit/actual lambda,nu,Vlabels. Then regard each coupled prime as the binary
+ideal (a5+a²+1,g_i(a,w)). Compute its complete standard basis,dimension20,
+and rho_i(w)=a mod that ideal. Check the recorded degree20binary norm by
+Frobenius2powers20and gcd tests at4and10. Save both full ideal products
+with (norm_i(w),a+rho_i(w)). Convert all32RRbasis values to F2[w]/norm_i,
+require degree<20 and no a,then save all32full source conversion products.
+An altered value must fail. All four points and128converted values are
+required;no sampling or search. Same source-coordinate/rank hypotheses,
+original resource caps,serialization and immutable driver;no global map or
+speed claim. These are explicit degree20closed-point evaluators,not a full
+arbitrary-divisor Jacobian reverse map.

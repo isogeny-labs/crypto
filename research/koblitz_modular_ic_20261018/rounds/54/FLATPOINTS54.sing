@@ -1,0 +1,63 @@
+proc require54(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump54(link out,string name,matrix A){int i;int j;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");for(i=1;i<=nrows(A);i++){for(j=1;j<=ncols(A);j++){if(A[i,j]!=0){write(out,name+"["+string(i)+","+string(j)+"]="+string(A[i,j])+";");}}}}
+execute(read("../fiber54-01/rr-fiber-certificate54.sing"));
+execute(read("../../../52/source-data/rr-table50.sing"));intmat parents54=parents50;
+execute(read("../frobfiber54-02/closed-factors54.sing"));
+require54(size(factors54)==5,"FLATPOINT54_FOUR_COUPLED_PRIMES");
+list normTexts54;list factorTexts54;list valueTexts54;string normText54;string factorText54;
+int i54;int j54;int k54;int point54;int checked54=0;int converted54=0;
+for(i54=1;i54<=4;i54++){factorTexts54[i54]=string(factors54[i54+1]);execute("normText54=string(norm"+string(i54)+"54);");normTexts54[i54]=normText54;}
+for(point54=1;point54<=4;point54++){
+ execute(read("../frobfiber54-02/closed-point"+string(point54)+"54.sing"));
+ execute("poly expectedFactor54="+factorTexts54[point54]+";");
+ require54(factor54==expectedFactor54 && deg(factor54)==4,"FLATPOINT54_FACTOR_SOURCE_BINDING");
+ ideal factorGB54=std(ideal(factor54));poly r54=reduce(w,factorGB54);poly r254;
+ for(j54=1;j54<=4;j54++){r54=reduce(r54^32,factorGB54);if(j54==2){r254=r54;}}
+ require54(reduce(r54+w,factorGB54)==0 && deg(gcd(factor54,r254+w))==0,"FLATPOINT54_INDEPENDENT_QUARTIC_RABIN");
+ map tableMap54=tablePidCertificate50,a;matrix table54=tableMap54(table50);
+ map rrMap54=rrFiberCertificate54,0;matrix one54=rrMap54(one54);
+ matrix unitValue54=values54*one54;require54(unitValue54[1,1]==1,"FLATPOINT54_UNIT");
+ matrix label54=values54*rrMap54(L54)*one54;
+ require54(reduce(label54[1,1]+w^4+w+1,factorGB54)==0,"FLATPOINT54_LAMBDA_LABEL");
+ label54=values54*rrMap54(N54)*one54;
+ require54(reduce(label54[1,1]+(1+1/a)*w,factorGB54)==0,"FLATPOINT54_NU_LABEL");
+ label54=values54*rrMap54(V54)*one54;
+ require54(label54[1,1]==(1+a^4+a)/(a+a^2),"FLATPOINT54_BASE_LABEL");
+ poly residual54;poly quotient54;
+ for(j54=1;j54<=528;j54++){
+  residual54=values54[1,parents54[j54,1]]*values54[1,parents54[j54,2]];
+  for(k54=1;k54<=32;k54++){residual54=residual54+table54[k54,j54]*values54[1,k54];}
+  quotient54=0;if(j54<=ncols(productLifts54)){quotient54=productLifts54[1,j54];}
+  require54(factor54*quotient54==residual54,"FLATPOINT54_SERIALIZED_RR_PRODUCT");checked54++;
+ }
+ factorText54=string(factor54);normText54=normTexts54[point54];
+ for(j54=1;j54<=32;j54++){valueTexts54[j54]=string(values54[1,j54]);}
+ ring flatPoint54=2,(a,w),lp;short=0;
+ execute("poly factorFlat54="+factorText54+";poly norm54="+normText54+";");
+ ideal coupled54=a^5+a^2+1,factorFlat54;ideal coupledGB54=std(coupled54);
+ require54(vdim(coupledGB54)==20,"FLATPOINT54_SOURCE_FIELD_DIMENSION");
+ poly rho54=reduce(a,coupledGB54);
+ require54(subst(rho54,a,0)==rho54 && deg(rho54)<20,"FLATPOINT54_BASE_RECOVERY");
+ require54(subst(norm54,a,0)==norm54 && deg(norm54)==20,"FLATPOINT54_F2_NORM");
+ ideal normGB54=std(ideal(norm54));poly frob54=w;poly frob454;poly frob1054;
+ for(j54=1;j54<=20;j54++){frob54=reduce(frob54^2,normGB54);if(j54==4){frob454=frob54;}if(j54==10){frob1054=frob54;}}
+ require54(reduce(frob54+w,normGB54)==0 && gcd(norm54,frob454+w)==1 && gcd(norm54,frob1054+w)==1,"FLATPOINT54_BINARY_RABIN");
+ ideal simple54=norm54,a+rho54;
+ matrix forward54=lift(coupled54,simple54);matrix reverse54=lift(simple54,coupled54);
+ require54(matrix(coupled54)*forward54==matrix(simple54) && matrix(simple54)*reverse54==matrix(coupled54),"FLATPOINT54_BOTH_FULL_FIELD_ISOMORPHISM_PRODUCTS");
+ ideal simpleGB54=std(simple54);matrix flatValues54[1][32];ideal valueResiduals54;poly parsed54;
+ for(j54=1;j54<=32;j54++){
+  execute("parsed54="+valueTexts54[j54]+";");flatValues54[1,j54]=reduce(parsed54,simpleGB54);
+  require54(subst(flatValues54[1,j54],a,0)==flatValues54[1,j54] && deg(flatValues54[1,j54])<20,"FLATPOINT54_BINARY_VALUES");
+  valueResiduals54[j54]=parsed54+flatValues54[1,j54];converted54++;
+ }
+ matrix conversion54=lift(coupled54,valueResiduals54);
+ require54(matrix(coupled54)*conversion54==matrix(valueResiduals54),"FLATPOINT54_ALL_VALUE_CONVERSION_PRODUCTS");
+ require54(reduce(valueResiduals54[1]+1,coupledGB54)!=0,"FLATPOINT54_CHANGED_VALUE_REJECTED");
+ link out54="ASCII:w flat-point"+string(point54)+"54.sing";
+ write(out54,"ring flatPointCertificate54=2,(a,w),lp;short=0;ideal coupled54="+string(coupled54)+";ideal simple54="+string(simple54)+";poly rho54="+string(rho54)+";poly norm54="+string(norm54)+";ideal valueResiduals54="+string(valueResiduals54)+";");
+ dump54(out54,"forward54",forward54);dump54(out54,"reverse54",reverse54);dump54(out54,"flatValues54",flatValues54);dump54(out54,"conversion54",conversion54);close(out54);
+ print("FLATPOINT54_POINT index="+string(point54)+" F2_degree=20 rho_degree="+string(deg(rho54))+" RR_values=32");
+}
+print("FLATPOINTS54_RESULT points=4 F2_degree=20 source_RR_products="+string(checked54)+" binary_value_conversions="+string(converted54)+" both_field_ideal_products=true");
+print("FLATPOINTS54_ALL_CHECKS_PASS");quit;
