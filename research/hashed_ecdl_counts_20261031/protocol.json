@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "crypto-hashed-ecdl-counts-20261031",
-  "version": 1,
+  "version": 2,
   "created": "2026-10-31",
   "repository": "crypto",
   "study_dir": "research/hashed_ecdl_counts_20261031",
@@ -9,20 +9,30 @@
     "Claude Code workflow subagent (owner request 2026-10-31: counted-S-only amendment of the hashed/tensor ECDL vs rho panels)"
   ],
   "links": {
-    "specs": "crypto:research/hashed_ecdl_counts_20261031/spec-C-tensor-counts.json (track C) and crypto:research/hashed_ecdl_counts_20261031/spec-B-hashed-native-counts.json (track B)",
+    "specs": "crypto:research/hashed_ecdl_counts_20261031/spec-C-tensor-counts-10-14.json (track C, 10/12/14 bits, sha256 4bf13a20a4ae254efd1791c0f652db4e8f9c870e6b19ab8503b5b0f102886afe), crypto:research/hashed_ecdl_counts_20261031/spec-C-tensor-counts-16.json (track C, 16 bits, sha256 1ec5dcb475df6fe497b29674a27086b77d0c817221ca2fe0b3c5e496e51d710c) and crypto:research/hashed_ecdl_counts_20261031/spec-B-hashed-native-counts.json (track B, sha256 9bf4e7b10b8c68437b069ea65c85bd4301b131b42887cd47d863cd26d1c6c917)",
     "supersedes_for_counted_S": "C: crypto:docs/ecbench/specs/tensor-ic-vs-rho.json (sha256 6735b6e5ba6d3dcb8e6e950aac41a2ec5b919e9be720681402f2f12c4964be25), crypto:docs/ecbench/specs/tensor-ic-vs-rho-16.json (434908fc3ff35268966f1950013c5a3dfa6d585ac3f8e3f8f8deaf2213dd325e), protocol crypto-ecdl-tensor-ic-speed-20261030 (research/ecdl_tensor_ic_speed_20261030/protocol.json, e08cf82b4bf1c667ad3072e75952aa058cbf77ef5b6c6b7bde556f2f8ef0cebf, frozen 40626d71...). B: HASHED-NATIVE-ECBENCH-20261030-FEASIBILITY-v2 at 3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d (spec 42027268bb4b88355d6d69be9bcec6a0c76680cb81eb67ea5893c8c019e300f1, protocol 1ff4c768502999bec2ec4f202b94cefc0b416c7f57348a2f3e8dc63a82de63f3), copied byte-identical under frozen-source/. All originals stay frozen and unchanged; their wall-time claims remain open, not answered here.",
     "lead": "crypto-autoresearcher:knowledge/leads/ecdlp/exotic/ LEAD-EXO-hashed-factor-base-tensor-ecdl",
     "implementation": "C: crates/ecdl-tensor-ic and ic.tensor_contraction_v1 in src/cryptanalysis/ecbench/methods.rs at 4df337e64d59bbe0145c204048ab1dc69a43c187. B: crates/hashed-ecdl-tensor through src/cryptanalysis/ecbench/hashed_native.rs at 3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d",
     "caveat": "On 64-bit builds lambda <= 64, so root_u = lambda/131072 = 0 and public inputs take the finite-size fallback. Nothing here exercises the recursive subexponential kernel. ic.tensor_contraction_v1 is an exponential toy (protocol H1).",
     "isolation_reason": "L0 ('recorded') is the level ecbench documents as sufficient for operation counts, which do not depend on contention; it is the lowest level the spec schema accepts. The EKS L2 gate refuses these panels because rho solves at 10-16 bits take under 1 ms (MIN_SOLVE_WALL_NS_V3 = 1,000,000 ns grades them L1; run gh-41008826427-1: 176/192 L1; exit 42). A counts-only session needs no wall isolation. Run with `ecbench run --cpus none` (L0 by construction) and a per-track --lock path if the tracks run concurrently.",
-    "order_note": "spec orders are alternate_measured (C) and shuffle (B); the schema field above is the nearest enum and has no effect on counted S",
+    "order_note": "spec orders are alternate_measured (both C specs) and shuffle (B); the schema field measurement.order is the nearest enum and has no effect on counted S",
     "execution_preconditions": [
       "resume checkpoint pushed and gated (scripts/checkpoint.sh init, push, gate) before any launcher",
-      "free disk for two release builds (the drafting host had about 100-200 MB free on / on 2026-10-31, which blocks both builds)",
+      "free disk for two release builds (the drafting host had about 81 MB free on / on 2026-10-31, which blocks both builds)",
       "binary C built at 4df337e64d59bbe0145c204048ab1dc69a43c187, binary B built at 3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d, sha256 and rustc -vV recorded",
-      "ecbench plan on each spec reproduces 128 (C) and 288 (B) measured executions"
+      "ecbench plan reproduces 96 (spec-C-tensor-counts-10-14), 32 (spec-C-tensor-counts-16) and 288 (spec-B) measured executions (not checked at freeze: no binary could be built on the drafting host)",
+      "run track B with no concurrent build and, if the tracks run together, pin each to its own CPU (taskset), to cut avoidable wall-clock timeouts"
     ],
-    "gap_wording": "every row's gap to rho is reported as distance remaining, never as pass/fail"
+    "gap_wording": "every row's gap to rho is reported as distance remaining, never as pass/fail",
+    "v1_withdrawn": "v1 (protocol_sha256 ee1a52e849396c46ad3c2033e34f0987328a7581ea5e32d873db78682ff8154b, frozen at 8a678a6b9) and its merged spec-C-tensor-counts.json (3692a2895557c3def47f02c7f59c6e77b48cafc7237b963d83165ed5b7bc6746) were withdrawn before any data after the Coordinator's revise decision (research/hashed_ecdl_counts_20261031/DECISION.md); both stay in git history. No session ran under v1.",
+    "changes_from_originals": [
+      "GATE-FORCED (both tracks): isolation_required L2 to L0. On EKS the run-ecbench L2 gate grades any solve under 1 ms as L1 (record.rs MIN_SOLVE_WALL_NS_V3) and exits 42; rho at 10-16 bits solves in microseconds (run gh-41008826427-1: 176/192 records L1). L0 is the level ecbench documents as sufficient for operation counts.",
+      "DISCRETIONARY, filed before data: rounds, C 10-14 bits 6 to 1 and B 5 to 1. S is a deterministic function of (workload, algorithm seed) and replays exactly; more rounds would add new walk seeds per target (power), which P1 and P4 do not need at their expected effect sizes. Cost: C3 (tensor vs ic-mitm) and B-source-selectors are probably underpowered at one round (sample_size.power), so no_ranking is the expected outcome there and is not evidence of parity. The C 16-bit spec already had 1 round.",
+      "DISCRETIONARY, filed before data: warmup 1 to 0 on all three specs. A warm-up only absorbs one-time wall costs, which counted S does not see; the measured round then uses absolute algorithm-seed index 0, which no measured round of the originals used.",
+      "DISCRETIONARY, filed before data: C order alternate to alternate_measured on 10-14 bits. With warmup 0 and one round both orders run the single round in spec order, so the plan's execution order is identical; alternate_measured matches the 16-bit original and avoids ecbench's warning that alternate parity counts warm-ups.",
+      "REVERTED in v2: v1 merged the two C specs into one with timeout_seconds 1800, which raised the 10-14-bit per-execution timeout from 900 s. v2 keeps two C specs as the originals do: 10/12/14 bits with timeout_seconds 900 (as tensor-ic-vs-rho.json) and 16 bits with 1800 (as tensor-ic-vs-rho-16.json). v1's statement that per-execution timeouts were unchanged was false for C; the 1800 s in the original C protocol is its job limit (execution.timeout_seconds), not a per-execution budget. In v2 every per-execution timeout equals its original's."
+    ],
+    "timeout_note": "timeout_seconds is a wall-clock limit (runner.rs L1245: Duration::from_secs(timeout_seconds)). At L0 whether a row ends verified or timeout depends on the host, most of all for B's 30 s native rows; the C budgets are 900 s (10-14 bits) and 1800 s (16 bits). A timeout row is host censoring: unknown, never evidence that a method fails, and never a determinism failure."
   },
   "question": "On the registered bench-roster prime curves of 10, 12, 14 and 16 bits, what do ic.tensor_contraction_v1 (m = 2) and the four native hashed-base backends of ic.hashed_native_v1 cost in ecbench's counted unit S, how far is each from the matched rho.negation reference (distance remaining, per curve, across the AGENTS.md 5a pricing band), and how does median S scale with r? Counted S only; no wall time.",
   "claims": [
@@ -34,7 +44,7 @@
     },
     {
       "id": "C2",
-      "text": "Track C, per curve: the paired ratio of summed S, tensor-m2 over rho-neg (the distance remaining to rho), with its paired bootstrap interval and the 5a band.",
+      "text": "Track C, per curve: the paired ratio of summed S, tensor-m2 over rho-neg (the distance remaining to rho), with compare's linearised_t interval (primary) and cluster-bootstrap interval (descriptive) at weights 0, 0.1 and 1 (the 5a band).",
       "class": "comparative",
       "decided_by": [
         "C-rho"
@@ -62,7 +72,7 @@
     },
     {
       "id": "C5",
-      "text": "Track B, per curve and native backend: the paired ratio of summed S lower bound over rho-neg, with the 5a band, only on curves where that backend verified all 8 targets. Native S is a lower bound, so only 'costs more than rho' can be concluded; a ratio interval below 1 is reported as unranked.",
+      "text": "Track B, per curve and native backend: the paired ratio of summed S lower bound over rho-neg, with the 5a band, only on curves where that backend and rho-neg verified all 8 targets. Native S is a lower bound, so only 'costs more than rho' can be concluded; a ratio below 1 is reported as unranked. Because timeout_seconds (30 s) is wall-clock, which (backend, curve) cells are complete depends on the host.",
       "class": "comparative",
       "decided_by": [
         "B-rho-source",
@@ -85,7 +95,7 @@
     },
     {
       "id": "C7",
-      "text": "Determinism: rho-neg and rho-neg-aa (both tracks) and native-selectors and native-selectors-aa (track B) share each (workload, round) algorithm seed, so their S must be identical row by row, and ecbench verify --replay-all must reproduce every row.",
+      "text": "Determinism: rho-neg and rho-neg-aa (both tracks) and native-selectors and native-selectors-aa (track B) share each (workload, round) algorithm seed, so on every pair whose two rows are both verified or both exhausted their S and total_gae must be identical, and ecbench verify --replay-all must reproduce every row. A status mismatch involving timeout is host censoring, not a determinism failure.",
       "class": "exact_computation",
       "decided_by": [
         "C-aa",
@@ -188,7 +198,7 @@
           "id": "P4",
           "metric": "s",
           "direction": "higher",
-          "minimum_effect": "native/rho-neg ratio interval above 1 at weights 0, 0.1 and 1 on every complete (backend, curve) cell",
+          "minimum_effect": "native/rho-neg ratio interval above 1 at weights 0, 0.1 and 1 on every complete (backend, curve) cell, under the decision rule's Holm procedure. The set of complete cells depends on the host: timeout_seconds (30 s) is a wall-clock limit, so at L0 whether a native row verifies or times out depends on the host. An incomplete cell is incomplete_unknown and neither supports nor refutes P4.",
           "provenance": {
             "written_at": "2026-10-31",
             "data_seen": [
@@ -212,7 +222,7 @@
     {
       "id": "C.rho-neg",
       "role": "reference",
-      "description": "rho.negation, the matched rho reference [spec-C-tensor-counts.json]",
+      "description": "rho.negation, the matched rho reference [spec-C-tensor-counts-10-14.json, spec-C-tensor-counts-16.json]",
       "instrument": {
         "repo": "crypto",
         "commit": "4df337e64d59bbe0145c204048ab1dc69a43c187",
@@ -246,7 +256,7 @@
     {
       "id": "C.ic-mitm",
       "role": "baseline",
-      "description": "ic.pipeline prime-abscissa:size=32, mitm:negation_folded=1 (current prime-curve IC baseline) [spec-C-tensor-counts.json]",
+      "description": "ic.pipeline prime-abscissa:size=32, mitm:negation_folded=1 (current prime-curve IC baseline) [spec-C-tensor-counts-10-14.json, spec-C-tensor-counts-16.json]",
       "instrument": {
         "repo": "crypto",
         "commit": "4df337e64d59bbe0145c204048ab1dc69a43c187",
@@ -283,7 +293,7 @@
     {
       "id": "C.tensor-m2",
       "role": "candidate",
-      "description": "ic.tensor_contraction_v1, m = 2 SHA-256 hashed factor bases (exponential toy) [spec-C-tensor-counts.json]",
+      "description": "ic.tensor_contraction_v1, m = 2 SHA-256 hashed factor bases (exponential toy) [spec-C-tensor-counts-10-14.json, spec-C-tensor-counts-16.json]",
       "instrument": {
         "repo": "crypto",
         "commit": "4df337e64d59bbe0145c204048ab1dc69a43c187",
@@ -319,7 +329,7 @@
     {
       "id": "C.rho-neg-aa",
       "role": "control_aa",
-      "description": "rho.negation under a second arm name; shares the per-(workload, round) algorithm seed with C.rho-neg, so in counted S it is a determinism/replay control (expected identical S row by row), not a noise floor [spec-C-tensor-counts.json]",
+      "description": "rho.negation under a second arm name; shares the per-(workload, round) algorithm seed with C.rho-neg, so in counted S it is a determinism/replay control (expected identical S row by row), not a noise floor [spec-C-tensor-counts-10-14.json, spec-C-tensor-counts-16.json]",
       "instrument": {
         "repo": "crypto",
         "commit": "4df337e64d59bbe0145c204048ab1dc69a43c187",
@@ -815,8 +825,8 @@
       {
         "name": "track",
         "treatment": "fixed",
-        "value": "C (spec-C, binary from origin/main 4df337e64d59bbe0145c204048ab1dc69a43c187) and B (spec-B, binary from 3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d)",
-        "how": "separate sessions; no comparison crosses tracks, because binary and targets differ"
+        "value": "C (spec-C-tensor-counts-10-14.json and spec-C-tensor-counts-16.json, one binary from origin/main 4df337e64d59bbe0145c204048ab1dc69a43c187, two sessions) and B (spec-B, binary from 3ae1ac2bd63d3fb0e86b7e8c0af2b5ec0f1bd09d)",
+        "how": "separate sessions (C-small, C-16, B); no comparison crosses tracks, because binary and targets differ; C curves are compared within their own session"
       },
       {
         "name": "curve",
@@ -856,12 +866,12 @@
       {
         "name": "arm_order",
         "treatment": "randomized",
-        "how": "C alternate_measured, B shuffle; arm order does not affect counted S"
+        "how": "C alternate_measured (with warmup 0 and one round identical to alternate: spec order), B shuffle; arm order does not affect counted S"
       },
       {
         "name": "host_load",
         "treatment": "measured",
-        "how": "recorded per row at L0; affects wall time only, which is not a metric here"
+        "how": "recorded per row at L0; affects wall time only, which is not a metric here, and whether a row hits its wall-clock timeout_seconds, which makes the set of complete cells host-dependent (censoring, never a result)"
       }
     ],
     "comparisons": [
@@ -1008,7 +1018,7 @@
   },
   "randomization": {
     "arm_order": "interleaved",
-    "arm_order_reason": "C: alternate_measured over one round, which ecbench warns it cannot balance; B: shuffle. Counted S does not depend on order, so balance is irrelevant to the primary metric",
+    "arm_order_reason": "C: alternate_measured over one round (identical to alternate at warmup 0; ecbench warns it cannot balance one round); B: shuffle. Counted S does not depend on order, so balance is irrelevant to the primary metric",
     "seed_derivation": {
       "method": "harness_drawn",
       "seeds": [],
@@ -1030,21 +1040,21 @@
     "replicates": 1,
     "warmups": 0,
     "power": {
-      "method": "paired_bootstrap",
+      "method": "other",
       "alpha": 0.05,
       "tests_in_family": 32,
       "correction": "holm",
       "rank_test_n": null,
       "min_attainable_two_sided_p": null,
-      "passes": true,
-      "note": "Family: C-rho, C-ic (4 curves each) + B-rho-{source,selectors,width,partial,ic} and B-source-selectors (4 curves each) = 32 per-curve tests. 8 paired targets per curve; the paired bootstrap resamples targets. One round: S is a deterministic function of (workload, algorithm seed) and exactly replayable, so repeating a round with the same seed adds nothing; further rounds would add new walk seeds per target (more power), which the expected H1 effect does not need and the 16-bit tensor cells (about 417 s each) make expensive. Warmup 0: warm-up rounds are unmeasured and only remove one-time wall costs, which counted S does not see; 0 is the minimum ecbench accepts (rounds must be >= 1). C-rho-ic and B-pos are reported but are not in the family."
+      "passes": false,
+      "note": "Computed by analysis/decide.py power (no data). Family: C-rho, C-ic (4 curves each) + B-rho-{source,selectors,width,partial,ic} and B-source-selectors (4 curves each) = 32 per-curve tests; Holm at alpha 0.05, so the strictest step tests at 0.05/32 = 0.0015625 and the loosest at 0.05. Each cell has 8 paired targets, df 7; t_crit = 5.0016 (0.05/32 two-sided) and 2.3646 (0.05). Model (assumption, not data): se(ln R) ~ sqrt(cv_A^2 + cv_B^2)/sqrt(8), rho cv ~ sqrt(4/pi - 1) = 0.523 (Rayleigh-like collision time). Minimum detectable ratio at power ~0.5 (~0.8), first Holm step / last step: rho vs a deterministic-cost arm 2.52 (2.98) / 1.55 (1.83); rho vs an arm with cv 0.25 2.79 (3.35) / 1.62 (1.95); rho vs an arm with rho-like spread 3.70 (4.68) / 1.86 (2.35); IC vs IC with both cv 0.25 1.87 (2.09) / 1.34 (1.50); with both cv 0.5 3.49 (4.37) / 1.81 (2.26). P1 (tensor/rho, expected to grow like r, so far above these on every curve) and P4 (native lower bound/rho, expected far above 1) are powered under this model. passes is false because the family is not uniformly powered: C3 (tensor vs ic-mitm) and B-source-selectors have no expected effect size above these thresholds, so C3 is probably underpowered at one round and no_ranking is the expected outcome there; it is not evidence of parity. C-rho-ic, C-aa, B-aa-* and B-pos are reported but are not in the family. Rounds and warmup are discretionary changes (links.changes_from_originals)."
     },
     "preflight_runtime": {
       "fixed_seconds": 120,
       "per_sample_seconds": null,
       "threads": 1,
       "estimated_total_seconds": 8700,
-      "measured_on": "Scaled from the 2026-10-30 session-log sizing (contended host): tensor solve 12 bits 3 s, 14 bits 21 s, 16 bits about 417 s; 10 bits assumed <= 1 s. Track C: tensor 8 x (1 + 3 + 21 + 417) s ~ 3540 s, of which the 16-bit cells are ~3340 s (0.93 h, under the 2.5 h split threshold, so 16 bits stays in spec-C); rho, rho-aa and ic-mitm 96 rows at ~1 s each; C total ~3.7e3 s (~1.0 h). Track B: 288 executions; worst case every native row (160) runs to its 30 s budget, 4800 s, plus 128 sub-second rows; B upper bound ~4.9e3 s (~1.4 h). Sequential worst case ~8.7e3 s (2.4 h); the two tracks may run concurrently on separate CPUs of the 4 vCPU host (counts are contention-independent), about 1.4 h wall. Within a spec ecbench executes curves in order 10, 12, 14, 16, so the smaller sizes finish first."
+      "measured_on": "Scaled from the 2026-10-30 session-log sizing (contended host): tensor solve 12 bits 3 s, 14 bits 21 s, 16 bits about 417 s; 10 bits assumed <= 1 s. Track C, two sessions: C-small (10/12/14 bits, 96 executions) tensor 8 x (1 + 3 + 21) s ~ 200 s plus 72 rho/rho-aa/ic-mitm rows at ~1 s; C-16 (32 executions) tensor 8 x 417 s ~ 3340 s (0.93 h, each well inside the 1800 s per-execution timeout) plus 24 rows at ~1 s; C total ~3.7e3 s (~1.0 h). Track B: 288 executions; worst case every native row (160) runs to its 30 s budget, 4800 s, plus 128 sub-second rows; B upper bound ~4.9e3 s (~1.4 h). Sequential worst case ~8.7e3 s (2.4 h); the tracks may run concurrently on separate CPUs (counts are contention-independent, but contention can turn a native row into a wall-clock timeout, which censors it), about 1.4 h wall."
     }
   },
   "metrics": {
@@ -1054,7 +1064,7 @@
         "name": "S",
         "unit": "total group-addition equivalents / sqrt(r)",
         "kind": "counted",
-        "definition": "every phase charged in ecbench.gae divided by sqrt(r); a lower bound for the native arms, whose arithmetic is not completely priced",
+        "definition": "every phase charged in ecbench.gae divided by sqrt(r); a lower bound for the native arms, whose arithmetic is not completely priced. Interval: ecbench compare's linearised_t (delta-method ratio-of-totals interval, targets as clusters, Student t(7), log scale) is primary; the cluster bootstrap (4000 resamples, seed 20261002) is descriptive; the uncertainty enum below is the nearest schema value",
         "source": "records.jsonl cost.s",
         "aggregation": "paired_ratio",
         "resolution": "1 GAE / sqrt(r)",
@@ -1155,12 +1165,12 @@
   },
   "stopping_rules": [
     {
-      "rule": "fixed design: C 4 arms x 32 workloads x 1 round = 128 executions; B 9 arms x 32 workloads x 1 round = 288 executions; no warm-up; then stop",
+      "rule": "fixed design: C-small 4 arms x 24 workloads x 1 round = 96 executions and C-16 4 arms x 8 workloads x 1 round = 32 executions (C total 128); B 9 arms x 32 workloads x 1 round = 288 executions; no warm-up; then stop",
       "kind": "fixed_n",
       "preregistered": true
     },
     {
-      "rule": "per-execution budgets are the specs' (C 1800 s, B 30 s and every native call's 5M-step bound); a row that hits them is retained as unknown/exhausted, never rerun with a larger budget",
+      "rule": "per-execution budgets are the specs' and equal the originals' (C 900 s on 10/12/14 bits, C 1800 s on 16 bits, B 30 s, all wall-clock; and every native call's 5M-step bound); a row that hits them is retained as unknown (timeout) or exhausted, never rerun with a larger budget",
       "kind": "budget",
       "preregistered": true
     },
@@ -1172,13 +1182,15 @@
   ],
   "invalidation_rules": [
     "a row with outcome.status other than verified is excluded from ratios and slopes and reported in the census",
-    "a track whose ecbench verify --replay-all is not OK with every replay identical yields no result",
-    "a determinism control (C-aa, B-aa-rho, B-aa-selectors) with any row whose S differs from its partner invalidates that track's counted results",
+    "a session whose ecbench verify --replay-all is not OK with every replay identical yields no result for its track",
+    "a determinism control (C-aa, B-aa-rho, B-aa-selectors) invalidates its track's counted results only when S or total_gae differs on a (workload, round) pair whose two rows are both verified or both exhausted",
+    "a status mismatch in a determinism pair that involves timeout is host/infrastructure censoring (timeout_seconds is wall-clock, runner.rs L1245): the affected cell becomes incomplete_unknown; it is not a determinism failure and not a negative result",
     "B is invalid if B.rho-neg-v2 fails to verify any target",
+    "no curve-level ratio containing a censored pair (timeout or exhausted, compare.rs run_cost) is used for ranking or for P1/P4; such a ratio is shown only as descriptive and flagged incomplete_unknown, a ratio containing a timeout pair is not shown at all, and no wall-implied S figure is reported",
     "any wall-time number from these sessions is descriptive host timing and is never reported as a result"
   ],
   "decision_rule": {
-    "text": "Per curve, the gap of arm X to rho is R = sum S(X) / sum S(rho-neg) over the 8 paired targets, reported as the distance remaining (R and log2 R) with a 95% paired bootstrap interval (ecbench compare, 4000 resamples, seed 20261002), at weights 0, 0.1 and 1 GAE per unpriced operation on every arm, rho included. X is ranked above (more expensive than) or below rho on a curve only when the Holm-adjusted interval excludes 1 on the same side at all three weights (ecbench band --ranks); otherwise no ranking. For native arms (lower-bound S) only R > 1 can be ranked. Ratios need all 8 rows of both arms verified on that curve; otherwise the census and a descriptive completed-row ratio flagged incomplete. C3 below 1 across the band would count as a measured improvement over the IC baseline; it is not expected. Slopes are OLS of log2 median S on log2 r over complete sizes, intervals by resampling targets within size.",
+    "text": "Implemented by analysis/decide.py (frozen with this protocol; sha256 in analysis_plan.script). Per (comparison, curve) cell, A the denominator arm and B the numerator: (1) at each weight w in {0, 0.1, 1} GAE per unpriced operation on every arm, rho included, run `ecbench compare --dir SESSION --a A --b B --weight w --resamples 4000 --seed 20261002 --json` and read curves[slug]: R_w = ratio_b_over_a (sum S(B)/sum S(A) over the 8 paired targets, reported as distance remaining R and log2 R) and the primary interval ci95 (ci_method linearised_t, df 7, log scale). The cluster bootstrap (ci95_bootstrap) is reported and decides nothing. (2) The cell is complete only if all 8 rows of both arms on that curve are verified and compare reports 8 pairs, 0 censored pairs and linearised_t at every weight; otherwise it is incomplete_unknown, gets p = 1, is never ranked and is never used for P1 or P4. (3) Per weight, cv_w = ln(hi_w/R_w)/t_{0.975,7}, T_w = ln(R_w)/cv_w, p_w = 2(1 - F_t7(|T_w|)). (4) Band condition: ln R_w has the same sign at all three weights and `ecbench band --weights 0,0.1,1 --ranks` gives the same order on that curve; band ranks supply only this 'order holds at 0, 0.1 and 1' condition (they compare point means and carry no interval). Failing it, p = 1 and no_ranking. (5) Native lower-bound arms (B-rho-source, -selectors, -width, -partial): only R > 1 is rankable. (6) Cell p = max over the three weights of p_w. (7) Holm over the 32 cells at alpha 0.05: sort p ascending (ties by comparison id, then log2 r); the k-th is ranked (supported_within_scope, with its direction) iff p_(j) <= 0.05/(32 - j + 1) for every j <= k; equivalently its two-sided interval at level 1 - 0.05/(32 - k + 1) excludes 1 on the same side at every weight. Every other cell is no_ranking or incomplete_unknown. P1 is supported_within_scope only if all four C-rho cells are ranked B > A and R increases from 10 to 16 bits at every weight. P4 is judged only on the complete native cells, a host-dependent set. C3 below 1 across the band would count as a measured improvement over the IC baseline; it is not expected, and at one round no_ranking is the expected C3 outcome (not parity). Slopes are OLS of log2 median S on log2 r over complete sizes, intervals by resampling targets within size (descriptive).",
     "comparison_ids": [
       "C-rho",
       "C-ic",
@@ -1189,9 +1201,9 @@
       "B-rho-ic",
       "B-source-selectors"
     ],
-    "threshold": "Holm-adjusted paired-bootstrap ratio interval excludes 1 on the same side at weights 0, 0.1 and 1",
-    "statistic": "ratio of summed S over paired targets per curve, candidate over reference (ecbench compare)",
-    "interval": "paired bootstrap over the 8 targets per curve, 95%",
+    "threshold": "Holm step-down over 32 cells at alpha 0.05: cell p (max over weights 0, 0.1, 1 of the linearised_t two-sided p, df 7) <= 0.05/(32-k+1) at its step k, with the sign of ln R the same at all three weights and confirmed by ecbench band --ranks; native lower-bound arms rankable only for R > 1",
+    "statistic": "ratio of summed S over the 8 paired targets per curve, B over A (ecbench compare curves[].ratio_b_over_a), with T = ln R / cv, cv backed out of compare's linearised_t log-scale ci95",
+    "interval": "ecbench compare linearised_t (delta-method, targets as clusters, Student t(7), log scale; primary); cluster bootstrap with 4000 resamples, seed 20261002 (descriptive only); Holm step-down levels 1 - 0.05/(32-k+1)",
     "multiple_comparison_correction": "holm",
     "effect_size_measure": "ratio of summed S per curve (distance remaining to rho), and log-log slope",
     "verdict_vocabulary": [
@@ -1203,19 +1215,25 @@
     ]
   },
   "analysis_plan": {
-    "script": null,
+    "script": {
+      "path": "analysis/decide.py",
+      "sha256": "3b6c69908ad6da040a214b1a4008807dc70d7a5ecfac30e26ae02b44e4a49519"
+    },
     "inputs": [
-      "C session/records.jsonl and session.json",
-      "B session/records.jsonl and session.json",
+      "C-small session (spec-C-tensor-counts-10-14) records.jsonl and session.json",
+      "C-16 session (spec-C-tensor-counts-16) records.jsonl and session.json",
+      "B session records.jsonl and session.json",
       "build receipts (commit, binary sha256, rustc -vV)"
     ],
     "outputs": [
-      "ecbench verify --dir SESSION --replay-all --exit-code (each track)",
-      "ecbench table --dir SESSION",
-      "ecbench band --dir SESSION --weights 0,0.1,1 --ranks --json band.json",
-      "C: ecbench compare --dir C --a rho-neg --b tensor-m2 --save; --a ic-mitm --b tensor-m2; --a rho-neg --b ic-mitm; --a rho-neg --b rho-neg-aa; each also with --weight 0.1 and --weight 1",
-      "B: ecbench compare --dir B --a rho-neg --b {native-source,native-selectors,native-width,native-partial,ic-mitm,rho-neg-v2} --save; --a native-source --b native-selectors; A/A pairs; each also with --weight 0.1 and --weight 1; incomplete stays incomplete (no --allow-interrupted)",
-      "medians per arm per curve; log-log slopes with target-resampled intervals; census of unknown/exhausted cells",
+      "python3 research/hashed_ecdl_counts_20261031/analysis/decide.py decide --ecbench-c BIN_C --ecbench-b BIN_B --c-small C_SMALL --c16 C_16 --b B --out research/hashed_ecdl_counts_20261031/reports/decision (runs every command below and writes decision.json)",
+      "ecbench verify --dir SESSION --replay-all (each of the three sessions)",
+      "ecbench band --dir C_SMALL C_16 --weights 0,0.1,1 --ranks --json band-C.json; ecbench band --dir B --weights 0,0.1,1 --ranks --json band-B.json",
+      "for each family comparison (C-rho: rho-neg/tensor-m2; C-ic: ic-mitm/tensor-m2; B-rho-{source,selectors,width,partial}: rho-neg/native-*; B-rho-ic: rho-neg/ic-mitm; B-source-selectors: native-source/native-selectors), each session of its track and each w in 0, 0.1, 1: ecbench compare --dir SESSION --a A --b B --weight w --resamples 4000 --seed 20261002 --json",
+      "descriptive, outside the family: C-rho-ic (rho-neg/ic-mitm) and B-pos (rho-neg/rho-neg-v2) the same way; A/A determinism checked row by row from records.jsonl",
+      "ecbench table --dir SESSION (descriptive)",
+      "medians per arm per curve; log-log slopes with target-resampled intervals; census of verified/timeout/exhausted/wrong_answer/error cells (descriptive)",
+      "no --allow-interrupted: an incomplete session stays incomplete",
       "experiment_protocol.py from-ecbench then check-export (experiment.export/v1)"
     ],
     "blinded": false,
@@ -1238,7 +1256,11 @@
     "treating native lower-bound S below rho as a ranking",
     "reading toy-size counts as evidence about deployed curves or about the subexponential kernel (root_u = 0 here)",
     "calling relabelling or accounting changes improvements",
-    "editing the frozen originals instead of filing this superseding protocol"
+    "editing the frozen originals instead of filing this superseding protocol",
+    "ranking, or using for P1/P4, any curve-level ratio that contains a censored (timeout or exhausted) pair",
+    "reporting any S implied by wall time (compare.rs run_cost for timeout rows)",
+    "treating a timeout row, or a timeout-induced status mismatch in an A/A pair, as a negative result or a determinism failure",
+    "reading no_ranking on C3 as evidence that tensor-m2 and ic-mitm cost the same"
   ],
   "literature": [
     {
@@ -1258,14 +1280,63 @@
       "provenance": "internal",
       "claim": "solves under 1,000,000 ns cannot earn L2",
       "verified_by": "source read at 4df337e64"
+    },
+    {
+      "ref": "crypto:src/cryptanalysis/ecbench/compare.rs",
+      "provenance": "internal",
+      "claim": "ratio_report gives linearised_t (primary) and cluster bootstrap intervals at 95% with no multiplicity adjustment; run_cost enters timeout rows at a wall-implied S and exhausted rows at the S spent, as censored pairs",
+      "verified_by": "source read at 4df337e64 by the v2 drafting session"
+    },
+    {
+      "ref": "crypto:src/cryptanalysis/ecbench/band.rs",
+      "provenance": "internal",
+      "claim": "band --ranks compares point means per weight; no interval and no multiplicity step",
+      "verified_by": "source read at 4df337e64 by the v2 drafting session"
+    },
+    {
+      "ref": "crypto:src/cryptanalysis/ecbench/runner.rs",
+      "provenance": "internal",
+      "claim": "timeout_seconds is a wall-clock Duration",
+      "verified_by": "source read at 4df337e64 by the v2 drafting session"
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "A1",
+      "filed": "2026-10-31",
+      "filed_before_affected_data": true,
+      "reason": "Coordinator decision 'revise' on v1 (research/hashed_ecdl_counts_20261031/DECISION.md): the decision rule named tools that do not implement it, censored rows could enter rankings, the wall-clock timeout was undeclared, the C timeout was misstated, and forced and discretionary changes were not separated. No session has run under any version.",
+      "changes": [
+        "1: decision rule made implementable: linearised_t primary, cluster bootstrap descriptive (4000 resamples, seed 20261002), per-cell p from T = ln R / cv with df 7, max over weights, Holm step-down levels 0.05/(32-k+1); band ranks supply only the order-holds-at-0/0.1/1 condition; analysis/decide.py committed and hashed",
+        "2: no curve-level ratio with a censored pair is used for ranking or P1/P4; such ratios are descriptive and flagged incomplete_unknown; ratios with a timeout pair are not shown; no wall-implied S is reported",
+        "3: timeout_seconds declared wall-clock; P4's complete-cell set declared host-dependent; determinism invalidation narrowed to S/total_gae differences on both-verified or both-exhausted pairs; timeout status mismatches are host censoring",
+        "4: spec-C split back into spec-C-tensor-counts-10-14.json (timeout 900 s, as the original) and spec-C-tensor-counts-16.json (1800 s, as the original); v1's merged spec-C-tensor-counts.json withdrawn",
+        "5: gate-forced (L2 to L0) and discretionary changes (rounds, warmup, C order on 10-14 bits; merge reverted; timeout unchanged) separated with rationale in specs, protocol (links.changes_from_originals) and README; sample_size.power computed (minimum detectable ratios) with passes false and C3 declared probably underpowered"
+      ],
+      "supersedes_fields": [
+        "decision_rule",
+        "analysis_plan",
+        "invalidation_rules",
+        "sample_size.power",
+        "links",
+        "claims.C2",
+        "claims.C5",
+        "claims.C7",
+        "hypotheses.H2.P4.minimum_effect",
+        "stopping_rules",
+        "inadmissible",
+        "variable_ledger.factors",
+        "randomization.arm_order_reason",
+        "metrics.primary.s.definition",
+        "literature"
+      ]
+    }
+  ],
   "freeze": {
-    "status": "frozen",
-    "protocol_sha256": "ee1a52e849396c46ad3c2033e34f0987328a7581ea5e32d873db78682ff8154b",
-    "commit": "8a678a6b94729035a264df6d77a479b9d3a47da8",
-    "frozen_at": "2026-10-31T06:45:44Z",
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
     "filed_before_affected_data": true
   }
 }
