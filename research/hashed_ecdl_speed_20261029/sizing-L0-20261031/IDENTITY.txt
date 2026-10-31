@@ -1,0 +1,5 @@
+baseline_arm_sha256  7c431843da1c1cf4079c2b34a967f0a3f881c95a05eb26979b93cb456976a8a8  (crypto d188c5a6, cargo 1.97.0 --release --locked, local development build)
+candidate_arm_sha256 48a4f0239d3ca4a238143db909166b5560a08df0eabf9c4e2d5d8a04cda13528  (crypto c866ee97, same flags; sources 20/20 match native-sources.sha256)
+driver_sha256        907a32ac186c08f54bd9313a4f1a1735eda72f74df5c5b9b26c667145e5ff857  (this branch, hashed-ecdl-panel)
+command: driver run --panel inputs --inputs-sha256 inputs/SHA256SUMS --baseline arm-baseline --candidate arm-candidate --out driver-run --seed 20261031 --case-limit-secs 900 --deadline-secs 5400 --aa-rounds 1 --ab-rounds 1 --cases p5-development-s001-t0,p7-development-s001-t0 --label L0-local-sizing-diagnostic --allow-incomplete-panel
+exit: 0; driver elapsed 2131.3 s; host: local 4 vCPU KVM sandbox, 15 GiB, no isolation; first rows overlapped the p17 probes
