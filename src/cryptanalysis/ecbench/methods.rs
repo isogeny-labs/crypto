@@ -53,6 +53,10 @@ use crate::cryptanalysis::gaudry_quartic_d4::{
 use crate::cryptanalysis::glv_invariant_base::Endomorphism;
 use crate::cryptanalysis::group_op_count::OpCounts;
 use crate::cryptanalysis::ic_boundary::{
+    price_phase, rho_batch_with, rho_cap, rho_reference, rho_walk_with, signed_frobenius_rho_tuned,
+    BinaryGroup, BinaryInstance, Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps,
+    NegationClasses, PhaseCost, PointClasses, PrimeInstance, PrimePoint, QuarticClasses,
+    RhoBatchResult, RhoResult, RhoWalk, PrimeCurve,
     price_phase, rho_batch_with, rho_cap, rho_reference, rho_walk_with, rho_walk_with_policy,
     signed_frobenius_rho_tuned, signed_frobenius_rho_tuned_policy, BinaryGroup, BinaryInstance,
     Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps, NegationClasses, PhaseCost,
@@ -5064,6 +5068,31 @@ fn solve_known_log<G: CountedGroup>(
     curve: &CurveFacts,
     seed: u64,
 ) -> Result<SolveReport, String> {
+    let (spec, fb_name, or_name) = pipeline_spec(m, seed)?;
+    let abscissa = PrimeAbscissaBase { instance: inst };
+    let projected = PrimeProjectedAbscissaBase { instance: inst };
+    let orbit = GlvOrbitBase { instance: inst };
+    let kummer = PrimeKummerBase { instance: inst };
+    let isogeny = PrimeIsogenyBase { instance: inst };
+    let cm_orbit = CmOrbitBase { instance: inst };
+    let plugin_base = prime_plugins().and_then(|p| (p.base)(fb_name.as_str(), inst));
+    let known_log = crate::cryptanalysis::ic_framework::plugins::KnownLogBase;
+    let base: &dyn FactorBaseBuilder<_> = match fb_name.as_str() {
+        "prime-abscissa" => &abscissa,
+        "known-log" => &known_log,
+        "prime-projected-abscissa" => &projected,
+        "glv-orbit" => &orbit,
+        "prime-kummer" => &kummer,
+        "prime-isogeny" => &isogeny,
+        "cm-scalar-orbit" => &cm_orbit,
+        other => match plugin_base.as_deref() {
+            Some(b) => b,
+            None => {
+                return Err(format!(
+                    "factor base `{other}` does not run on a prime curve"
+                ))
+            }
+        },
     let max_trials = param_u64(m, "max_trials")?;
     if max_trials == 0 {
         return Err("known-log max_trials must be positive".into());
@@ -5384,6 +5413,7 @@ fn solve_ic_prime(
     let mut rootfind_mitm = RootfindMitmOracle::new(ms);
     let mut rootfind_pairs = RootfindPairsOracle::new(ms);
     let mut rootfind = RootfindSubtractOracle::new(ms, inst);
+    let mut plugin_oracle = prime_plugins().and_then(|p| (p.oracle)(or_name.as_str(), ms, inst));
     // `pkm-semaev` writes its system on the base's own tower, so it reads
     // the tower from the `prime-kummer` spec and runs on no other base.
     let mut pkm = match or_name.as_str() {
@@ -5415,7 +5445,10 @@ fn solve_ic_prime(
         "rootfind-mitm" => &mut rootfind_mitm,
         "rootfind-pairs" => &mut rootfind_pairs,
         "rootfind-subtract" => &mut rootfind,
-        other => return Err(format!("oracle `{other}` does not run on a prime curve")),
+        other => match plugin_oracle.as_deref_mut() {
+            Some(o) => o,
+            None => return Err(format!("oracle `{other}` does not run on a prime curve")),
+        },
     };
     let ctx = prime_ctx(inst, curve, target);
     let calib = pinned_only_calibration("prime", &curve.slug);
@@ -5841,6 +5874,36 @@ fn binary_plugins() -> Option<&'static BinaryPlugins> {
     BINARY_PLUGINS.get()
 }
 
+/// A prime-curve factor base that a linking binary adds to `ic.pipeline`
+/// by name, or `None` when the name is not its.
+pub type PrimeBasePlugin =
+    for<'i> fn(&str, &'i PrimeInstance) -> Option<Box<dyn FactorBaseBuilder<PrimeCurve> + 'i>>;
+
+/// A prime-curve decomposition oracle that a linking binary adds to
+/// `ic.pipeline` by name, given the summand count `m`, or `None`.
+pub type PrimeOraclePlugin = for<'i> fn(
+    &str,
+    u32,
+    &'i PrimeInstance,
+) -> Option<Box<dyn DecompositionOracle<PrimeCurve> + 'i>>;
+
+/// Prime-curve plug-ins a binary registers at start-up, for the same
+/// reason as [`BinaryPlugins`].
+#[derive(Clone, Copy)]
+pub struct PrimePlugins {
+    pub base: PrimeBasePlugin,
+    pub oracle: PrimeOraclePlugin,
+}
+
+static PRIME_PLUGINS: std::sync::OnceLock<PrimePlugins> = std::sync::OnceLock::new();
+
+/// Register a binary's prime-curve plug-ins; the first registration wins.
+pub fn register_prime_plugins(plugins: PrimePlugins) {
+    let _ = PRIME_PLUGINS.set(plugins);
+}
+
+fn prime_plugins() -> Option<&'static PrimePlugins> {
+    PRIME_PLUGINS.get()
 /// The factor-base builder `fb_name` names on a binary curve: a built-in
 /// one, or one a binary registers ([`register_binary_plugins`]).
 fn binary_base_for<'a>(
@@ -6562,6 +6625,7 @@ pub fn dump_factor_base(
             let orbit = GlvOrbitBase { instance: i };
             let kummer = PrimeKummerBase { instance: i };
             let isogeny = PrimeIsogenyBase { instance: i };
+            let plugin_base = prime_plugins().and_then(|p| (p.base)(name.as_str(), i));
             let base: &dyn FactorBaseBuilder<_> = match name.as_str() {
                 "explicit-x" => &explicit,
                 "prime-abscissa" => &abscissa,
@@ -6569,11 +6633,14 @@ pub fn dump_factor_base(
                 "glv-orbit" => &orbit,
                 "prime-kummer" => &kummer,
                 "prime-isogeny" => &isogeny,
-                other => {
-                    return Err(format!(
-                        "factor base `{other}` does not run on a prime curve"
-                    ))
-                }
+                other => match plugin_base.as_deref() {
+                    Some(b) => b,
+                    None => {
+                        return Err(format!(
+                            "factor base `{other}` does not run on a prime curve"
+                        ))
+                    }
+                },
             };
             let ctx = InstanceCtx {
                 group: &i.curve,
