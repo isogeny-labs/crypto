@@ -104,6 +104,9 @@ fn feature_projection(public: &Value, base: &Value) -> Result<Value, String> {
     if public["schema"] != "ml-ecdlp-instance/v1" || base["schema"] != "ml-ecdlp-factor-base/v1" {
         return Err("unsupported source feature schema".into());
     }
+    if base["rule"] == "planted-known-log-subgroup/v1" {
+        return Err("planted control requires normalized v7 feature projection".into());
+    }
     let source_field = &public["field"];
     let mut field = json!({
         "characteristic":decimal(&source_field["characteristic"],"field.characteristic")?,
@@ -158,6 +161,21 @@ fn feature_projection(public: &Value, base: &Value) -> Result<Value, String> {
             "frobenius_action":action(&base["frobenius_action"],"frobenius_action")?,
             "frobenius_power":integer(&base["frobenius_power"],"factor_base.frobenius_power")?,"orbits":orbits},
     }))
+}
+
+/// Causal projection prepared for the planted-control integration. Normalize
+/// policy provenance for both populations; coordinates and mathematical
+/// actions remain visible, while the constructed-positive flag stays private.
+#[allow(dead_code)]
+fn feature_projection_v7(public: &Value, base: &Value) -> Result<Value, String> {
+    let mut normalized = base.clone();
+    if base["rule"] != "planted-known-log-subgroup/v1"
+        && base["rule"] != "small-x-prime-primary-projection-with-cyclic-membership"
+    {
+        return Err("unknown factor-base policy for v7 projection".into());
+    }
+    normalized["rule"] = json!("explicit-verified-point-set/v1");
+    feature_projection(public, &normalized)
 }
 
 /// Only the public mathematical definition enters the identity. Cost, logs,
@@ -1408,6 +1426,50 @@ mod tests {
         let mut poisoned = public;
         poisoned["field"]["basis"] = json!({"private":marker});
         assert!(feature_projection(&poisoned, &base).is_err());
+    }
+
+    #[test]
+    fn planted_v7_projection_hides_population_and_construction_provenance() {
+        let public = json!({"schema":"ml-ecdlp-instance/v1","family":"prime","n":11,"m":3,"twist":false,
+            "field":{"characteristic":"2017","modulus":"2017","degree":1,"basis":"canonical-residue"},
+            "curve":{"model":"short-weierstrass","a":"1","b":"1","group_order":"2011","subgroup_order":"2011","cofactor":"1"},
+            "generator":{"x":"1","y":"2"},"target":{"x":"3","y":"4"},
+            "symmetry":{"coefficient_field_degree":1,"frobenius_power":1,"frobenius_nontrivial_on_model":false,"negation":true},
+            "population":"planted-pdp-v1","planted_construction":{"scalar":"123","selected_indices":[0,0,0]}});
+        let base = json!({"schema":"ml-ecdlp-factor-base/v1","rule":"planted-known-log-subgroup/v1",
+            "points":[{"x":"5","y":"6"}],"negation_action":[null],"frobenius_action":[0],
+            "frobenius_power":1,"orbits":[{"points":[{"x":"5","y":"6"}],"closed":true,"stabilizer_size":1}],
+            "base_logs":["123"],"construction_attempts":17});
+        assert!(feature_projection(&public, &base).is_err());
+        let planted = feature_projection_v7(&public, &base).unwrap();
+        let mut natural_public = public.clone();
+        natural_public["population"] = json!("unconditioned-uniform-nonzero-subgroup-scalar");
+        natural_public
+            .as_object_mut()
+            .unwrap()
+            .remove("planted_construction");
+        let mut natural_base = base.clone();
+        natural_base["rule"] = json!("small-x-prime-primary-projection-with-cyclic-membership");
+        natural_base.as_object_mut().unwrap().remove("base_logs");
+        natural_base
+            .as_object_mut()
+            .unwrap()
+            .remove("construction_attempts");
+        assert_eq!(
+            planted,
+            feature_projection_v7(&natural_public, &natural_base).unwrap()
+        );
+        let text = serde_json::to_string(&planted).unwrap();
+        for forbidden in [
+            "planted",
+            "population",
+            "scalar",
+            "selected_indices",
+            "base_logs",
+            "construction_attempts",
+        ] {
+            assert!(!text.contains(forbidden), "leaked {forbidden}");
+        }
     }
 
     #[test]
