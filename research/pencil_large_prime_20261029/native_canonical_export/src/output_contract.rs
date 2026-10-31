@@ -1,5 +1,11 @@
 //! Structural and provenance checks for the actual native analyzer output.
 use super::*;
+fn slot_identity(slot: &V, disjoint: bool) -> Result<(String, u64)> {
+    Ok((
+        s(&slot[if disjoint { "plan" } else { "session_id" }])?.to_owned(),
+        n(&slot["seq"])?,
+    ))
+}
 pub(super) fn decimal(s: &str) -> bool {
     !s.is_empty() && s.bytes().all(|c| c.is_ascii_digit())
 }
@@ -372,6 +378,8 @@ pub(super) fn analysis(
         .map(|r| s(&r["run_id"]))
         .collect::<Result<_>>()?;
     let mut present = BTreeSet::new();
+    let disjoint = disjoint::selected(p);
+    let identity = |slot: &V| slot_identity(slot, disjoint);
     for slot in slots {
         if runs.iter().any(|r| {
             r["arm"] == slot["arm"]
@@ -379,18 +387,17 @@ pub(super) fn analysis(
                 && r["replicate"] == slot["round"]
                 && r["warmup"] == slot["warmup"]
         }) {
-            present.insert((s(&slot["session_id"])?.to_owned(), n(&slot["seq"])?));
+            present.insert(identity(slot)?);
         }
     }
     let mut misses = BTreeSet::new();
     for m in arr(&native["missing_executions"])? {
-        let key = (s(&m["session_id"])?.to_owned(), n(&m["seq"])?);
+        let key = identity(m)?;
         check(misses.insert(key.clone()), "duplicate native missing slot")?;
         check(
-            slots
-                .iter()
-                .any(|s| s["session_id"] == m["session_id"] && s["seq"] == m["seq"])
-                && !present.contains(&key),
+            slots.iter().any(|s| {
+                identity(s).ok().as_ref() == Some(&key) && s["session_id"] == m["session_id"]
+            }) && !present.contains(&key),
             "native missing slot differs from records",
         )?;
     }
@@ -418,6 +425,7 @@ pub(super) fn analysis(
             .iter()
             .find(|s| {
                 s["session_id"] == row["session_id"]
+                    && (!disjoint || s["plan"] == row["plan"])
                     && s["seq"] == row["candidate_seq"]
                     && s["workload_id"] == row["workload_id"]
                     && s["round"] == row["round"]
@@ -428,6 +436,7 @@ pub(super) fn analysis(
         check(
             slots.iter().any(|s| {
                 s["session_id"] == cs["session_id"]
+                    && (!disjoint || s["plan"] == cs["plan"])
                     && s["seq"] == row["reference_seq"]
                     && s["workload_id"] == cs["workload_id"]
                     && s["round"] == cs["round"]
@@ -446,4 +455,24 @@ pub(super) fn analysis(
         grid(&row["cells"], 1, false)?;
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod disjoint_identity_tests {
+    use super::*;
+    #[test]
+    fn missing_future_sessions_are_distinguished_by_plan_without_invention() {
+        let a = json!({"plan":"cohort20","session_id":null,"seq":0});
+        let b = json!({"plan":"cohort24","session_id":null,"seq":0});
+        assert_ne!(
+            slot_identity(&a, true).unwrap(),
+            slot_identity(&b, true).unwrap()
+        );
+        assert!(slot_identity(&a, false).is_err());
+        let old = json!({"session_id":"retained-session","seq":42});
+        assert_eq!(
+            slot_identity(&old, false).unwrap(),
+            ("retained-session".into(), 42)
+        );
+    }
 }

@@ -1,6 +1,6 @@
 //! Complete-plan aggregation of public synthetic mathematics records. File hashes
 //! establish byte integrity, not authorization, authenticity, or a scientific review.
-use crate::{analyzer, grid, Fraction};
+use crate::{analyzer, disjoint, grid, Fraction};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::{
@@ -128,8 +128,48 @@ fn expected(plan: &Value, e: &Value, entry: &Value, binary: &str) -> Result<Valu
         .get(n(e, "/arm")? as usize)
         .ok_or("arm index out of range")?;
     Ok(
-        json!({"session":s(entry,"/session_id")?,"binary_sha256":binary,"seq":n(e,"/seq")?,"round":n(e,"/round")?,"warmup":e["warmup"],"arm":s(arm,"/name")?,"role":s(arm,"/role")?,"seed":n(e,"/algorithm_seed")?.to_string(),"workload":w,"method":arm["method"]}),
+        json!({"session":entry.get("session_id").ok_or("session identity field missing")?,"binary_sha256":binary,"seq":n(e,"/seq")?,"round":n(e,"/round")?,"warmup":e["warmup"],"arm":s(arm,"/name")?,"role":s(arm,"/role")?,"seed":n(e,"/algorithm_seed")?.to_string(),"workload":w,"method":arm["method"]}),
     )
+}
+const DEFAULT_PLANS: [(&str, &str); 7] = [
+    (
+        "cohort-16.json",
+        "35e6311a7105a29c2459543ad0b281ed91e43aa63a99f66226f95a1f3c9cc2ba",
+    ),
+    (
+        "cohort-20.json",
+        "51a99e83c38b4d5d6b19f82337918b2f64f34b4934a5361298e84fc2f8bd432f",
+    ),
+    (
+        "cohort-24.json",
+        "7d34d0ce87c5a167ee1e94fecb08bcac34c9b4339570deb6377effe75efc28c4",
+    ),
+    (
+        "cohort-28.json",
+        "87760bc68b7598250c22976f15e4dbb36b5f2d738647de501222de1a8b27b001",
+    ),
+    (
+        "cohort-32.json",
+        "a9aebbc3120b61380a6936408635ac0f0e60715b4b4918dc826fbab4b578ae96",
+    ),
+    (
+        "cohort-36.json",
+        "6bb162d846bfbfe68b1bf7ba330abbc1e11c403b003215c960e7e71d81be3aa2",
+    ),
+    (
+        "cohort-40.json",
+        "8f2ec73a139f84b660573bd67c54ebfc567626ce7068a135dcb52c61891b22d5",
+    ),
+];
+const UPPER_GATE_PLAN_SHA256: &str =
+    "481d795e6208cfb3ca648c463de2d7b232adfb7d28bebc341afa4f58e119dfcf";
+fn exact_plan_inventory(entries: &[Value], expected: &[(&str, &str)]) -> bool {
+    entries.len() == expected.len()
+        && expected.iter().all(|(name, digest)| {
+            entries
+                .iter()
+                .any(|entry| entry["name"] == *name && entry["sha256"] == *digest)
+        })
 }
 /// Reads the actual prepared-plan validation schema and ecbench plans. This does
 /// not freeze a protocol or authenticate a caller-provided digest.
@@ -137,7 +177,10 @@ pub fn aggregate(manifest: &Value) -> Result<Value, String> {
     if !manifest["analysis_scope"].is_null() {
         return Err("full1260 route does not accept a gate scope".into());
     }
-    aggregate_scope(manifest, 1260)
+    if !exact_plan_inventory(a(manifest, "/plans")?, &DEFAULT_PLANS) {
+        return Err("exact original seven-plan membership required".into());
+    }
+    aggregate_scope(manifest, 1260, None, None)
 }
 /// Exact prepared preflight membership, not a caller-selected denominator.
 pub fn p739_gate60_scope() -> Value {
@@ -156,9 +199,55 @@ pub fn aggregate_p739_gate60(manifest: &Value) -> Result<Value, String> {
     }
     // read_bound checks actual bytes, so editing or omitting a target is refused.
     read_bound(&entries[0])?;
-    aggregate_scope(manifest, 60)
+    aggregate_scope(manifest, 60, None, None)
 }
-fn aggregate_scope(manifest: &Value, target_count: usize) -> Result<Value, String> {
+pub fn p186379_target0_scope() -> Value {
+    json!({"kind":"gate-p186379-target0/v1","expected_workloads":1,"expected_executions":18,"expected_measured_pairs":5,"prepared_plan_sha256":UPPER_GATE_PLAN_SHA256,"charged_separately_from_full_cohort":true})
+}
+pub fn aggregate_p186379_target0(manifest: &Value) -> Result<Value, String> {
+    if manifest["analysis_scope"] != p186379_target0_scope() {
+        return Err("exact p186379 target0 gate scope required".into());
+    }
+    let entries = a(manifest, "/plans")?;
+    if entries.len() != 1
+        || entries[0]["name"] != "gate-p186379-target0.json"
+        || entries[0]["sha256"] != UPPER_GATE_PLAN_SHA256
+    {
+        return Err("exact prepared p186379 target0 plan required".into());
+    }
+    read_bound(&entries[0])?;
+    aggregate_scope(manifest, 1, None, None)
+}
+pub fn aggregate_disjoint_p739(manifest: &Value) -> Result<Value, String> {
+    let validation = disjoint::validate_disjoint_manifest(manifest)?;
+    let mut output = aggregate_scope(
+        manifest,
+        1260,
+        Some(&validation["normalized_prepared_plan_validation"]),
+        Some(&validation["lineage"]),
+    )?;
+    output["verified_disjoint_enrollment"] = validation;
+    Ok(output)
+}
+/// Shared exporter API: recompute enrollment and return only the validated
+/// per-plan lineage. The full validation remains attached to aggregate output.
+pub fn validate_disjoint_manifest(manifest: &Value) -> Result<Value, String> {
+    Ok(disjoint::validate_disjoint_manifest(manifest)?["lineage"].clone())
+}
+/// Shared exporter API: normalize the preparation receipt without weakening
+/// native preparation's distinct receipt schema.
+pub fn normalized_disjoint_receipt(manifest: &Value) -> Result<Value, String> {
+    Ok(
+        disjoint::validate_disjoint_manifest(manifest)?["normalized_prepared_plan_validation"]
+            .clone(),
+    )
+}
+fn aggregate_scope(
+    manifest: &Value,
+    target_count: usize,
+    prepared_override: Option<&Value>,
+    lineage: Option<&Value>,
+) -> Result<Value, String> {
     if s(manifest, "/schema")? != "pencil-price-cohort-input/v1" {
         return Err("unsupported cohort input schema".into());
     }
@@ -168,8 +257,12 @@ fn aggregate_scope(manifest: &Value, target_count: usize) -> Result<Value, Strin
         serde_json::from_slice(&read_bound(&manifest["separate_resources"])?)
             .map_err(|e| e.to_string())?
     };
-    let receipt_bytes = read_bound(&manifest["prepared_plan_validation"])?;
-    let receipt: Value = serde_json::from_slice(&receipt_bytes).map_err(|e| e.to_string())?;
+    let receipt: Value = if let Some(receipt) = prepared_override {
+        receipt.clone()
+    } else {
+        let receipt_bytes = read_bound(&manifest["prepared_plan_validation"])?;
+        serde_json::from_slice(&receipt_bytes).map_err(|e| e.to_string())?
+    };
     if s(&receipt, "/schema")? != "pencil-prepared-plan-validation/v1"
         || receipt["passed"] != json!(true)
     {
@@ -184,6 +277,13 @@ fn aggregate_scope(manifest: &Value, target_count: usize) -> Result<Value, Strin
     }
     let binary = s(manifest, "/binary_sha256")?;
     let protocol = s(manifest, "/protocol_sha256")?;
+    let lineage_plans: BTreeMap<&str, &Value> = match lineage {
+        Some(value) => a(value, "/plans")?
+            .iter()
+            .map(|v| Ok((s(v, "/name")?, v)))
+            .collect::<Result<_, String>>()?,
+        None => BTreeMap::new(),
+    };
     let labels = ["pencil", "rho", "rho_AA", "rho"];
     let mut seen_plans = BTreeSet::new();
     let mut seen_workloads = BTreeSet::new();
@@ -206,8 +306,17 @@ fn aggregate_scope(manifest: &Value, target_count: usize) -> Result<Value, Strin
         {
             return Err("plan filename/digest differs from receipt or duplicated".into());
         }
-        if !seen_sessions.insert(s(entry, "/session_id")?) {
-            return Err("session reused across plans".into());
+        let session = match entry.get("session_id") {
+            Some(Value::String(value)) if !value.is_empty() => Some(value.as_str()),
+            Some(Value::Null) => None,
+            _ => return Err("plan session identity must be nonempty string or null".into()),
+        };
+        if let Some(session) = session {
+            if !seen_sessions.insert(session) {
+                return Err("session reused across plans".into());
+            }
+        } else if !entry["records"].is_null() {
+            return Err("records require a session identity".into());
         }
         let plan_bytes = read_bound(entry)?;
         let plan_text = String::from_utf8(plan_bytes).map_err(|e| e.to_string())?;
@@ -222,7 +331,7 @@ fn aggregate_scope(manifest: &Value, target_count: usize) -> Result<Value, Strin
         let mut records = BTreeMap::new();
         for line in records_text.lines().filter(|x| !x.trim().is_empty()) {
             let record: Value = serde_json::from_str(line).map_err(|e| e.to_string())?;
-            if s(&record, "/session_id")? != s(entry, "/session_id")?
+            if Some(s(&record, "/session_id")?) != session
                 || s(&record, "/binary_sha256")? != binary
             {
                 return Err("record session/binary differs from manifest".into());
@@ -298,7 +407,16 @@ fn aggregate_scope(manifest: &Value, target_count: usize) -> Result<Value, Strin
                 let re = group["rho"];
                 let cseq = n(ce, "/seq")?;
                 let rseq = n(re, "/seq")?;
-                let bundle = json!({"schema":"pencil-price-pair-input/v1","p":n(w,"/curve_spec/p")?,"r":n(w,"/curve_spec/r")?,"protocol_sha256":protocol,"coverage_review":manifest["coverage_review"],"candidate":{"expected":expected(&plan,ce,entry,binary)?,"record":records.get(&cseq)},"reference":{"expected":expected(&plan,re,entry,binary)?,"record":records.get(&rseq)}});
+                let (plan_protocol, coverage_review) =
+                    if let Some(lineage) = lineage_plans.get(name) {
+                        (
+                            s(lineage, "/data_protocol_sha256")?,
+                            &lineage["coverage_review"],
+                        )
+                    } else {
+                        (protocol, &manifest["coverage_review"])
+                    };
+                let bundle = json!({"schema":"pencil-price-pair-input/v1","p":n(w,"/curve_spec/p")?,"r":n(w,"/curve_spec/r")?,"protocol_sha256":plan_protocol,"coverage_review":coverage_review,"candidate":{"expected":expected(&plan,ce,entry,binary)?,"record":records.get(&cseq)},"reference":{"expected":expected(&plan,re,entry,binary)?,"record":records.get(&rseq)}});
                 let result = analyzer::analyze(&bundle)?;
                 all.push(&result["cells"])?;
                 streams[stream].push(&result["cells"])?;
@@ -310,7 +428,7 @@ fn aggregate_scope(manifest: &Value, target_count: usize) -> Result<Value, Strin
                 .iter()
                 .map(|x| json!({"plan":name,"target":x})),
         );
-        plan_observations.push(json!({"name":name,"plan_binding":diagnostics["plan_binding"],"record_artifact":entry["records"],"source_validation_binary_sha256":receipt["binary_sha256"]}));
+        plan_observations.push(json!({"name":name,"plan_binding":diagnostics["plan_binding"],"record_artifact":entry["records"],"session_id":entry["session_id"],"execution_history":entry.get("execution_history").unwrap_or(&Value::Null),"source_validation_binary_sha256":receipt["binary_sha256"]}));
     }
     if seen_workloads.len() != target_count
         || total_executions != (target_count * 18) as u64
@@ -442,7 +560,7 @@ mod tests {
     #[test]
     fn absent_whole_target_stays_in_plan_denominator() {
         let (dir, manifest) = fixture();
-        let out = aggregate_scope(&manifest, 1).unwrap();
+        let out = aggregate_scope(&manifest, 1, None, None).unwrap();
         assert_eq!(out["expected_measured_pairs"], 5);
         assert_eq!(out["expected_executions"], 18);
         assert_eq!(out["missing_executions"].as_array().unwrap().len(), 18);
@@ -456,7 +574,34 @@ mod tests {
             .all(|x| x["algorithm_ratio_of_sums"].is_null()));
         assert!(aggregate(&manifest)
             .unwrap_err()
-            .contains("cohort dimensions"));
+            .contains("exact original seven-plan membership"));
+        fs::remove_dir_all(dir).unwrap();
+    }
+    #[test]
+    fn exact_upper_gate_is_separate_and_membership_pinned() {
+        let (dir, mut manifest) = fixture();
+        let bytes = include_bytes!("../tests/fixtures/gate-p186379-target0.json");
+        let path = dir.join("gate-p186379-target0.json");
+        fs::write(&path, bytes).unwrap();
+        assert_eq!(sha(bytes), UPPER_GATE_PLAN_SHA256);
+        let receipt = json!({"schema":"pencil-prepared-plan-validation/v1","passed":true,"targets":1,"planned_executions":18,"measured_executions":15,"warmup_executions":3,"solver_executions_performed":0,"binary_sha256":"b".repeat(64),"files":{"gate-p186379-target0.json":sha(bytes)}});
+        let rb = serde_json::to_vec(&receipt).unwrap();
+        let rp = dir.join("upper-receipt.json");
+        fs::write(&rp, &rb).unwrap();
+        manifest["prepared_plan_validation"] = json!({"path":rp,"sha256":sha(&rb)});
+        manifest["plans"] = json!([{"name":"gate-p186379-target0.json","path":path,"sha256":sha(bytes),"session_id":"software-upper-not-executed","records":null}]);
+        manifest["analysis_scope"] = p186379_target0_scope();
+        let out = aggregate_p186379_target0(&manifest).unwrap();
+        assert_eq!(out["expected_workloads"], 1);
+        assert_eq!(out["expected_measured_pairs"], 5);
+        assert_eq!(out["expected_executions"], 18);
+        assert_eq!(out["observed_executions"], 0);
+        assert_eq!(out["missing_executions"].as_array().unwrap().len(), 18);
+        assert!(aggregate(&manifest).is_err());
+        assert!(aggregate_p739_gate60(&manifest).is_err());
+        let mut wrong = manifest.clone();
+        wrong["analysis_scope"]["charged_separately_from_full_cohort"] = json!(false);
+        assert!(aggregate_p186379_target0(&wrong).is_err());
         fs::remove_dir_all(dir).unwrap();
     }
     #[test]
@@ -466,7 +611,7 @@ mod tests {
         let mut plan: Value = serde_json::from_slice(&fs::read(path).unwrap()).unwrap();
         plan["workloads"][0]["workload_id"] = json!("different-target");
         fs::write(path, serde_json::to_vec(&plan).unwrap()).unwrap();
-        assert!(aggregate_scope(&manifest, 1)
+        assert!(aggregate_scope(&manifest, 1, None, None)
             .unwrap_err()
             .contains("digest mismatch"));
         fs::remove_dir_all(dir).unwrap();
@@ -476,7 +621,7 @@ mod tests {
         let (dir, mut manifest) = fixture();
         let p = manifest["plans"][0].clone();
         manifest["plans"].as_array_mut().unwrap().push(p);
-        assert!(aggregate_scope(&manifest, 1)
+        assert!(aggregate_scope(&manifest, 1, None, None)
             .unwrap_err()
             .contains("plan set differs"));
         fs::remove_dir_all(dir).unwrap();
@@ -521,7 +666,7 @@ mod tests {
         let (dir, mut manifest) = fixture();
         let mut records = records_for_fixture(&manifest);
         attach_records(&dir, &mut manifest, &records);
-        let pass = aggregate_scope(&manifest, 1).unwrap();
+        let pass = aggregate_scope(&manifest, 1, None, None).unwrap();
         assert_eq!(pass["all_target_cold_AA_passed"], true);
         assert_eq!(pass["all_target_online_AA_passed"], true);
         assert_eq!(pass["observed_warmup_executions"], 3);
@@ -531,7 +676,7 @@ mod tests {
             .unwrap();
         one["time"]["method_call_wall_ns"] = json!(120);
         attach_records(&dir, &mut manifest, &records);
-        let fail = aggregate_scope(&manifest, 1).unwrap();
+        let fail = aggregate_scope(&manifest, 1, None, None).unwrap();
         assert_eq!(fail["all_target_cold_AA_passed"], false);
         assert_eq!(fail["all_target_online_AA_passed"], true); // mean cold ratio1.04 does not rescue failing1.20.
         assert_eq!(fail["expected_measured_pairs"], 5);
@@ -544,11 +689,11 @@ mod tests {
         let mut records = records_for_fixture(&manifest);
         records.push(records[0].clone());
         attach_records(&dir, &mut manifest, &records);
-        assert!(aggregate_scope(&manifest, 1).is_err());
+        assert!(aggregate_scope(&manifest, 1, None, None).is_err());
         records.pop();
         records[0]["binary_sha256"] = json!("c".repeat(64));
         attach_records(&dir, &mut manifest, &records);
-        assert!(aggregate_scope(&manifest, 1)
+        assert!(aggregate_scope(&manifest, 1, None, None)
             .unwrap_err()
             .contains("session/binary"));
         fs::remove_dir_all(dir).unwrap();

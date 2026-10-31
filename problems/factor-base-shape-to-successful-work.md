@@ -4,7 +4,7 @@
 - **Kind:** implementation and measurement gap; formal-proof gap for a regularity claim
 - **Affected work:** [chart-complement screen](../research/factor_base_chart_complements_20261019/README.md), [completed shape study](../research/factor_base_shape_leads_20261018/README.md)
 - **Next action owner:** native factor-base CLI lane; new follow-up remains draft/unfunded
-- **Last updated:** 2026-10-26
+- **Last updated:** 2026-10-30
 
 ## Problem
 
@@ -73,6 +73,23 @@ all phases, matched rho and independent replay under repository rules.
 
 ## Resolution and history
 
+2026-10-30: the [structured predicate reference](../research/prime_ic_zero_filter_20261030/implementation/README.md)
+implements a rational two-isogeny fibre membership circuit with actual subgroup
+constraints, complete signed point-summation charts, exact counts and prefix
+witness extraction. A reusable local membership decision diagram can be built
+from quadratic fibre roots and both rational lifts, without scanning all field
+encodings; a separate exhaustive compiler is the finite control. The native
+checks cover two small fields, including the intermediate identity chart,
+noncanonical/nonrational inputs, poles, subgroup rejection and zero/limit
+distinctions. This special rational-two-torsion family does not cover arbitrary
+PKM auxiliary isogenies or prime-order curves without rational two-torsion.
+The execution backend remains finite functional enumeration. No compact message
+for the complete summation zero predicate, growing-parameter advantage, useful
+relation-rank improvement or end-to-end IC cost is established. The next code
+obligation is a bounded representation for the constrained summation boundary,
+checked against this reference with setup and intermediate storage retained.
+The successful-work and regularity exit conditions above remain open.
+
 2026-10-26: the literature/atlas review selects the still-unexamined native
 transfer of the product-profile/linearization-excess prior. The
 [new structural preflight](../research/factor_base_excess_20261026/README.md)
@@ -96,3 +113,16 @@ cofactor/rank diagnostics. Successful solver work and regularity remain
 unresolved. This record and its PR do not discharge those obligations.
 
 2026-10-26 storage follow-up: explicit owner S3 approval, verified full archive readback and a verified resume checkpoint remove the earlier authorization/custody blocker for the prepared software validation. See [publication receipt](../research/factor_base_excess_20261026/publication-20261026/README.md). Successful native decomposition/rank/complete-cost transfer remains unresolved; no research panel or old-card dispatch occurred.
+
+2026-10-29 lead investigation: the
+[target-conditioned symmetric-kernel review](../research/factor_base_kernel_lead_20261029/README.md)
+identifies a specific unfinished native transfer. The sibling symmetric m=2
+formulation already exists; this is not a new algebraic discovery. The current
+unified sweeper still uses direct descended F4, while the other native
+linearized path is subfield-specific. The proposed general-subspace adapter
+must charge the actual affine kernel search, splitting, original-inventory
+point checks and independent relation rank. Its
+[comparison design](../research/factor_base_kernel_lead_20261029/NEXT_TEST.md)
+is not a frozen executable protocol, implemented adapter or experiment result.
+No old card was promoted or dispatched. The native successful-work and
+regularity obligations remain open; custody completion does not discharge them.

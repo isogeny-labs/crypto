@@ -1,0 +1,15 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.85in]{geometry}\usepackage[T1]{fontenc}\usepackage{amsmath,amssymb}
+\begin{document}\section*{Degree-two zero-B point extraction}
+\textbf{Component result; independent review pending.}
+
+The retained source branch is \texttt{double22\_weighted\_variant}, $B=0$, $s\ne0$. Six Lean declarations compiled; fixed controls and separate axiom readback passed. The declarations report only \texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound}.
+\subsection*{Statements and assumptions}
+From original normalized Mumford validity, nonzero input weights, $s\ne0$, characteristic different from two and the literal $B=0$ condition, the extracted point has nonzero weights and lies on the curve. Extraction requires no smoothness assumption. A separate theorem adds global coprimality of the quintic and its derivative, derives a nonzero point ordinate, and composes the reviewed weighted doubling validity result.
+\subsection*{Fixed controls}
+The characteristic-five positive uses $f=X^5+X^2-X$, $u=X^2-X$, $v=X$, weighted input $(1,0,4,0,2,3)$. Its extracted point is $(4,4,3,3)$, normalizing to $(1,1)$. The explicit coprimality certificate is $4f+3Hf'=1$, with $H=X^4+3X^3+4X^2+3X+3$ over $\mathbb F_5$.
+
+For the singular rational input $f=X^5$, $u=X^2$, $v=X$, the extracted ordinate and following doubling weight are zero. In characteristic two, $f=X^5+X^2+X+1$, $u=X^2+X+1$, $v=X$ satisfy original validity and the branch conditions, but the extracted point is invalid. A zero-$s$ input demonstrates the nonzero-weight boundary.
+\subsection*{Evidence and remaining review}
+Main compilation: attempt4; controls: controls5; readback: readback1. Earlier attempts and control-script failures remain retained. Two tactic-style warnings remain in the passing controls. The companion JSON binds source hashes, dependency inventory and every receipt. No scientific payload or cost measurement was run. No UInt64, compiler, class-sum or counter correspondence is asserted by this field-level packet. Independent source-fidelity review is pending; the module is not integrated into the canonical project.
+\end{document}

@@ -90,3 +90,18 @@ waves and shared-host activity confound timing. The new 96-bit floor and 137th
 torsion certificate complete this particular upper construction. Complete
 common pricing, other upper floors and the stated CM proof bridges remain open
 independently. All completed large-gap ECDLP timing comparisons remain 53-bit.
+
+### Historical 60-bit-prime instance imported on 2026-10-31
+
+The [archived gap60 study](../research/prime_conductor_gap60_20261031/README.md)
+preserves a separate prime-degree instance, its source and rational-kernel
+certificate, the failed standard constructor, and checked partial block sums.
+It does not supply a full quotient equation or complete non-kernel images.
+This import does not replace or resolve the older upper instances above.
+
+The next acceptance condition for this instance is a complete explicit quotient
+and verified images at the unchanged minimum 60-bit prime gap. A continuation
+must preserve the archived inputs and producer provenance, use a native
+execution path for new research, and retain fresh construction, transport and
+matched endpoint receipts. The historical archive alone does not satisfy that
+condition or any performance-promotion gate.

@@ -83,6 +83,14 @@ pub struct FactorBases {
     pub gamma: Vec<u64>,
     pub bound: Vec<u64>,
     pub p: u64,
+
+    /// x_bound, if non-empty, adds a compact coordinate constraint: A is in
+    /// F_i only if x(A) < x_bound[i], on top of the hash test. window_bits is
+    /// the k with x_bound = p >> k. The window is deterministic, so unlike the
+    /// hash it is not random: it trades some independence between the F_i for
+    /// membership tests that fix the high bits of x.
+    pub x_bound: Vec<u64>,
+    pub window_bits: usize,
 }
 
 /// NewFactorBases draws m hash keys and sizes each F_i near (2r)^(1/m), so the
@@ -118,8 +126,24 @@ pub fn new_factor_bases(c: &Curve, m: usize, rng: &mut StdRng) -> FactorBases {
 /// excluded alpha = beta = 0), and unlike SHA-256 its membership test is cheap
 /// to encode with the low-degree gadgets (Builder::membership_check).
 pub fn new_affine_factor_bases(c: &Curve, m: usize, rng: &mut StdRng) -> FactorBases {
+    new_windowed_factor_bases(c, m, rng, 0)
+}
+
+/// NewWindowedFactorBases is NewAffineFactorBases with the extra constraint
+/// x < p >> k, so F_i = {A : x(A) < p>>k and hash_i(A) < U_i}. U_i is scaled
+/// by 2^k to keep |F_i| near (2r)^(1/m). If the window alone would be smaller
+/// than that, k is lowered until it fits. k = 0 means no window (Go:
+/// NewWindowedFactorBases).
+pub fn new_windowed_factor_bases(c: &Curve, m: usize, rng: &mut StdRng, k: usize) -> FactorBases {
     let target = (2.0 * c.order as f64).powf(1.0 / m as f64).ceil();
-    let mut bound = (c.p as f64 * target / (c.order - 1) as f64)
+    // The window holds about (r-1) * 2^-k points; it must hold at least target.
+    let mut k = k;
+    while k > 0 && (c.order - 1) as f64 / 2f64.powi(k as i32) < target {
+        k -= 1;
+    }
+    let xb = (c.p >> k).max(1);
+    let frac = xb as f64 / c.p as f64;
+    let mut bound = (c.p as f64 * target / ((c.order - 1) as f64 * frac))
         .round()
         .max(1.0) as u64;
     if bound > c.p {
@@ -132,6 +156,10 @@ pub fn new_affine_factor_bases(c: &Curve, m: usize, rng: &mut StdRng) -> FactorB
             p: c.p,
             ..Default::default()
         };
+        if k > 0 {
+            fb.window_bits = k;
+            fb.x_bound = vec![xb; m];
+        }
         for _ in 0..m {
             let mut a = rand_below(rng, c.p);
             let mut b = rand_below(rng, c.p);
@@ -159,9 +187,59 @@ impl FactorBases {
     /// list fills Sets, Points and Index. Toy shortcut: it enumerates the
     /// group. At scale F_i is only ever accessed through its membership
     /// predicate.
+    /// list fills sets, points and index. With a coordinate window it only
+    /// visits the window; otherwise it enumerates the whole group (Go: list).
     pub(crate) fn list(&mut self, c: &Curve) {
+        if !self.x_bound.is_empty() {
+            self.list_window(c);
+            return;
+        }
+        self.list_all(c);
+    }
+
+    /// list_all is list over the whole group (Go: listAll).
+    pub(crate) fn list_all(&mut self, c: &Curve) {
         let m = self.sets.len();
-        for pt in c.points() {
+        let points = c.points();
+        crate::opcount::bump("fb_points_listed_uncharged", points.len() as u64);
+        crate::opcount::bump("fb_membership_evals_uncharged", (points.len() * m) as u64);
+        for pt in points {
+            for i in 0..m {
+                if self.member(i, pt) {
+                    self.sets[i].push(pt);
+                    if !self.index.contains_key(&pt) {
+                        self.index.insert(pt, self.points.len());
+                        self.points.push(pt);
+                    }
+                }
+            }
+        }
+    }
+
+    /// window_candidates returns F_i without listing the whole group when the
+    /// factor bases carry a coordinate window: it enumerates the window's
+    /// points by square root and keeps those that pass the hash. Without a
+    /// window it returns a copy of sets[i] (Go: WindowCandidates).
+    pub fn window_candidates(&self, c: &Curve, i: usize) -> Vec<Point> {
+        if self.x_bound.is_empty() {
+            return self.sets[i].clone();
+        }
+        c.window_points(self.x_bound[i])
+            .into_iter()
+            .filter(|&pt| self.member(i, pt))
+            .collect()
+    }
+
+    /// list_window is list_all restricted to the union of the coordinate
+    /// windows: it takes square roots of x^3 + a x + b for x below the largest
+    /// x_bound, then applies each F_i's membership predicate (Go: listWindow).
+    pub(crate) fn list_window(&mut self, c: &Curve) {
+        let xmax = self.x_bound.iter().copied().max().unwrap_or(0);
+        let pts = c.window_points(xmax);
+        let m = self.sets.len();
+        crate::opcount::bump("fb_points_listed_uncharged", pts.len() as u64);
+        crate::opcount::bump("fb_membership_evals_uncharged", (pts.len() * m) as u64);
+        for pt in pts {
             for i in 0..m {
                 if self.member(i, pt) {
                     self.sets[i].push(pt);
@@ -190,6 +268,9 @@ impl FactorBases {
     /// little-endian, `% mods[i] == 0`.
     pub fn member(&self, i: usize, pt: Point) -> bool {
         if pt.inf {
+            return false;
+        }
+        if !self.x_bound.is_empty() && pt.x >= self.x_bound[i] {
             return false;
         }
         if self.affine {
@@ -265,4 +346,94 @@ pub fn relation_network(c: &Curve, fb: &FactorBases, r: Point) -> (Network, Vec<
     }));
     n.num_edges = next;
     (n, a)
+}
+
+// ---------------------------------------------------------------------------
+// Meet-in-the-middle relation search.
+//
+// The relation network fixes an order in which its edges are eliminated: a
+// forward contraction enumerates F_1 x ... x F_m, which is the whole product.
+// The same network can be eliminated from both ends toward the middle instead.
+// For a chain that changes the cost from |F_1| x ... x |F_m| to
+// |F|^{ceil(m/2)} + |F|^{floor(m/2)}, which for |F_i| ~ (2r)^(1/m) is about
+// 2 sqrt(2r) instead of 2r. Nothing about the count changes; this is only a
+// different elimination order, and it returns one witness instead of counting.
+
+fn mitm_left(
+    c: &Curve,
+    sets: &[Vec<Point>],
+    i: usize,
+    sum: Point,
+    picks: &mut Vec<u32>,
+    out: &mut HashMap<Point, Vec<u32>>,
+) {
+    if i == sets.len() {
+        out.entry(sum).or_insert_with(|| picks.clone());
+        return;
+    }
+    for (j, &a) in sets[i].iter().enumerate() {
+        picks.push(j as u32);
+        mitm_left(c, sets, i + 1, c.add(sum, a), picks, out);
+        picks.pop();
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn mitm_right(
+    c: &Curve,
+    sets: &[Vec<Point>],
+    i: usize,
+    sum: Point,
+    r: Point,
+    picks: &mut Vec<u32>,
+    table: &HashMap<Point, Vec<u32>>,
+) -> Option<(Point, Vec<u32>)> {
+    if i == sets.len() {
+        let need = c.add(r, c.neg(sum));
+        if table.contains_key(&need) {
+            return Some((need, picks.clone()));
+        }
+        return None;
+    }
+    for (j, &a) in sets[i].iter().enumerate() {
+        picks.push(j as u32);
+        if let found @ Some(_) = mitm_right(c, sets, i + 1, c.add(sum, a), r, picks, table) {
+            picks.pop();
+            return found;
+        }
+        picks.pop();
+    }
+    None
+}
+
+/// mitm_find_relation returns A_1 + ... + A_m = r with A_i in F_i, if one
+/// exists, by meeting in the middle: the first half of the factor bases is
+/// enumerated into a table keyed by its partial sum, then the second half is
+/// enumerated and its complement is looked up. It performs about
+/// |F|^(m/2) + |F|^(m/2) point additions instead of the product over all m
+/// sets, so it is the same relation network contracted from both ends. The
+/// witness is not checked here; callers verify membership and the sum.
+pub fn mitm_find_relation(c: &Curve, fb: &FactorBases, r: Point) -> Option<Vec<Point>> {
+    let m = fb.sets.len();
+    if m < 2 {
+        return None;
+    }
+    if fb.sets.iter().any(|s| s.is_empty()) {
+        return None;
+    }
+    let h = m / 2;
+    let mut table: HashMap<Point, Vec<u32>> = HashMap::new();
+    let mut picks: Vec<u32> = Vec::with_capacity(h);
+    mitm_left(c, &fb.sets[..h], 0, INFINITY, &mut picks, &mut table);
+    let mut rpicks: Vec<u32> = Vec::with_capacity(m - h);
+    let (need, right) = mitm_right(c, &fb.sets[h..], 0, INFINITY, r, &mut rpicks, &table)?;
+    let left = table.get(&need)?.clone();
+    let mut pts: Vec<Point> = Vec::with_capacity(m);
+    for (i, &j) in left.iter().enumerate() {
+        pts.push(fb.sets[i][j as usize]);
+    }
+    for (i, &j) in right.iter().enumerate() {
+        pts.push(fb.sets[h + i][j as usize]);
+    }
+    Some(pts)
 }

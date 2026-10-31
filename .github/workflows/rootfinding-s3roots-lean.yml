@@ -51,7 +51,7 @@ jobs:
         run: |
           set -o pipefail
           lake env lean AxiomAudit.lean | tee /tmp/axioms.txt
-          test "$(grep -cE "depends on axioms|does not depend on any axioms" /tmp/axioms.txt)" -eq 3
+          test "$(grep -cE "depends on axioms|does not depend on any axioms" /tmp/axioms.txt)" -eq 7
           if grep -vE "^AXIOM_AUDIT\||does not depend on any axioms|depends on axioms: \[(propext|Classical.choice|Quot.sound)(, (propext|Classical.choice|Quot.sound))*\]" /tmp/axioms.txt; then
             echo "unexpected axiom"; exit 1; fi
       - name: Keep the audit log

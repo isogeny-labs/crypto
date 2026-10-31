@@ -14,6 +14,12 @@ use std::time::{Duration, Instant};
 
 #[path = "prime_f4_wide.rs"]
 mod prime_f4_wide;
+#[path = "prime_f4_wide_dynamic.rs"]
+mod prime_f4_wide_dynamic;
+#[path = "prime_f4_wide_dynamic_replay.rs"]
+mod prime_f4_wide_dynamic_replay;
+#[path = "prime_f4_wide_m3.rs"]
+mod prime_f4_wide_m3;
 
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
@@ -80,6 +86,7 @@ struct LiveSink {
     events: File,
     sequence: u64,
 }
+#[allow(clippy::large_enum_variant)] // Keep the bounded sink inline without an additional heap allocation.
 enum EventSink {
     Legacy(LiveSink),
     Bound(CaptureEmitter),
@@ -157,6 +164,69 @@ pub(super) fn live_event(event: &Value) -> Result<(), String> {
         None => Ok(()),
     })
 }
+/// New bounded profiles require an attempt-bound sink. The caller debits the
+/// buffer's requested storage once and reuses it; this bridge does not reset
+/// budgets or silently downgrade to the legacy allocating event path.
+#[allow(dead_code)] // Dynamic dispatcher remains gated on complete adapter validation.
+pub(super) fn live_typed_event<T: serde::Serialize + ?Sized>(
+    kind: super::capture::TypedEventKind,
+    payload: &T,
+    buffer: &mut super::capture::TypedEventBuffer,
+) -> Result<(), String> {
+    LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+        Some(EventSink::Bound(sink)) => sink
+            .event_typed(kind, payload, buffer)
+            .map_err(|error| error.to_string()),
+        Some(EventSink::Legacy(_)) => {
+            Err("typed solver events require an attempt-bound capture sink".into())
+        }
+        None => Err("typed solver events require an active capture sink".into()),
+    })
+}
+/// Dedicated witness preparation/publication never downgrades to Legacy.
+/// The caller supplies and reconciles remaining original checking/byte budgets;
+/// `global_acknowledged` is the SAME adapter-wide4096 counter, not a new pool.
+#[allow(dead_code)]
+pub(super) fn prepare_bound_witness(
+    budget: &mut super::capture::WitnessBudget,
+) -> Result<super::capture::WitnessCaptureWorkspace, super::capture::WitnessError> {
+    LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+        Some(EventSink::Bound(sink)) => sink.prepare_witness(budget),
+        _ => Err(super::capture::WitnessError::Unbound),
+    })
+}
+#[allow(dead_code)]
+pub(super) fn publish_bound_witness(
+    bytes: &[u8],
+    workspace: &mut super::capture::WitnessCaptureWorkspace,
+    budget: &mut super::capture::WitnessBudget,
+    global_acknowledged: &mut usize,
+) -> Result<super::capture::WitnessReceipt, super::capture::WitnessError> {
+    LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+        Some(EventSink::Bound(sink)) => {
+            sink.publish_first_witness(bytes, workspace, budget, global_acknowledged)
+        }
+        _ => Err(super::capture::WitnessError::Unbound),
+    })
+}
+
+/// Borrowed complete artifacts from early dynamic failures use the same bound
+/// outer custody path. Dedicated witness publication is never downgraded here.
+#[allow(dead_code)] // Dormant dynamic parent integration.
+pub(super) fn live_borrowed_payload(
+    path: &str,
+    role: &str,
+    encoding: &str,
+    bytes: &[u8],
+) -> Result<(), String> {
+    LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+        Some(EventSink::Bound(sink)) => sink
+            .payload_borrowed(path, role, encoding, bytes)
+            .map_err(|error| error.to_string()),
+        _ => Err("borrowed retained artifacts require an attempt-bound capture sink".into()),
+    })
+}
+
 pub(super) fn live_payload(payload: &ArtifactPayload) -> Result<(), String> {
     LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
         Some(s) => s.payload(payload),
@@ -331,7 +401,7 @@ pub fn capabilities() -> Value {
             {"id":"bsgs","families":["koblitz","binary","prime"],"m":[2,15],"kind":"independent ECDLP baseline","trace":"baby table and giant probes"},
             {"id":"sat","families":["koblitz","binary"],"m":[2,15],"kind":"native chained S3 CNF/XOR subject to preflight caps","trace":"bounded native decisions, assignments and copied reasons, conflicts, analysis reasons, learned/deleted clauses, backjumps, restarts, XOR row operations; original formulas and checked models","gaps":["independently checked UNSAT proof","internal watch/heap operations and minimization derivations","full gate semantic map"]},
             {"id":"weil","families":["koblitz","binary"],"m":[2,2],"kind":"exact finite-domain selector Weil restriction","trace":"complete ANF equations and coordinate lift map","solver_completed":false},
-            {"id":"f4","families":["koblitz","binary","prime"],"m":[2,15],"m_by_family":{"koblitz":[2,2],"binary":[2,2],"prime":[2,15]},"prime_modulus_limit_exclusive":"4294967296","supervised_wide_prime_profile":{"m":[2,2],"modulus_min_inclusive":"4294967296","modulus_max_inclusive":"2305843009213693951","requires_original_execution_context":true},"kind":"native Boolean matrix F4 plus splitting; prime m2 finite-domain reference; prime m3..15 affine S3-chain traced visitor","trace":"original systems also retained for unsupported wide primes; bounded recursive systems, branch assignments, native bases and useful-row schedules, candidate and independent group-lift events","gaps":["wide-prime elimination requires supervised context and is currently m2 only","affine-chain exceptional infinity branches prevent general negative PDP conclusions","private pivot operations and zero rows","internal univariate factorization/GCD states","complete critical-pair stream"]},
+            {"id":"f4","families":["koblitz","binary","prime"],"m":[2,15],"m_by_family":{"koblitz":[2,2],"binary":[2,2],"prime":[2,15]},"prime_modulus_limit_exclusive":"4294967296","supervised_wide_prime_profile":{"m":[2,2],"modulus_min_inclusive":"4294967296","modulus_max_inclusive":"2305843009213693951","requires_original_execution_context":true},"supervised_wide_prime_m3_profile":{"m":[3,3],"modulus_min_inclusive":"4294967296","modulus_max_inclusive":"2305843009213693951","requires_original_execution_context":true,"extraction":"bounded ordered signed triples including infinity prefixes"},"kind":"native Boolean matrix F4 plus splitting; prime m2 finite-domain reference; prime m3..15 affine S3-chain traced visitor","trace":"original systems also retained for unsupported wide primes; bounded recursive systems, branch assignments, native bases and useful-row schedules, candidate and independent group-lift events","gaps":["wide-prime elimination requires supervised context and is currently m2 or m3","affine-chain exceptional infinity branches prevent general negative PDP conclusions","private pivot operations and zero rows","internal univariate factorization/GCD states","complete critical-pair stream"]},
             {"id":"f5","families":["koblitz","binary"],"m":[2,2],"kind":"native Boolean matrix F5 row criterion plus splitting; not general incremental F5","trace":"original ANF, bounded reduced rows, F5 report, splitting nodes","gaps":["per-row signatures and rejected signature witnesses"]},
             {"id":"f6","families":["koblitz","binary"],"m":[4,4],"kind":"native F6WidePairIndex geometric four-sum; not a general Groebner algorithm","trace":"pair sums, domain, verified indices","gaps":["native internal lookup sequence"]},
             {"id":"root","families":["koblitz","binary","prime"],"m":[2,2],"kind":"native S3 univariate root finding with exact domain and group lift","trace":"prime bounded field, power, GCD and split states; binary bounded quadratic, trace, half-trace and matrix states; independent distinct-root certificates","gaps":["higher-m root elimination","complete execution and total cost verification"]},
@@ -1700,9 +1770,12 @@ const PRIME_CHAIN_TRACE_CAP: &str = "prime F4 chain event or byte limit reached"
 fn retains_canonical_artifacts(data: &SolverData) -> bool {
     data.outcome["strategy"] == PRIME_CHAIN_STRATEGY
         || data.outcome["strategy"] == prime_f4_wide::STRATEGY
+        || data.outcome["strategy"] == prime_f4_wide_m3::STRATEGY
 }
 fn record_prime_chain_persistence_error(data: &mut SolverData, phase: &str, error: &str) {
-    if data.outcome["strategy"] == prime_f4_wide::STRATEGY {
+    if data.outcome["strategy"] == prime_f4_wide::STRATEGY
+        || data.outcome["strategy"] == prime_f4_wide_m3::STRATEGY
+    {
         data.outcome["solver_completed"] = json!(false);
         data.outcome["status"] = json!("partial");
         if data.outcome.get("live_persistence_errors").is_some() {
@@ -2244,6 +2317,12 @@ fn prime_f4(
 ) -> Result<SolverData, String> {
     use crate::cryptanalysis::f4_fp::{self, F4Options};
     use crate::cryptanalysis::groebner_f4::Ordering;
+    if config.m == 3
+        && context.is_some()
+        && matches!(group, Group::Prime(curve) if curve.p.to_u64().is_some_and(|p| p >= 1u64 << 32))
+    {
+        return prime_f4_wide_m3::solve(config, group, domain, target, context);
+    }
     if config.m != 2 {
         return prime_f4_chain(
             config,
@@ -3008,14 +3087,232 @@ pub(super) fn verify_prime_root_artifact(
     Ok(())
 }
 
+/// Explicit result of the profile verifier; only a validated censored prefix
+/// may bypass later mathematical parsing of incomplete bytes.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum WidePrimeReplay {
+    Ordinary,
+    CensoredM3Prefix,
+}
 /// Semantic wide-prime replay, independent of native basis derivation.
+// Original-input construction is separate from profile dispatch. The versioned
+// solver identifier is deliberately NOT yet accepted by production plan/CLI.
+#[allow(dead_code)]
+const DYNAMIC_PROFILE: &str = "f4-wide-dynamic-v1";
+#[allow(dead_code)]
+struct DynamicOriginal {
+    p: u64,
+    a: u64,
+    b: u64,
+    m: usize,
+    target: prime_f4_wide_dynamic_replay::Point,
+    domain: Vec<prime_f4_wide_dynamic_replay::Point>,
+    codes: Vec<u64>,
+    work_limit: u64,
+    memory_bytes: u64,
+    trace_bytes: u64,
+}
+#[allow(dead_code)]
+impl DynamicOriginal {
+    fn expected(&self) -> prime_f4_wide_dynamic_replay::Expected<'_> {
+        prime_f4_wide_dynamic_replay::Expected {
+            p: self.p,
+            a: self.a,
+            b: self.b,
+            m: self.m,
+            target: self.target,
+            domain: &self.domain,
+            codes: &self.codes,
+            work_limit: self.work_limit,
+            memory_bytes: self.memory_bytes,
+            trace_bytes: self.trace_bytes,
+        }
+    }
+}
+/// The parent must first authenticate config and execution limits against the
+/// original run. This independently validates/reconstructs public mathematical
+/// inputs; it never consults private_witness or any solver-produced input file.
+#[allow(dead_code)]
+fn dynamic_original(
+    config: &CaseConfig,
+    case: &CaseData,
+    memory_bytes: u64,
+    trace_bytes: u64,
+) -> Result<DynamicOriginal, String> {
+    use prime_f4_wide_dynamic_replay::Point as ReplayPoint;
+    if config.solver != DYNAMIC_PROFILE
+        || config.family != "prime"
+        || !(33..=61).contains(&config.n)
+        || !(4..=15).contains(&config.m)
+        || config.degree_bound != 12
+        || config.work_limit == 0
+        || memory_bytes == 0
+        || trace_bytes == 0
+    {
+        return Err("configuration is outside the frozen dynamic profile".into());
+    }
+    let public = &case.public_instance;
+    if public["family"] != config.family
+        || public["n"] != json!(config.n)
+        || public["m"] != json!(config.m)
+        || public["twist"] != json!(config.twist)
+        || case.factor_base["requested_size"] != json!(config.factor_base_size)
+    {
+        return Err("dynamic public inputs differ from original configuration".into());
+    }
+    curves::verify_public(public)?;
+    curves::verify_factor_base(public, &case.factor_base)?;
+    let group = Group::read(case)?;
+    let Group::Prime(curve) = &group else {
+        return Err("dynamic profile requires a prime curve".into());
+    };
+    let p = curve.p.to_u64().ok_or("dynamic modulus exceeds u64")?;
+    if 64 - p.leading_zeros() != config.n {
+        return Err("dynamic modulus width differs from original configuration".into());
+    }
+    let point = |element: &Element| -> Result<ReplayPoint, String> {
+        match element {
+            Element::Prime(Point::Affine { x, y }) => Ok(ReplayPoint {
+                x: x.value.to_u64().ok_or("dynamic x exceeds u64")?,
+                y: y.value.to_u64().ok_or("dynamic y exceeds u64")?,
+            }),
+            _ => Err("dynamic original point must be affine over the prime field".into()),
+        }
+    };
+    let target = point(&group.point(&public["target"])?)?;
+    let signed = domain(&group, case)?;
+    if signed.is_empty() || signed.len() > 64 {
+        return Err("dynamic signed domain exceeds original profile capacity".into());
+    }
+    let domain = signed.iter().map(point).collect::<Result<Vec<_>, _>>()?;
+    let mut codes: Vec<_> = domain.iter().map(|q| q.x).collect();
+    codes.sort_unstable();
+    codes.dedup();
+    if codes.is_empty() || codes.len() > 32 {
+        return Err("dynamic x domain exceeds original profile capacity".into());
+    }
+    Ok(DynamicOriginal {
+        p,
+        a: curve.a.to_u64().ok_or("dynamic a exceeds u64")?,
+        b: curve.b.to_u64().ok_or("dynamic b exceeds u64")?,
+        m: config.m,
+        target,
+        domain,
+        codes,
+        work_limit: config.work_limit,
+        memory_bytes,
+        trace_bytes,
+    })
+}
+
+/// Reconcile outer labels with independently checked mathematics and separately
+/// reported native boundary facts. Does not select/admit a profile or run it.
+#[allow(dead_code)]
+fn verify_dynamic_claims(
+    outcome: &Value,
+    verified: &prime_f4_wide_dynamic_replay::Verified,
+) -> Result<(), String> {
+    if !outcome.is_object() {
+        return Err("dynamic outcome must be an object".into());
+    }
+    prime_f4_wide::verify_unproved_claims(outcome)?;
+    for key in [
+        "independent_derivation_verified",
+        "operation_trajectory_verified",
+        "exact_instruction_count_verified",
+        "full_execution_trace_verified",
+        "fall_degree_verified",
+        "linear_extraction_complete",
+        "extraction_complete",
+    ] {
+        if !outcome[key].is_null() && outcome[key] != false {
+            return Err(format!("dynamic replay does not certify outer {key}"));
+        }
+    }
+    for key in ["solver_completed", "pdp_witness_verified"] {
+        if !outcome[key].is_boolean() {
+            return Err(format!("dynamic outcome lacks boolean {key}"));
+        }
+    }
+    for (key, supported) in [
+        ("solver_completed", verified.solver_completed_verified),
+        (
+            "pdp_witness_verified",
+            verified.first_witness_verified && verified.witness_capture_committed,
+        ),
+        (
+            "certificate_durably_persisted",
+            verified.witness_capture_committed,
+        ),
+        (
+            "group_domain_complete",
+            verified.independent_group_domain_complete,
+        ),
+        ("exhaustive_no_decomposition", verified.negative_verified),
+    ] {
+        if outcome[key].is_null() {
+            continue;
+        }
+        let claimed = outcome[key]
+            .as_bool()
+            .ok_or_else(|| format!("nonboolean dynamic claim {key}"))?;
+        if claimed && !supported {
+            return Err(format!("unsupported dynamic outcome claim {key}"));
+        }
+    }
+    for (key, reported) in [
+        (
+            "native_backend_invoked",
+            verified.native_backend_invoked_reported,
+        ),
+        (
+            "native_statistics_complete",
+            verified.native_statistics_complete_reported,
+        ),
+        (
+            "algebra_completed",
+            verified.native_statistics_complete_reported,
+        ),
+    ] {
+        if !outcome[key].is_null() && outcome[key] != json!(reported) {
+            return Err(format!("dynamic native metadata mismatch: {key}"));
+        }
+    }
+    if outcome.get("live_persistence_errors").is_some() && outcome["solver_completed"] == true {
+        return Err("dynamic completion cannot survive outer persistence failure".into());
+    }
+    match outcome["status"].as_str() {
+        Some("partial") => {}
+        Some("verified")
+            if outcome["solver_completed"] == true && outcome["pdp_witness_verified"] == true => {}
+        Some("timeout" | "trace_budget_exhausted" | "worker_failed") => {
+            prime_f4_wide::verify_censored_outcome(outcome)?;
+            for key in [
+                "certificate_durably_persisted",
+                "group_domain_complete",
+                "exhaustive_no_decomposition",
+            ] {
+                if outcome[key] == true {
+                    return Err("censored outer dynamic outcome promotes a claim".into());
+                }
+            }
+        }
+        _ => return Err("dynamic outcome status contradicts verified scope".into()),
+    }
+    Ok(())
+}
+
 pub(super) fn verify_prime_f4_wide(
     dir: &Path,
     config: &CaseConfig,
     outcome: &Value,
     artifacts: &[super::types::Artifact],
-) -> Result<(), String> {
-    prime_f4_wide::verify(dir, config, outcome, artifacts)
+) -> Result<WidePrimeReplay, String> {
+    let disposition = prime_f4_wide_m3::verify(dir, config, outcome, artifacts)?;
+    if disposition == WidePrimeReplay::Ordinary {
+        prime_f4_wide::verify(dir, config, outcome, artifacts)?;
+    }
+    Ok(disposition)
 }
 
 fn wide_begin_failure(
@@ -3027,7 +3324,7 @@ fn wide_begin_failure(
     let Some(context) = context else {
         return Err(error);
     };
-    if config.family != "prime" || config.solver != "f4" || config.m != 2 {
+    if config.family != "prime" || config.solver != "f4" || !matches!(config.m, 2 | 3) {
         return Err(error);
     }
     let group = Group::read(case)?;
@@ -3038,6 +3335,16 @@ fn wide_begin_failure(
         return Err(error);
     }
     let target = group.point(&case.public_instance["target"])?;
+    if config.m == 3 {
+        return prime_f4_wide_m3::begin_failure(
+            config,
+            &group,
+            &domain(&group, case)?,
+            &target,
+            context,
+            &error,
+        );
+    }
     prime_f4_wide::begin_failure(
         config,
         &group,
@@ -3051,6 +3358,176 @@ fn wide_begin_failure(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn dynamic_original_uses_verified_public_inputs_at_requested_boundaries() {
+        for n in [47, 61] {
+            for m in [4, 15] {
+                for twist in [false, true] {
+                    let config = CaseConfig {
+                        family: "prime".into(),
+                        n,
+                        m,
+                        twist,
+                        curve_seed: 7,
+                        generator_index: 1,
+                        key_index: 1,
+                        seed: 42,
+                        factor_base_size: 2,
+                        degree_bound: 12,
+                        work_limit: 16384,
+                        solver: DYNAMIC_PROFILE.into(),
+                    };
+                    let mut case = curves::generate(&config).unwrap();
+                    case.private_witness = json!({"must_not_be_consulted":true});
+                    let original = dynamic_original(&config, &case, 256 << 20, 128 << 20).unwrap();
+                    let expected = original.expected();
+                    assert_eq!(expected.m, m);
+                    assert_eq!(expected.work_limit, config.work_limit);
+                    assert_eq!(expected.memory_bytes, 256 << 20);
+                    assert_eq!(expected.trace_bytes, 128 << 20);
+                    assert_eq!(
+                        expected.target.x.to_string(),
+                        case.public_instance["target"]["x"].as_str().unwrap()
+                    );
+                    assert_eq!(
+                        expected.target.y.to_string(),
+                        case.public_instance["target"]["y"].as_str().unwrap()
+                    );
+                    assert!(expected.codes.windows(2).all(|w| w[0] < w[1]));
+                    for q in expected.domain {
+                        assert!(expected.codes.contains(&q.x));
+                        let negative_y = if q.y == 0 { 0 } else { expected.p - q.y };
+                        assert!(expected
+                            .domain
+                            .iter()
+                            .any(|r| r.x == q.x && r.y == negative_y));
+                    }
+                    if n == 61 {
+                        assert_eq!(expected.p, (1u64 << 61) - 1);
+                    }
+                    let mut changed = config.clone();
+                    changed.factor_base_size += 1;
+                    assert!(dynamic_original(&changed, &case, 256 << 20, 128 << 20).is_err());
+                    changed = config.clone();
+                    changed.twist = !changed.twist;
+                    assert!(dynamic_original(&changed, &case, 256 << 20, 128 << 20).is_err());
+                    let mut corrupted = case.clone();
+                    corrupted.factor_base["points"][0]["x"] = json!(expected.p.to_string());
+                    assert!(dynamic_original(&config, &corrupted, 256 << 20, 128 << 20).is_err());
+                }
+            }
+        }
+    }
+    #[test]
+    fn dynamic_original_rejects_unbound_or_different_profile_limits() {
+        let config = CaseConfig {
+            family: "prime".into(),
+            n: 47,
+            m: 4,
+            twist: false,
+            curve_seed: 7,
+            generator_index: 1,
+            key_index: 1,
+            seed: 42,
+            factor_base_size: 2,
+            degree_bound: 12,
+            work_limit: 16384,
+            solver: DYNAMIC_PROFILE.into(),
+        };
+        let case = curves::generate(&config).unwrap();
+        for mutation in 0..4 {
+            let mut changed = config.clone();
+            match mutation {
+                0 => changed.solver = "f4".into(),
+                1 => changed.degree_bound = 8,
+                2 => changed.work_limit = 0,
+                _ => changed.m = 3,
+            }
+            assert!(dynamic_original(&changed, &case, 256 << 20, 128 << 20).is_err());
+        }
+        assert!(dynamic_original(&config, &case, 0, 128 << 20).is_err());
+        assert!(dynamic_original(&config, &case, 256 << 20, 0).is_err());
+    }
+
+    #[test]
+    fn typed_solver_bridge_requires_bound_capture_and_preserves_sticky_failure() {
+        use super::super::capture::{TypedEventBuffer, TypedEventKind};
+        let mut buffer =
+            TypedEventBuffer::try_new(1024, TypedEventBuffer::requested_bytes(1024).unwrap())
+                .unwrap();
+        assert!(LIVE_SINK.with(|slot| slot.borrow().is_none()));
+        assert!(live_typed_event(TypedEventKind::WidePrimeDynamic, &7u64, &mut buffer).is_err());
+        assert!(live_borrowed_payload("input.json", "test", "json", b"{}").is_err());
+        let nonce = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let directory = std::env::temp_dir().join(format!(
+            "typed-solver-bridge-{}-{nonce}",
+            std::process::id()
+        ));
+        fs::create_dir(&directory).unwrap();
+        let legacy_path = directory.join("legacy.jsonl");
+        LIVE_SINK.with(|slot| {
+            *slot.borrow_mut() = Some(EventSink::Legacy(LiveSink {
+                directory: directory.clone(),
+                events: File::create(&legacy_path).unwrap(),
+                sequence: 0,
+            }));
+        });
+        let guard = LiveSinkGuard;
+        assert!(live_typed_event(TypedEventKind::WidePrimeDynamic, &7u64, &mut buffer).is_err());
+        assert!(live_borrowed_payload("input.json", "test", "json", b"{}").is_err());
+        assert_eq!(fs::metadata(&legacy_path).unwrap().len(), 0);
+        let binding = AttemptBinding {
+            schema: "crypto.ml-dataset.attempt-binding/v1".into(),
+            run_sha256: "1".repeat(64),
+            plan_sha256: "2".repeat(64),
+            protocol_sha256: "3".repeat(64),
+            config_sha256: "4".repeat(64),
+            source_commit: "5".repeat(40),
+            binary_sha256: "6".repeat(64),
+            cell_index: 0,
+            attempt_sha256: "7".repeat(64),
+        };
+        let live = directory.join("live");
+        let emitter = CaptureEmitter::create(
+            &live,
+            binding.clone(),
+            super::super::capture::capture_limits(64).unwrap(),
+        )
+        .unwrap();
+        LIVE_SINK.with(|slot| *slot.borrow_mut() = Some(EventSink::Bound(emitter)));
+        live_typed_event(TypedEventKind::WidePrimeDynamic, &7u64, &mut buffer).unwrap();
+        let original = fs::read(live.join("events.jsonl")).unwrap();
+        let event: Value = serde_json::from_slice(&original).unwrap();
+        assert_eq!(event["event"]["kind"], "wide_prime_dynamic");
+        assert_eq!(event["event"]["payload"], 7);
+        assert!(live_typed_event(
+            TypedEventKind::WidePrimeDynamic,
+            &"x".repeat(2048),
+            &mut buffer,
+        )
+        .is_err());
+        assert!(live_typed_event(TypedEventKind::WidePrimeDynamic, &8u64, &mut buffer).is_err());
+        assert_eq!(fs::read(live.join("events.jsonl")).unwrap(), original);
+        let initial = super::super::capture::CaptureCursor::initial(&binding).unwrap();
+        let snapshot = directory.join("snapshot");
+        let delta = super::super::capture::capture_committed_delta(
+            &directory,
+            &snapshot,
+            &binding,
+            &initial,
+            &super::super::capture::capture_limits(64).unwrap(),
+        )
+        .unwrap()
+        .unwrap();
+        assert_eq!(delta.cursor.event_count, 1);
+        super::super::capture::verify_captured_delta(&snapshot, &delta, &initial).unwrap();
+        drop(guard);
+        assert!(LIVE_SINK.with(|slot| slot.borrow().is_none()));
+        fs::remove_dir_all(directory).unwrap();
+    }
     #[test]
     fn native_sat_trace_caps_preserve_an_exact_accepted_prefix() {
         let mut log = SatEventLog::default();
@@ -4315,5 +4792,43 @@ mod tests {
         }
         assert!(solve_with_event_sink(&cfg, &case, &dir).is_err());
         fs::remove_dir_all(dir).unwrap();
+    }
+}
+
+#[cfg(test)]
+mod bounded_witness_bridge_tests {
+    use super::*;
+    #[test]
+    fn witness_bridge_requires_bound_sink_before_allocation() {
+        LIVE_SINK.with(|slot| assert!(slot.borrow().is_none()));
+        let mut budget = super::super::capture::WitnessBudget::new(
+            16_777_216,
+            1024 * 1024,
+            std::time::Instant::now() + std::time::Duration::from_secs(30),
+        );
+        assert!(matches!(
+            prepare_bound_witness(&mut budget),
+            Err(super::super::capture::WitnessError::Unbound)
+        ));
+        assert_eq!(budget.reserved_bytes, 0);
+        #[cfg(unix)]
+        {
+            LIVE_SINK.with(|slot| {
+                *slot.borrow_mut() = Some(EventSink::Legacy(LiveSink {
+                    directory: PathBuf::new(),
+                    events: File::open("/dev/null").unwrap(),
+                    sequence: 0,
+                }))
+            });
+            let result = prepare_bound_witness(&mut budget);
+            LIVE_SINK.with(|slot| {
+                slot.borrow_mut().take();
+            });
+            assert!(matches!(
+                result,
+                Err(super::super::capture::WitnessError::Unbound)
+            ));
+            assert_eq!(budget.reserved_bytes, 0);
+        }
     }
 }

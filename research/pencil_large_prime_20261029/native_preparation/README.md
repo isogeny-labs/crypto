@@ -20,6 +20,8 @@ cargo run --release -- prepare-archive ARCHIVE OUT
 cargo run --release -- prepare-specs INPUTS OUT
 cargo run --release -- check-archive BINARY INPUTS OUT [--expected-plans DIR]
 cargo run --release -- check-prepared BINARY INPUTS SPECS OUT [--expected-plans DIR]
+cargo run --release -- prepare-disjoint-enrollment REQUEST OUT
+cargo run --release -- check-disjoint-enrollment REQUEST OUT
 ```
 
 `prepare-archive` verifies the frozen archive SHA-256, reads the zstd/tar stream
@@ -46,3 +48,21 @@ requires byte equality with retained plan JSON.
 All outputs remain preparation or run-free plan evidence. They do not authorize
 an experiment, attest a source build, measure a cost, recover an unknown scalar,
 or establish a cost ratio against rho.
+
+`prepare-disjoint-enrollment` is an isolated continuation route documented in
+`DISJOINT_ENROLLMENT.md`. It leaves `prepare-specs` and `check-prepared` and
+their original nine-file inventory unchanged. A strict, hash-bound request
+names the approved seven cohort specifications and plans, the retained p739
+gate specification and plan, the pinned instrument and build information, and
+explicit protocol-lineage files. The command derives only the cohort-16
+remainder specification, invokes only `ecbench plan --doc` for that remainder,
+and proves a complete 22,680-slot bijection against the original seven plans.
+Its certificate and mappings preserve original and enrolled sequence numbers
+and workload indices. They make no admission, timing, launch, or empirical
+claim.
+
+`check-disjoint-enrollment` is solver-free. It rereads every hash-bound input,
+rederives the permitted specification change, reparses all seven original and
+eight enrolled plans, recomputes both mappings, and compares their exact bytes
+and certificate hashes. Consumers need not trust the certificate's `passed`
+or count fields.

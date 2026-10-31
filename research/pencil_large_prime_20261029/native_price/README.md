@@ -21,6 +21,9 @@ prime-domain identity and independently verified known-answer outcome flags.
 It retains the complete input as raw_input in the output. Missing counters
 remain absent, never zero. Changed schema, negative/overflowing counters,
 geometry partition disagreement or identity disagreement is rejected.
+`session` may be null only while the corresponding record is also null for a
+prospective, unexecuted plan; a present record always requires a concrete
+session identity.
 
 The importer projects current candidate field/native arithmetic, symbolic and
 cold_setup semantic counters, current outer-primality observations, rho counts,
@@ -109,7 +112,8 @@ The manifest is `pencil-price-cohort-input/v1` with:
 
 The aggregate validates actual `ecbench.plan/v1` arms/workloads/executions using
 existing `pencil-paired-export::export_with_plan`. It enforces the original
-1260-workload design, five measured and one warmup round per workload, and the
+seven plan names and SHA-256 digests before entering the default 1,260-workload
+route. It then enforces five measured and one warmup round per workload and the
 three exact pencil/rho/rho_AA arms. This yields22680 expected execution slots,
 18900 measured executions,3780 warmups and6300 measured candidate/rho pairs.
 Actual workload identities and plan bytes are checked; matching cardinality
@@ -160,3 +164,37 @@ rejected. The same aggregation arithmetic produces 300 measured pair slots,
 The gate route is analysis support, not launch permission or cohort completion.
 The canonical exporter additionally requires a frozen protocol with
 `sample_size.instances:60` and identical `extensions.analysis_scope`.
+
+### Exact upper-gate scope
+
+`analyze_cohort MANIFEST.json --p186379-target0` accepts only the retained
+`gate-p186379-target0.json` plan with SHA-256
+`481d795e6208cfb3ca648c463de2d7b232adfb7d28bebc341afa4f58e119dfcf`.
+It retains exactly one workload, five measured pairs and eighteen execution
+slots. This prerequisite is charged separately and is never enrolled as cohort
+coverage.
+
+### Opt-in disjoint p739 continuation
+
+`analyze_cohort MANIFEST.json --full1260-disjoint-p739` accepts only the
+reviewed eight-plan enrollment identified by `full1260-disjoint-p739/v1`. It
+invokes the separately compiled and hash-bound native-preparation verifier,
+then checks the exact request, certificate, 1,260-workload/22,680-slot mapping,
+and per-plan protocol/coverage/history lineage. The prior p739 gate must carry
+its actual records, session, history and a scoped reuse-admission record. All
+seven prospective plan entries must keep `session_id`, `records` and
+`execution_history` null until data exist. Missing rows remain in the complete
+denominator and all affected ratios remain null. This route neither authorizes
+execution nor qualifies timing, and the p186379 prerequisite remains separate.
+
+The opt-in manifest adds `enrollment` with exact `request`, `certificate` and
+`protocol_lineage` file bindings, `output_directory`, and a `verifier` object
+containing separately hash-bound native binary and source bindings. Lineage
+schema `pencil-disjoint-protocol-lineage/v1` binds the continuation protocol,
+the known-prior-data declaration, and exactly eight named plans. Every plan
+declares its plan digest, `prior_gate` or `prospective_continuation` origin,
+full-file data-protocol binding and identity, coverage-review object, session,
+records and execution history. A prospective execution triple must be either
+entirely null or entirely present and hash-bound; mixed or fabricated identities
+are rejected. The gate reuse admission additionally fixes its plan, protocol,
+records digest, session and observation-receipt digest.

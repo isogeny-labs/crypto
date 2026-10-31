@@ -9,14 +9,23 @@ fn binding(p: &Path) -> V {
     json!({"path":p,"sha256":digest(p).unwrap()})
 }
 #[test]
+#[ignore = "requires artifact-hydrated exact seven plans via PENCIL_ORIGINAL_PLAN_DIRECTORY"]
 fn production_full_denominator_replay_and_mutation_rejection() {
-    production_scope(false);
+    production_scope(false, false);
 }
 #[test]
 fn production_exact_gate60_replay_and_wrong_scope_rejection() {
-    production_scope(true);
+    production_scope(true, false);
 }
-fn production_scope(gate: bool) {
+#[test]
+fn production_exact_upper_gate_replay() {
+    production_scope(false, true);
+}
+#[test]
+fn arbitrary_full_denominator_partition_rejected() {
+    assert!(pencil_accounting_price_draft::aggregate::aggregate(&json!({"schema":"pencil-price-cohort-input/v1","plans":[{"name":"plan.json"}],"analysis_scope":null})).is_err());
+}
+fn production_scope(gate: bool, upper: bool) {
     let d = tempfile::tempdir().unwrap();
     let dir = d.path();
     let here = Path::new(env!("CARGO_MANIFEST_DIR"));
@@ -29,6 +38,11 @@ fn production_scope(gate: bool) {
         p["sample_size"]["instances"] = json!(60);
         p["extensions"]["analysis_scope"] =
             pencil_accounting_price_draft::aggregate::p739_gate60_scope();
+    }
+    if upper {
+        p["sample_size"]["instances"] = json!(1);
+        p["extensions"]["analysis_scope"] =
+            pencil_accounting_price_draft::aggregate::p186379_target0_scope();
     }
     let mut sources = serde_json::Map::new();
     let mut pins = serde_json::Map::new();
@@ -83,15 +97,23 @@ fn production_scope(gate: bool) {
         .collect();
     let executions:Vec<_>=(0..1260).flat_map(|wi|(0..6).flat_map(move|round|(0..3).map(move|arm|json!({"seq":wi*18+round*3+arm,"round":round,"warmup":round==0,"arm":arm,"workload":wi,"algorithm_seed":round+10})))).collect();
     let plan = json!({"schema":"ecbench.plan/v1","spec_id":"software-plan-not-executed","arms":arms,"workloads":workloads,"executions":executions});
-    let name = if gate { "gate-p739.json" } else { "plan.json" };
-    let count = if gate { 60 } else { 1260 };
+    let name = if gate {
+        "gate-p739.json"
+    } else if upper {
+        "gate-p186379-target0.json"
+    } else {
+        "plan.json"
+    };
+    let count = if gate {
+        60
+    } else if upper {
+        1
+    } else {
+        1260
+    };
     let plp = dir.join(name);
-    if gate {
-        fs::copy(
-            study.join("native_price/tests/fixtures/gate-p739.json"),
-            &plp,
-        )
-        .unwrap();
+    if gate || upper {
+        fs::copy(study.join("native_price/tests/fixtures").join(name), &plp).unwrap();
     } else {
         write(&plp, &plan);
     }
@@ -99,7 +121,29 @@ fn production_scope(gate: bool) {
     let rp = dir.join("receipt.json");
     write(&rp, &receipt);
     let mut manifest = json!({"schema":"pencil-price-cohort-input/v1","prepared_plan_validation":binding(&rp),"binary_sha256":p["arms"][0]["instrument"]["binary_sha256"],"protocol_sha256":p["freeze"]["protocol_sha256"],"coverage_review":null,"plans":[{"name":name,"path":plp,"sha256":digest(&plp).unwrap(),"session_id":"software-session-not-executed","records":null}]});
-    let native = if gate {
+    if !gate && !upper {
+        let original = std::env::var("PENCIL_ORIGINAL_PLAN_DIRECTORY")
+            .expect("hydrate exact original seven plans and set PENCIL_ORIGINAL_PLAN_DIRECTORY");
+        let mut files = serde_json::Map::new();
+        let mut entries = Vec::new();
+        for bits in [16, 20, 24, 28, 32, 36, 40] {
+            let name = format!("cohort-{bits}.json");
+            let path = Path::new(&original).join(&name);
+            let sha = digest(&path).unwrap();
+            files.insert(name.clone(), json!(sha));
+            entries.push(json!({"name":name,"path":path,"sha256":sha,"session_id":format!("software-not-executed-{bits}"),"records":null}));
+        }
+        let mut receipt = receipt.clone();
+        receipt["files"] = json!(files);
+        write(&rp, &receipt);
+        manifest["prepared_plan_validation"] = binding(&rp);
+        manifest["plans"] = json!(entries);
+    }
+    let native = if upper {
+        manifest["analysis_scope"] =
+            pencil_accounting_price_draft::aggregate::p186379_target0_scope();
+        pencil_accounting_price_draft::aggregate::aggregate_p186379_target0(&manifest).unwrap()
+    } else if gate {
         manifest["analysis_scope"] = pencil_accounting_price_draft::aggregate::p739_gate60_scope();
         pencil_accounting_price_draft::aggregate::aggregate_p739_gate60(&manifest).unwrap()
     } else {

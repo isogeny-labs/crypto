@@ -3,7 +3,6 @@
 // regenerated from the file, its plotted-point row, and its panel.  Every
 // number is copied from analysis/band-prime.json.  Run from the repository root.
 import { readFileSync, writeFileSync } from "node:fs";
-import { execFileSync } from "node:child_process";
 
 const DATE = process.argv[2] ?? "2026-10-28";
 const band = JSON.parse(readFileSync("research/prime_ksum_table_20261028/analysis/band-prime.json", "utf8"));
@@ -31,17 +30,39 @@ const point = {
   anchor: ANCHOR,
   source: SOURCE,
 };
-// The file is written by Python's json (indent 1, ASCII-escaped, float
-// literals kept), so the edit goes through it and leaves every other line alone.
-execFileSync("python3", ["-c", `
-import json, sys
-path, date, point = sys.argv[1], sys.argv[2], json.loads(sys.argv[3])
-tl = json.load(open(path))
-s = next(x for x in tl["series"] if x["id"] == "ec-bounded-counts")
-s["points"] = [p for p in s["points"] if p["anchor"] != point["anchor"]] + [point]
-tl["updated"] = max(tl["updated"], date)
-open(path, "w").write(json.dumps(tl, indent=1) + "\\n")
-`, tlPath, DATE, JSON.stringify(point)]);
+// The file keeps Python json formatting (indent 1, ASCII-escaped, float
+// literals as written), so the point is spliced into the text of its series and
+// every other byte is left alone.  A rerun replaces the point with this anchor in place.
+const ascii = (x) => x.replace(/[\u0080-\uffff]/g, (c) => "\\u" + c.charCodeAt(0).toString(16).padStart(4, "0"));
+const close = (text, i) => { // index of the bracket closing the one at text[i]
+  let depth = 0, str = false;
+  for (; i < text.length; i++) {
+    const c = text[i];
+    if (str) { if (c === "\\") i++; else if (c === "\"") str = false; continue; }
+    if (c === "\"") str = true;
+    else if (c === "[" || c === "{") depth++;
+    else if ((c === "]" || c === "}") && --depth === 0) return i;
+  }
+  throw new Error("unbalanced timeline file");
+};
+let tl0 = readFileSync(tlPath, "utf8");
+const sid = tl0.indexOf(`"id": "ec-bounded-counts"`);
+const open = tl0.indexOf("\"points\": [", sid) + "\"points\": ".length;
+const end = close(tl0, open);
+const spans = [];
+for (let i = tl0.indexOf("{", open); i > 0 && i < end; i = tl0.indexOf("{", i)) {
+  const j = close(tl0, i);
+  spans.push(tl0.slice(i, j + 1));
+  i = j + 1;
+}
+const kept = spans.slice();
+const fresh = ascii(JSON.stringify(point, null, 1)).replace(/\n/g, "\n    ");
+const at = kept.findIndex((sp) => JSON.parse(sp).anchor === point.anchor);
+if (at >= 0) kept[at] = fresh; else kept.push(fresh);
+const tail = tl0.slice(tl0.lastIndexOf("}", end) + 1, end);
+tl0 = tl0.slice(0, open + 1) + "\n    " + kept.join(",\n    ") + tail + tl0.slice(end);
+tl0 = tl0.replace(/"updated": "([0-9-]+)"/, (_, d) => `"updated": "${d > DATE ? d : DATE}"`);
+writeFileSync(tlPath, tl0);
 const tl = JSON.parse(readFileSync(tlPath, "utf8"));
 const tlText = readFileSync(tlPath, "utf8");
 
@@ -55,7 +76,9 @@ const row =
   `<tr><td>${DATE}</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Prime-field IC, k = 4 sum table (one probe a target), 40-bit <code>icv1-fp40-tm924137-0ecaaeb9</code></td>` +
   `<td class="n">${f(ratio, 2)}&times; <small>counted GAE lower-bound diagnostic; was ${f(was, 1)}&times; (pair table)</small></td><td>matched</td><td><span class="chip">engineering</span></td>` +
   `<td><a href="${ANCHOR}">panel</a> &middot; <a href="${SOURCE}">source</a></td></tr>`;
-if (!page.includes(`href="${ANCHOR}">panel`)) {
+const rowRe = new RegExp(`<tr><td>[0-9-]+</td>(?:(?!</tr>)[\\s\\S])*?href="${ANCHOR}">panel[\\s\\S]*?</tr>`);
+if (rowRe.test(page)) page = page.replace(rowRe, row);
+else {
   page = page.replace(/(<summary>Every plotted point as a table<\/summary>[\s\S]*?)(<\/tbody>)/, (_, a, b) => a + row + "\n" + b);
 }
 const panel =
@@ -63,7 +86,9 @@ const panel =
   `Replacing the pair table with a table of every signed 3- or 4-sum of a smaller base (one probe a target) lowers the prime IC baseline on the frontier campaign's six curves and test targets at every size and every band weight: ` +
   `at 40 bits <code>S</code> ${f(k4[0])} (k = 4) against ${f(pair[0])} (pair table), ${f(k4[2])} against ${f(pair[2])} at w = 1; fitted exponent 0.521 [0.506, 0.538] against 0.620 [0.586, 0.650]. ` +
   `Class: engineering. The method is generic: it converges to baby-step giant-step and stays ${f(k4[0] / bsgs[0], 1)}&times; above it and ${f(ratio, 1)}&times; above rho at 40 bits.</p>`;
-if (!page.includes('id="prime-ksum-table-20261028"')) {
+const panelRe = /<p id="prime-ksum-table-20261028">[\s\S]*?<\/p>/;
+if (panelRe.test(page)) page = page.replace(panelRe, panel);
+else {
   page = page.replace(/(<p id="m4-narrow-engines-wide-vars-20261020">[\s\S]*?<\/p>)/, (m) => m + "\n" + panel);
 }
 const best =

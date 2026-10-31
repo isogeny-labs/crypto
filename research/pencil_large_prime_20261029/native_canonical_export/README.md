@@ -103,3 +103,13 @@ the explicit post-data annotation. Other post-data changes, including altered
 methods, prices, seeds or a caller-rehashed replacement parent, are rejected.
 Clock and finite-price qualification remain separate checks. A structurally valid
 export does not turn the gate's rejected paired clocks into accepted timing.
+
+## Explicit disjoint enrollment
+
+The opt-in `full1260-disjoint-p739/v1` route uses the reviewed native preparation verifier through the native price consumer. It preserves the exact original workload denominator and requires the hash-bound enrollment certificate, verifier, request, source and per-plan protocol lineage. The continuation protocol declares `analysis_plan.frozen_before_data: false`, `extensions.disjoint_enrollment.known_prior_gate_data: true`, `freeze_scope: "prospective_continuation_only"`, and one explicit `known_data_amendment_id` whose amendment truthfully records post-data filing. This does not allow unrelated post-data changes or repurpose the historical four-pointer metadata erratum.
+
+Each lineage protocol uses `{file: {path, sha256}, protocol_sha256}`. Prior gate records, session, sequence and history retain their original v5 data protocol. Prospective unobserved plans have null session/record/history bindings; their missing slots are identified by plan and sequence, without invented attempts. Observed future records require all three bindings. The canonical export retains the validated lineage in `backend_record.disjoint_protocol_lineage`; clock validity remains false and no admission is inferred from packaging. The protocol pins the certificate; the runtime lineage binds the protocol, avoiding a circular protocol-to-lineage hash dependency.
+
+The exact separately charged p186379 target0 route supports only its pinned one-workload,18-slot,5-pair plan. It does not enter the full-cohort denominator. Existing full1260 and p739 paths and the historical metadata erratum remain separate.
+
+The default full1260 route now requires the original seven plan files. Its artifact-dependent production replay test is explicit and requires `PENCIL_ORIGINAL_PLAN_DIRECTORY`; the regular suite retains self-contained exact gate60, exact upper-gate and arbitrary-partition rejection tests. No test invokes a solver. Local validation receipts distinguish the separately executed hydrated seven-plan integration from the default suite.

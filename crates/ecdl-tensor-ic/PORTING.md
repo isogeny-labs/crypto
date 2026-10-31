@@ -82,6 +82,7 @@ Design choices:
 | `addMod`, `subMod` | `pub fn add_mod / sub_mod(a: u64, b: u64, m: u64) -> u64` (addMod must handle `a+b` overflow like Go) |
 | `powMod(a,e,m)` | `pub fn pow_mod(a: u64, e: u64, m: u64) -> u64` |
 | `invMod(a,m)` | `pub fn inv_mod(a: u64, m: u64) -> u64` |
+| `sqrtMod(a,p) (uint64,bool)` | `pub fn sqrt_mod(a: u64, p: u64) -> Option<u64>` (Tonelli–Shanks) |
 | `IsPrime(n)` | `pub fn is_prime(n: u64) -> bool` (re-exported at crate root) |
 | (new; Go `uint64(rng.Int63n(int64(n)))`) | `pub fn rand_below(rng: &mut StdRng, n: u64) -> u64` |
 
@@ -98,6 +99,7 @@ Design choices:
 | `Add(s,t)` | `fn add(&self, s: Point, t: Point) -> Point` |
 | `Mul(k,pt)` | `fn mul(&self, k: u64, pt: Point) -> Point` |
 | `Points()` | `fn points(&self) -> Vec<Point>` |
+| `WindowPoints(xBound)` | `fn window_points(&self, x_bound: u64) -> Vec<Point>` (sqrt per x) |
 | `RandomPrimeOrderCurve(rng,b)` | `fn random_prime_order_curve(rng: &mut StdRng, b: usize) -> Result<Curve>` |
 
 ### `tensor` (tensor.go)
@@ -135,15 +137,22 @@ Design choices:
 | `DecodePoint(v) (Point, bool)` | `fn decode_point(&self, v: &[bool]) -> Option<Point>` |
 | `FactorBases` | `struct FactorBases { sets: Vec<Vec<Point>>, points: Vec<Point>, index: HashMap<Point,usize>, keys: Vec<[u8;16]>, mods: Vec<u64>, affine: bool, alpha, beta, gamma, bound: Vec<u64>, p: u64 }` (all pub, `Default`) |
 | `NewFactorBases(c,m,rng)` | `fn new_factor_bases(c: &Curve, m: usize, rng: &mut StdRng) -> FactorBases` |
-| `NewAffineFactorBases` | `fn new_affine_factor_bases(c: &Curve, m: usize, rng: &mut StdRng) -> FactorBases` |
-| `(*FactorBases).list(c)` | `pub(crate) fn list(&mut self, c: &Curve)` |
+| `NewAffineFactorBases` | `fn new_affine_factor_bases(c: &Curve, m: usize, rng: &mut StdRng) -> FactorBases` (delegates to the windowed constructor with k = 0) |
+| `NewWindowedFactorBases(c,m,rng,k)` | `fn new_windowed_factor_bases(c: &Curve, m: usize, rng: &mut StdRng, k: usize) -> FactorBases` |
+| `XBound []uint64`, `WindowBits int` | `x_bound: Vec<u64>`, `window_bits: usize` |
+| `(*FactorBases).list(c)` / `listAll` / `listWindow` | `pub(crate) fn list` / `list_all` / `list_window` |
+| `WindowCandidates(c,i)` | `fn window_candidates(&self, c: &Curve, i: usize) -> Vec<Point>` |
 | `AffineHash(i,pt)` | `fn affine_hash(&self, i: usize, pt: Point) -> u64` |
 | `Member(i,pt)` | `fn member(&self, i: usize, pt: Point) -> bool` (sha2::Sha256) |
 | `RelationNetwork(c,fb,R)` | `fn relation_network(c: &Curve, fb: &FactorBases, r: Point) -> (Network, Vec<Vec<usize>>)` |
+| (new, Rust only) | `fn mitm_find_relation(c: &Curve, fb: &FactorBases, r: Point, ...) -> Option<Vec<Point>>`: meet-in-the-middle elimination order; `Solver::mitm`, `ecdldemo -mitm`; `Solver::threads` / `ecdldemo -threads N` for parallel search, disabled while `opcount::active()` |
 
 ### `linalg` (linalg.go)
-`LeftKernelVector(rows []map[int]uint64, ncols int, r uint64) ([]uint64, bool)`
--> `fn left_kernel_vector(rows: &[HashMap<usize,u64>], ncols: usize, r: u64) -> Option<Vec<u64>>`.
+
+| Go | Rust |
+|---|---|
+| `LeftKernelVector(rows []map[int]uint64, ncols int, r uint64) ([]uint64, bool)` | `fn left_kernel_vector(...) -> Option<Vec<u64>>` (dense reference, same contract) |
+| (Rust only) | `fn left_kernel_vector_sparse(...)`, used by the solver: sorted sparse rows, smallest-first pivots, deterministic |
 
 ### `solver` (solver.go)
 | Go | Rust |

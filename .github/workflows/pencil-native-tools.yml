@@ -1,6 +1,20 @@
 name: Pencil native study tools
 
 on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/pencil-native-tools.yml'
+      - 'research/pencil_large_prime_20261029/native_preparation/**'
+      - 'research/pencil_large_prime_20261029/native_canonical_export/**'
+      - 'research/pencil_large_prime_20261029/native_review_report/**'
+      - 'research/pencil_large_prime_20261029/native_price/**'
+      - 'research/pencil_large_prime_20261029/paired_export/**'
+      - 'research/pencil_large_prime_20261029/validation_inputs/**'
+      - 'research/pencil_large_prime_20261029/prepared_specs/**'
+      - 'research/pencil_large_prime_20261029/protocol_draft/first_gate_p739_infrastructure_retry_20261030/**'
+      - 'research/pencil_large_prime_20261029/validation/gate60_analysis_20261029/**'
+      - 'research/pencil_large_prime_20261029/validation/analysis_provenance_erratum_20261030/**'
   push:
     branches: [main]
     paths:
@@ -12,6 +26,9 @@ on:
       - 'research/pencil_large_prime_20261029/paired_export/**'
       - 'research/pencil_large_prime_20261029/validation_inputs/**'
       - 'research/pencil_large_prime_20261029/prepared_specs/**'
+      - 'research/pencil_large_prime_20261029/protocol_draft/first_gate_p739_infrastructure_retry_20261030/**'
+      - 'research/pencil_large_prime_20261029/validation/gate60_analysis_20261029/**'
+      - 'research/pencil_large_prime_20261029/validation/analysis_provenance_erratum_20261030/**'
   merge_group:
   workflow_dispatch:
 
@@ -46,6 +63,9 @@ jobs:
             /research/pencil_large_prime_20261029/paired_export/
             /research/pencil_large_prime_20261029/validation_inputs/
             /research/pencil_large_prime_20261029/prepared_specs/
+            /research/pencil_large_prime_20261029/protocol_draft/first_gate_p739_infrastructure_retry_20261030/
+            /research/pencil_large_prime_20261029/validation/gate60_analysis_20261029/
+            /research/pencil_large_prime_20261029/validation/analysis_provenance_erratum_20261030/
             /tools/artifacts/
             /.artifacts/
       - name: Pull store data this workflow reads (tools/artifacts)

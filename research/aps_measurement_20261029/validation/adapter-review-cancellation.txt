@@ -1,0 +1,16 @@
+Source-review boundary: validation/adapter-review-boundary-sha256.txt.
+The adapter build was cancelled with exit130 before any of its tests ran.
+Reason: code review found per-root full-base revalidation in the streaming
+adapter, while exhaustive mode validated once. No verdict is claimed for this
+interrupted build. Its private log and local source snapshot are retained.
+
+The correction gives both paths one validated, immutable RecoveryContext per
+attempt, preserving every coordinate/sign/denominator/scalar check. Existing
+find_relation already hoists that validation. Unexpected construction, solver
+or check errors now stop the execution; expected sampling/orbit failures may
+retry and remain charged. Both rho and APS reference/control pairs now appear
+in the development specs. The fresh final inputs are pinned separately.
+
+Environment reconnect closed the terminal-backed Conductor session. The same
+T-9 was natively returned to ready and reclaimed at epoch3 using a nonterminal
+wrapper. No task was marked complete. No S3 checkpoint or benchmark ran.

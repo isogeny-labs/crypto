@@ -370,9 +370,12 @@ crypto dataset export --out /work/restored-dataset \
   --destination /work/dataset-training-001
 ```
 
-Export replays sealed cells and writes `features.jsonl`,
-`restricted/targets.jsonl`, `restricted/index.jsonl` and `manifest.json`.
-It performs no remote download. Only `features.jsonl` is model input; targets
+The v6 implementation replays sealed cells and writes `features.jsonl`,
+`prefix-features.jsonl`, `algebraic-features.jsonl`, `restricted/targets.jsonl`,
+`restricted/index.jsonl`, `restricted/prefix-records.jsonl`,
+`restricted/algebraic-records.jsonl` and `manifest.json`.
+It performs no remote download. Only the three feature files are eligible model
+inputs; targets
 contain known-answer and recovered scalars, solver labels and certificate
 references, while the restricted index retains source manifests and artifact
 references. Keep the restricted directory access controls when copying it.
@@ -398,8 +401,11 @@ Use a separate destination outside the source tree. Export refuses the source
 root, its ancestors and paths inside `cells/`, and rejects symlink ancestors.
 Exports are immutable snapshots: identical retries verify existing bytes; a
 changed source or export policy requires a fresh destination. The current
-policy is `strict-structural-allowlist-v4`; its domain-aware feature identities
-must not be mixed with earlier export identities without regeneration.
+implemented policy is `strict-structural-allowlist-v6`. It adds the consequence
+input file while retaining the static and branch input identity rules. Keep
+historical v5 exports immutable; use a new destination for v6 and verify the
+manifest policy before selecting model inputs. Completed source-bound software
+validation is recorded in the [consequence implementation status](../../research/ml_dataset_algebraic_targets_20261030/STATUS.md).
 
 Prime-chain recursive events and termination records stay in restricted
 artifacts/provenance. The v4 exporter adds a `prime-chain-graph/v1` static equation
@@ -410,12 +416,71 @@ a graph-size refusal retains restricted provenance with no generic feature
 fallback; malformed input fails export. Earlier v3 snapshots stay unchanged.
 Source `1565b1fecd7` passed full-library, strict-lint and actual-CLI checks; see
 [retained software evidence](../../research/ml_dataset_20261028/validation-prime-graph-20261029/README.md).
-A future decision-prefix view must remove future bases, branches,
-lift results and other information unavailable at its declared decision time.
+The new v5 prefix path is implemented with validation in progress. It certifies
+both polynomial-ideal containments, reconstructs recursive specializations and
+legal iterators, and projects the state before each observed branch. It excludes
+future bases, branches, lift results and source identifiers. Restricted prefix
+records retain explicit certificates, observed actions, joins, cuts and bounded
+unknown suffixes. The public action domain describes the remaining iterator;
+labels do not establish an optimal policy. Root completeness and semantic state
+certificates do not verify all native operations, a complete Groebner basis or
+instruction totals. See [contract and limits](PREFIX-REPLAY-CERTIFICATES.md).
 
-The current export contains structural routing inputs and static prime-chain
-equations. Sequential solver policy views still need a separate projection of
-admissible prefix states.
+The v6 consequence task is `prime-polynomial-consequence/v1`. Its public rows
+contain the initial public projection, ordinary polynomial ring, active original
+variables, fixed bindings and the pre-native source equation graph. Field values
+are decimal strings. Multiple targets from the same context share a feature
+identity. `restricted/algebraic-records.jsonl` contains the target equation graph,
+generator-multiple proof, direct identity audit, source joins and nullable degree
+labels. A model may propose polynomial consequences and multiplier witnesses;
+every proposal still needs exact identity replay. Targets, costs and provenance
+must not be concatenated into model inputs.
+
+Consequence extraction currently accepts only retained native prime-chain nodes
+whose two ideal containments have already been certified, with m=3..15 and
+p<2^32. It directly checks each identity `g = sum(c_i X^a_i F[j_i])` using the
+pre-native system F. The searched representation is not a witness of the native
+F4 operations. A failed whole-node equality search supplies no consequence rows;
+this increment does not recover individual provable rows from that failure.
+The lower-level identity API supports p<2^62, including p=2^61-1, but that does
+not extend the recursive adapter's supported domain.
+
+Nonzero verified targets produce public feature occurrences and restricted
+labels. Zero targets remain restricted with null result degree and no degree-drop
+claim. A cap produces a restricted unknown-suffix record with no certified target
+or proof and no new feature occurrence; earlier admitted rows remain. Unknowns
+are not negative algebraic examples. The channel has separate cumulative limits
+of 10,000,000 direct coefficient operations, 4,096 examined target rows and 64 MiB
+of serialized feature/record payload before sorter envelopes and deduplication.
+Its terminal record has a separate 4 KiB limit. Censoring this channel leaves
+branch replay under its existing budget. These are bounded data structures and
+counted operations, not a whole-process memory or native-instruction guarantee.
+
+The restricted `witnessed_degree_drop` label compares the nonzero target degree
+with the largest nonzero generator-multiple summand in its checked representation;
+zero generators cannot inflate that degree. It establishes neither a minimum
+derivation degree nor exact first/last fall degree or closure completeness.
+Identity work counts direct multiplication and accumulation. The referenced
+node equality work includes both search and prior identity checking and is
+shared across target rows; do not sum it once per target. Neither counter is a
+counterfactual policy cost. See the [frozen consequence contract](../../research/ml_dataset_algebraic_targets_20261030/CONTRACT.md).
+
+The v6 runtime passed254 scoped dataset tests, strict maintained Clippy, a release
+build and5459 full library tests (0 failed,123 ignored). Its actual CLI fixture
+passed curve/twist export and immutable retry, all three input files, restricted
+joins/counts, unchanged static/branch feature bytes and corruption rejection.
+Failed earlier attempts remain preserved. See the implementation status for exact
+runtime, fixture and validation revisions; later main changes are outside this
+validation. Earlier v4/v5 evidence validates only its recorded source.
+Native re-export checks direct identities again; it is not an independent
+implementation or a standalone validator for externally supplied consequence
+records. No new scientific samples or cloud cells are established here.
+
+The current source contains structural routing inputs, static prime-chain
+equations, causal recursive prefixes and this bounded consequence channel.
+Broader sequential solver policy views, held-out training and efficacy validation
+remain open. These additions do not reduce the requested Koblitz/binary/prime,
+curve/twist, n=23..31 and 47..61, p=2^61-1, m=2..15 campaign.
 Keep answers, future pivots, recovered logs, construction seeds and
 future conflict clauses in the target/restricted partition. Group equivalent
 presentations, signs, Frobenius orbits, generators, twists and related cases in
@@ -463,3 +528,14 @@ not establish worker access or replace a real producer-to-S3-to-consumer replay.
 The first durable producer cell must be restored into an isolated directory and
 checked by both the native producer and that independent consumer before any
 broader scientific claim or training acceptance.
+
+
+## Merged polynomial-consequence validation, 2026-10-30
+
+PR2964's merged sourcea5343597d835 passed264 dataset tests, strict maintained
+Clippy, release binary build, retained curve/twist CLI exports/retries and full
+serialized library tests (5537 passed,0failed,123ignored). Source checks before
+and after every phase matched inventory03. The14 phase/pipeline/binary/CLI
+artifacts have fresh S3 readback records in
+research/ml_dataset_algebraic_targets_20261030/attempt-05-readback.json.
+These are software checks on retained synthetic fixtures; cloudcells remain0.

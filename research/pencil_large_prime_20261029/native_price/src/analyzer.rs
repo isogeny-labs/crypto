@@ -68,8 +68,13 @@ fn sum(v: &Value, prefix: &str, keys: &[&str]) -> Result<u128, String> {
         .try_fold(0, |a, k| plus(a, n(v, &format!("{prefix}/{k}"))?))
 }
 fn expected(v: &Value) -> Result<Expected, String> {
+    let session = match v.get("session") {
+        Some(Value::String(value)) => Some(value.clone()),
+        Some(Value::Null) => None,
+        _ => return Err("missing string or null /session".into()),
+    };
     Ok(Expected {
-        session: text(v, "/session")?.into(),
+        session,
         binary_sha256: text(v, "/binary_sha256")?.into(),
         seq: n(v, "/seq")?.try_into().map_err(|_| "seq overflow")?,
         round: n(v, "/round")?.try_into().map_err(|_| "round overflow")?,

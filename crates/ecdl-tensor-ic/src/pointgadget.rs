@@ -162,6 +162,11 @@ impl Builder {
             &(-BigInt::from(fb.gamma[i])),
         );
         self.range_check(ar, &h, &bi64(fb.bound[i]), false);
+        if !fb.x_bound.is_empty() {
+            // Compact coordinate constraint: x < x_bound[i], a block-level
+            // compare chain of degree O(t) that reads only x.
+            self.range_check(ar, &pt.x, &bi64(fb.x_bound[i]), false);
+        }
     }
 
     /// CompleteAdd defines P3 = P1 + P2 for every input, including the
@@ -338,7 +343,11 @@ pub fn gadget_relation_network(
             y: b.field_var(ar, "y"),
             inf: None,
         };
-        let set = set.clone();
+        let set = if fb.x_bound.is_empty() {
+            set.clone()
+        } else {
+            fb.window_candidates(c, i)
+        };
         b.hint(&[], &[pt.x.clone(), pt.y.clone()], move |_| {
             set.iter().map(|q| vec![bi64(q.x), bi64(q.y)]).collect()
         });

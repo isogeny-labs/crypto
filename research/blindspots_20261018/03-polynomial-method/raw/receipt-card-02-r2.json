@@ -1,0 +1,428 @@
+{
+  "card_id": "CARD-BLINDSPOT-03-02-r2",
+  "card_path": "research/blindspots_20261018/03-polynomial-method/card-02-r2.yaml",
+  "card_sha256": "43b5623c2875faad937bf28a15e8e0f7cf4b769683261f593e07a6f8f534cf56",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-03-r2/c02"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-build-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-03-r2/c02/b03",
+        "examples/blindspots_03_polynomial_method.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 4.964,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build-b03",
+      "index": 2,
+      "outputs": {},
+      "seconds": 4.964,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-03-r2/c02/b03",
+        "fes",
+        "--draws",
+        "research/blindspots_20261018/03-polynomial-method/draws.tsv",
+        "--cell",
+        "c13-6-2",
+        "--targets",
+        "0-7",
+        "--random",
+        "8"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fes-c13-6-2",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "41d434ecb4d1a133f1ca613215b59011f7207f9e23de917bba43d867f324103e",
+      "stdout_tail": [
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c13-6-2\",\"target\":0,\"N\":12,\"E\":13,\"d\":2,\"sols\":0,\"bitops\":114679,\"log2\":16.807242,\"ms\":0.015392,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c13-6-2\",\"target\":1,\"N\":12,\"E\":13,\"d\":2,\"sols\":0,\"bitops\":114690,\"log2\":16.807380,\"ms\":0.014996,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c13-6-2\",\"target\":2,\"N\":12,\"E\":13,\"d\":2,\"sols\":0,\"bitops\":114680,\"log2\":16.807254,\"ms\":0.015022,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c13-6-2\",\"target\":3,\"N\":12,\"E\":13,\"d\":2,\"sols\":0,\"bitops\":114658,\"log2\":16.806977,\"ms\":0.014451,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c13-6-2\",\"target\":4,\"N\":12,\"E\":13,\"d\":2,\"sols\":0,\"bitops\":114784,\"log2\":16.808562,\"ms\":0.014247,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c13-6-2\",\"target\":5,\"N\":12,\"E\":13,\"d\":2,\"sols\":0,\"bitops\":114722,\"log2\":16.807783,\"ms\":0.014531,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c13-6-2\",\"target\":6,\"N\":12,\"E\":13,\"d\":2,\"sols\":0,\"bitops\":114659,\"log2\":16.806990,\"ms\":0.014556,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c13-6-2\",\"target\":7,\"N\":12,\"E\":13,\"d\":2,\"sols\":0,\"bitops\":114448,\"log2\":16.804333,\"ms\":0.014520,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c13-6-2\",\"target\":0,\"N\":12,\"E\":13,\"d\":2,\"sols\":0,\"bitops\":114505,\"log2\":16.805051,\"ms\":0.014794,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c13-6-2\",\"target\":1,\"N\":12,\"E\":13,\"d\":2,\"sols\":2,\"bitops\":114593,\"log2\":16.806159,\"ms\":0.013905,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c13-6-2\",\"target\":2,\"N\":12,\"E\":13,\"d\":2,\"sols\":0,\"bitops\":114650,\"log2\":16.806877,\"ms\":0.014297,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c13-6-2\",\"target\":3,\"N\":12,\"E\":13,\"d\":2,\"sols\":1,\"bitops\":114608,\"log2\":16.806348,\"ms\":0.014042,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c13-6-2\",\"target\":4,\"N\":12,\"E\":13,\"d\":2,\"sols\":0,\"bitops\":114790,\"log2\":16.808637,\"ms\":0.014232,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c13-6-2\",\"target\":5,\"N\":12,\"E\":13,\"d\":2,\"sols\":0,\"bitops\":114724,\"log2\":16.807808,\"ms\":0.014268,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c13-6-2\",\"target\":6,\"N\":12,\"E\":13,\"d\":2,\"sols\":1,\"bitops\":114731,\"log2\":16.807896,\"ms\":0.013991,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c13-6-2\",\"target\":7,\"N\":12,\"E\":13,\"d\":2,\"sols\":0,\"bitops\":114605,\"log2\":16.806310,\"ms\":0.013951,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-03-r2/c02/b03",
+        "fes",
+        "--draws",
+        "research/blindspots_20261018/03-polynomial-method/draws.tsv",
+        "--cell",
+        "c17-8-2",
+        "--targets",
+        "0-7",
+        "--random",
+        "8"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.01,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fes-c17-8-2",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.01,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a838aec26eb5825414de87df12942d3fb2a50e0a9a706c0eb9956a1655cc615b",
+      "stdout_tail": [
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c17-8-2\",\"target\":0,\"N\":16,\"E\":17,\"d\":2,\"sols\":0,\"bitops\":2360084,\"log2\":21.170407,\"ms\":0.242459,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c17-8-2\",\"target\":1,\"N\":16,\"E\":17,\"d\":2,\"sols\":0,\"bitops\":2359980,\"log2\":21.170343,\"ms\":0.206097,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c17-8-2\",\"target\":2,\"N\":16,\"E\":17,\"d\":2,\"sols\":0,\"bitops\":2359364,\"log2\":21.169967,\"ms\":0.182618,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c17-8-2\",\"target\":3,\"N\":16,\"E\":17,\"d\":2,\"sols\":0,\"bitops\":2358821,\"log2\":21.169635,\"ms\":0.199253,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c17-8-2\",\"target\":4,\"N\":16,\"E\":17,\"d\":2,\"sols\":0,\"bitops\":2359362,\"log2\":21.169965,\"ms\":0.139433,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c17-8-2\",\"target\":5,\"N\":16,\"E\":17,\"d\":2,\"sols\":0,\"bitops\":2358684,\"log2\":21.169551,\"ms\":0.141755,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c17-8-2\",\"target\":6,\"N\":16,\"E\":17,\"d\":2,\"sols\":0,\"bitops\":2359108,\"log2\":21.169810,\"ms\":0.204566,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c17-8-2\",\"target\":7,\"N\":16,\"E\":17,\"d\":2,\"sols\":0,\"bitops\":2359741,\"log2\":21.170197,\"ms\":0.202133,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c17-8-2\",\"target\":0,\"N\":16,\"E\":17,\"d\":2,\"sols\":0,\"bitops\":2359109,\"log2\":21.169811,\"ms\":0.191231,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c17-8-2\",\"target\":1,\"N\":16,\"E\":17,\"d\":2,\"sols\":0,\"bitops\":2359589,\"log2\":21.170104,\"ms\":0.170654,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c17-8-2\",\"target\":2,\"N\":16,\"E\":17,\"d\":2,\"sols\":0,\"bitops\":2359249,\"log2\":21.169896,\"ms\":0.164335,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c17-8-2\",\"target\":3,\"N\":16,\"E\":17,\"d\":2,\"sols\":0,\"bitops\":2359684,\"log2\":21.170162,\"ms\":0.212176,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c17-8-2\",\"target\":4,\"N\":16,\"E\":17,\"d\":2,\"sols\":0,\"bitops\":2359231,\"log2\":21.169885,\"ms\":0.143186,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c17-8-2\",\"target\":5,\"N\":16,\"E\":17,\"d\":2,\"sols\":0,\"bitops\":2359302,\"log2\":21.169929,\"ms\":0.138833,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c17-8-2\",\"target\":6,\"N\":16,\"E\":17,\"d\":2,\"sols\":1,\"bitops\":2359476,\"log2\":21.170035,\"ms\":0.150934,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c17-8-2\",\"target\":7,\"N\":16,\"E\":17,\"d\":2,\"sols\":0,\"bitops\":2359354,\"log2\":21.169960,\"ms\":0.139248,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-03-r2/c02/b03",
+        "fes",
+        "--draws",
+        "research/blindspots_20261018/03-polynomial-method/draws.tsv",
+        "--cell",
+        "c21-10-2",
+        "--targets",
+        "0-7",
+        "--random",
+        "8"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.054,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fes-c21-10-2",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.054,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a841a3fd544d7f448ccda6580422486fff13cd05b816dbc3dfabfc1143cb58d5",
+      "stdout_tail": [
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c21-10-2\",\"target\":0,\"N\":20,\"E\":21,\"d\":2,\"sols\":0,\"bitops\":46139966,\"log2\":25.459514,\"ms\":2.773102,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c21-10-2\",\"target\":1,\"N\":20,\"E\":21,\"d\":2,\"sols\":0,\"bitops\":46138312,\"log2\":25.459462,\"ms\":4.013995,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c21-10-2\",\"target\":2,\"N\":20,\"E\":21,\"d\":2,\"sols\":0,\"bitops\":46134925,\"log2\":25.459356,\"ms\":2.902724,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c21-10-2\",\"target\":3,\"N\":20,\"E\":21,\"d\":2,\"sols\":0,\"bitops\":46139144,\"log2\":25.459488,\"ms\":2.587577,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c21-10-2\",\"target\":4,\"N\":20,\"E\":21,\"d\":2,\"sols\":0,\"bitops\":46137951,\"log2\":25.459451,\"ms\":2.458292,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c21-10-2\",\"target\":5,\"N\":20,\"E\":21,\"d\":2,\"sols\":0,\"bitops\":46136468,\"log2\":25.459404,\"ms\":2.554565,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c21-10-2\",\"target\":6,\"N\":20,\"E\":21,\"d\":2,\"sols\":0,\"bitops\":46137177,\"log2\":25.459426,\"ms\":2.305049,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c21-10-2\",\"target\":7,\"N\":20,\"E\":21,\"d\":2,\"sols\":0,\"bitops\":46138838,\"log2\":25.459478,\"ms\":2.472871,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c21-10-2\",\"target\":0,\"N\":20,\"E\":21,\"d\":2,\"sols\":1,\"bitops\":46135371,\"log2\":25.459370,\"ms\":2.397734,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c21-10-2\",\"target\":1,\"N\":20,\"E\":21,\"d\":2,\"sols\":0,\"bitops\":46137641,\"log2\":25.459441,\"ms\":2.536596,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c21-10-2\",\"target\":2,\"N\":20,\"E\":21,\"d\":2,\"sols\":0,\"bitops\":46138004,\"log2\":25.459452,\"ms\":2.567356,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c21-10-2\",\"target\":3,\"N\":20,\"E\":21,\"d\":2,\"sols\":1,\"bitops\":46137811,\"log2\":25.459446,\"ms\":2.464486,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c21-10-2\",\"target\":4,\"N\":20,\"E\":21,\"d\":2,\"sols\":0,\"bitops\":46138917,\"log2\":25.459481,\"ms\":2.290009,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c21-10-2\",\"target\":5,\"N\":20,\"E\":21,\"d\":2,\"sols\":0,\"bitops\":46135476,\"log2\":25.459373,\"ms\":2.453628,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c21-10-2\",\"target\":6,\"N\":20,\"E\":21,\"d\":2,\"sols\":0,\"bitops\":46137666,\"log2\":25.459442,\"ms\":2.456120,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c21-10-2\",\"target\":7,\"N\":20,\"E\":21,\"d\":2,\"sols\":1,\"bitops\":46138675,\"log2\":25.459473,\"ms\":2.539247,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-03-r2/c02/b03",
+        "fes",
+        "--draws",
+        "research/blindspots_20261018/03-polynomial-method/draws.tsv",
+        "--cell",
+        "c25-12-2",
+        "--targets",
+        "0-7",
+        "--random",
+        "8"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.685,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fes-c25-12-2",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.685,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "d39bfd7e10fcb99e593388a4369d741cf69141d9953ab6ef4b8f83abf601f18e",
+      "stdout_tail": [
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c25-12-2\",\"target\":0,\"N\":24,\"E\":25,\"d\":2,\"sols\":0,\"bitops\":872434654,\"log2\":29.700472,\"ms\":51.187644,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c25-12-2\",\"target\":1,\"N\":24,\"E\":25,\"d\":2,\"sols\":0,\"bitops\":872431822,\"log2\":29.700467,\"ms\":38.244860,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c25-12-2\",\"target\":2,\"N\":24,\"E\":25,\"d\":2,\"sols\":0,\"bitops\":872401064,\"log2\":29.700416,\"ms\":37.716977,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c25-12-2\",\"target\":3,\"N\":24,\"E\":25,\"d\":2,\"sols\":0,\"bitops\":872424890,\"log2\":29.700456,\"ms\":37.478639,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c25-12-2\",\"target\":4,\"N\":24,\"E\":25,\"d\":2,\"sols\":0,\"bitops\":872398586,\"log2\":29.700412,\"ms\":36.681359,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c25-12-2\",\"target\":5,\"N\":24,\"E\":25,\"d\":2,\"sols\":0,\"bitops\":872410860,\"log2\":29.700432,\"ms\":37.047805,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c25-12-2\",\"target\":6,\"N\":24,\"E\":25,\"d\":2,\"sols\":0,\"bitops\":872426513,\"log2\":29.700458,\"ms\":37.888157,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c25-12-2\",\"target\":7,\"N\":24,\"E\":25,\"d\":2,\"sols\":0,\"bitops\":872405791,\"log2\":29.700424,\"ms\":37.361985,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c25-12-2\",\"target\":0,\"N\":24,\"E\":25,\"d\":2,\"sols\":1,\"bitops\":872406418,\"log2\":29.700425,\"ms\":38.572008,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c25-12-2\",\"target\":1,\"N\":24,\"E\":25,\"d\":2,\"sols\":0,\"bitops\":872414421,\"log2\":29.700438,\"ms\":36.624383,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c25-12-2\",\"target\":2,\"N\":24,\"E\":25,\"d\":2,\"sols\":0,\"bitops\":872410708,\"log2\":29.700432,\"ms\":39.373097,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c25-12-2\",\"target\":3,\"N\":24,\"E\":25,\"d\":2,\"sols\":0,\"bitops\":872416463,\"log2\":29.700442,\"ms\":39.765171,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c25-12-2\",\"target\":4,\"N\":24,\"E\":25,\"d\":2,\"sols\":0,\"bitops\":872421332,\"log2\":29.700450,\"ms\":37.751678,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c25-12-2\",\"target\":5,\"N\":24,\"E\":25,\"d\":2,\"sols\":1,\"bitops\":872425852,\"log2\":29.700457,\"ms\":83.229389,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c25-12-2\",\"target\":6,\"N\":24,\"E\":25,\"d\":2,\"sols\":0,\"bitops\":872403819,\"log2\":29.700421,\"ms\":38.304331,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c25-12-2\",\"target\":7,\"N\":24,\"E\":25,\"d\":2,\"sols\":0,\"bitops\":872417390,\"log2\":29.700443,\"ms\":37.997034,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-03-r2/c02/b03",
+        "fes",
+        "--draws",
+        "research/blindspots_20261018/03-polynomial-method/draws.tsv",
+        "--cell",
+        "c29-14-2",
+        "--targets",
+        "0-7",
+        "--random",
+        "8"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 12.064,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fes-c29-14-2",
+      "index": 7,
+      "outputs": {},
+      "seconds": 12.064,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "455604118fdd88dad7d8d4848c9dec5dc96b69b02f648ebe20e9441ac4197fcb",
+      "stdout_tail": [
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c29-14-2\",\"target\":0,\"N\":28,\"E\":29,\"d\":2,\"sols\":0,\"bitops\":16106078408,\"log2\":33.906886,\"ms\":595.563170,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c29-14-2\",\"target\":1,\"N\":28,\"E\":29,\"d\":2,\"sols\":0,\"bitops\":16106118025,\"log2\":33.906890,\"ms\":742.141289,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c29-14-2\",\"target\":2,\"N\":28,\"E\":29,\"d\":2,\"sols\":0,\"bitops\":16106090564,\"log2\":33.906887,\"ms\":643.195269,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c29-14-2\",\"target\":3,\"N\":28,\"E\":29,\"d\":2,\"sols\":0,\"bitops\":16106167134,\"log2\":33.906894,\"ms\":746.482214,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c29-14-2\",\"target\":4,\"N\":28,\"E\":29,\"d\":2,\"sols\":0,\"bitops\":16106097932,\"log2\":33.906888,\"ms\":765.155373,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c29-14-2\",\"target\":5,\"N\":28,\"E\":29,\"d\":2,\"sols\":0,\"bitops\":16106139520,\"log2\":33.906892,\"ms\":781.800815,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c29-14-2\",\"target\":6,\"N\":28,\"E\":29,\"d\":2,\"sols\":0,\"bitops\":16106133878,\"log2\":33.906891,\"ms\":619.024313,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c29-14-2\",\"target\":7,\"N\":28,\"E\":29,\"d\":2,\"sols\":0,\"bitops\":16106148136,\"log2\":33.906892,\"ms\":949.508243,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c29-14-2\",\"target\":0,\"N\":28,\"E\":29,\"d\":2,\"sols\":0,\"bitops\":16106134203,\"log2\":33.906891,\"ms\":816.422688,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c29-14-2\",\"target\":1,\"N\":28,\"E\":29,\"d\":2,\"sols\":1,\"bitops\":16106117929,\"log2\":33.906890,\"ms\":572.654442,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c29-14-2\",\"target\":2,\"N\":28,\"E\":29,\"d\":2,\"sols\":0,\"bitops\":16106086008,\"log2\":33.906887,\"ms\":591.893101,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c29-14-2\",\"target\":3,\"N\":28,\"E\":29,\"d\":2,\"sols\":0,\"bitops\":16106111269,\"log2\":33.906889,\"ms\":657.259590,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c29-14-2\",\"target\":4,\"N\":28,\"E\":29,\"d\":2,\"sols\":0,\"bitops\":16106105992,\"log2\":33.906889,\"ms\":756.961591,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c29-14-2\",\"target\":5,\"N\":28,\"E\":29,\"d\":2,\"sols\":0,\"bitops\":16106144886,\"log2\":33.906892,\"ms\":995.989941,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c29-14-2\",\"target\":6,\"N\":28,\"E\":29,\"d\":2,\"sols\":0,\"bitops\":16106121085,\"log2\":33.906890,\"ms\":1016.877915,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c29-14-2\",\"target\":7,\"N\":28,\"E\":29,\"d\":2,\"sols\":0,\"bitops\":16106114515,\"log2\":33.906889,\"ms\":772.571313,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-03-r2/c02/b03",
+        "crossover"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 103.056,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "crossover",
+      "index": 8,
+      "outputs": {},
+      "seconds": 103.056,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "8c1f2ca457e55ef5f140afd3f411017cb9d40358fe40d29bfb90e94acf42ebf6",
+      "stdout_tail": [
+        "{\"item\":\"03\",\"kind\":\"crossover-grid\",\"N\":32,\"fes_log2\":38.087463,\"dinur_log2\":43.636811,\"dinur_sched\":\"31-4\",\"dinur_mem_log2_bits\":32.146778,\"dinur_cap43_log2\":43.636811,\"dinur_cap35_log2\":43.636811,\"lptwy_log2\":44.698263,\"lptwy_mem_log2_bits\":34.170571,\"dinur_c\":1.363650}",
+        "{\"item\":\"03\",\"kind\":\"crossover-grid\",\"N\":40,\"fes_log2\":46.392317,\"dinur_log2\":50.642420,\"dinur_sched\":\"39-5\",\"dinur_mem_log2_bits\":39.087717,\"dinur_cap43_log2\":50.642420,\"dinur_cap35_log2\":null,\"lptwy_log2\":52.325447,\"lptwy_mem_log2_bits\":41.170231,\"dinur_c\":1.266060}",
+        "{\"item\":\"03\",\"kind\":\"crossover-grid\",\"N\":48,\"fes_log2\":54.643856,\"dinur_log2\":58.052258,\"dinur_sched\":\"47-7\",\"dinur_mem_log2_bits\":45.208722,\"dinur_cap43_log2\":74.570646,\"dinur_cap35_log2\":null,\"lptwy_log2\":59.846919,\"lptwy_mem_log2_bits\":48.170072,\"dinur_c\":1.209422}",
+        "{\"item\":\"03\",\"kind\":\"crossover-grid\",\"N\":64,\"fes_log2\":71.044394,\"dinur_log2\":71.685352,\"dinur_sched\":\"63-9\",\"dinur_mem_log2_bits\":59.087468,\"dinur_cap43_log2\":null,\"dinur_cap35_log2\":null,\"lptwy_log2\":74.685773,\"lptwy_mem_log2_bits\":62.169960,\"dinur_c\":1.120084}",
+        "{\"item\":\"03\",\"kind\":\"crossover-grid\",\"N\":80,\"fes_log2\":87.357552,\"dinur_log2\":85.973920,\"dinur_sched\":\"79-13\",\"dinur_mem_log2_bits\":71.331978,\"dinur_cap43_log2\":null,\"dinur_cap35_log2\":null,\"lptwy_log2\":89.350384,\"lptwy_mem_log2_bits\":76.169933,\"dinur_c\":1.074674}",
+        "{\"item\":\"03\",\"kind\":\"crossover-grid\",\"N\":100,\"fes_log2\":107.672425,\"dinur_log2\":102.707659,\"dinur_sched\":\"99-15-9\",\"dinur_mem_log2_bits\":89.087463,\"dinur_cap43_log2\":null,\"dinur_cap35_log2\":null,\"lptwy_log2\":107.755161,\"lptwy_mem_log2_bits\":93.206592,\"dinur_c\":1.027077}",
+        "{\"item\":\"03\",\"kind\":\"crossover-grid\",\"N\":128,\"fes_log2\":136.022368,\"dinur_log2\":123.759493,\"dinur_sched\":\"127-23-15-11\",\"dinur_mem_log2_bits\":109.087463,\"dinur_cap43_log2\":null,\"dinur_cap35_log2\":null,\"lptwy_log2\":132.798863,\"lptwy_mem_log2_bits\":118.169925,\"dinur_c\":0.966871}",
+        "{\"item\":\"03\",\"kind\":\"crossover-grid\",\"N\":160,\"fes_log2\":168.339850,\"dinur_log2\":148.560183,\"dinur_sched\":\"147-31-23-15\",\"dinur_mem_log2_bits\":133.087463,\"dinur_cap43_log2\":null,\"dinur_cap35_log2\":null,\"lptwy_log2\":161.518367,\"lptwy_mem_log2_bits\":146.169925,\"dinur_c\":0.928501}",
+        "{\"item\":\"03\",\"kind\":\"crossover-grid\",\"N\":200,\"fes_log2\":208.658211,\"dinur_log2\":180.595582,\"dinur_sched\":\"154-39-29-19\",\"dinur_mem_log2_bits\":165.087463,\"dinur_cap43_log2\":null,\"dinur_cap35_log2\":null,\"lptwy_log2\":197.268548,\"lptwy_mem_log2_bits\":181.169925,\"dinur_c\":0.902978}",
+        "{\"item\":\"03\",\"kind\":\"crossover-grid\",\"N\":256,\"fes_log2\":265.011227,\"dinur_log2\":223.309625,\"dinur_sched\":\"255-59-45-31\",\"dinur_mem_log2_bits\":201.087463,\"dinur_cap43_log2\":null,\"dinur_cap35_log2\":null,\"lptwy_log2\":247.149705,\"lptwy_mem_log2_bits\":230.169925,\"dinur_c\":0.872303}",
+        "{\"item\":\"03\",\"kind\":\"crossover-grid\",\"N\":320,\"fes_log2\":329.330917,\"dinur_log2\":270.036513,\"dinur_sched\":\"319-71-55-39\",\"dinur_mem_log2_bits\":253.087463,\"dinur_cap43_log2\":null,\"dinur_cap35_log2\":null,\"lptwy_log2\":304.013621,\"lptwy_mem_log2_bits\":286.197302,\"dinur_c\":0.843864}",
+        "{\"item\":\"03\",\"kind\":\"crossover-grid\",\"N\":400,\"fes_log2\":409.651052,\"dinur_log2\":332.528659,\"dinur_sched\":\"399-89-69-49\",\"dinur_mem_log2_bits\":315.087463,\"dinur_cap43_log2\":null,\"dinur_cap35_log2\":null,\"lptwy_log2\":374.799515,\"lptwy_mem_log2_bits\":357.169925,\"dinur_c\":0.831322}",
+        "{\"item\":\"03\",\"kind\":\"crossover\",\"dinur_first_grid_N_below_fes\":80,\"dinur_first_grid_N_below_fes_mem43\":-1,\"dinur_first_grid_N_below_fes_mem35\":-1,\"lptwy_first_grid_N_below_fes\":128,\"nmax\":400}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-rf",
+        "target/blindspots-03-r2/c02"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-build-dir",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 9,
+  "commit": "d4737d55df423c113b484f04f21d052860eda4e5",
+  "dirty_after": [
+    "examples/blindspots_13_rho_negation.rs",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-build-b03.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-build-b03.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-crossover.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-crossover.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c13-6-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c13-6-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c17-8-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c17-8-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c21-10-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c21-10-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c25-12-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c25-12-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c29-14-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c29-14-2.stdout.log"
+  ],
+  "dirty_before": [
+    "examples/blindspots_13_rho_negation.rs"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}
