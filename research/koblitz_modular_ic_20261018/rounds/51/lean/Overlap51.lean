@@ -30,4 +30,27 @@ theorem localized_base_inverse {K : Type*} [CommRing K] (z q h s : K)
     _ = (z*q)*s^2 := by ring
     _ = (h*s)^2 := by rw [hz]; ring
     _ = 1 := by rw [hs]; ring
+/-- Once the actual localized maps exist and their field compatibility is
+checked,injective embeddings transfer the field inverse identities. -/
+theorem inverse_maps_of_compatible_embeddings {A B K : Type*}
+    (i : A → K) (j : B → K) (f : A → B) (g : B → A)
+    (phi psi : K → K) (hi : Function.Injective i) (hj : Function.Injective j)
+    (hleft : Function.LeftInverse psi phi)
+    (hright : Function.RightInverse psi phi)
+    (hf : ∀ a, j (f a) = phi (i a))
+    (hg : ∀ b, i (g b) = psi (j b)) :
+    Function.LeftInverse g f ∧ Function.RightInverse g f := by
+  constructor
+  · intro a
+    apply hi
+    calc
+      i (g (f a)) = psi (j (f a)) := hg (f a)
+      _ = psi (phi (i a)) := by rw [hf a]
+      _ = i a := hleft (i a)
+  · intro b
+    apply hj
+    calc
+      j (f (g b)) = phi (i (g b)) := hf (g b)
+      _ = phi (psi (j b)) := by rw [hg b]
+      _ = j b := hright (j b)
 end Overlap51
