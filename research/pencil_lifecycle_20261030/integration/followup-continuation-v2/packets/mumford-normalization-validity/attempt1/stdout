@@ -1,0 +1,30 @@
+/var/tmp/pencil-mumford-validity-20261031-v1/Validity.lean:8:7: error(lean.unknownIdentifier): Unknown identifier `degree_C_mul_X_add_C`
+/var/tmp/pencil-mumford-validity-20261031-v1/Validity.lean:11:7: error(lean.unknownIdentifier): Unknown identifier `natDegree_C_mul_X_add_C`
+/var/tmp/pencil-mumford-validity-20261031-v1/Validity.lean:14:7: error(lean.unknownIdentifier): Unknown identifier `leadingCoeff_C_mul_X_add_C`
+/var/tmp/pencil-mumford-validity-20261031-v1/Validity.lean:18:7: error(lean.unknownIdentifier): Unknown identifier `degree_C_mul`
+/var/tmp/pencil-mumford-validity-20261031-v1/Validity.lean:17:32: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+n : ℕ
+a b : K
+ha : a ≠ 0
+p : K[X]
+⊢ (C (a ^ n)⁻¹ * p.comp (affine a b)).degree = p.degree
+/var/tmp/pencil-mumford-validity-20261031-v1/Validity.lean:24:7: error(lean.unknownIdentifier): Unknown identifier `natDegree_C_mul`
+/var/tmp/pencil-mumford-validity-20261031-v1/Validity.lean:23:38: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+n : ℕ
+a b : K
+ha : a ≠ 0
+p : K[X]
+⊢ (C (a ^ n)⁻¹ * p.comp (affine a b)).natDegree = p.natDegree
+/var/tmp/pencil-mumford-validity-20261031-v1/Validity.lean:29:39: error(lean.unknownIdentifier): Unknown identifier `leadingCoeff_comp`
+/var/tmp/pencil-mumford-validity-20261031-v1/Validity.lean:27:32: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+a b : K
+ha : a ≠ 0
+u : K[X]
+hu : u.Monic
+⊢ (a ^ u.natDegree)⁻¹ * (u.comp (affine a b)).leadingCoeff = 1

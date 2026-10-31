@@ -240,6 +240,10 @@ pub struct System {
 }
 
 impl System {
+    pub fn modulus(&self) -> u64 {
+        self.modulus
+    }
+
     pub fn variables(&self) -> usize {
         self.variables
     }
@@ -509,6 +513,20 @@ pub fn solve_system(
     budget: Duration,
 ) -> Result<AlgebraReport, String> {
     solve_system_visit(system, p, degree, budget, |_| Ok(false))
+}
+
+/// Visit decoded, deduplicated coordinate sets from the existing exact-domain
+/// solver. Returning `true` requests an early stop; the report then preserves
+/// partial-enumeration status. A visitor error is propagated, never a solution.
+/// This exposes the same path used by [`find_relation`] to measurement drivers.
+pub fn visit_system(
+    system: &System,
+    p: u64,
+    degree: u32,
+    budget: Duration,
+    visitor: impl FnMut(&[u64]) -> Result<bool, String>,
+) -> Result<AlgebraReport, String> {
+    solve_system_visit(system, p, degree, budget, visitor)
 }
 
 fn solve_system_visit(
@@ -1086,6 +1104,59 @@ pub struct Recovery {
     pub b: u64,
 }
 
+/// Boundaries inside signed recovery, before the named work begins. Observers
+/// do not supply points, scalars, stopping decisions or acceptance decisions.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RecoveryPhase {
+    RelationCheck,
+    Descent,
+    Verification,
+}
+
+/// A validated, immutably borrowed base for checking many candidate sets.
+/// This gives streaming drivers the validation hoisting used by
+/// [`find_relation`], while retaining every per-candidate coordinate, sign,
+/// nonzero-denominator and scalar check. Private fields prevent constructing
+/// an unchecked context; the borrow prevents changing its base or curve.
+pub struct RecoveryContext<'a> {
+    curve: &'a FastCurve,
+    g: Pt,
+    q: Pt,
+    base: &'a LabeledBase,
+}
+
+impl<'a> RecoveryContext<'a> {
+    pub fn new(curve: &'a FastCurve, g: Pt, q: Pt, base: &'a LabeledBase) -> Result<Self, String> {
+        validate_instance(curve, g, q)?;
+        validate_base(curve, g, q, base)?;
+        Ok(Self { curve, g, q, base })
+    }
+
+    pub fn recover_observed(
+        &self,
+        sets: &[Vec<u64>],
+        mut observer: impl FnMut(RecoveryPhase),
+    ) -> Result<Option<Recovery>, String> {
+        observer(RecoveryPhase::RelationCheck);
+        recover_validated_observed(self.curve, self.g, self.q, self.base, sets, &mut observer)
+    }
+}
+
+/// [`recover`] with an opt-in phase observer. Existing recovery callers keep
+/// their algorithm and validation unchanged; clocks can account for all signs,
+/// rejected B=0 relations, modular recovery and the final scalar check.
+pub fn recover_observed(
+    curve: &FastCurve,
+    g: Pt,
+    q: Pt,
+    base: &LabeledBase,
+    sets: &[Vec<u64>],
+    mut observer: impl FnMut(RecoveryPhase),
+) -> Result<Option<Recovery>, String> {
+    observer(RecoveryPhase::RelationCheck);
+    RecoveryContext::new(curve, g, q, base)?.recover_observed(sets, observer)
+}
+
 pub fn recover(
     curve: &FastCurve,
     g: Pt,
@@ -1105,6 +1176,17 @@ fn recover_validated(
     base: &LabeledBase,
     sets: &[Vec<u64>],
 ) -> Result<Option<Recovery>, String> {
+    recover_validated_observed(curve, g, q, base, sets, &mut |_| {})
+}
+
+fn recover_validated_observed(
+    curve: &FastCurve,
+    g: Pt,
+    q: Pt,
+    base: &LabeledBase,
+    sets: &[Vec<u64>],
+    observer: &mut impl FnMut(RecoveryPhase),
+) -> Result<Option<Recovery>, String> {
     for coordinates in sets {
         if !(3..=16).contains(&coordinates.len()) {
             return Err("unsupported relation arity".into());
@@ -1119,6 +1201,7 @@ fn recover_validated(
             })
             .collect::<Result<_, _>>()?;
         for mask in 0..(1usize << (entries.len() - 1)) {
+            observer(RecoveryPhase::RelationCheck);
             let signs: Vec<i8> = (0..entries.len())
                 .map(|i| {
                     if i == 0 || mask & (1 << (i - 1)) == 0 {
@@ -1148,7 +1231,9 @@ fn recover_validated(
             if sum.is_some() || b == 0 {
                 continue;
             }
+            observer(RecoveryPhase::Descent);
             let logarithm = mul(neg(a, curve.n), inv_mod(b, curve.n), curve.n);
+            observer(RecoveryPhase::Verification);
             if curve.mul(Some(g), logarithm) != Some(q) {
                 return Err("signed point relation failed logarithm verification".into());
             }

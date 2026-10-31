@@ -1,0 +1,23 @@
+# Finite accounting review: preserved-source and run binding
+
+This write-once continuation binds the previously independent finite source audit to the instrument actually used for public synthetic mathematical workloads. It does not repeat the source author's own review: source coverage comes from `../accounting/finite-nine-category-source-audit.json`, authored by root/ci_audit, SHA-256 `28aa7c41bfc25552d9c63431671616d627fac61429b649ff4bffc1f8efba3724`. The present root/four_lead_state review checks the remaining identities and preserves that audit's nine categories, source sites, exclusions and empty uncovered-site lists. No solver or experiment was executed for this review.
+
+## Verified identity chain
+
+All 20 files in the prior post-closure root source manifest match commit `543a54b4b1c3be7052872af3ffe393a44c69a3c3`. All 17 distinct files cited by the source audit match their recorded digests at that instrument commit, except the analyzer/importer which match their separately pinned analysis commit `99b10d5c6f3f5f3fcdea8fb5a9484ac3a9ec6ff0`. Their exact source bytes are retained under source_snapshot, and source-checks.sha256 records their identities. The current checkout's rho-events file has a later test-only hash_one refactor; this review binds the original instrument source, not that changed file.
+
+The saved build receipt for workflow 40938439022 binds source543a to the static ecbench binary `a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab`, Rust1.99.1, x86_64-unknown-linux-musl, and target-cpu=x86-64. The binary at /home/ec2-user/pencil-build-40938439022/ecbench was rehashed and matches. Build-info SHA is `17b5602dd978e0484677b4b9e27b8323ceb60b01ae5bbdcf9728e578d0d352c5`; build receipt SHA is `59fd9e0e1f4573d9492bcca710b5351cd0175f788b197a7c82939e177ab1a1a1`. This is a source/build provenance binding, not an independently reproduced build.
+
+The mapper remains `eb5348c894516e9ba163740861dd1f0e58865c08a930500662e6b060f7a571d8`, policy pencil-algorithm-cost/atomic-scalar-disjoint-v1. The recorded post-data analysis-build reconciliation preserves the original pre-data build/source receipts; it does not replace a frozen binary or claim a new pre-data timestamp. Its SHA is `07e7359d4adfe9b8ab74ba19b313c534f9962f756209ea9059b9f65ac0fb3523`.
+
+## Protocol digest semantics
+
+The untouched frozen version5 protocol is ../../protocol_draft/first_gate_p739_infrastructure_retry_20261030/protocol.json. Its full-file SHA is `7d9f3a299c8d2e39f0a7b69aaab34a922dcc192102ab8d0ee1971ab6e635efee`. Its freeze.protocol_sha256 and the observed analysis manifest both use canonical body SHA `cf8f76eadc42ff487644ea13b3392af1fd31c94e4629eecd6ad7b9a18820badb`.
+
+The protocol-body.json file in this packet is exactly the compact sorted-key JSON of that original protocol after deleting only its top-level freeze member, with no trailing newline. Reproduction: `jq -cjS 'del(.freeze)' ORIGINAL_PROTOCOL > protocol-body.json`. Its bytes hash to that canonical body SHA. Structural equality against the original with only freeze removed is checked. The original frozen full protocol remains unchanged and separately linked; this body is deliberately not represented as a complete frozen protocol. The existing analyzer checks the bytes at protocol_path against its declared protocol hash, so the review points that field to this explicitly named body rather than mislabelling the full-file hash. No analyzer, pricing formula, protocol content, observed record or instrument was changed.
+
+## Admission scope
+
+The nine reviewed categories are field arithmetic, scalar arithmetic, outer/constructor validation, setup/transfer, collection/graph/elimination, hash/RNG, source verification, metadata clone, and calibration. All original source sites are retained and hash-bound. Calibration is recorded separately and included once in the combined cost. Diagnostic aggregates are not charged on top of primitives.
+
+This closes the listed source/protocol/instrument/build identity prerequisites for the finite algorithm-price model. It does not qualify wall clocks, establish universal mathematical correctness, or price CPU instructions, allocator internals, reporting, harness or infrastructure in invented GAE units. Actual L2 isolation and A/A failures remain unchanged; wall qualification stays false. Failed infrastructure work remains separately recorded. A subsequent analyzer invocation must still validate each record, exact denominator, category observation and paired identity; this review itself provides no numerical ratio or empirical recomputation. It is authored after the run and does not pretend otherwise.

@@ -1,0 +1,346 @@
+{
+  "audit_id": "timing_boundary_audit_20261030",
+  "evidence_identity": {
+    "canonical_exporter_commit": "77765ba8b51d782aa0f32767b3e217e245a81cbd",
+    "instrument_commit": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+    "protocol": {
+      "original_path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/analysis_provenance_erratum_20261030/diagnostic-protocol-v6.json",
+      "packet_path": "source-blobs/diagnostic-protocol-v6.json",
+      "sha256": "d2ca570ce39f2effa9564576bdb6b6e16148a0a6d511eeb05c3a01565e48d948"
+    },
+    "records": {
+      "bytes": 14821156,
+      "immutable_object_key": "runs/pencil-p739-20261030-a1-epoch-1/1af573c8-a09c-4dcb-89a4-1af63e1d13e0/session/records.jsonl",
+      "immutable_object_version": "j80kl6D8Jf9k6kO82KJRl1G.fWfPCc38",
+      "ingestion_receipt": {
+        "path": "../actual_gate_results_20261030/ingestion-receipt.json",
+        "sha256": "e44bee3631fcfcd967b51bff2394dc1b2d3e5a9986f3f881e68da9c902f861a5"
+      },
+      "local_source_path": "/home/ec2-user/pencil-actual-results-20261030-a1/fresh/session/records.jsonl",
+      "rows": 1080,
+      "sha256": "9ccc07c9b55b9180af36c3b910891803dde7f4249742881a7322f748bfdb73f7"
+    },
+    "renderer_source_sha256": "063548265e73d4782eeee0f68f11084476495c5b8eb8c048dcea451712922fa9",
+    "sources": [
+      {
+        "bytes": 93743,
+        "commit": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+        "git_blob_oid_sha1": "ef172f810b4fcbe407a78b402868750f3ecbbd99",
+        "label": "instrument_record",
+        "packet_path": "source-blobs/instrument-record.rs",
+        "repository_path": "src/cryptanalysis/ecbench/record.rs",
+        "sha256": "5ebb2ecd907d4e388004e5b3db05614bbdd6c0c0e080bba9ccc7d302e621f407"
+      },
+      {
+        "bytes": 15458,
+        "commit": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+        "git_blob_oid_sha1": "355b8134f3cb64d0c735240d9b59d88771979769",
+        "label": "instrument_three_leads",
+        "packet_path": "source-blobs/instrument-three-leads.rs",
+        "repository_path": "src/cryptanalysis/ecbench/three_leads.rs",
+        "sha256": "02dd6a5e6f665e302c1ccb208f5d9810955dab195aa993714a478df6cd567716"
+      },
+      {
+        "bytes": 345878,
+        "commit": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+        "git_blob_oid_sha1": "87aff2084db53655614ac592a5b84036d16575e7",
+        "label": "instrument_methods",
+        "packet_path": "source-blobs/instrument-methods.rs",
+        "repository_path": "src/cryptanalysis/ecbench/methods.rs",
+        "sha256": "7fbffc7d81be8af034c80794c8625351dd1e6deff261533c38ea567612c161a6"
+      },
+      {
+        "bytes": 36254,
+        "commit": "77765ba8b51d782aa0f32767b3e217e245a81cbd",
+        "git_blob_oid_sha1": "2aba0eca0df1a16b4fa679688d8878f1332311f4",
+        "label": "canonical_exporter",
+        "packet_path": "source-blobs/canonical-exporter-lib.rs",
+        "repository_path": "research/pencil_large_prime_20261029/native_canonical_export/src/lib.rs",
+        "sha256": "3ba6866c6394c9c7b87cf96f4e2c201434156fee4b15642a1aa21543e99fb5ea"
+      }
+    ]
+  },
+  "limits": [
+    "Minima, exact medians and maxima describe these 1080 retained rows only.",
+    "Warmup and measured records are both included in the displayed ranges and are counted separately.",
+    "No confidence interval, significance test, speed ratio or performance verdict is computed.",
+    "The packet audits source semantics and retained observations; it is not an independent mathematical proof or timing qualification."
+  ],
+  "observed_facts": {
+    "all_outcomes_verified_and_match_target": true,
+    "arm_execution_counts": {
+      "measured_per_arm": 300,
+      "pencil": 360,
+      "rho": 360,
+      "rho_AA": 360,
+      "warmup_per_arm": 60
+    },
+    "classification": "The classifier/protocol field mismatch is observed. Separately, every rho and rho_AA method-call interval is also below the unchanged 1ms floor, so selecting that broader field alone would admit none of the 720 control rows.",
+    "protocol": {
+      "cold_call_definition": "Immediately before methods::solve invocation to immediate return before profiling dump. Includes dispatch, parameter checks, per-call algorithm/model/transfer setup, target work, in-child verification and report construction. Excludes harness workload reconstruction, harness allocator preparation, child JSON serialization and parent audit. This is full method-call cost, not full process cost.",
+      "cold_call_source": "records.jsonl time.method_call_wall_ns",
+      "online_definition": "Target-dependent window only; require checked integer sum of exactly the five declared phase clocks equal to online.wall_ns and explicit online_clock_diagnostics.error=null. Setup excluded; never substitute for cold.",
+      "online_source": "records.jsonl online.wall_ns",
+      "prose_endpoint_mismatch": {
+        "observed": true,
+        "protocol_says": "immediate return before profiling dump",
+        "selected_field_source_stops": "after instrumentation closure and methods::complete"
+      }
+    },
+    "qualified_ratios": null,
+    "source_and_protocol": {
+      "common_cold_boundary": {
+        "source": {
+          "blob": "source-blobs/instrument-record.rs",
+          "complete_line": 480,
+          "start_line": 463,
+          "stop_line": 494
+        },
+        "start": "immediately before methods::solve_measured",
+        "stop": "after nested instrumentation closes and methods::complete returns"
+      },
+      "grading_wrong_field_for_protocol_primary": {
+        "classifier_field": "time.solve_wall_ns",
+        "observed": true,
+        "protocol_primary_field": "time.method_call_wall_ns",
+        "source": {
+          "blob": "source-blobs/instrument-record.rs",
+          "classifier_line": 1187,
+          "comparison_line": 1338,
+          "floor_line": 1144
+        },
+        "threshold_ns": 1000000
+      },
+      "inner_solve_boundary": {
+        "field": "time.solve_wall_ns",
+        "source": {
+          "blob": "source-blobs/instrument-three-leads.rs",
+          "start_line": 130,
+          "stop_line": 329
+        }
+      },
+      "rho_phase_schema_mismatch": {
+        "exporter_requirement": "exactly the five index-calculus target phases for every arm",
+        "exporter_source": {
+          "blob": "source-blobs/canonical-exporter-lib.rs",
+          "rejection_line": 130,
+          "wanted_line": 119
+        },
+        "instrument_contract": "rho_solve and recovery_check where marked",
+        "instrument_source": {
+          "blob": "source-blobs/instrument-methods.rs",
+          "line": 1482
+        },
+        "observed": true
+      }
+    },
+    "timing_distributions": {
+      "pencil": {
+        "executions": 360,
+        "isolation_levels": {
+          "L2": 360
+        },
+        "matches_target": 360,
+        "measured": 300,
+        "method_call_wall_ns": {
+          "below_1ms_count": 0,
+          "count": 360,
+          "maximum": 15533131,
+          "median_exact": {
+            "denominator": 2,
+            "numerator": 28356452
+          },
+          "minimum": 7478832,
+          "unit": "ns"
+        },
+        "method_minus_solve_ns": {
+          "below_1ms_count": 0,
+          "count": 360,
+          "maximum": 1118786,
+          "median_exact": {
+            "denominator": 2,
+            "numerator": 2149980
+          },
+          "minimum": 1029004,
+          "unit": "ns"
+        },
+        "methods": [
+          "ic.three_leads_genus2_pencil_symbolic_v2"
+        ],
+        "online_phase_sets": {
+          "target_PDP,target_descent,target_query,target_recovery_check,target_relation_check": 360
+        },
+        "online_wall_ns": {
+          "below_1ms_count": 0,
+          "count": 360,
+          "maximum": 12691682,
+          "median_exact": {
+            "denominator": 2,
+            "numerator": 22717139
+          },
+          "minimum": 4677784,
+          "unit": "ns"
+        },
+        "solve_wall_ns": {
+          "below_1ms_count": 0,
+          "count": 360,
+          "maximum": 14483966,
+          "median_exact": {
+            "denominator": 2,
+            "numerator": 26213740
+          },
+          "minimum": 6412938,
+          "unit": "ns"
+        },
+        "too_short_blocker_count": 0,
+        "verified": 360,
+        "warmup": 60
+      },
+      "rho": {
+        "executions": 360,
+        "isolation_levels": {
+          "L1": 360
+        },
+        "matches_target": 360,
+        "measured": 300,
+        "method_call_wall_ns": {
+          "below_1ms_count": 360,
+          "count": 360,
+          "maximum": 512627,
+          "median_exact": {
+            "denominator": 2,
+            "numerator": 845622
+          },
+          "minimum": 368735,
+          "unit": "ns"
+        },
+        "method_minus_solve_ns": {
+          "below_1ms_count": 360,
+          "count": 360,
+          "maximum": 173062,
+          "median_exact": {
+            "denominator": 2,
+            "numerator": 315524
+          },
+          "minimum": 151352,
+          "unit": "ns"
+        },
+        "methods": [
+          "rho.three_leads_negation_v1"
+        ],
+        "online_phase_sets": {
+          "recovery_check,rho_solve": 360
+        },
+        "online_wall_ns": {
+          "below_1ms_count": 360,
+          "count": 360,
+          "maximum": 302864,
+          "median_exact": {
+            "denominator": 2,
+            "numerator": 432186
+          },
+          "minimum": 162773,
+          "unit": "ns"
+        },
+        "solve_wall_ns": {
+          "below_1ms_count": 360,
+          "count": 360,
+          "maximum": 353185,
+          "median_exact": {
+            "denominator": 2,
+            "numerator": 529178
+          },
+          "minimum": 210043,
+          "unit": "ns"
+        },
+        "too_short_blocker_count": 360,
+        "verified": 360,
+        "warmup": 60
+      },
+      "rho_AA": {
+        "executions": 360,
+        "isolation_levels": {
+          "L1": 360
+        },
+        "matches_target": 360,
+        "measured": 300,
+        "method_call_wall_ns": {
+          "below_1ms_count": 360,
+          "count": 360,
+          "maximum": 511247,
+          "median_exact": {
+            "denominator": 2,
+            "numerator": 842651
+          },
+          "minimum": 365125,
+          "unit": "ns"
+        },
+        "method_minus_solve_ns": {
+          "below_1ms_count": 360,
+          "count": 360,
+          "maximum": 168612,
+          "median_exact": {
+            "denominator": 2,
+            "numerator": 315344
+          },
+          "minimum": 150652,
+          "unit": "ns"
+        },
+        "methods": [
+          "rho.three_leads_negation_v1"
+        ],
+        "online_phase_sets": {
+          "recovery_check,rho_solve": 360
+        },
+        "online_wall_ns": {
+          "below_1ms_count": 360,
+          "count": 360,
+          "maximum": 307444,
+          "median_exact": {
+            "denominator": 2,
+            "numerator": 432026
+          },
+          "minimum": 160313,
+          "unit": "ns"
+        },
+        "solve_wall_ns": {
+          "below_1ms_count": 360,
+          "count": 360,
+          "maximum": 355514,
+          "median_exact": {
+            "denominator": 2,
+            "numerator": 527377
+          },
+          "minimum": 206513,
+          "unit": "ns"
+        },
+        "too_short_blocker_count": 360,
+        "verified": 360,
+        "warmup": 60
+      }
+    },
+    "timing_qualification": null
+  },
+  "prospective_option_not_approved": {
+    "arithmetic_only": {
+      "eight_times_observed_minimum_ns": 1282504
+    },
+    "constraints_if_reviewed": [
+      "unchanged 1ms admission floor",
+      "same exact targets, arms, controls and stream identities",
+      "fresh cold state or an independently justified reset boundary",
+      "fixed repetition count frozen before new timing data",
+      "retain every raw repetition and fail closed below threshold",
+      "one-invocation operation counts kept separate from timing amplification",
+      "method-family phase schemas with exact integer phase sums",
+      "no reinterpretation or edit of the present records or frozen protocol"
+    ],
+    "fixed_repetitions_discussed": 8,
+    "minimum_integer_repetitions_to_cross_1ms_for_that_observed_minimum": 7,
+    "non_claim": "The audit does not select, approve or authorize K=8, a new phase schema, a new grading rule, a budget or another experiment.",
+    "observed_minimum_rho_or_rho_AA_online_ns": 160313,
+    "status": "unapproved_design_candidate_requiring_new_predata_protocol_budget_and_review"
+  },
+  "schema": "pencil-timing-boundary-audit/v1",
+  "scope": "Neutral source-and-record audit of public synthetic known-answer p739 observations. No solver execution, timing qualification, cost judgment, protocol amendment or experiment approval."
+}

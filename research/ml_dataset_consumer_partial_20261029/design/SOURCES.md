@@ -1,0 +1,11 @@
+# Primary references and limitations
+
+The parent supplied this live-read literature supplement on 2026-10-29 after reviewing the internal pinned source inventory. The design author did not repeat those web reads or make any S3 API request. These references support the existing transport/filesystem requirements; they add no execution or cloud permission.
+
+- [AWS S3 GetObject API](https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html): `If-Match` conditions a GET on the object's ETag; mismatch returns HTTP412. This is a version guard. The consumer still hashes and counts the downloaded body and treats 412 as terminal for that invocation; it does not infer a content SHA256 from ETag.
+- [AWS S3 HeadObject API](https://docs.aws.amazon.com/AmazonS3/latest/API/API_HeadObject.html): HEAD returns object metadata without the object body. It cannot by itself establish that the bytes consumed by this consumer match the declared body digest. Successful admission therefore requires the fresh GET and exact-byte hash, not HEAD alone.
+- [Linux man-pages open(2)](https://man7.org/linux/man-pages/man2/open.2.html): `O_NOFOLLOW` applies to the final path component; directory-FD-relative `openat` traversal addresses ancestor-replacement races. The design requires a pinned directory descriptor and no-follow checks at every traversed component, not one final-component flag or a previous pathname scan. Open descriptors with `O_CLOEXEC` atomically so concurrent child creation cannot inherit them during a later close-on-exec setup race.
+
+The attempted POSIX Issue8 `9799919799/functions/open.html` reference returned403 to the parent; it was not used as verified supporting text. The Linux man-pages maintainer reference is the applicable primary fallback because the proposed descriptor-based implementation is Linux-scoped. Cross-platform support is explicitly not claimed.
+
+Documentation semantics do not prove the implementation obeys them. Acceptance still requires deterministic descriptor-swap/second-read tests, exact argument checks for HEAD/conditioned GET, and fault handling. Mock transport tests do not establish fresh S3 access; a local restored fixture does not establish worker S3 publication, hardware truth or platform admission.

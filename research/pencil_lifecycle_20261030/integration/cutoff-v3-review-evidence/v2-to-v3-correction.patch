@@ -1,0 +1,412 @@
+--- a/taskq/deploy/eks-karpenter/resume/controller/src/cloud.rs
++++ b/taskq/deploy/eks-karpenter/resume/controller/src/cloud.rs
+@@ -592,7 +592,33 @@
+     Ok(())
+ }
+ 
++// ObjectFieldSelector.apiVersion has the Kubernetes-documented default v1.
++// Normalize ONLY omission of that field on an actual fieldRef object. Preserve
++// every other key, value, ordering, selector, namespace and owner identity.
++fn env_with_fieldref_default(value: &Value) -> Value {
++    let mut normalized = value.clone();
++    if let Some(entries) = normalized.as_array_mut() {
++        for entry in entries {
++            if let Some(reference) = entry
++                .get_mut("valueFrom")
++                .and_then(|v| v.get_mut("fieldRef"))
++                .and_then(Value::as_object_mut)
++            {
++                reference.entry("apiVersion").or_insert_with(|| json!("v1"));
++            }
++        }
++    }
++    normalized
++}
++
+ fn computation_owner_matches(observed: &Value, intended: &Value) -> Result<(), String> {
++    if ["initContainers", "ephemeralContainers"].iter().any(|key| {
++        observed["spec"]
++            .get(*key)
++            .is_some_and(|v| !v.as_array().is_some_and(Vec::is_empty))
++    }) {
++        return Err("unexpected computation init/ephemeral container".into());
++    }
+     if observed["spec"]["hostPID"].as_bool().unwrap_or(false)
+         || observed["spec"]["shareProcessNamespace"]
+             .as_bool()
+@@ -612,7 +638,14 @@
+         "volumeMounts",
+         "securityContext",
+     ] {
+-        if observed["spec"]["containers"][0][key] != intended["spec"]["containers"][0][key] {
++        let actual = &observed["spec"]["containers"][0][key];
++        let expected = &intended["spec"]["containers"][0][key];
++        let same = if key == "env" {
++            env_with_fieldref_default(actual) == env_with_fieldref_default(expected)
++        } else {
++            actual == expected
++        };
++        if !same {
+             return Err(format!(
+                 "computation owner {key} differs from intended manifest"
+             ));
+@@ -2131,6 +2164,24 @@
+     fn matching_annotation_cannot_hide_wrong_namespace_or_owner_transport() {
+         let v = json!({"metadata":{"annotations":{"isolab.dev/worker-reservation":"a"}},"spec":{"hostPID":false,"shareProcessNamespace":false,"containers":[{"name":"supervisor","image":"pinned","command":["owner"],"env":[{"name":"ISOLAB_COMPUTATION_RESERVATION","value":"exact"}],"volumeMounts":[],"securityContext":{}}],"volumes":[]}});
+         computation_owner_matches(&v, &v).unwrap();
++        let mut selector = v.clone();
++        selector["spec"]["containers"][0]["env"][0] = json!({"name":"BINDING","valueFrom":{"fieldRef":{"fieldPath":"metadata.annotations['isolab.dev/worker-reservation']"}}});
++        let mut api_defaulted = selector.clone();
++        api_defaulted["spec"]["containers"][0]["env"][0]["valueFrom"]["fieldRef"]["apiVersion"] =
++            json!("v1");
++        computation_owner_matches(&api_defaulted, &selector).unwrap();
++        api_defaulted["spec"]["containers"][0]["env"][0]["valueFrom"]["fieldRef"]["fieldPath"] =
++            json!("metadata.name");
++        assert!(computation_owner_matches(&api_defaulted, &selector).is_err());
++
++        for key in ["initContainers", "ephemeralContainers"] {
++            let mut wrong = v.clone();
++            wrong["spec"][key] = json!([{"name":"injected","targetContainerName":"supervisor"}]);
++            assert!(computation_owner_matches(&wrong, &v).is_err());
++            wrong["spec"][key] = json!([]);
++            computation_owner_matches(&wrong, &v).unwrap();
++        }
++
+         for key in ["hostPID", "shareProcessNamespace"] {
+             let mut wrong = v.clone();
+             wrong["spec"][key] = json!(true);
+@@ -2149,3 +2200,41 @@
+         assert!(computation_owner_matches(&sidecar, &v).is_err());
+     }
+ }
++
++#[cfg(test)]
++mod fieldref_default_tests {
++    use super::*;
++    #[test]
++    fn only_omitted_fieldref_api_version_defaults_to_v1() {
++        let expected = json!([{"name":"BINDING","valueFrom":{"fieldRef":{"fieldPath":"metadata.annotations['isolab.dev/worker-reservation']"}}}]);
++        let mut defaulted = expected.clone();
++        defaulted[0]["valueFrom"]["fieldRef"]["apiVersion"] = json!("v1");
++        assert_eq!(
++            env_with_fieldref_default(&expected),
++            env_with_fieldref_default(&defaulted)
++        );
++        for wrong in [json!("v2"), Value::Null, json!("")] {
++            let mut value = defaulted.clone();
++            value[0]["valueFrom"]["fieldRef"]["apiVersion"] = wrong;
++            assert_ne!(
++                env_with_fieldref_default(&expected),
++                env_with_fieldref_default(&value)
++            );
++        }
++        let mut wrong = defaulted.clone();
++        wrong[0]["valueFrom"]["fieldRef"]["fieldPath"] = json!("metadata.name");
++        assert_ne!(
++            env_with_fieldref_default(&expected),
++            env_with_fieldref_default(&wrong)
++        );
++        let mut extra = defaulted.clone();
++        extra
++            .as_array_mut()
++            .unwrap()
++            .push(json!({"name":"OTHER","value":"x"}));
++        assert_ne!(
++            env_with_fieldref_default(&expected),
++            env_with_fieldref_default(&extra)
++        );
++    }
++}
+--- a/taskq/deploy/eks-karpenter/resume/controller/src/supervisor.rs
++++ b/taskq/deploy/eks-karpenter/resume/controller/src/supervisor.rs
+@@ -225,7 +225,7 @@
+     credentials(pid)?;
+     Ok(pid)
+ }
+-fn continue_tree(s: &Status, cutoff: Option<u64>) -> Result<(), String> {
++fn continue_tree(s: &Status, cutoff: Option<deadline::Deadline>) -> Result<(), String> {
+     let pid = live(s)?;
+     for p in tree(pid)?.iter().rev() {
+         credentials(*p)?;
+@@ -278,7 +278,7 @@
+         .map_err(error)
+ }
+ 
+-fn launch(req: &Request, s: &mut Status, cutoff: u64) -> Result<(), String> {
++fn launch(req: &Request, s: &mut Status, cutoff: deadline::Deadline) -> Result<(), String> {
+     if s.phase != "waiting" || s.attempt != 0 {
+         return Err("fresh launch is permitted once on attempt zero".into());
+     }
+@@ -377,7 +377,7 @@
+     s: &mut Status,
+     n: u64,
+     owner: &mut owner_observation::Owner,
+-    cutoff: u64,
++    cutoff: deadline::Deadline,
+ ) -> Result<(), String> {
+     // Completion can race the controller's last status read. Preserve the
+     // successful computation instead of treating this as a failed checkpoint.
+@@ -406,7 +406,7 @@
+     // epoch, deadline, or logical checkpoint identity is retried/reset.
+     let mut captured = None;
+     for capture in 1..=8 {
+-        if now() >= cutoff {
++        if deadline::check(cutoff).is_err() {
+             return Err("effective computation cutoff expired during checkpoint".into());
+         }
+         if checkpoint_completion(req, s, pid, owner)? {
+@@ -529,7 +529,7 @@
+     s: &mut Status,
+     n: u64,
+     expected: Option<&str>,
+-    cutoff: u64,
++    cutoff: deadline::Deadline,
+ ) -> Result<(), String> {
+     if s.phase != "waiting" || s.attempt == 0 {
+         return Err("restore requires a fresh replacement attempt".into());
+@@ -627,7 +627,7 @@
+     s.phase = "stopped".into();
+     Ok(())
+ }
+-fn verify(s: &mut Status, cutoff: Option<u64>) -> Result<(), String> {
++fn verify(s: &mut Status, cutoff: Option<deadline::Deadline>) -> Result<(), String> {
+     if s.phase != "completed" || s.exit_code != Some(0) {
+         return Err("successful computation required for native replay".into());
+     }
+@@ -770,8 +770,13 @@
+ }
+ 
+ pub fn supervise(req: Request, attempt: u32) -> Result<(), String> {
+-    let cutoff = cutoff_from_environment(&req, attempt)?;
+-    if req.worker_campaign.is_some() && now() >= cutoff {
++    let utc_cutoff = cutoff_from_environment(&req, attempt)?;
++    let cutoff = if req.worker_campaign.is_some() {
++        deadline::Deadline::capture(utc_cutoff)?
++    } else {
++        deadline::Deadline::utc_only(utc_cutoff)
++    };
++    if req.worker_campaign.is_some() && deadline::check(cutoff).is_err() {
+         return Err("effective computation cutoff expired before supervisor admission".into());
+     }
+     if unsafe { libc::getpid() } != 1 || unsafe { libc::geteuid() } != 0 {
+@@ -809,7 +814,7 @@
+     save(&status_path(attempt), &s)?;
+     let mut owner = owner_observation::Owner::begin();
+     loop {
+-        if now() >= cutoff {
++        if deadline::check(cutoff).is_err() {
+             if let Some(pid) = s.pid {
+                 unsafe { libc::kill(-pid, libc::SIGKILL) };
+             }
+@@ -846,7 +851,7 @@
+                 continue;
+             }
+             let op: Operation = read(&path)?;
+-            let result = if now() >= cutoff {
++            let result = if deadline::check(cutoff).is_err() {
+                 Err("effective computation cutoff expired before operation".into())
+             } else if op.request_sha256 != req.hash() || op.attempt != attempt {
+                 Err("operation request mismatch".into())
+@@ -937,7 +942,7 @@
+             &mut s,
+             1,
+             &mut owner_observation::Owner::begin(),
+-            req.deadline_unix_seconds,
++            deadline::Deadline::utc_only(req.deadline_unix_seconds),
+         )
+         .unwrap();
+         assert_eq!(s.phase, "completed");
+--- a/taskq/deploy/eks-karpenter/resume/controller/src/deadline.rs
++++ b/taskq/deploy/eks-karpenter/resume/controller/src/deadline.rs
+@@ -17,18 +17,93 @@
+         .map(|v| v.as_secs())
+         .map_err(err)
+ }
+-pub fn check(cutoff: u64) -> Result<(), String> {
+-    if now()? >= cutoff {
+-        Err("absolute computation cutoff reached".into())
+-    } else {
++fn utc_ns() -> Result<u128, String> {
++    SystemTime::now()
++        .duration_since(UNIX_EPOCH)
++        .map(|v| v.as_nanos())
++        .map_err(err)
++}
++fn monotonic_ns() -> Result<u128, String> {
++    let mut value = std::mem::MaybeUninit::<libc::timespec>::uninit();
++    if unsafe { libc::clock_gettime(libc::CLOCK_MONOTONIC, value.as_mut_ptr()) } != 0 {
++        return Err(err(std::io::Error::last_os_error()));
++    }
++    let value = unsafe { value.assume_init() };
++    let sec = u128::try_from(value.tv_sec).map_err(err)?;
++    let ns = u128::try_from(value.tv_nsec).map_err(err)?;
++    if ns >= 1_000_000_000 {
++        return Err("invalid monotonic sample".into());
++    }
++    sec.checked_mul(1_000_000_000)
++        .and_then(|v| v.checked_add(ns))
++        .ok_or_else(|| "monotonic sample overflow".into())
++}
++/// One admission anchor, copied unchanged to every command and watchdog.
++/// Monotonic cutoff is never recalculated after a UTC adjustment.
++#[derive(Clone, Copy, Debug)]
++pub struct Deadline {
++    pub utc_seconds: u64,
++    monotonic: Option<(u128, u128)>,
++}
++impl Deadline {
++    pub fn utc_only(utc_seconds: u64) -> Self {
++        Self {
++            utc_seconds,
++            monotonic: None,
++        }
++    }
++    fn from_samples(
++        utc_seconds: u64,
++        sampled_utc_ns: u128,
++        sampled_monotonic_ns: u128,
++    ) -> Result<Self, String> {
++        let utc_ns = u128::from(utc_seconds) * 1_000_000_000;
++        let remaining = utc_ns
++            .checked_sub(sampled_utc_ns)
++            .filter(|v| *v > 0)
++            .ok_or("cutoff expired at admission")?;
++        let end = sampled_monotonic_ns
++            .checked_add(remaining)
++            .ok_or("monotonic deadline overflow")?;
++        Ok(Self {
++            utc_seconds,
++            monotonic: Some((sampled_monotonic_ns, end)),
++        })
++    }
++    pub fn capture(utc_seconds: u64) -> Result<Self, String> {
++        // Sample monotonic FIRST: delay between samples shortens the allowed
++        // interval rather than extending it beyond the original UTC budget.
++        let mono = monotonic_ns()?;
++        Self::from_samples(utc_seconds, utc_ns()?, mono)
++    }
++    fn check_samples(self, utc_now_ns: u128, mono_now_ns: Option<u128>) -> Result<(), String> {
++        if utc_now_ns >= u128::from(self.utc_seconds) * 1_000_000_000 {
++            return Err("absolute UTC computation cutoff reached".into());
++        }
++        if let Some((begin, end)) = self.monotonic {
++            let now = mono_now_ns.ok_or("monotonic observation missing")?;
++            if now < begin || now >= end {
++                return Err("monotonic computation cutoff reached or clock invalid".into());
++            }
++        }
+         Ok(())
+     }
++}
++pub fn check(cutoff: Deadline) -> Result<(), String> {
++    cutoff.check_samples(
++        utc_ns()?,
++        if cutoff.monotonic.is_some() {
++            Some(monotonic_ns()?)
++        } else {
++            None
++        },
++    )
+ }
+ /// Source-only defence against a synchronous filesystem/CRIU operation bypassing
+ /// polling. Caller must be trusted root PID1 in the reviewed non-host, unshared
+ /// Pod PID namespace. This assertion is controller provenance, not attestation.
+ /// Never call from tests or a host process.
+-pub fn install_namespace_backstop(cutoff: u64, assertion: &str) -> Result<(), String> {
++pub fn install_namespace_backstop(cutoff: Deadline, assertion: &str) -> Result<(), String> {
+     if assertion != "controller-owned-private-pid-namespace/v1"
+         || unsafe { libc::getpid() } != 1
+         || unsafe { libc::geteuid() } != 0
+@@ -86,7 +161,7 @@
+ )]
+ pub fn output(
+     cmd: &mut Command,
+-    cutoff: u64,
++    cutoff: Deadline,
+     stdout: &Path,
+     stderr: &Path,
+     already_group_leader: bool,
+@@ -136,7 +211,7 @@
+             libc::kill(-pid, libc::SIGKILL);
+         }
+     }
+-    let receipt = serde_json::json!({"schema":"isolab.absolute-command-observation/v1","cutoff_unix_seconds":cutoff,"pid":pid,"reap_observed":status.is_some(),"exit_code":status.as_ref().and_then(|s|s.code()),"success":status.as_ref().is_some_and(|s|s.success()),"cutoff_kill_requested":killed.is_some(),"wait_error":wait_error,"total_active_worker_ns":null,"accepted_external_closure":null});
++    let receipt = serde_json::json!({"schema":"isolab.absolute-command-observation/v1","cutoff_unix_seconds":cutoff.utc_seconds,"pid":pid,"reap_observed":status.is_some(),"exit_code":status.as_ref().and_then(|s|s.code()),"success":status.as_ref().is_some_and(|s|s.success()),"cutoff_kill_requested":killed.is_some(),"wait_error":wait_error,"total_active_worker_ns":null,"accepted_external_closure":null});
+     let receipt_path = stderr.with_extension("command-receipt.json");
+     let publication = (|| -> Result<(), String> {
+         let mut f = retained(&receipt_path)?;
+@@ -177,7 +252,7 @@
+             cmd.args(["-c", script]);
+             let result = output(
+                 &mut cmd,
+-                now().unwrap() + 5,
++                Deadline::capture(now().unwrap() + 5).unwrap(),
+                 &dir.join(format!("{name}.out")),
+                 &dir.join(format!("{name}.err")),
+                 false,
+@@ -190,7 +265,7 @@
+         cmd.args(["-c", "printf before; sleep 10"]);
+         assert!(output(
+             &mut cmd,
+-            now().unwrap() + 1,
++            Deadline::capture(now().unwrap() + 1).unwrap(),
+             &dir.join("sleep.out"),
+             &dir.join("sleep.err"),
+             false
+@@ -207,7 +282,7 @@
+         expired.args(["-c", "exit 0"]);
+         assert!(output(
+             &mut expired,
+-            now().unwrap(),
++            Deadline::utc_only(now().unwrap()),
+             &dir.join("never.out"),
+             &dir.join("never.err"),
+             false
+@@ -217,3 +292,47 @@
+         fs::remove_dir_all(dir).unwrap();
+     }
+ }
++
++#[cfg(test)]
++mod monotonic_tests {
++    use super::*;
++    #[test]
++    fn backwards_utc_never_extends_shared_admission_anchor() {
++        let d = Deadline::from_samples(110, 100_000_000_000, 20_000_000_000).unwrap();
++        assert!(d
++            .check_samples(101_000_000_000, Some(21_000_000_000))
++            .is_ok());
++        // A backwards UTC step is allowed only while the ORIGINAL monotonic
++        // allowance remains. The same copied context is shared by all users.
++        let watchdog = d;
++        let command = d;
++        assert!(command
++            .check_samples(50_000_000_000, Some(29_999_999_999))
++            .is_ok());
++        assert!(watchdog
++            .check_samples(50_000_000_000, Some(30_000_000_000))
++            .is_err());
++        assert!(command
++            .check_samples(50_000_000_000, Some(30_000_000_000))
++            .is_err());
++        assert!(d
++            .check_samples(110_000_000_000, Some(21_000_000_000))
++            .is_err());
++        assert!(d
++            .check_samples(99_000_000_000, Some(19_000_000_000))
++            .is_err());
++        assert!(d.check_samples(101_000_000_000, None).is_err());
++        assert!(Deadline::from_samples(100, 100_000_000_000, 20).is_err());
++        assert!(Deadline::from_samples(101, 100_000_000_000, u128::MAX).is_err());
++    }
++    #[test]
++    fn fractional_admission_does_not_round_up_the_remaining_budget() {
++        let d = Deadline::from_samples(101, 100_900_000_000, 7_000_000_000).unwrap();
++        assert!(d
++            .check_samples(100_950_000_000, Some(7_099_999_999))
++            .is_ok());
++        assert!(d
++            .check_samples(80_000_000_000, Some(7_100_000_000))
++            .is_err());
++    }
++}

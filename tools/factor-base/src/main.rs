@@ -10,6 +10,8 @@ const HELP: &str = r#"factor-base: deterministic native precomputation factory
   factor-base build CONFIG STORE
   factor-base batch CONFIG_ARRAY STORE RECEIPT
   factor-base verify STORE MANIFEST_SHA256
+  factor-base decompose STORE MANIFEST_SHA256 REQUEST RECEIPT
+  factor-base replay-decomposition STORE MANIFEST_SHA256 RECEIPT
   factor-base evaluate STORE MANIFEST_SHA256 WORKLOAD RECEIPT
   factor-base replay STORE MANIFEST_SHA256 RECEIPT
   factor-base compare RECEIPT [RECEIPT ...]
@@ -76,6 +78,21 @@ fn run() -> Result<()> {
             emit(
                 &json!({"status":"replayed","manifest_sha256":a[2],"points":g.points.len(),"requirements":m.requirements,"replay_source_sha256":source_digest(),"independence":"same_native_implementation"}),
             )
+        }
+        ("decompose", 5) => {
+            let request = read_json(Path::new(&a[3]))?;
+            save(
+                &a[4],
+                &factor_base::decomposition::evaluate(Path::new(&a[1]), &a[2], &request)?,
+            )
+        }
+        ("replay-decomposition", 4) => {
+            let receipt = read_json(Path::new(&a[3]))?;
+            emit(&factor_base::decomposition::replay(
+                Path::new(&a[1]),
+                &a[2],
+                &receipt,
+            )?)
         }
         ("evaluate", 5) => {
             let w = read_json(Path::new(&a[3]))?;

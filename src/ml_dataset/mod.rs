@@ -2080,6 +2080,22 @@ fn unix_nanos() -> Result<u128, String> {
 }
 
 #[cfg(target_os = "linux")]
+fn process_entry<T>(pid: u32, result: std::io::Result<T>) -> Result<Option<T>, String> {
+    match result {
+        Ok(value) => Ok(Some(value)),
+        // Linux proc_pid_cmdline_read returns ESRCH if the task exits after
+        // directory enumeration. It is as absent as an unlinked proc entry.
+        Err(error)
+            if error.kind() == std::io::ErrorKind::NotFound
+                || error.raw_os_error() == Some(libc::ESRCH) =>
+        {
+            Ok(None)
+        }
+        Err(error) => Err(format!("cannot inspect process {pid}: {error}")),
+    }
+}
+
+#[cfg(target_os = "linux")]
 fn assert_no_workers(root: &Path) -> Result<(), String> {
     let root = checked_directory(root, false)?;
     // A worker's external descendants may outlive a supervisor killed before
@@ -2102,7 +2118,9 @@ fn assert_no_workers(root: &Path) -> Result<(), String> {
             ));
         }
     }
-    for entry in fs::read_dir("/proc").map_err(|e| format!("cannot inspect live workers: {e}"))? {
+    'processes: for entry in
+        fs::read_dir("/proc").map_err(|e| format!("cannot inspect live workers: {e}"))?
+    {
         let entry = entry.map_err(|e| e.to_string())?;
         let Some(pid) = entry
             .file_name()
@@ -2117,18 +2135,14 @@ fn assert_no_workers(root: &Path) -> Result<(), String> {
         // Workers execute under this account. Permission errors inspecting a
         // same-user process fail closed instead of assuming it has exited.
         use std::os::unix::fs::MetadataExt;
-        let metadata = match entry.metadata() {
-            Ok(m) => m,
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,
-            Err(e) => return Err(e.to_string()),
+        let Some(metadata) = process_entry(pid, entry.metadata())? else {
+            continue;
         };
         if metadata.uid() != unsafe { libc::geteuid() } {
             continue;
         }
-        let command = match fs::read(entry.path().join("cmdline")) {
-            Ok(value) => value,
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,
-            Err(e) => return Err(format!("cannot inspect process {pid}: {e}")),
+        let Some(command) = process_entry(pid, fs::read(entry.path().join("cmdline")))? else {
+            continue;
         };
         let args: Vec<_> = command
             .split(|b| *b == 0)
@@ -2149,9 +2163,10 @@ fn assert_no_workers(root: &Path) -> Result<(), String> {
             let resolved = if path.is_absolute() {
                 path.to_path_buf()
             } else {
-                fs::read_link(entry.path().join("cwd"))
-                    .map_err(|e| format!("cannot resolve worker {pid} cwd: {e}"))?
-                    .join(path)
+                let Some(cwd) = process_entry(pid, fs::read_link(entry.path().join("cwd")))? else {
+                    continue 'processes;
+                };
+                cwd.join(path)
             };
             let resolved = resolved
                 .canonicalize()
@@ -2495,12 +2510,6 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     telemetry::checked::verify_artifacts(dir, &manifest.artifacts)?;
     verify_capture_context(dir, &manifest.artifacts)?;
     execution::verify(dir, &manifest.artifacts)?;
-    solvers::verify_prime_f4_wide(
-        dir,
-        &manifest.config,
-        &manifest.outcome,
-        &manifest.artifacts,
-    )?;
     for required in [
         "config.json",
         "run.json",
@@ -2522,6 +2531,13 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     {
         return Err("cell provenance differs from frozen plan".into());
     }
+    // Bind the original cell before admitting any specialized replay claim.
+    let wide_prime_replay = solvers::verify_prime_f4_wide(
+        dir,
+        &manifest.config,
+        &manifest.outcome,
+        &manifest.artifacts,
+    )?;
     let has = |path: &str| manifest.artifacts.iter().any(|a| a.path == path);
     let complete_known_answer = has("public.json") && has("witness.json");
     let complete_factor_base = has("public.json") && has("factor-base.json");
@@ -2607,9 +2623,11 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
         }
         verify_root_auxiliary_artifacts(dir, &manifest.artifacts, certificate, binary_root, false)?;
     }
-    let prime_chain_declared =
-        manifest.outcome["strategy"] == "prime-affine-s3-chain-f4-visitor/v1";
-    let prime_chain_input_expected = manifest.config.family == "prime"
+    let censored_m3_prefix = wide_prime_replay == solvers::WidePrimeReplay::CensoredM3Prefix;
+    let prime_chain_declared = !censored_m3_prefix
+        && manifest.outcome["strategy"] == "prime-affine-s3-chain-f4-visitor/v1";
+    let prime_chain_input_expected = !censored_m3_prefix
+        && manifest.config.family == "prime"
         && manifest.config.solver == "f4"
         && (3..=15).contains(&manifest.config.m)
         && (has("prime-f4-input.json")
@@ -2666,7 +2684,7 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
         let public = read_json(&dir.join("public.json"))?;
         let base = read_json(&dir.join("factor-base.json"))?;
         curves::verify_factor_base(&public, &base)?;
-        if has("prime-f4-input.json") {
+        if has("prime-f4-input.json") && !censored_m3_prefix {
             let input: Value = read_json(&dir.join("prime-f4-input.json"))?;
             // The m=2 reference uses the same filename with a legacy schema.
             // A declared chain may not evade reconstruction by changing schema.
@@ -3641,6 +3659,66 @@ mod tests {
             split_rule: "curve-twist-component-sha256-v1".into(),
         }
     }
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn vanished_procfs_entries_do_not_block_worker_inspection() {
+        for errno in [libc::ENOENT, libc::ESRCH] {
+            let entry = process_entry::<Vec<u8>>(42, Err(std::io::Error::from_raw_os_error(errno)))
+                .unwrap();
+            assert!(entry.is_none(), "a vanished process is not a live owner");
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn procfs_permission_and_io_errors_still_block_worker_inspection() {
+        for errno in [libc::EPERM, libc::EACCES, libc::EIO, libc::ENOTDIR] {
+            assert!(
+                process_entry::<Vec<u8>>(42, Err(std::io::Error::from_raw_os_error(errno)))
+                    .is_err(),
+                "an uninspectable process cannot be assumed absent: errno {errno}"
+            );
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn successful_procfs_inspection_preserves_the_worker_command() {
+        let command = b"ic\0dataset\0worker\0--out\0/tmp/unit-output\0".to_vec();
+        assert_eq!(
+            process_entry(42, Ok(command.clone())).unwrap(),
+            Some(command)
+        );
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn process_exit_between_procfs_open_and_read_is_not_a_live_worker() {
+        use std::io::Read;
+        let mut child = std::process::Command::new("sleep")
+            .arg("30")
+            .spawn()
+            .unwrap();
+        let pid = child.id();
+        let path = format!("/proc/{pid}/cmdline");
+        let opened = std::fs::File::open(&path);
+        // Always terminate and reap the owned fixture before any assertion.
+        let killed = child.kill();
+        let waited = child.wait();
+        killed.unwrap();
+        waited.unwrap();
+        let missing = std::fs::read(&path);
+        assert_eq!(
+            missing.as_ref().unwrap_err().kind(),
+            std::io::ErrorKind::NotFound
+        );
+        assert!(process_entry(pid, missing).unwrap().is_none());
+        let mut opened = opened.unwrap();
+        let read = opened.read_to_end(&mut Vec::new());
+        assert_eq!(read.as_ref().unwrap_err().raw_os_error(), Some(libc::ESRCH));
+        assert!(process_entry(pid, read).unwrap().is_none());
+    }
+
     #[test]
     fn cross_product_has_no_duplicate_and_includes_twists_and_endpoints() {
         let p = plan();
@@ -4447,6 +4525,470 @@ mod tests {
         assert!(!dir.join("witness.json").exists());
         verify_cell(&dir, true).unwrap();
         dir
+    }
+
+    fn wide_prime_f4_m3_cell_fixture_kind(
+        fixture: &TempRun,
+        twist: bool,
+        negative: bool,
+    ) -> PathBuf {
+        let m = 3;
+        let (mut plan, mut binding, protocol) = fixture.bound();
+        plan.field_sizes = vec![61];
+        plan.arities = vec![m];
+        plan.solvers = vec!["f4".into()];
+        plan.curve_seeds = 8;
+        plan.generators = 2;
+        plan.keys = 2;
+        plan.seed = 42;
+        plan.factor_base_size = 2;
+        plan.degree_bound = 8;
+        plan.work_limit = 50_000;
+        plan.validate().unwrap();
+        let index = 62 + u64::from(twist);
+        let config = plan.cell(index).unwrap();
+        assert_eq!(
+            (config.curve_seed, config.generator_index, config.key_index),
+            (7, 1, 1)
+        );
+        binding["plan_sha256"] = json!(plan.binding_sha256().unwrap());
+        binding["shard_index"] = json!(0);
+        binding["shard_count"] = json!(1);
+        binding["seconds_per_case"] = json!(30);
+        binding["memory_mib"] = json!(512);
+        binding["trace_mib"] = json!(64);
+        binding["execution_context_required"] = json!(true);
+
+        let mut case = curves::generate(&config).unwrap();
+        case.private_witness = Value::Null;
+        let arithmetic = curves::arithmetic(&case.public_instance).unwrap();
+        let point = curves::point_words(&case.factor_base["points"][0]).unwrap();
+        let mut sum = None;
+        // Prefixes alternate P,2P,P,2P,... and are affine for odd prime r.
+        // This constructs a group witness independently of S3 equations.
+        for i in 0..if negative { 4 } else { m } {
+            let summand = if negative || i < m {
+                point
+            } else {
+                arithmetic.neg(point)
+            };
+            sum = arithmetic.reference_add(sum, summand);
+            assert!(sum.is_some());
+        }
+        case.public_instance["target"] = curves::point_json(sum);
+        case.public_instance["population"] = json!("software-test-public-planted-pdp");
+        case.public_instance["known_answer_verified"] = json!(false);
+        curves::verify_public(&case.public_instance).unwrap();
+        curves::verify_factor_base(&case.public_instance, &case.factor_base).unwrap();
+        assert!(case.private_witness.is_null());
+
+        let dir = fixture
+            .0
+            .join(format!("cell-wide-f4-m3-twist{twist}-negative{negative}"));
+        fs::create_dir(&dir).unwrap();
+        let mut artifacts = vec![
+            storage::write_json(&dir, "plan.json", "plan", &plan).unwrap(),
+            storage::write_json(&dir, "run.json", "run", &binding).unwrap(),
+            storage::write_bytes(&dir, "protocol.json", "protocol", "json", &protocol).unwrap(),
+            storage::write_json(&dir, "config.json", "config", &config).unwrap(),
+            storage::write_json(
+                &dir,
+                "public.json",
+                "public-instance",
+                &case.public_instance,
+            )
+            .unwrap(),
+            storage::write_json(&dir, "factor-base.json", "factor-base", &case.factor_base)
+                .unwrap(),
+        ];
+        for path in ["attempt.json", "worker-process.json"] {
+            artifacts.push(
+                storage::write_json(&dir, path, "provenance", &if path=="attempt.json" {json!({"schema":"crypto.ml-dataset.attempt/v1","cell_index":index,"plan_sha256":plan.binding_sha256().unwrap()})} else {json!({"software_test":true})})
+                    .unwrap(),
+            );
+        }
+        for path in ["stdout.log", "stderr.log"] {
+            artifacts.push(storage::write_bytes(&dir, path, "log", "utf8", b"").unwrap());
+        }
+        let launch = execution::create(&dir).unwrap();
+        let (sha256, bytes) = crate::store::hash_file(&dir.join(execution::PATH)).unwrap();
+        artifacts.push(Artifact {
+            path: execution::PATH.into(),
+            role: execution::ROLE.into(),
+            encoding: "json".into(),
+            sha256,
+            bytes,
+        });
+        let context = execution::admit(&dir).unwrap().unwrap();
+        assert_eq!(context.launch, launch);
+        let solved = solvers::solve_with_context(&config, &case, Some(&context)).unwrap();
+        assert_eq!(
+            solved.outcome["pdp_witness_verified"], !negative,
+            "{}",
+            solved.outcome
+        );
+        assert_eq!(
+            solved.outcome["native_backend_invoked"], true,
+            "{}",
+            solved.outcome
+        );
+        for payload in solved.artifacts {
+            artifacts.push(
+                storage::write_bytes(
+                    &dir,
+                    &payload.path,
+                    &payload.role,
+                    &payload.encoding,
+                    &payload.bytes,
+                )
+                .unwrap(),
+            );
+        }
+        storage::write_json(
+            &dir,
+            "manifest.json",
+            "manifest",
+            &CellManifest {
+                schema: "crypto.ml-dataset.cell/v1".into(),
+                cell_index: index,
+                plan_sha256: plan.binding_sha256().unwrap(),
+                config,
+                outcome: solved.outcome,
+                artifacts,
+            },
+        )
+        .unwrap();
+        assert!(!dir.join("witness.json").exists());
+        verify_cell(&dir, true).unwrap();
+        dir
+    }
+
+    #[test]
+    fn wide_prime_m3_central_rehashed_tamper_and_censoring() {
+        for twist in [false, true] {
+            let fixture = TempRun::new();
+            let dir = wide_prime_f4_m3_cell_fixture_kind(&fixture, twist, false);
+            let negative = wide_prime_f4_m3_cell_fixture_kind(&fixture, twist, true);
+            assert_eq!(
+                verify_cell(&negative, true).unwrap().outcome["exhaustive_no_decomposition"],
+                true
+            );
+            for (label, file, key, value) in [
+                ("public-m", "public.json", "m", json!(2)),
+                (
+                    "aux-domain",
+                    "prime-f4-input.json",
+                    "domains",
+                    json!([[1], [1], [1], [1]]),
+                ),
+                (
+                    "prefix-claim",
+                    "prime-f4-wide-m3-group-extraction.json",
+                    "domain_complete",
+                    json!(false),
+                ),
+                (
+                    "counter",
+                    "prime-f4-wide-m3-group-extraction.json",
+                    "group_adds",
+                    json!(0),
+                ),
+                (
+                    "first-certificate",
+                    "prime-f4-wide-m3-group-extraction.json",
+                    "first_verified_cursor",
+                    json!(7),
+                ),
+                (
+                    "derivation",
+                    "prime-f4-wide-m3-result.json",
+                    "native_basis_derivation_verified",
+                    json!(true),
+                ),
+            ] {
+                let changed = altered_cell(&dir, &fixture.0.join(label), |path, manifest| {
+                    let mut data: Value = read_json(&path.join(file)).unwrap();
+                    data[key] = value;
+                    let index = manifest
+                        .artifacts
+                        .iter()
+                        .position(|a| a.path == file)
+                        .unwrap();
+                    let role = manifest.artifacts[index].role.clone();
+                    fs::remove_file(path.join(file)).unwrap();
+                    manifest.artifacts[index] =
+                        storage::write_json(path, file, &role, &data).unwrap();
+                });
+                assert!(verify_cell(&changed, true).is_err(), "{label}");
+            }
+            for missing in [
+                "public.json",
+                "factor-base.json",
+                "prime-f4-wide-m3-result.json",
+            ] {
+                let changed = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("missing-{missing}")),
+                    |_, manifest| manifest.artifacts.retain(|a| a.path != missing),
+                );
+                assert!(verify_cell(&changed, true).is_err());
+            }
+            let omitted = altered_cell(
+                &dir,
+                &fixture.0.join("combined-omission"),
+                |path, manifest| {
+                    for name in [
+                        "prime-f4-input.json",
+                        "prime-f4-wide-m3-result.json",
+                        "prime-f4-wide-m3-events.jsonl",
+                        "prime-f4-wide-m3-group-extraction.json",
+                    ] {
+                        manifest.artifacts.retain(|a| a.path != name);
+                        fs::remove_file(path.join(name)).unwrap();
+                    }
+                    manifest.outcome.as_object_mut().unwrap().remove("strategy");
+                },
+            );
+            assert!(verify_cell(&omitted, true).is_err());
+            let raw = altered_cell(
+                &dir,
+                &fixture.0.join("raw-censored-prefix"),
+                |path, manifest| {
+                    let paths = [
+                        "prime-f4-input.json",
+                        "prime-f4-wide-m3-result.json",
+                        "prime-f4-wide-m3-events.jsonl",
+                        "prime-f4-wide-m3-group-extraction.json",
+                        "pdp-witness.json",
+                        "solver-domain.json",
+                    ];
+                    for name in paths {
+                        manifest.artifacts.retain(|a| a.path != name);
+                        if path.join(name).exists() {
+                            fs::remove_file(path.join(name)).unwrap();
+                        }
+                    }
+                    manifest.artifacts.push(
+                        storage::write_bytes(
+                            path,
+                            "prime-f4-input.json",
+                            "unregistered-partial-artifact",
+                            "native",
+                            b"{\"schema\":",
+                        )
+                        .unwrap(),
+                    );
+                    manifest.outcome = json!({"status":"timeout","solver_completed":false});
+                },
+            );
+            verify_cell(&raw, true).unwrap();
+            for key in [
+                "solver_completed",
+                "group_domain_complete",
+                "group_prefix_complete",
+                "group_infinity_prefixes_covered",
+                "first_certificate_retained",
+            ] {
+                let forged = altered_cell(
+                    &raw,
+                    &fixture.0.join(format!("raw-promoted-{key}")),
+                    |_, manifest| manifest.outcome[key] = json!(true),
+                );
+                assert!(verify_cell(&forged, true).is_err());
+            }
+            let early = altered_cell(
+                &raw,
+                &fixture.0.join("raw-early-certificate"),
+                |path, manifest| {
+                    let nested = "live/payloads/pdp-witness.json";
+                    let bytes = fs::read(dir.join("pdp-witness.json")).unwrap();
+                    storage::write_bytes(
+                        path,
+                        nested,
+                        "producer-role-not-registered",
+                        "json",
+                        &bytes,
+                    )
+                    .unwrap();
+                    let collected = collect_cell_artifacts(path).unwrap();
+                    let certificate = collected.into_iter().find(|a| a.path == nested).unwrap();
+                    assert_eq!(certificate.role, "unregistered-partial-artifact");
+                    assert_eq!(certificate.encoding, "native");
+                    manifest.artifacts.push(certificate);
+                },
+            );
+            verify_cell(&early, true).unwrap();
+            let promoted = altered_cell(
+                &early,
+                &fixture.0.join("early-certificate-promoted"),
+                |_, manifest| manifest.outcome["pdp_witness_verified"] = json!(true),
+            );
+            assert!(verify_cell(&promoted, true).is_err());
+            let retained = altered_cell(&dir, &fixture.0.join("censored"), |path, manifest| {
+                manifest.artifacts.push(
+                    storage::write_json(path, "result.json", "solver-outcome", &manifest.outcome)
+                        .unwrap(),
+                );
+                manifest.outcome = json!({"status":"timeout","solver_completed":false});
+            });
+            verify_cell(&retained, true).unwrap();
+            for stop in ["missing_execution_context", "profile_admission"] {
+                let changed = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("false-admission-{stop}")),
+                    |path, manifest| {
+                        alter_json(&path.join("prime-f4-wide-m3-result.json"), |value| {
+                            value["stop"] = json!(stop);
+                            value["native_statistics_complete"] = json!(false);
+                        });
+                        manifest.outcome["termination"] = json!(stop);
+                        manifest.outcome["native_statistics_complete"] = json!(false);
+                        manifest.outcome["algebra_completed"] = json!(false);
+                    },
+                );
+                assert!(verify_cell(&changed, true).is_err());
+            }
+            for (field, counter, limit_key) in [
+                ("work_reserved", "native_work_reserved", "work"),
+                (
+                    "bytes_reserved",
+                    "native_cumulative_bytes_reserved",
+                    "bytes",
+                ),
+            ] {
+                let changed = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("terminal-{field}")),
+                    |path, manifest| {
+                        let events =
+                            fs::read_to_string(path.join("prime-f4-wide-m3-events.jsonl")).unwrap();
+                        let terminal: Value =
+                            serde_json::from_str(events.lines().last().unwrap()).unwrap();
+                        assert_eq!(terminal["boundary"], "terminal");
+                        let mut new_count = 0;
+                        alter_json(&path.join("prime-f4-wide-m3-result.json"), |value| {
+                            let old = value[field].as_u64().unwrap();
+                            new_count = old + 1;
+                            assert!(new_count <= value["limits"][limit_key].as_u64().unwrap());
+                            value[field] = json!(new_count);
+                        });
+                        manifest.outcome["counters"][counter] = json!(new_count);
+                    },
+                );
+                assert!(verify_cell(&changed, true).is_err());
+            }
+            for kind in [
+                "points",
+                "negation_closed",
+                "repetitions_allowed",
+                "role",
+                "missing",
+            ] {
+                let changed = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("solver-domain-{kind}")),
+                    |path, manifest| {
+                        if kind == "missing" {
+                            manifest
+                                .artifacts
+                                .retain(|a| a.path != "solver-domain.json");
+                        } else if kind == "role" {
+                            manifest
+                                .artifacts
+                                .iter_mut()
+                                .find(|a| a.path == "solver-domain.json")
+                                .unwrap()
+                                .role = "incorrect-role".into();
+                        } else {
+                            alter_json(&path.join("solver-domain.json"), |value| {
+                                if kind == "points" {
+                                    value["points"].as_array_mut().unwrap().swap(0, 1);
+                                } else {
+                                    value[kind] = json!(false);
+                                }
+                            });
+                        }
+                    },
+                );
+                assert!(verify_cell(&changed, true).is_err());
+            }
+            for key in [
+                "native_work_reserved",
+                "native_cumulative_bytes_reserved",
+                "acknowledged_native_boundaries",
+            ] {
+                let changed = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("counter-{key}")),
+                    |_, manifest| {
+                        let old = manifest.outcome["counters"][key].as_u64().unwrap();
+                        manifest.outcome["counters"][key] = json!(old + 1);
+                    },
+                );
+                assert!(verify_cell(&changed, true).is_err());
+                let changed = altered_cell(
+                    &retained,
+                    &fixture.0.join(format!("retained-counter-{key}")),
+                    |path, _| {
+                        alter_json(&path.join("result.json"), |value| {
+                            let old = value["counters"][key].as_u64().unwrap();
+                            value["counters"][key] = json!(old + 1);
+                        });
+                    },
+                );
+                assert!(verify_cell(&changed, true).is_err());
+            }
+            for key in [
+                "trace_complete",
+                "scalar_replay_verified",
+                "extraction_complete",
+            ] {
+                let changed = altered_cell(
+                    &retained,
+                    &fixture.0.join(format!("outer-{key}")),
+                    |_, manifest| manifest.outcome[key] = json!(true),
+                );
+                assert!(verify_cell(&changed, true).is_err());
+            }
+            let changed = altered_cell(
+                &retained,
+                &fixture.0.join("retained-false-proof"),
+                |path, manifest| {
+                    let mut data: Value = read_json(&path.join("result.json")).unwrap();
+                    data["last_fall_degree"] = json!(5);
+                    let index = manifest
+                        .artifacts
+                        .iter()
+                        .position(|a| a.path == "result.json")
+                        .unwrap();
+                    fs::remove_file(path.join("result.json")).unwrap();
+                    manifest.artifacts[index] =
+                        storage::write_json(path, "result.json", "solver-outcome", &data).unwrap();
+                },
+            );
+            assert!(verify_cell(&changed, true).is_err());
+            for file in ["prime-f4-input.json", "prime-f4-wide-m3-events.jsonl"] {
+                let changed = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("oversize-{file}")),
+                    |path, manifest| {
+                        let index = manifest
+                            .artifacts
+                            .iter()
+                            .position(|a| a.path == file)
+                            .unwrap();
+                        let a = manifest.artifacts[index].clone();
+                        let mut bytes = fs::read(path.join(file)).unwrap();
+                        bytes.extend(vec![b' '; 2 * 1024 * 1024 + 1]);
+                        fs::remove_file(path.join(file)).unwrap();
+                        manifest.artifacts[index] =
+                            storage::write_bytes(path, file, &a.role, &a.encoding, &bytes).unwrap();
+                        manifest.outcome.as_object_mut().unwrap().remove("strategy");
+                    },
+                );
+                assert!(verify_cell(&changed, true).is_err());
+            }
+        }
     }
 
     #[test]

@@ -207,6 +207,9 @@ pub mod groebner_f4;
 pub mod group_op_count;
 pub mod hash_attacks;
 pub mod hashed_ecdl;
+/// Toy index calculus with tensor-contraction relation finding
+/// (`crates/ecdl-tensor-ic`, Rust port of the Go `ecdltensor` prototype).
+pub use ecdl_tensor_ic as tensor_ic;
 pub mod hilbert_class_poly;
 pub mod hky_fp_tower;
 pub mod hnp_ecdsa;
@@ -223,6 +226,7 @@ pub mod ic_measurement;
 pub mod ic_oracle_pricing;
 pub mod ic_progress;
 pub mod ic_run;
+pub mod ic_wide;
 pub mod identity_certificate;
 pub mod inherited_f4;
 pub mod invalid_curve_attack;

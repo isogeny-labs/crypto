@@ -1,0 +1,42 @@
+== 1. smallest draw count, arm a, draws 0 and 1, every cell (a 1-target run; --dmax-u 12 on the big cell)
+PASS  cell (17,4,3) draw 0 arm a: [1, 16122, 46231, 65917]
+PASS  cell (17,4,3) draw 1 arm a: [1, 109007, 72367, 7165]
+PASS  cell (19,4,3) draw 0 arm a: [1, 162855, 304598, 499631]
+PASS  cell (19,4,3) draw 1 arm a: [1, 26383, 461612, 75589]
+PASS  cell (13,3,4) draw 0 arm a: [1, 5866, 8122]
+PASS  cell (13,3,4) draw 1 arm a: [1, 7918, 4214]
+PASS  cell (15,3,4) draw 0 arm a: [1, 30005, 26016]
+PASS  cell (15,3,4) draw 1 arm a: [1, 14002, 648]
+PASS  cell (17,4,4) draw 0 arm a: [1, 6433, 121892, 83024]
+PASS  cell (17,4,4) draw 1 arm a: [1, 65191, 121845, 52643]
+== 2. draw-0 bases and A/A draw-1 bases of the first run are unchanged
+PASS  draw 0 basis of cell 17_4_3 equals the first run (research/blindspots_20261018/04-presentation-search/raw/card-01-cheap-cell1.log)
+PASS  draw 0 basis of cell 19_4_3 equals the first run (research/blindspots_20261018/04-presentation-search/raw/card-01-cheap-cell2.log)
+PASS  draw 0 basis of cell 13_3_4 equals the first run (research/blindspots_20261018/04-presentation-search/raw/card-01-cheap-cell3.log)
+PASS  draw 0 basis of cell 15_3_4 equals the first run (research/blindspots_20261018/04-presentation-search/raw/card-01-cheap-cell4.log)
+PASS  draw 0 basis of cell 17_4_4 equals the first run (research/blindspots_20261018/04-presentation-search/raw/card-01-cheap-cell5-d.log)
+PASS  draw 1 basis of cell 17_4_3 equals the first run (research/blindspots_20261018/04-presentation-search/raw/card-02-aa-cell1.log)
+PASS  draw 1 basis of cell 19_4_3 equals the first run (research/blindspots_20261018/04-presentation-search/raw/card-02-aa-cell2.log)
+PASS  draw 1 basis of cell 13_3_4 equals the first run (research/blindspots_20261018/04-presentation-search/raw/card-02-aa-cell3.log)
+== 3. regression: the panic of card 02 command aa-cell4 (cell (15,3,4), draw 1) now returns a basis
+PASS  aa-cell4 exit 0, 8 rows, [1, 14002, 648]
+== 4. controls: linear and nonlinear recodings of arm a on cells 1 to 4 (never reached in the first run)
+PASS  recode linear cell (17,4,3): 6 rows
+PASS  recode nonlinear cell (17,4,3): 6 rows
+PASS  recode linear cell (19,4,3): 6 rows
+PASS  recode nonlinear cell (19,4,3): 6 rows
+PASS  recode linear cell (13,3,4): 6 rows
+PASS  recode nonlinear cell (13,3,4): 6 rows
+PASS  recode linear cell (15,3,4): 6 rows
+PASS  recode nonlinear cell (15,3,4): 6 rows
+== 5. arm e, smallest count: cell 3 (--first 4), cell 4 (--first 0), cell 5 (10 s cap)
+PASS  e cell 3 t4
+PASS  e cell 4 t0
+PASS  e cell 5 t0 (10 s cap)
+== 6. arm b, smallest count: cell 1 (random and planted), cell 4 (random t0 20 s cap, planted)
+PASS  b cell 1 random t0
+PASS  b cell 1 planted p0
+PASS  b cell 4 random t0 (20 s cap)
+PASS  b cell 4 planted
+== every row has a status
+SMOKE OK

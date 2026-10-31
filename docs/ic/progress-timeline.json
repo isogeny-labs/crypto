@@ -79,6 +79,17 @@
      "value": 1.356
     },
     {
+     "anchor": "#ic-tournament-round-0026",
+     "class": "engineering",
+     "date": "2026-10-28",
+     "detail": "Native fixed-support pilot, one public target per cold job. The selected batch16 configuration costs 0.630 [0.578, 0.676] of its same-fixture incumbent in Valgrind Ir, yet 11.524 [10.718, 13.016] times its matched worker rho across five cells. Best per-cell paired IC/rho is 10.658 at icv1-f2m19-t797-b6cf2467. This worker rho is not globally qualified; no curve-addition conversion or scaling result is available.",
+     "label": "Native tournament round 0026, batch16, best cell icv1-f2m19-t797-b6cf2467",
+     "reference": "matched",
+     "source": "https://github.com/isogeny-labs/crypto/blob/main/research/ic_candidate_tournament_20260915/runs/round-0026/REPORT.md",
+     "unit": "Valgrind Ir",
+     "value": 10.657953188446204
+    },
+    {
      "anchor": "#koblitz-descent-20260930",
      "class": "accounting",
      "date": "2026-10-01",
@@ -196,6 +207,17 @@
      "class": "engineering",
      "anchor": "#lazy-orbit-members-20261018",
      "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_lazy_orbit_members_20261018/REPORT.pdf"
+    },
+    {
+     "date": "2026-10-18",
+     "value": 1.287,
+     "reference": "matched",
+     "unit": "S",
+     "label": "Two orbit columns under the lazy oracle, fully priced (*_full), stride-renew, vs rho-frob: best cell icv1-f2m29-tm40309-30c52b96 (r = 2^15.4), frozen c = 1",
+     "detail": "The column-count tuning round: c = 2 against the per-curve column count frozen on 2026-10-14, all under the lazy orbit-member oracle, paired against the fully priced signed-Frobenius rho on 32 targets x 3 rounds per curve (n37: 16 x 3). The round's best cell is the frozen c = 1 arm at n = 29 a1: 1.287 [0.971, 1.686] (interval includes 1), a second measurement of the previous point on fresh seeds. c = 2 improves one cell of five: n17 a1, where the frozen c = 1 costs 1.176 [1.063, 1.297] times c = 2 (2.152 -> 1.830 against rho-frob). It is dearer at n13, n23, n29 and n37 (frozen / c = 2 down to 0.246 at n37), so the frozen counts stay the better choice on four of five curves; the n17 gain is a tuning result on these seeds and needs fresh seeds before it is a rule. No exponent change; no ranking against rho is claimed. L0, counts only. Not validated under the 2026-10-19 gate.",
+     "class": "engineering",
+     "anchor": "#lazy-columns2-20261018",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_lazy_columns2_20261018/REPORT.pdf"
     },
     {
      "anchor": "#ic-tool-programme-20261001",
@@ -324,6 +346,17 @@
      "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-base-size-cold-panel-20261004/RESULT.md",
      "unit": "unisolated in-process cold wall diagnostic",
      "value": 57.96488041072309
+    },
+    {
+     "date": "2026-10-12",
+     "value": 52.58560062120812,
+     "reference": "matched",
+     "unit": "unisolated in-process cold wall diagnostic",
+     "label": "n53 K220 fixed-base S3 root batch, nine single-target pairs",
+     "detail": "Nine verified same-Q/rank-seed control/batch pairs and nine strong-rho cells; batch/rho cold median 52.586 [33.179\u201364.668], was control/rho 78.146 on these Q. Batch/control complete-cold median 0.738 [0.714\u20130.750]. All 27 cells completed and 18 IC replays verified; shared Apple M4 Pro L0 only, common-operation S unset.",
+     "class": "diagnostic",
+     "anchor": "#n53-s3-root-batch-20261012",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/notes/ecc2k130/n53_s3_root_batch_20261012/RESULT.md"
     }
    ],
    "role": "context"
@@ -877,6 +910,17 @@
      "value": 0.0377
     },
     {
+     "date": "2026-10-12",
+     "value": 0.37777093852601323,
+     "reference": "matched",
+     "unit": "unisolated online wall diagnostic",
+     "label": "n53 K220 fixed-base S3 root batch, target phase, nine single-target pairs",
+     "detail": "Nine verified same-Q/rank-seed pairs; batch/rho target-online median 0.378 [0.103\u20130.442], was control/rho 0.490 on these Q. Batch/control online median 0.612 [0.569\u20130.903]. Reusable K220 setup excluded here but charged in the cold-series point; shared Apple M4 Pro L0 diagnostic.",
+     "class": "diagnostic",
+     "anchor": "#n53-s3-root-batch-20261012",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/notes/ecc2k130/n53_s3_root_batch_20261012/RESULT.md"
+   },
+   {
      "date": "2026-10-17",
      "value": 0.04508348816596248,
      "reference": "matched",

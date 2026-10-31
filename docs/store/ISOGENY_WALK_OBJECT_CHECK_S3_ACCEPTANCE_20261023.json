@@ -1,0 +1,89 @@
+{
+  "schema": "crypto.isogeny-walk-object-check-s3-acceptance/v1",
+  "date_utc": "2026-10-23",
+  "base_revision": "b73a3d778eed49a951013a9de7de9fb94e604718",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/isogeny-object-check/20261023T033629Z-b128d067",
+  "run_id": "custom-e193cd27a390fe52",
+  "checks": {
+    "before_publish": {
+      "bytes": null,
+      "exists": false,
+      "marker": "s3://setec-astronomy-artifacts/ic/v1/acceptance/isogeny-object-check/20261023T033629Z-b128d067/runs/custom-e193cd27a390fe52/complete.json",
+      "object_check": {
+        "checked": 0,
+        "mismatched": [],
+        "missing": [],
+        "status": "no_marker"
+      },
+      "schema": "isogeny-walk-exists/v1",
+      "sha256": null
+    },
+    "complete": {
+      "bytes": 1783,
+      "exists": true,
+      "marker": "s3://setec-astronomy-artifacts/ic/v1/acceptance/isogeny-object-check/20261023T033629Z-b128d067/runs/custom-e193cd27a390fe52/complete.json",
+      "object_check": {
+        "checked": 3,
+        "mismatched": [],
+        "missing": [],
+        "status": "pass"
+      },
+      "schema": "isogeny-walk-exists/v1",
+      "sha256": "30f906b8bdd263f45f128827246f061d7e53b13a23057c2d311f7c6e1bcba8ba"
+    },
+    "marker_only_after_delete": {
+      "bytes": 1783,
+      "exists": true,
+      "marker": "s3://setec-astronomy-artifacts/ic/v1/acceptance/isogeny-object-check/20261023T033629Z-b128d067/runs/custom-e193cd27a390fe52/complete.json",
+      "schema": "isogeny-walk-exists/v1",
+      "sha256": "30f906b8bdd263f45f128827246f061d7e53b13a23057c2d311f7c6e1bcba8ba"
+    },
+    "missing_object": {
+      "bytes": 1783,
+      "exists": true,
+      "marker": "s3://setec-astronomy-artifacts/ic/v1/acceptance/isogeny-object-check/20261023T033629Z-b128d067/runs/custom-e193cd27a390fe52/complete.json",
+      "object_check": {
+        "checked": 3,
+        "mismatched": [],
+        "missing": [
+          "ic/v1/acceptance/isogeny-object-check/20261023T033629Z-b128d067/runs/custom-e193cd27a390fe52/attempts/local-1792726592181792000/isogeny_routes.json.gz"
+        ],
+        "status": "incomplete"
+      },
+      "schema": "isogeny-walk-exists/v1",
+      "sha256": "30f906b8bdd263f45f128827246f061d7e53b13a23057c2d311f7c6e1bcba8ba"
+    },
+    "mismatched_object": {
+      "bytes": 1783,
+      "exists": true,
+      "marker": "s3://setec-astronomy-artifacts/ic/v1/acceptance/isogeny-object-check/20261023T033629Z-b128d067/runs/custom-e193cd27a390fe52/complete.json",
+      "object_check": {
+        "checked": 3,
+        "mismatched": [
+          "ic/v1/acceptance/isogeny-object-check/20261023T033629Z-b128d067/runs/custom-e193cd27a390fe52/attempts/local-1792726592181792000/isogeny_routes.json.gz"
+        ],
+        "missing": [],
+        "status": "incomplete"
+      },
+      "schema": "isogeny-walk-exists/v1",
+      "sha256": "30f906b8bdd263f45f128827246f061d7e53b13a23057c2d311f7c6e1bcba8ba"
+    },
+    "objects_deleted_after_fault": 4,
+    "after_cleanup": {
+      "bytes": null,
+      "exists": false,
+      "marker": "s3://setec-astronomy-artifacts/ic/v1/acceptance/isogeny-object-check/20261023T033629Z-b128d067/runs/custom-e193cd27a390fe52/complete.json",
+      "object_check": {
+        "checked": 0,
+        "mismatched": [],
+        "missing": [],
+        "status": "no_marker"
+      },
+      "schema": "isogeny-walk-exists/v1",
+      "sha256": null
+    }
+  },
+  "faulted_key": "ic/v1/acceptance/isogeny-object-check/20261023T033629Z-b128d067/runs/custom-e193cd27a390fe52/attempts/local-1792726592181792000/isogeny_routes.json.gz",
+  "binary_sha256": "db7ebd433a764700710021dfb14c502562ecaba411ec457fb2d8ca35ae28d1bc",
+  "limit": "HEAD checks marker and stored object byte counts and S3 SHA-256 values for one public three-object run in one account/region. It does not download or decode object payloads; fetch performs that check. Concurrent mutation is not excluded."
+}
