@@ -80,6 +80,7 @@ SOURCES = {
     "la_engines": "research/la_engines_20261014/summary.json",
     "lazy_members": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
     "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
+    "lazy_columns2": "research/ecbench_lazy_columns2_20261018/figures/ratios.json",
     "postgb_linear_stage": "research/postgb_linear_stage_20261026/analysis/summary.json",
     "ic_m2_linear_ladder": "research/ic_m2_linear_ladder_20261024/fit.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
@@ -853,6 +854,21 @@ def lazy_members_component() -> dict:
             "study": d["study"] + "/", "report": d["study"] + "/REPORT.pdf",
             "source": SOURCES["lazy_members"], "validation": NOT_VALIDATED}
 
+
+def lazy_columns2_component() -> dict:
+    """Two orbit columns against the frozen per-curve column count, under the lazy oracle:
+    research/ecbench_lazy_columns2_20261018, ratios copied from the study's saved ecbench
+    comparisons (figures/ratios.json). A tuning result for one parameter of an unchanged
+    algorithm; one cell of five improves. The ranked tables A-C are untouched."""
+    d = load(SOURCES["lazy_columns2"])
+    if d.get("schema") != "crypto.lazy_columns2/v1" or d.get("class") != "engineering":
+        raise SystemExit(f"{SOURCES['lazy_columns2']}: unexpected schema or class")
+    for r in d["rows"]:
+        if r["rho_frob_aa"]["ratio"] != 1.0:
+            raise SystemExit(f"{r['session']}: rho-frob A/A is not 1")
+    return {"rows": d["rows"], "unit": d["unit"], "class": d["class"], "note": d["note"],
+            "study": d["study"] + "/", "report": d["study"] + "/REPORT.pdf",
+            "source": SOURCES["lazy_columns2"], "validation": NOT_VALIDATED}
 
 def postgb_linear_stage_component() -> dict:
     """The linear stage after F4 across Gröbner-basis corpora, from
@@ -1916,6 +1932,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "linear_algebra_component": la_component(),
         "prime_base_size_component": prime_base_size_component(),
         "lazy_members_component": lazy_members_component(),
+        "lazy_columns2_component": lazy_columns2_component(),
         # A component speed-up (the linear stage after F4 in jv_cover) copied
         # from its study's frozen summary; it moves no row of tables A-C.
         "jv_cover_linear_stage_component": load(SOURCES["jv_cover_sparse_fglm"]),
@@ -2248,6 +2265,25 @@ def markdown(doc: dict) -> str:
     L += ["", f"[Report]({'../../' + lz['report']}) · [study](../../{lz['study']}) · "
               f"[data](../../{lz['source']}). Distance to rho is reported, not a gate; no ranking against "
               "rho is claimed.", "", lz["validation"], ""]
+    c2 = doc["lazy_columns2_component"]
+    L += ["## Component tuning: two orbit columns under the lazy oracle (2026-10-18, engineering)", "",
+          "Does `columns = 2` beat the per-curve column count frozen on 2026-10-14 now that the "
+          "member-index set-up is gone? One cell of five: it is cheaper at n17 a1 and dearer at the "
+          "other four, so the frozen counts stay the better choice on four of five curves. The n17 "
+          "gain is a tuning result on these seeds and needs fresh seeds before it is a rule. It moves "
+          f"no row of tables A–C. {c2['unit']}; 95 % intervals; below 1 the numerator is cheaper.", "",
+          "| curve | log₂ r | frozen c | frozen ÷ c=2 | frozen ÷ rho-strong | c=2 ÷ rho-strong | "
+          "frozen ÷ rho-frob | c=2 ÷ rho-frob |",
+          "|:--|--:|--:|:--|:--|:--|:--|:--|"]
+    for r in c2["rows"]:
+        def ci(x):
+            return f"{x['ratio']:.3f} [{x['ci95'][0]:.3f}, {x['ci95'][1]:.3f}]"
+        L.append(f"| `{r['curve']}` | {r['log2_r']:.1f} | {r['frozen_c']} | **{ci(r['frozen_over_c2'])}** | "
+                 f"{ci(r['frozen_over_rho_strong'])} | {ci(r['c2_over_rho_strong'])} | "
+                 f"{ci(r['frozen_over_rho_frob'])} | {ci(r['c2_over_rho_frob'])} |")
+    L += ["", f"[Report]({'../../' + c2['report']}) · [study](../../{c2['study']}) · "
+              f"[data](../../{c2['source']}). Distance to rho is reported, not a gate; no ranking against "
+              "rho is claimed (§5a band not applied).", "", c2["validation"], ""]
     for code in ("A", "B", "C"):
         f = fams[code]
         rows = [r for r in doc["board"] if r["family"] == code]
@@ -3215,6 +3251,29 @@ def page(doc: dict, standalone: bool) -> str:
              f'<p>{gh(lz["report"], "Report")} · {gh(lz["study"], "study")} · {gh(lz["source"], "data")}. '
              'Distance to rho is reported, not a gate; no ranking against rho is claimed.</p>'
              f'<p class="muted">{esc(lz["validation"])}</p></section>')
+    c2 = doc["lazy_columns2_component"]
+    P.append('<section class="panel" id="lazy-columns2"><h2>Component tuning · two orbit columns under the '
+             'lazy oracle <span class="chip">engineering</span></h2>'
+             '<p>Is <code>columns = 2</code> cheaper than the column count frozen on 2026-10-14 now that '
+             'the member-index set-up is gone? One cell of five: cheaper at n17 a1, dearer at the other '
+             'four, so the frozen counts stay the better choice on four of five curves. The n17 gain is a '
+             'tuning result on these seeds and needs fresh seeds before it is a rule. It moves no row of '
+             f'tables A–C. {esc(c2["unit"])}; below 1 the numerator is cheaper.</p>'
+             '<div class="scroll"><table><thead><tr><th>Curve</th><th>log₂ r</th><th>frozen c</th>'
+             '<th>frozen ÷ c=2</th><th>frozen ÷ rho-strong</th><th>c=2 ÷ rho-strong</th>'
+             '<th>frozen ÷ rho-frob</th><th>c=2 ÷ rho-frob</th></tr></thead><tbody>')
+    for r in c2["rows"]:
+        def ci(x):
+            return f'{x["ratio"]:.3f} [{x["ci95"][0]:.3f}, {x["ci95"][1]:.3f}]'
+        P.append(f'<tr><td><code>{esc(r["curve"])}</code></td><td>{r["log2_r"]:.1f}</td><td>{r["frozen_c"]}</td>'
+                 f'<td><b>{ci(r["frozen_over_c2"])}</b></td><td>{ci(r["frozen_over_rho_strong"])}</td>'
+                 f'<td>{ci(r["c2_over_rho_strong"])}</td><td>{ci(r["frozen_over_rho_frob"])}</td>'
+                 f'<td>{ci(r["c2_over_rho_frob"])}</td></tr>')
+    P.append('</tbody></table></div>'
+             f'<p>{gh(c2["report"], "Report")} · {gh(c2["study"], "study")} · {gh(c2["source"], "data")}. '
+             'Distance to rho is reported, not a gate; no ranking against rho is claimed (§5a band not '
+             'applied).</p>'
+             f'<p class="muted">{esc(c2["validation"])}</p></section>')
     d = doc["bounded_diagnostics"][0]
     P.append(f'<section class="card" id="bounded-n37-diagnostic"><h2>New n37 counted diagnostic, outside the priced tables</h2>'
              f'<p>On <code>{esc(d["curve"])}</code>, shared-rank K16 has {d["usable_points"]:,} actual usable '
