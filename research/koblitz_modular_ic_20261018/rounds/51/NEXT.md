@@ -1,37 +1,60 @@
-# R51 ordered continuation
+# R51 continuation queue; preserve all original limits
 
-1. Completed: overlap-lean51-01 compile0/audit0,all5declarations audited
-   with zero failing/trusted;original teardown reconciled before next math.
-2. Completed: glue-reload51-01 exit0,noerrors,exactmarker,all64 direct
-   numerator witnesses,both32-column PID products,four source products,
-   principal-open units and corruption controls. Do not repeat this producer.
-3. Reconcile the active UNIVERSAL51 attempt universal51-01: replay the archived universal QR circuit
-   and full certificates,clear every actual coefficient denominator,verify
-   the two polynomial matrix products. No old Groebner search is repeated.
-4. Run TWIST51 as twist51-01 only after universal acceptance. Require descent
-   of all original QR and triangular equations,exact G+(1+c)^16,fullF4/F2
-   products,gamma syzygies and serialized reload. Then run BASE23_51 as
-   base23-51-01 with the actual full marked23 specialization and denominator
-   inverse witnesses. Dimension112 is an algebra statement until primality.
-5. Run FIBER51 as fiber51-01,exhausting the1008 square-determinant matrices
-   on16 QR classes. If no16-cycle,do not search for an irreducible16-degree
-   ordinary fiber as a connectedness criterion. Its moduli interpretation
-   remains a separate identified-action premise.
-6. After marked23 acceptance,freeze a bounded symbolic primality check and
-   actual constants/descent checks. Retain the untwisted/sign controls from
-   R15;the selected order991 action remains the transfer acceptance test.
-7. Use universal descended N to recover nu on the actual level77 source,
-   check its diamond transport formula independently,and lift nu into the
-   existing normal PID algebra to certify exceptional denominator cancellation.
-8. Then continue the complete prescribed RR map/correspondence and132-section
-   intersection. Keep target modular factor/nonzero11 action,proper polarized
-   embedding,node187 coupled divisors,and arbitrary reverse-divisor evaluation
-   as separate obligations. Earlier accepted norm-zero recovery results and
-   Klein/same-field regression controls are reused,not repeated by default.
+Accepted:diamond51-01,glue-prep51-01,glue-forward51-01,
+glue-reverse51-01,overlap-lean51-01,glue-reload51-01,universal51-01,
+twist51-02,fiber51-01,hecke3-51-01,base23-struct51-03,nu51-01.
+Never repeat these producers for publication or resume.
 
-Only serialized local native jobs under the original4GiB/1200s limits;
-Lean -j1/-M4096 with1200s per compile/audit. No new EKS,Diem/freezer,
-Conductor claim,delegation or agent merge. R27-R50 remain sealed. R51 needs
-terminal receipt reconciliation,results/proof map,visual report,raw seal and
-fresh correct-bucket readback before scientific publication. Existing PR2995
-has all six checks green at18ce6ba68;new local commits are not yet pushed.
+Rejected and retained:twist51-01(two matrix/syzygy errors before late marker),
+base23-51-01(original1200s cap),base23-struct51-01(two unit/normalization errors),
+base23-struct51-02(one raw-representative unit comparison error). The accepted03
+has full raw-to-normal f23-multiple bindings and transformed inverse matrices.
+The expanded-matrix cap remains separate from the complete structured algebra.
+
+1. Reconcile the original active line51-01 before any other mathematics.
+   Its closed core checkpoint has the actual line product,denominator and
+   cubic-derivative units,source-compatible doubling,and three-doubling identity.
+   Full acceptance still requires the monic point annihilator,chord/sign and
+   fresh serialized products. Native4GiB/1200s;no duplicate or limit increase.
+2. Run frozen COLLISION51 as collision51-01 after the original process ends.
+   Require all12column products,3exact norms,full cofactor product and the
+   polynomial Bezout certificate,including serialized reload.
+3. Run frozen DIAMONDNU51 as diamond-nu51-01. Reload actualnu field/PID data,
+   verify its actual diamond formula/sign and complete localized PID lift.
+   This is the marked-point diamond,not the Hecke3 correspondence.
+4. Run frozen Specialize51 Lean module as specialize-lean51-01 with
+   REPLAY_SPECIALIZE_LEAN.sh. Final pre-data source has4declarations,not the
+   earlier unexecuted2/3versions. Keep4.34.1/mathlibd13f23b,-j1,-M4096,1200s
+   per compile/audit,no virtual-memory cap. Do not repeat accepted Overlap51.
+5. Record every terminal attempt,exact proof scope and all failures. Rebuild
+   and inspect the evidence-linked report,verify historical Git source bytes,
+   freeze science,seal raw,conditional correct-bucket upload,fresh directGET,
+   all member hashes and deterministic repack. Reconcile PR2995 before push.
+   No agent merge. R27-R50 science remains sealed.
+
+Next construction priorities after that evidence packet:
+
+- Use the actual line packet (if its strict gate accepts) to transport all
+  three7-torsion points through the checked generic Velu3 quotient. Solve
+  the target line slope/intercept by the complete3-dimensional cubic algebra,
+  normalize the marked level point,and explicitly check F2 twist descent.
+  Use the collision Bezout support (if accepted) to control denominators;
+  do not skip exceptional branches. Then construct the actual Hecke action,
+  zero-eigenspace projector and integral scalar by Smith/Bezout methods.
+- The actual descendednu belongs to the normal32-generator chart. Its
+  fractional N/C expression has full source/norm and PID witnesses. Finish
+  its actual diamond map above,then compute its precise pole orders and use
+  complete prescribed RR spaces/maps and the132-section intersection.
+- The marked23 source now has a complete structured rank112 algebra overF2(x).
+  Certify primality/constant field/normalization and selected991 action next.
+  The16-point action has no16-cycle,so irreducible ordinary degree16 fibers
+  are an unsuitable test under the stated Frobenius identification. Consider
+  symbolic primality or a source-bound modular monodromy identification.
+- Preserve the target modular-factor/nonzero11 gate,proper polarized embedding,
+  node187 coupled divisors and arbitrary reverse-divisor evaluation as distinct
+  obligations. Reuse the earlier exact norm-zero results and Klein/same-field
+  controls. T3 is an inert-prime annihilator probe;nonzero eigenvalue candidates
+  start at23 for level77 and11 for level161,with actual residual tests required.
+
+No new EKS,Diem/freezer,Conductor claim,delegation or agent merge. Only the
+existing manually authorized serialized native lane;Diem remains expired50/52.
