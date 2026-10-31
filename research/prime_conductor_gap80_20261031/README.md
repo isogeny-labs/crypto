@@ -93,6 +93,13 @@ contexts under Sage, Python-FLINT and the optimized native backend. Those
 
 ## Acceptance status and next construction
 
+The follow-up [measurement protocol](MEASUREMENT_PROTOCOL.md) and
+[exact native eligibility audit](measurement-readiness.json) identify the
+current launch blockers: the earlier codomain constructor has a 64-bit degree
+parser, its root slots alone exceed 3.4 TB for this 80-bit input, and it has
+no arbitrary-point evaluator. The audit is not a timing measurement. See the
+[readiness report](reports/measurement-readiness.pdf).
+
 | Requested obligation | Evidence/status |
 |:--|:--|
 | At least an 80-bit prime source/kernel candidate | Native and independent PARI checks; parameters and field-prime certificate retained |

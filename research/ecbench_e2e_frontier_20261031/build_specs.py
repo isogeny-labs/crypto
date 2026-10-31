@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the immutable ECBench campaign specs from the reviewed cells."""
+"""Generate the exact-build draft ECBench specs from the reviewed cells."""
 
 from __future__ import annotations
 
@@ -8,6 +8,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 SPECS = ROOT / "specs"
+SOURCE_COMMIT = "ff7ad61cfed11908fb79de9dd485b696d0ada779"
+BINARY_SHA256 = "924d090c1d83a20ce954848c04b116cee4d5a7cb04187bb618dff60958bfd64d"
+IMAGE_URI = "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:b8c20f9c151360b78f505360e8d47068c4068f00a8f6faa7ebd3086fa0a791c6"
 
 
 def arm(name: str, role: str, method_id: str, **params: str) -> dict:
@@ -128,6 +131,11 @@ def koblitz_specs() -> list[dict]:
         dn = cfg["neg_dimension"]
         arms = [
             arm("rho-strong-v2", "reference", "rho.signed_frobenius_strong_v2"),
+            arm(
+                "rho-strong-escape",
+                "baseline",
+                "rho.signed_frobenius_strong_escape",
+            ),
             arm("rho-frob-v2", "baseline", "rho.signed_frobenius_v2"),
             arm("rho-neg-v2", "baseline", "rho.negation_v2"),
             arm(
@@ -169,7 +177,7 @@ def koblitz_specs() -> list[dict]:
             "schema": "ecbench.spec/v1",
             "label": f"E2E frontier refresh: Koblitz E0 n={n}",
             "description": (
-                "Cold one-target comparison of accounting-v2 strong rho, tuned signed-Frobenius rho, "
+                "Cold one-target comparison of accounting-v2 strong rho, fruitless-cycle-escape rho, tuned signed-Frobenius rho, "
                 "root finding, inherited F4, F6-IC, the pair claw, and a strong-rho A/A arm. "
                 "Timeouts and budget exhaustion are retained."
             ),
@@ -242,11 +250,19 @@ def main() -> None:
     execution = {
         "schema": "ecbench.frontier-campaign/v1",
         "date": "2026-10-31",
-        "source_commit": "48c8a4767d2d1eed6a7b379f74410bc729239380",
-        "binary_sha256": "91f5895637501c6de257bbaf3afc9cbc2c0f5e964964d3dc4fc3bf78a427d96b",
+        "source_commit": SOURCE_COMMIT,
+        "binary_sha256": BINARY_SHA256,
+        "image_uri": IMAGE_URI,
+        "publication_receipt": "execution/publication.json",
         "backend": "isolab-eks-spot",
         "measurement_class": "measurement",
-        "state": "blocked_no_authenticated_eks_route",
+        "state": "blocked_checkpoint_and_protocol_revision",
+        "protocol_status": "draft",
+        "draft_warning": (
+            "The listed nine jobs plan on the exact current binary but do not yet cover every "
+            "current parameterized implementation or fit the 3600-second queue envelope; they "
+            "must be expanded and sharded before freeze."
+        ),
         "fixed_requirements": {
             "one_target_scope": True,
             "targets_per_cell": 8,
