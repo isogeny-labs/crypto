@@ -53,6 +53,8 @@ LEDGER = "research/notes/index-calculus/RESEARCH_IC_BOUNDARY_LEDGER.md"
 LEDGER_COVERED_THROUGH = 24
 
 SOURCES = {
+    "n83_basis_cold": "research/n83_basis_setup_20261015/reports/run-20261015T1842Z/native_statistics.json",
+    "n83_basis_final": "research/n83_basis_setup_20261015/reports/final-20261016/native_final.json",
     "round5": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "matched_rho": "research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json",
     "matched_rho_analysis": "research/ic_rho_reference_20260923/analysis.json",
@@ -123,6 +125,9 @@ SOURCES = {
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
+    "n83_matched": "research/n83_matched_20261014/records/postprocess-20261015T0018Z/statistics.json",
+    "n83_matched_replay": "research/n83_matched_20261014/records/postprocess-20261015T0018Z/independent_replay_v3_receipt.json",
+    "n83_matched_supplement": "research/n83_matched_20261014/records/postprocess-20261015T0018Z/presentation_supplement.json",
     "jv_sieve_strong_rho": "research/jv_sieve_strong_rho_20261019/review-20261020/summary.json",
     "n83_tier1_finalist_rows": "research/n83_e2e_final_holdout_20261016/ic1_rows_39005111289.json",
     "n83_tier1_finalist_validated": "research/n83_e2e_final_holdout_20261016/validated_rows.json",
@@ -1474,6 +1479,91 @@ def latest_frontier_audit() -> dict:
     }
 
 
+def matched_n83_diagnostic() -> dict:
+    """Quote native local-process observations outside every ranked table."""
+    result = load(SOURCES["n83_matched"])
+    replay = load(SOURCES["n83_matched_replay"])
+    supplement = load(SOURCES["n83_matched_supplement"])
+    if (result.get("schema") != "n83_matched_statistics_v1"
+            or result.get("all_required_rows_valid") is not True
+            or result.get("overall_primary_winner_eligible") is not True
+            or replay.get("status") != "PASS"
+            or replay.get("complete_panel_gate") is not True
+            or replay.get("completed_verified_processes") != 32
+            or replay.get("checked_target_rows") != 218
+            or replay.get("IC_four_point_witness_replays") != 104
+            or replay.get("checked_aa_semantic_pairs") != 5
+            or replay.get("invalid_rows") != 0
+            or supplement.get("schema") != "n83_matched_supplement_v1"
+            or supplement.get("counts") != {"ic_targets": 104, "rho_targets": 114,
+                                             "all_targets": 218, "processes": 32}
+            or supplement["provenance"]["frozen_statistics"]["sha256"]
+            != sha256(SOURCES["n83_matched"])
+            or result["input_metadata"]["independent_verification_receipt_sha256"]
+            != sha256(SOURCES["n83_matched_replay"])):
+        raise SystemExit("matched N83 diagnostic requires the complete bound native replay and analysis")
+    return {
+        "source": SOURCES["n83_matched"],
+        "replay_source": SOURCES["n83_matched_replay"],
+        "presentation_source": SOURCES["n83_matched_supplement"],
+        "curve": "icv1-f2m83-t6151469093347-9eba6cd5",
+        "measurement_date": "2026-10-14",
+        "class": "accounting",
+        "admission": "local diagnostic only; no ranked recipe or ledger promotion",
+        "S": None,
+        "ratio_to_floor": None,
+        "controlled_speedup": None,
+        "cold": result["primary_actual_cold_singleton_process_wall"],
+        "batch": result["primary_prepared_batch_process_wall"],
+        "online": result["secondary_prepared_online_target_means"],
+        "costs": result["costs"],
+        "observed_counts": result["observed_counts"],
+        "verification": {k: replay[k] for k in (
+            "completed_verified_processes", "checked_target_rows",
+            "IC_scalar_replays", "rho_scalar_replays", "IC_four_point_witness_replays",
+            "checked_aa_semantic_pairs", "aa_semantic_gate", "invalid_rows", "missing_target_rows")},
+        "limits": (
+            "Eight actual one-target cold pairs and three actual 32-target shared-setup pairs, "
+            "given retained K600; original base construction and OS-cold caching are unmeasured. "
+            "Rho reuses curve/basis preparation with fresh seed-specific jumps and fresh DP state. "
+            "Online is secondary because IC omits validation/output intervals charged by rho. "
+            "One VM, three preparation clusters, fixed IC rank seed 29; no common S, "
+            "sealed legacy-wide ecbench admission, physical-host or independent-host claim. "
+            "Modeled workloads beyond 32 are not measured crossovers."
+        ),
+    }
+
+
+def basis_n83_diagnostic() -> dict:
+    """Copy native recorded diagnostics; no scientific arithmetic or admission."""
+    cold, final = load(SOURCES["n83_basis_cold"]), load(SOURCES["n83_basis_final"])
+    if (cold.get("stage") != "cold" or cold.get("stage_failures") != 0
+            or final.get("status") != "COMPLETE_ACCOUNTING_WITH_UNRESOLVED_COHORT_REFERENCE"
+            or (final.get("attempted"), final.get("completed"), final.get("canonical_answers"),
+                final.get("rank_log_audits"), final.get("AA_pairs")) != (55, 50, 92, 30, 5)
+            or final.get("cohort_IC_over_rho") is not None):
+        raise SystemExit("N83 basis diagnostic requires bound actual evidence and unavailable cohort reference")
+    return {"source": SOURCES["n83_basis_final"], "cold_source": SOURCES["n83_basis_cold"],
+            "curve": "icv1-f2m83-t6151469093347-9eba6cd5", "measurement_date": "2026-10-15",
+            "class": "engineering", "admission": "local diagnostic only; no ranked or ledger promotion",
+            "S": None, "ratio_to_floor": None, "cohort_IC_over_rho": None,
+            "counts": {k: final[k] for k in ("attempted", "completed", "failed", "canonical_answers", "ic_answers", "rho_answers", "rank_log_audits", "AA_pairs")},
+            "cold": cold["comparisons"], "cold_processes": cold["process_summary"],
+            "cohort_selected_over_control": final["cohort_selected_over_control"],
+            "limits": "C3 selected before fresh holdouts. Eight actual cold blocks; three cohort rho workers rejected8-point input. Fifty complete and five failed processes,92answers. Cohort IC/rho unavailable; no replacement or projected timing. One guest/three prep clusters, no calibrated S/L2/independent-host or security claim. Original retained K600 construction and OS-cache flushing unpriced."}
+
+def basis_n83_markdown(doc):
+    b = doc["n83_basis_setup_diagnostic"]
+    lines = ["## Bounded legacy degree-83 basis/setup diagnostic (measured2026-10-15)", "",
+             "Training-selected C3 prefix1271dense, exact legacy a=1/tail149. Native complete-process ratios; below1 favors IC. Outside admitted tables.", "",
+             "| Cold comparison (8 target blocks) | Mean-cost ratio | Conditional95% interval |", "|:--|--:|:--|"]
+    for key, label in (("selected_over_rho", "C3/rho"), ("control_over_rho", "K600/rho"), ("selected_over_control", "C3/K600")):
+        row = b["cold"][key]
+        lines.append(f"| {label} | {row['mean_cost_ratio']:.9f} | [{row['conditional_95_percent_interval'][0]:.9f}, {row['conditional_95_percent_interval'][1]:.9f}] |")
+    lines += ["", b["limits"], "", f"[Native full accounting](../../{b['source']}); [cold statistics](../../{b['cold_source']}).", ""]
+    return lines
+
+
 def jv_sieve_table() -> dict:
     """Read qualified native analysis; retain descriptive fields without treating
     missing control acceptance or incomplete original accounting as eligibility.
@@ -1909,6 +1999,8 @@ def build(allow_unvalidated: bool = False) -> dict:
             "paired_intervals": n83_holdout["paired_intervals"],
             "aa_controls": n83_holdout["aa_controls"],
         },
+        "n83_matched_process_diagnostic": matched_n83_diagnostic(),
+        "n83_basis_setup_diagnostic": basis_n83_diagnostic(),
         "n83_tier1_finalist": {
             "source": SOURCES["n83_tier1_finalist_rows"],
             "report": "research/n83_e2e_finalist_results_20261017/RESULT.md",
@@ -2198,6 +2290,25 @@ def markdown(doc: dict) -> str:
         L.append(f"| {point['date']} | [{point['label']}]({point['source']}) | "
                  f"{times(point['value'])} | {point['reference']} | {point.get('unit') or 'source-specific; see result'} |")
     L.append("")
+    L += basis_n83_markdown(doc)
+    matched = doc["n83_matched_process_diagnostic"]
+    L += ["## Matched legacy degree-83 local process diagnostic (measured 2026-10-14)", "",
+          f"`{matched['curve']}`; accounting only, outside tables A–C. "
+          "Ratios are native IC/rho costs; below 1 favors IC. No S, floor or admitted-best promotion.", "",
+          "| Workload | Mean IC seconds | Mean rho seconds | Native IC/rho [95%] |",
+          "|:--|--:|--:|:--|"]
+    for label, key in (("8 actual cold singleton pairs", "cold"),
+                       ("3 actual shared-setup pairs, 32 targets each", "batch"),
+                       ("32 target online means, 3 repeats; secondary", "online")):
+        row = matched[key]
+        L.append(f"| {label} | {row['arithmetic_mean_ic_s']:.6f} | "
+                 f"{row['arithmetic_mean_rho_s']:.6f} | {row['ic_over_rho']:.6f} "
+                 f"[{row['interval_95'][0]:.6f}, {row['interval_95'][1]:.6f}] |")
+    L += ["", "32 processes, 218 replayed scalar answers, 104 IC witnesses and five exact-work A/A pairs; "
+          "no failed or omitted cases. " + matched["limits"], "",
+          f"[Native statistics](../../{matched['source']}); "
+          f"[independent replay](../../{matched['replay_source']}); "
+          f"[native phases and resource records](../../{matched['presentation_source']}).", ""]
     pilot = doc["native_tournament_pilot"]
     pilot_rows = pilot["rows"]
     confirmed = [r for r in pilot_rows if r["stage"] == "confirmation" and r["arm"] == "batch16"]
@@ -3132,6 +3243,32 @@ def page(doc: dict, standalone: bool) -> str:
                  f'{unit_ref("B")}</p></div>')
     P.append(f'<div class="fact"><dt>Curves</dt><dd>{len({r["slug"] for r in board})} priced</dd>'
              f'<p>of {len(doc["roster"])} named in the repository; every one by its ICV1 slug</p></div></dl></header>')
+    basis = doc["n83_basis_setup_diagnostic"]
+    P.append('<section class="panel" id="n83-basis-setup-diagnostic"><h2>Bounded degree-83 basis/setup · measured2026-10-15 <span class="chip">engineering diagnostic</span></h2><p>Training-selected C3 prefix1271dense. Native complete-process cold comparison,8 matched target blocks. No ranked/ledger promotion.</p><div class="scroll"><table><thead><tr><th>Cold comparison</th><th>Mean cost ratio</th><th>Conditional95% interval</th></tr></thead><tbody>')
+    for key, label in (("selected_over_rho", "C3/rho"), ("control_over_rho", "K600/rho"), ("selected_over_control", "C3/K600")):
+        row = basis["cold"][key]
+        P.append(f'<tr><td>{label}</td><td>{row["mean_cost_ratio"]:.9f}</td><td>[{row["conditional_95_percent_interval"][0]:.9f}, {row["conditional_95_percent_interval"][1]:.9f}]</td></tr>')
+    P.append('</tbody></table></div><p>' + esc(basis["limits"]) + '</p><p>' + gh(basis["source"], "Native final evidence") + ' · ' + gh(basis["cold_source"], "Native cold statistics") + '</p></section>')
+    matched = doc["n83_matched_process_diagnostic"]
+    P.append('<section class="panel" id="n83-matched-process-diagnostic">'
+             '<h2>Matched legacy degree-83 local process diagnostic · measured 2026-10-14 '
+             '<span class="chip">accounting</span></h2>'
+             f'<p><code>{esc(matched["curve"])}</code>. Native IC/rho costs; below 1 favors IC. '
+             'Outside the ranked tables: S, floor and admitted-best fields remain unset.</p>'
+             '<div class="scroll"><table><thead><tr><th>Workload</th><th>Mean IC seconds</th>'
+             '<th>Mean rho seconds</th><th>Native IC/rho [95%]</th></tr></thead><tbody>')
+    for label, key in (("8 actual cold singleton pairs", "cold"),
+                       ("3 actual shared-setup pairs, 32 targets each", "batch"),
+                       ("32 target online means, 3 repeats; secondary", "online")):
+        row = matched[key]
+        P.append(f'<tr><td>{esc(label)}</td><td>{row["arithmetic_mean_ic_s"]:.6f}</td>'
+                 f'<td>{row["arithmetic_mean_rho_s"]:.6f}</td><td>{row["ic_over_rho"]:.6f} '
+                 f'[{row["interval_95"][0]:.6f}, {row["interval_95"][1]:.6f}]</td></tr>')
+    P.append('</tbody></table></div><p>32 processes, 218 independently replayed scalar answers, '
+             '104 IC witnesses and five exact-work A/A pairs; no failed or omitted cases.</p>'
+             f'<p>{esc(matched["limits"])} {gh(matched["source"], "Native statistics")} · '
+             f'{gh(matched["replay_source"], "Independent replay")} · '
+             f'{gh(matched["presentation_source"], "Native phases and resource records")}.</p></section>')
     P.append(f'<section class="panel" id="lookup"><h2>Find a curve, base, and rho gap</h2>'
              '<p><a href="#board">Browse the ranked curve tables</a> or '
              f'<a href="{site}browser/#curves">search every registered curve</a>. Each ranked row names '
@@ -4232,7 +4369,12 @@ def main() -> int:
         ap.error("--check never allows unvalidated rows")
     doc = build(allow_unvalidated=args.allow_unvalidated)
     # Round only the JSON: rendering compares recipe rows by identity.
-    outs = {OUT_JSON: json.dumps(stable(doc), indent=1, ensure_ascii=False) + "\n",
+    serialized = stable(doc)
+    # This diagnostic copies native results without Python-derived arithmetic;
+    # preserve their full binary64 values instead of rounding their evidence.
+    serialized["n83_matched_process_diagnostic"] = doc["n83_matched_process_diagnostic"]
+    serialized["n83_basis_setup_diagnostic"] = doc["n83_basis_setup_diagnostic"]
+    outs = {OUT_JSON: json.dumps(serialized, indent=1, ensure_ascii=False) + "\n",
             OUT_MD: markdown(doc), OUT_HTML: page(doc, standalone=True)}
     if args.check:
         sections = [int(m) for m in re.findall(r"^## (\d+)\.", (REPO / LEDGER).read_text(), re.M)]
