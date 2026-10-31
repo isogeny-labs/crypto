@@ -141,10 +141,23 @@ admin() { # admin <event json>
 log "migrate";         admin '{"action":"migrate"}'
 log "login roles";     admin '{"action":"bootstrap_roles"}'
 if [ "${ECDB_SKIP_IMPORT:-0}" != 1 ]; then
-  for what in registry walks traits covers transfers certificates derived enrich; do
+  for what in registry walks traits covers transfers certificates siblings derived enrich results; do
     # Keep the full report in a variable: a pipe into head would SIGPIPE the script under pipefail.
     log "import $what"; report=$(admin "{\"action\":\"import\",\"what\":\"$what\"}"); echo "${report:0:2000}"
   done
+  # ecbench sessions: the parts build-lambda.sh left beside the zip, one invocation each.
+  parts="${zip%.zip}.ecbench"
+  if [ -d "$parts" ]; then
+    n=0
+    for part in "$parts"/ecbench-*.jsonl.gz; do
+      ev=$(mktemp)
+      printf '{"action":"import_pack","name":"ecbench","data":"%s"}' "$(base64 -w0 "$part")" > "$ev"
+      report=$(admin "$(cat "$ev")"); rm -f "$ev"; n=$((n + 1))
+      log "ecbench part $n: ${report:0:300}"
+    done
+  else
+    log "no ecbench parts at $parts; skipped"
+  fi
 fi
 log "status";          admin '{"action":"status"}'
 echo "API: $api_url  (bearer token: secret $name/api, key read_token)"

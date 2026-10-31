@@ -1790,11 +1790,20 @@ The user guide, including S3 storage, is
 
 ## Querying the curve database (ecdb)
 
-ecdb is a Postgres catalogue on RDS (us-west-2). It holds every curve in the
-registry, the walk outputs and the trait catalogue, with their Jacobians,
-isogenies, covers, transfer prices and computed polynomials. Agents reach it
-through the MCP server `ecdb` in `.mcp.json` or over HTTP. The guide is
-[ecdb/docs/AGENTS.md](ecdb/docs/AGENTS.md); read it before the first query.
+ecdb is a Postgres catalogue on RDS (us-west-2). It holds:
+
+- every curve in the registry, the walk outputs and the trait catalogue,
+  with their Jacobians, isogenies, covers, transfer prices and computed
+  polynomials;
+- this repository's measured results: the IC leaderboard and its recipes,
+  the progress timeline, the boundary ledger, the `benchmarks/` index, and
+  every ecbench session with its runs;
+- the curve records and measured datasets of cryptanalysis,
+  crypto-autoresearcher, cryptanalysis-rl and ml-cryptanalysis.
+
+Agents reach it through the MCP server `ecdb` in `.mcp.json`, over HTTP, or
+with `scripts/ecdb.sh`. The guide is [ecdb/docs/AGENTS.md](ecdb/docs/AGENTS.md);
+read it before the first query.
 
 - **Look up before computing.** Query ecdb before writing code or scanning
   `docs/curves/*.json` for a curve fact. This covers trace, order, cofactor,
@@ -1819,6 +1828,16 @@ through the MCP server `ecdb` in `.mcp.json` or over HTTP. The guide is
 - **Transfer prices are leads.** `dlp_transfer.ratio_log2` is a formula
   estimate. It is not a measured speedup, and it never enters the IC
   leaderboard or `benchmarks/` (§5a and "The rule: boundary, table, ratio").
+- **Measured rows are copies.** Leaderboard, progress, boundary, benchmark,
+  ecbench and sibling-dataset rows are the producers' frozen records with
+  their units:
+  - compare a ratio only within its leaderboard family, ecbench session or
+    dataset;
+  - rank arms only across the §5a band;
+  - keep `unvalidated (pre-gate)` rows out of any claim.
+
+  Querying them is not a measurement. A new result still goes through its
+  run, the validation gate and the generators of the files ecdb copies.
 - **Relations are not routes.** A twist, isomorphism or model-change row
   does not transport a logarithm. Only a kernel-certified `isogeny` row does
   (the typed curve-link rules above).
@@ -1826,10 +1845,14 @@ through the MCP server `ecdb` in `.mcp.json` or over HTTP. The guide is
   need the write token. They record what a run or certificate in a PR
   supports, with its artifact hash and true status. Correct imported data in
   the source file, then redeploy (`ecdb/deploy/README.md`). Never patch rows.
-- **Keep it current.** A PR that changes a catalogue ecdb imports (the
-  registry, `traits.json`, `covers.json`, `jacobian-transfers.json`, the
-  certificates, the imported walk outputs) says so in its body. After merge,
-  redeploy with `ecdb/deploy/build-lambda.sh` and `ecdb/deploy/deploy-aws.sh`.
+- **Keep it current.** A PR that changes a file ecdb imports says so in its
+  body. That covers the registry, `traits.json`, `covers.json`,
+  `jacobian-transfers.json`, the certificates, the imported walk outputs,
+  `docs/ic/leaderboard.json`, `progress-timeline.json`,
+  `boundary_targets.json`, `benchmarks/` and ecbench sessions.
+  `scripts/ecdb.sh check` lists the files that differ from ecdb's copy. After
+  merge, redeploy with `ecdb/deploy/build-lambda.sh` and
+  `ecdb/deploy/deploy-aws.sh`.
 
 ## IC measurement rules
 

@@ -239,6 +239,59 @@ paths:
       description: "Convention: n = 2 is psi_2^2 = 4x^3 + b2 x^2 + 2 b4 x + b6; odd n is psi_n; n = 4 is psi_4 / psi_2. Each was checked to vanish on torsion points when the curve is small enough to enumerate."
       parameters: [{ $ref: "#/components/parameters/reference" }]
       responses: { "200": { description: "{curve_id, convention, items[{n, variant, degree, sha256, coefficients_ascending, factor_degrees, status}]}" } }
+  /v1/curves/{reference}/measurements:
+    get:
+      summary: The curve's measured results, each block in its producer's unit
+      description: IC leaderboard rows with recipes, ecbench arm summaries (v_ecbench_arm), sibling-dataset measurements and sibling-repository records with their match kind. Compare within one block only.
+      parameters: [{ $ref: "#/components/parameters/reference" }]
+      responses: { "200": { description: "{curve_id, ic_leaderboard, ecbench_arms, dataset_measurements, external_records, caution}" } }
+  /v1/ic/leaderboard:
+    get:
+      summary: The IC leaderboard (docs/ic/leaderboard.json), as frozen there.
+      description: best_ratio_rho is IC / rho for the best recipe, cold, against the matched rho of the row's family, in that family's unit; ratios compare only within a family.
+      parameters:
+        - { name: family, in: query, schema: { type: string, enum: [A, B, C] } }
+        - { name: regime, in: query, schema: { type: string } }
+        - { name: validation, in: query, schema: { type: string }, description: "validated or unvalidated (pre-gate)" }
+        - { name: recipes, in: query, schema: { type: boolean, default: false } }
+      responses: { "200": { description: "{families[], rows[], caution}" } }
+  /v1/ic/progress:
+    get:
+      summary: The progress timeline (docs/ic/progress-timeline.json).
+      parameters: [{ name: series, in: query, schema: { type: string } }]
+      responses: { "200": { description: "{series[{id, label, points[]}], caution}" } }
+  /v1/ic/boundary:
+    get:
+      summary: The boundary ledger (docs/ic/boundary_targets.json), per regime and stage.
+      parameters:
+        - { name: regime, in: query, schema: { type: string } }
+        - { name: stage, in: query, schema: { type: string } }
+      responses: { "200": { description: "{items[]}" } }
+  /v1/benchmarks:
+    get:
+      summary: The benchmarks/ index, with each entry's README or archive row and VALIDATION.json.
+      parameters:
+        - { name: listed, in: query, schema: { type: string, enum: [admitted, archive, unlisted] } }
+        - { name: q, in: query, schema: { type: string } }
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses: { "200": { description: OK } }
+  /v1/ecbench/sessions:
+    get:
+      summary: ecbench sessions, newest first.
+      parameters:
+        - { name: method, in: query, schema: { type: string } }
+        - { name: curve, in: query, schema: { type: string }, description: ICV1 slug of a workload curve }
+        - { name: label, in: query, schema: { type: string } }
+        - { name: path, in: query, schema: { type: string } }
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses: { "200": { description: OK } }
+  /v1/ecbench/sessions/{id}:
+    get:
+      summary: One ecbench session with per-arm summaries (runs, verified, mean S and its standard error, mean ratio to the floor) and paired comparisons.
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK }, "404": { description: Not found } }
   /v1/isogenies/{id}:
     get:
       summary: One isogeny with its routes and provenance.
@@ -368,7 +421,7 @@ paths:
         prompts/list return empty lists). Notifications answer 202. initialize, ping and tools/list need no token;
         tools/call forwards the caller's Authorization header to the REST route the tool maps to. Tools:
         ecdb_schema, ecdb_search_curves, ecdb_get_curve, ecdb_curve_detail, ecdb_isogeny_class, ecdb_transfers,
-        ecdb_polynomials, ecdb_sql, ecdb_record_evidence.
+        ecdb_polynomials, ecdb_results, ecdb_ecbench, ecdb_sql, ecdb_record_evidence.
       security: [{}]
       requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
       responses: { "200": { description: JSON-RPC response }, "202": { description: notification accepted } }

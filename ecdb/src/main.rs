@@ -92,6 +92,14 @@ enum Command {
     },
     /// Print the OpenAPI description.
     Openapi,
+    /// Write the packed inputs the Lambda package carries instead of directory trees:
+    /// <out>/ecdb-pack/{ecbench,benchmarks}.jsonl.gz and <out>/ext/<sibling>/... (see deploy/build-lambda.sh).
+    Pack {
+        #[arg(long, default_value = "..")]
+        repo_root: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+    },
 }
 
 #[derive(Subcommand)]
@@ -136,6 +144,12 @@ enum ImportWhat {
     Derived,
     /// Polynomials, GLV endomorphisms, twist relations, group structures (src/import/enrich.rs).
     Enrich,
+    /// docs/ic leaderboard, progress timeline, boundary ledger and the benchmarks/ index.
+    Results,
+    /// Every ecbench session (session.json, records, comparisons, audit) under the checkout.
+    Ecbench,
+    /// Curve records, dataset curves and measurements of the sibling checkouts (src/import/siblings.rs).
+    Siblings,
     /// An LMFDB av_fq_isog JSON export (rows of isogeny classes over finite fields).
     LmfdbAvFq {
         path: PathBuf,
@@ -167,6 +181,19 @@ async fn main() -> Result<()> {
     }
     match Cli::parse().command {
         Command::Openapi => print!("{}", api::OPENAPI),
+        Command::Pack { repo_root, out } => {
+            let repo_root = repo_root.canonicalize()?;
+            let pack_dir = out.join(import::pack::DIR);
+            let (sessions, runs, parts) = import::ecbench::write_pack(&repo_root, &pack_dir)?;
+            let bench = import::results::collect_benchmarks(&repo_root)?;
+            let bench_sha = import::pack::write(&pack_dir, "benchmarks", &bench)?;
+            let staged = import::siblings::stage(&repo_root, &out)?;
+            print(&serde_json::json!({
+                "ecbench": { "sessions": sessions, "runs": runs, "parts": parts },
+                "benchmarks": { "entries": bench.len(), "sha256": bench_sha },
+                "sibling_files": staged.len(),
+            }))?;
+        }
         Command::Migrate { db } => {
             let pool = db::pool(&db)?;
             let mut client = pool.get().await?;
@@ -190,6 +217,9 @@ async fn main() -> Result<()> {
                 ImportWhat::Certificates => import::run(&ctx, Selection::Certificates, None).await?,
                 ImportWhat::Derived => import::run(&ctx, Selection::Derived, None).await?,
                 ImportWhat::Enrich => import::run(&ctx, Selection::Enrich, None).await?,
+                ImportWhat::Results => import::run(&ctx, Selection::Results, None).await?,
+                ImportWhat::Ecbench => import::run(&ctx, Selection::Ecbench, None).await?,
+                ImportWhat::Siblings => import::run(&ctx, Selection::Siblings, None).await?,
                 ImportWhat::LmfdbAvFq { path, title } => vec![import::lmfdb::import(&client, &path, &title).await?],
             };
             print(&reports)?;
