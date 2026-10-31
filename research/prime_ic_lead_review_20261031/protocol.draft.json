@@ -1,6 +1,6 @@
 {
   "schema": "experiment.protocol/v1",
-  "protocol_id": "EXP-prime-shared-coeff-sat-screen-20261031",
+  "protocol_id": "EXP-prime-m3-cdclt-exponent-screen-20261031",
   "version": 1,
   "created": "2026-10-31",
   "repository": "crypto",
@@ -10,10 +10,10 @@
   ],
   "links": {
     "narrative": "research/prime_ic_lead_review_20261031/PROTOCOL.md",
-    "construction": "research/prime_one_shot_20261029/README.md",
+    "construction": "research/prime_ic_lead_review_20261031/DEC-20261031-cd6460.md",
     "prior_sat_design": "research/sat_smt_prime_ic_design_20261030/DESIGN.md"
   },
-  "question": "On the same exact selected-chart prime-field decomposition predicate, does a CDCL, CNF-XOR or QF_FF solver bundle show lower complete-work growth than exact enumeration and F4 on unseen natural targets, with exact correctness, A/A, planted and matched-null controls?",
+  "question": "At fixed arity m=3, does hybrid CDCL(T) with an F_p theory or cvc5 QF_FF achieve point-decomposition work 2^(e s) with the upper corrected 95% interval for e strictly below 0.5, while passing exact enumeration, planted, UNSAT, curve-free-null and A/A controls?",
   "claims": [
     {
       "id": "C1",
@@ -23,18 +23,17 @@
     },
     {
       "id": "C2",
-      "text": "At least one preregistered SAT solver/representation bundle has lower complete retired-instruction growth than exact candidate enumeration and is below F4 on the two largest jointly completed rungs, outside A/A spread.",
+      "text": "At least one preregistered finite-field solver bundle has a complete-work exponent e whose corrected upper 95% interval is strictly below the arity-three rho crossover 0.5, outside A/A spread.",
       "class": "comparative",
       "decided_by": [
-        "C-sat-f4",
         "C-slope"
       ],
-      "if_supported": "the frozen SAT bundle advances to a complete relation-collection experiment; no asymptotic or ECDLP speedup claim",
-      "if_not_supported": "the frozen SAT bundle is not advanced under the stated ladder and limits; no universal SAT impossibility claim"
+      "if_supported": "the frozen bundle advances to the separately frozen s=15..27 continuation; no asymptotic or ECDLP speedup claim",
+      "if_not_supported": "the frozen bundle is not advanced under the stated ladder and limits; no universal SAT or CDCL(T) impossibility claim"
     },
     {
       "id": "C3",
-      "text": "The CDCL bundle uses elliptic/decomposition structure beyond a support- and model-count-matched curve-free null on the tested cells.",
+      "text": "The CDCL(T)/F_p bundle uses elliptic/decomposition structure beyond a support- and model-count-matched curve-free null on the tested cells.",
       "class": "comparative",
       "decided_by": [
         "C-structure"
@@ -54,14 +53,14 @@
   "hypotheses": [
     {
       "id": "H1",
-      "statement": "A compact shared-coefficient predicate exposes enough local Boolean structure that at least one SAT bundle prunes a growing fraction of the exact candidate space.",
-      "mechanism": "Quotient/remainder layers share coefficients across all roots and avoid the free quotient-carry pattern of the earlier direct Semaev bit-blast.",
+      "statement": "The arity-three one-hot chained-S3 predicate exposes enough Boolean and finite-field structure that at least one hybrid solver bundle has complete-work exponent e below 0.5.",
+      "mechanism": "CaDiCaL owns the one-hot Boolean skeleton while an F_p theory propagator owns field arithmetic and checked explanations; disjoint windows provide guarded three-summand rationality without an S4 expansion.",
       "predictions": [
         {
           "id": "P1",
-          "metric": "growth_slope",
+          "metric": "pdp_exponent_e",
           "direction": "lower",
-          "minimum_effect": "upper corrected 95% interval at most 0.85 across the three largest rungs",
+          "minimum_effect": "upper corrected 95% interval strictly below 0.5 over the preregistered s=6..14 ladder",
           "provenance": {
             "written_at": "2026-10-31",
             "first_recorded_in": "research/prime_ic_lead_review_20261031/PROTOCOL.md",
@@ -76,7 +75,7 @@
               }
             ],
             "sample_status": "out_of_sample",
-            "decisive_scope": "the four frozen shared-coefficient rungs and solver versions only"
+            "decisive_scope": "the fixed-m=3, s=6..14 ladder and frozen solver/theory versions only"
           },
           "role": "decisive"
         }
@@ -84,8 +83,8 @@
     },
     {
       "id": "H2",
-      "statement": "Any CDCL reduction is caused by the elliptic/shared-coefficient structure rather than sparse-system shape alone.",
-      "mechanism": "The curve equations and shared remainder identities create repeated implications absent from a coefficient-randomized support-matched null.",
+      "statement": "Any CDCL(T) reduction is caused by elliptic/chained-S3 structure rather than one-hot and sparse-system shape alone.",
+      "mechanism": "The curve equations and chained finite-field identities create repeated implications absent from a coefficient-randomized support-matched null.",
       "predictions": [
         {
           "id": "P2",
@@ -108,7 +107,7 @@
     {
       "id": "enum-ref",
       "role": "reference",
-      "description": "Canonical exact enumeration and projected model-set reference.",
+      "description": "Canonical exact two-window enumeration and projected model-set reference; expected exponent e=2 up to polynomial factors.",
       "instrument": {
         "repo": "crypto",
         "commit": null,
@@ -154,16 +153,16 @@
       }
     },
     {
-      "id": "cdcl-cnf",
+      "id": "cdcl-t-fp",
       "role": "candidate",
-      "description": "Parsimonious CNF export solved by a pinned single-thread CaDiCaL binary.",
+      "description": "One-hot Boolean skeleton solved by pinned single-thread CaDiCaL with an external F_p theory propagator and checked explanation clauses.",
       "instrument": {
         "repo": "crypto",
         "commit": null,
         "build": null,
         "binary_sha256": null,
         "flags": {
-          "backend": "cadical",
+          "backend": "cadical-external-fp-theory",
           "threads": "1"
         },
         "env": {
@@ -173,21 +172,22 @@
         "image_digest": null
       },
       "parameters": {
-        "encoding": "parsimonious-cnf",
+        "encoding": "one-hot-chained-s3-cdcl-t-fp",
+        "theory_explanations": "required and independently checked",
         "proof_logging": "required for UNSAT"
       }
     },
     {
-      "id": "xor-cnf",
-      "role": "candidate",
-      "description": "CNF-XOR export solved by a pinned single-thread CryptoMiniSat binary.",
+      "id": "cnf-cost",
+      "role": "baseline",
+      "description": "Complete pure-CNF bit-blast retained only as an encoding-cost control; general field multiplication pays Theta(log^2 p) gates.",
       "instrument": {
         "repo": "crypto",
         "commit": null,
         "build": null,
         "binary_sha256": null,
         "flags": {
-          "backend": "cryptominisat",
+          "backend": "cadical-pure-cnf-cost-control",
           "threads": "1"
         },
         "env": {
@@ -197,7 +197,7 @@
         "image_digest": null
       },
       "parameters": {
-        "encoding": "cnf-xor",
+        "encoding": "complete-field-bitblast-cnf",
         "proof_logging": "required for UNSAT"
       }
     },
@@ -226,16 +226,16 @@
       }
     },
     {
-      "id": "cdcl-aa",
+      "id": "cdcl-t-aa",
       "role": "control_aa",
-      "description": "Byte-identical CDCL input and seed in a fresh process/layout.",
+      "description": "Byte-identical CDCL(T) Boolean input, theory instance and seed in a fresh process/layout.",
       "instrument": {
         "repo": "crypto",
         "commit": null,
         "build": null,
         "binary_sha256": null,
         "flags": {
-          "backend": "cadical",
+          "backend": "cadical-external-fp-theory",
           "threads": "1"
         },
         "env": {
@@ -245,22 +245,22 @@
         "image_digest": null
       },
       "parameters": {
-        "encoding": "parsimonious-cnf",
+        "encoding": "one-hot-chained-s3-cdcl-t-fp",
         "layout": "fresh-process"
       },
-      "same_instrument_as": "cdcl-cnf"
+      "same_instrument_as": "cdcl-t-fp"
     },
     {
       "id": "planted-positive",
       "role": "control_positive",
-      "description": "The same CDCL path on instances with a hidden planted decomposition; any valid decomposition is accepted after replay.",
+      "description": "The same CDCL(T) path on instances with a hidden planted decomposition; any valid decomposition is accepted after replay.",
       "instrument": {
         "repo": "crypto",
         "commit": null,
         "build": null,
         "binary_sha256": null,
         "flags": {
-          "backend": "cadical",
+          "backend": "cadical-external-fp-theory",
           "threads": "1"
         },
         "env": {
@@ -271,21 +271,21 @@
       },
       "parameters": {
         "target_class": "planted",
-        "encoding": "parsimonious-cnf"
+        "encoding": "one-hot-chained-s3-cdcl-t-fp"
       },
-      "same_instrument_as": "cdcl-cnf"
+      "same_instrument_as": "cdcl-t-fp"
     },
     {
       "id": "matched-null",
       "role": "control_negative",
-      "description": "The same CDCL path on a coefficient-randomized curve-free predicate matched on field, shape, support graph and model class/count.",
+      "description": "The same CDCL(T) path on a coefficient-randomized curve-free predicate matched on field, one-hot/window shape, support graph and model class/count.",
       "instrument": {
         "repo": "crypto",
         "commit": null,
         "build": null,
         "binary_sha256": null,
         "flags": {
-          "backend": "cadical",
+          "backend": "cadical-external-fp-theory",
           "threads": "1"
         },
         "env": {
@@ -296,9 +296,9 @@
       },
       "parameters": {
         "target_class": "matched-null",
-        "encoding": "parsimonious-cnf"
+        "encoding": "one-hot-chained-s3-cdcl-t-fp"
       },
-      "same_instrument_as": "cdcl-cnf"
+      "same_instrument_as": "cdcl-t-fp"
     }
   ],
   "controls": {
@@ -317,16 +317,16 @@
       "present": true,
       "arm": "matched-null",
       "null_population": {
-        "description": "Coefficient-randomized curve-free sparse systems paired to the natural instances.",
-        "generator": "Protocol-hash seeded native generator; preserve field, variable/equation/degree multiset, monomial-support incidence graph, chart and field equations; condition on equal exact model count where enumerable and the same planted/UNSAT class otherwise.",
-        "n": 96,
+        "description": "Coefficient-randomized curve-free sparse systems paired to the natural arity-three instances.",
+        "generator": "Protocol-hash seeded native generator; preserve field, one-hot/window shape, variable/equation/degree multiset, monomial-support incidence graph, chart and field equations; condition on equal exact model count where enumerable and the same planted/UNSAT class otherwise.",
+        "n": 216,
         "why_n": "One paired null per declared instance; test-specific power remains a freeze blocker until preflight variance is measured.",
         "matched_on": [
           "prime field and bit length",
           "variable and equation counts",
           "degree multiset",
           "monomial-support incidence graph",
-          "selected chart and field equations",
+          "selected chart, one-hot/window shape and field equations",
           "target class",
           "exact model count on enumerable cells"
         ]
@@ -341,18 +341,23 @@
         "levels": [
           "exact-enumeration",
           "msolve-f4",
-          "cadical-cnf",
-          "cryptominisat-cnf-xor",
+          "cadical-cdcl-t-fp",
+          "cadical-pure-cnf-cost-control",
           "cvc5-qf-ff"
         ]
       },
       {
         "name": "rung",
         "levels": [
-          "m3-t3",
-          "m5-t4",
-          "m7-t5",
-          "m9-t6"
+          "m3-s6",
+          "m3-s7",
+          "m3-s8",
+          "m3-s9",
+          "m3-s10",
+          "m3-s11",
+          "m3-s12",
+          "m3-s13",
+          "m3-s14"
         ]
       },
       {
@@ -366,7 +371,7 @@
       {
         "name": "predicate_structure",
         "levels": [
-          "elliptic-shared-coefficient",
+          "elliptic-one-hot-chained-s3",
           "support-model-matched-null"
         ]
       }
@@ -394,9 +399,9 @@
         "how": "one commit and binary hash filled before freeze"
       },
       {
-        "name": "external_solver_version",
+        "name": "external_solver_and_theory_version",
         "treatment": "fixed",
-        "how": "one version/hash/flag set per arm, filled before freeze"
+        "how": "one solver version/hash/flag set per arm plus exact F_p propagator source and explanation checker, filled before freeze"
       },
       {
         "name": "threads",
@@ -430,8 +435,8 @@
         "id": "C-sat-f4",
         "arms": [
           "f4-base",
-          "cdcl-cnf",
-          "xor-cnf",
+          "cdcl-t-fp",
+          "cnf-cost",
           "qf-ff"
         ],
         "differs_in": [
@@ -445,36 +450,35 @@
         "id": "C-sat-enum",
         "arms": [
           "enum-ref",
-          "cdcl-cnf",
-          "xor-cnf",
+          "cdcl-t-fp",
+          "cnf-cost",
           "qf-ff"
         ],
         "differs_in": [
           "solver_representation_bundle"
         ],
         "design": "one_factor",
-        "reason": "Exact enumeration supplies the model set and candidate-space denominator.",
+        "reason": "Exact enumeration supplies the model set and the e=2 arity-three cost control; it is not the slope normalization axis.",
         "threshold": null
       },
       {
         "id": "C-slope",
         "arms": [
-          "cdcl-cnf",
-          "xor-cnf",
+          "cdcl-t-fp",
           "qf-ff"
         ],
         "differs_in": [
           "rung"
         ],
         "design": "absolute",
-        "reason": "Each candidate is read against a preregistered normalized growth threshold.",
-        "threshold": "upper corrected 95% interval of log-work slope <= 0.85"
+        "reason": "Each candidate is fit directly against scale s and read against the arity-three rho crossover.",
+        "threshold": "upper corrected 95% interval of e strictly below 0.5"
       },
       {
         "id": "C-aa",
         "arms": [
-          "cdcl-cnf",
-          "cdcl-aa"
+          "cdcl-t-fp",
+          "cdcl-t-aa"
         ],
         "differs_in": [],
         "design": "aa",
@@ -484,7 +488,7 @@
       {
         "id": "C-structure",
         "arms": [
-          "cdcl-cnf",
+          "cdcl-t-fp",
           "matched-null"
         ],
         "differs_in": [
@@ -520,7 +524,7 @@
       "note": "Use experiment_protocol.py seeds after freeze; scratch preflight uses disjoint disclosed seeds and never the target cells."
     },
     "instance_sampling": {
-      "rule": "For each of four rungs generate eight natural, eight planted and eight exact-UNSAT instances from protocol-hash seeds before assigning arms; generate one paired matched null per instance.",
+      "rule": "For every integer s=6..14 at fixed m=3, generate eight natural, eight planted and eight exact-UNSAT instances from protocol-hash seeds before assigning arms; generate one paired matched null per instance.",
       "independent_of_arm": true
     },
     "blinding": {
@@ -530,18 +534,18 @@
     }
   },
   "sample_size": {
-    "instances": 96,
+    "instances": 216,
     "replicates": 3,
     "warmups": 1,
     "power": {
       "method": "paired_bootstrap",
       "alpha": 0.05,
-      "tests_in_family": 3,
+      "tests_in_family": 2,
       "correction": "holm",
       "rank_test_n": null,
       "min_attainable_two_sided_p": null,
       "passes": false,
-      "note": "Draft freeze blocker: preflight must justify power for a 15% slope reduction and 1.5x paired instruction ratio under observed log-ratio variance. Passing p-value resolution alone would not establish this power."
+      "note": "Draft freeze blocker: preflight must justify power to distinguish an exponent below 0.5 from the boundary and a 1.5x paired instruction ratio under observed log-ratio variance. Passing p-value resolution alone would not establish this power."
     },
     "preflight_runtime": {
       "fixed_seconds": null,
@@ -570,7 +574,7 @@
         "name": "complete retired instructions",
         "unit": "hardware retired instructions",
         "kind": "counted",
-        "definition": "First target-dependent IR compilation instruction through backend exit, model/proof extraction and independent verification; includes serialization and parsing, excludes separately reported reusable target-independent setup.",
+        "definition": "First target-dependent IR compilation instruction through backend exit, model/proof extraction and independent verification; includes serialization, parsing, every theory call and explanation check, and excludes only separately reported reusable target-independent setup.",
         "source": "rows.jsonl perf.instructions",
         "formula": null,
         "aggregation": "median",
@@ -590,13 +594,13 @@
         "uncertainty": "range"
       },
       {
-        "id": "growth_slope",
-        "name": "normalized complete-work growth slope",
-        "unit": "delta log2(instructions) / delta log2(exact candidate-space size)",
+        "id": "pdp_exponent_e",
+        "name": "arity-three PDP complete-work exponent",
+        "unit": "delta log2(complete counted work) / delta s",
         "kind": "derived",
-        "definition": "Robust slope over completed rungs, paired by instance class; no imputation for timeouts.",
-        "source": "analysis output from retired_instructions and instance.exact_candidate_space",
-        "formula": "Theil-Sen slope of log2(retired_instructions) on log2(exact_candidate_space)",
+        "definition": "Robust slope over the fixed-m=3, s=6..14 ladder, paired by instance class; no imputation for timeouts and no normalization by candidate-space size.",
+        "source": "analysis output from retired_instructions and instance.scale_s",
+        "formula": "Theil-Sen slope of log2(retired_instructions) on s",
         "aggregation": "distribution",
         "resolution": null,
         "uncertainty": "paired_bootstrap_ci95"
@@ -608,7 +612,7 @@
         "name": "SAT native-work sensitivity band",
         "unit": "weighted solver events",
         "kind": "derived",
-        "definition": "Decisions plus conflicts plus w times propagations, separately for w=0,0.1,1; reported as a band and never converted to group additions.",
+        "definition": "Decisions plus conflicts plus w times Boolean propagations, separately for w=0,0.1,1; reported beside complete work and the theory ledger, never as a replacement for either.",
         "source": "rows.jsonl counters.decisions/conflicts/propagations",
         "formula": "W(w)=decisions+conflicts+w*propagations, w in {0,0.1,1}",
         "aggregation": "median",
@@ -656,7 +660,14 @@
       "restarts",
       "learned_clauses",
       "learned_bytes",
-      "xor_eliminations",
+      "theory_calls",
+      "theory_propagations",
+      "theory_conflicts",
+      "theory_explanations_checked",
+      "fp_additions",
+      "fp_multiplications",
+      "fp_inversions",
+      "pure_cnf_field_multiplication_gates",
       "f4_solving_degree",
       "f4_rows",
       "f4_columns",
@@ -713,7 +724,7 @@
   },
   "stopping_rules": [
     {
-      "rule": "Fixed design: 8 arms x 96 instances x (1 warmup + 3 measured fresh-process replicates), subject only to the same preregistered per-row timeout and memory limit; then stop.",
+      "rule": "Fixed design: 8 arms x 216 instances x (1 warmup + 3 measured fresh-process replicates), subject only to the same preregistered per-row timeout and memory limit; then stop.",
       "kind": "fixed_n",
       "preregistered": true
     },
@@ -730,22 +741,23 @@
   ],
   "invalidation_rules": [
     "a SAT witness that fails canonical evaluation or independent group replay is wrong_answer and invalidates that arm/cell",
+    "a CDCL(T) propagation or conflict with an explanation clause rejected by the independent checker is wrong_answer and invalidates that arm/cell",
     "an UNSAT result without a checked proof object is unknown, not unsat",
     "a natural/null pair without the preregistered shape and model-class/count match is excluded from C-structure and reported",
     "a row without valid retired-instruction counters is excluded from instruction comparisons and reported",
     "wall time below L2 or after restore is descriptive only with wall_valid false",
-    "a failed planted control makes the corresponding negative reading inconclusive"
+    "a failed planted control makes the corresponding negative reading inconclusive",
+    "a row that omits theory calls or field-operation counters from the complete interval is invalid_measurement"
   ],
   "decision_rule": {
-    "text": "C2 is supported within scope only when one preregistered SAT bundle verifies every completed row, completes all four natural rungs, has Holm-corrected upper 95% growth-slope interval <=0.85 across the three largest rungs, and has complete retired-instruction ratio below 1 versus F4 on the two largest jointly completed rungs outside A/A spread. It is not advanced only when the lower slope interval is >=0.95 on three consecutive rungs or every SAT bundle is censored before F4 on both largest jointly attempted rungs. Other censoring is inconclusive. C3 is separate and requires candidate/null ratio <=0.8 on the three largest rungs with corrected interval below 1.",
+    "text": "C2 is supported within scope only when one preregistered finite-field solver bundle verifies every completed row, completes enough natural cells for the frozen power calculation without favorable-subset selection, and has a Holm-corrected upper 95% interval for e strictly below 0.5 over s=6..14, outside A/A spread and with all theory work charged. It is not advanced only when the corrected lower interval is at least 0.5 with valid controls and sufficient power. Other censoring is inconclusive. C3 is separate and requires candidate/null ratio <=0.8 on the three largest completed rungs with corrected interval below 1.",
     "comparison_ids": [
-      "C-sat-f4",
       "C-slope",
       "C-structure"
     ],
-    "threshold": "slope <=0.85 and SAT/F4 instructions <1 for advance; slope >=0.95 or uniform earlier censoring for not-advanced; structure ratio <=0.8 for C3",
-    "statistic": "paired median instruction ratios and Theil-Sen log-work slope, bootstrapped over held-out instances",
-    "interval": "paired bootstrap 95% intervals, Holm-adjusted over three candidate bundles",
+    "threshold": "upper corrected interval e<0.5 for advance; lower corrected interval e>=0.5 for not-advanced; structure ratio <=0.8 for C3",
+    "statistic": "Theil-Sen slope of log2 complete counted work on s and paired median instruction ratios, bootstrapped over held-out instances",
+    "interval": "paired bootstrap 95% intervals, Holm-adjusted over two candidate bundles",
     "multiple_comparison_correction": "holm",
     "effect_size_measure": "instruction ratio, slope difference, and candidate/null instruction ratio, each shown against A/A spread",
     "verdict_vocabulary": [
@@ -780,8 +792,8 @@
     "export_schema": "experiment.export/v1",
     "review_schema": "experiment.review/v1",
     "graphs": [
-      "complete retired instructions versus exact candidate-space size by opaque arm",
-      "paired SAT/F4 instruction ratios with A/A interval",
+      "log2 complete counted work versus s by opaque arm, with the strict e=0.5 boundary",
+      "pure-CNF gate expansion and paired solver/F4 instruction ratios with A/A interval",
       "candidate/null ratios by rung",
       "solver-native counter vectors under weights 0,0.1,1"
     ],
@@ -791,10 +803,12 @@
     "taking affected pilot or benchmark data before the protocol is frozen and committed",
     "changing cells, seeds, primes, curves, target class, null generator, budgets or thresholds after seeing output",
     "comparing different selected/repeated-root charts across solver arms",
-    "omitting rationality, extraction, proof, setup or verification work from one arm",
+    "omitting theory calls, field operations, explanation checks, extraction, proof, setup or verification work from one arm",
+    "calling a pure-CNF bit-blast and a CDCL(T) finite-field propagator the same solver model",
     "treating timeout, unknown or unproved UNSAT as no solution",
     "selecting favorable solver seeds, variable orders or propagation weights",
     "imputing censored work to manufacture a slope",
+    "fitting the exponent against candidate-space size rather than s or using a non-strict threshold at e=0.5",
     "reading a solver-stage result as a complete ECDLP or rho comparison",
     "reading a finite slope as proof of subexponential complexity"
   ],
@@ -820,14 +834,26 @@
     {
       "ref": "crypto:research/prime_one_shot_20261029/README.md",
       "provenance": "internal",
-      "claim": "The shared quotient/remainder construction has exact tiny witnesses but no unknown-solve scaling result.",
+      "claim": "The shared quotient/remainder construction and three-summand rationality work supply checked semantic ingredients but no arity-three solver exponent.",
       "verified_by": "Repository review at 2c03791383f4bb4ce200e84bdef4309065c61e7f."
+    },
+    {
+      "ref": "crypto:research/prime_factor_base_degree_20261031/README.md",
+      "provenance": "internal",
+      "claim": "The split-graph degree theorems and completed F4 component study are all two-summand results and do not satisfy the arity-three cost bridge.",
+      "verified_by": "Repository review at c5d13654; see DEC-20261031-cd6460.md."
     },
     {
       "ref": "crypto:research/sat_smt_prime_ic_design_20261030/DESIGN.md",
       "provenance": "internal",
       "claim": "The previously tested direct prime-field Semaev QF_BV/LQ-CDCL representation did not show a competitive solver route under its stated probes and assumptions.",
       "verified_by": "Repository review at 2c03791383f4bb4ce200e84bdef4309065c61e7f."
+    },
+    {
+      "ref": "crypto:src/cryptanalysis/sat.rs",
+      "provenance": "internal",
+      "claim": "Current main exposes a native Rust solve_with_lazy_clauses theory callback, not a source-identified CaDiCaL ExternalPropagator implementation; the latter must be bound before freeze.",
+      "verified_by": "Source inspection at correction base c5d13654."
     }
   ],
   "amendments": [],

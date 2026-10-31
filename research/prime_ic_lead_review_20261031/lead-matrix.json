@@ -3,7 +3,16 @@
   "created": "2026-10-31",
   "repository": {
     "name": "isogeny-labs/crypto",
-    "commit": "2c03791383f4bb4ce200e84bdef4309065c61e7f"
+    "commit": "2c03791383f4bb4ce200e84bdef4309065c61e7f",
+    "correction_base": "c5d13654"
+  },
+  "correction": {
+    "decision": "DEC-20261031-cd6460",
+    "record": "research/prime_ic_lead_review_20261031/DEC-20261031-cd6460.md",
+    "cost_bridge": "e < m/2 - 1",
+    "first_relevant_fixed_arity": 3,
+    "m3_strict_exponent_gate": 0.5,
+    "solver_model": "hybrid CDCL(T) with F_p theory; pure CNF is an encoding-cost control"
   },
   "atlas": {
     "repository": "crypto-autoresearcher",
@@ -36,7 +45,7 @@
   ],
   "ranking_basis": "Expected information gain toward a non-generic prime-field relation oracle; not implementation convenience or a performance claim.",
   "best_overall": "hashed-factor-base-btn-contraction",
-  "best_practical_sat_screen": "shared-coefficient-solver-tournament",
+  "best_practical_sat_screen": "m3-chained-s3-cdclt-exponent-screen",
   "best_algebraic_control": "pkm-m4-generalized-root-finding",
   "leads": [
     {
@@ -62,24 +71,26 @@
     },
     {
       "rank": 2,
-      "id": "shared-coefficient-solver-tournament",
+      "id": "m3-chained-s3-cdclt-exponent-screen",
       "atlas_id": "LEAD-ICP-shared-coefficient-membership",
-      "class": "open_unexamined_solver_mechanism",
+      "class": "open_unexamined_hybrid_solver_mechanism",
       "track": "algebraic",
-      "claim_scope": "compact selected-chart decomposition predicate; no complexity bound",
+      "claim_scope": "fixed-arity-three PDP exponent measurement; no complexity bound",
       "current_evidence": [
-        "exact tiny selected-chart witnesses for m=3,5,7",
-        "an exact F17 toy unknown solver exists but enumerates p(p-1)",
-        "the literal norm-to-BTN translation has O(m b^2) edges and does not inherit the tensor bound"
+        "the cost bridge requires e<0.5 at m=3 and makes m=2 structurally irrelevant",
+        "the guarded disjoint-window argument gives rationality at m=3",
+        "the rational lambda lift has discriminant 16 t^2 f(x)",
+        "no measured arity-three PDP exponent exists"
       ],
       "open_obligations": [
-        "native canonical IR and solver exporters",
-        "F_p rationality and exceptional-chart accounting",
-        "unknown-solve scaling against exact enumeration and F4",
+        "native one-hot chained-S3 IR and hybrid solver exporters",
+        "exact CaDiCaL external-propagator source binding and explanation checker",
+        "exceptional-chart and forbidden-word accounting",
+        "complete-work exponent on s=6..14 against enumeration and the curve-free null",
         "complete relation extraction and group replay"
       ],
-      "next_experiment": "frozen exact-enumeration/F4/CDCL/XOR/QF_FF tournament on held-out cells",
-      "ordinary_cdcl_equivalent": true
+      "next_experiment": "frozen m=3, s=6..14 exact-enumeration/F4/CDCL(T)/QF_FF tournament on held-out cells",
+      "ordinary_cdcl_equivalent": false
     },
     {
       "rank": 3,
@@ -89,7 +100,7 @@
       "track": "algebraic",
       "claim_scope": "published factor-base construction with unknown relation-solver complexity",
       "current_evidence": [
-        "m=4 is the first fixed arity that can beat rho in the recorded complete-cost model",
+        "the generic cost bridge is e<m/2-1; m=3 is relevant if e<0.5",
         "measured F4 solving degrees are 6,7,7 at N=8,12,16",
         "the m=4 degree threshold for not losing to rho is at most 4",
         "N=20 is projected to require 240-380 GB under the existing F4 route"
@@ -99,7 +110,7 @@
         "SAT encoding of identical, not regenerated, systems",
         "natural successful target and root-extraction controls"
       ],
-      "next_experiment": "complete N=20 closure and compare SAT/F4 on the canonical same systems",
+      "next_experiment": "complete N=20 closure and compare hybrid CDCL(T)/QF_FF/F4 on the canonical same systems",
       "ordinary_cdcl_equivalent": false
     },
     {
@@ -144,6 +155,10 @@
     {
       "id": "direct-semaev-qfbv-qfff",
       "reason": "20-bit cvc5 arms returned unknown at 120 seconds and later Z3 probes showed no clean scaling; unchanged repetition has low information value"
+    },
+    {
+      "id": "split-graph-m2-as-exponent-lead",
+      "reason": "all accepted split-graph theorems and measurements are two-summand component results; e<0 would be required to beat rho at m=2"
     },
     {
       "id": "lq-cdcl-lattice",
