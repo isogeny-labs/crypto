@@ -1,0 +1,148 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling zerocopy v0.8.60
+   Compiling libc v0.2.190
+   Compiling icu_properties_data v2.3.0
+   Compiling generic-array v0.14.7
+   Compiling icu_normalizer_data v2.3.0
+   Compiling crossbeam-utils v0.8.23
+   Compiling num-traits v0.2.19
+   Compiling serde_core v1.0.229
+   Compiling form_urlencoded v1.2.2
+   Compiling serde v1.0.229
+   Compiling zmij v1.0.23
+   Compiling libsqlite3-sys v0.30.1
+   Compiling combine v4.6.8
+   Compiling clap_builder v4.6.7
+   Compiling crc32fast v1.5.2
+   Compiling blake3 v1.8.7
+   Compiling errno v0.3.14
+   Compiling getrandom v0.2.17
+   Compiling num-integer v0.1.47
+   Compiling core-foundation v0.10.1
+   Compiling block-buffer v0.10.4
+   Compiling rand_core v0.6.4
+   Compiling crypto-common v0.1.7
+   Compiling rustix v1.1.5
+   Compiling security-framework-sys v2.17.0
+   Compiling getrandom v0.4.3
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling digest v0.10.7
+   Compiling cpufeatures v0.2.17
+   Compiling num-bigint v0.5.1
+   Compiling socket2 v0.6.5
+   Compiling crossbeam-epoch v0.9.21
+   Compiling security-framework v3.7.0
+   Compiling sha2 v0.10.9
+   Compiling flate2 v1.1.10
+   Compiling serde_json v1.0.151
+   Compiling crossbeam-deque v0.8.8
+   Compiling tempfile v3.27.0
+   Compiling rayon-core v1.13.0
+   Compiling native-tls v0.2.18
+   Compiling rayon v1.12.0
+   Compiling ahash v0.8.12
+   Compiling ppv-lite86 v0.2.21
+   Compiling hashbrown v0.14.5
+   Compiling rand_chacha v0.3.1
+   Compiling zeroize_derive v1.5.0
+   Compiling synstructure v0.14.0
+   Compiling rand v0.8.8
+   Compiling zerovec-derive v0.11.6
+   Compiling displaydoc v0.2.7
+   Compiling serde_derive v1.0.229
+   Compiling clap_derive v4.6.7
+   Compiling hashlink v0.9.1
+   Compiling zerofrom-derive v0.1.8
+   Compiling yoke-derive v0.8.4
+   Compiling num-bigint v0.4.8
+   Compiling rusqlite v0.32.1
+   Compiling zeroize v1.9.0
+   Compiling clap v4.6.7
+   Compiling zerofrom v0.1.8
+   Compiling yoke v0.8.3
+   Compiling zerovec v0.11.8
+   Compiling zerotrie v0.2.5
+   Compiling volcano-cli v0.1.0 (/Volumes/SSD990-2/r2w-build/tree/tools/volcano-cli)
+   Compiling tinystr v0.8.4
+   Compiling potential_utf v0.1.6
+   Compiling icu_collections v2.3.0
+   Compiling icu_locale_core v2.3.0
+   Compiling icu_provider v2.3.1
+   Compiling icu_properties v2.3.0
+   Compiling icu_normalizer v2.3.0
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling redis v1.7.1
+   Compiling crypto v0.1.0 (/Volumes/SSD990-2/r2w-build/tree)
+warning: field `inherit` is never read
+    --> src/cryptanalysis/ecbench/isolation.rs:1610:5
+     |
+1606 | pub struct HwCounters {
+     |            ---------- field in this struct
+...
+1610 |     inherit: bool,
+     |     ^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `gfni` and `gfni_back` are never read
+   --> src/cryptanalysis/koblitz_fast.rs:691:5
+    |
+682 | pub struct FrobeniusCanon {
+    |            -------------- fields in this struct
+...
+691 |     gfni: [[u64; 8]; 8],
+    |     ^^^^
+...
+694 |     gfni_back: [[u64; 8]; 8],
+    |     ^^^^^^^^^
+    |
+    = note: `FrobeniusCanon` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: fields `pre` and `lanes` are never read
+    --> src/cryptanalysis/koblitz_fast.rs:1623:5
+     |
+1614 | pub struct BatchScratch {
+     |            ------------ fields in this struct
+...
+1623 |     pre: Vec<u64>,
+     |     ^^^
+1624 |     /// The folding kernel's lane products, inverted together.
+1625 |     lanes: Vec<u64>,
+     |     ^^^^^
+     |
+     = note: `BatchScratch` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: `crypto` (lib) generated 3 warnings
+warning: fields `n_vars` and `n_eqs` are never read
+  --> src/bin/ecbench/msolve_s4.rs:36:9
+   |
+25 | pub struct MsolveOutcome {
+   |            ------------- fields in this struct
+...
+36 |     pub n_vars: usize,
+   |         ^^^^^^
+37 |     pub n_eqs: usize,
+   |         ^^^^^
+   |
+   = note: `MsolveOutcome` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `n_vars` and `n_eqs` are never read
+  --> src/bin/ecbench/wdsat_s4.rs:48:9
+   |
+33 | pub struct WdOutcome {
+   |            --------- fields in this struct
+...
+48 |     pub n_vars: usize,
+   |         ^^^^^^
+49 |     pub n_eqs: usize,
+   |         ^^^^^
+   |
+   = note: `WdOutcome` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: `crypto` (bin "ecbench") generated 2 warnings
+    Finished `release` profile [optimized] target(s) in 5m 47s

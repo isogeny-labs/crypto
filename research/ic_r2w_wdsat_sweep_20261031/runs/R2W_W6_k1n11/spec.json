@@ -1,0 +1,39 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "R2W k1n11 l6",
+ "description": "R2W: WDSat (wdsat-s4, first-solution, -x -b) published arm swept over l, with the lab arm at its R2-best l as A/A.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 1,
+    "n": 11
+   }
+  ],
+  "targets_per_curve": 8,
+  "target_seed": 202610111901,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "wdsat-l6",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-standard-subspace:dimension=6",
+     "oracle": "pdp3-binary:m=3,engine=wdsat-s4,sym=1,xg=1,find=first",
+     "max_trials": "200000"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 202610111902,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

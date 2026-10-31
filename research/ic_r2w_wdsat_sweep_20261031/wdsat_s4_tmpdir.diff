@@ -1,0 +1,4 @@
+148c148
+<     let dir: PathBuf = std::env::temp_dir().join(format!("wdsat_s4_{}", std::process::id()));
+---
+>     let dir: PathBuf = option_env!("WDSAT_TMP_DEFAULT").map(PathBuf::from).unwrap_or_else(std::env::temp_dir).join(format!("wdsat_s4_{}", std::process::id()));
