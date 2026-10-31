@@ -35,3 +35,9 @@ field is F2(b,c),so transport to marked23 is applicable after denominator
 checks. Universal polynomial clearing and explicit F4/F2 twist descent are
 now frozen;no old Groebner producer is repeated. Marked23 degree112 remains
 prospective,with field primality and selected991 action separate obligations.
+
+Terminal continuation: overlap-lean51-01 compile0/audit0,all5declarations
+audited with zero failing/trusted. glue-reload51-01 exit0/no-question-mark
+errors/exact-marker: all64 direct substitution witnesses,2completePID
+products,4source lift products,principal units and corruption checks pass.
+No producer rerun. universal51-01 admitted next under original caps.

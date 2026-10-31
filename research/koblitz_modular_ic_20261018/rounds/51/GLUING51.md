@@ -26,22 +26,23 @@ from the maximum coefficient degree37, denominator degree37, lambda pole
 bound4e and V pole bound2e: 37-37+4*15+2=62. The older source-lift bound454
 was also frozen and checked; no coefficient search selected62.
 
-The fresh GLUE_RELOAD51 stage is the remaining independent compatibility
+The fresh GLUE_RELOAD51 stage passed the independent compatibility
 check: substitute each polynomial numerator directly in three coordinates,
 check a full E-times-quotient identity, link the result to every saved PID
 coefficient, and bind the first/ninth maps to the tenth-iterate identity.
-Until its terminal receipt is accepted, the two directional regularity
-checks are recorded separately rather than labeling the independent gluing
-check complete.
+The original glue-reload51-01 has exit0, the exact required marker and no
+question-mark errors. All64 direct identities, both complete PID products,
+all four source lift products and both corruption controls passed.
 
 The Lean Overlap51 module proves the three displayed identities under the
 explicit characteristic-two assumption; constructs z's inverse on each
 principal open; and proves that inverse field maps induce inverse maps under
 injective compatible embeddings. It does not encode the native arrays or
 prove the RR identification, source primality, geometric open cover, or
-polarized embedding. Kernel compilation is accepted; axiom audit is pending.
+polarized embedding. Kernel compilation and axiom audit both exit0; five declarations audited,
+zero failing and zero trusted.
 
-Once compatibility passes, the geometric interpretation uses the retained
+With compatibility checked, the geometric interpretation uses the retained
 R50 complete-RR/normal-algebra identification and the recorded disjoint
 excluded-fiber cover. This supplies concrete chart regularity data for that
 construction. The selected modular-factor map and proper polarized embedding
