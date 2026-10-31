@@ -3416,9 +3416,11 @@ impl<'a> BoundSignedEvents<'a> {
         budget.reserve_checking(1024 + 8 * SIGNED_EVENT_CAP, 4096, Instant::now())?;
         budget.reserve_trace(SIGNED_EVENT_CAP, Instant::now())?;
         let identity = super::LIVE_SINK.with(|slot| match slot.borrow().as_ref() {
-            Some(super::EventSink::Bound(sink)) => {
-                sink.verify_digest_limits(&self.binding_digest, self.limits)
-            }
+            Some(super::EventSink::Bound(sink)) => sink.verify_digest_limits_at_count(
+                &self.binding_digest,
+                self.limits,
+                *global as u64,
+            ),
             _ => Err("Koblitz typed event requires admitted bound sink".into()),
         });
         if identity.is_err() {
@@ -6358,5 +6360,276 @@ mod native_phase_driver_tests {
         assert!(run.events.as_ref().unwrap().pending.is_some());
         assert!(run.events.as_ref().unwrap().canonical.is_empty());
         assert_eq!(global, 0);
+    }
+}
+
+/// In-memory assembly. Canonical result serialization and parent publication
+/// remain required before this can produce a completed dataset cell.
+struct BoundPipelineRun<'a> {
+    native: NativePhaseRun<'a>,
+    signed: Option<SignedEnumeration>,
+    signed_events: Option<BoundSignedEvents<'a>>,
+    publisher: Option<BoundSignedPublisher<'a>>,
+    ledger: SavedBudgetLedger,
+}
+fn run_bound_pipeline<'a>(
+    original: &MathInput,
+    binding: &'a crate::ml_dataset::capture::AttemptBinding,
+    capture_limits: &'a crate::ml_dataset::capture::CaptureLimits,
+    public_sha256: &str,
+    factor_base_sha256: &str,
+    engine: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Engine,
+    degree: u32,
+    budget: &mut Budget,
+    global: &mut usize,
+    persist: &mut impl FnMut(&[u8], &mut Budget) -> Result<(), String>,
+) -> BoundPipelineRun<'a> {
+    let native = run_native_phases(
+        original,
+        binding,
+        capture_limits,
+        public_sha256,
+        factor_base_sha256,
+        engine,
+        degree,
+        budget,
+        global,
+        persist,
+    );
+    let mut out = BoundPipelineRun {
+        native,
+        signed: None,
+        signed_events: None,
+        publisher: None,
+        ledger: budget.saved_ledger(),
+    };
+    let result = (|| -> Result<(), Stop> {
+        budget.check(Instant::now())?;
+        if budget.phase != Phase::MatrixComplete
+            || !out
+                .native
+                .matrix
+                .as_ref()
+                .and_then(|m| m.report.as_ref())
+                .is_some_and(|r| r.native_step_complete)
+        {
+            return budget.fail(Stop::Phase);
+        }
+        budget.reserve_bytes(
+            std::mem::size_of::<BoundPipelineRun<'_>>() as u64,
+            Instant::now(),
+        )?;
+        out.signed_events = Some(BoundSignedEvents::new(binding, capture_limits, budget)?);
+        out.publisher = Some(BoundSignedPublisher::new(binding, capture_limits, budget));
+        let events = out.signed_events.as_mut().unwrap();
+        let publisher = out.publisher.as_mut().unwrap();
+        let prepared = prepare_signed(original, budget, true)?;
+        // Both callbacks mutate the caller's actual shared counter immediately.
+        // This is a borrow of that counter, not a fresh event allowance.
+        let counter = std::cell::RefCell::new(global);
+        out.signed = Some(enumerate_prepared_signed(
+            prepared,
+            &mut |event, b| events.emit(event, b, &mut **counter.borrow_mut()),
+            &mut |witness, b| publisher.publish(witness, b, &mut **counter.borrow_mut()),
+        ));
+        if let Some(stop) = out.signed.as_ref().unwrap().stop {
+            return Err(stop);
+        }
+        Ok(())
+    })();
+    if let Err(stop) = result {
+        let _ = budget.fail::<()>(stop);
+    }
+    out.ledger = budget.saved_ledger();
+    out
+}
+#[cfg(test)]
+mod bound_pipeline_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native;
+    use crate::ml_dataset::capture::capture_limits;
+    #[test]
+    fn actual_native_and_signed_phases_share_one_capture_counter_for_both_engines() {
+        for engine in [
+            native::Engine::F4Macaulay,
+            native::Engine::F5KoszulFrobenius,
+        ] {
+            for positive in [false, true] {
+                let binding = matrix_tests::binding();
+                let limits = capture_limits(16).unwrap();
+                let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+                let mut original = construction_tests::fixture();
+                if positive {
+                    original.target = original.signed[0];
+                }
+                let mut budget = construction_tests::budget();
+                let mut global = 0;
+                let run = run_bound_pipeline(
+                    &original,
+                    &binding,
+                    &limits,
+                    &"8".repeat(64),
+                    &"9".repeat(64),
+                    engine,
+                    3,
+                    &mut budget,
+                    &mut global,
+                    &mut |_, _| Ok(()),
+                );
+                assert_eq!(run.ledger.first_stop, None);
+                assert_eq!(run.native.ledger.phase, Phase::MatrixComplete);
+                assert_eq!(run.ledger.phase, Phase::Complete);
+                let signed = run.signed.as_ref().unwrap();
+                assert!(signed.complete && signed.unacknowledged.is_none());
+                assert_eq!(signed.acknowledged.len(), 192);
+                assert_eq!(signed.enumeration_additions, 192);
+                assert_eq!(signed.first_receipt.is_some(), positive);
+                assert_eq!(signed.witness_check_additions, if positive { 3 } else { 0 });
+                assert_eq!(
+                    run.ledger.group_additions,
+                    signed.enumeration_additions + signed.witness_check_additions
+                );
+                assert!(
+                    verify_signed_prefix(&original, &signed.acknowledged, None)
+                        .unwrap()
+                        .all_tuples_acknowledged
+                );
+                let native_events = run.native.events.as_ref().unwrap();
+                assert_eq!(
+                    global as u64,
+                    native_events.acknowledged + 192 + u64::from(positive)
+                );
+                assert!(
+                    verify_native_capture(
+                        sink.dir.parent().unwrap(),
+                        &native_events.canonical,
+                        &binding,
+                        &limits,
+                        23,
+                        engine,
+                        3
+                    )
+                    .unwrap()
+                    .matrix_finish_captured
+                );
+                if positive {
+                    let bytes = std::fs::read(sink.dir.join("payloads/pdp-witness.json")).unwrap();
+                    verify_signed_witness(&bytes, &original).unwrap();
+                    assert_eq!(
+                        run.publisher.as_ref().unwrap().receipt,
+                        signed.first_receipt
+                    );
+                }
+            }
+        }
+    }
+    #[test]
+    fn capped_signed_stage_retains_native_completion_without_resetting_addition_allowance() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let original = construction_tests::fixture();
+        let mut budget = construction_tests::budget();
+        budget.addition_limit = 2;
+        let mut global = 0;
+        let run = run_bound_pipeline(
+            &original,
+            &binding,
+            &limits,
+            &"8".repeat(64),
+            &"9".repeat(64),
+            native::Engine::F4Macaulay,
+            3,
+            &mut budget,
+            &mut global,
+            &mut |_, _| Ok(()),
+        );
+        assert_eq!(run.ledger.first_stop, Some(Stop::Additions));
+        assert_eq!(run.native.ledger.phase, Phase::MatrixComplete);
+        assert_eq!(run.ledger.group_additions, 2);
+        let signed = run.signed.as_ref().unwrap();
+        assert!(!signed.complete && signed.first_receipt.is_none());
+        assert_eq!(signed.acknowledged.len(), 2);
+        let events = run.native.events.as_ref().unwrap();
+        assert!(
+            verify_native_capture(
+                sink.dir.parent().unwrap(),
+                &events.canonical,
+                &binding,
+                &limits,
+                23,
+                native::Engine::F4Macaulay,
+                3
+            )
+            .unwrap()
+            .matrix_finish_captured
+        );
+        assert!(
+            !verify_budget_ledger(
+                &serde_json::to_vec(&run.ledger).unwrap(),
+                budget.original_limits()
+            )
+            .unwrap()
+            .completion_eligible
+        );
+    }
+    #[test]
+    fn native_persistence_failure_prevents_signed_setup_and_witness_publication() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let original = construction_tests::fixture();
+        let mut budget = construction_tests::budget();
+        let mut global = 0;
+        let run = run_bound_pipeline(
+            &original,
+            &binding,
+            &limits,
+            &"8".repeat(64),
+            &"9".repeat(64),
+            native::Engine::F4Macaulay,
+            3,
+            &mut budget,
+            &mut global,
+            &mut |_, _| Err("selected persistence failure".into()),
+        );
+        assert_eq!(run.ledger.first_stop, Some(Stop::Observer));
+        assert!(run.signed.is_none() && run.signed_events.is_none() && run.publisher.is_none());
+        assert!(run.native.persistence_failure.is_some());
+        assert!(!sink.dir.join("payloads/pdp-witness.json").exists());
+    }
+}
+#[cfg(test)]
+mod signed_shared_counter_tests {
+    use super::*;
+    use crate::ml_dataset::capture::capture_limits;
+    #[test]
+    fn signed_continuation_refuses_a_counter_that_differs_from_committed_capture() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let mut budget = construction_tests::budget();
+        let mut events = BoundSignedEvents::new(&binding, &limits, &mut budget).unwrap();
+        let event = SignedPrefix {
+            sequence: 1,
+            tuple: 0,
+            indices: [0; 3],
+            summand: 1,
+            prefix: None,
+            matches_target: false,
+        };
+        let mut global = 1;
+        assert_eq!(
+            events.emit(&event, &mut budget, &mut global),
+            Err(Stop::InvalidLimits)
+        );
+        assert_eq!(global, 1);
+        assert_eq!(events.acknowledged, 0);
+        assert_eq!(
+            std::fs::metadata(sink.dir.join("events.jsonl"))
+                .unwrap()
+                .len(),
+            0
+        );
     }
 }
