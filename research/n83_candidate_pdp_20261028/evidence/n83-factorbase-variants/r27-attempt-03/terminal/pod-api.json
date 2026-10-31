@@ -1,0 +1,368 @@
+{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "annotations": {
+            "karpenter.sh/do-not-disrupt": "true"
+        },
+        "creationTimestamp": "2026-10-31T07:21:28Z",
+        "generateName": "n83-fb-variants-r27-20261031-r3-",
+        "generation": 1,
+        "labels": {
+            "batch.kubernetes.io/controller-uid": "903977ac-244f-4b32-b986-72fe0b6e8388",
+            "batch.kubernetes.io/job-name": "n83-fb-variants-r27-20261031-r3",
+            "controller-uid": "903977ac-244f-4b32-b986-72fe0b6e8388",
+            "isolab.dev/job": "true",
+            "job-name": "n83-fb-variants-r27-20261031-r3",
+            "topology.kubernetes.io/region": "us-east-2",
+            "topology.kubernetes.io/zone": "us-east-2a"
+        },
+        "name": "n83-fb-variants-r27-20261031-r3-7944k",
+        "namespace": "isolab",
+        "ownerReferences": [
+            {
+                "apiVersion": "batch/v1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "Job",
+                "name": "n83-fb-variants-r27-20261031-r3",
+                "uid": "903977ac-244f-4b32-b986-72fe0b6e8388"
+            }
+        ],
+        "resourceVersion": "7978113",
+        "uid": "0fc24733-0e33-4cdc-bfb6-9dde94d3a7af"
+    },
+    "spec": {
+        "affinity": {
+            "podAntiAffinity": {
+                "requiredDuringSchedulingIgnoredDuringExecution": [
+                    {
+                        "labelSelector": {
+                            "matchLabels": {
+                                "isolab.dev/job": "true"
+                            }
+                        },
+                        "topologyKey": "kubernetes.io/hostname"
+                    }
+                ]
+            }
+        },
+        "automountServiceAccountToken": false,
+        "containers": [
+            {
+                "command": [
+                    "bash",
+                    "-lc",
+                    "set -euo pipefail; src=\"${ISOLAB_RESULTS_URI%/}/source-v3\"; mkdir -p /work/source/src/bin /work/source/target/release /work/results; aws s3 cp \"$src/BUNDLE_FORMAT.json\" /work/source/BUNDLE_FORMAT.json --only-show-errors --region us-east-2; aws s3 cp \"$src/BUNDLE_INDEX.json\" /work/source/BUNDLE_INDEX.json --only-show-errors --region us-east-2; aws s3 cp \"$src/bundle-manifest.sha256\" /work/source/bundle-manifest.sha256 --only-show-errors --region us-east-2; aws s3 cp \"$src/src/bin/factor_base.rs\" /work/source/src/bin/factor_base.rs --only-show-errors --region us-east-2; aws s3 cp \"$src/src/field.rs\" /work/source/src/field.rs --only-show-errors --region us-east-2; aws s3 cp \"$src/FORMAT.json\" /work/source/FORMAT.json --only-show-errors --region us-east-2; aws s3 cp \"$src/FACTOR_BASE_VARIANT_SWEEP_DESIGN.md\" /work/source/FACTOR_BASE_VARIANT_SWEEP_DESIGN.md --only-show-errors --region us-east-2; aws s3 cp \"$src/RUN_OUTPUT_FORMAT.json\" /work/source/RUN_OUTPUT_FORMAT.json --only-show-errors --region us-east-2; aws s3 cp \"$src/run-base-variant-v2.sh\" /work/source/run-base-variant-v2.sh --only-show-errors --region us-east-2; aws s3 cp \"$src/protocol-factor-base-variants-v3.json\" /work/source/protocol-factor-base-variants-v3.json --only-show-errors --region us-east-2; aws s3 cp \"$src/protocol-factor-base-variants-v3.sha256\" /work/source/protocol-factor-base-variants-v3.sha256 --only-show-errors --region us-east-2; aws s3 cp \"$src/factor-base-variant-source-index-v3.json\" /work/source/factor-base-variant-source-index-v3.json --only-show-errors --region us-east-2; aws s3 cp \"$src/factor-base-variant-source-index-v3.sha256\" /work/source/factor-base-variant-source-index-v3.sha256 --only-show-errors --region us-east-2; aws s3 cp \"$src/target/release/factor_base\" /work/source/target/release/factor_base --only-show-errors --region us-east-2; cd /work/source; sha256sum -c bundle-manifest.sha256; sha256sum -c protocol-factor-base-variants-v3.sha256; sha256sum -c factor-base-variant-source-index-v3.sha256; jq -r '.entries[] | \"\\(.sha256)  \\(.path)\"' factor-base-variant-source-index-v3.json \u003e source-files.sha256; sha256sum -c source-files.sha256; chmod 755 run-base-variant-v2.sh target/release/factor_base; exec ./run-base-variant-v2.sh ./target/release/factor_base 27 /work/results/r27 /work/source/protocol-factor-base-variants-v3.json \"$ISOLAB_RESULTS_URI\""
+                ],
+                "env": [
+                    {
+                        "name": "HOME",
+                        "value": "/work"
+                    },
+                    {
+                        "name": "AWS_REGION",
+                        "value": "us-east-2"
+                    },
+                    {
+                        "name": "AWS_DEFAULT_REGION",
+                        "value": "us-east-2"
+                    },
+                    {
+                        "name": "POD_UID",
+                        "valueFrom": {
+                            "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "metadata.uid"
+                            }
+                        }
+                    },
+                    {
+                        "name": "NODE_NAME",
+                        "valueFrom": {
+                            "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "spec.nodeName"
+                            }
+                        }
+                    },
+                    {
+                        "name": "ISOLAB_JOB_ID",
+                        "value": "n83-fb-variants-r27-20261031-r3"
+                    },
+                    {
+                        "name": "ISOLAB_OUTPUT_DIR",
+                        "value": "/work/results"
+                    },
+                    {
+                        "name": "ISOLAB_RESULTS_URI",
+                        "value": "s3://isolab-results-104186811093-us-east-2/runs/n83-fb-variants-r27-20261031-r3/$(POD_UID)/"
+                    },
+                    {
+                        "name": "RAYON_NUM_THREADS",
+                        "value": "6"
+                    },
+                    {
+                        "name": "OMP_NUM_THREADS",
+                        "value": "6"
+                    },
+                    {
+                        "name": "AWS_STS_REGIONAL_ENDPOINTS",
+                        "value": "regional"
+                    },
+                    {
+                        "name": "AWS_ROLE_ARN",
+                        "value": "arn:aws:iam::104186811093:role/isolab-job"
+                    },
+                    {
+                        "name": "AWS_WEB_IDENTITY_TOKEN_FILE",
+                        "value": "/var/run/secrets/eks.amazonaws.com/serviceaccount/token"
+                    }
+                ],
+                "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:c044fe7656fffe45a5ced4b7b5c6ebe6cdd4ada5815fe254c6e657fe92535fa2",
+                "imagePullPolicy": "IfNotPresent",
+                "name": "task",
+                "resources": {
+                    "limits": {
+                        "cpu": "6",
+                        "ephemeral-storage": "10Gi",
+                        "memory": "8Gi"
+                    },
+                    "requests": {
+                        "cpu": "6",
+                        "ephemeral-storage": "10Gi",
+                        "memory": "8Gi"
+                    }
+                },
+                "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                        "drop": [
+                            "ALL"
+                        ]
+                    },
+                    "readOnlyRootFilesystem": true
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "volumeMounts": [
+                    {
+                        "mountPath": "/work",
+                        "name": "work"
+                    },
+                    {
+                        "mountPath": "/tmp",
+                        "name": "tmp"
+                    },
+                    {
+                        "mountPath": "/var/run/secrets/eks.amazonaws.com/serviceaccount",
+                        "name": "aws-iam-token",
+                        "readOnly": true
+                    }
+                ],
+                "workingDir": "/work"
+            }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": true,
+        "nodeName": "ip-10-84-25-21.us-east-2.compute.internal",
+        "nodeSelector": {
+            "isolab.dev/pool": "cpu-spot"
+        },
+        "preemptionPolicy": "PreemptLowerPriority",
+        "priority": 0,
+        "restartPolicy": "Never",
+        "schedulerName": "default-scheduler",
+        "securityContext": {
+            "fsGroup": 1000,
+            "runAsGroup": 1000,
+            "runAsNonRoot": true,
+            "runAsUser": 1000,
+            "seccompProfile": {
+                "type": "RuntimeDefault"
+            }
+        },
+        "serviceAccount": "runner",
+        "serviceAccountName": "runner",
+        "terminationGracePeriodSeconds": 60,
+        "tolerations": [
+            {
+                "effect": "NoSchedule",
+                "key": "isolab.dev/workload",
+                "operator": "Equal",
+                "value": "cpu"
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            }
+        ],
+        "volumes": [
+            {
+                "name": "aws-iam-token",
+                "projected": {
+                    "defaultMode": 420,
+                    "sources": [
+                        {
+                            "serviceAccountToken": {
+                                "audience": "sts.amazonaws.com",
+                                "expirationSeconds": 86400,
+                                "path": "token"
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "emptyDir": {
+                    "sizeLimit": "8Gi"
+                },
+                "name": "work"
+            },
+            {
+                "emptyDir": {
+                    "sizeLimit": "1Gi"
+                },
+                "name": "tmp"
+            }
+        ]
+    },
+    "status": {
+        "allocatedResources": {
+            "cpu": "6",
+            "ephemeral-storage": "10Gi",
+            "memory": "8Gi"
+        },
+        "conditions": [
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-31T07:22:30Z",
+                "observedGeneration": 1,
+                "status": "False",
+                "type": "PodReadyToStartContainers"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-31T07:22:16Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Initialized"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-31T07:22:29Z",
+                "observedGeneration": 1,
+                "reason": "PodFailed",
+                "status": "False",
+                "type": "Ready"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-31T07:22:29Z",
+                "observedGeneration": 1,
+                "reason": "PodFailed",
+                "status": "False",
+                "type": "ContainersReady"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-31T07:22:16Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodScheduled"
+            }
+        ],
+        "containerStatuses": [
+            {
+                "allocatedResources": {
+                    "cpu": "6",
+                    "ephemeral-storage": "10Gi",
+                    "memory": "8Gi"
+                },
+                "containerID": "containerd://8ff176b13e68c4f8e553c057212e94d1a14ff493e2939cd4000964782799eee2",
+                "image": "sha256:bea91df61c802061ca353384d068ff54b4f3f22d1d1ef0fcb9dd3af86b6d5249",
+                "imageID": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:c044fe7656fffe45a5ced4b7b5c6ebe6cdd4ada5815fe254c6e657fe92535fa2",
+                "lastState": {},
+                "name": "task",
+                "ready": false,
+                "resources": {
+                    "limits": {
+                        "cpu": "6",
+                        "ephemeral-storage": "10Gi",
+                        "memory": "8Gi"
+                    },
+                    "requests": {
+                        "cpu": "6",
+                        "ephemeral-storage": "10Gi",
+                        "memory": "8Gi"
+                    }
+                },
+                "restartCount": 0,
+                "started": false,
+                "state": {
+                    "terminated": {
+                        "containerID": "containerd://8ff176b13e68c4f8e553c057212e94d1a14ff493e2939cd4000964782799eee2",
+                        "exitCode": 1,
+                        "finishedAt": "2026-10-31T07:22:21Z",
+                        "reason": "Error",
+                        "startedAt": "2026-10-31T07:22:21Z"
+                    }
+                },
+                "user": {
+                    "linux": {
+                        "gid": 1000,
+                        "supplementalGroups": [
+                            1000
+                        ],
+                        "uid": 1000
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "mountPath": "/work",
+                        "name": "work"
+                    },
+                    {
+                        "mountPath": "/tmp",
+                        "name": "tmp"
+                    },
+                    {
+                        "mountPath": "/var/run/secrets/eks.amazonaws.com/serviceaccount",
+                        "name": "aws-iam-token",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            }
+        ],
+        "hostIP": "10.84.25.21",
+        "hostIPs": [
+            {
+                "ip": "10.84.25.21"
+            }
+        ],
+        "observedGeneration": 1,
+        "phase": "Failed",
+        "podIP": "10.84.18.136",
+        "podIPs": [
+            {
+                "ip": "10.84.18.136"
+            }
+        ],
+        "qosClass": "Guaranteed",
+        "resources": {
+            "requests": {
+                "memory": "8Gi"
+            }
+        },
+        "startTime": "2026-10-31T07:22:16Z"
+    }
+}
