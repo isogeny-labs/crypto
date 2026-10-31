@@ -1349,6 +1349,25 @@ pub struct QuarticSolve {
     /// rank (`top_up`): 0 when the replayed rows had it.
     #[serde(skip_serializing_if = "is_zero")]
     pub topped_up: u64,
+    /// E33 (§9.35): pivot-selection native operations of a counted solver
+    /// (zero, and absent from the JSON, for every other solver): initial
+    /// counts, key comparisons and count maintenance after row updates.
+    #[serde(skip_serializing_if = "is_zero")]
+    pub pivot_init_ops: u64,
+    #[serde(skip_serializing_if = "is_zero")]
+    pub pivot_compare_ops: u64,
+    #[serde(skip_serializing_if = "is_zero")]
+    pub pivot_update_ops: u64,
+    /// E33: entries read by the echelon's lead scans (every rule; not
+    /// selection work).
+    #[serde(skip_serializing_if = "is_zero")]
+    pub lead_scan_reads: u64,
+    /// E33 diagnostics: maintained counts that differed from a recount, and
+    /// a digest of the pivot chosen in every column.
+    #[serde(skip_serializing_if = "is_zero")]
+    pub pivot_count_mismatches: u64,
+    #[serde(skip)]
+    pub pivot_digest: u64,
 }
 
 fn is_zero(v: &u64) -> bool {
@@ -1502,6 +1521,284 @@ pub(crate) fn echelon_by_lead_with(
             );
         }
     }
+    zero_ids.sort_unstable();
+    Echelon {
+        rows,
+        pivot_row,
+        zero_rows,
+        zero_ids,
+    }
+}
+
+// ── E33: pivot selection, counted (RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.35) ──
+//
+// Additive.  `echelon_by_lead_with` above is unchanged; the counted
+// echelon below performs the same elimination and emits the native work of
+// its pivot selection (one operation per entry examined for its zero
+// status, one per comparison of two candidates' keys).
+
+/// How [`echelon_by_lead_counted`] picks each column's pivot.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub enum PivotRule {
+    /// The lowest-indexed row of the bucket (E31 A, E25): no selection work.
+    Lowest,
+    /// E31 B as built: a nonzero count of every row before eliminating and
+    /// a recount of each updated row's tail.
+    SparsestRecount,
+    /// B′: the same choices as B; counts inherited by the caller
+    /// (`init_nnz`) and updated by the zero status of each entry the pivot
+    /// row touches.
+    SparsestIncremental,
+    /// B″: counts inherited as in B′, then the Markowitz fill bound
+    /// `min(nnz − 1 + |pivot| − 1, cols − lead)` per updated row.
+    SparsestEstimate,
+}
+
+/// Diagnostics and negative controls for [`echelon_by_lead_counted`]
+/// (all off by default; nothing here is charged).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct PivotCheck {
+    /// Compare every maintained count (initial and after each update)
+    /// with a recount; mismatches go to `PivotWork::count_mismatches`.
+    pub verify: bool,
+    /// Negative control: in the `k`-th column with more than one candidate,
+    /// take the second-best candidate instead.
+    pub second_best_at: Option<usize>,
+    /// Negative control: add one to the first maintained update.
+    pub perturb_count: bool,
+}
+
+/// The native work of one counted echelon.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize)]
+pub struct PivotWork {
+    /// Entries examined for the initial counts (B: `rows · cols`; B′, B″:
+    /// charged by the caller that inherits them).
+    pub init: u64,
+    /// Comparisons of candidates' keys (`|bucket| − 1` per column).
+    pub compare: u64,
+    /// Count maintenance after row updates (B: the recount reads; B′: two
+    /// per entry the pivot row touches plus one per row; B″: two per row).
+    pub update: u64,
+    /// Entries read by the lead scans every rule performs (not selection).
+    pub lead_scan: u64,
+    /// FNV-1a digest of `(column, pivot row)` over the elimination.
+    pub digest: u64,
+    /// Updated rows whose maintained count differed from a recount
+    /// (`PivotCheck::verify`; for B″ an estimate is expected to differ).
+    pub count_mismatches: u64,
+    /// Columns that had more than one candidate.
+    pub contested: u64,
+}
+
+impl PivotWork {
+    /// The selection work charged as native operations.
+    pub fn selection(&self) -> u64 {
+        self.init + self.compare + self.update
+    }
+}
+
+fn fnv(h: u64, x: u64) -> u64 {
+    let mut h = h;
+    for b in x.to_le_bytes() {
+        h ^= u64::from(b);
+        h = h.wrapping_mul(0x0000_0100_0000_01B3);
+    }
+    h
+}
+
+/// [`echelon_by_lead_with`] with its pivot selection counted (E33).
+///
+/// The elimination, the multiplications charged to `muls` and, for
+/// `Lowest` and the two exact sparsest rules, the pivot choices are those
+/// of `echelon_by_lead_with(…, sparsest = rule != Lowest)`.  `init_nnz`
+/// supplies the initial counts for `SparsestIncremental` and
+/// `SparsestEstimate` (required there, ignored otherwise).
+pub(crate) fn echelon_by_lead_counted(
+    mut rows: Vec<Vec<u16>>,
+    p: u32,
+    muls: &mut u64,
+    rule: PivotRule,
+    init_nnz: Option<Vec<u32>>,
+    check: PivotCheck,
+    work: &mut PivotWork,
+) -> Echelon {
+    let sparsest = rule != PivotRule::Lowest;
+    let ncols = rows.first().map_or(0, |r| r.len());
+    let mut buckets: Vec<Vec<u32>> = vec![Vec::new(); ncols];
+    let mut zero_rows = 0usize;
+    let mut zero_ids: Vec<u32> = Vec::new();
+    for (r, row) in rows.iter().enumerate() {
+        match row.iter().position(|&x| x != 0) {
+            Some(c) => {
+                work.lead_scan += c as u64 + 1;
+                buckets[c].push(r as u32);
+            }
+            None => {
+                work.lead_scan += ncols as u64;
+                zero_rows += 1;
+                zero_ids.push(r as u32);
+            }
+        }
+    }
+    let recount = |r: &[u16]| r.iter().filter(|&&x| x != 0).count() as u32;
+    let mut row_nnz: Vec<u32> = match rule {
+        PivotRule::Lowest => Vec::new(),
+        PivotRule::SparsestRecount => {
+            work.init += (rows.len() * ncols) as u64;
+            rows.iter().map(|r| recount(r)).collect()
+        }
+        PivotRule::SparsestIncremental | PivotRule::SparsestEstimate => {
+            let v = init_nnz.expect("inherited counts");
+            assert_eq!(v.len(), rows.len());
+            if check.verify {
+                for (r, row) in rows.iter().enumerate() {
+                    if recount(row) != v[r] {
+                        work.count_mismatches += 1;
+                    }
+                }
+            }
+            v
+        }
+    };
+    let mut perturbed = !check.perturb_count;
+    let mut digest = 0xCBF2_9CE4_8422_2325u64;
+    let mut pivot_row = vec![u32::MAX; ncols];
+    for c in 0..ncols {
+        let mut b = std::mem::take(&mut buckets[c]);
+        if b.is_empty() {
+            continue;
+        }
+        b.sort_unstable();
+        if b.len() > 1 {
+            work.contested += 1;
+        }
+        if sparsest && b.len() > 1 {
+            work.compare += b.len() as u64 - 1;
+            let mut best = (0..b.len())
+                .min_by_key(|&i| (row_nnz[b[i] as usize], i))
+                .unwrap_or(0);
+            if check.second_best_at == Some(work.contested as usize - 1) {
+                best = (0..b.len())
+                    .filter(|&i| i != best)
+                    .min_by_key(|&i| (row_nnz[b[i] as usize], i))
+                    .unwrap_or(best);
+            }
+            b.swap(0, best);
+        }
+        let pr = b[0] as usize;
+        digest = fnv(fnv(digest, c as u64), pr as u64);
+        let mut piv = std::mem::take(&mut rows[pr]);
+        let inv = inv_mod(piv[c] as u64, p as u64) as u32;
+        let mut nz: Vec<u32> = Vec::new();
+        for j in c..ncols {
+            if piv[j] != 0 {
+                piv[j] = ((piv[j] as u32 * inv) % p) as u16;
+                nz.push(j as u32);
+            }
+        }
+        *muls += nz.len() as u64;
+        let dense = nz.len() * 8 > ncols - c;
+        // (row, data, new lead, new count, lead-scan reads, update work, mismatch)
+        type Upd = (u32, Vec<u16>, Option<usize>, u32, u64, u64, bool);
+        let mut others: Vec<Upd> = b[1..]
+            .iter()
+            .map(|&r| {
+                (
+                    r,
+                    std::mem::take(&mut rows[r as usize]),
+                    None,
+                    0,
+                    0,
+                    0,
+                    false,
+                )
+            })
+            .collect();
+        *muls += (others.len() * nz.len()) as u64;
+        let nnz_ref = &row_nnz;
+        let nzr = &nz;
+        others
+            .par_iter_mut()
+            .for_each(|(r, row, lead, nnz, scan, upd, bad)| {
+                let old_nz = if rule == PivotRule::SparsestIncremental {
+                    nzr.iter().filter(|&&j| row[j as usize] != 0).count() as u32
+                } else {
+                    0
+                };
+                let f = row[c] as u32;
+                if dense {
+                    axpy(&mut row[c..], &piv[c..], f, p);
+                } else {
+                    let nf = p - f;
+                    for &j in nzr {
+                        let j = j as usize;
+                        row[j] = ((row[j] as u32 + nf * piv[j] as u32) % p) as u16;
+                    }
+                }
+                *lead = row[c + 1..].iter().position(|&x| x != 0).map(|k| k + c + 1);
+                *scan = match *lead {
+                    Some(l) => (l - c) as u64,
+                    None => (ncols - c - 1) as u64,
+                };
+                let Some(l) = *lead else {
+                    return;
+                };
+                match rule {
+                    PivotRule::Lowest => {}
+                    PivotRule::SparsestRecount => {
+                        *nnz = row[l..].iter().filter(|&&x| x != 0).count() as u32;
+                        *upd = (ncols - l) as u64;
+                    }
+                    PivotRule::SparsestIncremental => {
+                        let new_nz = nzr.iter().filter(|&&j| row[j as usize] != 0).count() as u32;
+                        *nnz = nnz_ref[*r as usize] - old_nz + new_nz;
+                        *upd = 2 * nzr.len() as u64 + 1;
+                        if check.verify {
+                            *bad = recount(&row[l..]) != *nnz;
+                        }
+                    }
+                    PivotRule::SparsestEstimate => {
+                        let est = (nnz_ref[*r as usize] + nzr.len() as u32).saturating_sub(2);
+                        *nnz = est.min((ncols - l) as u32);
+                        *upd = 2;
+                        if check.verify {
+                            *bad = recount(&row[l..]) != *nnz;
+                        }
+                    }
+                }
+            });
+        for (r, row, lead, mut nnz, scan, upd, bad) in others {
+            work.lead_scan += scan;
+            work.update += upd;
+            if sparsest && lead.is_some() {
+                if !perturbed {
+                    nnz += 1;
+                    perturbed = true;
+                    if check.verify {
+                        // The recount check sees the perturbed count.
+                        let l = lead.unwrap_or(0);
+                        if recount(&row[l..]) != nnz {
+                            work.count_mismatches += 1;
+                        }
+                    }
+                } else if bad {
+                    work.count_mismatches += 1;
+                }
+                row_nnz[r as usize] = nnz;
+            }
+            rows[r as usize] = row;
+            match lead {
+                Some(l) => buckets[l].push(r),
+                None => {
+                    zero_rows += 1;
+                    zero_ids.push(r);
+                }
+            }
+        }
+        rows[pr] = piv;
+        pivot_row[c] = pr as u32;
+    }
+    work.digest = digest;
     zero_ids.sort_unstable();
     Echelon {
         rows,

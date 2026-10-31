@@ -2154,6 +2154,15 @@ pub struct K4PipelineReport {
     /// away over the same span as `ic_fp_inversions` (absent when off).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ic_trivial_product_savings: Option<u64>,
+    /// E33 (§9.35): the solver's pivot-selection native operations, every
+    /// call (`[initial counts, key comparisons, count updates]`), their sum,
+    /// and the echelon's lead-scan reads; absent for uncounted solvers.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pivot_selection: Option<[u64; 3]>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pivot_selection_ops: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lead_scan_reads: Option<u64>,
 }
 
 /// One target's trip through the solve, priced by its own counters.
@@ -2179,6 +2188,9 @@ struct TargetOut {
     decs: Vec<[(usize, i64); 4]>,
     /// E31: the chain solve fell back to the existing solver.
     fallback: bool,
+    /// E33: pivot-selection native operations `[initial, comparisons,
+    /// updates]` and lead-scan reads (zero for uncounted solvers).
+    pivot: [u64; 4],
 }
 
 /// Decompose `r` over the base by the weighted `D₄` solve at degree 26:
@@ -2279,6 +2291,7 @@ fn d4_decompose(
         failures,
         decs,
         fallback: false,
+        pivot: [0; 4],
     }
 }
 
@@ -2388,6 +2401,7 @@ fn collect_and_solve(
         solver,
     } = setup;
     let mut fallbacks = 0u64;
+    let mut pivot = [0u64; 4];
     super::gaudry_quartic::reset_fp_inversions_total();
     super::gaudry_quartic::reset_trivial_product_savings();
     let mut folded = Arm::new(arm, fb.columns);
@@ -2431,6 +2445,9 @@ fn collect_and_solve(
             }
             residuals += 1;
             fallbacks += u64::from(o.fallback);
+            for (t, v) in pivot.iter_mut().zip(o.pivot) {
+                *t += v;
+            }
             calls.push(o.call_muls);
             gen_muls += o.gen_muls;
             weil_muls += o.weil_muls;
@@ -2525,6 +2542,9 @@ fn collect_and_solve(
         + lift_muls
         + check_muls
         + la_fp_muls;
+    let counted = solver
+        .and_then(super::klein_v4::V4Solver::parse)
+        .is_some_and(|v| v.counts_pivots());
     Ok(K4PipelineReport {
         p,
         seed,
@@ -2576,6 +2596,9 @@ fn collect_and_solve(
         ic_fp_inversions: super::gaudry_quartic::karatsuba_default().then_some(ic_fp_inversions),
         ic_trivial_product_savings: super::gaudry_quartic::trivial_product_audit()
             .then_some(ic_trivial),
+        pivot_selection: counted.then_some([pivot[0], pivot[1], pivot[2]]),
+        pivot_selection_ops: counted.then_some(pivot[0] + pivot[1] + pivot[2]),
+        lead_scan_reads: counted.then_some(pivot[3]),
     })
 }
 
@@ -3121,6 +3144,7 @@ fn v4_decompose(
         failures: 0,
         decs: Vec::new(),
         fallback: false,
+        pivot: [0; 4],
     };
     let before = c.f.muls();
     let Some(z_r) = ki.z_of_x(&c.f, &r.x) else {
@@ -3197,6 +3221,12 @@ fn v4_decompose(
         failures,
         decs,
         fallback,
+        pivot: [
+            st.pivot_init_ops,
+            st.pivot_compare_ops,
+            st.pivot_update_ops,
+            st.lead_scan_reads,
+        ],
     }
 }
 

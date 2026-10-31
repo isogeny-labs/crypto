@@ -64,7 +64,7 @@ fn main() {
             }
             "--solver" => {
                 i += 1;
-                solver = V4Solver::parse(&args[i]).expect("--solver macaulay|chain|chain-sparsest");
+                solver = V4Solver::parse(&args[i]).expect("--solver macaulay|chain|chain-sparsest|chain-counted|chain-sparsest-counted|chain-sparsest-inc|chain-sparsest-est");
             }
             "--audit" => {
                 // E30 (§9.28): the trivial-product audit counter.

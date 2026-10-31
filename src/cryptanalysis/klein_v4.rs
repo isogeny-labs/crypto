@@ -28,8 +28,9 @@ use super::gaudry_cubic::{
     am, charpoly_mod_p, eigenvectors_mod_p, mm, rref_mod_p, sm, PolyRing, UPoly,
 };
 use super::gaudry_quartic::{
-    charpoly_u16, echelon_by_lead, echelon_by_lead_with, eigenvectors_u16, split_quartic, Curve4,
-    Fp4, NormalForms4, Pt4, QuarticSolve, ReplayOutcome, E4,
+    charpoly_u16, echelon_by_lead, echelon_by_lead_counted, echelon_by_lead_with, eigenvectors_u16,
+    split_quartic, Curve4, Fp4, NormalForms4, PivotCheck, PivotRule, PivotWork, Pt4, QuarticSolve,
+    ReplayOutcome, E4,
 };
 use super::quartic_folds::KleinInstance;
 use super::residual_walk::{inv_mod, pow_mod};
@@ -1140,7 +1141,7 @@ fn build_echelon(
     p: u64,
     st: &mut QuarticSolve,
     row_selection: bool,
-    sparsest: bool,
+    pivot: Pivot,
 ) -> Result<Built, String> {
     assert!(p < 1 << 15, "rows are u16 and products must fit u32");
     let t0 = Instant::now();
@@ -1154,7 +1155,24 @@ fn build_echelon(
     st.triangularise_muls += tri;
     let divides = |lm: &[u8; 4], m: &[u8; 4]| (0..4).all(|k| lm[k] <= m[k]);
     let mut rows: Vec<Vec<u16>> = Vec::new();
+    // E33: each row's nonzero count, inherited from its equation (a
+    // monomial shift is injective on terms), for the counted rules B′, B″.
+    let inherit = matches!(
+        pivot,
+        Pivot::Counted(
+            PivotRule::SparsestIncremental | PivotRule::SparsestEstimate,
+            _
+        )
+    );
+    let mut row_nnz: Vec<u32> = Vec::new();
+    let mut inherit_ops = 0u64;
     for (i, comp) in comps.iter().enumerate() {
+        let comp_nnz = if inherit {
+            inherit_ops += comp.len() as u64;
+            comp.values().filter(|&&v| v % p != 0).count() as u32
+        } else {
+            0
+        };
         let Some(dg) = comp
             .iter()
             .filter(|(_, &v)| v != 0)
@@ -1182,6 +1200,10 @@ fn build_echelon(
                 row[ci] = am(row[ci] as u64, c, p) as u16;
             }
             rows.push(row);
+            if inherit {
+                row_nnz.push(comp_nnz);
+                inherit_ops += 1;
+            }
         }
     }
     st.rows = rows.len();
@@ -1189,7 +1211,30 @@ fn build_echelon(
     st.build_ms += t0.elapsed().as_secs_f64() * 1e3;
     let t1 = Instant::now();
     let mut ech_muls = 0u64;
-    let ech = echelon_by_lead_with(rows, p as u32, &mut ech_muls, false, sparsest);
+    let ech = match pivot {
+        Pivot::Uncounted { sparsest } => {
+            echelon_by_lead_with(rows, p as u32, &mut ech_muls, false, sparsest)
+        }
+        Pivot::Counted(rule, check) => {
+            let mut w = PivotWork::default();
+            let ech = echelon_by_lead_counted(
+                rows,
+                p as u32,
+                &mut ech_muls,
+                rule,
+                inherit.then_some(row_nnz),
+                check,
+                &mut w,
+            );
+            st.pivot_init_ops += w.init + inherit_ops;
+            st.pivot_compare_ops += w.compare;
+            st.pivot_update_ops += w.update;
+            st.lead_scan_reads += w.lead_scan;
+            st.pivot_count_mismatches += w.count_mismatches;
+            st.pivot_digest = w.digest;
+            ech
+        }
+    };
     st.echelon_muls += ech_muls;
     st.echelon_ms += t1.elapsed().as_secs_f64() * 1e3;
     st.zero_rows = ech.zero_rows;
@@ -1292,7 +1337,15 @@ pub struct ChainStructure {
 /// it charges nothing anywhere).
 pub fn chain_structure(comps: &[HashMap<[u8; 4], u64>], d: u16, p: u64) -> Option<ChainStructure> {
     let mut st = QuarticSolve::default();
-    let b = build_echelon(comps, d, p, &mut st, true, false).ok()?;
+    let b = build_echelon(
+        comps,
+        d,
+        p,
+        &mut st,
+        true,
+        Pivot::Uncounted { sparsest: false },
+    )
+    .ok()?;
     let ch = p2_chains(&b);
     let ncols = b.cols.len();
     let mut out = ChainStructure {
@@ -1365,6 +1418,22 @@ pub enum V4Solver {
     Chain,
     /// E31 B: [`solve_weighted_chain`] with sparsest pivots.
     ChainSparsest,
+    /// E33: A with its lead scans emitted (no selection work).
+    ChainCounted,
+    /// E33: B with its pivot selection counted (the same choices).
+    ChainSparsestCounted,
+    /// E33 B′: B's choices from inherited, incrementally maintained counts.
+    ChainSparsestInc,
+    /// E33 B″: sparsest by inherited counts and the Markowitz fill bound.
+    ChainSparsestEst,
+}
+
+/// The echelon's pivot rule in the chain solve: E31's (uncounted) or E33's
+/// counted rules.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Pivot {
+    Uncounted { sparsest: bool },
+    Counted(PivotRule, PivotCheck),
 }
 
 impl V4Solver {
@@ -1373,6 +1442,10 @@ impl V4Solver {
             "macaulay" | "existing" => Some(V4Solver::Macaulay),
             "chain" => Some(V4Solver::Chain),
             "chain-sparsest" => Some(V4Solver::ChainSparsest),
+            "chain-counted" => Some(V4Solver::ChainCounted),
+            "chain-sparsest-counted" => Some(V4Solver::ChainSparsestCounted),
+            "chain-sparsest-inc" => Some(V4Solver::ChainSparsestInc),
+            "chain-sparsest-est" => Some(V4Solver::ChainSparsestEst),
             _ => None,
         }
     }
@@ -1381,6 +1454,33 @@ impl V4Solver {
             V4Solver::Macaulay => "macaulay",
             V4Solver::Chain => "chain",
             V4Solver::ChainSparsest => "chain-sparsest",
+            V4Solver::ChainCounted => "chain-counted",
+            V4Solver::ChainSparsestCounted => "chain-sparsest-counted",
+            V4Solver::ChainSparsestInc => "chain-sparsest-inc",
+            V4Solver::ChainSparsestEst => "chain-sparsest-est",
+        }
+    }
+    /// E33: the solver emits its pivot-selection work.
+    pub fn counts_pivots(self) -> bool {
+        matches!(
+            self,
+            V4Solver::ChainCounted
+                | V4Solver::ChainSparsestCounted
+                | V4Solver::ChainSparsestInc
+                | V4Solver::ChainSparsestEst
+        )
+    }
+    /// The chain solve's pivot rule for this solver (`Macaulay` has none
+    /// and maps to E31 A's).
+    pub fn pivot(self) -> Pivot {
+        let counted = |rule| Pivot::Counted(rule, PivotCheck::default());
+        match self {
+            V4Solver::Macaulay | V4Solver::Chain => Pivot::Uncounted { sparsest: false },
+            V4Solver::ChainSparsest => Pivot::Uncounted { sparsest: true },
+            V4Solver::ChainCounted => counted(PivotRule::Lowest),
+            V4Solver::ChainSparsestCounted => counted(PivotRule::SparsestRecount),
+            V4Solver::ChainSparsestInc => counted(PivotRule::SparsestIncremental),
+            V4Solver::ChainSparsestEst => counted(PivotRule::SparsestEstimate),
         }
     }
 }
@@ -1727,10 +1827,10 @@ fn chain_at(
     p: u64,
     rng: &mut StdRng,
     st: &mut QuarticSolve,
-    sparsest: bool,
+    pivot: Pivot,
     info: &mut ChainInfo,
 ) -> Result<Vec<[u64; 4]>, String> {
-    let b = build_echelon(comps, d, p, st, true, sparsest)?;
+    let b = build_echelon(comps, d, p, st, true, pivot)?;
     let dim = b.standard.len();
     let t2 = Instant::now();
     let mut nf_muls = 0u64;
@@ -1829,11 +1929,26 @@ pub fn solve_weighted_chain(
     st: &mut QuarticSolve,
     sparsest: bool,
 ) -> (Option<Vec<[u64; 4]>>, u16, ChainInfo) {
+    solve_weighted_chain_with(comps, d, p, rng, st, Pivot::Uncounted { sparsest })
+}
+
+/// [`solve_weighted_chain`] with the echelon's pivot rule given as a
+/// [`Pivot`]: E31's uncounted rules, or E33's counted ones, which make the
+/// same elimination and add the selection work to `st`'s `pivot_*` fields
+/// (a fallback keeps the chain attempt's selection work).
+pub fn solve_weighted_chain_with(
+    comps: &[HashMap<[u8; 4], u64>],
+    d: u16,
+    p: u64,
+    rng: &mut StdRng,
+    st: &mut QuarticSolve,
+    pivot: Pivot,
+) -> (Option<Vec<[u64; 4]>>, u16, ChainInfo) {
     let t0 = Instant::now();
     let rng0 = rng.clone();
     let mut info = ChainInfo::default();
     st.degenerate_eigenspaces = 0;
-    match chain_at(comps, d, p, rng, st, sparsest, &mut info) {
+    match chain_at(comps, d, p, rng, st, pivot, &mut info) {
         Ok(sols) => {
             st.outcome = "solved".into();
             st.total_ms = t0.elapsed().as_secs_f64() * 1e3;
@@ -1859,6 +1974,12 @@ pub fn solve_weighted_chain(
             st.roots_muls += spent.roots_muls;
             st.eigenvector_muls += spent.eigenvector_muls;
             st.verify_muls += spent.verify_muls;
+            st.pivot_init_ops += spent.pivot_init_ops;
+            st.pivot_compare_ops += spent.pivot_compare_ops;
+            st.pivot_update_ops += spent.pivot_update_ops;
+            st.lead_scan_reads += spent.lead_scan_reads;
+            st.pivot_count_mismatches += spent.pivot_count_mismatches;
+            st.pivot_digest = spent.pivot_digest;
             st.build_ms += spent.build_ms;
             st.echelon_ms += spent.echelon_ms;
             st.nf_ms += spent.nf_ms;
@@ -1896,6 +2017,14 @@ pub fn solve_v4(
             );
             (s, d, info.fell_back)
         }
+        V4Solver::ChainCounted
+        | V4Solver::ChainSparsestCounted
+        | V4Solver::ChainSparsestInc
+        | V4Solver::ChainSparsestEst => {
+            let (s, d, info) =
+                solve_weighted_chain_with(comps, MACAULAY_BOUND, p, rng, st, solver.pivot());
+            (s, d, info.fell_back)
+        }
     }
 }
 
@@ -1910,7 +2039,7 @@ pub fn chain_quotient_agrees(
     sparsest: bool,
 ) -> Option<(bool, bool)> {
     let mut st = QuarticSolve::default();
-    let b = build_echelon(comps, d, p, &mut st, true, sparsest).ok()?;
+    let b = build_echelon(comps, d, p, &mut st, true, Pivot::Uncounted { sparsest }).ok()?;
     let mut scratch = 0u64;
     let q = chain_quotient(&b, p, &mut scratch).ok()?;
     let dim = b.standard.len();
@@ -1948,6 +2077,282 @@ mod tests {
     use super::*;
     use crate::cryptanalysis::quartic_folds::{generate_klein_instance, klein_base};
     use rand::SeedableRng;
+
+    /// E33 (§9.35, G2.124): the counted solvers return what the uncounted
+    /// ones return, with the same phase counts; B counted and B′ choose
+    /// B's pivots (equal digests); B′'s maintained counts equal a recount;
+    /// B″ returns the same decompositions; the old solvers emit no E33
+    /// field.  Negative controls: a second-best pivot in one column changes
+    /// the digest (and not the solutions), and a count off by one is
+    /// flagged by the recount check.
+    #[test]
+    fn e33_counted_pivot_selection_is_bit_identical() {
+        use crate::cryptanalysis::gaudry_quartic::{PivotCheck, PivotRule};
+        use crate::cryptanalysis::quartic_folds::generate_gls_klein_instance;
+        use rand::Rng;
+        let same_phases = |a: &QuarticSolve, b: &QuarticSolve| {
+            (
+                a.weil_muls,
+                a.triangularise_muls,
+                a.echelon_muls,
+                a.nf_muls,
+                a.charpoly_muls,
+                a.roots_muls,
+                a.eigenvector_muls,
+                a.verify_muls,
+                a.total_muls,
+                a.rows,
+                a.cols,
+                a.pivots,
+                &a.outcome,
+            ) == (
+                b.weil_muls,
+                b.triangularise_muls,
+                b.echelon_muls,
+                b.nf_muls,
+                b.charpoly_muls,
+                b.roots_muls,
+                b.eigenvector_muls,
+                b.verify_muls,
+                b.total_muls,
+                b.rows,
+                b.cols,
+                b.pivots,
+                &b.outcome,
+            )
+        };
+        let (mut calls, mut digest_flagged, mut count_flagged, mut contested) = (0, 0, 0, 0);
+        for (p, seed) in [(101u64, 2u64), (149, 1)] {
+            let ki = generate_gls_klein_instance(p, seed, 16).unwrap();
+            let curve = ki.inst.curve();
+            let f = &curve.f;
+            let mut rng = StdRng::seed_from_u64(p ^ 0xE33);
+            let pre = SymmetrisedV4::precompute(&ki, &curve, &mut rng, 4).unwrap();
+            let n = ki.inst.n;
+            let mut done = 0;
+            while done < 16 {
+                let (a, b) = (rng.gen_range(0..n), rng.gen_range(1..n));
+                let r = curve.add(&curve.mul(&ki.inst.g, a), &curve.mul(&ki.inst.q, b));
+                let Some(z_r) = ki.z_of_x(f, &r.x) else {
+                    continue;
+                };
+                done += 1;
+                let mut fp = 0u64;
+                let comps = v4_system(&pre, f, &z_r, &mut fp);
+                let tseed: u64 = rng.gen();
+                let run = |pivot: Pivot| {
+                    let mut tr = StdRng::seed_from_u64(tseed);
+                    let mut st = QuarticSolve::default();
+                    let (s, d, info) = solve_weighted_chain_with(
+                        &comps,
+                        MACAULAY_BOUND,
+                        p,
+                        &mut tr,
+                        &mut st,
+                        pivot,
+                    );
+                    let lb = lift_back_v4(&ki, &curve, s.as_deref().unwrap_or(&[]), &r, &mut tr);
+                    (s, d, lb.decompositions, st, info.fell_back)
+                };
+                let un = |sparsest| Pivot::Uncounted { sparsest };
+                let co = |rule| {
+                    Pivot::Counted(
+                        rule,
+                        PivotCheck {
+                            verify: true,
+                            ..Default::default()
+                        },
+                    )
+                };
+                let a = run(un(false));
+                let b = run(un(true));
+                let ac = run(co(PivotRule::Lowest));
+                let bc = run(co(PivotRule::SparsestRecount));
+                let bi = run(co(PivotRule::SparsestIncremental));
+                let be = run(co(PivotRule::SparsestEstimate));
+                for (x, base, what) in [
+                    (&ac, &a, "A counted"),
+                    (&bc, &b, "B counted"),
+                    (&bi, &b, "B′"),
+                ] {
+                    assert_eq!(
+                        (&x.0, x.1, &x.2),
+                        (&base.0, base.1, &base.2),
+                        "{what}: output"
+                    );
+                    assert!(same_phases(&x.3, &base.3), "{what}: phase counts");
+                }
+                assert_eq!((&be.0, be.1, &be.2), (&a.0, a.1, &a.2), "B″: output");
+                assert_eq!(a.3.outcome, be.3.outcome);
+                // Old solvers emit no E33 field.
+                for old in [&a.3, &b.3] {
+                    let js = serde_json::to_string(old).unwrap();
+                    assert!(!js.contains("pivot_") && !js.contains("lead_scan"), "{js}");
+                }
+                assert_eq!(
+                    a.3.pivot_init_ops + a.3.pivot_compare_ops + a.3.pivot_update_ops,
+                    0
+                );
+                assert_eq!(
+                    ac.3.pivot_init_ops + ac.3.pivot_compare_ops + ac.3.pivot_update_ops,
+                    0
+                );
+                assert_eq!(
+                    bc.3.pivot_digest, bi.3.pivot_digest,
+                    "B′ chooses B's pivots"
+                );
+                assert_ne!(ac.3.pivot_digest, 0);
+                assert_eq!(bi.3.pivot_count_mismatches, 0, "B′ counts = recount");
+                assert_eq!(bc.3.pivot_count_mismatches, 0);
+                if !bc.4 {
+                    // The initial pass reads every entry once.
+                    assert_eq!(bc.3.pivot_init_ops, (bc.3.rows * bc.3.cols) as u64);
+                }
+                assert!(bi.3.pivot_init_ops < bc.3.pivot_init_ops);
+                assert_eq!(bc.3.pivot_compare_ops, bi.3.pivot_compare_ops);
+                assert_eq!(bc.3.lead_scan_reads, bi.3.lead_scan_reads);
+                if bc.3.pivot_compare_ops > 0 {
+                    contested += 1;
+                    // Negative control 1: the second-best candidate once.
+                    let bad = run(Pivot::Counted(
+                        PivotRule::SparsestIncremental,
+                        PivotCheck {
+                            verify: true,
+                            second_best_at: Some(0),
+                            ..Default::default()
+                        },
+                    ));
+                    if bad.3.pivot_digest != bc.3.pivot_digest {
+                        digest_flagged += 1;
+                    }
+                    assert_eq!(
+                        (&bad.0, bad.1, &bad.2),
+                        (&a.0, a.1, &a.2),
+                        "any pivot: same output"
+                    );
+                    // Negative control 2: one maintained count off by one.
+                    let bad = run(Pivot::Counted(
+                        PivotRule::SparsestIncremental,
+                        PivotCheck {
+                            verify: true,
+                            perturb_count: true,
+                            ..Default::default()
+                        },
+                    ));
+                    if bad.3.pivot_count_mismatches > 0 {
+                        count_flagged += 1;
+                    }
+                }
+                calls += 1;
+            }
+        }
+        assert_eq!(calls, 32);
+        assert!(contested > 0);
+        assert_eq!(
+            digest_flagged, contested,
+            "every second-best control is detected"
+        );
+        assert_eq!(
+            count_flagged, contested,
+            "every off-by-one control is detected"
+        );
+    }
+
+    /// E33: the counted echelon equals `echelon_by_lead_with` on real E25
+    /// matrices, entry for entry, with the same multiplication count.
+    #[test]
+    fn e33_counted_echelon_equals_the_uncounted_one() {
+        use crate::cryptanalysis::gaudry_quartic::{
+            echelon_by_lead_counted, PivotCheck, PivotRule, PivotWork,
+        };
+        use crate::cryptanalysis::quartic_folds::generate_gls_klein_instance;
+        use rand::Rng;
+        let ki = generate_gls_klein_instance(101, 1, 16).unwrap();
+        let curve = ki.inst.curve();
+        let f = &curve.f;
+        let mut rng = StdRng::seed_from_u64(0xE33E);
+        let pre = SymmetrisedV4::precompute(&ki, &curve, &mut rng, 4).unwrap();
+        let n = ki.inst.n;
+        let mut done = 0;
+        while done < 6 {
+            let (a, b) = (rng.gen_range(0..n), rng.gen_range(1..n));
+            let r = curve.add(&curve.mul(&ki.inst.g, a), &curve.mul(&ki.inst.q, b));
+            let Some(z_r) = ki.z_of_x(f, &r.x) else {
+                continue;
+            };
+            done += 1;
+            let mut fp = 0u64;
+            let comps = v4_system(&pre, f, &z_r, &mut fp);
+            let (rows, nnz) = e33_rows(&comps, MACAULAY_BOUND, 101);
+            for (rule, sparsest) in [
+                (PivotRule::Lowest, false),
+                (PivotRule::SparsestRecount, true),
+                (PivotRule::SparsestIncremental, true),
+            ] {
+                let mut m0 = 0u64;
+                let e0 = echelon_by_lead_with(rows.clone(), 101, &mut m0, false, sparsest);
+                let mut m1 = 0u64;
+                let mut w = PivotWork::default();
+                let check = PivotCheck {
+                    verify: true,
+                    ..Default::default()
+                };
+                let e1 = echelon_by_lead_counted(
+                    rows.clone(),
+                    101,
+                    &mut m1,
+                    rule,
+                    Some(nnz.clone()),
+                    check,
+                    &mut w,
+                );
+                assert_eq!(m0, m1, "{rule:?}: multiplications");
+                assert_eq!(e0.rows, e1.rows, "{rule:?}: rows");
+                assert_eq!(e0.pivot_row, e1.pivot_row, "{rule:?}: pivots");
+                assert_eq!(e0.zero_ids, e1.zero_ids, "{rule:?}: zero rows");
+                assert_eq!(w.count_mismatches, 0, "{rule:?}: counts");
+            }
+        }
+    }
+
+    /// The rows `build_echelon` builds (row selection on), with each row's
+    /// count inherited from its equation.
+    fn e33_rows(comps: &[HashMap<[u8; 4], u64>], d: u16, p: u64) -> (Vec<Vec<u16>>, Vec<u32>) {
+        let cols = weighted_monomials_desc(d);
+        let col_index: HashMap<[u8; 4], usize> =
+            cols.iter().enumerate().map(|(i, m)| (*m, i)).collect();
+        let mut tri = 0u64;
+        let (comps, leads) = triangularise(comps, p, &mut tri);
+        let divides = |lm: &[u8; 4], m: &[u8; 4]| (0..4).all(|k| lm[k] <= m[k]);
+        let (mut rows, mut nnz) = (Vec::new(), Vec::new());
+        for (i, comp) in comps.iter().enumerate() {
+            let Some(dg) = comp
+                .iter()
+                .filter(|(_, &v)| v != 0)
+                .map(|(m, _)| wdeg(m))
+                .max()
+            else {
+                continue;
+            };
+            for sh in weighted_monomials_desc(d - dg) {
+                if leads
+                    .iter()
+                    .take(i)
+                    .any(|lm| lm.is_some_and(|lm| divides(&lm, &sh)))
+                {
+                    continue;
+                }
+                let mut row = vec![0u16; cols.len()];
+                for (&e, &c) in comp {
+                    let m: [u8; 4] = core::array::from_fn(|k| e[k] + sh[k]);
+                    row[col_index[&m]] = am(row[col_index[&m]] as u64, c, p) as u16;
+                }
+                rows.push(row);
+                nnz.push(comp.values().filter(|&&v| v % p != 0).count() as u32);
+            }
+        }
+        (rows, nnz)
+    }
 
     /// A planted sum of four base points from four distinct translation
     /// orbits comes back with its 64 translates, the quotient is 64, and
