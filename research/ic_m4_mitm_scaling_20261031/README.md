@@ -104,16 +104,20 @@ relation, outside a session.
 |---:|---:|---:|---:|---:|---:|
 | 64 | 7132 | 25,436,278 | 20,251,331 | 2/2 | 108 s |
 | 66 | 9410 | 44,278,755 | 35,066,153 | 2/2 | 233 s |
+| 64 | 7132 | 25,436,278 | 13,734,776 | 4/4 | 42 s |
+| 68 | 12,417 | 77,097,153 | 44,711,664 | 4/4 | 363 s |
 
-Two-rung fit: **0.396** (R^2 1.0000). It agrees with the u64 ladders
-(0.391--0.412), so the planted m = 4 solve exponent is stable below 1/2
-from 24 to 66 bits, across both native and arbitrary precision.
+Fits: **0.396** (64/66, R^2 1.0) and **0.426** (64/68, R^2 1.0). They agree
+with the u64 ladders (0.391--0.412): the planted m = 4 solve exponent is
+stable below 1/2 from 24 to 68 bits, native and arbitrary precision.
 
-The wall from here is memory, not the exponent: the 2+2 table is
-`B^2 = p^{2/5}` entries, 44M at 66 bits and ~2.4e8 at 72 bits (multi-GB),
-with each 68-bit rung roughly quadrupling the 66-bit wall time. A 3+1
-split trades a `B^3` table for a lower query exponent; an external-memory
-or distinguished-point table is the route past ~70 bits.
+The big ladder uses one **batch inversion per factor-base row** instead of
+one inversion per addition, which cut the 64-bit rung from 108 s to 42 s
+and made 68 bits (77M pair entries) run in 6 minutes. The wall from here
+is memory: the 2+2 table is `B^2 = p^{2/5}` entries, 77M at 68 bits and
+~2.4e8 at 72 bits (tens of GB). A 3+1 split trades a `B^3` table for a
+lower query exponent; an external-memory or distinguished-point table is
+the route past ~72 bits.
 
 ## Reading
 

@@ -176,6 +176,23 @@ impl ToU128 for BigUint {
     }
 }
 
+fn batch_inv(v: &[BigUint], p: &BigUint) -> Vec<BigUint> {
+    let n = v.len();
+    let mut pre = Vec::with_capacity(n);
+    let mut acc = BigUint::one();
+    for x in v {
+        pre.push(acc.clone());
+        acc = (&acc * x) % p;
+    }
+    let mut inv = modinv(&acc, p);
+    let mut out = vec![BigUint::zero(); n];
+    for i in (0..n).rev() {
+        out[i] = (&inv * &pre[i]) % p;
+        inv = (&inv * &v[i]) % p;
+    }
+    out
+}
+
 fn run(bits: u32, targets: usize, seed: u64) -> (f64, f64, usize, usize, f64) {
     let p = largest_prime_below_pow2(bits, 3);
     let curve = CurveBig {
@@ -187,7 +204,6 @@ fn run(bits: u32, targets: usize, seed: u64) -> (f64, f64, usize, usize, f64) {
     let bsz = pf.powf(0.2).round().max(4.0) as usize;
     let mut rng = StdRng::seed_from_u64(seed ^ u64::from(bits));
 
-    // Random factor base: sample x until the lift succeeds.
     let mut base: Vec<PtBig> = Vec::with_capacity(bsz);
     while base.len() < bsz {
         let x = BigUint::from(rng.gen::<u128>()) % &p;
@@ -201,17 +217,42 @@ fn run(bits: u32, targets: usize, seed: u64) -> (f64, f64, usize, usize, f64) {
 
     let t0 = Instant::now();
     let b = base.len();
-    let cap = (b * (b + 1) / 2).min(30_000_000);
+    let cap = (b * (b + 1) / 2).min(40_000_000);
     let mut table: HashMap<(u128, u128), (u32, u32)> = HashMap::with_capacity(cap);
-    let mut sums: Vec<Option<PtBig>> = Vec::with_capacity(b * (b + 1) / 2);
+    let mut sums: Vec<Option<PtBig>> = vec![None; b * (b + 1) / 2];
     let mut table_adds = 0u64;
+
+    // Pair table, one batch inversion per row instead of one per addition.
+    let three = BigUint::from(3u32);
+    let two = BigUint::from(2u32);
     for i in 0..b {
+        let mut ds: Vec<BigUint> = Vec::with_capacity(b - i);
+        let mut js: Vec<usize> = Vec::with_capacity(b - i);
         for j in i..b {
-            let s = curve.add(Some(&base[i]), Some(&base[j]));
-            if let Some(ref sp) = s {
-                table.entry(key_of(sp)).or_insert((i as u32, j as u32));
+            let den = if j == i {
+                (&two * &base[i].y) % &p
+            } else {
+                (&base[j].x + &p - &base[i].x) % &p
+            };
+            if den.is_zero() {
+                continue;
             }
-            sums.push(s);
+            ds.push(den);
+            js.push(j);
+        }
+        let invs = batch_inv(&ds, &p);
+        for (t, &j) in js.iter().enumerate() {
+            let invl = &invs[t];
+            let lam = if j == i {
+                (((&three * &base[i].x * &base[i].x) + &curve.a) % &p * invl) % &p
+            } else {
+                ((&base[j].y + &p - &base[i].y) % &p * invl) % &p
+            };
+            let x3 = (&lam * &lam + &p - &base[i].x + &p - &base[j].x) % &p;
+            let y3 = (&lam * ((&base[i].x + &p - &x3) % &p) + &p - &base[i].y) % &p;
+            let sp = PtBig { x: x3, y: y3 };
+            table.entry(key_of(&sp)).or_insert((i as u32, j as u32));
+            sums[i * b - i * (i - 1) / 2 + (j - i)] = Some(sp);
             table_adds += 1;
         }
     }
@@ -236,15 +277,31 @@ fn run(bits: u32, targets: usize, seed: u64) -> (f64, f64, usize, usize, f64) {
         let mut q = 0u64;
         let mut ok = false;
         'outer: for i in 0..b {
+            // Denominators x_S - x_R for every pair (i, j); one batch inverse.
+            let mut ds: Vec<BigUint> = Vec::with_capacity(b - i);
+            let mut jl: Vec<usize> = Vec::with_capacity(b - i);
+            let mut nums: Vec<BigUint> = Vec::with_capacity(b - i);
             for j in i..b {
                 let Some(s) = sums[i * b - i * (i - 1) / 2 + (j - i)].as_ref() else {
                     continue;
                 };
-                q += 1;
-                let ns = curve.neg(s);
-                let Some(d) = curve.add(Some(&r), Some(&ns)) else {
+                let den = (&s.x + &p - &r.x) % &p;
+                if den.is_zero() {
                     continue;
-                };
+                }
+                let num = (&p + &p - &s.y % &p - &r.y % &p) % &p;
+                ds.push(den);
+                nums.push(num);
+                jl.push(j);
+            }
+            let invs = batch_inv(&ds, &p);
+            for (t, &j) in jl.iter().enumerate() {
+                q += 1;
+                let s = sums[i * b - i * (i - 1) / 2 + (j - i)].as_ref().unwrap();
+                let lam = (&nums[t] * &invs[t]) % &p;
+                let x3 = (&lam * &lam + &p - &r.x + &p - &s.x) % &p;
+                let y3 = (&lam * ((&r.x + &p - &x3) % &p) + &p - &r.y) % &p;
+                let d = PtBig { x: x3, y: y3 };
                 if let Some(&(k, l)) = table.get(&key_of(&d)) {
                     let s4 = curve
                         .add(Some(&base[i]), Some(&base[j]))
