@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # PS-7: CDCL with an algebraic leaf, and dynamic branching (protocols/PS-7.md).
 #
-#   PS7_STAGES=all|build|test|graph|fidelity|countcheck|counts|verify|reg|timing|summary   (default all)
+#   PS7_STAGES=all|core|build|test|graph|fidelity|countcheck|counts|verify|reg|timing|summary   (default all; core = all but timing and countcheck)
 #
 # Every heavy command goes through `tools/isolated_bench.py busy --wait` (the benchmark lock); the timed stage uses
 # `tools/isolated_bench.py run --cpus $PS7_CPU` (reserved core, contention recorded).  Counts do not depend on
@@ -32,7 +32,9 @@ try() {   # try LABEL CMD... : run, log a failure, keep going
   if ! "$@"; then echo "$(date -u +%FT%TZ) FAILED: $label :: $*" >> "$OUT/failures.log"; FAIL=1; fi
 }
 want() {   # want STAGE: is it selected?  Selected stages log the host they ran on (the container can move between hosts).
-  if [ "$STAGES" = all ] || [ "$STAGES" = "$1" ]; then
+  # `core` = every stage that runs inside one lock acquisition (everything but the timed stage and the instrumented check)
+  local core=no; case "$1" in build|test|graph|fidelity|counts|verify|reg|summary|clippy) core=yes;; esac
+  if [ "$STAGES" = all ] || [ "$STAGES" = "$1" ] || { [ "$STAGES" = core ] && [ "$core" = yes ]; }; then
     echo "$(date -u +%FT%TZ) stage=$1 host=$(hostname) cpu=\"$(lscpu | sed -n 's/^Model name: *//p')\" kernel=$(uname -r) up=$(cut -d' ' -f1 /proc/uptime)s" >> "$OUT/host_per_stage.log"
     return 0
   fi
@@ -138,6 +140,11 @@ if want timing; then   # wall, a note: no accounting hooks, reserved core, ROUND
       done
     done
   done
+fi
+
+if want clippy; then   # lint the example; warnings of the library (a different file set) are in the log but are not this task's
+  busy cargo clippy --release --example pdp_ps7 > "$OUT/clippy.log" 2>&1
+  echo "clippy exit $?; warnings located in examples/pdp_ps7 or pdp_speedup: $(grep -c -E '^ *--> examples/pdp_(ps7|speedup)' "$OUT/clippy.log")" >> "$OUT/clippy.log"
 fi
 
 if want summary; then
