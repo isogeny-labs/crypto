@@ -291,7 +291,7 @@ pub fn irreducible_poly(p: u64, d: usize, rng: &mut SplitMix64) -> Poly {
     }
     let x: Poly = vec![0, 1];
     let primes: Vec<usize> = (2..=d)
-        .filter(|r| d % r == 0 && (2..*r).all(|s| r % s != 0))
+        .filter(|r| d.is_multiple_of(r) && (2..*r).all(|s| r % s != 0))
         .collect();
     loop {
         let mut f: Poly = (0..d).map(|_| rng.below(p)).collect();
@@ -1723,7 +1723,6 @@ impl Smith {
         let mut rows: Vec<Vec<u64>> = Vec::new();
         let mut rows2: Vec<Vec<u64>> = Vec::new();
         let mut seen: std::collections::BTreeSet<ClosedPt> = Default::default();
-        let mut mat = Vec::new();
         for it in 0..400 {
             let d = self.h.random_generic3(rng);
             let Ok(img) = self.psi_effective(&d, rng) else {
@@ -3070,14 +3069,14 @@ pub struct Sample {
 
 pub fn odd_prime_factors(mut n: u128) -> Vec<u64> {
     let mut v = Vec::new();
-    while n % 2 == 0 && n > 0 {
+    while n.is_multiple_of(2) && n > 0 {
         n /= 2;
     }
     let mut d = 3u128;
     while d * d <= n {
-        if n % d == 0 {
+        if n.is_multiple_of(d) {
             v.push(d as u64);
-            while n % d == 0 {
+            while n.is_multiple_of(d) {
                 n /= d;
             }
         }
@@ -3138,7 +3137,7 @@ impl Smith {
         let mut t5 = Vec::new();
         for ell in odd_prime_factors(n_jac) {
             let mut cof = n_jac;
-            while cof % ell as u128 == 0 {
+            while cof.is_multiple_of(ell as u128) {
                 cof /= ell as u128;
             }
             let mut got = 0;
