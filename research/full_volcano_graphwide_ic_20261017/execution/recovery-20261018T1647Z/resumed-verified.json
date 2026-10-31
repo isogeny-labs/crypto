@@ -1,0 +1,57 @@
+{
+  "schema": "volcano-recovery-resume-readback/v1",
+  "checked_utc": "2026-10-18T17:07:52.044044+00:00",
+  "pid": 3298,
+  "process_readback": "3298       1    3298 Ss   /workspace/volcano_ic_repaired_survey_20261017/volcano-ic-driver run /workspace/volcano_ic_repaired_survey_20261017 24823 183994 6442450944",
+  "native_status": {
+    "campaign": "/workspace/volcano_ic_repaired_survey_20261017",
+    "coverage": [
+      {
+        "graph": "mixed",
+        "state": "audited",
+        "vertices": 1856
+      },
+      {
+        "graph": "mixed",
+        "state": "queued",
+        "vertices": 8214
+      },
+      {
+        "graph": "three",
+        "state": "audited",
+        "vertices": 1837
+      },
+      {
+        "graph": "three",
+        "state": "queued",
+        "vertices": 4723
+      },
+      {
+        "graph": "three",
+        "state": "running",
+        "vertices": 1
+      },
+      {
+        "graph": "two",
+        "state": "audited",
+        "vertices": 1843
+      },
+      {
+        "graph": "two",
+        "state": "queued",
+        "vertices": 6349
+      }
+    ]
+  },
+  "new_audited_progress": true,
+  "log_tail": [
+    "1792343229104 RUN three-v1835 attempt 2",
+    "1792343242092 audited three-v1835: {\"exhausted\":10,\"timeout\":2,\"verified\":4}",
+    "1792343242234 RUN mixed-v1849 attempt 1",
+    "1792343244387 audited mixed-v1849: {\"exhausted\":2,\"verified\":14}",
+    "1792343244503 RUN two-v1840 attempt 1",
+    "1792343246936 audited two-v1840: {\"exhausted\":4,\"verified\":12}",
+    "1792343247054 RUN three-v1836 attempt 1"
+  ],
+  "scope": "Actual separate-session non-zombie process; original deadline preserved; no completion or automatic upload claim."
+}

@@ -1,0 +1,238 @@
+{
+  "schema": "ic_oracle_setup_blocked.analysis/v1",
+  "session_id": "ECBS1h90cd7a0dc213",
+  "measured_runs": 32,
+  "all_records": 48,
+  "unverified": 0,
+  "arms": [
+    {
+      "arm": "batch-16384",
+      "runs": 8,
+      "verified": 8,
+      "levels": {
+        "L1": 8
+      },
+      "S_w0_mean": 4097.226009938733,
+      "S_w0_1_mean": 4097.577891838142,
+      "S_w1_mean": 4100.744828932823,
+      "gae_mean": 268515574.875,
+      "uncharged_mean": 230609.125,
+      "run_wall_ms_mean": 120399.147004125,
+      "max_rss_kib": {
+        "n": 8,
+        "min": 9172156,
+        "median": 9511620,
+        "max": 9590516
+      },
+      "oracle": "mitm-prime-batch:m=2",
+      "factor_base": "prime-abscissa:size=16384",
+      "setup_gae_mean": 268451840,
+      "relations_gae_mean": 63690.375,
+      "relations": {
+        "n": 8,
+        "min": 3127,
+        "median": 7673,
+        "max": 8730
+      },
+      "wall_ms_mean": {
+        "oracle_setup": 116518.995317375,
+        "relations": 102.378918,
+        "linear_algebra": 3735.612502125
+      }
+    },
+    {
+      "arm": "blocked-16384",
+      "runs": 8,
+      "verified": 8,
+      "levels": {
+        "L1": 8
+      },
+      "S_w0_mean": 4097.226009938733,
+      "S_w0_1_mean": 4097.577891838142,
+      "S_w1_mean": 4100.744828932823,
+      "gae_mean": 268515574.875,
+      "uncharged_mean": 230609.125,
+      "run_wall_ms_mean": 29947.65107425,
+      "max_rss_kib": {
+        "n": 8,
+        "min": 4454568,
+        "median": 4793332,
+        "max": 4872432
+      },
+      "oracle": "mitm-prime-blocked:m=2",
+      "factor_base": "prime-abscissa:size=16384",
+      "setup_gae_mean": 268451840,
+      "relations_gae_mean": 63690.375,
+      "relations": {
+        "n": 8,
+        "min": 3127,
+        "median": 7673,
+        "max": 8730
+      },
+      "wall_ms_mean": {
+        "oracle_setup": 28200.815482625,
+        "relations": 96.39051225,
+        "linear_algebra": 1607.05492675
+      }
+    },
+    {
+      "arm": "rho-neg",
+      "runs": 8,
+      "verified": 8,
+      "levels": {
+        "L1": 1,
+        "L2": 7
+      },
+      "S_w0_mean": 0.801760403357206,
+      "S_w0_1_mean": 0.8813291433705095,
+      "S_w1_mean": 1.5974478034902422,
+      "gae_mean": 52544.125,
+      "uncharged_mean": 52146.125,
+      "run_wall_ms_mean": 21.060217375,
+      "max_rss_kib": {
+        "n": 8,
+        "min": 33128,
+        "median": 33420,
+        "max": 33544
+      }
+    },
+    {
+      "arm": "scalar-16384",
+      "runs": 8,
+      "verified": 8,
+      "levels": {
+        "L1": 8
+      },
+      "S_w0_mean": 4097.226009938733,
+      "S_w0_1_mean": 4097.577891838142,
+      "S_w1_mean": 4100.744828932823,
+      "gae_mean": 268515574.875,
+      "uncharged_mean": 230609.125,
+      "run_wall_ms_mean": 227916.430308625,
+      "max_rss_kib": {
+        "n": 8,
+        "min": 9172260,
+        "median": 9511372,
+        "max": 9590192
+      },
+      "oracle": "mitm:negation_folded=1",
+      "factor_base": "prime-abscissa:size=16384",
+      "setup_gae_mean": 268451840,
+      "relations_gae_mean": 63690.375,
+      "relations": {
+        "n": 8,
+        "min": 3127,
+        "median": 7673,
+        "max": 8730
+      },
+      "wall_ms_mean": {
+        "oracle_setup": 224141.725428625,
+        "relations": 103.746256,
+        "linear_algebra": 3630.341647875
+      }
+    }
+  ],
+  "per_size": [
+    {
+      "N": 16384,
+      "equality": {
+        "batch_vs_scalar": {
+          "executions": 12,
+          "identical": 12
+        },
+        "blocked_vs_batch": {
+          "executions": 12,
+          "identical": 12
+        }
+      },
+      "blocked_vs_batch_S": {
+        "a": "batch-16384",
+        "b": "blocked-16384",
+        "pairs": 8,
+        "S_ratio": {
+          "w0": 1,
+          "w0_1": 1,
+          "w1": 1
+        }
+      },
+      "blocked_vs_scalar_S": {
+        "a": "scalar-16384",
+        "b": "blocked-16384",
+        "pairs": 8,
+        "S_ratio": {
+          "w0": 1,
+          "w0_1": 1,
+          "w1": 1
+        }
+      },
+      "blocked_vs_batch_wall": {
+        "a": "batch-16384",
+        "b": "blocked-16384",
+        "pairs": 8,
+        "setup_wall_ratio_sum": 0.2420276230996627,
+        "setup_wall_pair_ratio": {
+          "n": 8,
+          "min": 0.22028448813937623,
+          "median": 0.2443775372466001,
+          "max": 0.260486706222843
+        },
+        "run_wall_ratio_sum": 0.24873640569250846,
+        "run_wall_pair_ratio": {
+          "n": 8,
+          "min": 0.22484894325455798,
+          "median": 0.25546454213686914,
+          "max": 0.26371431154548575
+        }
+      },
+      "blocked_vs_scalar_wall": {
+        "a": "scalar-16384",
+        "b": "blocked-16384",
+        "pairs": 8,
+        "setup_wall_ratio_sum": 0.12581689298900833,
+        "setup_wall_pair_ratio": {
+          "n": 8,
+          "min": 0.11508063933866935,
+          "median": 0.12815992704266185,
+          "max": 0.13588204854307873
+        },
+        "run_wall_ratio_sum": 0.13139750843630468,
+        "run_wall_pair_ratio": {
+          "n": 8,
+          "min": 0.11886017049365089,
+          "median": 0.1340531175506568,
+          "max": 0.1446202560565282
+        }
+      },
+      "batch_vs_scalar_wall": {
+        "a": "scalar-16384",
+        "b": "batch-16384",
+        "pairs": 8,
+        "setup_wall_ratio_sum": 0.5198451787348222,
+        "setup_wall_pair_ratio": {
+          "n": 8,
+          "min": 0.4936231982881244,
+          "median": 0.522418261543031,
+          "max": 0.5447896298130195
+        },
+        "run_wall_ratio_sum": 0.5282600593607523,
+        "run_wall_pair_ratio": {
+          "n": 8,
+          "min": 0.5045588705180013,
+          "median": 0.5286223220497233,
+          "max": 0.5526371292893055
+        }
+      },
+      "blocked_vs_rho_S": {
+        "a": "rho-neg",
+        "b": "blocked-16384",
+        "pairs": 8,
+        "S_ratio": {
+          "w0": 5110.287303766121,
+          "w0_1": 4649.316231808218,
+          "w1": 2567.0602945355463
+        }
+      }
+    }
+  ],
+  "aa_control": null
+}

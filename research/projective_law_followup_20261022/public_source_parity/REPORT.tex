@@ -1,0 +1,51 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.77in]{geometry}
+\usepackage[T1]{fontenc}
+\begin{document}
+\title{Finite public-source parity for a weighted genus-2 law}
+\author{Source-bound review packet}
+\date{25 October 2026}
+\maketitle
+\noindent\textbf{Protocol.} The pinned author Magma projective functions
+\texttt{ADDDIVISOR} and their 18 dependencies were translated by a strict
+syntax-limited parser and evaluated in $\mathbf F_7$ and $\mathbf F_{11}$.
+All valid reduced divisors of $y^2=x^5+x+2$ were enumerated independently
+of the compiled Rust enumerator. Every ordered pair was checked with unit
+weights and with $(z_1,w_1,z_2,w_2)=(2,3,3,5)$.
+The author result was normalized and compared with compiled Rust; Rust was
+compared with independent Cantor arithmetic. A 1,024-row bounded gate
+preceded the complete pass.
+
+\begin{center}
+\begin{tabular}{lrrrr}
+Field, weight & Pairs & Author/Rust matches & Invalid weights & Undefined divisions\\\hline
+F7, 0 & 4,356 & 4,356 & 0 & 0 \\
+F7, 1 & 4,356 & 4,356 & 0 & 0 \\
+F11, 0 & 12,996 & 12,996 & 0 & 0 \\
+F11, 1 & 12,996 & 12,996 & 0 & 0 \\
+\end{tabular}
+\end{center}
+
+\noindent\textbf{Observed.} There are 17,352 ordered pairs and 34,704
+weighted checks. All 34,704 author outputs matched Rust, and all 34,704
+Rust outputs matched Cantor. There were zero invalid author output weights,
+zero undefined field divisions, and zero other invalid intermediates.
+The branch matrix has 108 joint path/label cells, covering 28 observed
+author call paths and 16 Rust labels. These are finite counts, not timing.
+
+\noindent\textbf{Evidence.} \texttt{ROWS.csv} carries the four aggregate rows;
+\texttt{branch-matrix.csv} gives the joint paths and labels;
+\texttt{F7-weight*.csv.xz} and \texttt{F11-weight*.csv.xz} contain every
+standardized pair row. \texttt{SUMMARY.json} contains full raw digests,
+source hashes, and counts. \texttt{run.py} regenerates the data and checks
+it byte for byte. The author source SHA-256 is
+\texttt{7416a7fffaafff371738e7498a6795057372e1c477e0079297eebf2347c2e72a}; the Rust source SHA-256 is
+\texttt{5976e7f30b3e9c5c49a5fc0f4095404b7322832e4b02f467bc3cb7e0d9dcc8c0}.
+
+\noindent\textbf{Limit.} Magma was unavailable, so the pinned Magma source
+was translated and evaluated, not run by Magma. The parser checks its exact
+source bytes and supported syntax, but this is not an independent Magma
+execution. One curve over each of two small fields cannot establish
+universal formula correctness, full Rust semantics, or the Picard-group
+bridge. The frozen 1,260-target costs are unchanged.
+\end{document}

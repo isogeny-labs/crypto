@@ -1,6 +1,9 @@
 name: IC autolab integration
 on:
-  pull_request:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
     paths:
       - 'Cargo.lock'
       - 'build.rs'
@@ -14,17 +17,56 @@ on:
       - 'research/sat_factor_base_review_20260908/autolab/**'
       - '.github/workflows/ic-autolab.yml'
   workflow_dispatch:
+    inputs:
+      run_native_tournament_pilot:
+        description: Run the registered 2026-10-28 native IC pilot once
+        type: boolean
+        default: false
 permissions:
   contents: read
+  actions: read
+env:
+  # Runtime registrations hash the interpreter's existing stdlib bytecode.
+  # Keep the test controller from creating new caches after that snapshot.
+  PYTHONDONTWRITEBYTECODE: '1'
 concurrency:
   group: ic-autolab-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 jobs:
-  linux-integration:
-    runs-on: ubuntu-24.04
-    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
+  linux-integration-controls:
+    if: ${{ github.event_name != 'workflow_dispatch' || !inputs.run_native_tournament_pilot }}
+    # Valgrind 3.22.0 is the calibrated Ir unit (autolab.py checks it too).
+    # ubuntu-latest is now Ubuntu 26.04, whose apt ships 3.26.0; 24.04 ships 3.22.0.
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-autolab.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-autolab.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 25
     steps:
+      - name: Free hosted runner disk before Rust installation
+        if: runner.environment == 'github-hosted'
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          df -h /
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench research/ic_candidate_tournament_20260915
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -35,13 +77,28 @@ jobs:
       - name: Install calibrated profiler
         run: |
           sudo apt-get update
-          sudo apt-get install -y valgrind
+          sudo apt-get install -y valgrind zstd
           test "$(valgrind --version)" = valgrind-3.22.0
       - name: Freeze dependency resolution
         run: |
           # The committed root lock matches the current manifest. Keep the
           # tournament's older lock intact for its retained source replays.
           cargo fetch --locked
+      - name: Resolve the interpreter's own libpython without LD_LIBRARY_PATH
+        run: |
+          # setup-python's builds carry RUNPATH /opt/hostedtoolcache/...; on a
+          # self-hosted runner the tool cache lives elsewhere, so the SAT
+          # runtime's child (which drops LD_LIBRARY_PATH) loads the system
+          # libpython and sees a different interpreter. Point that RUNPATH at
+          # this interpreter's lib; a no-op where it already exists.
+          rp=$(readelf -d "$pythonLocation/bin/python3" | sed -n 's/.*(RUNPATH).*\[\(.*\)\]/\1/p')
+          if [ -n "$rp" ] && [ ! -e "$rp" ]; then
+            sudo mkdir -p "$(dirname "$rp")"
+            sudo ln -s "$pythonLocation/lib" "$rp"
+          fi
+          env -u LD_LIBRARY_PATH "$pythonLocation/bin/python3" -I -c \
+            'import platform, sys; assert platform.python_version() == sys.argv[1], platform.python_version()' \
+            "$(python -c 'import platform; print(platform.python_version())')"
       - name: Harness and accounting regression tests
         run: |
           python -m unittest discover -s research/ic_candidate_tournament_20260915 -p 'test_*.py' -v
@@ -51,6 +108,161 @@ jobs:
           cargo run --locked --release --example ic_query_law_vectors > "$RUNNER_TEMP/ic-query-law-rust-vectors.json"
           python research/ic_candidate_tournament_20260915/generic_query_law.py \
             --rust-vectors "$RUNNER_TEMP/ic-query-law-rust-vectors.json"
+      - name: Preserve controls and replay evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ic-autolab-controls-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/ic-query-law-rust-vectors.json
+            Cargo.lock
+          retention-days: 30
+          if-no-files-found: warn
+  native-tournament-pilot:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_native_tournament_pilot }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - name: Free hosted runner disk for sealed source and profiles
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          df -h /
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            .cargo
+            src
+            examples
+            tools
+            isogeny_algos
+            research/ic_candidate_tournament_20260915
+            docs/curves
+            docs/ecbench
+            docs/ic
+            .artifacts
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench research/ic_candidate_tournament_20260915
+      - uses: dtolnay/rust-toolchain@1.94.1
+      - name: Refuse a repeated dispatch of this registered seed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$GITHUB_RUN_ATTEMPT" -eq 1
+          gh run list --repo "$GITHUB_REPOSITORY" \
+            --workflow ic-autolab.yml --branch "$GITHUB_REF_NAME" \
+            --event workflow_dispatch --limit 100 --json databaseId \
+            | jq -e --argjson current "$GITHUB_RUN_ID" \
+                'map(select(.databaseId != $current)) | length == 0'
+      - name: Install the pinned instruction profiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y valgrind zstd
+          test "$(valgrind --version)" = valgrind-3.22.0
+      - name: Build and freeze the registered pilot
+        run: |
+          git rev-parse HEAD > "$RUNNER_TEMP/ic-dispatch-ref.txt"
+          cargo fetch --locked
+          cargo build --locked --release --bin icprog --jobs 2
+          target/release/icprog tournament prepare \
+            --out "$RUNNER_TEMP/runs/round-0026" \
+            --source-root "$GITHUB_WORKSPACE" \
+            --protocol research/ic_candidate_tournament_20260915/goal_20261028/native_pilot/PROTOCOL.md \
+            --seed 2026102801 --profile pilot \
+            --cells 13a0,17a1,19a0,23a0 --holdout-cells 19a1 \
+            --objective incumbent --require-native-progress \
+            --max-processes 1800 --timeout 60
+      - name: Run the native tournament once
+        run: |
+          "$RUNNER_TEMP/runs/round-0026/evaluator/icprog" tournament run \
+            --round "$RUNNER_TEMP/runs/round-0026" \
+            | tee "$RUNNER_TEMP/ic-native-round-run.log"
+      - name: Independently audit the frozen round
+        run: |
+          "$RUNNER_TEMP/runs/round-0026/evaluator/icprog" tournament verify \
+            --round "$RUNNER_TEMP/runs/round-0026" \
+            | tee "$RUNNER_TEMP/ic-native-round-audit.log"
+      - name: Pack all receipts, including failed attempts
+        if: always()
+        run: |
+          if test -d "$RUNNER_TEMP/runs/round-0026"; then
+            # Build cache is disposable; keep the frozen worker and build log.
+            rm -rf "$RUNNER_TEMP/runs/round-0026/build"
+            tar --zstd -cf "$RUNNER_TEMP/round-0026.tar.zst" \
+              -C "$RUNNER_TEMP" runs/round-0026
+            sha256sum "$RUNNER_TEMP/round-0026.tar.zst" \
+              > "$RUNNER_TEMP/round-0026.tar.zst.sha256"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ic-native-tournament-round-0026-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/round-0026.tar.zst
+            ${{ runner.temp }}/round-0026.tar.zst.sha256
+            ${{ runner.temp }}/ic-native-round-run.log
+            ${{ runner.temp }}/ic-native-round-audit.log
+            ${{ runner.temp }}/ic-dispatch-ref.txt
+          retention-days: 30
+          if-no-files-found: warn
+
+  linux-integration-release:
+    if: ${{ github.event_name != 'workflow_dispatch' || !inputs.run_native_tournament_pilot }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-autolab.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-autolab.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 25
+    steps:
+      - name: Free hosted runner disk before Rust installation
+        if: runner.environment == 'github-hosted'
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          df -h /
+      - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench research/ic_candidate_tournament_20260915
+      - uses: dtolnay/rust-toolchain@1.94.1
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: ic-autolab-integration
+      - name: Freeze dependency resolution
+        run: cargo fetch --locked
       - name: Release arithmetic and descent regressions
         run: |
           cargo test --locked --release --lib pdp_admission_ -- --test-threads=1
@@ -68,11 +280,62 @@ jobs:
           cargo test --locked --release --example ic_tournament_worker public_input_ -- --test-threads=1
           RAYON_NUM_THREADS=1 cargo test --locked --release --example ic_tournament_worker exclusive_worker_ -- --include-ignored --test-threads=1
           RAYON_NUM_THREADS=1 cargo test --locked --release --example ic_tournament_worker prepared_target_tests -- --ignored --test-threads=1
+      - name: Preserve release regression evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ic-autolab-release-${{ github.run_id }}-${{ github.run_attempt }}
+          path: Cargo.lock
+          retention-days: 30
+
+  linux-integration:
+    if: ${{ github.event_name != 'workflow_dispatch' || !inputs.run_native_tournament_pilot }}
+    needs: [linux-integration-controls, linux-integration-release]
+    # Valgrind 3.22.0 is the calibrated Ir unit (autolab.py checks it too).
+    # ubuntu-latest is now Ubuntu 26.04, whose apt ships 3.26.0; 24.04 ships 3.22.0.
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-autolab.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-autolab.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench research/ic_candidate_tournament_20260915
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@1.94.1
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: ic-autolab-integration
+      - name: Install calibrated profiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y valgrind zstd
+          test "$(valgrind --version)" = valgrind-3.22.0
+      - name: Freeze dependency resolution
+        run: cargo fetch --locked
       - name: Build source-bound generic worker and audit scientific controls
         run: |
           run_start=$(python research/ic_candidate_tournament_20260915/execution_ids.py \
             --workflow-run "$GITHUB_RUN_ID" --attempt "$GITHUB_RUN_ATTEMPT" --lane controls)
-          python research/ic_candidate_tournament_20260915/generic_build.py \
+          python research/ic_candidate_tournament_20260915/generic_build_v3.py \
             --out "$RUNNER_TEMP/ic-generic-build"
           python research/ic_candidate_tournament_20260915/goal_20260924/generic-scientific-admission/run_controls.py \
             --build "$RUNNER_TEMP/ic-generic-build" --out "$RUNNER_TEMP/ic-generic-admission" \

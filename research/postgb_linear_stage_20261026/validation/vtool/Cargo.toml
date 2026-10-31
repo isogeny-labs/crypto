@@ -1,0 +1,17 @@
+[package]
+name = "pgla-vtool"
+version = "0.2.0"
+edition = "2021"
+description = "Validator tooling for research/postgb_linear_stage_20261026 (independent of the repository's code)"
+publish = false
+
+[dependencies]
+serde_json = "1.0"
+sha2 = "0.10"
+rand = "0.8"
+
+[profile.release]
+opt-level = 3
+
+# A standalone package: not a member of the repository's crate.
+[workspace]

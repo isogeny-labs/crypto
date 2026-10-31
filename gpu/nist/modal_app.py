@@ -9,14 +9,14 @@ GPU=os.environ.get("NIST_GPU","RTX-PRO-6000")
 ROOT="/root/nist";LOCAL=pathlib.Path(__file__).parent
 image=(modal.Image.from_registry(f"nvidia/cuda:{CUDA}-devel-ubuntu24.04",add_python="3.12")
  .entrypoint([]).apt_install("build-essential","libboost-dev")
-  .add_local_dir(LOCAL,remote_path=ROOT,copy=True,ignore=["bench","test_cpu","test_rho","*.ptx","__pycache__"])
+  .add_local_dir(LOCAL,remote_path=ROOT,copy=True,ignore=["bench","bench-b*","test_cpu","test_rho","test_cpu_b*","test_rho_b*","*.ptx","__pycache__"])
  .run_commands(f"cd {ROOT} && make test"))
 app=modal.App("nist-prime-gpu-arithmetic")
 def sh(cmd,timeout=3600):
  r=subprocess.run(cmd,shell=True,cwd=ROOT,text=True,capture_output=True,timeout=timeout)
  return r.returncode,r.stdout+r.stderr
-def build(ptx,maxreg=0):
- return sh(f"make -B bench ARCH=sm_120 NIST_PTX={int(ptx)} MAXREG={maxreg}")
+def build(ptx,maxreg=0,shared=0):
+  return sh(f"make -B bench ARCH=sm_120 NIST_PTX={int(ptx)} MAXREG={maxreg} TABLE_SHARED={int(shared)}")
 @app.function(image=image,gpu=GPU,timeout=2*3600)
 def validate():
  rc,out=sh("make test");print(out)
@@ -113,6 +113,49 @@ def sweep_rho2():
   for k,v in best.items(): print(k,v)
   return {"rows":results}
 @app.function(image=image,gpu=GPU,timeout=4*3600)
+def sweep_rho3():
+  """Round 3: shared-memory jump table (global vs shared), W up to 64.
+  Cells: (table, threads, W)."""
+  import re
+  results=[]
+  for shared in (0,1):
+    rc,log=build(1,0,shared)
+    if rc: raise RuntimeError(f"build shared={shared} failed")
+    regs=re.findall(r"Compiling entry function '(\S*k_rhoI\S*)'.*?Used (\d+) registers.*?(\d+) bytes cumulative stack",log,re.S)
+    print("shared",shared,"k_rho:",regs)
+    for th in (128,256):
+      for W in (16,32,64):
+        rc,out=sh(f"./bench {th} rho {W} 8192")
+        if rc: print("FAILED",shared,th,W,out[-400:]); continue
+        print(out.strip())
+        for curve,r,thr,blk,ww,gstep,dps in re.findall(
+          r"^(P-(?:256|384)) rho: walks=(\d+) threads/blk=(\d+) blocks=(\d+) W=(\d+)\s+([0-9.]+) Gstep/s\s+\((\d+) DPs",out,re.M):
+          results.append({"shared":shared,"threads":th,"W":W,"curve":curve,"Gstep_s":float(gstep),"DPs":int(dps),
+                          "expected_DPs":int(r)*8192/2**24})
+  print("\n=== best per curve ===")
+  best={}
+  for r_ in results:
+    k=r_["curve"]
+    if k not in best or r_["Gstep_s"]>best[k]["Gstep_s"]: best[k]=r_
+  for k,v in best.items(): print(k,v)
+  return {"rows":results}
+@app.function(image=image,gpu=GPU,timeout=4*3600)
+def cell(shared:int=1,threads:int=256,wc:int=64,iters:int=8192):
+  """Single cell: build the given table variant and time one (threads, W)."""
+  import re
+  rc,log=build(1,0,shared)
+  if rc: raise RuntimeError(f"build shared={shared} failed")
+  regs=re.findall(r"Compiling entry function '(\S*k_rhoI\S*)'.*?Used (\d+) registers.*?(\d+) bytes cumulative stack",log,re.S)
+  print("shared",shared,"k_rho:",regs)
+  rc,out=sh(f"./bench {threads} rho {wc} {iters}")
+  if rc: raise RuntimeError("run failed")
+  print(out.strip())
+  rows=[{"shared":shared,"threads":threads,"W":wc,"curve":curve,"Gstep_s":float(gstep),"DPs":int(dps),
+         "expected_DPs":int(r)*iters/2**24}
+        for curve,r,thr,blk,ww,gstep,dps in re.findall(
+          r"^(P-(?:256|384)) rho: walks=(\d+) threads/blk=(\d+) blocks=(\d+) W=(\d+)\s+([0-9.]+) Gstep/s\s+\((\d+) DPs",out,re.M)]
+  return {"rows":rows}
+@app.function(image=image,gpu=GPU,timeout=4*3600)
 def tune(repeats:int=3):
  rows=[]
  rc,info=sh("nvidia-smi --query-gpu=name,compute_cap,clocks.max.sm,memory.total,memory.used,power.limit --format=csv,noheader")
@@ -140,3 +183,19 @@ def tune(repeats:int=3):
    ranked=sorted(((statistics.median(v),k,v) for k,v in groups.items()),reverse=True)
    if ranked:print(curve,op,{"median_Mop_s":ranked[0][0],"config":ranked[0][1],"samples":ranked[0][2]})
  return {"gpu":info.strip(),"rows":rows}
+
+# Best of P+M and P-M (RHO_BEST2): best2_ab.sh builds, tests and runs the
+# interleaved cells; this only launches it and saves its raw output.  The
+# rho-walk-leads harness parses the log (`rho_walk_leads gpuab --log`).
+#   modal run modal_app.py::best2_main --iters 2048 --reps 3 --out <file.log>
+@app.function(image=image,gpu=GPU,timeout=4*3600)
+def best2_ab(iters:int=2048,reps:int=3):
+ rc,out=sh(f"./best2_ab.sh {iters} {reps}",timeout=4*3600)
+ if rc: raise RuntimeError(out[-2000:])
+ return out
+
+@app.local_entrypoint()
+def best2_main(iters:int=2048,reps:int=3,out:str="best2.log"):
+ commit=subprocess.run(["git","rev-parse","HEAD"],capture_output=True,text=True,cwd=LOCAL).stdout.strip()
+ pathlib.Path(out).write_text(f"COMMIT {commit}\n"+best2_ab.remote(iters,reps))
+ print("wrote",out)

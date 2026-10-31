@@ -8,6 +8,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 EVIDENCE = HERE.parent / "leaf_m10_support_20260930/evidence"
+RAW_RUN = "run_36707051160"
 
 
 def sha(path: Path) -> str:
@@ -45,8 +46,29 @@ def main() -> None:
         else:
             assert item["provenance"] == "mac_replay"
             assert item["path"] == "mac_replay.json"
+    # The frozen archive is compared without the separately sealed run_*
+    # directories that landed beside it in evidence/ (run_36707051160/, added
+    # by #1614 and the union-resolve merge of #1062; it has its own
+    # SHA256SUMS and README replay command). Those are other runs, not part
+    # of this manifest: any top-level run_* directory is excluded, and so is
+    # anything under a run_36707051160 path component.
     assert paths == {path.relative_to(EVIDENCE).as_posix()
-                     for path in EVIDENCE.rglob("*") if path.is_file()}
+                     for path in EVIDENCE.rglob("*")
+                     if path.is_file()
+                     and not path.relative_to(EVIDENCE).parts[0].startswith("run_")
+                     and "run_36707051160" not in path.relative_to(EVIDENCE).parts}
+    raw = EVIDENCE / RAW_RUN
+    if raw.is_dir():
+        listed = set()
+        for line in (raw / "SHA256SUMS").read_text().splitlines():
+            digest, name = line.split("  ", 1)
+            assert sha(raw / name) == digest, name
+            listed.add(name)
+        assert listed == {
+            path.relative_to(raw).as_posix()
+            for path in raw.rglob("*")
+            if path.is_file() and path.name != "SHA256SUMS"
+        }
     assert hosted_files == manifest["hosted_artifact_files"] == 101
     assert hosted_bytes == manifest["hosted_artifact_bytes"]
     print(f"PASS {len(paths)} files, {hosted_bytes} hosted bytes")

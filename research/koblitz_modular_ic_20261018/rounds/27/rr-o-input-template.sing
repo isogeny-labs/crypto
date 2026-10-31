@@ -1,0 +1,568 @@
+// CM22 exact unchanged CM17 circuit; native Singular backend
+option(redSB);
+ring r=2,(n,l,b,c),dp;
+ideal nn; ideal dd; poly gg;
+nn[1]=b;dd[1]=1;gg=gcd(nn[1],dd[1]);nn[1]=nn[1]/gg;dd[1]=dd[1]/gg;
+nn[2]=c;dd[2]=1;gg=gcd(nn[2],dd[2]);nn[2]=nn[2]/gg;dd[2]=dd[2]/gg;
+nn[3]=l;dd[3]=1;gg=gcd(nn[3],dd[3]);nn[3]=nn[3]/gg;dd[3]=dd[3]/gg;
+nn[4]=n;dd[4]=1;gg=gcd(nn[4],dd[4]);nn[4]=nn[4]/gg;dd[4]=dd[4]/gg;
+nn[5]=1;dd[5]=1;gg=gcd(nn[5],dd[5]);nn[5]=nn[5]/gg;dd[5]=dd[5]/gg;
+nn[6]=nn[2]*dd[5]+nn[5]*dd[2];dd[6]=dd[2]*dd[5];gg=gcd(nn[6],dd[6]);nn[6]=nn[6]/gg;dd[6]=dd[6]/gg;
+nn[7]=nn[6]*nn[6];dd[7]=dd[6]*dd[6];gg=gcd(nn[7],dd[7]);nn[7]=nn[7]/gg;dd[7]=dd[7]/gg;
+nn[8]=nn[1]*nn[1];dd[8]=dd[1]*dd[1];gg=gcd(nn[8],dd[8]);nn[8]=nn[8]/gg;dd[8]=dd[8]/gg;
+nn[9]=nn[2]*nn[6];dd[9]=dd[2]*dd[6];gg=gcd(nn[9],dd[9]);nn[9]=nn[9]/gg;dd[9]=dd[9]/gg;
+nn[10]=nn[6]*nn[7];dd[10]=dd[6]*dd[7];gg=gcd(nn[10],dd[10]);nn[10]=nn[10]/gg;dd[10]=dd[10]/gg;
+nn[11]=nn[2]*nn[10];dd[11]=dd[2]*dd[10];gg=gcd(nn[11],dd[11]);nn[11]=nn[11]/gg;dd[11]=dd[11]/gg;
+nn[12]=nn[1]*dd[11]+nn[11]*dd[1];dd[12]=dd[1]*dd[11];gg=gcd(nn[12],dd[12]);nn[12]=nn[12]/gg;dd[12]=dd[12]/gg;
+nn[13]=dd[1];dd[13]=nn[1];gg=gcd(nn[13],dd[13]);nn[13]=nn[13]/gg;dd[13]=dd[13]/gg;
+nn[14]=dd[12];dd[14]=nn[12];gg=gcd(nn[14],dd[14]);nn[14]=nn[14]/gg;dd[14]=dd[14]/gg;
+nn[15]=dd[2];dd[15]=nn[2];gg=gcd(nn[15],dd[15]);nn[15]=nn[15]/gg;dd[15]=dd[15]/gg;
+nn[16]=nn[1]*nn[15];dd[16]=dd[1]*dd[15];gg=gcd(nn[16],dd[16]);nn[16]=nn[16]/gg;dd[16]=dd[16]/gg;
+nn[17]=nn[16]*nn[16];dd[17]=dd[16]*dd[16];gg=gcd(nn[17],dd[17]);nn[17]=nn[17]/gg;dd[17]=dd[17]/gg;
+nn[18]=nn[6]*nn[16];dd[18]=dd[6]*dd[16];gg=gcd(nn[18],dd[18]);nn[18]=nn[18]/gg;dd[18]=dd[18]/gg;
+nn[19]=nn[17]*dd[18]+nn[18]*dd[17];dd[19]=dd[17]*dd[18];gg=gcd(nn[19],dd[19]);nn[19]=nn[19]/gg;dd[19]=dd[19]/gg;
+nn[20]=nn[1]*dd[19]+nn[19]*dd[1];dd[20]=dd[1]*dd[19];gg=gcd(nn[20],dd[20]);nn[20]=nn[20]/gg;dd[20]=dd[20]/gg;
+nn[21]=nn[1]*dd[20]+nn[20]*dd[1];dd[21]=dd[1]*dd[20];gg=gcd(nn[21],dd[21]);nn[21]=nn[21]/gg;dd[21]=dd[21]/gg;
+nn[22]=nn[16]*nn[21];dd[22]=dd[16]*dd[21];gg=gcd(nn[22],dd[22]);nn[22]=nn[22]/gg;dd[22]=dd[22]/gg;
+nn[23]=dd[20];dd[23]=nn[20];gg=gcd(nn[23],dd[23]);nn[23]=nn[23]/gg;dd[23]=dd[23]/gg;
+nn[24]=nn[22]*nn[23];dd[24]=dd[22]*dd[23];gg=gcd(nn[24],dd[24]);nn[24]=nn[24]/gg;dd[24]=dd[24]/gg;
+nn[25]=nn[24]*nn[24];dd[25]=dd[24]*dd[24];gg=gcd(nn[25],dd[25]);nn[25]=nn[25]/gg;dd[25]=dd[25]/gg;
+nn[26]=nn[6]*nn[24];dd[26]=dd[6]*dd[24];gg=gcd(nn[26],dd[26]);nn[26]=nn[26]/gg;dd[26]=dd[26]/gg;
+nn[27]=nn[25]*dd[26]+nn[26]*dd[25];dd[27]=dd[25]*dd[26];gg=gcd(nn[27],dd[27]);nn[27]=nn[27]/gg;dd[27]=dd[27]/gg;
+nn[28]=nn[1]*dd[27]+nn[27]*dd[1];dd[28]=dd[1]*dd[27];gg=gcd(nn[28],dd[28]);nn[28]=nn[28]/gg;dd[28]=dd[28]/gg;
+nn[29]=nn[20]*dd[28]+nn[28]*dd[20];dd[29]=dd[20]*dd[28];gg=gcd(nn[29],dd[29]);nn[29]=nn[29]/gg;dd[29]=dd[29]/gg;
+nn[30]=nn[6]*dd[24]+nn[24]*dd[6];dd[30]=dd[6]*dd[24];gg=gcd(nn[30],dd[30]);nn[30]=nn[30]/gg;dd[30]=dd[30]/gg;
+nn[31]=nn[29]*nn[30];dd[31]=dd[29]*dd[30];gg=gcd(nn[31],dd[31]);nn[31]=nn[31]/gg;dd[31]=dd[31]/gg;
+nn[32]=nn[1]*dd[31]+nn[31]*dd[1];dd[32]=dd[1]*dd[31];gg=gcd(nn[32],dd[32]);nn[32]=nn[32]/gg;dd[32]=dd[32]/gg;
+nn[33]=nn[2]*nn[2];dd[33]=dd[2]*dd[2];gg=gcd(nn[33],dd[33]);nn[33]=nn[33]/gg;dd[33]=dd[33]/gg;
+nn[34]=nn[1]*dd[2]+nn[2]*dd[1];dd[34]=dd[1]*dd[2];gg=gcd(nn[34],dd[34]);nn[34]=nn[34]/gg;dd[34]=dd[34]/gg;
+nn[35]=nn[6]*nn[34];dd[35]=dd[6]*dd[34];gg=gcd(nn[35],dd[35]);nn[35]=nn[35]/gg;dd[35]=dd[35]/gg;
+nn[36]=nn[33]*dd[35]+nn[35]*dd[33];dd[36]=dd[33]*dd[35];gg=gcd(nn[36],dd[36]);nn[36]=nn[36]/gg;dd[36]=dd[36]/gg;
+nn[37]=nn[1]*dd[9]+nn[9]*dd[1];dd[37]=dd[1]*dd[9];gg=gcd(nn[37],dd[37]);nn[37]=nn[37]/gg;dd[37]=dd[37]/gg;
+nn[38]=dd[37];dd[38]=nn[37];gg=gcd(nn[38],dd[38]);nn[38]=nn[38]/gg;dd[38]=dd[38]/gg;
+nn[39]=nn[36]*nn[38];dd[39]=dd[36]*dd[38];gg=gcd(nn[39],dd[39]);nn[39]=nn[39]/gg;dd[39]=dd[39]/gg;
+nn[40]=nn[39]*nn[39];dd[40]=dd[39]*dd[39];gg=gcd(nn[40],dd[40]);nn[40]=nn[40]/gg;dd[40]=dd[40]/gg;
+nn[41]=nn[6]*nn[39];dd[41]=dd[6]*dd[39];gg=gcd(nn[41],dd[41]);nn[41]=nn[41]/gg;dd[41]=dd[41]/gg;
+nn[42]=nn[40]*dd[41]+nn[41]*dd[40];dd[42]=dd[40]*dd[41];gg=gcd(nn[42],dd[42]);nn[42]=nn[42]/gg;dd[42]=dd[42]/gg;
+nn[43]=nn[1]*dd[42]+nn[42]*dd[1];dd[43]=dd[1]*dd[42];gg=gcd(nn[43],dd[43]);nn[43]=nn[43]/gg;dd[43]=dd[43]/gg;
+nn[44]=nn[6]*dd[39]+nn[39]*dd[6];dd[44]=dd[6]*dd[39];gg=gcd(nn[44],dd[44]);nn[44]=nn[44]/gg;dd[44]=dd[44]/gg;
+nn[45]=nn[43]*nn[44];dd[45]=dd[43]*dd[44];gg=gcd(nn[45],dd[45]);nn[45]=nn[45]/gg;dd[45]=dd[45]/gg;
+nn[46]=nn[2]*nn[39];dd[46]=dd[2]*dd[39];gg=gcd(nn[46],dd[46]);nn[46]=nn[46]/gg;dd[46]=dd[46]/gg;
+nn[47]=nn[2]*dd[45]+nn[45]*dd[2];dd[47]=dd[2]*dd[45];gg=gcd(nn[47],dd[47]);nn[47]=nn[47]/gg;dd[47]=dd[47]/gg;
+nn[48]=nn[46]*dd[47]+nn[47]*dd[46];dd[48]=dd[46]*dd[47];gg=gcd(nn[48],dd[48]);nn[48]=nn[48]/gg;dd[48]=dd[48]/gg;
+nn[49]=nn[29]*dd[43]+nn[43]*dd[29];dd[49]=dd[29]*dd[43];gg=gcd(nn[49],dd[49]);nn[49]=nn[49]/gg;dd[49]=dd[49]/gg;
+nn[50]=nn[32]*dd[48]+nn[48]*dd[32];dd[50]=dd[32]*dd[48];gg=gcd(nn[50],dd[50]);nn[50]=nn[50]/gg;dd[50]=dd[50]/gg;
+nn[51]=nn[6]*nn[29];dd[51]=dd[6]*dd[29];gg=gcd(nn[51],dd[51]);nn[51]=nn[51]/gg;dd[51]=dd[51]/gg;
+nn[52]=nn[50]*dd[51]+nn[51]*dd[50];dd[52]=dd[50]*dd[51];gg=gcd(nn[52],dd[52]);nn[52]=nn[52]/gg;dd[52]=dd[52]/gg;
+nn[53]=nn[1]*dd[52]+nn[52]*dd[1];dd[53]=dd[1]*dd[52];gg=gcd(nn[53],dd[53]);nn[53]=nn[53]/gg;dd[53]=dd[53]/gg;
+nn[54]=nn[3]*nn[3];dd[54]=dd[3]*dd[3];gg=gcd(nn[54],dd[54]);nn[54]=nn[54]/gg;dd[54]=dd[54]/gg;
+nn[55]=nn[3]*nn[6];dd[55]=dd[3]*dd[6];gg=gcd(nn[55],dd[55]);nn[55]=nn[55]/gg;dd[55]=dd[55]/gg;
+nn[56]=nn[1]*dd[54]+nn[54]*dd[1];dd[56]=dd[1]*dd[54];gg=gcd(nn[56],dd[56]);nn[56]=nn[56]/gg;dd[56]=dd[56]/gg;
+nn[57]=nn[55]*dd[56]+nn[56]*dd[55];dd[57]=dd[55]*dd[56];gg=gcd(nn[57],dd[57]);nn[57]=nn[57]/gg;dd[57]=dd[57]/gg;
+nn[58]=nn[4]*nn[6];dd[58]=dd[4]*dd[6];gg=gcd(nn[58],dd[58]);nn[58]=nn[58]/gg;dd[58]=dd[58]/gg;
+nn[59]=nn[1]*nn[3];dd[59]=dd[1]*dd[3];gg=gcd(nn[59],dd[59]);nn[59]=nn[59]/gg;dd[59]=dd[59]/gg;
+nn[60]=nn[58]*dd[59]+nn[59]*dd[58];dd[60]=dd[58]*dd[59];gg=gcd(nn[60],dd[60]);nn[60]=nn[60]/gg;dd[60]=dd[60]/gg;
+nn[61]=nn[4]*nn[4];dd[61]=dd[4]*dd[4];gg=gcd(nn[61],dd[61]);nn[61]=nn[61]/gg;dd[61]=dd[61]/gg;
+nn[62]=nn[1]*nn[4];dd[62]=dd[1]*dd[4];gg=gcd(nn[62],dd[62]);nn[62]=nn[62]/gg;dd[62]=dd[62]/gg;
+nn[63]=nn[61]*dd[62]+nn[62]*dd[61];dd[63]=dd[61]*dd[62];gg=gcd(nn[63],dd[63]);nn[63]=nn[63]/gg;dd[63]=dd[63]/gg;
+nn[64]=nn[57]*nn[60];dd[64]=dd[57]*dd[60];gg=gcd(nn[64],dd[64]);nn[64]=nn[64]/gg;dd[64]=dd[64]/gg;
+nn[65]=nn[63]*dd[64]+nn[64]*dd[63];dd[65]=dd[63]*dd[64];gg=gcd(nn[65],dd[65]);nn[65]=nn[65]/gg;dd[65]=dd[65]/gg;
+nn[66]=dd[65];dd[66]=nn[65];gg=gcd(nn[66],dd[66]);nn[66]=nn[66]/gg;dd[66]=dd[66]/gg;
+nn[67]=nn[1]*nn[8];dd[67]=dd[1]*dd[8];gg=gcd(nn[67],dd[67]);nn[67]=nn[67]/gg;dd[67]=dd[67]/gg;
+nn[68]=nn[6]*nn[8];dd[68]=dd[6]*dd[8];gg=gcd(nn[68],dd[68]);nn[68]=nn[68]/gg;dd[68]=dd[68]/gg;
+nn[69]=nn[57]*nn[68];dd[69]=dd[57]*dd[68];gg=gcd(nn[69],dd[69]);nn[69]=nn[69]/gg;dd[69]=dd[69]/gg;
+nn[70]=nn[1]*nn[7];dd[70]=dd[1]*dd[7];gg=gcd(nn[70],dd[70]);nn[70]=nn[70]/gg;dd[70]=dd[70]/gg;
+nn[71]=nn[60]*nn[70];dd[71]=dd[60]*dd[70];gg=gcd(nn[71],dd[71]);nn[71]=nn[71]/gg;dd[71]=dd[71]/gg;
+nn[72]=nn[10]*nn[63];dd[72]=dd[10]*dd[63];gg=gcd(nn[72],dd[72]);nn[72]=nn[72]/gg;dd[72]=dd[72]/gg;
+nn[73]=nn[67]*dd[69]+nn[69]*dd[67];dd[73]=dd[67]*dd[69];gg=gcd(nn[73],dd[73]);nn[73]=nn[73]/gg;dd[73]=dd[73]/gg;
+nn[74]=nn[71]*dd[73]+nn[73]*dd[71];dd[74]=dd[71]*dd[73];gg=gcd(nn[74],dd[74]);nn[74]=nn[74]/gg;dd[74]=dd[74]/gg;
+nn[75]=nn[72]*dd[74]+nn[74]*dd[72];dd[75]=dd[72]*dd[74];gg=gcd(nn[75],dd[75]);nn[75]=nn[75]/gg;dd[75]=dd[75]/gg;
+nn[76]=dd[75];dd[76]=nn[75];gg=gcd(nn[76],dd[76]);nn[76]=nn[76]/gg;dd[76]=dd[76]/gg;
+nn[77]=0;dd[77]=1;gg=gcd(nn[77],dd[77]);nn[77]=nn[77]/gg;dd[77]=dd[77]/gg;
+nn[78]=nn[58]*nn[58];dd[78]=dd[58]*dd[58];gg=gcd(nn[78],dd[78]);nn[78]=nn[78]/gg;dd[78]=dd[78]/gg;
+nn[79]=nn[77]*dd[78]+nn[78]*dd[77];dd[79]=dd[77]*dd[78];gg=gcd(nn[79],dd[79]);nn[79]=nn[79]/gg;dd[79]=dd[79]/gg;
+nn[80]=nn[55]*nn[58];dd[80]=dd[55]*dd[58];gg=gcd(nn[80],dd[80]);nn[80]=nn[80]/gg;dd[80]=dd[80]/gg;
+nn[81]=nn[77]*dd[80]+nn[80]*dd[77];dd[81]=dd[77]*dd[80];gg=gcd(nn[81],dd[81]);nn[81]=nn[81]/gg;dd[81]=dd[81]/gg;
+nn[82]=nn[5]*nn[58];dd[82]=dd[5]*dd[58];gg=gcd(nn[82],dd[82]);nn[82]=nn[82]/gg;dd[82]=dd[82]/gg;
+nn[83]=nn[77]*dd[82]+nn[82]*dd[77];dd[83]=dd[77]*dd[82];gg=gcd(nn[83],dd[83]);nn[83]=nn[83]/gg;dd[83]=dd[83]/gg;
+nn[84]=nn[80]*dd[81]+nn[81]*dd[80];dd[84]=dd[80]*dd[81];gg=gcd(nn[84],dd[84]);nn[84]=nn[84]/gg;dd[84]=dd[84]/gg;
+nn[85]=nn[55]*nn[55];dd[85]=dd[55]*dd[55];gg=gcd(nn[85],dd[85]);nn[85]=nn[85]/gg;dd[85]=dd[85]/gg;
+nn[86]=nn[83]*dd[85]+nn[85]*dd[83];dd[86]=dd[83]*dd[85];gg=gcd(nn[86],dd[86]);nn[86]=nn[86]/gg;dd[86]=dd[86]/gg;
+nn[87]=nn[5]*nn[55];dd[87]=dd[5]*dd[55];gg=gcd(nn[87],dd[87]);nn[87]=nn[87]/gg;dd[87]=dd[87]/gg;
+nn[88]=nn[77]*dd[87]+nn[87]*dd[77];dd[88]=dd[77]*dd[87];gg=gcd(nn[88],dd[88]);nn[88]=nn[88]/gg;dd[88]=dd[88]/gg;
+nn[89]=nn[82]*dd[86]+nn[86]*dd[82];dd[89]=dd[82]*dd[86];gg=gcd(nn[89],dd[89]);nn[89]=nn[89]/gg;dd[89]=dd[89]/gg;
+nn[90]=nn[87]*dd[88]+nn[88]*dd[87];dd[90]=dd[87]*dd[88];gg=gcd(nn[90],dd[90]);nn[90]=nn[90]/gg;dd[90]=dd[90]/gg;
+nn[91]=nn[5]*nn[5];dd[91]=dd[5]*dd[5];gg=gcd(nn[91],dd[91]);nn[91]=nn[91]/gg;dd[91]=dd[91]/gg;
+nn[92]=nn[77]*dd[91]+nn[91]*dd[77];dd[92]=dd[77]*dd[91];gg=gcd(nn[92],dd[92]);nn[92]=nn[92]/gg;dd[92]=dd[92]/gg;
+nn[93]=nn[1]*nn[58];dd[93]=dd[1]*dd[58];gg=gcd(nn[93],dd[93]);nn[93]=nn[93]/gg;dd[93]=dd[93]/gg;
+nn[94]=nn[77]*dd[93]+nn[93]*dd[77];dd[94]=dd[77]*dd[93];gg=gcd(nn[94],dd[94]);nn[94]=nn[94]/gg;dd[94]=dd[94]/gg;
+nn[95]=nn[6]*nn[58];dd[95]=dd[6]*dd[58];gg=gcd(nn[95],dd[95]);nn[95]=nn[95]/gg;dd[95]=dd[95]/gg;
+nn[96]=nn[77]*dd[95]+nn[95]*dd[77];dd[96]=dd[77]*dd[95];gg=gcd(nn[96],dd[96]);nn[96]=nn[96]/gg;dd[96]=dd[96]/gg;
+nn[97]=nn[1]*nn[55];dd[97]=dd[1]*dd[55];gg=gcd(nn[97],dd[97]);nn[97]=nn[97]/gg;dd[97]=dd[97]/gg;
+nn[98]=nn[96]*dd[97]+nn[97]*dd[96];dd[98]=dd[96]*dd[97];gg=gcd(nn[98],dd[98]);nn[98]=nn[98]/gg;dd[98]=dd[98]/gg;
+nn[99]=nn[6]*nn[55];dd[99]=dd[6]*dd[55];gg=gcd(nn[99],dd[99]);nn[99]=nn[99]/gg;dd[99]=dd[99]/gg;
+nn[100]=nn[77]*dd[99]+nn[99]*dd[77];dd[100]=dd[77]*dd[99];gg=gcd(nn[100],dd[100]);nn[100]=nn[100]/gg;dd[100]=dd[100]/gg;
+nn[101]=nn[1]*nn[5];dd[101]=dd[1]*dd[5];gg=gcd(nn[101],dd[101]);nn[101]=nn[101]/gg;dd[101]=dd[101]/gg;
+nn[102]=nn[100]*dd[101]+nn[101]*dd[100];dd[102]=dd[100]*dd[101];gg=gcd(nn[102],dd[102]);nn[102]=nn[102]/gg;dd[102]=dd[102]/gg;
+nn[103]=nn[5]*nn[6];dd[103]=dd[5]*dd[6];gg=gcd(nn[103],dd[103]);nn[103]=nn[103]/gg;dd[103]=dd[103]/gg;
+nn[104]=nn[77]*dd[103]+nn[103]*dd[77];dd[104]=dd[77]*dd[103];gg=gcd(nn[104],dd[104]);nn[104]=nn[104]/gg;dd[104]=dd[104]/gg;
+nn[105]=nn[6]*nn[94];dd[105]=dd[6]*dd[94];gg=gcd(nn[105],dd[105]);nn[105]=nn[105]/gg;dd[105]=dd[105]/gg;
+nn[106]=nn[6]*nn[98];dd[106]=dd[6]*dd[98];gg=gcd(nn[106],dd[106]);nn[106]=nn[106]/gg;dd[106]=dd[106]/gg;
+nn[107]=nn[6]*nn[102];dd[107]=dd[6]*dd[102];gg=gcd(nn[107],dd[107]);nn[107]=nn[107]/gg;dd[107]=dd[107]/gg;
+nn[108]=nn[6]*nn[104];dd[108]=dd[6]*dd[104];gg=gcd(nn[108],dd[108]);nn[108]=nn[108]/gg;dd[108]=dd[108]/gg;
+nn[109]=nn[8]*dd[77]+nn[77]*dd[8];dd[109]=dd[8]*dd[77];gg=gcd(nn[109],dd[109]);nn[109]=nn[109]/gg;dd[109]=dd[109]/gg;
+nn[110]=nn[1]*nn[6];dd[110]=dd[1]*dd[6];gg=gcd(nn[110],dd[110]);nn[110]=nn[110]/gg;dd[110]=dd[110]/gg;
+nn[111]=nn[77]*dd[110]+nn[110]*dd[77];dd[111]=dd[77]*dd[110];gg=gcd(nn[111],dd[111]);nn[111]=nn[111]/gg;dd[111]=dd[111]/gg;
+nn[112]=nn[110]*dd[111]+nn[111]*dd[110];dd[112]=dd[110]*dd[111];gg=gcd(nn[112],dd[112]);nn[112]=nn[112]/gg;dd[112]=dd[112]/gg;
+nn[113]=nn[7]*dd[77]+nn[77]*dd[7];dd[113]=dd[7]*dd[77];gg=gcd(nn[113],dd[113]);nn[113]=nn[113]/gg;dd[113]=dd[113]/gg;
+nn[114]=nn[1]*nn[109];dd[114]=dd[1]*dd[109];gg=gcd(nn[114],dd[114]);nn[114]=nn[114]/gg;dd[114]=dd[114]/gg;
+nn[115]=nn[1]*nn[112];dd[115]=dd[1]*dd[112];gg=gcd(nn[115],dd[115]);nn[115]=nn[115]/gg;dd[115]=dd[115]/gg;
+nn[116]=nn[1]*nn[113];dd[116]=dd[1]*dd[113];gg=gcd(nn[116],dd[116]);nn[116]=nn[116]/gg;dd[116]=dd[116]/gg;
+nn[117]=nn[79]*dd[105]+nn[105]*dd[79];dd[117]=dd[79]*dd[105];gg=gcd(nn[117],dd[117]);nn[117]=nn[117]/gg;dd[117]=dd[117]/gg;
+nn[118]=nn[84]*dd[106]+nn[106]*dd[84];dd[118]=dd[84]*dd[106];gg=gcd(nn[118],dd[118]);nn[118]=nn[118]/gg;dd[118]=dd[118]/gg;
+nn[119]=nn[89]*dd[107]+nn[107]*dd[89];dd[119]=dd[89]*dd[107];gg=gcd(nn[119],dd[119]);nn[119]=nn[119]/gg;dd[119]=dd[119]/gg;
+nn[120]=nn[90]*dd[108]+nn[108]*dd[90];dd[120]=dd[90]*dd[108];gg=gcd(nn[120],dd[120]);nn[120]=nn[120]/gg;dd[120]=dd[120]/gg;
+nn[121]=nn[77]*dd[92]+nn[92]*dd[77];dd[121]=dd[77]*dd[92];gg=gcd(nn[121],dd[121]);nn[121]=nn[121]/gg;dd[121]=dd[121]/gg;
+nn[122]=nn[114]*dd[117]+nn[117]*dd[114];dd[122]=dd[114]*dd[117];gg=gcd(nn[122],dd[122]);nn[122]=nn[122]/gg;dd[122]=dd[122]/gg;
+nn[123]=nn[115]*dd[118]+nn[118]*dd[115];dd[123]=dd[115]*dd[118];gg=gcd(nn[123],dd[123]);nn[123]=nn[123]/gg;dd[123]=dd[123]/gg;
+nn[124]=nn[116]*dd[119]+nn[119]*dd[116];dd[124]=dd[116]*dd[119];gg=gcd(nn[124],dd[124]);nn[124]=nn[124]/gg;dd[124]=dd[124]/gg;
+nn[125]=nn[77]*dd[120]+nn[120]*dd[77];dd[125]=dd[77]*dd[120];gg=gcd(nn[125],dd[125]);nn[125]=nn[125]/gg;dd[125]=dd[125]/gg;
+nn[126]=nn[77]*dd[121]+nn[121]*dd[77];dd[126]=dd[77]*dd[121];gg=gcd(nn[126],dd[126]);nn[126]=nn[126]/gg;dd[126]=dd[126]/gg;
+nn[127]=nn[3]*dd[6]+nn[6]*dd[3];dd[127]=dd[3]*dd[6];gg=gcd(nn[127],dd[127]);nn[127]=nn[127]/gg;dd[127]=dd[127]/gg;
+nn[128]=nn[1]*nn[127];dd[128]=dd[1]*dd[127];gg=gcd(nn[128],dd[128]);nn[128]=nn[128]/gg;dd[128]=dd[128]/gg;
+nn[129]=nn[6]*nn[127];dd[129]=dd[6]*dd[127];gg=gcd(nn[129],dd[129]);nn[129]=nn[129]/gg;dd[129]=dd[129]/gg;
+nn[130]=nn[58]*dd[128]+nn[128]*dd[58];dd[130]=dd[58]*dd[128];gg=gcd(nn[130],dd[130]);nn[130]=nn[130]/gg;dd[130]=dd[130]/gg;
+nn[131]=nn[55]*dd[129]+nn[129]*dd[55];dd[131]=dd[55]*dd[129];gg=gcd(nn[131],dd[131]);nn[131]=nn[131]/gg;dd[131]=dd[131]/gg;
+nn[132]=nn[5]*dd[77]+nn[77]*dd[5];dd[132]=dd[5]*dd[77];gg=gcd(nn[132],dd[132]);nn[132]=nn[132]/gg;dd[132]=dd[132]/gg;
+nn[133]=nn[122]*nn[130];dd[133]=dd[122]*dd[130];gg=gcd(nn[133],dd[133]);nn[133]=nn[133]/gg;dd[133]=dd[133]/gg;
+nn[134]=nn[77]*dd[133]+nn[133]*dd[77];dd[134]=dd[77]*dd[133];gg=gcd(nn[134],dd[134]);nn[134]=nn[134]/gg;dd[134]=dd[134]/gg;
+nn[135]=nn[123]*nn[130];dd[135]=dd[123]*dd[130];gg=gcd(nn[135],dd[135]);nn[135]=nn[135]/gg;dd[135]=dd[135]/gg;
+nn[136]=nn[77]*dd[135]+nn[135]*dd[77];dd[136]=dd[77]*dd[135];gg=gcd(nn[136],dd[136]);nn[136]=nn[136]/gg;dd[136]=dd[136]/gg;
+nn[137]=nn[124]*nn[130];dd[137]=dd[124]*dd[130];gg=gcd(nn[137],dd[137]);nn[137]=nn[137]/gg;dd[137]=dd[137]/gg;
+nn[138]=nn[77]*dd[137]+nn[137]*dd[77];dd[138]=dd[77]*dd[137];gg=gcd(nn[138],dd[138]);nn[138]=nn[138]/gg;dd[138]=dd[138]/gg;
+nn[139]=nn[125]*nn[130];dd[139]=dd[125]*dd[130];gg=gcd(nn[139],dd[139]);nn[139]=nn[139]/gg;dd[139]=dd[139]/gg;
+nn[140]=nn[77]*dd[139]+nn[139]*dd[77];dd[140]=dd[77]*dd[139];gg=gcd(nn[140],dd[140]);nn[140]=nn[140]/gg;dd[140]=dd[140]/gg;
+nn[141]=nn[126]*nn[130];dd[141]=dd[126]*dd[130];gg=gcd(nn[141],dd[141]);nn[141]=nn[141]/gg;dd[141]=dd[141]/gg;
+nn[142]=nn[77]*dd[141]+nn[141]*dd[77];dd[142]=dd[77]*dd[141];gg=gcd(nn[142],dd[142]);nn[142]=nn[142]/gg;dd[142]=dd[142]/gg;
+nn[143]=nn[122]*nn[131];dd[143]=dd[122]*dd[131];gg=gcd(nn[143],dd[143]);nn[143]=nn[143]/gg;dd[143]=dd[143]/gg;
+nn[144]=nn[136]*dd[143]+nn[143]*dd[136];dd[144]=dd[136]*dd[143];gg=gcd(nn[144],dd[144]);nn[144]=nn[144]/gg;dd[144]=dd[144]/gg;
+nn[145]=nn[123]*nn[131];dd[145]=dd[123]*dd[131];gg=gcd(nn[145],dd[145]);nn[145]=nn[145]/gg;dd[145]=dd[145]/gg;
+nn[146]=nn[138]*dd[145]+nn[145]*dd[138];dd[146]=dd[138]*dd[145];gg=gcd(nn[146],dd[146]);nn[146]=nn[146]/gg;dd[146]=dd[146]/gg;
+nn[147]=nn[124]*nn[131];dd[147]=dd[124]*dd[131];gg=gcd(nn[147],dd[147]);nn[147]=nn[147]/gg;dd[147]=dd[147]/gg;
+nn[148]=nn[140]*dd[147]+nn[147]*dd[140];dd[148]=dd[140]*dd[147];gg=gcd(nn[148],dd[148]);nn[148]=nn[148]/gg;dd[148]=dd[148]/gg;
+nn[149]=nn[125]*nn[131];dd[149]=dd[125]*dd[131];gg=gcd(nn[149],dd[149]);nn[149]=nn[149]/gg;dd[149]=dd[149]/gg;
+nn[150]=nn[142]*dd[149]+nn[149]*dd[142];dd[150]=dd[142]*dd[149];gg=gcd(nn[150],dd[150]);nn[150]=nn[150]/gg;dd[150]=dd[150]/gg;
+nn[151]=nn[126]*nn[131];dd[151]=dd[126]*dd[131];gg=gcd(nn[151],dd[151]);nn[151]=nn[151]/gg;dd[151]=dd[151]/gg;
+nn[152]=nn[77]*dd[151]+nn[151]*dd[77];dd[152]=dd[77]*dd[151];gg=gcd(nn[152],dd[152]);nn[152]=nn[152]/gg;dd[152]=dd[152]/gg;
+nn[153]=nn[122]*nn[132];dd[153]=dd[122]*dd[132];gg=gcd(nn[153],dd[153]);nn[153]=nn[153]/gg;dd[153]=dd[153]/gg;
+nn[154]=nn[146]*dd[153]+nn[153]*dd[146];dd[154]=dd[146]*dd[153];gg=gcd(nn[154],dd[154]);nn[154]=nn[154]/gg;dd[154]=dd[154]/gg;
+nn[155]=nn[123]*nn[132];dd[155]=dd[123]*dd[132];gg=gcd(nn[155],dd[155]);nn[155]=nn[155]/gg;dd[155]=dd[155]/gg;
+nn[156]=nn[148]*dd[155]+nn[155]*dd[148];dd[156]=dd[148]*dd[155];gg=gcd(nn[156],dd[156]);nn[156]=nn[156]/gg;dd[156]=dd[156]/gg;
+nn[157]=nn[124]*nn[132];dd[157]=dd[124]*dd[132];gg=gcd(nn[157],dd[157]);nn[157]=nn[157]/gg;dd[157]=dd[157]/gg;
+nn[158]=nn[150]*dd[157]+nn[157]*dd[150];dd[158]=dd[150]*dd[157];gg=gcd(nn[158],dd[158]);nn[158]=nn[158]/gg;dd[158]=dd[158]/gg;
+nn[159]=nn[125]*nn[132];dd[159]=dd[125]*dd[132];gg=gcd(nn[159],dd[159]);nn[159]=nn[159]/gg;dd[159]=dd[159]/gg;
+nn[160]=nn[152]*dd[159]+nn[159]*dd[152];dd[160]=dd[152]*dd[159];gg=gcd(nn[160],dd[160]);nn[160]=nn[160]/gg;dd[160]=dd[160]/gg;
+nn[161]=nn[126]*nn[132];dd[161]=dd[126]*dd[132];gg=gcd(nn[161],dd[161]);nn[161]=nn[161]/gg;dd[161]=dd[161]/gg;
+nn[162]=nn[77]*dd[161]+nn[161]*dd[77];dd[162]=dd[77]*dd[161];gg=gcd(nn[162],dd[162]);nn[162]=nn[162]/gg;dd[162]=dd[162]/gg;
+nn[163]=nn[60]*nn[77];dd[163]=dd[60]*dd[77];gg=gcd(nn[163],dd[163]);nn[163]=nn[163]/gg;dd[163]=dd[163]/gg;
+nn[164]=nn[77]*dd[163]+nn[163]*dd[77];dd[164]=dd[77]*dd[163];gg=gcd(nn[164],dd[164]);nn[164]=nn[164]/gg;dd[164]=dd[164]/gg;
+nn[165]=nn[60]*nn[109];dd[165]=dd[60]*dd[109];gg=gcd(nn[165],dd[165]);nn[165]=nn[165]/gg;dd[165]=dd[165]/gg;
+nn[166]=nn[77]*dd[165]+nn[165]*dd[77];dd[166]=dd[77]*dd[165];gg=gcd(nn[166],dd[166]);nn[166]=nn[166]/gg;dd[166]=dd[166]/gg;
+nn[167]=nn[60]*nn[112];dd[167]=dd[60]*dd[112];gg=gcd(nn[167],dd[167]);nn[167]=nn[167]/gg;dd[167]=dd[167]/gg;
+nn[168]=nn[77]*dd[167]+nn[167]*dd[77];dd[168]=dd[77]*dd[167];gg=gcd(nn[168],dd[168]);nn[168]=nn[168]/gg;dd[168]=dd[168]/gg;
+nn[169]=nn[60]*nn[113];dd[169]=dd[60]*dd[113];gg=gcd(nn[169],dd[169]);nn[169]=nn[169]/gg;dd[169]=dd[169]/gg;
+nn[170]=nn[77]*dd[169]+nn[169]*dd[77];dd[170]=dd[77]*dd[169];gg=gcd(nn[170],dd[170]);nn[170]=nn[170]/gg;dd[170]=dd[170]/gg;
+nn[171]=nn[77]*nn[77];dd[171]=dd[77]*dd[77];gg=gcd(nn[171],dd[171]);nn[171]=nn[171]/gg;dd[171]=dd[171]/gg;
+nn[172]=nn[166]*dd[171]+nn[171]*dd[166];dd[172]=dd[166]*dd[171];gg=gcd(nn[172],dd[172]);nn[172]=nn[172]/gg;dd[172]=dd[172]/gg;
+nn[173]=nn[77]*nn[109];dd[173]=dd[77]*dd[109];gg=gcd(nn[173],dd[173]);nn[173]=nn[173]/gg;dd[173]=dd[173]/gg;
+nn[174]=nn[168]*dd[173]+nn[173]*dd[168];dd[174]=dd[168]*dd[173];gg=gcd(nn[174],dd[174]);nn[174]=nn[174]/gg;dd[174]=dd[174]/gg;
+nn[175]=nn[77]*nn[112];dd[175]=dd[77]*dd[112];gg=gcd(nn[175],dd[175]);nn[175]=nn[175]/gg;dd[175]=dd[175]/gg;
+nn[176]=nn[170]*dd[175]+nn[175]*dd[170];dd[176]=dd[170]*dd[175];gg=gcd(nn[176],dd[176]);nn[176]=nn[176]/gg;dd[176]=dd[176]/gg;
+nn[177]=nn[77]*nn[113];dd[177]=dd[77]*dd[113];gg=gcd(nn[177],dd[177]);nn[177]=nn[177]/gg;dd[177]=dd[177]/gg;
+nn[178]=nn[77]*dd[177]+nn[177]*dd[77];dd[178]=dd[77]*dd[177];gg=gcd(nn[178],dd[178]);nn[178]=nn[178]/gg;dd[178]=dd[178]/gg;
+nn[179]=nn[77]*nn[132];dd[179]=dd[77]*dd[132];gg=gcd(nn[179],dd[179]);nn[179]=nn[179]/gg;dd[179]=dd[179]/gg;
+nn[180]=nn[174]*dd[179]+nn[179]*dd[174];dd[180]=dd[174]*dd[179];gg=gcd(nn[180],dd[180]);nn[180]=nn[180]/gg;dd[180]=dd[180]/gg;
+nn[181]=nn[109]*nn[132];dd[181]=dd[109]*dd[132];gg=gcd(nn[181],dd[181]);nn[181]=nn[181]/gg;dd[181]=dd[181]/gg;
+nn[182]=nn[176]*dd[181]+nn[181]*dd[176];dd[182]=dd[176]*dd[181];gg=gcd(nn[182],dd[182]);nn[182]=nn[182]/gg;dd[182]=dd[182]/gg;
+nn[183]=nn[112]*nn[132];dd[183]=dd[112]*dd[132];gg=gcd(nn[183],dd[183]);nn[183]=nn[183]/gg;dd[183]=dd[183]/gg;
+nn[184]=nn[178]*dd[183]+nn[183]*dd[178];dd[184]=dd[178]*dd[183];gg=gcd(nn[184],dd[184]);nn[184]=nn[184]/gg;dd[184]=dd[184]/gg;
+nn[185]=nn[113]*nn[132];dd[185]=dd[113]*dd[132];gg=gcd(nn[185],dd[185]);nn[185]=nn[185]/gg;dd[185]=dd[185]/gg;
+nn[186]=nn[77]*dd[185]+nn[185]*dd[77];dd[186]=dd[77]*dd[185];gg=gcd(nn[186],dd[186]);nn[186]=nn[186]/gg;dd[186]=dd[186]/gg;
+nn[187]=nn[77]*dd[114]+nn[114]*dd[77];dd[187]=dd[77]*dd[114];gg=gcd(nn[187],dd[187]);nn[187]=nn[187]/gg;dd[187]=dd[187]/gg;
+nn[188]=nn[6]*nn[109];dd[188]=dd[6]*dd[109];gg=gcd(nn[188],dd[188]);nn[188]=nn[188]/gg;dd[188]=dd[188]/gg;
+nn[189]=nn[77]*dd[188]+nn[188]*dd[77];dd[189]=dd[77]*dd[188];gg=gcd(nn[189],dd[189]);nn[189]=nn[189]/gg;dd[189]=dd[189]/gg;
+nn[190]=nn[115]*dd[189]+nn[189]*dd[115];dd[190]=dd[115]*dd[189];gg=gcd(nn[190],dd[190]);nn[190]=nn[190]/gg;dd[190]=dd[190]/gg;
+nn[191]=nn[6]*nn[112];dd[191]=dd[6]*dd[112];gg=gcd(nn[191],dd[191]);nn[191]=nn[191]/gg;dd[191]=dd[191]/gg;
+nn[192]=nn[77]*dd[191]+nn[191]*dd[77];dd[192]=dd[77]*dd[191];gg=gcd(nn[192],dd[192]);nn[192]=nn[192]/gg;dd[192]=dd[192]/gg;
+nn[193]=nn[116]*dd[192]+nn[192]*dd[116];dd[193]=dd[116]*dd[192];gg=gcd(nn[193],dd[193]);nn[193]=nn[193]/gg;dd[193]=dd[193]/gg;
+nn[194]=nn[6]*nn[113];dd[194]=dd[6]*dd[113];gg=gcd(nn[194],dd[194]);nn[194]=nn[194]/gg;dd[194]=dd[194]/gg;
+nn[195]=nn[77]*dd[194]+nn[194]*dd[77];dd[195]=dd[77]*dd[194];gg=gcd(nn[195],dd[195]);nn[195]=nn[195]/gg;dd[195]=dd[195]/gg;
+nn[196]=nn[1]*nn[187];dd[196]=dd[1]*dd[187];gg=gcd(nn[196],dd[196]);nn[196]=nn[196]/gg;dd[196]=dd[196]/gg;
+nn[197]=nn[1]*nn[190];dd[197]=dd[1]*dd[190];gg=gcd(nn[197],dd[197]);nn[197]=nn[197]/gg;dd[197]=dd[197]/gg;
+nn[198]=nn[1]*nn[193];dd[198]=dd[1]*dd[193];gg=gcd(nn[198],dd[198]);nn[198]=nn[198]/gg;dd[198]=dd[198]/gg;
+nn[199]=nn[1]*nn[195];dd[199]=dd[1]*dd[195];gg=gcd(nn[199],dd[199]);nn[199]=nn[199]/gg;dd[199]=dd[199]/gg;
+nn[200]=nn[134]*dd[164]+nn[164]*dd[134];dd[200]=dd[134]*dd[164];gg=gcd(nn[200],dd[200]);nn[200]=nn[200]/gg;dd[200]=dd[200]/gg;
+nn[201]=nn[144]*dd[172]+nn[172]*dd[144];dd[201]=dd[144]*dd[172];gg=gcd(nn[201],dd[201]);nn[201]=nn[201]/gg;dd[201]=dd[201]/gg;
+nn[202]=nn[154]*dd[180]+nn[180]*dd[154];dd[202]=dd[154]*dd[180];gg=gcd(nn[202],dd[202]);nn[202]=nn[202]/gg;dd[202]=dd[202]/gg;
+nn[203]=nn[156]*dd[182]+nn[182]*dd[156];dd[203]=dd[156]*dd[182];gg=gcd(nn[203],dd[203]);nn[203]=nn[203]/gg;dd[203]=dd[203]/gg;
+nn[204]=nn[158]*dd[184]+nn[184]*dd[158];dd[204]=dd[158]*dd[184];gg=gcd(nn[204],dd[204]);nn[204]=nn[204]/gg;dd[204]=dd[204]/gg;
+nn[205]=nn[160]*dd[186]+nn[186]*dd[160];dd[205]=dd[160]*dd[186];gg=gcd(nn[205],dd[205]);nn[205]=nn[205]/gg;dd[205]=dd[205]/gg;
+nn[206]=nn[77]*dd[162]+nn[162]*dd[77];dd[206]=dd[77]*dd[162];gg=gcd(nn[206],dd[206]);nn[206]=nn[206]/gg;dd[206]=dd[206]/gg;
+nn[207]=nn[196]*dd[200]+nn[200]*dd[196];dd[207]=dd[196]*dd[200];gg=gcd(nn[207],dd[207]);nn[207]=nn[207]/gg;dd[207]=dd[207]/gg;
+nn[208]=nn[197]*dd[201]+nn[201]*dd[197];dd[208]=dd[197]*dd[201];gg=gcd(nn[208],dd[208]);nn[208]=nn[208]/gg;dd[208]=dd[208]/gg;
+nn[209]=nn[198]*dd[202]+nn[202]*dd[198];dd[209]=dd[198]*dd[202];gg=gcd(nn[209],dd[209]);nn[209]=nn[209]/gg;dd[209]=dd[209]/gg;
+nn[210]=nn[199]*dd[203]+nn[203]*dd[199];dd[210]=dd[199]*dd[203];gg=gcd(nn[210],dd[210]);nn[210]=nn[210]/gg;dd[210]=dd[210]/gg;
+nn[211]=nn[77]*dd[204]+nn[204]*dd[77];dd[211]=dd[77]*dd[204];gg=gcd(nn[211],dd[211]);nn[211]=nn[211]/gg;dd[211]=dd[211]/gg;
+nn[212]=nn[77]*dd[205]+nn[205]*dd[77];dd[212]=dd[77]*dd[205];gg=gcd(nn[212],dd[212]);nn[212]=nn[212]/gg;dd[212]=dd[212]/gg;
+nn[213]=nn[77]*dd[206]+nn[206]*dd[77];dd[213]=dd[77]*dd[206];gg=gcd(nn[213],dd[213]);nn[213]=nn[213]/gg;dd[213]=dd[213]/gg;
+nn[214]=nn[63]*nn[213];dd[214]=dd[63]*dd[213];gg=gcd(nn[214],dd[214]);nn[214]=nn[214]/gg;dd[214]=dd[214]/gg;
+nn[215]=nn[210]*dd[214]+nn[214]*dd[210];dd[215]=dd[210]*dd[214];gg=gcd(nn[215],dd[215]);nn[215]=nn[215]/gg;dd[215]=dd[215]/gg;
+nn[216]=nn[60]*nn[213];dd[216]=dd[60]*dd[213];gg=gcd(nn[216],dd[216]);nn[216]=nn[216]/gg;dd[216]=dd[216]/gg;
+nn[217]=nn[211]*dd[216]+nn[216]*dd[211];dd[217]=dd[211]*dd[216];gg=gcd(nn[217],dd[217]);nn[217]=nn[217]/gg;dd[217]=dd[217]/gg;
+nn[218]=nn[57]*nn[213];dd[218]=dd[57]*dd[213];gg=gcd(nn[218],dd[218]);nn[218]=nn[218]/gg;dd[218]=dd[218]/gg;
+nn[219]=nn[212]*dd[218]+nn[218]*dd[212];dd[219]=dd[212]*dd[218];gg=gcd(nn[219],dd[219]);nn[219]=nn[219]/gg;dd[219]=dd[219]/gg;
+nn[220]=nn[5]*nn[213];dd[220]=dd[5]*dd[213];gg=gcd(nn[220],dd[220]);nn[220]=nn[220]/gg;dd[220]=dd[220]/gg;
+nn[221]=nn[213]*dd[220]+nn[220]*dd[213];dd[221]=dd[213]*dd[220];gg=gcd(nn[221],dd[221]);nn[221]=nn[221]/gg;dd[221]=dd[221]/gg;
+nn[222]=nn[63]*nn[219];dd[222]=dd[63]*dd[219];gg=gcd(nn[222],dd[222]);nn[222]=nn[222]/gg;dd[222]=dd[222]/gg;
+nn[223]=nn[209]*dd[222]+nn[222]*dd[209];dd[223]=dd[209]*dd[222];gg=gcd(nn[223],dd[223]);nn[223]=nn[223]/gg;dd[223]=dd[223]/gg;
+nn[224]=nn[60]*nn[219];dd[224]=dd[60]*dd[219];gg=gcd(nn[224],dd[224]);nn[224]=nn[224]/gg;dd[224]=dd[224]/gg;
+nn[225]=nn[215]*dd[224]+nn[224]*dd[215];dd[225]=dd[215]*dd[224];gg=gcd(nn[225],dd[225]);nn[225]=nn[225]/gg;dd[225]=dd[225]/gg;
+nn[226]=nn[57]*nn[219];dd[226]=dd[57]*dd[219];gg=gcd(nn[226],dd[226]);nn[226]=nn[226]/gg;dd[226]=dd[226]/gg;
+nn[227]=nn[217]*dd[226]+nn[226]*dd[217];dd[227]=dd[217]*dd[226];gg=gcd(nn[227],dd[227]);nn[227]=nn[227]/gg;dd[227]=dd[227]/gg;
+nn[228]=nn[5]*nn[219];dd[228]=dd[5]*dd[219];gg=gcd(nn[228],dd[228]);nn[228]=nn[228]/gg;dd[228]=dd[228]/gg;
+nn[229]=nn[219]*dd[228]+nn[228]*dd[219];dd[229]=dd[219]*dd[228];gg=gcd(nn[229],dd[229]);nn[229]=nn[229]/gg;dd[229]=dd[229]/gg;
+nn[230]=nn[63]*nn[227];dd[230]=dd[63]*dd[227];gg=gcd(nn[230],dd[230]);nn[230]=nn[230]/gg;dd[230]=dd[230]/gg;
+nn[231]=nn[208]*dd[230]+nn[230]*dd[208];dd[231]=dd[208]*dd[230];gg=gcd(nn[231],dd[231]);nn[231]=nn[231]/gg;dd[231]=dd[231]/gg;
+nn[232]=nn[60]*nn[227];dd[232]=dd[60]*dd[227];gg=gcd(nn[232],dd[232]);nn[232]=nn[232]/gg;dd[232]=dd[232]/gg;
+nn[233]=nn[223]*dd[232]+nn[232]*dd[223];dd[233]=dd[223]*dd[232];gg=gcd(nn[233],dd[233]);nn[233]=nn[233]/gg;dd[233]=dd[233]/gg;
+nn[234]=nn[57]*nn[227];dd[234]=dd[57]*dd[227];gg=gcd(nn[234],dd[234]);nn[234]=nn[234]/gg;dd[234]=dd[234]/gg;
+nn[235]=nn[225]*dd[234]+nn[234]*dd[225];dd[235]=dd[225]*dd[234];gg=gcd(nn[235],dd[235]);nn[235]=nn[235]/gg;dd[235]=dd[235]/gg;
+nn[236]=nn[5]*nn[227];dd[236]=dd[5]*dd[227];gg=gcd(nn[236],dd[236]);nn[236]=nn[236]/gg;dd[236]=dd[236]/gg;
+nn[237]=nn[227]*dd[236]+nn[236]*dd[227];dd[237]=dd[227]*dd[236];gg=gcd(nn[237],dd[237]);nn[237]=nn[237]/gg;dd[237]=dd[237]/gg;
+nn[238]=nn[63]*nn[235];dd[238]=dd[63]*dd[235];gg=gcd(nn[238],dd[238]);nn[238]=nn[238]/gg;dd[238]=dd[238]/gg;
+nn[239]=nn[207]*dd[238]+nn[238]*dd[207];dd[239]=dd[207]*dd[238];gg=gcd(nn[239],dd[239]);nn[239]=nn[239]/gg;dd[239]=dd[239]/gg;
+nn[240]=nn[60]*nn[235];dd[240]=dd[60]*dd[235];gg=gcd(nn[240],dd[240]);nn[240]=nn[240]/gg;dd[240]=dd[240]/gg;
+nn[241]=nn[231]*dd[240]+nn[240]*dd[231];dd[241]=dd[231]*dd[240];gg=gcd(nn[241],dd[241]);nn[241]=nn[241]/gg;dd[241]=dd[241]/gg;
+nn[242]=nn[57]*nn[235];dd[242]=dd[57]*dd[235];gg=gcd(nn[242],dd[242]);nn[242]=nn[242]/gg;dd[242]=dd[242]/gg;
+nn[243]=nn[233]*dd[242]+nn[242]*dd[233];dd[243]=dd[233]*dd[242];gg=gcd(nn[243],dd[243]);nn[243]=nn[243]/gg;dd[243]=dd[243]/gg;
+nn[244]=nn[5]*nn[235];dd[244]=dd[5]*dd[235];gg=gcd(nn[244],dd[244]);nn[244]=nn[244]/gg;dd[244]=dd[244]/gg;
+nn[245]=nn[235]*dd[244]+nn[244]*dd[235];dd[245]=dd[235]*dd[244];gg=gcd(nn[245],dd[245]);nn[245]=nn[245]/gg;dd[245]=dd[245]/gg;
+poly nuEquation=(b4c2+b4+b3c6+b3c5+b3c2+b3c)*n+(c3+c2+c+1)*l14+(c4+1)*l13+(bc3+bc+c5+c4+c+1)*l12+(c6+c4+c2+1)*l11+(b2c3+b2c2+bc5+bc+c7+c6+c5+c4+c3+c2+c+1)*l10+(b2c4+b2c2+c8+1)*l9+(b3c3+bc7+bc5+bc3+bc+c9+c8+c+1)*l8+(c10+c8+c2+1)*l7+(b4c3+b4c2+b4c+b4+b3c3+b3c+b2c7+b2c6+b2c3+b2c2+bc9+bc)*l6+(b4c4+b4+b3c4+b3c3+b3c2+b3c+b2c8+b2c6+b2c4+b2c2)*l5+(b5c3+b5c+b4c5+b4c4+b4c3+b4c2+b4c+b4+b3c7+b3c5+b3c3+b3c)*l4+(b4c6+b4c4+b4c2+b4+b3c6+b3c5+b3c2+b3c)*l3+(b6c3+b6c2+b5c5+b5c3+b5c+b4c5+b4c4+b4c+b4+b3c7+b3c5+b3c3+b3c)*l2+(b6c4+b6c2+b5c4+b5c3+b5c+b5+b4c5+b4c4+b4c+b4+b3c8+b3c7+b3c6+b3c5+b3c4+b3c3+b3c2+b3c)*l+(b7c3+b6c3+b6c2+b6c+b6+b4c7+b4c6+b4c5+b4c4+b4c3+b4c2+b4c+b4+b3c9+b3c);
+poly nuCoefficient=diff(nuEquation,n);
+if(nuCoefficient!=(1+c)^2*b^3*(b+c*(1+c)^3)){ERROR("nu coefficient mismatch");}
+ideal original=nn[49],nn[53],nn[239],nn[241],nn[243];
+ideal registered=nn[1],nn[12],nn[2],nn[2],nn[20],nn[37],nn[65],nn[75];
+proc encode27(poly f){list a;int i;for(i=1;i<=size(f);i++){a=insert(a,leadexp(f[i]),size(a));}return(a);}
+list sourceTerms;list registeredTerms;int enc;
+for(enc=1;enc<=5;enc++){sourceTerms=insert(sourceTerms,encode27(original[enc]),size(sourceTerms));}
+for(enc=1;enc<=8;enc++){registeredTerms=insert(registeredTerms,encode27(registered[enc]),size(registeredTerms));}
+// Exact local charts on the retained degree-8-by-2 source tower.
+option(redSB);
+ring o=2,(q,y,l,t),dp;
+poly E0=q+1+(1+t)*t^3*q^2;
+ideal EB=std(ideal(E0));
+poly cp=1+t+t^4*q+t^6*q^2;
+poly rp=1+t^2*q+t^5*q^2;
+poly b=t^3*q^3*rp*cp;
+poly c=t^2*q^2*cp;
+poly A=1+c;
+poly delta=b+c*A^3;
+poly Delta=b^3*delta;
+poly C=b^4*(b^2+A^2*b+c*A^4);
+poly d=Delta/t^11;poly e=C/t^14;
+if(Delta!=t^11*d || C!=t^14*e){ERROR("tower coefficient division failed");}
+print("O24_COEFFICIENT_UNIT_VALUES");
+subst(subst(d,t,0),q,1);subst(subst(e,t,0),q,1);subst(subst(A,t,0),q,1);
+if(subst(subst(d,t,0),q,1)!=1 || subst(subst(e,t,0),q,1)!=1 || subst(subst(A,t,0),q,1)!=1){ERROR("wrong O coefficient units");}
+poly F=b*c^7+b^2*c^5+b*c^6+b^2*c^4+c^6+b^5+b^4*c+b^3*c^2+b^2*c^3;
+print("O24_ORIGINAL_TATE_RESIDUAL");reduce(F,EB);
+if(reduce(F,EB)!=0){ERROR("wrong Tate coordinate chart");}
+// u=1/(t^2*q), v=1/(t^3*q); clear denominators in E, b and c.
+poly cubic=q+t^3*q^2+1+t^4*q^2;
+print("O24_CUBIC_CHART_RESIDUAL");reduce(cubic,EB);
+if(reduce(cubic,EB)!=0){ERROR("wrong elliptic infinity chart");}
+print("O24_ORIGINAL_BASE_COORDINATE_RESIDUALS");
+reduce(c+t^2*q*(1+t*q*rp),EB);reduce(b+t^3*q^2*rp*(1+t*q*rp),EB);
+if(reduce(c+t^2*q*(1+t*q*rp),EB)!=0 || reduce(b+t^3*q^2*rp*(1+t*q*rp),EB)!=0){ERROR("original base coordinate recovery failed");}
+poly H0=t^10*y^8+t^3*d*y^2+A^2*d*y+e;
+poly L0=l^2+A*l+t^3*y+b;
+poly tower0=(t^3*y)^8+Delta*(t^3*y)^2+A^2*Delta*(t^3*y)+C;
+if(tower0!=t^14*H0){ERROR("unramified tower identity failed");}
+// Input: original ring r/circuit and nuEquation, then O24-charts prefix in o.
+ring s=2,(w),dp;
+int precision=768;
+ideal cutoff=std(ideal(w^precision));
+ideal checkcut=std(ideal(w^100));
+proc tr(poly p){return(reduce(p,cutoff));}
+proc invUnit(poly p){
+ poly answer=1;int k;
+ if(subst(p,w,0)!=1){ERROR("inverse input is not a unit");}
+ for(k=1;k<=11;k++){answer=tr(p*answer^2);}
+ if(tr(p*answer)!=1){ERROR("truncated unit inverse failed");}
+ return(answer);
+}
+proc wVal(poly p){
+ if(p==0){ERROR("order unresolved at retained precision");return(-999);}
+ // In this univariate global ordering the last term has least exponent.
+ return(deg(p[size(p)]));
+}
+proc recordOrder(string name,poly p){
+ int value=wVal(p);
+ print("ORDER "+name+" "+string(value)+" LEAD "+string(subst(p/w^value,w,0)));
+ if(value<0 || value>=100){ERROR("valuation outside certified precision");}
+}
+int kind;int branch;int k;int j;
+poly tt;poly qq;poly xx;poly yy;poly zz;poly bb;poly cc;poly aa;poly dd;poly ee;
+poly ll;poly nnum;poly nden;poly nu;poly residue;int denorder;int numorder;
+ideal lifted;ideal evaluatedUnits;
+print("VALUATION_HELPER_CONTROLS");wVal(1+w^191);wVal(w+w^3);wVal(w^7+w^179);
+if(wVal(1+w^191)!=0 || wVal(w+w^3)!=1 || wVal(w^7+w^179)!=7){ERROR("univariate valuation controls failed");}
+// Append in the univariate seed ring s, with sourceTerms (integer lists).
+// (p,e,P) represents w^e p + O(w^P). p is normalized with constant1.
+proc lnrm(poly p,int e,int pr){
+ if(pr<=e){return(list(poly(0),pr,pr));}
+ p=jet(p,pr-e-1);
+ if(p==0){return(list(poly(0),pr,pr));}
+ int vv=deg(p[size(p)]);p=p/w^vv;e=e+vv;
+ return(list(p,e,pr));
+}
+proc lc(int a){return(list(poly(a),0,4096));}
+proc lseed(poly p,int pr){return(lnrm(p,0,pr));}
+proc la(list a,list b){
+ int pr=min(a[3],b[3]);int e=min(a[2],b[2]);
+ return(lnrm(a[1]*w^(a[2]-e)+b[1]*w^(b[2]-e),e,pr));
+}
+proc lm(list a,list b){
+ int pr=min(a[3]+b[2],b[3]+a[2]);
+ return(lnrm(a[1]*b[1],a[2]+b[2],pr));
+}
+proc li(list a){
+ if(a[1]==0){ERROR("Laurent inverse unresolved zero");return(lc(0));}
+ int rel=a[3]-a[2];poly ans=1;int z;
+ if(rel>4096){ERROR("inverse precision exceeds frozen iteration bound");}
+ for(z=1;z<=13;z++){ans=jet(a[1]*ans^2,rel-1);}
+ if(jet(a[1]*ans,rel-1)!=1){ERROR("Laurent unit inverse failed");}
+ return(lnrm(ans,-a[2],a[3]-2*a[2]));
+}
+proc lpw(list a,int k){
+ list ans=lc(1);
+ while(k>0){if(k%2==1){ans=lm(ans,a);}k=k div 2;if(k>0){a=lm(a,a);}}
+ return(ans);
+}
+proc leval(list terms,list coords){
+ list ans=lc(0);list mon;int z;int j;intvec ex;
+ for(z=1;z<=size(terms);z++){
+  mon=lc(1);ex=terms[z];
+  for(j=1;j<=4;j++){if(ex[j]>0){mon=lm(mon,lpw(coords[j],ex[j]));}}
+  ans=la(ans,mon);
+ }
+ return(ans);
+}
+proc lzero(string name,list a){
+ print("RESIDUAL "+name+" ABS_PRECISION "+string(a[3]));
+ if(a[1]!=0 || a[3]<=0){ERROR("source residual nonzero or precision insufficient: "+name);}
+}
+proc lrecord(string name,list a){
+ if(a[1]==0 || a[2]>=a[3]){ERROR("valuation unresolved: "+name);}
+ print("LAURENT_ORDER "+name+" "+string(a[2])+" ABS_PRECISION "+string(a[3])+" LEAD "+string(subst(a[1],w,0)));
+}
+list ctl=lseed(w+w^3,50);list invctl=li(ctl);list checkctl=lm(ctl,invctl);
+if(invctl[2]!=-1 || invctl[3]!=48 || checkctl[1]!=1 || checkctl[2]!=0 || checkctl[3]!=49){ERROR("inversion/pole precision control");}
+checkctl=la(ctl,lseed(w,40));
+if(checkctl[2]!=3 || checkctl[3]!=40){ERROR("cancellation control");}
+checkctl=lm(lseed(w^3,50),lseed(w^5,60));
+if(checkctl[2]!=8 || checkctl[3]!=55){ERROR("multiplication precision control");}
+print("LAURENT27_HELPER_CONTROLS_PASS");
+list charts;
+
+for(kind=0;kind<=1;kind++){
+ qq=1;xx=1;yy=1;
+ if(kind==0){
+  tt=w;
+  for(k=1;k<=12;k++){qq=tr(1+(1+tt)*tt^3*qq^2);}
+  map base=o,qq,0,0,tt;
+  bb=tr(base(b));cc=tr(base(c));aa=tr(base(A));dd=tr(base(d));ee=tr(base(e));
+  for(k=1;k<=12;k++){yy=tr((tt^10*yy^8+tt^3*dd*yy^2+ee)*invUnit(tr(aa^2*dd)));}
+  zz=tr(tt^3*yy);
+  residue=tr(tt^10*yy^8+tt^3*dd*yy^2+aa^2*dd*yy+ee);
+ }else{
+  for(k=1;k<=12;k++){
+   tt=tr(w^7*xx^2);
+   for(j=1;j<=10;j++){qq=tr(1+(1+tt)*tt^3*qq^2);}
+   map base=o,qq,0,0,tt;
+   bb=tr(base(b));cc=tr(base(c));aa=tr(base(A));dd=tr(base(d));ee=tr(base(e));
+   xx=tr((1+(w^11*dd+w^10*ee)*xx^4)*invUnit(tr(aa^2*dd)));
+  }
+  tt=tr(w^7*xx^2);zz=tr(w^11*xx^3);
+  map base=o,qq,0,0,tt;
+  bb=tr(base(b));cc=tr(base(c));aa=tr(base(A));dd=tr(base(d));ee=tr(base(e));
+  residue=tr(1+aa^2*dd*xx+w^11*dd*xx^4+w^10*ee*xx^4);
+ }
+ print("CHART "+string(kind)+" PARAMETER_SERIES");tt;qq;xx;yy;zz;
+ print("BASE_AND_TOWER_SERIES_RESIDUALS");tr(qq+1+(1+tt)*tt^3*qq^2);residue;
+ if(tr(qq+1+(1+tt)*tt^3*qq^2)!=0 || residue!=0){ERROR("implicit chart series residual");}
+ for(branch=0;branch<=1;branch++){
+  ll=branch;
+  for(k=1;k<=12;k++){ll=tr((ll^2+zz+bb)*invUnit(aa));}
+  print("BRANCH "+string(kind)+" "+string(branch));
+  print("LAMBDA_SERIES");ll;
+  if(tr(ll^2+aa*ll+zz+bb)!=0){ERROR("lambda series residual");}
+  map getnu=r,0,ll,bb,cc;
+  nnum=tr(getnu(nuEquation));nden=tr(getnu(nuCoefficient));
+  numorder=wVal(nnum);denorder=wVal(nden);
+  print("NU_NUMERATOR_DENOMINATOR_ORDERS");numorder;denorder;
+  if(numorder<denorder){ERROR("nu has a pole; Laurent adaptation not frozen");}
+  nu=tr((nnum/w^denorder)*invUnit(nden/w^denorder));
+  print("NU_SERIES");nu;
+  map evaluate=r,nu,ll,bb,cc;
+  lifted=evaluate(original);
+  print("ALL_FIVE_ORIGINAL_RESIDUALS_MOD_W100");
+  for(j=1;j<=5;j++){
+   residue=reduce(lifted[j],checkcut);residue;
+   if(residue!=0){ERROR("original source residual failed");}
+  }
+  recordOrder("t",tt);recordOrder("b",bb);recordOrder("c",cc);
+  recordOrder("lambda",ll);recordOrder("nu",nu);recordOrder("A",aa);
+  recordOrder("Z",zz);
+  evaluatedUnits=evaluate(registered);
+  for(j=1;j<=8;j++){
+   poly entry=tr(evaluatedUnits[j]);
+   recordOrder("unit"+string(j),entry);
+  }
+// Insert inside each R24 seed branch after all original seed checks.
+list ob=lseed(bb,precision);list oc=lseed(cc,precision);
+list ol=lseed(ll,precision);list on=lseed(nu,precision-denorder);
+list initialL=ol;list initialN=on;list initialB=ob;list initialC=oc;
+list ou=li(lm(lpw(lseed(tt,precision),2),lseed(qq,precision)));
+list ov=li(lm(lpw(lseed(tt,precision),3),lseed(qq,precision)));
+list oa;list ok;list osc;list osl;list nb;list nc;list nl;list nnu;
+list nbu;list nbv;list coords;list result;int orbit;int index27;int ram=1;
+if(kind==1){ram=7;}
+intvec expectedB=3,-7,1,2,1;
+intvec expectedC=2,-4,1,2,-1;
+for(orbit=0;orbit<=4;orbit++){
+ print("CUSPORBIT "+string(kind)+" "+string(branch)+" "+string(orbit));
+ coords=list(on,ol,ob,oc);
+ charts=insert(charts,list(coords,ou,ov,ram,orbit),size(charts));
+ for(index27=1;index27<=5;index27++){
+  result=leval(sourceTerms[index27],coords);lzero("original"+string(index27),result);
+ }
+ lrecord("lambda",ol);lrecord("nu",on);
+ for(index27=1;index27<=8;index27++){
+  result=leval(registeredTerms[index27],coords);
+  lrecord("registered"+string(index27),result);
+  if(index27==1 && result[2]!=ram*expectedB[orbit+1]){ERROR("base b order mismatch");}
+  if(index27==3 && result[2]!=ram*expectedC[orbit+1]){ERROR("base c order mismatch");}
+ }
+ oa=la(lc(1),oc);ok=la(ob,lm(oa,oc));
+ osc=lm(lpw(oc,3),li(ok));osl=lm(ok,li(oc));
+ nb=lm(lm(ob,oc),lpw(li(osc),3));
+ nc=la(lc(1),lm(oa,li(osc)));
+ nl=lm(la(ol,osl),li(osc)); // actual update, corrupt-control target
+ nnu=lm(la(la(on,lm(ol,ob)),lm(ob,oc)),lpw(li(osc),3));
+ nbu=lm(la(ou,ov),lpw(li(ou),2));
+ nbv=lm(la(la(lm(ou,ov),ou),ov),lpw(li(ou),3));
+ ob=nb;oc=nc;ol=nl;on=nnu;ou=nbu;ov=nbv;
+ lzero("base_cubic",la(la(lpw(ov,2),ov),la(lpw(ou,3),ou)));
+}
+lzero("fifth_b",la(ob,initialB));lzero("fifth_c",la(oc,initialC));
+lzero("fifth_lambda",la(ol,la(initialL,la(lc(1),initialC))));
+lzero("fifth_nu",la(on,la(initialN,initialB)));
+
+ }
+}
+// charts contains all20 (coords,u,v,e,cusp_index) Laurent records.
+// Constraint bits and candidate-coefficient bits are polynomials over F2,
+// used ONLY as finite vectors with XOR, never as polynomial modules.
+write("chart-series.dump",charts);
+list widths=8,16,24,32;
+int widthIndex;int width;int il;int jn;int ev;int iu;int ch;int tid;
+int total;int cand;int bound;int rrExponent;int pos;int pivot;int rankJ;
+int dependent;int valid;int reductions;int gi;int z;
+list oneChart;list chartCoords;list value;list baseValue;
+poly bits;poly jj;poly comb;poly currentBits;poly currentJet;poly currentComb;
+poly term;poly cc;poly verifyBits;poly verifyJet;
+list allBits;list allJets;list constraintBasis;list constraintComb;list constraintJet;
+list jetBasis;list jetComb;list accepted;
+for(widthIndex=1;widthIndex<=size(widths);widthIndex++){
+ width=widths[widthIndex];
+ print("RR27_WIDTH "+string(width));
+ allBits=list();allJets=list();constraintBasis=list();constraintComb=list();constraintJet=list();
+ jetBasis=list();jetComb=list();accepted=list();
+ for(z=1;z<=10240;z++){
+  constraintBasis=insert(constraintBasis,poly(0),size(constraintBasis));
+  constraintComb=insert(constraintComb,poly(0),size(constraintComb));
+  constraintJet=insert(constraintJet,poly(0),size(constraintJet));
+ }
+ for(z=1;z<=129;z++){jetBasis=insert(jetBasis,poly(0),size(jetBasis));jetComb=insert(jetComb,poly(0),size(jetComb));}
+ rankJ=0;dependent=0;valid=0;reductions=0;cand=0;
+ for(il=0;il<=3;il++){
+ for(jn=0;jn<=3;jn++){
+ for(ev=0;ev<=1;ev++){
+ for(iu=-width;iu<=2*width;iu++){
+  bits=0;jj=0;
+  for(ch=1;ch<=size(charts);ch++){
+   oneChart=charts[ch];chartCoords=oneChart[1];
+   baseValue=lm(lpw(la(oneChart[2],lc(1)),width),lc(1));
+   baseValue=li(baseValue);
+   if(iu<0){baseValue=lm(baseValue,lpw(li(oneChart[2]),-iu));}
+   else{baseValue=lm(baseValue,lpw(oneChart[2],iu));}
+   value=lm(lm(lm(baseValue,lpw(oneChart[3],ev)),lpw(chartCoords[2],il)),lpw(chartCoords[1],jn));
+   bound=0;
+   if(oneChart[5]==1){bound=7*oneChart[4];}
+   if(oneChart[5]==4){bound=oneChart[4];}
+   if(value[3]<=0 || value[2]<-512){ERROR("RR27 candidate precision/row bound insufficient");}
+   if(ch==1 && value[3]<129){ERROR("RR27 evaluation jet precision insufficient");}
+   for(tid=1;tid<=size(value[1]);tid++){
+    term=value[1][tid];rrExponent=deg(term)+value[2];
+    if(rrExponent < -bound){bits=bits+w^((ch-1)*512+rrExponent+512);}
+    if(ch==1 && rrExponent>=0 && rrExponent<129){jj=jj+w^rrExponent;}
+   }
+  }
+  allBits=insert(allBits,bits,size(allBits));allJets=insert(allJets,jj,size(allJets));
+  print("RR27_CANDIDATE "+string(cand)+" "+string(il)+" "+string(jn)+" "+string(ev)+" "+string(iu));
+  currentBits=bits;currentJet=jj;currentComb=w^cand;
+  while(currentBits!=0){
+   pivot=deg(currentBits)+1;
+   if(constraintBasis[pivot]==0){
+    constraintBasis[pivot]=currentBits;constraintComb[pivot]=currentComb;constraintJet[pivot]=currentJet;break;
+   }
+   currentBits=currentBits+constraintBasis[pivot];
+   currentComb=currentComb+constraintComb[pivot];currentJet=currentJet+constraintJet[pivot];
+   reductions=reductions+1;
+  }
+  if(currentBits==0){
+   valid=valid+1;
+   while(currentJet!=0){
+    pivot=deg(currentJet)+1;
+    if(jetBasis[pivot]==0){
+     jetBasis[pivot]=currentJet;jetComb[pivot]=currentComb;
+     accepted=insert(accepted,currentComb,size(accepted));rankJ=rankJ+1;break;
+    }
+    currentJet=currentJet+jetBasis[pivot];currentComb=currentComb+jetComb[pivot];
+   }
+   if(currentJet==0){dependent=dependent+1;}
+  }
+  cand=cand+1;
+ }
+ }
+ }
+ }
+ print("RR27_COUNTS width,candidates,valid_vectors,jet_rank,dependent,reductions");
+ width;cand;valid;rankJ;dependent;reductions;
+ // Independent recombination from original columns for every accepted vector.
+ for(gi=1;gi<=size(accepted);gi++){
+  verifyBits=0;verifyJet=0;cc=accepted[gi];
+  for(tid=1;tid<=size(cc);tid++){
+   pos=deg(cc[tid])+1;verifyBits=verifyBits+allBits[pos];verifyJet=verifyJet+allJets[pos];
+  }
+  if(verifyBits!=0 || verifyJet==0){ERROR("RR27 independent certificate recombination failed");}
+ }
+ write("rr27-width"+string(width)+"-certificate.dump",accepted);
+ write("rr27-width"+string(width)+"-constraints.dump",allBits);
+ write("rr27-width"+string(width)+"-jets.dump",allJets);
+ if(rankJ>68){ERROR("RR27 rank exceeds geometric dimension; stop and audit bridges");}
+ if(rankJ==68){print("RR27_COMPLETE_BASIS_DIMENSION_68");break;}
+}
+print("RR27_FINAL_RANK "+string(rankJ));
+print("RR27_ALL_CHECKS_PASS");quit;

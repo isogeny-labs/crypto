@@ -1,0 +1,24 @@
+lane-CLMADs per SM-clock at the clock sampled after each pass; two passes each
+lo                                                      8 blocks/SM 1.672 1.667   2 blocks/SM 1.672 1.672
+hi                                                      8 blocks/SM 1.672 1.667   2 blocks/SM 1.672 1.672
+pair-same                                               8 blocks/SM 1.670 1.666   2 blocks/SM 1.673 1.673
+pair-other                                              8 blocks/SM 1.671 1.666   2 blocks/SM 1.674 1.674
+lo-lo-same                                              8 blocks/SM 1.670 1.666   2 blocks/SM 1.673 1.673
+flat 3lo+3hi                                            8 blocks/SM 1.670 1.666   2 blocks/SM 1.674 1.672
+karat 3x(lo,hi)                                         8 blocks/SM 1.670 1.665   2 blocks/SM 1.672 1.672
+pair-far (4 lop3 between)                               8 blocks/SM 1.670 1.666   2 blocks/SM 1.671 1.672
+lo-acc (clmad-price form)                               8 blocks/SM 1.669 1.665   2 blocks/SM 1.671 1.673
+pair-acc (clmad-price form)                             8 blocks/SM 1.983 1.978   2 blocks/SM 1.982 1.983
+16 lo then 16 hi, fresh dest                            8 blocks/SM 1.670 1.665   2 blocks/SM 1.670 1.672
+pair-acc forced adjacent                                8 blocks/SM 1.983 1.978   2 blocks/SM 1.983 1.986
+16 lo-acc then 16 hi-acc, hi reads old a                8 blocks/SM 1.984 1.978   2 blocks/SM 1.984 1.985
+hi-acc alone (addend = dest)                            8 blocks/SM 1.670 1.666   2 blocks/SM 1.670 1.672
+hi, addend another register                             8 blocks/SM 1.670 1.665   2 blocks/SM 1.671 1.674
+lo, addend another register                             8 blocks/SM 1.671 1.665   2 blocks/SM 1.671 1.671
+lo fresh + hi with addend                               8 blocks/SM 1.813 1.807   2 blocks/SM 1.812 1.814
+pair, addend = zero register (kernel arg)               8 blocks/SM 1.670 1.665   2 blocks/SM 1.670 1.672
+karat 3x(lo,hi), addends = zero register                8 blocks/SM 1.670 1.666   2 blocks/SM 1.671 1.673
+pair, fresh dest, multiplicand = 0 (per-lane register)  8 blocks/SM 1.671 1.666   2 blocks/SM 1.671 1.672
+pair-acc, operands kept nonzero every round             8 blocks/SM 1.984 1.978   2 blocks/SM 1.984 1.987
+pair, self-addend on copies, corrected                  8 blocks/SM 1.983 1.978   2 blocks/SM 1.984 1.986
+karat 3x(lo,hi), self-addend on copies, corrected       8 blocks/SM 1.980 1.999   2 blocks/SM 1.981 1.983

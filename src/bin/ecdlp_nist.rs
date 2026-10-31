@@ -14,6 +14,7 @@
 //! Every subcommand takes `--json` for a machine-readable report.  See
 //! `docs/ECDLP_NIST.md`.
 
+use std::path::Path;
 use std::process::ExitCode;
 use std::time::Instant;
 
@@ -22,6 +23,9 @@ use num_bigint::{BigUint, RandBigInt};
 use rand::rngs::StdRng;
 use rand::SeedableRng;
 use serde_json::json;
+
+use crypto_lib::binary_ecc::curve::BinaryCurve;
+use crypto_lib::ecc::certicom::prime_challenge;
 
 use crypto_lib::cryptanalysis::ecdlp_nist::{
     self as nist, anomalous, audit, curve_by_name, curve_names, nist_curves, solve, Audit, Curve,
@@ -32,8 +36,9 @@ use crypto_lib::cryptanalysis::ecdlp_nist::{
 #[command(
     name = "ecdlp-nist",
     version,
-    about = "ECDLP solvers and structural audit across the fifteen NIST curves",
-    long_about = "Solve Q = [k]G on P-192…P-521, K-163…K-571 and B-163…B-571 by the \
+    about = "ECDLP solvers and structural audit across NIST and Certicom curves",
+    long_about = "Solve Q = [k]G on the NIST P, K and B curves and Certicom prime and binary \
+                  challenges by the \
                   branch the curve calls for (Smart on anomalous prime curves, \
                   Pohlig–Hellman on composite orders, BSGS/kangaroo on an interval, \
                   folded parallel rho otherwise), and audit each curve for the \
@@ -51,7 +56,7 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
-    /// List the NIST curves with their audit summary.
+    /// List the NIST and Certicom curves with their audit summary.
     List,
     /// Structural audit of one curve.
     Audit(CurveArg),
@@ -74,15 +79,21 @@ struct SolveArgs {
     /// Curve name (see `list`).
     curve: String,
     /// Plant Q = [k]G with this scalar (decimal or 0x-hex).
-    #[arg(long, conflicts_with_all = ["random_bits", "point"])]
+    #[arg(long, conflicts_with_all = ["random_bits", "point", "point_file", "challenge"])]
     secret: Option<String>,
     /// Plant Q = [k]G with a random k of this many bits (seeded).
-    #[arg(long, conflicts_with = "point")]
+    #[arg(long, conflicts_with_all = ["point", "point_file", "challenge"])]
     random_bits: Option<u32>,
     /// Solve an externally supplied point `x,y` (hex).  Needs an interval
     /// unless the curve is a toy.
-    #[arg(long, value_name = "X,Y")]
+    #[arg(long, value_name = "X,Y", conflicts_with_all = ["point_file", "challenge"])]
     point: Option<String>,
+    /// Checked JSON target artifact, local or store:NAME/sha256:DIGEST.
+    #[arg(long, conflicts_with_all = ["secret", "random_bits", "point", "challenge"])]
+    point_file: Option<std::path::PathBuf>,
+    /// Use the published Certicom challenge point Q for this curve.
+    #[arg(long)]
+    challenge: bool,
     /// Interval lower bound `lo` (decimal or 0x-hex); default 0.
     #[arg(long)]
     interval_lo: Option<String>,
@@ -144,6 +155,110 @@ fn parse_uint(s: &str) -> Result<BigUint, String> {
     .ok_or_else(|| format!("not a number: {s:?}"))
 }
 
+fn random_span(bits: u32, available: &BigUint) -> Result<BigUint, String> {
+    if bits == 0 {
+        return Err("--random-bits must be positive".into());
+    }
+    if u64::from(bits) >= available.bits() {
+        Ok(available.clone())
+    } else {
+        Ok((BigUint::from(1u8) << bits).min(available.clone()))
+    }
+}
+
+fn solve_bounds(
+    args: &SolveArgs,
+    order: &BigUint,
+    method: Method,
+) -> Result<(BigUint, Option<BigUint>), String> {
+    let lo = match &args.interval_lo {
+        Some(s) => parse_uint(s)?,
+        None => BigUint::from(0u8),
+    };
+    if &lo >= order {
+        return Err("interval lower bound must be below the subgroup order".into());
+    }
+    let available = order - &lo;
+    let infer_from_random = args.random_bits.is_some()
+        && (args.interval_lo.is_some()
+            || matches!(method, Method::Bsgs | Method::Kangaroo)
+            || (method == Method::Auto && order.bits() > 40));
+    let width = match (&args.interval_bits, &args.interval_width) {
+        (Some(bits), _) => {
+            if u64::from(*bits) > order.bits() {
+                return Err("interval bit width exceeds the subgroup order".into());
+            }
+            Some(BigUint::from(1u8) << *bits)
+        }
+        (None, Some(value)) => Some(parse_uint(value)?),
+        (None, None) if infer_from_random => Some(random_span(
+            args.random_bits.expect("inferred from random bits"),
+            &available,
+        )?),
+        (None, None) => None,
+    };
+    if args.interval_lo.is_some() && width.is_none() {
+        return Err("--interval-lo requires an interval width or --random-bits".into());
+    }
+    if let Some(width) = &width {
+        if width == &BigUint::from(0u8) || width > &available {
+            return Err(
+                "interval width must be positive and stay within the subgroup order".into(),
+            );
+        }
+    }
+    if let Some(bits) = args.random_bits {
+        random_span(bits, &available)?;
+    }
+    Ok((lo, width))
+}
+
+fn load_target_artifact(
+    curve: &Curve,
+    input: &Path,
+) -> Result<(nist::AnyPoint, serde_json::Value), String> {
+    let resolved = crypto_lib::store::resolve_path(input)?;
+    if std::fs::metadata(&resolved)
+        .map_err(|e| e.to_string())?
+        .len()
+        > 1024 * 1024
+    {
+        return Err("ECDLP target artifact exceeds 1 MiB".into());
+    }
+    let bytes = std::fs::read(&resolved).map_err(|e| e.to_string())?;
+    if bytes.len() > 1024 * 1024 {
+        return Err("ECDLP target artifact exceeds 1 MiB".into());
+    }
+    let value: serde_json::Value = serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+    let accepted_envelope = (value["schema_version"] == 1
+        && value.get("operation").is_none()
+        && value.as_object().is_some_and(|obj| {
+            obj.keys()
+                .all(|key| matches!(key.as_str(), "schema_version" | "curve" | "target"))
+        }))
+        || (value["operation"] == "solve" && value.get("schema_version").is_none());
+    if !accepted_envelope {
+        return Err("ECDLP target artifact must be a v1 target envelope or solve report".into());
+    }
+    if value.get("curve") != Some(&curve.describe()) {
+        return Err("ECDLP target artifact curve identity differs from the selected curve".into());
+    }
+    let x = value["target"]["x"]
+        .as_str()
+        .ok_or("ECDLP target artifact lacks hex x coordinate")?;
+    let y = value["target"]["y"]
+        .as_str()
+        .ok_or("ECDLP target artifact lacks hex y coordinate")?;
+    let point = curve.parse_point(x, y)?;
+    Ok((
+        point,
+        json!({
+            "source": input.display().to_string(),
+            "sha256": hex::encode(crypto_lib::hash::sha256(&bytes)),
+        }),
+    ))
+}
+
 fn audit_row(a: &Audit) -> String {
     format!(
         "{:<6} {:<8} {:>5} {:>5} {:>3}  {:<5} {:<5} {:<5}  {:>6}  {:>7.1}  {:>7.1}  {}",
@@ -183,7 +298,8 @@ fn audit_header() -> String {
 }
 
 fn cmd_list(json: bool) -> Result<(), String> {
-    let curves = nist_curves();
+    let mut curves = nist_curves();
+    curves.extend(nist::certicom_curves());
     let audits: Vec<Audit> = curves.iter().map(audit).collect();
     if json {
         let rows: Vec<serde_json::Value> = curves
@@ -272,35 +388,65 @@ fn cmd_solve(args: &SolveArgs, json: bool) -> Result<(), String> {
     let curve = curve_by_name(&args.curve)?;
     let method: Method = args.method.parse()?;
     let mut rng = StdRng::seed_from_u64(args.seed ^ 0xC0FFEE);
-    let lo = match &args.interval_lo {
-        Some(s) => parse_uint(s)?,
-        None => BigUint::from(0u32),
-    };
-    let width = match (&args.interval_bits, &args.interval_width) {
-        (Some(b), _) => Some(BigUint::from(1u32) << *b),
-        (None, Some(w)) => Some(parse_uint(w)?),
-        (None, None) => None,
-    };
+    let (lo, width) = solve_bounds(args, curve.order(), method)?;
     // Target: planted or supplied.
-    let (target, planted): (nist::AnyPoint, Option<BigUint>) = if let Some(pt) = &args.point {
+    let (target, planted, target_artifact): (
+        nist::AnyPoint,
+        Option<BigUint>,
+        Option<serde_json::Value>,
+    ) = if args.challenge {
+        if let Some((_, target)) = prime_challenge(&curve.name) {
+            (nist::AnyPoint::Prime(target), None, None)
+        } else if curve.name.eq_ignore_ascii_case("ECCp-131") {
+            let (x, y) = crypto_lib::ecc::curve::CurveParams::certicom_eccp131_target();
+            let target = curve.parse_point(&x.to_str_radix(16), &y.to_str_radix(16))?;
+            (target, None, None)
+        } else if let Some((_, target)) = BinaryCurve::certicom_challenge(&curve.name) {
+            (nist::AnyPoint::Binary(target), None, None)
+        } else {
+            return Err(format!(
+                "{} is not a supported Certicom challenge",
+                curve.name
+            ));
+        }
+    } else if let Some(path) = &args.point_file {
+        let (point, receipt) = load_target_artifact(&curve, path)?;
+        (point, None, Some(receipt))
+    } else if let Some(pt) = &args.point {
         let (x, y) = pt
             .split_once(',')
             .ok_or_else(|| "--point wants X,Y in hex".to_string())?;
-        (curve.parse_point(x, y)?, None)
+        (curve.parse_point(x, y)?, None, None)
     } else {
         let k = match (&args.secret, args.random_bits) {
-            (Some(s), _) => parse_uint(s)? % curve.order(),
+            (Some(s), _) => {
+                let k = parse_uint(s)?;
+                if &k >= curve.order() {
+                    return Err("planted scalar must be below the subgroup order".into());
+                }
+                if width.as_ref().is_some_and(|w| k < lo || k >= &lo + w) {
+                    return Err("planted scalar is outside the declared interval".into());
+                }
+                k
+            }
             (None, Some(bits)) => {
-                let w = width.clone().unwrap_or_else(|| BigUint::from(1u32) << bits);
-                // Random k in [lo, lo + min(w, 2^bits)) ∩ [0, n).
-                let span = w.min(BigUint::from(1u32) << bits);
-                (&lo + rng.gen_biguint_below(&span)) % curve.order()
+                // Keep the sampled scalar in both the declared interval and
+                // the subgroup's canonical [0, n) range, without wraparound.
+                let available = curve.order() - &lo;
+                let mut span = random_span(bits, &available)?;
+                if let Some(w) = &width {
+                    span = span.min(w.clone());
+                }
+                &lo + rng.gen_biguint_below(&span)
             }
             (None, None) => {
-                return Err("give --secret K, --random-bits B, or --point X,Y".into());
+                return Err(
+                    "give --secret K, --random-bits B, --point X,Y, --point-file PATH, or --challenge"
+                        .into(),
+                );
             }
         };
-        (curve.plant(&k), Some(k))
+        (curve.plant(&k), Some(k), None)
     };
     let interval = width.map(|w| (lo.clone(), w));
     let opts = SolveOptions {
@@ -324,7 +470,9 @@ fn cmd_solve(args: &SolveArgs, json: bool) -> Result<(), String> {
             "{}",
             serde_json::to_string_pretty(&json!({
                 "operation": "solve",
+                "curve": curve.describe(),
                 "target": {"x": tx, "y": ty},
+                "target_artifact": target_artifact,
                 "planted_scalar": planted.as_ref().map(|k| k.to_string()),
                 "planted_recovered": planted_ok,
                 "report": report,
@@ -334,6 +482,13 @@ fn cmd_solve(args: &SolveArgs, json: bool) -> Result<(), String> {
     } else {
         println!("curve:     {} ({})", report.curve, report.family.tag());
         println!("target:    ({tx}, {ty})");
+        if let Some(artifact) = &target_artifact {
+            println!(
+                "artifact:  {} (SHA-256 {})",
+                artifact["source"].as_str().unwrap_or("?"),
+                artifact["sha256"].as_str().unwrap_or("?")
+            );
+        }
         println!("method:    {}", report.method);
         match &report.scalar {
             Some(k) => println!(
@@ -490,5 +645,101 @@ fn main() -> ExitCode {
             }
             ExitCode::FAILURE
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn args() -> SolveArgs {
+        SolveArgs {
+            curve: "P-256".into(),
+            secret: None,
+            random_bits: None,
+            point: None,
+            point_file: None,
+            challenge: false,
+            interval_lo: None,
+            interval_bits: None,
+            interval_width: None,
+            method: "auto".into(),
+            threads: 1,
+            seed: 1,
+            max_iterations: None,
+            dp_bits: None,
+            no_fold: false,
+            force: false,
+        }
+    }
+
+    #[test]
+    fn random_bits_infer_large_curve_interval_and_reject_invalid_bounds() {
+        let order = curve_by_name("P-256").unwrap().order().clone();
+        let mut input = args();
+        input.random_bits = Some(8);
+        assert_eq!(
+            solve_bounds(&input, &order, Method::Auto).unwrap().1,
+            Some(BigUint::from(256u32))
+        );
+        let small_order = (BigUint::from(1u32) << 23) - BigUint::from(1u32);
+        assert!(solve_bounds(&input, &small_order, Method::Auto)
+            .unwrap()
+            .1
+            .is_none());
+        input.interval_width = Some("0".into());
+        assert!(solve_bounds(&input, &order, Method::Auto)
+            .unwrap_err()
+            .contains("positive"));
+        input.interval_width = None;
+        input.interval_lo = Some((&order - BigUint::from(1u32)).to_string());
+        input.interval_bits = Some(1);
+        assert!(solve_bounds(&input, &order, Method::Auto)
+            .unwrap_err()
+            .contains("within"));
+        input.interval_lo = None;
+        input.interval_bits = None;
+        input.random_bits = Some(0);
+        assert!(solve_bounds(&input, &order, Method::Auto)
+            .unwrap_err()
+            .contains("positive"));
+    }
+
+    #[test]
+    fn target_artifact_requires_exact_curve_and_valid_point() {
+        let curve = curve_by_name("P-256").unwrap();
+        let fixture = Path::new(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/docs/ic/fixtures/ecdlp_nist_p256_target_20261022.json"
+        ));
+        let (point, receipt) = load_target_artifact(&curve, fixture).unwrap();
+        assert_eq!(point, curve.plant(&BigUint::from(38u32)));
+        assert_eq!(
+            receipt["sha256"],
+            hex::encode(crypto_lib::hash::sha256(&std::fs::read(fixture).unwrap()))
+        );
+        let path = std::env::temp_dir().join(format!(
+            "ecdlp-target-{}-{}.json",
+            std::process::id(),
+            line!()
+        ));
+        let mut value: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(fixture).unwrap()).unwrap();
+        value["curve"]["field_and_equation"]["p_hex"] = json!("dead");
+        std::fs::write(&path, serde_json::to_vec(&value).unwrap()).unwrap();
+        assert!(load_target_artifact(&curve, &path)
+            .err()
+            .unwrap()
+            .contains("curve identity"));
+        value["curve"] = curve.describe();
+        value["target"]["y"] = json!("0");
+        std::fs::write(&path, serde_json::to_vec(&value).unwrap()).unwrap();
+        assert!(load_target_artifact(&curve, &path).is_err());
+        value["target"]["y"] = json!(curve.point_hex(&point).unwrap().1);
+        value.as_object_mut().unwrap().remove("schema_version");
+        value["operation"] = json!("solve");
+        std::fs::write(&path, serde_json::to_vec(&value).unwrap()).unwrap();
+        assert_eq!(load_target_artifact(&curve, &path).unwrap().0, point);
+        std::fs::remove_file(path).unwrap();
     }
 }

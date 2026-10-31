@@ -1,0 +1,74 @@
+{
+  "schema": "factor_base_sweep/v1",
+  "seed": 2026101801,
+  "train": 8,
+  "holdout": 16,
+  "max_degree": 8,
+  "candidate_seconds": 30,
+  "max_abscissae": 64,
+  "max_matrix_cells": 2000000,
+  "memory_mib": 2048,
+  "threads": 1,
+  "candidates": [
+    {
+      "label": "primary-coordinate-d6",
+      "curve": {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 31
+      },
+      "factor_base": "binary-subspace:dimension=6,basis=0x1;0x2;0x4;0x8;0x10;0x20",
+      "shape": null,
+      "dimension": 6,
+      "seed": 17
+    },
+    {
+      "label": "primary-coordinate-reversed-d6",
+      "curve": {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 31
+      },
+      "factor_base": "binary-subspace:dimension=6,basis=0x20;0x10;0x8;0x4;0x2;0x1",
+      "shape": null,
+      "dimension": 6,
+      "seed": 17
+    },
+    {
+      "label": "primary-coordinate-triangular-d6",
+      "curve": {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 31
+      },
+      "factor_base": "binary-subspace:dimension=6,basis=0x1;0x3;0x7;0xf;0x1f;0x3f",
+      "shape": null,
+      "dimension": 6,
+      "seed": 17
+    },
+    {
+      "label": "primary-random-d6-seed17",
+      "curve": {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 31
+      },
+      "factor_base": null,
+      "shape": "random",
+      "dimension": 6,
+      "seed": 17
+    },
+    {
+      "label": "primary-tracezero-frobenius-d6-seed17",
+      "curve": {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 31
+      },
+      "factor_base": null,
+      "shape": "tracezero-frobenius",
+      "dimension": 6,
+      "seed": 17
+    }
+  ]
+}

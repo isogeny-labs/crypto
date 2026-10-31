@@ -1,0 +1,76 @@
+{
+  "branch_head": "c4f8154e20323860145c46b5395271b30ee0a70d",
+  "first_attempts": [
+    {
+      "gzip_sha256": "2ca470cf2b59ce82b53c2ef1a43ef7f4904bc6af23d9574b2257f1be44690fa4",
+      "status": "SPARSE_COMPILE_MISSING_FIXTURES",
+      "store_name": "evidence/n83-root4-frontier_20261019/cargo_lib_sparse_failure.log.gz"
+    },
+    {
+      "gzip_sha256": "5a0c56c433ce28310085fb5020657c2fd78c88dad1f9829ce516167a33dfc6b9",
+      "status": "SEVEN_FAILURES_SIX_MISSING_RUNTIME_FIXTURES_ONE_Z3",
+      "store_name": "evidence/n83-root4-frontier_20261019/cargo_lib_pr.log.gz"
+    },
+    {
+      "gzip_sha256": "c4d7704cae8e2312852b1457266cd6ee28e34f898b72917e2b082a69d5fc4b9a",
+      "status": "ONE_INTERMITTENT_UNRELATED_SQISIGN_RATE_TEST",
+      "store_name": "evidence/n83-root4-frontier_20261019/cargo_lib_pr_rerun.log.gz"
+    }
+  ],
+  "independent_stored_replay_sha256": "3c3a1d05ace2a8958e95a0e58230670c3eb8a1d4b1adde9dd408f42753d8cd88",
+  "library": {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "--offline",
+      "--lib",
+      "--",
+      "--test-threads=2"
+    ],
+    "exit_code": 0,
+    "failed": 0,
+    "gzip_sha256": "e289da386fd8f8f604a8d67318f912ad73b77d10a5d0999873d1a6476d561831",
+    "ignored": 117,
+    "passed": 4162,
+    "raw_log_sha256": "1c0831c7f2e0b8f5017c51b802dd83292e7f5e819e144e2c7e84df29fbc738ad",
+    "store_name": "evidence/n83-root4-frontier_20261019/cargo_lib_pr_final.log.gz"
+  },
+  "other": {
+    "frontier_selector": {
+      "command": [
+        "python3",
+        "research/n83_root4_frontier_current_20261018/test_select.py"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"cases\": 9, \"exact_minimum_p\": 3.0517578125e-05, \"status\": \"PASS_ROOT4_FRONTIER_SELECTOR\"}\n"
+    },
+    "provider_jobs": {
+      "command": [
+        "python3",
+        "research/n83_root4_frontier_current_20261018/test_provider_jobs.py"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"cases\": 2, \"status\": \"PASS_ROOT4_FRONTIER_PROVIDER_JOBS\"}\n"
+    },
+    "root_example": {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--example",
+        "koblitz_orbit_dlp_fast"
+      ],
+      "exit_code": 0,
+      "stderr": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running unittests examples/koblitz_orbit_dlp_fast.rs (/Volumes/SSD990-2/tmp/n83_id30_current_build/release/examples/koblitz_orbit_dlp_fast-04459ed62ccd0f60)\n",
+      "stdout": "\nrunning 21 tests\ntest wide::root_bloom_table_tests::indexed_five_byte_id30_preserves_large_ids_and_exact_keys ... ok\ntest wide::root_bloom_table_tests::indexed_four_byte_slots_preserve_exact_first_witness ... ok\ntest wide::root_bloom_table_tests::indexed_five_byte_slots_preserve_exact_first_witness ... ok\ntest root_bloom_table_tests::every_bloom_profile_preserves_all_inserted_keys ... ok\ntest sparse_canonical_tests::sparse_key_and_shift_match_every_word_through_degree_13 ... ok\ntest wide::root_bloom_table_tests::denser_packed_slots_preserve_first_witness_and_exact_lookup ... ok\ntest wide::state83_tests::packed_state_preserves_both_83_bit_roots_and_order ... ok\ntest wide::state83_tests::root21_roundtrips_boundary_pairs ... ok\ntest wide::state83_tests::state26_preserves_boundary_labels_roots_and_order ... ok\ntest wide::wide_json_tests::wide_point_coordinates_round_trip_as_decimal_strings ... ok\ntest wide::wide_json_tests::wide_point_list_preserves_infinity_entries ... ok\ntest wide::wide_json_tests::wide_point_parser_accepts_small_legacy_numeric_words ... ok\ntest wide::sparse_canonical_tests::sparse_key_and_shift_match_every_word_through_degree_13 ... ok\ntest wide::root_bloom_table_tests::packed_slots_preserve_first_witness_and_exact_lookup ... ok\ntest root_bloom_table_tests::canonical_u64_lookup_matches_unscreened_table ... ok\ntest sparse_canonical_tests::sparse_key_and_shift_match_sampled_u64_words ... ok\ntest wide::root_bloom_table_tests::canonical_u128_lookup_matches_unscreened_table ... ok\ntest wide::root_bloom_table_tests::indexed_five_byte_slots_match_real_n83_s3_roots ... ok\ntest wide::sparse_canonical_tests::sparse_key_and_shift_match_sampled_wide_words ... ok\ntest wide::wide_json_tests::batched_roots_match_scalar_roots_in_order ... ok\ntest wide::root_bloom_table_tests::symmetric_s3_states_preserve_exact_root_keys_and_first_witness ... ok\n\ntest result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s\n\n"
+    }
+  },
+  "recorded_utc": "2026-10-19T09:11:30.426730+00:00",
+  "schema": "n83.highk-verification/v1",
+  "source_sha256": "4a94e4e570f0cc4e39ba5c0846e411a6c43820c28119f7b9802e549023596507",
+  "status": "PASS_REQUIRED_BRANCH_GATES"
+}

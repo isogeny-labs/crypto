@@ -1,5 +1,8 @@
 # Tall isogeny volcanoes: descent algorithm, dataset and per-layer ECDLP measurements
 
+> **Status (2026-10-18).** The code here is Python (PARI) and is **legacy evidence, not to be extended**: AGENTS.md forbids Python for this work. The native tools are `crypto volcano` (`docs/volcano/README.md`) and `ecbench`; the ECDLP measurements below are superseded by `research/volcano_prime_layers_20261018/` and `research/volcano_koblitz_layers_20261018/`. The interval claim in `RESULT.md` is corrected in its addendum.
+
+
 **Date.** 2026-10-11. **Scope.** Prime-field ordinary curves, toy sizes (fields of 40 to
 68 bits). Binary fields: one ECC2K-130 step only (see `ecc2k130_level1.py`). Nothing here
 concerns a deployed curve, and no ECDLP speedup is claimed. Results are in

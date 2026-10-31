@@ -1,4 +1,4 @@
-//! The two `dp/` key shapes and how each names its upload time.
+//! The `dp/` key shapes and how each names its upload time.
 
 use regex::Regex;
 use std::sync::OnceLock;
@@ -7,6 +7,8 @@ use std::sync::OnceLock;
 pub static LEGACY_KEY_RE: OnceLock<Regex> = OnceLock::new();
 /// `dp/slot-00140/<32-hex>-<offset>-<64-hex>.bin` — content hash, no clock.
 pub static ORBIT_KEY_RE: OnceLock<Regex> = OnceLock::new();
+/// `dp/slot-00002/<64-hex sha256>-<start>-<end>.bin` — digest and byte span.
+pub static HASH_SPAN_KEY_RE: OnceLock<Regex> = OnceLock::new();
 static SLOT_OF_KEY_RE: OnceLock<Regex> = OnceLock::new();
 
 fn legacy() -> &'static Regex {
@@ -19,6 +21,12 @@ fn orbit() -> &'static Regex {
     })
 }
 
+fn hash_span() -> &'static Regex {
+    HASH_SPAN_KEY_RE.get_or_init(|| {
+        Regex::new(r"^dp/(slot-\d+)/([0-9a-f]{64})-(\d{16})-(\d{16})\.bin$").unwrap()
+    })
+}
+
 fn slot_re() -> &'static Regex {
     SLOT_OF_KEY_RE.get_or_init(|| Regex::new(r"^dp/slot-(\d+)/").unwrap())
 }
@@ -27,6 +35,7 @@ fn slot_re() -> &'static Regex {
 pub enum KeyKind {
     Legacy,
     Orbit,
+    HashSpan,
     Envelope,
     Unrecognised,
 }
@@ -67,6 +76,14 @@ pub fn classify_key(key: &str) -> Classified<'_> {
             offset: c.get(3).and_then(|m| m.as_str().parse().ok()),
         };
     }
+    if let Some(c) = hash_span().captures(key) {
+        return Classified {
+            kind: KeyKind::HashSpan,
+            key,
+            stream: None,
+            offset: c.get(3).and_then(|m| m.as_str().parse().ok()),
+        };
+    }
     Classified {
         kind: KeyKind::Unrecognised,
         key,
@@ -83,14 +100,14 @@ pub fn worker_id(key: &str) -> String {
 
 /// Upload time of one dp object, or `None` if the key is not a point object.
 ///
-/// Legacy names carry the uploader's clock; orbit names need `last_modified`
+/// Legacy names carry the uploader's clock; content-addressed names need `last_modified`
 /// (Unix seconds). Reading only the first shape is how five hours of a
 /// 133-worker fleet went into `dp/` without a row reaching the store.
 pub fn found_at(key: &str, last_modified: Option<i64>) -> Option<i64> {
     if let Some(c) = legacy().captures(key) {
         return c.get(2)?.as_str().parse().ok();
     }
-    if orbit().is_match(key) {
+    if orbit().is_match(key) || hash_span().is_match(key) {
         return last_modified;
     }
     None
@@ -110,6 +127,8 @@ mod tests {
     const LEGACY: &str = "dp/slot-00002/1789311001-0000000000000000.bin";
     const ORBIT: &str =
         "dp/slot-00140/a8b4133d5c5f414ebd1337f15603588d-0000000000000000-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.bin";
+    const HASH_SPAN: &str =
+        "dp/slot-00002/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-0000000000000000-0000000000000064.bin";
 
     #[test]
     fn legacy_key_takes_found_at_from_the_name() {
@@ -129,6 +148,16 @@ mod tests {
         assert_eq!(c.kind, KeyKind::Orbit);
         assert_eq!(c.stream, Some("a8b4133d5c5f414ebd1337f15603588d"));
         assert_eq!(c.offset, Some(0));
+    }
+
+    #[test]
+    fn hash_span_is_a_point_object_with_storage_time() {
+        assert_eq!(
+            found_at(HASH_SPAN, Some(1_700_000_000)),
+            Some(1_700_000_000)
+        );
+        assert_eq!(classify_key(HASH_SPAN).kind, KeyKind::HashSpan);
+        assert_eq!(classify_key(HASH_SPAN).offset, Some(0));
     }
 
     #[test]

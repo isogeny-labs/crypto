@@ -1,0 +1,434 @@
+== YIELD (exact ordered decompositions per target; PROTOCOL section 3) ==
+
+-- H-Y1 rows: z = (mean - pred)/(s/sqrt T), empirical variance --
+ k curve arm                     FBpts      T    mean N       pred         sd       z tested
+11 A1   std                      2046    150    0.9600     0.9961     4.7188   -0.09   true
+11 A1   tw_a(u=2)                4094    150   16.0000    15.9688    25.2812    0.02   true
+11 A1   tw_b(u=3)                4094    150   16.3200    15.9688    26.4256    0.16   true
+11 A2   std                      2046    150    0.8000     0.9961     4.3226   -0.56   true
+11 A2   tw_a(u=4)                4094    150   17.0400    15.9688    28.2631    0.46   true
+11 A2   tw_b(u=6)                4094    150   17.0400    15.9688    28.2631    0.46   true
+11 B1   std                      2046    150    1.2800          -     5.4108      -  false
+11 B1   tw_a(u generic)          4094    150   18.7200          -    30.6960      -  false
+11 B1   tw_b(u generic)          4094    150   17.7600          -    26.8767      -  false
+ 5 A0   std                        62  20000   17.0784    13.9398   954.5408    0.47   true
+ 5 A0   tw_a(u=1)                  62  20000   17.0784    13.9398   954.5408    0.47   true
+ 5 A0   tw_b(u=6)                  62  20000   14.1494    14.0921   108.0328    0.07   true
+ 5 A1   std                        30  20000    0.7579     0.7686     8.3946   -0.18   true
+ 5 A1   tw_a(u=2)                  62  20000   14.1852    14.0552    37.0272    0.50   true
+ 5 A1   tw_b(u=3)                  62  20000   14.1699    14.0552    38.2087    0.42   true
+ 5 A2   std                        30  20000    0.7235     0.7696     5.4586   -1.20   true
+ 5 A2   tw_a(u=4)                  62  20000   14.2011    14.0746    37.3792    0.48   true
+ 5 A2   tw_b(u=6)                  62  20000   14.2011    14.0746    37.3792    0.48   true
+ 5 NEG  std                        32  20000    0.9246     0.9990     8.7158   -1.21   true
+ 5 B1   std                        30  20000    0.7236     0.7709     7.3891   -0.91   true
+ 5 B1   tw_a(u generic)            62  20000   14.0769    14.0985    38.3314   -0.08   true
+ 5 B1   tw_b(u generic)            62  20000   14.2180    14.0985    36.8818    0.46   true
+ 5 B2   std                        30  20000    0.6317     0.7690     5.3948   -3.60   true
+ 5 B2   tw_a(u generic)            62  20000   13.6431    14.0622    34.8763   -1.70   true
+ 5 B2   tw_b(u generic)            62  20000   14.4048    14.0622    38.9615    1.24   true
+ 5 B3   std                        30  20000    0.8303     0.7703     8.0989    1.05   true
+ 5 B3   tw_a(u generic)            62  20000   14.3858    14.0873    38.6462    1.09   true
+ 5 B3   tw_b(u generic)            62  20000   13.8512    14.0873    37.2258   -0.90   true
+ 7 A0   std                       254   8000    0.0000    15.4719     0.0000     NaN  false
+ 7 A0   tw_a(u=1)                 254   8000    0.0000    15.4719     0.0000     NaN  false
+ 7 A0   tw_b(u=6)                 254   8000   13.2995    15.5034    96.3057   -2.05   true
+ 7 A1   std                       126   8000    0.9225     0.9388     4.7810   -0.31   true
+ 7 A1   tw_a(u=2)                 254   8000   15.5687    15.5059    41.8899    0.13   true
+ 7 A1   tw_b(u=3)                 254   8000   14.7590    15.5059    23.7957   -2.81   true
+ 7 A2   std                       126   8000    0.9818     0.9389     4.9055    0.78   true
+ 7 A2   tw_a(u=4)                 254   8000   16.2985    15.5070    54.3027    1.30   true
+ 7 A2   tw_b(u=6)                 254   8000   16.2985    15.5070    54.3027    1.30   true
+ 7 NEG  std                       128   8000    0.8940     0.9998     4.7581   -1.99   true
+ 7 B1   std                       126   8000    0.8990     0.9389     4.6676   -0.76   true
+ 7 B1   tw_a(u generic)           254   8000   15.6418    15.5067    41.7750    0.29   true
+ 7 B1   tw_b(u generic)           254   8000   15.4477    15.5067    24.4303   -0.22   true
+ 7 B2   std                       126   8000    1.0670     0.9387    17.2535    0.67   true
+ 7 B2   tw_a(u generic)           254   8000   15.0087    15.5041    23.9865   -1.85   true
+ 7 B2   tw_b(u generic)           254   8000   15.6075    15.5041    42.1763    0.22   true
+ 7 B3   std                       126   8000    1.1270     0.9388    17.3184    0.97   true
+ 7 B3   tw_a(u generic)           254   8000   15.5105    15.5051    24.3402    0.02   true
+ 7 B3   tw_b(u generic)           254   8000   15.0038    15.5051    24.1324   -1.86   true
+ 9 A0   std                      1022   1500    0.0000    15.8676     0.0000     NaN  false
+ 9 A0   tw_a(u=1)                1022   1500    0.0000    15.8676     0.0000     NaN  false
+ 9 A0   tw_b(u=6)                1022   1500    7.7120    15.8754    61.1273   -5.17   true
+ 9 A1   std                       510   1500    0.7920     0.9845     4.3664   -1.71   true
+ 9 A1   tw_a(u=2)                1022   1500   16.4560    15.8754    25.5963    0.88   true
+ 9 A1   tw_b(u=3)                1022   1500   15.6920    15.8754    25.1650   -0.28   true
+ 9 A2   std                       510   1500    1.1520     0.9845     5.4056    1.20   true
+ 9 A2   tw_a(u=4)                1022   1500   16.7680    15.8753    24.8286    1.39   true
+ 9 A2   tw_b(u=6)                1022   1500   16.7680    15.8753    24.8286    1.39   true
+ 9 NEG  std                       512   1500    0.8800     1.0000     4.7202   -0.98   true
+ 9 B1   std                       510   1500    1.0080          -     5.0304      -  false
+ 9 B1   tw_a(u generic)          1022   1500   15.8560          -    25.5944      -  false
+ 9 B1   tw_b(u generic)          1022   1500   15.4560          -    24.6313      -  false
+ 9 B2   std                       510   1500    1.0880          -     5.0328      -  false
+ 9 B2   tw_a(u generic)          1022   1500   17.0480          -    26.9339      -  false
+ 9 B2   tw_b(u generic)          1022   1500   16.4000          -    24.8579      -  false
+ 9 B3   std                       510   1500    0.9520          -     4.8371      -  false
+ 9 B3   tw_a(u generic)          1022   1500   15.3840          -    24.4750      -  false
+ 9 B3   tw_b(u generic)          1022   1500   15.4560          -    24.9606      -  false
+
+H-Y1: tested rows 50, |z|<=3 on 48, |z|>5 on 1; z mean -0.240 sd 1.352  => FAIL
+
+-- H-Y2/H-Y3 yield ratio tw/std on the same targets (95 % paired bootstrap, 2000) --
+ k curve arm                       R_obs    CI lo    CI hi     R_pred R_pred_src  covers
+ 5 A0   tw_a(u=1)                 1.000    1.000    1.000      1.000     exact    true
+ 5 A0   tw_b(u=6)                 0.828    0.467    2.281      1.011     exact    true
+ 5 A1   tw_a(u=2)                18.718   16.229   21.993     18.287     exact    true
+ 5 A1   tw_b(u=3)                18.697   16.174   22.042     18.287     exact    true
+ 5 A2   tw_a(u=4)                19.628   17.465   21.871     18.287     exact    true
+ 5 A2   tw_b(u=6)                19.628   17.566   21.903     18.287     exact    true
+ 5 B1   tw_a(u generic)          19.454   16.709   22.381     18.287     exact    true
+ 5 B1   tw_b(u generic)          19.649   16.993   22.855     18.287     exact    true
+ 5 B2   tw_a(u generic)          21.597   19.090   24.352     18.287     exact   false
+ 5 B2   tw_b(u generic)          22.803   20.221   25.827     18.287     exact   false
+ 5 B3   tw_a(u generic)          17.327   15.077   19.870     18.287     exact    true
+ 5 B3   tw_b(u generic)          16.683   14.629   19.262     18.287     exact    true
+ 7 A0   tw_a(u=1)                   NaN      NaN      NaN      1.000     exact   false
+ 7 A0   tw_b(u=6)                   inf      NaN      NaN      1.002     exact   false
+ 7 A1   tw_a(u=2)                16.877   15.026   19.185     16.516     exact    true
+ 7 A1   tw_b(u=3)                15.999   14.285   18.215     16.516     exact    true
+ 7 A2   tw_a(u=4)                16.601   14.664   18.960     16.516     exact    true
+ 7 A2   tw_b(u=6)                16.601   14.716   19.004     16.516     exact    true
+ 7 B1   tw_a(u generic)          17.399   15.430   19.750     16.516     exact    true
+ 7 B1   tw_b(u generic)          17.183   15.414   19.352     16.516     exact    true
+ 7 B2   tw_a(u generic)          14.066    9.922   18.715     16.516     exact    true
+ 7 B2   tw_b(u generic)          14.627   10.305   19.339     16.516     exact    true
+ 7 B3   tw_a(u generic)          13.763    9.938   18.064     16.516     exact    true
+ 7 B3   tw_b(u generic)          13.313    9.538   17.573     16.516     exact    true
+ 9 A0   tw_a(u=1)                   NaN      NaN      NaN      1.000     exact   false
+ 9 A0   tw_b(u=6)                   inf      NaN      NaN      1.000     exact   false
+ 9 A1   tw_a(u=2)                20.778   15.946   28.155     16.126     exact    true
+ 9 A1   tw_b(u=3)                19.813   15.468   26.973     16.126     exact    true
+ 9 A2   tw_a(u=4)                14.556   11.753   18.830     16.126     exact    true
+ 9 A2   tw_b(u=6)                14.556   11.529   19.062     16.126     exact    true
+ 9 B1   tw_a(u generic)          15.730   12.444   20.811     16.126       m^4    true
+ 9 B1   tw_b(u generic)          15.333   12.236   20.058     16.126       m^4    true
+ 9 B2   tw_a(u generic)          15.669   12.592   20.758     16.126       m^4    true
+ 9 B2   tw_b(u generic)          15.074   12.176   19.413     16.126       m^4    true
+ 9 B3   tw_a(u generic)          16.160   12.959   21.422     16.126       m^4    true
+ 9 B3   tw_b(u generic)          16.235   12.884   21.677     16.126       m^4    true
+11 A1   tw_a(u=2)                16.667    8.909   51.500     16.031     exact    true
+11 A1   tw_b(u=3)                17.000    9.300   52.000     16.031     exact    true
+11 A2   tw_a(u=4)                21.300   10.500   93.000     16.031     exact    true
+11 A2   tw_b(u=6)                21.300   10.450   95.000     16.031     exact    true
+11 B1   tw_a(u generic)          14.625    8.000   37.000     16.031       m^4    true
+11 B1   tw_b(u generic)          13.875    7.583   35.750     16.031       m^4    true
+H-Y2 (tau=1 curves A1 A2 B*): R_pred inside the interval in 34/36; pooled (sum of means) obs 17.3254 / pred 16.9227 = 1.0238  => PASS
+H-Y3 (A0, tau=0 control): R_pred inside the interval in 2/6; pooled (sum of means) obs 1.5294 / pred 1.0021 = 1.5262  => FAIL
+
+-- H-Y4 negative control NEG (Tr(a)=1) --
+k=5 std                    lifting abscissae 16 of 31, FB points 32, sum of counts over 20000 targets 18493
+k=5 tw_a(u=2)              lifting abscissae 0 of 31, FB points 0, sum of counts over 20000 targets 0
+k=5 tw_b(u=3)              lifting abscissae 0 of 31, FB points 0, sum of counts over 20000 targets 0
+k=7 std                    lifting abscissae 64 of 127, FB points 128, sum of counts over 8000 targets 7152
+k=7 tw_a(u=2)              lifting abscissae 0 of 127, FB points 0, sum of counts over 8000 targets 0
+k=7 tw_b(u=3)              lifting abscissae 0 of 127, FB points 0, sum of counts over 8000 targets 0
+k=9 std                    lifting abscissae 256 of 511, FB points 512, sum of counts over 1500 targets 1320
+k=9 tw_a(u=2)              lifting abscissae 0 of 511, FB points 0, sum of counts over 1500 targets 0
+k=9 tw_b(u=3)              lifting abscissae 0 of 511, FB points 0, sum of counts over 1500 targets 0
+H-Y4: PASS
+
+-- lifting abscissae on the line (of Q-1) --
+k=5 A0   Q-1=31 std:31  tw_a(u=1):31  tw_b(u=6):31
+k=5 A1   Q-1=31 std:15  tw_a(u=2):31  tw_b(u=3):31
+k=5 A2   Q-1=31 std:15  tw_a(u=4):31  tw_b(u=6):31
+k=5 B1   Q-1=31 std:15  tw_a(u generic):31  tw_b(u generic):31
+k=5 B2   Q-1=31 std:15  tw_a(u generic):31  tw_b(u generic):31
+k=5 B3   Q-1=31 std:15  tw_a(u generic):31  tw_b(u generic):31
+k=5 NEG  Q-1=31 std:16  tw_a(u=2):0  tw_b(u=3):0
+k=7 A0   Q-1=127 std:127  tw_a(u=1):127  tw_b(u=6):127
+k=7 A1   Q-1=127 std:63  tw_a(u=2):127  tw_b(u=3):127
+k=7 A2   Q-1=127 std:63  tw_a(u=4):127  tw_b(u=6):127
+k=7 B1   Q-1=127 std:63  tw_a(u generic):127  tw_b(u generic):127
+k=7 B2   Q-1=127 std:63  tw_a(u generic):127  tw_b(u generic):127
+k=7 B3   Q-1=127 std:63  tw_a(u generic):127  tw_b(u generic):127
+k=7 NEG  Q-1=127 std:64  tw_a(u=2):0  tw_b(u=3):0
+k=9 A0   Q-1=511 std:511  tw_a(u=1):511  tw_b(u=6):511
+k=9 A1   Q-1=511 std:255  tw_a(u=2):511  tw_b(u=3):511
+k=9 A2   Q-1=511 std:255  tw_a(u=4):511  tw_b(u=6):511
+k=9 B1   Q-1=511 std:255  tw_a(u generic):511  tw_b(u generic):511
+k=9 B2   Q-1=511 std:255  tw_a(u generic):511  tw_b(u generic):511
+k=9 B3   Q-1=511 std:255  tw_a(u generic):511  tw_b(u generic):511
+k=9 NEG  Q-1=511 std:256  tw_a(u=2):0  tw_b(u=3):0
+k=11 A1   Q-1=2047 std:1023  tw_a(u=2):2047  tw_b(u=3):2047
+k=11 A2   Q-1=2047 std:1023  tw_a(u=4):2047  tw_b(u=6):2047
+k=11 B1   Q-1=2047 std:1023  tw_a(u generic):2047  tw_b(u generic):2047
+
+-- H-Y5 A/A: tw_a / tw_b on the same targets --
+ k curve    R_obs    CI lo    CI hi     R_pred   has 1
+ 5 A0      1.207    0.394    2.208     0.9892    true
+ 5 A1      1.001    0.952    1.048     1.0000    true
+ 5 A2      1.000    1.000    1.000     1.0000    true
+ 5 B1      0.990    0.940    1.037     1.0000    true
+ 5 B2      0.947    0.902    0.993     1.0000   false
+ 5 B3      1.039    0.990    1.093     1.0000    true
+ 7 A0      0.000    0.000    0.000     0.9980   false
+ 7 A1      1.055    0.997    1.126     1.0000    true
+ 7 A2      1.000    1.000    1.000     1.0000    true
+ 7 B1      1.013    0.961    1.085     1.0000    true
+ 7 B2      0.962    0.900    1.016     1.0000    true
+ 7 B3      1.034    0.993    1.072     1.0000    true
+ 9 A0      0.000    0.000    0.000     0.9995   false
+ 9 A1      1.049    0.957    1.138     1.0000    true
+ 9 A2      1.000    1.000    1.000     1.0000    true
+ 9 B1      1.026    0.934    1.123     1.0000    true
+ 9 B2      1.040    0.954    1.130     1.0000    true
+ 9 B3      0.995    0.913    1.086     1.0000    true
+11 A1      0.980    0.745    1.283     1.0000    true
+11 A2      1.000    1.000    1.000     1.0000    true
+11 B1      1.054    0.808    1.400     1.0000    true
+H-Y5: interval contains 1 in 18/21; pooled ratio 0.9518 => PASS
+
+== VALIDATION (k=5; PROTOCOL section 5) ==
+cells 12: ordered relations enumerated 16678, equation violations 0, abscissae with x/u not in F_Q 0, pair-table vs enumeration mismatches 0
+
+== COST (counted F_Q multiplications of the D=26 weighted Macaulay elimination; PROTOCOL section 4) ==
+
+linecheck: 99 arm-cells sampled 64 abscissae each; twisted arms with a non-lifting sampled abscissa: 0
+
+-- matrix dimensions per degree step (target 0), cells A1 and B1 --
+ k cv  arm                      D   rows   cols   rank    HF  stdmax        mults
+11 A1  std                      8      4    105      4   101       8          646
+11 A1  std                     14    200    540    200   340      14        42776
+11 A1  std                     15    280    660    280   380      15        63506
+11 A1  std                     16    420    825    414   411      16       226346
+11 A1  std                     17    560    990    548   442      17       388921
+11 A1  std                     18    784   1210    748   462      18      1185351
+11 A1  std                     19   1008   1430    948   482      19      1979157
+11 A1  std                     20   1344   1716   1224   492      20      5280930
+11 A1  std                     21   1680   2002   1500   502      21      8574974
+11 A1  std                     22   2160   2366   1860   506      22     19589971
+11 A1  std                     23   2640   2730   2220   510      23     30600259
+11 A1  std                     24   3300   3185   2674   511      24     59743755
+11 A1  std                     25   3960   3640   3128   512      25     88886331
+11 A1  std                     26   4840   4200   3688   512      25    153693766
+11 A1  std                     27   5720   4760   4248   512      25    218501315
+11 A1  tw_a(u=2)                8      4    105      4   101       8          651
+11 A1  tw_a(u=2)               14    200    540    200   340      14        42323
+11 A1  tw_a(u=2)               15    280    660    280   380      15        62690
+11 A1  tw_a(u=2)               16    420    825    414   411      16       231426
+11 A1  tw_a(u=2)               17    560    990    548   442      17       400092
+11 A1  tw_a(u=2)               18    784   1210    748   462      18      1226412
+11 A1  tw_a(u=2)               19   1008   1430    948   482      19      2052550
+11 A1  tw_a(u=2)               20   1344   1716   1224   492      20      5180485
+11 A1  tw_a(u=2)               21   1680   2002   1500   502      21      8308000
+11 A1  tw_a(u=2)               22   2160   2366   1860   506      22     18592051
+11 A1  tw_a(u=2)               23   2640   2730   2220   510      23     28875470
+11 A1  tw_a(u=2)               24   3300   3185   2674   511      24     56250114
+11 A1  tw_a(u=2)               25   3960   3640   3128   512      25     83624071
+11 A1  tw_a(u=2)               26   4840   4200   3688   512      25    143947793
+11 A1  tw_a(u=2)               27   5720   4760   4248   512      25    204270026
+11 A1  tw_b(u=3)                8      4    105      4   101       8          522
+11 A1  tw_b(u=3)               14    200    540    200   340      14        34650
+11 A1  tw_b(u=3)               15    280    660    280   380      15        51558
+11 A1  tw_b(u=3)               16    420    825    414   411      16       199140
+11 A1  tw_b(u=3)               17    560    990    548   442      17       346529
+11 A1  tw_b(u=3)               18    784   1210    748   462      18      1074199
+11 A1  tw_b(u=3)               19   1008   1430    948   482      19      1801527
+11 A1  tw_b(u=3)               20   1344   1716   1224   492      20      4663658
+11 A1  tw_b(u=3)               21   1680   2002   1500   502      21      7523968
+11 A1  tw_b(u=3)               22   2160   2366   1860   506      22     17326609
+11 A1  tw_b(u=3)               23   2640   2730   2220   510      23     27126743
+11 A1  tw_b(u=3)               24   3300   3185   2674   511      24     54043988
+11 A1  tw_b(u=3)               25   3960   3640   3128   512      25     80957686
+11 A1  tw_b(u=3)               26   4840   4200   3688   512      25    141154655
+11 A1  tw_b(u=3)               27   5720   4760   4248   512      25    201346608
+11 B1  std                      8      4    105      4   101       8          653
+11 B1  std                     14    200    540    200   340      14        43140
+11 B1  std                     15    280    660    280   380      15        64024
+11 B1  std                     16    420    825    414   411      16       218126
+11 B1  std                     17    560    990    548   442      17       372265
+11 B1  std                     18    784   1210    748   462      18      1156568
+11 B1  std                     19   1008   1430    948   482      19      1940535
+11 B1  std                     20   1344   1716   1224   492      20      5281309
+11 B1  std                     21   1680   2002   1500   502      21      8621690
+11 B1  std                     22   2160   2366   1860   506      22     19755065
+11 B1  std                     23   2640   2730   2220   510      23     30888040
+11 B1  std                     24   3300   3185   2674   511      24     60228534
+11 B1  std                     25   3960   3640   3128   512      25     89567066
+11 B1  std                     26   4840   4200   3688   512      25    154715948
+11 B1  std                     27   5720   4760   4248   512      25    219861369
+11 B1  tw_a(u generic)          8      4    105      4   101       8          660
+11 B1  tw_a(u generic)         14    200    540    200   340      14        43592
+11 B1  tw_a(u generic)         15    280    660    280   380      15        64692
+11 B1  tw_a(u generic)         16    420    825    414   411      16       220193
+11 B1  tw_a(u generic)         17    560    990    548   442      17       375732
+11 B1  tw_a(u generic)         18    784   1210    748   462      18      1144099
+11 B1  tw_a(u generic)         19   1008   1430    948   482      19      1912379
+11 B1  tw_a(u generic)         20   1344   1716   1224   492      20      5177416
+11 B1  tw_a(u generic)         21   1680   2002   1500   502      21      8444655
+11 B1  tw_a(u generic)         22   2160   2366   1860   506      22     19502335
+11 B1  tw_a(u generic)         23   2640   2730   2220   510      23     30560910
+11 B1  tw_a(u generic)         24   3300   3185   2674   511      24     59973090
+11 B1  tw_a(u generic)         25   3960   3640   3128   512      25     89383560
+11 B1  tw_a(u generic)         26   4840   4200   3688   512      25    154917285
+11 B1  tw_a(u generic)         27   5720   4760   4248   512      25    220447752
+11 B1  tw_b(u generic)          8      4    105      4   101       8          660
+11 B1  tw_b(u generic)         14    200    540    200   340      14        43606
+11 B1  tw_b(u generic)         15    280    660    280   380      15        64716
+11 B1  tw_b(u generic)         16    420    825    414   411      16       220423
+11 B1  tw_b(u generic)         17    560    990    548   442      17       376165
+11 B1  tw_b(u generic)         18    784   1210    748   462      18      1145224
+11 B1  tw_b(u generic)         19   1008   1430    948   482      19      1913502
+11 B1  tw_b(u generic)         20   1344   1716   1224   492      20      5176833
+11 B1  tw_b(u generic)         21   1680   2002   1500   502      21      8441613
+11 B1  tw_b(u generic)         22   2160   2366   1860   506      22     19513325
+11 B1  tw_b(u generic)         23   2640   2730   2220   510      23     30588723
+11 B1  tw_b(u generic)         24   3300   3185   2674   511      24     60046146
+11 B1  tw_b(u generic)         25   3960   3640   3128   512      25     89502890
+11 B1  tw_b(u generic)         26   4840   4200   3688   512      25    155098689
+11 B1  tw_b(u generic)         27   5720   4760   4248   512      25    220691346
+ 5 A1  std                      8      4    105      4   101       8          392
+ 5 A1  std                     14    200    540    200   340      14        28323
+ 5 A1  std                     15    280    660    280   380      15        42618
+ 5 A1  std                     16    420    825    414   411      16       151499
+ 5 A1  std                     17    560    990    548   442      17       260360
+ 5 A1  std                     18    784   1210    748   462      18       829701
+ 5 A1  std                     19   1008   1430    948   482      19      1398640
+ 5 A1  std                     20   1344   1716   1224   492      20      3779109
+ 5 A1  std                     21   1680   2002   1500   502      21      6410544
+ 5 A1  std                     22   2160   2366   1860   506      22     15362789
+ 5 A1  std                     23   2640   2730   2220   510      23     26123671
+ 5 A1  std                     24   3300   3185   2674   511      24     52884691
+ 5 A1  std                     25   3960   3640   3128   512      25     83794291
+ 5 A1  std                     26   4840   4200   3688   512      25    146611031
+ 5 A1  std                     27   5720   4760   4248   512      25    216671199
+ 5 A1  tw_a(u=2)                8      4    105      4   101       8          541
+ 5 A1  tw_a(u=2)               14    200    540    200   340      14        33917
+ 5 A1  tw_a(u=2)               15    280    660    280   380      15        50060
+ 5 A1  tw_a(u=2)               16    420    825    414   411      16       168799
+ 5 A1  tw_a(u=2)               17    560    990    548   442      17       287538
+ 5 A1  tw_a(u=2)               18    784   1210    748   462      18       860510
+ 5 A1  tw_a(u=2)               19   1008   1430    948   482      19      1433482
+ 5 A1  tw_a(u=2)               20   1344   1716   1224   492      20      3771687
+ 5 A1  tw_a(u=2)               21   1680   2002   1500   502      21      6110940
+ 5 A1  tw_a(u=2)               22   2160   2366   1860   506      22     13794953
+ 5 A1  tw_a(u=2)               23   2640   2730   2220   510      23     21478329
+ 5 A1  tw_a(u=2)               24   3300   3185   2674   511      24     41051543
+ 5 A1  tw_a(u=2)               25   3960   3640   3128   512      25     60624404
+ 5 A1  tw_a(u=2)               26   4840   4200   3688   512      25    102309083
+ 5 A1  tw_a(u=2)               27   5720   4760   4248   512      25    143992440
+ 5 A1  tw_b(u=3)                8      4    105      4   101       8          415
+ 5 A1  tw_b(u=3)               14    200    540    200   340      14        27650
+ 5 A1  tw_b(u=3)               15    280    660    280   380      15        41306
+ 5 A1  tw_b(u=3)               16    420    825    414   411      16       151800
+ 5 A1  tw_b(u=3)               17    560    990    548   442      17       262294
+ 5 A1  tw_b(u=3)               18    784   1210    748   462      18       819761
+ 5 A1  tw_b(u=3)               19   1008   1430    948   482      19      1377228
+ 5 A1  tw_b(u=3)               20   1344   1716   1224   492      20      3666305
+ 5 A1  tw_b(u=3)               21   1680   2002   1500   502      21      5955318
+ 5 A1  tw_b(u=3)               22   2160   2366   1860   506      22     13421912
+ 5 A1  tw_b(u=3)               23   2640   2730   2220   510      23     20888426
+ 5 A1  tw_b(u=3)               24   3300   3185   2674   511      24     39937523
+ 5 A1  tw_b(u=3)               25   3960   3640   3128   512      25     58986288
+ 5 A1  tw_b(u=3)               26   4840   4200   3688   512      25     99704415
+ 5 A1  tw_b(u=3)               27   5720   4760   4248   512      25    140422066
+ 5 B1  std                      8      4    105      4   101       8          641
+ 5 B1  std                     14    200    540    200   340      14        40791
+ 5 B1  std                     15    280    660    280   380      15        60338
+ 5 B1  std                     16    420    825    414   411      16       197300
+ 5 B1  std                     17    560    990    548   442      17       334449
+ 5 B1  std                     18    784   1210    748   462      18       986691
+ 5 B1  std                     19   1008   1430    948   482      19      1639541
+ 5 B1  std                     20   1344   1716   1224   492      20      4229828
+ 5 B1  std                     21   1680   2002   1500   502      21      6820768
+ 5 B1  std                     22   2160   2366   1860   506      22     15114926
+ 5 B1  std                     23   2640   2730   2220   510      23     23411047
+ 5 B1  std                     24   3300   3185   2674   511      24     45086498
+ 5 B1  std                     25   3960   3640   3128   512      25     66751696
+ 5 B1  std                     26   4840   4200   3688   512      25    116751253
+ 5 B1  std                     27   5720   4760   4248   512      25    166747508
+ 5 B1  tw_a(u generic)          8      4    105      4   101       8          569
+ 5 B1  tw_a(u generic)         14    200    540    200   340      14        36667
+ 5 B1  tw_a(u generic)         15    280    660    280   380      15        54418
+ 5 B1  tw_a(u generic)         16    420    825    414   411      16       190307
+ 5 B1  tw_a(u generic)         17    560    990    548   442      17       326175
+ 5 B1  tw_a(u generic)         18    784   1210    748   462      18       971278
+ 5 B1  tw_a(u generic)         19   1008   1430    948   482      19      1617316
+ 5 B1  tw_a(u generic)         20   1344   1716   1224   492      20      4093835
+ 5 B1  tw_a(u generic)         21   1680   2002   1500   502      21      6570042
+ 5 B1  tw_a(u generic)         22   2160   2366   1860   506      22     14334899
+ 5 B1  tw_a(u generic)         23   2640   2730   2220   510      23     22099714
+ 5 B1  tw_a(u generic)         24   3300   3185   2674   511      24     44045872
+ 5 B1  tw_a(u generic)         25   3960   3640   3128   512      25     68780659
+ 5 B1  tw_a(u generic)         26   4840   4200   3688   512      25    127346067
+ 5 B1  tw_a(u generic)         27   5720   4760   4248   512      25    192337965
+ 5 B1  tw_b(u generic)          8      4    105      4   101       8          568
+ 5 B1  tw_b(u generic)         14    200    540    200   340      14        44611
+ 5 B1  tw_b(u generic)         15    280    660    280   380      15        67300
+ 5 B1  tw_b(u generic)         16    420    825    414   411      16       254126
+ 5 B1  tw_b(u generic)         17    560    990    548   442      17       482334
+ 5 B1  tw_b(u generic)         18    784   1210    748   462      18      1604674
+ 5 B1  tw_b(u generic)         19   1008   1430    948   482      19      2937160
+ 5 B1  tw_b(u generic)         20   1344   1716   1224   492      20      7933051
+ 5 B1  tw_b(u generic)         21   1680   2002   1500   502      21     13911252
+ 5 B1  tw_b(u generic)         22   2160   2366   1860   506      22     30489312
+ 5 B1  tw_b(u generic)         23   2640   2730   2220   510      23     49800635
+ 5 B1  tw_b(u generic)         24   3300   3185   2674   511      24     92869627
+ 5 B1  tw_b(u generic)         25   3960   3640   3128   512      25    142369613
+ 5 B1  tw_b(u generic)         26   4840   4200   3688   512      25    236502311
+ 5 B1  tw_b(u generic)         27   5720   4760   4248   512      25    342434742
+
+-- per-arm statistics over all solves --
+std  : solves 198, closed (std_max_deg<26) 197 (0.995), HF=512 198 , mean mults (closed) 1.5659e8, cv 0.169
+tw_a : solves 198, closed (std_max_deg<26) 193 (0.975), HF=512 198 , mean mults (closed) 1.5573e8, cv 0.195
+tw_b : solves 198, closed (std_max_deg<26) 193 (0.975), HF=512 198 , mean mults (closed) 1.4475e8, cv 0.100
+matrix dimension at D=26: rows 4840 cols 4200 for every solve: true; memory (dense u16) 40.7 MB
+
+H-C1: pairs (std,tw) 396; rank equal 396; HF equal 396 => PASS
+H-C3: closed fraction std 0.995, tw_a 0.975, tw_b 0.975 => PASS
+non-closed systems (11):
+   k=5 A2 t1 tw_a(u=4) (HF 512, stdmax 26)
+   k=5 B2 t0 tw_b(u generic) (HF 512, stdmax 26)
+   k=5 B2 t2 tw_a(u generic) (HF 512, stdmax 26)
+   k=5 B3 t2 tw_b(u generic) (HF 512, stdmax 26)
+   k=7 A2 t2 tw_a(u=4) (HF 512, stdmax 26)
+   k=7 A2 t4 tw_a(u=4) (HF 512, stdmax 26)
+   k=7 A2 t4 tw_b(u=6) (HF 512, stdmax 26)
+   k=7 A2 t5 std (HF 512, stdmax 26)
+   k=7 B2 t3 tw_b(u generic) (HF 512, stdmax 26)
+   k=7 B2 t4 tw_a(u generic) (HF 512, stdmax 26)
+   k=9 A2 t4 tw_b(u=6) (HF 512, stdmax 26)
+
+-- H-C2: rho = mults(tw)/mults(std) at D=26, same target; geometric mean, 95 % two-level bootstrap; tolerance [0.8, 1.25] --
+all pairs, both closed [PRIMARY]               n=384  geo-mean 0.9606  95% [0.9279, 0.9913]  sd(log) 0.162  => UNCHANGED
+all pairs (closed or not)                      n=396  geo-mean 0.9610  95% [0.9313, 0.9925]  sd(log) 0.165  => UNCHANGED
+family A, both closed                          n=173  geo-mean 0.9097  95% [0.8627, 0.9539]  sd(log) 0.176  => UNCHANGED
+family B, both closed                          n=211  geo-mean 1.0045  95% [0.9788, 1.0327]  sd(log) 0.134  => UNCHANGED
+A/A tw_a/tw_b, both closed [NOISE REFERENCE]   n=189  geo-mean 1.0596  95% [1.0043, 1.1266]  sd(log) 0.190  => UNCHANGED
+
+per k (both closed, std vs tw), and per k A/A:
+  k std/tw     n      geo       lo       hi   A/A        n      geo       lo       hi
+  5 A         35   0.8992   0.7682   1.0522   A         17   1.3349   1.0767   1.6707
+  5 B         33   1.0370   0.9036   1.1880   B         15   0.9125   0.7881   1.0937
+  5 all       68   0.9636   0.8578   1.0862   all       32   1.1169   0.9119   1.3837
+  7 A         31   0.8949   0.7770   1.0219   A         16   1.2564   1.0424   1.6038
+  7 B         34   0.9604   0.8918   1.0456   B         16   1.0044   0.9214   1.1365
+  7 all       65   0.9286   0.8501   1.0019   all       32   1.1234   0.9897   1.3370
+  9 A         35   0.8864   0.7699   0.9725   A         17   1.2230   1.0101   1.6949
+  9 B         36   1.0224   0.9885   1.0782   B         18   0.9935   0.9368   1.1060
+  9 all       71   0.9529   0.8599   1.0241   all       35   1.0990   0.9682   1.3237
+ 11 A         24   0.9299   0.9254   0.9348   A         12   1.0126   1.0069   1.0179
+ 11 B         36   1.0004   0.9860   1.0136   B         18   0.9995   0.9799   1.0186
+ 11 all       60   0.9716   0.9401   1.0024   all       30   1.0047   0.9905   1.0161
+ 13 A         24   0.9333   0.9283   0.9390   A         12   1.0141   1.0082   1.0194
+ 13 B         36   1.0069   1.0052   1.0099   B         18   1.0020   1.0000   1.0047
+ 13 all       60   0.9768   0.9461   1.0073   all       30   1.0068   1.0015   1.0130
+ 15 A         24   0.9357   0.9289   0.9425   A         12   1.0204   1.0136   1.0351
+ 15 B         36   1.0015   0.9858   1.0079   B         18   0.9886   0.9600   0.9999
+ 15 all       60   0.9747   0.9465   1.0040   all       30   1.0012   0.9776   1.0179
+
+rho (std->tw, both closed) quantiles: min 0.476  5% 0.661  25% 0.928  50% 1.000  75% 1.007  95% 1.193  max 2.026; fraction inside [0.8,1.25]: 0.870
+
+-- H-C4: mean counted mults (closed solves) by k and arm; setup mults in F_Q products --
+  k            std           tw_a           tw_b      setup
+  5       1.4925e8       1.5422e8       1.3269e8       3968
+  7       1.6331e8       1.6217e8       1.4087e8       3968
+  9       1.6464e8       1.6512e8       1.4781e8       3968
+ 11       1.5372e8       1.4982e8       1.4914e8       3968
+ 13       1.5368e8       1.5074e8       1.4975e8       3968
+ 15       1.5367e8       1.5001e8       1.4983e8       3968
+slope of ln(mean mults) per unit k (pooled arms): 0.0011
+mean inversions per solve: 3688 (negligible against mults)

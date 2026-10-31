@@ -1,0 +1,12 @@
+{
+  "job_name": "ecbench-real-20261019-1922",
+  "cpu": 2,
+  "memory": "4Gi",
+  "seconds": 1200,
+  "retries": 0,
+  "command": [
+    "/bin/bash",
+    "-c",
+    "set -euo pipefail\nmkdir -p \"$ISOLAB_OUTPUT_DIR\"\nfinish() {\n  run_exit=$?\n  trap - EXIT TERM INT\n  set +e\n  printf '{\"exit_code\":%s,\"job_name\":\"%s\",\"pod_uid\":\"%s\",\"node_name\":\"%s\"}\\n' \"$run_exit\" \"$ISOLAB_JOB_ID\" \"$POD_UID\" \"$NODE_NAME\" > \"$ISOLAB_OUTPUT_DIR/job-exit.json\"\n  (\n    set -e\n    cd \"$ISOLAB_OUTPUT_DIR\"\n    shopt -s globstar nullglob\n    for artifact in **/*; do\n      if [[ -f \"$artifact\" && \"$artifact\" != SHA256SUMS ]]; then sha256sum \"$artifact\"; fi\n    done\n  ) > \"$ISOLAB_OUTPUT_DIR/SHA256SUMS\"\n  hash_exit=$?\n  if [[ \"$hash_exit\" != 0 ]]; then exit 90; fi\n  if aws s3 cp \"$ISOLAB_OUTPUT_DIR/\" \"$ISOLAB_RESULTS_URI\" --recursive --only-show-errors; then\n    printf 'Artifacts saved: %s\\n' \"$ISOLAB_RESULTS_URI\"\n  else\n    exit 91\n  fi\n  exit \"$run_exit\"\n}\ntrap finish EXIT\ntrap 'exit 143' TERM\ntrap 'exit 130' INT\ncp /opt/isolab/build-info.json \"$ISOLAB_OUTPUT_DIR/build-info.json\"\ncp /opt/isolab/specs/smoke-prime.json \"$ISOLAB_OUTPUT_DIR/input-spec.json\"\nsha256sum /usr/local/bin/ecbench > \"$ISOLAB_OUTPUT_DIR/binary.sha256\"\naws sts get-caller-identity > \"$ISOLAB_OUTPUT_DIR/runner-identity.json\"\ncat /proc/self/status > \"$ISOLAB_OUTPUT_DIR/process-status.txt\"\necbench run --spec /opt/isolab/specs/smoke-prime.json --out \"$ISOLAB_OUTPUT_DIR/session\" --cpus inherit --allow-busy > \"$ISOLAB_OUTPUT_DIR/run-summary.json\" 2> \"$ISOLAB_OUTPUT_DIR/run.stderr\"\necbench verify --dir \"$ISOLAB_OUTPUT_DIR/session\" --replay-all --exit-code --out \"$ISOLAB_OUTPUT_DIR/audit.json\" > \"$ISOLAB_OUTPUT_DIR/audit.stdout\" 2> \"$ISOLAB_OUTPUT_DIR/audit.stderr\"\ncat \"$ISOLAB_OUTPUT_DIR/audit.stderr\"\n"
+  ]
+}

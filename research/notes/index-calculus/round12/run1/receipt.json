@@ -1,0 +1,322 @@
+{
+  "card_id": "CARD-HEIC-ROUND12-1",
+  "card_path": "research/notes/index-calculus/round12/CARD-HEIC-ROUND12-1.yaml",
+  "card_sha256": "1f59909392d2370817c74b60aa31773dd8da4a69a116e9ab4f8105c3389668b0",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r12/attempt1"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r12-mkdir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/isolated_bench.py",
+        "run",
+        "--wait",
+        "--cpus",
+        "3",
+        "--max-other-cpu",
+        "1.0",
+        "--out",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r12/attempt1/isolated_bench.jsonl",
+        "--label",
+        "R12",
+        "--",
+        "sh",
+        "-c",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r12/hyperelliptic_rho_branch_width > /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r12/attempt1/R12.txt 2>&1"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 531.052,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r12-rho",
+      "index": 2,
+      "outputs": {},
+      "seconds": 531.052,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "wc",
+        "-l",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r12/attempt1/R12.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r12-lines",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "7865095e48b31f13364f8961da4fa8fa54a2ba4b2d59071ff0d0fb25363752af",
+      "stdout_tail": [
+        "27 /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r12/attempt1/R12.txt"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sed",
+        "-n",
+        "1,20p",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r12/attempt1/R12.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r12-lines-1-20",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "f00ff69f8102d44133f6a30058097a95d1c1dd255e5f2edb48a00393fc5bb092",
+      "stdout_tail": [
+        "Round twelve. Plain DP rho, 8-bit vs full-width branch coefficients (S_walk = mean walk ops / sqrt(N), 40 seeds from 0xc0ffee).",
+        " g    p         N   jac 8b jac full   int 8b int full  full pre  ok",
+        " 2   41      1321    1.390    1.385    1.259    1.209       408   y",
+        " 2   61      1399    1.273    1.240    1.269    1.317       408   y",
+        " 2  101      4663    1.287    1.244    1.352    1.370       476   y",
+        " 2  151      7949    1.421    1.284    1.324    1.530       476   y",
+        " 2  211     11813    1.333    1.676    1.401    1.331       510   y",
+        " 2  251     61667    1.246    1.308    1.327    1.398       578   y",
+        " 3   23      6299    1.159    1.340    1.346    1.471       476   y",
+        " 3   31      7333    1.047    1.317    1.261    1.228       476   y",
+        " 3   41      6679    1.314    1.333    1.291    1.375       476   y",
+        " 3   61    124459    1.477    1.390    1.521    1.347       612   y",
+        " 3  101    364747    1.407    1.484    1.406    1.219       680   y",
+        " 3  151   1180351    1.706    1.457    1.514    1.331       748   y",
+        " 3  211   4620611    1.820    1.212    1.752    1.303       816   y",
+        " 4   17      5639    1.422    1.346    1.453    1.245       476   y",
+        " 4   23     30223    1.233    1.286    1.387    1.230       544   y",
+        " 4   31    239753    1.303    1.287    1.549    1.239       646   y",
+        " 4   41    333041    1.344    1.327    1.259    1.173       680   y",
+        " 4   61  16790591    2.100    1.481    2.171    1.505       884   y"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sed",
+        "-n",
+        "21,40p",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r12/attempt1/R12.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r12-lines-21-40",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "fd741f96883c87c44a738d3203198052376946f549e78366dc4285a9af9f3a45",
+      "stdout_tail": [
+        "",
+        "W1 (integer full width, N >= 1e5, 7 rows): median 1.303 (in [1.10, 1.40]), two largest [\"1.505\", \"1.303\"] (<= 1.55) -> HOLDS",
+        "W2 (Jacobian full width, N >= 1e5, 7 rows): median 1.390 (in [1.10, 1.40]), two largest [\"1.481\", \"1.212\"] (<= 1.55) -> HOLDS",
+        "W3 (control, N <= 6e4, 10 rows): |median full - median 8-bit| Jacobian S_walk = 0.025 -> HOLDS",
+        "W4 (every run verified): HOLDS",
+        "Largest row: Jacobian 8-bit / full-width S_walk = 1.418; full-width precompute 884 ops = 0.2157 sqrt(N).",
+        "Ideal S_walk: 1.2533."
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sed",
+        "-n",
+        "41,60p",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r12/attempt1/R12.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r12-lines-41-60",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sed",
+        "-n",
+        "61,80p",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r12/attempt1/R12.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r12-lines-61-80",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sed",
+        "-n",
+        "81,100p",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r12/attempt1/R12.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r12-lines-81-100",
+      "index": 8,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "tail",
+        "-n",
+        "1",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r12/attempt1/isolated_bench.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r12-record",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "43bde203b2cce6918c77598c164b163aa3a2d1d95a6f70581b5816b83116f77b",
+      "stdout_tail": [
+        "{\"host\": {\"cpu_model\": \"Intel(R) Xeon(R) Processor @ 2.80GHz\", \"kernel\": \"6.18.44-fc-v139\", \"logical_cpus\": 4, \"machine\": \"x86_64\", \"python\": \"3.11.17\"}, \"label\": \"R12\", \"left_on_reserved\": {\"kernel_threads\": 28, \"user_threads\": []}, \"mode\": \"run\", \"preflight\": {\"conditions\": {\"loadavg\": [1.27, 2.46, 2.21], \"psi_cpu\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.38, \"avg300\": 1.06, \"avg60\": 0.35, \"total\": 33079991.0}}, \"psi_memory\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}}, \"unix_time\": 1792362267.4738317}, \"settle\": {\"other_cpu_seconds\": 0.07, \"seconds\": 2.0, \"top\": {\"claude[125]\": 0.07}}}, \"reserved_cpus\": [3], \"run\": {\"after\": {\"loadavg\": [1.02, 1.37, 1.75], \"psi_cpu\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.0, \"avg300\": 0.14, \"avg60\": 0.0, \"total\": 33278209.0}}, \"psi_memory\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}}, \"unix_time\": 1792362796.4697924}, \"before\": {\"loadavg\": [1.27, 2.46, 2.21], \"psi_cpu\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.38, \"avg300\": 1.06, \"avg60\": 0.35, \"total\": 33079991.0}}, \"psi_memory\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}}, \"unix_time\": 1792362267.479644}, \"command\": [\"sh\", \"-c\", \"/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r12/hyperelliptic_rho_branch_width > /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r12/attempt1/R12.txt 2>&1\"], \"contended\": false, \"cpus\": [3], \"exit_status\": 0, \"involuntary_switches\": 931, \"major_faults\": 0, \"max_rss_kib\": 13428, \"minor_faults\": 3474, \"other_cpu_seconds\": 14.069999999999995, \"other_top\": {\"6[81]\": 0.05, \"claude[125]\": 13.03, \"environment-man[88]\": 0.51, \"kcompactd0[46]\": 0.03, \"kworker/3:2-events[86]\": 0.02, \"kworker/u16:0-kvfree_rcu_reclaim[12]\": 0.04, \"kworker/u16:3-kvfree_rcu_reclaim[6987]\": 0.03, \"process_api[1]\": 0.27}, \"system_seconds\": 1.216494, \"user_seconds\": 523.124828, \"voluntary_switches\": 4, \"wall_seconds\": 528.9898810039995}, \"schema\": \"isolated-bench/1\", \"threads_moved\": 53}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 9,
+  "commit": "be98f8e7e5c6b2d10f2ad2a0fe2e4635b962d278",
+  "dirty_after": [
+    "research/notes/index-calculus/round12/CARD-HEIC-ROUND12-1.yaml",
+    "research/notes/index-calculus/round12/run1/cmd1.stderr",
+    "research/notes/index-calculus/round12/run1/cmd1.stdout",
+    "research/notes/index-calculus/round12/run1/cmd2.stderr",
+    "research/notes/index-calculus/round12/run1/cmd2.stdout",
+    "research/notes/index-calculus/round12/run1/cmd3.stdout",
+    "research/notes/index-calculus/round12/run1/cmd4.stdout",
+    "research/notes/index-calculus/round12/run1/cmd5.stdout",
+    "research/notes/index-calculus/round12/run1/cmd6.stdout",
+    "research/notes/index-calculus/round12/run1/cmd7.stdout",
+    "research/notes/index-calculus/round12/run1/cmd8.stdout",
+    "research/notes/index-calculus/round12/run1/cmd9.stdout"
+  ],
+  "dirty_before": [
+    "research/notes/index-calculus/round12/CARD-HEIC-ROUND12-1.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

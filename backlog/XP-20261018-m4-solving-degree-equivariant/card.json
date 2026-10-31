@@ -1,0 +1,127 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261018-m4-solving-degree-equivariant",
+  "title": "m = 4 refutation degree at l = 4, 5, 6 and surplus 0: chained S3 and FGHR-symmetrised S5, with C3 Faugere-Svartz blocks",
+  "created": "2026-10-18",
+  "authors": ["backlog lane", "ic-experiment-designs session"],
+  "status": "blocked",
+  "status_note": "Design written 2026-10-18 (README.md, DESIGN.md, PROTOCOL.md DRAFT). The earlier blocker 'depends on equivariant F4 blocks not integrated into the solver' is corrected: the G2 Frobenius blocks cannot apply to these random-subspace cells (no sigma symmetry; at n = 131 no nontrivial sigma-stable V), and the cells are measurable today with the native closure and msolve. Stage S0 (arm A closure at (16,4), (20,5); msolve on the committed (13,4), (13,5) draws) needs only M0 (half a day). Arm B (FGHR S5) needs M1, the C3 blocks need M2, arm A at (24,6) needs M3 and a 512 GB host. The harness examples/m4_formulations.rs named in run and outputs does not exist yet. The protocol is not frozen.",
+  "blocked_on": [
+    "note:M0 msolve v0.6.5 not installed on the host; the 06 study parsed msolve logs with Python (run_f4.py), so a native reader examples/msolve_degree_log.rs is needed (DESIGN.md M0)",
+    "note:M1 the FGHR m = 4 system is not built: symmetrised_terms returns None for m >= 4 (src/cryptanalysis/koblitz_symmetrised.rs:414-443); harness examples/m4_formulations.rs not built (DESIGN.md section 3)",
+    "note:M2 C3 Faugere-Svartz blocks for the Macaulay step and the closure not built (src/cryptanalysis/equivariant_macaulay.rs; template examples/ic_next10_06_g2_full_pass.rs) (DESIGN.md section 4)",
+    "note:M3 (stage S3 only) native monomials are u64 masks (src/cryptanalysis/pq_groebner_f2.rs:77-79), so arm A at (24, 6) with N = 72 needs a wider mask or runs on msolve only",
+    "note:PROTOCOL.md is a draft; it freezes after M0-M2 merge with binaries pinned",
+    "hw:a 512 GB host for stage S3 (arm A closure at (24, 6) about 264 GB; arm B at (28, 7) with C3 blocks about 161 GB at degree 8)"
+  ],
+  "links": {
+    "lead": "RESEARCH_IC_LEADS_AND_CONNECTIONS_20261010.md section 5 and section 9 item 3 (the only experiment that bears on ECC2K-130 security rather than accounting)",
+    "notes": [
+      "research/notes/index-calculus/RESEARCH_DREG_MEASUREMENT.md Results 10-13 (XL and closure degrees at m = 4)",
+      "research/ic_next10_20261014/06-equivariant-f4-m4/README.md (msolve F4 degree 4 at (11,4); (13,4), (13,5) capped at 3 GB; G2 pass not applicable to subspace cells)",
+      "research/dreg_closure_m4l6_20261018/RESULTS.md (closure refutes at 4 at (15,6), S = -9, 2/2 draws)",
+      "research/ic_improve_20261014/02-equivariant-oracle/README.md (G2 as an oracle: TRADES; reduce_system hook would be dead code)",
+      "RESEARCH_G2_EQUIVARIANT_F4_SCOPE.md",
+      "research/notes/ecc2k130/RESEARCH_ECC2K130_DESCENT_DEGREE.md sections 2, 6-9 (the price rows)",
+      "research/notes/index-calculus/RESEARCH_EXOTIC_COORDINATES.md section 8 (binary FGHR at m <= 3)",
+      "research/ic_leads_review_20261018/README.md sections 2.1 and 3.1"
+    ],
+    "prs": []
+  },
+  "question": "At m = 4 and surplus 0, does the closure refutation degree stay at 4 for l = 4, 5, 6 on the chained S3 system, and is the refutation degree of the FGHR-symmetrised S5 system (4l - 3 unknowns) flat in l or rising by about one per step?",
+  "decision_value": "Every m = 4, l >= 4 degree measured so far is at surplus -3 to -9, while ECC2K-130's route sits at surplus about 0, and no FGHR-symmetrised m = 4 system has ever been run. If the chained system holds degree 4 at surplus 0 through l = 5 (or 6), the ECC2K-130 degree-4 row (2^68.43, +7.62 bits over rho, unconverted) regains support there and the next spend is K and the symmetry constants; if it rises, that row is withdrawn at surplus 0 and the degree-5 row (+10.32 bits) loses its last support. On the FGHR arm, a flat degree of at most 6 adds a row whose oracle term at l = 33 (2^28.1-2^32.5) is below the chained degree-5 term (2^36.2), a flat degree of 8 or more or a degree that rises with l closes FGHR as a rescue for m = 4. The equivariant C3 blocks decide only how far l the FGHR arm can be pushed on a given host. A result that leaves all of these unchanged (e.g. FGHR input degree 8 or 9 and arm A at degree 4) still ends this card: it is then recorded as a mechanism result and no larger host is bought.",
+  "protocol": {"path": "PROTOCOL.md", "blob": null},
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "main",
+    "build": [
+      ["cargo", "build", "--release", "--example", "m4_formulations", "--example", "msolve_degree_log", "--example", "dreg_ladder", "--example", "dreg_closure", "--example", "ic_next10_06_chain_export"]
+    ]
+  },
+  "resources": {
+    "cpus": 4,
+    "ram_gb": 100,
+    "disk_gb": 200,
+    "gpu": null,
+    "est_core_hours": 350,
+    "est_wall_hours": 120,
+    "notes": "Host (a), this host: 32 vCPU Xeon 6975P with AVX-512, 124 GB, 2 TB EBS, shared with a multi-day job, so at most 4 concurrent single-threaded jobs and 100 GB in total. It runs stages S0-S2: arm A closure at (16,4) and (20,5) (10 and 61 GB derived from the measured 0.222 x cols^2 bytes), msolve on (13,4), (13,5) (2.8-12.6 GB band) and a 6 h sizing probe at (16,4), arm B at l = 4, 5, 6 (under 4 GB plain to l = 5; 54 GB at l = 6, degree 10 with C3 blocks). The 350 core-hours are dominated by msolve's upper band under a 72 h wall per draw; the closure and arm B together are under 60. Host (b): a 512 GB host (32-64 vCPU, 500 GB disk) for stage S3 only: arm A at (24,6), N = 72, about 264 GB (after M3) or msolve multi-threaded; arm B at (28,7) to degree 8 and (32,8) to degree 7 with C3 blocks (161-235 GB); about 100-200 core-hours plus what the msolve probe justifies. A 1 TB host is needed only if the FGHR input degree is 9 and (28,7) is wanted at degree 9 (about 0.73 TB with blocks); not proposed. Arm A at degree 5 fits no host considered (0.8 TB at (16,4)). Derivation: README.md section 5."
+  },
+  "run": {
+    "argv": [
+      "target/release/examples/m4_formulations",
+      "--cells",
+      "{cells}",
+      "--arms",
+      "{arms}",
+      "--engine",
+      "{engine}",
+      "--seed",
+      "{seed}",
+      "--unsat",
+      "4",
+      "--sat-controls",
+      "1",
+      "--max-draws",
+      "512",
+      "--to",
+      "{to}",
+      "--max-cols",
+      "{max_cols}",
+      "--msolve-bin",
+      "msolve",
+      "--out",
+      "{out}/rows.jsonl"
+    ],
+    "env": {"RAYON_NUM_THREADS": "1", "OMP_NUM_THREADS": "1", "F4_F2_MAX_ROWS": "50000000", "F4_F2_MAX_COLS": "50000000"},
+    "timeout_per_shard_s": 259200
+  },
+  "shards": {
+    "count": 7,
+    "scheme": "list",
+    "params": {
+      "items": [
+        {"name": "s0-armA-closure-surplus0", "vars": {"cells": "16:4,20:5", "arms": "A", "engine": "closure", "seed": "20261019", "to": "4", "max_cols": "600000"}},
+        {"name": "s0-armA-msolve-committed", "vars": {"cells": "13:4,13:5", "arms": "A", "engine": "msolve", "seed": "20261014", "to": "0", "max_cols": "0"}},
+        {"name": "s0-armA-msolve-probe-p1", "vars": {"cells": "16:4", "arms": "A", "engine": "msolve", "seed": "20261019", "to": "0", "max_cols": "0"}},
+        {"name": "s1-armB-fghr-plain", "vars": {"cells": "16:4,20:5,24:6", "arms": "B,B0", "engine": "closure", "seed": "20261019", "to": "17", "max_cols": "600000"}},
+        {"name": "s2-armB-fghr-c3", "vars": {"cells": "24:6", "arms": "B", "engine": "closure-c3", "seed": "20261019", "to": "10", "max_cols": "1100000"}},
+        {"name": "s3-armA-l6-bighost", "vars": {"cells": "24:6", "arms": "A", "engine": "closure", "seed": "20261019", "to": "4", "max_cols": "1400000"}},
+        {"name": "s3-armB-l7-l8-bighost", "vars": {"cells": "28:7,32:8", "arms": "B", "engine": "closure-c3", "seed": "20261019", "to": "8", "max_cols": "2500000"}}
+      ],
+      "argv_note": "--to 0 and --max-cols 0 mean unbounded for the msolve engine (msolve has no degree bound; its caps are prlimit and the wall). Shard 1 replays the committed 06 exports (seed 20261014, unsat indices 0-3); shard 2 is the sizing probe of PROTOCOL section 4 (6 h wall, not a reading). Shards 5 and 6 run on host (b) only, after gate G3; shard 5 needs M3 (N = 72 > 64). The msolve runs at (15,6) and (20,5) are added as shards only if the shard-2 probe projects they fit; that amendment is made before the freeze."
+    },
+    "stop": "all"
+  },
+  "checkpoint": {"file": "rows.jsonl", "resume_flag": "--resume"},
+  "outputs": {
+    "result_schema": "m4_formulations JSONL, one line per (arm, draw): arm, cell, draw, basis, x_r, n_vars, d_sys, exact solution count, and per degree xl_refuted, closure_refuted, saturated, xl_rank, closure_rank, columns, closure_products, closure_word_ops, secs; msolve lines add per-round degree and matrix size, max_degree, gb_is_one, peak_rss_kb; c3 lines add the E1-E5 identity fields",
+    "verify": ["target/release/examples/m4_formulations", "--verify", "{out}/rows.jsonl"],
+    "land": "research/m4_solving_degree_fghr_20261018"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "notes": "Seven single heavy runs, one lab task per shard. The harness writes one line per (arm, draw) and --resume skips finished ones, so a shard is preemptible between draws (a draw in progress is lost). Shards 0-4 on host (a); shards 5-6 need host (b) and gate G3 (owner approval).",
+    "space": "TBD",
+    "tasks": ["XP-20261018-m4-solving-degree-equivariant/shard-{k}"],
+    "ttl_s": 86400,
+    "env": {
+      "name": "crypto-m4-degree",
+      "recipe": "A rust image with the pinned commit checked out and `cargo build --release --example m4_formulations --example msolve_degree_log --example dreg_ladder --example dreg_closure --example ic_next10_06_chain_export` baked in, plus msolve v0.6.5 built from source (research/dreg_closure_m4l6_20261018/pod/boot.sh:85-89), then `cairn lab env import crypto-m4-degree --docker <image>`"
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 102400,
+      "timeout_s": 259200,
+      "sandbox": "none",
+      "sandbox_reason": "working sets of 10-100 GB on host (a) and up to about 300 GB on host (b); the jails' memory limits are untested at that size and a host-level kill would read as an infrastructure error; the receipt records the run as unconfined",
+      "publish": "runs/XP-20261018-m4-solving-degree-equivariant"
+    },
+    "funding": {
+      "units": 600000,
+      "rationale": "Exponent-level for the binary (ECC2K-130) route, below PKM lead 1 (1,000,000) because part of the question is already read (closure 4 at l <= 6, surplus <= -3) and stages S0-S2 run on a host already owned; above the Kummer P-224 depth card (400,000) because it can add or withdraw an ECC2K-130 price row."
+    }
+  },
+  "owner_hint": "S0-S2 on the 124 GB host by whoever builds M0-M2; S3 by whoever has a 512 GB host"
+}

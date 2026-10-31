@@ -280,6 +280,14 @@ multiply chains. Forcing four blocks per SM doubles residency for a couple
 of hundred bytes of stack. **Expected**: `RHO_MIN_BLOCKS=4` is the better
 operating point everywhere; verify with `./bench rho` against the default.
 
+**Measured on the RTX PRO 6000 (`sm_120`, 2026-10-17):** the expectation
+holds for the portable build only. Portable rises from 733 Mstep/s unset to
+791 at min-blocks 4; `FP_PTX=1` peaks at min-blocks 2 (1,377 Mstep/s, 1.88x
+the portable default) and falls to 1,256 at 4. Both builds pass `./bench
+selftest` on the device, so `make bench ARCH=sm_120` now defaults to
+`FP_PTX=1 MIN_BLOCKS=2`. Receipts:
+[`validation/20261017-modal-rtx-pro-6000/`](validation/20261017-modal-rtx-pro-6000/README.md).
+
 Two source-level changes already cut the stack by 4-5x, and both are
 measured:
 

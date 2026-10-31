@@ -1,0 +1,58 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
+\begin{document}
+\begin{center}
+{\Large Explicit infinity point: checked proof boundary}\\[4pt]
+{\small aburan28/crypto, genus-2 projective-law follow-up, 25 October 2026}
+\end{center}
+
+\textbf{Object.} For a field $K$ and arbitrary $a_3,a_2,a_1,a_0\in K$, the
+explicit infinity chart has ring
+\[
+  R=K[z,w]/\bigl(w^2-z(1+a_3z^2+a_2z^3+a_1z^4+a_0z^5)\bigr).
+\]
+The checked overlap with the affine chart is the principal open $D(z)$.
+
+\textbf{Checked result.} The complement of $D(z)$ in $\operatorname{Spec}R$
+contains exactly one point, the origin ideal $(z,w)$. For any prime $\mathfrak p$
+containing $z$, the equation gives $w^2\in\mathfrak p$, and primality gives
+$w\in\mathfrak p$. The pre-existing Lean theorem proves $(z,w)$ is maximal,
+so $\mathfrak p=(z,w)$. Evaluation at $z=w=0$ proves the origin is outside
+$D(z)$. This statement is for the explicit affine chart; it is not a claim
+of projectivity or smoothness of the glued scheme.
+
+\textbf{Compiler evidence.} Pinned Lean v4.34.1 and Mathlib revision
+\begin{center}\small\texttt{d13f23b723b8a846827a245b89c10fc7d3f11612}\end{center}
+The command
+\texttt{timeout 180s lake env lean Common22CompletionBridge.lean} exited 0.
+The four \texttt{\#print axioms} lines list exactly
+\texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}.
+The adjacent CSV records each theorem, its hypotheses, and status; the SVG
+shows the dependency and open-obligation graph.
+
+\textbf{Chosen completion target.} Let $A$ be the graded quotient
+\[
+K[X,Y,Z]/(Y^2-X^5Z-a_3X^3Z^3-a_2X^2Z^4-a_1XZ^5-a_0Z^6),
+\quad (\deg X,\deg Y,\deg Z)=(1,3,1).
+\]
+On $D_+(Z)$ set $x=X/Z,\ y=Y/Z^3$; on $D_+(X)$ set
+$z=Z/X,\ w=Y/X^3$. Their equations are the two checked affine chart
+equations. The equation forces $Y^2=0$ when $X=Z=0$, so these two opens
+cover the relevant homogeneous primes. The graded construction,
+chart-ring isomorphisms, and overlap comparison remain unproved in Lean.
+The pinned Mathlib supplies $\operatorname{Proj}$ properness for finite-type
+graded rings over their degree-zero part; smoothness still needs the
+squarefree hypothesis and chartwise proof. The principal divisor of the
+interpolating function, including its order at this unique point, and the
+resulting $\operatorname{Pic}^0$ equation remain separate proof obligations.
+
+\textbf{Interpretation.} This packet advances the local geometry of the
+constructed chart. It does not revise measured cost ratios or assert
+correctness of the full published law.
+\end{document}

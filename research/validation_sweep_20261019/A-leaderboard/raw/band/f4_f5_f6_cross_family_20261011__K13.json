@@ -1,0 +1,180 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "rows": [
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "log2_r": 10.967946705812707,
+      "arm": "f6-ic",
+      "runs": 8,
+      "verified": 8,
+      "mean_s": [
+        1160.9095077750242,
+        21694.21890797618,
+        206494.00350978656
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "log2_r": 10.967946705812707,
+      "arm": "inherited-f4",
+      "runs": 8,
+      "verified": 8,
+      "mean_s": [
+        16.25241470787479,
+        25164.769711183053,
+        251501.4253794597
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "log2_r": 10.967946705812707,
+      "arm": "matrix-f4",
+      "runs": 8,
+      "verified": 8,
+      "mean_s": [
+        16.20493386064436,
+        4939849.139641903,
+        49398345.55201429
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "log2_r": 10.967946705812707,
+      "arm": "matrix-f5",
+      "runs": 8,
+      "verified": 8,
+      "mean_s": [
+        16.20493386064436,
+        3194005.4979841667,
+        31939909.135436922
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "log2_r": 10.967946705812707,
+      "arm": "rho-negation",
+      "runs": 8,
+      "verified": 8,
+      "mean_s": [
+        2.5108989211856745,
+        2.6187083743088855,
+        3.588993452417788
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "log2_r": 10.967946705812707,
+      "arm": "rho-strong",
+      "runs": 8,
+      "verified": 8,
+      "mean_s": [
+        14.237376753977697,
+        14.446292481791586,
+        16.32653403211661
+      ],
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "f6-ic",
+      "b": "inherited-f4",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "f6-ic",
+      "b": "matrix-f4",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "f6-ic",
+      "b": "matrix-f5",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "f6-ic",
+      "b": "rho-negation",
+      "verdict": "rho-negation < f6-ic"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "f6-ic",
+      "b": "rho-strong",
+      "verdict": "rho-strong < f6-ic"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "inherited-f4",
+      "b": "matrix-f4",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "inherited-f4",
+      "b": "matrix-f5",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "inherited-f4",
+      "b": "rho-negation",
+      "verdict": "rho-negation < inherited-f4"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "inherited-f4",
+      "b": "rho-strong",
+      "verdict": "rho-strong < inherited-f4"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "matrix-f4",
+      "b": "matrix-f5",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "matrix-f4",
+      "b": "rho-negation",
+      "verdict": "rho-negation < matrix-f4"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "matrix-f4",
+      "b": "rho-strong",
+      "verdict": "rho-strong < matrix-f4"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "matrix-f5",
+      "b": "rho-negation",
+      "verdict": "rho-negation < matrix-f5"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "matrix-f5",
+      "b": "rho-strong",
+      "verdict": "rho-strong < matrix-f5"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "rho-negation",
+      "b": "rho-strong",
+      "verdict": "rho-negation < rho-strong"
+    }
+  ]
+}

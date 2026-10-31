@@ -1,0 +1,7 @@
+
+W1 (integer full width, N >= 1e5, 7 rows): median 1.303 (in [1.10, 1.40]), two largest ["1.505", "1.303"] (<= 1.55) -> HOLDS
+W2 (Jacobian full width, N >= 1e5, 7 rows): median 1.390 (in [1.10, 1.40]), two largest ["1.481", "1.212"] (<= 1.55) -> HOLDS
+W3 (control, N <= 6e4, 10 rows): |median full - median 8-bit| Jacobian S_walk = 0.025 -> HOLDS
+W4 (every run verified): HOLDS
+Largest row: Jacobian 8-bit / full-width S_walk = 1.418; full-width precompute 884 ops = 0.2157 sqrt(N).
+Ideal S_walk: 1.2533.

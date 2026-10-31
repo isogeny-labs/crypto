@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: isolab
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: v1.36
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: runner
+  namespace: isolab
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::104186811093:role/isolab-job
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: harness
+  namespace: isolab
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: job-submitter
+  namespace: isolab
+rules:
+  - apiGroups: [batch]
+    resources: [jobs]
+    verbs: [create, get, list, watch, delete]
+  - apiGroups: ['']
+    resources: [pods, pods/log, events]
+    verbs: [get, list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: job-submitters
+  namespace: isolab
+subjects:
+  - kind: ServiceAccount
+    name: harness
+    namespace: isolab
+  - kind: Group
+    name: isolab:submitters
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: job-submitter
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: jobs
+  namespace: isolab
+spec:
+  hard:
+    requests.cpu: '64'
+    limits.cpu: '64'
+    requests.memory: 224Gi
+    limits.memory: 224Gi
+    requests.ephemeral-storage: 400Gi
+    limits.ephemeral-storage: 400Gi
+    pods: '32'
+    count/jobs.batch: '200'
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gp3
+provisioner: ebs.csi.aws.com
+parameters:
+  type: gp3
+  encrypted: 'true'
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+reclaimPolicy: Retain

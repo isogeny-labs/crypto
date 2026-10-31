@@ -1,0 +1,85 @@
+{
+  "schema": "spot.automatic-legacy-failover/v1",
+  "observed_utc": "2026-10-19T06:09:31.933934+00:00",
+  "scope": "real coordinate image, separate test ownership and S3 namespace; disposable predecessors only",
+  "protected_source": "i-01f85a6c905181498",
+  "protected_source_terminated": false,
+  "test_source": "i-09b2ecf24f6cf72c9",
+  "recovery_workers": [
+    "i-062235eb763f989e4",
+    "i-052e113c6dfa4fa77"
+  ],
+  "test_hosts_cleaned_up": true,
+  "source_alive_fence": "passed on both successors",
+  "first_hop": {
+    "cpu_ticks": [
+      8584,
+      9084
+    ],
+    "threads": 2,
+    "restored_batch": "20261019T050023Z-d5a7d6f0a562",
+    "new_encrypted_backup": "20261019T051148Z-320fee65dfab",
+    "monotonic_since_snapshot_seconds": 167.881743479,
+    "wall_since_snapshot_seconds": 685.595653565
+  },
+  "second_hop": {
+    "cpu_ticks": [
+      4310,
+      4810
+    ],
+    "threads": 2,
+    "restored_batch": "20261019T051522Z-548656aaaf9c",
+    "new_encrypted_backup": "20261019T052804Z-0199c461cc66",
+    "monotonic_since_snapshot_seconds": 130.037800558,
+    "wall_since_snapshot_seconds": 762.193622977
+  },
+  "commands": {
+    "managed-coldboot": {
+      "command_id": "1a04e252-7a59-4826-9f4c-57f0340e0219",
+      "instance_id": "i-0a6466bc0b69106b2",
+      "status": "Success"
+    },
+    "second-rebackup": {
+      "command_id": "94989693-a83e-43b4-b2d2-b06f3909f462",
+      "instance_id": "i-052e113c6dfa4fa77",
+      "status": "Success"
+    },
+    "second-restore": {
+      "command_id": "975a581f-f032-41cf-9da9-9ecae8b31fb6",
+      "instance_id": "i-052e113c6dfa4fa77",
+      "status": "Success"
+    },
+    "second-early-check": {
+      "command_id": "134d6e1f-64ea-45fc-ba58-78b0607aaa94",
+      "instance_id": "i-052e113c6dfa4fa77",
+      "status": "Success"
+    },
+    "first-restore": {
+      "command_id": "c3b1a5f1-eaab-4a0f-a464-8e573b8ad10e",
+      "instance_id": "i-062235eb763f989e4",
+      "status": "Success"
+    },
+    "first-rebackup": {
+      "command_id": "5719eb76-8c8e-4406-853c-8a85fa07b6eb",
+      "instance_id": "i-062235eb763f989e4",
+      "status": "Success"
+    },
+    "first-fence": {
+      "command_id": "441d16bf-6df0-49e7-b3c4-a1a644065998",
+      "instance_id": "i-062235eb763f989e4",
+      "status": "Success"
+    },
+    "second-fence": {
+      "command_id": "415dd25e-309b-48ec-9f9c-807740980165",
+      "instance_id": "i-052e113c6dfa4fa77",
+      "status": "Success"
+    }
+  },
+  "clock_and_deadline_scope": "saved monotonic/boottime exclude downtime; declared UTC deadlines are retained; unit rejection of expired receipts; no new budget for a resumed job",
+  "raw_archive": "failover-evidence.tar.gz",
+  "limits": [
+    "actual protected source has not failed",
+    "cross-family CRIU portability not established",
+    "arbitrary-program recovery and exactly-once external effects not established"
+  ]
+}

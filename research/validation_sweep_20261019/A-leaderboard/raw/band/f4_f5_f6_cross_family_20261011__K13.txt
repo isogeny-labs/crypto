@@ -1,0 +1,26 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m13-t181-515ee569 | 10.97 | f6-ic | 8/8 | 1160.910 | 21694.219 | 206494.004 | — |
+| icv1-f2m13-t181-515ee569 | 10.97 | inherited-f4 | 8/8 | 16.252 | 25164.770 | 251501.425 | — |
+| icv1-f2m13-t181-515ee569 | 10.97 | matrix-f4 | 8/8 | 16.205 | 4939849.140 | 49398345.552 | — |
+| icv1-f2m13-t181-515ee569 | 10.97 | matrix-f5 | 8/8 | 16.205 | 3194005.498 | 31939909.135 | — |
+| icv1-f2m13-t181-515ee569 | 10.97 | rho-negation | 8/8 | 2.511 | 2.619 | 3.589 | — |
+| icv1-f2m13-t181-515ee569 | 10.97 | rho-strong | 8/8 | 14.237 | 14.446 | 16.327 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m13-t181-515ee569 | f6-ic vs inherited-f4 | unresolved inside the band |
+| icv1-f2m13-t181-515ee569 | f6-ic vs matrix-f4 | unresolved inside the band |
+| icv1-f2m13-t181-515ee569 | f6-ic vs matrix-f5 | unresolved inside the band |
+| icv1-f2m13-t181-515ee569 | f6-ic vs rho-negation | rho-negation < f6-ic |
+| icv1-f2m13-t181-515ee569 | f6-ic vs rho-strong | rho-strong < f6-ic |
+| icv1-f2m13-t181-515ee569 | inherited-f4 vs matrix-f4 | unresolved inside the band |
+| icv1-f2m13-t181-515ee569 | inherited-f4 vs matrix-f5 | unresolved inside the band |
+| icv1-f2m13-t181-515ee569 | inherited-f4 vs rho-negation | rho-negation < inherited-f4 |
+| icv1-f2m13-t181-515ee569 | inherited-f4 vs rho-strong | rho-strong < inherited-f4 |
+| icv1-f2m13-t181-515ee569 | matrix-f4 vs matrix-f5 | unresolved inside the band |
+| icv1-f2m13-t181-515ee569 | matrix-f4 vs rho-negation | rho-negation < matrix-f4 |
+| icv1-f2m13-t181-515ee569 | matrix-f4 vs rho-strong | rho-strong < matrix-f4 |
+| icv1-f2m13-t181-515ee569 | matrix-f5 vs rho-negation | rho-negation < matrix-f5 |
+| icv1-f2m13-t181-515ee569 | matrix-f5 vs rho-strong | rho-strong < matrix-f5 |
+| icv1-f2m13-t181-515ee569 | rho-negation vs rho-strong | rho-negation < rho-strong |

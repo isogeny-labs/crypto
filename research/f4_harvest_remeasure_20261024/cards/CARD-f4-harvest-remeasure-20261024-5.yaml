@@ -1,0 +1,57 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-f4-harvest-remeasure-20261024-5
+experiment_id: f4_harvest_remeasure_20261024
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: a3c8f17494755aea34c070374b94b7ae4250b1f3
+receipt: research/f4_harvest_remeasure_20261024/cards/CARD-f4-harvest-remeasure-20261024-5.receipt.json
+binds:
+- path: research/f4_harvest_remeasure_20261024/PROTOCOL.md
+  sha256: 3583d0d1510b52a3808f515542b3a31b935abc4973ee74273e7558050e793558
+- path: research/f4_harvest_remeasure_20261024/SPEC.sha256
+  sha256: 46fa35939fb2b539a0b24b5f5bfc05bc3ca936b159b5d93cbfd95664f057e890
+- path: research/f4_harvest_remeasure_20261024/SPEC-K0n13.json
+  sha256: 49af20ba270036298ec112d786d2058a80b1df104d423da903c4b6de4e8ea15e
+- path: research/f4_harvest_remeasure_20261024/SPEC-K1n11.json
+  sha256: b2e3b1b9f647e47acc2674b719b2d22e3ab6d70234472cd087a84e89e2e8653f
+- path: research/f4_harvest_remeasure_20261024/SPEC-K1n17.json
+  sha256: 8ebc7ff39611c34043421520d4715e566fa644e775cd2bc48dcef3c2296cd33a
+- path: research/f4_harvest_remeasure_20261024/SPEC-K1n19.json
+  sha256: 3fe7d8b63e8d7a44ca0ada54afc59ba940ba192ffbe676db57d6ee3759dfb5de
+- path: research/f4_harvest_remeasure_20261024/SPEC-K0n19.json
+  sha256: dfbdfbfac07778f63f6ef4d94e392e18221169c736b39d2253a030c465f087e5
+- path: /tmp/f4-harvest-remeasure.lock
+  sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+- path: /home/user/tgt/release/ecbench
+  sha256: aa246d23df49391ccb13e0a659f10a6cd77e4677bb0c04331c2cbbefe8c9a2db
+must_not_exist:
+- research/f4_harvest_remeasure_20261024/sessions/K0n19
+commands:
+- id: run-k0n19
+  argv:
+  - /home/user/tgt/release/ecbench
+  - run
+  - --spec
+  - research/f4_harvest_remeasure_20261024/SPEC-K0n19.json
+  - --out
+  - research/f4_harvest_remeasure_20261024/sessions/K0n19
+  - --cpus
+  - none
+  - --allow-busy
+  - --quiet
+  - --lock
+  - /tmp/f4-harvest-remeasure.lock
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/f4_harvest_remeasure_20261024/cards/CARD-f4-harvest-remeasure-20261024-5.run-k0n19.stdout
+bus_address: executor-mechanical-f4-harvest-remeasure
+background: true
+write_scope:
+- research/f4_harvest_remeasure_20261024/
+stop_when:
+- Any command exits with a non-zero status.
+- 'The last stdout line of any run command does not read (144 records: {"verified": 144}).'
+- Any session status is not complete.
+- Any verify command prints an audit that is not OK.

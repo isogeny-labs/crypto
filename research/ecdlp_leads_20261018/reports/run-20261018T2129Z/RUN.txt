@@ -1,0 +1,32 @@
+commit: 483bda1bdc731d388bd810cdf21d5b3941927399
+start_utc: 2026-10-18T21:29:33Z
+host: Linux 6.18.44-fc-v139 x86_64
+cpu: Intel(R) Xeon(R) Processor @ 2.80GHz, 4 cores
+rustc: rustc 1.97.0 (2d8144b78 2026-07-07)
+command: etale-search 2 ; etale-search 3 ; etale-search q (stdout -> *.jsonl, stderr -> *.err)
+isolation: none (shared cloud container, L0); timing is not a result
+
+family: genus2
+
+real	0m0.170s
+user	0m0.151s
+sys	0m0.012s
+
+family: genus3
+
+real	0m2.412s
+user	0m2.378s
+sys	0m0.016s
+
+family: quartic
+
+real	2m26.168s
+user	2m24.417s
+sys	0m0.034s
+end_utc: 2026-10-18T21:32:02Z
+2359afaa25e465c5256cff8fbc0a93e6019de2d0441ccef518652ab6de517d9f  research/ecdlp_leads_20261018/reports/run-20261018T2129Z/genus2.jsonl
+3895727326c345c8e49725e195a4334df402a823e72b03eb0310cf1f3f1cd613  research/ecdlp_leads_20261018/reports/run-20261018T2129Z/genus3.jsonl
+114162c7136d67aafa3c7865040414c8638cce7d2ea93788c5b272218b60678b  research/ecdlp_leads_20261018/reports/run-20261018T2129Z/quartic.jsonl
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  research/ecdlp_leads_20261018/reports/run-20261018T2129Z/genus2.err
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  research/ecdlp_leads_20261018/reports/run-20261018T2129Z/genus3.err
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  research/ecdlp_leads_20261018/reports/run-20261018T2129Z/quartic.err

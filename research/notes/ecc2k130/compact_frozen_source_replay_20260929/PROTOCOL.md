@@ -95,3 +95,33 @@ checkouts, the three distinct freezes materialize and build with their
 workflows' `cargo build --release --locked` commands; the S3 batch's example
 tests pass in its tree. The hosted runs on the pull request that lands this
 amendment are the check that the full panels still reproduce.
+
+## Verification on hosted runners, 2026-10-18
+
+The 2026-10-12 amendment above was checked locally. Its hosted results, read
+from the Actions history of `main` and of pull requests after it merged
+(#1718):
+
+| workflow | result |
+|:--|:--|
+| `compact-s3-batch` | success on pushes to `main` and on pull requests (the full panels run on those) |
+| `compact-swap-quotient` | success on pushes to `main` |
+| `compact-s3-prefilter` | success on pushes to `main` |
+| `compact-ir-ledger` | success on recent pull requests |
+| `ecc2k130-disjoint-cold-v2` | success on recent pull requests |
+| `compact-ir-cold-gap` | failed, for a reason unrelated to the materializer; see below |
+| `ecc2k130-disjoint-cold-q` | retired by the owner on 2026-10-11 (manual dispatch only, to stop it fanning out across shared runners), so it has no hosted run since the fix; it uses the same tool and freeze as the passing ledger, cold-gap and v2 workflows |
+
+**`compact-ir-cold-gap`.** Its `validate` job analyzes the archived cold-gap
+evidence before it reaches the materializer, and that archive was invalid JSON
+on `main`: merge `6cf567da1` fused two different archives that both used
+`evidence/run_36694337420/`. The generation from `d373295dc` is self-consistent
+(its analysis passes and matches `ANALYSIS.json`, 105 children, 15,450 target
+logs); the one from `b8606c7ee` is a smaller fill-in archive naming a different
+`verify_cold.py`. The directory is restored byte for byte to `d373295dc`, and
+the `b8606c7ee` files are kept unedited in
+`evidence/run_36694337420_fillin_b8606c7ee/` with a note on their provenance.
+Checked locally from a sparse root shaped like the job's checkout: the
+analysis and its `equivalent` check pass, the frozen tree materializes and
+builds, `run_cold.py --cell n37_L1 --mode smoke` runs, and `verify_cold.py`
+reports `SMOKE_PASS`.

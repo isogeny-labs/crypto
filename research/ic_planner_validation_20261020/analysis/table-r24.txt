@@ -1,0 +1,10 @@
+| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels |
+|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|
+| ECBS1hcf6d4ac07e64 | rho-neg | rho.negation | icv1-fp24-tm5099-a6f137c6 | 24.00 | 24/24 | 0.954 | [0.735, 1.191] | 0.886 | 1.076 | 1.076 | 1.000 | yes | 6.482 | L1×4 L2×20 |
+| ECBS1hcf6d4ac07e64 | plan | ic.pipeline | icv1-fp24-tm5099-a6f137c6 | 24.00 | 24/24 | 13.727 | [12.705, 14.676] | – | – | 15.489 | 14.390 | yes | 12.230 | L1×4 L2×20 |
+| ECBS1hcf6d4ac07e64 | half-base | ic.pipeline | icv1-fp24-tm5099-a6f137c6 | 24.00 | 24/24 | 21.428 | [18.702, 24.041] | – | – | 24.179 | 22.464 | yes | 25.778 | L1×5 L2×19 |
+| ECBS1hcf6d4ac07e64 | double-base | ic.pipeline | icv1-fp24-tm5099-a6f137c6 | 24.00 | 24/24 | 20.686 | [20.034, 21.250] | – | – | 23.342 | 21.686 | yes | 8.416 | L1×1 L2×23 |
+| ECBS1hcf6d4ac07e64 | rootfind | ic.pipeline | icv1-fp24-tm5099-a6f137c6 | 24.00 | 24/24 | 2341.216 | [2080.837, 2583.324] | – | – | 2641.779 | 2454.398 | yes | 302.456 | L1×7 L2×17 |
+| ECBS1hcf6d4ac07e64 | full-rank | ic.pipeline | icv1-fp24-tm5099-a6f137c6 | 24.00 | 24/24 | 49.985 | [45.185, 55.249] | – | – | 56.402 | 52.401 | yes | 57.697 | L1×3 L2×21 |
+| ECBS1hcf6d4ac07e64 | random-targets | ic.pipeline | icv1-fp24-tm5099-a6f137c6 | 24.00 | 24/24 | 615.639 | [558.434, 665.719] | – | – | 694.674 | 645.401 | yes | 335.769 | L1×10 L2×14 |
+| ECBS1hcf6d4ac07e64 | plan-aa | ic.pipeline | icv1-fp24-tm5099-a6f137c6 | 24.00 | 24/24 | 13.727 | [12.705, 14.676] | – | – | 15.489 | 14.390 | yes | 12.057 | L1×2 L2×22 |

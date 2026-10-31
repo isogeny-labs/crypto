@@ -1,7 +1,10 @@
 name: Koblitz relation-yield bridge
 
 on:
-  pull_request:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
     paths:
       - "research/weil_factor_composition_20260914/validation/dependencies.lock.txt"
       - "Cargo.toml"
@@ -23,17 +26,31 @@ on:
 permissions:
   contents: read
 
-# A newer push to the same pull request cancels this workflow's run for the older commit.
-# Every other event (push, schedule, dispatch) gets a group of its own and is never cancelled.
+# Superseding main pushes share a group; manual dispatches get an independent group.
 concurrency:
-  group: ${{ github.event_name == 'pull_request' && github.workflow_ref || format('run-{0}', github.run_id) }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ${{ github.event_name == 'push' && github.workflow_ref || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 
 jobs:
   smoke-and-custody:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-relation-yield-bridge.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-relation-yield-bridge.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    # Include cold builds and custody checks around the fixed operational
+    # smoke. Its frozen inputs, inner meter caps and ineligible status are unchanged.
+    timeout-minutes: 45
+    # Keep the full test set and assertions while avoiding oversized debug artifacts.
+    env:
+      CARGO_INCREMENTAL: "0"
+      CARGO_PROFILE_DEV_DEBUG: "0"
+      CARGO_PROFILE_TEST_DEBUG: "0"
     steps:
+      # The full checkout plus a debug build no longer fits the hosted runner disk.
+      - name: Free runner disk
+        if: runner.environment == 'github-hosted'
+        run: |
+          df -h /
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/local/share/powershell
+          df -h /
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - name: Validate Python custody rules

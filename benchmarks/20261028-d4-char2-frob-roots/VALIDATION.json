@@ -1,0 +1,79 @@
+{
+ "schema": "validation-gate/v1",
+ "rows": [
+  "icv1-f2m48-tm17036033-cfcd9389",
+  "icv1-f2m56-tm338854401-5d597dcf"
+ ],
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "05af365c2d690ac933637431f3f2faf153833292bde04a0ab4bae550c6d173a8"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "daa5fb1ab3082dac9f9428973af3e5ed6a1afbb4ebcd89538126d2bd21668f34"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "PROTOCOL.md arm rho-neg: rho.negation (cap_multiple 64), same instances, targets and algorithm seeds, same session",
+  "unit": "ecbench.gae (counted group-addition equivalents; IC F_q multiplications at the curve's measured 179 F_q mults per affine addition)",
+  "binary_or_process": "ecbench sha256 13818f3ec38240cf4e0c1f953eb55a918d7b0ff73ad38ff4524c30656f25a89d, sessions ECBS1h081b9c5cbc94 (m12) and ECBS1hcdb18ea9ecd1 (m14)",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "strongest_available_basis": "Aut(E) = {+-1} (ordinary, j != 0). No Frobenius/GLS fold: j(E) lies in no proper subfield of F_(2^48) or F_(2^56) (2^25 +- t and 2^29 +- t are not squares, so E is neither defined over nor a quadratic twist of a curve over F_(2^24)/F_(2^28); definition over F_(2^16)/F_(2^8) is excluded because #E_0 over that subfield cannot divide 10r resp. 2r). ecbench's Frobenius walks (rho.signed_frobenius*) apply to Koblitz Instance::Binary only; rho.cubic/quartic to prime-field j=0/1728.",
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band_row": "icv1-f2m56-tm338854401-5d597dcf (m = 14, target 0), ic = ic-lever S, rho = rho-neg S + w * canonicalisations_uncharged / sqrt(r)",
+  "gae_band": {
+   "0": {
+    "ic": 4.378645544469566,
+    "rho": 1.2580963957846858
+   },
+   "0.1": {
+    "ic": 4.378645544469566,
+    "rho": 1.3839057814283926
+   },
+   "1": {
+    "ic": 4.378645544469566,
+    "rho": 2.516190252221755
+   }
+  },
+  "gae_band_baseline": {
+   "0": {
+    "ic": 5.370113483774138,
+    "rho": 1.2580963957846858
+   },
+   "0.1": {
+    "ic": 5.370113483774138,
+    "rho": 1.3839057814283926
+   },
+   "1": {
+    "ic": 5.370113483774138,
+    "rho": 2.516190252221755
+   }
+  },
+  "gae_band_m12_sums": {
+   "0": {
+    "ic_lever_over_rho": 38.821623550613516,
+    "ic_base_over_rho": 45.44234654190632
+   },
+   "0.1": {
+    "ic_lever_over_rho": 35.29266995532998,
+    "ic_base_over_rho": 41.311557627369886
+   },
+   "1": {
+    "ic_lever_over_rho": 19.411673657302988,
+    "ic_base_over_rho": 22.722182140154615
+   }
+  },
+  "order_holds_across_band": true,
+  "order": "rho-neg below ic-lever below ic-base at w = 0, 0.1 and 1, on every target of both curves (rho is ahead; distance remaining, not a beat)"
+ },
+ "verdict": "validated-with-caveats",
+ "caveats": [
+  "replay is same-host and same-binary (not an independent-host or independent-implementation replication)",
+  "m = 14 is one target",
+  "m = 14 ratio 0.8154 lies below the pre-registered prediction interval [0.82, 0.95]; REPORT.md does not note it",
+  "counted-unit result only; IC F_q additions/lookups/copies are uncounted in both IC arms (IC S is a lower bound in that sense); no wall-clock claim"
+ ],
+ "source_study": "research/ic_d4_char2_lever_20261023/VALIDATION.json"
+}

@@ -34,6 +34,13 @@
 //! `tower stop in step` line. `--targets 1` measures target 1 alone: every
 //! target is still drawn, so it is the system a full run gives it.
 //!
+//! `--kinds dickson-torus` builds the Dickson tower in its torus case
+//! (`2^t | p + 1`, `u` and `μ_{2^t}` in the norm-1 torus of `F_{p²}`; note
+//! §2.1), checked by `check_torus` before anything is measured.
+//! `--null-chain` runs the null control at `m ≥ 3` as well, with every `S₃`
+//! link of the chain given random coefficients on its own support
+//! (`research/pkm_dickson_torus_20261015/`).
+//!
 //! The committed runs, their exact flags and the scripts that tabulate and
 //! cross-check them are in `research/pkm_tower_pilot_20260924/` (the pilot,
 //! `f4_fp`) and `research/pkm_tower_round2_20260925/` (round 2,
@@ -59,6 +66,8 @@
 //!     --controls tower --t-min 8 --max-t 8 --planted 0 --random 1 --ladder-t none --trace
 //! ```
 
+#![recursion_limit = "256"]
+
 use std::collections::BTreeMap;
 use std::fs::File;
 use std::io::Write;
@@ -66,11 +75,64 @@ use std::time::{Duration, Instant};
 
 use crypto_lib::cryptanalysis::f4_fp::{self, F4Options, F4Report, Ordering, Poly};
 use crypto_lib::cryptanalysis::f4_fp_tower::{self, RPoly, SquareRule, TowerF4Options, TowerRing};
+use crypto_lib::cryptanalysis::f4_tower_generic::{f4_tower_generic, GPoly, GTowerRing};
+use crypto_lib::cryptanalysis::fp_backend::{Fp224, Fp256, Fp32, Fp64, FpP192, FpWide, PrimeField};
+use crypto_lib::cryptanalysis::fp_backend_ifma::Fp52;
+use crypto_lib::cryptanalysis::hky_fp_tower::{self, HkyLimits, HkyRing};
 use crypto_lib::cryptanalysis::ic_boundary::{CountedGroup, GroupOps, PrimeCurve, PrimePoint};
 use crypto_lib::cryptanalysis::sig_fp_tower;
+use num_bigint::BigUint;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 use serde_json::{json, Value};
+
+#[path = "pkm_tower_wide/wide.rs"]
+mod wide;
+
+/// Runs `$body` with `$f` bound to the backend `$b` at the prime `$p`
+/// (a `BigUint`).
+macro_rules! with_backend {
+    ($b:expr, $p:expr, |$f:ident| $body:expr) => {{
+        let p_big: &BigUint = $p;
+        let small = || u64::try_from(p_big).expect("the backend needs p below 2^64");
+        match resolve_backend($b, p_big) {
+            Backend::Fp32 => {
+                let $f = Fp32::new(small());
+                $body
+            }
+            Backend::Fp64 => {
+                let $f = Fp64::new(small());
+                $body
+            }
+            Backend::Fp52 => {
+                let $f = Fp52::new(small());
+                $body
+            }
+            Backend::Wide1 => {
+                let $f = FpWide::<1>::new(p_big);
+                $body
+            }
+            Backend::Wide3 => {
+                let $f = FpWide::<3>::new(p_big);
+                $body
+            }
+            Backend::P192 => {
+                assert_eq!(Some(p_big), nist("P-192").as_ref(), "FpP192 is P-192 only");
+                let $f = FpP192::new();
+                $body
+            }
+            Backend::Fp224 => {
+                let $f = Fp224::new(p_big);
+                $body
+            }
+            Backend::Wide4 => {
+                let $f = Fp256::new(p_big);
+                $body
+            }
+            Backend::Auto => unreachable!(),
+        }
+    }};
+}
 
 // ── Field arithmetic ───────────────────────────────────────────────
 
@@ -229,6 +291,9 @@ enum Kind {
     Kummer,
     Dickson,
     Isogeny,
+    /// The Dickson tower in its torus case (`2^t | p + 1`). Last, so the
+    /// cell seeds of the other kinds (`kind as u64`) are unchanged.
+    DicksonTorus,
 }
 
 impl Kind {
@@ -237,6 +302,7 @@ impl Kind {
             Kind::Kummer => "kummer",
             Kind::Dickson => "dickson",
             Kind::Isogeny => "isogeny",
+            Kind::DicksonTorus => "dickson-torus",
         }
     }
 }
@@ -460,6 +526,152 @@ fn dickson(p: u64, t: usize, rng: &mut StdRng) -> Tower {
     }
 }
 
+// ── The Dickson torus case (note §2.1, `2^t | p + 1`) ───────────────
+//
+// `F_{p²} = F_p(i)` with `i² = −1`, which is a field because `p ≡ 3 mod 4`
+// whenever `4 | p + 1`. An element is `(re, im)`. The norm-1 torus
+// `T = {w : w·w̄ = 1}` is cyclic of order `p + 1`; on it `w̄ = w^p = w^{−1}`,
+// so `w + w^{−1} = 2·re(w)` lies in `F_p`.
+
+type Fp2 = (u64, u64);
+
+fn fp2_mul(x: Fp2, y: Fp2, p: u64) -> Fp2 {
+    (
+        subm(mulm(x.0, y.0, p), mulm(x.1, y.1, p), p),
+        addm(mulm(x.0, y.1, p), mulm(x.1, y.0, p), p),
+    )
+}
+
+fn fp2_pow(mut x: Fp2, mut e: u64, p: u64) -> Fp2 {
+    let mut r = (1u64, 0u64);
+    while e > 0 {
+        if e & 1 == 1 {
+            r = fp2_mul(r, x, p);
+        }
+        x = fp2_mul(x, x, p);
+        e >>= 1;
+    }
+    r
+}
+
+/// `x^{−1} = x̄ / N(x)`, for any non-zero `x` (not only torus elements).
+fn fp2_inv(x: Fp2, p: u64) -> Fp2 {
+    let n = addm(mulm(x.0, x.0, p), mulm(x.1, x.1, p), p);
+    let ni = invm(n, p);
+    (mulm(x.0, ni, p), mulm(subm(0, x.1, p), ni, p))
+}
+
+/// A random element of the torus `T`: `z^{p−1} = z̄/z` for a random
+/// `z ∈ F_{p²}^*`.
+fn torus_element(p: u64, rng: &mut StdRng) -> Fp2 {
+    loop {
+        let z = (rng.gen_range(0..p), rng.gen_range(0..p));
+        if z == (0, 0) {
+            continue;
+        }
+        let w = fp2_pow(z, p - 1, p);
+        debug_assert_eq!(fp2_mul(w, fp2_pow(w, p, p), p), (1, 0));
+        return w;
+    }
+}
+
+/// The checks of note §2.1 for a torus tower, beyond [`Tower::check`]
+/// (which checks `|V| = 2^t`, distinctness and every level equation):
+/// - `V ⊂ F_p`: `w + w^{−1}` has no `i`-part for every `w ∈ u·μ_{2^t}`;
+/// - the case is the torus one: `y² − 4` is a non-residue for every
+///   `y ∈ V` (so `X² − yX + 1` has its roots in `T \ F_p`);
+/// - the tower is unramified: `y_j ≠ 0` at every level on `V` (`c` avoids
+///   the critical value `−2` along the chain), and `c ≠ ±2`.
+///
+/// Panics otherwise.
+fn check_torus(tower: &Tower, u: Fp2, zeta: Fp2, p: u64) {
+    let t = tower.t;
+    assert_eq!(p % 4, 3, "the torus case needs p ≡ 3 mod 4");
+    assert!(
+        (p + 1).is_multiple_of(1u64 << t),
+        "2^{t} does not divide p + 1"
+    );
+    // ζ has exact order 2^t in T; u is in T and u² ∉ μ_{2^t}.
+    assert_eq!(fp2_pow(zeta, 1u64 << t, p), (1, 0), "ζ^(2^t) ≠ 1");
+    assert_eq!(
+        fp2_pow(zeta, 1u64 << (t - 1), p),
+        (p - 1, 0),
+        "ζ does not have exact order 2^t"
+    );
+    assert_eq!(fp2_pow(u, p + 1, p), (1, 0), "u is not in the torus");
+    assert_ne!(u.1, 0, "u lies in F_p: the split case, not the torus");
+    assert_ne!(fp2_pow(u, 1u64 << (t + 1), p), (1, 0), "u² ∈ μ_{{2^t}}");
+    let mut w = u;
+    for (k, &x) in tower.v.iter().enumerate() {
+        // By the general inverse, not by the conjugate the builder used.
+        let wi = fp2_inv(w, p);
+        let sum = (addm(w.0, wi.0, p), addm(w.1, wi.1, p));
+        assert_eq!(sum.1, 0, "w + 1/w ∉ F_p at k = {k}");
+        assert_eq!(sum.0, x, "V[{k}] is not w + 1/w");
+        let disc = subm(mulm(x, x, p), 4, p);
+        assert_eq!(
+            powm(disc, (p - 1) / 2, p),
+            p - 1,
+            "y² − 4 is not a non-residue at V[{k}]: not the torus case"
+        );
+        let y = tower.values(x, p);
+        assert!(y.iter().all(|&yj| yj != 0), "a level is ramified at V[{k}]");
+        w = fp2_mul(w, zeta, p);
+    }
+    assert!(tower.c != 2 && tower.c != p - 2, "c = ±2");
+}
+
+/// The Dickson tower in its torus case: `V = {w + w^{−1} : w ∈ u·μ_{2^t}}`
+/// with `u` and `μ_{2^t}` in the norm-1 torus `T ⊂ F_{p²}^*`, which needs
+/// `2^t | p + 1`. The step is `y ↦ y² − 2` and `c = u^{2^t} + u^{−2^t}`,
+/// as in the split case: only the numbers change, never the equations.
+fn dickson_torus(p: u64, t: usize, rng: &mut StdRng) -> Tower {
+    assert!(
+        p % 4 == 3 && (p + 1).is_multiple_of(1u64 << t),
+        "the torus case needs 2^{t} | p + 1 (and p ≡ 3 mod 4)"
+    );
+    // A primitive 2^t-th root of unity in T: h^{(p+1)/2^t} for an h ∈ T
+    // that is not a square in T.
+    let zeta = loop {
+        let h = torus_element(p, rng);
+        if fp2_pow(h, p.div_ceil(2), p) == (p - 1, 0) {
+            break fp2_pow(h, (p + 1) >> t, p);
+        }
+    };
+    loop {
+        let u = torus_element(p, rng);
+        if u.1 == 0 || fp2_pow(u, 1u64 << (t + 1), p) == (1, 0) {
+            continue;
+        }
+        let mut v = Vec::with_capacity(1 << t);
+        let mut w = u;
+        for _ in 0..1u64 << t {
+            // On T, w^{−1} = w̄, so w + w^{−1} = 2·re(w).
+            v.push(addm(w.0, w.0, p));
+            w = fp2_mul(w, zeta, p);
+        }
+        let mut s = v.clone();
+        s.sort_unstable();
+        s.dedup();
+        if s.len() != 1 << t {
+            continue;
+        }
+        let ut = fp2_pow(u, 1u64 << t, p);
+        let c = addm(ut.0, ut.0, p);
+        let tower = Tower {
+            kind: Kind::DicksonTorus,
+            t,
+            v,
+            scale: 1,
+            steps: vec![Step::Dickson; t],
+            c,
+            info: json!({"case": "torus", "u": [u.0, u.1], "zeta": [zeta.0, zeta.1], "c": c}),
+        };
+        check_torus(&tower, u, zeta, p);
+        return tower;
+    }
+}
+
 fn random_point(curve: &PrimeCurve, rng: &mut StdRng) -> PrimePoint {
     loop {
         let x = rng.gen_range(0..curve.p);
@@ -594,6 +806,7 @@ fn build_tower(kind: Kind, p: u64, t: usize, rng: &mut StdRng) -> Tower {
         Kind::Kummer => kummer(p, t, rng),
         Kind::Dickson => dickson(p, t, rng),
         Kind::Isogeny => isogeny(p, t, rng),
+        Kind::DicksonTorus => dickson_torus(p, t, rng),
     };
     tower.check(p);
     tower
@@ -774,17 +987,20 @@ fn system(
     let n = m * t + (m - 2);
     let mut eqs = summation(tower, curve, m, n, target.x_r);
     if control == Control::Null {
-        // S₃'s support, random coefficients, planted zero.
-        assert_eq!(m, 2);
-        let mut f = Pol::zero(n);
-        for e in eqs[0].terms.keys() {
-            f.terms.insert(e.clone(), rng.gen_range(1..p));
+        // S₃'s support, random coefficients, planted zero: at m = 2 the one
+        // S₃, and at m ≥ 3 (`--null-chain`) every S₃ link of the chain, in
+        // order. At m = 2 the draws are those of the pilot's null.
+        for eq in eqs.iter_mut() {
+            let mut f = Pol::zero(n);
+            for e in eq.terms.keys() {
+                f.terms.insert(e.clone(), rng.gen_range(1..p));
+            }
+            if let Some(sol) = &target.solution {
+                let c = f.eval(sol, p);
+                f = f.sub(&Pol::constant(n, c, p), p);
+            }
+            *eq = f;
         }
-        if let Some(sol) = &target.solution {
-            let c = f.eval(sol, p);
-            f = f.sub(&Pol::constant(n, c, p), p);
-        }
-        eqs[0] = f;
     }
     let towers_from = eqs.len();
     for i in 0..m {
@@ -1080,6 +1296,101 @@ fn print_sig_step(k: usize, st: &sig_fp_tower::SigStep) {
 /// Run `f4_fp_tower` on a system: the tower equations become the ring's
 /// rewriting, and the other equations its input in normal form.
 #[allow(clippy::too_many_arguments)]
+/// The HKY closures of one system (`--engine hky`): the system in the tower
+/// quotient's normal form (the tower equations vanish there), `V_{F,c}` for
+/// `c` from the least input degree, and the fall degrees.
+fn measure_hky(
+    eqs: &[Pol],
+    tower: &Tower,
+    cell: &Cell,
+    n: usize,
+    p: u64,
+    sol: Option<&[u64]>,
+    a: &Args,
+) -> Outcome {
+    let ring = if cell.control == Control::Naive {
+        HkyRing::new(p, Vec::new(), n)
+    } else {
+        HkyRing::new(p, tower_ring(tower, cell.m, p).rules, cell.m - 2)
+    };
+    let gens: Vec<hky_fp_tower::NfPoly> = eqs
+        .iter()
+        .map(|e| ring.from_raw(&raw_terms(e)))
+        .filter(|g| !g.is_empty())
+        .collect();
+    let planted_ok = sol.map(|s| gens.iter().all(|g| ring.eval(g, s) == 0));
+    let nf_degrees: Vec<u32> = gens.iter().map(HkyRing::degree).collect();
+    let c_min = a
+        .hky_cmin
+        .unwrap_or_else(|| nf_degrees.iter().copied().min().unwrap_or(1));
+    let limits = HkyLimits {
+        max_cols: a.hky_max_cols,
+        max_entries: a.hky_max_entries,
+        budget: Duration::from_secs(a.budget),
+        ..HkyLimits::default()
+    };
+    let started = Instant::now();
+    let fd = hky_fp_tower::fall_degrees(&ring, &gens, c_min, a.hky_cmax, &limits);
+    let ms = started.elapsed().as_secs_f64() * 1e3;
+    let closures: Vec<Value> = fd
+        .closures
+        .iter()
+        .map(|c| {
+            json!({"c": c.c, "cols": c.cols as u64, "dims": c.dims, "one": c.contains_one,
+                   "censored": c.censored, "rows_reduced": c.rows_reduced,
+                   "entries": c.entries, "muladds": c.muladds, "ms": c.ms})
+        })
+        .collect();
+    let censored_at = fd
+        .closures
+        .last()
+        .and_then(|c| c.censored.as_ref().map(|_| c.c));
+    eprintln!(
+        "{:8} m={} {:6} t={:2} hky d_F={:?} ffd={:?} falls={:?} censored_at={:?} {:.0} ms",
+        cell.kind.name(),
+        cell.m,
+        cell.control.name(),
+        cell.t,
+        fd.last_fall,
+        fd.first_fall,
+        fd.falls,
+        censored_at,
+        ms
+    );
+    Outcome {
+        solving_degree_max: 0,
+        last_productive_degree: 0,
+        degree_reached: 0,
+        max_cols_to_solution: 0,
+        steps_to_solution: 0,
+        inconsistent: fd.last_fall.is_some(),
+        zero_dim: false,
+        linear: 0,
+        basis_len: 0,
+        steps: 0,
+        max_rows: 0,
+        max_cols: 0,
+        ms,
+        timed_out: censored_at.is_some(),
+        pairs_above_bound: 0,
+        staircase_at_stop: None,
+        planted_ok,
+        extra: json!({
+            "engine": "hky_fp_tower",
+            "nf_degrees": nf_degrees,
+            "hky_cmin": c_min,
+            "hky_cmax": a.hky_cmax,
+            "last_fall_degree": fd.last_fall,
+            "first_fall_degree": fd.first_fall,
+            "falls": fd.falls,
+            "censored_at": censored_at,
+            "muladds": fd.closures.iter().map(|c| c.muladds).sum::<u64>(),
+            "muladds_last_closure": fd.closures.last().map(|c| c.muladds),
+            "closures": closures,
+        }),
+    }
+}
+
 fn measure_tower(
     eqs: &[Pol],
     towers: std::ops::Range<usize>,
@@ -1203,6 +1514,200 @@ fn measure_tower(
     (out, r.basis)
 }
 
+/// Run `f4_tower_generic` over the backend `f` on a system of the `u64`
+/// builder (`p < 2⁶³`): `measure_tower` with the generic engine. The basis
+/// comes back as `RPoly` when its coefficients fit (`p < 2³²`), for
+/// `--dump`; empty otherwise.
+#[allow(clippy::too_many_arguments)]
+fn measure_generic<F: PrimeField>(
+    f: F,
+    eqs: &[Pol],
+    towers: std::ops::Range<usize>,
+    ring: &TowerRing,
+    sol: Option<&[u64]>,
+    max_degree: u32,
+    budget: Duration,
+    max_nnz: Option<u64>,
+    max_dense: Option<u64>,
+    trace: bool,
+    full_rank_exit: bool,
+) -> (Outcome, Vec<RPoly>) {
+    let p = ring.p;
+    if let Some(s) = sol {
+        for (k, e) in eqs.iter().enumerate() {
+            assert_eq!(
+                e.eval(s, p),
+                0,
+                "equation {k} does not vanish at the planted solution"
+            );
+        }
+    }
+    let backend = f.name();
+    let gring = GTowerRing::from_tower_ring(f, ring);
+    let f = &gring.field;
+    let raw = |e: &Pol| -> Vec<(Vec<u32>, F::Elem)> {
+        e.terms
+            .iter()
+            .map(|(k, &v)| (k.clone(), f.from_u64(v)))
+            .collect()
+    };
+    for k in towers.clone() {
+        assert!(
+            gring.from_raw(&raw(&eqs[k])).is_empty(),
+            "tower equation {k} is not zero in the ring: the square rules are wrong"
+        );
+    }
+    let input: Vec<GPoly<F::Elem>> = eqs
+        .iter()
+        .enumerate()
+        .filter(|(k, _)| !towers.contains(k))
+        .map(|(_, e)| gring.from_raw(&raw(e)))
+        .filter(|g| !g.is_empty())
+        .collect();
+    let ring_degrees: Vec<u32> = input.iter().map(GPoly::degree).collect();
+    let mut opts = TowerF4Options::new(max_degree).with_budget(budget);
+    if let Some(c) = max_nnz {
+        opts = opts.with_max_nnz(c);
+    }
+    if let Some(c) = max_dense {
+        opts = opts.with_max_dense(c);
+    }
+    opts.full_rank_exit = full_rank_exit;
+    if trace {
+        opts = opts.on_step(print_tower_step);
+        opts.on_stop = Some(print_stopped_step);
+    }
+    let rep = f4_tower_generic(&input, &gring, &opts);
+    let r = &rep.stats;
+    let planted_ok = sol.map(|s| {
+        let x: Vec<F::Elem> = s.iter().map(|&v| f.from_u64(v)).collect();
+        !r.inconsistent && rep.basis.iter().all(|g| f.is_zero(gring.eval(g, &x)))
+    });
+    let lms: Vec<u128> = rep.basis.iter().filter_map(GPoly::lm).collect();
+    let pure = |k: usize| {
+        lms.iter().any(|&m| {
+            let fr = f4_fp_tower::free_of(m);
+            f4_fp_tower::mask_of(m) == 0
+                && (0..f4_fp_tower::MAX_FREE).all(|i| (i == k) == (fr[i] > 0))
+        })
+    };
+    let zero_dim = r.inconsistent || (0..ring.n_free).all(pure);
+    let linear = lms
+        .iter()
+        .filter(|&&m| f4_fp_tower::degree_of(m) == 1)
+        .count();
+    let out = Outcome {
+        solving_degree_max: r.solving_degree_max,
+        last_productive_degree: r.last_productive_degree,
+        degree_reached: r.degree_reached,
+        max_cols_to_solution: r.max_cols_to_solution,
+        steps_to_solution: r.steps_to_solution,
+        inconsistent: r.inconsistent,
+        zero_dim,
+        linear,
+        basis_len: rep.basis.len(),
+        steps: r.steps,
+        max_rows: r.max_rows,
+        max_cols: r.max_cols,
+        ms: r.ms,
+        timed_out: r.timed_out || r.oversize,
+        pairs_above_bound: r.pairs_above_bound,
+        staircase_at_stop: r.staircase_at_stop,
+        planted_ok,
+        extra: json!({
+            "engine": "f4_tower_generic",
+            "backend": backend,
+            "builder": "u64",
+            "input_ring_degrees": ring_degrees,
+            "muladds": r.muladds,
+            "max_nnz": r.max_nnz,
+            "max_residual_rows": r.max_residual_rows,
+            "full_rank_exit": full_rank_exit,
+            "rows_skipped_full_rank": r.rows_skipped,
+            "max_dense_entries": r.max_dense_entries,
+            "stopped_step": r.stopped_step,
+            "oversize": r.oversize,
+            "critical_pairs_reduced": r.critical_pairs_reduced,
+            "tower_pairs_reduced": r.tower_pairs_reduced,
+            "pairs_product_skipped": r.pairs_product_skipped,
+            "pairs_chain_skipped": r.pairs_chain_skipped,
+            "reducer_rows": r.reducer_rows,
+        }),
+    };
+    let basis = rep
+        .basis
+        .iter()
+        .map(|g| g.to_rpoly(f))
+        .collect::<Option<Vec<RPoly>>>()
+        .unwrap_or_default();
+    (out, basis)
+}
+
+/// The tower cells on the wide builder (`pkm_tower_wide`): Kummer and the
+/// Dickson torus, the tower control and the null, `t` upward until a whole
+/// cell stops.
+fn run_wide(a: &Args, sink: &mut Sink) {
+    let wa = wide::WArgs {
+        seed: a.seed,
+        planted: a.planted,
+        random: a.random,
+        budget: a.budget,
+        max_nnz: a.max_nnz,
+        max_dense: a.max_dense,
+        full_rank_exit: a.full_rank_exit,
+        trace: a.trace.then_some((
+            print_tower_step as fn(usize, &f4_fp_tower::StepTrace),
+            print_stopped_step as fn(usize, bool, &f4_fp_tower::StepTrace),
+        )),
+        targets: a.targets.clone(),
+        verify: a.verify,
+        label: a.p_label.clone(),
+    };
+    for &kind in &a.kinds {
+        let wk = match kind {
+            Kind::Kummer => wide::WKind::Kummer,
+            Kind::DicksonTorus => wide::WKind::DicksonTorus,
+            other => panic!("the wide builder has no {} tower", other.name()),
+        };
+        for &m in &a.ms {
+            let max_t = match m {
+                2 => a.max_t,
+                3 => a.max_t_m3,
+                _ => a.max_t_m4,
+            };
+            let t_min = if m >= 3 { a.t_min.max(2) } else { a.t_min };
+            for &control in &a.controls {
+                let wc = match control {
+                    Control::Tower => wide::WControl::Tower,
+                    Control::Null if m == 2 || a.null_chain => wide::WControl::Null,
+                    _ => continue,
+                };
+                for t in t_min..=max_t {
+                    let cell = wide::WCell {
+                        kind: wk,
+                        m,
+                        control: wc,
+                        t,
+                    };
+                    let (rows, finished) =
+                        with_backend!(a.backend, &a.p_big, |f| wide::run_cell(&f, &cell, &wa));
+                    for r in rows {
+                        sink.push(r);
+                    }
+                    if !finished {
+                        eprintln!(
+                            "-- {} m={m} {}: every run at t = {t} stopped; stopping",
+                            kind.name(),
+                            control.name()
+                        );
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
 // ── Driver ─────────────────────────────────────────────────────────
 
 struct Args {
@@ -1220,6 +1725,10 @@ struct Args {
     /// large `N` that tail, not the solve, exhausts memory.
     planted_max_t: usize,
     random: usize,
+    /// `--null-chain`: run the null control at `m ≥ 3` too, with every `S₃`
+    /// link of the chain given random coefficients on its own support (off
+    /// by default, so every committed command line runs what it ran).
+    null_chain: bool,
     budget: u64,
     seed: u64,
     ladder_ts: Vec<usize>,
@@ -1255,6 +1764,25 @@ struct Args {
     /// target and system is still drawn, in order, so each one measured is
     /// the system a run without the flag gives it.
     targets: Option<Vec<usize>>,
+    /// The prime as given (`--p` takes a decimal number or `P-192`,
+    /// `P-224`, `P-256`); `p` is it when it fits the `u64` builder
+    /// (`p < 2⁶³`), else 0.
+    p_big: BigUint,
+    /// The prime's label in rows (`--p` as given).
+    p_label: String,
+    /// `--engine generic` only: the backend.
+    backend: Backend,
+    /// `--builder wide`: build the systems over the backend
+    /// (`pkm_tower_wide`), Kummer and torus only; forced above `2⁶³`.
+    wide: bool,
+    /// `--verify`: wide builder only, the exhaustive and `BigUint` checks.
+    verify: bool,
+    /// `--engine hky` only: the closure degrees, and the limits of one
+    /// closure (`--budget` is its time limit).
+    hky_cmin: Option<u32>,
+    hky_cmax: u32,
+    hky_max_cols: u128,
+    hky_max_entries: u64,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -1262,6 +1790,119 @@ enum Engine {
     F4,
     Tower,
     Sig,
+    /// `f4_tower_generic`, over the backend `--backend` picks.
+    Generic,
+    /// `hky_fp_tower`: the Huang–Kosters–Yeo closures `V_{F,c}` for
+    /// `c = --hky-cmin … --hky-cmax`, and the first and last fall degree
+    /// read off them (`research/prime_fall_degree_20261027/`). No F4 runs;
+    /// the naive control runs too (free variables only).
+    Hky,
+}
+
+/// The prime-field backend of `--engine generic`. `Auto` picks by the
+/// prime's size: `Fp32` below `2³²`, `Fp52` below `2⁵²` on a CPU with
+/// AVX-512 IFMA, `Fp64` below `2⁶³`, `FpP192` at
+/// NIST P-192, `FpWide<3>` to 192 bits, `Fp224` (`FpWide<4>` with a spare
+/// top bit) to 255 bits, `FpWide<4>` above.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Backend {
+    Auto,
+    Fp32,
+    Fp52,
+    Fp64,
+    Wide1,
+    Wide3,
+    P192,
+    Fp224,
+    Wide4,
+}
+
+fn nist(name: &str) -> Option<BigUint> {
+    let one = BigUint::from(1u32);
+    match name {
+        "P-192" | "p192" => Some((&one << 192u32) - (&one << 64u32) - 1u32),
+        "P-224" | "p224" => Some((&one << 224u32) - (&one << 96u32) + 1u32),
+        "P-256" | "p256" => {
+            Some((&one << 256u32) - (&one << 224u32) + (&one << 192u32) + (&one << 96u32) - 1u32)
+        }
+        _ => None,
+    }
+}
+
+/// Deterministic Miller–Rabin for `n < 2⁶⁴` (the first twelve prime bases).
+fn is_prime_u64(n: u64) -> bool {
+    if n < 2 {
+        return false;
+    }
+    const BASES: [u64; 12] = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37];
+    for q in BASES {
+        if n.is_multiple_of(q) {
+            return n == q;
+        }
+    }
+    let mulm = |a: u64, b: u64| ((u128::from(a) * u128::from(b)) % u128::from(n)) as u64;
+    let powm = |mut a: u64, mut e: u64| {
+        let mut r = 1u64;
+        while e > 0 {
+            if e & 1 == 1 {
+                r = mulm(r, a);
+            }
+            a = mulm(a, a);
+            e >>= 1;
+        }
+        r
+    };
+    let s = (n - 1).trailing_zeros();
+    let d = (n - 1) >> s;
+    'bases: for a in BASES {
+        let mut x = powm(a, d);
+        if x == 1 || x == n - 1 {
+            continue;
+        }
+        for _ in 1..s {
+            x = mulm(x, x);
+            if x == n - 1 {
+                continue 'bases;
+            }
+        }
+        return false;
+    }
+    true
+}
+
+/// `proth:K`: the smallest prime `c·2^K + 1` with `c` odd (so
+/// `v₂(p − 1) = K` exactly), for `K ≤ 61`.
+fn proth(spec: &str) -> Option<BigUint> {
+    let k: u32 = spec.strip_prefix("proth:")?.parse().ok()?;
+    assert!((2..=61).contains(&k), "proth:K needs 2 <= K <= 61");
+    (1u64..)
+        .step_by(2)
+        .map(|c| (c << k) + 1)
+        .take_while(|&p| p < 1 << 63)
+        .find(|&p| is_prime_u64(p))
+        .map(BigUint::from)
+}
+
+fn resolve_backend(b: Backend, p: &BigUint) -> Backend {
+    if b != Backend::Auto {
+        return b;
+    }
+    let bits = p.bits();
+    if bits <= 32 {
+        Backend::Fp32
+    } else if bits <= 52 && Fp52::new(u64::try_from(p).unwrap()).uses_ifma() {
+        Backend::Fp52
+    } else if bits <= 63 {
+        Backend::Fp64
+    } else if Some(p) == nist("P-192").as_ref() {
+        Backend::P192
+    } else if bits <= 192 {
+        Backend::Wide3
+    } else if p < &((BigUint::from((1u64 << 63) - 1)) << 192u32) {
+        Backend::Fp224
+    } else {
+        Backend::Wide4
+    }
 }
 
 /// Rows as they are measured: every row reaches `--out` and is flushed
@@ -1295,6 +1936,7 @@ fn parse_args() -> Args {
         planted: 3,
         planted_max_t: usize::MAX,
         random: 3,
+        null_chain: false,
         budget: 60,
         seed: 0x504B_4D54,
         ladder_ts: vec![4, 6],
@@ -1310,6 +1952,15 @@ fn parse_args() -> Args {
         full_rank_exit: true,
         sig: sig_fp_tower::SigOptions::default(),
         targets: None,
+        p_big: BigUint::from(786_433u32),
+        p_label: "786433".into(),
+        backend: Backend::Auto,
+        wide: false,
+        verify: false,
+        hky_cmin: None,
+        hky_cmax: 6,
+        hky_max_cols: 2_000_000,
+        hky_max_entries: 600_000_000,
     };
     let args: Vec<String> = std::env::args().skip(1).collect();
     let list = |s: &str| -> Vec<usize> {
@@ -1325,14 +1976,54 @@ fn parse_args() -> Args {
             i += 1;
             continue;
         }
+        if args[i] == "--null-chain" {
+            a.null_chain = true;
+            i += 1;
+            continue;
+        }
         if args[i] == "--no-full-rank-exit" {
             a.full_rank_exit = false;
             i += 1;
             continue;
         }
+        if args[i] == "--verify" {
+            a.verify = true;
+            i += 1;
+            continue;
+        }
         let v = args.get(i + 1).cloned().unwrap_or_default();
         match args[i].as_str() {
-            "--p" => a.p = v.parse().expect("--p"),
+            "--p" => {
+                a.p_big = nist(&v)
+                    .or_else(|| proth(&v))
+                    .unwrap_or_else(|| v.parse().expect("--p"));
+                a.p_label = v.clone();
+                a.p = u64::try_from(&a.p_big)
+                    .ok()
+                    .filter(|&p| p < 1 << 63)
+                    .unwrap_or(0);
+            }
+            "--backend" => {
+                a.backend = match v.as_str() {
+                    "auto" => Backend::Auto,
+                    "fp32" => Backend::Fp32,
+                    "fp64" => Backend::Fp64,
+                    "fp52" => Backend::Fp52,
+                    "wide1" => Backend::Wide1,
+                    "wide3" => Backend::Wide3,
+                    "p192" => Backend::P192,
+                    "fp224" => Backend::Fp224,
+                    "wide4" => Backend::Wide4,
+                    other => panic!("unknown backend `{other}`"),
+                }
+            }
+            "--builder" => {
+                a.wide = match v.as_str() {
+                    "wide" => true,
+                    "u64" => false,
+                    other => panic!("unknown builder `{other}`"),
+                }
+            }
             "--kinds" => {
                 a.kinds = v
                     .split(',')
@@ -1340,6 +2031,7 @@ fn parse_args() -> Args {
                         "kummer" => Kind::Kummer,
                         "dickson" => Kind::Dickson,
                         "isogeny" => Kind::Isogeny,
+                        "dickson-torus" => Kind::DicksonTorus,
                         other => panic!("unknown kind `{other}`"),
                     })
                     .collect()
@@ -1375,11 +2067,17 @@ fn parse_args() -> Args {
                     "f4" | "f4_fp" => Engine::F4,
                     "tower" | "f4_fp_tower" => Engine::Tower,
                     "sig" | "f4_fp_tower_sig" => Engine::Sig,
+                    "generic" | "f4_tower_generic" => Engine::Generic,
+                    "hky" | "hky_fp_tower" => Engine::Hky,
                     other => panic!("unknown engine `{other}`"),
                 }
             }
             "--max-nnz" => a.max_nnz = Some(v.parse().expect("--max-nnz")),
             "--max-dense" => a.max_dense = Some(v.parse().expect("--max-dense")),
+            "--hky-cmin" => a.hky_cmin = Some(v.parse().expect("--hky-cmin")),
+            "--hky-cmax" => a.hky_cmax = v.parse().expect("--hky-cmax"),
+            "--hky-max-cols" => a.hky_max_cols = v.parse().expect("--hky-max-cols"),
+            "--hky-max-entries" => a.hky_max_entries = v.parse().expect("--hky-max-entries"),
             "--sig-order" => {
                 a.sig.order = match v.as_str() {
                     "pot" => sig_fp_tower::ModuleOrder::PositionFirst,
@@ -1407,6 +2105,16 @@ fn parse_args() -> Args {
             other => panic!("unknown flag `{other}`"),
         }
         i += 2;
+    }
+    if a.p == 0 {
+        // Above 2^63 only the wide builder holds the prime.
+        a.wide = true;
+    }
+    if a.wide {
+        assert!(
+            matches!(a.engine, Engine::Generic),
+            "the wide builder runs `--engine generic` only"
+        );
     }
     a
 }
@@ -1450,7 +2158,17 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
         ^ (cell.g as u64);
     let mut rng = StdRng::seed_from_u64(cell_seed);
     let tower = build_tower(cell.kind, p, cell.t, &mut rng);
-    let (curve, on) = target_curve(p, &tower, cell.m.max(2), &mut rng);
+    // A cell with planted targets needs m distinct base abscissae on the
+    // curve. Random targets need none beyond two. Capping the requirement
+    // at |V| changes nothing for a cell that could be drawn before
+    // (`m ≤ |V|`), and stops the search from looping when `m > |V|`
+    // (research/prime_fall_degree_20261027, Amendment 4).
+    let need = if a.planted == 0 && cell.control != Control::Ladder {
+        cell.m.max(2).min(tower.v.len())
+    } else {
+        cell.m.max(2)
+    };
+    let (curve, on) = target_curve(p, &tower, need, &mut rng);
     let mut targets = Vec::new();
     let planted = if cell.t > a.planted_max_t && cell.control != Control::Ladder {
         0
@@ -1478,7 +2196,7 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
             cell.g,
             &mut rng,
         );
-        if a.engine != Engine::F4 && cell.control == Control::Naive {
+        if !matches!(a.engine, Engine::F4 | Engine::Hky) && cell.control == Control::Naive {
             // The naive control has no tower to rewrite by.
             continue;
         }
@@ -1506,6 +2224,27 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
                 );
                 let out = Outcome::from_f4(&m);
                 (out, Dumpable::Raw(m.report.basis))
+            }
+            Engine::Generic => {
+                let ring = tower_ring(&tower, cell.m, p);
+                let (out, basis) = with_backend!(a.backend, &a.p_big, |f| measure_generic(
+                    f,
+                    &eqs,
+                    towers,
+                    &ring,
+                    sol.as_deref(),
+                    max_degree,
+                    Duration::from_secs(a.budget),
+                    a.max_nnz,
+                    a.max_dense,
+                    a.trace,
+                    a.full_rank_exit,
+                ));
+                (out, Dumpable::Ring(basis))
+            }
+            Engine::Hky => {
+                let out = measure_hky(&eqs, &tower, cell, n, p, sol.as_deref(), a);
+                (out, Dumpable::Raw(Vec::new()))
             }
             Engine::Tower | Engine::Sig => {
                 let ring = tower_ring(&tower, cell.m, p);
@@ -1569,6 +2308,27 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
         if let (Some(obj), Some(extra)) = (row.as_object_mut(), r.extra.as_object()) {
             for (k, v) in extra {
                 obj.insert(k.clone(), v.clone());
+            }
+            if a.engine == Engine::Hky {
+                // No F4 ran: keep only the fields the closure measured.
+                for k in [
+                    "solving_degree_max",
+                    "last_productive_degree",
+                    "degree_reached",
+                    "max_cols_to_solution",
+                    "steps_to_solution",
+                    "inconsistent",
+                    "zero_dim",
+                    "linear_basis_elements",
+                    "basis_len",
+                    "steps",
+                    "max_rows",
+                    "max_cols",
+                    "pairs_above_bound",
+                    "staircase_at_stop",
+                ] {
+                    obj.remove(k);
+                }
             }
         }
         eprintln!(
@@ -1814,24 +2574,27 @@ fn main() {
             .as_ref()
             .map(|path| File::create(path).expect("create --out")),
     };
+    if a.wide {
+        run_wide(&a, &mut sink);
+    }
     // The tower systems and their naive and null controls, t upward until
     // a whole cell times out.
-    for &kind in &a.kinds {
+    for &kind in a.kinds.iter().filter(|_| !a.wide) {
         for &m in &a.ms {
             let max_t = match m {
                 2 => a.max_t,
                 3 => a.max_t_m3,
                 _ => a.max_t_m4,
             };
-            // The null and naive controls are written for m = 2, and the
-            // naive membership for the Kummer coset only.
+            // The naive control is written for m = 2 and the Kummer coset
+            // only; the null for m = 2, and for every m with `--null-chain`.
             let controls: Vec<Control> = a
                 .controls
                 .iter()
                 .copied()
                 .filter(|c| match c {
                     Control::Tower => true,
-                    Control::Null => m == 2,
+                    Control::Null => m == 2 || a.null_chain,
                     Control::Naive => m == 2 && kind == Kind::Kummer,
                     Control::Ladder => false,
                 })
@@ -1860,7 +2623,7 @@ fn main() {
         }
     }
     // The generator-count ladder, on planted targets.
-    for &kind in &a.kinds {
+    for &kind in a.kinds.iter().filter(|_| !a.wide) {
         for &t in &a.ladder_ts {
             for &g in &a.ladder_gs {
                 let cell = Cell {
@@ -1876,7 +2639,7 @@ fn main() {
     }
     let rows = &sink.rows;
     let summary = json!({
-        "p": a.p,
+        "p": if a.p != 0 { json!(a.p) } else { json!(a.p_label) },
         "budget_seconds": a.budget,
         "seed": a.seed,
         "planted_per_cell": a.planted,
@@ -1888,5 +2651,105 @@ fn main() {
     eprintln!("{summary}");
     if let Some(f) = sink.file.as_mut() {
         writeln!(f, "{}", json!({ "summary": summary })).expect("write --out");
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// `7·2^21 − 1` and `61·2^25 − 1`, the torus primes of
+    /// `research/pkm_dickson_torus_20261015/`.
+    const TORUS_PRIMES: [u64; 2] = [14_680_063, 2_046_820_351];
+
+    #[test]
+    fn torus_tower_has_2t_distinct_values_in_fp() {
+        for &p in &TORUS_PRIMES {
+            for t in 1..=12 {
+                let mut rng = StdRng::seed_from_u64(0x7031 ^ t as u64);
+                // `build_tower` runs `Tower::check`, and `dickson_torus`
+                // runs `check_torus`: both panic on a wrong tower.
+                let tower = build_tower(Kind::DicksonTorus, p, t, &mut rng);
+                assert_eq!(tower.v.len(), 1 << t);
+                let mut s = tower.v.clone();
+                s.sort_unstable();
+                s.dedup();
+                assert_eq!(s.len(), 1 << t, "|V| = 2^t, p = {p}, t = {t}");
+                assert!(s.iter().all(|&x| x < p), "V ⊂ F_p");
+                // Every value climbs the chain to c.
+                for &x in &tower.v {
+                    let y = tower.values(x, p);
+                    assert_eq!(tower.apply(t - 1, y[t - 1], p), tower.c);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn torus_values_are_traces_of_torus_elements() {
+        // Independent of the builder: y ∈ V iff the roots of X² − yX + 1
+        // are a coset element and its inverse in T \ F_p, so y² − 4 is a
+        // non-residue, and D_{2^t}(y) = c.
+        let p = TORUS_PRIMES[0];
+        let t = 8;
+        let mut rng = StdRng::seed_from_u64(5);
+        let tower = build_tower(Kind::DicksonTorus, p, t, &mut rng);
+        for &y in &tower.v {
+            let d = subm(mulm(y, y, p), 4, p);
+            assert_eq!(powm(d, (p - 1) / 2, p), p - 1);
+            let mut z = y;
+            for _ in 0..t {
+                z = subm(mulm(z, z, p), 2, p);
+            }
+            assert_eq!(z, tower.c);
+        }
+        // c itself is not ±2 and D_{2^t} has exactly 2^t roots over c in V.
+        assert!(tower.c != 2 && tower.c != p - 2);
+    }
+
+    #[test]
+    #[should_panic(expected = "the torus case needs")]
+    fn torus_refuses_a_split_prime() {
+        let mut rng = StdRng::seed_from_u64(1);
+        // p₀ = 3·2^18 + 1: p + 1 = 2·393217, so 2^2 ∤ p + 1.
+        dickson_torus(786_433, 2, &mut rng);
+    }
+
+    #[test]
+    fn torus_tower_square_rules_vanish_on_v() {
+        // The f4_fp_tower rewriting rules are the Dickson ones: every tower
+        // equation reduces to zero in the ring, and every element of V^2
+        // satisfies the raw equations.
+        let p = TORUS_PRIMES[1];
+        let t = 6;
+        let mut rng = StdRng::seed_from_u64(9);
+        let tower = build_tower(Kind::DicksonTorus, p, t, &mut rng);
+        let ring = tower_ring(&tower, 2, p);
+        let n = 2 * t;
+        for i in 0..2 {
+            for e in tower.equations(n, i * t, p) {
+                assert!(ring.from_raw(&raw_terms(&e)).is_empty());
+            }
+        }
+    }
+
+    #[test]
+    fn chain_null_keeps_planted_zero() {
+        let p = TORUS_PRIMES[1];
+        let mut rng = StdRng::seed_from_u64(11);
+        let tower = build_tower(Kind::DicksonTorus, p, 3, &mut rng);
+        let (curve, on) = target_curve(p, &tower, 3, &mut rng);
+        let target = loop {
+            if let Some(tg) = plant(&curve, &tower, 3, &on, &mut rng) {
+                break tg;
+            }
+        };
+        let (eqs, _, sol, _) = system(Control::Null, &tower, &curve, 3, &target, 1, &mut rng);
+        let sol = sol.expect("planted");
+        assert!(eqs.iter().all(|e| e.eval(&sol, p) == 0));
+        // The null changed every chain link's coefficients.
+        let (tw, _, _, _) = system(Control::Tower, &tower, &curve, 3, &target, 1, &mut rng);
+        assert_ne!(eqs[0].terms, tw[0].terms);
+        assert_ne!(eqs[1].terms, tw[1].terms);
     }
 }

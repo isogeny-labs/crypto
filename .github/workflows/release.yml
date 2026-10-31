@@ -4,27 +4,10 @@ name: Release
 # major/minor version and patch + run number, giving ReleaseMe a distinct
 # stable version per run so /releases/latest remains the newest main build.
 on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
-  # Dry run on pull requests that touch what the build consumes, so the
-  # macOS and Windows legs are proven before a merge can turn a release
-  # red. The `release` job is skipped for these; nothing is published.
-  pull_request:
-    paths:
-      - '.github/workflows/release.yml'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      # `cargo build --bins` consumes the library and every binary target.
-      # Exercise the cross-platform packaging path whenever any Rust source
-      # changes, including the cover/Jacobian command-line tools.
-      - 'src/**'
-      - 'tests/fixtures/ecbench_manifest_small.json'
-      - 'ecc2k130/Makefile'
-      - 'tools/isogeny-cli/**'
-      - 'isogeny_algos/**'
-      - 'research/p192_p224_large_degree_isogenies_20261009/**'
-      - 'docs/curves/registry.json'
-  merge_group:
   workflow_dispatch:
 
 concurrency:
@@ -72,6 +55,7 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /.github/scripts/
             /build.rs
             /rustfmt.toml
@@ -83,6 +67,28 @@ jobs:
             /benches/
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - id: scope
         env:
           CI_EVENT: ${{ github.event_name }}
@@ -101,7 +107,31 @@ jobs:
         with:
           filter: blob:none
           sparse-checkout-cone-mode: false
-          sparse-checkout: /Cargo.toml
+          sparse-checkout: |
+            /tools/factor-base/
+            /Cargo.toml
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - id: v
         run: |
           version=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)
@@ -125,9 +155,8 @@ jobs:
           # musl omitted: redis → native-tls → openssl-sys needs a musl-built
           # libssl (vendored openssl in Cargo.toml). That edit is held by
           # another task; restore x86_64-unknown-linux-musl here when it lands.
-          - {target: aarch64-apple-darwin,      os: macos-latest}
-          - {target: x86_64-pc-windows-msvc,    os: windows-latest}
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    # The Windows and macOS legs were removed on 2026-10-26 (ubuntu-latest only).
     timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 45 }}
     steps:
       - name: Require successful scope classification
@@ -135,17 +164,18 @@ jobs:
         run: |
           echo '::error::CI scope or release metadata failed; refusing to skip validation.'
           exit 1
-      - name: Enable long Git paths on Windows
-        if: runner.os == 'Windows' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false')
-        run: git config --global core.longpaths true
       - if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         uses: actions/checkout@v4
         with:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /Cargo.toml
+            /tools/volcano-cli/
+            /isogeny_algos/
             /Cargo.lock
+            /.gitattributes
             /.cargo/
             /rust-toolchain*
             /.github/scripts/
@@ -159,13 +189,37 @@ jobs:
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
             /docs/curves/
+            /docs/ecdlp-audit/
             /README.md
             /LICENSE*
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - name: Materialize compile-time inputs without research archives
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         run: node .github/scripts/ci-scope.mjs --materialize
       - if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
-        uses: dtolnay/rust-toolchain@1.90.0
+        uses: dtolnay/rust-toolchain@1.98.0
         with:
           targets: ${{ matrix.target }}
       - if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
@@ -182,7 +236,8 @@ jobs:
         run: >-
           cargo build --locked --release
           --bin crypto --bin ic --bin ecbench --bin curve_cover_check
-          --bin curve_standards --bin hyperelliptic-cover
+          --bin curve_standards --bin hyperelliptic-cover --bin ecdlp-audit
+          --bin factor-base-sweep
           --target ${{ matrix.target }}
       - name: Smoke-test the binaries
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
@@ -192,12 +247,10 @@ jobs:
         run: |
           ext=""
           [ "${{ runner.os }}" = "Windows" ] && ext=".exe"
-          for bin in crypto curve_cover_check hyperelliptic-cover; do
+          for bin in crypto curve_cover_check curve_standards hyperelliptic-cover ecdlp-audit factor-base-sweep; do
             "./target/${{ matrix.target }}/release/$bin$ext" --help > /dev/null
           done
           "./target/${{ matrix.target }}/release/ic$ext" --help > /dev/null
-          "./target/${{ matrix.target }}/release/curve_cover_check$ext" --help > /dev/null
-          "./target/${{ matrix.target }}/release/curve_standards$ext" --help > /dev/null
           "./target/${{ matrix.target }}/release/ic$ext" --version > /dev/null
           "./target/${{ matrix.target }}/release/ic$ext" --json > ic-smoke.json
           grep -Fq '"git_commit": "'"$GITHUB_SHA"'"' ic-smoke.json
@@ -227,9 +280,18 @@ jobs:
           mkdir -p "dist/$name/docs/curves"
           cp docs/curves/registry.json docs/curves/covers.json docs/curves/cover-links.yaml \
              docs/curves/cover-links.schema.json docs/curves/COVERS.md docs/curves/ICV1.md \
+             docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md \
+             docs/curves/hyperelliptic-infrastructure.schema.json \
+             docs/curves/cover-transfer-assessments.json \
+             docs/curves/cover-transfer-assessment.schema.json \
+             docs/curves/fixed-f8-genus3-order-certificate.json \
              "dist/$name/docs/curves/"
           cp -R docs/curves/standards "dist/$name/docs/curves/"
-          for bin in crypto ic ecbench curve_cover_check hyperelliptic-cover; do
+          # These are non-authoritative examples, not a self-contained
+          # verification checkout. The mock binds repository source/report
+          # paths and pinned Git objects that are intentionally not staged.
+          cp -R docs/ecdlp-audit "dist/$name/docs/"
+          for bin in crypto ic ecbench curve_cover_check hyperelliptic-cover ecdlp-audit factor-base-sweep; do
             cp "target/${{ matrix.target }}/release/$bin$ext" "dist/$name/"
           done
           # `[ -f ] && cp` leaves the loop's exit status at 1 when the last
@@ -237,6 +299,47 @@ jobs:
           for extra in README.md LICENSE LICENSE.md; do
             [ -f "$extra" ] && cp "$extra" "dist/$name/" || true
           done
+          # Exercise the installed layout, not just binaries in target/. The
+          # generated verification request reuses the constructor's exact
+          # certificate, while native catalog checking consumes the staged
+          # registry, report, and link graph without repository fallbacks.
+          (
+            cd "dist/$name"
+            for required in \
+              docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md \
+              docs/curves/hyperelliptic-infrastructure.schema.json \
+              docs/curves/cover-transfer-assessments.json \
+              docs/curves/cover-transfer-assessment.schema.json \
+              docs/curves/fixed-f8-genus3-order-certificate.json; do
+              test -f "$required"
+            done
+            "./hyperelliptic-cover$ext" --help > /dev/null
+            "./ecdlp-audit$ext" --help > /dev/null
+            "./curve_cover_check$ext" \
+              --registry docs/curves/registry.json \
+              --output docs/curves/covers.json \
+              --links docs/curves/cover-links.yaml --check \
+              > curve-cover-check-smoke.json
+            printf '%s\n' \
+              '{"a":"0x0","b":"0x1","field":"f2m-7-e1a6f45a","form":"y^2+xy=x^3+a*x^2+b","modulus":"0x83","v":"1"}' \
+              | "./hyperelliptic-cover$ext" construct --input - > construct-smoke.json
+            node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("construct-smoke.json")); if(r.status!=="ok") process.exit(1); fs.writeFileSync("verify-smoke.json",JSON.stringify({model:r.result.model,certificate:r.result.certificate}));'
+            "./hyperelliptic-cover$ext" verify --input verify-smoke.json > verified-smoke.json
+            printf '%s\n' \
+              '{"schema":"hyperelliptic-jacobian-operation/v1","model":{"a":"0x0","b":"0x1","field":"f2m-7-e1a6f45a","form":"y^2+xy=x^3+a*x^2+b","modulus":"0x83","v":"1"},"operation":"identity"}' \
+              | "./hyperelliptic-cover$ext" arithmetic --input - > arithmetic-smoke.json
+            "./hyperelliptic-cover$ext" catalog-export \
+              --registry docs/curves/registry.json --output catalog-smoke.json
+            node -e 'const fs=require("fs"); for(const file of ["verified-smoke.json","arithmetic-smoke.json"]){const r=JSON.parse(fs.readFileSync(file)); if(r.status!=="ok") process.exit(1)} const c=JSON.parse(fs.readFileSync("catalog-smoke.json")); if(c.schema_version!=="curve-covers/v1") process.exit(1);'
+            "./ecdlp-audit$ext" verify-fixed-f8-order \
+              --input docs/curves/fixed-f8-genus3-order-certificate.json \
+              --repo-root . \
+              > fixed-f8-order-smoke.json
+            node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("fixed-f8-order-smoke.json")); if(r.status!=="verified"||r.jacobian_order_over_f8!==486) process.exit(1);'
+            rm construct-smoke.json verify-smoke.json verified-smoke.json \
+               arithmetic-smoke.json catalog-smoke.json fixed-f8-order-smoke.json \
+               curve-cover-check-smoke.json
+          )
           cd dist
           if [ "${{ runner.os }}" = "Windows" ]; then
             7z a -tzip "$name.zip" "$name" > /dev/null
@@ -260,21 +363,45 @@ jobs:
         include:
           - {target: x86_64-unknown-linux-gnu,  os: ubuntu-latest}
           - {target: x86_64-unknown-linux-musl, os: ubuntu-latest}
-          - {target: aarch64-apple-darwin,      os: macos-latest}
-          - {target: x86_64-pc-windows-msvc,    os: windows-latest}
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 30 }}
+    runs-on: ubuntu-latest
+    # Measured in run 40259290676 (PR #2588 head 7f5ca198d): Linux gnu took
+    # 36m25s (step 9 23m37s, soft-hash step 10m07s), musl 24m37s. The Windows
+    # and macOS legs were removed on 2026-10-26 (ubuntu-latest only).
+    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 45 || 50 }}
     steps:
+      # Keep Cargo output outside the package tree while it is fingerprinted.
+      # `runner.temp` is not available in job-level `env`, so set it per job.
+      - name: Keep Cargo output outside the package tree
+        shell: bash
+        run: echo "CARGO_TARGET_DIR=$RUNNER_TEMP/isogeny-target" >> "$GITHUB_ENV"
       - name: Require successful scope classification
         if: needs.scope.result != 'success' || needs.meta.result != 'success'
         run: |
           echo '::error::CI scope or release metadata failed; refusing to skip validation.'
           exit 1
-      - name: Enable long Git paths on Windows
-        if: runner.os == 'Windows' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false')
-        run: git config --global core.longpaths true
       - if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - uses: dtolnay/rust-toolchain@1.93.1
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         with:
@@ -286,14 +413,21 @@ jobs:
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         with:
           workspaces: tools/isogeny-cli
+          cache-targets: false
       - name: Build and test the dedicated executable
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
+        # bash (-e) so a failing cargo command fails the step on Windows too; the default
+        # pwsh only reports the last native command, which hid two failing isogeny-cli
+        # commands behind two passing isogeny_algos ones.
+        shell: bash
         env:
           CRYPTO_BUILD_GIT_COMMIT: ${{ github.sha }}
           CRYPTO_BUILD_GIT_DIRTY: "false"
         run: |
           cargo build --locked --release --manifest-path tools/isogeny-cli/Cargo.toml --target ${{ matrix.target }}
           cargo test --locked --release --manifest-path tools/isogeny-cli/Cargo.toml --target ${{ matrix.target }}
+          cargo build --locked --release --manifest-path isogeny_algos/Cargo.toml --target ${{ matrix.target }} --bin isogeny-perf
+          cargo test --locked --release --manifest-path isogeny_algos/Cargo.toml --target ${{ matrix.target }} --bin isogeny-perf
       - name: Check the portable receipt-hash fallback
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         env:
@@ -309,9 +443,11 @@ jobs:
           ext=""
           [ "${{ runner.os }}" = "Windows" ] && ext=".exe"
           mkdir -p "$RUNNER_TEMP/isogeny-installed"
-          cp "tools/isogeny-cli/target/${{ matrix.target }}/release/isogeny$ext" "$RUNNER_TEMP/isogeny-installed/"
+          cp "$CARGO_TARGET_DIR/${{ matrix.target }}/release/isogeny$ext" "$RUNNER_TEMP/isogeny-installed/"
+          cp "$CARGO_TARGET_DIR/${{ matrix.target }}/release/isogeny-perf$ext" "$RUNNER_TEMP/isogeny-installed/"
           cd "$RUNNER_TEMP/isogeny-installed"
           "./isogeny$ext" --help > /dev/null
+          "./isogeny-perf$ext" --help > /dev/null
           "./isogeny$ext" --version > BUILD.json
           grep -Fq '"git_commit": "'"$GITHUB_SHA"'"' BUILD.json
           "./isogeny$ext" screen --curve p192 --from 1010 --to 65537 > screen.json
@@ -335,7 +471,8 @@ jobs:
           ext=""
           [ "${{ runner.os }}" = "Windows" ] && ext=".exe"
           mkdir -p "dist/$name"
-          cp "tools/isogeny-cli/target/${{ matrix.target }}/release/isogeny$ext" "dist/$name/"
+          cp "$CARGO_TARGET_DIR/${{ matrix.target }}/release/isogeny$ext" "dist/$name/"
+          cp "$CARGO_TARGET_DIR/${{ matrix.target }}/release/isogeny-perf$ext" "dist/$name/"
           cp tools/isogeny-cli/README.md "dist/$name/README.md"
           cp "$RUNNER_TEMP/isogeny-installed/BUILD.json" "dist/$name/BUILD.json"
           for license in LICENSE LICENSE.md; do
@@ -355,6 +492,135 @@ jobs:
           path: dist/*
           if-no-files-found: error
 
+  isogeny-algos:
+    if: always() && !cancelled()
+    needs: [meta, scope]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {target: x86_64-unknown-linux-gnu,  os: ubuntu-latest}
+          - {target: x86_64-unknown-linux-musl, os: ubuntu-latest}
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 30 }}
+    steps:
+      - name: Keep Cargo output outside the package tree
+        shell: bash
+        run: echo "CARGO_TARGET_DIR=$RUNNER_TEMP/isogeny-algos-target" >> "$GITHUB_ENV"
+      - name: Require successful scope classification
+        if: needs.scope.result != 'success' || needs.meta.result != 'success'
+        run: |
+          echo '::error::CI scope or release metadata failed; refusing to skip validation.'
+          exit 1
+      - if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /isogeny_algos/
+            /LICENSE
+            /LICENSE.md
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
+      # the crate's own CI toolchain (isogeny-algos.yml); it uses slice APIs newer than 1.93
+      - uses: dtolnay/rust-toolchain@1.98
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
+        with:
+          targets: ${{ matrix.target }}
+      - name: Install the musl linker
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false') && matrix.target == 'x86_64-unknown-linux-musl'
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq musl-tools
+      - uses: Swatinem/rust-cache@v2
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
+        with:
+          workspaces: isogeny_algos
+          cache-targets: false
+      # x86-64 builds stay portable: the AVX-512 IFMA and ADX paths are chosen at run time
+      - name: Build the command line
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
+        run: cargo build --locked --release --manifest-path isogeny_algos/Cargo.toml --target ${{ matrix.target }} --bin isogeny-algos
+      - name: Test the installed executable without a checkout
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
+        shell: bash
+        run: |
+          set -euo pipefail
+          ext=""
+          [ "${{ runner.os }}" = "Windows" ] && ext=".exe"
+          mkdir -p "$RUNNER_TEMP/isogeny-algos-installed"
+          cp "$CARGO_TARGET_DIR/${{ matrix.target }}/release/isogeny-algos$ext" "$RUNNER_TEMP/isogeny-algos-installed/"
+          cd "$RUNNER_TEMP/isogeny-algos-installed"
+          B="./isogeny-algos$ext"
+          "$B" version > BUILD.json
+          grep -Fq '"name":"isogeny-algos"' BUILD.json
+          "$B" count --curve p256 --order 115792089210356248762697446949407573529996955224135760342422259061068512044369 > p256.json
+          grep -Fq '"status":"PASS"' p256.json
+          set +e; "$B" count --curve p256 --order 1 > /dev/null; code=$?; set -e
+          test "$code" -eq 1
+          P=2305843009213693951
+          for args in \
+            "count --p 170141183460469231731687303715884105727 --a 3 --b 1234567" \
+            "isogenies --p $P --a 7 --b 7 --ell 73" \
+            "chain --p $P --a 4 --b 7 --ell 3 --n 3" \
+            "velu --p $P --a 7 --b 7 --ell 73 --kernel-x 2302858932999476951 --method sqrtvelu" \
+            "dual --p $P --a 7 --b 7 --ell 73" \
+            "csidh --primes 3,5,7,11,13,17,19,23,29,31,37,59 --exps 1,-1,2,0,0,1,-3,0,1,0,0,2" \
+            "path --p 1000003 --j1 499965 --j2 620467 --method ghs" \
+            "klpt --p 1152921504606847067 --norm 1000003" \
+            "richelot --p 211 --roots 1,2,3,4,5,6 --lc 3" \
+            "modpoly --ell 5 --p 10007 --j 1234"; do
+            read -r -a family_args <<< "$args"
+            "$B" "${family_args[@]}" > family.json
+            grep -Fq '"status":"PASS"' family.json || { echo "FAILED: $args"; cat family.json; exit 1; }
+          done
+      - name: Stage the archive
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
+        shell: bash
+        run: |
+          name="isogeny-algos-${{ needs.meta.outputs.tag }}-${{ matrix.target }}"
+          ext=""
+          [ "${{ runner.os }}" = "Windows" ] && ext=".exe"
+          mkdir -p "dist/$name"
+          cp "$CARGO_TARGET_DIR/${{ matrix.target }}/release/isogeny-algos$ext" "dist/$name/"
+          cp isogeny_algos/docs/USAGE.md "dist/$name/USAGE.md"
+          cp "$RUNNER_TEMP/isogeny-algos-installed/BUILD.json" "dist/$name/BUILD.json"
+          for license in LICENSE LICENSE.md; do
+            [ -f "$license" ] && cp "$license" "dist/$name/" || true
+          done
+          cd dist
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            7z a -tzip "$name.zip" "$name" > /dev/null
+          else
+            tar czf "$name.tar.gz" "$name"
+          fi
+          rm -rf "$name"
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
+        with:
+          name: isogeny-algos-${{ matrix.target }}
+          path: dist/*
+          if-no-files-found: error
+
   native:
     if: always() && !cancelled()
     needs: [meta, scope]
@@ -368,6 +634,27 @@ jobs:
           exit 1
       - if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_native != 'false'
         uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_native != 'false'
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - name: Build the ECC2K-130 CPU client
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_native != 'false'
         run: make -C ecc2k130 cpu MARCH="$ECC_MARCH"
@@ -414,7 +701,11 @@ jobs:
     needs: [meta, scope]
     # Pinned, not ubuntu-latest: the NVIDIA apt repo below is addressed by
     # distro, and the CUDA version is pinned, so letting the runner image
-    # float would eventually 404 the install and block every release.
+    # float would eventually 404 the install and block every release. That
+    # happened: the standard-runner rewrite (b94618d7a) turned this pin into
+    # ubuntu-latest, which is now Ubuntu 26.04, and run 40259290676 failed here
+    # with "Unable to locate package cuda-nvcc-12-8". Without this job
+    # the `release` job never runs. docs/RELEASES.md describes the pin.
     runs-on: ubuntu-24.04
     timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 60 }}
     steps:
@@ -429,6 +720,7 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /.gitattributes
             /ecc2k130/Makefile
             /ecc2k130/README.md
             /ecc2k130/src/
@@ -439,6 +731,29 @@ jobs:
             /gpu/semaev/
             /gpu/macaulay/
             /gpu/btcpuzzle/
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_cuda != 'false'
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - name: Install nvcc
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_cuda != 'false'
         # Compiler and CUDA headers only, not the full toolkit: ~330 MB
@@ -478,8 +793,46 @@ jobs:
           path: dist/*
           if-no-files-found: error
 
+  release-assets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/scripts/
+            /docs/curves/
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
+      - name: Test binary asset publication
+        run: |
+          bash -n .github/scripts/publish_release_assets.sh .github/scripts/test_publish_release_assets.sh
+          bash .github/scripts/test_publish_release_assets.sh
+
   release:
-    needs: [meta, rust, native, cuda, isogeny]
+    needs: [meta, rust, native, cuda, isogeny, isogeny-algos, release-assets]
     # Dry runs build and stage everything, then stop short of publishing.
     # The ref test is not redundant with the event test: workflow_dispatch
     # can be started from any branch, and a release tagged `-main.` that
@@ -491,6 +844,34 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/scripts/
+            /docs/curves/
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - uses: actions/download-artifact@v4
         with:
           path: staging
@@ -517,22 +898,32 @@ jobs:
 
           | Artifact | Contents |
           | --- | --- |
-          | `crypto-*-x86_64-unknown-linux-gnu.tar.gz` | `crypto`, `ic`, `ecbench`, `curve_cover_check`, `hyperelliptic-cover` — glibc |
-          | `crypto-*-x86_64-unknown-linux-musl.tar.gz` | same five executables — static |
-          | `crypto-*-aarch64-apple-darwin.tar.gz` | same five executables — Apple silicon |
-          | `crypto-*-x86_64-pc-windows-msvc.zip` | same five executables (`.exe`) |
+          | `crypto-*-x86_64-unknown-linux-gnu.tar.gz` | `crypto`, `ic`, `ecbench`, `curve_cover_check`, `curve_standards`, `hyperelliptic-cover`, `ecdlp-audit`, `factor-base-sweep` — glibc |
           | `isogeny-*-x86_64-unknown-linux-gnu.tar.gz` | dedicated `isogeny` executable, README, BUILD.json — glibc |
           | `isogeny-*-x86_64-unknown-linux-musl.tar.gz` | dedicated tool — static |
-          | `isogeny-*-aarch64-apple-darwin.tar.gz` | dedicated tool — Apple silicon |
-          | `isogeny-*-x86_64-pc-windows-msvc.zip` | dedicated `isogeny.exe` tool |
+          | `isogeny-algos-*-x86_64-unknown-linux-gnu.tar.gz` | `isogeny-algos` (point counting, isogenies, Vélu/√élu, chains, BMSS, duals, CSIDH, paths, KLPT, Richelot, Φ_ℓ), USAGE.md, BUILD.json — glibc |
+          | `isogeny-algos-*-x86_64-unknown-linux-musl.tar.gz` | `isogeny-algos` — static |
           | `ecc2k130-cpu-*.tar.gz` | ECC2K-130 client, CPU (`-march=x86-64-v3`) |
           | `ecc2k130-cuda-*.tar.gz` | ECC2K-130 client, CUDA fatbinary (sm_80–sm_120) |
 
           Verify with `sha256sum -c SHA256SUMS`.
 
+          Put the extracted `factor-base-sweep` executable on PATH and launch
+          `factor-base-sweep run --out runs/bases`. No Rust toolchain or source
+          checkout is needed to run the installed native CLI.
+
           Run `isogeny --help` after extracting the dedicated tool archive.
           `isogeny search --curve p224 --ell 1471 --out p224-1471` constructs
           and independently verifies the recorded one-eigenline map.
+
+          The Rust archives also include the `docs/curves` catalog snapshot,
+          hyperelliptic command contract and transfer-assessment records, plus
+          non-authoritative `docs/ecdlp-audit` examples. Run `ecdlp-audit --help`
+          to inspect the audit CLI. Its packaged mock is not self-validating:
+          `verify-plan` requires the matching repository paths and Git objects.
+
+          Run `isogeny-algos help` for the algorithm toolkit; every command prints one
+          JSON record with its checks (USAGE.md in the archive).
 
           The CUDA binary is compiled, not GPU-tested: GitHub runners have no GPU.
           NOTES
@@ -549,7 +940,15 @@ jobs:
         with:
           token: ${{ github.token }}
           prefix: v
-          version: ${{ needs.meta.outputs.release_version }}
-          draft: false
+          version: ${{ needs.meta.outputs.tag }}
+          draft: true
           release-notes: /tmp/notes.md
-          files: ${{ steps.assets.outputs.files }}
+        # The pinned action decodes files as UTF-8. Keep binary transfer in gh.
+        # Publish the draft only after downloaded assets match our manifest.
+      - name: Upload archives as bytes and verify published checksums
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          bash .github/scripts/publish_release_assets.sh
+          "$GITHUB_REPOSITORY" "${{ needs.meta.outputs.tag }}"
+          dist "$RUNNER_TEMP/published-release-assets"

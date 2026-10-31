@@ -1,0 +1,114 @@
+{
+  "captured_at": "2026-10-19T18:43:43.206698+00:00",
+  "state": {
+    "started_at": "2026-10-19T18:32:03.292514+00:00",
+    "driver_pid": 549179,
+    "status": "generating",
+    "steps": [
+      {
+        "name": "library-tests",
+        "command": [
+          "cargo",
+          "test",
+          "--release",
+          "--locked",
+          "--offline",
+          "--lib",
+          "diem_quartic",
+          "-j",
+          "2",
+          "--",
+          "--test-threads=1"
+        ],
+        "started_at": "2026-10-19T18:32:03.300583+00:00",
+        "timeout_seconds": 1800,
+        "pid": 549180,
+        "exit_code": 0,
+        "finished_at": "2026-10-19T18:38:05.121526+00:00"
+      },
+      {
+        "name": "checkpoint-tests",
+        "command": [
+          "cargo",
+          "test",
+          "--release",
+          "--locked",
+          "--offline",
+          "--example",
+          "diem_quartic_study",
+          "-j",
+          "2",
+          "--",
+          "--test-threads=1"
+        ],
+        "started_at": "2026-10-19T18:38:05.128841+00:00",
+        "timeout_seconds": 1800,
+        "pid": 572689,
+        "exit_code": 0,
+        "finished_at": "2026-10-19T18:42:20.018967+00:00"
+      },
+      {
+        "name": "build",
+        "command": [
+          "cargo",
+          "build",
+          "--release",
+          "--locked",
+          "--offline",
+          "--example",
+          "diem_quartic_study",
+          "-j",
+          "2"
+        ],
+        "started_at": "2026-10-19T18:42:20.025888+00:00",
+        "timeout_seconds": 1800,
+        "pid": 607076,
+        "exit_code": 0,
+        "finished_at": "2026-10-19T18:42:21.951425+00:00"
+      },
+      {
+        "name": "preflight",
+        "command": [
+          "/home/ec2-user/crypto-w2a-diem-relations/target/release/examples/diem_quartic_study",
+          "gen-status"
+        ],
+        "started_at": "2026-10-19T18:42:21.962058+00:00",
+        "timeout_seconds": 60,
+        "pid": 607370,
+        "exit_code": 0,
+        "finished_at": "2026-10-19T18:42:21.974957+00:00"
+      },
+      {
+        "name": "generation",
+        "command": [
+          "/home/ec2-user/crypto-w2a-diem-relations/target/release/examples/diem_quartic_study",
+          "gen"
+        ],
+        "started_at": "2026-10-19T18:42:21.993407+00:00",
+        "timeout_seconds": 86400,
+        "pid": 607388
+      }
+    ],
+    "output": "/home/ec2-user/crypto-w2a-diem-relations/research/diem_quartic_relations_20261018/resume-20261019/run-20261019T183203Z",
+    "source_sha256": {
+      "examples/diem_quartic_study.rs": "a9a34afae332b399525bd0cffe16980163e9b108236d79bc2f09614bd4976653",
+      "examples/diem_support/checkpoint.rs": "82957e4b1b05149af5d85770d87cacdeb6d1e4cb6fcee625f0bc07af9ee20d14",
+      "src/cryptanalysis/diem_quartic.rs": "2b0cb0cc2242220873f83a329a5749bbcb18a3acb003f0c39b4b11820e2e292d"
+    },
+    "binary_sha256": "cf3e9b152ed45250744ac9d12601e6ef1e4e678b37b1fa467b739b7798c5c827"
+  },
+  "processes": [
+    {
+      "pid": 607388,
+      "args": [
+        "/home/ec2-user/crypto-w2a-diem-relations/target/release/examples/diem_quartic_study",
+        "gen"
+      ],
+      "cwd": "/home/ec2-user/crypto-w2a-diem-relations",
+      "cpu_affinity": [
+        "26-28"
+      ]
+    }
+  ],
+  "durable_records_copied": 37
+}

@@ -1,0 +1,76 @@
+{
+  "schema": "pencil-test-only-ci-correction/v1",
+  "observed_utc": "2026-10-29T19:22:09.243410+00:00",
+  "path": "src/cryptanalysis/three_leads_rho_events.rs",
+  "instrument_source_revision": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+  "source_old_sha256": "dd1a67d91cab300d7c19a113c76ce0d0cd44cbd6d6abd075459bbf08d3c43a24",
+  "source_new_sha256": "16d51e2d8ba04bf08477f0a935c47ef0a8dbb7930ee833039515ba1088f42836",
+  "non_test_prefix_byte_identical": true,
+  "correction": "Replace explicit BuildHasher::build_hasher plus Hash::hash calls with BuildHasher::hash_one in exact_hash_and_table_semantics; same assertion.",
+  "ci_toolchain": "1.98",
+  "failed_run": 40938159763,
+  "failed_job": 123675663985,
+  "required_validation": "Rust 1.98 maintained Clippy passed. The required default-parallel Rust 1.99.1 release library suite completed with two pre-existing concurrency-sensitive failures; both passed in bounded serial reruns from the exact same compiled test binary. A fully passing default-parallel full suite is not claimed. Exact-current-head remote CI remains the merge gate.",
+  "static_build_restarted": false,
+  "validation_completed_utc": "2026-10-29T20:00:24.068763+00:00",
+  "validation_status": "clippy_passed_full_release_completed_with_two_concurrency_failures_bounded_same_binary_serial_checks_passed",
+  "clippy_validation": {
+    "command": "RUSTUP_TOOLCHAIN=1.98 bash scripts/clippy-maintained.sh",
+    "exit_code": 0,
+    "log": "clippy-materialized.stdout-stderr.log",
+    "log_sha256": "099b1a0757b2cb380d92a1df9ce67a8ba2ea825d5d751f5d24bb329b14289ab9",
+    "summary": "Finished dev profile in 2m 57s",
+    "initial_environment_only_failure_log": "clippy.stdout-stderr.log",
+    "initial_environment_only_failure_log_sha256": "dae8af341a3c2c12fe00c50ff285e6a526f789cbae7bb2a1c051d81d8d66213f",
+    "materialized_prerequisites": "materialized-prerequisites.sha256"
+  },
+  "release_validation": {
+    "command": "cargo +1.99.1 test --release --lib",
+    "exit_code": 101,
+    "log": "release-lib.stdout-stderr.log",
+    "log_sha256": "94d4bf9b8c4d04b07843e8b4ba4b29ab49d60f6942156b7fe388df04d97364ba",
+    "passed": 5275,
+    "failed": 2,
+    "ignored": 123,
+    "duration_seconds": 690.66,
+    "failures": [
+      {
+        "test": "cryptanalysis::ecbench::record::allocator_tests::the_child_prepares_the_allocator_before_the_solve_and_says_so",
+        "assertion": "src/cryptanalysis/ecbench/record.rs:2177: assertion failed: obs.cpu.is_some()",
+        "classification": "pre-existing concurrency-sensitive CPU-migration observation; not changed by this correction"
+      },
+      {
+        "test": "cryptanalysis::ecbench::gpu::lock_and_capsule_tests::a_gpu_stage_writes_a_host_capsule_the_receipt_binds",
+        "assertion": "src/cryptanalysis/ecbench/gpu.rs:1266: another benchmark holds the test lock",
+        "classification": "pre-existing lock-release timing behavior; not changed by this correction"
+      }
+    ]
+  },
+  "bounded_same_binary_confirmation": {
+    "command_scope": "each failed test run exactly with --test-threads=1 from the compiled release test binary",
+    "binary": "target/release/deps/crypto_lib-736382a8cfddd63f",
+    "binary_sha256": "12867c9d42920e7981cc8f82a404ad6b39e0a3a1ed1d7afa920258ae47dc8eb2",
+    "exit_code": 0,
+    "log": "focused-same-binary.stdout-stderr.log",
+    "log_sha256": "7165f35ec08114d094627fc6479463683c71690befd28cf940c918721f389c8d",
+    "allocator": {
+      "passed": 1,
+      "failed": 0,
+      "duration_seconds": 0.12
+    },
+    "gpu": {
+      "passed": 1,
+      "failed": 0,
+      "duration_seconds": 61.27
+    }
+  },
+  "source_identity": {
+    "materialized_file_count": 2244,
+    "before_manifest": "source-files.materialized-before.sha256",
+    "before_manifest_sha256": "86f45a4da12b220a4f044ca8ca6a1700e6d36adb19f4e3c7e3c76c6a4aea98a6",
+    "after_manifest": "source-files.after-release.sha256",
+    "after_manifest_sha256": "86f45a4da12b220a4f044ca8ca6a1700e6d36adb19f4e3c7e3c76c6a4aea98a6",
+    "manifests_byte_identical": true,
+    "corrected_source_sha256_before_and_after": "16d51e2d8ba04bf08477f0a935c47ef0a8dbb7930ee833039515ba1088f42836"
+  }
+}

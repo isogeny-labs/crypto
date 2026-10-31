@@ -1,0 +1,266 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Mixed twist IC native controls B=24, target-pin control",
+  "description": "Same exact public targets as mixed_component_results.ndjson; pure rational width-three pipeline, matched negation rho and A/A control. Follow-up target-pin baseline after full-rank B36 exhaustion; original spec/session retained.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_public_fixture",
+        "p": 101,
+        "a": 3,
+        "b": 17,
+        "group_order": 107,
+        "r": 107,
+        "gx": 0,
+        "gy": 44,
+        "qx": 62,
+        "qy": 26
+      },
+      {
+        "kind": "prime_public_fixture",
+        "p": 101,
+        "a": 3,
+        "b": 17,
+        "group_order": 107,
+        "r": 107,
+        "gx": 0,
+        "gy": 44,
+        "qx": 7,
+        "qy": 49
+      },
+      {
+        "kind": "prime_public_fixture",
+        "p": 101,
+        "a": 3,
+        "b": 17,
+        "group_order": 107,
+        "r": 107,
+        "gx": 0,
+        "gy": 44,
+        "qx": 1,
+        "qy": 18
+      },
+      {
+        "kind": "prime_public_fixture",
+        "p": 211,
+        "a": 1,
+        "b": 1,
+        "group_order": 223,
+        "r": 223,
+        "gx": 0,
+        "gy": 1,
+        "qx": 42,
+        "qy": 80
+      },
+      {
+        "kind": "prime_public_fixture",
+        "p": 211,
+        "a": 1,
+        "b": 1,
+        "group_order": 223,
+        "r": 223,
+        "gx": 0,
+        "gy": 1,
+        "qx": 163,
+        "qy": 145
+      },
+      {
+        "kind": "prime_public_fixture",
+        "p": 211,
+        "a": 1,
+        "b": 1,
+        "group_order": 223,
+        "r": 223,
+        "gx": 0,
+        "gy": 1,
+        "qx": 37,
+        "qy": 126
+      },
+      {
+        "kind": "prime_public_fixture",
+        "p": 307,
+        "a": 1,
+        "b": 6,
+        "group_order": 331,
+        "r": 331,
+        "gx": 0,
+        "gy": 96,
+        "qx": 97,
+        "qy": 267
+      },
+      {
+        "kind": "prime_public_fixture",
+        "p": 307,
+        "a": 1,
+        "b": 6,
+        "group_order": 331,
+        "r": 331,
+        "gx": 0,
+        "gy": 96,
+        "qx": 209,
+        "qy": 63
+      },
+      {
+        "kind": "prime_public_fixture",
+        "p": 307,
+        "a": 1,
+        "b": 6,
+        "group_order": 331,
+        "r": 331,
+        "gx": 0,
+        "gy": 96,
+        "qx": 192,
+        "qy": 220
+      },
+      {
+        "kind": "prime_public_fixture",
+        "p": 509,
+        "a": 1,
+        "b": 17,
+        "group_order": 503,
+        "r": 503,
+        "gx": 0,
+        "gy": 148,
+        "qx": 330,
+        "qy": 287
+      },
+      {
+        "kind": "prime_public_fixture",
+        "p": 509,
+        "a": 1,
+        "b": 17,
+        "group_order": 503,
+        "r": 503,
+        "gx": 0,
+        "gy": 148,
+        "qx": 212,
+        "qy": 74
+      },
+      {
+        "kind": "prime_public_fixture",
+        "p": 509,
+        "a": 1,
+        "b": 17,
+        "group_order": 503,
+        "r": 503,
+        "gx": 0,
+        "gy": 148,
+        "qx": 349,
+        "qy": 17
+      },
+      {
+        "kind": "prime_public_fixture",
+        "p": 1009,
+        "a": 1,
+        "b": 14,
+        "group_order": 1013,
+        "r": 1013,
+        "gx": 0,
+        "gy": 425,
+        "qx": 547,
+        "qy": 298
+      },
+      {
+        "kind": "prime_public_fixture",
+        "p": 1009,
+        "a": 1,
+        "b": 14,
+        "group_order": 1013,
+        "r": 1013,
+        "gx": 0,
+        "gy": 425,
+        "qx": 126,
+        "qy": 474
+      },
+      {
+        "kind": "prime_public_fixture",
+        "p": 1009,
+        "a": 1,
+        "b": 14,
+        "group_order": 1013,
+        "r": 1013,
+        "gx": 0,
+        "gy": 425,
+        "qx": 268,
+        "qy": 613
+      },
+      {
+        "kind": "prime_public_fixture",
+        "p": 2003,
+        "a": 2,
+        "b": 15,
+        "group_order": 1933,
+        "r": 1933,
+        "gx": 2,
+        "gy": 848,
+        "qx": 1833,
+        "qy": 1793
+      },
+      {
+        "kind": "prime_public_fixture",
+        "p": 2003,
+        "a": 2,
+        "b": 15,
+        "group_order": 1933,
+        "r": 1933,
+        "gx": 2,
+        "gy": 848,
+        "qx": 737,
+        "qy": 947
+      },
+      {
+        "kind": "prime_public_fixture",
+        "p": 2003,
+        "a": 2,
+        "b": 15,
+        "group_order": 1933,
+        "r": 1933,
+        "gx": 2,
+        "gy": 848,
+        "qx": 1192,
+        "qy": 578
+      }
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 20261021,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "ic-native",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=24",
+          "oracle": "mitm:m=3",
+          "linalg": "incremental-gauss",
+          "targets": "walk",
+          "max_trials": "10000"
+        }
+      }
+    },
+    {
+      "name": "rho-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 5,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261021,
+    "isolation_required": "L2",
+    "timeout_seconds": 120
+  }
+}

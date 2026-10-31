@@ -1,9 +1,18 @@
 # ECDLP Attack Taxonomy & Applicability Matrix
 
-A comprehensive map of every known attack on elliptic-curve cryptography,
-cross-referenced with where each one is implemented in this repository.
-The matrix is calibrated to **what an attacker can actually do to a curve**
-— not speculative weaknesses.
+> **Status:** taxonomy seed and historical implementation view, not the
+> canonical completeness or evidence ledger. The proposed
+> [comprehensive audit plan](../research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.md)
+> and its [non-authoritative machine mock](ecdlp-audit/ECDLP_AUDIT_PLAN.mock.json)
+> define the new identity, evidence, accounting, authorization, and governance
+> contract. Existing `✗/◐/◌/○` cells must be recertified before import; a
+> bypass is not automatically an ECDLP solution, and a blank or stale cell is
+> `unknown`, not safe.
+
+A historical map of attacks presently inventoried for elliptic-curve
+cryptography, cross-referenced with where each one is represented in this
+repository. Its cells are leads for recertification under the audit plan, not
+proof that the route inventory or implementation coverage is complete.
 
 ---
 
@@ -155,7 +164,7 @@ repository (`src/ecc/curve_zoo.rs`):
 | Curve | Country / Standard | Worst applicable row | Severity |
 |-------|--------------------|----------------------|----------|
 | secp256k1 | SECG / Bitcoin | #15 twist attack | ◌ Impl-dep, twist work factor 2¹⁰⁹·⁵ — passes SafeCurves |
-| P-256 (NIST) | NIST / NIST | #13 special-prime trapdoor *(speculative)*, #15 twist 2¹²⁰ | ◌ Impl-dep + speculative rigidity |
+| P-256 (NIST) | NIST / NIST | #13 special-prime trapdoor *(speculative)*, #15 twist 2¹²⁰ | ◌ Impl-dep + speculative rigidity (seed explained 2026-10-16; see note) |
 | P-224 (NIST) | NIST / NIST | #15 twist attack 2⁵⁸·⁴ | **✗ Breaks** if validation skipped |
 | P-384 / P-521 (NIST) | NIST | #15 twist 2¹⁹¹·⁸ / 2²²¹·⁸ | ◌ Impl-dep but high margin |
 | brainpoolP256r1 / t1 | BSI / RFC 5639 | #15 twist 2⁴⁴·⁵ on t1 | **✗ Breaks** on twisted variant if validation skipped |
@@ -167,6 +176,15 @@ repository (`src/ecc/curve_zoo.rs`):
 | Curve25519 / Curve448 | Bernstein / RFC 7748 | none (twist-secure by design) | passes every SafeCurves row |
 | BN254 / alt_bn128 | Brazilian / Ethereum | #8 MOV-style via Kim-Barbulescu 2016 → ~110 bit | **✗ Below 128-bit pairing security**; migration to BLS12-381 advised |
 | BLS12-381 | Swiss-academic / Ethereum-2 | #8 future Tower-NFS erosion | ◐ ~120-bit margin holding for now |
+
+*Note (2026-10-16).* The NIST P-curve seeds are now explained: they are
+`drand48` output seeded with UNIX times from 1997–98 (Anthropic Frontier Red
+Team and F. Valsorda, 2026-10-16; reproduced in
+`research/nist_seed_provenance_20261016/`). The rigidity concern on the NIST
+rows therefore no longer rests on the seed, whose remaining freedom is about
+30 bits per curve. It rests only on the unexplained base points (no ECDLP
+consequence in a prime-order group) and on an unexplained skip of about half
+the valid candidates in each generation run.
 
 ---
 

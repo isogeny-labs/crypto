@@ -51,12 +51,55 @@ equations as hypotheses, the factorization
 `S₃(xR, xF, X) = (xR − xF)² (X − x₊)(X − x₋)` (`SemaevS3.S3_factor`) with
 `x± = λ±² − xR − xF`, `λ± = (±yF − yR)/(xF − xR)` the affine chord formulas,
 and derives `S₃(xR, xF, X) = 0 ↔ X = x₊ ∨ X = x₋` (`SemaevS3.S3_root_iff`).
-No `sorry`; `#print axioms` gives only `propext`, `Classical.choice`,
-`Quot.sound`. Toolchain Lean 4.34.1, Mathlib `v4.34.1` pinned in
-`lean/lake-manifest.json`. Check with
+The toolchain is Lean 4.34.1, with Mathlib `v4.34.1` pinned in
+`lean/lake-manifest.json`.
+
+**Bridge to Mathlib's group law** (added 2026-10-29, CFSG exposure audit).
+The file's own `slope` and `addX` are now proved to be Mathlib's affine
+group law, not just described as such:
+
+- `SemaevS3.addX_eq_mathlib_addX`: for any `W : WeierstrassCurve.Affine K`
+  with `W.a₁ = 0`, `W.a₂ = 0` and `xR ≠ xF`,
+  `addX xR yR xF yF = W.addX xR xF (W.slope xR xF yR yF)`. No curve
+  equation is needed.
+- `SemaevS3.pointX_add_eq_xPlus`: for nonsingular `R = (xR, yR)`,
+  `F = (xF, yF)` on such a `W` with `xR ≠ xF`, the `x`-coordinate of
+  Mathlib's `Point.some … + Point.some …` is `xPlus xR yR xF yF`.
+- `SemaevS3.pointX_add_neg_eq_xMinus`: the same for `R + (−F)` and `xMinus`;
+  this one also needs `W.a₃ = 0`, so that Mathlib's `−(xF, yF)` is
+  `(xF, −yF)`.
+- `SemaevS3.S3_factor_mathlib`: Proposition 1 for Mathlib points on
+  `y² = x³ + a₄x + a₆` (`a₁ = a₂ = a₃ = 0`), the factorization of
+  `S₃(xR, xF, X)` with the curve equations taken from `W.Nonsingular`.
+
+Hypotheses not in the paper's sentence: `[DecidableEq K]` (Mathlib's
+`slope` and `Point.add` branch on equality) and, for the `R − F` root,
+`a₃ = 0` (implied by the paper's short Weierstrass form but not by
+"`a₁ = a₂ = 0`" alone). Nonsingularity is what Mathlib's `Point` requires;
+the paper's "points on the curve" are nonsingular when the discriminant is
+nonzero, which these lemmas do not assume or use. `pointX` (a helper defined
+here) returns `none` at infinity. **`S_m` for `m ≥ 4` is not formalized**;
+only `S₃` and its link to the group law are.
+
+**Axiom audit.** `lean/AxiomAudit.lean` runs `#print axioms` on
+`SemaevS3.S3_factor`, `SemaevS3.S3_root_iff`, the helper
+`SemaevS3.d2_mul_addX` and the four bridge lemmas above. It fails if any of them depends on an axiom other
+than `propext`, `Classical.choice` or `Quot.sound`, including `sorryAx`.
+The audit log comes from CI job `lean-proof` in
+`.github/workflows/rootfinding-s3roots-lean.yml`, kept as the run artifact
+`rootfinding-s3roots-axiom-audit`. That job builds against the Mathlib
+cache, replays `S3Roots` with `leanchecker --fresh`, and refuses `sorry`,
+`admit`, `native_decide` and custom axioms. Read the CI log for the actual
+axiom set. Earlier text here stated the result without any kept output
+(sheriff case SHF-20261016-3caa6f, finding L6). The output of a green run
+is now committed as [`lean/axiom-audit.txt`](lean/axiom-audit.txt) (`.txt` because `papers/.gitignore` ignores `*.log`)
+(run 38984047507, job 117251255336, PR #2026 head e5a884227,
+2026-10-17): all three theorems depend on exactly `propext`,
+`Classical.choice` and `Quot.sound`, and `leanchecker --fresh` passed
+(added 2026-10-17, sheriff case SHF-20261017-e4d7f6, L-N7). To check locally:
 
 ```
-cd lean && lake exe cache get && lake build
+cd lean && lake exe cache get && lake build && lake env lean AxiomAudit.lean
 ```
 
 (the Mathlib cache is ≈7.6 GB; `.lake/` is git-ignored).
@@ -109,7 +152,7 @@ packages); it has no overfull boxes and all references resolve. ≈10 pages.
   `research/semaev_rootfind_scaling_20261012/`,
   `research/semaev_rootfind_nist_20261012/` (console transcripts + JSON).
 - `cargo test --release --lib`: 2247 passed at the measured commit.
-- Lean: `lean/S3Roots.lean` (see above).
+- Lean: `lean/S3Roots.lean` and `lean/AxiomAudit.lean` (see above).
 
 ## Before submission
 

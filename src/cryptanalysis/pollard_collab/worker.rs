@@ -6,13 +6,15 @@
 //! Lanes share the node's [`SharedState`] behind a mutex and touch it
 //! only at check-in time, so the walk itself runs lock-free.
 
+use std::collections::VecDeque;
 use std::sync::Mutex;
 
 use num_bigint::BigUint;
 
 use super::job::{hex_of, JobContext, PROTOCOL_VERSION};
 use super::state::{now_secs, CheckIn, SharedState, UnitReport};
-use super::walk::{run_walker, WalkerOutcome};
+use super::walk::{run_walker, run_walkers_batch, WalkerOutcome};
+use crate::ecc::curve::CurveParams;
 
 /// Lane tuning.
 #[derive(Clone, Debug)]
@@ -30,6 +32,9 @@ pub struct LaneOptions {
     pub max_units: u64,
     /// Stop after this many walkers in this lane; `0` = until solved.
     pub max_walkers: u64,
+    /// Independent walkers advanced together; `1` retains the serial path.
+    /// Widths above one are currently restricted to secp256k1 jobs.
+    pub batch_width: usize,
 }
 
 impl LaneOptions {
@@ -41,6 +46,7 @@ impl LaneOptions {
             claim_window: 4,
             max_units: 0,
             max_walkers: 0,
+            batch_width: 1,
         }
     }
 }
@@ -68,6 +74,17 @@ pub fn run_lane(
     on_checkin: &mut dyn FnMut(&CheckIn),
     should_stop: &dyn Fn() -> bool,
 ) -> LaneSummary {
+    if opts.batch_width > 1 {
+        let curve = CurveParams::secp256k1();
+        assert!(
+            ctx.p == curve.p
+                && ctx.a.value == curve.a
+                && ctx.b == curve.b
+                && ctx.n == curve.n
+                && ctx.g == curve.generator(),
+            "batched rho worker requires an exact secp256k1 job"
+        );
+    }
     let mut sum = LaneSummary::default();
     let every = opts.checkin_every.max(1);
     // `steps`/`dps`/`dead_trails` in `LaneSummary` are lane totals,
@@ -117,12 +134,33 @@ pub fn run_lane(
         let mut u_dead = 0u64;
         let mut pending = Vec::new();
         let mut since_checkin = 0u64;
+        let mut batch_outcomes = VecDeque::new();
 
         while cursor < last {
             if should_stop() {
                 break 'units;
             }
-            match run_walker(ctx, cursor) {
+            let outcome = if opts.batch_width > 1 {
+                if batch_outcomes.is_empty() {
+                    let budget = if opts.max_walkers == 0 {
+                        u64::MAX
+                    } else {
+                        opts.max_walkers.saturating_sub(sum.walkers)
+                    };
+                    let count = (opts.batch_width as u64)
+                        .min(last - cursor)
+                        .min(every - since_checkin)
+                        .min(budget) as usize;
+                    batch_outcomes =
+                        VecDeque::from(run_walkers_batch(ctx, cursor, count, opts.batch_width));
+                }
+                batch_outcomes
+                    .pop_front()
+                    .expect("batch contains next walker")
+            } else {
+                run_walker(ctx, cursor)
+            };
+            match outcome {
                 WalkerOutcome::Dp(rec) => {
                     u_steps += rec.steps;
                     u_dps += 1;
@@ -364,6 +402,60 @@ mod tests {
         assert_eq!(
             sum.walkers, 27,
             "resumes own unit at walker 5, then no unit is left"
+        );
+    }
+
+    #[test]
+    fn batched_secp256k1_lane_replays_serial_checkins() {
+        let curve = CurveParams::secp256k1();
+        let q = curve
+            .generator()
+            .scalar_mul(&BigUint::from(7u32), &curve.a_fe());
+        let mut spec = JobSpec::new(&curve, &q, "batch-lane-replay", 0x71cc_2026_1017).unwrap();
+        spec.dp_bits = 3;
+        spec.num_branches = 32;
+        spec.unit_size = 16;
+        spec.max_steps_per_walker = 8;
+        let c = spec.build().unwrap();
+        let run = |batch_width| {
+            let state = Mutex::new(SharedState::new(&c));
+            let mut checkins = Vec::new();
+            let summary = run_lane(
+                &c,
+                &state,
+                &LaneOptions {
+                    checkin_every: 3,
+                    max_walkers: 8,
+                    max_units: 1,
+                    batch_width,
+                    ..LaneOptions::new("batch.0")
+                },
+                &mut |ci| {
+                    let mut ci = ci.clone();
+                    ci.time = 0;
+                    checkins.push(ci);
+                },
+                &|| false,
+            );
+            (summary, checkins)
+        };
+        assert_eq!(run(1), run(4));
+    }
+
+    #[test]
+    #[should_panic(expected = "batched rho worker requires an exact secp256k1 job")]
+    fn batched_lane_rejects_other_curves() {
+        let c = ctx(7, false);
+        let state = Mutex::new(SharedState::new(&c));
+        let _ = run_lane(
+            &c,
+            &state,
+            &LaneOptions {
+                batch_width: 4,
+                ..LaneOptions::new("batch.0")
+            },
+            &mut |_| {},
+            &|| false,
         );
     }
 }

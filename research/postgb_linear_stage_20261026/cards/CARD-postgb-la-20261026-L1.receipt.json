@@ -1,0 +1,286 @@
+{
+  "card_id": "CARD-postgb-la-20261026-L1",
+  "card_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-L1.yaml",
+  "card_sha256": "b2fb5396b16c27659298c9d84e7027e601286389aa0e307e36cff447ade8bf45",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import subprocess,sys; out=subprocess.run(['git','status','--porcelain','--untracked-files=all','--',':(exclude)research/postgb_linear_stage_20261026/cards'],capture_output=True,text=True).stdout; sys.exit(1 if out.strip() else 0)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.36,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "git-clean",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.36,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import os,sys; sys.exit(1 if os.path.exists('research/postgb_linear_stage_20261026/runs/L1.json') else 0)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.014,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "output-absent",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.014,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "research/postgb_linear_stage_20261026/runs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "mkdir-runs",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "df",
+        "-h",
+        "/"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-record",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "2164115a9b26649b1ddb12392db08a1c3b2759ba0c3983c30c143b3b7c6a3d66",
+      "stdout_tail": [
+        "Filesystem      Size  Used Avail Use% Mounted on",
+        "/dev/vda        252G   36G  3.5G  92% /"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "lscpu"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "lscpu-record",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "18269c4df3e10f9a7ceccc769e9a0e4351de77618a6c51c2cc178fb979d0c0e1",
+      "stdout_tail": [
+        "NUMA node0 CPU(s):                       0-3",
+        "Vulnerability Gather data sampling:      Not affected",
+        "Vulnerability Ghostwrite:                Not affected",
+        "Vulnerability Indirect target selection: Not affected",
+        "Vulnerability Itlb multihit:             Not affected",
+        "Vulnerability L1tf:                      Not affected",
+        "Vulnerability Mds:                       Not affected",
+        "Vulnerability Meltdown:                  Not affected",
+        "Vulnerability Mmio stale data:           Not affected",
+        "Vulnerability Old microcode:             Not affected",
+        "Vulnerability Reg file data sampling:    Not affected",
+        "Vulnerability Retbleed:                  Not affected",
+        "Vulnerability Spec rstack overflow:      Not affected",
+        "Vulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl",
+        "Vulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization",
+        "Vulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI Vulnerable",
+        "Vulnerability Srbds:                     Not affected",
+        "Vulnerability Tsa:                       Not affected",
+        "Vulnerability Tsx async abort:           Not affected",
+        "Vulnerability Vmscape:                   Not affected"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.025,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-run",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.025,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import re, sys, time\nstart = time.time()\nheld = 0\nwhile True:\n    value = float(re.search(r'some avg10=([0-9.]+)', open('/proc/pressure/cpu').read()).group(1))\n    if value <= 1.0:\n        held += 1\n    else:\n        held = 0\n    if held >= 6:\n        sys.exit(0)\n    if time.time() - start >= 1800:\n        sys.exit(1)\n    time.sleep(5)\n"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 55.03,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "quiet-before-run",
+      "index": 7,
+      "outputs": {},
+      "seconds": 55.03,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/examples/postgb_la_bench",
+        "--families",
+        "jv-nagao,gaudry-s4,gaudry-d4",
+        "--per",
+        "8",
+        "--reps",
+        "7",
+        "--json",
+        "research/postgb_linear_stage_20261026/runs/L1.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 354.084,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run",
+      "index": 8,
+      "outputs": {
+        "research/postgb_linear_stage_20261026/runs/L1.json": "465f88b644b2bc6cafdf5cb26be8ead062e4a176a75113e6595cd60a198ff89b"
+      },
+      "seconds": 354.084,
+      "stderr_sha256": "14baf34e86a8e4be200c131cfb8d5bd4eec311d21ac313a01cbc24b90d23556f",
+      "stderr_tail": [
+        "gaudry-d4 p97-4                  \u03b4=  512 f4=     42.5ms dense=10360.288 sparse=10802.339 fast=10050.041 sols=0 agree=true planted=None fast-gave-up:minimal polynomial short of delta",
+        "gaudry-d4 p97-5                  \u03b4=  512 f4=     39.2ms dense=  586.666 sparse=   87.186 fast=    9.252 sols=0 agree=true planted=None",
+        "gaudry-d4 p97-6                  \u03b4=  512 f4=     41.5ms dense=  612.479 sparse=   89.683 fast=    9.677 sols=0 agree=true planted=None",
+        "gaudry-d4 p97-7                  \u03b4=  512 f4=     39.8ms dense=  538.293 sparse=   84.354 fast=    9.702 sols=0 agree=true planted=None",
+        "gaudry-d4 p1033-0                \u03b4=  512 f4=     47.5ms dense=  596.260 sparse=   98.724 fast=   12.258 sols=0 agree=true planted=None",
+        "gaudry-d4 p1033-1                \u03b4=  512 f4=     41.8ms dense=  588.317 sparse=   96.579 fast=   11.887 sols=0 agree=true planted=None",
+        "gaudry-d4 p1033-2                \u03b4=  512 f4=     39.9ms dense=  650.535 sparse=  101.706 fast=   11.879 sols=1 agree=true planted=None",
+        "gaudry-d4 p1033-3                \u03b4=  512 f4=     40.5ms dense=  565.742 sparse=  107.757 fast=   11.897 sols=0 agree=true planted=None",
+        "gaudry-d4 p1033-4                \u03b4=  512 f4=     39.1ms dense=  682.071 sparse=   97.015 fast=   11.439 sols=1 agree=true planted=None",
+        "gaudry-d4 p1033-5                \u03b4=  512 f4=     39.1ms dense=  646.731 sparse=   96.472 fast=   11.183 sols=1 agree=true planted=None",
+        "gaudry-d4 p1033-6                \u03b4=  512 f4=     44.0ms dense=  908.409 sparse=  110.896 fast=   11.416 sols=4 agree=true planted=None",
+        "gaudry-d4 p1033-7                \u03b4=  512 f4=     41.5ms dense=  543.305 sparse=   89.048 fast=   11.066 sols=0 agree=true planted=None",
+        "gaudry-d4 p4093-0                \u03b4=  512 f4=     36.4ms dense=  591.380 sparse=  105.352 fast=   11.852 sols=0 agree=true planted=None",
+        "gaudry-d4 p4093-1                \u03b4=  512 f4=     37.9ms dense=  588.424 sparse=  102.023 fast=   12.315 sols=0 agree=true planted=None",
+        "gaudry-d4 p4093-2                \u03b4=  512 f4=     45.8ms dense=  553.426 sparse=  102.766 fast=   11.645 sols=0 agree=true planted=None",
+        "gaudry-d4 p4093-3                \u03b4=  512 f4=     41.0ms dense=  569.764 sparse=  108.450 fast=   12.538 sols=0 agree=true planted=None",
+        "gaudry-d4 p4093-4                \u03b4=  512 f4=     39.1ms dense=  826.551 sparse=  111.217 fast=   12.156 sols=2 agree=true planted=None",
+        "gaudry-d4 p4093-5                \u03b4=  512 f4=     39.1ms dense=  552.392 sparse=  102.651 fast=   12.161 sols=0 agree=true planted=None",
+        "gaudry-d4 p4093-6                \u03b4=  512 f4=     40.3ms dense= 1446.028 sparse=  111.721 fast=   12.436 sols=2 agree=true planted=None",
+        "gaudry-d4 p4093-7                \u03b4=  512 f4=     40.9ms dense=  858.300 sparse=  113.655 fast=   12.147 sols=3 agree=true planted=None"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 8,
+  "commit": "a6a6b27d6a98c31f19a0532aa34aa1b7a6f3bc60",
+  "dirty_after": [
+    "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-L1.disk-start.stdout",
+    "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-L1.lscpu.stdout",
+    "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-L1.run.stderr",
+    "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-L1.run.stdout",
+    "research/postgb_linear_stage_20261026/runs/L1.json"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

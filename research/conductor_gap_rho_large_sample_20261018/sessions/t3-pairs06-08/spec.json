@@ -1,0 +1,149 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "conductor gap ell~2^25, D=-19, 53-bit, pairs 6..8: crater, crater twin, floor, floor twin (u=5), 16 shared targets",
+ "description": "Twin round (AMENDMENTS.md item 4): both endpoints of every pair with an isomorphic model u=5; same pairs.json pairs as tier L. Curve roles, in order: pair6-crater, pair6-crater-twin(u=5), pair6-floor, pair6-floor-twin(u=5), pair7-crater, pair7-crater-twin(u=5), pair7-floor, pair7-floor-twin(u=5), pair8-crater, pair8-crater-twin(u=5), pair8-floor, pair8-floor-twin(u=5).",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 5697485836047167,
+    "a": 4226948435727167,
+    "b": 433598394628605,
+    "gx": 1,
+    "gy": 333478327121814,
+    "r": 5697485802290731,
+    "group_order": 5697485802290731
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 5697485836047167,
+    "a": 3906830239641054,
+    "b": 664257011871562,
+    "gx": 25,
+    "gy": 1802390037896581,
+    "r": 5697485802290731,
+    "group_order": 5697485802290731
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 5697485836047167,
+    "a": 4432361817156577,
+    "b": 927131955627253,
+    "gx": 0,
+    "gy": 852088211879992,
+    "r": 5697485802290731,
+    "group_order": 5697485802290731
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 5697485836047167,
+    "a": 1248019403937463,
+    "b": 3427811443929611,
+    "gx": 0,
+    "gy": 3956281436149994,
+    "r": 5697485802290731,
+    "group_order": 5697485802290731
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 5707159132799363,
+    "a": 5697747693437315,
+    "b": 5090732107400154,
+    "gx": 0,
+    "gy": 2568374649325522,
+    "r": 5707159099014283,
+    "group_order": 5707159099014283
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 5707159132799363,
+    "a": 5532168664318726,
+    "b": 2012344302684119,
+    "gx": 0,
+    "gy": 1445919728925922,
+    "r": 5707159099014283,
+    "group_order": 5707159099014283
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 5707159132799363,
+    "a": 2852449256394690,
+    "b": 3286851806860262,
+    "gx": 1,
+    "gy": 1122900760029347,
+    "r": 5707159099014283,
+    "group_order": 5707159099014283
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 5707159132799363,
+    "a": 2147135813279994,
+    "b": 4041605262925476,
+    "gx": 25,
+    "gy": 3390775816483663,
+    "r": 5707159099014283,
+    "group_order": 5707159099014283
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 5731515729621907,
+    "a": 5722104290259859,
+    "b": 1002454344763791,
+    "gx": 1,
+    "gy": 2317986535519339,
+    "r": 5731515695764811,
+    "group_order": 5731515695764811
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 5731515729621907,
+    "a": 5580881857963814,
+    "b": 4848163607184451,
+    "gx": 25,
+    "gy": 3172530458822025,
+    "r": 5731515695764811,
+    "group_order": 5731515695764811
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 5731515729621907,
+    "a": 2320023958153715,
+    "b": 3787748237131458,
+    "gx": 0,
+    "gy": 2406923834242566,
+    "r": 5731515695764811,
+    "group_order": 5731515695764811
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 5731515729621907,
+    "a": 5673009981351311,
+    "b": 5666296832841475,
+    "gx": 0,
+    "gy": 2826661339981586,
+    "r": 5731515695764811,
+    "group_order": 5731515695764811
+   }
+  ],
+  "target_kind": "planted_shared",
+  "target_seed": 2026101843,
+  "targets_per_curve": 16
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261018,
+  "isolation_required": "L2",
+  "timeout_seconds": 1800
+ }
+}

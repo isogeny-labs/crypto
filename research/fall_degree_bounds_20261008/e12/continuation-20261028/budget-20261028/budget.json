@@ -1,0 +1,59 @@
+{
+  "schema": "dataset-campaign-budget/v1",
+  "recorded_utc": "2026-10-28T04:57:22.525522+00:00",
+  "currency": "USD",
+  "total_ceiling": "200.00",
+  "target": "100.00",
+  "renewal": "none; total, not daily",
+  "user_horizon": "through tomorrow; no new worker may run more than 24 hours after its admitted launch",
+  "billing_scope": "E12a/E12c full original 48-hour authorizations, one hour for completed E12b, and at most one new 24-hour dataset worker",
+  "pricing_basis": "AWS Price List API Linux Shared On-Demand rates in us-east-1; conservative reservations for Spot, not observed billing",
+  "existing_jobs": [
+    {
+      "job": "20261028-021829-fd-e12a-r6a-20261028-r3-0c1d7f",
+      "instance": "i-0f1e979a30bc4f52b",
+      "instance_type": "r6a.8xlarge",
+      "maximum_hours": "48",
+      "hourly_usd": "1.8144",
+      "original_deadline_utc": "2026-10-30T02:18:31Z"
+    },
+    {
+      "job": "20261028-021036-fd-e12c-20261028-r3-914d46",
+      "instance": "i-0ac1c3ad72a141ac0",
+      "instance_type": "r7i.4xlarge",
+      "maximum_hours": "48",
+      "hourly_usd": "1.0584",
+      "original_deadline_utc": "2026-10-30T02:10:38Z"
+    },
+    {
+      "job": "20261028-031317-fd-e12b-spot-20261028-r3-24148b",
+      "instance": "i-03d408f37b22432d1",
+      "instance_type": "m7i.4xlarge",
+      "maximum_hours": "1",
+      "hourly_usd": "0.8064",
+      "state": "completed, terminated"
+    }
+  ],
+  "proposed_new_worker": {
+    "instance_type": "c6a.4xlarge",
+    "region": "us-east-1",
+    "vcpu": 16,
+    "maximum_hours": "24",
+    "hourly_usd": "0.612",
+    "maximum_instances": 1,
+    "state": "not launched; active dataset owner must incorporate admission and freeze protocol"
+  },
+  "reserves_usd": {
+    "s3_storage_requests_first_month": "15",
+    "ebs_and_transfer": "10",
+    "contingency": "10"
+  },
+  "new_worker_output_caps": {
+    "unique_bytes": 21474836480,
+    "put_requests": 100000,
+    "get_requests": 200000
+  },
+  "cloud_enforcement": "Existing E12 TTLs unchanged. This record admits no instance itself. New worker needs budget check, finite TTL, source/protocol/checkpoint and nonduplication checks before launch.",
+  "new_launches_this_record": 0,
+  "scientific_review": false
+}

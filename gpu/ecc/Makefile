@@ -24,6 +24,13 @@ NVCCFLAGS ?= -O3 -std=c++17 -arch=$(ARCH) -lineinfo
 # default: see OPTIMIZATION_BLACKWELL.md section 2 for what has and has not
 # been verified about them.  MIN_BLOCKS sets __launch_bounds__ min-blocks
 # on the rho kernels (0 = unset).
+# On sm_120 (RTX PRO 6000) both are measured: the device selftest passes
+# with FP_PTX=1 and the rho walk runs 1.88x faster with it at MIN_BLOCKS=2
+# (validation/20261017-modal-rtx-pro-6000), so that is the default there.
+ifeq ($(ARCH),sm_120)
+FP_PTX     ?= 1
+MIN_BLOCKS ?= 2
+endif
 FP_PTX     ?= 0
 MIN_BLOCKS ?= 0
 

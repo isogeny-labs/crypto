@@ -1,0 +1,32 @@
+name: EKS ARC runner smoke
+on:
+  workflow_dispatch:
+    inputs:
+      pool:
+        description: Runner pool to check
+        type: choice
+        options: [linux, highmem]
+        default: linux
+permissions:
+  contents: read
+jobs:
+  smoke:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ${{ inputs.pool == 'highmem' && 'crypto-eks-highmem' || 'crypto-eks-linux' }}
+    timeout-minutes: 20
+    steps:
+      - name: Runner and Docker readiness
+        run: |
+          set -euo pipefail
+          printf 'runner=%s\narch=%s\n' "$RUNNER_NAME" "$(uname -m)"
+          test "$(uname -m)" = x86_64
+          docker info --format '{{.ServerVersion}}'
+          test -w "$RUNNER_TEMP"
+          memory_bytes=$(cat /sys/fs/cgroup/memory.max)
+          cpu_quota=$(cat /sys/fs/cgroup/cpu.max)
+          printf 'memory_bytes=%s\ncpu_quota=%s\n' "$memory_bytes" "$cpu_quota"
+          if [ '${{ inputs.pool }}' = highmem ]; then
+            test "$memory_bytes" -ge $((112 * 1024 * 1024 * 1024))
+          else
+            test "$memory_bytes" -ge $((24 * 1024 * 1024 * 1024))
+          fi

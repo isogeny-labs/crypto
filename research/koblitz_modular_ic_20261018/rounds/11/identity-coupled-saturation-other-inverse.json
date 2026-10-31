@@ -1,0 +1,187 @@
+{
+  "id": "IDC1hd59239b47b8f3dec",
+  "independence": "same-agent native issuance plus128 extra checks;universal Lean identity",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": {
+    "kind": "lean4",
+    "path": "research/koblitz_modular_ic_20261018/lean/KoblitzRound11.lean",
+    "sha256": "5df97051cfad5ed166a52cec78fbd1efe9131b85b2800c39cc12faaff89bf54c"
+  },
+  "schema": "identity.certificate/v1",
+  "seed": 202610191100,
+  "statement": {
+    "degree_bound": 3,
+    "lhs": {
+      "args": [
+        {
+          "args": "h",
+          "op": "var"
+        },
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "z",
+                  "op": "var"
+                },
+                {
+                  "args": "v",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": -1,
+                  "op": "const"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "x",
+                      "op": "var"
+                    },
+                    {
+                      "args": "h",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        }
+      ],
+      "op": "mul"
+    },
+    "name": "coupled-saturation-other-inverse",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": "x",
+              "op": "var"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "y",
+                      "op": "var"
+                    },
+                    {
+                      "args": "v",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": [
+                    {
+                      "args": -1,
+                      "op": "const"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "h",
+                          "op": "var"
+                        },
+                        {
+                          "args": "h",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": -1,
+              "op": "const"
+            },
+            {
+              "args": [
+                {
+                  "args": "v",
+                  "op": "var"
+                },
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "x",
+                          "op": "var"
+                        },
+                        {
+                          "args": "y",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": -1,
+                          "op": "const"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": "z",
+                              "op": "var"
+                            },
+                            {
+                              "args": "h",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "source": "KoblitzRound11.saturation_other_inverse",
+    "variables": [
+      "x",
+      "z",
+      "y",
+      "v",
+      "h"
+    ]
+  },
+  "value_digest": "71546e73c83275459c260921046881e231db25be07dc0018e79ceb3018546aaf"
+}

@@ -1,0 +1,96 @@
+{
+  "admissible_path": [
+    "Retain frozen protocol v5 byte-for-byte and cite it as the data-taking protocol.",
+    "Publish a dated erratum or version 6 that binds parent v5, uses filed_before_affected_data=false, and contains exact before/after values for only the four metadata pointers.",
+    "Bind the post-data reconciled receipt and the pre-data commit/manifests; report both v5 and the erratum/v6.",
+    "Do not claim that corrected metadata was itself frozen before raw data.",
+    "Before canonical live-run packaging, review a narrow exporter admission path that requires the parent hash, an allowlisted canonical diff limited to these four metadata fields, and carries post-data status into output. Do not blanket-allow post-data amendments."
+  ],
+  "confirmed_mismatches": [
+    {
+      "actual": "pencil-gate60-binding-receipt/v1",
+      "pointer": "/extensions/analysis_build/receipt",
+      "required": "pencil-native-analysis-build/v1"
+    },
+    {
+      "actual": "absent",
+      "pointer": "/extensions/analysis_build/binaries/{analyze_pair,analyze_cohort}/bytes",
+      "required": "843944 and 1396160"
+    },
+    {
+      "actual": "stale eb2b2ce... and 337e089...",
+      "pointer": "/extensions/finite_cost_model/analyzer_binaries_sha256",
+      "required": "predata gate pins 3eb53f33... and 0aa541a3..."
+    },
+    {
+      "actual": "full repository-relative keys",
+      "pointer": "/extensions/analysis_support_sha256 keys",
+      "required": "same 13 hashes under study-relative native_price/... and paired_export/... keys"
+    }
+  ],
+  "created_utc": "2026-10-30T00:24:14Z",
+  "diagnostic_boundary": "A zero-observation packaging diagnostic may test software behavior but cannot certify the live run, qualify clocks/prices, or substitute for the truthful post-data erratum.",
+  "evidence": {
+    "all_13_sources_match_commit_99b10d5c": true,
+    "analyze_cohort": {
+      "bytes": 1396160,
+      "sha256": "0aa541a3b6785f987433691e72d8829b51f780bae5dd6756fb788f14b341ab52"
+    },
+    "analyze_pair": {
+      "bytes": 843944,
+      "sha256": "3eb53f3344aecb14e411d278b7229d80c5f4c79ffe3920c99f5109d902abf88e"
+    },
+    "binary_bytes_match_predata_hashes": true,
+    "predata_binaries_manifest_sha256": "581f4f3f103f3c69af738189f7811eda12d7ae0653fc87e4fe2d64f3288e5742",
+    "predata_build_log_sha256": "fd1b92161a096f36553c7e7b2e9669f195902d69b7c9a4c79a7b8a7771cf12ad",
+    "predata_software_receipt_sha256": "14a482e87682761cbe6a29b777714fb5dc7c700cb5152745a7aa3a859e232d8e",
+    "predata_sources_manifest_sha256": "9618895ede7542e314167822e25ad1ecaf1bdc9da6da84cceb2499ec8a1acb24",
+    "reconciled_build_receipt": {
+      "schema": "pencil-native-analysis-build/v1",
+      "sha256": "07e7359d4adfe9b8ab74ba19b313c534f9962f756209ea9059b9f65ac0fb3523"
+    },
+    "source_check_sha256": "3be0e1e41a70b9f6f0c63c5918a5ddb56235886780dd368f748dc6ac2d355f79"
+  },
+  "parent_protocol": {
+    "file_sha256": "7d9f3a299c8d2e39f0a7b69aaab34a922dcc192102ab8d0ee1971ab6e635efee",
+    "immutable": true,
+    "protocol_sha256": "cf8f76eadc42ff487644ea13b3392af1fd31c94e4629eecd6ad7b9a18820badb",
+    "version": 5
+  },
+  "proposal": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/analysis_provenance_erratum_20261030/proposal.json",
+    "sha256": "49ab67c953dc69c7e07f37b7bdea7c7f66fd0911bbd05f9165205d46752d4008"
+  },
+  "review_actions": {
+    "protocol_edits": 0,
+    "raw_data_analysis": 0,
+    "solver_runs": 0,
+    "source_edits": 0
+  },
+  "rules": {
+    "blocking_source_locations": [
+      "native_canonical_export/src/lib.rs:139-143",
+      "native_canonical_export/src/lib.rs:192-196"
+    ],
+    "current_native_exporter_allows_false": false,
+    "experiment_protocol_skill": "Post-data amendments are allowed only under a new version, dated, with truthful timing, and both versions reported.",
+    "json_schema_allows_false": true
+  },
+  "schema": "pencil.analysis-provenance-erratum-review/v1",
+  "scientific_identity": {
+    "instrument_changed": false,
+    "methods_changed": false,
+    "price_mapping_or_arithmetic_changed": false,
+    "raw_data_changed": false,
+    "seeds_or_targets_changed": false,
+    "stopping_or_estimands_changed": false
+  },
+  "timing": {
+    "erratum_after_payload_start": true,
+    "may_claim_corrected_protocol_preregistered": false,
+    "predata_commit_utc": "2026-10-29T23:54:13Z",
+    "predata_evidence_commit": "99b10d5c6f3f5f3fcdea8fb5a9484ac3a9ec6ff0",
+    "required_filed_before_affected_data": false
+  },
+  "verdict": "metadata_only_erratum_supported_but_current_canonical_export_blocks_truthful_post_data_amendment"
+}

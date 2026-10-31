@@ -1,0 +1,51 @@
+    Blocking waiting for file lock on build directory
+    Finished `release` profile [optimized] target(s) in 26m 42s
+     Running unittests src/lib.rs (/home/user/crypto/target/release/deps/crypto_lib-c31a9f171635c454)
+
+running 1 test
+test cryptanalysis::solinas_correlations::tests::solinas_micro_bit_correlations has been running for over 60 seconds
+
+=== P-256 Solinas Reduction: Bit-Pair Correlation Search ===
+
+N = 1000000 random 512-bit inputs
+Computed Pr[r[i] = 1 | c[j] = 1] for all 256 × 512 = 131,072 (i,j) pairs.
+
+HIST |z| bins of 0.5 starting at 0 (last bin is >= 5.5): [49972, 39615, 23998, 11484, 4392, 1263, 276, 68, 4, 0, 0, 0]
+Top 20 outlier (i, j) pairs by |z-score|:
+
+   i (r)    j (c)      |z|
+     149       54     4.26
+     197      164     4.12
+     117      119     4.02
+     103      101     4.01
+     122      185     3.97
+     159       32     3.94
+      44      219     3.90
+     156      452     3.87
+     102       58     3.87
+      68       88     3.86
+      51      475     3.85
+      54       24     3.83
+      72      211     3.83
+      55      159     3.81
+     120      358     3.80
+      11       75     3.79
+     116      474     3.78
+      99      169     3.78
+     115      412     3.76
+     111      168     3.76
+
+Maximum |z| observed: 4.26
+
+Expected under independence: max |z| ≈ 6.11 for N tests at α=0.001 / N
+
+✓ Max |z| within expected range under independence null.
+  No exploitable bit-pair correlation detected at this N.
+test cryptanalysis::solinas_correlations::tests::solinas_micro_bit_correlations ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4593 filtered out; finished in 75.21s
+
+
+real	27m58.104s
+user	0m59.299s
+sys	0m0.113s

@@ -11,13 +11,13 @@ no ECDLP cost changes.
 
 ## Verdicts in one table
 
-| original claim (note §) | class | verdict (v2, pre-registered rule) |
+| original claim (note §) | class | verdict (pre-registered rules; v2 unless v3 is named) |
 |:--|:--|:--|
-| P-256 `n − 1` is "the outlier", "a 1-in-30 accident" (§0, §2.2) | comparative | **Not established.** It ranks 1992/2000 on M1 (p = 0.009) and 1991/2000 on M2 (p = 0.010) against random Hasse-interval primes. α = 0.05/18 = 0.0028, so it is **within the control distribution**. It is more extreme than 99.6% of controls before correction. The "1-in-30" Dickman figure assumed the wrong null and is withdrawn. |
+| P-256 `n − 1` is "the outlier", "a 1-in-30 accident" (§0, §2.2) | comparative | **Not established.** It ranks 1992/2000 on M1 (p = 0.009) and 1991/2000 on M2 (p = 0.010) against random Hasse-interval primes. α = 0.05/18 = 0.0028, so it is **within the control distribution**. It is more extreme than 99.6% of controls before correction. The "1-in-30" Dickman figure assumed the wrong null and is withdrawn. **v3 (ECM-completed factoring):** same verdict, rank 796/800, p = 0.0125 > 0.05/9. ECM changed M1 for 0 of 2400 control values, so the rho instrument was already complete below 2^32. |
 | other `n ± 1` and twist orders unremarkable (§2.2, §2.3) | comparative | **Supported.** All 8 are within the control distribution (p ≥ 0.20 on both metrics). |
 | the canonical lift has no small points (§3.1) | "nothing found" | **Supported only as bounded.** The census found 90/90 planted points (integer, `d = 2`, `d = 3`), found nothing on 30 random-`b` curves, and found nothing on the NIST `b`. Licensed wording: "no point with integer x, −10^6 ≤ x ≤ 10^6, or `x = u/d²` with `d ≤ 40` and −10^5 ≤ u ≤ 10^5". "No small point" is not licensed. |
 | lifted generator has `ĥ ≈ log p`, nowhere near small (§3.2) | comparative | **Supported as "typical".** `ĥ(G̃)/ln p` is within the random-point distribution on all three curves (p ≥ 0.37). The generator is an ordinary lifted point, neither large nor small. |
-| two-point lift: independent and orthogonal, cos < 0.002 (§3.3) | comparative | **Independence supported, orthogonality unresolved.** det/(ĥĥ) for random pairs is 1.0000 (2.5–97.5%: 0.99992–1.00000), against −0.005 to −0.002 for exactly dependent pairs. The absolute cosine sits at the instrument's floor (below), and the dependent pairs read 1.0011–1.0025 where the truth is 1. "Zero to three decimals" is below the instrument's resolution and is withdrawn. |
+| two-point lift: independent and orthogonal, cos < 0.002 (§3.3) | comparative | **Independence supported. Orthogonality: typical, measured in v3.** v2's instrument read 1.0011–1.0025 on exactly dependent pairs, so "zero to three decimals" was below its resolution and is withdrawn. **v3** uses rational-model heights, and both accuracy gates passed: dependent pairs are exact to about 1e-16, and the parallelogram defect is at most 2.7e-3 nats. With it, the absolute cosine of (G̃, R̃) is 5.9e-4 / 0 / 4.4e-4 (P-192 / P-224 / P-256), within the random-pair distribution (p ≥ 0.41). For 59–66% of random pairs the canonical pairing is exactly 0; the rest are at most 0.013. |
 
 Exact computations in the note (factorisations, certified `Z[t]` identities,
 embedding degrees, Cheon tables) are not statistical claims and were not
@@ -80,9 +80,9 @@ These were noticed after the data. They are not pre-registered verdicts.
   integral model with `u = lcm(all denominators)`, including the point's
   own (`x.d = d²`, `y.d = d³`). It measures the naive height on that model,
   so h_x is inflated by about `2 log u` and 4⁵ doublings leave about 0.3
-  nats. On E1 the integer points have `u = 1`, so E3 is unaffected. A
-  follow-up protocol will measure the reduced rational `x` instead and
-  re-test E4.
+  nats. On E1 the integer points have `u = 1`, so E3 is unaffected.
+  Amendment 2 (v3, below) measures the reduced rational `x` instead, and
+  re-tests E4 as E4r.
 - **`h_x − ĥ` is discrete.** In E3 it takes a few values (−0.5493 =
   −½ ln 3, −0.2027, 0.1438, …), consistent with local correction terms at
   2 and 3. Ties are handled conservatively by the rank rule. P-256's
@@ -92,13 +92,60 @@ These were noticed after the data. They are not pre-registered verdicts.
   `ĥ/ln p` of 0.64–0.67, because the lift's `B ≈ y²` is about `p²`. Note
   §3.4 equated the two and is corrected.
 
+## v3: Amendment 2 (E1b, E4r)
+
+`AMENDMENT_2.md` was frozen (commit `6eb5c015a`, sha256 `6dba19da…1ee9`)
+after two dry runs and before any v3 run. Its disclosure section lists
+what the dry runs showed. The first full attempt was lost to a container
+restart after E4r P-192. The same binary was then re-run from scratch, and
+this rerun is the one reported. Wall time was 12 342 s, against a
+pre-flight estimate of about 3.6 h (E1b: 3919 s against about 70 min).
+Records: `rows_v3.jsonl`, `RESULTS_v3.md`, `results_v3.json`.
+
+**E1b, ECM-completed factoring.** Rho with 2^18 iterations is followed by
+ECM (B1 = 2000, 20 curves) on every composite it leaves. The controls are
+the first 800 of v2's draws per curve.
+
+- **Completeness.** ECM changed M1 for **0 of 2400** control values and for
+  none of the targets. ECM could not split 1301, 1475 and 1592 composites
+  per curve (P-192 / P-224 / P-256). These are large cofactors in which
+  ECM at this budget found no prime below 2^32; the positive control shows
+  it recovers such primes when they are present.
+- **Positive control.** 150/150 planted 32-bit primes were recovered
+  exactly.
+- **Verdicts.** All 9 targets are within the control distribution at
+  α = 0.05/9. P-256 `n − 1` ranks 796/800, p = 0.0125. So the v2 verdict
+  does not depend on the factoring instrument's completeness.
+
+**E4r, pairing from rational-model heights.**
+
+- **Gate 1, dependent pairs: passed.** `(G̃, [2]G̃)` and `(G̃, [3]G̃)`
+  give `|cos|` = 1 and det/(ĥĥ) = 0 to about 1e-16.
+- **Gate 2, parallelogram law on 50 pairs per curve: passed.** The maximum
+  defect is 1.35e-3 / 1.35e-3 / 2.71e-3 nats, and 45–47 of the 50 pairs
+  are below 1e-10.
+- **Target.** `|cos(G̃, R̃)|` is 5.9e-4 (P-192), 0 (P-224) and 4.4e-4
+  (P-256). Ranks are 316/500, 0/500 (ties at 0) and 313/500, with p = 0.74,
+  0.41 and 0.75: all within the control distribution.
+- **The canonical pairing of random two-point lifts is exactly 0 for 59–66%
+  of pairs** (296, 328 and 306 of 500). The nonzero values are small
+  multiples of `log ℓ` for small primes ℓ, such as ½ ln 3, ½ ln 5, ½ ln 7,
+  ½ ln 11 and (1/6) ln 2, and `|cos|` ≤ 0.013. This is a description of
+  the recorded rows, not a tested claim.
+
+![Amendment 2 (v3): ECM-completed M1 and rational-model pairings](controls_v3.svg)
+
+*Figure (v3). The top two panels are E1b's M1 after and before ECM on the
+same inputs; they are identical. The bottom two are E4r's `|cos|` and
+det/(ĥĥ). Recorded values only.*
+
 ## What this does not show
 
 Nothing here is a security statement. E1 is one incomplete small-factor
 metric against one null model of prime-order group orders. Its
 completeness below 2^32 is argued analytically: rho with 2^18 iterations
 per constant misses a 32-bit prime with probability of about 3·10⁻⁴ per
-constant. An ECM robustness run is a follow-up. E2 is bounded by its
+constant, and v3's ECM stage changed no control value. E2 is bounded by its
 census box. E3 and E4 compare against random points under one lift
 construction and say nothing about adversarially chosen lifts. "Within the
 control distribution" means the test did not distinguish the target from
@@ -125,5 +172,7 @@ cargo run --release --example nist_cyclotomic_controls -- --protocol v1   # ≈ 
 cargo run --release --example nist_cyclotomic_controls -- --protocol v2   # ≈ 2.5 h on 4 vCPU
 cargo run --release --example nist_cyclotomic_controls -- --protocol v1 --plot
 cargo run --release --example nist_cyclotomic_controls -- --protocol v2 --plot
+cargo run --release --example nist_cyclotomic_controls -- --protocol v3        # ≈ 3.4 h on 4 vCPU
+cargo run --release --example nist_cyclotomic_controls -- --protocol v3 --plot
 sh research/nist_cyclotomic_controls_20261011/build.sh                    # REPORT.pdf
 ```

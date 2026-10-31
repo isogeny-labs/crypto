@@ -137,6 +137,75 @@ pub fn build_exact_residual_suffix_factor_base(
     Ok(residual)
 }
 
+/// Materialise `pool \ small` at complete signed-Frobenius-orbit granularity.
+///
+/// The inputs may come from different public-x policies or seeds and need not
+/// be nested. Reconstructing their orbit maps first prevents a corrupted map
+/// from changing the set difference. A shared orbit is removed in full; a
+/// partial overlap, damaged phase/sign label, or remaining x-domain overlap
+/// fails closed. This is an import/adapter step, not a relation measurement.
+pub fn build_exact_residual_difference_factor_base(
+    curve: &KoblitzCurve,
+    small: &FrobeniusFactorBase,
+    pool: &FrobeniusFactorBase,
+) -> Result<FrobeniusFactorBase, &'static str> {
+    for base in [small, pool] {
+        let replayed = build_explicit_frobenius_point_factor_base(curve, base.points.clone())
+            .ok_or("cross-stream input is not a complete Frobenius base")?;
+        if replayed.orbits != base.orbits
+            || replayed.orbit_of != base.orbit_of
+            || replayed.signed_orbits != base.signed_orbits
+            || replayed.signed_orbit_of != base.signed_orbit_of
+        {
+            return Err("cross-stream input orbit map differs from point record");
+        }
+        MixedOrbitDomains::checked_domain(curve, base)?;
+    }
+    let small_index = small.index_map();
+    let mut retained_points = Vec::new();
+    let mut retained_orbits = Vec::new();
+    for (orbit_index, orbit) in pool.signed_orbits.iter().enumerate() {
+        let shared = orbit
+            .iter()
+            .filter(|&&index| small_index.contains_key(&point_key(&pool.points[index])))
+            .count();
+        if shared == orbit.len() {
+            continue;
+        }
+        if shared != 0 {
+            return Err("cross-stream pool has partial signed-orbit overlap");
+        }
+        retained_orbits.push(orbit_index);
+        retained_points.extend(orbit.iter().map(|&index| pool.points[index].clone()));
+    }
+    let residual = build_explicit_frobenius_point_factor_base(curve, retained_points)
+        .ok_or("cross-stream residual is not a complete signed-Frobenius base")?;
+    if residual.signed_orbits.len() != retained_orbits.len() {
+        return Err("cross-stream residual orbit count differs");
+    }
+    for (local_orbit, &pool_orbit) in retained_orbits.iter().enumerate() {
+        let local = &residual.signed_orbits[local_orbit];
+        let original = &pool.signed_orbits[pool_orbit];
+        if local.len() != original.len()
+            || local
+                .iter()
+                .zip(original)
+                .any(|(&local_index, &pool_index)| {
+                    residual.points[local_index] != pool.points[pool_index]
+                        || residual.signed_orbit_of[local_index].0 != local_orbit
+                        || residual.signed_orbit_of[local_index].1
+                            != pool.signed_orbit_of[pool_index].1
+                        || residual.signed_orbit_of[local_index].2
+                            != pool.signed_orbit_of[pool_index].2
+                })
+        {
+            return Err("cross-stream residual orbit labels differ from pool");
+        }
+    }
+    MixedOrbitDomains::new(curve, small, &residual)?;
+    Ok(residual)
+}
+
 impl<'a> MixedOrbitDomains<'a> {
     fn checked_domain(
         curve: &KoblitzCurve,
@@ -218,12 +287,17 @@ impl<'a> MixedOrbitDomains<'a> {
         })
     }
 
-    fn lift(
+    /// Lift exact x-domain choices to subgroup points and accept only a tuple
+    /// whose original curve-group sum equals the supplied target.
+    pub fn lift(
         &self,
         xs: &[F2mElement],
         small_summands: usize,
         target: &BinaryPoint,
     ) -> Option<(Vec<usize>, Vec<BinaryPoint>)> {
+        if small_summands > xs.len() {
+            return None;
+        }
         fn walk(
             domains: &MixedOrbitDomains<'_>,
             xs: &[F2mElement],
@@ -295,6 +369,116 @@ impl<'a> MixedOrbitDomains<'a> {
             target,
         )
         .then_some((small, residual))
+    }
+
+    /// Build the ordinary all-affine identity pattern for an external XOR
+    /// solver. The same exact domains, capacity bounds, and first-pair order
+    /// constraint used by `search` are installed before export. The caller
+    /// must verify the external assignment against the original clauses and
+    /// equations, then use `lift` for the final curve-group check.
+    pub fn first_pattern_encoding(
+        &self,
+        coef_a: &BigUint,
+        coef_b: &BigUint,
+        public_target: &BinaryPoint,
+        small_summands: usize,
+        residual_summands: usize,
+        limits: ChainS3Limits,
+        order_first_pair: bool,
+    ) -> Result<(ChainedS3Encoding, BinaryPoint), &'static str> {
+        self.pattern_encoding(
+            coef_a,
+            coef_b,
+            public_target,
+            small_summands,
+            residual_summands,
+            0,
+            limits,
+            order_first_pair,
+        )
+    }
+
+    /// Build one specified identity pattern with the same domains and
+    /// symmetry constraint as `search`. The mask spans the `m - 2` chained
+    /// addition steps and is checked before any solver allocation.
+    pub fn pattern_encoding(
+        &self,
+        coef_a: &BigUint,
+        coef_b: &BigUint,
+        public_target: &BinaryPoint,
+        small_summands: usize,
+        residual_summands: usize,
+        identity_mask: u32,
+        limits: ChainS3Limits,
+        order_first_pair: bool,
+    ) -> Result<(ChainedS3Encoding, BinaryPoint), &'static str> {
+        let m = small_summands
+            .checked_add(residual_summands)
+            .ok_or("summand count overflow")?;
+        if !(5..=6).contains(&m)
+            || small_summands < 3
+            || !(1..=2).contains(&residual_summands)
+            || identity_mask >= (1u32 << (m - 2))
+            || limits.max_variables == 0
+            || limits.max_domain_clauses == 0
+            || !self.curve.curve.is_on_curve(public_target)
+            || self.curve.mul(public_target, &self.curve.subgroup_order) != BinaryPoint::Infinity
+        {
+            return Err("invalid external mixed-orbit shape or target");
+        }
+        let small_size =
+            frobenius_orbit_domain_size(self.curve.n, small_summands, self.small_reps.len())
+                .ok_or("small domain size unavailable")?;
+        let residual_size =
+            frobenius_orbit_domain_size(self.curve.n, residual_summands, self.residual_reps.len())
+                .ok_or("residual domain size unavailable")?;
+        let domain_clauses = small_size
+            .clauses
+            .checked_add(residual_size.clauses)
+            .ok_or("domain clause count overflow")?;
+        if domain_clauses > limits.max_domain_clauses {
+            return Err("external domain clause cap exceeded");
+        }
+        let modulus = &self.curve.subgroup_order;
+        let target = self.curve.add(
+            &self.curve.mul(self.curve.generator(), &(coef_a % modulus)),
+            &self.curve.mul(public_target, &(coef_b % modulus)),
+        );
+        let target_x = match &target {
+            BinaryPoint::Affine { x, .. } => Some(x),
+            BinaryPoint::Infinity => None,
+        };
+        let domains: Vec<Vec<BigUint>> = (0..m)
+            .map(|position| {
+                if position < small_summands {
+                    self.small_reps.clone()
+                } else {
+                    self.residual_reps.clone()
+                }
+            })
+            .collect();
+        let mut encoding = ChainedS3Encoding::build(
+            m,
+            &self.curve.curve.irreducible,
+            &self.curve.curve.b,
+            target_x,
+            identity_mask,
+            limits.max_variables,
+        )
+        .map_err(|_| "external identity-pattern construction failed")?;
+        if encoding
+            .constrain_frobenius_orbit_domains(
+                &domains,
+                limits.max_variables,
+                limits.max_domain_clauses,
+            )
+            .map(|size| size.clauses)
+            != Ok(domain_clauses)
+            || (order_first_pair && encoding.order_first_pair(limits.max_variables).is_err())
+        {
+            return Err("external identity-pattern domain or symmetry failed");
+        }
+        Ok((encoding, target))
     }
 
     /// Search one public source equation with either one or two residual
@@ -1192,12 +1376,212 @@ mod tests {
         graph
             .feed(PartialCandidate {
                 source_id: 4,
-                coef_a: double_a,
+                coef_a: double_a.clone(),
                 coef_b: BigUint::zero(),
                 small_point_indices: double_small,
                 residual_points: double_residual,
             })
             .unwrap();
+
+        let (candidate, stats) =
+            domains.search(5, &double_a, &BigUint::zero(), &target, 3, 2, bounded, true);
+        let candidate = candidate.unwrap_or_else(|| panic!("two-residual SAT search: {stats:?}"));
+        assert!(stats.models > 0);
+        assert_eq!(candidate.small_point_indices.len(), 3);
+        assert_eq!(candidate.residual_points.len(), 2);
+        graph.feed(candidate).unwrap();
+
+        // Exercise both six-summand shapes used by the hosted N83 pilots.
+        // The target coefficients are constructed from exact domain points;
+        // SAT must still find and group-verify a candidate through each path.
+        let single_six_a = BigUint::from(selected[0].0 * 3 + selected[1].0 * 2 + selected[2].0);
+        let (candidate, stats) = domains.search(
+            6,
+            &single_six_a,
+            &BigUint::zero(),
+            &target,
+            5,
+            1,
+            bounded,
+            true,
+        );
+        let candidate = candidate.unwrap_or_else(|| panic!("5+1 SAT search: {stats:?}"));
+        assert!(stats.models > 0);
+        assert_eq!(candidate.small_point_indices.len(), 5);
+        assert_eq!(candidate.residual_points.len(), 1);
+        graph.feed(candidate).unwrap();
+
+        let double_six_a =
+            BigUint::from(selected[0].0 * 2 + selected[1].0 * 2 + selected[2].0 + selected[3].0);
+        let (candidate, stats) = domains.search(
+            7,
+            &double_six_a,
+            &BigUint::zero(),
+            &target,
+            4,
+            2,
+            bounded,
+            true,
+        );
+        let candidate = candidate.unwrap_or_else(|| panic!("4+2 SAT search: {stats:?}"));
+        assert!(stats.models > 0);
+        assert_eq!(candidate.small_point_indices.len(), 4);
+        assert_eq!(candidate.residual_points.len(), 2);
+        graph.feed(candidate).unwrap();
+
+        for (coefficient, small_count, residual_count) in
+            [(&single_six_a, 5, 1), (&double_six_a, 4, 2)]
+        {
+            let (mut encoding, group_target) = domains
+                .first_pattern_encoding(
+                    coefficient,
+                    &BigUint::zero(),
+                    &target,
+                    small_count,
+                    residual_count,
+                    bounded,
+                    true,
+                )
+                .unwrap();
+            assert_eq!(encoding.solver.solve(), SolveResult::Sat);
+            let assignment = encoding.solver.model();
+            assert!(encoding.verify_external_assignment(&assignment));
+            let xs = encoding.decode_summands_assignment(&assignment).unwrap();
+            let (small, residual) = domains.lift(&xs, small_count, &group_target).unwrap();
+            assert_eq!(small.len(), small_count);
+            assert_eq!(residual.len(), residual_count);
+            let (later, later_target) = domains
+                .pattern_encoding(
+                    coefficient,
+                    &BigUint::zero(),
+                    &target,
+                    small_count,
+                    residual_count,
+                    1,
+                    bounded,
+                    true,
+                )
+                .unwrap();
+            assert_eq!(later_target, group_target);
+            assert!(later.solver.n_vars() > 0);
+            assert!(domains
+                .pattern_encoding(
+                    coefficient,
+                    &BigUint::zero(),
+                    &target,
+                    small_count,
+                    residual_count,
+                    16,
+                    bounded,
+                    true,
+                )
+                .is_err());
+        }
+    }
+
+    #[test]
+    fn cross_stream_difference_keeps_only_complete_disjoint_signed_orbits() {
+        let curve = KoblitzCurve::new(1, 7).unwrap();
+        let mut xs = Vec::new();
+        let mut seen = BTreeSet::new();
+        for scalar in 1..200u32 {
+            let BinaryPoint::Affine { x, .. } =
+                curve.mul(curve.generator(), &BigUint::from(scalar))
+            else {
+                continue;
+            };
+            let mut phase = x.clone();
+            let mut orbit = Vec::new();
+            for _ in 0..curve.n {
+                orbit.push(phase.to_biguint());
+                phase = curve.frobenius_x(&phase);
+            }
+            if seen.insert(orbit.into_iter().min().unwrap()) {
+                xs.push(x);
+            }
+            if xs.len() == 4 {
+                break;
+            }
+        }
+        assert_eq!(xs.len(), 4);
+        let base = |indices: &[usize]| {
+            build_explicit_frobenius_orbit_factor_base(
+                &curve,
+                &indices
+                    .iter()
+                    .map(|&index| xs[index].clone())
+                    .collect::<Vec<_>>(),
+            )
+            .unwrap()
+        };
+        let small = base(&[0, 1]);
+        let cross_stream_pool = base(&[1, 2, 3]);
+        let expected = base(&[2, 3]);
+        assert_ne!(cross_stream_pool.points[..small.points.len()], small.points);
+        let residual =
+            build_exact_residual_difference_factor_base(&curve, &small, &cross_stream_pool)
+                .unwrap();
+        assert_eq!(residual.signed_orbits.len(), expected.signed_orbits.len());
+        assert_eq!(
+            residual
+                .points
+                .iter()
+                .map(point_key)
+                .collect::<BTreeSet<_>>(),
+            expected
+                .points
+                .iter()
+                .map(point_key)
+                .collect::<BTreeSet<_>>()
+        );
+        assert!(MixedOrbitDomains::new(&curve, &small, &residual).is_ok());
+
+        let nested_pool = build_explicit_frobenius_point_factor_base(
+            &curve,
+            small
+                .points
+                .iter()
+                .chain(&expected.points)
+                .cloned()
+                .collect(),
+        )
+        .unwrap();
+        let nested_difference =
+            build_exact_residual_difference_factor_base(&curve, &small, &nested_pool).unwrap();
+        let nested_suffix =
+            build_exact_residual_suffix_factor_base(&curve, &small, &nested_pool).unwrap();
+        assert_eq!(
+            nested_difference
+                .points
+                .iter()
+                .map(point_key)
+                .collect::<BTreeSet<_>>(),
+            nested_suffix
+                .points
+                .iter()
+                .map(point_key)
+                .collect::<BTreeSet<_>>()
+        );
+        assert_eq!(
+            nested_difference.signed_orbits.len(),
+            nested_suffix.signed_orbits.len()
+        );
+
+        let mut changed_label = cross_stream_pool.clone();
+        changed_label.signed_orbit_of[0].1 ^= 1;
+        assert!(
+            build_exact_residual_difference_factor_base(&curve, &small, &changed_label).is_err()
+        );
+        let mut partial_overlap = small.clone();
+        partial_overlap.points.pop();
+        partial_overlap.signed_orbit_of.pop();
+        assert!(build_exact_residual_difference_factor_base(
+            &curve,
+            &partial_overlap,
+            &cross_stream_pool
+        )
+        .is_err());
+        assert!(build_exact_residual_difference_factor_base(&curve, &small, &small).is_err());
     }
 
     #[test]

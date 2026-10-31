@@ -8,38 +8,8 @@ name: ic programme harness
 # tree, byte for byte.  It runs no experiment.
 
 on:
-  pull_request:
-    paths:
-      - 'Cargo.lock'
-      - 'build.rs'
-      - '.cargo/**'
-      - 'rust-toolchain*'
-      - 'src/bin/icprog.rs'
-      - 'src/bin/icprog/**'
-      - 'src/bin/prepared_sat_worker.rs'
-      - 'src/bin/prepared_sat_worker/**'
-      - 'src/cryptanalysis/prepared_sat_control.rs'
-      - 'src/cryptanalysis/prepared_control_archive.rs'
-      - 'src/bin/isolated_bench.rs'
-      - 'src/bin/isolated_bench/**'
-      - 'tests/icprog.rs'
-      - 'research/ic_tool_program/rounds/**'
-      - 'research/ic_tool_program/suite/**'
-      - 'research/ic_tool_program/baselines.json'
-      - 'docs/curves/registry.json'
-      - 'src/cryptanalysis/curve_aliases.json'
-      - 'research/ic_single_target_20260930/**'
-      - 'research/ic_candidate_tournament_20260915/goal_20260924/prepared-ic-state-v1/**'
-      - 'research/ic_candidate_tournament_20260915/goal_20260924/native-f5-preparation-v1/**'
-      - 'research/ic_candidate_tournament_20260915/goal_20260924/native-ordinary-preparation-v1/**'
-      - 'research/ic_candidate_tournament_20260915/goal_20260924/native-f5-target-replay-v1/**'
-      - 'research/ic_candidate_tournament_20260915/goal_20260924/native-f5-control-v1/**'
-      - 'research/ic_candidate_tournament_20260915/goal_20260924/native-f5-custody-v1/**'
-      - 'research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/**'
-      - 'research/sat_factor_base_review_20260908/autolab/protocol.json'
-      - 'docs/ic/boundary_targets.json'
-      - 'Cargo.toml'
-      - '.github/workflows/ic-programme-harness.yml'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:
@@ -73,10 +43,13 @@ concurrency:
 
 jobs:
   harness:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-programme-harness.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-programme-harness.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
     steps:
       - uses: actions/checkout@v4
+      - name: Keep only build and harness inputs in the Linux worktree
+        if: runner.os == 'Linux'
+        run: scripts/sparse-checkout.sh apply --profile minimal --path isogeny_algos/ --path research/ic_tool_program/rule/v8/runs/
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Install valgrind, for callgrind_annotate
@@ -97,11 +70,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+        os: [ubuntu-latest]
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-programme-harness.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-programme-harness.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
     steps:
       - uses: actions/checkout@v4
+      - name: Keep only build and harness inputs in the Linux worktree
+        if: runner.os == 'Linux'
+        run: scripts/sparse-checkout.sh apply --profile minimal --path isogeny_algos/
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Bootstrap native build serialization

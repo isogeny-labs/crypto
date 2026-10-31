@@ -8,6 +8,16 @@
       "command": "conductor-mcp",
       "type": "stdio"
     },
+    "isolab": {
+      "command": "bash",
+      "args": ["-c", "exec bash \"$(git rev-parse --show-toplevel)/scripts/isolab-agent.sh\" mcp nats"],
+      "type": "stdio"
+    },
+    "isolab-eks": {
+      "command": "bash",
+      "args": ["-c", "exec bash \"$(git rev-parse --show-toplevel)/scripts/isolab-agent.sh\" mcp eks"],
+      "type": "stdio"
+    },
     "cairn": {
       "args": [
         "--log",

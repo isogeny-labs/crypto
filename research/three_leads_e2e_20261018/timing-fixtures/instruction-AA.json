@@ -1,0 +1,55 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.three_leads_negation_v1",
+        "params": {
+          "trial_cap": "297231900"
+        }
+      },
+      "name": "rho_neg",
+      "role": "reference"
+    },
+    {
+      "name": "rho_AA",
+      "role": "control",
+      "method": {
+        "id": "rho.three_leads_negation_v1",
+        "params": {
+          "trial_cap": "297231900"
+        }
+      }
+    }
+  ],
+  "description": "L0 instruction-counter A/A control; wall time is unqualified",
+  "label": "three-leads-retired-instruction-AA",
+  "measurement": {
+    "isolation_required": "L2",
+    "order": "shuffle",
+    "rounds": 5,
+    "seed": 2026101801,
+    "timeout_seconds": 1200,
+    "warmup": 1
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 4255430436932,
+        "b": 1351106155619,
+        "family": "scholten",
+        "group_order": 8805124221808,
+        "gx": 4017562840038,
+        "gy": 8704560266432,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 2967343,
+        "parameter": 0,
+        "r": 550320263863
+      }
+    ],
+    "target_seed": 202610181260,
+    "targets_per_curve": 1
+  }
+}

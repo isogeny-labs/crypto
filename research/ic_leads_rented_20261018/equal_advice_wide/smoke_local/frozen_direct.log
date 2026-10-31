@@ -1,0 +1,22 @@
+[2026-10-18T21:28:08Z] rung n41smoke: preflight
+[2026-10-18T21:28:08Z] build
+[2026-10-18T21:28:15Z] start BL arm (table walks use 4 threads, then idle at the barrier)
+[2026-10-18T21:29:15Z] BL table ready
+[2026-10-18T21:29:15Z] IC process 1 (setup threads 4, online single thread)
+[2026-10-18T21:29:16Z] BL online pass 1
+[2026-10-18T21:29:21Z] BL online pass 2
+[2026-10-18T21:29:26Z] IC process 2 (setup threads 4, online single thread)
+[2026-10-18T21:29:27Z] assemble, replay, check
+{
+  "claims": 64,
+  "rung_verdict": "BL_WINS_AT_EQUAL_ADVICE",
+  "tier_A": "BL_FASTER_AT_TIER_A",
+  "tier_B": "NOT_IC_FASTER_AT_TIER_B"
+}
+[2026-10-18T21:29:27Z] rung n41smoke done: research/ic_leads_rented_20261018/equal_advice_wide/smoke_local/frozen_direct/n41smoke/assembled/decision.json
+Terminated
+
+real	1m19.175s
+user	2m4.951s
+sys	0m1.466s
+rc=143

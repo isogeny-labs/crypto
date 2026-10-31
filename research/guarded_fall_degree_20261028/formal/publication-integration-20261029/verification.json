@@ -1,0 +1,88 @@
+{
+  "schema": "lean-publication-integration-verification/v1",
+  "verification_date": "2026-10-29",
+  "completed_utc": "2026-10-29T17:13:26.967Z",
+  "purpose": "PR 2859 main integration and publication validation; no new mathematical scope or scientific experiment",
+  "integration_commit": "2be1b8e5d6dd1406332ef49fcc3da579f5e2080a",
+  "parents": [
+    "a7605a9a3b1a850b4f723d694bae570f7af551ad",
+    "17805c0db9bd92e8b1cfd10c5c10130c36aad3ce"
+  ],
+  "conflict": {
+    "path": "docs/session-logs/2026-10-29.md",
+    "copilot_request": "https://github.com/isogeny-labs/crypto/pull/2859#issuecomment-6501471948",
+    "fallback_explanation": "https://github.com/isogeny-labs/crypto/pull/2859#issuecomment-6502568473",
+    "reason": "No acknowledgment, response or head update after approximately 46 minutes",
+    "resolution": "Every nonempty line from both parents retained modulo existing main header whitespace repairs; both full conflict sides retained"
+  },
+  "proof_validation": "../complete-exact-pair-validation/verification.json",
+  "proof_preservation": "Entire guarded proof study unchanged from a7605a9a3b1a850b4f723d694bae570f7af551ad through the main integration; new publication records are separate.",
+  "source_bindings": {
+    "src": "800dbdbe5d4abc5f5e918f8857acc6c83ccfd790",
+    "cargo_toml": "37727ebbd8370f6604d842d2b421078bae46a08e",
+    "cargo_lock": "54dcf6ba8d4fac7aa670870730448a9bd18ec319",
+    "pencil_path_dependency": "e5246ba370dfce95b35a76b7ed762e5bc47e97f4"
+  },
+  "lean_build": {
+    "command": "lake build",
+    "exit_code": 0,
+    "jobs": 1690,
+    "log": "lean-build.log",
+    "log_sha256": "0dbe24ea608a409c6d760e457b384f9d99fb25337b3b9b042200d33224fe676c"
+  },
+  "lean_audit": {
+    "command": "lake env lean --run ../../../tools/lean/AuditAxioms.lean -- CubicArithmetic CubicNormalization GridArithmetic GridClosure AffineGrid StagedResultant GuardedReduction RationalFibers GuardedFibers GuardedLastFall GuardedTops WeightedFirstFall GuardedExactPair",
+    "exit_code": 0,
+    "audited_theorem_declarations": 231,
+    "forbidden_axioms": 0,
+    "compiler_trusted": 0,
+    "log": "lean-audit.log",
+    "log_sha256": "273cdf27baf3755c660c5b97d8f130a5df75e2825bcf045592c7a19bfa42aa67"
+  },
+  "fresh_kernel_replays": "All thirteen original fresh replays remain bound to exactly unchanged proof sources and pinned dependencies; not rerun or relabelled as a new replay.",
+  "library": {
+    "command": "cargo test --release --lib --locked -- --test-threads=4",
+    "exit_code": 0,
+    "passed": 5251,
+    "failed": 0,
+    "ignored": 123,
+    "seconds_reported_by_test_runner": 1155,
+    "performance_claim": false,
+    "binary": "target/release/deps/crypto_lib-736382a8cfddd63f",
+    "binary_sha256": "8c3e8df36461e2cd6be61ad9c0554e38a7d5645c8bf66b60331246842a60239e",
+    "source_context": "Main files were merged into the worktree before launch and stayed byte-identical throughout compilation and testing; integration commit was recorded during compilation without changing code.",
+    "raw_bytes": 466482,
+    "raw_sha256": "6bafae4406c21bcce32a2a2e5c0a138bccef417977d3569a7d4b9a89a8c06857",
+    "lossless_archive_bytes": 74656,
+    "lossless_archive_sha256": "b8fc7bf50bd4d103cb0b6cdf87b9c460b571a0e8237c10a8d5ea0822703c8b6d",
+    "raw_retention": "Full development output retained locally at /workspace/scratch/lean-complete-integration-20261029/library.log.xz; not a scientific result record",
+    "committed_excerpt": "library-summary.txt"
+  },
+  "initial_failures": [
+    {
+      "exit_code": 101,
+      "stage": "Cargo setup/compilation",
+      "reason": "Unmaterialized tracked main pencil-symbolic-graph path dependency",
+      "log": "library-unmaterialized-path.log",
+      "log_sha256": "76142819dce33954ef934a61d8fc13a930b9434c5cd717d4b050ace56b2b5cdd",
+      "remedy": "Restored exact tracked main bytes; no source, fixture, test or gate changes"
+    },
+    {
+      "exit_code": 101,
+      "stage": "Cargo setup/compilation",
+      "reason": "Five unmaterialized tracked prime20 include files",
+      "log": "library-unmaterialized-prime20.log",
+      "log_sha256": "77673c1035da9d1dcae5452ef5af7e6c1fb559d5341131a8bbc4120e2604a4fd",
+      "remedy": "Restored exact tracked main bytes; no source, fixture, test or gate changes"
+    }
+  ],
+  "materialization": {
+    "receipt": "materialization.json",
+    "receipt_sha256": "75f14746b6c4075217d94f461ec35c3956c307d2524e39c7b8a406e1dd6353d7",
+    "files": 242,
+    "bytes": 12626520,
+    "scope": "Source-referenced tracked fixture materialization only, no content change"
+  },
+  "scientific_experiment": false,
+  "performance_claim": false
+}

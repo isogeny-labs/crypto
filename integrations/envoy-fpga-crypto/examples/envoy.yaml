@@ -1,0 +1,67 @@
+# Requires a custom Envoy build and a loaded AFI implementing docs/fpga-abi.md.
+# Slots: 1 RSA signing key, 2 P-256 signing key, 10 AES-128 key, 11 AES-256 key.
+# The certificate's public key must match the selected hardware signing slot.
+static_resources:
+  listeners:
+    - name: fpga_tls_and_crypto
+      address:
+        socket_address: {address: 127.0.0.1, port_value: 8443}
+      filter_chains:
+        - transport_socket:
+            name: envoy.transport_sockets.tls
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext
+              common_tls_context:
+                tls_params:
+                  tls_minimum_protocol_version: TLSv1_2
+                  tls_maximum_protocol_version: TLSv1_3
+                  cipher_suites:
+                    - ECDHE-RSA-AES128-GCM-SHA256
+                    - ECDHE-RSA-AES256-GCM-SHA384
+                  signature_algorithms:
+                    - rsa_pss_rsae_sha256
+                    - rsa_pkcs1_sha256
+                tls_certificates:
+                  - certificate_chain: {filename: /etc/envoy/certs/server-chain.pem}
+                    private_key_provider:
+                      provider_name: fpga
+                      fallback: false
+                      typed_config:
+                        "@type": type.googleapis.com/google.protobuf.Struct
+                        value:
+                          slot_id: 0
+                          key_slot: 1
+                          queue_capacity: 128
+                          timeout_ms: 20
+                          offload_tls_records: true
+                          sdk_library: /usr/local/lib64/libfpga_mgmt.so
+                          lock_directory: /run/lock/envoy-fpga-crypto
+          filters:
+            - name: envoy.filters.network.http_connection_manager
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                stat_prefix: fpga_demo
+                stream_idle_timeout: 15s
+                route_config:
+                  name: local
+                  virtual_hosts:
+                    - name: local
+                      domains: ["*"]
+                      routes:
+                        - match: {prefix: /}
+                          direct_response: {status: 404}
+                http_filters:
+                  - name: envoy.filters.http.fpga_crypto
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.fpga_crypto.v3.FpgaHttp
+                      value:
+                        slot_id: 0
+                        queue_capacity: 128
+                        timeout_ms: 20
+                        sdk_library: /usr/local/lib64/libfpga_mgmt.so
+                        lock_directory: /run/lock/envoy-fpga-crypto
+                        path_prefix: /_fpga/
+                        key_slots: {aes128: 10, aes256: 11, rsa: 1, ecdsa: 2}
+                  - name: envoy.filters.http.router
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router

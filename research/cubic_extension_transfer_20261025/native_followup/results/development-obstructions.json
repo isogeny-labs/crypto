@@ -1,0 +1,20 @@
+{
+  "scope": "Development failures retained separately from frozen performance records",
+  "resolved": [
+    {"issue":"Installed FLINT uses flint_randinit/flint_randseed/flint_randclear names", "action":"Adapted native API calls"},
+    {"issue":"GMP random-state cleanup needed explicit -lgmp linkage", "action":"Added GMP link flag"},
+    {"issue":"Fixed-quartic helper-pool negation returned Ycoord on first random class", "action":"Retained bounded helper generation with failed-attempt counter"},
+    {"issue":"Werror rejected misleading one-line control indentation", "action":"Separated affected statements"},
+    {"issue":"Manifest generator had a missing object brace", "action":"Saved readable jq source and regenerated before the run"},
+    {"issue":"Existing certificate checker accepts Option for extra points", "action":"Wrapped checker seed and count in Some"}
+  ],
+  "open": [
+    {"issue":"CPU and memory PSI unavailable in /proc and cgroup, including permitted host read", "effect":"Strict wall-time isolation cannot be qualified"},
+    {"issue":"System threads cannot all be moved off the selected CPU", "effect":"Diagnostic pinning is a partial reservation; no qualified wall-time evidence"},
+    {"issue":"Root cargo test --release --lib cannot run in the partial import checkout; Cargo.toml is absent", "effect":"Repository-wide checks remain pending; standalone native tests do not replace them"},
+    {"issue":"Conductor executable and workflow reference unavailable", "effect":"No Conductor reservation receipt"},
+    {"issue":"Native elliptic-to-quartic construction and inverse map not implemented", "effect":"Native target measurements are stage diagnostics, not a cold transfer benchmark"}
+  ],
+  "historical_evidence": "unchanged",
+  "smoke_timings": "Unqualified development observations; excluded from final repeated-run summaries"
+}

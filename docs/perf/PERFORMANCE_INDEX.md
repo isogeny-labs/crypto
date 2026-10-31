@@ -5,16 +5,31 @@ computed the same way every time, refused when the two revisions compute
 different answers, and reported with its noise.
 
 ```bash
+# perfindex is a Rust example (examples/perfindex); build it once.
+cargo build --release --example perfindex
+PI=target/release/examples/perfindex
 # 1. Build both sides with the SAME harness (this tree's examples/perfbench).
-python3 scripts/perf/perfindex.py build --ref <base-rev> --out /tmp/pi-base
-python3 scripts/perf/perfindex.py build --current      --out /tmp/pi-cand
+$PI build --reference <base-rev> --out /tmp/pi-base
+$PI build --current              --out /tmp/pi-cand
 # 2. Wall time, paired and interleaved, one thread (the headline).
-python3 scripts/perf/perfindex.py compare --base /tmp/pi-base/perfbench \
-    --cand /tmp/pi-cand/perfbench --rounds 5 --threads 1 --out /tmp/pi-1t
+$PI compare --base /tmp/pi-base/perfbench --cand /tmp/pi-cand/perfbench \
+    --rounds 5 --threads 1 --taskset 2 --out /tmp/pi-1t
 # 3. The same at every core, and the deterministic instruction count.
-python3 scripts/perf/perfindex.py compare ... --threads 4 --out /tmp/pi-4t
-python3 scripts/perf/perfindex.py instr --base ... --cand ... --out /tmp/pi-ir
+$PI compare ... --threads 4 --out /tmp/pi-4t
+$PI instr --base ... --cand ... --out /tmp/pi-ir
+# 4. What the host and the rule can and cannot show, before trusting a verdict.
+$PI null --bin /tmp/pi-base/perfbench --out /tmp/pi-null --rounds 5 --taskset 2
+# 5. Hand a reviewer something that replays.
+$PI bundle /tmp/pi-1t --dest benchmarks/<date>-<name>/perfbench
 ```
+
+`compare` and `instr` refuse, instead of reporting a number, when the two
+binaries were built from different harness sources, when they are the same
+binary, when either build had uncommitted changes under `src/`, or when the
+two sides do not have the same kernels (`--allow-missing` and
+`--allow-provenance-mismatch` run anyway and record the problem; the result
+is then marked not qualified).  A candidate that drops its slowest kernel
+would otherwise raise the index.
 
 ## Progress over time: the history
 
@@ -27,8 +42,24 @@ renders `HISTORY.md`, `history.svg` and a machine-readable `history.json`
 from them.  The snapshots and the rendered files live on the
 [`perf-history`](https://github.com/aburan28/crypto/tree/perf-history/docs/perf)
 branch, appended by `.github/workflows/perf-history.yml` on every push to
-`main`; pull requests that touch measured code get a comparison against the
-latest snapshot in their job summary.
+`main`.  Pull requests that touch measured code only test the history
+machinery and compile both tools; the full instruction comparison of a branch
+runs through a `check_only` manual dispatch.
+
+Three pictures are rendered next to `HISTORY.md`:
+
+* `history.svg`: the overall index and one line per area since the first
+  snapshot.
+* `history-panels.svg`: one small panel per area, each kernel a thin line
+  and the area's index a thick one, so a single kernel that moved is visible
+  without the others drowning it; a kernel flagged as a regression in the
+  latest snapshot carries a red ring.
+* `factor-bases.svg`: one bar per index-calculus solve in the
+  `ic_factor_base` area (below), grouped by curve, its length the solve `Ir`
+  on a log scale, its colour the symmetry its factor base is closed under,
+  labelled with the base's size, next to the matched rho reference on the
+  same curve as a grey dashed line.  The distance from a bar to that line is
+  the distance still to go.
 
 ```bash
 git fetch origin perf-history
@@ -49,6 +80,54 @@ inlining follows), so one step under about 5 % on one kernel is build
 noise and a trend or an area index is the signal.  The wall column is one
 reading on the recording host and is informational.  Recording a snapshot
 takes about fifteen minutes of callgrind on four cores.
+
+### Regressions are surfaced, not enforced
+
+Neither a snapshot on `main` nor a pull-request check fails on a slower
+kernel (only a `check_only` dispatch with `PERF_HISTORY_FAIL_ON_REGRESSION`
+set can).  After each snapshot on `main`,
+`perfhistory.py regressions` compares every kernel with its own recent
+range: the previous 5 snapshots with the same fingerprint.  A kernel is
+flagged when its `Ir` rises more than 8 % above the highest of those (and
+reported as improved when it falls more than 8 % below the lowest).  Against
+the range rather than the previous snapshot, because several kernels flip
+between two codegen levels from build to build (`ct_scalar_mul` by about
+7 %): a plain 5 % step rule fires on 38 of the 74 recorded steps, the range
+rule on 3, each of them a real change.  A flag appears as a GitHub warning
+on the run, a table in its job summary, a callout at the top of
+`HISTORY.md` and one comment on the merged pull request that introduced it.
+
+```bash
+python3 scripts/perf/perfhistory.py regressions --history <perf-history>/docs/perf/history
+```
+
+### Factor bases
+
+The `ic_factor_base` area (weight 0: it never moves the overall index)
+tracks frozen index-calculus solves whose factor bases differ, with the
+matched rho reference on each curve.  Every row records the factor-base
+spec, its symmetry class as `docs/ecbench/FACTOR_BASE_PROTOCOL.md` names it,
+and the size the run's own report gives (columns, signed points):
+
+| curve | factor bases | symmetry |
+|---|---|---|
+| Koblitz a = 1, n = 17 | `koblitz-orbit`, `compact-orbit-scan` | signed Frobenius |
+| | `binary-subspace`, `koblitz-standard-subspace` | none |
+| prime, 20-bit, generic | `prime-abscissa`, `glv-orbit` | negation (a generic curve has no larger automorphism) |
+| prime, j = 0, p = 2345743 | `glv-orbit` `group=auto` | GLV (order 6) |
+| | `glv-orbit` `group=negation` | negation |
+
+The j = 0 curve and its arms are frozen in
+`docs/perf/ic-factor-base-j0.spec.json` (the E2 curve of
+`research/isogeny_conductor_gap_round2_20261011`, with an oracle that still
+runs on prime curves).  At this size the order-6 fold builds three times the
+signed points of the negation-only base for the same 32 columns (192
+against 64) and costs about 4 % more `Ir` in all (34.6 M against 33.2 M at
+`ca00c151`); on the larger j = 0 curve p = 22793761 it was about 9× cheaper
+(25.9 M against 234.3 M `Ir`, measured once with an older `ecbench` build,
+and too slow to repeat on every push).  Every index-calculus row is still
+tens of times above its rho reference at these sizes: the chart shows that
+distance, not a pass or fail.
 
 ### Separate F4/F5 groups
 
@@ -165,7 +244,7 @@ PI      = exp( Σ_a w(a) · ln A(a) ),  Σ_a w(a) = 1  performance index
 * **Threads.** The headline index is at `RAYON_NUM_THREADS=1`.  The
   many-thread index is reported beside it; a multi-core gain must not
   regress the single-thread index (§10).
-* **Instruction counts.** `perfindex.py instr` runs each kernel once under
+* **Instruction counts.** `perfindex instr` runs each kernel once under
   callgrind, restricted to the timed region (`perfbench_measured_region`),
   and applies the same formula to instruction counts `Ir`.  It is
   deterministic and immune to host load, and it is blind to memory stalls,
@@ -177,6 +256,10 @@ PI      = exp( Σ_a w(a) · ln A(a) ),  Σ_a w(a) = 1  performance index
   Instrumentation is switched on and off by client requests in the
   measured region, so work on every thread counts, including private
   thread pools.  Report it next to wall time, never instead of it.
+  `--jobs N` counts N kernels at once (the count does not depend on load,
+  so this is safe on a shared host) and `--repeat K` counts each kernel K
+  times and reports, rather than averages, any kernel whose count differs
+  between runs; `instr.json` keeps every count and the valgrind version.
 
 ## From the index to a workload
 
@@ -213,6 +296,146 @@ only a cross-check.
 5. **One-time costs outside the timer.**  Input construction happens in
    `setup`; per-sample restoration of consumed inputs in `prepare`.
    Lazy statics and thread pools are warmed by the discarded warm-up runs.
+6. **Fingerprint the answer, and know what else the fingerprint covers.**  A
+   fingerprint that also mixes in counted units (multiply-adds, pairs
+   reduced) fails when a unit legitimately depends on the thread count.  Two
+   `fp_gb` tower kernels do: their basis, step and row counts are identical
+   at 1, 2 and 4 threads and only `muladds` moves (by under 0.3%).  They are
+   listed under `thread_dependent` in `docs/perf/fingerprints.json`, with the
+   reason; the A/B gate compares builds at one thread count, where it is exact.
+
+## What a run records, and how to check it
+
+`compare` writes, besides `compare.json` and `compare.md`:
+
+| file | holds |
+|:--|:--|
+| `plan.json` | the frozen run: seed and schedule hash, thresholds, the area weights as they were, and for both builds the revision, harness hash, binary hash, lockfile hash, and the host's frequency governor, SMT, ASLR, THP and CPU mask |
+| `raw.jsonl` | every harness row exactly as printed, appended and synced as it arrives, with the machine's load average and PSI at each round's start and end |
+| `cost.json` | what the measurement itself cost (below) |
+
+A crash, a timeout or `--budget-seconds` therefore keeps what was measured;
+`--resume` continues the same plan and refuses to if the schedule or either
+binary differs.  `perfindex replay DIR` recomputes `compare.json` from
+`plan.json` and `raw.jsonl` alone and reports MATCH or MISMATCH: it checks
+that the reported numbers follow from the raw rows by the formula above, that
+every planned invocation is present once, and that nothing was edited.  It
+does not re-time anything, so it is a check of the statistics, not of the
+host.  `perfindex bundle` replays first and refuses a run that does not
+match, then copies the five files with `SHA256SUMS` and a `README.md` of the
+commands, ready to commit under `benchmarks/`.
+
+### Cost accounting
+
+Each harness row (schema 2) carries, beside the wall times, the process's
+CPU time per sample, its peak resident set after setup and at the end, the
+involuntary and voluntary context switches and the page faults during the
+timed samples, the thread count the rayon pool actually had, how many
+warm-up runs there were, and whether the time budget cut sampling short of
+the requested count.  `cost.json` adds what `perfindex` measured around
+each invocation: the whole process's wall time (start-up, setup, warm-up and
+samples), summed by kernel, area and round, the share that was overhead
+rather than timed samples, and the largest consumers.  `--dry-run` prints the
+number of invocations before anything runs; `--budget-seconds` stops before a
+round that would end past the budget (the first round always runs, and the
+result is marked not qualified).  Peak RSS is per kernel and covers setup;
+it is the process high-water mark, not a model of allocation.
+
+### Contended rounds
+
+Wall time is evidence only from uncontended runs (`AGENTS.md` section 10).  A
+paired round is **contended**, and by default left out of the medians and the
+index (and counted in the report), when an arm in it shows any of:
+
+* at one thread, process CPU time below 90% of wall time (`--min-cpu-ratio`):
+  the process was descheduled;
+* optionally, more than N involuntary context switches per second of sampling
+  (`--max-invol-per-s N`, off by default: kernels with a private thread pool
+  pinned to one CPU switch constantly while measuring correctly, and a
+  threshold of 100 excluded 441 of the 490 invocations of the null run);
+* at least two scheduler ticks (20 ms) of hypervisor *steal* amounting to more
+  than 5% of the invocation (`--max-steal`), read from `/proc/stat`.
+
+`--keep-contended` pools them anyway; the count is reported either way.  What
+this cannot see: a noisy neighbour that costs cache or memory bandwidth
+without taking CPU time, and frequency changes.  Steal is summed over every
+CPU the process may use unless `--taskset` names the CPU, so an unpinned run
+can exclude a round for steal on a CPU the benchmark never ran on; pin it
+(`--taskset N`, or reserve the core with `tools/isolated_bench.py reserve`)
+for an exact account.  A kernel with fewer than three usable rounds gets the
+verdict `insufficient`.
+
+### Verdicts, and what five rounds can show
+
+The verdict rule above is unchanged, so earlier tables stay comparable.  Three
+things are reported beside it because the rule is weaker than it reads at the
+five rounds `AGENTS.md` asks for as a minimum:
+
+* An exact two-sided **sign test** cannot give p below 0.0625 with five
+  rounds, and the distribution-free confidence interval for the median is the
+  sample range at 93.75% coverage.  Both are in `compare.json`
+  (`sign_test_p`, `speedup_ci_exact`, `ci_exact_coverage`); a percentile
+  bootstrap of five values looks narrower than that.  Use six or more rounds
+  to claim p below 0.05.
+* The **best-of ratio** (fastest sample of each arm, over the used rounds) is
+  not moved by a few slow samples.  A "faster" or "slower" whose best-of ratio
+  does not lie beyond the 2% floor on the same side is marked `†` (not
+  corroborated) and counted in the warnings: it is a statement about
+  interference, not about the code.
+* With no A/A spread (`--no-aa`, or fewer than three A/A pairs) a kernel's
+  verdict is `unqualified-faster` or `unqualified-slower`, never a result.
+
+`perfindex null --bin BIN` compares BIN with a copy of itself that differs
+by one trailing byte, so every `faster`/`slower` it reports is false.  It is
+the empirical false-positive rate of the whole method on this host at this
+round count and load, and it should be run (and its `null.json` kept) before a
+verdict on that host is cited.
+
+### How the false-positive rate was measured
+
+`null` was run on all 136 quick kernels, 5 rounds, one thread, pinned to a
+single CPU of this 4-vCPU shared-tenancy host (2040 invocations): **2 of 136
+kernels (1.5%) received a faster/slower verdict between identical binaries**,
+both marginal (0.96x and 0.98x) with sign-test p = 0.125; the index was 1.005x
+(95% CI 0.985-1.019), and the median A/A noise was 4.6% per kernel.  So on this
+host a per-kernel verdict inside a few percent is not evidence, while the index
+is good to about +-2%.  The rule is not exact: with 136 independent kernels
+about two false verdicts are expected even for a well-calibrated rule, which is
+why the report prints `†` and the sign test and why the index, not a single
+kernel, is the headline.  `null` over a subset is a smoke test of the pipeline,
+not a measurement of this rate.
+
+The run is committed as
+[`research/perfindex_validation_20261024/null-136x5/`](../../research/perfindex_validation_20261024/null-136x5/)
+(raw rows, plan, summary, checksums; `perfindex replay` reproduces the summary)
+with a [run report](../../research/perfindex_validation_20261024/reports/run-20261024T0208Z/report.pdf).
+Its summary is `qualified: false` (28 kernels kept only four usable rounds
+after contended rounds were left out, and one kernel has no A/A spread), and
+both false verdicts rest on four rounds.  The run was first summarised with
+the involuntary-switch limit on; `perfindex reanalyze DIR --out NEW
+--no-invol-limit` re-summarises the same raw rows under other thresholds, and
+the new `plan.json` records the hashes of the run it came from and both
+threshold sets, so a changed rule is never an edit of a result.
+
+### The Python tool
+
+`scripts/perf/perfindex.py` is the earlier implementation and is kept
+unmodified because `scripts/perf/perfhistory.py` and its tests import it.  New
+work should use the Rust tool, which has the same formula and thresholds (the
+two were cross-checked on the 2040 recorded rows of the null run: the summaries agree, and a 1e-6 perturbation of any reported number is detected) and adds the
+raw record, replay, contention classification, the resumable schedule and the
+sparse-checkout build.  Its `build --ref` fails on recent revisions because the
+sparse list it writes lacks the crate's path dependencies; `perfindex build
+--reference` reads them from the manifests of the revision being built.
+
+### Fingerprints
+
+Beyond the A/B gate, `perfindex fingerprints --bin BIN --threads 1,2 --golden
+docs/perf/fingerprints.json` runs every kernel once at each thread count and
+checks (a) that the fingerprint does not depend on the thread count and (b)
+that it equals the recorded one.  A kernel whose fingerprint moves computes
+something else: it needs a new ID (rule 3 below), not an edit of the golden
+file.
 
 ## Reporting a change
 
@@ -221,6 +444,14 @@ A performance change carries, in its commit or PR: the host manifest
 fingerprints, the single- and many-thread indices, the instruction-count
 index, and the changes that were tried and rejected with their numbers
 (§10).  It is classified **engineering** (§3).
+
+The raw evidence belongs in the repository, not on the author's machine: a
+reviewer cannot weigh a ratio whose rows they cannot open.  Run `bundle` on
+each `compare` and commit the result under `benchmarks/`.  State whether
+`compare.json` says `qualified`; if it does not, say which warning, and treat
+every ratio as an unverified observation.  Run `null` on the same host first
+and quote its false-verdict count, so a reader knows what a "slower" row
+there is worth.
 
 ## Build settings tried
 

@@ -1,0 +1,23 @@
+{
+  "schema": "crypto.ml-dataset.startup-config/v1",
+  "policy_sha256": "__NATIVE_POLICY_SHA256__",
+  "reservation_sha256": "__NATIVE_RESERVATION_SHA256__",
+  "startup_deadline_unix_seconds": "__ABSOLUTE_STARTUP_DEADLINE_U64__",
+  "max_wait_seconds": 300,
+  "generate": {
+    "max_cases": 36,
+    "seconds_per_case": 30,
+    "memory_mib": 2048,
+    "trace_mib": 64,
+    "remote": "s3://setec-astronomy-artifacts/__APPROVED_DATA_PREFIX__",
+    "lab_receipt_prefix": null,
+    "cell_envelope": {
+      "money_micro_usd": "__ADMITTED_CELL_MONEY_U64__",
+      "output_bytes": "__ADMITTED_CELL_OUTPUT_BYTES_U64__",
+      "put_attempts": "__ADMITTED_CELL_PUT_ATTEMPTS_U64__",
+      "read_attempts": "__ADMITTED_CELL_READ_ATTEMPTS_U64__",
+      "download_bytes": "__ADMITTED_CELL_DOWNLOAD_BYTES_U64__",
+      "local_bytes": "__ADMITTED_CELL_LOCAL_BYTES_U64__"
+    }
+  }
+}

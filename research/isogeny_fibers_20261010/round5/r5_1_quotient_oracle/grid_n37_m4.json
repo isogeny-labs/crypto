@@ -1,0 +1,626 @@
+{
+  "cells": [
+    {
+      "N": 137439487532,
+      "a": 0,
+      "base_points": 444,
+      "class_group_size": 596,
+      "curve": "icv1-f2m37-tm534059-32aad96b",
+      "h": 596,
+      "k_parent_orbits": 3,
+      "m": 4,
+      "n": 37,
+      "quotient_points": 222,
+      "r": 230603167,
+      "result": {
+        "arms": [
+          {
+            "arm": "a_plain",
+            "base_points": 444,
+            "census": {
+              "D_ratio_vs_ref": 1.0,
+              "class_factor_reps": 0.0017109421327828926,
+              "cost_D": 54568134.93855244,
+              "cost_D_ratio_vs_ref": 1.0,
+              "cost_rows_ratio_vs_ref": 1.0,
+              "decomposable_targets_D": 2504900,
+              "distinct_rows": 2517702,
+              "hit_probability_D_over_r": 0.01086238334272313,
+              "reps_into_G": 2770486,
+              "reps_per_row": 1.100402668782882,
+              "rows_per_target": 0.010917898625390518,
+              "rows_ratio_vs_ref": 1.0
+            },
+            "columns_U": 6,
+            "oracle": {
+              "adds_per_target": 98560.03866666666,
+              "canonicalisations_per_target": 98119.73133333333,
+              "hit_rate": 0.010666666666666666,
+              "lookups_per_target": 98119.73133333333,
+              "targets": 1500,
+              "total_U_W_over_H": 110632370.625,
+              "total_ratio_vs_ref_boot95": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "work_per_relation": 18438728.4375
+            },
+            "oracle_base_points": 444,
+            "swept": 444,
+            "table_build_adds": 1554,
+            "table_entries": 1314
+          },
+          {
+            "arm": "b_saturated_sweep_F",
+            "base_points": 444,
+            "census": {
+              "D_ratio_vs_ref": 0.11388478581979321,
+              "class_factor_reps": 0.001703356022201895,
+              "cost_D": 239576052.87548637,
+              "cost_D_ratio_vs_ref": 4.3904020752269775,
+              "cost_rows_ratio_vs_ref": 4.41284046692607,
+              "decomposable_targets_D": 285270,
+              "distinct_rows": 285270,
+              "hit_probability_D_over_r": 0.001237060200478513,
+              "reps_into_G": 2758202,
+              "reps_per_row": 9.668741893644617,
+              "rows_per_target": 0.001237060200478513,
+              "rows_ratio_vs_ref": 0.11330570496428886
+            },
+            "columns_U": 3,
+            "oracle": {
+              "adds_per_target": 99177.85466666667,
+              "canonicalisations_per_target": 98734.126,
+              "hit_rate": 0.0006666666666666666,
+              "lookups_per_target": 98734.126,
+              "targets": 1500,
+              "total_U_W_over_H": 890603913.0,
+              "total_ratio_vs_ref_boot95": [
+                8.050120484345356,
+                2.006630010846546,
+                11.583554571987888
+              ],
+              "work_per_relation": 296867971.0
+            },
+            "oracle_base_points": 444,
+            "swept": 444,
+            "table_build_adds": 1554,
+            "table_entries": 649
+          },
+          {
+            "arm": "c1_quotient_E_over_T",
+            "base_points": 444,
+            "census": {
+              "D_ratio_vs_ref": 0.11388478581979321,
+              "class_factor_reps": 0.0002159756542517682,
+              "cost_D": 60028606.50700389,
+              "cost_D_ratio_vs_ref": 1.1000670368265348,
+              "cost_rows_ratio_vs_ref": 1.1056892405893413,
+              "decomposable_targets_D": 285270,
+              "distinct_rows": 285270,
+              "hit_probability_D_over_r": 0.001237060200478513,
+              "reps_into_G": 349724,
+              "reps_per_row": 1.225940337224384,
+              "rows_per_target": 0.001237060200478513,
+              "rows_ratio_vs_ref": 0.11330570496428886
+            },
+            "columns_U": 3,
+            "oracle": {
+              "adds_per_target": 24963.022,
+              "canonicalisations_per_target": 24740.151333333335,
+              "hit_rate": 0.0006666666666666666,
+              "lookups_per_target": 24740.151333333335,
+              "targets": 1500,
+              "total_U_W_over_H": 223664280.0,
+              "total_ratio_vs_ref_boot95": [
+                2.021689300667103,
+                0.46206048386653303,
+                2.913049014458153
+              ],
+              "work_per_relation": 74554760.00000001
+            },
+            "oracle_base_points": 222,
+            "swept": 222,
+            "table_build_adds": 444,
+            "table_entries": 324
+          },
+          {
+            "arm": "c2_halfsweep_on_E",
+            "base_points": 444,
+            "census": {
+              "D_ratio_vs_ref": 0.11388478581979321,
+              "class_factor_reps": 0.001703356022201895,
+              "cost_D": 60028606.50700389,
+              "cost_D_ratio_vs_ref": 1.1000670368265348,
+              "cost_rows_ratio_vs_ref": 1.1056892405893413,
+              "decomposable_targets_D": 285270,
+              "distinct_rows": 285270,
+              "hit_probability_D_over_r": 0.001237060200478513,
+              "reps_into_G": 2758202,
+              "reps_per_row": 9.668741893644617,
+              "rows_per_target": 0.001237060200478513,
+              "rows_ratio_vs_ref": 0.11330570496428886
+            },
+            "columns_U": 3,
+            "oracle": {
+              "adds_per_target": 24962.926666666666,
+              "canonicalisations_per_target": 24741.051333333333,
+              "hit_rate": 0.0006666666666666666,
+              "lookups_per_target": 24741.051333333333,
+              "targets": 1500,
+              "total_U_W_over_H": 223667901.0,
+              "total_ratio_vs_ref_boot95": [
+                2.021722030689786,
+                0.4622105714867933,
+                3.04255251698359
+              ],
+              "work_per_relation": 74555967.0
+            },
+            "oracle_base_points": 444,
+            "swept": 222,
+            "table_build_adds": 1554,
+            "table_entries": 649
+          },
+          {
+            "arm": "d_image_2E",
+            "base_points": 444,
+            "census": {
+              "D_ratio_vs_ref": 1.9853175775480059,
+              "class_factor_reps": 0.0034363252953464787,
+              "cost_D": 27485846.876925137,
+              "cost_D_ratio_vs_ref": 0.5036977515884707,
+              "cost_rows_ratio_vs_ref": 0.5009423127889514,
+              "decomposable_targets_D": 4973022,
+              "distinct_rows": 5025932,
+              "hit_probability_D_over_r": 0.021565280584372893,
+              "reps_into_G": 5564356,
+              "reps_per_row": 1.1071291851939102,
+              "rows_per_target": 0.02179472235955892,
+              "rows_ratio_vs_ref": 1.9962378391088382
+            },
+            "columns_U": 6,
+            "oracle": {
+              "adds_per_target": 97681.424,
+              "canonicalisations_per_target": 97245.48266666666,
+              "hit_rate": 0.022,
+              "lookups_per_target": 97245.48266666666,
+              "targets": 1500,
+              "total_U_W_over_H": 53161883.63636363,
+              "total_ratio_vs_ref_boot95": [
+                0.4805273839477001,
+                0.24001343926187504,
+                0.855953457883533
+              ],
+              "work_per_relation": 8860313.93939394
+            },
+            "oracle_base_points": 444,
+            "swept": 444,
+            "table_build_adds": 1554,
+            "table_entries": 1314
+          }
+        ],
+        "m": 4,
+        "verify_failures": 0
+      },
+      "seed": 0,
+      "translate_reps": 222
+    },
+    {
+      "N": 137439487532,
+      "a": 0,
+      "base_points": 444,
+      "class_group_size": 596,
+      "curve": "icv1-f2m37-tm534059-32aad96b",
+      "h": 596,
+      "k_parent_orbits": 3,
+      "m": 4,
+      "n": 37,
+      "quotient_points": 222,
+      "r": 230603167,
+      "result": {
+        "arms": [
+          {
+            "arm": "a_plain",
+            "base_points": 444,
+            "census": {
+              "D_ratio_vs_ref": 1.0,
+              "class_factor_reps": 0.0017487812867652166,
+              "cost_D": 53377586.11963589,
+              "cost_D_ratio_vs_ref": 1.0,
+              "cost_rows_ratio_vs_ref": 1.0,
+              "decomposable_targets_D": 2560770,
+              "distinct_rows": 2572314,
+              "hit_probability_D_over_r": 0.011104661021416067,
+              "reps_into_G": 2831758,
+              "reps_per_row": 1.100860159374011,
+              "rows_per_target": 0.011154721045093019,
+              "rows_ratio_vs_ref": 1.0
+            },
+            "columns_U": 6,
+            "oracle": {
+              "adds_per_target": 98531.93266666666,
+              "canonicalisations_per_target": 98091.526,
+              "hit_rate": 0.01,
+              "lookups_per_target": 98091.526,
+              "targets": 1500,
+              "total_U_W_over_H": 117974075.2,
+              "total_ratio_vs_ref_boot95": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "work_per_relation": 19662345.866666663
+            },
+            "oracle_base_points": 444,
+            "swept": 444,
+            "table_build_adds": 1554,
+            "table_entries": 1314
+          },
+          {
+            "arm": "b_saturated_sweep_F",
+            "base_points": 444,
+            "census": {
+              "D_ratio_vs_ref": 0.2256610316428262,
+              "class_factor_reps": 0.003369558382341436,
+              "cost_D": 118269392.21859393,
+              "cost_D_ratio_vs_ref": 2.2157126392623896,
+              "cost_rows_ratio_vs_ref": 2.2251312251952373,
+              "decomposable_targets_D": 577866,
+              "distinct_rows": 578014,
+              "hit_probability_D_over_r": 0.0025058892621366295,
+              "reps_into_G": 5456242,
+              "reps_per_row": 9.439636410190756,
+              "rows_per_target": 0.0025065310573119753,
+              "rows_ratio_vs_ref": 0.22470584850838585
+            },
+            "columns_U": 3,
+            "oracle": {
+              "adds_per_target": 98896.258,
+              "canonicalisations_per_target": 98453.88466666666,
+              "hit_rate": 0.004,
+              "lookups_per_target": 98453.88466666666,
+              "targets": 1500,
+              "total_U_W_over_H": 148012607.0,
+              "total_ratio_vs_ref_boot95": [
+                1.2546197692084133,
+                0.4995503047344118,
+                5.297496978265723
+              ],
+              "work_per_relation": 49337535.666666664
+            },
+            "oracle_base_points": 444,
+            "swept": 444,
+            "table_build_adds": 1554,
+            "table_entries": 649
+          },
+          {
+            "arm": "c1_quotient_E_over_T",
+            "base_points": 444,
+            "census": {
+              "D_ratio_vs_ref": 0.2256610316428262,
+              "class_factor_reps": 0.00042683296883442976,
+              "cost_D": 29633791.533422973,
+              "cost_D_ratio_vs_ref": 0.5551729421972055,
+              "cost_rows_ratio_vs_ref": 0.5575328800208291,
+              "decomposable_targets_D": 577866,
+              "distinct_rows": 578014,
+              "hit_probability_D_over_r": 0.0025058892621366295,
+              "reps_into_G": 691160,
+              "reps_per_row": 1.1957495839201127,
+              "rows_per_target": 0.0025065310573119753,
+              "rows_ratio_vs_ref": 0.22470584850838585
+            },
+            "columns_U": 3,
+            "oracle": {
+              "adds_per_target": 24901.011333333332,
+              "canonicalisations_per_target": 24678.750666666667,
+              "hit_rate": 0.004,
+              "lookups_per_target": 24678.750666666667,
+              "targets": 1500,
+              "total_U_W_over_H": 37184821.5,
+              "total_ratio_vs_ref_boot95": [
+                0.31519485477602627,
+                0.1343652574019804,
+                1.0751173738835862
+              ],
+              "work_per_relation": 12394940.5
+            },
+            "oracle_base_points": 222,
+            "swept": 222,
+            "table_build_adds": 444,
+            "table_entries": 324
+          },
+          {
+            "arm": "c2_halfsweep_on_E",
+            "base_points": 444,
+            "census": {
+              "D_ratio_vs_ref": 0.2256610316428262,
+              "class_factor_reps": 0.003369558382341436,
+              "cost_D": 29633791.533422973,
+              "cost_D_ratio_vs_ref": 0.5551729421972055,
+              "cost_rows_ratio_vs_ref": 0.5575328800208291,
+              "decomposable_targets_D": 577866,
+              "distinct_rows": 578014,
+              "hit_probability_D_over_r": 0.0025058892621366295,
+              "reps_into_G": 5456242,
+              "reps_per_row": 9.439636410190756,
+              "rows_per_target": 0.0025065310573119753,
+              "rows_ratio_vs_ref": 0.22470584850838585
+            },
+            "columns_U": 3,
+            "oracle": {
+              "adds_per_target": 24901.646,
+              "canonicalisations_per_target": 24680.392666666667,
+              "hit_rate": 0.004,
+              "lookups_per_target": 24680.392666666667,
+              "targets": 1500,
+              "total_U_W_over_H": 37186529.0,
+              "total_ratio_vs_ref_boot95": [
+                0.3152093282948659,
+                0.13592836888034165,
+                1.0997149594355138
+              ],
+              "work_per_relation": 12395509.666666666
+            },
+            "oracle_base_points": 444,
+            "swept": 222,
+            "table_build_adds": 1554,
+            "table_entries": 649
+          },
+          {
+            "arm": "d_image_2E",
+            "base_points": 444,
+            "census": {
+              "D_ratio_vs_ref": 1.940355439965323,
+              "class_factor_reps": 0.0034363252953464787,
+              "cost_D": 27509179.514341883,
+              "cost_D_ratio_vs_ref": 0.5153694933428649,
+              "cost_rows_ratio_vs_ref": 0.511808357136547,
+              "decomposable_targets_D": 4968804,
+              "distinct_rows": 5025932,
+              "hit_probability_D_over_r": 0.021546989421875547,
+              "reps_into_G": 5564356,
+              "reps_per_row": 1.1071291851939102,
+              "rows_per_target": 0.02179472235955892,
+              "rows_ratio_vs_ref": 1.9538563332470298
+            },
+            "columns_U": 6,
+            "oracle": {
+              "adds_per_target": 97695.51333333334,
+              "canonicalisations_per_target": 97259.39466666666,
+              "hit_rate": 0.021333333333333333,
+              "lookups_per_target": 97259.39466666666,
+              "targets": 1500,
+              "total_U_W_over_H": 54831067.875,
+              "total_ratio_vs_ref_boot95": [
+                0.46477217797253817,
+                0.22771064323520318,
+                0.824230942358345
+              ],
+              "work_per_relation": 9138511.3125
+            },
+            "oracle_base_points": 444,
+            "swept": 444,
+            "table_build_adds": 1554,
+            "table_entries": 1314
+          }
+        ],
+        "m": 4,
+        "verify_failures": 0
+      },
+      "seed": 1,
+      "translate_reps": 222
+    },
+    {
+      "N": 137439487532,
+      "a": 0,
+      "base_points": 444,
+      "class_group_size": 596,
+      "curve": "icv1-f2m37-tm534059-32aad96b",
+      "h": 596,
+      "k_parent_orbits": 3,
+      "m": 4,
+      "n": 37,
+      "quotient_points": 222,
+      "r": 230603167,
+      "result": {
+        "arms": [
+          {
+            "arm": "a_plain",
+            "base_points": 444,
+            "census": {
+              "D_ratio_vs_ref": 1.0,
+              "class_factor_reps": 0.002386151673952989,
+              "cost_D": 39818305.36700511,
+              "cost_D_ratio_vs_ref": 1.0,
+              "cost_rows_ratio_vs_ref": 1.0,
+              "decomposable_targets_D": 3432786,
+              "distinct_rows": 3460166,
+              "hit_probability_D_over_r": 0.014886118194551943,
+              "reps_into_G": 3863836,
+              "reps_per_row": 1.1166620329776087,
+              "rows_per_target": 0.015004850301990865,
+              "rows_ratio_vs_ref": 1.0
+            },
+            "columns_U": 6,
+            "oracle": {
+              "adds_per_target": 98312.82733333333,
+              "canonicalisations_per_target": 97873.86733333333,
+              "hit_rate": 0.014666666666666666,
+              "lookups_per_target": 97873.86733333333,
+              "targets": 1500,
+              "total_U_W_over_H": 80258193.27272727,
+              "total_ratio_vs_ref_boot95": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "work_per_relation": 13376365.545454547
+            },
+            "oracle_base_points": 444,
+            "swept": 444,
+            "table_build_adds": 1554,
+            "table_entries": 1314
+          },
+          {
+            "arm": "b_saturated_sweep_F",
+            "base_points": 444,
+            "census": {
+              "D_ratio_vs_ref": 0.08428722326413589,
+              "class_factor_reps": 0.0016920682552530617,
+              "cost_D": 236206057.24680308,
+              "cost_D_ratio_vs_ref": 5.9320971867007675,
+              "cost_rows_ratio_vs_ref": 5.974827498083312,
+              "decomposable_targets_D": 289340,
+              "distinct_rows": 289562,
+              "hit_probability_D_over_r": 0.001254709567800515,
+              "reps_into_G": 2739924,
+              "reps_per_row": 9.46230513672374,
+              "rows_per_target": 0.0012556722605635334,
+              "rows_ratio_vs_ref": 0.08368442438888771
+            },
+            "columns_U": 3,
+            "oracle": {
+              "adds_per_target": 99092.692,
+              "canonicalisations_per_target": 98649.43,
+              "hit_rate": 0.002,
+              "lookups_per_target": 98649.43,
+              "targets": 1500,
+              "total_U_W_over_H": 296613183.0,
+              "total_ratio_vs_ref_boot95": [
+                3.6957371067658067,
+                1.3993952762046296,
+                13.636183857741292
+              ],
+              "work_per_relation": 98871060.99999999
+            },
+            "oracle_base_points": 444,
+            "swept": 444,
+            "table_build_adds": 1554,
+            "table_entries": 649
+          },
+          {
+            "arm": "c1_quotient_E_over_T",
+            "base_points": 444,
+            "census": {
+              "D_ratio_vs_ref": 0.08428722326413589,
+              "class_factor_reps": 0.0002146046704118289,
+              "cost_D": 59184214.34386189,
+              "cost_D_ratio_vs_ref": 1.4863569355441248,
+              "cost_rows_ratio_vs_ref": 1.4970635191826724,
+              "decomposable_targets_D": 289340,
+              "distinct_rows": 289562,
+              "hit_probability_D_over_r": 0.001254709567800515,
+              "reps_into_G": 347504,
+              "reps_per_row": 1.2001022233580374,
+              "rows_per_target": 0.0012556722605635334,
+              "rows_ratio_vs_ref": 0.08368442438888771
+            },
+            "columns_U": 3,
+            "oracle": {
+              "adds_per_target": 24938.520666666667,
+              "canonicalisations_per_target": 24715.892666666667,
+              "hit_rate": 0.002,
+              "lookups_per_target": 24715.892666666667,
+              "targets": 1500,
+              "total_U_W_over_H": 74481620.0,
+              "total_ratio_vs_ref_boot95": [
+                0.9280251269412737,
+                0.3780969080874965,
+                3.3044566247520692
+              ],
+              "work_per_relation": 24827206.666666664
+            },
+            "oracle_base_points": 222,
+            "swept": 222,
+            "table_build_adds": 444,
+            "table_entries": 324
+          },
+          {
+            "arm": "c2_halfsweep_on_E",
+            "base_points": 444,
+            "census": {
+              "D_ratio_vs_ref": 0.08428722326413589,
+              "class_factor_reps": 0.0016920682552530617,
+              "cost_D": 59184214.34386189,
+              "cost_D_ratio_vs_ref": 1.4863569355441248,
+              "cost_rows_ratio_vs_ref": 1.4970635191826724,
+              "decomposable_targets_D": 289340,
+              "distinct_rows": 289562,
+              "hit_probability_D_over_r": 0.001254709567800515,
+              "reps_into_G": 2739924,
+              "reps_per_row": 9.46230513672374,
+              "rows_per_target": 0.0012556722605635334,
+              "rows_ratio_vs_ref": 0.08368442438888771
+            },
+            "columns_U": 3,
+            "oracle": {
+              "adds_per_target": 24947.597333333335,
+              "canonicalisations_per_target": 24725.911333333333,
+              "hit_rate": 0.002,
+              "lookups_per_target": 24725.911333333333,
+              "targets": 1500,
+              "total_U_W_over_H": 74510263.0,
+              "total_ratio_vs_ref_boot95": [
+                0.9283820126227476,
+                0.3425208553283725,
+                3.4265689152320635
+              ],
+              "work_per_relation": 24836754.333333332
+            },
+            "oracle_base_points": 444,
+            "swept": 222,
+            "table_build_adds": 1554,
+            "table_entries": 649
+          },
+          {
+            "arm": "d_image_2E",
+            "base_points": 444,
+            "census": {
+              "D_ratio_vs_ref": 1.4550432214533617,
+              "class_factor_reps": 0.003431938147058673,
+              "cost_D": 27365719.986814424,
+              "cost_D_ratio_vs_ref": 0.6872648078461584,
+              "cost_rows_ratio_vs_ref": 0.6855153203342619,
+              "decomposable_targets_D": 4994852,
+              "distinct_rows": 5047540,
+              "hit_probability_D_over_r": 0.02165994537273636,
+              "reps_into_G": 5557252,
+              "reps_per_row": 1.1009822606655915,
+              "rows_per_target": 0.02188842445515937,
+              "rows_ratio_vs_ref": 1.4587566030069077
+            },
+            "columns_U": 6,
+            "oracle": {
+              "adds_per_target": 97979.96,
+              "canonicalisations_per_target": 97542.62266666666,
+              "hit_rate": 0.018666666666666668,
+              "lookups_per_target": 97542.62266666666,
+              "targets": 1500,
+              "total_U_W_over_H": 62846544.428571425,
+              "total_ratio_vs_ref_boot95": [
+                0.7830545626041081,
+                0.4419231432473186,
+                1.3538352050900522
+              ],
+              "work_per_relation": 10474424.071428569
+            },
+            "oracle_base_points": 444,
+            "swept": 444,
+            "table_build_adds": 1554,
+            "table_entries": 1314
+          }
+        ],
+        "m": 4,
+        "verify_failures": 0
+      },
+      "seed": 2,
+      "translate_reps": 222
+    }
+  ],
+  "experiment": "grid",
+  "fill": 0.02,
+  "seed": 20261016,
+  "wall_seconds_contended": 467.148858379
+}

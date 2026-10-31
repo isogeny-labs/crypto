@@ -1,6 +1,7 @@
 //! Read-only parameter inspection. This module never calls a DLP solver.
 use crypto_lib::{
     binary_ecc::{curve::scalar_mul, BinaryCurve, BinaryPoint, F2mElement, IrreduciblePoly},
+    cryptanalysis::secg_standards::{secg, secg_names, SecgField},
     ecc::{curve::CurveParams, field::FieldElement, point::Point},
 };
 use num_bigint::{BigInt, BigUint};
@@ -87,9 +88,68 @@ pub fn binary_coordinates(point: &BinaryPoint) -> Option<Coordinates> {
         }),
     }
 }
-pub const NAMES: &[&str] = &["ecc2k-130", "ecc2k-95", "sect163k1", "secp256k1"];
+/// Every curve `ic inspect --curve` knows: the ECCp-131 and ECC2K challenge
+/// curves, plus every SECG curve in the standards database.
+pub fn names() -> Vec<&'static str> {
+    let mut v = vec!["ecc2k-130", "ecc2k-95", "eccp-131"];
+    v.extend(secg_names());
+    v
+}
+/// A SECG curve from the standards database as inspection parameters.
+fn secg_parameters(name: &str) -> Option<Parameters> {
+    let c = secg(name)?;
+    let field = match &c.field {
+        SecgField::Prime { p } => Field::Prime { modulus: hex(p) },
+        SecgField::Binary { degree, low_terms } => {
+            let mut terms = low_terms.clone();
+            terms.push(*degree);
+            Field::Binary {
+                degree: *degree,
+                polynomial_terms: terms,
+            }
+        }
+    };
+    Some(Parameters {
+        schema_version: 1,
+        name: c.name.clone(),
+        field,
+        a: hex(&c.a),
+        b: hex(&c.b),
+        subgroup_order: hex(&c.order),
+        cofactor: c.cofactor.to_string(),
+        generator: Some(Coordinates {
+            x: hex(&c.gx),
+            y: hex(&c.gy),
+        }),
+        point: None,
+        fixture: None,
+    })
+}
 pub fn named(name: &str) -> Result<Parameters, String> {
     let profile = match name.to_ascii_lowercase().as_str() {
+        // Exact public parameters are inspected here; the missing full-size
+        // relation pipeline is tracked in problems/eccp131-full-parameter-index-calculus.md.
+        "eccp-131" | "eccp131" => {
+            let c = CurveParams::eccp131();
+            Parameters {
+                schema_version: 1,
+                name: c.name.into(),
+                field: Field::Prime { modulus: hex(&c.p) },
+                a: hex(&c.a),
+                b: hex(&c.b),
+                subgroup_order: hex(&c.n),
+                cofactor: c.h.to_string(),
+                generator: Some(Coordinates {
+                    x: hex(&c.gx),
+                    y: hex(&c.gy),
+                }),
+                point: Some(Coordinates {
+                    x: "0x03AA6F004FC62E2DA1ED0BFB62C3FFB568".into(),
+                    y: "0x009C21C284BA8A445BB2701BF55E3A67ED".into(),
+                }),
+                fixture: None,
+            }
+        }
         "ecc2k-130" => Parameters {
             schema_version: 1,
             name: "ECC2K-130".into(),
@@ -147,6 +207,28 @@ pub fn named(name: &str) -> Result<Parameters, String> {
                 fixture: None,
             }
         }
+        "secp192r1" | "p192" | "nist-p192" | "p-192" => {
+            use crypto_lib::cryptanalysis::p192_native::{
+                p192_order, p192_prime, B_HEX, GX_HEX, GY_HEX,
+            };
+            // NIST P-192 (SEC 2 secp192r1): y² = x³ − 3x + b, prime order, cofactor 1.
+            let p = p192_prime();
+            Parameters {
+                schema_version: 1,
+                name: "secp192r1 (NIST P-192)".into(),
+                field: Field::Prime { modulus: hex(&p) },
+                a: hex(&(&p - BigUint::from(3u8))),
+                b: format!("0x{B_HEX}"),
+                subgroup_order: hex(&p192_order()),
+                cofactor: "1".into(),
+                generator: Some(Coordinates {
+                    x: format!("0x{GX_HEX}"),
+                    y: format!("0x{GY_HEX}"),
+                }),
+                point: None,
+                fixture: None,
+            }
+        }
         "secp256k1" => {
             let c = CurveParams::secp256k1();
             Parameters {
@@ -165,7 +247,10 @@ pub fn named(name: &str) -> Result<Parameters, String> {
                 fixture: None,
             }
         }
-        _ => return Err(format!("unknown curve {name:?}; use ic list")),
+        _ => {
+            return secg_parameters(name)
+                .ok_or_else(|| format!("unknown curve {name:?}; use ic list"))
+        }
     };
     Ok(profile)
 }
@@ -479,8 +564,8 @@ pub fn inspect(p: Parameters, source: String) -> Result<Value, String> {
         }
         Field::Prime { modulus } => {
             q = number(modulus)?;
-            if q.bits() > 512 || q < BigUint::from(5u8) {
-                return Err("prime-field modulus must be >=5 and at most 512 bits".into());
+            if q.bits() > 1024 || q < BigUint::from(5u8) {
+                return Err("prime-field modulus must be >=5 and at most 1024 bits".into());
             }
             let prime = probable_prime(&q);
             check(

@@ -4,11 +4,17 @@
 name: ECC2K-130 status pages
 
 on:
+  # Validate matching site changes on PRs; publish only from main or schedule.
   schedule:
     # Every 10 minutes. scripts/rho_status/render.py sizes history.json from
     # this interval, and test_rho_status.py pins the two together.
     - cron: "*/10 * * * *"
   workflow_dispatch:
+    inputs:
+      source_connection_check:
+        description: "Read the original rho-dp endpoint and secret reference; do not publish Pages"
+        type: boolean
+        default: false
   pull_request:
     paths:
       - ".github/workflows/ecc2k130-status.yml"
@@ -17,22 +23,19 @@ on:
       - "docs/ecc2k130-status/**"
       - "docs/site/**"
       - "docs/index-calculus-scoreboard.html"
-      # The panel index is generated from the scoreboard and pinned by
-      # scripts/site/test_build.py; an edit to either side must rerun it.
       - "docs/ic-current-state.html"
       - "docs/browser/**"
+      - "docs/backend-leaderboard/**"
       - "scripts/build_lab_browser.py"
       - "docs/ic/progress-timeline.json"
       - "docs/ic-leaderboard.html"
+      - "docs/ic-leaderboard/**"
       - "docs/ic-measurement.html"
       - "scripts/rho_gpu_emulate.mjs"
       - "docs/algorithm-lab.html"
       - "docs/algorithm-lab/**"
       - "docs/performance-gains.html"
       - "docs/performance-gains/**"
-      # Documents the published pages cite and scripts/site/test_build.py pins
-      # them to; an edit there must rerun the pins, not wait for the next
-      # site change to find out.
       - "ecc2k130/LAMBDA-PROJECTIVE.md"
       - "ecc2k130/aws/README.md"
   push:
@@ -48,9 +51,11 @@ on:
       # scripts/site/test_build.py; an edit to either side must rerun it.
       - "docs/ic-current-state.html"
       - "docs/browser/**"
+      - "docs/backend-leaderboard/**"
       - "scripts/build_lab_browser.py"
       - "docs/ic/progress-timeline.json"
       - "docs/ic-leaderboard.html"
+      - "docs/ic-leaderboard/**"
       - "docs/ic-measurement.html"
       - "scripts/rho_gpu_emulate.mjs"
       - "docs/algorithm-lab.html"
@@ -65,17 +70,56 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   # PRs get their own group so they never cancel each other. Scheduled,
   # push and manual publishers share one group and admitted runs finish even
   # when the hosted runner queue is under pressure.
-  group: ${{ github.event_name == 'pull_request' && format('ecc2k130-status-pages-pr-{0}', github.event.pull_request.number) || 'ecc2k130-status-pages' }}
+  group: ${{ inputs.source_connection_check && format('ecc2k130-source-connection-{0}', github.ref) || (github.event_name == 'pull_request' && format('ecc2k130-status-pages-pr-{0}', github.event.pull_request.number) || 'ecc2k130-status-pages') }}
   cancel-in-progress: false
 
 jobs:
+  source-connection-check:
+    if: github.event_name == 'workflow_dispatch' && inputs.source_connection_check && github.ref == 'refs/heads/main'
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-status.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-status.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/backend-leaderboard
+      - name: Configure source AWS identity
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-west-2
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: Read source connection metadata
+        env:
+          RHO_SOURCE_REPORT_DEST: s3://ecc-challenges-data-104186811093/connection-checks/ecc2k130-20261019/6626ec30ad72464ddcd61618d5a9f261.pem
+        run: |
+          export RHO_SOURCE_REPORT_CERT="${RHO_SOURCE_REPORT_CERT:-$(cat scripts/rho_status/source_connection_recipient.pem)}"
+          bash scripts/rho_status/source_connection.sh
+
   # Pull requests only. A publishing run runs these same steps inside the
   # publish job, before anything is deployed, so it waits for one runner
   # rather than two. Every job here queues for the same GitHub-hosted runners
@@ -86,10 +130,30 @@ jobs:
   # pins the two step lists to each other.
   test:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-status.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-status.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/backend-leaderboard
       - name: Offline snapshot tests
         run: python3 scripts/rho_status/test_rho_status.py
       - name: DP34 telemetry snapshot tests
@@ -109,8 +173,8 @@ jobs:
         run: node scripts/site/test_algorithm_lab.js
 
   publish:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
-    runs-on: ubuntu-latest
+    if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')) && !inputs.source_connection_check
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-status.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-status.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     # 35 min so the index-only fallback plus a stretch of hour-chunk
     # backfill (300 s each, resumed next run) plus history merge and Pages
     # deploy still fit. Later runs read the rollup and finish in the old 15.
@@ -124,6 +188,26 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/backend-leaderboard
 
       # The test job's steps, in the same order: a failure here stops the
       # run before anything is deployed, as `needs: test` used to.
@@ -210,7 +294,7 @@ jobs:
 
       - name: Merge previous Pages history
         env:
-          PAGES_HISTORY_URL: https://aburan28.github.io/crypto/history.json
+          PAGES_HISTORY_URL: https://isogeny-labs.github.io/crypto/history.json
         run: |
           set -euo pipefail
           set +e
@@ -237,7 +321,7 @@ jobs:
 
       - name: Merge previous DP34 Pages history
         env:
-          PAGES_HISTORY34_URL: https://aburan28.github.io/crypto/history34.json
+          PAGES_HISTORY34_URL: https://isogeny-labs.github.io/crypto/history34.json
         run: |
           set -euo pipefail
           set +e

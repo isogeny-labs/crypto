@@ -1,0 +1,52 @@
+Note that running a local entrypoint in detached mode only keeps the last triggered Modal function alive after the parent process has been killed or disconnected.
+✓ Initialized. View run at 
+https://modal.com/apps/a-buran28/main/ap-mAq2zzCKORjmMGyb2NPdgR
+✓ Created objects.
+├── 🔨 Created mount 
+│   /Volumes/SSD990-2/crypto/rtx6000-sweeps-20261017/gpu/ecc/modal_app.py
+├── 🔨 Created mount /Volumes/SSD990-2/crypto/rtx6000-sweeps-20261017/gpu/ecc
+├── 🔨 Created function runSelftest.
+├── 🔨 Created function runBench.
+├── 🔨 Created function runTune.
+└── 🔨 Created function runBsgs.
+GPU: NVIDIA RTX PRO 6000 Blackwell Server Edition (2430 MHz, 97887 MiB), sm_120; curve secp256k1
+=== building portable ===
+=== ./bench selftest (portable) ===
+device: NVIDIA RTX PRO 6000 Blackwell Server Edition  sm_120  188 SMs  2.4 GHz  102.0 GB  L2 134.2 MB
+        1536 threads/SM, 100 KB shared/SM, 99 KB shared/block (opt-in)
+        Blackwell class: see OPTIMIZATION_BLACKWELL.md
+[selftest] curve secp256k1, special reduction
+  scalar_mul(ct=0): 4096 points match the host
+  scalar_mul(ct=1): 4096 points match the host
+  rho (fold 6): 2048 walks x 64 steps identical to the host, 4174 DPs
+  rho: device DPs replay correctly on the host
+  rho lowmem variant matches
+[selftest bsgs] 2048 chains
+  bsgs: device baby table (16383 entries) and chain state match the host
+  bsgs: device giant phase recovered the planted secret
+selftest OK
+=== building FP_PTX=1 ===
+=== ./bench selftest (FP_PTX=1) ===
+device: NVIDIA RTX PRO 6000 Blackwell Server Edition  sm_120  188 SMs  2.4 GHz  102.0 GB  L2 134.2 MB
+        1536 threads/SM, 100 KB shared/SM, 99 KB shared/block (opt-in)
+        Blackwell class: see OPTIMIZATION_BLACKWELL.md
+[selftest] curve secp256k1, special reduction
+  scalar_mul(ct=0): 4096 points match the host
+  scalar_mul(ct=1): 4096 points match the host
+  rho (fold 6): 2048 walks x 64 steps identical to the host, 4174 DPs
+  rho: device DPs replay correctly on the host
+  rho lowmem variant matches
+[selftest bsgs] 2048 chains
+  bsgs: device baby table (16383 entries) and chain state match the host
+  bsgs: device giant phase recovered the planted secret
+selftest OK
+============================================================
+  portable                 PASS
+  FP_PTX=1                 PASS
+Both configurations agree with the host reference on real hardware.
+That is the check OPTIMIZATION_BLACKWELL.md section 2 calls for: the
+inline assembly is now executed, not merely assembled and interpreted.
+FP_PTX=1 can be made the default on this architecture.
+[modal-client] 2026-10-17T13:55:11-0700 Timed out waiting for final app logs.
+✓ App completed. View run at 
+https://modal.com/apps/a-buran28/main/ap-mAq2zzCKORjmMGyb2NPdgR

@@ -1,0 +1,51 @@
+{
+  "arms": {
+    "4096": {
+      "cold_wall_seconds_diagnostic": 594.3803346670029,
+      "mean_target_ms": 7.535362579589844,
+      "median_target_ms": 5.467188,
+      "peak_sampled_rss_bytes": 20574584832
+    },
+    "4300": {
+      "cold_wall_seconds_diagnostic": 708.2852295830016,
+      "mean_target_ms": 6.380855282958985,
+      "median_target_ms": 4.660813,
+      "peak_sampled_rss_bytes": 21635514368
+    },
+    "4405": {
+      "cold_wall_seconds_diagnostic": 672.3802866250044,
+      "mean_target_ms": 6.804136933105469,
+      "median_target_ms": 5.1075420000000005,
+      "peak_sampled_rss_bytes": 22091218944
+    }
+  },
+  "bootstrap_method": "circular moving blocks of 64, 20000 resamples per comparison, PCG64 seed 20261020",
+  "comparisons": {
+    "k4096_minus_k4300": {
+      "bootstrap_99pct_ci_ms": [
+        0.46977090595214865,
+        1.9072851163305664
+      ],
+      "bootstrap_one_sided_p_nonpositive": 5e-05,
+      "mean_ms": 1.1545072966308594,
+      "median_ms": 0.7071664999999999,
+      "positive_fraction": 0.55078125
+    },
+    "k4096_minus_k4405": {
+      "bootstrap_99pct_ci_ms": [
+        0.005872323040771626,
+        1.5186525273718268
+      ],
+      "bootstrap_one_sided_p_nonpositive": 0.00475,
+      "mean_ms": 0.7312256464843752,
+      "median_ms": 0.4534370000000001,
+      "positive_fraction": 0.529296875
+    }
+  },
+  "hardware_tier": "local_correctness_diagnostic",
+  "point_count": 4096,
+  "schema": "n83.wide3-fresh4096-extension-analysis/v1",
+  "selected_online_candidate_id": null,
+  "status": "PASS_LOCAL_DIAGNOSTIC",
+  "target_sha256": "281a088cc49658973375ab88359d65a3b4d51d2819a297872b5fe5da01783895"
+}

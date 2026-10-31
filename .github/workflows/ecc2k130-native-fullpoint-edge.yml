@@ -1,14 +1,7 @@
 name: Degree-263 native full-point edge replay
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/ecc2k130-native-fullpoint-edge.yml'
-      - 'research/notes/ecc2k130/native_fullpoint_edge_20260929/**'
-      - 'research/notes/ecc2k130/symbolic_dag_fullpoint_20260925/dag.py'
-      - 'research/ecc2k130_factor_base_replication_20260925/exact_smoke.json'
-      - 'research/ecc2k130_factor_base_replication_20260925/exact_replay.json'
-      - 'research/ecc2k130_relations/relations.py'
-      - 'research/ecc2k130_relations/fastfield.py'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:
@@ -18,12 +11,13 @@ on:
 
 jobs:
   frozen-and-replay:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-native-fullpoint-edge.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-native-fullpoint-edge.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             .github/workflows/ecc2k130-native-fullpoint-edge.yml
