@@ -767,9 +767,9 @@ where
     let adapter_stop = if report.stop == native::Stop::Complete && report.native_step_complete {
         budget.finish_native(Instant::now()).err()
     } else {
-        let stop = budget.stopped;
-        let _ = budget.fail::<()>(Stop::NativeFailure);
-        stop
+        // Preserve an earlier observer/deadline failure, otherwise expose the
+        // native failure recorded in the sticky ledger to the pipeline caller.
+        Some(*budget.stopped.get_or_insert(Stop::NativeFailure))
     };
     MatrixStep {
         original_bytes: bytes,
@@ -4324,5 +4324,241 @@ mod koblitz_slot_tests {
         require_canonical_slots(&a).unwrap();
         a[0].role = "restricted-koblitz-m3-original-equations/v1".into();
         assert!(verify_slot_identities(&a).is_err());
+    }
+}
+
+#[cfg(test)]
+mod matrix_failure_propagation_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native;
+    #[test]
+    fn native_entry_work_failure_is_returned_and_blocks_extraction() {
+        for engine in [
+            native::Engine::F4Macaulay,
+            native::Engine::F5KoszulFrobenius,
+        ] {
+            let original = construction_tests::fixture();
+            let mut budget = construction_tests::budget();
+            let output = construct_original(&original, &mut budget, &mut |_, _| Ok(()))
+                .output
+                .unwrap();
+            let input = persist_original(
+                &original,
+                &output,
+                &mut budget,
+                &matrix_tests::binding(),
+                &"8".repeat(64),
+                &"9".repeat(64),
+                &mut |_, b| {
+                    let remaining = b.native_work_limit - b.native.work - b.checking_work;
+                    b.reserve_checking(remaining - 1, 0, Instant::now())
+                        .map_err(|s| format!("{s:?}"))
+                },
+            )
+            .unwrap();
+            let result = matrix_step(input, engine, 3, &mut |_, _| Ok(()));
+            assert_eq!(result.adapter_stop, Some(Stop::NativeFailure));
+            let report = result.report.unwrap();
+            assert_eq!(report.stop, native::Stop::WorkLimit);
+            assert!(!report.native_step_complete);
+            assert!(!result.original_bytes.is_empty());
+            assert_eq!(budget.stopped, Some(Stop::NativeFailure));
+            assert_eq!(
+                budget.begin_extraction(true, Instant::now()),
+                Err(Stop::NativeFailure)
+            );
+        }
+    }
+}
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SavedMatrixReport {
+    engine: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Engine,
+    degree: u32,
+    stop: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Stop,
+    backend_invoked: bool,
+    native_step_complete: bool,
+    criterion_status: crate::cryptanalysis::koblitz_groebner::bounded_matrix::CriterionStatus,
+    reserved: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Reservation,
+    counters: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Counters,
+    columns: usize,
+    rank: Option<usize>,
+    rows: Vec<SavedEquation>,
+}
+/// Only finite-assignment consistency and bounded report structure are checked.
+/// This is not a derivation certificate, full row-space check or solver verdict.
+struct MatrixAssessment {
+    input_zero_assignments: usize,
+    rows_checked: usize,
+    reported_native_step_complete: bool,
+}
+fn check_saved_boolean_polynomial(poly: &SavedEquation) -> Result<(), String> {
+    use crate::cryptanalysis::pq_groebner_f2::{cmp_mono, mask_from64, F2BoolMono};
+    if poly.n_vars != 3 || poly.terms.len() > 8 || poly.terms.iter().any(|m| m.mask > 7) {
+        return Err("matrix polynomial exceeds three-selector domain".into());
+    }
+    for pair in poly.terms.windows(2) {
+        if !cmp_mono(
+            F2BoolMono::from_mask(mask_from64(pair[0].mask as u64)),
+            F2BoolMono::from_mask(mask_from64(pair[1].mask as u64)),
+        )
+        .is_gt()
+        {
+            return Err("matrix polynomial terms are not canonical".into());
+        }
+    }
+    Ok(())
+}
+fn boolean_value(poly: &SavedEquation, assignment: u8) -> bool {
+    poly.terms.iter().fold(false, |value, mono| {
+        value ^ (assignment & mono.mask == mono.mask)
+    })
+}
+fn verify_matrix_report(
+    bytes: &[u8],
+    original_equations: &[SavedEquation],
+    engine: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Engine,
+    degree: u32,
+    limits: OriginalLimits,
+) -> Result<MatrixAssessment, String> {
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native;
+    if bytes.len() > INPUT_BYTE_CAP || original_equations.len() > 61 {
+        return Err("matrix replay exceeds fixed decode domain".into());
+    }
+    let report: SavedMatrixReport =
+        serde_json::from_slice(bytes).map_err(|e| format!("strict bounded matrix report: {e}"))?;
+    if report.engine != engine
+        || report.degree != degree
+        || report.columns > 8
+        || report.rows.len() > 8
+        || report.rank.is_some_and(|rank| rank > report.columns)
+        || report.reserved.work > limits.native_work
+        || report.reserved.bytes > limits.memory.min(NATIVE_BYTES_MAX)
+        || report.counters.acknowledged_events > report.counters.attempted_events
+        || report.counters.attempted_events > native::MAX_EVENTS
+        || report.native_step_complete != (report.stop == native::Stop::Complete)
+        || (report.native_step_complete
+            && (!report.backend_invoked || report.rank != Some(report.rows.len())))
+        || (engine == native::Engine::F4Macaulay
+            && report.criterion_status != native::CriterionStatus::NotRequested)
+    {
+        return Err("matrix report identity, bounds or completion mismatch".into());
+    }
+    for poly in original_equations.iter().chain(&report.rows) {
+        check_saved_boolean_polynomial(poly)?;
+    }
+    let mut input_zero_assignments = 0;
+    for assignment in 0..8 {
+        if original_equations
+            .iter()
+            .all(|p| !boolean_value(p, assignment))
+        {
+            input_zero_assignments += 1;
+            if report.rows.iter().any(|p| boolean_value(p, assignment)) {
+                return Err("matrix row contradicts an original Boolean solution".into());
+            }
+        }
+    }
+    Ok(MatrixAssessment {
+        input_zero_assignments,
+        rows_checked: report.rows.len(),
+        reported_native_step_complete: report.native_step_complete,
+    })
+}
+
+#[cfg(test)]
+mod matrix_report_replay_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native;
+    fn actual(engine: native::Engine) -> (Vec<u8>, Vec<SavedEquation>, OriginalLimits) {
+        let mut original = construction_tests::fixture();
+        original.target = original.signed[0];
+        let mut budget = construction_tests::budget();
+        let limits = budget.original_limits();
+        let output = construct_original(&original, &mut budget, &mut |_, _| Ok(()))
+            .output
+            .unwrap();
+        let input = persist_original(
+            &original,
+            &output,
+            &mut budget,
+            &matrix_tests::binding(),
+            &"8".repeat(64),
+            &"9".repeat(64),
+            &mut |_, _| Ok(()),
+        )
+        .unwrap();
+        let step = matrix_step(input, engine, 3, &mut |_, _| Ok(()));
+        assert_eq!(step.adapter_stop, None);
+        let saved: SavedInput = serde_json::from_slice(&step.original_bytes).unwrap();
+        (
+            serde_json::to_vec(&step.report.unwrap()).unwrap(),
+            saved.equations,
+            limits,
+        )
+    }
+    #[test]
+    fn actual_f4_and_f5_rows_preserve_original_positive_assignments() {
+        for engine in [
+            native::Engine::F4Macaulay,
+            native::Engine::F5KoszulFrobenius,
+        ] {
+            let (bytes, equations, limits) = actual(engine);
+            let checked = verify_matrix_report(&bytes, &equations, engine, 3, limits).unwrap();
+            assert!(checked.input_zero_assignments > 0);
+            assert!(checked.rows_checked > 0);
+            assert!(checked.reported_native_step_complete);
+        }
+    }
+    #[test]
+    fn matrix_rows_cannot_contradict_a_positive_original_assignment() {
+        let engine = native::Engine::F4Macaulay;
+        let (bytes, equations, limits) = actual(engine);
+        let mut report: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+        report["rows"] = serde_json::json!([{"n_vars":3,"terms":[{"mask":0}]}]);
+        report["rank"] = 1.into();
+        assert!(verify_matrix_report(
+            &serde_json::to_vec(&report).unwrap(),
+            &equations,
+            engine,
+            3,
+            limits
+        )
+        .err()
+        .unwrap()
+        .contains("contradicts an original Boolean solution"));
+    }
+    #[test]
+    fn matrix_replay_rejects_reencoded_schema_domain_and_report_mutations() {
+        let engine = native::Engine::F4Macaulay;
+        let (bytes, equations, limits) = actual(engine);
+        let base: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+        for mutation in 0..10 {
+            let mut v = base.clone();
+            match mutation {
+                0 => v["extra"] = true.into(),
+                1 => v["rows"][0]["extra"] = true.into(),
+                2 => v["rows"][0]["terms"][0]["extra"] = true.into(),
+                3 => v["rows"][0]["n_vars"] = 4.into(),
+                4 => v["rows"][0]["terms"][0]["mask"] = 8.into(),
+                5 => v["rank"] = 9.into(),
+                6 => v["degree"] = 4.into(),
+                7 => v["reserved"]["work"] = u64::MAX.into(),
+                8 => {
+                    v["counters"]["acknowledged_events"] =
+                        (base["counters"]["attempted_events"].as_u64().unwrap() + 1).into()
+                }
+                _ => v["stop"] = "Deadline".into(),
+            }
+            assert!(verify_matrix_report(
+                &serde_json::to_vec(&v).unwrap(),
+                &equations,
+                engine,
+                3,
+                limits
+            )
+            .is_err());
+        }
     }
 }
