@@ -23,7 +23,7 @@ for(branch52=0;branch52<=1;branch52++){
   length52=vdim(standardBasis52);increment52=length52-previous52;
   if(increment52<0 || increment52>oldIncrement52){ERROR("FILTRATION52_LENGTH_CONCAVITY");quit;}
   if(branch52==0){lengthsZero52[size(lengthsZero52)+1]=length52;}else{lengthsOne52[size(lengthsOne52)+1]=length52;}
-  for(i52=33-increment52;i52<=32;i52++){if(branch52==0){exponentsZero52[i52]++;}else{exponentsOne52[i52]++;}}
+  for(i52=33-increment52;i52<=32;i52++){if(branch52==0){exponentsZero52[i52]=exponentsZero52[i52]+1;}else{exponentsOne52[i52]=exponentsOne52[i52]+1;}}
   string suffix52=string(branch52)+"_"+string(k52);
   dump52(out52,"basis"+suffix52,matrix(standardBasis52));dump52(out52,"forward"+suffix52,forward52);dump52(out52,"reverse"+suffix52,reverse52);
   print("FILTRATION52_LENGTH branch="+string(branch52)+" k="+string(k52)+" length="+string(length52)+" increment="+string(increment52));

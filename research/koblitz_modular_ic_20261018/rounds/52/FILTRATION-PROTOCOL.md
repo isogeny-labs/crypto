@@ -17,3 +17,7 @@ exit0,no native ? errorlines,FILTRATION52_ALL_CHECKS_PASS. Exact finite
 calculation,no randomization/power,A/A,timing or performance claim. Failures
 and partials retained. This fully describes the remaining finite-module
 obstruction; it does not itself resolve the singular fibers or polarization.
+
+Before02:01 rejected because Singular does not support ++ on intvec
+entries. Replace both indexed increments with explicit indexed assignments;
+retain the failed output and recheck every full product under the same limits.
