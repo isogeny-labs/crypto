@@ -9253,7 +9253,12 @@ pub fn sat_decompose_chained_s3_any_m(
         m,
         limits,
         frobenius_orbits,
-        order_first_pair,
+        if order_first_pair {
+            ChainS3Order::FirstPair
+        } else {
+            ChainS3Order::Unordered
+        },
+        ChainS3Patterns::All,
     )
 }
 
@@ -9282,10 +9287,92 @@ fn sat_decompose_chained_s3_with_domain(
         m,
         limits,
         frobenius_orbits,
-        order_first_pair,
+        if order_first_pair {
+            ChainS3Order::FirstPair
+        } else {
+            ChainS3Order::Unordered
+        },
+        ChainS3Patterns::All,
     )
 }
 
+/// Which summand permutations a chained-S3 search keeps.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ChainS3Order {
+    /// Every ordered tuple: the `m!` reorderings of one decomposition are
+    /// all searched.
+    Unordered,
+    /// `x_1 <= x_2` only ([`ChainedS3Encoding::order_first_pair`]).
+    FirstPair,
+    /// `x_1 <= ... <= x_m` ([`ChainedS3Encoding::order_all_summands`]).
+    /// Every identity pattern is still searched, so a refutation keeps its
+    /// meaning: no decomposition in any order.
+    AllSummands,
+}
+
+/// Which intermediate-identity patterns a chained-S3 search covers.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ChainS3Patterns {
+    /// All `2^(m-2)` patterns: a refutation means no decomposition at all.
+    All,
+    /// Only the pattern whose partial sums are all affine. A partial sum is
+    /// the identity exactly when the summands contain a zero-sum
+    /// sub-multiset, so this is complete for decompositions with no
+    /// zero-sum sub-multiset, and a refutation means only that none of
+    /// those exists. The others split into a shorter decomposition plus a
+    /// target-free relation among base points.
+    AffineOnly,
+}
+
+/// [`sat_decompose_chained_s3_any_m`] with the summand-order arm chosen
+/// explicitly, for `m` in `2..=9`, over every identity pattern.
+pub fn sat_decompose_chained_s3_ordered(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    target: &BinaryPoint,
+    m: usize,
+    limits: ChainS3Limits,
+    frobenius_orbits: bool,
+    order: ChainS3Order,
+) -> (Option<Vec<usize>>, ChainS3Stats) {
+    sat_decompose_chained_s3_patterns(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        frobenius_orbits,
+        order,
+        ChainS3Patterns::All,
+    )
+}
+
+/// [`sat_decompose_chained_s3_ordered`] with the pattern coverage chosen
+/// explicitly; see [`ChainS3Patterns`] for what a refutation then means.
+#[allow(clippy::too_many_arguments)]
+pub fn sat_decompose_chained_s3_patterns(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    target: &BinaryPoint,
+    m: usize,
+    limits: ChainS3Limits,
+    frobenius_orbits: bool,
+    order: ChainS3Order,
+    patterns: ChainS3Patterns,
+) -> (Option<Vec<usize>>, ChainS3Stats) {
+    if !(2..=9).contains(&m) {
+        return (
+            None,
+            ChainS3Stats {
+                exhausted: true,
+                ..ChainS3Stats::default()
+            },
+        );
+    }
+    sat_decompose_chained_s3_checked(kc, fb, target, m, limits, frobenius_orbits, order, patterns)
+}
+
+#[allow(clippy::too_many_arguments)]
 fn sat_decompose_chained_s3_checked(
     kc: &KoblitzCurve,
     fb: &FrobeniusFactorBase,
@@ -9293,7 +9380,8 @@ fn sat_decompose_chained_s3_checked(
     m: usize,
     limits: ChainS3Limits,
     frobenius_orbits: bool,
-    order_first_pair: bool,
+    order: ChainS3Order,
+    patterns: ChainS3Patterns,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
     use crate::cryptanalysis::binary_semaev_chain_sat::{
         finite_domain_clause_count, frobenius_orbit_domain_size, ChainBuildError, ChainedS3Encoding,
@@ -9380,7 +9468,11 @@ fn sat_decompose_chained_s3_checked(
         BinaryPoint::Affine { x, .. } => Some(x),
         BinaryPoint::Infinity => None,
     };
-    for identity_mask in 0..(1u32 << (m - 2)) {
+    let masks = match patterns {
+        ChainS3Patterns::All => 1u32 << (m - 2),
+        ChainS3Patterns::AffineOnly => 1,
+    };
+    for identity_mask in 0..masks {
         if stats.conflicts >= limits.conflict_budget {
             stats.exhausted = true;
             return (None, stats);
@@ -9417,7 +9509,12 @@ fn sat_decompose_chained_s3_checked(
             stats.exhausted = true;
             return (None, stats);
         }
-        if order_first_pair && enc.order_first_pair(limits.max_variables).is_err() {
+        let ordered = match order {
+            ChainS3Order::Unordered => Ok(()),
+            ChainS3Order::FirstPair => enc.order_first_pair(limits.max_variables),
+            ChainS3Order::AllSummands => enc.order_all_summands(limits.max_variables),
+        };
+        if ordered.is_err() {
             stats.exhausted = true;
             return (None, stats);
         }

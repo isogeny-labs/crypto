@@ -299,6 +299,8 @@ pub struct ChainedS3Encoding {
     orbit_choice_wires: Vec<FrobeniusOrbitChoiceWires>,
     first_pair_exchangeable: bool,
     first_pair_ordered: bool,
+    all_summands_exchangeable: bool,
+    all_summands_ordered: bool,
 }
 
 impl ChainedS3Encoding {
@@ -393,6 +395,8 @@ impl ChainedS3Encoding {
             orbit_choice_wires: Vec::new(),
             first_pair_exchangeable: false,
             first_pair_ordered: false,
+            all_summands_exchangeable: false,
+            all_summands_ordered: false,
         })
     }
 
@@ -422,6 +426,7 @@ impl ChainedS3Encoding {
         }
         self.domain_installed = true;
         self.first_pair_exchangeable = true;
+        self.all_summands_exchangeable = true;
         Ok(required)
     }
 
@@ -492,6 +497,7 @@ impl ChainedS3Encoding {
         }
         self.domain_installed = true;
         self.first_pair_exchangeable = true;
+        self.all_summands_exchangeable = true;
         Ok(required)
     }
 
@@ -556,6 +562,7 @@ impl ChainedS3Encoding {
             });
         }
         self.first_pair_exchangeable = sorted_domains[0] == sorted_domains[1];
+        self.all_summands_exchangeable = sorted_domains.windows(2).all(|w| w[0] == w[1]);
         for (block, representatives) in self.blocks[..self.m].iter().zip(&sorted_domains) {
             self.orbit_choice_wires.push(add_frobenius_orbit_domain(
                 &mut self.solver,
@@ -580,7 +587,7 @@ impl ChainedS3Encoding {
     /// node depends only on its output. This is optional so ordered and
     /// unrestricted searches remain separate sweep arms.
     pub fn order_first_pair(&mut self, max_variables: u32) -> Result<(), ChainBuildError> {
-        if self.first_pair_ordered || !self.first_pair_exchangeable {
+        if self.first_pair_ordered || self.all_summands_ordered || !self.first_pair_exchangeable {
             return Err(ChainBuildError::Unsupported);
         }
         let extra = self.n - 1;
@@ -593,6 +600,32 @@ impl ChainedS3Encoding {
         }
         add_lex_leq(&mut self.solver, &self.blocks[0], &self.blocks[1]);
         self.first_pair_ordered = true;
+        Ok(())
+    }
+
+    /// Keep one representative of every summand permutation:
+    /// `x_1 <= x_2 <= ... <= x_m` as unsigned codes. A decomposition
+    /// `R = P_1 + ... + P_m` has a chain witness in every summand order, its
+    /// partial sums landing in some identity pattern, so a caller that
+    /// searches every pattern loses no decomposition; it only stops searching
+    /// the `m!` reorderings of each one. Requires one shared summand domain.
+    /// Optional, like [`Self::order_first_pair`], so the arms stay separate.
+    pub fn order_all_summands(&mut self, max_variables: u32) -> Result<(), ChainBuildError> {
+        if self.first_pair_ordered || self.all_summands_ordered || !self.all_summands_exchangeable {
+            return Err(ChainBuildError::Unsupported);
+        }
+        let extra = u64::from(self.n - 1) * (self.m as u64 - 1);
+        let required = u64::from(self.solver.n_vars()) + extra;
+        if required > u64::from(max_variables) || required > i32::MAX as u64 {
+            return Err(ChainBuildError::VariableCap {
+                required,
+                maximum: max_variables,
+            });
+        }
+        for i in 0..self.m - 1 {
+            add_lex_leq(&mut self.solver, &self.blocks[i], &self.blocks[i + 1]);
+        }
+        self.all_summands_ordered = true;
         Ok(())
     }
 
