@@ -60,6 +60,8 @@ pub(super) struct Budget {
     construction_deadline: Instant,
     phase: Phase,
     native: Reservation,
+    checking_work: u64,
+    checking_performed_work: u64,
     phase_native: Reservation,
     phase_limits: NativeLimits,
     adapter_bytes: u64,
@@ -96,6 +98,8 @@ impl Budget {
             construction_deadline,
             phase: Phase::Setup,
             native: Reservation::default(),
+            checking_work: 0,
+            checking_performed_work: 0,
             phase_native: Reservation::default(),
             phase_limits: NativeLimits { work: 0, bytes: 0 },
             adapter_bytes: 0,
@@ -175,7 +179,7 @@ impl Budget {
                 .min(NATIVE_BYTES_MAX)
         };
         let limits = NativeLimits {
-            work: self.native_work_limit - self.native.work,
+            work: self.native_work_limit - self.native.work - self.checking_work,
             bytes,
         };
         self.phase = if matrix {
@@ -200,7 +204,9 @@ impl Budget {
         }
         let dw = current.work - self.phase_native.work;
         let db = current.bytes - self.phase_native.bytes;
-        if current.work > self.phase_limits.work || dw > self.native_work_limit - self.native.work {
+        if current.work > self.phase_limits.work
+            || dw > self.native_work_limit - self.native.work - self.checking_work
+        {
             return self.fail(Stop::Work);
         }
         if current.bytes > self.phase_limits.bytes
@@ -2502,8 +2508,8 @@ fn signed_setup_bytes(n: u32) -> Result<u64, Stop> {
 /// Reserve setup before constructing the original-bound native kernel. Table
 /// initialization has at most rows*(8+256+255) slots/entries; that bounded setup
 /// loop bound is a source-derived bound, not a measured instruction count.
-/// Setup-work admission and generic reference-check scratch admission remain
-/// activation dependencies; this increment enforces setup byte admission.
+/// Table slot/entry work and requested setup bytes are pre-admitted. Generic
+/// reference-check scratch admission remains an activation dependency.
 pub(super) fn prepare_signed<'a>(
     original: &'a MathInput,
     budget: &'a mut Budget,
@@ -2527,7 +2533,10 @@ pub(super) fn prepare_signed<'a>(
         Some(a) => a,
         None => return budget.fail(Stop::InvalidLimits),
     };
-    budget.reserve_bytes(bytes, Instant::now())?;
+    let rows = u64::from(original.curve.m - 1).div_ceil(8);
+    // Slot initialization and table-entry bounds; not machine instructions.
+    let setup_work = rows * (8 + 2 * 256 + 255);
+    budget.reserve_checking(setup_work, bytes, Instant::now())?;
     let curve = crate::cryptanalysis::koblitz_fast_arith::FastBinaryCurve::new(
         &original.curve.irreducible,
         a,
@@ -2621,5 +2630,244 @@ mod signed_setup_tests {
             signed_setup_bytes(original.curve.m).unwrap()
                 + (192 * std::mem::size_of::<SignedPrefix>()) as u64
         );
+    }
+}
+/// Cumulative capture checking reservations. Constructed only with the original
+/// deadline; unused supply is closed between calls, never reset or refunded.
+pub(super) struct CaptureChecking {
+    inner: crate::ml_dataset::capture::WitnessBudget,
+}
+pub(super) struct CaptureCall<T> {
+    pub value: Option<T>,
+    pub error: Option<crate::ml_dataset::capture::WitnessError>,
+    pub stop: Option<Stop>,
+}
+impl Budget {
+    /// Setup/capture checking and native algebra share one admitted work pool.
+    /// These are reservation units, not measured machine instructions.
+    fn reserve_checking(&mut self, work: u64, bytes: u64, now: Instant) -> Result<(), Stop> {
+        self.check(now)?;
+        if work > self.native_work_limit - self.native.work - self.checking_work {
+            return self.fail(Stop::Work);
+        }
+        if bytes > self.memory_limit - self.native.bytes - self.adapter_bytes {
+            return self.fail(Stop::Bytes);
+        }
+        self.checking_work += work;
+        self.adapter_bytes += bytes;
+        Ok(())
+    }
+    fn capture_checking(&self) -> CaptureChecking {
+        CaptureChecking {
+            inner: crate::ml_dataset::capture::WitnessBudget::new(0, 0, self.deadline),
+        }
+    }
+    /// The callback exclusively borrows capture supply, not the parent ledger.
+    /// Settle reservations without a clock check on every return. Preserve a
+    /// durable receipt even when the following parent check fails.
+    fn capture_call<T>(
+        &mut self,
+        capture: &mut CaptureChecking,
+        action: impl FnOnce(
+            &mut crate::ml_dataset::capture::WitnessBudget,
+        ) -> Result<T, crate::ml_dataset::capture::WitnessError>,
+    ) -> CaptureCall<T> {
+        use crate::ml_dataset::capture::WitnessError;
+        if let Err(stop) = self.check(Instant::now()) {
+            return CaptureCall {
+                value: None,
+                error: None,
+                stop: Some(stop),
+            };
+        }
+        let work = self.native_work_limit - self.native.work - self.checking_work;
+        let bytes = self.memory_limit - self.native.bytes - self.adapter_bytes;
+        let before = (
+            capture.inner.reserved_work,
+            capture.inner.performed_work,
+            capture.inner.reserved_bytes,
+        );
+        if let Err(error) = capture.inner.set_exclusive_supply(work, bytes) {
+            let stop = *self.stopped.get_or_insert(Stop::Overflow);
+            return CaptureCall {
+                value: None,
+                error: Some(error),
+                stop: Some(stop),
+            };
+        }
+        let outcome = action(&mut capture.inner);
+        capture.inner.release_exclusive_supply();
+        let delta = capture
+            .inner
+            .reserved_work
+            .checked_sub(before.0)
+            .zip(capture.inner.performed_work.checked_sub(before.1))
+            .zip(capture.inner.reserved_bytes.checked_sub(before.2));
+        let settled = match delta {
+            Some(((reserved, performed), storage))
+                if reserved <= work && performed <= reserved && storage <= bytes =>
+            {
+                self.checking_work += reserved;
+                self.checking_performed_work += performed;
+                self.adapter_bytes += storage;
+                true
+            }
+            _ => false,
+        };
+        let (value, error) = match outcome {
+            Ok(value) => (Some(value), None),
+            Err(error) => (None, Some(error)),
+        };
+        if !settled {
+            // A broken trusted callback cannot reopen its lent capacity.
+            self.checking_work += work;
+            self.adapter_bytes += bytes;
+            self.stopped.get_or_insert(Stop::Nonmonotone);
+        } else if let Some(error) = error {
+            self.stopped.get_or_insert(match error {
+                WitnessError::Deadline => Stop::Deadline,
+                WitnessError::Work => Stop::Work,
+                WitnessError::Storage => Stop::Bytes,
+                WitnessError::Allocation => Stop::Allocation,
+                _ => Stop::Observer,
+            });
+        }
+        let stop = self.check(Instant::now()).err();
+        CaptureCall { value, error, stop }
+    }
+}
+
+#[cfg(test)]
+mod checking_budget_tests {
+    use super::*;
+    use crate::ml_dataset::capture::WitnessError;
+    fn budget() -> Budget {
+        construction_tests::budget()
+    }
+    #[test]
+    fn real_capture_prepare_publish_and_confirm_use_one_parent_supply() {
+        use crate::ml_dataset::capture::{capture_limits, CaptureEmitter, WitnessCommit};
+        let nonce = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let dir = std::env::temp_dir().join(format!(
+            "koblitz-capture-supply-{}-{nonce}",
+            std::process::id()
+        ));
+        let mut emitter =
+            CaptureEmitter::create(&dir, matrix_tests::binding(), capture_limits(16).unwrap())
+                .unwrap();
+        let mut b = budget();
+        let mut capture = b.capture_checking();
+        let prepared = b.capture_call(&mut capture, |c| emitter.prepare_witness(c));
+        assert!(prepared.stop.is_none());
+        assert!(prepared.error.is_none());
+        let mut workspace = prepared.value.unwrap();
+        let prepare_work = b.checking_work;
+        let prepare_bytes = b.adapter_bytes;
+        assert!(prepare_work > 0);
+        assert!(prepare_bytes > 0);
+        // This is a transport-accounting control, not a mathematical witness.
+        let payload = br#"{"summands":[],"target":null}"#;
+        let mut global = 0;
+        let published = b.capture_call(&mut capture, |c| {
+            emitter.publish_first_witness(payload, &mut workspace, c, &mut global)
+        });
+        assert!(published.stop.is_none());
+        assert!(published.error.is_none());
+        let receipt = published.value.unwrap();
+        assert_eq!(receipt.commit, WitnessCommit::NewCommit);
+        assert_eq!(global, 1);
+        assert!(b.checking_work > prepare_work);
+        assert_eq!(
+            std::fs::read(dir.join("payloads/pdp-witness.json")).unwrap(),
+            payload
+        );
+        let publication_work = b.checking_work;
+        let confirmed = b.capture_call(&mut capture, |c| {
+            emitter.publish_first_witness(payload, &mut workspace, c, &mut global)
+        });
+        assert!(confirmed.stop.is_none());
+        let confirmation = confirmed.value.unwrap();
+        assert_eq!(confirmation.commit, WitnessCommit::AlreadyCommitted);
+        assert_eq!(confirmation.payload_sha256, receipt.payload_sha256);
+        assert_eq!(global, 1);
+        assert!(b.checking_work > publication_work);
+        assert_eq!(b.checking_work, capture.inner.reserved_work);
+        assert_eq!(b.checking_performed_work, capture.inner.performed_work);
+        assert_eq!(b.adapter_bytes, capture.inner.reserved_bytes);
+        drop(emitter);
+        std::fs::remove_dir_all(dir).unwrap();
+    }
+    #[test]
+    fn checking_reservations_reduce_native_headroom_and_are_atomic() {
+        let mut b = budget();
+        let limit = b.native_work_limit;
+        b.reserve_checking(17, 23, Instant::now()).unwrap();
+        let limits = b.begin_native(false, Instant::now()).unwrap();
+        assert_eq!(limits.work, limit - 17);
+        b.observe(
+            Reservation {
+                work: limit - 17,
+                bytes: 0,
+            },
+            Instant::now(),
+        )
+        .unwrap();
+        assert_eq!(b.reserve_checking(1, 0, Instant::now()), Err(Stop::Work));
+        assert_eq!(b.checking_work, 17);
+        assert_eq!(b.adapter_bytes, 23);
+    }
+    #[test]
+    fn capture_settles_failed_call_reservations_without_refund() {
+        let mut b = budget();
+        let mut capture = b.capture_checking();
+        let result: CaptureCall<()> = b.capture_call(&mut capture, |c| {
+            // Fault-injected accounting receipt; real emitter tests follow.
+            c.reserved_work += 31;
+            c.performed_work += 19;
+            c.reserved_bytes += 41;
+            Err(WitnessError::Io(std::io::ErrorKind::Other))
+        });
+        assert_eq!(result.stop, Some(Stop::Observer));
+        assert!(result.error.is_some());
+        assert!(result.value.is_none());
+        assert_eq!(b.checking_work, 31);
+        assert_eq!(b.checking_performed_work, 19);
+        assert_eq!(b.adapter_bytes, 41);
+        let second: CaptureCall<()> =
+            b.capture_call(&mut capture, |_| panic!("stopped ledger retried"));
+        assert_eq!(second.stop, Some(Stop::Observer));
+    }
+    #[test]
+    fn capture_successes_share_cumulative_work_and_storage() {
+        let mut b = budget();
+        let mut capture = b.capture_checking();
+        for expected in [11, 22] {
+            let r = b.capture_call(&mut capture, |c| {
+                c.reserved_work += 11;
+                c.performed_work += 7;
+                c.reserved_bytes += 5;
+                Ok(42)
+            });
+            assert_eq!(r.value, Some(42));
+            assert!(r.stop.is_none());
+            assert_eq!(b.checking_work, expected);
+        }
+        assert_eq!(b.checking_performed_work, 14);
+        assert_eq!(b.adapter_bytes, 10);
+    }
+    #[test]
+    fn invalid_capture_delta_closes_entire_lent_supply() {
+        let mut b = budget();
+        let mut capture = b.capture_checking();
+        let r: CaptureCall<()> = b.capture_call(&mut capture, |c| {
+            c.performed_work = 1;
+            Ok(())
+        });
+        assert_eq!(r.stop, Some(Stop::Nonmonotone));
+        assert_eq!(b.checking_work, b.native_work_limit);
+        assert_eq!(b.adapter_bytes, b.memory_limit);
     }
 }
