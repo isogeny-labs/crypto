@@ -22,17 +22,32 @@ destination is weaker or faster.
   on the panel. Both are generic square-root algorithms. The source/destination
   operation totals have no certified common unit, and wall observations are L0
   descriptive. No net advantage is promoted.
+- A clean six-round untallied follow-up completed 896/896 verified records and
+  replayed all 768 measured records. Its paired median destination/source wall
+  ratios widen over `n=9,13,19,23`, closing the toy gate against an infeasible
+  exact generic `n=83` run. A separate deterministic ledger records the complete
+  destination routes without contaminating timing.
+- The standard full-Jacobian genus-three index calculus is not an applicable
+  solver for this order-`r ~= q` image. Its ambient `q^(4/3)` ledger loses to
+  source rho by about 70.17 exponent bits here, and no image-compatible
+  factor-base projection has been supplied.
 
 ## Start here
 
 - [Run report](RUN_REPORT.md)
 - [Results and interpretation](RESULTS.md)
 - [Operational transfer/measurement guidance](GUIDANCE.md)
+- [Destination-calculus applicability screen](DESTINATION_CALCULUS_SCREEN.md)
+- [Untallied four-size common-cost result](COMMON_COST_LOCAL_RESULTS.md)
+- [Separate complete-route field accounting](FIELD_ACCOUNTING_RESULTS.md)
 - [Validated v3 assessment](TRANSFER_ASSESSMENT_V3.json) and its
   [validator receipt](ASSESSMENT_VALIDATION.json)
 - [Final exact certificate](runs/exact-n83-post-panel-20261031T044500Z/certificate.json)
 - [Quantitative figure](figures/native-cost-and-wall.svg)
 - [Open destination-calculus/common-cost obligation](../../problems/genus3-image-destination-calculus-and-common-cost-missing.md)
 
-The source of truth is the two sealed directories under `sessions/`; generated
-tables and figures are derived convenience views.
+The source of truth is the sealed directories under `sessions/`; generated
+tables, reports, and figures are derived convenience views. The directory named
+`common-cost-local-lt-l2-20261031T064500Z` is deliberately retained as an
+invalid instrumentation-overhead preflight and must not be used for timing
+claims.

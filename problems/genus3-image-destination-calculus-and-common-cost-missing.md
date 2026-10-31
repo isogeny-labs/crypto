@@ -1,6 +1,7 @@
 # Genus-3 image destination calculus and common-cost calibration are missing
 
-Status: open; standard full-Jacobian calculus rejected, common-cost L2 pending
+Status: open; standard full-Jacobian calculus and exact generic run rejected,
+common-cost L2 pending
 
 ## Blocked claim
 
@@ -34,12 +35,17 @@ The exact object is the order-
   [`research/n83_genus3_image_solver_20261031/sessions/`](../research/n83_genus3_image_solver_20261031/sessions/).
 - [`TRANSFER_ASSESSMENT_V3.json`](../research/n83_genus3_image_solver_20261031/TRANSFER_ASSESSMENT_V3.json)
   separates valid transfer and solver applicability from the unknown advantage.
-- The four successful sizes show destination BSGS using fewer native
-  Jacobian group operations than destination rho, as expected from their
-  generic algorithms. The L0 descriptive candidate/source wall ratio grows
-  from about 1.2 at `n=9` to about 13.6 at `n=23`. This is evidence against a
-  practical win for this implementation on this host, not a lower bound or an
-  impossibility theorem for another destination calculus.
+- The clean six-round untallied session in
+  [`COMMON_COST_LOCAL_RESULTS.md`](../research/n83_genus3_image_solver_20261031/COMMON_COST_LOCAL_RESULTS.md)
+  completed 896/896 verified records and reproduced all 768 measured records.
+  Its paired median BSGS/source ratio grows from 5.36 at `n=9` to 131.32 at
+  `n=23`; destination-rho/source grows from 9.82 to 364.98. A/A stays within
+  2.4% of one. This L0 result closes the toy go/no-go gate against an exact
+  generic `n=83` attempt, but it is not an admitted cross-host speed claim.
+- The separate deterministic
+  [`FIELD_ACCOUNTING_RESULTS.md`](../research/n83_genus3_image_solver_20261031/FIELD_ACCOUNTING_RESULTS.md)
+  reports complete-route binary-field counts without putting instrumentation
+  overhead into the timing arms.
 - [`DESTINATION_CALCULUS_SCREEN.md`](../research/n83_genus3_image_solver_20261031/DESTINATION_CALCULUS_SCREEN.md)
   rejects the off-the-shelf full-Jacobian genus-three calculus for this
   order-`r ~= q` image: its `q^(4/3)` ledger is about 70.17 exponent bits
@@ -78,7 +84,10 @@ precomputation reuse, and amortization must be reported separately.
 Do not implement the ambient full-Jacobian calculus under a new method name.
 First design an image-compatible factor base and either an image projection or
 image-closed relation rule, with a relation probability and exponent stated in
-the actual order `r`. In parallel, execute the frozen common-cost L2 spec on
-both registered Spot host classes. Only an image-compatible candidate that
-passes the six admission criteria in `DESTINATION_CALCULUS_SCREEN.md` should be
-implemented and measured against the existing generic controls.
+the actual order `r`. Do not spend resources on an exact `n=83` generic BSGS or
+rho run: the 81-bit image implies roughly `2^40.5` generic group steps and the
+four-size panel shows a widening loss. In parallel, execute the frozen
+common-cost L2 spec once on both registered Spot host classes. Only an
+image-compatible candidate that passes the six admission criteria in
+`DESTINATION_CALCULUS_SCREEN.md` should be implemented and measured against the
+existing generic controls.

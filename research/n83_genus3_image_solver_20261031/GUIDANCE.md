@@ -75,7 +75,33 @@ and descriptive wall time. It does not establish a weaker destination DLP:
 both methods retain generic square-root behavior, no index calculus is attached,
 native work has no source-GAE conversion, and the wall evidence is L0.
 
-The next useful method is not a full-order n=83 BSGS run. It is a complete
-small-field destination index-calculus adapter with relation, matrix, and
-individual-log stages, tested against the existing destination generic control
-before any exact-family resource gate.
+The clean six-round panel strengthens the practical decision without changing
+that evidence tier. All 896 records verified and all 768 measured records
+replayed. Paired median BSGS/source wall ratios rise from 5.36 at `n=9` to
+131.32 at `n=23`; rho/source rises from 9.82 to 364.98, while A/A remains within
+2.4% of one. These L0 ratios reject an exact generic `n=83` attempt but do not
+constitute an admitted cross-host performance result.
+
+The standard ambient genus-three index calculus is also not the next useful
+method. For this order-`r ~= q` image, its `q^(4/3)` work is about 70.17 exponent
+bits above source rho at `n=83`, and ambient factor-base relations have no
+proved projection into the image. A future destination calculus should be
+implemented only after it defines an image-closed factor base or projector,
+measures relation yield for image samples, completes matrix and individual-log
+stages, and predicts cost in both `q` and `r`.
+
+Use the methods and artifacts as follows:
+
+| Need | Use | Do not infer |
+|---|---|---|
+| Certify the exact cover and subgroup | exact certificate and typed pull/push checks | destination weakness |
+| Check that a solver reaches the image | `jacobian_image.rho3` or `jacobian_image.bsgs` | asymptotic improvement |
+| Count complete-route destination field work | the separately named `_field_tally` adapters | wall time from those instrumented runs |
+| Compare end-to-end wall behavior | untallied three-arm spec plus A/A at L2 or better | a speed claim from this local L0 session |
+| Admit a non-generic destination calculus | the six gates in `DESTINATION_CALCULUS_SCREEN.md` | ambient-Jacobian heuristics applied to the strict image |
+
+The next measurements are the already frozen untallied spec, once on each
+registered `c8a.2xlarge` and `m8a.2xlarge` EKS Spot class. The next algorithmic
+work is a paper design for an image-compatible relation calculus; it should not
+receive implementation or exact-family compute until its exponent and
+reachability gates pass.
