@@ -333,6 +333,7 @@ rho's expectation `√(π/2)`; the curve's floor is `√(π/2A)` (§3).
 |---|---|---|
 | `rho.*` | jump-table set-up, walk starts, every step, cycle escapes, look-ahead additions, internal verification | canonicalisations (negation, signed Frobenius), Frobenius maps |
 | `rho.signed_frobenius_strong` | group additions exactly; each scalar multiplication (jump table, walk start stride, candidate checks) at `1.5·log₂ r` additions, `ic_boundary::signed_frobenius_rho`'s convention | canonicalisations, partition hashes, distinguished-point table queries and inserts |
+| `jacobian_image.rho3`, `jacobian_image.bsgs` | none until a versioned conversion to source-curve GAE is certified | construction of the same-field degree-three genus-3 cover, both point-class pullbacks, Cantor additions/doublings/scalar multiplications, rho walk/restarts/collisions, BSGS table inserts/lookups; cold solve wall includes the entire route |
 | `bsgs.*` | baby steps, the giant stride, giant steps | table inserts and lookups |
 | `kangaroo.vow` | jump-table set-up, starts and restarts, every jump | table inserts and lookups |
 | `claw.pair_table` | the known-log base's seed scalar multiplications, every table addition `P_i + F_b`, both query additions `Q − (F_k + F_l)`, the addition that rebuilds a hit's table sum; phases `base`, `table`, `search`, `recover` | Frobenius maps, canonicalisations, table inserts and probes |
@@ -345,6 +346,18 @@ retain their exact parameter and accounting contract. It removes solver wall
 pricing from the reported group-addition equivalents. Solver conflicts and
 other work without a pinned conversion stay visible as unpriced counters;
 the recorded `S` is therefore a lower bound on the complete pipeline cost.
+
+The `jacobian_image.*` adapters are transfer diagnostics, not source-curve
+speedup rows. They reconstruct `binary_cubic_pullback_v1`, pull the generator
+and unseen target into its exact cyclic Jacobian image, solve there without
+receiving the planted logarithm, verify the collision in `Jac(H)`, and return
+the candidate for the runner's independent source-curve replay. Their native
+phase counters are meaningful within that destination. Their `total_gae` is
+deliberately zero and their records are lower bounds because one genus-3
+Cantor operation is not one elliptic-curve addition. Use cold wall and the
+resource vector to identify implementation bottlenecks; promote a net-cost
+claim only after supplying a pinned conversion or a matched end-to-end wall
+comparison that clears the A/A and isolation gates.
 
 `ic.pipeline` defaults to `linalg=incremental-gauss`, which stops when the
 target scalar is pinned; the factor-base logs can still be underdetermined.

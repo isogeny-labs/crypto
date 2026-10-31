@@ -932,6 +932,7 @@ fn verify_substitution(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::binary_ecc::{hcdlp_bsgs_counted, hcdlp_pollard_rho_counted};
 
     fn f8_modulus() -> IrreduciblePoly {
         // z^3 + z + 1.
@@ -1196,5 +1197,42 @@ mod tests {
                 .unwrap(),
             generator
         );
+
+        // Both named destination solvers operate on the pulled-back
+        // Jacobian image, receive no planted logarithm, and verify their
+        // recovered scalar in that image subgroup.
+        let scalar = BigUint::from(13u32);
+        let target = catalog.target_scalar_mul_small(&generator, 13).unwrap();
+        let target_image = catalog.pullback_point_class(&target).unwrap();
+        assert_eq!(
+            image
+                .try_scalar_mul(&scalar, catalog.source_curve())
+                .unwrap(),
+            target_image
+        );
+        let bsgs = hcdlp_bsgs_counted(
+            &image,
+            &target_image,
+            &BigUint::from(29u32),
+            catalog.source_curve(),
+        )
+        .unwrap();
+        assert_eq!(bsgs.recovered, Some(scalar.clone()));
+        assert!(!bsgs.exhausted);
+        assert!(bsgs.table_inserts > 0);
+
+        let rho = hcdlp_pollard_rho_counted(
+            &image,
+            &target_image,
+            &BigUint::from(29u32),
+            catalog.source_curve(),
+            0x83_03,
+            1_024,
+            64,
+        )
+        .unwrap();
+        assert_eq!(rho.recovered, Some(scalar));
+        assert!(!rho.exhausted);
+        assert!(rho.walk_steps > 0);
     }
 }

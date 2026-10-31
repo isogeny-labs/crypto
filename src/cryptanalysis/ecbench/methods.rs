@@ -17,9 +17,14 @@
 use std::collections::BTreeMap;
 use std::time::Instant;
 
+use num_bigint::BigUint;
+use num_traits::ToPrimitive;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
+use crate::binary_ecc::{
+    hcdlp_bsgs_counted, hcdlp_pollard_rho_counted, F2mElement, HcdlpGroupOps, OrdinaryBinaryCover,
+};
 use crate::cryptanalysis::ecbench::canonical::{derive_u64, sha256_hex, short_id};
 use crate::cryptanalysis::ecbench::claw::{pair_claw, pair_claw_wide, ClawOutcome, ClawShape};
 use crate::cryptanalysis::ecbench::generic::{
@@ -236,6 +241,33 @@ pub fn registry() -> &'static [MethodDecl] {
                     help: "give up after this multiple of the ideal step count",
                 },
             ],
+        },
+        MethodDecl {
+            id: "jacobian_image.rho3",
+            family: "rho",
+            summary: "deterministic three-partition Pollard rho after the certified degree-three pullback into the same-field genus-three Jacobian image; native Jacobian operations are counted but remain unpriced in source-curve GAE",
+            entry: "binary_ecc::hcdlp_pollard_rho_counted",
+            applies: Applies::BinaryOnly,
+            params: &[
+                ParamDecl {
+                    name: "cap_multiple",
+                    default: Some("64"),
+                    help: "walk-step budget per restart as a multiple of sqrt(r)",
+                },
+                ParamDecl {
+                    name: "max_restarts",
+                    default: Some("64"),
+                    help: "deterministic restart cap for degenerate rho collisions",
+                },
+            ],
+        },
+        MethodDecl {
+            id: "jacobian_image.bsgs",
+            family: "bsgs",
+            summary: "textbook BSGS after the certified degree-three pullback into the same-field genus-three Jacobian image; native Jacobian operations are counted but remain unpriced in source-curve GAE",
+            entry: "binary_ecc::hcdlp_bsgs_counted",
+            applies: Applies::BinaryOnly,
+            params: &[],
         },
         MethodDecl {
             id: "bsgs.textbook",
@@ -1001,6 +1033,9 @@ fn solve_inner(
         return Err("a wide instance goes through solve_wide".into());
     }
     match (inst, d.family) {
+        (Instance::Binary(i), _) if m.id.starts_with("jacobian_image.") => {
+            solve_jacobian_image(m, i, FastPoint::affine(tx, ty), seed)
+        }
         (Instance::Binary(i), _) if m.id == "ic.large_prime" => {
             solve_large_prime(m, i, curve, FastPoint::affine(tx, ty), seed)
         }
@@ -1097,6 +1132,157 @@ fn solve_inner(
         }
         (Instance::Wide(_), _) => unreachable!("returned above"),
     }
+}
+
+fn jacobian_phase(name: &str, ops: HcdlpGroupOps) -> PhaseRecord {
+    PhaseRecord {
+        name: name.into(),
+        native: [
+            ("jacobian_additions".into(), ops.additions),
+            ("jacobian_doublings".into(), ops.doublings),
+            (
+                "jacobian_scalar_multiplications".into(),
+                ops.scalar_multiplications,
+            ),
+        ]
+        .into_iter()
+        .collect(),
+        // No source-curve GAE conversion for Cantor arithmetic has been
+        // certified. Keep this phase visibly unpriced instead of asserting
+        // that a Jacobian addition costs one elliptic addition.
+        gae: 0.0,
+        ..Default::default()
+    }
+}
+
+/// Execute a named solver on the exact image of the certified same-field
+/// degree-three pullback. The planted logarithm is not an input. The solver
+/// verifies its candidate in the destination group and ecbench independently
+/// verifies it again on the source elliptic curve.
+fn solve_jacobian_image(
+    method: &ResolvedMethod,
+    inst: &BinaryInstance,
+    target: FastPoint,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    if target.infinity {
+        return Err("jacobian-image adapter requires an affine target".into());
+    }
+    let started = Instant::now();
+    let cover = OrdinaryBinaryCover::new(
+        inst.n,
+        inst.irreducible.clone(),
+        F2mElement::from_biguint(&BigUint::from(inst.a), inst.n),
+        F2mElement::from_biguint(&BigUint::from(inst.b), inst.n),
+    )
+    .map_err(|e| format!("constructing the certified genus-three cover: {e}"))?;
+    let source_generator = crate::binary_ecc::BinaryPoint::Affine {
+        x: F2mElement::from_biguint(&BigUint::from(inst.generator.x), inst.n),
+        y: F2mElement::from_biguint(&BigUint::from(inst.generator.y), inst.n),
+    };
+    let image_generator = cover
+        .pullback_point_class(&source_generator)
+        .map_err(|e| format!("pulling the generator into the Jacobian: {e}"))?;
+
+    measurement::begin_online(Phase::RhoSolve);
+    let source_target = crate::binary_ecc::BinaryPoint::Affine {
+        x: F2mElement::from_biguint(&BigUint::from(target.x), inst.n),
+        y: F2mElement::from_biguint(&BigUint::from(target.y), inst.n),
+    };
+    let image_target = cover
+        .pullback_point_class(&source_target)
+        .map_err(|e| format!("pulling the target into the Jacobian: {e}"))?;
+    let order = BigUint::from(inst.r);
+    let outcome = match method.id.as_str() {
+        "jacobian_image.bsgs" => hcdlp_bsgs_counted(
+            &image_generator,
+            &image_target,
+            &order,
+            cover.source_curve(),
+        ),
+        "jacobian_image.rho3" => hcdlp_pollard_rho_counted(
+            &image_generator,
+            &image_target,
+            &order,
+            cover.source_curve(),
+            seed,
+            rho_cap(inst.r, param_u64(method, "cap_multiple")? as f64),
+            param_u64(method, "max_restarts")?,
+        ),
+        other => return Err(format!("unknown Jacobian-image solver `{other}`")),
+    }
+    .map_err(|e| format!("destination Jacobian solver failed: {e}"))?;
+    measurement::end_online();
+
+    let recovered = outcome
+        .recovered
+        .as_ref()
+        .map(|value| {
+            value
+                .to_u128()
+                .ok_or_else(|| "recovered scalar exceeds ecbench's u128 record width".to_string())
+        })
+        .transpose()?;
+    let native_operations = outcome
+        .setup
+        .operations()
+        .saturating_add(outcome.search.operations())
+        .saturating_add(outcome.verification.operations());
+    let mut counters = BTreeMap::from([
+        ("cover_constructions_uncharged".into(), 1),
+        ("cover_pullbacks_uncharged".into(), 2),
+        (
+            "jacobian_group_operations_uncharged".into(),
+            native_operations,
+        ),
+        (
+            "jacobian_table_inserts_uncharged".into(),
+            outcome.table_inserts,
+        ),
+        (
+            "jacobian_table_lookups_uncharged".into(),
+            outcome.table_lookups,
+        ),
+        ("jacobian_walk_steps_uncharged".into(), outcome.walk_steps),
+        ("rho_restarts".into(), outcome.restarts),
+        ("rho_collisions".into(), outcome.collisions),
+    ]);
+    counters.retain(|_, value| *value > 0);
+    let phases = vec![
+        jacobian_phase("setup", outcome.setup),
+        jacobian_phase("search", outcome.search),
+        jacobian_phase("internal_verification", outcome.verification),
+    ];
+    let unpriced = unpriced_of(&counters);
+    Ok(SolveReport {
+        recovered,
+        exhausted: outcome.exhausted,
+        phases,
+        // Deliberately zero until a versioned source-GAE conversion is
+        // supplied. `unpriced` makes the resulting record a lower bound.
+        total_gae: 0.0,
+        automorphisms_used: 1,
+        counters,
+        unpriced,
+        deterministic: true,
+        nondeterminism: Vec::new(),
+        solve_wall_ns: started.elapsed().as_nanos() as u64,
+        factor_base: None,
+        detail: json!({
+            "adapter": "binary_cubic_pullback_v1",
+            "destination": "genus_3_jacobian_image",
+            "destination_solver": method.id,
+            "map_degree": 3,
+            "native_operation_unit": "Cantor additions/doublings in Jac(H)(F_2^m)",
+            "source_gae_conversion": "unavailable",
+            "destination_candidate_verified": recovered.is_some(),
+            "source_reverification": "performed independently by the ecbench runner"
+        }),
+        online: None,
+        online_error: None,
+        solver: None,
+        field_ops: None,
+    })
 }
 
 fn solve_large_prime(
@@ -2398,6 +2584,41 @@ pub fn dump_factor_base(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn named_jacobian_image_adapters_recover_without_source_gae_conflation() {
+        use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+        let spec = CurveSpec::Koblitz { a: 0, n: 7 };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let Instance::Binary(binary) = &inst else {
+            unreachable!()
+        };
+        let scalar = 13u64;
+        let target = binary.fast.mul_u64(binary.generator, scalar);
+        let coordinates = [format!("0x{:x}", target.x), format!("0x{:x}", target.y)];
+        for id in ["jacobian_image.bsgs", "jacobian_image.rho3"] {
+            let method = resolve(&MethodSpec {
+                id: id.into(),
+                params: BTreeMap::new(),
+            })
+            .unwrap();
+            let report = solve(&method, &inst, &facts, &coordinates, 0x83_03).unwrap();
+            assert_eq!(report.recovered, Some(u128::from(scalar)));
+            assert!(!report.exhausted);
+            assert_eq!(report.total_gae, 0.0);
+            assert!(report
+                .unpriced
+                .contains(&"jacobian_group_operations_uncharged".into()));
+            assert_eq!(report.detail["destination"], "genus_3_jacobian_image");
+            assert_eq!(report.detail["source_gae_conversion"], "unavailable");
+            assert!(report
+                .online
+                .as_ref()
+                .is_some_and(|window| window.wall_ns > 0));
+        }
+    }
 
     #[test]
     fn defaults_are_written_before_hashing() {
