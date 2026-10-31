@@ -76,3 +76,21 @@ campaign receipts rather than unique curve or key identities.
 python3 research/ml_dataset_inventory_20261031/build_inventory_v5.py
 python3 research/ml_dataset_coverage_20261031/build_coverage_v5.py
 ```
+
+# Version 6 update
+
+`build_coverage_v6.py` binds the reviewed Koblitz n23 arity campaign to
+`inventory-v6.json` and all 26 custody checkpoints. `coverage-v6.json` has
+**198 retained receipts** at sizes 23, 47, and 61, with at least one retained
+receipt at each requested arity `m=2..15`. The Koblitz enumeration intersection
+has 34 receipts, including 26 new m3..15 cells across both twists. Four new
+cells completed a finite fixed-base search without decomposition; 22 are
+timeout-censored. The existing family/method receipts and earlier campaign
+denominators remain intact. `pkm` and sizes 24..31 and 48..60
+still have no retained receipts; arity presence alone does not establish broad
+curve or method coverage.
+
+```sh
+python3 research/ml_dataset_inventory_20261031/build_inventory_v6.py
+python3 research/ml_dataset_coverage_20261031/build_coverage_v6.py
+```
