@@ -14,6 +14,13 @@ every finished piece of work, after every decision, and whenever we switch
 tasks. Preserve previous entries. Record concrete facts from commands and
 logs; distinguish verified results from plans or assumptions.
 
+Keep the log current *always*, not only at handoff: it is the session's working
+memory. Before choosing the next step in any task, read the newest entries in
+today's log (and the previous day's when the session spans a date change) and
+let them decide the next action; if work already done is missing from the log,
+write that entry before doing anything else. Never start a new measurement,
+experiment or code change without the previous one recorded and reviewed.
+
 Every entry has four headings:
 
 - What was done (commands, files, features)
