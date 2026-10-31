@@ -7874,31 +7874,9 @@ mod canonical_component_tests {
                 assert!(
                     run.group.as_ref().unwrap().complete && run.result.as_ref().unwrap().complete
                 );
-                let pipeline = run.pipeline.as_ref().unwrap();
-                std::fs::write(
-                    root.join("koblitz-m3-input.json"),
-                    &pipeline.native.matrix.as_ref().unwrap().original_bytes,
-                )
-                .unwrap();
-                std::fs::write(
-                    root.join("koblitz-m3-events.jsonl"),
-                    &pipeline.native.events.as_ref().unwrap().canonical,
-                )
-                .unwrap();
-                std::fs::write(
-                    root.join("koblitz-m3-group-replay.json"),
-                    &run.group.as_ref().unwrap().bytes,
-                )
-                .unwrap();
-                let result = &run.result.as_ref().unwrap().bytes;
-                std::fs::write(root.join("koblitz-m3-result.json"), result).unwrap();
-                if positive {
-                    std::fs::copy(
-                        sink.dir.join("payloads/pdp-witness.json"),
-                        root.join("pdp-witness.json"),
-                    )
+                run.visit_retained_artifacts(|a| std::fs::write(root.join(a.path), a.bytes))
                     .unwrap();
-                }
+                let result = &run.result.as_ref().unwrap().bytes;
                 let check = || {
                     verify_canonical_components(
                         root,
@@ -7981,5 +7959,286 @@ mod canonical_component_tests {
                 }
             }
         }
+    }
+}
+
+/// A borrowed view of already retained bytes. The visitor itself performs no
+/// allocation, serialization, publication, or budget reset. Its caller owns
+/// admission of any storage I/O and must preserve an existing witness receipt.
+struct RetainedArtifact<'a> {
+    path: &'static str,
+    role: &'static str,
+    encoding: &'static str,
+    bytes: &'a [u8],
+    publication: Option<crate::ml_dataset::capture::WitnessReceipt>,
+}
+impl CanonicalPipelineRun<'_> {
+    fn visit_retained_artifacts<E>(
+        &self,
+        mut visit: impl FnMut(RetainedArtifact<'_>) -> Result<(), E>,
+    ) -> Result<(), E> {
+        let mut emit = |slot: (&'static str, &'static str, &'static str), bytes, publication| {
+            visit(RetainedArtifact {
+                path: slot.0,
+                role: slot.1,
+                encoding: slot.2,
+                bytes,
+                publication,
+            })
+        };
+        if let Some(run) = &self.pipeline {
+            if let Some(matrix) = &run.native.matrix {
+                emit(KOBLITZ_SLOTS[0], matrix.original_bytes.as_slice(), None)?;
+            }
+            if let Some(failure) = &run.native.persistence_failure {
+                if !failure.bytes.is_empty() {
+                    emit(
+                        (
+                            "partial/koblitz-m3-input.raw",
+                            "unregistered-partial-artifact",
+                            "native",
+                        ),
+                        failure.bytes.as_slice(),
+                        None,
+                    )?;
+                }
+            }
+            if let Some(events) = &run.native.events {
+                // An empty acknowledged prefix is still a valid JSONL stream.
+                emit(KOBLITZ_SLOTS[1], events.canonical.as_slice(), None)?;
+                if !events.pending_bytes.is_empty() {
+                    emit(
+                        (
+                            "partial/koblitz-m3-native-event.raw",
+                            "unregistered-partial-artifact",
+                            "native",
+                        ),
+                        events.pending_bytes.as_slice(),
+                        None,
+                    )?;
+                }
+            }
+            if let Some(publisher) = &run.publisher {
+                if let Some(encoded) = &publisher.encoding {
+                    if encoded.complete && publisher.receipt.is_some() {
+                        emit(
+                            ("pdp-witness.json", "independently-verified-pdp", "json"),
+                            encoded.bytes.as_slice(),
+                            publisher.receipt,
+                        )?;
+                    } else if !encoded.bytes.is_empty() {
+                        emit(
+                            (
+                                "partial/koblitz-m3-witness.raw",
+                                "unregistered-partial-artifact",
+                                "native",
+                            ),
+                            encoded.bytes.as_slice(),
+                            None,
+                        )?;
+                    }
+                }
+            }
+        }
+        for (encoded, canonical, partial) in [
+            (
+                &self.group,
+                KOBLITZ_SLOTS[3],
+                "partial/koblitz-m3-group-replay.raw",
+            ),
+            (
+                &self.result,
+                KOBLITZ_SLOTS[2],
+                "partial/koblitz-m3-result.raw",
+            ),
+        ] {
+            if let Some(encoded) = encoded {
+                if encoded.complete {
+                    emit(canonical, encoded.bytes.as_slice(), None)?;
+                } else if !encoded.bytes.is_empty() {
+                    emit(
+                        (partial, "unregistered-partial-artifact", "native"),
+                        encoded.bytes.as_slice(),
+                        None,
+                    )?;
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod retained_artifact_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native;
+    use crate::ml_dataset::capture::capture_limits;
+
+    #[test]
+    fn borrowed_visit_preserves_bytes_receipts_and_stops_at_parent_failure() {
+        for positive in [false, true] {
+            let binding = matrix_tests::binding();
+            let limits = capture_limits(16).unwrap();
+            let _sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+            let mut original = construction_tests::fixture();
+            if positive {
+                original.target = original.signed[0];
+            }
+            let mut budget = construction_tests::budget();
+            let mut global = 0;
+            let run = run_canonical_pipeline(
+                &original,
+                &binding,
+                &limits,
+                &"8".repeat(64),
+                &"9".repeat(64),
+                native::Engine::F4Macaulay,
+                3,
+                &mut budget,
+                &mut global,
+                &mut |_, _| Ok(()),
+            );
+            let mut identities = Vec::new();
+            run.visit_retained_artifacts::<()>(|a| {
+                if a.path == KOBLITZ_SLOTS[0].0 {
+                    assert_eq!(
+                        a.bytes.as_ptr(),
+                        run.pipeline
+                            .as_ref()
+                            .unwrap()
+                            .native
+                            .matrix
+                            .as_ref()
+                            .unwrap()
+                            .original_bytes
+                            .as_ptr()
+                    );
+                }
+                if a.path == "pdp-witness.json" {
+                    assert!(positive);
+                    assert_eq!(
+                        a.publication,
+                        run.pipeline
+                            .as_ref()
+                            .unwrap()
+                            .publisher
+                            .as_ref()
+                            .unwrap()
+                            .receipt
+                    );
+                    assert!(a.publication.is_some());
+                } else {
+                    assert!(a.publication.is_none());
+                }
+                identities.push((a.path, a.role, a.encoding, a.bytes.len()));
+                Ok(())
+            })
+            .unwrap();
+            assert_eq!(identities.len(), if positive { 5 } else { 4 });
+            for slot in KOBLITZ_SLOTS {
+                assert_eq!(
+                    identities
+                        .iter()
+                        .filter(|a| (a.0, a.1, a.2) == slot)
+                        .count(),
+                    1
+                );
+            }
+            let mut visited = 0;
+            assert_eq!(
+                run.visit_retained_artifacts(|_| {
+                    visited += 1;
+                    Err("parent storage failure")
+                }),
+                Err("parent storage failure")
+            );
+            assert_eq!(visited, 1);
+            let mut replayed = Vec::new();
+            run.visit_retained_artifacts::<()>(|a| {
+                replayed.push((a.path, a.role, a.encoding, a.bytes.len()));
+                Ok(())
+            })
+            .unwrap();
+            assert_eq!(identities, replayed);
+        }
+    }
+
+    #[test]
+    fn failed_input_partial_terminal_and_unpublished_witness_keep_raw_roles() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let _sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let mut original = construction_tests::fixture();
+        original.target = original.signed[0];
+        let mut budget = construction_tests::budget();
+        let mut global = 0;
+        let failed = run_canonical_pipeline(
+            &original,
+            &binding,
+            &limits,
+            &"8".repeat(64),
+            &"9".repeat(64),
+            native::Engine::F4Macaulay,
+            3,
+            &mut budget,
+            &mut global,
+            &mut |_, _| Err("selected storage failure".into()),
+        );
+        let mut paths = Vec::new();
+        failed
+            .visit_retained_artifacts::<()>(|a| {
+                assert_ne!(a.path, KOBLITZ_SLOTS[0].0);
+                if a.path.contains("input.raw") {
+                    assert_eq!(a.role, "unregistered-partial-artifact");
+                    assert_eq!(a.encoding, "native");
+                    assert!(!a.bytes.is_empty());
+                }
+                paths.push(a.path);
+                Ok(())
+            })
+            .unwrap();
+        assert!(paths.contains(&"partial/koblitz-m3-input.raw"));
+        drop(_sink);
+        let _sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let mut budget = construction_tests::budget();
+        let mut global = 0;
+        let mut run = run_canonical_pipeline(
+            &original,
+            &binding,
+            &limits,
+            &"8".repeat(64),
+            &"9".repeat(64),
+            native::Engine::F4Macaulay,
+            3,
+            &mut budget,
+            &mut global,
+            &mut |_, _| Ok(()),
+        );
+        // Selection controls: retain real bytes while withholding completion or
+        // publication evidence. Neither flag alone may promote a raw artifact.
+        run.group.as_mut().unwrap().complete = false;
+        run.result.as_mut().unwrap().complete = false;
+        run.pipeline
+            .as_mut()
+            .unwrap()
+            .publisher
+            .as_mut()
+            .unwrap()
+            .receipt = None;
+        let mut raw = 0;
+        run.visit_retained_artifacts::<()>(|a| {
+            assert!(
+                ![KOBLITZ_SLOTS[2].0, KOBLITZ_SLOTS[3].0, "pdp-witness.json"].contains(&a.path)
+            );
+            if a.path.starts_with("partial/") {
+                raw += 1;
+                assert_eq!(a.role, "unregistered-partial-artifact");
+                assert_eq!(a.encoding, "native");
+                assert!(a.publication.is_none());
+            }
+            Ok(())
+        })
+        .unwrap();
+        assert_eq!(raw, 3);
     }
 }
