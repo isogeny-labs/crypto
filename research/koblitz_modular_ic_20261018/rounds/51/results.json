@@ -1,15 +1,19 @@
 {
   "scope": "R51 actual chart maps and larger marked23 QR construction",
   "status_counts": {
-    "running": 1,
+    "rejected": 2,
     "accepted": 8,
-    "rejected": 1
+    "running": 1
   },
   "runs": [
     {
       "attempt": "base23-51-01",
-      "status": "running",
-      "source_revision": null
+      "status": "rejected",
+      "source_revision": "422a3ce35a791f39cc6bea1a4641b51ebc0a7b7f",
+      "kind": "Singular",
+      "native_exit": 124,
+      "required_marker": "BASE23_51_ALL_CHECKS_PASS",
+      "error_lines": []
     },
     {
       "attempt": "diamond51-01",
@@ -19,6 +23,11 @@
       "native_exit": 0,
       "required_marker": "DIAMOND51_ALL_CHECKS_PASS",
       "error_lines": []
+    },
+    {
+      "attempt": "fiber51-01",
+      "status": "running",
+      "source_revision": null
     },
     {
       "attempt": "glue-forward51-01",
@@ -62,7 +71,9 @@
       "source_revision": "ea247d929bb40ee543d0172f279f36dec74d417a",
       "kind": "Lean",
       "compile_exit": 0,
-      "audit_exit": 0
+      "audit_exit": 0,
+      "audited_theorems": 5,
+      "root": "Overlap51"
     },
     {
       "attempt": "twist51-01",

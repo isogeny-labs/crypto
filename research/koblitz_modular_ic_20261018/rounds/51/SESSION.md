@@ -57,3 +57,10 @@ equations descend individually,exact Gtw=G+(1+c)^16,entrywise F4/F2
 products,gamma reconstructions/syzygies,corruption and serialized reload pass.
 Original twist51-01 stays rejected. BASE23 uses only repaired accepted02.
 base23-51-01 admitted under the original native caps.
+
+base23-51-01 hit the original1200s cap,nativeexit124. Exact denominator
+factor check and the closed520KB actual D/C inverse file are preserved.
+No rank112 acceptance or completed expanded matrix gate is claimed from it.
+The native process ended before the next invocation. fiber51-01 admitted next;
+then use the frozen structured source experiment and independently validate
+those partial inverse coefficients before promoting them to a donor.
