@@ -94,3 +94,21 @@ curve or method coverage.
 python3 research/ml_dataset_inventory_20261031/build_inventory_v6.py
 python3 research/ml_dataset_coverage_20261031/build_coverage_v6.py
 ```
+
+# Version 7 update
+
+`build_coverage_v7.py` binds the reviewed ordinary-binary n23 arity campaign
+to `inventory-v7.json`, all 26 custody checkpoints, the archive audit, the
+fresh S3 readback sample, and the migrated cost-artifact pointer.
+`coverage-v7.json` has **224 retained receipts** at field sizes 23, 47, and
+61. The binary enumeration intersection rises from two to 28 receipts; its
+new 26-cell matched panel covers `m=3..15` on both twists. Six native searches
+finished with verified method outcomes and twenty reached the fixed work
+budget. All 26 completed strict export, including the budget-limited cells.
+The requested axes and prior denominators remain intact; `pkm` and sizes
+24..31 and 48..60 still have no retained receipts.
+
+```sh
+python3 research/ml_dataset_inventory_20261031/build_inventory_v7.py
+python3 research/ml_dataset_coverage_20261031/build_coverage_v7.py
+```
