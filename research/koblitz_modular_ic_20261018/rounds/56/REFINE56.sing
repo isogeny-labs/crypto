@@ -1,0 +1,75 @@
+proc require56(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc orderH56(poly f){int value=100000;intvec e;while(f!=0){e=leadexp(f);if(e[2]<value){value=e[2];}f=f-lead(f);}return(value);}
+execute(read("../infinity56-02/base-jets56.sing"));
+ring refine56=(2,a),(s,h),dp;minpoly=a^2+a+1;short=0;
+map baseMap56=baseJets56,s,h;poly originalZero56=baseMap56(Gzero56);poly originalOne56=baseMap56(Gone56);
+proc gcdInt56(int x,int y){int r;while(y!=0){r=x%y;x=y;y=r;}if(x<0){x=-x;}return(x);}
+proc polygon56(poly F,string label,int precision){
+ int i;int j;int n;int v;int p;int q;int d;int cross;int left;int right;int col;intvec e;
+ intmat points[17][2];intmat hull[17][2];list lc;poly rest=F;poly term;poly face;list records;
+ for(i=0;i<=16;i++){points[i+1,1]=i;points[i+1,2]=100000;lc[i+1]=number(0);}
+ while(rest!=0){term=lead(rest);e=leadexp(term);i=e[1]+1;v=e[2];if(v<points[i,2]){points[i,2]=v;lc[i]=leadcoef(term);}rest=rest-term;}
+ for(i=1;i<=17;i++){
+  if(points[i,2]<precision){
+   while(n>=2){cross=(hull[n,1]-hull[n-1,1])*(points[i,2]-hull[n,2])-(hull[n,2]-hull[n-1,2])*(points[i,1]-hull[n,1]);if(cross>0){break;}n--;}
+   n++;hull[n,1]=points[i,1];hull[n,2]=points[i,2];
+  }
+ }
+ require56(n>=2 && hull[1,1]==0 && hull[n,1]==16,"INFINITY56_COMPLETE_NEWTON_ENDPOINTS");
+ for(i=1;i<n;i++){
+  left=hull[i,1];right=hull[i+1,1];p=hull[i,2]-hull[i+1,2];q=right-left;d=gcdInt56(p,q);p=p/d;q=q/d;face=0;
+  for(j=left;j<=right;j++){
+   if(points[j+1,2]<precision && (points[j+1,2]-hull[i,2])*(right-left)==(hull[i+1,2]-hull[i,2])*(j-left)){
+    require56((j-left)%q==0,"INFINITY56_INTEGRAL_FACE_EXPONENT");face=face+lc[j+1]*s^((j-left)/q);
+   }
+  }
+  records[i]=list(left,right,p,q,face);
+  print("NEWTON56 label="+label+" left="+string(left)+" right="+string(right)+" root_value="+string(p)+"/"+string(q)+" residual="+string(face));
+ }
+ link out="newton-"+label+"56.sing";write(out,"ring newton"+label+"56=(2,a),(s,h),dp;minpoly=a^2+a+1;short=0;poly F56="+string(F)+";");
+ for(i=1;i<=17;i++){write(out,"int val"+string(i-1)+"56="+string(points[i,2])+";");}
+ for(i=1;i<size(records)+1;i++){write(out,"poly face"+string(i)+"56="+string(records[i][5])+";");}
+ close(out);return(records);
+}
+proc refine56(poly original,int branch){
+ int step;int scale;int divisor;int precision;int minimum;int p;int q;int i;int found;int matched;int zeroCount;int positiveCount;int resolved=0;
+ poly center;poly F;poly expanded;poly face;poly c;poly candidate;poly reconstructed;list records;list candidates=number(0),number(1),a,a+1;
+ if(branch==0){center=a;scale=0;}else{center=a*h^3;scale=3;}
+ expanded=subst(original,s,center+h^scale*s);minimum=orderH56(expanded);divisor=minimum;precision=128-divisor;
+ F=expanded/h^minimum;require56(F*h^minimum==expanded,"REFINE56_INITIAL_EXACT_SCALING");F=reduce(F,std(ideal(h^precision)));
+ link out="refinement-branch"+string(branch)+"56.sing";write(out,"ring refinementBranch"+string(branch)+"56=(2,a),(s,h),dp;minpoly=a^2+a+1;short=0;");
+ for(step=0;step<=8;step++){
+  require56(precision>=16,"REFINE56_PRECISION_SUFFICIENT");
+  reconstructed=subst(original,s,center+h^scale*s);
+  require56(reduce(reconstructed+h^divisor*F,std(ideal(h^128)))==0,"REFINE56_FULL_ORIGINAL_RECONSTRUCTION");
+  records=polygon56(F,"b"+string(branch)+"step"+string(step),precision);
+  write(out,"poly Fstep"+string(step)+"56="+string(F)+";poly centerStep"+string(step)+"56="+string(center)+";int scaleStep"+string(step)+"56="+string(scale)+";int divisorStep"+string(step)+"56="+string(divisor)+";int precisionStep"+string(step)+"56="+string(precision)+";");
+  positiveCount=0;zeroCount=0;
+  for(i=1;i<=size(records);i++){
+   if(records[i][3]>0){positiveCount=positiveCount+records[i][2]-records[i][1];if(records[i][2]-records[i][1]==records[i][4]){zeroCount=zeroCount+records[i][2]-records[i][1];}}
+  }
+  if(positiveCount==8 && zeroCount==8){resolved=1;print("REFINEMENT56_RESOLVED branch="+string(branch)+" step="+string(step)+" scale="+string(scale)+" precision="+string(precision));break;}
+  if(step==8){break;}
+  if(size(records)<1){break;}
+  if(records[1][1]!=0 || records[1][2]!=8 || records[1][4]!=1 || records[1][3]<=0){break;}
+  p=records[1][3];face=records[1][5];
+  // The unique F4 root must account for the entire repeated eighth-power face.
+  found=0;
+  for(i=1;i<=4;i++){
+   candidate=candidates[i];
+   if(subst(face,s,candidate)==0){found++;c=candidate;}
+  }
+  require56(found==1 && deg(face)==8 && face==leadcoef(face)*(s+c)^8,"REFINE56_EXACT_REPEATED_FACE_AND_UNIQUE_ROOT");
+  require56(subst(face,s,c+1)!=0,"REFINE56_CHANGED_RESIDUE_ROOT_REJECTED");
+  expanded=subst(F,s,h^p*(s+c));minimum=orderH56(expanded);
+  poly quotient=expanded/h^minimum;require56(quotient*h^minimum==expanded,"REFINE56_EXACT_NEXT_SCALING");
+  center=center+h^(scale+p)*c;scale=scale+p;divisor=divisor+minimum;precision=128-divisor;
+  require56(precision>=16,"REFINE56_RETAINED_PRECISION");F=reduce(quotient,std(ideal(h^precision)));
+ }
+ write(out,"int resolved56="+string(resolved)+";int finalStep56="+string(step)+";");close(out);
+ print("REFINEMENT56_RESULT branch="+string(branch)+" resolved="+string(resolved)+" steps="+string(step)+" remaining_precision="+string(precision));
+ return(list(resolved,records,center,scale,divisor,precision,F));
+}
+list zero56=refine56(originalZero56,0);list one56=refine56(originalOne56,1);
+print("REFINE56_RESULT zero_resolved="+string(zero56[1])+" one_resolved="+string(one56[1]));
+print("REFINE56_ALL_CHECKS_PASS");quit;

@@ -27,3 +27,17 @@ Run correctednativeonce afterfreeze,then interpret exactedges underthe reviewed 
 
 ### Errors
 Ring-owned indexedlist cannot be mapped directly;implementationfailure,not a mathematical null.
+
+## Base poles and first cover faces accepted
+
+### What was done
+Infinity56-02passes exactchart/sourcecoordinateproducts,128jets and Aorders-4/-1;both local derivatives nonzero. Firstfaces are repeated eighthpowers:zero positivecluster8slope1,one16slope3withquadraticresidueface. These do not certify tamebranchdegrees. Lean fourconditional implications frozen and compile/audit invocation52380live.
+
+### Decisions made
+Freeze bounded repeated-face translations overF4withfulloriginalpolynomial reconstruction and explicitprecisionloss. No targettopology assumed. Serialize afterLeanterminal. Allrawfirstfailure retained.
+
+### Open threads
+WaitexistingLeanhandle,thenfreshrefine56-01once;inspectresolvedflags/denominators and completeclosedpoint accounting beforeprojectivedivisorclaim.
+
+### Errors
+Only rejectedfirstindexed-listfailure. Integerdivisionwarnings in acceptedNewtoncode are non-error diagnostics;all divisions in face exponents checked exact.
