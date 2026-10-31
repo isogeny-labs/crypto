@@ -77,3 +77,8 @@ https://fredrikj.net/fdoc/html/algorithms/polynomials/irreducibility.html .
 Only the stated criterion is used,not that page's complexity/performance claims.
 Independent Rabin checks replace reuse of the factorizer as its own checker.
 No intended11action is inferred without its separate deck/action premises.
+
+Primitive attempt01is rejected:degree is a reserved Singular name in the
+Rabin helper. Its native errors skipped the point checks;late output does not
+validate any hypothesis. Rename local identifiers only before attempt02;
+keep the source equations,factors,metrics,limits and decision rules unchanged.

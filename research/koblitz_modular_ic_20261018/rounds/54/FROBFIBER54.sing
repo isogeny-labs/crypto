@@ -36,13 +36,13 @@ matrix values54=monomials54*coordinateInverse54;
 for(j54=1;j54<=32;j54++){values54[1,j54]=reduce(values54[1,j54],pGB54);}
 // Independent Rabin tests; no second factorize call decides irreducibility.
 proc irreducible54(poly f,int q){
- int degree=deg(f);if(degree<1){return(0);}
- ideal gb=std(ideal(f));poly r=reduce(w,gb);list powers;int i;int p;int t;int prime;
- for(i=1;i<=degree;i++){r=reduce(r^q,gb);powers[i]=r;}
+ int degreeLocal54=deg(f);if(degreeLocal54<1){return(0);}
+ ideal gb=std(ideal(f));poly r=reduce(w,gb);list powersLocal54;int i;int p;int t;int primeLocal54;
+ for(i=1;i<=degreeLocal54;i++){r=reduce(r^q,gb);powersLocal54[i]=r;}
  if(reduce(r+w,gb)!=0){return(0);}
- for(p=2;p<=degree;p++){
-  if(degree%p==0){prime=1;for(t=2;t<p;t++){if(p%t==0){prime=0;break;}}
-   if(prime){if(deg(gcd(f,powers[degree div p]+w))>0){return(0);}}
+ for(p=2;p<=degreeLocal54;p++){
+  if(degreeLocal54%p==0){primeLocal54=1;for(t=2;t<p;t++){if(p%t==0){primeLocal54=0;break;}}
+   if(primeLocal54){if(deg(gcd(f,powersLocal54[degreeLocal54 div p]+w))>0){return(0);}}
   }
  }
  return(1);
