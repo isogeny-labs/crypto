@@ -7895,6 +7895,90 @@ mod canonical_component_tests {
                 assert_eq!(verified.math.group.math.witness.is_some(), positive);
                 assert_eq!(verified.reported_group_complete, scenario != 2);
                 assert!(verified.native_boundaries > 0);
+                let outer = serde_json::json!({
+                    "status": if scenario == 2 { "partial" } else { "verified" },
+                    "solver_completed": scenario != 2,
+                    "pdp_witness_verified": positive,
+                    "exhaustive_no_decomposition": scenario == 0,
+                    "group_domain_complete": scenario != 2,
+                    "certificate_durably_persisted": positive
+                });
+                let facts = verify_outer_outcome(&outer, &verified).unwrap();
+                assert!(!facts.supervisor_censored);
+                assert_eq!(facts.solver_completed, scenario != 2);
+                assert_eq!(facts.retained_witness_verified, positive);
+                for (stop, success) in [
+                    (Some("timeout"), true),
+                    (Some("trace_budget_exhausted"), true),
+                    (None, false),
+                ] {
+                    let censored = crate::ml_dataset::execution::terminal_outcome(
+                        outer.clone(),
+                        stop,
+                        success,
+                        Some(1),
+                    );
+                    let facts = verify_outer_outcome(&censored, &verified).unwrap();
+                    assert!(facts.supervisor_censored && !facts.solver_completed);
+                    assert_eq!(facts.retained_witness_verified, positive);
+                    for key in [
+                        "solver_completed",
+                        "pdp_witness_verified",
+                        "exhaustive_no_decomposition",
+                        "certificate_durably_persisted",
+                        "group_domain_complete",
+                        "native_backend_invoked",
+                        "native_statistics_complete",
+                        "algebra_completed",
+                    ] {
+                        let mut forged = censored.clone();
+                        forged[key] = serde_json::json!(true);
+                        assert!(verify_outer_outcome(&forged, &verified).is_err(), "{key}");
+                    }
+                    let mut retained = censored.clone();
+                    retained["retained_pdp_witness_verified"] = serde_json::json!(true);
+                    assert_eq!(verify_outer_outcome(&retained, &verified).is_ok(), positive);
+                }
+                for key in [
+                    "solver_completed",
+                    "pdp_witness_verified",
+                    "certificate_durably_persisted",
+                    "group_domain_complete",
+                    "exhaustive_no_decomposition",
+                    "retained_pdp_witness_verified",
+                ] {
+                    for value in [
+                        serde_json::Value::Null,
+                        serde_json::json!(1),
+                        serde_json::json!("true"),
+                    ] {
+                        let mut forged = outer.clone();
+                        forged[key] = value;
+                        assert!(verify_outer_outcome(&forged, &verified).is_err(), "{key}");
+                    }
+                }
+                for key in [
+                    "first_fall_degree",
+                    "last_fall_degree",
+                    "retired_hardware_instructions",
+                    "native_basis_derivation_verified",
+                    "execution_trace_complete_verified",
+                    "total_operation_count_verified",
+                    "ecdlp_pipeline_completed",
+                    "fall_degree_verified",
+                    "extraction_complete",
+                ] {
+                    let mut forged = outer.clone();
+                    forged[key] = serde_json::json!(true);
+                    assert!(verify_outer_outcome(&forged, &verified).is_err(), "{key}");
+                }
+                let mut failed = outer.clone();
+                failed["live_persistence_errors"] = serde_json::json!(["parent write failed"]);
+                assert_eq!(
+                    verify_outer_outcome(&failed, &verified).is_ok(),
+                    scenario == 2
+                );
+
                 if positive {
                     assert!(verified.input_zero_assignments > 0);
                     let base: serde_json::Value = serde_json::from_slice(result).unwrap();
@@ -8241,4 +8325,94 @@ mod retained_artifact_tests {
         .unwrap();
         assert_eq!(raw, 3);
     }
+}
+
+/// Outer labels are checked only after canonical component authentication.
+/// Original execution admission remains a separate prerequisite at dispatch.
+#[derive(Debug)]
+struct VerifiedOuterOutcome {
+    supervisor_censored: bool,
+    solver_completed: bool,
+    retained_witness_verified: bool,
+}
+fn verify_outer_outcome(
+    outcome: &serde_json::Value,
+    verified: &VerifiedCanonicalComponents,
+) -> Result<VerifiedOuterOutcome, String> {
+    if !outcome.is_object() {
+        return Err("Koblitz outcome must be an object".into());
+    }
+    super::prime_f4_wide::verify_unproved_claims(outcome)?;
+    for key in [
+        "independent_derivation_verified",
+        "operation_trajectory_verified",
+        "exact_instruction_count_verified",
+        "full_execution_trace_verified",
+        "fall_degree_verified",
+        "linear_extraction_complete",
+        "extraction_complete",
+    ] {
+        if !outcome[key].is_null() && outcome[key] != false {
+            return Err(format!("Koblitz replay does not certify {key}"));
+        }
+    }
+    let censored = matches!(
+        outcome["status"].as_str(),
+        Some("timeout" | "trace_budget_exhausted" | "worker_failed")
+    );
+    let witness = verified.math.group.math.witness.is_some()
+        && verified.math.witness_publication_sequence.is_some();
+    let domain = verified.math.group.math.prefix.all_tuples_acknowledged;
+    let negative = verified.math.group.math.negative_domain_verified();
+    let complete = verified.reported_group_complete && domain && (witness || negative);
+    let completed = outcome["solver_completed"]
+        .as_bool()
+        .ok_or("Koblitz outcome lacks boolean solver_completed")?;
+    if !censored && !outcome["pdp_witness_verified"].is_boolean() {
+        return Err("Koblitz outcome lacks boolean pdp_witness_verified".into());
+    }
+    for (key, supported) in [
+        ("solver_completed", complete),
+        ("pdp_witness_verified", witness),
+        ("certificate_durably_persisted", witness),
+        ("group_domain_complete", domain),
+        ("exhaustive_no_decomposition", negative),
+        ("native_backend_invoked", true),
+        ("native_statistics_complete", true),
+        ("algebra_completed", true),
+    ] {
+        if let Some(value) = outcome.get(key) {
+            let claimed = value
+                .as_bool()
+                .ok_or_else(|| format!("nonboolean Koblitz claim {key}"))?;
+            if claimed && (censored || !supported) {
+                return Err(format!("unsupported Koblitz outer claim {key}"));
+            }
+        }
+    }
+    if let Some(value) = outcome.get("retained_pdp_witness_verified") {
+        let claimed = value
+            .as_bool()
+            .ok_or("nonboolean retained Koblitz witness claim")?;
+        if claimed && !witness {
+            return Err("retained Koblitz witness lacks authenticated evidence".into());
+        }
+    }
+    if completed && outcome.get("live_persistence_errors").is_some() {
+        return Err("Koblitz completion cannot survive parent persistence failure".into());
+    }
+    match outcome["status"].as_str() {
+        Some("verified")
+            if completed
+                && (outcome["pdp_witness_verified"] == true
+                    || outcome["exhaustive_no_decomposition"] == true) => {}
+        Some("partial") if !completed => {}
+        Some("timeout" | "trace_budget_exhausted" | "worker_failed") if !completed => {}
+        _ => return Err("Koblitz status contradicts checked outcome".into()),
+    }
+    Ok(VerifiedOuterOutcome {
+        supervisor_censored: censored,
+        solver_completed: completed,
+        retained_witness_verified: witness,
+    })
 }
