@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render a compact, evidence-linked PDF of the triangle-cover audit."""
+"""Render a compact, evidence-linked PDF of the binary cubic V4-cover audit."""
 import json
 from pathlib import Path
 
@@ -79,7 +79,7 @@ def page(canvas, doc):
     canvas.line(48, height - 45, width - 48, height - 45)
     canvas.setFillColor(BLUE)
     canvas.setFont("ArialUnicode", 8)
-    canvas.drawString(48, 34, "Binary cubic triangle covers | research audit | 27 October 2026")
+    canvas.drawString(48, 34, "Binary cubic V4 covers | research audit | 27 October 2026")
     canvas.drawRightString(width - 48, 34, str(doc.page))
     canvas.restoreState()
 
@@ -95,11 +95,14 @@ def render():
             for n in certs}
     quartics = {n: json.loads((HERE / f"canonical_data_{n}.json").read_text())
                 for n in certs}
+    two = json.loads((HERE / "two_pole_4132.json").read_text())
+    two_map = json.loads((HERE / "two_pole_map_4132.json").read_text())
+    two_quartic = json.loads((HERE / "canonical_two_pole_4132.json").read_text())
 
     flow = [
-        P("Binary cubic triangle covers", title),
-        P("An exact eligibility criterion, four canonical quartics, and evaluated subgroup maps", subtitle),
-        P("<b>Status.</b> The construction and maps are verified for the four listed curves. "
+        P("Binary cubic V4 covers", title),
+        P("Two exact eligibility gates, five canonical quartics, and evaluated subgroup maps", subtitle),
+        P("<b>Status.</b> The constructions and maps are verified for five listed curves. "
           "This report establishes a low-genus transfer route and a conditional asymptotic "
           "attack bound. A complete attack-cost comparison has not yet been measured."),
         P("1. Family theorem and bound", h1),
@@ -114,6 +117,10 @@ def render():
           "K-isomorphism classes. At q=16 it is 4095 of 8190. This count is exact "
           "for this construction; it is neither a global classification of cover "
           "routes nor a count of curves with a measured attack advantage."),
+        P("A 2012 seminar abstract reports an approximately three-quarter density "
+          "for the wider binary cubic (2,...,2) weak-cover class when the base "
+          "field has even degree over F2. The present exact one-half count is a "
+          "construction-specific lower bound, not the full weak-cover density."),
         P("Choose nonzero delta in ker Tr_(K/k), and t0+t0^q=delta. With "
           "t1=t0^q, t2=t0^(q^2), lambda=b^d, and A=delta^(q^2-q+1)lambda, "
           "put f0=A/(x+t0)+A^q/(x+t1) and f1=A^q/(x+t1)+A^(q^2)/(x+t2). "
@@ -210,11 +217,13 @@ def render():
                "<b>eligible family</b>, and <b>attack method</b>. The 3972 and "
                "4222 equations may be new catalog additions. The 4006 and 4198 "
                "classes are rediscoveries at isogeny-class level. The V4 cover "
-               "type and genus-three transfer method have prior art; exact "
-               "overlap with the SCIS 2010/2011 even-characteristic cubic "
-               "classification remains unresolved because the full case tables "
-               "were unavailable. No global new-family or new-vulnerability "
-               "claim follows from this audit."),
+               "type and genus-three transfer method have prior art. A SCIS 2024 "
+               "abstract reports classification of all ordinary binary elliptic "
+               "sources with extension degree at most nine outside the isogeny "
+               "condition; a 2025 poster covers a domain that includes the "
+               "normalized q=16 cubic source here. Exact equation-level overlap "
+               "remains unresolved without their case tables. No global "
+               "new-family or new-vulnerability claim follows from this audit."),
              P(link("https://arxiv.org/abs/0905.0546", "Nart and Ritzenthaler (2009)")
                + ": genus-three characteristic-two V4 covers and elliptic quotients."),
              P(link("https://www.iwsec.org/scis/2022/_abst/1A3-2.pdf",
@@ -222,6 +231,12 @@ def render():
                + ": even-characteristic classification under the isogeny condition."),
              P(link("https://eprint.iacr.org/2013/487.pdf", "Iijima, Momose, and Chao (2013)")
                + ": references the earlier SCIS 2010/2011 cubic weak-cover papers."),
+             P(link("https://sem-wnt.w.waseda.jp/kako/2012.html", "Shimura seminar (2012)")
+               + ": reports about three-quarter weak-cover density for even base-field degree."),
+             P(link("https://www.iwsec.org/scis/2024/program.html", "SCIS program (2024)")
+               + ": reports non-isogeny ordinary binary classification through degree nine."),
+             P(link("https://iss.iisec.ac.jp/sympo24/posters/M2_212poster24.pdf", "Uesato poster (2025)")
+               + ": gives a wider even-characteristic classification domain."),
              P(link("https://www.numdam.org/item/10.5802/jtnb.815.pdf", "Diem (2012)")
                + ": expected soft-O(q) Jacobian DLP for nonhyperelliptic genus three."),
              P(link("https://arxiv.org/pdf/2012.07173", "Tian (2020)")
@@ -230,17 +245,84 @@ def render():
              P("The full derivation, all exact coefficients, replay scripts, Magma "
                "inputs and responses, Lean file, and candidate-specific prior-work "
                "record live in research/ghs_twisted_v4_triangle_20261027/ in "
-               + link("https://github.com/isogeny-labs/crypto/pull/2735", "draft PR #2735")
+               + link("https://github.com/isogeny-labs/crypto/pull/2735", "merged PR #2735")
                + ". TriangleGate.lean kernel-checks the q=16 exponent/count "
                "arithmetic and trivial doubling kernel for the four named odd "
                "prime orders. It does not formalize the function-field geometry "
                "or the quartic Jacobian computations."),
+             PageBreak(),
+             P("8. Hess's known two-common-pole construction", h1),
+             P("Let V=ker Tr_(K/k), a two-dimensional k-space. Choose A,B in V* "
+               "with A B=sqrt(b), and put f_i=A^(q^i)x+B^(q^i)/x for i=0,1,2. "
+               "The three f_i sum to zero. The connected V4 cover "
+               "y0^2+y0=f0, y1^2+y1=f1 descends to k; its two common branch "
+               "poles have full V4 inertia and total different 12, so its "
+               "smooth normalization has genus three. Its first elliptic quotient "
+               "is the normalized E_(a,b) precisely for the trace-zero twist "
+               "Tr_(K/F2)(a)=0."),
+             P("This is Hess's published double-trace-zero branch. The exact "
+               "all-q product count was already proved in this repository's "
+               "earlier Hess audit. The calculation below restates it to make "
+               "the overlap with the triangle gate precise."),
+             P("The product test is a binary-quadratic isotropy test: "
+               "Q_s(A)=Tr_(K/k)(s A^q A^(q^2))=0 for s=sqrt(b). Over an algebraic "
+               "closure, the three conjugates of A have coordinates (u,v,u+v); "
+               "the map from s to the three coefficients of Q_s is invertible. "
+               "Counting double and distinct rational linear factors gives the "
+               "exact all-q product count below."),
+             P("#(V*V*) = (q^2-1)(q+2)/2.", code),
+             P("The all-q overlap has a closed form. Put e=(q+1)^(-1) modulo "
+               "q^3-1 and t=s^e. Since b=s^2, the triangle trace is the "
+               "absolute trace of t. Scaling s by c in k* scales t by "
+               "sqrt(c). The projective product classes with relative trace "
+               "t=0 are exactly t^(q+1) for t in V*, giving q+1 classes; "
+               "the remaining q(q+1)/2 classes each contribute q/2 trace-one "
+               "scalars. Hence exactly q^2(q+1)/4 source models pass Hess "
+               "while failing the triangle gate."),
+             P("Union of the two gates: q^3-1+q^2(q+1)/4 of 2(q^3-1).", code),
+             P("At q=16, the Hess gate has 2295 b values, the new overlap count "
+               "adds 1088 models, and the union is <b>5183 of 8190</b>. This "
+               "is an exact cover-eligibility count and a lower bound for the "
+               "wider cover universe; it is not an attack-cost count or a "
+               "global vulnerability classification. The overlap formula is "
+               "new to this audit; its publication novelty is unresolved."),
+             P("9. Exact two-pole witness and subgroup map", h1),
+             P("In the pinned F_(2^12) field, A=1079, B=2852, a=0, b=3399, "
+               "and E: Y^2+XY=X^3+b. It has #E(K)=4132=4·1033, "
+               "G=(2305,2550), and Q=(2273,2935)=7G. Its descended affine "
+               "function field is"),
+             P("x^2(u^4+2622u^2+3158u)=1821x^4+373x^3+1640x+1.", code),
+             P("Magma 2.30-1 confirms genus three, a smooth nonhyperelliptic "
+               "canonical quartic, and L-polynomial 1+35T^3+4096T^6. Its "
+               "canonical quartic has the coefficient vector below in the "
+               "monomial order X^4,X^3Y,X^2Y^2,Y^4,X^2YZ,XY^2Z,X^2Z^2,XYZ^2,YZ^3,Z^4."),
+             P('<font name="Courier" size="7">['
+               + ', '.join(str(z) for z in two_quartic["quartic_coefficients"])
+               + ']</font>', code),
+             P("Sage evaluates the quotient pullback and Frobenius trace in "
+               "this quartic's actual Jacobian: Phi(G) is nonzero, "
+               "[1033]Phi(G)=0, and Phi(Q)=7Phi(G). Jacobian setup was "
+               f"{two_map['jacobian_setup_seconds']:.2f} s and the two map "
+               f"evaluations were {two_map['subgroup_map_seconds']:.2f} s. "
+               "A full index-calculus and matched-rho cost is still unmeasured."),
+             P(link("https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_bj",
+                    "LMFDB class 3.16.a_a_bj")
+               + " already records a positive Jacobian. "
+               + link("https://www.cambridge.org/core/services/aop-cambridge-core/content/view/315278965D8D277A85812D9498236A88/S146115700000108Xa.pdf/generalising-the-ghs-attack-on-the-elliptic-curve-discrete-logarithm-problem.pdf",
+                      "Hess (2004)")
+               + " covers the factor branch. This is a new q=16 exact map "
+               "witness in this audit, while its family and isogeny class "
+               "are known. Its exact equation has not been checked against "
+               "every earlier case table."),
+             P("TwoPoleGate.lean kernel-checks the q=16 count arithmetic and "
+               "the doubling kernel on the 1033-order subgroup; it does not "
+               "formalize the field-product proof or geometric map."),
              ]
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     doc = BaseDocTemplate(str(OUT), pagesize=letter, leftMargin=48,
                           rightMargin=48, topMargin=58, bottomMargin=50,
-                          title="Binary cubic triangle covers: research audit",
+                          title="Binary cubic V4 covers: research audit",
                           author="Cryptanalysis research audit")
     frame = Frame(48, 50, 516, 684, leftPadding=0, rightPadding=0,
                   topPadding=0, bottomPadding=0)

@@ -128,6 +128,78 @@ def config_at(plan, index):
     return config
 
 
+def phase_measurements(root, members):
+    """Validate reported PMU label consistency, not PMU calibration or full cost."""
+    starts, ends = {}, {}
+    for artifact in members.values():
+        role = artifact["role"]
+        if role not in ("phase-start", "hardware-and-resource-telemetry"):
+            continue
+        record = load(root / artifact["path"])
+        phase = record.get("phase")
+        require(isinstance(phase, str) and re.fullmatch(r"[a-z][a-z0-9-]{0,63}", phase), "invalid telemetry phase")
+        start = role == "phase-start"
+        expected = "crypto.ml-dataset.phase-start/v1" if start else "crypto.ml-dataset.phase-metrics/v1"
+        suffix = "-start" if start else ""
+        require(record.get("schema") == expected and artifact["path"] == f"telemetry/{phase}{suffix}.json",
+                "telemetry schema/path mismatch")
+        target = starts if start else ends
+        require(phase not in target, "duplicate telemetry phase")
+        target[phase] = (record, artifact["sha256"])
+    require(ends.keys() <= starts.keys(), "phase metrics lack durable start boundary")
+    result = []
+    for phase, (start, start_sha) in sorted(starts.items()):
+        entry = {"phase": phase, "start_sha256": start_sha, "start": start,
+                 "metrics_sha256": None, "producer_reported": None,
+                 "measurement_state": "interrupted_or_unfinished", "independently_verified": False}
+        if phase not in ends:
+            result.append(entry)
+            continue
+        metrics, sha = ends[phase]
+        hardware = metrics.get("hardware")
+        require(isinstance(hardware, dict), "missing hardware record")
+        for key in ("instructions", "instructions_scaled", "instructions_time_enabled_ns", "instructions_time_running_ns",
+                    "cycles", "cycles_scaled", "cycles_time_enabled_ns", "cycles_time_running_ns"):
+            value = hardware.get(key)
+            require(value is None or type(value) is int and 0 <= value < 2**64, "invalid hardware counter")
+        any_counter, expected_mux = False, False
+        for event in ("instructions", "cycles"):
+            raw, enabled, running = (hardware.get(event), hardware.get(event + "_time_enabled_ns"),
+                                     hardware.get(event + "_time_running_ns"))
+            scaled = None
+            if raw is not None and enabled is not None and running is not None:
+                any_counter = True
+                require(running <= enabled, "invalid PMU running/enabled time")
+                expected_mux |= running < enabled
+                if running == enabled:  # Also matches the producer's (0, 0) boundary.
+                    scaled = raw
+                elif running > 0:
+                    scaled = min(raw * enabled // running, 2**64 - 1)
+            require(hardware.get(event + "_scaled") == scaled, f"inconsistent {event} scaling")
+        multiplexed = hardware.get("multiplexed")
+        require(multiplexed is None or type(multiplexed) is bool, "invalid multiplexing flag")
+        require(multiplexed == (expected_mux if any_counter else None), "inconsistent aggregate multiplexing flag")
+        raw, running = hardware.get("instructions"), hardware.get("instructions_time_running_ns")
+        usable = raw is not None and running is not None and running > 0
+        status = metrics.get("instructions_status")
+        expected = "unavailable" if not usable else "measured_unmultiplexed" if multiplexed is False else "measured_multiplexed_estimate"
+        require(status == expected, "instruction status contradicts hardware")
+        for key in ("retired_instructions_raw", "retired_instructions_exact_in_scope"):
+            value = metrics.get(key)
+            require(value is None or type(value) is int and 0 <= value < 2**64, "invalid instruction label type")
+        require(metrics.get("retired_instructions_raw") == (raw if usable else None), "raw instruction label mismatch")
+        exact = raw if usable and multiplexed is False else None
+        require(metrics.get("retired_instructions_exact_in_scope") == exact, "exact instruction label mismatch")
+        require(metrics.get("clock_valid_for_comparison") is False, "unsupported comparative clock claim")
+        require(isinstance(metrics.get("counter_scope"), str) and metrics["counter_scope"]
+                and isinstance(metrics.get("excludes"), list) and metrics["excludes"], "missing counter scope/exclusions")
+        require(type(metrics.get("returned_ok")) is bool, "missing phase completion status")
+        require((metrics.get("returned_error") is None) == metrics["returned_ok"], "phase error/status mismatch")
+        entry.update(metrics_sha256=sha, producer_reported=metrics, measurement_state="reported_phase_readback")
+        result.append(entry)
+    return result
+
+
 def audit_cell(root, plan, plan_sha, binding):
     manifest_path = contained(root, "manifest.json")
     manifest = load(manifest_path)
@@ -199,6 +271,7 @@ def audit_cell(root, plan, plan_sha, binding):
                 require(config["solver"] == "pkm", "alternate factor base outside PKM")
     return {"id": digest(manifest_path.read_bytes()), "index": index, "config": config,
             "public": public, "factor_base": base, "outcome": outcome,
+            "phase_measurements": phase_measurements(root, members),
             "artifact_roles": sorted(roles), "manifest_sha256": digest(manifest_path.read_bytes())}
 
 
@@ -294,7 +367,9 @@ def export_rows(rows, path):
                 split = "train" if split_number < 80 else "validation" if split_number < 90 else "test"
                 record = {"schema": "ml-dataset.static-routing-view/v1", "record_id": row["id"],
                           "split": split, "independent_unit": component, "features": static_features(row),
-                          "labels": {"producer_reported": row["outcome"], "independently_verified": False},
+                          "labels": {"producer_reported": row["outcome"], "independently_verified": False,
+                                     "phase_measurements": row["phase_measurements"],
+                                     "whole_worker_instruction_count": None},
                           "feature_policy": "allowlisted public static inputs only; no trace/manifest/witness features"}
                 out.write(compact(record).decode() + "\n")
             out.flush()

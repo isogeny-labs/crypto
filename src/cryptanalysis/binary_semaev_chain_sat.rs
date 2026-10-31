@@ -23,7 +23,10 @@ pub enum ChainBuildError {
 /// Worst-case SAT variable count for the field-product circuit, before a
 /// finite-coordinate domain. The bound is exact for the all-affine pattern.
 pub fn chain_s3_max_variables(n: u32, m: usize) -> Option<u64> {
-    if !(2..=6).contains(&m) || !(2..=127).contains(&n) {
+    // m=15 uses only 13 intermediate-identity bits. Keep this explicit
+    // bound below the u32 mask width; build() checks its allocation cap
+    // against the returned full circuit bound before constructing gates.
+    if !(2..=15).contains(&m) || !(2..=127).contains(&n) {
         return None;
     }
     let n = u64::from(n);
@@ -1098,7 +1101,57 @@ mod tests {
         assert_eq!(chain_s3_max_variables(83, 4), Some(63_578));
         assert_eq!(chain_s3_max_variables(83, 5), Some(84_743));
         assert_eq!(chain_s3_max_variables(83, 6), Some(105_908));
-        assert_eq!(chain_s3_max_variables(83, 7), None);
+        assert_eq!(chain_s3_max_variables(83, 9), Some(169_403));
+        assert_eq!(chain_s3_max_variables(83, 7), Some(127_073));
+        assert_eq!(chain_s3_max_variables(83, 15), Some(296_393));
+        assert_eq!(chain_s3_max_variables(83, 16), None);
+    }
+
+    #[test]
+    fn fifteen_summands_preflight_cap_and_pinned_identity_pattern() {
+        let kc = KoblitzCurve::new(0, 7).unwrap();
+        let required = chain_s3_max_variables(7, 15).unwrap();
+        assert!(matches!(
+            ChainedS3Encoding::build(
+                15,
+                &kc.curve.irreducible,
+                &kc.curve.b,
+                None,
+                0,
+                required as u32 - 1
+            ),
+            Err(ChainBuildError::VariableCap { .. })
+        ));
+        let p = kc.generator().clone();
+        let x = match &p {
+            BinaryPoint::Affine { x, .. } => x.clone(),
+            _ => unreachable!(),
+        };
+        // P,-P,P,-P,...,P: each even prefix is infinity. This exercises
+        // the highest intermediate-identity bit and the final affine link.
+        let mask = (0..13)
+            .filter(|i| i % 2 == 0)
+            .fold(0u32, |mask, i| mask | (1 << i));
+        let mut enc = ChainedS3Encoding::build(
+            15,
+            &kc.curve.irreducible,
+            &kc.curve.b,
+            Some(&x),
+            mask,
+            required as u32,
+        )
+        .unwrap();
+        for i in 0..15 {
+            enc.pin_x_block(i, &x).unwrap();
+        }
+        let zero = F2mElement::zero(7);
+        for i in 0..13 {
+            enc.pin_x_block(15 + i, if i % 2 == 0 { &zero } else { &x })
+                .unwrap();
+        }
+        assert_eq!(enc.solver.solve(), SolveResult::Sat);
+        assert!(enc.verify_model());
+        assert_eq!(enc.decode_summands(), vec![x; 15]);
     }
 
     #[test]

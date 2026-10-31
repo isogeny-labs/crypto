@@ -1,136 +1,194 @@
-# Independent ML dataset consumer
+# Independent native ML dataset consumer
 
-This companion checks saved native dataset artifacts, restores one completed
-cell from S3, and exports an allowlisted view for static solver-routing and cost
-models. It does not generate cryptographic instances or implement a second
-cryptographic solver. The native producer remains separately owned under
-`codex/ml-ecdlp-dataset-20261028` (Conductor T-684); this directory is T-693.
+`native/` implements the supported saved-dataset consumer in Rust. It checks
+native producer artifacts, restores one published cell from S3 and exports an
+allowlisted static view for solver-routing and cost models. Its independent
+arithmetic does not link the producer's field or curve code. It does not
+search for logarithms or generate campaign instances.
 
-## Checks and boundaries
+The earlier Python consumer and its receipts are retained as historical
+artifacts. They are superseded for execution; see [NATIVE_MIGRATION.md](NATIVE_MIGRATION.md).
+The producer remains separately owned in `codex/ml-ecdlp-dataset-20261028`.
+This companion does not modify its working tree or launch compute workers.
 
-`consumer.py audit` checks artifact sizes and SHA-256 digests, canonical paths,
-the frozen plan and mixed-radix cell index, run identity, shard membership,
-public instance family/field size/arity/twist, private sampling provenance,
-factor-base requested size, and basic positive-certificate consistency.
-Certificate-bearing cells must contain their public instance, witness and
-factor base. A successful PDP certificate must have the configured arity and
-target; positive and exhaustive-negative outcomes cannot coexist.
+Explicit factor-base policy datasets have a versioned companion contract:
+see [POLICY_COMPATIBILITY.md](POLICY_COMPATIBILITY.md). The native consumer
+accepts strict plan/v2 and factor-base/v2 bindings and emits its own static
+routing view/v2. This is not conformance to the producer's v4 training export.
 
-These are structural checks. They do **not** prove curve orders, point sums,
-discrete logarithms, UNSAT, exact operation counts, or first/last fall degrees.
-The report always keeps `mathematics_independently_verified: false`.
-Optional native replay is explicitly producer replay, with the verifier binary
-hash recorded before invocation and checked afterward. All artifact hashes
-are rechecked afterward, and run/manifest digests must remain unchanged.
-Use an isolated restored directory; this is not a filesystem locking protocol
-against concurrent or adversarial writers.
+Sealed cells with the exact checked-phase policy also receive an independent
+recorded-contract check. It reconstructs the attempt binding, verifies protocol
+freeze hashes with number-preserving canonicalization, checks the finite native
+syscall lifecycle, and recomputes each recorded counter projection. The new
+`labels.checked_phase_contract` result remains restricted; public feature bytes
+and legacy v1 labels are unchanged. Policy-only, unavailable, operation-error and
+start-only prefixes remain explicit. Successful checks do not establish hardware
+truth, complete execution, whole-worker counts or admitted training cost.
 
-`consumer.py export` requires native replay unless explicitly requested as an
-unreplayed preview. It keeps failure, unsupported and timeout outcome rows;
-missing public inputs yield null features. Labels remain under
-`producer_reported` with `independently_verified: false`. Hash verification does
-not convert an outcome into a scientifically accepted label.
+This component uses a conservative32MiB cumulative modeled-storage allowance,
+in addition to strict file/array bounds. `consumer_resource_limit` is a consumer
+refusal, not a producer outcome. Partial snapshots and their lineage are not
+accepted as sealed cells. See the
+[frozen contract](../ml_dataset_consumer_checked_phase_20261029/IMPLEMENTATION_FREEZE.md)
+and [validation record](../ml_dataset_consumer_checked_phase_20261029/VALIDATION.md)
+for exact scope, evidence and remaining interoperability limits.
 
-Feature selection admits only typed static public inputs: curve/field
-description, generator/target, factor-base points/actions/orbits, solver and
-work limits. It excludes complete manifests and configs, private witnesses,
-generation seeds, construction traces, and all solver traces, including the
-terminal BSGS hit. Do not feed the entire exported record to a model: only
-`features` is the feature view; IDs, labels and split metadata are separate.
-The record schema `ml-dataset.static-routing-view/v1` is a narrow companion
-view, not a claim of conformance to the broader `crypto-ml-v1` training schema.
-
-Whole field sizes are assigned deterministically to 80/10/10 hash buckets.
-Every generator, key, twist and family at a fixed n stays together. This can
-produce uneven or empty evaluation partitions for small size panels. It does
-not yet identify isogeny, subfield or other linked components across sizes,
-so it is not sufficient by itself for cross-size generalization claims.
-Adaptive solver policies need a separate prefix-only trace export and
-decision-time feature definitions; this tool intentionally has no such view.
-
-## S3 restoration
-
-`fetch` consumes a publication receipt with an independently supplied SHA-256
-anchor. It accepts only the canonical bucket `setec-astronomy-artifacts`,
-with optional prefix, and canonical content-addressed object keys. It checks
-declared download limits (20 GiB and 100,000 references), HEAD size, GET with
-the observed ETag, and SHA-256/size of every downloaded artifact. The restored
-artifact set must exactly equal the manifest, including frozen provenance.
-Failed downloads remain in an isolated incomplete directory and must not be
-treated as completed cells. Existing destinations are never overwritten.
-
-The receipt anchor must come from a trusted source such as a reviewed Git
-record; calculating it from an untrusted receipt does not authenticate data.
-S3 byte integrity is distinct from mathematical validity and from retention
-guarantees. This tool does not configure versioning, Object Lock or lifecycle.
+## Native commands
 
 ```sh
-python3 consumer.py fetch --receipt completion.json \
+cargo build --release --locked --manifest-path native/Cargo.toml
+native/target/release/dataset-consumer fetch --receipt completion.json \
   --expected-sha256 TRUSTED_COMPLETION_SHA256 --out /new/restored-run
-python3 consumer.py audit --run /new/restored-run \
-  --expected-run-sha256 TRUSTED_RUN_SHA256 --native-verifier /trusted/native/crypto
-python3 consumer.py export --run /new/restored-run \
-  --native-verifier /trusted/native/crypto --out /new/routing-view.jsonl
+native/target/release/dataset-consumer audit --run /new/restored-run \
+  --expected-run-sha256 TRUSTED_RUN_SHA256 --arithmetic \
+  --native-verifier /trusted/native/crypto
+native/target/release/dataset-consumer export --run /new/restored-run \
+  --arithmetic --native-verifier /trusted/native/crypto --out /new/routing-view.jsonl
+cargo test --release --locked --manifest-path native/Cargo.toml
 ```
 
-The native binary must expose `dataset verify --out PATH`. Its success status
-must cover exactly the audited completed cells. This consumer supports the
-original cofactor-projection rule and the producer's revised prime-primary
-projection with cyclic-membership rule, preserving their distinct names.
+`audit` checks artifact sizes and SHA-256 digests, canonical paths, unique JSON
+keys, the frozen plan and mixed-radix cell index, run identity, shard membership,
+public/config bindings, sampling provenance and outcome/certificate consistency.
+Use an isolated restored directory. The consumer detects changed input bytes;
+it is not a filesystem locking protocol against concurrent writers.
 
-## Validation and evidence
+`export` requires producer replay unless `--allow-unreplayed-preview` is explicit.
+It retains failed, unsupported, interrupted and censored outcomes, with null
+features when public inputs are absent. It refuses to overwrite an output file.
+Producer replay is separately identified and its binary digest is checked before
+and after invocation. It does not count as an independently implemented solver.
 
-Run `python3 -m unittest -v test_consumer.py` from this directory. Fixtures
-are intentionally artificial format data, not valid cryptographic experiments
-or training examples. Tests cover corruption, duplicate members and JSON keys,
-path traversal/symlinks, forged success without inputs, transplanted metadata,
-contradictory labels, arity/domain mismatches, false factor-base completion,
-feature leakage, atomic export failure, native replay coverage and changing
-inputs/binaries, and S3 restore using mocked HTTP-facing commands.
+## Independent positive certificates
 
-`integration_s3.py --execute --evidence NEW_DIRECTORY` performs a separate
-bounded live S3 software test (under 100 kB and 32 artifact references). It
-uploads an explicitly named **software fixture**, restores and hashes every
-artifact, and publishes the completion receipt last, then checks its readback.
-`evidence/` contains small receipts and validation metadata, not scientific
-measurements. Audit snapshots discussed in `AUDIT.md` are archived separately
-with a hash and S3 receipt; they are immutable observations of development code.
+`--arithmetic` checks scalar equations `k * G = target` and PDP sums with exactly
+the configured number of summands. It validates field definitions, nonsingular
+curve equations and point encodings, including exceptional addition cases.
+PDP points must belong to the declared signed factor base; PKM's alternate
+Kummer domain is checked separately, without adding unlisted points. Complete
+twist metadata is checked against the underlying curve and twist parameter.
 
-## Progress
+The code uses independent affine arithmetic over prime fields and binary
+polynomial fields. Prime validation uses twelve Miller–Rabin bases within the
+bounded word range; binary irreducibility uses Rabin's criterion. These checks
+reuse established mathematics:
+[SEC 1 v2, §§2.1–2.2](https://www.secg.org/sec1-v2.pdf),
+[Sorenson–Webster, Theorem 1.1](https://arxiv.org/pdf/1509.00864), and
+[Rabin's criterion in the FLINT author's documentation](https://fredrikj.net/fdoc/html/algorithms/polynomials/irreducibility.html).
 
-Implemented the independent consumer and adversarial tests without changing
-the live producer or launching duplicate generation. Independent review found
-a factor-base rule compatibility error and a replay/input race in this
-consumer; both have dedicated regression checks. The live S3 test records
-storage behavior only. No cost improvement, attack success, or general
-fall-degree statement follows from this work, so research result plots are
-unchanged.
+The arithmetic module receives public inputs and the positive certificate,
+never the private witness. The surrounding provenance audit separately reads
+the witness's sampling metadata. A checked scalar equation establishes neither
+the declared subgroup order nor how the scalar was found. No group cardinality,
+solver independence, UNSAT, exact cost, exhaustive enumeration or fall-degree
+claim is verified by this module.
 
-## Decisions
+Each certificate's digest and scoped results appear under
+`labels.positive_certificate_arithmetic`; an empty certificate list has checked
+count zero. The broad `mathematics_independently_verified` and
+`labels.independently_verified` flags remain false. Positive checks do not turn
+unsupported, timed-out or negative cells into verified mathematical results.
 
-Retain every completed outcome and keep all mathematical labels explicitly
-producer-reported. Permit unreplayed exports only with an explicit preview
-flag. Use public feature allowlists instead of excluding only private roles:
-manifest seeds and terminal solver traces can also reveal supervised answers.
-Keep this work in a separate path and worktree from the active producer.
-The shared daily session log is reserved by another owner; this scoped
-handoff records this work without editing that owner's log.
+## Independent distinct-root certificates
 
-## Next steps
+The native consumer also checks recognized prime/root/m=2 and binary/root/m=2
+certificates with `--arithmetic`. Its separate polynomial implementation computes
+`monic gcd(f, X^q-X)` and compares it with the product of the declared distinct
+linear factors. This checks the complete root set of each completed nonzero
+polynomial without invoking the producer root finder. The zero polynomial has
+an explicit all-field result; only the saved finite factor-base domain is used
+for group-lift checks. Censored calls never establish absence of roots.
 
-Run the consumer against the producer's first completed native dataset and
-its published receipt, then rerun native arithmetic/certificate verification
-on the isolated restore. A synthetic software integration does not substitute
-for that end-to-end native test. Reconcile the pinned static findings in
-`AUDIT.md` with the producer's final code and tests. Extend schema support only
-alongside explicit feature-time and label-validity contracts.
+The checker binds curve, field, twist, target, configured budget, ordered signed
+factor base, S3 coefficients, query order, finite-domain lift prefix and outcome.
+Binary certificates additionally bind hashes of the complete public/base/config
+objects. Prime v1 certificates have no equivalent full-object hash; their
+mathematical fields are bound, but arbitrary annotations are outside that claim.
+Results appear only in `labels.root_certificate_arithmetic`; static feature
+schemas are unchanged. A positive root-set label is per supplied completed call,
+and does not certify complete execution, every intermediate event identity,
+instruction cost, factor-base construction, subgroup order, UNSAT or fall degree.
+Historical root artifacts remain readable with explicit unverified status.
+See [ROOT_CERTIFICATE_DESIGN.md](ROOT_CERTIFICATE_DESIGN.md) for the bounded
+prime/binary contracts and primary mathematical sources, and
+[ROOT_VALIDATION.md](ROOT_VALIDATION.md) for the 51-cell sealed acceptance,
+retained failures, source reviews and verified S3 readback.
 
-## Outstanding work
+## Feature and measurement contract
 
-The full generator, native solver coverage, instruction accounting, factor
-base controls, all requested curve/twist families, scientific label replay,
-large-scale dataset production and cross-size component graph remain owned
-by the main dataset task. The campaign budget is a total ceiling of $200,
-not a daily allowance; the budget record merged in PR #2751 reserves $188.3888
-under conservative assumptions, but this consumer does not enforce account-wide
-spend or authorize a new compute worker.
+Only `features` is suitable as a model input. It contains typed public curve and
+field descriptions, generator/target, factor-base points/actions/orbits, solver
+and work limits. Seeds, complete manifests/configs, witnesses, generation traces,
+solver traces and terminal answers are excluded. IDs, labels and split metadata
+remain separate. This is the narrow `ml-dataset.static-routing-view/v1` view,
+not full conformance to the broader `crypto-ml-v1` training design.
+
+Phase telemetry is label-only. Preserve raw counts, scaled estimates, counter
+availability, enabled/running times, unfinished phases, exclusions and source
+hashes. Integer scaling and status consistency are checked independently;
+missing readings remain null. Exact and multiplexed estimated counts remain
+separate. These checks do not calibrate a PMU or establish whole-worker cost:
+`whole_worker_instruction_count` stays null and no phase totals are invented.
+
+Whole field sizes are assigned deterministically to 80/10/10 hash buckets.
+Every generator, key, twist and family at a fixed n stays together. Small panels
+can have uneven or empty partitions. Linked isogeny/subfield components across
+sizes are not identified, so this split alone cannot establish cross-size
+learning claims. Adaptive policies still need a separate prefix-only trace
+view with decision-time features.
+
+## S3 restoration and durability
+
+`fetch` requires a completion receipt and a SHA-256 anchor from a trusted source.
+It permits only `setec-astronomy-artifacts`, checks canonical content-addressed
+keys and declared download limits (20 GiB, 100,000 references), then checks HEAD
+size, ETag-bound GET and every downloaded hash. The restored artifact set must
+exactly match the manifest. Failed restores remain visibly incomplete; existing
+destinations are never overwritten. AWS CLI is used only for S3 transport.
+
+Byte integrity does not imply mathematical validity or retention guarantees.
+This tool does not configure versioning, Object Lock or lifecycle. A controller
+software-fixture test does not establish EKS worker permissions. Production
+publication must pass a fresh worker-role write/read/hash preflight and publish
+completion receipts only after every referenced object is durable.
+
+## Validation and open work
+
+Native tests cover fixed prime/binary field and group vectors, tampered public
+certificates, exceptional points, fields, twists and PKM domains; provenance,
+PMU labels and feature isolation; duplicate keys, path traversal, symlinks and
+changing bytes; and bounded S3/producer command handling. They are software
+fixtures, not campaign draws. Historical 19-test and 25-test Python receipts
+remain unchanged, with separate evidence for the Rust replacement.
+
+The deployed-worker native-producer-to-S3-to-independent-consumer replay remains
+outstanding. The separate controller archive roundtrip in
+[POLICY_COMPATIBILITY.md](POLICY_COMPATIBILITY.md) checks retained software
+fixtures. As of the 2026-10-28 06:47 UTC inspection, the dated canonical
+catalog had no completed cells. Pilot 002 failed on S3 HEAD permission before
+publication. Broad solver/curve/twist coverage, instruction accounting, factor
+base controls, large-scale generation and scientific label acceptance remain
+unfinished. This consumer does not resolve those producer requirements.
+
+The campaign budget is **$100–$200 total through tomorrow**, with a hard planning
+ceiling of $200. PR #2751 records a conservative $188.3888 reservation, leaving
+$11.6112 unallocated. Those are planning reservations, not verified billing or
+account-wide enforcement. No extra retry or compute worker is authorized by
+this companion's implementation.
+
+The completed native validation is recorded in
+[evidence/native-20261028/validation.json](evidence/native-20261028/validation.json):
+79 release tests, strict Clippy and formatting passed. The live S3 software
+fixture restored 13 artifact references (11 unique objects, 4,153 declared
+bytes), verified all hashes, and independently checked one positive certificate.
+The receipt, source hashes and raw test outputs are preserved beside the report.
+This establishes the controller storage path and software checks only.
+
+The PR #2757 delivery follow-up adds a regression for missing instruction
+enabled time alongside a complete cycle tuple. The native validator rejects
+that incomplete instruction tuple before accepting any exact label. After
+merging main `189ac727fcc4475b42755d4f1c15f97a4a102070`, 80 native release
+tests (73 library and 7 integration), strict Clippy, formatting and the release
+build passed. The new source hashes and logs are separate in
+`evidence/review-followup-20261028/`; the earlier receipts remain unchanged.
+These local checks do not establish current-head remote CI or review approval.

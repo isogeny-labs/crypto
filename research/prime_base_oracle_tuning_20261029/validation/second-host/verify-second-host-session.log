@@ -1,0 +1,4 @@
+start 2026-10-29T03:42:50Z binary_sha256=bf5eec6d61fbe83a7e6911bf73d05d847cc0ab23fd6db3342290a26b9f3807d9 host=vm commit=1e7b2b7ed20dcfccaf6f9454281f042508a7d2bd
+cmd: RAYON_NUM_THREADS=1 taskset -c 2 <binary> verify --dir research/prime_base_oracle_tuning_20261029/second-host/eks-results/session --replay-all --exit-code --out research/prime_base_oracle_tuning_20261029/validation/second-host/verify-second-host-session.audit.json
+end rc=0 elapsed_s=20 2026-10-29T03:43:10Z
+stdout (receipt printed by verify) sha256 48cce122114a86401a288e4d97a9af7f43439f7180b7b68d18a1b4110ae658ad == audit.json sha256 48cce122114a86401a288e4d97a9af7f43439f7180b7b68d18a1b4110ae658ad; stdout not kept (duplicate)

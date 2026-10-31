@@ -1,0 +1,19 @@
+Pre-correction source: validation/pre-audit-input-sha256.txt and
+validation/pre-audit-integration-sha256.txt.
+The corrected divisibility expression passed strict Rust1.98/1.99 lint,
+14 adapter controls and the three public integration controls. The latter
+ran directly from its newly compiled binary. Its Cargo driver was interrupted
+with exit130 during collateral binary builds after audit integration review;
+that driver is not reported as a completed pass.
+
+Review found that method_determinism defaulted this method to Always, while
+APS correctly reports deterministic=false under its cooperative wall budget.
+Classify this exact new method as Never. No existing method classification,
+frozen exemption, replay assertion or protection is removed or weakened.
+
+Add a public correctness scratch-session control: one toy public target and
+one round at L0, APS plus rho, with a private lock. The native audit must accept
+the honest APS record and replay only deterministic rho. This is not an APS
+cost-count replay certificate, L2 admission or a performance measurement.
+Corrected strict lint, adapter/audit regression and public integration checks
+must actually exit before passes are reported. Final sources are pinned apart.

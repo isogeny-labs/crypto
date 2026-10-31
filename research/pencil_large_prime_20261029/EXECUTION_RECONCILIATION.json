@@ -1,0 +1,55 @@
+{
+  "schema": "pencil-execution-reconciliation/v1",
+  "observed_utc": "2026-10-29T07:00:00Z",
+  "scope": "existing isolab namespace submitter connection",
+  "prior_diagnosis_correction": "Research EKS access was incorrectly interpreted as namespace research. The repository access guide and retained audit specify isolab.",
+  "existing_identity": {
+    "credential_source": "temporary host instance role",
+    "eks_group": "isolab:submitters",
+    "new_identity_created": false,
+    "permissions_changed": false,
+    "configuration_changed": false
+  },
+  "live_checks": {
+    "mcp_overview": "succeeded",
+    "documented_connection_can_create_jobs_in_isolab": true,
+    "isolab_inventory": {
+      "jobs": 9,
+      "succeeded": 7,
+      "failed": 2,
+      "active": 0
+    },
+    "default_launcher_assume_role": "AccessDenied",
+    "research_namespace_list_permission": false
+  },
+  "historical_binding": {
+    "task_owned_eks_job_id": "not found in inspected four-lead records",
+    "pencil_upper_primary_and_replay": "terminal saved status receipts",
+    "scope_limit": "Current isolab inventory does not assert historical results or visibility in other namespaces."
+  },
+  "diem": {
+    "separate_lane": true,
+    "state": "deadline-expired",
+    "durable_records": 50,
+    "expected_records": 52,
+    "pending": false,
+    "original_deadline_utc": "2026-10-20T18:42:21.993407Z",
+    "restart": false
+  },
+  "freeze_followup": {
+    "separate_lane": true,
+    "saved_state": "waiting_for_grid",
+    "dependent_steps": 0,
+    "producer_terminal_error": "generation exited -15; no dependent work launched",
+    "resume_prerequisite": "52 records plus successful producer terminal receipt plus no live generator",
+    "prerequisite_met": false
+  },
+  "remaining_execution_requirements": [
+    "Refactor pencil into a reusable per-target native solver and register it with ecbench; current CLI is not a resumable ecbench workload",
+    "Freeze the experiment protocol and matched valuation before data",
+    "Bind source, binary, image, original deadline, workload IDs and partition",
+    "Preserve upper gate and replay before extending the frozen cohort",
+    "Use qualified CRIU/EBS recovery and a separate L2 epoch; arbitrary-command jobs are non-resumable"
+  ],
+  "experiment_submitted": false
+}

@@ -1,0 +1,231 @@
+{
+  "card_id": "CARD-BLINDSPOT-08-01",
+  "card_path": "research/blindspots_20261018/08-learned-sat-branching/card-01.yaml",
+  "card_sha256": "fdf33f4196001738f01e277347c3b7b99e78b3bc944cab2dd13779988fc1cb47",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-08/card-01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-08/card-01/b08",
+        "examples/blindspots_08_learned_branching.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 6.726,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 6.726,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-08/card-01/b08",
+        "selftest"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.626,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "selftest",
+      "index": 3,
+      "outputs": {},
+      "seconds": 1.626,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "3899009ae7906cc461b92820782925c85b868f54f23dbb31a7b7f9b1d3ec8ecb",
+      "stdout_tail": [
+        "selftest field-axioms-and-s3-symmetry: PASS",
+        "selftest e-form of S_4 == resultant == symmetric in 4 arguments (300 random points, n=31): PASS",
+        "  small cells: 18 satisfiable, 24 unsatisfiable draws, 113 models in all",
+        "selftest engine find-all == brute force over the core == field evaluation (3 orders): PASS",
+        "selftest first-solution verdicts agree with the exact count and models verify (2 orders): PASS",
+        "selftest chain-DP count <= direct count (degenerate solutions only add): PASS",
+        "selftest both satisfiable and unsatisfiable draws seen: PASS",
+        "  learner rmse on a synthetic law: linear 0.2443, gbt 0.0431",
+        "selftest ridge fits a linear law: PASS",
+        "selftest gbt fits a law with a step: PASS",
+        "selftest model text round trip: PASS",
+        "selftest rss_peak_kb 3212",
+        "SELFTEST OK"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-08/card-01/b08",
+        "corpus",
+        "--tsv",
+        "research/blindspots_20261018/08-learned-sat-branching/corpus60.tsv"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 93.306,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "corpus",
+      "index": 4,
+      "outputs": {},
+      "seconds": 93.306,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "76e7b0e9154234d348bca9cf9a4d388e594e03e66aa1a90d5bf98196783cf821",
+      "stdout_tail": [
+        "{\"stem\":\"n19l6-3-S\",\"n\":19,\"l\":6,\"label\":\"S\",\"replica_verdict\":\"SAT\",\"stock_status\":\"SAT\",\"replica_decisions\":144329,\"stock_decisions\":144329,\"decisions_equal\":true,\"verdict_equal\":true,\"model_ok\":true,\"cert_ok\":true,\"replica_prop\":26202257,\"cms_decisions\":595969,\"cms_conflicts\":557363,\"cms_propagations\":27,\"ms\":1875}",
+        "{\"stem\":\"n19l6-4-S\",\"n\":19,\"l\":6,\"label\":\"S\",\"replica_verdict\":\"SAT\",\"stock_status\":\"SAT\",\"replica_decisions\":24,\"stock_decisions\":24,\"decisions_equal\":true,\"verdict_equal\":true,\"model_ok\":true,\"cert_ok\":true,\"replica_prop\":967,\"cms_decisions\":499,\"cms_conflicts\":53,\"cms_propagations\":14541,\"ms\":0}",
+        "{\"stem\":\"n19l6-5-S\",\"n\":19,\"l\":6,\"label\":\"S\",\"replica_verdict\":\"SAT\",\"stock_status\":\"SAT\",\"replica_decisions\":7511,\"stock_decisions\":7511,\"decisions_equal\":true,\"verdict_equal\":true,\"model_ok\":true,\"cert_ok\":true,\"replica_prop\":710371,\"cms_decisions\":210582,\"cms_conflicts\":191269,\"cms_propagations\":15546,\"ms\":65}",
+        "{\"stem\":\"n19l6-6-S\",\"n\":19,\"l\":6,\"label\":\"S\",\"replica_verdict\":\"SAT\",\"stock_status\":\"SAT\",\"replica_decisions\":92046,\"stock_decisions\":92046,\"decisions_equal\":true,\"verdict_equal\":true,\"model_ok\":true,\"cert_ok\":true,\"replica_prop\":15265512,\"cms_decisions\":1354394,\"cms_conflicts\":1282329,\"cms_propagations\":31,\"ms\":1252}",
+        "{\"stem\":\"n19l6-7-S\",\"n\":19,\"l\":6,\"label\":\"S\",\"replica_verdict\":\"SAT\",\"stock_status\":\"SAT\",\"replica_decisions\":76021,\"stock_decisions\":76021,\"decisions_equal\":true,\"verdict_equal\":true,\"model_ok\":true,\"cert_ok\":true,\"replica_prop\":12104859,\"cms_decisions\":199642,\"cms_conflicts\":179343,\"cms_propagations\":10796,\"ms\":1085}",
+        "{\"stem\":\"n19l6-8-S\",\"n\":19,\"l\":6,\"label\":\"S\",\"replica_verdict\":\"SAT\",\"stock_status\":\"SAT\",\"replica_decisions\":29688,\"stock_decisions\":29688,\"decisions_equal\":true,\"verdict_equal\":true,\"model_ok\":true,\"cert_ok\":true,\"replica_prop\":4058962,\"cms_decisions\":236531,\"cms_conflicts\":212020,\"cms_propagations\":23,\"ms\":368}",
+        "{\"stem\":\"n19l6-9-S\",\"n\":19,\"l\":6,\"label\":\"S\",\"replica_verdict\":\"SAT\",\"stock_status\":\"SAT\",\"replica_decisions\":53934,\"stock_decisions\":53934,\"decisions_equal\":true,\"verdict_equal\":true,\"model_ok\":true,\"cert_ok\":true,\"replica_prop\":8207004,\"cms_decisions\":940902,\"cms_conflicts\":887258,\"cms_propagations\":39,\"ms\":590}",
+        "{\"stem\":\"n19l6-10-S\",\"n\":19,\"l\":6,\"label\":\"S\",\"replica_verdict\":\"SAT\",\"stock_status\":\"SAT\",\"replica_decisions\":6667,\"stock_decisions\":6667,\"decisions_equal\":true,\"verdict_equal\":true,\"model_ok\":true,\"cert_ok\":true,\"replica_prop\":619631,\"cms_decisions\":372589,\"cms_conflicts\":347555,\"cms_propagations\":114,\"ms\":50}",
+        "{\"stem\":\"n19l6-11-U\",\"n\":19,\"l\":6,\"label\":\"U\",\"replica_verdict\":\"UNSAT\",\"stock_status\":\"UNSAT\",\"replica_decisions\":255958,\"stock_decisions\":255958,\"decisions_equal\":true,\"verdict_equal\":true,\"model_ok\":true,\"cert_ok\":null,\"replica_prop\":52704994,\"cms_decisions\":989257,\"cms_conflicts\":935474,\"cms_propagations\":37,\"ms\":3900}",
+        "{\"stem\":\"n19l6-12-U\",\"n\":19,\"l\":6,\"label\":\"U\",\"replica_verdict\":\"UNSAT\",\"stock_status\":\"UNSAT\",\"replica_decisions\":255969,\"stock_decisions\":255969,\"decisions_equal\":true,\"verdict_equal\":true,\"model_ok\":true,\"cert_ok\":null,\"replica_prop\":52838775,\"cms_decisions\":0,\"cms_conflicts\":0,\"cms_propagations\":0,\"ms\":4309}",
+        "{\"stem\":\"n19l6-13-U\",\"n\":19,\"l\":6,\"label\":\"U\",\"replica_verdict\":\"UNSAT\",\"stock_status\":\"UNSAT\",\"replica_decisions\":255052,\"stock_decisions\":255052,\"decisions_equal\":true,\"verdict_equal\":true,\"model_ok\":true,\"cert_ok\":null,\"replica_prop\":52660579,\"cms_decisions\":2469083,\"cms_conflicts\":2348167,\"cms_propagations\":71,\"ms\":3844}",
+        "{\"stem\":\"n19l6-14-U\",\"n\":19,\"l\":6,\"label\":\"U\",\"replica_verdict\":\"UNSAT\",\"stock_status\":\"UNSAT\",\"replica_decisions\":254622,\"stock_decisions\":254622,\"decisions_equal\":true,\"verdict_equal\":true,\"model_ok\":true,\"cert_ok\":null,\"replica_prop\":52824480,\"cms_decisions\":0,\"cms_conflicts\":0,\"cms_propagations\":0,\"ms\":4119}",
+        "{\"stem\":\"n19l6-15-U\",\"n\":19,\"l\":6,\"label\":\"U\",\"replica_verdict\":\"UNSAT\",\"stock_status\":\"UNSAT\",\"replica_decisions\":255285,\"stock_decisions\":255285,\"decisions_equal\":true,\"verdict_equal\":true,\"model_ok\":true,\"cert_ok\":null,\"replica_prop\":52749785,\"cms_decisions\":1729398,\"cms_conflicts\":1650340,\"cms_propagations\":28,\"ms\":4169}",
+        "{\"stem\":\"n19l6-16-U\",\"n\":19,\"l\":6,\"label\":\"U\",\"replica_verdict\":\"UNSAT\",\"stock_status\":\"UNSAT\",\"replica_decisions\":256002,\"stock_decisions\":256002,\"decisions_equal\":true,\"verdict_equal\":true,\"model_ok\":true,\"cert_ok\":null,\"replica_prop\":52613406,\"cms_decisions\":1189234,\"cms_conflicts\":1126267,\"cms_propagations\":55,\"ms\":3770}",
+        "{\"stem\":\"n19l6-17-U\",\"n\":19,\"l\":6,\"label\":\"U\",\"replica_verdict\":\"UNSAT\",\"stock_status\":\"UNSAT\",\"replica_decisions\":255317,\"stock_decisions\":255317,\"decisions_equal\":true,\"verdict_equal\":true,\"model_ok\":true,\"cert_ok\":null,\"replica_prop\":52714363,\"cms_decisions\":1029492,\"cms_conflicts\":970461,\"cms_propagations\":67,\"ms\":3807}",
+        "{\"stem\":\"n19l6-18-U\",\"n\":19,\"l\":6,\"label\":\"U\",\"replica_verdict\":\"UNSAT\",\"stock_status\":\"UNSAT\",\"replica_decisions\":254968,\"stock_decisions\":254968,\"decisions_equal\":true,\"verdict_equal\":true,\"model_ok\":true,\"cert_ok\":null,\"replica_prop\":52713876,\"cms_decisions\":2243099,\"cms_conflicts\":2140197,\"cms_propagations\":92,\"ms\":3938}",
+        "{\"stem\":\"n19l6-19-U\",\"n\":19,\"l\":6,\"label\":\"U\",\"replica_verdict\":\"SAT\",\"stock_status\":\"SAT\",\"replica_decisions\":38020,\"stock_decisions\":38020,\"decisions_equal\":true,\"verdict_equal\":true,\"model_ok\":true,\"cert_ok\":null,\"replica_prop\":5303688,\"cms_decisions\":343574,\"cms_conflicts\":312732,\"cms_propagations\":46,\"ms\":440}",
+        "{\"stem\":\"n19l6-20-U\",\"n\":19,\"l\":6,\"label\":\"U\",\"replica_verdict\":\"UNSAT\",\"stock_status\":\"UNSAT\",\"replica_decisions\":255332,\"stock_decisions\":255332,\"decisions_equal\":true,\"verdict_equal\":true,\"model_ok\":true,\"cert_ok\":null,\"replica_prop\":52800984,\"cms_decisions\":2914988,\"cms_conflicts\":2779270,\"cms_propagations\":96,\"ms\":4089}",
+        "CORPUS tot=60 decisions_equal=60 verdict_equal=60 certificates_ok=30/30",
+        "CORPUS OK"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-08/card-01/b08"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-08/card-01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "4d4e077ddcff25e6798c87cfc823a6d14064b1a0",
+  "dirty_after": [
+    "research/blindspots_20261018/08-learned-sat-branching/raw/corpus.jsonl",
+    "research/blindspots_20261018/08-learned-sat-branching/raw/corpus.stderr.log"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/04-presentation-search/raw/card-14-b-cell4-t2.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-14-b-cell4-t2.log",
+    "research/blindspots_20261018/04-presentation-search/raw/receipt-card-14.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

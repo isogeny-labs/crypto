@@ -9,8 +9,14 @@ verified relation rank, base-log recovery and target descent. Import no original
 scalar witness or generic-solver answer. One pilot is a prerequisite for the
 remaining 4,599 original instances, not a smaller replacement workload.
 
-Prerequisites: authorized source-only durable checkpoint, a configured custom
-Iso Lab route, an image actually built from the tested commit, and a qualified
+The source-only durable checkpoint passed on October 28; its encrypted S3 archive
+was downloaded and hash/content checked. This is not a process-state checkpoint.
+The authorized lab identity was denied `codebuild:StartBuild` on the launcher;
+the read-only preflight created no build or experiment. See the
+[current launch status](../../research/volcano_ic_recovery_20261027/LAUNCH_STATUS.md).
+
+Remaining prerequisites: an authorized custom Iso Lab route, a current source
+checkpoint, an image actually built from the tested commit, and a qualified
 recovery path. The implementation cannot serialize its hash table and is not
 CRIU-qualified. These gaps prevent marking this card ready; its null checkpoint
 fields are deliberate and must not be replaced by fictitious paths/flags.
@@ -39,3 +45,9 @@ Canonical `backlog validate` could not execute in the authoring runtime because
 Cargo/backlog were unavailable. The card is structurally inspected against
 `backlog/schema/card.v1.json`; canonical cross-field validation remains a gate,
 not a claimed pass.
+
+
+Canonical backlog verifier templates use `{out}`, the runner-chosen shard
+output directory. `outputs.verify` now addresses `{out}/records.private.jsonl`, the runner's existing private journal. The separate cairn checker retains its `{artifact}` interface.
+This template correction changes neither readiness nor the frozen protocol;
+no experiment, journal upload or checkpoint action is performed.

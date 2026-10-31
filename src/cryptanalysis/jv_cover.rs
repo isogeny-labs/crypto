@@ -3243,6 +3243,26 @@ pub struct CoverDlpReport {
     pub c_add_e: f64,
     pub c_add_j: f64,
     pub stop_staircase: Option<usize>,
+    /// The stop mode as a label: `full`, `staircase:K`, `hilbert:C`.
+    pub stop_mode: String,
+    /// Tests where the Hilbert rule ran / fell back to the plain run, and the
+    /// regularity-check multiplications (inside `f4_muls`).
+    pub hilbert_applied: u64,
+    pub hilbert_fallbacks: u64,
+    pub hilbert_check_muls: u64,
+    /// Sum of the per-test F4 multiplications; equals `f4_muls` when one
+    /// thread runs the batch (a consistency check on the global counter).
+    pub f4_muls_per_test_sum: u64,
+    /// Native F4-driver operations no multiplication counter prices (leading-monomial
+    /// divisibility tests, monomial-table probes of symbolic preprocessing); a lower bound.
+    pub f4_native_ops: u64,
+    /// The share of `f4_native_ops` spent on staircase / Hilbert-function checks.
+    pub f4_stair_ops: u64,
+    /// FNV-1a of every relation found, in residual order: (a, b, terms).
+    /// Equal digests mean equal relations.
+    pub relation_digest: u64,
+    /// Total steps of the rho runs (the table inserts and lookups rho leaves unpriced).
+    pub rho_steps_mean: f64,
     pub stopped: u64,
     pub trace: bool,
     pub replayed: u64,
@@ -3319,6 +3339,31 @@ pub fn run_cover_dlp(
     stop: Option<usize>,
     trace: bool,
 ) -> CoverDlpReport {
+    run_cover_dlp_mode(
+        p,
+        seed,
+        rho_runs,
+        check_every,
+        rho_s_ref,
+        stop.map_or(StopMode::Full, StopMode::Staircase),
+        trace,
+    )
+}
+
+/// [`run_cover_dlp`] with any [`StopMode`] for the F4 of every Nagao test.
+pub fn run_cover_dlp_mode(
+    p: u64,
+    seed: u64,
+    rho_runs: usize,
+    check_every: u64,
+    rho_s_ref: f64,
+    mode: StopMode,
+    trace: bool,
+) -> CoverDlpReport {
+    let stop = match mode {
+        StopMode::Staircase(k) => Some(k),
+        _ => None,
+    };
     let start = Instant::now();
     let spec = generate_spec(p, seed);
     let ctx = Ctx::with_trace(&spec, trace);
@@ -3354,6 +3399,12 @@ pub fn run_cover_dlp(
         base: small,
         c_add_e: c_e,
         c_add_j: c_j,
+        stop_mode: match mode {
+            StopMode::Full => "full".into(),
+            StopMode::Staircase(k) => format!("staircase:{k}"),
+            StopMode::Hilbert(c) => format!("hilbert:{c}"),
+        },
+        relation_digest: 0xcbf2_9ce4_8422_2325,
         stop_staircase: stop,
         trace,
         expected_rate: 1.0 / 720.0,
@@ -3382,13 +3433,15 @@ pub fn run_cover_dlp(
         rep.stream_muls += ctx.f.muls();
         ctx.f.reset_muls();
         let f4_before = f4_fp::field_ops_total();
+        let native_before = f4_fp::native_ops_total();
+        let stair_before = f4_fp::native_stair_ops_total();
         let found: Vec<(u64, u64, Div<E2>, Vec<Dec6>, NagaoCost, u64, bool, bool)> = batch
             .par_iter()
             .map_init(
                 || Ctx::with_trace(&spec, trace),
                 |c, (a, b, r, idx)| {
                     // the deadline is absolute: one budget per test, not per run
-                    let opts = opts_for(24, 600.0, stop);
+                    let opts = opts_for_mode(24, 600.0, mode);
                     let mut lrng =
                         StdRng::seed_from_u64(seed ^ idx.wrapping_mul(0x9E37_79B9_7F4A_7C15));
                     let (decs, cost) = nagao_decompose(c, &base, &by_x, r, &opts, &mut lrng);
@@ -3413,6 +3466,8 @@ pub fn run_cover_dlp(
             .collect();
         // the F4 work is counted once, globally, by the batch's difference
         rep.f4_muls += f4_fp::field_ops_total() - f4_before;
+        rep.f4_native_ops += f4_fp::native_ops_total() - native_before;
+        rep.f4_stair_ops += f4_fp::native_stair_ops_total() - stair_before;
         for (a, b, _r, decs, cost, vm, checked, was_checked) in found {
             rep.residuals += 1;
             rep.weil_muls += cost.weil_muls;
@@ -3421,6 +3476,10 @@ pub fn run_cover_dlp(
             rep.lin_ms += cost.lin_ms;
             rep.post_muls += cost.post_muls;
             rep.verify_muls += vm;
+            rep.f4_muls_per_test_sum += cost.f4_muls;
+            rep.hilbert_check_muls += cost.hilbert_check_muls;
+            rep.hilbert_applied += cost.hilbert_applied as u64;
+            rep.hilbert_fallbacks += cost.hilbert_fallback as u64;
             if cost.incomplete {
                 rep.incomplete += 1;
             }
@@ -3446,6 +3505,13 @@ pub fn run_cover_dlp(
             for d in decs {
                 any = true;
                 rep.decompositions += 1;
+                for w in std::iter::once(a)
+                    .chain(std::iter::once(b))
+                    .chain(d.terms.iter().flat_map(|&(i, e)| [i as u64, e as u64]))
+                {
+                    rep.relation_digest =
+                        (rep.relation_digest ^ w).wrapping_mul(0x0000_0100_0000_01b3);
+                }
                 if lp_log {
                     eprintln!(
                         "LPLOG {{\"p\":{},\"seed\":{},\"residual\":{},\"base\":{},\"idx\":{:?},\"x\":{:?}}}",
@@ -3546,6 +3612,11 @@ pub fn run_cover_dlp(
     } else {
         (ss.iter().map(|s| (s - rep.rho_s_mean).powi(2)).sum::<f64>() / (ss.len() - 1) as f64)
             .sqrt()
+    };
+    rep.rho_steps_mean = if rep.rho.is_empty() {
+        0.0
+    } else {
+        rep.rho.iter().map(|r| r.steps as f64).sum::<f64>() / rep.rho.len() as f64
     };
     let rho_muls = rep.rho_s_mean * sqrt_l * c_e;
     rep.s_over_rho = rep.total_muls as f64 / rho_muls;
@@ -4306,7 +4377,12 @@ mod tests {
         let full = jv_options(24, 120.0);
         let hil = jv_options(24, 120.0).stopping_by_hilbert(1);
         let (mut applied, mut fallbacks, mut n) = (0, 0, 0);
-        for k in 0..40 {
+        // Some residuals are degenerate or exhaust a solver budget. Keep
+        // sampling until the comparison includes 30 completed residuals.
+        for k in 0..80 {
+            if n >= 30 {
+                break;
+            }
             let r = if k % 2 == 0 {
                 planted(&jac, &base, &mut rng).0
             } else {

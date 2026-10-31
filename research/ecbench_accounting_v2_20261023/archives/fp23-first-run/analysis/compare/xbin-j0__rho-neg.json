@@ -1,0 +1,159 @@
+{
+  "schema": "ecbench.comparison/v1",
+  "comparison_id": "ECC1hfa89a5aafd3f",
+  "resample_seed": 20261002,
+  "a": {
+    "session_id": "ECBS1h26edfacea04b",
+    "arm": "rho-neg",
+    "method_id": "ECM1hefea4e0ebe79",
+    "method": "rho.negation",
+    "measured": 24,
+    "verified": 24,
+    "statuses": {
+      "verified": 24
+    },
+    "mean_s": 1.2693376213241148,
+    "mean_ratio_to_floor": 2.4808062009273604,
+    "lower_bound": true,
+    "deterministic": true
+  },
+  "b": {
+    "session_id": "ECBS1h1c109f746e68",
+    "arm": "rho-neg",
+    "method_id": "ECM1hefea4e0ebe79",
+    "method": "rho.negation",
+    "measured": 24,
+    "verified": 24,
+    "statuses": {
+      "verified": 24
+    },
+    "mean_s": 1.2693376213241148,
+    "mean_ratio_to_floor": 1.432294127912704,
+    "lower_bound": true,
+    "deterministic": true
+  },
+  "workloads": [
+    {
+      "workload_id": "W1017eb37e8be",
+      "slug": "icv1-fp23-tm110-8df20cbc",
+      "r": 1048627,
+      "floor_s": 0.5116633539732443,
+      "pairs": 4,
+      "a_mean_s": 1.2389835417784107,
+      "b_mean_s": 1.2389835417784107,
+      "ratio_b_over_a": 1.0
+    },
+    {
+      "workload_id": "W14ee0ae3e0eb",
+      "slug": "icv1-fp23-tm110-8df20cbc",
+      "r": 1048627,
+      "floor_s": 0.5116633539732443,
+      "pairs": 4,
+      "a_mean_s": 0.8481239062341278,
+      "b_mean_s": 0.8481239062341278,
+      "ratio_b_over_a": 1.0
+    },
+    {
+      "workload_id": "W36d70e9060f4",
+      "slug": "icv1-fp23-tm110-8df20cbc",
+      "r": 1048627,
+      "floor_s": 0.5116633539732443,
+      "pairs": 4,
+      "a_mean_s": 1.176240926953376,
+      "b_mean_s": 1.176240926953376,
+      "ratio_b_over_a": 1.0
+    },
+    {
+      "workload_id": "W5e8ee9654264",
+      "slug": "icv1-fp23-tm110-8df20cbc",
+      "r": 1048627,
+      "floor_s": 0.5116633539732443,
+      "pairs": 4,
+      "a_mean_s": 0.9982667393757481,
+      "b_mean_s": 0.9982667393757481,
+      "ratio_b_over_a": 1.0
+    },
+    {
+      "workload_id": "W66a7ef93f986",
+      "slug": "icv1-fp23-tm110-8df20cbc",
+      "r": 1048627,
+      "floor_s": 0.5116633539732443,
+      "pairs": 4,
+      "a_mean_s": 1.8703158450373212,
+      "b_mean_s": 1.8703158450373212,
+      "ratio_b_over_a": 1.0
+    },
+    {
+      "workload_id": "W9c37aa13521d",
+      "slug": "icv1-fp23-tm110-8df20cbc",
+      "r": 1048627,
+      "floor_s": 0.5116633539732443,
+      "pairs": 4,
+      "a_mean_s": 1.4840947685657062,
+      "b_mean_s": 1.4840947685657062,
+      "ratio_b_over_a": 1.0
+    }
+  ],
+  "curves": [
+    {
+      "slug": "icv1-fp23-tm110-8df20cbc",
+      "log2_r": 20.000070167215192,
+      "workloads": 6,
+      "pairs": 24,
+      "ratio_b_over_a": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ],
+      "ci_method": "cluster"
+    }
+  ],
+  "ops": {
+    "status": "ok",
+    "unit": "ecbench.gae",
+    "ratio_b_over_a": 1.0,
+    "ci95": [
+      1.0,
+      1.0
+    ],
+    "ci_method": "cluster",
+    "pairs": 24,
+    "unpaired_runs": 0,
+    "same_seeds": true,
+    "same_session": false,
+    "pooled_curves": 1,
+    "bounded": true,
+    "resamples": 4000
+  },
+  "wall": {
+    "status": "refused",
+    "reasons": [
+      "the arms ran in different sessions, so no pair shares a host window"
+    ],
+    "required_level": "L0",
+    "pairs": 0,
+    "pairs_below_level": 0,
+    "median_ratio": null,
+    "ci95": null,
+    "aa_arms": null,
+    "aa_pairs": 0,
+    "aa_median_ratio": null,
+    "aa_ci95": null,
+    "outside_noise": null
+  },
+  "quality": {
+    "score": null,
+    "rubric": "average paired isolation points (L0=0, L1=40, L2=75, L3=90); +10 only for an L2-or-higher A/A 95% interval containing 1 within [0.9,1.1]",
+    "paired_attempts": 0,
+    "verified_pairs": 0,
+    "admitted_pairs": 0,
+    "levels": {},
+    "p95_foreign_busy_percent": null,
+    "p95_run_queue_percent": null,
+    "contention_observed_runs": 0,
+    "notes": [
+      "different sessions: no shared host window for a fidelity score"
+    ]
+  },
+  "verdict": "ops (ok): rho-neg / rho-neg = 1.0000 [1.000, 1.000] (cluster) over 24 pairs on 6 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); wall: refused (the arms ran in different sessions, so no pair shares a host window)"
+}

@@ -249,6 +249,115 @@ class ConsumerTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "expected JSON object"):
             c.load(path)
 
+    def add_phase(self, multiplexed=False):
+        self.metrics = {"schema": "crypto.ml-dataset.phase-metrics/v1", "phase": "solver",
+            "returned_ok": True, "returned_error": None,
+            "instructions_status": "measured_multiplexed_estimate" if multiplexed else "measured_unmultiplexed",
+            "retired_instructions_raw": 100, "retired_instructions_exact_in_scope": None if multiplexed else 100,
+            "hardware": {"instructions": 100, "instructions_scaled": 200 if multiplexed else 100,
+                         "instructions_time_enabled_ns": 20 if multiplexed else 10,
+                         "instructions_time_running_ns": 10, "multiplexed": multiplexed,
+                         "inherit": True, "grouped": True, "error": None},
+            "clock_valid_for_comparison": False, "counter_scope": "calling thread user space",
+            "excludes": ["startup", "upload", "preexisting threads"], "interrupted_phase_readback": False}
+        self.add("telemetry/solver-start.json", {"schema": "crypto.ml-dataset.phase-start/v1",
+            "phase": "solver", "pid": 123, "usage_before": None}, "phase-start")
+        self.save_phase()
+
+    def save_phase(self):
+        self.add("telemetry/solver.json", self.metrics, "hardware-and-resource-telemetry")
+        self.seal()
+
+    def test_instruction_labels_preserve_scope_and_stay_out_of_features(self):
+        self.add_public()
+        self.add_phase()
+        _, rows = c.audit(self.root)
+        path = self.root / "telemetry-view.jsonl"
+        c.export_rows(rows, path)
+        record = json.loads(path.read_text())
+        phase = record["labels"]["phase_measurements"][0]
+        self.assertEqual(phase["producer_reported"]["retired_instructions_exact_in_scope"], 100)
+        self.assertEqual(phase["producer_reported"]["excludes"], self.metrics["excludes"])
+        self.assertFalse(phase["independently_verified"])
+        self.assertIsNone(record["labels"]["whole_worker_instruction_count"])
+        self.assertNotIn("instructions", json.dumps(record["features"]))
+
+    def test_multiplexed_estimates_are_not_exact_counts(self):
+        self.add_phase(multiplexed=True)
+        _, rows = c.audit(self.root)
+        metrics = rows[0]["phase_measurements"][0]["producer_reported"]
+        self.assertEqual(metrics["retired_instructions_raw"], 100)
+        self.assertEqual(metrics["hardware"]["instructions_scaled"], 200)
+        self.assertIsNone(metrics["retired_instructions_exact_in_scope"])
+        self.metrics["retired_instructions_exact_in_scope"] = 200
+        self.save_phase()
+        self.reject("exact instruction label mismatch")
+
+    def test_unavailable_pmu_and_interrupted_phase_remain_missing(self):
+        self.add_phase()
+        self.metrics.update(instructions_status="unavailable", retired_instructions_raw=None,
+                            retired_instructions_exact_in_scope=None)
+        self.metrics["hardware"] = {"instructions": None, "error": "Permission denied"}
+        self.save_phase()
+        _, rows = c.audit(self.root)
+        metrics = rows[0]["phase_measurements"][0]["producer_reported"]
+        self.assertIsNone(metrics["retired_instructions_raw"])
+        self.assertEqual(metrics["hardware"]["error"], "Permission denied")
+        del self.members["telemetry/solver.json"]
+        self.seal()
+        _, rows = c.audit(self.root)
+        phase = rows[0]["phase_measurements"][0]
+        self.assertEqual(phase["measurement_state"], "interrupted_or_unfinished")
+        self.assertIsNone(phase["producer_reported"])
+
+    def test_hardware_labels_reject_inconsistent_scope_and_values(self):
+        self.add_phase()
+        original = copy.deepcopy(self.metrics)
+        changes = [
+            (lambda m: m["hardware"].update(instructions_scaled=101), "scaling"),
+            (lambda m: m["hardware"].update(instructions_time_running_ns=11), "running/enabled"),
+            (lambda m: m["hardware"].update(instructions_time_enabled_ns=20, instructions_scaled=200), "multiplexing"),
+            (lambda m: m.update(retired_instructions_exact_in_scope=True), "label type"),
+            (lambda m: m.update(clock_valid_for_comparison=True), "comparative clock"),
+            (lambda m: m.update(excludes=[]), "scope/exclusions"),
+            (lambda m: m.update(returned_ok=False), "phase error/status"),
+        ]
+        for change, message in changes:
+            with self.subTest(message=message):
+                self.metrics = copy.deepcopy(original)
+                change(self.metrics)
+                self.save_phase()
+                self.reject(message)
+
+    def test_phase_readback_requires_start_artifact(self):
+        self.add_phase()
+        del self.members["telemetry/solver-start.json"]
+        self.seal()
+        self.reject("lack durable start")
+
+    def test_cycles_and_missing_or_zero_running_counters_are_consistent(self):
+        self.add_phase()
+        original = copy.deepcopy(self.metrics)
+        for updates, message in [
+            ({"cycles": 100, "cycles_scaled": 999, "cycles_time_enabled_ns": 10, "cycles_time_running_ns": 10}, "cycles scaling"),
+            ({"cycles": 100, "cycles_scaled": 100, "cycles_time_enabled_ns": 10, "cycles_time_running_ns": 11}, "running/enabled"),
+            ({"instructions": None, "instructions_scaled": 123}, "instructions scaling"),
+        ]:
+            with self.subTest(message=message):
+                self.metrics = copy.deepcopy(original)
+                self.metrics["hardware"].update(updates)
+                self.save_phase()
+                self.reject(message)
+        for enabled, scaled in [(0, 100), (10, None)]:
+            self.metrics = copy.deepcopy(original)
+            self.metrics.update(instructions_status="unavailable", retired_instructions_raw=None,
+                                retired_instructions_exact_in_scope=None)
+            self.metrics["hardware"].update(instructions_time_enabled_ns=enabled, instructions_time_running_ns=0,
+                                            instructions_scaled=scaled, multiplexed=enabled > 0)
+            self.save_phase()
+            _, rows = c.audit(self.root)
+            self.assertIsNone(rows[0]["phase_measurements"][0]["producer_reported"]["retired_instructions_raw"])
+
     def test_mutation_during_native_replay_rejected(self):
         verifier = self.root / "verifier"
         verifier.write_bytes(b"before")

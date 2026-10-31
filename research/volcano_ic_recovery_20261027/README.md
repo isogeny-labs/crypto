@@ -27,7 +27,7 @@ and checks kP=Q. The [protocol](PROTOCOL.md) defines exact acceptance and limits
 | Native arithmetic on actual public field/points | 129 differential scalar/batch checks passed |
 | Corruption and input rejection | Seven negative controls passed |
 | Large-table resources | Static payload calculation: 9,566,497,092 bytes; not an allocation/RSS measurement |
-| Original source-case recovery | Not attempted; durable checkpoint/custom EKS route unavailable |
+| Original source-case recovery | Not attempted; source checkpoint verified, AWS launch permission denied; custom image/recovery still required |
 | New performance or regularity result | None; existing polynomial certificates remain unchanged |
 
 Receipts are in [validation/](validation/). They are development-test receipts,
@@ -64,22 +64,19 @@ points or a proved chance of success.
 
 ## Execution gates and next action
 
-Automatic approval review rejected `scripts/checkpoint.sh gate` before execution
-because it can upload worktree patches and private research data to S3 without
-specific authorization for that payload/destination. No upload or production
-experiment was started. A safe checkpoint needs a reviewed, source-only payload;
-all original private journals live outside this checkout and must stay excluded.
-Do not route around the rejection with another tool or destination.
+The source-only checkpoint gate passed on October 28 using the authorized AWS
+credentials. Its AES256-encrypted S3 archive was read back and its hash/content
+verified. It contains the source handoff and metadata, not private scalar/RNG
+journals, credential values or a live-process checkpoint. This resolves the
+earlier missing-upload-access blocker; see [current launch status](LAUNCH_STATUS.md)
+and [access evidence](validation/access_20261028.json).
 
-After a clean public-source payload audit, a retry of the same checkpoint gate
-was permitted and actually stopped because no AWS profile or checkpoint upload
-token is configured. The earlier payload rejection is resolved for that audited
-state; see [current launch status](LAUNCH_STATUS.md). Nothing was uploaded.
-
-The current runtime also has no observed ready AWS identity or installed EKS MCP
-connection. The existing commit-building GitHub workflow executes ecbench specs,
-not this standalone collector. A real launch needs a tested-commit custom image,
-verified custom-command route, durable checkpoint and retained Job/Pod receipts.
+The same identity was definitively denied `codebuild:StartBuild` on the lab
+launcher and `eks:DescribeCluster`. A bounded read-only bridge preflight created
+no build or experiment. The existing commit-building GitHub workflow executes
+ecbench specs, not this standalone collector. A real launch still needs an
+authorized custom-command route, tested-commit immutable image, qualified
+CRIU/EBS recovery, a current source checkpoint and retained Job/Pod receipts.
 The blocked [backlog card](../../backlog/XP-20261027-volcano-unknown-log-pilot/README.md)
 keeps those prerequisites explicit. Its status is not ready or running.
 
@@ -107,5 +104,6 @@ research performance KPI. No hardware timing is promoted.
 
 Conductor was attempted and unavailable. `cargo test --release --lib` could not
 run because Cargo is absent. The relevant native checks passed; no whole-library
-test pass, cloud job, restore support, full-width recovery or successful S3 upload
-is claimed. The original IC obstruction remains open.
+test pass, cloud job, restore support or full-width recovery is claimed. Source
+checkpoint and approved heatmap storage now have verified S3 readbacks; these
+are preservation results, not ECDLP recoveries. The original IC gap remains open.

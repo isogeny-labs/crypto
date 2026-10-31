@@ -1,0 +1,88 @@
+{
+  "schema": "prime-one-shot-continuation-sources/v1",
+  "date": "2026-10-30",
+  "parent_register": "../SOURCES.json (historical frozen counts; not current continuation totals)",
+  "base_commit": "52888c47e595ca887544d27d1058cd86d5fb3cb2",
+  "sources": [
+    {
+      "title": "PKM2016",
+      "url": "https://people.maths.ox.ac.uk/petit/files/16PKC_primeECDLP.pdf",
+      "sha256": "a53030a6cde720c354aebfb65b1eb01e07766ce2d26e543d77f2516c0a49ef5b",
+      "scope": "Sections3.1-3.5,4.2,5; sections3.4-3.5 reread in continuation; auxiliary factor base predates this work."
+    },
+    {
+      "title": "Conrad arithmetic moduli",
+      "url": "https://math.stanford.edu/~conrad/papers/kmpaper.pdf",
+      "sha256": "f53e4ff819d534926e6ee59874cbce4e7bad4a315cbd6d05984b8405b11f15d8",
+      "scope": "Theorems3.2.7,4.2.1,4.3.4; Remark4.2.2, fine moduli and good reduction."
+    },
+    {
+      "title": "MIT modular curves lecture21",
+      "url": "https://math.mit.edu/classes/18.786/2024/LectureNotes21.pdf",
+      "sha256": "436ebe7cf78abf8ec568b9ab0e664dab1f52fad2f49e612967c68c2c62d000e4",
+      "scope": "Official notes; genus/index/cusps, primary modular-curve facts from Conrad."
+    },
+    {
+      "title": "MIT modular curves lecture22",
+      "url": "https://math.mit.edu/classes/18.786/2024/LectureNotes22.pdf",
+      "sha256": "272106e4f6fe05ca023696b2494c6041ec1d8b3f7f8f73c55d87bbb93f52f9c0",
+      "scope": "Official notes; good reduction."
+    },
+    {
+      "title": "Rouse Sutherland Zureick-Brown2022",
+      "url": "https://arxiv.org/pdf/2106.11141",
+      "sha256": "7b1ada8521a3a2d4be3b9ab88bc0badd9f8e5561d114722364f0ae2b8453927a",
+      "scope": "Section2.3; coarse-moduli twist caveat checked rather than assumed absent."
+    },
+    {
+      "title": "Schoof1985",
+      "url": "https://www.mat.uniroma2.it/~schoof/ctpts.pdf",
+      "sha256": "29f3cdc7297a08f094cdbe52f7a7692467475b76c965df30cab0f7afcea11895",
+      "scope": "Original scan visually read p483 and490: unconditional O((log q)^9) bit-operation point counting."
+    },
+    {
+      "title": "msolve official source README",
+      "url": "https://github.com/algebraic-solving/msolve",
+      "sha256": "4fd7b11055cbd583ba8cc48e91e53f1c1cc7e2193065498a9b0ebef02a97cb89",
+      "scope": "Collected expanded monomials required; v0.11.0 inspected, not built or benchmarked."
+    },
+    {
+      "title": "Bochum ECDLP preprint v0.2",
+      "url": "https://raw.githubusercontent.com/bochum-crypto/subexponential-ecdl/1ee44e562b1b9a50ea339f3b8f81112b5a24b96f/subexponential-ecdl.pdf",
+      "sha256": "82e273629b437660607117d5e99f400141ed7aa78b25c6749b03651f42deaa11",
+      "scope": "Theorems2-4, Fourier/modular/point encodings, sections3.2-3.5 coverage/recovery/complete cost. Existing claimed algorithm; not session novelty."
+    },
+    {
+      "title": "The Exponential Time Hypothesis is False, October25 manuscript",
+      "url": "https://raw.githubusercontent.com/openai/math/7ef5c0cc5ca4b0e072b7a050fca09ab24bc6fa3a/preprints/The-Exponential-Time-Hypothesis-is-False-October-25-2026/paper.pdf",
+      "sha256": "5b1612dc2eebb2cad5b4cbe62d1fed2982f01ab1908c26f70010a651487e8123",
+      "scope": "D.1 and fullD.4 independently read for cost/precision; no concrete scoped gap found, not global institutional/formal certification."
+    }
+  ],
+  "independent_primary_readers": "Primary modular and Schoof literature checked by modular_curve_sources; proof/source scopes recorded in reviews/. Not external peer review or a formal certificate.",
+  "backend": "Native Debian msolve0.7.5-1, package hashes in canonical/backend/packages.json; no fastest-backend claim.",
+  "scientific_solver_experiments": 0,
+  "local_native_development_only": true,
+  "full_library_check": "Official unprivileged Rust1.78 installed later; existing tensor crate release suite34/0/0 passes. Root library suite not run; no Rust library source changed by this study.",
+  "cloud_execution": "EKS readiness run40979213857 terminal cancelled,0steps; no scientific execution",
+  "prior_art_correction": "Initial focused audit omitted these recent preprints. Existing claimed subexponential tensor route identified and scoped proof reviews recorded; no original algorithm achieved.",
+  "native_existing_tensor_crate_validation": {
+    "source_revision": "6b6f42a2de5f1ddbbc2cb4bbf0a3fe072248d248",
+    "tree": "712d83360e07bf9fe321c11d3367653949bd9af7",
+    "source_files_blob_checked": 24,
+    "library_tests_passed": 34,
+    "failed": 0,
+    "test_exit": 0,
+    "toolchain": "official Rust1.78.0 minimal",
+    "scope": "existing fixed release tests, not scientific timing or asymptotic certification"
+  },
+  "native_hermite_unit": {
+    "cases": 72,
+    "cauchy_charts": 308,
+    "node_errors_checked": 8832,
+    "final_errors_checked": 1152,
+    "negative_controls": 4,
+    "complete_contraction": false,
+    "scope": "fixed exact scalar-coordinate lemma unit, final tables replayed by hash"
+  }
+}

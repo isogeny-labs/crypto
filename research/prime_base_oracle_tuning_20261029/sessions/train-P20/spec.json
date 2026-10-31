@@ -1,0 +1,370 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "XP-20261016-prime-base-oracle-tuning Stage T (train), 20-bit fresh prime-order curve",
+  "description": "Train panel of the frozen PROTOCOL.md (section 4): every exact native prime decomposition oracle crossed with a five-point factor-base size grid around the frontier incumbent, low-x base, target-pinned linear algebra, the incumbent trial cap. Selection only; no claim. Public synthetic curve and targets.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 20,
+        "seed": 20261018101
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261018111,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "mitm2-n16",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=16",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "mitm2-n23",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=23",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "mitm2-n32",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "mitm2-n45",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=45",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "mitm2-n64",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=64",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "batch2-n16",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=16",
+          "oracle": "mitm-prime-batch:m=2",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "batch2-n23",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=23",
+          "oracle": "mitm-prime-batch:m=2",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "batch2-n32",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "oracle": "mitm-prime-batch:m=2",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "batch2-n45",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=45",
+          "oracle": "mitm-prime-batch:m=2",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "batch2-n64",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=64",
+          "oracle": "mitm-prime-batch:m=2",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "mitm3-n16",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=16",
+          "oracle": "mitm:m=3,negation_folded=1",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "mitm3-n23",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=23",
+          "oracle": "mitm:m=3,negation_folded=1",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "mitm3-n32",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "oracle": "mitm:m=3,negation_folded=1",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "mitm3-n45",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=45",
+          "oracle": "mitm:m=3,negation_folded=1",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "mitm3-n64",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=64",
+          "oracle": "mitm:m=3,negation_folded=1",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "rfmitm3-n16",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=16",
+          "oracle": "rootfind-mitm:m=3",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "rfmitm3-n23",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=23",
+          "oracle": "rootfind-mitm:m=3",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "rfmitm3-n32",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "oracle": "rootfind-mitm:m=3",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "rfmitm3-n45",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=45",
+          "oracle": "rootfind-mitm:m=3",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "rfmitm3-n64",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=64",
+          "oracle": "rootfind-mitm:m=3",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "rfsub3-n16",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=16",
+          "oracle": "rootfind-subtract:m=3",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "rfsub3-n23",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=23",
+          "oracle": "rootfind-subtract:m=3",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "rfsub3-n32",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "oracle": "rootfind-subtract:m=3",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "rfsub3-n45",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=45",
+          "oracle": "rootfind-subtract:m=3",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "rfsub3-n64",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=64",
+          "oracle": "rootfind-subtract:m=3",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "rfsub2-n32",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "oracle": "rootfind-subtract:m=2",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "sub2-n32",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "oracle": "subtract",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "rfpairs3-n32",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "oracle": "rootfind-pairs:m=3",
+          "max_trials": "1410236"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 20261018121,
+    "isolation_required": "L0",
+    "timeout_seconds": 1800
+  }
+}

@@ -137,21 +137,30 @@ baselines ─► per trial:  ask (TPE) ─► rung 1 ─► rung 2 ─► … �
 
 ## Tracks
 
-Owner decision, 2026-10-24: an index-calculus pipeline counts only when its
+Owner rulings: on 2026-10-24, an index-calculus pipeline counts only when its
 relations come from solving summation-polynomial systems over an
-algebraically defined factor base, without table collisions.
+algebraically defined factor base, without table collisions. On 2026-10-29
+this was refined by `AGENTS.md`, "Tracks of index calculus"
+(`research/prime_ic_program_20261029/DECISIONS.md` R1). There are now two
+counted tracks, algebraic and generic decomposition, each with its own
+baseline. They may be ranked against each other on the same instances in the
+same unit, and a gain in one never ratchets the other.
 
-| track | spaces | counted? |
+| track (2026-10-29) | spaces | counted? |
 |:--|:--|:--|
-| `algebraic` | `koblitz-algebraic`, `char2-algebraic` (inherited F4, baseline inherited F4), `koblitz-algebraic-elim`, `char2-algebraic-elim` (`f4-f2`, `matrix-f4`, `matrix-f5`, baseline `f4-f2`) | yes, within a scope |
-| `table` | `koblitz-table`, `prime-table` | no: reference only, never ranked against the algebraic track |
-| `unclassified` | `prime-rootfind` (`rootfind-subtract`) | no: searched and reported on its own, never ranked against either other track |
+| `algebraic` | `koblitz-algebraic`, `char2-algebraic` (inherited F4, baseline inherited F4), `koblitz-algebraic-elim`, `char2-algebraic-elim` (`f4-f2`, `matrix-f4`, `matrix-f5`, baseline `f4-f2`) | yes, within a scope; the headline track |
+| `generic` | `koblitz-table`, `prime-table`, `prime-rootfind` (`rootfind-subtract`) | yes, as generic decomposition (bounded by √r; cannot beat rho), never as algebraic progress |
 
-The `rootfind-*` oracles are `unclassified` because whether solving the
-univariate Semaev polynomial per base point counts as "solving a
-summation-polynomial system" or as a root table is not decided by the
-criterion as recorded. They are included at the owner's request, and stay
-uncounted until the owner rules.
+The `rootfind-*` oracles are generic. At m = 2, `rootfind-subtract` computes
+x(R ∓ F_i) for every base point and probes the base's hash index. It never
+forms S₃, and it runs identically on a random base
+(`research/prime_ic_program_20261029/ruling/README.md`).
+
+**Code not yet relabelled.** `src/bin/ic/sweep/space.rs` still tags these
+spaces `Track::Table` and `Track::Unclassified` and keeps them unranked
+against the algebraic track. Until a build session adds `Track::Generic` and
+retires `Track::Unclassified`, read the sweeper's `table` and `unclassified`
+output as the generic track.
 
 ## Scale-relative knobs
 

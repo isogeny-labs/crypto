@@ -1,0 +1,44 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "DenyNonSpotInstanceLaunch",
+            "Effect": "Deny",
+            "Action": "ec2:RunInstances",
+            "Resource": "arn:aws:ec2:*:*:instance/*",
+            "Condition": {
+                "StringNotEquals": {
+                    "ec2:InstanceMarketType": "spot"
+                },
+                "ForAllValues:StringNotEquals": {
+                    "aws:CalledVia": "autoscaling.amazonaws.com"
+                }
+            }
+        },
+        {
+            "Sid": "DenyNonSpotOutsideRecoveryTemplate",
+            "Effect": "Deny",
+            "Action": "ec2:RunInstances",
+            "Resource": "arn:aws:ec2:*:*:instance/*",
+            "Condition": {
+                "StringNotEquals": {
+                    "ec2:InstanceMarketType": "spot"
+                },
+                "ArnNotEquals": {
+                    "ec2:LaunchTemplate": "arn:aws:ec2:us-east-2:104186811093:launch-template/lt-0a663a3e15a051473"
+                }
+            }
+        },
+        {
+            "Sid": "DenyStartingNonSpotInstances",
+            "Effect": "Deny",
+            "Action": "ec2:StartInstances",
+            "Resource": "arn:aws:ec2:*:*:instance/*",
+            "Condition": {
+                "StringNotEquals": {
+                    "ec2:InstanceMarketType": "spot"
+                }
+            }
+        }
+    ]
+}

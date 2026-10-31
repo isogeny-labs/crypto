@@ -1,0 +1,101 @@
+K<a> := GF(8);
+print "field", DefiningPolynomial(K);
+P<x,y,z> := PolynomialRing(K, 3);
+F := (1)*x^4 +
+     (a^2)*x^3*y +
+     (a^2)*x^3*z +
+     (a+a^2)*x^2*y^2 +
+     (1+a+a^2)*x^2*y*z +
+     (a)*x*y^3 +
+     (1+a^2)*x*y*z^2 +
+     (1+a+a^2)*x*z^3 +
+     (1+a)*y^4 +
+     (1+a^2)*y^3*z +
+     (a+a^2)*y^2*z^2 +
+     (a^2)*y*z^3 +
+     (1+a+a^2)*z^4;
+C := Curve(ProjectiveSpace(P), F);
+print "rational_points", #RationalPoints(C);
+print "smooth", IsNonsingular(C);
+CK := BaseChange(C, 3);
+L := BaseField(CK);
+w := L.1;
+assert DefiningPolynomial(L) eq Polynomial([L|1,0,0,0,1,0,0,0,0,1]);
+T := Matrix(L,3,3,[1, 0, 0, w^132, w^68, w^179, 1, 0, 1]);
+P3<t0,t1,t2,t3> := PolynomialRing(L,4);
+Q1 := t1^2 + t0*t2;
+Q2 := 1*t3^2 + (w^161*t0 + w^297*t1 + w^83*t2)*t3
+    + w^458*t0^2 + w^234*t0*t1 + w^366*t1^2
+    + w^498*t1*t2 + w^310*t2^2;
+D := Curve(ProjectiveSpace(P3),[Q1,Q2]);
+print "quotient_smooth", IsNonsingular(D);
+print "quotient_genus", Genus(D);
+print "quotient_points", #RationalPoints(D);
+P2 := CoordinateRing(AmbientSpace(CK));
+vx := P2.1; vy := P2.2; vz := P2.3;
+Xf := T[1,1]*vx+T[1,2]*vy+T[1,3]*vz;
+Yf := T[2,1]*vx+T[2,2]*vy+T[2,3]*vz;
+Zf := T[3,1]*vx+T[3,2]*vy+T[3,3]*vz;
+Uf := Xf^2+Xf*Yf;
+projection := map<CK->D|[Yf^2,Yf*Zf,Zf^2,Uf]>;
+print "projection_regular", IsRegular(projection);
+for p in RationalPoints(CK) do
+    xyz := Vector(L,Eltseq(p))*Transpose(T);
+    X := xyz[1]; Y := xyz[2]; Z := xyz[3];
+    U := X^2 + X*Y;
+    q := D![Y^2,Y*Z,Z^2,U];
+    assert projection(p) eq q;
+    print "source_point", p;
+    print "quotient_point", q;
+    E, psi := EllipticCurve(D,q);
+    print "elliptic_model", E;
+    print "elliptic_points", #E;
+    for n in [14, 84, 105, 222, 235, 408, 437, 454, 493] do
+        bn := &+[(Integers()!((n div 2^i) mod 2))*w^i : i in [0..8]];
+        Es := EllipticCurve([L|1,1,0,0,bn]);
+        print "source_b_order_isomorphic", n, #Es, IsIsomorphic(E,Es);
+    end for;
+    bn := &+[(Integers()!((105 div 2^i) mod 2))*w^i : i in [0..8]];
+    Es := EllipticCurve([L|1,1,0,0,bn]);
+    source_to_quotient := Isomorphism(Es,E,[w^424,w^228,w^167,w^209]);
+    print "source_105_isomorphism", source_to_quotient;
+    print "source_105_isomorphism_data", IsomorphismData(source_to_quotient);
+    cpoints := RationalPoints(CK);
+    images := [psi(projection(p4)) : p4 in cpoints];
+    for i in [1..#cpoints] do
+        ep0 := images[i];
+        j := Index(images,7*ep0);
+        if Order(ep0) eq 277 and j ne 0 then
+            print "paired_source_generator", ep0 @@ source_to_quotient;
+            print "paired_source_target", (7*ep0) @@ source_to_quotient;
+            print "paired_generator_fiber", [cpoints[t] : t in [1..#cpoints] | images[t] eq ep0];
+            print "paired_target_fiber", [cpoints[t] : t in [1..#cpoints] | images[t] eq 7*ep0];
+            print "paired_origin_fiber", [cpoints[t] : t in [1..#cpoints] | images[t] eq E!0];
+            break;
+        end if;
+    end for;
+    for g in RationalPoints(Es) do
+        if Order(g) eq 277 then
+            print "source_generator", g;
+            print "source_target_7G", 7*g;
+            print "quotient_generator", source_to_quotient(g);
+            print "quotient_target", source_to_quotient(7*g);
+            for p2 in RationalPoints(CK) do
+                ep := psi(projection(p2));
+                if Order(ep) eq 277 then
+                    print "fiber_target_elliptic", ep;
+                    print "fiber_target_projection", projection(p2);
+                    print "fiber_target_points", [p3 : p3 in RationalPoints(CK) |
+                        projection(p3) eq projection(p2)];
+                    print "fiber_origin_points", [p3 : p3 in RationalPoints(CK) |
+                        projection(p3) eq q];
+                    print "fiber_scalar_in_source_generator",
+                        Index([i*source_to_quotient(g) : i in [1..276]],ep);
+                    break;
+                end if;
+            end for;
+            break;
+        end if;
+    end for;
+    break;
+end for;

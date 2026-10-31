@@ -1,0 +1,7 @@
+CONDITION selftest_ok=true planted_ok=true evaluable_folds=7
+CONDITION macro_mae_d a=2.3821 b=0.3908 c1=0.4819
+CONDITION beat_a=true (diff a-c1 interval [1.6471, 2.1368])
+CONDITION beat_b=false (diff b-c1 interval [-0.1947, 0.0056])
+CONDITION null_excluded=false (real3 0.5687, null q025 0.4835)
+CONDITION cover_c1=0.7349 in_band=false
+VERDICT MATCHES (primitive)

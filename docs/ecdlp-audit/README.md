@@ -96,6 +96,14 @@ states, and every required gate must be referenced by at least one deliverable.
 An artifact digest establishes byte identity only; it is not scientific or
 semantic validation of the artifact's claims.
 
+When a current deliverable changes, review its source diff and update its
+`artifact_sha256` in the non-authoritative mock, then derive the full-record
+`plan_uid` again using the canonical codec. Keep historical `source_artifacts`
+revision/digest tuples, open scientific gates, and claim/status fields intact
+unless separately reviewed evidence authorizes a change. Refreshing a current
+artifact digest does not promote that artifact or close a scientific gate.
+
+
 Executable work defaults to passive public evidence and public
 synthetic/known-answer fixtures. No live-target execution, secret material, or
 production exploitation is authorized by these files.

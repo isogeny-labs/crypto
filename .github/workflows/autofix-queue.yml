@@ -104,6 +104,14 @@ jobs:
           sparse-checkout: .github/scripts
           persist-credentials: true # triage fetches PR refs for `git merge-tree`
 
+      - name: Install GitHub CLI when absent from the runner
+        run: |
+          if ! command -v gh >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends gh
+          fi
+          gh --version
+
       - name: Ensure labels exist
         env:
           GH_TOKEN: ${{ github.token }}
@@ -163,6 +171,14 @@ jobs:
       FAILING: ${{ toJSON(matrix.pr.failing) }}
       HAS_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
     steps:
+      - name: Install GitHub CLI when absent from the runner
+        run: |
+          if ! command -v gh >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends gh
+          fi
+          gh --version
+
       - name: Require ANTHROPIC_API_KEY
         if: env.HAS_KEY != 'true'
         run: |

@@ -84,6 +84,7 @@ check "--ttl over the ceiling is refused" bash -c "! '$CLI' run --ttl 3d --no-so
 check "--ttl under 15m is refused" bash -c "! '$CLI' run --ttl 5m --no-source -- true 2>/dev/null"
 check "a missing command is refused" bash -c "! '$CLI' run --no-source 2>/dev/null"
 check "--ref with --no-source is refused" bash -c "! '$CLI' run --ref HEAD --no-source -- true 2>/dev/null"
+check "--spot and --on-demand conflict" bash -c "! '$CLI' run --spot --on-demand --no-source -- true 2>/dev/null"
 check "an unpushed --ref is refused" bash -c "
     c=\$(git commit-tree -m unpushed HEAD^{tree} -p HEAD)
     ! '$CLI' run --ref \$c -- true 2>/dev/null"
@@ -124,6 +125,18 @@ out=$XDG_CACHE_HOME/ephemeral/runs/$id
 check "resumed run exits 0" test "$rc" -eq 0
 check "prior output was restored" test -s "$out/out/resumed.txt"
 check "resumed run still requested Spot" bash -c "grep 'ec2 run-instances' '$FAKE_AWS/calls.log' | tail -1 | grep -q -- '--instance-market-options MarketType=spot'"
+
+echo "== explicit On-Demand run"
+set +e
+"$CLI" run --toolchain none --ttl 30m --no-source --on-demand --name e2e-on-demand -- true
+rc=$?
+set -e
+id=$(last)
+out=$XDG_CACHE_HOME/ephemeral/runs/$id
+check "On-Demand run exits 0" test "$rc" -eq 0
+check "On-Demand job receipt records spot false" grep -q '"spot": false' "$out/job.json"
+check "On-Demand launch omitted Spot market options" bash -c "! grep 'ec2 run-instances' '$FAKE_AWS/calls.log' | tail -1 | grep -q -- '--instance-market-options'"
+check "On-Demand instance terminated" wait_state "$id" terminated 30
 
 echo "== failing command, argv form, capacity retry"
 rm -f "$FAKE_AWS/capacity-fails"
