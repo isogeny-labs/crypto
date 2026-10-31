@@ -1,6 +1,6 @@
 # r29 attempt-01 recovered partial output
 
-This directory reconstructs the original local path structure from all 75 immutable S3 content-addressed snapshots under `runs/n83-fb-variants-r29-20261031-r1/attempt-01/`. Each snapshot body was fetched by its exact S3 key and checked against the SHA-256 encoded in that key and the S3 object size. The mapping from snapshot path hash to local relative path is retained in `DATA_INDEX.json`.
+This directory reconstructs the original local path structure from all 75 immutable S3 content-addressed snapshots under `runs/n83-fb-variants-r29-20261031-r1/attempt-01/`. Each snapshot body was fetched by its exact S3 key and checked against the SHA-256 encoded in that key and the S3 object size. The mapping from snapshot path hash to local relative path is retained in `DATA_INDEX.json`. `S3_READBACK.json` records the exact mirrored S3 keys and the all-75-object readback check (338,530,495 bytes).
 
 The partial contains 33 compressed binary-family shard payloads (`part-0000` through `part-0032`) and 32 matching JSON receipts. Each captured payload and receipt matches its binary-family manifest entry. `part-0032.bin.zst` exists without a corresponding receipt. The recovered run support files include the copied protocol, generator binary, format documents, host record, and selfcheck artifacts.
 
