@@ -1,0 +1,18 @@
+status: completed
+
+card: CARD-BLINDSPOT-02-02 (sha256 f98dd5c6fffd12db89e1f68720163663c1d9e20382f59cb8495dd9542ae2bf85)
+commit: cf8fd63c43ba61685703a3b66f618068ba34c22e
+receipt: research/blindspots_20261018/02-deployed-binary-pricing/raw/receipt-card-02.json sha256 7e739fd0df0664dce32b86464c365263cb6bebd1680400f590c9eeab1cd38897
+command 1 (make-bin-dir): ["mkdir", "-p", "target/blindspots-02/card-02"] exit 0 (0.004 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (build): ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-o", "target/blindspots-02/card-02/b02", "examples/blindspots_02_deployed_binary_pricing.rs"] exit 0 (1.685 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 3 (scan): ["prlimit", "--as=4294967296", "target/blindspots-02/card-02/b02", "scan", "--out-dir", "research/blindspots_20261018/02-deployed-binary-pricing/raw"] exit 0 (28.996 s) succeeded
+  stdout sha256 de7c25292e8a9a41f362f24054b176517493c95aeb6f7d373afbedb6e24f6b3d; last 3 lines:
+    wrote research/blindspots_20261018/02-deployed-binary-pricing/raw/scan.tsv (30341 bytes)
+    wrote research/blindspots_20261018/02-deployed-binary-pricing/raw/scan.md (36947 bytes)
+    scan: 132 (family, model, m, w, K) rows have a grid n with gap <= 0
+  output research/blindspots_20261018/02-deployed-binary-pricing/raw/scan.tsv: 12407af106de05350c109851c9f0386c745c47741edbd782a2c4a1a6b2a4221e
+  output research/blindspots_20261018/02-deployed-binary-pricing/raw/scan.md: 8bf7e8b51307afbafe926bfd9028ac41afb7c62b9d0c517e17d7975acf159e56
+command 4 (remove-bin): ["rm", "-f", "target/blindspots-02/card-02/b02"] exit 0 (0.002 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:

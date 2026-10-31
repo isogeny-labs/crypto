@@ -164,9 +164,8 @@ __global__ void build_partial(Curve c, Bases b, unsigned first, unsigned end,
     points[id] = point;
 }
 #ifdef ER_RIGHT_FULL_CACHE
-#if defined(ER_QUERY_CACHED)
-#error "full and partial right caches are distinct experimental variants"
-#endif
+// With ER_QUERY_CACHED, the full cache takes precedence and the charged
+// partial tables serve as the exact fallback when full-cache admission fails.
 __global__ void build_right_cache(Curve c, Bases b, unsigned split, U count,
                                  CachedPoint *out) {
   U id = U(blockIdx.x) * BLOCK + threadIdx.x;
@@ -283,6 +282,31 @@ RF_HD U relation_lookup(const TableRow *rows, U size, Point key,
 #endif
   return indexed_lookup(rows, size, key, offsets, shift);
 }
+// One arithmetic path shared by packed, unpacked and persistent searches.
+// The optional affine formula applies only to complete cached right sums.
+__device__ __forceinline__ Jac query_residual(Curve c, Bases b, unsigned split,
+                                             Point target, U id,
+                                             RightPartials partials) {
+  Jac sum;
+#ifdef ER_RIGHT_FULL_CACHE
+  if (partials.full) {
+#ifdef ER_AFFINE_QUERY
+    return c.affine_sub(target, partials.full[id].point());
+#else
+    sum = c.jac(partials.full[id].point());
+#endif
+  } else
+#endif
+  if (partials.first) {
+    sum = c.mixed(sum, partials.first[id / partials.second_size]);
+    sum = c.mixed(sum, partials.second[id % partials.second_size]);
+  } else {
+    sum = tuple_sum(c, b, split, b.slots, id);
+  }
+  if (sum.y)
+    sum.y = c.f.p - sum.y;
+  return c.mixed(sum, target);
+}
 template <bool Packed>
 __global__ void search_right(Curve c, Bases b, unsigned split, Point target,
                              U start, U count, const DeviceRow *left, U left_size,
@@ -292,24 +316,8 @@ __global__ void search_right(Curve c, Bases b, unsigned split, Point target,
   U local = U(blockIdx.x) * BLOCK + threadIdx.x;
   // Form target - sum(right) in Jacobian coordinates, then normalize once.
   Jac sum;
-  if (local < count) {
-    U id = start + local;
-#ifdef ER_RIGHT_FULL_CACHE
-    if (partials.full) {
-      sum = c.jac(partials.full[id].point());
-    } else
-#endif
-    if (partials.first) {
-      sum = c.mixed(sum, partials.first[id / partials.second_size]);
-      sum = c.mixed(sum, partials.second[id % partials.second_size]);
-    } else {
-      sum = tuple_sum(c, b, split, b.slots, id);
-    }
-  }
-  if (sum.y)
-    sum.y = c.f.p - sum.y;
   if (local < count)
-    sum = c.mixed(sum, target);
+    sum = query_residual(c, b, split, target, start + local, partials);
   Point residual = normalize_block(c, sum);
   if (local < count) {
     U l = relation_lookup(left, left_size, residual, offsets, shift, partials);
@@ -343,22 +351,8 @@ __global__ void search_right_persistent(
     const bool active = threadIdx.x < count_here;
     U id = active ? start + threadIdx.x : 0;
     Jac sum;
-    if (active) {
-#ifdef ER_RIGHT_FULL_CACHE
-      if (partials.full) {
-        sum = c.jac(partials.full[id].point());
-      } else
-#endif
-      if (partials.first) {
-        sum = c.mixed(sum, partials.first[id / partials.second_size]);
-        sum = c.mixed(sum, partials.second[id % partials.second_size]);
-      } else {
-        sum = tuple_sum(c, b, split, b.slots, id);
-      }
-      if (sum.y)
-        sum.y = c.f.p - sum.y;
-      sum = c.mixed(sum, target);
-    }
+    if (active)
+      sum = query_residual(c, b, split, target, id, partials);
     Point residual = normalize_block(c, sum);
     if (active && id <= bound &&
         relation_lookup(left, left_size, residual, offsets, shift, partials) != UINT64_MAX)
@@ -385,22 +379,8 @@ __global__ void resolve_persistent_winner(
   if (id == UINT64_MAX)
     return; // Uniform; previous kernel completed on the same stream.
   Jac sum;
-  if (!threadIdx.x) {
-#ifdef ER_RIGHT_FULL_CACHE
-    if (partials.full) {
-      sum = c.jac(partials.full[id].point());
-    } else
-#endif
-    if (partials.first) {
-      sum = c.mixed(sum, partials.first[id / partials.second_size]);
-      sum = c.mixed(sum, partials.second[id % partials.second_size]);
-    } else {
-      sum = tuple_sum(c, b, split, b.slots, id);
-    }
-    if (sum.y)
-      sum.y = c.f.p - sum.y;
-    sum = c.mixed(sum, target);
-  }
+  if (!threadIdx.x)
+    sum = query_residual(c, b, split, target, id, partials);
   Point residual = normalize_block(c, sum);
   if (!threadIdx.x)
     result[1] = relation_lookup(left, left_size, residual, offsets, shift, partials);
@@ -500,6 +480,9 @@ class DeviceBackend {
   }
 
 public:
+  U cached_partial_rows() const {
+    return right_first.size() + right_second.size();
+  }
   DeviceBackend(Curve curve, U max_rows, U batch, U full_cache_limit = UINT64_MAX)
       : c(curve), cap(max_rows), chunk(batch) {
 #ifdef ER_RIGHT_FULL_CACHE
