@@ -1,7 +1,7 @@
 proc require56(int ok,string tag){if(!ok){ERROR(tag);quit;}}
 proc orderH56(poly f){int value=100000;intvec e;while(f!=0){e=leadexp(f);if(e[2]<value){value=e[2];}f=f-lead(f);}return(value);}
 execute(read("../infinity56-02/base-jets56.sing"));
-ring refine56=(2,a),(s,h),dp;minpoly=a^2+a+1;short=0;
+ring refinementWork56=(2,a),(s,h),dp;minpoly=a^2+a+1;short=0;
 map baseMap56=baseJets56,s,h;poly originalZero56=baseMap56(Gzero56);poly originalOne56=baseMap56(Gone56);
 proc gcdInt56(int x,int y){int r;while(y!=0){r=x%y;x=y;y=r;}if(x<0){x=-x;}return(x);}
 proc polygon56(poly F,string label,int precision){
@@ -62,9 +62,9 @@ proc refine56(poly original,int branch){
   require56(found==1 && deg(face)==8 && face==leadcoef(face)*(s+c)^8,"REFINE56_EXACT_REPEATED_FACE_AND_UNIQUE_ROOT");
   require56(subst(face,s,c+1)!=0,"REFINE56_CHANGED_RESIDUE_ROOT_REJECTED");
   expanded=subst(F,s,h^p*(s+c));minimum=orderH56(expanded);
-  poly quotient=expanded/h^minimum;require56(quotient*h^minimum==expanded,"REFINE56_EXACT_NEXT_SCALING");
+  poly nextQuotient56=expanded/h^minimum;require56(nextQuotient56*h^minimum==expanded,"REFINE56_EXACT_NEXT_SCALING");
   center=center+h^(scale+p)*c;scale=scale+p;divisor=divisor+minimum;precision=128-divisor;
-  require56(precision>=16,"REFINE56_RETAINED_PRECISION");F=reduce(quotient,std(ideal(h^precision)));
+  require56(precision>=16,"REFINE56_RETAINED_PRECISION");F=reduce(nextQuotient56,std(ideal(h^precision)));
  }
  write(out,"int resolved56="+string(resolved)+";int finalStep56="+string(step)+";");close(out);
  print("REFINEMENT56_RESULT branch="+string(branch)+" resolved="+string(resolved)+" steps="+string(step)+" remaining_precision="+string(precision));
