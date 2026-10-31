@@ -75,6 +75,15 @@ impl Acc {
     }
 }
 
+/// A JSON value as a cell: `null` is "n/a".
+fn na(v: &Value) -> String {
+    if v.is_null() {
+        "n/a".to_string()
+    } else {
+        v.to_string()
+    }
+}
+
 fn f3(x: f64) -> String {
     if x.is_nan() {
         "n/a".to_string()
@@ -348,8 +357,8 @@ pub fn cmd_summary(args: &[String]) {
         };
         // Expectation if the three members of a solution were independent draws from the
         // base: a solution is kept when at least one member is a representative.
-        let frac_rep = u(&settings[&(*n, *w)]["reps"]) as f64
-            / u(&settings[&(*n, *w)]["liftable_x"]) as f64;
+        let frac_rep =
+            u(&settings[&(*n, *w)]["reps"]) as f64 / u(&settings[&(*n, *w)]["liftable_x"]) as f64;
         let expect = 1.0 - (1.0 - frac_rep).powi(3);
         let kept = if r.sols_total == 0 {
             "n/a".to_string()
@@ -716,8 +725,8 @@ pub fn cmd_summary(args: &[String]) {
             u(&c["n"]),
             c["T_on_curve"],
             c["T_plus_T_is_O"],
-            c["points"],
-            c["points_expected"],
+            na(&c["points"]),
+            na(&c["points_expected"]),
             u(&c["T_translation_points"]),
             c["T_translation_exhaustive"],
             u(&c["T_translation_mismatch"]),

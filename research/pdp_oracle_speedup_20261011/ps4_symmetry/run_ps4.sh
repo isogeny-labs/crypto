@@ -6,7 +6,7 @@
 # pinning) and is a note, not a result.
 #
 # STAGES (space separated, default: all):
-#   build checks panel run torsion control summary figures pdf
+#   build checks panel run torsion control summary figures tables pdf benchmarks
 # A stage skips what its marker file in raw/done/ says is finished, so an interrupted run is
 # resumed without overwriting any record; a re-run of a finished stage needs its marker removed.
 set -euo pipefail
@@ -18,7 +18,7 @@ C=$S/baseline_v1/corpus
 BIN=target/release/examples/pdp_ps4
 OPC=target/opcount/release/examples/pdp_ps4
 PANEL=target/release/examples/hamming_nb_sat_panel
-STAGES=${STAGES:-"build checks panel run torsion control summary figures pdf"}
+STAGES=${STAGES:-"build checks panel run torsion control summary figures tables pdf benchmarks"}
 SEED=20261011
 BUSY="python3 tools/isolated_bench.py busy --wait --"
 mkdir -p "$OUT/done" "$OUT/panel_work"
@@ -157,6 +157,15 @@ if stage figures; then
   mkdir -p "$REPORT"
   /tmp/report-venv/bin/python "$D/plot_ps4.py" "$OUT/plot_data.json" "$REPORT"
 fi
+if stage tables; then
+  # table fragments of the report, cut from raw/summary.md
+  bash "$D/typst_tables.sh" "$OUT/summary.md" "$REPORT"
+fi
 if stage pdf; then
   /tmp/report-venv/bin/python -c "import typst; typst.compile('$REPORT/ps4_report.typ', output='$REPORT/ps4_report.pdf')"
+fi
+if stage benchmarks; then
+  # copies of the visual record for browsing (AGENTS.md "Performance results also land in benchmarks/");
+  # not an admitted row of benchmarks/README.md (validation gate), see the script.
+  bash "$D/copy_benchmarks.sh"
 fi

@@ -4,7 +4,8 @@
 Python here only lays out what the Rust binary recorded and derived; it computes nothing.
 
   plot_ps4.py raw/plot_data.json OUT_DIR
-writes OUT_DIR/ps4_candidate_factor.svg, ps4_decision.svg, ps4_leaf.svg, ps4_mechanism.svg
+writes OUT_DIR/ps4_candidate_factor.svg, ps4_decision.svg, ps4_leaf.svg, ps4_mechanism.svg and a 150 dpi PNG of each
+(rendered from the same plotting code; the benchmarks/ copy needs both)
 """
 import json
 import sys
@@ -76,6 +77,7 @@ def main():
                  fontsize=7.5, color=INK, loc="left")
     fig.tight_layout()
     fig.savefig(f"{out}/ps4_candidate_factor.svg")
+    fig.savefig(f"{out}/ps4_candidate_factor.png", dpi=150)
     plt.close(fig)
 
     # ---- Figure 2: what the reduction decides ----------------------------------
@@ -115,6 +117,7 @@ def main():
     ax.set_title("(c) cost of deciding: ratio 1 means no saving", fontsize=7.5, loc="left")
     fig.tight_layout()
     fig.savefig(f"{out}/ps4_decision.svg")
+    fig.savefig(f"{out}/ps4_decision.png", dpi=150)
     plt.close(fig)
 
     # ---- Figure 3: leaf cost per pair, weight base against the subspace control ---
@@ -145,6 +148,7 @@ def main():
     ax.set_title("(b) the same pairs priced in the bit-operation model (a convention, model.rs)", fontsize=7.5, loc="left")
     fig.tight_layout()
     fig.savefig(f"{out}/ps4_leaf.svg")
+    fig.savefig(f"{out}/ps4_leaf.png", dpi=150)
     plt.close(fig)
 
     # ---- Figure 4: the accounting, as a diagram ----------------------------------
@@ -176,6 +180,7 @@ def main():
     ax.set_title("What each reduction decides (mechanism; the measured values are in the other figures)", fontsize=8, loc="left", color=INK)
     fig.tight_layout()
     fig.savefig(f"{out}/ps4_mechanism.svg")
+    fig.savefig(f"{out}/ps4_mechanism.png", dpi=150)
     plt.close(fig)
 
 
