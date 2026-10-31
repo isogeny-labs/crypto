@@ -6,7 +6,7 @@
 
 #align(center)[
   #text(size: 14pt, weight: "bold")[PS-4 run report: candidate reduction by Frobenius-orbit representatives and the 2-torsion symmetry] \
-  #text(size: 9.5pt)[PDP oracle speedup program, `research/pdp_oracle_speedup_20261011/ps4_symmetry/` --- run started 2026-10-11 23:46 UTC, finished 2026-10-18; frozen protocol `protocols/PS-4.md`; class (as frozen): engineering; stage measurement]
+  #text(size: 9.5pt)[PDP oracle speedup program, `research/pdp_oracle_speedup_20261011/ps4_symmetry/` --- run started 2026-10-11 23:46 UTC, measurements finished 2026-10-25; frozen protocol `protocols/PS-4.md`; class (as frozen): engineering; stage measurement]
 ]
 
 = What ran
@@ -15,7 +15,7 @@
 
 *Workload.* Fourteen settings, the Hamming-weight base `wt <= w` with `w` in {2, 3} at the type-II degrees `n` in {11, 23, 29, 33, 35, 39, 41} of the curve `K_0: y^2 + xy = x^3 + 1`; per setting the panel's 8 targets (6 uniform, 2 planted sums of three base points; seed 20261011; `m = 3`): 112 targets. Raw records: `ps4_symmetry/raw/*.jsonl`; tables: `raw/summary.md`.
 
-*Hosts.* The checks, the panel runs and the unreduced/reduced runs up to `(n, w) = (39, 3)` ran on an Intel Xeon 2.80 GHz KVM guest (kernel v114, 4 vCPU, AVX-512, `pclmulqdq`); a container restart moved the rest (run `(41, 3)`, torsion, control) to an Intel Xeon 2.10 GHz guest (kernel v139); a second restart interrupted the torsion stage at `(33, 3)`, whose partial records are kept in `raw/attempts/`. Every count below is deterministic and host independent; wall figures are labelled and never pooled across the two hosts.
+*Hosts.* The checks, the panel runs and the unreduced/reduced runs up to `(n, w) = (39, 3)` and at `(41, 2)` ran on an Intel Xeon 2.80 GHz KVM guest (kernel v114, 4 vCPU, AVX-512, `pclmulqdq`); a container restart moved the rest (run `(41, 3)`, torsion, control) to an Intel Xeon 2.10 GHz guest (kernel v139); a second restart interrupted the torsion stage at `(33, 3)`, whose partial records are kept in `raw/attempts/`; a third container (same CPU class, kernel v153) repeated the run at `(35, 3)` with the panel's records and built the report. Every count below is deterministic and host independent; wall figures are labelled and never pooled across the two hosts.
 
 = Observations
 
@@ -38,7 +38,7 @@ Counted operations per pair are the same in every loop and setting: `mul` 4.00 t
 
 #text(size: 6.4pt)[#include "ps4_tab_agree.typ"]
 
-Over the 112 targets: the oracle calls 66 decomposable and 46 not; the unreduced kernel's solution set equals the oracle's on 112/112 (unordered and ordered loops); the panel (run on 11 of the 14 settings, 88 targets) agrees with the pair-table oracle of the example on `x_R`, verdict and `ref_count` on 88/88. The reduced loop's set is contained in the oracle's on 112/112 and equals the oracle's triples that have a representative member on 112/112 (`kept solutions`: pooled distinct solutions of the reduced loop over the oracle's).
+Over the 112 targets: the oracle calls 66 decomposable and 46 not; the unreduced kernel's solution set equals the oracle's on 112/112 (unordered and ordered loops); the panel (run on 12 of the 14 settings, 96 targets) agrees with the pair-table oracle of the example on `x_R`, verdict and `ref_count` on 96/96. The reduced loop's set is contained in the oracle's on 112/112 and equals the oracle's triples that have a representative member on 112/112 (`kept solutions`: pooled distinct solutions of the reduced loop over the oracle's).
 
 #text(size: 6.4pt)[#include "ps4_tab_decision.typ"]
 
@@ -68,7 +68,7 @@ The control is the PS-2 group-law kernel on the first 6 uniform and 2 planted ta
   caption: [Leaf cost per pair, weight base in the ONB against the subspace control at the rung with `3 l` nearest `n`. (a) counted multiplications; (b) the same pairs in the bit-operation model, at each side's own degree and with the control scaled to `n`; the dashed line is the frozen stop condition (ratio above 2). Source `raw/plot_data.json`.],
 )
 
-*Wall time, a labelled note, unisolated, shared container.* Weight kernel (portable software cyclic-convolution product): 480 to 1,233 ns per pair on the 2.80 GHz host and 911 ns at `(41, 3)` on the 2.10 GHz host; control (`pclmulqdq`): 26 to 39 ns per pair on the 2.10 GHz host. The one same-host pair, `(41, 3)` against `l = 12`: 911 against 31 ns per pair. The two kernels are different code on different instructions, so this does not compare the bases.
+*Wall time, a labelled note, unisolated, shared container.* Weight kernel (portable software cyclic-convolution product): 480 to 1,233 ns per pair on the 2.80 GHz host and 729 and 911 ns at `(35, 3)` and `(41, 3)` on the 2.10 GHz class; control (`pclmulqdq`): 26 to 39 ns per pair on the 2.10 GHz host. The one same-host pair, `(41, 3)` against `l = 12`: 911 against 31 ns per pair. The two kernels are different code on different instructions, so this does not compare the bases.
 
 == Algebra and field checks (`K_0`, `a = 0`, `b = 1`)
 
@@ -79,7 +79,7 @@ The control is the PS-2 group-law kernel on the first 6 uniform and 2 planted ta
 
 = Missing, partial or not done
 
-- The panel's own oracle was not run for `(39, 3)` and `(41, 3)` (its pair-table code needs about 10^7 to 10^8 additions on the library's inversion and, for refuting targets, a full scan each; measured 449 s for the table at `(33, 3)`); at those two settings (16 targets) the verdicts and solution sets are checked against the example's own pair-table oracle, which reproduces the panel's `ref_count` and verdict on all 88 panel targets. The `(35, 3)` panel run is listed in `raw/` only if it finished (see README).
+- The panel's own oracle was not run for `(39, 3)` and `(41, 3)` (resource limit, not an impossibility: its pair-table code needs about 5 x 10^7 additions on the library's inversion, 449 s for the table at `(33, 3)` and 359 s at `(35, 3)`, and a full scan of the same size for each refuting target, 2,167 and 2,214 s at `(35, 3)`); at those two settings (16 targets) the verdicts and solution sets are checked against the example's own pair-table oracle, which reproduces the panel's `x_R`, verdict and `ref_count` on all 96 panel targets.
 - Torsion at the three largest `w = 3` bases ran on 2 of 8 targets (a uniform and a planted one).
 - Not attempted: a hardware-assisted normal-basis product; `T` on the repository's invariant subspace bases; the combined orbit-and-`T` loop; any `m = 2` or `m > 3` loop; any end-to-end cost.
 
