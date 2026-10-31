@@ -1,7 +1,7 @@
 //! Normalize declared scalar events; this is not a whole-program cost model.
 //! Callers must supply the verified prime scalar modulus and disjoint counters.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-#[cfg_attr(feature = "producer", derive(serde::Serialize))]
+#[cfg_attr(feature = "reporting", derive(serde::Serialize))]
 pub struct AtomicScalar {
     pub additions_and_negations: u128,
     pub multiplications_outside_inversions: u128,

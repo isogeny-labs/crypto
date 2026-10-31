@@ -1,0 +1,48 @@
+#include <gmpxx.h>
+#include <bit>
+#include <cstdint>
+#include <iostream>
+#include <stdexcept>
+#include <utility>
+#include <vector>
+using Q=mpq_class;
+using Poly=std::vector<Q>;
+static void require(bool b,const char* label){if(!b)throw std::runtime_error(label);}
+static Poly multiply_linear(Poly p,const Q& c,const Q& d){
+  Poly r(p.size()+1);for(std::size_t i=0;i<p.size();++i){r[i]+=c*p[i];r[i+1]+=d*p[i];}return r;
+}
+static Poly chart(int delta,int t,int alpha){
+  Q normal=1;for(int q=-4;q<=3;++q)if(q!=0)normal*=-q;
+  Poly p{Q(1)/normal};for(int q=-4;q<=3;++q)if(q!=delta)p=multiply_linear(std::move(p),Q(t-q),Q(alpha));
+  return p;
+}
+static unsigned gf2rank(std::vector<std::uint64_t> rows,unsigned n){
+  unsigned rank=0;for(unsigned col=0;col<n;++col){unsigned k=rank;while(k<rows.size()&&!(rows[k]&(std::uint64_t{1}<<col)))++k;
+    if(k==rows.size()) continue;
+    std::swap(rows[k],rows[rank]);
+    for(unsigned j=0;j<rows.size();++j) {
+      if(j!=rank&&(rows[j]&(std::uint64_t{1}<<col))) rows[j]^=rows[rank];
+    }
+    ++rank;
+  }return rank;
+}
+int main(){try{
+  unsigned origin=0;for(int delta=-4;delta<=3;++delta){require(chart(delta,0,1)[0]==Q(delta==0?1:0),"one-axis origin");++origin;}
+  std::vector<std::pair<int,int>> slots;for(int x=0;x<4;++x)for(int y=0;y<4;++y)if((std::popcount(static_cast<unsigned>(x))+std::popcount(static_cast<unsigned>(y)))%2==0)slots.emplace_back(x,y);
+  require(slots.size()==8,"code density");unsigned pairs=0;for(const auto& x:slots)for(const auto& y:slots){
+    require(chart(y.first-x.first,0,1)[0]*chart(y.second-x.second,0,1)[0]==Q(x==y?1:0),"product origin");++pairs;
+  }
+  Q cp0=1,cp1=1;for(int q=-4;q<=3;++q){if(q!=0)cp0*=-q;if(q!=1)cp1*=1-q;}
+  require(cp0==Q(-144)&&cp1==Q(240),"derivatives");
+  Q exact=chart(2,1,8)[1];Q local=chart(1,1,8)[0];
+  require(exact==Q(40,3),"cross derivative");require(local==Q(-5,3),"local value");
+  require(exact*local==Q(-200,9)&&exact*local!=0,"passive coefficient");
+  require(std::popcount(0U)%2==0&&(std::popcount(2U)+std::popcount(1U))%2==0,"even slots");
+  require((0&1)==(2&1)&&1-0==1,"axis channels");
+  std::cout<<"single_axis_origins="<<origin<<" code_slots="<<slots.size()<<" product_origin_pairs="<<pairs<<'\n';
+  std::cout<<"Cprime0="<<cp0<<" Cprime1="<<cp1<<" W1_node="<<local<<" W2_linear="<<exact<<" passive="<<exact*local<<'\n';
+  for(unsigned n=2;n<=9;++n){std::vector<std::uint64_t> rows;for(unsigned j=0;j<n;++j){std::uint64_t row=0;for(unsigned k=j+1;k<n;++k){row^=std::uint64_t{1}<<k;row^=std::uint64_t{1}<<((k+n-1)%n);}rows.push_back(row);}
+    auto rank=gf2rank(rows,n);require(rank==n-1,"shuffle rank");std::cout<<"shuffle_n="<<n<<" rank="<<rank<<'\n';
+  }
+  std::cout<<"PASS exact development identities; no runtime claim\n";return 0;
+}catch(const std::exception& e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}}

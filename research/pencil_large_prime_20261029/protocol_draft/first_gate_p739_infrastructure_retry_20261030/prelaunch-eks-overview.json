@@ -1,0 +1,1786 @@
+{
+  "benchmark_node_pool": "cpu-l2-spot",
+  "configured_vcpu_limit": 64,
+  "guidance": "Run trusted lab commands as Kubernetes Jobs in the isolab namespace on CPU Spot nodes. Start with isolab_k8s_overview. Submit with a unique job_name; on timeout check that name before retrying. Poll isolab_k8s_status for completion, then read logs and results. Commands receive temporary /work/results and ISOLAB_RESULTS_URI; they must upload outputs before exiting. Spot interruptions can lose unuploaded data. These VM pods do not establish legacy Iso Lab strict fidelity. No cryptographic performance claim follows from job success.",
+  "jobs": [
+    {
+      "created_at": "2026-10-29T07:38:21Z",
+      "job_name": "ic-dg-p24-20261029",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T07:42:14Z",
+            "lastTransitionTime": "2026-10-29T07:42:14Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T07:42:14Z",
+            "lastTransitionTime": "2026-10-29T07:42:14Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T07:38:21Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "6ab2c994-6d9b-4691-bb4b-c7bbb157c7a9"
+    },
+    {
+      "created_at": "2026-10-29T07:38:19Z",
+      "job_name": "ic-dg-p28-20261029",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T07:43:37Z",
+            "lastTransitionTime": "2026-10-29T07:43:37Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T07:43:37Z",
+            "lastTransitionTime": "2026-10-29T07:43:37Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T07:38:19Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "9c9ab2d0-3ee3-4a9a-83a8-5f5ab9a212cd"
+    },
+    {
+      "created_at": "2026-10-29T07:45:01Z",
+      "job_name": "ic-dg-p32-20261029",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T07:59:44Z",
+            "lastTransitionTime": "2026-10-29T07:59:44Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T07:59:44Z",
+            "lastTransitionTime": "2026-10-29T07:59:44Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T07:45:01Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "fb546844-6fa5-4006-bf0e-99554f779c8a"
+    },
+    {
+      "created_at": "2026-10-29T08:01:04Z",
+      "job_name": "ic-dg3-p24-20261029",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T08:04:09Z",
+            "lastTransitionTime": "2026-10-29T08:04:09Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T08:04:09Z",
+            "lastTransitionTime": "2026-10-29T08:04:09Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T08:01:04Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "5a034b97-039e-413b-ac4c-a7f05eba9dad"
+    },
+    {
+      "created_at": "2026-10-29T08:02:24Z",
+      "job_name": "ic-dg3-p28-20261029",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T08:07:46Z",
+            "lastTransitionTime": "2026-10-29T08:07:46Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T08:07:46Z",
+            "lastTransitionTime": "2026-10-29T08:07:46Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T08:02:24Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "acb82acf-cc11-4adc-93b4-741c297a10d4"
+    },
+    {
+      "created_at": "2026-10-29T08:05:53Z",
+      "job_name": "ic-dg3-p32-20261029",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T08:23:21Z",
+            "lastTransitionTime": "2026-10-29T08:23:21Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T08:23:21Z",
+            "lastTransitionTime": "2026-10-29T08:23:21Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T08:05:53Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "d516a6e7-4db8-4e3f-bd0d-45f0c004e6c9"
+    },
+    {
+      "created_at": "2026-10-29T13:09:36Z",
+      "job_name": "ic-dgb-p24-20261029",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T13:12:37Z",
+            "lastTransitionTime": "2026-10-29T13:12:37Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T13:12:37Z",
+            "lastTransitionTime": "2026-10-29T13:12:37Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T13:09:36Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "6498760e-fabb-4771-938c-94731167170c"
+    },
+    {
+      "created_at": "2026-10-29T13:19:19Z",
+      "job_name": "ic-dgb-p28-20261029",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T13:22:53Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T13:22:53Z",
+            "lastTransitionTime": "2026-10-29T13:22:53Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T13:22:53Z",
+            "lastTransitionTime": "2026-10-29T13:22:53Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T13:19:19Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "f4824f7f-5806-44e0-9634-0a8eabe64083"
+    },
+    {
+      "created_at": "2026-10-29T13:29:29Z",
+      "job_name": "ic-dgb-p32-20261029",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T13:39:19Z",
+            "lastTransitionTime": "2026-10-29T13:39:19Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T13:39:19Z",
+            "lastTransitionTime": "2026-10-29T13:39:19Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T13:29:29Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "db387bea-5888-40c1-b11d-e11ac6d72ec3"
+    },
+    {
+      "created_at": "2026-10-29T13:09:33Z",
+      "job_name": "ic-dgb-rho-p24-20261029",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T13:12:21Z",
+            "lastTransitionTime": "2026-10-29T13:12:21Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T13:12:21Z",
+            "lastTransitionTime": "2026-10-29T13:12:21Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T13:09:33Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "30f7f1ec-b11e-4fe0-8e53-0fe730262e64"
+    },
+    {
+      "created_at": "2026-10-29T13:19:20Z",
+      "job_name": "ic-dgb-rho-p28-20261029",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T13:22:38Z",
+            "lastTransitionTime": "2026-10-29T13:22:38Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T13:22:38Z",
+            "lastTransitionTime": "2026-10-29T13:22:38Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T13:19:20Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "cf83edb6-b3d6-4195-9ad9-c9185994fd2a"
+    },
+    {
+      "created_at": "2026-10-29T13:29:31Z",
+      "job_name": "ic-dgb-rho-p32-20261029",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T13:36:04Z",
+            "lastTransitionTime": "2026-10-29T13:36:04Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T13:36:04Z",
+            "lastTransitionTime": "2026-10-29T13:36:04Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T13:29:31Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "af13292f-7392-44de-9d29-6604b5a6bf11"
+    },
+    {
+      "created_at": "2026-10-29T18:44:20Z",
+      "job_name": "ic-dgbf-p24-20261029",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T19:00:28Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T19:00:28Z",
+            "lastTransitionTime": "2026-10-29T19:00:28Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T19:00:28Z",
+            "lastTransitionTime": "2026-10-29T19:00:28Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T18:44:20Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "3a31f9d2-681d-45a6-b809-867d63c4b90f"
+    },
+    {
+      "created_at": "2026-10-29T19:13:31Z",
+      "job_name": "ic-dgbf-p28-20261029",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T20:07:38Z",
+            "lastTransitionTime": "2026-10-29T20:07:38Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T20:07:39Z",
+            "lastTransitionTime": "2026-10-29T20:07:39Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T19:13:31Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "4038d319-545a-48b2-8fcd-8fda2e8f352a"
+    },
+    {
+      "created_at": "2026-10-29T23:24:47Z",
+      "job_name": "ic-dgbf-p32-20261029",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T23:40:47Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T23:40:47Z",
+            "lastTransitionTime": "2026-10-29T23:40:47Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T23:40:47Z",
+            "lastTransitionTime": "2026-10-29T23:40:47Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T23:24:47Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "730a19d7-7e98-4893-b4c4-ffb347fedcca"
+    },
+    {
+      "created_at": "2026-10-29T18:46:29Z",
+      "job_name": "ic-dgbf-rho-p24-20261029",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T19:07:52Z",
+            "lastTransitionTime": "2026-10-29T19:07:52Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T19:07:52Z",
+            "lastTransitionTime": "2026-10-29T19:07:52Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T18:46:29Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "545540f3-343b-4bc1-965e-fdaa7edc2c3c"
+    },
+    {
+      "created_at": "2026-10-29T19:13:31Z",
+      "job_name": "ic-dgbf-rho-p28-20261029",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T20:13:31Z",
+            "lastTransitionTime": "2026-10-29T20:13:31Z",
+            "message": "Job was active longer than specified deadline",
+            "reason": "DeadlineExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T20:13:32Z",
+            "lastTransitionTime": "2026-10-29T20:13:32Z",
+            "message": "Job was active longer than specified deadline",
+            "reason": "DeadlineExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T19:13:31Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "104c5615-8715-4982-8bad-4190f0e79171"
+    },
+    {
+      "created_at": "2026-10-29T21:18:14Z",
+      "job_name": "ic-dgbf-rho-p28-20261029-r2",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T21:24:39Z",
+            "lastTransitionTime": "2026-10-29T21:24:39Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T21:24:39Z",
+            "lastTransitionTime": "2026-10-29T21:24:39Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T21:18:14Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "b2ae70cd-de3a-4163-ba5a-a404ffdaccbb"
+    },
+    {
+      "created_at": "2026-10-29T23:24:49Z",
+      "job_name": "ic-dgbf-rho-p32-20261029",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T23:37:21Z",
+            "lastTransitionTime": "2026-10-29T23:37:21Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T23:37:21Z",
+            "lastTransitionTime": "2026-10-29T23:37:21Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T23:24:49Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "513cb8ef-324d-478a-ab4d-c11c8e72cefa"
+    },
+    {
+      "created_at": "2026-10-29T10:03:14Z",
+      "job_name": "ic-dgw-p24-20261029",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T10:06:31Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T10:06:31Z",
+            "lastTransitionTime": "2026-10-29T10:06:31Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T10:06:31Z",
+            "lastTransitionTime": "2026-10-29T10:06:31Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T10:03:14Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "a7b6c619-3093-48dd-89c1-8d622db89ca1"
+    },
+    {
+      "created_at": "2026-10-29T10:10:44Z",
+      "job_name": "ic-dgw-p28-20261029",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T10:14:47Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T10:14:47Z",
+            "lastTransitionTime": "2026-10-29T10:14:47Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T10:14:47Z",
+            "lastTransitionTime": "2026-10-29T10:14:47Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T10:10:44Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "3d60a6bf-b71e-4a30-9d2a-726fc58cf352"
+    },
+    {
+      "created_at": "2026-10-29T10:26:50Z",
+      "job_name": "ic-dgw-p32-20261029",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T10:39:40Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T10:39:40Z",
+            "lastTransitionTime": "2026-10-29T10:39:40Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T10:39:40Z",
+            "lastTransitionTime": "2026-10-29T10:39:40Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T10:26:50Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "bc04445c-04db-4633-ba28-7cd7f33ec1aa"
+    },
+    {
+      "created_at": "2026-10-29T10:03:11Z",
+      "job_name": "ic-dgw-rho-p24-20261029",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T10:06:00Z",
+            "lastTransitionTime": "2026-10-29T10:06:00Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T10:06:01Z",
+            "lastTransitionTime": "2026-10-29T10:06:01Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T10:03:11Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "6d120ad2-8931-4a30-9aaf-43988611fa67"
+    },
+    {
+      "created_at": "2026-10-29T10:10:44Z",
+      "job_name": "ic-dgw-rho-p28-20261029",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T10:13:54Z",
+            "lastTransitionTime": "2026-10-29T10:13:54Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T10:13:55Z",
+            "lastTransitionTime": "2026-10-29T10:13:55Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T10:10:44Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "be9a73d8-7e2b-4bb4-b2f2-2c92145ae764"
+    },
+    {
+      "created_at": "2026-10-29T10:26:49Z",
+      "job_name": "ic-dgw-rho-p32-20261029",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T10:33:31Z",
+            "lastTransitionTime": "2026-10-29T10:33:31Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T10:33:32Z",
+            "lastTransitionTime": "2026-10-29T10:33:32Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T10:26:49Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "ef1fd3a9-677c-4832-86c2-1e2bfd2720a3"
+    },
+    {
+      "created_at": "2026-10-29T04:57:30Z",
+      "job_name": "ic-srenew-p20-20261029",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T05:00:15Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T05:00:15Z",
+            "lastTransitionTime": "2026-10-29T05:00:15Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T05:00:15Z",
+            "lastTransitionTime": "2026-10-29T05:00:15Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T04:57:30Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "ff437ed6-af85-4248-a9b5-2abb9ce1c51a"
+    },
+    {
+      "created_at": "2026-10-29T04:57:13Z",
+      "job_name": "ic-srenew-p24-20261029",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T05:00:07Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T05:00:07Z",
+            "lastTransitionTime": "2026-10-29T05:00:07Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T05:00:07Z",
+            "lastTransitionTime": "2026-10-29T05:00:07Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T04:57:13Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "4396da56-77d4-43cd-97dd-e22cd2d2bd88"
+    },
+    {
+      "created_at": "2026-10-29T04:42:59Z",
+      "job_name": "ic-srenew-p28-20261029",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T04:46:36Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T04:46:36Z",
+            "lastTransitionTime": "2026-10-29T04:46:36Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T04:46:36Z",
+            "lastTransitionTime": "2026-10-29T04:46:36Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T04:42:59Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "8c561f3a-24d5-49c5-8b06-59fbd601c7fa"
+    },
+    {
+      "created_at": "2026-10-29T04:42:58Z",
+      "job_name": "ic-srenew-p32-20261029",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T04:52:07Z",
+            "lastTransitionTime": "2026-10-29T04:52:07Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T04:52:07Z",
+            "lastTransitionTime": "2026-10-29T04:52:07Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T04:42:58Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "c641bda7-c43a-4e7a-947c-054baf04ade6"
+    },
+    {
+      "created_at": "2026-10-29T05:01:47Z",
+      "job_name": "ic-srenew-p32r2-20261029",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T05:10:01Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T05:10:01Z",
+            "lastTransitionTime": "2026-10-29T05:10:01Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T05:10:01Z",
+            "lastTransitionTime": "2026-10-29T05:10:01Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T05:01:47Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "cff99371-5514-4bd6-9948-68c49dc0a4b8"
+    },
+    {
+      "created_at": "2026-10-29T06:28:37Z",
+      "job_name": "n83-cont-storage-20261029",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T06:29:46Z",
+            "lastTransitionTime": "2026-10-29T06:29:46Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T06:29:46Z",
+            "lastTransitionTime": "2026-10-29T06:29:46Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T06:28:37Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "18249a5f-9893-4cb6-97e6-5af2f63c327c"
+    },
+    {
+      "created_at": "2026-10-29T04:20:20Z",
+      "job_name": "p20-large-n-20261029",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T04:24:33Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T04:24:33Z",
+            "lastTransitionTime": "2026-10-29T04:24:33Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T04:24:33Z",
+            "lastTransitionTime": "2026-10-29T04:24:33Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T04:20:20Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "225d6e6d-e729-4f29-a1e4-645751a82fac"
+    },
+    {
+      "created_at": "2026-10-29T03:17:01Z",
+      "job_name": "pbo-p20-xhost-20261029",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T03:19:57Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T03:19:57Z",
+            "lastTransitionTime": "2026-10-29T03:19:57Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T03:19:57Z",
+            "lastTransitionTime": "2026-10-29T03:19:57Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T03:17:01Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "b3207fe0-32b1-47b5-a9fb-da09e7ea8282"
+    },
+    {
+      "created_at": "2026-10-29T15:59:13Z",
+      "job_name": "semaev-panel-n42-rand03-20261029-1600",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T16:00:31Z",
+            "lastTransitionTime": "2026-10-29T16:00:31Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T16:00:31Z",
+            "lastTransitionTime": "2026-10-29T16:00:31Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T15:59:13Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "c1f3b890-b797-4597-a6dc-a851e890a718"
+    },
+    {
+      "created_at": "2026-10-29T16:07:10Z",
+      "job_name": "semaev-panel-n42-rand03-v2-20261029-1606",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T16:11:03Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T16:11:03Z",
+            "lastTransitionTime": "2026-10-29T16:11:03Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T16:11:03Z",
+            "lastTransitionTime": "2026-10-29T16:11:03Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T16:07:10Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "a7ec7b9c-dc7d-4b0e-858a-95754f9630ef"
+    },
+    {
+      "created_at": "2026-10-29T16:16:36Z",
+      "job_name": "semaev-panel-n42-rand04-v2-20261029-1616",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T16:20:34Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T16:20:34Z",
+            "lastTransitionTime": "2026-10-29T16:20:34Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T16:20:34Z",
+            "lastTransitionTime": "2026-10-29T16:20:34Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T16:16:36Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "36ee6a7f-d2e4-49a9-bb57-ed0fdeff9362"
+    },
+    {
+      "created_at": "2026-10-29T16:53:30Z",
+      "job_name": "semaev-panel-n43-poly00-retry-20261029-1653",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T17:20:08Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T17:20:08Z",
+            "lastTransitionTime": "2026-10-29T17:20:08Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T17:20:08Z",
+            "lastTransitionTime": "2026-10-29T17:20:08Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T16:53:30Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "b08203d7-7cbe-4ee0-b819-3bd95464790b"
+    },
+    {
+      "created_at": "2026-10-29T16:16:37Z",
+      "job_name": "semaev-panel-n43-poly00-v2-20261029-1616",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T16:41:25Z",
+            "lastTransitionTime": "2026-10-29T16:41:25Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T16:41:25Z",
+            "lastTransitionTime": "2026-10-29T16:41:25Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T16:16:37Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "31c4d8ba-2197-40be-aff3-52a15713e26e"
+    },
+    {
+      "created_at": "2026-10-29T16:28:49Z",
+      "job_name": "semaev-panel-n43-poly01-v2-20261029-1628",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T16:30:21Z",
+            "lastTransitionTime": "2026-10-29T16:30:21Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T16:30:22Z",
+            "lastTransitionTime": "2026-10-29T16:30:22Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T16:28:49Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "2213bd98-5531-49c7-9e63-404ee790f402"
+    },
+    {
+      "created_at": "2026-10-29T16:42:41Z",
+      "job_name": "semaev-panel-n43-poly01-v3-20261029-1642",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T17:16:20Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T17:16:20Z",
+            "lastTransitionTime": "2026-10-29T17:16:20Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T17:16:20Z",
+            "lastTransitionTime": "2026-10-29T17:16:20Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T16:42:41Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "b1e9aa9b-063b-4c46-97f9-fde52d0debf1"
+    },
+    {
+      "created_at": "2026-10-29T17:25:26Z",
+      "job_name": "semaev-panel-n43-poly02-v3-20261029-1725",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T17:50:23Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T17:50:23Z",
+            "lastTransitionTime": "2026-10-29T17:50:23Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T17:50:24Z",
+            "lastTransitionTime": "2026-10-29T17:50:24Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T17:25:26Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "47eea183-050e-4e4b-aa27-21f92cfccc02"
+    },
+    {
+      "created_at": "2026-10-29T17:43:23Z",
+      "job_name": "semaev-panel-n43-poly03-retry-20261029-1742",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T18:18:32Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T18:18:32Z",
+            "lastTransitionTime": "2026-10-29T18:18:32Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T18:18:32Z",
+            "lastTransitionTime": "2026-10-29T18:18:32Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T17:43:23Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "62239f41-c6b9-4326-841d-ab32e76d5def"
+    },
+    {
+      "created_at": "2026-10-29T17:25:27Z",
+      "job_name": "semaev-panel-n43-poly03-v3-20261029-1725",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T17:35:53Z",
+            "lastTransitionTime": "2026-10-29T17:35:53Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-29T17:35:53Z",
+            "lastTransitionTime": "2026-10-29T17:35:53Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-29T17:25:27Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "b22d35f2-4987-4749-96a5-047d5ce99464"
+    },
+    {
+      "created_at": "2026-10-29T17:56:13Z",
+      "job_name": "semaev-panel-n43-poly04-v3-20261029-1753",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T18:29:08Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T18:29:08Z",
+            "lastTransitionTime": "2026-10-29T18:29:08Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T18:29:08Z",
+            "lastTransitionTime": "2026-10-29T18:29:08Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T17:56:13Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "ce67147b-e14b-49a2-91d1-587b94541967"
+    },
+    {
+      "created_at": "2026-10-29T18:21:46Z",
+      "job_name": "semaev-panel-n43-rand00-v3-20261029-1822",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T19:07:47Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T19:07:47Z",
+            "lastTransitionTime": "2026-10-29T19:07:47Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T19:07:47Z",
+            "lastTransitionTime": "2026-10-29T19:07:47Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T18:21:46Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "73d05d00-13dc-4bd7-b9e5-51fbea6a0b92"
+    },
+    {
+      "created_at": "2026-10-29T18:32:19Z",
+      "job_name": "semaev-panel-n43-rand01-v3-20261029-1831",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T19:17:51Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T19:17:51Z",
+            "lastTransitionTime": "2026-10-29T19:17:51Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T19:17:51Z",
+            "lastTransitionTime": "2026-10-29T19:17:51Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T18:32:19Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "519554cd-22a6-4132-8198-8711409b9d83"
+    },
+    {
+      "created_at": "2026-10-29T19:11:42Z",
+      "job_name": "semaev-panel-n43-rand02-v3-20261029-1909",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T19:57:21Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T19:57:21Z",
+            "lastTransitionTime": "2026-10-29T19:57:21Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T19:57:21Z",
+            "lastTransitionTime": "2026-10-29T19:57:21Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T19:11:42Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "977753a3-9687-49e7-9e1d-ea2287fc0102"
+    },
+    {
+      "created_at": "2026-10-29T19:21:47Z",
+      "job_name": "semaev-panel-n43-rand03-v3-20261029-1920",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T20:02:14Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T20:02:14Z",
+            "lastTransitionTime": "2026-10-29T20:02:14Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T20:02:14Z",
+            "lastTransitionTime": "2026-10-29T20:02:14Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T19:21:47Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "03be516c-1376-4a20-8ab1-a4112c223df0"
+    },
+    {
+      "created_at": "2026-10-29T20:02:15Z",
+      "job_name": "semaev-panel-n43-rand04-v3-20261029-2000",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T20:42:22Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T20:42:22Z",
+            "lastTransitionTime": "2026-10-29T20:42:22Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T20:42:22Z",
+            "lastTransitionTime": "2026-10-29T20:42:22Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T20:02:15Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "26d4dcf6-9860-4f9c-9c4a-2bcc9d77988d"
+    },
+    {
+      "created_at": "2026-10-29T20:07:49Z",
+      "job_name": "semaev-panel-n44-poly00-v3-20261029-2006",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T20:37:22Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T20:37:22Z",
+            "lastTransitionTime": "2026-10-29T20:37:22Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T20:37:22Z",
+            "lastTransitionTime": "2026-10-29T20:37:22Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T20:07:49Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "23658093-1091-482a-9b39-fd854dc3252b"
+    },
+    {
+      "created_at": "2026-10-29T20:39:29Z",
+      "job_name": "semaev-panel-n44-poly01-v3-20261029-2038",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T20:40:22Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T20:40:22Z",
+            "lastTransitionTime": "2026-10-29T20:40:22Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T20:40:22Z",
+            "lastTransitionTime": "2026-10-29T20:40:22Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T20:39:29Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "92097f50-5491-4b20-ac2f-e578c4eb1ba6"
+    },
+    {
+      "created_at": "2026-10-29T20:42:40Z",
+      "job_name": "semaev-panel-n44-poly02-v3-20261029-2042",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T21:10:01Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T21:10:01Z",
+            "lastTransitionTime": "2026-10-29T21:10:01Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T21:10:01Z",
+            "lastTransitionTime": "2026-10-29T21:10:01Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T20:42:40Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "4a4ee63c-4ecc-435d-a772-42b33cc2d599"
+    },
+    {
+      "created_at": "2026-10-29T20:45:39Z",
+      "job_name": "semaev-panel-n44-poly03-v3-20261029-2045",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T20:47:29Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T20:47:29Z",
+            "lastTransitionTime": "2026-10-29T20:47:29Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T20:47:29Z",
+            "lastTransitionTime": "2026-10-29T20:47:29Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T20:45:39Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "e34ae4bb-7a34-4ccf-a138-d0ce8db3c936"
+    },
+    {
+      "created_at": "2026-10-29T20:50:35Z",
+      "job_name": "semaev-panel-n44-poly04-v3-20261029-2049",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T21:22:54Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T21:22:54Z",
+            "lastTransitionTime": "2026-10-29T21:22:54Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T21:22:54Z",
+            "lastTransitionTime": "2026-10-29T21:22:54Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T20:50:35Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "6e5c0478-8584-412e-a153-20d3ee288371"
+    },
+    {
+      "created_at": "2026-10-29T06:33:56Z",
+      "job_name": "semaev-runtime-probe-20261029-0633",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T06:34:59Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T06:34:59Z",
+            "lastTransitionTime": "2026-10-29T06:34:59Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T06:34:59Z",
+            "lastTransitionTime": "2026-10-29T06:34:59Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T06:33:56Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "584fc676-204a-4608-8934-b153616e1597"
+    },
+    {
+      "created_at": "2026-10-29T15:39:12Z",
+      "job_name": "semaev-worker-control-20261029-1540",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-10-29T15:40:15Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-29T15:40:15Z",
+            "lastTransitionTime": "2026-10-29T15:40:15Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-10-29T15:40:15Z",
+            "lastTransitionTime": "2026-10-29T15:40:15Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-10-29T15:39:12Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "5df04f48-514b-44a0-aead-03c965d63167"
+    }
+  ],
+  "namespace": "isolab",
+  "node_pool": "cpu-spot",
+  "pool_limits": {
+    "cpu-l2-spot": {
+      "cpu": 32,
+      "memory": "128Gi"
+    },
+    "cpu-spot": {
+      "cpu": 32,
+      "memory": "128Gi"
+    }
+  }
+}
