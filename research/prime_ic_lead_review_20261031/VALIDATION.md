@@ -185,3 +185,21 @@ Outcome: exit 128,
 The managed environment has no GitHub credential/identity. No remote branch,
 pull request or auto-merge was created; those delivery requirements remain
 blocked rather than reported as complete.
+
+### Correction delivery
+
+After the arity/solver-model correction was committed, `origin/main` advanced
+from `c5d13654` to `9e15e04d3`. The new base was merged forward without a
+rebase; the only conflict was the append-only session log, and both histories
+were preserved. The combined tree passed the protocol, JSON, cost-bridge,
+artifact, 10 MiB large-file and diff checks again.
+
+The correction branch was pushed successfully at merge head `ecdc04d49`, and
+the pull request was opened:
+
+- branch: `codex/prime-ic-arity-correction-20261031`
+- pull request: <https://github.com/isogeny-labs/crypto/pull/3096>
+
+This receipt update is committed and pushed on the same branch. Required CI
+and guarded auto-merge remain the remote authority for the combined current-
+head tree.
