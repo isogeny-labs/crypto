@@ -13,8 +13,22 @@ Sources (all committed, read at --ref unless noted):
                                 certified factorization status and recorded raw relation counts
   research/nist_skip_criterion_20261025/factor_followup_20261026/results/factor-summary.json
                                 proved complete integer records in the all-21 selection census
+  research/nist_skip_criterion_20261025/period_ecpp_20261026/results/summary.json
+                                retained original orders in the period-software trial
+  research/nist_skip_criterion_20261025/freelip_replay_20261027/results/summary.json
+                                distinct original orders in the recovered FreeLIP replay
+  research/nist_skip_criterion_20261025/period_work_20261027/results/verification.json
+                                independently checked saved work-count cells, not security
+  research/nist_skip_criterion_20261025/generator_b_execution_20261029/results/verification.json
+                                verified point-trait cells on 21 choices; repeated controls, not security
+  research/nist_skip_criterion_20261025/expanded_cutoff_reanalysis_20261030/results/verification.json
+                                verified fixed-cohort cutoff coverage, not random sampling or security
+  research/nist_skip_criterion_20261025/broader_census_reanalysis_20261030/results/verification.json
+                                verified broader recorded-census coverage, not historical use or security
   research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json
                                 IC collect-phase component: paired native ratio and its A/A floor
+  research/explicit_relations_e2e_20261030/results-v*/
+                                exact recovery counts and bounded two-target frontier; no L0 timing rank
 Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 """
 # ---- progress-metrics exporter boilerplate (copied verbatim into each repo's tools/progress_metrics.py) ----
@@ -22,6 +36,7 @@ Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 # problem, unit, better (higher|lower|neutral), kind (gauge|event), label, source.
 # Reads committed state at --ref via `git show`; never the working tree. stdlib only.
 import argparse
+import atexit
 import datetime as dt
 import json
 import os
@@ -40,9 +55,41 @@ def _git(*args, check=True):
     return p.stdout
 
 
+_object_reader = None
+
+
+def _close_object_reader():
+    global _object_reader
+    if _object_reader is not None:
+        _object_reader.stdin.close()
+        _object_reader.stdout.close()
+        _object_reader.wait()
+        _object_reader = None
+
+
+atexit.register(_close_object_reader)
+
+
 def show(ref, path):
-    p = subprocess.run(["git", "-C", str(REPO), "show", f"{ref}:{path}"], capture_output=True, text=True)
-    return p.stdout if p.returncode == 0 else None
+    """Read committed blobs through one Git process, preserving missing=None."""
+    global _object_reader
+    if _object_reader is None:
+        _object_reader = subprocess.Popen(
+            ["git", "-C", str(REPO), "cat-file", "--batch"],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    reader = _object_reader
+    reader.stdin.write(f"{ref}:{path}\n".encode())
+    reader.stdin.flush()
+    header = reader.stdout.readline().split()
+    if header and header[-1] == b"missing":
+        return None
+    if len(header) != 3 or header[1] != b"blob":
+        raise RuntimeError(f"invalid committed metrics source: {path}")
+    size = int(header[2])
+    data = reader.stdout.read(size)
+    if len(data) != size or reader.stdout.read(1) != b"\n":
+        raise RuntimeError(f"truncated committed metrics source: {path}")
+    return data.decode()
 
 
 def ls(ref, path=""):
@@ -244,6 +291,16 @@ def nist_selection_factor_census(ref, since):
                  label=f"NIST all-21 census: complete {family} records", source=source)
 
 
+def nist_selection_period_ecpp(ref, since):
+    path = "research/nist_skip_criterion_20261025/period_ecpp_20261026/results/summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_period_ecpp.retained_rows", data.get("rows"),
+             date=date, problem="nist-candidate-selection", unit="orders", better="neutral",
+             label="Period ECPP trial: original cohort rows retained, including indeterminate",
+             source=f"{path}@{commit}")
+
+
 def nist_selection_exact_embedding(ref, since):
     path = "research/nist_skip_criterion_20261025/exact_embedding_20261026/results/verification.json"
     for date, commit, text in file_history(ref, path, since):
@@ -254,26 +311,79 @@ def nist_selection_exact_embedding(ref, since):
              source=f"{path}@{commit}")
 
 
-def twist_kernel_connection(ref, since):
-    """Recorded exact toy checks; these counts are not cost or speed metrics."""
-    path = "research/twist_routes_1_3_20261021/execution-v8/ADMISSION.json"
+def nist_selection_freelip(ref, since):
+    path = "research/nist_skip_criterion_20261025/freelip_replay_20261027/results/summary.json"
     for date, commit, text in file_history(ref, path, since):
         data = json.loads(text)
-        if data.get("status") != "native-complete-replay-and-independent-PARI-passed":
+        emit("nist.selection_freelip.distinct_orders", data.get("distinct_orders"),
+             date=date, problem="nist-candidate-selection", unit="orders", better="neutral",
+             label="Recovered FreeLIP replay: distinct original orders, not repeated-call count",
+             source=f"{path}@{commit}")
+
+
+def nist_selection_period_work(ref, since):
+    path = "research/nist_skip_criterion_20261025/period_work_20261027/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_period_work.verified_cells", data.get("cells_checked"),
+             date=date, problem="nist-candidate-selection", unit="cells", better="neutral",
+             label="Saved ECPP work: independently checked count cells; no historical-rule claim",
+             source=f"{path}@{commit}")
+
+
+
+
+def nist_selection_generator_traits(ref, since):
+    """Export recorded coverage only; do not compute curve traits or estimates."""
+    path = "research/nist_skip_criterion_20261025/generator_b_execution_20261029/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_generator_traits.verified_cells", data.get("trait_cells_checked"),
+             date=date, problem="nist-candidate-selection", unit="cells", better="neutral",
+             label="21 curve choices: verified point-trait cells under repeated controls; not security",
+             source=f"{path}@{commit}")
+
+
+def nist_selection_strict_elkies(ref, since):
+    """Export recorded exact-character coverage, without recomputing a result."""
+    path = "research/nist_skip_criterion_20261025/strict_elkies_20261029/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_strict_elkies.verified_character_cells",
+             data.get("odd_prime_character_cells_checked"), date=date,
+             problem="nist-candidate-selection", unit="cells", better="neutral",
+             label="21 curve choices: strict-character cells verified; no historical-use or security claim",
+             source=f"{path}@{commit}")
+
+
+def nist_selection_expanded_cutoff(ref, since):
+    """Export independently verified coverage from committed records only."""
+    path = "research/nist_skip_criterion_20261025/expanded_cutoff_reanalysis_20261030/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        if data.get("all_five_files_equal") is not True:
             continue
-        for key, unit in (("kernel_lines", "certified maps"),
-                          ("query_cases", "verified query cases")):
-            emit(f"twist.connection.{key}", data.get("summary", {}).get(key),
-                 date=date, problem="twist-relation-connection", unit=unit,
-                 better="neutral", label="Exact p827 toy checks; no performance inference",
+        for field, unit in (("character_cells", "cells"), ("integer_cutoffs", "cutoffs")):
+            emit(f"nist.selection_expanded_cutoff.verified_{field}", data.get(field),
+                 date=date, problem="nist-candidate-selection", unit=unit, better="neutral",
+                 label="Fixed 21-curve cohort: independently verified coverage; not security or sampling",
                  source=f"{path}@{commit}")
-    path = "research/twist_routes_1_3_20261021/execution-v10/ADMISSION.json"
+
+
+def nist_selection_broader_census(ref, since):
+    """Export recorded exact coverage only, without computing a new curve trait."""
+    path = "research/nist_skip_criterion_20261025/broader_census_reanalysis_20261030/results/verification.json"
     for date, commit, text in file_history(ref, path, since):
         data = json.loads(text)
-        if data.get("status") == "native-generic-and-independent-PARI-endomorphism-verified":
-            emit("twist.connection.endomorphism_degree", data.get("velu", {}).get("degree"),
-                 date=date, problem="twist-relation-connection", unit="isogeny degree",
-                 better="neutral", label="Exact public toy endomorphism; no performance inference",
+        if data.get("all_six_files_equal") is not True:
+            continue
+        for field, unit in (("character_cells", "cells"), ("seed_positions", "positions")):
+            emit(f"nist.selection_broader_census.verified_{field}", data.get(field),
+                 date=date, problem="nist-candidate-selection", unit=unit, better="neutral",
+                 label="Broader recorded census: independently verified coverage; not security or sampling",
+                 source=f"{path}@{commit}")
+
+
 def koblitz_modular_augmentation(ref, since):
     """Export the recorded scalar for the fixed n=5 augmentation presentation."""
     path = "research/koblitz_modular_ic_20261018/rounds/22/ledger.json"
@@ -490,6 +600,109 @@ def ic_aimed_gather(ref, since):
              source=src)
 
 
+def explicit_gpu_frontier(ref, since, study="research/explicit_relations_e2e_20261030",
+                          metric_prefix="gpu.explicit_relations"):
+    """Exact completed-panel counts; no timing or global-maximum claims."""
+    revision = _git("rev-parse", ref).strip()[:12]
+    paths = [p for p in ls(ref, study) if p.endswith("/coverage.json")]
+    requested = [f"{p.rsplit('/', 1)[0]}/{name}" for p in paths
+                 for name in ("coverage.json", "export.json", "frontier.txt")]
+    # One Git process avoids per-file process and remote-filesystem overhead.
+    batch = subprocess.run(["git", "-C", str(REPO), "cat-file", "--batch"],
+                           input="".join(f"{ref}:{p}\n" for p in requested).encode(),
+                           capture_output=True, check=True).stdout
+    blobs, offset = {}, 0
+    for path in requested:
+        end = batch.index(b"\n", offset)
+        header = batch[offset:end].split()
+        offset = end + 1
+        if header[-1] == b"missing":
+            continue
+        if len(header) != 3 or header[1] != b"blob":
+            raise ValueError(f"invalid committed GPU source: {path}")
+        size = int(header[2])
+        blobs[path] = batch[offset:offset + size].decode()
+        if batch[offset + size:offset + size + 1] != b"\n":
+            raise ValueError(f"truncated committed GPU source: {path}")
+        offset += size + 1
+    for path in paths:
+        directory = path.rsplit("/", 1)[0]
+        name = directory.rsplit("/", 1)[-1]
+        if not name.startswith("results-v") or not name[9:].isdigit():
+            continue
+        coverage_text = blobs.get(path)
+        export_text = blobs.get(f"{directory}/export.json")
+        if not coverage_text or not export_text:
+            continue
+        coverage, export = json.loads(coverage_text), json.loads(export_text)
+        date = export.get("created", "")[:10]
+        if len(date) != 10 or date < since:
+            continue
+        runs = export.get("runs", [])
+        verified = sum(r.get("status") == "succeeded" and
+                       r.get("verification", {}).get("status") == "verified" for r in runs)
+        if len(runs) != coverage.get("attempted") or verified != coverage.get("verified_recoveries"):
+            raise ValueError(f"inconsistent completed GPU panel: {path}")
+        prefix = f"{metric_prefix}.{name[8:]}"
+        source = f"{path}@{revision}"
+        for suffix, value, label in (
+            ("attempted", coverage["attempted"], "recorded executions"),
+            ("verified_recoveries", verified, "fresh CPU-replayed recoveries"),
+            ("timeouts", sum(r.get("status") == "timeout" for r in runs), "retained solve timeouts"),
+        ):
+            emit(f"{prefix}.{suffix}", value, date=date, problem="gpu-generic-decomposition",
+                 unit="count", better="neutral", label=f"GPU {name}: {label}; fixed bounded panel, L0",
+                 source=source)
+        frontier = blobs.get(f"{directory}/frontier.txt")
+        if frontier:
+            key, _, value = frontier.strip().partition("=")
+            if key == "largest_complete_bits" and value.isdigit():
+                emit(f"{prefix}.complete_field_bits", int(value), date=date,
+                     problem="gpu-generic-decomposition", unit="field bits", better="neutral",
+                     label=f"GPU {name}: complete two-target rung under fixed limits; not a global maximum",
+                     source=f"{directory}/frontier.txt@{revision}")
+
+
+
+def explicit_gpu_profile(ref, since):
+    """Committed diagnostic coverage only; no recovery or timing promotion."""
+    study = "research/explicit_relations_profile_20261031"
+    revision = _git("rev-parse", ref).strip()[:12]
+    for version in (1, 2):
+        path = f"{study}/results-v{version}/export.json"
+        text = show(ref, path)
+        if text is None:
+            continue
+        export = json.loads(text)
+        date = export.get("created", "")[:10]
+        if len(date) != 10 or date < since:
+            continue
+        runs = export.get("runs", [])
+        if len(runs) != export.get("flow", {}).get("attempted"):
+            raise ValueError(f"inconsistent GPU profile coverage: {path}")
+        verified = [r for r in runs if r.get("status") == "succeeded" and
+                    r.get("verification", {}).get("status") == "verified"]
+        if version == 1:
+            samples = (
+                ("verified_cells", len(verified), "byte-exact query replay cells"),
+                ("verified_queries", sum(r["measurements"]["counted"]["verified_queries"]
+                                         for r in verified), "byte-exact query replies"),
+            )
+        else:
+            samples = (
+                ("timeline_profiles", sum(r["arm"] == "t" for r in verified),
+                 "successful Nsight Systems traces"),
+                ("counter_unavailable", sum(r["measurements"]["counters"].get("native_status")
+                                             == "unsupported" for r in runs),
+                 "retained unavailable hardware-counter profiles"),
+            )
+        for suffix, value, label in samples:
+            emit(f"gpu.explicit_relations.profile.v{version}.{suffix}", value,
+                 date=date, problem="gpu-query-diagnostics", unit="count",
+                 better="neutral", label=f"GPU profile v{version}: {label}; fixed prefixes",
+                 source=f"{path}@{revision}")
+
+
 def main():
     a = args()
     jacobian_catalog(a.ref, a.since)
@@ -501,8 +714,15 @@ def main():
     photo_volcano(a.ref)
     nist_factorization(a.ref, a.since)
     nist_selection_factor_census(a.ref, a.since)
+    nist_selection_period_ecpp(a.ref, a.since)
     nist_selection_exact_embedding(a.ref, a.since)
-    twist_kernel_connection(a.ref, a.since)
+    nist_selection_freelip(a.ref, a.since)
+    nist_selection_period_work(a.ref, a.since)
+    nist_selection_generator_traits(a.ref, a.since)
+    nist_selection_strict_elkies(a.ref, a.since)
+    nist_selection_expanded_cutoff(a.ref, a.since)
+    nist_selection_broader_census(a.ref, a.since)
+
 
     ghs_ipsec_archive(a.ref, a.since)
     fall_degree(a.ref)
@@ -512,6 +732,10 @@ def main():
     koblitz_modular_geometry(a.ref, a.since)
     pencil_gate_observations(a.ref, a.since)
     ic_aimed_gather(a.ref, a.since)
+    explicit_gpu_frontier(a.ref, a.since)
+    explicit_gpu_frontier(a.ref, a.since, "research/explicit_relations_affine_20261030",
+                          "gpu.explicit_relations.affine")
+    explicit_gpu_profile(a.ref, a.since)
 
 if __name__ == "__main__":
     main()

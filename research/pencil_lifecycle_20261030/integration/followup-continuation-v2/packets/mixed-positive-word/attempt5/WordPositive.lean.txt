@@ -1,0 +1,102 @@
+import WordGeneric
+import WordDoubling
+import PositiveDistinct
+set_option autoImplicit false
+set_option maxHeartbeats 2000000
+namespace PencilWordRefinement
+
+def positiveXz (p : UInt64) (a : WordD1) (b : WeightedWord) : UInt64 :=
+ (a.x*((b.z*b.z)%p))%p
+
+def positiveWordDispatch (p a0 a1 a2 a3 : UInt64) (a : WordD1) (b : WeightedWord) : Option WeightedWord :=
+ if mixedClassifyWord p a b = .positiveCoincidence then
+  if positiveXz p a b = (mixedWords p a b).point.x then none
+  else genericWordDispatch p (mixedWords p a b).point (dblWordPayload p a0 a1 a2 a3 a) a3
+ else none
+
+theorem positive_xz_decode (p : UInt64) [Fact p.toNat.Prime]
+ (hfive : 5≤p.toNat) (hb : p.toNat<2^31) (a : WordD1) (b : WeightedWord)
+ (ha : a.canonical p) (hc : b.canonical p) :
+ (positiveXz p a b).toNat<p.toNat ∧
+ ((positiveXz p a b).toNat:ZMod p.toNat)=(a.decode p).x*((b.decodeTwo p).z*(b.decodeTwo p).z) := by
+ exact FieldExpr.composition p hfive hb (.mul (.leaf a.x) (.mul (.leaf b.z) (.leaf b.z))) ⟨ha.1,hc.2.2.2.2.1,hc.2.2.2.2.1⟩
+
+theorem doubled_decode (p : UInt64) [Fact p.toNat.Prime]
+ (hfive : 5≤p.toNat) (hb : p.toNat<2^31) (a0 a1 a2 a3 : UInt64) (a : WordD1)
+ (h0 : a0.toNat<p.toNat) (h1 : a1.toNat<p.toNat) (h2 : a2.toNat<p.toNat) (h3 : a3.toNat<p.toNat)
+ (ha : a.canonical p) :
+ (dblWordPayload p a0 a1 a2 a3 a).canonical p ∧
+ (dblWordPayload p a0 a1 a2 a3 a).decodeTwo p=MixedPositiveDistinct.doubled
+ (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat) (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat) (a.decode p) := by
+ obtain ⟨hc,hq,hr,hs,ht,hz,hw⟩ := dbl_payload_decode p hfive hb a0 a1 a2 a3 a h0 h1 h2 h3 ha
+ refine ⟨hc,?_⟩
+ unfold WeightedWord.decodeTwo MixedPositiveDistinct.doubled
+ rw [hq,hr,hs,ht,hz,hw]
+
+theorem positive_valid_transport (p : UInt64) (f : Polynomial (ZMod p.toNat))
+ (c : WeightedWord) (d : MixedCancellation.D2 (ZMod p.toNat))
+ (he : c.decodeTwo p=d) (hv : MixedCancellation.validTwo f d) : c.normalizedValid p f := by
+ change MixedCancellation.validTwo f (c.decodeTwo p)
+ rw [he];exact hv
+
+attribute [local irreducible] genericWords mixedWords dblWordPayload positiveXz
+
+theorem positive_word_preserves (p : UInt64) [Fact p.toNat.Prime]
+ (hfive : 5≤p.toNat) (hbound : p.toNat<2^31) (a0 a1 a2 a3 : UInt64) (a : WordD1) (b : WeightedWord)
+ (h0 : a0.toNat<p.toNat) (h1 : a1.toNat<p.toNat) (h2 : a2.toNat<p.toNat) (h3 : a3.toNat<p.toNat)
+ (ha : a.canonical p) (hb : b.canonical p)
+ (haz : a.z≠0) (haw : a.w≠0) (hbz : b.z≠0) (hbw : b.w≠0)
+ (hva : a.normalizedValid p (MixedGeneric.curve (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat) (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat)))
+ (hvb : b.normalizedValid p (MixedGeneric.curve (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat) (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat)))
+ (hk : (mixedWords p a b).k=0)
+ (hc : (mixedWords p a b).l≠wordNeg p (mixedWords p a b).ry)
+ (hd : positiveXz p a b≠(mixedWords p a b).point.x) :
+ let c := (genericWords p (mixedWords p a b).point (dblWordPayload p a0 a1 a2 a3 a) a3).payload
+ positiveWordDispatch p a0 a1 a2 a3 a b=some c ∧ c.canonical p ∧ c.z≠0 ∧ c.w≠0 ∧
+ c.normalizedValid p (MixedGeneric.curve (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat) (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat)) := by
+ have hp : 0<p.toNat := by omega
+ obtain ⟨hmk,hml,hmr,hmc,hmkd,hmld,hmrd,hmpd⟩ := mixed_decode p hfive hbound a b ha hb
+ have eqw (u v : UInt64) (hu : u.toNat<p.toNat) (hv : v.toNat<p.toNat) :
+  u=v ↔ (u.toNat:ZMod p.toNat)=(v.toNat:ZMod p.toNat) := by
+  rw [←UInt64.toNat_inj]
+  exact (canonical_equality p.toNat u.toNat v.toNat hu hv).symm
+ have fk : MixedCancellation.rawK (a.decode p) (b.decodeTwo p)=0 := by rw [←hmkd,hk]; simp
+ have hn := wordNeg_composition p (mixedWords p a b).ry hp hmr
+ have fc : (a.decode p).y*MixedCancellation.rawW3 (b.decodeTwo p) ≠ -(MixedCancellation.rawY3 (a.decode p) (b.decodeTwo p)*(a.decode p).w) := by
+  intro he;apply hc;apply (eqw _ _ hml hn.1).mpr;rw [hmld,hn.2,hmrd];exact he
+ obtain ⟨hxc,hxd⟩ := positive_xz_decode p hfive hbound a b ha hb
+ have fd : (a.decode p).x*((b.decodeTwo p).z*(b.decodeTwo p).z) ≠ (MixedCancellation.other (a.decode p) (b.decodeTwo p)).x := by
+  intro he;apply hd;apply (eqw _ _ hxc hmc.1).mpr
+  rw [hxd]; have hx := congrArg WeightedAdd11.Input.x hmpd
+  exact he.trans hx.symm
+ have az := canonical_word_nonzero p a.z hp ha.2.2.1 haz
+ have aw := canonical_word_nonzero p a.w hp ha.2.2.2 haw
+ have bz := canonical_word_nonzero p b.z hp hb.2.2.2.2.1 hbz
+ have bw := canonical_word_nonzero p b.w hp hb.2.2.2.2.2 hbw
+ obtain ⟨fclass,_,_,fdispatch,fz,fw,fv⟩ := MixedPositiveDistinct.source_branch_preserves
+  (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat) (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat)
+  (a.decode p) (b.decodeTwo p) az aw bz bw hva hvb fk fc fd
+ have cls : mixedClassifyWord p a b=.positiveCoincidence := by rw [mixed_classifier_decode p hfive hbound a b ha hb];exact fclass
+ obtain ⟨dc,dd⟩ := doubled_decode p hfive hbound a0 a1 a2 a3 a h0 h1 h2 h3 ha
+ obtain ⟨_,cc,kdec,cdec⟩ := generic_word_decode p hfive hbound (mixedWords p a b).point (dblWordPayload p a0 a1 a2 a3 a) a3 hmc dc h3
+ have disp := generic_dispatch_decode p hfive hbound (mixedWords p a b).point (dblWordPayload p a0 a1 a2 a3 a) a3 hmc dc h3
+ rw [hmpd,dd] at disp cdec
+ have someword : genericWordDispatch p (mixedWords p a b).point (dblWordPayload p a0 a1 a2 a3 a) a3 =
+  some (genericWords p (mixedWords p a b).point (dblWordPayload p a0 a1 a2 a3 a) a3).payload := by
+  by_cases hz : (genericWords p (mixedWords p a b).point (dblWordPayload p a0 a1 a2 a3 a) a3).k=0
+  · have hw : genericWordDispatch p (mixedWords p a b).point (dblWordPayload p a0 a1 a2 a3 a) a3=none := by
+     simp only [genericWordDispatch,hz,ite_true]
+    rw [hw,fdispatch] at disp
+    contradiction
+  · simp only [genericWordDispatch,hz,ite_false]
+ refine ⟨by simp only [positiveWordDispatch,cls,ite_true,hd,ite_false,someword],cc,?_,?_,?_⟩
+ · have zz : ((genericWords p (mixedWords p a b).point (dblWordPayload p a0 a1 a2 a3 a) a3).payload.decodeTwo p).z≠0 := by rw [cdec];exact fz
+   intro he;apply zz
+   change (((genericWords p (mixedWords p a b).point (dblWordPayload p a0 a1 a2 a3 a) a3).payload.z).toNat:ZMod p.toNat)=0
+   rw [he];simp
+ · have ww : ((genericWords p (mixedWords p a b).point (dblWordPayload p a0 a1 a2 a3 a) a3).payload.decodeTwo p).w≠0 := by rw [cdec];exact fw
+   intro he;apply ww
+   change (((genericWords p (mixedWords p a b).point (dblWordPayload p a0 a1 a2 a3 a) a3).payload.w).toNat:ZMod p.toNat)=0
+   rw [he];simp
+ · exact positive_valid_transport p _ _ _ cdec fv
+end PencilWordRefinement

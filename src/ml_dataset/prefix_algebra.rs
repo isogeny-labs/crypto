@@ -61,16 +61,64 @@ pub(super) struct Audit {
     pub exact_fall_degree_verified: bool,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub(super) enum IdentityCapKind {
+    PolynomialRows,
+    PolynomialTerms,
+    PolynomialDegree,
+    ProofEntries,
+    MultiplierDegree,
+    CoefficientOperations,
+    SparseEntries,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[serde(tag = "status", rename_all = "snake_case")]
+pub(super) enum IdentityStatus {
+    Verified {
+        result_degree: Option<u32>,
+        max_generator_multiple_degree: Option<u32>,
+        witnessed_degree_drop: bool,
+    },
+    UnknownCap {
+        kind: IdentityCapKind,
+    },
+}
+
+#[derive(Debug, Serialize)]
+pub(super) struct IdentityAudit {
+    pub schema: &'static str,
+    pub status: IdentityStatus,
+    pub limits: IdentityLimits,
+    pub work: Work,
+}
+
+#[derive(Clone, Copy, Debug, Serialize)]
+pub(super) struct IdentityLimits {
+    pub generator_rows: usize,
+    pub total_polynomial_rows: usize,
+    pub polynomial_terms: usize,
+    pub polynomial_degree: u32,
+    pub multiplier_degree: u32,
+    pub generator_multiple_degree: u32,
+    pub entries: usize,
+    pub operations: u64,
+}
+
 struct Ring {
     p: u64,
     n: usize,
     limits: Limits,
     work: Work,
+    // Set at the failure site; direct identity callers never classify error text.
+    cap: Option<IdentityCapKind>,
 }
 
 impl Ring {
     fn charge(&mut self) -> Result<(), String> {
         if self.work.coefficient_operations >= self.limits.operations {
+            self.cap = Some(IdentityCapKind::CoefficientOperations);
             return Err("coefficient operation cap".into());
         }
         self.work.coefficient_operations += 1;
@@ -102,6 +150,7 @@ impl Ring {
     fn entries(&mut self, n: usize) -> Result<(), String> {
         self.work.peak_retained_entries = self.work.peak_retained_entries.max(n);
         if n > self.limits.entries {
+            self.cap = Some(IdentityCapKind::SparseEntries);
             Err("retained sparse entry cap".into())
         } else {
             Ok(())
@@ -334,6 +383,148 @@ fn verify_containment(
     Ok(())
 }
 
+/// Replay one supplied generator identity using the direct containment checker.
+/// `limits.degree` bounds certificate *search*, not direct identity replay: the
+/// existing checker supports input degree <=64 and multiplier degree <=12.
+/// Work counts only direct coefficient multiplication/accumulation, excluding
+/// validation, primality, parsing and I/O. Caps do not certify an uninspected tail.
+/// Neither a witnessed drop nor a cap determines any first/last fall degree.
+pub(super) fn verify_identity(
+    generators: &[Poly],
+    target: &Poly,
+    proof: &[Multiple],
+    n: usize,
+    p: u64,
+    limits: Limits,
+) -> Result<IdentityAudit, String> {
+    if n > 28
+        || !(5..1u64 << 62).contains(&p)
+        || !crate::cryptanalysis::residual_walk::is_prime_u64(p)
+    {
+        return Err("unsupported certificate ring".into());
+    }
+    let mut ring = Ring {
+        p,
+        n,
+        limits,
+        work: Work::default(),
+        cap: None,
+    };
+    let identity_limits = IdentityLimits {
+        generator_rows: 4096,
+        total_polynomial_rows: limits.rows,
+        polynomial_terms: 16_384,
+        polynomial_degree: 64,
+        multiplier_degree: 12,
+        generator_multiple_degree: 76,
+        entries: limits.entries,
+        operations: limits.operations,
+    };
+    let unknown = |kind, work| IdentityAudit {
+        schema: "ml-dataset.polynomial-identity-audit/v1",
+        status: IdentityStatus::UnknownCap { kind },
+        limits: identity_limits,
+        work,
+    };
+    // Check structural bounds before inspecting an arbitrarily large tail.
+    if generators.len() > 4096 || generators.len().saturating_add(1) > limits.rows {
+        return Ok(unknown(IdentityCapKind::PolynomialRows, ring.work));
+    }
+    let mut terms = 0usize;
+    let mut generator_degrees = Vec::with_capacity(generators.len());
+    let mut result_degree = None;
+    for (index, polynomial) in generators.iter().chain(std::iter::once(target)).enumerate() {
+        let mut seen = BTreeSet::new();
+        let mut polynomial_degree = None;
+        for (exponents, coefficient) in polynomial {
+            terms += 1;
+            if terms > 16_384 {
+                return Ok(unknown(IdentityCapKind::PolynomialTerms, ring.work));
+            }
+            if exponents.len() != n
+                || *coefficient == 0
+                || *coefficient >= p
+                || !seen.insert(exponents)
+            {
+                return Err("invalid polynomial dimension, coefficient or duplicate term".into());
+            }
+            // Typed exponents are valid even when their mathematical sum does
+            // not fit u32. That exceeds the verifier bound, not the ring syntax.
+            let Ok(d) = degree(exponents) else {
+                return Ok(unknown(IdentityCapKind::PolynomialDegree, ring.work));
+            };
+            if d > 64 {
+                return Ok(unknown(IdentityCapKind::PolynomialDegree, ring.work));
+            }
+            polynomial_degree = Some(polynomial_degree.unwrap_or(0).max(d));
+        }
+        if index == generators.len() {
+            result_degree = polynomial_degree;
+        } else {
+            generator_degrees.push(polynomial_degree);
+        }
+    }
+    if proof.len() > limits.entries {
+        return Ok(unknown(IdentityCapKind::ProofEntries, ring.work));
+    }
+    let mut keys = BTreeSet::new();
+    let mut max_generator_multiple_degree = None;
+    for multiple in proof {
+        let generator_degree = generator_degrees
+            .get(multiple.generator)
+            .ok_or("certificate generator index")?;
+        let coefficient = multiple
+            .coefficient
+            .parse::<u64>()
+            .map_err(|_| "certificate coefficient")?;
+        if coefficient == 0
+            || coefficient >= p
+            || coefficient.to_string() != multiple.coefficient
+            || multiple.exponents.len() != n
+            || !keys.insert((multiple.generator, &multiple.exponents))
+        {
+            return Err("noncanonical certificate multiple".into());
+        }
+        let Ok(multiplier_degree) = degree(&multiple.exponents) else {
+            return Ok(unknown(IdentityCapKind::MultiplierDegree, ring.work));
+        };
+        if multiplier_degree > 12 {
+            return Ok(unknown(IdentityCapKind::MultiplierDegree, ring.work));
+        }
+        // A zero generator contributes no nonzero summand, regardless of shift.
+        if let Some(generator_degree) = generator_degree {
+            let summand_degree = generator_degree + multiplier_degree;
+            max_generator_multiple_degree = Some(
+                max_generator_multiple_degree
+                    .unwrap_or(0)
+                    .max(summand_degree),
+            );
+        }
+    }
+    // The shared checker takes multiple targets. This bounded copy preserves its
+    // existing interface and avoids introducing another polynomial arithmetic path.
+    let proofs = [proof.to_vec()];
+    match verify_containment(&mut ring, generators, std::slice::from_ref(target), &proofs) {
+        Ok(()) => Ok(IdentityAudit {
+            schema: "ml-dataset.polynomial-identity-audit/v1",
+            status: IdentityStatus::Verified {
+                result_degree,
+                max_generator_multiple_degree,
+                witnessed_degree_drop: matches!(
+                    (result_degree, max_generator_multiple_degree),
+                    (Some(result), Some(summand)) if result < summand
+                ),
+            },
+            limits: identity_limits,
+            work: ring.work,
+        }),
+        Err(reason) => match ring.cap {
+            Some(kind) => Ok(unknown(kind, ring.work)),
+            None => Err(reason),
+        },
+    }
+}
+
 pub(super) fn equivalent(
     left: &[Poly],
     right: &[Poly],
@@ -355,6 +546,7 @@ pub(super) fn equivalent(
         n,
         limits,
         work: Work::default(),
+        cap: None,
     };
     let result = (|| {
         let left_from_right = containment(&mut ring, right, left)?;
@@ -487,6 +679,7 @@ pub(super) fn roots(
             ..Limits::default()
         },
         work: Work::default(),
+        cap: None,
     };
     let result = (|| {
         let mut xp = power_mod(&mut ring, &[0, 1], p, &f)?;
@@ -582,6 +775,358 @@ mod tests {
     fn poly(terms: &[(&[u32], u64)]) -> Poly {
         terms.iter().map(|(e, c)| (e.to_vec(), *c)).collect()
     }
+    fn multiple(generator: usize, exponents: &[u32], coefficient: u64) -> Multiple {
+        Multiple {
+            generator,
+            exponents: exponents.to_vec(),
+            coefficient: coefficient.to_string(),
+        }
+    }
+    #[test]
+    fn identity_replay_certifies_cancellation_without_search_minimality() {
+        // y = y*x^2 + (xy+y) - x*(xy+y), with a degree-three summand.
+        let generators = vec![
+            poly(&[(&[2, 0], 1)]),
+            poly(&[(&[1, 1], 1), (&[0, 1], 1)]),
+            vec![],
+        ];
+        let proof = vec![
+            multiple(0, &[0, 1], 1),
+            multiple(1, &[0, 0], 1),
+            multiple(1, &[1, 0], 126),
+            multiple(2, &[12, 0], 1),
+        ];
+        let audit = verify_identity(
+            &generators,
+            &poly(&[(&[0, 1], 1)]),
+            &proof,
+            2,
+            127,
+            Limits {
+                degree: 0,
+                ..Limits::default()
+            },
+        )
+        .unwrap();
+        assert_eq!(
+            audit.status,
+            IdentityStatus::Verified {
+                result_degree: Some(1),
+                max_generator_multiple_degree: Some(3),
+                witnessed_degree_drop: true,
+            }
+        );
+        assert_eq!(audit.work.coefficient_operations, 10);
+        assert_eq!(audit.limits.generator_multiple_degree, 76);
+        assert!(serde_json::to_value(&audit).unwrap()["limits"]
+            .get("degree")
+            .is_none());
+    }
+    #[test]
+    fn identity_zero_results_and_generators_do_not_claim_degree_drops() {
+        let x = poly(&[(&[1], 1)]);
+        let audit = verify_identity(
+            &[x.clone(), x],
+            &vec![],
+            &[multiple(0, &[0], 1), multiple(1, &[0], 126)],
+            1,
+            127,
+            Limits::default(),
+        )
+        .unwrap();
+        assert_eq!(
+            audit.status,
+            IdentityStatus::Verified {
+                result_degree: None,
+                max_generator_multiple_degree: Some(1),
+                witnessed_degree_drop: false,
+            }
+        );
+        let zero = verify_identity(
+            &[vec![]],
+            &vec![],
+            &[multiple(0, &[12], 1)],
+            1,
+            127,
+            Limits::default(),
+        )
+        .unwrap();
+        assert_eq!(
+            zero.status,
+            IdentityStatus::Verified {
+                result_degree: None,
+                max_generator_multiple_degree: None,
+                witnessed_degree_drop: false,
+            }
+        );
+        assert_eq!(zero.work.coefficient_operations, 0);
+        assert!(matches!(
+            verify_identity(&[], &vec![], &[], 0, 127, Limits::default())
+                .unwrap()
+                .status,
+            IdentityStatus::Verified {
+                result_degree: None,
+                ..
+            }
+        ));
+    }
+    #[test]
+    fn identity_corruption_and_duplicate_encodings_are_hard_errors() {
+        let x = poly(&[(&[1], 1)]);
+        let proof = multiple(0, &[0], 1);
+        for bad_proof in [
+            vec![multiple(0, &[0], 2)],
+            vec![multiple(1, &[0], 1)],
+            vec![multiple(0, &[0, 0], 1)],
+            vec![multiple(0, &[0], 0)],
+            vec![multiple(0, &[0], 127)],
+            vec![proof.clone(), proof.clone()],
+            vec![Multiple {
+                coefficient: "01".into(),
+                ..proof.clone()
+            }],
+            vec![Multiple {
+                coefficient: "+1".into(),
+                ..proof.clone()
+            }],
+        ] {
+            assert!(verify_identity(
+                std::slice::from_ref(&x),
+                &x,
+                &bad_proof,
+                1,
+                127,
+                Limits::default()
+            )
+            .is_err());
+        }
+        for bad_poly in [
+            poly(&[(&[1], 1), (&[1], 2)]),
+            poly(&[(&[1], 0)]),
+            poly(&[(&[1], 127)]),
+            poly(&[(&[1, 0], 1)]),
+        ] {
+            assert!(verify_identity(
+                &[bad_poly],
+                &x,
+                std::slice::from_ref(&proof),
+                1,
+                127,
+                Limits::default()
+            )
+            .is_err());
+        }
+        assert!(verify_identity(
+            std::slice::from_ref(&x),
+            &x,
+            &[proof],
+            1,
+            15,
+            Limits::default()
+        )
+        .is_err());
+        // Well-formed source or target substitutions must still fail the identity.
+        let two_x = poly(&[(&[1], 2)]);
+        assert!(verify_identity(
+            std::slice::from_ref(&two_x),
+            &x,
+            &[multiple(0, &[0], 1)],
+            1,
+            127,
+            Limits::default(),
+        )
+        .is_err());
+        assert!(verify_identity(
+            &[x],
+            &two_x,
+            &[multiple(0, &[0], 1)],
+            1,
+            127,
+            Limits::default(),
+        )
+        .is_err());
+    }
+    #[test]
+    fn identity_typed_caps_retain_partial_work_and_do_not_leak_verified_labels() {
+        let x = poly(&[(&[1], 1)]);
+        let proof = vec![multiple(0, &[0], 1)];
+        for (limits, kind, operations) in [
+            (
+                Limits {
+                    operations: 1,
+                    ..Limits::default()
+                },
+                IdentityCapKind::CoefficientOperations,
+                1,
+            ),
+            (
+                Limits {
+                    entries: 1,
+                    ..Limits::default()
+                },
+                IdentityCapKind::SparseEntries,
+                2,
+            ),
+            (
+                Limits {
+                    entries: 0,
+                    ..Limits::default()
+                },
+                IdentityCapKind::ProofEntries,
+                0,
+            ),
+            (
+                Limits {
+                    rows: 1,
+                    ..Limits::default()
+                },
+                IdentityCapKind::PolynomialRows,
+                0,
+            ),
+        ] {
+            let audit =
+                verify_identity(std::slice::from_ref(&x), &x, &proof, 1, 127, limits).unwrap();
+            assert_eq!(audit.status, IdentityStatus::UnknownCap { kind });
+            assert_eq!(audit.work.coefficient_operations, operations);
+            let value = serde_json::to_value(audit).unwrap();
+            assert!(value["status"].get("result_degree").is_none());
+            assert!(value["status"].get("witnessed_degree_drop").is_none());
+        }
+        // A new call has no stale cap state from any preceding attempt.
+        assert!(matches!(
+            verify_identity(
+                std::slice::from_ref(&x),
+                &x,
+                &proof,
+                1,
+                127,
+                Limits::default()
+            )
+            .unwrap()
+            .status,
+            IdentityStatus::Verified { .. }
+        ));
+        assert_eq!(
+            verify_identity(
+                &[poly(&[(&[65], 1)])],
+                &vec![],
+                &[],
+                1,
+                127,
+                Limits::default()
+            )
+            .unwrap()
+            .status,
+            IdentityStatus::UnknownCap {
+                kind: IdentityCapKind::PolynomialDegree
+            }
+        );
+        assert_eq!(
+            verify_identity(
+                &[x],
+                &vec![],
+                &[multiple(0, &[13], 1)],
+                1,
+                127,
+                Limits::default()
+            )
+            .unwrap()
+            .status,
+            IdentityStatus::UnknownCap {
+                kind: IdentityCapKind::MultiplierDegree
+            }
+        );
+        let many_terms: Poly = (0..16_385u32)
+            .map(|i| (vec![i % 16, (i / 16) % 16, (i / 256) % 16, i / 4096], 1))
+            .collect();
+        assert_eq!(
+            verify_identity(&[many_terms], &vec![], &[], 4, 127, Limits::default())
+                .unwrap()
+                .status,
+            IdentityStatus::UnknownCap {
+                kind: IdentityCapKind::PolynomialTerms
+            }
+        );
+    }
+    #[test]
+    fn identity_oversized_degree_sums_are_caps_and_search_limit_is_ignored() {
+        for (generators, target) in [
+            (vec![poly(&[(&[u32::MAX, 1], 1)])], vec![]),
+            (vec![vec![]], poly(&[(&[u32::MAX, 1], 1)])),
+        ] {
+            assert_eq!(
+                verify_identity(&generators, &target, &[], 2, 127, Limits::default())
+                    .unwrap()
+                    .status,
+                IdentityStatus::UnknownCap {
+                    kind: IdentityCapKind::PolynomialDegree
+                },
+            );
+        }
+        assert_eq!(
+            verify_identity(
+                &[vec![]],
+                &vec![],
+                &[multiple(0, &[u32::MAX, 1], 1)],
+                2,
+                127,
+                Limits::default()
+            )
+            .unwrap()
+            .status,
+            IdentityStatus::UnknownCap {
+                kind: IdentityCapKind::MultiplierDegree
+            },
+        );
+        let x = poly(&[(&[1], 1)]);
+        let proof = vec![multiple(0, &[0], 1)];
+        let audit = verify_identity(
+            std::slice::from_ref(&x),
+            &x,
+            &proof,
+            1,
+            127,
+            Limits {
+                degree: u32::MAX,
+                ..Limits::default()
+            },
+        )
+        .unwrap();
+        assert!(matches!(audit.status, IdentityStatus::Verified { .. }));
+    }
+    #[test]
+    fn identity_wide_coefficients_match_bigint_and_decimal_proof_encoding() {
+        use num_bigint::BigUint;
+        let p = (1u64 << 61) - 1;
+        let c = p - 2;
+        let a = p - 3;
+        let expected: u64 = ((BigUint::from(c) * BigUint::from(a)) % BigUint::from(p))
+            .try_into()
+            .unwrap();
+        let proof = vec![multiple(0, &[1], c)];
+        let audit = verify_identity(
+            &[poly(&[(&[1], a)])],
+            &poly(&[(&[2], expected)]),
+            &proof,
+            1,
+            p,
+            Limits::default(),
+        )
+        .unwrap();
+        assert_eq!(
+            audit.status,
+            IdentityStatus::Verified {
+                result_degree: Some(2),
+                max_generator_multiple_degree: Some(2),
+                witnessed_degree_drop: false,
+            }
+        );
+        assert_eq!(audit.work.coefficient_operations, 2);
+        assert_eq!(
+            serde_json::to_value(proof).unwrap()[0]["coefficient"],
+            c.to_string()
+        );
+    }
     #[test]
     fn certificates_check_both_containments_and_cancellation() {
         // <x+y, x-y> = <x,y> in odd characteristic.
@@ -599,6 +1144,7 @@ mod tests {
             n: 2,
             limits: Limits::default(),
             work: Work::default(),
+            cap: None,
         };
         assert!(verify_containment(&mut ring, &right, &left, &proof.left_from_right).is_err());
     }

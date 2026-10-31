@@ -6065,38 +6065,54 @@ mod tests {
 
     #[test]
     fn hilbert_stop_gives_the_same_reduced_basis_as_the_plain_run() {
-        let p = 101;
-        let (mut applied, mut cheaper) = (0, 0);
-        for n in [3usize, 4, 5, 6] {
-            for seed in 0..6u64 {
-                let sys = random_quadrics(n, p, 1000 * n as u64 + seed);
-                let plain = f4(&sys, n, p, &F4Options::new(Ordering::Grevlex, 24));
-                for chunk in [1usize, 3, usize::MAX] {
-                    let h = f4(
-                        &sys,
-                        n,
-                        p,
-                        &F4Options::new(Ordering::Grevlex, 24).stopping_by_hilbert(chunk),
-                    );
-                    assert_eq!(
-                        sorted(h.basis.clone()),
-                        sorted(plain.basis.clone()),
-                        "n = {n}, seed {seed}, chunk {chunk}, outcome {:?}",
-                        h.hilbert
-                    );
-                    if h.hilbert == HilbertStop::Applied {
-                        applied += 1;
-                        assert!(h.hilbert_check_ops > 0 && h.hilbert_check_ops <= h.field_ops);
-                        if chunk == 1 && h.field_ops < plain.field_ops {
-                            cheaper += 1;
+        // Reports use a process-wide counter by default, so other parallel
+        // tests can contaminate an operation-cost comparison. Keep every solve
+        // on one worker and compare its existing thread-local operation counts.
+        // The basis, applicability and savings assertions remain unchanged.
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(1)
+            .build()
+            .unwrap()
+            .install(|| {
+                let p = 101;
+                let (mut applied, mut cheaper) = (0, 0);
+                for n in [3usize, 4, 5, 6] {
+                    for seed in 0..6u64 {
+                        let sys = random_quadrics(n, p, 1000 * n as u64 + seed);
+                        let counted = |options: &F4Options| {
+                            FIELD_OPS_THREAD.with(|counter| {
+                                let before = counter.get();
+                                let report = f4(&sys, n, p, options);
+                                (report, counter.get() - before)
+                            })
+                        };
+                        let (plain, plain_ops) = counted(&F4Options::new(Ordering::Grevlex, 24));
+                        for chunk in [1usize, 3, usize::MAX] {
+                            let (h, hilbert_ops) = counted(
+                                &F4Options::new(Ordering::Grevlex, 24).stopping_by_hilbert(chunk),
+                            );
+                            assert_eq!(
+                                sorted(h.basis.clone()),
+                                sorted(plain.basis.clone()),
+                                "n = {n}, seed {seed}, chunk {chunk}, outcome {:?}",
+                                h.hilbert
+                            );
+                            if h.hilbert == HilbertStop::Applied {
+                                applied += 1;
+                                assert!(
+                                    h.hilbert_check_ops > 0 && h.hilbert_check_ops <= h.field_ops
+                                );
+                                if chunk == 1 && hilbert_ops < plain_ops {
+                                    cheaper += 1;
+                                }
+                            }
                         }
                     }
                 }
-            }
-        }
-        // random quadrics are regular with overwhelming probability
-        assert!(applied >= 60, "{applied}");
-        assert!(cheaper >= 20, "{cheaper}");
+                // random quadrics are regular with overwhelming probability
+                assert!(applied >= 60, "{applied}");
+                assert!(cheaper >= 20, "{cheaper}");
+            });
     }
 
     #[test]
