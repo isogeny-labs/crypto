@@ -62,3 +62,15 @@ lean_lib WordAdd11Validity
 
 @[default_target]
 lean_lib WordDoubling
+
+@[default_target]
+lean_lib MixedCancellation
+
+@[default_target]
+lean_lib WordMixed
+
+@[default_target]
+lean_lib MixedGeneric
+
+@[default_target]
+lean_lib WordGeneric

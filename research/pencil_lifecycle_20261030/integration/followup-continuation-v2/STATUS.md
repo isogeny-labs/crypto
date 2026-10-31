@@ -135,3 +135,17 @@ Mixed-degree cancellation proof has compiled and awaits independent source revie
 
 ### Errors
 No archival validation failure, missing disposition or retry occurred. Historical source-review corrections and prior software failures remain retained.
+
+## 2026-10-31 02:02 UTC — reviewed mixed branches and build-source preparation
+
+### What was done
+Independent field/word reviews passed for mixed cancellation and generic mixed branches. Four exact-byte modules are integrated into the canonical project; 23-target Lake configuration compiled. Maintained Clippy and retained typed fixtures passed on unchanged boxed-request sources. New neutral PDF/SVG/index combines these branch results with the independently reviewed archival audit.
+
+### Decisions made
+Build-source preparation remains separate from scientific admission. The full isolated checkout was stopped with SIGINT after the complete tree inventory showed 194,715 entries and 10.647GB; its child exit -2 and partial destination are retained. Git removed the worktree administrative entry, leaving a stale pointer. A prospectively reviewed exact build-input selection is being prepared before reconciliation and materialization.
+
+### Open threads
+Full library and CLI checks; sparse source closure review, isolated musl build and actual runtime/artifact qualification; positive shared-support branch review.
+
+### Errors
+Initial source-wrapper root validation bypassed failure receipt creation; additive v2 moved the same assertion inside receipt supervision, and an invalid-root control now retains its failure receipt. All historical failures remain recorded.
