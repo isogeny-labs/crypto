@@ -328,6 +328,19 @@ baseline it is measured against.
    `S_{m+1}(g(t_1), …)` with higher degree, worse by §2.2), subgroups,
    arithmetic progressions. *Falsifier:* count solutions of the combined
    system over `F̄_p` for a toy `p`; if it is `≥ B^{m−1}`, the lever is dead.
+
+   *Correction (2026-10-31; the sentence above is kept as written).* That count cannot
+   decide the lever. For a base whose membership splits over `F_p`, the closure count for a
+   target is the number of size-`m` multisets of the base that sum to it, and its mean over
+   targets is exactly `C(B+m−1, m)/N` for every base (`KN-FIND-007`; measured exactly in 288
+   cells, `EV-FBG-001`), about `1/(m!·B^{m−1})` of the threshold at `B^m ≈ N`. The maximum
+   reaches `B^{m−1}` only for concentrated bases such as `{kP}`, which lower coverage. What
+   decides the lever is the solving degree of the per-equation presentation, since any size-`B`
+   description has scheme degree at least `B` (`IDEA-20260801-021`). The tower thread
+   (`research/notes/index-calculus/RESEARCH_PKM_TOWER_ORACLE.md`; atlas lead
+   `LEAD-ICP-pkm-tower-algebraic-oracle`) and the digit presentation
+   (`LEAD-ICP-digit-presentation-solving-degree`) hold it. Derivation, evidence map and the
+   recorded degrees: [`research/lever2_closure_20261031/REPORT.md`](research/lever2_closure_20261031/REPORT.md).
 3. **Transfer to a structured setting.** Isogenies to curves with
    exploitable endomorphisms, covers by higher-genus curves over `F_p`,
    lifts to characteristic 0 (anomalous only). This repository's isogeny
