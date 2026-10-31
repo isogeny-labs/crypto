@@ -2,7 +2,7 @@
   "scope": "R51 actual chart maps and larger marked23 QR construction",
   "status_counts": {
     "rejected": 2,
-    "accepted": 8,
+    "accepted": 9,
     "running": 1
   },
   "runs": [
@@ -26,8 +26,12 @@
     },
     {
       "attempt": "fiber51-01",
-      "status": "running",
-      "source_revision": null
+      "status": "accepted",
+      "source_revision": "445c52955a4a31aea5de693f47b65d0fc4d9365c",
+      "kind": "Rust",
+      "native_exit": 0,
+      "required_marker": "FIBER51_ALL_CHECKS_PASS",
+      "error_lines": []
     },
     {
       "attempt": "glue-forward51-01",
@@ -64,6 +68,11 @@
       "native_exit": 0,
       "required_marker": "GLUE51_ALL_CHECKS_PASS",
       "error_lines": []
+    },
+    {
+      "attempt": "hecke3-51-01",
+      "status": "running",
+      "source_revision": null
     },
     {
       "attempt": "overlap-lean51-01",

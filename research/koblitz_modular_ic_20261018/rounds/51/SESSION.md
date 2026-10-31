@@ -64,3 +64,10 @@ No rank112 acceptance or completed expanded matrix gate is claimed from it.
 The native process ended before the next invocation. fiber51-01 admitted next;
 then use the frozen structured source experiment and independently validate
 those partial inverse coefficients before promoting them to a donor.
+
+fiber51-01 accepted exit0/exactmarker. Complete1008 square-determinant and
+336SL2 matrices on16QR classes: no16-cycle,longest14;all scalar normalizations
+verified. First good odd split prime filter gives23 at77 and11 at161.
+This obstructs a16-degree irreducible finite-fiber criterion under the stated
+Frobenius-action identification,not generic connectedness. hecke3-51-01
+admitted next as a generic quotient/annihilator control,not a nonzero CM map.
