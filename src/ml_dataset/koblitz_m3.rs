@@ -7876,7 +7876,7 @@ mod canonical_component_tests {
                 }
                 let limits = budget.original_limits();
                 let mut global = 0;
-                let run = run_canonical_pipeline(
+                let mut run = run_canonical_pipeline(
                     &original,
                     &binding,
                     &capture,
@@ -7891,9 +7891,34 @@ mod canonical_component_tests {
                 assert!(
                     run.group.as_ref().unwrap().complete && run.result.as_ref().unwrap().complete
                 );
-                run.visit_retained_artifacts(|a| std::fs::write(root.join(a.path), a.bytes))
+                let mut parent = ParentRetention::begin(&mut budget).unwrap();
+                let transfer = take_parent_artifacts(&mut run, &mut parent);
+                assert!(transfer.error.is_none() && transfer.stop.is_none());
+                let mut owners = transfer.value.unwrap();
+                let before = std::fs::read(sink.dir.join("events.jsonl")).unwrap();
+                persist_parent_artifacts(&mut owners, &mut parent, root, &binding, &capture)
                     .unwrap();
-                let result = &run.result.as_ref().unwrap().bytes;
+                assert!(owners
+                    .items
+                    .iter()
+                    .all(|a| a.capture_acknowledged && a.root_artifact.is_some()));
+                let result = &owners
+                    .items
+                    .iter()
+                    .find(|a| a.payload.path == "koblitz-m3-result.json")
+                    .unwrap()
+                    .payload
+                    .bytes;
+                if positive {
+                    let after = std::fs::read_to_string(sink.dir.join("events.jsonl")).unwrap();
+                    let witness_events = |text: &str| {
+                        text.lines()
+                            .filter(|line| line.contains("payloads/pdp-witness.json"))
+                            .count()
+                    };
+                    assert_eq!(witness_events(std::str::from_utf8(&before).unwrap()), 1);
+                    assert_eq!(witness_events(&after), 1);
+                }
                 let check = || {
                     verify_canonical_components(
                         root,
@@ -8773,12 +8798,16 @@ fn parent_artifact_path(path: &'static str) -> &'static str {
 }
 struct OwnedRetainedArtifact {
     logical_path: &'static str,
+    capture_acknowledged: bool,
+    root_artifact: Option<crate::ml_dataset::types::Artifact>,
     payload: crate::ml_dataset::types::ArtifactPayload,
     publication: Option<crate::ml_dataset::capture::WitnessReceipt>,
 }
 struct ParentArtifacts {
     items: Vec<OwnedRetainedArtifact>,
     payload_bytes: u64,
+    persistence_error: Option<String>,
+    retention_stop: Option<Stop>,
 }
 #[derive(Debug)]
 struct OwnerQuote {
@@ -8858,6 +8887,8 @@ fn take_parent_artifacts(
         run.visit_retained_artifacts(|a| {
             items.push(OwnedRetainedArtifact {
                 logical_path: a.path,
+                capture_acknowledged: false,
+                root_artifact: None,
                 payload: crate::ml_dataset::types::ArtifactPayload {
                     path: retained_identity(parent_artifact_path(a.path))?,
                     role: retained_identity(a.role)?,
@@ -8941,6 +8972,8 @@ fn take_parent_artifacts(
         Ok(ParentArtifacts {
             items,
             payload_bytes: quote.payload_bytes,
+            persistence_error: None,
+            retention_stop: None,
         })
     })
 }
@@ -9073,6 +9106,291 @@ mod parent_artifact_owner_tests {
             forged.encoding = "json".into();
             assert!(verify_slot_identities(&[forged]).is_err());
             assert!(verify_slot_identities(&[a.clone(), a]).is_err());
+        }
+    }
+}
+
+/// Quote storage from actual retained length. Work is a declared hashing and
+/// metadata tariff, not machine instructions. Trace covers live/root temporary
+/// copies and head metadata; memory includes the store's 1 MiB hash buffers.
+fn quote_parent_storage(
+    item: &OwnedRetainedArtifact,
+    limits: &crate::ml_dataset::capture::CaptureLimits,
+) -> Result<RetentionQuote, Stop> {
+    limits.validate().map_err(|_| Stop::InvalidLimits)?;
+    let len = item.payload.bytes.len() as u64;
+    let witness = item.publication.is_some();
+    let metadata = if witness {
+        0
+    } else {
+        limits
+            .metadata_reserve_bytes
+            .checked_mul(2)
+            .ok_or(Stop::Overflow)?
+    };
+    let event = if witness {
+        0
+    } else {
+        limits
+            .max_event_bytes
+            .checked_mul(2)
+            .ok_or(Stop::Overflow)?
+    };
+    Ok(RetentionQuote {
+        work: len
+            .checked_mul(32)
+            .and_then(|n| n.checked_add(65536))
+            .ok_or(Stop::Overflow)?,
+        bytes: metadata
+            .checked_add(event)
+            .and_then(|n| n.checked_add(2 * 1024 * 1024 + 16384))
+            .ok_or(Stop::Overflow)?,
+        trace: len
+            .checked_mul(if witness { 2 } else { 4 })
+            .and_then(|n| n.checked_add(metadata))
+            .and_then(|n| n.checked_add(4096))
+            .ok_or(Stop::Overflow)?,
+    })
+}
+/// Caller supplies the admitted original output directory and binding. This
+/// function does not create a new capture sink or a new retention allowance.
+fn persist_parent_artifacts(
+    owned: &mut ParentArtifacts,
+    parent: &mut ParentRetention<'_>,
+    root: &std::path::Path,
+    binding: &crate::ml_dataset::capture::AttemptBinding,
+    limits: &crate::ml_dataset::capture::CaptureLimits,
+) -> Result<(), Stop> {
+    if let Some(stop) = owned.retention_stop {
+        return Err(stop);
+    }
+    for item in &mut owned.items {
+        if item.root_artifact.is_some() {
+            continue;
+        }
+        let quote = match quote_parent_storage(item, limits) {
+            Ok(q) => q,
+            Err(stop) => {
+                owned.retention_stop = Some(stop);
+                return Err(stop);
+            }
+        };
+        let call = parent.execute(quote, || {
+            if item.payload.path != parent_artifact_path(item.logical_path) {
+                return Err("parent artifact identity changed".into());
+            }
+            super::LIVE_SINK.with(|slot| match slot.borrow().as_ref() {
+                Some(super::EventSink::Bound(sink)) => sink.verify_attempt_limits(binding, limits),
+                _ => Err("parent retention requires original bound capture".into()),
+            })?;
+            if let Some(receipt) = item.publication {
+                if item.payload.path != "pdp-witness.json"
+                    || item.payload.role != "independently-verified-pdp"
+                    || item.payload.encoding != "json"
+                    || receipt.payload_bytes != item.payload.bytes.len() as u64
+                    || hex::encode(receipt.payload_sha256)
+                        != crate::ml_dataset::digest(&item.payload.bytes)
+                {
+                    return Err("parent witness differs from dedicated receipt".into());
+                }
+                // The producer already acknowledged this dedicated publication.
+                // Never pass it through the generic payload route.
+                item.capture_acknowledged = true;
+            } else {
+                super::live_borrowed_payload(
+                    &item.payload.path,
+                    &item.payload.role,
+                    &item.payload.encoding,
+                    &item.payload.bytes,
+                )?;
+                item.capture_acknowledged = true;
+            }
+            let artifact = crate::ml_dataset::storage::write_bytes(
+                root,
+                &item.payload.path,
+                &item.payload.role,
+                &item.payload.encoding,
+                &item.payload.bytes,
+            )?;
+            item.root_artifact = Some(artifact);
+            Ok::<(), String>(())
+        });
+        if let Some(error) = call.error {
+            owned.persistence_error = Some(error);
+        }
+        if let Some(stop) = call.stop {
+            owned.retention_stop = Some(stop);
+            return Err(stop);
+        }
+    }
+    Ok(())
+}
+#[cfg(test)]
+mod parent_storage_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native;
+    use crate::ml_dataset::capture::capture_limits;
+    #[test]
+    fn failed_input_raw_payload_crosses_actual_capture_and_root_storage() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let original = construction_tests::fixture();
+        let mut budget = construction_tests::budget();
+        let mut global = 0;
+        let mut run = run_canonical_pipeline(
+            &original,
+            &binding,
+            &limits,
+            &"8".repeat(64),
+            &"9".repeat(64),
+            native::Engine::F4Macaulay,
+            3,
+            &mut budget,
+            &mut global,
+            &mut |_, _| Err("selected input persistence failure".into()),
+        );
+        let mut parent = ParentRetention::begin(&mut budget).unwrap();
+        let mut owned = take_parent_artifacts(&mut run, &mut parent).value.unwrap();
+        persist_parent_artifacts(
+            &mut owned,
+            &mut parent,
+            sink.dir.parent().unwrap(),
+            &binding,
+            &limits,
+        )
+        .unwrap();
+        assert_eq!(parent.budget.stopped, Some(Stop::Observer));
+        assert!(owned.persistence_error.is_none());
+        let raw = owned
+            .items
+            .iter()
+            .find(|a| a.payload.path == "partial-koblitz-m3-input.raw")
+            .unwrap();
+        assert!(raw.capture_acknowledged && raw.root_artifact.is_some());
+        assert_eq!(
+            std::fs::read(sink.dir.join("payloads/partial-koblitz-m3-input.raw")).unwrap(),
+            raw.payload.bytes
+        );
+        assert_eq!(
+            std::fs::read(sink.dir.parent().unwrap().join(&raw.payload.path)).unwrap(),
+            raw.payload.bytes
+        );
+        assert!(!sink.dir.parent().unwrap().join(KOBLITZ_SLOTS[0].0).exists());
+        let artifacts: Vec<_> = owned
+            .items
+            .iter()
+            .map(|a| a.root_artifact.clone().unwrap())
+            .collect();
+        verify_slot_identities(&artifacts).unwrap();
+        crate::ml_dataset::capture::verify_live_committed_prefix_visit(
+            sink.dir.parent().unwrap(),
+            &binding,
+            &limits,
+            &mut |_| Ok(()),
+        )
+        .unwrap()
+        .unwrap();
+    }
+    #[test]
+    fn root_collision_keeps_live_acknowledgement_and_stops_later_items() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let root = sink.dir.parent().unwrap();
+        let original = construction_tests::fixture();
+        let mut budget = construction_tests::budget();
+        let mut global = 0;
+        let mut run = run_canonical_pipeline(
+            &original,
+            &binding,
+            &limits,
+            &"8".repeat(64),
+            &"9".repeat(64),
+            native::Engine::F4Macaulay,
+            3,
+            &mut budget,
+            &mut global,
+            &mut |_, _| Ok(()),
+        );
+        let mut parent = ParentRetention::begin(&mut budget).unwrap();
+        let mut owned = take_parent_artifacts(&mut run, &mut parent).value.unwrap();
+        std::fs::write(root.join(KOBLITZ_SLOTS[0].0), b"existing conflicting bytes").unwrap();
+        assert_eq!(
+            persist_parent_artifacts(&mut owned, &mut parent, root, &binding, &limits),
+            Err(Stop::Observer)
+        );
+        assert!(owned.items[0].capture_acknowledged && owned.items[0].root_artifact.is_none());
+        assert!(owned.persistence_error.is_some());
+        assert!(owned
+            .items
+            .iter()
+            .skip(1)
+            .all(|a| !a.capture_acknowledged && a.root_artifact.is_none()));
+        assert_eq!(
+            std::fs::read(sink.dir.join("payloads").join(&owned.items[0].payload.path)).unwrap(),
+            owned.items[0].payload.bytes
+        );
+        assert_eq!(
+            std::fs::read(root.join(KOBLITZ_SLOTS[0].0)).unwrap(),
+            b"existing conflicting bytes"
+        );
+        let work = parent.budget.checking_work;
+        assert_eq!(
+            persist_parent_artifacts(&mut owned, &mut parent, root, &binding, &limits),
+            Err(Stop::Observer)
+        );
+        assert_eq!(parent.budget.checking_work, work);
+    }
+    #[test]
+    fn wrong_attempt_or_no_headroom_prevents_all_storage() {
+        for no_headroom in [false, true] {
+            let binding = matrix_tests::binding();
+            let limits = capture_limits(16).unwrap();
+            let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+            let root = sink.dir.parent().unwrap();
+            let original = construction_tests::fixture();
+            let mut budget = construction_tests::budget();
+            let mut global = 0;
+            let mut run = run_canonical_pipeline(
+                &original,
+                &binding,
+                &limits,
+                &"8".repeat(64),
+                &"9".repeat(64),
+                native::Engine::F4Macaulay,
+                3,
+                &mut budget,
+                &mut global,
+                &mut |_, _| Ok(()),
+            );
+            let mut parent = ParentRetention::begin(&mut budget).unwrap();
+            let mut owned = take_parent_artifacts(&mut run, &mut parent).value.unwrap();
+            let before = std::fs::read(sink.dir.join("committed.json")).unwrap();
+            let mut supplied = binding.clone();
+            if no_headroom {
+                parent.budget.trace_limit = parent.budget.trace_bytes;
+            } else {
+                supplied.cell_index += 1;
+            }
+            assert_eq!(
+                persist_parent_artifacts(&mut owned, &mut parent, root, &supplied, &limits),
+                Err(if no_headroom {
+                    Stop::Trace
+                } else {
+                    Stop::Observer
+                })
+            );
+            assert!(owned
+                .items
+                .iter()
+                .all(|a| !a.capture_acknowledged && a.root_artifact.is_none()));
+            assert_eq!(
+                std::fs::read(sink.dir.join("committed.json")).unwrap(),
+                before
+            );
+            assert!(!root.join(KOBLITZ_SLOTS[0].0).exists());
+            assert!(!sink.dir.join("payloads").join(KOBLITZ_SLOTS[0].0).exists());
         }
     }
 }
