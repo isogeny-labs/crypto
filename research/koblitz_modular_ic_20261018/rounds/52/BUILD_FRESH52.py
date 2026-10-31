@@ -53,6 +53,20 @@ print("FRESH52_FIELD m={field} cases={count} complete=true");''')
 tail='''
 if(checked52!=3810 || pattern88_52!=774 || pattern214_52!=924 || odd11_52!=2024){ERROR("FRESH52_ALL_CASE_COUNTS");quit;}
 execute(read("../normline52-01/normline-certificate52.sing"));
+poly A52=1+c;poly actualH52=x+t;poly kernelDen52=A52*t+b;
+poly point52=y^2+A52*x*y+b*y+x^3+b*x^2;poly kernel52=w^2+kernelDen52*w+t^3+b*t^2;
+poly actualPsi52=t^4+A52^2*t^3+A52*b*t^2+b^2*t+b^3;
+if(matrix(source52)!=matrix(ideal(point52,kernel52,actualPsi52)) || H52!=actualH52){ERROR("FRESH52_ACTUAL_NORM_SOURCE");quit;}
+poly plusSlope52=y+w;poly minusSlope52=y+w+kernelDen52;
+poly xp52=plusSlope52^2+A52*plusSlope52*actualH52+(b+x+t)*actualH52^2;
+poly xm52=minusSlope52^2+A52*minusSlope52*actualH52+(b+x+t)*actualH52^2;
+poly yp52=plusSlope52*(x*actualH52^2+xp52)+(y+b)*actualH52^3+A52*xp52*actualH52;
+poly ym52=minusSlope52*(x*actualH52^2+xm52)+(y+b)*actualH52^3+A52*xm52*actualH52;
+poly actualNorm52=(y+l*x+n)*(yp52+l*xp52*actualH52+n*actualH52^3)*(ym52+l*xm52*actualH52+n*actualH52^3);
+poly actualX52=x*actualH52^2+xp52+xm52;
+poly actualY52=reduce(y*actualH52^3+yp52+ym52+kernelDen52*actualH52^3,std(ideal(kernel52)));
+poly actualAlpha52=t^3+(b+l^2+A52*l)*t^2+(A52*n+b*l)*t+n^2+b*n;
+if(actualNorm52!=normNumerator52 || actualX52!=X52 || actualY52!=Y52 || actualAlpha52!=alpha52){ERROR("FRESH52_ACTUAL_NORM_FUNCTION_BINDING");quit;}
 if(matrix(source52)*lift52!=matrix(ideal(residual52)) || residual52!=normNumerator52+alpha52*Y52*H52^3+beta52*X52*H52^4+gamma52*H52^6){ERROR("FRESH52_FULL_NORM_PRODUCT");quit;}
 poly psi52=source52[3];
 if(matrix(ideal(psi52))*signLift52!=matrix(signResiduals52)){ERROR("FRESH52_SIGN_PRODUCTS");quit;}
