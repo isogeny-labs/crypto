@@ -1331,6 +1331,47 @@ fn adopt_worker_solver_artifacts(
     Ok(data.outcome)
 }
 
+/// Preserve native retained evidence when post-operation telemetry fails.
+/// Generic legacy failures retain their existing error behavior.
+fn finish_worker_solver_artifacts(
+    out: &Path,
+    registry: &mut Vec<Artifact>,
+    mut data: types::SolverData,
+    stored: Vec<Artifact>,
+    measurement: Result<(), String>,
+) -> Result<Value, String> {
+    if let Err(error) = measurement {
+        let native = data.outcome["adapter_id"] == "koblitz-m3-native-v1"
+            && data.outcome["strategy"] == "koblitz-m3-native-v1";
+        // No new pending writes after a telemetry failure. Already acknowledged
+        // roots remain in the registry before handling the censored outcome.
+        data.artifacts.clear();
+        let mut outcome = adopt_worker_solver_artifacts(out, registry, data, stored)?;
+        if !native {
+            return Err(error);
+        }
+        outcome["status"] = json!("worker_failed");
+        for key in [
+            "solver_completed",
+            "pdp_witness_verified",
+            "certificate_durably_persisted",
+            "group_domain_complete",
+            "exhaustive_no_decomposition",
+            "native_backend_invoked",
+            "algebra_completed",
+            "native_statistics_complete",
+            "scalar_recovered_without_witness",
+        ] {
+            outcome[key] = json!(false);
+        }
+        // Keep retained_pdp_witness_verified and original ledger/custody fields.
+        // Preserve prior persistence errors rather than replacing them.
+        outcome["worker_telemetry_error"] = json!(error);
+        return Ok(outcome);
+    }
+    adopt_worker_solver_artifacts(out, registry, data, stored)
+}
+
 fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
     let out = checked_directory(out, false)?;
     let mut registry = Vec::<Artifact>::new();
@@ -1396,15 +1437,8 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
                     .unwrap_or_else(|| "solver returned no output".into()))
             }
         };
-        let (mut data, stored) = solved.into_parts();
-        if let Err(error) = measurement {
-            // Preserve successful roots; do not start pending writes after a
-            // telemetry failure. The outer worker emits its ordinary error result.
-            data.artifacts.clear();
-            adopt_worker_solver_artifacts(&out, &mut registry, data, stored)?;
-            return Err(error);
-        }
-        adopt_worker_solver_artifacts(&out, &mut registry, data, stored)
+        let (data, stored) = solved.into_parts();
+        finish_worker_solver_artifacts(&out, &mut registry, data, stored, measurement)
     })();
     let mut outcome = match result {
         Ok(v) => v,
@@ -6828,6 +6862,77 @@ mod worker_receipt_adoption_tests {
         }
         fs::remove_dir_all(root).unwrap();
     }
+    #[test]
+    fn real_terminal_telemetry_failure_retains_native_receipt_and_censors_outcome() {
+        let root = std::env::temp_dir().join(format!(
+            "worker-telemetry-censor-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        // Real legacy telemetry backend: its final immutable write fails after
+        // the operation has produced and stored an artifact.
+        storage::write_bytes(
+            &root,
+            "telemetry/solver.json",
+            "control-conflict",
+            "native",
+            b"occupied",
+        )
+        .unwrap();
+        let mut registry = Vec::with_capacity(40);
+        let mut produced = None;
+        let measurement = telemetry::measured(&root, &mut registry, "solver", || {
+            let receipt =
+                storage::write_bytes(&root, "ack.bin", "test-receipt", "native", b"stored")?;
+            let mut output = data(&["must-not-write.bin"]);
+            output.outcome = json!({
+                "adapter_id":"koblitz-m3-native-v1", "strategy":"koblitz-m3-native-v1",
+                "status":"verified", "solver_completed":true,
+                "pdp_witness_verified":true,"retained_pdp_witness_verified":true,
+                "certificate_durably_persisted":true,"group_domain_complete":true,
+                "native_backend_invoked":true,"native_statistics_complete":true,
+                "algebra_completed":true,"performed_group_additions":195,
+                "live_persistence_errors":["earlier retained condition"]
+            });
+            produced = Some((output, vec![receipt]));
+            Ok(())
+        });
+        assert!(measurement.is_err());
+        let (data, roots) = produced.expect("operation ran before terminal telemetry failed");
+        let outcome =
+            finish_worker_solver_artifacts(&root, &mut registry, data, roots, measurement).unwrap();
+        assert_eq!(outcome["status"], "worker_failed");
+        for key in [
+            "solver_completed",
+            "pdp_witness_verified",
+            "certificate_durably_persisted",
+            "group_domain_complete",
+            "native_backend_invoked",
+            "native_statistics_complete",
+            "algebra_completed",
+        ] {
+            assert_eq!(outcome[key], false, "{key}");
+        }
+        assert_eq!(outcome["retained_pdp_witness_verified"], true);
+        assert_eq!(outcome["performed_group_additions"], 195);
+        assert_eq!(
+            outcome["live_persistence_errors"],
+            json!(["earlier retained condition"])
+        );
+        assert!(outcome["worker_telemetry_error"].is_string());
+        assert_eq!(registry.iter().filter(|a| a.path == "ack.bin").count(), 1);
+        storage::verify_manifest(&root, &registry).unwrap();
+        assert!(!root.join("must-not-write.bin").exists());
+        assert_eq!(
+            fs::read(root.join("telemetry/solver.json")).unwrap(),
+            b"occupied"
+        );
+        fs::remove_dir_all(root).unwrap();
+    }
+
     #[test]
     fn worker_receipts_survive_later_pending_storage_failure() {
         let root = std::env::temp_dir().join(format!(

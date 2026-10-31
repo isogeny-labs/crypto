@@ -1,6 +1,6 @@
 //! Adapter-side cumulative reservations for the bounded Koblitz m3 pipeline.
 //!
-//! This module is not yet registered in runtime dispatch. Its constructor must
+//! Runtime dispatch requires verified original worker inputs. Its constructor must
 //! receive limits from a validated original SolverExecutionContext, never from
 //! a producer result. Reservations model admitted work/bytes, not RSS or retired
 //! instructions. Native work and actual group additions have different units.
@@ -11413,7 +11413,7 @@ pub(super) fn run_verified_worker_entry(
         "adapter_id":"koblitz-m3-native-v1", "strategy":"koblitz-m3-native-v1",
         "status":if completed {"verified"} else {"partial"},
         "solver_completed":completed,
-        "pdp_witness_verified":witness,
+        "pdp_witness_verified":witness && witness_root_registered,
         "retained_pdp_witness_verified":witness,
         "certificate_durably_persisted":witness && witness_root_registered,
         "group_domain_complete":completed && domain_complete,
@@ -11440,22 +11440,19 @@ pub(super) fn run_verified_worker_entry(
         outcome["live_persistence_errors"] =
             json!(["Koblitz retention or receipt handoff incomplete"]);
     }
-    let terminal =
-        super::live_event(&json!({"kind":"solver_return","outcome":&outcome,"error":null}));
-    let finish = super::LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
-        Some(super::EventSink::Bound(sink)) => sink.finish().map_err(|e| e.to_string()),
-        _ => Err("Koblitz capture disappeared during finalization".into()),
-    });
-    if terminal.is_err() || finish.is_err() || Instant::now() >= budget.deadline {
-        outcome["status"] = json!("partial");
-        outcome["solver_completed"] = json!(false);
-        outcome["exhaustive_no_decomposition"] = json!(false);
-        outcome["group_domain_complete"] = json!(false);
-        outcome["native_backend_invoked"] = json!(false);
-        outcome["algebra_completed"] = json!(false);
-        outcome["native_statistics_complete"] = json!(false);
-        outcome["live_persistence_errors"] = json!(["Koblitz final capture delivery incomplete"]);
-    }
+    apply_worker_witness_claims(&mut outcome, witness, witness_root_registered);
+    finalize_worker_capture(
+        &mut outcome,
+        &mut budget,
+        Instant::now,
+        super::live_event,
+        || {
+            super::LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+                Some(super::EventSink::Bound(sink)) => sink.finish().map_err(|e| e.to_string()),
+                _ => Err("Koblitz capture disappeared during finalization".into()),
+            })
+        },
+    );
     Ok(receipts.finish(SolverData {
         outcome,
         artifacts: Vec::new(),
@@ -11509,9 +11506,11 @@ pub(super) fn verify_worker_cell(
         _ => return Err("Koblitz artifact outside original engine profile".into()),
     };
     verify_slot_identities(artifacts)?;
+    verify_reported_capture_finalization(outcome)?;
     super::prime_f4_wide::verify_unproved_claims(outcome)?;
     for key in [
         "producer_entry_anchor_verified",
+        "capture_finalization_clock_verified",
         "independent_derivation_verified",
         "operation_trajectory_verified",
         "exact_instruction_count_verified",
@@ -11619,6 +11618,7 @@ pub(super) fn verify_worker_cell(
             "supervisor_censored":facts.supervisor_censored,
             "parent_delivery_independently_verified":has_delivery,
             "producer_entry_anchor_verified":false,
+            "capture_finalization_clock_verified":false,
             "exact_instruction_count_verified":false,
             "fall_degree_verified":false
         })));
@@ -11862,6 +11862,7 @@ pub(super) fn verify_worker_cell(
         "group_domain_verified":domain_verified,"negative_domain_verified":negative_verified,
         "solver_completed":false,"parent_delivery_consistency_verified":parent_consistency_verified,
         "parent_delivery_independently_verified":false,"producer_entry_anchor_verified":false,
+        "capture_finalization_clock_verified":false,
         "exact_instruction_count_verified":false,"fall_degree_verified":false})))
 }
 
@@ -11987,6 +11988,28 @@ mod worker_central_replay_tests {
                     assert_eq!(data.outcome["solver_completed"], json!(!root_collision));
                     assert_eq!(verified["producer_entry_anchor_verified"], false);
                     assert_eq!(verified["exact_instruction_count_verified"], false);
+                    // Exercise the actual worker censor/adoption helper against
+                    // genuine complete and partial artifacts, not a JSON-only mock.
+                    let roots_before = registry.len();
+                    let censored = dataset::finish_worker_solver_artifacts(
+                        &f.root,
+                        &mut registry,
+                        data.clone(),
+                        Vec::new(),
+                        Err("selected post-operation telemetry failure".into()),
+                    )
+                    .unwrap();
+                    assert_eq!(registry.len(), roots_before);
+                    assert_eq!(censored["status"], "worker_failed");
+                    assert_eq!(
+                        censored["retained_pdp_witness_verified"],
+                        data.outcome["retained_pdp_witness_verified"]
+                    );
+                    let censored_checked =
+                        verify_worker_cell(&f.root, &f.config, &censored, &artifacts)
+                            .unwrap()
+                            .unwrap();
+                    assert_eq!(censored_checked["solver_completed"], false);
                     if root_collision {
                         assert_eq!(verified["scope"], "partial-artifacts");
                         assert_eq!(verified["original_input_verified"], true);
@@ -12152,4 +12175,331 @@ mod worker_central_replay_tests {
             // supervisor's worker-process/stdout descriptors or call verify_cell.
         }
     }
+}
+
+/// Dedicated capture proves a retained witness; ordinary PDP/certificate labels
+/// additionally require its canonical root to be accepted by the worker registry.
+fn apply_worker_witness_claims(
+    outcome: &mut serde_json::Value,
+    checked_capture: bool,
+    root_registered: bool,
+) {
+    outcome["pdp_witness_verified"] = (checked_capture && root_registered).into();
+    outcome["retained_pdp_witness_verified"] = checked_capture.into();
+    outcome["certificate_durably_persisted"] = (checked_capture && root_registered).into();
+}
+
+/// Uses the already admitted terminal allowance and original absolute deadline.
+/// No new native budget or resource admission is created by finalization. The
+/// return event describes a candidate result pending finish; only returned worker
+/// output may report completed capture, after the finish acknowledgement.
+fn finalize_worker_capture(
+    outcome: &mut serde_json::Value,
+    budget: &mut Budget,
+    mut now: impl FnMut() -> Instant,
+    mut event: impl FnMut(&serde_json::Value) -> Result<(), String>,
+    mut finish: impl FnMut() -> Result<(), String>,
+) {
+    use serde_json::json;
+    let pre_finalization_stop = budget.stopped;
+    let mut stop = None;
+    let mut event_attempted = false;
+    let mut event_acknowledged = false;
+    let mut finish_attempted = false;
+    let mut finish_acknowledged = false;
+    if now() >= budget.deadline {
+        stop = Some(Stop::Deadline);
+    } else {
+        // This bounded clone/assembly is covered by the entry's terminal tariff.
+        let mut pending = outcome.clone();
+        pending["status"] = json!("partial");
+        pending["solver_completed"] = false.into();
+        pending["exhaustive_no_decomposition"] = false.into();
+        pending["completion_pending_capture_finish"] = true.into();
+        let frame = json!({"kind":"solver_return","snapshot_boundary":"before-capture-finalization","outcome":pending,"error":null});
+        if now() >= budget.deadline {
+            stop = Some(Stop::Deadline);
+        } else {
+            event_attempted = true;
+            match event(&frame) {
+                Ok(()) => event_acknowledged = true,
+                Err(_) => stop = Some(Stop::Observer),
+            }
+            if now() >= budget.deadline {
+                stop.get_or_insert(Stop::Deadline);
+            }
+        }
+    }
+    if stop.is_none() {
+        // A distinct pre-finish clock gate covers time spent between actions.
+        if now() >= budget.deadline {
+            stop = Some(Stop::Deadline);
+        } else {
+            finish_attempted = true;
+            match finish() {
+                Ok(()) => finish_acknowledged = true,
+                Err(_) => stop = Some(Stop::Observer),
+            }
+            if now() >= budget.deadline {
+                stop.get_or_insert(Stop::Deadline);
+            }
+        }
+    }
+    if let Some(reason) = stop {
+        // Preserve a producer failure if one already occurred; expose the new
+        // terminal failure separately rather than changing the saved ledger.
+        budget.stopped.get_or_insert(reason);
+        for key in [
+            "solver_completed",
+            "exhaustive_no_decomposition",
+            "group_domain_complete",
+            "native_backend_invoked",
+            "algebra_completed",
+            "native_statistics_complete",
+        ] {
+            outcome[key] = false.into();
+        }
+        outcome["status"] = json!("partial");
+        let error = json!("Koblitz final capture delivery incomplete");
+        match outcome
+            .get_mut("live_persistence_errors")
+            .and_then(|v| v.as_array_mut())
+        {
+            Some(errors) => errors.push(error),
+            None => outcome["live_persistence_errors"] = json!([error]),
+        }
+    }
+    outcome["capture_finalization_clock_verified"] = false.into();
+    outcome["pre_finalization_first_stop"] = json!(pre_finalization_stop);
+    outcome["first_stop"] = json!(budget.stopped);
+    outcome["capture_finalization"] = json!({
+        "event_attempted":event_attempted,"event_acknowledged":event_acknowledged,
+        "finish_attempted":finish_attempted,"finish_acknowledged":finish_acknowledged,
+        "stop":stop
+    });
+}
+
+#[cfg(test)]
+mod worker_finalization_controls {
+    use super::*;
+    use serde_json::json;
+    #[test]
+    fn clock_gates_prevent_expired_actions_preserve_receipts_and_first_stop() {
+        for scenario in 0..8 {
+            let entry = Instant::now();
+            let deadline = entry + Duration::from_secs(30);
+            let mut budget =
+                Budget::new(10000, 64 * 1024 * 1024, 16 * 1024 * 1024, deadline, entry).unwrap();
+            budget.phase = Phase::Complete;
+            if scenario == 7 {
+                budget.stopped = Some(Stop::Work);
+            }
+            let before = budget.saved_ledger();
+            let late_at = match scenario {
+                0 | 7 => 0,
+                1 => 1,
+                2 => 2,
+                3 => 3,
+                4 => 4,
+                _ => usize::MAX,
+            };
+            let mut ticks = 0;
+            let mut events = 0;
+            let mut finishes = 0;
+            let mut outcome = json!({"status":"verified","solver_completed":true,
+                "exhaustive_no_decomposition":false,"pdp_witness_verified":true,
+                "retained_pdp_witness_verified":true,"certificate_durably_persisted":true});
+            finalize_worker_capture(
+                &mut outcome,
+                &mut budget,
+                || {
+                    let t = if ticks >= late_at { deadline } else { entry };
+                    ticks += 1;
+                    t
+                },
+                |frame| {
+                    events += 1;
+                    assert_eq!(frame["outcome"]["solver_completed"], false);
+                    assert_eq!(frame["outcome"]["completion_pending_capture_finish"], true);
+                    if scenario == 5 {
+                        Err("event refusal".into())
+                    } else {
+                        Ok(())
+                    }
+                },
+                || {
+                    finishes += 1;
+                    if scenario == 6 {
+                        Err("finish refusal".into())
+                    } else {
+                        Ok(())
+                    }
+                },
+            );
+            assert_eq!(events, usize::from(![0, 1, 7].contains(&scenario)));
+            assert_eq!(finishes, usize::from([4, 6].contains(&scenario)));
+            assert_eq!(outcome["solver_completed"], false);
+            assert_eq!(outcome["retained_pdp_witness_verified"], true);
+            assert_eq!(
+                outcome["capture_finalization"]["event_acknowledged"],
+                json!(![0, 1, 5, 7].contains(&scenario))
+            );
+            assert_eq!(
+                outcome["capture_finalization"]["finish_acknowledged"],
+                json!(scenario == 4)
+            );
+            assert_eq!(
+                budget.stopped,
+                Some(if scenario == 7 {
+                    Stop::Work
+                } else if [5, 6].contains(&scenario) {
+                    Stop::Observer
+                } else {
+                    Stop::Deadline
+                })
+            );
+            verify_reported_capture_finalization(&outcome).unwrap();
+            let mut forged = outcome.clone();
+            forged["solver_completed"] = true.into();
+            assert!(verify_reported_capture_finalization(&forged).is_err());
+            let mut forged = outcome.clone();
+            forged["capture_finalization"]["finish_acknowledged"] = true.into();
+            forged["capture_finalization"]["finish_attempted"] = false.into();
+            assert!(verify_reported_capture_finalization(&forged).is_err());
+            let mut forged = outcome.clone();
+            forged["first_stop"] = serde_json::Value::Null;
+            assert!(verify_reported_capture_finalization(&forged).is_err());
+            assert_eq!(budget.deadline, deadline);
+            let after = budget.saved_ledger();
+            assert_eq!(after.native_reserved, before.native_reserved);
+            assert_eq!(after.checking_reserved_work, before.checking_reserved_work);
+            assert_eq!(after.adapter_reserved_bytes, before.adapter_reserved_bytes);
+            assert_eq!(after.charged_trace_bytes, before.charged_trace_bytes);
+        }
+    }
+    #[test]
+    fn successful_finalization_keeps_completion_and_reports_both_acknowledgements() {
+        let entry = Instant::now();
+        let mut budget = Budget::new(
+            10000,
+            64 * 1024 * 1024,
+            16 * 1024 * 1024,
+            entry + Duration::from_secs(30),
+            entry,
+        )
+        .unwrap();
+        budget.phase = Phase::Complete;
+        let mut outcome = json!({"status":"verified","solver_completed":true});
+        finalize_worker_capture(&mut outcome, &mut budget, || entry, |_| Ok(()), || Ok(()));
+        assert_eq!(outcome["solver_completed"], true);
+        assert_eq!(outcome["capture_finalization"]["finish_acknowledged"], true);
+        assert!(outcome["capture_finalization"]["stop"].is_null());
+        assert!(budget.stopped.is_none());
+    }
+    #[test]
+    fn positive_checked_witness_root_collision_keeps_only_retained_claim() {
+        use crate::cryptanalysis::koblitz_groebner::bounded_matrix::Engine;
+        for engine in [Engine::F4Macaulay, Engine::F5KoszulFrobenius] {
+            let binding = matrix_tests::binding();
+            let limits = crate::ml_dataset::capture::capture_limits(16).unwrap();
+            let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+            let root = sink.dir.parent().unwrap();
+            let mut original = construction_tests::fixture();
+            original.target = original.signed[0];
+            let mut budget = construction_tests::budget();
+            let mut global = 0;
+            let mut run = run_canonical_pipeline(
+                &original,
+                &binding,
+                &limits,
+                &"8".repeat(64),
+                &"9".repeat(64),
+                engine,
+                3,
+                &mut budget,
+                &mut global,
+                &mut |_, _, _| Ok(()),
+            );
+            let receipt = run
+                .pipeline
+                .as_ref()
+                .unwrap()
+                .signed
+                .as_ref()
+                .unwrap()
+                .first_receipt;
+            assert!(receipt.is_some());
+            let captured = std::fs::read(sink.dir.join("payloads/pdp-witness.json")).unwrap();
+            verify_signed_witness(&captured, &original).unwrap();
+            std::fs::write(
+                root.join("pdp-witness.json"),
+                b"existing witness root collision",
+            )
+            .unwrap();
+            let mut parent = ParentRetention::begin(&mut budget).unwrap();
+            let mut owners = take_parent_artifacts(&mut run, &mut parent).value.unwrap();
+            assert_eq!(
+                persist_parent_artifacts(&mut owners, &mut parent, root, &binding, &limits),
+                Err(Stop::Observer)
+            );
+            let witness = owners
+                .items
+                .iter()
+                .find(|a| a.payload.path == "pdp-witness.json")
+                .unwrap();
+            assert!(witness.capture_acknowledged);
+            assert!(witness.root_artifact.is_none());
+            assert_eq!(
+                std::fs::read(root.join("pdp-witness.json")).unwrap(),
+                b"existing witness root collision"
+            );
+            let mut outcome = json!({"solver_completed":false});
+            apply_worker_witness_claims(
+                &mut outcome,
+                receipt.is_some(),
+                witness.root_artifact.is_some(),
+            );
+            assert_eq!(outcome["pdp_witness_verified"], false);
+            assert_eq!(outcome["certificate_durably_persisted"], false);
+            assert_eq!(outcome["retained_pdp_witness_verified"], true);
+        }
+    }
+}
+
+/// Shape/consistency only: these are producer reports, not independent clock
+/// evidence. Historical partial records without this additive field stay valid.
+fn verify_reported_capture_finalization(outcome: &serde_json::Value) -> Result<(), String> {
+    #[derive(serde::Deserialize)]
+    #[serde(deny_unknown_fields)]
+    struct Report {
+        event_attempted: bool,
+        event_acknowledged: bool,
+        finish_attempted: bool,
+        finish_acknowledged: bool,
+        stop: Option<Stop>,
+    }
+    let Some(value) = outcome.get("capture_finalization") else {
+        return Ok(());
+    };
+    let r: Report = serde_json::from_value(value.clone())
+        .map_err(|e| format!("capture finalization report: {e}"))?;
+    let pre: Option<Stop> = serde_json::from_value(
+        outcome
+            .get("pre_finalization_first_stop")
+            .ok_or("missing pre-finalization stop")?
+            .clone(),
+    )
+    .map_err(|e| e.to_string())?;
+    let first: Option<Stop> =
+        serde_json::from_value(outcome["first_stop"].clone()).map_err(|e| e.to_string())?;
+    if r.event_acknowledged && !r.event_attempted
+        || r.finish_attempted && !r.event_acknowledged
+        || r.finish_acknowledged && !r.finish_attempted
+        || r.stop.is_none() && !(r.event_acknowledged && r.finish_acknowledged)
+        || outcome["solver_completed"] == true && (r.stop.is_some() || !r.finish_acknowledged)
+        || first != pre.or(r.stop)
+    {
+        return Err("inconsistent reported capture finalization".into());
+    }
+    Ok(())
 }
