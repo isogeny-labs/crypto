@@ -1,5 +1,18 @@
 # Prime-field factor bases: certificates and a secant degree reduction
 
+## Concrete semantic/degree theorem, 2026-10-31
+
+The [concrete F17 continuation](fixture_bridge_20261031/README.md) now joins
+the actual polynomial generator set, exact signed factor-base group
+relations and canonical degree 3 versus the inherited dense degree 5 in one
+Lean theorem. All four signs and identity inverse pairs are covered. The
+unchanged transitive auditor checks 159 declarations in fourteen modules:
+zero failures and zero native trust. The published generic group project
+also rebuilt and passed its complete 22-declaration audit, closing the
+specific outage verification gaps recorded below. Existing sealed records
+remain historical. This is formal semantic integration of the earlier degree
+result, without a new degree measurement or runtime claim.
+
 ## Checked Lean continuation, 2026-10-31
 
 The [formalization](proof/FORMALIZATION.md) now proves the polynomial-ring
