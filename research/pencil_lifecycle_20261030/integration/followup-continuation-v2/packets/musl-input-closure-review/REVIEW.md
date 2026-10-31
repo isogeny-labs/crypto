@@ -1,0 +1,13 @@
+# Exact-commit local build-input review
+
+Target commit: b985ddb30b46abbd9a050e5753c7e301f40b07f6. Target command remains ecbench, no default features, musl. This review used targeted git-show reads; it did not duplicate the full tree inventory, checkout, or build.
+
+All six direct path dependencies resolve within the repository: hashed-ecdl-tensor, ecdl-tensor-ic, pencil-symbolic-graph, factor-base, volcano-cli, and isogeny_algos. Volcano-cli also resolves isogeny_algos internally. Pencil's optional five-leads-study resolves to research/five_leads_e2e_20261019/native; its manifest exists at the target commit. The reporting feature does not enable its producer feature. Retaining that optional manifest in the full tree avoids Cargo resolution assumptions.
+
+No package in this eight-manifest closure has an explicit or implicit tracked build.rs at this commit, including the root. Consequently there are no local package build-script reads/writes to enumerate. This statement does not cover registry dependency build scripts: bundled SQLite, ring and other native dependencies still require their cached source/compiler inputs and OUT_DIR outputs. Cargo.lock contains only local and crates.io registry sources, with no Git dependency source. Existing offline/locked and pinned compiler controls remain necessary; this is not a full registry build-script audit.
+
+The inspected current source contains compile-time inputs outside src: factor-base embeds its Cargo.lock and source files; root modules embed docs registry/calibration/SQL data; pencil's native solver is selected via a repository-relative path. These resolve within a complete checkout. This is a spot inspection, not a claim of exhaustive cfg-sensitive source closure. Full checkout and root's existing exact-commit mode inventory must cover included files, and any gitlink or symlink must be resolved or excluded from the consumed closure. The committed .gitmodules declares verification/pqc-assay/upstream; this review did not initialize it or infer it is required by ecbench.
+
+No config/config.toml exists at the current source .cargo, /home/ec2-user/.cargo, /home/.cargo or /.cargo; CARGO_HOME resolves to the inspected home location in this review process. Effective environment must be rechecked for the actual wrapper invocation and new source .cargo. No credential values were read or emitted. The detached full-tree inventory is still owned by root; do not repeat its checkout or scan.
+
+Evidence.json binds exact manifest and lock hashes. Initial inspection with python3 failed because tomllib was unavailable; rerun with existing python3.11 succeeded. No installation or repository mutation occurred.

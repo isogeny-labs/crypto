@@ -378,7 +378,7 @@ impl ResourceTracking {
 // Exact compact serialized upper bound: actual escaped identity strings,
 // u64::MAX in every numeric tail field, empty-journal header plus commas.
 // This is admission for one session, not an implicit cohort partition.
-fn resource_journal_capacity(
+pub(crate) fn resource_journal_capacity(
     journal: &super::diagnostic_resources::SessionResourceJournal,
     mut identity: super::diagnostic_resources::Identity,
     slots: usize,

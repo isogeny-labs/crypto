@@ -211,7 +211,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "oracle",
             default: None,
-            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4|5 (one probe a target into a negation-folded table of every signed m-sum of the base); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
+            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4|5 (one probe a target into a negation-folded table of every signed m-sum of the base); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
         },
         ParamDecl {
             name: "solver",
@@ -2364,6 +2364,12 @@ fn solve_generic<G: CountedGroup>(
     Ok(rep)
 }
 
+/// A `u128` order on a one-word path: the wide curves route to
+/// `ic_wide` before they get here.
+fn one_word(v: u128) -> Result<u64, String> {
+    u64::try_from(v).map_err(|_| format!("{v} needs the wide (u128) path"))
+}
+
 fn parse_hex_wide(s: &str) -> Result<u128, String> {
     u128::from_str_radix(s.trim_start_matches("0x"), 16).map_err(|_| format!("bad hex `{s}`"))
 }
@@ -2655,6 +2661,15 @@ pub fn solve_measured(
     let mut rep = if let Instance::Wide(wi) = inst {
         let (tx, ty) = (parse_hex_wide(&target[0])?, parse_hex_wide(&target[1])?);
         solve_wide(m, wi, tx, ty, seed)?
+    } else if let Instance::F2m4(i) = inst {
+        let (tx, ty) = (parse_hex_wide(&target[0])?, parse_hex_wide(&target[1])?);
+        if u64::try_from(i.r).is_err() {
+            // `m ≥ 16` with a small cofactor: the subgroup order needs two
+            // words; the u128 implementations (`ic_wide`, `rho_wide`).
+            solve_f2m4_wide(m, i, curve, tx, ty, seed)?
+        } else {
+            solve_inner(m, inst, curve, d, tx as u64, ty as u64, seed)?
+        }
     } else if matches!(
         inst,
         Instance::Genus2(_) | Instance::Quartic(_) | Instance::Ghs(_)
@@ -2757,8 +2772,8 @@ fn solve_inner(
         };
         let f = &i.curve.f;
         let target = PtB {
-            x: f.unpack(tx),
-            y: f.unpack(ty),
+            x: f.unpack(u128::from(tx)),
+            y: f.unpack(u128::from(ty)),
             inf: false,
         };
         return solve_neg_strong(m, i, target, seed);
@@ -2846,8 +2861,8 @@ fn solve_inner(
         (Instance::F2m4(i), "ic") if m.id == "ic.pipeline" => {
             let f = &i.curve.f;
             let target = PtB {
-                x: f.unpack(tx),
-                y: f.unpack(ty),
+                x: f.unpack(u128::from(tx)),
+                y: f.unpack(u128::from(ty)),
                 inf: false,
             };
             solve_ic_f2m4(m, i, curve, target, seed)
@@ -3041,11 +3056,11 @@ fn solve_inner(
         (Instance::F2m4(i), _) => {
             let f = &i.curve.f;
             let target = PtB {
-                x: f.unpack(tx),
-                y: f.unpack(ty),
+                x: f.unpack(u128::from(tx)),
+                y: f.unpack(u128::from(ty)),
                 inf: false,
             };
-            solve_generic(m, &i.curve, i.generator, target, i.r, seed)
+            solve_generic(m, &i.curve, i.generator, target, one_word(i.r)?, seed)
         }
         (Instance::Wide(_), _)
         | (Instance::Fp4(_), _)
@@ -5818,7 +5833,12 @@ fn solve_neg_strong(
     seed: u64,
 ) -> Result<SolveReport, String> {
     use super::negation_strong::{NegStrongRho, CANON_FQ_MULS, JUMPS};
-    let params = neg_strong_params(m, inst.r)?;
+    if inst.curve.f.f.m > 16 {
+        return Err("rho.negation_strong requires a one-word packed point key".into());
+    }
+    let r = u64::try_from(inst.r)
+        .map_err(|_| "rho.negation_strong supports subgroup orders through u64".to_string())?;
+    let params = neg_strong_params(m, r)?;
     if !inst.curve.on_curve(&target) {
         return Err("the target is not on the curve".into());
     }
@@ -5968,9 +5988,9 @@ fn solve_ic_f2m4(
         group: c,
         generator: inst.generator,
         target,
-        r: inst.r,
-        cofactor: inst.cofactor,
-        group_order: inst.group_order,
+        r: one_word(inst.r)?,
+        cofactor: one_word(inst.cofactor)?,
+        group_order: one_word(inst.group_order)?,
         name: curve.slug.clone(),
         field_degree: None,
     };
@@ -6003,6 +6023,148 @@ fn solve_ic_f2m4(
         |q| CountedGroup::key(c, q),
     )?;
     Ok(ic_report(m, rep, &calib, Some(facts), wall, 2))
+}
+
+/// A curve over `F_{(2^m)^4}` whose subgroup order needs two words
+/// (`m ≥ 16`): `rho.negation` and `ic.pipeline` through `ic_wide`, the
+/// same algorithms at `u128` (its tests pin them to the one-word code).
+fn solve_f2m4_wide(
+    m: &ResolvedMethod,
+    inst: &BinCurve,
+    curve: &CurveFacts,
+    tx: u128,
+    ty: u128,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    use crate::cryptanalysis::ic_wide::{rho_negation, run_f2m4};
+    let f = &inst.curve.f;
+    let target = PtB {
+        x: f.unpack(tx),
+        y: f.unpack(ty),
+        inf: false,
+    };
+    let r = inst.r;
+    match m.id.as_str() {
+        "rho.negation" => {
+            let multiple = param_u64(m, "cap_multiple")? as f64;
+            let cap = (crate::cryptanalysis::ic_boundary::generic_floor_ops(r as f64, 1.0)
+                * multiple) as u64
+                + 4096;
+            let t = Instant::now();
+            measurement::begin_online(Phase::RhoSolve);
+            let (res, d) =
+                rho_negation::<crate::cryptanalysis::gaudry_quartic_bin::CurveB, u128>(&inst.curve, inst.generator, target, r, seed, cap);
+            measurement::end_online();
+            let fops = field_ops_of(&inst.curve, &[res.group_ops]);
+            let mut rep = rho_report(res, t.elapsed().as_nanos() as u64, fops);
+            rep.recovered = d;
+            rep.exhausted = d.is_none();
+            Ok(rep)
+        }
+        "ic.pipeline" => {
+            let (spec, fb_name, or_name) = pipeline_spec(m, seed)?;
+            if fb_name != "bin-t-line" || or_name != "gaudry-d4-bin" {
+                return Err("on a wide curve over F_(2^m)^4 only bin-t-line + gaudry-d4-bin run".into());
+            }
+            let mut oracle = bin_oracle(&spec, inst, seed)?;
+            let c = &inst.curve;
+            // The one-word fields are not read on this path (the base and
+            // the oracle ignore them); r and h travel as u128.
+            let ctx = InstanceCtx {
+                group: c,
+                generator: inst.generator,
+                target,
+                r: 0,
+                cofactor: 0,
+                group_order: 0,
+                name: curve.slug.clone(),
+                field_degree: None,
+            };
+            let per_add = fq_muls_per_add(c) as f64;
+            let calib = Calibration {
+                ns_per_add: per_add,
+                ns_per_double: per_add,
+                ns_per_row_op: 1.0,
+                ns_per_lookup: 1.0,
+                ns_per_sqrt: Some(f2m4_lift_muls(inst)),
+                pinned_units: vec![
+                    "ns_per_double".into(),
+                    "ns_per_row_op".into(),
+                    "ns_per_lookup".into(),
+                    "ns_per_sqrt".into(),
+                ],
+                ..Default::default()
+            };
+            let t = Instant::now();
+            let run = run_f2m4::<u128>(&ctx, inst, &spec, &mut oracle, r, inst.cofactor, &calib)?;
+            let wall = t.elapsed().as_nanos() as u64;
+            let mut scratch = GroupOps::default();
+            let base = TLineBase { curve: inst };
+            let fb = base.build(&ctx, &spec.factor_base_params, &mut scratch)?;
+            let facts = factor_base_facts(
+                &curve.slug,
+                &m.params["factor_base"],
+                &spec.factor_base_params,
+                &fb,
+                |q| CountedGroup::key(c, q),
+            )?;
+            let mut rep = ic_report(m, run.report, &calib, Some(facts), wall, 2);
+            rep.recovered = run.recovered;
+            rep.exhausted = run.recovered.is_none();
+            Ok(rep)
+        }
+        other => Err(format!(
+            "`{other}` has no implementation past one word on a curve over F_(2^m)^4; rho.negation and ic.pipeline do"
+        )),
+    }
+}
+
+/// `gaudry-d4-bin`'s parameters, checked, as an oracle on `inst`; shared
+/// by the one-word and the wide pipelines.
+fn bin_oracle<'a>(
+    spec: &crate::cryptanalysis::ic_framework::PipelineSpec,
+    inst: &'a BinCurve,
+    seed: u64,
+) -> Result<BinD4Oracle<'a>, String> {
+    let macaulay = spec.oracle_params.u64("macaulay")?;
+    let macaulay = u8::try_from(macaulay)
+        .ok()
+        .filter(|&d| d >= 2)
+        .ok_or_else(|| {
+            format!("gaudry-d4-bin: macaulay is a degree from 2 to 255, not {macaulay}")
+        })?;
+    let flag = |k: &str| -> Result<bool, String> {
+        match spec.oracle_params.u64_or(k, 0)? {
+            0 => Ok(false),
+            1 => Ok(true),
+            v => Err(format!("gaudry-d4-bin: {k} is 0 or 1, not {v}")),
+        }
+    };
+    let frobenius = flag("frobenius")?;
+    let opts = BinOptions {
+        weighted: flag("weighted")? || frobenius,
+        frobenius,
+        sparsest: flag("sparsest")?,
+        replay: flag("replay")?,
+        frob_roots: flag("frob_roots")?,
+    };
+    let mut oracle = BinD4Oracle::new(inst, macaulay, seed, opts);
+    oracle.charge_unsolved = flag("charge_unsolved")?;
+    let large_primes = spec.oracle_params.u64_or("large_primes", 0)?;
+    if large_primes > 2 {
+        return Err(format!(
+            "gaudry-d4-bin: large_primes is 0, 1 or 2, not {large_primes}"
+        ));
+    }
+    let small_permille = spec.oracle_params.u64_or("small_permille", 1000)?;
+    if !(1..=1000).contains(&small_permille) {
+        return Err(format!(
+            "gaudry-d4-bin: small_permille is 1 to 1000, not {small_permille}"
+        ));
+    }
+    oracle.lp.max_large = large_primes as u8;
+    oracle.lp.small_permille = small_permille;
+    Ok(oracle)
 }
 
 /// `F_q` multiplications in one lift (`lift_x`) of a random abscissa
@@ -6139,6 +6301,9 @@ fn solve_ic_binary(
         "mitm-frobenius" => Box::new(FrobeniusMitmOracle::new(ms, inst)),
         "mitm-frobenius-counted" => Box::new(FrobeniusMitmOracle::new_counted(ms, inst)),
         "mitm-frobenius-lazy-counted" => Box::new(FrobeniusMitmOracle::new_lazy_counted(ms, inst)),
+        "mitm-frobenius-layout-counted" => {
+            Box::new(FrobeniusMitmOracle::new_layout_counted(ms, inst))
+        }
         "mitm-fiber" => Box::new(FiberMitmOracle::new(ms)),
         "mitm-frobenius-fiber" => Box::new(FiberFrobeniusMitmOracle::new(ms, inst)),
         "rootfind-mitm" => Box::new(RootfindMitmOracle::new(ms)),

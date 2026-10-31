@@ -73,7 +73,7 @@ def seal() -> dict:
             (4405, False), (4405, True), (4500, True), (4549, True)]:
         raise ValueError("candidate order differs")
     hours = Decimal("10")
-    rate = Decimal("0.20")
+    rate = Decimal("0.22")
     reserve = Decimal("0.25")
     previous = Decimal("5.710216")
     incremental = hours * rate + reserve

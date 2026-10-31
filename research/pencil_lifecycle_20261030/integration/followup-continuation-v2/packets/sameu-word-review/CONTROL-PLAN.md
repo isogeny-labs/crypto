@@ -1,0 +1,3 @@
+# Additional fixed reviewer controls
+
+After producer module review and before additional execution: use p5 singular source words a=(0,0,1,0,1,1), b=(0,0,2,0,1,1). Confirm retained source arithmetic k4, point y0 and raw doubled w0; do not claim full original valid-input theorem applies without global coprimality. Separately prove global IsCoprime fails for quinticX5 using existing global-to-local lemma. Confirm asymmetric support mismatched words return restrictedNone and p=2 violates minimum prime bound. These are boundary controls, not sampled native trajectories. Compile ReviewerControls once with pinned120s wrapper, retain any failure before correction.

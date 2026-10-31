@@ -1,0 +1,119 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261025-uniform-useful-yield",
+  "title": "Test exact uniform useful-rank yield and collection degree on all frozen bases",
+  "status": "draft",
+  "status_note": "Executed locally at0e88deaae:96arms/896targets/210comparisons,536states,172failed queries,0joint gains both modes;13controls reject and22backend tests pass. Nine named/16audited conditional Lean declarations pass. Remains draft for main-ancestry/Cairn gate, no task/lease/promotion; iid probability bridge and complete work open.",
+  "created": "2026-10-25",
+  "authors": [
+    "research reasoning lane"
+  ],
+  "owner_hint": "Existing PR2381 research continuation",
+  "question": "Under the fixed uniform nonidentity sampler, can an actual twist policy improve expected useful rank gain and lower mean named solver degree, retaining all main policies and source reductions?",
+  "decision_value": "The full uniform census now retains every policy and loss and finds no strict joint mean-rank and degree gain on either input form. This closes the preregistered finite comparison while directing the next work to actual-state probability semantics or a different constrained encoding, preserving source recovery and complete-cost obligations.",
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "codex/quadratic-twist-evidence-import",
+    "build": [
+      [
+        "c++",
+        "-std=c++17",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "research/quadratic_twist_evidence_20261021/native/uniform-yield-v2.cpp",
+        "-lcrypto",
+        "-lgmpxx",
+        "-lgmp",
+        "-o",
+        "/tmp/quadratic-twist-uniform-yield"
+      ],
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--manifest-path",
+        "research/quadratic_twist_evidence_20261021/native/uniform-yield-audit-v3/Cargo.toml"
+      ]
+    ]
+  },
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
+  "run": {
+    "argv": [
+      "research/quadratic_twist_evidence_20261021/run-uniform-yield-v3.sh",
+      "{out}"
+    ],
+    "env": {
+      "RAYON_NUM_THREADS": "1"
+    },
+    "timeout_per_shard_s": 3600
+  },
+  "shards": {
+    "scheme": "single",
+    "count": 1,
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "resources": {
+    "cpus": 2,
+    "ram_gb": 4,
+    "disk_gb": 4,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Use existing local resources; native command caps600 seconds and one iteration envelope3600 seconds. Estimates remain null until the implementation and protocol are fixed; no paid compute or upload requested."
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "unassigned",
+    "tasks": [
+      "XP-20261025-uniform-useful-yield"
+    ],
+    "env": {
+      "name": "crypto-rust",
+      "recipe": "Local evidence executed; this remains a draft for main-ancestry/Cairn gates. No Cairn lease or task execution claimed."
+    },
+    "exec": {
+      "cpus": 2,
+      "memory_mb": 4096,
+      "timeout_s": 3600,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261025-uniform-useful-yield"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "No funding, paid resource or task reservation requested."
+    },
+    "ttl_s": 86400,
+    "notes": "Draft only; no Cairn lease, run or publication performed."
+  },
+  "outputs": {
+    "result_schema": "quadratic-twist-uniform-yield/v1",
+    "verify": [],
+    "land": "research/quadratic_twist_evidence_20261021"
+  },
+  "links": {
+    "prs": [
+      2381
+    ],
+    "lead": "crypto-autoresearcher:LEAD-ICE-relation-graph-rank-large-prime",
+    "notes": [
+      "research/quadratic_twist_evidence_20261021/reports/uniform-audit-preflight-20261026/README.md",
+      "research/quadratic_twist_evidence_20261021/UNIFORM_YIELD_20261025_PROTOCOL.md",
+      "research/quadratic_twist_evidence_20261021/reports/uniform-yield-preflight-20261025/README.md",
+      "research/quadratic_twist_evidence_20261021/CONTINUATION.md",
+      "research/quadratic_twist_evidence_20261021/reports/uniform-20261029/README.md"
+    ]
+  },
+  "blocked_on": []
+}

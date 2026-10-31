@@ -21,6 +21,7 @@ path = "src/lib.rs"
 
 [dependencies]
 anyhow = "1"
+base64 = "0.22"
 axum = { version = "0.8", features = ["macros"] }
 clap = { version = "4", features = ["derive", "env"] }
 deadpool-postgres = "0.14"
@@ -39,17 +40,19 @@ serde = { version = "1", features = ["derive"] }
 # Exact big integers inside JSON: group orders and Weil coefficients must not
 # round through f64 on their way between Postgres and a client.
 serde_json = { version = "1", features = ["arbitrary_precision"] }
+# cryptanalysis's IC candidate catalogue (curves.yaml).
+serde_yaml = "0.9"
 sha2 = "0.10"
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "signal", "net", "time"] }
 tokio-postgres = { version = "0.7", features = ["with-serde_json-1"] }
 tokio-postgres-rustls = "0.13"
+tower = { version = "0.5", features = ["util"] }
 tower-http = { version = "0.6", features = ["cors", "trace"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
 webpki-roots = "0.26"
 
 [dev-dependencies]
-tower = { version = "0.5", features = ["util"] }
 http-body-util = "0.1"
 
 [lints.rust]

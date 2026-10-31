@@ -1,0 +1,97 @@
+import TwistEigenspace
+import Mathlib.Algebra.QuadraticAlgebra.Basic
+import Mathlib.Data.ZMod.Basic
+
+/-! A concrete, computable field and actual elliptic points for the retained
+F_43 pairing fixture.  No general Weil-pairing theorem is assumed here. -/
+namespace PairingFixture
+
+open WeierstrassCurve.Affine
+
+abbrev k := ZMod 43
+instance : Fact (Nat.Prime 43) := ⟨by decide⟩
+instance : Fact (∀ z : k, z ^ 2 ≠ (2 : k) + 0 * z) := ⟨by decide⟩
+abbrev K := QuadraticAlgebra k 2 0
+abbrev E : WeierstrassCurve.Affine K := TwistEmbedding.short 1 0
+
+instance : E.IsElliptic := by
+  constructor
+  apply isUnit_iff_ne_zero.mpr
+  decide
+
+def mkPoint (x y : K) (h : y ^ 2 = x ^ 3 + x) : E.Point :=
+  Point.some x y ((equation_iff_nonsingular_of_Δ_ne_zero
+    (WeierstrassCurve.isUnit_Δ E).ne_zero).mp (by
+      simpa [equation_iff, E, TwistEmbedding.short] using h))
+
+def P : E.Point := mkPoint ⟨31, 0⟩ ⟨18, 0⟩ (by decide)
+def Q : E.Point := mkPoint ⟨13, 0⟩ ⟨24, 0⟩ (by decide)
+def S : E.Point := mkPoint ⟨39, 0⟩ ⟨0, 3⟩ (by decide)
+def g : K := ⟨2, 25⟩
+def h : K := ⟨11, 19⟩
+
+/-- Reject support collisions instead of treating a zero denominator as a pairing value. -/
+def ratio (a b : K) : Option K := if a = 0 ∨ b = 0 then none else some (a / b)
+
+def line (A B X : E.Point) : Option K :=
+  match A, B, X with
+  | .some ax ay _, .some bx byy _, .some xx xy _ =>
+    if ax = bx ∧ ay + byy = 0 then ratio (xx - ax) 1
+    else
+      let m := if ax = bx then (3 * ax ^ 2 + 1) / (2 * ay)
+               else (byy - ay) / (bx - ax)
+      let numerator := xy - ay - m * (xx - ax)
+      match A + B with
+      | .zero => ratio numerator 1
+      | .some cx _ _ => ratio numerator (xx - cx)
+  | _, _, _ => none
+
+def millerAux (P X : E.Point) : ℕ → E.Point → K → Option K
+  | 0, V, z => if V = 0 then some z else none
+  | n + 1, V, z => (line V P X).bind fun v => millerAux P X n (V + P) (z * v)
+
+/-- The linear addition-chain Miller function for r=11, evaluated without a log lookup. -/
+def miller11 (P X : E.Point) : Option K := millerAux P X 10 P 1
+
+def weil11 (P Q : E.Point) : Option K :=
+  if P = 0 ∨ Q = 0 then some 1 else
+    (miller11 P Q).bind fun a => (miller11 Q P).bind fun b =>
+      (ratio a b).map Neg.neg
+
+theorem source_order : 11 • P = 0 := by decide +kernel
+theorem source_known_scalar : 7 • P = Q := by decide +kernel
+theorem twist_order : 11 • S = 0 := by decide +kernel
+theorem target_nontrivial : g ≠ 1 := by decide
+theorem target_order : g ^ 11 = 1 := by decide
+theorem target_known_scalar : g ^ 7 = h := by decide
+theorem pairing_generator : weil11 P S = some g := by decide +kernel
+theorem pairing_target : weil11 Q S = some h := by decide +kernel
+
+set_option maxRecDepth 100000 in
+theorem pairing_table : ∀ a b : Fin 11,
+    weil11 (a.val • P) (b.val • S) = some (g ^ (a.val * b.val)) := by
+  decide +kernel
+
+theorem target_powers_injective : ∀ a b : Fin 11, g ^ a.val = g ^ b.val ↔ a = b := by
+  decide +kernel
+
+theorem logarithm_transport (a b : Fin 11) :
+    weil11 (a.val • P) S = some (g ^ b.val) ↔ a = b := by
+  have ht := pairing_table a (1 : Fin 11)
+  simp only [Fin.val_one, one_nsmul, mul_one] at ht
+  rw [ht, Option.some.injEq]
+  exact target_powers_injective a b
+
+#print axioms source_order
+#print axioms source_known_scalar
+#print axioms twist_order
+#print axioms target_nontrivial
+#print axioms target_order
+#print axioms target_known_scalar
+#print axioms pairing_generator
+#print axioms pairing_target
+#print axioms pairing_table
+#print axioms target_powers_injective
+#print axioms logarithm_transport
+
+end PairingFixture

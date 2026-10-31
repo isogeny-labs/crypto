@@ -608,6 +608,17 @@
      "class": "engineering",
      "anchor": "#prime-ksum-vs-incumbent-20261029",
      "source": "https://github.com/isogeny-labs/crypto/blob/main/research/prime_ksum_vs_incumbent_20261029/README.md"
+    },
+    {
+     "date": "2026-10-30",
+     "value": 5.416156370487082,
+     "reference": "matched",
+     "unit": "counted GAE lower-bound diagnostic",
+     "label": "Prime-field IC, generic decomposition track, k = 4 sum table vs the tuned mitm incumbent, 20-bit, 4 fresh curves pooled",
+     "detail": "ksum4-sel / rho-neg pooled mean S at w = 0 on 4 fresh 20-bit curves (24 targets x 2 rounds each, every run verified, replay-all audited; incumbent re-tuned on separate train curves by the same rule): 5.42x. Was 8.56x (tuned mitm incumbent, same session and curves). ksum5 / inc-sel 0.700 / 0.446 / 0.324 / 0.217 at 20 / 24 / 28 / 32 bits, on all 16 curves and below 1 at every band weight. Track: generic decomposition (bounded by sqrt(r); cannot beat rho). Same host only (unqualified; second-host replay owed). Pooled over four curves, so not comparable with the single-curve ksum4 point of research/prime_ksum_vs_incumbent_20261029. Lookups unpriced.",
+     "class": "engineering",
+     "anchor": "#prime-ksum-pooled-20261029",
+     "source": "https://github.com/isogeny-labs/crypto/blob/main/research/prime_ksum_pooled_20261029/README.md"
     }
    ],
    "role": "context"
@@ -1164,5 +1175,5 @@
   }
  ],
  "unit_note": "Each point is quoted from the frozen result it links, in that result's own unit (Valgrind Ir, S, counted operations, online wall time, or isolated CPU time where marked). Direction against 1 is meaningful only for fully priced ratios; a quotient of incomplete lower bounds is diagnostic even when paired. No value on this page is computed from another.",
- "updated": "2026-10-29"
+ "updated": "2026-10-30"
 }

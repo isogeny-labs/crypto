@@ -218,6 +218,80 @@ paths:
       summary: Verbatim producer trait records (e.g. curve-traits/2 with DiSSECT families).
       parameters: [{ $ref: "#/components/parameters/reference" }]
       responses: { "200": { description: OK } }
+  /v1/curves/{reference}/relations:
+    get:
+      summary: Typed relations to other curves (quadratic_twist, isomorphism, birational_model_change), each with other_curve_id and other_slug.
+      description: Twist pairs are recorded only for j != 0, 1728 and t != 0, where the quadratic twist is the unique curve with the same j and trace -t.
+      parameters: [{ $ref: "#/components/parameters/reference" }]
+      responses: { "200": { description: "{curve_id, items[]}" } }
+  /v1/curves/{reference}/endomorphisms:
+    get:
+      summary: Endomorphisms (Frobenius, GLV maps with eigenvalue, subfield tau) and GLV scalar-decomposition lattices.
+      description: |
+        A GLV row for j = 0 is (x, y) -> (beta x, y) with beta a primitive cube root of unity in F_p; for j = 1728 it is
+        (x, y) -> (-x, i y). The eigenvalue lambda on the prime-order subgroup is checked on the curve's generator
+        when one is recorded (status proved); scalar_decompositions hold the reduced basis of {(a, b) : a + b lambda = 0 mod r}.
+      parameters: [{ $ref: "#/components/parameters/reference" }]
+      responses: { "200": { description: "{curve_id, endomorphisms[], scalar_decompositions[]}" } }
+  /v1/curves/{reference}/division-polynomials:
+    get:
+      summary: Division polynomials psi_n for n = 2..5 in x only, coefficients in ascending degree, over the curve's field.
+      description: "Convention: n = 2 is psi_2^2 = 4x^3 + b2 x^2 + 2 b4 x + b6; odd n is psi_n; n = 4 is psi_4 / psi_2. Each was checked to vanish on torsion points when the curve is small enough to enumerate."
+      parameters: [{ $ref: "#/components/parameters/reference" }]
+      responses: { "200": { description: "{curve_id, convention, items[{n, variant, degree, sha256, coefficients_ascending, factor_degrees, status}]}" } }
+  /v1/curves/{reference}/measurements:
+    get:
+      summary: The curve's measured results, each block in its producer's unit
+      description: IC leaderboard rows with recipes, ecbench arm summaries (v_ecbench_arm), sibling-dataset measurements and sibling-repository records with their match kind. Compare within one block only.
+      parameters: [{ $ref: "#/components/parameters/reference" }]
+      responses: { "200": { description: "{curve_id, ic_leaderboard, ecbench_arms, dataset_measurements, external_records, caution}" } }
+  /v1/ic/leaderboard:
+    get:
+      summary: The IC leaderboard (docs/ic/leaderboard.json), as frozen there.
+      description: best_ratio_rho is IC / rho for the best recipe, cold, against the matched rho of the row's family, in that family's unit; ratios compare only within a family.
+      parameters:
+        - { name: family, in: query, schema: { type: string, enum: [A, B, C] } }
+        - { name: regime, in: query, schema: { type: string } }
+        - { name: validation, in: query, schema: { type: string }, description: "validated or unvalidated (pre-gate)" }
+        - { name: recipes, in: query, schema: { type: boolean, default: false } }
+      responses: { "200": { description: "{families[], rows[], caution}" } }
+  /v1/ic/progress:
+    get:
+      summary: The progress timeline (docs/ic/progress-timeline.json).
+      parameters: [{ name: series, in: query, schema: { type: string } }]
+      responses: { "200": { description: "{series[{id, label, points[]}], caution}" } }
+  /v1/ic/boundary:
+    get:
+      summary: The boundary ledger (docs/ic/boundary_targets.json), per regime and stage.
+      parameters:
+        - { name: regime, in: query, schema: { type: string } }
+        - { name: stage, in: query, schema: { type: string } }
+      responses: { "200": { description: "{items[]}" } }
+  /v1/benchmarks:
+    get:
+      summary: The benchmarks/ index, with each entry's README or archive row and VALIDATION.json.
+      parameters:
+        - { name: listed, in: query, schema: { type: string, enum: [admitted, archive, unlisted] } }
+        - { name: q, in: query, schema: { type: string } }
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses: { "200": { description: OK } }
+  /v1/ecbench/sessions:
+    get:
+      summary: ecbench sessions, newest first.
+      parameters:
+        - { name: method, in: query, schema: { type: string } }
+        - { name: curve, in: query, schema: { type: string }, description: ICV1 slug of a workload curve }
+        - { name: label, in: query, schema: { type: string } }
+        - { name: path, in: query, schema: { type: string } }
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses: { "200": { description: OK } }
+  /v1/ecbench/sessions/{id}:
+    get:
+      summary: One ecbench session with per-arm summaries (runs, verified, mean S and its standard error, mean ratio to the floor) and paired comparisons.
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK }, "404": { description: Not found } }
   /v1/isogenies/{id}:
     get:
       summary: One isogeny with its routes and provenance.
@@ -278,10 +352,20 @@ paths:
       responses: { "200": { description: OK }, "404": { description: Not found } }
   /v1/modular-polynomials:
     get:
-      summary: Modular polynomials by level and kind.
+      summary: Classical modular polynomials Phi_l(X, Y) over Z (l = 2, 3, 5, 7, 11, 13, 17, 19).
+      description: "Coefficients are sparse [[i, j], c] for c X^i Y^j with both (i, j) and (j, i) listed; c is a decimal string when beyond 2^53."
       parameters:
         - { name: level, in: query, schema: { type: integer } }
         - { name: kind, in: query, schema: { type: string } }
+        - { name: coefficients, in: query, schema: { type: boolean, default: false }, description: include the coefficients }
+      responses: { "200": { description: OK } }
+  /v1/class-polynomials:
+    get:
+      summary: Hilbert class polynomials H_D for the 13 class-number-one discriminants, with the curves each was checked on.
+      responses: { "200": { description: OK } }
+  /v1/summation-polynomials:
+    get:
+      summary: Semaev summation polynomials S_2 and S_3 for y^2 = x^3 + a x + b, generic in a and b.
       responses: { "200": { description: OK } }
   /v1/sql:
     post:
@@ -329,6 +413,22 @@ paths:
                   required: [name]
                   properties: { name: { type: string }, method: { type: string }, notes: { type: string } }
       responses: { "201": { description: Created }, "200": { description: Duplicate }, "401": { description: Unauthorized }, "403": { description: Writes disabled } }
+  /mcp:
+    post:
+      summary: Model Context Protocol endpoint (streamable HTTP, JSON responses, stateless).
+      description: |
+        One JSON-RPC 2.0 message per POST. Methods: initialize, ping, tools/list, tools/call (resources/list and
+        prompts/list return empty lists). Notifications answer 202. initialize, ping and tools/list need no token;
+        tools/call forwards the caller's Authorization header to the REST route the tool maps to. Tools:
+        ecdb_schema, ecdb_search_curves, ecdb_get_curve, ecdb_curve_detail, ecdb_isogeny_class, ecdb_transfers,
+        ecdb_polynomials, ecdb_results, ecdb_ecbench, ecdb_sql, ecdb_record_evidence.
+      security: [{}]
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses: { "200": { description: JSON-RPC response }, "202": { description: notification accepted } }
+    get:
+      summary: Not supported (no server-initiated stream).
+      security: [{}]
+      responses: { "405": { description: Method not allowed } }
   /v1/isogenies:
     post:
       summary: Record an isogeny claim between two curves over the same field (write token).
