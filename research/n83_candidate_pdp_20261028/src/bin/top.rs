@@ -89,16 +89,16 @@ fn positions(input: &Value) -> Vec<usize> {
         .iter()
         .map(|v| v.as_u64().unwrap() as usize)
         .collect();
-    let expected: Vec<_> = (0..27)
-        .map(|j| {
-            if input["arm"] == "spike40" && j == 26 {
-                40
-            } else {
-                j
-            }
-        })
-        .collect();
-    assert!(input["arm"] == "baseline" || input["arm"] == "spike40");
+    let arm = input["arm"].as_str().unwrap();
+    let last = if arm == "baseline" {
+        26
+    } else {
+        arm.strip_prefix("spike")
+            .and_then(|bit| bit.parse::<usize>().ok())
+            .filter(|bit| (27..=40).contains(bit))
+            .expect("candidate arm must be spike27 through spike40")
+    };
+    let expected: Vec<_> = (0..27).map(|j| if j == 26 { last } else { j }).collect();
     assert_eq!(p, expected);
     p
 }
@@ -429,12 +429,49 @@ fn paired(root: &Path, out: &Path, replay: bool) {
         );
     }
 }
+fn single(root: &Path, out: &Path, replay: bool) {
+    let inputs: Vec<Value> =
+        serde_json::from_slice(&fs::read(root.join("inputs.json")).unwrap()).unwrap();
+    if !replay {
+        fs::create_dir(out).unwrap();
+    }
+    let mut rows = Vec::new();
+    for input in inputs {
+        let id = input["id"].as_str().unwrap();
+        let source = fs::read_to_string(root.join(id).join("system.sing")).unwrap();
+        let certificate = certify(&input, &source);
+        let certificate_path = out.join(format!("{id}.json"));
+        if replay {
+            assert_eq!(
+                read(&certificate_path),
+                certificate,
+                "certificate replay mismatch for {id}"
+            );
+        } else {
+            save(&certificate_path, &certificate);
+        }
+        rows.push(json!({"id":id,"family":input["family"],"m":input["m"],"target_kind":input["target_kind"],"arm":input["arm"],"factor_base_manifest_sha256":input["factor_base_manifest_sha256"],"status":certificate["status"],"dreg_lower_bound":certificate["dreg_lower_bound"],"dreg_upper_bound":certificate["dreg_upper_bound"],"source_sha256":certificate["source_sha256"],"certificate":format!("{id}.json")}));
+    }
+    if replay {
+        save(
+            &out.parent().unwrap().join("replay-summary.json"),
+            &json!({"schema":"n83.single-top-replay/v1","all_verified":true,"rows":rows}),
+        );
+    } else {
+        save(
+            &out.join("summary.json"),
+            &json!({"schema":"n83.single-top-summary/v1","rows":rows,"scope":"Original highest-homogeneous-form quotient certificates for one candidate base. These are top-form graded-quotient measurements, not affine solving degree or a solver-cost result."}),
+        );
+    }
+}
 fn main() {
     let a: Vec<_> = std::env::args().collect();
     match a[1].as_str() {
         "run" => paired(Path::new(&a[2]), Path::new(&a[3]), false),
         "replay" => paired(Path::new(&a[2]), Path::new(&a[3]), true),
-        _ => panic!("run/replay PAIRED_RAW CERT_DIR"),
+        "single" => single(Path::new(&a[2]), Path::new(&a[3]), false),
+        "single-replay" => single(Path::new(&a[2]), Path::new(&a[3]), true),
+        _ => panic!("run/replay PAIRED_RAW CERT_DIR | single/single-replay INPUT_ROOT CERT_DIR"),
     }
 }
 #[cfg(test)]
@@ -455,15 +492,25 @@ mod tests {
                     .join("+")
             );
         }
-        if m == 2 {
-            t += &format!("I[1]={};\n", s3("x0", "x1", "5", "2", "3"));
-        } else {
-            assert_eq!(m, 3);
-            t += &format!(
-                "I[1]={};\nI[2]={};\n",
-                s3("x0", "x1", "v(82)", "2", "3"),
-                s3("v(82)", "x2", "5", "2", "3")
-            );
+        for k in 0..m - 1 {
+            let (x, y, z) = if m == 2 {
+                ("x0".to_string(), "x1".to_string(), "5".to_string())
+            } else if k == 0 {
+                ("x0".to_string(), "x1".to_string(), format!("v({})", nb + 1))
+            } else if k == m - 2 {
+                (
+                    format!("v({})", nb + k),
+                    format!("x{}", k + 1),
+                    "5".to_string(),
+                )
+            } else {
+                (
+                    format!("v({})", nb + k),
+                    format!("x{}", k + 1),
+                    format!("v({})", nb + k + 1),
+                )
+            };
+            t += &format!("I[{}]={};\n", k + 1, s3(&x, &y, &z, "2", "3"));
         }
         for i in 0..nb {
             t += &format!("I[{}]=v({})^2-v({});\n", m + i, i + 1, i + 1);
@@ -563,17 +610,25 @@ mod tests {
     }
     #[test]
     fn prime_diagonal_map_invertible_and_weight_matched() {
-        for m in [2, 3] {
+        for m in 2..=9 {
             let (a, t) = prime_fixture(m);
-            let mut b = a.clone();
-            b["arm"] = json!("spike40");
-            b["coordinate_bit_positions"][26] = json!(40);
             prime(&a, &t);
-            prime(&b, &t.replace("67108864*", "1099511627776*"));
-            let proof = prime_isomorphism(&a, &b);
-            assert_eq!(proof["variables"][26]["scale"], "16384");
-            assert_eq!(proof["verified_graded_quotient_isomorphism"], true);
-            let mut bad = b.clone();
+            for r in 27..=40 {
+                let mut b = a.clone();
+                b["arm"] = json!(format!("spike{r}"));
+                b["coordinate_bit_positions"][26] = json!(r);
+                let candidate_weight = (1u128 << r).to_string();
+                let candidate_text = t.replace("67108864*", &format!("{candidate_weight}*"));
+                prime(&b, &candidate_text);
+                let proof = prime_isomorphism(&a, &b);
+                assert_eq!(
+                    proof["variables"][26]["scale"],
+                    (1u128 << (r - 26)).to_string()
+                );
+                assert_eq!(proof["verified_graded_quotient_isomorphism"], true);
+            }
+            let mut bad = a.clone();
+            bad["arm"] = json!("spike41");
             bad["coordinate_bit_positions"][26] = json!(41);
             assert!(std::panic::catch_unwind(|| prime_isomorphism(&a, &bad)).is_err());
         }

@@ -253,40 +253,48 @@ fn peval(p: &Poly, bits: &[u128]) -> u128 {
 fn s3text(x: &str, y: &str, z: &str, a: u128, b: u128) -> String {
     format!("(({x})-({y}))^2*({z})^2-2*((({x})+({y}))*(({x})*({y})+{a})+2*{b})*({z})+(({x})*({y})-{a})^2-4*{b}*(({x})+({y}))")
 }
-fn basis_bit(j: usize, spike: bool) -> usize {
-    if spike && j == 26 {
-        40
+fn basis_bit(j: usize, coordinate_bit: Option<usize>) -> usize {
+    if j == 26 {
+        coordinate_bit.unwrap_or(26)
     } else {
         j
     }
 }
-fn base_linear(start: usize, spike: bool) -> Poly {
+fn base_linear(start: usize, coordinate_bit: Option<usize>) -> Poly {
     (0..27)
-        .map(|j| (vec![start + j], 1u128 << basis_bit(j, spike)))
+        .map(|j| (vec![start + j], 1u128 << basis_bit(j, coordinate_bit)))
         .collect()
 }
-fn selector(x: u128, spike: bool) -> usize {
-    let i = if spike {
-        (x & ((1 << 26) - 1)) | ((x >> 40) << 26)
+fn selector(x: u128, coordinate_bit: Option<usize>) -> usize {
+    let i = if let Some(bit) = coordinate_bit {
+        (x & ((1 << 26) - 1)) | ((x >> bit) << 26)
     } else {
         x
     };
     assert!(i < (1 << 27));
-    let decoded = if spike {
-        (i & ((1 << 26) - 1)) | ((i >> 26) << 40)
+    let decoded = if let Some(bit) = coordinate_bit {
+        (i & ((1 << 26) - 1)) | ((i >> 26) << bit)
     } else {
         i
     };
     assert_eq!(x, decoded, "x outside base domain");
     i as usize
 }
-fn base_record(raw: &[u8], pt: (u128, u128)) -> bool {
+fn base_record(raw: &[u8], pt: (u128, u128), coordinate_bit: Option<usize>) -> bool {
     assert!(raw.len() >= 32);
     let spike = &raw[..8] == b"N83FB02\n";
     assert!(spike || &raw[..8] == b"N83FB01\n");
     if spike {
-        assert_eq!(raw[10], 40);
+        assert_eq!(
+            raw[10] as usize,
+            coordinate_bit.expect("candidate shard coordinate bit")
+        );
         assert!(raw[11..16].iter().all(|b| *b == 0));
+    } else {
+        assert!(
+            coordinate_bit.is_none(),
+            "candidate bit cannot use baseline shard"
+        );
     }
     assert_eq!((raw.len() - 32) % 20, 0);
     let read = |i: usize| {
@@ -295,7 +303,8 @@ fn base_record(raw: &[u8], pt: (u128, u128)) -> bool {
             {
                 let i = u32::from_le_bytes(raw[offset..offset + 4].try_into().unwrap()) as u128;
                 if spike {
-                    (i & ((1 << 26) - 1)) | ((i >> 26) << 40)
+                    let bit = coordinate_bit.unwrap();
+                    (i & ((1 << 26) - 1)) | ((i >> 26) << bit)
                 } else {
                     i
                 }
@@ -315,8 +324,17 @@ fn base_record(raw: &[u8], pt: (u128, u128)) -> bool {
     lo < (raw.len() - 32) / 20 && read(lo) == pt
 }
 fn generate(root: &Path, bases: &Path, matched: &Path, arm: &str) -> Vec<Value> {
-    assert!(arm == "baseline" || arm == "spike40");
-    let spike = arm == "spike40";
+    let coordinate_bit = if arm == "baseline" {
+        None
+    } else {
+        Some(
+            arm.strip_prefix("spike")
+                .and_then(|s| s.parse::<usize>().ok())
+                .filter(|bit| (27..=40).contains(bit))
+                .expect("candidate arm must be spike27 through spike40"),
+        )
+    };
+    let spike = coordinate_bit.is_some();
     assert!(!root.exists(), "fresh output required");
     let matched_bytes = fs::read(matched.join("inputs.json")).unwrap();
     assert_eq!(
@@ -330,16 +348,12 @@ fn generate(root: &Path, bases: &Path, matched: &Path, arm: &str) -> Vec<Value> 
     assert_eq!(index["complete"], true);
     assert_eq!(index["ell"], 27);
     assert_eq!(index["candidate_x_count_per_curve"], 1u64 << 27);
-    if spike {
-        assert_eq!(index["candidate_id"], "spike40");
+    if let Some(bit) = coordinate_bit {
+        assert_eq!(index["candidate_id"], arm);
+        assert_eq!(index["coordinate_bit_positions"][26], bit);
     }
-    let candidate_hashes = [
-        "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6",
-        "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe",
-        "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324",
-    ];
     let mut manifests = BTreeMap::new();
-    for (family, expected) in [
+    for (family, baseline_expected) in [
         (
             "koblitz",
             "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b",
@@ -353,23 +367,23 @@ fn generate(root: &Path, bases: &Path, matched: &Path, arm: &str) -> Vec<Value> 
             "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5",
         ),
     ] {
-        let expected = if spike {
-            candidate_hashes[match family {
-                "koblitz" => 0,
-                "binary" => 1,
-                _ => 2,
-            }]
-        } else {
-            expected
-        };
-        let bytes = fs::read(bases.join(family).join("manifest.json")).unwrap();
-        assert_eq!(hash(&bytes), expected);
         let entry = index["families"]
             .as_array()
             .unwrap()
             .iter()
             .find(|e| e["family"] == family)
             .unwrap();
+        let expected = match coordinate_bit {
+            Some(40) => match family {
+                "koblitz" => "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6",
+                "binary" => "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe",
+                _ => "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324",
+            },
+            None => baseline_expected,
+            Some(_) => entry["manifest_sha256"].as_str().unwrap(),
+        };
+        let bytes = fs::read(bases.join(family).join("manifest.json")).unwrap();
+        assert_eq!(hash(&bytes), expected);
         assert_eq!(entry["manifest_sha256"], expected);
         manifests.insert(
             family,
@@ -439,7 +453,7 @@ fn generate(root: &Path, bases: &Path, matched: &Path, arm: &str) -> Vec<Value> 
             let (manifest, manifest_hash) = &manifests[family];
             let mut membership = Vec::new();
             for &pt in &pts {
-                let part = selector(pt.0, spike) >> 20;
+                let part = selector(pt.0, coordinate_bit) >> 20;
                 let cert = &manifest["shards"][part];
                 let bytes =
                     fs::read(bases.join(family).join(cert["file"].as_str().unwrap())).unwrap();
@@ -456,7 +470,7 @@ fn generate(root: &Path, bases: &Path, matched: &Path, arm: &str) -> Vec<Value> 
                 assert_eq!(raw[9], 27);
                 assert_eq!(&raw[..8], if spike { b"N83FB02\n" } else { b"N83FB01\n" });
                 assert!(
-                    base_record(&raw, pt),
+                    base_record(&raw, pt, coordinate_bit),
                     "planted point absent from saved factor base"
                 );
                 membership.push(json!({"x":pt.0.to_string(),"y":pt.1.to_string(),"shard":cert["file"],"sha256":cert["sha256"],"present":true}));
@@ -486,7 +500,7 @@ fn generate(root: &Path, bases: &Path, matched: &Path, arm: &str) -> Vec<Value> 
                 let mut witness = Vec::new();
                 for (x, _) in &pts {
                     for j in 0..ell {
-                        witness.push((x >> basis_bit(j, spike)) & 1)
+                        witness.push((x >> basis_bit(j, coordinate_bit)) & 1)
                     }
                 }
                 for s in sums.iter().take(m - 1).skip(1) {
@@ -515,7 +529,9 @@ fn generate(root: &Path, bases: &Path, matched: &Path, arm: &str) -> Vec<Value> 
                 let mut eqs = 0;
                 let mut terms = 0;
                 if curve.binary {
-                    let x: Vec<Poly> = (0..m).map(|i| base_linear(i * ell, spike)).collect();
+                    let x: Vec<Poly> = (0..m)
+                        .map(|i| base_linear(i * ell, coordinate_bit))
+                        .collect();
                     let u: Vec<Poly> = (0..m - 2).map(|i| linear(m * ell + i * N, N)).collect();
                     let t: Poly = [(vec![], target.0)].into();
                     for k in 0..m - 1 {
@@ -563,7 +579,11 @@ fn generate(root: &Path, bases: &Path, matched: &Path, arm: &str) -> Vec<Value> 
                     for i in 0..m {
                         let expr = (0..ell)
                             .map(|j| {
-                                format!("{}*v({})", 1u128 << basis_bit(j, spike), i * ell + j + 1)
+                                format!(
+                                    "{}*v({})",
+                                    1u128 << basis_bit(j, coordinate_bit),
+                                    i * ell + j + 1
+                                )
                             })
                             .collect::<Vec<_>>()
                             .join("+");
@@ -628,8 +648,9 @@ fn generate(root: &Path, bases: &Path, matched: &Path, arm: &str) -> Vec<Value> 
                 let mut row = row;
                 row["arm"] = json!(arm);
                 row["candidate_id"] = json!(arm);
-                row["coordinate_bit_positions"] =
-                    json!((0..27).map(|j| basis_bit(j, spike)).collect::<Vec<_>>());
+                row["coordinate_bit_positions"] = json!((0..27)
+                    .map(|j| basis_bit(j, coordinate_bit))
+                    .collect::<Vec<_>>());
                 row["target_distribution"] = json!(if kind == "planted" {
                     "common-support-planted: same low26 tuple and target in both arms; not uniform over full domain"
                 } else {
@@ -810,7 +831,7 @@ fn main() {
             }
             save(&root.join("results.json"), &json!(rows));
         }
-        _ => panic!("generate OUT BASES MATCHED_INPUTS baseline|spike40 | run OUT SECONDS SHARD SHARDS | summary OUT"),
+        _ => panic!("generate OUT BASES MATCHED_INPUTS baseline|spike27..spike40 | run OUT SECONDS SHARD SHARDS | summary OUT"),
     }
 }
 
@@ -826,10 +847,10 @@ mod tests {
             raw.extend(y.to_le_bytes());
         }
         for pt in [(0, 1), (3, 6), (3, 99), (9, 17)] {
-            assert!(base_record(&raw, pt));
+            assert!(base_record(&raw, pt, None));
         }
         for pt in [(0, 0), (1, 1), (3, 7), (9, 18), (10, 1)] {
-            assert!(!base_record(&raw, pt));
+            assert!(!base_record(&raw, pt, None));
         }
     }
     #[test]
@@ -908,19 +929,21 @@ mod candidate_tests {
     use super::*;
     #[test]
     fn coordinate_map_and_lift_lookup() {
-        for i in [0u128, 7, (1 << 26) - 1, 1 << 26, (1 << 27) - 1] {
-            let x = (i & ((1 << 26) - 1)) | ((i >> 26) << 40);
-            assert_eq!(selector(x, true) as u128, i);
-            let mut raw = vec![0; 32];
-            raw[..8].copy_from_slice(b"N83FB02\n");
-            raw[10] = 40;
-            raw.extend((i as u32).to_le_bytes());
-            raw.extend(19u128.to_le_bytes());
-            assert!(base_record(&raw, (x, 19)));
-            assert!(!base_record(&raw, (x, 18)));
-            let bits: Vec<_> = (0..27).map(|j| (i >> j) & 1).collect();
-            assert_eq!(peval(&base_linear(0, true), &bits), x);
+        for bit in 27..=40 {
+            for i in [0u128, 7, (1 << 26) - 1, 1 << 26, (1 << 27) - 1] {
+                let x = (i & ((1 << 26) - 1)) | ((i >> 26) << bit);
+                assert_eq!(selector(x, Some(bit)) as u128, i);
+                let mut raw = vec![0; 32];
+                raw[..8].copy_from_slice(b"N83FB02\n");
+                raw[10] = bit as u8;
+                raw.extend((i as u32).to_le_bytes());
+                raw.extend(19u128.to_le_bytes());
+                assert!(base_record(&raw, (x, 19), Some(bit)));
+                assert!(!base_record(&raw, (x, 18), Some(bit)));
+                let bits: Vec<_> = (0..27).map(|j| (i >> j) & 1).collect();
+                assert_eq!(peval(&base_linear(0, Some(bit)), &bits), x);
+            }
         }
-        assert!(std::panic::catch_unwind(|| selector(1 << 26, true)).is_err());
+        assert!(std::panic::catch_unwind(|| selector(1 << 26, Some(40))).is_err());
     }
 }

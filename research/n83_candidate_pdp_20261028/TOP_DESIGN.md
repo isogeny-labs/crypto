@@ -75,3 +75,17 @@ quotients and equal Hilbert functions. This certifies equality of regularity
 under the recorded convention, not an affine-selector ideal isomorphism or a
 universal assertion about other bases/encodings. Add this check before freeze;
 no affected production data have yet been taken.
+
+## Prime top-quotient invariance across candidate bits
+
+The same diagonal proof applies to every candidate coordinate bit r=27..40.
+For each 27-selector block substitute baseline v_26 by 2^(r-26) times the
+candidate v_26 and leave all other variables fixed. The baseline selector
+form then maps exactly to the r-weighted candidate form. Every original
+highest Semaev form maps to its candidate counterpart, and each selector-square
+generator maps to a nonzero scalar multiple because 2 is invertible modulo the
+prime-field modulus. Thus the prime-family original top ideals have isomorphic
+graded quotients for every r in the frozen sweep. `src/bin/top.rs` checks this
+map for m=2,3 fixtures across r=27..40. This removes prime-family top-quotient
+regularity as a varying response for the proposed candidate model; it says
+nothing about affine solving degree or the binary/Koblitz systems.
