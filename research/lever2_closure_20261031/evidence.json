@@ -1,0 +1,44 @@
+{
+  "schema": "lever2.recorded-values/v1",
+  "note": "Every number below is copied from a committed note; nothing here was measured in this study. 'D' is the F4 solving degree (largest degree reached before the solution or the refutation) of the PKM tower decomposition system, N = m*t tower unknowns, t = tower height.",
+  "thread": "research/notes/index-calculus/RESEARCH_PKM_TOWER_ORACLE.md",
+  "series": [
+    {
+      "id": "kummer-m2", "family": "Kummer", "m": 2,
+      "points": [[2,3],[4,4],[6,4],[8,4],[10,4],[12,5],[14,5],[16,5],[18,5],[20,6],[22,6]],
+      "source": "N=2..20: section 17 ('Measured: the torus D equals the split D', 3 4 4 4 4 5 5 5 5 6); N=22: section 11.7 K1 (D = 6, 6)",
+      "caveat": "N=2 reads 3 in the reduced presentation used here and 4 in the raw pilot table (section 10.2); every other N agrees."
+    },
+    {
+      "id": "null-m2", "family": "shape-matched null", "m": 2,
+      "points": [[12,5],[14,5],[16,5],[18,5],[20,6]],
+      "source": "section 11.7 K1n: same D, width and step count as K1 at every N from 12 to 20"
+    },
+    {
+      "id": "isogeny-m2", "family": "2-isogeny", "m": 2,
+      "points": [[2,4],[4,5],[6,5],[8,5],[10,5],[12,5],[14,5],[16,5],[18,5],[20,6]],
+      "source": "N=2..18: section 10.2 raw table; N=20: section 11.7 I0 (D = 6, 6)"
+    },
+    {
+      "id": "kummer-m3", "family": "Kummer", "m": 3,
+      "points": [[6,5],[9,6],[12,6],[15,7],[18,7]],
+      "source": "N=6,9,12: section 10.2 / section 17; N=15: section 11.7 M3 (D = 7); N=18: section 16 summary (D = 7 on both targets)"
+    },
+    {
+      "id": "kummer-m4", "family": "Kummer", "m": 4,
+      "points": [[8,6],[12,7],[16,7]],
+      "source": "N=8,12: section 10.2 / section 11.7 M4; N=16: section 12 summary (D = 7 on both targets)"
+    }
+  ],
+  "registered_prediction": {
+    "name": "C-step",
+    "formula": "d_F = 4 + floor((t - 2)/4) for Kummer m = 2, t >= 2 (N = 2t)",
+    "points": [[22,6],[24,6],[26,6],[28,7]],
+    "source": "research/prime_fall_degree_20261027/PREREGISTRATION.md, Amendment 6 (2026-10-28); t = 11 is not a blind test, t = 12..14 are, t = 14 is decisive (Amendment 7, disclosure E)",
+    "status": "not run; the study's stage A is routed to Iso Lab EKS"
+  },
+  "width_kummer_m2_round2": {
+    "points": [[12,1231],[14,2304],[16,4789],[18,8644],[20,33446],[22,51909]],
+    "source": "section 11.7 K1 table, column 'width' (widest F4 matrix, columns)"
+  }
+}
