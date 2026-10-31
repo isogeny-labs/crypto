@@ -600,9 +600,9 @@ def ic_aimed_gather(ref, since):
              source=src)
 
 
-def explicit_gpu_frontier(ref, since):
+def explicit_gpu_frontier(ref, since, study="research/explicit_relations_e2e_20261030",
+                          metric_prefix="gpu.explicit_relations"):
     """Exact completed-panel counts; no timing or global-maximum claims."""
-    study = "research/explicit_relations_e2e_20261030"
     revision = _git("rev-parse", ref).strip()[:12]
     paths = [p for p in ls(ref, study) if p.endswith("/coverage.json")]
     requested = [f"{p.rsplit('/', 1)[0]}/{name}" for p in paths
@@ -643,7 +643,7 @@ def explicit_gpu_frontier(ref, since):
                        r.get("verification", {}).get("status") == "verified" for r in runs)
         if len(runs) != coverage.get("attempted") or verified != coverage.get("verified_recoveries"):
             raise ValueError(f"inconsistent completed GPU panel: {path}")
-        prefix = f"gpu.explicit_relations.{name[8:]}"
+        prefix = f"{metric_prefix}.{name[8:]}"
         source = f"{path}@{revision}"
         for suffix, value, label in (
             ("attempted", coverage["attempted"], "recorded executions"),
@@ -693,6 +693,8 @@ def main():
     pencil_gate_observations(a.ref, a.since)
     ic_aimed_gather(a.ref, a.since)
     explicit_gpu_frontier(a.ref, a.since)
+    explicit_gpu_frontier(a.ref, a.since, "research/explicit_relations_affine_20261030",
+                          "gpu.explicit_relations.affine")
 
 if __name__ == "__main__":
     main()

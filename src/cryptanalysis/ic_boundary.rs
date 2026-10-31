@@ -6663,6 +6663,10 @@ impl FrobeniusPairTable {
             build_canonicalisations: canons,
             build_frobenius_maps: 0,
             build_lookups: 0,
+            // The layout names every orbit, so there is no orbit-index
+            // pass: the inserts tried are the pair inserts alone.
+            insert_attempts: canons,
+            orbit_canonicalisations: 0,
         })
     }
 
@@ -7918,7 +7922,6 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
         // The stride is G itself: no draw, no scalar multiplication.
         stride = (generator, 1, 0);
     }
-    if targets == TargetSource::StrideRenew {
     if targets.renews_stride() {
         while g.is_identity(&renew_by.0) {
             renew_by = draw_jumps(
