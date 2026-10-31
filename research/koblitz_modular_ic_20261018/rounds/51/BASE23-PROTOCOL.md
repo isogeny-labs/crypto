@@ -27,3 +27,6 @@ Adaptive source-bound followup, after universal51-01 exported its degree26 D:
 require the actual full polynomial identity D=(1+c)^5*Delta^3, with
 Delta=b^3(b+c(1+c)^3), before specialization. This identifies the open
 explicitly; the inverse witnesses must still pass on the marked23 base.
+
+The specialized donor is twist51-02,conditional on its strict acceptance;
+never consume the output of the rejected late-marker twist51-01.
