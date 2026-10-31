@@ -28,3 +28,9 @@ CM role:3 is inert for discriminant-7. This generic quotient is a control
 and an annihilator/relation-correspondence probe,not an expected nonzero
 map on the CM target. Good split prime correspondences require the separate
 prime/eigenvalue filter;do not label T3 as that construction.
+
+Before data,also require psi3'(t)=(At+b)^2 and its full quotient inverse,
+so the four-dimensional generic kernel algebra is separable. Check the
+reduced X-map numerator at x=t equals(At+b)^2 and its derivative is
+(x+t)^2+v,with derivative of(x+t)^2 zero. These identify its reduced degree3
+and separability using the certified kernel denominator unit.
