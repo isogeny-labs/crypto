@@ -1,0 +1,77 @@
+{
+  "build": [],
+  "command": {
+    "argv": [
+      "./ecbench",
+      "run",
+      "--spec",
+      "spec.json",
+      "--out",
+      "${ISOLAB_OUTPUT_DIR}/session",
+      "--cpus",
+      "inherit",
+      "--allow-busy"
+    ],
+    "env": {
+      "RAYON_NUM_THREADS": "1"
+    }
+  },
+  "fidelity": {
+    "policy": "strict",
+    "require": [
+      "cpu_partition",
+      "numa_bind",
+      "evicted",
+      "no_steal"
+    ]
+  },
+  "inputs": [
+    {
+      "content": "{\n  \"schema\": \"ecbench.spec/v1\",\n  \"label\": \"pdp_split_round3_20261018 Part A, n=19\",\n  \"description\": \"Preregistered (PROTOCOL.md Part A): hybrid guess 4 vs 8 on the standard subspace and its Frobenius closure, the fully charged pair-table bracket on the same closure, and matched rho. F4 arms' S are counted lower bounds; the table arms are fully charged.\",\n  \"workloads\": {\n    \"curves\": [\n      {\n        \"kind\": \"koblitz\",\n        \"a\": 1,\n        \"n\": 19\n      }\n    ],\n    \"targets_per_curve\": 8,\n    \"target_seed\": 202610181101,\n    \"target_kind\": \"public\"\n  },\n  \"arms\": [\n    {\n      \"name\": \"rho-strong\",\n      \"role\": \"reference\",\n      \"method\": {\n        \"id\": \"rho.signed_frobenius_strong\",\n        \"params\": {\n          \"lanes\": \"32\",\n          \"dp_bits\": \"4\",\n          \"step_cap_factor\": \"2000\"\n        }\n      }\n    },\n    {\n      \"name\": \"rho-frob\",\n      \"role\": \"baseline\",\n      \"method\": {\n        \"id\": \"rho.signed_frobenius\"\n      }\n    },\n    {\n      \"name\": \"std-unsplit-g4\",\n      \"role\": \"candidate\",\n      \"method\": {\n        \"id\": \"ic.pipeline\",\n        \"params\": {\n          \"factor_base\": \"koblitz-standard-subspace:dimension=4\",\n          \"oracle\": \"pdp-split:m=3,plan=3,guess=4,slots=one,max_free=24\",\n          \"max_trials\": \"200000\"\n        }\n      }\n    },\n    {\n      \"name\": \"clo-unsplit-g4\",\n      \"role\": \"candidate\",\n      \"method\": {\n        \"id\": \"ic.pipeline\",\n        \"params\": {\n          \"factor_base\": \"koblitz-closure:dimension=4\",\n          \"oracle\": \"pdp-split:m=3,plan=3,guess=4,slots=all,max_free=24\",\n          \"max_trials\": \"200000\"\n        }\n      }\n    },\n    {\n      \"name\": \"std-unsplit-g8\",\n      \"role\": \"candidate\",\n      \"method\": {\n        \"id\": \"ic.pipeline\",\n        \"params\": {\n          \"factor_base\": \"koblitz-standard-subspace:dimension=4\",\n          \"oracle\": \"pdp-split:m=3,plan=3,guess=8,slots=one,max_free=24\",\n          \"max_trials\": \"200000\"\n        }\n      }\n    },\n    {\n      \"name\": \"clo-unsplit-g8\",\n      \"role\": \"candidate\",\n      \"method\": {\n        \"id\": \"ic.pipeline\",\n        \"params\": {\n          \"factor_base\": \"koblitz-closure:dimension=4\",\n          \"oracle\": \"pdp-split:m=3,plan=3,guess=8,slots=all,max_free=24\",\n          \"max_trials\": \"200000\"\n        }\n      }\n    },\n    {\n      \"name\": \"clo-mitm3\",\n      \"role\": \"candidate\",\n      \"method\": {\n        \"id\": \"ic.pipeline\",\n        \"params\": {\n          \"factor_base\": \"koblitz-closure:dimension=4\",\n          \"oracle\": \"mitm-frobenius:m=3\",\n          \"max_trials\": \"200000\"\n        }\n      }\n    }\n  ],\n  \"measurement\": {\n    \"rounds\": 1,\n    \"warmup\": 0,\n    \"order\": \"alternate\",\n    \"seed\": 202610181102,\n    \"isolation_required\": \"L0\",\n    \"timeout_seconds\": 7200\n  }\n}",
+      "encoding": "utf8",
+      "path": "spec.json"
+    },
+    {
+      "local_file": "target/release/ecbench",
+      "mode": "755",
+      "path": "ecbench"
+    }
+  ],
+  "labels": {
+    "ecbench_delivery": "binary",
+    "ecbench_label": "pdp_split_round3_20261018 Part A, n=19",
+    "ecbench_spec_id": "ECS1hca2f68b407b9",
+    "ecbench_spec_sha256": "ca2f68b407b9853c052e6b46e9f80d19b834eb2bfb6c832edf9e92e692bc2abd"
+  },
+  "limits": {
+    "timeout_s": 403800
+  },
+  "measure": {
+    "repeats": 1,
+    "warmups": 0
+  },
+  "name": "ecbench pdp_split_round3_20261018 Part A, n=19",
+  "pool": "default",
+  "resources": {
+    "cpus": 2,
+    "numa_node": "single",
+    "smt": "isolate"
+  },
+  "runtime": {
+    "backend": "auto",
+    "network": "none"
+  },
+  "schema": "isolab.job/v1",
+  "verify": {
+    "argv": [
+      "./ecbench",
+      "verify",
+      "--dir",
+      "${ISOLAB_OUTPUT_DIR}/session",
+      "--replay",
+      "3",
+      "--exit-code"
+    ],
+    "timeout_s": 3600
+  }
+}
