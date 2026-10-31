@@ -5031,3 +5031,491 @@ mod canonical_math_file_tests {
             .contains("differs from authenticated publication"));
     }
 }
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+enum ConstructionBoundaryStage {
+    Begin,
+    Table,
+    Selector,
+    Add,
+    Square,
+    Product,
+    Coordinates,
+    Complete,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+enum MatrixBoundaryStage {
+    Begin,
+    CriterionLevel {
+        level: u32,
+    },
+    CriterionCandidate {
+        generator: usize,
+        multiplier: u8,
+        frobenius: bool,
+    },
+    MainCandidate {
+        generator: usize,
+        multiplier: u8,
+    },
+    Pack,
+    Reduce,
+    Readback,
+    Finish,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(tag = "phase", rename_all = "snake_case", deny_unknown_fields)]
+enum NativeBoundary {
+    Construction {
+        stage: ConstructionBoundaryStage,
+        reserved: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Reservation,
+    },
+    Matrix {
+        stage: MatrixBoundaryStage,
+        reserved: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Reservation,
+        counters: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Counters,
+    },
+}
+impl NativeBoundary {
+    fn construction(event: crate::cryptanalysis::koblitz_groebner::bounded_s4::Event) -> Self {
+        use crate::cryptanalysis::koblitz_groebner::bounded_s4::Stage as S;
+        let stage = match event.stage {
+            S::Begin => ConstructionBoundaryStage::Begin,
+            S::Table => ConstructionBoundaryStage::Table,
+            S::Selector => ConstructionBoundaryStage::Selector,
+            S::Add => ConstructionBoundaryStage::Add,
+            S::Square => ConstructionBoundaryStage::Square,
+            S::Product => ConstructionBoundaryStage::Product,
+            S::Coordinates => ConstructionBoundaryStage::Coordinates,
+            S::Complete => ConstructionBoundaryStage::Complete,
+        };
+        Self::Construction {
+            stage,
+            reserved: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Reservation {
+                work: event.reserved.work,
+                bytes: event.reserved.bytes,
+            },
+        }
+    }
+    fn matrix(event: &crate::cryptanalysis::koblitz_groebner::bounded_matrix::Event) -> Self {
+        use crate::cryptanalysis::koblitz_groebner::bounded_matrix::Stage as S;
+        let stage = match event.stage {
+            S::Begin => MatrixBoundaryStage::Begin,
+            S::CriterionLevel { level } => MatrixBoundaryStage::CriterionLevel { level },
+            S::CriterionCandidate {
+                generator,
+                multiplier,
+                frobenius,
+            } => MatrixBoundaryStage::CriterionCandidate {
+                generator,
+                multiplier,
+                frobenius,
+            },
+            S::MainCandidate {
+                generator,
+                multiplier,
+            } => MatrixBoundaryStage::MainCandidate {
+                generator,
+                multiplier,
+            },
+            S::Pack => MatrixBoundaryStage::Pack,
+            S::Reduce => MatrixBoundaryStage::Reduce,
+            S::Readback => MatrixBoundaryStage::Readback,
+            S::Finish => MatrixBoundaryStage::Finish,
+        };
+        Self::Matrix {
+            stage,
+            reserved: event.reserved,
+            counters: event.counters,
+        }
+    }
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SavedBoundaryRecord {
+    schema: String,
+    binding_sha256: String,
+    sequence: u64,
+    capture_sequence: u64,
+    event: NativeBoundary,
+}
+/// Strict record admission only; stream ordering, authenticated capture matching
+/// and native terminal-result consistency are separate checks.
+fn decode_boundary_record(
+    line: &[u8],
+    binding_sha256: &str,
+    sequence: u64,
+    equations: usize,
+    engine: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Engine,
+    degree: u32,
+) -> Result<SavedBoundaryRecord, String> {
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native;
+    if line.len() > 2048
+        || !line.ends_with(b"\n")
+        || !(1..=4096).contains(&sequence)
+        || equations > 61
+        || !(1..=6).contains(&degree)
+    {
+        return Err("native boundary decode limits".into());
+    }
+    crate::store::index::validate_sha256(binding_sha256)?;
+    let record: SavedBoundaryRecord =
+        serde_json::from_slice(line).map_err(|e| format!("strict native boundary: {e}"))?;
+    if record.schema != "crypto.ml-dataset.koblitz-m3-events/v1"
+        || record.binding_sha256 != binding_sha256
+        || record.sequence != sequence
+        || !(1..=4096).contains(&record.capture_sequence)
+    {
+        return Err("native boundary schema, binding or sequence mismatch".into());
+    }
+    let reserved = match record.event {
+        NativeBoundary::Construction { reserved, .. } => reserved,
+        NativeBoundary::Matrix {
+            stage,
+            reserved,
+            counters,
+        } => {
+            if counters.attempted_events == 0
+                || counters.attempted_events > native::MAX_EVENTS
+                || counters.acknowledged_events.checked_add(1) != Some(counters.attempted_events)
+                || counters.dynamic_layout_bytes
+                    > reserved.bytes.saturating_sub(native::METADATA_BYTES)
+            {
+                return Err("native boundary counter mismatch".into());
+            }
+            match stage {
+                MatrixBoundaryStage::CriterionLevel { level } => {
+                    if engine != native::Engine::F5KoszulFrobenius || level >= degree {
+                        return Err("native criterion level mismatch".into());
+                    }
+                }
+                MatrixBoundaryStage::CriterionCandidate {
+                    generator,
+                    multiplier,
+                    ..
+                } => {
+                    if engine != native::Engine::F5KoszulFrobenius
+                        || generator >= equations
+                        || multiplier > 7
+                    {
+                        return Err("native criterion candidate mismatch".into());
+                    }
+                }
+                MatrixBoundaryStage::MainCandidate {
+                    generator,
+                    multiplier,
+                } => {
+                    if generator >= equations || multiplier > 7 {
+                        return Err("native main candidate mismatch".into());
+                    }
+                }
+                _ => {}
+            }
+            reserved
+        }
+    };
+    if reserved.work > native::MAX_WORK || reserved.bytes > native::MAX_BYTES {
+        return Err("native boundary reservation exceeds native caps".into());
+    }
+    Ok(record)
+}
+
+#[cfg(test)]
+mod native_boundary_schema_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native;
+    fn encode(event: NativeBoundary, sequence: u64) -> Vec<u8> {
+        let record = SavedBoundaryRecord {
+            schema: "crypto.ml-dataset.koblitz-m3-events/v1".into(),
+            binding_sha256: matrix_tests::binding().digest().unwrap(),
+            sequence,
+            capture_sequence: sequence,
+            event,
+        };
+        let mut bytes = serde_json::to_vec(&record).unwrap();
+        bytes.push(b'\n');
+        bytes
+    }
+    #[test]
+    fn strict_boundary_records_roundtrip_actual_construction_and_both_matrix_engines() {
+        let binding = matrix_tests::binding();
+        let digest = binding.digest().unwrap();
+        for engine in [
+            native::Engine::F4Macaulay,
+            native::Engine::F5KoszulFrobenius,
+        ] {
+            let original = construction_tests::fixture();
+            let mut budget = construction_tests::budget();
+            let mut boundaries = Vec::new();
+            let output = construct_original(&original, &mut budget, &mut |event, _| {
+                boundaries.push(NativeBoundary::construction(event));
+                Ok(())
+            })
+            .output
+            .unwrap();
+            let construction_count = boundaries.len();
+            assert!(construction_count > 0);
+            let input = persist_original(
+                &original,
+                &output,
+                &mut budget,
+                &binding,
+                &"8".repeat(64),
+                &"9".repeat(64),
+                &mut |_, _| Ok(()),
+            )
+            .unwrap();
+            let step = matrix_step(input, engine, 3, &mut |event, _| {
+                boundaries.push(NativeBoundary::matrix(event));
+                Ok(())
+            });
+            assert_eq!(step.adapter_stop, None);
+            assert!(boundaries.len() > construction_count);
+            let mut stream = Vec::new();
+            for (i, event) in boundaries.into_iter().enumerate() {
+                let sequence = (i + 1) as u64;
+                let bytes = encode(event, sequence);
+                stream.extend_from_slice(&bytes);
+                let decoded =
+                    decode_boundary_record(&bytes, &digest, sequence, 23, engine, 3).unwrap();
+                assert_eq!(decoded.event, event);
+            }
+            let verified = verify_boundary_stream(&stream, &digest, 23, engine, 3).unwrap();
+            assert!(verified.construction_complete_captured && verified.matrix_finish_captured);
+            let lines = stream.split_inclusive(|b| *b == b'\n').collect::<Vec<_>>();
+            assert_eq!(verified.records, lines.len());
+            let prefix = lines[..lines.len() - 1].concat();
+            assert!(
+                !verify_boundary_stream(&prefix, &digest, 23, engine, 3)
+                    .unwrap()
+                    .matrix_finish_captured
+            );
+            let mut missing = lines.clone();
+            missing.remove(construction_count);
+            assert!(verify_boundary_stream(&missing.concat(), &digest, 23, engine, 3).is_err());
+            let mut reordered = lines.clone();
+            reordered.swap(construction_count, construction_count + 1);
+            assert!(verify_boundary_stream(&reordered.concat(), &digest, 23, engine, 3).is_err());
+            let mut duplicate = lines.clone();
+            duplicate.insert(construction_count, lines[construction_count]);
+            assert!(verify_boundary_stream(&duplicate.concat(), &digest, 23, engine, 3).is_err());
+        }
+    }
+    fn candidate() -> NativeBoundary {
+        NativeBoundary::Matrix {
+            stage: MatrixBoundaryStage::CriterionCandidate {
+                generator: 0,
+                multiplier: 1,
+                frobenius: true,
+            },
+            reserved: native::Reservation {
+                work: 8192,
+                bytes: 8192,
+            },
+            counters: native::Counters {
+                attempted_events: 1,
+                ..Default::default()
+            },
+        }
+    }
+    #[test]
+    fn boundary_records_reject_nested_unknown_fields_and_metadata_mutations() {
+        let base: serde_json::Value = serde_json::from_slice(&encode(candidate(), 1)).unwrap();
+        let digest = matrix_tests::binding().digest().unwrap();
+        for mutation in 0..12 {
+            let mut v = base.clone();
+            match mutation {
+                0 => v["extra"] = true.into(),
+                1 => v["event"]["extra"] = true.into(),
+                2 => v["event"]["stage"]["CriterionCandidate"]["extra"] = true.into(),
+                3 => v["event"]["counters"]["extra"] = true.into(),
+                4 => v["event"]["reserved"]["extra"] = true.into(),
+                5 => v["sequence"] = 2.into(),
+                6 => v["capture_sequence"] = 0.into(),
+                7 => v["binding_sha256"] = "9".repeat(64).into(),
+                8 => v["event"]["stage"]["CriterionCandidate"]["generator"] = 23.into(),
+                9 => v["event"]["stage"]["CriterionCandidate"]["multiplier"] = 8.into(),
+                10 => v["event"]["counters"]["acknowledged_events"] = 1.into(),
+                _ => v["event"]["reserved"]["work"] = u64::MAX.into(),
+            }
+            let mut bytes = serde_json::to_vec(&v).unwrap();
+            bytes.push(b'\n');
+            assert!(
+                decode_boundary_record(
+                    &bytes,
+                    &digest,
+                    1,
+                    23,
+                    native::Engine::F5KoszulFrobenius,
+                    3
+                )
+                .is_err(),
+                "mutation {mutation}"
+            );
+        }
+    }
+    #[test]
+    fn boundary_decode_enforces_line_and_engine_limits() {
+        let digest = matrix_tests::binding().digest().unwrap();
+        let bytes = encode(candidate(), 1);
+        assert!(
+            decode_boundary_record(&bytes, &digest, 1, 23, native::Engine::F4Macaulay, 3).is_err()
+        );
+        assert!(decode_boundary_record(
+            &bytes[..bytes.len() - 1],
+            &digest,
+            1,
+            23,
+            native::Engine::F5KoszulFrobenius,
+            3
+        )
+        .is_err());
+        let mut oversized = vec![b' '; 2049];
+        oversized.push(b'\n');
+        assert!(decode_boundary_record(
+            &oversized,
+            &digest,
+            1,
+            23,
+            native::Engine::F5KoszulFrobenius,
+            3
+        )
+        .is_err());
+    }
+}
+
+#[derive(Default)]
+struct BoundaryStreamAssessment {
+    records: usize,
+    construction_captured: usize,
+    matrix_captured: usize,
+    construction_complete_captured: bool,
+    matrix_finish_captured: bool,
+    last_capture_sequence: u64,
+}
+fn native_counter_values(
+    c: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Counters,
+) -> [u64; 15] {
+    [
+        c.main_attempts,
+        c.nonempty_rows,
+        c.selected_rows,
+        c.pruned_nonempty_rows,
+        c.criterion_attempts,
+        c.criterion_rows,
+        c.criterion_zero_reductions,
+        c.koszul_pruned,
+        c.frobenius_pruned,
+        c.criterion_word_xors,
+        c.reduction_word_xors,
+        c.attempted_events,
+        c.acknowledged_events,
+        c.dynamic_layout_bytes,
+        c.allocation_requests,
+    ]
+}
+/// Validate a captured boundary prefix, not native execution or completion.
+/// Authentication against the capture chain and result counters remains separate.
+fn verify_boundary_stream(
+    bytes: &[u8],
+    binding_sha256: &str,
+    equations: usize,
+    engine: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Engine,
+    degree: u32,
+) -> Result<BoundaryStreamAssessment, String> {
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native;
+    if bytes.len() > 4096 * 2048 || equations > 61 || !(1..=6).contains(&degree) {
+        return Err("native boundary stream exceeds cap".into());
+    }
+    crate::store::index::validate_sha256(binding_sha256)?;
+    let mut out = BoundaryStreamAssessment::default();
+    let mut reserved = native::Reservation::default();
+    let mut counters = [0u64; 15];
+    // Matrix phase ranks: 0=not started, 1=begin, 2=criterion,
+    // 3=main, 4=pack, 5=reduce, 6=readback, 7=finish.
+    let mut matrix_phase = 0u8;
+    for line in bytes.split_inclusive(|b| *b == b'\n') {
+        let row = decode_boundary_record(
+            line,
+            binding_sha256,
+            (out.records + 1) as u64,
+            equations,
+            engine,
+            degree,
+        )?;
+        if row.capture_sequence <= out.last_capture_sequence {
+            return Err("native capture sequence does not increase".into());
+        }
+        let current = match row.event {
+            NativeBoundary::Construction {
+                stage,
+                reserved: current,
+            } => {
+                if matrix_phase != 0
+                    || out.construction_complete_captured
+                    || ((out.construction_captured == 0)
+                        != (stage == ConstructionBoundaryStage::Begin))
+                {
+                    return Err("construction boundary order mismatch".into());
+                }
+                out.construction_captured += 1;
+                out.construction_complete_captured = stage == ConstructionBoundaryStage::Complete;
+                current
+            }
+            NativeBoundary::Matrix {
+                stage,
+                reserved: current,
+                counters: next,
+            } => {
+                if !out.construction_complete_captured || out.matrix_finish_captured {
+                    return Err("matrix boundary lacks completed construction prefix".into());
+                }
+                let next_phase = match stage {
+                    MatrixBoundaryStage::Begin => 1,
+                    MatrixBoundaryStage::CriterionLevel { .. }
+                    | MatrixBoundaryStage::CriterionCandidate { .. } => 2,
+                    MatrixBoundaryStage::MainCandidate { .. } => 3,
+                    MatrixBoundaryStage::Pack => 4,
+                    MatrixBoundaryStage::Reduce => 5,
+                    MatrixBoundaryStage::Readback => 6,
+                    MatrixBoundaryStage::Finish => 7,
+                };
+                let valid = match next_phase {
+                    1 => matrix_phase == 0,
+                    2 => matches!(matrix_phase, 1 | 2),
+                    3 => matches!(matrix_phase, 1 | 2 | 3),
+                    4 => matches!(matrix_phase, 1 | 2 | 3),
+                    5..=7 => matrix_phase + 1 == next_phase,
+                    _ => false,
+                };
+                if !valid || next.attempted_events != (out.matrix_captured + 1) as u64 {
+                    return Err("matrix boundary phase or native event gap".into());
+                }
+                if matrix_phase == 0 {
+                    reserved = native::Reservation::default();
+                }
+                let values = native_counter_values(next);
+                if values
+                    .iter()
+                    .zip(counters)
+                    .any(|(&next, previous)| next < previous)
+                {
+                    return Err("native boundary counters regress".into());
+                }
+                counters = values;
+                matrix_phase = next_phase;
+                out.matrix_captured += 1;
+                out.matrix_finish_captured = next_phase == 7;
+                current
+            }
+        };
+        if current.work < reserved.work || current.bytes < reserved.bytes {
+            return Err("native boundary reservations regress".into());
+        }
+        reserved = current;
+        out.records += 1;
+        out.last_capture_sequence = row.capture_sequence;
+    }
+    Ok(out)
+}
