@@ -7,7 +7,8 @@
 #
 #   sage generate.sage SET out=DIR [workers=W worker=I] [units=u1,u2]
 #
-# SET: census-fp | census-f2m | crypto-prime | pairing | genus2
+# SET: census-fp | census-f2m | crypto-prime | pairing | genus2 | isogenies
+# (isogenies reads the census-fp, crypto-prime and pairing output: in=DIR)
 # Every set is split into units (one prime, one bit size, one family); a unit
 # writes DIR/<set>/<unit>.jsonl and then <unit>.done, so a rerun resumes.
 # Each unit seeds Sage's RNG from its name: reruns reproduce the same curves.
@@ -374,6 +375,77 @@ def genus2(unit):
 def genus2_units():
     return ["b%02d" % b for b in G2_BITS]
 
+# ------------------------------------------------------------- isogeny graphs
+
+ISOGENY_ELLS = (2, 3, 5)
+
+def canonical_short_w(a, b, p, squares):
+    """canonical_short, also returning the square w with (a w^2, b w^3) = the representative."""
+    best, bw = None, None
+    for w in squares:
+        c = (a * w * w % p, b * w * w * w % p)
+        if best is None or c < best:
+            best, bw = c, w
+    return best, bw
+
+def isogeny_records(p, a, b, N, canonical, neighbour_of=None):
+    """Every F_p-rational l-isogeny (l = 2, 3, 5) out of y^2 = x^3 + a x + b. Sage's
+    codomain is Velu's; the stored target is the census representative of its class
+    (canonical) or the Velu codomain itself, reached by (a w^2, b w^3)."""
+    F = GF(p)
+    E = EllipticCurve(F, [a, b])
+    squares = sorted({(u * u) % p for u in range(1, p)}) if canonical else None
+    for l in ISOGENY_ELLS:
+        for phi in E.isogenies_prime_degree(l):
+            C = phi.codomain()
+            if C.a1() or C.a2() or C.a3():
+                C = C.short_weierstrass_model()
+            ca, cb = int(C.a4()), int(C.a6())
+            if canonical:
+                (ta, tb), w = canonical_short_w(ca, cb, p, squares)
+            else:
+                (ta, tb), w = (ca, cb), 1
+            if neighbour_of is not None:
+                rec = prime_record(EllipticCurve(F, [ta, tb]), "isogeny-neighbour",
+                                   {"source_family": neighbour_of["family"], "ell": l,
+                                    "source": {"a": str(a), "b": str(b)}}, order=N, with_cm=False)
+                rec["cm"] = neighbour_of.get("cm")   # same trace, same Frobenius discriminant
+                yield rec
+            yield {"record": "isogeny", "genus": 1, "field": {"kind": "prime", "p": str(p)}, "order": str(N),
+                   "ell": l, "source": {"a": str(a), "b": str(b)},
+                   "kernel": [str(c) for c in phi.kernel_polynomial().list()],
+                   "codomain": {"a": str(ca), "b": str(cb)}, "w": str(w), "target": {"a": str(ta), "b": str(tb)}}
+
+def isogenies(unit):
+    src = arg("--in", arg("--out", "out"))
+    kind, rest = unit.split("-", 1)
+    if kind == "census":
+        path = os.path.join(src, "census-fp", rest + ".jsonl")
+        canonical, neighbours = True, False
+    else:
+        sset, sunit = rest.split(".", 1)
+        path = os.path.join(src, sset, sunit + ".jsonl")
+        canonical, neighbours = False, True
+    for line in open(path):
+        r = json.loads(line)
+        if r.get("genus") != 1 or r["field"]["kind"] != "prime":
+            continue
+        p = ZZ(r["field"]["p"])
+        if p.nbits() > 512:
+            continue
+        for rec in isogeny_records(p, ZZ(r["a"]), ZZ(r["b"]), ZZ(r["order"]), canonical,
+                                   neighbour_of=r if neighbours else None):
+            yield rec
+
+def isogeny_units():
+    src = arg("--in", arg("--out", "out"))
+    units = ["census-" + u for u in census_fp_units()]
+    for sset in ("crypto-prime", "pairing"):
+        d = os.path.join(src, sset)
+        if os.path.isdir(d):
+            units += ["%s-%s.%s" % ("from", sset, f[:-5]) for f in sorted(os.listdir(d)) if f.endswith(".done")]
+    return units
+
 # ------------------------------------------------------------- main
 
 SETS = {
@@ -382,6 +454,7 @@ SETS = {
     "crypto-prime": (crypto_prime_units, crypto_prime),
     "pairing": (pairing_units, pairing),
     "genus2": (genus2_units, genus2),
+    "isogenies": (isogeny_units, isogenies),
 }
 
 which = sys.argv[1]
