@@ -33,7 +33,9 @@ jobs:
               --evidence research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/evidence/final
           fi
   measured-first-attempt:
-    if: ${{ github.event.action == 'labeled' && github.event.label.name == 'ecc2k130-n19-sparse-measure-once' && github.run_attempt == 1 && github.event.pull_request.number == 795 }}
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event.action == 'labeled' && github.event.label.name == 'ecc2k130-n19-sparse-measure-once' && github.run_attempt == 1 && github.event.pull_request.number == 795)
     needs: frozen-and-archive
     concurrency:
       group: ecc2k130-n19-sparse-first-release-795

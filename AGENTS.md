@@ -661,6 +661,14 @@ follows the PR until it lands, under the check-in and merge rules below.
   runtime defaults to. Before ending an update to an existing draft, mark it
   ready so reviews and checks that skip drafts (`llm-review`) can run. An
   explicit user request to keep a particular PR in draft is the only exception.
+- **One PR per research lane, not per session.** Before opening a PR, look for
+  an open PR from `lane/<lane>` for the same study (IC autolab, volcano,
+  conductor gap, N83, ...). If there is one, push to it with
+  `scripts/lane-push.sh <lane>` (merge commits, retried, never a force-push)
+  and stop there: the lane PR carries your commits. Open a new PR only for
+  work no lane covers; name new lanes after the study.
+- **Keep a PR's head within 30 CI checks.** The sweeper holds a PR whose head
+  ran more (`ci:over-budget`); split it by touched area instead.
 - Review the final diff and confirm that the requested scope, relevant tests,
   evidence, and documentation are complete before opening the PR. Passing CI
   does not substitute for checking that the work is finished.
