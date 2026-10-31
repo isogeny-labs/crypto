@@ -3564,3 +3564,86 @@ selection that costs `O(1)` per row update (B″) could keep part of B's saving 
 `1` GAE its comparisons and updates (thousands per call, `97` multiplications each) should exceed the
 saving; if so, no sparsest-pivot rule here ranks ahead of A across the band, and the next lever is the
 echelon's arithmetic itself, not its pivot order.
+
+### 9.38 E34 pre-registration: a cheaper order-24 class representative, and which walk is the matched rho on E18's `j = 0` curves across the §5a band
+
+*Registered 2026-10-31, before any E34 code.*  **Question.**  §9.31 and §9.33 left the matched reference on
+E18's eight `j = 0` curves unresolved: E29's order-24 walk takes `1.701×` fewer steps (pooled) but its class
+representative costs `≈ 90` `F_p` multiplications a call (three full Frobenius images, twelve `ψ` candidates),
+so at `0` GAE the order-6 walk is cheaper (`0.962` schoolbook, `0.884` Karatsuba), at `1` GAE the order-24 walk
+(`1.205`, `1.172`), and the order-24 walk's `12` candidate comparisons were not emitted.  E34 builds the cheaper
+representative §9.31 names, counts and emits every per-step operation of every arm, and re-ranks.
+
+**Design (derived before code).**  On the canonical model `y² = x³ + b₀t³` (`t⁴ = c`), E29's representative of
+`P` is: among the twelve points `ι^k ∘ Φ^j (P)` (`j < 4`, `k < 3`, `Φ` the transported Frobenius, `ι` the cubic
+automorphism) the one with least abscissa in the lexicographic order of `E4`'s coordinates (first in the order
+`j`-major, `k`-minor on a tie), then the least of `±y`; multiplier `λ_Φ^j λ_ω^k`, negated with `y`.  Both maps are
+coordinate-wise on `x`: `Φ(x)_i = h² zⁱ x_i` with `z = t^{p−1} ∈ F_p` and `h² = z^{−1}` (`h = t^{−(p−1)/2}`), and
+`ι(x) = ωx`; so candidate `(j, k)` has `x_i·c_{ijk}`, `c_{ijk} = h^{2j} z^{ij} ω^k ∈ F_p`, a table of `48`
+constants computed once per walk (charged).  On `y`, `Φ^j` is a monomial map (a coordinate permutation with
+`F_p` scalars), `ι` fixes `y`.  The new representative:
+1. computes coordinate `0` of the twelve candidate abscissae, `x₀·c_{0jk}` (`c = ±1` taken as a copy or a
+   negation, every other constant as one `F_p` multiplication), and keeps the minimum by `11` comparisons;
+   only on a tie (`x₀ = 0`, probability `≈ 1/p`) does it go on to coordinate `1`, `2`, `3` over the tied set;
+2. completes the winner's abscissa (coordinates `1`–`3`, `≤ 3` multiplications) and computes only the
+   winner's ordinate (`Φ^j` on `y`, `≤ 4` multiplications);
+3. resolves the sign by comparing, at the first non-zero coordinate `y_i`, `y_i` against `(p − 1)/2` (equal to
+   E29's `−y < y`), and negates `y` only when needed; the multiplier comes from a `24`-entry table.
+The same construction gives a cheap order-6 representative (three candidates `ω^k x`, the arm E29 did not have),
+run as a fourth arm so that the order-24 walk is ranked against the strongest order-6 walk too.  A mul-lean
+variant (sign classes `c_{0,j+2,k} = −c_{0jk}`: `5` multiplications and `6` negations instead of `10` and `1`)
+is registered as a fifth arm, producing the same walk.
+
+**Counting rule.**  Every arm is one serial walk loop (a copy of E29's, which this experiment does not modify)
+with a pluggable representative.  Counted unit: `F_p` multiplications (`F_{p⁴}` products at `19` / `13`, as
+E27), the per-walk constants included, the `[d]G` check excluded.  **Emitted native operations**, each one
+counter, applied the same way to every arm: `cmp`, a comparison of two `F_p` residues in the representative
+(an `E4` comparison counts one per coordinate it examines; a test against `0` or `(p−1)/2` counts one); `neg`,
+an `F_p` negation or addition in the representative (outside the group law; `F_p` additions inside an affine
+addition are part of the counted group operation, as the GAE that prices native operations is itself a group
+addition); `modn`, a multiplication, addition, subtraction or negation mod `n` in the logarithm bookkeeping
+(`pow_mod(λ, k)` counted by its products: `0, 2, 3` for `k = 0, 1, 2`; the collision's inversion as one);
+`hash`, a partition-hash evaluation; `table`, a hash-table lookup or insert.  E27's visit digest is an
+instrument, not part of the walk, and is not counted.  The band (§5a): `cost(w) = F_p multiplications + w·97·
+(native operations)`, `w ∈ {0, 0.1, 1}`, one GAE `= 97` in both arithmetics (as §9.33; the Karatsuba
+arithmetic's own `79` is a sensitivity column).  The validator's convention (one native operation per step)
+is reported beside it for continuity.  A ratio is order 6 over order 24 (`> 1`: the order-24 walk is cheaper),
+pooled as §9.33 (sum over curves of cost`/√n`).  **Ranking rule:** two walks are ranked only where the pooled
+ratio is on one side of `1` at all three weights, in both arithmetics; per curve, the same test per curve.
+
+**Identity and controls.**  (a) The counted copies of E29's two walks must reproduce E29's `256` Stage R
+records field for field (`rho4_folded_with`, `rho_twist24_with` unchanged; E29's outputs bit-identical, shown
+by a unit test and by the rerun).  (b) The new representatives must equal E29's on every one of the `24`
+(resp. `6`) class members of `≥ 200` random points per curve, including forced `x₀ = 0` and `x = 0` points, in
+both point and multiplier, and `rep = [m]P` checked by scalar multiplication on a sample.  (c) The new walks
+must equal E29's walks per seed: steps, group operations, cycle escapes, recovered log, correctness, and the
+visit digest of every representative visited.  **Negative controls:** a perturbed representative that omits
+candidate `(j, k) = (3, 2)`, and one that takes `Φ^{j−1}` for the ordinate; both must fail (b), and the first
+must change the visit digest of every one of `16` Stage R walks at `p = 241`.  **Positive control:** the
+counters must reproduce the analytic counts of the order-6 arm (`8` multiplications per E29 representative).
+
+**Protocol.**  E29's eight curves and canonical models (`b₀ = 3, 3, 3, 9, 9, 2, 17, 3`), seeds `1000`–`1015`,
+five arms (order 6 as built; order 6 cheap; order 24 as built = E29; order 24 cheap; order 24 cheap mul-lean)
+× schoolbook and Karatsuba.  Route: isolab-eks is the default but unreachable from this container (no `aws`
+CLI, no `kubectl`); so local, operation counts only, one core (`RAYON_NUM_THREADS=1`), no wall-time claim.
+Records `experiments/38_twist24_cheap_rep/`; report `research/e34_twist24_cheap_rep_20261031/`.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.134 | identity (b) | both cheap representatives equal E29's on every class member tested, all eight curves; both negative controls caught | any mismatch, or a control not caught |
+| G2.135 | E29 replay (a) | counted copies reproduce all `256` E29 Stage R records in every field; E29's functions untouched | any field differs |
+| G2.136 | walk identity (c) | all `128` cheap order-24 walks (and their mul-lean twins) per arithmetic equal E29's per seed, digests included; cheap order 6 equals order 6 likewise | any walk differs |
+| G2.137 | negative control in the walk | the omitted-candidate walk's digest differs from E29's on `16/16` seeds at `p = 241` | fewer than `16` |
+| G2.138 | representative cost | `F_p` multiplications per call: order 6 as built `8.0`; order 6 cheap `[3, 5]`; order 24 as built `[85, 100]`; order 24 cheap `[12, 20]`; mul-lean `[7, 15]` (equal in both arithmetics) | outside |
+| G2.139 | per-step multiplications | cheap order 24 / order 6 as built, per step, `[1.00, 1.15]` on every curve with `p ≥ 541`, both arithmetics | outside |
+| G2.140 | native operations per step | order 6 as built `[14, 19]`; order 6 cheap `[12, 17]`; order 24 as built `[40, 70]`; order 24 cheap `[22, 30]` (of which `cmp` `[11, 14]` per representative) | outside |
+| G2.141 | ranking, pooled | order 6 as built / cheap order 24: `0` GAE `[1.40, 1.80]`, `0.1` GAE `[1.10, 1.45]`, `1` GAE `[1.00, 1.30]`, both arithmetics: **the cheap order-24 walk is cheaper across the band**; per curve, the same holds on `≥ 6` of `8` | a pooled ratio `≤ 1` at any weight, or `< 6` curves |
+| G2.142 | against the strongest order-6 walk | cheap order 6 / cheap order 24 pooled: `> 1.3` at `0` GAE, `> 1.0` at `0.1`, and in `[0.90, 1.10]` at `1` GAE (a crossing inside the band is possible) | outside |
+| G2.143 | consequence for E18 | the `ψ`-arm distances to rho lengthen by the pooled ratio against the strongest walk at each weight where the ranking holds (`[1.4, 1.8]×` at `0` GAE, handover later by `4·log₂` of it, `[1.9, 3.4]` bits); a **reference correction, not an improvement** | — (derived from G2.141–G2.142) |
+
+**What it would say.**  If G2.141 holds, the order-24 walk with the cheap representative is the stronger rho
+on E18's curves at every weight of the band against E29's order-6 walk, and E18's `ψ` rows stand further from
+rho by the pooled ratio — a reference correction.  If G2.142's `1` GAE ratio straddles `1`, the matched
+reference is the cheap order-24 walk at `0` and `0.1` GAE and unresolved at `1` GAE against the cheap order-6
+walk; the deciding counters are the `11` comparisons a minimum of twelve needs, which no representative equal
+to E29's can avoid.
