@@ -19,18 +19,33 @@ on:
       - 'tools/lean/**'
       - '.github/workflows/lean-proof-gate.yml'
   workflow_dispatch:
+    inputs:
+      runner:
+        description: Runner for this manual proof audit
+        type: choice
+        options: [configured, github-hosted]
+        default: configured
 
 permissions:
   contents: read
+env:
+  # Every tracked proof and Lake context, without unrelated research archives.
+  LEAN_CHECKOUT: |
+    *.lean
+    lakefile.toml
+    lake-manifest.json
+    lean-toolchain
+    /tools/lean/
+    /.github/workflows/lean-proof-gate.yml
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}${{ github.event_name == 'workflow_dispatch' && inputs.runner == 'github-hosted' && '-hosted' || '' }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   selftest:
     # Known-good and known-bad fixtures: the gate must pass and fail them
     # exactly as expected, so it is exercised even with no proofs in the repo.
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    runs-on: ${{ (github.event_name == 'workflow_dispatch' && inputs.runner == 'github-hosted' && 'ubuntu-latest') || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -39,10 +54,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # The gate's fixtures need only this subtree. A full research
-          # checkout can exhaust disk before the Lean toolchain extracts.
-          sparse-checkout: /tools/lean/
           sparse-checkout-cone-mode: false
+          sparse-checkout: ${{ env.LEAN_CHECKOUT }}
       - name: Install elan
         run: |
           toolchain='${{ matrix.toolchain }}'
@@ -53,15 +66,19 @@ jobs:
       - run: tools/lean/selftest/run.sh
 
   discover:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    runs-on: ${{ (github.event_name == 'workflow_dispatch' && inputs.runner == 'github-hosted' && 'ubuntu-latest') || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 10
     outputs:
       indexes: ${{ steps.list.outputs.indexes }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: ${{ env.LEAN_CHECKOUT }}
       - id: list
         run: |
           python3 tools/lean/test_ci_targets.py
+          python3 tools/lean/test_checkout_coverage.py
           indexes=$(python3 tools/lean/ci-targets.py matrix)
           echo "indexes=$indexes" >> "$GITHUB_OUTPUT"
           tools/lean/proof-gate.sh --list | grep . || echo "no Lean targets in this repository yet; only the self-test runs"
@@ -69,7 +86,7 @@ jobs:
   prove:
     needs: discover
     if: ${{ needs.discover.outputs.indexes != '[]' }}
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    runs-on: ${{ (github.event_name == 'workflow_dispatch' && inputs.runner == 'github-hosted' && 'ubuntu-latest') || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
     strategy:
       fail-fast: false
@@ -78,6 +95,9 @@ jobs:
     name: Lean target ${{ matrix.index }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: ${{ env.LEAN_CHECKOUT }}
       - name: Install elan
         run: |
           curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none

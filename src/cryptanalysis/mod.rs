@@ -226,6 +226,7 @@ pub mod ic_measurement;
 pub mod ic_oracle_pricing;
 pub mod ic_progress;
 pub mod ic_run;
+pub mod ic_wide;
 pub mod identity_certificate;
 pub mod inherited_f4;
 pub mod invalid_curve_attack;
