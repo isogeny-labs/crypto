@@ -10554,17 +10554,19 @@ impl<'a> PreMatrixInputStore<'a> {
                 KOBLITZ_SLOTS[0].2,
                 bytes,
             )?;
-            self.capture_acknowledged = true;
-            self.capture_sequence = Some(next as u64);
-            *global = next;
+            // Generic payload storage is idempotent: success need not append
+            // an event. Authenticate a new sequence before claiming one.
             super::LIVE_SINK.with(|slot| match slot.borrow().as_ref() {
                 Some(super::EventSink::Bound(sink)) => sink.verify_digest_limits_at_count(
                     &self.binding_digest,
                     self.limits,
-                    *global as u64,
+                    next as u64,
                 ),
                 _ => Err("original input capture disappeared".into()),
             })?;
+            self.capture_acknowledged = true;
+            self.capture_sequence = Some(next as u64);
+            *global = next;
             budget
                 .check(Instant::now())
                 .map_err(|s| format!("input root deadline: {s:?}"))?;
@@ -10598,7 +10600,7 @@ mod pre_matrix_input_store_tests {
     #[test]
     fn input_is_stored_before_both_matrix_engines_and_failures_preserve_acknowledgements() {
         for engine in [Engine::F4Macaulay, Engine::F5KoszulFrobenius] {
-            for mode in 0..6 {
+            for mode in 0..7 {
                 let binding = matrix_tests::binding();
                 let limits = crate::ml_dataset::capture::capture_limits(16).unwrap();
                 let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
@@ -10635,6 +10637,37 @@ mod pre_matrix_input_store_tests {
                     &mut budget,
                     &mut global,
                     &mut |bytes, b, g| {
+                        if mode == 6 {
+                            // Fault injection: the exact input is already in
+                            // capture. Its existing event is counted truthfully.
+                            super::super::live_borrowed_payload(
+                                KOBLITZ_SLOTS[0].0,
+                                KOBLITZ_SLOTS[0].1,
+                                KOBLITZ_SLOTS[0].2,
+                                bytes,
+                            )
+                            .unwrap();
+                            *g += 1;
+                            let previous = *g;
+                            let result = storage.publish(bytes, b, g);
+                            assert!(result.is_err());
+                            assert_eq!(*g, previous);
+                            assert!(storage.capture_sequence.is_none());
+                            assert!(!storage.capture_acknowledged);
+                            assert!(!root.join(KOBLITZ_SLOTS[0].0).exists());
+                            super::super::LIVE_SINK.with(|slot| match slot.borrow().as_ref() {
+                                Some(super::super::EventSink::Bound(sink)) => {
+                                    sink.verify_digest_limits_at_count(
+                                        &storage.binding_digest,
+                                        &limits,
+                                        previous as u64,
+                                    )
+                                    .unwrap();
+                                }
+                                _ => panic!("missing bound capture"),
+                            });
+                            return result;
+                        }
                         if mode == 5 {
                             let quote =
                                 quote_parent_storage_length(bytes.len() as u64, false, &limits)
