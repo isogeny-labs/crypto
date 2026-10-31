@@ -3187,10 +3187,13 @@ mod bound_signed_publisher_tests {
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
                 .as_nanos();
-            let dir = std::env::temp_dir().join(format!(
-                "koblitz-bound-witness-{}-{nonce}",
-                std::process::id()
-            ));
+            let dir = std::env::temp_dir()
+                .join(format!(
+                    "koblitz-bound-witness-{}-{nonce}",
+                    std::process::id()
+                ))
+                .join("live");
+            std::fs::create_dir_all(dir.parent().unwrap()).unwrap();
             let emitter =
                 CaptureEmitter::create(&dir, binding.clone(), capture_limits(16).unwrap()).unwrap();
             super::super::LIVE_SINK.with(|slot| {
@@ -3208,7 +3211,7 @@ mod bound_signed_publisher_tests {
             super::super::LIVE_SINK.with(|slot| {
                 slot.borrow_mut().take();
             });
-            let _ = std::fs::remove_dir_all(&self.dir);
+            let _ = std::fs::remove_dir_all(self.dir.parent().unwrap());
         }
     }
     #[test]
@@ -3474,6 +3477,46 @@ mod signed_typed_event_tests {
             }
         }
         assert_eq!(signed, result.acknowledged);
+        let replay = SavedSignedReplay {
+            schema: "crypto.ml-dataset.koblitz-m3-signed-prefix/v1".into(),
+            binding: binding.clone(),
+            public_sha256: "8".repeat(64),
+            factor_base_sha256: "9".repeat(64),
+            input_sha256: "a".repeat(64),
+            addition_limit: 16384,
+            performed_additions: result.enumeration_additions as usize,
+            acknowledged_additions: result.acknowledged.len(),
+            acknowledged: result.acknowledged.clone(),
+            unacknowledged: result.unacknowledged.clone(),
+        };
+        let replay_bytes = serde_json::to_vec(&replay).unwrap();
+        let custody =
+            verify_signed_capture(sink.dir.parent().unwrap(), &replay_bytes, &binding, &limits)
+                .unwrap();
+        assert_eq!(custody.payloads.len(), 1);
+        let mut altered: serde_json::Value = serde_json::from_slice(&replay_bytes).unwrap();
+        altered["acknowledged"].as_array_mut().unwrap().pop();
+        assert!(verify_signed_capture(
+            sink.dir.parent().unwrap(),
+            &serde_json::to_vec(&altered).unwrap(),
+            &binding,
+            &limits
+        )
+        .is_err());
+        // Even after all event callbacks match, a changed payload invalidates custody.
+        let payload_path = sink.dir.join("payloads/pdp-witness.json");
+        let original_payload = std::fs::read(&payload_path).unwrap();
+        let mut damaged = original_payload.clone();
+        damaged[0] ^= 1;
+        std::fs::write(&payload_path, damaged).unwrap();
+        assert!(verify_signed_capture(
+            sink.dir.parent().unwrap(),
+            &replay_bytes,
+            &binding,
+            &limits
+        )
+        .is_err());
+        std::fs::write(&payload_path, original_payload).unwrap();
         assert_eq!(events.encoded_bytes, encoded as u64);
         assert!(
             verify_signed_prefix(&original, &signed, None)
@@ -3835,5 +3878,148 @@ mod signed_math_pair_tests {
         assert!(!check(&original, &bytes, None)
             .unwrap()
             .negative_domain_verified());
+    }
+}
+
+/// Match a saved arithmetic prefix to each event of a custody-checked stream.
+/// Observations are provisional until the outer capture verifier succeeds.
+struct SignedCaptureMatch {
+    expected: Vec<SignedPrefix>,
+    next: usize,
+}
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SavedSignedEvent {
+    kind: String,
+    payload: SavedSignedEventPayload,
+}
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SavedSignedEventPayload {
+    phase: String,
+    progress: SignedPrefix,
+}
+impl SignedCaptureMatch {
+    fn new(replay_bytes: &[u8]) -> Result<Self, String> {
+        if replay_bytes.len() > SIGNED_REPLAY_BYTE_CAP {
+            return Err("signed replay exceeds byte cap".into());
+        }
+        let saved: SavedSignedReplay = serde_json::from_slice(replay_bytes)
+            .map_err(|e| format!("strict signed capture replay: {e}"))?;
+        if saved.acknowledged.len() > 192 {
+            return Err("signed capture exceeds domain".into());
+        }
+        Ok(Self {
+            expected: saved.acknowledged,
+            next: 0,
+        })
+    }
+    fn observe(&mut self, line: &[u8]) -> Result<(), String> {
+        let row: crate::ml_dataset::capture::EventRecord =
+            serde_json::from_slice(line).map_err(|e| format!("signed capture record: {e}"))?;
+        if row.event["kind"] != "koblitz_m3" {
+            return Ok(());
+        }
+        let event: SavedSignedEvent = serde_json::from_value(row.event)
+            .map_err(|e| format!("strict signed capture event: {e}"))?;
+        if event.kind != "koblitz_m3"
+            || event.payload.phase != "signed-domain"
+            || self.expected.get(self.next) != Some(&event.payload.progress)
+        {
+            return Err("signed capture disagrees with acknowledged arithmetic prefix".into());
+        }
+        self.next += 1;
+        Ok(())
+    }
+    fn finish(self) -> Result<(), String> {
+        if self.next != self.expected.len() {
+            return Err("signed capture omits acknowledged arithmetic events".into());
+        }
+        Ok(())
+    }
+}
+
+/// Authenticate the live committed stream and match its signed events to the
+/// saved replay. Arithmetic and original replay binding require verify_signed_math.
+/// No observer result escapes when custody validation fails later in the stream.
+pub(super) fn verify_signed_capture(
+    cell_dir: &std::path::Path,
+    replay_bytes: &[u8],
+    binding: &crate::ml_dataset::capture::AttemptBinding,
+    limits: &crate::ml_dataset::capture::CaptureLimits,
+) -> Result<crate::ml_dataset::capture::VerifiedLivePrefix, String> {
+    let mut matcher = SignedCaptureMatch::new(replay_bytes)?;
+    let custody = crate::ml_dataset::capture::verify_live_committed_prefix_visit(
+        cell_dir,
+        binding,
+        limits,
+        &mut |line| matcher.observe(line),
+    )?
+    .ok_or("missing committed Koblitz capture prefix")?;
+    matcher.finish()?;
+    Ok(custody)
+}
+
+#[cfg(test)]
+mod signed_capture_match_tests {
+    use super::*;
+    fn event(sequence: u16) -> SignedPrefix {
+        SignedPrefix {
+            sequence,
+            tuple: 0,
+            indices: [0; 3],
+            summand: sequence as u8,
+            prefix: None,
+            matches_target: false,
+        }
+    }
+    fn line(event: &SignedPrefix) -> Vec<u8> {
+        serde_json::to_vec(&serde_json::json!({
+            "schema":"crypto.ml-dataset.live-event/v2", "binding_sha256":"8".repeat(64),
+            "sequence":1,"previous_event_sha256":"0".repeat(64),
+            "event":{"kind":"koblitz_m3","payload":{"phase":"signed-domain","progress":event}}
+        }))
+        .unwrap()
+    }
+    #[test]
+    fn acknowledged_stream_match_rejects_omission_duplication_and_reordering() {
+        let expected = vec![event(0), event(1)];
+        let matcher = || SignedCaptureMatch {
+            expected: expected.clone(),
+            next: 0,
+        };
+        assert!(matcher().finish().is_err());
+        let mut omitted = matcher();
+        omitted.observe(&line(&expected[0])).unwrap();
+        assert!(omitted.finish().is_err());
+        let mut reversed = matcher();
+        assert!(reversed.observe(&line(&expected[1])).is_err());
+        let mut duplicate = matcher();
+        duplicate.observe(&line(&expected[0])).unwrap();
+        assert!(duplicate.observe(&line(&expected[0])).is_err());
+        let mut complete = matcher();
+        for e in &expected {
+            complete.observe(&line(e)).unwrap();
+        }
+        complete.finish().unwrap();
+    }
+    #[test]
+    fn signed_capture_schema_and_values_are_strict() {
+        let expected = event(0);
+        for mutation in 0..5 {
+            let mut row: serde_json::Value = serde_json::from_slice(&line(&expected)).unwrap();
+            match mutation {
+                0 => row["event"]["extra"] = true.into(),
+                1 => row["event"]["payload"]["extra"] = true.into(),
+                2 => row["event"]["payload"]["progress"]["extra"] = true.into(),
+                3 => row["event"]["payload"]["phase"] = "other".into(),
+                _ => row["event"]["payload"]["progress"]["matches_target"] = true.into(),
+            }
+            let mut matcher = SignedCaptureMatch {
+                expected: vec![expected.clone()],
+                next: 0,
+            };
+            assert!(matcher.observe(&serde_json::to_vec(&row).unwrap()).is_err());
+        }
     }
 }

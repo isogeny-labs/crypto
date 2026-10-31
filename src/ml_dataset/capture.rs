@@ -1825,6 +1825,18 @@ pub(super) fn verify_live_committed_prefix(
     binding: &AttemptBinding,
     limits: &CaptureLimits,
 ) -> Result<Option<VerifiedLivePrefix>, String> {
+    verify_live_committed_prefix_visit(cell_dir, binding, limits, &mut |_| Ok(()))
+}
+
+/// Visit checked records while authenticating the entire committed prefix.
+/// Callback observations remain provisional until this function returns Some;
+/// later chain, watermark or payload failures invalidate every observation.
+pub(super) fn verify_live_committed_prefix_visit(
+    cell_dir: &Path,
+    binding: &AttemptBinding,
+    limits: &CaptureLimits,
+    visit: &mut impl FnMut(&[u8]) -> Result<(), String>,
+) -> Result<Option<VerifiedLivePrefix>, String> {
     binding.validate()?;
     limits.validate()?;
     let cell = storage::root_dir(cell_dir, false)?;
@@ -1875,6 +1887,7 @@ pub(super) fn verify_live_committed_prefix(
             cursor.event_count + 1,
             &cursor.last_event_sha256,
         )?;
+        visit(&line)?;
         cursor.event_count += 1;
         cursor.byte_end += line.len() as u64;
         cursor.last_event_sha256 = hash;
