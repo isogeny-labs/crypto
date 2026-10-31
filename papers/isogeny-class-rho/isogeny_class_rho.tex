@@ -70,6 +70,11 @@ walk (expected $1/\sqrt{6} = 0.408$), and the Frobenius fold on the Koblitz
 crater $0.155$ $[0.141, 0.170]$ (expected $1/\sqrt{41}$), $0.113$ with negation
 (expected $1/\sqrt{82}$). The recorded $1.7$ to $2.2$ wall-time ratio is an
 unisolated shared-VM observation, not an admitted performance result.
+A replica of the prime-field class at $46$ bits ($1{,}773\times$ the group
+order, $38$ curves, $4{,}400$ solves) reads the same on the primary comparison;
+its generator family deviated once and did not repeat on a fresh seed, and a
+second-host re-run of the four class-mode measurements reproduced every
+iteration count exactly.
 Every measured off-crater isogeny leads away from the curve that
 has them. On the way we record that, for odd $m$, every prime dividing the
 conductor of a curve over $\FF_{2^m}$ is $\pm 1 \bmod 8$. For the Koblitz curve
@@ -649,6 +654,53 @@ shift cell in the original report
 shared-seed covariance must be retained in a corrected analysis before
 inferring source independence.
 
+\subsection{Replication at $46$ bits and on a second host}
+\label{sec:replica}
+
+Two further runs were made after the main study. Both are descriptive and
+use the same native instrument, so the tied-sample and shared-seed reservations
+above apply to them unchanged.
+
+\paragraph{A $46$-bit replica of the prime-field class.} One class, P2, over
+$\FF_p$ with $p=46339417407469$ and prime $n=46{,}339{,}405{,}405{,}021$, was
+walked and measured under a protocol frozen before data
+(\art{crypto:research/isogeny-class-rho-n45/PROTOCOL.md}), reusing the P1
+design: $38$ isogenous curves, $100$ seeds each, three isomorphism controls,
+an A/A replica and the planted negation fold and $4$-adding walk.
+All $4{,}400$ solves returned the planted logarithm, and replaying the first
+five seeds of every arm reproduced $220$ of $220$ iteration counts exactly.
+The pooled mean is $1.0097\times\sqrt{\pi n/2}$ (bootstrap $95\%$ interval
+$0.993$ to $1.026$); Kruskal--Wallis $p=0.38$, ANOVA $p=0.67$, no curve
+beyond the Bonferroni band (largest $|z|=2.39$ against $3.21$). The controls
+read $1.107$, $0.996$, $0.984$ and the A/A replica $0.974$; the planted
+negation fold $0.732$ (expected $0.707$) and the planted $4$-adding walk
+$1.291$ (the P1 range was $1.27$--$1.36$). The ratio of the P2 to the P1 pooled
+mean is $41.68$ against $\sqrt{n_{P2}/n_{P1}}=42.11$. This addresses the worry
+that the P1 null is an artefact of a small group, at one class and one larger
+size; power per curve is the same $18\%$ as before and no smaller effect is
+excluded.
+
+\paragraph{A generator family that deviated once.} The P2 generator family
+($20$ generators on each of two vertices, $10$ solves each) fell outside its
+frozen rule: Kruskal--Wallis $p=1.2\times10^{-4}$, largest $|z|=4.76$ against
+$3.23$, with arms at $1.64\times$ and $0.61\times$ of expected. A repeat with
+a fresh seed and the identical command, with its replication rule written
+down before it ran (\art{crypto:research/isogeny-class-rho-n45/ADDENDUM-generators.md}),
+gave $p=0.97$, largest $|z|=1.97$ and no flagged arm. The repeat is not a
+preregistered confirmation, draws new generators, and does not explain the
+first result. Together with the single flagged generator in $384$ on B1, the
+generator family remains the one place where the record is not clean, and
+we do not claim that the generator cannot matter.
+
+\paragraph{A second host.} The four class-mode measurements of the main study
+were re-run on a second VM of the same type with the same seed. No row differs
+in iterations, restarts, distinguished points or escapes (P1 $11{,}000$ rows,
+P0 $5{,}200$, B1 $4{,}600$, K $1{,}900$). The per-iteration wall time on the
+second host is $0.61$ to $0.75$ of the first, which is a property of two
+shared VMs and says nothing about the algorithm; neither host was isolated,
+so these remain unadmitted wall-time observations
+(\art{crypto:research/isogeny-class-rho-n45/second-host/COMPARISON.md}).
+
 \subsection{Historical end-to-end costs}
 
 Carrying an instance to a curve costs the isogenies on the way. The following
@@ -704,6 +756,12 @@ native-harness admission and concrete proof bridges are unresolved, so this
 draft does not promote the historical analysis to a general empirical
 invariance conclusion. Random self-reducibility~\cite{JaoMillerVenkatesan2005}
 is the cited theoretical context, not a substitute for those gates.
+
+\paragraph{Replication.} The $46$-bit replica (Section~\ref{sec:replica}) shows the
+primary comparison unchanged at $1{,}773\times$ the group order and the second
+host reproduces every iteration count, which supports the exactness of the
+counts, not the absence of smaller effects. The one deviation, in a generator
+family, did not repeat and is unexplained.
 
 \paragraph{What it does not say.} It does not say that no curve of a class
 is easier for some non-generic method; index calculus on a curve with a
