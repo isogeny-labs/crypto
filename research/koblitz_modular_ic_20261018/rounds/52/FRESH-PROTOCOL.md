@@ -17,3 +17,8 @@ Same local authorization,seed52,one thread,4GiBvirtual,1200s,serialize math,
 freeze code/catalog before data. Strict exit0,no? errors,FRESH52_ALL_CHECKS_PASS.
 This is a fresh same-backend certificate check,not external independent
 implementation/semantic review. Retain failures,caps and all partials.
+
+Before first fresh run additionally reconstruct all three translated line
+functions,the actual kernel/source equations,VeluX/Y and alpha=lineCubic(t)
+from point addition. Bind them to the serialized norm numerator and source
+arrays before checking its full product. No producer is repeated.
