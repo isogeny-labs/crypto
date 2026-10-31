@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Original evidence for three ECDLP leads is unlocated](three-leads-original-evidence-unlocated.md) | open for historical provenance; fresh rebuild complete | exact authentication of the historical statistics only; all three routes now have fresh complete solves and cost verdicts | original immutable producers and raw records; see the [fresh two-cohort genus-2 rebuild](../research/three_leads_e2e_20261018/README.md) |
 | [PQC cross-platform performance and leakage validation](pqc-cross-platform-validation.md) | open | ML-KEM/ML-DSA speed and side-channel claims across platforms | qualified PQC benchmark route, native target correctness, emitted-code audit and target-specific leakage evidence |
 | [IC campaign frontier implementation and validation gaps](ic-campaign-frontier-obstructions-20261018.md) | open | full F4/closure frontier trials, large certified replay, realistic Boolean c fits and GPU/distributed execution | closure-preserving disk integration, wider canonical monomials/adapters, independent certificates and prospective scaling/calibration, usable bounded cloud lifecycle |
 | [Transport-oracle exact simulation](transport-oracle-exact-simulation-gap.md) | open | R6.8 general simulation and closure claim | correct identity/kernel handling, complete lifting costs, and a proof of adaptive instance independence |

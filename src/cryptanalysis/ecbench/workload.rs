@@ -268,6 +268,7 @@ impl CurveSpec {
     pub fn build(&self) -> Result<Instance, String> {
         match *self {
             CurveSpec::ThreeLeads {
+                p, n, modulus, a, b, group_order, r, gx, gy, ref family, parameter,
                 p,
                 n,
                 modulus,
@@ -286,6 +287,7 @@ impl CurveSpec {
                 let f = crate::cryptanalysis::three_leads::Field::new(p, n as usize, modulus);
                 let c = if p == 2 { [b, 0, a, 1] } else { [b, a, 0, 1] };
                 let i = crate::cryptanalysis::three_leads::StudyInstance {
+                    curve: crate::cryptanalysis::three_leads::Elliptic { f, c, binary: p == 2 },
                     curve: crate::cryptanalysis::three_leads::Elliptic {
                         f,
                         c,
@@ -616,6 +618,8 @@ impl CurveSpec {
             | Instance::Fp4(_)
             | Instance::Fp4Torsion(_)
             | Instance::F2m4(_)
+            | Instance::Ext(_)
+            | Instance::ThreeLeads(_) => None,
             | Instance::ThreeLeads(_)
             | Instance::Ext(_) => None,
             // The thread rule and the order's point counts are the slow
@@ -681,6 +685,9 @@ impl CurveSpec {
             CurveSpec::Fp4Translation { p, seed } => {
                 format!("quartic_folds::generate_translation_instance({p}, {seed}, 16)")
             }
+            CurveSpec::ThreeLeads { p, n, a, b, ref family, parameter, .. } => format!(
+                "three_leads_explicit(p={p},n={n},a={a},b={b},family={family},parameter={parameter})"
+            ),
             CurveSpec::GlsFp2 {
                 p_bits,
                 seed,
@@ -1158,7 +1165,8 @@ impl Instance {
             | Instance::Genus2(_)
             | Instance::Quartic(_)
             | Instance::Ghs(_)
-            | Instance::Hyper(_) => {
+            | Instance::Hyper(_)
+            | Instance::ThreeLeads(_) => {
                 unreachable!("returned above")
             }
             Instance::Wide(i) => (
@@ -1335,7 +1343,8 @@ impl Instance {
             | Instance::Genus2(_)
             | Instance::Quartic(_)
             | Instance::Ghs(_)
-            | Instance::Hyper(_) => {
+            | Instance::Hyper(_)
+            | Instance::ThreeLeads(_) => {
                 unreachable!("returned above")
             }
         }
@@ -1412,6 +1421,7 @@ impl Instance {
                         return Some(([format!("0x{:x}", q.x), format!("0x{:x}", q.y)], counter));
                     }
                 }
+                Instance::Wide(_) | Instance::Fp4(_) | Instance::ThreeLeads(_) | Instance::Hyper(_) => {
                 Instance::Wide(_)
                 | Instance::Fp4(_)
                 | Instance::ThreeLeads(_)

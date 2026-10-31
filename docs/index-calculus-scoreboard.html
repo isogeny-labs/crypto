@@ -941,6 +941,26 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
 <tr><td>2026-10-18</td><td>Elliptic curve, whole method, cold, one target</td><td>Lazy orbit-member index, fully priced, stride-renew, vs rho-frob: best cell <code>icv1-f2m29-tm40309-30c52b96</code> (r = 2<sup>15.4</sup>)</td><td class="n">1.272&times; <small>S; [0.770, 1.803]; was 1.566&times; (eager table, other seeds)</small></td><td>matched</td><td><span class="chip">engineering</span></td><td><a href="#lazy-orbit-members-20261018">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_lazy_orbit_members_20261018/REPORT.pdf">source</a></td></tr>
 <tr><td>2026-10-18</td><td>Elliptic curve, whole method, cold, one target</td><td>Two orbit columns under the lazy oracle, fully priced, stride-renew, vs rho-frob: best cell <code>icv1-f2m29-tm40309-30c52b96</code> (r = 2<sup>15.4</sup>), frozen c = 1</td><td class="n">1.287&times; <small>S; [0.971, 1.686]; c = 2 cheaper in 1 of 5 cells (n17 a1, 1.176&times;)</small></td><td>matched</td><td><span class="chip">engineering</span></td><td><a href="#lazy-columns2-20261018">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_lazy_columns2_20261018/REPORT.pdf">source</a></td></tr>
 <tr><td>2026-10-15</td><td>Elliptic curve, whole method, cold, one target</td><td>Joux&ndash;Vitse (n &minus; 1)-decomposition at n = 5 on E(F<sub>p&#8309;</sub>), complete DLP, p = 31 (&#8467; = 2<sup>24.8</sup>), F4 replaying a recorded trace; p = 11: 4.5&middot;10<sup>7</sup>&times; and 1.8&middot;10<sup>8</sup>&times;</td><td class="n">6.8&middot;10<sup>7</sup>&times; <small>F<sub>p</sub> multiplications against rho on the same target; extrapolated parity q &asymp; 2<sup>58.2</sup> (group 2<sup>291</sup>)</small></td><td>matched</td><td><span class="chip">accounting</span></td><td><a href="#rho-parity-ledger">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md">source</a></td></tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<tr><td>2026-10-19</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Three-leads fresh Binary subfield</td><td class="n">2.0158&times;</td><td>matched</td><td>accounting</td><td><a href="#three-leads-e2e-0">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md">source</a></td></tr>
+<tr><td>2026-10-19</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Three-leads fresh Odd subfield</td><td class="n">2.2283&times;</td><td>matched</td><td>accounting</td><td><a href="#three-leads-e2e-1">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md">source</a></td></tr>
+<tr><td>2026-10-19</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Three-leads fresh PKM fixed fibers</td><td class="n">7.7116&times;</td><td>matched</td><td>accounting</td><td><a href="#three-leads-e2e-2">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md">source</a></td></tr>
+<tr><td>2026-10-19</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Three-leads fresh Genus transfer, field cohort</td><td class="n">5.2546&times;</td><td>matched</td><td>accounting</td><td><a href="#three-leads-e2e-3">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md">source</a></td></tr>
+<tr><td>2026-10-19</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Three-leads fresh Genus transfer, subgroup cohort</td><td class="n">5.3922&times;</td><td>matched</td><td>accounting</td><td><a href="#three-leads-e2e-4">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md">source</a></td></tr>
 <tr><td>2026-10-20</td><td>Elliptic curve, whole method, cold, one target</td><td>k = 5 2-torsion Edwards route on E(F<sub>p&#8309;</sub>), F4 trace replay, complete DLP at p = 61 (&#8467; = 2<sup>27.7</sup>); five solved arms 1.24&middot;10<sup>6</sup>&ndash;5.8&middot;10<sup>6</sup>&times;</td><td class="n">1.24&middot;10<sup>6</sup>&times; <small>F<sub>p</sub> multiplications against rho on the same target; 4.1&middot;10<sup>5</sup>&times; with rho&rsquo;s unpriced walk work at 1 GAE; extrapolated parity n &asymp; 2<sup>227</sup></small></td><td>matched</td><td><span class="chip">engineering</span></td><td><a href="#rho-parity-ledger">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md">source</a></td></tr>
 <tr><td>2026-10-20</td><td>Elliptic curve, whole method, cold, one target</td><td>Rule v8: the Koblitz descent at baseline v8 against a matched rho, one target cold, closest size 2^36.6</td><td class="n">4.669&times; <small>rho matched; rule v7 read 3.43&times; against an unmatched rho</small></td><td>matched</td><td><span class="chip">accounting</span></td><td><a href="#ic-tool-programme-20261001">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v8/README.md">source</a></td></tr>
 <tr><td>2026-10-20</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>PKM Kummer tower (t=12) + rootfind-mitm, 30-bit prime curve icv1-fp30-t49927-d70f5de2</td><td class="n">158.9&times; <small>counted GAE lower-bound diagnostic; not a speed bound; 140.6&times; at 28 bits</small></td><td>matched</td><td><span class="chip">accounting</span></td><td><a href="#lab-ecbench-all">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/certicom131_ic_program_20261020/README.md">source</a></td></tr>
@@ -1451,6 +1471,7 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "anchor": "#three-leads-e2e-0",
      "class": "accounting",
      "date": "2026-10-19",
+     "detail": "Best tested curve/recipe after observation: binary-q16-v2::icv1-f2m8-tm17-ec7ed2e8, 8 matched targets; cold default arithmetic IC/rho-neg 2.0158; 12-price range 1.965–2.146. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
      "detail": "Best tested curve/recipe after observation: binary-q16-v2::icv1-f2m8-tm17-ec7ed2e8, 8 matched targets; cold default arithmetic IC/rho-neg 2.0158; 12-price range 1.965\u20132.146. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
      "label": "Three-leads fresh Binary subfield",
      "reference": "matched",
@@ -1462,6 +1483,7 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "anchor": "#three-leads-e2e-1",
      "class": "accounting",
      "date": "2026-10-19",
+     "detail": "Best tested curve/recipe after observation: odd-p5-v2::icv1-fp3k2-t4-1f351b3a, 8 matched targets; cold default arithmetic IC/rho-neg 2.2283; 12-price range 2.079–2.274. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
      "detail": "Best tested curve/recipe after observation: odd-p5-v2::icv1-fp3k2-t4-1f351b3a, 8 matched targets; cold default arithmetic IC/rho-neg 2.2283; 12-price range 2.079\u20132.274. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
      "label": "Three-leads fresh Odd subfield",
      "reference": "matched",
@@ -1473,6 +1495,7 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "anchor": "#three-leads-e2e-2",
      "class": "accounting",
      "date": "2026-10-19",
+     "detail": "Best tested curve/recipe after observation: pkm_dickson-d2-lo8192-v2::icv1-fp14-t60-aa1a2317, 8 matched targets; cold default arithmetic IC/rho-neg 7.7116; 12-price range 6.304–8.289. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
      "detail": "Best tested curve/recipe after observation: pkm_dickson-d2-lo8192-v2::icv1-fp14-t60-aa1a2317, 8 matched targets; cold default arithmetic IC/rho-neg 7.7116; 12-price range 6.304\u20138.289. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
      "label": "Three-leads fresh PKM fixed fibers",
      "reference": "matched",
@@ -1484,6 +1507,7 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "anchor": "#three-leads-e2e-3",
      "class": "accounting",
      "date": "2026-10-19",
+     "detail": "Best tested curve/recipe after observation: genus-16-v2::icv1-fp9k2-tm342-02fbacd7, 60 matched targets; cold default arithmetic IC/rho-neg 5.2546; 12-price range 3.614–6.841. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
      "detail": "Best tested curve/recipe after observation: genus-16-v2::icv1-fp9k2-tm342-02fbacd7, 60 matched targets; cold default arithmetic IC/rho-neg 5.2546; 12-price range 3.614\u20136.841. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
      "label": "Three-leads fresh Genus transfer, field cohort",
      "reference": "matched",
@@ -1495,6 +1519,7 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "anchor": "#three-leads-e2e-4",
      "class": "accounting",
      "date": "2026-10-19",
+     "detail": "Best tested curve/recipe after observation: order-genus-16::icv1-fp10k2-tm230-7cd9e337, 60 matched targets; cold default arithmetic IC/rho-neg 5.3922; 12-price range 3.295–7.162. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
      "detail": "Best tested curve/recipe after observation: order-genus-16::icv1-fp10k2-tm230-7cd9e337, 60 matched targets; cold default arithmetic IC/rho-neg 5.3922; 12-price range 3.295\u20137.162. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
      "label": "Three-leads fresh Genus transfer, subgroup cohort",
      "reference": "matched",
@@ -1556,17 +1581,6 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
    "note": "Callgrind counts user-space instructions inside the solve boundary, including reusable setup. It is neither isolated native wall time nor the primary online target interval.",
    "points": [
     {
-     "anchor": "#n37-k8-k16-20261004",
-     "class": "accounting",
-     "date": "2026-10-04",
-     "detail": "All 64 profiles recovered the archived logarithms; K8/rho whole-solve Callgrind Ir is 3.6446 [3.2353, 4.1360], with K16/K8 1.1903 [1.1584, 1.2218]. The identical K16 A/A maximum deviation was 0.0042%. The native session replayed 320/320 records on a different host class. This does not establish an isolated online wall speedup; K16 remains a target-only candidate.",
-     "label": "n37 shared-rank K8 vs strong rho, 16 untouched public points",
-     "reference": "matched",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_k8_k16_20261004/RESULT.md",
-     "unit": "Callgrind Ir diagnostic",
-     "value": 3.6445922113828737
-    },
-    {
      "anchor": "#n37-online-ir-20261004",
      "class": "accounting",
      "date": "2026-10-04",
@@ -1576,6 +1590,18 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_online_ir_20261004/RESULT.md",
      "unit": "Callgrind Ir diagnostic",
      "value": 3.9836937719692034
+     "value": 3.6445922113828737
+    },
+    {
+     "anchor": "#n37-k8-k16-20261004",
+     "class": "accounting",
+     "date": "2026-10-04",
+     "detail": "All 64 profiles recovered the archived logarithms; K8/rho whole-solve Callgrind Ir is 3.6446 [3.2353, 4.1360], with K16/K8 1.1903 [1.1584, 1.2218]. The identical K16 A/A maximum deviation was 0.0042%. The native session replayed 320/320 records on a different host class. This does not establish an isolated online wall speedup; K16 remains a target-only candidate.",
+     "label": "n37 shared-rank K8 vs strong rho, 16 untouched public points",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_k8_k16_20261004/RESULT.md",
+     "unit": "Callgrind Ir diagnostic",
+     "value": 3.6445922113828737
     }
    ],
    "role": "context"
@@ -1823,6 +1849,17 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-base-size-cold-panel-20261004/RESULT.md",
      "unit": "unisolated online wall diagnostic",
      "value": 0.0744283266338394
+    },
+    {
+     "anchor": "#n41-n53-base-size-cold-20261004",
+     "class": "accounting",
+     "date": "2026-10-04",
+     "detail": "Six verified same-point held-out pairs: median paired IC/rho online 0.195867, or rho/IC 5.106. IC online median 2.631 ms versus rho 13.409 ms; cold IC/rho was 35.144 in the separate unisolated diagnostic series. No controlled speedup claim.",
+     "label": "n41 K85, held-out base-size baseline",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-base-size-cold-panel-20261004/RESULT.md",
+     "unit": "unisolated online wall diagnostic",
+     "value": 0.1958670477093132
     },
     {
      "anchor": "#ic-tool-programme-20261001",

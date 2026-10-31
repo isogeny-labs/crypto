@@ -473,6 +473,13 @@ const BEST2_MODEL_PARAMS: &[ParamDecl] = &[
 
 pub fn registry() -> &'static [MethodDecl] {
     &[
+        MethodDecl{id:"rho.three_leads_plain_v1",family:"rho",summary:"Fully counted memoized r-adding rho on frozen finite-extension study inputs; collision-table memory reported",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"rho.three_leads_negation_v1",family:"rho",summary:"Fully counted memoized negation rho with fruitless-two-cycle look-ahead and charged escape/restarts",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"rho.three_leads_jacobian_v1",family:"rho",summary:"Explicit Scholten transfer followed by the matched generic Jacobian negation rho, every primitive counted",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"ic.three_leads_genus2_v2",family:"ic",summary:"Signed double-large-prime IC with charged restart on every repeated walk divisor, including unsplit states",entry:"three_leads::solve_genus2_v2",applies:Applies::Any,params:THREE_LEADS_GENUS2_PARAMS},
+        MethodDecl{id:"ic.three_leads_genus2_v1",family:"ic",summary:"Complete Scholten transfer and signed double-large-prime elimination; independent and duplicate-relation controls are explicit parameters",entry:"three_leads::solve_genus2",applies:Applies::Any,params:THREE_LEADS_GENUS2_PARAMS},
+        MethodDecl{id:"ic.three_leads_decomposition_v2",family:"ic",summary:"Complete subfield or PKM IC including initial and restarted relation targets, charged cofactor offsets, actual roots and elimination",entry:"three_leads::solve_subfield_or_pkm_v2",applies:Applies::Any,params:THREE_LEADS_DECOMPOSITION_PARAMS},
+        MethodDecl{id:"ic.three_leads_decomposition_v1",family:"ic",summary:"Complete subfield or PKM IC with actual S3 roots, unknown projected base logarithms and incremental elimination",entry:"three_leads::solve_subfield_or_pkm",applies:Applies::Any,params:THREE_LEADS_DECOMPOSITION_PARAMS},
         MethodDecl {
             id: super::aps::ID,
             family: "ic",
@@ -3835,6 +3842,9 @@ fn solve_ext(
             }
             solve_endo_orbit(m, &i.curve, i.frobenius, i.generator, target, i.r, seed, "frobenius-orbit walk on {±π^i(P)}: look-ahead, short-cycle escape by doubling, distinguished points, stride starts")
         }
+        (Instance::Wide(_), _) | (Instance::Fp4(_), _) | (Instance::ThreeLeads(_), _) => {
+            unreachable!("returned above")
+        }
     }
 }
 
@@ -6827,7 +6837,7 @@ pub fn dump_factor_base(
         | Instance::Genus2(_)
         | Instance::Quartic(_)
         | Instance::Ghs(_)
-        | Instance::Hyper(_) => unreachable!("returned above"),
+        | Instance::Hyper(_) | Instance::ThreeLeads(_) => unreachable!("returned above"),
     }
 }
 
