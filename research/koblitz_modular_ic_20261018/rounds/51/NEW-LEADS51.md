@@ -66,3 +66,21 @@ pins mathlib5b040b83e23fa9897cf3e3be7ba34775eda1093d. Those differ from
 this project's frozen Lean4.34.1/mathlibd13f23b. Do not silently upgrade.
 Any reuse must port the required statements to the current pins,compile and
 audit them locally,and instantiate their actual subgroup hypotheses.
+
+## 4. Use the zero Hecke eigenvalue as a projector constraint
+
+T3's vanishing on the CM factor need not discard the correspondence. Once
+its actual action matrix on the retained anti-invariant differential/Jacobian
+module is constructed,compute its zero-eigenspace and the other factors
+exactly. A polynomial in T3 can project onto its zero eigenspace with an
+integral scalar denominator determined by a Bezout/Smith calculation. This
+could isolate the CM block from some larger carrier components. It does not
+automatically isolate the selected Frobenius sign or prove the zero eigenspace
+has only CM constituents;both require actual matrix/factor checks.
+
+The decisive test is an integral source-bound projector certificate and its
+scalar on the order11 target. If the scalar is divisible by11,record the
+exact lattice obstruction and investigate joint Hecke/Frobenius/diamond
+saturation. If it is a unit mod11,compose with the required factor/sign
+selection and test actual divisor images. This gives T3 a useful role while
+keeping a3=0 explicit. No coefficient-box or inferred nonzero-action claim.
