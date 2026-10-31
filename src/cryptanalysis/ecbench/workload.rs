@@ -992,7 +992,7 @@ impl Instance {
             Instance::Wide(i) => i.kc.r,
             Instance::Fp4(i) => u128::from(i.r),
             Instance::Fp4Torsion(i) => u128::from(i.r),
-            Instance::F2m4(i) => u128::from(i.r),
+            Instance::F2m4(i) => i.r,
             Instance::Ext(i) => u128::from(i.r()),
             Instance::Genus2(i) => u128::from(i.r),
             Instance::Quartic(i) => u128::from(i.r),
