@@ -631,6 +631,34 @@ def koblitz_checked_source_geometry(ref, since):
                  source=f"{path}@{commit}")
 
 
+
+def koblitz_integral_chart_transfers(ref, since):
+    """Neutral exact chart, packet and kernel-geometry counters from R51 receipts."""
+    path = "research/koblitz_modular_ic_20261018/rounds/51/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        counts = json.loads(text).get("construction_counts", {})
+        for key, unit, label in (
+            ("localized_generator_compatibilities", "complete generator identities", "Independent source-bound normal-generator compatibility checks"),
+            ("localized_normal_chart_maps", "localized chart maps", "Actual first and inverse diamond maps on the complete normal basis"),
+            ("universal_certificate_denominator_degree", "polynomial degrees", "Actual denominator of the portable QR polynomial certificate"),
+            ("structured_marked23_algebra_dimension", "algebra dimensions", "Complete structured marked23 source algebra over F2(x)"),
+            ("structured_marked23_source_equations", "coupled source equations", "All QR and marked-base equations in the structured presentation"),
+            ("integral_nu_normal_chart_coordinates", "integral source coordinates", "Actual descended nu with a complete normal-module lift"),
+            ("QR_square_determinant_actions", "finite matrix actions", "Exhaustive QR7 square-determinant action checks"),
+            ("QR_largest_cycle", "cycle lengths", "Largest cycle in the complete QR7 action enumeration"),
+            ("Hecke3_kernel_parameter_degree", "algebra dimensions", "Generic separable Tate3 kernel-parameter algebra"),
+            ("Hecke3_isogeny_degree", "isogeny degrees", "Generic Tate quotient with full function and unit certificates"),
+            ("ordinary_QR_point_algebra_dimension", "algebra dimensions", "Actual ordinary QR line-packet point algebra"),
+            ("coprime_kernel_Bezout_Delta_exponent", "discriminant powers", "Full polynomial coprime3/7 kernel collision certificate"),
+            ("nu_diamond_PID_entries", "complete module entries", "Actual nu diamond transport in the retained normal module"),
+            ("nu_diamond_clearing_power", "principal-open powers", "Fixed source-bound clearing exponent for nu diamond transport"),
+            ("audited_unique_theorems", "audited declarations", "Unique locally audited R51 algebra and packet lemmas"),
+        ):
+            emit("koblitz_modular.geometry51_" + key, counts.get(key), date=date,
+                 problem=P_IC, unit=unit, better="neutral", label=label,
+                 source=f"{path}@{commit}")
+
+
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
     path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
@@ -744,6 +772,7 @@ def main():
     koblitz_degree13_characters(a.ref, a.since)
     koblitz_affine_normalization(a.ref, a.since)
     koblitz_checked_source_geometry(a.ref, a.since)
+    koblitz_integral_chart_transfers(a.ref, a.since)
 
 if __name__ == "__main__":
     main()

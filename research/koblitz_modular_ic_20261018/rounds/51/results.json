@@ -2,7 +2,7 @@
   "scope": "R51 actual chart maps and larger marked23 QR construction",
   "status_counts": {
     "rejected": 4,
-    "accepted": 12,
+    "accepted": 13,
     "running": 1
   },
   "runs": [
@@ -46,6 +46,11 @@
       "native_exit": 0,
       "required_marker": "BASE23_STRUCT51_ALL_CHECKS_PASS",
       "error_lines": []
+    },
+    {
+      "attempt": "collision51-01",
+      "status": "running",
+      "source_revision": null
     },
     {
       "attempt": "diamond51-01",
@@ -112,8 +117,12 @@
     },
     {
       "attempt": "line51-01",
-      "status": "running",
-      "source_revision": null
+      "status": "accepted",
+      "source_revision": "5b85ae1a2ec7a36b8902b2147d40463599d0e988",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "LINE51_ALL_CHECKS_PASS",
+      "error_lines": []
     },
     {
       "attempt": "nu51-01",
@@ -174,5 +183,22 @@
     "native arrays and RR/open-cover premises are not encoded in Lean",
     "marked23 quotient dimension is not primality",
     "selected modular-factor action and polarized embedding remain separate"
-  ]
+  ],
+  "construction_counts": {
+    "localized_generator_compatibilities": 64,
+    "localized_normal_chart_maps": 2,
+    "universal_certificate_denominator_degree": 26,
+    "structured_marked23_algebra_dimension": 112,
+    "structured_marked23_source_equations": 6,
+    "integral_nu_normal_chart_coordinates": 1,
+    "QR_square_determinant_actions": 1008,
+    "QR_largest_cycle": 14,
+    "Hecke3_kernel_parameter_degree": 4,
+    "Hecke3_isogeny_degree": 3,
+    "ordinary_QR_point_algebra_dimension": 48,
+    "coprime_kernel_Bezout_Delta_exponent": null,
+    "nu_diamond_PID_entries": null,
+    "nu_diamond_clearing_power": null,
+    "audited_unique_theorems": 5
+  }
 }
