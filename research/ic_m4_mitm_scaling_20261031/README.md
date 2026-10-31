@@ -75,6 +75,24 @@ The 24--40 fit is 0.469, but the 40 -> 44 step is `log2(1.08e9 / 2.09e7) / 4 =
 bits the same geometry predicts ~`4.7e8` additions per relation and hours of
 wall time, so the uniform arm was stopped at 44.
 
+
+## Larger rungs (native u64 cap)
+
+Pushing the planted arm to the `Fp64` ceiling (`p < 2^62`), 5 targets per rung
+(`run_60bit.txt`):
+
+| bits | |F| | pairs | adds/target | verified |
+|---:|---:|---:|---:|---:|
+| 52 | 1351 | 913,276 | 480,854 | 5/5 |
+| 56 | 2353 | 2,769,481 | 1,776,582 | 5/5 |
+| 60 | 4096 | 8,390,656 | 4,519,071 | 5/5 |
+
+Three-rung fit: **0.404** (R^2 0.9908). The 8-rung fit at 0.412 and this
+0.404 agree; the planted solve exponent is stable below 1/2 up to 60-bit
+primes and 8.4M pair-table entries. The uniform arm was not pushed past 44
+bits: at 60 bits the `p / B^2` relation cost is about `2^36` additions per
+relation, outside a session.
+
 ## Reading
 
 - The **planted** m = 4 solve exponent is stable and below 1/2 (0.412 over eight
