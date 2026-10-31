@@ -44,3 +44,36 @@ Relevant sources reviewed:retained R50/R51 RR construction,R52 complete nu
 binding,R53 exact ordinary/twisted fibers and failed compact specialization;
 Stacks0BJF and native linalg.lib constant rank implementation. Use existing
 linear algebra and idempotent methods;no novelty claim for those methods.
+
+## Primitive coordinate,closed points and Frobenius stage
+
+FIBER54accepted with ranks16,all model flags1,and both full inverse,
+multiplication and border products. The actual reduced border equations
+suggest w=nu/b,lambda=w4+w+1 and the monic polynomial
+P=w16+(1+b)w4+bw+1+b+b². FROBFIBER54tests this exact simplification and
+saves full membership products for both directions of the coordinate change,
+including equality with the retained descended ideal.
+
+Factor P over F32,verify full factor product and each factor irreducible by
+independent Rabin powers/gcd tests. Reject repeated-factor control. For each
+factor retain the coupled(a,w)prime,not merely a projected norm polynomial.
+Generate all32normal-RR basis values using the complete inverse matrix from
+FIBER54. Verify unit,lambda,nu,Vlabels and all528multiplication products,
+with full factor-times-quotient witnesses;corrupted unit evaluation must fail.
+Expected four quartic factors would give four degree20closed source points.
+Record actual factor degrees without revising them.
+
+Compute all five coefficient-Frobenius conjugates of each factor and its norm;
+check every norm coefficient lies in F2,and record degree,irreducibility and
+duplicate norms. Do not merge coupled primes solely because norms coincide.
+Build all16columns of Frobenius32 and the deck map w->w+1. Record whether
+Frob²=sign,Frob4=I and (I+sign)*(I+Frob+Frob²+Frob³)=0,plus both operator
+ranks. These are finite-fiber outcomes,not global Jacobian-action statements.
+If anti-trace zero holds with a nonzero anti operator,detect a changed trace.
+
+Same1200s/4GiB/single-thread/seed54limits. No coefficient boxes or timings
+comparison. Reviewed R52factor replays and the elementary Rabin criterion in
+https://fredrikj.net/fdoc/html/algorithms/polynomials/irreducibility.html .
+Only the stated criterion is used,not that page's complexity/performance claims.
+Independent Rabin checks replace reuse of the factorizer as its own checker.
+No intended11action is inferred without its separate deck/action premises.
