@@ -40,9 +40,9 @@ Hashes: `scripts/binary_hashes.txt`. Evidence: `research/ic_r2w_wdsat_sweep_2026
 - **Probes** (correctness and per-system cost, first-solution, `probes/probe_first_*.jsonl`): l = 3..8 at the five cells, 320 systems, root sets against brute force over V^3: **320/320 agree**, `inexact` 0.
 - **Whole-solve sessions** (ecbench law of E1/R2/R5, 8 targets each, `[d]G = Q` checked by ecbench on every record): l = 3..8 at all five cells; l = 9, 10 at K_1 n=11; l = 9..12 at K_0 n=13; l = 9..13 at K_0 n=15 (l = 11 = n at K_1 n=11, and l >= 9 at n = 9, are not run: l < n is required, and the n=9 optima are interior at l = 3 and 6).
   The lab arm at its R2-best l was repeated in the l = 4/5 sessions (A/A); lab l = 3 was run at K_0 n=13.
-  384 records: 352 verified (all `matches_target`), 24 `exhausted` (the three structurally failing l = 3 cells), 8 refused (l = n). WDSat calls 34,685; `refuted_by_emitter` 0; `lift_failures` 21 (all K_1 n=11, spurious roots, as in R5);
+  WDSat/lab sessions before Amendment 2: 384 records: 352 verified (all `matches_target`), 24 `exhausted` (the three structurally failing l = 3 cells), 8 refused (l = n). WDSat calls 34,685; `refuted_by_emitter` 0; `lift_failures` 21 (all K_1 n=11, spurious roots, as in R5);
   `wdsat_inexact` 13 (K_1 n=11 l=9: 5 of 324 calls; K_0 n=13 l=9: 1, l=11: 3, l=12: 4; none in a best config; a larger-id binary was used and counted).
-- **Lab arm**: R2's recorded values (pooled records of E1/T/R2 sessions, loaded by the same loader as `r2_analyze.py`), **not re-measured**. A/A against R2 in these sessions: K_0 n=9 l5 2.96e8 (R2 2.95e8), K_1 n=9 l3 2.34e8 (2.37e8), K_1 n=11 l5 4.61e8 (4.56e8), K_0 n=13 l6 1.04e9 (1.03e9), K_0 n=15 l7 1.86e9 (1.85e9): within 1.3 %.
+- **Lab arm**: R2's recorded values (pooled records of E1/T/R2 sessions, loaded by the same loader as `r2_analyze.py`), **not re-measured** for fit A and B1; for B2 (Amendment 2, at the end) the lab was extended, see "Matched lab sweep". A/A against R2 in these sessions: K_0 n=9 l5 2.96e8 (R2 2.95e8), K_1 n=9 l3 2.34e8 (2.37e8), K_1 n=11 l5 4.61e8 (4.56e8), K_0 n=13 l6 1.04e9 (1.03e9), K_0 n=15 l7 1.86e9 (1.85e9): within 1.3 %.
   New lab point: K_0 n=13 l3 2.93e9 (worse than l6). Best lab l is unchanged in every cell (5, 3, 5, 6, 7).
 - **l = 3 is structurally invalid at K_0 n=9, K_1 n=11 and K_0 n=15**: the base exhausts (calls = r - 1 = 126, 990, 750, status `exhausted`) whatever the solver, as with msolve in R2; it works at K_1 n=9 and K_0 n=13.
 - **History of the grid** (all of it was decided on the cost curves only, none on the ratios): the first reading stopped the extension at K_0 n=15 after l = 5..8 (all dearer than l = 4) and gave an interim fit B of +0.398 per bit (CI +0.020 to +0.777, "growing") committed as `b08763195a`.
@@ -80,7 +80,7 @@ relation systems (WDSat calls) per target, median
 
 ## Result: best WDSat against best lab
 
-Ratio = median over the 8 paired targets of WDSat metric / best-lab whole run. Fit A = pre-fixed grid l in {3..7}. Fit B = extended grid (Amendment 1): A plus l = 8 everywhere, l = 9..12 where run (see above), i.e. to an interior optimum in every cell. Last column: R2 (msolve).
+Ratio = median over the 8 paired targets of WDSat metric / best-lab whole run. Fit A = pre-fixed grid l in {3..7}. Fit B = extended WDSat grid (Amendment 1): A plus l = 8 everywhere, l = 9..13 where run (see above), i.e. to an interior optimum in every cell; lab = R2's values (B1), which equal the matched-lab values (B2, Amendment 2, because the best lab l did not change). Last column: R2 (msolve).
 
 | cell | best lab: l, Ir | A: best WDSat whole: l, Ir | ratio | A: best solver-only: l, Ir | ratio | B: best WDSat whole: l, Ir | ratio | B: best solver-only: l, Ir | ratio | R2 msolve whole / solver-only |
 |:--|:--|:--|--:|:--|--:|:--|--:|:--|--:|:--|
@@ -93,6 +93,18 @@ Ratio = median over the 8 paired targets of WDSat metric / best-lab whole run. F
 Every best point is a whole solve (8/8 verified); no cell is *open* and no projection supplies a best point. Interior optimum in B: K_0 n=9 l=6 (l=7, 8 dearer); K_1 n=9 l=3 (lowest valid; l=4..8 dearer); K_1 n=11 l=8 (l=9, 10 dearer; l=11 invalid); K_0 n=13 l=8 (l=9..12 dearer); K_0 n=15 l=10 (l=11, 12, 13 dearer).
 At l = 3 the solver-only figure is the whole WDSat cost less about 1.39e7 per call, i.e. most of the cost; a 7 % error in the start-up changes it by 15 % to 25 % (K_1 n=9, K_0 n=13), so the 0.18 and 1.16 are soft.
 
+## Matched lab sweep (Amendment 2): lab-only sessions at the l values WDSat was run at (8 targets each; all 136 records verified, plus 5 one-target trials at the top l)
+
+Whole-run median Ir per target (R2 values for the l that R2 had; new points marked *). The best lab l is unchanged in every cell and the lab curve rises monotonically past its minimum on every cell with no late drop, so **B2 = B1** (identical best points, ratios and fits).
+
+| cell | lab whole-run median Ir/target by l | best |
+|:--|:--|:--|
+| K_0 n=9  | l4 3.52e8, **l5 2.95e8**, l6 3.28e8, l7* 3.72e8, l8* 4.40e8 | l5 |
+| K_1 n=9  | l2 failed, **l3 2.37e8**, l4 2.47e8, l5 2.52e8, l6* 2.75e8, l7* 3.00e8, l8* 3.28e8 | l3 |
+| K_1 n=11 | l4 1.18e9, **l5 4.56e8**, l6 5.45e8, l7* 7.44e8, l8* 8.93e8, l9* 1.12e9, l10* 1.33e9 | l5 |
+| K_0 n=13 | l3* 2.93e9, l4 2.03e9, l5 1.88e9, **l6 1.03e9**, l7 1.40e9, l8 1.76e9, l9* 2.23e9, l10* 2.42e9, l11* 3.30e9, l12* 3.98e9 | l6 |
+| K_0 n=15 | l5 2.32e10, l6 3.93e9, **l7 1.85e9**, l8 2.25e9, l9 2.25e9, l10* 2.56e9, l11* 3.05e9, l12* 3.81e9, l13* 4.38e9 | l7 |
+
 ## Fit: ln(best WDSat / best lab) on n (OLS, 95 % t interval, k-2 degrees of freedom; `analysis/r2w_fit*.txt`)
 
 | set | slope per bit +- half CI | 95 % CI | x per 4 bits (CI) | verdict (rule above) |
@@ -101,10 +113,10 @@ At l = 3 the solver-only figure is the whole WDSat cost less about 1.39e7 per ca
 | A, whole run, without n=15 | **+0.292 +- 1.226** | -0.934 to +1.518 (p=0.41) | 3.2 (0.02 to 433) | undecided |
 | A, solver-only, all 5 | **+0.619 +- 1.023** | -0.404 to +1.642 (p=0.15) | 11.9 (0.20 to 711) | undecided |
 | A, solver-only, without n=15 | **+0.444 +- 2.572** | -2.128 to +3.016 (p=0.54) | 5.9 (0.00 to 173181) | undecided |
-| **B (extended), whole run, all 5** | **+0.146 +- 0.308** | -0.162 to +0.454 (p=0.23) | 1.8 (0.52 to 6) | undecided |
-| B, whole run, without n=15 | **+0.231 +- 0.730** | -0.499 to +0.960 (p=0.31) | 2.5 (0.14 to 47) | undecided |
-| **B, solver-only, all 5** | **+0.330 +- 0.578** | -0.248 to +0.908 (p=0.17) | 3.7 (0.37 to 38) | undecided |
-| B, solver-only, without n=15 | **+0.374 +- 1.494** | -1.120 to +1.869 (p=0.39) | 4.5 (0.01 to 1762) | undecided |
+| **B1 = B2 (extended WDSat; lab as R2 and matched), whole run, all 5** | **+0.146 +- 0.308** | -0.162 to +0.454 (p=0.23) | 1.8 (0.52 to 6) | undecided |
+| B1 = B2, whole run, without n=15 | **+0.231 +- 0.730** | -0.499 to +0.960 (p=0.31) | 2.5 (0.14 to 47) | undecided |
+| **B1 = B2, solver-only, all 5** | **+0.330 +- 0.578** | -0.248 to +0.908 (p=0.17) | 3.7 (0.37 to 38) | undecided |
+| B1 = B2, solver-only, without n=15 | **+0.374 +- 1.494** | -1.120 to +1.869 (p=0.39) | 4.5 (0.01 to 1762) | undecided |
 | R2 msolve, whole / solver-only, all 5 | +0.296 +- 0.285 / +0.304 +- 0.382 | +0.011 to +0.581 / -0.078 to +0.686 | 3.3 / 3.4 | undecided leaning growing |
 | WDSat fixed at l=4 (R5-style), whole run, all 5 | **+0.335 +- 0.453** | -0.118 to +0.788 (p=0.10) | 3.8 (0.62 to 23) | undecided |
 | WDSat fixed at l=4, solver-only, all 5 | **+0.463 +- 0.754** | -0.291 to +1.217 (p=0.15) | 6.4 (0.31 to 130) | undecided |
@@ -112,7 +124,7 @@ At l = 3 the solver-only figure is the whole WDSat cost less about 1.39e7 per ca
 ## Verdict
 
 - **Under the pre-fixed rule (fit A, grid l = 3..7): undecided** (whole run CI -0.101 to +0.891; solver-only -0.404 to +1.642; both contain 0 and are far from the flat band [-0.10, +0.10]; R2's looser "flat" wording gives the same).
-- **With the grid extended to the interior optimum in every cell (fit B): undecided as well**: whole run +0.146 per bit (CI -0.162 to +0.454; x1.8 per 4 bits), solver-only +0.330 (CI -0.248 to +0.908; x3.8 per 4 bits). Both metrics agree, both contain 0, neither is inside the flat band. The overall verdict is **undecided**.
+- **With the WDSat grid extended to the interior optimum in every cell (fit B1 = B2, lab sweep matched): undecided as well**: whole run +0.146 per bit (CI -0.162 to +0.454; x1.8 per 4 bits), solver-only +0.330 (CI -0.248 to +0.908; x3.8 per 4 bits). Both metrics agree, both contain 0, neither is inside the flat band. The overall verdict is **undecided**.
   The point estimates are positive and about half of R2's msolve slope (+0.30); the data neither exclude a flat ratio nor a ratio growing by x6 per 4 bits.
 - **What the sweep changed.** Sweeping WDSat over l shrinks the lab's lead sharply: the best-WDSat/lab whole-run ratios are 3.3, 2.0, 8.7, 5.6, 6.3 (n = 9, 9, 11, 13, 15), against 86, 71, 206, 136, 634 for the swept msolve arm of R2 and 7.0, 2.3, 18, 9.5 for R5's WDSat at l = 4 (K_0 n=9, K_1 n=9, K_1 n=11, K_0 n=13).
   The larger slope of A (+0.395, and the R5-style fixed-l4 fits) comes almost entirely from K_0 n=15, where the grids of A hold WDSat at a base that is wrong for it: l = 4 costs 8.3e10 there and l = 10 costs 1.3e10 (ratio 42.7 against 6.3).
@@ -127,8 +139,8 @@ At l = 3 the solver-only figure is the whole WDSat cost less about 1.39e7 per ca
 - The verdict rule's grid (l 3..7) did not contain the WDSat optimum at K_1 n=11, K_0 n=13 and K_0 n=15; l = 8 (all cells) and l = 9..13 (as listed) were added by Amendment 1, written after the l = 3..8 data at n = 9..13 existed and before any l >= 9 run. The pre-fixed verdict is fit A; fit B is post hoc in its grid. The interim fit B (superseded) is described under "History of the grid".
 - l = 1, 2 not tried (WDSat l = 3 already fails at three cells; the lab fails at l = 2 at n = 9). l >= 9 not run at n = 9 (interior optimum) and l = 13 is the top at n = 15 (cost rising over l = 11, 12, 13). l = 9..13 sessions were not brute-force cross-checked (only the ecbench `[d]G = Q` check; probes cover l <= 8).
   13 of 34,685 WDSat calls used a larger-`__MAX_ID__` binary (l = 9, 11, 12 at n = 11, 13 only; not best configs).
-- First-solution mode only (R5's find-all l = 4, 5 numbers are a reference, not re-swept); no `-g` branching order, no hybrid specialisation, no `T`-invariants, `m = 3` only, as in R5. The lab arm is R2's record (swept l = 3..9 where R2 or this run measured it, not re-measured; the lab sweeps have one point above the minimum at n = 9, 11).
-- No separate A/A of the WDSat arms; the whole sweep was run twice end to end (first build, discarded, below) and the repeat reproduces the first build's numbers where both were valid (for example K_0 n=13 l6 1.21e11 in both); WDSat sessions are deterministic in Ir (R5: repeats differ by 0.2 %).
+- First-solution mode only (R5's find-all l = 4, 5 numbers are a reference, not re-swept); no `-g` branching order, no hybrid specialisation, no `T`-invariants, `m = 3` only, as in R5. The lab arm for A and B1 is R2's record, not re-measured (A/A within 1.3 %); B2 re-sweeps the lab over the WDSat l values (Amendment 2) and gives the same best points. l = 14 was not run at K_0 n=15 for either arm (both curves rise monotonically over their last three or more points).
+- `analysis/r2w_fitB1_*` and `analysis/r2w_fitB2_*` are identical in their fits; `analysis/r2w_fitB_l3-13.*` is the same fit before Amendment 2. No separate A/A of the WDSat arms; the whole sweep was run twice end to end (first build, discarded, below) and the repeat reproduces the first build's numbers where both were valid (for example K_0 n=13 l6 1.21e11 in both); WDSat sessions are deterministic in Ir (R5: repeats differ by 0.2 %).
 - Sandbox off for: `git worktree add` (the sandbox denied writing `.mcp.json` in the new worktree), every build, probe, start-up measurement and `ecbench run` (`/usr/bin/time -l` needs a sysctl; writes outside `/Volumes/SSD990-2/crypto`). One command was refused by the built-in safety check:
   `rm -rf` of the stale analysis outputs by a relative glob (`analysis/*`); I did not work around it. The stale files `analysis/r2w_fitB_l3-11.*` (interim fit B, superseded) therefore remain in the evidence directory. No other refusals.
 - **First-build sessions discarded.** The first ecbench build wrote the emitter's scratch files to `/tmp` on the root disk, which filled up transiently (another job); WDSat calls then failed with "No space left on device" and the pipeline silently dropped those systems (stderr only). Those sessions (some W6 cells, W_k0n15) were detected from the child stderr, discarded, and every session was re-run on a rebuilt binary with `WDSAT_TMP_DEFAULT` on SSD990-2.
