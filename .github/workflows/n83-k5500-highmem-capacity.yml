@@ -1,0 +1,134 @@
+name: N83 K5500 existing high-memory runner capacity
+
+on:
+  push:
+    branches: [codex/n83-k5500-full-control-20261021]
+    paths:
+      - .github/workflows/n83-k5500-highmem-capacity.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n83-k5500-highmem-capacity-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  capacity-only:
+    if: github.repository == 'aburan28/crypto'
+    runs-on: ${{ 'crypto-eks-highmem' }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Record exact source and exposed K5500 resource envelope
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import platform
+          import shutil
+          import sys
+          from datetime import datetime, timezone
+
+          def read(path):
+              try:
+                  return Path(path).read_text().strip()
+              except OSError:
+                  return None
+
+          def digest(path):
+              return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+          def memory_limit():
+              v2 = read('/sys/fs/cgroup/memory.max')
+              if v2 is not None:
+                  return 'v2', v2
+              return 'v1', read('/sys/fs/cgroup/memory/memory.limit_in_bytes')
+
+          def cpu_quota():
+              v2 = read('/sys/fs/cgroup/cpu.max')
+              if v2 is not None:
+                  return v2
+              quota = read('/sys/fs/cgroup/cpu/cpu.cfs_quota_us')
+              period = read('/sys/fs/cgroup/cpu/cpu.cfs_period_us')
+              return f'{quota} {period}' if quota and period else None
+
+          source = Path('examples/koblitz_orbit_dlp_fast.rs')
+          runner = Path('research/n83_highk_beyond4405_20261021/run_k5500_full_control.py')
+          expected_source = '58e3ee492093de5f6b760b96e3aba819fa479cdecd22b1adee94f0ecb26026d8'
+          interface, raw_limit = memory_limit()
+          meminfo = read('/proc/meminfo') or ''
+          host_bytes = next((int(line.split()[1]) * 1024 for line in meminfo.splitlines()
+                             if line.startswith('MemTotal:')), None)
+          limit = (int(raw_limit) if raw_limit and raw_limit.isdigit()
+                   else host_bytes if raw_limit == 'max' else None)
+          quota = cpu_quota()
+          allowed = sorted(os.sched_getaffinity(0))
+          quota_cores = None
+          if quota:
+              parts = quota.split()
+              if len(parts) == 2 and parts[0] not in ('max', '-1'):
+                  quota_cores = int(parts[0]) / int(parts[1])
+          disk_free = shutil.disk_usage(os.environ['RUNNER_TEMP']).free
+          checks = {
+              'source_sha256': digest(source) == expected_source,
+              'runner_present': runner.is_file(),
+              'memory_limit_at_least_48_gib':
+                  limit is not None and limit >= 48 * 1024**3,
+              'host_memory_at_least_48_gib':
+                  host_bytes is not None and host_bytes >= 48 * 1024**3,
+              'visible_cpus_at_least_4': len(allowed) >= 4,
+              'cpu_quota_at_least_4': quota is not None and
+                  (quota_cores is None or quota_cores >= 4),
+              'disk_free_at_least_8_gib': disk_free >= 8 * 1024**3,
+          }
+          receipt = {
+              'schema': 'n83.k5500-existing-highmem-capacity/v1',
+              'recorded_utc': datetime.now(timezone.utc).isoformat(),
+              'status': 'PASS_CAPACITY_PREFLIGHT' if all(checks.values())
+                        else 'INSUFFICIENT_OR_UNKNOWN_CAPACITY',
+              'checks': checks,
+              'github_sha': os.environ.get('GITHUB_SHA'),
+              'github_run_id': os.environ.get('GITHUB_RUN_ID'),
+              'github_run_attempt': os.environ.get('GITHUB_RUN_ATTEMPT'),
+              'runner_name': os.environ.get('RUNNER_NAME'),
+              'runner_os': os.environ.get('RUNNER_OS'),
+              'runner_arch': os.environ.get('RUNNER_ARCH'),
+              'platform': platform.platform(),
+              'source_sha256': digest(source),
+              'runner_script_sha256': digest(runner) if runner.is_file() else None,
+              'cgroup_interface': interface,
+              'cgroup_memory_max': raw_limit,
+              'host_mem_total_bytes': host_bytes,
+              'cgroup_cpu_max': quota,
+              'cgroup_cpu_stat': read('/sys/fs/cgroup/cpu.stat'),
+              'cgroup_memory_events': read('/sys/fs/cgroup/memory.events'),
+              'effective_cpuset': read('/sys/fs/cgroup/cpuset.cpus.effective'),
+              'visible_affinity': allowed,
+              'disk_free_bytes': disk_free,
+              'core_array_bytes_required': 33136508082,
+              'planned_child_rss_cap_bytes': 40 * 1024**3,
+              'planned_full_run_cap_seconds': 14400,
+              'experiment_launched': False,
+          }
+          path = Path(os.environ['RUNNER_TEMP']) / 'n83-k5500-highmem-capacity.json'
+          path.write_text(json.dumps(receipt, indent=2, sort_keys=True) + '\n')
+          print(json.dumps({'status': receipt['status'], 'checks': checks},
+                           sort_keys=True))
+          sys.exit(0 if all(checks.values()) else 2)
+          PY
+
+      - name: Preserve capacity and rejected-envelope receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n83-k5500-highmem-capacity-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/n83-k5500-highmem-capacity.json
+          if-no-files-found: warn
+          retention-days: 14

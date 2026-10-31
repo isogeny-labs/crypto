@@ -1,0 +1,124 @@
+name: N83 fresh cold finalist shared-binary retest
+
+on:
+  push:
+    branches: [codex/n83-fresh-cold-binary-retest-20261021]
+    paths:
+      - research/n83_fresh_cold_binary_retest_20261021/dispatch.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n83-fresh-cold-binary-retest-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  shared-binaries:
+    if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-fresh-cold-binary-retest-20261021'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and test one pinned executable pair
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.99.1 --profile minimal
+          mkdir -p "$RUNNER_TEMP/n83-retest-binaries"
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/n83-retest-build-target"
+          export CARGO_BUILD_JOBS=2
+          cargo +1.99.1 test --release --locked --example koblitz_orbit_dlp_fast
+          cargo +1.99.1 test --release --locked --example n83_rho_optimization_eval
+          cargo +1.99.1 build --release --locked --example koblitz_orbit_dlp_fast
+          cargo +1.99.1 build --release --locked --example n83_rho_optimization_eval
+          cp "$CARGO_TARGET_DIR/release/examples/koblitz_orbit_dlp_fast" "$RUNNER_TEMP/n83-retest-binaries/"
+          cp "$CARGO_TARGET_DIR/release/examples/n83_rho_optimization_eval" "$RUNNER_TEMP/n83-retest-binaries/"
+          cd "$RUNNER_TEMP/n83-retest-binaries"
+          sha256sum koblitz_orbit_dlp_fast n83_rho_optimization_eval > SHA256SUMS
+          rustc +1.99.1 --version > rustc-version.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: n83-retest-shared-binaries-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/n83-retest-binaries/
+          if-no-files-found: error
+          retention-days: 14
+
+  fresh-cold-binary-retest-stratum:
+    if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-fresh-cold-binary-retest-20261021'
+    needs: shared-binaries
+    strategy:
+      fail-fast: false
+      matrix:
+        stratum: [0, 1]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: n83-retest-shared-binaries-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/n83-retest-binaries
+      - name: Verify shared executable pair
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/n83-retest-binaries"
+          sha256sum -c SHA256SUMS
+          chmod +x koblitz_orbit_dlp_fast n83_rho_optimization_eval
+      - name: Replay sealed inputs and preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PYTHONDONTWRITEBYTECODE=1
+          out="$RUNNER_TEMP/n83-fresh-cold-binary-retest-stratum-${{ matrix.stratum }}"
+          mkdir -p "$out"
+          python3 research/n83_fresh_cold_binary_retest_20261021/generate_fresh.py > "$out/fixture-check.json"
+          python3 research/n83_fresh_cold_binary_retest_20261021/audit_fresh.py > "$out/exclusion-check.json"
+          python3 -m research.n83_fresh_cold_binary_retest_20261021.test_arms > "$out/arms-test.json"
+          python3 -m research.n83_fresh_cold_binary_retest_20261021.test_preflight > "$out/preflight-test.json"
+          python3 -m research.n83_fresh_cold_binary_retest_20261021.test_select > "$out/selector-test.json"
+          python3 -m research.n83_fresh_cold_binary_retest_20261021.test_provider_jobs > "$out/provider-test.json"
+          python3 research/n83_fresh_cold_binary_retest_20261021/check_dispatch.py > "$out/dispatch-check.json"
+          mkdir -p "$out/k3300-pilot"
+          tar -xzf research/n83_final_extended_20261018/pilots/k3300.tar.gz -C "$out/k3300-pilot"
+          python3 -m research.n83_fresh_cold_binary_retest_20261021.verify_mid \
+            "$out/k3300-pilot/n83-k3300-current-pilot-20261018" > "$out/k3300-pilot-check.json"
+          python3 research/n83_fresh_cold_binary_retest_20261021/run.py \
+            --preflight --stratum "${{ matrix.stratum }}" \
+            --validated research/n83_fresh_cold_binary_retest_20261021/upstream_validated.json \
+            --selection research/n83_fresh_cold_binary_retest_20261021/upstream_selection.json \
+            > "$out/schedule-preflight.json"
+      - name: Run five frozen bases with calibrated same-point rho
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/n83-fresh-cold-binary-retest-stratum-${{ matrix.stratum }}"
+          python3 research/n83_fresh_cold_binary_retest_20261021/run.py \
+            --stratum "${{ matrix.stratum }}" \
+            --validated research/n83_fresh_cold_binary_retest_20261021/upstream_validated.json \
+            --selection research/n83_fresh_cold_binary_retest_20261021/upstream_selection.json \
+            --binary "$RUNNER_TEMP/n83-retest-binaries/koblitz_orbit_dlp_fast" \
+            --rho-binary "$RUNNER_TEMP/n83-retest-binaries/n83_rho_optimization_eval" \
+            --output "$out/results" 2>&1 | tee "$out/run.log"
+      - name: Independently replay bases relations scalars and resources
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/n83-fresh-cold-binary-retest-stratum-${{ matrix.stratum }}"
+          if [ -d "$out/results" ]; then
+            python3 research/n83_fresh_cold_binary_retest_20261021/verify.py "$out/results" \
+              --stratum "${{ matrix.stratum }}" \
+              --validated research/n83_fresh_cold_binary_retest_20261021/upstream_validated.json \
+              --selection research/n83_fresh_cold_binary_retest_20261021/upstream_selection.json \
+              2>&1 | tee "$out/verify.log"
+          fi
+      - name: Preserve raw receipts and failed pairs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n83-fresh-cold-binary-retest-stratum-${{ matrix.stratum }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/n83-fresh-cold-binary-retest-stratum-${{ matrix.stratum }}/
+          if-no-files-found: error
+          retention-days: 14
