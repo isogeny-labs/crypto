@@ -22,3 +22,8 @@ certificates. A reducible quotient is preserved and reported as such, not
 relabeled a field. Native bounds: seed51, one Singular/FLINT thread,
 4GiB virtual/1200s, serialized mathematical jobs. Full source frozen before
 data, strict exit0/no question-mark lines/BASE23_51_ALL_CHECKS_PASS.
+
+Adaptive source-bound followup, after universal51-01 exported its degree26 D:
+require the actual full polynomial identity D=(1+c)^5*Delta^3, with
+Delta=b^3(b+c(1+c)^3), before specialization. This identifies the open
+explicitly; the inverse witnesses must still pass on the marked23 base.

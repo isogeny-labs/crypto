@@ -1,5 +1,8 @@
 execute(read("../../source-data/marked23-field51.sing"));
 execute(read("../twist51-01/universal-twisted51.sing"));
+poly universalDelta51=b^3*(b+c*(1+c)^3);
+if(D51!=(1+c)^5*universalDelta51^3){ERROR("BASE23_51_ACTUAL_DENOMINATOR_FACTOR_IDENTITY");quit;}
+print("BASE23_51_DENOMINATOR D=(1+c)^5*Delta^3 full_polynomial_identity=true");
 ring base23Workspace51=(2,x),(y),dp;short=0;
 map oldBase51=marked23Certificate50,y;
 poly f51=oldBase51(f23);poly b51=oldBase51(b23);poly c51=oldBase51(c23);

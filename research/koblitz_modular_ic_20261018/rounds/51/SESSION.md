@@ -41,3 +41,8 @@ audited with zero failing/trusted. glue-reload51-01 exit0/no-question-mark
 errors/exact-marker: all64 direct substitution witnesses,2completePID
 products,4source lift products,principal units and corruption checks pass.
 No producer rerun. universal51-01 admitted next under original caps.
+
+universal51-01 accepted exit0/noerrors/exactmarker. Both complete archived
+field products and both cleared polynomial products pass. Actual common
+denominator degree26 exported. twist51-01 admitted next. Before BASE23 data,
+freeze a source-bound test of D=(1+c)^5*Delta^3 against that actual polynomial.
