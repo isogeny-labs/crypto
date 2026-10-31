@@ -29,7 +29,7 @@ for name in ("science.files", "source.files"):
 (h / "source.sha256").write_text("".join(hashlib.sha256((h / p).read_bytes()).hexdigest() + "  " + p + "\n" for p in files))
 (h / "source-revision.txt").write_text(revision + "\n")
 members = []
-contents = ["runs", "source-data"]
+contents = ["runs", "source-data", "publication-checks"]
 for folder in contents:
     for p in sorted((h / folder).rglob("*")):
         assert not p.is_symlink()
