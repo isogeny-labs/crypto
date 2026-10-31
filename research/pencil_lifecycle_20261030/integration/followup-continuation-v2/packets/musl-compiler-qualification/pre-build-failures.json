@@ -1,0 +1,12 @@
+[
+  {
+    "stage": "key_import",
+    "failure": "gpg-agent absent after successful public key import",
+    "resolution": "public signature verification succeeded with --no-autostart; key-import.log preserved"
+  },
+  {
+    "stage": "tar_path_check",
+    "failure": "safe root directory musl-1.2.6 lacks trailing slash",
+    "resolution": "explicitly permit that root directory; other members must remain underneath it; no symlinks allowed"
+  }
+]

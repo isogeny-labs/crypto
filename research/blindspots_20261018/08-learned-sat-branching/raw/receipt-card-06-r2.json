@@ -1,0 +1,250 @@
+{
+  "card_id": "CARD-BLINDSPOT-08-06-r2",
+  "card_path": "research/blindspots_20261018/08-learned-sat-branching/card-06-r2.yaml",
+  "card_sha256": "7daf0efba1314524d79377d687e8f0000968b0d99319f84f2a50c4a028907792",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-08/card-06-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-work-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-08/card-06-r2/b08",
+        "examples/blindspots_08_learned_branching.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 7.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 7.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-08/card-06-r2/b08",
+        "cell",
+        "--n",
+        "35",
+        "--ell",
+        "5",
+        "--np",
+        "16",
+        "--nr",
+        "16",
+        "--seed",
+        "20261018",
+        "--role",
+        "7",
+        "--models",
+        "research/blindspots_20261018/08-learned-sat-branching/raw/model.txt",
+        "--truth",
+        "--cap",
+        "100000000"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 64.799,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "test-n35",
+      "index": 3,
+      "outputs": {},
+      "seconds": 64.799,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ee5ba2f8cb4e06d673f8e9edea5a27496ef2ce5b39890d43d77b326e1d8a2b4c",
+      "stdout_tail": [
+        "{\"n\":35,\"l\":5,\"idx\":29,\"kind\":\"R\",\"xr\":30180623583,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"b2s\",\"verdict\":\"UNSAT\",\"D\":31336,\"P\":4560140,\"Q\":0,\"W\":5182053,\"visits\":34504749,\"model_ok\":true,\"ms\":324}",
+        "{\"n\":35,\"l\":5,\"idx\":29,\"check\":\"agreement\",\"arms_agree\":true,\"planted_sat\":true,\"truth_ok\":true}",
+        "{\"n\":35,\"l\":5,\"idx\":30,\"kind\":\"R\",\"xr\":8135446219,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"a\",\"verdict\":\"UNSAT\",\"D\":30795,\"P\":4378017,\"Q\":0,\"W\":30795,\"visits\":36749352,\"model_ok\":true,\"ms\":338}",
+        "{\"n\":35,\"l\":5,\"idx\":30,\"kind\":\"R\",\"xr\":8135446219,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"a2\",\"verdict\":\"UNSAT\",\"D\":31482,\"P\":4285186,\"Q\":0,\"W\":31482,\"visits\":33523332,\"model_ok\":true,\"ms\":356}",
+        "{\"n\":35,\"l\":5,\"idx\":30,\"kind\":\"R\",\"xr\":8135446219,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"b\",\"verdict\":\"UNSAT\",\"D\":30794,\"P\":4397707,\"Q\":717,\"W\":32397,\"visits\":36455806,\"model_ok\":true,\"ms\":396}",
+        "{\"n\":35,\"l\":5,\"idx\":30,\"kind\":\"R\",\"xr\":8135446219,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"b2\",\"verdict\":\"UNSAT\",\"D\":30786,\"P\":4372262,\"Q\":0,\"W\":5025078,\"visits\":36707210,\"model_ok\":true,\"ms\":415}",
+        "{\"n\":35,\"l\":5,\"idx\":30,\"kind\":\"R\",\"xr\":8135446219,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"c\",\"verdict\":\"UNSAT\",\"D\":30794,\"P\":4364394,\"Q\":12499,\"W\":162350,\"visits\":36489977,\"model_ok\":true,\"ms\":429}",
+        "{\"n\":35,\"l\":5,\"idx\":30,\"kind\":\"R\",\"xr\":8135446219,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"d\",\"verdict\":\"UNSAT\",\"D\":31247,\"P\":4693519,\"Q\":0,\"W\":31248,\"visits\":43740073,\"model_ok\":true,\"ms\":467}",
+        "{\"n\":35,\"l\":5,\"idx\":30,\"kind\":\"R\",\"xr\":8135446219,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"bs\",\"verdict\":\"UNSAT\",\"D\":31002,\"P\":4282039,\"Q\":717,\"W\":32605,\"visits\":33604027,\"model_ok\":true,\"ms\":425}",
+        "{\"n\":35,\"l\":5,\"idx\":30,\"kind\":\"R\",\"xr\":8135446219,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"b2s\",\"verdict\":\"UNSAT\",\"D\":31354,\"P\":4573272,\"Q\":0,\"W\":5183775,\"visits\":37981929,\"model_ok\":true,\"ms\":472}",
+        "{\"n\":35,\"l\":5,\"idx\":30,\"check\":\"agreement\",\"arms_agree\":true,\"planted_sat\":true,\"truth_ok\":true}",
+        "{\"n\":35,\"l\":5,\"idx\":31,\"kind\":\"R\",\"xr\":1293506910,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"a\",\"verdict\":\"UNSAT\",\"D\":30921,\"P\":4350487,\"Q\":0,\"W\":30943,\"visits\":33237363,\"model_ok\":true,\"ms\":395}",
+        "{\"n\":35,\"l\":5,\"idx\":31,\"kind\":\"R\",\"xr\":1293506910,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"a2\",\"verdict\":\"UNSAT\",\"D\":31458,\"P\":4255155,\"Q\":0,\"W\":31458,\"visits\":30607232,\"model_ok\":true,\"ms\":394}",
+        "{\"n\":35,\"l\":5,\"idx\":31,\"kind\":\"R\",\"xr\":1293506910,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"b\",\"verdict\":\"UNSAT\",\"D\":30929,\"P\":4365820,\"Q\":717,\"W\":32600,\"visits\":33140370,\"model_ok\":true,\"ms\":487}",
+        "{\"n\":35,\"l\":5,\"idx\":31,\"kind\":\"R\",\"xr\":1293506910,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"b2\",\"verdict\":\"UNSAT\",\"D\":30920,\"P\":4344900,\"Q\":0,\"W\":5065841,\"visits\":33185883,\"model_ok\":true,\"ms\":393}",
+        "{\"n\":35,\"l\":5,\"idx\":31,\"kind\":\"R\",\"xr\":1293506910,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"c\",\"verdict\":\"UNSAT\",\"D\":30921,\"P\":4336928,\"Q\":12487,\"W\":162538,\"visits\":33021979,\"model_ok\":true,\"ms\":321}",
+        "{\"n\":35,\"l\":5,\"idx\":31,\"kind\":\"R\",\"xr\":1293506910,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"d\",\"verdict\":\"UNSAT\",\"D\":31391,\"P\":4879444,\"Q\":0,\"W\":31391,\"visits\":41839564,\"model_ok\":true,\"ms\":468}",
+        "{\"n\":35,\"l\":5,\"idx\":31,\"kind\":\"R\",\"xr\":1293506910,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"bs\",\"verdict\":\"UNSAT\",\"D\":30967,\"P\":4248648,\"Q\":717,\"W\":32570,\"visits\":30694174,\"model_ok\":true,\"ms\":369}",
+        "{\"n\":35,\"l\":5,\"idx\":31,\"kind\":\"R\",\"xr\":1293506910,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"b2s\",\"verdict\":\"UNSAT\",\"D\":31373,\"P\":4549987,\"Q\":0,\"W\":5199891,\"visits\":33987714,\"model_ok\":true,\"ms\":417}",
+        "{\"n\":35,\"l\":5,\"idx\":31,\"check\":\"agreement\",\"arms_agree\":true,\"planted_sat\":true,\"truth_ok\":true}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-08/card-06-r2/b08",
+        "cell",
+        "--n",
+        "37",
+        "--ell",
+        "5",
+        "--np",
+        "16",
+        "--nr",
+        "16",
+        "--seed",
+        "20261018",
+        "--role",
+        "7",
+        "--models",
+        "research/blindspots_20261018/08-learned-sat-branching/raw/model.txt",
+        "--truth",
+        "--cap",
+        "100000000"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 67.137,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "test-n37",
+      "index": 4,
+      "outputs": {},
+      "seconds": 67.137,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "101e284e3fac47ecace8dc002610dc9a51a2a7d1e6787b6c839916aab5ef1332",
+      "stdout_tail": [
+        "{\"n\":37,\"l\":5,\"idx\":29,\"kind\":\"R\",\"xr\":87746202724,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"b2s\",\"verdict\":\"UNSAT\",\"D\":31388,\"P\":4533988,\"Q\":0,\"W\":5202509,\"visits\":37073990,\"model_ok\":true,\"ms\":424}",
+        "{\"n\":37,\"l\":5,\"idx\":29,\"check\":\"agreement\",\"arms_agree\":true,\"planted_sat\":true,\"truth_ok\":true}",
+        "{\"n\":37,\"l\":5,\"idx\":30,\"kind\":\"R\",\"xr\":11461194666,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"a\",\"verdict\":\"UNSAT\",\"D\":30794,\"P\":4325956,\"Q\":0,\"W\":30794,\"visits\":33568260,\"model_ok\":true,\"ms\":407}",
+        "{\"n\":37,\"l\":5,\"idx\":30,\"kind\":\"R\",\"xr\":11461194666,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"a2\",\"verdict\":\"UNSAT\",\"D\":31447,\"P\":4232062,\"Q\":0,\"W\":31447,\"visits\":31034992,\"model_ok\":true,\"ms\":435}",
+        "{\"n\":37,\"l\":5,\"idx\":30,\"kind\":\"R\",\"xr\":11461194666,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"b\",\"verdict\":\"UNSAT\",\"D\":30766,\"P\":4354464,\"Q\":717,\"W\":32369,\"visits\":33292999,\"model_ok\":true,\"ms\":465}",
+        "{\"n\":37,\"l\":5,\"idx\":30,\"kind\":\"R\",\"xr\":11461194666,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"b2\",\"verdict\":\"UNSAT\",\"D\":30791,\"P\":4320280,\"Q\":0,\"W\":5038725,\"visits\":33517353,\"model_ok\":true,\"ms\":461}",
+        "{\"n\":37,\"l\":5,\"idx\":30,\"kind\":\"R\",\"xr\":11461194666,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"c\",\"verdict\":\"UNSAT\",\"D\":30793,\"P\":4312376,\"Q\":12493,\"W\":162378,\"visits\":33348152,\"model_ok\":true,\"ms\":445}",
+        "{\"n\":37,\"l\":5,\"idx\":30,\"kind\":\"R\",\"xr\":11461194666,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"d\",\"verdict\":\"UNSAT\",\"D\":31024,\"P\":4525767,\"Q\":0,\"W\":31024,\"visits\":36813602,\"model_ok\":true,\"ms\":387}",
+        "{\"n\":37,\"l\":5,\"idx\":30,\"kind\":\"R\",\"xr\":11461194666,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"bs\",\"verdict\":\"UNSAT\",\"D\":30954,\"P\":4246791,\"Q\":717,\"W\":32557,\"visits\":30893010,\"model_ok\":true,\"ms\":437}",
+        "{\"n\":37,\"l\":5,\"idx\":30,\"kind\":\"R\",\"xr\":11461194666,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"b2s\",\"verdict\":\"UNSAT\",\"D\":31345,\"P\":4542985,\"Q\":0,\"W\":5194633,\"visits\":34651576,\"model_ok\":true,\"ms\":618}",
+        "{\"n\":37,\"l\":5,\"idx\":30,\"check\":\"agreement\",\"arms_agree\":true,\"planted_sat\":true,\"truth_ok\":true}",
+        "{\"n\":37,\"l\":5,\"idx\":31,\"kind\":\"R\",\"xr\":89719827110,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"a\",\"verdict\":\"UNSAT\",\"D\":30783,\"P\":4363771,\"Q\":0,\"W\":30783,\"visits\":36095912,\"model_ok\":true,\"ms\":527}",
+        "{\"n\":37,\"l\":5,\"idx\":31,\"kind\":\"R\",\"xr\":89719827110,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"a2\",\"verdict\":\"UNSAT\",\"D\":31447,\"P\":4271148,\"Q\":0,\"W\":31447,\"visits\":33089394,\"model_ok\":true,\"ms\":400}",
+        "{\"n\":37,\"l\":5,\"idx\":31,\"kind\":\"R\",\"xr\":89719827110,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"b\",\"verdict\":\"UNSAT\",\"D\":30804,\"P\":4382875,\"Q\":717,\"W\":32407,\"visits\":36122535,\"model_ok\":true,\"ms\":392}",
+        "{\"n\":37,\"l\":5,\"idx\":31,\"kind\":\"R\",\"xr\":89719827110,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"b2\",\"verdict\":\"UNSAT\",\"D\":30775,\"P\":4358076,\"Q\":0,\"W\":5030480,\"visits\":36044503,\"model_ok\":true,\"ms\":521}",
+        "{\"n\":37,\"l\":5,\"idx\":31,\"kind\":\"R\",\"xr\":89719827110,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"c\",\"verdict\":\"UNSAT\",\"D\":30783,\"P\":4350214,\"Q\":12495,\"W\":162374,\"visits\":35843200,\"model_ok\":true,\"ms\":544}",
+        "{\"n\":37,\"l\":5,\"idx\":31,\"kind\":\"R\",\"xr\":89719827110,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"d\",\"verdict\":\"UNSAT\",\"D\":31098,\"P\":4413137,\"Q\":0,\"W\":31098,\"visits\":36120687,\"model_ok\":true,\"ms\":577}",
+        "{\"n\":37,\"l\":5,\"idx\":31,\"kind\":\"R\",\"xr\":89719827110,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"bs\",\"verdict\":\"UNSAT\",\"D\":30986,\"P\":4243489,\"Q\":717,\"W\":32589,\"visits\":32970515,\"model_ok\":true,\"ms\":544}",
+        "{\"n\":37,\"l\":5,\"idx\":31,\"kind\":\"R\",\"xr\":89719827110,\"chain_sols\":0,\"direct_sols\":0,\"arm\":\"b2s\",\"verdict\":\"UNSAT\",\"D\":31379,\"P\":4536979,\"Q\":0,\"W\":5198950,\"visits\":36600982,\"model_ok\":true,\"ms\":664}",
+        "{\"n\":37,\"l\":5,\"idx\":31,\"check\":\"agreement\",\"arms_agree\":true,\"planted_sat\":true,\"truth_ok\":true}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-rf",
+        "target/blindspots-08/card-06-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.008,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-work-dir",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.008,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 5,
+  "commit": "3565e5f4f3bec49c71d58377f0f057dba672f239",
+  "dirty_after": [
+    "examples/blindspots_13_rho_negation.rs",
+    "research/blindspots_20261018/04-presentation-search/smoke/smoke_r2.log",
+    "research/blindspots_20261018/08-learned-sat-branching/raw/test-n37-r2.jsonl",
+    "research/blindspots_20261018/08-learned-sat-branching/raw/test-n37-r2.stderr.log",
+    "xamples/blindspots_04_presentation_search.rs"
+  ],
+  "dirty_before": [
+    "examples/blindspots_13_rho_negation.rs",
+    "research/blindspots_20261018/04-presentation-search/smoke/smoke_r2.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-05-r2-main-c13-3-4-t4-7.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-05-r2-main-c13-3-4-t4-7.stdout.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/receipt-card-05-r2.json",
+    "xamples/blindspots_04_presentation_search.rs"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}
