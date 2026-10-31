@@ -3094,3 +3094,245 @@ mod signed_witness_encoding_tests {
         assert_eq!(b.adapter_bytes, SIGNED_WITNESS_BYTE_CAP as u64);
     }
 }
+/// One publication attempt for the first independently checked signed witness.
+/// Expected binding/limits are borrowed from original admission. No local event
+/// counter is created: the caller supplies its adapter-wide acknowledgement count.
+pub(super) struct BoundSignedPublisher<'a> {
+    binding: &'a crate::ml_dataset::capture::AttemptBinding,
+    limits: &'a crate::ml_dataset::capture::CaptureLimits,
+    checking: CaptureChecking,
+    workspace: Option<crate::ml_dataset::capture::WitnessCaptureWorkspace>,
+    encoding: Option<WitnessEncoding>,
+    receipt: Option<crate::ml_dataset::capture::WitnessReceipt>,
+    capture_error: Option<crate::ml_dataset::capture::WitnessError>,
+    attempted: bool,
+}
+impl<'a> BoundSignedPublisher<'a> {
+    fn new(
+        binding: &'a crate::ml_dataset::capture::AttemptBinding,
+        limits: &'a crate::ml_dataset::capture::CaptureLimits,
+        budget: &Budget,
+    ) -> Self {
+        Self {
+            binding,
+            limits,
+            checking: budget.capture_checking(),
+            workspace: None,
+            encoding: None,
+            receipt: None,
+            capture_error: None,
+            attempted: false,
+        }
+    }
+    fn publish(
+        &mut self,
+        witness: &CheckedSignedWitness,
+        budget: &mut Budget,
+        global_acknowledged: &mut usize,
+    ) -> Result<crate::ml_dataset::capture::WitnessReceipt, Stop> {
+        if self.attempted {
+            return budget.fail(Stop::Phase);
+        }
+        self.attempted = true;
+        // Fixed-size binding validation/hash encoding and bounded identity
+        // scratch are admitted before the existing sink admission helper.
+        budget.reserve_checking(64 * 1024, 4096, Instant::now())?;
+        let identity = super::LIVE_SINK.with(|slot| match slot.borrow().as_ref() {
+            Some(super::EventSink::Bound(sink)) => {
+                sink.verify_attempt_limits(self.binding, self.limits)
+            }
+            _ => Err("Koblitz witness requires the admitted bound sink".into()),
+        });
+        if identity.is_err() {
+            return budget.fail(Stop::InvalidLimits);
+        }
+        self.encoding = Some(encode_signed_witness(witness, budget));
+        let encoding = self.encoding.as_ref().expect("encoding retained");
+        if !encoding.complete || encoding.stop.is_some() {
+            return budget.fail(encoding.stop.unwrap_or(Stop::Serialization));
+        }
+        let prepared = budget.capture_call(&mut self.checking, super::prepare_bound_witness);
+        self.capture_error = prepared.error;
+        self.workspace = prepared.value;
+        if let Some(stop) = prepared.stop {
+            return Err(stop);
+        }
+        let workspace = self.workspace.as_mut().ok_or(Stop::Observer)?;
+        let published = budget.capture_call(&mut self.checking, |supply| {
+            super::publish_bound_witness(&encoding.bytes, workspace, supply, global_acknowledged)
+        });
+        self.capture_error = published.error;
+        self.receipt = published.value;
+        // Return a real acknowledged receipt even if post-call settlement/clock
+        // stopped the ledger. enumerate_signed stores it before checking again.
+        if let Some(receipt) = self.receipt {
+            return Ok(receipt);
+        }
+        budget.fail(published.stop.unwrap_or(Stop::Observer))
+    }
+}
+
+#[cfg(test)]
+mod bound_signed_publisher_tests {
+    use super::*;
+    use crate::ml_dataset::capture::{capture_limits, CaptureEmitter};
+    struct SinkFixture {
+        dir: std::path::PathBuf,
+        _guard: super::super::LiveSinkGuard,
+    }
+    impl SinkFixture {
+        fn new(binding: &crate::ml_dataset::capture::AttemptBinding) -> Self {
+            let nonce = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos();
+            let dir = std::env::temp_dir().join(format!(
+                "koblitz-bound-witness-{}-{nonce}",
+                std::process::id()
+            ));
+            let emitter =
+                CaptureEmitter::create(&dir, binding.clone(), capture_limits(16).unwrap()).unwrap();
+            super::super::LIVE_SINK.with(|slot| {
+                assert!(slot.borrow().is_none());
+                *slot.borrow_mut() = Some(super::super::EventSink::Bound(emitter));
+            });
+            Self {
+                dir,
+                _guard: super::super::LiveSinkGuard,
+            }
+        }
+    }
+    impl Drop for SinkFixture {
+        fn drop(&mut self) {
+            super::super::LIVE_SINK.with(|slot| {
+                slot.borrow_mut().take();
+            });
+            let _ = std::fs::remove_dir_all(&self.dir);
+        }
+    }
+    #[test]
+    fn real_checked_witness_survives_later_event_refusal_and_replays_from_disk() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let sink = SinkFixture::new(&binding);
+        let mut original = construction_tests::fixture();
+        original.target = original.signed[0];
+        let mut budget = construction_tests::budget();
+        let mut publisher = BoundSignedPublisher::new(&binding, &limits, &budget);
+        budget.begin_native(false, Instant::now()).unwrap();
+        budget.finish_native(Instant::now()).unwrap();
+        let prepared = prepare_signed(&original, &mut budget, false).unwrap();
+        let mut global = 0;
+        let result = enumerate_prepared_signed(
+            prepared,
+            &mut |event, _| {
+                if event.matches_target {
+                    Err(Stop::Observer)
+                } else {
+                    Ok(())
+                }
+            },
+            &mut |w, b| publisher.publish(w, b, &mut global),
+        );
+        assert_eq!(result.stop, Some(Stop::Observer));
+        assert!(!result.complete);
+        let receipt = result.first_receipt.unwrap();
+        assert_eq!(publisher.receipt, Some(receipt));
+        assert_eq!(global, 1);
+        assert_eq!(result.witness_check_additions, 3);
+        let bytes = std::fs::read(sink.dir.join("payloads/pdp-witness.json")).unwrap();
+        assert_eq!(bytes, publisher.encoding.as_ref().unwrap().bytes);
+        assert_eq!(bytes.len() as u64, receipt.payload_bytes);
+        let digest = crate::ml_dataset::digest(&bytes);
+        let expected_hex = receipt
+            .payload_sha256
+            .iter()
+            .map(|b| format!("{b:02x}"))
+            .collect::<String>();
+        assert_eq!(digest, expected_hex);
+        let value: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+        let group = super::super::Group::Binary(original.curve.clone());
+        let mut sum = group.zero();
+        for p in value["summands"].as_array().unwrap() {
+            let point = group.point(p).unwrap();
+            assert!(group.on_curve(&point));
+            assert!(original
+                .signed
+                .iter()
+                .any(|&(x, y)| p["x"] == x.to_string() && p["y"] == y.to_string()));
+            sum = group.add(&sum, &point);
+        }
+        assert_eq!(sum, group.point(&value["target"]).unwrap());
+        assert_eq!(sum, group.point(&value["sum"]).unwrap());
+        assert!(publisher.capture_error.is_none());
+    }
+    #[test]
+    fn bound_witness_rejects_wrong_attempt_before_payload_or_acknowledgement() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let sink = SinkFixture::new(&binding);
+        let mut wrong = binding.clone();
+        wrong.cell_index += 1;
+        let mut b = construction_tests::budget();
+        let mut publisher = BoundSignedPublisher::new(&wrong, &limits, &b);
+        let witness = CheckedSignedWitness {
+            indices: [0; 3],
+            points: [(1, 2); 3],
+            target: (3, 4),
+        };
+        let mut global = 0;
+        assert_eq!(
+            publisher.publish(&witness, &mut b, &mut global),
+            Err(Stop::InvalidLimits)
+        );
+        assert_eq!(global, 0);
+        assert!(publisher.encoding.is_none());
+        assert!(publisher.receipt.is_none());
+        assert!(!sink.dir.join("payloads/pdp-witness.json").exists());
+    }
+    #[test]
+    fn bound_witness_refuses_unbound_execution() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let mut b = construction_tests::budget();
+        let mut publisher = BoundSignedPublisher::new(&binding, &limits, &b);
+        let witness = CheckedSignedWitness {
+            indices: [0; 3],
+            points: [(1, 2); 3],
+            target: (3, 4),
+        };
+        assert_eq!(
+            publisher.publish(&witness, &mut b, &mut 0),
+            Err(Stop::InvalidLimits)
+        );
+        assert!(publisher.receipt.is_none());
+    }
+    #[test]
+    fn bound_witness_keeps_encoding_when_workspace_storage_is_refused() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let sink = SinkFixture::new(&binding);
+        let mut b = construction_tests::budget();
+        b.memory_limit = 4096 + SIGNED_WITNESS_BYTE_CAP as u64;
+        let mut publisher = BoundSignedPublisher::new(&binding, &limits, &b);
+        // Transport refusal control; no mathematical certificate is claimed.
+        let witness = CheckedSignedWitness {
+            indices: [0; 3],
+            points: [(1, 2); 3],
+            target: (3, 4),
+        };
+        let mut global = 0;
+        assert_eq!(
+            publisher.publish(&witness, &mut b, &mut global),
+            Err(Stop::Bytes)
+        );
+        assert!(publisher.encoding.as_ref().unwrap().complete);
+        assert_eq!(
+            publisher.capture_error,
+            Some(crate::ml_dataset::capture::WitnessError::Storage)
+        );
+        assert!(publisher.receipt.is_none());
+        assert_eq!(global, 0);
+        assert!(!sink.dir.join("payloads/pdp-witness.json").exists());
+    }
+}
