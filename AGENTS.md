@@ -218,6 +218,9 @@ protocol calls for that comparison. Per-oracle classification:
   leads, and run `--match "<idea>"` before proposing an ECDLP mechanism. A
   result that lands here updates the lead it advances in the same PR or the
   next atlas review (skill `lead-atlas` there).
+- **Curve facts, by query instead of by file scan:** the curve database
+  ecdb (MCP server `ecdb` in `.mcp.json`, or HTTP). See "Querying the curve
+  database (ecdb)" below and [ecdb/docs/AGENTS.md](ecdb/docs/AGENTS.md).
 - Boundary ledger (machine): `docs/ic/boundary_targets.json`
 - Boundary scoreboard (human): `docs/ic/BOUNDARY_TARGETS.md`
 - Autolab runner: `research/sat_factor_base_review_20260908/autolab/`
@@ -1777,6 +1780,49 @@ it emits these records and kernel-certified `IW1` routes, and `isogeny_walk
 verify` replays them.
 The user guide, including S3 storage, is
 [docs/isogeny-walk/README.md](docs/isogeny-walk/README.md).
+
+## Querying the curve database (ecdb)
+
+ecdb is a Postgres catalogue on RDS (us-west-2). It holds every curve in the
+registry, the walk outputs and the trait catalogue, with their Jacobians,
+isogenies, covers, transfer prices and computed polynomials. Agents reach it
+through the MCP server `ecdb` in `.mcp.json` or over HTTP. The guide is
+[ecdb/docs/AGENTS.md](ecdb/docs/AGENTS.md); read it before the first query.
+
+- **Look up before computing.** Query ecdb before writing code or scanning
+  `docs/curves/*.json` for a curve fact. This covers trace, order, cofactor,
+  CM discriminant, End(E), embedding degree, twist, l-torsion, volcano level,
+  isogeny neighbours, covers, transfer price, division or modular
+  polynomials, and GLV data. Resolve curve names there too; on an ambiguous
+  name (409), choose a candidate explicitly.
+- **Token.** Export it before the runtime starts:
+
+  ```sh
+  export ECDB_TOKEN=$(aws secretsmanager get-secret-value --region us-west-2 --secret-id ecdb/api --query SecretString --output text | jq -r .read_token)
+  ```
+
+  Never print, commit or log it. Without AWS access to `ecdb/api`, say so and
+  fall back to the repository files.
+- **Cite the source, not the query.** ecdb is imported from this
+  repository's files at the commit `GET /v1/meta` names. A PR, report or
+  leaderboard row cites the repository file, certificate or run, not an ecdb
+  query.
+- **Keep statuses.** Report every value with its `fact_status`. Unknown is
+  `null`, never 0. `probable` is not `proved`.
+- **Transfer prices are leads.** `dlp_transfer.ratio_log2` is a formula
+  estimate. It is not a measured speedup, and it never enters the IC
+  leaderboard or `benchmarks/` (§5a and "The rule: boundary, table, ratio").
+- **Relations are not routes.** A twist, isomorphism or model-change row
+  does not transport a logarithm. Only a kernel-certified `isogeny` row does
+  (the typed curve-link rules above).
+- **Writes are claims.** `ecdb_record_evidence` and `POST /v1/isogenies`
+  need the write token. They record what a run or certificate in a PR
+  supports, with its artifact hash and true status. Correct imported data in
+  the source file, then redeploy (`ecdb/deploy/README.md`). Never patch rows.
+- **Keep it current.** A PR that changes a catalogue ecdb imports (the
+  registry, `traits.json`, `covers.json`, `jacobian-transfers.json`, the
+  certificates, the imported walk outputs) says so in its body. After merge,
+  redeploy with `ecdb/deploy/build-lambda.sh` and `ecdb/deploy/deploy-aws.sh`.
 
 ## IC measurement rules
 
