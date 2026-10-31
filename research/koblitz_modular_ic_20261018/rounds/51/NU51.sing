@@ -21,7 +21,7 @@ if(normal51(C51*inverse51)!=1 || normal51(C51*(inverse51+1))==1){ERROR("NU51_INV
 poly nuResidual51=C51*nu51+mappedN51;matrix nuLift51=lift(ideal(source51[1]),ideal(nuResidual51));
 if(source51[1]*nuLift51[1,1]!=nuResidual51 || normal51(C51*(nu51+1)+mappedN51)==0){ERROR("NU51_FULL_RECOVERY_PRODUCT");quit;}
 map pidField51=compactPid51,u;poly D51=pidField51(commonDenominator51);
-poly remaining51=D51*nu51;vector coefficients51=0;intvec exponents51;int position51;int allIntegral51=1;int row51;number coefficient51;ideal coefficientDenominators51;
+poly remaining51=D51*nu51;vector coefficients51=0;intvec exponents51;int position51;int allIntegral51=1;int row51;int col51;number coefficient51;ideal coefficientDenominators51;
 while(remaining51!=0){
  exponents51=leadexp(remaining51);
  if(exponents51[1]>=16 || exponents51[2]>=2){ERROR("NU51_FIELD_BASIS_SHAPE");quit;}
@@ -40,7 +40,9 @@ if(allIntegral51==1){
  setring compactPid51;execute("vector target51="+targetString51+";");
  module oneTarget51=target51;module stdBasis51=std(basis51);module remainder51=reduce(oneTarget51,stdBasis51);
  link pidOut51="ASCII:w nu-pid-certificate51.sing";open(pidOut51);
- write(pidOut51,"ring nuPidCertificate51=2,(u),(c,dp);short=0;vector target51="+targetString51+";matrix H51="+string(matrix(basis51))+";");
+ write(pidOut51,"ring nuPidCertificate51=2,(u),(c,dp);short=0;vector target51="+targetString51+";matrix H51[32][32];");
+ matrix currentH51=matrix(basis51);
+ for(row51=1;row51<=32;row51++){for(col51=1;col51<=32;col51++){if(currentH51[row51,col51]!=0){write(pidOut51,"H51["+string(row51)+","+string(col51)+"]="+string(currentH51[row51,col51])+";");}}}
  if(size(remainder51)==0){
   matrix lift51=lift(basis51,oneTarget51);matrix H51=matrix(basis51);matrix targetMatrix51[32][1];
   for(row51=1;row51<=32;row51++){targetMatrix51[row51,1]=target51[row51];}
@@ -52,7 +54,11 @@ if(allIntegral51==1){
  }else{
   obstruction51=2;matrix toStd51=lift(basis51,stdBasis51);matrix fromStd51=lift(stdBasis51,basis51);
   if(matrix(basis51)*toStd51!=matrix(stdBasis51) || matrix(stdBasis51)*fromStd51!=matrix(basis51)){ERROR("NU51_NONMEMBERSHIP_STD_BRIDGES");quit;}
-  write(pidOut51,"module remainder51="+string(remainder51)+";");
+  write(pidOut51,"module remainder51="+string(remainder51)+";matrix standardH51[32][32];matrix toStd51[32][32];matrix fromStd51[32][32];");
+  matrix standardH51=matrix(stdBasis51);
+  for(row51=1;row51<=32;row51++){for(col51=1;col51<=32;col51++){
+   write(pidOut51,"standardH51["+string(row51)+","+string(col51)+"]="+string(standardH51[row51,col51])+";toStd51["+string(row51)+","+string(col51)+"]="+string(toStd51[row51,col51])+";fromStd51["+string(row51)+","+string(col51)+"]="+string(fromStd51[row51,col51])+";");
+  }}
  }
  close(pidOut51);
 }
