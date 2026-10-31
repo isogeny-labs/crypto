@@ -25,6 +25,7 @@ pub mod partial;
 pub mod primality;
 pub mod reduction;
 pub mod ring;
+pub mod structured;
 pub mod weighted;
 pub mod width;
 

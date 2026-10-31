@@ -35,6 +35,7 @@ trusted="${LEAN_GATE_TRUSTED:-$root/tools/lean/trusted-native.txt}"
 # cannot silently turn an unrelated build failure into a passing target.
 archived_failed='research/isogeny_world_frontier_20261016/replay-optimization-v1/implementation-01/Newton.failed.lean'
 archived_failed_sha256='b439d1edbe04798a56012688254ea7bd120494e4fd10856f4bdc0c07796e9d1c'
+# shellcheck disable=SC2016 # The Lean diagnostic contains literal backticks.
 archived_failed_error='error(lean.unknownIdentifier): Unknown constant `Int.mul_two`'
 trust_args=()
 [ -f "$trusted" ] && trust_args=(--trusted "$trusted")
@@ -74,7 +75,6 @@ command -v python3 > /dev/null || { echo "python3 not on PATH (target path norma
 scratch=$(mktemp -d)
 trap 'rm -rf "$scratch"' EXIT
 fail=0
-summary=()
 
 run_target() {
   local t slug log status
@@ -150,8 +150,8 @@ PY
     if ! (cd "$root/$t" && lake build) > "$log/build.log" 2>&1; then
       status=FAIL_build
     else
-      local mods f module
-      local -a sources=()
+      local f module
+      local -a sources=() mods=()
       # A default target may omit an entire tracked module. The +Module
       # syntax works in both supported Lake versions; an unregistered source
       # fails closed rather than silently escaping the axiom audit.
@@ -166,18 +166,21 @@ PY
           lakefile.lean|AxiomAudit.lean|*/AxiomAudit.lean) continue ;;
         esac
         module=${module%.lean}
-        sources+=("+${module//\//.}")
+        # Quote path components as Lean identifiers: a tracked directory can
+        # contain a hyphen, which Lake otherwise parses as target syntax.
+        module=${module//\//».«}
+        sources+=("+«$module»")
       done < <(cd "$root" && git ls-files -z -- "$t")
       if [ ${#sources[@]} -eq 0 ]; then
         status=FAIL_no_sources
       elif ! (cd "$root/$t" && lake build "${sources[@]}") > "$log/source-build.log" 2>&1; then
         status=FAIL_source_build
       else
-        mods=$(cd "$root/$t/.lake/build/lib/lean" 2>/dev/null && find . -name '*.olean' \
-          | sed 's|^\./||; s|\.olean$||; s|/|.|g' | sort | tr '\n' ' ')
-        if [ -z "$mods" ]; then
+        mapfile -t mods < <(cd "$root/$t/.lake/build/lib/lean" 2>/dev/null && find . -name '*.olean' \
+          | sed 's|^\./|«|; s|\.olean$|»|; s|/|».«|g' | sort)
+        if [ ${#mods[@]} -eq 0 ]; then
           status=FAIL_no_modules
-        elif ! (cd "$root/$t" && lake env lean --run "$audit" -- "${trust_args[@]}" $mods) > "$log/audit.log" 2>&1; then
+        elif ! (cd "$root/$t" && lake env lean --run "$audit" -- "${trust_args[@]}" "${mods[@]}") > "$log/audit.log" 2>&1; then
           status=FAIL_audit
         fi
       fi

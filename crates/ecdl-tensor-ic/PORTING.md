@@ -148,8 +148,11 @@ Design choices:
 | (new, Rust only) | `fn mitm_find_relation(c: &Curve, fb: &FactorBases, r: Point, ...) -> Option<Vec<Point>>`: meet-in-the-middle elimination order; `Solver::mitm`, `ecdldemo -mitm`; `Solver::threads` / `ecdldemo -threads N` for parallel search, disabled while `opcount::active()` |
 
 ### `linalg` (linalg.go)
-`LeftKernelVector(rows []map[int]uint64, ncols int, r uint64) ([]uint64, bool)`
--> `fn left_kernel_vector(rows: &[HashMap<usize,u64>], ncols: usize, r: u64) -> Option<Vec<u64>>`.
+
+| Go | Rust |
+|---|---|
+| `LeftKernelVector(rows []map[int]uint64, ncols int, r uint64) ([]uint64, bool)` | `fn left_kernel_vector(...) -> Option<Vec<u64>>` (dense reference, same contract) |
+| (Rust only) | `fn left_kernel_vector_sparse(...)`, used by the solver: sorted sparse rows, smallest-first pivots, deterministic |
 
 ### `solver` (solver.go)
 | Go | Rust |
