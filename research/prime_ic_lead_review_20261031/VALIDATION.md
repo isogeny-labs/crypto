@@ -1,8 +1,8 @@
 # Validation receipt
 
-This receipt covers the 2026-10-31 literature/repository assessment and its
-rendered report. It is not an experiment export and contains no new solver or
-ECDLP measurement.
+This receipt covers the 2026-10-31 literature/repository assessment, the
+subsequent arity/solver-model correction, and the rendered report. It is not an
+experiment export and contains no new solver or ECDLP measurement.
 
 ## Starting identities
 
@@ -10,6 +10,8 @@ ECDLP measurement.
   study branch was created.
 - `crypto-autoresearcher`: `5338aead98855d578d444fa6d8b507370847217c`.
 - Branch: `codex/prime-ic-lead-review-20261031`.
+- Correction base: `c5d13654`; correction branch:
+  `codex/prime-ic-arity-correction-20261031`.
 
 ## Coordination check
 
@@ -55,6 +57,25 @@ read directly were Bochum's abstract, introduction, Theorems 2 and 4 and the
 decomposition encoding; OpenAI Appendix D.1 and D.4; and PKM's contribution,
 partial analysis, experiments and conclusion.
 
+## Correction evidence audit
+
+- Read the accepted theorem, Lean scope, complete-system equivalence and
+  measured continuation in `research/prime_factor_base_degree_20261031`.
+  Every accepted relation system there is two-summand; no arity-three solver
+  exponent is established.
+- Re-derived the complete-cost bridge: `Theta(2^s)` relations times
+  `2^(e s)` work per PDP gives `p^((e+1)/m)`, hence the strict rho gate
+  `e<m/2-1`.
+- Inspected `src/cryptanalysis/sat.rs` at correction base `c5d13654`.
+  `solve_with_lazy_clauses` is a native Rust theory-callback contract. No
+  source-identified CaDiCaL `ExternalPropagator` implementation was found on
+  current `main`; binding the reviewer-referenced loop remains a freeze
+  blocker rather than an assumed implementation fact.
+- Searches of the current tree and recent public pull-request metadata found no
+  original `DEC-20261031-cd6460` object. The checked-in file with that name is
+  explicitly a repository-side correction record, not a fabricated edit to a
+  missing source object.
+
 ## Lead-atlas review
 
 Commands were run at the autoresearcher revision above:
@@ -82,14 +103,17 @@ python3 ../crypto-autoresearcher/tools/experiment_protocol.py validate \
   research/prime_ic_lead_review_20261031/protocol.draft.json
 ```
 
-Outcome:
+Original outcome:
 
 ```text
 OK: experiment.protocol/v1 research/prime_ic_lead_review_20261031/protocol.draft.json (0 finding(s))
 ```
 
-The record remains `freeze.status: draft`. No `freeze` command and no affected
-data collection occurred.
+After the correction, the same pinned validator and schema were retrieved to a
+temporary directory and rerun. The corrected protocol ID is
+`EXP-prime-m3-cdclt-exponent-screen-20261031`; validation again returned
+`0 finding(s)`. The record remains `freeze.status: draft`. No `freeze` command
+and no affected data collection occurred.
 
 ## Figure and PDF rendering
 
@@ -97,7 +121,11 @@ Commands:
 
 ```sh
 dot -Tsvg figures/lead-funnel.dot -o figures/lead-funnel.svg
-dot -Tpng -Gdpi=150 figures/lead-funnel.dot -o figures/lead-funnel.png
+dot -Tpng -Gdpi=48 figures/lead-funnel.dot -o figures/lead-funnel.png
+XDG_CONFIG_HOME=/tmp/prime-ic-correction-inkscape \
+XDG_CACHE_HOME=/tmp/prime-ic-correction-font-cache \
+inkscape figures/arity-cost-bridge.svg --export-type=png \
+  --export-filename=figures/arity-cost-bridge.png --export-dpi=96
 XDG_CONFIG_HOME=/tmp/prime-ic-inkscape-config \
 XDG_CACHE_HOME=/tmp/prime-ic-font-cache \
 inkscape figures/pkm-m4-degree.svg --export-type=png \
@@ -109,18 +137,23 @@ pdfinfo report.pdf
 pdftoppm -png -r 105 report.pdf /tmp/prime-ic-final-page
 ```
 
-Graphviz and Pandoc returned exit 0. Inkscape returned exit 0 with read-only
-profile/font-cache warnings after the writable XDG scratch paths were supplied.
-`report.pdf` has four letter-size pages. All four rendered pages were opened;
-the figures, source pins, experiment gates and dependencies are legible and no
-text crosses the page boundary.
+Graphviz and Pandoc returned exit 0. Inkscape returned exit 0 with harmless
+font-map/recent-manager warnings after writable XDG scratch paths were
+supplied. The corrected `report.pdf` has five letter-size pages. All five
+rendered pages were opened; the figures, source pins, corrected cost bridge,
+experiment gates and dependencies are legible and no text crosses a page
+boundary. Its final SHA-256 is
+`29aea1c26d2a4df40fb34c54ff8fc278be8d0abdcbef5cab28a08c2e840f7a15`.
 
 ## Scientific execution status
 
 - New experiment rows: 0.
 - EKS jobs submitted: 0.
 - Solver/benchmark claims: 0.
-- New algebraic identities: 0; no identity certificate is required.
+- New algebraic identities claimed as research: 0. The reviewer-supplied
+  quadratic lift was expanded directly, giving discriminant `16t^2 f(x)`;
+  the cost bridge was checked row-by-row against `e=m/2-1`. These are
+  correction derivations, not novelty or performance claims.
 - Leaderboard/benchmark updates: none, because there is no admitted result row.
 
 ## Repository test availability
@@ -131,10 +164,11 @@ The required broad Rust check was attempted after staging the report:
 cargo test --release --lib
 ```
 
-Outcome: exit 127, `/bin/bash: line 1: cargo: command not found`. No Rust source
-or build manifest changed in this task. JSON/schema, curve-name, render and PDF
-checks above completed; the unavailable Cargo toolchain remains a validation
-environment limitation rather than a passing test.
+Outcome, both originally and after the correction: exit 127,
+`/bin/bash: line 1: cargo: command not found`. No Rust source or build manifest
+changed in this correction. JSON/schema, cost-bridge, artifact-hash, render and
+PDF checks above completed; the unavailable Cargo toolchain remains a
+validation environment limitation rather than a passing test.
 
 ## Remote delivery attempt
 
