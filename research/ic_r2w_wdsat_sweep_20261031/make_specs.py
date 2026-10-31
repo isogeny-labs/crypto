@@ -31,3 +31,9 @@ for c in CELLS:
 for c in CELLS:
     dump(f'W3_{c}', spec(f'R2W {c} wdsat l3 full', c, [3], []))            # l=3 full session (200000 trials)
     dump(f'L3_{c}', spec(f'R2W {c} lab l3', c, [], [3]))                    # lab l=3 (only where WDSat l=3 is viable)
+
+# Amendment 2: lab-only extension over the l values WDSat was run at (trial = 1 target at the top l, short timeout; full = 8 targets)
+LX = {'k0n9': [7, 8], 'k1n9': [6, 7, 8], 'k1n11': [7, 8, 9, 10], 'k0n13': [9, 10, 11, 12], 'k0n15': [10, 11, 12, 13]}
+for c, ls in LX.items():
+    dump(f'LX_{c}', spec(f'R2W {c} lab extension', c, [], ls))
+    dump(f'LXtrial_{c}', spec(f'R2W {c} lab extension trial top l', c, [], [ls[-1]], targets=1, timeout=900))

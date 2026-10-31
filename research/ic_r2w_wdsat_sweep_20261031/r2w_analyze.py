@@ -35,6 +35,7 @@ def load(sess, tm):
 def main():
     rdir, tdir, outp = sys.argv[1:4]
     LMAX = int(sys.argv[4]) if len(sys.argv) > 4 else 7   # primary grid l in 3..7; 8 = extension
+    LABMODE = sys.argv[5] if len(sys.argv) > 5 else "ext"  # "r2": lab values of R2 only (fit A, B1); "ext": plus the lab arms measured in the R2W sessions (B2)
     os.chdir(tdir)
     E, T, R = "e1/runs/", "runs/", "r2/runs/"
     CELLS = {
@@ -55,7 +56,7 @@ def main():
         r2labs = set(by)
         # R2W sessions for this cell
         for s in sorted(glob.glob(f"{rdir}/R2W_*_{short}")):
-            if s.endswith("_tm") or "R2W_V3_" in s: continue
+            if s.endswith("_tm") or "R2W_V3_" in s or "R2W_LXtrial_" in s: continue
             try: L = load(s, s + "_tm")
             except AssertionError as e: print("SKIP incomplete session", e); continue
             for x in L:
@@ -74,7 +75,7 @@ def main():
                 e["med_lower"] = st.median(x["lower"] for x in ok.values()) if ok else None
                 e["inexact"] = sum(x.get("inexact", 0) for x in d.values()); e["refuted"] = sum(x.get("refuted", 0) for x in d.values())
             arms[a] = e
-        labs = [a for a in arms if a.startswith("lab-") and arms[a]["n"] == 8]
+        labs = [a for a in arms if a.startswith("lab-") and arms[a]["n"] == 8 and (LABMODE == "ext" or a in r2labs)]
         wds = [a for a in arms if a.startswith("wd-") and arms[a]["n"] == 8 and int(a.split("l")[-1]) <= LMAX]
         bl = min(labs, key=lambda a: arms[a]["med_whole"])
         def pair(wa, key):

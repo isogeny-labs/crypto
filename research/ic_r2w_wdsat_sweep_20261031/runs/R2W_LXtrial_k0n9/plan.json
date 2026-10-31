@@ -1,0 +1,75 @@
+{
+  "schema": "ecbench.plan/v1",
+  "spec_id": "ECS1hda412b69b99f",
+  "arms": [
+    {
+      "name": "inherited-f4-l8",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "family": "ic",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=8",
+          "linalg": "incremental-gauss",
+          "max_trials": "200000",
+          "oracle": "pdp3-binary:m=3,engine=inherited-f4,degree=3,node_budget=8192",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "walk"
+        },
+        "method_id": "ECM1hebcad00a3088",
+        "method_sha256": "ebcad00a30887e2a7cd53e627376508f05d186a798065244862e1ff9967b89cb",
+        "entry": "ic_framework::run_pipeline"
+      }
+    }
+  ],
+  "workloads": [
+    {
+      "workload_id": "W8cdd28ec209a",
+      "workload_sha256": "8cdd28ec209a30ca2ccbe2c0c3340055d2656ebfffec6bbf7d887319b37b788f",
+      "curve_spec": {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 9
+      },
+      "curve": {
+        "slug": "icv1-f2m9-t5-81e744be",
+        "icv1": "ICV1:f2m-9-37f297a3:5:508:0x1:-7:unk:r:81e744bec1a8",
+        "family": "koblitz",
+        "construction": "KoblitzCurve::new(0, 9)",
+        "field_degree": 9,
+        "field_bits": null,
+        "group_order": 508,
+        "r": 127,
+        "cofactor": 4,
+        "generator": [
+          "0x160",
+          "0x1d2"
+        ],
+        "automorphisms_available": 18,
+        "registered": true,
+        "ec1": "EC1N9Ce0h56c2643982af",
+        "curve_uid": "urn:ec-record:1:sha256:56c2643982afc0b4751402926c9eac2e89b30a86d4d933eab35aece977d00794"
+      },
+      "target_law": "hash_to_subgroup_v1",
+      "target_seed": 202610111901,
+      "target_index": 0,
+      "target": [
+        "0x5a",
+        "0x1db"
+      ],
+      "planted": null,
+      "target_counter": 0
+    }
+  ],
+  "executions": [
+    {
+      "seq": 0,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 0,
+      "algorithm_seed": 8661451950409461799
+    }
+  ]
+}
