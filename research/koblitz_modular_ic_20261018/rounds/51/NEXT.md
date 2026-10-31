@@ -1,13 +1,11 @@
 # R51 ordered continuation
 
-1. Reconcile overlap-lean51-01. Compile exit0 and all five audit declarations
-   are printed with zero failures/trust; the original process was blocked
-   on filesystem teardown before writing audit.exit. Never duplicate it.
-2. Run the frozen independent GLUE_RELOAD51 checker as glue-reload51-01.
-   All64 direct numerator identities, both32-column PID products, source
-   lift products and principal-open units must pass. A late marker following
-   any question-mark error is rejected.
-3. Run UNIVERSAL51 as universal51-01: replay the archived universal QR circuit
+1. Completed: overlap-lean51-01 compile0/audit0,all5declarations audited
+   with zero failing/trusted;original teardown reconciled before next math.
+2. Completed: glue-reload51-01 exit0,noerrors,exactmarker,all64 direct
+   numerator witnesses,both32-column PID products,four source products,
+   principal-open units and corruption controls. Do not repeat this producer.
+3. Reconcile the active UNIVERSAL51 attempt universal51-01: replay the archived universal QR circuit
    and full certificates,clear every actual coefficient denominator,verify
    the two polynomial matrix products. No old Groebner search is repeated.
 4. Run TWIST51 as twist51-01 only after universal acceptance. Require descent
