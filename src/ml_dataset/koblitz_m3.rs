@@ -8087,7 +8087,41 @@ mod canonical_component_tests {
                     "group_domain_complete": scenario != 2,
                     "certificate_durably_persisted": positive
                 });
-                let facts = verify_outer_outcome(&outer, &verified).unwrap();
+                let facts = verify_delivered_outcome(&outer, &verified, &delivered).unwrap();
+                // Retain real canonical files and capture evidence, but replace
+                // the delivery record with an honestly incomplete root receipt.
+                // The final write was admitted and capture-acknowledged; only
+                // the root acknowledgement is missing. Charges remain intact.
+                let mut incomplete = parent_json.clone();
+                incomplete["items"]
+                    .as_array_mut()
+                    .unwrap()
+                    .last_mut()
+                    .unwrap()["root_artifact"] = serde_json::Value::Null;
+                incomplete["parent_stop"] = serde_json::json!("Observer");
+                incomplete["persistence_error"] =
+                    serde_json::json!("final root acknowledgement missing");
+                incomplete["delivery_complete"] = serde_json::json!(false);
+                std::fs::write(
+                    root.join(PARENT_DELIVERY_SLOT.0),
+                    serde_json::to_vec(&incomplete).unwrap(),
+                )
+                .unwrap();
+                let incomplete_delivery = delivery_check().unwrap();
+                assert!(!incomplete_delivery.delivery_complete);
+                assert_eq!(
+                    verify_delivered_outcome(&outer, &verified, &incomplete_delivery).is_ok(),
+                    scenario == 2
+                );
+                let mut partial = outer.clone();
+                partial["status"] = serde_json::json!("partial");
+                partial["solver_completed"] = serde_json::json!(false);
+                let retained =
+                    verify_delivered_outcome(&partial, &verified, &incomplete_delivery).unwrap();
+                assert_eq!(retained.retained_witness_verified, positive);
+                assert!(!retained.solver_completed);
+                std::fs::write(root.join(PARENT_DELIVERY_SLOT.0), &parent_bytes).unwrap();
+                assert!(delivery_check().unwrap().delivery_complete);
                 assert!(!facts.supervisor_censored);
                 assert_eq!(facts.solver_completed, scenario != 2);
                 assert_eq!(facts.retained_witness_verified, positive);
@@ -8522,6 +8556,20 @@ struct VerifiedOuterOutcome {
     solver_completed: bool,
     retained_witness_verified: bool,
 }
+/// Completion requires independently checked mathematics and delivery. An
+/// omitted outer error field cannot stand in for a positive storage receipt.
+fn verify_delivered_outcome(
+    outcome: &serde_json::Value,
+    verified: &VerifiedCanonicalComponents,
+    delivery: &VerifiedParentDelivery,
+) -> Result<VerifiedOuterOutcome, String> {
+    let facts = verify_outer_outcome(outcome, verified)?;
+    if facts.solver_completed && !delivery.delivery_complete {
+        return Err("Koblitz completion lacks complete parent delivery".into());
+    }
+    Ok(facts)
+}
+
 fn verify_outer_outcome(
     outcome: &serde_json::Value,
     verified: &VerifiedCanonicalComponents,
