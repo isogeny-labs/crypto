@@ -1282,10 +1282,12 @@ fn certify(sessions: &[PathBuf], out: &Path) -> Result<(), String> {
                 continue;
             };
             // Building a curve counts its points (2^n steps): once per curve, not per record.
-            if !instances.contains_key(&(n, seed, max_cofactor)) {
+            if let std::collections::btree_map::Entry::Vacant(e) =
+                instances.entry((n, seed, max_cofactor))
+            {
                 let built = random_binary_instance(n, seed, max_cofactor)
                     .ok_or(format!("no curve for n = {n}"))?;
-                instances.insert((n, seed, max_cofactor), built);
+                e.insert(built);
             }
             let inst = &instances[&(n, seed, max_cofactor)];
             let gf = &inst.gf;
@@ -1464,7 +1466,7 @@ fn recompute_unpriced(r: &Record) -> f64 {
                 && r.method
                     .params
                     .get("oracle")
-                    .map_or(true, |o| !o.starts_with("semaev-s4-grouplaw"))
+                    .is_none_or(|o| !o.starts_with("semaev-s4-grouplaw"))
             {
                 continue;
             }
