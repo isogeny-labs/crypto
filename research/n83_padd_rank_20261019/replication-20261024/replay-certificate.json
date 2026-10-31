@@ -1,0 +1,82 @@
+{
+  "independence": "the PR's frozen runner and binary sources re-executed on a different host (this session's cloud container) by a different session; comparison and scalar checks by examples/n83_panel_analyze.rs",
+  "independent": true,
+  "runs": [
+    {
+      "compared": true,
+      "pass": true,
+      "run": "p1_cur_a"
+    },
+    {
+      "compared": true,
+      "pass": true,
+      "run": "p1_cur_b"
+    },
+    {
+      "compared": true,
+      "pass": true,
+      "run": "p1_padd"
+    },
+    {
+      "compared": true,
+      "pass": true,
+      "run": "p1_rho0"
+    },
+    {
+      "compared": true,
+      "pass": true,
+      "run": "p1_rho1"
+    },
+    {
+      "compared": true,
+      "pass": true,
+      "run": "p1_rho2"
+    },
+    {
+      "compared": true,
+      "pass": true,
+      "run": "p2_cur_a"
+    },
+    {
+      "compared": true,
+      "pass": true,
+      "run": "p2_cur_b"
+    },
+    {
+      "compared": true,
+      "pass": true,
+      "run": "p2_padd"
+    },
+    {
+      "compared": true,
+      "pass": true,
+      "run": "p2_rho0"
+    },
+    {
+      "compared": true,
+      "pass": true,
+      "run": "p2_rho1"
+    },
+    {
+      "compared": true,
+      "pass": true,
+      "run": "p2_rho2"
+    },
+    {
+      "compared": false,
+      "note": "replay process did not complete (panel stopped by the operator)",
+      "run": "p3_cur_a",
+      "status": "KILLED_NO_USAGE"
+    },
+    {
+      "compared": true,
+      "pass": true,
+      "run": "p3_padd"
+    }
+  ],
+  "sample": "points 1-2 complete (cur_a, cur_b, padd, three rho draws each) and point 3 padd; the replication was stopped after point 2 when the session moved to other work",
+  "scalar_checks": 26,
+  "scalars_verified": true,
+  "schema": "n83.padd-rank-replay-certificate/v1",
+  "status": "verified"
+}
