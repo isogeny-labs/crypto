@@ -16,3 +16,11 @@ nonvanishing obligation remains for each base specialization.
 Same manual local authorization, seed51, one Singular/FLINT thread,
 4GiB virtual/1200s, strict exit0/no error lines and TWIST51_ALL_CHECKS_PASS.
 Preserve rejected attempts. Do not run concurrently with another math job.
+
+Repair frozen after rejected twist51-01: that attempt printed errors in the
+F4 matrix and gamma-syzygy gates,followed by a late marker;it is rejected.
+Use explicit entrywise scalar reductions for all3x2/2x3 arrays,entrywise
+F4/syzygy residual checks,and require complete F=F0+gamma*F1 and B=B0+gamma*B1
+reconstruction before accepting components. Matrix-vs-scalar zero and
+matrix-vs-rank1 reduction semantics are not trusted as scalar-entry checks.
+Retain all original scalar descent,exactF2products and serialized reload.

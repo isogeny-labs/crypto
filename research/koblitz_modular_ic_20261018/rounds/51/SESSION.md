@@ -46,3 +46,8 @@ universal51-01 accepted exit0/noerrors/exactmarker. Both complete archived
 field products and both cleared polynomial products pass. Actual common
 denominator degree26 exported. twist51-01 admitted next. Before BASE23 data,
 freeze a source-bound test of D=(1+c)^5*Delta^3 against that actual polynomial.
+
+REJECTED twist51-01: nativeexit0 but question-mark errors
+TWIST51_FULL_F4_PRODUCTS and TWIST51_GAMMA_SYZYGIES. LatePASS is invalid.
+Freeze entrywise scalar reduction/checking and complete gamma reconstruction
+before the repaired attempt. Reuse accepted universal51-01 unchanged.
