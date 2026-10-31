@@ -4,7 +4,7 @@
 
 ## Recommendation
 
-Build the canonical IR gate, then run a boundary-tensor rank census. Test SAT immediately afterward as a mechanism triangulation, not as an unstructured solver race.
+Finish the canonical IR coverage gate, then run a boundary-tensor rank census. Test SAT immediately afterward as a mechanism triangulation, not as an unstructured solver race.
 
 The strongest actionable hypothesis is that the natural hashed ECDLP network emits lower-dimensional boundary messages than a close rewired null. This is where tensor contraction, SAT propagation, BDD width, and variable elimination meet: each benefits when the information crossing a cut is compressible. Measuring the invariant first makes a later solver or contraction win interpretable. If E1 passes, E1S exports the same natural/null pairs to parsimonious CNF, CNF-XOR, and an exact BDD path, then asks whether complete solver work tracks the measured rank.
 
@@ -36,11 +36,11 @@ The SAT suspicion receives a sharp falsifier in E1S: natural and rewired instanc
 
 Local structure does not count unless it composes. E2 therefore requires a checked composition certificate predicting lower global exact work. E3 then searches rewrites and orders on training instances only; E4 tests the frozen engine on untouched holdouts.
 
-## Existing implementation constraint
+## E0 implementation status
 
-The current graph records predicates as `Arc<dyn Predicate>`. That supports evaluation but not stable semantic serialization of arbitrary closures. A canonical graph dump would therefore be able to preserve shape while silently losing predicate identity. E0 must introduce tagged predicate kinds and parameters, preserve interface order and pins, and verify complete prefix counts and witnesses after round trip.
+The graph originally recorded predicate behavior only behind `Arc<dyn Predicate>`, so shape-only serialization could silently lose semantics. E0 now supplies `BTNIR001`: construction-order incidence, ordered ports and interface, pins, provenance, tags, and exact semantic bodies share stable bytes and a SHA-256 identity. Predicates through 16 ports use complete truth tables. A representative tiny decomposition exposed a 132-port Fourier relation, so larger built-in relations use strict typed programs that are also their live evaluators before export and after import.
 
-This is the immediate engineering task because every later comparison depends on it.
+Tiny controls pass round-trip count, every interface-prefix count, least-witness, parser, and five mutation checks. This establishes the core comparison instrument, not the E1 result: optional high-arity selector/custom predicates, final-ladder preflight, and the fresh-process A/A runner remain open. No affected rank or solver data has been taken.
 
 ## Claim boundary
 
@@ -48,5 +48,5 @@ No result in the proposed rank census proves a subexponential ECDLP algorithm. E
 
 ## State of evidence
 
-This package contains designs, controls, stop gates, and a draft schema record. It contains no E1 measurements, no benchmark rows, and no frozen protocol. The protocol intentionally blocks data collection until the canonical IR, hashes, preflight, power justification, and final ladder are committed.
+This package contains designs, controls, stop gates, a draft schema record, and the core E0 canonical-IR implementation. It contains no E1 measurements, no benchmark rows, and no frozen protocol. The protocol intentionally blocks data collection until the remaining E0 coverage, census binary and hashes, preflight, power justification, and final ladder are committed.
 

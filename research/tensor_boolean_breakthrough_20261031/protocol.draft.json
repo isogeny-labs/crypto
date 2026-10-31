@@ -10,6 +10,8 @@
   ],
   "links": {
     "narrative": "research/tensor_boolean_breakthrough_20261031/PROTOCOL.md",
+    "canonical_ir_implementation": "crates/hashed-ecdl-tensor/src/canonical.rs",
+    "e0_receipt": "research/tensor_boolean_breakthrough_20261031/E0_IMPLEMENTATION.md",
     "portfolio": "research/tensor_boolean_breakthrough_20261031/experiment-matrix.json",
     "lead_review": "research/prime_ic_lead_review_20261031/README.md"
   },
@@ -642,7 +644,7 @@
   },
   "inadmissible": [
     "taking affected data before this protocol is frozen and committed",
-    "using a graph-only serialization that omits predicate identity, parameters, port order, interface order or pins",
+    "using a graph-only serialization that omits predicate tags, parameters, exact bounded truth tables or typed high-arity programs, port order, interface order or pins",
     "selecting a cut after observing rank or support",
     "substituting a smaller favorable cut when the frozen cut exceeds the cap",
     "calling modular rank an exact integer rank",

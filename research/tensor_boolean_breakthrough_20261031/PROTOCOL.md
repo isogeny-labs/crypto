@@ -36,9 +36,13 @@ No E1 row is admissible until the following pass on every fixture:
 - Exact equality of total count, every interface-prefix count, lexicographically least interface witness, and model multiplicity before and after round trip.
 - Independent direct and functional contraction agree where both apply.
 - Endpoint swap, interface permutation, predicate-parameter bit flip, predicate port reversal, and dropped pin are each detected as a hash change and either rejected or produce a deliberately unequal semantic certificate.
-- Predicate closures are replaced by tagged kinds and explicit parameters. Tiny bounded truth tables may be serialized only when the arity cap is met.
+- Every production predicate carries a tagged kind and sorted parameters. Predicates at or below the frozen arity cap serialize their complete truth table; larger production predicates serialize a strict typed operation that is also the live evaluator before export. Tag, parameters, arity and the truth table or typed program share one semantic digest. Untagged predicates require the explicit bounded-truth-table policy reserved for tiny fixtures and controls.
 
 E0 is a validity gate, not evidence for the compression hypothesis.
+
+### Pre-freeze E0 clarification
+
+The first draft required tags and parameters for production closures and mentioned truth tables only for tiny custom predicates. Source inspection exposed a semantic-identity gap: a tag identifies intended meaning but cannot prove that two closure bodies implement that meaning. E0 first attempted to strengthen every production vertex with a complete table under a 16-port cap. Its representative hash-network control failed as intended: the tiny production graph has a maximum predicate arity of 132 in the Fourier multiplication relation. The corrected hybrid stores exact tables through 16 ports and typed, strictly serialized value-relation programs above the cap. A programmed predicate uses that same typed relation as its live pre-export evaluator and its post-import evaluator, so closure identity is not trusted. This clarification was made before affected data and does not alter the E1 estimand, ladder, controls, or thresholds.
 
 ## Population and ladder
 

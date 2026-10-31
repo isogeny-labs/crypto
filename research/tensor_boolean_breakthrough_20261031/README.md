@@ -1,7 +1,7 @@
 # Tensor–Boolean breakthrough experiments
 
 Date: 2026-10-31  
-Status: design complete; no affected measurements taken  
+Status: experiment design complete; E0 core implemented; no affected measurements taken
 Repository baseline: `e3741fd5bbcc1f52a86be609587e7cf4ceeef566`
 
 ## Outcome
@@ -30,15 +30,17 @@ SAT, tensor contraction, BDDs, variable elimination, and algebraic elimination a
 
 The null changes only the global wiring of interior ports while preserving the vertex predicates, vertex degrees, edge count, interface, local evaluation code, cut width, and each vertex's cut-degree profile. Conditioning on a preregistered solution-count stratum prevents a trivial “one family is mostly unsatisfiable” explanation. This does not make the null uniquely correct; the report must show both conditioned and unconditioned panels.
 
-## Immediate implementation slice
+## Immediate implementation status
 
-1. Add a canonical, versioned network IR with stable edge/port ordering, interface order, pins, predicate tags and parameters, and provenance.
-2. Add an exact IR round-trip harness and the five E0 mutations.
-3. Add a `tensor-census` binary that materializes the boundary tensor for a frozen cut law and computes fraction-free integer ranks.
-4. Run only scratch preflight fixtures that are disjoint from the declared ladder; fill binary, analysis, runtime, memory, and power fields.
-5. Freeze and commit `protocol.json`; derive seeds from its hash; only then generate E1 data.
+1. **Implemented:** a canonical, versioned network IR with stable edge/port ordering, interface order, pins, predicate semantics, and provenance.
+2. **Implemented on tiny controls:** exact IR round trip and all five E0 mutations. See [`E0_IMPLEMENTATION.md`](E0_IMPLEMENTATION.md).
+3. **Next:** add a `tensor-census` binary that materializes the boundary tensor for a frozen cut law and computes fraction-free integer ranks.
+4. **Then:** run only scratch preflight fixtures disjoint from the declared ladder; fill binary, analysis, runtime, memory, and power fields.
+5. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
 
-The current `Network` stores predicates behind `Arc<dyn Predicate>`, so closure identity cannot be serialized faithfully. E0 therefore requires tagged production predicates. A bounded truth-table predicate is allowed only for tiny fixtures and controls. Canonicalizing graph shape alone would be insufficient.
+The current `Network` stores predicates behind `Arc<dyn Predicate>`, so closure identity cannot be serialized faithfully. E0 therefore uses a hybrid semantic representation: predicates at or below 16 ports carry their complete truth table; larger production predicates carry a strict typed operation that is also their live evaluator. Tag, parameters, truth table or typed program, port order, interface and pins are bound into one SHA-256 identity. Untagged predicates are admitted only through an explicit bounded-truth-table policy for tiny fixtures and controls. Canonicalizing graph shape alone would be insufficient.
+
+This hybrid requirement is a pre-freeze clarification of the original tag-only draft. Tags make the IR interpretable but do not by themselves prove that an imported closure has the same semantics. An initial universal-table implementation was rejected by its own representative control: the tiny hash network contains a 132-port Fourier relation, so a 16-port cap cannot cover production. The typed program supplies exact, replayable semantics for those vertices without materializing a `2^132` table. No affected data preceded either correction.
 
 ## Interpretation discipline
 
@@ -58,6 +60,7 @@ The current `Network` stores predicates behind `Arc<dyn Predicate>`, so closure 
 | Make the next action concrete | E0 implementation slice and E1 protocol | Complete at design scope |
 | Include controls and falsifiers | `PROTOCOL.md` §§ Controls, decision rule, invalidation | Complete at design scope |
 | Prevent post-hoc search claims | Frozen train/holdout policy in E3 and protocol freeze gate | Complete at design scope |
+| Implement semantic comparison gate | `canonical.rs` and `E0_IMPLEMENTATION.md` | Core implemented and tiny controls verified; final-ladder preflight open |
 | Produce measured evidence | No rows or exports exist | Not started; intentionally blocked by draft status |
 | Establish a tensor/Boolean breakthrough | Requires E1–E5 evidence and, for asymptotics, a theorem | Open |
 
@@ -66,6 +69,7 @@ The current `Network` stores predicates behind `Arc<dyn Predicate>`, so closure 
 - [`PROTOCOL.md`](PROTOCOL.md) — E1 estimand, construction, controls, analysis, and gates.
 - [`protocol.draft.json`](protocol.draft.json) — draft `experiment.protocol/v1` record.
 - [`experiment-matrix.json`](experiment-matrix.json) — machine-readable experiment cards and dependencies.
+- [`E0_IMPLEMENTATION.md`](E0_IMPLEMENTATION.md) — canonical-IR format, controls, evidence boundary, and open obligations.
 - [`REPORT.md`](REPORT.md) — visual decision brief.
 - `report.pdf` — rendered report after validation.
 - [`VALIDATION.md`](VALIDATION.md) — generated-artifact and protocol checks.
