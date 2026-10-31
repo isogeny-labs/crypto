@@ -1,0 +1,54 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-03-04
+experiment_id: BLINDSPOT-03
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/03-polynomial-method/raw/receipt-card-04.json
+binds:
+  - {path: examples/blindspots_03_polynomial_method.rs, sha256: 9cb0ba308e36f6e5f2b0a9d20a940b839121b94dc4121c1f8d09bb0d8d1fd168}
+  - {path: examples/blindspots_05_elimination_orders.rs, sha256: f21a761b97177a130c610d8041cad256c8dfec44e2419fe20233030e69e82adf}
+  - {path: research/blindspots_20261018/03-polynomial-method/draws.tsv, sha256: d748ab677344ac8cde3e9bf75c6ded9fb62d6ce20f4bde90a9ceb8c52bb45028}
+commands:
+  - id: f4-c13-6-2
+    argv: [prlimit, --as=4294967296, target/blindspots-03/bin/b05, run, --draws, research/blindspots_20261018/03-polynomial-method/draws.tsv, --cell, c13-6-2, --targets, "0-7", --arms, grevlex, --time-limit, "20", --total-limit, "25"]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/03-polynomial-method/raw/card-04-f4-c13-6-2.stdout.log
+    stderr: research/blindspots_20261018/03-polynomial-method/raw/card-04-f4-c13-6-2.stderr.log
+  - id: f4-c17-8-2
+    argv: [prlimit, --as=4294967296, target/blindspots-03/bin/b05, run, --draws, research/blindspots_20261018/03-polynomial-method/draws.tsv, --cell, c17-8-2, --targets, "0-7", --arms, grevlex, --time-limit, "20", --total-limit, "25"]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/03-polynomial-method/raw/card-04-f4-c17-8-2.stdout.log
+    stderr: research/blindspots_20261018/03-polynomial-method/raw/card-04-f4-c17-8-2.stderr.log
+  - id: f4-c21-10-2
+    argv: [prlimit, --as=4294967296, target/blindspots-03/bin/b05, run, --draws, research/blindspots_20261018/03-polynomial-method/draws.tsv, --cell, c21-10-2, --targets, "0-7", --arms, grevlex, --time-limit, "30", --total-limit, "50"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/03-polynomial-method/raw/card-04-f4-c21-10-2.stdout.log
+    stderr: research/blindspots_20261018/03-polynomial-method/raw/card-04-f4-c21-10-2.stderr.log
+  - id: f4-c25-12-2
+    argv: [prlimit, --as=4294967296, target/blindspots-03/bin/b05, run, --draws, research/blindspots_20261018/03-polynomial-method/draws.tsv, --cell, c25-12-2, --targets, "0-7", --arms, grevlex, --time-limit, "60", --total-limit, "150"]
+    timeout_seconds: 170
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/03-polynomial-method/raw/card-04-f4-c25-12-2.stdout.log
+    stderr: research/blindspots_20261018/03-polynomial-method/raw/card-04-f4-c25-12-2.stderr.log
+  - id: f4-c29-14-2
+    argv: [prlimit, --as=4294967296, target/blindspots-03/bin/b05, run, --draws, research/blindspots_20261018/03-polynomial-method/draws.tsv, --cell, c29-14-2, --targets, "0-1", --arms, grevlex, --time-limit, "80", --total-limit, "170"]
+    timeout_seconds: 190
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/03-polynomial-method/raw/card-04-f4-c29-14-2.stdout.log
+    stderr: research/blindspots_20261018/03-polynomial-method/raw/card-04-f4-c29-14-2.stderr.log
+
+bus_address: executor-mechanical-blindspot-03
+background: false
+write_scope:
+  - research/blindspots_20261018/03-polynomial-method/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto."

@@ -1,0 +1,1162 @@
+{
+  "amendments": [],
+  "analysis_plan": {
+    "blinded": false,
+    "frozen_before_data": true,
+    "inputs": [
+      "three field shard records and manifests",
+      "independent verification receipts",
+      "controls.json",
+      "workflow metadata and partial failure records"
+    ],
+    "outputs": [
+      "summary.json",
+      "export.json",
+      "source-linked Markdown report",
+      "quantitative SVG from recorded exact values or pending-execution diagram",
+      "inspected PDF"
+    ],
+    "script": {
+      "path": "../../tools/twist-relations/src/tr04_report.rs",
+      "sha256": "dbff251e6ede8244f1ff6f9519d88830be5c3076ed9ae8d906d4fb6abe37b923"
+    }
+  },
+  "arms": [
+    {
+      "description": "Baseline: accept the first B distinct original-curve x coordinates from every IID length-8 candidate word; canonical point signs and ordering.",
+      "id": "random",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "tools/twist-relations/Cargo.toml",
+            "--bin",
+            "twist-tr04"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "overflow_checks": "true",
+          "profile": "release",
+          "target": "native x86_64 ARC runner"
+        },
+        "image_digest": null,
+        "repo": "isogeny-labs/crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "base_sizes": [
+          2,
+          3
+        ],
+        "selector_budget": 8,
+        "walk_length": 8
+      },
+      "role": "baseline",
+      "same_instrument_as": null
+    },
+    {
+      "description": "Contextual reference: every x0 in Fp and nonzero delta in Fp yields an eight-candidate arithmetic progression; the same acceptance and canonicalization as random.",
+      "id": "progression",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "tools/twist-relations/Cargo.toml",
+            "--bin",
+            "twist-tr04"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "overflow_checks": "true",
+          "profile": "release",
+          "target": "native x86_64 ARC runner"
+        },
+        "image_digest": null,
+        "repo": "isogeny-labs/crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "base_sizes": [
+          2,
+          3
+        ],
+        "selector_budget": 8,
+        "walk_length": 8
+      },
+      "role": "reference",
+      "same_instrument_as": "random"
+    },
+    {
+      "description": "Accept distinct original-curve coordinates whose next one field coordinate is twist-only; no free full-field character table.",
+      "id": "twist_l1",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "tools/twist-relations/Cargo.toml",
+            "--bin",
+            "twist-tr04"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "overflow_checks": "true",
+          "profile": "release",
+          "target": "native x86_64 ARC runner"
+        },
+        "image_digest": null,
+        "repo": "isogeny-labs/crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "base_sizes": [
+          2,
+          3
+        ],
+        "selector_budget": 8,
+        "threshold": 1,
+        "walk_length": 8
+      },
+      "role": "candidate",
+      "same_instrument_as": "random"
+    },
+    {
+      "description": "Accept distinct original-curve coordinates whose next two consecutive field coordinates are twist-only.",
+      "id": "twist_l2",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "tools/twist-relations/Cargo.toml",
+            "--bin",
+            "twist-tr04"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "overflow_checks": "true",
+          "profile": "release",
+          "target": "native x86_64 ARC runner"
+        },
+        "image_digest": null,
+        "repo": "isogeny-labs/crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "base_sizes": [
+          2,
+          3
+        ],
+        "selector_budget": 8,
+        "threshold": 2,
+        "walk_length": 8
+      },
+      "role": "candidate",
+      "same_instrument_as": "random"
+    },
+    {
+      "description": "Accept distinct original-curve coordinates whose next three consecutive field coordinates are twist-only.",
+      "id": "twist_l3",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "tools/twist-relations/Cargo.toml",
+            "--bin",
+            "twist-tr04"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "overflow_checks": "true",
+          "profile": "release",
+          "target": "native x86_64 ARC runner"
+        },
+        "image_digest": null,
+        "repo": "isogeny-labs/crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "base_sizes": [
+          2,
+          3
+        ],
+        "selector_budget": 8,
+        "threshold": 3,
+        "walk_length": 8
+      },
+      "role": "candidate",
+      "same_instrument_as": "random"
+    },
+    {
+      "description": "Accept distinct original-curve coordinates whose next four consecutive field coordinates are twist-only.",
+      "id": "twist_l4",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "tools/twist-relations/Cargo.toml",
+            "--bin",
+            "twist-tr04"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "overflow_checks": "true",
+          "profile": "release",
+          "target": "native x86_64 ARC runner"
+        },
+        "image_digest": null,
+        "repo": "isogeny-labs/crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "base_sizes": [
+          2,
+          3
+        ],
+        "selector_budget": 8,
+        "threshold": 4,
+        "walk_length": 8
+      },
+      "role": "candidate",
+      "same_instrument_as": "random"
+    },
+    {
+      "description": "Reference: accept a candidate iff the complete canonical trial pair-sum table has no collision; charge all trial work and reuse the final accepted table.",
+      "id": "collision_avoid",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "tools/twist-relations/Cargo.toml",
+            "--bin",
+            "twist-tr04"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "overflow_checks": "true",
+          "profile": "release",
+          "target": "native x86_64 ARC runner"
+        },
+        "image_digest": null,
+        "repo": "isogeny-labs/crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "base_sizes": [
+          2,
+          3
+        ],
+        "selector_budget": 8,
+        "walk_length": 8
+      },
+      "role": "reference",
+      "same_instrument_as": "random"
+    },
+    {
+      "description": "Auxiliary instrument fixture, not an eighth selector: p7,a0,b3,n13,G=(1,2),Q=G,base[(1,2),(2,2)], word GGQQGGGG must attain coefficient rank3 by prefix6; execute once per field job and retain controls.json.",
+      "id": "planted_rank",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "tools/twist-relations/Cargo.toml",
+            "--bin",
+            "twist-tr04"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "overflow_checks": "true",
+          "profile": "release",
+          "target": "native x86_64 ARC runner"
+        },
+        "image_digest": null,
+        "repo": "isogeny-labs/crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "a": 0,
+        "b": 3,
+        "base": [
+          {
+            "x": 1,
+            "y": 2
+          },
+          {
+            "x": 2,
+            "y": 2
+          }
+        ],
+        "expected_first_full_rank_prefix": 6,
+        "expected_rank": 3,
+        "g": {
+          "x": 1,
+          "y": 2
+        },
+        "n": 13,
+        "p": 7,
+        "q": {
+          "x": 1,
+          "y": 2
+        },
+        "word": "GGQQGGGG"
+      },
+      "role": "control_positive",
+      "same_instrument_as": "random"
+    },
+    {
+      "description": "Auxiliary nonvacuous fixed B2 fixture must have three distinct pair sums; each real shard also checks this for every completed canonical B2 base. This detects accidental selector-specific coverage claims at B2.",
+      "id": "b2_negative",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "tools/twist-relations/Cargo.toml",
+            "--bin",
+            "twist-tr04"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "overflow_checks": "true",
+          "profile": "release",
+          "target": "native x86_64 ARC runner"
+        },
+        "image_digest": null,
+        "repo": "isogeny-labs/crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "a": 0,
+        "b": 3,
+        "base": [
+          {
+            "x": 1,
+            "y": 2
+          },
+          {
+            "x": 2,
+            "y": 2
+          }
+        ],
+        "expected_pair_entries": 3,
+        "g": {
+          "x": 1,
+          "y": 2
+        },
+        "n": 13,
+        "p": 7
+      },
+      "role": "control_negative",
+      "same_instrument_as": "random"
+    }
+  ],
+  "authors": [
+    "TR-04 design and execution lane",
+    "independent verification lane"
+  ],
+  "claims": [
+    {
+      "class": "exact_computation",
+      "decided_by": [],
+      "id": "finite-census",
+      "if_not_supported": "Mark incomplete or invalid; retain partial records and missing-domain identities.",
+      "if_supported": "Report the reconciled finite census and its exact scope.",
+      "text": "The run exhausts exactly the declared finite coefficient, selector-word, public-target and eight-step relation-word domains, including failures and ineligible model dispositions."
+    },
+    {
+      "class": "comparative",
+      "decided_by": [
+        "twist_l1_vs_random",
+        "twist_l1_vs_collision_avoid",
+        "twist_l2_vs_random",
+        "twist_l2_vs_collision_avoid",
+        "twist_l3_vs_random",
+        "twist_l3_vs_collision_avoid",
+        "twist_l4_vs_random",
+        "twist_l4_vs_collision_avoid"
+      ],
+      "id": "within-model-tradeoff",
+      "if_not_supported": "Retain ties, worse cells, failed selectors and mixed tradeoffs; do not infer universal nonexistence.",
+      "if_supported": "Report only the identified finite cells and exact componentwise differences; no runtime, GAE, asymptotic, algebraic-track or ECDLP-solving claim.",
+      "text": "A twist selector may Pareto-improve the exact unconditional rank-survival distribution and declared paid-work vector for a specifically identified matched coefficient-model/base-size cell."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "planted_detection",
+        "b2_invariant"
+      ],
+      "id": "instrument-controls",
+      "if_not_supported": "Invalidate the affected shard and combined result.",
+      "if_supported": "Retain controls.json and independent verification receipts.",
+      "text": "The fixed positive-rank fixture and B2 negative-control fixture are detected and independently replayed before a field census can be accepted."
+    },
+    {
+      "class": "out_of_scope",
+      "decided_by": [],
+      "id": "outside-scope",
+      "text": "Universal twist advantage, arbitrary fields or walks, scalar recovery, algebraic index-calculus progress, admitted runtime gains, fastest-tool rankings, matched-rho advantage and resumable execution are outside this finite experiment."
+    }
+  ],
+  "controls": {
+    "aa": {
+      "comparison": null,
+      "not_applicable_reason": "The primary quantities are exact finite-population integers/rationals, not sampled estimates or clocks. Deterministic replay and a separate arithmetic/rank verifier must reproduce them exactly; a stochastic A/A noise interval is inapplicable. Development timing calibration is separate and cannot support an algorithm comparison.",
+      "present": false
+    },
+    "negative": {
+      "arm": "b2_negative",
+      "not_applicable_reason": null,
+      "null_population": {
+        "description": "The fixed nonvacuous B2 fixture plus all distinct canonical two-point bases reached in the declared eligible odd-prime groups.",
+        "generator": "Fixed p7,a0,b3 fixture and complete canonical-base census already present in each field shard; no random resampling.",
+        "matched_on": [
+          "canonical point signs and ordering",
+          "odd-prime group order",
+          "i<=j canonical pair sums",
+          "same production and independent pair-table checks"
+        ],
+        "n": 3,
+        "why_n": "Three actual field-job copies of the fixed fixture are required; all completed B2 bases add exact validation checks rather than sampled null replicates."
+      },
+      "present": true
+    },
+    "positive": {
+      "arm": "planted_rank",
+      "expected_detection": "Each field-job copy verifies the public GGQQGGGG fixture, whose prefix2/4/6 coefficient rows [2,0,0],[1,1,11],[0,2,11] have full rank3 over F13 by prefix6; independent arithmetic and batch-rank verification agree.",
+      "not_applicable_reason": null,
+      "present": true
+    }
+  },
+  "created": "2026-10-29",
+  "decision_rule": {
+    "comparison_ids": [
+      "twist_l1_vs_random",
+      "twist_l1_vs_collision_avoid",
+      "twist_l2_vs_random",
+      "twist_l2_vs_collision_avoid",
+      "twist_l3_vs_random",
+      "twist_l3_vs_collision_avoid",
+      "twist_l4_vs_random",
+      "twist_l4_vs_collision_avoid"
+    ],
+    "effect_size_measure": "Exact signed componentwise differences and rational ratios where denominators are nonzero; undefined ratios remain undefined.",
+    "interval": "Exact finite-population values; no sampling interval or p-value.",
+    "multiple_comparison_correction": "none",
+    "statistic": "Exact rational componentwise contrasts by model, B and fixed threshold; explicit counts of ties, worse cells and mixed tradeoffs.",
+    "text": "For each explicitly named matched eligible model/B cell, a twist arm is within-model Pareto-improved only if its unconditional P(rank>=r) is no lower for every rank r1..B+1 at every prefix0..8 and each unconditional expected total and rank-milestone paid-work vector is componentwise no greater than the stated IID reference, with at least one strict improvement. Expectations are exact sum/denominator ratios, not stochastic dominance of individual work values. Otherwise report tie, worse or mixed tradeoff exactly. Report every field/B/threshold separately and preserve all failing mass; do not choose L from pooled outcomes. Counter incompleteness forbids a physical runtime or complete GAE/ECDLP cost ranking.",
+    "threshold": "Componentwise exact weak improvement in every declared utility/work component and strict improvement in at least one, for a stated matched finite cell.",
+    "verdict_vocabulary": [
+      "within_model_pareto",
+      "tie_within_model",
+      "worse_within_model",
+      "mixed_tradeoff",
+      "invalid",
+      "incomplete"
+    ]
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "checkpoint": {
+      "after_restore": {
+        "counted_units": "valid",
+        "wall_time": "invalid"
+      },
+      "grace_seconds": null,
+      "interval_seconds": null,
+      "policy": "none",
+      "restore_validation": "none"
+    },
+    "measurement_class": "search",
+    "placement": {
+      "algorithm_threads_per_shard": 1,
+      "existing_runner_resources": "existing ARC runner resource and scaling caps; no new reservation or settings change",
+      "fail_fast": false,
+      "field_matrix": [
+        7,
+        11,
+        19
+      ],
+      "max_parallel": 3,
+      "readiness": "runner inventory and checkpoint secret readiness unverified until preflight",
+      "runner_label": "crypto-eks-linux",
+      "suite": "tr04",
+      "workflow": ".github/workflows/twist-relations.yml"
+    },
+    "queue": "crypto-eks-linux ARC runner scale set; existing Iso Lab EKS Spot",
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    },
+    "timeout_seconds": 1800
+  },
+  "extensions": {
+    "cost_model_gaps": [
+      "allocator and physical cache/branch cost",
+      "RNG internal bit-generation/rejection cost behind abstract random_draws",
+      "physical byte-level peak memory",
+      "audit DP/trie memoization, independent verification and serialization/evidence-IO overhead excluded from the modeled algorithm count vector"
+    ],
+    "development_preflight": {
+      "cache_count_ceilings": {
+        "p11": 1430,
+        "p19": 11352,
+        "p7": 222
+      },
+      "calibration": "preflight/calibration.json",
+      "calibration_sha256": "12baec892f3fdfd5a4bfd1e86ca687631c4fa5f6065c336eafc872a2d2825cd1",
+      "complete_primary_case_expectation": 1106,
+      "documentation": "PREFLIGHT.md",
+      "estimated_total_seconds": 3219,
+      "estimation_type": "Heuristic schedule planning from one known-control timing, exact public cache-count ceilings, width-cubic scaling,2x cache/IO margin and8x selector margin. Not a runtime theorem, admitted clock or solving advantage.",
+      "field_work_planning_envelopes_seconds": {
+        "p11": 100,
+        "p19": 1000,
+        "p7": 100
+      },
+      "fixed_seconds": 219,
+      "hard_field_timeout_seconds": 1800,
+      "helper": "preflight-helper/src/main.rs",
+      "helper_lock_sha256": "8cd835f8317dc216d60075f8c1ba07af3de613de040dc6dd775b779f256b59bc",
+      "helper_source_sha256": "c8dee26696da8ddfa34e16ad2d7beaf717e7e123b8d7a023a48f281fda01062a",
+      "per_sample_seconds": 1000,
+      "public_eligible_models": {
+        "p11": 20,
+        "p19": 51,
+        "p7": 8
+      },
+      "receipt": "preflight/estimate.json",
+      "receipt_sha256": "40befdadff8a9df7d22fa3e466b307e1ca94aae5cebef127ffa01a9d3fd27dfa",
+      "scope": "Public input configuration and fixed known-answer development timing only; no primary M8 selector, relation-rank or paid-work comparison census ran before freeze.",
+      "total_eligible_models": 79
+    },
+    "durable_evidence": {
+      "archive": "artifacts/tr04-delivery/run-<run-id>-attempt-<attempt>/runs.tar.xz",
+      "archive_inputs": "Actual preflight, field and aggregate directories, frozen protocol and input/source fingerprints; missing inputs and original failed statuses remain explicit.",
+      "github_retention": "tr04-delivery-<run>-<attempt> uploads only the narrow delivery directory, including hidden manifests/ignore rules and explicitly excluding raw archive/readback/.tmp payloads. Original raw GitHub artifacts remain separate even if store delivery fails.",
+      "launcher": "tools/twist-relations/run-tr04-delivery.sh",
+      "packing": "Deterministic GNU tar with sorted names, zero mtime, numeric uid/gid0 and normalized modes; xz single-thread.",
+      "preflight": "Require presence of existing ARTIFACTS_AWS_ACCESS_KEY_ID and ARTIFACTS_AWS_SECRET_ACCESS_KEY bindings before the primary census; presence does not prove authorization or store readiness.",
+      "qualification": "Unverified until an actual authorized run completes upload and fresh store readback. Stub AWS/filesystem tests are development checks only. No successful store transfer, independent remote download or cloud runner readiness is claimed before that receipt.",
+      "readback": "Copy only the tracked-pointer manifest into an empty verification directory; use a fresh ARTIFACTS_CACHE and ARTIFACTS_NO_READ_URL=1 for an actual store pull, then compare downloaded bytes. A cache hit or upload receipt alone is insufficient.",
+      "receipt": "delivery.json plus delivery-source.sha256, .artifacts.json and managed .gitignore record actual stage exits, hashes, byte counts, tool/policy/source identities and original aggregate/checkpoint outcomes.",
+      "transport": "Maintained tools/artifacts/artifacts.py explicit-file push to existing s3://setec-astronomy-artifacts/store; existing ARTIFACTS_* credentials only in post-analysis delivery step, with configured region/defaultus-west-2. No new identity, settings or bucket configuration."
+    },
+    "execution_state": "Draft pending source/analysis filing commit and canonical protocol freeze. Fixed development timing/public-input preflight and heuristic estimate are recorded before primary comparison data. Successful source/spec checkpoint gates and existing store-credential presence precede the primary census; actual artifact-store upload/fresh-readback acceptance occurs after analysis and remains unverified until its delivery receipt.",
+    "export_layout": {
+      "b_handling": "B2 and B3 retain separate metric/counter keys and raw model data within each selector field row; they are never averaged together.",
+      "comparison_cells": 42,
+      "control_rows": 6,
+      "instance_ids": [
+        "p7",
+        "p11",
+        "p19"
+      ],
+      "missing_shards_policy": "The 27-row table is complete acceptance only. Partial exports include actual attempted execution receipts; never fabricate attempts for unattempted missing shards. Retain expected27/missing IDs in backend metadata/observations; canonical flow reconciles actual rows and incomplete export exits nonzero.",
+      "selector_rows": 21,
+      "total_rows": 27
+    },
+    "finite_scope": {
+      "base_sizes": [
+        2,
+        3
+      ],
+      "canonical_generator": "smallest canonical original-curve point by x then y",
+      "coefficient_model_dispositions": 531,
+      "eligible": "nonsingular and prime original order n>=7",
+      "iid_domain": "Fp^8; every length8 word has equal multiplicity",
+      "pair_tie": "first lexicographic canonical i<=j pair per sum",
+      "point_sign": "canonical y=min(root,p-root)",
+      "primes": [
+        7,
+        11,
+        19
+      ],
+      "progression_domain": "every (x0,delta) in Fp x Fp*; candidate_j=x0+j*delta modp",
+      "relation_domain": "every Q!=O for canonical G and every word in {G,Q}^8, starting a=b=0",
+      "selector_budget": 8,
+      "thresholds": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "walk_length": 8
+    },
+    "source_checkpoint": "Source/spec/lead S3 preflight and per-field start gates are mandatory before each census begins. Each field attempts a finish checkpoint retaining its actual native outcome and partial outputs; aggregate attempts an evidence checkpoint after reporting. Per-run/attempt/field/phase prefixes prevent collisions; checkpoint failure fails the job without replacing the original native failure. Maintained transport file-size/total-size caps apply, and abrupt Spot pod loss may prevent final upload. These source/evidence checkpoints are independent of execution.checkpoint.policy none because process-memory/application resume is not implemented.",
+    "track": "generic decomposition (bounded by sqrt(r); cannot beat rho)"
+  },
+  "freeze": {
+    "commit": "445d84bf7f57750e0e34bd7a65992c36c0da92ec",
+    "filed_before_affected_data": true,
+    "frozen_at": "2026-10-29T22:18:02Z",
+    "protocol_sha256": "bbfdd9109f37523198ced6ff25f7d50d28b373ee36249e7c8b9a01a0171aadea",
+    "status": "frozen"
+  },
+  "inadmissible": [
+    "Calling p^8 subset-state DP elapsed time the runtime of a selector, or memoized relation-audit elapsed time the cold relation finder.",
+    "Dropping rejected candidates, incomplete bases, rank-budget failures, ineligible model dispositions or interrupted shards.",
+    "Survivor-only means, free full-field character tables, or known scalar/base-log oracle data inside selection or relation search.",
+    "Treating raw hits, bigger sumsets or rank of the augmented RHS as independent coefficient-rank improvement.",
+    "Pooling fields or B values to select a threshold after observing data.",
+    "Adding unlike primitive counts into a physical-time or complete GAE claim; allocator/cache/branch/RNG-internal and byte-peak-memory prices remain unmeasured.",
+    "Claiming algebraic-track progress, sub-rho or generic-curve/asymptotic security consequences from the generic pair-table census.",
+    "Changing an existing frozen protocol, raw record or scientific ledger in place after affected data are taken.",
+    "Calling source/evidence S3 checkpoint retention process-memory recovery or automatic resumability."
+  ],
+  "invalidation_rules": [
+    "The canonical export must have exactly27 logical rows:9 arms x3 identical field instance IDs x1 replicate;42 selector comparison cells retain B2/B3 separately inside21 selector rows, plus6 actual control rows.",
+    "All531 coefficient-model dispositions must be present across complete field shards.",
+    "The source/protocol hash and per-file manifest must reconcile before interpreting any comparison."
+  ],
+  "links": {
+    "backlog_card": "backlog/XP-20261029-twist-factor-base",
+    "base_commit": "24def3ae4dfe94bbbee5f30245847b372d02fa70",
+    "implementation": "tools/twist-relations",
+    "prior_implementation_pr": "https://github.com/isogeny-labs/crypto/pull/2815",
+    "prior_validation_pr": "https://github.com/isogeny-labs/crypto/pull/2857",
+    "protocol_schema_source": "isogeny-labs/crypto-autoresearcher:schemas/experiment-protocol.v1.json",
+    "workflow": ".github/workflows/twist-relations.yml"
+  },
+  "literature": [
+    {
+      "claim": "Short-Weierstrass group law, inverse/identity/doubling cases and public point validation define the arithmetic contract.",
+      "provenance": "retrieved",
+      "ref": "https://www.secg.org/sec1-v2.pdf section2.2.1",
+      "verified_by": "Parent source review; downloaded for this task."
+    },
+    {
+      "claim": "Existing native-port primary-source review supplies the signed-addition/summation-polynomial context. Its extension-field results are not prime-field speedup evidence here.",
+      "provenance": "internal",
+      "ref": "https://doi.org/10.1112/S0010437X10005075, Diem, On the discrete logarithm problem in elliptic curves, section3",
+      "verified_by": "Existing tools/twist-relations source notes and prior port review."
+    },
+    {
+      "claim": "Primary PDF fetch returned HTTP403; no novel theorem or efficiency result is inferred from this inaccessible source.",
+      "provenance": "retrieved",
+      "ref": "https://eprint.iacr.org/2004/031",
+      "verified_by": "Parent retained failed fetch; scope gap recorded."
+    },
+    {
+      "claim": "Existing TR01-03 correctness fixtures, generic-decomposition classification, transfer limits and accounting boundaries remain separate from this new finite census.",
+      "provenance": "internal",
+      "ref": "tools/twist-relations/README.md; backlog/XP-20261029-twist-factor-base/PROTOCOL.md; docs/endomorphism-rules.md"
+    },
+    {
+      "claim": "crypto-eks-linux is the existing ephemeral ARC EKS Spot route for this standalone native workload; no L2 admission or new runner/IAM configuration is implied.",
+      "provenance": "internal",
+      "ref": "taskq/deploy/eks-karpenter/arc/README.md; .agents/skills/isolab-eks/SKILL.md"
+    }
+  ],
+  "measurement": {
+    "clock": "counted",
+    "counters": [
+      "candidate_reads",
+      "random_draws",
+      "character_tests",
+      "square_roots",
+      "group_additions",
+      "field_adds",
+      "field_muls",
+      "field_reductions",
+      "field_inversions",
+      "field_exponent_bits",
+      "duplicate_checks",
+      "point_comparisons",
+      "coordinate_comparisons",
+      "table_lookups",
+      "table_inserts",
+      "table_collisions",
+      "linear_cells",
+      "linear_adds",
+      "linear_muls",
+      "linear_reductions",
+      "linear_inversions",
+      "linear_exponent_bits"
+    ],
+    "isolation_required": "L0",
+    "order": "sequential",
+    "record": [
+      "immutable source commit",
+      "compiled source and binary SHA-256",
+      "frozen protocol hash",
+      "workflow/run/job IDs and attempt",
+      "runner name/label/host facts",
+      "all model dispositions",
+      "selector/rank domain denominators",
+      "exact decimal-string weighted counts",
+      "independent verification coverage and result",
+      "partial/incomplete manifest and error metadata when applicable"
+    ],
+    "timed_primary_justification": null,
+    "warmups": 0
+  },
+  "metrics": {
+    "primary": [
+      {
+        "aggregation": "distribution",
+        "definition": "For each fixed eligible model and B, count every candidate word, nonzero target and relation word uniformly within its declared population. Selector failures contribute rank0. Report P(rank>=r) for every r1..B+1 and every prefix, with full-rank absorption.",
+        "formula": null,
+        "id": "rank_survival",
+        "kind": "rate",
+        "name": "Unconditional coefficient-rank survival",
+        "resolution": "Exact integer or rational; large integers serialized as decimal strings.",
+        "source": "per-cell selector weights combined with relation rank_hist_by_prefix",
+        "uncertainty": "none_exact",
+        "unit": "exact rational probability for each rank/prefix"
+      },
+      {
+        "aggregation": "mean",
+        "definition": "Charge candidate reads/draws, characters, roots, field operations, duplicate/order checks, trial tables, pair setup, query search, elimination and public relation verification to every conceptual cold execution; for each rank milestone use first-attainment work or full-budget work when missing. Compare exact unconditional sum/denominator expectations, retaining sums and attained/missing partitions, not a distribution of individual work values. Never average only survivors.",
+        "formula": null,
+        "id": "paid_work",
+        "kind": "counted",
+        "name": "Unconditional paid-work vector",
+        "resolution": "Exact integer or rational; large integers serialized as decimal strings.",
+        "source": "selection outcomes work_sum plus weighted relation total_work_sum and milestone work_sum",
+        "uncertainty": "none_exact",
+        "unit": "native primitive counts, separately by unit"
+      }
+    ],
+    "secondary": [
+      {
+        "aggregation": "distribution",
+        "definition": "Number of full B-point selector outcomes divided by all length8 IID words, or all p(p-1) progression words. Every incomplete base is a retained failure.",
+        "formula": null,
+        "id": "selector_success",
+        "kind": "rate",
+        "name": "Selector completion mass",
+        "resolution": "Exact integer or rational; large integers serialized as decimal strings.",
+        "source": "selection outcomes ways, total_words, base length",
+        "uncertainty": "none_exact",
+        "unit": "exact rational probability"
+      },
+      {
+        "aggregation": "distribution",
+        "definition": "Canonical first-pair table cardinality for each completed base; B2 must equal3. This is a coverage endpoint, not a runtime gain.",
+        "formula": null,
+        "id": "pair_coverage",
+        "kind": "exact",
+        "name": "Distinct pair-sum inventory",
+        "resolution": "Exact integer or rational; large integers serialized as decimal strings.",
+        "source": "RelationAudit.pair_table_entries",
+        "uncertainty": "none_exact",
+        "unit": "distinct group elements"
+      },
+      {
+        "aggregation": "distribution",
+        "definition": "For each rank, retain attained and missing word counts, first-prefix histogram and unconditional paid-work vector including missing cases.",
+        "formula": null,
+        "id": "rank_milestones",
+        "kind": "exact",
+        "name": "First-rank milestone census",
+        "resolution": "Exact integer or rational; large integers serialized as decimal strings.",
+        "source": "RelationAudit.milestones",
+        "uncertainty": "none_exact",
+        "unit": "exact integer/rational distributions"
+      },
+      {
+        "aggregation": "sum",
+        "definition": "Retain every singular, composite-order, too-small-order and eligible model disposition across the531 declared models.",
+        "formula": null,
+        "id": "model_dispositions",
+        "kind": "exact",
+        "name": "Coefficient-model census",
+        "resolution": "Exact integer or rational; large integers serialized as decimal strings.",
+        "source": "shard model-disposition census",
+        "uncertainty": "none_exact",
+        "unit": "coefficient models"
+      },
+      {
+        "aggregation": "per_row",
+        "definition": "The positive-rank and nonvacuous B2 fixtures must pass on every field shard; actual receipts appear as six auxiliary export rows.",
+        "formula": null,
+        "id": "controls_passed",
+        "kind": "exact",
+        "name": "Instrument fixture status",
+        "resolution": "Exact integer or rational; large integers serialized as decimal strings.",
+        "source": "controls.json and independent verification receipts",
+        "uncertainty": "none_exact",
+        "unit": "0 or1 per auxiliary control and field job"
+      }
+    ]
+  },
+  "protocol_id": "TR04-exhaustive-twist-relations-20261029",
+  "question": "Within the complete declared tiny-field candidate and relation-word populations, can a bounded public twist-threshold selector improve independent original-curve relation rank without increasing the declared paid-work vector relative to matched ordinary selectors?",
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "All primary quantities are exact operation-count distributions from the same pure interpreter. Fixed lexicographic traversal cannot allocate a cold-start clock cost to an arm; no elapsed-time comparison is admitted.",
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "The full exact census and frozen arithmetic comparisons are reported without data-dependent thresholds or model fitting; no analyst blinding claim is made.",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "No sampling. All 49+121+361 coefficient-model dispositions across p7,p11,p19, both B2/B3 values, all declared selector inputs and all declared public relation inputs are enumerated. Isomorphic models remain separately identified; they are not statistical independent draws."
+    },
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "There is no random seed draw: the frozen enumerator exhausts every IID candidate word in Fp^8 by weighted state DP, every affine progression start/nonzero-step, every nonzero public target, and every binary relation word in {G,Q}^8. Field IDs p7,p11,p19 identify the three export instances."
+    }
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "graphs": [
+      "workflow.svg",
+      "recorded-value quantitative SVG after execution"
+    ],
+    "report_dir": "research/twist_relations_tr04_20261029/reports",
+    "review_schema": "experiment.review/v1"
+  },
+  "repository": "crypto",
+  "sample_size": {
+    "instances": 3,
+    "power": {
+      "alpha": 0.05,
+      "correction": "none",
+      "method": "exact",
+      "min_attainable_two_sided_p": null,
+      "note": "Complete finite populations, not sampled statistical tests. Alpha is a schema-required placeholder and is unused. The single predeclared componentwise decision family has no p-values or sampling intervals; no power or generic-curve generalization is claimed.",
+      "passes": true,
+      "rank_test_n": null,
+      "tests_in_family": 1
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": 3219,
+      "fixed_seconds": 219,
+      "measured_on": "Development planning only: existing p7,a0,b3,B2,M3 selector timing plus known-control audit/replay13,430,371ns (preflight/calibration.json); observed fresh helper/native-dependency build36.88s and final native checks34s. Local clocks have no L2/physical-host admission. PREFLIGHT.md and preflight/estimate.json retain derivation. per_sample is the maximum1000s heuristic field-work envelope covering all9 logical arms, not a measured row or a guaranteed bound; fixed219 plus3*1000=3219 serial planning seconds. Actual field job cap remains1800s.",
+      "per_sample_seconds": 1000,
+      "threads": 1
+    },
+    "replicates": 1,
+    "warmups": 0
+  },
+  "schema": "experiment.protocol/v1",
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "Complete the full three-field finite domain and all declared model dispositions, selector populations, target/query-word populations and control receipts; no stopping because a result appears favorable."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "A selector stops upon B distinct accepted points or eight visited candidates; unread suffixes preserve probability mass without work. A relation case stops at coefficient rank B+1 or eight G/Q increments."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "Each physical field job has the fixed1800-second job deadline. Preserve partial output and identify missing cells if interrupted; no automatic retry, no interpreting an incomplete manifest as a pass."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "An invalid point/relation, cost/census overflow or reconciliation failure, missing mandatory control, independent-verifier mismatch, missing shard, source/protocol identity mismatch or checkpoint-gate failure invalidates the affected result."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "Complete durable delivery requires the deterministic raw archive, maintained store push, pointer manifest, fresh-cache store download and byte comparison. A delivery failure leaves end-to-end completion open even if a finite census completed; preserve raw records, missing inputs and original computation/checkpoint failures. Never count a local transport stub or cache read as actual remote readback."
+    }
+  ],
+  "study_dir": "research/twist_relations_tr04_20261029",
+  "variable_ledger": {
+    "aa_not_applicable": "Exact finite population; no timed primary or stochastic sampling noise.",
+    "comparisons": [
+      {
+        "arms": [
+          "random",
+          "twist_l1"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "selector"
+        ],
+        "id": "twist_l1_vs_random",
+        "reason": "The IID candidate-word universe, public instances, relation-word universe, sign/tie policy, budget and instrument are identical. Only the complete selector algorithm changes."
+      },
+      {
+        "arms": [
+          "collision_avoid",
+          "twist_l1"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "selector"
+        ],
+        "id": "twist_l1_vs_collision_avoid",
+        "reason": "The IID candidate-word universe, public instances, relation-word universe, sign/tie policy, budget and instrument are identical. Only the complete selector algorithm changes."
+      },
+      {
+        "arms": [
+          "random",
+          "twist_l2"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "selector"
+        ],
+        "id": "twist_l2_vs_random",
+        "reason": "The IID candidate-word universe, public instances, relation-word universe, sign/tie policy, budget and instrument are identical. Only the complete selector algorithm changes."
+      },
+      {
+        "arms": [
+          "collision_avoid",
+          "twist_l2"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "selector"
+        ],
+        "id": "twist_l2_vs_collision_avoid",
+        "reason": "The IID candidate-word universe, public instances, relation-word universe, sign/tie policy, budget and instrument are identical. Only the complete selector algorithm changes."
+      },
+      {
+        "arms": [
+          "random",
+          "twist_l3"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "selector"
+        ],
+        "id": "twist_l3_vs_random",
+        "reason": "The IID candidate-word universe, public instances, relation-word universe, sign/tie policy, budget and instrument are identical. Only the complete selector algorithm changes."
+      },
+      {
+        "arms": [
+          "collision_avoid",
+          "twist_l3"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "selector"
+        ],
+        "id": "twist_l3_vs_collision_avoid",
+        "reason": "The IID candidate-word universe, public instances, relation-word universe, sign/tie policy, budget and instrument are identical. Only the complete selector algorithm changes."
+      },
+      {
+        "arms": [
+          "random",
+          "twist_l4"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "selector"
+        ],
+        "id": "twist_l4_vs_random",
+        "reason": "The IID candidate-word universe, public instances, relation-word universe, sign/tie policy, budget and instrument are identical. Only the complete selector algorithm changes."
+      },
+      {
+        "arms": [
+          "collision_avoid",
+          "twist_l4"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "selector"
+        ],
+        "id": "twist_l4_vs_collision_avoid",
+        "reason": "The IID candidate-word universe, public instances, relation-word universe, sign/tie policy, budget and instrument are identical. Only the complete selector algorithm changes."
+      },
+      {
+        "arms": [
+          "random",
+          "progression"
+        ],
+        "design": "confounded",
+        "differs_in": [
+          "selector",
+          "candidate_word_family"
+        ],
+        "id": "progression_context",
+        "reason": "The progression control intentionally changes the candidate-word distribution as well as the provider strategy. It is contextual algorithm evidence and cannot isolate a twist-character effect."
+      },
+      {
+        "arms": [
+          "planted_rank"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "planted_detection",
+        "threshold": "All three field-job copies of the fixed public fixture attain rank3 by prefix6 and independently replay its public relations."
+      },
+      {
+        "arms": [
+          "b2_negative"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "b2_invariant",
+        "threshold": "The fixed nonvacuous B2 fixture and every completed B2 audit have exactly3 distinct canonical pair sums."
+      }
+    ],
+    "crosses_map": false,
+    "factors": [
+      {
+        "how": "Pin final source and analysis hash before launch; record binary/source hashes in all shards.",
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "same source, binary and deterministic primitive interpreter for every comparison arm"
+      },
+      {
+        "how": "All models enumerated in fixed lexicographic order; singular, composite-order and n<7 dispositions remain explicit.",
+        "name": "coefficient_models",
+        "treatment": "crossed",
+        "value": "Every a,b in each Fp; 531 dispositions"
+      },
+      {
+        "how": "Enumerate targets by public additions; the selector and relation finder receive no scalar labels or base-log oracle.",
+        "name": "public_targets",
+        "treatment": "crossed",
+        "value": "Every nonzero Q for canonical G"
+      },
+      {
+        "how": "Use the identical complete query-word population for every selector outcome; stop only at full coefficient rank or the fixed word horizon.",
+        "name": "relation_words",
+        "treatment": "crossed",
+        "value": "All 256 binary G/Q words length8 from a=b=0"
+      },
+      {
+        "how": "Each visited candidate consumes one read; complete states are absorbing and unused suffixes add multiplicity without paid work.",
+        "name": "candidate_budget",
+        "treatment": "fixed",
+        "value": 8
+      },
+      {
+        "how": "Every arm uses the same canonical representation; charge comparisons, insertions and pair-table work.",
+        "name": "point_sign_and_table_ties",
+        "treatment": "fixed",
+        "value": "y=min(root,p-root), canonical x/y base order; first lexicographic i<=j pair per sum"
+      },
+      {
+        "how": "All four thresholds are declared before data and reported separately; no winner is chosen by pooling fields or B values.",
+        "name": "thresholds",
+        "treatment": "fixed",
+        "value": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "how": "Retain workflow/job/source/runner identities and host facts. No execution clock is an algorithm metric.",
+        "name": "host_and_runtime",
+        "treatment": "measured",
+        "value": "crypto-eks-linux ARC EKS Spot; L0 operation-count audit"
+      },
+      {
+        "how": "Preserve multiplicities and conceptual cold-execution costs. DP/trie/verification elapsed work is audit overhead, not selector runtime.",
+        "name": "audit_acceleration",
+        "treatment": "fixed",
+        "value": "Exact subset-state DP, relation prefix trie, and repeated-base memoization"
+      },
+      {
+        "how": "No label-dependent fitting or significance test; compare all fixed arms and every cell under the frozen componentwise rule.",
+        "name": "analyst_and_labels",
+        "treatment": "fixed",
+        "value": "Unmasked preregistered exact analysis"
+      }
+    ],
+    "independent": [
+      {
+        "levels": [
+          "random",
+          "progression",
+          "twist_l1",
+          "twist_l2",
+          "twist_l3",
+          "twist_l4",
+          "collision_avoid"
+        ],
+        "name": "selector"
+      },
+      {
+        "levels": [
+          7,
+          11,
+          19
+        ],
+        "name": "field"
+      },
+      {
+        "levels": [
+          2,
+          3
+        ],
+        "name": "base_size"
+      },
+      {
+        "levels": [
+          "IID length8 over Fp",
+          "all affine start/nonzero-step length8"
+        ],
+        "name": "candidate_word_family"
+      }
+    ],
+    "transfer_obligations": []
+  },
+  "version": 1
+}
