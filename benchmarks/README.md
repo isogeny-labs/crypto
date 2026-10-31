@@ -43,6 +43,15 @@ remains outside this table pending validation admission.
 The [retained cross-layout screen](N83_CROSSLAYOUT_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
+The [31 October gap80 native-helper and partial-tile diagnostics](20261031-gap80-native-diagnostic/)
+retain documentary run/results PDFs and SVG/PNG copies. Historical medians
+were 0.469961 → 0.395023 s and 2.453493 → 2.087622 s for native helper
+degrees 4,096/16,384 (seven unpinned pairs), and 3.735434 → 3.431381 s for
+one repeated partial tile (three CPU-0 pairs). These remain outside the
+admitted table: no independent timing replay, matched rho reference or
+completed 80-bit isogeny is supplied. The linked study preserves the native
+code and historical Sage provenance without promoting a benchmark row.
+
 The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
