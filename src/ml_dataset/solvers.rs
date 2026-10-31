@@ -6114,7 +6114,7 @@ mod verified_worker_original_tests {
             Self::with_shape(23, false, 2)
         }
         pub(super) fn with_shape(n: u32, twist: bool, factor_base_size: usize) -> Self {
-            Self::with_profile(n, twist, factor_base_size, "enumerate", 100, false)
+            Self::with_profile(n, twist, factor_base_size, "enumerate", 100, false, false)
         }
         /// Actual frozen software-control plan; no edits to a live attempt.
         pub(super) fn with_runtime_shape(
@@ -6123,7 +6123,15 @@ mod verified_worker_original_tests {
             factor_base_size: usize,
             solver: &str,
         ) -> Self {
-            Self::with_profile(n, twist, factor_base_size, solver, 16384, true)
+            Self::with_profile(n, twist, factor_base_size, solver, 16384, true, false)
+        }
+        pub(super) fn with_positive_runtime_shape(
+            n: u32,
+            twist: bool,
+            factor_base_size: usize,
+            solver: &str,
+        ) -> Self {
+            Self::with_profile(n, twist, factor_base_size, solver, 16384, true, true)
         }
         fn with_profile(
             n: u32,
@@ -6132,6 +6140,7 @@ mod verified_worker_original_tests {
             solver: &str,
             work_limit: u64,
             execution_required: bool,
+            positive_control: bool,
         ) -> Self {
             let nonce = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
@@ -6141,6 +6150,17 @@ mod verified_worker_original_tests {
                 .join(format!("verified-worker-{}-{nonce}", std::process::id()));
             fs::create_dir(&root).unwrap();
             let mut protocol = json!({"schema":"experiment.protocol/v1", "purpose":"verified worker input software controls"});
+            if positive_control {
+                protocol["software_control"] = json!({
+                    "population":"conditioned-positive-pdp-software-control",
+                    "field_degree":23,
+                    "target_rule":"first nonzero retained factor-base point P; valid tuple P,P,-P",
+                    "known_answer_rule":"bounded native-arithmetic BSGS relative to unchanged original generator, then independent curves::verify",
+                    "bsgs_baby_slot_cap":4096,
+                    "freeze_boundary":"control rule before generation; all original bytes final before token/capture admission",
+                    "root_failure_rule":"conflicting raw pdp-witness.json before producer entry"
+                });
+            }
             let body = dataset::protocol_canonical_bytes(&protocol).unwrap();
             protocol["freeze"] = json!({"status":"frozen", "protocol_sha256":dataset::digest(&body), "filed_before_affected_data":true, "frozen_at":"2026-10-31T00:00:00Z"});
             let bytes = serde_json::to_vec(&protocol).unwrap();

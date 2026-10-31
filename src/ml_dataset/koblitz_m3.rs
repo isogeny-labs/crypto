@@ -11560,13 +11560,29 @@ pub(super) fn verify_worker_cell(
             }
         }
     }
-    let witness_artifact = artifact(
-        artifacts,
-        "pdp-witness.json",
-        "independently-verified-pdp",
-        "json",
-        false,
-    )?;
+    let witness_candidates: Vec<_> = artifacts
+        .iter()
+        .filter(|a| a.path == "pdp-witness.json" || a.role == "independently-verified-pdp")
+        .collect();
+    let witness_artifact = match witness_candidates.as_slice() {
+        [] => None,
+        [a] if a.path == "pdp-witness.json"
+            && a.role == "independently-verified-pdp"
+            && a.encoding == "json" =>
+        {
+            Some(*a)
+        }
+        // The collector preserves a conflicting, unacknowledged root as raw
+        // custody. Its bytes were manifest-checked above and are never used as
+        // proof. A separately authenticated live witness may still survive.
+        [a] if a.path == "pdp-witness.json"
+            && a.role == "unregistered-partial-artifact"
+            && a.encoding == "native" =>
+        {
+            None
+        }
+        _ => return Err("Koblitz witness root identity/uniqueness mismatch".into()),
+    };
     let captured_witness = prefix.as_ref().and_then(|p| {
         p.payloads
             .iter()
@@ -11891,10 +11907,22 @@ mod worker_central_replay_tests {
 
     #[test]
     fn frozen_worker_f4_f5_twists_replay_complete_and_input_storage_failure() {
+        frozen_worker_cases_at_field(23);
+    }
+
+    #[test]
+    fn frozen_wide_worker_f4_f5_twists_replay_complete_and_input_storage_failure() {
+        for n in [47, 61] {
+            frozen_worker_cases_at_field(n);
+        }
+    }
+
+    fn frozen_worker_cases_at_field(n: u32) {
         for solver in ["f4", "f5"] {
             for twist in [false, true] {
                 for root_collision in [false, true] {
-                    let f = Fixture::with_runtime_shape(23, twist, 4, solver);
+                    eprintln!("frozen software control n={n} solver={solver} twist={twist} input_root_collision={root_collision}");
+                    let f = Fixture::with_runtime_shape(n, twist, 4, solver);
                     let capture_limits = capture::capture_limits(128).unwrap();
                     let mut registry = vec![telemetry::checked::install_policy(&f.root).unwrap()];
                     registry.push(
@@ -12096,8 +12124,22 @@ mod worker_central_replay_tests {
 
     #[test]
     fn real_worker_dispatches_frozen_f4_f5_and_replays_stored_receipts() {
+        real_worker_cases_at_field(23, false);
+    }
+
+    #[test]
+    fn real_wide_worker_dispatches_frozen_f4_f5_twists_and_replays_stored_receipts() {
+        for n in [47, 61] {
+            for twist in [false, true] {
+                real_worker_cases_at_field(n, twist);
+            }
+        }
+    }
+
+    fn real_worker_cases_at_field(n: u32, twist: bool) {
         for solver in ["f4", "f5"] {
-            let f = Fixture::with_runtime_shape(23, false, 4, solver);
+            eprintln!("actual worker software control n={n} solver={solver} twist={twist}");
+            let f = Fixture::with_runtime_shape(n, twist, 4, solver);
             let limits = capture::capture_limits(128).unwrap();
             telemetry::checked::install_policy(&f.root).unwrap();
             storage::write_json(
@@ -12502,4 +12544,291 @@ fn verify_reported_capture_finalization(outcome: &serde_json::Value) -> Result<(
         return Err("inconsistent reported capture finalization".into());
     }
     Ok(())
+}
+// Append inside koblitz_m3.rs. Requires positive fixture and witness collision
+// patches. These are conditioned software controls, not unconditioned samples.
+#[cfg(test)]
+mod positive_original_bound_worker_tests {
+    use super::*;
+    use crate::ml_dataset::solvers::{self, verified_worker_original_tests::Fixture};
+    use crate::ml_dataset::{self as dataset, capture, execution, storage, telemetry};
+    use serde_json::json;
+
+    fn positive_original(
+        config: &crate::ml_dataset::types::CaseConfig,
+    ) -> Result<crate::ml_dataset::types::CaseData, String> {
+        if config.n != 23 || config.m != 3 || config.factor_base_size != 4 {
+            return Err("positive software control is fixed at n23/m3/fb4".into());
+        }
+        let mut case = solvers::curves::generate(config)?;
+        let arithmetic = solvers::curves::arithmetic(&case.public_instance)?;
+        let generator = solvers::curves::point_words(&case.public_instance["generator"])?;
+        let point = solvers::curves::point_words(&case.factor_base["points"][0])?;
+        if point.is_none() || generator.is_none() {
+            return Err("positive control requires nonzero points".into());
+        }
+        let order: u64 = case.public_instance["curve"]["subgroup_order"]
+            .as_str()
+            .ok_or("missing subgroup order")?
+            .parse()
+            .map_err(|_| "invalid subgroup order")?;
+        let mut width = 1u64;
+        while width.checked_mul(width).ok_or("BSGS width overflow")? < order {
+            width += 1;
+            if width > 4096 {
+                return Err("positive setup exceeds frozen BSGS slot cap".into());
+            }
+        }
+        let mut baby = std::collections::HashMap::new();
+        baby.try_reserve(width as usize)
+            .map_err(|e| e.to_string())?;
+        let mut q = None;
+        for j in 0..width {
+            if baby.insert(q, j).is_some() {
+                return Err("duplicate positive BSGS baby point".into());
+            }
+            q = arithmetic.add(q, generator);
+        }
+        let backwards = arithmetic.neg(arithmetic.mul(generator, width));
+        let mut giant = point;
+        let mut scalar = None;
+        let mut giant_probes = 0u64;
+        let mut giant_additions = 0u64;
+        for i in 0..=width {
+            giant_probes += 1;
+            if let Some(&j) = baby.get(&giant) {
+                let candidate = i
+                    .checked_mul(width)
+                    .and_then(|v| v.checked_add(j))
+                    .ok_or("BSGS scalar overflow")?;
+                if candidate > 0
+                    && candidate < order
+                    && arithmetic.reference_mul(generator, candidate) == point
+                {
+                    scalar = Some(candidate);
+                    break;
+                }
+            }
+            giant = arithmetic.add(giant, backwards);
+            giant_additions += 1;
+        }
+        let scalar = scalar.ok_or("frozen positive target logarithm was not recovered")?;
+        let negative = arithmetic.neg(point);
+        if !case.factor_base["points"]
+            .as_array()
+            .ok_or("missing factor base")?
+            .iter()
+            .any(|p| solvers::curves::point_words(p).ok() == Some(negative))
+        {
+            return Err("positive control lacks retained negative summand".into());
+        }
+        let sum = arithmetic.reference_add(arithmetic.reference_add(point, point), negative);
+        if sum != point {
+            return Err("positive reference PDP tuple failed".into());
+        }
+        // All changes precede persistence/token/capture. Preserve generator,
+        // generator construction provenance and the complete original factor base.
+        case.private_witness["unconditioned_scalar_before_software_control"] =
+            case.private_witness["scalar"].clone();
+        case.private_witness["unconditioned_target_before_software_control"] =
+            case.public_instance["target"].clone();
+        case.private_witness["scalar"] = scalar.to_string().into();
+        case.private_witness["software_control"] = json!({
+            "rule":"first retained factor-base point target; native BSGS then independent scalar replay",
+            "baby_slot_cap":4096,"baby_slots":width,
+            "baby_additions":width,"giant_probe_cap":width+1,
+            "giant_probes":giant_probes,"giant_additions":giant_additions,
+            "accounting_scope":"software-control setup loop counts only; scalar multiplications and independent replay are additional; not producer timings or total instructions",
+            "feature_access":"forbidden"
+        });
+        case.public_instance["target"] = solvers::curves::point_json(point);
+        case.public_instance["population"] = "conditioned-positive-pdp-software-control".into();
+        case.public_instance["sampling"]["algorithm"] =
+            "deterministic-first-factor-base-point-target".into();
+        case.public_instance["sampling"]["scalar_domain"] =
+            "restricted known answer recovered for the fixed positive software target".into();
+        // Independent general library multiplication validates the fast setup.
+        solvers::curves::verify(&case.public_instance, &case.private_witness)?;
+        solvers::curves::verify_factor_base(&case.public_instance, &case.factor_base)?;
+        Ok(case)
+    }
+
+    #[test]
+    fn positive_original_bound_workers_keep_captured_witness_when_root_collides() {
+        for solver in ["f4", "f5"] {
+            for twist in [false, true] {
+                let f = Fixture::with_positive_runtime_shape(23, twist, 4, solver);
+                let protocol: serde_json::Value =
+                    dataset::read_json(&f.root.join("protocol.json")).unwrap();
+                assert_eq!(protocol["software_control"]["bsgs_baby_slot_cap"], 4096);
+                let limits = capture::capture_limits(128).unwrap();
+                let mut registry = vec![telemetry::checked::install_policy(&f.root).unwrap()];
+                registry.push(
+                    storage::write_json(
+                        &f.root,
+                        "capture-binding.json",
+                        "partial-capture-binding",
+                        &f.binding,
+                    )
+                    .unwrap(),
+                );
+                registry.push(
+                    storage::write_json(
+                        &f.root,
+                        "capture-limits.json",
+                        "partial-capture-limits",
+                        &limits,
+                    )
+                    .unwrap(),
+                );
+                let original_launch = execution::create(&f.root).unwrap();
+                let context = execution::admit(&f.root).unwrap().unwrap();
+                let case =
+                    telemetry::measured(&f.root, &mut registry, "curve-construction", || {
+                        positive_original(&f.config)
+                    })
+                    .unwrap();
+                let token = solvers::verify_and_store_worker_originals(
+                    &f.config,
+                    &case,
+                    &f.root,
+                    Some(&f.binding),
+                    &mut registry,
+                )
+                .unwrap();
+                let original_bytes: Vec<_> = [
+                    "public.json",
+                    "witness.json",
+                    "factor-base.json",
+                    "config.json",
+                ]
+                .iter()
+                .map(|name| (*name, std::fs::read(f.root.join(name)).unwrap()))
+                .collect();
+                let conflict = b"positive software-control witness-root collision";
+                std::fs::write(f.root.join("pdp-witness.json"), conflict).unwrap();
+                assert!(solvers::LIVE_SINK.with(|slot| slot.borrow().is_none()));
+                let output = telemetry::measured(&f.root, &mut registry, "solver", || {
+                    solvers::solve_with_verified_worker_originals(
+                        &f.config,
+                        &case,
+                        &f.root.join("live"),
+                        f.binding.clone(),
+                        limits.clone(),
+                        Some(&context),
+                        &token,
+                    )
+                })
+                .unwrap();
+                assert!(solvers::LIVE_SINK.with(|slot| slot.borrow().is_none()));
+                let (data, roots) = output.into_parts();
+                assert!(data.artifacts.is_empty());
+                assert!(roots.iter().all(|a| a.path != "pdp-witness.json"));
+                for a in roots {
+                    assert!(!registry.iter().any(|old| old.path == a.path));
+                    registry.push(a);
+                }
+                assert_eq!(data.outcome["retained_pdp_witness_verified"], true);
+                assert_eq!(data.outcome["pdp_witness_verified"], false);
+                assert_eq!(data.outcome["certificate_durably_persisted"], false);
+                assert_eq!(data.outcome["solver_completed"], false);
+                storage::write_json(&f.root, "result.json", "solver-outcome", &data.outcome)
+                    .unwrap();
+                storage::write_json(
+                    &f.root,
+                    "worker-artifacts.json",
+                    "artifact-registry",
+                    &registry,
+                )
+                .unwrap();
+                let artifacts = dataset::collect_cell_artifacts(&f.root).unwrap();
+                let raw = artifacts
+                    .iter()
+                    .find(|a| a.path == "pdp-witness.json")
+                    .unwrap();
+                assert_eq!(raw.role, "unregistered-partial-artifact");
+                assert_eq!(raw.encoding, "native");
+                assert_eq!(
+                    std::fs::read(f.root.join("pdp-witness.json")).unwrap(),
+                    conflict
+                );
+                let checked =
+                    solvers::verify_koblitz_m3_cell(&f.root, &f.config, &data.outcome, &artifacts)
+                        .unwrap()
+                        .unwrap();
+                assert_eq!(checked["scope"], "partial-artifacts");
+                assert_eq!(checked["retained_witness_verified"], true);
+                assert_eq!(checked["witness_root_verified"], false);
+                assert_eq!(checked["solver_completed"], false);
+                let math = original_math(&f.config, &case).unwrap();
+                let captured =
+                    std::fs::read(f.root.join("live/payloads/pdp-witness.json")).unwrap();
+                verify_signed_witness(&captured, &math).unwrap();
+                for (name, bytes) in &original_bytes {
+                    assert_eq!(std::fs::read(f.root.join(name)).unwrap(), *bytes);
+                }
+                assert_eq!(
+                    execution::load(&f.root)
+                        .unwrap()
+                        .unwrap()
+                        .deadline_monotonic_ns,
+                    original_launch.deadline_monotonic_ns
+                );
+                // Exact raw collector identity is the only admitted collision
+                // exception. None of these descriptors may turn raw bytes into proof.
+                for mutation in 0..5 {
+                    let mut forged = artifacts.clone();
+                    let index = forged
+                        .iter()
+                        .position(|a| a.path == "pdp-witness.json")
+                        .unwrap();
+                    match mutation {
+                        0 => forged[index].role = "arbitrary-raw-role".into(),
+                        1 => {
+                            let duplicate = forged[index].clone();
+                            forged.push(duplicate);
+                        }
+                        2 => {
+                            forged[index].role = "independently-verified-pdp".into();
+                            forged[index].encoding = "json".into();
+                        }
+                        3 => forged[index].encoding = "json".into(),
+                        4 => {
+                            forged[index].role =
+                                "restricted-koblitz-m3-original-equations/v1".into()
+                        }
+                        _ => unreachable!(),
+                    }
+                    assert!(
+                        solvers::verify_koblitz_m3_cell(&f.root, &f.config, &data.outcome, &forged)
+                            .is_err(),
+                        "mutation {mutation} {solver} twist={twist}"
+                    );
+                }
+                for key in [
+                    "pdp_witness_verified",
+                    "certificate_durably_persisted",
+                    "solver_completed",
+                ] {
+                    let mut forged = data.outcome.clone();
+                    forged[key] = true.into();
+                    assert!(
+                        solvers::verify_koblitz_m3_cell(&f.root, &f.config, &forged, &artifacts)
+                            .is_err(),
+                        "unsupported {key}"
+                    );
+                }
+                std::fs::write(
+                    f.root.join("pdp-witness.json"),
+                    b"changed unregistered collision",
+                )
+                .unwrap();
+                assert!(
+                    solvers::verify_koblitz_m3_cell(&f.root, &f.config, &data.outcome, &artifacts)
+                        .is_err(),
+                    "raw collision must remain manifest hash checked"
+                );
+            }
+        }
+    }
 }
