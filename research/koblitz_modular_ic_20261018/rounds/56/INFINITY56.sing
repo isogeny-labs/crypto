@@ -68,7 +68,9 @@ proc polygon56(poly F,string label){
  for(i=1;i<size(records)+1;i++){write(out,"poly face"+string(i)+"56="+string(records[i][5])+";");}
  close(out);return(records);
 }
-poly zero56=jetMap56(polynomials56[1]);poly one56=jetMap56(polynomials56[2]);
+list mappedJets56=jetMap56(polynomials56);
+poly zero56=mappedJets56[1];poly one56=mappedJets56[2];
+require56(diff(zero56,s)!=0 && diff(one56,s)!=0,"INFINITY56_BOTH_LOCAL_POLYNOMIALS_SEPARABLE");
 list zeroFaces56=polygon56(subst(zero56,s,s+a),"zero");list oneFaces56=polygon56(one56,"one");
 poly badJet56=jetMap56(Wzero56)+h^3;
 require56(reduce(badJet56^2+badJet56+h+h^3,std(ideal(h^128)))!=0,"INFINITY56_CHANGED_JET_REJECTED");

@@ -13,3 +13,17 @@ Invoke infinity56-01once after sourcefreeze;inspect exactpolecoefficients and co
 
 ### Errors
 No mathematical data yet. Broad read hit a long serializedsource line;subsequent reads bounded to selected coefficients/files. No source/owner changed.
+
+## First native attempt and repair
+
+### What was done
+Infinity56-01terminalrejected,exit0butnativeerrorlines. Baseprefix recorded Aorders-4/-1;coverNewtonstage failed at indexed list mapping and has no accepted result. Allrawretained. Reviewed GarrettNewton polygons completeDVR/separability/slopedenominator hypotheses.
+
+### Decisions made
+Map namedwholepolynomiallist before indexing,targetring;add explicitnonzero localderivatives. Freezefresh02withsamebudget/precision/formulas. Do not treatlate marker/prefix as finalacceptance.
+
+### Open threads
+Run correctednativeonce afterfreeze,then interpret exactedges underthe reviewed theorem and supply additional localfactor certificates where needed.
+
+### Errors
+Ring-owned indexedlist cannot be mapped directly;implementationfailure,not a mathematical null.

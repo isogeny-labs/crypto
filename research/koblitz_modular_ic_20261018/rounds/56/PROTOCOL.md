@@ -80,3 +80,6 @@ no virtualcap. No sorry,native_decide or newaxiom;actualarrays/localfield
 semantics remain external premises and must be mapped clause-by-clause.
 Canonical protocolchecker/schema absent from selectedGitindexes;manual
 experiment.protocol/v1 record does not claim canonical schema validation.
+
+## Preserved first attempt and corrected list mapping
+Infinity56-01rejected:baseprefix completed,but direct mapping of an indexed ring-owned list fails at ring switch. Map the complete named polynomial list,then index it in the target ring. Freeze beforefresh02. Add explicit nonzero derivatives of both local polynomials to supply separability for Garrett's Newton theorem. Reviewed Paul Garrett,Newton polygons,pages1–2,https://www-users.cse.umn.edu/~garrett/m/number_theory/newton_polygon.pdf:overcompleteDVR,separable roots group by slopes;full-length reduced denominator implies irreducible totallyramified factor. Smaller denominator alone gives no irreducibility conclusion. No failedprefix is accepted as the final branch calculation.
