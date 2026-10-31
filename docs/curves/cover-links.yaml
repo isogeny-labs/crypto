@@ -63416,7 +63416,46 @@
       },
       "model_json": "{\"a\":\"0x0\",\"b\":\"0x1\",\"field\":\"f2m-83-a1d5abfa\",\"form\":\"y^2+xy=x^3+a*x^2+b\",\"modulus\":\"0x800000000200000000007\",\"v\":\"1\"}",
       "model_sha256": "debefd742f59717afbbe57c88c63afbcc90f032133056c153ebe197d570ba22a",
-      "representations": [],
+      "representations": [
+        {
+          "curve": {
+            "coefficients": [
+              1,
+              0,
+              0,
+              0,
+              1
+            ],
+            "cofactor": 4,
+            "generator": [
+              "0x477f77103dfad59850800",
+              "0x2fa5e737d542c4e4fd5c3"
+            ],
+            "model": "binary Weierstrass",
+            "subgroup_order": "2417851639230796216685689",
+            "target_group": "prime-order subgroup"
+          },
+          "curve_uid": "urn:ec-record:1:sha256:5ad08e3bea59aae5a686e5c0796ddda536d455b2fb3371f2641d4524ccbdd618",
+          "ec1": "EC1N83Ce0h5ad08e3bea59",
+          "field": {
+            "characteristic": 2,
+            "degree": 83,
+            "element_encoding": "hex polynomial coefficient bitset, least significant bit is constant",
+            "modulus_exponents": [
+              83,
+              45,
+              2,
+              1,
+              0
+            ],
+            "representation": "polynomial"
+          },
+          "subgroup_transport": {
+            "evidence_ref": null,
+            "status": "not_tested"
+          }
+        }
+      ],
       "standard_names": [],
       "standards_provenance": null,
       "status": "verified_over_declared_field"
@@ -183630,6 +183669,6 @@
       "verification_status": "verified_over_declared_field"
     }
   },
-  "registry_sha256": "03f63efa54482b2ea37baed22da046202cd67739c76d9b43f569e2375f025ca4",
+  "registry_sha256": "12a077dfd086f8371b92dfdd794cc6bb32da1e2929a7cd7becac6b5834709c64",
   "schema_version": "curve-cover-graph/v1"
 }
