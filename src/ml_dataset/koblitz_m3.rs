@@ -6,6 +6,21 @@
 //! instructions. Native work and actual group additions have different units.
 use std::time::{Duration, Instant};
 
+#[path = "koblitz_m3_causal.rs"]
+mod causal_projection;
+
+/// Source-authenticated group examples; matrix/construction projection remains
+/// explicitly unavailable. Exporter integration needs its own policy validation.
+pub(super) fn project_worker_prefixes(
+    dir: &std::path::Path,
+    config: &crate::ml_dataset::types::CaseConfig,
+    outcome: &serde_json::Value,
+    artifacts: &[crate::ml_dataset::types::Artifact],
+    emit: &mut impl FnMut(Option<serde_json::Value>, serde_json::Value) -> Result<(), String>,
+) -> Result<serde_json::Value, String> {
+    causal_projection::project(dir, config, outcome, artifacts, emit)
+}
+
 const NATIVE_WORK_MAX: u64 = 16_777_216;
 const NATIVE_BYTES_MAX: u64 = 64 * 1024 * 1024;
 
@@ -12447,6 +12462,127 @@ mod worker_central_replay_tests {
                     assert_eq!(data.outcome["solver_completed"], json!(!root_collision));
                     assert_eq!(verified["producer_entry_anchor_verified"], false);
                     assert_eq!(verified["exact_instruction_count_verified"], false);
+                    // Real original-bound API: no private witness or arbitrary
+                    // caller-provided public projection enters this boundary.
+                    let mut projected = Vec::new();
+                    let summary = project_worker_prefixes(
+                        &f.root,
+                        &f.config,
+                        &data.outcome,
+                        &artifacts,
+                        &mut |feature, label| {
+                            projected.push((feature.unwrap(), label));
+                            Ok(())
+                        },
+                    )
+                    .unwrap();
+                    assert_eq!(
+                        summary["group_examples"],
+                        json!(if root_collision { 0 } else { 192 })
+                    );
+                    assert_eq!(summary["matrix_projection_status"], "not_implemented");
+                    for (feature, _) in &projected {
+                        assert_eq!(feature["static_inputs"]["twist"], twist);
+                    }
+                    let mut different_future = data.outcome.clone();
+                    different_future["unused_future_note"] =
+                        json!({"rank":8,"known_answer_scalar":"123"});
+                    let mut again = Vec::new();
+                    project_worker_prefixes(
+                        &f.root,
+                        &f.config,
+                        &different_future,
+                        &artifacts,
+                        &mut |feature, _| {
+                            again.push(feature.unwrap());
+                            Ok(())
+                        },
+                    )
+                    .unwrap();
+                    assert_eq!(
+                        again,
+                        projected.iter().map(|(f, _)| f.clone()).collect::<Vec<_>>()
+                    );
+                    // Swap in a different but internally valid committed prefix
+                    // only during the visitor, then restore all original files.
+                    // Central admission and final manifest readback both see the
+                    // originals; the staged records must still bind the old head.
+                    let stream_path = f.root.join("live/events.jsonl");
+                    let swap_head_path = f.root.join("live/committed.json");
+                    let saved_stream = std::fs::read(&stream_path).unwrap();
+                    let saved_head = std::fs::read(&swap_head_path).unwrap();
+                    let mut alternate: capture::CommittedHead =
+                        serde_json::from_slice(&saved_head).unwrap();
+                    let end = alternate.byte_end as usize;
+                    let cut = saved_stream[..end - 1]
+                        .iter()
+                        .rposition(|b| *b == b'\n')
+                        .map_or(0, |i| i + 1);
+                    let last: capture::EventRecord =
+                        serde_json::from_slice(&saved_stream[cut..end]).unwrap();
+                    assert_eq!(last.event["kind"], "solver_return");
+                    alternate.event_count -= 1;
+                    alternate.byte_end = cut as u64;
+                    alternate.last_event_sha256 = last.previous_event_sha256;
+                    let alternate_head = serde_json::to_vec(&alternate).unwrap();
+                    let mut swapped_emitted = 0;
+                    let swapped = causal_projection::project_with_hooks(
+                        &f.root,
+                        &f.config,
+                        &data.outcome,
+                        &artifacts,
+                        &mut |_, _| {
+                            swapped_emitted += 1;
+                            Ok(())
+                        },
+                        || {
+                            std::fs::write(&stream_path, &saved_stream[..cut])
+                                .map_err(|e| e.to_string())?;
+                            std::fs::write(&swap_head_path, &alternate_head)
+                                .map_err(|e| e.to_string())?;
+                            // Prove this is not merely a corrupt-chain control.
+                            capture::verify_live_committed_prefix(
+                                &f.root,
+                                &f.binding,
+                                &capture_limits,
+                            )?
+                            .ok_or("alternate prefix missing")?;
+                            Ok(())
+                        },
+                        || {
+                            std::fs::write(&stream_path, &saved_stream)
+                                .map_err(|e| e.to_string())?;
+                            std::fs::write(&swap_head_path, &saved_head)
+                                .map_err(|e| e.to_string())?;
+                            storage::verify_manifest(&f.root, &artifacts)?;
+                            Ok(())
+                        },
+                    );
+                    assert!(swapped
+                        .unwrap_err()
+                        .contains("original committed watermark"));
+                    assert_eq!(swapped_emitted, 0);
+                    // A late custody failure must release zero provisional rows.
+                    let head_path = f.root.join("live/committed.json");
+                    let original_head = std::fs::read(&head_path).unwrap();
+                    let mut bad_head: serde_json::Value =
+                        serde_json::from_slice(&original_head).unwrap();
+                    bad_head["last_event_sha256"] = json!("0".repeat(64));
+                    std::fs::write(&head_path, serde_json::to_vec(&bad_head).unwrap()).unwrap();
+                    let mut emitted = 0;
+                    let rejected = project_worker_prefixes(
+                        &f.root,
+                        &f.config,
+                        &data.outcome,
+                        &artifacts,
+                        &mut |_, _| {
+                            emitted += 1;
+                            Ok(())
+                        },
+                    );
+                    std::fs::write(&head_path, &original_head).unwrap();
+                    assert!(rejected.is_err());
+                    assert_eq!(emitted, 0);
                     // Exercise the actual worker censor/adoption helper against
                     // genuine complete and partial artifacts, not a JSON-only mock.
                     let roots_before = registry.len();

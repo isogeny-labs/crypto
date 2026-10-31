@@ -486,6 +486,19 @@ fn koblitz_worker_profile(config: &CaseConfig, case: &CaseData) -> bool {
         == 2
 }
 
+/// Native causal projection seam for the separately owned exporter. Currently
+/// implements independently replayed signed-group prefixes only.
+#[allow(dead_code)] // Exporter T828 integration has not been applied.
+pub(super) fn project_koblitz_m3_prefixes(
+    dir: &Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+    emit: &mut impl FnMut(Option<Value>, Value) -> Result<(), String>,
+) -> Result<Value, String> {
+    koblitz_m3::project_worker_prefixes(dir, config, outcome, artifacts, emit)
+}
+
 /// Always invoked by central replay, independently of mutable outcome strategy.
 pub(super) fn verify_koblitz_m3_cell(
     dir: &Path,
