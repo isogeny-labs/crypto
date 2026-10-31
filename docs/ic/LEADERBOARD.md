@@ -479,7 +479,7 @@ Copied from native analysis: eight independent one-target workloads per fixed cu
 
 ## F_p Gröbner engine (`f4_fp`) in the Jacobian-cover IC
 
-Component speed-up, class engineering: `f4_fp` before and after #1717 in examples/jv_cover.rs (Nagao decompositions on a genus-2 cover of E(F_{p^6}); every decomposition one f4_fp solve), same seeds and the same relations, every DLP solved and verified by both builds (`research/f4_fp_ic_effect_20261018`, run-20261018T1548Z). It moves no row of tables A–C. S/rho is a lower-bound comparison (unpriced native work is not emitted).
+Component speed-up, class engineering: `f4_fp` before and after #1717 in examples/jv_cover.rs (Nagao decompositions on a genus-2 cover of E(F_{p^6}); every decomposition one f4_fp solve), same seeds and the same relations. Both builds recorded `solved=true` and `correct=true` for every DLP row (`research/f4_fp_ic_effect_20261018`, run-20261018T1548Z); the archived rows have no recovered-scalar certificate for an independent replay. It moves no row of tables A–C. S/rho is a lower-bound comparison (unpriced native work is not emitted).
 
 | p | seed | relations | S before | S after | before ÷ after | S/rho before | S/rho after (distance to rho) |
 |---:|---:|---:|---:|---:|---:|---:|---:|

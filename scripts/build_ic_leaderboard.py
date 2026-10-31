@@ -2859,8 +2859,9 @@ def markdown(doc: dict) -> str:
     f4 = doc["f4_fp_ic_component"]
     L += ["", "## F_p Gröbner engine (`f4_fp`) in the Jacobian-cover IC", "",
           f"Component speed-up, class {f4['class']}: `f4_fp` before and after #1717 in "
-          f"{f4['pipeline']}, same seeds and the same relations, every DLP solved and "
-          f"verified by both builds (`{f4['study']}`, {f4['run']}). It moves no row of "
+          f"{f4['pipeline']}, same seeds and the same relations. Both builds recorded "
+          f"`solved=true` and `correct=true` for every DLP row (`{f4['study']}`, {f4['run']}); "
+          "the archived rows have no recovered-scalar certificate for an independent replay. It moves no row of "
           "tables A–C. S/rho is a lower-bound comparison (unpriced native work is not emitted).", "",
           "| p | seed | relations | S before | S after | before ÷ after | S/rho before | S/rho after (distance to rho) |",
           "|---:|---:|---:|---:|---:|---:|---:|---:|"]
@@ -4077,8 +4078,10 @@ def page(doc: dict, standalone: bool) -> str:
     P.append('<section id="f4-fp-ic-component"><h2>F<sub>p</sub> Gröbner engine '
              '(<code>f4_fp</code>) in the Jacobian-cover IC</h2>'
              f'<p>Component speed-up, class {esc(f4["class"])}: <code>f4_fp</code> before and after '
-             f'#1717 in {esc(f4["pipeline"])}, same seeds and relations; every DLP solved and '
-             'verified by both builds. It moves no row of tables A–C. S/rho is a lower-bound '
+             f'#1717 in {esc(f4["pipeline"])}, same seeds and relations. Both builds recorded '
+             '<code>solved=true</code> and <code>correct=true</code> for every DLP row; the '
+             'archived rows have no recovered-scalar certificate for an independent replay. '
+             'It moves no row of tables A–C. S/rho is a lower-bound '
              'comparison because native work is not emitted.</p>'
              '<table><thead><tr><th>p</th><th>seed</th><th>relations</th><th>S before</th>'
              '<th>S after</th><th>before ÷ after</th><th>S/rho before</th>'

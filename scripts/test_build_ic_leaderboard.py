@@ -135,8 +135,10 @@ class FrozenEngineeringComponent(unittest.TestCase):
         html = builder.page(data, standalone=True)
         self.assertIn("## F_p Gröbner engine (`f4_fp`)", md)
         self.assertIn("S/rho is a lower-bound comparison", md)
+        self.assertIn("no recovered-scalar certificate for an independent replay", md)
         self.assertIn('id="f4-fp-ic-component"', html)
         self.assertIn("Frozen engineering summary", html)
+        self.assertIn("no recovered-scalar certificate for an independent replay", html)
 
     def test_incorrect_frozen_result_fails_closed(self):
         def corrupt(study):
