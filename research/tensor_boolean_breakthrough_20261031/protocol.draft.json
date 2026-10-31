@@ -1,0 +1,677 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "EXP-tensor-boundary-rank-census-20261031",
+  "version": 1,
+  "created": "2026-10-31",
+  "repository": "crypto",
+  "study_dir": "research/tensor_boolean_breakthrough_20261031",
+  "authors": [
+    "Codex tensor-Boolean experiment design"
+  ],
+  "links": {
+    "narrative": "research/tensor_boolean_breakthrough_20261031/PROTOCOL.md",
+    "portfolio": "research/tensor_boolean_breakthrough_20261031/experiment-matrix.json",
+    "lead_review": "research/prime_ic_lead_review_20261031/README.md"
+  },
+  "question": "At preregistered semantic cuts, do exact boundary tensors of natural hashed prime-field ECDLP Boolean networks have lower balanced flattening-rank growth than interior-rewired networks preserving the local predicates, graph statistics, interface and pins?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Every admitted row has exact canonical-IR round-trip equality, exact total and prefix-count agreement, and independently replayed witnesses.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "On the frozen held-out ladder, natural hashed networks have materially lower normalized exact boundary-flattening rank and lower rank-growth slope than paired interior-rewired matched nulls.",
+      "class": "comparative",
+      "decided_by": [
+        "C-structure",
+        "C-slope"
+      ],
+      "if_supported": "advance to a separately preregistered local-basis and composition-certificate experiment; no ECDLP or asymptotic speedup claim",
+      "if_not_supported": "do not advance this registered boundary-rank route on the tested cuts and sizes; no universal impossibility claim"
+    },
+    {
+      "id": "C3",
+      "text": "A finite rank census proves or disproves subexponential Boolean tensor contraction or prime-field ECDLP complexity.",
+      "class": "out_of_scope",
+      "decided_by": [],
+      "if_supported": null,
+      "if_not_supported": "only a proved family invariant and complete cost theorem can decide the asymptotic claim"
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "The repeated arithmetic and hash composition in a natural hashed ECDLP network constrains exact boundary messages to a lower-dimensional space than a close rewired null.",
+      "mechanism": "Globally aligned repeated predicates create dependent rows and columns in balanced flattenings of exact boundary-count tensors; interior rewiring preserves local complexity while breaking that alignment.",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "normalized_log_rank",
+          "direction": "lower",
+          "minimum_effect": "corrected upper 95% interval at most -0.20 on each of the three largest b values for at least two m values",
+          "provenance": {
+            "written_at": "2026-10-31",
+            "first_recorded_in": "research/tensor_boolean_breakthrough_20261031/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/prime_ic_lead_review_20261031/README.md",
+                "measured": "architecture and prior-work review only; no boundary tensors or ranks from the declared cells"
+              }
+            ],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "the frozen cut, target/null generator, and final ladder only"
+          },
+          "role": "decisive"
+        },
+        {
+          "id": "P2",
+          "metric": "rank_growth_slope",
+          "direction": "lower",
+          "minimum_effect": "natural upper 95% slope interval at least 0.10 below the matched-null lower interval for one passing m family",
+          "provenance": {
+            "written_at": "2026-10-31",
+            "first_recorded_in": "research/tensor_boolean_breakthrough_20261031/PROTOCOL.md",
+            "data_seen": [],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "exact ranks on the final held-out ladder"
+          },
+          "role": "decisive"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "natural-target",
+      "role": "candidate",
+      "description": "The exact canonical Boolean tensor network emitted by the natural hashed prime-field construction.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {
+          "backend": "fraction-free-rank",
+          "cut": "semantic-mid-slot"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "network": "natural-hashed-ecdl",
+        "rank_domain": "Q",
+        "boundary_tensor": "exact-integer-counts"
+      }
+    },
+    {
+      "id": "rewired-null",
+      "role": "control_negative",
+      "description": "The paired target network with degree-preserving swaps inside frozen cut-edge classes, preserving every local predicate, degree, edge, interface, pin, cut width and per-vertex cut degree.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {
+          "backend": "fraction-free-rank",
+          "cut": "semantic-mid-slot"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "network": "interior-rewired-matched-null",
+        "conditioning": "same floor(log2(1+model_count)) stratum; retain first unconditioned draw",
+        "maximum_rewiring_attempts": 256
+      },
+      "same_instrument_as": "natural-target"
+    },
+    {
+      "id": "known-rank-positive",
+      "role": "control_positive",
+      "description": "Copy/equality boundary networks with analytically known balanced flattening ranks 1, 2 or 4 through the same IR and rank path.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {
+          "backend": "fraction-free-rank",
+          "cut": "declared-positive-cut"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "network": "known-rank-copy-equality",
+        "expected_ranks": [1, 2, 4]
+      },
+      "same_instrument_as": "natural-target"
+    },
+    {
+      "id": "natural-aa",
+      "role": "control_aa",
+      "description": "Byte-identical natural IR reimported and evaluated in an independent fresh process.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {
+          "backend": "fraction-free-rank",
+          "cut": "semantic-mid-slot"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "network": "identical-natural-ir",
+        "layout": "fresh-process-reimport"
+      },
+      "same_instrument_as": "natural-target"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "known-rank-positive",
+      "expected_detection": "The exact rank path returns each analytically declared rank and exact boundary support; any miss invalidates that rank size.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "rewired-null",
+      "null_population": {
+        "description": "Degree-preserving edge swaps within frozen left-internal, right-internal and cut-crossing classes of each sampled natural network, with local predicates and interface semantics fixed.",
+        "generator": "Protocol-hash seeded double-edge swaps, separately within left-internal, right-internal and cut-crossing classes, keeping every vertex on its semantic cut side and interface-adjacent edges fixed; reject self-loops, duplicate port use, disconnected networks and original wiring; accept first draw in the target's floor(log2(1+model_count)) stratum within 256 attempts and retain the first valid unconditioned draw.",
+        "n": 192,
+        "why_n": "One paired conditioned null for each of 16 instances in 12 draft cells; freeze requires test-specific preflight power and completion evidence.",
+        "matched_on": [
+          "source semantic instance",
+          "field, b and m",
+          "vertex and tagged-predicate multiset",
+          "degree sequence and edge count",
+          "cut width and per-vertex cut-degree profile",
+          "local predicate parameters and evaluator",
+          "interface order and pins",
+          "solution-count stratum for conditioned panel"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "global_interior_wiring",
+        "levels": [
+          "natural",
+          "interior-rewired"
+        ]
+      },
+      {
+        "name": "factor_base_bits_b",
+        "levels": [6, 8, 10, 12]
+      },
+      {
+        "name": "slot_count_m",
+        "levels": [2, 3, 4]
+      },
+      {
+        "name": "network_family",
+        "levels": [
+          "hashed-ecdl",
+          "interior-rewired",
+          "known-rank-copy-equality"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source_instance",
+        "treatment": "randomized",
+        "how": "protocol-hash seeds generate curves, targets and hash keys before arm assignment"
+      },
+      {
+        "name": "canonical_ir_and_cut_law",
+        "treatment": "fixed",
+        "how": "one version, semantic-mid-slot cut and lexical edge ordering filled before freeze"
+      },
+      {
+        "name": "local_predicates_degrees_edges_interface_pins",
+        "treatment": "fixed",
+        "how": "copied byte-for-byte from target into paired null"
+      },
+      {
+        "name": "b_and_m",
+        "treatment": "crossed",
+        "how": "every arm attempts every final ladder cell under identical limits"
+      },
+      {
+        "name": "null_rewiring_seed",
+        "treatment": "randomized",
+        "how": "derived independently from protocol hash and pair index"
+      },
+      {
+        "name": "instrument_commit_binary_and_analysis",
+        "treatment": "fixed",
+        "how": "hashes filled before freeze"
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "single-thread exact construction and rank"
+      },
+      {
+        "name": "arm_order",
+        "treatment": "randomized",
+        "how": "interleaved within each source pair"
+      },
+      {
+        "name": "host_state",
+        "treatment": "measured",
+        "how": "environment, memory limit and isolation receipt recorded; exact metrics remain primary"
+      },
+      {
+        "name": "analyst_labels",
+        "treatment": "fixed",
+        "how": "opaque until analysis artifacts are fixed"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-structure",
+        "arms": [
+          "natural-target",
+          "rewired-null"
+        ],
+        "differs_in": [
+          "global_interior_wiring"
+        ],
+        "design": "one_factor",
+        "reason": "The paired null retains the complete local predicate and graph-statistic inventory while breaking global interior alignment.",
+        "threshold": "paired normalized-log-rank difference upper corrected 95% interval <= -0.20"
+      },
+      {
+        "id": "C-slope",
+        "arms": [
+          "natural-target",
+          "rewired-null"
+        ],
+        "differs_in": [
+          "global_interior_wiring",
+          "factor_base_bits_b"
+        ],
+        "design": "factorial",
+        "reason": "Growth is compared across the same crossed b ladder within each m family.",
+        "threshold": "natural upper slope interval at least 0.10 below null lower interval"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "natural-target",
+          "natural-aa"
+        ],
+        "differs_in": [],
+        "design": "aa",
+        "reason": "Identical IR and exact algorithm in a fresh process; every exact field must agree.",
+        "threshold": "bit-for-bit equality"
+      },
+      {
+        "id": "C-positive",
+        "arms": [
+          "known-rank-positive"
+        ],
+        "differs_in": [
+          "network_family"
+        ],
+        "design": "absolute",
+        "reason": "Detector-power and arithmetic-correctness gate.",
+        "threshold": "100% exact agreement with declared ranks 1, 2 and 4"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "protocol_hash_sha256",
+      "seeds": [],
+      "nonce": null,
+      "note": "Derive production seeds only after freeze; scratch preflight uses disclosed disjoint seeds with b<=5."
+    },
+    "instance_sampling": {
+      "rule": "For each crossed (b,m) cell sample 16 natural curve/target/hash instances from frozen protocol-hash seeds before arm assignment, then derive one conditioned and one retained unconditioned null draw per source instance.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": true,
+      "how": "Opaque arm labels are written by the protocol tool; the key and unmasked protocol/export are withheld until analysis.json and figures are fixed.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 192,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "paired_bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 3,
+      "correction": "holm",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": false,
+      "note": "Draft freeze blocker: disjoint preflight must justify power/resolution for a 0.20 paired normalized-log-rank gap and verify >=90% exact-rank completion under the final cap."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": null
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "verified_status",
+        "name": "canonical semantic verification",
+        "unit": "status plus exact count/witness certificate",
+        "kind": "exact",
+        "definition": "Stable IR round trip, total count, every interface-prefix count, model multiplicity and least-witness replay through independent paths.",
+        "source": "rows.jsonl verification",
+        "formula": null,
+        "aggregation": "distribution",
+        "resolution": null,
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "exact_integer_rank",
+        "name": "best balanced exact boundary-flattening rank",
+        "unit": "rank over Q",
+        "kind": "exact",
+        "definition": "Minimum fraction-free integer rank across all balanced cut-edge splits admitted by the frozen cap; canonical alternating split is separately recorded.",
+        "source": "rows.jsonl rank.exact_integer",
+        "formula": null,
+        "aggregation": "distribution",
+        "resolution": "1 rank",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "normalized_log_rank",
+        "name": "normalized log rank",
+        "unit": "log2(rank) per smaller-side boundary bit",
+        "kind": "derived",
+        "definition": "Exact rank normalized by the ambient exponent of the smaller flattening side.",
+        "source": "analysis output from exact_integer_rank and split dimensions",
+        "formula": "log2(exact_integer_rank)/min(abs(A),abs(B))",
+        "aggregation": "median",
+        "resolution": null,
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "rank_growth_slope",
+        "name": "exact-rank growth slope",
+        "unit": "delta log2(rank) / delta b",
+        "kind": "derived",
+        "definition": "Theil-Sen slope within each fixed m family over exact uncensored cells.",
+        "source": "analysis output from exact_integer_rank and b",
+        "formula": "Theil-Sen(log2(rank), b)",
+        "aggregation": "distribution",
+        "resolution": null,
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "boundary_support",
+        "name": "boundary tensor support",
+        "unit": "nonzero boundary assignments",
+        "kind": "counted",
+        "definition": "Number of boundary assignments having at least one internal completion.",
+        "source": "rows.jsonl boundary.nonzero_entries",
+        "formula": null,
+        "aggregation": "distribution",
+        "resolution": "1 assignment",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "rank_storage_entries",
+        "name": "rank-factor storage proxy",
+        "unit": "integer entries",
+        "kind": "derived",
+        "definition": "Storage of a dense rank factorization at the measured rank; a proxy, not a realized algorithm cost.",
+        "source": "analysis output",
+        "formula": "rank*(2^abs(A)+2^abs(B))",
+        "aggregation": "median",
+        "resolution": "1 entry",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "construction_operations",
+        "name": "exact boundary construction operations",
+        "unit": "integer additions, multiplications and comparisons",
+        "kind": "counted",
+        "definition": "Operation vector for constructing the full exact boundary tensor, with setup and verification separate but included in complete reporting.",
+        "source": "rows.jsonl counters",
+        "formula": null,
+        "aggregation": "distribution",
+        "resolution": "1 operation",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "peak_live_entries",
+        "name": "maximum live exact entries",
+        "unit": "integer entries",
+        "kind": "counted",
+        "definition": "Maximum simultaneously live exact integers during boundary construction and rank elimination.",
+        "source": "rows.jsonl memory.peak_live_entries",
+        "formula": null,
+        "aggregation": "max",
+        "resolution": "1 entry",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "complete_wall_seconds",
+        "name": "complete wall time",
+        "unit": "seconds",
+        "kind": "timed",
+        "definition": "IR import through verification; descriptive only because exact structural metrics are primary.",
+        "source": "rows.jsonl time.complete_wall_ns",
+        "formula": null,
+        "aggregation": "median",
+        "resolution": "1 microsecond",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "randomized",
+    "clock": "monotonic",
+    "counters": [
+      "integer_additions",
+      "integer_multiplications",
+      "integer_comparisons",
+      "maximum_coefficient_bits",
+      "peak_live_entries",
+      "peak_rss_bytes"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "image_digest",
+      "memory_limit",
+      "isolation.level",
+      "isolation.blockers",
+      "threads"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab",
+    "placement": {
+      "cpus": 2,
+      "memory": "fill from disjoint preflight; identical per arm",
+      "spot": true
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 3600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 2
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Fixed design: four arms over 192 source instances, one exact evaluation per deterministic IR, under identical frozen caps; then stop.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Run E0 and known-rank controls first; a miss invalidates affected cells but all attempted rows remain in the export.",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "Timeouts, OOMs, unmatched nulls and nonzero exits are outcomes and are not rerun; only recorded infrastructure failures may retry once.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "any round-trip count, prefix-count, model-multiplicity or witness mismatch invalidates the affected cell",
+    "any nonzero A/A exact difference invalidates the affected cell rather than defining a noise band",
+    "a failed known-rank positive control invalidates that rank size",
+    "a modular-only rank is retained as a lower bound but cannot enter the primary verdict",
+    "a null outside the registered solution-count stratum is excluded from the conditioned panel and reported",
+    "a row produced under a different cut, cap, IR version, binary or analysis hash is excluded and reported",
+    "wall time is descriptive and cannot rescue a failed exact-metric gate"
+  ],
+  "decision_rule": {
+    "text": "C2 advances only if correctness, A/A and positive controls pass; at least 90% of declared pairs have exact ranks; the Holm-corrected upper 95% interval for natural-minus-conditioned-null normalized log rank is <=-0.20 on the three largest b values for at least two m families; one passing family has natural upper rank-slope interval at least 0.10 below the null lower interval; and conditioned and unconditioned panels have the same effect sign. The route is not advanced only if controls pass, at least 90% are exact, every m family has corrected intervals contained in [-0.05,+0.05] on the three largest b values, and no slope separation. All other outcomes are inconclusive.",
+    "comparison_ids": [
+      "C-structure",
+      "C-slope"
+    ],
+    "threshold": "advance: D upper<=-0.20 plus slope separation>=0.10 and >=90% exact; not advance: D interval within [-0.05,+0.05], no slope separation and >=90% exact",
+    "statistic": "paired cellwise median normalized-log-rank difference and Theil-Sen log2(rank)-on-b slopes",
+    "interval": "paired bootstrap 95% intervals over source instances, Holm-adjusted over three m families",
+    "multiple_comparison_correction": "holm",
+    "effect_size_measure": "natural-minus-null normalized-log-rank difference and rank-growth-slope difference",
+    "verdict_vocabulary": [
+      "boundary_rank_route_advanced",
+      "boundary_rank_route_not_advanced",
+      "within_control_distribution",
+      "invalid_measurement",
+      "wrong_answer",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/tensor_boolean_breakthrough_20261031/analyze.rs",
+      "sha256": null
+    },
+    "inputs": [
+      "rows.jsonl",
+      "instance-manifest.json",
+      "arm-manifest.json"
+    ],
+    "outputs": [
+      "analysis.json",
+      "tables.md",
+      "figures/rank-growth.svg",
+      "figures/paired-rank-gap.svg"
+    ],
+    "blinded": true,
+    "frozen_before_data": false
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "exact log2 rank versus b by opaque arm and m",
+      "paired normalized-log-rank differences with corrected intervals",
+      "conditioned versus unconditioned null sensitivity",
+      "completion and censoring map",
+      "support, operation and live-entry diagnostics"
+    ],
+    "report_dir": "research/tensor_boolean_breakthrough_20261031/reports"
+  },
+  "inadmissible": [
+    "taking affected data before this protocol is frozen and committed",
+    "using a graph-only serialization that omits predicate identity, parameters, port order, interface order or pins",
+    "selecting a cut after observing rank or support",
+    "substituting a smaller favorable cut when the frozen cut exceeds the cap",
+    "calling modular rank an exact integer rank",
+    "dropping timeout, OOM, unmatched-null, wrong-answer or failed-control rows",
+    "choosing the closest of failed null matches after 256 attempts",
+    "tuning rewrites, bases or orders on the held-out ladder",
+    "using wall time to override the exact rank decision",
+    "reading finite-size low rank as proof of subexponential contraction or an ECDLP speedup"
+  ],
+  "literature": [
+    {
+      "ref": "crypto:research/prime_ic_lead_review_20261031/README.md",
+      "provenance": "internal",
+      "claim": "The hashed-factor-base Boolean tensor network is the strongest overall mechanism lead, while solver-family performance remains an empirical question.",
+      "verified_by": "Repository review at e3741fd5bbcc1f52a86be609587e7cf4ceeef566."
+    },
+    {
+      "ref": "crypto:crates/hashed-ecdl-tensor/src/network.rs",
+      "provenance": "internal",
+      "claim": "The current Network stores explicit graph/interface data but predicate behavior behind a trait object, motivating the typed predicate IR prerequisite.",
+      "verified_by": "Direct source inspection at e3741fd5bbcc1f52a86be609587e7cf4ceeef566."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  }
+}
