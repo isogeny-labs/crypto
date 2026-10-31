@@ -3,6 +3,14 @@ set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd);repo=$(git -C "$here" rev-parse --show-toplevel)
 attempt=${1:?fresh attempt};input=${2:?relative input};marker=${3:?marker};raw="$here/runs/$attempt"
 [ ! -e "$raw" ];mkdir -p "$raw"
+if [ -n "${4:-}" ];then
+ prerequisite="$here/runs/$4"
+ [ "$(cat "$prerequisite/compile.exit")" = 0 ]
+ [ "$(cat "$prerequisite/audit.exit")" = 0 ]
+ cp "$prerequisite/compile.exit" "$raw/prerequisite-compile.exit"
+ cp "$prerequisite/audit.exit" "$raw/prerequisite-audit.exit"
+ printf '%s\n' "$4" > "$raw/prerequisite.txt"
+fi
 "$repo/scripts/checkpoint.sh" gate > "$raw/gate.log" 2>&1
 python3 - "$here" <<'PYDONOR'
 from pathlib import Path

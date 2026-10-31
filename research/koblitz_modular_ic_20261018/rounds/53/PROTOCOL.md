@@ -106,3 +106,9 @@ zero residuals. A changed intercept must give nonzero N coefficient. This is
 an exact native quotient-algebra evaluation,not a standalone expanded target
 source-membership witness or proper/F2 map certificate. All coefficients are
 generic F2(b,c);record caps and partials. Same1200s/4GiB/one-thread limits.
+
+Packet admission amendment before attempt02:the CAS runner accepts a named
+Lean prerequisite and requires both saved compile.exit/audit.exit=0before
+checkpoint and invocation. Attempt01is rejected for admission ordering;the
+auditPASSlog had appeared but the audit terminal receipt had not. Keep its
+partials and stop receipt. Do not infer actual overlap solely from timestamps.
