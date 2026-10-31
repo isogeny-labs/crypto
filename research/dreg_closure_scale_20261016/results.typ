@@ -37,6 +37,7 @@ text is `RESULTS.md`, and the run report is `reports/run-20261016T1705Z/`.
 )
 
 - No row beats rho, and the units are unconverted.
+- *Correction 2026-10-30.* The m = 4 degree-5 row (2^71.13, +10.32) is priced at w = 1, a floor (lower bound), not an optimistic estimate. At the fitted w (degree 5: 2.83, 95% CI 2.59 to 2.92) it is *+61.45 bits over rho in rho-step units* (bootstrap 55.8 to 64.0; degree-4 proxy +52.21), and a structured / block-Wiedemann elimination prices it at about +43. The interval excludes the extrapolation from about 2^16 to 2^36 columns. Source: `research/m4_matrix_profile_20261030/README.md`; `RESEARCH_ECC2K130_DESCENT_DEGREE.md` §7 correction.
 - *The next cell* is m = 4, ℓ = 5 at degree 4 (about 179k columns). It is
   at this container's memory limit.
 - *Degree 5 at N ≥ 40* needs a sparse closure.

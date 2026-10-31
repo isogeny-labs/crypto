@@ -26,5 +26,6 @@ are *derived*.
   ℓ = 6 or 7, far below the priced ℓ = 33. The m = 4 "4, constant" row
   (2^68.43) is therefore contradicted, and the degree-5 rows (m = 4 at
   2^71.13) become the optimistic case.
+- *Correction 2026-10-30.* The m = 4 degree-5 row (2^71.13, +10.32) is priced at w = 1, a floor (lower bound), not an optimistic estimate. At the fitted w (degree 5: 2.83, 95% CI 2.59 to 2.92) it is *+61.45 bits over rho in rho-step units* (bootstrap 55.8 to 64.0; degree-4 proxy +52.21), and a structured / block-Wiedemann elimination prices it at about +43. The interval excludes the extrapolation from about 2^16 to 2^36 columns. Source: `research/m4_matrix_profile_20261030/README.md`; `RESEARCH_ECC2K130_DESCENT_DEGREE.md` §7 correction.
 - *Next:* m = 4, ℓ = 6 separates the two survivors, and degree 5 past
   ℓ = 7 decides the rows. Both need more memory or a sparse closure.

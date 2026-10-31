@@ -544,3 +544,13 @@ new value from this review.
   `report.pdf`.
 - `figures/plot.py`, `figures/ecc2k130_degree_rows.{svg,png}`,
   `figures/memory_wall.{svg,png}`.
+
+== Corrections 2026-10-24 and 2026-10-30: the +10.32 bits row is a w = 1 floor
+
+The m = 4, degree-5 row quoted in §1 item 4 and §3 as 2^71.13, +10.32 bits over rho is priced at w = 1 (one touch per Macaulay column), which `RESEARCH_ECC2K130_DESCENT_DEGREE.md` §2 calls a price no elimination beats. It is a *lower bound*, not the optimistic case (README, correction 2026-10-24). The 2026-10-24 correction used w = 2.25 (+46.33 rho steps, bracket +37.3 to +49.2) because no fitted w existed. `research/m4_matrix_profile_20261030/README.md` now fits w with an intercept per degree block (1561 recorded closure rows, cell-clustered bootstrap): degree 3 2.00 (1.83 to 2.07), degree 4 2.54 (2.42 to 2.60), degree 5 2.83 (2.59 to 2.92).
+
+- *Degree-5 fit: +61.45 bits over rho in rho-step units* (bootstrap 55.8 to 64.0; +69.89 in column-touch units).
+- Degree-4 fit as a proxy at D = 5: +52.21 (49.5 to 53.7) in rho-step units.
+- Structured / block-Wiedemann solve of the plain-XL matrix: about +43 (+42.8 to +43.5; +51.2 to +51.9 with no conversion), because plain XL refutes at least one degree after the closure (0 of 136 unsatisfiable draws at degree 4).
+
+The interval covers the bootstrap of (a, w) only: it excludes the extrapolation from about 2^16 to about 2^36 columns and the conversion range (about +/-1.5 bits). Degree 5 held to N near 398 is still an assumption, and none of this is a measured row at n = 131. The (4,6) cell is downgraded to a degree curiosity. The text above is left unchanged.

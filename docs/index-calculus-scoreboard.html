@@ -4798,7 +4798,7 @@ Increasing factor-base dimension remains the next scaling test.</p></div></div>
         <tr><td>3</td><td>D&thinsp;=&thinsp;5, constant: the closure's next degree (&ell;&thinsp;=&thinsp;41) &mdash; 2026-10-16</td><td class="n">1</td><td class="n">85.18</td><td class="n">+24.37</td><td><span class="chip">extrapolation</span></td></tr>
         <tr><td>4</td><td>D&thinsp;=&thinsp;4, constant: the measured MutantXL closure degree (&ell;&thinsp;=&thinsp;33) &mdash; 2026-10-16</td><td class="n">1</td><td class="n">68.43</td><td class="n">+7.62</td><td><span class="chip">contradicted</span></td></tr>
         <tr><td>4</td><td>D&thinsp;=&thinsp;4, constant: the closure (&ell;&thinsp;=&thinsp;34), w&thinsp;=&thinsp;2, which its counted work tracks &mdash; 2026-10-16</td><td class="n">2</td><td class="n">93.91</td><td class="n">+33.10</td><td><span class="chip">extrapolation</span></td></tr>
-        <tr><td>4</td><td>D&thinsp;=&thinsp;5, constant: the closure's next degree (&ell;&thinsp;=&thinsp;34) &mdash; 2026-10-16</td><td class="n">1</td><td class="n">71.13</td><td class="n">+10.32</td><td><span class="chip">extrapolation</span></td></tr>
+        <tr><td>4</td><td>D&thinsp;=&thinsp;5, constant: the closure's next degree (&ell;&thinsp;=&thinsp;34) &mdash; 2026-10-16; w&thinsp;=&thinsp;1 is a floor (lower bound), see 2026-10-30 below</td><td class="n">1</td><td class="n">71.13</td><td class="n">+10.32</td><td><span class="chip">extrapolation</span></td></tr>
       </tbody>
     </table></div>
     <div class="panel-head">
@@ -4844,6 +4844,7 @@ Increasing factor-base dimension remains the next scaling test.</p></div></div>
         N&thinsp;=&thinsp;42, 44. N is rejected as the driver, and so is an m&middot;&ell; threshold &le;&thinsp;20; the degree rises at
         &ell;&thinsp;=&thinsp;7 or at m&middot;&ell;&thinsp;&ge;&thinsp;21. Under either, m&thinsp;=&thinsp;4 exceeds 4 by &ell;&thinsp;=&thinsp;7, far below the priced
         &ell;&thinsp;=&thinsp;33, so the m&thinsp;=&thinsp;4 degree-4 row is marked contradicted and the degree-5 rows are the optimistic case.</p>
+      <p><b>Correction (2026-10-30): the +10.32 row is a w&thinsp;=&thinsp;1 floor.</b> w&thinsp;=&thinsp;1 is one touch per column, a lower bound, not an optimistic estimate. Fitted with an intercept on the recorded closures (<code>research/m4_matrix_profile_20261030/</code>), w is 2.54 at degree 4 (95% CI 2.42&ndash;2.60) and 2.83 at degree 5 (2.59&ndash;2.92), which prices the m&thinsp;=&thinsp;4 degree-5 row at <b>+61.45 bits over rho in rho-step units</b> (bootstrap 55.8&ndash;64.0; degree-4 proxy +52.21); a structured block-Wiedemann elimination gives about +43. The interval excludes the extrapolation from about 2<sup>16</sup> to 2<sup>36</sup> columns, and none of this is a measured row at n&thinsp;=&thinsp;131.</p>
       <p><b>One guess (2026-10-17).</b> Fixing any single variable in the eight m&thinsp;=&thinsp;3, &ell;&thinsp;=&thinsp;7 draws lets degree 4 refute on
         6 of 8, and both values of one guessed summand coordinate refute on 5 of 8 (<code>research/dreg_closure_specialise_20261017/</code>,
         pre-registered; its max-&ell; vs &Sigma;&ell; test was uninformative because the null control also refuted). The &ell;&thinsp;=&thinsp;7
