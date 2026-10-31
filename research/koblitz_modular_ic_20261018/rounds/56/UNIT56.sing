@@ -1,0 +1,23 @@
+proc require56(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../../../52/source-data/rr-table50.sing"));
+matrix lambdaSource56[32][1];matrix baseSource56[32][1];int i56;
+ideal fGB56=std(ideal(u^5+u^2+1));
+for(i56=1;i56<=32;i56++){lambdaSource56[i56,1]=reduce(sourceLift50[i56,2],fGB56);baseSource56[i56,1]=reduce(sourceLift50[i56,17],fGB56);}
+execute(read("../../../55/runs/quotient55-02/crt-quotient55.sing"));
+map sourceMap56=tablePidCertificate50,rho55;ideal normGB56=std(ideal(norm55));
+matrix lambdaVector56=sourceMap56(lambdaSource56);matrix baseVector56=sourceMap56(baseSource56);
+matrix lambdaValue56=reduce(values55*lambdaVector56,normGB56);matrix baseValue56=reduce(values55*baseVector56,normGB56);
+poly l56=lambdaValue56[1,1];poly V56=baseValue56[1,1];poly R56=reduce((1+rho55)*V56+rho55^3,normGB56);
+poly b56=reduce(rho55*R56*(R56+1),normGB56);poly c56=reduce(rho55*(R56+1),normGB56);
+require56(c56==1,"UNIT56_ACTUAL_A_ZERO_SOURCE_BINDING");
+require56(reduce(l56^4+b56*l56+b56^2,normGB56)==0,"UNIT56_ACTUAL_LAMBDA_BORDER_RELATION");
+matrix lambdaBezout56=lift(ideal(norm55,l56),ideal(1));matrix bBezout56=lift(ideal(norm55,b56),ideal(1));
+require56(matrix(ideal(norm55,l56))*lambdaBezout56==matrix(ideal(1)),"UNIT56_FULL_LAMBDA_UNIT_PRODUCT");
+require56(matrix(ideal(norm55,b56))*bBezout56==matrix(ideal(1)),"UNIT56_FULL_B_UNIT_PRODUCT");
+require56(gcd(l56,norm55)==1 && gcd(b56,norm55)==1,"UNIT56_INDEPENDENT_GCD_UNITS");
+matrix bad56=lambdaBezout56;bad56[2,1]=bad56[2,1]+1;
+require56(matrix(ideal(norm55,l56))*bad56!=matrix(ideal(1)),"UNIT56_CHANGED_INVERSE_REJECTED");
+link out56="lambda-unit56.sing";write(out56,"ring lambdaUnit56=2,(w),dp;short=0;poly norm56="+string(norm55)+";poly lambda56="+string(l56)+";poly V56="+string(V56)+";poly b56="+string(b56)+";");
+write(out56,"poly lambdaLift156="+string(lambdaBezout56[1,1])+";poly lambdaLift256="+string(lambdaBezout56[2,1])+";poly bLift156="+string(bBezout56[1,1])+";poly bLift256="+string(bBezout56[2,1])+";");close(out56);
+print("UNIT56_RESULT affine_zero_degree=80 lambda_unit=1 b_unit=1 actual_border_relation=1 full_Bezout_products=2 changed_inverse_rejected=1");
+print("UNIT56_ALL_CHECKS_PASS");quit;
