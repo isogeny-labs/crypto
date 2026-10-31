@@ -1,0 +1,49 @@
+import WordTriple
+open Polynomial PencilWordRefinement
+instance : Fact (5:UInt64).toNat.Prime := ⟨by decide⟩
+instance : Fact (7:UInt64).toNat.Prime := ⟨by decide⟩
+example : (8*(4:UInt64))%5=((8%5)*4)%5 ∧ (10*(4:UInt64))%5=((10%5)*4)%5 := by decide
+example : (8*(6:UInt64))%7=((8%7)*6)%7 ∧ (10*(6:UInt64))%7=((10%7)*6)%7 := by decide
+example : (10*(2147483646:UInt64))%2147483647=((10%2147483647)*2147483646)%2147483647 := by decide
+example : ¬ (8:UInt64).toNat<(5:UInt64).toNat ∧ ¬ (10:UInt64).toNat<(7:UInt64).toNat := by decide
+example : let a : WordD1 := ⟨0,1,1,1⟩
+ let b : WeightedWord := ⟨0,0,2,1,1,1⟩
+ let c := tripleWords 5 4 0 0 a
+ a.y≠0 ∧ tripleWordDispatch 5 4 0 0 a b=some c ∧ c.canonical 5 ∧ c.z≠0 ∧ c.w≠0 ∧
+ c.normalizedValid 5 (MixedGeneric.curve (1:ZMod (5:UInt64).toNat) 4 0 0) := by
+ apply repeated_word_preserves 5 (by decide) (by decide) 1 4 0 0 ⟨0,1,1,1⟩ ⟨0,0,2,1,1,1⟩
+ · decide
+ · decide
+ · decide
+ · unfold WordD1.canonical;decide
+ · unfold WeightedWord.canonical;decide
+ · decide
+ · decide
+ · decide
+ · decide
+ · norm_num [WordD1.normalizedValid,MixedCancellation.validPoint,WordD1.decode,WeightedAdd11.nx,WeightedAdd11.ny]
+   refine ⟨X^4+C 4,?_⟩;simp [MixedGeneric.curve];ring
+ · norm_num [WeightedWord.normalizedValid,MixedCancellation.validTwo,WeightedWord.decodeTwo,MixedCancellation.nq,MixedCancellation.nr,MixedCancellation.ns,MixedCancellation.nt,MixedCancellation.support,MixedCancellation.ordinate]
+   refine ⟨X^3+1,?_⟩
+   have h4 : (4:ZMod (5:UInt64).toNat)= -1 := by decide
+   simp [MixedGeneric.curve,h4]
+   have hdouble : C (2:ZMod (5:UInt64).toNat)*(2:Polynomial (ZMod (5:UInt64).toNat))= -1 := by
+    calc C (2:ZMod (5:UInt64).toNat)*2 = C ((2:ZMod (5:UInt64).toNat)*2) := by rw [C_mul];norm_num only [map_ofNat]
+         _ = -1 := by rw [show (2:ZMod (5:UInt64).toNat)*2= -1 by decide];simp
+   have hsquare : (C (2:ZMod (5:UInt64).toNat))^2= -1 := by
+    rw [←C_pow,show (2:ZMod (5:UInt64).toNat)^2= -1 by decide];simp
+   calc
+    _ = -X-X*(C (2:ZMod (5:UInt64).toNat)*2)-X^2*(C (2:ZMod (5:UInt64).toNat))^2+X^5 := by ring
+    _ = _ := by rw [hdouble,hsquare];ring
+ · decide
+ · decide
+ · decide
+example : let c := tripleWords 7 6 0 0 ⟨0,1,2,2⟩
+ c.canonical 7 ∧ c.decodeTwo 7=MixedTripling.rawOutput (6:ZMod (7:UInt64).toNat) 0 0 ((⟨0,1,2,2⟩:WordD1).decode 7) := by
+ apply triple_word_decode 7 (by decide) (by decide) 6 0 0 ⟨0,1,2,2⟩
+ · decide
+ · decide
+ · decide
+ · unfold WordD1.canonical;decide
+example : tripleWordDispatch 5 0 0 0 ⟨0,0,1,1⟩ ⟨0,0,0,0,1,1⟩=none := by decide
+example : tripleWordDispatch 7 0 0 0 ⟨0,1,1,1⟩ ⟨6,0,0,1,1,1⟩=none := by decide

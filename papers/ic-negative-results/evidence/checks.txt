@@ -1,0 +1,26 @@
+# blindspots_19_checks all  (examples/blindspots_19_checks.rs sha256 751277a8c075483cb0d1edcff9ef44e76f21164e989e289c8c6a54950c158ec5)
+# rustc 1.97.0 (2d8144b78 2026-07-07); host: shared 4-vCPU container, L0; run under prlimit --as=4294967296, one thread; wall time not recorded
+CONTROL positive X, X+1: d_F(out)=1 d_F(in)=1 d'_F=1 -> PASS
+WITNESS A (X^2Y, XY+X): d_F(outside)=3 d_F(inside)=3 d'_F=2
+WITNESS B (X1X2+X3, X1X3+X2): d_F(outside)=3 d_F(inside)=3 d'_F=2
+WITNESS C (X1X2+X3, X1+X2): d_F(outside)=3 d_F(inside)=2 d'_F=2
+CHECK witness A d'_F=2, d_F=3 outside and inside -> PASS
+CHECK witness B d'_F=2, d_F=3 outside and inside -> PASS
+CENSUS pairs=7875 (126 polys, n=3, dmax=6): d_F>d'_F outside=6138 inside=4830; d_F<d'_F outside=0 inside=224; undetermined outside=0 inside=0
+CHECK census finds violations of d_F <= d'_F in both placements -> PASS
+CHECK Z/5: 600 ordered pairs of distinct forms, max agreements 1 <= 1 -> PASS
+CHECK Z/7: 2352 ordered pairs of distinct forms, max agreements 1 <= 1 -> PASS
+CHECK Z/11: 14520 ordered pairs of distinct forms, max agreements 1 <= 1 -> PASS
+CHECK Z/5: 12650 sets of n=4 forms, max bad secrets 5 <= n(n-1)/2=6 <= n^2-n=12 -> PASS
+CHECK Z/7: 18424 sets of n=3 forms, max bad secrets 3 <= n(n-1)/2=3 <= n^2-n=6 -> PASS
+CHECK Z/7: 211876 sets of n=4 forms, max bad secrets 6 <= n(n-1)/2=6 <= n^2-n=12 -> PASS
+CHECK Z/11: 287980 sets of n=3 forms, max bad secrets 3 <= n(n-1)/2=3 <= n^2-n=6 -> PASS
+CONTROL negative Z/8: max agreements 4 at forms (0, 0, 0, 4) (>1 expected, not a field) -> PASS
+CONTROL negative Z/9: max agreements 3 at forms (0, 0, 0, 3) (>1 expected, not a field) -> PASS
+CHECK Z/11 B=3 m=3: 120 bases, every total = C(B+2,3) = 10; coverage min 7 max 9; AP base total 10 coverage 7 -> PASS
+CHECK Z/11 B=4 m=3: 210 bases, every total = C(B+2,3) = 20; coverage min 10 max 11; AP base total 20 coverage 10 -> PASS
+CHECK Z/12 B=3 m=3: 165 bases, every total = C(B+2,3) = 10; coverage min 3 max 9; AP base total 10 coverage 7 -> PASS
+CHECK Z/12 B=4 m=3: 330 bases, every total = C(B+2,3) = 20; coverage min 4 max 12; AP base total 20 coverage 10 -> PASS
+CHECK Z/13 B=3 m=3: 220 bases, every total = C(B+2,3) = 10; coverage min 7 max 10; AP base total 10 coverage 7 -> PASS
+CHECK Z/13 B=4 m=3: 495 bases, every total = C(B+2,3) = 20; coverage min 10 max 13; AP base total 20 coverage 10 -> PASS
+ALL CHECKS PASS

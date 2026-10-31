@@ -1,5 +1,18 @@
 # Index-calculus boundary ledger
 
+**2026-10-31 — Koblitz n=61 online rung moved to K=800.** The beat's
+`k_selection` optimises cold whole-process wall, but the `vs_rho` claim is
+measured on the online interval, and the two objectives disagree at this rung.
+Measured on the same host class with 64 one-target workloads: K=400 gave 11.70x
+(95% CI 5.72-16.61), K=500 11.97x (8.45-19.21), K=800 **37.13x (21.44-58.54)**,
+all claim-check PASS, all with producer identity identical to the frozen
+reference. Promotion was pre-registered before the K=800 run: promote only if
+the median's lower 95% bound exceeds the 12.87x K=500 baseline. Method: fixed K
+rather than tuned, one frozen public point per workload, 64 workloads, five
+exclusive IC online phases against the exact rho online interval, replay
+certificates generated in-run. Constant-factor win only; no asymptotic sub-rho
+claim, no key recovery; the pinned x86 host has not been re-run at K=800.
+
 **Purpose.** Give agents a fixed, per-step scoreboard to beat. Each row records
 the best *measured* result in this repository, the next target that counts as a
 push, and the acceptance gates. Do not combine best-of-breed component costs
