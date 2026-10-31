@@ -115,13 +115,13 @@ impl BinaryTables {
         h
     }
 }
-pub fn batch_inverse(start: u64, end: u64) -> Vec<u128> {
+pub fn batch_inverse(start: u64, end: u64, coordinate_bit: u8) -> Vec<u128> {
     let mut prefix = Vec::with_capacity((end - start) as usize);
     let mut acc = 1;
     for x in start..end {
         prefix.push(acc);
         if x != 0 {
-            acc = bmul(acc, super::domain_x(x) as u128);
+            acc = bmul(acc, super::domain_x(x, coordinate_bit) as u128);
         }
     }
     let mut inv = bpow(acc, MASK - 1);
@@ -131,7 +131,7 @@ pub fn batch_inverse(start: u64, end: u64) -> Vec<u128> {
             prefix[i] = 0;
         } else {
             prefix[i] = bmul(prefix[i], inv);
-            inv = bmul(inv, super::domain_x(x) as u128);
+            inv = bmul(inv, super::domain_x(x, coordinate_bit) as u128);
         }
     }
     assert_eq!(inv, 1);
@@ -348,11 +348,13 @@ mod tests {
             assert_eq!(slow_bmul(h, h) ^ h ^ c, bs.trace(c) as u128);
         }
         assert_eq!(ps.root(0), Some(0));
-        for (start, end) in [(0, 256), (12345, 12401), (134217700, 134217728)] {
-            let v = batch_inverse(start, end);
-            for (i, x) in (start..end).enumerate() {
-                if x != 0 {
-                    assert_eq!(slow_bmul(crate::domain_x(x) as u128, v[i]), 1);
+        for bit in 27..=40 {
+            for (start, end) in [(0, 256), (12345, 12401), (134217700, 134217728)] {
+                let v = batch_inverse(start, end, bit);
+                for (i, x) in (start..end).enumerate() {
+                    if x != 0 {
+                        assert_eq!(slow_bmul(crate::domain_x(x, bit) as u128, v[i]), 1);
+                    }
                 }
             }
         }
