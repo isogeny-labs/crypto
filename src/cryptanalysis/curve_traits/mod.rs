@@ -58,6 +58,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::binary_ecc::{F2mElement, IrreduciblePoly};
+use crate::cryptanalysis::cover_catalog;
 use arith::Factored;
 
 /// How well a value is established.  Ordered from strongest to weakest,
@@ -2065,7 +2066,7 @@ pub fn signature(t: &CurveTraits, keys: &[&str]) -> String {
 
 // ── The trait file ────────────────────────────────────────────────────
 
-pub const SCHEMA: &str = "curve-traits/2";
+pub const SCHEMA: &str = "curve-traits/3";
 
 /// One file a build read, by path and SHA-256.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -2123,9 +2124,14 @@ pub struct TraitFile {
     pub schema: String,
     pub generated_by: String,
     pub what_this_is: String,
-    /// SHA-256 of the registry bytes the records were derived from.
-    pub registry_sha256: String,
-    /// Every file read: registry, factor hints, source manifest, sources.
+    /// The manifest naming the registry rows the records were derived from
+    /// (`docs/curves/cover-catalog.json`).
+    pub catalog: String,
+    /// SHA-256 of those rows ([`crate::cryptanalysis::cover_catalog::rows_sha256`]),
+    /// not of the registry file: rows the manifest does not name leave it unchanged.
+    pub catalog_rows_sha256: String,
+    /// Every file read: the catalog rows of the registry, the catalog
+    /// manifest, factor hints, source manifest, sources.
     pub inputs: Vec<InputDigest>,
     /// Rho iterations per composite.
     pub factor_budget: u64,
@@ -2135,20 +2141,26 @@ pub struct TraitFile {
 }
 
 impl TraitFile {
-    /// The registry alone: no hints, no other sources.
-    pub fn build(registry_text: &str, budget: u64) -> Result<Self, String> {
+    /// The catalog rows of the registry alone: no hints, no other sources.
+    pub fn build(registry_text: &str, catalog_text: &str, budget: u64) -> Result<Self, String> {
         let registry = Input {
             path: "docs/curves/registry.json".into(),
             text: registry_text.to_string(),
         };
-        Ok(Self::build_from(&registry, None, None, None, &[], budget)?.0)
+        let catalog = Input {
+            path: cover_catalog::MANIFEST_PATH.into(),
+            text: catalog_text.to_string(),
+        };
+        Ok(Self::build_from(&registry, &catalog, None, None, None, &[], budget)?.0)
     }
 
-    /// The registry, the factor hints, and the curves of every source the
-    /// manifest names (`sources[i]` is the file at the manifest's `i`-th
-    /// path).  Returns the [`Factoring`] too, for its leftovers.
+    /// The registry rows the catalog manifest names, the factor hints, and
+    /// the curves of every source the manifest names (`sources[i]` is the
+    /// file at the manifest's `i`-th path).  Returns the [`Factoring`] too,
+    /// for its leftovers.
     pub fn build_from(
         registry: &Input,
+        catalog: &Input,
         hints: Option<&Input>,
         certificates: Option<&Input>,
         manifest: Option<&Input>,
@@ -2156,8 +2168,16 @@ impl TraitFile {
         budget: u64,
     ) -> Result<(Self, Factoring), String> {
         use rayon::prelude::*;
-        let mut curves = read_registry(&registry.text)?;
-        let mut inputs = vec![registry.digest()];
+        let rows = Input {
+            path: format!(
+                "{} (rows named by {})",
+                registry.path,
+                cover_catalog::MANIFEST_PATH
+            ),
+            text: cover_catalog::restrict(&registry.text, &catalog.text)?,
+        };
+        let mut curves = read_registry(&rows.text)?;
+        let mut inputs = vec![rows.digest(), catalog.digest()];
         let hint_primes = match hints {
             Some(h) => {
                 inputs.push(h.digest());
@@ -2203,11 +2223,13 @@ impl TraitFile {
         let file = TraitFile {
             schema: SCHEMA.into(),
             generated_by: "cargo run --release --bin curve_traits -- build".into(),
-            what_this_is: "Traits derived from each curve's model and order (the registry, then \
-                           the sources in docs/curves/trait-sources.json), with the status of \
-                           each value; see docs/curves/TRAITS.md."
+            what_this_is: "Traits derived from each curve's model and order (the registry rows \
+                           docs/curves/cover-catalog.json names, then the sources in \
+                           docs/curves/trait-sources.json), with the status of each value; \
+                           see docs/curves/TRAITS.md."
                 .into(),
-            registry_sha256: inputs[0].sha256.clone(),
+            catalog: cover_catalog::MANIFEST_PATH.into(),
+            catalog_rows_sha256: inputs[0].sha256.clone(),
             inputs,
             factor_budget: budget,
             default_signature: DEFAULT_SIGNATURE.iter().map(|s| s.to_string()).collect(),
