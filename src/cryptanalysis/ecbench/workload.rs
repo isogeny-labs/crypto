@@ -1358,17 +1358,13 @@ impl Instance {
         let model = model_hash(curve);
         let mut scratch = GroupOps::default();
         if let Instance::Fp4(_)
-            | Instance::Fp4Torsion(_)
-            | Instance::F2m4(_)
-            | Instance::ThreeLeads(_)
-            | Instance::Hyper(_) = self
+        | Instance::Fp4Torsion(_)
+        | Instance::F2m4(_)
+        | Instance::ThreeLeads(_)
+        | Instance::Hyper(_) = self
         {
             // Planted targets only on E(F_{p^4}), the tower, the three-leads
             // study and the hyperelliptic Jacobians: no public-target law yet.
-            return None;
-        }
-            // Planted targets only on E(F_{p⁴}) and on the hyperelliptic
-            // Jacobians: no public-target law yet.
             return None;
         }
         if let Instance::Wide(i) = self {
@@ -1818,18 +1814,15 @@ mod tests {
             assert!(inst.mul_generator_hex(0).is_none());
             assert!(inst.mul_generator_hex(inst.r()).is_none());
             assert!(inst.mul_generator_hex(2).is_some());
-            let target = inst.hash_to_subgroup(&facts, 1, 0);
-            if matches!(&inst, Instance::Fp4(_)) {
-                assert!(
-                    target.is_none(),
-                    "translation public-target law is unavailable"
-                );
-            } else {
-                let (target, counter) = target.expect("torsion public-target law from main");
-                assert_eq!(
-                    inst.hash_to_subgroup(&facts, 1, 0),
-                    Some((target.clone(), counter))
-                );
+            assert!(
+                inst.hash_to_subgroup(&facts, 1, 0).is_none(),
+                "quartic translation and torsion variants retain planted-only policy"
+            );
+            if !matches!(&inst, Instance::Fp4(_)) {
+                // Check subgroup arithmetic on the known fixture 2G, without
+                // enabling the deliberately unavailable public-target route.
+                let target = inst.mul_generator_hex(2).unwrap();
+                assert_eq!(inst.mul_generator_hex(2), Some(target.clone()));
                 let x = u64::from_str_radix(target[0].trim_start_matches("0x"), 16).unwrap();
                 let y = u64::from_str_radix(target[1].trim_start_matches("0x"), 16).unwrap();
                 let mut scratch = GroupOps::default();

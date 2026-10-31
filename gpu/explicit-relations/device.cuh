@@ -1,5 +1,6 @@
 #pragma once
 #include "host.hpp"
+#include "negative-filter.hpp"
 #include <cstdio>
 #include <cuda_runtime.h>
 #ifdef ER_QUERY_PERSISTENT
@@ -162,9 +163,42 @@ __global__ void build_partial(Curve c, Bases b, unsigned first, unsigned end,
   if (id < count)
     points[id] = point;
 }
+#ifdef ER_RIGHT_FULL_CACHE
+// With ER_QUERY_CACHED, the full cache takes precedence and the charged
+// partial tables serve as the exact fallback when full-cache admission fails.
+__global__ void build_right_cache(Curve c, Bases b, unsigned split, U count,
+                                 CachedPoint *out) {
+  U id = U(blockIdx.x) * BLOCK + threadIdx.x;
+  Jac sum = id < count ? tuple_sum(c, b, split, b.slots, id) : Jac{};
+  Point point = normalize_block(c, sum);
+  if (id < count)
+    out[id] = CachedPoint::from(point);
+}
+#endif
+#ifdef ER_NEGATIVE_FILTER
+RF_HD U filter_row_key(const Row &r) { return point_key(r.point); }
+RF_HD U filter_row_key(const CompactRow &r) { return r.key; }
+RF_HD U filter_row_key(const DenseRow &r) { return r.key(); }
+template <class TableRow>
+__global__ void build_negative_filter(const TableRow *rows, U count,
+                                      unsigned long long *words, U word_mask) {
+  U i = U(blockIdx.x) * BLOCK + threadIdx.x;
+  if (i < count) {
+    const U h = filter_hash(filter_row_key(rows[i]));
+    atomicOr(words + ((h >> 32) & word_mask),
+             static_cast<unsigned long long>(filter_pattern(h)));
+  }
+}
+#endif
 struct RightPartials {
   const Point *first = nullptr, *second = nullptr;
   U second_size = 0;
+#ifdef ER_NEGATIVE_FILTER
+  NegativeFilter filter;
+#endif
+#ifdef ER_RIGHT_FULL_CACHE
+  const CachedPoint *full = nullptr;
+#endif
 };
 // A radix encoding preserves the existing right-then-left witness order.
 // Reserve UINT64_MAX for no match; fall back to the separate array when the
@@ -212,6 +246,10 @@ __global__ void build_prefix(const TableRow *rows, U size, U bins, unsigned shif
   U bucket = U(blockIdx.x) * BLOCK + threadIdx.x;
   if (bucket > bins)
     return;
+  if (bucket == bins) {
+    offsets[bucket] = size;
+    return; // The conceptual x=2^63 endpoint has no compact u64 key.
+  }
   Point key{bucket << shift, 0, false};
   U lo = 0, hi = size;
   while (lo < hi) {
@@ -232,6 +270,43 @@ RF_HD U indexed_lookup(const TableRow *rows, U size, Point key, const U *offsets
   U first = offsets[bucket], last = offsets[bucket + 1];
   return lookup(rows + first, last - first, key);
 }
+template <class TableRow>
+RF_HD U relation_lookup(const TableRow *rows, U size, Point key,
+                         const U *offsets, unsigned shift,
+                         const RightPartials &partials) {
+#ifdef ER_NEGATIVE_FILTER
+  if (!partials.filter.maybe(point_key(key)))
+    return UINT64_MAX;
+#else
+  (void)partials;
+#endif
+  return indexed_lookup(rows, size, key, offsets, shift);
+}
+// One arithmetic path shared by packed, unpacked and persistent searches.
+// The optional affine formula applies only to complete cached right sums.
+__device__ __forceinline__ Jac query_residual(Curve c, Bases b, unsigned split,
+                                             Point target, U id,
+                                             RightPartials partials) {
+  Jac sum;
+#ifdef ER_RIGHT_FULL_CACHE
+  if (partials.full) {
+#ifdef ER_AFFINE_QUERY
+    return c.affine_sub(target, partials.full[id].point());
+#else
+    sum = c.jac(partials.full[id].point());
+#endif
+  } else
+#endif
+  if (partials.first) {
+    sum = c.mixed(sum, partials.first[id / partials.second_size]);
+    sum = c.mixed(sum, partials.second[id % partials.second_size]);
+  } else {
+    sum = tuple_sum(c, b, split, b.slots, id);
+  }
+  if (sum.y)
+    sum.y = c.f.p - sum.y;
+  return c.mixed(sum, target);
+}
 template <bool Packed>
 __global__ void search_right(Curve c, Bases b, unsigned split, Point target,
                              U start, U count, const DeviceRow *left, U left_size,
@@ -241,22 +316,11 @@ __global__ void search_right(Curve c, Bases b, unsigned split, Point target,
   U local = U(blockIdx.x) * BLOCK + threadIdx.x;
   // Form target - sum(right) in Jacobian coordinates, then normalize once.
   Jac sum;
-  if (local < count) {
-    U id = start + local;
-    if (partials.first) {
-      sum = c.mixed(sum, partials.first[id / partials.second_size]);
-      sum = c.mixed(sum, partials.second[id % partials.second_size]);
-    } else {
-      sum = tuple_sum(c, b, split, b.slots, id);
-    }
-  }
-  if (sum.y)
-    sum.y = c.f.p - sum.y;
   if (local < count)
-    sum = c.mixed(sum, target);
+    sum = query_residual(c, b, split, target, start + local, partials);
   Point residual = normalize_block(c, sum);
   if (local < count) {
-    U l = indexed_lookup(left, left_size, residual, offsets, shift);
+    U l = relation_lookup(left, left_size, residual, offsets, shift, partials);
     if constexpr (!Packed)
       matches[local] = l;
     if (l != UINT64_MAX) {
@@ -287,20 +351,11 @@ __global__ void search_right_persistent(
     const bool active = threadIdx.x < count_here;
     U id = active ? start + threadIdx.x : 0;
     Jac sum;
-    if (active) {
-      if (partials.first) {
-        sum = c.mixed(sum, partials.first[id / partials.second_size]);
-        sum = c.mixed(sum, partials.second[id % partials.second_size]);
-      } else {
-        sum = tuple_sum(c, b, split, b.slots, id);
-      }
-      if (sum.y)
-        sum.y = c.f.p - sum.y;
-      sum = c.mixed(sum, target);
-    }
+    if (active)
+      sum = query_residual(c, b, split, target, id, partials);
     Point residual = normalize_block(c, sum);
     if (active && id <= bound &&
-        indexed_lookup(left, left_size, residual, offsets, shift) != UINT64_MAX)
+        relation_lookup(left, left_size, residual, offsets, shift, partials) != UINT64_MAX)
       atomicMin(result, static_cast<unsigned long long>(id));
     if (!threadIdx.x)
       visited += count_here;
@@ -324,20 +379,11 @@ __global__ void resolve_persistent_winner(
   if (id == UINT64_MAX)
     return; // Uniform; previous kernel completed on the same stream.
   Jac sum;
-  if (!threadIdx.x) {
-    if (partials.first) {
-      sum = c.mixed(sum, partials.first[id / partials.second_size]);
-      sum = c.mixed(sum, partials.second[id % partials.second_size]);
-    } else {
-      sum = tuple_sum(c, b, split, b.slots, id);
-    }
-    if (sum.y)
-      sum.y = c.f.p - sum.y;
-    sum = c.mixed(sum, target);
-  }
+  if (!threadIdx.x)
+    sum = query_residual(c, b, split, target, id, partials);
   Point residual = normalize_block(c, sum);
   if (!threadIdx.x)
-    result[1] = indexed_lookup(left, left_size, residual, offsets, shift);
+    result[1] = relation_lookup(left, left_size, residual, offsets, shift, partials);
 }
 #endif
 __global__ void lift_x(Curve c, const U *xs, U n, Point *out) {
@@ -368,7 +414,8 @@ __global__ void hash_base_wide(Curve c, U modulus, U inv, U beta, U tau,
   if (t >= tau)
     return;
   U v = t >= beta ? t - beta : modulus - (beta - t);
-  U z = hash_mul63(inv, v, modulus);
+  U z = modulus < (U(1) << 63) ? hash_mul63(inv, v, modulus)
+                                     : hash_mul64(inv, v, modulus);
   Point q;
   if (z < 2 * c.f.p)
     c.lift(z / 2, z & 1, q);
@@ -398,7 +445,14 @@ class DeviceBackend {
   thrust::device_vector<DeviceRow> rows;
   thrust::device_vector<U> matches;
   thrust::device_vector<U> prefixes;
+#ifdef ER_NEGATIVE_FILTER
+  thrust::device_vector<unsigned long long> filter_words;
+#endif
   thrust::device_vector<Point> right_first, right_second;
+#ifdef ER_RIGHT_FULL_CACHE
+  thrust::device_vector<CachedPoint> right_full;
+  U right_cache_limit = UINT64_MAX;
+#endif
   unsigned prefix_shift = 0;
   thrust::device_vector<unsigned long long> winner;
   void admission(U bytes) {
@@ -426,8 +480,16 @@ class DeviceBackend {
   }
 
 public:
-  DeviceBackend(Curve curve, U max_rows, U batch)
+  U cached_partial_rows() const {
+    return right_first.size() + right_second.size();
+  }
+  DeviceBackend(Curve curve, U max_rows, U batch, U full_cache_limit = UINT64_MAX)
       : c(curve), cap(max_rows), chunk(batch) {
+#ifdef ER_RIGHT_FULL_CACHE
+    right_cache_limit = full_cache_limit;
+#else
+    (void)full_cache_limit;
+#endif
     if (!cap || !chunk || chunk > cap)
       throw std::runtime_error("invalid GPU row/chunk caps");
     blocks(cap);
@@ -446,7 +508,25 @@ public:
 #endif
 #endif
   }
+  U cached_right_rows() const {
+#ifdef ER_RIGHT_FULL_CACHE
+    return right_full.size();
+#else
+    return 0;
+#endif
+  }
+  U negative_filter_bytes() const {
+#ifdef ER_NEGATIVE_FILTER
+    return filter_words.size() * sizeof(unsigned long long);
+#else
+    return 0;
+#endif
+  }
   void prepare(const Plan &next) {
+#ifdef ER_NEGATIVE_FILTER
+    filter_words.clear();
+    filter_words.shrink_to_fit();
+#endif
     rows.clear();
     rows.shrink_to_fit();
     points.clear();
@@ -461,6 +541,10 @@ public:
     right_first.shrink_to_fit();
     right_second.clear();
     right_second.shrink_to_fit();
+#ifdef ER_RIGHT_FULL_CACHE
+    right_full.clear();
+    right_full.shrink_to_fit();
+#endif
     p = next;
 #ifdef ER_DENSE_ROWS
     if (p.left > (U(1) << 32))
@@ -517,16 +601,36 @@ public:
               (packed ? 0 : product(chunk, sizeof(U))) + result_words * sizeof(U) +
               (bins ? product(bins + 1, sizeof(U)) : 0) +
               product(first_count + second_count, sizeof(Point));
+    [[maybe_unused]] U filter_count = 0;
+#ifdef ER_NEGATIVE_FILTER
+    filter_count = filter_word_count(p.left);
+#endif
+    const U filter_bytes = product(filter_count, sizeof(unsigned long long));
+    const U retained = bytes - sort_bytes + filter_bytes;
+    // Filter construction follows sort scratch release, before cache allocation.
+    bytes = std::max(bytes, retained);
+    [[maybe_unused]] U full_count = 0;
+#ifdef ER_RIGHT_FULL_CACHE
+    size_t free_bytes = 0, total_bytes = 0;
+    cuda_check(cudaMemGetInfo(&free_bytes, &total_bytes));
+    if (right_cache_fits(p.right, retained, free_bytes, right_cache_limit)) {
+      full_count = p.right;
+      // Sort scratch is released before the full cache is allocated. Charge
+      // the greater phase peak, rather than simultaneously-live storage.
+      bytes = std::max(bytes, retained + product(full_count, sizeof(CachedPoint)));
+    }
+#endif
 #ifdef ER_TABLE_DIAGNOSTICS
     std::fprintf(stderr,
                  "TABLE left=%llu right=%llu bins=%llu admission_bytes=%llu "
                  "partial_first=%llu partial_second=%llu row_width=%u "
-                 "sort_bytes=%llu sort_queried=%u\n",
+                 "sort_bytes=%llu sort_queried=%u right_cache_rows=%llu filter_bytes=%llu\n",
                  (unsigned long long)p.left, (unsigned long long)p.right,
                  (unsigned long long)bins, (unsigned long long)bytes,
                  (unsigned long long)first_count,
                  (unsigned long long)second_count, unsigned(sizeof(DeviceRow)),
-                 (unsigned long long)sort_bytes, queried_sort);
+                 (unsigned long long)sort_bytes, queried_sort,
+                 (unsigned long long)full_count, (unsigned long long)filter_bytes);
 #endif
     admission(bytes);
     points.assign(p.points.begin(), p.points.end());
@@ -569,6 +673,25 @@ public:
       }
       cuda_check(cudaDeviceSynchronize());
     }
+#ifdef ER_NEGATIVE_FILTER
+    if (filter_count) {
+      filter_words.resize(filter_count);
+      cuda_check(cudaMemsetAsync(data(filter_words), 0, filter_bytes));
+      build_negative_filter<<<blocks(p.left), BLOCK>>>(
+          data(rows), p.left, data(filter_words), filter_count - 1);
+      cuda_check(cudaGetLastError());
+      cuda_check(cudaDeviceSynchronize());
+    }
+#endif
+#ifdef ER_RIGHT_FULL_CACHE
+    if (full_count) {
+      right_full.resize(full_count);
+      build_right_cache<<<blocks(full_count), BLOCK>>>(
+          c, p.view(data(points)), p.split, full_count, data(right_full));
+      cuda_check(cudaGetLastError());
+      cuda_check(cudaDeviceSynchronize());
+    }
+#endif
   }
   Result find(Point target, U max_work) {
     if (!c.on_curve(target))
@@ -579,6 +702,14 @@ public:
     RightPartials partials;
     if (!right_first.empty())
       partials = {data(right_first), data(right_second), right_second.size()};
+#ifdef ER_RIGHT_FULL_CACHE
+    if (!right_full.empty())
+      partials.full = data(right_full);
+#endif
+#ifdef ER_NEGATIVE_FILTER
+    if (!filter_words.empty())
+      partials.filter = {data(filter_words), filter_words.size() - 1};
+#endif
 #ifdef ER_QUERY_PERSISTENT
     if (p.right) {
       cuda_check(cudaMemsetAsync(data(winner), 0xff, 2 * sizeof(U)));
