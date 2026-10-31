@@ -1,0 +1,40 @@
+[
+  {
+    "case": "legacy-rejected",
+    "wrapper_exit": 0,
+    "native_exit": 1,
+    "inputs_unchanged": true,
+    "expected_wrapper_exit": 0,
+    "expected_native_exit": 1
+  },
+  {
+    "case": "strict-rejected",
+    "wrapper_exit": 1,
+    "native_exit": 1,
+    "inputs_unchanged": true,
+    "expected_wrapper_exit": 1,
+    "expected_native_exit": 1
+  },
+  {
+    "case": "strict-positive",
+    "wrapper_exit": 0,
+    "native_exit": 0,
+    "inputs_unchanged": true,
+    "expected_wrapper_exit": 0,
+    "expected_native_exit": 0
+  },
+  {
+    "case": "strict-input-mutation",
+    "wrapper_exit": 2,
+    "native_exit": 0,
+    "inputs_unchanged": false,
+    "expected_wrapper_exit": 2,
+    "expected_native_exit": 0
+  },
+  {
+    "case": "stale-output",
+    "wrapper_exit": 1,
+    "native_execution": "not reached; existing directory rejected",
+    "retained_files_unchanged": true
+  }
+]

@@ -1,0 +1,7 @@
+# Fresh native owner monotonic-stop correction
+
+Captures one Instant before validation, then precise UTC Duration. The immutable remaining duration is checked both before spawn and throughout wait4 polling, alongside the original absolute UTC stop. Sampling monotonic first makes sampling delay conservative. A backwards UTC step cannot extend the admission interval. Clock read/epoch errors fail closed. Config bytes, stop binding, receipt schema, child statuses, bounded cleanup, and unknown allocated-worker values are unchanged.
+
+Fake-clock tests cover rollback, forward step, fractional remaining duration and exact/already expired admission. Existing owned-child success/failure, direct/wrapper signal forwarding, missing binding and receipt identity fixtures pass. Final-source all-target Clippy passes. First fixture compilation lacked run-ecbench at expected relative path; retained failure log, repaired private directory layout. No shared edits, scientific/cloud execution, static-musl rebuild or publication. Prior static binary hash qualifies prior source only.
+
+This remains polling enforcement: synchronous spawn/postexec observation/evidence I/O and detached processes are not independently killed by a watchdog. Process-group stop and reap timeout do not establish physical worker teardown. The same-UID trust boundary and null allocated-worker accounting remain. Capture occurs separately for run and replay using the unchanged absolute stop, not a new grant.
