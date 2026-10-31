@@ -1,0 +1,39 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "R2 k1n9L",
+ "description": "R2 matched sweep cell (published arm swept per size vs lab arm swept).",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 1,
+    "n": 9
+   }
+  ],
+  "targets_per_curve": 8,
+  "target_seed": 202610111901,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "inherited-f4-l2",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-standard-subspace:dimension=2",
+     "oracle": "pdp3-binary:m=3,engine=inherited-f4,degree=3,node_budget=8192",
+     "max_trials": "200000"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 202610111902,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

@@ -1,0 +1,63 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "R2 k1n11",
+ "description": "R2 matched sweep cell (published arm swept per size vs lab arm swept).",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 1,
+    "n": 11
+   }
+  ],
+  "targets_per_curve": 8,
+  "target_seed": 202610111901,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "msolve-x-l4-s3",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-standard-subspace:dimension=4",
+     "oracle": "pdp3-binary:m=3,engine=msolve-s4,form=x,spec=3",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "msolve-x-l4-s5",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-standard-subspace:dimension=4",
+     "oracle": "pdp3-binary:m=3,engine=msolve-s4,form=x,spec=5",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "msolve-x-l5-s6",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-standard-subspace:dimension=5",
+     "oracle": "pdp3-binary:m=3,engine=msolve-s4,form=x,spec=6",
+     "max_trials": "200000"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 202610111902,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}
