@@ -6159,3 +6159,204 @@ mod terminal_ledger_tests {
         assert!(verify_budget_ledger(&vec![b' '; 2049], b.original_limits()).is_err());
     }
 }
+
+/// Retained native-phase artifacts; no claim of signed-domain or cell completion.
+struct NativePhaseRun<'a> {
+    construction: Option<Construction>,
+    persistence_failure: Option<PersistenceFailure>,
+    matrix: Option<MatrixStep>,
+    events: Option<BoundNativeEvents<'a>>,
+    ledger: SavedBudgetLedger,
+}
+fn run_native_phases<'a>(
+    original: &MathInput,
+    binding: &crate::ml_dataset::capture::AttemptBinding,
+    capture_limits: &'a crate::ml_dataset::capture::CaptureLimits,
+    public_sha256: &str,
+    factor_base_sha256: &str,
+    engine: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Engine,
+    degree: u32,
+    budget: &mut Budget,
+    global: &mut usize,
+    persist: &mut impl FnMut(&[u8], &mut Budget) -> Result<(), String>,
+) -> NativePhaseRun<'a> {
+    let mut out = NativePhaseRun {
+        construction: None,
+        persistence_failure: None,
+        matrix: None,
+        events: None,
+        ledger: budget.saved_ledger(),
+    };
+    let result = (|| -> Result<(), Stop> {
+        if budget.phase != Phase::Setup {
+            return budget.fail(Stop::Phase);
+        }
+        budget.reserve_bytes(
+            std::mem::size_of::<NativePhaseRun<'_>>() as u64,
+            Instant::now(),
+        )?;
+        out.events = Some(BoundNativeEvents::new(binding, capture_limits, budget)?);
+        let events = out.events.as_mut().unwrap();
+        out.construction = Some(construct_original(original, budget, &mut |event, b| {
+            events
+                .emit(NativeBoundary::construction(event), b, global)
+                .map_err(|_| ())
+        }));
+        let construction = out.construction.as_ref().unwrap();
+        if let Some(stop) = construction.adapter_stop {
+            return Err(stop);
+        }
+        let Some(output) = construction.output.as_ref() else {
+            return budget.fail(Stop::NativeFailure);
+        };
+        let input = match persist_original(
+            original,
+            output,
+            budget,
+            binding,
+            public_sha256,
+            factor_base_sha256,
+            persist,
+        ) {
+            Ok(input) => input,
+            Err(failure) => {
+                out.persistence_failure = Some(failure);
+                return Err(Stop::Observer);
+            }
+        };
+        out.matrix = Some(matrix_step(input, engine, degree, &mut |event, b| {
+            events
+                .emit(NativeBoundary::matrix(event), b, global)
+                .map_err(|_| ())
+        }));
+        if let Some(stop) = out.matrix.as_ref().unwrap().adapter_stop {
+            return Err(stop);
+        }
+        Ok(())
+    })();
+    if let Err(stop) = result {
+        let _ = budget.fail::<()>(stop);
+    }
+    out.ledger = budget.saved_ledger();
+    out
+}
+#[cfg(test)]
+mod native_phase_driver_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native;
+    use crate::ml_dataset::capture::capture_limits;
+    #[test]
+    fn original_native_phases_share_capture_and_preserve_exact_persisted_input() {
+        for engine in [
+            native::Engine::F4Macaulay,
+            native::Engine::F5KoszulFrobenius,
+        ] {
+            let binding = matrix_tests::binding();
+            let limits = capture_limits(16).unwrap();
+            let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+            let original = construction_tests::fixture();
+            let mut budget = construction_tests::budget();
+            let mut global = 0;
+            let mut persisted = Vec::new();
+            let run = run_native_phases(
+                &original,
+                &binding,
+                &limits,
+                &"8".repeat(64),
+                &"9".repeat(64),
+                engine,
+                3,
+                &mut budget,
+                &mut global,
+                &mut |bytes, _| {
+                    persisted = bytes.to_vec();
+                    Ok(())
+                },
+            );
+            assert!(run.ledger.first_stop.is_none());
+            assert_eq!(run.ledger.phase, Phase::MatrixComplete);
+            assert!(run.persistence_failure.is_none());
+            assert!(run.construction.as_ref().unwrap().output.is_some());
+            let matrix = run.matrix.as_ref().unwrap();
+            assert_eq!(matrix.original_bytes, persisted);
+            assert!(matrix.report.as_ref().unwrap().native_step_complete);
+            let events = run.events.as_ref().unwrap();
+            let replay = verify_native_capture(
+                sink.dir.parent().unwrap(),
+                &events.canonical,
+                &binding,
+                &limits,
+                23,
+                engine,
+                3,
+            )
+            .unwrap();
+            assert!(replay.construction_complete_captured && replay.matrix_finish_captured);
+            assert_eq!(replay.records, global);
+            let ledger = verify_budget_ledger(
+                &serde_json::to_vec(&run.ledger).unwrap(),
+                budget.original_limits(),
+            )
+            .unwrap();
+            assert!(!ledger.completion_eligible);
+        }
+    }
+    #[test]
+    fn persistence_failure_retains_input_and_prevents_matrix_execution() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let _sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let original = construction_tests::fixture();
+        let mut budget = construction_tests::budget();
+        let mut global = 0;
+        let run = run_native_phases(
+            &original,
+            &binding,
+            &limits,
+            &"8".repeat(64),
+            &"9".repeat(64),
+            native::Engine::F4Macaulay,
+            3,
+            &mut budget,
+            &mut global,
+            &mut |_, _| Err("selected persistence failure".into()),
+        );
+        assert_eq!(run.ledger.first_stop, Some(Stop::Observer));
+        assert!(run.matrix.is_none());
+        let failure = run.persistence_failure.as_ref().unwrap();
+        assert!(failure.serialized_complete && !failure.bytes.is_empty());
+        assert_eq!(failure.reason, "selected persistence failure");
+        assert!(run.construction.as_ref().unwrap().output.is_some());
+    }
+    #[test]
+    fn capture_trace_refusal_retains_pending_boundary_and_skips_downstream_work() {
+        let binding = matrix_tests::binding();
+        let limits = capture_limits(16).unwrap();
+        let _sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+        let original = construction_tests::fixture();
+        let mut budget = construction_tests::budget();
+        budget.trace_limit = 1;
+        let mut global = 0;
+        let mut persistence_called = false;
+        let run = run_native_phases(
+            &original,
+            &binding,
+            &limits,
+            &"8".repeat(64),
+            &"9".repeat(64),
+            native::Engine::F4Macaulay,
+            3,
+            &mut budget,
+            &mut global,
+            &mut |_, _| {
+                persistence_called = true;
+                Ok(())
+            },
+        );
+        assert_eq!(run.ledger.first_stop, Some(Stop::Trace));
+        assert!(!persistence_called && run.matrix.is_none());
+        assert!(run.events.as_ref().unwrap().pending.is_some());
+        assert!(run.events.as_ref().unwrap().canonical.is_empty());
+        assert_eq!(global, 0);
+    }
+}
