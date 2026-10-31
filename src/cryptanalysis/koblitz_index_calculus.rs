@@ -9261,6 +9261,7 @@ pub fn sat_decompose_chained_s3_any_m(
             },
             patterns: ChainS3Patterns::All,
             tables: ChainS3Tables::default(),
+            wall_budget: None,
         },
     )
 }
@@ -9298,6 +9299,7 @@ fn sat_decompose_chained_s3_with_domain(
             },
             patterns: ChainS3Patterns::All,
             tables: ChainS3Tables::default(),
+            wall_budget: None,
         },
     )
 }
@@ -9379,6 +9381,9 @@ pub struct ChainS3Options {
     pub order: ChainS3Order,
     pub patterns: ChainS3Patterns,
     pub tables: ChainS3Tables,
+    /// Wall-clock cap on the whole query (tables and every pattern's
+    /// solve); reaching it leaves the query undecided, never refuted.
+    pub wall_budget: Option<std::time::Duration>,
 }
 
 /// The chained-S3 decomposer for `m` in `2..=9` with every option explicit.
@@ -9485,6 +9490,7 @@ pub fn sat_decompose_chained_s3_patterns(
             order,
             patterns,
             tables: ChainS3Tables::default(),
+            wall_budget: None,
         },
     )
 }
@@ -9502,7 +9508,9 @@ fn sat_decompose_chained_s3_checked(
         order,
         patterns,
         tables,
+        wall_budget,
     } = options;
+    let deadline = wall_budget.map(|budget| std::time::Instant::now() + budget);
     use crate::cryptanalysis::binary_semaev_chain_sat::{
         finite_domain_clause_count, frobenius_orbit_domain_size, ChainBuildError, ChainedS3Encoding,
     };
@@ -9694,6 +9702,11 @@ fn sat_decompose_chained_s3_checked(
         stats.peak_xors = stats.peak_xors.max(enc.solver.n_xors());
         let earlier_conflicts = stats.conflicts;
         enc.solver.conflict_budget = limits.conflict_budget - earlier_conflicts;
+        enc.solver.deadline = deadline;
+        if deadline.is_some_and(|d| std::time::Instant::now() >= d) {
+            stats.exhausted = true;
+            return (None, stats);
+        }
         loop {
             stats.solver_calls += 1;
             let outcome = enc.solver.solve();
@@ -23201,5 +23214,79 @@ mod wide_field_structure_tests {
             SatDecompositionOptions::default(),
         );
         assert!(points.is_none() && !stats.refuted);
+    }
+}
+
+#[cfg(test)]
+mod chain_s3_tables_tests {
+    use super::*;
+
+    fn union_base(kc: &KoblitzCurve) -> FrobeniusFactorBase {
+        let basis: Vec<F2mElement> = (0..2)
+            .map(|i| F2mElement::from_bit_positions(&[i], kc.n))
+            .collect();
+        build_frobenius_union_factor_base(kc, &basis).expect("union base")
+    }
+
+    fn options(tables: ChainS3Tables) -> ChainS3Options {
+        ChainS3Options {
+            frobenius_orbits: false,
+            order: ChainS3Order::AllSummands,
+            patterns: ChainS3Patterns::All,
+            tables,
+            wall_budget: None,
+        }
+    }
+
+    const LIMITS: ChainS3Limits = ChainS3Limits {
+        max_variables: 4_000_000,
+        max_domain_clauses: 50_000_000,
+        max_models: 64,
+        conflict_budget: 400_000,
+    };
+
+    /// The tables are exact domains: a planted three-summand target keeps a
+    /// group-verified witness with full ordering and both table sides on.
+    #[test]
+    fn n83_tables_keep_a_planted_three_summand_witness() {
+        let kc = KoblitzCurve::known_n83_k1().expect("fixture");
+        let fb = union_base(&kc);
+        let picks = [3usize, 40, 97];
+        let target = picks
+            .iter()
+            .fold(BinaryPoint::Infinity, |acc, &i| kc.add(&acc, &fb.points[i]));
+        let tables = ChainS3Tables {
+            front: 2,
+            back: 1,
+            max_points: 300_000,
+        };
+        let (found, stats) =
+            sat_decompose_chained_s3_with(&kc, &fb, &target, 3, LIMITS, options(tables));
+        let found = found.unwrap_or_else(|| panic!("planted witness lost: {stats:?}"));
+        let sum = found
+            .iter()
+            .fold(BinaryPoint::Infinity, |acc, &i| kc.add(&acc, &fb.points[i]));
+        assert_eq!(sum, target);
+    }
+
+    /// A step whose front and back tables do not meet is refuted at the root,
+    /// and a refutation is reported only after every identity pattern.
+    #[test]
+    fn n83_disjoint_tables_refute_without_search() {
+        let kc = KoblitzCurve::known_n83_k1().expect("fixture");
+        let fb = union_base(&kc);
+        let target = kc.mul(kc.generator(), &BigUint::from(0x5eed_83u64));
+        let tables = ChainS3Tables {
+            front: 2,
+            back: 1,
+            max_points: 300_000,
+        };
+        let (found, stats) =
+            sat_decompose_chained_s3_with(&kc, &fb, &target, 3, LIMITS, options(tables));
+        assert!(
+            found.is_none() && stats.refuted && !stats.exhausted,
+            "{stats:?}"
+        );
+        assert_eq!(stats.patterns_attempted, 2);
     }
 }

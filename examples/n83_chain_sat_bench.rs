@@ -10,7 +10,7 @@
 //! beside it. Every witness is re-added in the curve group.
 //!
 //! ```text
-//! n83_chain_sat_bench <m> <union_dim> <public> <planted> <conflict_budget> <seed> <arms>
+//! n83_chain_sat_bench <m> <union_dim> <public> <planted> <conflict_budget> <seed> <arms> <wall_seconds>
 //! ```
 //! `arms` is a comma list of `unordered`, `first-pair`, `all-summands`, each
 //! optionally followed by `+affine` (search only the all-affine identity
@@ -28,8 +28,10 @@ use std::time::Instant;
 
 fn main() {
     let a: Vec<String> = std::env::args().skip(1).collect();
-    if a.len() != 7 {
-        eprintln!("usage: <m> <union_dim> <public> <planted> <conflict_budget> <seed> <arms>");
+    if a.len() != 8 {
+        eprintln!(
+            "usage: <m> <union_dim> <public> <planted> <conflict_budget> <seed> <arms> <wall_seconds>"
+        );
         std::process::exit(2);
     }
     let m: usize = a[0].parse().expect("m");
@@ -38,6 +40,7 @@ fn main() {
     let planted: usize = a[3].parse().expect("planted");
     let budget: u64 = a[4].parse().expect("conflict_budget");
     let seed: u64 = a[5].parse().expect("seed");
+    let wall_seconds: u64 = a[7].parse().expect("wall_seconds");
     let arms: Vec<(String, ChainS3Options)> = a[6]
         .split(',')
         .map(|spec| {
@@ -53,6 +56,7 @@ fn main() {
                 order,
                 patterns: ChainS3Patterns::All,
                 tables: ChainS3Tables::default(),
+                wall_budget: Some(std::time::Duration::from_secs(wall_seconds)),
             };
             for part in parts {
                 if part == "affine" {
