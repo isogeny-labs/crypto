@@ -1,0 +1,3336 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "N83-FACTOR-BASE-COORDINATE-VARIANTS-E28-20261031-R1",
+  "version": 8,
+  "created": "2026-10-31",
+  "repository": "crypto",
+  "study_dir": "research/n83_candidate_pdp_20261028",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "design": "FACTOR_BASE_VARIANT_SWEEP_DESIGN.md",
+    "format": "FORMAT.json",
+    "run_output_format": "RUN_OUTPUT_FORMAT.json"
+  },
+  "question": "For each fixed high coordinate bit r=27..39, exhaustively enumerate the same 2^27 selector indices on each N83 Koblitz, general-binary, and prime curve, preserve complete affine point bases, and bind each base for reuse at m=2..9. This stage records factor-base structure and exact point counts only; it does not measure FFD, LFD, degree of regularity, or solver cost. This amendment uses the EKS job-scoped results bucket for source reads and outputs; it preserves partial uploads as immutable content-addressed snapshots.",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "For every r in 27..39 and all three curve families, enumerate all 2^27 candidate x-coordinates, retain every affine lift with both distinct signs, and validate all omitted-lift checks.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Bind each completed family/r manifest to the unchanged base used for m=2..9.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C3",
+      "text": "No FFD, LFD, degree-of-regularity, PDP-solver-cost, subgroup, or ECDLP claim is made by this enumeration stage.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [],
+  "arms": [
+    {
+      "id": "koblitz_spike27",
+      "role": "candidate",
+      "description": "Exhaustive koblitz factor base using coordinate-bit variant r=27; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike27",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          27
+        ]
+      }
+    },
+    {
+      "id": "binary_spike27",
+      "role": "candidate",
+      "description": "Exhaustive binary factor base using coordinate-bit variant r=27; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike27",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          27
+        ]
+      }
+    },
+    {
+      "id": "prime_spike27",
+      "role": "candidate",
+      "description": "Exhaustive prime factor base using coordinate-bit variant r=27; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike27",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          27
+        ]
+      }
+    },
+    {
+      "id": "koblitz_spike28",
+      "role": "candidate",
+      "description": "Exhaustive koblitz factor base using coordinate-bit variant r=28; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike28",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          28
+        ]
+      }
+    },
+    {
+      "id": "binary_spike28",
+      "role": "candidate",
+      "description": "Exhaustive binary factor base using coordinate-bit variant r=28; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike28",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          28
+        ]
+      }
+    },
+    {
+      "id": "prime_spike28",
+      "role": "candidate",
+      "description": "Exhaustive prime factor base using coordinate-bit variant r=28; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike28",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          28
+        ]
+      }
+    },
+    {
+      "id": "koblitz_spike29",
+      "role": "candidate",
+      "description": "Exhaustive koblitz factor base using coordinate-bit variant r=29; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike29",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          29
+        ]
+      }
+    },
+    {
+      "id": "binary_spike29",
+      "role": "candidate",
+      "description": "Exhaustive binary factor base using coordinate-bit variant r=29; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike29",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          29
+        ]
+      }
+    },
+    {
+      "id": "prime_spike29",
+      "role": "candidate",
+      "description": "Exhaustive prime factor base using coordinate-bit variant r=29; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike29",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          29
+        ]
+      }
+    },
+    {
+      "id": "koblitz_spike30",
+      "role": "candidate",
+      "description": "Exhaustive koblitz factor base using coordinate-bit variant r=30; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike30",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          30
+        ]
+      }
+    },
+    {
+      "id": "binary_spike30",
+      "role": "candidate",
+      "description": "Exhaustive binary factor base using coordinate-bit variant r=30; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike30",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          30
+        ]
+      }
+    },
+    {
+      "id": "prime_spike30",
+      "role": "candidate",
+      "description": "Exhaustive prime factor base using coordinate-bit variant r=30; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike30",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          30
+        ]
+      }
+    },
+    {
+      "id": "koblitz_spike31",
+      "role": "candidate",
+      "description": "Exhaustive koblitz factor base using coordinate-bit variant r=31; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike31",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          31
+        ]
+      }
+    },
+    {
+      "id": "binary_spike31",
+      "role": "candidate",
+      "description": "Exhaustive binary factor base using coordinate-bit variant r=31; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike31",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          31
+        ]
+      }
+    },
+    {
+      "id": "prime_spike31",
+      "role": "candidate",
+      "description": "Exhaustive prime factor base using coordinate-bit variant r=31; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike31",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          31
+        ]
+      }
+    },
+    {
+      "id": "koblitz_spike32",
+      "role": "candidate",
+      "description": "Exhaustive koblitz factor base using coordinate-bit variant r=32; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike32",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          32
+        ]
+      }
+    },
+    {
+      "id": "binary_spike32",
+      "role": "candidate",
+      "description": "Exhaustive binary factor base using coordinate-bit variant r=32; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike32",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          32
+        ]
+      }
+    },
+    {
+      "id": "prime_spike32",
+      "role": "candidate",
+      "description": "Exhaustive prime factor base using coordinate-bit variant r=32; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike32",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          32
+        ]
+      }
+    },
+    {
+      "id": "koblitz_spike33",
+      "role": "candidate",
+      "description": "Exhaustive koblitz factor base using coordinate-bit variant r=33; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike33",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          33
+        ]
+      }
+    },
+    {
+      "id": "binary_spike33",
+      "role": "candidate",
+      "description": "Exhaustive binary factor base using coordinate-bit variant r=33; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike33",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          33
+        ]
+      }
+    },
+    {
+      "id": "prime_spike33",
+      "role": "candidate",
+      "description": "Exhaustive prime factor base using coordinate-bit variant r=33; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike33",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          33
+        ]
+      }
+    },
+    {
+      "id": "koblitz_spike34",
+      "role": "candidate",
+      "description": "Exhaustive koblitz factor base using coordinate-bit variant r=34; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike34",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          34
+        ]
+      }
+    },
+    {
+      "id": "binary_spike34",
+      "role": "candidate",
+      "description": "Exhaustive binary factor base using coordinate-bit variant r=34; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike34",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          34
+        ]
+      }
+    },
+    {
+      "id": "prime_spike34",
+      "role": "candidate",
+      "description": "Exhaustive prime factor base using coordinate-bit variant r=34; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike34",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          34
+        ]
+      }
+    },
+    {
+      "id": "koblitz_spike35",
+      "role": "candidate",
+      "description": "Exhaustive koblitz factor base using coordinate-bit variant r=35; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike35",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          35
+        ]
+      }
+    },
+    {
+      "id": "binary_spike35",
+      "role": "candidate",
+      "description": "Exhaustive binary factor base using coordinate-bit variant r=35; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike35",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          35
+        ]
+      }
+    },
+    {
+      "id": "prime_spike35",
+      "role": "candidate",
+      "description": "Exhaustive prime factor base using coordinate-bit variant r=35; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike35",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          35
+        ]
+      }
+    },
+    {
+      "id": "koblitz_spike36",
+      "role": "candidate",
+      "description": "Exhaustive koblitz factor base using coordinate-bit variant r=36; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike36",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          36
+        ]
+      }
+    },
+    {
+      "id": "binary_spike36",
+      "role": "candidate",
+      "description": "Exhaustive binary factor base using coordinate-bit variant r=36; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike36",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          36
+        ]
+      }
+    },
+    {
+      "id": "prime_spike36",
+      "role": "candidate",
+      "description": "Exhaustive prime factor base using coordinate-bit variant r=36; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike36",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          36
+        ]
+      }
+    },
+    {
+      "id": "koblitz_spike37",
+      "role": "candidate",
+      "description": "Exhaustive koblitz factor base using coordinate-bit variant r=37; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike37",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          37
+        ]
+      }
+    },
+    {
+      "id": "binary_spike37",
+      "role": "candidate",
+      "description": "Exhaustive binary factor base using coordinate-bit variant r=37; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike37",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          37
+        ]
+      }
+    },
+    {
+      "id": "prime_spike37",
+      "role": "candidate",
+      "description": "Exhaustive prime factor base using coordinate-bit variant r=37; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike37",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          37
+        ]
+      }
+    },
+    {
+      "id": "koblitz_spike38",
+      "role": "candidate",
+      "description": "Exhaustive koblitz factor base using coordinate-bit variant r=38; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike38",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          38
+        ]
+      }
+    },
+    {
+      "id": "binary_spike38",
+      "role": "candidate",
+      "description": "Exhaustive binary factor base using coordinate-bit variant r=38; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike38",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          38
+        ]
+      }
+    },
+    {
+      "id": "prime_spike38",
+      "role": "candidate",
+      "description": "Exhaustive prime factor base using coordinate-bit variant r=38; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike38",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          38
+        ]
+      }
+    },
+    {
+      "id": "koblitz_spike39",
+      "role": "candidate",
+      "description": "Exhaustive koblitz factor base using coordinate-bit variant r=39; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike39",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          39
+        ]
+      }
+    },
+    {
+      "id": "binary_spike39",
+      "role": "candidate",
+      "description": "Exhaustive binary factor base using coordinate-bit variant r=39; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike39",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          39
+        ]
+      }
+    },
+    {
+      "id": "prime_spike39",
+      "role": "candidate",
+      "description": "Exhaustive prime factor base using coordinate-bit variant r=39; same point set reused for m=2..9.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "factor_base"
+          ]
+        ],
+        "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+        "threads": 6
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true,
+        "candidate_id": "spike39",
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          39
+        ]
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact enumeration and equation/existence checks; no clock comparison."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Pre-run selfcheck enumerates all three curves on x0..63 and validates complete points; development arithmetic and endpoint tests pass. These are mandatory checks, not comparison arms."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Pre-run selfcheck must reject altered y and deleted point on each family."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "coordinate_bit",
+        "levels": [
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39
+        ]
+      },
+      {
+        "name": "curve_family",
+        "levels": [
+          "koblitz",
+          "binary",
+          "prime"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source",
+        "treatment": "fixed",
+        "value": "9abf61694c4ac6a73788ef25b4ca1c66119aa440",
+        "how": "Committed native enumerator and verifier, binary hash bound"
+      },
+      {
+        "name": "domain",
+        "treatment": "fixed",
+        "value": "For each r in 27..39: x=(i & (2^26-1)) | ((i>>26)<<r), 0<=i<2^27; each r is a separate fixed base domain.",
+        "how": "Injective coordinate map, all values enumerated, independent of m"
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 6,
+        "how": "Disjoint deterministic shards, dynamically assigned workers"
+      },
+      {
+        "name": "host",
+        "treatment": "execution-only; record host and image identity; no timing claim",
+        "how": "Existing m8i.8xlarge Spot workspace, six worker threads, uname and lscpu recorded, no performance clock claim"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "how": "Prime/Koblitz/binary interleaved by shard; output sorted by x and y",
+        "value": "Coordinate bits enumerated in ascending order; each candidate covers all three curve families; shards ordered by selector index."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "All-candidate validation, no exclusions"
+      },
+      {
+        "name": "limits",
+        "treatment": "fixed",
+        "how": "Six threads,8GiB virtual memory,5400s producer+20s grace,5700s outer limit; no retries",
+        "value": "Six worker threads;8GiB virtual memory;5400s producer plus20s grace;5700s outer deadline per coordinate-bit candidate; no automatic retries; upload every30s."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-coverage",
+        "arms": [
+          "koblitz_spike27",
+          "binary_spike27",
+          "prime_spike27",
+          "koblitz_spike28",
+          "binary_spike28",
+          "prime_spike28",
+          "koblitz_spike29",
+          "binary_spike29",
+          "prime_spike29",
+          "koblitz_spike30",
+          "binary_spike30",
+          "prime_spike30",
+          "koblitz_spike31",
+          "binary_spike31",
+          "prime_spike31",
+          "koblitz_spike32",
+          "binary_spike32",
+          "prime_spike32",
+          "koblitz_spike33",
+          "binary_spike33",
+          "prime_spike33",
+          "koblitz_spike34",
+          "binary_spike34",
+          "prime_spike34",
+          "koblitz_spike35",
+          "binary_spike35",
+          "prime_spike35",
+          "koblitz_spike36",
+          "binary_spike36",
+          "prime_spike36",
+          "koblitz_spike37",
+          "binary_spike37",
+          "prime_spike37",
+          "koblitz_spike38",
+          "binary_spike38",
+          "prime_spike38",
+          "koblitz_spike39",
+          "binary_spike39",
+          "prime_spike39"
+        ],
+        "differs_in": [
+          "coordinate_bit",
+          "curve_family"
+        ],
+        "design": "exhaustive enumeration",
+        "threshold": "All 128 shards per family/r validate, each family manifest validates, and top-level candidate index binds the exact r plus same_base_for_m=[2..9]."
+      }
+    ],
+    "aa_not_applicable": "Exact non-timing computation",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Deterministic complete enumeration, no timing comparison.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261028
+      ],
+      "nonce": null,
+      "note": "Development test seed only; production enumeration has no randomness."
+    },
+    "instance_sampling": {
+      "rule": "All128 disjoint contiguous x ranges per curve, no sampling",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact point validity and completeness criteria",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 4992,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": null,
+      "tests_in_family": 0,
+      "correction": "not applicable",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "13 coordinate bits x 3 families x 128 exhaustive shards; deterministic coverage, no statistical inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 6,
+      "estimated_total_seconds": 70200,
+      "measured_on": "Not measured; 5400-second per-bit wall cap is a budget, not an estimate of actual completion."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "point_count",
+        "name": "Stored affine points",
+        "unit": "points",
+        "kind": "counted",
+        "definition": "Number of20-byte records after32-byte header, both distinct signs included",
+        "source": "shard point_count",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "liftable_x",
+        "name": "Liftable x-values",
+        "unit": "x-values",
+        "kind": "counted",
+        "definition": "Candidate x-values with one or two affine lifts",
+        "source": "shard liftable_x",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0; exact deterministic counts only",
+    "warmups": 0,
+    "order": "alternate",
+    "clock": "none; wall_valid=false",
+    "counters": [
+      "point_count",
+      "liftable_x",
+      "checked_x",
+      "shards_verified"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "container_image_digest",
+      "source_revision",
+      "exit_code",
+      "protocol_file_sha256",
+      "per-file-sha256",
+      "s3_readback_sha256"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s-spot",
+    "queue": "isolab cpu-l2-spot",
+    "placement": {
+      "cpus": 6,
+      "memory": "8Gi",
+      "spot": true
+    },
+    "measurement_class": "exact-enumeration",
+    "timeout_seconds": 5700,
+    "checkpoint": {
+      "policy": "periodic-append-only-content-addressed-S3-snapshots",
+      "interval_seconds": 30,
+      "grace_seconds": 20,
+      "restore_validation": "not resumable; a new attempt has a fresh job-scoped S3 prefix and never overwrites prior keys",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "not resumed"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1,
+      "attempt_identity": "A failed or incomplete attempt is never overwritten; retry receives a new job name and attempt number."
+    },
+    "image_digest": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:c044fe7656fffe45a5ced4b7b5c6ebe6cdd4ada5815fe254c6e657fe92535fa2",
+    "source_bucket": "isolab-results-104186811093-us-east-2",
+    "source_read_mode": "Explicit aws s3 cp of each exact object key; no ListBucket call.",
+    "output_write_mode": "Explicit aws s3 cp to path-and-content-addressed keys under the job-scoped ISOLAB_RESULTS_URI; no ListBucket call."
+  },
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "rule": "All13 coordinate-bit domains x 3 curve families x 128 shards, covering each selector i in [0,2^27); each completed base is reused for m=2..9.",
+      "preregistered": true
+    },
+    {
+      "kind": "budget",
+      "rule": "Per coordinate bit, 5400-second producer cap plus20-second termination grace;6 threads;8GiB virtual memory;5700-second outer cap; no automatic retries. Every attempt and partial output is retained under a unique S3 prefix.",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any failed arithmetic/control, point-equation, sign-pair, omission, shard-join, candidate identity, or hash check invalidates affected outputs.",
+    "Missing shards prevent complete=true.",
+    "Timeouts and infrastructure failures are retained as incomplete attempts; never overwrite or delete.",
+    "No FFD/LFD/Dreg, PDP cost, subgroup, ECDLP or comparative performance inference."
+  ],
+  "decision_rule": {
+    "text": "Accept a candidate enumeration only when all 384 family shards, family manifests, omitted-lift checks, candidate coordinate identity and same-base-for-m binding validate. Otherwise retain as incomplete or invalid.",
+    "comparison_ids": [
+      "C-coverage"
+    ],
+    "statistic": "Exact point and lift counts plus verified coverage",
+    "interval": "not applicable",
+    "multiple_comparison_correction": "not applicable",
+    "effect_size_measure": "not applicable",
+    "verdict_vocabulary": [
+      "complete",
+      "incomplete",
+      "invalid"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "src/bin/factor_base.rs",
+      "sha256": "c67dd93d827936fb8c8bde0e0158f3ff82cd63c06eadb960e2539be6f0e00dd9",
+      "runner_path": "run-base-variant-v2.sh",
+      "runner_sha256": "ea3aa8bbfff51b50eaf5152190bb98a0c5bd7ba1f1e93459a0c8a3a7fde7e438"
+    },
+    "inputs": [
+      "All selector indices0..134217727 for each coordinate bit r=27..39",
+      "Each existing public N83 curve definition for Koblitz, general-binary, and prime families",
+      "Existing r=26 baseline and r=40 spike40 bases retained as historical controls; not regenerated."
+    ],
+    "outputs": [
+      "data/index.json",
+      "data/{family}/manifest.json",
+      "data/{family}/part-NNNN.bin.zst",
+      "data/{family}/part-NNNN.json",
+      "run-manifest.json",
+      "manifest.sha256",
+      "upload-history.jsonl",
+      "s3-file-index.json",
+      "protocol.json",
+      "runner.sh",
+      "instrument",
+      "producer.log",
+      "selfcheck.json",
+      "index-validation.json when complete"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Exact factor-base point counts per curve; reuse across m2..9"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Incomplete enumeration called complete",
+    "Candidate x-count confused with point count",
+    "Old varying-ell degrees presented for the new fixed base",
+    "Performance, subgroup or ECDLP claims"
+  ],
+  "literature": [
+    {
+      "ref": "https://arxiv.org/html/1906.05594",
+      "provenance": "retrieved",
+      "claim": "Established factor-base subspace construction and distinction of first fall from solver complexity",
+      "verified_by": "Primary text read before choosing candidate"
+    },
+    {
+      "ref": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7334981/",
+      "provenance": "retrieved",
+      "claim": "Subspace factor bases and point decomposition encodings",
+      "verified_by": "Primary paper read before implementation"
+    },
+    {
+      "ref": "research/koblitz_n83_factor_base_sweep_20261008/README.md",
+      "provenance": "internal",
+      "claim": "Existing polynomial/random/affine subspace sweep and n83 invariant-subspace obstruction",
+      "verified_by": "Inspected prior source/README; no novelty claim"
+    }
+  ],
+  "amendments": [
+    {
+      "id": "A1",
+      "amends_protocol_sha256": "a8534b5355237ce83ed70f0e484d0d06c4476a4cab2daae5c53d4bb6cfc1b4db",
+      "reason": "The r=27 attempt r1 failed before the factor-base producer started because the EKS worker role could not list the setec-astronomy-artifacts source bucket. This amendment places runtime assets and immutable outputs under the job-scoped isolab-results prefix and uses exact-key aws s3 cp operations. No factor-base data from r1 existed."
+    },
+    {
+      "id": "A2",
+      "amends_protocol_sha256": "68813867257218b986819458f75eb46810764bfb5e0a909a0ab9cc0e690cb567",
+      "reason": "The r=27 attempt r2 reached DeadlineExceeded at 2026-10-31T03:30:10Z while unscheduled. Its final results listing contains only the ten source-v2 objects and no point output. This amendment changes only the r=27 immutable attempt binding to 03 and preserves the full r=27..39, three-family, all-shard enumeration and all instrument/resource choices."
+    },
+    {
+      "id": "A3",
+      "amends_protocol_sha256": "d6da2b7ff0246b4709912a252df875a1929ecfc4138585559bfdd45ff24952a7",
+      "reason": "The r=27 attempt r3 scheduled and its wrapper started, but exact-key source retrieval used the Pod-scoped ISOLAB_RESULTS_URI and therefore requested a nonexistent r3/<pod-uid>/source-v3/BUNDLE_FORMAT.json key. The verified source-v3 bundle was at the Job-root prefix; the producer did not start and no point data was produced. This amendment assigns fresh attempt04 and fixes source location to exact keys under the new Job-root source-v4 prefix; output remains under the per-Pod ISOLAB_RESULTS_URI. Mathematical scope, source, binary, image, resources, shards, curve families and m-reuse are unchanged."
+    },
+    {
+      "id": "A4",
+      "amends_protocol_sha256": "6ac60066f0f0b226f059428f48a7b90271df6bec64539275efe9d38ccb4c186c",
+      "reason": "The r27 attempt r7 has emitted a complete factor-base index; r28 has no affected data. This amendment binds a fresh r28 attempt, updates the immutable source prefix and exact launch command, and passes coordinate bit 28 to the generic producer. All 13 candidate bits, complete three-family enumeration, 128 shards per family, and same-base-for-m=2..9 rule remain unchanged."
+    }
+  ],
+  "freeze": {
+    "status": "frozen-amendment-v8-r28",
+    "source_commit": "0a6c11b2b0dd",
+    "frozen_at": "2026-10-31T09:03:14Z",
+    "filed_before_affected_data": true,
+    "protocol_digest": "Exact protocol bytes are hashed in protocol-factor-base-variants-v8-r28.sha256 and included in the run manifest. The exact launch command SHA-256 is bound by extensions.launch_command_sha256. This amendment sets the r=28 attempt to fresh attempt 01 and derives the coordinate from the immutable Job-root output URI; candidate map, three curve families, complete shard coverage, resource limits and m reuse are unchanged."
+  },
+  "extensions": {
+    "candidate_coordinate_bits": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39
+    ],
+    "candidate_arm_count": 39,
+    "candidate_id_rule": "spike{r}",
+    "coordinate_map": "x_r(i)=(i & (2^26-1)) | ((i>>26)<<r), 0<=i<2^27",
+    "coordinate_bit_positions_rule": "[0,1,...,25,r]",
+    "selector_count_per_variant": 134217728,
+    "families": [
+      "koblitz",
+      "binary",
+      "prime"
+    ],
+    "reuse_for_m": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "shards_per_family": 128,
+    "total_shard_computations": 4992,
+    "existing_controls": {
+      "baseline": "r=26",
+      "spike40": "r=40",
+      "regenerate": false
+    },
+    "source_file_sha256": {
+      "src/bin/factor_base.rs": "c67dd93d827936fb8c8bde0e0158f3ff82cd63c06eadb960e2539be6f0e00dd9",
+      "src/field.rs": "dd297b8ec1297a7e84ce2728e748c7ce511217b7d8c62d134d4ffa012574150d",
+      "FORMAT.json": "baea1b3362eccacf7af41132f4a7dc571e783f861e557b46c811d61ac2c3befd",
+      "FACTOR_BASE_VARIANT_SWEEP_DESIGN.md": "a2c8e601f5e8fbb504b11c1572746878875b5ba8b8941883670f988174dfdb0c",
+      "RUN_OUTPUT_FORMAT.json": "e23469a9a5b7b095a501a4fb50f1b17c7b872968d4eb8243e9e3d5bd0dfd574b",
+      "run-base-variant-v2.sh": "a880a3e5bc844b4391af27e170ac88da9a727a453aec463360f405bb970acd98"
+    },
+    "binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+    "output_prefix_rule": "${ISOLAB_RESULTS_URI%/}/attempt-01/ for coordinate bit 28; NN is bound by attempt_by_coordinate_bit.",
+    "output_layout": "RUN_OUTPUT_FORMAT.json",
+    "model_readiness": "Enumeration only. Train a base-ranking model only after matched PDP systems and exact or explicitly censored Dreg evidence are available; validation folds must group by coordinate-bit/base ID.",
+    "data_preservation": "Never delete or overwrite local or S3 attempts; retries use a new attempt identifier and retain partial outputs.",
+    "image_digest": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:c044fe7656fffe45a5ced4b7b5c6ebe6cdd4ada5815fe254c6e657fe92535fa2",
+    "image_contract": "The existing UID-1000 isolab/tasks base image; the factor_base binary, runner, protocol and design are downloaded from the immutable S3 source prefix into /work/source before execution. The runner writes to the unique per-bit S3 attempt prefix.",
+    "source_prefix_rule": "Immutable code/assets are downloaded by exact keys from Job root runs/n83-fb-variants-r27-20261031-r4/source-v4/, except the corrected runner plus v8-r28 protocol/index downloaded from this Job root runs/n83-fb-variants-r28-20261031-r1/source-v8/. Derive Job root from Pod-scoped ISOLAB_RESULTS_URI by removing final /<podUID>/. The exact launch command SHA-256 is recorded in launch_command_sha256.",
+    "attempt_by_coordinate_bit": {
+      "27": "07",
+      "28": "01",
+      "29": "01",
+      "30": "01",
+      "31": "01",
+      "32": "01",
+      "33": "01",
+      "34": "01",
+      "35": "01",
+      "36": "01",
+      "37": "01",
+      "38": "01",
+      "39": "01"
+    },
+    "results_bucket": "isolab-results-104186811093-us-east-2",
+    "output_upload_contract": "Every payload state is copied to snapshots/<sha256(relative-path)>/<sha256(exact-bytes)>; uploaded states are not overwritten. A final content-addressed index maps file names, lengths and hashes to object keys.",
+    "source_access_contract": "EKS worker role cannot ListBucket on setec-astronomy-artifacts. Runtime assets therefore live under the current job\u2019s allowed ISOLAB_RESULTS_URI; the worker downloads exact objects with aws s3 cp.",
+    "prior_attempt_r27": {
+      "job_name": "n83-fb-variants-r27-20261031-r1",
+      "job_uid": "7e58d2f7-b5e8-42d6-a236-1b90d237d6c3",
+      "outcome": "failed before producer start",
+      "reason": "AccessDenied for s3:ListBucket on setec-astronomy-artifacts",
+      "factor_base_data_generated": false,
+      "receipt": "evidence/n83-factorbase-variants/r27-attempt-01/terminal/terminal-receipt.json"
+    },
+    "launch_argument_contract": "run-base-variant-v2.sh <binary> <coordinate_bit> <fresh_output_dir> <job_root_results_uri> <protocol_path>; the fourth argument must be the Job root, never raw Pod-scoped ISOLAB_RESULTS_URI.",
+    "prior_attempt_r27_r4": {
+      "job_name": "n83-fb-variants-r27-20261031-r4",
+      "job_uid": "52ffebcf-d07b-44b4-a836-8181cc2b8b48",
+      "pod_uid": "d10d054d-7c3d-485d-9b34-91a5363a3c61",
+      "outcome": "failed before producer start",
+      "reason": "After source checksum validation, jq was given the Pod-scoped S3 URI as a local protocol path and exited 2.",
+      "factor_base_data_generated": false,
+      "receipt": "evidence/n83-factorbase-variants/r27-attempt-04/terminal-20261031T0820Z/"
+    },
+    "launch_command_sha256": "a046788cab3648f31324f1407e70e4914c61ed0d827e8107f2f3df1a1861fad5",
+    "prior_attempt_r27_r5": {
+      "job_name": "n83-fb-variants-r27-20261031-r5",
+      "outcome": "not submitted",
+      "reason": "Preflight review found the saved command attempted to verify v4 bundle files it did not download. No Job was created and no data were generated.",
+      "factor_base_data_generated": false
+    },
+    "host_metadata_contract": "Record uname; use lscpu when available, otherwise record /proc/cpuinfo; if neither exists, record the absence without aborting before selfcheck or enumeration.",
+    "prior_attempt_r27_r6": {
+      "job_name": "n83-fb-variants-r27-20261031-r6",
+      "job_uid": "0ee0e7f5-1747-419b-b1f2-36fefc2c4762",
+      "pod_uid": "314fdcd3-21a7-446d-acc0-5a16261c7208",
+      "outcome": "failed before native selfcheck/producer",
+      "reason": "Pinned image lacks lscpu; runner exited 127 after source verification and before selfcheck.",
+      "factor_base_data_generated": false,
+      "receipt": "evidence/n83-factorbase-variants/r27-attempt-06/terminal-20261031T0843Z/"
+    },
+    "prior_attempt_r27_r7": {
+      "job_name": "n83-fb-variants-r27-20261031-r7",
+      "job_uid": "cede27a2-cdc3-4b86-87e5-0f0ebae38ab6",
+      "outcome": "producer emitted complete r27 point index; terminal evidence and final custody index pending at freeze time",
+      "factor_base_data_generated": true,
+      "coordinate_bit": 27,
+      "same_base_for_m": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    }
+  }
+}
