@@ -1,0 +1,48 @@
+// Generic Tate 3-isogeny control; no claim yet on the QR carrier packet.
+ring veluSource51=(2,b,c),(w,y,x,t),lp;short=0;
+poly A51=1+c;poly H51=x+t;poly kernelDen51=A51*t+b;
+poly pointEquation51=y^2+A51*x*y+b*y+x^3+b*x^2;
+poly kernelEquation51=w^2+A51*t*w+b*w+t^3+b*t^2;
+poly psi3_51=t^4+A51^2*t^3+A51*b*t^2+b^2*t+b^3;
+ideal source51=pointEquation51,kernelEquation51,psi3_51;
+ideal sourceStandard51=std(source51);ideal kernelStandard51=std(ideal(kernelEquation51,psi3_51));
+poly slopePlus51=y+w;poly slopeMinus51=y+w+kernelDen51;
+poly xPlus51=slopePlus51^2+A51*slopePlus51*H51+(b+x+t)*H51^2;
+poly xMinus51=slopeMinus51^2+A51*slopeMinus51*H51+(b+x+t)*H51^2;
+poly yPlus51=slopePlus51*(x*H51^2+xPlus51)+(y+b)*H51^3+A51*xPlus51*H51;
+poly yMinus51=slopeMinus51*(x*H51^2+xMinus51)+(y+b)*H51^3+A51*xMinus51*H51;
+poly X51=x*H51^2+xPlus51+xMinus51;
+poly rawY51=y*H51^3+yPlus51+yMinus51+kernelDen51*H51^3;
+poly Y51=reduce(rawY51,std(ideal(kernelEquation51)));
+if(X51!=x*H51^2+kernelDen51*(A51*x+b) || subst(Y51,w,0)!=Y51){ERROR("HECKE3_51_SIGNED_KERNEL_DESCENT");quit;}
+poly v51=A51^2*t+A51*b;poly ww51=A51*b*t+b^2;
+poly a4_51=v51;poly a6_51=A51^2*v51+ww51;
+poly residual51=Y51^2+A51*X51*Y51*H51+b*Y51*H51^3+X51^3+b*X51^2*H51^2+a4_51*X51*H51^4+a6_51*H51^6;
+matrix fullLift51=lift(source51,ideal(residual51));
+if(matrix(source51)*fullLift51!=matrix(ideal(residual51))){ERROR("HECKE3_51_FULL_FUNCTION_FIELD_PRODUCT");quit;}
+if(reduce(residual51+X51*H51^4,sourceStandard51)==0){ERROR("HECKE3_51_CODOMAIN_CORRUPTION_ACCEPTED");quit;}
+poly doubleSlope51=t^2+A51*w;
+poly doubleX51=doubleSlope51^2+A51*doubleSlope51*kernelDen51+b*kernelDen51^2;
+poly doubleY51=doubleSlope51*(t*kernelDen51^2+doubleX51)+(w+b)*kernelDen51^3+A51*doubleX51*kernelDen51;
+ideal orderThreeResiduals51=doubleX51+t*kernelDen51^2,doubleY51+(w+A51*t+b)*kernelDen51^3;
+ideal kernelSource51=kernelEquation51,psi3_51;matrix orderThreeLift51=lift(kernelSource51,orderThreeResiduals51);
+if(matrix(kernelSource51)*orderThreeLift51!=matrix(orderThreeResiduals51)){ERROR("HECKE3_51_FULL_ORDER_THREE_PRODUCTS");quit;}
+link out51="ASCII:w hecke3-function-certificate51.sing";open(out51);
+write(out51,"ring hecke3FunctionCertificate51=(2,b,c),(w,y,x,t),lp;short=0;ideal source51="+string(source51)+";poly H51="+string(H51)+";poly X51="+string(X51)+";poly Y51="+string(Y51)+";poly a4_51="+string(a4_51)+";poly a6_51="+string(a6_51)+";poly residual51="+string(residual51)+";matrix fullLift51[3][1];");
+int i51;for(i51=1;i51<=3;i51++){write(out51,"fullLift51["+string(i51)+",1]="+string(fullLift51[i51,1])+";");}
+write(out51,"ideal kernelSource51="+string(kernelSource51)+";ideal orderThreeResiduals51="+string(orderThreeResiduals51)+";matrix orderThreeLift51[2][2];");
+int j51;for(i51=1;i51<=2;i51++){for(j51=1;j51<=2;j51++){write(out51,"orderThreeLift51["+string(i51)+","+string(j51)+"]="+string(orderThreeLift51[i51,j51])+";");}}close(out51);
+ring veluBase51=(2,b,c),(t),dp;short=0;
+map baseMap51=veluSource51,0,0,0,t;
+poly psi3_51=baseMap51(psi3_51);poly kernelDen51=baseMap51(kernelDen51);
+poly A51=1+c;poly a4_51=baseMap51(a4_51);poly a6_51=baseMap51(a6_51);
+poly discriminant51=A51^4*(A51^2*a6_51+b^3+A51*b*a4_51+a4_51^2)+b^4+A51^3*b^3;
+matrix kernelInverse51=lift(ideal(psi3_51,kernelDen51),ideal(1));matrix discriminantInverse51=lift(ideal(psi3_51,discriminant51),ideal(1));
+if(matrix(ideal(psi3_51,kernelDen51))*kernelInverse51!=matrix(ideal(1)) || matrix(ideal(psi3_51,discriminant51))*discriminantInverse51!=matrix(ideal(1))){ERROR("HECKE3_51_FULL_UNIT_PRODUCTS");quit;}
+link unitOut51="ASCII:w hecke3-unit-certificate51.sing";open(unitOut51);
+write(unitOut51,"ring hecke3UnitCertificate51=(2,b,c),(t),dp;short=0;poly psi3_51="+string(psi3_51)+";poly kernelDen51="+string(kernelDen51)+";poly discriminant51="+string(discriminant51)+";matrix kernelInverse51[2][1];matrix discriminantInverse51[2][1];");
+for(i51=1;i51<=2;i51++){write(unitOut51,"kernelInverse51["+string(i51)+",1]="+string(kernelInverse51[i51,1])+";discriminantInverse51["+string(i51)+",1]="+string(discriminantInverse51[i51,1])+";");}close(unitOut51);
+execute(read("hecke3-function-certificate51.sing"));
+if(matrix(source51)*fullLift51!=matrix(ideal(residual51))){ERROR("HECKE3_51_RELOADED_FULL_PRODUCT");quit;}
+print("HECKE3_51_RESULT kernel_parameter_degree=4 isogeny_X_degree=3 signed_kernel_coordinate_descent=true full_curve_product=true order_three_products=2 kernel_and_discriminant_units=2 corrupted_codomain_rejected=true serialized_function_product_rechecked=true QR_packet_transport_not_yet_constructed=true");
+print("HECKE3_51_ALL_CHECKS_PASS");quit;
