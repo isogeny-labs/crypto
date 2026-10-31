@@ -20,8 +20,11 @@ for a direct all5target-equation QR-packet test.
 - [RECORD_RESULTS.py](RECORD_RESULTS.py): terminal acceptance and historical executed-byte checks.
 - [NEXT.md](NEXT.md): remaining constructions and larger-source leads.
 
-The report and results ledger are generated only after every admitted workflow
-is terminal. All accepted,rejected and capped outputs belong in immutable raw
+All12workflows are terminal:6accepted,6rejected,with3audited declarations.
+See results.json for24valid executed-input pins and the explicit interrupted
+packet custody exception. The direct target evaluation capped at1200s with
+normalized coordinates saved;the full twisted supersingular fiber and compact
+residual checks passed. The report and raw custody cover every workflow. All accepted,rejected and capped outputs belong in immutable raw
 custody. Do not repeat accepted producers for publication. The broad research
 objective remains active;the original manual local limits and cloud/job
 ownership restrictions persist.

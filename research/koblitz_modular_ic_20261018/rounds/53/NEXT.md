@@ -1,9 +1,10 @@
 # Next constructions after the R53 source geometry
 
-1. Finish the frozen `PACKET53` evaluation before changing its inputs. It uses
-   the actual saved alpha inverse and Tate coefficients,not an independent
-   scalar model. A cap leaves coordinates saved before modular-power work.
-   If generic all5identities pass,preserve them and proceed to descent.
+1. Direct PACKET53evaluation reached its original1200scap after saving actual
+   normalized coordinates. Do not repeat the capped producer unchanged.
+   Freeze a new checker using Frobenius squaring and universal QR/G,Nsyzygies,
+   with explicit target denominator units and retained source binding.
+   Completing targetG,Nwith these units would transport all3QRidentities.
 2. Establish F2descent of the normalized line coordinates. The proposed formulas
    are lnew=(L+s)/u,nnew=(L*r+N+q)/u³. R52sign covariance and the verified
    h/u³=bnew suggest target shifts A/u and bnew. Check the actual coefficient
@@ -46,3 +47,12 @@ This avoids evaluating every cleared QRmonomial independently. It is a new
 exact checking strategy,not evidence from the capped method. The actual
 degree8level11base route remains available to reduce coefficient growth.
 Never edit a runner while its driver is live;wait for terminal reconciliation.
+
+The actual twisted fAfiber is now finite etale dimension16,with lambda4/nu4
+leading monomials and full quadratic-descent products. CompactG,Nspecialize
+instead to the ideal(Q²)with nu free. Next bind this finite fiber directly to
+normal RR coordinates:reduce the full32basis table at fA,form the base
+idempotent e=(V+Vvalue+z²)/z²,then test the16columns lambda^i*nu^j*e for
+0<=i,j<4. Full-rank and complete multiplication products give a concrete
+coordinate isomorphism to the supersingular normal-chart summand. This uses
+the actual integral nu action and avoids generic parameter coefficient growth.

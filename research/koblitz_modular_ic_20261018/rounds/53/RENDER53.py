@@ -9,6 +9,7 @@ import typst
 h=Path(__file__).resolve().parent;r=json.loads((h/'results.json').read_text())
 assert all(any(x['attempt']==a and x['status']=='accepted' for x in r['runs']) for a in ['discrim53-02','alphaunit53-01','tate53-03'])
 assert len(r['audited_unique_declarations'])==3
+assert all(any(x['attempt']==a and x['status']=='accepted' for x in r['runs']) for a in ['supersingular53-01','compactfiber53-01'])
 data={'source':'runs/discrim53-02/native.log','stage_labels':['M0','M1','M2','M3'],
       'factor_exponents':{'z':[82,60,60,60],'z+1':[164,120,120,120],
                           'fA = z^5+z^2+1':[24,8,4,0],'fC = z^5+z^3+z^2+z+1':[2,0,0,0]}}
@@ -61,6 +62,43 @@ dimension 64. The complete witness is retained in raw custody. Generic
 coefficient denominators and exceptional fibers remain explicit obligations.
 #image("construction53.svg",width:100%)
 #pagebreak()
+= Full integral fiber versus the localized compact equations
+At c=1 (A=0),the source equations give
+#raw("Q=lambda^4+b*lambda+b^2; G=Q^4; N=b^3*Q^2",block:true)
+The prediction N=0 failed. A fresh native check verifies both full ideal
+products identifying (G,N) with (Q^2). This compact specialization leaves nu
+free:its two-variable quotient has infinite dimension (vdim=-1).
+
+The full three QR equations instead give a finite etale algebra of dimension
+16,with a Jacobian-minor unit witness and complete ideal products. This holds
+over F2(b) and at the actual F32 base point
+#raw("a^5+a^2+1=0; V=(1+a^4+a)/(a+a^2); c=1; b=1+1/a",block:true)
+The original base equation and b,c formulas are checked directly. The lambda
+quartic factors with degrees 1,1,2 over F32,so it has four distinct geometric
+roots,two of which are F32 rational.
+
+== The actual twisted fiber
+Ordinary nu is descended nu+b*zeta at A=0,where zeta^2+zeta+1=0.
+Elimination and both full augmented-ideal products certify descent. The
+descended quotient has dimension16,Jacobian unit,and leading monomials
+lambda^4 and nu^4. Its standard monomials are lambda^i*nu^j for 0<=i,j<4.
+Thus nu separates four points over each geometric lambda root. The ordinary
+and twisted nu equations differ;both are retained,without identifying them.
+
+This identifies the missing integral coordinate data at the projection
+fiber. It is a finite-fiber result;direct binding to the normal RR fiber,
+the remaining completed local rings and proper correspondence are next.
+Sources:supersingular53-01 and compactfiber53-01,including every full witness.
+
+== Normalized map prefix and its cap
+packet53-02 retains the composed inverse,the image line,normalized coordinates
+and a native target-Delta unit check. The coordinate export is 78KiB;the
+Delta unit lift was not separately serialized. Direct multivariate modular
+powers reached the original 1200second cap(exit124) before the five target
+equations completed. This is a computational cap,not a failed identity.
+The next checker can use Frobenius squares and the retained QR/G,Nsyzygies,
+or the actual degree8level11base to reduce coefficient growth.
+#pagebreak()
 = Validation and next construction
 The generic marked Tate change uses h=A*r+b,
 s=(r^2+a4+A*q)/h, D2=b+r+s^2+A*s and u=h/D2.
@@ -78,6 +116,13 @@ producer rerun for publication. Lean uses4.34.1,pinned mathlibd13f23b,-j1,
 -M4096,1200s separately for compile/audit,without a virtual-memory cap. Native wall times are recorded in results.json;
 complete CPU times were not recorded. These are exact identity checks,not
 statistical or performance comparisons.
+
+packet53-01 has invalid intermediate custody:a live Bash-runner edit caused
+interpreter re-entry into a second native invocation. The owned processes
+were stopped,all retained files are rejected,and this exception is excluded
+from valid historical executed-byte pins. A fresh workflow requires completed
+Lean receipts before admission. All12workflows are terminal,6accepted and
+6rejected;24valid completed-workflow input pins are verified separately.
 
 The three Lean implications cover determinant change,composed alpha product
 and the resulting unit. Actual arrays,trace semantics,source specialization

@@ -21,8 +21,9 @@ for d in sorted((h/'runs').iterdir()):
   errors=[s for s in log.splitlines() if re.match(r'^\s*\?',s)]
   row.update(kind='Singular',native_exit=code,marker=markers[0],marker_present=markers[0] in log.splitlines(),error_count=len(errors),first_errors=errors[:8])
   row['status']='accepted' if code==0 and not errors and row['marker_present'] else 'rejected'
+  row['outcome']='time_cap' if code==124 else 'native_error' if errors else 'completed' if row['status']=='accepted' else 'missing_marker'
   row['started_utc']=(d/'started-utc.txt').read_text().strip();row['finished_utc']=(d/'finished-utc.txt').read_text().strip()
-  row['native_wall_seconds']=(datetime.fromisoformat(row['finished_utc'])-datetime.fromisoformat(row['started_utc'])).total_seconds()
+  row['native_wall_seconds']=(datetime.fromisoformat(row['finished_utc'].replace('Z','+00:00'))-datetime.fromisoformat(row['started_utc'].replace('Z','+00:00'))).total_seconds()
   sources=['input.sing','runner.sh']
  else:
   cc=int((d/'compile.exit').read_text());ac=int((d/'audit.exit').read_text()) if (d/'audit.exit').exists() else None
@@ -47,5 +48,14 @@ for d in sorted((h/'runs').iterdir()):
  rows.append(row)
 result={'schema':'koblitz.results/v1','round':53,'runs':rows,'input_pins':pins,
         'audited_unique_declarations':sorted(set(x for r in rows if r['status']=='accepted' for x in r.get('declarations',[])))}
+observations={}
+for attempt in ['supersingular53-01','compactfiber53-01']:
+ log=(h/'runs'/attempt/'native.log').read_text()
+ observations[attempt]=[line for line in log.splitlines() if re.match(r'^(SUPER53(?:_ACTUAL|_DESCENDED)?|COMPACT53)_RESULT ',line)]
+observations['packet53-02']={'completed_prefix_markers':[line for line in (h/'runs/packet53-02/native.log').read_text().splitlines() if line.startswith('PACKET53_')],
+ 'coordinate_export_bytes':(h/'runs/packet53-02/packet-coordinates53.sing').stat().st_size,
+ 'five_target_equations':'not completed before time cap','target_delta_unit_lift_serialized':False}
+observations['discrim53-02']={'prediction_flags':[int(x) for x in re.search(r'intvec matches53=([^;]+);',(h/'runs/discrim53-02/discriminant-certificate53.sing').read_text()).group(1).split(',')]}
+result['native_observations']=observations
 (h/'results.json').write_text(json.dumps(result,indent=2)+'\n')
 print(json.dumps({'attempts':len(rows),'accepted':sum(r['status']=='accepted' for r in rows),'audited_unique_declarations':len(result['audited_unique_declarations']),'executed_source_pins':len(pins)}))

@@ -51,6 +51,12 @@ exponents82/164to60/120. These are measured module statements. They do not
 identify the completed local subrings. Matching the proposed (7,11)cusp
 model still requires actual branch valuations and residue-field descent.
 
+For the retained finite free rank32algebra B,the discriminant is a unit at
+fA. Thus its fiber there is etale by the trace criterion in
+[Stacks0BJF](https://stacks.math.columbia.edu/tag/0BJF). This is a derived
+geometric implication using the retained normal-RR bridge,not another Lean
+theorem. It distinguishes the coordinate collision from ramification of B.
+
 The table-derived Gram certificate, independent source Gram, all31universal
 companion traces, source equation, normal traces and four determinants are
 retained in raw output. `discrim53-01` is rejected: missing matrix-helper
@@ -110,8 +116,77 @@ Tate attempt01failed a source-ring indexed expression import. Attempt02
 passed reduced identities but failed serialization by direct polynomial slash
 division;it finished before a proposed SIGTERM. Attempt03uses explicit ideal
 lifts and verifies their full products. Every partial and rejected attempt is
-retained. `PACKET53.sing` is frozen to evaluate all5target equations in the
-complete rank64source algebra;its outcome is pending.
+retained. `packet53-02` reaches the original1200second limit,exit124. It
+verifies the composed alpha inverse in the full rank64source quotient and
+saves the actual normalized coordinates in a78KiBexport. The native prefix
+also checks the targetDeltaunit,but that lift is not separately serialized.
+The higher modular-power stage does not complete any of the5target-equation
+checks. This is a computational cap,not a failed identity. No limit changed.
+
+## The full supersingular fiber restores the nu equation
+
+`supersingular53-01` is accepted. At c=1(A=0),write
+
+\[
+ Q=\lambda^4+b\lambda+b^2.
+\]
+
+The source G specializes exactly to Q4,and Q has derivative b,nonzero on
+the smooth generic fiber. The complete original3QR equations have a
+dimension16quotient over F2(b),a Jacobian-minor unit witness,and a full source
+membership for Q. Both source/standard-basis inclusion products are saved.
+
+The actual fApoint is checked over F32=F2[a]/(a5+a²+1):
+
+\[
+ z=a,\quad V=(1+a^4+a)/(a+a^2),\quad
+ R=(1+a)V+a^3,\quad c=1,\quad b=1+1/a\ne0.
+\]
+
+It satisfies the original base equation and the actual b,cformulas. Direct
+specialization of the original QR equations again has dimension16and a full
+Jacobian unit witness. Its lambdaquartic factors with degrees1,1,2 overF32;
+these are four distinct geometric lambda values,not four F32rational values.
+
+The actual twist is checked separately. At A=0the retained R51substitution
+fixes lambda and sends ordinary nu to descended nu+b*zeta,where
+zeta²+zeta+1=0. Elimination of zeta produces the descended equations;both full
+augmented-ideal inclusion products certify descent. The descended quotient
+has dimension16,Jacobian unit,and leading monomials lambda4and nu4. Hence
+its standard monomials are lambda^i*nu^j for0<=i,j<4. It is a finite etale
+fiber with four groups of four geometric points over the four lambda values.
+The ordinary and descended nu equations have different constant terms;their
+identification was not assumed. All bases and full witnesses are retained.
+
+The prediction compactN=0was false. `compactfiber53-01` resolves the exact
+residual,both generically and at the actual F32point:
+
+\[
+ G=Q^4,\qquad N=b^3Q^2,\qquad (G,N)=(Q^2).
+\]
+
+Both full ideal products identify the principal ideal Q2. In the two-variable
+lambda,nuring,this compact fiber leaves nufree and has infinite dimension
+(native vdim=-1),whereas the full QR fiber is finite etale of dimension16.
+This is an explicit failure of specializing the localized compact presentation
+as though it were a complete integral presentation. The full QR equations
+retain the missing nu geometry. It is a finite-fiber result;identification
+with the actual normal-RR fiber by direct basis specialization and extension
+of the correspondence on the proper model remain separate constructions.
+
+## Complete terminal ledger
+
+All12workflows are terminal:6accepted,6rejected,with3audited declarations.
+The accepted workflows are discrim53-02,alphaunit53-01,tate53-03,
+transfer-lean53-02,supersingular53-01and compactfiber53-01. The retained
+failures are the first trace attempt,two Tate import/quotient attempts,the
+first Lean audit launcher,the interrupted first packet attempt and the
+capped second packet attempt. The first packet attempt has invalid
+intermediate custody after a live Bash-runner edit caused an unintended
+second invocation. Its owned driver/processes were stopped;its files are
+retained as rejected evidence and excluded from valid historical input pins.
+`results.json` contains24valid completed-workflow input pins and the explicit
+exception. Both compiled Lean objects are byte-identical and archived.
 
 `lean/Transfer53.lean` supplies the determinant-change and composed unit
 implications. All3declarations compile/audit with zero failing/trusted in transfer-lean53-02;
