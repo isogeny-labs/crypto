@@ -90,3 +90,20 @@ PMU values remain ineligible as complete instruction-to-solve labels.
 python3 tools/artifacts/artifacts.py pull research/ml_dataset_binary_methods_20261031
 python3 research/ml_dataset_inventory_20261031/build_inventory_v5.py
 ```
+
+# Version 6 update
+
+`build_inventory_v6.py` appends the independently audited 26-cell Koblitz
+`n=23`, `m=3..15` enumeration campaign to immutable version 5. It binds the
+frozen plan and protocol, all 26 Git custody checkpoints, 685 rehashed native
+artifacts, official export/checker receipt, 82 phase cost records, first/last
+fresh S3 readback sample, and the interrupted shard 18 custody reconciliation.
+`inventory-v6.json` reports **198 retained receipts**, **93 independently
+solved ECDLP cells**, eight checker-receipted official exports with 103
+completed and 31 censored rows, and twelve retained F6 pair domains. The new
+campaign has four verified finite fixed-base searches at `m=3,4`, 22 native
+timeouts at `m=5..15`, and zero complete instruction-to-solve labels.
+
+```sh
+python3 research/ml_dataset_inventory_20261031/build_inventory_v6.py
+```
