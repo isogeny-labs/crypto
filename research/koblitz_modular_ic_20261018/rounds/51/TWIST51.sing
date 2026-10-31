@@ -1,0 +1,31 @@
+execute(read("../universal51-01/universal-polynomial51.sing"));
+ring twistWorkspace51=2,(g,n,l,b,c),dp;short=0;
+ideal gamma51=std(ideal(g^2+g+1));
+map twistMap51=universalPolynomialCertificate51,n+b*g,l+(1+c)*g,b,c;
+ideal twistedQR51=reduce(twistMap51(qr51),gamma51);
+ideal twistedGB51=reduce(twistMap51(generic51),gamma51);
+poly twistedD51=twistMap51(D51);
+poly twistedG51=reduce(twistMap51(G51),gamma51);poly twistedN51=reduce(twistMap51(N51),gamma51);
+map unchanged51=universalPolynomialCertificate51,n,l,b,c;
+if(twistedG51!=unchanged51(G51)+(1+c)^16){ERROR("TWIST51_COMPACT_LAMBDA_TRANSLATION");quit;}
+if(subst(twistedG51,g,0)!=twistedG51 || subst(twistedN51,g,0)!=twistedN51){ERROR("TWIST51_TRIANGULAR_DESCENT");quit;}
+int i51;int j51;
+for(i51=1;i51<=3;i51++){if(subst(twistedQR51[i51],g,0)!=twistedQR51[i51]){ERROR("TWIST51_QR_DESCENT");quit;}}
+for(i51=1;i51<=2;i51++){if(subst(twistedGB51[i51],g,0)!=twistedGB51[i51]){ERROR("TWIST51_BASIS_DESCENT");quit;}}
+matrix transportedF51=reduce(twistMap51(F51),gamma51);matrix transportedB51=reduce(twistMap51(B51),gamma51);
+if(reduce(matrix(twistedQR51)*transportedF51-matrix(twistedGB51),gamma51)!=0 || reduce(matrix(twistedGB51)*transportedB51-twistedD51^2*matrix(twistedQR51),gamma51)!=0){ERROR("TWIST51_FULL_F4_PRODUCTS");quit;}
+matrix descendedF51=subst(transportedF51,g,0);matrix descendedB51=subst(transportedB51,g,0);
+matrix gammaF51=(transportedF51-descendedF51)/g;matrix gammaB51=(transportedB51-descendedB51)/g;
+if(matrix(twistedQR51)*descendedF51!=matrix(twistedGB51) || matrix(twistedGB51)*descendedB51!=twistedD51^2*matrix(twistedQR51)){ERROR("TWIST51_FULL_F2_PRODUCTS");quit;}
+if(matrix(twistedQR51)*gammaF51!=0 || matrix(twistedGB51)*gammaB51!=0){ERROR("TWIST51_GAMMA_SYZYGIES");quit;}
+matrix bad51=descendedF51;bad51[1,1]=bad51[1,1]+1;
+if(matrix(twistedQR51)*bad51==matrix(twistedGB51)){ERROR("TWIST51_CORRUPTION_ACCEPTED");quit;}
+link out51="ASCII:w universal-twisted51.sing";open(out51);
+write(out51,"ring universalTwistedCertificate51=2,(n,l,b,c),dp;short=0;poly D51="+string(twistedD51)+";ideal qr51="+string(twistedQR51)+";ideal generic51="+string(twistedGB51)+";poly G51="+string(twistedG51)+";poly N51="+string(twistedN51)+";matrix F51[3][2];matrix B51[2][3];");
+for(i51=1;i51<=3;i51++){for(j51=1;j51<=2;j51++){write(out51,"F51["+string(i51)+","+string(j51)+"]="+string(descendedF51[i51,j51])+";");}}
+for(i51=1;i51<=2;i51++){for(j51=1;j51<=3;j51++){write(out51,"B51["+string(i51)+","+string(j51)+"]="+string(descendedB51[i51,j51])+";");}}
+close(out51);
+execute(read("universal-twisted51.sing"));
+if(matrix(qr51)*F51!=matrix(generic51) || matrix(generic51)*B51!=D51^2*matrix(qr51)){ERROR("TWIST51_RELOADED_F2_PRODUCTS");quit;}
+print("TWIST51_RESULT original_QR_descent=3 triangular_descent=2 full_F4_products=2 full_F2_products=2 gamma_syzygies=2 reloaded_F2_products=2 G_twist_equals_G_plus_A16=true corruption_rejected=true");
+print("TWIST51_ALL_CHECKS_PASS");quit;
