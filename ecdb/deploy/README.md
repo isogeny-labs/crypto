@@ -12,10 +12,11 @@ agents ──HTTPS──▶ Lambda function URL ─▶ ecdb-api (VPC) ──TLS 
   static musl `ecdb` binary (`ecdb lambda api|admin`).
   - `ecdb-api` serves the HTTP API on a public function URL. The URL is open,
     but every data endpoint requires the bearer token; `/healthz` and
-    `/openapi.yaml` do not.
+    `/openapi.yaml` do not. `POST /mcp` serves MCP on the same function: the
+    handshake and tool list are open, and tool calls need the token.
   - `ecdb-admin` has no URL. Each invocation runs one action:
     `{"action": "status" | "migrate" | "bootstrap_roles"}` or
-    `{"action": "import", "what": "registry" | "walks" | "traits" | "covers" | "transfers" | "certificates" | "derived" | "all"}`.
+    `{"action": "import", "what": "registry" | "walks" | "traits" | "covers" | "transfers" | "certificates" | "derived" | "enrich" | "all"}`.
 - **Network.**
   - Lambda security group `ecdb-lambda`: egress only to 5432 on `ecdb-rds`.
   - RDS security group `ecdb-rds`: ingress only from `ecdb-lambda`.
@@ -67,6 +68,11 @@ URL=$(aws lambda get-function-url-config --function-name ecdb-api --query Functi
 TOKEN=$(aws secretsmanager get-secret-value --secret-id ecdb/api --query SecretString --output text | jq -r .read_token)
 curl -s -H "authorization: Bearer $TOKEN" "${URL}v1/curves/secp256k1"
 ```
+
+MCP clients point at `${URL}mcp` with the header
+`Authorization: Bearer $TOKEN`. In this repository, `.mcp.json` registers it
+as server `ecdb` and reads the token from `ECDB_TOKEN`; see
+[`../docs/AGENTS.md`](../docs/AGENTS.md).
 
 Rotate a token or password by editing `ecdb/api`, then re-run
 `deploy-aws.sh` with `ECDB_SKIP_IMPORT=1`. The script refreshes the function

@@ -257,18 +257,49 @@ pub async fn polynomial(State(state): State<Shared>, Path(sha256): Path<String>)
 pub struct ModularQuery {
     pub level: Option<i64>,
     pub kind: Option<String>,
+    /// Include the coefficients (Phi_19 has about 200 terms of up to ~1000 bits).
+    pub coefficients: Option<bool>,
 }
 
 pub async fn modular_polynomials(State(state): State<Shared>, Query(q): Query<ModularQuery>) -> ApiResult<Json<Value>> {
     let mut f = Filters::default();
     f.opt("m.level = {}::int", &q.level);
     f.opt("m.kind = {}", &q.kind);
+    let coeffs = if q.coefficients.unwrap_or(false) { "p.coefficients" } else { "NULL::jsonb" };
     let sql = format!(
-        "SELECT (to_jsonb(m) || jsonb_build_object('polynomial_sha256', p.sha256, 'degrees', p.degrees,
-                 'term_count', p.term_count, 'inline', p.coefficients IS NOT NULL))::text
+        "SELECT (to_jsonb(m) || jsonb_build_object('polynomial_sha256', p.sha256, 'variables', p.variables,
+                 'degrees', p.degrees, 'term_count', p.term_count, 'max_coefficient_bits', p.max_coefficient_bits,
+                 'coefficients', {coeffs}))::text
            FROM ec.modular_polynomial m JOIN ec.polynomial p ON p.id = m.polynomial_id {} ORDER BY m.level, m.kind",
         f.where_sql()
     );
     let client = state.read.get().await?;
-    Ok(Json(json!({ "items": json_rows(&client, &sql, &f.params).await? })))
+    Ok(Json(
+        json!({ "convention": "sparse terms [[i, j], c] of c X^i Y^j", "items": json_rows(&client, &sql, &f.params).await? }),
+    ))
+}
+
+pub async fn class_polynomials(State(state): State<Shared>) -> ApiResult<Json<Value>> {
+    let client = state.read.get().await?;
+    let rows = json_rows(
+        &client,
+        "SELECT (to_jsonb(c) || jsonb_build_object('coefficients_ascending', p.coefficients, 'polynomial_sha256', p.sha256))::text
+           FROM ec.class_polynomial c JOIN ec.polynomial p ON p.id = c.polynomial_id ORDER BY c.discriminant DESC",
+        &[],
+    )
+    .await?;
+    Ok(Json(json!({ "items": rows })))
+}
+
+pub async fn summation_polynomials(State(state): State<Shared>) -> ApiResult<Json<Value>> {
+    let client = state.read.get().await?;
+    let rows = json_rows(
+        &client,
+        "SELECT (to_jsonb(s) || jsonb_build_object('variables', p.variables, 'coefficients', p.coefficients,
+                 'polynomial_sha256', p.sha256))::text
+           FROM ec.summation_polynomial s JOIN ec.polynomial p ON p.id = s.polynomial_id ORDER BY s.model, s.m",
+        &[],
+    )
+    .await?;
+    Ok(Json(json!({ "convention": "sparse terms [[exponents per variable], c]; y^2 = x^3 + a x + b", "items": rows })))
 }
