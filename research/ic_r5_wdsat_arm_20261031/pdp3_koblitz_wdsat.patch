@@ -1,0 +1,165 @@
+--- /tmp/claude-501/pdp3_orig.rs	2026-10-31 09:35:24
++++ /Volumes/SSD990-2/r5-wdsat-build/tree/src/bin/ecbench/pdp3_koblitz.rs	2026-10-31 10:16:24
+@@ -106,6 +106,8 @@
+ 
+ #[path = "msolve_s4.rs"]
+ mod msolve_s4;
++#[path = "wdsat_s4.rs"]
++mod wdsat_s4;
+ 
+ use std::collections::{BTreeMap, HashMap};
+ use std::time::Instant;
+@@ -334,6 +336,8 @@
+     /// Published-method pilot: the e_i-symmetrised Semaev S4 solved by external msolve (see
+     /// `msolve_s4.rs`); not a lab engine.
+     MsolveS4,
++    /// R5: the same S4 system solved by external WDSat (see `wdsat_s4.rs`); not a lab engine.
++    WdsatS4,
+     /// The root-finding engine of `DecompositionStrategy::PairTable`: a
+     /// [`PairSumTable`] of the base's pair sums, probed once per target
+     /// (`m = 2`) or once per `R − P_k` (`m = 3`).  No Groebner search, so
+@@ -358,6 +362,7 @@
+             "matrix-f4" => Ok(Self::MatrixF4),
+             "matrix-f5" => Ok(Self::MatrixF5),
+             "msolve-s4" => Ok(Self::MsolveS4),
++            "wdsat-s4" => Ok(Self::WdsatS4),
+             "rootfind" => Ok(Self::Rootfind),
+             "rootfind-window" => Ok(Self::RootfindWindow),
+             "rootfind-negfold" => Ok(Self::RootfindNegfold),
+@@ -376,6 +381,7 @@
+             Self::MatrixF4 => "matrix-f4",
+             Self::MatrixF5 => "matrix-f5",
+             Self::MsolveS4 => "msolve-s4",
++            Self::WdsatS4 => "wdsat-s4",
+             Self::Rootfind => "rootfind",
+             Self::RootfindWindow => "rootfind-window",
+             Self::RootfindNegfold => "rootfind-negfold",
+@@ -385,7 +391,7 @@
+ 
+     /// Whether the engine solves an algebraic system at all.
+     pub fn is_groebner(self) -> bool {
+-        !self.is_rootfind() && self != Self::MsolveS4
++        !self.is_rootfind() && self != Self::MsolveS4 && self != Self::WdsatS4
+     }
+ 
+     /// Whether the engine builds and probes a pair-sum table (full or
+@@ -417,7 +423,7 @@
+             Self::InheritedF4 | Self::F6Ic => Some(SolverEngine::InheritedF4 { max_degree }),
+             Self::MatrixF4 => Some(SolverEngine::MatrixF4 { max_degree }),
+             Self::MatrixF5 => Some(SolverEngine::MatrixF5 { max_degree }),
+-            Self::MsolveS4 => None,
++            Self::MsolveS4 | Self::WdsatS4 => None,
+             Self::Rootfind
+             | Self::RootfindWindow
+             | Self::RootfindNegfold
+@@ -518,6 +524,8 @@
+     ms_errors: u64,
+     /// Tuning of the msolve-s4 engine (`form=e|x`, `spec=k`).
+     ms_tune: msolve_s4::Tune,
++    /// Tuning of the wdsat-s4 engine (`sym=0|1`).
++    wd_tune: wdsat_s4::WdTune,
+     /// Pair-table hits whose summands did not re-add to the probed point
+     /// in the group.  Must stay zero; a nonzero count would mean the
+     /// table and the run's base disagree on a point.
+@@ -547,6 +555,7 @@
+             ms_calls: 0,
+             ms_errors: 0,
+             ms_tune: msolve_s4::Tune::default(),
++            wd_tune: wdsat_s4::WdTune::default(),
+             table_mismatches: 0,
+         }
+     }
+@@ -797,6 +806,33 @@
+             self.node_budget = budget
+                 .parse()
+                 .map_err(|_| format!("node_budget `{budget}` is not a number"))?;
++            self.scan_window_len = 0;
++            self.window_div = 0;
++            self.pair_table_points = 0;
++            self.pair = None;
++            self.pair_neg = None;
++        } else if self.engine == Pdp3Engine::WdsatS4 {
++            if self.summands != 3 {
++                return Err("engine=wdsat-s4 takes m = 3".into());
++            }
++            if kc.curve.b != F2mElement::one(kc.n) {
++                return Err("engine=wdsat-s4: b != 1 is not validated in ecbench".into());
++            }
++            self.wd_tune.sym = match params.get("sym") {
++                None | Some("1") => true,
++                Some("0") => false,
++                Some(other) => return Err(format!("engine=wdsat-s4: sym `{other}` is not 0 or 1")),
++            };
++            self.wd_tune.all = match params.get("find") {
++                None | Some("all") => true,
++                Some("first") => false,
++                Some(other) => return Err(format!("engine=wdsat-s4: find `{other}` is not all or first")),
++            };
++            self.wd_tune.xg = match params.get("xg") {
++                None | Some("1") => true,
++                Some("0") => false,
++                Some(other) => return Err(format!("engine=wdsat-s4: xg `{other}` is not 0 or 1")),
++            };
+             self.scan_window_len = 0;
+             self.window_div = 0;
+             self.pair_table_points = 0;
+@@ -1015,6 +1051,59 @@
+         let view = self.view.as_ref().ok()?;
+         let kc = view.curve();
+         let target = view.instance().fast.lower(point);
++        if self.engine == Pdp3Engine::WdsatS4 {
++            let crypto_lib::binary_ecc::BinaryPoint::Affine { x: x_r, .. } = &target else {
++                return None;
++            };
++            // ecbench scrubs the environment of its measured children, so the binary directory is also a build-time default.
++            let wdsat = std::env::var("WDSAT_BIN").ok().or_else(|| option_env!("WDSAT_BIN_DEFAULT").map(str::to_string)).unwrap_or_else(|| "wdsat_solver".into());
++            let started = Instant::now();
++            self.ms_calls += 1;
++            let tag = format!("w{}", self.ms_calls);
++            let res = wdsat_s4::solve_s4(&wdsat, kc.n, frob.ell, &kc.curve.irreducible, &kc.curve.b, x_r, &tag, self.wd_tune);
++            let wall_ns = started.elapsed().as_nanos() as u64;
++            let out = match res {
++                Ok(o) => o,
++                Err(e) => {
++                    eprintln!("wdsat-s4: {e}");
++                    self.ms_errors += 1;
++                    return None;
++                }
++            };
++            let mut extra = BTreeMap::new();
++            extra.insert("wdsat_calls".into(), out.calls);
++            extra.insert("refuted_by_emitter".into(), out.refuted_by_emitter);
++            extra.insert("wdsat_unsat".into(), out.unsat);
++            extra.insert("wdsat_ir".into(), out.ir);
++            extra.insert("wdsat_inexact".into(), out.inexact);
++            extra.insert("wdsat_conf".into(), out.conflicts);
++            extra.insert("wdsat_models".into(), out.roots.len() as u64);
++            let cost = SolverCost {
++                ops: out.ir,
++                op_unit: "wdsat instructions retired".into(),
++                wall_ns,
++                peak_bytes: 0,
++                degree_reached: None,
++                solving_degree: None,
++                timed_out: false,
++                extra,
++            };
++            self.totals.absorb(shape, Some(&cost), false);
++            let mut seen: std::collections::HashSet<[u64; 3]> = std::collections::HashSet::new();
++            for r in &out.roots {
++                let mut key = *r;
++                key.sort_unstable();
++                if !seen.insert(key) {
++                    continue;
++                }
++                if let Some(found) = lift_abscissae(ctx.group, fb, ops, &r[..], point) {
++                    return Some(found);
++                }
++                counters.lift_failures += 1;
++                self.unliftable += 1;
++            }
++            return None;
++        }
+         if self.engine == Pdp3Engine::MsolveS4 {
+             let crypto_lib::binary_ecc::BinaryPoint::Affine { x: x_r, .. } = &target else {
+                 return None;

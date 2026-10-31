@@ -1,0 +1,75 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "R5f k1n11",
+ "description": "R5 WDSat arm: wdsat-s4 (e-form S4, WDSat find=first, -x -b) against the lab arm; E1 session law.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 1,
+    "n": 11
+   }
+  ],
+  "targets_per_curve": 8,
+  "target_seed": 202610111901,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "inherited-f4-l4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-standard-subspace:dimension=4",
+     "oracle": "pdp3-binary:m=3,engine=inherited-f4,degree=3,node_budget=8192",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "inherited-f4-l5",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-standard-subspace:dimension=5",
+     "oracle": "pdp3-binary:m=3,engine=inherited-f4,degree=3,node_budget=8192",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "wdsatf-l4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-standard-subspace:dimension=4",
+     "oracle": "pdp3-binary:m=3,engine=wdsat-s4,sym=1,xg=1,find=first",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "wdsatf-l5",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-standard-subspace:dimension=5",
+     "oracle": "pdp3-binary:m=3,engine=wdsat-s4,sym=1,xg=1,find=first",
+     "max_trials": "200000"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 202610111902,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}
