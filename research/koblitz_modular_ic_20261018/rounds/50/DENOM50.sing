@@ -1,0 +1,57 @@
+option(redSB);short=0;
+proc euclid50(poly aa50,poly bb50)
+{
+ poly r050=aa50;poly r150=bb50;
+ poly x050=1;poly x150=0;poly y050=0;poly y150=1;
+ poly rem50;poly quotient50;poly factor50;poly nextX50;poly nextY50;number leading50;
+ int oldDegree50;int outer50=0;
+ while(r150!=0){
+  rem50=r050;quotient50=0;
+  while(rem50!=0 && deg(rem50)>=deg(r150)){
+   oldDegree50=deg(rem50);
+   factor50=(leadcoef(rem50)/leadcoef(r150))*t^(deg(rem50)-deg(r150));
+   quotient50=quotient50+factor50;rem50=rem50+factor50*r150;
+   if(rem50!=0 && deg(rem50)>=oldDegree50){ERROR("DENOM50_DIVISION_NO_DEGREE_DROP");return(list());}
+  }
+  if(r050!=quotient50*r150+rem50){ERROR("DENOM50_DIVISION_IDENTITY");return(list());}
+  nextX50=x050+quotient50*x150;nextY50=y050+quotient50*y150;
+  if(rem50!=nextX50*aa50+nextY50*bb50){ERROR("DENOM50_EUCLID_BEZOUT_STEP");return(list());}
+  if(rem50!=0){leading50=leadcoef(rem50);rem50=rem50/leading50;nextX50=nextX50/leading50;nextY50=nextY50/leading50;}
+  r050=r150;r150=rem50;x050=x150;x150=nextX50;y050=y150;y150=nextY50;
+  outer50++;print("DENOM50_EUCLID_STEP index="+string(outer50)+" remainder_degree="+string(deg(r150)));
+ }
+ return(list(r050,x050,y050));
+}
+print("DENOM50_STAGE exported_norm_identities_begin=true");
+if(norm50!=a50^2+a50*b50+(u^3+u)*b50^2 || monic50!=norm50/leadcoef(norm50) || nNumerator50!=c50*b50+d50*a50){ERROR("DENOM50_EXPORTED_ARRAY_IDENTITIES");quit;}
+poly controlA50=t^2+t+u;poly controlB50=t;
+list controlBez50=euclid50(controlA50,controlB50);
+if(size(controlBez50)!=3 || controlBez50[2]*controlA50+controlBez50[3]*controlB50!=controlBez50[1] || deg(controlBez50[1])!=0){ERROR("DENOM50_EXTGCD_CONTROL");quit;}
+list splitControl50=euclid50(t^2+t,t);
+if(size(splitControl50)!=3 || deg(splitControl50[1])!=1 || splitControl50[2]*(t^2+t)+splitControl50[3]*t!=splitControl50[1]){ERROR("DENOM50_NONUNIT_CONTROL");quit;}
+print("DENOM50_STAGE Euclid_controls_pass=true actual_Bezout_begin=true");
+list bez50=euclid50(a50,b50);
+if(size(bez50)!=3 || bez50[1]==0 || deg(bez50[1])!=0){ERROR("DENOM50_DENOMINATOR_GCD");quit;}
+number gcdValue50=leadcoef(bez50[1]);
+poly x50=bez50[2]/gcdValue50;poly y50=bez50[3]/gcdValue50;
+if(x50*a50+y50*b50!=1){ERROR("DENOM50_BEZOUT_IDENTITY");quit;}
+if((x50+1)*a50+y50*b50==1){ERROR("DENOM50_CORRUPT_BEZOUT_ACCEPTED");quit;}
+poly inverseB50=x50^2*a50+(y50^2+(u^3+u)*x50^2)*b50;
+if(b50*inverseB50+1+x50^2*norm50!=0){ERROR("DENOM50_INVERSE_IDENTITY");quit;}
+if(b50*(inverseB50+1)+1+x50^2*norm50==0){ERROR("DENOM50_CORRUPT_INVERSE_ACCEPTED");quit;}
+link bezOut50="ASCII:w denominator-certificate50.sing";open(bezOut50);
+write(bezOut50,"poly x50="+string(x50)+";poly y50="+string(y50)+";poly inverseB50="+string(inverseB50)+";");close(bezOut50);
+print("DENOM50_STAGE Bezout_and_inverse_exported=true source_binding_begin=true");
+setring genericCertificate49;short=0;
+map candidateToSource50=rationalCandidate50,l;
+poly aSource50=candidateToSource50(a50);poly bSource50=candidateToSource50(b50);
+poly cSource50=candidateToSource50(c50);poly dSource50=candidateToSource50(d50);
+poly normSource50=candidateToSource50(norm50);poly nNumSource50=candidateToSource50(nNumerator50);
+if(prime49_1[1]!=v^2+v+u^3+u || prime49_1[2]!=aSource50+bSource50*v || prime49_1[3]!=n+cSource50+dSource50*v){ERROR("DENOM50_SOURCE_TRIANGULAR_BINDING");quit;}
+if(normSource50+prime49_1[2]^2+bSource50*prime49_1[2]+bSource50^2*prime49_1[1]!=0){ERROR("DENOM50_NORM_SOURCE_MEMBERSHIP");quit;}
+if(bSource50*n+nNumSource50+bSource50*prime49_1[3]+dSource50*prime49_1[2]!=0){ERROR("DENOM50_N_REVERSE_IDENTITY");quit;}
+map scaledToSource50=integralCandidate50,u^4*l,u;
+ideal scaledBound50=scaledToSource50(candidateIdeal50);
+if(scaledBound50[1]!=u^128*candidateToSource50(monic50)){ERROR("DENOM50_INTEGRAL_SCALING_BINDING");quit;}
+print("DENOM50_RESULT actual_Bezout_checked=true denominator_unit_certificate=true inverse_corruption_rejected=true norm_source_membership=true reverse_coordinates=true integral_scaling_bound=true original_four_forward_equations_pending=true");
+print("DENOM50_ALL_CHECKS_PASS");quit;

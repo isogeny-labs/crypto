@@ -592,12 +592,98 @@ def koblitz_affine_normalization(ref, since):
             ("normalization_control_cases", "control cases", "Smooth and cusp normalization API controls over F2"),
             ("source_preparation_cases", "prepared source ideals", "Exact twisted F2 source input; not a normalization"),
             ("generic_source_prime", "certified generic fields", "Exact generic primeness; affine contraction and normalization separate"),
+            ("integral_lambda_plane_models", "integral plane models", "Accepted monic lambda-plane models; normalization separate"),
             ("primitive_presentations", "two-way field presentations", "Fixed primitive-element test; integral model and normalization separate"),
             ("normalization_outputs_computed", "normalizer outputs", "Computed affine presentations; independent exported-data checks counted separately"),
             ("verified_affine_normalizations", "checked affine presentations", "Affine normalization only; proper projective and modular-factor geometry remain open"),
             ("audited_conditional_declarations", "audited declarations", "Conditional field-degree lemmas; concrete native ideals not formalized"),
         ):
             emit("koblitz_modular.affine_" + key, counts.get(key), date=date,
+                 problem=P_IC, unit=unit, better="neutral", label=label,
+                 source=f"{path}@{commit}")
+
+
+def koblitz_checked_source_geometry(ref, since):
+    """Exact source geometry and RR algebra counters, with neutral direction."""
+    path = "research/koblitz_modular_ic_20261018/rounds/50/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        counts = json.loads(text).get("construction_counts", {})
+        for key, unit, label in (
+            ("proper_monic_charts", "checked source charts", "Monic rank32 charts with exact overlap products"),
+            ("integral_v_charts", "checked source charts", "Integral quadratic-base refinement on both charts"),
+            ("proper_sign_quotient_charts", "checked quotient charts", "Known sign quotient with explicit monic rank16 equations"),
+            ("complete_forward_source_products", "complete polynomial products", "All four original source equations under the rational map"),
+            ("boundary_cyclic_F2_dimension", "F2 dimensions", "Exact source coordinate-defect block at the degree2 boundary"),
+            ("boundary_exact_saturation_exponent", "parameter powers", "Least power of u+1 annihilating the checked cyclic block"),
+            ("global_coordinate_defect_F2_dimension", "F2 dimensions", "Complete plane-to-integral-v coordinate defect on the proper model"),
+            ("RR_product_columns", "checked field columns", "All196 complete-RR products in the actual32-element field basis"),
+            ("RR_PID_basis_rank", "module generators", "Checked complete-RR polynomial module with original-column lifts"),
+            ("RR_PID_normalization_index", "F2 dimensions", "Exact source lattice index under the retained complete-RR bridge"),
+            ("RR_algebra_product_pairs", "complete product pairs", "All528 source-bound multiplication identities of the RR algebra"),
+            ("marked23_base_generic_degree", "field degrees", "Actual prime characteristic2 marked23 base field"),
+            ("marked23_point_exact_order", "point order", "Exact order23 point verified in the actual larger base field"),
+            ("normalization_presentations_computed", "normalizer outputs", "Accepted serialized presentations; independent ring checks separate"),
+            ("verified_affine_normalizations", "checked presentations", "Independent full affine-presentation verification receipts"),
+            ("audited_unique_theorems", "audited declarations", "Unique conditional algebra lemmas; concrete arrays remain native data"),
+        ):
+            emit("koblitz_modular.geometry50_" + key, counts.get(key), date=date,
+                 problem=P_IC, unit=unit, better="neutral", label=label,
+                 source=f"{path}@{commit}")
+
+
+
+def koblitz_integral_chart_transfers(ref, since):
+    """Neutral exact chart, packet and kernel-geometry counters from R51 receipts."""
+    path = "research/koblitz_modular_ic_20261018/rounds/51/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        counts = json.loads(text).get("construction_counts", {})
+        for key, unit, label in (
+            ("localized_generator_compatibilities", "complete generator identities", "Independent source-bound normal-generator compatibility checks"),
+            ("localized_normal_chart_maps", "localized chart maps", "Actual first and inverse diamond maps on the complete normal basis"),
+            ("universal_certificate_denominator_degree", "polynomial degrees", "Actual denominator of the portable QR polynomial certificate"),
+            ("structured_marked23_algebra_dimension", "algebra dimensions", "Complete structured marked23 source algebra over F2(x)"),
+            ("structured_marked23_source_equations", "coupled source equations", "All QR and marked-base equations in the structured presentation"),
+            ("integral_nu_normal_chart_coordinates", "integral source coordinates", "Actual descended nu with a complete normal-module lift"),
+            ("QR_square_determinant_actions", "finite matrix actions", "Exhaustive QR7 square-determinant action checks"),
+            ("QR_largest_cycle", "cycle lengths", "Largest cycle in the complete QR7 action enumeration"),
+            ("Hecke3_kernel_parameter_degree", "algebra dimensions", "Generic separable Tate3 kernel-parameter algebra"),
+            ("Hecke3_isogeny_degree", "isogeny degrees", "Generic Tate quotient with full function and unit certificates"),
+            ("ordinary_QR_point_algebra_dimension", "algebra dimensions", "Actual ordinary QR line-packet point algebra"),
+            ("coprime_kernel_Bezout_Delta_exponent", "discriminant powers", "Full polynomial coprime3/7 kernel collision certificate"),
+            ("nu_diamond_PID_entries", "complete module entries", "Actual nu diamond transport in the retained normal module"),
+            ("nu_diamond_clearing_power", "principal-open powers", "Fixed source-bound clearing exponent for nu diamond transport"),
+            ("audited_unique_theorems", "audited declarations", "Unique locally audited R51 algebra and packet lemmas"),
+        ):
+            emit("koblitz_modular.geometry51_" + key, counts.get(key), date=date,
+                 problem=P_IC, unit=unit, better="neutral", label=label,
+                 source=f"{path}@{commit}")
+
+
+
+def koblitz_normal_closure52(ref, since):
+    """Neutral exact closure, finite factor-certificate and local-model counters."""
+    path = "research/koblitz_modular_ic_20261018/rounds/52/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        counts = json.loads(text).get("construction_counts", {})
+        for key, unit, label in (
+            ("normal_chart_rank", "module rank", "Complete retained normal-chart module rank"),
+            ("source_index_length", "F2 dimensions", "Source lattice index before adjoining actual nu"),
+            ("nu_adjoined_index_length", "F2 dimensions", "Exact remaining index after stable complete nu adjunction"),
+            ("nu_closure_extensions", "complete module extensions", "Extensions before verified nu stability"),
+            ("least_zero_exponent", "scalar denominator exponents", "Least z exponent in residual cokernel annihilator"),
+            ("least_one_exponent", "scalar denominator exponents", "Least z plus one exponent in residual cokernel annihilator"),
+            ("local_filtration_levels", "complete module levels", "All local filtration levels with both matrix products"),
+            ("candidate_semigroup_gaps", "numerical semigroup gaps", "Candidate 7,11 model gaps; actual local-ring identification separate"),
+            ("candidate_semigroup_conductor", "numerical semigroup conductor", "Candidate 7,11 model conductor; actual local-ring identification separate"),
+            ("large_good_packet_fibers", "finite fibers", "Complete good source specializations over fields1024 and2048"),
+            ("large_patterns88", "finite factorization certificates", "Good larger fibers with factor degrees8 and8"),
+            ("large_patterns214", "finite factorization certificates", "Good larger fibers with factor degrees2 and14"),
+            ("large_odd_degree11_packet_factors", "irreducible factors", "Odd degree packet factors over field2048"),
+            ("fresh_verified_packet_fibers", "fresh checked finite fibers", "All stored source specializations and irreducible factors rechecked"),
+            ("generic_norm_line_maps", "generic line maps", "Full degree3 isogeny line norm and sign products"),
+            ("audited_unique_theorems", "audited declarations", "Unique R52 module and polynomial implications; source premises external"),
+        ):
+            emit("koblitz_modular.geometry52_" + key, counts.get(key), date=date,
                  problem=P_IC, unit=unit, better="neutral", label=label,
                  source=f"{path}@{commit}")
 
@@ -685,7 +771,7 @@ def main():
     # ordering and the original first-parent/per-day semantics stay unchanged.
     base = "research/koblitz_modular_ic_20261018/rounds/"
     paths = [base + "22/ledger.json"] + [base + f"{n}/results.json"
-             for n in (24, 25, 26, 27, 28, 29, 30, 33, 34, 35, 36, 42, 43, 44, 45, 46, 47, 48)]
+             for n in (24, 25, 26, 27, 28, 29, 30, 33, 34, 35, 36, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52)]
     pool = ThreadPoolExecutor(max_workers=4)
     histories = [pool.submit(_history_rows, a.ref, path, a.since) for path in paths]
     jacobian_catalog(a.ref, a.since)
@@ -714,6 +800,9 @@ def main():
     koblitz_degree13_divisors(a.ref, a.since)
     koblitz_degree13_characters(a.ref, a.since)
     koblitz_affine_normalization(a.ref, a.since)
+    koblitz_checked_source_geometry(a.ref, a.since)
+    koblitz_integral_chart_transfers(a.ref, a.since)
+    koblitz_normal_closure52(a.ref, a.since)
 
 if __name__ == "__main__":
     main()

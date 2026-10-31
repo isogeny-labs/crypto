@@ -9,7 +9,7 @@ assert all(x['status'] in ('accepted','rejected') for x in r['runs'])
 revision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=repo,text=True).strip();tracked=subprocess.check_output(['git','ls-files','--',str(h.relative_to(repo))],cwd=repo,text=True).splitlines()
 exclude={'.artifacts.json','.gitignore','report.pdf','artifact-verification.json','source.sha256','source.files','science.files','source-revision.txt','raw-meta.json','runs.sha256','runs.tar.xz.sha256','ARTIFACTS.md','publication-validation.json','VISUAL_REVIEW.md','visual-review.json','export.json','CONTINUATION.md'}
 files=[str((repo/p).relative_to(h)) for p in tracked if Path(p).name not in exclude and not str((repo/p).relative_to(h)).startswith('runs/')]
-files+=['../../../../tools/progress_metrics.py','../../../../scripts/checkpoint.sh','../../../../tools/lean/AuditAxioms.lean','../27/VERIFY_ARCHIVE.py','../47/runs.sha256'];files=sorted(set(files))
+files+=['../../../../tools/progress_metrics.py','../../../../scripts/checkpoint.sh','../../../../tools/lean/AuditAxioms.lean','../27/VERIFY_ARCHIVE.py','../47/runs.sha256','../34/source-data/proof-cache-source-roots.txt'];files=sorted(set(files))
 for name in ['science.files','source.files']:(h/name).write_text('\n'.join(files)+'\n')
 (h/'source.sha256').write_text(''.join(hashlib.sha256((h/p).read_bytes()).hexdigest()+'  '+p+'\n' for p in files));(h/'source-revision.txt').write_text(revision+'\n')
 contents=['runs','source-data'];members=[]
