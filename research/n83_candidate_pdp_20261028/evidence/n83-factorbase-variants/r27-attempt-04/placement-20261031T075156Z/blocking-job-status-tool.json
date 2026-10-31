@@ -1,0 +1,154 @@
+{
+  "captured_utc": "2026-10-31T07:51:56Z",
+  "response": {
+    "job": {
+      "created_at": "2026-10-31T07:21:46Z",
+      "job_name": "semaev-n47-rand03-d5-blocked-20261031-0100",
+      "state": "active",
+      "status": {
+        "active": 1,
+        "ready": 1,
+        "startTime": "2026-10-31T07:21:46Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "78fbd79f-4663-4d6f-a1ec-09d33f32b728"
+    },
+    "pods": [
+      {
+        "name": "semaev-n47-rand03-d5-blocked-20261031-0100-dm5wh",
+        "node": "ip-10-84-109-174.us-east-2.compute.internal",
+        "status": {
+          "allocatedResources": {
+            "cpu": "2",
+            "ephemeral-storage": "10Gi",
+            "memory": "112Gi"
+          },
+          "conditions": [
+            {
+              "lastProbeTime": null,
+              "lastTransitionTime": "2026-10-31T07:25:40Z",
+              "observedGeneration": 1,
+              "status": "True",
+              "type": "PodReadyToStartContainers"
+            },
+            {
+              "lastProbeTime": null,
+              "lastTransitionTime": "2026-10-31T07:25:39Z",
+              "observedGeneration": 1,
+              "status": "True",
+              "type": "Initialized"
+            },
+            {
+              "lastProbeTime": null,
+              "lastTransitionTime": "2026-10-31T07:25:45Z",
+              "observedGeneration": 1,
+              "status": "True",
+              "type": "Ready"
+            },
+            {
+              "lastProbeTime": null,
+              "lastTransitionTime": "2026-10-31T07:25:45Z",
+              "observedGeneration": 1,
+              "status": "True",
+              "type": "ContainersReady"
+            },
+            {
+              "lastProbeTime": null,
+              "lastTransitionTime": "2026-10-31T07:25:39Z",
+              "observedGeneration": 1,
+              "status": "True",
+              "type": "PodScheduled"
+            }
+          ],
+          "containerStatuses": [
+            {
+              "allocatedResources": {
+                "cpu": "2",
+                "ephemeral-storage": "10Gi",
+                "memory": "112Gi"
+              },
+              "containerID": "containerd://0f2cbd3bd531249e2c0b6a2cf3fc71a3e18dc28b9166430f069d8f07ad7f3707",
+              "image": "sha256:50f0ef614828bc267a28a10061a12e3d8280eb1cd92f207a9ea1aa9c18ea8f24",
+              "imageID": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581",
+              "lastState": {},
+              "name": "task",
+              "ready": true,
+              "resources": {
+                "limits": {
+                  "cpu": "2",
+                  "ephemeral-storage": "10Gi",
+                  "memory": "112Gi"
+                },
+                "requests": {
+                  "cpu": "2",
+                  "ephemeral-storage": "10Gi",
+                  "memory": "112Gi"
+                }
+              },
+              "restartCount": 0,
+              "started": true,
+              "state": {
+                "running": {
+                  "startedAt": "2026-10-31T07:25:45Z"
+                }
+              },
+              "user": {
+                "linux": {
+                  "gid": 1000,
+                  "supplementalGroups": [
+                    1000
+                  ],
+                  "uid": 1000
+                }
+              },
+              "volumeMounts": [
+                {
+                  "mountPath": "/work",
+                  "name": "work"
+                },
+                {
+                  "mountPath": "/tmp",
+                  "name": "tmp"
+                },
+                {
+                  "mountPath": "/var/run/secrets/eks.amazonaws.com/serviceaccount",
+                  "name": "aws-iam-token",
+                  "readOnly": true,
+                  "recursiveReadOnly": "Disabled"
+                }
+              ]
+            }
+          ],
+          "hostIP": "10.84.109.174",
+          "hostIPs": [
+            {
+              "ip": "10.84.109.174"
+            }
+          ],
+          "observedGeneration": 1,
+          "phase": "Running",
+          "podIP": "10.84.98.165",
+          "podIPs": [
+            {
+              "ip": "10.84.98.165"
+            }
+          ],
+          "qosClass": "Guaranteed",
+          "resources": {
+            "limits": {
+              "cpu": "2",
+              "memory": "112Gi"
+            },
+            "requests": {
+              "cpu": "1999m",
+              "memory": "112Gi"
+            }
+          },
+          "startTime": "2026-10-31T07:25:39Z"
+        },
+        "uid": "a6b4b0d0-2355-4e70-a947-0215c322d9f1"
+      }
+    ]
+  }
+}
