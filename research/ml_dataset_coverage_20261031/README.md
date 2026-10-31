@@ -1,5 +1,15 @@
 # Requested versus retained dataset coverage
 
+`build_coverage_v3.py` binds the prime61 audit and four custody checkpoints to
+`inventory-v3.json`, preserving the immutable v2 ledger. The resulting
+`coverage-v3.json` has 152 retained receipts and observed sizes `n=23` and
+`n=61`. Prime enumeration now has two retained method artifacts; `pkm` remains
+unobserved. The specific modulus `2^61-1` has four retained cells at `m=2`,
+both twists, one generator and one key per twist. The other requested sizes
+and arities remain coverage gaps. Recompute with
+`python3 research/ml_dataset_inventory_20261031/build_inventory_v3.py` followed
+by `python3 research/ml_dataset_coverage_20261031/build_coverage_v3.py`.
+
 `build_coverage.py` reads the immutable five-campaign inventory, every
 retained Git custody checkpoint, and `prime-twist-archive-audit.json`. It
 verifies campaign denominators, plan hashes, native export flags, archive

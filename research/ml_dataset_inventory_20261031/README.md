@@ -47,3 +47,11 @@ restricted archive; the inventory does not claim fresh GETs for every archive.
 ```sh
 python3 research/ml_dataset_inventory_20261031/build_inventory_v2.py
 ```
+# Version 3 update
+
+`build_inventory_v3.py` appends the four-cell prime61 root/enumeration pilot to
+the immutable five-campaign inventory. `inventory-v3.json` has 152 retained
+receipts, 93 independent scalar solves, five checker-receipted official exports,
+80 completed export rows, and eight censored rows. The prime61 pilot contributes
+two verified enumeration artifacts and two root timeouts across both twists,
+with zero scalar solves. The earlier inventory files remain unchanged.
