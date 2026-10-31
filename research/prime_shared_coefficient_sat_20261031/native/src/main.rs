@@ -1,4 +1,7 @@
-use prime_shared_coeff_ir::{build_ir, e0_f17_panel, InstanceSpec};
+use prime_shared_coeff_ir::{
+    boolean::BooleanEncoding, build_ir, e0_f17_panel, e1::run_e1_sat_panel, InstanceSpec,
+};
+use std::path::Path;
 use std::process::ExitCode;
 
 fn parse_u64(value: &str, name: &str) -> Result<u64, String> {
@@ -10,7 +13,7 @@ fn parse_u64(value: &str, name: &str) -> Result<u64, String> {
 fn emit(args: &[String]) -> Result<(), String> {
     if args.len() != 9 {
         return Err(
-            "usage: prime-shared-coeff-ir emit P A B M T C TARGET_X TARGET_Y json|msolve|qf-ff"
+            "usage: prime-shared-coeff-ir emit P A B M T C TARGET_X TARGET_Y json|msolve|qf-ff|cnf|cnf-xor"
                 .to_owned(),
         );
     }
@@ -33,7 +36,9 @@ fn emit(args: &[String]) -> Result<(), String> {
         "json" => println!("{}", ir.canonical_json_pretty()?),
         "msolve" => print!("{}", ir.to_msolve()?),
         "qf-ff" => print!("{}", ir.to_qf_ff()?),
-        _ => return Err("format must be json, msolve, or qf-ff".to_owned()),
+        "cnf" => print!("{}", BooleanEncoding::from_ir(&ir)?.to_cnf()),
+        "cnf-xor" => print!("{}", BooleanEncoding::from_ir(&ir)?.to_cnf_xor()),
+        _ => return Err("format must be json, msolve, qf-ff, cnf, or cnf-xor".to_owned()),
     }
     Ok(())
 }
@@ -49,8 +54,29 @@ fn run() -> Result<(), String> {
             );
             Ok(())
         }
+        Some("e1-sat-panel") if args.len() == 7 => {
+            let report = run_e1_sat_panel(
+                Path::new(&args[1]),
+                Path::new(&args[2]),
+                Path::new(&args[3]),
+                Path::new(&args[4]),
+                Path::new(&args[5]),
+                &args[6],
+            )?;
+            println!(
+                "{}: {}/{} exact target/backend matches; {} checked UNSAT proofs",
+                report.verdict,
+                report.exact_target_backend_matches,
+                report.expected_target_backend_matches,
+                report.checked_terminal_unsat_proofs
+            );
+            Ok(())
+        }
         _ => {
-            Err("usage: prime-shared-coeff-ir emit ... | prime-shared-coeff-ir e0-panel".to_owned())
+            Err(
+                "usage: prime-shared-coeff-ir emit ... | prime-shared-coeff-ir e0-panel | prime-shared-coeff-ir e1-sat-panel CADICAL LRAT_TRIM CRYPTOMINISAT CAKE_XLRUP OUTPUT_DIR SOURCE_REVISION"
+                    .to_owned(),
+            )
         }
     }
 }
