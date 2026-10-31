@@ -2,7 +2,9 @@
 
 A PostgreSQL catalogue (RDS-ready, Postgres 15+) of elliptic curves, curves
 of higher genus, Jacobians, isogenies, covers and DLP transfers, with an HTTP
-API that agents query. The design and the reasons behind it are in
+API and an MCP endpoint that agents query. A deployed instance runs on AWS
+(see [`deploy/README.md`](deploy/README.md)); how agents use it is in
+[`docs/AGENTS.md`](docs/AGENTS.md). The design and the reasons behind it are in
 [`docs/SCHEMA.md`](docs/SCHEMA.md); the API is described in
 [`openapi.yaml`](openapi.yaml), which `GET /openapi.yaml` also serves.
 
@@ -17,7 +19,7 @@ cargo build --release
 export DATABASE_URL='postgres://postgres@localhost:5432/ecdb' ECDB_PG_TLS=disable
 
 ./target/release/ecdb migrate                      # schema ec, eight migrations
-./target/release/ecdb import --repo-root .. all    # registry, walks, traits, covers, transfers, certificates, derived
+./target/release/ecdb import --repo-root .. all    # registry, walks, traits, covers, transfers, certificates, derived, enrich
 ./target/release/ecdb serve                        # http://0.0.0.0:8080
 
 curl -s localhost:8080/v1/meta
@@ -30,8 +32,19 @@ curl -s -X POST localhost:8080/v1/sql -H 'content-type: application/json' \
 `ecdb import` subcommands:
 
 - `registry`, `walks [files...]`, `traits`, `covers`, `transfers`,
-  `certificates` and `derived` run one importer each; `all` runs all of them
-  in dependency order.
+  `certificates`, `derived` and `enrich` run one importer each; `all` runs
+  all of them in dependency order.
+- `enrich` computes from the imported rows, in Rust (`src/ec.rs`,
+  `src/import/enrich.rs`):
+  - Phi_l for l up to 19 (from `src/cryptanalysis/curve_traits/modular_polynomials.txt`);
+  - the 13 class-number-one H_D, each checked against every curve with that j;
+  - Semaev S_2 and S_3;
+  - division polynomials psi_2..psi_5 per prime-field genus-1 curve;
+  - GLV endomorphisms for j = 0 and 1728, with the eigenvalue checked on the
+    generator and a reduced decomposition lattice;
+  - twist, isomorphism and model-change relations;
+  - cyclic group structures where gcd(n, q - 1) decides them;
+  - p-ranks and Hasse invariants.
 - `lmfdb-av-fq <file>` loads an LMFDB `av_fq_isog` JSON export (isogeny
   classes of abelian varieties over finite fields, any dimension). Each label
   is recomputed from its Weil polynomial and must match.
@@ -52,13 +65,19 @@ record it refused, with the reason.
 | `GET /v1/curves/{ref}/transfers` | priced DLP transfer routes for the curve |
 | `GET /v1/curves/{ref}/covers` | covers onto (or from) the curve, with the cover's model and map |
 | `GET /v1/curves/{ref}/traits` | verbatim producer trait records |
+| `GET /v1/curves/{ref}/relations` | quadratic twists, isomorphisms and model changes to other curves |
+| `GET /v1/curves/{ref}/endomorphisms` | Frobenius, GLV (with eigenvalue) and subfield-tau endomorphisms, GLV decomposition lattices |
+| `GET /v1/curves/{ref}/division-polynomials` | psi_2..psi_5 in x, ascending coefficients over the curve's field |
 | `GET /v1/isogenies/{id}` | one isogeny |
 | `GET /v1/isogeny-classes`, `GET /v1/isogeny-classes/{label}` | isogeny classes over F_q by Weil polynomial, any dimension |
 | `GET /v1/fields`, `GET /v1/fields/{id}` | field representations |
 | `GET /v1/transfers` | transfer routes across all curves |
-| `GET /v1/polynomials/{sha256}`, `GET /v1/modular-polynomials` | the polynomial store |
+| `GET /v1/polynomials/{sha256}` | the content-addressed polynomial store |
+| `GET /v1/modular-polynomials?level=&coefficients=` | Phi_l over Z, l = 2..19 |
+| `GET /v1/class-polynomials`, `GET /v1/summation-polynomials` | H_D for class number one; Semaev S_2, S_3 |
 | `POST /v1/sql` | one read-only query |
 | `POST /v1/evidence`, `POST /v1/isogenies` | token-gated agent writes |
+| `POST /mcp` | MCP (streamable HTTP, JSON responses, stateless): nine tools over the routes above |
 
 Integers beyond 2^53 come back as decimal strings. Unknown values are
 `null` with a status, never 0. An ambiguous name returns 409 with the
@@ -119,4 +138,5 @@ ECDB_TEST_DATABASE_URL='postgres://postgres@localhost/ecdb_test' cargo test --te
 The integration test needs a database whose name ends in `_test`. It drops
 and recreates schema `ec` there, migrates twice (the second run must be a
 no-op), imports the registry, walks and traits from this checkout (the
-registry twice, to show idempotence), then queries through the router.
+registry twice, to show idempotence), runs `derived` and `enrich`, then
+queries through the router and the MCP endpoint.

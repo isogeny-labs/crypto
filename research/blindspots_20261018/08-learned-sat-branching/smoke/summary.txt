@@ -1,0 +1,49 @@
+summary: 32 records, incumbent 'a' has 4 targets
+arm a: targets 4 SAT 2 UNSAT 2 capped 0  median D 23113 P 3108352 Q 0 W 23117
+arm a2: targets 4 SAT 2 UNSAT 2 capped 0  median D 29706 P 3939787 Q 0 W 29706
+arm b: targets 4 SAT 2 UNSAT 2 capped 0  median D 27720 P 3774733 Q 717 W 29327
+arm b2: targets 4 SAT 2 UNSAT 2 capped 0  median D 26702 P 3626788 Q 0 W 4331202
+arm c: targets 4 SAT 2 UNSAT 2 capped 0  median D 26722 P 3628438 Q 722 W 35404
+arm d: targets 4 SAT 2 UNSAT 2 capped 0  median D 19780 P 2762916 Q 0 W 19780
+arm bs: targets 4 SAT 2 UNSAT 2 capped 0  median D 19514 P 2600368 Q 717 W 21117
+arm b2s: targets 4 SAT 2 UNSAT 2 capped 0  median D 29356 P 3858283 Q 0 W 4992322
+rule b vs a kappa=0: pairs 4 median ratio 0.7899 CI [0.4118, 0.9963] pass false  (n23:0.790 P:0.498 R:0.996)
+rule b vs a kappa=0.1: pairs 4 median ratio 0.7899 CI [0.3646, 0.9963] pass false  (n23:0.790 P:0.474 R:0.996)
+rule b vs a kappa=1: pairs 4 median ratio 0.7897 CI [0.1822, 0.9960] pass false  (n23:0.790 P:0.383 R:0.996)
+VERDICT b vs a: REGRESSES (level: constant; ratio of D+P+Q+k*W at k in 0,0.1,1; ADVANCES needs median >= 1.3 with the bootstrap interval above 1 at all three)
+rule b2 vs a kappa=0: pairs 4 median ratio 1.0006 CI [0.6395, 1.0011] pass false  (n23:1.001 P:0.820 R:1.001)
+rule b2 vs a kappa=0.1: pairs 4 median ratio 0.7340 CI [0.3974, 0.8992] pass false  (n23:0.734 P:0.483 R:0.899)
+rule b2 vs a kappa=1: pairs 4 median ratio 0.3784 CI [0.0634, 0.4709] pass false  (n23:0.378 P:0.175 R:0.471)
+VERDICT b2 vs a: MATCHES (level: constant; ratio of D+P+Q+k*W at k in 0,0.1,1; ADVANCES needs median >= 1.3 with the bootstrap interval above 1 at all three)
+rule c vs a kappa=0: pairs 4 median ratio 0.8198 CI [0.4970, 1.0006] pass false  (n23:0.820 P:0.568 R:1.001)
+rule c vs a kappa=0.1: pairs 4 median ratio 0.8196 CI [0.3239, 1.0004] pass false  (n23:0.820 P:0.481 R:1.000)
+rule c vs a kappa=1: pairs 4 median ratio 0.8180 CI [0.0801, 0.9986] pass false  (n23:0.818 P:0.359 R:0.999)
+VERDICT c vs a: MATCHES (level: constant; ratio of D+P+Q+k*W at k in 0,0.1,1; ADVANCES needs median >= 1.3 with the bootstrap interval above 1 at all three)
+rule bs vs a kappa=0: pairs 4 median ratio 0.9988 CI [0.4118, 2.2196] pass false  (n23:0.999 P:1.316 R:0.999)
+rule bs vs a kappa=0.1: pairs 4 median ratio 0.9988 CI [0.3646, 2.2189] pass false  (n23:0.999 P:1.292 R:0.999)
+rule bs vs a kappa=1: pairs 4 median ratio 0.9985 CI [0.1822, 2.2121] pass false  (n23:0.998 P:1.197 R:0.998)
+DESCRIPTIVE bs vs a: MATCHES (level: constant; ratio of D+P+Q+k*W at k in 0,0.1,1; ADVANCES needs median >= 1.3 with the bootstrap interval above 1 at all three)
+rule b2s vs a kappa=0: pairs 4 median ratio 0.7830 CI [0.0275, 1.0419] pass false  (n23:0.783 P:0.276 R:1.042)
+rule b2s vs a kappa=0.1: pairs 4 median ratio 0.6949 CI [0.0198, 0.9264] pass false  (n23:0.695 P:0.242 R:0.926)
+rule b2s vs a kappa=1: pairs 4 median ratio 0.3466 CI [0.0057, 0.4655] pass false  (n23:0.347 P:0.117 R:0.465)
+DESCRIPTIVE b2s vs a: MATCHES (level: constant; ratio of D+P+Q+k*W at k in 0,0.1,1; ADVANCES needs median >= 1.3 with the bootstrap interval above 1 at all three)
+rule d vs a kappa=0: pairs 4 median ratio 0.9385 CI [0.0762, 1.7210] pass false  (n23:0.939 P:0.899 R:0.939)
+rule d vs a kappa=0.1: pairs 4 median ratio 0.9385 CI [0.0763, 1.7211] pass false  (n23:0.939 P:0.899 R:0.939)
+rule d vs a kappa=1: pairs 4 median ratio 0.9388 CI [0.0770, 1.7220] pass false  (n23:0.939 P:0.899 R:0.939)
+DESCRIPTIVE d vs a: MATCHES (level: constant; ratio of D+P+Q+k*W at k in 0,0.1,1; ADVANCES needs median >= 1.3 with the bootstrap interval above 1 at all three)
+rule a2 vs a kappa=0: pairs 4 median ratio 0.7671 CI [0.0271, 1.0215] pass false  (n23:0.767 P:0.270 R:1.021)
+rule a2 vs a kappa=0.1: pairs 4 median ratio 0.7671 CI [0.0271, 1.0215] pass false  (n23:0.767 P:0.270 R:1.021)
+rule a2 vs a kappa=1: pairs 4 median ratio 0.7671 CI [0.0274, 1.0212] pass false  (n23:0.767 P:0.270 R:1.021)
+DESCRIPTIVE a2 vs a: MATCHES (level: constant; ratio of D+P+Q+k*W at k in 0,0.1,1; ADVANCES needs median >= 1.3 with the bootstrap interval above 1 at all three)
+rule b vs a2 kappa=0: pairs 4 median ratio 1.0574 CI [0.9745, 15.2034] pass false  (n23:1.057 P:8.171 R:0.975)
+rule b vs a2 kappa=0.1: pairs 4 median ratio 1.0574 CI [0.9745, 13.4485] pass false  (n23:1.057 P:7.294 R:0.975)
+rule b vs a2 kappa=1: pairs 4 median ratio 1.0571 CI [0.9745, 6.6620] pass false  (n23:1.057 P:3.900 R:0.975)
+DESCRIPTIVE b vs a2: MATCHES (level: constant; ratio of D+P+Q+k*W at k in 0,0.1,1; ADVANCES needs median >= 1.3 with the bootstrap interval above 1 at all three)
+rule b2 vs a2 kappa=0: pairs 4 median ratio 1.1137 CI [0.9800, 36.9183] pass false  (n23:1.114 P:19.083 R:0.980)
+rule b2 vs a2 kappa=0.1: pairs 4 median ratio 0.9948 CI [0.8802, 14.6564] pass false  (n23:0.995 P:7.883 R:0.880)
+rule b2 vs a2 kappa=1: pairs 4 median ratio 0.5095 CI [0.4608, 2.3184] pass false  (n23:0.510 P:1.438 R:0.461)
+DESCRIPTIVE b2 vs a2: MATCHES (level: constant; ratio of D+P+Q+k*W at k in 0,0.1,1; ADVANCES needs median >= 1.3 with the bootstrap interval above 1 at all three)
+rule c vs a2 kappa=0: pairs 4 median ratio 1.1129 CI [0.9795, 18.3495] pass false  (n23:1.113 P:9.798 R:0.980)
+rule c vs a2 kappa=0.1: pairs 4 median ratio 1.1126 CI [0.9794, 11.9458] pass false  (n23:1.113 P:6.596 R:0.979)
+rule c vs a2 kappa=1: pairs 4 median ratio 1.1102 CI [0.9779, 2.9280] pass false  (n23:1.110 P:2.085 R:0.978)
+DESCRIPTIVE c vs a2: MATCHES (level: constant; ratio of D+P+Q+k*W at k in 0,0.1,1; ADVANCES needs median >= 1.3 with the bootstrap interval above 1 at all three)
