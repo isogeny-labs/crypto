@@ -60,3 +60,19 @@ no retained receipts. Counts are campaign receipts, not unique key identities.
 python3 research/ml_dataset_inventory_20261031/build_inventory_v4.py
 python3 research/ml_dataset_coverage_20261031/build_coverage_v4.py
 ```
+
+# Version 5 update
+
+`build_coverage_v5.py` binds the ordinary-binary n=47 pilot's independent audit,
+plan, checkpoints, cost projection, and S3 readback sample to the checked
+version 5 inventory. `coverage-v5.json` records **172 retained receipts** at
+field sizes 23, 47, and 61. The binary family gains two F6 pair-domain and
+two bounded enumeration receipts across both twists; one enumeration cell
+timed out and remains censored. The requested n=48..60 sizes, arities other
+than 2 and 4, and PKM method still have no retained receipts. Counts remain
+campaign receipts rather than unique curve or key identities.
+
+```sh
+python3 research/ml_dataset_inventory_20261031/build_inventory_v5.py
+python3 research/ml_dataset_coverage_20261031/build_coverage_v5.py
+```
