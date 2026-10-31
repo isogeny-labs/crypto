@@ -138,13 +138,6 @@ impl CurveBig {
         }
     }
 
-    fn neg(&self, a: &PtBig) -> PtBig {
-        PtBig {
-            x: a.x.clone(),
-            y: (&self.p - (&a.y % &self.p)) % &self.p,
-        }
-    }
-
     fn lift_x(&self, x: &BigUint) -> Option<PtBig> {
         let p = &self.p;
         let x2 = (x * x) % p;

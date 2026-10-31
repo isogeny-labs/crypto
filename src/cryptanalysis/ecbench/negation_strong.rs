@@ -205,7 +205,7 @@ impl<'a> NegStrongRho<'a> {
         let f = &self.c().f;
         let ny = s.p.x.add(&s.p.y);
         if f.pack(&ny) < f.pack(&s.p.y) {
-            let r = self.inst.r;
+            let r = u64::try_from(self.inst.r).expect("one-word negation order");
             State {
                 p: PtB {
                     x: s.p.x,
@@ -224,7 +224,7 @@ impl<'a> NegStrongRho<'a> {
         if p.inf {
             u64::MAX
         } else {
-            self.c().f.pack(&p.x)
+            u64::try_from(self.c().f.pack(&p.x)).expect("one-word negation point key")
         }
     }
 
@@ -288,19 +288,24 @@ impl<'a> NegStrongRho<'a> {
     fn jumps(&self, jump_seed: u64, out: &mut NegStrongOutcome) -> Vec<(PtB, u64)> {
         let mut rng = StdRng::seed_from_u64(jump_seed);
         let g = self.inst.generator;
+        let r = u64::try_from(self.inst.r).expect("one-word negation order");
         (0..JUMPS)
             .map(|_| {
-                let c = rng.gen_range(1..self.inst.r);
+                let c = rng.gen_range(1..r);
                 out.scalar_multiplications += 1;
-                (self.c().mul(&g, c), c)
+                (self.c().mul(&g, u128::from(c)), c)
             })
             .collect()
     }
 
     /// Solve `Q = [d]G`.  Deterministic in `(curve, q, seed, params)`.
     pub fn solve(&self, q: PtB, seed: u64, params: &NegStrongParams) -> NegStrongOutcome {
+        assert!(
+            self.inst.curve.f.f.m <= 16,
+            "rho.negation_strong requires a one-word packed point key"
+        );
         let c = self.c();
-        let r = self.inst.r;
+        let r = u64::try_from(self.inst.r).expect("one-word negation order");
         let g = self.inst.generator;
         let mut out = NegStrongOutcome {
             ideal_steps: ideal_steps(r),
@@ -313,9 +318,9 @@ impl<'a> NegStrongRho<'a> {
         let jumps = self.jumps(jump_seed, &mut out);
         let mut rng = StdRng::seed_from_u64(seed);
         let stride_a = rng.gen_range(1..r);
-        let stride = c.mul(&g, stride_a);
+        let stride = c.mul(&g, u128::from(stride_a));
         let mut cursor_a = rng.gen_range(0..r);
-        let mut cursor = c.add(&c.mul(&g, cursor_a), &q);
+        let mut cursor = c.add(&c.mul(&g, u128::from(cursor_a)), &q);
         out.scalar_multiplications += 2;
         let m1 = self.muls();
         out.setup_fq_muls = m1 - m0;
@@ -390,7 +395,7 @@ impl<'a> NegStrongRho<'a> {
                 let d = mul_mod(sub_mod(ha, lane.s.a, r), inv, r);
                 let before = self.muls();
                 out.scalar_multiplications += 1;
-                let hit = c.mul(&g, d) == q;
+                let hit = c.mul(&g, u128::from(d)) == q;
                 check_muls += self.muls() - before;
                 if hit {
                     found = Some(d);
@@ -518,10 +523,11 @@ mod tests {
         for m in 4..=6u32 {
             let inst = find_bin_curve(m, 1, 16).unwrap();
             let rho = NegStrongRho::new(&inst);
+            let r = u64::try_from(inst.r).expect("small test subgroup order");
             for seed in 0..4u64 {
-                let k = (1 + seed * 7919 + u64::from(m) * 104_729) % inst.r;
-                let q = inst.curve.mul(&inst.generator, k);
-                let dp = auto_dp_bits(ideal_steps(inst.r));
+                let k = (1 + seed * 7919 + u64::from(m) * 104_729) % r;
+                let q = inst.curve.mul(&inst.generator, u128::from(k));
+                let dp = auto_dp_bits(ideal_steps(r));
                 let o = rho.solve(q, 0x5eed + seed, &params(4, dp));
                 assert_eq!(o.scalar, Some(k), "m = {m}, seed {seed}");
                 assert!(o.walk_steps > 0 && o.search_fq_muls > 0);
