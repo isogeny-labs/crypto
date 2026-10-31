@@ -504,6 +504,21 @@ struct Rung {
     measured: BTreeMap<String, u64>,
     verified: BTreeMap<String, u64>,
     workloads: Vec<String>,
+    parity: Parity,
+}
+
+/// Verdict parity between the baseline and the group-law arms, read from the records.
+#[derive(Default, Clone, Copy)]
+struct Parity {
+    /// (workload, round) groups in which all three S4 arms are present.
+    groups: u64,
+    /// Groups whose targets tried, relations found, matrix rank and recovered scalar agree.
+    identical: u64,
+    /// Witness comparisons the audit arm made (non-degenerate targets) and its mismatches.
+    audit_checks: u64,
+    audit_mismatches: u64,
+    /// Targets sent to the baseline by the group-law arm (degenerate).
+    degenerate_targets: u64,
 }
 
 fn load_rung(dir: &Path) -> Result<Rung, String> {
@@ -545,6 +560,38 @@ fn load_rung(dir: &Path) -> Result<Rung, String> {
     let f = first.ok_or("session has no measured records")?;
     let r_sub = f.workload.curve.r as f64;
     let n = f.workload.curve.field_degree.ok_or("not a binary curve")?;
+    let mut parity = Parity::default();
+    let mut groups: BTreeMap<(String, u32), BTreeMap<String, &Record>> = BTreeMap::new();
+    for r in recs.iter().filter(|r| r.counts()) {
+        groups
+            .entry((r.workload.workload_id.clone(), r.round))
+            .or_default()
+            .insert(r.arm.clone(), r);
+    }
+    for arms_in in groups.values() {
+        let names = ["s4-baseline", "s4-grouplaw", "s4-grouplaw-audit"];
+        if !names.iter().all(|a| arms_in.contains_key(*a)) {
+            continue;
+        }
+        parity.groups += 1;
+        let sig = |a: &str| {
+            let r = arms_in[a];
+            (
+                r.counters.get("targets_tried").copied(),
+                r.counters.get("relations_found").copied(),
+                r.counters.get("matrix_rank").copied(),
+                r.outcome.recovered.clone(),
+            )
+        };
+        if names.iter().all(|a| sig(a) == sig(names[0])) {
+            parity.identical += 1;
+        }
+        if let Some(sv) = &arms_in["s4-grouplaw-audit"].solver {
+            parity.audit_checks += sv.extra.get("audit_checks").copied().unwrap_or(0);
+            parity.audit_mismatches += sv.extra.get("audit_mismatches").copied().unwrap_or(0);
+            parity.degenerate_targets += sv.extra.get("degenerate_targets").copied().unwrap_or(0);
+        }
+    }
     Ok(Rung {
         n,
         l: n.div_ceil(3),
@@ -558,6 +605,7 @@ fn load_rung(dir: &Path) -> Result<Rung, String> {
         measured,
         verified,
         workloads: workloads.into_iter().collect(),
+        parity,
     })
 }
 
@@ -950,6 +998,16 @@ fn analyze(
                 json!({"a": a, "b": b, "ratio_a_over_b_at_w0_w01_w1": rs, "verdict": verdict}),
             );
         }
+        if rg.parity.groups > 0 {
+            md.push_str(&format!(
+                "\nVerdict parity (baseline, group-law and audit arms): {} of {} (workload, round) groups have identical targets tried, relations found, matrix rank and recovered scalar; the audit arm compared {} witnesses with the baseline's and found {} mismatches; {} degenerate targets went to the baseline.\n",
+                rg.parity.identical,
+                rg.parity.groups,
+                rg.parity.audit_checks,
+                rg.parity.audit_mismatches,
+                rg.parity.degenerate_targets
+            ));
+        }
         md.push_str(&format!(
             "\nConversions at this rung (GAE per pair): baseline pair pinned {:.3}; baseline pair measured here {:.3}; kernel pair / baseline pair time {:.4} (min {:.4}, max {:.4}), so anchored kernel pair {:.4}; kernel pair over a measured addition {:.4} (min {:.4}, max {:.4}).\n\n",
             c.c_s4_pinned, c.c_s4_measured, c.gl_over_s4, c.gl_over_s4_min, c.gl_over_s4_max,
@@ -959,6 +1017,7 @@ fn analyze(
             "n": rg.n, "l": rg.l, "slug": rg.slug, "log2_r": rg.log2_r, "floor_s": rg.floor_s,
             "session": rg.session_id, "dir": rg.dir, "workloads": rg.workloads.len(),
             "arms": arms_json, "baseline_over_arm": cmp_json, "order_across_band": order_json,
+            "parity": {"groups": rg.parity.groups, "identical": rg.parity.identical, "audit_checks": rg.parity.audit_checks, "audit_mismatches": rg.parity.audit_mismatches, "degenerate_targets": rg.parity.degenerate_targets},
             "conversions": {"c_s4_pinned": c.c_s4_pinned, "c_gl_over_add_median": c.c_gl, "c_gl_over_add_min": c.c_gl_min, "c_gl_over_add_max": c.c_gl_max, "c_s4_measured_over_add": c.c_s4_measured, "gl_over_s4_median": c.gl_over_s4, "gl_over_s4_min": c.gl_over_s4_min, "gl_over_s4_max": c.gl_over_s4_max, "c_gl_anchored": c.c_s4_pinned * c.gl_over_s4},
         }));
     }
