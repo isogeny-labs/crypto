@@ -3,7 +3,7 @@ proc require53(int ok,string tag){if(!ok){ERROR(tag);quit;}}
 execute(read("../../../51/runs/hecke3-51-01/hecke3-function-certificate51.sing"));
 ring tateBase53=(2,b,c),(t),dp;short=0;
 map sourceMap53=hecke3FunctionCertificate51,0,0,0,t;
-poly psi53=sourceMap53(source51[3]);ideal gb53=std(ideal(psi53));
+ideal mappedSource53=sourceMap53(source51);poly psi53=mappedSource53[3];ideal gb53=std(ideal(psi53));
 poly A53=1+c;poly a453=sourceMap53(a4_51);poly a653=sourceMap53(a6_51);
 poly X053=sourceMap53(X51);poly Y053=sourceMap53(Y51);
 link out53="ASCII:w tate-base-certificate53.sing";
