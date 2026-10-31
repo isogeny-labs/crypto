@@ -103,6 +103,14 @@ def step_lines(indent: str, paths: list[str]) -> list[str]:
         f"{i2}  AWS_SECRET_ACCESS_KEY: ${{{{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}}}",
         f"{i2}  AWS_REGION: ${{{{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}}}",
         f"{i2}run: |",
+        # Self-hosted runners may lack the AWS CLI the store backend shells
+        # out to; install it into the runner's temp dir (no sudo) when absent.
+        f"{i2}  if ! command -v aws >/dev/null; then",
+        f'{i2}    curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip" -o "$RUNNER_TEMP/awscli.zip"',
+        f'{i2}    python3 -c "import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" "$RUNNER_TEMP/awscli.zip" "$RUNNER_TEMP/awscli"',
+        f'{i2}    chmod -R u+x "$RUNNER_TEMP/awscli"',  # zipfile drops the mode bits
+        f'{i2}    "$RUNNER_TEMP/awscli/aws/install" --update -i "$RUNNER_TEMP/aws-cli" -b "$RUNNER_TEMP/aws-bin"',
+        f'{i2}    export ARTIFACTS_AWS="$RUNNER_TEMP/aws-bin/aws"',
         # A pinned, isolated CLI works on Linux, macOS and Windows without sudo.
         f"{i2}  if ! command -v aws >/dev/null; then",
         f'{i2}    python3 -m venv "$RUNNER_TEMP/artifacts-awscli"',
@@ -160,6 +168,7 @@ def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
             j = k + 1
             while j < len(lines) and (not lines[j].strip() or len(lines[j]) - len(lines[j].lstrip()) > len(indent)):
                 j += 1
+            while not lines[j - 1].strip():
             while j > k + 1 and not lines[j - 1].strip():
                 j -= 1
         step = step_lines(indent, paths)
@@ -180,6 +189,7 @@ def add_sparse_pattern(block: list[str], indent: str) -> list[str]:
             (".artifacts", "/.artifacts/", ())]
     for k, b in enumerate(block):
         scalar = re.match(rf"^({indent}    sparse-checkout: )(?!\|)(\S.*)$", b)
+        if scalar:  # one pattern on the key line: rewrite as a block list
         if scalar and "${{" in scalar.group(2):
             # A conditional empty value means a full checkout. Appending literal
             # patterns would silently narrow it to the artifact bootstrap only.

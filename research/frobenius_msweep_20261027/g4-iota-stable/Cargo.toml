@@ -1,0 +1,20 @@
+[package]
+name = "g4-iota-stable"
+version = "0.1.0"
+edition = "2021"
+description = "Cell G4: iota-stable (2-torsion translation stable) non-subspace factor bases, exact enumeration on toy Koblitz curves"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "g4iota"
+path = "src/main.rs"
+
+[dependencies]
+
+[profile.release]
+opt-level = 3
+debug = false
+
+[workspace]
