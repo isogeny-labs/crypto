@@ -1,0 +1,98 @@
+{
+ "beat_id": "prime.end_to_end_dlp.j0_24bit",
+ "claim_boundary": "synthetic_known_answer",
+ "claim_boundary_non_claims": [
+  "not key recovery on deployed curves",
+  "not asymptotic sub-rho",
+  "not a vs_rho claim (IC wall exceeds rho wall at this size)",
+  "not ledger promotion until independent validation"
+ ],
+ "created_at": "2026-10-31T07:32:42.795962+00:00",
+ "curve": "j0-bench-24bit",
+ "curve_params": {
+  "p": 16777213,
+  "a": 0,
+  "b": 7,
+  "n": 16770451,
+  "h": 1,
+  "generator": [
+   6,
+   7827705
+  ],
+  "provenance": "sage-constructed: p prime with p = 1 mod 3, #E prime, generator order = #E (verified in sage)"
+ },
+ "evidence_paths": [
+  "research/sat_factor_base_review_20260908/autolab/runs_manual/prime_j0_e2e_24bit_20261031/ka_24bit_seed20261031.json",
+  "research/sat_factor_base_review_20260908/autolab/runs_manual/prime_j0_e2e_24bit_20261031/ka_24bit_seed20261101.json",
+  "research/sat_factor_base_review_20260908/autolab/runs_manual/prime_j0_e2e_24bit_20261031/ka_24bit_seed20261102.json"
+ ],
+ "executable_or_source_hash": {
+  "source_j0_stage_ladder": "e6e17505bc9d644502e4853899be90950ddfdbabf89278c5cff10af8f163639d",
+  "source_bench_curves": "870857b6e19aca7c89771a8da905d7aafd135d24f7ada565003620398eaf80f1"
+ },
+ "host_id": {
+  "node": "Adams-MacBook-Pro.local",
+  "platform": "macOS-26.6-arm64-arm-64bit"
+ },
+ "ic_agrees_rho": true,
+ "recovered_d_verified": true,
+ "regime": "prime",
+ "n_or_bits": 24,
+ "policy": {
+  "target_orbits": 40,
+  "extra_relations": 8,
+  "max_relation_attempts": 64,
+  "max_trials_per_relation": 1000000,
+  "rho_steps_cap": 1048576,
+  "note": "frozen 20-bit rung policy, unchanged, driven by the staged ladder CLI"
+ },
+ "resource_caps": {},
+ "schema_version": 2,
+ "seeds": {
+  "target_seeds": [
+   "20261031",
+   "20261101",
+   "20261102"
+  ]
+ },
+ "stage": "end_to_end_dlp",
+ "stage_timers": {
+  "seed20261031": {
+   "factor_base_ms": 0.566333,
+   "relations_ms": 110451.644125,
+   "linear_algebra_ms": 0.031792,
+   "verify_ms": 0.011,
+   "rho_ms": 99.843833
+  },
+  "seed20261101": {
+   "factor_base_ms": 0.569916,
+   "relations_ms": 97376.836416,
+   "linear_algebra_ms": 0.03625,
+   "verify_ms": 0.014457999999999999,
+   "rho_ms": 75.296084
+  },
+  "seed20261102": {
+   "factor_base_ms": 0.576792,
+   "relations_ms": 123020.975459,
+   "linear_algebra_ms": 0.034499999999999996,
+   "verify_ms": 0.010750000000000001,
+   "rho_ms": 84.04029200000001
+  }
+ },
+ "relations": {
+  "collected": [
+   48,
+   48,
+   48
+  ],
+  "trials_per_relation_median": [
+   3739.0,
+   3955.5,
+   3752.5
+  ],
+  "trials_total": 782012,
+  "attempts_exhausted": 0
+ },
+ "task_id": "TASK-IC-BOUNDARY-AUTOLAB-20260910",
+ "gate_note": "acceptance gate 'independent replay on a second host or >=3 seeds for any size past 20 bits' satisfied by 3 deterministic seeds, all recovered, verified, and rho-agreeing"
+}
