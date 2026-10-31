@@ -1544,7 +1544,6 @@ fn pdiv(g: &GfTab, a: &[Fe], h: &[Fe], muls: &mut u64) -> Vec<Fe> {
 /// `X^q − X` (by `m` squarings modulo the polynomial), then splitting by
 /// `Tr(δX)`; every multiplication counted.
 pub fn roots(f: &Gf2q, poly: &[Fe], muls: &mut u64) -> Vec<Fe> {
-pub fn roots(f: &Gf2q, poly: &[u16], muls: &mut u64) -> Vec<u16> {
     roots_with(f, poly, muls, false)
 }
 
@@ -1557,20 +1556,20 @@ pub fn roots(f: &Gf2q, poly: &[u16], muls: &mut u64) -> Vec<u16> {
 /// counted, one per nonzero product) differ.
 struct SqMod {
     d: usize,
-    tbl: Vec<Vec<u16>>,
+    tbl: Vec<Vec<Fe>>,
 }
 
 impl SqMod {
-    fn new(g: &GfTab, h: &[u16], muls: &mut u64) -> SqMod {
+    fn new(g: &GfTab, h: &[Fe], muls: &mut u64) -> SqMod {
         let d = h.len() - 1;
-        let mut tbl: Vec<Vec<u16>> = Vec::with_capacity(d.saturating_sub(1));
+        let mut tbl: Vec<Vec<Fe>> = Vec::with_capacity(d.saturating_sub(1));
         if d >= 2 {
             // X^d ≡ h[0..d] (characteristic 2).
             tbl.push(h[..d].to_vec());
             for j in 1..d - 1 {
                 let prev = &tbl[j - 1];
                 let top = prev[d - 1];
-                let mut next = vec![0u16; d];
+                let mut next = vec![0u32; d];
                 next[1..d].copy_from_slice(&prev[..d - 1]);
                 if top != 0 {
                     for (k, &hk) in h[..d].iter().enumerate() {
@@ -1586,9 +1585,9 @@ impl SqMod {
         SqMod { d, tbl }
     }
     /// `r² mod h` for `deg r < d`.
-    fn sq(&self, g: &GfTab, r: &[u16], muls: &mut u64) -> Vec<u16> {
+    fn sq(&self, g: &GfTab, r: &[Fe], muls: &mut u64) -> Vec<Fe> {
         let d = self.d;
-        let mut out = vec![0u16; d];
+        let mut out = vec![0u32; d];
         for (i, &a) in r.iter().enumerate() {
             if a == 0 {
                 continue;
@@ -1613,7 +1612,7 @@ impl SqMod {
 
 /// [`roots`], with the `m` squarings of the `X^q − X` and splitting loops
 /// done by [`SqMod`] when `frob` is set (identical output).
-pub fn roots_with(f: &Gf2q, poly: &[u16], muls: &mut u64, frob: bool) -> Vec<u16> {
+pub fn roots_with(f: &Gf2q, poly: &[Fe], muls: &mut u64, frob: bool) -> Vec<Fe> {
     let g = &f.tab;
     let p = pmonic(g, poly.to_vec(), muls);
     if p.len() <= 1 {
@@ -1647,15 +1646,7 @@ pub fn roots_with(f: &Gf2q, poly: &[u16], muls: &mut u64, frob: bool) -> Vec<u16
     out
 }
 
-fn split_roots(f: &Gf2q, h: Vec<Fe>, out: &mut Vec<Fe>, mut seed: u32, muls: &mut u64) {
-fn split_roots(
-    f: &Gf2q,
-    h: Vec<u16>,
-    out: &mut Vec<u16>,
-    mut seed: u32,
-    muls: &mut u64,
-    frob: bool,
-) {
+fn split_roots(f: &Gf2q, h: Vec<Fe>, out: &mut Vec<Fe>, mut seed: u32, muls: &mut u64, frob: bool) {
     let g = &f.tab;
     match h.len() {
         0 | 1 => {}
@@ -1882,9 +1873,8 @@ fn split_partial(
     w: &[Vec<Fe>],
     known: &[(usize, usize)],
     muls: &mut u64,
-) -> Vec<Vec<Fe>> {
     frob: bool,
-) -> Vec<Vec<u16>> {
+) -> Vec<Vec<Fe>> {
     let g = &f.tab;
     let k = w.len();
     let mut a = vec![vec![0u32; k]; k];
@@ -3585,15 +3575,15 @@ mod ecbench_tests {
             for deg in [2usize, 3, 4, 9, 17, 40, 64] {
                 for _ in 0..4 {
                     // A polynomial with known rational roots times a random one.
-                    let mut poly = vec![1u16];
+                    let mut poly = vec![1u32];
                     let mut sink = 0;
                     for _ in 0..deg / 2 {
-                        let r = rng.gen_range(0..f.q) as u16;
+                        let r = rng.gen_range(0..f.q) as Fe;
                         poly = pmul(&f.tab, &poly, &[r, 1], &mut sink);
                     }
                     while poly.len() < deg + 1 {
-                        let mut tail = vec![0u16; 2];
-                        tail[0] = rng.gen_range(1..f.q) as u16;
+                        let mut tail = vec![0u32; 2];
+                        tail[0] = rng.gen_range(1..f.q) as Fe;
                         tail[1] = 1;
                         poly = pmul(&f.tab, &poly, &tail, &mut sink);
                         if poly.len() > deg + 1 {
@@ -3605,7 +3595,7 @@ mod ecbench_tests {
                     let fast = roots_with(&f, &poly, &mut b, true);
                     assert_eq!(base, fast, "m {m} degree {}", poly.len() - 1);
                     for r in &base {
-                        let mut ev = 0u16;
+                        let mut ev = 0u32;
                         for &c in poly.iter().rev() {
                             ev = f.tab.mul(ev, *r) ^ c;
                         }
