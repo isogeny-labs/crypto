@@ -183,7 +183,8 @@ fn shell_record<L: Leaf>(
     all: bool,
     base: Value,
 ) -> Value {
-    let found = run.outcome == Outcome::Sat;
+    // A model was found: the first-model run ends in Sat; the all-roots run ends in Unsat after its last blocking clause.
+    let found = run.models > 0;
     let known = run.outcome != Outcome::Unknown;
     let total = st.acct.total_pairs;
     let words = shell_words(run, st, graph);
@@ -963,8 +964,10 @@ fn cmd_summarize(args: &[String]) {
             writeln!(f, "{}", Value::Object(row)).unwrap();
         }
     }
-    println!("| set | leaf | arm | class | targets | ok | pairs/target | leaves/target | saved/target | conflicts/target | learned/target | pairs per learned | saved per learned | cube per learned | marginal per learned | shorter than pair | leaf bitops/target | shell bitops/target | total bitops/target | ms/target |");
-    println!("|:--|:--|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|");
+    println!("| set | leaf | arm | class | targets | ok | pairs/target | leaves/target | saved/target | conflicts/target | learned/target | pairs per learned | saved per learned | cube per learned | marginal per learned | shorter than pair | leaf bitops/target | shell bitops/target | total bitops/target | ms/target | mvc decisions / differing from lex |");
+    println!(
+        "|:--|:--|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|"
+    );
     for ((set, leaf, arm, class), g) in &groups {
         let n = g.n as f64;
         let s = |k: &str| g.sums.get(k).copied().unwrap_or(0.0);
@@ -982,7 +985,7 @@ fn cmd_summarize(args: &[String]) {
             }
         };
         println!(
-            "| {set} | {leaf} | {arm} | {class} | {} | {} | {:.1} | {:.1} | {:.1} | {:.1} | {:.1} | {} | {} | {} | {} | {:.0} | {:.0} | {:.0} | {:.0} | {:.2} |",
+            "| {set} | {leaf} | {arm} | {class} | {} | {} | {:.1} | {:.1} | {:.1} | {:.1} | {:.1} | {} | {} | {} | {} | {:.0} | {:.0} | {:.0} | {:.0} | {:.2} | {} |",
             g.n,
             g.ok,
             s("pairs_total") / n,
@@ -999,6 +1002,11 @@ fn cmd_summarize(args: &[String]) {
             s("shell_bitops64") / n,
             s("total_bitops") / n,
             s("wall_ns") / n / 1e6,
+            if s("dyn_decisions") > 0.0 {
+                format!("{} / {}", s("dyn_decisions") as u64, s("dyn_differs") as u64)
+            } else {
+                "-".to_string()
+            },
         );
     }
 }

@@ -123,20 +123,24 @@ if want reg; then
   done
 fi
 
-if want timing; then   # wall, a note: no accounting hooks, reserved core, ROUNDS interleaved rounds; a1b = the A/A of a1
-  [ -f "$OUT/iso.jsonl" ] || : > "$OUT/iso.jsonl"; [ -f "$OUT/times.jsonl" ] || : > "$OUT/times.jsonl"
+if want timing; then   # wall, a note: ONE isolated_bench acquisition (reserved core) around the whole block of runs
+  started=no
+  for try_n in $(seq 1 200); do   # the tool refuses to start on a busy machine: retry, and keep the refusals
+    if python3 tools/isolated_bench.py run --cpus "$CPU" --wait --out "$OUT/iso.jsonl" --label timing-block -- env PS7_STAGES=timing_inner PS7_MAIN_SHA="${PS7_MAIN_SHA:-}" "$0"; then started=yes; break; fi
+    echo "$(date -u +%FT%TZ) timing block attempt $try_n refused or failed" >> "$OUT/refused_starts.log"; sleep 20
+  done
+  [ "$started" = yes ] || { echo "$(date -u +%FT%TZ) FAILED: timing block never completed" >> "$OUT/failures.log"; FAIL=1; }
+fi
+
+if [ "$STAGES" = timing_inner ]; then   # the block itself: ROUNDS interleaved rounds, no accounting hooks; a1b = the A/A of a1
   for l in $RUNGS; do
     for r in $(seq 1 "$ROUNDS"); do
       for tag in a1 a1b a1u a2 a2l a3; do
         arm=$tag; [ "$tag" = a1b ] && arm=a1
         label="$tag-l$l-r$r"
-        grep -q "\"label\":\"$label\"" "$OUT/times.jsonl" && continue
-        for try_n in $(seq 1 100); do
-          if python3 tools/isolated_bench.py run --cpus "$CPU" --wait --out "$OUT/iso.jsonl" --label "$label" -- \
-               "$BIN" run --arm "$arm" --l "$l" --corpus "$C/corpus_l$l.txt" --gates "$GATES" --targets 16 --no-log --summary-only \
-               --label "$label" --out "$OUT/times.jsonl" > /dev/null; then break; fi
-          echo "$label attempt $try_n refused or failed" >> "$OUT/refused_starts.log"; sleep 3
-        done
+        grep -q "\"label\":\"$label\"" "$OUT/times.jsonl" 2>/dev/null && continue
+        "$BIN" run --arm "$arm" --l "$l" --corpus "$C/corpus_l$l.txt" --gates "$GATES" --targets 16 --no-log --summary-only \
+          --label "$label" --out "$OUT/times.jsonl" > /dev/null || echo "$label failed" >> "$OUT/refused_starts.log"
       done
     done
   done
