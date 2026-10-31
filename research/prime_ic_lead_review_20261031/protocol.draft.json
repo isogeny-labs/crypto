@@ -1,0 +1,841 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "EXP-prime-shared-coeff-sat-screen-20261031",
+  "version": 1,
+  "created": "2026-10-31",
+  "repository": "crypto",
+  "study_dir": "research/prime_ic_lead_review_20261031",
+  "authors": [
+    "Codex prime-field IC lead review"
+  ],
+  "links": {
+    "narrative": "research/prime_ic_lead_review_20261031/PROTOCOL.md",
+    "construction": "research/prime_one_shot_20261029/README.md",
+    "prior_sat_design": "research/sat_smt_prime_ic_design_20261030/DESIGN.md"
+  },
+  "question": "On the same exact selected-chart prime-field decomposition predicate, does a CDCL, CNF-XOR or QF_FF solver bundle show lower complete-work growth than exact enumeration and F4 on unseen natural targets, with exact correctness, A/A, planted and matched-null controls?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Every completed backend row agrees with the canonical evaluator and independent group-law replay; enumerable cells have identical projected model sets.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "At least one preregistered SAT solver/representation bundle has lower complete retired-instruction growth than exact candidate enumeration and is below F4 on the two largest jointly completed rungs, outside A/A spread.",
+      "class": "comparative",
+      "decided_by": [
+        "C-sat-f4",
+        "C-slope"
+      ],
+      "if_supported": "the frozen SAT bundle advances to a complete relation-collection experiment; no asymptotic or ECDLP speedup claim",
+      "if_not_supported": "the frozen SAT bundle is not advanced under the stated ladder and limits; no universal SAT impossibility claim"
+    },
+    {
+      "id": "C3",
+      "text": "The CDCL bundle uses elliptic/decomposition structure beyond a support- and model-count-matched curve-free null on the tested cells.",
+      "class": "comparative",
+      "decided_by": [
+        "C-structure"
+      ],
+      "if_supported": "a scoped structure effect on these predicates",
+      "if_not_supported": "within the matched-null distribution on these metrics; not proof that the predicate is random"
+    },
+    {
+      "id": "C4",
+      "text": "A finite solver panel proves or disproves subexponential prime-field ECDLP complexity.",
+      "class": "out_of_scope",
+      "decided_by": [],
+      "if_supported": null,
+      "if_not_supported": "only a proof/counterexample to the relevant theorem can decide the asymptotic statement"
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "A compact shared-coefficient predicate exposes enough local Boolean structure that at least one SAT bundle prunes a growing fraction of the exact candidate space.",
+      "mechanism": "Quotient/remainder layers share coefficients across all roots and avoid the free quotient-carry pattern of the earlier direct Semaev bit-blast.",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "growth_slope",
+          "direction": "lower",
+          "minimum_effect": "upper corrected 95% interval at most 0.85 across the three largest rungs",
+          "provenance": {
+            "written_at": "2026-10-31",
+            "first_recorded_in": "research/prime_ic_lead_review_20261031/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/prime_one_shot_20261029/prototype",
+                "measured": "known-witness correctness only; no unknown solve or retired-instruction data for the declared cells"
+              },
+              {
+                "path": "research/sat_smt_prime_ic_design_20261030/DESIGN.md",
+                "measured": "a different direct Semaev QF_BV representation"
+              }
+            ],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "the four frozen shared-coefficient rungs and solver versions only"
+          },
+          "role": "decisive"
+        }
+      ]
+    },
+    {
+      "id": "H2",
+      "statement": "Any CDCL reduction is caused by the elliptic/shared-coefficient structure rather than sparse-system shape alone.",
+      "mechanism": "The curve equations and shared remainder identities create repeated implications absent from a coefficient-randomized support-matched null.",
+      "predictions": [
+        {
+          "id": "P2",
+          "metric": "retired_instructions",
+          "direction": "lower",
+          "minimum_effect": "paired candidate/null median ratio at most 0.8 on the three largest rungs with corrected 95% interval below 1",
+          "provenance": {
+            "written_at": "2026-10-31",
+            "first_recorded_in": "research/prime_ic_lead_review_20261031/PROTOCOL.md",
+            "data_seen": [],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "matched null pairs generated under this protocol"
+          },
+          "role": "decisive"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "enum-ref",
+      "role": "reference",
+      "description": "Canonical exact enumeration and projected model-set reference.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {
+          "backend": "exact-enumeration"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "input": "canonical typed IR",
+        "proof": "complete projected model set where the fixed budget completes"
+      }
+    },
+    {
+      "id": "f4-base",
+      "role": "baseline",
+      "description": "Polynomial IR exported to a pinned msolve F4 backend.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {
+          "backend": "msolve",
+          "threads": "1"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "input": "canonical polynomial IR",
+        "model_recovery": "required"
+      }
+    },
+    {
+      "id": "cdcl-cnf",
+      "role": "candidate",
+      "description": "Parsimonious CNF export solved by a pinned single-thread CaDiCaL binary.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {
+          "backend": "cadical",
+          "threads": "1"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "encoding": "parsimonious-cnf",
+        "proof_logging": "required for UNSAT"
+      }
+    },
+    {
+      "id": "xor-cnf",
+      "role": "candidate",
+      "description": "CNF-XOR export solved by a pinned single-thread CryptoMiniSat binary.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {
+          "backend": "cryptominisat",
+          "threads": "1"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "encoding": "cnf-xor",
+        "proof_logging": "required for UNSAT"
+      }
+    },
+    {
+      "id": "qf-ff",
+      "role": "candidate",
+      "description": "Finite-field SMT export solved by a pinned single-thread cvc5 binary.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {
+          "backend": "cvc5-qf-ff",
+          "threads": "1"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "encoding": "QF_FF",
+        "model_recovery": "required"
+      }
+    },
+    {
+      "id": "cdcl-aa",
+      "role": "control_aa",
+      "description": "Byte-identical CDCL input and seed in a fresh process/layout.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {
+          "backend": "cadical",
+          "threads": "1"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "encoding": "parsimonious-cnf",
+        "layout": "fresh-process"
+      },
+      "same_instrument_as": "cdcl-cnf"
+    },
+    {
+      "id": "planted-positive",
+      "role": "control_positive",
+      "description": "The same CDCL path on instances with a hidden planted decomposition; any valid decomposition is accepted after replay.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {
+          "backend": "cadical",
+          "threads": "1"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "target_class": "planted",
+        "encoding": "parsimonious-cnf"
+      },
+      "same_instrument_as": "cdcl-cnf"
+    },
+    {
+      "id": "matched-null",
+      "role": "control_negative",
+      "description": "The same CDCL path on a coefficient-randomized curve-free predicate matched on field, shape, support graph and model class/count.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {
+          "backend": "cadical",
+          "threads": "1"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "target_class": "matched-null",
+        "encoding": "parsimonious-cnf"
+      },
+      "same_instrument_as": "cdcl-cnf"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "planted-positive",
+      "expected_detection": "Every planted row returns a canonical-IR-valid model whose independently extracted points sum to the public target; a miss invalidates that backend/rung's negative reading.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "matched-null",
+      "null_population": {
+        "description": "Coefficient-randomized curve-free sparse systems paired to the natural instances.",
+        "generator": "Protocol-hash seeded native generator; preserve field, variable/equation/degree multiset, monomial-support incidence graph, chart and field equations; condition on equal exact model count where enumerable and the same planted/UNSAT class otherwise.",
+        "n": 96,
+        "why_n": "One paired null per declared instance; test-specific power remains a freeze blocker until preflight variance is measured.",
+        "matched_on": [
+          "prime field and bit length",
+          "variable and equation counts",
+          "degree multiset",
+          "monomial-support incidence graph",
+          "selected chart and field equations",
+          "target class",
+          "exact model count on enumerable cells"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "solver_representation_bundle",
+        "levels": [
+          "exact-enumeration",
+          "msolve-f4",
+          "cadical-cnf",
+          "cryptominisat-cnf-xor",
+          "cvc5-qf-ff"
+        ]
+      },
+      {
+        "name": "rung",
+        "levels": [
+          "m3-t3",
+          "m5-t4",
+          "m7-t5",
+          "m9-t6"
+        ]
+      },
+      {
+        "name": "target_class",
+        "levels": [
+          "natural",
+          "planted",
+          "exact-unsat"
+        ]
+      },
+      {
+        "name": "predicate_structure",
+        "levels": [
+          "elliptic-shared-coefficient",
+          "support-model-matched-null"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "canonical_instance_ir",
+        "treatment": "fixed",
+        "value": "one hash per instance",
+        "how": "one native generator emits the semantic instance before any backend export"
+      },
+      {
+        "name": "curve_target_null_draw",
+        "treatment": "randomized",
+        "how": "protocol-hash seeds, sampled independently of arm"
+      },
+      {
+        "name": "rung_and_target_class",
+        "treatment": "crossed",
+        "how": "every declared arm attempts every declared cell under the same limits"
+      },
+      {
+        "name": "wrapper_exporter_commit",
+        "treatment": "fixed",
+        "how": "one commit and binary hash filled before freeze"
+      },
+      {
+        "name": "external_solver_version",
+        "treatment": "fixed",
+        "how": "one version/hash/flag set per arm, filled before freeze"
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "single-thread solver and environment for every arm"
+      },
+      {
+        "name": "arm_order",
+        "treatment": "randomized",
+        "how": "interleaved within each instance/rung replicate"
+      },
+      {
+        "name": "process_layout",
+        "treatment": "randomized",
+        "how": "fresh process per replicate; byte-identical fresh-process A/A"
+      },
+      {
+        "name": "host_state",
+        "treatment": "measured",
+        "how": "CPU, kernel, governor, turbo, SMT, NUMA, pressure, steal and isolation receipt on every row"
+      },
+      {
+        "name": "analyst_labels",
+        "treatment": "fixed",
+        "how": "masked until the frozen analysis completes"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-sat-f4",
+        "arms": [
+          "f4-base",
+          "cdcl-cnf",
+          "xor-cnf",
+          "qf-ff"
+        ],
+        "differs_in": [
+          "solver_representation_bundle"
+        ],
+        "design": "one_factor",
+        "reason": "The claimed object is the complete solver/export bundle; this comparison does not attribute an effect to solver code alone.",
+        "threshold": null
+      },
+      {
+        "id": "C-sat-enum",
+        "arms": [
+          "enum-ref",
+          "cdcl-cnf",
+          "xor-cnf",
+          "qf-ff"
+        ],
+        "differs_in": [
+          "solver_representation_bundle"
+        ],
+        "design": "one_factor",
+        "reason": "Exact enumeration supplies the model set and candidate-space denominator.",
+        "threshold": null
+      },
+      {
+        "id": "C-slope",
+        "arms": [
+          "cdcl-cnf",
+          "xor-cnf",
+          "qf-ff"
+        ],
+        "differs_in": [
+          "rung"
+        ],
+        "design": "absolute",
+        "reason": "Each candidate is read against a preregistered normalized growth threshold.",
+        "threshold": "upper corrected 95% interval of log-work slope <= 0.85"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "cdcl-cnf",
+          "cdcl-aa"
+        ],
+        "differs_in": [],
+        "design": "aa",
+        "reason": "Byte-identical input/seed with a fresh process/layout.",
+        "threshold": null
+      },
+      {
+        "id": "C-structure",
+        "arms": [
+          "cdcl-cnf",
+          "matched-null"
+        ],
+        "differs_in": [
+          "predicate_structure"
+        ],
+        "design": "one_factor",
+        "reason": "The null is matched on field, shape, support graph and model class/count.",
+        "threshold": "paired instruction ratio <= 0.8 on the three largest rungs with corrected 95% interval below 1"
+      },
+      {
+        "id": "C-positive",
+        "arms": [
+          "planted-positive"
+        ],
+        "differs_in": [
+          "target_class"
+        ],
+        "design": "absolute",
+        "reason": "Detector-power gate through the same CDCL path.",
+        "threshold": "100% verified decompositions on completed planted rows"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "protocol_hash_sha256",
+      "seeds": [],
+      "nonce": null,
+      "note": "Use experiment_protocol.py seeds after freeze; scratch preflight uses disjoint disclosed seeds and never the target cells."
+    },
+    "instance_sampling": {
+      "rule": "For each of four rungs generate eight natural, eight planted and eight exact-UNSAT instances from protocol-hash seeds before assigning arms; generate one paired matched null per instance.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": true,
+      "how": "experiment_protocol.py blind produces opaque arm labels; the original protocol/export and key are withheld from the analysis process until outputs are fixed.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 96,
+    "replicates": 3,
+    "warmups": 1,
+    "power": {
+      "method": "paired_bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 3,
+      "correction": "holm",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": false,
+      "note": "Draft freeze blocker: preflight must justify power for a 15% slope reduction and 1.5x paired instruction ratio under observed log-ratio variance. Passing p-value resolution alone would not establish this power."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": null
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "verified_status",
+        "name": "verified model status",
+        "unit": "status and canonical projected model set",
+        "kind": "exact",
+        "definition": "From backend result through canonical IR evaluation, root extraction and independent group replay; enumerable cells compare the complete projected model set.",
+        "source": "rows.jsonl verification",
+        "formula": null,
+        "aggregation": "distribution",
+        "resolution": null,
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "retired_instructions",
+        "name": "complete retired instructions",
+        "unit": "hardware retired instructions",
+        "kind": "counted",
+        "definition": "First target-dependent IR compilation instruction through backend exit, model/proof extraction and independent verification; includes serialization and parsing, excludes separately reported reusable target-independent setup.",
+        "source": "rows.jsonl perf.instructions",
+        "formula": null,
+        "aggregation": "median",
+        "resolution": "1 instruction",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "peak_rss_bytes",
+        "name": "peak resident memory",
+        "unit": "bytes",
+        "kind": "counted",
+        "definition": "Maximum resident set of the wrapper and all solver descendants over the complete target-dependent interval.",
+        "source": "rows.jsonl rusage.max_rss_bytes",
+        "formula": null,
+        "aggregation": "max",
+        "resolution": "1 byte",
+        "uncertainty": "range"
+      },
+      {
+        "id": "growth_slope",
+        "name": "normalized complete-work growth slope",
+        "unit": "delta log2(instructions) / delta log2(exact candidate-space size)",
+        "kind": "derived",
+        "definition": "Robust slope over completed rungs, paired by instance class; no imputation for timeouts.",
+        "source": "analysis output from retired_instructions and instance.exact_candidate_space",
+        "formula": "Theil-Sen slope of log2(retired_instructions) on log2(exact_candidate_space)",
+        "aggregation": "distribution",
+        "resolution": null,
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "sat_work_band",
+        "name": "SAT native-work sensitivity band",
+        "unit": "weighted solver events",
+        "kind": "derived",
+        "definition": "Decisions plus conflicts plus w times propagations, separately for w=0,0.1,1; reported as a band and never converted to group additions.",
+        "source": "rows.jsonl counters.decisions/conflicts/propagations",
+        "formula": "W(w)=decisions+conflicts+w*propagations, w in {0,0.1,1}",
+        "aggregation": "median",
+        "resolution": "1 weighted event",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "f4_degree",
+        "name": "F4 solving degree",
+        "unit": "total degree",
+        "kind": "counted",
+        "definition": "Largest productive degree reported by the pinned F4 backend for the canonical polynomial system.",
+        "source": "rows.jsonl counters.f4_solving_degree",
+        "formula": null,
+        "aggregation": "distribution",
+        "resolution": "1 degree",
+        "uncertainty": "range"
+      },
+      {
+        "id": "complete_wall_seconds",
+        "name": "complete cold wall time",
+        "unit": "seconds",
+        "kind": "timed",
+        "definition": "The same complete target-dependent interval as retired_instructions on an L2 row; invalid after restore or below L2.",
+        "source": "rows.jsonl time.complete_wall_ns",
+        "formula": null,
+        "aggregation": "median",
+        "resolution": "1 microsecond",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "randomized",
+    "clock": "perf",
+    "counters": [
+      "retired_instructions",
+      "cpu_cycles",
+      "peak_rss_bytes",
+      "decisions",
+      "conflicts",
+      "propagations",
+      "restarts",
+      "learned_clauses",
+      "learned_bytes",
+      "xor_eliminations",
+      "f4_solving_degree",
+      "f4_rows",
+      "f4_columns",
+      "f4_nonzeros",
+      "f4_multiply_adds",
+      "setup_instructions",
+      "solve_instructions",
+      "verification_instructions"
+    ],
+    "record": [
+      "cpu_model",
+      "cpu_features",
+      "kernel_release",
+      "governor",
+      "turbo",
+      "smt",
+      "numa_node",
+      "binary_sha256",
+      "solver_binary_sha256",
+      "image_digest",
+      "isolation.level",
+      "isolation.blockers",
+      "steal_ticks",
+      "psi",
+      "run_cpu",
+      "threads"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab",
+    "placement": {
+      "cpus": 2,
+      "memory": "set from preflight with identical per-arm limit",
+      "spot": true
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 1800,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 2
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Fixed design: 8 arms x 96 instances x (1 warmup + 3 measured fresh-process replicates), subject only to the same preregistered per-row timeout and memory limit; then stop.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Run the planted positive-control block first; a miss invalidates affected negative readings but all attempted rows remain in the export.",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "Timeouts, OOMs and nonzero solver exits are outcomes and are not retried; only recorded infrastructure failures may retry once.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "a SAT witness that fails canonical evaluation or independent group replay is wrong_answer and invalidates that arm/cell",
+    "an UNSAT result without a checked proof object is unknown, not unsat",
+    "a natural/null pair without the preregistered shape and model-class/count match is excluded from C-structure and reported",
+    "a row without valid retired-instruction counters is excluded from instruction comparisons and reported",
+    "wall time below L2 or after restore is descriptive only with wall_valid false",
+    "a failed planted control makes the corresponding negative reading inconclusive"
+  ],
+  "decision_rule": {
+    "text": "C2 is supported within scope only when one preregistered SAT bundle verifies every completed row, completes all four natural rungs, has Holm-corrected upper 95% growth-slope interval <=0.85 across the three largest rungs, and has complete retired-instruction ratio below 1 versus F4 on the two largest jointly completed rungs outside A/A spread. It is not advanced only when the lower slope interval is >=0.95 on three consecutive rungs or every SAT bundle is censored before F4 on both largest jointly attempted rungs. Other censoring is inconclusive. C3 is separate and requires candidate/null ratio <=0.8 on the three largest rungs with corrected interval below 1.",
+    "comparison_ids": [
+      "C-sat-f4",
+      "C-slope",
+      "C-structure"
+    ],
+    "threshold": "slope <=0.85 and SAT/F4 instructions <1 for advance; slope >=0.95 or uniform earlier censoring for not-advanced; structure ratio <=0.8 for C3",
+    "statistic": "paired median instruction ratios and Theil-Sen log-work slope, bootstrapped over held-out instances",
+    "interval": "paired bootstrap 95% intervals, Holm-adjusted over three candidate bundles",
+    "multiple_comparison_correction": "holm",
+    "effect_size_measure": "instruction ratio, slope difference, and candidate/null instruction ratio, each shown against A/A spread",
+    "verdict_vocabulary": [
+      "sat_screen_advanced",
+      "sat_screen_not_advanced",
+      "within_control_distribution",
+      "invalid_measurement",
+      "wrong_answer",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/prime_ic_lead_review_20261031/analyze.rs",
+      "sha256": null
+    },
+    "inputs": [
+      "rows.jsonl",
+      "instance-manifest.json",
+      "arm-manifest.json"
+    ],
+    "outputs": [
+      "analysis.json",
+      "tables.md",
+      "figures/solver-growth.svg",
+      "figures/solver-growth.png"
+    ],
+    "blinded": true,
+    "frozen_before_data": false
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "complete retired instructions versus exact candidate-space size by opaque arm",
+      "paired SAT/F4 instruction ratios with A/A interval",
+      "candidate/null ratios by rung",
+      "solver-native counter vectors under weights 0,0.1,1"
+    ],
+    "report_dir": "research/prime_ic_lead_review_20261031/reports"
+  },
+  "inadmissible": [
+    "taking affected pilot or benchmark data before the protocol is frozen and committed",
+    "changing cells, seeds, primes, curves, target class, null generator, budgets or thresholds after seeing output",
+    "comparing different selected/repeated-root charts across solver arms",
+    "omitting rationality, extraction, proof, setup or verification work from one arm",
+    "treating timeout, unknown or unproved UNSAT as no solution",
+    "selecting favorable solver seeds, variable orders or propagation weights",
+    "imputing censored work to manufacture a slope",
+    "reading a solver-stage result as a complete ECDLP or rho comparison",
+    "reading a finite slope as proof of subexponential complexity"
+  ],
+  "literature": [
+    {
+      "ref": "https://github.com/bochum-crypto/subexponential-ecdl/tree/1ee44e562b1b9a50ea339f3b8f81112b5a24b96f",
+      "provenance": "retrieved",
+      "claim": "The conditional hashed-factor-base reduction uses a compact O(mb)-edge Boolean tensor network and distinguishes tensor contraction from a conventional SAT reduction.",
+      "verified_by": "Direct PDF retrieval and SHA-256 82e273629b437660607117d5e99f400141ed7aa78b25c6749b03651f42deaa11 on 2026-10-31."
+    },
+    {
+      "ref": "https://github.com/openai/math/tree/7ef5c0cc5ca4b0e072b7a050fca09ab24bc6fa3a/preprints/The-Exponential-Time-Hypothesis-is-False-October-25-2026",
+      "provenance": "retrieved",
+      "claim": "Appendix D states the exact bounded-degree implicit Boolean tensor-contraction theorem used by the ECDLP reduction.",
+      "verified_by": "Direct PDF retrieval and SHA-256 5b1612dc2eebb2cad5b4cbe62d1fed2982f01ab1908c26f70010a651487e8123 on 2026-10-31."
+    },
+    {
+      "ref": "https://people.maths.ox.ac.uk/petit/files/16PKC_primeECDLP.pdf",
+      "provenance": "retrieved",
+      "claim": "PKM defines prime-field rational-map tower factor bases and identifies dedicated generalized root finding as the open solver problem.",
+      "verified_by": "Direct PDF retrieval and SHA-256 a53030a6cde720c354aebfb65b1eb01e07766ce2d26e543d77f2516c0a49ef5b on 2026-10-31."
+    },
+    {
+      "ref": "crypto:research/prime_one_shot_20261029/README.md",
+      "provenance": "internal",
+      "claim": "The shared quotient/remainder construction has exact tiny witnesses but no unknown-solve scaling result.",
+      "verified_by": "Repository review at 2c03791383f4bb4ce200e84bdef4309065c61e7f."
+    },
+    {
+      "ref": "crypto:research/sat_smt_prime_ic_design_20261030/DESIGN.md",
+      "provenance": "internal",
+      "claim": "The previously tested direct prime-field Semaev QF_BV/LQ-CDCL representation did not show a competitive solver route under its stated probes and assumptions.",
+      "verified_by": "Repository review at 2c03791383f4bb4ce200e84bdef4309065c61e7f."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  }
+}

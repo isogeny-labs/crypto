@@ -1,0 +1,52 @@
+digraph PrimeICLeadFunnel {
+  graph [
+    rankdir=LR,
+    bgcolor="white",
+    fontname="DejaVu Sans",
+    fontsize=18,
+    label="Prime-field index-calculus lead funnel — 2026-10-31",
+    labelloc=t,
+    pad=0.25,
+    nodesep=0.35,
+    ranksep=0.6
+  ];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, margin="0.12,0.08"];
+  edge [fontname="DejaVu Sans", fontsize=9, color="#475569"];
+
+  question [label="Prime-field relation oracle\nthat may change the exponent", fillcolor="#e0f2fe", color="#0369a1", penwidth=2];
+
+  generic [label="Generic decomposition\npair tables / subtract / MITM", fillcolor="#f1f5f9", color="#64748b"];
+  direct [label="Direct Semaev SAT/SMT\nQF_BV / QF_FF", fillcolor="#fee2e2", color="#b91c1c"];
+  algebraic [label="Compact algebraic predicates", fillcolor="#fef3c7", color="#b45309"];
+  boolean [label="Compact Boolean predicates", fillcolor="#ede9fe", color="#6d28d9"];
+
+  pkm [label="3 · PKM tower, m >= 4\nestablished; degree wall", fillcolor="#fff7ed", color="#c2410c"];
+  shared [label="2 · Shared divisor coefficients\nSAT / XOR / SMT / F4 screen", fillcolor="#dcfce7", color="#15803d", penwidth=2];
+  reuse [label="4 · Target-parametric reuse\nsecondary amortization", fillcolor="#f0fdf4", color="#65a30d"];
+  special [label="5 · Special j / Solinas / chart\nconstant-factor screen", fillcolor="#f8fafc", color="#64748b"];
+
+  btn [label="1 · Hashed factor bases + BTN\nconditional subexponential chain", fillcolor="#ddd6fe", color="#5b21b6", penwidth=2.5];
+  proof [label="Proof/code bridge audit\nfirst decisive action", fillcolor="#fae8ff", color="#a21caf"];
+  panel [label="Frozen 84-case finite panel\nengineering evidence only", fillcolor="#f5f3ff", color="#7c3aed"];
+
+  question -> generic;
+  question -> direct;
+  question -> algebraic;
+  question -> boolean;
+
+  generic -> special [label="reference only"];
+  direct -> shared [label="change representation"];
+  algebraic -> pkm;
+  algebraic -> shared;
+  algebraic -> reuse;
+  algebraic -> special;
+  boolean -> btn;
+
+  btn -> proof [label="theorem claim"];
+  btn -> panel [label="finite implementation"];
+
+  generic_note [shape=note, label="Previously measured above\nmatched rho; generic bounds apply", fillcolor="#f8fafc", color="#94a3b8"];
+  direct_note [shape=note, label="20-bit 120 s unknown;\nno clean Z3 scaling", fillcolor="#fff1f2", color="#fb7185"];
+  generic -> generic_note [style=dashed, arrowhead=none];
+  direct -> direct_note [style=dashed, arrowhead=none];
+}
