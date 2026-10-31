@@ -13,6 +13,9 @@ these are shared-host observations, and the tile harness used Sage/Python.
 
 The study retains raw receipts, sources, certificates and an unchanged
 archive. [Run report](run-report.pdf), [results report](results-report.pdf),
-[SVG](historical-timings.svg) and [150-dpi PNG](historical-timings.png) are
+[SVG](historical-timings.svg) and [150-dpi PNG artifact pointer](.artifacts.json) are
 copies for browsing; the study is the source of truth. No benchmark-admission
 or leaderboard status follows from copying the reports.
+
+Hydrate the PNG from the repository root with
+`python3 tools/artifacts/artifacts.py pull benchmarks/20261031-gap80-native-diagnostic`.

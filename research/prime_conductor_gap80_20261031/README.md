@@ -44,6 +44,14 @@ native/build/check
 (cd native/build && ./pari_verify ../verify80.gp)
 ```
 
+The artifact-autofix workflow uploaded and byte-verified the large timing
+PNG copies in commit `2e04bf488`; each directory's `.artifacts.json` pins
+those bytes. From the repository root, hydrate the browsing images with:
+
+```sh
+python3 tools/artifacts/artifacts.py pull research/prime_conductor_gap80_20261031/reports benchmarks/20261031-gap80-native-diagnostic
+```
+
 The original Python/Sage producer and its clocks remain inside the archive
 as historical provenance; they are not installed as a research execution path.
 Research execution uses native source and thin shell build orchestration.
