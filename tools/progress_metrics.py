@@ -771,7 +771,7 @@ def main():
     # ordering and the original first-parent/per-day semantics stay unchanged.
     base = "research/koblitz_modular_ic_20261018/rounds/"
     paths = [base + "22/ledger.json"] + [base + f"{n}/results.json"
-             for n in (24, 25, 26, 27, 28, 29, 30, 33, 34, 35, 36, 42, 43, 44, 45, 46, 47, 48)]
+             for n in (24, 25, 26, 27, 28, 29, 30, 33, 34, 35, 36, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52)]
     pool = ThreadPoolExecutor(max_workers=4)
     histories = [pool.submit(_history_rows, a.ref, path, a.since) for path in paths]
     jacobian_catalog(a.ref, a.since)
