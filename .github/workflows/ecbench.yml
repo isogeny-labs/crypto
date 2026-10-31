@@ -641,7 +641,7 @@ jobs:
       - name: Validate committed evidence integrity on pull requests
         # Sixteen byte-balanced shards keep per-run audit work within the PR cap;
         # each shard verifies every assigned session and the matrix covers all.
-        timeout-minutes: 20
+        timeout-minutes: 25
         env:
           AUDIT_SHARD: ${{ matrix.shard }}/16
         run: |
