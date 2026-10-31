@@ -1,0 +1,26 @@
+{
+  "schema": "research.source-review/v1",
+  "verdict": "supports bounded value-level source mapping",
+  "source_blinded_plan": true,
+  "fresh_compile_exit_codes": [
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "named_readbacks": 5,
+  "rust_field_fragment_sha256": "089c4b52e1e53a6874d4aa012046d854d48477b44a0a20a8f5cf3ba0e62103f6",
+  "required_external_conditions": [
+    "Field.n=1",
+    "prime5<=p<2^31",
+    "canonical inputs",
+    "ignored counters have headroom for concrete calls"
+  ],
+  "unproved": [
+    "cross-scaled expression composition",
+    "compiler translation",
+    "counter-state refinement",
+    "branch payload correctness"
+  ]
+}

@@ -1,0 +1,11 @@
+PencilWordRefinement.bounded_word_prelude_excludes_zero_slope (p : UInt64) (f : Polynomial (ZMod p.toNat))
+  (a b : PencilWordRefinement.WeightedWord) [Fact (Nat.Prime p.toNat)] (hfive : 5 ≤ p.toNat) (hbound : p.toNat < 2 ^ 31)
+  (ha : PencilWordRefinement.WeightedWord.canonical p a) (hb : PencilWordRefinement.WeightedWord.canonical p b)
+  (haz : a.z ≠ 0) (haw : a.w ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0)
+  (hva : PencilWordRefinement.WeightedWord.normalizedValid p f a)
+  (hvb : PencilWordRefinement.WeightedWord.normalizedValid p f b) :
+  PencilWordRefinement.crossPreludeWord p a b ≠ some ProjectiveLawRuntime.Branch22Prelude.sameUMixedZeroSlope
+'PencilWordRefinement.canonical_word_nonzero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PencilWordRefinement.bounded_word_prelude_excludes_zero_slope' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

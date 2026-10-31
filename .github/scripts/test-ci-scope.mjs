@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync, renameSync } from 'node:fs';
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, writeFileSync, rmSync, renameSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
-import { classify, embeddedInputs, materializeInputs, pathDependencyDirs, scopes, select } from './ci-scope.mjs';
+import { classify, embeddedInputs, materializeInputs, pathDependencyDirs, scopes, select, sourceFiles } from './ci-scope.mjs';
 
 test('a cold root checkout resolves path crates and their embedded inputs', () => {
   const cwd = mkdtempSync(path.join(os.tmpdir(), 'crypto-path-crates-'));
@@ -312,5 +312,45 @@ test('path dependencies of the root crate are materialized, transitively', () =>
     assert.equal(existsSync(path.join(cwd, 'tools/helper/archive/raw.jsonl')), false);
     write('Cargo.toml', '[package]\nname="fixture"\nversion="0.1.0"\n[dependencies]\nup = { path = "../up" }\n');
     assert.throws(() => pathDependencyDirs(cwd), /escapes the checkout/);
+  } finally { rmSync(cwd, { recursive: true, force: true }); }
+});
+
+
+test('large tracked path lists preserve source discovery beyond 16 MiB', () => {
+  const cwd = mkdtempSync(path.join(os.tmpdir(), 'crypto-ci-large-index-'));
+  try {
+    execFileSync('git', ['init', '-q'], { cwd });
+    const oid = execFileSync('git', ['hash-object', '-w', '--stdin'],
+      { cwd, input: '', encoding: 'utf8' }).trim();
+    const files = Array.from({ length: 80000 }, (_, i) =>
+      `archive/${'x'.repeat(210)}-${String(i).padStart(6, '0')}.txt`);
+    const sources = ['src/first.rs', 'src/last ü line\nname.rs'];
+    files.push(...sources);
+    assert.ok(Buffer.byteLength(files.join('\0') + '\0') > 16 * 1024 * 1024);
+    execFileSync('git', ['update-index', '-z', '--index-info'], {
+      cwd, input: files.map(file => `100644 ${oid}\t${file}\0`).join(''),
+    });
+    mkdirSync(path.join(cwd, 'src'));
+    for (const source of sources) writeFileSync(path.join(cwd, source), '');
+    let found;
+    try { found = sourceFiles(cwd); }
+    catch (error) { assert.fail(`large Git path list failed: ${error.code ?? error.message}`); }
+    assert.deepEqual([...found].sort(), [...sources].sort());
+  } finally { rmSync(cwd, { recursive: true, force: true }); }
+});
+
+
+test('failed Git commands propagate and remove their temporary output', () => {
+  const cwd = mkdtempSync(path.join(os.tmpdir(), 'crypto-ci-git-failure-'));
+  const scratch = path.join(cwd, 'scratch');
+  mkdirSync(scratch);
+  try {
+    const module = new URL('./ci-scope.mjs', import.meta.url).href;
+    execFileSync(process.execPath, ['--input-type=module', '-e', `
+      import assert from 'node:assert/strict';
+      import { sourceFiles } from ${JSON.stringify(module)};
+      assert.throws(() => sourceFiles(process.cwd()), /not a git repository/);
+    `], { cwd, env: { ...process.env, TMPDIR: scratch, TMP: scratch, TEMP: scratch } });
+    assert.deepEqual(readdirSync(scratch), []);
   } finally { rmSync(cwd, { recursive: true, force: true }); }
 });
