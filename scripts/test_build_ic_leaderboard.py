@@ -189,6 +189,19 @@ class FrozenEngineeringComponent(unittest.TestCase):
             with self.assertRaisesRegex(SystemExit, "incomplete or inconsistent"):
                 builder.f4_fp_ic_component()
 
+    def test_raw_phase_counter_must_sum_to_recorded_total(self):
+        original_load = builder.load
+
+        def corrupt_raw(rel):
+            value = original_load(rel)
+            if rel == builder.SOURCES["f4_fp_ic_new"]:
+                value[0]["f4_muls"] += 1
+            return value
+
+        with patch.object(builder, "load", side_effect=corrupt_raw):
+            with self.assertRaisesRegex(SystemExit, "incomplete or inconsistent"):
+                builder.f4_fp_ic_component()
+
 
 if __name__ == "__main__":
     unittest.main()

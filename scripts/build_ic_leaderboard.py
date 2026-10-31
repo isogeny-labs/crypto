@@ -1521,6 +1521,14 @@ def jv_sieve_table() -> dict:
 
 def f4_fp_ic_component() -> dict:
     """Carry the frozen engineering result without promoting it to a gate verdict."""
+    counted_phases = ("setup_muls", "base_muls", "stream_muls", "weil_muls",
+                      "f4_muls", "lin_muls", "post_muls", "verify_muls", "la_muls")
+
+    def counted_total(raw):
+        return (all(type(raw.get(key)) is int and raw[key] >= 0 for key in counted_phases)
+                and type(raw.get("total_muls")) is int
+                and raw["total_muls"] == sum(raw[key] for key in counted_phases))
+
     study = load(SOURCES["f4_fp_ic_effect"])
     rows = study.get("dlp")
     main = load(SOURCES["f4_fp_ic_main"])
@@ -1546,7 +1554,8 @@ def f4_fp_ic_component() -> dict:
         before = main_by_key[(r["p"], r["seed"])]
         after = new_by_key[(r["p"], r["seed"])]
         rho = before.get("rho")
-        if (not all(positive(v) for v in (before.get("l"), before.get("c_add_e"),
+        if (not counted_total(before) or not counted_total(after)
+                or not all(positive(v) for v in (before.get("l"), before.get("c_add_e"),
                                           before.get("total_muls"), after.get("total_muls")))
                 or before["l"] != after.get("l") or before["c_add_e"] != after.get("c_add_e")
                 or not isinstance(rho, list) or len(rho) != 4 or rho != after.get("rho")
