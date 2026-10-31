@@ -12,3 +12,12 @@ sha256:
 44b45a7d85bdee6aa1a5e29dcba60c2460d1dd1c09c4e66b99ec455c8f61121b  quartic_pipeline_gls
 93edcc4059ed305e73e6989cda28fa4903c988b710504457eee12b129e599ed0  e27_walk
 1713471e6f446f296271476bb845400e8ad36d22fc47e1786af49105329234d4  e32_ladder
+
+Runner: run_ladder.py (pre-registration commit) ran the three p = 101 curves and was then replaced by
+run_ladder.sh with the same logic (AGENTS.md "Implementation language: no Python"); the p = 149 seed 1 run it
+had started was killed and rerun by run_ladder.sh, its wall time added to spent_s.
+
+Analysis: examples/e32_tables.rs (std + serde_json 1.0.151 only, no library code), built outside the shared
+target dir as a standalone crate in the scratchpad (e32tables/Cargo.toml: [[bin]] path = this file;
+cargo build --release --offline). Source sha256 at build: 6616e08cab8e2e8a254b425d26cf573f4ec522128f08ee18965d16939003fa15; binary sha256: 5f854b73bdc164d685e9d474204323fa5a8d59bbab95683d39e53d88764b4c05.
+If the source changes later, its commit and hashes are recorded below.
