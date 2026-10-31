@@ -78,7 +78,9 @@ use crypto_lib::cryptanalysis::ic_boundary::{
     lift_abscissae, semaev_s3_quadratic, CountedGroup, FactorBase, GroupOps, OracleCounters,
     PrimeCurve, PrimeInstance, PrimePoint,
 };
-use crypto_lib::cryptanalysis::ic_framework::prime_tower::{primitive_two_power_root, PrimeKummerBase};
+use crypto_lib::cryptanalysis::ic_framework::prime_tower::{
+    primitive_two_power_root, PrimeKummerBase,
+};
 use crypto_lib::cryptanalysis::ic_framework::stages::{
     DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params, SolverCost, SolverTotals,
     SystemShape,
@@ -167,7 +169,9 @@ impl Kummer {
         }
         let zeta = primitive_two_power_root(p, t)
             .ok_or_else(|| format!("2^{t} does not divide p − 1 = {}", p - 1))?;
-        let v = (0..1u64 << t).map(|k| mulm(g, powm(zeta, k, p), p)).collect();
+        let v = (0..1u64 << t)
+            .map(|k| mulm(g, powm(zeta, k, p), p))
+            .collect();
         Ok(Kummer { t, g, v })
     }
 
@@ -338,7 +342,10 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeTowerBase<'_> {
         let t = params.u64("t")? as u32;
         let g = Kummer::new(self.instance.curve.p, t, params.u64_or("seed", 1)?)?.g;
         let (_, kp) = Params::parse_spec(&format!("prime-kummer:t={t},g={g}"))?;
-        PrimeKummerBase { instance: self.instance }.build(ctx, &kp, ops)
+        PrimeKummerBase {
+            instance: self.instance,
+        }
+        .build(ctx, &kp, ops)
     }
 }
 
