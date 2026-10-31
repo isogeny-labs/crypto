@@ -10,8 +10,11 @@ the fastest external solver. All clocks are shared-host L0 observations.
 **Both fixed public targets now complete through 60-bit fields.** V8 records
 12 verified recoveries out of 12 prescribed executions. The 60-bit cold solves
 are 770.270416 and 845.179937 seconds. These are bounded observations on two
-public fixtures, not a global hardware maximum. The CPU driver currently
-requires p < 2^60; extending that guard and its arithmetic is separate work.
+public fixtures, not a global hardware maximum. The separately checked v9
+extension accepts p < 2^62 and records one verified61-bit recovery; the other
+prescribed61-bit target hit memory admission. Its62-bit cells were unattempted.
+
+The latest completed panel is described in the [v9 observation report](reports/run-20261030T1502Z/report.pdf).
 
 ## Complete run accounting
 
@@ -25,10 +28,11 @@ requires p < 2^60; extending that guard and its arithmetic is separate work.
 | v6 | `5a7bfdb97af8941261a2e66a9008231e52f3f23a` | 0 | 0 | Preflight passed; first solve rejected the requested row cap |
 | v7 | `4014622e18caef9a6b6c89d79653e7633f5aaaff` | 12 | 10 | Two 60-bit timeouts at 1,200 seconds |
 | v8 | `bbf0f2f51e73afd7e41174094feb2c56a72d3d9d` | 12 | 12 | Complete through both 60-bit targets |
+| v9 | `e1a38ce4bc586050c3faa67a3ab79f312eb549b5` | 8 | 7 | One61-bit memory refusal; one61-bit recovery; both62-bit cells unattempted |
 
 The first v6 solve was attempted and failed, despite producing no CSV data
 row. Its input, error and entire archive are retained. No launch is silently
-reclassified or retried under its original protocol. V1–v8 pods were deleted
+reclassified or retried under its original protocol. V1–v9 pods were deleted
 and deletion verified before the next task GPU launched.
 
 ## Observed comparisons
@@ -97,6 +101,26 @@ The wide index boundary check covers 2^24 offsets, exact lower-bound agreement,
 duplicate/parity/infinity cases and existing valid-curve differential fixtures.
 Worker/controller exited zero, archive collection and deletion were verified.
 
+## Checked width extension: one61-bit recovery
+
+V9's six52-bit control executions verified. At61bits, seed101 refused the
+85,969,611,408-byte admission estimate for1,788,236,560left rows after0.263632s;
+seed202 admitted63,161,668,896bytes for1,313,071,104left rows and recovered in
+1537.899248s cold,1537.918073s including fresh verification and corruption
+rejection. It used1591relations from2432attempts; oracle1536.244543s and
+elimination1.360546s. These are L0 observations, not certified performance.
+V9's largest complete prescribed rung is52bits; v8's separate complete rung
+remains60. Both62-bit cells were unattempted by the frozen stopping rule.
+
+All19Rust tests and the recorded host/device, Clippy, maximum-cap and
+full/compact/wide query sanitizer checks passed. The archive digest matched,
+worker/controller exited zero, and pod deletion was verified. The exact
+[raw export](results-v9/export.json), [coverage](results-v9/coverage.json),
+[checker limits](results-v9/CHECKER-NOTE.md) and [protocol](protocol-v9.json)
+retain the failure and five canonical rectangular-coverage findings.
+V10 was never executed; see [the supersession record](UNEXECUTED-v10.md).
+V11 remains a separate frozen test; no pending outcome is counted here.
+
 ## Correctness and custody
 
 Each public target Q is obtained by coordinate lifting; its scalar is never
@@ -145,3 +169,28 @@ certified. EKS was not used; any future EKS image must come from crypto main.
 
 [Inspected seven-page report](reports/run-20261030T0304Z/report.pdf) and
 [benchmark browsing copies](../../benchmarks/20261030-explicit-relations-gpu/README.md).
+
+## V11: complete prescribed recovery through 62 field bits
+
+All 12 executions succeeded: eight matched 52-bit controls and both fixed
+targets at 61 and 62 bits. Every certificate passed fresh CPU replay and
+scalar+1 rejection; the prescribed 52-bit cross-arm certificates match exactly.
+The measured source is `d44b59149f468357e86186f956ecb7e323f38915`.
+
+The two 62-bit cold solves took 2139.880951918 and 2187.942594727 seconds; totals
+including the separate audit were 2139.908483146 and 2187.971582474 seconds.
+For this panel, target-coordinate generation is outside `solver_seconds` and
+included in `wall_seconds`, along with fresh replay and corruption rejection.
+All clocks remain L0 diagnostics with `wall_valid=false`. Table admission
+estimates, including queried CUB scratch, were 48,798,250,775 and 49,539,778,479
+bytes; these are not measured peak VRAM. No hardware maximum is established.
+
+[Raw rows](results-v11/rows.csv), [export](results-v11/export.json),
+[strict audit](results-v11/frontier-audit.txt), [validation scope](results-v11/CHECKER-NOTE.md),
+and [inspected two-page report](reports/run-20261030T1550Z/report.pdf).
+All 19 Rust tests and recorded device/header/Clippy/sanitizer checks passed.
+Archive integrity and pod deletion were verified; raw evidence was pushed
+before rendering. Schema/flow/file hashes pass; five canonical rectangular
+coverage findings remain disclosed. The exact staged plan and eight mutation
+controls pass the native coverage audit. V13 separately tests persistent
+queries and full right-sum reuse; its results are not included here.

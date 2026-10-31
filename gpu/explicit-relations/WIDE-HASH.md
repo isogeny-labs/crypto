@@ -1,4 +1,4 @@
-# Checked field-width extension (device validation pending)
+# Checked field-width extension (v9 device validation passed)
 
 The completed v8 record uses p < 2^60. This separate extension admits certified
 prime-order curves with p < 2^62 and r < 2^63. Exact Hasse/order-witness
@@ -34,3 +34,9 @@ Sources: the existing Fp64 contract in ../rootfind/fp64.cuh; HAC algorithms
 https://pari.math.u-bordeaux.fr/dochtml/html-stable/Elliptic_curves.html;
 the supplied paper's inverse-hash construction. This is a bounded generic
 MITM backend, not the paper's conditional tensor contraction.
+
+V9 completed all19Rust tests, device differential and recorded sanitizer
+checks; one61-bit public target verified and the other refused memory
+admission. Both62-bit recovery cells were unattempted. See
+../../research/explicit_relations_e2e_20261030/results-v9/export.json and its
+CHECKER-NOTE.md for full outcomes and retained canonical coverage findings.

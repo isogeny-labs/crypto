@@ -1,0 +1,35 @@
+{
+  "schema": "research.formal-component-result/v1",
+  "scope": "conditional local nonsingularity extraction-to-doubling field bridge",
+  "theorems": [
+    "zero_ordinate_square_factor",
+    "square_factor_value_derivative",
+    "extracted_ordinate_nonzero",
+    "source_extraction_then_doubling"
+  ],
+  "local_premise": "not(value(x)=0 and explicit_quintic_deriv(x)=0)",
+  "characteristic_not_two": "explicit for doubling",
+  "global_squarefree_bridge": false,
+  "output_validity_assumed": false,
+  "derived": [
+    "zero extracted ordinate implies squared factor",
+    "squared factor implies zero value and explicit derivative",
+    "local premise excludes zero ordinate",
+    "next weighted doubling nonzero weights and validTwo"
+  ],
+  "checks": {
+    "attempt4": 0,
+    "controls3": 0,
+    "readback1": 0
+  },
+  "retained_failures": [
+    "attempt1",
+    "attempt2",
+    "attempt3",
+    "controls1",
+    "controls2"
+  ],
+  "independent_review": "pending",
+  "scientific_execution": false,
+  "cost_ratio": null
+}

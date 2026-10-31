@@ -4,7 +4,7 @@
 //! with a separate complete tensor implementation exported as [`tensor`].
 //! This bounded reference's default oracle enumerates group decompositions (generic
 //! decomposition, bounded by sqrt(r); cannot beat rho). No subexponential or
-//! performance claim is made. Cofactor-one prime-field curves below 2^60 are
+//! performance claim is made. Cofactor-one prime-field curves below 2^63 are
 //! supported using an exact prime-order witness; the original constructor
 //! retains its small-field exhaustive check. Answers carry replayable certificates.
 //!
@@ -161,7 +161,34 @@ pub(crate) fn inverse(a: u64, p: u64) -> u64 {
     }
 }
 
+// For a validated prime p <= 4096, p = q*a + r gives
+// a^-1 = -q*r^-1 mod p, where 0 < r < a. Charge this bounded
+// (at most 32 KiB) field-arithmetic table to each Curve construction.
+fn small_inverses(p: u64) -> Vec<u64> {
+    if p > 4096 {
+        return Vec::new();
+    }
+    let mut table = vec![0; p as usize];
+    table[1] = 1;
+    for a in 2..p {
+        table[a as usize] = p - (p / a * table[(p % a) as usize]) % p;
+    }
+    table
+}
+
+fn inverse_with_table(a: u64, p: u64, table: &[u64]) -> u64 {
+    debug_assert!(a > 0 && a < p);
+    if table.is_empty() {
+        inverse(a, p)
+    } else {
+        table[a as usize]
+    }
+}
+
 fn addmod(a: u64, b: u64, p: u64) -> u64 {
+    if p >= (1u64 << 63) {
+        return if a >= p - b { a - (p - b) } else { a + b };
+    }
     let sum = a + b;
     if sum >= p {
         sum - p
@@ -170,11 +197,13 @@ fn addmod(a: u64, b: u64, p: u64) -> u64 {
     }
 }
 
-fn floor_sqrt(n: u64) -> u64 {
-    let (mut lo, mut hi) = (0u64, 1u64 << 32);
+fn floor_sqrt(n: u128) -> u64 {
+    // Only Hasse radicands <=4*(2^63-1), plus u64 test inputs.
+    assert!(n < (1u128 << 65));
+    let (mut lo, mut hi) = (0u64, 1u64 << 33);
     while lo + 1 < hi {
         let mid = (lo + hi) / 2;
-        if u128::from(mid) * u128::from(mid) <= u128::from(n) {
+        if u128::from(mid) * u128::from(mid) <= n {
             lo = mid;
         } else {
             hi = mid;
@@ -291,6 +320,8 @@ impl SqrtContext {
 /// Explicit CPU reduction memory ceiling; callers must opt in above 512.
 /// Two dense triangular workspaces can require several GiB at this ceiling.
 pub const MAX_COLUMNS: usize = 16384;
+/// Bounded ordered factor-base slots shared with the standalone GPU service.
+pub const MAX_SLOTS: usize = 12;
 /// Bound inverse-hash enumeration, including independent certificate replay.
 pub const MAX_HASH_CANDIDATES: u64 = 1 << 24;
 
@@ -306,9 +337,15 @@ pub struct Curve {
     // Tiny constructor's lookup; empty for the order-witness constructor.
     roots: Vec<Option<u64>>,
     sqrt: Option<SqrtContext>,
+    inverses: Vec<u64>,
+    field: Modulus,
 }
 
 impl Curve {
+    pub(crate) fn field_inverse(&self, a: u64) -> u64 {
+        inverse_with_table(a, self.p, &self.inverses)
+    }
+
     /// Certify cofactor one without scanning the field. A nonzero point killed
     /// by prime r has exact order r. The unique multiple of r in the integer
     /// Hasse interval must be r itself. No unverified cardinality is accepted.
@@ -319,7 +356,7 @@ impl Curve {
         r: u64,
         generator: Point,
     ) -> Result<Self, Error> {
-        if !(5..(1u64 << 62)).contains(&p)
+        if !(5..(1u64 << 63)).contains(&p)
             || !(3..(1u64 << 63)).contains(&r)
             || !prime(p)
             || !prime(r)
@@ -340,11 +377,13 @@ impl Curve {
             r,
             roots: Vec::new(),
             sqrt: Some(SqrtContext::new(p)),
+            inverses: small_inverses(p),
+            field: Modulus::new(p),
         };
         if generator.is_none() || !curve.contains(generator) || curve.mul(generator, r)?.is_some() {
             return Err(Error::Invalid("invalid prime-order witness"));
         }
-        let radius = floor_sqrt(4 * p);
+        let radius = floor_sqrt(4 * u128::from(p));
         let (lower, upper) = (p + 1 - radius, p + 1 + radius);
         if lower.div_ceil(r) != 1 || upper / r != 1 {
             // Preserve exact validation for ambiguous tiny Hasse intervals.
@@ -363,7 +402,7 @@ impl Curve {
         if a >= p || b >= p || (4 * a * a % p * a + 27 * b * b) % p == 0 {
             return Err(Error::Invalid("noncanonical or singular curve"));
         }
-        let radius = floor_sqrt(4 * p);
+        let radius = floor_sqrt(4 * u128::from(p));
         if p >= 1024 && (p + 1 - radius).div_ceil(r) == 1 && (p + 1 + radius) / r == 1 {
             // The same exact certificate as with_order_witness, discovering
             // a public point rather than enumerating every x in the field.
@@ -376,6 +415,8 @@ impl Curve {
                 r,
                 roots: Vec::new(),
                 sqrt: Some(SqrtContext::new(p)),
+                inverses: small_inverses(p),
+                field: Modulus::new(p),
             };
             let witness = (0..p).find_map(|x| curve.decode(2 * x));
             if witness.is_some() && curve.mul(witness, r)?.is_none() {
@@ -406,6 +447,8 @@ impl Curve {
             r,
             roots,
             sqrt: None,
+            inverses: small_inverses(p),
+            field: Modulus::new(p),
         };
         // Finite differences of x^3+a*x+b: first difference at zero
         // is 1+a, second is 6, and the third difference is constant 6.
@@ -442,14 +485,22 @@ impl Curve {
         self.r
     }
     fn rhs(&self, x: u64) -> u64 {
-        (mulmod(mulmod(x, x, self.p), x, self.p) + mulmod(self.a, x, self.p) + self.b) % self.p
+        addmod(
+            addmod(
+                self.field.mul(self.field.mul(x, x), x),
+                self.field.mul(self.a, x),
+                self.p,
+            ),
+            self.b,
+            self.p,
+        )
     }
 
     /// Test canonical coordinates and the curve equation; accepts the identity.
     pub fn contains(&self, point: Point) -> bool {
         match point {
             None => true,
-            Some((x, y)) => x < self.p && y < self.p && mulmod(y, y, self.p) == self.rhs(x),
+            Some((x, y)) => x < self.p && y < self.p && self.field.mul(y, y) == self.rhs(x),
         }
     }
 
@@ -493,17 +544,21 @@ impl Curve {
             Some(p) => p,
         };
         let p = self.p;
-        if x == xx && (y + yy) % p == 0 {
+        if x == xx && addmod(y, yy, p) == 0 {
             return None;
         }
         let (num, den) = if x == xx {
-            ((3 * mulmod(x, x, p) + self.a) % p, 2 * y % p)
+            let square = self.field.mul(x, x);
+            (
+                addmod(addmod(addmod(square, square, p), square, p), self.a, p),
+                addmod(y, y, p),
+            )
         } else {
             (sub(yy, y, p), sub(xx, x, p))
         };
-        let slope = mulmod(num, inverse(den, p), p);
-        let nx = sub(sub(mulmod(slope, slope, p), x, p), xx, p);
-        Some((nx, sub(mulmod(slope, sub(x, nx, p), p), y, p)))
+        let slope = self.field.mul(num, self.field_inverse(den));
+        let nx = sub(sub(self.field.mul(slope, slope), x, p), xx, p);
+        Some((nx, sub(self.field.mul(slope, sub(x, nx, p)), y, p)))
     }
 
     /// Checked affine addition, including identity, inverses, and doubling.
@@ -534,7 +589,7 @@ impl Curve {
 /// One affine hash and its threshold, defining a slot-specific factor base.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct HashBase {
-    /// Prime hash modulus, in `[2p,4p]` and strictly below `2^63`.
+    /// Prime hash modulus, in `[2p,4p]` and representable as u64.
     pub s: u64,
     /// Nonzero multiplier modulo `s`.
     pub alpha: u64,
@@ -545,11 +600,9 @@ pub struct HashBase {
 }
 
 impl HashBase {
-    fn validate(&self, curve: &Curve) -> Result<(), Error> {
-        if self.s >= (1u64 << 63)
-            || self.s < 2 * curve.p
-            || self.s > 4 * curve.p
-            || !prime(self.s)
+    fn validate_parameters(&self, curve: &Curve) -> Result<(), Error> {
+        if self.s < 2 * curve.p
+            || u128::from(self.s) > 4 * u128::from(curve.p)
             || self.alpha == 0
             || self.alpha >= self.s
             || self.beta >= self.s
@@ -561,23 +614,64 @@ impl HashBase {
         Ok(())
     }
 
+    fn validate(&self, curve: &Curve) -> Result<(), Error> {
+        self.validate_parameters(curve)?;
+        if !prime(self.s) {
+            return Err(Error::Invalid("hash parameters"));
+        }
+        Ok(())
+    }
+
     /// Enumerate by inverse hashing, not by scanning all curve points (§3.5).
     pub fn enumerate(&self, curve: &Curve) -> Result<Vec<Point>, Error> {
         self.validate(curve)?;
+        self.enumerate_validated(curve)
+    }
+
+    // Callers must establish all parameters and the primality of s locally.
+    fn enumerate_validated(&self, curve: &Curve) -> Result<Vec<Point>, Error> {
         if self.tau > MAX_HASH_CANDIDATES {
             return Err(Error::Limit("inverse-hash candidate bound"));
         }
-        let inv = inverse(self.alpha, self.s);
+        // Keep the established signed EEA bound; use Fermat for full-u64 hashes.
+        let inv = if self.s < (1u64 << 63) {
+            inverse(self.alpha, self.s)
+        } else {
+            pow(self.alpha, self.s - 2, self.s)
+        };
         let mut points = Vec::new();
-        for t in 0..self.tau {
-            let z = mulmod(inv, sub(t, self.beta, self.s), self.s);
+        // z(t) = alpha^-1 * (t-beta) mod s, so z(t+1)=z(t)+inv mod s.
+        // Both operands are canonical; addmod also handles full-u64 hash moduli.
+        let mut z = mulmod(inv, sub(0, self.beta, self.s), self.s);
+        for _ in 0..self.tau {
             if let Some(point) = curve.decode(z) {
                 points.push(Some(point));
             }
+            z = addmod(z, inv, self.s);
         }
         points.sort_unstable();
         Ok(points)
     }
+}
+
+// Each invocation establishes its own prime-modulus facts; no fact is shared
+// between collection and independent certificate replays. Only consecutive
+// identical moduli reuse primality, while every hash's bounds are checked.
+fn enumerate_hash_bases(curve: &Curve, hashes: &[HashBase]) -> Result<Vec<Vec<Point>>, Error> {
+    let mut checked_prime = None;
+    hashes
+        .iter()
+        .map(|h| {
+            h.validate_parameters(curve)?;
+            if checked_prime != Some(h.s) {
+                if !prime(h.s) {
+                    return Err(Error::Invalid("hash parameters"));
+                }
+                checked_prime = Some(h.s);
+            }
+            h.enumerate_validated(curve)
+        })
+        .collect()
 }
 
 /// Deterministic decomposition interface. The oracle receives no `u`, `v`,
@@ -594,7 +688,7 @@ pub trait DecompositionOracle {
         curve: &Curve,
         hashes: &[HashBase],
     ) -> Result<Vec<Vec<Point>>, Error> {
-        hashes.iter().map(|h| h.enumerate(curve)).collect()
+        enumerate_hash_bases(curve, hashes)
     }
 
     /// Find an ordered slot-specific decomposition of `target`.
@@ -621,7 +715,7 @@ impl DecompositionOracle for Enumerate {
         max_work: u64,
     ) -> Result<Option<Vec<Point>>, Error> {
         if bases.len() < 2
-            || bases.len() > 8
+            || bases.len() > MAX_SLOTS
             || !curve.contains(target)
             || bases.iter().any(|b| {
                 b.iter().any(|&a| a.is_none() || !curve.contains(a))
@@ -668,7 +762,7 @@ impl DecompositionOracle for Enumerate {
 /// Bounded reduction parameters. Bounds make exhaustion explicit.
 #[derive(Clone, Debug)]
 pub struct Config {
-    /// Number of ordered factor-base slots, 2 through 8.
+    /// Number of ordered factor-base slots, 2 through MAX_SLOTS.
     pub m: usize,
     /// Override the Lemma 13 threshold; `None` uses its integer ceiling.
     pub tau: Option<u64>,
@@ -900,7 +994,15 @@ pub fn solve_with_oracle(
     config: &Config,
     oracle: &mut impl DecompositionOracle,
 ) -> Result<Certificate, Error> {
-    solve_with_oracle_profile(curve, p, q, config, oracle, &mut ReductionStats::default())
+    solve_reduction::<false>(
+        curve,
+        p,
+        q,
+        config,
+        oracle,
+        &mut ReductionStats::default(),
+        20,
+    )
 }
 
 /// Descriptive stage clocks, accumulated across all attempted trials.
@@ -928,11 +1030,44 @@ pub fn solve_with_oracle_profile(
     oracle: &mut impl DecompositionOracle,
     stats: &mut ReductionStats,
 ) -> Result<Certificate, Error> {
+    solve_reduction::<true>(curve, p, q, config, oracle, stats, 20)
+}
+
+/// Profile a reduction with an explicit per-trial target-query budget.
+/// Each trial permits at most `attempts_per_column * (columns + 1)` queries.
+/// The multiplier must be in 1..=256; ordinary entry points retain 20.
+/// Smaller bases may need more queries to collect a complete relation matrix.
+/// This changes only exhaustion: every returned relation and certificate is
+/// checked in exactly the same way as the ordinary reduction.
+pub fn solve_with_oracle_profile_budget(
+    curve: &Curve,
+    p: Point,
+    q: Point,
+    config: &Config,
+    oracle: &mut impl DecompositionOracle,
+    stats: &mut ReductionStats,
+    attempts_per_column: usize,
+) -> Result<Certificate, Error> {
+    solve_reduction::<true>(curve, p, q, config, oracle, stats, attempts_per_column)
+}
+
+// One reduction body preserves identical random draws, bounds and verification.
+// The ordinary API does not read clocks for statistics the caller discarded.
+fn solve_reduction<const PROFILE: bool>(
+    curve: &Curve,
+    p: Point,
+    q: Point,
+    config: &Config,
+    oracle: &mut impl DecompositionOracle,
+    stats: &mut ReductionStats,
+    attempts_per_column: usize,
+) -> Result<Certificate, Error> {
     use std::time::Instant;
     if p.is_none() || !curve.contains(p) || !curve.contains(q) {
         return Err(Error::Invalid("generator or target"));
     }
-    if !(2..=8).contains(&config.m)
+    if !(2..=MAX_SLOTS).contains(&config.m)
+        || !(1..=256).contains(&attempts_per_column)
         || config.max_trials == 0
         || config.max_trials > 1000
         || config.max_columns == 0
@@ -951,9 +1086,10 @@ pub fn solve_with_oracle_profile(
             attempts: 0,
         });
     }
-    let s = (2 * curve.p..=(4 * curve.p).min((1u64 << 63) - 1))
+    let upper = (4 * u128::from(curve.p)).min(u128::from(u64::MAX)) as u64;
+    let s = (2 * curve.p..=upper)
         .find(|&s| prime(s))
-        .ok_or(Error::Limit("no supported hash prime below 2^63"))?;
+        .ok_or(Error::Limit("no supported u64 hash prime in [2p,4p]"))?;
     // Binary search and saturating products avoid both a sqrt(r) setup loop
     // and overflow for large exponents; only comparison against r matters.
     let (mut lower, mut root) = (0, curve.r);
@@ -977,11 +1113,13 @@ pub fn solve_with_oracle_profile(
     }
     let mut rng = Rng(config.seed);
     let mut attempts = 0;
-    let stage = Instant::now();
+    let stage = PROFILE.then(Instant::now);
     let fixed = FixedPair::new(curve, p, q);
-    stats.targets += stage.elapsed();
+    if let Some(stage) = stage {
+        stats.targets += stage.elapsed();
+    }
     for trial in 1..=config.max_trials {
-        let stage = Instant::now();
+        let stage = PROFILE.then(Instant::now);
         let hashes: Vec<_> = (0..config.m)
             .map(|_| HashBase {
                 s,
@@ -995,7 +1133,7 @@ pub fn solve_with_oracle_profile(
             || bases.iter().zip(&hashes).any(|(base, h)| {
                 base.windows(2).any(|w| w[0] >= w[1])
                     || base.iter().any(|&point| match curve.encode(point) {
-                        Ok(z) => (mulmod(h.alpha, z, h.s) + h.beta) % h.s >= h.tau,
+                        Ok(z) => addmod(mulmod(h.alpha, z, h.s), h.beta, h.s) >= h.tau,
                         Err(_) => true,
                     })
             })
@@ -1003,7 +1141,9 @@ pub fn solve_with_oracle_profile(
             return Err(Error::Verification);
         }
         let n: usize = bases.iter().map(Vec::len).sum();
-        stats.bases += stage.elapsed();
+        if let Some(stage) = stage {
+            stats.bases += stage.elapsed();
+        }
         if n > config.max_columns {
             return Err(Error::Limit("dense relation matrix columns"));
         }
@@ -1011,21 +1151,30 @@ pub fn solve_with_oracle_profile(
             continue;
         }
         let mut relations = Vec::new();
-        for _ in 0..20 * (n + 1) {
+        let query_limit = (n + 1)
+            .checked_mul(attempts_per_column)
+            .ok_or(Error::Limit("target-query budget overflow"))?;
+        for _ in 0..query_limit {
             attempts += 1;
-            let stage = Instant::now();
+            let stage = PROFILE.then(Instant::now);
             let (u, v) = (rng.below(curve.r), rng.below(curve.r));
             let target = fixed.evaluate(curve, u, v);
-            stats.targets += stage.elapsed();
-            let stage = Instant::now();
-            let found = oracle.find(curve, &bases, target, config.max_work);
-            stats.oracle += stage.elapsed();
-            if let Some(points) = found? {
-                let stage = Instant::now();
-                let rel = Relation { u, v, points };
-                check_relation(curve, &fixed, &bases, &rel)?;
-                relations.push(rel);
+            if let Some(stage) = stage {
                 stats.targets += stage.elapsed();
+            }
+            let stage = PROFILE.then(Instant::now);
+            let found = oracle.find(curve, &bases, target, config.max_work);
+            if let Some(stage) = stage {
+                stats.oracle += stage.elapsed();
+            }
+            if let Some(points) = found? {
+                let stage = PROFILE.then(Instant::now);
+                let rel = Relation { u, v, points };
+                check_collected_relation(curve, &bases, &rel, target)?;
+                relations.push(rel);
+                if let Some(stage) = stage {
+                    stats.targets += stage.elapsed();
+                }
                 if relations.len() == n + 1 {
                     break;
                 }
@@ -1034,10 +1183,12 @@ pub fn solve_with_oracle_profile(
         if relations.len() != n + 1 {
             continue;
         }
-        let stage = Instant::now();
+        let stage = PROFILE.then(Instant::now);
         let coeff = dependency(&matrix(&bases, &relations)?, curve.r).ok_or(Error::Verification)?;
         let scalar = extract(&relations, &coeff, curve.r);
-        stats.linear += stage.elapsed();
+        if let Some(stage) = stage {
+            stats.linear += stage.elapsed();
+        }
         if let Some(scalar) = scalar {
             let cert = Certificate {
                 scalar,
@@ -1047,9 +1198,11 @@ pub fn solve_with_oracle_profile(
                 trials: trial,
                 attempts,
             };
-            let stage = Instant::now();
+            let stage = PROFILE.then(Instant::now);
             verify(curve, p, q, &cert)?;
-            stats.replay += stage.elapsed();
+            if let Some(stage) = stage {
+                stats.replay += stage.elapsed();
+            }
             return Ok(cert);
         }
     }
@@ -1071,18 +1224,18 @@ impl Jacobian {
     fn from_affine(point: Point) -> Self {
         point.map_or(Self { x: 0, y: 1, z: 0 }, |(x, y)| Self { x, y, z: 1 })
     }
-    fn affine(self, modulus: Modulus) -> Point {
+    fn affine(self, modulus: Modulus, inverses: &[u64]) -> Point {
         if self.z == 0 {
             return None;
         }
-        let iz = inverse(self.z, modulus.p);
+        let iz = inverse_with_table(self.z, modulus.p, inverses);
         let iz2 = modulus.mul(iz, iz);
         Some((
             modulus.mul(self.x, iz2),
             modulus.mul(self.y, modulus.mul(iz, iz2)),
         ))
     }
-    fn batch_affine(points: &[Self], modulus: Modulus) -> Vec<Point> {
+    fn batch_affine(points: &[Self], modulus: Modulus, inverses: &[u64]) -> Vec<Point> {
         let mut prefix = Vec::with_capacity(points.len());
         let mut product = 1;
         for point in points {
@@ -1091,7 +1244,7 @@ impl Jacobian {
                 product = modulus.mul(product, point.z);
             }
         }
-        let mut inv = inverse(product, modulus.p);
+        let mut inv = inverse_with_table(product, modulus.p, inverses);
         let mut out = vec![None; points.len()];
         for (i, point) in points.iter().enumerate().rev() {
             if point.z == 0 {
@@ -1171,7 +1324,7 @@ struct FixedPair {
 impl FixedPair {
     fn new(curve: &Curve, p: Point, q: Point) -> Self {
         let windows = (64 - (curve.r - 1).leading_zeros()).div_ceil(4) as usize;
-        let modulus = Modulus::new(curve.p);
+        let modulus = curve.field;
         let table = |mut base| {
             let mut out = Vec::with_capacity(windows);
             for window in 0..windows {
@@ -1181,7 +1334,7 @@ impl FixedPair {
                     row[digit] = row[digit - 1].add_affine(base, curve.a, modulus);
                 }
                 // Include 16*base in the same inversion for the next window.
-                let affine = Jacobian::batch_affine(&row, modulus);
+                let affine = Jacobian::batch_affine(&row, modulus, &curve.inverses);
                 let mut table_row = [None; 16];
                 table_row.copy_from_slice(&affine[..16]);
                 if window + 1 < windows {
@@ -1192,7 +1345,7 @@ impl FixedPair {
             out
         };
         Self {
-            modulus: Modulus::new(curve.p),
+            modulus: curve.field,
             p: table(p),
             q: table(q),
         }
@@ -1206,8 +1359,34 @@ impl FixedPair {
             u >>= 4;
             v >>= 4;
         }
-        out.affine(self.modulus)
+        out.affine(self.modulus, &curve.inverses)
     }
+}
+
+// Collection already computed target=[u]P+[v]Q immediately before the query.
+// Check every returned point and the affine tuple sum against that exact target.
+// Only the collector uses this helper; independent certificate replay below
+// always recomputes the target from the recorded u/v with check_relation.
+fn check_collected_relation(
+    curve: &Curve,
+    bases: &[Vec<Point>],
+    rel: &Relation,
+    target: Point,
+) -> Result<(), Error> {
+    if rel.u >= curve.r || rel.v >= curve.r || rel.points.len() != bases.len() {
+        return Err(Error::Verification);
+    }
+    let mut sum = None;
+    for (base, &point) in bases.iter().zip(&rel.points) {
+        if point.is_none() || !curve.contains(point) || base.binary_search(&point).is_err() {
+            return Err(Error::Verification);
+        }
+        sum = curve.add_valid(sum, point);
+    }
+    if sum != target {
+        return Err(Error::Verification);
+    }
+    Ok(())
 }
 
 fn check_relation(
@@ -1252,14 +1431,10 @@ pub fn verify(curve: &Curve, p: Point, q: Point, cert: &Certificate) -> Result<(
             Err(Error::Verification)
         };
     }
-    if !(2..=8).contains(&cert.hashes.len()) {
+    if !(2..=MAX_SLOTS).contains(&cert.hashes.len()) {
         return Err(Error::Verification);
     }
-    let bases: Vec<_> = cert
-        .hashes
-        .iter()
-        .map(|h| h.enumerate(curve))
-        .collect::<Result<_, _>>()?;
+    let bases = enumerate_hash_bases(curve, &cert.hashes)?;
     let n: usize = bases.iter().map(Vec::len).sum();
     if n > MAX_COLUMNS
         || bases.iter().any(Vec::is_empty)
@@ -1304,9 +1479,213 @@ mod tests {
     }
 
     #[test]
+    fn twelve_slot_replay_and_bounded_oracle() {
+        let (curve, p) = fixture();
+        let q = curve.mul(p, 42).unwrap();
+        // Public known-answer certificate: each separate slot contains P only.
+        // enc(P)=7, hence (enc(P)+424) mod431=0 is the sole accepted encoding.
+        let hash = HashBase {
+            s: 431,
+            alpha: 1,
+            beta: 424,
+            tau: 1,
+        };
+        assert_eq!(hash.enumerate(&curve).unwrap(), vec![p]);
+        for m in [9, 10, MAX_SLOTS] {
+            let bases = vec![vec![p]; m];
+            let target = curve.mul(p, m as u64).unwrap();
+            assert_eq!(
+                Enumerate.find(&curve, &bases, target, 1).unwrap(),
+                Some(vec![p; m])
+            );
+            assert_eq!(Enumerate.find(&curve, &bases, None, 1).unwrap(), None);
+            let mut relations = vec![
+                Relation {
+                    u: m as u64,
+                    v: 0,
+                    points: vec![p; m]
+                };
+                m + 1
+            ];
+            relations[m].u = (m as u64 + curve.r - 42) % curve.r;
+            relations[m].v = 1;
+            let mut dependency = vec![0; m + 1];
+            dependency[0] = 1;
+            dependency[m] = curve.r - 1;
+            let cert = Certificate {
+                scalar: 42,
+                hashes: vec![hash; m],
+                relations,
+                dependency,
+                trials: 1,
+                attempts: m + 1,
+            };
+            verify(&curve, p, q, &cert).unwrap();
+            let mut bad = cert.clone();
+            bad.relations[0].points.pop();
+            assert_eq!(verify(&curve, p, q, &bad), Err(Error::Verification));
+            bad = cert;
+            bad.hashes.resize(MAX_SLOTS + 1, hash);
+            assert_eq!(verify(&curve, p, q, &bad), Err(Error::Verification));
+        }
+        let oversized = vec![vec![p]; MAX_SLOTS + 1];
+        assert!(matches!(
+            Enumerate.find(&curve, &oversized, p, 1),
+            Err(Error::Invalid("oracle input"))
+        ));
+        let config = Config {
+            m: MAX_SLOTS + 1,
+            ..Config::default()
+        };
+        assert!(matches!(
+            solve(&curve, p, q, &config),
+            Err(Error::Invalid("reduction bounds"))
+        ));
+    }
+
+    #[test]
+    fn collected_relation_reuses_target_but_full_replay_recomputes_it() {
+        let (curve, p) = fixture();
+        let q = curve.mul(p, 42).unwrap();
+        let config = Config {
+            m: 3,
+            tau: Some(40),
+            seed: 111,
+            max_trials: 16,
+            ..Config::default()
+        };
+        let cert = solve(&curve, p, q, &config).unwrap();
+        let bases: Vec<_> = cert
+            .hashes
+            .iter()
+            .map(|h| h.enumerate(&curve).unwrap())
+            .collect();
+        let fixed = FixedPair::new(&curve, p, q);
+        for rel in &cert.relations {
+            let target = fixed.evaluate(&curve, rel.u, rel.v);
+            assert_eq!(
+                check_collected_relation(&curve, &bases, rel, target),
+                check_relation(&curve, &fixed, &bases, rel)
+            );
+            let wrong = curve.add(target, p).unwrap();
+            assert_eq!(
+                check_collected_relation(&curve, &bases, rel, wrong),
+                Err(Error::Verification)
+            );
+            for point in [None, Some((0, 0)), Some((211, 33))] {
+                let mut bad = rel.clone();
+                bad.points[0] = point;
+                assert_eq!(
+                    check_collected_relation(&curve, &bases, &bad, target),
+                    Err(Error::Verification)
+                );
+            }
+            let mut bad = rel.clone();
+            bad.u = curve.r;
+            assert_eq!(
+                check_collected_relation(&curve, &bases, &bad, target),
+                Err(Error::Verification)
+            );
+            bad = rel.clone();
+            bad.points.pop();
+            assert_eq!(
+                check_collected_relation(&curve, &bases, &bad, target),
+                Err(Error::Verification)
+            );
+        }
+        let mut bad = cert.clone();
+        bad.relations[0].u = (bad.relations[0].u + 1) % curve.r;
+        assert_eq!(verify(&curve, p, q, &bad), Err(Error::Verification));
+        verify(&curve, p, q, &cert).unwrap();
+    }
+
+    #[test]
+    fn optional_profile_preserves_queries_certificates_and_stats() {
+        struct Trace(Vec<Point>);
+        impl DecompositionOracle for Trace {
+            fn find(
+                &mut self,
+                c: &Curve,
+                b: &[Vec<Point>],
+                t: Point,
+                w: u64,
+            ) -> Result<Option<Vec<Point>>, Error> {
+                self.0.push(t);
+                Enumerate.find(c, b, t, w)
+            }
+        }
+        let (curve, p) = fixture();
+        for scalar in [0, 1, 42, 198] {
+            for seed in [111, 222, 333] {
+                let q = curve.mul(p, scalar).unwrap();
+                let config = Config {
+                    m: 3,
+                    tau: Some(40),
+                    seed,
+                    max_trials: 16,
+                    ..Config::default()
+                };
+                let mut plain = Trace(vec![]);
+                let mut profiled = Trace(vec![]);
+                let expected = solve_with_oracle(&curve, p, q, &config, &mut plain).unwrap();
+                let marker = std::time::Duration::from_secs(1);
+                let mut stats = ReductionStats {
+                    bases: marker,
+                    targets: marker,
+                    oracle: marker,
+                    linear: marker,
+                    replay: marker,
+                };
+                let actual =
+                    solve_with_oracle_profile(&curve, p, q, &config, &mut profiled, &mut stats)
+                        .unwrap();
+                assert_eq!(actual, expected);
+                assert_eq!(plain.0, profiled.0);
+                verify(&curve, p, q, &actual).unwrap();
+                for clock in [
+                    stats.bases,
+                    stats.targets,
+                    stats.oracle,
+                    stats.linear,
+                    stats.replay,
+                ] {
+                    assert!(clock >= marker);
+                }
+                let mut untouched = ReductionStats {
+                    bases: marker,
+                    targets: marker,
+                    oracle: marker,
+                    linear: marker,
+                    replay: marker,
+                };
+                let no_clocks = solve_reduction::<false>(
+                    &curve,
+                    p,
+                    q,
+                    &config,
+                    &mut Enumerate,
+                    &mut untouched,
+                    20,
+                )
+                .unwrap();
+                assert_eq!(no_clocks, expected);
+                for clock in [
+                    untouched.bases,
+                    untouched.targets,
+                    untouched.oracle,
+                    untouched.linear,
+                    untouched.replay,
+                ] {
+                    assert_eq!(clock, marker);
+                }
+            }
+        }
+    }
+
+    #[test]
     fn jacobian_mixed_add_matches_affine_with_nonunit_scales() {
         let (curve, generator) = fixture();
-        let modulus = Modulus::new(curve.p);
+        let modulus = curve.field;
         let points: Vec<_> = (0..curve.r)
             .map(|k| curve.mul(generator, k).unwrap())
             .collect();
@@ -1320,7 +1699,7 @@ mod tests {
                     z,
                 }
             });
-            assert_eq!(projective.affine(modulus), point);
+            assert_eq!(projective.affine(modulus, &curve.inverses), point);
             assert_eq!(
                 Jacobian::batch_affine(
                     &[
@@ -1328,7 +1707,8 @@ mod tests {
                         projective,
                         projective.double(curve.a, modulus)
                     ],
-                    modulus
+                    modulus,
+                    &curve.inverses
                 ),
                 vec![None, point, curve.add(point, point).unwrap()]
             );
@@ -1336,14 +1716,17 @@ mod tests {
                 assert_eq!(
                     projective
                         .add_affine(other, curve.a, modulus)
-                        .affine(modulus),
+                        .affine(modulus, &curve.inverses),
                     curve.add(point, other).unwrap()
                 );
             }
         }
         // A point with y=0 doubles to identity, including a nonunit scale.
         let m = Modulus::new(7);
-        assert_eq!(Jacobian { x: 0, y: 0, z: 3 }.double(1, m).affine(m), None);
+        assert_eq!(
+            Jacobian { x: 0, y: 0, z: 3 }.double(1, m).affine(m, &[]),
+            None
+        );
     }
 
     #[test]
@@ -1382,6 +1765,108 @@ mod tests {
                 assert_eq!(m.mul(a, b), reference(a, b, p));
             }
         }
+    }
+
+    #[test]
+    fn cached_curve_arithmetic_matches_independent_remainders() {
+        // Test oracle uses wide integer remainder and Fermat inversion, neither
+        // the reciprocal reducer nor the inverse cache used by production.
+        fn product(a: u64, b: u64, p: u64) -> u64 {
+            (u128::from(a) * u128::from(b) % u128::from(p)) as u64
+        }
+        fn power(mut a: u64, mut n: u64, p: u64) -> u64 {
+            let mut r = 1;
+            while n != 0 {
+                if n & 1 != 0 {
+                    r = product(r, a, p);
+                }
+                a = product(a, a, p);
+                n >>= 1;
+            }
+            r
+        }
+        fn add(a: Point, b: Point, c: &Curve) -> Point {
+            let (Some((x, y)), Some((xx, yy))) = (a, b) else {
+                return a.or(b);
+            };
+            let p = c.p;
+            if x == xx && (y + yy) % p == 0 {
+                return None;
+            }
+            let (n, d) = if x == xx {
+                ((3 * product(x, x, p) + c.a) % p, 2 * y % p)
+            } else {
+                ((yy + p - y) % p, (xx + p - x) % p)
+            };
+            let slope = product(n, power(d, p - 2, p), p);
+            let nx = (product(slope, slope, p) + 2 * p - x - xx) % p;
+            Some((nx, (product(slope, (x + p - nx) % p, p) + p - y) % p))
+        }
+        for (p, a, b, r, g) in [
+            (17, 2, 2, 19, Some((5, 1))),
+            (211, 0, 7, 199, Some((3, 33))),
+            (65521, 65518, 3, 65563, Some((0, 64894))),
+            (
+                1_099_511_627_563,
+                1_099_511_627_560,
+                56,
+                1_099_512_551_701,
+                Some((1, 15_267_301_451)),
+            ),
+        ] {
+            let c = Curve::with_order_witness(p, a, b, r, g).unwrap();
+            let mut points = vec![None];
+            for _ in 1..r.min(200) {
+                points.push(add(*points.last().unwrap(), g, &c));
+            }
+            for &x in &points {
+                assert!(c.contains(x));
+                for &y in &points {
+                    assert_eq!(c.add(x, y).unwrap(), add(x, y, &c));
+                }
+            }
+            let mut rng = Rng(0x9c43);
+            for x in [0, 1, p / 2, p - 1]
+                .into_iter()
+                .chain((0..256).map(|_| rng.below(p)))
+            {
+                let rhs = (product(product(x, x, p), x, p) + product(a, x, p) + b) % p;
+                assert_eq!(c.rhs(x), rhs);
+                for y in [0, 1, p / 2, p - 1] {
+                    assert_eq!(c.contains(Some((x, y))), product(y, y, p) == rhs);
+                }
+            }
+            for invalid in [Some((p, 0)), Some((0, p)), Some((u64::MAX, u64::MAX))] {
+                assert!(!c.contains(invalid));
+                assert!(c.add(invalid, g).is_err());
+            }
+        }
+    }
+
+    #[test]
+    fn bounded_inverse_tables_match_independent_references() {
+        for p in [5, 7, 17, 211, 4093] {
+            assert!(prime(p));
+            let table = small_inverses(p);
+            assert_eq!(table.len(), p as usize);
+            for a in 1..p {
+                let actual = inverse_with_table(a, p, &table);
+                assert_eq!(actual, inverse(a, p));
+                assert_eq!(actual, pow(a, p - 2, p));
+                assert_eq!(a * actual % p, 1);
+            }
+        }
+        for p in [4099, 65521, 2_305_843_009_213_693_951] {
+            let table = small_inverses(p);
+            assert!(table.is_empty());
+            for a in [1, 2, p / 2, p - 1] {
+                assert_eq!(inverse_with_table(a, p, &table), pow(a, p - 2, p));
+            }
+        }
+        let (curve, generator) = fixture();
+        let witnessed =
+            Curve::with_order_witness(curve.p, curve.a, curve.b, curve.r, generator).unwrap();
+        assert_eq!(curve.inverses, witnessed.inverses);
     }
 
     #[test]
@@ -1535,8 +2020,80 @@ mod tests {
             assert!(prime(n));
         }
         for n in [0, 1, 2, 3, 4, 15, 16, 17, u64::MAX] {
-            let x = u128::from(floor_sqrt(n));
+            let x = u128::from(floor_sqrt(u128::from(n)));
             assert!(x * x <= u128::from(n) && (x + 1) * (x + 1) > u128::from(n));
+        }
+    }
+
+    #[test]
+    fn field63_full_hash_and_hasse_boundaries() {
+        let p = 9_223_372_036_854_775_783u64;
+        let s = 18_446_744_073_709_551_557u64;
+        assert!(prime(p) && prime(s));
+        for modulus in [p, s, u64::MAX] {
+            for a in [0, 1, modulus / 2, modulus - 2, modulus - 1] {
+                for b in [0, 1, modulus / 2, modulus - 2, modulus - 1] {
+                    assert_eq!(
+                        addmod(a, b, modulus),
+                        ((u128::from(a) + u128::from(b)) % u128::from(modulus)) as u64
+                    );
+                }
+            }
+        }
+        for n in [u128::from(u64::MAX), 4 * u128::from(p), (1u128 << 65) - 1] {
+            let x = u128::from(floor_sqrt(n));
+            assert!(x * x <= n && (x + 1) * (x + 1) > n);
+        }
+        // Arithmetic fixture only: no group order is asserted by this struct.
+        let c = Curve {
+            p,
+            a: p - 3,
+            b: 7,
+            r: 3,
+            roots: vec![],
+            sqrt: Some(SqrtContext::new(p)),
+            inverses: small_inverses(p),
+            field: Modulus::new(p),
+        };
+        for x in [0, 1, p / 2, p - 2, p - 1] {
+            let expected = ((u128::from(mulmod(mulmod(x, x, p), x, p))
+                + u128::from(mulmod(c.a, x, p))
+                + u128::from(c.b))
+                % u128::from(p)) as u64;
+            assert_eq!(c.rhs(x), expected);
+            if let Some(q) = c.decode(2 * x) {
+                assert_eq!(c.decode(c.encode(Some(q)).unwrap()), Some(q));
+                assert!(c.contains(c.add(Some(q), Some(q)).unwrap()));
+            }
+        }
+        // Use a smaller 63-bit field so [2p,4p] contains u64 primes.
+        let hp = 6_917_529_027_641_081_737u64;
+        assert!(prime(hp));
+        let hc = Curve {
+            p: hp,
+            a: 0,
+            b: 7,
+            r: 3,
+            roots: vec![],
+            sqrt: Some(SqrtContext::new(hp)),
+            inverses: small_inverses(hp),
+            field: Modulus::new(hp),
+        };
+        for alpha in [1, 17, s - 1] {
+            for beta in [0, s / 2, s - 1] {
+                let h = HashBase {
+                    s,
+                    alpha,
+                    beta,
+                    tau: 257,
+                };
+                for point in h.enumerate(&hc).unwrap() {
+                    let z = hc.encode(point).unwrap();
+                    let expected = ((u128::from(mulmod(alpha, z, s)) + u128::from(beta))
+                        % u128::from(s)) as u64;
+                    assert!(expected < h.tau && hc.contains(point));
+                }
+            }
         }
     }
 
@@ -1642,6 +2199,103 @@ mod tests {
     }
 
     #[test]
+    fn inverse_hash_progression_matches_direct_products() {
+        fn direct(h: &HashBase, c: &Curve) -> Vec<Point> {
+            let inv = pow(h.alpha, h.s - 2, h.s);
+            let mut out = Vec::new();
+            for t in 0..h.tau {
+                let z = (u128::from(inv) * u128::from((t + h.s - h.beta) % h.s) % u128::from(h.s))
+                    as u64;
+                if let Some(point) = c.decode(z) {
+                    out.push(Some(point));
+                }
+            }
+            out.sort_unstable();
+            out
+        }
+        let c = Curve::new(17, 2, 2, 19).unwrap();
+        for s in [37, 41, 43] {
+            for alpha in 1..s {
+                for beta in 0..s {
+                    for tau in [1, s / 2, s] {
+                        let h = HashBase {
+                            s,
+                            alpha,
+                            beta,
+                            tau,
+                        };
+                        assert_eq!(h.enumerate(&c).unwrap(), direct(&h, &c));
+                    }
+                }
+            }
+        }
+        let p = 1_099_511_627_563;
+        let c =
+            Curve::with_order_witness(p, p - 3, 56, 1_099_512_551_701, Some((1, 15_267_301_451)))
+                .unwrap();
+        let s = (2 * p..4 * p).find(|&s| prime(s)).unwrap();
+        for alpha in [1, 7, s / 2, s - 1] {
+            for beta in [0, 1, s / 2, s - 1] {
+                let h = HashBase {
+                    s,
+                    alpha,
+                    beta,
+                    tau: 64,
+                };
+                assert_eq!(h.enumerate(&c).unwrap(), direct(&h, &c));
+            }
+        }
+    }
+
+    #[test]
+    fn grouped_hash_validation_matches_standalone_enumeration() {
+        let (c, _) = fixture();
+        let first = HashBase {
+            s: 431,
+            alpha: 7,
+            beta: 19,
+            tau: 44,
+        };
+        let second = HashBase {
+            s: 433,
+            alpha: 11,
+            beta: 29,
+            tau: 64,
+        };
+        for hashes in [
+            vec![],
+            vec![first],
+            vec![first, first, second, second, first],
+        ] {
+            let expected: Result<Vec<_>, _> = hashes.iter().map(|h| h.enumerate(&c)).collect();
+            assert_eq!(enumerate_hash_bases(&c, &hashes), expected);
+        }
+        for bad in [
+            HashBase { s: 432, ..first },
+            HashBase {
+                s: 1u64 << 63,
+                ..first
+            },
+            HashBase { s: 421, ..first },
+            HashBase { s: 853, ..first },
+            HashBase { alpha: 0, ..first },
+            HashBase {
+                alpha: 431,
+                ..first
+            },
+            HashBase { beta: 431, ..first },
+            HashBase { tau: 0, ..first },
+            HashBase { tau: 432, ..first },
+        ] {
+            assert!(bad.enumerate(&c).is_err());
+            for hashes in [vec![bad, first], vec![first, bad], vec![first, first, bad]] {
+                let expected: Result<Vec<_>, _> = hashes.iter().map(|h| h.enumerate(&c)).collect();
+                assert_eq!(enumerate_hash_bases(&c, &hashes), expected);
+            }
+        }
+    }
+
+    #[test]
     fn inverse_hash_enumeration_matches_complete_group_scan() {
         let (c, p) = fixture();
         for (alpha, beta, tau) in [(1, 0, 1), (7, 19, 44), (430, 430, 431)] {
@@ -1742,6 +2396,77 @@ mod tests {
             let mut bad = cert;
             bad.hashes[0].alpha = 0;
             assert!(verify(&c, p, q, &bad).is_err());
+        }
+    }
+
+    #[test]
+    fn explicit_query_budget_preserves_default_and_bounds_exhaustion() {
+        // A deliberately non-solving mock isolates query-budget control flow;
+        // it is not used as decomposition or recovery evidence.
+        #[derive(Default)]
+        struct MissCounter {
+            calls: usize,
+            columns: usize,
+        }
+        impl DecompositionOracle for MissCounter {
+            fn find(
+                &mut self,
+                _curve: &Curve,
+                bases: &[Vec<Point>],
+                _target: Point,
+                _max_work: u64,
+            ) -> Result<Option<Vec<Point>>, Error> {
+                self.calls += 1;
+                self.columns = bases.iter().map(Vec::len).sum();
+                Ok(None)
+            }
+        }
+        let (c, p) = fixture();
+        let q = c.mul(p, 42).unwrap();
+        let config = Config {
+            tau: Some(40),
+            max_trials: 1,
+            ..Config::default()
+        };
+        let mut default = MissCounter::default();
+        assert!(matches!(
+            solve_with_oracle(&c, p, q, &config, &mut default),
+            Err(Error::Limit(_))
+        ));
+        assert!(default.columns > 0);
+        assert_eq!(default.calls, 20 * (default.columns + 1));
+        for multiplier in [1, 3, 20, 128] {
+            let mut oracle = MissCounter::default();
+            assert!(matches!(
+                solve_with_oracle_profile_budget(
+                    &c,
+                    p,
+                    q,
+                    &config,
+                    &mut oracle,
+                    &mut ReductionStats::default(),
+                    multiplier,
+                ),
+                Err(Error::Limit(_))
+            ));
+            assert_eq!(oracle.columns, default.columns);
+            assert_eq!(oracle.calls, multiplier * (oracle.columns + 1));
+        }
+        for multiplier in [0, 257, usize::MAX] {
+            let mut oracle = MissCounter::default();
+            assert!(matches!(
+                solve_with_oracle_profile_budget(
+                    &c,
+                    p,
+                    q,
+                    &config,
+                    &mut oracle,
+                    &mut ReductionStats::default(),
+                    multiplier,
+                ),
+                Err(Error::Invalid(_))
+            ));
+            assert_eq!(oracle.calls, 0);
         }
     }
 

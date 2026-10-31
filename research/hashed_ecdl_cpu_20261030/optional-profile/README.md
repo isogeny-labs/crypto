@@ -28,14 +28,14 @@ from a source change. This is an engineering optimization, not a new algorithm.
 
 The exact base, candidate and patch SHA-256 values are in [source.json](source.json).
 [optional-profile.patch](optional-profile.patch) applies to the pinned shared
-source with `git apply --check`. [validate.py](validate.py) refuses an existing
+source with `git apply --check`. [validate.sh](validate.sh) refuses an existing
 destination, verifies source identities, copies only the standalone CPU/tensor
 crates and archived certificate fixtures into a disposable snapshot, applies
 the patch there, and runs release tests, strict Clippy and formatting checks.
 It rechecks that the original shared source is unchanged.
 
 ```sh
-python3 research/hashed_ecdl_cpu_20261030/optional-profile/validate.py   /tmp/hashed-ecdl-profile-snapshot-unique   /tmp/hashed-ecdl-profile-target
+bash research/hashed_ecdl_cpu_20261030/optional-profile/validate.sh   /tmp/hashed-ecdl-profile-snapshot-unique   /tmp/hashed-ecdl-profile-target
 ```
 
 All 32 release tests pass in the snapshot, with strict Clippy and formatting
@@ -59,3 +59,17 @@ comparison with original baseline2bd4588fba60, previous92463171363c, A/A and
 batch1 controls. Preserve all fixtures and phases. No further10x claim follows;
 strict isolation, independent review and matched external comparisons remain
 outstanding. No new cloud job was launched for this artifact.
+
+The active reproduction path uses thin shell tooling and the shared
+`../validate-snapshot.sh` runner. It reconstructs source, crates and certificate
+fixtures from the exact `base_commit` in the immutable descriptor, then checks
+the base, patch and candidate digests. This remains reproducible after later
+source integration. The current shared source is hash-checked before and after
+and is never edited. Original Python helpers and historical receipts remain
+unchanged as evidence, outside the active reproduction path. Requires Bash,
+GNU coreutils, jq, Git and Cargo. No timing or scientific run is performed.
+
+The [pinned shell reproduction receipt](pinned-shell-validation/receipt.json)
+records successful release tests, strict Clippy and formatting after the later
+source integration. The current shared source is retained byte-for-byte. The
+source descriptors and Python-era receipts keep their original recorded state.
