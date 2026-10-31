@@ -94,6 +94,12 @@ accepted rank-bearing three-sum targets and zero hits in 64 frozen fresh
 known-scalar queries. This is evidence about the specified reduction and
 collector policy; the registry requires relation rank and complete cost
 before a curve-level weakness verdict.
+The [weighted support theorem](lean/WeightedSupport.lean) extends the same
+criterion to finite seeded query laws with unequal target probabilities. If
+no accepted target has more than \(M\) preimage seeds, the supported accepted
+seed mass is at most \(\binom{B+m-1}{m}M\). This makes sampler concentration
+a checkable input alongside base size, relation yield and rank; the
+[proof map](PROOF_MAP.md) states the exact one-query hypotheses.
 
 The [genus-128 GHS cost audit](ghs_genus128_cost_audit.json) resolves the
 nominal factor-base and relation-query stages behind the two exact-invariant

@@ -1,8 +1,8 @@
 # Index Calculus for the Elliptic-Curve Discrete Logarithm, Measured
 
-`ic_program.tex` (built: [`ic_program.pdf`](ic_program.pdf), 21 pages) is the
+`ic_program.tex` (built: [`ic_program.pdf`](ic_program.pdf)) is the
 programme record of the repository's ECDLP index-calculus work from
-2026-07-01 to 2026-10-14: the routes pursued, the measurement infrastructure
+2026-07-01 to 2026-10-26 (last folded in: 21–24 October, plus the plane-quartic program of 18–26 October): the routes pursued, the measurement infrastructure
 (ecbench, the boundary ledger, claim hygiene), what improved and on which
 boundary, the negative results, and where the frontier stands.
 
@@ -15,21 +15,24 @@ Restore authors with `make deanonymize` after creating an `AUTHORS` file
 
 **Change class** (per `AGENTS.md`): none of its own; it reports results
 already classed by their studies. With one modelled exception (the `k = 4`
-crossover of §8.4, an extrapolation fed by a measured constant) every
-improvement it reports is *engineering* or *accounting*.
+crossover of §10.9, an extrapolation fed by a measured constant) every
+improvement it reports is *engineering* or *accounting*. The plane-quartic
+N4 result (§11), which the leaderboard classes *advance* restricted to the
+GHS-weak family, is reported as below a matched plain rho, not as an advance
+against the strongest rho.
 
 ## What it says
 
-- **Measurement** (§3): the unit `S = GAE / √r`, cold one-target cost
+- **Measurement** (§4): the unit `S = GAE / √r`, cold one-target cost
   beside the online window, sealed records and exact replays, isolation
   levels L0–L3, paired cluster-bootstrap ratios of totals, the frontier
   comparability key, and seven corrections the accounting forced on earlier
   claims (exploratory online ratios, a Buchberger baseline labelled F4,
   unpriced F4 word XORs, cross-host counter drift, an `f4_fp` soundness
   bug, F6-IC's charged cost, the ECC2K-130 constant).
-- **Chronology** (§4): commit activity by ISO week and theme, four phases
-  from 6 September to 14 October, with the July–August prime-field prelude.
-- **Root-finding decomposition** (§5): how one suggestion in an audited
+- **Chronology** (§5): commit activity by ISO week and theme, seven phases
+  from 6 September to 24 October, with the July–August prime-field prelude.
+- **Root-finding decomposition** (§6): how one suggestion in an audited
   manuscript (the roots of `S₃(x_R, x_F, X)` are `x(R ± F)`) became a
   proved identity (Lean), prime and binary oracles, `m ≤ 4` pair tables,
   the PDP family, a CUDA kernel, Kummer-tower and dense-index variants, and
@@ -37,15 +40,57 @@ improvement it reports is *engineering* or *accounting*.
   matrix F4), 3,021–5,802× (NIST vs Buchberger), end to end 50–105× (vs
   msolve); best complete Koblitz `n = 13` arm `S` 38.82 → 22.97, still
   1.55× strong rho.
-- **Gröbner engines** (§6), **Koblitz curves** (§7), **prime and extension
-  fields** (§8: PKM tower 29–141× rho; FGHR `D₄` cuts `C₄` 47.5–48.4×,
-  modelled crossover `2^150 → 2^135`), **transfer routes** (§9: the
-  transport-conservation lemma and the negative results).
-- **Frontier** (§10): a table of every measured improvement by boundary and
+- **Gröbner engines** (§7).
+- **Koblitz curves** (§8): bases and oracles, the September results below
+  rho that reversed against a stronger rho, the online ladder and its
+  retirement, the full `n = 83` campaign (145 entries, 4–21 Oct), Table A
+  rules v3–v8 (4.67–18.07× at v8), and ECC2K-130 (every constructed or priced route at
+  least about 5 bits above rho).
+- **Random and prime-degree binary curves** (§9, new): the degree question
+  measured (fall degrees 3–4, solving degree tracks ℓ within one of
+  semi-regular, closure and hybrid studies), the pair-table floor and the
+  oracles measured against it, SAT/SMT/WDSat as enumerators, the PDP oracle
+  programme, Table B binary rows (10.6–38.2×, validated), ECC2-131.
+- **Prime fields** (§10): ladders and Table B prime rows (5.47–13.5×,
+  validated), the Kummer tower's solving degree (plateau at 7, `D ≥ 8`
+  implied at `N = 21`), 24 structured-base rounds on the P-256 field (no
+  unplanted relation), small-x bases, isogeny walks over a million
+  P-256-isogenous curves, lattices, ECCp-131, audits of standard curves,
+  Gaudry `k = 4` over `F_{p^4}`.
+- **Covers and transfers** (§11): the conservation lemma, plane-quartic index
+  calculus below a matched plain rho from q = 4051 on the GHS-weak family, Smith's
+  walk (frozen o(p), post hoc Θ~(p)), genus 3 at parity
+  with the strongest rho over `q = 2^14..2^20`, the two generations of
+  Joux–Vitse comparisons, cover censuses, volcano levels.
+- **Frontier** (§12): a table of every measured improvement by boundary and
   class; cold one-target frontier still rho; one admitted online point
   (compact-orbit IC at Koblitz `n = 61`, 13.9× [9.8, 19.1] over strong rho,
   64 targets, set-up excluded; 83× rho with set-up charged).
-- **Appendix A**: how to organise the material for publication (below).
+- **21–24 October** (frontier section, "The ladder continued, 21–24 October"): four factor bases closed under known-log maps
+  (Z[τ], Z[φ], integer multiples, LEAD-19 cofactor projection), 1.3–20×
+  against the programme's own arms, exponent unchanged; Koblitz Table A
+  re-priced at the canonical rho step (9.9–43×); hybrid guess closes the
+  (3,7) descent cell, m = 4 row stays +8.4 to +58 bits over rho (+45.7 at
+  w = 2 even at degree 5); Joux–Vitse cover of E(F_{p^6}) at 1.6–2.0× a
+  pooled rho constant at p = 1009, slope −2.05 (lower bound); the inherited-F4
+  replay regression traced to a BMI2 path.
+- **Not yet measured**: any comparison with a published index calculus at
+  the same (q, n, m) (open problem 10).
+- **Appendices**: the artefact index, the open pull requests not used
+  (111, titles as filed), and the **catalogue**: all 1,444 study
+  directories, benchmark rows, problem records and notes on `main` by
+  family, with headline number, class and status
+  ([`data/catalogue.tsv`](data/catalogue.tsv), built by
+  [`tools/catalogue.py`](tools/catalogue.py), which also checks that none
+  is missing).
+
+## Rebuilding the catalogue
+
+```sh
+python3 tools/catalogue.py                 # sections/catalogue.tex
+python3 tools/catalogue.py --check paths.txt   # paths with no row
+python3 tools/open_prs.py                  # sections/openprs.tex
+```
 
 ## What it does not say
 
@@ -66,11 +111,11 @@ provenance:
 
 | paper | content | owed before submission |
 |:--|:--|:--|
-| P1. Root-finding decomposition | §5; extends `../rootfinding-decomposition/` with the PDP family, GPU, Kummer tower, ecbench loops and the audit corrections | novelty audit; Magma/msolve cross-check on every row; a GPU run on hardware; `m ≥ 3` prime measurements |
-| P2. ecbench: one unit for every ECDLP method | §3, Definition 1, corrections, isolation rubric, frontier synthesis | an L3 cross-host replay certificate; inherited-F4 counter drift resolved; a four-size bound per incumbent |
-| P3. Index calculus on Koblitz curves, measured | §7, compact orbit, online ladder, admitted `n = 61` panel, ECC2K-130 extrapolation | isolated panels at `n = 71, 73, 83`; the constant `C` reconciled; a cold `n = 83` session |
-| P4. Symmetry at `k = 4` | §8.4 | a second prime and more seeds; the degenerate target explained; a measured end-to-end point |
-| P5. Negative results | §9, lit2026 negatives, SAT scaling, symmetrised bases, fibre-aware IC, Lemma 1 | literature check of Lemma 1; the conductor-gap yield experiment |
+| P1. Root-finding decomposition | §6; extends `../rootfinding-decomposition/` with the PDP family, GPU, Kummer tower, ecbench loops and the audit corrections | novelty audit; Magma/msolve cross-check on every row; a GPU run on hardware; `m ≥ 3` prime measurements |
+| P2. ecbench: one unit for every ECDLP method | §4, Definition 1, corrections, isolation rubric, frontier synthesis | an L3 cross-host replay certificate; inherited-F4 counter drift resolved; a four-size bound per incumbent |
+| P3. Index calculus on Koblitz curves, measured | §8, compact orbit, online ladder, admitted `n = 61` panel, ECC2K-130 extrapolation | isolated panels at `n = 71, 73, 83`; the constant `C` reconciled; a cold `n = 83` session |
+| P4. Symmetry at `k = 4` | §10.9 | a second prime and more seeds; the degenerate target explained; a measured end-to-end point |
+| P5. Negative results | §§9–11, lit2026 negatives, SAT scaling, symmetrised bases, fibre-aware IC, Lemma 1 | literature check of Lemma 1; the conductor-gap yield experiment |
 
 Each paper should follow: the question stated as a boundary (Definition 1)
 → the mathematics with proofs or certificates → implementation and

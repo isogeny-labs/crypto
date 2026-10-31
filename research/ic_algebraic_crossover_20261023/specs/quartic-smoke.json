@@ -1,0 +1,71 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Quartic IC independent smoke: m=6,8,10,12; two targets per rung",
+  "description": "Pursuit PROTOCOL.md C1 smoke only. Complete cold solves and same-point negation rho; counted results at L0; no crossover claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "f2m4_torsion",
+        "m": 6,
+        "seed": 1,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 8,
+        "seed": 1,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 10,
+        "seed": 1,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 12,
+        "seed": 1,
+        "max_cofactor": 16
+      }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 202610230001
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "ic-frobenius",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "bin-t-line",
+          "oracle": "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1,charge_unsolved=1",
+          "max_trials": "5000000"
+        }
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 202610230002,
+    "isolation_required": "L0",
+    "timeout_seconds": 3600
+  }
+}

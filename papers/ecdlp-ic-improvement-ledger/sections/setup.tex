@@ -1,0 +1,73 @@
+\section{The ratchet, III: set-up and linear algebra}\label{sec:setup}
+
+\subsection{Set-up}
+
+Set-up is the largest term on the Koblitz pipelines (\S\ref{sec:model}).
+\begin{itemize}
+\item \emph{Stacked $n=83$ producer} (\texttt{cryptanalysis} \#938). This
+  stacks the cryptanalysis repository's set-up optimisations into one
+  producer. It made end-to-end cold $3.2391\times$ $[2.9809,3.5240]$
+  faster than its own baseline. Paired within that run, the cold gap to
+  rho fell from $305.8$ to $94.4$. The online ratio moved from $0.133$ to
+  $0.139$, a small online regression. An integrity audit upheld the claim
+  within a narrower scope (\art{crypto-autoresearcher:research/sheriff/SHF-20261016-3caa6f/findings.yaml},
+  C17--C19):
+  \begin{itemize}
+  \item it is one run on one runner class, with no replay on another host;
+  \item about $1.48\times$ of the gain is host-independent operation
+    counts, and the rest is wall time;
+  \item factor-base construction is charged to neither arm;
+  \item the repository's ``$360\to94.4$'' wording and a set-up field
+    compared across rows with different meanings were judged
+    overclaimed.
+  \end{itemize}
+  We report the scoped figure.
+\item \emph{Cache-blocked pair table.} Building the prime-field pair table
+  in cache-sized blocks cuts set-up to $0.24$ $[0.22,0.26]$ of the batched
+  build and $0.13$ $[0.12,0.14]$ of the scalar build at $N=16{,}384$. That
+  is $28.2$\,s instead of $117$\,s and $224$\,s, and peak memory falls from
+  $9.15$\,GiB to $4.65$\,GiB. All 456 of 456 executions are identical, and
+  the A/A ratio is $1.02$ $[0.70,1.46]$
+  (\art{research/ic_oracle_setup_blocked_20261020/}). Two caveats apply.
+  The host earned L1, so the wall ratios are descriptive. And counted $S$
+  is unchanged, so this is a wall-time gain that leaves the gap in the
+  counted unit as it was (rho is $32.96$, $74.31$ and $269.03\times$
+  cheaper at $N=1{,}024$ to $16{,}384$, $w=0$).
+\item \emph{u64 root batching.} Batching root extraction in 64-bit lanes
+  gives $3.26\times$ whole-process. The rank-stage and per-target cells were
+  corrected on 20 October from $2.95\times$ and $6.09\times$ to $2.47\times$
+  and $5.00\times$; the originals had compared the candidate's fastest run
+  with the baseline median (benchmarks row \texttt{20261015-u64-rootbatch}).
+\end{itemize}
+
+\subsection{Linear algebra}
+
+\begin{itemize}
+\item \emph{CADO-style filtering and Wiedemann.} On synthetic $m=3$
+  matrices over a 62-bit prime, a filter followed by
+  Wiedemann~\cite{wiedemann1986} beats the legacy solver by $2.48\times$
+  at $2^{14}$ columns and $10.40\times$ $[9.99,11.06]$ at $2^{18}$. At
+  $2^{18}$ it is $1.93\times$ $[1.74,1.96]$ faster than CADO-NFS itself
+  (\art{research/la_engines_20261014/}).
+\item \emph{Inside ecbench.} Wired into the end-to-end pipeline, the same
+  solver leaves counted $S$ at $1.000$ and cuts linear-algebra wall time
+  to $0.25$--$0.72$. Linear algebra is only 0.1--1.9\% of these runs, and
+  the best cell is still $149\times$ rho
+  (\art{research/ic_linalg_pipeline_20261019/}).
+\item \emph{Deferred sparse solvers.} A negative: no deferred sparse
+  solver lowers end-to-end $S$ ($1.206\times$ on the $k=4$ ladder;
+  $5.72\to1.030\times$ on the scaling curve). These solvers answer only at
+  full rank, which is a completion-rule effect, not a linear-algebra one
+  (\art{research/sparse_la_timing_20261018/README.md}).
+\item \emph{Sparse FGLM in the Jacobian-cover pipeline} cuts $S$ by
+  $1.28$--$1.29\times$. For example, IC/rho falls from $851$ to $664$ at
+  $p=53$ (\art{research/jv_cover_sparse_fglm_20261018/}). Both are lower
+  bounds.
+\end{itemize}
+
+\paragraph{Reading.} The set-up results are the largest end-to-end
+constant-factor gains of the period: $3.24\times$ at $n=83$, and $4$--$8\times$
+in prime set-up wall. Linear algebra is a large stage gain on a term that
+is small on the curves measured. It becomes the term that matters on the
+genus-three family (\S\ref{sec:families}), where large primes and
+structured Gaussian elimination moved the exponent.

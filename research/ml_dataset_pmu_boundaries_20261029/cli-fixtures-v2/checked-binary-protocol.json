@@ -1,0 +1,106 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "ML-CHECKED-PHASE-BINARY-CLI-SOFTWARE-20261029",
+  "classification": "software_correctness_fixture",
+  "purpose": "Verify local checked phase and bound root capture through actual native CLI generation, replay, restricted report and export.",
+  "inputs": {
+    "families": [
+      "binary",
+      "koblitz"
+    ],
+    "field_sizes": [
+      11,
+      12
+    ],
+    "m": 2,
+    "solver": "root",
+    "curve_seeds": 1,
+    "generators": 1,
+    "keys": 1,
+    "seed": 42,
+    "factor_base_size": 2,
+    "degree_bound": 4,
+    "work_limit": 50000,
+    "twists": [
+      false,
+      true
+    ],
+    "selected_shards": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "shard_count": 8,
+    "max_cases_per_invocation": 1,
+    "expected_cells": 8,
+    "cell_order": "solver fastest, twist, arity, key, generator, curve seed, field size, family slowest; singleton axes leave binary n11 false/true, binary n12 false/true, koblitz n11 false/true, koblitz n12 false/true"
+  },
+  "limits": {
+    "seconds_per_case": 20,
+    "memory_mib": 512,
+    "polled_trace_mib": 16,
+    "seconds_per_command": 45,
+    "total_runner_seconds": 1800,
+    "retries": 0
+  },
+  "acceptance": [
+    "clean binary source identity and immutable binary hash before and after each command",
+    "eight fixed cells cover every requested family/field/twist combination exactly once and each retains one binary root certificate",
+    "native dataset verify succeeds with semantic replay (not hashes-only)",
+    "export retains restricted certificates and representative certificate/private payload keys are absent from public features",
+    "four checked phase starts and four metrics per selected cell; unavailable counters allowed",
+    "capture binding and limits admitted by native replay",
+    "eight restricted report rows per cell; no whole-worker or training-cost claim",
+    "no phase measurements enter public feature objects"
+  ],
+  "controls": {
+    "positive": "fixed natural seed42 targets; no planted PDP target, success requirement, resampling or adaptation after draw",
+    "negative": "separate source-bound Rust tests reject malformed and rehashed certificate/outcome/artifact tampering",
+    "aa": "not applicable: exact software assertions, no timing or statistical comparison"
+  },
+  "stopping": "any command or assertion failure stops fixture and retains all outputs; no automatic retry or substitution. Parent invokes bash script with an outer timeout --signal=TERM --kill-after=10s 1800s; internal commands use min(45 seconds, remaining 1800-second allowance).",
+  "design_notes": "42 commands: plan/preflight and generate/verify/status/export/report for each of eight fixed cells; 54 commands across both protocols.",
+  "exclusions": [
+    "scientific corpus rows",
+    "cloud worker publication",
+    "complete execution or instruction counts",
+    "independent scalar recovery requirement",
+    "PDP solve requirement",
+    "higher-m root elimination",
+    "fall-degree bound",
+    "model efficacy"
+  ],
+  "analysis": "Exact software validation of this combined source only. Preserve every outcome, verify retained root artifacts and restricted export. No timing comparison, scientific corpus, broad parameter coverage, or mathematical claim.",
+  "runner_sha256": "a70b22f4e4c7b6ac98ff49047d8865c496ddc23ca153ca1b4079099822da6dc1",
+  "variable_ledger": {
+    "output_storage": {
+      "fixed": "existing canonical parent under /var/tmp on XFS",
+      "check": "stat -f -c %T must equal xfs before output creation and again afterward",
+      "record": "output-filesystem.txt",
+      "publication": "Parent archives all completed or failed outputs to S3; runner performs no publication"
+    },
+    "resource_limits": "unchanged: 20 seconds per case, 45 seconds per command, 512 MiB, 16 MiB polled trace, 1800 seconds total, zero retries",
+    "binary": "Bind exact final validated source and executable hash before freezing; no execution while draft."
+  },
+  "version": 2,
+  "amendment": {
+    "filed_before_affected_data": true,
+    "reason": "Original fixture stopped at native preflight before any generation: freeze record lacked frozen_at and canonical protocol_sha256. Correct metadata only; identical inputs, binary, scripts and limits; preserve first attempt.",
+    "prior_protocol_file_sha256": "4777620aeefee6e756be3ae2aa9990ff1881921ae8fd16fe65cb0d9d2b7bae41"
+  },
+  "software_binding": {
+    "source": "c59a5dd8a8a81c4749540b92ebcdf7fb24da4a59",
+    "binary_sha256": "74b23756aa776d85085bbfeef03400b68a354994bc3a8a2bea6c1d19735414d1"
+  },
+  "freeze": {
+    "status": "frozen",
+    "filed_before_affected_data": true,
+    "frozen_at": "2026-10-29T19:43:39.644864+00:00",
+    "protocol_sha256": "80e7483ef5f677a5da059ac09905ced7717d740a092f8b717a172c77c4cc4136"
+  }
+}

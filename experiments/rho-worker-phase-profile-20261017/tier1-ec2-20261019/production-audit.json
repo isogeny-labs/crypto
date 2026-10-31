@@ -1,0 +1,70 @@
+{
+  "aa_extreme_failures": [],
+  "aa_mode_median_ratios": {
+    "aa_batch": 1.000230466396937,
+    "aa_serial": 1.0001385011801938
+  },
+  "aa_outliers": [
+    {
+      "case": "q29-aa_serial",
+      "ratio": 0.8151196372321131,
+      "repeat": 0
+    },
+    {
+      "case": "q04-aa_batch",
+      "ratio": 0.8672997073938821,
+      "repeat": 2
+    }
+  ],
+  "aa_q_mode_median_failures": [],
+  "comparison_q_cluster_bootstrap95_diagnostic": null,
+  "comparison_ratio_descriptive": 4.92159716072016,
+  "completed_arms": 768,
+  "completed_pairs": 384,
+  "decision": "unknown_gate_failed",
+  "gate_passed": false,
+  "invalid_arms": [
+    {
+      "issues": [
+        "runner marked arm invalid",
+        "host noise or memory event"
+      ],
+      "serial": 691
+    }
+  ],
+  "invalid_pairs": [
+    {
+      "case": "q19-comparison",
+      "issues": [
+        "invalid or absent arm",
+        "pair receipt mismatch"
+      ],
+      "repeat": 3
+    }
+  ],
+  "measurement_tier": "tier1_instance",
+  "median_phase_and_rss": {
+    "batch": {
+      "peak_rss_kib": 5612.0,
+      "setup_ns": 103106266.0,
+      "total_charged_ns": 2615126869.5,
+      "walk_ns": 2512388768.0
+    },
+    "serial": {
+      "peak_rss_kib": 5600,
+      "setup_ns": 103120043,
+      "total_charged_ns": 12930222555,
+      "walk_ns": 12827650674
+    }
+  },
+  "memory_failures": [],
+  "qualified_q_cluster_bootstrap95": null,
+  "raw_manifest_sha256": "3caf3cd9c5b4aab90a53bdbdc44c9fe7f9f72920c28f336004cce135c36fbcfc",
+  "raw_summary_sha256": "287898c933404becf77a57e291561096fc654c7e2ce3d311b4365e2418190511",
+  "schema": "rho-worker-tier1-production-audit-v1",
+  "structural_issues": [
+    "incomplete run summary",
+    "missing or invalid pair",
+    "Q repetition count mismatch"
+  ]
+}

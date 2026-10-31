@@ -1,0 +1,108 @@
+validation_report:
+  id: VAL-20261027-1884a1-r2
+  supersedes: VAL-20261027-1884a1 (round 1, snapshot e9bf8737a3, Python tooling)
+  task_id: null   # dispatched by the main session; no TASK id or review_plan given
+  snapshot_commit: 6f356f71ef8b5392fe27da22170b914e37109390
+  study: research/postgb_linear_stage_20261026
+  run_ids: [R2-L1, R2-L2, R2-L3, R2-L4, R2-L5, R2-L6, R2-A1, R2-A2, R2-D1, R2-D2, R3-C, R3-D1, R3-D2]
+  beside_only_run_ids: [L1, L2, L3, L4]
+  tooling: >-
+    validation/vtool, a standalone Rust crate written by the validator (serde_json, sha2, rand 0.8; no
+    repository code), plus round2/run.sh for thin launch orchestration only. The round-1 Python tools
+    were deleted; their outputs are kept as historical evidence.
+  artifact_checks:
+    - "Inputs read with git show at 6f356f71ef. From 12a5bba630 (where validation began) to 6f356f71ef no file
+      under runs/ or cards/ and no protocol file changed. The R2 runs are byte-identical to round 1."
+    - "13 receipts (R2-L1..L6, R2-A1/A2, R2-D1/D2, R3-C, R3-D1, R3-D2) are completed, every command exit 0,
+      and each card_sha256 equals its card. The R3 cards bind bench 06351d89... and jv_cover a49184b0... plus
+      PROTOCOL.md and amendments 1-3. Output hashes (including R3-D*.instances.jsonl), stdout, stderr,
+      lscpu and the launcher logs match."
+    - "The cards ran one at a time (each started at the commit adding the previous receipt). R3 timeouts
+      are 7000 s; env and argv are as amendment 3; all R2 and R3 cards ran on host B (identical lscpu)."
+    - "Coverage: R2 main, R2 ablation and R3-C each contain exactly the 253 corpus systems, once each;
+      every skipped list is empty."
+  metric_recomputations:
+    - "validator-report.json (vtool recompute) is pass: 276 checks, 693 values compared, 151 headline
+      numbers at rel_tol 1e-9, 0 mismatches, nothing underivable."
+    - "Covered: geomeans, minima and maxima (R2 wall); bootstrap CIs reproduced with StdRng(20261027)
+      within 8e-16; sparse_over_fast counted ratio (R3-C); Spearman 0.93080369034499; give-up 1/253;
+      P4 outside-25% = 97 (85 dense, 8 gaudry-s4, 2 gaudry-d4, 2 gaudry-s5, 0 jv-nagao); ablation;
+      portable/SIMD."
+    - "DLP: S, S/rho and S/rho_neg rebuilt from R3 counters; lin_ms, f4_ms and wall_ms from R2; the
+      ratios; the 253 systems entries; gates and meta."
+    - "At 12a5bba630, 17 counted_ratio fields were wrong (8 under the wrong definition, 9 from the pre-fix
+      counter) and P4's 121 was in the sparse/fast direction. Fixed in 3b4ec13ae0 and 6f356f71ef;
+      recomputed there."
+  control_checks:
+    - "R3 gates: R3-C solution sets equal R2's on all 253 systems (sols per arm, agree, delta, planted,
+      give-up, fallback). R3-D relations, solved logs and plain rho runs equal R2-D's. All 32 rho and 32
+      rho_neg runs are correct."
+    - "Counter-fix scope: at equal si, R3-C sparse counts equal R2's (96/96); the fast arm's non-root
+      counters equal R2's (96/96) and only roots_muls moves. R3-D1 differs from R2-D1 only in the new
+      rho_neg fields; R3-D2 differs from R2-D2 only in lin_muls-derived counts."
+    - "Replay (replay-certificate.json, verified): full R3-C card command with the pinned bench, 253/253
+      systems equal in every non-timing field including muls, with the 14 nonce-sampled systems among
+      them. Nonce-chosen DLP p=53 seed=1 per arm with the pinned jv_cover: 57/57 non-timing fields equal
+      R3-D1/R3-D2, and the dump lines are byte-identical."
+    - "Scalars (vtool verify-scalars, own arithmetic): 18/18 instances verified (8 R3-D, 8 round-1
+      dumps, 2 validator replay dumps). Checked: tower is a field, curve non-singular, G and Q on it,
+      l prime, G != O, lG = O, ddG = Q, dd = d. Self-tests and negative controls pass."
+  rho_reference_assessment:
+    kind: negation
+    strongest_available: "true: on every curve j is not 0 or 1728 (Aut = +-1) and j is in neither F_p^2 nor F_p^3 (no subfield Frobenius); computed, not taken from alpha"
+    same_unit: "true: group-addition equivalents per sqrt(l) (IC muls / c_add_E; rho group ops, doublings counted as 1)"
+    same_binary_or_process: "true: rho_e_neg runs in the same jv_cover process, on the same Spec, after the IC clock"
+    matches_protocol: "true: amendment 3, S of each arm over the mean S of its 4 rho_neg runs (s_over_rho_neg recomputed)"
+    band_note: >-
+      S is not the same at 0, 0.1 and 1 GAE. rho_neg leaves canonicalisations, partition hashes and table
+      lookups/inserts unpriced, bounded from emitted steps and group_ops as u in [5 steps, 3 steps +
+      4 group_ops]. The IC emits no unpriced counter, so its S at w > 0 is a lower bound.
+    gae_band_proposed: {"0": {"ic": 408.25, "rho": 0.821}, "0.1": {"ic": 408.25, "rho": 1.374}, "1": {"ic": 408.25, "rho": 6.352}}
+    gae_band_basis: "pooled: fast-arm mean S over 4 instances; mean rho_neg S over 16 runs, upper bound at w > 0; ic a lower bound at w > 0"
+    order_holds_across_band: "true: rho_neg is below both IC arms on every instance at every weight; IC/rho_neg is 33x to 1310x per instance, 64x to 497x pooled"
+    caveat: "4 rho_neg runs per instance are noisy (means 0.55 to 1.40); pooled steps/sqrt(l) is 0.749 against theory 0.886"
+  heuristic_validation_checks:
+    - "Not applicable: no heuristic distribution is validated. P1-P5 were frozen before measurement; P4's counted clause is on R3 per amendment 3."
+    - "Scale ladder and null-object controls not applicable: a measured component ratio, not an extrapolation; P2 is a performance trend."
+  cost_model_checks:
+    - "Units declared: wall time headline, counted multiplications beside it; the DLP S in group-addition equivalents."
+    - "Unpriced work: neither binary emits an unpriced counter. rho_neg's is bounded from steps and group_ops; the IC's S is a lower bound."
+    - "Memory is not reported (limitation). rho_e_neg uses exhaustive storage, O(steps) memory."
+  proof_architecture_checks: []
+  verdict: passed
+  verdict_scope: >-
+    The R2 and R3 records are admissible receipts, and every number in analysis/summary.json at 6f356f71ef is
+    supported by them. The replay certificate (scalars_verified true) and the validator report (pass) both
+    satisfy the gate's checks. The rho_reference block above is the validator's assessment for
+    VALIDATION.json. This is not an ECDLP claim, a promotion, or a judgement of whether the speed-up matters.
+  limitations:
+    - "Planted points are checked only in the dense family (constructed jv-nagao systems have >= 1 solution)."
+    - "PROTOCOL.md's text says 900 s for the dense-family F4 budget; the code uses 600 s. No system timed out."
+    - "The DLP lin_ms is summed inside a 4-thread pool."
+    - "Binaries are bound by sha256 and were not rebuilt from source."
+    - "Aborted preflight launches of R3-C and R3-D1 left no receipt or output."
+    - "P4.counted_ratio_range is in the sparse/fast direction while counted_outside_25pct counts fast/sparse; recommend labelling it."
+    - "The rho_neg reference rests on 4 runs per instance."
+    - "Leaderboard and benchmarks rows were not assessed."
+  artifact_paths:
+    - research/postgb_linear_stage_20261026/validation/validator-report.json        # sha256 fa23c847b169b531d83c5e735bf174475b4392042a4a1a777c165797482e0153
+    - research/postgb_linear_stage_20261026/validation/replay-certificate.json      # sha256 2e49056e465330b5b7aee8e58ed9319ea40f564c54b3d02e1cfa1b1ff4d4a500
+    - research/postgb_linear_stage_20261026/validation/round2/scalar-verification.json  # sha256 74bfc5b897dedaa68c894cbe73e54cbd945b9d4841862ae9557876a747686a88
+    - research/postgb_linear_stage_20261026/validation/VALIDATION_NOTES.md
+    - research/postgb_linear_stage_20261026/validation/vtool/   # Cargo.toml, Cargo.lock, src/{main,util,scalars,recompute,replay}.rs
+    - research/postgb_linear_stage_20261026/validation/round2/  # nonce, sample.json, run.sh, journal.jsonl, out/
+  review_attestation:
+    joints_owned: []
+    blind_rederivation: false
+    read_sibling_reports: false
+    producer_scripts_read: "none (examples/postgb_la_summary.rs not read or run)"
+    sources_read:
+      - research/postgb_linear_stage_20261026/PROTOCOL_AMENDMENT_3.md
+      - AGENTS.md sections "Implementation language: no Python" and "5a. Price the unpriced work on every arm"
+      - "cards and receipts for R3-C, R3-D1 and R3-D2 (yaml, receipt, lscpu, launcher logs including the aborted preflights), by tool"
+      - runs/R3-C.json, runs/R3-D1.json, runs/R3-D2.json and the instances.jsonl files (by tool); all R2 and L runs (by tool)
+      - "analysis/summary.json at 12a5bba630 and 6f356f71ef (structure via jq; compared by tool)"
+      - "src/cryptanalysis/jv_cover.rs at 12a5bba630: rho_e, rho_e_neg, unit_costs, ops()"
+      - "src/cryptanalysis/zero_dim_la.rs diff b8b4a97983^..30cef72a5b (counter fix)"
+      - "git log, diff and stat for the commits b8b4a97983..6f356f71ef"
+      - "scripts/validation_gate.py at 6f356f71ef (check functions run as a lint)"

@@ -36,6 +36,7 @@ not describe isogeny problems.
 | `path.supersingular` | a path between two random supersingular j over F_p² | log₂ p | oracle calls | `delfs_galbraith`, `bfs`, `ghs` | every edge a root of Φ_ℓ; the endpoints |
 | `csidh.action` | [∏ ℓᵢ^eᵢ] E₀, eᵢ uniform in [−B, B] | B | fme | `tree`, `batched`, `one_at_a_time` | the one-at-a-time action's result (the tree action's for that arm) |
 | `klpt` | an equivalent left O₀-ideal of 2-power norm for a random ideal of prime norm | log₂ p | norm bits | `klpt` | N(Iξ) = 2ᵉ recomputed, integral, left order O₀, primitive |
+| `radical.chain` | the j-path of a non-backtracking chain of n radical ℓ-isogenies (ℓ ∈ {5, 7}) on the X₁(ℓ) family, one ℓ-th root per step (Castryck–Decru–Vercauteren) | n | fme | `radical` | each step a root of Φ_ℓ (built independently of the radical formulas), non-backtracking, starting at the instance curve |
 
 `isobench problems` prints this registry, including the parameters and their defaults.
 

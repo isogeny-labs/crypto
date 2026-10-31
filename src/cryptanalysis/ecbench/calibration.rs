@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 
-use super::compare::{Comparison, COMPARISON_SCHEMA};
+use super::compare::{is_comparison_schema, Comparison, COMPARISON_SCHEMA};
 
 pub const CALIBRATION_SCHEMA: &str = "ecbench.calibration/v1";
 
@@ -127,7 +127,7 @@ fn read(
 ) -> Result<(Comparison, String, Option<String>), String> {
     let raw = std::fs::read(path).map_err(|e| format!("{}: {e}", path.display()))?;
     let row: Comparison = serde_json::from_slice(&raw).map_err(|e| e.to_string())?;
-    if row.schema != COMPARISON_SCHEMA
+    if !is_comparison_schema(&row.schema)
         || row.a.method_id != row.b.method_id
         || row.a.method != row.b.method
     {
@@ -191,12 +191,30 @@ fn read(
             (None, None) => true,
             _ => false,
         };
-        if replay.comparison_id != row.comparison_id
+        // A v1 file was made by the v1 statistics, which the replay keeps as
+        // its legacy fields; a v2 file is compared on its own fields.
+        let v1 = row.schema == COMPARISON_SCHEMA;
+        let (id, ci, aa_ci, outside) = if v1 {
+            (
+                replay.legacy_comparison_id.clone().unwrap_or_default(),
+                replay.wall.legacy_ci95,
+                replay.wall.legacy_aa_ci95,
+                replay.wall.legacy_outside_noise,
+            )
+        } else {
+            (
+                replay.comparison_id.clone(),
+                replay.wall.ci95,
+                replay.wall.aa_ci95,
+                replay.wall.outside_noise,
+            )
+        };
+        if id != row.comparison_id
             || replay.wall.status != row.wall.status
             || replay.wall.pairs != row.wall.pairs
-            || !same_ci(replay.wall.ci95, row.wall.ci95)
-            || !same_ci(replay.wall.aa_ci95, row.wall.aa_ci95)
-            || replay.wall.outside_noise != row.wall.outside_noise
+            || !same_ci(ci, row.wall.ci95)
+            || !same_ci(aa_ci, row.wall.aa_ci95)
+            || outside != row.wall.outside_noise
         {
             return Err(format!(
                 "{}: comparison does not reproduce from its source session",

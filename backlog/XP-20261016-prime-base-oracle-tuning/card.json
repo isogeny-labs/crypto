@@ -6,13 +6,9 @@
   "authors": [
     "factor-base follow-up"
   ],
-  "status": "draft",
-  "status_note": "Draft protocol written (PROTOCOL.md, DRAFT): frozen incumbent = frontier ic-pair (prime-abscissa + mitm:negation_folded=1, N 32/162/407/1024), 5-size x 5-oracle train grid on fresh prime_search curves, hash-frozen selection, 48-target x 2-round holdout per size, band-priced paired decision. Not frozen: needs ecbench compare --weight, then pin and record the blob. No experiment run or scheduled; sizing probes only (PROTOCOL.md section 11).",
-  "blocked_on": [
-    "note: ecbench compare has no --weight option (src/bin/ecbench.rs:228 Compare; src/cryptanalysis/ecbench/compare.rs:288 compare) and band.rs:187 ranks means without intervals, so the paired cluster-bootstrap intervals at w=0.1 and w=1 required by PROTOCOL.md section 7.2 cannot be computed natively; run.sh analyse exits 3 until it lands",
-    "note: no seeded random prime factor-base plug-in (src/cryptanalysis/ecbench/methods.rs:2125-2137 admits prime-abscissa, prime-projected-abscissa, glv-orbit, prime-kummer, prime-isogeny, cm-scalar-orbit only); random-base control replaced by a stride control unless a prime-random plug-in lands before freezing (control gap, not the primary decision)",
-    "note: freeze steps pending: merge card files and the compare --weight change, pin code.commit to that merge, commit PROTOCOL.md as FROZEN and record protocol.blob (PROTOCOL.md section 12)"
-  ],
+  "status": "ready",
+  "status_note": "Protocol frozen 2026-10-29 (PROTOCOL.md §12): ecbench compare --weight on main resolves blocker 1; random-base control absent and recorded as a gap; plan check at code.commit reproduces the incumbent ids, 232/232/208/208 train executions and fresh curves. No session has run.",
+  "blocked_on": [],
   "links": {
     "lead": "research/factor_base_evaluation_20261015/followup_20261016/README.md",
     "notes": [
@@ -32,11 +28,11 @@
   "decision_value": "A verified holdout reduction robust to the common native-operation pricing band promotes the selected recipe to the next IC baseline, even if rho is still cheaper. A null, failed or price-sensitive result retains the incumbent and narrows the tuning question; no coverage-only result is promoted to a pipeline improvement.",
   "protocol": {
     "path": "PROTOCOL.md",
-    "blob": null
+    "blob": "0ee2e28732a57f45cbd283bb796d2d41b3933a94"
   },
   "code": {
     "repo": "crypto",
-    "commit": "abee07ee7337d04a7e734333669ca1bacd6c763a",
+    "commit": "0e124fb1b207a76ae9ef88c2bffb1f5b8d92b1b6",
     "branch": null,
     "build": [
       [
@@ -93,7 +89,7 @@
   },
   "cairn": {
     "mode": "lab-task",
-    "notes": "Not published or leased; draft only. One sequential shard; resumable at session granularity by rerunning the same command (--resume).",
+    "notes": "Frozen; not yet published or leased. One sequential shard; resumable at session granularity by rerunning the same command (--resume).",
     "space": "TBD",
     "tasks": [
       "XP-20261016-prime-base-oracle-tuning"
@@ -112,7 +108,7 @@
     },
     "funding": {
       "units": 0,
-      "rationale": "Draft: not frozen, so no queue priority or posted reward yet. Derived cost is ~2 core-hours on one core; a reviewer may set funding at or below the 131072 seed-card floor once frozen."
+      "rationale": "Frozen 2026-10-29. Derived cost ~2 core-hours on one core; funding at or below the 131072 seed-card floor is for a reviewer to set."
     }
   },
   "owner_hint": "Native ecbench prime-field lane"

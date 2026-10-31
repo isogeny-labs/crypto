@@ -20,7 +20,7 @@
 //! `m ≥ 3` Semaev systems are cubic and are refused here.
 
 use super::wdsat_oracle::AnfRow;
-use crate::cryptanalysis::pq_groebner_f2::F2BoolPoly;
+use crate::cryptanalysis::pq_groebner_f2::{mask_from64, F2BoolPoly};
 
 /// Packed quadratic form over `n` Boolean variables: constant, linear
 /// coefficients, and upper-triangular quadratic coefficients.
@@ -865,12 +865,12 @@ pub fn mq_fes_decompose(
     }
     for root in roots {
         stats.models += 1;
-        if !sys.equations.iter().all(|e| e.eval(root) == 0) {
+        if !sys.equations.iter().all(|e| e.eval(mask_from64(root)) == 0) {
             stats.spurious += 1;
             continue;
         }
         let xs: Vec<_> = (0..m)
-            .map(|i| sys.summand_x(&fb.subspace_basis, root, i, kc.n))
+            .map(|i| sys.summand_x(&fb.subspace_basis, mask_from64(root), i, kc.n))
             .collect();
         if let Some(idxs) = lift_candidate(kc, fb, index_of, &xs, target) {
             return (Some(idxs), stats);
@@ -882,6 +882,10 @@ pub fn mq_fes_decompose(
 
 #[cfg(test)]
 mod tests {
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     /// The layer-by-layer transform the blocked one replaced.
     fn moebius_reference(table: &mut [u64], n: usize) {

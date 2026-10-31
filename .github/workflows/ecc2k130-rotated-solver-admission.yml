@@ -1,6 +1,8 @@
 name: ECC2K130 rotated solver admission replay
 
 on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:
@@ -15,25 +17,6 @@ on:
       - 'src/cryptanalysis/koblitz_groebner.rs'
       - 'src/cryptanalysis/polynomial_reuse.rs'
       - 'src/cryptanalysis/koblitz_index_calculus.rs'
-  pull_request:
-    paths:
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - 'build.rs'
-      - '.cargo/**'
-      - 'rust-toolchain*'
-      - '.github/workflows/ecc2k130-rotated-solver-admission.yml'
-      - '.github/scripts/*frozen-workflow-check*'
-      - 'research/notes/ecc2k130/rotated_solver_admission_replay_20260925/**'
-      - 'research/notes/ecc2k130/rotated_solver_admission_20260925/**'
-      - 'research/notes/ecc2k130/rotated_pdp_corpus_20260925/evidence/raw.tar.gz'
-      - 'research/notes/ecc2k130/rotated_s3_candidate_20260925/evidence/**'
-      - 'research/notes/ecc2k130/rotated_m56_export_gate_20260925/RESULT.md'
-      - 'research/notes/ecc2k130/rotated_s3_fibre_theorem_20260925/RESULT.md'
-      - 'src/cryptanalysis/koblitz_groebner.rs'
-      - 'src/cryptanalysis/polynomial_reuse.rs'
-      - 'src/cryptanalysis/koblitz_index_calculus.rs'
-
 permissions:
   contents: read
 
@@ -43,7 +26,7 @@ concurrency:
 
 jobs:
   historical-and-current-interface:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-rotated-solver-admission.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-rotated-solver-admission.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-rotated-solver-admission.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-rotated-solver-admission.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
     steps:
       - uses: actions/checkout@v4

@@ -20,7 +20,7 @@ def archive_tree(stage, destination):
     # Stable order, metadata, permissions and xz stream, independent of checkout
     # timestamps and extraction ownership. No links or external filesystem data.
     with tarfile.open(destination, "x:xz", format=tarfile.GNU_FORMAT,
-                      preset=6) as archive:
+                      preset=6, dereference=True) as archive:
         for path in sorted(stage.rglob("*")):
             if path.is_symlink():
                 raise ValueError(f"links are not package inputs: {path}")

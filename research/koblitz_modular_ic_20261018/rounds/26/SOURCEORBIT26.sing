@@ -1,0 +1,70 @@
+// Universal original Tate/line coordinate transformation, before imposing level11.
+ring generic26=(2,b,c,l,n),(X,Y),dp;
+number a=1+c;number kk=b+a*c;number sc=c^3/kk;number sl=kk/c;
+poly xx=sc^2*X+b;poly yy=sc^3*Y+sl*sc^2*X+b*c;
+poly oldEC=yy^2+a*xx*yy+b*yy+xx^3+b*xx^2;
+poly newEC=Y^2+(a/sc)*X*Y+(b*c/sc^3)*Y+X^3+(b*c/sc^3)*X^2;
+poly oldLine=yy+l*xx+n;
+poly newLine=Y+((l+sl)/sc)*X+(n+l*b+b*c)/sc^3;
+print("EXACT_UNIVERSAL_TATE_AND_LINE_RESIDUALS");oldEC-sc^6*newEC;oldLine-sc^3*newLine;
+if(oldEC!=sc^6*newEC || oldLine!=sc^3*newLine){ERROR("wrong source Tate re-normalization");}
+ring base26=(2,u),(v),lp;
+poly ee=v^2+v+u^3+u;ideal ei=std(ideal(ee));
+proc red(poly p){return(reduce(p,ei));}
+proc inverse26(poly p){
+ p=red(p);poly conjugate=subst(p,v,v+1);poly nn=red(p*conjugate);
+ if(p==0 || deg(nn)>0){ERROR("invalid function-field inverse");return(0);}
+ number cc=leadcoef(nn);poly result=conjugate/cc;
+ if(red(p*result)!=1){ERROR("function-field inverse residual");}
+ return(result);
+}
+poly rn=(u+1)*v+1;poly cn=rn+u^3;
+poly bb=red(rn*cn/u^7);poly cc=red(cn/u^4);poly aa=1+cc;
+poly kk=red(bb+aa*cc);poly sc=red(cc^3*inverse26(kk));
+poly up=(u+v)/u^2;poly vp=(u*v+u+v)/u^3;
+poly newRn=red((up+1)*vp+1);poly newCn=red(newRn+up^3);
+poly newB=red(newRn*newCn*inverse26(up)^7);poly newC=red(newCn*inverse26(up)^4);
+print("EXACT_BASE_TRANSLATION_RESIDUALS");red(vp^2+vp+up^3+up);
+red(newB-bb*cc*inverse26(sc)^3);red(newC-1-aa*inverse26(sc));
+if(red(vp^2+vp+up^3+up)!=0 || red(newB-bb*cc*inverse26(sc)^3)!=0 || red(newC-1-aa*inverse26(sc))!=0){ERROR("source base action differs from translation");}
+poly curU=u;poly curV=v;poly nextU;poly nextV;int i;
+for(i=1;i<=5;i++){
+ nextU=red((curU+curV)*inverse26(curU)^2);
+ nextV=red((curU*curV+curU+curV)*inverse26(curU)^3);
+ curU=nextU;curV=nextV;
+ print("BASE_TRANSLATION_ITERATE "+string(i));curU;curV;
+ if(red(curV^2+curV+curU^3+curU)!=0){ERROR("iterate leaves cubic");}
+}
+print("BASE_FIFTH_ITERATE_RESIDUALS");curU-u;curV-v;
+if(curU!=u || curV!=v){ERROR("base translation not order5");}
+// Full original lambda/nu affine coefficient orbit in the exact base field.
+curU=u;curV=v;
+poly lambdaCoefficient=1;poly lambdaOffset=0;
+poly nuCoefficient=1;poly nuLambda=0;poly nuOffset=0;
+poly currentRn;poly currentCn;poly currentB;poly currentC;poly currentA;
+poly currentK;poly currentScale;poly currentSlope;
+poly nextLC;poly nextLO;poly nextNC;poly nextNL;poly nextNO;
+for(i=1;i<=5;i++){
+ currentRn=red((curU+1)*curV+1);currentCn=red(currentRn+curU^3);
+ currentB=red(currentRn*currentCn*inverse26(curU)^7);
+ currentC=red(currentCn*inverse26(curU)^4);currentA=1+currentC;
+ currentK=red(currentB+currentA*currentC);
+ currentScale=red(currentC^3*inverse26(currentK));
+ currentSlope=red(currentK*inverse26(currentC));
+ nextLC=red(lambdaCoefficient*inverse26(currentScale));
+ nextLO=red((lambdaOffset+currentSlope)*inverse26(currentScale));
+ nextNC=red(nuCoefficient*inverse26(currentScale)^3);
+ nextNL=red((nuLambda+currentB*lambdaCoefficient)*inverse26(currentScale)^3);
+ nextNO=red((nuOffset+currentB*lambdaOffset+currentB*currentC)*inverse26(currentScale)^3);
+ lambdaCoefficient=nextLC;lambdaOffset=nextLO;
+ nuCoefficient=nextNC;nuLambda=nextNL;nuOffset=nextNO;
+ nextU=red((curU+curV)*inverse26(curU)^2);
+ nextV=red((curU*curV+curU+curV)*inverse26(curU)^3);
+ curU=nextU;curV=nextV;
+ print("ORIGINAL_SOURCE_ORBIT_STEP "+string(i));
+ lambdaCoefficient;lambdaOffset;nuCoefficient;nuLambda;nuOffset;
+}
+print("EXACT_SOURCE_FIFTH_ITERATE_RESIDUALS");
+lambdaCoefficient-1;lambdaOffset-aa;nuCoefficient-1;nuLambda;nuOffset-bb;
+if(lambdaCoefficient!=1 || lambdaOffset!=aa || nuCoefficient!=1 || nuLambda!=0 || nuOffset!=bb){ERROR("source fifth iterate differs from sigma");}
+print("SOURCEORBIT26_ALL_CHECKS_PASS");quit;

@@ -857,6 +857,10 @@ closure measurement on its cells. It has 16 unsatisfiable draws at degree 4.
 - **For ECC2K-130.** `RESEARCH_ECC2K130_DESCENT_DEGREE.md` §8: both
   survivors put the m = 4 rise at ℓ ≤ 7, so the m = 4 degree-4 row is
   contradicted.
+- **Update 2026-10-23.** The separating cell was measured by another
+  session on a large host (`research/dreg_closure_m4l6_20261018/RESULTS.md`): m = 4, ℓ = 6
+  (N = 54) refutes at degree 4 on 2 of 2 unsatisfiable draws. So
+  **m·ℓ ≥ 21 is refuted and ℓ = 7 survives.**
 
 ## Result 14: one fixed variable usually brings the ℓ = 7 draws back to degree 4
 
@@ -876,6 +880,69 @@ specialises the 8 m = 3, ℓ = 7 draws whose degree-4 closure does not refute
   refutation: about 100k columns per branch, against about 760k–1M at
   degree 5.
 - **The open question.** It is how many guesses degree 4 needs as ℓ grows.
+
+## Result 15: four guessed variables bring every ℓ = 8 draw back to degree 4
+
+`research/dreg_closure_guess_20261022/` was pre-registered. At m = 3,
+(n, ℓ) = (22, 8), N = 46, it guesses four variables (one coordinate per
+summand and one intermediate coordinate) on 4 unsatisfiable draws, all 16
+branches each, and runs the degree-4 closure on every branch.
+
+- **Registered verdict: four guesses suffice at ℓ = 8.** All 64 branches
+  refute at degree 4. The positive control (one more coordinate per summand,
+  dimensions 6, 6, 6) refutes on 4 of 4.
+- **The rule `m·(ℓ−6)` is rejected for this guess set:** it predicted 6.
+- **An upper bound only.** k = 4 is the fewest guesses the 130k-column
+  dense closure can measure at N = 46. A k that stays bounded as ℓ grows,
+  as k ≈ 1 at ℓ = 7 would suggest, is not excluded.
+- **Instrument fix.** `dreg_closure` now reads `--max-cols` against the
+  variables that occur after `--fix`. The engine's columns already ran over
+  those, and unspecialised systems are unchanged.
+
+## Result 16: three guessed variables do not suffice at ℓ = 8 for this set
+
+`research/dreg_closure_guess3_20261023/` was pre-registered. At m = 3,
+(n, ℓ) = (22, 8) on the same 4 unsatisfiable draws, it guesses variables 7,
+15 and 23 (the top coordinate of each summand, no intermediate coordinate),
+8 branches per draw, N = 43, 136,698 degree-4 columns.
+
+- **Registered verdict: three guesses do not suffice at ℓ = 8 (for this
+  guess set).** 1 draw suffices (draw 6, 8 of 8 branches refute) and 3 do not
+  (draws 0, 3, 5: the first branch saturates degree 4 without the constant
+  `1`; the other 7 branches were not run, by the registered stop rule).
+- **Controls valid.** The unspecialised ℓ = 7 draw matches the committed
+  scale-study record on every non-timing field; the dimension-6 control
+  refutes on 4 of 4.
+- **What it says.** Three do not suffice for variables 7, 15, 23; four
+  (7, 15, 23, 24) did in Result 15. Another three-variable set is unmeasured.
+- **Reading (not registered).** The 3-set leaves every summand in dimension 7
+  with N = 43, structurally the ℓ = 7 systems that did not refute at degree 4
+  on 8 of 8 draws (Results 12 and 13), so its failure is what that result
+  predicts. The pattern fits `m·(ℓ−7)+1` guesses (4 at ℓ = 8), which would be
+  105 at the priced m = 4, ℓ = 33 cell against a break-even of 6. That is an
+  extrapolation from two values of ℓ, not a result.
+- **Memory.** Peak 7.04 GB under the 15 GB limit; the earlier 10.6 GB was one
+  outlier (median 7.0 GB over 68 runs).
+
+## Result 17: the unspecialised (22, 7) system does not refute at degree 4
+
+`research/dreg_closure_null22_7_20261028/` was pre-registered. It measures the
+**matched null** for the three-guess set of Result 16: the unspecialised
+m = 3, (n, ℓ) = (22, 7) system, with the same N = 43 unknowns, 44 equations and
+136,698 degree-4 columns, on its first four unsatisfiable draws (surplus +1).
+
+- **Registered verdict: "N0 does not refute on at least 3 draws: the pure ℓ = 7
+  reading."** It does not refute on 4 of 4. Controls valid: the identity control
+  matches its committed record on every non-timing field, the dimension-6 control
+  refutes on 4 of 4, and neither satisfiable draw is refuted.
+- **With Results 12 and 13, 12 of 12 unspecialised ℓ = 7 draws do not refute,**
+  over N = 40, 42, 43 and surplus −2, 0, +1, so surplus is not what caused the
+  earlier ℓ = 7 failure.
+- **Reading.** The three-guess failure (Result 16) is what ℓ = 7 does. The pattern
+  fits `m·(ℓ−7)+1` guesses, 4 at ℓ = 8. The 3-set and this cell are an analogy:
+  3 of 4 and 4 of 4 failures are not distinguishable at four draws each.
+- **Not measured:** a three-variable set leaving one summand at dimension 8
+  (predicted to fail), degree 5 at ℓ = 7, ℓ = 9.
 
 ## Reproducing
 
@@ -981,3 +1048,47 @@ F4_F2_MAX_ROWS=2000000 F4_F2_MAX_COLS=200000 \
   **Superseded:** structured sparse elimination landed ("Sparse
   elimination" above). The frontier is now wall time. A degree-6 matrix at
   28 unknowns takes more than 4.5 hours on a four-core container (Result 4).
+
+## Pair-invariant arms (2026-10-28)
+
+- `examples/dreg_invariant.rs` builds two variants of the m = 3 chain, each
+  checked against the plain system by exact polynomial identity (`--check`):
+  - Q adds the summand-swap invariant `p = x₁x₂` as unknowns;
+  - R adds the non-invariant `r = x₁e₁`.
+- Both are quadratic. Neither refutes at degree 3 on the committed (22, 6)
+  and (21, 7) draws, and their degree-4 matrices are 5.1–5.5 times the plain
+  system's (`research/dreg_pair_invariant_20261028/RESULTS.md`).
+- At (22, 6), making the system quadratic with auxiliary unknowns does not
+  lower the MutantXL closure degree.
+- At (21, 7), degree 4 of the quadratic arms is unmeasured: a sparse run
+  capped at 10⁹ entries. A lower degree there is not excluded.
+
+## Linear guesses (2026-10-29)
+
+- `examples/dreg_linear_guess.rs` specialises the chained system with fixed
+  variables and linear substitutions `x_j := x_i + c`. `--check` evaluates
+  every specialised equation against the original at 4,096 random points of
+  the guessed subspace.
+- `examples/dreg_chain_solutions.rs` lists every solution of an m = 3 draw
+  and checks it against the system. That is what makes a refutation of a
+  satisfiable branch checkable.
+- At (22, 8), a guess on `a₇ + b₇` refutes at degree 4 on more draws than a
+  guess on `a₇` (2 against 1 of 4;
+  `research/dreg_invariant_guess_20261029/RESULTS.md`).
+- Branches that hold a solution cannot refute, and at this size they ran
+  past 16 GB.
+
+## Invariant guesses on fresh draws (2026-10-29)
+
+- On 8 fresh (22, 8) draws, a guess on `a₇ + b₇` lets degree 4 refute on every
+  branch of 5 draws, and a guess on `a₇` on none (p = 0.031, pre-registered;
+  `research/dreg_invariant_guess_more_20261029/RESULTS.md`).
+- `examples/dreg_linear_guess_more_score.rs` re-checks the draw generator's
+  replay of the committed draws before scoring.
+
+## A second invariant guess on the pair (2026-10-29)
+
+- Replacing the raw guess `c₇` by `a₆ + b₆` at (22, 8) lets degree 4 refute on
+  every branch of 2 of 12 draws, against 7 of 12 for S3. That is no detected
+  difference at the registered two-sided threshold (p = 0.0625), and the new
+  arm is never better (`research/dreg_invariant_pair_guess_20261029/RESULTS.md`).

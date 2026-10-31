@@ -1,0 +1,991 @@
+{
+  "all_size_medians_faster_per_step": true,
+  "cold_by_size": [
+    {
+      "IC_cold_S": 6.656697236320822,
+      "R1": 64,
+      "R2": 4,
+      "cold_ratio": 3.7803510216309886,
+      "curve": "icv1-f2m47-t22705043-f4e44623",
+      "group": "k1n47",
+      "online_speedup": 21.970997918331417,
+      "rho_cold_S": 1.7608674956985522
+    },
+    {
+      "IC_cold_S": 7.4043006878136,
+      "R1": 64,
+      "R2": 4,
+      "cold_ratio": 4.539980570467914,
+      "curve": "icv1-f2m57-tm747311035-c1f545af",
+      "group": "k0n57",
+      "online_speedup": 20.447114514190034,
+      "rho_cold_S": 1.6309102148977863
+    },
+    {
+      "IC_cold_S": 7.137900546262308,
+      "R1": 64,
+      "R2": 4,
+      "cold_ratio": 5.117186591952443,
+      "curve": "icv1-f2m41-tm2308219-7f48b14a",
+      "group": "k0n41",
+      "online_speedup": 14.215299686828486,
+      "rho_cold_S": 1.3948876825183094
+    },
+    {
+      "IC_cold_S": 9.54049748259237,
+      "R1": 64,
+      "R2": 4,
+      "cold_ratio": 7.8974413209012315,
+      "curve": "icv1-f2m53-tm56619371-dac20a85",
+      "group": "k0n53",
+      "online_speedup": 30.660695463371304,
+      "rho_cold_S": 1.2080491763000067
+    },
+    {
+      "IC_cold_S": 9.109655889766199,
+      "R1": 64,
+      "R2": 4,
+      "cold_ratio": 7.396126156997682,
+      "curve": "icv1-f2m59-tm943548413-98844ecc",
+      "group": "k1n59",
+      "online_speedup": 36.36966088328248,
+      "rho_cold_S": 1.2316793543532647
+    },
+    {
+      "IC_cold_S": 12.989348374997558,
+      "R1": 64,
+      "R2": 4,
+      "cold_ratio": 12.06412492037804,
+      "curve": "icv1-f2m61-t158598901-ab42b6c5",
+      "group": "k0n61",
+      "online_speedup": 19.87872420274568,
+      "rho_cold_S": 1.0766921314828797
+    }
+  ],
+  "errors": [],
+  "gae_band": {
+    "0": [
+      {
+        "group": "k1n47",
+        "ic": 6.656697236320822,
+        "rho": 1.7608674956985522
+      },
+      {
+        "group": "k0n57",
+        "ic": 7.4043006878136,
+        "rho": 1.6309102148977863
+      },
+      {
+        "group": "k0n41",
+        "ic": 7.137900546262308,
+        "rho": 1.3948876825183094
+      },
+      {
+        "group": "k0n53",
+        "ic": 9.54049748259237,
+        "rho": 1.2080491763000067
+      },
+      {
+        "group": "k1n59",
+        "ic": 9.109655889766199,
+        "rho": 1.2316793543532647
+      },
+      {
+        "group": "k0n61",
+        "ic": 12.989348374997558,
+        "rho": 1.0766921314828797
+      }
+    ],
+    "0.1": [
+      {
+        "group": "k1n47",
+        "ic": 6.656697236320822,
+        "rho": 1.7608674956985522
+      },
+      {
+        "group": "k0n57",
+        "ic": 7.4043006878136,
+        "rho": 1.6309102148977863
+      },
+      {
+        "group": "k0n41",
+        "ic": 7.137900546262308,
+        "rho": 1.3948876825183094
+      },
+      {
+        "group": "k0n53",
+        "ic": 9.54049748259237,
+        "rho": 1.2080491763000067
+      },
+      {
+        "group": "k1n59",
+        "ic": 9.109655889766199,
+        "rho": 1.2316793543532647
+      },
+      {
+        "group": "k0n61",
+        "ic": 12.989348374997558,
+        "rho": 1.0766921314828797
+      }
+    ],
+    "1": [
+      {
+        "group": "k1n47",
+        "ic": 6.656697236320822,
+        "rho": 1.7608674956985522
+      },
+      {
+        "group": "k0n57",
+        "ic": 7.4043006878136,
+        "rho": 1.6309102148977863
+      },
+      {
+        "group": "k0n41",
+        "ic": 7.137900546262308,
+        "rho": 1.3948876825183094
+      },
+      {
+        "group": "k0n53",
+        "ic": 9.54049748259237,
+        "rho": 1.2080491763000067
+      },
+      {
+        "group": "k1n59",
+        "ic": 9.109655889766199,
+        "rho": 1.2316793543532647
+      },
+      {
+        "group": "k0n61",
+        "ic": 12.989348374997558,
+        "rho": 1.0766921314828797
+      }
+    ]
+  },
+  "gae_band_basis": "Both full arms were timed in one process and all native operations are inside those intervals, as frozen PROTOCOL.md states; the unpriced count is zero, so adding 0, 0.1 or 1 GAE per unpriced operation leaves each measured S unchanged. Count-only model readings remain lower bounds.",
+  "limits": [
+    "The frozen protocol compares size medians over eight public targets. Two individual targets are slower than the separate strong-walk reference; their ratios are preserved in this report.",
+    "The strong reference is a separate binary on the same public points; no claim is made about unexamined rho implementations or deployed curves."
+  ],
+  "raw_data": [
+    {
+      "path": "runs/reference/k1n47/T01.strong.json",
+      "sha256": "8ed6594b5ee54496b2c41a4f1c17c8270bcb32f90deeb4fe68c277f087bec1ad"
+    },
+    {
+      "path": "runs/reference/k1n47/T02.strong.json",
+      "sha256": "38f85f5dfdf0fad638c4607623d98475aec5381780e8894d82aefab40bf299f4"
+    },
+    {
+      "path": "runs/reference/k1n47/T03.strong.json",
+      "sha256": "d4479fb568b1f9cc511294b6bf61278e3f044a283c15ebee77a918e99f46e459"
+    },
+    {
+      "path": "runs/reference/k1n47/T04-retry1.strong.json",
+      "sha256": "9d3e759c70359fea53945098fcdedee62f7fcadddd883c36cef723ffca0e5e4c"
+    },
+    {
+      "path": "runs/reference/k1n47/T05.strong.json",
+      "sha256": "a68bdb96f872dbb67af166b069414d6fd446c808f1ded478c7fb2ef89b21dcfd"
+    },
+    {
+      "path": "runs/reference/k1n47/T06.strong.json",
+      "sha256": "6bdf04760f7596ffc7fd5d61a0eea4065bde37f6a3420d3e095df65ca7b08fab"
+    },
+    {
+      "path": "runs/reference/k1n47/T07.strong.json",
+      "sha256": "3abbbb5f6ebdfffecb67e484c6f0504bd57f84fd212f3ca532fe5f35e28a6dc7"
+    },
+    {
+      "path": "runs/reference/k1n47/T08.strong.json",
+      "sha256": "9b35945d6d36484b380043937584298ef3e3b14ebdd007c15e6203c44eadff90"
+    },
+    {
+      "path": "runs/reference/k0n57/T01.strong.json",
+      "sha256": "e8aafc23046de2ef7072365da8aaf93033dc24f704eb1bc37ca658116909e1ce"
+    },
+    {
+      "path": "runs/reference/k0n57/T02.strong.json",
+      "sha256": "623dd851b6f3612ddde2dceb1fe7994eea4b52b01fccde8367cda19e60e55aa8"
+    },
+    {
+      "path": "runs/reference/k0n57/T03.strong.json",
+      "sha256": "a0fdd9729264afd17432c2a13dcfddf7c14b5fce90db10f70cd322cbfef8978f"
+    },
+    {
+      "path": "runs/reference/k0n57/T04-retry1.strong.json",
+      "sha256": "dd41c935f308358bb68726a3654abbb5af5e21af70f325f69f5e1ea98dbda58d"
+    },
+    {
+      "path": "runs/reference/k0n57/T05.strong.json",
+      "sha256": "0a3ac30463925c73e1b5db199401347bc4d819ef4e64beb2733ea63408c760fc"
+    },
+    {
+      "path": "runs/reference/k0n57/T06.strong.json",
+      "sha256": "b73635e2ce076c726dc81f0773986fe1740733344bf0bf0ba44e9d74b138e2c9"
+    },
+    {
+      "path": "runs/reference/k0n57/T07.strong.json",
+      "sha256": "47a407b01298d8a6d44215fa87f1976d3b9611f16d39118314ca4759ba8ca5e5"
+    },
+    {
+      "path": "runs/reference/k0n57/T08.strong.json",
+      "sha256": "ca7d88e1454a4b7136701802ab1af8ae836032780b115c34cf129cef4c6d39d9"
+    },
+    {
+      "path": "runs/reference/k0n41/T01.strong.json",
+      "sha256": "31d3de191afd1237b723587809e38db035e925b1d3c892ef19ab58e5771203f8"
+    },
+    {
+      "path": "runs/reference/k0n41/T02.strong.json",
+      "sha256": "5ca9e3cff9462fe85e971c5fbe2192f589f4868791592e5ffcdcc312c65e1771"
+    },
+    {
+      "path": "runs/reference/k0n41/T03.strong.json",
+      "sha256": "891c4cd9f9e9f719435cc5dd19ddb375c5d912793b4f8605c3ebaccb2c3ad4ed"
+    },
+    {
+      "path": "runs/reference/k0n41/T04.strong.json",
+      "sha256": "c1557f606e4745f668ca0a50b66676d0936bfd9783b0bfab266355701935041c"
+    },
+    {
+      "path": "runs/reference/k0n41/T05.strong.json",
+      "sha256": "20f736e182c1f55c800869310fd064c581e2ce6233a42bec64a4d3a2d7a8295d"
+    },
+    {
+      "path": "runs/reference/k0n41/T06.strong.json",
+      "sha256": "86a7d378e7971ea59e0d76ec7e2066e4c3587d8888efb40f7f7ff7b1d56b168a"
+    },
+    {
+      "path": "runs/reference/k0n41/T07.strong.json",
+      "sha256": "35300fdc697cdbaf52824c5e7bd6ef96b57707dd5d792e48582640ae4613dd0a"
+    },
+    {
+      "path": "runs/reference/k0n41/T08.strong.json",
+      "sha256": "e4732dc5ae597d200e515012a318d7e318f78751ef3237b80b818a09e3b0bdb3"
+    },
+    {
+      "path": "runs/reference/k0n53/T01.strong.json",
+      "sha256": "ea892fee7f3dcb9e2561959e8c6f0049abd0e0199597f2e930bd376ca664bc87"
+    },
+    {
+      "path": "runs/reference/k0n53/T02-retry1.strong.json",
+      "sha256": "f313105fcd745025ffe1672c0f8580ad27068991a2b6d513f67914be3a5620e0"
+    },
+    {
+      "path": "runs/reference/k0n53/T03.strong.json",
+      "sha256": "a97c2c476a5872f4daeb14f0f3a48b1186b3784799b6a1debda812b16e5ac345"
+    },
+    {
+      "path": "runs/reference/k0n53/T04.strong.json",
+      "sha256": "5acfdc81e82ee6a77a925c737a0b6682d1009b41fddde83974f5dbddbf2108d2"
+    },
+    {
+      "path": "runs/reference/k0n53/T05.strong.json",
+      "sha256": "859bcc89cc6ce2eea54290a4f1eb8644f6a7261c6d668a1d08e2bcf92a53c59e"
+    },
+    {
+      "path": "runs/reference/k0n53/T06.strong.json",
+      "sha256": "d8d798dcc2713a066ccc59d17ac718b995bc3b193f10ffe4d8766c0345dfecdd"
+    },
+    {
+      "path": "runs/reference/k0n53/T07.strong.json",
+      "sha256": "7b6bf58485deffa4acfe1ba76504be22ae42756c153d5792b19eee7f6e992eaf"
+    },
+    {
+      "path": "runs/reference/k0n53/T08.strong.json",
+      "sha256": "dfa447f2333902f52f4d5abb7b060bc2c01bbaa9623cd864dac546affba28f84"
+    },
+    {
+      "path": "runs/reference/k1n59/T01.strong.json",
+      "sha256": "dd39613586a2553d93f41b5bcbd8b86eb8ccbc1f786ce04d6a6add9e825f4693"
+    },
+    {
+      "path": "runs/reference/k1n59/T02.strong.json",
+      "sha256": "37aa9660909ed60d27c5a31230efa13d7a4c8026c02dabf0d3ca17932944bb6f"
+    },
+    {
+      "path": "runs/reference/k1n59/T03.strong.json",
+      "sha256": "883cd81e283f276269f0d1639370b204fd2f6bad43b966e38bc7a1754e81a509"
+    },
+    {
+      "path": "runs/reference/k1n59/T04.strong.json",
+      "sha256": "7ce8d987ea7c3f3daae3eb5e32c18fcc1983a146f8e774f8a5700faffb65665d"
+    },
+    {
+      "path": "runs/reference/k1n59/T05-retry1.strong.json",
+      "sha256": "9156388ed12cf9749ea105d4c7724d47050d0032fb5d5a72728d6e6c86b78cb6"
+    },
+    {
+      "path": "runs/reference/k1n59/T06.strong.json",
+      "sha256": "a582bfcdb781968b2b10ddd7f4ef8673525ba59e074728162eee05215078cf2a"
+    },
+    {
+      "path": "runs/reference/k1n59/T07.strong.json",
+      "sha256": "bfa52161ec0d50ad86338aedca80efba222ff76f57996eb21afe62956c80aac3"
+    },
+    {
+      "path": "runs/reference/k1n59/T08.strong.json",
+      "sha256": "2b7ed840ff32dba3de1a23e35b9a11caecda7783e945397abe8638782fd75d46"
+    },
+    {
+      "path": "runs/reference/k0n61/T01.strong.json",
+      "sha256": "1f102d95c1e58a62e6610cdbf89b24af74f0d84c5e4a694d1cbc15fcde3f8887"
+    },
+    {
+      "path": "runs/reference/k0n61/T02.strong.json",
+      "sha256": "177ffc8406edab61137982a96b6c54375e76a08c603bc2d256dfa88ca6fe9248"
+    },
+    {
+      "path": "runs/reference/k0n61/T03.strong.json",
+      "sha256": "a5c7e4901320a86a89a96bc7c3f78d3a3dd6f8e44a3b095461a6431780217354"
+    },
+    {
+      "path": "runs/reference/k0n61/T04.strong.json",
+      "sha256": "fcffdd2dd9d59414e2dbe64abdb19281543534ae6e6e8e805a42987fca5c54d7"
+    },
+    {
+      "path": "runs/reference/k0n61/T05.strong.json",
+      "sha256": "c76f4809ccfa7152fd47d79bb2b5579a71fb030626adfe6648cb8f9028cb3d53"
+    },
+    {
+      "path": "runs/reference/k0n61/T06.strong.json",
+      "sha256": "9254856b289f4858f89b06f50e3b4a29ce6a48fa7fa5b460ab2310d1d000e3d1"
+    },
+    {
+      "path": "runs/reference/k0n61/T07.strong.json",
+      "sha256": "7cde368833491e4eaf556bfbd54260772f772154b52789425d25e84cff4a0171"
+    },
+    {
+      "path": "runs/reference/k0n61/T08.strong.json",
+      "sha256": "4828a4f4ceb746a918a071dcec4c6b408c25e1d33fc81803a6e9418efb915008"
+    }
+  ],
+  "schema": "rule-v6-independent-rho-reference/v1",
+  "size_median_comparisons": [
+    {
+      "group": "k1n47",
+      "individual_targets_slower_than_strong": [],
+      "measured_rho_ns_per_step_median": 111.62796325386614,
+      "rho_over_strong": 0.7585966948551741,
+      "strong_ns_per_step_median": 147.15060586334002
+    },
+    {
+      "group": "k0n57",
+      "individual_targets_slower_than_strong": [
+        5
+      ],
+      "measured_rho_ns_per_step_median": 122.88691825525618,
+      "rho_over_strong": 0.8482053623172309,
+      "strong_ns_per_step_median": 144.8787330458967
+    },
+    {
+      "group": "k0n41",
+      "individual_targets_slower_than_strong": [
+        4
+      ],
+      "measured_rho_ns_per_step_median": 104.75058465024033,
+      "rho_over_strong": 0.7506547536723497,
+      "strong_ns_per_step_median": 139.54562218886912
+    },
+    {
+      "group": "k0n53",
+      "individual_targets_slower_than_strong": [],
+      "measured_rho_ns_per_step_median": 119.87623219264728,
+      "rho_over_strong": 0.8294003965250105,
+      "strong_ns_per_step_median": 144.53360848981993
+    },
+    {
+      "group": "k1n59",
+      "individual_targets_slower_than_strong": [],
+      "measured_rho_ns_per_step_median": 110.6179135789441,
+      "rho_over_strong": 0.6974713909261072,
+      "strong_ns_per_step_median": 158.59849596420705
+    },
+    {
+      "group": "k0n61",
+      "individual_targets_slower_than_strong": [],
+      "measured_rho_ns_per_step_median": 111.44007686763668,
+      "rho_over_strong": 0.7164946512935563,
+      "strong_ns_per_step_median": 155.5351134393582
+    }
+  ],
+  "status": "pass",
+  "strong_comparisons": [
+    {
+      "group": "k1n47",
+      "measured_rho_ns_per_step": 111.30619909502262,
+      "measured_rho_over_strong": 0.8000778194640188,
+      "price": "runs/k1n47/T01-R1.price.json",
+      "price_sha256": "dff524632e6cabe9474dfeab9e8a484939b1783336cff341404da120cf2933a8",
+      "same_target": true,
+      "strong": "runs/reference/k1n47/T01.strong.json",
+      "strong_ns_per_step": 139.11921614023484,
+      "strong_sha256": "8ed6594b5ee54496b2c41a4f1c17c8270bcb32f90deeb4fe68c277f087bec1ad",
+      "target": 1
+    },
+    {
+      "group": "k1n47",
+      "measured_rho_ns_per_step": 112.33809694242765,
+      "measured_rho_over_strong": 0.7813368018604013,
+      "price": "runs/k1n47/T02-R1.price.json",
+      "price_sha256": "5014475ef1b9e4d6026a95b8d86bdce2026f6f8e00f5ce96e7b45468bd120b21",
+      "same_target": true,
+      "strong": "runs/reference/k1n47/T02.strong.json",
+      "strong_ns_per_step": 143.77678956750165,
+      "strong_sha256": "38f85f5dfdf0fad638c4607623d98475aec5381780e8894d82aefab40bf299f4",
+      "target": 2
+    },
+    {
+      "group": "k1n47",
+      "measured_rho_ns_per_step": 110.4859131253362,
+      "measured_rho_over_strong": 0.7918610022420315,
+      "price": "runs/k1n47/T03-R1.price.json",
+      "price_sha256": "7e9fb455080d158e19f17a2a11b48e7f8ef9d9407face327197b72affdc8bbbe",
+      "same_target": true,
+      "strong": "runs/reference/k1n47/T03.strong.json",
+      "strong_ns_per_step": 139.5269028434441,
+      "strong_sha256": "d4479fb568b1f9cc511294b6bf61278e3f044a283c15ebee77a918e99f46e459",
+      "target": 3
+    },
+    {
+      "group": "k1n47",
+      "measured_rho_ns_per_step": 132.13100681049673,
+      "measured_rho_over_strong": 0.6678073030471277,
+      "price": "runs/k1n47/T04-R1.price.json",
+      "price_sha256": "177d0ff6b8457026ada9778671c8181acf43755b14511666d46f652c332d4b47",
+      "same_target": true,
+      "strong": "runs/reference/k1n47/T04-retry1.strong.json",
+      "strong_ns_per_step": 197.85798419334168,
+      "strong_sha256": "9d3e759c70359fea53945098fcdedee62f7fcadddd883c36cef723ffca0e5e4c",
+      "target": 4
+    },
+    {
+      "group": "k1n47",
+      "measured_rho_ns_per_step": 116.16270461891357,
+      "measured_rho_over_strong": 0.5791476015299261,
+      "price": "runs/k1n47/T05-R1.price.json",
+      "price_sha256": "86486b900d2f57ae12b4e63797bf329eaf539db9c562a7ae1e1d80ec71179f91",
+      "same_target": true,
+      "strong": "runs/reference/k1n47/T05.strong.json",
+      "strong_ns_per_step": 200.57530120481928,
+      "strong_sha256": "a68bdb96f872dbb67af166b069414d6fd446c808f1ded478c7fb2ef89b21dcfd",
+      "target": 5
+    },
+    {
+      "group": "k1n47",
+      "measured_rho_ns_per_step": 110.88849010933978,
+      "measured_rho_over_strong": 0.6220432272141905,
+      "price": "runs/k1n47/T06-R1.price.json",
+      "price_sha256": "699366f385d8bb29ae43f2c712045bc8febd67c407d33422624a889f7464a8cc",
+      "same_target": true,
+      "strong": "runs/reference/k1n47/T06.strong.json",
+      "strong_ns_per_step": 178.2649263877559,
+      "strong_sha256": "6bdf04760f7596ffc7fd5d61a0eea4065bde37f6a3420d3e095df65ca7b08fab",
+      "target": 6
+    },
+    {
+      "group": "k1n47",
+      "measured_rho_ns_per_step": 111.94972741270965,
+      "measured_rho_over_strong": 0.8167369903087336,
+      "price": "runs/k1n47/T07-R1.price.json",
+      "price_sha256": "ebf0da265bc3bfe0d22c53ef3c5356892247449cfd4aaf1071bf1b75a6dd0204",
+      "same_target": true,
+      "strong": "runs/reference/k1n47/T07.strong.json",
+      "strong_ns_per_step": 137.06949573863636,
+      "strong_sha256": "3abbbb5f6ebdfffecb67e484c6f0504bd57f84fd212f3ca532fe5f35e28a6dc7",
+      "target": 7
+    },
+    {
+      "group": "k1n47",
+      "measured_rho_ns_per_step": 109.93382458353643,
+      "measured_rho_over_strong": 0.7303387915834832,
+      "price": "runs/k1n47/T08-R1.price.json",
+      "price_sha256": "fc561e4314ce4f35915d76b31f401342e86edaeb6fc3718496af3d1f4c68efc4",
+      "same_target": true,
+      "strong": "runs/reference/k1n47/T08.strong.json",
+      "strong_ns_per_step": 150.52442215917839,
+      "strong_sha256": "9b35945d6d36484b380043937584298ef3e3b14ebdd007c15e6203c44eadff90",
+      "target": 8
+    },
+    {
+      "group": "k0n57",
+      "measured_rho_ns_per_step": 120.1171087855926,
+      "measured_rho_over_strong": 0.5539976020516808,
+      "price": "runs/k0n57/T01-R1.price.json",
+      "price_sha256": "03d582648c4cd67b3b3fdd3d44012e67b2c2d9d750a1cf1304839e8040627f27",
+      "same_target": true,
+      "strong": "runs/reference/k0n57/T01.strong.json",
+      "strong_ns_per_step": 216.8188243789316,
+      "strong_sha256": "e8aafc23046de2ef7072365da8aaf93033dc24f704eb1bc37ca658116909e1ce",
+      "target": 1
+    },
+    {
+      "group": "k0n57",
+      "measured_rho_ns_per_step": 126.08008171603677,
+      "measured_rho_over_strong": 0.8726292415028746,
+      "price": "runs/k0n57/T02-R1.price.json",
+      "price_sha256": "a05f6b43c612c7f702eb5055bf43d43471f9218cf6e86eb3fbcf6524dce30f33",
+      "same_target": true,
+      "strong": "runs/reference/k0n57/T02.strong.json",
+      "strong_ns_per_step": 144.48298970465046,
+      "strong_sha256": "623dd851b6f3612ddde2dceb1fe7994eea4b52b01fccde8367cda19e60e55aa8",
+      "target": 2
+    },
+    {
+      "group": "k0n57",
+      "measured_rho_ns_per_step": 120.72713788732774,
+      "measured_rho_over_strong": 0.8318628975044057,
+      "price": "runs/k0n57/T03-R1.price.json",
+      "price_sha256": "9881502a7953a863483bcc54e40a4ea471fddbab4c81dc6c340cb62d67ab5945",
+      "same_target": true,
+      "strong": "runs/reference/k0n57/T03.strong.json",
+      "strong_ns_per_step": 145.12864830191367,
+      "strong_sha256": "a0fdd9729264afd17432c2a13dcfddf7c14b5fce90db10f70cd322cbfef8978f",
+      "target": 3
+    },
+    {
+      "group": "k0n57",
+      "measured_rho_ns_per_step": 118.51765351803361,
+      "measured_rho_over_strong": 0.6352939333804078,
+      "price": "runs/k0n57/T04-R1.price.json",
+      "price_sha256": "bf8e888e46e603774fd9ff5824b6552441fbe7dd8cf331891554710846ab7a01",
+      "same_target": true,
+      "strong": "runs/reference/k0n57/T04-retry1.strong.json",
+      "strong_ns_per_step": 186.55561983316846,
+      "strong_sha256": "dd41c935f308358bb68726a3654abbb5af5e21af70f325f69f5e1ea98dbda58d",
+      "target": 4
+    },
+    {
+      "group": "k0n57",
+      "measured_rho_ns_per_step": 190.7823411482987,
+      "measured_rho_over_strong": 1.3191170616181895,
+      "price": "runs/k0n57/T05-R1.price.json",
+      "price_sha256": "49cc08557fd8e7343b6e0c69e6178350a21050e26ab35fd58f506f76a4b7fd2d",
+      "same_target": true,
+      "strong": "runs/reference/k0n57/T05.strong.json",
+      "strong_ns_per_step": 144.62881778987975,
+      "strong_sha256": "0a3ac30463925c73e1b5db199401347bc4d819ef4e64beb2733ea63408c760fc",
+      "target": 5
+    },
+    {
+      "group": "k0n57",
+      "measured_rho_ns_per_step": 135.64551731089048,
+      "measured_rho_over_strong": 0.9485374866966981,
+      "price": "runs/k0n57/T06-R1.price.json",
+      "price_sha256": "f4ca0a29749cb6fede232ddf6e2f537cd85dc4ff55cfa3edf08adb46e28c5420",
+      "same_target": true,
+      "strong": "runs/reference/k0n57/T06.strong.json",
+      "strong_ns_per_step": 143.0049093613357,
+      "strong_sha256": "b73635e2ce076c726dc81f0773986fe1740733344bf0bf0ba44e9d74b138e2c9",
+      "target": 6
+    },
+    {
+      "group": "k0n57",
+      "measured_rho_ns_per_step": 120.98989578163771,
+      "measured_rho_over_strong": 0.842307671849371,
+      "price": "runs/k0n57/T07-R1.price.json",
+      "price_sha256": "430179494afa35e2ba7c4492ff1debe8213cd435bc26e23c1191b78fc2d6e67d",
+      "same_target": true,
+      "strong": "runs/reference/k0n57/T07.strong.json",
+      "strong_ns_per_step": 143.64097564966048,
+      "strong_sha256": "47a407b01298d8a6d44215fa87f1976d3b9611f16d39118314ca4759ba8ca5e5",
+      "target": 7
+    },
+    {
+      "group": "k0n57",
+      "measured_rho_ns_per_step": 124.78394072887465,
+      "measured_rho_over_strong": 0.6036050536088083,
+      "price": "runs/k0n57/T08-R1.price.json",
+      "price_sha256": "a3576d0b3ce0aa370ce2a590ef7e1cc46614ddbebb3da64479cf46fc389ab35d",
+      "same_target": true,
+      "strong": "runs/reference/k0n57/T08.strong.json",
+      "strong_ns_per_step": 206.7311066778214,
+      "strong_sha256": "ca7d88e1454a4b7136701802ab1af8ae836032780b115c34cf129cef4c6d39d9",
+      "target": 8
+    },
+    {
+      "group": "k0n41",
+      "measured_rho_ns_per_step": 102.35754899625618,
+      "measured_rho_over_strong": 0.7455765365718162,
+      "price": "runs/k0n41/T01-R1.price.json",
+      "price_sha256": "8590c85372e1f60e3eb8554aa4b91f878c99376ceda24e4ea0b012f5a6a29ae1",
+      "same_target": true,
+      "strong": "runs/reference/k0n41/T01.strong.json",
+      "strong_ns_per_step": 137.2864407280027,
+      "strong_sha256": "31d3de191afd1237b723587809e38db035e925b1d3c892ef19ab58e5771203f8",
+      "target": 1
+    },
+    {
+      "group": "k0n41",
+      "measured_rho_ns_per_step": 131.77073812287844,
+      "measured_rho_over_strong": 0.8704231585241707,
+      "price": "runs/k0n41/T02-R1.price.json",
+      "price_sha256": "58570dc799c48ebe26adb1a47be583ea96683707742c20049bb0308f055de70e",
+      "same_target": true,
+      "strong": "runs/reference/k0n41/T02.strong.json",
+      "strong_ns_per_step": 151.3869855511425,
+      "strong_sha256": "5ca9e3cff9462fe85e971c5fbe2192f589f4868791592e5ffcdcc312c65e1771",
+      "target": 2
+    },
+    {
+      "group": "k0n41",
+      "measured_rho_ns_per_step": 103.42704393115422,
+      "measured_rho_over_strong": 0.5596508322848207,
+      "price": "runs/k0n41/T03-R1.price.json",
+      "price_sha256": "0d58b68bf699e22954d081295ea1e594df6779d550fabd993124cc91bbe6c69f",
+      "same_target": true,
+      "strong": "runs/reference/k0n41/T03.strong.json",
+      "strong_ns_per_step": 184.8063792005897,
+      "strong_sha256": "891c4cd9f9e9f719435cc5dd19ddb375c5d912793b4f8605c3ebaccb2c3ad4ed",
+      "target": 3
+    },
+    {
+      "group": "k0n41",
+      "measured_rho_ns_per_step": 149.85103721823734,
+      "measured_rho_over_strong": 1.0832936116075695,
+      "price": "runs/k0n41/T04-R1.price.json",
+      "price_sha256": "441e3007b77d7c462dbdfc4b2b0f493dd77433d62f89e4a10078022f11a18fed",
+      "same_target": true,
+      "strong": "runs/reference/k0n41/T04.strong.json",
+      "strong_ns_per_step": 138.3291063591372,
+      "strong_sha256": "c1557f606e4745f668ca0a50b66676d0936bfd9783b0bfab266355701935041c",
+      "target": 4
+    },
+    {
+      "group": "k0n41",
+      "measured_rho_ns_per_step": 105.47968682035668,
+      "measured_rho_over_strong": 0.7901611167369391,
+      "price": "runs/k0n41/T05-R1.price.json",
+      "price_sha256": "805c3ef156bbda2c4c67e487522e1e5790cfe9d124c558279309fc43805035de",
+      "same_target": true,
+      "strong": "runs/reference/k0n41/T05.strong.json",
+      "strong_ns_per_step": 133.49136598362006,
+      "strong_sha256": "20f736e182c1f55c800869310fd064c581e2ce6233a42bec64a4d3a2d7a8295d",
+      "target": 5
+    },
+    {
+      "group": "k0n41",
+      "measured_rho_ns_per_step": 104.02148248012398,
+      "measured_rho_over_strong": 0.7774668012293395,
+      "price": "runs/k0n41/T06-R1.price.json",
+      "price_sha256": "65c0f16d6a36d39d92fae02a317932037b12e539cc4e0a31ee68d341e7ff5b57",
+      "same_target": true,
+      "strong": "runs/reference/k0n41/T06.strong.json",
+      "strong_ns_per_step": 133.79540105846834,
+      "strong_sha256": "86a7d378e7971ea59e0d76ec7e2066e4c3587d8888efb40f7f7ff7b1d56b168a",
+      "target": 6
+    },
+    {
+      "group": "k0n41",
+      "measured_rho_ns_per_step": 103.58495380554334,
+      "measured_rho_over_strong": 0.701559267013821,
+      "price": "runs/k0n41/T07-R1.price.json",
+      "price_sha256": "ccc3db0a28a5acfdf4d165d4fdec599216fe4c8554f3c512d7fcd47d6f021a4c",
+      "same_target": true,
+      "strong": "runs/reference/k0n41/T07.strong.json",
+      "strong_ns_per_step": 147.6496123363198,
+      "strong_sha256": "35300fdc697cdbaf52824c5e7bd6ef96b57707dd5d792e48582640ae4613dd0a",
+      "target": 7
+    },
+    {
+      "group": "k0n41",
+      "measured_rho_ns_per_step": 108.60272489290814,
+      "measured_rho_over_strong": 0.7715336412306898,
+      "price": "runs/k0n41/T08-R1.price.json",
+      "price_sha256": "24796076afa170692cad6c0b6a14fd96a770aa443f6fdd9c25eaf7984a08f2d2",
+      "same_target": true,
+      "strong": "runs/reference/k0n41/T08.strong.json",
+      "strong_ns_per_step": 140.762138018601,
+      "strong_sha256": "e4732dc5ae597d200e515012a318d7e318f78751ef3237b80b818a09e3b0bdb3",
+      "target": 8
+    },
+    {
+      "group": "k0n53",
+      "measured_rho_ns_per_step": 124.15099695436896,
+      "measured_rho_over_strong": 0.8435946258300112,
+      "price": "runs/k0n53/T01-R1.price.json",
+      "price_sha256": "627436090f42615160a3bb83dfe498d80e3c26972a37076aff6383687c096f96",
+      "same_target": true,
+      "strong": "runs/reference/k0n53/T01.strong.json",
+      "strong_ns_per_step": 147.16902307458042,
+      "strong_sha256": "ea892fee7f3dcb9e2561959e8c6f0049abd0e0199597f2e930bd376ca664bc87",
+      "target": 1
+    },
+    {
+      "group": "k0n53",
+      "measured_rho_ns_per_step": 110.93814855786094,
+      "measured_rho_over_strong": 0.7992375545952324,
+      "price": "runs/k0n53/T02-R1.price.json",
+      "price_sha256": "dffaf11d792f9fedb39dd1d8d9bea56cba159d40d2839b728c2efa052d1f1238",
+      "same_target": true,
+      "strong": "runs/reference/k0n53/T02-retry1.strong.json",
+      "strong_ns_per_step": 138.80497471624028,
+      "strong_sha256": "f313105fcd745025ffe1672c0f8580ad27068991a2b6d513f67914be3a5620e0",
+      "target": 2
+    },
+    {
+      "group": "k0n53",
+      "measured_rho_ns_per_step": 131.8087856826789,
+      "measured_rho_over_strong": 0.9288968524213133,
+      "price": "runs/k0n53/T03-R1.price.json",
+      "price_sha256": "8eaa163d9fdb873f8708b4641e980d70d47fc34ff6db7421a0f37642179224ee",
+      "same_target": true,
+      "strong": "runs/reference/k0n53/T03.strong.json",
+      "strong_ns_per_step": 141.89819390505943,
+      "strong_sha256": "a97c2c476a5872f4daeb14f0f3a48b1186b3784799b6a1debda812b16e5ac345",
+      "target": 3
+    },
+    {
+      "group": "k0n53",
+      "measured_rho_ns_per_step": 127.20523851431598,
+      "measured_rho_over_strong": 0.8640960801667132,
+      "price": "runs/k0n53/T04-R1.price.json",
+      "price_sha256": "8de4b39004e5b15c65dd80bc43483db19ecc721a6ec20fb49935edfac50eb734",
+      "same_target": true,
+      "strong": "runs/reference/k0n53/T04.strong.json",
+      "strong_ns_per_step": 147.2119147789373,
+      "strong_sha256": "5acfdc81e82ee6a77a925c737a0b6682d1009b41fddde83974f5dbddbf2108d2",
+      "target": 4
+    },
+    {
+      "group": "k0n53",
+      "measured_rho_ns_per_step": 120.6966849759848,
+      "measured_rho_over_strong": 0.8865682088831114,
+      "price": "runs/k0n53/T05-R1.price.json",
+      "price_sha256": "b6cf5baabbd378b0a489f28aada15498eca2893317e992335cf418b907461616",
+      "same_target": true,
+      "strong": "runs/reference/k0n53/T05.strong.json",
+      "strong_ns_per_step": 136.1391980522707,
+      "strong_sha256": "859bcc89cc6ce2eea54290a4f1eb8644f6a7261c6d668a1d08e2bcf92a53c59e",
+      "target": 5
+    },
+    {
+      "group": "k0n53",
+      "measured_rho_ns_per_step": 108.97908139256128,
+      "measured_rho_over_strong": 0.775343946689581,
+      "price": "runs/k0n53/T06-R1.price.json",
+      "price_sha256": "bfa629c7749185ba37c34ebc5ddc5d94a68ea8370c675168c13816ba1b2da93d",
+      "same_target": true,
+      "strong": "runs/reference/k0n53/T06.strong.json",
+      "strong_ns_per_step": 140.55579057250637,
+      "strong_sha256": "d8d798dcc2713a066ccc59d17ac718b995bc3b193f10ffe4d8766c0345dfecdd",
+      "target": 6
+    },
+    {
+      "group": "k0n53",
+      "measured_rho_ns_per_step": 106.45225677717919,
+      "measured_rho_over_strong": 0.5140872282304682,
+      "price": "runs/k0n53/T07-R1.price.json",
+      "price_sha256": "c07f00f3b2d109c4e8756a2ec4a13813b7a6785f56b999cd8f4f7427e501f679",
+      "same_target": true,
+      "strong": "runs/reference/k0n53/T07.strong.json",
+      "strong_ns_per_step": 207.07041710333263,
+      "strong_sha256": "7b6bf58485deffa4acfe1ba76504be22ae42756c153d5792b19eee7f6e992eaf",
+      "target": 7
+    },
+    {
+      "group": "k0n53",
+      "measured_rho_ns_per_step": 119.05577940930976,
+      "measured_rho_over_strong": 0.6890180741447498,
+      "price": "runs/k0n53/T08-R1.price.json",
+      "price_sha256": "9992f8e4bfa7699012532f8f5276cde50d5f6aabd5281057fa2c2221f778e7d0",
+      "same_target": true,
+      "strong": "runs/reference/k0n53/T08.strong.json",
+      "strong_ns_per_step": 172.79050271226757,
+      "strong_sha256": "dfa447f2333902f52f4d5abb7b060bc2c01bbaa9623cd864dac546affba28f84",
+      "target": 8
+    },
+    {
+      "group": "k1n59",
+      "measured_rho_ns_per_step": 106.60326627704923,
+      "measured_rho_over_strong": 0.56536723483304,
+      "price": "runs/k1n59/T01-R1.price.json",
+      "price_sha256": "ad5b4803014a6d6164bcc202ee25faab771a3746b9046ad7a25a29eb6d368af9",
+      "same_target": true,
+      "strong": "runs/reference/k1n59/T01.strong.json",
+      "strong_ns_per_step": 188.5557911903588,
+      "strong_sha256": "dd39613586a2553d93f41b5bcbd8b86eb8ccbc1f786ce04d6a6add9e825f4693",
+      "target": 1
+    },
+    {
+      "group": "k1n59",
+      "measured_rho_ns_per_step": 115.14033959711281,
+      "measured_rho_over_strong": 0.8082412707200913,
+      "price": "runs/k1n59/T02-R1.price.json",
+      "price_sha256": "7c031ffbcbc45575c1194ad36a0fca4a30a7ef0a5dec602359ac1d7724bb3a87",
+      "same_target": true,
+      "strong": "runs/reference/k1n59/T02.strong.json",
+      "strong_ns_per_step": 142.457882031352,
+      "strong_sha256": "37aa9660909ed60d27c5a31230efa13d7a4c8026c02dabf0d3ca17932944bb6f",
+      "target": 2
+    },
+    {
+      "group": "k1n59",
+      "measured_rho_ns_per_step": 106.60251193846533,
+      "measured_rho_over_strong": 0.749712063417706,
+      "price": "runs/k1n59/T03-R1.price.json",
+      "price_sha256": "9c58201160e45ec58c684dcbb92a0eb97102bc103a17544317a9eb9418efbe48",
+      "same_target": true,
+      "strong": "runs/reference/k1n59/T03.strong.json",
+      "strong_ns_per_step": 142.19127200981316,
+      "strong_sha256": "883cd81e283f276269f0d1639370b204fd2f6bad43b966e38bc7a1754e81a509",
+      "target": 3
+    },
+    {
+      "group": "k1n59",
+      "measured_rho_ns_per_step": 111.89962259536918,
+      "measured_rho_over_strong": 0.7652753561537902,
+      "price": "runs/k1n59/T04-R1.price.json",
+      "price_sha256": "ed853c033233439ef620653961e6a8fc9b978667d25769e12c4e2d6c3f386645",
+      "same_target": true,
+      "strong": "runs/reference/k1n59/T04.strong.json",
+      "strong_ns_per_step": 146.22138514660568,
+      "strong_sha256": "7ce8d987ea7c3f3daae3eb5e32c18fcc1983a146f8e774f8a5700faffb65665d",
+      "target": 4
+    },
+    {
+      "group": "k1n59",
+      "measured_rho_ns_per_step": 109.33620456251901,
+      "measured_rho_over_strong": 0.6458084018462709,
+      "price": "runs/k1n59/T05-R1.price.json",
+      "price_sha256": "5f05270b3a81ffd20d7e2f9a616932b2e73f7296ecfd431c887d9dfec02bca89",
+      "same_target": true,
+      "strong": "runs/reference/k1n59/T05-retry1.strong.json",
+      "strong_ns_per_step": 169.30130399348002,
+      "strong_sha256": "9156388ed12cf9749ea105d4c7724d47050d0032fb5d5a72728d6e6c86b78cb6",
+      "target": 5
+    },
+    {
+      "group": "k1n59",
+      "measured_rho_ns_per_step": 105.09722474967512,
+      "measured_rho_over_strong": 0.6785423786908887,
+      "price": "runs/k1n59/T06-R1.price.json",
+      "price_sha256": "1f3a9b278e0193d7936a9f91f87b86b9eb2dd954e964c146e217400649e141a5",
+      "same_target": true,
+      "strong": "runs/reference/k1n59/T06.strong.json",
+      "strong_ns_per_step": 154.88675143981297,
+      "strong_sha256": "a582bfcdb781968b2b10ddd7f4ef8673525ba59e074728162eee05215078cf2a",
+      "target": 6
+    },
+    {
+      "group": "k1n59",
+      "measured_rho_ns_per_step": 117.05657385332138,
+      "measured_rho_over_strong": 0.6190126689870176,
+      "price": "runs/k1n59/T07-R1.price.json",
+      "price_sha256": "52ff5c37453fc9ce3239bf9160e5d959eda4eac6e5cdff1262262bcc5db9529a",
+      "same_target": true,
+      "strong": "runs/reference/k1n59/T07.strong.json",
+      "strong_ns_per_step": 189.10206481699066,
+      "strong_sha256": "bfa52161ec0d50ad86338aedca80efba222ff76f57996eb21afe62956c80aac3",
+      "target": 7
+    },
+    {
+      "group": "k1n59",
+      "measured_rho_ns_per_step": 113.12533576814326,
+      "measured_rho_over_strong": 0.6969697994877159,
+      "price": "runs/k1n59/T08-R1.price.json",
+      "price_sha256": "487d9e7ea01871613e729fefb1843ced90a2110354001927025da1d916217b50",
+      "same_target": true,
+      "strong": "runs/reference/k1n59/T08.strong.json",
+      "strong_ns_per_step": 162.31024048860112,
+      "strong_sha256": "2b7ed840ff32dba3de1a23e35b9a11caecda7783e945397abe8638782fd75d46",
+      "target": 8
+    },
+    {
+      "group": "k0n61",
+      "measured_rho_ns_per_step": 108.48883088555804,
+      "measured_rho_over_strong": 0.7301116375400019,
+      "price": "runs/k0n61/T01-R1.price.json",
+      "price_sha256": "a77c79e413455e45423895ceeedf9cde45bcb368d8a9b3e6814dd0c6e3992823",
+      "same_target": true,
+      "strong": "runs/reference/k0n61/T01.strong.json",
+      "strong_ns_per_step": 148.59211291453232,
+      "strong_sha256": "1f102d95c1e58a62e6610cdbf89b24af74f0d84c5e4a694d1cbc15fcde3f8887",
+      "target": 1
+    },
+    {
+      "group": "k0n61",
+      "measured_rho_ns_per_step": 110.06091025667895,
+      "measured_rho_over_strong": 0.6500608951119726,
+      "price": "runs/k0n61/T02-R1.price.json",
+      "price_sha256": "6217b921be3208f9a414f879ab17952001c6a30edcda47799587889f00ad374d",
+      "same_target": true,
+      "strong": "runs/reference/k0n61/T02.strong.json",
+      "strong_ns_per_step": 169.30861567626064,
+      "strong_sha256": "177ffc8406edab61137982a96b6c54375e76a08c603bc2d256dfa88ca6fe9248",
+      "target": 2
+    },
+    {
+      "group": "k0n61",
+      "measured_rho_ns_per_step": 117.28124289760848,
+      "measured_rho_over_strong": 0.765746752709178,
+      "price": "runs/k0n61/T03-R1.price.json",
+      "price_sha256": "42afef78ff9aec7cb4c86c51115a2214f2a39a677a69ca089d95cab53411b19f",
+      "same_target": true,
+      "strong": "runs/reference/k0n61/T03.strong.json",
+      "strong_ns_per_step": 153.15930819513454,
+      "strong_sha256": "a5c7e4901320a86a89a96bc7c3f78d3a3dd6f8e44a3b095461a6431780217354",
+      "target": 3
+    },
+    {
+      "group": "k0n61",
+      "measured_rho_ns_per_step": 115.48772083864469,
+      "measured_rho_over_strong": 0.77977639624193,
+      "price": "runs/k0n61/T04-R1.price.json",
+      "price_sha256": "676e2acc0713961ce16abbb267c2c2ae83157c6cf74bfc81cf95b497002e963e",
+      "same_target": true,
+      "strong": "runs/reference/k0n61/T04.strong.json",
+      "strong_ns_per_step": 148.10363765206094,
+      "strong_sha256": "fcffdd2dd9d59414e2dbe64abdb19281543534ae6e6e8e805a42987fca5c54d7",
+      "target": 4
+    },
+    {
+      "group": "k0n61",
+      "measured_rho_ns_per_step": 109.05798465585055,
+      "measured_rho_over_strong": 0.6906297902957448,
+      "price": "runs/k0n61/T05-R1.price.json",
+      "price_sha256": "ea0485357656b6d33034d5f9463fc930699a87429a62dcc04108b90eb28306ea",
+      "same_target": true,
+      "strong": "runs/reference/k0n61/T05.strong.json",
+      "strong_ns_per_step": 157.91091868358185,
+      "strong_sha256": "c76f4809ccfa7152fd47d79bb2b5579a71fb030626adfe6648cb8f9028cb3d53",
+      "target": 5
+    },
+    {
+      "group": "k0n61",
+      "measured_rho_ns_per_step": 112.8192434785944,
+      "measured_rho_over_strong": 0.6437427246968819,
+      "price": "runs/k0n61/T06-R1.price.json",
+      "price_sha256": "d11e68941fbe3a36995060b8e181d699d29681615b974d387ec7f2d255f354f7",
+      "same_target": true,
+      "strong": "runs/reference/k0n61/T06.strong.json",
+      "strong_ns_per_step": 175.25517438929882,
+      "strong_sha256": "9254856b289f4858f89b06f50e3b4a29ce6a48fa7fa5b460ab2310d1d000e3d1",
+      "target": 6
+    },
+    {
+      "group": "k0n61",
+      "measured_rho_ns_per_step": 125.33490893752172,
+      "measured_rho_over_strong": 0.69972430915531,
+      "price": "runs/k0n61/T07-R1.price.json",
+      "price_sha256": "2567c0a114f3c369914c2fb4a8a196840752a762092b50acfcaf94c2a4179d67",
+      "same_target": true,
+      "strong": "runs/reference/k0n61/T07.strong.json",
+      "strong_ns_per_step": 179.12041542307276,
+      "strong_sha256": "7cde368833491e4eaf556bfbd54260772f772154b52789425d25e84cff4a0171",
+      "target": 7
+    },
+    {
+      "group": "k0n61",
+      "measured_rho_ns_per_step": 107.15415539487542,
+      "measured_rho_over_strong": 0.7219120671439108,
+      "price": "runs/k0n61/T08-R1.price.json",
+      "price_sha256": "b11468581a3b22f9a85440558997ef40febd9eb47032bc47d5ac20c6e2e3a801",
+      "same_target": true,
+      "strong": "runs/reference/k0n61/T08.strong.json",
+      "strong_ns_per_step": 148.43103512427447,
+      "strong_sha256": "4828a4f4ceb746a918a071dcec4c6b408c25e1d33fc81803a6e9418efb915008",
+      "target": 8
+    }
+  ]
+}

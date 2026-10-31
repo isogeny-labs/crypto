@@ -1,0 +1,575 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-21T06:08:02Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "PersistentVolumeClaim",
+                "name": "ecbench-criu-restored",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "721261",
+                "uid": "9e1c8983-de9c-467b-88da-32f2ad77f13c"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-21T06:08:02Z",
+            "message": "waiting for first consumer to be created before binding",
+            "metadata": {
+                "creationTimestamp": "2026-10-21T06:08:02Z",
+                "name": "ecbench-criu-restored.18e07671c2d838ef",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "721262",
+                "uid": "b662137e-72db-4c85-a961-32a116f8ee85"
+            },
+            "reason": "WaitForFirstConsumer",
+            "reportingComponent": "persistentvolume-controller",
+            "reportingInstance": "",
+            "source": {
+                "component": "persistentvolume-controller"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-21T06:08:02Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "ecbench-criu-restored",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "721263",
+                "uid": "f9b932be-c77c-4d9f-a1b9-85163fb59157"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-21T06:08:02Z",
+            "message": "0/6 nodes are available: 2 node(s) didn't match Pod's node affinity/selector, 4 node(s) had untolerated taint(s). no new claims to deallocate, preemption: 0/6 nodes are available: 6 Preemption is not helpful for scheduling.",
+            "metadata": {
+                "creationTimestamp": "2026-10-21T06:08:02Z",
+                "name": "ecbench-criu-restored.18e07671c4f18d7a",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "721264",
+                "uid": "79312fc8-7983-4967-ac78-ce6d75ead581"
+            },
+            "reason": "FailedScheduling",
+            "reportingComponent": "default-scheduler",
+            "reportingInstance": "",
+            "source": {
+                "component": "default-scheduler"
+            },
+            "type": "Warning"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-21T06:08:04Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "ecbench-criu-restored",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "721265",
+                "uid": "f9b932be-c77c-4d9f-a1b9-85163fb59157"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-21T06:08:04Z",
+            "message": "Pod should schedule on: nodeclaim/cpu-spot-khf7p",
+            "metadata": {
+                "creationTimestamp": "2026-10-21T06:08:04Z",
+                "name": "ecbench-criu-restored.18e0767212f88fec",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "721274",
+                "uid": "f83a6037-ba1a-43a5-8b51-f0098361d18a"
+            },
+            "reason": "Nominated",
+            "reportingComponent": "karpenter",
+            "reportingInstance": "",
+            "source": {
+                "component": "karpenter"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-21T06:08:06Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "ecbench-criu-restored",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "721265",
+                "uid": "f9b932be-c77c-4d9f-a1b9-85163fb59157"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-21T06:08:06Z",
+            "message": "NodeClaim cpu-spot-khf7p nominated for this pod failed to launch: creating instance, insufficient capacity, with fleet error(s), MaxSpotInstanceCountExceeded: Max spot instance count exceeded; UnfulfillableCapacity: Unable to fulfill capacity due to your request configuration. Please adjust your request and try again. (aws-error-code=UnfulfillableCapacity, aws-operation-name=CreateFleet, aws-request-id=25dc4ff9-ddfe-4359-b1f7-7067af4cb6da, aws-service-name=EC2, aws-status-code=200)",
+            "metadata": {
+                "creationTimestamp": "2026-10-21T06:08:07Z",
+                "name": "ecbench-criu-restored.18e07672c4e9f0e1",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "721294",
+                "uid": "ae5552fe-7fc5-4727-9658-c6cad697f9f2"
+            },
+            "reason": "InsufficientCapacityError",
+            "reportingComponent": "karpenter",
+            "reportingInstance": "",
+            "source": {
+                "component": "karpenter"
+            },
+            "type": "Warning"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 17,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-21T06:08:07Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "PersistentVolumeClaim",
+                "name": "ecbench-criu-restored",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "721261",
+                "uid": "9e1c8983-de9c-467b-88da-32f2ad77f13c"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-21T06:12:07Z",
+            "message": "waiting for pod ecbench-criu-restored to be scheduled",
+            "metadata": {
+                "creationTimestamp": "2026-10-21T06:08:07Z",
+                "name": "ecbench-criu-restored.18e07672c9887a39",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723151",
+                "uid": "81815122-c21c-4a30-9275-14557f2ae81e"
+            },
+            "reason": "WaitForPodScheduled",
+            "reportingComponent": "persistentvolume-controller",
+            "reportingInstance": "",
+            "source": {
+                "component": "persistentvolume-controller"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-21T06:08:14Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "ecbench-criu-restored",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "721265",
+                "uid": "f9b932be-c77c-4d9f-a1b9-85163fb59157"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-21T06:08:14Z",
+            "message": "Failed to schedule pod, all available instance types exceed limits for nodepool (NodePool=gha-on-demand-extra); all available instance types exceed limits for nodepool (NodePool=gha-on-demand); all available instance types exceed limits for nodepool (NodePool=gha-gates); no instance type met all requirements, requirements=isolab.dev/cpu-isolation In [v4], isolab.dev/pool In [cpu-spot], isolab.dev/role In [worker], karpenter.k8s.aws/ec2nodeclass In [cpu], karpenter.k8s.aws/instance-category In [c m r], karpenter.k8s.aws/instance-cpu In [16 32 8], karpenter.k8s.aws/instance-family NotIn [c7i-flex c8i-flex m7i-flex m8i-flex], karpenter.k8s.aws/instance-generation Exists \u003e=6, karpenter.sh/capacity-type In [spot], karpenter.sh/initialized In [true], karpenter.sh/nodepool In [cpu-spot], karpenter.sh/registered In [true], kubernetes.io/arch In [amd64], kubernetes.io/os In [linux], node.kubernetes.io/instance-type In [c8a.2xlarge], resources={\"cpu\":\"4180m\",\"memory\":\"4200Mi\",\"pods\":\"4\"}",
+            "metadata": {
+                "creationTimestamp": "2026-10-21T06:08:14Z",
+                "name": "ecbench-criu-restored.18e07674667788eb",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "721379",
+                "uid": "8696b1c3-4a4c-475b-a0cb-5ad71240d809"
+            },
+            "reason": "FailedScheduling",
+            "reportingComponent": "karpenter",
+            "reportingInstance": "",
+            "source": {
+                "component": "karpenter"
+            },
+            "type": "Warning"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-21T06:11:24Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "ecbench-criu-restored",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "721265",
+                "uid": "f9b932be-c77c-4d9f-a1b9-85163fb59157"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-21T06:11:24Z",
+            "message": "Pod should schedule on: nodeclaim/cpu-spot-28c2x",
+            "metadata": {
+                "creationTimestamp": "2026-10-21T06:11:24Z",
+                "name": "ecbench-criu-restored.18e076a0a869d3a8",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "722748",
+                "uid": "bff9da12-2a6c-4b8d-ad35-12add823182f"
+            },
+            "reason": "Nominated",
+            "reportingComponent": "karpenter",
+            "reportingInstance": "",
+            "source": {
+                "component": "karpenter"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 3,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-21T06:11:58Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "ecbench-criu-restored",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "721265",
+                "uid": "f9b932be-c77c-4d9f-a1b9-85163fb59157"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-21T06:11:59Z",
+            "message": "0/7 nodes are available: 2 node(s) didn't match Pod's node affinity/selector, 5 node(s) had untolerated taint(s). no new claims to deallocate, preemption: 0/7 nodes are available: 7 Preemption is not helpful for scheduling.",
+            "metadata": {
+                "creationTimestamp": "2026-10-21T06:11:58Z",
+                "name": "ecbench-criu-restored.18e076a8c1a392ec",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723066",
+                "uid": "0df2ffae-7e03-467c-852b-45af0235bfb8"
+            },
+            "reason": "FailedScheduling",
+            "reportingComponent": "default-scheduler",
+            "reportingInstance": "",
+            "source": {
+                "component": "default-scheduler"
+            },
+            "type": "Warning"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 5,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-21T06:12:07Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "PersistentVolumeClaim",
+                "name": "ecbench-criu-restored",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723165",
+                "uid": "9e1c8983-de9c-467b-88da-32f2ad77f13c"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-21T06:12:22Z",
+            "message": "External provisioner is provisioning volume for claim \"isolab-recovery-system/ecbench-criu-restored\"",
+            "metadata": {
+                "creationTimestamp": "2026-10-21T06:12:07Z",
+                "name": "ecbench-criu-restored.18e076aadadef11f",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723301",
+                "uid": "ebef97f3-3f82-4a12-b2b5-c2b5aeaf4e49"
+            },
+            "reason": "Provisioning",
+            "reportingComponent": "ebs.csi.aws.com_ebs-csi-controller-6c89866cf-txjj6_63c0fc10-58fa-431f-8081-c02dae6dabbf",
+            "reportingInstance": "",
+            "source": {
+                "component": "ebs.csi.aws.com_ebs-csi-controller-6c89866cf-txjj6_63c0fc10-58fa-431f-8081-c02dae6dabbf"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 2,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-21T06:12:07Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "PersistentVolumeClaim",
+                "name": "ecbench-criu-restored",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723165",
+                "uid": "9e1c8983-de9c-467b-88da-32f2ad77f13c"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-21T06:12:22Z",
+            "message": "Waiting for a volume to be created either by the external provisioner 'ebs.csi.aws.com' or manually by the system administrator. If volume creation is delayed, please verify that the provisioner is running and correctly registered.",
+            "metadata": {
+                "creationTimestamp": "2026-10-21T06:12:07Z",
+                "name": "ecbench-criu-restored.18e076aadae2011d",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723295",
+                "uid": "ed0173cb-44a4-4513-9dd8-36334fba5f22"
+            },
+            "reason": "ExternalProvisioning",
+            "reportingComponent": "persistentvolume-controller",
+            "reportingInstance": "",
+            "source": {
+                "component": "persistentvolume-controller"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 4,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-21T06:12:07Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "PersistentVolumeClaim",
+                "name": "ecbench-criu-restored",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723165",
+                "uid": "9e1c8983-de9c-467b-88da-32f2ad77f13c"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-21T06:12:14Z",
+            "message": "error generating accessibility requirements: no topology key found for node ip-10-84-96-204.us-east-2.compute.internal",
+            "metadata": {
+                "creationTimestamp": "2026-10-21T06:12:07Z",
+                "name": "ecbench-criu-restored.18e076aadc44c4ce",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723248",
+                "uid": "28704ba6-6de8-4bd2-933b-536a27c9ddce"
+            },
+            "reason": "ProvisioningFailed",
+            "reportingComponent": "ebs.csi.aws.com_ebs-csi-controller-6c89866cf-txjj6_63c0fc10-58fa-431f-8081-c02dae6dabbf",
+            "reportingInstance": "",
+            "source": {
+                "component": "ebs.csi.aws.com_ebs-csi-controller-6c89866cf-txjj6_63c0fc10-58fa-431f-8081-c02dae6dabbf"
+            },
+            "type": "Warning"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-21T06:12:25Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "PersistentVolumeClaim",
+                "name": "ecbench-criu-restored",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723165",
+                "uid": "9e1c8983-de9c-467b-88da-32f2ad77f13c"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-21T06:12:25Z",
+            "message": "Successfully provisioned volume pvc-9e1c8983-de9c-467b-88da-32f2ad77f13c",
+            "metadata": {
+                "creationTimestamp": "2026-10-21T06:12:25Z",
+                "name": "ecbench-criu-restored.18e076aee44e8d30",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723316",
+                "uid": "140abdeb-bc64-4e7a-9871-d2951a87fc94"
+            },
+            "reason": "ProvisioningSucceeded",
+            "reportingComponent": "ebs.csi.aws.com_ebs-csi-controller-6c89866cf-txjj6_63c0fc10-58fa-431f-8081-c02dae6dabbf",
+            "reportingInstance": "",
+            "source": {
+                "component": "ebs.csi.aws.com_ebs-csi-controller-6c89866cf-txjj6_63c0fc10-58fa-431f-8081-c02dae6dabbf"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-21T06:12:25Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "ecbench-criu-restored",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723021",
+                "uid": "f9b932be-c77c-4d9f-a1b9-85163fb59157"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-21T06:12:25Z",
+            "message": "Successfully assigned isolab-recovery-system/ecbench-criu-restored to ip-10-84-96-204.us-east-2.compute.internal",
+            "metadata": {
+                "creationTimestamp": "2026-10-21T06:12:25Z",
+                "name": "ecbench-criu-restored.18e076af0b7b9990",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723327",
+                "uid": "eea10a4e-4135-4952-9f21-9542774f1f15"
+            },
+            "reason": "Scheduled",
+            "reportingComponent": "default-scheduler",
+            "reportingInstance": "",
+            "source": {
+                "component": "default-scheduler"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-21T06:12:28Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "ecbench-criu-restored",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723326",
+                "uid": "f9b932be-c77c-4d9f-a1b9-85163fb59157"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-21T06:12:28Z",
+            "message": "AttachVolume.Attach succeeded for volume \"pvc-9e1c8983-de9c-467b-88da-32f2ad77f13c\" ",
+            "metadata": {
+                "creationTimestamp": "2026-10-21T06:12:28Z",
+                "name": "ecbench-criu-restored.18e076af950f4b61",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723345",
+                "uid": "ed1a2592-2e3e-40fe-b66a-a8642aa68b59"
+            },
+            "reason": "SuccessfulAttachVolume",
+            "reportingComponent": "attachdetach-controller",
+            "reportingInstance": "",
+            "source": {
+                "component": "attachdetach-controller"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-21T06:12:29Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "fieldPath": "spec.containers{supervisor}",
+                "kind": "Pod",
+                "name": "ecbench-criu-restored",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723326",
+                "uid": "f9b932be-c77c-4d9f-a1b9-85163fb59157"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-21T06:12:29Z",
+            "message": "Pulling image \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581\"",
+            "metadata": {
+                "creationTimestamp": "2026-10-21T06:12:29Z",
+                "name": "ecbench-criu-restored.18e076aff32c358a",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723367",
+                "uid": "b8dc538d-3197-44dd-949c-f32d549bc70c"
+            },
+            "reason": "Pulling",
+            "reportingComponent": "kubelet",
+            "reportingInstance": "ip-10-84-96-204.us-east-2.compute.internal",
+            "source": {
+                "component": "kubelet",
+                "host": "ip-10-84-96-204.us-east-2.compute.internal"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-21T06:12:32Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "fieldPath": "spec.containers{supervisor}",
+                "kind": "Pod",
+                "name": "ecbench-criu-restored",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723326",
+                "uid": "f9b932be-c77c-4d9f-a1b9-85163fb59157"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-21T06:12:32Z",
+            "message": "Successfully pulled image \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581\" in 2.44s (2.44s including waiting). Image size: 147174799 bytes.",
+            "metadata": {
+                "creationTimestamp": "2026-10-21T06:12:32Z",
+                "name": "ecbench-criu-restored.18e076b084a47808",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723378",
+                "uid": "1f15074e-5aad-49b1-986c-2710576c7323"
+            },
+            "reason": "Pulled",
+            "reportingComponent": "kubelet",
+            "reportingInstance": "ip-10-84-96-204.us-east-2.compute.internal",
+            "source": {
+                "component": "kubelet",
+                "host": "ip-10-84-96-204.us-east-2.compute.internal"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-21T06:12:32Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "fieldPath": "spec.containers{supervisor}",
+                "kind": "Pod",
+                "name": "ecbench-criu-restored",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723326",
+                "uid": "f9b932be-c77c-4d9f-a1b9-85163fb59157"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-21T06:12:32Z",
+            "message": "Container created",
+            "metadata": {
+                "creationTimestamp": "2026-10-21T06:12:32Z",
+                "name": "ecbench-criu-restored.18e076b085808442",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723379",
+                "uid": "5e09ed95-ed5c-469e-8ccb-5ce9999c1d70"
+            },
+            "reason": "Created",
+            "reportingComponent": "kubelet",
+            "reportingInstance": "ip-10-84-96-204.us-east-2.compute.internal",
+            "source": {
+                "component": "kubelet",
+                "host": "ip-10-84-96-204.us-east-2.compute.internal"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-21T06:12:32Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "fieldPath": "spec.containers{supervisor}",
+                "kind": "Pod",
+                "name": "ecbench-criu-restored",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723326",
+                "uid": "f9b932be-c77c-4d9f-a1b9-85163fb59157"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-21T06:12:32Z",
+            "message": "Container started",
+            "metadata": {
+                "creationTimestamp": "2026-10-21T06:12:32Z",
+                "name": "ecbench-criu-restored.18e076b0889e0b2e",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "723380",
+                "uid": "c9888669-ad54-4720-ad3b-dad5ceef5839"
+            },
+            "reason": "Started",
+            "reportingComponent": "kubelet",
+            "reportingInstance": "ip-10-84-96-204.us-east-2.compute.internal",
+            "source": {
+                "component": "kubelet",
+                "host": "ip-10-84-96-204.us-east-2.compute.internal"
+            },
+            "type": "Normal"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

@@ -240,3 +240,14 @@ which excludes word XORs on those curves.
   the reduced spec): `2245b75` `ECBS1hbe337273061b`, main `ECBS1h3d02b5ea6bf7`.
 - Conductor: the control plane could not be started (port 8080 in use), and
   its MCP endpoint later returned 401. No task card was taken.
+
+## `plan.json` restored (2026-10-21)
+
+The 12 committed sessions (`records/*`, `leaderboard_rerun/*`) were first
+committed without their `plan.json`. As a result, `ecbench verify` (CI job
+`evidence_audit_pr`) stopped with `No such file or directory`. Each plan is
+a pure function of its committed `spec.json`. I rebuilt them with
+`ecbench plan --spec <dir>/spec.json --doc > <dir>/plan.json`, which writes
+the same bytes `ecbench run` writes. All 12 hash to the `plan_sha256` that
+their `session.json` already pinned. None of the other files changed. Each
+session now passes `ecbench verify --replay 0 --allow-interrupted`.

@@ -1,6 +1,9 @@
 name: ic research framework
 on:
-  pull_request:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
     paths:
       - "src/bin/ic.rs"
       - "src/bin/ic/**"
@@ -14,12 +17,12 @@ permissions:
 # A newer push to the same pull request cancels this workflow's run for the older commit.
 # Every other event (push, schedule, dispatch) gets a group of its own and is never cancelled.
 concurrency:
-  group: ${{ github.event_name == 'pull_request' && github.workflow_ref || format('run-{0}', github.run_id) }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ${{ github.event_name == 'push' && github.workflow_ref || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 
 jobs:
   validate-cli:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-research.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-research.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-research.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-research.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     # A cold release build of `ic` alone takes about 6 minutes; whole runs
     # took 7-10 minutes in October 2026 and a 10-minute limit cancelled
     # passing runs mid-test.
@@ -27,10 +30,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+      - name: Install native zlib linker dependency
+        shell: bash
+        run: |
+          if ! command -v pkg-config >/dev/null || ! pkg-config --exists zlib; then
+            if [ "$(id -u)" -eq 0 ]; then
+              apt-get update
+              apt-get install -y --no-install-recommends pkg-config zlib1g-dev
+            else
+              sudo apt-get update
+              sudo apt-get install -y --no-install-recommends pkg-config zlib1g-dev
+            fi
+          fi
       - name: Build ic
-        run: cargo build --release --bin ic
+        run: cargo build --release --features ic-cli-contracts --bin ic
       - name: Parameter and synthetic pipeline checks
-        run: cargo test --release --test ic_framework --test ic_progress
+        env:
+          IC_TEST_BINARY: ${{ github.workspace }}/target/release/ic
+        # Run all three existing suites against the freshly built production CLI.
+        run: cargo test --release --features ic-cli-contracts --bin ic
       - name: Inspect supplied example documents
         run: |
           target/release/ic inspect --file docs/ic/prime-example.json --json

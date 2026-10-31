@@ -1,0 +1,7 @@
+ic-mitm: S over 12800 runs
+rho-neg: S over 12800 runs
+ic-mitm: relation yield over 12800 runs
+         ic-mitm               S: floor/crater 1.0390 90% [1.0083, 1.0719] p=0.0623 equiv=false | horizontal tau 0.0287 (null p95 0.0212) p=0.0020 maxz p=0.0500 | model tau 0.0559 (null p95 0.0369) p=0.0005 maxz p=0.0760
+         rho-neg               S: floor/crater 1.0222 90% [0.9839, 1.0641] p=0.2600 equiv=false | horizontal tau 0.0170 (null p95 0.0264) p=0.2929 maxz p=0.7206 | model tau 0.0262 (null p95 0.0462) p=0.7231 maxz p=0.4893
+         ic-mitm  relation_yield: floor/crater 1.0002 90% [0.9768, 1.0227] p=0.9887 equiv=true | horizontal tau 0.0034 (null p95 0.0137) p=0.5687 maxz p=0.2489 | model tau 0.0019 (null p95 0.0246) p=0.9635 maxz p=0.7746
+./target/release/volcano-stats --records $REC --curves $CUR --vertical  --n0   21.12s user 0.28s system 96% cpu 22.155 total

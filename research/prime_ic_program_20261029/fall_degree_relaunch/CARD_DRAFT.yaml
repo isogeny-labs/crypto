@@ -1,0 +1,132 @@
+# DRAFT cards (plan) for the prime fall-degree relaunch on the Iso Lab harness host.
+# Not lint-checked (tools/task_card.py lint was not run; no harness host here). Every `FILL:` is a
+# value the main session or experiment-director must supply before the card is frozen; a card
+# with any FILL left is a specification_error. Two cards: submit (card 1) and collect (card 2).
+#
+# Main-session steps BEFORE card 1 (not executor work; README §2.1):
+#   1. Owner decision on AMENDMENT_7_DRAFT.md; commit it, the proposed Dockerfile/entry.sh, and the
+#      scorer patch on the PR head. COMMIT=$(git rev-parse HEAD).
+#   2. docker build -f research/prime_ic_program_20261029/fall_degree_relaunch/proposed/Dockerfile \
+#        --build-arg SOURCE_REVISION=$COMMIT -t $ISOLAB_IMAGE_REPOSITORY:pfd-$COMMIT .
+#      docker push ...; DIGEST from `aws ecr describe-images --repository-name isolab/tasks`.
+#   3. Smoke test (must pass before freezing):
+#      docker run --rm --read-only --tmpfs /work --tmpfs /tmp --user 1000:1000 IMAGE /usr/local/bin/hky_fp_tower_check
+#        -> last line "G1: 6 cases pass"
+#      docker run --rm --read-only --tmpfs /work --tmpfs /tmp --user 1000:1000 IMAGE /usr/local/bin/pkm_tower_pilot \
+#        --p 2013265921 --ladder-t none --planted 0 --random 2 --kinds kummer --m 2 --controls tower \
+#        --t-min 2 --max-t 2 --engine hky --hky-cmax 7 --out /work/s.jsonl
+#        -> exit 0 (the d_F it prints is a smoke value, not a measurement; do not record it as one)
+#      docker run --rm IMAGE aws --version
+#   4. scripts/checkpoint.sh init; fill .resume/RESUME.md; scripts/checkpoint.sh push; scripts/checkpoint.sh gate -> 0.
+#   5. Substitute FILL_DIGEST, FILL_DATE and FILL_SECONDS_INTEGER in proposed/jobs/*.json; sha256sum them.
+---
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-prime_fall_degree_20261027-FILL_YYYYMMDD-1
+experiment_id: prime_fall_degree_20261027
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: FILL_40_CHAR_COMMIT
+receipt: research/prime_fall_degree_20261027/cards/CARD-prime_fall_degree_20261027-FILL_YYYYMMDD-1.receipt.json
+binds:
+  - {path: research/prime_fall_degree_20261027/PREREGISTRATION.md, sha256: FILL}
+  - {path: research/prime_fall_degree_20261027/run.sh, sha256: FILL}
+  - {path: research/prime_ic_program_20261029/fall_degree_relaunch/proposed/entry.sh, sha256: FILL}
+  - {path: research/prime_ic_program_20261029/fall_degree_relaunch/proposed/Dockerfile, sha256: FILL}
+  - {path: research/prime_ic_program_20261029/fall_degree_relaunch/proposed/jobs/pfd-a.json, sha256: FILL}
+  - {path: research/prime_ic_program_20261029/fall_degree_relaunch/proposed/jobs/pfd-c.json, sha256: FILL}
+must_not_exist: [research/prime_fall_degree_20261027/cards/receipts-FILL_YYYYMMDD-1]
+env_common: &env
+  AWS_REGION: us-east-2
+  ISOLAB_CLUSTER: isolab
+  ISOLAB_BUCKET: isolab-results-104186811093-us-east-2
+  KUBECONFIG: /home/ec2-user/ops/eks-isolab/kubeconfig
+  ISOLAB_KUBE_CONTEXT: i-01f85a6c905181498@isolab.us-east-2.eksctl.io
+  TMPDIR: /home/ec2-user/ops/eks-isolab/tmp
+commands:
+  - id: identity
+    argv: [aws, sts, get-caller-identity]
+    env: *env
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    expect_stdout_contains: '"Account": "104186811093"'
+  - id: ready
+    argv: [taskq/deploy/eks-karpenter/remote/check-ready]
+    env: *env
+    timeout_seconds: 120
+    success_exit_codes: [0]
+  - id: overview
+    argv: [/home/ec2-user/ops/eks-isolab/mcp/isolab-eks-mcp, call, isolab_k8s_overview, '{}']
+    env: *env
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    stdout: research/prime_fall_degree_20261027/cards/receipts-FILL_YYYYMMDD-1/overview.json
+    # Director check after the run, not an executor choice: no existing job named pfd-*-FILL_DATE-*.
+  - id: submit-a
+    argv: [/home/ec2-user/ops/eks-isolab/mcp/isolab-eks-mcp, call, isolab_k8s_run, 'FILL: exact contents of proposed/jobs/pfd-a.json after substitution']
+    env: *env
+    timeout_seconds: 300
+    success_exit_codes: [0]
+    stdout: research/prime_fall_degree_20261027/cards/receipts-FILL_YYYYMMDD-1/submit-a.json
+  - id: submit-c
+    argv: [/home/ec2-user/ops/eks-isolab/mcp/isolab-eks-mcp, call, isolab_k8s_run, 'FILL: exact contents of proposed/jobs/pfd-c.json after substitution']
+    env: *env
+    timeout_seconds: 300
+    success_exit_codes: [0]
+    stdout: research/prime_fall_degree_20261027/cards/receipts-FILL_YYYYMMDD-1/submit-c.json
+outputs_required:
+  - research/prime_fall_degree_20261027/cards/receipts-FILL_YYYYMMDD-1/submit-a.json
+  - research/prime_fall_degree_20261027/cards/receipts-FILL_YYYYMMDD-1/submit-c.json
+# On a submit timeout the executor stops; the main session checks the same job_name with
+# isolab_k8s_status before anything else (SKILL.md "Before launch" 2). No resubmission under a new name.
+#
+# Later cards, same shape (one submit each), only after the stated condition, which the director checks:
+#   - pfd-b.json        after job C has ended (pool holds two 14-vCPU pods).
+#   - pfd-x-t12-k*.json after job A's progress.txt shows "end g3 exit 0" AND Amendment 7 is committed.
+#   - pfd-x-t13-k*.json, pfd-x-t14-k*.json one at a time (112Gi each), same conditions.
+---
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-prime_fall_degree_20261027-FILL_YYYYMMDD-2
+experiment_id: prime_fall_degree_20261027
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: FILL_40_CHAR_COMMIT
+receipt: research/prime_fall_degree_20261027/cards/CARD-prime_fall_degree_20261027-FILL_YYYYMMDD-2.receipt.json
+must_not_exist: [research/prime_fall_degree_20261027/runs-eks/FILL_JOB_NAME]
+env_common: &env
+  AWS_REGION: us-east-2
+  ISOLAB_CLUSTER: isolab
+  ISOLAB_BUCKET: isolab-results-104186811093-us-east-2
+  KUBECONFIG: /home/ec2-user/ops/eks-isolab/kubeconfig
+  ISOLAB_KUBE_CONTEXT: i-01f85a6c905181498@isolab.us-east-2.eksctl.io
+  TMPDIR: /home/ec2-user/ops/eks-isolab/tmp
+commands:
+  - id: status
+    argv: [/home/ec2-user/ops/eks-isolab/mcp/isolab-eks-mcp, call, isolab_k8s_status, '{"job_name":"FILL_JOB_NAME"}']
+    env: *env
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    stdout: research/prime_fall_degree_20261027/runs-eks/FILL_JOB_NAME/status.json
+  - id: logs
+    argv: [/home/ec2-user/ops/eks-isolab/mcp/isolab-eks-mcp, call, isolab_k8s_logs, '{"job_name":"FILL_JOB_NAME"}']
+    env: *env
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    stdout: research/prime_fall_degree_20261027/runs-eks/FILL_JOB_NAME/logs.json
+  - id: results
+    argv: [/home/ec2-user/ops/eks-isolab/mcp/isolab-eks-mcp, call, isolab_k8s_results, '{"job_name":"FILL_JOB_NAME"}']
+    env: *env
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    stdout: research/prime_fall_degree_20261027/runs-eks/FILL_JOB_NAME/objects.json
+    # If objects.json has next_token, a further frozen command with {"job_name":..., "next_token":...} is FILL.
+  - id: download
+    argv: [aws, s3, sync, 's3://isolab-results-104186811093-us-east-2/runs/FILL_JOB_NAME/FILL_POD_UID/', research/prime_fall_degree_20261027/runs-eks/FILL_JOB_NAME/s3/]
+    env: *env
+    timeout_seconds: 1800
+    success_exit_codes: [0]
+# Director assess: status.json job.uid equals submit receipt; pod UID equals the S3 path segment;
+# the hash values in s3/binary.sha256 equal those in s3/build-binaries.sha256 and the hashes recorded at build; every
+# "end ... exit N" line in s3/progress.txt has N = 0; gates/g1.log ends "G1: 6 cases pass";
+# gates/g3.log reports ", 0 disagreements". Scoring (patched scorer) is main-session work.

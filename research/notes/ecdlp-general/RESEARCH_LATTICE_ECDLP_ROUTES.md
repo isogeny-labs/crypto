@@ -165,6 +165,25 @@ every basis that depends on `k` *is* `k`.
   (Coppersmith), and the LWE/NTRU lattice-cryptanalysis spine (BKZ 2.0,
   sieving, G6K), which is about lattice *problems*, not the ECDLP.
 
+- **Coppersmith on `S₃`, already measured (correction, 2026-10-23).** The
+  first version of this note missed three records, found while building the
+  §7 falsifier: `RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM.md` §3.2–§3.3
+  (Probe B: the JM basic lattice on `S₃` at 40 bits, "≥ 2 rows vanish" to
+  `δ = 0.12`–`0.14` and Howgrave-Graham to `0.10`; Probe C: extended shifts
+  and the symmetric `(e₁, e₂)` lattice, same threshold), §2.2's derived
+  `2/(m(m+1)d)` limits `1/6, 1/24, 1/80`, and
+  [`research/lit2026_w10_s5_coppersmith_20261011/`](../../lit2026_w10_s5_coppersmith_20261011/README.md)
+  (an exact min-cut optimiser over all monomial sets in the box, reproducing
+  `1/18, 1/10, 0.119` at `ℓ = 1, 2, 3` and the `1/6` limit for `S₃`, and
+  closing the `S₅` route at `1/80`). §6's `θ_m = 2/((m+1)·2^{m−1})` is the
+  same quantity as that `2/(m(m+1)d)` with `d = 2^{m−1}` and the per-variable
+  `β` doubled to the product exponent, so the derivation was already in the
+  repository and already measured at one size and one multiplicity each.
+  The original sentence below ("What was missing is … the Coppersmith
+  ceiling (§6)") is kept as written and is wrong on that point; what §6
+  adds is the cost-exponent consequence (`p^{5/6}` relation collection and
+  the `θ ≥ m/(2(m−1))` parity condition), not the root bound.
+
 So the repository has already measured the two lattice routes that can be
 measured at all (HNP with leakage, function-field lifting at toy scale) and
 certified the `k`-dependence obstruction for witness lattices. What was
@@ -465,6 +484,12 @@ test it.
    note is corrected; otherwise the route is closed at measured level. Cost:
    one session. It cannot produce a speedup, so it never reaches the IC
    leaderboard; it is a check on a derivation. Class: boundary measurement.
+   **Done (2026-10-23):** [`research/coppersmith_s3_theta2_20261023/`](../../coppersmith_s3_theta2_20261023/REPORT.md),
+   protocol frozen before the run, instrument
+   `examples/coppersmith_s3_theta2_falsifier.rs` (full pipeline: lattice,
+   LLL, resultant root extraction, candidates checked against `S₃`), four
+   sizes 24–56 bits, `ℓ ≤ 3`, `β` to 0.34, positive and negative controls.
+   The verdict against the stop rule is in that study's `REPORT.md`.
 2. **Lemma B as a derivation record.** State and prove, under the R1–R5
    test of `RESEARCH_REPRESENTATION_STRUCTURE.md`, that a lattice computable
    from `(E, P, Q)` in time `o(√N)` is `k`-independent, and that a
@@ -547,6 +572,12 @@ summary was available):
   `research/lll_degeneracy_rerun_20261016/`, `docs/ECDLP_ATTACK_MATRIX.md`,
   `RESEARCH_NZMS_AMS_AUSTMS_2024_IDEAS.md` §4.2,
   `RESEARCH_REPRESENTATION_STRUCTURE.md` (this repository).
+
+- Repository, Coppersmith on summation polynomials (missed in the first
+  version, added 2026-10-23): `RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM.md`
+  §2.2, §3.2 (Probe B), §3.3 (Probe C);
+  `research/lit2026_w10_s5_coppersmith_20261011/README.md` and
+  `examples/lit2026_w10_coppersmith_bound.rs`; `examples/prime_ecdlp_breakthrough_probe.rs`.
 
 **Gaps.** Amadori–Pintore–Sala (2018, eprint 2017/609) and Petit–Kosters–
 Messeng (2016) were not re-read this session (eprint returned 403 through

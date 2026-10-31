@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Thin authenticated bootstrap; native controller owns recovery/epoch semantics.
+set -euo pipefail
+: "${ISOLAB_RECOVERY_REQUEST_KEY:?}" "${CODEBUILD_BUILD_ID:?}"
+[[ "$ISOLAB_RECOVERY_REQUEST_KEY" =~ ^inputs/recovery-requests/([a-f0-9]{64})\.json$ ]] || exit 2
+request_hash=${BASH_REMATCH[1]}
+export AWS_REGION=us-east-2 AWS_DEFAULT_REGION=us-east-2 AWS_PAGER=''
+export KUBECONFIG="$CODEBUILD_SRC_DIR/kubeconfig"
+mkdir -p receipts
+aws s3 cp "s3://isolab-results-104186811093-us-east-2/$ISOLAB_RECOVERY_REQUEST_KEY" request.json --only-show-errors
+printf '%s  request.json\n' "$request_hash" | sha256sum -c -
+isolab-eks-recovery validate request.json > receipts/request.json
+aws eks update-kubeconfig --name isolab --region us-east-2 --alias isolab --kubeconfig "$KUBECONFIG" >/dev/null
+run=$(jq -er .run_name receipts/request.json)
+finish() {
+  rc=$?
+  trap - EXIT
+  set +e
+  # Do not include kubeconfig or memory archives in public/launcher artifacts.
+  for path in receipts/*.json; do
+    [[ -f "$path" ]] || continue
+    aws s3 cp "$path" "s3://isolab-results-104186811093-us-east-2/recovery/runs/$run/controllers/${CODEBUILD_BUILD_ID##*:}/${path##*/}" --only-show-errors || rc=91
+  done
+  exit "$rc"
+}
+trap finish EXIT
+isolab-eks-recovery controller request.json "$CODEBUILD_SRC_DIR/receipts"

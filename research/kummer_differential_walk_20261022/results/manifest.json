@@ -1,0 +1,17 @@
+{
+  "schema": "kummer-differential-walk-manifest/v1",
+  "study_id": "KUMMER-DIFFERENTIAL-WALK-20261022",
+  "protocol": "PROTOCOL.md",
+  "partition_amendment": "AMENDMENT.md",
+  "source_input": "research/kummer_coordinates_20261022/results/target-gate-{16,20,24,28,32,36,40}.jsonl",
+  "producer": "research/kummer_differential_walk_20261022/target/release/kummer-differential-walk",
+  "validator": "python3 research/kummer_differential_walk_20261022/validate.py",
+  "rows": "results/transition-{16,20,24,28,32,36,40}.jsonl",
+  "preliminary_partition_rows": "results/legendre_diagnostic/transition-{16,20,24,28,32,36,40}.jsonl",
+  "summary": "results/summary.json",
+  "pdf": "TRANSITION_GATE.pdf",
+  "graph": ["transition-cohort.svg", "transition-cohort.png"],
+  "candidate_cost": null,
+  "rho_cost": null,
+  "candidate_to_rho_ratio": null
+}

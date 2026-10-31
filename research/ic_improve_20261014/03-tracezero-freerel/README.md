@@ -14,6 +14,8 @@
 > tuned-vs-tuned 0.960× [0.946, 0.976] is partly where the incumbent's tuned
 > K landed. Quote round 2, per size, not this 0.957×.
 
+**R10 pin re-rate (2026-10-19):** the historic 0.957× claim is superseded by the K retune; the old K=255 is 2.17× the pin at n=41 (1.08× at n=53; equal at n=61). See [`pinned ledger`](../../ic_tool_program/ledger/r10-20261019/README.md).
+
 **Verdict.**
 
 - **R (free relations): ADVANCES, at constant level.** The complete Koblitz DLP solve costs 0.957× the incumbent in the counted unit, 95% CI [0.944, 0.970], pooled over 44 paired replicates at three sizes.

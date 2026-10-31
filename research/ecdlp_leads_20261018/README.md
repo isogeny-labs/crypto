@@ -71,14 +71,20 @@ listed so that nobody spends budget on them.
   | `5.2.a_a_a_a_h` | Res_{F₃₂/F₂}(E), t₅ = −7 | yes | yes | 1 |
   | `5.2.a_a_a_a_f` | Res_{F₃₂/F₂}(E), t₅ = −5 | yes | yes | 1 |
   | `5.2.a_a_a_a_d` | Res_{F₃₂/F₂}(E), t₅ = −3 | yes | yes | 4 |
+  | `5.2.a_a_a_a_b` | Res_{F₃₂/F₂}(E), t₅ = −1 | yes | yes | 4 |
+  | `5.2.a_a_a_a_ab` | Res_{F₃₂/F₂}(E), t₅ = 1 | yes | yes | 5 |
+  | `5.2.a_a_a_a_ad` | Res_{F₃₂/F₂}(E), t₅ = 3 | yes | yes | 2 |
+  | `5.2.a_a_a_a_af` | Res_{F₃₂/F₂}(E), t₅ = 5 | yes | yes | 0 |
+  | `6.2.ab_ab_d_ab_af_h` | T₇, n = 7 trace-zero class (first of the two) | no | yes | 0 |
 
-  The `5.2.*` rows came from the scheduled retry at 21:00 UTC. Still owed,
-  blocked by the captcha after those five:
+  The first five `5.2.*` rows came from the scheduled retry at 21:00 UTC and
+  the next four from a second retry on 2026-10-24, when the captcha had
+  lifted. All nine `5.2.*` classes report 3 F₂-points. The `6.2.*` row was
+  read from a summarised fetch, not the raw JSON, and reports 2 F₂-points.
+  Still owed, blocked by the captcha again:
   - `3.2.a_a_af` (t₃ = 5, the a = 0 Koblitz curve, already excluded by point
     counts);
-  - `5.2.a_a_a_a_{b,ab,ad,af}` (t₅ = −1, 1, 3, 5);
-  - the n = 7 trace-zero classes `6.2.ab_ab_d_ab_af_h` and
-    `6.2.b_ab_ad_ab_f_h`.
+  - the second n = 7 class `6.2.b_ab_ad_ab_f_h`.
 - **Computed.** Frobenius cyclotomic-coset sizes, `ord_n(2)`. Trace-zero
   L-polynomials for n = 3, 5, 7. The rho and L(1/2) budget arithmetic in
   `cover-genus-budget.csv`, via the awk lines in the "Reproduce" section.
@@ -128,7 +134,7 @@ listed so that nobody spends budget on them.
    behind the Koblitz leads is unavailable *(derived sketch)*. The one new
    binary lead (L10) asks whether a genus-n Jacobian realises the Weil
    restriction beyond the n = 3 cases that GHS already covers. LMFDB says
-   yes at n = 5 for t₅ ∈ {−9, −7, −5, −3}, where GHS gives genus 16
+   yes at n = 5 for t₅ ∈ {−9, −7, −5, −3, −1, 1, 3}, where GHS gives genus 16
    *(sourced)*. Whether an explicit map makes them usable is open.
 
 ## The ten leads
@@ -140,7 +146,7 @@ defined above.
 |:--|:--|:--|:--|:--|:--|:--|
 | L8 | Koblitz | Étale route: curve D/F₂ with an order-n automorphism and an F₂-map to E; its twist contains E × T_n, genus 1 + n(g₀ − 1) | **measured, every base of genus ≤ 3; genus 4 screened:** hits at n = 3 and n = 5 only (one plane quartic gives a genus-11 cover carrying T₅, a = 0); **closed for ECC2K-130, K-163, K-233 and K-283** | next: genus-5 bases with 409 ∣ P_B(λ), ord λ ≤ 3, for K-409 (Dragutinović's genus-5 census) | no genus-5 B passes the screen at n = 409 | the only structured family left inside the L(1/2) budget for K-409 and K-571, with explicit maps |
 | L6 | Koblitz | Modular twists: (f_E ⊗ χ) mod 2 ≅ T_n up to isogeny, for every n | derived | find the smallest curve whose Jacobian contains A_{f⊗χ} for n = 3, 5, 7, 11 (modular quotients, Fermat quotients of level 7ℓ, Ekedahl–Serre curves) | minimal genus grows faster than c(n)·n | an explicit, computable transfer of T_n into a Jacobian over F₂ |
-| L10 | random-b binary | Genus-n Jacobians realising Res(E), beyond GHS | **sourced at n = 3 and 5:** genus-5 Jacobians realise Res(E) for t₅ ∈ {−9, −7, −5, −3} (LMFDB) | take the genus-5 curves (Dragutinović census) and compute an explicit map C → E over F₃₂; then n = 7 | no explicit map; or no realisation at n = 7 | a genus-O(n) family would make prime-degree binary curves subexponential |
+| L10 | random-b binary | Genus-n Jacobians realising Res(E), beyond GHS | **sourced at n = 3 and 5:** genus-5 Jacobians realise Res(E) for t₅ ∈ {−9, −7, −5, −3, −1, 1, 3} (LMFDB) | take the genus-5 curves (Dragutinović census) and compute an explicit map C → E over F₃₂; then n = 7 | no explicit map; or no realisation at n = 7 | a genus-O(n) family would make prime-degree binary curves subexponential |
 | L9 | Koblitz and binary | Certified lower bounds on the cover genus | derived (partial); (a = 0, n = 5) at genus 5 excluded by LMFDB | Howe's principal-polarisability test on T_n for deployed n; point-count positivity | (produces bounds) | closes deployed sizes for good where the bound exceeds the budget |
 | L1 | prime | Coefficient collapse plus Farey bases | derived | extend Probes B/C with the 3-term collapsed lattice and Farey parametrisation, m = 2, 3, 4, against random-coefficient controls | reach gain under 1.25× at m = 4 | a curve-specific improvement to the prime decomposition oracle |
 | L2 | prime | Eisenstein–Farey bases for j = 0 | derived | same harness on secp256k1-shaped toys | invariance lost under shifts | 3× fewer columns and 9× less linear algebra at equal reach |
@@ -457,10 +463,13 @@ and has no modular-curve parametrisation.
   the two routes. The lead lives at n ≥ 5.
 - n = 5 (*sourced, LMFDB*). Positivity allows odd t₅ ≤ 5 (33 − 5t₅ ≥ 3).
   - Res_{F₃₂/F₂}(E) is isogenous to the Jacobian of a genus-5 curve over F₂
-    for t₅ ∈ {−9, −7, −5, −3}: one, one, one and four Jacobians.
+    for t₅ ∈ {−9, −7, −5, −3, −1, 1, 3}: one, one, one, four, four, five and two Jacobians.
   - It is not for t₅ = −11, the a = 0 Koblitz curve, whose Res is not
     simple.
-  - t₅ ∈ {−1, 1, 3, 5} is still blocked by the captcha.
+  - The second retry completed the set: t₅ = −1, 1, 3 have 4, 5 and 2
+    Jacobians, and t₅ = 5 has none. So genus-5 Jacobians realise Res for
+    t₅ ∈ {−9, −7, −5, −3, −1, 1, 3}, which is every trace the point counts
+    allow except t₅ = −11 and t₅ = 5.
   - So genus-n realisations of random-b Weil restrictions exist at n = 5,
     where GHS gives genus 2^(m−1) = 16.
 - What is still open is whether they are usable. The isogeny is known only
@@ -534,13 +543,10 @@ and has no modular-curve parametrisation.
   2. L_Klein = L(Res_{F₈/F₂} E_{a=1});
   3. the Eichler–Shimura twist identity (L6);
   4. the a = 1 point-count obstruction (L9).
-- LMFDB queries still blocked by the captcha:
-  - `5.2.a_a_a_a_{b,ab,ad,af}` (t₅ = −1, 1, 3, 5);
-  - the two n = 7 trace-zero classes in dimension 6;
-  - `3.2.a_a_af`.
-
-  Five `5.2.*` classes returned data on the scheduled retry. They are in the
-  table under "Method and sources".
+- LMFDB queries still blocked by the captcha: `3.2.a_a_af` and the second
+  n = 7 trace-zero class `6.2.b_ab_ad_ab_f_h`. All nine `5.2.*` classes and
+  the first n = 7 class returned data on the retries. They are in the table
+  under "Method and sources".
 - L8 covers bases of genus ≤ 3, and genus 4 by the screen. Still not run:
   - genus-5 and larger bases, needed for K-409 and K-571;
   - the twisted λ = −1 genus-3 covers, which were checked only for

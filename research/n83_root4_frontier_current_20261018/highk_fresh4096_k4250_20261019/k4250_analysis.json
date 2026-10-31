@@ -1,0 +1,32 @@
+{
+  "bootstrap_method": "circular moving blocks of 64, 20000 resamples per comparison, PCG64 seed 20261021",
+  "comparisons": {
+    "k4250_minus_k4300": {
+      "bootstrap_99pct_ci_ms": [
+        -0.4347656112182615,
+        1.04766147901001
+      ],
+      "bootstrap_one_sided_p_nonpositive": 0.1409,
+      "mean_ms": 0.30404249633789066
+    },
+    "k4250_minus_k4405": {
+      "bootstrap_99pct_ci_ms": [
+        -0.9117966710607911,
+        0.701524116472168
+      ],
+      "bootstrap_one_sided_p_nonpositive": 0.6503,
+      "mean_ms": -0.11923915380859373
+    }
+  },
+  "hardware_tier": "local_correctness_diagnostic",
+  "mean_target_ms": {
+    "4250": 6.684897779296875,
+    "4300": 6.380855282958985,
+    "4405": 6.804136933105469
+  },
+  "schema": "n83.wide3-fresh4096-k4250-analysis/v1",
+  "selected_online_candidate_id": null,
+  "status": "PASS_LOCAL_DIAGNOSTIC",
+  "target_count": 4096,
+  "target_sha256": "281a088cc49658973375ab88359d65a3b4d51d2819a297872b5fe5da01783895"
+}

@@ -31,11 +31,17 @@ What it shows:
 - **Output.** `OUT.svg` (vector, for reports and PDFs) and `OUT.png` at 150
   dpi (for `benchmarks/`), from the same figure.
 
-## Input: `volcano-diagram/v2`
+## Input: `volcano-diagram/v3`
+
+Version 3 adds the optional `"synthetic": true` presentation flag for explicitly
+invented datasets. It labels counts as abstract vertices and color ranges as
+simulated. Such inputs must also identify the data as synthetic in the title
+and mark every unconstructed edge `unverified`. Inputs with schema v1 or v2
+remain accepted, and ordinary inputs retain their existing labels.
 
 ```json
 {
-  "schema": "volcano-diagram/v2",
+  "schema": "volcano-diagram/v3",
   "ell": 2,
   "depth": 3,
   "title": "Measured 2-isogeny volcano heat map · p = 146833024135393 · 100 paired walk seeds per curve",

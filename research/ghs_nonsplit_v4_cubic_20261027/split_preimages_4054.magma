@@ -1,0 +1,52 @@
+F2 := GF(2);
+P<X> := PolynomialRing(F2);
+L<z> := ext<F2 | X^24+X^16+X^15+X^14+X^13+X^10+X^9+X^7+X^5+X^3+1>;
+K := FiniteField(2,12); Embed(K,L);
+P2<x,y,z0> := ProjectiveSpace(K,2);
+D := x^2+x*z0+K!(L!(1+z+z^3+z^4+z^5+z^7+z^8+z^10+z^11+z^12+z^14+z^15+z^17+z^20))*z0^2;
+N := K!(L!(1+z+z^2+z^4+z^6+z^13+z^16+z^17+z^18+z^19+z^20+z^21+z^23))*x*z0^3+K!(L!(1+z^2+z^3+z^4+z^7+z^8+z^10+z^12+z^15+z^16+z^18+z^19+z^20+z^21+z^22+z^23))*z0^4;
+C0 := Curve(P2,D*(y^2+y*z0)+N);
+print "GENUS"; print Genus(C0);
+pt := C0![K!0,K!(L!(1+z+z^4+z^6+z^8+z^9+z^11+z^12+z^14+z^17+z^19+z^21+z^22+z^23)),K!1];
+print "PT"; print pt;
+E0,toE := EllipticCurve(C0,pt);
+print "E0"; print E0;
+E := EllipticCurve([K|1,K!(L!(1+z^2+z^3+z^4+z^6+z^7+z^8+z^10+z^14+z^18+z^20+z^22)),0,0,K!(L!(z+z^3+z^4+z^6+z^7+z^8+z^14+z^15+z^16+z^17+z^19+z^23))]);
+print "TARGET"; print E;
+print "ORDER"; print #E;
+ok,iso := IsIsomorphic(E0,E);
+print "ISOMORPHIC"; print ok;
+if ok then print "TO_E";print toE;print "ISO";print iso;print "ISO_DATA";print IsomorphismData(iso);end if;
+
+G := E![K!(L!(1+z+z^3+z^4+z^6+z^7+z^8+z^14+z^15+z^16+z^17+z^19+z^23)),K!(L!(z+z^3+z^5+z^6+z^8+z^10+z^11+z^13+z^14+z^15+z^16+z^17+z^20+z^21+z^23))];
+assert G ne E!0 and 2027*G eq E!0;
+T<Tvar> := PolynomialRing(K);
+A := L!(1+z^2+z^6+z^7+z^8+z^11+z^12+z^13+z^16+z^17+z^19+z^21); pole := L!(z+z^2+z^5+z^6+z^7+z^12+z^16+z^17+z^18+z^20+z^21+z^22+z^23);
+function SplitFiber(P)
+  P0 := P@@iso;
+  pre := P0@@toE;
+  for cp in RationalPoints(pre) do
+    if cp[3] ne 0 then
+      pc := C0!cp;
+      if iso(toE(pc)) eq P then
+        xx := pc[1]/pc[3]; yy := pc[2]/pc[3];
+        f1 := K!(A^16/(L!xx+pole^16) + A^65536/(L!xx+pole));
+        rr := Roots(Tvar^2+Tvar+f1);
+        if #rr eq 2 then
+          return true,xx,yy,rr[1][1],rr[2][1];
+        end if;
+      end if;
+    end if;
+  end for;
+  return false,K!0,K!0,K!0,K!0;
+end function;
+for n in [1..80] do
+  ok0,x0,y0,v0,w0 := SplitFiber(n*G);
+  ok1,x1,y1,v1,w1 := SplitFiber((n+1)*G);
+  ok7,x7,y7,v7,w7 := SplitFiber((n+7)*G);
+  if ok0 and ok1 and ok7 then
+    print "SCALAR";print n;
+    print "FIBERS";print [Eltseq(L!u):u in [x0,y0,v0,w0,x1,y1,v1,w1,x7,y7,v7,w7]];
+    break;
+  end if;
+end for;

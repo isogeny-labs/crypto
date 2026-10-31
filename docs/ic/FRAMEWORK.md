@@ -24,6 +24,12 @@ is visible where it lands, not only in the total.
 
 ## 1. Quick start
 
+For one-command structured-base search with live CADO-style progress, exact
+inventories, verified decomposition probes and resumable attempts, see
+[the native factor-base sweeper](factor-base-sweep/README.md). Its live rates
+and ETAs are provisional diagnostics; it does not certify regularity or a
+complete discrete-log speedup.
+
 ```bash
 cargo build --release --bin ic
 
@@ -108,8 +114,33 @@ same studies and says which to run: on every class measured so far rho is
 cheaper, so the verdict says so. A class with no measured recipe (extension
 fields, even-degree or wide Koblitz curves) gets the rho reference and no
 index-calculus plan. A plan is a hypothesis until a paired session confirms it
-on the curve (`research/ic_planner_validation_20261020`). The rule set is
-versioned (`ic-planner/1`); change a rule and the version changes with it.
+on the curve (`research/ic_planner_validation_20261020`).
+
+`--native-weight w` (on `ic plan` and `ic bench --auto`, default 0) plans for
+the AGENTS.md §5a weight `w`, in GAE per unpriced native operation. The
+operations are lookups, guard probes, Legendre symbols, square roots and row
+operations.
+- **No weight rule is in force.** Since `ic-planner/4` the factor base is the
+  counted optimum at every weight: N₀ on prime curves, c₀ orbit columns on
+  Koblitz curves, d₀ on random binary curves. A declared weight adds a warning
+  and the evidence for that weight.
+- **What was withdrawn.** `ic-planner/3` scaled the prime base by 1.41 at
+  `w = 1` (`research/ic_planner_weight_rule_20261021`). It shrank the Koblitz
+  base to 0.71·c₀ at `w ≥ 0.3` (`research/ic_planner_weight_rule_binkob_20261026`).
+  Both failed their preregistered hold-outs in
+  `research/ic_planner_exhaustive_20261026`, and its decision rule withdraws them:
+  - **Prime:** 1.41·N₀ was cheaper at `w = 1` on 4 of 4 curves, but also at
+    `w = 0` on 2 of 4.
+  - **Koblitz:** at log2 r 36.6–47.2, 0.71·c₀ cost 1.06–1.17× c₀ at `w = 1`.
+  - **Binary:** d₀ + 1 beat d₀ at `w = 1` on one of four held-out curves.
+- For log2 r ≥ 36 the Koblitz plan also cites
+  `research/ic_koblitz_descent_routing_20261026`. There the ledger §23 descent,
+  now the `ecbench` method `ic.koblitz_descent`, measured 1.41–1.49× costlier
+  in counted `S`.
+
+A weighted plan is cheaper only at its weight; it is never a ranking across
+the band. The rule set is versioned (`ic-planner/4` since the weight rules were withdrawn);
+change a rule and the version changes with it.
 
 ---
 
@@ -801,11 +832,27 @@ worse than none:
 
 | stage | trait | plug-ins |
 |:--|:--|:--|
-| factor base | `FactorBaseBuilder` | `prime-abscissa`, `glv-orbit`, `binary-subspace`, `koblitz-orbit`, `koblitz-trace-zero`, `koblitz-symmetrised`, `gls-line` |
+| factor base | `FactorBaseBuilder` | `prime-abscissa`, `glv-orbit`, `hashed-affine`, `binary-subspace`, `koblitz-orbit`, `koblitz-trace-zero`, `koblitz-symmetrised`, `gls-line` |
 | targets | `Targets` | `random`, `walk` |
-| point decomposition | `DecompositionOracle` | `subtract`, `mitm`, `mitm-frobenius`, `descent-algebraic`, `symmetrised`; `line-resultant` (library and `examples/glv_invariant_experiments.rs`: the `O(log p)` Weil-descent oracle for a line base over `F_{p^k}`, `line_oracle.rs`) |
+| point decomposition | `DecompositionOracle` | `subtract`, `mitm`, `hashed-tensor`, `mitm-frobenius`, `descent-algebraic`, `symmetrised`; `line-resultant` (library and `examples/glv_invariant_experiments.rs`: the `O(log p)` Weil-descent oracle for a line base over `F_{p^k}`, `line_oracle.rs`) |
 | polynomial solver | `SystemSolver` | `f4-f2`, `buchberger-f2`, `matrix-f4`, `matrix-f5`, `inherited-f4`, `crossbred-f2`, `xl-f2`, `sat-cdcl`, `fes-f2`, `fes-f2-wide`, `exhaustive` |
 | relation matrix | `RelationSolver` | `incremental-gauss`, `structured-gauss`, `sparse-cado` |
+
+### Hashed-affine / hashed-tensor
+
+`hashed-affine` is the union of `slots` independent affine-hashed bases
+(`(α·encode(A) + β) mod s < τ`) and `hashed-tensor` is the exact Boolean
+tensor-contraction oracle over those slots, from the vendored
+`crates/hashed-ecdl-tensor`. Both read `slots`, `seed`, `tau` and `s`; the
+two specifications must agree, and `prepare` refuses the run when the base
+is not the same point list. This is the Bochum v0.2 §3 construction with the
+October 25 manuscript Appendix D.4 contraction; it is a separate arm from
+the summation-polynomial pipeline.
+
+The contraction's work is reported as `hashed_tensor_steps`, an
+**uncalibrated** charged-primitive count, so the `S` column does not yet
+price it. Treat a `hashed-affine + hashed-tensor` row as a stage diagnostic,
+not as a comparable end-to-end `S`, until that step has a calibration.
 
 `ic bench --list` prints this with every parameter each plug-in reads.
 A parameter that takes several values (`divisor` on `koblitz-orbit`,

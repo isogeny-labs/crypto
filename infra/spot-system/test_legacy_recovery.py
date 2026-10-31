@@ -72,8 +72,10 @@ class FencingTests(unittest.TestCase):
             writes.append(kw);return {}
         def expired(**kw):self.fail('Previously confirmed deaths need no expiring EC2 record')
         self.assertTrue(recovery.acquire(db,expired,'table','owner-key','origin','successor'))
-        self.assertNotIn('OwnerTerminated',writes[0]['item'])
-        self.assertEqual(writes[0]['expression_attribute_values'][':prior'],{'S':'previous'})
+        self.assertTrue(writes[0]['item']['OwnerTerminated']['BOOL'])
+        self.assertEqual(writes[0]['item']['Id']['S'], 'terminated-owner-previous')
+        self.assertNotIn('OwnerTerminated',writes[-1]['item'])
+        self.assertEqual(writes[-1]['expression_attribute_values'][':prior'],{'S':'previous'})
 
     def test_source_cannot_restore_its_own_work(self):
         def forbidden(*args,**kw):self.fail('Source must not attempt to claim or restore')
@@ -104,8 +106,8 @@ class FencingTests(unittest.TestCase):
             writes.append(kw);return {}
         ec2=lambda **kw:{'Reservations':[{'Instances':[{'State':{'Name':'terminated'}}]}]}
         self.assertTrue(recovery.acquire(db,ec2,'table','owner-key','origin','successor'))
-        self.assertEqual(writes[0]['expression_attribute_values'][':prior'],{'S':'previous'})
-        self.assertEqual(writes[0]['condition_expression'],'#owner = :prior')
+        self.assertEqual(writes[-1]['expression_attribute_values'][':prior'],{'S':'previous'})
+        self.assertEqual(writes[-1]['condition_expression'],'#owner = :prior')
 
     def test_expired_lease_is_never_a_recovery_permission(self):
         def db(op, **kw):

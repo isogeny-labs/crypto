@@ -1,6 +1,46 @@
+<!-- BEGIN SHARED SESSION LOG -->
+
+## Session log
+
+At the start of every session, read the newest dated Markdown file in
+`docs/session-logs/`.
+
+Write today's log at `docs/session-logs/YYYY-MM-DD.md`, using the current date.
+These paths are relative to the repository or workspace root.
+Create the folder and file if missing. Claude and Codex share this directory.
+
+Do not wait for the user to end the session. Append a timestamped entry after
+every finished piece of work, after every decision, and whenever we switch
+tasks. Preserve previous entries. Record concrete facts from commands and
+logs; distinguish verified results from plans or assumptions.
+
+Every entry has four headings:
+
+- What was done (commands, files, features)
+- Decisions made (and why)
+- Open threads (unfinished, pick up next time)
+- Errors (what went wrong, how it was handled)
+
+Commit project handoffs with the related PR so they survive across sessions.
+Keep entries about this project; do not copy private global logs or chat transcripts.
+
+<!-- END SHARED SESSION LOG -->
+
+Run authorized x86 CPU experiments and crypto benchmarks through
+[`isolab-eks`](.claude/skills/isolab-eks/SKILL.md) on EKS Spot by default
+(owner, 2026-10-25; AGENTS.md §9a). Use the executor's existing AWS identity,
+submit from the agent, and verify source/image identity and S3 hashes. L2
+benchmarks require native L2/replay/A/A admission. Requested resume uses the
+separate CRIU/EBS contract. The
+experiment director freezes this route in the task card; the executor runs it
+unchanged. Preserve explicitly requested environments and keep local development
+checks local. Loading instructions alone does not authorize an experiment.
+
 Open pull requests ready for review, never as drafts, whatever the runtime
 defaults to, and mark an existing draft ready; only a user request in the task
-makes a draft. This and the repository's other rules are in
+makes a draft. Enable auto-merge as you open the PR (`gh pr merge <n> --auto
+--merge`); a stacked PR cannot auto-merge until it is retargeted to `main`.
+This and the repository's other rules are in
 [`AGENTS.md`](AGENTS.md) ("Default workflow").
 
 **Success criterion** (owner, 2026-10-15): every verified, measured
@@ -10,6 +50,11 @@ breakthrough. Report each row's gap to the matched rho as the distance
 remaining, not as a pass/fail gate. Relabelling and accounting changes are
 not improvements. Full rule: [`AGENTS.md`](AGENTS.md), "Success criterion:
 iterative improvement of the index-calculus baseline".
+
+Look up curve facts in the curve database before computing them or
+scanning `docs/curves/*.json`: MCP server `ecdb` (export `ECDB_TOKEN` from
+secret `ecdb/api` first). Rules and the guide: AGENTS.md, "Querying the curve
+database (ecdb)", and [`ecdb/docs/AGENTS.md`](ecdb/docs/AGENTS.md).
 
 Before surveying for ECDLP leads or proposing one, read the lead atlas in the
 sibling crypto-autoresearcher checkout (`knowledge/leads/ecdlp/`,
@@ -66,8 +111,18 @@ land it".
 Model tiers (owner, 2026-10-17): frontier/core models reason and decide;
 `experiment-director` (Sonnet) writes a frozen command card, the main session
 relays it verbatim to `executor-mechanical` (Haiku), and the director assesses
-the run. AGENTS.md, "Model tiers".
+the run. AGENTS.md, "Model tiers". After a relay the main session records what
+it cost: `python3 tools/token_usage.py session --units <cards> --unit-name card`
+(tokens and list-price cost per agent and tier, cache hit ratio, cost per card;
+`autofix-queue.yml` records each attempt the same way). Metrics and the
+transcript accounting traps: [`docs/token-efficiency.md`](docs/token-efficiency.md).
 
 Every cross-method ECDLP comparison prices the unpriced native work of
 every arm, rho references included, at 0, 0.1 and 1 GAE per operation and
 ranks two arms only where the order holds across that band (AGENTS.md §5a).
+
+**Resume checkpoints** (owner, 2026-10-24): before any experiment run, fill
+`.resume/RESUME.md` (`scripts/checkpoint.sh init`) so a fresh session could
+resume the effort from it alone. The hooks push it to S3 with the specs,
+leads and unpushed work, and refuse run launchers until that succeeds.
+AGENTS.md, "Resume checkpoints in S3 before every run".

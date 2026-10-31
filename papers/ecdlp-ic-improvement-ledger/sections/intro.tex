@@ -1,0 +1,100 @@
+\section{Introduction}\label{sec:intro}
+
+Let $\langle G\rangle$ be a subgroup of prime order $r$ of an elliptic
+curve $E/\FF_q$. The best generic algorithm for its discrete-logarithm
+problem is Pollard rho~\cite{pollard1978,vanoorschot1999}. When $A$
+efficiently computable automorphisms act on the subgroup, rho costs about
+$\sqrt{\pi r/(2A)}$ group additions~\cite{wiener1998,gallant2000}. Index
+calculus was brought to elliptic curves through Semaev's summation
+polynomials~\cite{semaev2004} and the extension-field analyses of Gaudry and
+Diem~\cite{gaudry2009,diem2011}. It is the method that should exploit the
+most structure. On prime-order curves of cryptographic shape it has never
+beaten rho.
+
+This paper does not ask whether index calculus beats rho; at every size we
+can measure, it does not. It records how far a sustained engineering
+programme moved index calculus \emph{toward} rho, one verified step at a
+time, and how far remains.
+
+\paragraph{The success criterion.} On 15 October 2026 the repository's owner
+fixed the rule that governs this paper (\art{AGENTS.md}, ``Success
+criterion: iterative improvement of the index-calculus baseline''):
+\begin{itemize}
+\item the baseline for each curve and size is the best current verified
+  index-calculus pipeline, frozen with its protocol and receipts;
+\item an \emph{improvement} lowers cost against that baseline on the same
+  instances, with every answer verified, under a protocol frozen before
+  timing;
+\item each landed improvement becomes the new baseline (the ratchet);
+\item every row reports its gap to the matched rho as the distance
+  remaining, not as a pass/fail gate;
+\item relabelling and accounting changes are recorded but are not
+  improvements.
+\end{itemize}
+Beating rho remains the long-term goal, and a claim to have done so still
+needs a cold, end-to-end, independently replayed win at growing sizes. No
+such claim appears here.
+
+\paragraph{Relation to the programme record.} A companion record
+(\cite{icprogram2026}, \art{papers/ecdlp-index-calculus-program/}) surveys
+the literature, the measurement infrastructure and the programme's
+chronology through 20 October. This paper takes a narrower view in three
+ways:
+\begin{enumerate}
+\item it organises the work by the pipeline stage each change acts on
+  (\S\S\ref{sec:oracle}--\ref{sec:families}), and states each change
+  against its own incumbent;
+\item it collects the distance to rho by curve family, as it stands after
+  the 19--20 October corrections, including the matched-rho re-run of the
+  Koblitz rule (\S\ref{sec:distance});
+\item it adds the work of 20--23 October: the confirmed $n=83$ base
+  selection, the cache-blocked pair table, the planner validation, the
+  ECCp-131 relation probes, the cross-ISA root cause of the replay
+  regression, and the state of the validation gate
+  (\S\S\ref{sec:audit}--\ref{sec:gate}).
+\end{enumerate}
+Where the two papers overlap, this one cites the same committed artefacts.
+It ran no new measurement.
+
+\paragraph{Contributions.}
+\begin{itemize}
+\item A cost decomposition of elliptic-curve index calculus into the levers
+  the programme actually pulled, and the share of total cost each one
+  controls (\S\ref{sec:model}).
+\item The ratchet: about thirty improvements, each against its own
+  incumbent, with boundary, class, interval and source
+  (Figure~\ref{fig:ratchet}, Table~\ref{tab:ledger}).
+\item The distance to matched rho, by family and size, with the reference
+  each figure uses (\S\ref{sec:distance}).
+\item An audit trail of claims that were corrected, and why each correction
+  moved the gap \emph{up} (\S\ref{sec:audit}).
+\item The state of the validation gate and what each row needs to pass it
+  (\S\ref{sec:gate}).
+\item The next improvements, ranked by the stage that now dominates cost
+  (\S\ref{sec:next}).
+\end{itemize}
+
+\paragraph{What this paper does not claim.}
+\begin{itemize}
+\item No ECDLP speed-up on any deployed curve, and no key recovery.
+\item No asymptotic sub-rho algorithm for prime fields, and no change to
+  the Gaudry--Diem picture.
+\item No statement about ECC2K-130, P-256 or secp256k1 security.
+\end{itemize}
+Every instance is a public synthetic or standard-parameter known-answer
+instance. Stage ratios are never presented as end-to-end speed-ups. Wall
+times from hosts without a qualifying isolation level are labelled
+\emph{descriptive}. A cost with unpriced work is labelled a \emph{lower
+bound}.
+
+\paragraph{Reading the numbers.} We use two conventions.
+\begin{itemize}
+\item In the ledger (\S\S\ref{sec:oracle}--\ref{sec:families}) a ratio is
+  \emph{candidate/incumbent}, so less than 1 is an improvement. Where a
+  source reports a speed-up $s$, we write it as $s\times$ and plot $1/s$.
+\item In distance statements (\S\ref{sec:distance}) a ratio is \emph{IC/rho},
+  so greater than 1 means rho is cheaper.
+\end{itemize}
+Intervals are 95\%: paired cluster-bootstrap or Student-$t$, as the source
+recorded them. Artefact paths are relative to the root of the \texttt{crypto}
+repository unless prefixed by a sibling repository's name.

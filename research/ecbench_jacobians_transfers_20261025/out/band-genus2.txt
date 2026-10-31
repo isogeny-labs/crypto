@@ -1,0 +1,35 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| jcv1-g2-fp10-4c1c114a | 17.54 | bsgs-neg | 12/12 | 0.952 | 1.044 | 1.876 | — |
+| jcv1-g2-fp10-4c1c114a | 17.54 | ic-hec | 12/12 | 1.807 | 47.055 | 454.279 | — |
+| jcv1-g2-fp10-4c1c114a | 17.54 | rho-neg | 12/12 | 1.528 | 1.645 | 2.695 | — |
+| jcv1-g2-fp10-4c1c114a | 17.54 | rho-neg-aa | 12/12 | 1.528 | 1.645 | 2.695 | — |
+| jcv1-g2-fp10-4c1c114a | 17.54 | rho-plain | 12/12 | 1.528 | 1.528 | 1.528 | — |
+| jcv1-g2-fp12-7c76fc39 | 20.16 | bsgs-neg | 12/12 | 1.096 | 1.205 | 2.180 | — |
+| jcv1-g2-fp12-7c76fc39 | 20.16 | ic-hec | 12/12 | 2.284 | 65.620 | 635.645 | — |
+| jcv1-g2-fp12-7c76fc39 | 20.16 | rho-neg | 12/12 | 1.249 | 1.358 | 2.342 | — |
+| jcv1-g2-fp12-7c76fc39 | 20.16 | rho-neg-aa | 12/12 | 1.249 | 1.358 | 2.342 | — |
+| jcv1-g2-fp12-7c76fc39 | 20.16 | rho-plain | 12/12 | 1.545 | 1.545 | 1.545 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| jcv1-g2-fp10-4c1c114a | bsgs-neg vs ic-hec | bsgs-neg < ic-hec |
+| jcv1-g2-fp10-4c1c114a | bsgs-neg vs rho-neg | bsgs-neg < rho-neg |
+| jcv1-g2-fp10-4c1c114a | bsgs-neg vs rho-neg-aa | bsgs-neg < rho-neg-aa |
+| jcv1-g2-fp10-4c1c114a | bsgs-neg vs rho-plain | unresolved inside the band |
+| jcv1-g2-fp10-4c1c114a | ic-hec vs rho-neg | rho-neg < ic-hec |
+| jcv1-g2-fp10-4c1c114a | ic-hec vs rho-neg-aa | rho-neg-aa < ic-hec |
+| jcv1-g2-fp10-4c1c114a | ic-hec vs rho-plain | rho-plain < ic-hec |
+| jcv1-g2-fp10-4c1c114a | rho-neg vs rho-neg-aa | unresolved inside the band |
+| jcv1-g2-fp10-4c1c114a | rho-neg vs rho-plain | rho-plain < rho-neg |
+| jcv1-g2-fp10-4c1c114a | rho-neg-aa vs rho-plain | rho-plain < rho-neg-aa |
+| jcv1-g2-fp12-7c76fc39 | bsgs-neg vs ic-hec | bsgs-neg < ic-hec |
+| jcv1-g2-fp12-7c76fc39 | bsgs-neg vs rho-neg | bsgs-neg < rho-neg |
+| jcv1-g2-fp12-7c76fc39 | bsgs-neg vs rho-neg-aa | bsgs-neg < rho-neg-aa |
+| jcv1-g2-fp12-7c76fc39 | bsgs-neg vs rho-plain | unresolved inside the band |
+| jcv1-g2-fp12-7c76fc39 | ic-hec vs rho-neg | rho-neg < ic-hec |
+| jcv1-g2-fp12-7c76fc39 | ic-hec vs rho-neg-aa | rho-neg-aa < ic-hec |
+| jcv1-g2-fp12-7c76fc39 | ic-hec vs rho-plain | rho-plain < ic-hec |
+| jcv1-g2-fp12-7c76fc39 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| jcv1-g2-fp12-7c76fc39 | rho-neg vs rho-plain | unresolved inside the band |
+| jcv1-g2-fp12-7c76fc39 | rho-neg-aa vs rho-plain | unresolved inside the band |

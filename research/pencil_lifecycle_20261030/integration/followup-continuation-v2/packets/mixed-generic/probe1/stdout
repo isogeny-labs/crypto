@@ -1,0 +1,7 @@
+Polynomial.natDegree_quadratic_le.{u} {R : Type u} {a b c : R} [Semiring R] :
+  (Polynomial.C a * Polynomial.X ^ 2 + Polynomial.C b * Polynomial.X + Polynomial.C c).natDegree ≤ 2
+Polynomial.natDegree_mul.{u} {R : Type u} [Semiring R] [NoZeroDivisors R] {p q : Polynomial R} (hp : p ≠ 0)
+  (hq : q ≠ 0) : (p * q).natDegree = p.natDegree + q.natDegree
+Polynomial.natDegree_X_sub_C.{u} {R : Type u} [Ring R] [Nontrivial R] (x : R) :
+  (Polynomial.X - Polynomial.C x).natDegree = 1
+/var/tmp/pencil-mixed-generic-20261031-v1/Probe.lean:5:7: error(lean.unknownIdentifier): Unknown constant `Polynomial.natDegree_le_iff_coeff_eq_zero`

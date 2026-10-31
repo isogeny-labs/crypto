@@ -1,0 +1,120 @@
+{
+  "schema": "native-smallroot-dependency-lock-v1",
+  "compiler": "g++ (Debian 14.2.0-19)14.2.0",
+  "language": "C++17",
+  "flags": [
+    "-std=c++17",
+    "-O2",
+    "-g",
+    "-Wall",
+    "-Wextra",
+    "-Wpedantic",
+    "-Werror"
+  ],
+  "prefix": "/workspace/skeleton_sage-runtime",
+  "singular_version": "4.4.1 (44105)",
+  "packages": [
+    {
+      "name": "cddlib",
+      "version": "1!0.94n",
+      "build": "h91791ec_0",
+      "license": "GPL-2.0-only",
+      "package_sha256": "c051870cc5ba036b0d2fc0d51cd593638d88366cac7b77389a757b24fac0e19e",
+      "package_url": "https://conda.anaconda.org/conda-forge/linux-64/cddlib-1%210.94n-h91791ec_0.conda",
+      "metadata_sha256": "9f50c529beb84a999951c2278f3338cf60f9eb705c3d74d379c9c00fc0e359e6"
+    },
+    {
+      "name": "gmp",
+      "version": "6.3.0",
+      "build": "hfd2156b_3",
+      "license": "GPL-2.0-or-later OR LGPL-3.0-or-later",
+      "package_sha256": "f36c336efc874f346a53a9011f67e997f9faac505562cc18c13b6d399cfe61c7",
+      "package_url": "https://conda.anaconda.org/conda-forge/linux-64/gmp-6.3.0-hfd2156b_3.conda",
+      "metadata_sha256": "7ed6e61b2ef967e7fe1df72257dd961117c098891de8180ccca1a9b001505e8f"
+    },
+    {
+      "name": "openssl",
+      "version": "3.6.5",
+      "build": "h781a0a9_0",
+      "license": "Apache-2.0",
+      "package_sha256": "9c1533f1cf784f0e250919c0c9762d0b0e6bc727a79290ffb7cea1ceca1d038c",
+      "package_url": "https://conda.anaconda.org/conda-forge/linux-64/openssl-3.6.5-h781a0a9_0.conda",
+      "metadata_sha256": "9d22b453a99bca210ac1382164c0a3cda63a146463caf1e961ff32c55998f671"
+    }
+  ],
+  "binaries": [
+    {
+      "path": "/workspace/native-smallroot-build/native-smallroot",
+      "sha256": "914cae8e89343a6c9ea7d2459de50a397e76fe413c63908e7b148ad5b2a2fe91",
+      "bytes": 5305568
+    },
+    {
+      "path": "/workspace/native-smallroot-build/structural",
+      "sha256": "ce7b2994d22f3bc60f317ba616d9e8ae55ee1ca3a5763b17ca4e97855536d0b8",
+      "bytes": 2326912
+    },
+    {
+      "path": "/workspace/native-smallroot-build/cdd-helper",
+      "sha256": "92b55101808c65287319d03835be6c6cf471e320a3097a25e0d36c160ed8af92",
+      "bytes": 152392
+    },
+    {
+      "path": "/workspace/skeleton_sage-runtime/bin/Singular",
+      "sha256": "01cc7d15127d75f21cfc314ba6058c31d7d4f3e52e2409721d683245b0811b62",
+      "bytes": 22320
+    },
+    {
+      "path": "/usr/bin/x86_64-linux-gnu-g++-14",
+      "sha256": "6b3696e4dcb85e1c949c732a02befa50e3983ecf94ce7e8e58d9d503b954b79d",
+      "bytes": 1166360
+    }
+  ],
+  "libraries": [
+    {
+      "path": "/workspace/skeleton_sage-runtime/lib/libgmp.so.10",
+      "realpath": "/workspace/skeleton_sage-runtime/lib/libgmp.so.10.5.0",
+      "sha256": "71a072c91addce36c8abd431c35a0662f942bd373b04305f06d4878066323f87"
+    },
+    {
+      "path": "/workspace/skeleton_sage-runtime/lib/libcddgmp.so.0",
+      "realpath": "/workspace/skeleton_sage-runtime/lib/libcddgmp.so.0.1.3",
+      "sha256": "81c1770ffccf992cdd81dfb4ab97fb28e0cf81714b4b8980059778f48198f14e"
+    },
+    {
+      "path": "/workspace/skeleton_sage-runtime/lib/libcrypto.so.3",
+      "realpath": "/workspace/skeleton_sage-runtime/lib/libcrypto.so.3",
+      "sha256": "1a8cc605fb88783cc0e69effd9bb1c9fe4b5ddf38aa5f0b0ccdb119298ce89f6"
+    },
+    {
+      "path": "/workspace/skeleton_sage-runtime/lib/libstdc++.so.6",
+      "realpath": "/workspace/skeleton_sage-runtime/lib/libstdc++.so.6.0.36",
+      "sha256": "10f0d3c46c070acd4abea2ccf2500ff0ec77e9b90154b82ea2720dba05510cb9"
+    },
+    {
+      "path": "/workspace/skeleton_sage-runtime/lib/libgcc_s.so.1",
+      "realpath": "/workspace/skeleton_sage-runtime/lib/libgcc_s.so.1",
+      "sha256": "5444fbe71e8cfe3bd05cdf2b44bd8c2e553e6e7e276977089b5e4e1a1ceed531"
+    }
+  ],
+  "linkage": {
+    "core": [
+      "GMP",
+      "OpenSSL",
+      "C++ runtime"
+    ],
+    "cdd_helper": [
+      "cddlib/GMP",
+      "GMP",
+      "C++ runtime"
+    ],
+    "boundary": "separate generic GPL2-only native helper; exact rational text IPC; no cddlib linkage in core; architecture not legal certification"
+  },
+  "external_reference": {
+    "repository": "keeganryan/cuso",
+    "commit": "fb2747d2105a8e48499bf10a3a717cf80c14d079",
+    "license": "LGPL-3.0-or-later",
+    "read_only": true
+  },
+  "python_research_runtime": false,
+  "cmake_required": false
+}

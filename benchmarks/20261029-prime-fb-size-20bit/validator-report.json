@@ -1,0 +1,2383 @@
+{
+  "schema": "validator-report/v1",
+  "id": "VAL-20261029-d7c08b",
+  "status": "pass",
+  "verdict": "passed",
+  "independent": true,
+  "validator": "Validator subagent (claude-opus-5-5); did not produce the sessions, code, analysis or README",
+  "claim": "20-bit holdout: prime-abscissa:size=45 + mitm:negation_folded=1 (sel) against the incumbent ic-pair prime-abscissa:size=32 + the same oracle (inc) reduces counted cost S at every section 5a weight; README readings: 24/28 bits relabelling, 32 bits null by construction",
+  "claim_verdict": {
+    "20": "improvement (section 7.3 conditions 1-4 hold)",
+    "24": "relabelling; incumbent retained",
+    "28": "relabelling; incumbent retained",
+    "32": "null by construction; incumbent retained"
+  },
+  "snapshot": {
+    "branch": "claude/pbo-results-20261029",
+    "validated_content_commit": "deabd9d629c907016794aa673f6a16c68fb5c2c4",
+    "parent": "7df34ba67dc6d9f03c4aa2daee24a7e31e784257",
+    "readme_git_blob": "d6761bd8afc80167eb011c4c6a8d94a6224daea9",
+    "note": "Every study file this certificate names is unchanged in the work tree against deabd9d629c907016794aa673f6a16c68fb5c2c4 (git status clean for the study dir; validation/ untracked, written by the validator). records.jsonl files are bound by sha256 and git blob; they may move to the artifact store as .artifacts.json pointers with the same sha256."
+  },
+  "method": "records.jsonl read directly by validation/recompute.py (stdlib; pricing (G + w*U)/sqrt(r) with C = n_C = 0, checked: no record carries a pinned calibration); ecbench compare/band re-run with the pinned binary into validation/ and byte-compared with analysis/ and select/; README values transcribed in validation/build_gate_files.py README_CLAIMS",
+  "raw_data": [
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/holdout-P20/session.json",
+      "sha256": "1980d379ef18af7662800ab3ec853dfb8d40e565d42626d0592cd73c1ac13d00",
+      "git_blob": "c62a179cbfa56250b60a6d1c6396e7f869f2a804",
+      "session_dir": "sessions/holdout-P20",
+      "records_jsonl": {
+        "sha256": "9754f196068270bba8b44fe1dda0b147dc4f277ce70cfdac22a744d7a216fc15",
+        "git_blob": "9d81581ab4f56ab34c25fd9c29486e06c03173a2",
+        "note": "named through its session dir; may move to the artifact store with this sha256"
+      }
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/holdout-P20/spec.json",
+      "sha256": "e5f640d0ee37936f38cecbd9c279ec81ba26646da0285eb81ffafc1909820ce2",
+      "git_blob": "c480c2c947241f03f3c626c8753476029a7d41f7"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/holdout-P20/plan.json",
+      "sha256": "4774a71ca304e9d7832004ab03cdb802ac41f7203e819354186ad9205169a0a8",
+      "git_blob": "1ca3f1f617f1b48cae67eb16520f636a587db366"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/holdout-P20/host.json",
+      "sha256": "8552135c7f0843517135f279e7e8b9cfd72678fe59cc3ff7c6bebaa9670ba462",
+      "git_blob": "b25a4067cc28625c16f9b017d1724a81295d87fb"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-P20/session.json",
+      "sha256": "22b8a90d0e517c70683c0fd8d08fe6ff9c3be16307f761036d4a2eadb3a6e5c3",
+      "git_blob": "5c341256dbd8de61815e0804a315fd3b671d54b3",
+      "session_dir": "sessions/train-P20",
+      "records_jsonl": {
+        "sha256": "f6ec6df61486dca06c2934bbf3480ec843f3b811514b3187a8e7fbf304bb9a87",
+        "git_blob": "0d14eeebc8d02ba23e4319d84ad9689b79bcb758",
+        "note": "named through its session dir; may move to the artifact store with this sha256"
+      }
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-P20/spec.json",
+      "sha256": "450e583863a52af78e881c0d1fb4e4c8e0fa0ae5391331c8681b3f9c3b62becc",
+      "git_blob": "72af5ae5d8e5e7403e5bee1638bf3cc095aeb822"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-P20/plan.json",
+      "sha256": "ded10fc8779488c9ac8d525ae6823181a0cc69cb601bca6daeef7a50370aa432",
+      "git_blob": "c94c1f8f9464935f44e5a490feda421706526cad"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-P20/host.json",
+      "sha256": "0372763d46b690d74355605f1391d220ff86f93be7f26f2f9e4b8e39df20f93b",
+      "git_blob": "088c4b40a3f0baf1ba9f37a779c728338c2caf2b"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-mitm3-n91/session.json",
+      "sha256": "ce43aad29fdd815d783626b4614b2fd96265a488eeffc63e04284ea9f0b99251",
+      "git_blob": "fb68b234c5a8a042e5af1e80c6ca1930cb644fd3",
+      "session_dir": "sessions/train-ext-P20-mitm3-n91",
+      "records_jsonl": {
+        "sha256": "d095988b7ed40d909d20bd2155ebc416ba7b14455fe53cf29dc1a4cf6e8d26b7",
+        "git_blob": "0f3ef97134b813bc0019ea027c1bf0be14ebb94b",
+        "note": "named through its session dir; may move to the artifact store with this sha256"
+      }
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-mitm3-n91/spec.json",
+      "sha256": "fbe6b281c734eec4ff55712e9c47090fc885e64aea331b20b7518b6d5149e4f5",
+      "git_blob": "49e2579a02dc79ee0d978773b7272e5f19c74b3c"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-mitm3-n91/plan.json",
+      "sha256": "e4a7572cfec2d215d9a925fec7b2234e50b78d351444d6523b69001736d5f5b7",
+      "git_blob": "694676b012f353a504884b1600206a68c8315c05"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-mitm3-n91/host.json",
+      "sha256": "74d55d9da02f3d0af85410c1f287f3d1a56a2f9650ccce74e6436f76f63fc789",
+      "git_blob": "72c15d0218cab94757a7ceadc0576a33e34beb75"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-rfmitm3-n91/session.json",
+      "sha256": "88eaf1083cffe2f60aa26ec642f2c4acb7d4bc742e93b1aaf2c189b46d0f4b30",
+      "git_blob": "9032650cd2742c6b8c82a7fa5d1a9f2747482519",
+      "session_dir": "sessions/train-ext-P20-rfmitm3-n91",
+      "records_jsonl": {
+        "sha256": "15864d80a6561aac4dc2cf7b494732ee959d8d2d620bb380b49ce29a45c9d565",
+        "git_blob": "77985aa23259d5db774a94d747444f9ab19ff712",
+        "note": "named through its session dir; may move to the artifact store with this sha256"
+      }
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-rfmitm3-n91/spec.json",
+      "sha256": "bc1539747b5efffb1f7e6223bae2779a54f2390972d522e620695379318bf5d5",
+      "git_blob": "292e0df97cfdf0c1580d4aaadf0c14e2ec4c3bf1"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-rfmitm3-n91/plan.json",
+      "sha256": "a3b946016ad5408900d4fd4f69c0ebdbabe793f1234a6546064a31aad9d08c42",
+      "git_blob": "a4e7047eb33efde61c88afecec8eda2fc4eb920d"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-rfmitm3-n91/host.json",
+      "sha256": "c44a5415d98b6d8203e46f1e226dc6efdeabc83139db11856306c04d6351992a",
+      "git_blob": "76e2b82f8b85ea811584c1cb345505202555505c"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-rfsub3-n91/session.json",
+      "sha256": "fa7b90cf19ce0b83defe78148829b8b87c09eedacf157a4680f38371e0ec9801",
+      "git_blob": "955ff3d9ba5f29cec16f9c0976c01d5e9b35b809",
+      "session_dir": "sessions/train-ext-P20-rfsub3-n91",
+      "records_jsonl": {
+        "sha256": "d8c1ea85c5b3654c440c46dc97f13d8039a3bd321550265fa28e27adcd728ad4",
+        "git_blob": "c18350797dae25e427768176d1f16594a4f18d79",
+        "note": "named through its session dir; may move to the artifact store with this sha256"
+      }
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-rfsub3-n91/spec.json",
+      "sha256": "0007b43f3c8cd2549a22e7e85e98c75b53e4f89527da4725ec60e62a52942d56",
+      "git_blob": "07e6aebfc85aff6beffbf578c9b6f5e50696cf75"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-rfsub3-n91/plan.json",
+      "sha256": "2a2af99feafca6a20411d68fe1e6de12045af252e3eb41a024256031e9a6286a",
+      "git_blob": "d35ce42c9c554544cbd8c00b2a04468a6708b986"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-rfsub3-n91/host.json",
+      "sha256": "4967da8d8e166de6c0bf9c70de83f94025e5dcfc99c8f0732e44323341605acd",
+      "git_blob": "91cec903aab2f32da44ce280dd00706abbb1c90c"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-mitm3-n128/session.json",
+      "sha256": "20731a53356027fa30709e81c3e1cd2cbc89f763408e51b9554fbcc5ab22ee1c",
+      "git_blob": "6cedbad4516a3eef6ba9657944335cc1ace28570",
+      "session_dir": "sessions/train-ext-P20-mitm3-n128",
+      "records_jsonl": {
+        "sha256": "df99991d4b3e0faa5133a44f7a3013c250cab0a214910fb64ab4333f1294fb6d",
+        "git_blob": "0823be1e2b20e9f95068f3f0abcc7a5c681a64d5",
+        "note": "named through its session dir; may move to the artifact store with this sha256"
+      }
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-mitm3-n128/spec.json",
+      "sha256": "01328cd29d502475f1460d691461ff99fcf651c2341ecd98d0bc0f614449711a",
+      "git_blob": "09b7a47e89ad5ae04c2622f1c088ba77d7a5dc5d"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-mitm3-n128/plan.json",
+      "sha256": "5bb20e20fc943dd1ddc5276fd6df96588e44270e46ad60543d5839cce691d464",
+      "git_blob": "212497769559c5e6255610f79d21bfa6fa998c98"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-mitm3-n128/host.json",
+      "sha256": "86cc37ba5fc93caa7211a11fe93284e17f1bf31f953312542aaaaa853577be64",
+      "git_blob": "eec69b1ca1565ee9f26b975e3864fd0ec01eb54d"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-rfmitm3-n128/session.json",
+      "sha256": "9514f5370616d53e245f79e27cb8a219c33b2d7fb7132227ca75fcd983600289",
+      "git_blob": "61dcfdcc08fa7e7eba32271d7794bbb0fd725f44",
+      "session_dir": "sessions/train-ext-P20-rfmitm3-n128",
+      "records_jsonl": {
+        "sha256": "9e7361fc0d2dd49b72f9e1e3b31a17e6262fa2a1f4cb86d247b0ecb1fe3a4e94",
+        "git_blob": "84b27d9e1be0a41926c43fa8f39c797201aece99",
+        "note": "named through its session dir; may move to the artifact store with this sha256"
+      }
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-rfmitm3-n128/spec.json",
+      "sha256": "575440f68b5a0c3bf768ed06e3e3651c1b556cbf01412334e449a4b622cb8456",
+      "git_blob": "89f690936c28da63b24662709a515f147a1aa322"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-rfmitm3-n128/plan.json",
+      "sha256": "5cb1d0af5e094a98aa429a61c58c652da784bc51ce340a229be77c5c7b20c7d1",
+      "git_blob": "24b866b04e9dfcdd7a29dfc63db311f038bbb1cc"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-rfmitm3-n128/host.json",
+      "sha256": "ce41dbc6c3ea3d54acc4c9743b9382638575e552e8cbfa8a7ee777db5007a57a",
+      "git_blob": "8b75083c0af355d3b61fdaca9f5bbafb1ddb37ed"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-rfsub3-n128/session.json",
+      "sha256": "4b111a658512859745e5d252c00369748455c03e8203de917558033f11ff4f27",
+      "git_blob": "e3e0d2adae0ea1d96bb23a4853f735ce8a7ffc7e",
+      "session_dir": "sessions/train-ext-P20-rfsub3-n128",
+      "records_jsonl": {
+        "sha256": "8f7e2fca9a443011d19b963de4dcd6aba43dd3e45a4f49050fe661584d4df843",
+        "git_blob": "a281d483c54da0d4691bf6ad4df15e560906a430",
+        "note": "named through its session dir; may move to the artifact store with this sha256"
+      }
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-rfsub3-n128/spec.json",
+      "sha256": "f692c8898d4dbd6dc367bac9ce60e3fde293f19ba444783d8b0b65faf748272e",
+      "git_blob": "7fa27b0224eb802ca4789d70696bd46ec179d972"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-rfsub3-n128/plan.json",
+      "sha256": "1f8d1f477149e8ae693abf7d9c4e17268773758be3cb2a8f9b692450bce3f65f",
+      "git_blob": "bf5e886b2f32f11c077c8fc100faa9689af8a119"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/sessions/train-ext-P20-rfsub3-n128/host.json",
+      "sha256": "bee1fcd69cabede655a65c0b23052245995612b756c1736cedcbf94e7738540d",
+      "git_blob": "5501484162cbb019846fca1fb04b25fb72d7108f"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/select/FROZEN.sha256",
+      "sha256": "3d4461e9455d6cd2df387852b348516ec7eeb09655ef5e91b47435d88be37445",
+      "git_blob": "e132cccdeb790738cdf9037b103ce726cc9b263e"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/select/selection-P20.json",
+      "sha256": "09024c2e57516f139be7ce77c31c025001eef105b4d2fa075d0f0e9240e5101f",
+      "git_blob": "aae3d825e8d6fcec7ac9aa457be6d6768506b4f1"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/select/band-train-P20.json",
+      "sha256": "0c15f03f9f1869dc235733effc5a8e32d6f846ab66ebb46075e68380856bacc4",
+      "git_blob": "4f84b92a19bf71b36952d8d7dd7950b797b74347"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/specs/holdout-P20.json",
+      "sha256": "e5f640d0ee37936f38cecbd9c279ec81ba26646da0285eb81ffafc1909820ce2",
+      "git_blob": "c480c2c947241f03f3c626c8753476029a7d41f7"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/audits/holdout-P20.json",
+      "sha256": "2abd87116af5bafce27dd2b33c1c23bbc3852d4782578a860ad90f3e4fdc740c",
+      "git_blob": "bd596fd35f81045e3ae7f4270982ecf032a48ed2"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/audits/identity-frontier-P20.json",
+      "sha256": "a4f5503751b75c0a780b10bacff2a5c3aab7b849cd87eb68e06467f37a7ebecf",
+      "git_blob": "cf87032fcf51e450b285da88d05b579dd47c9a68"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/band-holdout.json",
+      "sha256": "8a9245efc64597939051f5cc0e4ee820727366d4cd1e1845dd4c2568766f6634",
+      "git_blob": "7d19dc394fd18f33b74ba27b3054631c26115f9c"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/host/ecbench.sha256",
+      "sha256": "5013b6dbd959eb1d937ae7165899df708c58eced91ed95c946b5efee39575f2f",
+      "git_blob": "605301f6e8e3fe5c8be3ec3085c028f5325a39a2"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/host/host.json",
+      "sha256": "376fd0fe964f2ecd472e711c0760d106935558accb7c9cfc1d81d4898fcbb1b1",
+      "git_blob": "e1f742a5080c3748ee9267b6179208012ae0bcf1"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/host/commit.txt",
+      "sha256": "6134685e0d1478078911362380fb8d550ac21b373b1051bb337962069521e1a7",
+      "git_blob": "a22f2e30c1c8fc1201430dfeee89e9a25b67230f"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P20-inc__inc-aa-w0.1.json",
+      "sha256": "c18daa3fdd7f3ebe7a05a38e9003280d1c18cb840d971f3089424be37de89e7a",
+      "git_blob": "a06d6908cab998a447442b486ac66f92e05009a0"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P20-inc__inc-aa-w0.json",
+      "sha256": "a85e0355fd8196f277b818d388384b3761ec5c9e1229b505f205a24e7494b7ca",
+      "git_blob": "653034662171cc2fcf537610b883d90443bdf0fe"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P20-inc__inc-aa-w1.json",
+      "sha256": "625e9bf6ef70281c6c6e0358d3e9e3521f252bfac42a0c1e381ee31f67c5081b",
+      "git_blob": "618e6635478a2d59d88193069d6ba19d9dcdc49a"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P20-inc__sel-w0.1.json",
+      "sha256": "28e0977040e1784e3a7e8b1767d080aa2694b35cf3a2eaf391e1eb986b72af57",
+      "git_blob": "4109977fac8ef1072e1826d78bdb4cd0ef113d21"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P20-inc__sel-w0.json",
+      "sha256": "ed2356913eec2de57593432884ef08af91aa63c5a2d2be3bbb88564fa0ee0798",
+      "git_blob": "ed2005d709d867274aefeb42d6a6f426f48e9260"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P20-inc__sel-w1.json",
+      "sha256": "51a34c17afbf2bf74eaec870c9e637c1f5a0d286a72f690f587a3f31f409ebe5",
+      "git_blob": "dbf01004e1e3919204d5b9ad5d2bc13b2a37a0c0"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P20-inc__size-w0.1.json",
+      "sha256": "514992d9932543dc0ba8c28f4e19d19da3687c46dc3e4379a1ccd6261ef25478",
+      "git_blob": "94907b90698497333f6d688a944fac941d20f2b2"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P20-inc__size-w0.json",
+      "sha256": "91a3bcc10290a4570768e090daec8d95e9d8c3713c551b31a3aae5232cbcd77e",
+      "git_blob": "a5b9993a2e93bf674c546e8d6e2ec7c8ce3b40ba"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P20-inc__size-w1.json",
+      "sha256": "497d6fa6c496a4276c92c4aa6f3a39b6c754d71e90d5b70159cceb8ceedbf8a5",
+      "git_blob": "3b9f2ce3801a8bf9c84cf734ed83d626448225d5"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P20-inc__stride-w0.1.json",
+      "sha256": "536433c65e47e70cca8d788e30a2ad3ab68f2b8b85f7d934544930bd5f00cae2",
+      "git_blob": "41377381b3bf1ac74138fad2ba07be0fd263409d"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P20-inc__stride-w0.json",
+      "sha256": "587f9c8a3ddfd9c4ea5383f2f07790c8f754fe40ea89101abb501ca55d559ab2",
+      "git_blob": "8b3c362d67b9dcf9e0b4ce952afe47ca9aa2032e"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P20-inc__stride-w1.json",
+      "sha256": "001952aa56672cfe795769676efd71e6a22efb7765280e37b4848a6de47d4466",
+      "git_blob": "19d5475026f2cc52603de72f95d45db31c0d2422"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P20-rho-neg__inc-w0.1.json",
+      "sha256": "cae7a8142605f92c640c130aaa3b647f7f2d7bc338e117cdbe4a0c5a5b323148",
+      "git_blob": "8c32e309ae2f37334a84b07a991bdce5633e839d"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P20-rho-neg__inc-w0.json",
+      "sha256": "ead7cf9475c13b0edc896513dfcabea8def14980a6f0bd51814dc685b09cefad",
+      "git_blob": "0268c7f84e529242ee2dcecf71947f31614d513d"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P20-rho-neg__inc-w1.json",
+      "sha256": "ce375ead5c54d8b233d526b6025f65a91f6bc6243a765d7a7e00e38b3d50e556",
+      "git_blob": "b7d88c5ce866111782db58a3ff1059f1703a40d2"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P20-rho-neg__rho-neg-aa-w0.1.json",
+      "sha256": "6be1998799f11a9874a44306b3ef11a0436d8775cc168975b5384400d129b6df",
+      "git_blob": "f07b2b3a3200d179bfd6e217e7590faf521c2d64"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P20-rho-neg__rho-neg-aa-w0.json",
+      "sha256": "78fd60c2c6f6fc600a84cf00f352f2e17ea5dfd2d9c909fb845c705951b3aee6",
+      "git_blob": "d299ae0db86aad99603df8b584f2b541f6fc2734"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P20-rho-neg__rho-neg-aa-w1.json",
+      "sha256": "d738c77ba95022edcfbd8756d4df5007aefc7c2fab1f256e168f56340ae65f4a",
+      "git_blob": "e0cb029034cfd9f6fea814b49e68aeae6063d23a"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P20-rho-neg__sel-w0.1.json",
+      "sha256": "4ac58850572a81f0c913f05ddf239faf231c70d7f3828a5dbec167fa66aa4dc8",
+      "git_blob": "6e2cb2a9aadfd8c1652351d9479fc3b4a5cdb2f2"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P20-rho-neg__sel-w0.json",
+      "sha256": "6a05bdcd287a55b983bb1e5b106201ce9be0e0d1d44c5e9d2bc7b93a9acf8b46",
+      "git_blob": "5af732e85233fb83c31f98b2c00004c09196126d"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P20-rho-neg__sel-w1.json",
+      "sha256": "0d2a08a9491329d6f6f3e458062dfc79cd370db24aca393ba3182a3f96238fa1",
+      "git_blob": "738dec13e42fc36ab90f22206a1d3de834c2a2b5"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/select/selection-P24.json",
+      "sha256": "3c00bf29cb4e9f9e6955944ea920ef978420e075434e29f3bfb7beb87b1dacfb",
+      "git_blob": "4abb9b08c5ad716cdec5fa1f3669cfcda6b57697"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P24-inc__sel-w0.json",
+      "sha256": "a848bbc55f930f5bae7d4c9ee224eed99300d61c19dfcb606cdd1340d937c6f6",
+      "git_blob": "4107260d9d5525b72e4a5f4d515922ac7f62eb17"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P24-inc__sel-w0.1.json",
+      "sha256": "dcbffd584d917f24a998ecfbe7682b1086fa5c38accd5bb10f3618f981bee224",
+      "git_blob": "7d78085af1f9f01d804a562e7b8772135292aa25"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P24-inc__sel-w1.json",
+      "sha256": "a05d3e0a892617bbfad27f28c43dc718a673d991031da8d8f34780c690633e92",
+      "git_blob": "62bfaa0afcc8868973b7b2d2ed9ead76c2e91515"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/select/selection-P28.json",
+      "sha256": "1f7e225b9d6a31fef4fdf507707769d45dfa3d3e26c277d3c71a6ebb6f1a6e43",
+      "git_blob": "deca4f67a85d9c87b2fdcee5c0f2f2f68821820b"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P28-inc__sel-w0.json",
+      "sha256": "983288ab88ea948fe482b32bdd6564c62c82a9b6d29bcaf01419889b9fc31a69",
+      "git_blob": "2f6af026749afa3c2112533344a6a2fd5b5882fe"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P28-inc__sel-w0.1.json",
+      "sha256": "9e3de76889b8dfccaf47591a49429593f018dec45dd5b65dcd6c6097318d6480",
+      "git_blob": "5098fa84673f9264869a28e9d1ddf77e184c5886"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P28-inc__sel-w1.json",
+      "sha256": "9635ec98f42e87709e306ce62f8a77e7f705bd59fabca520a80249f90de270a3",
+      "git_blob": "c0eb3659f55e1c963d15ee25e27f58f4ad28cfaa"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/select/selection-P32.json",
+      "sha256": "0380888537a47068ecab5a34177fb52efabd3895216e91a16f873faff3d4ded7",
+      "git_blob": "c70c76764471da16811d6d5255f0661c35de4fa6"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P32-inc__sel-w0.json",
+      "sha256": "89ea72d63ca5ba9cf8616cf6a1a3dbfc7d28d8362f574548a8aea253afa8d8fa",
+      "git_blob": "54afb5039d26d4f9cd9d7b32a1105bffee84b260"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P32-inc__sel-w0.1.json",
+      "sha256": "881dbb3c274b33a4867e7c90e49da59a59277238aa92391e47aad8555114142c",
+      "git_blob": "564d01080efcb8266dd9e95dd4a8f9fbe7b6a35d"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/analysis/compare-P32-inc__sel-w1.json",
+      "sha256": "3ec908cb1c0b1d9410d646bf7738170ce2017aa4fc06995ff28231312326712f",
+      "git_blob": "a7bbeb26ce9bd4159c9ea281b9c13b9b570c25fc"
+    },
+    {
+      "path": "../../research/prime_base_oracle_tuning_20261029/../../backlog/XP-20261016-prime-base-oracle-tuning/PROTOCOL.md",
+      "sha256": "1a7d714c9e4611b0a7a2349e2f688f2fc10d2f29e7ebe3077d26751d8be9887f",
+      "git_blob": "0ee2e28732a57f45cbd283bb796d2d41b3933a94",
+      "protocol_git_blob_expected": "0ee2e28732a57f45cbd283bb796d2d41b3933a94"
+    }
+  ],
+  "raw_data_note": "Session dirs are the raw data; each records.jsonl is pinned by sha256 and git blob inside its session.json entry, so moving it to the artifact store keeps this report valid.",
+  "headline": [
+    {
+      "name": "P20 sum S_sel / sum S_inc at w=0 (paired, 96 pairs)",
+      "claimed": 0.818033674403639,
+      "recomputed": 0.8180336744036392,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P20-inc__sel-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sum S_size / sum S_inc at w=0 (paired, 96 pairs)",
+      "claimed": 0.818033674403639,
+      "recomputed": 0.8180336744036392,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P20-inc__size-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sum S_stride / sum S_inc at w=0 (paired, 96 pairs)",
+      "claimed": 0.8092901513802637,
+      "recomputed": 0.8092901513802638,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P20-inc__stride-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sum S_inc-aa / sum S_inc at w=0 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P20-inc__inc-aa-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sum S_rho-neg-aa / sum S_rho-neg at w=0 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P20-rho-neg__rho-neg-aa-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sum S_sel / sum S_rho-neg at w=0 (paired, 96 pairs)",
+      "claimed": 7.747581791100991,
+      "recomputed": 7.747581791100991,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P20-rho-neg__sel-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sum S_inc / sum S_rho-neg at w=0 (paired, 96 pairs)",
+      "claimed": 9.470981493211896,
+      "recomputed": 9.470981493211895,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P20-rho-neg__inc-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sel/inc at w=0 (README)",
+      "claimed": 0.818,
+      "recomputed": 0.8180336744036392,
+      "rel_tol": 0.0006112217823606207,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sel/inc 95% bootstrap lower at w=0 (README)",
+      "claimed": 0.773,
+      "recomputed": 0.7727276258908049,
+      "rel_tol": 0.0006468305310478654,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P20 sel/inc 95% bootstrap upper at w=0 (README)",
+      "claimed": 0.866,
+      "recomputed": 0.8663609175033095,
+      "rel_tol": 0.0005771266805766202,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P20 sel/inc bootstrap lower at w=0, validator's own resampler (different RNG)",
+      "claimed": 0.7727276258908049,
+      "recomputed": 0.7721450714433991,
+      "rel_tol": 0.01,
+      "claimed_source": "analysis/compare-P20-inc__sel-w0.json ops.ci95_bootstrap",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly); two-stage cluster bootstrap, 4000 resamples, seed 29102026; Monte Carlo tolerance 1%"
+    },
+    {
+      "name": "P20 sel/inc bootstrap upper at w=0, validator's own resampler (different RNG)",
+      "claimed": 0.8663609175033095,
+      "recomputed": 0.8671021783000951,
+      "rel_tol": 0.01,
+      "claimed_source": "analysis/compare-P20-inc__sel-w0.json ops.ci95_bootstrap",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly); two-stage cluster bootstrap, 4000 resamples, seed 29102026; Monte Carlo tolerance 1%"
+    },
+    {
+      "name": "P20 sum S_sel / sum S_inc at w=0.1 (paired, 96 pairs)",
+      "claimed": 0.7978369244854302,
+      "recomputed": 0.7978369244854301,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P20-inc__sel-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sum S_size / sum S_inc at w=0.1 (paired, 96 pairs)",
+      "claimed": 0.7978369244854302,
+      "recomputed": 0.7978369244854301,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P20-inc__size-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sum S_stride / sum S_inc at w=0.1 (paired, 96 pairs)",
+      "claimed": 0.7886618836180559,
+      "recomputed": 0.788661883618056,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P20-inc__stride-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sum S_inc-aa / sum S_inc at w=0.1 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P20-inc__inc-aa-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sum S_rho-neg-aa / sum S_rho-neg at w=0.1 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P20-rho-neg__rho-neg-aa-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sum S_sel / sum S_rho-neg at w=0.1 (paired, 96 pairs)",
+      "claimed": 8.022975228231529,
+      "recomputed": 8.022975228231527,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P20-rho-neg__sel-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sum S_inc / sum S_rho-neg at w=0.1 (paired, 96 pairs)",
+      "claimed": 10.05590864750462,
+      "recomputed": 10.05590864750462,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P20-rho-neg__inc-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sel/inc at w=0.1 (README)",
+      "claimed": 0.798,
+      "recomputed": 0.7978369244854301,
+      "rel_tol": 0.0006265664166666667,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sel/inc 95% bootstrap lower at w=0.1 (README)",
+      "claimed": 0.752,
+      "recomputed": 0.7516036782169863,
+      "rel_tol": 0.0006648936176861703,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P20 sel/inc 95% bootstrap upper at w=0.1 (README)",
+      "claimed": 0.847,
+      "recomputed": 0.8468348044994571,
+      "rel_tol": 0.0005903187727272728,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P20 sel/inc bootstrap lower at w=0.1, validator's own resampler (different RNG)",
+      "claimed": 0.7516036782169863,
+      "recomputed": 0.7511380569833629,
+      "rel_tol": 0.01,
+      "claimed_source": "analysis/compare-P20-inc__sel-w0.1.json ops.ci95_bootstrap",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly); two-stage cluster bootstrap, 4000 resamples, seed 29102026; Monte Carlo tolerance 1%"
+    },
+    {
+      "name": "P20 sel/inc bootstrap upper at w=0.1, validator's own resampler (different RNG)",
+      "claimed": 0.8468348044994571,
+      "recomputed": 0.8480016162368639,
+      "rel_tol": 0.01,
+      "claimed_source": "analysis/compare-P20-inc__sel-w0.1.json ops.ci95_bootstrap",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly); two-stage cluster bootstrap, 4000 resamples, seed 29102026; Monte Carlo tolerance 1%"
+    },
+    {
+      "name": "P20 sum S_sel / sum S_inc at w=1 (paired, 96 pairs)",
+      "claimed": 0.7261189561674931,
+      "recomputed": 0.7261189561674933,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P20-inc__sel-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sum S_size / sum S_inc at w=1 (paired, 96 pairs)",
+      "claimed": 0.7261189561674931,
+      "recomputed": 0.7261189561674933,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P20-inc__size-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sum S_stride / sum S_inc at w=1 (paired, 96 pairs)",
+      "claimed": 0.7154116101921268,
+      "recomputed": 0.7154116101921267,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P20-inc__stride-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sum S_inc-aa / sum S_inc at w=1 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P20-inc__inc-aa-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sum S_rho-neg-aa / sum S_rho-neg at w=1 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P20-rho-neg__rho-neg-aa-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sum S_sel / sum S_rho-neg at w=1 (paired, 96 pairs)",
+      "claimed": 9.352959009315224,
+      "recomputed": 9.35295900931523,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P20-rho-neg__sel-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sum S_inc / sum S_rho-neg at w=1 (paired, 96 pairs)",
+      "claimed": 12.880753118856449,
+      "recomputed": 12.88075311885645,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P20-rho-neg__inc-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sel/inc at w=1 (README)",
+      "claimed": 0.726,
+      "recomputed": 0.7261189561674933,
+      "rel_tol": 0.0006885924079699489,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sel/inc 95% bootstrap lower at w=1 (README)",
+      "claimed": 0.677,
+      "recomputed": 0.6774615179478017,
+      "rel_tol": 0.000738049302069029,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P20 sel/inc 95% bootstrap upper at w=1 (README)",
+      "claimed": 0.778,
+      "recomputed": 0.7781930961928213,
+      "rel_tol": 0.0006425140533193701,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P20 sel/inc bootstrap lower at w=1, validator's own resampler (different RNG)",
+      "claimed": 0.6774615179478017,
+      "recomputed": 0.6777693121864667,
+      "rel_tol": 0.01,
+      "claimed_source": "analysis/compare-P20-inc__sel-w1.json ops.ci95_bootstrap",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly); two-stage cluster bootstrap, 4000 resamples, seed 29102026; Monte Carlo tolerance 1%"
+    },
+    {
+      "name": "P20 sel/inc bootstrap upper at w=1, validator's own resampler (different RNG)",
+      "claimed": 0.7781930961928213,
+      "recomputed": 0.778869086254419,
+      "rel_tol": 0.01,
+      "claimed_source": "analysis/compare-P20-inc__sel-w1.json ops.ci95_bootstrap",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly); two-stage cluster bootstrap, 4000 resamples, seed 29102026; Monte Carlo tolerance 1%"
+    },
+    {
+      "name": "P20 mean S inc at w=0 (README)",
+      "claimed": 12.853,
+      "recomputed": 12.853413437618684,
+      "rel_tol": 0.000038900172543787225,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 mean S inc at w=0.1 (README)",
+      "claimed": 14.826,
+      "recomputed": 14.825797662429673,
+      "rel_tol": 0.0000337245380075543,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 mean S inc at w=1 (README)",
+      "claimed": 32.577,
+      "recomputed": 32.57725568572858,
+      "rel_tol": 0.000015348131387231603,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 mean S sel at w=0 (README)",
+      "claimed": 10.515,
+      "recomputed": 10.514525023004323,
+      "rel_tol": 0.000047551117498811224,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 mean S sel at w=0.1 (README)",
+      "claimed": 11.829,
+      "recomputed": 11.828568810036169,
+      "rel_tol": 0.000042268999957731,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 mean S sel at w=1 (README)",
+      "claimed": 23.655,
+      "recomputed": 23.654962893322775,
+      "rel_tol": 0.000021137180321285143,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 mean S rho-neg at w=0 (README)",
+      "claimed": 1.357,
+      "recomputed": 1.3571363693225533,
+      "rel_tol": 0.0003684228142449582,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 mean S rho-neg at w=0.1 (README)",
+      "claimed": 1.474,
+      "recomputed": 1.4743369477713688,
+      "rel_tol": 0.0003391355017289691,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 mean S rho-neg at w=1 (README)",
+      "claimed": 2.529,
+      "recomputed": 2.529142153810707,
+      "rel_tol": 0.00019769549123470204,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 rho-neg -> inc gap at w=0 (README)",
+      "claimed": 9.47,
+      "recomputed": 9.470981493211895,
+      "rel_tol": 0.0005279283893209625,
+      "claimed_source": "README.md 'Gap to matched rho' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 rho-neg -> inc gap at w=0.1 (README)",
+      "claimed": 10.06,
+      "recomputed": 10.05590864750462,
+      "rel_tol": 0.000497017893141153,
+      "claimed_source": "README.md 'Gap to matched rho' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 rho-neg -> inc gap at w=1 (README)",
+      "claimed": 12.88,
+      "recomputed": 12.88075311885645,
+      "rel_tol": 0.00038817606073672647,
+      "claimed_source": "README.md 'Gap to matched rho' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 rho-neg -> sel gap at w=0 (README)",
+      "claimed": 7.75,
+      "recomputed": 7.747581791100991,
+      "rel_tol": 0.000645161290967742,
+      "claimed_source": "README.md 'Gap to matched rho' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 rho-neg -> sel gap at w=0.1 (README)",
+      "claimed": 8.02,
+      "recomputed": 8.022975228231527,
+      "rel_tol": 0.0006232102010493345,
+      "claimed_source": "README.md 'Gap to matched rho' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 rho-neg -> sel gap at w=1 (README)",
+      "claimed": 9.35,
+      "recomputed": 9.35295900931523,
+      "rel_tol": 0.000534590176223393,
+      "claimed_source": "README.md 'Gap to matched rho' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 stride/inc at w=0 (README)",
+      "claimed": 0.809,
+      "recomputed": 0.8092901513802638,
+      "rel_tol": 0.0006178253864170199,
+      "claimed_source": "README.md 'Attribution and controls'",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 stride/inc lower at w=0 (README)",
+      "claimed": 0.758,
+      "recomputed": 0.75794021120135,
+      "rel_tol": 0.000659630607519789,
+      "claimed_source": "README.md 'Attribution and controls'",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P20 stride/inc upper at w=0 (README)",
+      "claimed": 0.868,
+      "recomputed": 0.8676538269212282,
+      "rel_tol": 0.0005760368669354839,
+      "claimed_source": "README.md 'Attribution and controls'",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P20 stride/inc at w=1 (README)",
+      "claimed": 0.715,
+      "recomputed": 0.7154116101921267,
+      "rel_tol": 0.0006988983591777648,
+      "claimed_source": "README.md 'Attribution and controls'",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 stride/inc lower at w=1 (README)",
+      "claimed": 0.661,
+      "recomputed": 0.6608708820948691,
+      "rel_tol": 0.0007564296527987898,
+      "claimed_source": "README.md 'Attribution and controls'",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P20 stride/inc upper at w=1 (README)",
+      "claimed": 0.778,
+      "recomputed": 0.7776256288666145,
+      "rel_tol": 0.0006426735224935732,
+      "claimed_source": "README.md 'Attribution and controls'",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P24 sum S_sel / sum S_inc at w=0 (paired, 96 pairs)",
+      "claimed": 0.9019233825415248,
+      "recomputed": 0.901923382541525,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P24-inc__sel-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sum S_size / sum S_inc at w=0 (paired, 96 pairs)",
+      "claimed": 0.9019233825415248,
+      "recomputed": 0.901923382541525,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P24-inc__size-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sum S_stride / sum S_inc at w=0 (paired, 96 pairs)",
+      "claimed": 0.8974768124339222,
+      "recomputed": 0.8974768124339219,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P24-inc__stride-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sum S_inc-aa / sum S_inc at w=0 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P24-inc__inc-aa-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sum S_rho-neg-aa / sum S_rho-neg at w=0 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P24-rho-neg__rho-neg-aa-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sum S_sel / sum S_rho-neg at w=0 (paired, 96 pairs)",
+      "claimed": 12.441960288540193,
+      "recomputed": 12.441960288540196,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P24-rho-neg__sel-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sum S_inc / sum S_rho-neg at w=0 (paired, 96 pairs)",
+      "claimed": 13.794919312857886,
+      "recomputed": 13.794919312857887,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P24-rho-neg__inc-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sel/inc at w=0 (README)",
+      "claimed": 0.902,
+      "recomputed": 0.901923382541525,
+      "rel_tol": 0.0005543237256097561,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sel/inc 95% bootstrap lower at w=0 (README)",
+      "claimed": 0.87,
+      "recomputed": 0.8702186386865893,
+      "rel_tol": 0.0005745682501752021,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P24 sel/inc 95% bootstrap upper at w=0 (README)",
+      "claimed": 0.933,
+      "recomputed": 0.9329404688610663,
+      "rel_tol": 0.0005359056811361201,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P24 sum S_sel / sum S_inc at w=0.1 (paired, 96 pairs)",
+      "claimed": 0.9401374144780682,
+      "recomputed": 0.9401374144780681,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P24-inc__sel-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sum S_size / sum S_inc at w=0.1 (paired, 96 pairs)",
+      "claimed": 0.9401374144780682,
+      "recomputed": 0.9401374144780681,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P24-inc__size-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sum S_stride / sum S_inc at w=0.1 (paired, 96 pairs)",
+      "claimed": 0.9350840704341546,
+      "recomputed": 0.9350840704341542,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P24-inc__stride-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sum S_inc-aa / sum S_inc at w=0.1 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P24-inc__inc-aa-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sum S_rho-neg-aa / sum S_rho-neg at w=0.1 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P24-rho-neg__rho-neg-aa-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sum S_sel / sum S_rho-neg at w=0.1 (paired, 96 pairs)",
+      "claimed": 12.919115565145855,
+      "recomputed": 12.919115565145853,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P24-rho-neg__sel-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sum S_inc / sum S_rho-neg at w=0.1 (paired, 96 pairs)",
+      "claimed": 13.741731119506717,
+      "recomputed": 13.741731119506719,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P24-rho-neg__inc-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sel/inc at w=0.1 (README)",
+      "claimed": 0.94,
+      "recomputed": 0.9401374144780681,
+      "rel_tol": 0.0005318371472085098,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sel/inc 95% bootstrap lower at w=0.1 (README)",
+      "claimed": 0.905,
+      "recomputed": 0.9049893788887569,
+      "rel_tol": 0.0005524861883977901,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P24 sel/inc 95% bootstrap upper at w=0.1 (README)",
+      "claimed": 0.975,
+      "recomputed": 0.9749070997762481,
+      "rel_tol": 0.0005128205133333334,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P24 sum S_sel / sum S_inc at w=1 (paired, 96 pairs)",
+      "claimed": 1.1257817332182112,
+      "recomputed": 1.1257817332182116,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P24-inc__sel-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sum S_size / sum S_inc at w=1 (paired, 96 pairs)",
+      "claimed": 1.1257817332182112,
+      "recomputed": 1.1257817332182116,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P24-inc__size-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sum S_stride / sum S_inc at w=1 (paired, 96 pairs)",
+      "claimed": 1.1177806726333483,
+      "recomputed": 1.1177806726333488,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P24-inc__stride-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sum S_inc-aa / sum S_inc at w=1 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P24-inc__inc-aa-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sum S_rho-neg-aa / sum S_rho-neg at w=1 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P24-rho-neg__rho-neg-aa-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sum S_sel / sum S_rho-neg at w=1 (paired, 96 pairs)",
+      "claimed": 15.185749589431664,
+      "recomputed": 15.185749589431675,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P24-rho-neg__sel-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sum S_inc / sum S_rho-neg at w=1 (paired, 96 pairs)",
+      "claimed": 13.489070875240609,
+      "recomputed": 13.48907087524061,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P24-rho-neg__inc-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sel/inc at w=1 (README)",
+      "claimed": 1.126,
+      "recomputed": 1.1257817332182116,
+      "rel_tol": 0.0004440497340142097,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 sel/inc 95% bootstrap lower at w=1 (README)",
+      "claimed": 1.073,
+      "recomputed": 1.0731700912798705,
+      "rel_tol": 0.0004659093694119787,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P24 sel/inc 95% bootstrap upper at w=1 (README)",
+      "claimed": 1.179,
+      "recomputed": 1.1793835146891332,
+      "rel_tol": 0.00042395030477578965,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P24 mean S inc at w=0 (README)",
+      "claimed": 13.976,
+      "recomputed": 13.976011224519695,
+      "rel_tol": 0.000035775586643977044,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 mean S inc at w=0.1 (README)",
+      "claimed": 15.168,
+      "recomputed": 15.167618156552685,
+      "rel_tol": 0.00003296413505406119,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 mean S inc at w=1 (README)",
+      "claimed": 25.892,
+      "recomputed": 25.892080544849595,
+      "rel_tol": 0.00001931092403462568,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 mean S sel at w=0 (README)",
+      "claimed": 12.605,
+      "recomputed": 12.605291318057125,
+      "rel_tol": 0.00003966588219851359,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 mean S sel at w=0.1 (README)",
+      "claimed": 14.26,
+      "recomputed": 14.259645317492042,
+      "rel_tol": 0.0000350631136395512,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 mean S sel at w=1 (README)",
+      "claimed": 29.149,
+      "recomputed": 29.148831312406315,
+      "rel_tol": 0.000017153247126831107,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 mean S rho-neg at w=0 (README)",
+      "claimed": 1.013,
+      "recomputed": 1.0131274353662232,
+      "rel_tol": 0.0004935213311238197,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 mean S rho-neg at w=0.1 (README)",
+      "claimed": 1.104,
+      "recomputed": 1.1037632758671785,
+      "rel_tol": 0.0004528985511775362,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 mean S rho-neg at w=1 (README)",
+      "claimed": 1.919,
+      "recomputed": 1.9194858403757735,
+      "rel_tol": 0.0002604864229694532,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 rho-neg -> inc gap at w=0 (README)",
+      "claimed": 13.79,
+      "recomputed": 13.794919312857887,
+      "rel_tol": 0.00036245228345334573,
+      "claimed_source": "README.md 'Gap to matched rho' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 rho-neg -> inc gap at w=0.1 (README)",
+      "claimed": 13.74,
+      "recomputed": 13.741731119506719,
+      "rel_tol": 0.00036385517672532394,
+      "claimed_source": "README.md 'Gap to matched rho' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 rho-neg -> inc gap at w=1 (README)",
+      "claimed": 13.49,
+      "recomputed": 13.48907087524061,
+      "rel_tol": 0.0003706449225352113,
+      "claimed_source": "README.md 'Gap to matched rho' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 rho-neg -> sel gap at w=0 (README)",
+      "claimed": 12.44,
+      "recomputed": 12.441960288540196,
+      "rel_tol": 0.0004018659350331881,
+      "claimed_source": "README.md 'Gap to matched rho' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 rho-neg -> sel gap at w=0.1 (README)",
+      "claimed": 12.92,
+      "recomputed": 12.919115565145853,
+      "rel_tol": 0.00038699690441176474,
+      "claimed_source": "README.md 'Gap to matched rho' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 rho-neg -> sel gap at w=1 (README)",
+      "claimed": 15.19,
+      "recomputed": 15.185749589431675,
+      "rel_tol": 0.0003291639239631337,
+      "claimed_source": "README.md 'Gap to matched rho' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sum S_sel / sum S_inc at w=0 (paired, 96 pairs)",
+      "claimed": 0.9286141224661316,
+      "recomputed": 0.9286141224661315,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P28-inc__sel-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sum S_size / sum S_inc at w=0 (paired, 96 pairs)",
+      "claimed": 0.9286141224661316,
+      "recomputed": 0.9286141224661315,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P28-inc__size-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sum S_stride / sum S_inc at w=0 (paired, 96 pairs)",
+      "claimed": 0.9271684218810203,
+      "recomputed": 0.9271684218810208,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P28-inc__stride-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sum S_inc-aa / sum S_inc at w=0 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P28-inc__inc-aa-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sum S_rho-neg-aa / sum S_rho-neg at w=0 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P28-rho-neg__rho-neg-aa-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sum S_sel / sum S_rho-neg at w=0 (paired, 96 pairs)",
+      "claimed": 20.24563156288252,
+      "recomputed": 20.245631562882522,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P28-rho-neg__sel-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sum S_inc / sum S_rho-neg at w=0 (paired, 96 pairs)",
+      "claimed": 21.801985424382686,
+      "recomputed": 21.801985424382693,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P28-rho-neg__inc-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sel/inc at w=0 (README)",
+      "claimed": 0.929,
+      "recomputed": 0.9286141224661315,
+      "rel_tol": 0.0005382131329386437,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sel/inc 95% bootstrap lower at w=0 (README)",
+      "claimed": 0.894,
+      "recomputed": 0.8942248761729561,
+      "rel_tol": 0.0005591434703090197,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P28 sel/inc 95% bootstrap upper at w=0 (README)",
+      "claimed": 0.964,
+      "recomputed": 0.9644593668379497,
+      "rel_tol": 0.0005184251588942378,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P28 sum S_sel / sum S_inc at w=0.1 (paired, 96 pairs)",
+      "claimed": 0.9736176053229733,
+      "recomputed": 0.973617605322973,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P28-inc__sel-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sum S_size / sum S_inc at w=0.1 (paired, 96 pairs)",
+      "claimed": 0.9736176053229733,
+      "recomputed": 0.973617605322973,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P28-inc__size-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sum S_stride / sum S_inc at w=0.1 (paired, 96 pairs)",
+      "claimed": 0.9720209727594216,
+      "recomputed": 0.9720209727594211,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P28-inc__stride-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sum S_inc-aa / sum S_inc at w=0.1 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P28-inc__inc-aa-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sum S_rho-neg-aa / sum S_rho-neg at w=0.1 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P28-rho-neg__rho-neg-aa-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sum S_sel / sum S_rho-neg at w=0.1 (paired, 96 pairs)",
+      "claimed": 20.97860623174698,
+      "recomputed": 20.978606231746976,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P28-rho-neg__sel-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sum S_inc / sum S_rho-neg at w=0.1 (paired, 96 pairs)",
+      "claimed": 21.547069524064177,
+      "recomputed": 21.547069524064177,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P28-rho-neg__inc-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sel/inc at w=0.1 (README)",
+      "claimed": 0.974,
+      "recomputed": 0.973617605322973,
+      "rel_tol": 0.0005133470231006161,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sel/inc 95% bootstrap lower at w=0.1 (README)",
+      "claimed": 0.935,
+      "recomputed": 0.9353814490612495,
+      "rel_tol": 0.0005345412836675358,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P28 sel/inc 95% bootstrap upper at w=0.1 (README)",
+      "claimed": 1.014,
+      "recomputed": 1.0135564027018713,
+      "rel_tol": 0.0004930966474358975,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P28 sum S_sel / sum S_inc at w=1 (paired, 96 pairs)",
+      "claimed": 1.19341458741455,
+      "recomputed": 1.1934145874145496,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P28-inc__sel-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sum S_size / sum S_inc at w=1 (paired, 96 pairs)",
+      "claimed": 1.19341458741455,
+      "recomputed": 1.1934145874145496,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P28-inc__size-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sum S_stride / sum S_inc at w=1 (paired, 96 pairs)",
+      "claimed": 1.191080803162806,
+      "recomputed": 1.1910808031628057,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P28-inc__stride-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sum S_inc-aa / sum S_inc at w=1 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P28-inc__inc-aa-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sum S_rho-neg-aa / sum S_rho-neg at w=1 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P28-rho-neg__rho-neg-aa-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sum S_sel / sum S_rho-neg at w=1 (paired, 96 pairs)",
+      "claimed": 24.325473428268438,
+      "recomputed": 24.325473428268435,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P28-rho-neg__sel-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sum S_inc / sum S_rho-neg at w=1 (paired, 96 pairs)",
+      "claimed": 20.383087055243635,
+      "recomputed": 20.383087055243642,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P28-rho-neg__inc-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sel/inc at w=1 (README)",
+      "claimed": 1.193,
+      "recomputed": 1.1934145874145496,
+      "rel_tol": 0.0004189658864345001,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 sel/inc 95% bootstrap lower at w=1 (README)",
+      "claimed": 1.134,
+      "recomputed": 1.1336180628761252,
+      "rel_tol": 0.00044091710802469144,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P28 sel/inc 95% bootstrap upper at w=1 (README)",
+      "claimed": 1.257,
+      "recomputed": 1.257259136985163,
+      "rel_tol": 0.0003976904886123732,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P28 mean S inc at w=0 (README)",
+      "claimed": 20.478,
+      "recomputed": 20.47846438500454,
+      "rel_tol": 0.000024415893257412776,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 mean S inc at w=0.1 (README)",
+      "claimed": 22.204,
+      "recomputed": 22.204291228564475,
+      "rel_tol": 0.00002251816981470592,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 mean S inc at w=1 (README)",
+      "claimed": 37.737,
+      "recomputed": 37.73673282060392,
+      "rel_tol": 0.000013249595900575034,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 mean S sel at w=0 (README)",
+      "claimed": 19.017,
+      "recomputed": 19.016591234334918,
+      "rel_tol": 0.000026292264841983493,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 mean S sel at w=0.1 (README)",
+      "claimed": 21.618,
+      "recomputed": 21.61848885384884,
+      "rel_tol": 0.000023128351101699817,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 mean S sel at w=1 (README)",
+      "claimed": 45.036,
+      "recomputed": 45.03556742947412,
+      "rel_tol": 0.000011102229338751221,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 mean S rho-neg at w=0 (README)",
+      "claimed": 0.939,
+      "recomputed": 0.939293554526554,
+      "rel_tol": 0.000532314948921397,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 mean S rho-neg at w=0.1 (README)",
+      "claimed": 1.031,
+      "recomputed": 1.0305016746600415,
+      "rel_tol": 0.0004849660528612998,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 mean S rho-neg at w=1 (README)",
+      "claimed": 1.851,
+      "recomputed": 1.8513747558614275,
+      "rel_tol": 0.0002700695787911155,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 rho-neg -> inc gap at w=0 (README)",
+      "claimed": 21.8,
+      "recomputed": 21.801985424382693,
+      "rel_tol": 0.00022933691164696168,
+      "claimed_source": "README.md 'Gap to matched rho' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 rho-neg -> inc gap at w=0.1 (README)",
+      "claimed": 21.55,
+      "recomputed": 21.547069524064177,
+      "rel_tol": 0.00023201856171693738,
+      "claimed_source": "README.md 'Gap to matched rho' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 rho-neg -> inc gap at w=1 (README)",
+      "claimed": 20.38,
+      "recomputed": 20.383087055243642,
+      "rel_tol": 0.00024530141050021803,
+      "claimed_source": "README.md 'Gap to matched rho' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 rho-neg -> sel gap at w=0 (README)",
+      "claimed": 20.25,
+      "recomputed": 20.245631562882522,
+      "rel_tol": 0.0002469135804938272,
+      "claimed_source": "README.md 'Gap to matched rho' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 rho-neg -> sel gap at w=0.1 (README)",
+      "claimed": 20.98,
+      "recomputed": 20.978606231746976,
+      "rel_tol": 0.00023832221186844614,
+      "claimed_source": "README.md 'Gap to matched rho' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 rho-neg -> sel gap at w=1 (README)",
+      "claimed": 24.33,
+      "recomputed": 24.325473428268435,
+      "rel_tol": 0.00020550760398684755,
+      "claimed_source": "README.md 'Gap to matched rho' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sum S_sel / sum S_inc at w=0 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P32-inc__sel-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sum S_size / sum S_inc at w=0 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P32-inc__size-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sum S_stride / sum S_inc at w=0 (paired, 96 pairs)",
+      "claimed": 0.9888428790556419,
+      "recomputed": 0.9888428790556426,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P32-inc__stride-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sum S_inc-aa / sum S_inc at w=0 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P32-inc__inc-aa-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sum S_rho-neg-aa / sum S_rho-neg at w=0 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P32-rho-neg__rho-neg-aa-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sum S_sel / sum S_rho-neg at w=0 (paired, 96 pairs)",
+      "claimed": 33.30178039294961,
+      "recomputed": 33.301780392949574,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P32-rho-neg__sel-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sum S_inc / sum S_rho-neg at w=0 (paired, 96 pairs)",
+      "claimed": 33.30178039294961,
+      "recomputed": 33.301780392949574,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P32-rho-neg__inc-w0.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sel/inc at w=0 (README)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 0.0005000000005,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sel/inc 95% bootstrap lower at w=0 (README)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 0.0005000000005,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P32 sel/inc 95% bootstrap upper at w=0 (README)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 0.0005000000005,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P32 sum S_sel / sum S_inc at w=0.1 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P32-inc__sel-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sum S_size / sum S_inc at w=0.1 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P32-inc__size-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sum S_stride / sum S_inc at w=0.1 (paired, 96 pairs)",
+      "claimed": 0.9877623841066145,
+      "recomputed": 0.9877623841066148,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P32-inc__stride-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sum S_inc-aa / sum S_inc at w=0.1 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P32-inc__inc-aa-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sum S_rho-neg-aa / sum S_rho-neg at w=0.1 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P32-rho-neg__rho-neg-aa-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sum S_sel / sum S_rho-neg at w=0.1 (paired, 96 pairs)",
+      "claimed": 33.17627111913848,
+      "recomputed": 33.176271119138484,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P32-rho-neg__sel-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sum S_inc / sum S_rho-neg at w=0.1 (paired, 96 pairs)",
+      "claimed": 33.17627111913848,
+      "recomputed": 33.176271119138484,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P32-rho-neg__inc-w0.1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sel/inc at w=0.1 (README)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 0.0005000000005,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sel/inc 95% bootstrap lower at w=0.1 (README)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 0.0005000000005,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P32 sel/inc 95% bootstrap upper at w=0.1 (README)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 0.0005000000005,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P32 sum S_sel / sum S_inc at w=1 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P32-inc__sel-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sum S_size / sum S_inc at w=1 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P32-inc__size-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sum S_stride / sum S_inc at w=1 (paired, 96 pairs)",
+      "claimed": 0.9827805491276678,
+      "recomputed": 0.9827805491276672,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P32-inc__stride-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sum S_inc-aa / sum S_inc at w=1 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P32-inc__inc-aa-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sum S_rho-neg-aa / sum S_rho-neg at w=1 (paired, 96 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P32-rho-neg__rho-neg-aa-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sum S_sel / sum S_rho-neg at w=1 (paired, 96 pairs)",
+      "claimed": 32.60961365428301,
+      "recomputed": 32.60961365428303,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P32-rho-neg__sel-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sum S_inc / sum S_rho-neg at w=1 (paired, 96 pairs)",
+      "claimed": 32.60961365428301,
+      "recomputed": 32.60961365428303,
+      "rel_tol": 1E-12,
+      "claimed_source": "analysis/compare-P32-rho-neg__inc-w1.json ops.ratio_b_over_a",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sel/inc at w=1 (README)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 0.0005000000005,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 sel/inc 95% bootstrap lower at w=1 (README)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 0.0005000000005,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P32 sel/inc 95% bootstrap upper at w=1 (README)",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 0.0005000000005,
+      "claimed_source": "README.md 'Paired ratio of totals' table",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P32 mean S inc at w=0 (README)",
+      "claimed": 32.24,
+      "recomputed": 32.239778362575464,
+      "rel_tol": 0.00001550868487903226,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 mean S inc at w=0.1 (README)",
+      "claimed": 35.309,
+      "recomputed": 35.308948742421556,
+      "rel_tol": 0.000014160695587527261,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 mean S inc at w=1 (README)",
+      "claimed": 62.931,
+      "recomputed": 62.931482161036406,
+      "rel_tol": 0.0000079451489672616,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 mean S rho-neg at w=0 (README)",
+      "claimed": 0.968,
+      "recomputed": 0.9681097521561054,
+      "rel_tol": 0.0005164703685573206,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 mean S rho-neg at w=0.1 (README)",
+      "claimed": 1.064,
+      "recomputed": 1.0642832226570753,
+      "rel_tol": 0.0004697997580490903,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 mean S rho-neg at w=1 (README)",
+      "claimed": 1.93,
+      "recomputed": 1.9298444571658033,
+      "rel_tol": 0.00025906735777202075,
+      "claimed_source": "README.md 'Mean S' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 rho-neg -> inc gap at w=0 (README)",
+      "claimed": 33.3,
+      "recomputed": 33.301780392949574,
+      "rel_tol": 0.00015014212291360152,
+      "claimed_source": "README.md 'Gap to matched rho' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 rho-neg -> inc gap at w=0.1 (README)",
+      "claimed": 33.18,
+      "recomputed": 33.176271119138484,
+      "rel_tol": 0.0001506931888185654,
+      "claimed_source": "README.md 'Gap to matched rho' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 rho-neg -> inc gap at w=1 (README)",
+      "claimed": 32.61,
+      "recomputed": 32.60961365428303,
+      "rel_tol": 0.00015332720039865075,
+      "claimed_source": "README.md 'Gap to matched rho' table",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 sel/rho-neg lower at w=0 (README)",
+      "claimed": 6.92,
+      "recomputed": 6.921581033174934,
+      "rel_tol": 0.000722378309382661,
+      "claimed_source": "README.md 'Gap to matched rho'",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P20 sel/rho-neg upper at w=0 (README)",
+      "claimed": 8.7,
+      "recomputed": 8.695138050844612,
+      "rel_tol": 0.0005747126442528737,
+      "claimed_source": "README.md 'Gap to matched rho'",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P20 sel/rho-neg lower at w=1 (README)",
+      "claimed": 8.27,
+      "recomputed": 8.274698714340424,
+      "rel_tol": 0.000604251608138285,
+      "claimed_source": "README.md 'Gap to matched rho'",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P20 sel/rho-neg upper at w=1 (README)",
+      "claimed": 10.6,
+      "recomputed": 10.604893987624095,
+      "rel_tol": 0.00047148043260356943,
+      "claimed_source": "README.md 'Gap to matched rho'",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)"
+    },
+    {
+      "name": "P20 sel measured runs verified [d]G = Q (README: 96/96)",
+      "claimed": 96.0,
+      "recomputed": 96.0,
+      "rel_tol": 0.0,
+      "claimed_source": "README.md section 7.3 check 2",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 inc measured runs verified [d]G = Q (README: 96/96)",
+      "claimed": 96.0,
+      "recomputed": 96.0,
+      "rel_tol": 0.0,
+      "claimed_source": "README.md section 7.3 check 2",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 measured records whose [d]G = Q re-verified by the validator's own EC arithmetic (all 672, all arms)",
+      "claimed": 672.0,
+      "recomputed": 672.0,
+      "rel_tol": 0.0,
+      "claimed_source": "sessions/holdout-P20 (1008 records, 672 measured)",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 train mean S of selected cell mitm2-n45 at w=0",
+      "claimed": 10.036493030014816,
+      "recomputed": 10.036493030014816,
+      "rel_tol": 1E-12,
+      "claimed_source": "select/selection-P20.json selected.s0",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 train mean S of selected cell mitm2-n45 at w=0.1",
+      "claimed": 11.243185562045603,
+      "recomputed": 11.243185562045602,
+      "rel_tol": 1E-12,
+      "claimed_source": "select/selection-P20.json selected.s1",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P20 train mean S of selected cell mitm2-n45 at w=1",
+      "claimed": 22.10341835032268,
+      "recomputed": 22.103418350322677,
+      "rel_tol": 1E-12,
+      "claimed_source": "select/selection-P20.json selected.s2",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 train mean S of selected cell mitm2-n115 at w=0",
+      "claimed": 10.53036001782136,
+      "recomputed": 10.53036001782136,
+      "rel_tol": 1E-12,
+      "claimed_source": "select/selection-P24.json selected.s0",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 train mean S of selected cell mitm2-n115 at w=0.1",
+      "claimed": 11.659236274506034,
+      "recomputed": 11.659236274506034,
+      "rel_tol": 1E-12,
+      "claimed_source": "select/selection-P24.json selected.s1",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P24 train mean S of selected cell mitm2-n115 at w=1",
+      "claimed": 21.819122584668097,
+      "recomputed": 21.819122584668097,
+      "rel_tol": 1E-12,
+      "claimed_source": "select/selection-P24.json selected.s2",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 train mean S of selected cell mitm2-n288 at w=0",
+      "claimed": 17.404524369455704,
+      "recomputed": 17.404524369455704,
+      "rel_tol": 1E-12,
+      "claimed_source": "select/selection-P28.json selected.s0",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 train mean S of selected cell mitm2-n288 at w=0.1",
+      "claimed": 19.534289703112076,
+      "recomputed": 19.534289703112076,
+      "rel_tol": 1E-12,
+      "claimed_source": "select/selection-P28.json selected.s1",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P28 train mean S of selected cell mitm2-n288 at w=1",
+      "claimed": 38.70217770601941,
+      "recomputed": 38.70217770601942,
+      "rel_tol": 1E-12,
+      "claimed_source": "select/selection-P28.json selected.s2",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 train mean S of selected cell mitm2-n1024 at w=0",
+      "claimed": 31.85004785060943,
+      "recomputed": 31.85004785060943,
+      "rel_tol": 1E-12,
+      "claimed_source": "select/selection-P32.json selected.s0",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 train mean S of selected cell mitm2-n1024 at w=0.1",
+      "claimed": 34.524654057056864,
+      "recomputed": 34.524654057056864,
+      "rel_tol": 1E-12,
+      "claimed_source": "select/selection-P32.json selected.s1",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    },
+    {
+      "name": "P32 train mean S of selected cell mitm2-n1024 at w=1",
+      "claimed": 58.596109915083765,
+      "recomputed": 58.596109915083765,
+      "rel_tol": 1E-12,
+      "claimed_source": "select/selection-P32.json selected.s2",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+    }
+  ],
+  "non_headline_checks": [
+    {
+      "name": "P32 stride/inc at w=0 (README)",
+      "claimed": 0.989,
+      "recomputed": 0.9888428790556426,
+      "rel_tol": 0.0005055611734074823,
+      "claimed_source": "README.md 'Attribution and controls'",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)",
+      "agrees": true
+    },
+    {
+      "name": "P32 stride/inc lower at w=0 (README)",
+      "claimed": 0.96,
+      "recomputed": 0.959719223260229,
+      "rel_tol": 0.0005208333338541667,
+      "claimed_source": "README.md 'Attribution and controls'",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)",
+      "agrees": true
+    },
+    {
+      "name": "P32 stride/inc upper at w=0 (README)",
+      "claimed": 1.019,
+      "recomputed": 1.0184963607388637,
+      "rel_tol": 0.0004906771349362121,
+      "claimed_source": "README.md 'Attribution and controls'",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)",
+      "agrees": false
+    },
+    {
+      "name": "P32 stride/inc at w=1 (README)",
+      "claimed": 0.983,
+      "recomputed": 0.9827805491276672,
+      "rel_tol": 0.000508646999491353,
+      "claimed_source": "README.md 'Attribution and controls'",
+      "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)",
+      "agrees": true
+    },
+    {
+      "name": "P32 stride/inc lower at w=1 (README)",
+      "claimed": 0.939,
+      "recomputed": 0.9384775979813208,
+      "rel_tol": 0.0005324813636847711,
+      "claimed_source": "README.md 'Attribution and controls'",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)",
+      "agrees": false
+    },
+    {
+      "name": "P32 stride/inc upper at w=1 (README)",
+      "claimed": 1.029,
+      "recomputed": 1.0286287832278624,
+      "rel_tol": 0.000485908649659864,
+      "claimed_source": "README.md 'Attribution and controls'",
+      "recomputed_by": "validator re-run of `ecbench compare` (validation/compare/)",
+      "agrees": true
+    }
+  ],
+  "readme_discrepancies": [
+    {
+      "name": "P32 stride/inc upper at w=0 (README)",
+      "readme": 1.019,
+      "recomputed": 1.0184963607388637,
+      "correct_rounding": 1.018,
+      "impact": "none on any reading: 32-bit stride control interval, descriptive, includes 1 either way; README line 'At 32 bits: 0.989 [0.960, 1.019] (w = 0) and 0.983 [0.939, 1.029] (w = 1)' should read [0.960, 1.018] and [0.938, 1.029]"
+    },
+    {
+      "name": "P32 stride/inc lower at w=1 (README)",
+      "readme": 0.939,
+      "recomputed": 0.9384775979813208,
+      "correct_rounding": 0.938,
+      "impact": "none on any reading: 32-bit stride control interval, descriptive, includes 1 either way; README line 'At 32 bits: 0.989 [0.960, 1.019] (w = 0) and 0.983 [0.939, 1.029] (w = 1)' should read [0.960, 1.018] and [0.938, 1.029]"
+    }
+  ],
+  "checks": [
+    {
+      "check": "binary sha256 equals host/ecbench.sha256 and every session's binary_sha256",
+      "result": "pass",
+      "evidence": "validation/provenance.txt ## binary"
+    },
+    {
+      "check": "select/FROZEN.sha256 (sha256sum -c from the study dir)",
+      "result": "pass",
+      "evidence": "validation/provenance.txt; all 12 lines OK; FROZEN.sha256 sha256 3d4461e9455d6cd2..."
+    },
+    {
+      "check": "PROTOCOL.md git blob = 0ee2e28732a57f45cbd283bb796d2d41b3933a94 (card, HEAD, work tree)",
+      "result": "pass",
+      "evidence": "validation/provenance.txt ## protocol; no amendments (section 14 'None.')"
+    },
+    {
+      "check": "holdout spec in select/FROZEN = specs/holdout-P<b>.json = sessions/holdout-P<b>/spec.json = template filled from selection",
+      "result": "pass",
+      "evidence": "validation/provenance.txt ## holdout specs (all four sizes byte-identical)"
+    },
+    {
+      "check": "selection used train data only",
+      "result": "pass",
+      "evidence": "selection-P<b>.json band_train_sha256 = sha256(select/band-train-P<b>.json); every band row is the train curve, disjoint from the holdout curve; `ecbench band` re-run on the train sessions reproduces band-train-P<b>.json/.md byte-for-byte (validation/band/); validator's own selection from train records gives mitm2-n45/115/288/1024 (validation/recompute.json selection); FROZEN.sha256 written 01:34:05Z, holdout-P20 started 01:34:06Z"
+    },
+    {
+      "check": "edge rule (section 4.2) applied correctly",
+      "result": "pass",
+      "evidence": "20 bits: mitm3/rfmitm3/rfsub3 minimum at n64 extended to n91, n128 (minimum then interior at n91); every other family and size has an interior minimum"
+    },
+    {
+      "check": "selection tie rule",
+      "result": "pass",
+      "evidence": "batch2-nN ties mitm2-nN exactly at w = 0.1 at every size (prediction 2); tie goes to the incumbent oracle"
+    },
+    {
+      "check": "holdout workloads, seeds, rounds, arms match PROTOCOL.md sections 3 and 4.4",
+      "result": "pass",
+      "evidence": "curve seed 20261018202, target seed 20261018211, algorithm seed 20261018221, 48 targets, 2 rounds + 1 warm-up, timeout 1800 s; arms rho-neg, inc, sel, size, stride, inc-aa, rho-neg-aa"
+    },
+    {
+      "check": "incumbent unchanged (section 2)",
+      "result": "pass",
+      "evidence": "inc method_id ECM1h586f93741037 (20 bits), ECM1h61a6431fe629 (32 bits) = PROTOCOL.md section 2 ids; fixed params targets=walk, linalg=incremental-gauss, max_trials 1410236, solver '', budget 0"
+    },
+    {
+      "check": "replay-all of holdout-P20 on core 2",
+      "result": "pass",
+      "evidence": "1008 records, 1008 verified, 672/672 measured replays identical, 0 problems; session files unchanged; receipt files equal producer audits/holdout-P20.json"
+    },
+    {
+      "check": "replay-all of 20-bit train sessions (train-P20 + 6 edge extensions) and identity frontier P20",
+      "result": "pass",
+      "evidence": "232 + 6 x 16 measured replays identical; identity 240 records verified, 160/160 replays identical"
+    },
+    {
+      "check": "every measured holdout-P20 run verified [d]G = Q",
+      "result": "pass",
+      "evidence": "ecbench: 96/96 per arm, all 7 arms; validator affine arithmetic: 672/672"
+    },
+    {
+      "check": "paired ratios: `ecbench compare --weight` re-run equals committed analysis",
+      "result": "pass",
+      "evidence": "84/84 compare JSON files byte-identical (validation/compare/byte-compare.txt)"
+    },
+    {
+      "check": "paired ratios: independent stdlib recompute from records",
+      "result": "pass",
+      "evidence": "84/84 ratios agree with ecbench to <= 1.07e-15 relative (validation/recompute.json)"
+    },
+    {
+      "check": "section 7.3 (1) A/A arms exactly 1 at every weight and size",
+      "result": "pass",
+      "evidence": "inc-aa/inc and rho-neg-aa/rho-neg = 1.0 [1, 1] at w = 0, 0.1, 1 for 20-32 bits; per-pair GAE, unpriced counts and scalars identical (96/96 pairs each)"
+    },
+    {
+      "check": "section 7.3 (2) completeness",
+      "result": "pass",
+      "evidence": "sel 96/96, inc 96/96 verified; 0 censored pairs, 0 unpaired runs; no exhausted/timeout/error"
+    },
+    {
+      "check": "section 7.3 (3) 95% upper bound of sel/inc below 1 at all weights",
+      "result": "pass",
+      "evidence": "0.8664, 0.8468, 0.7782 (ecbench cluster bootstrap); validator's own resampler 0.8671, 0.8480, 0.7789"
+    },
+    {
+      "check": "section 7.3 (4) ecbench band --ranks gives sel < inc",
+      "result": "pass",
+      "evidence": "analysis/band-holdout.json (reproduced byte-for-byte in validation/band/) rank 'sel < inc' on icv1-fp20-tm565-6d7d1d32; point ratios 0.818 / 0.798 / 0.726 all < 1"
+    },
+    {
+      "check": "24-bit reading 'relabelling, incumbent retained'",
+      "result": "pass",
+      "evidence": "w = 0: 0.902 [0.870, 0.933] (falls); w = 1: 1.126 [1.073, 1.179] (rises)"
+    },
+    {
+      "check": "28-bit reading 'relabelling, incumbent retained'",
+      "result": "pass",
+      "evidence": "w = 0: 0.929 [0.894, 0.964] (falls); w = 0.1: 0.974 [0.935, 1.014] (includes 1); w = 1: 1.193 [1.134, 1.257] (rises)"
+    },
+    {
+      "check": "32-bit reading 'null by construction'",
+      "result": "pass",
+      "evidence": "selection-P32 = mitm2-n1024 + incumbent oracle; sel method_id = inc method_id ECM1h61a6431fe629; sel/inc = 1.0 [1, 1] at every weight"
+    },
+    {
+      "check": "memory (section 6: label a time-memory trade if sel RSS > 2x inc)",
+      "result": "pass",
+      "evidence": "mean max RSS sel 50258 KiB vs inc 50319 KiB (ratio 0.999); no label needed"
+    },
+    {
+      "check": "README numbers equal the recomputed values at their printed precision",
+      "result": "pass",
+      "evidence": "headline entries with claimed_source README.md; outside the 20-bit row, README misrounds P32 stride/inc upper at w=0 (README), P32 stride/inc lower at w=1 (README) (see readme_discrepancies)"
+    },
+    {
+      "check": "rho reference strongest available",
+      "result": "pass",
+      "evidence": "j(E) = 109888 mod p = 803441, neither 0 nor 1728, so Aut(E) = {+-1}; E is over the prime field (no subfield, no Frobenius fold); records: automorphisms_available 2, used 2 by rho.negation"
+    }
+  ],
+  "gae_band": {
+    "row": "icv1-fp20-tm565-6d7d1d32",
+    "sel": {
+      "0": {
+        "ic": 10.514525023004323,
+        "rho": 1.3571363693225533
+      },
+      "0.1": {
+        "ic": 11.828568810036169,
+        "rho": 1.4743369477713688
+      },
+      "1": {
+        "ic": 23.654962893322775,
+        "rho": 2.529142153810707
+      }
+    },
+    "inc": {
+      "0": {
+        "ic": 12.853413437618684,
+        "rho": 1.3571363693225533
+      },
+      "0.1": {
+        "ic": 14.825797662429673,
+        "rho": 1.4743369477713688
+      },
+      "1": {
+        "ic": 32.57725568572858,
+        "rho": 2.529142153810707
+      }
+    },
+    "ratio_sel_over_inc": {
+      "0": 0.8180336744036392,
+      "0.1": 0.7978369244854301,
+      "1": 0.7261189561674933
+    },
+    "ratio_sel_over_rho": {
+      "0": 7.747581791100991,
+      "0.1": 8.022975228231527,
+      "1": 9.35295900931523
+    },
+    "ratio_inc_over_rho": {
+      "0": 9.470981493211895,
+      "0.1": 10.05590864750462,
+      "1": 12.88075311885645
+    }
+  },
+  "null_controls": "A/A arms (inc-aa, rho-neg-aa) are the null object of the same shape: identical method, same targets and seeds; they give exactly 1.000 at every weight. The cost metric is deterministic per (target, seed); sampling variation enters only through the targets and is carried by the cluster bootstrap over targets. 32 bits (R* = incumbent) is a built-in negative case and gives exactly 1.",
+  "not_applicable": {
+    "inventor_protocol_6_ladder": "the claim is measured at the size where it is made (20 bits); no extrapolation, exponent or larger-size claim is made",
+    "heuristic_validation": "no heuristic distribution (e.g. Dickman rho) is claimed"
+  },
+  "replay_certificate": {
+    "path": "replay-certificate.json",
+    "sha256": "abfda6629a6df76ea1a58e769bc7c16e308a92a21bd58429bf8978b61a8abde2"
+  },
+  "limitations": [
+    "PROTOCOL.md section 13 requires a second-host replay (ecbench-independent-runner) before a leaderboard promotion; none exists. This validation does not meet that requirement and does not authorize promotion.",
+    "Replay is same-host and same-binary (env class ECBENV3hc4d998f5ae3f, same container class as the measurement); not an independent-host or independent-implementation replication. The validator's own [d]G = Q check and stdlib recompute are independent of ecbench code.",
+    "One fresh holdout curve at 20 bits (icv1-fp20-tm565-6d7d1d32, log2 r = 19.62); 48 targets x 2 rounds. The interval covers target-to-target variation on that curve only, not curve-to-curve variation. No exponent, pooled or other-size claim.",
+    "Counted unit only: ecbench GAE / sqrt(r), with unpriced native work priced at w = 0, 0.1, 1 (section 5a). At w = 0 the IC arms are lower bounds (`lower_bound: true`). No wall-clock claim; wall ratios in the compare files are L0 and descriptive.",
+    "The 20-bit holdout gain (18.2% at w = 0, 27.4% at w = 1) is larger than PROTOCOL.md section 10 prediction 4 ('any holdout gain is under about 10%'); the README does not mention the prediction. The train sweep already showed it (mitm2 n45 vs n32 at w = 0.1: 11.24 vs 13.92). Not a decision criterion; recorded as an unexpected observation.",
+    "Shallow train minimum at 20 bits: mitm2 n45 11.243 vs n64 11.413 at w = 0.1 (8 runs per cell). Selection is a grid choice; a better N between grid points is not excluded.",
+    "Random-base control absent (PROTOCOL.md section 12.2); the stride-7919 control is cheaper than sel at every size (stride/sel 0.989 / 0.989 / 0.985 at 20 bits), so the gain is attributed to N, not to the low-x choice.",
+    "Binary-to-source binding: the binary sha256 equals every session's binary_sha256 and host/ecbench.sha256; that it was built from code.commit 0e124fb1b is asserted by the card, not rebuilt here. src/, Cargo.toml and Cargo.lock are identical between 0e124fb1b and 7df34ba67 (the commit host/commit.txt records).",
+    "Route: run locally on one core of a 4-vCPU container (PBO_CPU=3 instead of the card's 31), not on isolab-eks. The card's run block names the local route; counted costs are deterministic (A/A exactly 1, 672/672 replays identical), so the core and route do not affect S.",
+    "README 'Raw sessions: stored in the artifact store (.artifacts.json pointers)' describes a planned move; at the validated commit records.jsonl files are in git. Raw data here is bound by session dir, session.json and records sha256.",
+    "README section 7.3 check 1 cites `run.sh verify` (verify/); the validator did not rely on verify/ and replayed holdout-P20, the 20-bit train sessions and the 20-bit identity session itself.",
+    "Decision-table rows overlap: at 28 bits the w = 0.1 interval [0.935, 1.014] includes 1, so 'null at this sample size' and 'unresolved' apply as well as 'relabelling'; at 24 bits 'unresolved' applies as well. Every applicable row retains the incumbent, so the README's readings follow the rule.",
+    "README misrounds two bounds of the 32-bit stride-control interval (prints [0.960, 1.019] at w = 0 and [0.939, 1.029] at w = 1; the bootstrap gives 1.01850 and 0.93848, i.e. [0.960, 1.018] and [0.938, 1.029]). Outside the 20-bit row and not decision-bearing; the producer should correct the README line.",
+    "Not re-checked: panel K (kummer-P22/P24) numbers, median wall times, the figures and PDFs, verify/ and reports/; producer audits for the 24-32-bit sessions and panel K were read as receipts (ok, all replays identical), not replayed by the validator.",
+    "The work tree had unrelated tracked modifications during validation (docs/ic-leaderboard.html, docs/ic/LEADERBOARD.md, docs/ic/leaderboard.json, scripts/build_ic_leaderboard.py, modified 02:07Z, after the run); none is under the study dir, src/ or the card."
+  ],
+  "review_attestation": {
+    "joints_owned": [
+      "whole receipt (no review_plan on the task card)"
+    ],
+    "sources_read": [
+      "crypto-autoresearcher: agents/validator.md, docs/agent-runtime-core.md",
+      "backlog/XP-20261016-prime-base-oracle-tuning/{PROTOCOL.md, card.json, run.sh, specs/holdout-P*.template.json}",
+      "docs/VALIDATION_GATE.md (git show HEAD), scripts/validation_gate.py",
+      "src/cryptanalysis/ecbench/band.rs (priced_gae definition), src/cryptanalysis/ecbench/compare.rs (match_pairs)",
+      "research/prime_base_oracle_tuning_20261029/README.md, progress.txt, host/*, select/*, specs/holdout-P*.json, audits/*.json (summaries), analysis/compare-*.json, analysis/band-holdout.json, sessions/*/session.json, sessions/holdout-P*/records.jsonl, sessions/train-P*/records.jsonl, sessions/train-ext-P20-*/records.jsonl",
+      "research/ic_frontier_campaign_20261015/phase1/sessions/P20 (replayed)",
+      "origin/claude/ic-d4-char2-lever-20261023:benchmarks/20261028-d4-char2-frob-roots/{VALIDATION.json, replay-certificate.json, validator-report.json} (shape template only)"
+    ],
+    "not_read": [
+      "research/prime_base_oracle_tuning_20261029/verify/ (producer's run.sh verify output; not relied upon)",
+      "research/prime_base_oracle_tuning_20261029/reports/run-20261029T0129Z/REPORT.md"
+    ],
+    "read_sibling_reports": false,
+    "verdict": "passed"
+  }
+}

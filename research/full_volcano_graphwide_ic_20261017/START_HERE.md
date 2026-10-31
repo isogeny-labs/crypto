@@ -1,5 +1,75 @@
 # Volcano experiment downloads, 17 October 2026
 
+[Download guide v7: current7,937-vertex delivery and verified bounded continuation](https://drive.google.com/file/d/1Tm1_reS7F8XAuifUeVUi7geFO3Cr8Xf9/view).
+
+Latest immutable publication: **7,937 /24,823 audited vertices**, all51 strata
+sampled;126,992 records (81,666 verified /39,550 exhausted /5,776 timeout),
+4,117,173 relations /193,153,057 actual decomposition calls.
+[Archive, CSV, inspected report, viewer and exact verification scope](execution/publication-20261018T2313Z/README.md).
+Clean stop; no new interruption. Frozen runtime source/binaries/queue unchanged.
+Native archive hash/manifest/source checks pass; outer repack not rechecked for
+this publication. Original A/C/D/E/full matrix/independent arithmetic/large-k IC
+remain open. Older entries below are immutable historical snapshots.
+
+[Download guide v6: 6,137-vertex dataset, all downloads and actual guarded resume](https://drive.google.com/file/d/1XyB-FgGQ3vxC90RbE_Z41T787RONHHQQ/view).
+
+Latest immutable publication, 18 October: **6,137 / 24,823 audited vertices**,
+all 51 strata sampled, 98,192 accepted records (63,182 verified / 30,553
+exhausted / 4,457 timeout), 3,181,542 relations / 149,275,746 actual calls.
+[Archive, CSV, report, viewer and byte-verification receipts](execution/publication-20261018T1835Z/README.md).
+This snapshot follows a clean vertex-boundary stop for file-staging validation;
+no new attempt was interrupted. Earlier failed/interrupted attempts are retained.
+All 61,466 manifest entries and a byte-identical outer repack pass. Downloads
+remain fixed while a separate verified runtime epoch may advance the campaign.
+Original A/C/D/E, full matrix, independent arithmetic and large-k IC remain open.
+
+The entries below retain earlier immutable deliveries and execution history.
+
+[Download guide v5: 5,533-vertex checkpoint and actual bounded resume](https://drive.google.com/file/d/1MC0v3MQpCbWTZpa6oWtrQO7EfOYbW_vq/view).
+
+Latest stopped checkpoint, 18 October 2026: **5,533 / 24,823 audited vertices**,
+all 51 strata, 88,528 accepted records (56,959 verified / 27,545 exhausted /
+4,024 timeout), 2,870,489 relations / 134,616,948 actual decomposition calls.
+The retained interrupted attempt was marked by a zero-job native stop;
+its disappearance cause is unknown. [Recovery and new downloads](execution/recovery-20261018T1647Z/README.md).
+Older 4,037-vertex links and PID receipts remain immutable historical snapshots.
+The frozen solver, queue and child mathematical budgets are unchanged. A new
+actual launch receipt will determine resumed status; no stale ledger is treated
+as a live process. Clocks remain unqualified; full original classes and matrix
+remain open.
+
+
+[Download guide v4](https://drive.google.com/file/d/1We8r_TMO00hXcGUdTJhrFOHYOHF61kXd/view) includes all new artifacts, exact scopes and the actual local resume receipt.
+
+Latest measured addition (17 October 2026): **full selected-point-order C**.
+Both EC PH/BSGS and k=1 Tate/Miller → multiplicative PH / projected-prime
+factor-base relations verify all 3,738 public one-target workloads over the
+1,869 retained models (7,476 primary method records); every non-clock record,
+fixture and truth field matches its separate replay. Selected exact orders
+range from 2,600,529,297,408 to 1,637,958,981,148,213,248, with largest prime 7.
+All 2/3/7 prime-power parts are included. This extends the earlier r=7-only
+cohort; the two cohorts are never pooled. It is not full C population, NFS,
+large-k support, a maximal-point-order certificate or a runtime improvement.
+[Protocol, implementation and archived evidence](execution/full_point_order/README.md).
+[Drive archive](https://drive.google.com/file/d/1HHlPDmGzwSopnwMGQ4vgvcGSH0WRa0BO/view),
+[report](https://drive.google.com/file/d/1Gdrpkb8n8XhBoO8Sdr3JKl_VIPMUgqdZ/view),
+[phase CSV](https://drive.google.com/file/d/1UHAE8NCShFWGQ1hHOR3U56KeNdW_MrQL/view),
+[aggregate CSV](https://drive.google.com/file/d/1OUbeh-phxP8vXXE_gzY6KoS6tFPapjIE/view).
+The cold solver intervals charge order certification, setup, projections,
+transfer, relations, matrix work, reconstruction and verification. Shared
+fixture generation is outside both intervals and reported separately. Raw
+clocks remain unqualified; a contended replay is retained separately.
+
+Latest frozen repaired survey: **4,037 / 24,823 vertices**, all 51 strata,
+64,592 records (41,573 verified / 20,132 exhausted / 2,887 timeout),
+2,098,636 relations / 98,188,909 actual calls. The worker was cleanly paused
+at 18:48:59 UTC for isolated C measurement and delivery validation.
+[Checkpoint and downloads](execution/checkpoint-4037/README.md).
+Older 2,935-vertex uploads and PID receipts below remain historical snapshots.
+The new fixed viewer covers every graph vertex/map but only marks 4,037
+measured vertices. A later execution receipt controls current worker status.
+
+
 [Open the Drive folder](https://drive.google.com/drive/folders/109DpcQpX7ATz6GeI8iSWAExGMWBoR-H_).
 These are frozen snapshots. Complete graph enumeration and completed ECDLP
 measurements have different coverage.
@@ -110,3 +180,7 @@ This is local certification, not complete original class populations. S3
 access was rechecked and still lacks a runtime AWS identity.
 
 Recovery resume **PID 8973 launched 2026-10-17T16:14:06.513686+00:00**, verified live at 2026-10-17T16:15:21.322908+00:00. The unchanged frozen queue/solver/driver retry the preserved interruption in attempt 2, under the same 24-hour / 2-GiB guard. This is a new runtime epoch; wall times remain unqualified. See `execution/recovery-20261017T1450Z/resumed-launch-verified.json` for actual native progress. The Drive archive and explorer remain the frozen 2,935-vertex checkpoint, not live uploads.
+
+Current local resume: PID 97646, launched 2026-10-17T20:13:41.722914+00:00, verified live 2026-10-17T20:13:55.172771+00:00 with newly audited progress. [Actual receipt](execution/resume-after-4037/verified.json) and [outer envelope](execution/resume-after-4037/envelope.json). Outer guards changed from 24 h / 2 GiB to 72 h / 6 GiB; frozen mathematical/child budgets and queue are unchanged. Multiple runtime epochs remain unqualified; no host-survival or unattended-upload guarantee. Frozen Drive snapshots remain 4,037 vertices.
+
+18 October actual resume: PID3298 launched 2026-10-18T17:07:08.420807+00:00, verified 2026-10-18T17:07:52.044044+00:00 with new audited progress and interrupted attempt2 accepted. [Process/native receipt](execution/recovery-20261018T1647Z/resumed-verified.json), [preserved-deadline envelope](execution/recovery-20261018T1647Z/resume-envelope.json). Deadline2026-10-20T20:13:42.570000+00:00; remaining seconds were charged rather than resetting72hours, spool cap6GiB. A bounded continuation check is scheduled around21:09UTC18October. Published snapshot remains5533; clocks unqualified.

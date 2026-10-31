@@ -1,0 +1,15 @@
+{
+  "schema": "isolab.job/v1",
+  "name": "isoclass-rho-k-class-timing",
+  "runtime": {"image": "localhost/isolab-base:latest", "oci_runtime": "crun", "network": "none"},
+  "inputs": [
+    {"path": "bin/isoclass-rho", "local_file": "./target/release/isoclass-rho"},
+    {"path": "K/walk.json", "local_file": "./research/isogeny-class-rho/runs/run-20261018T0857Z/K/walk.json"}
+  ],
+  "command": {"argv": ["./bin/isoclass-rho", "measure", "--walk", "K/walk.json", "--mode", "class", "--trials", "100", "--controls", "3", "--plants", "--folds", "--seed", "20261018", "--out", "out/class"]},
+  "measure": {"warmups": 0, "repeats": 3, "cooldown_s": 2},
+  "resources": {"cpus": 4, "memory_mb": 8192, "numa_node": "single", "smt": "isolate"},
+  "fidelity": {"policy": "strict"},
+  "limits": {"timeout_s": 1800},
+  "labels": {"experiment": "isoclass-rho-timing", "status": "unsubmitted"}
+}

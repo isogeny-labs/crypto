@@ -1,0 +1,15 @@
+# Candidate 4 independent classifier composition review
+
+The new declaration valid_inputs_exclude_same_support_error faithfully composes common monic-quadratic divisibility validity with the existing abstract classifier. Over Field K with DecidableEq K and (2:K) ≠ 0, for arbitrary f,q,r,s1,t1,s2,t2, it assumes the two divisibilities on the same f and identical monic support. Its conclusion is exactly that classifySameU22 does not return sameUMixedZeroSlope. Equal slopes are no longer an input hypothesis: the proof splits on that equality internally.
+
+In the equal-slope case, the previously reviewed coefficient theorem produces hx and hc, and the helper consumes exactly those arguments and hodd. In the unequal-slope case, s1−s2 ≠ 0; the equal-input branch is also false. The remaining inverse/noninverse alternatives return either sameUInverse or sameUMixed, both distinct from the excluded constructor. This matches the actual classifier's decision order. No assumption of the conclusion, omitted equality case, or mathematical mismatch was found. The written tactic proof is consistent with this derivation; whether tactics elaborate is outside this review.
+
+The source adds no weighted/projective coordinate correspondence, arithmetic implementation refinement, or divisor-class theorem. Its docstring accurately labels the classifier abstract and excludes a Rust-semantics interpretation. This declaration resolves the earlier source-level absence of a composed classifier corollary. The original coefficient theorem and the new classifier theorem remain distinct claims with distinct hypotheses.
+
+Mathematical verdict: holds. Source fidelity: faithful_scoped. Machine status: not_verified by this independent reviewer. Formal gate outcome: inconclusive within this review alone. No producer compiler outputs, readbacks, or sibling verdicts were read. No builds, experiments, or source mutations performed.
+
+Reviewed candidate SHA256: 7f21fd6153d972309fe5f0d4b7a5b00ff188eb4e6510cbfbd8c33f7a12efa41e. Intended imported coefficient source SHA256: ecb3a5f91f7217d1ab107466c470a491559f7cfe0276ca6d72661fffef66170b. Reviewed classifier helper source SHA256: 9e015c3c79f465b2b16f6e0dae5c744f9de3400f51646f746c61c54c4722c318. Reviewed algebraic helper source SHA256: 0cbdbb636e11f34ad94493353f2fc748a353c89f248f868accbdaaf02fc88e2b.
+
+The imported modules are not colocated with candidate4 source. This review checks source fidelity against the specifically pinned previously reviewed definitions, and does not verify compiler module search-path resolution or loaded olean identity. The machine evidence owner must bind actual imported modules separately.
+
+Attestation: candidate4-plan.json was written before opening candidate4 source; original source reviews were preserved; sources used were candidate4 source and the previously reviewed 3b/original helper source texts. Review claim and proof structure were already independently described in the original review before candidate4 was supplied.

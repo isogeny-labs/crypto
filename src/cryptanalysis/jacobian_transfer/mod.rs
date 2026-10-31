@@ -850,7 +850,7 @@ fn extension_routes(
                     if rb.model.extension_measured_solve_mults.iter().any(|&(kk, _)| kk == k) {
                         "measured"
                     } else {
-                        "degree_cubed_floor"
+                        "degree_cubed_estimate"
                     },
                 ),
             ),
@@ -874,8 +874,8 @@ fn extension_routes(
             enge_gaudry_hypothesis_holds: false,
         },
         vec![
-            "no transfer: the method works on E itself with a subfield factor base; each of the k! * p^(2-2/k) decomposition attempts is priced at the measured C_k F_p multiplications (k = 3, 4) or, elsewhere, at D^3 with D = 2^(k(k-1)) the Bézout bound of the Semaev system, a floor on the Gröbner/FGLM solve".into(),
-            "until 2026-10-16 the solve was priced at D elliptic operations with no k! trial factor; the measured C_3 = 0.876e6 and C_4 = 1.227e12 lie above D^3, so rows at other k remain lower bounds and a formula advantage here is a lead, not a measurement".into(),
+            "no transfer: the method works on E itself with a subfield factor base; each of the k! * p^(2-2/k) decomposition attempts is priced at the measured C_k F_p multiplications (k = 3, 4) or, elsewhere, at the estimate D^3 with D = 2^(k(k-1)) the Bézout bound of the Semaev system (a dense FGLM-style solve; not a lower bound)".into(),
+            "until 2026-10-16 the solve was priced at D elliptic operations with no k! trial factor; C_3 = 0.876e6 is measured, and C_4 = 8.69e10 is the plain S_5 solve with sparsest pivots, the chain eigen step and shape replay (2026-10-19; 13.9x below the 1.227e12 charged from 2026-10-16), 0.34 bits above D^3; the D_4-symmetric oracle on curves with rational 2-torsion measured about 2^26, so D^3 at other k is an estimate, and a formula advantage here is a lead, not a measurement".into(),
         ],
     ));
     // Descent to a cover over GF(p).  The cheapest genus the literature
@@ -1053,9 +1053,15 @@ impl TransferFile {
         })
     }
 
-    /// Pretty JSON with a trailing newline, as committed.
+    /// Plain, one-space-indented JSON with a trailing newline, as committed.
+    /// At 20,592 curves, two-space indentation alone puts this generated
+    /// catalog over GitHub's 100 MiB blob limit. Keep every field and line
+    /// break while retaining a format that Git can delta-compress.
     pub fn to_json(&self) -> String {
-        let mut s = serde_json::to_string_pretty(self).expect("serialisable");
+        let formatter = serde_json::ser::PrettyFormatter::with_indent(b" ");
+        let mut serializer = serde_json::Serializer::with_formatter(Vec::new(), formatter);
+        self.serialize(&mut serializer).expect("serialisable");
+        let mut s = String::from_utf8(serializer.into_inner()).expect("JSON is UTF-8");
         s.push('\n');
         s
     }
@@ -1180,18 +1186,36 @@ mod tests {
             );
         }
         // c2pnb304w1's 288-bit subgroup does not fit in a 256-bit Jacobian;
-        // its best route is the n = 4 descent over GF(2^76). Priced with the
-        // measured Jacobian operation counts (#1983) it costs 2^160.259
-        // against matched rho's 2^160.226, so it is no longer below rho.
-        let r = screen(
-            &by_name("c2pnb304w1"),
-            &CostModel::default(),
-            DEFAULT_FACTOR_BUDGET,
-        );
+        // its best route is the n = 4, genus-8 descent over GF(2^76).
+        // The earlier 10*g^2 Jacobian price put that route 2.001 bits below
+        // rho. The measured Cantor price (2620.9, rather than 640, at g=8)
+        // moves it 0.033 bits above rho without changing its exact geometry.
+        let model = CostModel::default();
+        let r = screen(&by_name("c2pnb304w1"), &model, DEFAULT_FACTOR_BUDGET);
+        let best = &r.routes[r.best_route.unwrap()];
         assert_eq!(r.verdict, RouteClass::Boundary);
-        assert_eq!(
-            r.routes[r.best_route.unwrap()].invariants["base_degree"],
-            76
+        assert_eq!(best.invariants["base_degree"], 76);
+        assert_eq!(best.destination.genus, "8");
+        assert!(best.cost.ratio_log2 < 0.0);
+        assert!(best.cost.exponent_ratio_log2 > 0.0);
+
+        // Preserve the historical model's conclusion as an explicit control:
+        // do not recover it by weakening the measured production price.
+        let mut legacy = model.clone();
+        legacy.jacobian_group_op_mults_measured = model
+            .jacobian_group_op_mults_measured
+            .iter()
+            .map(|&(g, _)| (g, 10.0 * f64::from(g).powi(2)))
+            .collect();
+        legacy.jacobian_group_op_extrapolation_exponent = 2.0;
+        let old = screen(&by_name("c2pnb304w1"), &legacy, DEFAULT_FACTOR_BUDGET);
+        let old_best = &old.routes[old.best_route.unwrap()];
+        assert_eq!(old.verdict, RouteClass::FormulaMarginal);
+        assert_eq!(old_best.invariants, best.invariants);
+        assert_eq!(old_best.destination, best.destination);
+        let measured_price_delta = (2620.9_f64 / 640.0).log2();
+        assert!(
+            (old_best.cost.ratio_log2 - best.cost.ratio_log2 - measured_price_delta).abs() < 0.003
         );
         // A registry curve where (8) fails: b in F_2, Tr(a) = 1, N = 18.
         let r = screen(

@@ -80,7 +80,10 @@ for m in sorted({r["m"] for r in rows if r["arm"] == "floor-mitm"}):
                  "bars: 95% bootstrap; open markers with arrows: lower bounds")
     ax.grid(alpha=0.3)
     if m == "4" and not any(
-        r["m"] == "4" and r["arm"] == "wide-chain" for r in rows
+        r["m"] == "4" and (r["arm"] == "wide-chain" or (
+            r["arm"] == "f4-chain" and int(r["n"]) >= 23
+            and r["status"] in ("measured", "lower_bound")))
+        for r in rows
     ):
         ax.axvspan(21.5, 32, color="#999999", alpha=0.12)
         ax.text(26.5, 31, "F4 / F6-IC / SAT unsupported here:\nchain has 4d+2n > 64 unknowns\n(MAX_VARS); floor only", ha="center", fontsize=7)

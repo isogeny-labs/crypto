@@ -1,0 +1,22 @@
+  ***   Warning: new maximum stack size = 2000003072 (1907.352 Mbytes).
+# stage0_identities m=13 seed=2039102100 modulus=13465 gp=[2, 15, 4] x_primitive=1
+CHECK T_tables_vs_ffelt m=13 PASS n=4000 mismatches=0
+VALUE ncensus_K0=8012 ncensus_K1=8374 ellcard_K0=8012 ellcard_K1=8374
+VALUE N0=4005 N1=4186
+CHECK C1_sum m=13 PASS ellcard sum=16386 census sum=16386 target=16386
+CHECK C1_census_eq_ellcard m=13 PASS census K0=8012 K1=8374
+VALUE t_K0=181 t_K1=-181
+CHECK C2_trace_negation m=13 PASS t0=181 t1=-181
+CHECK C2_lucas m=13 PASS Lucas t(K0)=181 t(K1)=-181
+CHECK C2_tau_negation m=13 PASS tau1=-tau0 (polynomials tau^2+tau+2 -> tau^2-tau+2)
+CHECK C2_cofactors m=13 PASS v2(#K0)=2 v2(#K1)=1 odd parts 2003 4187 gcd=1
+CHECK C1_N_formulas m=13 PASS N0+N1=8191
+CHECK C1_point_orders m=13 PASS random points: [#E]P=O on both curves (40 each)
+CHECK C3_exactly_one_type m=13 PASS x scanned=8191 ellordinate-type0=4005 type1=4186 violations=0
+CHECK C4_frobenius_type m=13 PASS x checked=8191 violations=0
+CHECK C5_S3_K0 m=13 PASS pairs=1997 nonvanishing=0
+CHECK C5_S3_K1_shared m=13 PASS pairs=1998 nonvanishing=0
+CHECK C5_roots3_equals_pair_sum_diff m=13 PASS pairs=3995 set mismatches=0
+CHECK C5_doubling_branch m=13 PASS pairs=600 mismatches=0
+CHECK solver_bruteforce m=13 PASS pairs=300 same-type=147 cross-type=153 root-count mismatches=0
+# stage0 done m=13

@@ -12,13 +12,20 @@ of the existing `taskq/deploy/aws` Redis/managed-worker stack.
   `3.134.144.201/32`, the current harness host. Change this allowlist explicitly
   before connecting from another host; the kubeconfig alone does not grant
   network access.
-- Two On-Demand `t3.medium` system nodes for DNS, CSI and Karpenter.
+- Two Spot system nodes for DNS, CSI and Karpenter, selected from four
+  compatible instance types. The node group has a two-node floor and a
+  three-node ceiling.
 - Karpenter 1.15.0, two replicas on system nodes, scoped controller IAM,
   node access entry, SQS interruption queue and EventBridge interruption rules.
-- `cpu-spot` NodePool: x86-64 Linux, Spot only, C/M/R generation 6+, instances
-  with 8/16/32 vCPUs, excluding Flex families, aggregate limits of 64 vCPUs
-  and 256 GiB RAM. CPU 0's whole physical core is reserved for housekeeping.
-  No GPU or automatic On-Demand fallback is enabled.
+- `cpu-spot` for ordinary commands and `cpu-l2-spot` for native benchmarks:
+  x86-64 Linux, Spot only, C/M/R generation 6+, 8/16/32-vCPU instance types,
+  excluding Flex families. Each pool has a 32-vCPU / 128-GiB limit, preserving
+  the combined 64-vCPU / 256-GiB envelope. A single node must fit its pool
+  (for example, a 256-GiB memory-optimized type cannot fit either pool).
+  CPU 0's whole physical core is reserved for housekeeping. No GPU or automatic
+  On-Demand fallback is enabled. Unused capacity is not borrowed across pools.
+- `spot-only-policy.yaml` rejects Karpenter NodePools that omit a Spot-only
+  capacity requirement or request On-Demand capacity.
 - VPC CNI with network-policy support, CoreDNS, kube-proxy, metrics-server,
   EBS CSI, an encrypted `gp3` StorageClass and seven-day control-plane logs.
 - Versioned, encrypted S3 results bucket and immutable ECR repository
@@ -32,11 +39,12 @@ during concurrent provisioning; this is not a hard spending limit. Namespace
 quota separately caps admitted pod CPU requests and limits at 64. Spot capacity
 can be unavailable or interrupted; jobs needing recovery must checkpoint to S3.
 
-Estimated idle cost at 730 hours/month: about **$175/month** (EKS $73,
-two t3.medium nodes $60.74, NAT $32.85, its IPv4 $3.65, system gp3 disks $4.80).
-Spot workers, worker disks, stored artifacts/images, logs, requests and data
-transfer/processing are additional. The single NAT is a cost choice and an
-egress availability dependency. System nodes and EKS continue billing at idle.
+Idle costs include the EKS control plane, two Spot system nodes, NAT, public
+IPv4, and system EBS disks. Spot workers, worker disks, stored artifacts/images,
+logs, requests and data transfer/processing are additional. The single NAT is
+an egress availability dependency. System nodes and EKS continue billing at
+idle. The account-wide monthly AWS Cost Budget is $1,500 with alerts only;
+it does not stop new capacity.
 
 ## Install or resume
 
@@ -58,6 +66,25 @@ script does not reconcile changes to existing VPC, nodegroup or EKS configuratio
 Review and apply those changes with eksctl/CloudFormation separately. Helm CRD
 upgrades also require explicit review; do not merely change the chart version.
 
+`spot-only-iam-policy.json` is the account's `SpotOnlyEC2Launch` IAM deny policy.
+It blocks direct `ec2:RunInstances` launches and `ec2:StartInstances` restarts
+unless the instance market type is Spot. It is attached to the `coreuser` IAM
+user and the `InstanceRole` and `spot-experiments-WorkerRole-G1FZ84yk3gS6`
+administrator roles. This identity policy does not govern the account root
+user, new roles, service-linked roles, EC2 Fleet requests or future Auto
+Scaling group purchase settings. Review those launch paths separately when
+adding infrastructure; the Karpenter admission policy and Spot EKS node group
+cover this deployment.
+
+The [2026-10-21 restart authorization receipt](validation/spot-restart-20261021.json)
+matches the committed policy to the live version and confirms those attachments.
+For `coreuser`, IAM simulation allows `StartInstances` with Spot market context
+and explicitly denies it with On-Demand context. A real EC2 Spot dry run returns
+`DryRunOperation`; no instance was started. The running/stopped inventory in
+`us-east-2` contained no On-Demand instance, so the On-Demand restart case is
+simulation evidence only. These checks establish authorization behavior, not a
+successful restart or coverage of other launch paths.
+
 The upstream Karpenter CloudFormation template is vendored unmodified from
 release v1.15.0; SHA-256:
 `8ee49d6de4f2397797aea5c961706c90491a291b6a961268000cb2daadbd958f`.
@@ -68,6 +95,10 @@ release `v20261012`, in us-east-2. Review and roll updates deliberately: worker
 expiration and drift replacement are disabled to protect long running jobs.
 
 ## Submit from the harness
+
+Start with [agent access and setup](ACCESS.md) for Claude Code, Codex and
+OpenCode: authentication, client registration, remote caller permissions and
+submission/result verification commands.
 
 For the versioned request/result schemas, portable AWS launcher and GitHub
 Actions trigger, see [the end-to-end harness contract](HARNESS.md).
@@ -263,7 +294,13 @@ The optional `instance_type` pins hardware within the existing Spot pool;
 omitting it lets Karpenter choose a permitted instance. There is no fallback
 to another type when a specific type is requested and unavailable.
 
-The tool requests four exclusive vCPUs, selects bootstrap profile `v4`, and runs
+The [GitHub Actions entry point](HARNESS.md#github-actions) builds a new native
+image from the requested commit and submits its immutable digest automatically.
+The optional `build` object binds the image, source revision and executable
+SHA-256; both the pod and the launcher verify that identity. Callers that omit
+`build` retain the deployed default image.
+
+The tool requests four exclusive vCPUs, selects `cpu-l2-spot` with bootstrap profile `v6`, and runs
 `run-ecbench` with `--cpus auto`. One whole physical core measures the child;
 the remaining allocated CPUs accommodate the parent shell and harness. `--cpus inherit` would
 reserve the entire pod allocation and leave those processes nowhere to go.
@@ -273,19 +310,36 @@ Worker bootstrap confines OS services to CPU 0's physical core, reserves it with
 Kubernetes' static/full-core/strict CPU manager, and routes movable IRQs and
 unbound workqueues to housekeeping. This includes AL2023's separate
 `runtime.slice` for kubelet/containerd. It discovers sibling topology at boot.
-The kernel also boots with managed-IRQ isolation, full tickless
-CPUs and offloaded RCU callbacks on workload CPUs. Fresh workers reboot once
+The kernel also boots with managed-IRQ isolation and offloaded RCU callbacks on
+workload CPUs. Running CPUs retain the periodic tick: full-dynticks accounting
+on the pinned AL2023 kernel produced excess busy ticks in the native diagnostic.
+The bootstrap removes `nohz_full` and refuses to admit a worker if full dynticks
+remain active. Fresh workers reboot once
 before joining; a persistent service checks the kernel arguments and reapplies
 runtime affinity before every kubelet start. Kubelet refuses to start if this
 service fails. The AL2023 reserved-cgroup defaults
 are cleared because they conflict with `reservedSystemCPUs`; pod resource
 accounting and reservations remain enforced. DaemonSets share the remaining
 unallocated CPUs. No measurement thresholds or native grader rules change.
-Scheduler-domain load balancing remains enabled so ordinary multithreaded
-jobs can use their allocated CPUs. Each measured ecbench child is separately
-pinned by the native harness. Live validation and retained private failure
-artifacts include 108/108 L2 records on the final v4 profile, complete S3 replay, and
+The benchmark pool also isolates scheduler domains, confines the watchdog and
+RCU kernel threads to housekeeping, and disables per-cgroup PSI work. System-wide
+`/proc/pressure/cpu` and `/proc/pressure/memory` remain enabled and mandatory in the
+native preflight. Per-container PSI metrics are therefore unavailable on these
+workers. Each measured ecbench child is explicitly pinned by the native harness.
+The separate ordinary `cpu-spot` pool retains its v4 bootstrap and scheduler load
+balancing so general multithreaded commands can use their allocation. Ordinary
+jobs neither select nor tolerate the benchmark pool. Live validation and retained private failure
+artifacts include 108/108 L2 records on the earlier v4 profile, complete S3 replay, and
 4,405 passing library tests on a separate multithreaded job.
+The longer periodic-recovery qualification later rejected three v4 observations;
+that failed result remains retained. The [CPU-accounting diagnostic](diagnostics/cpu-accounting/README.md)
+documents the v5 accounting investigation. The complete periodic-tick-only
+qualification E then failed 48 preemption checks and remains retained. The
+[dedicated-worker qualification](diagnostics/validation/20261023-l2-domain/REPORT.md)
+passed all 3,606 L2 records, 3,600 native replays, 1,200 A/A pairs and 19 S3 payload
+hashes after scheduler tracing identified the remaining kernel work. No native
+threshold changed. Node labels never replace per-execution L2, replay, A/A and
+S3 verification; the post-merge GitHub Action is a separate integration proof.
 
 After a 60-second startup settle, the native quiet preflight must pass. Every
 record, including warmups, must earn L2 or L3, and all measured executions must
@@ -329,8 +383,10 @@ For an in-cluster harness, use the `harness` ServiceAccount and enable a project
 Kubernetes API token on that harness pod explicitly. External AWS roles can be
 given an EKS access entry mapped to `isolab:submitters`. This group can submit,
 inspect and cancel Jobs and read pod logs only in `isolab`. The current host
-instance role is the cluster creator/admin; no static Kubernetes bearer tokens
-were generated. These are trusted same-lab workloads, not mutually hostile tenants.
+role is mapped to this submitter group; temporary operator/admin grants were
+removed after deployment. No static Kubernetes bearer tokens were generated.
+See [identity setup](ACCESS.md) before connecting another environment. These are
+trusted same-lab workloads, not mutually hostile tenants.
 
 ## Operations and teardown
 
@@ -341,7 +397,7 @@ kubectl -n isolab get events --sort-by=.lastTimestamp
 ```
 
 For deliberate teardown, first stop new submissions and preserve outputs. Delete
-the lab Jobs, then delete `nodepool/cpu-spot` and wait for **all** NodeClaims and
+the lab Jobs, then delete `nodepool/cpu-spot` and `nodepool/cpu-l2-spot` and wait for **all** NodeClaims and
 their EC2 instances to terminate while Karpenter still runs. Only then uninstall
 Karpenter, delete the cluster with eksctl, and delete `Karpenter-isolab`.
 Do not remove the controller first: its finalizers clean up launched instances.

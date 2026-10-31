@@ -1,21 +1,7 @@
 name: jacobian-transfers
 on:
-  pull_request:
-    paths:
-      - 'src/cryptanalysis/jacobian_transfer/**'
-      - 'src/bin/jacobian_transfers.rs'
-      - 'src/cryptanalysis/ec_trapdoor.rs'
-      - 'src/cryptanalysis/curve_traits/arith.rs'
-      - 'src/cryptanalysis/curve_id.rs'
-      - 'src/binary_ecc/**'
-      - 'docs/curves/registry.json'
-      - 'docs/curves/jacobian-transfers.json'
-      - 'docs/curves/JACOBIAN_TRANSFERS.md'
-      - '.github/workflows/jacobian-transfers.yml'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - 'rust-toolchain.toml'
-      - '.cargo/**'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change reaches main, or on demand.
   push:
     branches: [main]
     paths:
@@ -33,10 +19,6 @@ on:
       - 'Cargo.lock'
       - 'rust-toolchain.toml'
       - '.cargo/**'
-  # The registry grows in PRs that do not touch this file; a weekly rebuild
-  # catches a curve that landed unscreened.
-  schedule:
-    - cron: '17 6 * * 1'
   workflow_dispatch:
 permissions:
   contents: read
@@ -45,13 +27,14 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   transfers:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|jacobian-transfers.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|jacobian-transfers.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|jacobian-transfers.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|jacobian-transfers.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 45 }}
     steps:
       - uses: actions/checkout@v4
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /.github/scripts/
             /Cargo.toml
             /tools/volcano-cli/
@@ -85,9 +68,9 @@ jobs:
       - name: The summary table in JACOBIAN_TRANSFERS.md is current
         run: |
           ./target/release/jacobian_transfers table > /tmp/table.md
-          sed -n '/<!-- jacobian_transfers table -->/,$p' docs/curves/JACOBIAN_TRANSFERS.md | tail -n +2 > /tmp/committed.md
+          sed -n "/<!-- jacobian_transfers table -->/,\$p" docs/curves/JACOBIAN_TRANSFERS.md | tail -n +2 > /tmp/committed.md
           if ! diff /tmp/committed.md /tmp/table.md; then
-            echo 'docs/curves/JACOBIAN_TRANSFERS.md table is stale: run `jacobian_transfers table --write-doc docs/curves/JACOBIAN_TRANSFERS.md`'
+            echo 'docs/curves/JACOBIAN_TRANSFERS.md table is stale: run jacobian_transfers table --write-doc docs/curves/JACOBIAN_TRANSFERS.md'
             exit 1
           fi
       - name: Queries run on the committed file

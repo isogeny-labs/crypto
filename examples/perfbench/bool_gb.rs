@@ -38,7 +38,9 @@ use crypto_lib::cryptanalysis::mq_fes::{
 };
 use crypto_lib::cryptanalysis::mq_monica::monica_find_all;
 use crypto_lib::cryptanalysis::pq_f4_f2::groebner_basis_f4;
-use crypto_lib::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
+use crypto_lib::cryptanalysis::pq_groebner_f2::{
+    mask_from64, mask_low64, masks_low64, F2BoolMono, F2BoolPoly,
+};
 use crypto_lib::cryptanalysis::wide_groebner::wide_groebner_decompose;
 use num_bigint::BigUint;
 use rand::{rngs::StdRng, Rng, SeedableRng};
@@ -48,7 +50,7 @@ use rand::{rngs::StdRng, Rng, SeedableRng};
 fn fp_poly(fp: Fp, p: &F2BoolPoly) -> Fp {
     let mut fp = fp.usize(p.n_vars).usize(p.terms.len());
     for t in &p.terms {
-        fp = fp.u64(t.mask);
+        fp = fp.u64(mask_low64(t.mask));
     }
     fp
 }
@@ -155,7 +157,7 @@ fn solve_all(systems: &[BoolSystem], opts: &SolveOptions) -> u64 {
         let before = f4_word_ops_thread();
         let (roots, stats) = solve_boolean_system(&s.equations, s.n_vars, opts);
         let word_ops = f4_word_ops_thread().wrapping_sub(before);
-        fp = fp_solve_stats(fp.words(&roots), &stats).u64(word_ops);
+        fp = fp_solve_stats(fp.words(&masks_low64(&roots)), &stats).u64(word_ops);
     }
     fp.finish()
 }
@@ -364,8 +366,10 @@ fn random_quadratic_polys(n: usize, m: usize, seed: u64) -> Vec<F2BoolPoly> {
                 .filter(|_| rng.gen::<bool>())
                 .collect();
             let val = chosen.iter().filter(|&&t| t & planted == t).count() & 1;
-            let mut terms: Vec<F2BoolMono> =
-                chosen.into_iter().map(F2BoolMono::from_mask).collect();
+            let mut terms: Vec<F2BoolMono> = chosen
+                .into_iter()
+                .map(|m| F2BoolMono::from_mask(mask_from64(m)))
+                .collect();
             if val == 1 {
                 terms.push(F2BoolMono::from_mask(0));
             }

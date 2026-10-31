@@ -1,0 +1,21 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage[T1]{fontenc}
+\begin{document}
+\section*{Independent weighted constructor review}
+31 October 2026 UTC. Component scope: literal word constructor and conditional degree-two initialization.
+
+\textbf{Native checks.} All 50 producer manifest entries match. Constructor, literal equality, producer controls, separate axiom readback and independent reviewer controls compiled privately with exit 0. Readback uses only propext, Classical.choice and Quot.sound. A reviewer control initially failed to synthesize Decidable for the canonical predicate; that source and failure are retained, with the successful explicit contradiction proof alongside.
+
+\textbf{Expression fidelity.} Rust computes $z_2=z^2$, $z_3=z_2z$, $z_4=z_2^2$, $z_5=z_4z$, reducing after each product. Outputs are $qz_2$, $rz_4$, $s(z_3w)$, $t(z_5w)$, $z,w$. The formal literal equality preserves these associations, rather than the different cross-scaling tree. Shared expression subtrees are expanded in the value model; operation-count equivalence is not asserted.
+
+\textbf{Invariant.} Positive modulus $p<2^{31}$ and six canonical inputs establish canonical outputs and field decoding. Prime modulus and nonzero weights permit cancellation of normalization denominators. The normalized support and linear polynomial then equal the original affine coefficients, so original affine Mumford divisibility supplies validity. The Rust degree-two from-affine branch calls this constructor with unit weights, exactly matching the specialization.
+
+\textbf{Composition.} With $5\le p<2^{31}$, the initialized input paired with an explicitly canonical, nonzero-weight, normalized-valid partner cannot select the same-support zero-slope error in the modeled word prelude. This is initialization-to-prelude composition, not nonidentity addition or walk closure.
+
+\textbf{Controls.} Producer controls instantiate the full invariant over $p=5$ with nonunit weights and valid polynomial divisibility. Reviewer controls check all nonzero coefficient outputs over $p=7$, unit-weight preservation, zero-weight preservation, and failure of canonicality when retained $z=p$. This last control exposes the canonical-input premise rather than contradicting the theorem.
+
+\textbf{Source boundary.} No blocking discrepancy was found. Native mapping requires degree-two input, Field.n=1, tables=None, odd prime, normal execution and counter headroom. Canonicality of transferred coefficients and refinement of Rust Jacobian::valid to mathematical divisibility remain external. No scientific run or cost measurement was performed.
+
+Artifacts: review.json, PLAN.md, source/receipt copies in replay/, separate readback output, controls-failure/, and overview.svg. Exact hashes and scope are retained for publication.
+\end{document}

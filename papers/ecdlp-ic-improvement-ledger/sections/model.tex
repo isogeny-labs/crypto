@@ -1,0 +1,85 @@
+\section{Where the cost of index calculus lives}\label{sec:model}
+
+An improvement is only useful if it moves a term that matters. This section
+writes the cost of one index-calculus solve as a sum of terms, and maps each
+lever of the programme to the term it acts on.
+
+\subsection{The pipeline}
+
+Fix a factor base $\Fb\subset E(\FF_q)$ of size $N$. A \emph{relation} is a
+decomposition $aG+bQ=P_1+\cdots+P_m$ with every $P_i\in\pm\Fb$. Once about
+$N$ independent relations are known, linear algebra over $\ZZ/r$ yields
+$\log_G Q$. A heuristic count is enough to place the levers. A uniformly
+random point decomposes into $m$ base points with probability about
+$N^m/(m!\,r)$. Collecting $N$ relations therefore needs about
+$m!\,r/N^{m-1}$ trials. The cold cost of one target is then
+\begin{equation}\label{eq:cost}
+  T \;\approx\;
+  \underbrace{T_{\mathrm{setup}}(N)}_{\text{base, tables}}
+  \;+\;
+  \underbrace{\frac{m!\,r}{N^{m-1}}\;\frac{1}{\rho_{\mathrm{yield}}}\;
+  C_{\mathrm{dec}}(N,m)}_{\text{relation collection}}
+  \;+\;
+  \underbrace{T_{\mathrm{LA}}(N,m)}_{\text{linear algebra}}
+  \;+\;
+  \underbrace{T_{\mathrm{target}}}_{\text{descent, check}}.
+\end{equation}
+Here $C_{\mathrm{dec}}$ is the cost of one decomposition attempt (the
+\emph{oracle}). The factor $\rho_{\mathrm{yield}}\ge1$ collects everything
+that makes a trial more productive than the heuristic: free relations,
+large primes, symmetry, re-randomised targets. $T_{\mathrm{LA}}$ is roughly
+$mN^2$ for sparse elimination. With rho's cost $\sqrt{\pi r/(2A)}$ on the
+other side, the classical balance at $m=2$ with a constant-cost oracle gives
+$N\approx r^{1/3}$ and $T\approx r^{2/3}$. That is why two-summand
+prime-field index calculus loses ground to rho as $r^{1/6}$
+(\S\ref{sec:distance}).
+
+\subsection{The levers}
+
+Table~\ref{tab:levers} lists, for each term of~\eqref{eq:cost}, the levers
+the programme pulled and the sections that report them.
+
+\begin{table}[t]
+\centering\small
+\caption[]{The terms of~\eqref{eq:cost} and the levers that act on them.}
+\label{tab:levers}
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright}X>{\raggedright\arraybackslash}p{2.6cm}@{}}
+\toprule
+Term & Levers pulled & Section \\
+\midrule
+$C_{\mathrm{dec}}$ & root finding of $S_3$; pair and meet-in-the-middle
+  tables; inherited F4, F5, F6-IC; gate-first order; harvest gates;
+  $\FF_p$ F4; $D_4$ invariants & \S\ref{sec:oracle}, \S\ref{sec:families} \\
+$\rho_{\mathrm{yield}}$, $N$ & compact Frobenius orbits; free relations;
+  stride-renewed targets; greedy coverage; $n=83$ base selection; double
+  large primes & \S\ref{sec:basis}, \S\ref{sec:families} \\
+$T_{\mathrm{setup}}$ & stacked producer; cache-blocked pair table; u64 root
+  batching & \S\ref{sec:setup} \\
+$T_{\mathrm{LA}}$ & CADO-style filter and Wiedemann; structured Gaussian
+  elimination; block Wiedemann; first-dependency stop & \S\ref{sec:setup},
+  \S\ref{sec:families} \\
+the exponent & genus-three transfer (cubic GHS); $k=4$ extension fields &
+  \S\ref{sec:families} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Which term dominates now}
+
+Early in the programme, $C_{\mathrm{dec}}$ dominated. A Gr\"obner solve per
+trial cost milliseconds to seconds. After root finding
+(\S\ref{sec:oracle}), the oracle is a handful of field operations and table
+probes, and the cost has moved elsewhere.
+\begin{itemize}
+\item On the Koblitz descent of the leaderboard's Table~A, reusable set-up
+  is $98.5$--$99.7\%$ of cold $S$, and descent is $0.3$--$1.4\%$
+  (\art{docs/ic/LEADERBOARD.md}, phase table).
+\item On the $n=83$ cold pipeline with base K1107, a mean $113.755$\,s
+  process splits into $47.166$\,s of set-up and $66.486$\,s of rank stage.
+  The target stages take $0.099$\,s
+  (\art{research/n83_cold_base_confirm_20261021/RESULT.md}).
+\end{itemize}
+So the relation-collection and set-up terms dominate. Their cost is set by
+$N$ and by the yield per probe, not by the oracle. This is the main
+structural fact behind the ledger. Oracle speed-ups of three to five orders
+of magnitude moved the end-to-end gap by one order at most.

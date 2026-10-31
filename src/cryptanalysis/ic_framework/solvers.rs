@@ -72,11 +72,14 @@ use std::collections::BTreeMap;
 use std::time::{Duration, Instant};
 
 use super::stages::{BooleanSystem, Params, SolverCost, SolverVerdict, SystemShape, SystemSolver};
+use crate::cryptanalysis::bitop_tally;
 use crate::cryptanalysis::koblitz_groebner::{
     f4_word_ops_thread, solve_boolean_system, SolveOptions, SolverEngine, SplitRule,
 };
 use crate::cryptanalysis::pq_f4_f2::{groebner_basis_f4, solutions_from_reduced_basis};
-use crate::cryptanalysis::pq_groebner_f2::{groebner_basis_f2_within, solve_system_f2, F2BoolPoly};
+use crate::cryptanalysis::pq_groebner_f2::{
+    groebner_basis_f2_within, mask_from64, solve_system_f2_counted, F2BoolPoly, Mask, MASK_BITS,
+};
 use crate::cryptanalysis::semaev_sat::XorEncoding;
 
 /// The largest system `exhaustive` and the model-enumerating solvers
@@ -91,6 +94,12 @@ const ENUMERATION_CAP: usize = 26;
 /// what keeps a sweep row from running for hours; the row is then
 /// skipped and says why.
 const XL_CAP: usize = 10;
+
+/// Terms of a system: the words a copy of it moves, and the word
+/// operations of a pass over it.
+fn terms_of(equations: &[F2BoolPoly]) -> u64 {
+    equations.iter().map(|p| p.terms.len() as u64).sum()
+}
 
 fn is_one(gb: &[F2BoolPoly]) -> bool {
     gb.len() == 1 && gb[0].terms.len() == 1 && gb[0].terms[0].degree() == 0
@@ -108,7 +117,7 @@ fn points_satisfying(equations: &[F2BoolPoly], n_vars: usize) -> (Vec<u64>, u64)
         let mut ok = true;
         for e in equations {
             tests += e.terms.len() as u64;
-            if e.eval(v) != 0 {
+            if e.eval(mask_from64(v)) != 0 {
                 ok = false;
                 break;
             }
@@ -120,9 +129,15 @@ fn points_satisfying(equations: &[F2BoolPoly], n_vars: usize) -> (Vec<u64>, u64)
     (out, tests)
 }
 
+/// Enumeration engines work in `u64` points (at most `2^n` of them, so
+/// `n < 64`); the verdict carries [`Mask`] points.
+fn masks(points: Vec<u64>) -> Vec<Mask> {
+    points.into_iter().map(mask_from64).collect()
+}
+
 /// Check every returned point against the original equations, counting
 /// the monomial tests.  An engine's answer is never trusted unchecked.
-fn verified(points: Vec<u64>, system: &BooleanSystem, tests: &mut u64) -> Vec<u64> {
+fn verified(points: Vec<Mask>, system: &BooleanSystem, tests: &mut u64) -> Vec<Mask> {
     points
         .into_iter()
         .filter(|&v| {
@@ -153,7 +168,7 @@ impl SystemSolver for F4F2 {
     }
 
     fn accepts(&self, shape: &SystemShape) -> bool {
-        shape.n_vars <= 64
+        shape.n_vars <= MASK_BITS
     }
 
     fn solve(
@@ -163,6 +178,7 @@ impl SystemSolver for F4F2 {
         budget: Option<Duration>,
     ) -> (SolverVerdict, SolverCost) {
         let started = Instant::now();
+        let tally_before = bitop_tally::snapshot();
         let (gb, st) = groebner_basis_f4(system.equations.clone(), system.n_vars, budget);
         let mut tests = 0u64;
         let mut extra = BTreeMap::new();
@@ -276,6 +292,15 @@ impl SystemSolver for F4F2 {
             }
         };
         cost.extra.insert("extraction_tests".into(), tests);
+        // The whole run in `bitop/v1` primitives: the XORs the eliminations
+        // performed (M4RI tables included), every other word operation and
+        // hash probe `pq_f4_f2` tallies (products, symbolic preprocessing,
+        // pair selection, column sort and index, packing, lead scans,
+        // read-back, interreduction), and the extraction's monomial tests,
+        // one word operation each.
+        bitop_tally::snapshot()
+            .since(tally_before)
+            .put_complete(&mut cost.extra, st.word_xors_performed + tests);
         cost.wall_ns = started.elapsed().as_nanos() as u64;
         (verdict, cost)
     }
@@ -366,7 +391,7 @@ impl SystemSolver for HybridF4 {
     }
 
     fn accepts(&self, shape: &SystemShape) -> bool {
-        shape.n_vars <= 64
+        shape.n_vars <= MASK_BITS
     }
 
     fn solve(
@@ -390,11 +415,21 @@ impl SystemSolver for HybridF4 {
         // another's.
         let resolved = opts.resolve();
         let before = f4_word_ops_thread();
+        let tally_before = bitop_tally::snapshot();
         let (points, st) = solve_boolean_system(&system.equations, system.n_vars, &opts);
         let ops = f4_word_ops_thread().wrapping_sub(before);
         let mut tests = 0u64;
         let points = verified(points, system, &mut tests);
         let mut extra = BTreeMap::new();
+        // The whole run in `bitop/v1` primitives: the engine's word XORs
+        // (`ops`), every other word operation and hash probe the splitting
+        // solve tallied (Macaulay builds, column sorts and indexes,
+        // packing, pivot searches, read-back, substitutions and scans, the
+        // inherited bases' layouts), and the verification's monomial
+        // tests, a word operation each.
+        bitop_tally::snapshot()
+            .since(tally_before)
+            .put_complete(&mut extra, ops + tests);
         for (k, v) in [
             ("reductions", st.reductions as u64),
             ("infeasible_branches", st.infeasible_branches as u64),
@@ -486,7 +521,7 @@ impl SystemSolver for CrossbredF2 {
         _budget: Option<Duration>,
     ) -> (SolverVerdict, SolverCost) {
         use crate::cryptanalysis::crossbred::{
-            extract_crossbred, solve_crossbred, CrossbredParams, SearchOptions,
+            extract_crossbred_counted, solve_crossbred, CrossbredParams, SearchOptions,
         };
         let started = Instant::now();
         let n = system.n_vars;
@@ -502,33 +537,42 @@ impl SystemSolver for CrossbredF2 {
             ..SearchOptions::default()
         };
         let mut extra = BTreeMap::new();
-        let (verdict, ops) = match extract_crossbred(&system.equations, n, &xp) {
-            None => (SolverVerdict::BudgetExceeded, 0),
-            Some(xb) => {
-                let (points, ss) = solve_crossbred(&system.equations, &xb, &opts);
-                for (k, v) in [
-                    ("macaulay_rows", xb.stats.macaulay_rows as u64),
-                    ("macaulay_cols", xb.stats.macaulay_cols as u64),
-                    ("kernel_dim", xb.stats.kernel_dim as u64),
-                    ("filters", xb.stats.filters as u64),
-                    ("points", ss.points),
-                    ("survivors", ss.survivors),
-                    ("linear_solves", ss.linear_solves),
-                    ("solve_row_ops", ss.solve_row_ops),
-                    ("exhausted", ss.exhausted as u64),
-                ] {
-                    extra.insert(k.to_string(), v);
+        // `bitop/v1` over the whole call: every word operation of the
+        // extraction (also when it gives up at `max_rows`) and of the
+        // search, per-point solves and verification included.
+        let mut word_ops = 0u64;
+        let (verdict, ops) =
+            match extract_crossbred_counted(&system.equations, n, &xp, &mut word_ops) {
+                None => (SolverVerdict::BudgetExceeded, 0),
+                Some(xb) => {
+                    let (points, ss) = solve_crossbred(&system.equations, &xb, &opts);
+                    word_ops += ss.bitop_word_ops;
+                    for (k, v) in [
+                        ("macaulay_rows", xb.stats.macaulay_rows as u64),
+                        ("macaulay_cols", xb.stats.macaulay_cols as u64),
+                        ("kernel_dim", xb.stats.kernel_dim as u64),
+                        ("filters", xb.stats.filters as u64),
+                        ("points", ss.points),
+                        ("survivors", ss.survivors),
+                        ("linear_solves", ss.linear_solves),
+                        ("solve_row_ops", ss.solve_row_ops),
+                        ("exhausted", ss.exhausted as u64),
+                    ] {
+                        extra.insert(k.to_string(), v);
+                    }
+                    let ops = xb.stats.word_ops + ss.transform_word_ops + ss.filter_word_ops;
+                    // (`xb.stats.bitop_word_ops` is already in `word_ops`.)
+                    if ss.exhausted {
+                        (SolverVerdict::BudgetExceeded, ops)
+                    } else if points.is_empty() {
+                        (SolverVerdict::Unsatisfiable, ops)
+                    } else {
+                        (SolverVerdict::Solved(masks(points)), ops)
+                    }
                 }
-                let ops = xb.stats.word_ops + ss.transform_word_ops + ss.filter_word_ops;
-                if ss.exhausted {
-                    (SolverVerdict::BudgetExceeded, ops)
-                } else if points.is_empty() {
-                    (SolverVerdict::Unsatisfiable, ops)
-                } else {
-                    (SolverVerdict::Solved(points), ops)
-                }
-            }
-        };
+            };
+        extra.insert("bitop_word_ops".into(), word_ops);
+        extra.insert("bitop_complete".into(), 1);
         let cost = SolverCost {
             ops,
             op_unit: "word operations (partial: extraction, transform and filter; per-point solves in solve_row_ops)".into(),
@@ -544,6 +588,35 @@ impl SystemSolver for CrossbredF2 {
 }
 
 // ── Fast exhaustive search ─────────────────────────────────────────
+
+/// Word operations (`bitop/v1`'s `word_op`) of turning one equation of
+/// `terms` terms into a [`QuadraticForm`](crate::cryptanalysis::mq_fes::QuadraticForm)
+/// over `n` unknowns: `AnfRow::from_poly` tests the 64 bits of each mask
+/// (64) and stores the row (1); `from_anf_row` zeroes `n + n(n−1)/2`
+/// coefficient bytes (a word per eight) and flips one or two of them a
+/// term (2).
+fn fes_form_ops(terms: usize, n: usize) -> u64 {
+    let bytes = (n + n * n.saturating_sub(1) / 2) as u64;
+    67 * terms as u64 + bytes.div_ceil(8)
+}
+
+/// Word operations of `gray_tables` for `m` forms over `n` unknowns: the
+/// two stack tables zeroed (561 + 34 words), a coefficient test (and its
+/// XOR) per constant, linear and quadratic coefficient of every form, and
+/// the `2n + 2` fictive entries.
+fn gray_table_ops(m: usize, n: usize) -> u64 {
+    595 + m as u64 * (1 + n + n * n.saturating_sub(1) / 2) as u64 + 2 * n as u64 + 2
+}
+
+/// Word operations of a Gray-code walk of `steps` steps on words of
+/// `words` 64-bit words (one for the scalar walk, `lanes / 2` for a vector
+/// of `lanes` 32-bit lanes): per step the zero test of the value (a
+/// compare of every word and the test of the resulting mask, `words + 1`)
+/// and two XORs of `words` words; per sixteen-step chunk the focus-pointer
+/// advance and the chunk's three table indices (12).
+fn gray_walk_ops(steps: u64, words: u64) -> u64 {
+    steps * (3 * words + 1) + 12 * steps.div_ceil(16)
+}
 
 /// Bouillaguet et al.'s fast exhaustive search in the libfes-lite form
 /// ([`crate::cryptanalysis::mq_fes::gray_incremental_find_all`]): all
@@ -576,14 +649,19 @@ impl SystemSolver for FesF2 {
         use crate::cryptanalysis::mq_fes::{gray_incremental_find_all, QuadraticForm};
         let started = Instant::now();
         let n = system.n_vars;
+        // `bitop/v1` over the whole call; see `fes_form_ops`,
+        // `gray_table_ops` and `gray_walk_ops` for the constants.
+        let mut word_ops = 0u64;
         let forms: Option<Vec<QuadraticForm>> = system
             .equations
             .iter()
             .map(|p| {
+                word_ops += fes_form_ops(p.terms.len(), p.n_vars);
                 let mut q = QuadraticForm::from_poly(p)?;
                 // `from_poly` sizes the form by the polynomial's own
                 // variable count; the search needs the system's.
                 if q.n != n {
+                    word_ops += fes_form_ops(p.terms.len(), n);
                     q = QuadraticForm::from_anf_row(
                         &crate::cryptanalysis::wdsat_oracle::AnfRow::from_poly(p),
                         n,
@@ -613,7 +691,14 @@ impl SystemSolver for FesF2 {
         let (verdict, ops) = match found {
             None => (SolverVerdict::BudgetExceeded, 0),
             Some(points) => {
-                let points = verified(points, system, &mut tests);
+                // The coefficient scan above (a test a coefficient), the
+                // tables, the walk, and a store per root found.
+                let m = system.equations.len();
+                word_ops += m as u64 * (1 + n + n * n.saturating_sub(1) / 2) as u64
+                    + gray_table_ops(m, n)
+                    + gray_walk_ops(1u64 << n, 1)
+                    + 2 * points.len() as u64;
+                let points = verified(masks(points), system, &mut tests);
                 // Two XORs per Gray-code step, one step per point, plus
                 // one per coefficient scattered into the tables.
                 let ops = 2 * (1u64 << n) + setup;
@@ -625,6 +710,9 @@ impl SystemSolver for FesF2 {
             }
         };
         extra.insert("verification_tests".into(), tests);
+        // A verification test is a word test of one term.
+        extra.insert("bitop_word_ops".into(), word_ops + tests);
+        extra.insert("bitop_complete".into(), 1);
         let cost = SolverCost {
             ops,
             op_unit: "word XORs (Gray-code steps)".into(),
@@ -683,6 +771,11 @@ impl SystemSolver for FesWide {
         use crate::cryptanalysis::mq_fes::{gray_find_all_wide, QuadraticForm};
         let started = Instant::now();
         let n = system.n_vars;
+        let form_ops: u64 = system
+            .equations
+            .iter()
+            .map(|p| fes_form_ops(p.terms.len(), n))
+            .sum();
         let forms: Option<Vec<QuadraticForm>> = system
             .equations
             .iter()
@@ -702,17 +795,41 @@ impl SystemSolver for FesWide {
             .and_then(|fs| gray_find_all_wide(&fs[..fs.len().min(32)], usize::MAX));
         let Some((candidates, lanes)) = found else {
             // No lanes on this host, or a system the lanes do not fit:
-            // the scalar walk, which reports its own unit.
-            return FesF2.solve(system, params, budget);
+            // the scalar walk, which reports its own unit.  The forms
+            // built here for nothing are still work done.
+            let (verdict, mut cost) = FesF2.solve(system, params, budget);
+            *cost.extra.entry("bitop_word_ops".into()).or_insert(0) += form_ops;
+            return (verdict, cost);
         };
         let mut tests = 0u64;
         let candidate_count = candidates.len() as u64;
-        let points = verified(candidates, system, &mut tests);
+        let points = verified(masks(candidates), system, &mut tests);
         let mut extra = BTreeMap::new();
         extra.insert("points".into(), 1u64 << n);
         extra.insert("lanes".into(), lanes as u64);
         extra.insert("candidates".into(), candidate_count);
         extra.insert("verification_tests".into(), tests);
+        // `bitop/v1` over the whole call: the forms; per lane the
+        // specialisation (a test a coefficient of the form, `m` forms of
+        // the walked `m'` = min(m, 32)) and its tables, and the lane's
+        // first-derivative column moved into the vector table (34), plus
+        // the shared second-derivative table (561); the walk on vectors of
+        // `lanes / 2` words; a store per candidate; a word test per
+        // verification test.
+        let walked = system.equations.len().min(32);
+        let k = lanes.trailing_zeros() as usize;
+        let free = n - k;
+        let per_lane = walked as u64 * (1 + n + n * n.saturating_sub(1) / 2) as u64
+            + gray_table_ops(walked, free)
+            + 34;
+        let word_ops = form_ops
+            + lanes as u64 * per_lane
+            + 561
+            + gray_walk_ops((1u64 << n) / lanes as u64, lanes as u64 / 2)
+            + 2 * candidate_count
+            + tests;
+        extra.insert("bitop_word_ops".into(), word_ops);
+        extra.insert("bitop_complete".into(), 1);
         let cost = SolverCost {
             // Two vector XORs per Gray-code step, one step per `lanes`
             // points; the per-lane table setup is negligible beside it.
@@ -750,7 +867,7 @@ impl SystemSolver for BuchbergerF2 {
     }
 
     fn accepts(&self, shape: &SystemShape) -> bool {
-        shape.n_vars <= 64
+        shape.n_vars <= MASK_BITS
     }
 
     fn solve(
@@ -760,6 +877,10 @@ impl SystemSolver for BuchbergerF2 {
         budget: Option<Duration>,
     ) -> (SolverVerdict, SolverCost) {
         let (gb, st) = groebner_basis_f2_within(system.equations.clone(), system.n_vars, budget);
+        // `bitop/v1` over the whole call: the engine's own word operations
+        // (`GbStats::bitop_word_ops`), the copy of the input (a word a
+        // term), the `is_one` test, and the solution enumeration below.
+        let mut word_ops = st.bitop_word_ops + terms_of(&system.equations) + 1;
         let mut extra = BTreeMap::new();
         extra.insert("spolys".into(), st.spolys);
         extra.insert("reduction_steps".into(), st.reduction_steps);
@@ -777,23 +898,29 @@ impl SystemSolver for BuchbergerF2 {
             timed_out: st.timed_out,
             extra,
         };
+        let done = |mut cost: SolverCost, word_ops: u64| {
+            cost.extra.insert("bitop_word_ops".into(), word_ops);
+            cost.extra.insert("bitop_complete".into(), 1);
+            cost
+        };
         if st.timed_out {
-            return (SolverVerdict::BudgetExceeded, cost);
+            return (SolverVerdict::BudgetExceeded, done(cost, word_ops));
         }
         if is_one(&gb) {
-            return (SolverVerdict::Unsatisfiable, cost);
+            return (SolverVerdict::Unsatisfiable, done(cost, word_ops));
         }
         if system.n_vars > ENUMERATION_CAP {
             // The basis is correct but this module extracts solutions by
             // enumeration, which is not affordable here.  Saying so is
             // better than reporting no solutions.
-            return (SolverVerdict::BudgetExceeded, cost);
+            return (SolverVerdict::BudgetExceeded, done(cost, word_ops));
         }
-        let solutions = solve_system_f2(&gb, system.n_vars);
+        let solutions = solve_system_f2_counted(&gb, system.n_vars, &mut word_ops);
+        let cost = done(cost, word_ops);
         if solutions.is_empty() {
             (SolverVerdict::Unsatisfiable, cost)
         } else {
-            (SolverVerdict::Solved(solutions), cost)
+            (SolverVerdict::Solved(masks(solutions)), cost)
         }
     }
 }
@@ -830,8 +957,14 @@ impl SystemSolver for XlF2 {
         // than mid-run.  That is stated rather than hidden: a long XL
         // call will run to completion.
         let started = Instant::now();
-        let solutions =
-            crate::cryptanalysis::pq_xl::boolean_xl_solve(system.equations.clone(), system.n_vars);
+        // `bitop/v1` over the whole call: the copy of the input (a word a
+        // term), then XL's own word operations and the enumeration.
+        let mut word_ops = terms_of(&system.equations);
+        let solutions = crate::cryptanalysis::pq_xl::boolean_xl_solve_counted(
+            system.equations.clone(),
+            system.n_vars,
+            &mut word_ops,
+        );
         let terms: u64 = system.equations.iter().map(|p| p.terms.len() as u64).sum();
         let cost = SolverCost {
             // XL's work is dominated by the linearised elimination; the
@@ -844,12 +977,15 @@ impl SystemSolver for XlF2 {
             degree_reached: None,
             solving_degree: None,
             timed_out: false,
-            extra: BTreeMap::new(),
+            extra: BTreeMap::from([
+                ("bitop_word_ops".to_string(), word_ops),
+                ("bitop_complete".to_string(), 1),
+            ]),
         };
         if solutions.is_empty() {
             (SolverVerdict::Unsatisfiable, cost)
         } else {
-            (SolverVerdict::Solved(solutions), cost)
+            (SolverVerdict::Solved(masks(solutions)), cost)
         }
     }
 }
@@ -906,7 +1042,7 @@ impl SystemSolver for SatCdcl {
     }
 
     fn accepts(&self, shape: &SystemShape) -> bool {
-        shape.n_vars <= 64
+        shape.n_vars <= MASK_BITS
     }
 
     /// One model per call: a first-solution search.
@@ -959,6 +1095,17 @@ impl SystemSolver for SatCdcl {
         // cnf_clauses.
         extra.insert("variables_max".into(), u64::from(enc.solver.n_vars()));
         extra.insert("clauses_max".into(), enc.solver.n_clauses() as u64);
+        // The whole run in `bitop/v1` word operations: the encoding and
+        // the search as `Solver::word_ops` counts them, plus reading a
+        // model out (the per-variable assignment, then the problem
+        // variables packed into a word).  No hash map is probed.
+        let model_read = if matches!(verdict, SolveResult::Sat) {
+            u64::from(enc.solver.n_vars()) + system.n_vars as u64
+        } else {
+            0
+        };
+        extra.insert("bitop_word_ops".into(), enc.solver.word_ops() + model_read);
+        extra.insert("bitop_complete".into(), 1);
         let cost = SolverCost {
             ops: st.conflicts,
             op_unit: "conflicts".into(),
@@ -1009,6 +1156,10 @@ impl SystemSolver for Exhaustive {
     ) -> (SolverVerdict, SolverCost) {
         let started = Instant::now();
         let (solutions, ops) = points_satisfying(&system.equations, system.n_vars);
+        // `bitop/v1` over the whole call: a word test a monomial test (an
+        // AND and a compare on the point word), the point counter, and a
+        // store per solution.
+        let word_ops = ops + (1u64 << system.n_vars) + solutions.len() as u64;
         let cost = SolverCost {
             ops,
             op_unit: "monomial tests".into(),
@@ -1017,12 +1168,15 @@ impl SystemSolver for Exhaustive {
             degree_reached: None,
             solving_degree: None,
             timed_out: false,
-            extra: BTreeMap::new(),
+            extra: BTreeMap::from([
+                ("bitop_word_ops".to_string(), word_ops),
+                ("bitop_complete".to_string(), 1),
+            ]),
         };
         if solutions.is_empty() {
             (SolverVerdict::Unsatisfiable, cost)
         } else {
-            (SolverVerdict::Solved(solutions), cost)
+            (SolverVerdict::Solved(masks(solutions)), cost)
         }
     }
 }
@@ -1063,6 +1217,10 @@ pub fn solver_by_name(name: &str) -> Result<Box<dyn SystemSolver>, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
     use crate::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
 
     /// `v0 + v1`, `v0·v1 + v1` — solutions are `v0 = v1 = 0` and
@@ -1087,7 +1245,7 @@ mod tests {
         cnf.set("sat_xor_encoding", "cnf");
         let mut native = Params::default();
         native.set("sat_xor_encoding", "native");
-        let reference: std::collections::BTreeSet<u64> = [0, 3].into_iter().collect();
+        let reference: std::collections::BTreeSet<Mask> = [0, 3].into_iter().collect();
         for (params, expected_native) in [(Params::default(), false), (cnf, false), (native, true)]
         {
             let (verdict, cost) = SatCdcl.solve(&sys, &params, None);
@@ -1125,18 +1283,49 @@ mod tests {
         assert!(std::panic::catch_unwind(|| SatCdcl.solve(&sys, &invalid, None)).is_err());
     }
 
+    /// sat-cdcl prices its whole run in `bitop/v1` word operations, the
+    /// count is deterministic, and the completeness flag survives being
+    /// totalled over calls (it is a flag, not a sum) until a call that
+    /// does not report it.
+    #[test]
+    fn sat_cdcl_reports_complete_bitop_work() {
+        use crate::cryptanalysis::ic_framework::stages::SolverTotals;
+        let sys = fixture();
+        for mode in ["cnf", "native"] {
+            let mut params = Params::default();
+            params.set("sat_xor_encoding", mode);
+            let (_, a) = SatCdcl.solve(&sys, &params, None);
+            let (_, b) = SatCdcl.solve(&sys, &params, None);
+            assert_eq!(a.extra["bitop_complete"], 1);
+            assert!(a.extra["bitop_word_ops"] > 0);
+            assert_eq!(a.extra["bitop_word_ops"], b.extra["bitop_word_ops"]);
+
+            let shape = sys.shape();
+            let mut totals = SolverTotals::default();
+            totals.absorb(&shape, Some(&a), false);
+            totals.absorb(&shape, Some(&b), false);
+            assert_eq!(totals.extra["bitop_complete"], 1);
+            assert_eq!(
+                totals.extra["bitop_word_ops"],
+                2 * a.extra["bitop_word_ops"]
+            );
+            totals.absorb(&shape, None, false);
+            assert_eq!(totals.extra["bitop_complete"], 0);
+        }
+    }
+
     /// **Every engine must agree on the answer.**  A framework whose
     /// plug points disagree is not measuring the same problem, and the
     /// column that compares them would be meaningless.
     #[test]
     fn every_solver_finds_the_same_solution_set() {
         let sys = fixture();
-        let reference: std::collections::BTreeSet<u64> =
+        let reference: std::collections::BTreeSet<Mask> =
             match Exhaustive.solve(&sys, &Params::default(), None).0 {
                 SolverVerdict::Solved(v) => v.into_iter().collect(),
                 other => panic!("the reference must solve the fixture, got {other:?}"),
             };
-        assert_eq!(reference, [0u64, 3].into_iter().collect());
+        assert_eq!(reference, [0 as Mask, 3].into_iter().collect());
 
         for solver in solver_registry() {
             // The CDCL solver returns one model rather than all of
@@ -1157,7 +1346,7 @@ mod tests {
                         );
                     }
                     if solver.name() != "sat-cdcl" {
-                        let got: std::collections::BTreeSet<u64> = found.into_iter().collect();
+                        let got: std::collections::BTreeSet<Mask> = found.into_iter().collect();
                         assert_eq!(got, reference, "{} missed a solution", solver.name());
                     }
                 }
@@ -1211,7 +1400,7 @@ mod tests {
             let mut sys = random_quadratic(n, m, &mut rng);
             // Make `planted` a root so the answer is never trivially empty.
             for e in &mut sys.equations {
-                if e.eval(planted) != 0 {
+                if e.eval(mask_from64(planted)) != 0 {
                     *e = e.add(&F2BoolPoly::one(n));
                 }
             }
@@ -1227,7 +1416,7 @@ mod tests {
                 other => panic!("trial {trial}: {other:?} on a system with a planted root"),
             };
             let (wide, scalar) = (sorted(wide), sorted(scalar));
-            assert!(scalar.contains(&planted));
+            assert!(scalar.contains(&mask_from64(planted)));
             assert_eq!(wide, scalar, "trial {trial} (n = {n}, m = {m})");
             assert!(
                 cost.op_unit.starts_with("vector XORs"),
@@ -1253,11 +1442,11 @@ mod tests {
                 for i in 0..n {
                     for j in 0..i {
                         if rng.gen_bool(0.5) {
-                            monos.push(F2BoolMono::from_mask((1u64 << i) | (1 << j)));
+                            monos.push(F2BoolMono::from_mask(mask_from64((1u64 << i) | (1 << j))));
                         }
                     }
                     if rng.gen_bool(0.5) {
-                        monos.push(F2BoolMono::from_mask(1u64 << i));
+                        monos.push(F2BoolMono::from_mask(mask_from64(1u64 << i)));
                     }
                 }
                 if rng.gen_bool(0.5) {
@@ -1277,7 +1466,7 @@ mod tests {
     /// a wrong answer — but a verdict it gives must be the right one,
     /// and every engine but CDCL (one model) must return every solution.
     fn agree_with_the_reference(sys: &BooleanSystem, label: &str) -> usize {
-        let reference: std::collections::BTreeSet<u64> =
+        let reference: std::collections::BTreeSet<Mask> =
             match Exhaustive.solve(sys, &Params::default(), None).0 {
                 SolverVerdict::Solved(v) => v.into_iter().collect(),
                 SolverVerdict::Unsatisfiable => Default::default(),
@@ -1298,7 +1487,7 @@ mod tests {
                         "{label}: {} solved an inconsistent system",
                         solver.name()
                     );
-                    let got: std::collections::BTreeSet<u64> = found.into_iter().collect();
+                    let got: std::collections::BTreeSet<Mask> = found.into_iter().collect();
                     assert!(
                         got.is_subset(&reference),
                         "{label}: {} returned a non-solution",
@@ -1326,6 +1515,48 @@ mod tests {
             assert!(!cost.op_unit.is_empty());
         }
         answered
+    }
+
+    /// **The F4 family counts its whole run** in `bitop/v1` primitives
+    /// (`bitop_complete = 1`), more than its native unit, and the count is
+    /// a function of the system: the same on a fresh thread (the engines'
+    /// layout and template caches are per thread, as in a replay).
+    #[test]
+    fn the_f4_family_reports_its_whole_run() {
+        use rand::SeedableRng;
+        let mut rng = rand::rngs::StdRng::seed_from_u64(20261016);
+        let sys = random_quadratic(10, 9, &mut rng);
+        for name in ["f4-f2", "matrix-f4", "matrix-f5", "inherited-f4"] {
+            let run = || {
+                let sys = sys.clone();
+                std::thread::spawn(move || {
+                    let solver = solver_registry()
+                        .into_iter()
+                        .find(|s| s.name() == name)
+                        .expect("registered");
+                    solver.solve(&sys, &Params::default(), None).1
+                })
+                .join()
+                .unwrap()
+            };
+            let (a, b) = (run(), run());
+            assert_eq!(a.extra.get("bitop_complete"), Some(&1), "{name}");
+            let bitops = |c: &SolverCost| -> Vec<(String, u64)> {
+                c.extra
+                    .iter()
+                    .filter(|(k, _)| k.starts_with("bitop_"))
+                    .map(|(k, v)| (k.clone(), *v))
+                    .collect()
+            };
+            assert_eq!(bitops(&a), bitops(&b), "{name} is deterministic");
+            assert!(
+                a.extra["bitop_word_ops"] > a.ops,
+                "{name}: {} word operations against {} {}",
+                a.extra["bitop_word_ops"],
+                a.ops,
+                a.op_unit
+            );
+        }
     }
 
     /// **The new engines against the reference, on random quadratic
@@ -1391,7 +1622,7 @@ mod tests {
                 let sys = random_quadratic(n, n.saturating_sub(1).max(1), &mut rng);
                 let (fes, cost) = FesF2.solve(&sys, &Params::default(), None);
                 let (reference, _) = Exhaustive.solve(&sys, &Params::default(), None);
-                let as_set = |v: &SolverVerdict| -> std::collections::BTreeSet<u64> {
+                let as_set = |v: &SolverVerdict| -> std::collections::BTreeSet<Mask> {
                     match v {
                         SolverVerdict::Solved(p) => p.iter().copied().collect(),
                         SolverVerdict::Unsatisfiable => Default::default(),

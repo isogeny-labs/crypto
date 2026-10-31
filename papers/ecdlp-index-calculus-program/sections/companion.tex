@@ -1,0 +1,120 @@
+\section{The companion repositories}\label{sec:companion}
+
+The work this paper reports was not all done in one repository. Besides
+\texttt{crypto}, where the harness, the ledger and most studies live, the
+laboratory kept ECDLP work in nine further repositories
+(Table~\ref{tab:repos}). This section says what each holds and what it adds;
+results that bear on a family are also stated in that family's section, and
+every unit of every repository is listed in
+Appendix~\ref{sec:companion-catalogue}. Paths into these repositories are
+written \texttt{ar:}, \texttt{ca:} and so on with the prefix of
+Table~\ref{tab:repos}, and refer to the pinned commit. Three of the
+repositories, like \texttt{crypto} itself, are private; a reader without
+access can check only the public ones.
+
+\begin{table}[t]
+\centering\small
+\caption[]{The laboratory's repositories with ECDLP work, at the commits
+read for this paper (24 October 2026). Units: the entries catalogued in
+Appendix~\ref{sec:companion-catalogue} (study directories, experiments,
+evidence and correction records, knowledge records, or top-level entries).}
+\label{tab:repos}
+\begin{tabularx}{\linewidth}{@{}l l l r >{\raggedright\arraybackslash}X@{}}
+\toprule
+Prefix & Repository & Commit & Units & Subject \\
+\midrule
+--- & \texttt{crypto} (private) & \texttt{5cb553810e} & 1{,}444 & harness, ledger, every study of \S\S\ref{sec:koblitz}--\ref{sec:frontier} \\
+ar: & \texttt{crypto-autoresearcher} (public) & \texttt{ab0609ebee} & 4{,}534 & multi-agent ECDLP research with its own claim tiers; experiments, evidence, knowledge records \\
+ca: & \texttt{cryptanalysis} (private) & \texttt{c5aa7b39bf} & 467 & discrete-log library and attack suite; a separate $n=83$ pipeline; ECC2K-130 GPU rho \\
+ecc: & \texttt{ecc-challenges} (public) & \texttt{86f8a57a5e} & 26 & distributed Pollard rho for the 24 Certicom curves \\
+ml: & \texttt{ml-cryptanalysis} (private) & \texttt{58494969fd} & 17 & curve-structure learning on toy ECDLP instances \\
+--- & \texttt{ecdlp-prime-field-smallness} (private) & \texttt{4f20be9b36} & 7 & whether any ``small'' subset of $E(\FF_p)$ is addition-compatible \\
+--- & \texttt{crypto-lean} (public) & \texttt{148f5dc389} & 12 & Lean 4 library and proof gate shared by the repositories \\
+--- & \texttt{ecbench}, \texttt{isogeny-labs}, \texttt{isolab}, \texttt{cryptanalysis-rl} & --- & 49 & a copy of the harness, a website, a benchmark runner, and non-ECDLP reinforcement learning \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\paragraph{crypto-autoresearcher.} A multi-agent laboratory with separate
+coordinator, executor, reviewer, validator and red-team roles, whose
+experiments are frozen specifications with claim tiers and authorised
+stages, and whose results are evidence records in a ledger. Of its 2{,}779
+experiment specifications, 601 have run output; the rest were approved or
+drafted and never run, and are catalogued as such. It holds 793 evidence
+records, 427 corrections, about 320 knowledge records (findings,
+techniques, open problems) and about 8{,}100 literature records; its
+June--August history comes partly from an imported Autolab corpus whose
+48\,GB byte mirror is local, not on GitHub. Its ECDLP results, all at toy
+claim tiers:
+\begin{itemize}
+\item \emph{Prime fields, June--August.} An imported Autolab round of
+  1 June 2026 solved discrete logarithms end to end with an $m=3$ Semaev
+  index calculus and measured a cost exponent of $0.889$ against rho's
+  $0.5$, IC/rho growing from $21.5$ to $205.7$ over 10--18 bits
+  (\art{ar:experiments/EXP-ALPF-032/analysis.md}). By 18--19 July the
+  repository had proved the mixed-volume law of the Semaev family
+  (\art{ar:research/THM_BKKMV1.md}) and opened ``Does index calculus beat
+  Pollard rho for prime-field ECDLP?'' as its first open problem
+  (\art{ar:knowledge/open-problems/KN-OPEN-001.md}).
+\item \emph{Binary descent.} msolve's solving degree of the descended $m=3$
+  Semaev system is 7 at every $n$ from 11 to 23 (a firm lower bound at
+  $n\ge17$, where the run walls on matrix size;
+  \art{ar:experiments/EXP-ALBIN-008/analysis.md}). A degree-4 reuse closure
+  refutes 400 of 400 unsatisfiable $\Sem3$ descents at $n=19$ where plain
+  degree-4 Macaulay refutes none
+  (\art{ar:experiments/EXP-CERTBIN-060020/}). A crossbred solver's fitted
+  total exponent is $0.891$ $[0.869,0.914]$ against a rho control's $0.498$
+  over $n=10$--$24$ (\art{ar:experiments/EXP-ICI-001/analysis.md}). On the 60
+  published $\Sem4$ instances of Trimoska et al.\ over $\FF_{2^{15}}$ to
+  $\FF_{2^{19}}$, WDSat decides the unsatisfiable $n=19$, $\ell=6$ cell in
+  2.37\,s against 124.6\,s for CryptoMiniSat with XOR clauses and 56.7\,s for
+  CaDiCaL; no Gröbner engine finished, and there is no rho column
+  (\art{ar:experiments/EXP-ICPERF-66fd51/}).
+\item \emph{Named binary curves.} At $n=131$ the only Frobenius-stable
+  subspace dimensions are 0, 1, 130 and 131, so the orbit trick loses
+  57--96 bits for $m=2$--5 (\art{ar:experiments/EXP-FROB-ec08b5/}); the
+  descended system exceeds the rho budget by 40.8 bits at $n=131$
+  (\art{ar:experiments/EXP-ICPERF-783e9e/}). Conditional on a solving degree
+  of at most 4---checked only at $n\le21$---Semaev's 2015 estimate is
+  $+49.92$ bits over rho at $n=131$, $+6.15$ at 283, $-37.96$ at 409 and
+  $-99.19$ at 571 (\art{ar:experiments/EXP-SEMBIN-992e73/RESULTS.md}); the
+  study says nothing in the table is a security statement.
+\end{itemize}
+The repository's own records correct many of its results (an instrument
+tautology, a fabricated justification, superseded headline rows), and the
+catalogue follows its corrections.
+
+\paragraph{cryptanalysis.} A C11 discrete-log library (BSGS, rho, kangaroo,
+GLV rho, $\FF_p^*$ index calculus, GPU and distributed rho) with bindings
+and a Rust attack suite; its README says it contains no ECDLP speed-up. It
+holds a second $n=83$ Koblitz pipeline (K600, $a=1$) improved through a
+Tier~1 ratchet of rank-probe, closure, index-build and rank-finder changes,
+whose latest row is $3.92\times$ a tuned rho end to end, cold
+(\S\ref{sec:n83}; \art{ca:experiments/koblitz-n83-rankfinder-20261021/README.md}).
+Its \art{ca:ecc2k130/} directory is the ECC2K-130 GPU rho client imported
+from \texttt{crypto}, now at 20.08 billion iterations per second on one RTX
+PRO 6000 for a table-walk variant that cannot join the live campaign's walk.
+Most of its 139 $j=0$ prime-curve directories are fixed-generator $[k]G$
+table formats, which compute scalar multiples rather than logarithms and
+are out of scope.
+
+\paragraph{The others.} \texttt{ecc-challenges} runs a public
+distributed Pollard rho on all 24 Certicom curves, with 338 million
+imported ECC2K-130 distinguished points and no curve solved. \texttt{ml-cryptanalysis}
+(``curve structural discovery'') recovers a planted automorphism law in
+rho cost ($0.572$ against $0.577$) and finds no hardness signal on toy
+curves. \texttt{ecdlp-prime-field-smallness} asks whether any
+coordinate-defined subset of $E(\FF_p)$ interacts with addition better than
+a random subset, and finds none on toy curves---negative evidence on the
+prime-field question of \S\ref{sec:prime}. \texttt{crypto-lean} holds the
+Lean statements the papers rely on, among them the $\Sem3$ root identity of
+Proposition~\ref{prop:s3}. \texttt{ecbench} is a pinned copy of the
+\texttt{crypto} harness; \texttt{isogeny-labs}, \texttt{isolab} and
+\texttt{cryptanalysis-rl} hold no ECDLP results.
+
+\paragraph{Overlaps.} The ECC2K-130 GPU rho, the PDP oracle programme and
+the $n=83$ surfaces study exist in both \texttt{crypto} and
+\texttt{cryptanalysis}; the narrative cites the \texttt{crypto} copy. The
+two $n=83$ pipelines are separate (K1107 in \texttt{crypto}, K600 here),
+and \texttt{crypto}'s validation sweep records that their numbers are not
+comparable (\art{research/validation_sweep_20261019/D-known-issues/REPORT.md}).

@@ -1,0 +1,85 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s
+     Running unittests src/lib.rs (research/guarded_fall_degree_20261028/native/target/debug/deps/fall_degree_replay-701e25fab9ab9b64)
+
+running 27 tests
+test bigprime::tests::rejects_floats_strings_boolean_and_disguised_numbers ... ok
+test bigprime::tests::arbitrary_precision_product_is_reduced_exactly ... ok
+test bigprime::tests::accepts_256_bit_modulus_without_rounding ... ok
+test bigprime::tests::rejects_forward_references_and_unknown_operations ... ok
+test bigprime::tests::rejects_integer_tokens_over_the_documented_digit_limit ... ok
+test bigprime::tests::rejects_noninteger_input_coefficients_and_wrong_exponents ... ok
+test bigprime::tests::rejects_unused_overdegree_nodes ... ok
+test bigprime::tests::signed_huge_coefficients_cancel_before_degree_filter ... ok
+test bigprime::tests::rejects_wrong_schema_missing_fields_and_invalid_variables ... ok
+test bigprime::tests::rejects_tampered_problem_digest_goal_and_trace_coefficients ... ok
+test bigprime::tests::canonical_binding_agrees_with_existing_small_verifier ... ok
+test tests::accepts_a_valid_identity ... ok
+test tests::accepts_equivalent_input_encodings ... ok
+test tests::canonicalizes_duplicates_negative_coefficients_and_zero_terms ... ok
+test tests::modular_products_do_not_overflow_at_u64_boundary ... ok
+test tests::rejects_an_object_disguised_as_a_number ... ok
+test tests::rejects_forged_digest_nonunit_goals_and_unknown_operations ... ok
+test tests::rejects_invalid_dag_references ... ok
+test tests::rejects_lowered_degree_and_instance_substitution ... ok
+test tests::rejects_noninteger_and_oversized_moduli ... ok
+test tests::rejects_out_of_range_inputs_coefficients_and_variables ... ok
+test tests::rejects_unused_high_degree_nodes ... ok
+test tests::replays_the_historical_characteristic_five_edge_certificate ... ok
+test tests::replays_the_historical_p101_constructive_certificate ... ok
+test large_curves::tests::serialized_geometry_and_witness_tampering_fail_closed ... ok
+test large_curves::tests::point_recurrences_and_summation_polynomials_agree ... ok
+test large_curves::tests::standard_large_curve_fixtures_reconstruct_and_check ... ok
+
+test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+     Running unittests src/bin/big_prime_replay.rs (research/guarded_fall_degree_20261028/native/target/debug/deps/big_prime_replay-f3408860ab9d2e89)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/construct_big_prime.rs (research/guarded_fall_degree_20261028/native/target/debug/deps/construct_big_prime-3e67fdae2bc72b8e)
+
+running 5 tests
+test constructive::tests::large_coefficients_serialize_as_exact_integer_tokens ... ok
+test constructive::tests::rejects_decimal_and_string_moduli ... ok
+test constructive::tests::rejects_disguised_integer_tokens_and_wrong_declared_curve ... ok
+test constructive::tests::characteristic_five_edge_constructive_dag_passes_independent_u64_replay ... ok
+test constructive::tests::historical_prime_101_constructive_dag_passes_independent_u64_replay ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests src/main.rs (research/guarded_fall_degree_20261028/native/target/debug/deps/fall_degree_replay-540c6cdf20efeef8)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/identity_records.rs (research/guarded_fall_degree_20261028/native/target/debug/deps/identity_records-75b91ffdb3176abd)
+
+running 11 tests
+test identity_certificate::tests::field_arithmetic_agrees_with_u128_reference ... ok
+test identity_certificate::tests::degree_bound_is_checked_syntactically_not_trusted ... ok
+test identity_certificate::tests::committed_schoenhage_certificate_still_checks ... ok
+test identity_certificate::tests::canonical_bytes_are_sorted_and_round_trip ... ok
+test identity_certificate::tests::points_depend_on_the_id_so_the_author_cannot_pre_pick_them ... ok
+test identity_certificate::tests::the_identity_without_its_error_term_is_false_and_cannot_be_issued ... ok
+test identity_certificate::tests::swapping_the_statement_under_a_sealed_id_is_malformed ... ok
+test identity_certificate::tests::tampering_with_the_digest_is_detected ... ok
+test tests::characteristic_two_equality_is_not_misrepresented_in_an_odd_field ... ok
+test identity_certificate::tests::schoenhage_identity_certifies_and_checks ... ok
+test tests::the_four_all_ring_identities_issue_and_replay ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/bin/large_curve_fixtures.rs (research/guarded_fall_degree_20261028/native/target/debug/deps/large_curve_fixtures-256a03f614e33e1c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests fall_degree_replay
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

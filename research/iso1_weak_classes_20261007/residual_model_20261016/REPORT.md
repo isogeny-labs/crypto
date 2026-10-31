@@ -4,11 +4,11 @@ This round answers the two open items in the [main report](../REPORT.md):
 the zero labels were probabilistic, and the high-depth classes with no weak
 representative had no explanation beyond an association with class number.
 
-1. **Every census label through p = 113 is now certified.** A new counter
+1. **Every census label through p = 127 is now certified.** A new counter
    returns a group order only when it is the unique Hasse-interval candidate
    compatible with the tested points on the curve and its twist. Reruns at
    p = 7, 13, 37, 41, 43, 47, 53 and 59 reproduce every retained CSV byte for
-   byte. p = 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109 and 113 are new. The queue continues through p = 199.
+   byte. p = 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113 and 127 are new. The queue continues through p = 199.
 2. **The number of 8th-power Legendre parameters in a class is an exact
    2-adic formula times a Hurwitz class number.** The formula reproduces
    exhaustive censuses at p = 7, 11, 13, 17 and the registered holdouts
@@ -16,7 +16,7 @@ representative had no explanation beyond an association with class number.
 3. **Beyond that 2-adic structure, the norm-one torus samples a class at
    random.** A parameter-free binomial thinning predicts the residual zero
    count. It passes at the pristine holdouts p = 53 and 59, and at p = 61,
-   67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109 and 113, which were predicted before their censuses finished (113 falls 0.6 below its interval, a deficit). The dispersion is
+   67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113 and 127, which were predicted before their censuses finished (113 falls 0.6 below its interval, a deficit). The dispersion is
    1.00 ± 0.01 throughout.
 
 The consequence for the original request: past the proved obstruction
@@ -74,6 +74,7 @@ threads, against 1,107 s for the original direct run.
 | **107** | **10,926,163** | **55** | resumed\* | **new**: 605,820 / 1,213,594 ordinary rows weak; 0 / 606,798 depth-1 weak; 976 / 606,796 high-depth zero |
 | **109** | **11,766,151** | **47** | resumed\* | **new**: 640,542 / 1,283,148 ordinary rows weak; 0 / 641,574 depth-1 weak; 1,032 / 641,574 high-depth zero |
 | **113** | **13,590,473** | **48** | resumed\* | **new**: 714,130 / 1,430,128 ordinary rows weak; 0 / 715,064 depth-1 weak; 934 / 715,064 high-depth zero |
+| **127** | **21,682,753** | **46** | resumed\* | **new**: 1,014,958 / 2,032,254 ordinary rows weak; 0 / 1,016,128 depth-1 weak; 1,168 / 1,016,126 high-depth zero |
 
 "Extra isolation points" counts the points needed beyond the first, summed
 over all point counts. Almost every order is isolated by one scan.
@@ -84,7 +85,7 @@ per-prime stderr receipts and CSV hashes, the
 [status log](../certified_20261016/queue_status.tsv), and the
 [p = 61](../certified_20261016/p61_cert.csv.gz) and
 [p = 67](../certified_20261016/p67_cert.csv.gz) and
-[p = 71](../certified_20261016/p71_cert.csv.gz) CSVs. \*p = 71 through 113 ran in
+[p = 71](../certified_20261016/p71_cert.csv.gz) CSVs. \*p = 71 through 127 ran in
 several container sessions with `ISO1_CHECKPOINT`; its job log is
 [p71_cert.ckpt.gz](../certified_20261016/p71_cert.ckpt.gz), and its
 wall time is not a single measurement. The unit test
@@ -198,6 +199,7 @@ are reported but are not pristine.
 | **107** | fresh prime, follow-up test (e = 3) | 303,398 | **488** | 480.2 [443.0, 517.5] | **pass** | 1.000 | 0.996 |
 | **109** | fresh prime, follow-up test (e = 3) | 320,787 | **516** | 488.9 [451.3, 526.5] | **pass** | 1.001 | 0.995 |
 | **113** | fresh prime, follow-up test (e = 5) | 357,532 | **467** | 505.8 [467.6, 544.0] | **0.6 below** | 0.999 | 0.996 |
+| **127** | post-test prediction (e = 8) | 508,063 | **584** | 568.5 [528.0, 609.0] | **pass** | 0.999 | 0.997 |
 
 **Pooled check, and a small excess that is not confirming.** After
 p = 97 the pooled excess over the ten scored primes 53–97 was +95.3 zero rows
@@ -227,6 +229,8 @@ By e = v₂(p²−1) the fresh primes give e = 3: +35.6 (z = 1.09), e = 4: −18
 of −57.1 (z = −2.12), are exploratory, were not registered and are two-sided
 readings of noise-level numbers of rows, so they are not evidence of a
 deficit. p = 113 has 0 / 715,064 depth-1 weak classes.
+
+**After the test: p = 127.** The prediction for p = 127 (568.5, e = 8) was committed on 23 October, with the census at 18,189 of 32,258 jobs, outside the closed follow-up test. The census gave 584 zero rows (+15.5, inside [528.0, 609.0]) and 0 / 1,016,128 depth-1 weak classes. Over all sixteen primes from 53 on the pooled excess is +89.3 (sd 68.6, z = 1.30). The one prime with e = 8 has z = 0.75, and the pooled e ≥ 4 excess is 0.0 (sd 50.3).
 
 The checkpoint logs and the class tables for p ≥ 101 are not committed (they
 are 30–40 MB each and grow with p); their SHA-256 and recovery commands are
@@ -273,7 +277,7 @@ rows.
 
 * Proved (THEOREM.pdf): no ordinary class with `v₂(f_π) = 1` is weak, at
   every odd `p`.
-* Exact for p ≤ 113: the class labels, certified.
+* Exact for p ≤ 127: the class labels, certified.
 * Conjectured, exact on six primes: the `N₈` formula.
 * Measured, all but one of the pristine or forward holdouts inside their 95% interval (p = 113 is 0.6 below, a deficit): inside high-depth
   classes, weakness is a binomial thinning of the 8th-power mass. No
@@ -282,7 +286,7 @@ rows.
   `h_K`) separates the residual zeros.
 * Not shown: that no exotic arithmetic criterion exists. A future failure of
   the forward predictions would be evidence for one.
-* Census status: p ≤ 113 complete and certified; the queue runs the remaining
+* Census status: p ≤ 127 complete and certified; the queue runs the remaining
   primes through 199 in order. At the measured rate, p = 199 alone needs
   about 4 days on 4 threads.
 

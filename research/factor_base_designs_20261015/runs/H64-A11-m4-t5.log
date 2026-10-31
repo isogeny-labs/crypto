@@ -1,0 +1,9 @@
+== A11 m=4 p1: commit fab81e175f405c502e4c38b85100be1ac39aa767, budget 14400 s, grace 600 s, ulimit -v 64250008, started 2026-10-21T00:56:08Z
+memory allocation of 168 bytes failed
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+A11  m=4 t= 5 target=0 b=5.000 |V|=32 n_vars=42 n_eqs=43 D=null reached=null 6011.1 s aborted (memory allocation failed under ulimit -v 64250008 (signal: 6 (SIGABRT) (core dumped)))
+memory allocation of 168 bytes failed
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+A11  m=4 t= 5 target=1 b=5.000 |V|=32 n_vars=42 n_eqs=43 D=null reached=null 6024.0 s aborted (memory allocation failed under ulimit -v 64250008 (signal: 6 (SIGABRT) (core dumped)))
+-- A11 m=4: a system at t = 5 hit a limit or failed; the series stops
+== A11 m=4: ended 2026-10-21T04:16:44Z
