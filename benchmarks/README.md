@@ -36,6 +36,7 @@ Rows that are removed from this admitted-results table before validation remain
 in the [unvalidated benchmark archive](ARCHIVE.md), with their exact former row
 text, digest, reason, and source provenance. Archived rows are not measurements
 admitted by this table and cannot satisfy the validation gate.
+The [N53 root-batching evidence awaiting validation](N53_ROOT_BATCH_UNADMITTED_20261021.md) is retained separately from the admitted index.
 
 The [retained wide-variable engine report](WIDE_VARS_UNADMITTED_20261021.md)
 remains outside this table pending validation admission.

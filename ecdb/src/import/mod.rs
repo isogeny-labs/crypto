@@ -81,8 +81,19 @@ impl Ctx<'_> {
     }
 }
 
+/// Read a JSON input, or its gzip copy `<path>.gz` when only that exists (the
+/// Lambda package ships the catalogues compressed). The recorded SHA-256 is
+/// always that of the uncompressed bytes, so it matches the repository file.
 pub fn read_json(path: &Path, rel_path: &str) -> Result<Input> {
-    let bytes = std::fs::read(path).with_context(|| format!("reading {}", path.display()))?;
+    let gz = PathBuf::from(format!("{}.gz", path.display()));
+    let bytes = if !path.exists() && gz.exists() {
+        let mut out = Vec::new();
+        std::io::Read::read_to_end(&mut flate2::read::GzDecoder::new(std::fs::File::open(&gz)?), &mut out)
+            .with_context(|| format!("decompressing {}", gz.display()))?;
+        out
+    } else {
+        std::fs::read(path).with_context(|| format!("reading {}", path.display()))?
+    };
     let sha256 = hex::encode(<sha2::Sha256 as sha2::Digest>::digest(&bytes));
     let doc = serde_json::from_slice(&bytes).with_context(|| format!("parsing {}", path.display()))?;
     Ok(Input { rel_path: rel_path.to_string(), sha256, doc })
@@ -145,4 +156,47 @@ pub fn s(v: &Value) -> Option<String> {
         Value::Number(n) => Some(n.to_string()),
         _ => None,
     }
+}
+
+/// Which repository importers to run; `All` runs them in dependency order.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Selection {
+    All,
+    Registry,
+    Walks,
+    Traits,
+    Covers,
+    Transfers,
+    Certificates,
+    Derived,
+}
+
+/// Run the selected importers; `walk_files` overrides the default walk outputs.
+pub async fn run(ctx: &Ctx<'_>, what: Selection, walk_files: Option<Vec<String>>) -> Result<Vec<Report>> {
+    let walks = walk_files.unwrap_or_else(|| walks::DEFAULT_FILES.iter().map(|s| s.to_string()).collect());
+    let mut reports = Vec::new();
+    let all = what == Selection::All;
+    if all || what == Selection::Registry {
+        reports.push(registry::import(ctx).await?);
+    }
+    if all || what == Selection::Walks {
+        reports.extend(walks::import(ctx, &walks).await?);
+    }
+    if all || what == Selection::Traits {
+        reports.push(traits::import(ctx).await?);
+    }
+    if all || what == Selection::Covers {
+        reports.push(covers::import(ctx).await?);
+    }
+    if all || what == Selection::Transfers {
+        reports.push(transfers::import(ctx).await?);
+    }
+    if all || what == Selection::Certificates {
+        reports.extend(certs::import(ctx).await?);
+    }
+    if all || what == Selection::Derived {
+        reports.push(derive::import(ctx).await?);
+    }
+    Ok(reports)
 }

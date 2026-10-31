@@ -175,6 +175,25 @@ struct Curve {
     U y = sub(mul(r, sub(v, x)), twice(mul(p.y, j)));
     return {x, y, sub(sub(sq(add(p.z, h)), zz), hh)};
   }
+  // target - right for ordinary affine inputs. EFD mmadd-2007-bl,
+  // Z1=Z2=1: 4M+2S in the nonexceptional formula (conversions excluded).
+  // Keep the same operand order as mixed(jac(-right), target).
+  RF_HD Jac affine_sub(Point target, Point right) const {
+    if (right.inf)
+      return jac(target);
+    Jac p = jac(neg(right));
+    if (target.inf)
+      return p;
+    U h = sub(fp64_to_mont(f, target.x), p.x);
+    U d = sub(fp64_to_mont(f, target.y), p.y);
+    if (!h)
+      return !d ? dbl(p) : Jac{};
+    U hh = sq(h), i = twice(twice(hh)), j = mul(h, i), r = twice(d),
+      v = mul(p.x, i);
+    U x = sub(sub(sq(r), j), twice(v));
+    U y = sub(mul(r, sub(v, x)), twice(mul(p.y, j)));
+    return {x, y, twice(h)};
+  }
   RF_HD Point affine(Jac p, U iz) const {
     if (!p.z)
       return {};

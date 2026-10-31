@@ -66,3 +66,28 @@ intermediate field sizes53–62 were not measured here. External comparison:
 not run in this configuration/admission panel. The original frozen analyzer's
 raw SVG retains an inherited PRO6000 title; this derived report correctly
 labels the actual4090 telemetry without rewriting raw output.
+
+V21 completed all ten prescribed executions on one RTX4090, including both
+63-bit public targets. Fresh CPU replay and corrupted-scalar rejection passed
+for every cell. The [two-page V21 report](e2e-v21-report.pdf),
+[SVG](e2e-scaling-v21.svg) and [150-dpi PNG](e2e-scaling-v21.png) retain every
+execution; both PDF pages were inspected after raw commit `ee2a1cb4c613` was
+pushed. The 63-bit targets used338/344 relations and15737/13733 queries.
+Audit totals2600.976385/1192.904874 seconds are descriptive L0 observations.
+The smaller52-bit bases required more queries and longer cold time than the
+larger-base controls. This panel measures completion of the prescribed rung,
+not a global hardware maximum. Exact10-cell coverage passes; the canonical
+rectangular checker retains five findings. External comparison: not run in
+this configuration/admission panel. All earlier outcomes remain unchanged.
+
+The [affine-subtraction comparison](../../research/explicit_relations_affine_20261030/RESULTS.md)
+completed all 12 recoveries on one RTX 4090. Certificates and relation/query
+counts agree across both formulas and baseline repeats. The two 52-bit targets
+used 3.00% and 1.47% less cold solve time; the two 63-bit targets used 0.31% more
+and 1.37% less time. These are per-input L0 descriptions, not a uniform gain.
+The [two-page PDF](affine-v1-report.pdf), [SVG](affine-v1-scaling.svg), and
+[150-dpi PNG](affine-v1-scaling.png) retain every execution. Both pages were
+visually inspected after raw commit `c79bd38363f9` was pushed. Canonical schema
+and coverage checks passed with zero findings. Formula remains opt-in; next
+measure the costs within relation queries. No external-tool timing arm was
+prescribed for this formula-only comparison. Earlier records are unchanged.
