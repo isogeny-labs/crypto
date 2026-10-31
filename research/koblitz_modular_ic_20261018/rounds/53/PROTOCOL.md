@@ -82,3 +82,12 @@ The full residual must equal its explicit psi3 multiple; a changed x
 coefficient must fail. This stage is generic over F2(b,c)[t]/psi3. It does
 not assert all exceptional specializations, target QR equations or F2
 descent. Same fixed exact workload and native limits; retain caps/partials.
+
+## Lean implications
+
+Transfer53 proves discriminant change from the full Gram product, and exact
+alpha product/unit implications from the two native source memberships plus
+vanishing source equations and a unit Delta. Compile/audit separately under
+the pinned Lean limits. Actual arrays,trace semantics,localization,exceptional
+geometry and source-certificate fidelity are external obligations. No
+native_decide,axioms,sorry or trusted computation is allowed.
