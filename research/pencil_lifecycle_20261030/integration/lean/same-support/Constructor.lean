@@ -93,4 +93,3 @@ theorem initialized_against_valid_partner (p q r s t : UInt64) [Fact p.toNat.Pri
   obtain ⟨hc,hz,hw,hv⟩ := from_affine_two_invariant p q r s t hfive hb hq hr hs ht f valid
   exact bounded_word_prelude_excludes_zero_slope p f _ b hfive hb hc hbc hz hw hbz hbw hv hbv
 end PencilWordRefinement
-

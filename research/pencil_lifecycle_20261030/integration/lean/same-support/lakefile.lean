@@ -47,3 +47,18 @@ lean_lib Constructor
 
 @[default_target]
 lean_lib Add11
+
+@[default_target]
+lean_lib WeightedAdd11
+
+@[default_target]
+lean_lib WordAdd11
+
+@[default_target]
+lean_lib Doubling
+
+@[default_target]
+lean_lib WordAdd11Validity
+
+@[default_target]
+lean_lib WordDoubling

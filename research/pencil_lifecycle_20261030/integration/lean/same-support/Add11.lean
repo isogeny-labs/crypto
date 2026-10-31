@@ -79,4 +79,3 @@ theorem distinct_output_invariant (f : K[X]) (x1 y1 x2 y2 : K)
   have h := distinct_preserves_mumford f x1 y1 x2 y2 hx h1 h2
   exact ⟨one_ne_zero,h.1,by simpa using h.2⟩
 end Add11Distinct
-

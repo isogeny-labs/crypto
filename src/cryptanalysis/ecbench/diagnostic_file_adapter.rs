@@ -54,7 +54,7 @@ enum Request {
         schema: String,
         routes: Vec<Route>,
         artifacts: Vec<Artifact>,
-        actual: Actual,
+        actual: Box<Actual>,
     },
 }
 #[derive(Deserialize)]
