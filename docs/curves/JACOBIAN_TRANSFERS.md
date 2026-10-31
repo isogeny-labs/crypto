@@ -13,8 +13,9 @@ checks the file.
 
 **The catalog.** The file screens the registry rows that
 [`cover-catalog.json`](cover-catalog.json) names (the 2,572 rows the registry
-held before the isogeny-volcano census was swept into it), not every registry
-row, and records `catalog_rows_sha256`, the SHA-256 of those rows in registry
+held before the isogeny-volcano census was swept into it, plus the two
+mixed-twist IC curves the `transfer-audit` registry sweep pins: 2,574), not
+every registry row, and records `catalog_rows_sha256`, the SHA-256 of those rows in registry
 order (sorted-key compact JSON of `{schema_version, curves}`), instead of the
 registry file's hash.  A row the manifest does not name, such as a new census
 curve, changes nothing and does not stale the file; an edited catalog row, or a

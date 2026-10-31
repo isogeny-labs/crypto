@@ -285,10 +285,10 @@ coordinate/order adapter is unavailable explicitly report `not_evaluated`;
 Curve25519 is one such record. A complete catalogue entry does not by itself
 certify its coordinates or group order.
 
-In the regenerated file (the 2,572 catalog curves and 180 source curves: 175
+In the regenerated file (the 2,574 catalog curves and 180 source curves: 175
 walked curves of the P-256 and P-224 isogeny classes, the ECC2K-130
 degree-263 descendant and the four prime-field Hecke `X₀(11)` records),
-`End(E)` is proved for 1,831 curves and probable
+`End(E)` is proved for 1,833 curves and probable
 for 915; none is bounded and 6 remain unknown because a 125- to 152-digit
 composite of `Δ` is unsplit. Of the 1,324
 curves over `GF(p^k)`, `k > 1`, 1,319 have a certified order (9 by generator,
@@ -420,7 +420,9 @@ mv /tmp/hints.txt docs/curves/factor-hints.txt
 `traits.json` is derived from the catalog rows of `registry.json`, the factor
 hints, the source manifest and its files. The catalog is the set of registry
 rows [`cover-catalog.json`](cover-catalog.json) names (the 2,572 rows the
-registry held before the isogeny-volcano census was swept into it). The file
+registry held before the isogeny-volcano census was swept into it, plus the two
+mixed-twist IC curves whose trait records the `transfer-audit` registry sweep
+pins: 2,574). The file
 records `catalog_rows_sha256`, the SHA-256 of those rows in registry order
 (sorted-key compact JSON of `{schema_version, curves}`), and the SHA-256 of
 every other input. A registry row the manifest does not name does not change
