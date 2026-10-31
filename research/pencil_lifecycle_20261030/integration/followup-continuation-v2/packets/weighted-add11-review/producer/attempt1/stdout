@@ -1,0 +1,98 @@
+/var/tmp/pencil-add11-weighted-invariant-20261031-v1/WeightedAdd11.lean:30:6: error: Invalid pattern
+/var/tmp/pencil-add11-weighted-invariant-20261031-v1/WeightedAdd11.lean:38:6: warning: Unused tactic linter: `ring` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/var/tmp/pencil-add11-weighted-invariant-20261031-v1/WeightedAdd11.lean:38:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/var/tmp/pencil-add11-weighted-invariant-20261031-v1/WeightedAdd11.lean:57:34: error: Type mismatch
+  mul_ne_zero haz hbz
+has type
+  a.z * b.z ≠ 0
+but is expected to have type
+  (output a b).z ≠ 0
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/var/tmp/pencil-add11-weighted-invariant-20261031-v1/WeightedAdd11.lean:54:59: error: unsolved goals
+case refine_1
+K : Type u_1
+inst✝ : Field K
+a b : Input K
+haz : a.z ≠ 0
+haw : a.w ≠ 0
+hbz : b.z ≠ 0
+hbw : b.w ≠ 0
+hx : nx a ≠ nx b
+hd : a.x * b.z ^ 2 - b.x * a.z ^ 2 ≠ 0
+hz : (output a b).z ≠ 0
+hw : (output a b).w ≠ 0
+⊢ (sorry ()).q * a.z ^ 2 * b.z ^ 2 * (sorry ()).z⁻¹ ^ 2 = -(a.z ^ 2 * b.x) - b.z ^ 2 * a.x
+
+case refine_2
+K : Type u_1
+inst✝ : Field K
+a b : Input K
+haz : a.z ≠ 0
+haw : a.w ≠ 0
+hbz : b.z ≠ 0
+hbw : b.w ≠ 0
+hx : nx a ≠ nx b
+hd : a.x * b.z ^ 2 - b.x * a.z ^ 2 ≠ 0
+hz : (output a b).z ≠ 0
+hw : (output a b).w ≠ 0
+⊢ (sorry ()).r * a.z ^ 2 * b.z ^ 2 * (sorry ()).z⁻¹ ^ 4 = a.x * b.x
+
+case refine_3
+K : Type u_1
+inst✝ : Field K
+a b : Input K
+haz : a.z ≠ 0
+haw : a.w ≠ 0
+hbz : b.z ≠ 0
+hbw : b.w ≠ 0
+hx : nx a ≠ nx b
+hd : a.x * b.z ^ 2 - b.x * a.z ^ 2 ≠ 0
+hz : (output a b).z ≠ 0
+hw : (output a b).w ≠ 0
+⊢ (sorry ()).s * a.z ^ 3 * a.w * b.z ^ 3 * b.w * (sorry ()).z⁻¹ ^ 3 * (sorry ()).w⁻¹ =
+    -(a.z ^ 5 * a.w * b.y * (-(a.z ^ 2 * b.x) + b.z ^ 2 * a.x)⁻¹) +
+      b.z ^ 5 * b.w * a.y * (-(a.z ^ 2 * b.x) + b.z ^ 2 * a.x)⁻¹
+
+case refine_4
+K : Type u_1
+inst✝ : Field K
+a b : Input K
+haz : a.z ≠ 0
+haw : a.w ≠ 0
+hbz : b.z ≠ 0
+hbw : b.w ≠ 0
+hx : nx a ≠ nx b
+hd : a.x * b.z ^ 2 - b.x * a.z ^ 2 ≠ 0
+hz : (output a b).z ≠ 0
+hw : (output a b).w ≠ 0
+⊢ (sorry ()).t * a.z ^ 3 * b.z ^ 3 * b.w * a.w * (sorry ()).z⁻¹ ^ 5 * (sorry ()).w⁻¹ =
+    a.z ^ 3 * a.w * a.x * b.y * (-(a.z ^ 2 * b.x) + b.z ^ 2 * a.x)⁻¹ -
+      b.z ^ 3 * b.w * b.x * a.y * (-(a.z ^ 2 * b.x) + b.z ^ 2 * a.x)⁻¹
+/var/tmp/pencil-add11-weighted-invariant-20261031-v1/WeightedAdd11.lean:59:11: warning: declaration uses `sorry`
