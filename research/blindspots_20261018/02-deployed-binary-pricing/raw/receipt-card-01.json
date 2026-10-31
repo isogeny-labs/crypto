@@ -1,0 +1,216 @@
+{
+  "card_id": "CARD-BLINDSPOT-02-01",
+  "card_path": "research/blindspots_20261018/02-deployed-binary-pricing/card-01.yaml",
+  "card_sha256": "96f35c67b8a00e5f8d61bc6888455eebf3572d4f568e8b97bad9e2fe76fad429",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-02/card-01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-o",
+        "target/blindspots-02/card-01/b02",
+        "examples/blindspots_02_deployed_binary_pricing.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.493,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 1.493,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-02/card-01/b02",
+        "control",
+        "--scale-ref",
+        "research/notes/ecc2k130/descent_degree_cost-output-20261016-scale.txt",
+        "--d4-ref",
+        "research/ic_next10_20261014/06-equivariant-f4-m4/cost_d4-output.txt",
+        "--out-dir",
+        "research/blindspots_20261018/02-deployed-binary-pricing/raw"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.348,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "control",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/02-deployed-binary-pricing/raw/control.txt": "96633aa8e3c0497f82947a51b0680ad8577dfc9029ca0644f4edac52c6171ea5"
+      },
+      "seconds": 0.348,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "3b837bc934290706982bf44c70b67a79419a04771ab8172315d55ea790d63a93",
+      "stdout_tail": [
+        "wrote research/blindspots_20261018/02-deployed-binary-pricing/raw/control.txt (751 bytes)",
+        "positive control A (descent_degree_cost-output-20261016-scale.txt, n = 131, l in 4..70, rho 60.81): 30/30 rows identical",
+        "positive control B (06-equivariant-f4-m4/cost_d4-output.txt, n = 131, l in 4..=70, rho 60.81): 16/16 rows identical",
+        "headline rows: m=4 D=6 w=1 -> 2^76.31 (committed 2^76.31); m=3 D=6 w=1 -> 2^88.05 (committed 2^88.05): identical",
+        "rho reference: ECC2K-130 log2 r = 129.000000, h = 4, A = 262, rho = 60.8090 (committed 60.8090): identical",
+        "range check (constant-D rows, n = 131, 4..70 vs 1..=131): minimiser unchanged",
+        "negative control (m = 2, all cells x models x w x K): minimum gap to rho = +24.50 bits at sect131r1 floor w=1 K=1 l=43: never crosses rho",
+        "internal monotonicity (w, K, D): 1392 checks, 0 violations: pass",
+        "CONTROL PASS"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-02/card-01/b02",
+        "cells",
+        "--out-dir",
+        "research/blindspots_20261018/02-deployed-binary-pricing/raw"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.251,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "cells",
+      "index": 4,
+      "outputs": {
+        "research/blindspots_20261018/02-deployed-binary-pricing/raw/cells.md": "0e1c73f14258231bd3893971599ea88383affe01737f235c1f531e79a2a3aacf",
+        "research/blindspots_20261018/02-deployed-binary-pricing/raw/cells.tsv": "e99f40c92620b73438915f0427693e4ac2a5d3c560af9636107290031bce7e82"
+      },
+      "seconds": 0.251,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "6d04339aa7e1473b74962f71fbd5c6cd65185e369080659c782469356b928820",
+      "stdout_tail": [
+        "  FLIP k1 D=4 (design) m=4 w=1 K=16 at n=571: gap -33.48",
+        "  FLIP k1 D=4 (design) m=4 w=1 K=256 at n=571: gap -35.26",
+        "  FLIP k1 D=4 (design) m=4 w=2 K=1 at n=571: gap -16.75",
+        "  FLIP k1 D=4 (design) m=4 w=2 K=10 at n=571: gap -17.70",
+        "  FLIP k1 D=4 (design) m=4 w=2 K=16 at n=571: gap -18.18",
+        "  FLIP k1 D=4 (design) m=4 w=2 K=256 at n=571: gap -19.58",
+        "  FLIP k1 D=4 (design) m=5 w=1 K=1 at n=571: gap -71.19",
+        "  FLIP k1 D=4 (design) m=5 w=1 K=10 at n=571: gap -72.35",
+        "  FLIP k1 D=4 (design) m=5 w=1 K=16 at n=571: gap -72.67",
+        "  FLIP k1 D=4 (design) m=5 w=1 K=256 at n=571: gap -73.52",
+        "  FLIP k1 D=4 (design) m=5 w=2 K=1 at n=571: gap -57.46",
+        "  FLIP k1 D=4 (design) m=5 w=2 K=10 at n=571: gap -59.06",
+        "  FLIP k1 D=4 (design) m=5 w=2 K=16 at n=571: gap -59.18",
+        "  FLIP k1 D=4 (design) m=5 w=2 K=256 at n=571: gap -60.65",
+        "  FLIP k1 D=6 (design) m=4 w=1 K=1 at n=571: gap -25.38",
+        "  FLIP k1 D=6 (design) m=4 w=1 K=10 at n=571: gap -26.82",
+        "  FLIP k1 D=6 (design) m=4 w=1 K=16 at n=571: gap -27.10",
+        "  FLIP k1 D=6 (design) m=4 w=1 K=256 at n=571: gap -28.67",
+        "  FLIP k1 D=6 (design) m=4 w=2 K=1 at n=571: gap -3.37",
+        "  FLIP k1 D=6 (design) m=4 w=2 K=10 at n=571: gap -4.80"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-02/card-01/b02"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 5,
+  "commit": "973b8af37c631c0749752e62b55da998a37c8678",
+  "dirty_after": [
+    "research/blindspots_20261018/02-deployed-binary-pricing/raw/card-01-build.stderr.log",
+    "research/blindspots_20261018/02-deployed-binary-pricing/raw/card-01-build.stdout.log",
+    "research/blindspots_20261018/02-deployed-binary-pricing/raw/card-01-cells.stderr.log",
+    "research/blindspots_20261018/02-deployed-binary-pricing/raw/card-01-cells.stdout.log",
+    "research/blindspots_20261018/02-deployed-binary-pricing/raw/card-01-control.stderr.log",
+    "research/blindspots_20261018/02-deployed-binary-pricing/raw/card-01-control.stdout.log",
+    "research/blindspots_20261018/02-deployed-binary-pricing/raw/cells.md",
+    "research/blindspots_20261018/02-deployed-binary-pricing/raw/cells.tsv",
+    "research/blindspots_20261018/02-deployed-binary-pricing/raw/control.txt",
+    "research/blindspots_20261018/03-polynomial-method/draws.tsv"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/03-polynomial-method/draws.tsv"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

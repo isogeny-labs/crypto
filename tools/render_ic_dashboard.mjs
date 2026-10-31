@@ -283,7 +283,7 @@ const percent = value => (value - .85) / .25 * 100;
 const forest = `<div class="comparison-plot" data-measurement-chart role="group" aria-label="Challenger to reference ratios; the 1.00 reference line divides faster and slower costs"><div class="plot-row plot-head"><span>Curve cell</span><span class="plot-directions"><span>Faster</span><span>Slower</span></span><span>Ratio</span></div>${Object.entries(online.per_cell).map(([cell,value])=>`<div class="plot-row"><span>${escape(cell)}</span><span class="plot-track"><i class="plot-link" style="left:${Math.min(60,percent(value))}%;width:${Math.abs(60-percent(value))}%"></i><i class="plot-dot ${value>1?'plot-slower':'plot-faster'}" style="left:${percent(value)}%"></i></span><strong>${f(value)}×</strong></div>`).join('')}<div class="plot-row plot-overall"><strong>Overall</strong><span class="plot-track"><i class="plot-interval" style="left:${percent(lo)}%;width:${percent(hi)-percent(lo)}%"></i><i class="plot-dot" style="left:${percent(ratio)}%"></i></span><strong>${f(ratio)}×</strong></div><div class="plot-row plot-head"><span></span><span class="plot-directions"><span>0.85×</span><span>1.10×</span></span><span></span></div><p class="plot-reference">Dashed line = 1.00× reference time</p></div>`;
 const rhoGraph = `<div class="rho-plot" data-measurement-chart role="group" aria-label="Recorded single-target online milliseconds, shown on a zero-based linear scale">${['incumbent','stop7_word','rho_online'].map((alias,index)=>`<div class="rho-row"><div><strong>${['Incumbent IC','Challenger IC','Matched rho'][index]}</strong><span>${f(rows[alias].online_ms,6)} ms</span></div><div class="rho-track"><span style="width:${rows[alias].online_ms/rows.rho_online.online_ms*100}%;background:${index===2?'var(--lab-muted)':'var(--lab-blue)'}"></span></div></div>`).join('')}<div class="rho-axis"><span>0</span><span>0.253 ms</span></div></div>`;
 
-let page = readFileSync(process.argv.includes('--stdin') ? 0 : PAGE, 'utf8');
+let page = readFileSync(PAGE, 'utf8');
 const oldFront = between(page, START, END);
 const historical = section(oldFront, 'lab-best');
 // Recover the exact historical panel from its canonical committed source,
@@ -293,13 +293,6 @@ const threeLeadsRaw = readFileSync(resolve(ROOT, 'docs/ic/three-leads-e2e-panel.
 assert.equal(sha(threeLeadsRaw), '23ee9d71ab77e9a5673fd8c15aa8edad06da22ad4c1cd0f798b932b3c01f8084', 'Historical three-leads panel changed; review its original evidence before changing the pin');
 const threeLeads = threeLeadsRaw.toString('utf8');
 const progressRaw = readFileSync(resolve(ROOT,'docs/ic/progress-timeline.json'));
-const progressDocument = JSON.parse(progressRaw);
-const progressTableRows = progressDocument.series.flatMap(series => series.points.map(point => {
-  assert.ok(Number.isFinite(point.value), 'Timeline table requires a recorded finite value');
-  const unit = point.unit ? ' · ' + escape(point.unit) : '';
-  const sourceLink = point.source ? ` &middot; <a href="${escape(point.source)}">source</a>` : '';
-  return `<tr><td>${escape(point.date)}</td><td>${escape(series.label)}</td><td title="${escape(point.detail || '')}">${escape(point.label)}</td><td class="n">${point.value.toPrecision(6)}&times;</td><td>${escape(point.reference || '')}${unit}</td><td><span class="chip">${escape(point.class || '')}</span></td><td><a href="${escape(point.anchor)}">panel</a>${sourceLink}</td></tr>`;
-})).join('\n');
 // GHS-weak E0/F_{q^3} plane-quartic panel: rendered from the committed frozen
 // summaries only (no arithmetic beyond formatting).
 function ghsWeakPanel() {
@@ -351,10 +344,17 @@ const retainedPanels = [
     const marker = /(<script type="application\/json" id="progress-data">)[\s\S]*?(<\/script>)/;
     assert.ok(marker.test(html), 'Progress panel has no canonical data embed');
     html = html.replace(marker, (_, start, end) => start + progressRaw.toString('utf8') + end);
-    const tableMarker = /(<summary>Every plotted point as a table<\/summary>)[\s\S]*?(<\/details>)/;
-    assert.ok(tableMarker.test(html), 'Progress panel has no canonical point table');
-    const table = `<div class="dash-detail-body"><table><caption>Recorded IC/reference ratios by date; diagnostic count quotients are incomplete costs</caption><thead><tr><th>Date</th><th>Series</th><th>Result</th><th>IC / reference</th><th>Reference and unit</th><th>Class</th><th>Links</th></tr></thead><tbody>\n${progressTableRows}\n</tbody></table></div>`;
-    html = html.replace(tableMarker, (_, start, end) => start + table + end);
+    const timeline = JSON.parse(progressRaw);
+    const table = /(<summary>Every plotted point as a table<\/summary>[\s\S]*?<tbody>)[\s\S]*?(<\/table>)/;
+    assert.ok(table.test(html), 'Progress panel has no plotted-point table');
+    const rows = timeline.series.flatMap(series => series.points.map(point => {
+      assert.ok(Number.isFinite(point.value), `Invalid progress value: ${point.label}`);
+      const unit = point.unit ? `<br><small>${escape(point.unit)}</small>` : '';
+      // Keep each result's cost boundary, uncertainty and reference limitations
+      // beside its value; these are recorded descriptions, not new estimates.
+      return `<tr><td>${escape(point.date)}</td><td>${escape(series.label)}<br><small>${escape(series.note)}</small></td><td>${escape(point.label)}<br><small>${escape(point.detail)}</small></td><td class="n">${point.value}&times;${unit}</td><td>${escape(point.reference)}</td><td><span class="chip">${escape(point.class)}</span></td><td><a href="${escape(point.anchor)}">panel</a> &middot; <a href="${escape(point.source)}">source</a></td></tr>`;
+    })).join('\n');
+    html = html.replace(table, (_, start, end) => start + '\n' + rows + '\n</tbody>' + end);
   }
   return {id,label,html};
 });
@@ -484,9 +484,7 @@ const data = {
   progress_timeline_sha256: sha(progressRaw)
 };
 const output = JSON.stringify(data,null,2) + '\n';
-if (process.argv.includes('--json')) {
-  process.stdout.write(JSON.stringify({page, data_text: output}) + '\n');
-} else if (process.argv.includes('--check')) {
+if (process.argv.includes('--check')) {
   assert.equal(readFileSync(PAGE,'utf8'), page, 'Dashboard is stale; run node tools/render_ic_dashboard.mjs');
   assert.equal(readFileSync(resolve(ROOT,'docs/ic/dashboard-overview-data.json'),'utf8'), output, 'Dashboard data is stale');
   console.log('PASS: evidence pins, status gates, generated page/data and unchanged historical ledger');

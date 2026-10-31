@@ -1,6 +1,7 @@
 /target
 research/ecbench_open_questions_20261014/native-publish/target/
 **/Cargo.lock
+/store/index.json.lock
 !/Cargo.lock
 !research/ecbench_open_questions_20261014/native-publish/Cargo.lock
 !research/ecbench_open_questions_20261014/locked/Cargo.lock
@@ -127,3 +128,6 @@ research/notes/ecc2k130/compact_frozen_source_replay_20260929/frozen-materialize
 
 # Resume note and push state for scripts/checkpoint.sh (the copy lives in S3)
 .resume/
+
+# Stored plot; preserve the study's frozen ignore file.
+/research/nist_skip_criterion_20261025/strict_elkies_20261029/strict-counts.png
