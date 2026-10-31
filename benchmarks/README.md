@@ -36,6 +36,7 @@ Rows that are removed from this admitted-results table before validation remain
 in the [unvalidated benchmark archive](ARCHIVE.md), with their exact former row
 text, digest, reason, and source provenance. Archived rows are not measurements
 admitted by this table and cannot satisfy the validation gate.
+The [N53 root-batching evidence awaiting validation](N53_ROOT_BATCH_UNADMITTED_20261021.md) is retained separately from the admitted index.
 
 The [retained wide-variable engine report](WIDE_VARS_UNADMITTED_20261021.md)
 remains outside this table pending validation admission.
@@ -73,6 +74,11 @@ recovery ladder and its failures are linked from the same entry. These
 records remain outside the admitted table: matched rho and independent
 scientific validation have not been supplied. No fastest-tool or certified
 speedup claim follows from these diagnostic copies.
+
+The [retained characteristic-two k=4 observations](UNADMITTED_PR2596_20261030.md)
+include unreplayed and interrupted sessions and remain outside the admitted
+results table pending the required independent validation. Original reports,
+figures and exact proposed row are preserved there.
 
 | date | entry | measured | headline (as reported) | host | study |
 |:--|:--|:--|:--|:--|:--|

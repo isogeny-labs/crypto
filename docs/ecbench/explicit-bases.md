@@ -1162,3 +1162,17 @@ collect and publish exact outcomes and PR. No task GPU active at this entry.
 Errors: default system Python lacks the required jsonschema API; canonical
 protocol validation passes using the existing tools venv. Initial draft lacked
 the required draft-freeze block; corrected before freeze or data.
+
+## V21 completion — 2026-10-30 16:12 PDT
+
+### What was done
+The smaller-base RTX4090 panel completed10/10 prescribed recoveries, including both63-bit prime-field targets. Fresh CPU replay and scalar+1 rejection passed for every cell. All29 Rust tests and27 query sanitizer checks passed before collection. The final archive was downloaded and SHA256 checked; the worker was deleted and provider absence verified. See `research/explicit_relations_e2e_20261030/results-v21` for exact rows, certificate audit and custody.
+
+### Decisions made
+Preserve all L0 clocks as descriptive; the completed63-bit rung is the scope of the result. At52 bits smaller bases needed more queries and longer observed cold time. Publish the exact10-cell audit alongside the canonical checker's five rectangular-coverage findings.
+
+### Open threads
+Publish the separate inspected V21 report and follow-up PR. The next affine-query specialization is documented but not implemented or measured. PR3003 merged; compile and Clippy pass. No task GPU remains active.
+
+### Errors
+PR3003 evidence-audit shards1/8 fail because unrelated pencil-study terminal-g18/checkpoint-g9 session directories lack host.json. Preserve these failures without changing unrelated evidence. V20's earlier preflight compile failure and V19's memory/work limits remain recorded.

@@ -906,6 +906,310 @@ pub fn generate(config: &CaseConfig) -> Result<CaseData, String> {
     })
 }
 
+/// Isolated positive-control constructor. The native planner does not route
+/// cells here yet; callers must retain the private witness as a restricted
+/// artifact and charge the ordinary constructor work performed before this
+/// control replaces its target and factor base.
+pub fn generate_planted(config: &CaseConfig) -> Result<CaseData, String> {
+    if config.factor_base_size == 0 || config.factor_base_size > 4096 {
+        return Err("invalid planted factor-base size".into());
+    }
+    let mut case = generate(config)?;
+    let c = arithmetic(&case.public_instance)?;
+    let generator = point_words(&case.public_instance["generator"])?;
+    let r = number(&case.public_instance["curve"]["subgroup_order"], "subgroup")?;
+    let mut base_rng = planted_rng(config, "base-v1")?;
+    let mut base_points = Vec::new();
+    let mut base_logs = Vec::new();
+    let mut base_draws = Vec::new();
+    let mut seen = HashSet::new();
+    let base_cap = config
+        .factor_base_size
+        .saturating_mul(32)
+        .saturating_add(128);
+    for _ in 0..base_cap {
+        if base_points.len() == config.factor_base_size {
+            break;
+        }
+        let b = base_rng.gen_range(1..r);
+        let p = c.mul(generator, b);
+        let accepted = p.is_some() && !seen.contains(&p) && !seen.contains(&c.neg(p));
+        base_draws.push(json!({"scalar":u(b),"point":point_json(p),"accepted":accepted}));
+        if accepted {
+            seen.insert(p);
+            base_points.push(p);
+            base_logs.push(b);
+        }
+    }
+    if base_points.len() != config.factor_base_size {
+        return Err(format!("budget_exhausted: planted factor-base construction retained {} of {} after {base_cap} draws", base_points.len(), config.factor_base_size));
+    }
+    let mut target_rng = planted_rng(config, "target-v1")?;
+    let mut target_draws = Vec::new();
+    let mut selected = None;
+    for _ in 0..128 {
+        let mut terms = Vec::with_capacity(config.m);
+        let mut q = None;
+        let mut scalar = 0u64;
+        for _ in 0..config.m {
+            let index = target_rng.gen_range(0..base_points.len());
+            let positive = target_rng.gen_bool(0.5);
+            let sign = if positive { 1 } else { -1 };
+            let p = if positive {
+                base_points[index]
+            } else {
+                c.neg(base_points[index])
+            };
+            q = c.add(q, p);
+            let contribution = if positive {
+                base_logs[index]
+            } else {
+                r - base_logs[index]
+            };
+            scalar = ((scalar as u128 + contribution as u128) % r as u128) as u64;
+            terms.push(json!({"index":index,"sign":sign}));
+        }
+        let accepted = scalar != 0 && q.is_some();
+        target_draws.push(
+            json!({"terms":terms,"scalar":u(scalar),"target":point_json(q),"accepted":accepted}),
+        );
+        if accepted {
+            if c.mul(generator, scalar) != q {
+                return Err("planted target scalar construction disagrees with group sum".into());
+            }
+            selected = Some((q, scalar));
+            break;
+        }
+    }
+    let (target, scalar) =
+        selected.ok_or("budget_exhausted: 128 planted target draws were zero")?;
+    let k = case.public_instance["symmetry"]["frobenius_power"]
+        .as_u64()
+        .ok_or("missing Frobenius power")? as u32;
+    let lookup: HashMap<_, _> = base_points
+        .iter()
+        .copied()
+        .enumerate()
+        .map(|(i, p)| (p, i))
+        .collect();
+    let negation: Vec<_> = base_points
+        .iter()
+        .map(|&p| lookup.get(&c.neg(p)).copied())
+        .collect();
+    let frobenius: Vec<_> = base_points
+        .iter()
+        .map(|&p| lookup.get(&c.frobenius(p, k)).copied())
+        .collect();
+    let orbits: Vec<_> = base_points
+        .iter()
+        .map(|&p| {
+            let mut orbit = vec![point_json(p)];
+            let mut cur = c.frobenius(p, k);
+            while cur != p && orbit.len() <= config.n as usize {
+                orbit.push(point_json(cur));
+                cur = c.frobenius(cur, k);
+            }
+            let action_order = if config.family == "prime" {
+                1
+            } else {
+                config.n as usize / k as usize
+            };
+            json!({"points":orbit,"closed":cur==p,"stabilizer_size":action_order/orbit.len()})
+        })
+        .collect();
+    case.public_instance["target"] = point_json(target);
+    // Keep construction/population provenance out of the public instance.
+    // The natural constructor's sampling and factor-base trace describe the
+    // discarded target and point set, so they must not survive this override.
+    let public_object = case
+        .public_instance
+        .as_object_mut()
+        .ok_or("invalid public instance")?;
+    public_object.remove("population");
+    public_object.remove("sampling");
+    public_object.remove("construction_trace");
+    case.factor_base = json!({"schema":"ml-ecdlp-factor-base/v1",
+        "rule":"planted-known-log-subgroup/v1",
+        "points":base_points.into_iter().map(point_json).collect::<Vec<_>>(),
+        "requested_size":config.factor_base_size,"construction_status":"verified",
+        "known_log_features":false,"negation_closed":negation.iter().all(Option::is_some),
+        "negation_action":negation,
+        "frobenius_action":frobenius,"frobenius_power":k,"orbits":orbits});
+    case.private_witness["scalar"] = u(scalar);
+    case.private_witness
+        .as_object_mut()
+        .ok_or("invalid private witness")?
+        .remove("factor_base_membership_logs");
+    let accepted_target_attempt = target_draws.len() - 1;
+    case.private_witness["planted_construction"] = json!({
+        "schema":"ml-dataset.planted-construction/v1",
+        "population":"planted-pdp-v1",
+        "preliminary_natural_constructor_run":true,
+        "preliminary_natural_constructor_cost":{"operation_counts":"unavailable","charge_required":true,
+            "scope":"curve/order/generator, discarded natural scalar and factor-base construction, and verification"},
+        "config_sha256":super::digest(&serde_json::to_vec(config).map_err(|e| e.to_string())?),
+        "base_draw_cap":base_cap,"target_draw_cap":128,
+        "base_draws":base_draws,"target_draws":target_draws,
+        "base_logs":base_logs.into_iter().map(u).collect::<Vec<_>>(),
+        "accepted_target_attempt":accepted_target_attempt,
+        "raw_base_draw_probability":"1/(r-1)",
+        "raw_signed_term_probability":format!("1/{}", 2*config.factor_base_size),
+        "feature_access":"forbidden; restricted replay and label store only"});
+    verify_planted(config, &case)?;
+    Ok(case)
+}
+
+fn planted_rng(config: &CaseConfig, domain: &str) -> Result<StdRng, String> {
+    let binding = serde_json::to_vec(config).map_err(|e| e.to_string())?;
+    let mut seed = b"ml-dataset.planted-pdp/v1\0".to_vec();
+    seed.extend_from_slice(domain.as_bytes());
+    seed.push(0);
+    seed.extend_from_slice(&binding);
+    Ok(StdRng::from_seed(crate::hash::sha256(&seed)))
+}
+
+/// Recompute every private draw and both target identities using independent
+/// reference group arithmetic. A constructed scalar is a known answer, never
+/// evidence that an ECDLP solver recovered it.
+pub fn verify_planted(config: &CaseConfig, case: &CaseData) -> Result<(), String> {
+    if config.factor_base_size == 0 || config.factor_base_size > 4096 {
+        return Err("invalid planted factor-base size".into());
+    }
+    let public = &case.public_instance;
+    let private = &case.private_witness;
+    let base = &case.factor_base;
+    if public["family"].as_str() != Some(config.family.as_str())
+        || public["n"].as_u64() != Some(config.n as u64)
+        || public["m"].as_u64() != Some(config.m as u64)
+        || public["twist"].as_bool() != Some(config.twist)
+        || public.get("population").is_some()
+        || public.get("sampling").is_some()
+        || public.get("construction_trace").is_some()
+    {
+        return Err("planted public axes differ from config".into());
+    }
+    verify(public, private)?;
+    verify_planted_factor_base(public, base)?;
+    let record = &private["planted_construction"];
+    let binding = super::digest(&serde_json::to_vec(config).map_err(|e| e.to_string())?);
+    if record["schema"] != "ml-dataset.planted-construction/v1"
+        || record["population"] != "planted-pdp-v1"
+        || record["preliminary_natural_constructor_run"] != true
+        || record["preliminary_natural_constructor_cost"]
+            != json!({"operation_counts":"unavailable",
+            "charge_required":true,
+            "scope":"curve/order/generator, discarded natural scalar and factor-base construction, and verification"})
+        || record["config_sha256"] != binding
+        || record["base_draw_cap"].as_u64()
+            != Some(
+                config
+                    .factor_base_size
+                    .saturating_mul(32)
+                    .saturating_add(128) as u64,
+            )
+        || record["target_draw_cap"].as_u64() != Some(128)
+        || record["raw_base_draw_probability"] != "1/(r-1)"
+        || record["raw_signed_term_probability"] != format!("1/{}", 2 * config.factor_base_size)
+        || record["feature_access"] != "forbidden; restricted replay and label store only"
+    {
+        return Err("planted construction binding or caps differ".into());
+    }
+    let c = arithmetic(public)?;
+    let generator = point_words(&public["generator"])?;
+    let r = number(&public["curve"]["subgroup_order"], "subgroup")?;
+    let points = base["points"].as_array().ok_or("missing planted points")?;
+    let logs = record["base_logs"]
+        .as_array()
+        .ok_or("missing planted logs")?;
+    let draws = record["base_draws"]
+        .as_array()
+        .ok_or("missing planted base draws")?;
+    if points.len() != config.factor_base_size
+        || logs.len() != points.len()
+        || draws.is_empty()
+        || draws.len()
+            > config
+                .factor_base_size
+                .saturating_mul(32)
+                .saturating_add(128)
+    {
+        return Err("planted base cardinality or draw count differs".into());
+    }
+    let mut rng = planted_rng(config, "base-v1")?;
+    let mut reconstructed = Vec::new();
+    let mut reconstructed_logs = Vec::new();
+    let mut seen = HashSet::new();
+    for draw in draws {
+        if reconstructed.len() == config.factor_base_size {
+            return Err("planted base contains draws after completion".into());
+        }
+        let b = rng.gen_range(1..r);
+        let p = c.reference_mul(generator, b);
+        let accepted = p.is_some() && !seen.contains(&p) && !seen.contains(&c.neg(p));
+        if draw["scalar"] != u(b)
+            || point_words(&draw["point"])? != p
+            || draw["accepted"].as_bool() != Some(accepted)
+        {
+            return Err("planted base RNG or point draw differs".into());
+        }
+        if accepted {
+            seen.insert(p);
+            reconstructed.push(point_json(p));
+            reconstructed_logs.push(u(b));
+        }
+    }
+    if reconstructed != *points || reconstructed_logs != *logs {
+        return Err("planted factor base or restricted logs differ".into());
+    }
+    let target_draws = record["target_draws"]
+        .as_array()
+        .ok_or("missing planted target draws")?;
+    if target_draws.is_empty()
+        || target_draws.len() > 128
+        || record["accepted_target_attempt"].as_u64() != Some((target_draws.len() - 1) as u64)
+    {
+        return Err("planted target attempt count differs".into());
+    }
+    let mut rng = planted_rng(config, "target-v1")?;
+    for (attempt, draw) in target_draws.iter().enumerate() {
+        let terms = draw["terms"].as_array().ok_or("missing planted terms")?;
+        if terms.len() != config.m {
+            return Err("planted term arity differs".into());
+        }
+        let mut q = None;
+        let mut scalar = 0u64;
+        for term in terms {
+            let index = rng.gen_range(0..points.len());
+            let positive = rng.gen_bool(0.5);
+            let sign = if positive { 1 } else { -1 };
+            if term["index"].as_u64() != Some(index as u64) || term["sign"].as_i64() != Some(sign) {
+                return Err("planted term draw differs".into());
+            }
+            let p = point_words(&points[index])?;
+            q = c.add(q, if positive { p } else { c.neg(p) });
+            let b = number(&logs[index], "base log")?;
+            let contribution = if positive { b } else { r - b };
+            scalar = ((scalar as u128 + contribution as u128) % r as u128) as u64;
+        }
+        let accepted = scalar != 0 && q.is_some();
+        if draw["scalar"] != u(scalar)
+            || point_words(&draw["target"])? != q
+            || draw["accepted"].as_bool() != Some(accepted)
+            || accepted != (attempt + 1 == target_draws.len())
+        {
+            return Err("planted target draw, rejection or acceptance differs".into());
+        }
+        if accepted
+            && (point_words(&public["target"])? != q
+                || private["scalar"] != u(scalar)
+                || c.reference_mul(generator, scalar) != q)
+        {
+            return Err("planted target and scalar replay failed".into());
+        }
+    }
+    Ok(())
+}
+
 /// Reconstruct binary arithmetic after strict field and coordinate validation.
 pub fn binary_curve(v: &Value) -> Result<BinaryCurve, String> {
     let n = v["n"].as_u64().ok_or("missing n")?;
@@ -1307,6 +1611,119 @@ pub fn verify(public: &Value, private: &Value) -> Result<(), String> {
 }
 
 pub fn verify_factor_base(public: &Value, base: &Value) -> Result<(), String> {
+    if base["rule"] == "planted-known-log-subgroup/v1" {
+        return Err(
+            "planted factor base requires restricted witness replay via verify_planted".into(),
+        );
+    }
+    verify_natural_factor_base(public, base)
+}
+
+fn verify_planted_factor_base(public: &Value, base: &Value) -> Result<(), String> {
+    if base["schema"] == "ml-ecdlp-factor-base/v1"
+        && base["rule"] == "planted-known-log-subgroup/v1"
+    {
+        let c = arithmetic(public)?;
+        let r = number(&public["curve"]["subgroup_order"], "subgroup")?;
+        let points = base["points"].as_array().ok_or("missing planted points")?;
+        if points.is_empty()
+            || points.len() > 4096
+            || base["requested_size"].as_u64() != Some(points.len() as u64)
+            || base["construction_status"] != "verified"
+            || base["known_log_features"] != false
+        {
+            return Err("invalid planted factor-base size or public policy".into());
+        }
+        let mut seen = HashSet::new();
+        for point in points {
+            let p = point_words(point)?;
+            if p.is_none()
+                || !c.on_curve(p)
+                || c.reference_mul(p, r).is_some()
+                || seen.contains(&p)
+                || seen.contains(&c.neg(p))
+            {
+                return Err("invalid, repeated or opposite planted base point".into());
+            }
+            seen.insert(p);
+        }
+        let k = base["frobenius_power"]
+            .as_u64()
+            .ok_or("missing planted Frobenius power")?;
+        if k == 0 || k > 61 || public["symmetry"]["frobenius_power"].as_u64() != Some(k) {
+            return Err("invalid planted Frobenius power".into());
+        }
+        for (name, frobenius) in [("negation_action", false), ("frobenius_action", true)] {
+            let action = base[name]
+                .as_array()
+                .ok_or("missing planted symmetry action")?;
+            if action.len() != points.len() {
+                return Err("planted symmetry action length differs".into());
+            }
+            for (i, destination) in action.iter().enumerate() {
+                let p = point_words(&points[i])?;
+                let mapped = if frobenius {
+                    c.frobenius(p, k as u32)
+                } else {
+                    c.neg(p)
+                };
+                match destination.as_u64() {
+                    Some(j)
+                        if j < points.len() as u64
+                            && point_words(&points[j as usize])? == mapped => {}
+                    None if destination.is_null() && !seen.contains(&mapped) => {}
+                    _ => return Err("invalid planted symmetry action".into()),
+                }
+            }
+        }
+        if base["negation_closed"].as_bool()
+            != Some(
+                base["negation_action"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .all(|x| !x.is_null()),
+            )
+        {
+            return Err("incorrect planted negation closure".into());
+        }
+        let orbits = base["orbits"].as_array().ok_or("missing planted orbits")?;
+        if orbits.len() != points.len() {
+            return Err("planted orbit count differs".into());
+        }
+        let order = match &c {
+            Arithmetic::Binary { fast, .. } => fast.n / k as u32,
+            Arithmetic::Prime(_) => 1,
+        };
+        for (point, orbit) in points.iter().zip(orbits) {
+            let saved = orbit["points"]
+                .as_array()
+                .ok_or("missing planted orbit points")?;
+            if saved.is_empty() || saved.len() > order as usize {
+                return Err("invalid planted orbit length".into());
+            }
+            let start = point_words(point)?;
+            let mut next = start;
+            let mut orbit_seen = HashSet::new();
+            for p in saved {
+                if point_words(p)? != next || !orbit_seen.insert(next) || !c.on_curve(next) {
+                    return Err("invalid planted orbit witness".into());
+                }
+                next = c.frobenius(next, k as u32);
+            }
+            if next != start
+                || orbit["closed"].as_bool() != Some(true)
+                || orbit["stabilizer_size"].as_u64() != Some(order as u64 / saved.len() as u64)
+            {
+                return Err("incorrect planted orbit closure or stabilizer".into());
+            }
+        }
+        return Ok(());
+    }
+    Err("invalid planted factor-base schema or policy".into())
+}
+
+fn verify_natural_factor_base(public: &Value, base: &Value) -> Result<(), String> {
     if base["schema"] != "ml-ecdlp-factor-base/v1"
         || base["rule"] != "small-x-prime-primary-projection-with-cyclic-membership"
     {
@@ -1483,6 +1900,56 @@ mod tests {
             work_limit: 1000,
             solver: "enumerate".into(),
         }
+    }
+    #[test]
+    fn planted_control_is_deterministic_and_independently_replayed() {
+        let mut cfg = config("koblitz", 23, false);
+        let mut invalid_size = cfg.clone();
+        invalid_size.factor_base_size = usize::MAX;
+        assert!(generate_planted(&invalid_size).is_err());
+        cfg.factor_base_size = 4;
+        cfg.m = 15; // Terms are sampled with replacement, even above base size.
+        let natural = generate(&cfg).unwrap();
+        let planted = generate_planted(&cfg).unwrap();
+        assert!(planted.public_instance.get("population").is_none());
+        assert!(planted.public_instance.get("sampling").is_none());
+        assert!(planted.public_instance.get("construction_trace").is_none());
+        assert_eq!(
+            planted.private_witness["planted_construction"]["population"],
+            "planted-pdp-v1"
+        );
+        assert_eq!(
+            natural.public_instance["population"],
+            "unconditioned-uniform-nonzero-subgroup-scalar"
+        );
+        assert_eq!(planted.factor_base["rule"], "planted-known-log-subgroup/v1");
+        assert_eq!(planted.factor_base["points"].as_array().unwrap().len(), 4);
+        assert_eq!(
+            planted.private_witness["planted_construction"]["target_draws"][0]["terms"]
+                .as_array()
+                .unwrap()
+                .len(),
+            15
+        );
+        assert_eq!(
+            serde_json::to_value(&planted).unwrap(),
+            serde_json::to_value(generate_planted(&cfg).unwrap()).unwrap()
+        );
+        verify_planted(&cfg, &planted).unwrap();
+        assert!(verify_factor_base(&planted.public_instance, &planted.factor_base).is_err());
+        let mut leaked = planted.clone();
+        leaked.public_instance["population"] = json!("planted-pdp-v1");
+        assert!(verify_planted(&cfg, &leaked).is_err());
+        let mut wrong_sign = planted.clone();
+        wrong_sign.private_witness["planted_construction"]["target_draws"][0]["terms"][0]["sign"] =
+            json!(0);
+        assert!(verify_planted(&cfg, &wrong_sign).is_err());
+        let mut wrong_log = planted.clone();
+        wrong_log.private_witness["planted_construction"]["base_logs"][0] = json!("0");
+        assert!(verify_planted(&cfg, &wrong_log).is_err());
+        let mut wrong_target = planted.clone();
+        wrong_target.public_instance["target"] = natural.public_instance["target"].clone();
+        assert!(verify_planted(&cfg, &wrong_target).is_err());
     }
     #[test]
     fn exact_prime_context_matches_legacy_small_cofactor_arithmetic() {

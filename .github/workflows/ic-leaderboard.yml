@@ -74,6 +74,7 @@ on:
       - 'research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json'
       - 'research/la_engines_20261014/summary.json'
       - 'research/ecbench_lazy_orbit_members_20261018/figures/ratios.json'
+      - 'research/ecbench_lazy_columns2_20261018/figures/ratios.json'
       - 'research/jv_cover_sparse_fglm_20261018/summary.json'
       - 'research/ic_m2_linear_ladder_20261024/fit.json'
       - 'research/ic_oracle_setup_blocked_20261020/RESULT.json'
@@ -144,7 +145,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/bitop_ladder_20261019 research/f4_fp_ic_effect_20261018 research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst research/four_followups_20261021/results/pencil-pilot research/hec_bitop_20261020 research/ic_aimed_gather_20261023 research/ic_cover_weakclass_20261023 research/ic_d4_char2_lever_20261023 research/kummer_coordinates_20261022 research/kummer_differential_collector_20261022 research/n83_e2e_finalist_results_20261017 research/pencil_sparse_20261022 research/postgb_linear_stage_20261026 research/prime_base_oracle_tuning_20261029 research/projective_law_followup_20261022 research/quartic_n4_20261019 research/quartic_n4v2_20261020 research/three_leads_e2e_20261018/results research/twist_index_calculus_20261020 research/validation_sweep_20261019
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/bitop_ladder_20261019 research/ecbench_lazy_columns2_20261018/figures research/ecbench_lazy_orbit_members_20261018/figures research/f4_fp_ic_effect_20261018 research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst research/four_followups_20261021/results/pencil-pilot research/hec_bitop_20261020 research/ic_aimed_gather_20261023 research/ic_cover_weakclass_20261023 research/ic_d4_char2_lever_20261023 research/kummer_coordinates_20261022 research/kummer_differential_collector_20261022 research/n83_e2e_finalist_results_20261017 research/notes/ecc2k130 research/pencil_sparse_20261022 research/postgb_linear_stage_20261026 research/prime_base_oracle_tuning_20261029 research/projective_law_followup_20261022 research/quartic_n4_20261019 research/quartic_n4v2_20261020 research/three_leads_e2e_20261018/results research/twist_index_calculus_20261020 research/validation_sweep_20261019
       - name: Curve search, priced rows, sources and timeline agree (AGENTS.md §7d)
         run: node scripts/check_ic_dashboard_coverage.mjs
       - uses: actions/setup-python@v5
