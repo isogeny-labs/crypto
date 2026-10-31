@@ -339,7 +339,7 @@ fn generate(root: &Path, bases: &Path, matched: &Path, arm: &str) -> Vec<Value> 
     let matched_bytes = fs::read(matched.join("inputs.json")).unwrap();
     assert_eq!(
         hash(&matched_bytes),
-        "c9e5a0ff7e38e792c2cbfa196e6e6b7d5fc231bdc6d683784de8774f94afad4e"
+        "f7325211302b4ca21f98ea9a7022d2dcc023b29ea2fad9329867e90b75a01c82"
     );
     let prior: Vec<Value> = serde_json::from_slice(&matched_bytes).unwrap();
     fs::create_dir_all(root).unwrap();
