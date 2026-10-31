@@ -1254,6 +1254,29 @@ fn read_json(p: &Path) -> Value {
     serde_json::from_str(&std::fs::read_to_string(p).unwrap()).unwrap()
 }
 
+/// Audit a session with every run replayed and write the receipt.  Fit
+/// version 2 (`FIT_VERSION`) makes a bound admissible only when each session
+/// it reads has a passing audit receipt (docs/bounds/README.md: "a session
+/// without at least one passing audit receipt is inadmissible"), so a test
+/// that fits a bound passes this receipt to `bound fit --audit`.
+fn audit_receipt(dir: &Path, session: &Path) -> PathBuf {
+    let receipt = dir.join(format!(
+        "audit-{}.json",
+        session.file_name().unwrap().to_str().unwrap()
+    ));
+    let (ok, _, err) = ecbench(&[
+        "verify",
+        "--dir",
+        session.to_str().unwrap(),
+        "--replay-all",
+        "--out",
+        receipt.to_str().unwrap(),
+        "--exit-code",
+    ]);
+    assert!(ok, "audit {}: {err}", session.display());
+    receipt
+}
+
 #[test]
 fn bounds_a_frontier_and_challenge_verdicts_round_trip() {
     let dir = scratch("bounds");
@@ -1278,6 +1301,7 @@ fn bounds_a_frontier_and_challenge_verdicts_round_trip() {
     // Bounds of three arms, sealed, re-derivable, and refused when touched.
     let records = dir.join("records");
     std::fs::create_dir_all(&records).unwrap();
+    let receipt = audit_receipt(&dir, &session);
     let mut ids = std::collections::BTreeMap::new();
     for arm in ["rho-plain", "rho-neg", "bsgs-neg"] {
         let out = records.join(format!("{arm}.json"));
@@ -1288,6 +1312,8 @@ fn bounds_a_frontier_and_challenge_verdicts_round_trip() {
             &s(&session),
             "--arm",
             arm,
+            "--audit",
+            &s(&receipt),
             "--root",
             &s(&dir),
             "--out",
@@ -1353,7 +1379,7 @@ fn bounds_a_frontier_and_challenge_verdicts_round_trip() {
     ]);
     assert!(ok, "frontier build: {err}");
     let f = read_json(&fjson);
-    assert_eq!(f["schema"], "ecbench.frontier/v1");
+    assert_eq!(f["schema"], "ecbench.frontier/v2");
     assert_eq!(f["domains"].as_array().unwrap().len(), 1);
     let d = &f["domains"][0];
     assert_eq!(d["entries"].as_array().unwrap().len(), 3);
@@ -1437,6 +1463,11 @@ fn bounds_a_frontier_and_challenge_verdicts_round_trip() {
         serde_json::json!(["ops", "memory"])
     );
 
+    // These tests pin verdict procedure 1 (`--legacy-epoch N` on `challenge
+    // spec`, `--procedure 1 --epoch N` on `challenge verdict`), the
+    // procedure that keeps committed verdicts re-derivable.  Procedure 2,
+    // the default since fit v2, derives the epoch from a commitment and a
+    // later beacon and has no `--epoch`; its unit tests are in challenge.rs.
     // Epoch 1: BSGS with the negation map.  Fewer operations, a √r table:
     // a trade, and a new bound that names the incumbent's.
     let spec1 = dir.join("spec1.json");
@@ -1447,7 +1478,7 @@ fn bounds_a_frontier_and_challenge_verdicts_round_trip() {
         &s(&challenge),
         "--candidate",
         r#"{"id":"bsgs.negation"}"#,
-        "--epoch",
+        "--legacy-epoch",
         "1",
         "--out",
         &s(&spec1),
@@ -1476,6 +1507,8 @@ fn bounds_a_frontier_and_challenge_verdicts_round_trip() {
         &s(&challenge),
         "--dir",
         &s(&s1),
+        "--procedure",
+        "1",
         "--epoch",
         "1",
         "--replay-all",
@@ -1521,7 +1554,7 @@ fn bounds_a_frontier_and_challenge_verdicts_round_trip() {
             &s(&challenge),
             "--candidate",
             r#"{"id":"rho.plain"}"#,
-            "--epoch",
+            "--legacy-epoch",
             "2",
             "--out",
             &s(&spec2),
@@ -1553,6 +1586,8 @@ fn bounds_a_frontier_and_challenge_verdicts_round_trip() {
         &s(&challenge),
         "--dir",
         &s(&s2),
+        "--procedure",
+        "1",
         "--epoch",
         "2",
         "--replay-all",
@@ -1580,6 +1615,8 @@ fn bounds_a_frontier_and_challenge_verdicts_round_trip() {
         &s(&challenge),
         "--dir",
         &s(&s2),
+        "--procedure",
+        "1",
         "--epoch",
         "3",
         "--root",
@@ -1715,6 +1752,7 @@ fn field_operations_are_counted_bounded_and_judged() {
     // two-stage interval the other axes have, and re-derives.
     let records_dir = dir.join("records");
     std::fs::create_dir_all(&records_dir).unwrap();
+    let receipt = audit_receipt(&dir, &session);
     let mut ids = std::collections::BTreeMap::new();
     for arm in ["rho-neg", "bsgs-neg"] {
         let out = records_dir.join(format!("{arm}.json"));
@@ -1725,6 +1763,8 @@ fn field_operations_are_counted_bounded_and_judged() {
             &s(&session),
             "--arm",
             arm,
+            "--audit",
+            &s(&receipt),
             "--root",
             &s(&dir),
             "--out",
@@ -1784,7 +1824,12 @@ fn field_operations_are_counted_bounded_and_judged() {
     }
     let page = std::fs::read_to_string(&fmd).unwrap();
     assert!(page.contains("| field muls (/√r) | field sqrs (/√r) | field invs (/√r) |"));
-    assert!(page.contains("the primitive level"));
+    // The v2 page (procedure 2) explains the three columns in one sentence
+    // that no longer carries the words "the primitive level"; pin the
+    // sentence, which is what documents the axes.
+    assert!(page.contains(
+        "are the modular multiplications, squarings and inversions behind the group operations"
+    ));
     let (ok, _, err) = ecbench(&[
         "frontier",
         "build",
@@ -1857,7 +1902,7 @@ fn field_operations_are_counted_bounded_and_judged() {
         &s(&challenge),
         "--candidate",
         r#"{"id":"bsgs.negation"}"#,
-        "--epoch",
+        "--legacy-epoch",
         "1",
         "--out",
         &s(&spec1),
@@ -1886,6 +1931,8 @@ fn field_operations_are_counted_bounded_and_judged() {
         &s(&challenge),
         "--dir",
         &s(&s1),
+        "--procedure",
+        "1",
         "--epoch",
         "1",
         "--replay-all",
@@ -1987,6 +2034,8 @@ fn field_operations_are_counted_bounded_and_judged() {
         &s(&ksession),
         "--arm",
         "bsgs-neg",
+        "--audit",
+        &s(&audit_receipt(&dir, &ksession)),
         "--root",
         &s(&dir),
         "--out",
@@ -2037,7 +2086,7 @@ fn field_operations_are_counted_bounded_and_judged() {
         &s(&kchallenge),
         "--candidate",
         r#"{"id":"bsgs.negation"}"#,
-        "--epoch",
+        "--legacy-epoch",
         "1",
         "--out",
         &s(&kspec1),
@@ -2065,6 +2114,8 @@ fn field_operations_are_counted_bounded_and_judged() {
         &s(&kchallenge),
         "--dir",
         &s(&k1),
+        "--procedure",
+        "1",
         "--epoch",
         "1",
         "--replay-all",
