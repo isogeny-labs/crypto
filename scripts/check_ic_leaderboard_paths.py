@@ -10,9 +10,9 @@ list names and on nothing else, so a frozen file the builder reads but the
 list omits can change the page's numbers with no check run, and the page goes
 stale until some unrelated change happens to trigger one.  The list is kept by
 hand and the builder's inputs grow with every round, so this runs the builder
-under a read recorder and tests every file it opened against the workflow's
-`pull_request` and `push` lists (an event the workflow does not declare is
-skipped).  The builder is itself on each list, so the
+under a read recorder and tests every file it opened against each configured
+`pull_request` or `push` list. Absent events are not required; an unfiltered
+configured event covers every input.  The builder is itself on both lists, so the
 change that adds an input also runs this check.
 
 Stdlib only; the workflow's filter is read as text.  Only the glob forms the
@@ -100,32 +100,39 @@ def glob_regex(pat: str) -> re.Pattern:
     return re.compile("^" + out + "$")
 
 
-def event_declared(workflow: Path, event: str) -> bool:
-    """Whether `on:` names the event; an undeclared event runs nothing to cover."""
-    return any(re.match(rf"^  {re.escape(event)}:", line) for line in workflow.read_text().splitlines())
-
-
-def event_paths(workflow: Path, event: str) -> list[str]:
-    """The `paths:` list under `on: <event>:` of a workflow, read as text."""
+def event_paths(workflow: Path, event: str) -> list[str] | None:
+    """None when absent, [] when unfiltered, otherwise the configured paths."""
     patterns: list[str] = []
-    in_event = in_paths = False
+    in_on = in_event = in_paths = configured = has_paths = False
     for line in workflow.read_text().splitlines():
+        if re.fullmatch(r"(?:on|'on'|\"on\"):\s*(?:#.*)?", line):
+            in_on = True
+            continue
+        if line and not line[0].isspace() and not line.startswith("#"):
+            in_on = False
+        if not in_on:
+            continue
         if re.match(r"^  \w[\w-]*:", line):  # a key of `on:`
             in_event, in_paths = line.strip().startswith(event + ":"), False
+            configured |= in_event
             continue
         if not in_event:
             continue
         if re.match(r"^    paths-ignore:", line):
             raise SystemExit(f"{workflow.name}: {event} uses paths-ignore; this check does not model it")
         if re.match(r"^    paths:", line):
-            in_paths = True
+            if not re.fullmatch(r"    paths:\s*(?:#.*)?", line):
+                raise SystemExit(f"{workflow.name}: inline {event} paths are not modelled")
+            in_paths = has_paths = True
         elif re.match(r"^    \S", line):
             in_paths = False
         elif in_paths:
             m = re.match(r"^\s+-\s+(?:'([^']+)'|\"([^\"]+)\"|([^\s#]+))", line)
             if m:
                 patterns.append(next(g for g in m.groups() if g))
-    return patterns
+    if has_paths and not patterns:
+        raise SystemExit(f"{workflow.name}: empty {event} paths list")
+    return patterns if configured else None
 
 
 def label(path: str) -> str:
@@ -142,14 +149,14 @@ def main() -> int:
     bad = 0
     for wf in workflows:
         rel = wf.relative_to(REPO) if wf.is_relative_to(REPO) else wf
+        configured_events = 0
         for event in EVENTS:
-            if not event_declared(wf, event):
-                print(f"{rel}: no {event} trigger; nothing to cover")
-                continue
             patterns = event_paths(wf, event)
+            if patterns is None:
+                continue
+            configured_events += 1
             if not patterns:
-                print(f"{rel}: no `paths:` list for {event}", file=sys.stderr)
-                bad += 1
+                print(f"{rel} [{event}] is unfiltered and covers all {len(reads)} builder inputs")
                 continue
             rx = [glob_regex(p) for p in patterns]
             missed = [r for r in reads if not any(p.match(r) for p in rx)]
@@ -164,6 +171,9 @@ def main() -> int:
                     print(f"  {g}" + (f"   ({n} files)" if n > 1 else ""), file=sys.stderr)
             else:
                 print(f"{rel} [{event}] covers all {len(reads)} files the builder reads")
+        if not configured_events:
+            print(f"{rel}: no configured push or pull_request event to check", file=sys.stderr)
+            bad += 1
     return 1 if bad else 0
 
 

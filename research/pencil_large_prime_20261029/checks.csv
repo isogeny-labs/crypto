@@ -28,3 +28,10 @@ rho_hook_parity,development_test,pass,3,modes,producer-tests.log,one hook call w
 root_library_suite,software_check,failed_then_rechecked,5146,passed_tests,root-tests.log,initial full run: 7 failed and 123 ignored; all failed tests included in subsequent same-binary serial recheck
 root_targeted_regressions,development_test,pass,2,tests,root-regressions.log,digest coverage and leading zero rho target coefficient boundary; full suite unfinished
 root_prerequisite_recheck,software_check,pass,8,tests,root-focused-recheck.log,six missing fixture failures and one test-lock conflict plus device control; same binary serial recheck
+common_cold_boundary,development_test,pass,1,tests,cold-boundary-test.log,shared enclosing timer contains internal solver timer; legacy missing field and rejected-input absence
+paired_export,development_test,pass,12,tests,paired_export/cargo-test.log,exact plan completeness; absent whole workloads; per-clock A/A tolerance; failures and diagnostics
+root_cold_seed_suite,software_check,failed_then_rechecked,5154,passed_tests,root-cold-seed-tests.log,one GPU lock failure and123 ignored; same binary serial recheck passed
+root_cold_seed_recheck,software_check,pass,1,tests,root-cold-seed-recheck.log,previous GPU capsule lock failure checked serially on same binary
+native_archive_parity,exact_input_check,pass,1260,workloads,native_parity/result.json,IDs coordinates target seeds indices and original algorithm seeds; no solves or performance claim
+final_ecbench_suite,software_check,pass,287,passed_tests,final-ecbench-tests.log,zero failures and one ignored; final clock diagnostics and seed implementation
+prepared_native_plans,exact_input_check,pass,1260,workloads,prepared_native_plans/result.json,22680 planned calls and zero solver calls; all original first measured seeds preserved

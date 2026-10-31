@@ -16,8 +16,14 @@ use serde_json::{json, Value};
 use super::storage;
 use super::types::Artifact;
 
+#[path = "algebraic_targets.rs"]
+mod algebraic_targets;
+#[path = "prefix_algebra.rs"]
+mod prefix_algebra;
 #[path = "prime_chain_graph.rs"]
 mod prime_chain_graph;
+#[path = "prime_chain_prefix.rs"]
+mod prime_chain_prefix;
 
 const CHUNK_BYTES: usize = 16 * 1024 * 1024;
 const MAX_RECORD_BYTES: usize = 64 * 1024 * 1024;
@@ -778,6 +784,16 @@ fn export_with_graph_projector(
     let mut features = Sorter::new(&scratch.0, "feature");
     let mut targets = Sorter::new(&scratch.0, "target");
     let mut index = Sorter::new(&scratch.0, "index");
+    let mut prefix_features = Sorter::new(&scratch.0, "prefix-feature");
+    let mut prefix_records = Sorter::new(&scratch.0, "prefix-record");
+    let mut algebraic_features = Sorter::new(&scratch.0, "algebraic-feature");
+    let mut algebraic_records = Sorter::new(&scratch.0, "algebraic-record");
+    let mut algebraic_occurrences = 0u64;
+    let mut algebraic_verified_nonzero = 0u64;
+    let mut algebraic_verified_zero = 0u64;
+    let mut algebraic_unknown_suffixes = 0u64;
+    let mut algebraic_degree_reductions = 0u64;
+    let mut prefix_occurrences = 0u64;
     let mut feature_occurrences = 0u64;
     let mut sealed = 0u64;
     let mut unsealed = 0u64;
@@ -926,6 +942,106 @@ fn export_with_graph_projector(
                     let domain = text(&inputs["pdp_domain"], "PDP domain")?;
                     let id = super::digest(bounded_json(&inputs, MAX_RECORD_BYTES)?.as_bytes());
                     let (group, partition) = split_for_size(integer(&inputs["n"], "n")?);
+                    if inputs.get("prime_chain_graph").is_some() {
+                        let event_artifact = manifest
+                            .artifacts
+                            .iter()
+                            .find(|a| a.path == "prime-f4-chain-events.jsonl");
+                        let replay = if let Some(artifact) = event_artifact {
+                            if artifact.role
+                                != "restricted-native-prime-f4-recursion-and-lift-events"
+                                || artifact.encoding != "jsonl"
+                            {
+                                return Err(
+                                    "invalid prime-chain event artifact role or encoding".into()
+                                );
+                            }
+                            let input: Value = super::read_json(&dir.join("prime-f4-input.json"))?;
+                            let reader = BufReader::new(
+                                File::open(dir.join(&artifact.path)).map_err(|e| e.to_string())?,
+                            );
+                            let mut occurrence = 0u64;
+                            let mut algebraic_record_occurrence = 0u64;
+                            prime_chain_prefix::replay(
+                                &input,
+                                &inputs,
+                                reader,
+                                |feature, record| {
+                                    if record["kind"] == "polynomial_consequence" {
+                                        algebraic_record_occurrence += 1;
+                                        let record_id = super::digest(
+                                            format!("{target_id}\nalgebraic-record\n{algebraic_record_occurrence}").as_bytes(),
+                                        );
+                                        match record["admission_status"].as_str() {
+                                            Some("verified_nonzero") => {
+                                                algebraic_verified_nonzero += 1
+                                            }
+                                            Some("verified_zero") => algebraic_verified_zero += 1,
+                                            Some("bounded_unknown_suffix") => {
+                                                algebraic_unknown_suffixes += 1
+                                            }
+                                            _ => {
+                                                return Err(
+                                                    "unknown algebraic admission status".into()
+                                                )
+                                            }
+                                        }
+                                        if record["witnessed_degree_drop"] == true {
+                                            algebraic_degree_reductions += 1;
+                                        }
+                                        let feature_id = if let Some(feature) = feature {
+                                            if record["admission_status"] != "verified_nonzero" {
+                                                return Err("unverified or zero algebraic row supplied public features".into());
+                                            }
+                                            let id = super::digest(
+                                                bounded_json(&feature, MAX_RECORD_BYTES)?
+                                                    .as_bytes(),
+                                            );
+                                            algebraic_features.push(&id, &json!({"schema":"ml-dataset.algebraic-features/v1",
+                                                "feature_id":id,"split_component":group,"split":partition,"inputs":feature}))?;
+                                            algebraic_occurrences += 1;
+                                            Some(id)
+                                        } else {
+                                            None
+                                        };
+                                        return algebraic_records.push(&record_id, &json!({"schema":"ml-dataset.restricted-algebraic-record/v1",
+                                            "record_id":record_id,"source_target_id":target_id,"source_event_artifact":artifact,
+                                            "feature_id":feature_id,"split_component":group,"split":partition,"record":record}));
+                                    }
+                                    occurrence += 1;
+                                    let record_id = super::digest(
+                                        format!("{target_id}\nprefix-record\n{occurrence}")
+                                            .as_bytes(),
+                                    );
+                                    let prefix_id = if let Some(feature) = feature {
+                                        let prefix_id = super::digest(
+                                            bounded_json(&feature, MAX_RECORD_BYTES)?.as_bytes(),
+                                        );
+                                        prefix_features.push(&prefix_id, &json!({"schema":"ml-dataset.prefix-features/v1",
+                                        "feature_id":prefix_id,"split_component":group,"split":partition,"inputs":feature}))?;
+                                        prefix_occurrences += 1;
+                                        Some(prefix_id)
+                                    } else {
+                                        None
+                                    };
+                                    prefix_records.push(&record_id, &json!({"schema":"ml-dataset.restricted-prefix-record/v1",
+                                    "record_id":record_id,"source_target_id":target_id,"source_event_artifact":artifact,
+                                    "feature_id":prefix_id,"split_component":group,"split":partition,"record":record}))
+                                },
+                            )?
+                        } else {
+                            json!({"schema":"ml-dataset.prime-chain-prefix-replay/v1","admission_status":"no_retained_native_events",
+                                "verified_branch_examples":0,"source_completion_claimed":false})
+                        };
+                        let record_id =
+                            super::digest(format!("{target_id}\nprefix-replay-summary").as_bytes());
+                        prefix_records.push(
+                            &record_id,
+                            &json!({"schema":"ml-dataset.restricted-prefix-record/v1",
+                            "record_id":record_id,"source_target_id":target_id,"feature_id":null,
+                            "split_component":group,"split":partition,"record":replay}),
+                        )?;
+                    }
                     let row = json!({"schema":"ml-dataset.features/v1","feature_id":id,"split_component":group,"split":partition,"inputs":inputs});
                     features.push(&id, &row)?;
                     feature_occurrences += 1;
@@ -988,6 +1104,20 @@ fn export_with_graph_projector(
     let unique_features = features.finish(&features_staged)?;
     let target_rows = targets.finish(&targets_staged)?;
     let index_rows = index.finish(&index_staged)?;
+    let prefix_features_staged = scratch.0.join("prefix-features.jsonl");
+    let prefix_records_staged = scratch.0.join("prefix-records.jsonl");
+    let unique_prefix_features = prefix_features.finish(&prefix_features_staged)?;
+    let prefix_record_rows = prefix_records.finish(&prefix_records_staged)?;
+    let algebraic_features_staged = scratch.0.join("algebraic-features.jsonl");
+    let algebraic_records_staged = scratch.0.join("algebraic-records.jsonl");
+    let unique_algebraic_features = algebraic_features.finish(&algebraic_features_staged)?;
+    let algebraic_record_rows = algebraic_records.finish(&algebraic_records_staged)?;
+    if algebraic_occurrences != algebraic_verified_nonzero
+        || algebraic_record_rows
+            != algebraic_verified_nonzero + algebraic_verified_zero + algebraic_unknown_suffixes
+    {
+        return Err("export lost algebraic feature or record joins".into());
+    }
     if target_rows != sealed || index_rows != sealed + unsealed {
         return Err("export lost or duplicated source identities".into());
     }
@@ -1010,8 +1140,33 @@ fn export_with_graph_projector(
             "restricted/index.jsonl",
             "restricted-source-provenance",
         )?,
+        install(
+            &out,
+            &prefix_features_staged,
+            "prefix-features.jsonl",
+            "allowlisted-causal-model-inputs",
+        )?,
+        install(
+            &out,
+            &prefix_records_staged,
+            "restricted/prefix-records.jsonl",
+            "restricted-prefix-labels-certificates-and-provenance",
+        )?,
+        install(
+            &out,
+            &algebraic_features_staged,
+            "algebraic-features.jsonl",
+            "allowlisted-polynomial-consequence-inputs",
+        )?,
+        install(
+            &out,
+            &algebraic_records_staged,
+            "restricted/algebraic-records.jsonl",
+            "restricted-checked-polynomial-consequences-certificates-and-provenance",
+        )?,
     ];
-    let manifest = json!({"schema":"ml-dataset.training-export/v1","source_run_sha256":source_run_sha,"plan_sha256":plan_sha,
+    // Keep each object expansion bounded without changing manifest keys or order.
+    let mut manifest = json!({"schema":"ml-dataset.training-export/v1","source_run_sha256":source_run_sha,"plan_sha256":plan_sha,
         "source_commit":binding["source_commit"],"binary_sha256":binding["binary_sha256"],"artifacts":artifacts,
         "sealed_source_cells":sealed,"unsealed_attempts_excluded":unsealed,"cells_without_verified_features":unavailable,
         "cells_without_verified_alternative_factor_base":missing_alternative_base,"feature_occurrences_by_pdp_domain":domain_counts,
@@ -1019,12 +1174,25 @@ fn export_with_graph_projector(
         "cells_without_verified_prime_chain_graph":missing_prime_chain_graph,
         "cells_excluded_by_prime_chain_graph_size_limit":oversized_prime_chain_graph,
         "prime_chain_graph_occurrences":prime_chain_graph_occurrences,
+        "prefix_feature_occurrences":prefix_occurrences,"unique_prefix_feature_rows":unique_prefix_features,
+        "restricted_prefix_record_rows":prefix_record_rows});
+    let manifest_tail = json!({
+        "algebraic_feature_occurrences":algebraic_occurrences,"unique_algebraic_feature_rows":unique_algebraic_features,
+        "restricted_algebraic_record_rows":algebraic_record_rows,
+        "algebraic_outcomes":{"verified_nonzero_target_rows":algebraic_verified_nonzero,"verified_zero_target_rows":algebraic_verified_zero,
+            "witnessed_degree_reduction_rows":algebraic_degree_reductions,"bounded_unknown_suffix_records":algebraic_unknown_suffixes,
+            "count_scope":"non-deduplicated target occurrences and one terminal unknown record per capped consequence channel; not exact degree invariants or solved instances"},
         "feature_occurrences":feature_occurrences,"unique_feature_rows":unique_features,"restricted_target_rows":target_rows,
         "feature_identity":"SHA256 of canonical strictly projected public inputs, optional exact equation graph and mathematical encoding, actual small/residual factor bases, column actions and PDP/relation-query domain; solver and source provenance excluded",
         "split_policy":{"domain":SPLIT_DOMAIN,"component":"field-size-nN","assignment":"first 64 hash bits modulo 100: train 0..79, validation 80..89, test 90..99",
             "occurrences_by_partition":split_counts,"all_same_size_families_twists_generators_keys_stay_together":true,
             "cross_size_algebraic_links_merged":false,"row_random_split_permitted":false},
-        "feature_policy":{"version":"strict-structural-allowlist-v4","only_features_jsonl_is_model_input":true,
+        "feature_policy":{"version":"strict-structural-allowlist-v6","only_features_jsonl_is_model_input":false,
+            "model_input_files":["features.jsonl","prefix-features.jsonl","algebraic-features.jsonl"],
+            "algebraic_task":"prime-polynomial-consequence/v1; pre-native equations only; independently checked identities for retained native basis rows, with separately searched witnesses",
+            "algebraic_claim_limits":["recursive prime m3..15 and p<2^32 only","admission requires a previously certified equality node","separate cumulative consequence-channel caps preserve existing branch budget","witness-dependent cancellation is not exact first/last fall degree","no native-operation or native-instruction witness"],
+            "prefix_task":"prime-chain-next-branch-attempt/v1; replayed recursive state and independently derived iterator; observed imitation labels only, no optimality or counterfactual cost",
+            "prefix_claim_limits":["bounded ideal-certificate search can exclude a suffix","no complete native execution or instruction proof","no exact first/last fall degree","no complete Groebner basis claim"],
             "prime_chain_graph":"prime-chain-graph/v1 static equations/domains and signed-point incidence, reconstructed before publication; no solver-prefix/action features; missing or oversized graphs excluded with restricted provenance",
             "prime_chain_graph_capabilities":prime_chain_graph::capabilities(),
             "pkm_domain":"verified exact alternative Kummer base; missing base excluded from matched routing features",
@@ -1034,6 +1202,13 @@ fn export_with_graph_projector(
         "sort":{"implementation":"bounded Rust external merge","chunk_bytes":CHUNK_BYTES,"merge_fan_in":MERGE_FAN_IN,"max_row_bytes":MAX_RECORD_BYTES,
             "source_cell_values_materialized":true,"total_process_rss_bound_claimed":false},
         "source_artifacts_modified":false,"remote_download_performed":false});
+    let Value::Object(tail_fields) = manifest_tail else {
+        unreachable!("manifest tail is an object literal");
+    };
+    manifest
+        .as_object_mut()
+        .expect("manifest is an object literal")
+        .extend(tail_fields);
     let manifest_artifact =
         storage::write_json(&out, "manifest.json", "training-export-manifest", &manifest)?;
     storage::verify_manifest(&out, &artifacts)?;
@@ -1385,7 +1560,7 @@ mod tests {
             assert_eq!(result["export"]["restricted_target_rows"], 4);
             assert_eq!(
                 result["export"]["feature_policy"]["version"],
-                "strict-structural-allowlist-v4"
+                "strict-structural-allowlist-v6"
             );
             let bytes = fs::read_to_string(out.join("features.jsonl")).unwrap();
             let rows: Vec<Value> = bytes

@@ -1,0 +1,61 @@
+{
+  "admission": "exact record expectations plus independent source-bound nine-category review; matching protocol/source/report digests, binary IDs and Rust1.99.1; missing or failed pair keeps all36 prices null",
+  "aggregation": "pair rows only; cohort aggregation must sum exact prices across the entire prescribed matched cohort before dividing, never average ratios or use survivors",
+  "coverage_categories": [
+    "field_arithmetic",
+    "scalar_arithmetic",
+    "outer_and_constructor_validation",
+    "setup_transfer",
+    "collection_graph_elimination",
+    "hash_rng",
+    "source_verification",
+    "metadata_clone",
+    "calibration"
+  ],
+  "diagnostic_exclusions": [
+    "map_calls",
+    "sparse_accumulations",
+    "partition_terms",
+    "payload_terms",
+    "parent_hops",
+    "primality_checks",
+    "constructor_prime_calls",
+    "scalar_constructor_prime_calls",
+    "product_reductions",
+    "rho_observed_hash_bytes_v1"
+  ],
+  "geometry": "use solver_including_cold_setup + additional_source_verification segments; never add total again; calibration separate and included once in combined ratio",
+  "grid": {
+    "inversion": [
+      1,
+      10,
+      100,
+      1000
+    ],
+    "native_tenths": [
+      0,
+      1,
+      10
+    ],
+    "square_twice": [
+      0,
+      1,
+      2
+    ]
+  },
+  "hash": "reference rho_observed_hash_calls_v1 plus partition_hashes_uncharged; hash_probes_uncharged excluded as overlapping summary",
+  "mapping_sha256": "eb5348c894516e9ba163740861dd1f0e58865c08a930500662e6b060f7a571d8",
+  "metadata": "one native unit per copied Value node; key/string/family bytes supplemental",
+  "normalization": "atomic scalar inversions; base inverse-expanded multiplies subtracted using bitlength(p-2)+popcount(p-2)",
+  "policy": "pencil-algorithm-cost/atomic-scalar-disjoint-v1",
+  "rng": "candidate symbolic.semantic_counts.walk_label_calls plus cold_setup; reference rng_draws_uncharged, one atomic generation each, internal mix and reduction included",
+  "schema": "pencil-algorithm-mapping/v1",
+  "separate_units": [
+    "report formatting and serialization",
+    "allocation bytes and calls",
+    "RSS",
+    "wall and CPU time",
+    "parent verification and harness",
+    "infrastructure and retries"
+  ]
+}

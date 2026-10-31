@@ -1,0 +1,83 @@
+{
+  "schema": "pencil-replacement-external-execution-admission/v1",
+  "admitted_utc": "2026-10-30T05:41:33.390731+00:00",
+  "admitter": "/root",
+  "published_freeze_commit": "64fbfaf8a7389b71a8ca8ec7500d21a5ca6b5719",
+  "pull_request": "https://github.com/isogeny-labs/crypto/pull/2943",
+  "protocol": {
+    "path": "protocol/replacement-frozen-protocol.json",
+    "sha256": "4b1290eb3802af06238d70e83d6cdf049d85f483dc709ba89e40d9f73563166e"
+  },
+  "protocol_body_sha256": "18d5ea7d08097c6b1c952d979a71be5d05efa82902bee1bc1470b031345f37c9",
+  "request": {
+    "path": "request.json",
+    "sha256": "e49b94e02639a57b5af1b71b6b0a415a852190156a4beef9583e88d205866c0d"
+  },
+  "controller_request_sha256": "92897e1dc5fb7fb10b3df9eceeed01aa88ea083b5a67be1431e915bf3231d907",
+  "resource_authorization": {
+    "path": "resource_authorization.json",
+    "sha256": "5ea8e080af4b28572f3ff1d074e9e261ef8ad3c24a53a6e7d06d1b37b0316d25"
+  },
+  "committed_provenance": {
+    "path": "committed-provenance.json",
+    "sha256": "f2e6a808a0f63995c66b858a1a3c393411c083ea125b1074edbfc2d9783d0392"
+  },
+  "live_reconciliation": {
+    "path": "presubmit-live-reconciliation.json",
+    "sha256": "06d5be39bbac3d2a03fe2f2b0e234e4a08c9baf8fa45e2abed1a74a931604e46"
+  },
+  "reviews": [
+    {
+      "path": "replacement-independent-design-review.json",
+      "sha256": "8508baa4910e7ba909dd6bd19e4b95e391400b609ab1ce9ec79a61877f3ec7db"
+    },
+    {
+      "path": "replacement-finite-coverage-review.json",
+      "sha256": "1d18cad8da81aea06105b7022fc9ff26565ea4eb62a3e116fa925c54a8f2855f"
+    },
+    {
+      "path": "independent-unknown-runtime-source-review.json",
+      "sha256": "9e4cf3a10638075f71846968a683b5b14f19c922af93635e4894a68379e47478"
+    },
+    {
+      "path": "pencil-six-hour-operational-review.json",
+      "sha256": "a865795463c9f24c6f553c6534692c64a1f89e2135a47c4674b56e586dc0d7f0"
+    }
+  ],
+  "preparation_state_interpretation": "Frozen protocol draft_only and pending fields retain preparation-state history; false embedded scientific_admission and launch_authorized do not assert prior launch or self-authorize. This separate admission resolves their external prerequisites for this exact request only.",
+  "approved_client_sha256": "ac7d57132617775679770dc55b6f8b3acc83f4454e31b025a1f35e9b915abc21",
+  "controller_source_sha256": "0bd84d4009064968365f03518adbca1bf6fd6c27eeed24721721e20018a9e85a",
+  "controller_source_version": "Fz9bO0_vOwOm_qUhALJ4zOxuCUopZwmg",
+  "runtime_image_digest": "sha256:e82333a5e77a03270335589848783e1d0cf55e42c7c2f5f35732ee8ba54523fd",
+  "scientific_image_digest": "sha256:13f27597322fced9230635cedc5a4e228daf2fb951f77652edbbcab17e674c1b",
+  "run_name": "pencil-p186379-20261030-c1",
+  "single_request_submission_admitted": true,
+  "new_scientific_launches_before_this_receipt": 0,
+  "cumulative_active_worker_seconds": 21600,
+  "original_authorization_start_utc": "2026-10-30T05:17:54Z",
+  "request_cutoff_utc": "2026-10-30T08:10:24Z",
+  "outer_expiry_utc": "2026-10-30T11:17:54Z",
+  "maximum_active_scientific_payloads": 1,
+  "charged": [
+    "candidate",
+    "rho",
+    "rho_AA",
+    "warmups",
+    "computation",
+    "fresh_epoch",
+    "replay",
+    "recovery",
+    "failed_attempts"
+  ],
+  "automatic_scientific_retry_admitted": false,
+  "remaining_cohort_admitted": false,
+  "timing_qualified": false,
+  "early_rejection_instrument_integrated": false,
+  "later_cohort_barrier": [
+    "complete_gate",
+    "all_15_measured_independent_nonwall_replays",
+    "independent_review",
+    "separate_prospective_cohort_admission"
+  ],
+  "stop_rule": "Stop at earlier cumulative ceiling and expiry; preserve original request cutoff, all failed/incomplete observations and unknown costs; no restart under a new run identity."
+}

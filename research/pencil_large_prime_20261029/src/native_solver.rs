@@ -5,6 +5,7 @@
 //! Graph accounting is incomplete: outputs MUST NOT be priced by old analyzers.
 use super::{engine, kernel, measurement};
 use engine::{Counts, Divisor, Point, Scholten, StudyInstance};
+use kernel::tracked_set::TrackedSet;
 use kernel::{
     allocation::{ObservedSystem, Region},
     collector::{Admission, Collector},
@@ -14,7 +15,7 @@ use kernel::{
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::cell::Cell;
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 use std::time::Instant;
 
 struct GraphSolver {
@@ -30,6 +31,103 @@ struct GraphSolver {
 #[cfg(test)]
 mod graph_adapter_tests {
     use super::*;
+
+    #[test]
+    fn walk_labels_are_atomic_observed_calls_in_the_generation_phase() {
+        let s = Scholten::new(739);
+        meter::reset();
+        let before = meter::snapshot();
+        let mut phases = BTreeMap::new();
+        measured(None, &s, &mut phases, "walk_generation", || {
+            assert_eq!(walk_label(0, 0, 0x4455, 34147), 31712);
+            assert_eq!(walk_label(u64::MAX, 15, 0x7788, 34147), 22146);
+            assert_eq!(walk_label(7, 2, 0x4455, 1), 0);
+        });
+        let expected = meter::Snapshot {
+            walk_label_calls: 3,
+            ..meter::Snapshot::default()
+        };
+        let observed = meter::snapshot();
+        assert_eq!(observed, expected);
+        assert_eq!(phases["walk_generation"].symbolic, expected);
+        assert_eq!(observed - before, expected);
+        assert_eq!(observed.checked_difference(before), Some(expected));
+        assert_eq!(before.checked_difference(observed), None);
+        let mut combined = before;
+        combined += expected;
+        assert_eq!(combined, observed);
+        assert_eq!(
+            serde_json::to_value(observed).unwrap()["walk_label_calls"],
+            3
+        );
+    }
+
+    #[test]
+    fn collection_short_circuit_inventory_and_polynomial_observations() {
+        meter::reset();
+        let ys = vec![vec![], vec![0], vec![2, 5], vec![0, 3]];
+        let solver = LinearSolver::new(4, 7, &ys);
+        let counts = meter::snapshot();
+        assert_eq!(solver.nodes, vec![None, None, Some(0), Some(1)]);
+        assert_eq!(counts.collection_entry_visits, 8); // four outer + 0,1,1,2 inner
+        assert_eq!(counts.collection_comparisons, 4);
+        assert_eq!(counts.collection_elements_initialized, 4);
+        assert_eq!(counts.collection_elements_copied, 0);
+        meter::reset();
+        assert_eq!(peval(&[1, 2, 3], 2, 7), 3);
+        assert_eq!(meter::snapshot().collection_entry_visits, 3);
+        meter::reset();
+        assert_eq!(trim(vec![1, 0, 0]), vec![1]);
+        assert_eq!(meter::snapshot().collection_entry_visits, 3);
+        assert_eq!(meter::snapshot().collection_comparisons, 3);
+        meter::reset();
+        let h = [1];
+        assert_eq!(rational_y_by_x(&h, 3), vec![vec![1, 2]; 3]);
+        let counts = meter::snapshot();
+        assert_eq!(counts.collection_elements_copied, 6);
+        assert_eq!(counts.collection_elements_initialized, 9);
+        assert_eq!(counts.collection_entry_visits, 6); // three polynomial + three root buckets
+    }
+
+    #[test]
+    fn rejected_validation_preserves_exact_invocation_prefix() {
+        let mut inst = engine::scholten_instance(739, 23).unwrap();
+        let config = Config {
+            denominator: 2,
+            matrix_coefficient_cap: 1_000_000,
+        };
+        inst.curve.binary = true;
+        let error = solve_one(&inst, Point::O, 1, config, None).err().unwrap();
+        assert_eq!(
+            error.outer_primality,
+            kernel::outer_primality::OuterValidation::default()
+        );
+        inst.curve.binary = false;
+        inst.curve.f.p = 1763;
+        let error = solve_one(&inst, Point::O, 1, config, None).err().unwrap();
+        assert_eq!(
+            error.outer_primality.base_modulus,
+            Some(kernel::outer_primality::observe(1763))
+        );
+        assert!(error.outer_primality.scalar_modulus.is_none());
+        inst.curve.f.p = 739;
+        inst.r = 1763;
+        let error = solve_one(&inst, Point::O, 1, config, None).err().unwrap();
+        assert_eq!(
+            error.outer_primality.base_modulus,
+            Some(kernel::outer_primality::observe(739))
+        );
+        assert_eq!(
+            error.outer_primality.scalar_modulus,
+            Some(kernel::outer_primality::observe(1763))
+        );
+        let serialized: Value = serde_json::from_str(&error.to_string()).unwrap();
+        assert_eq!(serialized["schema"], "pencil-validation-error/v1");
+        assert_eq!(
+            serialized["outer_primality"]["scalar_modulus"]["prime"],
+            false
+        );
+    }
 
     #[test]
     fn rho_boundary_hook_is_once_and_preserves_recorded_work() {
@@ -237,6 +335,55 @@ mod graph_adapter_tests {
     }
 
     #[test]
+    fn iterator_bookkeeping_preserves_strict_phase_accounting() {
+        let mut phases = BTreeMap::from([(
+            "fixture",
+            PhaseTotals {
+                elapsed_ns: 20,
+                symbolic: meter::Snapshot {
+                    map_entry_visits: 2,
+                    ..meter::Snapshot::default()
+                },
+                ..PhaseTotals::default()
+            },
+        )]);
+        let total = meter::Snapshot {
+            map_entry_visits: 5,
+            ..meter::Snapshot::default()
+        };
+        attribute_iterator_bookkeeping(&mut phases, total);
+        assert_eq!(phases["iterator_bookkeeping"].symbolic.map_entry_visits, 3);
+        assert_eq!(phases["iterator_bookkeeping"].elapsed_ns, 0);
+        attribute_iterator_bookkeeping(&mut phases, total);
+        assert_eq!(
+            validate_phases(
+                &phases,
+                Counts::default(),
+                ArithmeticCounts::default(),
+                total,
+                29
+            ),
+            9
+        );
+        let collection_leak = meter::Snapshot {
+            collection_entry_visits: 1,
+            ..total
+        };
+        assert!(std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            attribute_iterator_bookkeeping(&mut phases, collection_leak)
+        }))
+        .is_err());
+        let invalid = meter::Snapshot {
+            scalar_muls: 1,
+            ..total
+        };
+        assert!(std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            attribute_iterator_bookkeeping(&mut phases, invalid)
+        }))
+        .is_err());
+    }
+
+    #[test]
     fn setup_and_elimination_partition_symbolic_events() {
         let s = Scholten::new(739);
         meter::reset();
@@ -296,7 +443,13 @@ impl GraphSolver {
         assert!([2, 4, 8, 16].contains(&denominator));
         assert_eq!(source.node_order, "identity");
         let n = source.node_count;
-        let partition: Vec<_> = (0..n + 2).map(|i| i >= n || i % denominator == 0).collect();
+        let partition: Vec<_> = (0..n + 2)
+            .map(|i| {
+                meter::collection(0, 0, 1, 1 + usize::from(i < n));
+                i >= n || i % denominator == 0
+            })
+            .collect();
+        meter::collection(0, source.nodes.len(), 0, 0);
         Self {
             collector: Collector::new(
                 source.modulus,
@@ -320,12 +473,15 @@ impl GraphSolver {
         let n = self.node_count;
         let mut row = Vec::new();
         for &[x, y] in points {
+            meter::collection(1, 0, 0, 1);
             if y == 0 {
                 continue;
             }
+            meter::collection(1, 0, 1, 1);
             let col = self.nodes[x as usize].expect("checked rational point");
             row.push((col, if y <= self.field_prime / 2 { 1 } else { r - 1 }));
         }
+        meter::collection(0, 0, 2, 0);
         row.push((n, b));
         row.push((n + 1, sub(0, a, r)));
         match self.collector.insert(&row).expect("bound columns") {
@@ -349,7 +505,14 @@ impl GraphSolver {
         if let Some(row) = self.collector.basis().pivot(target_column) {
             // Normalized target pivot is one; same signed convention as
             // the frozen LinearSolver, with independent source replay below.
-            return Some(row.get(&(target_column + 1)).copied().unwrap_or(0));
+            return Some(
+                row.get(&(target_column + 1))
+                    .map(|&v| {
+                        meter::collection(0, 1, 0, 0);
+                        v
+                    })
+                    .unwrap_or(0),
+            );
         }
         None
     }
@@ -456,6 +619,32 @@ fn measured<T>(
         .add_assign(arithmetic_counts().difference(before_arithmetic));
     result
 }
+// Candidate iterator consumption occurs between scoped callbacks. Attribute only
+// this observed visit delta; missing arithmetic or other symbolic events still fail.
+// This row has no separate wall interval: its time is part of envelope overhead.
+fn attribute_iterator_bookkeeping(
+    phases: &mut BTreeMap<&'static str, PhaseTotals>,
+    total: meter::Snapshot,
+) {
+    let mut scoped = meter::Snapshot::default();
+    for phase in phases.values() {
+        scoped += phase.symbolic;
+    }
+    let delta = total
+        .checked_difference(scoped)
+        .expect("symbolic phase counters exceed total");
+    assert_eq!(
+        delta,
+        meter::Snapshot {
+            map_entry_visits: delta.map_entry_visits,
+            ..meter::Snapshot::default()
+        },
+        "non-iterator work escaped named phases"
+    );
+    if delta.map_entry_visits != 0 {
+        phases.entry("iterator_bookkeeping").or_default().symbolic += delta;
+    }
+}
 // Reject an export if measured arithmetic escaped the named phases. The
 // envelope remainder includes bookkeeping and control flow, not missing field work.
 fn validate_phases(
@@ -513,7 +702,10 @@ fn reset_arithmetic_counts() {
 }
 
 fn trim(mut a: Vec<u64>) -> Vec<u64> {
-    while a.last() == Some(&0) {
+    while {
+        meter::collection(usize::from(!a.is_empty()), 0, 0, 1);
+        a.last() == Some(&0)
+    } {
         a.pop();
     }
     a
@@ -569,24 +761,37 @@ fn pow(mut a: u64, mut n: u64, p: u64) -> u64 {
 }
 fn pmul(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     let mut out = vec![0; a.len() + b.len() - 1];
+    meter::collection(0, 0, out.len(), 0);
     for (i, &x) in a.iter().enumerate() {
+        meter::collection(1, 0, 0, 0);
         for (j, &y) in b.iter().enumerate() {
+            meter::collection(2, 0, 0, 0);
             out[i + j] = add(out[i + j], mul(x, y, p), p);
         }
     }
     trim(out)
 }
 fn peval(a: &[u64], x: u64, p: u64) -> u64 {
-    a.iter().rev().fold(0, |v, &c| add(mul(v, x, p), c, p))
+    a.iter().rev().fold(0, |v, &c| {
+        meter::collection(1, 0, 0, 0);
+        add(mul(v, x, p), c, p)
+    })
 }
 fn divide_monic(mut a: Vec<u64>, b: &[u64], p: u64) -> (Vec<u64>, Vec<u64>) {
+    meter::collection(usize::from(!b.is_empty()), 0, 0, 1);
     assert_eq!(b.last(), Some(&1));
     let mut q = vec![0; a.len().saturating_sub(b.len()) + 1];
-    while a.len() >= b.len() {
+    meter::collection(0, 0, q.len(), 0);
+    while {
+        meter::collection(0, 0, 0, 1);
+        a.len() >= b.len()
+    } {
         let shift = a.len() - b.len();
+        meter::collection(1, 1, 0, 0); // last coefficient read and copied to q
         let c = *a.last().unwrap();
         q[shift] = c;
         for (i, &bi) in b.iter().enumerate() {
+            meter::collection(2, 0, 0, 0);
             a[i + shift] = sub(a[i + shift], mul(c, bi, p), p);
         }
         a = trim(a);
@@ -596,31 +801,43 @@ fn divide_monic(mut a: Vec<u64>, b: &[u64], p: u64) -> (Vec<u64>, Vec<u64>) {
 fn complement(d: Divisor, lambda: u64, h: &[u64], p: u64) -> (Vec<u64>, Vec<u64>) {
     let u = &d.u[..=d.degree];
     let mut w = vec![0; u.len()];
+    meter::collection(0, 0, w.len(), 0);
     for i in 0..u.len() {
+        meter::collection(1 + usize::from(i < d.degree), 0, 0, 1);
         let vi = if i < d.degree { d.v[i] } else { 0 };
         w[i] = add(vi, mul(lambda, u[i], p), p);
     }
     let w2 = pmul(&w, &w, p);
     let numerator = trim(
         (0..h.len())
-            .map(|i| sub(*w2.get(i).unwrap_or(&0), h[i], p))
+            .map(|i| {
+                meter::collection(1 + usize::from(i < w2.len()), 0, 1, 0);
+                sub(*w2.get(i).unwrap_or(&0), h[i], p)
+            })
             .collect(),
     );
     let (quotient, remainder) = divide_monic(numerator, u, p);
+    meter::collection(0, 0, 0, 1);
     assert!(remainder.is_empty());
     (quotient, w)
 }
 fn rational_y_by_x(h: &[u64], p: u64) -> Vec<Vec<u64>> {
     let mut square_roots = vec![Vec::new(); p as usize];
+    meter::collection(0, 0, p as usize, 0);
     for y in 0..p {
         square_roots[mul(y, y, p) as usize].push(y);
+        meter::collection(0, 0, 1, 0);
     }
     (0..p)
-        .map(|x| square_roots[peval(h, x, p) as usize].clone())
+        .map(|x| {
+            let roots = &square_roots[peval(h, x, p) as usize];
+            meter::collection(1, roots.len(), 1, 0);
+            roots.clone()
+        })
         .collect()
 }
 type SieveResult = (
-    BTreeSet<u64>,
+    TrackedSet,
     usize,
     usize,
     usize,
@@ -632,6 +849,7 @@ type SieveResult = (
 );
 fn point_sieve_candidates(d: Divisor, h: &[u64], p: u64, rational_y: &[Vec<u64>]) -> SieveResult {
     let mut buckets = vec![Vec::<u64>::new(); p as usize];
+    meter::collection(0, 0, p as usize, 0);
     let mut point_probes = 0;
     let mut denominators = Vec::new();
     let mut exceptional_denominators = Vec::new();
@@ -640,47 +858,64 @@ fn point_sieve_candidates(d: Divisor, h: &[u64], p: u64, rational_y: &[Vec<u64>]
     let u = &d.u[..=d.degree];
     let v = &d.v[..d.degree];
     let (q0, _) = complement(d, 0, h, p);
-    let mut exceptional = BTreeSet::new();
+    let mut exceptional = TrackedSet::new();
     for x in 0..p {
         let ux = peval(u, x, p);
         let vx = peval(v, x, p);
+        meter::collection(0, 0, 0, 1);
         if ux == 0 {
             // q_lambda = q_0 + 2 lambda v + lambda^2 u.  At a root
             // of u, this is linear in lambda even for a double root.
             let qx = peval(&q0, x, p);
             let slope = mul(2, vx, p);
+            meter::collection(0, 0, 0, 1 + usize::from(slope == 0));
             if slope != 0 {
                 exceptional_denominators.push((x, qx, slope));
+                meter::collection(0, 0, 1, 0);
             } else if qx == 0 {
                 exceptional.extend(0..p);
                 all_lambda_points.push(x);
+                meter::collection(0, 0, 1, 0);
             }
             continue;
         }
+        meter::collection(1, 0, 0, 1);
         if rational_y[x as usize].is_empty() {
             continue;
         }
         denominators.push((x, ux, vx));
+        meter::collection(0, 0, 1, 0);
     }
     let ordinary_count = denominators.len();
     let all_denominators: Vec<u64> = denominators
         .iter()
-        .map(|&(_, ux, _)| ux)
-        .chain(exceptional_denominators.iter().map(|&(_, _, slope)| slope))
+        .map(|&(_, ux, _)| {
+            meter::collection(1, 1, 0, 0);
+            ux
+        })
+        .chain(exceptional_denominators.iter().map(|&(_, _, slope)| {
+            meter::collection(1, 1, 0, 0);
+            slope
+        }))
         .collect();
     let mut prefix = vec![1; all_denominators.len() + 1];
+    meter::collection(0, 0, prefix.len(), 0);
     let mut batch_multiplies = 0;
     for (i, &d) in all_denominators.iter().enumerate() {
+        meter::collection(2, 0, 0, 0);
         prefix[i + 1] = mul(prefix[i], d, p);
         batch_multiplies += 1;
     }
+    meter::collection(0, 0, 0, 2);
     let batch_inversions = usize::from(!all_denominators.is_empty());
     let mut suffix = if all_denominators.is_empty() {
         1
     } else {
+        meter::collection(1, 0, 0, 0);
         pow(*prefix.last().unwrap(), p - 2, p)
     };
     for i in (0..all_denominators.len()).rev() {
+        meter::collection(3, 0, 0, 2); // denominator, prefix, selected tuple; inverse assertion and branch
         let d_i = all_denominators[i];
         let inv = mul(prefix[i], suffix, p);
         suffix = mul(suffix, d_i, p);
@@ -691,34 +926,58 @@ fn point_sieve_candidates(d: Divisor, h: &[u64], p: u64, rational_y: &[Vec<u64>]
             let lambda = mul(sub(0, qx, p), inv, p);
             exceptional.insert(lambda);
             exceptional_points.push((lambda, x));
+            meter::collection(0, 0, 1, 0);
             continue;
         }
         let (x, ux, vx) = denominators[i];
+        meter::collection(1, 0, 0, 1); // selected rational-y vector and inverse assertion
         assert_eq!(mul(inv, ux, p), 1);
         for &y in &rational_y[x as usize] {
+            meter::collection(1, 0, 0, 0);
             point_probes += 1;
             let lambda = mul(sub(y, vx, p), inv, p);
             buckets[lambda as usize].push(x);
+            meter::collection(0, 0, 1, 0);
         }
     }
-    let collision_candidates = buckets.iter().filter(|b| b.len() >= 3).count();
+    let collision_candidates = buckets
+        .iter()
+        .filter(|b| {
+            meter::collection(1, 0, 0, 1);
+            b.len() >= 3
+        })
+        .count();
     let exceptional_count = exceptional.len();
     let mut candidates = exceptional;
     for (lambda, bucket) in buckets.iter().enumerate() {
+        meter::collection(1, 0, 0, 1);
         if bucket.len() >= 3 {
+            meter::collection(0, 0, 0, 1); // duplicate cardinality assertion
             assert_eq!(
-                bucket.iter().copied().collect::<BTreeSet<_>>().len(),
+                bucket
+                    .iter()
+                    .map(|&x| {
+                        meter::collection(1, 1, 0, 0);
+                        x
+                    })
+                    .collect::<TrackedSet>()
+                    .len(),
                 bucket.len()
             );
             candidates.insert(lambda as u64);
         }
     }
     for (lambda, x) in exceptional_points {
+        meter::collection(1, 0, 0, 0);
         buckets[lambda as usize].push(x);
+        meter::collection(0, 0, 1, 0);
     }
     for x in all_lambda_points {
+        meter::collection(1, 0, 0, 0);
         for bucket in &mut buckets {
+            meter::collection(1, 0, 0, 0);
             bucket.push(x);
+            meter::collection(0, 0, 1, 0);
         }
     }
     (
@@ -758,9 +1017,14 @@ struct LinearSolver {
 impl LinearSolver {
     fn new(p: u64, r: u64, rational_y: &[Vec<u64>]) -> Self {
         let mut nodes = vec![None; p as usize];
+        meter::collection(0, 0, nodes.len(), 0);
         let mut count = 0;
         for (x, ys) in rational_y.iter().enumerate() {
-            if ys.iter().any(|&y| y != 0) {
+            meter::collection(1, 0, 0, 0);
+            if ys.iter().any(|&y| {
+                meter::collection(1, 0, 0, 1);
+                y != 0
+            }) {
                 nodes[x] = Some(count);
                 count += 1;
             }
@@ -892,6 +1156,35 @@ impl Drop for PriceGuard {
     }
 }
 
+/// An API validation rejection retaining every outer primality call actually made.
+#[derive(Debug, Serialize)]
+pub struct ValidationError {
+    pub schema: &'static str,
+    pub reason: &'static str,
+    pub outer_primality: kernel::outer_primality::OuterValidation,
+}
+impl ValidationError {
+    fn new(
+        reason: &'static str,
+        outer_primality: kernel::outer_primality::OuterValidation,
+    ) -> Box<Self> {
+        Box::new(Self {
+            schema: "pencil-validation-error/v1",
+            reason,
+            outer_primality,
+        })
+    }
+}
+impl std::fmt::Display for ValidationError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match serde_json::to_string(self) {
+            Ok(value) => f.write_str(&value),
+            Err(_) => f.write_str("pencil-validation-error/v1: serialization failed"),
+        }
+    }
+}
+impl std::error::Error for ValidationError {}
+
 /// One independent public target, including cold setup. No planted answer is accepted.
 /// observer must be the process's installed global allocator, or None. The
 /// caller must serialize executions: arithmetic counters are thread-local and
@@ -902,10 +1195,16 @@ pub fn solve_one(
     seed: u64,
     config: Config,
     observer: Option<&ObservedSystem>,
-) -> Result<PencilResult, &'static str> {
-    config.validate()?;
+) -> Result<PencilResult, Box<ValidationError>> {
+    let mut outer_primality = kernel::outer_primality::OuterValidation::default();
+    config
+        .validate()
+        .map_err(|reason| ValidationError::new(reason, outer_primality.clone()))?;
     if inst.family != "scholten" {
-        return Err("pencil requires Scholten family");
+        return Err(ValidationError::new(
+            "pencil requires Scholten family",
+            outer_primality,
+        ));
     }
     let p = inst.curve.f.p;
     if inst.curve.binary
@@ -913,20 +1212,26 @@ pub fn solve_one(
         || inst.curve.f.modulus != 1
         || p <= 13
         || p % 4 != 3
-        || !engine::is_prime(p)
+        || !outer_primality.check_base(p)
         || inst.generator == Point::O
     {
-        return Err("invalid Scholten source representation");
+        return Err(ValidationError::new(
+            "invalid Scholten source representation",
+            outer_primality,
+        ));
     }
     let r = inst.r;
     let order = inst.order;
     if r <= 2
-        || !engine::is_prime(r)
+        || !outer_primality.check_scalar(r)
         || !order.is_multiple_of(r)
         || order == 0
         || inst.h != order / r
     {
-        return Err("invalid scalar subgroup");
+        return Err(ValidationError::new(
+            "invalid scalar subgroup",
+            outer_primality,
+        ));
     }
     let cofactor = order / r;
     let generator = inst.generator;
@@ -938,6 +1243,7 @@ pub fn solve_one(
     let setup_allocation_start = observer.map(ObservedSystem::begin);
     let setup_clock = Instant::now();
     reset_arithmetic_counts();
+    meter::reset();
     let s = Scholten::new(p);
     let source = s.short_curve();
     assert_eq!(source.c, inst.curve.c, "source curve mismatch");
@@ -947,10 +1253,18 @@ pub fn solve_one(
     assert_eq!(s.j.mul(transferred, r), Divisor::O);
     let h = &s.j.polynomial;
     let rational_y = rational_y_by_x(h, p);
-    let rational_curve_points: usize = rational_y.iter().map(Vec::len).sum();
+    let rational_curve_points: usize = rational_y
+        .iter()
+        .map(|ys| {
+            meter::collection(1, 0, 0, 0);
+            ys.len()
+        })
+        .sum();
     let mut projected_points_checked = 0;
     for (x, ys) in rational_y.iter().enumerate() {
+        meter::collection(1, 0, 0, 0);
         for &y in ys {
+            meter::collection(1, 0, 0, 1);
             if projected_points_checked == 16 {
                 break;
             }
@@ -958,6 +1272,7 @@ pub fn solve_one(
             assert_eq!(s.j.mul(projected, r), Divisor::O);
             projected_points_checked += 1;
         }
+        meter::collection(0, 0, 0, 1);
         if projected_points_checked == 16 {
             break;
         }
@@ -965,6 +1280,7 @@ pub fn solve_one(
     assert_eq!(projected_points_checked, 16);
     let setup_field = group_counts(&s);
     let setup_arithmetic = arithmetic_counts();
+    let setup_semantic_counts = meter::snapshot();
     let setup_elapsed_ns = setup_clock.elapsed().as_nanos();
     let setup_allocation = observer
         .zip(setup_allocation_start)
@@ -1015,17 +1331,20 @@ pub fn solve_one(
             let points = measured(observer, &s, &mut phases, "candidate_verification", || {
                 let (quotient, w) = complement(d, lambda, h, p);
                 let roots = &buckets[lambda as usize];
+                meter::collection(1, 0, 0, 1);
                 if roots.len() != 3 {
                     return None;
                 }
                 let mut sum = Divisor::O;
                 let mut points = Vec::with_capacity(3);
                 for &x in roots {
+                    meter::collection(1, 0, 0, 2);
                     assert_eq!(peval(&quotient, x, p), 0);
                     let y = peval(&w, x, p);
                     assert_eq!(mul(y, y, p), peval(h, x, p));
                     sum = s.j.add(sum, s.j.point(x, y));
                     points.push([x, y]);
+                    meter::collection(0, 0, 1, 0);
                 }
                 assert_eq!(s.j.add(d, sum), Divisor::O);
                 Some(points)
@@ -1064,6 +1383,7 @@ pub fn solve_one(
         .zip(candidate_envelope)
         .map(|(o, b)| o.finish_envelope(b));
     let mut pencil_arithmetic = arithmetic_counts();
+    attribute_iterator_bookkeeping(&mut phases, meter::snapshot());
     let candidate_phase_overhead_ns = validate_phases(
         &phases,
         group_counts(&s),
@@ -1075,9 +1395,10 @@ pub fn solve_one(
     let pencil_field = group_counts(&s) + setup_field;
     let setup = json!({"schema":"pencil-symbolic-setup/v2","p":p,"r":r,
         "allocation":setup_allocation,"elapsed_ns":setup_elapsed_ns,
+        "outer_primality":{"schema":"pencil-outer-primality/v1","observations":outer_primality},
         "order":order,"cofactor":cofactor,"rational_curve_points":rational_curve_points,
         "projected_points_checked":projected_points_checked,"matrix_coefficient_cap":matrix_coefficient_cap,
-        "field":setup_field,"arithmetic":setup_arithmetic});
+        "field":setup_field,"arithmetic":setup_arithmetic,"semantic_counts":setup_semantic_counts});
     let detail = json!({"schema":"pencil-symbolic-result/v2","p":p,"r":r,
         "symbolic":graph.detail(),"cost_status":"incomplete_graph_and_allocation_accounting",
         "candidate_over_rho":Value::Null,"candidate_envelope_allocation":candidate_allocation,
@@ -1103,6 +1424,7 @@ pub fn solve_one(
 }
 
 fn walk_label(seed: u64, walk: u64, lane: u64, modulus: u64) -> u64 {
+    meter::walk_label_call();
     let mut x = seed ^ walk.wrapping_mul(0x9e37_79b9_7f4a_7c15) ^ lane;
     x = x.wrapping_add(0x9e37_79b9_7f4a_7c15);
     x = (x ^ (x >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
