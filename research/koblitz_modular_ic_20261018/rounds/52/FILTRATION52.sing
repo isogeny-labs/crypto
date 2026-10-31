@@ -1,0 +1,40 @@
+execute(read("../closure52-02/closure-certificate52.sing"));
+execute(read("../annihilator52-01/annihilator-certificate52.sing"));
+setring annihilatorCertificate52;short=0;option(redSB);
+map closure52=closureCertificate52,u;
+if(final52!=closure52(final52) || matrix(standard52)*fromStandard52!=final52 || final52*toStandard52!=matrix(standard52)){ERROR("FILTRATION52_DONOR_PRODUCTS");quit;}
+matrix I52[32][32];int i52;int k52;int branch52;int bound52;int previous52;int length52;int increment52;int oldIncrement52;
+for(i52=1;i52<=32;i52++){I52[i52,i52]=1;}
+if(final52*recovery52!=annihilator52*I52 || annihilator52!=u^5*(u+1)^9){ERROR("FILTRATION52_RECOVERY_PRODUCT");quit;}
+module M52=std(module(final52));
+module zeroCheck52=reduce(module(u^4*(u+1)^120*I52),M52);module oneCheck52=reduce(module(u^60*(u+1)^8*I52),M52);
+if(matrix(zeroCheck52)!=matrix(zeroRemainder52) || matrix(oneCheck52)!=matrix(oneRemainder52) || size(zeroCheck52)==0 || size(oneCheck52)==0){ERROR("FILTRATION52_MINIMALITY_RELOAD");quit;}
+proc dump52(link out,string name,matrix A){int r;int c;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");for(r=1;r<=nrows(A);r++){for(c=1;c<=ncols(A);c++){if(A[r,c]!=0){write(out,name+"["+string(r)+","+string(c)+"]="+string(A[r,c])+";");}}}}
+link out52="ASCII:w filtration-certificate52.sing";open(out52);write(out52,"ring filtrationCertificate52=2,(u),(c,dp);short=0;");
+intvec exponentsZero52;intvec exponentsOne52;for(i52=1;i52<=32;i52++){exponentsZero52[i52]=0;exponentsOne52[i52]=0;}
+intvec lengthsZero52=0;intvec lengthsOne52=0;poly prime52;module combined52;module standardBasis52;matrix forward52;matrix reverse52;
+for(branch52=0;branch52<=1;branch52++){
+ if(branch52==0){prime52=u;bound52=5;}else{prime52=u+1;bound52=9;}
+ previous52=0;oldIncrement52=32;
+ for(k52=1;k52<=bound52;k52++){
+  combined52=module(final52),module(prime52^k52*I52);standardBasis52=std(combined52);
+  forward52=lift(combined52,standardBasis52);reverse52=lift(standardBasis52,combined52);
+  if(matrix(combined52)*forward52!=matrix(standardBasis52) || matrix(standardBasis52)*reverse52!=matrix(combined52)){ERROR("FILTRATION52_FULL_MODULE_PRODUCTS");quit;}
+  length52=vdim(standardBasis52);increment52=length52-previous52;
+  if(increment52<0 || increment52>oldIncrement52){ERROR("FILTRATION52_LENGTH_CONCAVITY");quit;}
+  if(branch52==0){lengthsZero52[size(lengthsZero52)+1]=length52;}else{lengthsOne52[size(lengthsOne52)+1]=length52;}
+  for(i52=33-increment52;i52<=32;i52++){if(branch52==0){exponentsZero52[i52]++;}else{exponentsOne52[i52]++;}}
+  string suffix52=string(branch52)+"_"+string(k52);
+  dump52(out52,"basis"+suffix52,matrix(standardBasis52));dump52(out52,"forward"+suffix52,forward52);dump52(out52,"reverse"+suffix52,reverse52);
+  print("FILTRATION52_LENGTH branch="+string(branch52)+" k="+string(k52)+" length="+string(length52)+" increment="+string(increment52));
+  previous52=length52;oldIncrement52=increment52;
+ }
+ if((branch52==0 && length52!=60) || (branch52==1 && length52!=120)){ERROR("FILTRATION52_LOCAL_TOTAL");quit;}
+}
+ideal invariantFactors52;poly product52=1;
+for(i52=1;i52<=32;i52++){invariantFactors52[i52]=u^exponentsZero52[i52]*(u+1)^exponentsOne52[i52];product52=product52*invariantFactors52[i52];}
+if(product52!=u^60*(u+1)^120){ERROR("FILTRATION52_INVARIANT_FACTOR_PRODUCT");quit;}
+write(out52,"intvec exponentsZero52="+string(exponentsZero52)+";intvec exponentsOne52="+string(exponentsOne52)+";intvec lengthsZero52="+string(lengthsZero52)+";intvec lengthsOne52="+string(lengthsOne52)+";ideal invariantFactors52="+string(invariantFactors52)+";");close(out52);
+print("FILTRATION52_EXPONENTS zero="+string(exponentsZero52)+" one="+string(exponentsOne52));
+print("FILTRATION52_RESULT local_total_zero=60 local_total_one=120 local_filtration_levels=14 complete_module_products=28 full_recovery_and_minimality_reloaded=true");
+print("FILTRATION52_ALL_CHECKS_PASS");quit;
