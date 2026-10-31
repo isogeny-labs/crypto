@@ -7896,8 +7896,9 @@ mod canonical_component_tests {
                 assert!(transfer.error.is_none() && transfer.stop.is_none());
                 let mut owners = transfer.value.unwrap();
                 let before = std::fs::read(sink.dir.join("events.jsonl")).unwrap();
-                persist_parent_artifacts(&mut owners, &mut parent, root, &binding, &capture)
-                    .unwrap();
+                let storage_result =
+                    persist_parent_artifacts(&mut owners, &mut parent, root, &binding, &capture);
+                assert!(storage_result.is_ok(), "parent storage: engine={engine:?} scenario={scenario} result={storage_result:?} ledger={:?} items={:?}", parent.budget, owners.items.iter().map(|a|(&a.payload.path,a.payload.bytes.len(),a.capture_acknowledged,a.root_artifact.is_some(),quote_parent_storage(a,&capture))).collect::<Vec<_>>());
                 assert!(owners
                     .items
                     .iter()
