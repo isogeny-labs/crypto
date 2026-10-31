@@ -87,6 +87,7 @@ mod tests {
             std::env::temp_dir().join(format!("ml-dataset-phase-test-{}", std::process::id()));
         std::fs::create_dir(&root).unwrap();
         let config = CaseConfig {
+            factor_base_policy: None,
             family: "koblitz".into(),
             n: 23,
             m: 2,

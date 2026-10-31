@@ -554,6 +554,7 @@ mod tests {
                 "filed_before_affected_data":true,"frozen_at":"2026-10-28T00:00:00Z"});
             let protocol = serde_json::to_vec(&protocol).unwrap();
             let plan = super::super::DatasetPlan {
+                factor_base_policies: vec![],
                 schema: "crypto.ml-dataset.plan/v1".into(),
                 field_sizes: vec![7],
                 arities: vec![2],

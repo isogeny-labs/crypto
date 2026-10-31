@@ -101,7 +101,10 @@ fn action(value: &Value, name: &str) -> Result<Value, String> {
 /// Future fields on curves, points, certificates, candidates, or orbit records
 /// cannot silently become model features.
 fn feature_projection(public: &Value, base: &Value) -> Result<Value, String> {
-    if public["schema"] != "ml-ecdlp-instance/v1" || base["schema"] != "ml-ecdlp-factor-base/v1" {
+    if public["schema"] != "ml-ecdlp-instance/v1"
+        || !["ml-ecdlp-factor-base/v1", "ml-ecdlp-factor-base/v2"]
+            .contains(&base["schema"].as_str().unwrap_or_default())
+    {
         return Err("unsupported source feature schema".into());
     }
     let source_field = &public["field"];
@@ -142,7 +145,7 @@ fn feature_projection(public: &Value, base: &Value) -> Result<Value, String> {
             "stabilizer_size":integer(&orbit["stabilizer_size"],"orbit.stabilizer_size")?}))
         })
         .collect::<Result<Vec<Value>, String>>()?;
-    Ok(json!({
+    let mut projected = json!({
         "pdp_domain":STANDARD_PDP_DOMAIN,
         "family":text(&public["family"],"family")?,"n":integer(&public["n"],"n")?,
         "m":integer(&public["m"],"m")?,"twist":boolean(&public["twist"],"twist")?,
@@ -157,7 +160,39 @@ fn feature_projection(public: &Value, base: &Value) -> Result<Value, String> {
             "negation_action":action(&base["negation_action"],"negation_action")?,
             "frobenius_action":action(&base["frobenius_action"],"frobenius_action")?,
             "frobenius_power":integer(&base["frobenius_power"],"factor_base.frobenius_power")?,"orbits":orbits},
-    }))
+    });
+    if base["schema"] == "ml-ecdlp-factor-base/v2" {
+        projected["factor_base"]["policy"] = policy_projection(&base["policy"])?;
+        // Keep the source recipe when a solver-specific projection replaces factor_base.
+        projected["source_factor_base_policy"] = policy_projection(&base["policy"])?;
+    }
+    Ok(projected)
+}
+
+/// Deliberate public recipe fields only. New provenance or enum fields cannot
+/// enter model inputs through a whole-object copy.
+fn policy_projection(value: &Value) -> Result<Value, String> {
+    use super::types::FactorBasePolicy;
+    let policy: FactorBasePolicy =
+        serde_json::from_value(value.clone()).map_err(|e| e.to_string())?;
+    Ok(match policy {
+        FactorBasePolicy::Legacy {} => json!({"kind":"legacy"}),
+        FactorBasePolicy::SampledXProjectedControl { candidate_limit } => {
+            json!({"kind":"sampled_x_projected_control","candidate_limit":candidate_limit})
+        }
+        FactorBasePolicy::BinarySubspaceIntersection {
+            basis,
+            candidate_limit,
+        } => {
+            json!({"kind":"binary_subspace_intersection","basis":basis,"candidate_limit":candidate_limit})
+        }
+        FactorBasePolicy::BinaryFrobeniusUnionIntersection {
+            basis,
+            candidate_limit,
+        } => {
+            json!({"kind":"binary_frobenius_union_intersection","basis":basis,"candidate_limit":candidate_limit})
+        }
+    })
 }
 
 /// Only the public mathematical definition enters the identity. Cost, logs,
@@ -855,9 +890,16 @@ fn export_with_graph_projector(
             let mut split = None;
             let mut feature_status = "missing_verified_public_inputs";
             let mut pdp_domain = None;
+            let mut construction_label = None;
             if has("public.json") && has("factor-base.json") && has("witness.json") {
                 let public: Value = super::read_json(&dir.join("public.json"))?;
                 let base: Value = super::read_json(&dir.join("factor-base.json"))?;
+                if base["schema"] == "ml-ecdlp-factor-base/v2" {
+                    construction_label = Some(json!({"policy":policy_projection(&base["policy"])?,
+                        "status":base["construction_status"],"coordinate_domain_complete":base["coordinate_domain_complete"],
+                        "actual_points":base["points"].as_array().map(Vec::len),
+                        "counters":base["construction_counters"]}));
+                }
                 let alternative = manifest
                     .artifacts
                     .iter()
@@ -870,7 +912,12 @@ fn export_with_graph_projector(
                 {
                     return Err("large-prime domain on a different solver source cell".into());
                 }
-                let inputs = if manifest.config.solver == "pkm" {
+                let inputs = if base["schema"] == "ml-ecdlp-factor-base/v2"
+                    && base["construction_status"] == "unsupported"
+                {
+                    feature_status = "unsupported_factor_base_policy";
+                    None
+                } else if manifest.config.solver == "pkm" {
                     if let Some(artifact) = alternative {
                         if artifact.role != "explicit-alternative-kummer-factor-base"
                             || artifact.encoding != "json"
@@ -1075,6 +1122,7 @@ fn export_with_graph_projector(
                     [
                         "independently-verified-pdp",
                         "restricted-independent-scalar-label",
+                        "prime-root-certificates/v1",
                     ]
                     .contains(&a.role.as_str())
                 })
@@ -1087,11 +1135,15 @@ fn export_with_graph_projector(
                     independent_scalar = Some(decimal(&label["scalar"], "independent scalar")?);
                 }
             }
-            targets.push(&target_id,&json!({"schema":"ml-dataset.restricted-targets/v1","target_id":target_id,
+            let mut target = json!({"schema":"ml-dataset.restricted-targets/v1","target_id":target_id,
                 "feature_id":feature_id,"pdp_domain":pdp_domain,"split_component":component,"split":split,"solver":manifest.config.solver,
                 "labels":manifest.outcome,"known_answer_scalar":known_scalar,"independently_recovered_scalar":independent_scalar,
                 "witness_artifact":witness_ref,"solution_certificates":certificate_refs,
-                "feature_status":feature_status}))?;
+                "feature_status":feature_status});
+            if let Some(construction) = construction_label {
+                target["factor_base_construction"] = construction;
+            }
+            targets.push(&target_id, &target)?;
             index.push(&target_id,&json!({"schema":"ml-dataset.export-index/v1","record_id":target_id,"target_id":target_id,
                 "feature_id":feature_id,"cell":relative,"source_manifest_sha256":manifest_sha,
                 "source_run_sha256":source_run_sha,"source_artifacts":manifest.artifacts,"status":"verified_sealed_cell"}))?;
@@ -1187,7 +1239,7 @@ fn export_with_graph_projector(
         "split_policy":{"domain":SPLIT_DOMAIN,"component":"field-size-nN","assignment":"first 64 hash bits modulo 100: train 0..79, validation 80..89, test 90..99",
             "occurrences_by_partition":split_counts,"all_same_size_families_twists_generators_keys_stay_together":true,
             "cross_size_algebraic_links_merged":false,"row_random_split_permitted":false},
-        "feature_policy":{"version":"strict-structural-allowlist-v6","only_features_jsonl_is_model_input":false,
+        "feature_policy":{"version":if plan.schema == "crypto.ml-dataset.plan/v2" {"strict-structural-allowlist-v7"} else {"strict-structural-allowlist-v6"},"only_features_jsonl_is_model_input":false,
             "model_input_files":["features.jsonl","prefix-features.jsonl","algebraic-features.jsonl"],
             "algebraic_task":"prime-polynomial-consequence/v1; pre-native equations only; independently checked identities for retained native basis rows, with separately searched witnesses",
             "algebraic_claim_limits":["recursive prime m3..15 and p<2^32 only","admission requires a previously certified equality node","separate cumulative consequence-channel caps preserve existing branch budget","witness-dependent cancellation is not exact first/last fall degree","no native-operation or native-instruction witness"],
@@ -1218,6 +1270,7 @@ fn export_with_graph_projector(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::ml_dataset::types::{CaseConfig, FactorBasePolicy};
     use crate::ml_dataset::{curves, CellManifest, DatasetPlan};
 
     struct Fixture(PathBuf);
@@ -1249,6 +1302,35 @@ mod tests {
             m: usize,
             factor_base_size: usize,
         ) -> PathBuf {
+            self.source_with_policy_parameters(
+                family,
+                method,
+                run_solver,
+                n,
+                m,
+                factor_base_size,
+                None,
+            )
+        }
+        fn source_with_policy(
+            &self,
+            family: &str,
+            method: &str,
+            run_solver: bool,
+            policy: Option<super::super::types::FactorBasePolicy>,
+        ) -> PathBuf {
+            self.source_with_policy_parameters(family, method, run_solver, 11, 2, 8, policy)
+        }
+        fn source_with_policy_parameters(
+            &self,
+            family: &str,
+            method: &str,
+            run_solver: bool,
+            n: u32,
+            m: usize,
+            factor_base_size: usize,
+            policy: Option<super::super::types::FactorBasePolicy>,
+        ) -> PathBuf {
             let source = self.0.join("source");
             fs::create_dir(&source).unwrap();
             let mut protocol = json!({"schema":"experiment.protocol/v1","purpose":"native export correctness fixture"});
@@ -1259,7 +1341,12 @@ mod tests {
                 "filed_before_affected_data":true,"frozen_at":"2026-10-28T00:00:00Z"});
             let protocol = serde_json::to_vec(&protocol).unwrap();
             let plan = DatasetPlan {
-                schema: "crypto.ml-dataset.plan/v1".into(),
+                schema: if policy.is_some() {
+                    "crypto.ml-dataset.plan/v2"
+                } else {
+                    "crypto.ml-dataset.plan/v1"
+                }
+                .into(),
                 field_sizes: vec![n],
                 arities: vec![m],
                 families: vec![family.into()],
@@ -1274,6 +1361,7 @@ mod tests {
                 twists: true,
                 protocol_sha256: Some(crate::ml_dataset::digest(&protocol)),
                 split_rule: "curve-twist-component-sha256-v1".into(),
+                factor_base_policies: policy.into_iter().collect(),
             };
             let plan_sha = crate::ml_dataset::digest(&serde_json::to_vec(&plan).unwrap());
             let binding = json!({"schema":"crypto.ml-dataset.run/v1","plan_sha256":plan_sha,
@@ -1384,6 +1472,37 @@ mod tests {
         }
     }
 
+    fn jsonl_rows(path: &Path) -> Vec<Value> {
+        fs::read_to_string(path)
+            .unwrap()
+            .lines()
+            .map(|line| serde_json::from_str(line).unwrap())
+            .collect()
+    }
+
+    fn replace_factor_base_and_rehash(dir: &Path, base: &Value) {
+        let mut manifest: CellManifest =
+            crate::ml_dataset::read_json(&dir.join("manifest.json")).unwrap();
+        fs::write(
+            dir.join("factor-base.json"),
+            serde_json::to_vec(base).unwrap(),
+        )
+        .unwrap();
+        let artifact = manifest
+            .artifacts
+            .iter_mut()
+            .find(|a| a.path == "factor-base.json")
+            .unwrap();
+        (artifact.sha256, artifact.bytes) =
+            crate::store::hash_file(&dir.join(&artifact.path)).unwrap();
+        fs::write(
+            dir.join("manifest.json"),
+            serde_json::to_vec(&manifest).unwrap(),
+        )
+        .unwrap();
+        storage::verify_manifest(dir, &manifest.artifacts).unwrap();
+    }
+
     #[test]
     fn projection_ignores_unknown_secret_and_future_state_at_every_nested_level() {
         let marker = "FORBIDDEN_FUTURE_OR_PRIVATE_VALUE";
@@ -1405,6 +1524,20 @@ mod tests {
         assert!(!encoded.contains("seed"));
         assert!(!encoded.contains("construction"));
         assert_eq!(projected["target"], json!({"x":"3","y":"4"}));
+        let mut versioned = base.clone();
+        versioned["schema"] = json!("ml-ecdlp-factor-base/v2");
+        versioned["policy"] =
+            json!({"kind":"binary_subspace_intersection","basis":[1,2,4],"candidate_limit":8});
+        versioned["construction_context"] = json!({"seed":marker});
+        versioned["construction_counters"] = json!({"rejected":marker});
+        versioned["construction_status"] = json!(marker);
+        let policy_inputs = feature_projection(&public, &versioned).unwrap();
+        assert_eq!(policy_inputs["factor_base"]["policy"], versioned["policy"]);
+        assert!(!serde_json::to_string(&policy_inputs)
+            .unwrap()
+            .contains(marker));
+        versioned["policy"]["unknown_private_field"] = json!(marker);
+        assert!(feature_projection(&public, &versioned).is_err());
         let mut poisoned = public;
         poisoned["field"]["basis"] = json!({"private":marker});
         assert!(feature_projection(&poisoned, &base).is_err());
@@ -1482,6 +1615,10 @@ mod tests {
         assert_eq!(first["export"]["feature_occurrences"], 2);
         assert_eq!(first["export"]["unique_feature_rows"], 1);
         assert_eq!(first["export"]["restricted_target_rows"], 2);
+        assert_eq!(
+            first["export"]["feature_policy"]["version"],
+            "strict-structural-allowlist-v3"
+        );
         let features = fs::read_to_string(out.join("features.jsonl")).unwrap();
         for forbidden in [
             "private_witness",
@@ -2162,5 +2299,248 @@ mod tests {
         assert_eq!(first, split_for_size(23));
         assert_eq!(first.0, "field-size-n23");
         assert_ne!(first.0, split_for_size(24).0);
+    }
+    #[test]
+    fn sealed_policy_export_and_report_keep_construction_labels_restricted() {
+        let f = Fixture::new();
+        let policy = FactorBasePolicy::SampledXProjectedControl {
+            candidate_limit: 64,
+        };
+        let source = f.source_with_policy("prime", "bsgs", false, Some(policy.clone()));
+        let dir = source.join("cells/000000000124");
+        let base: Value = crate::ml_dataset::read_json(&dir.join("factor-base.json")).unwrap();
+        assert_ne!(base["construction_status"], "unsupported");
+        let out = f.0.join("training");
+        let exported = export(&source, &out).unwrap();
+        assert_eq!(exported["export"]["sealed_source_cells"], 2);
+        assert_eq!(exported["export"]["unique_feature_rows"], 1);
+        assert_eq!(exported["export"]["cells_without_verified_features"], 0);
+        assert_eq!(
+            exported["export"]["feature_policy"]["version"],
+            "strict-structural-allowlist-v7"
+        );
+        let features = jsonl_rows(&out.join("features.jsonl"));
+        assert_eq!(features.len(), 1);
+        assert_eq!(
+            features[0]["inputs"]["factor_base"]["policy"],
+            json!(policy)
+        );
+        assert_eq!(
+            features[0]["inputs"]["factor_base"]["points"],
+            base["points"]
+        );
+        assert_eq!(features[0]["inputs"]["pdp_domain"], STANDARD_PDP_DOMAIN);
+        let encoded = serde_json::to_string(&features).unwrap();
+        for forbidden in [
+            "construction_context",
+            "construction_candidates",
+            "construction_counters",
+            "construction_status",
+            "coordinate_domain_complete",
+            "sampling_seed",
+            "known_answer_scalar",
+            "generator_multiplier",
+        ] {
+            assert!(!encoded.contains(forbidden), "{forbidden}");
+        }
+        let expected_construction = json!({
+            "policy":policy,"status":base["construction_status"],
+            "coordinate_domain_complete":base["coordinate_domain_complete"],
+            "actual_points":base["points"].as_array().unwrap().len(),
+            "counters":base["construction_counters"]
+        });
+        let targets = jsonl_rows(&out.join("restricted/targets.jsonl"));
+        assert_eq!(targets.len(), 2);
+        for target in &targets {
+            assert_eq!(target["feature_id"], features[0]["feature_id"]);
+            assert_eq!(target["split_component"], features[0]["split_component"]);
+            assert_eq!(target["factor_base_construction"], expected_construction);
+            assert_eq!(target["feature_status"], "available");
+            assert!(target["known_answer_scalar"].is_string());
+        }
+
+        let report_out = f.0.join("coverage");
+        let report = crate::ml_dataset::report::report_run(&source, &report_out).unwrap();
+        assert_eq!(report["summary"]["counts"]["active_sealed_cells"], 2);
+        assert_eq!(report["summary"]["certificate_replay_performed"], false);
+        let measurements = jsonl_rows(&report_out.join("measurements.jsonl"));
+        let construction: Vec<_> = measurements
+            .iter()
+            .filter(|row| row["kind"] == "factor_base_construction")
+            .collect();
+        assert_eq!(construction.len(), 2);
+        for row in construction {
+            assert_eq!(row["policy"], json!(policy));
+            assert_eq!(row["counters"], base["construction_counters"]);
+            assert_eq!(row["status"], base["construction_status"]);
+            assert_eq!(row["manifest_bound"], true);
+            assert_eq!(row["interpreted_as_retired_instructions"], false);
+        }
+    }
+
+    #[test]
+    fn rehashed_valid_policy_or_sampling_seed_substitution_fails_cell_and_export() {
+        for replace_policy in [true, false] {
+            let f = Fixture::new();
+            let policy = FactorBasePolicy::SampledXProjectedControl {
+                candidate_limit: 64,
+            };
+            let source = f.source_with_policy("prime", "bsgs", false, Some(policy.clone()));
+            let dir = source.join("cells/000000000124");
+            let public: Value = crate::ml_dataset::read_json(&dir.join("public.json")).unwrap();
+            let config: CaseConfig =
+                crate::ml_dataset::read_json(&dir.join("config.json")).unwrap();
+            let original_seed = crate::ml_dataset::factor_bases::sampling_seed(&config);
+            let replacement_policy = if replace_policy {
+                FactorBasePolicy::SampledXProjectedControl {
+                    candidate_limit: 32,
+                }
+            } else {
+                policy
+            };
+            let replacement_seed = if replace_policy {
+                original_seed
+            } else {
+                original_seed ^ 1
+            };
+            let (replacement, _) = crate::ml_dataset::factor_bases::build(
+                &public,
+                &replacement_policy,
+                config.factor_base_size,
+                replacement_seed,
+                false,
+            )
+            .unwrap();
+            // This is a valid construction for its declared recipe and seed.
+            // Only the frozen cell binding makes it the wrong construction.
+            curves::verify_factor_base(&public, &replacement).unwrap();
+            replace_factor_base_and_rehash(&dir, &replacement);
+            crate::ml_dataset::verify_cell(&dir, false).unwrap();
+            assert!(crate::ml_dataset::verify_cell(&dir, true)
+                .unwrap_err()
+                .contains("recipe or control seed differs from frozen config"));
+            let out = f.0.join("rejected-export");
+            assert!(export(&source, &out)
+                .unwrap_err()
+                .contains("recipe or control seed differs from frozen config"));
+            assert!(!out.join("manifest.json").exists());
+            assert!(!out.join("features.jsonl").exists());
+        }
+    }
+    #[test]
+    fn explicit_source_policy_survives_solver_domain_replacement() {
+        for solver in ["pkm", "double-large-prime"] {
+            let f = Fixture::new();
+            let policy = FactorBasePolicy::Legacy {};
+            let source = f.source_with_policy("prime", solver, true, Some(policy.clone()));
+            let out = f.0.join("policy-domain");
+            export(&source, &out).unwrap();
+            let rows = jsonl_rows(&out.join("features.jsonl"));
+            assert!(rows
+                .iter()
+                .any(|row| row["inputs"]["pdp_domain"] != STANDARD_PDP_DOMAIN));
+            for row in rows {
+                assert_eq!(row["inputs"]["source_factor_base_policy"], json!(policy));
+                let encoded = serde_json::to_string(&row).unwrap();
+                for forbidden in [
+                    "sampling_seed",
+                    "construction_candidates",
+                    "construction_counters",
+                    "construction_status",
+                    "factor_base_membership_logs",
+                ] {
+                    assert!(!encoded.contains(forbidden), "{solver}: {forbidden}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn explicit_policy_is_preserved_in_each_retained_causal_and_algebraic_initial() {
+        let f = Fixture::new();
+        let policy = FactorBasePolicy::Legacy {};
+        let source =
+            f.source_with_policy_parameters("prime", "f4", true, 7, 3, 2, Some(policy.clone()));
+        let out = f.0.join("policy-channels");
+        export(&source, &out).unwrap();
+        let static_rows = jsonl_rows(&out.join("features.jsonl"));
+        assert!(!static_rows.is_empty());
+        for row in static_rows {
+            assert_eq!(row["inputs"]["source_factor_base_policy"], json!(policy));
+        }
+        // A bounded producer need not retain an algebraic consequence. Check every
+        // actually retained row; this is not a claim that this fixture produced one.
+        for channel in ["prefix-features.jsonl", "algebraic-features.jsonl"] {
+            for row in jsonl_rows(&out.join(channel)) {
+                assert_eq!(
+                    row["inputs"]["initial"]["source_factor_base_policy"],
+                    json!(policy)
+                );
+                let encoded = serde_json::to_string(&row).unwrap();
+                for forbidden in [
+                    "sampling_seed",
+                    "construction_candidates",
+                    "construction_counters",
+                    "construction_status",
+                    "factor_base_membership_logs",
+                    "known_answer_scalar",
+                ] {
+                    assert!(!encoded.contains(forbidden), "{channel}: {forbidden}");
+                }
+            }
+        }
+    }
+    #[test]
+    fn unsupported_policy_export_and_report_preserve_records_without_features() {
+        let f = Fixture::new();
+        let policy = FactorBasePolicy::BinarySubspaceIntersection {
+            basis: vec![1, 2, 4],
+            candidate_limit: 8,
+        };
+        let source = f.source_with_policy("prime", "bsgs", false, Some(policy.clone()));
+        let out = f.0.join("training");
+        let exported = export(&source, &out).unwrap();
+        assert_eq!(exported["export"]["sealed_source_cells"], 2);
+        assert_eq!(exported["export"]["unique_feature_rows"], 0);
+        assert_eq!(exported["export"]["cells_without_verified_features"], 2);
+        assert!(jsonl_rows(&out.join("features.jsonl")).is_empty());
+        let targets = jsonl_rows(&out.join("restricted/targets.jsonl"));
+        assert_eq!(targets.len(), 2);
+        for target in targets {
+            assert!(target["feature_id"].is_null());
+            assert!(target["pdp_domain"].is_null());
+            assert!(target["split_component"].is_null());
+            assert_eq!(target["feature_status"], "unsupported_factor_base_policy");
+            assert_eq!(target["factor_base_construction"]["policy"], json!(policy));
+            assert_eq!(target["factor_base_construction"]["status"], "unsupported");
+            assert_eq!(target["factor_base_construction"]["actual_points"], 0);
+            assert_eq!(
+                target["factor_base_construction"]["coordinate_domain_complete"],
+                false
+            );
+            assert!(target["factor_base_construction"]["counters"].is_object());
+            assert_eq!(target["labels"]["solver_completed"], false);
+        }
+        assert_eq!(jsonl_rows(&out.join("restricted/index.jsonl")).len(), 2);
+
+        let report_out = f.0.join("coverage");
+        let report = crate::ml_dataset::report::report_run(&source, &report_out).unwrap();
+        assert_eq!(report["summary"]["counts"]["active_sealed_cells"], 2);
+        assert_eq!(
+            report["summary"]["counts"]["recorded_solver_completed_cells"],
+            0
+        );
+        let measurements = jsonl_rows(&report_out.join("measurements.jsonl"));
+        let construction: Vec<_> = measurements
+            .iter()
+            .filter(|row| row["kind"] == "factor_base_construction")
+            .collect();
+        assert_eq!(construction.len(), 2);
+        for row in construction {
+            assert_eq!(row["status"], "unsupported");
+            assert_eq!(row["policy"], json!(policy));
+            assert_eq!(row["actual_points"], 0);
+            assert_eq!(row["coordinate_domain_complete"], false);
+        }
     }
 }

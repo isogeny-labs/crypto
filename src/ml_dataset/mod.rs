@@ -4,6 +4,7 @@ pub mod capture;
 pub mod curves;
 mod execution;
 pub mod export;
+pub mod factor_bases;
 pub mod relations;
 pub mod report;
 pub mod restore;
@@ -28,7 +29,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Child, Command, ExitStatus, Stdio};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
-use types::{Artifact, CaseConfig};
+use types::{Artifact, CaseConfig, FactorBasePolicy};
 
 #[derive(Args)]
 pub struct DatasetArgs {
@@ -249,6 +250,9 @@ pub struct PlanArgs {
     pub seed: u64,
     #[arg(long, default_value_t = 8)]
     pub factor_base_size: usize,
+    /// JSON array of explicit factor-base recipes; selects plan/v2. Omit for exact legacy plan/v1.
+    #[arg(long)]
+    pub factor_base_policies: Option<PathBuf>,
     #[arg(long, default_value_t = 3)]
     pub degree_bound: u32,
     #[arg(long, default_value_t = 100000)]
@@ -311,6 +315,25 @@ pub struct DatasetPlan {
     pub twists: bool,
     pub protocol_sha256: Option<String>,
     pub split_rule: String,
+    /// Empty and absent for frozen plan/v1. Explicit nonempty policy axis for plan/v2.
+    #[serde(
+        default,
+        deserialize_with = "nonempty_policy_axis",
+        skip_serializing_if = "Vec::is_empty"
+    )]
+    pub factor_base_policies: Vec<FactorBasePolicy>,
+}
+
+fn nonempty_policy_axis<'de, D: serde::Deserializer<'de>>(
+    deserializer: D,
+) -> Result<Vec<FactorBasePolicy>, D::Error> {
+    let policies = Vec::<FactorBasePolicy>::deserialize(deserializer)?;
+    if policies.is_empty() || policies.len() > 32 {
+        return Err(serde::de::Error::custom(
+            "a present policy axis must contain 1..32 recipes",
+        ));
+    }
+    Ok(policies)
 }
 
 impl DatasetPlan {
@@ -323,8 +346,17 @@ impl DatasetPlan {
     }
 
     pub fn validate(&self) -> Result<(), String> {
-        if self.schema != "crypto.ml-dataset.plan/v1" || !self.twists {
-            return Err("expected plan/v1 with paired twists".into());
+        let policy_plan = match self.schema.as_str() {
+            "crypto.ml-dataset.plan/v1" if self.factor_base_policies.is_empty() => false,
+            "crypto.ml-dataset.plan/v2" if !self.factor_base_policies.is_empty() => true,
+            _ => {
+                return Err(
+                    "expected plan/v1 without policies or plan/v2 with explicit policies".into(),
+                )
+            }
+        };
+        if !self.twists {
+            return Err("expected paired twists".into());
         }
         if self.field_sizes.is_empty()
             || self.field_sizes.iter().any(|n| !(3..=61).contains(n))
@@ -377,6 +409,20 @@ impl DatasetPlan {
         if self.split_rule != "curve-twist-component-sha256-v1" {
             return Err("unknown split rule".into());
         }
+        if policy_plan {
+            if self.factor_base_policies.len() > 32 {
+                return Err("at most 32 factor-base policies are supported per plan".into());
+            }
+            let mut recipes = BTreeSet::new();
+            for policy in &self.factor_base_policies {
+                for &n in &self.field_sizes {
+                    policy.validate(n)?;
+                }
+                if !recipes.insert(serde_json::to_vec(policy).map_err(|e| e.to_string())?) {
+                    return Err("duplicate factor-base policy recipe".into());
+                }
+            }
+        }
         if let Some(hash) = &self.protocol_sha256 {
             crate::store::index::validate_sha256(hash)?;
         }
@@ -394,6 +440,7 @@ impl DatasetPlan {
             self.generators,
             self.keys,
             2,
+            self.factor_base_policies.len().max(1) as u64,
         ]
         .into_iter()
         .try_fold(1u64, |a, b| {
@@ -412,6 +459,14 @@ impl DatasetPlan {
             d
         };
         let solver = self.solvers[digit(self.solvers.len() as u64) as usize].clone();
+        let factor_base_policy = if self.factor_base_policies.is_empty() {
+            None
+        } else {
+            Some(
+                self.factor_base_policies[digit(self.factor_base_policies.len() as u64) as usize]
+                    .clone(),
+            )
+        };
         let twist = digit(2) == 1;
         let m = self.arities[digit(self.arities.len() as u64) as usize];
         let key_index = digit(self.keys);
@@ -429,6 +484,7 @@ impl DatasetPlan {
             key_index,
             seed: self.seed,
             factor_base_size: self.factor_base_size,
+            factor_base_policy,
             degree_bound: self.degree_bound,
             work_limit: self.work_limit,
             solver,
@@ -938,8 +994,22 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
         }
         DatasetCommand::Budget { command } => println!("{}", run_budget_command(command)?),
         DatasetCommand::Plan(a) => {
+            let factor_base_policies: Vec<FactorBasePolicy> = a
+                .factor_base_policies
+                .as_ref()
+                .map(|path| read_json(path))
+                .transpose()?
+                .unwrap_or_default();
+            if a.factor_base_policies.is_some() && factor_base_policies.is_empty() {
+                return Err("explicit factor-base policy array must not be empty".into());
+            }
             let plan = DatasetPlan {
-                schema: "crypto.ml-dataset.plan/v1".into(),
+                schema: if factor_base_policies.is_empty() {
+                    "crypto.ml-dataset.plan/v1"
+                } else {
+                    "crypto.ml-dataset.plan/v2"
+                }
+                .into(),
                 field_sizes: numbers(&a.n)?,
                 arities: numbers(&a.m)?.into_iter().map(|m| m as usize).collect(),
                 families: a.families.split(',').map(str::to_owned).collect(),
@@ -954,6 +1024,7 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
                 twists: true,
                 protocol_sha256: a.protocol_sha256.clone(),
                 split_rule: "curve-twist-component-sha256-v1".into(),
+                factor_base_policies,
             };
             plan.validate()?;
             let parent = a
@@ -2787,7 +2858,7 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     {
         let public = read_json(&dir.join("public.json"))?;
         let base = read_json(&dir.join("factor-base.json"))?;
-        curves::verify_factor_base(&public, &base)?;
+        curves::verify_factor_base_config(&manifest.config, &public, &base)?;
         if has("prime-f4-input.json")
             && !censored_m3_prefix
             && dynamic_replay == solvers::DynamicReplayDisposition::Ordinary
@@ -3764,6 +3835,7 @@ mod tests {
             twists: true,
             protocol_sha256: None,
             split_rule: "curve-twist-component-sha256-v1".into(),
+            factor_base_policies: Vec::new(),
         }
     }
     #[cfg(target_os = "linux")]
@@ -3864,6 +3936,148 @@ mod tests {
         assert_eq!(a, b);
     }
 
+    #[test]
+    fn frozen_720_cell_pilot_keeps_bytes_and_legacy_mapping() {
+        let bytes = br###"{
+  "arities": [
+    2,
+    4,
+    15
+  ],
+  "curve_seeds": 1,
+  "degree_bound": 3,
+  "factor_base_size": 4,
+  "families": [
+    "koblitz",
+    "binary",
+    "prime"
+  ],
+  "field_sizes": [
+    23
+  ],
+  "generators": 2,
+  "keys": 2,
+  "protocol_sha256": "05a54dacc052b49bf7b9d6ffd776c461f49757e01488088c9a79bbf136f11604",
+  "schema": "crypto.ml-dataset.plan/v1",
+  "seed": 20261027,
+  "solvers": [
+    "bsgs",
+    "enumerate",
+    "root",
+    "sat",
+    "f4",
+    "f5",
+    "f6",
+    "weil",
+    "pkm",
+    "double-large-prime"
+  ],
+  "split_rule": "curve-twist-component-sha256-v1",
+  "twists": true,
+  "work_limit": 20000
+}
+"###;
+        assert_eq!(
+            digest(bytes),
+            "d698efdad6d674e944ebf3741962eb71b38829bdaf882fb8a8407a7fc57f753a"
+        );
+        let plan: DatasetPlan = serde_json::from_slice(bytes).unwrap();
+        plan.validate().unwrap();
+        assert_eq!(plan.cell_count().unwrap(), 720);
+        assert_eq!(
+            digest(&serde_json::to_vec(&plan).unwrap()),
+            "c905e878e3dcb29e407e743874d18b6b7091c097984f829820f26673ccd47f21"
+        );
+        let mut with_empty_axis = serde_json::to_value(&plan).unwrap();
+        with_empty_axis["factor_base_policies"] = json!([]);
+        assert!(serde_json::from_value::<DatasetPlan>(with_empty_axis).is_err());
+        let solvers = [
+            "bsgs",
+            "enumerate",
+            "root",
+            "sat",
+            "f4",
+            "f5",
+            "f6",
+            "weil",
+            "pkm",
+            "double-large-prime",
+        ];
+        for i in 0..720 {
+            let c = plan.cell(i).unwrap();
+            assert_eq!(c.solver, solvers[(i % 10) as usize]);
+            assert_eq!(c.twist, (i / 10) % 2 == 1);
+            assert_eq!(c.m, [2, 4, 15][((i / 20) % 3) as usize]);
+            assert_eq!(c.key_index, (i / 60) % 2);
+            assert_eq!(c.generator_index, (i / 120) % 2);
+            assert_eq!(c.curve_seed, 0);
+            assert_eq!(c.family, ["koblitz", "binary", "prime"][(i / 240) as usize]);
+            assert!(c.factor_base_policy.is_none());
+            assert!(!serde_json::to_string(&c)
+                .unwrap()
+                .contains("factor_base_policy"));
+        }
+        assert_eq!(
+            serde_json::to_string(&plan.cell(0).unwrap()).unwrap(),
+            r#"{"family":"koblitz","n":23,"m":2,"twist":false,"curve_seed":0,"generator_index":0,"key_index":0,"seed":20261027,"factor_base_size":4,"degree_bound":3,"work_limit":20000,"solver":"bsgs"}"#
+        );
+        assert_eq!(
+            serde_json::to_string(&plan.cell(719).unwrap()).unwrap(),
+            r#"{"family":"prime","n":23,"m":15,"twist":true,"curve_seed":0,"generator_index":1,"key_index":1,"seed":20261027,"factor_base_size":4,"degree_bound":3,"work_limit":20000,"solver":"double-large-prime"}"#
+        );
+    }
+
+    #[test]
+    fn policy_axis_preserves_every_matched_problem_and_rejects_ambiguous_versions() {
+        let legacy = plan();
+        let mut explicit = legacy.clone();
+        explicit.schema = "crypto.ml-dataset.plan/v2".into();
+        assert!(explicit.validate().is_err());
+        explicit.factor_base_policies = vec![
+            FactorBasePolicy::Legacy {},
+            FactorBasePolicy::SampledXProjectedControl {
+                candidate_limit: 256,
+            },
+            FactorBasePolicy::BinarySubspaceIntersection {
+                basis: vec![1, 2, 4],
+                candidate_limit: 8,
+            },
+        ];
+        explicit.validate().unwrap();
+        assert_eq!(
+            explicit.cell_count().unwrap(),
+            3 * legacy.cell_count().unwrap()
+        );
+        let solvers = legacy.solvers.len() as u64;
+        for index in 0..legacy.cell_count().unwrap() {
+            for policy_index in 0..3 {
+                let new_index =
+                    (index / solvers) * (solvers * 3) + policy_index * solvers + index % solvers;
+                let mut cell = explicit.cell(new_index).unwrap();
+                assert_eq!(
+                    cell.factor_base_policy.take().unwrap(),
+                    explicit.factor_base_policies[policy_index as usize]
+                );
+                assert_eq!(
+                    serde_json::to_vec(&cell).unwrap(),
+                    serde_json::to_vec(&legacy.cell(index).unwrap()).unwrap()
+                );
+            }
+        }
+        explicit.schema = legacy.schema.clone();
+        assert!(explicit.validate().is_err());
+        explicit.schema = "crypto.ml-dataset.plan/v2".into();
+        explicit
+            .factor_base_policies
+            .push(FactorBasePolicy::Legacy {});
+        assert!(explicit.validate().is_err());
+        explicit.factor_base_policies = vec![FactorBasePolicy::BinarySubspaceIntersection {
+            basis: vec![1, 2, 3],
+            candidate_limit: 8,
+        }];
+        assert!(explicit.validate().is_err());
+    }
+
     struct TempRun(PathBuf);
     impl TempRun {
         fn new() -> Self {
@@ -3898,9 +4112,18 @@ mod tests {
             (p, binding, protocol)
         }
         fn failed_cell(&self, p: &DatasetPlan, binding: &Value, protocol: &[u8]) -> PathBuf {
-            let dir = self.0.join("cells/000000000001");
+            self.failed_cell_at(p, binding, protocol, 1)
+        }
+        fn failed_cell_at(
+            &self,
+            p: &DatasetPlan,
+            binding: &Value,
+            protocol: &[u8],
+            index: u64,
+        ) -> PathBuf {
+            let dir = self.0.join(format!("cells/{index:012}"));
             fs::create_dir_all(&dir).unwrap();
-            let config = p.cell(1).unwrap();
+            let config = p.cell(index).unwrap();
             let mut artifacts = vec![
                 storage::write_json(&dir, "plan.json", "plan", p).unwrap(),
                 storage::write_json(&dir, "run.json", "run", binding).unwrap(),
@@ -3914,7 +4137,7 @@ mod tests {
                 artifacts.push(storage::write_bytes(&dir, path, "log", "utf8", b"").unwrap());
             }
             storage::write_json(&dir,"manifest.json","manifest",&CellManifest {
-                schema:"crypto.ml-dataset.cell/v1".into(),cell_index:1,plan_sha256:binding["plan_sha256"].as_str().unwrap().into(),
+                schema:"crypto.ml-dataset.cell/v1".into(),cell_index:index,plan_sha256:binding["plan_sha256"].as_str().unwrap().into(),
                 config,outcome:json!({"status":"worker_failed","known_answer_verified":false,"solver_completed":false}),artifacts,
             }).unwrap();
             dir

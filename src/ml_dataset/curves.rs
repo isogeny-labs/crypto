@@ -177,7 +177,7 @@ impl Arithmetic {
             }
         }
     }
-    fn frobenius(&self, p: WPoint, power: u32) -> WPoint {
+    pub(super) fn frobenius(&self, p: WPoint, power: u32) -> WPoint {
         match self {
             Self::Binary { fast, .. } => {
                 p.map(|(x, y)| (fast.gf.sqr_k(x, power), fast.gf.sqr_k(y, power)))
@@ -335,7 +335,7 @@ fn factor(n: u64) -> Result<Vec<(u64, u32)>, String> {
     Ok(factors)
 }
 
-fn prime_projection(
+pub(super) fn prime_projection(
     c: &Arithmetic,
     p: WPoint,
     order: u64,
@@ -373,25 +373,36 @@ fn prime_projection(
     (result, multiplier)
 }
 
-struct CyclicMembership {
+pub(super) struct CyclicMembership {
     babies: HashMap<WPoint, u64>,
-    stride: u64,
+    pub(super) stride: u64,
     negative_stride: WPoint,
     order: u64,
 }
 impl CyclicMembership {
     fn new(c: &Arithmetic, g: WPoint, r: u64) -> Self {
+        Self::new_with_reference(c, g, r, false)
+    }
+    pub(super) fn new_with_reference(c: &Arithmetic, g: WPoint, r: u64, reference: bool) -> Self {
         let stride = sqrt_floor(r) + 1;
         let mut babies = HashMap::new();
         let mut current = None;
         for j in 0..stride {
             babies.entry(current).or_insert(j);
-            current = c.add(current, g);
+            current = if reference {
+                c.reference_add(current, g)
+            } else {
+                c.add(current, g)
+            };
         }
         Self {
             babies,
             stride,
-            negative_stride: c.neg(current),
+            negative_stride: if reference {
+                c.reference_mul(g, (r - stride % r) % r)
+            } else {
+                c.neg(current)
+            },
             order: r,
         }
     }
@@ -399,6 +410,14 @@ impl CyclicMembership {
         self.logarithm_counted(c, p).0
     }
     fn logarithm_counted(&self, c: &Arithmetic, p: WPoint) -> (Option<u64>, u64) {
+        self.logarithm_with_reference(c, p, false)
+    }
+    pub(super) fn logarithm_with_reference(
+        &self,
+        c: &Arithmetic,
+        p: WPoint,
+        reference: bool,
+    ) -> (Option<u64>, u64) {
         let mut current = p;
         let mut additions = 0;
         for i in 0..=self.order / self.stride {
@@ -408,7 +427,11 @@ impl CyclicMembership {
                     return (Some(k), additions);
                 }
             }
-            current = c.add(current, self.negative_stride);
+            current = if reference {
+                c.reference_add(current, self.negative_stride)
+            } else {
+                c.add(current, self.negative_stride)
+            };
             additions += 1;
         }
         (None, additions)
@@ -757,6 +780,9 @@ pub fn generate(config: &CaseConfig) -> Result<CaseData, String> {
     if config.factor_base_size == 0 || config.factor_base_size > 4096 {
         return Err("factor base size must lie in 1..4096".into());
     }
+    if let Some(policy) = &config.factor_base_policy {
+        policy.validate(config.n)?;
+    }
     let (arithmetic, field, mut model, order, certificate, k) = construct(config)?;
     let factors = factor(order)?;
     let subgroup = factors.last().ok_or("empty group order factorization")?.0;
@@ -795,8 +821,7 @@ pub fn generate(config: &CaseConfig) -> Result<CaseData, String> {
     );
     let multiplier = generator_rng.gen_range(1..subgroup);
     let generator = arithmetic.mul(base_generator, multiplier);
-    let membership = cofactor
-        .is_multiple_of(subgroup)
+    let membership = (config.factor_base_policy.is_none() && cofactor.is_multiple_of(subgroup))
         .then(|| CyclicMembership::new(&arithmetic, generator, subgroup));
     let mut key_rng = StdRng::seed_from_u64(
         config.seed.rotate_left(7)
@@ -813,78 +838,6 @@ pub fn generate(config: &CaseConfig) -> Result<CaseData, String> {
     model["cofactor"] = u(cofactor);
     model["group_order_factorization"] = factors_json(&factors);
     model["order_certificate"] = certificate;
-    let mut points = Vec::new();
-    let mut seen = HashSet::new();
-    let mut candidates = Vec::new();
-    let mut private_membership_logs = Vec::new();
-    let limit = (config.factor_base_size as u64 * 32 + 128).min(arithmetic.q());
-    for x in 1..limit {
-        let lifts = arithmetic.lift(x);
-        let mut row = Vec::new();
-        for p in lifts {
-            let (projected, projection_multiplier) =
-                prime_projection(&arithmetic, p, order, subgroup, false);
-            let membership_log = membership
-                .as_ref()
-                .and_then(|test| test.logarithm(&arithmetic, projected));
-            let subgroup_member = projected.is_some()
-                && arithmetic.mul(projected, subgroup).is_none()
-                && (membership.is_none() || membership_log.is_some());
-            let accepted = subgroup_member && seen.insert(projected);
-            row.push(json!({"lifted":point_json(p),"projected":point_json(projected),"projection_multiplier":u(projection_multiplier),"cyclic_subgroup_member":subgroup_member,"accepted":accepted}));
-            if accepted {
-                points.push(projected);
-                private_membership_logs.push(membership_log.map(|k| k.to_string()));
-            }
-        }
-        candidates.push(json!({"x":u(x),"lifts":row}));
-        if points.len() >= config.factor_base_size || points.len() as u64 == subgroup - 1 {
-            break;
-        }
-    }
-    let lookup: HashMap<_, _> = points
-        .iter()
-        .copied()
-        .enumerate()
-        .map(|(i, p)| (p, i))
-        .collect();
-    let negation: Vec<_> = points
-        .iter()
-        .map(|&p| lookup.get(&arithmetic.neg(p)).copied())
-        .collect();
-    let frobenius: Vec<_> = points
-        .iter()
-        .map(|&p| lookup.get(&arithmetic.frobenius(p, k)).copied())
-        .collect();
-    let orbits: Vec<_> = points
-        .iter()
-        .map(|&p| {
-            let mut orbit = vec![point_json(p)];
-            let mut cur = arithmetic.frobenius(p, k);
-            while cur != p && orbit.len() <= config.n as usize {
-                orbit.push(point_json(cur));
-                cur = arithmetic.frobenius(cur, k);
-            }
-            let action_order = if config.family == "prime" {
-                1
-            } else {
-                config.n as usize / k as usize
-            };
-            json!({"points":orbit,"closed":cur==p,"stabilizer_size":action_order / orbit.len()})
-        })
-        .collect();
-    let factor_base = json!({
-        "schema":"ml-ecdlp-factor-base/v1","rule":"small-x-prime-primary-projection-with-cyclic-membership",
-        "projection_rule":"multiply by N/r^v_r(N), then trim by r until exact order r; multiplier retained for every candidate",
-        "cyclic_membership_method":if membership.is_some(){"bounded-bsgs-diagnostic; computed membership logs restricted to private provenance; setup cost must be charged"}else{"unique subgroup because r divides N once"},
-        "points":points.into_iter().map(point_json).collect::<Vec<_>>(),
-        "requested_size":config.factor_base_size,"negation_closed":negation.iter().all(Option::is_some),
-        "size_policy":"retain-both-signs; may exceed requested size by one; capped by subgroup cardinality",
-        "construction_candidates":candidates,"negation_action":negation,"frobenius_action":frobenius,
-        "frobenius_power":k,"orbits":orbits,
-        "construction_status":if lookup.len()>=config.factor_base_size || lookup.len() as u64==subgroup-1 {"verified"} else {"budget_exhausted"},
-        "known_log_features":false
-    });
     let public_instance = json!({
         "schema":"ml-ecdlp-instance/v1","family":config.family,"n":config.n,"m":config.m,"twist":config.twist,
         "field":field,"curve":model,"generator":point_json(generator),"target":point_json(target),
@@ -896,9 +849,98 @@ pub fn generate(config: &CaseConfig) -> Result<CaseData, String> {
         "split_component":format!("field-size-n{}",config.n),
         "split_policy":"conservative whole-size holdout: all seeds, families, isomorphic models, generators, keys and twists at the same n stay together; cross-size algebraic transfer links require a future merged-component index"
     });
+    let (factor_base, private_membership_logs) = if let Some(policy) = &config.factor_base_policy {
+        super::factor_bases::build(
+            &public_instance,
+            policy,
+            config.factor_base_size,
+            super::factor_bases::sampling_seed(config),
+            false,
+        )?
+    } else {
+        let mut points = Vec::new();
+        let mut seen = HashSet::new();
+        let mut candidates = Vec::new();
+        let mut private_membership_logs = Vec::new();
+        let limit = (config.factor_base_size as u64 * 32 + 128).min(arithmetic.q());
+        for x in 1..limit {
+            let lifts = arithmetic.lift(x);
+            let mut row = Vec::new();
+            for p in lifts {
+                let (projected, projection_multiplier) =
+                    prime_projection(&arithmetic, p, order, subgroup, false);
+                let membership_log = membership
+                    .as_ref()
+                    .and_then(|test| test.logarithm(&arithmetic, projected));
+                let subgroup_member = projected.is_some()
+                    && arithmetic.mul(projected, subgroup).is_none()
+                    && (membership.is_none() || membership_log.is_some());
+                let accepted = subgroup_member && seen.insert(projected);
+                row.push(json!({"lifted":point_json(p),"projected":point_json(projected),"projection_multiplier":u(projection_multiplier),"cyclic_subgroup_member":subgroup_member,"accepted":accepted}));
+                if accepted {
+                    points.push(projected);
+                    private_membership_logs.push(membership_log.map(|k| k.to_string()));
+                }
+            }
+            candidates.push(json!({"x":u(x),"lifts":row}));
+            if points.len() >= config.factor_base_size || points.len() as u64 == subgroup - 1 {
+                break;
+            }
+        }
+        let lookup: HashMap<_, _> = points
+            .iter()
+            .copied()
+            .enumerate()
+            .map(|(i, p)| (p, i))
+            .collect();
+        let negation: Vec<_> = points
+            .iter()
+            .map(|&p| lookup.get(&arithmetic.neg(p)).copied())
+            .collect();
+        let frobenius: Vec<_> = points
+            .iter()
+            .map(|&p| lookup.get(&arithmetic.frobenius(p, k)).copied())
+            .collect();
+        let orbits: Vec<_> = points
+            .iter()
+            .map(|&p| {
+                let mut orbit = vec![point_json(p)];
+                let mut cur = arithmetic.frobenius(p, k);
+                while cur != p && orbit.len() <= config.n as usize {
+                    orbit.push(point_json(cur));
+                    cur = arithmetic.frobenius(cur, k);
+                }
+                let action_order = if config.family == "prime" {
+                    1
+                } else {
+                    config.n as usize / k as usize
+                };
+                json!({"points":orbit,"closed":cur==p,"stabilizer_size":action_order / orbit.len()})
+            })
+            .collect();
+        let factor_base = json!({
+            "schema":"ml-ecdlp-factor-base/v1","rule":"small-x-prime-primary-projection-with-cyclic-membership",
+            "projection_rule":"multiply by N/r^v_r(N), then trim by r until exact order r; multiplier retained for every candidate",
+            "cyclic_membership_method":if membership.is_some(){"bounded-bsgs-diagnostic; computed membership logs restricted to private provenance; setup cost must be charged"}else{"unique subgroup because r divides N once"},
+            "points":points.into_iter().map(point_json).collect::<Vec<_>>(),
+            "requested_size":config.factor_base_size,"negation_closed":negation.iter().all(Option::is_some),
+            "size_policy":"retain-both-signs; may exceed requested size by one; capped by subgroup cardinality",
+            "construction_candidates":candidates,"negation_action":negation,"frobenius_action":frobenius,
+            "frobenius_power":k,"orbits":orbits,
+            "construction_status":if lookup.len()>=config.factor_base_size || lookup.len() as u64==subgroup-1 {"verified"} else {"budget_exhausted"},
+            "known_log_features":false
+        });
+        (
+            factor_base,
+            private_membership_logs
+                .into_iter()
+                .map(|v| json!(v))
+                .collect::<Vec<Value>>(),
+        )
+    };
     let private_witness = json!({"schema":"ml-ecdlp-private-witness/v1","scalar":u(scalar),"generator_multiplier":u(multiplier),"base_generator":point_json(base_generator),"generator_construction_attempts":generator_attempts,"factor_base_membership_logs":private_membership_logs,"sampling_provenance":{"seed":config.seed,"curve_seed":config.curve_seed,"generator_index":config.generator_index,"key_index":config.key_index},"feature_access":"forbidden; replay and supervised-label store only"});
     verify(&public_instance, &private_witness)?;
-    verify_factor_base(&public_instance, &factor_base)?;
+    verify_factor_base_config(config, &public_instance, &factor_base)?;
     Ok(CaseData {
         public_instance,
         private_witness,
@@ -1307,6 +1349,9 @@ pub fn verify(public: &Value, private: &Value) -> Result<(), String> {
 }
 
 pub fn verify_factor_base(public: &Value, base: &Value) -> Result<(), String> {
+    if base["schema"] == "ml-ecdlp-factor-base/v2" {
+        return super::factor_bases::verify(public, base);
+    }
     if base["schema"] != "ml-ecdlp-factor-base/v1"
         || base["rule"] != "small-x-prime-primary-projection-with-cyclic-membership"
     {
@@ -1465,6 +1510,42 @@ pub fn verify_factor_base(public: &Value, base: &Value) -> Result<(), String> {
     Ok(())
 }
 
+/// Bind the reconstructed base to the frozen cell, including restricted
+/// sampling provenance. Base-only replay verifies its declared recipe; this
+/// additional check ensures that recipe is the one the plan selected.
+pub fn verify_factor_base_config(
+    config: &CaseConfig,
+    public: &Value,
+    base: &Value,
+) -> Result<(), String> {
+    if base["requested_size"].as_u64() != Some(config.factor_base_size as u64)
+        || public["n"].as_u64() != Some(config.n as u64)
+        || public["m"].as_u64() != Some(config.m as u64)
+        || public["family"] != config.family
+        || public["twist"] != config.twist
+    {
+        return Err("factor base or public identity differs from frozen config".into());
+    }
+    match &config.factor_base_policy {
+        None if base["schema"] == "ml-ecdlp-factor-base/v1" => {}
+        Some(policy) if base["schema"] == "ml-ecdlp-factor-base/v2" => {
+            policy.validate(config.n)?;
+            let saved: super::types::FactorBasePolicy =
+                serde_json::from_value(base["policy"].clone()).map_err(|e| e.to_string())?;
+            if saved != *policy
+                || number(
+                    &base["construction_context"]["sampling_seed"],
+                    "policy sampling seed",
+                )? != super::factor_bases::sampling_seed(config)
+            {
+                return Err("factor-base recipe or control seed differs from frozen config".into());
+            }
+        }
+        _ => return Err("factor-base schema differs from frozen policy version".into()),
+    }
+    verify_factor_base(public, base)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1479,6 +1560,7 @@ mod tests {
             key_index: 1,
             seed: 42,
             factor_base_size: 8,
+            factor_base_policy: None,
             degree_bound: 4,
             work_limit: 1000,
             solver: "enumerate".into(),

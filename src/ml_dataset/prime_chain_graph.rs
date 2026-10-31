@@ -743,6 +743,7 @@ mod tests {
 
     fn input(n: u32, m: usize, twist: bool) -> (Value, Value, Value) {
         let config = CaseConfig {
+            factor_base_policy: None,
             family: "prime".into(),
             n,
             m,

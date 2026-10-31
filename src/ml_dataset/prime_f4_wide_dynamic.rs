@@ -5503,6 +5503,7 @@ mod tests {
             for twist in [false, true] {
                 for m in 4..=15 {
                     let cfg = super::super::CaseConfig {
+                        factor_base_policy: None,
                         family: "prime".into(),
                         n,
                         m,

@@ -1079,7 +1079,7 @@ pub(super) fn verify(
         return Err("wide public instance differs from frozen config".into());
     }
     curves::verify_public(&case.public_instance)?;
-    curves::verify_factor_base(&case.public_instance, &case.factor_base)?;
+    curves::verify_factor_base_config(config, &case.public_instance, &case.factor_base)?;
     let group = Group::read(&case)?;
     let target = group.point(&case.public_instance["target"])?;
     let domain = domain(&group, &case)?;
@@ -1532,6 +1532,7 @@ mod tests {
     }
     fn fixture_at(twist: bool, n: u32) -> (CaseConfig, CaseData, SolverExecutionContext) {
         let cfg = CaseConfig {
+            factor_base_policy: None,
             family: "prime".into(),
             solver: "f4".into(),
             n,

@@ -323,7 +323,7 @@ pub(super) fn verify_and_store_worker_originals<'a>(
         curves::verify(&case.public_instance, &case.private_witness)
     })?;
     super::telemetry::measured(root, registry, "factor-base-replay", || {
-        curves::verify_factor_base(&case.public_instance, &case.factor_base)
+        curves::verify_factor_base_config(config, &case.public_instance, &case.factor_base)
     })?;
     let public = super::storage::write_json(
         root,
@@ -921,6 +921,15 @@ pub(super) fn solve_with_context(
             outcome: unsupported,
             artifacts: Vec::new(),
         });
+    }
+    if case.factor_base["schema"] == "ml-ecdlp-factor-base/v2"
+        && case.factor_base["construction_status"] == "unsupported"
+    {
+        return Ok(unsupported(
+            case.factor_base["unsupported_reason"]
+                .as_str()
+                .unwrap_or("The requested factor-base policy is unsupported"),
+        ));
     }
     let group = Group::read(case)?;
     let target = group.point(&case.public_instance["target"])?;
@@ -3495,7 +3504,7 @@ fn dynamic_original(
         return Err("dynamic public inputs differ from original configuration".into());
     }
     curves::verify_public(public)?;
-    curves::verify_factor_base(public, &case.factor_base)?;
+    curves::verify_factor_base_config(config, public, &case.factor_base)?;
     let group = Group::read(case)?;
     let Group::Prime(curve) = &group else {
         return Err("dynamic profile requires a prime curve".into());
@@ -4232,6 +4241,7 @@ mod tests {
     #[test]
     fn dynamic_unsupported_axes_preserve_outcomes_without_reading_curve_bytes() {
         let base = CaseConfig {
+            factor_base_policy: None,
             family: "prime".into(),
             n: 47,
             m: 4,
@@ -4281,6 +4291,7 @@ mod tests {
     fn dynamic_runtime_composes_actual_bound_capture_and_independent_replay() {
         for twist in [false, true] {
             let config = CaseConfig {
+                factor_base_policy: None,
                 family: "prime".into(),
                 n: 47,
                 m: 4,
@@ -4650,6 +4661,7 @@ mod tests {
             for m in [4, 15] {
                 for twist in [false, true] {
                     let config = CaseConfig {
+                        factor_base_policy: None,
                         family: "prime".into(),
                         n,
                         m,
@@ -4707,6 +4719,7 @@ mod tests {
     #[test]
     fn dynamic_original_rejects_unbound_or_different_profile_limits() {
         let config = CaseConfig {
+            factor_base_policy: None,
             family: "prime".into(),
             n: 47,
             m: 4,
@@ -5213,6 +5226,7 @@ mod tests {
 
     fn config(family: &str, solver: &str) -> CaseConfig {
         CaseConfig {
+            factor_base_policy: None,
             family: family.into(),
             n: 7,
             m: 2,
@@ -6162,6 +6176,27 @@ mod verified_worker_original_tests {
             execution_required: bool,
             positive_control: bool,
         ) -> Self {
+            Self::with_policy_profile(
+                n,
+                twist,
+                factor_base_size,
+                solver,
+                work_limit,
+                execution_required,
+                positive_control,
+                None,
+            )
+        }
+        fn with_policy_profile(
+            n: u32,
+            twist: bool,
+            factor_base_size: usize,
+            solver: &str,
+            work_limit: u64,
+            execution_required: bool,
+            positive_control: bool,
+            policy: Option<crate::ml_dataset::types::FactorBasePolicy>,
+        ) -> Self {
             let nonce = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
@@ -6185,7 +6220,13 @@ mod verified_worker_original_tests {
             protocol["freeze"] = json!({"status":"frozen", "protocol_sha256":dataset::digest(&body), "filed_before_affected_data":true, "frozen_at":"2026-10-31T00:00:00Z"});
             let bytes = serde_json::to_vec(&protocol).unwrap();
             let plan = dataset::DatasetPlan {
-                schema: "crypto.ml-dataset.plan/v1".into(),
+                factor_base_policies: policy.clone().into_iter().collect(),
+                schema: if policy.is_some() {
+                    "crypto.ml-dataset.plan/v2"
+                } else {
+                    "crypto.ml-dataset.plan/v1"
+                }
+                .into(),
                 field_sizes: vec![n],
                 arities: vec![3],
                 families: vec!["koblitz".into()],
@@ -6245,6 +6286,79 @@ mod verified_worker_original_tests {
             }
         }
     }
+    #[test]
+    fn worker_token_rejects_self_consistent_policy_substitution_before_original_writes() {
+        use crate::ml_dataset::types::FactorBasePolicy;
+        for replace_policy in [true, false] {
+            let policy = FactorBasePolicy::SampledXProjectedControl {
+                candidate_limit: 64,
+            };
+            // Recipe, plan, config and binding are frozen before generating or verifying input.
+            let f = Fixture::with_policy_profile(
+                11,
+                false,
+                4,
+                "enumerate",
+                16384,
+                false,
+                false,
+                Some(policy.clone()),
+            );
+            let seed = dataset::factor_bases::sampling_seed(&f.config);
+            let wrong = if replace_policy {
+                FactorBasePolicy::SampledXProjectedControl {
+                    candidate_limit: 32,
+                }
+            } else {
+                policy
+            };
+            let mut case = f.case.clone();
+            case.factor_base = dataset::factor_bases::build(
+                &case.public_instance,
+                &wrong,
+                f.config.factor_base_size,
+                if replace_policy { seed } else { seed ^ 1 },
+                false,
+            )
+            .unwrap()
+            .0;
+            curves::verify_factor_base(&case.public_instance, &case.factor_base).unwrap();
+            let mut registry = Vec::new();
+            let error = verify_and_store_worker_originals(
+                &f.config,
+                &case,
+                &f.root,
+                Some(&f.binding),
+                &mut registry,
+            )
+            .err()
+            .expect("substituted recipe must not mint token");
+            assert!(error.contains("recipe or control seed differs from frozen config"));
+            assert!(!f.root.join("public.json").exists());
+            assert!(!f.root.join("factor-base.json").exists());
+        }
+        let f = Fixture::with_policy_profile(
+            11,
+            false,
+            4,
+            "enumerate",
+            16384,
+            false,
+            false,
+            Some(FactorBasePolicy::Legacy {}),
+        );
+        let mut registry = Vec::new();
+        verify_and_store_worker_originals(
+            &f.config,
+            &f.case,
+            &f.root,
+            Some(&f.binding),
+            &mut registry,
+        )
+        .unwrap();
+        assert!(f.root.join("factor-base.json").exists());
+    }
+
     #[test]
     fn worker_koblitz_dispatch_rejects_missing_context_before_capture_creation() {
         let f = Fixture::with_runtime_shape(23, false, 4, "f4");
@@ -6403,6 +6517,7 @@ mod capability_dispatch_metadata_controls {
     use super::*;
     fn config() -> CaseConfig {
         CaseConfig {
+            factor_base_policy: None,
             family: "koblitz".into(),
             n: 23,
             m: 3,

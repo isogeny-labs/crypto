@@ -898,7 +898,7 @@ pub(super) fn verify(
         return Err("m3 public/config mismatch".into());
     }
     curves::verify_public(public)?;
-    curves::verify_factor_base(public, &case.factor_base)?;
+    curves::verify_factor_base_config(config, public, &case.factor_base)?;
     let group = Group::read(&case)?;
     let target = group.point(&public["target"])?;
     let domain = domain(&group, &case)?;
@@ -1449,6 +1449,7 @@ mod tests {
     use super::*;
     fn fixture_at(twist: bool, n: u32) -> (CaseConfig, CaseData, SolverExecutionContext) {
         let cfg = CaseConfig {
+            factor_base_policy: None,
             family: "prime".into(),
             solver: "f4".into(),
             n,

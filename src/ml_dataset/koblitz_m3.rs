@@ -389,7 +389,7 @@ pub(super) fn original_math(
     // irreducibility, subgroup checks and factor-base construction replay.
     // Their setup cost is not represented by native S4 reservation counters.
     curves::verify_public(public)?;
-    curves::verify_factor_base(public, &case.factor_base)?;
+    curves::verify_factor_base_config(config, public, &case.factor_base)?;
     let group = Group::read(case)?;
     let Group::Binary(curve) = &group else {
         return Err("Koblitz profile requires actual binary curve".into());
@@ -1199,6 +1199,7 @@ mod admission_tests {
             protocol["freeze"] = json!({"status":"frozen", "protocol_sha256":dataset::digest(&body), "filed_before_affected_data":true, "frozen_at":"2026-10-30T00:00:00Z"});
             let bytes = serde_json::to_vec(&protocol).unwrap();
             let plan = dataset::DatasetPlan {
+                factor_base_policies: vec![],
                 schema: "crypto.ml-dataset.plan/v1".into(),
                 field_sizes: vec![23],
                 arities: vec![3],
@@ -1342,6 +1343,7 @@ mod mathematical_tests {
 
     fn config(n: u32, twist: bool, size: usize) -> CaseConfig {
         CaseConfig {
+            factor_base_policy: None,
             family: "koblitz".into(),
             n,
             m: 3,
@@ -1444,6 +1446,7 @@ mod construction_tests {
 
     pub(super) fn fixture() -> MathInput {
         let config = CaseConfig {
+            factor_base_policy: None,
             family: "koblitz".into(),
             n: 23,
             m: 3,
@@ -1841,6 +1844,7 @@ mod input_verification_tests {
         for n in [23, 31, 47, 53, 61] {
             for twist in [false, true] {
                 let config = CaseConfig {
+                    factor_base_policy: None,
                     family: "koblitz".into(),
                     n,
                     m: 3,
@@ -2051,6 +2055,7 @@ mod signed_prefix_tests {
         for n in [23, 31, 47, 53, 61] {
             for twist in [false, true] {
                 let cfg = CaseConfig {
+                    factor_base_policy: None,
                     family: "koblitz".into(),
                     n,
                     m: 3,
@@ -13564,7 +13569,11 @@ mod positive_original_bound_worker_tests {
             "restricted known answer recovered for the fixed positive software target".into();
         // Independent general library multiplication validates the fast setup.
         solvers::curves::verify(&case.public_instance, &case.private_witness)?;
-        solvers::curves::verify_factor_base(&case.public_instance, &case.factor_base)?;
+        solvers::curves::verify_factor_base_config(
+            config,
+            &case.public_instance,
+            &case.factor_base,
+        )?;
         Ok(case)
     }
 
