@@ -18,5 +18,6 @@ No arrays,polynomial arithmetic,field irreducibility,normalization or projective
 geometry are evaluated by these Lean statements. Full pole divisors,proper
 polarization,global modular target identities and intended11action remain open.
 
-Compilation/audit must be terminal before an acceptance count is reported.
+Compilation and separate audit both exit0:all four authored declarations pass,
+zero failing and zero trusted. Concrete arithmetic remains native,as above.
 No sorry,native_decide,newaxiom or trusted declaration is permitted.

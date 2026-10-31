@@ -31,14 +31,14 @@ all member hashes and deterministic repacking pass. These are byte-custody
 checks,not mathematical producer reruns or an independent scientific review.
 
 ```bash
-ARTIFACTS_REMOTE=s3://setec-astronomy-artifacts/store python3 tools/artifacts/artifacts.py pull research/koblitz_modular_ic_20261018/rounds/54
-cd research/koblitz_modular_ic_20261018/rounds/54
+ARTIFACTS_REMOTE=s3://setec-astronomy-artifacts/store python3 tools/artifacts/artifacts.py pull research/koblitz_modular_ic_20261018/rounds/55
+cd research/koblitz_modular_ic_20261018/rounds/55
 tar -xJf runs.tar.xz
 sha256sum -c runs.sha256
 ```
 
 Read CM.md,PROOF_MAP.md,SESSION.md and NEXT.md. The donor manifest also
-requires retained R52/R53 archives for a native replay. Do not repeat an
+requires retained R52/R54 archives for a native replay. Do not repeat an
 accepted producer merely to publish or verify custody.
 ''')
 print(json.dumps({'raw_sha256':digest,'bucket':bucket,'key':key,'fresh_download_verified':True}))

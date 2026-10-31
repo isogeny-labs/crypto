@@ -61,9 +61,15 @@ source/quotient predictions,with exit0,exact marker and no native error lines.
 Non-error ring/link redefinitions are retained. Same limits:4GiBvirtual,
 1200seconds,one Singular/FLINT thread,seed55. Python/shell handle metadata only.
 
-The serialized checker and Lean implications are separately frozen stages;
-their actual terminal receipts,not this planned paragraph,decide acceptance.
-Actual normal-source geometry and field arrays remain native premises for Lean.
+Four conditional Lean implications compiled and passed the separate axiom audit,
+zero failing and zero trusted declarations. The first serialized checker is
+rejected because a polynomial temporary was declared in the wrong ring;its
+late marker is excluded. The corrected check55-02 passes:all25,600binary entries,12,800evaluation
+entries,full recoveryproducts,128point-value labels and528sourceproducts
+are freshly reconstructed. The base polynomial passes its own binary
+Frobenius/gcd irreducibility test. All six workflows are terminal,four accepted
+and two rejected;35executed historical byte pins match Git. Actual normal-source
+geometry and field arrays remain native premises for Lean.
 No official hypothesis promotion or independent scientific review is claimed.
 
 ## Sources and next leads
