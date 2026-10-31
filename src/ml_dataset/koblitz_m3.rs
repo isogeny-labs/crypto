@@ -7583,3 +7583,403 @@ mod terminal_result_reader_tests {
         .is_err());
     }
 }
+
+struct VerifiedCanonicalComponents {
+    math: VerifiedCanonicalMath,
+    native_boundaries: usize,
+    reported_group_complete: bool,
+    input_zero_assignments: usize,
+}
+/// Join canonical arithmetic, reported terminal metadata and authenticated
+/// boundary records. Original run admission and supervisor outcome remain
+/// external gates; matrix row consistency is not a derivation certificate.
+fn verify_canonical_components(
+    dir: &std::path::Path,
+    artifacts: &[crate::ml_dataset::types::Artifact],
+    original: &MathInput,
+    binding: &crate::ml_dataset::capture::AttemptBinding,
+    capture_limits: &crate::ml_dataset::capture::CaptureLimits,
+    limits: OriginalLimits,
+    public_sha256: &str,
+    factor_base_sha256: &str,
+    engine: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Engine,
+    degree: u32,
+) -> Result<VerifiedCanonicalComponents, String> {
+    use super::prime_f4_wide::{artifact, read_bounded};
+    let math = verify_canonical_math_files(
+        dir,
+        artifacts,
+        original,
+        binding,
+        capture_limits,
+        limits,
+        public_sha256,
+        factor_base_sha256,
+    )?;
+    let read = |path: &str, role: &str, encoding: &str, cap: usize| -> Result<Vec<u8>, String> {
+        let a = artifact(artifacts, path, role, encoding, true)?
+            .ok_or("missing canonical component")?;
+        let bytes = read_bounded(dir, path, cap)?;
+        if a.bytes != bytes.len() as u64 || a.sha256 != crate::ml_dataset::digest(&bytes) {
+            return Err("canonical component changed after manifest verification".into());
+        }
+        Ok(bytes)
+    };
+    let input = read(
+        "koblitz-m3-input.json",
+        "restricted-koblitz-m3-original-equations/v1",
+        "json",
+        INPUT_BYTE_CAP,
+    )?;
+    let group = read(
+        "koblitz-m3-group-replay.json",
+        "restricted-koblitz-m3-group-replay/v1",
+        "json",
+        SIGNED_REPLAY_BYTE_CAP,
+    )?;
+    let terminal = read(
+        "koblitz-m3-result.json",
+        "restricted-koblitz-m3-result/v1",
+        "json",
+        64 * 1024,
+    )?;
+    let boundaries = read(
+        "koblitz-m3-events.jsonl",
+        "restricted-koblitz-m3-boundary-events/v1",
+        "jsonl",
+        4096 * 2048,
+    )?;
+    let input_sha = crate::ml_dataset::digest(&input);
+    let r = decode_terminal_result(
+        &terminal,
+        binding,
+        public_sha256,
+        factor_base_sha256,
+        Some(&input_sha),
+        limits,
+        engine,
+        degree,
+    )?;
+    let g: SavedGroupReplay = serde_json::from_slice(&group).map_err(|e| e.to_string())?;
+    let i: SavedInput = serde_json::from_slice(&input).map_err(|e| e.to_string())?;
+    let captured = verify_native_capture(
+        dir,
+        &boundaries,
+        binding,
+        capture_limits,
+        i.equations.len(),
+        engine,
+        degree,
+    )?;
+    if !captured.construction_complete_captured
+        || !captured.matrix_finish_captured
+        || captured.records as u64 != r.native_capture_acknowledged
+        || r.pending_native.is_some()
+        || !r.group_replay_encoded
+        || r.group_replay_encoding_stop.is_some()
+    {
+        return Err("terminal native completion or retained group differs from capture".into());
+    }
+    let signed = r
+        .signed
+        .as_ref()
+        .ok_or("canonical group lacks terminal signed report")?;
+    if signed.enumeration_additions != g.signed.performed_additions as u64
+        || signed.acknowledged_additions != g.signed.acknowledged.len()
+        || signed.has_unacknowledged_addition != g.signed.unacknowledged.is_some()
+        || signed.witness_check_additions != u64::from(g.reported_witness_check_additions)
+        || r.ledger_before_terminal_encoding.group_additions != g.reported_total_additions
+        || (signed.reported_complete && !math.group.math.prefix.all_tuples_acknowledged)
+    {
+        return Err("terminal signed counters differ from replayed group".into());
+    }
+    let matrix = r
+        .matrix
+        .as_ref()
+        .ok_or("canonical group lacks native matrix report")?;
+    if !matrix.native_step_complete
+        || matrix.counters.attempted_events != captured.matrix_captured as u64
+        || matrix.counters.acknowledged_events != captured.matrix_captured as u64
+    {
+        return Err("terminal matrix completion counters differ from capture".into());
+    }
+    let digest = binding.digest()?;
+    let mut construction_final = None;
+    let mut matrix_final = None;
+    for (index, line) in boundaries.split_inclusive(|b| *b == b'\n').enumerate() {
+        let row = decode_boundary_record(
+            line,
+            &digest,
+            index as u64 + 1,
+            i.equations.len(),
+            engine,
+            degree,
+        )?;
+        match row.event {
+            NativeBoundary::Construction {
+                stage: ConstructionBoundaryStage::Complete,
+                reserved,
+            } => construction_final = Some(reserved),
+            NativeBoundary::Matrix {
+                stage: MatrixBoundaryStage::Finish,
+                reserved,
+                counters,
+            } => matrix_final = Some((reserved, counters)),
+            _ => {}
+        }
+    }
+    let c = r
+        .construction
+        .as_ref()
+        .ok_or("missing terminal construction")?;
+    let c_end = construction_final.ok_or("missing captured construction completion")?;
+    let (m_end, mut m_counts) = matrix_final.ok_or("missing captured matrix finish")?;
+    m_counts.acknowledged_events = m_counts
+        .acknowledged_events
+        .checked_add(1)
+        .ok_or("native acknowledgement overflow")?;
+    if c.reserved.work != c_end.work
+        || c.reserved.bytes != c_end.bytes
+        || matrix.reserved != m_end
+        || native_counter_values(matrix.counters) != native_counter_values(m_counts)
+    {
+        return Err("terminal native reservations or counters differ from final boundaries".into());
+    }
+    let raw: serde_json::Value = serde_json::from_slice(&terminal).map_err(|e| e.to_string())?;
+    let matrix_bytes = serde_json::to_vec(&raw["matrix"]).map_err(|e| e.to_string())?;
+    let row_check = verify_matrix_report(&matrix_bytes, &i.equations, engine, degree, limits)?;
+    let mut last_signed = 0;
+    crate::ml_dataset::capture::verify_live_committed_prefix_visit(
+        dir,
+        binding,
+        capture_limits,
+        &mut |line| {
+            let row: crate::ml_dataset::capture::EventRecord =
+                serde_json::from_slice(line).map_err(|e| e.to_string())?;
+            if row.event["kind"] == "koblitz_m3" {
+                last_signed = row.sequence;
+            }
+            Ok(())
+        },
+    )?
+    .ok_or("missing committed capture")?;
+    let final_producer = captured
+        .last_capture_sequence
+        .max(last_signed)
+        .max(math.witness_publication_sequence.unwrap_or(0));
+    if final_producer != r.capture_count_before_artifact_publication as u64 {
+        return Err("terminal producer capture count differs from authenticated sequence".into());
+    }
+    match (&r.witness_receipt, math.witness_publication_sequence) {
+        (None, None) => {}
+        (Some(w), Some(sequence)) => {
+            let a = artifact(
+                artifacts,
+                "pdp-witness.json",
+                "independently-verified-pdp",
+                "json",
+                true,
+            )?
+            .ok_or("missing witness artifact")?;
+            let sha = w
+                .payload_sha256_bytes
+                .iter()
+                .map(|b| format!("{b:02x}"))
+                .collect::<String>();
+            if w.sequence != Some(sequence) || w.payload_bytes != a.bytes || sha != a.sha256 {
+                return Err(
+                    "terminal receipt differs from authenticated witness publication".into(),
+                );
+            }
+        }
+        _ => return Err("terminal witness presence differs from authenticated publication".into()),
+    }
+    Ok(VerifiedCanonicalComponents {
+        math,
+        native_boundaries: captured.records,
+        reported_group_complete: signed.reported_complete,
+        input_zero_assignments: row_check.input_zero_assignments,
+    })
+}
+#[cfg(test)]
+mod canonical_component_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native;
+    use crate::ml_dataset::{capture::capture_limits, types::Artifact};
+    fn manifest(root: &std::path::Path, positive: bool) -> Vec<Artifact> {
+        let mut names = KOBLITZ_SLOTS.to_vec();
+        names.extend([
+            (
+                "live/committed.json",
+                "unregistered-partial-artifact",
+                "native",
+            ),
+            (
+                "live/events.jsonl",
+                "unregistered-partial-artifact",
+                "native",
+            ),
+        ]);
+        if positive {
+            names.push(("pdp-witness.json", "independently-verified-pdp", "json"));
+        }
+        names
+            .iter()
+            .map(|(path, role, encoding)| {
+                let bytes = std::fs::read(root.join(path)).unwrap();
+                Artifact {
+                    path: (*path).into(),
+                    role: (*role).into(),
+                    encoding: (*encoding).into(),
+                    bytes: bytes.len() as u64,
+                    sha256: crate::ml_dataset::digest(&bytes),
+                }
+            })
+            .collect()
+    }
+    #[test]
+    fn canonical_components_join_real_positive_negative_and_capped_runs() {
+        for engine in [
+            native::Engine::F4Macaulay,
+            native::Engine::F5KoszulFrobenius,
+        ] {
+            for scenario in 0..3 {
+                let positive = scenario == 1;
+                let binding = matrix_tests::binding();
+                let capture = capture_limits(16).unwrap();
+                let sink = bound_signed_publisher_tests::SinkFixture::new(&binding);
+                let root = sink.dir.parent().unwrap();
+                let mut original = construction_tests::fixture();
+                if positive {
+                    original.target = original.signed[0];
+                }
+                let mut budget = construction_tests::budget();
+                if scenario == 2 {
+                    budget.addition_limit = 2;
+                }
+                let limits = budget.original_limits();
+                let mut global = 0;
+                let run = run_canonical_pipeline(
+                    &original,
+                    &binding,
+                    &capture,
+                    &"8".repeat(64),
+                    &"9".repeat(64),
+                    engine,
+                    3,
+                    &mut budget,
+                    &mut global,
+                    &mut |_, _| Ok(()),
+                );
+                assert!(
+                    run.group.as_ref().unwrap().complete && run.result.as_ref().unwrap().complete
+                );
+                let pipeline = run.pipeline.as_ref().unwrap();
+                std::fs::write(
+                    root.join("koblitz-m3-input.json"),
+                    &pipeline.native.matrix.as_ref().unwrap().original_bytes,
+                )
+                .unwrap();
+                std::fs::write(
+                    root.join("koblitz-m3-events.jsonl"),
+                    &pipeline.native.events.as_ref().unwrap().canonical,
+                )
+                .unwrap();
+                std::fs::write(
+                    root.join("koblitz-m3-group-replay.json"),
+                    &run.group.as_ref().unwrap().bytes,
+                )
+                .unwrap();
+                let result = &run.result.as_ref().unwrap().bytes;
+                std::fs::write(root.join("koblitz-m3-result.json"), result).unwrap();
+                if positive {
+                    std::fs::copy(
+                        sink.dir.join("payloads/pdp-witness.json"),
+                        root.join("pdp-witness.json"),
+                    )
+                    .unwrap();
+                }
+                let check = || {
+                    verify_canonical_components(
+                        root,
+                        &manifest(root, positive),
+                        &original,
+                        &binding,
+                        &capture,
+                        limits,
+                        &"8".repeat(64),
+                        &"9".repeat(64),
+                        engine,
+                        3,
+                    )
+                };
+                let verified = check().unwrap();
+                assert_eq!(verified.math.group.math.witness.is_some(), positive);
+                assert_eq!(verified.reported_group_complete, scenario != 2);
+                assert!(verified.native_boundaries > 0);
+                if positive {
+                    assert!(verified.input_zero_assignments > 0);
+                    let base: serde_json::Value = serde_json::from_slice(result).unwrap();
+                    for mutation in 0..6 {
+                        let mut v = base.clone();
+                        match mutation {
+                            0 => {
+                                v["matrix"]["counters"]["reduction_word_xors"] = serde_json::json!(
+                                    base["matrix"]["counters"]["reduction_word_xors"]
+                                        .as_u64()
+                                        .unwrap()
+                                        + 1
+                                )
+                            }
+                            1 => {
+                                v["construction"]["reserved"]["work"] = serde_json::json!(
+                                    base["construction"]["reserved"]["work"].as_u64().unwrap() + 1
+                                );
+                                v["ledger_before_terminal_encoding"]["native_reserved"]["work"] = serde_json::json!(
+                                    base["ledger_before_terminal_encoding"]["native_reserved"]
+                                        ["work"]
+                                        .as_u64()
+                                        .unwrap()
+                                        + 1
+                                );
+                            }
+                            2 => {
+                                v["native_capture_acknowledged"] = serde_json::json!(
+                                    base["native_capture_acknowledged"].as_u64().unwrap() + 1
+                                );
+                                v["capture_count_before_artifact_publication"] =
+                                    serde_json::json!(global + 1);
+                            }
+                            3 => {
+                                v["capture_count_before_artifact_publication"] =
+                                    serde_json::json!(global + 1)
+                            }
+                            4 => {
+                                v["witness_receipt"]["payload_sha256_bytes"][0] = serde_json::json!(
+                                    base["witness_receipt"]["payload_sha256_bytes"][0]
+                                        .as_u64()
+                                        .unwrap()
+                                        ^ 1
+                                )
+                            }
+                            5 => {
+                                v["matrix"]["rows"] =
+                                    serde_json::json!([{"n_vars":3,"terms":[{"mask":0}]}]);
+                                v["matrix"]["rank"] = 1.into();
+                            }
+                            _ => unreachable!(),
+                        }
+                        std::fs::write(
+                            root.join("koblitz-m3-result.json"),
+                            serde_json::to_vec(&v).unwrap(),
+                        )
+                        .unwrap();
+                        assert!(check().is_err(), "rehashed mutation {mutation}");
+                    }
+                    std::fs::write(root.join("koblitz-m3-result.json"), result).unwrap();
+                    assert!(check().is_ok());
+                }
+            }
+        }
+    }
+}
