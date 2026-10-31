@@ -1,3 +1,6 @@
+execute(read("../../source-data/universal-twisted51.sing"));
+poly A52=1+c;poly delta52=b^3*(b+c*A52^3);
+if(G51!=l^16+A52^8*l^8+delta52*l^4+A52^3*delta52*l+b^4*(b^4+b*c*A52^3+c^2*A52^4)+A52^16){ERROR("FIBERS23_52_ACTUAL_TWISTED_G_BINDING");quit;}
 execute(read("../../source-data/marked23-field51.sing"));
 string fText52=string(f23);string bText52=string(b23);string cText52=string(c23);
 list denominatorTexts52;poly rem52=b23;int denominatorCount52=0;

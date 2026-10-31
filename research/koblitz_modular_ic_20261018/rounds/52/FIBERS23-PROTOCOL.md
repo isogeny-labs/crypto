@@ -35,3 +35,6 @@ Same local authorization,seed52,one thread,4GiBvirtual,1200s,serialize math,
 Git freeze before affected data. Strict exit0,no ? errors and exact
 FIBERS23_52_ALL_CHECKS_PASS. Keep every failure/partial/cap. No performance
 comparison,statistics,power,A/A or randomization; fixed exhaustive finite set.
+
+Before first run: bind the polynomial formula byte-for-byte algebraically
+to the accepted R51 universal twisted G before any finite specialization.
