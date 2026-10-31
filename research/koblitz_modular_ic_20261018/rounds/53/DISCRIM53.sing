@@ -1,3 +1,4 @@
+LIB "linalg.lib";
 // Complete fixed-algebra trace experiment. Predictions are reported, not assumed.
 proc require53(int ok,string tag){if(!ok){ERROR(tag);quit;}}
 proc dump53(link out,string name,matrix A){
@@ -15,16 +16,16 @@ matrix companion53[16][16];int i53;int j53;int k53;
 for(i53=1;i53<16;i53++){companion53[i53+1,i53]=1;}
 companion53[9,16]=a8;companion53[5,16]=a4;
 companion53[2,16]=a1;companion53[1,16]=a0;
-matrix power53=unitmat(16);ideal genericTraces53;
+matrix power53=unitmat(16);matrix genericTraces53[1][31];
 for(k53=0;k53<=30;k53++){
  poly tr53=0;for(i53=1;i53<=16;i53++){tr53=tr53+power53[i53,i53];}
- genericTraces53[k53+1]=tr53;power53=power53*companion53;
+ genericTraces53[1,k53+1]=tr53;power53=power53*companion53;
 }
-for(k53=1;k53<=15;k53++){require53(genericTraces53[k53]==0,"TRACE53_EARLY");}
-require53(genericTraces53[16]==a1,"TRACE53_DERIVATIVE");
+for(k53=1;k53<=15;k53++){require53(genericTraces53[1,k53]==0,"TRACE53_EARLY");}
+require53(genericTraces53[1,16]==a1,"TRACE53_DERIVATIVE");
 link genericOut53="ASCII:w generic-traces53.sing";
-write(genericOut53,"ring genericTraceCertificate53=2,(a8,a4,a1,a0),dp;short=0;ideal traces53="+string(genericTraces53)+";");
-dump53(genericOut53,"companion53",companion53);close(genericOut53);
+write(genericOut53,"ring genericTraceCertificate53=2,(a8,a4,a1,a0),dp;short=0;");
+dump53(genericOut53,"traces53",genericTraces53);dump53(genericOut53,"companion53",companion53);close(genericOut53);
 ring actual53=2,(l,v,u),wp(4,2,1);short=0;
 map sourceMap53=relativeInfinity50,l,v,u;
 ideal source53=sourceMap53(relativeInfinityIdeal50);
@@ -34,7 +35,7 @@ poly b53=u*R53*(R53+1);poly c53=u*(R53+1);
 poly A53=reduce(1+c53,baseGB53);
 poly delta53=reduce(b53^3*(b53+c53*(1+c53)^3),baseGB53);
 poly C53=reduce(A53^3*delta53,baseGB53);
-ideal coefficients53;poly term53;int exponent53;int index53;
+matrix coefficients53[1][5];poly term53;int exponent53;int index53;
 poly rest53=source53[2];
 while(rest53!=0){
  term53=lead(rest53);exponent53=leadexp(term53)[1];
@@ -43,18 +44,18 @@ while(rest53!=0){
  if(exponent53==4){index53=3;}if(exponent53==1){index53=4;}
  if(exponent53==0){index53=5;}
  require53(index53>0,"TRACE53_ADDITIVE_EXPONENT");
- coefficients53[index53]=coefficients53[index53]+term53/l^exponent53;
+ coefficients53[1,index53]=coefficients53[1,index53]+term53/l^exponent53;
  rest53=rest53-term53;
 }
-require53(coefficients53[1]==1,"TRACE53_MONIC");
-require53(reduce(coefficients53[4]+C53,baseGB53)==0,"TRACE53_TATE_DERIVATIVE");
-map tracesMap53=genericTrace53,coefficients53[2],coefficients53[3],coefficients53[4],coefficients53[5];
-ideal traces53=tracesMap53(genericTraces53);
+require53(coefficients53[1,1]==1,"TRACE53_MONIC");
+require53(reduce(coefficients53[1,4]+C53,baseGB53)==0,"TRACE53_TATE_DERIVATIVE");
+map tracesMap53=genericTrace53,coefficients53[1,2],coefficients53[1,3],coefficients53[1,4],coefficients53[1,5];
+matrix traces53=tracesMap53(genericTraces53);
 matrix powerGram53[32][32];int ei53;int ej53;int vi53;int vj53;
 poly reduced53;poly scalar53;
 for(i53=1;i53<=32;i53++){for(j53=1;j53<=32;j53++){
  ei53=(i53-1)%16;ej53=(j53-1)%16;vi53=(i53-1) div 16;vj53=(j53-1) div 16;
- reduced53=reduce(traces53[ei53+ej53+1]*v^(vi53+vj53),baseGB53);
+ reduced53=reduce(traces53[1,ei53+ej53+1]*v^(vi53+vj53),baseGB53);
  scalar53=u^2*diff(reduced53,v);
  require53(diff(scalar53,l)==0 && diff(scalar53,v)==0,"TRACE53_SCALAR");
  powerGram53[i53,j53]=scalar53;
