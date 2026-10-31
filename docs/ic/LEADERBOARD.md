@@ -477,6 +477,16 @@ Copied from native analysis: eight independent one-target workloads per fixed cu
 | 8209 | 0.975242 | 0.603463 to 1.450934 |
 | 131101 | 1.127134 | 0.922471 to 1.341694 |
 
+## Conductor-gap complete implementation instruction census
+
+Copied from native Callgrind analysis in a separate instruction unit. The same archived one-target workloads are replayed; method resolution, target construction, external verification and kernel work remain outside the interval. No full-cost GAE ranking changes.
+
+Profiles verified: 100/100; comparison status: admissible_implementation_diagnostic.
+
+| gap cell | IC floor/crater Ir | 99% interval |
+|---|---:|---|
+| ell8209-q29 | 0.968807 | 0.573521 to 1.492155 |
+| ell131101-q37 | 1.162501 | 0.901657 to 1.462762 |
 ## GHS-weak E0/F_{q^3} with 4 | #E0(K): plane-quartic index calculus against matched rho
 
 Whole method, cold, one target, no subgroup enumeration, in F_q-multiplication equivalents; copied from the frozen summaries of `research/quartic_n4_20261019/`. **Restricted to one special GHS-weak family** (E0 over F_{q^3}, #E0(K) = 4*ell): not generic curves, not prime-order E/F_{q^3}, not any standard curve. Matched reference: plain Pollard rho (no negation map) on the same E0(K) subgroup. Class: advance (restricted to the GHS-weak family). Baseline for the improvement: arm A0r (all rational points as factor base). It moves no row of tables A–C. Columns give IC/rho with 95% bootstrap interval at 0, 0.1 and 1 GAE per unpriced operation.
@@ -792,6 +802,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ecbench_e2e_frontier_20261031/establishment/certificate.json` — sha256 `fb5759832dd0f80a…`
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
+- `research/ecbench_conductor_gap_ir_20261014/analysis.json` — sha256 `c211baf8a91f79d4…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/ecbench_lazy_orbit_members_20261018/figures/ratios.json` — sha256 `c86743775097e0e1…`
 - `research/jv_cover_sparse_fglm_20261018/summary.json` — sha256 `4217cb1de3458ee8…`
