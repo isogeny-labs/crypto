@@ -3490,6 +3490,95 @@ counts are not emitted.  The `F_{p⁴}`-priced phases are `1.53`–`1.90 %` of `
 is `6.39·10³`–`4.06·10⁵×` rho at `0` GAE, rho ahead at every weight.  The modelled handover (`2^{88}`–`2^{90}`) is
 an extrapolation from `p = 101`–`521` (`22`–`32`-bit `n`), and every `S` above is `≥ 99 %` solve.
 
+### 9.34 E32 pre-registration: the handover ladder — the crossover order fitted from many sizes, with intervals
+
+*Registered 2026-10-31, before any E32 run.*  **Numbering:** E32 owns §9.34 (this registration), §9.36
+(results) and G2.114–G2.123; E33 owns §9.35, §9.37 and G2.124–G2.133.  **Question.**  §9.33's handover
+(`2^{88}`–`2^{90}`) is §11.16's model applied to constants from four or five sizes (`n = 2^{22}`–`2^{32}`).
+The lead atlas (`LEAD-ICE-charged-toy-ic-exponent-vs-rho`) records that a four-size ratio exponent was
+unidentifiable and asks instead for a fit of the crossover order `log l*`, the size at which
+`S_IC = S_rho`.  E32 measures the line's current best configuration and its matched rho on a ladder of
+sizes, two decades wider in `n` than any run so far, and fits `log₂ n*` directly, with intervals, at
+`0`, `0.1` and `1` GAE.  **Class, fixed in advance:** a *measurement of distance* (and a fit of where it
+reaches `1`); nothing in E32 changes either arm, so no outcome is an improvement, and a fitted `n*`
+beyond the measured range is an extrapolation, reported as such.
+
+**The arms (unchanged code, pinned binaries).**  *IC:* the `k = 4` `V₄`/GLS index calculus on E25's
+curves, arm **B** (the `⟨V₄, ψ⟩`-folded base, the line's best arm), E31's solver **A** (`chain`), E27's
+Karatsuba `F_{p⁴}` products: exactly `quartic_pipeline_gls --solver chain --karatsuba` restricted to arm
+B (`run_k4_gls_pipeline_with`, unchanged), every phase charged as in E25/E31.  *Matched rho:* E27's walk
+(iii) — the `⟨±ψ⟩` walk, Karatsuba products, norm inversions batched over a pool of `16` walks with
+fillers — `16` walks per curve, seeds `1000·seed + k`, cost per walk **without** the `[d]G = Q` check
+(E25's and E27's convention), `rho` = mean over the `16` walks.  Both arms run through
+`examples/e32_ladder.rs` (modes `ic` and `walk`), which calls only those two unchanged library
+functions.  Binaries: built from `e75771052` (build inputs identical at `45378560dd`), copied to the
+session scratchpad and run only from there; sha256 in `experiments/36_handover_ladder/binary_commit.txt`.
+
+**Sizes, curves, seeds.**  `p ∈ {101, 149, 197, 269, 397, 557, 773, 1093, 1549, 2213, 3089}` (`log₂ n ≈
+22.6`–`42.4`, eleven sizes, `≈ 2` bits apart above `p = 397`), and `p = 4337` (`2^{44.3}`) only under the
+budget rule below.  At each size three curves, `generate_gls_klein_instance(p, seed, 16)` with seeds
+`1, 2, 3`; a seed that yields no curve is replaced by the next unused seed (`4, 5, …`), recorded.  At the
+five E25 sizes seeds `1, 2` are E25's curves, and their runs (with `--rho-runs 16`) are also the identity
+check against E27's records; elsewhere `--rho-runs 1` (the pipeline's own walks are not used by E32).
+The target stream is the pipeline's (seeded by the curve seed); the replicate unit for intervals is the
+curve.  Per curve: `S` (`total_muls`), Macaulay entries, `C`, `y`, columns, phase shares; per walk: steps,
+`F_p` multiplications, correctness, visit digest.
+
+**Distance and band (§5a).**  `S(g) = S + 97 g · E` (`E` = Macaulay entries), `rho(g) = rho + 97 g ·
+steps` (mean steps), `D(g) = S(g) / rho(g)`, `g ∈ {0, 0.1, 1}`, one GAE `= 97` (as §9.24 and §9.29).
+Rho's own unpriced native work is priced by the same rule (one per step).  A row is "ahead of rho" only
+if `D < 1` at all three weights.
+
+**Fit (frozen).**  Per curve `c`: `x_c = log₂ n_c − 32`, `L_c(g) = log₂ D_c(g)`.
+- **M1 (primary):** OLS `L = α + β x` on the curves with `p ≥ 269` (where the walk's set-up — `66`
+  scalar multiplications, `≈ 13 %` of a walk at `2^{30}` and falling — no longer bends `rho`); the
+  crossover order `log₂ n* = 32 − α/β` (defined for `β < 0`).
+- **M1-all (sensitivity):** M1 on every curve.
+- **M2 (sensitivity, theory slope):** `β` fixed at `−1/4` (`S ∝ p`, `rho ∝ p²`), `α` the mean of
+  `L + x/4` over `p ≥ 269`; `log₂ n* = 32 + 4α`.
+- **Intervals:** cluster bootstrap over curves, stratified by size (resample each size's curves with
+  replacement), `10,000` replicates, fixed RNG seed `32`; 95 % percentile intervals for `β`, `α` and
+  `log₂ n*`; the fraction of replicates with `β ≥ 0` (no crossover) is reported, and those replicates
+  count as `n* = ∞` in the percentiles.  Also reported: the OLS standard-error interval for `β`.
+- **Measured bound:** if no row has `D(g) ≤ 1`, the crossover is *empty in the reachable range* and is
+  recorded as `n* > 2^{x_max}` with `x_max` the largest `log₂ n` measured, beside the fit.  The linear
+  algebra is `≤ 0.002 %` of `S` at `p ≤ 397`; its share is reported per curve and its `∝ p²` term
+  is not modelled (sensitivity: its extrapolated share at the fitted `n*`).
+
+**Route, budget, stopping.**  isolab-eks is the default and was checked: unreachable from this container
+(no `aws` or `kubectl`; the GitHub `isolab-experiment.yml` dispatch is refused by the session proxy for
+both repository paths).  So: local, **operation counts only, no wall-time claim**, at most `3` of the `4`
+cores (`taskset -c 1-3`; `RAYON_NUM_THREADS=4`, which fixes the pipeline's target stream as in §9.19), one
+curve at a time.  Cost estimate from E27's arm-B walls (`≈ 2` ms per target on three cores, `≈ 0.07 p`
+columns, median `y ≈ 1,500`): `≈ 0.2 p` seconds per curve at the median, `≈ 1.6` h for the six new sizes,
+`×2`–`×10` on a heavy-tailed `y` curve.  **Budget:** `14` h of wall time for all E32 runs; a curve still
+running after `4` h is stopped and recorded as censored (not in the fits; reported).  Sizes run in
+ascending order, all three curves of a size before the next; a size is not started if the budget left is
+under `3×` the previous size's median curve time `× p_next / p_prev`.  `p = 4337` runs only if, after
+`p = 3089`, `≥ 3` h of budget remain and `≥ 8` GB of memory are free (its 16-walk pool holds `≈ 6` GB).
+No size, curve or seed is dropped or added for any reason other than these rules.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.114 | identity (**kill**) | `ic` reproduces every field of E27's ten arm-B records (`experiments/32_walk_karatsuba/e2e_chain_karatsuba_p*s*.json`) apart from wall times; `walk` reproduces E27's `rho_e27` and `walk_steps` (`summary.json`) on the ten curves exactly; at every size every log recovered, every kept row re-added, every walk correct | any difference or failure (E32 then stops) |
+| G2.115 | curves and base | every `(p, seed)` yields a curve with `h = 16`; columns / `p` in `[0.04, 0.10]` on every curve with `p ≥ 557` | a size without three curves, or outside |
+| G2.116 | per-call cost | `C` median in `[6.2, 6.9]·10⁵` and Macaulay entries per residual in `[1.70, 1.85]·10⁵` on every curve with `p ≥ 557` | outside |
+| G2.117 | phase shares | (Weil + solve) / `S` `≥ 98 %` and linear algebra `≤ 0.1 %` of `S` on every curve | outside |
+| G2.118 | yield | OLS exponent of `y` in `p`, all curves, in `[−0.5, 0.5]`; per-size median `y` in `[400, 6,000]` | outside |
+| G2.119 | matched rho | steps / `√n` in `[0.4, 0.9]` per curve (mean of `16`); `F_p` multiplications per step (set-up included) falling with `p`, in `[66, 80]` at every curve with `p ≥ 1549` | outside |
+| G2.120 | distance reached | per-size median `D(0)` falls with `n`; at the largest size reached the median `D(0)` is in `[3·10², 5·10³]`; rho ahead of every row at every weight (**the crossover is empty in the reachable range**) | outside; any row with `D ≤ 1` at any weight |
+| G2.121 | slope (M1, `0` GAE) | `β` in `[−0.30, −0.15]`; its 95 % interval contains `−0.25` | outside, or `−0.25` excluded |
+| G2.122 | crossover order at `0` GAE | M1: `log₂ n*` in `[74, 96]`, 95 % interval wider than `8` bits; M2: `log₂ n*` in `[76, 90]`, 95 % interval at most `6` bits wide | any of the four outside |
+| G2.123 | crossover across the band | M2 `log₂ n*` later than at `0` GAE by `[5, 9]` bits at `0.1` GAE and `[11, 17]` bits at `1` GAE (derived: per call `E/C ≈ 1.78·10⁵ / 6.45·10⁵`, per step `≈ 70`; `D` grows `≈ 3.2×` and `≈ 11.6×`); `D(0) < D(0.1) < D(1)` on every row | outside, or the order breaks on a row |
+
+**What it would say.**  If G2.114–G2.123 hold, the line's distance to the matched rho is measured over
+`2^{22.6}`–`2^{42.4}` (or `2^{44.3}`), falls as `≈ n^{−1/4}` with an interval on the exponent, and still
+exceeds `≈ 10³` at the largest size: the crossover is empty in the reachable range, recorded as a bound
+`n* > 2^{42}`, and the fitted crossover order with its interval replaces §9.33's single-point
+extrapolation.  A free-slope interval spanning more than a decade of bits says the slope, not the
+constant, limits what the ladder can tell; the theory-slope fit says where the constants put it.
+Neither moves the line toward rho: the distance remaining is reported as measured.
+
 ### 9.35 E33 pre-registration: solver B's pivot selection, counted (and two cheaper selections)
 
 *Registered 2026-10-31, before any E33 code.*  **Numbering:** E32 (a parallel experiment in this
