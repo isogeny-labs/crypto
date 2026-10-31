@@ -1,0 +1,90 @@
+{
+  "aa": {
+    "cases_in_interval": 2,
+    "certificate_pairs_compared": 2,
+    "certificate_pairs_identical": 2,
+    "ci95_log_ratio": [
+      -0.0510437583663263,
+      0.011003091066654896
+    ],
+    "ci95_ratio": [
+      0.9502370888000307,
+      1.011063847705635
+    ],
+    "complete_pairs": 2,
+    "excluded_pairs": 0,
+    "interval_excludes_no_change": false,
+    "mean_log_ratio": -0.0200203336498357,
+    "pairs": 2,
+    "ratio_point": 0.9801787424927967,
+    "status_counts": {
+      "member0": {
+        "validated": 2
+      },
+      "member1": {
+        "validated": 2
+      }
+    }
+  },
+  "ab": {
+    "cases_in_interval": 2,
+    "certificate_pairs_compared": 2,
+    "certificate_pairs_identical": 2,
+    "ci95_log_ratio": [
+      -2.201297284509973,
+      -0.18651903269850645
+    ],
+    "ci95_ratio": [
+      0.1106595083389557,
+      0.8298427676538378
+    ],
+    "complete_pairs": 2,
+    "excluded_pairs": 0,
+    "interval_excludes_no_change": true,
+    "mean_log_ratio": -1.1939081586042397,
+    "pairs": 2,
+    "ratio_point": 0.3030346393850247,
+    "status_counts": {
+      "member0": {
+        "validated": 2
+      },
+      "member1": {
+        "validated": 2
+      }
+    }
+  },
+  "arms": {
+    "baseline_sha256": "7c431843da1c1cf4079c2b34a967f0a3f881c95a05eb26979b93cb456976a8a8",
+    "candidate_sha256": "48a4f0239d3ca4a238143db909166b5560a08df0eabf9c4e2d5d8a04cda13528",
+    "unchanged_after_run": true
+  },
+  "choices": {
+    "effect": "ln(wall member1 / wall member0); member1 = candidate in A/B, second baseline copy in A/A",
+    "interval": "two-sided 95% Student-t over cases",
+    "pair_exclusion": "pair enters the interval only if both members validated",
+    "unit_of_inference": "case (mean of per-round paired log ratios)",
+    "warmup": "one pair before round 0, retained, excluded"
+  },
+  "evidence_class": "diagnostic_incomplete_panel",
+  "inputs": {
+    "inputs_sha256_file_sha256": "2fb0abc41597ba7c654019a0ef0e9a1f1ef6cfd3b23467f5a20666b7ae67667f",
+    "manifest_sha256": "b28404c9a3b0d2d5b3db8d530f07746b4f0bfda3cc3090cb673e64930f3c1ea9",
+    "selected_cases": 2
+  },
+  "label": "L0-local-sizing-diagnostic",
+  "protocol_complete": false,
+  "runtime_claim_admissible": null,
+  "runtime_claim_note": "Requires an externally admitted matched L2 host; this driver cannot attest isolation. Local runs are diagnostics.",
+  "s_over_rho": null,
+  "schedule": {
+    "aa_rounds": 1,
+    "ab_rounds": 1,
+    "case_limit_ms": 900000,
+    "deadline_ms": 5400000,
+    "driver_elapsed_ns": 2131308769114,
+    "executions": 10,
+    "seed": "20261031"
+  },
+  "schema": "hashed-ecdl-panel.analysis/v1",
+  "unpriced_common_operations": null
+}
