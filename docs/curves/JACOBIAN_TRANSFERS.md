@@ -5,16 +5,26 @@ proves that same-field covers exist; [`GHS_SCREEN.md`](../GHS_SCREEN.md)
 screens one binary curve at a time.  None of them says **whether moving a
 curve's discrete logarithm into a Jacobian could ever pay**.
 [`jacobian-transfers.json`](jacobian-transfers.json) does: for every curve in
-the registry it enumerates the known transfer routes, computes what is exact
+the catalog it enumerates the known transfer routes, computes what is exact
 about each (magic numbers, genera, map degrees, torsion signals), prices the
 destination with one frozen formula-level cost model, and reports the ratio to
 Pollard rho on the original subgroup.  `jacobian_transfers` rebuilds and
-checks the file; CI fails when the registry gains a curve the file has not
-screened.
+checks the file.
+
+**The catalog.** The file screens the registry rows that
+[`cover-catalog.json`](cover-catalog.json) names (the 2,572 rows the registry
+held before the isogeny-volcano census was swept into it), not every registry
+row, and records `catalog_rows_sha256`, the SHA-256 of those rows in registry
+order (sorted-key compact JSON of `{schema_version, curves}`), instead of the
+registry file's hash.  A row the manifest does not name, such as a new census
+curve, changes nothing and does not stale the file; an edited catalog row, or a
+manifest slug the registry lacks, still fails `check`.  Screening a further
+curve is an explicit change: add its slug to the manifest (and bump `count`),
+then rebuild.
 
 ```bash
 cargo build --release --bin jacobian_transfers
-./target/release/jacobian_transfers build                 # registry.json → jacobian-transfers.json
+./target/release/jacobian_transfers build                 # catalog rows of registry.json → jacobian-transfers.json
 ./target/release/jacobian_transfers check                 # CI: the committed file is current
 ./target/release/jacobian_transfers show "Oakley Group 3" # every route of one curve
 ./target/release/jacobian_transfers rank --top 20         # curves by best ratio
