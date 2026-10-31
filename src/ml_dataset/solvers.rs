@@ -356,6 +356,87 @@ pub(super) fn verify_and_store_worker_originals<'a>(
     })
 }
 
+/// Private worker transport: acknowledged roots never re-enter payload writers.
+pub(super) struct WorkerSolveOutput {
+    data: SolverData,
+    stored: Vec<super::types::Artifact>,
+}
+impl WorkerSolveOutput {
+    pub(super) fn legacy(data: SolverData) -> Self {
+        Self {
+            data,
+            stored: Vec::new(),
+        }
+    }
+    pub(super) fn into_parts(self) -> (SolverData, Vec<super::types::Artifact>) {
+        (self.data, self.stored)
+    }
+}
+
+pub(super) const WORKER_STORED_RECEIPT_MAX: usize = 32;
+
+/// Reserved before producer execution; the caller charges its original budget.
+/// Root Artifact strings are moved from storage acknowledgements, not cloned.
+/// This admission prices the transport Vec and bounded identity comparisons;
+/// worker setup/finalization retain their separately stated measurement scope.
+#[allow(dead_code)] // Consumed by the staged native orchestration integration.
+struct WorkerStoredReceipts<'a> {
+    original: &'a VerifiedWorkerOriginal<'a>,
+    records: Vec<super::types::Artifact>,
+    capacity: usize,
+}
+#[allow(dead_code)]
+impl<'a> WorkerStoredReceipts<'a> {
+    fn admit(
+        original: &'a VerifiedWorkerOriginal<'a>,
+        capacity: usize,
+        charge: impl FnOnce(u64, u64) -> Result<(), String>,
+    ) -> Result<Self, String> {
+        if original.binding.is_none() || capacity == 0 || capacity > WORKER_STORED_RECEIPT_MAX {
+            return Err(
+                "stored worker receipts require bound original and bounded capacity".into(),
+            );
+        }
+        let bytes = (capacity * std::mem::size_of::<super::types::Artifact>()) as u64;
+        let work = (capacity * capacity * 1024) as u64;
+        charge(work, bytes)?;
+        let mut records = Vec::new();
+        records
+            .try_reserve_exact(capacity)
+            .map_err(|e| e.to_string())?;
+        Ok(Self {
+            original,
+            records,
+            capacity,
+        })
+    }
+    fn push(
+        &mut self,
+        artifact: super::types::Artifact,
+    ) -> Result<(), (String, super::types::Artifact)> {
+        if self.records.len() == self.capacity
+            || artifact.path.len() > 1024
+            || super::worker_reserved_artifact_path(&artifact.path)
+            || self.records.iter().any(|a| a.path == artifact.path)
+        {
+            return Err((
+                "stored worker receipt exceeds admission or collides".into(),
+                artifact,
+            ));
+        }
+        self.records.push(artifact);
+        Ok(())
+    }
+    fn finish(self, data: SolverData) -> WorkerSolveOutput {
+        // Holding original until handoff keeps the original worker lifetime.
+        let _ = self.original;
+        WorkerSolveOutput {
+            data,
+            stored: self.records,
+        }
+    }
+}
+
 /// Internal worker path; unsupervised callers cannot obtain this token by
 /// setting an outcome flag. Adapter consumption is integrated separately.
 pub(super) fn solve_with_verified_worker_originals(
@@ -366,12 +447,13 @@ pub(super) fn solve_with_verified_worker_originals(
     limits: CaptureLimits,
     context: Option<&super::execution::SolverExecutionContext>,
     original: &VerifiedWorkerOriginal<'_>,
-) -> Result<SolverData, String> {
+) -> Result<WorkerSolveOutput, String> {
     original.matches_bound(config, case, directory, &binding)?;
     if context.is_some_and(|c| c.launch.binding != binding) {
         return Err("verified worker originals differ from execution attempt".into());
     }
     solve_with_bound_event_sink_context(config, case, directory, binding, limits, context)
+        .map(WorkerSolveOutput::legacy)
 }
 
 pub fn solve_with_event_sink(
@@ -6080,7 +6162,8 @@ mod verified_worker_original_tests {
             &original,
         )
         .unwrap();
-        assert!(result.outcome.is_object());
+        assert!(result.data.outcome.is_object());
+        assert!(result.stored.is_empty());
         assert!(live.join("committed.json").is_file());
     }
     #[test]

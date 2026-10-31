@@ -1256,6 +1256,81 @@ fn verify_capture_context(dir: &Path, artifacts: &[Artifact]) -> Result<(), Stri
     Ok(())
 }
 
+fn worker_reserved_artifact_path(path: &str) -> bool {
+    [
+        "config.json",
+        "public.json",
+        "witness.json",
+        "factor-base.json",
+        "result.json",
+        "manifest.json",
+        "stdout.log",
+        "stderr.log",
+        "plan.json",
+        "run.json",
+        "protocol.json",
+        "attempt.json",
+        "worker-process.json",
+        "host.json",
+        "worker-artifacts.json",
+        "measurement-policy.json",
+        "capture-binding.json",
+        "capture-limits.json",
+        execution::PATH,
+    ]
+    .contains(&path)
+        || path.starts_with("publication/")
+        || path.starts_with("telemetry/")
+}
+
+/// Adopt validated stored roots before pending validation; retain them when a
+/// later pending write fails. No payload/root/capture write occurs for stored.
+fn adopt_worker_solver_artifacts(
+    out: &Path,
+    registry: &mut Vec<Artifact>,
+    data: types::SolverData,
+    stored: Vec<Artifact>,
+) -> Result<Value, String> {
+    if stored.len() > solvers::WORKER_STORED_RECEIPT_MAX {
+        return Err("stored worker receipt count exceeds admission".into());
+    }
+    // Bounded stored channel uses capacity reserved before solver execution.
+    if registry.capacity() - registry.len() < stored.len() {
+        return Err("worker receipt registry capacity was not reserved".into());
+    }
+    // Authenticate the stored channel first. Pending validation must not erase
+    // successful root writes that have already happened.
+    for (i, artifact) in stored.iter().enumerate() {
+        if worker_reserved_artifact_path(&artifact.path)
+            || registry.iter().any(|a| a.path == artifact.path)
+            || stored[..i].iter().any(|a| a.path == artifact.path)
+        {
+            return Err("stored solver artifact collides with reserved output".into());
+        }
+    }
+    registry.extend(stored);
+    // Check the entire pending list before any new write, against the adopted
+    // roots as well as worker outputs and earlier pending identities.
+    for (i, artifact) in data.artifacts.iter().enumerate() {
+        if worker_reserved_artifact_path(&artifact.path)
+            || registry.iter().any(|a| a.path == artifact.path)
+            || data.artifacts[..i].iter().any(|a| a.path == artifact.path)
+        {
+            return Err("pending solver artifact collides with reserved output".into());
+        }
+    }
+    for artifact in data.artifacts {
+        registry.push(storage::write_bytes(
+            out,
+            &artifact.path,
+            &artifact.role,
+            &artifact.encoding,
+            &artifact.bytes,
+        )?);
+    }
+    Ok(data.outcome)
+}
+
 fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
     let out = checked_directory(out, false)?;
     let mut registry = Vec::<Artifact>::new();
@@ -1283,8 +1358,14 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
         )?;
         known_answer = true;
         factor_base_verified = true;
-        let solved = telemetry::measured(&out, &mut registry, "solver", || {
-            if let Some((binding, limits)) = &capture_context {
+        // Worker setup reservation, before producer execution. Adapter receipt
+        // admission separately accounts its transport Vec in the original budget.
+        registry
+            .try_reserve_exact(solvers::WORKER_STORED_RECEIPT_MAX + 2)
+            .map_err(|e| e.to_string())?;
+        let mut produced = None;
+        let measurement = telemetry::measured(&out, &mut registry, "solver", || {
+            let output = if let Some((binding, limits)) = &capture_context {
                 solvers::solve_with_verified_worker_originals(
                     config,
                     &case,
@@ -1301,47 +1382,29 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
                     &out.join("live"),
                     execution_context.as_ref(),
                 )
+                .map(solvers::WorkerSolveOutput::legacy)
+            }?;
+            // Keep custody outside measured: its terminal telemetry write may fail.
+            produced = Some(output);
+            Ok(())
+        });
+        let solved = match produced {
+            Some(solved) => solved,
+            None => {
+                return Err(measurement
+                    .err()
+                    .unwrap_or_else(|| "solver returned no output".into()))
             }
-        })?;
-        let mut names = BTreeSet::new();
-        for artifact in solved.artifacts {
-            if [
-                "config.json",
-                "public.json",
-                "witness.json",
-                "factor-base.json",
-                "result.json",
-                "manifest.json",
-                "stdout.log",
-                "stderr.log",
-                "plan.json",
-                "run.json",
-                "protocol.json",
-                "attempt.json",
-                "worker-process.json",
-                "host.json",
-                "worker-artifacts.json",
-                "measurement-policy.json",
-                "capture-binding.json",
-                "capture-limits.json",
-                execution::PATH,
-            ]
-            .contains(&artifact.path.as_str())
-                || artifact.path.starts_with("publication/")
-                || artifact.path.starts_with("telemetry/")
-                || !names.insert(artifact.path.clone())
-            {
-                return Err("solver artifact collides with reserved output".into());
-            }
-            registry.push(storage::write_bytes(
-                &out,
-                &artifact.path,
-                &artifact.role,
-                &artifact.encoding,
-                &artifact.bytes,
-            )?);
+        };
+        let (mut data, stored) = solved.into_parts();
+        if let Err(error) = measurement {
+            // Preserve successful roots; do not start pending writes after a
+            // telemetry failure. The outer worker emits its ordinary error result.
+            data.artifacts.clear();
+            adopt_worker_solver_artifacts(&out, &mut registry, data, stored)?;
+            return Err(error);
         }
-        Ok::<Value, String>(solved.outcome)
+        adopt_worker_solver_artifacts(&out, &mut registry, data, stored)
     })();
     let mut outcome = match result {
         Ok(v) => v,
@@ -6640,5 +6703,148 @@ mod tests {
             fs::read(first.join("partial.bin")).unwrap(),
             b"incomplete but valuable trace"
         );
+    }
+}
+
+#[cfg(test)]
+mod worker_receipt_adoption_tests {
+    use super::*;
+    fn data(paths: &[&str]) -> types::SolverData {
+        types::SolverData {
+            outcome: json!({"status":"partial"}),
+            artifacts: paths
+                .iter()
+                .map(|path| types::ArtifactPayload {
+                    path: (*path).into(),
+                    role: "test-payload".into(),
+                    encoding: "native".into(),
+                    bytes: b"new".to_vec(),
+                })
+                .collect(),
+        }
+    }
+    fn record(path: &str) -> Artifact {
+        Artifact {
+            path: path.into(),
+            role: "test-receipt".into(),
+            encoding: "native".into(),
+            sha256: digest(b"stored"),
+            bytes: 6,
+        }
+    }
+    #[test]
+    fn worker_receipt_union_rejects_reserved_and_duplicate_paths_before_writes() {
+        let absent = std::env::temp_dir().join("worker-receipt-validation-must-not-create");
+        for path in [
+            "result.json",
+            "public.json",
+            "telemetry/x",
+            "publication/x",
+            execution::PATH,
+        ] {
+            for stored_channel in [false, true] {
+                let mut registry = Vec::with_capacity(32);
+                let (pending, stored) = if stored_channel {
+                    (data(&[]), vec![record(path)])
+                } else {
+                    (data(&[path]), vec![])
+                };
+                assert!(
+                    adopt_worker_solver_artifacts(&absent, &mut registry, pending, stored).is_err()
+                );
+                assert!(registry.is_empty());
+            }
+        }
+        for mode in 0..4 {
+            let mut registry = Vec::with_capacity(32);
+            if mode == 3 {
+                registry.push(record("same.bin"));
+            }
+            let stored = if mode == 0 {
+                vec![record("same.bin"), record("same.bin")]
+            } else if mode == 2 || mode == 3 {
+                vec![record("same.bin")]
+            } else {
+                vec![]
+            };
+            let pending = if mode == 1 {
+                data(&["same.bin", "same.bin"])
+            } else if mode == 2 {
+                data(&["same.bin"])
+            } else {
+                data(&[])
+            };
+            let before = registry.clone();
+            assert!(
+                adopt_worker_solver_artifacts(&absent, &mut registry, pending, stored).is_err()
+            );
+            if mode == 2 {
+                assert_eq!(registry, vec![record("same.bin")]);
+            } else {
+                assert_eq!(registry, before);
+            }
+        }
+    }
+    #[test]
+    fn worker_receipts_survive_pending_validation_failures_without_new_writes() {
+        let root = std::env::temp_dir().join(format!(
+            "worker-receipt-validation-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let stored =
+            storage::write_bytes(&root, "ack.bin", "test-receipt", "native", b"stored").unwrap();
+        for paths in [
+            vec!["first.bin", "result.json"],
+            vec!["first.bin", "duplicate.bin", "duplicate.bin"],
+            vec!["first.bin", "ack.bin"],
+        ] {
+            let mut registry = Vec::with_capacity(32);
+            assert!(adopt_worker_solver_artifacts(
+                &root,
+                &mut registry,
+                data(&paths),
+                vec![stored.clone()]
+            )
+            .is_err());
+            assert_eq!(registry, vec![stored.clone()]);
+            storage::verify_manifest(&root, &registry).unwrap();
+            assert_eq!(fs::read(root.join("ack.bin")).unwrap(), b"stored");
+            assert!(!root.join("first.bin").exists());
+            assert!(!root.join("duplicate.bin").exists());
+            assert!(!root.join("result.json").exists());
+            assert_eq!(fs::read_dir(&root).unwrap().count(), 1);
+        }
+        fs::remove_dir_all(root).unwrap();
+    }
+    #[test]
+    fn worker_receipts_survive_later_pending_storage_failure() {
+        let root = std::env::temp_dir().join(format!(
+            "worker-receipt-adoption-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let stored =
+            storage::write_bytes(&root, "ack.bin", "test-receipt", "native", b"stored").unwrap();
+        storage::write_bytes(&root, "conflict.bin", "test-conflict", "native", b"old").unwrap();
+        let mut registry = Vec::with_capacity(32);
+        assert!(adopt_worker_solver_artifacts(
+            &root,
+            &mut registry,
+            data(&["conflict.bin"]),
+            vec![stored.clone()]
+        )
+        .is_err());
+        assert_eq!(registry, vec![stored]);
+        assert_eq!(fs::read(root.join("ack.bin")).unwrap(), b"stored");
+        assert_eq!(fs::read(root.join("conflict.bin")).unwrap(), b"old");
+        storage::verify_manifest(&root, &registry).unwrap();
+        fs::remove_dir_all(root).unwrap();
     }
 }
