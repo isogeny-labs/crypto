@@ -4787,7 +4787,9 @@ pub(super) fn verify_canonical_math_files(
         let expected =
             artifact(artifacts, path, role, encoding, true)?.ok_or("missing canonical file")?;
         let bytes = read_bounded(dir, path, cap)?;
-        if bytes.len() as u64 != expected.bytes || super::digest(&bytes) != expected.sha256 {
+        if bytes.len() as u64 != expected.bytes
+            || crate::ml_dataset::digest(&bytes) != expected.sha256
+        {
             return Err(format!("canonical bytes differ from manifest: {path}"));
         }
         Ok(bytes)
@@ -4806,7 +4808,7 @@ pub(super) fn verify_canonical_math_files(
         factor_base_sha256,
         limits,
     )?;
-    let input_sha256 = super::digest(&input);
+    let input_sha256 = crate::ml_dataset::digest(&input);
     let group_bytes = read(
         "koblitz-m3-group-replay.json",
         "restricted-koblitz-m3-group-replay/v1",
@@ -4897,7 +4899,7 @@ mod canonical_math_file_tests {
                     role: (*role).into(),
                     encoding: (*encoding).into(),
                     bytes: bytes.len() as u64,
-                    sha256: super::super::digest(&bytes),
+                    sha256: crate::ml_dataset::digest(&bytes),
                 }
             })
             .collect()
@@ -4948,7 +4950,7 @@ mod canonical_math_file_tests {
                 binding: binding.clone(),
                 public_sha256: "8".repeat(64),
                 factor_base_sha256: "9".repeat(64),
-                input_sha256: super::super::digest(&input_bytes),
+                input_sha256: crate::ml_dataset::digest(&input_bytes),
                 addition_limit: limits.additions,
                 performed_additions: result.enumeration_additions as usize,
                 acknowledged_additions: result.acknowledged.len(),
