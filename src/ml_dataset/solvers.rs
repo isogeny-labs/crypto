@@ -12,9 +12,8 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
-// Staged adapter: compile its admission and resource controls without activating
-// a CLI profile before native persistence and semantic replay are integrated.
-#[cfg(test)]
+// Worker-only adapter: verified originals, bound capture, original execution
+// context, and central semantic replay gate the native profile.
 #[path = "koblitz_m3.rs"]
 mod koblitz_m3;
 
@@ -437,6 +436,65 @@ impl<'a> WorkerStoredReceipts<'a> {
     }
 }
 
+/// Dispatch only the initial native two-code/four-signed-point profile.
+/// Original worker verification has already authenticated these public values.
+/// This bounded shape check allocates no curve, domain, or payload buffers.
+fn koblitz_worker_profile(config: &CaseConfig, case: &CaseData) -> bool {
+    if config.family != "koblitz"
+        || config.m != 3
+        || !((23..=31).contains(&config.n) || (47..=61).contains(&config.n))
+        || !matches!(config.solver.as_str(), "f4" | "f5")
+        || config.factor_base_size != 4
+        || !(1..=6).contains(&config.degree_bound)
+        || config.work_limit == 0
+    {
+        return false;
+    }
+    let Some(points) = case.factor_base["points"]
+        .as_array()
+        .filter(|points| points.len() == 4)
+    else {
+        return false;
+    };
+    let mut signed = [(0u64, 0u64); 4];
+    for (row, output) in points.iter().zip(&mut signed) {
+        let parse = |name: &str| {
+            row[name]
+                .as_str()
+                .filter(|s| s.len() <= 20)
+                .and_then(|s| s.parse::<u64>().ok())
+        };
+        let (Some(x), Some(y)) = (parse("x"), parse("y")) else {
+            return false;
+        };
+        if x >= (1u64 << config.n) || y >= (1u64 << config.n) {
+            return false;
+        }
+        *output = (x, y);
+    }
+    if signed.iter().enumerate().any(|(i, point)| {
+        signed[..i].contains(point) || !signed.contains(&(point.0, point.0 ^ point.1))
+    }) {
+        return false;
+    }
+    signed
+        .iter()
+        .enumerate()
+        .filter(|(i, point)| !signed[..*i].iter().any(|prior| prior.0 == point.0))
+        .count()
+        == 2
+}
+
+/// Always invoked by central replay, independently of mutable outcome strategy.
+pub(super) fn verify_koblitz_m3_cell(
+    dir: &Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+) -> Result<Option<Value>, String> {
+    koblitz_m3::verify_worker_cell(dir, config, outcome, artifacts)
+}
+
 /// Internal worker path; unsupervised callers cannot obtain this token by
 /// setting an outcome flag. Adapter consumption is integrated separately.
 pub(super) fn solve_with_verified_worker_originals(
@@ -451,6 +509,18 @@ pub(super) fn solve_with_verified_worker_originals(
     original.matches_bound(config, case, directory, &binding)?;
     if context.is_some_and(|c| c.launch.binding != binding) {
         return Err("verified worker originals differ from execution attempt".into());
+    }
+    if koblitz_worker_profile(config, case) {
+        let context = context.ok_or("Koblitz m3 worker requires original execution context")?;
+        if LIVE_SINK.with(|slot| slot.borrow().is_some()) {
+            return Err("nested live solver sink".into());
+        }
+        let emitter = CaptureEmitter::create(directory, binding.clone(), limits.clone())?;
+        LIVE_SINK.with(|slot| *slot.borrow_mut() = Some(EventSink::Bound(emitter)));
+        let _guard = LiveSinkGuard;
+        // The entry owns the original ledger, first capture event, retained-root
+        // handoff and capture finalization. Do not run generic wrapper effects.
+        return koblitz_m3::run_verified_worker_entry(original, context, &binding, &limits);
     }
     solve_with_bound_event_sink_context(config, case, directory, binding, limits, context)
         .map(WorkerSolveOutput::legacy)
@@ -6044,6 +6114,25 @@ mod verified_worker_original_tests {
             Self::with_shape(23, false, 2)
         }
         pub(super) fn with_shape(n: u32, twist: bool, factor_base_size: usize) -> Self {
+            Self::with_profile(n, twist, factor_base_size, "enumerate", 100, false)
+        }
+        /// Actual frozen software-control plan; no edits to a live attempt.
+        pub(super) fn with_runtime_shape(
+            n: u32,
+            twist: bool,
+            factor_base_size: usize,
+            solver: &str,
+        ) -> Self {
+            Self::with_profile(n, twist, factor_base_size, solver, 16384, true)
+        }
+        fn with_profile(
+            n: u32,
+            twist: bool,
+            factor_base_size: usize,
+            solver: &str,
+            work_limit: u64,
+            execution_required: bool,
+        ) -> Self {
             let nonce = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
@@ -6060,14 +6149,14 @@ mod verified_worker_original_tests {
                 field_sizes: vec![n],
                 arities: vec![3],
                 families: vec!["koblitz".into()],
-                solvers: vec!["enumerate".into()],
+                solvers: vec![solver.into()],
                 curve_seeds: 1,
                 generators: 1,
                 keys: 1,
                 seed: 42,
                 factor_base_size,
                 degree_bound: 3,
-                work_limit: 100,
+                work_limit,
                 twists: true,
                 protocol_sha256: Some(dataset::digest(&bytes)),
                 split_rule: "curve-twist-component-sha256-v1".into(),
@@ -6076,7 +6165,14 @@ mod verified_worker_original_tests {
             let index = u64::from(twist);
             let config = plan.cell(index).unwrap();
             assert_eq!(config.twist, twist);
-            storage::write_json(&root,"run.json","run",&json!({"schema":"crypto.ml-dataset.run/v1","plan_sha256":hash,"source_commit":"a".repeat(40),"binary_sha256":"b".repeat(64)})).unwrap();
+            let mut run = json!({"schema":"crypto.ml-dataset.run/v1","plan_sha256":hash,"source_commit":"a".repeat(40),"binary_sha256":"b".repeat(64)});
+            if execution_required {
+                run["execution_context_required"] = true.into();
+                run["seconds_per_case"] = 60.into();
+                run["memory_mib"] = 256.into();
+                run["trace_mib"] = 128.into();
+            }
+            storage::write_json(&root, "run.json", "run", &run).unwrap();
             storage::write_json(&root, "plan.json", "plan", &plan).unwrap();
             storage::write_json(&root, "config.json", "config", &config).unwrap();
             storage::write_json(
@@ -6102,6 +6198,66 @@ mod verified_worker_original_tests {
             let _ = fs::remove_dir_all(&self.root);
         }
     }
+    #[test]
+    fn worker_koblitz_dispatch_rejects_missing_context_before_capture_creation() {
+        let f = Fixture::with_runtime_shape(23, false, 4, "f4");
+        let mut registry = Vec::new();
+        let original = verify_and_store_worker_originals(
+            &f.config,
+            &f.case,
+            &f.root,
+            Some(&f.binding),
+            &mut registry,
+        )
+        .unwrap();
+        let live = f.root.join("live");
+        let error = solve_with_verified_worker_originals(
+            &f.config,
+            &f.case,
+            &live,
+            f.binding.clone(),
+            dataset::capture::capture_limits(16).unwrap(),
+            None,
+            &original,
+        )
+        .err()
+        .expect("missing original execution context must be refused");
+        assert!(error.contains("requires original execution context"));
+        assert!(!live.exists());
+        assert!(LIVE_SINK.with(|slot| slot.borrow().is_none()));
+    }
+
+    #[test]
+    fn worker_koblitz_dispatch_requires_exact_supported_profile() {
+        for twist in [false, true] {
+            let mut f = Fixture::with_shape(23, twist, 4);
+            f.config.solver = "f4".into();
+            assert!(koblitz_worker_profile(&f.config, &f.case));
+            f.config.solver = "f5".into();
+            assert!(koblitz_worker_profile(&f.config, &f.case));
+            for variant in 0..8 {
+                let mut config = f.config.clone();
+                match variant {
+                    0 => config.family = "binary".into(),
+                    1 => config.m = 4,
+                    2 => config.n = 32,
+                    3 => config.factor_base_size = 2,
+                    4 => config.degree_bound = 0,
+                    5 => config.degree_bound = 7,
+                    6 => config.work_limit = 0,
+                    _ => config.solver = "f6".into(),
+                }
+                assert!(
+                    !koblitz_worker_profile(&config, &f.case),
+                    "variant {variant}"
+                );
+            }
+            let mut malformed = f.case.clone();
+            malformed.factor_base["points"][1] = malformed.factor_base["points"][0].clone();
+            assert!(!koblitz_worker_profile(&f.config, &malformed));
+        }
+    }
+
     #[test]
     fn verified_worker_originals_bind_real_files_and_reject_substitution() {
         let f = Fixture::new();

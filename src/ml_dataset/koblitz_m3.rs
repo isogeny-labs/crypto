@@ -11220,3 +11220,936 @@ mod producer_input_adoption_tests {
         }
     }
 }
+
+/// Worker-only orchestration. The caller installs the original bound sink and
+/// authenticates the token before entry. This function owns capture finalization;
+/// the generic wrapper must not republish payloads or finish the sink again.
+/// Registration remains gated on independent central replay and worker fixtures.
+pub(super) fn run_verified_worker_entry(
+    original: &super::VerifiedWorkerOriginal<'_>,
+    context: &crate::ml_dataset::execution::SolverExecutionContext,
+    binding: &crate::ml_dataset::capture::AttemptBinding,
+    limits: &crate::ml_dataset::capture::CaptureLimits,
+) -> Result<super::WorkerSolveOutput, String> {
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix::Engine;
+    use crate::ml_dataset::types::SolverData;
+    use serde_json::json;
+    if original.binding != Some(binding) || &context.launch.binding != binding {
+        return Err("Koblitz worker token differs from original execution attempt".into());
+    }
+    let engine = match original.config.solver.as_str() {
+        "f4" => Engine::F4Macaulay,
+        "f5" => Engine::F5KoszulFrobenius,
+        _ => return Err("Koblitz m3 requires F4 or F5".into()),
+    };
+    let mut budget = super::LIVE_SINK.with(|slot| match slot.borrow().as_ref() {
+        Some(super::EventSink::Bound(sink)) => {
+            sink.verify_attempt_limits(binding, limits)?;
+            admit_original(original.root, original.config, context, sink)
+        }
+        _ => Err("Koblitz worker entry requires installed bound capture".into()),
+    })?;
+    // Charge output assembly, fixed-size hashes, and a terminal capture event
+    // before any native producer or root-storage side effect. This tariff is
+    // modeled work/bytes, never a retired hardware instruction count.
+    budget
+        .reserve_checking(
+            32 * 64 * 1024 + 65536,
+            2 * 1024 * 1024 + 128 * 1024,
+            Instant::now(),
+        )
+        .map_err(|s| format!("Koblitz output admission: {s:?}"))?;
+    budget
+        .reserve_trace(4 * 64 * 1024 + 4096, Instant::now())
+        .map_err(|s| format!("Koblitz terminal capture admission: {s:?}"))?;
+    let mut receipts = super::WorkerStoredReceipts::admit(original, 12, |work, bytes| {
+        budget
+            .reserve_checking(work, bytes, Instant::now())
+            .map_err(|s| format!("Koblitz receipt handoff admission: {s:?}"))
+    })?;
+    // At most ten retained owners plus one delivery record. The unattached
+    // publisher / attached-run input roots are alternative owners of the same
+    // input, never additional roots. Reserve twelve rejection slots before work.
+    let mut rejected_roots = Vec::new();
+    budget
+        .reserve_bytes(
+            (12 * std::mem::size_of::<crate::ml_dataset::types::Artifact>()) as u64,
+            Instant::now(),
+        )
+        .map_err(|s| format!("Koblitz rejected receipt admission: {s:?}"))?;
+    rejected_roots
+        .try_reserve_exact(12)
+        .map_err(|_| "Koblitz rejected receipt allocation")?;
+    let mut witness_root_registered = false;
+    let mut accept_receipt = |artifact: crate::ml_dataset::types::Artifact| {
+        let is_witness = artifact.path == "pdp-witness.json";
+        match receipts.push(artifact) {
+            Ok(()) => witness_root_registered |= is_witness,
+            Err((_error, artifact)) => rejected_roots.push(artifact),
+        }
+    };
+    let mut delivery = ParentDeliveryFile::admit(&mut budget)
+        .map_err(|s| format!("Koblitz delivery admission: {s:?}"))?;
+    let mut publisher = PreMatrixInputStore::new(original.root, binding, limits, &mut budget)
+        .map_err(|s| format!("Koblitz input admission: {s:?}"))?;
+    let mut global = super::LIVE_SINK.with(|slot| match slot.borrow().as_ref() {
+        Some(super::EventSink::Bound(sink)) => {
+            sink.verify_attempt_limits(binding, limits)?;
+            usize::try_from(sink.committed_event_count())
+                .map_err(|_| "Koblitz capture count overflow".to_owned())
+        }
+        _ => Err("Koblitz capture disappeared before producer entry".into()),
+    })?;
+    let public_sha256 = hex::encode(original.public_sha256);
+    let factor_base_sha256 = hex::encode(original.factor_base_sha256);
+    let mut witness = false;
+    let mut domain_complete = false;
+    let mut matrix_complete = false;
+    let mut delivery_complete = false;
+    let mut canonical_complete = false;
+    let mut retention_failed = false;
+    // Never return Err after producer entry: acknowledged roots must reach the
+    // worker even when another phase, final event, or capture finish fails.
+    if let Ok(math) = decode_verified_worker_math(original, &mut budget) {
+        let mut run = run_canonical_pipeline(
+            &math,
+            binding,
+            limits,
+            &public_sha256,
+            &factor_base_sha256,
+            engine,
+            original.config.degree_bound,
+            &mut budget,
+            &mut global,
+            &mut |bytes, b, count| publisher.publish(bytes, b, count),
+        );
+        if publisher.attempted && publisher.attach_to(&mut run).is_err() {
+            // A rejected checking reservation can leave a raw buffer without a
+            // receipt. Preserve the original stop and retained raw identity.
+            retention_failed = true;
+        }
+        if let Some(p) = &run.pipeline {
+            matrix_complete = p
+                .native
+                .matrix
+                .as_ref()
+                .and_then(|m| m.report.as_ref())
+                .is_some_and(|r| r.native_step_complete);
+            if let Some(signed) = &p.signed {
+                witness = signed.first_receipt.is_some();
+                domain_complete = signed.complete
+                    && signed.unacknowledged.is_none()
+                    && signed.acknowledged.len() == 192;
+            }
+        }
+        canonical_complete = run.input_sha256.is_some()
+            && run.group.as_ref().is_some_and(|e| e.complete)
+            && run.result.as_ref().is_some_and(|e| e.complete);
+        match ParentRetention::begin(&mut budget) {
+            Ok(mut parent) => {
+                let taken = take_parent_artifacts(&mut run, &mut parent);
+                retention_failed |= taken.error.is_some() || taken.stop.is_some();
+                if let Some(mut owners) = taken.value {
+                    if persist_parent_artifacts(
+                        &mut owners,
+                        &mut parent,
+                        original.root,
+                        binding,
+                        limits,
+                    )
+                    .is_err()
+                    {
+                        retention_failed = true;
+                    }
+                    delivery_complete = owners.retention_stop.is_none()
+                        && parent.stop.is_none()
+                        && owners.persistence_error.is_none()
+                        && !owners.items.is_empty()
+                        && owners
+                            .items
+                            .iter()
+                            .all(|a| a.capture_acknowledged && a.root_artifact.is_some());
+                    if delivery
+                        .finish(&owners, &parent, binding, original.root)
+                        .is_err()
+                    {
+                        retention_failed = true;
+                    }
+                    for item in &mut owners.items {
+                        if let Some(artifact) = item.root_artifact.take() {
+                            accept_receipt(artifact);
+                        }
+                    }
+                }
+            }
+            Err(_) => retention_failed = true,
+        }
+        // Owner admission may fail after original input storage. Preserve the
+        // acknowledged original root even though no parent record was emitted.
+        if let Some(input) = &mut run.producer_input {
+            if let Some(artifact) = input.root_artifact.take() {
+                accept_receipt(artifact);
+            }
+        }
+    }
+    // An attach failure leaves the actual root acknowledgement in publisher.
+    if let Some(artifact) = publisher.root_artifact.take() {
+        accept_receipt(artifact);
+    }
+    if let Some(artifact) = delivery.artifact.take() {
+        accept_receipt(artifact);
+    }
+    drop(accept_receipt);
+    let receipt_rejected = !rejected_roots.is_empty();
+    let ledger = budget.saved_ledger();
+    let completed = ledger.phase == Phase::Complete
+        && ledger.first_stop.is_none()
+        && domain_complete
+        && canonical_complete
+        && delivery_complete
+        && !retention_failed
+        && !receipt_rejected;
+    let mut outcome = json!({
+        "adapter_id":"koblitz-m3-native-v1", "strategy":"koblitz-m3-native-v1",
+        "status":if completed {"verified"} else {"partial"},
+        "solver_completed":completed,
+        "pdp_witness_verified":witness,
+        "retained_pdp_witness_verified":witness,
+        "certificate_durably_persisted":witness && witness_root_registered,
+        "group_domain_complete":completed && domain_complete,
+        "exhaustive_no_decomposition":completed && !witness,
+        "native_backend_invoked":completed && matrix_complete,
+        "algebra_completed":completed && matrix_complete,
+        "native_statistics_complete":completed && matrix_complete,
+        "first_fall_degree":null,"last_fall_degree":null,
+        "retired_hardware_instructions":null,
+        "fall_degree_verified":false,"exact_instruction_count_verified":false,
+        "operation_trajectory_verified":false,"full_execution_trace_verified":false,
+        "independent_derivation_verified":false,
+        "adapter_reserved_native_work":ledger.native_reserved.work,
+        "adapter_reserved_checking_work":ledger.checking_reserved_work,
+        "adapter_reserved_bytes":ledger.adapter_reserved_bytes,
+        "native_reserved_bytes":ledger.native_reserved.bytes,
+        "charged_trace_bytes":ledger.charged_trace_bytes,
+        "performed_group_additions":ledger.group_additions,
+        "first_stop":ledger.first_stop,
+        "parent_delivery_complete":delivery_complete,
+        "unregistered_root_acknowledgements":&rejected_roots
+    });
+    if retention_failed || receipt_rejected {
+        outcome["live_persistence_errors"] =
+            json!(["Koblitz retention or receipt handoff incomplete"]);
+    }
+    let terminal =
+        super::live_event(&json!({"kind":"solver_return","outcome":&outcome,"error":null}));
+    let finish = super::LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+        Some(super::EventSink::Bound(sink)) => sink.finish().map_err(|e| e.to_string()),
+        _ => Err("Koblitz capture disappeared during finalization".into()),
+    });
+    if terminal.is_err() || finish.is_err() || Instant::now() >= budget.deadline {
+        outcome["status"] = json!("partial");
+        outcome["solver_completed"] = json!(false);
+        outcome["exhaustive_no_decomposition"] = json!(false);
+        outcome["group_domain_complete"] = json!(false);
+        outcome["native_backend_invoked"] = json!(false);
+        outcome["algebra_completed"] = json!(false);
+        outcome["native_statistics_complete"] = json!(false);
+        outcome["live_persistence_errors"] = json!(["Koblitz final capture delivery incomplete"]);
+    }
+    Ok(receipts.finish(SolverData {
+        outcome,
+        artifacts: Vec::new(),
+    }))
+}
+
+// Central original-bound replay for full and interrupted native worker output.
+pub(super) fn verify_worker_cell(
+    dir: &std::path::Path,
+    config: &crate::ml_dataset::types::CaseConfig,
+    outcome: &serde_json::Value,
+    artifacts: &[crate::ml_dataset::types::Artifact],
+) -> Result<Option<serde_json::Value>, String> {
+    use super::prime_f4_wide::{artifact, read_bounded};
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix::Engine;
+    use crate::ml_dataset::{execution, storage, types::CaseData};
+    let reserved = artifacts.iter().any(|a| {
+        let p = a.path.strip_prefix("live/payloads/").unwrap_or(&a.path);
+        p.starts_with("koblitz-m3-")
+            || p.starts_with("partial-koblitz-m3-")
+            || a.role.starts_with("restricted-koblitz-m3-")
+    });
+    if !reserved
+        && outcome["strategy"] != "koblitz-m3-native-v1"
+        && outcome["adapter_id"] != "koblitz-m3-native-v1"
+    {
+        return Ok(None);
+    }
+    if !outcome.is_object() {
+        return Err("Koblitz outcome must be an object".into());
+    }
+    let saved_config: crate::ml_dataset::types::CaseConfig =
+        crate::ml_dataset::read_json(&dir.join("config.json"))?;
+    // Same parsed configuration used by original worker admission, including
+    // work, degree and solver fields that mathematical input replay cannot bind.
+    if serde_json::to_value(&saved_config).map_err(|e| e.to_string())?
+        != serde_json::to_value(config).map_err(|e| e.to_string())?
+    {
+        return Err("Koblitz replay config differs from original saved config".into());
+    }
+    if config.family != "koblitz"
+        || config.m != 3
+        || !((23..=31).contains(&config.n) || (47..=61).contains(&config.n))
+        || !(1..=6).contains(&config.degree_bound)
+    {
+        return Err("Koblitz artifact outside original field/arity/degree profile".into());
+    }
+    let engine = match config.solver.as_str() {
+        "f4" => Engine::F4Macaulay,
+        "f5" => Engine::F5KoszulFrobenius,
+        _ => return Err("Koblitz artifact outside original engine profile".into()),
+    };
+    verify_slot_identities(artifacts)?;
+    super::prime_f4_wide::verify_unproved_claims(outcome)?;
+    for key in [
+        "producer_entry_anchor_verified",
+        "independent_derivation_verified",
+        "operation_trajectory_verified",
+        "exact_instruction_count_verified",
+        "full_execution_trace_verified",
+        "fall_degree_verified",
+        "linear_extraction_complete",
+        "extraction_complete",
+    ] {
+        if !outcome[key].is_null() && outcome[key] != false {
+            return Err(format!("Koblitz replay does not certify {key}"));
+        }
+    }
+    storage::verify_manifest(dir, artifacts)?;
+    execution::verify(dir, artifacts)?;
+    crate::ml_dataset::verify_capture_context(dir, artifacts)?;
+    let launch = execution::load(dir)?.ok_or("Koblitz replay lacks original launch")?;
+    let (binding, capture) = crate::ml_dataset::admit_capture_context(dir)?
+        .ok_or("Koblitz replay lacks original capture binding")?;
+    if launch.binding != binding {
+        return Err("Koblitz original bindings differ".into());
+    }
+    let limits = OriginalLimits::from_original(config, &launch)?;
+    // Historical load validates frozen launch/attempt without renewing a clock.
+    // Original curve/domain replay is offline verification, not producer setup.
+    let case = CaseData {
+        public_instance: crate::ml_dataset::read_json(&dir.join("public.json"))?,
+        private_witness: serde_json::Value::Null,
+        factor_base: crate::ml_dataset::read_json(&dir.join("factor-base.json"))?,
+    };
+    let original = original_math(config, &case)?;
+    let public = artifact(artifacts, "public.json", "public-instance", "json", true)?
+        .ok_or("missing original public artifact")?;
+    let factor = artifact(artifacts, "factor-base.json", "factor-base", "json", true)?
+        .ok_or("missing original factor base artifact")?;
+    let canonical = |slot: (&str, &str, &str)| {
+        artifacts
+            .iter()
+            .any(|a| a.path == slot.0 && a.role == slot.1 && a.encoding == slot.2)
+    };
+    let prefix = crate::ml_dataset::capture::verify_live_committed_prefix(dir, &binding, &capture)?;
+    if prefix.is_some() {
+        for path in ["live/committed.json", "live/events.jsonl"] {
+            if artifacts.iter().filter(|a| a.path == path).count() != 1 {
+                return Err(format!(
+                    "Koblitz prefix lacks unique manifest member {path}"
+                ));
+            }
+        }
+    }
+    let witness_artifact = artifact(
+        artifacts,
+        "pdp-witness.json",
+        "independently-verified-pdp",
+        "json",
+        false,
+    )?;
+    let captured_witness = prefix.as_ref().and_then(|p| {
+        p.payloads
+            .iter()
+            .find(|(_, a)| a.path == "payloads/pdp-witness.json")
+    });
+    // A published witness can survive root-storage failure. That case goes
+    // through partial verification, which can authenticate the live-held proof.
+    let root_inventory_complete = captured_witness.is_none() || witness_artifact.is_some();
+    if KOBLITZ_SLOTS.iter().all(|&slot| canonical(slot)) && root_inventory_complete {
+        let checked = verify_canonical_components(
+            dir,
+            artifacts,
+            &original,
+            &binding,
+            &capture,
+            limits,
+            &public.sha256,
+            &factor.sha256,
+            engine,
+            config.degree_bound,
+        )?;
+        let has_delivery = canonical(PARENT_DELIVERY_SLOT);
+        let facts = if has_delivery {
+            let delivery = verify_parent_delivery(
+                dir,
+                artifacts,
+                &binding,
+                &capture,
+                limits,
+                checked.producer_ledger,
+            )?;
+            verify_delivered_outcome(outcome, &checked, &delivery)?
+        } else {
+            let facts = verify_outer_outcome(outcome, &checked)?;
+            if facts.solver_completed {
+                return Err("Koblitz completion lacks canonical parent delivery".into());
+            }
+            if !outcome["parent_delivery_independently_verified"].is_null()
+                && outcome["parent_delivery_independently_verified"] != false
+            {
+                return Err("Koblitz parent delivery claim lacks canonical evidence".into());
+            }
+            facts
+        };
+        return Ok(Some(serde_json::json!({
+            "scope":if has_delivery {"canonical-components-and-parent-delivery"} else {"canonical-components-without-parent-delivery"},
+            "solver_completed":facts.solver_completed,
+            "retained_witness_verified":facts.retained_witness_verified,
+            "supervisor_censored":facts.supervisor_censored,
+            "parent_delivery_independently_verified":has_delivery,
+            "producer_entry_anchor_verified":false,
+            "exact_instruction_count_verified":false,
+            "fall_degree_verified":false
+        })));
+    }
+    if outcome["solver_completed"].as_bool() != Some(false) {
+        return Err("partial Koblitz artifacts require boolean solver_completed=false".into());
+    }
+    if !matches!(
+        outcome["status"].as_str(),
+        Some("partial" | "timeout" | "trace_budget_exhausted" | "worker_failed")
+    ) {
+        return Err("partial Koblitz artifacts require a partial/censored outcome".into());
+    }
+    let mut input_sha = None;
+    let mut input_verified = false;
+    let mut raw_input_verified = false;
+    if canonical(KOBLITZ_SLOTS[0]) {
+        let bytes = read_bounded(dir, KOBLITZ_SLOTS[0].0, INPUT_BYTE_CAP)?;
+        verify_original_input(
+            &bytes,
+            &original,
+            &binding,
+            &public.sha256,
+            &factor.sha256,
+            limits,
+        )?;
+        input_sha = Some(crate::ml_dataset::digest(&bytes));
+        input_verified = true;
+    } else if let Some(prefix) = &prefix {
+        if let Some((_, a)) = prefix
+            .payloads
+            .iter()
+            .find(|(_, a)| a.path == "payloads/koblitz-m3-input.json")
+        {
+            if a.role != KOBLITZ_SLOTS[0].1 || a.encoding != KOBLITZ_SLOTS[0].2 {
+                return Err("partial captured input identity mismatch".into());
+            }
+            let bytes = read_bounded(dir, "live/payloads/koblitz-m3-input.json", INPUT_BYTE_CAP)?;
+            if a.bytes != bytes.len() as u64 || a.sha256 != crate::ml_dataset::digest(&bytes) {
+                return Err("partial captured input digest mismatch".into());
+            }
+            verify_original_input(
+                &bytes,
+                &original,
+                &binding,
+                &public.sha256,
+                &factor.sha256,
+                limits,
+            )?;
+            input_sha = Some(a.sha256.clone());
+            input_verified = true;
+        }
+    }
+    if input_sha.is_none() {
+        if artifact(
+            artifacts,
+            "partial-koblitz-m3-input.raw",
+            "unregistered-partial-artifact",
+            "native",
+            false,
+        )?
+        .is_some()
+        {
+            let bytes = read_bounded(dir, "partial-koblitz-m3-input.raw", INPUT_BYTE_CAP)?;
+            // Truncated raw encoding remains raw custody, not a malformed
+            // canonical assertion. Only a full strict mathematical replay
+            // supplies a digest for subsequent terminal/group binding.
+            if verify_original_input(
+                &bytes,
+                &original,
+                &binding,
+                &public.sha256,
+                &factor.sha256,
+                limits,
+            )
+            .is_ok()
+            {
+                input_sha = Some(crate::ml_dataset::digest(&bytes));
+                raw_input_verified = true;
+            }
+        }
+    }
+    let native = if canonical(KOBLITZ_SLOTS[1]) {
+        let bytes = read_bounded(dir, KOBLITZ_SLOTS[1].0, 4096 * 2048)?;
+        Some(verify_native_capture(
+            dir,
+            &bytes,
+            &binding,
+            &capture,
+            config.n as usize,
+            engine,
+            config.degree_bound,
+        )?)
+    } else {
+        None
+    };
+    let terminal = if canonical(KOBLITZ_SLOTS[2]) {
+        let bytes = read_bounded(dir, KOBLITZ_SLOTS[2].0, 64 * 1024)?;
+        Some(decode_terminal_result(
+            &bytes,
+            &binding,
+            &public.sha256,
+            &factor.sha256,
+            input_sha.as_deref(),
+            limits,
+            engine,
+            config.degree_bound,
+        )?)
+    } else {
+        None
+    };
+    if let (Some(n), Some(t)) = (&native, &terminal) {
+        if n.records as u64 != t.native_capture_acknowledged {
+            return Err("partial terminal native count differs from captured prefix".into());
+        }
+        if let Some(m) = &t.matrix {
+            if m.counters.acknowledged_events != n.matrix_captured as u64
+                || m.native_step_complete && !n.matrix_finish_captured
+            {
+                return Err("partial matrix report differs from captured prefix".into());
+            }
+        }
+    }
+    let mut witness_bytes = None;
+    let mut witness_root_verified = false;
+    if let Some(a) = witness_artifact {
+        let bytes = read_bounded(dir, "pdp-witness.json", SIGNED_WITNESS_BYTE_CAP)?;
+        verify_signed_witness(&bytes, &original)?;
+        let prefix = prefix
+            .as_ref()
+            .ok_or("retained witness lacks committed capture")?;
+        let matching: Vec<_> = prefix
+            .payloads
+            .iter()
+            .filter(|(_, p)| p.path == "payloads/pdp-witness.json")
+            .collect();
+        if matching.len() != 1
+            || matching[0].1.role != a.role
+            || matching[0].1.encoding != a.encoding
+            || matching[0].1.bytes != a.bytes
+            || matching[0].1.sha256 != a.sha256
+        {
+            return Err("retained witness lacks matching capture receipt".into());
+        }
+        witness_root_verified = true;
+        witness_bytes = Some(bytes);
+    } else if let Some((_, a)) = captured_witness {
+        if a.role != "independently-verified-pdp" || a.encoding != "json" {
+            return Err("captured witness identity mismatch".into());
+        }
+        let bytes = read_bounded(
+            dir,
+            "live/payloads/pdp-witness.json",
+            SIGNED_WITNESS_BYTE_CAP,
+        )?;
+        if a.bytes != bytes.len() as u64 || a.sha256 != crate::ml_dataset::digest(&bytes) {
+            return Err("captured witness digest mismatch".into());
+        }
+        verify_signed_witness(&bytes, &original)?;
+        witness_bytes = Some(bytes);
+    }
+    let mut domain_verified = false;
+    let mut negative_verified = false;
+    if canonical(KOBLITZ_SLOTS[3]) {
+        let bytes = read_bounded(dir, KOBLITZ_SLOTS[3].0, SIGNED_REPLAY_BYTE_CAP)?;
+        let checked = verify_group_replay(
+            &bytes,
+            witness_bytes.as_deref(),
+            &original,
+            &binding,
+            &public.sha256,
+            &factor.sha256,
+            input_sha
+                .as_deref()
+                .ok_or("partial group lacks verified input")?,
+            limits.additions,
+        )?;
+        let saved: SavedGroupReplay = serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+        let signed = serde_json::to_vec(&saved.signed).map_err(|e| e.to_string())?;
+        verify_signed_capture(dir, &signed, &binding, &capture)?;
+        domain_verified = checked.math.prefix.all_tuples_acknowledged;
+        negative_verified = checked.math.negative_domain_verified();
+        if let Some(t) = &terminal {
+            let s = t
+                .signed
+                .as_ref()
+                .ok_or("partial group lacks terminal signed report")?;
+            if s.enumeration_additions != saved.signed.performed_additions as u64
+                || s.acknowledged_additions != saved.signed.acknowledged.len()
+                || s.has_unacknowledged_addition != saved.signed.unacknowledged.is_some()
+                || s.witness_check_additions != u64::from(saved.reported_witness_check_additions)
+                || t.ledger_before_terminal_encoding.group_additions
+                    != saved.reported_total_additions
+            {
+                return Err("partial terminal signed counters differ from replay".into());
+            }
+        }
+    }
+    let mut parent_consistency_verified = false;
+    if canonical(PARENT_DELIVERY_SLOT) {
+        let bytes = read_bounded(dir, PARENT_DELIVERY_SLOT.0, PARENT_DELIVERY_CAP)?;
+        let saved: SavedParentDelivery = serde_json::from_slice(&bytes)
+            .map_err(|e| format!("strict partial parent delivery: {e}"))?;
+        if let Some(t) = &terminal {
+            if saved.before != t.ledger_before_terminal_encoding {
+                return Err("partial parent boundary contradicts terminal ledger".into());
+            }
+        }
+        // Validate actual custody and modeled transition using its reported
+        // boundary. This is deliberately NOT independently anchored accounting.
+        verify_parent_delivery(dir, artifacts, &binding, &capture, limits, saved.before)?;
+        parent_consistency_verified = true;
+    }
+    let witness_verified = witness_bytes.is_some();
+    for (key, supported) in [
+        ("pdp_witness_verified", witness_root_verified),
+        ("retained_pdp_witness_verified", witness_verified),
+        ("certificate_durably_persisted", witness_root_verified),
+        ("group_domain_complete", domain_verified),
+        ("exhaustive_no_decomposition", negative_verified),
+        (
+            "native_backend_invoked",
+            native.as_ref().is_some_and(|n| n.matrix_captured > 0),
+        ),
+        ("native_statistics_complete", false),
+        ("algebra_completed", false),
+        ("parent_delivery_independently_verified", false),
+    ] {
+        if let Some(value) = outcome.get(key) {
+            let claimed = value
+                .as_bool()
+                .ok_or_else(|| format!("nonboolean Koblitz claim {key}"))?;
+            if claimed && !supported {
+                return Err(format!("partial Koblitz artifacts do not support {key}"));
+            }
+        }
+    }
+    Ok(Some(serde_json::json!({"scope":"partial-artifacts",
+        "original_input_verified":input_verified,"raw_original_input_verified":raw_input_verified,
+        "retained_witness_verified":witness_verified,"witness_root_verified":witness_root_verified,
+        "group_domain_verified":domain_verified,"negative_domain_verified":negative_verified,
+        "solver_completed":false,"parent_delivery_consistency_verified":parent_consistency_verified,
+        "parent_delivery_independently_verified":false,"producer_entry_anchor_verified":false,
+        "exact_instruction_count_verified":false,"fall_degree_verified":false})))
+}
+
+// Append inside koblitz_m3.rs after runtime entry + central replay definitions.
+// Requires external koblitz-worker-fixture-extension.patch, runtime entry,
+// WorkerSolveOutput::into_parts, and stored-root transport already applied.
+// Uses the SAME fixture constructor as with_shape(23, twist, 4), extended to
+// freeze solver/work/launch resources before generating an original case.
+// Existing with_shape defaults remain enumerate/100 and are unchanged.
+#[cfg(test)]
+mod worker_central_replay_tests {
+    use super::*;
+    use crate::ml_dataset::solvers::{self, verified_worker_original_tests::Fixture};
+    use crate::ml_dataset::{self as dataset, capture, execution, storage, telemetry};
+    use serde_json::json;
+
+    struct InstalledSink;
+    impl Drop for InstalledSink {
+        fn drop(&mut self) {
+            // Runtime owns finish; cleanup must never finish it a second time.
+            solvers::LIVE_SINK.with(|slot| {
+                slot.borrow_mut().take();
+            });
+        }
+    }
+
+    #[test]
+    fn frozen_worker_f4_f5_twists_replay_complete_and_input_storage_failure() {
+        for solver in ["f4", "f5"] {
+            for twist in [false, true] {
+                for root_collision in [false, true] {
+                    let f = Fixture::with_runtime_shape(23, twist, 4, solver);
+                    let capture_limits = capture::capture_limits(128).unwrap();
+                    let mut registry = vec![telemetry::checked::install_policy(&f.root).unwrap()];
+                    registry.push(
+                        storage::write_json(
+                            &f.root,
+                            "capture-binding.json",
+                            "partial-capture-binding",
+                            &f.binding,
+                        )
+                        .unwrap(),
+                    );
+                    registry.push(
+                        storage::write_json(
+                            &f.root,
+                            "capture-limits.json",
+                            "partial-capture-limits",
+                            &capture_limits,
+                        )
+                        .unwrap(),
+                    );
+                    execution::create(&f.root).unwrap();
+                    let context = execution::admit(&f.root).unwrap().unwrap();
+                    let case =
+                        telemetry::measured(&f.root, &mut registry, "curve-construction", || {
+                            solvers::curves::generate(&f.config)
+                        })
+                        .unwrap();
+                    let token = solvers::verify_and_store_worker_originals(
+                        &f.config,
+                        &case,
+                        &f.root,
+                        Some(&f.binding),
+                        &mut registry,
+                    )
+                    .unwrap();
+                    token
+                        .matches_bound(&f.config, &case, &f.root.join("live"), &f.binding)
+                        .unwrap();
+                    if root_collision {
+                        // A real storage refusal preserves the captured input.
+                        // It does not mutate the frozen plan, limits or binding.
+                        std::fs::write(
+                            f.root.join(KOBLITZ_SLOTS[0].0),
+                            b"software-control root conflict",
+                        )
+                        .unwrap();
+                    }
+                    let sink = capture::CaptureEmitter::create(
+                        &f.root.join("live"),
+                        f.binding.clone(),
+                        capture_limits.clone(),
+                    )
+                    .unwrap();
+                    solvers::LIVE_SINK.with(|slot| {
+                        assert!(slot.borrow().is_none());
+                        *slot.borrow_mut() = Some(solvers::EventSink::Bound(sink));
+                    });
+                    let _guard = InstalledSink;
+                    let output = telemetry::measured(&f.root, &mut registry, "solver", || {
+                        run_verified_worker_entry(&token, &context, &f.binding, &capture_limits)
+                    })
+                    .unwrap();
+                    let (data, roots) = output.into_parts();
+                    assert!(
+                        data.artifacts.is_empty(),
+                        "runtime must not hand duplicate payloads to worker"
+                    );
+                    let input_roots = roots
+                        .iter()
+                        .filter(|a| a.path == KOBLITZ_SLOTS[0].0)
+                        .count();
+                    assert_eq!(input_roots, usize::from(!root_collision));
+                    // Adopt actual already-stored receipts; do not write bytes again.
+                    for a in roots {
+                        assert!(!registry.iter().any(|old| old.path == a.path));
+                        registry.push(a);
+                    }
+                    storage::write_json(
+                        &f.root,
+                        "worker-artifacts.json",
+                        "artifact-registry",
+                        &registry,
+                    )
+                    .unwrap();
+                    let artifacts = dataset::collect_cell_artifacts(&f.root).unwrap();
+                    let verified =
+                        verify_worker_cell(&f.root, &f.config, &data.outcome, &artifacts)
+                            .unwrap()
+                            .unwrap();
+                    assert_eq!(verified["solver_completed"], json!(!root_collision));
+                    assert_eq!(data.outcome["solver_completed"], json!(!root_collision));
+                    assert_eq!(verified["producer_entry_anchor_verified"], false);
+                    assert_eq!(verified["exact_instruction_count_verified"], false);
+                    if root_collision {
+                        assert_eq!(verified["scope"], "partial-artifacts");
+                        assert_eq!(verified["original_input_verified"], true);
+                        assert_eq!(verified["parent_delivery_independently_verified"], false);
+                        assert_eq!(
+                            std::fs::read(f.root.join(KOBLITZ_SLOTS[0].0)).unwrap(),
+                            b"software-control root conflict"
+                        );
+                    }
+                    // Caller-side substitutions cannot replace the saved admission.
+                    for mutation in 0..3 {
+                        let mut changed = f.config.clone();
+                        match mutation {
+                            0 => changed.work_limit += 1,
+                            1 => changed.degree_bound += 1,
+                            _ => changed.solver = if solver == "f4" { "f5" } else { "f4" }.into(),
+                        }
+                        assert!(
+                            verify_worker_cell(&f.root, &changed, &data.outcome, &artifacts)
+                                .is_err()
+                        );
+                    }
+                    for key in [
+                        "producer_entry_anchor_verified",
+                        "exact_instruction_count_verified",
+                        "fall_degree_verified",
+                    ] {
+                        let mut forged = data.outcome.clone();
+                        forged[key] = true.into();
+                        assert!(
+                            verify_worker_cell(&f.root, &f.config, &forged, &artifacts).is_err(),
+                            "unsupported {key}"
+                        );
+                    }
+                    if root_collision {
+                        for key in [
+                            "solver_completed",
+                            "parent_delivery_independently_verified",
+                            "native_backend_invoked",
+                        ] {
+                            let mut forged = data.outcome.clone();
+                            forged[key] = true.into();
+                            assert!(
+                                verify_worker_cell(&f.root, &f.config, &forged, &artifacts)
+                                    .is_err(),
+                                "partial unsupported {key}"
+                            );
+                        }
+                        let mut forged = data.outcome.clone();
+                        forged.as_object_mut().unwrap().remove("solver_completed");
+                        assert!(
+                            verify_worker_cell(&f.root, &f.config, &forged, &artifacts).is_err()
+                        );
+                    } else {
+                        // Full mathematical evidence without a parent descriptor
+                        // retains partial facts, but cannot claim completion.
+                        let without_parent: Vec<_> = artifacts
+                            .iter()
+                            .filter(|a| a.path != PARENT_DELIVERY_SLOT.0)
+                            .cloned()
+                            .collect();
+                        let mut partial = data.outcome.clone();
+                        partial["status"] = "partial".into();
+                        partial["solver_completed"] = false.into();
+                        partial["parent_delivery_independently_verified"] = false.into();
+                        let retained =
+                            verify_worker_cell(&f.root, &f.config, &partial, &without_parent)
+                                .unwrap()
+                                .unwrap();
+                        assert_eq!(retained["solver_completed"], false);
+                        assert_eq!(retained["parent_delivery_independently_verified"], false);
+                        assert!(verify_worker_cell(
+                            &f.root,
+                            &f.config,
+                            &data.outcome,
+                            &without_parent
+                        )
+                        .is_err());
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn real_worker_dispatches_frozen_f4_f5_and_replays_stored_receipts() {
+        for solver in ["f4", "f5"] {
+            let f = Fixture::with_runtime_shape(23, false, 4, solver);
+            let limits = capture::capture_limits(128).unwrap();
+            telemetry::checked::install_policy(&f.root).unwrap();
+            storage::write_json(
+                &f.root,
+                "capture-binding.json",
+                "partial-capture-binding",
+                &f.binding,
+            )
+            .unwrap();
+            storage::write_json(
+                &f.root,
+                "capture-limits.json",
+                "partial-capture-limits",
+                &limits,
+            )
+            .unwrap();
+            let original_launch = execution::create(&f.root).unwrap();
+            assert!(solvers::LIVE_SINK.with(|slot| slot.borrow().is_none()));
+
+            // Exercise the actual worker's checked generation, original-token
+            // verification, dedicated dispatch, telemetry, root adoption and
+            // result/registry writes. No direct adapter call in this control.
+            dataset::worker(&f.config, &f.root).unwrap();
+            assert!(solvers::LIVE_SINK.with(|slot| slot.borrow().is_none()));
+            let outcome: serde_json::Value =
+                dataset::read_json(&f.root.join("result.json")).unwrap();
+            assert_eq!(
+                outcome["strategy"], "koblitz-m3-native-v1",
+                "worker outcome: {outcome}"
+            );
+            assert_eq!(outcome["adapter_id"], "koblitz-m3-native-v1");
+            assert_eq!(
+                outcome["solver_completed"], true,
+                "worker outcome: {outcome}"
+            );
+            assert_eq!(outcome["known_answer_verified"], true);
+            assert_eq!(outcome["factor_base_verified"], true);
+            let artifacts = dataset::collect_cell_artifacts(&f.root).unwrap();
+            let checked = solvers::verify_koblitz_m3_cell(&f.root, &f.config, &outcome, &artifacts)
+                .unwrap()
+                .unwrap();
+            assert_eq!(checked["solver_completed"], true);
+            assert_eq!(checked["parent_delivery_independently_verified"], true);
+            assert_eq!(checked["producer_entry_anchor_verified"], false);
+            for &(path, role, encoding) in &KOBLITZ_SLOTS {
+                let matches: Vec<_> = artifacts.iter().filter(|a| a.path == path).collect();
+                assert_eq!(matches.len(), 1);
+                assert_eq!(matches[0].role, role);
+                assert_eq!(matches[0].encoding, encoding);
+            }
+            let registry: Vec<crate::ml_dataset::types::Artifact> =
+                dataset::read_json(&f.root.join("worker-artifacts.json")).unwrap();
+            assert_eq!(
+                registry
+                    .iter()
+                    .filter(|a| a.path == KOBLITZ_SLOTS[0].0)
+                    .count(),
+                1
+            );
+            assert_eq!(
+                registry
+                    .iter()
+                    .filter(|a| a.path == PARENT_DELIVERY_SLOT.0)
+                    .count(),
+                1
+            );
+            assert!(telemetry::checked::validate_directory(&f.root).is_ok());
+            let saved_launch = execution::load(&f.root).unwrap().unwrap();
+            assert_eq!(
+                saved_launch.deadline_monotonic_ns,
+                original_launch.deadline_monotonic_ns
+            );
+            assert_eq!(saved_launch.binding, original_launch.binding);
+            // This is an in-process worker control. It does not fabricate the
+            // supervisor's worker-process/stdout descriptors or call verify_cell.
+        }
+    }
+}

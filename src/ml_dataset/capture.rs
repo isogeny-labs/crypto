@@ -863,6 +863,11 @@ fn witness_write(
     Ok(())
 }
 impl CaptureEmitter {
+    /// Actual acknowledged stream head for worker-only adapter admission.
+    pub(super) fn committed_event_count(&self) -> u64 {
+        self.head.event_count
+    }
+
     /// Prepare under the caller's remaining shared byte/checking pools, before native.
     #[allow(dead_code)]
     pub(super) fn prepare_witness(

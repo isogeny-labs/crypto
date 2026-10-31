@@ -2586,6 +2586,14 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
         &manifest.outcome,
         &manifest.artifacts,
     )?;
+    // Reserved Koblitz artifacts must be checked even if strategy/labels were
+    // stripped, and even when optional known-answer replay was not requested.
+    solvers::verify_koblitz_m3_cell(
+        dir,
+        &manifest.config,
+        &manifest.outcome,
+        &manifest.artifacts,
+    )?;
     let wide_prime_replay = solvers::verify_prime_f4_wide(
         dir,
         &manifest.config,
