@@ -1,0 +1,75 @@
+ℹ [1161/1169] Replayed TwistProof
+info: TwistProof.lean:124:0: 'TwistProof.mixed_relation_two_torsion' depends on axioms: [propext]
+info: TwistProof.lean:125:0: 'TwistProof.coprime_annihilators' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TwistProof.lean:126:0: 'TwistProof.mixed_relation_odd' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TwistProof.lean:127:0: 'TwistProof.finite_hom_coprime' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TwistProof.lean:128:0: 'TwistProof.trace_antitrace_sum' depends on axioms: [propext]
+info: TwistProof.lean:129:0: 'TwistProof.trace_fixed' does not depend on any axioms
+info: TwistProof.lean:130:0: 'TwistProof.antitrace_negated' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TwistProof.lean:131:0: 'TwistProof.common_order_divides_q_plus_one' depends on axioms: [propext, Quot.sound]
+info: TwistProof.lean:132:0: 'TwistProof.symmetric_s3' depends on axioms: [propext, Quot.sound]
+info: TwistProof.lean:133:0: 'TwistProof.vieta_twist_cancellation' depends on axioms: [propext, Quot.sound]
+info: TwistProof.lean:134:0: 'TwistProof.twist_equation_identity' depends on axioms: [propext, Quot.sound]
+info: TwistProof.lean:135:0: 'TwistProof.twist_affine_map' depends on axioms: [propext]
+info: TwistProof.lean:136:0: 'TwistProof.monic_normalization' depends on axioms: [propext]
+info: TwistProof.lean:137:0: 'TwistProof.embedding_degree_two' depends on axioms: [propext, Quot.sound]
+✖ [2023/2024] Building FrobeniusBridge (3.2s)
+trace: .> LEAN_PATH=/workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/packages/mathlib/.lake/build/lib/lean:/workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/build/lib/lean /workspace/twist-tooling/elan/toolchains/leanprover--lean4---v4.34.1/bin/lean /workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/FrobeniusBridge.lean -o /workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/build/lib/lean/FrobeniusBridge.olean -i /workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/build/lib/lean/FrobeniusBridge.ilean -c /workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/build/ir/FrobeniusBridge.c --setup /workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/build/ir/FrobeniusBridge.setup.json --json
+error: FrobeniusBridge.lean:15:4: failed to synthesize instance of type class
+  AddZero (W⁄K).Point
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+error: FrobeniusBridge.lean:16:2: failed to synthesize instance of type class
+  DecidableEq K
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+error: FrobeniusBridge.lean:19:4: failed to synthesize instance of type class
+  AddZero (W⁄k).Point
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+error: FrobeniusBridge.lean:20:2: failed to synthesize instance of type class
+  DecidableEq k
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+error: FrobeniusBridge.lean:25:79: Unknown identifier `K`
+error: FrobeniusBridge.lean:25:39: Invalid argument name `S` for function `Point.map_baseChange`
+
+Hint: Perhaps you meant one of the following parameter names:
+  • `R`: S̵R̲
+  • `F`: S̵F̲
+  • `K`: S̵K̲
+  • `L`: S̵L̲
+  • `f`: S̵f̲
+  • `P`: S̵P̲
+error: FrobeniusBridge.lean:30:55: failed to synthesize instance of type class
+  HSMul ℕ (W⁄K).Point (W⁄K).Point
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+error: FrobeniusBridge.lean:31:8: failed to synthesize instance of type class
+  AddCommGroup (W⁄K).Point
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+error: FrobeniusBridge.lean:32:10: Unknown identifier `frobenius_fixes_rational`
+error: FrobeniusBridge.lean:33:2: No goals to be solved
+error: FrobeniusBridge.lean:39:43: failed to synthesize instance of type class
+  HSMul ℕ (W⁄K).Point ?m.29
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+error: FrobeniusBridge.lean:42:2: failed to synthesize instance of type class
+  AddCommGroup (W⁄K).Point
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+error: FrobeniusBridge.lean:46:43: failed to synthesize instance of type class
+  HSMul ℕ (W⁄K).Point ?m.29
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+warning: FrobeniusBridge.lean:51:16: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+error: FrobeniusBridge.lean:53:14: Unknown constant `frobenius_fixes_rational`
+info: FrobeniusBridge.lean:54:0: 'FrobeniusBridge.rational_mixed_two_torsion' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+info: FrobeniusBridge.lean:55:0: 'FrobeniusBridge.rational_mixed_odd' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+error: FrobeniusBridge.lean:56:14: Unknown constant `rational_relation_has_zero_twist_term`
+Some required targets logged failures:
+- FrobeniusBridge
+error: build failed

@@ -1,0 +1,8 @@
+# L0 local p17 probes, 2026-10-31, diagnostic only; concurrent with the crate test suite and each other (2-4 busy processes on 4 vCPU)
+# command: timeout 3600 ARM solve inputs/problems/p17-development-s001-t0.json NEW_RECEIPT
+cand p17-development-s001-t0 rc=1 wall_s=697.739529136
+base p17-development-s001-t0 rc=1 wall_s=716.997177593
+# stderr base: resource limit: parsimonious program evaluation
+# stderr cand: resource limit: parsimonious program evaluation
+# earlier probe with 300 s limit: base rc=124 300.0 s, cand rc=124 300.0 s
+# earlier direct probes (300 s limit, concurrent with builds): p5-development-s001-t0 base 245.96 s cand 66.90 s; p7-development-s001-t1 base 283.20 s cand 91.97 s

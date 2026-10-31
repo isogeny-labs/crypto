@@ -1,0 +1,6 @@
+digraph G {rankdir=TB;node[shape=box,style="rounded,filled",fillcolor="#edf3f5",fontname="Helvetica"];
+ old[label="Pinned prior 0..8\n3024 configurations / 54432 attempts\nOld arithmetic not re-executed"];
+ fresh[label="Fresh 9..12 / all 336 arms\n1344 configurations / 24192 attempts\nIndependent native replay"];
+ combined[label="Combined 4368 profiles\n21,464,352 policy/target/cap pairs\n243,624 unmatched / 0 strongest-source"];
+ {rank=same;old;fresh;}old->combined[label="Exact pins and provenance"];fresh->combined[label="New certificates and source scalars"];
+}

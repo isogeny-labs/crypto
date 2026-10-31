@@ -1,0 +1,73 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-01-02
+experiment_id: BLINDSPOT-01
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/01-fp2-gaudry-k2/raw/receipt-card-02.json
+must_not_exist:
+  - research/blindspots_20261018/01-fp2-gaudry-k2/raw/receipt-card-02.json
+  - research/blindspots_20261018/01-fp2-gaudry-k2/raw/control-b28.jsonl
+  - research/blindspots_20261018/01-fp2-gaudry-k2/raw/torsion-b32.jsonl
+  - research/blindspots_20261018/01-fp2-gaudry-k2/raw/gls-b32.jsonl
+  - research/blindspots_20261018/01-fp2-gaudry-k2/raw/prime-b32.jsonl
+  - research/blindspots_20261018/01-fp2-gaudry-k2/raw/rate-b32.jsonl
+  - research/blindspots_20261018/01-fp2-gaudry-k2/raw/rate-b36.jsonl
+binds:
+  - {path: examples/blindspots_01_fp2_gaudry.rs, sha256: 0629a73c7ff443e70c6ce16c0872b98a5aebc5a71d25f7bff60156c8693ff559}
+commands:
+  - id: make-bin-dir
+    argv: [mkdir, "-p", target/blindspots-01/card-02]
+    timeout_seconds: 15
+    success_exit_codes: [0]
+  - id: build
+    argv: [prlimit, --as=4294967296, rustc, --edition, "2021", "-C", opt-level=3, "-C", codegen-units=1, "-o", target/blindspots-01/card-02/b01, examples/blindspots_01_fp2_gaudry.rs]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+  - id: control-b28
+    argv: [prlimit, --as=4294967296, target/blindspots-01/card-02/b01, run, --family, torsion, --bits, "28", --idx, 0-2, --arms, "control-shuffled-a:0", --inv-cost, "4", --quiet, --out, research/blindspots_20261018/01-fp2-gaudry-k2/raw/control-b28.jsonl]
+    timeout_seconds: 110
+    success_exit_codes: [0]
+    outputs: [research/blindspots_20261018/01-fp2-gaudry-k2/raw/control-b28.jsonl]
+  - id: torsion-b32
+    argv: [prlimit, --as=4294967296, target/blindspots-01/card-02/b01, run, --family, torsion, --bits, "32", --idx, 0-5, --arms, "ic-a:0-1,ic-b:0-1,ic-c1:0-1,ic-c2:0-1,rho-neg:0-7", --inv-cost, "4", --crosscheck, "60", --quiet, --out, research/blindspots_20261018/01-fp2-gaudry-k2/raw/torsion-b32.jsonl]
+    timeout_seconds: 80
+    success_exit_codes: [0]
+    outputs: [research/blindspots_20261018/01-fp2-gaudry-k2/raw/torsion-b32.jsonl]
+  - id: gls-b32
+    argv: [prlimit, --as=4294967296, target/blindspots-01/card-02/b01, run, --family, gls, --bits, "32", --idx, 0-2, --arms, "ic-gls-neg:0-1,ic-gls-psi:0-1,rho-neg:0-7,rho-psi:0-7", --inv-cost, "4", --crosscheck, "60", --quiet, --out, research/blindspots_20261018/01-fp2-gaudry-k2/raw/gls-b32.jsonl]
+    timeout_seconds: 45
+    success_exit_codes: [0]
+    outputs: [research/blindspots_20261018/01-fp2-gaudry-k2/raw/gls-b32.jsonl]
+  - id: prime-b32
+    argv: [prlimit, --as=4294967296, target/blindspots-01/card-02/b01, run, --family, prime, --bits, "32", --idx, 0-2, --arms, "ic-a:0-1,rho-neg:0-7", --inv-cost, "4", --crosscheck, "60", --quiet, --out, research/blindspots_20261018/01-fp2-gaudry-k2/raw/prime-b32.jsonl]
+    timeout_seconds: 45
+    success_exit_codes: [0]
+    outputs: [research/blindspots_20261018/01-fp2-gaudry-k2/raw/prime-b32.jsonl]
+  - id: rate-b32
+    argv: [prlimit, --as=4294967296, target/blindspots-01/card-02/b01, run, --family, torsion, --bits, "32", --idx, 0-2, --arms, "control-shuffled-rate:0", --inv-cost, "4", --control-trials, "200", --quiet, --out, research/blindspots_20261018/01-fp2-gaudry-k2/raw/rate-b32.jsonl]
+    timeout_seconds: 45
+    success_exit_codes: [0]
+    outputs: [research/blindspots_20261018/01-fp2-gaudry-k2/raw/rate-b32.jsonl]
+  - id: rate-b36
+    argv: [prlimit, --as=4294967296, target/blindspots-01/card-02/b01, run, --family, torsion, --bits, "36", --idx, 0-2, --arms, "control-shuffled-rate:0", --inv-cost, "4", --control-trials, "300", --quiet, --out, research/blindspots_20261018/01-fp2-gaudry-k2/raw/rate-b36.jsonl]
+    timeout_seconds: 100
+    success_exit_codes: [0]
+    outputs: [research/blindspots_20261018/01-fp2-gaudry-k2/raw/rate-b36.jsonl]
+  - id: remove-bin
+    argv: [rm, "-f", target/blindspots-01/card-02/b01]
+    timeout_seconds: 15
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-01
+background: false
+write_scope:
+  - research/blindspots_20261018/01-fp2-gaudry-k2/raw/
+  - target/blindspots-01/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto."

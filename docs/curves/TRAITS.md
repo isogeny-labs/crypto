@@ -278,12 +278,20 @@ over a field of the target's size.
 
 ## Current catalogue and earlier classification panel
 
-The generated index covers every registered model. It includes the
+The retained generated index covers the registry snapshot used for its run. It includes the
 100 independently verified large-prime isogeny codomains. Each record retains
 the status of its order certificate and every derived trait. Models whose
 coordinate/order adapter is unavailable explicitly report `not_evaluated`;
 Curve25519 is one such record. A complete catalogue entry does not by itself
 certify its coordinates or group order.
+
+The 2026-10-21 [native quadratic-twist catalog](sources/quadratic-twist-native-20261021.json)
+adds 1,921 registered models, including 963 extension-field models and 27 selected
+EC1 subgroup representations. Those finite replay and identity records are linked
+from the [study](../../research/quadratic_twist_evidence_20261021/README.md).
+The generated trait-classification panel below has not been rerun for these
+additions; its totals remain the earlier snapshot. Registration alone does not
+assign a new endomorphism-ring or volcano-level classification.
 
 In the regenerated file (the 2,574 catalog curves and 180 source curves: 175
 walked curves of the P-256 and P-224 isogeny classes, the ECC2K-130
