@@ -2166,7 +2166,7 @@ pub(super) struct SignedEnumeration {
 /// serialization, retention and transport work to this same ledger. Runtime
 /// activation additionally requires a bound-capture bridge, not arbitrary
 /// caller receipts. Counts below are actual addition API calls, including O+P.
-pub(super) fn enumerate_signed(
+fn enumerate_signed(
     original: &MathInput,
     curve: &crate::cryptanalysis::koblitz_fast_arith::FastBinaryCurve,
     budget: &mut Budget,
@@ -2475,5 +2475,151 @@ mod signed_producer_tests {
         );
         assert_eq!(r.stop, Some(Stop::InvalidLimits));
         assert_eq!(b.additions, 0);
+    }
+}
+/// Owns a kernel built from validated originals and exclusively borrows the
+/// same attempt ledger until enumeration finishes. No caller-selected kernel.
+pub(super) struct PreparedSigned<'a> {
+    original: &'a MathInput,
+    curve: crate::cryptanalysis::koblitz_fast_arith::FastBinaryCurve,
+    budget: &'a mut Budget,
+    matrix_required: bool,
+}
+
+/// Conservative requested dynamic storage for Gf2::reduction_table: `pow`
+/// contains rows*8 words; `red` contains rows*256 words. Reserve a second
+/// red-sized block for a possible Vec-to-box storage move. A folding kernel may
+/// use less. No refund is made. This excludes allocator overhead and is not RSS.
+fn signed_setup_bytes(n: u32) -> Result<u64, Stop> {
+    if !((23..=31).contains(&n) || (47..=61).contains(&n)) {
+        return Err(Stop::InvalidLimits);
+    }
+    let rows = u64::from(n - 1).div_ceil(8);
+    Ok(rows * (8 + 2 * 256) * 8
+        + std::mem::size_of::<crate::cryptanalysis::koblitz_fast_arith::FastBinaryCurve>() as u64)
+}
+
+/// Reserve setup before constructing the original-bound native kernel. Table
+/// initialization has at most rows*(8+256+255) slots/entries; that bounded setup
+/// loop bound is a source-derived bound, not a measured instruction count.
+/// Setup-work admission and generic reference-check scratch admission remain
+/// activation dependencies; this increment enforces setup byte admission.
+pub(super) fn prepare_signed<'a>(
+    original: &'a MathInput,
+    budget: &'a mut Budget,
+    matrix_required: bool,
+) -> Result<PreparedSigned<'a>, Stop> {
+    use num_traits::ToPrimitive;
+    budget.check(Instant::now())?;
+    let expected = if matrix_required {
+        Phase::MatrixComplete
+    } else {
+        Phase::Constructed
+    };
+    if budget.phase != expected {
+        return budget.fail(Stop::Phase);
+    }
+    let bytes = match signed_setup_bytes(original.curve.m) {
+        Ok(bytes) => bytes,
+        Err(stop) => return budget.fail(stop),
+    };
+    let a = match original.curve.a.to_biguint().to_u64() {
+        Some(a) => a,
+        None => return budget.fail(Stop::InvalidLimits),
+    };
+    budget.reserve_bytes(bytes, Instant::now())?;
+    let curve = crate::cryptanalysis::koblitz_fast_arith::FastBinaryCurve::new(
+        &original.curve.irreducible,
+        a,
+    )
+    .ok_or(Stop::InvalidLimits)?;
+    budget.check(Instant::now())?;
+    Ok(PreparedSigned {
+        original,
+        curve,
+        budget,
+        matrix_required,
+    })
+}
+
+/// Public producer entry consumes the prepared original/budget pair. The inner
+/// staged driver is private; callbacks retain the original cumulative ledger.
+pub(super) fn enumerate_prepared_signed(
+    prepared: PreparedSigned<'_>,
+    event_sink: &mut impl FnMut(&SignedPrefix, &mut Budget) -> Result<(), Stop>,
+    publish: &mut impl FnMut(
+        &CheckedSignedWitness,
+        &mut Budget,
+    ) -> Result<crate::ml_dataset::capture::WitnessReceipt, Stop>,
+) -> SignedEnumeration {
+    enumerate_signed(
+        prepared.original,
+        &prepared.curve,
+        prepared.budget,
+        prepared.matrix_required,
+        event_sink,
+        publish,
+    )
+}
+
+#[cfg(test)]
+mod signed_setup_tests {
+    use super::*;
+    fn constructed_budget(bytes: u64) -> Budget {
+        let now = Instant::now();
+        let mut b = Budget::new(192, bytes, 1 << 20, now + Duration::from_secs(20), now).unwrap();
+        b.begin_native(false, now).unwrap();
+        b.finish_native(now).unwrap();
+        b
+    }
+    #[test]
+    fn signed_setup_admits_exact_requested_bytes_and_rejects_one_less() {
+        let original = construction_tests::fixture();
+        let bytes = signed_setup_bytes(original.curve.m).unwrap();
+        let mut short = constructed_budget(bytes - 1);
+        assert!(matches!(
+            prepare_signed(&original, &mut short, false),
+            Err(Stop::Bytes)
+        ));
+        assert_eq!(short.adapter_bytes, 0);
+        let mut exact = constructed_budget(bytes);
+        let prepared = prepare_signed(&original, &mut exact, false).unwrap();
+        assert_eq!(prepared.budget.adapter_bytes, bytes);
+        assert_eq!(prepared.curve.n, original.curve.m);
+        assert_eq!(prepared.budget.additions, 0);
+    }
+    #[test]
+    fn signed_setup_keeps_prior_reservations_and_requires_requested_matrix() {
+        let original = construction_tests::fixture();
+        let mut missing = constructed_budget(1 << 20);
+        assert!(matches!(
+            prepare_signed(&original, &mut missing, true),
+            Err(Stop::Phase)
+        ));
+        let bytes = signed_setup_bytes(original.curve.m).unwrap();
+        let mut b = constructed_budget(bytes + 100);
+        b.reserve_bytes(101, Instant::now()).unwrap();
+        assert!(matches!(
+            prepare_signed(&original, &mut b, false),
+            Err(Stop::Bytes)
+        ));
+        assert_eq!(b.adapter_bytes, 101);
+    }
+    #[test]
+    fn signed_setup_token_runs_original_domain_and_same_addition_ledger() {
+        let original = construction_tests::fixture();
+        let mut b = constructed_budget(1 << 20);
+        let prepared = prepare_signed(&original, &mut b, false).unwrap();
+        let r = enumerate_prepared_signed(prepared, &mut |_, _| Ok(()), &mut |_, _| {
+            panic!("fixed negative control unexpectedly matched")
+        });
+        assert!(r.complete);
+        assert_eq!(r.enumeration_additions, 192);
+        assert_eq!(b.additions, 192);
+        assert_eq!(
+            b.adapter_bytes,
+            signed_setup_bytes(original.curve.m).unwrap()
+                + (192 * std::mem::size_of::<SignedPrefix>()) as u64
+        );
     }
 }
