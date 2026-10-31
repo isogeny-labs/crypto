@@ -1,0 +1,23 @@
+[package]
+name = "fall-degree-replay"
+version = "0.1.0"
+edition = "2021"
+description = "Native replay of bounded-degree polynomial ideal refutations"
+publish = false
+default-run = "fall-degree-replay"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["raw_value"] }
+sha2 = "0.10"
+hex = "0.4"
+num-bigint = "0.4"
+num-traits = "0.2"
+num-integer = "0.1"
+
+[profile.release]
+overflow-checks = true
+
+# Keep the checker relocatable under a larger repository without changing its
+# root workspace membership or dependency graph.
+[workspace]

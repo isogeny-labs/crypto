@@ -174,6 +174,13 @@ seeds. Results:
 - The sign of `Gy` on the six FreeLIP base points is not the fixed root (3 of
   6), and no single bit of the next generator outputs predicts it.
 
+*Update (2026-10-22).* The binary base points are `G = hR` under X9.62
+A.3.1, so the random draw is `x(R)`, not `Gx`. A follow-up searched the
+halvings and quarter points in both bases, plus GMP, MIRACL, PARI, FreeLIP
+small-seed and timestamp seeds, SHA-1 expansion, and C-library and one-edit
+searches of the B-163 seed. It found no hit:
+[`../nist_basepoint_provenance_20261017/`](../nist_basepoint_provenance_20261017/README.md).
+
 ## Independent validation (2026-10-17)
 
 A blind validator in `aburan28/crypto-autoresearcher` checked this bundle

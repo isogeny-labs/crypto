@@ -1,0 +1,74 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "rows": [
+    {
+      "curve": "icv1-f2m47-t22705043-f4e44623",
+      "log2_r": 36.635865112243344,
+      "arm": "descent",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        1.8639754745862571,
+        null,
+        null
+      ],
+      "uncounted": [
+        "field_arithmetic_uncharged",
+        "hash_and_allocation_uncharged",
+        "modular_combination_uncharged",
+        "vector_declined_lanes_uncharged"
+      ]
+    },
+    {
+      "curve": "icv1-f2m47-t22705043-f4e44623",
+      "log2_r": 36.635865112243344,
+      "arm": "pipeline",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        1.311794742912879,
+        1.8504756395835118,
+        6.69860370961921
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m47-t22705043-f4e44623",
+      "log2_r": 36.635865112243344,
+      "arm": "rho",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        0.1386045901130218,
+        0.16596590177765216,
+        0.4122177067593256
+      ],
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-f2m47-t22705043-f4e44623",
+      "a": "descent",
+      "b": "pipeline",
+      "verdict": "unrankable (uncounted unpriced work)"
+    },
+    {
+      "curve": "icv1-f2m47-t22705043-f4e44623",
+      "a": "descent",
+      "b": "rho",
+      "verdict": "unrankable (uncounted unpriced work)"
+    },
+    {
+      "curve": "icv1-f2m47-t22705043-f4e44623",
+      "a": "pipeline",
+      "b": "rho",
+      "verdict": "rho < pipeline"
+    }
+  ]
+}

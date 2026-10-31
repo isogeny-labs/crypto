@@ -1,0 +1,212 @@
+{
+ "schema": "replay-certificate/v1",
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "what": "Table B (13 prime and random-binary instances): `ic boundary` re-executed in a new process on the current binary with the archive's frozen configuration; every counted field of every variant repetition and rho run compared exactly with the archive; matched negation-map rho recomputed in the same process; archive re-pricing re-run on the same binary; every recovered scalar checked by an independent pure-Python EC verifier.",
+ "replay_binary_blake3": {
+  "prime": "98e06480a3d765992ae68a38dc8eca66fe23c8d7b040acfb47f48ec0e7b5df36",
+  "char2": "98e06480a3d765992ae68a38dc8eca66fe23c8d7b040acfb47f48ec0e7b5df36"
+ },
+ "archive_binary_blake3": "ae6dd73f4404cad9bb672063e9abdceb00f086ef0f78962e6403b03164544301",
+ "source_tree": "HEAD 8559b6b673aad8cab5bac33ff56b81653134dcd4 plus uncommitted edits by other agents (src/cryptanalysis/koblitz_index_calculus.rs, not used by prime or char2 pricing); see README",
+ "fields_excluded_as_clocks": [
+  "wall_ns",
+  "total_wall_ns",
+  "s_wall",
+  "elapsed_seconds"
+ ],
+ "archive_reprice_on_current_binary": {
+  "identity": {
+   "all_reproduced": true,
+   "failures": []
+  },
+  "binary_blake3": "4bf7bc1d1c792e47432f0993de7ac51739b64ae25d8e6b93a3142e25eec21d06"
+ },
+ "counts": {
+  "instances": 13,
+  "instances_identical": 13,
+  "runs_compared": 1257,
+  "scalar_runs_checked_archive": 633,
+  "scalar_runs_checked_replay": 945,
+  "negative_control_rejected": 1578,
+  "negative_control_total": 1578
+ },
+ "raw": {
+  "compare": "../raw/compare_B.json",
+  "ec_verify_archive": "../raw/ec_verify_archive.json",
+  "ec_verify_replay_prime": "../raw/ec_verify_replay_prime.json",
+  "ec_verify_replay_char2": "../raw/ec_verify_replay_char2.json"
+ },
+ "runs": [
+  {
+   "slug": "icv1-fp10-t5-192cb216",
+   "archive_name": "bench-10bit",
+   "replay_name": "icv1-fp10-t5-192cb216",
+   "ic_variant_runs": 27,
+   "frozen_rho_runs": 24,
+   "matched_rho_runs": 24,
+   "replay_identical": true,
+   "scalars_archive_ok": true,
+   "scalars_replay_ok": true,
+   "scalar_runs_checked_archive": 51,
+   "scalar_runs_checked_replay": 75
+  },
+  {
+   "slug": "icv1-fp12-t19-d4a315df",
+   "archive_name": "bench-12bit",
+   "replay_name": "icv1-fp12-t19-d4a315df",
+   "ic_variant_runs": 27,
+   "frozen_rho_runs": 24,
+   "matched_rho_runs": 24,
+   "replay_identical": true,
+   "scalars_archive_ok": true,
+   "scalars_replay_ok": true,
+   "scalar_runs_checked_archive": 51,
+   "scalar_runs_checked_replay": 75
+  },
+  {
+   "slug": "icv1-fp14-tm43-158b6914",
+   "archive_name": "bench-14bit",
+   "replay_name": "icv1-fp14-tm43-158b6914",
+   "ic_variant_runs": 27,
+   "frozen_rho_runs": 24,
+   "matched_rho_runs": 24,
+   "replay_identical": true,
+   "scalars_archive_ok": true,
+   "scalars_replay_ok": true,
+   "scalar_runs_checked_archive": 51,
+   "scalar_runs_checked_replay": 75
+  },
+  {
+   "slug": "icv1-fp16-t351-d433f24e",
+   "archive_name": "bench-16bit",
+   "replay_name": "icv1-fp16-t351-d433f24e",
+   "ic_variant_runs": 27,
+   "frozen_rho_runs": 24,
+   "matched_rho_runs": 24,
+   "replay_identical": true,
+   "scalars_archive_ok": true,
+   "scalars_replay_ok": true,
+   "scalar_runs_checked_archive": 51,
+   "scalar_runs_checked_replay": 75
+  },
+  {
+   "slug": "icv1-fp18-t175-45770ebc",
+   "archive_name": "bench-18bit",
+   "replay_name": "icv1-fp18-t175-45770ebc",
+   "ic_variant_runs": 27,
+   "frozen_rho_runs": 24,
+   "matched_rho_runs": 24,
+   "replay_identical": true,
+   "scalars_archive_ok": true,
+   "scalars_replay_ok": true,
+   "scalar_runs_checked_archive": 51,
+   "scalar_runs_checked_replay": 75
+  },
+  {
+   "slug": "icv1-fp20-t1293-3c2999ba",
+   "archive_name": "bench-20bit",
+   "replay_name": "icv1-fp20-t1293-3c2999ba",
+   "ic_variant_runs": 27,
+   "frozen_rho_runs": 24,
+   "matched_rho_runs": 24,
+   "replay_identical": true,
+   "scalars_archive_ok": true,
+   "scalars_replay_ok": true,
+   "scalar_runs_checked_archive": 51,
+   "scalar_runs_checked_replay": 75
+  },
+  {
+   "slug": "icv1-fp22-tm1267-a5acaf6d",
+   "archive_name": "generated-22bit-3290411",
+   "replay_name": "icv1-fp22-tm1267-a5acaf6d",
+   "ic_variant_runs": 27,
+   "frozen_rho_runs": 24,
+   "matched_rho_runs": 24,
+   "replay_identical": true,
+   "scalars_archive_ok": true,
+   "scalars_replay_ok": true,
+   "scalar_runs_checked_archive": 51,
+   "scalar_runs_checked_replay": 75
+  },
+  {
+   "slug": "icv1-fp24-t1577-77336155",
+   "archive_name": "generated-24bit-10935329",
+   "replay_name": "icv1-fp24-t1577-77336155",
+   "ic_variant_runs": 27,
+   "frozen_rho_runs": 24,
+   "matched_rho_runs": 24,
+   "replay_identical": true,
+   "scalars_archive_ok": true,
+   "scalars_replay_ok": true,
+   "scalar_runs_checked_archive": 51,
+   "scalar_runs_checked_replay": 75
+  },
+  {
+   "slug": "icv1-f2m15-t131-ed7256f0",
+   "archive_name": "random-binary-n15-b524b",
+   "replay_name": "icv1-f2m15-t131-ed7256f0",
+   "ic_variant_runs": 21,
+   "frozen_rho_runs": 24,
+   "matched_rho_runs": 24,
+   "replay_identical": true,
+   "scalars_archive_ok": true,
+   "scalars_replay_ok": true,
+   "scalar_runs_checked_archive": 45,
+   "scalar_runs_checked_replay": 69
+  },
+  {
+   "slug": "icv1-f2m18-t393-d2c04152",
+   "archive_name": "random-binary-n18-b6507",
+   "replay_name": "icv1-f2m18-t393-d2c04152",
+   "ic_variant_runs": 21,
+   "frozen_rho_runs": 24,
+   "matched_rho_runs": 24,
+   "replay_identical": true,
+   "scalars_archive_ok": true,
+   "scalars_replay_ok": true,
+   "scalar_runs_checked_archive": 45,
+   "scalar_runs_checked_replay": 69
+  },
+  {
+   "slug": "icv1-f2m21-t2591-de54d72e",
+   "archive_name": "random-binary-n21-b1b6f3b",
+   "replay_name": "icv1-f2m21-t2591-de54d72e",
+   "ic_variant_runs": 21,
+   "frozen_rho_runs": 24,
+   "matched_rho_runs": 24,
+   "replay_identical": true,
+   "scalars_archive_ok": true,
+   "scalars_replay_ok": true,
+   "scalar_runs_checked_archive": 45,
+   "scalar_runs_checked_replay": 69
+  },
+  {
+   "slug": "icv1-f2m24-tm3047-2d0c0e8c",
+   "archive_name": "random-binary-n24-b5fc9da",
+   "replay_name": "icv1-f2m24-tm3047-2d0c0e8c",
+   "ic_variant_runs": 21,
+   "frozen_rho_runs": 24,
+   "matched_rho_runs": 24,
+   "replay_identical": true,
+   "scalars_archive_ok": true,
+   "scalars_replay_ok": true,
+   "scalar_runs_checked_archive": 45,
+   "scalar_runs_checked_replay": 69
+  },
+  {
+   "slug": "icv1-f2m27-t12543-569dca8b",
+   "archive_name": "random-binary-n27-b845462",
+   "replay_name": "icv1-f2m27-t12543-569dca8b",
+   "ic_variant_runs": 21,
+   "frozen_rho_runs": 24,
+   "matched_rho_runs": 24,
+   "replay_identical": true,
+   "scalars_archive_ok": true,
+   "scalars_replay_ok": true,
+   "scalar_runs_checked_archive": 45,
+   "scalar_runs_checked_replay": 69
+  }
+ ]
+}

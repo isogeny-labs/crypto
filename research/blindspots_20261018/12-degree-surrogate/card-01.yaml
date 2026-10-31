@@ -1,0 +1,53 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-12-01
+experiment_id: BLINDSPOT-12
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/12-degree-surrogate/raw/receipt-card-01.json
+binds:
+  - {path: examples/blindspots_12_degree_surrogate.rs, sha256: c7eef63fb4aabb23856c60963a4bc28e78a7cb90182a46b68187499e8bfdc102}
+  - {path: research/blindspots_20261018/12-degree-surrogate/sources.tsv, sha256: 7b9580d2cc7db5ae1890ba26ac8483d9dc824a5a221eb2f4e551991d8003bb5e}
+commands:
+  - id: make-bin-dir
+    argv: [mkdir, -p, target/blindspots-12/card-01]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: build
+    argv: [prlimit, --as=4294967296, rustc, --edition, "2021", -C, opt-level=3, -C, target-cpu=native, -o, target/blindspots-12/card-01/b12, examples/blindspots_12_degree_surrogate.rs]
+    timeout_seconds: 180
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/12-degree-surrogate/raw/card-01-build.stdout.log
+    stderr: research/blindspots_20261018/12-degree-surrogate/raw/card-01-build.stderr.log
+  - id: selftest
+    argv: [prlimit, --as=4294967296, target/blindspots-12/card-01/b12, selftest, --raw, research/blindspots_20261018/12-degree-surrogate/raw]
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/12-degree-surrogate/raw/selftest.txt
+    stderr: research/blindspots_20261018/12-degree-surrogate/raw/selftest.stderr.log
+  - id: harvest
+    argv: [prlimit, --as=4294967296, target/blindspots-12/card-01/b12, harvest, --manifest, research/blindspots_20261018/12-degree-surrogate/sources.tsv, --raw, research/blindspots_20261018/12-degree-surrogate/raw]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/12-degree-surrogate/raw/harvest.txt
+    stderr: research/blindspots_20261018/12-degree-surrogate/raw/harvest.stderr.log
+  - id: remove-bin
+    argv: [rm, -f, target/blindspots-12/card-01/b12]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: remove-bin-dir
+    argv: [rmdir, target/blindspots-12/card-01]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-12
+background: false
+write_scope:
+  - research/blindspots_20261018/12-degree-surrogate/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto."

@@ -1,0 +1,135 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-ic-acct6-archive-20261021-2
+experiment_id: ic_acct6_archive_20261021
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 2e0e318cbfaebf3561e909cd11745fad9cc1b6e5
+receipt: research/ic_acct6_archive_20261021/cards/CARD-ic-acct6-archive-20261021-2.receipt.json
+bus_address: executor-mechanical-ic-acct6-archive
+background: true
+write_scope:
+  - research/ic_acct6_archive_20261021/sessions/
+  - research/ic_acct6_archive_20261021/logs/
+  - research/ic_acct6_archive_20261021/cards/
+stop_when:
+  - The tranche-2 command exits with a status other than 0.
+  - Any path listed under must_not_exist already exists before the command starts.
+binds:
+  - {path: research/ic_acct6_archive_20261021/PROTOCOL.md, sha256: 57e34b84582abc1f335b3f1af40f340dc51db4203c4b815eb827f545d6b34c4f}
+  - {path: research/ic_acct6_archive_20261021/run_tranche.sh, sha256: 5455ff8af3bf19b83f87ed3dd51150a7b77037e847b316923b36128ca3dd6f2f}
+  - {path: research/ic_acct6_archive_20261021/tranche.json, sha256: 3df6d5184ed214467250739ebf47bd7ff0eb504a518d17cdeaed42a900373428}
+  - {path: target/release/ecbench, sha256: 6d9fd143d3b04760cb80c06d72d6c700ecb483f8395f6736c5658ce469f3e475}
+  - {path: research/ic_acct6_archive_20261021/specs/p001-mac_arm64_l0_01.json, sha256: b2442b3c7fa4e2ace39348f28a1f393e0474b8fbbe9fe794c8d334dfd1c79f0b}
+  - {path: research/ic_acct6_archive_20261021/specs/p002-mac_arm64_l0_01.json, sha256: 96dbd9b4b77ae876b057c5ae5e6bc121095aaa1a303a1d7513699e43c215fdca}
+  - {path: research/ic_acct6_archive_20261021/specs/p003-hosted_ubuntu_01.json, sha256: 34367b44ffa17e2e5c24dfa46b6ff2847dc1247daa9ab0f0a7d79cb7a2a7b15b}
+  - {path: research/ic_acct6_archive_20261021/specs/p004-mac_arm64_l0_01.json, sha256: 655b05ceda0ba07226d04cf3bb21140b0e9f36b49f7237ddeb2d5333ce40821c}
+  - {path: research/ic_acct6_archive_20261021/specs/p005-n13.json, sha256: 9be8f9f4601dfe3ff2437d03b8b18b18f5dcb8949c00fa18710476b9e0124dfc}
+  - {path: research/ic_acct6_archive_20261021/specs/p006-n19.json, sha256: c2457f4a8dde40d29d79b7e6afb1ac50ceda98b820f9f23acb5194300a781b65}
+  - {path: research/ic_acct6_archive_20261021/specs/p009-K13.json, sha256: 5580721ea80bbc4269574c6a3b00ffc18c529445f2a3a16d7b11e698ea0c6e68}
+  - {path: research/ic_acct6_archive_20261021/specs/p010-R13.json, sha256: 3875cb2d2f13cd8a312b4d0b597a4193fefdec007c32605f4d4159c7b8120cb7}
+  - {path: research/ic_acct6_archive_20261021/specs/p011-n37_cold_v1.json, sha256: 79a92830f3c8ddbf230e329ec1fd2b2235661ce130d2afef2accf0ba2dfb076c}
+  - {path: research/ic_acct6_archive_20261021/specs/p012-n37_full_rank_v1.json, sha256: c5e5d69157eaa11286f0ad53f3e990cdf028d4276b49193d3f7cc26d4670a10e}
+  - {path: research/ic_acct6_archive_20261021/specs/p013-ell131101-q37.json, sha256: 1277a62ed1e900780ece38125739ef12f6a1f0b12731ec06ff770e79f468424a}
+  - {path: research/ic_acct6_archive_20261021/specs/p014-ell8209-q29.json, sha256: 00b34434213e00ceb885c2670bb21070f06f45821c8f0078cdf883bae110d2e8}
+  - {path: research/ic_acct6_archive_20261021/specs/p015-K19.json, sha256: dbdc7205f421ad7cf7e641d545ace6bf4413107c3a612ba277f09ccfc506909d}
+  - {path: research/ic_acct6_archive_20261021/specs/p016-R19.json, sha256: bb44373a3fb85c0e0738beaa20f105beff7b00aa3deaf3382ee7afcf749dff00}
+  - {path: research/ic_acct6_archive_20261021/specs/p017-session-1.json, sha256: 1384f873f3123b487175dab5d1be1199983267d8bdef4cd4e4148dac031fd5b3}
+  - {path: research/ic_acct6_archive_20261021/specs/p018-e2_glv_crater_floor.json, sha256: d1a6addcd971ba3836d10482ddc2584056c0c5ca03d0923b919b354ea9cbc5d7}
+  - {path: research/ic_acct6_archive_20261021/specs/p019-fiber_prime.json, sha256: fe3b48bac60f61c85f6c4808d35b87232e1ffff8317544709d20860940b7e276}
+  - {path: research/ic_acct6_archive_20261021/specs/p020-prime_gap_22_fiber.json, sha256: 9269bad52c518d115c913f253a4955e877b0e88250c65c495ce2861262427df9}
+  - {path: research/ic_acct6_archive_20261021/specs/p021-prime_gap_26_fiber.json, sha256: 110fc551f1399733ecf89cc5ed8186693244c0164fc60f8d634fbcd6a0576d1d}
+  - {path: research/ic_acct6_archive_20261021/specs/p022-fiber_prime_large_h.json, sha256: f1e93ffb6658fe77829aaf58bdb7692664bbb6d0a62a28db321ce65426a5acf2}
+  - {path: research/ic_acct6_archive_20261021/specs/p023-a0_coset_prime26.json, sha256: 36a6617dd1ceb167b0f8db41fcd4b349cfa1db954e9aa8dca4e1b2e3bf345c19}
+  - {path: research/ic_acct6_archive_20261021/specs/p025-panel-prime.json, sha256: 2620c764c291a6ba856040f1ae5a9540398072071f3b4b9f0a7f9249efc92b82}
+  - {path: research/ic_acct6_archive_20261021/specs/p026-claim-renew-n13.json, sha256: 1180f07dc20647b0c3656bc27e88972860517ff4d099d030dae03a931bc760af}
+  - {path: research/ic_acct6_archive_20261021/specs/p028-prime-scaling.json, sha256: 867a3a490983979c3932b2c187c9fd73faec1b4e80211bc8f20a8a9d742078ca}
+  - {path: research/ic_acct6_archive_20261021/specs/p029-claim-n13.json, sha256: 0583abfc4f03ae6820c0beb7ab161a87050102c89d4928bc7556c2cc944bd06e}
+  - {path: research/ic_acct6_archive_20261021/specs/p030-scaling_h4.json, sha256: 4d82c505db311ed5df00eb10d444eb6bc1538be833e88a3042bd02ac4f08ecc7}
+  - {path: research/ic_acct6_archive_20261021/specs/p031-scaling_h72.json, sha256: baa81e58aa98d6ee104a6f7fceda491f71775412da867807090a31df6f50f895}
+  - {path: research/ic_acct6_archive_20261021/specs/p032-ell263_q19_ic16.json, sha256: f8b0f85e5e3ef0938ba31377e59f9213d73b3e50327faf9e18abf7096cefedb7}
+  - {path: research/ic_acct6_archive_20261021/specs/p033-fiber_binary_n17.json, sha256: 938bdd7bd118bb71a9eb6aac5714b859cb0d90e9cbdf0edb0bf1a672f2686cbf}
+  - {path: research/ic_acct6_archive_20261021/specs/p035-ell8209_q29_ic16.json, sha256: 16bf04016f7c984b2690b7c805c489a37a7f3c0d00d6458a2cf8cec77d815c99}
+  - {path: research/ic_acct6_archive_20261021/specs/p036-prime.json, sha256: 33aa24448406b469297659f6051b0671c0067cc0ef61f8615f0c151aa88a862e}
+  - {path: research/ic_acct6_archive_20261021/specs/p056-claim-renew-n19.json, sha256: bfa6d68a620bf341bb4960fb089d76cacd5082b887715fcd5ba35a469027c282}
+  - {path: research/ic_acct6_archive_20261021/specs/p101-prime.json, sha256: 932c8477d7c1c1e94fb797f77e56607a79e9b7b5aff7f27717dbb71f4adc37ba}
+  - {path: research/ic_acct6_archive_20261021/specs/p143-K23.json, sha256: 3665f65e87564a33b16294aa46de629c47c6f5016b17c2cd5293de2ea3de62a8}
+must_not_exist:
+  - research/ic_acct6_archive_20261021/sessions/p001-mac_arm64_l0_01
+  - research/ic_acct6_archive_20261021/sessions/p002-mac_arm64_l0_01
+  - research/ic_acct6_archive_20261021/sessions/p003-hosted_ubuntu_01
+  - research/ic_acct6_archive_20261021/sessions/p004-mac_arm64_l0_01
+  - research/ic_acct6_archive_20261021/sessions/p005-n13
+  - research/ic_acct6_archive_20261021/sessions/p006-n19
+  - research/ic_acct6_archive_20261021/sessions/p009-K13
+  - research/ic_acct6_archive_20261021/sessions/p010-R13
+  - research/ic_acct6_archive_20261021/sessions/p011-n37_cold_v1
+  - research/ic_acct6_archive_20261021/sessions/p012-n37_full_rank_v1
+  - research/ic_acct6_archive_20261021/sessions/p013-ell131101-q37
+  - research/ic_acct6_archive_20261021/sessions/p014-ell8209-q29
+  - research/ic_acct6_archive_20261021/sessions/p015-K19
+  - research/ic_acct6_archive_20261021/sessions/p016-R19
+  - research/ic_acct6_archive_20261021/sessions/p017-session-1
+  - research/ic_acct6_archive_20261021/sessions/p018-e2_glv_crater_floor
+  - research/ic_acct6_archive_20261021/sessions/p019-fiber_prime
+  - research/ic_acct6_archive_20261021/sessions/p020-prime_gap_22_fiber
+  - research/ic_acct6_archive_20261021/sessions/p021-prime_gap_26_fiber
+  - research/ic_acct6_archive_20261021/sessions/p022-fiber_prime_large_h
+  - research/ic_acct6_archive_20261021/sessions/p023-a0_coset_prime26
+  - research/ic_acct6_archive_20261021/sessions/p025-panel-prime
+  - research/ic_acct6_archive_20261021/sessions/p026-claim-renew-n13
+  - research/ic_acct6_archive_20261021/sessions/p028-prime-scaling
+  - research/ic_acct6_archive_20261021/sessions/p029-claim-n13
+  - research/ic_acct6_archive_20261021/sessions/p030-scaling_h4
+  - research/ic_acct6_archive_20261021/sessions/p031-scaling_h72
+  - research/ic_acct6_archive_20261021/sessions/p032-ell263_q19_ic16
+  - research/ic_acct6_archive_20261021/sessions/p033-fiber_binary_n17
+  - research/ic_acct6_archive_20261021/sessions/p035-ell8209_q29_ic16
+  - research/ic_acct6_archive_20261021/sessions/p036-prime
+  - research/ic_acct6_archive_20261021/sessions/p056-claim-renew-n19
+  - research/ic_acct6_archive_20261021/sessions/p101-prime
+  - research/ic_acct6_archive_20261021/sessions/p143-K23
+commands:
+  - id: tranche-2
+    cwd: research/ic_acct6_archive_20261021
+    argv:
+      - ./run_tranche.sh
+      - p001-mac_arm64_l0_01
+      - p002-mac_arm64_l0_01
+      - p003-hosted_ubuntu_01
+      - p004-mac_arm64_l0_01
+      - p005-n13
+      - p006-n19
+      - p009-K13
+      - p010-R13
+      - p011-n37_cold_v1
+      - p012-n37_full_rank_v1
+      - p013-ell131101-q37
+      - p014-ell8209-q29
+      - p015-K19
+      - p016-R19
+      - p017-session-1
+      - p018-e2_glv_crater_floor
+      - p019-fiber_prime
+      - p020-prime_gap_22_fiber
+      - p021-prime_gap_26_fiber
+      - p022-fiber_prime_large_h
+      - p023-a0_coset_prime26
+      - p025-panel-prime
+      - p026-claim-renew-n13
+      - p028-prime-scaling
+      - p029-claim-n13
+      - p030-scaling_h4
+      - p031-scaling_h72
+      - p032-ell263_q19_ic16
+      - p033-fiber_binary_n17
+      - p035-ell8209_q29_ic16
+      - p036-prime
+      - p056-claim-renew-n19
+      - p101-prime
+      - p143-K23
+    env: {DEADLINE: "1793009789"}
+    timeout_seconds: 14400
+    success_exit_codes: [0]
+    stdout: research/ic_acct6_archive_20261021/cards/CARD-ic-acct6-archive-20261021-2.run.stdout
+    stderr: research/ic_acct6_archive_20261021/cards/CARD-ic-acct6-archive-20261021-2.run.stderr

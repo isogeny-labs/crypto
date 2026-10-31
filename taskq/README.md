@@ -269,10 +269,45 @@ The image is `deploy/Dockerfile`. The `taskq image` workflow publishes it to
 CI lints and renders the chart in three configurations and builds the image.
 
 **On AWS**, `deploy/aws/` is a Terraform root module. It creates a VPC, EKS
-with CPU and GPU node groups running the static CPU manager, ElastiCache, an
-EFS results volume, and the Helm release. It also covers ElastiCache's
+with Spot-only Karpenter worker NodePools, ElastiCache, an EFS results volume,
+and the Helm release. It also covers ElastiCache's
 durability caveat and the MemoryDB alternative; see
 [`deploy/aws/README.md`](deploy/aws/README.md).
+
+### Resuming a command after Spot interruption
+
+For a long-running `kind: command` task, include `"checkpoint":
+{"file": "state.bin"}` in the submitted spec. The worker mounts the shared
+EFS results volume and supplies these variables to the command:
+
+| variable | meaning |
+|---|---|
+| `TASKQ_CHECKPOINT_FILE` | Destination for this attempt's `state.bin` |
+| `TASKQ_CHECKPOINT_DIR` | This attempt's durable checkpoint directory |
+| `TASKQ_RESUME_FILE` | This attempt's verified copy of the newest complete prior checkpoint, or empty |
+
+The application decides what state to save and when. Write a complete local
+snapshot, then run `taskq checkpoint save /path/to/snapshot` periodically and
+from its SIGTERM handler. The helper copies it to an immutable generation on
+EFS, then atomically publishes its SHA-256 marker. The stable destination is
+maintained separately, so a later write cannot invalidate that generation.
+Each attempt keeps its current and preceding committed generations; older
+generations are removed only after the replacement is fully published.
+Overlapping saves to one destination are serialized with a filesystem lock.
+On retry, taskq copies and verifies the chosen bytes into the new attempt;
+the application reads
+`TASKQ_RESUME_FILE` and continues from that state. Taskq ignores incomplete or
+corrupt checkpoint pairs. A checkpoint written by a prior attempt is never
+overwritten by the new attempt, including when an old worker loses its lease.
+
+Karpenter's interruption queue drains a Spot node on notice. Kubernetes gives
+the worker 110 seconds to exit; taskq gives a checkpoint-enabled child up to
+90 seconds after SIGTERM before killing its process group. The worker then
+requeues the task as an infrastructure interruption. An abrupt node loss can
+resume only from the latest periodic checkpoint. Commands without a
+`checkpoint` field restart from the beginning after eviction. Benchmarks do
+not accept this checkpoint contract because a resumed timed repetition would
+change its measurement interval.
 
 **Checkouts.** Each repo gets one blobless mirror (`--filter=blob:none`) per
 worker. Each commit gets a git worktree, reused across tasks so `target/` and

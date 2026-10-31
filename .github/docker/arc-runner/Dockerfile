@@ -6,10 +6,10 @@ USER root
 # Ubuntu jobs assume. Keep this a general Linux build image; specialized Sage,
 # GPU, perf and virtualization workflows still need separate pools.
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-      autoconf automake bison build-essential clang cmake flex gfortran \
+      autoconf automake bison build-essential clang cmake flex gfortran gh \
       libffi-dev libgmp-dev libmpc-dev libmpfr-dev libsqlite3-dev libssl-dev \
       libtool libzstd-dev musl-tools ninja-build pkg-config python-is-python3 \
-      python3-pip python3-venv \
+      python3-pip python3-venv zlib1g-dev zstd \
     && rm -rf /var/lib/apt/lists/* \
     && for tool in node npm npx corepack; do \
          ln -s "/home/runner/externals/node24/bin/$tool" "/usr/local/bin/$tool"; \

@@ -1,0 +1,106 @@
+Characteristic-two exceptional cube-orbit family: degree-four derivation
+Date: 2026-10-28
+
+Status
+------
+This symbolic derivation has been independently reviewed by the parent
+characteristic-two proof agent and the root agent. It strengthens the
+exceptional case excluded by generic_lower_five_independent_audit.txt.
+Under the same ordinary binary curve, rational lift, inverse guard, and
+ordinary-degree assumptions, suppose sigma1=sigma2=0. Then the proposed
+conclusion is exact last fall four on every unsatisfiable instance.
+
+Available pair algebra and first equation
+----------------------------------------
+Write g(T)=T^3+c with c=sigma3 nonzero. The three roots S are a multiplicative
+cube orbit. The unordered pair coordinate algebra has affine basis 1,w,v
+and the degree-preserving quadratic Groebner basis established separately.
+All those quadratic equations, the orientation equation, and g(z) are
+available inside V_4. Every scalar function of the pair state has an
+affine normal form; in particular b^2 has an affine normal form whenever
+b is affine in w,v.
+
+The first binary S3 equation monically normalizes within V_4 to
+ H1=u^2+u+b,
+where b=B(w,v) is affine in the pair state. The coefficient of u is one
+because M=w^2 and the leading coefficient d^2=w^2 in this exceptional
+family. The original first S3 and H1 generate the same ideal modulo the
+base equations, since that leading coefficient is a unit on the states.
+
+Reducing the second equation to a linear equation in u
+-----------------------------------------------------
+Unsatisfiability implies r outside S. Put
+ t(z)=z^2+r^2,
+ q(z)=z^2+rz+r^2,
+ s(z)=r^2*z^2+a6.
+The second raw S3 input is f2=t*u^2+rz*u+s. Therefore
+ P=f2+t*H1=q*u+b*t+s
+is available in V_4: t has degree two and H1 total degree two. The result
+P has total degree at most three.
+
+Modulo g(z),
+ q(z)*(z+r)=z^3+r^3=c+r^3.
+This scalar is nonzero because r is not a root of g. Thus q has the LINEAR
+inverse (z+r)/(c+r^3) in the state quotient. Multiply P by this linear
+polynomial (cost at most four) and reduce g(z). The result is
+ L=u+R,
+ R=b*f(z)+h(z),
+where f=NF(t/q), h=NF(s/q) have degree at most two in z. Consequently
+L has total degree at most three and is available in V_4.
+
+The needed apparently high-degree multiplication is legal by staging
+--------------------------------------------------------------------
+The product b*L costs at most four. Reduce the pair-state equations. Since
+ b*L=b*u+b^2*f+b*h
+and b^2 has affine pair-state normal form, the reduced b*L has total degree
+at most three.
+
+Multiply this derived row by z and reduce g(z). Its u coefficient is
+b*z and hence contributes degree three after multiplication by u. Its
+scalar coefficients have affine pair-state part and z-degree at most two,
+hence total degree at most three. Thus NF(z*b*L) still has degree at most
+three. A second z multiplication costs at most four. A scalar linear
+combination yields NF(f(z)*b*L) within V_4.
+
+Likewise NF(z*L) has degree at most three, because its scalar part remains
+affine in the pair state and quadratic or lower in z, while its u term
+is z*u. A second z multiplication costs at most four. Hence NF(h(z)*L)
+is also available in V_4.
+
+Their sum is exactly NF(R*L), despite a direct unreduced product possibly
+having degree six. This staged construction is the essential degree saving.
+
+Derive a scalar and invert it
+-----------------------------
+The product u*L costs at most four. In characteristic two,
+ H1+u*L+NF(R*L)+L = NF(R^2+R+b).
+All u^2 and u terms cancel. Call the resulting scalar normal form T.
+
+Because R=b*f+h, Frobenius gives
+ R^2=b^2*f^2+h^2.
+After pair-state and z-cubic reduction, b^2 is affine and f^2,h^2 have
+z-degree at most two. Therefore T has ordinary total degree at most three.
+
+At any pair state and z in S, T=0 is equivalent to u=R solving both
+L=0 and H1=0. The linear normalization of P used a unit, and the first
+normalization used a unit, so this would give a solution of the original
+guarded chain. The assumed unsatisfiability makes T nonzero at all nine
+pair-state/third-abscissa points.
+
+The scalar quotient of the three pair states times the three z states
+has representatives affine in w,v and quadratic in z, with maximum total
+degree three. Multiplication by w, v, or z costs at most four and reduction
+returns to degree at most three. The available scalar rows consequently
+form an ideal containing the unit T, and hence contain 1. This proves
+1 in V_4.
+
+The raw-S3 presentation cannot refute below degree four: neither quartic
+S3 is eligible there, and the membership-plus-guard ideal is proper.
+Therefore an unsatisfiable exceptional instance has d_F=4.
+
+No numerical experiments or generic-coefficient assumptions enter this
+derivation. It is specific to the exceptional condition sigma1=sigma2=0.
+Together with generic_lower_five_independent_audit.txt, it gives the full
+classification: exact d_F=4 when sigma1=sigma2=0, and exact d_F=5 otherwise.
+The ordinary top-syzygy/Koszul first fall is four in both cases. This is a
+mathematical proof with explicit degree accounting, not a Lean formalization.

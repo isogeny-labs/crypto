@@ -4,29 +4,10 @@ name: Release
 # major/minor version and patch + run number, giving ReleaseMe a distinct
 # stable version per run so /releases/latest remains the newest main build.
 on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
-  # Start the dry run for every pull request. The scope job then selects only
-  # affected build/package lanes, including compile-time inputs discovered
-  # recursively; an event-level path list cannot safely anticipate that set.
-  # The `release` job is skipped for pull requests, so nothing is published.
-  pull_request:
-    paths:
-      - '.github/workflows/release.yml'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      # `cargo build --bins` consumes the library and every binary target.
-      # Exercise the cross-platform packaging path whenever any Rust source
-      # changes, including the cover/Jacobian command-line tools.
-      - 'src/**'
-      - 'tests/fixtures/ecbench_manifest_small.json'
-      - 'ecc2k130/Makefile'
-      - 'tools/isogeny-cli/**'
-      - 'tools/volcano-cli/**'
-      - 'isogeny_algos/**'
-      - 'research/p192_p224_large_degree_isogenies_20261009/**'
-      - 'docs/curves/registry.json'
-  merge_group:
   workflow_dispatch:
 
 concurrency:
@@ -51,7 +32,7 @@ env:
 
 jobs:
   scope:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|release.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|release.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
       contents: read
@@ -74,6 +55,7 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /.github/scripts/
             /build.rs
             /rustfmt.toml
@@ -85,6 +67,28 @@ jobs:
             /benches/
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - id: scope
         env:
           CI_EVENT: ${{ github.event_name }}
@@ -92,7 +96,7 @@ jobs:
         run: node .github/scripts/ci-scope.mjs
 
   meta:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|release.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|release.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
       tag: ${{ steps.v.outputs.tag }}
@@ -103,7 +107,31 @@ jobs:
         with:
           filter: blob:none
           sparse-checkout-cone-mode: false
-          sparse-checkout: /Cargo.toml
+          sparse-checkout: |
+            /tools/factor-base/
+            /Cargo.toml
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - id: v
         run: |
           version=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)
@@ -127,9 +155,8 @@ jobs:
           # musl omitted: redis → native-tls → openssl-sys needs a musl-built
           # libssl (vendored openssl in Cargo.toml). That edit is held by
           # another task; restore x86_64-unknown-linux-musl here when it lands.
-          - {target: aarch64-apple-darwin,      os: macos-latest}
-          - {target: x86_64-pc-windows-msvc,    os: windows-latest}
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    # The Windows and macOS legs were removed on 2026-10-26 (ubuntu-latest only).
     timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 45 }}
     steps:
       - name: Require successful scope classification
@@ -137,15 +164,13 @@ jobs:
         run: |
           echo '::error::CI scope or release metadata failed; refusing to skip validation.'
           exit 1
-      - name: Enable long Git paths on Windows
-        if: runner.os == 'Windows' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false')
-        run: git config --global core.longpaths true
       - if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         uses: actions/checkout@v4
         with:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /Cargo.toml
             /tools/volcano-cli/
             /isogeny_algos/
@@ -167,11 +192,34 @@ jobs:
             /docs/ecdlp-audit/
             /README.md
             /LICENSE*
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - name: Materialize compile-time inputs without research archives
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         run: node .github/scripts/ci-scope.mjs --materialize
       - if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
-        uses: dtolnay/rust-toolchain@1.90.0
+        uses: dtolnay/rust-toolchain@1.98.0
         with:
           targets: ${{ matrix.target }}
       - if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
@@ -189,6 +237,7 @@ jobs:
           cargo build --locked --release
           --bin crypto --bin ic --bin ecbench --bin curve_cover_check
           --bin curve_standards --bin hyperelliptic-cover --bin ecdlp-audit
+          --bin factor-base-sweep
           --target ${{ matrix.target }}
       - name: Smoke-test the binaries
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
@@ -198,7 +247,7 @@ jobs:
         run: |
           ext=""
           [ "${{ runner.os }}" = "Windows" ] && ext=".exe"
-          for bin in crypto curve_cover_check curve_standards hyperelliptic-cover ecdlp-audit; do
+          for bin in crypto curve_cover_check curve_standards hyperelliptic-cover ecdlp-audit factor-base-sweep; do
             "./target/${{ matrix.target }}/release/$bin$ext" --help > /dev/null
           done
           "./target/${{ matrix.target }}/release/ic$ext" --help > /dev/null
@@ -242,7 +291,7 @@ jobs:
           # verification checkout. The mock binds repository source/report
           # paths and pinned Git objects that are intentionally not staged.
           cp -R docs/ecdlp-audit "dist/$name/docs/"
-          for bin in crypto ic ecbench curve_cover_check hyperelliptic-cover ecdlp-audit; do
+          for bin in crypto ic ecbench curve_cover_check hyperelliptic-cover ecdlp-audit factor-base-sweep; do
             cp "target/${{ matrix.target }}/release/$bin$ext" "dist/$name/"
           done
           # `[ -f ] && cp` leaves the loop's exit status at 1 when the last
@@ -314,10 +363,11 @@ jobs:
         include:
           - {target: x86_64-unknown-linux-gnu,  os: ubuntu-latest}
           - {target: x86_64-unknown-linux-musl, os: ubuntu-latest}
-          - {target: aarch64-apple-darwin,      os: macos-latest}
-          - {target: x86_64-pc-windows-msvc,    os: windows-latest}
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 30 }}
+    runs-on: ubuntu-latest
+    # Measured in run 40259290676 (PR #2588 head 7f5ca198d): Linux gnu took
+    # 36m25s (step 9 23m37s, soft-hash step 10m07s), musl 24m37s. The Windows
+    # and macOS legs were removed on 2026-10-26 (ubuntu-latest only).
+    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 45 || 50 }}
     steps:
       # Keep Cargo output outside the package tree while it is fingerprinted.
       # `runner.temp` is not available in job-level `env`, so set it per job.
@@ -329,11 +379,29 @@ jobs:
         run: |
           echo '::error::CI scope or release metadata failed; refusing to skip validation.'
           exit 1
-      - name: Enable long Git paths on Windows
-        if: runner.os == 'Windows' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false')
-        run: git config --global core.longpaths true
       - if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - uses: dtolnay/rust-toolchain@1.93.1
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         with:
@@ -348,12 +416,18 @@ jobs:
           cache-targets: false
       - name: Build and test the dedicated executable
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
+        # bash (-e) so a failing cargo command fails the step on Windows too; the default
+        # pwsh only reports the last native command, which hid two failing isogeny-cli
+        # commands behind two passing isogeny_algos ones.
+        shell: bash
         env:
           CRYPTO_BUILD_GIT_COMMIT: ${{ github.sha }}
           CRYPTO_BUILD_GIT_DIRTY: "false"
         run: |
           cargo build --locked --release --manifest-path tools/isogeny-cli/Cargo.toml --target ${{ matrix.target }}
           cargo test --locked --release --manifest-path tools/isogeny-cli/Cargo.toml --target ${{ matrix.target }}
+          cargo build --locked --release --manifest-path isogeny_algos/Cargo.toml --target ${{ matrix.target }} --bin isogeny-perf
+          cargo test --locked --release --manifest-path isogeny_algos/Cargo.toml --target ${{ matrix.target }} --bin isogeny-perf
       - name: Check the portable receipt-hash fallback
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         env:
@@ -370,8 +444,10 @@ jobs:
           [ "${{ runner.os }}" = "Windows" ] && ext=".exe"
           mkdir -p "$RUNNER_TEMP/isogeny-installed"
           cp "$CARGO_TARGET_DIR/${{ matrix.target }}/release/isogeny$ext" "$RUNNER_TEMP/isogeny-installed/"
+          cp "$CARGO_TARGET_DIR/${{ matrix.target }}/release/isogeny-perf$ext" "$RUNNER_TEMP/isogeny-installed/"
           cd "$RUNNER_TEMP/isogeny-installed"
           "./isogeny$ext" --help > /dev/null
+          "./isogeny-perf$ext" --help > /dev/null
           "./isogeny$ext" --version > BUILD.json
           grep -Fq '"git_commit": "'"$GITHUB_SHA"'"' BUILD.json
           "./isogeny$ext" screen --curve p192 --from 1010 --to 65537 > screen.json
@@ -396,6 +472,7 @@ jobs:
           [ "${{ runner.os }}" = "Windows" ] && ext=".exe"
           mkdir -p "dist/$name"
           cp "$CARGO_TARGET_DIR/${{ matrix.target }}/release/isogeny$ext" "dist/$name/"
+          cp "$CARGO_TARGET_DIR/${{ matrix.target }}/release/isogeny-perf$ext" "dist/$name/"
           cp tools/isogeny-cli/README.md "dist/$name/README.md"
           cp "$RUNNER_TEMP/isogeny-installed/BUILD.json" "dist/$name/BUILD.json"
           for license in LICENSE LICENSE.md; do
@@ -424,9 +501,7 @@ jobs:
         include:
           - {target: x86_64-unknown-linux-gnu,  os: ubuntu-latest}
           - {target: x86_64-unknown-linux-musl, os: ubuntu-latest}
-          - {target: aarch64-apple-darwin,      os: macos-latest}
-          - {target: x86_64-pc-windows-msvc,    os: windows-latest}
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 30 }}
     steps:
       - name: Keep Cargo output outside the package tree
@@ -445,6 +520,29 @@ jobs:
             /isogeny_algos/
             /LICENSE
             /LICENSE.md
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       # the crate's own CI toolchain (isogeny-algos.yml); it uses slice APIs newer than 1.93
       - uses: dtolnay/rust-toolchain@1.98
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
@@ -491,7 +589,8 @@ jobs:
             "klpt --p 1152921504606847067 --norm 1000003" \
             "richelot --p 211 --roots 1,2,3,4,5,6 --lc 3" \
             "modpoly --ell 5 --p 10007 --j 1234"; do
-            "$B" $args > family.json
+            read -r -a family_args <<< "$args"
+            "$B" "${family_args[@]}" > family.json
             grep -Fq '"status":"PASS"' family.json || { echo "FAILED: $args"; cat family.json; exit 1; }
           done
       - name: Stage the archive
@@ -525,7 +624,7 @@ jobs:
   native:
     if: always() && !cancelled()
     needs: [meta, scope]
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|release.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|release.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 45 }}
     steps:
       - name: Require successful scope classification
@@ -535,6 +634,27 @@ jobs:
           exit 1
       - if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_native != 'false'
         uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_native != 'false'
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - name: Build the ECC2K-130 CPU client
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_native != 'false'
         run: make -C ecc2k130 cpu MARCH="$ECC_MARCH"
@@ -581,8 +701,12 @@ jobs:
     needs: [meta, scope]
     # Pinned, not ubuntu-latest: the NVIDIA apt repo below is addressed by
     # distro, and the CUDA version is pinned, so letting the runner image
-    # float would eventually 404 the install and block every release.
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|release.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|release.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    # float would eventually 404 the install and block every release. That
+    # happened: the standard-runner rewrite (b94618d7a) turned this pin into
+    # ubuntu-latest, which is now Ubuntu 26.04, and run 40259290676 failed here
+    # with "Unable to locate package cuda-nvcc-12-8". Without this job
+    # the `release` job never runs. docs/RELEASES.md describes the pin.
+    runs-on: ubuntu-24.04
     timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 60 }}
     steps:
       - name: Require successful scope classification
@@ -607,6 +731,29 @@ jobs:
             /gpu/semaev/
             /gpu/macaulay/
             /gpu/btcpuzzle/
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_cuda != 'false'
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - name: Install nvcc
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_cuda != 'false'
         # Compiler and CUDA headers only, not the full toolkit: ~330 MB
@@ -647,10 +794,38 @@ jobs:
           if-no-files-found: error
 
   release-assets:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|release.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|release.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/scripts/
+            /docs/curves/
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - name: Test binary asset publication
         run: |
           bash -n .github/scripts/publish_release_assets.sh .github/scripts/test_publish_release_assets.sh
@@ -663,12 +838,40 @@ jobs:
     # can be started from any branch, and a release tagged `-main.` that
     # was not built from main would still become /releases/latest.
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|release.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|release.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/scripts/
+            /docs/curves/
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - uses: actions/download-artifact@v4
         with:
           path: staging
@@ -695,21 +898,19 @@ jobs:
 
           | Artifact | Contents |
           | --- | --- |
-          | `crypto-*-x86_64-unknown-linux-gnu.tar.gz` | `crypto`, `ic`, `ecbench`, `curve_cover_check`, `curve_standards`, `hyperelliptic-cover`, `ecdlp-audit` — glibc |
-          | `crypto-*-aarch64-apple-darwin.tar.gz` | same seven executables — Apple silicon |
-          | `crypto-*-x86_64-pc-windows-msvc.zip` | same seven executables (`.exe`) |
+          | `crypto-*-x86_64-unknown-linux-gnu.tar.gz` | `crypto`, `ic`, `ecbench`, `curve_cover_check`, `curve_standards`, `hyperelliptic-cover`, `ecdlp-audit`, `factor-base-sweep` — glibc |
           | `isogeny-*-x86_64-unknown-linux-gnu.tar.gz` | dedicated `isogeny` executable, README, BUILD.json — glibc |
           | `isogeny-*-x86_64-unknown-linux-musl.tar.gz` | dedicated tool — static |
-          | `isogeny-*-aarch64-apple-darwin.tar.gz` | dedicated tool — Apple silicon |
-          | `isogeny-*-x86_64-pc-windows-msvc.zip` | dedicated `isogeny.exe` tool |
           | `isogeny-algos-*-x86_64-unknown-linux-gnu.tar.gz` | `isogeny-algos` (point counting, isogenies, Vélu/√élu, chains, BMSS, duals, CSIDH, paths, KLPT, Richelot, Φ_ℓ), USAGE.md, BUILD.json — glibc |
           | `isogeny-algos-*-x86_64-unknown-linux-musl.tar.gz` | `isogeny-algos` — static |
-          | `isogeny-algos-*-aarch64-apple-darwin.tar.gz` | `isogeny-algos` — Apple silicon |
-          | `isogeny-algos-*-x86_64-pc-windows-msvc.zip` | `isogeny-algos.exe` |
           | `ecc2k130-cpu-*.tar.gz` | ECC2K-130 client, CPU (`-march=x86-64-v3`) |
           | `ecc2k130-cuda-*.tar.gz` | ECC2K-130 client, CUDA fatbinary (sm_80–sm_120) |
 
           Verify with `sha256sum -c SHA256SUMS`.
+
+          Put the extracted `factor-base-sweep` executable on PATH and launch
+          `factor-base-sweep run --out runs/bases`. No Rust toolchain or source
+          checkout is needed to run the installed native CLI.
 
           Run `isogeny --help` after extracting the dedicated tool archive.
           `isogeny search --curve p224 --ell 1471 --out p224-1471` constructs

@@ -1,0 +1,82 @@
+== model port (f64 price)
+g=128 b=17 tot=36.410 (note b=17, 36.41) OK
+g=255 b=27 tot=55.603 (note b=27, 55.6) OK
+g=256 b=27 tot=55.650 (note b=27, 55.65) OK
+== control: smoothness test vs full factorisation
+A (DDF+EDF, squarefree deg 8..96, b 2..24): n=300 smooth=45 nonsmooth=255 disagreements=0
+B (trial division, deg<=24, b 2..10, 295 with repeated factors): n=300 smooth=248 nonsmooth=52 disagreements=0
+== F_2^131 and EC addition
+modulus irreducible: true
+EC: points on curve + associativity: triples checked=50, failures=0
+W per op on F_2^131: mul=501 sqr=142 add=3 inv=761; affine EC add=1925; LD mixed 8M+5S+9A=4741; affine add wall 9276 ns
+g=7: model b=2; Cantor controls: outputs=200+16 group-law triples=100 failures=0
+g=7 b=2: W/trial=199 (add 152 [compose 108] + test 47) sd_blocks=2 events=30.5 ns=2661 mean deg u=6.11 reduction steps/trial=1.79 smooth hits=749/4000
+g=15: model b=3; Cantor controls: outputs=200+16 group-law triples=100 failures=0
+g=15 b=3: W/trial=546 (add 410 [compose 243] + test 136) sd_blocks=6 events=45.2 ns=4940 mean deg u=13.96 reduction steps/trial=3.59 smooth hits=185/4000
+g=31: model b=6; Cantor controls: outputs=200+16 group-law triples=100 failures=0
+g=31 b=6: W/trial=1650 (add 1197 [compose 533] + test 453) sd_blocks=13 events=69.8 ns=11124 mean deg u=30.00 reduction steps/trial=7.51 smooth hits=1/4000
+g=63: model b=10; Cantor controls: outputs=200+16 group-law triples=100 failures=0
+g=63 b=10: W/trial=5895 (add 4497 [compose 730] + test 1398) sd_blocks=37 events=106.8 ns=30108 mean deg u=62.03 reduction steps/trial=15.76 smooth hits=0/4000
+g=127: model b=17; Cantor controls: outputs=200+16 group-law triples=100 failures=0
+g=127 b=17: W/trial=33137 (add 26562 [compose 2890] + test 6575) sd_blocks=137 events=198.3 ns=110746 mean deg u=126.01 reduction steps/trial=31.61 smooth hits=0/4000
+g=255: model b=27; Cantor controls: outputs=200+16 group-law triples=100 failures=0
+g=255 b=27: W/trial=198149 (add 166385 [compose 8622] + test 31764) sd_blocks=940 events=357.3 ns=411246 mean deg u=254.02 reduction steps/trial=63.64 smooth hits=0/4000
+g=511: model b=42; Cantor controls: outputs=200+16 group-law triples=100 failures=0
+g=511 b=42: W/trial=1334802 (add 1164425 [compose 32255] + test 170378) sd_blocks=3093 events=660.5 ns=1856618 mean deg u=509.99 reduction steps/trial=127.46 smooth hits=0/4000
+== smooth-rate fidelity (walk vs model vs random monic polynomials)
+g=7 b=2: walk 0.14736 (29473), random monic 0.15724 (31447), model 0.27451; walk deg u == g in 0.500
+g=11 b=2: walk 0.00112 (224), random monic 0.02105 (4210), model 0.04957; walk deg u == g in 0.482
+g=15 b=3: walk 0.00170 (340), random monic 0.01103 (2205), model 0.02432; walk deg u == g in 0.495
+g=23 b=4: walk 0.00067 (134), random monic 0.00093 (187), model 0.00222; walk deg u == g in 0.501
+g=31 b=6: walk 0.00221 (443), random monic 0.00085 (170), model 0.00160; walk deg u == g in 0.499
+fit g>=63 total: log2 W = -3.010 + 2.588 log2 g; g>=15: -0.230 + 2.232 log2 g
+fit g>=63 cantor slope 2.652 test slope 2.291; g>=15 cantor 2.282 test 2.024
+fit on g=31,63,127 only predicts g=255: 17.041 bits vs measured 17.596
+== b scan at g=255
+b=8: test W=4446 trial W=170830 CAE(cheap)=88.7 (2^6.47) rel=158.33 lin=20.33 total=165.80 margin=-105.49
+b=12: test W=10486 trial W=176871 CAE(cheap)=91.9 (2^6.52) rel=106.11 lin=27.09 total=113.63 margin=-53.32
+b=16: test W=16349 trial W=182734 CAE(cheap)=94.9 (2^6.57) rel=79.05 lin=34.20 total=86.62 margin=-26.31
+b=20: test W=22079 trial W=188464 CAE(cheap)=97.9 (2^6.61) rel=65.06 lin=41.52 total=72.67 margin=-12.36
+b=24: test W=27734 trial W=194118 CAE(cheap)=100.8 (2^6.66) rel=57.59 lin=48.96 total=65.25 margin=-4.93
+b=27: test W=31848 trial W=198233 CAE(cheap)=103.0 (2^6.69) rel=54.46 lin=54.60 total=62.15 margin=-1.83
+b=32: test W=38538 trial W=204923 CAE(cheap)=106.4 (2^6.73) rel=52.10 lin=64.09 total=65.09 margin=-4.78
+b=36: test W=43748 trial W=210132 CAE(cheap)=109.1 (2^6.77) rel=51.86 lin=71.74 total=72.74 margin=-12.43
+b=40: test W=48822 trial W=215207 CAE(cheap)=111.8 (2^6.80) rel=52.59 lin=79.43 total=80.43 margin=-20.11
+b=48: test W=58590 trial W=224975 CAE(cheap)=116.8 (2^6.87) rel=55.90 lin=94.89 total=95.89 margin=-35.57
+b=56: test W=67889 trial W=234274 CAE(cheap)=121.7 (2^6.93) rel=60.75 lin=110.43 total=111.43 margin=-51.12
+b=64: test W=76730 trial W=243114 CAE(cheap)=126.3 (2^6.98) rel=66.50 lin=126.04 total=127.04 margin=-66.73
+== N=130 margin
+model g=255: b=27 rel=54.462 lin=54.603 note total=55.603 margin=4.711; rho=60.315
+note's 2^7: total=62.462 margin=-2.148
+measured trial W=198149; CAE vs cheap EC add (1925) = 102.91 = 2^6.685; vs affine (1925) = 102.91 = 2^6.685
+calibrated margin (headline, cheap EC add): -1.833; affine: -1.833; re-optimised b=27 margin -1.834
+scenario A_full_cantor_plus_test: W=198149 events=357.3 CAE=2^6.685 total=2^62.148 margin=-1.833
+scenario B_compose_only_plus_test: W=40387 events=102.7 CAE=2^4.391 total=2^59.853 margin=0.462
+scenario C_test_only_floor: W=31764 events=90.7 CAE=2^4.044 total=2^59.506 margin=0.808
+band A_full_cantor_plus_test w=0 n_rho=0: IC trial = 1.0 GAE, rho step = 1.00 GAE, IC total 2^55.60, rho 2^60.31, margin 4.71
+band A_full_cantor_plus_test w=0 n_rho=3: IC trial = 1.0 GAE, rho step = 1.00 GAE, IC total 2^55.60, rho 2^60.31, margin 4.71
+band A_full_cantor_plus_test w=0 n_rho=10: IC trial = 1.0 GAE, rho step = 1.00 GAE, IC total 2^55.60, rho 2^60.31, margin 4.71
+band A_full_cantor_plus_test w=0.1 n_rho=0: IC trial = 36.7 GAE, rho step = 1.00 GAE, IC total 2^60.66, rho 2^60.31, margin -0.35
+band A_full_cantor_plus_test w=0.1 n_rho=3: IC trial = 36.7 GAE, rho step = 1.30 GAE, IC total 2^60.66, rho 2^60.69, margin 0.03
+band A_full_cantor_plus_test w=0.1 n_rho=10: IC trial = 36.7 GAE, rho step = 2.00 GAE, IC total 2^60.66, rho 2^61.31, margin 0.65
+band A_full_cantor_plus_test w=1 n_rho=0: IC trial = 358.3 GAE, rho step = 1.00 GAE, IC total 2^63.95, rho 2^60.31, margin -3.63
+band A_full_cantor_plus_test w=1 n_rho=3: IC trial = 358.3 GAE, rho step = 4.00 GAE, IC total 2^63.95, rho 2^62.31, margin -1.63
+band A_full_cantor_plus_test w=1 n_rho=10: IC trial = 358.3 GAE, rho step = 11.00 GAE, IC total 2^63.95, rho 2^63.77, margin -0.17
+band B_compose_only_plus_test w=0 n_rho=0: IC trial = 1.0 GAE, rho step = 1.00 GAE, IC total 2^55.60, rho 2^60.31, margin 4.71
+band B_compose_only_plus_test w=0 n_rho=3: IC trial = 1.0 GAE, rho step = 1.00 GAE, IC total 2^55.60, rho 2^60.31, margin 4.71
+band B_compose_only_plus_test w=0 n_rho=10: IC trial = 1.0 GAE, rho step = 1.00 GAE, IC total 2^55.60, rho 2^60.31, margin 4.71
+band B_compose_only_plus_test w=0.1 n_rho=0: IC trial = 11.3 GAE, rho step = 1.00 GAE, IC total 2^58.96, rho 2^60.31, margin 1.36
+band B_compose_only_plus_test w=0.1 n_rho=3: IC trial = 11.3 GAE, rho step = 1.30 GAE, IC total 2^58.96, rho 2^60.69, margin 1.74
+band B_compose_only_plus_test w=0.1 n_rho=10: IC trial = 11.3 GAE, rho step = 2.00 GAE, IC total 2^58.96, rho 2^61.31, margin 2.36
+band B_compose_only_plus_test w=1 n_rho=0: IC trial = 103.7 GAE, rho step = 1.00 GAE, IC total 2^62.16, rho 2^60.31, margin -1.84
+band B_compose_only_plus_test w=1 n_rho=3: IC trial = 103.7 GAE, rho step = 4.00 GAE, IC total 2^62.16, rho 2^62.31, margin 0.16
+band B_compose_only_plus_test w=1 n_rho=10: IC trial = 103.7 GAE, rho step = 11.00 GAE, IC total 2^62.16, rho 2^63.77, margin 1.61
+band C_test_only_floor w=0 n_rho=0: IC trial = 1.0 GAE, rho step = 1.00 GAE, IC total 2^55.60, rho 2^60.31, margin 4.71
+band C_test_only_floor w=0 n_rho=3: IC trial = 1.0 GAE, rho step = 1.00 GAE, IC total 2^55.60, rho 2^60.31, margin 4.71
+band C_test_only_floor w=0 n_rho=10: IC trial = 1.0 GAE, rho step = 1.00 GAE, IC total 2^55.60, rho 2^60.31, margin 4.71
+band C_test_only_floor w=0.1 n_rho=0: IC trial = 10.1 GAE, rho step = 1.00 GAE, IC total 2^58.79, rho 2^60.31, margin 1.52
+band C_test_only_floor w=0.1 n_rho=3: IC trial = 10.1 GAE, rho step = 1.30 GAE, IC total 2^58.79, rho 2^60.69, margin 1.90
+band C_test_only_floor w=0.1 n_rho=10: IC trial = 10.1 GAE, rho step = 2.00 GAE, IC total 2^58.79, rho 2^61.31, margin 2.52
+band C_test_only_floor w=1 n_rho=0: IC trial = 91.7 GAE, rho step = 1.00 GAE, IC total 2^61.98, rho 2^60.31, margin -1.67
+band C_test_only_floor w=1 n_rho=3: IC trial = 91.7 GAE, rho step = 4.00 GAE, IC total 2^61.98, rho 2^62.31, margin 0.33
+band C_test_only_floor w=1 n_rho=10: IC trial = 91.7 GAE, rho step = 11.00 GAE, IC total 2^61.98, rho 2^63.77, margin 1.79

@@ -1,0 +1,287 @@
+Prime-field bit restrictions: a degree bound independent of modulus size
+Date: 2026-10-29
+
+Status and scope
+----------------
+This note gives a mathematical derivation for a specific presentation over
+the coefficient field F_p. It is not a computation, parameter sweep, timing
+result, first-fall equality, Lean formalization, or security claim.
+
+The variables called bits below are Boolean-constrained variables in an
+F_p polynomial ring. Prime-field arithmetic is still performed in F_p.
+This is NOT a GF(2) carry-circuit encoding of prime-field arithmetic, and
+the result does not automatically transfer to such a circuit or to E12.
+
+The point-lift and summation-polynomial context is the same as in
+../../proofs/universal_five_symmetric_audit.txt and proof_scope.txt in this
+directory. The source formulas are recorded in ../../SOURCES.md: Semaev,
+arXiv:1504.01175, Section 2, and Kosters--Yeo, arXiv:1503.08001, Section 2.
+The proof here is separate from the ordinary-field three-abscissa theorem
+and from the characteristic-two Boolean affine-specialization theorem.
+It does not assume either theorem's degree conclusion.
+
+1. Exact normalized-input presentation
+--------------------------------------
+Let p>3 be prime and let
+  E/F_p: Y^2=X^3+a*X+b
+be nonsingular. Write f(T)=T^3+a*T+b, so f has no repeated root in an
+algebraic closure. Let ell>=1 and n>=ceil(log_2 p).
+
+Introduce three independent blocks of ell base variables
+  X_1,...,X_ell; Y_1,...,Y_ell; Z_1,...,Z_ell
+and an auxiliary block U_0,...,U_(n-1). If the inverse guard is included,
+also introduce the independent block V_0,...,V_(n-1). All variables belong
+to an ordinary polynomial ring over F_p, and every variable W has an
+explicit input equation
+  W^2-W.
+
+Choose arbitrary multilinear F_p polynomials
+  x=X(X_1,...,X_ell), y=Y(Y_1,...,Y_ell),
+  z=Z(Z_1,...,Z_ell).
+Each of the three lookup maps must have the following image property:
+on EVERY Boolean assignment of its block, its value is the abscissa of
+an affine F_p-rational point of E. The maps need not be injective, their
+images may differ, and they need not be linear. Both rational point signs
+above an abscissa are permitted; no additional sign restriction is imposed.
+
+Set, in F_p,
+  u=sum_(i=0)^(n-1) 2^i*U_i,
+  v=sum_(i=0)^(n-1) 2^i*V_i, when the guard is included.
+Because 2^n>=p, each map on Boolean inputs is surjective onto F_p: choose
+the ordinary n-bit representation of a residue in {0,...,p-1}. Encodings
+may be nonunique modulo p. No canonical-range constraint is added.
+
+Choose an affine rational target R and put r=x(R). Use the symmetric
+third summation polynomial, displayed as a quadratic in its last variable:
+  S3(A,B,T)=(A-B)^2*T^2
+             -2*((A+B)*(A*B+a)+2*b)*T
+             +(A*B-a)^2-4*b*(A+B).
+Let NF denote multilinear normal form using all the equations W^2-W.
+The supplied NON-BOOLEAN input equations for this first theorem are
+  p1=NF(S3(x,y,u)), p2=NF(S3(u,z,r)),
+and, optionally,
+  ph=NF(v*(x-y)-1).
+Together with every bit equation these form the generating set F.
+
+It is essential that these normal forms are the supplied inputs in this
+first presentation. Section 7 separately accounts for raw substitutions.
+No additional constraints on the auxiliary bits are part of F.
+
+Let V(F,D) be the smallest F_p-linear space containing each input of
+ordinary degree at most D and closed under multiplication whenever the
+ordinary product degree is at most D. No implicit Boolean quotient is
+used in the degree accounting: every normalization below is obtained
+from the explicit bit-equation inputs.
+
+THEOREM. If F is unsatisfiable on Boolean assignments, then
+  1 belongs to V(F,3*ell+2), and d_F(F)<=3*ell+2.
+The guard may be included or omitted. The bound is independent of n and
+the bit length of p. The theorem assumes the exact presentation above.
+
+2. Degree-preserving Boolean normalization over F_p
+---------------------------------------------------
+For a polynomial P of ordinary degree at most D, Boolean division writes
+  P-NF(P)=sum_j A_j*(W_j^2-W_j),
+with every product of degree at most D. Indeed, eliminating a repeated
+variable in a monomial M*W^k, k>=2, uses
+  M*W^(k-2)*(W^2-W)
+and replaces it by a term of smaller degree. Repeat until all monomials
+are multilinear. Therefore P-NF(P) belongs to V(F,D), and an available
+row may be normalized within its current degree cap.
+
+Write L=3*ell for the number of base bits. Each normalized p_i has
+auxiliary degree at most two, since S3 is quadratic in the shared u.
+The first equation uses only the X,Y base blocks (at most 2*ell bits);
+the second uses only Z (at most ell bits). The optional guard uses X,Y
+and is linear in the V bits. Consequently each input has the form
+  p_i(base,auxiliary),
+multilinear in all bits, with base support A_i of size s_i<=2*ell and
+auxiliary degree at most two. No claim of affine dependence on the U
+bits is made: in odd characteristic the cross terms of u^2 remain.
+
+3. Assignment localization at cap L+2
+-------------------------------------
+Fix a full base assignment epsilon in {0,1}^L. For any subset A of base
+variables define the ODD-CHARACTERISTIC indicator
+  delta_(epsilon,A)=product_(j in A, epsilon_j=1) B_j
+                    *product_(j in A, epsilon_j=0)(1-B_j),
+and put delta_epsilon=delta_(epsilon,all base bits).
+These indicators have their ordinary signs over F_p. In particular the
+characteristic-two formula with factors B_j+1+epsilon_j is not used.
+
+Starting with p_i, multiply successively by its indicator factors on
+A_i, normalizing after every multiplication. Every current normal form
+uses at most those s_i base bits and has auxiliary degree at most two.
+It thus has total degree at most s_i+2. The next linear-factor product
+and its normalization cost at most s_i+3. For ell>=1,
+  s_i+3 <= 2*ell+3 <= 3*ell+2=L+2.
+All these rows are therefore available at cap L+2.
+
+After the support factors are processed, the exact normal form is
+  delta_(epsilon,A_i)*p_i(epsilon,auxiliary).
+Both sides are multilinear in the support variables and agree on their
+Boolean assignments coefficientwise as polynomials in the auxiliary
+variables. Boolean interpolation over F_p proves the stated identity.
+Multiplication by the complementary base indicator then derives
+  delta_epsilon*p_i(epsilon,auxiliary)
+at ordinary degree at most L+2.
+
+This step uses each equation's support first. Direct multiplication of a
+general high-support row by the full degree-L indicator would not give
+the required degree bound.
+
+4. Rational roots and the same-abscissa edge case
+-------------------------------------------------
+Fix epsilon and write x0,y0,z0 for its lookup values. Set
+  q1(T)=S3(x0,y0,T), q2(T)=S3(T,z0,r).
+These have degree at most two over F_p.
+
+If x0!=y0, choose rational lifts (x0,eta),(y0,zeta), where
+eta^2=f(x0) and zeta^2=f(y0). The exact factorization is
+  q1(T)=(x0-y0)^2*(T-rho_plus)*(T-rho_minus),
+  rho_plus=((eta+zeta)/(x0-y0))^2-x0-y0,
+  rho_minus=((eta-zeta)/(x0-y0))^2-x0-y0.
+Both roots are in F_p, with multiplicities allowed. They are the
+abscissas of sums/differences of the two point lifts. The denominators
+are nonzero because the abscissas differ.
+
+If x0=y0=t, direct specialization gives
+  q1(T)=-4*f(t)*T+(t^2-a)^2-8*b*t.
+If f(t)!=0 this is a nonzero linear polynomial, whose root lies in F_p.
+If f(t)=0, substituting b=-t^3-a*t gives the nonzero constant
+  q1(T)=(3*t^2+a)^2=f'(t)^2.
+It is nonzero because f and f' have no common root on a nonsingular curve.
+Thus q1 is NEVER the zero polynomial. Every algebraic root it has lies
+in F_p. This includes rational two-torsion and repeated quadratic roots.
+The same analysis also shows q2 cannot be identically zero under the
+rational-target and rational-lift assumptions, although q1's root property
+alone is sufficient for the argument below.
+
+If the guard is included and x0=y0, its localized equation is simply
+  -delta_epsilon,
+so delta_epsilon is already available. No coprimality assertion is needed
+in that branch.
+
+In every remaining branch, suppose q1,q2 had a common algebraic root.
+By q1's root property, that root would belong to F_p, and surjectivity of
+the U-bit map would supply a Boolean representation for it. Without the
+guard this would solve the specialized system. With the guard, x0!=y0,
+and surjectivity of the V-bit map would also represent (x0-y0)^(-1).
+That would likewise solve the full specialized system. This contradicts
+UNSAT. Hence q1,q2 are coprime in every remaining branch.
+
+The full-range auxiliary encodings and the all-image rational-lift
+hypothesis are substantive. Without them a Boolean system could exclude
+an available field root while the two univariate polynomials still have
+a common algebraic root; the following degree-two refutation would then
+be unavailable.
+
+5. Restore raw auxiliary quadratics and use only degree-two steps
+----------------------------------------------------------------
+Localization has supplied delta_epsilon times each specialized normalized
+equation. At Boolean base assignments, specialization commutes with the
+remaining auxiliary normalization, so these rows are
+  delta_epsilon*NF_aux(q_i(u)).
+They can be restored to delta_epsilon*q_i(u) within cap L+2. Explicitly,
+if q_i(T)=a_i*T^2+b_i*T+c_i and w_j=2^j in F_p, then
+  q_i(u)-NF_aux(q_i(u))
+    =a_i*sum_j w_j^2*(U_j^2-U_j).
+Multiplying these explicit bit-equation inputs by delta_epsilon costs
+at most L+2. Using delta_epsilon as a polynomial multiplier here does not
+assume that delta_epsilon has already been derived as a row.
+
+For clarity, the elementary univariate fact used next is stronger than a
+direct degree-three Bezout expansion: two coprime polynomials of degree
+at most two have a refutation in filtered closure at cap TWO.
+
+If a nonzero constant is present, divide by it. Otherwise normalize
+quadratic leading coefficients when needed. If two monic quadratics
+H1=T^2+A*T+B and H2 are present, their difference is linear or constant.
+A nonzero constant finishes. A nonzero linear difference normalizes to
+  M=T-alpha.
+If a linear polynomial was already present with a quadratic, use it as
+M instead. The sole necessary nonconstant multiplier is T applied to M.
+Then
+  H1-T*M-(A+alpha)*M=H1(alpha).
+Coprimality ensures this scalar is nonzero. Two coprime linear
+polynomials similarly yield a nonzero constant by scalar combinations.
+These cases cover all coprime pairs of degrees at most two. A zero member
+can only occur in a coprime pair when the other member is a nonzero
+constant, already handled.
+
+Carry delta_epsilon through those same derivation steps after substituting
+the linear bit form u for T. All scalar combinations are permitted, and
+the only multiplication that needs degree accounting is
+  u*(delta_epsilon*(u-alpha)),
+whose ordinary degree is at most L+2. Thus every remaining branch derives
+delta_epsilon without exceeding the cap.
+
+6. Summation and the last-fall bound
+------------------------------------
+Every base assignment has now supplied delta_epsilon, either from its
+guard contradiction or its coprime quadratic/linear pair. The exact
+polynomial identity over F_p is
+  sum_(epsilon in {0,1}^L) delta_epsilon
+    =product_(j=1)^L (B_j+(1-B_j))=1.
+This derives 1 inside V(F,L+2)=V(F,3*ell+2).
+
+All variables satisfy explicit W^2-W inputs, so every algebraic-closure
+zero has every coordinate in {0,1}, hence already in F_p. Boolean UNSAT
+therefore makes the ideal the unit ideal. On a unit ideal the least
+degree cap deriving 1 equals last fall degree: one direction follows by
+applying the definition to 1, and the other by multiplying the available
+1 by each monomial at cap max(D,degree of that monomial). This proves
+  d_F<=3*ell+2.
+
+7. Separate raw-input variants
+-------------------------------
+If the supplied non-Boolean inputs are the RAW lookup substitutions
+  S3(x,y,u), S3(u,z,r), v*(x-y)-1 when included,
+let d_raw be the largest ordinary degree among these inputs and the
+explicit bit equations. Boolean division derives their normal forms at
+cap d_raw. The preceding proof then establishes the presentation-specific
+bound
+  d_F <= max(3*ell+2,d_raw).
+It does not assert that the normalized and raw presentations have the
+same last fall degree.
+
+For arbitrary multilinear lookup polynomials, deg x,deg y,deg z<=ell.
+The first raw summation polynomial has degree at most
+  max(4*ell,3*ell+1,2*ell+2)=4*ell, for ell>=1;
+the second has degree at most 2*ell+2, and the raw guard at most ell+1.
+Bit equations have degree two. Hence d_raw<=4*ell and
+  d_F <= max(3*ell+2,4*ell)
+for this raw-input variant.
+
+If all lookup polynomials are affine, including the case of linear base
+embeddings, their raw substitutions have degree at most four. Since
+3*ell+2>=5 for ell>=1, the same d_F<=3*ell+2 bound holds for those raw
+inputs as well. In every variant the coefficient field remains F_p.
+
+8. Exact limitations
+---------------------
+* The theorem is conditional on UNSAT and the stated input presentation;
+  it is not a first-fall equality or an exact last-fall value.
+* Arbitrary lookup normal forms can have exponentially many coefficients.
+  The localization proof may use all 2^(3*ell) base assignments. The
+  degree bound supplies no small proof-size, memory, timing, or ECDLP
+  complexity guarantee, and it is not a measured improvement.
+* Every lookup value must have a rational point lift. Prime-field base
+  restrictions not satisfying that condition require a different argument.
+* The auxiliary maps must cover F_p, with independent U and V blocks when
+  the guard is used. Additional circuit variables, carry equations, range
+  conditions, sign restrictions or other auxiliary constraints are not
+  covered by the exact theorem as stated.
+* This is an F_p-coefficient Boolean-restricted system, not a GF(2)
+  prime-field arithmetic circuit or a characteristic-two Weil descent.
+  No general encoding/degree transfer to those presentations is asserted.
+* The ordinary-field cardinality lower bounds B+1 do not automatically
+  transfer to this bit-restricted presentation. No growing lower bound,
+  universal ceiling five, E12 certification, or deployed-curve-security
+  conclusion is proved here.
+* The complete theorem is not Lean formalized. The separate
+  ../../formal/PrimeBitLocal.lean module checks eight local algebraic
+  dependencies, including the discriminant/diagonal branch and quadratic
+  cancellation; ../../formal/prime-bit-verification.json records the checks.
+  Support-aware localization, rational roots, auxiliary encoding, and the
+  complete filtered-closure argument remain unformalized.

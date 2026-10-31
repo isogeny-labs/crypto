@@ -1,0 +1,37 @@
+# Exact N83 D18 source delivery for the Linux Spot runner
+
+**Status: local archive tested; no new source upload or three-object IAM grant applied.** This version supersedes the *unapplied* [two-object runner read proposal](../attempt-3/ACCESS_PROPOSAL.md) if explicitly authorized. It changes the hosted source route, not the frozen [Linux positive/natural protocol](../LINUX_SPOT_PROTOCOL.md). The earlier approved `54cbef1a` archive is retained separately and is not a substitute for this source.
+
+## Reviewable archive
+
+The proposed source package is a 58,011,243-byte gzip tarball with SHA-256 `dcc242fc0c4e6b4af99a854b885b0dece5d18ef69716a82cc5b5cc98d86044cd`. It is presently local at `/private/tmp/n83-d18-source-45ce91d5-verifier-1290dd0b-20261026.tar.gz`; [the manifest](source-archive-proposal.json) records the exact proposed destination:
+
+`s3://crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/d18-full-direct-subgroup-v1/a0/runs/linux-cadence32-20261026/source/dcc242fc0c4e6b4af99a854b885b0dece5d18ef69716a82cc5b5cc98d86044cd.tar.gz`
+
+It contains a sparse, shallow, clean Git checkout at `45ce91d503ee0d0acc57e3d8d5cb49108c90ded6`, with no remote URL, plus the separate patched verifier source blob `1290dd0b70bc49ee6d5ab930917532517f396461`. It contains no `.aws`, `.env`, credential or SSH-key paths in the tar listing; `.git/FETCH_HEAD` and reflogs were excluded. It is sized and tested for the frozen D18 examples, not for unrelated repository paths. The archive itself is deliberately absent from Git; until approved upload and provider readback, its local path is not durable custody.
+
+I extracted the archive into a fresh directory, checked `git rev-parse HEAD`, empty `git status --porcelain`, no configured remote and the separate verifier blob hash. I overlaid that verifier file for build only, ran `CARGO_NET_OFFLINE=true cargo test --release --example koblitz_n83_factor_base_export --example n83_d18_native_relation_replay` (20 worker and 5 verifier tests passed), built both release examples, and restored the tracked verifier file to a clean exact-commit checkout. The Darwin worker binary SHA-256 was `45e433e584b5561ef87424517504dc3a7f2f9545e82f4a274d1235c103967f36`; the patched verifier binary SHA-256 was `fd88fe178992a9ae920774a79c872e4ae5d9d1c789044aa0910b3ff4688092ed`. These hashes identify the local check only; a Linux build must record its own binary hashes. The no-source Rust Spot [smoke receipt](evidence/no-source-rust/status.json) confirms that `--no-source --toolchain rust` executes a command with Rust and AWS CLI available, uploads outputs and terminates its instance. It did not read this archive.
+
+## Exact temporary access proposal
+
+The [bucket policy](bucket-three-object-read-proposal.json) and [runner-role inline policy](runner-three-object-read-proposal.json) allow only `s3:GetObject` for (1) the original D18 custody manifest, (2) its exact compressed object, and (3) this exact-hash source tarball, to `arn:aws:iam::104186811093:role/ephemeral-runner`. The proposed inline-policy name is `N83D18ExactBundleReadEphemeral20261026`. There is no prefix wildcard, `ListBucket`, write or other principal. The source bucket was policy-free at the prior readback; the current policy state must be freshly checked immediately before applying. The original D18 input cannot be replaced by a copy or presigned substitute under the frozen protocol.
+
+The reviewed proposal file SHA-256 values are `4a88161d9bda1a9e6b141c5c2606b3c55d65840a2ea2f6590f60cf3889c14970` for the bucket policy and `8d3e74482e6d5aead6e6057a66edd12c69774cf1a459bd615b697b484a24bf4c` for the runner policy. Their resource arrays are the same three exact keys.
+
+After explicit authorization, first check that the exact source key is absent, upload only these 58,011,243 bytes with SHA-256 checksum and server-side AES256, then GET it and compare provider checksum, byte count, local hash, commit and verifier blob. Recheck the source bucket and runner role's live policies. If the prior two-object proposal has meanwhile been applied or any unrelated bucket policy appears, stop and reconcile rather than overwrite it. Otherwise apply the reviewed whole-bucket policy and role inline policy, read back and compare canonical JSON; roll back either partial application on failure. Launch a **new** `--no-source --toolchain rust` Spot job whose command GETs the exact source archive and original D18 pair with the instance role, then follows the Linux protocol's launch lock, positive exit-0, separate replay and conditional natural gates. Capture termination and charge evidence. Delete the temporary role and bucket policies after the hosted attempt ends or is cancelled, checking live documents before deletion and absence afterward. The separate active `rho-gh-snapshot-readonly-20261024` user grant has its own cleanup obligation.
+
+The archive upload and two policy mutations remain explicit authorization gates because they expose private source and change cross-account S3 access. No hosted D18 worker arm follows from this proposal alone. Cargo dependency availability on the Linux host remains a build gate; the local offline pass establishes only this machine's cache. The no-source Rust smoke ran for seconds and does not establish Spot endurance.
+
+The checked-in [Linux source/input/build preflight](linux_source_preflight.sh) is the proposed entry point for a new `ephemeral run --no-source --toolchain rust` job after those access gates pass. It requires the runner's `EPHEMERAL_OUT`, uses the instance role for checksum-enabled GETs of the three exact keys, checks full-object SHA-256 and byte counts, extracts and verifies the clean source commit and verifier blob, runs the 20+5 focused release example tests, builds both binaries and records Linux hashes and host metadata. It records an exit receipt and stops before any worker arm. The [thin local command packer](prepare_linux_preflight_command.sh) emits a 2,701-byte remote command: it transfers only that script through the runner's `-- CMD [ARGS...]` interface, checks the script SHA-256 after decoding on the instance, then executes it. The first two generated lines were decoded and hash-checked locally; the final line and the preflight were not executed in that test. `bash -n` and `shellcheck` pass for both scripts. The preflight has **not** been executed on Linux or against the proposed S3 source object. A passing script alone does not satisfy the separate frozen launch-lock, host-admission, positive replay or natural-query gates.
+
+Once the exact archive upload and temporary access are authorized and read back, the launch form is:
+
+```sh
+preflight_dir=research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/linux-build-smoke-20261026
+remote_command="$(bash "$preflight_dir/prepare_linux_preflight_command.sh")"
+taskq/deploy/ephemeral/ephemeral run --spot --type c7i.2xlarge \
+  --toolchain rust --no-source --ttl 70m --name n83-d18-source-gate \
+  --detach -- /bin/bash -lc "$remote_command"
+```
+
+This command is a frozen-input build gate, not the positive/natural job. Capture its job ID, output S3 prefix, costs and final EC2 termination; any Linux build failure remains a producer gate. The deployed account's current Spot-only policy precludes substituting On-Demand without an authorized protocol change.

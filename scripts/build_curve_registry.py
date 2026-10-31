@@ -279,7 +279,7 @@ def generator_of(o: dict) -> tuple[int, int] | None:
 
 
 def subgroup_of(o: dict, order: int) -> tuple[int, int] | None:
-    r = _int(o.get("subgroup_order"))
+    r = _int(o.get("subgroup_order", o.get("r")))
     h = _int(o.get("cofactor"))
     if r is None:
         return None
@@ -473,6 +473,12 @@ def check_thread_ids(curves: list[dict], fatal: list[str]) -> None:
             if uid and uid not in held:
                 fatal.append(f"{path.relative_to(REPO)}: {c.get('curve_id')} ({uid[-12:]}) "
                              "is not a representation in the registry")
+        # List-format files record no UID; derive it from the record itself.
+        for p, a, b, order, r, h, g in prepared_prime_rows(doc):
+            uid = ec1.curve_identity(*prime_record(p, a, b, order, r, h, g), "x")["curve_uid"]
+            if uid not in held:
+                fatal.append(f"{path.relative_to(REPO)}: prime record p={p} a={a} b={b} "
+                             f"({uid[-12:]}) is not a representation in the registry")
 
 
 def check_calibration(reg: "Registry", fatal: list[str]) -> None:
@@ -511,6 +517,83 @@ def harvest_curve_records(reg: Registry) -> None:
             reg.add(ident, "koblitz" if koblitz else "binary", params, rel,
                     koblitz_aliases(a, m) if koblitz else [])
             reg.represent(ident, f, {k: v for k, v in c.items() if k != "curve_id"}, rel)
+
+
+def harvest_thread_binary_representations(reg: Registry) -> None:
+    """Keep full binary EC1 records in curve_ids.json in the registry too.
+
+    Some frozen thread inventories retain an exact generator representation
+    that predates (or was not copied into) their companion curve_records.json.
+    The UID is recomputed before importing the row, so this cannot silently
+    turn a stale identifier into a catalog entry.
+    """
+    held = {uid for reps in reg.reps.values() for uid in reps}
+    for path in tracked("*curve_ids.json"):
+        rel = str(path.relative_to(REPO))
+        try:
+            doc = json.loads(path.read_text())
+        except (OSError, ValueError):
+            continue
+        for row in doc.get("curves", []) if isinstance(doc, dict) else []:
+            if not isinstance(row, dict) or not row.get("curve_uid") or row["curve_uid"] in held:
+                continue
+            field, curve = row.get("field"), row.get("curve")
+            if not isinstance(field, dict) or not isinstance(curve, dict):
+                continue
+            coeff = curve.get("coefficients")
+            order = _int(row.get("group_order"))
+            if (field.get("characteristic") != 2 or not isinstance(coeff, list)
+                    or len(coeff) != 5 or coeff[0] != 1 or coeff[2] or coeff[3]
+                    or not order or not isinstance(field.get("degree"), int)
+                    or not isinstance(field.get("modulus_exponents"), list)):
+                continue
+            m = field["degree"]
+            modulus = sum(1 << e for e in field["modulus_exponents"])
+            a, b = coeff[1], coeff[4]
+            ident = cid.binary_id(m, modulus, a, b, order,
+                                  end="-7" if b == 1 and a in (0, 1) else "unk")
+            rep = ec1.curve_identity(field, curve, "x")
+            if rep["curve_uid"] != row["curve_uid"]:
+                raise ValueError(f"{rel}: stored EC1 UID does not match its binary record")
+            koblitz = b == 1 and a in (0, 1)
+            params = ({"a": a, "n": m, "modulus": cid._hex(modulus),
+                       "modulus_rule": "recorded in the run"}
+                      if koblitz else {"m": m, "modulus": cid._hex(modulus),
+                                      "a": cid._hex(a), "b": cid._hex(b)})
+            reg.add(ident, "koblitz" if koblitz else "binary", params, rel,
+                    koblitz_aliases(a, m) if koblitz else [])
+            reg.represent(ident, field, curve, rel)
+            held.add(rep["curve_uid"])
+
+
+def prepared_prime_rows(doc) -> list[tuple]:
+    """The rows of a list-format curve_ids.json (the conductor-gap threads):
+    each {p, a, b, order, r, generator} is one prime-field EC1 record."""
+    rows = []
+    for c in doc if isinstance(doc, list) else []:
+        if not isinstance(c, dict):
+            continue
+        p, a, b = _int(c.get("p")), _int(c.get("a")), _int(c.get("b"))
+        order, r, g = _int(c.get("order")), _int(c.get("r")), c.get("generator")
+        if None in (p, a, b, order, r) or not r or order % r or not isinstance(g, list) or len(g) != 2:
+            continue
+        rows.append((p, a, b, order, r, order // r, (int(g[0], 16), int(g[1], 16))))
+    return rows
+
+
+def harvest_prepared_curve_ids(reg: Registry) -> None:
+    """List-format curve_ids.json files carry no EC1 UID, only the record:
+    representations are rebuilt from it, so a registry rebuild keeps them."""
+    for path in tracked("*curve_ids.json"):
+        rel = str(path.relative_to(REPO))
+        try:
+            doc = json.loads(path.read_text())
+        except (OSError, ValueError):
+            continue
+        for p, a, b, order, r, h, g in prepared_prime_rows(doc):
+            ident = cid.prime_id(p, a, b, order)
+            reg.add(ident, "prime", {"p": str(p), "a": str(a % p), "b": str(b % p)}, rel)
+            reg.represent(ident, *prime_record(p, a, b, order, r, h, g), rel)
 
 
 def harvest_bench(reg: Registry) -> None:
@@ -593,6 +676,50 @@ def harvest_programme_extensions(reg: Registry) -> None:
                                            [int(x) for x in rec["a"]], [int(x) for x in rec["b"]],
                                            int(rec["order"]))["model_sha256"]]["slug"] == rec["slug"]
     add_extension_doc(reg, B2_C050)
+
+
+THREE_LEADS_FIXTURES = (
+    "research/three_leads_e2e_20261018/coverage-fixtures-v3/fixtures.json",
+    "research/three_leads_e2e_20261018/genus-fixtures-v1/fixtures.json",
+    "research/three_leads_e2e_20261018/genus-order-fixtures-v1/fixtures.json",
+)
+
+
+def _base_p_coefficients(value: int, degree: int, p: int) -> list[int]:
+    coefficients = []
+    for _ in range(degree):
+        value, coefficient = divmod(value, p)
+        coefficients.append(coefficient)
+    if value:
+        raise ValueError("packed extension coefficient exceeds field degree")
+    return coefficients
+
+
+def harvest_three_leads_extensions(reg: Registry) -> None:
+    """Retain the exact extension models in the frozen three-leads fixtures."""
+    for rel in THREE_LEADS_FIXTURES:
+        rows = json.loads((REPO / rel).read_text())
+        for row in rows:
+            curve = row["curve"]
+            field = curve["f"]
+            p, degree = int(field["p"]), int(field["n"])
+            if curve["binary"] or degree < 2:
+                continue
+            coefficients = curve["c"]
+            order = int(row["order"])
+            if (len(coefficients) != 4 or coefficients[2:] != [0, 1]
+                    or int(row["r"]) * int(row["h"]) != order
+                    or int(row["evidence"]["order"]) != order):
+                raise ValueError(f"invalid frozen extension record in {rel}")
+            modulus = _base_p_coefficients(int(field["modulus"]), degree, p)
+            a = _base_p_coefficients(int(coefficients[1]), degree, p)
+            b = _base_p_coefficients(int(coefficients[0]), degree, p)
+            ident = cid.extension_id(p, degree, modulus, a, b, order)
+            ident["trace"] = str(ident["trace"])
+            reg.add(ident, "extension", {
+                "p": p, "degree": degree, "modulus": int(field["modulus"]),
+                "a": int(coefficients[1]), "b": int(coefficients[0]),
+            }, rel)
 
 
 def harvest_standards(reg: Registry) -> None:
@@ -720,10 +847,13 @@ def build() -> tuple[dict, list[str], list[str]]:
     harvest_bench(reg)
     harvest_json(reg, problems, fatal)
     harvest_curve_records(reg)
+    harvest_thread_binary_representations(reg)
+    harvest_prepared_curve_ids(reg)
     harvest_text_koblitz(reg)
     harvest_native_standards(reg)
     harvest_native_factor_base_history(reg)
     harvest_programme_extensions(reg)
+    harvest_three_leads_extensions(reg)
     carry_forward(reg)
     ambiguous = sorted(f"{reg.alias_text[k]!r} -> {len(v)} models"
                        for k, v in reg.alias_models.items() if len(v) > 1)

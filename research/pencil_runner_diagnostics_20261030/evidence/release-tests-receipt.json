@@ -1,0 +1,57 @@
+{
+  "schema": "software-validation-receipt/v1",
+  "task": "T-933",
+  "recorded_at": "2026-10-30T16:09:05.604533+00:00",
+  "production_root_release_tests": {
+    "diagnostic_ingestion_tests": {
+      "passed": 11,
+      "failed": 0,
+      "filtered_out": 5554
+    },
+    "diagnostic_context_tests": {
+      "passed": 1,
+      "failed": 0,
+      "filtered_out": 5564
+    },
+    "diagnostic_acceptance_tests": {
+      "passed": 2,
+      "failed": 0,
+      "filtered_out": 5563
+    }
+  },
+  "tested_source_sha256": {
+    "src/cryptanalysis/ecbench/record.rs": "e56fc0bfdb288c6b5e8ac85d5ce8af015dd05d8008b2bb956250140307c09721",
+    "src/cryptanalysis/ecbench/runner.rs": "bab73f7a589f5c6efbcdfa400d13d984e9577fd5502e6530c7d6dc55ec2755b9",
+    "src/cryptanalysis/ecbench/diagnostics.rs": "018930292f5f869dc5b3ecf4b23048779c55017f21ee0704ac5e04f66b82b8ba",
+    "src/cryptanalysis/ecbench/mod.rs": "045aa0faa28a9c3dff7ecc792931b86964adfc0b55f79b89f27020e193fe88c9",
+    "src/cryptanalysis/ecbench/audit.rs": "0c516a1be2b937b1030134076ffe262751357e2972a18a1a97114fe874bdccb3",
+    "src/bin/ecbench.rs": "9c7fc1d637346ed13c7e00a6c5317a071cc74f6d24a5031114c21d3d20073e85",
+    "examples/ecbench_child_overhead.rs": "3bc9c8c7f364434f48973a03943033f3033a2ec44b4a83ad5ca0d3c909fc7b20"
+  },
+  "software_fixture_scope": "tiny known-answer plan fixture allowed only for assembly test; no solver or cohort generation",
+  "scientific_executions": 0,
+  "producer_enabled": false,
+  "initial_attempts": [
+    "missing sparse ecdl-tensor-ic before compilation",
+    "missing sparse hashed-ecdl-tensor before compilation"
+  ],
+  "initial_clippy": {
+    "exit_code": 101,
+    "errors": [
+      "int_plus_one",
+      "cmp_owned"
+    ]
+  },
+  "post_lint_release_tests": "not repeated yet; root will rerun after main reconciliation",
+  "log_sha256": {
+    "root-test-dependencies.stdout": "6dc7e09530b5a42e82ba7bee6684c1a588e14effcd0dd6d5ba32e9e3b97bb4a0",
+    "root-test-dependencies.stderr": "eeb736743f96d773129e31f3fd00b58cfec1465d93406820cd98a7bcd30452ed",
+    "root-context.stdout": "015c90acd39b68364140c035cc9baeefc199387f73ff871bc99003e85e4ddc09",
+    "root-context.stderr": "cf30f0cc503c12c96714165198f440479c24dfbd308423a89ad5463d3837c23c",
+    "root-acceptance.stdout": "c49e5c916fefc36b314329f828fdb8074465ed945f9803ae726182ed93e49d4a",
+    "root-acceptance.stderr": "ddd0622ea62436785152bd31ffdf83190d279ac125f4197a6b8290be841e97ac",
+    "root-test.stderr": "467ecff1d8b6cad61e6c4f65f9e76468ce6c2fe7093c700406668f3f28fc7502",
+    "root-test-materialized.stderr": "255113c3e63e1fd4928805d4cfa3b0d3ff7894ac3f12f997c03fee7efda50adb",
+    "root-clippy.stderr": "347b7b32e416b735445bfe0bedd6790eece938717ee78fe9e2c93e1a470923d6"
+  }
+}

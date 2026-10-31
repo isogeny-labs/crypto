@@ -1,0 +1,16 @@
+[package]
+name = "kummer-n11-sidecar"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+serde_json = "1"
+sha2 = "0.10"
+
+[[bin]]
+name = "generate"
+path = "src/generate.rs"
+
+[[bin]]
+name = "validate"
+path = "src/validate.rs"

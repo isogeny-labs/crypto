@@ -1,0 +1,19 @@
+# Koblitz step: y² + xy = x³ + 0x² + 1 over F_(2^83), ℓ = 6473
+t_n = -6151469093347,  conductor f = 347450761417,  (−7/ℓ) = -1
+expected: 0 horizontal (back to j = 1) + 6474 descending = 6474 kernels; level 1 holds h(O_ℓ) = 6474 curves
+
+[1/4] Φ_ℓ(X, j₀) over Z by CRT (D = −7, j₀ = −3375)
+      9864 primes, coefficients up to 606365 bits, 8589.9 s
+[2/4] reduce mod 2 and factor over F_2
+      0.17 s; leftover (non-rational) degree 0
+      root j = 1 (the crater) with multiplicity 0  (expected 0)
+      78 Frobenius orbit(s) of size 83
+      distinct level-1 roots in F_(2^83): 6474  (expected 6474)
+[3/4] roots in F_(2^83)
+      6474 roots, 6474 distinct, 0.7 s
+[4/4] verify 48 neighbours: build the curve over F_(2^83) and test [N]P = O, N = 2^n + 1 − t_n
+      48 of 48 neighbours have exactly one twist of order N (all must)
+      control: 0 of 8 random j-invariants pass the same test (expect 0)
+wrote 6474 j-invariants to /tmp/claude-0/-home-user/cde20536-6e40-5ac6-9a5d-3929cc9e07a9/scratchpad/n83_ell6473_j.txt
+
+total 8591.0 s — ALL CHECKS PASS

@@ -1,0 +1,52 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1hfa1efd0bb82e",
+  "label": "DLP tuning HOLDOUT Koblitz n=43",
+  "spec_id": "ECS1hea9bb675a8e4",
+  "spec_sha256": "ea9bb675a8e4c7ca743d2c6572a4362295fd61e3a56932d59abcb4f6dd90de6e",
+  "env_class_id": "ECBENV2h777a501d3cac",
+  "host_sha256": "3e3fba1d43996c6d4e6a9bbfe50713edeca198f68fb3ccef14e09e02b1f95e1e",
+  "plan_sha256": "9d4cd05ff063f113706b42ab487aeca85b70517646deda74c987c6782225ad43",
+  "binary_sha256": "91263a526a9f591f601acf8a9372fd718da16b486fab7271d3f4f8b3d6b83798",
+  "git_commit": null,
+  "git_dirty": null,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/claude-0/dlp.lock",
+    "wait_for_lock": true,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 2,
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1793162898168,
+  "finished_unix_ms": 1793162932734,
+  "status": "complete",
+  "executions_planned": 576,
+  "records_written": 576,
+  "records_sha256": "d5de025a73ccfb4d2cdde786d0b6d50a5a695399924d61eac6d2da085daead69",
+  "status_counts": {
+    "verified": 576
+  }
+}

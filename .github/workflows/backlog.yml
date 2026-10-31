@@ -12,21 +12,8 @@ name: backlog
 # repository's all-target Rust check.
 
 on:
-  pull_request:
-    paths:
-      - 'backlog/**'
-      - 'problems/**'
-      - 'src/bin/backlog.rs'
-      - 'src/bin/backlog/**'
-      - 'src/bin/backlog_check_aux2t.rs'
-      - 'src/hash/**'
-      - 'src/lib.rs'
-      - 'tests/backlog_cli.rs'
-      - '.github/workflows/backlog.yml'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - 'rust-toolchain*'
-      - '.cargo/**'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:
@@ -59,13 +46,14 @@ env:
 
 jobs:
   validate:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|backlog.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|backlog.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|backlog.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|backlog.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /.github/scripts/
             /Cargo.toml
             /tools/volcano-cli/
@@ -88,26 +76,39 @@ jobs:
         run: node .github/scripts/ci-scope.mjs --materialize
       - name: Draft runner resume and selection controls (mocked ecbench)
         run: python3 backlog/XP-20261016-prime-base-oracle-tuning/test_runner.py -v
+      - name: Install the native zlib link dependency
+        run: |
+          if ! pkg-config --exists zlib; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends zlib1g-dev
+          fi
+          pkg-config --modversion zlib
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.98'
       - uses: Swatinem/rust-cache@v2
       - run: cargo build --release --bin backlog --bin backlog_check_aux2t
       - name: Fetch main's history (no blobs) for the merged-commit check
-        run: git fetch --no-tags --filter=blob:none origin +refs/heads/main:refs/remotes/origin/main
+        run: |
+          history_args=()
+          if [ "$(git rev-parse --is-shallow-repository)" = true ]; then
+            history_args+=(--unshallow)
+          fi
+          git fetch "${history_args[@]}" --no-tags --filter=blob:none --recurse-submodules=no origin +refs/heads/main:refs/remotes/origin/main
       - name: Every card validates; ready cards pin a commit on main
         run: ./target/release/backlog validate --all --merged-into origin/main
       - name: Unit and integration tests (cairn lab tests skip here, loudly; the lab job runs them)
         run: cargo test --release --bin backlog --bin backlog_check_aux2t --test backlog_cli -- --nocapture
 
   lab:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|backlog.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|backlog.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|backlog.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|backlog.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /.github/scripts/
             /Cargo.toml
             /tools/volcano-cli/
@@ -128,6 +129,13 @@ jobs:
             /problems/
       - name: Materialize compile-time fixture inputs
         run: node .github/scripts/ci-scope.mjs --materialize
+      - name: Install the native zlib link dependency
+        run: |
+          if ! pkg-config --exists zlib; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends zlib1g-dev
+          fi
+          pkg-config --modversion zlib
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.98'

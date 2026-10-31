@@ -37,6 +37,16 @@ CURRENT_PATH = RUNS_DIR / "current.json"
 LOCK_PATH = RUNS_DIR / "autolab.lock"
 TASK_ID = "TASK-IC-BOUNDARY-AUTOLAB-20260910"
 
+if str(REPO / "tools") not in sys.path:
+    sys.path.insert(0, str(REPO / "tools"))
+import result_switches  # noqa: E402
+
+
+def write_switches(run: Path, env: dict[str, str], arguments: Any, name: str = "switches.json", **extra: Any) -> dict[str, Any]:
+    """R9: the environment handed to the producers and every parsed argument,
+    written into the run's artifacts (tools/result_switches.py)."""
+    return result_switches.write(run / "artifacts" / name, env, arguments, **extra)
+
 # Abstract measurement_schema keys -> accepted concrete aliases in reports.
 FIELD_ALIASES: dict[str, tuple[str, ...]] = {
     "n_or_bits": ("n_or_bits", "n", "bits"),
@@ -2197,6 +2207,7 @@ def launch(arguments: argparse.Namespace) -> dict[str, Any]:
         env.setdefault("KIC_INCREMENTAL_RANK_CROSSCHECK", "1")
         for key, value in (beat.get("env") or {}).items():
             env[str(key)] = str(value)
+        write_switches(run, env, arguments, beat_env=beat.get("env") or {})
 
         commands = producer_commands(beat, beat_id, fixtures, binaries=binaries)
         write_json(run / "artifacts/commands.json", commands)
@@ -2253,6 +2264,20 @@ def launch(arguments: argparse.Namespace) -> dict[str, Any]:
                      and row.get("online_target_count") == 1),
                     None,
                 )
+                if direct_online is None:
+                    # Producers on main no longer emit `online_target_count`
+                    # (the field is absent from every example).  Accept exactly
+                    # one `relation_rank_summary` row that carries the published
+                    # scalar, so the rho pairing below is unchanged and still
+                    # fail-closed on ambiguity.  The absence is recorded.
+                    candidates = [
+                        row for row in direct_rows
+                        if row.get("kind") == "relation_rank_summary"
+                        and isinstance(row.get("published_fixture_scalar"), int)
+                    ]
+                    if len(candidates) == 1:
+                        direct_online = candidates[0]
+                        commands["online_target_count_absent"] = True
                 if direct_online is not None:
                     rho_fixed_target_scalar = direct_online.get("published_fixture_scalar")
                 if isinstance(rho_fixed_target_scalar, int):
@@ -2905,6 +2930,8 @@ def launch_panel(arguments: argparse.Namespace) -> dict[str, Any]:
         env = os.environ.copy()
         env["RAYON_NUM_THREADS"] = "1"
         rho_env = dict(env, **{k: str(v) for k, v in producers["rho"].get("env", {}).items()})
+        write_switches(run, env, arguments, rho_env=result_switches.result_env(rho_env),
+                       producer_env={arm: pr.get("env", {}) for arm, pr in producers.items()})
 
         advance("corpora")
         corpora: dict[str, Any] = {}
@@ -3279,6 +3306,7 @@ def launch_equal_advice(arguments: argparse.Namespace) -> dict[str, Any]:
     label = str(arguments.label or beat.get("target_label_default", "autolab-n61-bl-ref-eval-v1"))
     pair_ic = bool(getattr(arguments, "pair_ic", False))
     reuse_archive = getattr(arguments, "reuse_bl_archive", None)
+    co_measure = bool(getattr(arguments, "co_measure", False))
     ic_k = int(getattr(arguments, "ic_k", None) or beat.get("ic_k_default", 256))
     ic_rank_seed = int(getattr(arguments, "ic_rank_seed", None) or beat.get("ic_rank_seed", 7))
     ic_target_count = getattr(arguments, "ic_target_count", None)
@@ -3288,7 +3316,9 @@ def launch_equal_advice(arguments: argparse.Namespace) -> dict[str, Any]:
     ic_prod = producers["ic"]
     if pair_ic:
         require("ic" in producers, f"{beat_id} has no IC panel producer")
-    if reuse_archive:
+    if co_measure:
+        require(pair_ic and reuse_archive, "--co-measure requires --pair-ic and --reuse-bl-archive (points only)")
+    if reuse_archive and not co_measure:
         require(pair_ic or arguments.prepare_only, "--reuse-bl-archive requires --pair-ic (or --prepare-only)")
 
     with RunnerLock():
@@ -3375,6 +3405,7 @@ def launch_equal_advice(arguments: argparse.Namespace) -> dict[str, Any]:
             (run / name).mkdir(parents=True, exist_ok=True)
         write_json(CURRENT_PATH, {"run_id": run_id, "beat_id": beat_id, "updated_at": now()})
         write_json(run / "artifacts/preflight.json", preflight_receipt)
+        write_switches(run, os.environ, arguments)
         write_json(run / "inputs/protocol.json", protocol)
         write_json(run / "inputs/boundary_targets.json", ledger)
         write_json(
@@ -3447,6 +3478,7 @@ def launch_equal_advice(arguments: argparse.Namespace) -> dict[str, Any]:
             "table_bytes": table_bytes,
             "target_label": label,
             "pair_ic": pair_ic,
+            "co_measure": co_measure,
             "reuse_bl_archive": bool(reuse_archive),
             "ic_k": ic_k if pair_ic else None,
             "ic_rank_seed": ic_rank_seed if pair_ic else None,
@@ -3491,7 +3523,7 @@ def launch_equal_advice(arguments: argparse.Namespace) -> dict[str, Any]:
             return state
 
         pin: dict[str, Any] | None = None
-        if reuse_archive:
+        if reuse_archive and not co_measure:
             state.update(phase="reuse_bl", updated_at=now())
             write_json(run / "state.json", state)
             try:
@@ -3528,16 +3560,28 @@ def launch_equal_advice(arguments: argparse.Namespace) -> dict[str, Any]:
                     },
                 },
             )
-
-            state.update(phase="targets", updated_at=now())
-            write_json(run / "state.json", state)
-            gen = subprocess.run(targets_cmd, cwd=REPO, capture_output=True, text=True)
-            (run / "logs/targets.stdout").write_text(gen.stdout)
-            (run / "logs/targets.stderr").write_text(gen.stderr)
-            require(gen.returncode == 0, "targets generation failed:\n" + gen.stderr[-2000:])
-            require(points_path.is_file() and scalars_path.is_file(), "targets mode did not write point/scalar files")
-            point_lines = [ln for ln in points_path.read_text().splitlines() if ln.strip()]
-            require(len(point_lines) == targets, f"expected {targets} points, got {len(point_lines)}")
+            if co_measure:
+                state.update(phase="archived_points", updated_at=now())
+                write_json(run / "state.json", state)
+                try:
+                    pin = equal_advice_pair.copy_archived_points(
+                        archive=Path(reuse_archive),
+                        run=run,
+                        lab=sys.modules[__name__],
+                        targets=targets,
+                    )
+                except (OSError, ValueError, FileNotFoundError) as exc:
+                    require(False, f"archived points copy failed: {exc}")
+            else:
+                state.update(phase="targets", updated_at=now())
+                write_json(run / "state.json", state)
+                gen = subprocess.run(targets_cmd, cwd=REPO, capture_output=True, text=True)
+                (run / "logs/targets.stdout").write_text(gen.stdout)
+                (run / "logs/targets.stderr").write_text(gen.stderr)
+                require(gen.returncode == 0, "targets generation failed:\n" + gen.stderr[-2000:])
+                require(points_path.is_file() and scalars_path.is_file(), "targets mode did not write point/scalar files")
+                point_lines = [ln for ln in points_path.read_text().splitlines() if ln.strip()]
+                require(len(point_lines) == targets, f"expected {targets} points, got {len(point_lines)}")
 
             state.update(phase="bl", updated_at=now())
             write_json(run / "state.json", state)
@@ -3599,6 +3643,7 @@ def launch_equal_advice(arguments: argparse.Namespace) -> dict[str, Any]:
                     rank_seed=ic_rank_seed,
                     points=points,
                     ic_target_count=count,
+                    extra_env={"KIC_DUMP_BASE": str(run / "logs/base.jsonl")} if co_measure else None,
                 )
             except (OSError, RuntimeError, ValueError) as exc:
                 require(False, f"paired IC arm failed: {exc}")
@@ -3623,20 +3668,41 @@ def launch_equal_advice(arguments: argparse.Namespace) -> dict[str, Any]:
                     "bl_jsonl_sha256": sha256(bl_out),
                     "remeasured": True,
                 }
-            claim_draft = equal_advice_pair.draft_paired_vs_rho_slice(
-                lab=sys.modules[__name__],
-                beat=beat,
-                beat_id=beat_id,
-                run=run,
-                pin=pin,
-                ic_obs=ic_obs,
-                bl_records=records,
-                points=points,
-                scalars=scalars,
-                table_bytes=table_bytes,
-                binaries=binaries,
-                git_head=git_head,
-            )
+            if co_measure:
+                try:
+                    claim_draft = equal_advice_pair.build_schema_complete_claim(
+                        lab=sys.modules[__name__],
+                        protocol=protocol,
+                        beat=beat,
+                        beat_id=beat_id,
+                        run=run,
+                        pin=pin,
+                        ic_obs=ic_obs,
+                        bl_records=records,
+                        points=points,
+                        scalars=scalars,
+                        table_bytes=table_bytes,
+                        binaries=binaries,
+                        git_head=git_head,
+                        base_dump=run / "logs/base.jsonl",
+                    )
+                except (OSError, RuntimeError, ValueError, KeyError, ModuleNotFoundError) as exc:
+                    require(False, f"schema claim failed: {exc}")
+            else:
+                claim_draft = equal_advice_pair.draft_paired_vs_rho_slice(
+                    lab=sys.modules[__name__],
+                    beat=beat,
+                    beat_id=beat_id,
+                    run=run,
+                    pin=pin,
+                    ic_obs=ic_obs,
+                    bl_records=records,
+                    points=points,
+                    scalars=scalars,
+                    table_bytes=table_bytes,
+                    binaries=binaries,
+                    git_head=git_head,
+                )
             claim_draft["bl_records"] = len(records)
             claim_draft["bl_online_rows"] = len(online_rows)
             claim_draft["bl_solved_or_verified_rows"] = solved
@@ -3818,6 +3884,14 @@ def parser() -> argparse.ArgumentParser:
         "--ic-target-count",
         type=int,
         help="How many leading archived points to solve with IC (default: all)",
+    )
+    equal.add_argument(
+        "--co-measure",
+        action="store_true",
+        help=(
+            "Reuse archived public points, remeasure BL and IC in this session, "
+            "and emit a one-target vs_rho claim from measured fields"
+        ),
     )
 
     for name in ("status", "verify"):

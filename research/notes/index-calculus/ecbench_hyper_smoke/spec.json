@@ -1,0 +1,16 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "hyperelliptic family end-to-end check (not a measurement)",
+  "workloads": {
+    "curves": [{"kind": "hyperelliptic_thread", "p": 41, "genus": 2},
+               {"kind": "hyperelliptic_thread", "p": 23, "genus": 3},
+               {"kind": "hyperelliptic_thread", "p": 17, "genus": 4}],
+    "targets_per_curve": 2,
+    "target_seed": 7
+  },
+  "arms": [
+    {"name": "rho-plain", "role": "reference", "method": {"id": "rho.plain"}},
+    {"name": "rho-neg", "role": "candidate", "method": {"id": "rho.negation"}}
+  ],
+  "measurement": {"rounds": 2, "warmup": 1, "seed": 3, "isolation_required": "L0", "timeout_seconds": 120}
+}

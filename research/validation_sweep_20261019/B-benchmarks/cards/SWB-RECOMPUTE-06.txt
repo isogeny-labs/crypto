@@ -1,0 +1,71 @@
+CARD SWB-RECOMPUTE-06  (frozen before dispatch; experiment-director style; mechanical tier)
+GOAL  Recompute, from raw records committed in this repository, the headline numbers of the benchmark-README rows listed below, and check the identical-output claims. COMPUTE AND COPY ONLY. You do not judge, classify, explain or repair anything.
+REPO  /home/user/crypto (cwd). Read everything; write ONLY under research/validation_sweep_20261019/B-benchmarks/scripts/recompute/ and research/validation_sweep_20261019/B-benchmarks/recompute/.
+TOOLS  python3 -I (isolated mode) for every computation; grep/ls/zcat/xz -dc/tar -tf/sed for reading. FORBIDDEN: cargo/rustc builds or tests, running any benchmark or ecbench/crypto binary, network access, editing or deleting any file outside the two write dirs, git commands other than read-only (git log/show/ls-files).
+PER ROW (do these in order; at most 25 tool calls per row, then record status cannot_define for what is left):
+ 1. Open the row's study directories (listed per row) and read the README/PROTOCOL/REPORT only as needed to find which raw files hold per-run records.
+ 2. From the row's HEADLINE copy up to 10 numeric claims, preferring ratios, speedups, quotients, medians, intervals and counts (verbatim string each).
+ 3. For each, find the raw per-run/per-pair records in the repo that the number is computed from. Write ONE script per row at scripts/recompute/<row_no>.py (python3 -I, reads only committed files, prints the computed values with the field names used). Run it. If the aggregation (median vs mean, paired vs pooled, which rounds are excluded) is not stated in the study, try the study's stated rule; if still undefined record status cannot_define and say which choice is missing. Never pick the aggregation that happens to match.
+ 4. status per claim: match (relative difference <= 1% or equal at the precision the row prints), mismatch (state both numbers), no_raw_in_repo (the records are not in the repo), cannot_define, partial.
+ 5. If the HEADLINE or MEASURED text claims identical/bit-identical/equal outputs, counters, answers, digests or checksums between arms: find the corresponding fields in the raw records of both arms and report n_compared, n_equal, n_differ, files. If the raw records contain no such field, status no_raw_in_repo.
+ 6. Copy verbatim (path:line) every sentence in the row's study files that points to data outside the repo (drive.google.com, /Volumes, SSD, /Users, s3://, gs://, store:<name>, Modal volume, 'not committed', 'scratch'). For each store:<name> check store/index.json lists it (yes/no).
+ 7. Copy verbatim from the study files: (a) the A/A or null-control result lines (path:line), (b) the isolation tier or isolation statement (path:line), (c) whether PROTOCOL/spec is committed in git before the first raw record (run `git log --diff-filter=A --format=%H%x20%cI -- <protocol path>` and `git log --diff-filter=A --format=%H%x20%cI -- <first raw file>` and print both dates; if either is empty say so).
+OUTPUT  Write research/validation_sweep_20261019/B-benchmarks/recompute/SWB-RECOMPUTE-06.jsonl, one JSON object per row: {"row_no":int,"slug":str,"claims":[{"claimed":str,"computed":str,"definition":str,"files":[str],"status":str}],"identical":{"claimed":bool,"n_compared":int|null,"n_equal":int|null,"n_differ":int|null,"files":[str],"status":str},"offrepo_refs":[str],"aa_lines":[str],"isolation_lines":[str],"protocol_git_date":str,"first_raw_git_date":str,"script":str,"notes":str}. notes holds only facts you saw, never opinions. Then reply with the file path and one line per row: row_no, number of match/mismatch/no_raw/cannot_define claims.
+STOP_WHEN  a row's study directory does not exist; a file you must read is unreadable; you are about to write outside the two write dirs. Report the stop verbatim and continue with the next row.
+ROWS
+
+--- ROW 41 | 2026-10-15 | 20261015-pair46-factor-bases
+MEASURED: pair-46 (53-bit CM(-19), p = 5t²+19t+19) factor-base campaign, 14 families; timed items: 01 endo-chain (ψ-chain DLP vs ±BSGS and rho on CM(-19) toys at 16–22 bits, 40 targets per arm and size; ψ x-evaluation vs affine addition on pair 46) and 06 PKM chained rational-map bases (one Buchberger relation system per target, p = 17–17921, 12 targets per level, vs matched rho)
+HEADLINE: 01: best ψ-chain S = 1.47 [1.28, 1.69] per √N vs ±BSGS 0.955 [0.86, 1.05] (ratio 1.54 [1.30, 1.82]) at 22 bits; ψ x-evaluation 454 ns vs addition 462 ns (c_E 0.98) on pair 46 — negative, constant; 06: per-system cost slope p^2.02 [2.00, 2.04] (chained A1, local toy range) vs rho p^0.52, projected relation stage about 4e6× rho at n1 = 5 (Python constants) — negative; campaign: no factor-base advantage found, 12/13 red-team upheld, item 14 refuted to empirical_negative, item 11 blocked
+HOST (as reported): shared Linux host, 1 pinned core (taskset), L0, standalone Rust/Python instruments (no ecbench session)
+STUDY DIRS: research/pair46_factor_bases_20261015
+RAW CANDIDATES (largest first): research/pair46_factor_bases_20261015/06-pkm-rational-map/results.json, research/pair46_factor_bases_20261015/08-learned/results.json, research/pair46_factor_bases_20261015/10-bounded-degree/results.json, research/pair46_factor_bases_20261015/12-model-small-x/results.json, research/pair46_factor_bases_20261015/14-dor-verdict/out/results.json, research/pair46_factor_bases_20261015/14-dor-verdict/results.json
+
+--- ROW 42 | 2026-10-16 | 20261016-binary-mitm-ladder-l11-l12
+MEASURED: binary MITM oracle ladder, `ℓ = 11` over `F_{2^33}` and `ℓ = 12` over `F_{2^37}` on the non-Koblitz `y^2+xy=x^3+zx+1` (2,017 / 4,023-point bases; pair tables 2,033,876 / 8,092,016 sums, 65 / 259 MB), 64 targets each, vs Gaudry pairs-and-solve on the same subspace
+HEADLINE: 0 disagreements on all 128 targets; median 1.746 ms vs 1.62 s (928.0×) at ℓ=11 and 8.566 ms vs 18.7 s (2,187.2×) at ℓ=12 — the largest rung pairs-and-solve was historically usable at; max 8,068 / 16,092 counted point-adds vs 2,098,176 / 8,390,656 quartic solves; all witnesses group-verified — engineering, no exponent or vs_rho claim
+HOST (as reported): arm64 macOS, shared, unpinned (L0 wall, contended by other builds)
+STUDY DIRS: research/binary_mitm_oracle_l11_l12_20261016
+RAW CANDIDATES (largest first): research/binary_mitm_oracle_l11_l12_20261016/l11n33/results.json, research/binary_mitm_oracle_l11_l12_20261016/l12n37/results.json, research/binary_mitm_oracle_l11_l12_20261016/provenance.json
+
+--- ROW 43 | 2026-10-16 | 20261016-isogeny-large-ell
+MEASURED: isogeny_algos kernel → codomain and one point image at large prime degree ℓ = 101–10007 (pair-by-pair vs remainder tree to ℓ = 250007), 256- and 511-bit p: √élu (Montgomery, short Weierstrass) vs projective / x-only Vélu; CSIDH-512 with √élu leaves
+HEADLINE: Montgomery √élu codomain 5.58× (256-bit) / 5.27× (511-bit) Vélu at ℓ = 10007 (was 1.51× / 1.62×), crossover ≈ ℓ 150 (was ≈ 1000); images 1.27–1.51×; Weierstrass √élu 2.7–2.8× x-only Vélu (was slower), x-only Vélu itself 15–25 % faster; remainder-tree path slower than pair-by-pair to ℓ = 250007; CSIDH-512 no change outside noise; all outputs equal Vélu (130/130 tests)
+HOST (as reported): 4 vCPU shared VM, one run per setting, L0 wall
+STUDY DIRS: isogeny_algos/docs/large-ell-20261016/REPORT.md
+RAW CANDIDATES (largest first): 
+
+--- ROW 44 | 2026-10-16 | 20261015-u64-rootbatch
+MEASURED: matched baseline/candidate whole-process A/B of the Koblitz orbit-DLP fast path u64 pipeline (n ≤ 63): `S3Solver` split into prepare/finish and a new `RootBatch` shares one Itoh–Tsujii inversion per state via Montgomery's trick instead of one per candidate; n=41, 16 public synthetic targets, 3 interleaved reps against `origin/main` `9f7fb66e6b`
+HEADLINE: engineering: whole-process median 76.4 s → 23.4 s (3.26×; 1.87× min-to-min on a contended shared host), rank stage 2.95×, per-target median 6.09×; ~80× fewer field inversions per solved state; recovered scalars, relations and probe counts identical on every rep (3/3); new batched-vs-scalar equivalence unit test (4,096 inputs incl. exceptional paths)
+HOST (as reported): Apple M4 Pro, 14 cores, shared, no isolation receipt
+STUDY DIRS: research/u64_root_batch_20261015
+RAW CANDIDATES (largest first): research/u64_root_batch_20261015/raw/o3-cand-1.jsonl, research/u64_root_batch_20261015/raw/o3-cand-3.jsonl, research/u64_root_batch_20261015/raw/o4-base-1.jsonl, research/u64_root_batch_20261015/raw/o4-base-2.jsonl, research/u64_root_batch_20261015/raw/o4-base-3.jsonl, research/u64_root_batch_20261015/raw/o4-cand-3.jsonl
+
+--- ROW 45 | 2026-10-16 | 20261015-ic-improve4-01-genus3-relations
+MEASURED: genus-3 IC after cubic GHS, relation phase vs round 3's R2 (`r2:lpsgebw2`): C1 = field-level splitting test (Lucas test of the Cardano resolvent's cubic character, V_{n/3}(2+27·disc/P'^3)=2, n=q−(−3\|q); identical relations, shadow-verified every trial); C2 = 32 lockstep walks sharing one inversion (Montgomery); C3 = 70% oversampling + clique removal + SGE cx 32; C4 = C1+C2+C3 with κ re-tuned on training; held-out curves 0–4, q = 2^12–2^22; F_q-mult equivalents
+HEADLINE: C1 ADVANCES (exponent, constant, primitive): whole 0.756× at 2^22, exponent Δ −0.015 (12..22) / −0.034 (16..22), local 21–22 1.364 vs 1.408, per-trial log slope 9.75→2.71 units/bit. C2 ADVANCES (constant) 0.959×; C1+C2 0.715×, local 1.356. C3 TRADES (0.979×, LA 0.78×, gain shrinks with q). C4 TRADES: 0.690× at 2^22 but steep κ schedule, exponent +0.0045 (16..22). Distance to 4/3 (16..22 fit): 0.035 (C1+C2) vs 0.075. A/A Δ −0.0012; gate 0 41/41; every log verified
+HOST (as reported): 4-core host, ≤ 3 single-threaded jobs, 4.5 GB cap (2^23 memory-limited)
+STUDY DIRS: research/ic_improve4_20261015/01-genus3-relations/README.md; research/ic_improve4_20261015/01-genus3-relations
+RAW CANDIDATES (largest first): research/ic_improve4_20261015/01-genus3-relations/results/run/progress.log, research/ic_improve4_20261015/01-genus3-relations/results/run/summary.json, research/ic_improve4_20261015/01-genus3-relations/results/run/summary_all.json, research/ic_improve4_20261015/01-genus3-relations/results/run/summary_c2.json, research/ic_improve4_20261015/01-genus3-relations/results/run/summary_c4dec.json, research/ic_improve4_20261015/01-genus3-relations/results/train/progress.log
+
+--- ROW 46 | 2026-10-15 | 20261015-genus3-2lp-rebalance
+MEASURED: genus-3 index calculus with double large primes on GHS cubic covers (q prime ≈ 2^10–2^20), whole method in F_q plus mod-ℓ multiplications: rebuilt baseline (κ = 2, tree-cycle elimination + Lanczos) against a factor base retuned per size (κ ∈ {0.5…2} on training curves) and structured Gaussian elimination before Lanczos; 12 paired test instances per size, all 360 logs verified
+HEADLINE: baseline fit q^1.383 over 2^14–2^20 (99% [1.382, 1.384]), relation phase q^1.332, linear algebra q^1.447 (row weight 7.8 → 14.4); retuned κ: q^1.373, paired ratio 0.961 at 2^20; SGE: q^1.419, ratio 0.781 at 2^14 → 0.906 at 2^20; rebuilt baseline / rho on Jac(C) 0.16 raw at 2^14 (n = 4)
+HOST (as reported): 4-vCPU Xeon cloud container, unisolated (counts are the metric)
+STUDY DIRS: research/ic_improve_20261014/04b-genus3-2lp-rebalance/README.md; research/ic_improve_20261014/04b-genus3-2lp-rebalance/reports/run-20261015T0200Z/run-report.pdf
+RAW CANDIDATES (largest first): research/ic_improve_20261014/04b-genus3-2lp-rebalance/analysis.json, research/ic_improve_20261014/04b-genus3-2lp-rebalance/jobs/test_a1.txt, research/ic_improve_20261014/04b-genus3-2lp-rebalance/jobs/test_all.txt, research/ic_improve_20261014/04b-genus3-2lp-rebalance/jobs/test_kappa2.txt, research/ic_improve_20261014/04b-genus3-2lp-rebalance/jobs/tuning.txt, research/ic_improve_20261014/04b-genus3-2lp-rebalance/tuning/kappa_choice.json
+
+--- ROW 47 | 2026-10-16 | 20261016-isogeny-round5
+MEASURED: isogeny_algos optimisation round 5: multi-prime NTT for long products over multi-limb prime fields (1/2/4/8 limbs), shared q-series for Φ_ℓ, lazy squarings, sliding-window polynomial powers, table reducer to 160 coefficients, BMSS linear-algebra loop fix; SEA over 2^127 − 1 profiled per phase; full benchmark suite main vs branch, min of two runs per arm
+HEADLINE: NTT 10–11× Karatsuba at n = 8192 (2/4 limbs), bit-identical output; Φ_ℓ for ℓ ≤ 89 over 2^127 − 1 9.4–9.6 s → 2.3 s (4.1×); SEA point count 2^127 − 1 1.14× geomean (0.82–1.42); BMSS linear algebra ℓ = 101 40/64/52× (40/256/511-bit); Kohel ℓ = 1009 2.0–2.4×; CSIDH-512, √élu, kernel/find groups unchanged; 148/148 tests
+HOST (as reported): 4 vCPU shared VM, one run per profile, min of two per suite arm, L0 wall
+STUDY DIRS: isogeny_algos/docs/round5-20261016/REPORT.md
+RAW CANDIDATES (largest first): 
+
+--- ROW 48 | 2026-10-15 | 20261015-p61-adjacency-pilot
+MEASURED: selected-degree 5/13/37/59 adjacency generation and distinct kernel-first replay on admitted vertices of the certified `p61-i0025` class over `p = 2^61 - 1`; nested one-, 64-, and 4,096-vertex windows
+HEADLINE: 4,096 vertices, 28,672 edges and 471,040 kernel coefficients: 191.551 s generation, 296.931 s replay, 41,543,871 logical and 8,552,556 gzip bytes; exact shard, chain, source, and summary replay; one shared-host observation, L0 descriptive; full-class projection 3.632 TB logical / 0.748 TB gzip
+HOST (as reported): macOS arm64, shared and unisolated; concurrent 8-thread p61 census
+STUDY DIRS: research/p61_isogeny_class_20261014
+RAW CANDIDATES (largest first): research/p61_isogeny_class_20261014/reports/run-20261014T0902Z/certification-terminal-manifest.json, research/p61_isogeny_class_20261014/reports/run-20261014T0902Z/certified-prefix-x000000000000-x000000000320-manifest.json, research/p61_isogeny_class_20261014/reports/run-20261014T0902Z/certified-prefix-x000000000000-x000000016704-manifest.json, research/p61_isogeny_class_20261014/reports/run-20261014T0902Z/parallel-verifier-release-manifest.json, research/p61_isogeny_class_20261014/reports/run-20261014T0902Z/timings.json, research/p61_isogeny_class_20261014/reports/run-20261015T0436Z-adjacency-pilot/metrics.json

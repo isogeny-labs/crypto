@@ -1,7 +1,9 @@
 import PrimeExamples
 import OakleyOrders
+import OakleyPrimality
 import MinimalPairingField
 import RelationSupport
+import WeightedSupport
 
 #print axioms WeakCurveLeaderboard.anomalous_F101_affine
 #print axioms WeakCurveLeaderboard.smooth_F101_affine
@@ -23,8 +25,14 @@ import RelationSupport
 #print axioms WeakCurveLeaderboard.selected_order_of_generator
 #print axioms WeakCurveLeaderboard.oakley3_selected_order
 #print axioms WeakCurveLeaderboard.oakley4_selected_order
+#print axioms WeakCurveLeaderboard.Pratt.powModAux_cast
+#print axioms WeakCurveLeaderboard.Pratt.pratt
+#print axioms WeakCurveLeaderboard.oakley3Prime_prime
+#print axioms WeakCurveLeaderboard.oakley4Prime_prime
 #print axioms WeakCurveLeaderboard.embedding_degree_formula
 #print axioms WeakCurveLeaderboard.minimal_degree_divides_pairing_extension
 #print axioms WeakCurveLeaderboard.minimal_degree_is_minimal
 #print axioms WeakCurveLeaderboard.unordered_relation_support_bound
 #print axioms WeakCurveLeaderboard.conditioned_relation_support_bound
+#print axioms WeakCurveLeaderboard.weighted_relation_support_bound
+#print axioms WeakCurveLeaderboard.conditioned_weighted_relation_support_bound

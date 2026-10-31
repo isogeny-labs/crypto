@@ -1,0 +1,15 @@
+rustc 1.90.0 (1159e78c4 2025-09-14)
+1.5.1 (1f227d9 (release tag v1.5.1))
+src/pqc/fast/ml_dsa.rs: OK
+src/pqc/ml_dsa.rs: OK
+src/pqc/fast/keccak.rs: OK
+src/hash/sha3.rs: OK
+error[E0433]: failed to resolve: could not find `keccak4` in the crate root
+   --> /workspace/crypto/verification/pqc-assay/../../src/pqc/fast/keccak.rs:214:16
+    |
+214 |     if !super::keccak4::keccak_f1600_lane0(s) {
+    |                ^^^^^^^ could not find `keccak4` in the crate root
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0433`.

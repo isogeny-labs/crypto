@@ -12,14 +12,11 @@
 name: "CodeQL Advanced"
 
 on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change reaches main, or on demand.
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-  merge_group:
+    branches: [main]
   workflow_dispatch:
-  schedule:
-    - cron: '41 2 * * 3'
 
 concurrency:
   group: codeql-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
@@ -50,6 +47,7 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /.github/scripts/
             /build.rs
             /rustfmt.toml
@@ -84,9 +82,9 @@ jobs:
     #   - https://gh.io/supported-runners-and-hardware-resources
     #   - https://gh.io/using-larger-runners (GitHub.com only)
     # Consider using larger runners or machines with greater resources for possible analysis time improvements.
-    # Rust uses the standard public-repository ARM runner with the same four
-    # CPUs and 16 GiB envelope; CodeQL provides a Linux arm64 bundle.
-    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || (matrix.language == 'rust' && 'ubuntu-24.04-arm') || 'ubuntu-latest' }}
+    # Every language, Rust included, runs on ubuntu-latest (owner decision
+    # 2026-10-26, runner cost); Rust uses the matching Linux x64 bundle.
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|codeql.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|codeql.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     permissions:
       # required for all workflows
       security-events: write
@@ -117,6 +115,53 @@ jobs:
         - language: rust
           scope: rust
           build-mode: none
+          check_name: rust
+          category: /language:rust-core
+          rust_paths: |
+            /Cargo.toml
+            /Cargo.lock
+            /build.rs
+            /src/
+            /tests/
+            /benches/
+        - language: rust
+          scope: rust
+          build-mode: none
+          check_name: rust-boolean
+          category: /language:rust-boolean
+          rust_paths: |
+            /Cargo.toml
+            /Cargo.lock
+            /research/boolean_*/
+        - language: rust
+          scope: rust
+          build-mode: none
+          check_name: rust-research
+          category: /language:rust-research
+          rust_paths: |
+            /Cargo.toml
+            /Cargo.lock
+            /research/
+            !/research/boolean_*/
+            /examples/
+            /experiments/
+            /docs/
+        - language: rust
+          scope: rust
+          build-mode: none
+          check_name: rust-aux
+          category: /language:rust-aux
+          rust_paths: |
+            /Cargo.toml
+            /Cargo.lock
+            /isogeny_algos/
+            /tools/
+            /eigen_seta/
+            /cd_attack/
+            /ecc2k130/
+            /spotlab/
+            /gpu/
+            /quantum_circuit_secp256k1/
         # CodeQL supports the following values keywords for 'language': 'actions', 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'rust', 'swift'
         # Use `c-cpp` to analyze code written in C, C++ or both
         # Use 'java-kotlin' to analyze code written in Java, Kotlin or both
@@ -139,6 +184,9 @@ jobs:
     - name: Checkout repository
       if: needs.scope.outputs[matrix.scope] != 'false' && matrix.language != 'rust'
       uses: actions/checkout@v7
+      with:
+        sparse-checkout: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && matrix.rust_paths || '' }}
+        sparse-checkout-cone-mode: false
 
     # The repository contains many research receipts that CodeQL does not
     # parse as Rust. Keep every tracked Rust source and Cargo manifest while
@@ -150,6 +198,7 @@ jobs:
         filter: blob:none
         sparse-checkout-cone-mode: false
         sparse-checkout: |
+          /tools/factor-base/
           /*.rs
           /**/*.rs
           /Cargo.toml
@@ -214,7 +263,7 @@ jobs:
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
     - name: Run manual build steps
-      if: needs.scope.outputs[matrix.scope] != 'false' && matrix.build-mode == 'manual'
+      if: needs.scope.outputs[matrix.scope] != 'false' && matrix.build-mode == 'manual' && (matrix.language != 'rust' || matrix.check_name == 'rust' || github.event_name == 'pull_request' || github.event_name == 'merge_group')
       shell: bash
       run: |
         echo 'If you are using a "manual" build mode for one or more of the' \
@@ -228,7 +277,7 @@ jobs:
       if: needs.scope.outputs[matrix.scope] != 'false' && !(matrix.language == 'rust' && (github.event_name == 'pull_request' || github.event_name == 'merge_group'))
       uses: github/codeql-action/analyze@v4
       with:
-        category: "/language:${{matrix.language}}"
+        category: ${{ matrix.category || format('/language:{0}', matrix.language) }}
 
     - name: Set up CodeQL for the finalized Rust database
       id: rust-tools
@@ -236,6 +285,7 @@ jobs:
       uses: github/codeql-action/setup-codeql@v4
       with:
         languages: rust
+        tools: https://github.com/github/codeql-action/releases/download/codeql-bundle-v${{ needs.build-rust-database.outputs.codeql-version }}/codeql-bundle-linux64.tar.zst
     - name: Download this workflow attempt's warmed database
       if: needs.scope.outputs[matrix.scope] != 'false' && matrix.language == 'rust' && (github.event_name == 'pull_request' || github.event_name == 'merge_group')
       uses: actions/download-artifact@v4
@@ -275,8 +325,10 @@ jobs:
     name: Build database (rust)
     if: needs.scope.outputs.rust != 'false' && (github.event_name == 'pull_request' || github.event_name == 'merge_group')
     needs: scope
+    outputs:
+      codeql-version: ${{ steps.init.outputs.codeql-version }}
     timeout-minutes: 25
-    runs-on: ubuntu-24.04-arm
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|codeql.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|codeql.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     permissions:
       security-events: write
       packages: read
@@ -289,6 +341,7 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /*.rs
             /**/*.rs
             /Cargo.toml
@@ -377,7 +430,7 @@ jobs:
     # (run 39226121956 was cancelled mid-evaluation); 45 leaves headroom.
     # check-pr-budgets.py names this job as a budget exception.
     timeout-minutes: 45
-    runs-on: ubuntu-24.04-arm
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|codeql.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|codeql.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     permissions:
       packages: read
       actions: read
@@ -388,6 +441,8 @@ jobs:
         uses: github/codeql-action/setup-codeql@v4
         with:
           languages: rust
+          # Queued jobs may span a CodeQL release; consume the producer's exact bundle.
+          tools: https://github.com/github/codeql-action/releases/download/codeql-bundle-v${{ needs.build-rust-database.outputs.codeql-version }}/codeql-bundle-linux64.tar.zst
       - name: Download this workflow attempt's finalized database
         uses: actions/download-artifact@v4
         with:

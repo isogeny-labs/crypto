@@ -71,6 +71,20 @@ Main-branch rolling releases retain their existing full packaging behavior.
 The ecbench workflow also starts on every PR/merge group so dependency and
 embedded-data changes cannot disappear behind an incomplete trigger allowlist.
 
+### Result-page triggers
+
+AGENTS.md section 7a has every result PR edit
+`docs/index-calculus-scoreboard.html`, often with `docs/ic-current-state.html`,
+so a workflow whose `paths:` filter matches either page runs on every result
+PR. [check-result-page-triggers.py](scripts/check-result-page-triggers.py)
+allows that only for the workflows listed in its `ALLOWED` table, each with
+its reason: the dashboard renderer, the site build, the curve-name scan, and
+one frozen workflow whose own bytes are pinned by its evidence. A frozen-result
+replay that never opens the pages fails the check (#1952 and #2060 removed six
+such triggers). It follows GitHub's glob rules, so `docs/**` or `**/*.html`
+count, and it also fails on an `ALLOWED` entry that no longer matches.
+Workflows with no path filter run on every PR by design and are not checked.
+
 ## Budgets and evidence coverage
 
 Every job eligible for an ordinary PR or merge group has an explicit execution
@@ -120,7 +134,8 @@ workloads.
 | Scope / syntax / changed-file format | Five minutes |
 | Each clippy crate | 15 minutes |
 | Root all-target compile / CodeQL language | 25 minutes |
-| Rust CodeQL: database build, cache warming | 25 minutes each |
+| Rust CodeQL database build | 25 minutes |
+| Rust CodeQL cache warming (`warm-rust-cache`, named exception) | 45 minutes |
 | Rust CodeQL queries (`analyze`, named exception) | 60 minutes |
 | Each PR or merge-group packaging component | 25 minutes |
 | ecbench PR harness | 25 minutes, including a 12-minute historical integrity step |
@@ -136,7 +151,14 @@ so each phase must finish in its own budget. Measured on a 4-core x86 host
 (CodeQL 2.27.2): the warming query took 2,111 s cold, and the full 37-query
 suite then took 438 s with identical results, against about 2,700 s cold.
 The query job keeps its 60-minute named exception; with the warmed cache it
-runs far below it. Main, scheduled and manual scans keep the single job.
+runs far below it.
+The cache-warming job is also a named exception (45 minutes, set after run
+39226121956 was cancelled at the old 25-minute cap). Measured "Warm cache
+(rust)" durations, 2026-10: 22 min 59 s, success (run 39007908280, 2026-10-17);
+25 min 16 s, cancelled at the cap mid-evaluation (run 39226121956,
+2026-10-19). Those are the only two runs found where the job ran to
+completion or to its cap; later runs were cancelled while queued. The 45-minute
+cap leaves about 20 minutes over the slower of them. Main, scheduled and manual scans keep the single job.
 
 The ecbench PR lane keeps unit/integration tests, session immutability,
 hash/seal/answer validation, bounds/frontier validation, fresh pinned smoke
@@ -167,6 +189,8 @@ node --test .github/scripts/test-frozen-workflow-check.mjs
 python3 -B scripts/test_workflows_parse.py -v
 python3 -B .github/scripts/test-pr-budgets.py -v
 python3 -B .github/scripts/check-pr-budgets.py
+python3 -B .github/scripts/test-result-page-triggers.py -v
+python3 -B .github/scripts/check-result-page-triggers.py
 actionlint .github/workflows/{codeql,ecbench,release,rust-all-targets,rust-lint,workflows-parse}.yml
 ```
 

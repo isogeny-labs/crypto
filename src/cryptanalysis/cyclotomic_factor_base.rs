@@ -32,6 +32,7 @@
 //! Koblitz models `K_a` at toy degrees, targets are seeded multiples of
 //! the public generator, and no logarithm is computed.
 
+use crate::cryptanalysis::pq_groebner_f2::{bit, Mask};
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::time::Instant;
 
@@ -614,7 +615,7 @@ pub struct MembershipSystem {
 
 impl MembershipSystem {
     /// Abscissa of summand `i` at Boolean assignment `root`.
-    pub fn summand_x(&self, root: u64, i: usize, n: u32) -> F2mElement {
+    pub fn summand_x(&self, root: Mask, i: usize, n: u32) -> F2mElement {
         let mut acc = F2mElement::zero(n);
         for t in 0..self.vars_per_summand {
             if (root >> (i * self.vars_per_summand + t)) & 1 == 1 {
@@ -700,7 +701,7 @@ pub fn build_membership_system(
                     for_each_subset(nn, w + 1, |subset| {
                         let mask = subset
                             .iter()
-                            .fold(0u64, |acc, &t| acc | (1u64 << (offset + t)));
+                            .fold(0 as Mask, |acc, &t| acc | bit((offset + t) as u32));
                         equations.push(F2BoolPoly::from_monos(vec![F2BoolMono { mask }], n_vars));
                         membership_equations += 1;
                     });
@@ -710,7 +711,7 @@ pub fn build_membership_system(
                 for_each_subset(nn, w, |subset| {
                     let mask = subset
                         .iter()
-                        .fold(0u64, |acc, &t| acc | (1u64 << (offset + t)));
+                        .fold(0 as Mask, |acc, &t| acc | bit((offset + t) as u32));
                     monos.push(F2BoolMono { mask });
                 });
                 equations.push(F2BoolPoly::from_monos(monos, n_vars));
@@ -817,7 +818,7 @@ pub fn measure_system(
     };
     let xors_before = f4_word_ops_thread();
     let started = Instant::now();
-    let (roots, stats): (Vec<u64>, SolveStats) =
+    let (roots, stats): (Vec<Mask>, SolveStats) =
         solve_boolean_system(&sys.equations, sys.n_vars, &opts);
     let f4_ms = started.elapsed().as_secs_f64() * 1e3;
     let f4_word_xors = f4_word_ops_thread().saturating_sub(xors_before);
@@ -874,6 +875,10 @@ pub fn index_map(base: &FrobeniusFactorBase) -> HashMap<(BigUint, BigUint), usiz
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     /// `K_1 / F_2^11` (`#E = 2·991`).  `K_0` at `n = 11` has `#E = 4·23²`,
     /// so the constructor rejects it: the `K_0` toy rung is `n = 23`.
@@ -1049,7 +1054,7 @@ mod tests {
         assert_eq!(members.len(), 23);
         let mut satisfied = 0;
         for x in 0..(1u64 << 11) {
-            let holds = eqs.iter().all(|e| e.eval(x) == 0);
+            let holds = eqs.iter().all(|e| e.eval(mask_from64(x)) == 0);
             assert_eq!(holds, members.contains(&x), "x = {x}");
             satisfied += holds as usize;
         }

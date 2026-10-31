@@ -1,0 +1,1019 @@
+{
+ "schema": "validator-report/v1",
+ "status": "pass",
+ "independent": true,
+ "study": "research/isogeny-volcano-cost-v2_20261017",
+ "repository_commit": "0710232b16a18eb4e803b39557892f9dcf2002e2",
+ "validator": "independent Validator subagent (not the executing session that produced the study), 2026-10-22",
+ "implementation": {
+  "program": "validation/vrecompute.rs",
+  "sha256": "3a584e5c64381d9d252649cf603ccd26fb6a74d83f9af3443093b111c78286f9",
+  "language": "Rust",
+  "dependencies": "serde_json 1.0.151 and flate2 1.1.10 for JSON and gzip parsing only",
+  "build_and_run": "cargo new vrecompute; add serde_json = \"1\", flate2 = \"1\"; copy vrecompute.rs to src/main.rs; cargo build --release; vrecompute research/isogeny-volcano-cost-v2_20261017 <nonce> recompute.json",
+  "output": "validation/recompute.json",
+  "output_sha256": "5831618d012fb90d603490f66bb7a9f6407a1b0d0dee570915af5508c39132ca",
+  "reads": "the committed records.jsonl.gz (all 113 sessions) and classes/<class>/curves.jsonl only; not analysis/, band/ or audits/",
+  "shares_code_with_producer": false,
+  "definitions_from": "PROTOCOL.md section 4 and the documented definitions in src/bin/volcano_stats.rs (read to learn them, not run): a run's value is num/den (S: s/1, yield: relations_found/targets_tried); per class, floor/crater ratio of pooled sums (floor = the deepest sidecar level, crater = level 0); equal-weight mean of log ratios across classes, exp (class normalisation cancels within a class). Planted pair: matched by (class, vertex, model, target), per-class ratio of pooled yields, equal-weight log mean. Band: the module comment of src/cryptanalysis/ecbench/band.rs, priced_S(w) = (total_gae + w*U)/sqrt(r), U = counts behind the record's unpriced counters, mean over the 8 measured runs per curve-model and arm in the main session.",
+  "runtime": "about 18 s for 308,511 records on the 4-vCPU host"
+ },
+ "raw_data": [
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/MANIFEST.sha256",
+   "sha256": "2154f8e2bc3628f0850d7e182fc373aecee3f88a060b0ab1317731d1677d2112"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l2-s1001/curves.jsonl",
+   "sha256": "967912fb19250b3d8f9fe900f7d4ab9695f274d5ed32cd384cc2bc8beff23a42"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l2-s1002/curves.jsonl",
+   "sha256": "ad05cc77486ced7cc1ebaf355229885df8df540c902d6e5041bfd5f48253fb43"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l2-s1003/curves.jsonl",
+   "sha256": "51df1f14596fe48867be8dd5ec07fa55964e3d26300f01d16ad97cf9254d3bc1"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l2-s1004/curves.jsonl",
+   "sha256": "4469134c87a9cd8fe605410b4022a5bf8631c41cc7823dcf9689872bb2947f5e"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l2-s1005/curves.jsonl",
+   "sha256": "c20fc17ff734f6be9ef7cee2e74f5519a45e88708dbe4f755d867c69ed89c35b"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l2-s1006/curves.jsonl",
+   "sha256": "0ed08e547831ee5913cd15f17360ddec3f64b9d5371ac09ccf017958429eed46"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l2-s1007/curves.jsonl",
+   "sha256": "d24f9ea8e26c04643705d0fdcb53679cef57665ac0fe1ea49d634d2aade52e28"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l2-s1008/curves.jsonl",
+   "sha256": "805fe54342254323fdcbcd912cb3b6572725713b4e34aacdc1737c2ffe8ad0a1"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l2-s1009/curves.jsonl",
+   "sha256": "4f1b6c56406f25a1b5e7d3da09e7ddbd2406071b0ae1ff812ee1782361b51a45"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l2-s1010/curves.jsonl",
+   "sha256": "4c659e0af7a003cf35c79a4589128ffeac05f03a5446109c579d4a57204d19d4"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l2-s1011/curves.jsonl",
+   "sha256": "74700b8762f0e226b315dbc96a60bcc9e21c63eff5c5037aecc1b6faa0c15e7d"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l2-s1012/curves.jsonl",
+   "sha256": "1f4027a4c21812621d4d4b91e9ff7681f1e5ff6834dbfc90ae58f452e96cad47"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l2-s1013/curves.jsonl",
+   "sha256": "7e82e1e22c56378c6a50c0d2117c6c3c4c3746cb5f30dc255a465b1978490735"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l2-s1014/curves.jsonl",
+   "sha256": "8eda64cff9271f747ad417bf31c1200cc66787e11ae50a4ddfdff13fe8675f75"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l3-s1001/curves.jsonl",
+   "sha256": "93eb0b22673780bf569039de39d18e642a974ad5a766b4debc0c847c9eccd322"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l3-s1002/curves.jsonl",
+   "sha256": "ca728eff9595ffc2021f887adeedd53b48fb63cb9f2e579537b4827d9955a9bd"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l3-s1003/curves.jsonl",
+   "sha256": "da5f8c24f23b5b30cf7edd87073b38d618c7988341bd01820129661f53cfaf0f"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l3-s1004/curves.jsonl",
+   "sha256": "ba405957f0e3b303b2939e8e521c880d10c908c8167185dd31b939b85d0fdc78"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l3-s1005/curves.jsonl",
+   "sha256": "5465094a1527db075b9685fd72aa73fc9271d55bca33959c8e10953f0c581fcf"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l3-s1006/curves.jsonl",
+   "sha256": "0dd9a5ece92e118eebeeb6ee634b0422a17374eaeba70b3188f39db5140ad0d5"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l3-s1007/curves.jsonl",
+   "sha256": "1dd7bb7a2179a9f9aa3d50d05f61791b0692071ff0ff3057651c3c2b9e409e96"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l3-s1008/curves.jsonl",
+   "sha256": "5cf0f73220a8b9639b856d5bcf275d68790a5d0ab137931456b961d88b8f9b0e"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l3-s1009/curves.jsonl",
+   "sha256": "58c4dcf0eedd14ccd98df2677a5bbd21fe94efacc519ade15e6642aa0ee73208"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l3-s1010/curves.jsonl",
+   "sha256": "2814479a669bdbbfbadd5d40127830eee7a3bd9d3a7a300eae8bc7699a892d87"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l3-s1011/curves.jsonl",
+   "sha256": "1b565270229e76ad88933a69be0fd33fe75637573b91fef90bd29a02944e7e97"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l3-s1012/curves.jsonl",
+   "sha256": "2911bbf97f4f9af561531702382ad6ff15f8422dbe3c43de0bf5977a28a3d963"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l3-s1013/curves.jsonl",
+   "sha256": "c6a85a422c5f63a4d6192850168bbeff4f5ace5d618daee187209951206d2e55"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/classes/l3-s1014/curves.jsonl",
+   "sha256": "4978e6d9376e597400b7b3b4fd32b5c32390432899bf0de5acff25b5d3f44df2"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1001/spec-aa/records.jsonl.gz",
+   "sha256": "eb9bc32f2ae0a04f3b75cb2f2818b69790f8c1dda562ef514ba557b6ffec9087"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1001/spec-bsgs/records.jsonl.gz",
+   "sha256": "95f096626edf775c3ce21b30fe8c4dd2c2adfd9729bb568495256b5318731b49"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1001/spec-icctl/records.jsonl.gz",
+   "sha256": "ecda6682043f77a97dfc9bf09bf898fa6eefaed3b30b53edf4917836d81c5501"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1001/spec/records.jsonl.gz",
+   "sha256": "72d10d159fdaa4db313176a2d017e8cc3da3bc2d79ccd279bae6654f85f59571"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1002/spec-aa/records.jsonl.gz",
+   "sha256": "7c309d62747fbd94d3584db9453dc5e6c4d1eed68e5584ca75c1f05ceb81b137"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1002/spec-bsgs/records.jsonl.gz",
+   "sha256": "8cc69c42464835d7c2fa9909a19d1cafc12415a31e0c6f47929f21c61ed40aaa"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1002/spec-icctl/records.jsonl.gz",
+   "sha256": "5fe9f93b08be68fed7e413ae27a3712a7252c7a860986d3007b3637f8b71cd90"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1002/spec-r2/records.jsonl.gz",
+   "sha256": "7053019da170e33d86300adc7fd27cb5f65be671c049f8427ef7eeea739cdbf8"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1002/spec/records.jsonl.gz",
+   "sha256": "68b76965c12ed75f144d21b849bc8e21bca050fbcca6b8335ea7eacc99097dff"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1003/spec-aa/records.jsonl.gz",
+   "sha256": "155644b3c222a2d6ec7c5e408b1a3acdd82b28dd57b4e1874b9376731c508231"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1003/spec-bsgs/records.jsonl.gz",
+   "sha256": "f115c0322091e28a32e3243964b89ecea51a776013e84bcffcee0f1355bbeff1"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1003/spec-icctl/records.jsonl.gz",
+   "sha256": "36600a231c695ca23e03cc25fa70002e8eea6f5421afc850e8a3019d7fafc607"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1003/spec/records.jsonl.gz",
+   "sha256": "4636c972c7304624ae50151096df5c714e4518d893a1e804ff8aacf1a099f1a3"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1004/spec-aa/records.jsonl.gz",
+   "sha256": "f35d741ae6b8b1bc2ac585fcbb4e20b27e542e332687b3662966692d9116ed24"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1004/spec-bsgs/records.jsonl.gz",
+   "sha256": "42014dc3b2051d765d86231ae76d55e35185c60066b45f1714da94965accd26c"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1004/spec-icctl/records.jsonl.gz",
+   "sha256": "40e93f5a0cb7c773cba6b6ac5594b1bb4289c99e2a588b1e3743f217223f45f3"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1004/spec/records.jsonl.gz",
+   "sha256": "b31dcea93f1f85c6b76ce33466d3c056081d7c0984380d81efe17d2e7d2def3e"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1005/spec-aa/records.jsonl.gz",
+   "sha256": "ab3b7348c9bf43076bf85571c3b04b6b33985b7246444a85874395f200d3e79b"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1005/spec-bsgs/records.jsonl.gz",
+   "sha256": "718aa2d810490bcafa94cb48d3de21393bea78659983d6898ab3c561df42141f"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1005/spec-icctl/records.jsonl.gz",
+   "sha256": "02eb1c1bade74a048ac57a965354bdde8e768fe31f177955516ce00ca349e8bc"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1005/spec/records.jsonl.gz",
+   "sha256": "b8134f196acc4a9ad4fe02307e3b578ed5c90d691487d109d40670ab54400601"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1006/spec-aa/records.jsonl.gz",
+   "sha256": "ed2df5f82237929f8d0d2102df0ddf69d796c160862dad14243460f7ce956731"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1006/spec-bsgs/records.jsonl.gz",
+   "sha256": "2a240e1653dfcc9a9108bf2c0d60c70f9c1f4cfbb57685289e46945a298f0c3f"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1006/spec-icctl/records.jsonl.gz",
+   "sha256": "2ce0b7a8f4dd9e91963769e0df021b1da3bbc2286396f30f90d31cbe2dcc631f"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1006/spec/records.jsonl.gz",
+   "sha256": "5d574fc16b02e79d0fa63d4ba32f7420b884bc5423ccca7e2469e8e141e7c2a4"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1007/spec-aa/records.jsonl.gz",
+   "sha256": "8c38ce25180f954f6d1a3ceef2faa339314e6ecd6cda539376f40955edeb5610"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1007/spec-bsgs/records.jsonl.gz",
+   "sha256": "98f6e5cb66160418d20b606036feda106698433b3e5a1ba9098ac813219ce03c"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1007/spec-icctl/records.jsonl.gz",
+   "sha256": "b7037664971aa23bd836854abe5cc1b777cd99e5137da19843192d1a54e9a9a3"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1007/spec/records.jsonl.gz",
+   "sha256": "2b10c7d62cff8db200ca1f74867fa2171e268a2deb47d4a0512e4209ad8b652f"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1008/spec-aa/records.jsonl.gz",
+   "sha256": "74241973e8c3533df810776a821ac867044d1935b96d552681f0bd5ea003bcff"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1008/spec-bsgs/records.jsonl.gz",
+   "sha256": "1df20f9deae9d6a758bb743397ccff87bd8d2d82c568092fa2223440fa73cbee"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1008/spec-icctl/records.jsonl.gz",
+   "sha256": "884c4ba88519fd23c6d5d933f93aca1704cb7bb50c91ca14e447b1a8580d4c54"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1008/spec/records.jsonl.gz",
+   "sha256": "05bd9447280ee6304baa1633502c34e411e8f48eff2a07c41eaa10eedb59c702"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1009/spec-aa/records.jsonl.gz",
+   "sha256": "caefbbe8644a0b13013761f98a101890a7a1aa4305303458a2f483c5641c3c1c"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1009/spec-bsgs/records.jsonl.gz",
+   "sha256": "6e418844d47ea8fd17cb69c323dcbc4eb1f1c23eb6af6e63b06481d2846812e2"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1009/spec-icctl/records.jsonl.gz",
+   "sha256": "5c2ff2d66e033202d2dc6d25ed6b824308f209749eb1aa532889f6ade67d54e6"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1009/spec/records.jsonl.gz",
+   "sha256": "31444b36e209b40313cfe80d7acb1cb84ff59bd6a3189e2f1677bf47be628e1d"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1010/spec-aa/records.jsonl.gz",
+   "sha256": "c59de85292ae152d16c25fc8c269963dadebd53b15aecabfc2c64a0e00e739ef"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1010/spec-bsgs/records.jsonl.gz",
+   "sha256": "2327a2f5319240cadc34ff93bf1db8db3179848fd848249602a856224dc053d6"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1010/spec-icctl/records.jsonl.gz",
+   "sha256": "17418c629ec79fa6f111550155a57971001f3a7f4be243b2aa69d9f7a0ad204f"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1010/spec/records.jsonl.gz",
+   "sha256": "a423c50e24beee53dab0b8585b0f9411315c10c8b04e3ea126afcd989cae7a85"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1011/spec-aa/records.jsonl.gz",
+   "sha256": "327b869104820d7d10f1348f492157f77b8c3511338639b294c5ab1582b66a5f"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1011/spec-bsgs/records.jsonl.gz",
+   "sha256": "dc8a813d5485d71258b42a6e02119246c0140af50f15b44e37ac152190376cd8"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1011/spec-icctl/records.jsonl.gz",
+   "sha256": "e75c0b4698cbe7106ddb26a298da1dee0df747fb0d3673bdc7839cd67f0151cf"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1011/spec/records.jsonl.gz",
+   "sha256": "d77f4e5bf9f4c2584d5c4d5ddaa715075fc8de12363ac76086ced564c18fbaf9"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1012/spec-aa/records.jsonl.gz",
+   "sha256": "059e688491d5c42b9ad7348a1dc60ae37c871556bb78ccc1e32294da13237b69"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1012/spec-bsgs/records.jsonl.gz",
+   "sha256": "0cb953abfa18fec0d99d3fff09fde5df73cdca0bf118bb93597a3dd8dea6f545"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1012/spec-icctl/records.jsonl.gz",
+   "sha256": "8a4cd8d57272094c23eacb0489a497166510517f2d2ec306273f0168b42414ad"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1012/spec/records.jsonl.gz",
+   "sha256": "6f5c4f7f58394db69627ee694182225f1c33fed4dbb1b90b754aa9dcc7f22c60"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1013/spec-aa/records.jsonl.gz",
+   "sha256": "cc384ae5e9a417a4a645b359282ff8ebf4dcb386a526abd58c21d730481b016c"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1013/spec-bsgs/records.jsonl.gz",
+   "sha256": "28d5d932072fd1df9d36b04b38cc6669376c7b8b6bd92012be6cb2536fdb6afa"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1013/spec-icctl/records.jsonl.gz",
+   "sha256": "f968601f214d1b70619f6464700368855951b1f79a2213998e8f6b21cfffcfe3"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1013/spec/records.jsonl.gz",
+   "sha256": "a2db62784cf6eedef1cb3f01da1b3396dcba6c93bd53e7d99f7a43d5786dab90"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1014/spec-aa/records.jsonl.gz",
+   "sha256": "8bf81d9cec0ab6af8b0a2dd9ec4e0b4f825378492ed403a49ffc25826d48eca3"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1014/spec-bsgs/records.jsonl.gz",
+   "sha256": "e280de321314b76c3582db142ed8cdbe99c72faf1b26088b5ecaa2d63c56aad4"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1014/spec-icctl/records.jsonl.gz",
+   "sha256": "464b1c876818d74ae5134d4da510c8940213c099b76e7c33cf5f3045e4f2dc2d"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1014/spec/records.jsonl.gz",
+   "sha256": "229bcf7f560b53dcd60693ea5e735eb47a5a9ceccec83c1ef728c279a387a739"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1001/spec-aa/records.jsonl.gz",
+   "sha256": "ad6fcdf7c54f870d9535533fc6569d6cef907a2b0c04088ff37ecc5f0b8c0ead"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1001/spec-bsgs/records.jsonl.gz",
+   "sha256": "413dcfd2d8b81caaa346da6900507fe018066e8c320260d72ee3528fb4fcfa82"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1001/spec-icctl/records.jsonl.gz",
+   "sha256": "a504f7558dab7afec256a4942bc716116171ef70fad1cb01c7318ae6d0485b26"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1001/spec/records.jsonl.gz",
+   "sha256": "5bc72f722b79b5eca8ca30083bcb855a80306dde637466b837ed0a249f04f6c6"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1002/spec-aa/records.jsonl.gz",
+   "sha256": "b9cf191705a64ea2c1c2b18914fd93ae6fb79b5cc3edc683ad0d2725c7298186"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1002/spec-bsgs/records.jsonl.gz",
+   "sha256": "d4f11e050a043d74e72e8585a3008c197f00d648801a87e46c0f16015472c593"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1002/spec-icctl/records.jsonl.gz",
+   "sha256": "0eb6240263d8537546d831c32e41d1a1a9efb88a767fe37103d2c3610057b13e"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1002/spec/records.jsonl.gz",
+   "sha256": "4fc9da54dc60756acb9233642fd554431392785c122c33c4f2b6360007b61ea0"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1003/spec-aa/records.jsonl.gz",
+   "sha256": "0707d750e462f436f2939b26eb595d5dfcb1df2b1c084cbc6de0a3e2205ca1fe"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1003/spec-bsgs/records.jsonl.gz",
+   "sha256": "ecdd46286c55b1a49a5076213f5156ba662968e0f43c59e5506a8cfa7ec628c0"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1003/spec-icctl/records.jsonl.gz",
+   "sha256": "3c2f301f0ed603671533a4da8e0ddb02903a396dd8ca1b528c23092150deb9b1"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1003/spec/records.jsonl.gz",
+   "sha256": "d05562f177ee8e2219488a042d79b23eac146ced23fa4fc711fc864909041c4e"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1004/spec-aa/records.jsonl.gz",
+   "sha256": "aa30c36354c1a9bee4779c5f2ea6ef6f7440efbf56278c4bf6e71fdc0fa1fc54"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1004/spec-bsgs/records.jsonl.gz",
+   "sha256": "37f52c9fac0cfa2f603f2c3e18713a6bcc9bc4b7170066ad84bbda5a3980a1e9"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1004/spec-icctl/records.jsonl.gz",
+   "sha256": "667f0009114560de7b041b3c53229135daa27eb53b6497b998c42ace3703e1bf"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1004/spec/records.jsonl.gz",
+   "sha256": "e88b50be1bfe3c2cce1decfc2ae11201c4ee560941f1b116c6b81baa8794db4b"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1005/spec-aa/records.jsonl.gz",
+   "sha256": "5eeaab21811b2a7062c6f7fca26555ab9c2f1f76265dabe35a092a9984620d7e"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1005/spec-bsgs/records.jsonl.gz",
+   "sha256": "e0bcfc8abdbc470c10c63596c02d5a08198618b480d4dd9e34eb481597c68cdd"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1005/spec-icctl/records.jsonl.gz",
+   "sha256": "a9ad8395f61f1832fb9bb1c9f4b8c97d62fd8aa9b749b72f3dd4c1dfbccb2605"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1005/spec/records.jsonl.gz",
+   "sha256": "4bc1693896b5c9ac409664b6be3d0f3b47b392920bdc2833a117d0314598d0b9"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1006/spec-aa/records.jsonl.gz",
+   "sha256": "c9f1657ad9cf61f16548ee6682628264102f9523964d382ac40c0c3f2587b1ba"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1006/spec-bsgs/records.jsonl.gz",
+   "sha256": "9fd24848b93cb8a4f9b851cc8c64cf96fdde38547ba4d325dbc0f49027fa99d6"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1006/spec-icctl/records.jsonl.gz",
+   "sha256": "721534ebaba20221096001d65e4165c4d956eabf75d33d57aca90d591fdd1f72"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1006/spec/records.jsonl.gz",
+   "sha256": "b18c30a57cc0b0969a58bcf6a551b1863c3b84d8155d23c35a03f71e9a642c22"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1007/spec-aa/records.jsonl.gz",
+   "sha256": "b7181681f075a9145078656ce706da829f1e912a361ef0bf5af83ae2b053d352"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1007/spec-bsgs/records.jsonl.gz",
+   "sha256": "8fa04712f156d58294984e3e3134b1d9beecebb8d68b035bfe779f7e5b5eb64d"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1007/spec-icctl/records.jsonl.gz",
+   "sha256": "163bcea8dbd31052429c8421f9f3d352aff3a7ae5e7dd58b913f55c595c5e1f7"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1007/spec/records.jsonl.gz",
+   "sha256": "31d59f970aae57177aede57d09d186e1b1ee907ee2435de4e82dd7b0326c59d5"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1008/spec-aa/records.jsonl.gz",
+   "sha256": "707c7b128c5c1e3b9f640842dae9335a589e7a082d2145e6d9d5eedb73a52a28"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1008/spec-bsgs/records.jsonl.gz",
+   "sha256": "6be8886fa987911a2cbc7b68fab7192673afe756fa3528ed9a9ac52d49c9682a"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1008/spec-icctl/records.jsonl.gz",
+   "sha256": "2338eb093c61804549aa31993e9934cfac88eb70c058679a889ddd2091f59ddf"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1008/spec/records.jsonl.gz",
+   "sha256": "4db6b564a42d1a9e21140adedae7da40c6b5f8d65bd5dba0f9b558ef001e14b1"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1009/spec-aa/records.jsonl.gz",
+   "sha256": "08332720d5e8658531061e6c3c9288ffd585a7d7de5a419b936b90500dfdd0de"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1009/spec-bsgs/records.jsonl.gz",
+   "sha256": "aa1d33347a9de965c233b364ccdcec207113233988da52083b0aab2ac5cfe50d"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1009/spec-icctl/records.jsonl.gz",
+   "sha256": "c1691636f97de6c6d5bdaad83071fb04eedfe6f9c6ad824865b85b623fa8b453"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1009/spec/records.jsonl.gz",
+   "sha256": "3b5d963fe01e8a2a132157028e4137cf09cb557d21fce765600924357fd97641"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1010/spec-aa/records.jsonl.gz",
+   "sha256": "997c6e6c4417ec9f33a5ece1bf33a08e016c36ba82ed44d7b4bacc8ec4b4cf69"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1010/spec-bsgs/records.jsonl.gz",
+   "sha256": "718c29178eac02607c3c34ef004cb2d4e34dbdcc56dd04aa87836c20a21cf3db"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1010/spec-icctl/records.jsonl.gz",
+   "sha256": "db047b45bf16f8f65eca6a4a3c3f4d10de03dcb0b9501ca1d90dbbf45cb74998"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1010/spec/records.jsonl.gz",
+   "sha256": "20a0856363ce9bc36f9f6a1d956f1973e5b39265cb8574ca4b1656d58cb1597e"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1011/spec-aa/records.jsonl.gz",
+   "sha256": "6946616aeb7bbb53fe175e558e12c1a8eb21f79f918a3ed217bc93cd25f7298f"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1011/spec-bsgs/records.jsonl.gz",
+   "sha256": "300e094301900cbd69ad137c78be6d787b19e34f92a25f7a2eb54e7f67826e72"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1011/spec-icctl/records.jsonl.gz",
+   "sha256": "3f566d6c33dcac1485fcba2dc15282148a851c1326469d659da838c10ea69229"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1011/spec/records.jsonl.gz",
+   "sha256": "f74ffcbbe58044ae5cdc3a519a849c2329f844c77a3d19b8075f154eb27262d1"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1012/spec-aa/records.jsonl.gz",
+   "sha256": "1cd4f31880a81637784399b985c1b4cec74bf1227903474c2f566bb98bd3c4e7"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1012/spec-bsgs/records.jsonl.gz",
+   "sha256": "ede7476668c400e5e76c170bf93d122cf5dde00124dec218ab413515ba76a8e5"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1012/spec-icctl/records.jsonl.gz",
+   "sha256": "5214ab33ee56e50c13679d312c8cb123fc783b46102dea1dc6aa066d779f61d9"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1012/spec/records.jsonl.gz",
+   "sha256": "2e42ba3727cd961664320a4eb8d6ad2a81337ae25de29247e63eddcf87038f02"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1013/spec-aa/records.jsonl.gz",
+   "sha256": "87d83b30ddd0abe26506b631d319ba2e38bec8de728688de0a8201a14ee01cf0"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1013/spec-bsgs/records.jsonl.gz",
+   "sha256": "ac30e64d73496c75afac031b6abd6ec9c208206514ca06aa23af1a2ac657be1b"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1013/spec-icctl/records.jsonl.gz",
+   "sha256": "0c3a47162c3cf4e7fadc4081677517c70e20d552ebf7a84043c15e1b393496d8"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1013/spec/records.jsonl.gz",
+   "sha256": "dee38017048b3d556e8f5886264f7ddc1652bef6a0ec875530d0aa4438709e03"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1014/spec-aa/records.jsonl.gz",
+   "sha256": "a2f347c865bf522e0b22d3eed2b127354bdced246c9aed20cce2dce1de4b60c5"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1014/spec-bsgs/records.jsonl.gz",
+   "sha256": "ebd67a655ce0772c45d17050778fffba669427304093b352304dfdaba52cf61e"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1014/spec-icctl/records.jsonl.gz",
+   "sha256": "264b37ecd55629093188406f0e1304b715b0364a75ad4ae2effffcc633a137ca"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/sessions/l3-s1014/spec/records.jsonl.gz",
+   "sha256": "29eb4032066ac02dda3433a954316d1ce2f25aa1bbc050e37f5f2d11dc1be6b5"
+  }
+ ],
+ "claims_source": [
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/PROTOCOL.md",
+   "sha256": "a0050edcf55cd5ac07f455ac0dacd19a46514ac46a707f8d005c8bf05e6d0b9a"
+  },
+  {
+   "path": "../../research/isogeny-volcano-cost-v2_20261017/README.md",
+   "sha256": "2131a17069c9d406b80d957382d130a20d49adda897e67c140e3295cb21ed495"
+  }
+ ],
+ "claims_source_note": "the README the headline values are read from and the frozen PROTOCOL, at the hashes validated (not raw data, so not pinned in raw_data)",
+ "headline": [
+  {
+   "name": "H1 v2.1 (14 l=2 classes): IC relation yield floor/crater, stratified",
+   "claimed": 0.942,
+   "recomputed": 0.9417222742005841,
+   "rel_tol": 0.00054,
+   "tolerance_basis": "README prints 0.942: half a unit in its last digit, relative",
+   "readme": "Answer table, H1 row",
+   "required_by_task": true
+  },
+  {
+   "name": "H2 v2.1 (14 l=3 classes): IC relation yield floor/crater, stratified",
+   "claimed": 1.006,
+   "recomputed": 1.00620794247315,
+   "rel_tol": 0.0005,
+   "tolerance_basis": "README prints 1.006: half a unit in its last digit, relative",
+   "readme": "Answer table, H2 row",
+   "required_by_task": true
+  },
+  {
+   "name": "H3 v2.1 (28 classes): rho-neg S floor/crater, stratified",
+   "claimed": 1.004,
+   "recomputed": 1.003778764754005,
+   "rel_tol": 0.0005,
+   "tolerance_basis": "README prints 1.004: half a unit in its last digit, relative",
+   "readme": "Answer table, H3 row",
+   "required_by_task": true
+  },
+  {
+   "name": "planted IC pair ic-mitm-plus1:ic-mitm relation yield, 28 classes (matched by class, curve, model, target)",
+   "claimed": 1.062,
+   "recomputed": 1.061700446454186,
+   "rel_tol": 0.00048,
+   "tolerance_basis": "README prints 1.062: half a unit in its last digit, relative",
+   "readme": "Positive controls, planted IC, all",
+   "required_by_task": true
+  },
+  {
+   "name": "measured runs (non-warm-up, verified) in the 112 analysed sessions",
+   "claimed": 154160,
+   "recomputed": 154160,
+   "rel_tol": 0.0,
+   "tolerance_basis": "exact integer",
+   "readme": "Answer, 'Measured' list",
+   "required_by_task": true
+  },
+  {
+   "name": "band: IC S / rho S per curve-model, min at w = 0",
+   "claimed": 17.4,
+   "recomputed": 17.379242151357843,
+   "rel_tol": 0.0029,
+   "tolerance_basis": "README prints 17.4: half a unit in its last digit, relative",
+   "readme": "Gap to rho table",
+   "required_by_task": true
+  },
+  {
+   "name": "H1 v2 (4 l=2 classes)",
+   "claimed": 0.932,
+   "recomputed": 0.9316959582340545,
+   "rel_tol": 0.00054,
+   "tolerance_basis": "README prints 0.932: half a unit in its last digit, relative",
+   "readme": "Answer table, H1 v2 column",
+   "required_by_task": false
+  },
+  {
+   "name": "H2 v2 (4 l=3 classes)",
+   "claimed": 1.001,
+   "recomputed": 1.0011155014485043,
+   "rel_tol": 0.0005,
+   "tolerance_basis": "README prints 1.001: half a unit in its last digit, relative",
+   "readme": "Answer table, H2 v2 column",
+   "required_by_task": false
+  },
+  {
+   "name": "H3 v2 (8 classes)",
+   "claimed": 1.0,
+   "recomputed": 0.9995550203721139,
+   "rel_tol": 0.0005,
+   "tolerance_basis": "README prints 1.000: half a unit in its last digit, relative",
+   "readme": "Answer table, H3 v2 column",
+   "required_by_task": false
+  },
+  {
+   "name": "H5 v2.1 IC cost S floor/crater, l=2",
+   "claimed": 1.045,
+   "recomputed": 1.0452872173285157,
+   "rel_tol": 0.00048,
+   "tolerance_basis": "README prints 1.045: half a unit in its last digit, relative",
+   "readme": "Answer table, H5 row",
+   "required_by_task": false
+  },
+  {
+   "name": "H5 v2.1 IC cost S floor/crater, l=3",
+   "claimed": 1.001,
+   "recomputed": 1.0005534576083879,
+   "rel_tol": 0.0005,
+   "tolerance_basis": "README prints 1.001: half a unit in its last digit, relative",
+   "readme": "Answer table, H5 row",
+   "required_by_task": false
+  },
+  {
+   "name": "H5 v2 IC cost S floor/crater, l=2",
+   "claimed": 1.042,
+   "recomputed": 1.0415409597790177,
+   "rel_tol": 0.00048,
+   "tolerance_basis": "README prints 1.042: half a unit in its last digit, relative",
+   "readme": "Answer table, H5 v2 column",
+   "required_by_task": false
+  },
+  {
+   "name": "H5 v2 IC cost S floor/crater, l=3",
+   "claimed": 0.997,
+   "recomputed": 0.9970895955499712,
+   "rel_tol": 0.00051,
+   "tolerance_basis": "README prints 0.997: half a unit in its last digit, relative",
+   "readme": "Answer table, H5 v2 column",
+   "required_by_task": false
+  },
+  {
+   "name": "planted IC pair, l=2 (14 classes)",
+   "claimed": 1.061,
+   "recomputed": 1.0608521890691516,
+   "rel_tol": 0.00048,
+   "tolerance_basis": "README prints 1.061: half a unit in its last digit, relative",
+   "readme": "Positive controls, planted IC",
+   "required_by_task": false
+  },
+  {
+   "name": "planted IC pair, l=3 (14 classes)",
+   "claimed": 1.063,
+   "recomputed": 1.0625493821058052,
+   "rel_tol": 0.00048,
+   "tolerance_basis": "README prints 1.063: half a unit in its last digit, relative",
+   "readme": "Positive controls, planted IC",
+   "required_by_task": false
+  },
+  {
+   "name": "H1 power control point estimate (plant 3:0.95 on l=3 IC yield)",
+   "claimed": 0.956,
+   "recomputed": 0.9558975453494925,
+   "rel_tol": 0.00053,
+   "tolerance_basis": "README prints 0.956: half a unit in its last digit, relative",
+   "readme": "Positive controls, H1 power",
+   "required_by_task": false
+  },
+  {
+   "name": "H3 power control point estimate (plant 3:1.05 on rho, 28 classes)",
+   "claimed": 1.054,
+   "recomputed": 1.0539677029917054,
+   "rel_tol": 0.00048,
+   "tolerance_basis": "README prints 1.054: half a unit in its last digit, relative",
+   "readme": "Positive controls, H3 power",
+   "required_by_task": false
+  },
+  {
+   "name": "BSGS exactness: paired targets",
+   "claimed": 56,
+   "recomputed": 56,
+   "rel_tol": 0.0,
+   "tolerance_basis": "exact integer",
+   "readme": "Positive controls, BSGS exactness",
+   "required_by_task": false
+  },
+  {
+   "name": "BSGS exactness: max distinct cost per paired target",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0.0,
+   "tolerance_basis": "exact integer",
+   "readme": "Positive controls, BSGS exactness",
+   "required_by_task": false
+  },
+  {
+   "name": "per-class IC yield floor/crater, l3-s1011",
+   "claimed": 1.025,
+   "recomputed": 1.0245528856380333,
+   "rel_tol": 0.00049,
+   "tolerance_basis": "README prints 1.025: half a unit in its last digit, relative",
+   "readme": "Mechanism contrasts",
+   "required_by_task": false
+  },
+  {
+   "name": "per-class IC yield floor/crater, l3-s1003",
+   "claimed": 1.015,
+   "recomputed": 1.015073795619663,
+   "rel_tol": 0.0005,
+   "tolerance_basis": "README prints 1.015: half a unit in its last digit, relative",
+   "readme": "Mechanism contrasts",
+   "required_by_task": false
+  },
+  {
+   "name": "per-class IC yield floor/crater, l3-s1010",
+   "claimed": 1.012,
+   "recomputed": 1.0121137234733475,
+   "rel_tol": 0.0005,
+   "tolerance_basis": "README prints 1.012: half a unit in its last digit, relative",
+   "readme": "Mechanism contrasts",
+   "required_by_task": false
+  },
+  {
+   "name": "per-class IC yield floor/crater, l=2 minimum (l2-s1001)",
+   "claimed": 0.893,
+   "recomputed": 0.8933691877906971,
+   "rel_tol": 0.00056,
+   "tolerance_basis": "README prints 0.893: half a unit in its last digit, relative",
+   "readme": "Mechanism contrasts, every l=2 class",
+   "required_by_task": false
+  },
+  {
+   "name": "per-class IC yield floor/crater, l=2 maximum (l2-s1007)",
+   "claimed": 0.964,
+   "recomputed": 0.964225464954544,
+   "rel_tol": 0.00052,
+   "tolerance_basis": "README prints 0.964: half a unit in its last digit, relative",
+   "readme": "Mechanism contrasts, every l=2 class",
+   "required_by_task": false
+  },
+  {
+   "name": "exploratory rho S floor/crater, l=2",
+   "claimed": 0.989,
+   "recomputed": 0.9894005457125502,
+   "rel_tol": 0.00051,
+   "tolerance_basis": "README prints 0.989: half a unit in its last digit, relative",
+   "readme": "Exploratory, rho split by l",
+   "required_by_task": false
+  },
+  {
+   "name": "exploratory rho S floor/crater, l=3",
+   "claimed": 1.018,
+   "recomputed": 1.0183659317121556,
+   "rel_tol": 0.0005,
+   "tolerance_basis": "README prints 1.018: half a unit in its last digit, relative",
+   "readme": "Exploratory, rho split by l",
+   "required_by_task": false
+  },
+  {
+   "name": "band: IC S / rho S per curve-model, median at w = 0 (mean of the two middle of 7,760)",
+   "claimed": 46.5,
+   "recomputed": 46.50628041103401,
+   "rel_tol": 0.0011,
+   "tolerance_basis": "README prints 46.5: half a unit in its last digit, relative",
+   "readme": "Gap to rho table",
+   "required_by_task": false
+  },
+  {
+   "name": "band: IC S / rho S per curve-model, max at w = 0",
+   "claimed": 169.5,
+   "recomputed": 169.45816216216215,
+   "rel_tol": 0.0003,
+   "tolerance_basis": "README prints 169.5: half a unit in its last digit, relative",
+   "readme": "Gap to rho table",
+   "required_by_task": false
+  },
+  {
+   "name": "band: IC S / rho S per curve-model, min at w = 0.1",
+   "claimed": 18.9,
+   "recomputed": 18.87748481056746,
+   "rel_tol": 0.0027,
+   "tolerance_basis": "README prints 18.9: half a unit in its last digit, relative",
+   "readme": "Gap to rho table",
+   "required_by_task": false
+  },
+  {
+   "name": "band: IC S / rho S per curve-model, median at w = 0.1 (mean of the two middle of 7,760)",
+   "claimed": 50.8,
+   "recomputed": 50.84916791302584,
+   "rel_tol": 0.00099,
+   "tolerance_basis": "README prints 50.8: half a unit in its last digit, relative",
+   "readme": "Gap to rho table",
+   "required_by_task": false
+  },
+  {
+   "name": "band: IC S / rho S per curve-model, max at w = 0.1",
+   "claimed": 188.2,
+   "recomputed": 188.23643848886022,
+   "rel_tol": 0.00027,
+   "tolerance_basis": "README prints 188.2: half a unit in its last digit, relative",
+   "readme": "Gap to rho table",
+   "required_by_task": false
+  },
+  {
+   "name": "band: IC S / rho S per curve-model, min at w = 1",
+   "claimed": 25.8,
+   "recomputed": 25.79084209954554,
+   "rel_tol": 0.002,
+   "tolerance_basis": "README prints 25.8: half a unit in its last digit, relative",
+   "readme": "Gap to rho table",
+   "required_by_task": false
+  },
+  {
+   "name": "band: IC S / rho S per curve-model, median at w = 1 (mean of the two middle of 7,760)",
+   "claimed": 71.4,
+   "recomputed": 71.42824478952056,
+   "rel_tol": 0.00071,
+   "tolerance_basis": "README prints 71.4: half a unit in its last digit, relative",
+   "readme": "Gap to rho table",
+   "required_by_task": false
+  },
+  {
+   "name": "band: IC S / rho S per curve-model, max at w = 1",
+   "claimed": 286.8,
+   "recomputed": 286.84193263529716,
+   "rel_tol": 0.00018,
+   "tolerance_basis": "README prints 286.8: half a unit in its last digit, relative",
+   "readme": "Gap to rho table",
+   "required_by_task": false
+  },
+  {
+   "name": "band: curve-models with rho-neg below ic-mitm at every weight",
+   "claimed": 7760,
+   "recomputed": 7760,
+   "rel_tol": 0.0,
+   "tolerance_basis": "exact integer",
+   "readme": "Gap to rho, 'all 7,760 curve-models'",
+   "required_by_task": false
+  },
+  {
+   "name": "curve-models (sidecars)",
+   "claimed": 7760,
+   "recomputed": 7760,
+   "rel_tol": 0.0,
+   "tolerance_basis": "exact integer",
+   "readme": "Answer, 'Measured' list",
+   "required_by_task": false
+  },
+  {
+   "name": "records counted by the audits (incl. warm-ups and the interrupted session)",
+   "claimed": 308511,
+   "recomputed": 308511,
+   "rel_tol": 0.0,
+   "tolerance_basis": "exact integer",
+   "readme": "Evidence, Audits",
+   "required_by_task": false
+  }
+ ],
+ "headline_failures": [],
+ "stochastic_checks": [
+  {
+   "name": "H1 permutation p, one-sided less, 10,000 level-label shuffles within class (validator RNG: splitmix64 seeded from the nonce)",
+   "claimed": 0.0001,
+   "recomputed": 9.999000099990002e-05,
+   "extreme_permutations": 0,
+   "agrees": true,
+   "note": "0 of 10,000 as extreme in both; below Holm's 0.0167"
+  },
+  {
+   "name": "H2 permutation p, two-sided",
+   "claimed": 0.13,
+   "recomputed": 0.12888711128887112,
+   "mc_se": 0.0033630343441600472,
+   "agrees": true
+  },
+  {
+   "name": "H3 permutation p, two-sided",
+   "claimed": 0.42,
+   "recomputed": 0.41755824417558246,
+   "mc_se": 0.004935585071701226,
+   "agrees": true
+  }
+ ],
+ "cross_check_against_producer_analysis_json": [
+  {
+   "name": "H1",
+   "validator": 0.9417222742005841,
+   "producer_analysis_json": 0.9417222742005833,
+   "rel_diff": 8.252497987236503e-16
+  },
+  {
+   "name": "H2",
+   "validator": 1.00620794247315,
+   "producer_analysis_json": 1.0062079424731494,
+   "rel_diff": 6.620240078187116e-16
+  },
+  {
+   "name": "H3",
+   "validator": 1.003778764754005,
+   "producer_analysis_json": 1.003778764754005,
+   "rel_diff": 0.0
+  },
+  {
+   "name": "planted pair, 28 classes",
+   "validator": 1.061700446454186,
+   "producer_analysis_json": 1.061700446454186,
+   "rel_diff": 0.0
+  }
+ ],
+ "artifact_checks": [
+  "sessions/MANIFEST.sha256: 678 of 678 entries match (plain files, and the decompressed stream of each .gz); no unlisted file",
+  "frozen spec digests reproduce: all 28 classes ed9a7b88526c1e5a...06786, v2's 8 classes 0f7c63764c796c02...e12b",
+  "every session.json: git_dirty false; binary_sha256 7da27ec3...7a9f in all 113 sessions and all 308,511 records; 5 git commits (63d5906 v2 freeze, 156f80c v2.1 freeze, c167f1e, d4ed77c, de8cd61), all after the freeze",
+  "PROTOCOL v2 frozen in commit 63d5906 (2026-10-17T09:09:30Z) and v2.1 in 156f80c (09:12:09Z); earliest session start 09:10:17Z; v2.1 frozen while v2 sessions ran and before any analysis, as the amendment states",
+  "the producer's 113 audits: ok, 1,344 of 1,344 replays reproduced (read, not relied on; the replay certificate is the validator's own)",
+  "measured-run sizes: 45,088 (v2, 8 classes) + 109,072 (v2.1's 20 classes) = 154,160, as frozen in PROTOCOL sections 3 and v2.1",
+  "0 measured records unmatched to a sidecar; 0 measured unverified records; 0 records priced by a pinned calibration; total_gae/sqrt(r) equals cost.s to 2.2e-16 relative on every measured record"
+ ],
+ "control_checks": [
+  "planted IC (factor base 33 against 32): 1.0617 over 28 classes, 7,240 matched workloads, predicted 1.063",
+  "BSGS exactness: 56 paired targets (28 classes x 2), max 1 distinct S per target",
+  "H1 and H3 power controls: a planted factor on level 3 scales each class's floor ratio exactly, so the point estimates are H2 x 0.95 = 0.9559 and H3 x 1.05 = 1.0540; the permutation p of each control was not recomputed",
+  "null control for H1: the validator's own permutation null (level labels shuffled among curves within each class) gives 0 of 10,000 shuffles at or below the observed 0.9417"
+ ],
+ "heuristic_validation_checks": [
+  "pre-registration: hypotheses, statistic, direction of H1, margins and controls were committed before the first session started (see artifact_checks)",
+  "no dropped runs: every planned measured run is present and verified (154,160), and the analysis uses spec-r2 for l2-s1002 as PROTOCOL section 3 states"
+ ],
+ "cost_model_checks": [
+  "unit declared: S = counted GAE / sqrt(r) (ecbench.gae), a lower bound; unpriced native work priced in the band at 0, 0.1 and 1 GAE per operation (AGENTS.md section 5a), rho references included",
+  "no wall time is used in any recomputed number",
+  "rho-neg below ic-mitm on 7,760 of 7,760 curve-models at every weight; IC/rho per curve-model 17.4 to 169.5 at w = 0"
+ ],
+ "limitations": [
+  "bootstrap confidence intervals, H4's tau/Q statistics, the max|z| single-curve control and the power controls' p values were not recomputed; only point estimates, counts, the band and three permutation p values (own RNG, Monte Carlo) were",
+  "the recompute learned the statistic's definition from volcano_stats.rs (allowed by the task); a definitional error shared by PROTOCOL and that file would not be detected",
+  "replays ran with the same ecbench binary that produced the records, on the same host class; this checks determinism and the recorded counts, not a second implementation of the methods (the scalar check is the independent part)",
+  "24-bit p only; no security statement; the floor-to-crater IC candidate does not charge the isogeny walk (as the README says)"
+ ],
+ "verdict": "passed"
+}

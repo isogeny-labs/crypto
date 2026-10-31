@@ -22,6 +22,7 @@ use serde_json::json;
 
 const LEDGER_SCHEMA_V1: &str = "ec-hardness/p61-class-ledger/v1";
 const LEDGER_SCHEMA_V2: &str = "ec-hardness/p61-class-ledger/v2";
+const LEDGER_SCHEMA_V3: &str = "ec-hardness/p61-class-ledger/v3";
 const AUDIT_SCHEMA: &str = "ec-hardness/p61-class-uniqueness-audit/v2";
 const PREFLIGHT_SCHEMA: &str = "ec-hardness/p61-class-preflight/v1";
 const CERTIFICATION_SCHEMA: &str = "ec-hardness/p61-class-number-certification/v1";
@@ -83,6 +84,8 @@ struct LedgerEntry {
     x_start: u64,
     x_end: u64,
     node_records: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    source_commit: Option<String>,
     segment: PathBuf,
     segment_digest: FileDigest,
     checkpoint: PathBuf,
@@ -93,6 +96,15 @@ struct LedgerEntry {
     verification_receipt_digest: FileDigest,
 }
 
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SourceCommitSpan {
+    source_commit: String,
+    x_start: u64,
+    x_end: u64,
+    segments: u64,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct Ledger {
@@ -100,6 +112,8 @@ struct Ledger {
     status: String,
     builder_source_commit: String,
     source_commit: String,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    source_commits: Vec<SourceCommitSpan>,
     class_number_receipt: PathBuf,
     class_number_receipt_digest: FileDigest,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -162,6 +176,7 @@ struct SegmentAudit {
     x_end: u64,
     node_records: u64,
     closure_records: u64,
+    source_commit: String,
     record_chain_sha256: String,
     segment_digest: FileDigest,
     checkpoint_digest: FileDigest,
@@ -183,6 +198,7 @@ struct AuditReceipt {
     auditor_source_commit: String,
     ledger_builder_source_commit: String,
     source_commit: String,
+    source_commits: Vec<SourceCommitSpan>,
     class_number_receipt_sha256: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     class_number_certification_receipt_sha256: Option<String>,
@@ -216,6 +232,100 @@ fn is_lower_hex(value: &str, length: usize) -> bool {
         && value
             .bytes()
             .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+}
+
+fn collect_source_commit_spans<'a, I>(ranges: I) -> Result<Vec<SourceCommitSpan>, String>
+where
+    I: IntoIterator<Item = (u64, u64, &'a str)>,
+{
+    let mut spans: Vec<SourceCommitSpan> = Vec::new();
+    let mut cursor: Option<u64> = None;
+    for (x_start, x_end, source_commit) in ranges {
+        if !is_lower_hex(source_commit, 40) {
+            return Err(format!(
+                "source commit at {x_start}..{x_end} must be 40 lowercase hexadecimal digits"
+            ));
+        }
+        if x_end <= x_start {
+            return Err(format!(
+                "source-commit range is not positive at {x_start}..{x_end}"
+            ));
+        }
+        if let Some(expected) = cursor {
+            if x_start != expected {
+                return Err(format!(
+                    "source-commit ranges are not contiguous at {x_start}..{x_end} (expected {expected})"
+                ));
+            }
+        }
+        match spans.last_mut() {
+            Some(span) if span.source_commit == source_commit => {
+                span.x_end = x_end;
+                span.segments = span
+                    .segments
+                    .checked_add(1)
+                    .ok_or("source-commit segment count overflow")?;
+            }
+            _ => spans.push(SourceCommitSpan {
+                source_commit: source_commit.to_owned(),
+                x_start,
+                x_end,
+                segments: 1,
+            }),
+        }
+        cursor = Some(x_end);
+    }
+    Ok(spans)
+}
+
+fn entry_source_commit<'a>(ledger: &'a Ledger, entry: &'a LedgerEntry) -> &'a str {
+    entry
+        .source_commit
+        .as_deref()
+        .unwrap_or(&ledger.source_commit)
+}
+
+fn validate_ledger_source_commits(ledger: &Ledger) -> Result<Vec<SourceCommitSpan>, String> {
+    if !is_lower_hex(&ledger.source_commit, 40) {
+        return Err("ledger primary source commit is malformed".into());
+    }
+    let observed = collect_source_commit_spans(ledger.entries.iter().map(|entry| {
+        (
+            entry.x_start,
+            entry.x_end,
+            entry_source_commit(ledger, entry),
+        )
+    }))?;
+    let primary = observed
+        .first()
+        .ok_or("ledger has no source-commit provenance")?;
+    if primary.source_commit != ledger.source_commit {
+        return Err("ledger primary source commit differs from its first provenance span".into());
+    }
+    if ledger.schema == LEDGER_SCHEMA_V3 {
+        if ledger.source_commits != observed {
+            return Err("ledger source-commit spans differ from its entries".into());
+        }
+        if ledger
+            .entries
+            .iter()
+            .any(|entry| entry.source_commit.is_none())
+        {
+            return Err("v3 ledger entry omits its source commit".into());
+        }
+    } else {
+        if ledger
+            .entries
+            .iter()
+            .any(|entry| entry.source_commit.is_some())
+        {
+            return Err("legacy ledger unexpectedly carries per-entry source commits".into());
+        }
+        if !ledger.source_commits.is_empty() {
+            return Err("legacy ledger unexpectedly carries source-commit spans".into());
+        }
+    }
+    Ok(observed)
 }
 
 fn sync_file(file: &File, path: &Path) -> Result<String, String> {
@@ -461,7 +571,10 @@ fn validate_class_number_evidence(
     }
 }
 
-fn validate_generation_envelope(path: &Path, envelope: &GenerationEnvelope) -> Result<(), String> {
+fn validate_generation_envelope_metadata(
+    path: &Path,
+    envelope: &GenerationEnvelope,
+) -> Result<(), String> {
     if envelope.status != "pass"
         || envelope.receipt.status != "pass"
         || envelope.receipt.schema != RECEIPT_SCHEMA
@@ -475,6 +588,11 @@ fn validate_generation_envelope(path: &Path, envelope: &GenerationEnvelope) -> R
             path.display()
         ));
     }
+    Ok(())
+}
+
+fn validate_generation_envelope(path: &Path, envelope: &GenerationEnvelope) -> Result<(), String> {
+    validate_generation_envelope_metadata(path, envelope)?;
     ensure_digest(&envelope.segment, &envelope.segment_digest, "segment")?;
     ensure_digest(
         &envelope.checkpoint,
@@ -484,7 +602,7 @@ fn validate_generation_envelope(path: &Path, envelope: &GenerationEnvelope) -> R
     Ok(())
 }
 
-fn validate_verification_envelope(
+fn validate_verification_envelope_metadata(
     path: &Path,
     envelope: &VerificationEnvelope,
 ) -> Result<(), String> {
@@ -499,6 +617,14 @@ fn validate_verification_envelope(
             path.display()
         ));
     }
+    Ok(())
+}
+
+fn validate_verification_envelope(
+    path: &Path,
+    envelope: &VerificationEnvelope,
+) -> Result<(), String> {
+    validate_verification_envelope_metadata(path, envelope)?;
     ensure_digest(
         &envelope.segment,
         &envelope.segment_digest,
@@ -544,7 +670,6 @@ fn build_ledger(
     }
 
     let mut entries = Vec::new();
-    let mut source_commit: Option<String> = None;
     for generation_path in json_files(generation_dir)? {
         let envelope: GenerationEnvelope = read_json(&generation_path)?;
         validate_generation_envelope(&generation_path, &envelope)?;
@@ -577,17 +702,17 @@ fn build_ledger(
                 generation_path.display()
             ));
         }
-        match &source_commit {
-            None => source_commit = Some(envelope.receipt.source_commit.clone()),
-            Some(expected) if expected != &envelope.receipt.source_commit => {
-                return Err("generation receipts mix source commits".into())
-            }
-            _ => {}
+        if !is_lower_hex(&envelope.receipt.source_commit, 40) {
+            return Err(format!(
+                "{} carries a malformed source commit",
+                generation_path.display()
+            ));
         }
         entries.push(LedgerEntry {
             x_start: envelope.receipt.summary.x_start,
             x_end: envelope.receipt.summary.x_end,
             node_records: envelope.receipt.summary.node_records,
+            source_commit: Some(envelope.receipt.source_commit.clone()),
             segment: envelope.segment,
             segment_digest: envelope.segment_digest,
             checkpoint: envelope.checkpoint,
@@ -628,7 +753,7 @@ fn build_ledger(
             ));
         }
         let checkpoint: Checkpoint = read_json(&entry.checkpoint)?;
-        if checkpoint.source_commit != source_commit.as_deref().unwrap_or_default()
+        if checkpoint.source_commit != entry.source_commit.as_deref().unwrap_or_default()
             || checkpoint.class_number_receipt_sha256 != class_number_receipt_digest.sha256
             || checkpoint.x_start != entry.x_start
             || checkpoint.next_x != entry.x_end
@@ -646,11 +771,27 @@ fn build_ledger(
             .ok_or("ledger node count overflow")?;
         next_x = entry.x_end;
     }
+    let source_commits = collect_source_commit_spans(entries.iter().map(|entry| {
+        (
+            entry.x_start,
+            entry.x_end,
+            entry
+                .source_commit
+                .as_deref()
+                .expect("new ledger entries always bind a source commit"),
+        )
+    }))?;
+    let source_commit = source_commits
+        .first()
+        .ok_or("missing source commit")?
+        .source_commit
+        .clone();
     let ledger = Ledger {
-        schema: LEDGER_SCHEMA_V2.into(),
+        schema: LEDGER_SCHEMA_V3.into(),
         status: "sealed".into(),
         builder_source_commit: auditor_source_commit,
-        source_commit: source_commit.ok_or("missing source commit")?,
+        source_commit,
+        source_commits,
         class_number_receipt: class_number_receipt.to_path_buf(),
         class_number_receipt_digest,
         class_number_certification_receipt: class_number_certification_receipt
@@ -824,6 +965,7 @@ fn validate_entry_artifacts(
     entry: &LedgerEntry,
     prior_checkpoint_digest: Option<&str>,
 ) -> Result<Checkpoint, String> {
+    let source_commit = entry_source_commit(ledger, entry);
     ensure_digest(&entry.segment, &entry.segment_digest, "ledger segment")?;
     ensure_digest(
         &entry.checkpoint,
@@ -842,8 +984,11 @@ fn validate_entry_artifacts(
     )?;
     let generation: GenerationEnvelope = read_json(&entry.generation_receipt)?;
     let verification: VerificationEnvelope = read_json(&entry.verification_receipt)?;
-    validate_generation_envelope(&entry.generation_receipt, &generation)?;
-    validate_verification_envelope(&entry.verification_receipt, &verification)?;
+    // The four ledger artifacts were digest-verified immediately above.  Re-run
+    // the envelope admission checks without hashing the same segment and
+    // checkpoint twice more before the strict record-stream audit.
+    validate_generation_envelope_metadata(&entry.generation_receipt, &generation)?;
+    validate_verification_envelope_metadata(&entry.verification_receipt, &verification)?;
     if generation.segment != entry.segment
         || generation.segment_digest != entry.segment_digest
         || generation.checkpoint != entry.checkpoint
@@ -852,8 +997,8 @@ fn validate_entry_artifacts(
         || verification.segment_digest != entry.segment_digest
         || verification.checkpoint != entry.checkpoint
         || verification.checkpoint_digest != entry.checkpoint_digest
-        || generation.receipt.source_commit != ledger.source_commit
-        || verification.receipt.source_commit != ledger.source_commit
+        || generation.receipt.source_commit != source_commit
+        || verification.receipt.source_commit != source_commit
         || generation.receipt.summary != verification.receipt.summary
         || generation.receipt.summary.x_start != entry.x_start
         || generation.receipt.summary.x_end != entry.x_end
@@ -866,7 +1011,7 @@ fn validate_entry_artifacts(
     }
     let checkpoint: Checkpoint = read_json(&entry.checkpoint)?;
     if checkpoint.schema != CHECKPOINT_SCHEMA
-        || checkpoint.source_commit != ledger.source_commit
+        || checkpoint.source_commit != source_commit
         || checkpoint.class_number_receipt_sha256 != ledger.class_number_receipt_digest.sha256
         || checkpoint.x_start != entry.x_start
         || checkpoint.next_x != entry.x_end
@@ -889,6 +1034,7 @@ fn audit_segment(
     work_dir: &Path,
     chunks: &mut Vec<ChunkMeta>,
 ) -> Result<SegmentAudit, String> {
+    let source_commit = entry_source_commit(ledger, entry);
     let file = File::open(&entry.segment)
         .map_err(|error| format!("open {}: {error}", entry.segment.display()))?;
     let mut reader = BufReader::new(GzDecoder::new(file));
@@ -934,7 +1080,7 @@ fn audit_segment(
                 let parsed: SegmentHeader =
                     serde_json::from_value(value).map_err(|error| error.to_string())?;
                 if parsed.schema != SEGMENT_SCHEMA
-                    || parsed.source_commit != ledger.source_commit
+                    || parsed.source_commit != source_commit
                     || parsed.class_number_receipt_sha256
                         != ledger.class_number_receipt_digest.sha256
                     || parsed.x_start != entry.x_start
@@ -1017,6 +1163,7 @@ fn audit_segment(
         x_end: entry.x_end,
         node_records: nodes,
         closure_records: closures,
+        source_commit: source_commit.to_owned(),
         record_chain_sha256: summary.record_chain_sha256,
         segment_digest: entry.segment_digest.clone(),
         checkpoint_digest: entry.checkpoint_digest.clone(),
@@ -1222,7 +1369,9 @@ fn audit_ledger(
     let started = Instant::now();
     let ledger_digest = digest_file(ledger_path)?;
     let ledger: Ledger = read_json(ledger_path)?;
-    if (ledger.schema != LEDGER_SCHEMA_V1 && ledger.schema != LEDGER_SCHEMA_V2)
+    if (ledger.schema != LEDGER_SCHEMA_V1
+        && ledger.schema != LEDGER_SCHEMA_V2
+        && ledger.schema != LEDGER_SCHEMA_V3)
         || ledger.status != "sealed"
         || ledger.entries.is_empty()
         || !is_lower_hex(&ledger.builder_source_commit, 40)
@@ -1232,6 +1381,7 @@ fn audit_ledger(
     {
         return Err("ledger header is malformed or does not target the frozen p61 class".into());
     }
+    let source_commits = validate_ledger_source_commits(&ledger)?;
     let (observed_preflight_digest, observed_certification_digest) =
         validate_class_number_evidence(
             &ledger.class_number_receipt,
@@ -1299,6 +1449,7 @@ fn audit_ledger(
         auditor_source_commit,
         ledger_builder_source_commit: ledger.builder_source_commit,
         source_commit: ledger.source_commit,
+        source_commits,
         class_number_receipt_sha256: ledger.class_number_receipt_digest.sha256,
         class_number_certification_receipt_sha256: ledger
             .class_number_certification_receipt_digest
@@ -1466,6 +1617,45 @@ mod tests {
         assert!(set_once(&mut bits, 65).is_ok());
         assert!(set_once(&mut bits, 65).is_err());
         assert_eq!(bits.iter().map(|word| word.count_ones()).sum::<u32>(), 1);
+    }
+
+    #[test]
+    fn source_commit_spans_preserve_terminal_successor_provenance() {
+        let predecessor = "a".repeat(40);
+        let terminal_successor = "b".repeat(40);
+        let spans = collect_source_commit_spans([
+            (0, 32, predecessor.as_str()),
+            (32, 64, predecessor.as_str()),
+            (64, 96, terminal_successor.as_str()),
+        ])
+        .unwrap();
+        assert_eq!(
+            spans,
+            vec![
+                SourceCommitSpan {
+                    source_commit: predecessor,
+                    x_start: 0,
+                    x_end: 64,
+                    segments: 2,
+                },
+                SourceCommitSpan {
+                    source_commit: terminal_successor,
+                    x_start: 64,
+                    x_end: 96,
+                    segments: 1,
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn source_commit_spans_fail_closed_on_gaps_or_malformed_commits() {
+        let commit = "a".repeat(40);
+        assert!(collect_source_commit_spans(
+            [(0, 32, commit.as_str()), (33, 64, commit.as_str()),]
+        )
+        .is_err());
+        assert!(collect_source_commit_spans([(0, 32, "A")]).is_err());
     }
 
     #[test]

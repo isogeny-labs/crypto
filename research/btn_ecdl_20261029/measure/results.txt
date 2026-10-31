@@ -1,0 +1,186 @@
+Measurement crate: research/btn_ecdl_20261029/measure
+Depends on hashed-ecdl-tensor by path (../../../crates/hashed-ecdl-tensor).
+
+Timing status: all durations below are historical diagnostics, not a controlled
+comparison. There is no matched A/A, interleaved run, or host manifest here;
+no runtime improvement is claimed from these values.
+
+Decomposition network size (Lemma 11, slots=2, tau=8):
+bits  edges    vertices  max_degree  interface
+3     31740    8464      132         14
+5     58024    13758     132         22
+7     61120    15558     132         30
+9     114344   19514     132         38
+11    117440   21314     132         46
+13    120748   23220     132         54
+16    127920   31176     260         66
+17    223808   35510     260         70
+
+Exact count vs brute force, using the crate's own FactorBase::contains and
+Curve::add language definition:
+bits  |F1| |F2| brute network agree backend       steps(diagnostic)
+3     1    2    1     1       yes   Functional    4096306
+5     4    5    1     1       yes   Functional    627736914
+
+Step counts are Meter.used, a diagnostic, not a calibrated benchmark unit.
+ECCp-131: network build is AKS-bound; see eccp131.log.
+
+ECCp-131: build launched; still in the crate's exact AKS primality at 19+ min
+(86% CPU, pid 99242, log measure/eccp131.log). Command to resume:
+  cd research/btn_ecdl_20261029/measure && ./target/release/btn-measure --eccp131
+
+=== 61-bit Fp instances (real crate encodings)
+
+p = 2^61 - 1 is NOT usable with the j=0 construction: all six CM twist orders
+are composite, so there is no prime-order curve to certify.
+
+Nearest usable 61-bit primes (p = 1 mod 3, p = 3 mod 4, prime-order j=0 twist),
+found by Cornacchia in <5 ms:
+p                          curve        r
+2305843009213693123        y^2=x^3+3    2305843007258120689
+2305843009213692967        y^2=x^3+10   2305843011927994003
+2305843009213692799        y^2=x^3+13   2305843008689551411
+2305843009213688359        y^2=x^3+3    2305843012249865941
+
+Bottleneck in the exact crate: is_prime is AKS. At 61 bits it runs
+bits*sqrt(phi(r)) identity tests with degree-r BigUint polynomial arithmetic
+(~1e11 BigUint ops); it did not finish in 28 minutes. At 131 bits likewise.
+
+Study-vendored copy (hashed-ecdl-tensor-fast) replaces only is_prime with
+deterministic Miller-Rabin (exact below 3.3e24, which covers 61-bit). Same
+encoding/contraction code otherwise.
+
+Timings (61-bit):
+p                    Curve::new   two bases   Lemma 11 network
+2305843009213693123  0.90 ms      0.26 ms     edges=493124 verts=84264 deg=520 iface=246  75.6 ms
+2305843009213692967  0.81 ms      0.18 ms     edges=493120 verts=84262 deg=520 iface=246  70.6 ms
+2305843009213692799  0.55 ms      0.07 ms     edges=493404 verts=84404 deg=520 iface=246  49.0 ms
+2305843009213688359  0.59 ms      0.10 ms     edges=493036 verts=84220 deg=520 iface=246  54.9 ms
+
+=== 61-bit build optimisations (CPU time; wall is noisy under host load)
+variant                              edges    CPU(user)
+exact crate (AKS primality)          -        never finishes (>28 min)
+vendored MR primality                493124   ~75 ms
++ hash special case alpha=1,beta=0   472646   ~54 ms
++ skip the Infinity+A1 addition      300652   ~30 ms
++ both (simple seeds)                280174   ~30 ms
+
+A single point-add gadget is ~193k edges at 61 bits, so skipping Infinity+A1
+removed that much. The remaining cost is one point addition plus two hashtests.
+
+Correctness of the patched copy: --check-fast compares Counter::count against a
+brute force over the crate's own contains/add at 3 and 5 bits, for both seed
+modes. All four cases agree (backends Functional).
+
+=== further Cor-2 / encoder optimisations (61-bit, p=2305843009213693123)
+variant                                        edges    build observation (ms)
+exact crate (AKS)                              -        never
+vendored Miller-Rabin                          493124   ~75 ms
++ hash alpha=1,beta=0 special case             472646   ~54 ms
++ skip Infinity+A1 addition                    300652   ~32 ms
++ drop redundant valid_point(result)           259301   ~28 ms
++ 3*x as two additions                         252098   ~27 ms
++ fold a=0/b=0 in the curve equation           209560   ~20 ms
++ affine validity + raw add (no re-validation) 209560   ~20 ms
+simple seeds (alpha=1,beta=0)                  189082   ~17 ms
+
+Structural change from first working build: 493124 -> 209560 edges
+(2.35x smaller). --check-fast still agrees with brute force in all four cases
+(3/5 bits x two seed modes).
+
+=== per-gadget cost at 61 bits (patched encoder)
+modular_multiply   9247 edges   degree 520
+modular_add         717 edges   degree 5
+less_than           122 edges   degree 3
+gated_equal         241 edges   degree 3
+hash_member       40712 edges   degree 520
+point_add        188704 edges   degree 520
+
+Within point_add, the two curve-validity checks account for 112,192 used
+signals (59%); the paper's addition constraints and the multiply gadget are the
+rest. modular_multiply is therefore NOT the bottleneck.
+
+Conclusion: the remaining floor is structural. Two Ai validity checks are
+required by the language (interface points may be off-curve), each costing
+x^2, x^3, y^2. Removing them or folding validity into membership is unsound.
+Going below this needs either a different validity encoding or dropping the
+low-degree requirement in favour of a single program vertex.
+
+=== latest (61-bit, p=2305843009213693123)
+mode                      edges    vertices  degree  interface
+faithful, general seeds   199947   36433     520     246
+faithful, simple seeds    179469   34233     520     246
+program-vertex, general   143101   21074     520     246
+program-vertex, simple    122623   18042     520     246
+
+Additional wins this round:
+- reuse x^2 computed by curve validity in the doubling constraint (saves one
+  modular multiply = 9247 edges on the faithful path)
+- programme-vertex mode: one checked predicate replaces the whole Cor-2
+  selector/slope block. Degree stays 520 because validity/hash gadgets remain.
+  This is a size/degree trade, NOT the paper's O(b^3/4)-degree encoding; it is behind
+  an explicit --program flag and the faithful path stays the default.
+
+Cumulative structural change: 493124 -> 122623 edges (4.0x smaller).
+--check-fast: 4/4 counts still agree with brute force.
+
+=== duplicate-validation fix (biggest remaining win)
+input_point() already calls valid_point internally. The harness then called
+valid_point_affine() again, so every point was validated twice. Removing the
+second check and returning x^2 from the validated input:
+
+variant                     edges   vertices  degree  build observation (ms)
+faithful, simple seeds      118163  25219     520     ~12 ms
+program-vertex, simple      61317   9028      520     ~5.2-7.8 ms
+
+Full table (simple seeds):
+p                      mode      edges   verts  deg  single-run ms observation
+2305843009213693123    faithful  118163 25219 520 14.65
+2305843009213693123    program    61317  9028 520  5.90
+2305843009213692967    faithful  118163 25219 520 12.74
+2305843009213692967    program    61317  9028 520  6.25
+2305843009213692799    faithful  118275 25275 520 12.04
+2305843009213692799    program    61333  9036 520  7.78
+2305843009213688359    faithful  118135 25205 520 11.33
+2305843009213688359    program    61313  9026 520  5.22
+
+Cumulative structural change: 493124 -> 61317 edges (8.0x smaller).
+The programme mode is now essentially the two required curve-validity checks
+(~30k edges each); everything else is <1k.
+--check-fast: 4/4 still agree with brute force.
+
+=== derived-parameter decomposition (structural)
+A2 = T - A1 instead of a free second point. For cofactor-one curves, this
+parameterizes the same decompositions with a smaller interface. With a
+nontrivial cofactor, A1 is projected into the certified subgroup; projection
+may give multiple witness assignments for a decomposition.
+
+61-bit, simple seeds:
+mode                         edges   verts  degree  interface
+faithful, two free points    118163  25219  520     246
+faithful, derived            94788   20746  520     123
+programme, two free points   61317   9028   520     246
+programme, derived           31865   5307   520     123
+
+Cumulative structural change: 493124 -> 31865 edges (15.5x smaller).
+--check-fast: 16/16 combinations agree with brute force on cofactor-one
+fixtures. A separate cofactor-two regression checks the projected derived
+encoding and its expected non-parsimonious witness count.
+
+=== scalar-parameter decomposition (structurally removes validity)
+Interface is k with A1 = k*G by a double-and-add programme circuit, A2 = T - A1.
+k -> k*G is a bijection on the prime-order subgroup, so the exact count is
+unchanged. A1 is on-curve by construction; A2 is on-curve by the group law.
+No curve-validity check remains.
+
+61-bit, simple seeds:
+mode                         edges   verts  degree  interface
+faithful, two free points    118163  25219  520     246
+faithful, derived            94788   20746  520     123
+programme, derived           31865   5307   520     123
+scalar (k*G)                 9203    1227   247     61
+
+Cumulative structural change: 493124 -> 9203 edges (53.6x smaller),
+interface 246 -> 61 (4x), degree 520 -> 247. No runtime gain is claimed.
+--check-fast: 20/20 combinations agree with brute force on cofactor-one
+fixtures. Cofactor-two derived projection is covered by the separate regression.

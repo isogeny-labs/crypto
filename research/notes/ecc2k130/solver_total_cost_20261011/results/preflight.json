@@ -1,0 +1,71 @@
+{
+  "binaries": {
+    "WDSat": null,
+    "cryptominisat5": null,
+    "msolve": null,
+    "pandoc": "/usr/bin/pandoc",
+    "pdflatex": null,
+    "sage": null,
+    "typst": null
+  },
+  "engine_smoke": {
+    "f5b_prototype_import_and_tiny_basis": true,
+    "pycryptosat_native_xor": true,
+    "z3_and_xor": true
+  },
+  "frozen_m83_scripts": {
+    "preflight_engines.py": {
+      "engine_rows": [
+        {
+          "engine": "msolve-F4",
+          "path": null,
+          "status": "unavailable"
+        },
+        {
+          "engine": "WDSat",
+          "path": null,
+          "status": "unavailable"
+        },
+        {
+          "engine": "Sage",
+          "path": null,
+          "status": "unavailable"
+        },
+        {
+          "engine": "CryptoMiniSat-CLI",
+          "path": null,
+          "status": "unavailable"
+        },
+        {
+          "engine": "pycryptosat-native-XOR",
+          "status": "available"
+        }
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "",
+      "unsupported_memory_cases": 12
+    },
+    "verify_archive.py": {
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "{\"verified_files\": 131, \"archive_sha256\": \"6792ab6016437fe2f04a18ebed0d244d5ffb503526db1f2c23f25c1ea98e12a7\", \"original_runner_hash_matched\": true}"
+    }
+  },
+  "loadavg": [
+    0.4921875,
+    1.23974609375,
+    0.84130859375
+  ],
+  "ok": true,
+  "time_unix": 1792977405.1176405,
+  "versions": {
+    "cpu_count": 4,
+    "cpu_model": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "machine": "x86_64",
+    "platform": "Linux-6.18.44-fc-v153-x86_64-with-glibc2.39",
+    "pycryptosat": "5.16.0",
+    "python": "3.13.16 (main, Oct  1 2026, 15:40:24) [GCC 13.3.0]",
+    "z3": "5.1.0"
+  }
+}

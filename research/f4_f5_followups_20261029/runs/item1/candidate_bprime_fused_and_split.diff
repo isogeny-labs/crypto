@@ -1,0 +1,333 @@
+diff --git a/src/cryptanalysis/f4_fp.rs b/tmp/claude-0/-home-user/cba6917f-779a-544b-9ecf-84e512b45b33/scratchpad/f4_fp.rs.split
+index e89922a165..cbd92c3007 100644
+--- a/src/cryptanalysis/f4_fp.rs
++++ b/tmp/claude-0/-home-user/cba6917f-779a-544b-9ecf-84e512b45b33/scratchpad/f4_fp.rs.split
+@@ -2258,6 +2258,10 @@ fn reduce_pairs_fl(
+     const NONE: u32 = u32::MAX;
+     const NORMALIZE_AFTER: usize = 256;
+     let simd = lazy_simd_kind();
++    // four reducer rows per pass while `B'` is built (`add_lazy_updates`);
++    // the AVX-512 kernel keeps one row per pass (the four-row kernel is
++    // AVX2 and scalar only)
++    let fused = simd != 2 && bprime_fused();
+     let n_free = free_cols.len();
+     let mut free_index = vec![NONE; n_cols];
+     for (i, &c) in free_cols.iter().enumerate() {
+@@ -2287,6 +2291,7 @@ fn reduce_pairs_fl(
+         let mut acc = vec![0u64; n_free];
+         let mut pending = 0usize;
+         let mut later: Vec<(usize, u64)> = Vec::new();
++        let mut finished: Vec<(&[u32], u64, usize)> = Vec::new();
+         for &(c, v) in &reducers[k][1..] {
+             let fi = free_index[c as usize];
+             if fi != NONE {
+@@ -2294,17 +2299,24 @@ fn reduce_pairs_fl(
+             } else {
+                 let j = reducer_at[c as usize] as usize;
+                 if position[j] < block_start {
+-                    add_lazy(&mut acc, &bprime[j], bstart[j], fp.p - v, simd);
+-                    pending += 1;
+-                    if pending == NORMALIZE_AFTER {
+-                        normalize_lazy(&mut acc, fp);
+-                        pending = 0;
++                    if fused {
++                        finished.push((&bprime[j], fp.p - v, bstart[j]));
++                    } else {
++                        add_lazy(&mut acc, &bprime[j], bstart[j], fp.p - v, simd);
++                        pending += 1;
++                        if pending == NORMALIZE_AFTER {
++                            normalize_lazy(&mut acc, fp);
++                            pending = 0;
++                        }
+                     }
+                 } else {
+                     later.push((j, v));
+                 }
+             }
+         }
++        if fused {
++            add_lazy_updates(&mut acc, &finished, &mut pending, NORMALIZE_AFTER, fp, simd);
++        }
+         (acc, pending, later)
+     };
+     for block in order.chunks(FL_BLOCK) {
+@@ -2325,15 +2337,42 @@ fn reduce_pairs_fl(
+                     .map(|&k| against_finished(k, block_start, bp))
+                     .collect()
+             };
++        if bprime_split()
++            && rayon::current_num_threads() > 1
++            && block.len() * n_free > PAR_WORK
++            && partial.iter().any(|(_, _, later)| !later.is_empty())
++        {
++            finish_block_by_columns(
++                block,
++                &mut partial,
++                &mut bprime,
++                &position,
++                &bstart,
++                block_start,
++                n_free,
++                fp,
++                simd,
++                fused,
++            );
++            continue;
++        }
+         for (&k, (acc, pending, later)) in block.iter().zip(partial.iter_mut()) {
+             // in-block dependencies are earlier in the block, so finished
+-            for &(j, v) in later.iter() {
+-                debug_assert!(position[j] < position[k]);
+-                add_lazy(acc, &bprime[j], bstart[j], fp.p - v, simd);
+-                *pending += 1;
+-                if *pending == NORMALIZE_AFTER {
+-                    normalize_lazy(acc, fp);
+-                    *pending = 0;
++            if fused {
++                let upd: Vec<(&[u32], u64, usize)> = later
++                    .iter()
++                    .map(|&(j, v)| (&bprime[j][..], fp.p - v, bstart[j]))
++                    .collect();
++                add_lazy_updates(acc, &upd, pending, NORMALIZE_AFTER, fp, simd);
++            } else {
++                for &(j, v) in later.iter() {
++                    debug_assert!(position[j] < position[k]);
++                    add_lazy(acc, &bprime[j], bstart[j], fp.p - v, simd);
++                    *pending += 1;
++                    if *pending == NORMALIZE_AFTER {
++                        normalize_lazy(acc, fp);
++                        *pending = 0;
++                    }
+                 }
+             }
+             bprime[k] = acc.iter().map(|&x| fp.reduce(x) as u32).collect();
+@@ -2387,6 +2426,114 @@ fn fl_blocked_pairs() -> bool {
+     *ON.get_or_init(|| std::env::var("F4_FP_FL_BLOCKED").as_deref() != Ok("0"))
+ }
+ 
++/// `F4_FP_BPRIME_SPLIT=0` finishes a block of `B'` row by row on the
++/// calling thread; a same-binary control for [`finish_block_by_columns`].
++fn bprime_split() -> bool {
++    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
++    *ON.get_or_init(|| std::env::var("F4_FP_BPRIME_SPLIT").as_deref() != Ok("0"))
++}
++
++/// Finish a block of `B'` rows whose in-block dependencies are pending:
++/// row `k` still takes `−v · B'_j` for each `(j, v)` of its `later` list,
++/// `j` earlier in the block.  That chain is serial along the rows but
++/// independent along the columns, so the free columns are cut into tiles
++/// and each tile runs the whole chain for every row of the block, in
++/// parallel.  A tile sees the same updates in the same order, with the
++/// same normalisation points, as the row-at-a-time loop on its columns,
++/// so every entry of `B'` is the same; the field operations are counted
++/// once, on the calling thread, as that loop counted them.
++#[allow(clippy::too_many_arguments)]
++fn finish_block_by_columns(
++    block: &[usize],
++    partial: &mut [(Vec<u64>, usize, Vec<(usize, u64)>)],
++    bprime: &mut [Vec<u32>],
++    position: &[usize],
++    bstart: &[usize],
++    block_start: usize,
++    n_free: usize,
++    fp: Barrett,
++    simd: u8,
++    fused: bool,
++) {
++    const NORMALIZE_AFTER: usize = 256;
++    let tile = n_free.div_ceil(4 * rayon::current_num_threads()).max(256);
++    let mut later: Vec<(usize, Vec<(usize, u64)>)> = Vec::with_capacity(block.len());
++    let mut acc_tiles: Vec<Vec<&mut [u64]>> = (0..n_free.div_ceil(tile)).map(|_| Vec::new()).collect();
++    for (acc, pending, l) in partial.iter_mut() {
++        later.push((*pending, std::mem::take(l)));
++        for (t, a) in acc.chunks_mut(tile).enumerate() {
++            acc_tiles[t].push(a);
++        }
++    }
++    let mut out: Vec<Vec<u32>> = vec![vec![0u32; n_free]; block.len()];
++    let mut out_tiles: Vec<Vec<&mut [u32]>> = (0..acc_tiles.len()).map(|_| Vec::new()).collect();
++    for o in out.iter_mut() {
++        for (t, a) in o.chunks_mut(tile).enumerate() {
++            out_tiles[t].push(a);
++        }
++    }
++    acc_tiles
++        .into_par_iter()
++        .zip(out_tiles.into_par_iter())
++        .enumerate()
++        .for_each(|(t, (mut accs, mut outs))| {
++            let lo = t * tile;
++            for b in 0..accs.len() {
++                let (done, rest) = outs.split_at_mut(b);
++                let acc = &mut *accs[b];
++                let len = acc.len();
++                let (mut pending, ref deps) = later[b];
++                if fused {
++                    let mut upd: Vec<(&[u32], u64, usize)> = Vec::with_capacity(deps.len());
++                    for &(j, v) in deps {
++                        let jb = position[j] - block_start;
++                        let start = bstart[j].saturating_sub(lo).min(len);
++                        upd.push((&*done[jb], fp.p - v, start));
++                    }
++                    for g in upd.chunks(4) {
++                        if pending + g.len() > NORMALIZE_AFTER {
++                            normalize_lazy(acc, fp);
++                            pending = 0;
++                        }
++                        add_lazy_group(acc, g, len, simd);
++                        pending += g.len();
++                    }
++                } else {
++                    for &(j, v) in deps {
++                        let jb = position[j] - block_start;
++                        let start = bstart[j].saturating_sub(lo).min(len);
++                        add_lazy_range(acc, &done[jb][..], start, len, fp.p - v, simd);
++                        pending += 1;
++                        if pending == NORMALIZE_AFTER {
++                            normalize_lazy(acc, fp);
++                            pending = 0;
++                        }
++                    }
++                }
++                for (o, &x) in rest[0].iter_mut().zip(acc.iter()) {
++                    *o = fp.reduce(x) as u32;
++                }
++            }
++        });
++    count_ops(
++        later
++            .iter()
++            .flat_map(|(_, deps)| deps.iter().map(|&(j, _)| n_free - bstart[j]))
++            .sum(),
++    );
++    for (b, &k) in block.iter().enumerate() {
++        bprime[k] = std::mem::take(&mut out[b]);
++    }
++}
++
++/// `F4_FP_BPRIME_FUSED=0` builds `B'` one finished reducer row per pass
++/// over the accumulator; a same-binary control for the four-row pass
++/// ([`add_lazy_updates`]).
++fn bprime_fused() -> bool {
++    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
++    *ON.get_or_init(|| std::env::var("F4_FP_BPRIME_FUSED").as_deref() != Ok("0"))
++}
++
+ /// Pair rows reduced together in [`reduce_pairs_blocked`].
+ const FL_PAIR_BLOCK: usize = 64;
+ 
+@@ -2502,6 +2649,114 @@ fn add_lazy_range(acc: &mut [u64], pivot: &[u32], from: usize, to: usize, factor
+     }
+ }
+ 
++/// `acc[start..to] += factor · row[start..to]` for every `(row, factor,
++/// start)` of `active`, four rows per pass over `acc` where
++/// their ranges overlap: the accumulator tile is loaded and stored once
++/// for four updates instead of once each.  Each lane receives the same
++/// products as one [`add_lazy_range`] per reducer, only summed in another
++/// order, and the sum is exact; uncounted, like [`add_lazy_range`].
++fn add_lazy_group(acc: &mut [u64], active: &[(&[u32], u64, usize)], to: usize, simd: u8) {
++    let mut quads = active.chunks_exact(4);
++    for q in &mut quads {
++        // the common range; each row's own prefix runs alone
++        let common = q.iter().map(|&(_, _, s)| s).max().unwrap_or(to);
++        for &(row, factor, start) in q {
++            if start < common {
++                add_lazy_range(acc, row, start, common, factor, simd);
++            }
++        }
++        let p = [&q[0].0[..to], &q[1].0[..to], &q[2].0[..to], &q[3].0[..to]];
++        let f = [q[0].1, q[1].1, q[2].1, q[3].1];
++        add_lazy4(&mut acc[..to], p, common, f, simd);
++    }
++    for &(row, factor, start) in quads.remainder() {
++        add_lazy_range(acc, row, start, to, factor, simd);
++    }
++}
++
++/// `acc += factor · row` from `start` on for every `(row, factor, start)`
++/// of `updates`, in groups of four ([`add_lazy_group`]), counted as
++/// one [`add_lazy`] each.  `pending` counts the products a lane has taken
++/// since `acc` was last reduced; a group that would take it past
++/// `normalize_after` reduces `acc` first, so no lane takes more products
++/// between reductions than the row-at-a-time loop allows.
++fn add_lazy_updates(
++    acc: &mut [u64],
++    updates: &[(&[u32], u64, usize)],
++    pending: &mut usize,
++    normalize_after: usize,
++    fp: Barrett,
++    simd: u8,
++) {
++    let n = acc.len();
++    for g in updates.chunks(4) {
++        if *pending + g.len() > normalize_after {
++            normalize_lazy(acc, fp);
++            *pending = 0;
++        }
++        add_lazy_group(acc, g, n, simd);
++        count_ops(g.iter().map(|&(_, _, start)| n - start).sum());
++        *pending += g.len();
++    }
++}
++
++/// `acc[from..] += Σ f[k] · p[k][from..]`, all slices of one length.
++#[inline]
++fn add_lazy4(acc: &mut [u64], p: [&[u32]; 4], from: usize, f: [u64; 4], simd: u8) {
++    #[cfg(target_arch = "x86_64")]
++    if simd != 0 {
++        // SAFETY: `lazy_simd_kind` verified AVX2 for every nonzero kind.
++        unsafe { add_lazy4_avx2(acc, p, from, f) };
++        return;
++    }
++    let _ = simd;
++    for (c, x) in acc.iter_mut().enumerate().skip(from) {
++        *x += f[0] * u64::from(p[0][c])
++            + f[1] * u64::from(p[1][c])
++            + f[2] * u64::from(p[2][c])
++            + f[3] * u64::from(p[3][c]);
++    }
++}
++
++/// [`add_lazy4`] four lanes at a time: one accumulator load and store per
++/// four bounded 32-bit products a lane.
++#[cfg(target_arch = "x86_64")]
++#[target_feature(enable = "avx2")]
++unsafe fn add_lazy4_avx2(acc: &mut [u64], p: [&[u32]; 4], from: usize, f: [u64; 4]) {
++    use std::arch::x86_64::{
++        __m128i, __m256i, _mm256_add_epi64, _mm256_cvtepu32_epi64, _mm256_loadu_si256,
++        _mm256_mul_epu32, _mm256_set1_epi64x, _mm256_storeu_si256, _mm_loadu_si128,
++    };
++    let n = acc.len();
++    assert!(p.iter().all(|r| r.len() == n), "equal lengths");
++    let m = [
++        _mm256_set1_epi64x(f[0] as i64),
++        _mm256_set1_epi64x(f[1] as i64),
++        _mm256_set1_epi64x(f[2] as i64),
++        _mm256_set1_epi64x(f[3] as i64),
++    ];
++    let mut i = from;
++    while i + 4 <= n {
++        // SAFETY: `i + 4 <= n` and every slice has length `n`; the loads
++        // and the store accept unaligned pointers.
++        unsafe {
++            let mut a = _mm256_loadu_si256(acc.as_ptr().add(i) as *const __m256i);
++            for k in 0..4 {
++                let v = _mm_loadu_si128(p[k].as_ptr().add(i) as *const __m128i);
++                a = _mm256_add_epi64(a, _mm256_mul_epu32(_mm256_cvtepu32_epi64(v), m[k]));
++            }
++            _mm256_storeu_si256(acc.as_mut_ptr().add(i) as *mut __m256i, a);
++        }
++        i += 4;
++    }
++    for c in i..n {
++        acc[c] += f[0] * u64::from(p[0][c])
++            + f[1] * u64::from(p[1][c])
++            + f[2] * u64::from(p[2][c])
++            + f[3] * u64::from(p[3][c]);
++    }
++}
++
+ /// Where a dense reduction stands, shown to the in-step snapshot hook at a
+ /// column boundary (`phase` 0, forward, `c` the next column) or before a
+ /// back-substitution row (`phase` 1, `i` the row about to be cleared).

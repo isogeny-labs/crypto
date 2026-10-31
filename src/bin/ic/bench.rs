@@ -16,23 +16,27 @@
 //! See `docs/ic/FRAMEWORK.md`.
 
 use clap::Args;
+use crypto_lib::cryptanalysis::ic_framework::archive::{
+    self, ArchiveInstance, BinaryArchiveBase, PrimeArchiveBase,
+};
 use serde_json::{json, Value};
 
 use crypto_lib::cryptanalysis::glv_invariant_base::{generate_cm_instance, CmFamily};
 use crypto_lib::cryptanalysis::ic_boundary::{
     calibrate_binary_instance, calibrate_group, calibrate_row_ops, calibrate_word_xor,
-    generic_floor_ops, koblitz_floor_instance, koblitz_instance, random_binary_instance,
-    rho_reference, rho_reference_negation, roster_prime_instance, signed_frobenius_rho,
-    BinaryGroup, BinaryInstance, Calibration, CountedGroup, GroupOps, PinOutcome, PrimeInstance,
-    RhoResult,
+    find_prime_order_curve, generic_floor_ops, koblitz_floor_instance, koblitz_instance,
+    random_binary_instance, rho_reference, rho_reference_negation, roster_prime_instance,
+    signed_frobenius_rho, BinaryGroup, BinaryInstance, Calibration, CountedGroup, GroupOps,
+    PinOutcome, PrimeInstance, RhoResult,
 };
+use crypto_lib::cryptanalysis::ic_framework::hashed::{HashedAffineBase, HashedTensorOracle};
 use crypto_lib::cryptanalysis::ic_framework::linalg::MATRIX_NAMES;
 use crypto_lib::cryptanalysis::ic_framework::planner::{self, CurveProfile, PlanOptions};
 use crypto_lib::cryptanalysis::ic_framework::plugins::{
-    BinarySubspaceBase, CompactOrbitScanBase, DescentAlgebraicOracle, FrobeniusMitmOracle,
-    GlvOrbitBase, KoblitzClosureBase, KoblitzOrbitBase, KoblitzSymmetrisedBase,
-    KoblitzTraceZeroBase, MitmOracle, PrimeAbscissaBase, PrimeBatchMitmOracle,
-    RootfindSubtractOracle, SubtractOracle, SymmetrisedOracle,
+    BinaryMultiplierBase, BinarySubspaceBase, CmMultiplierBase, CompactOrbitScanBase,
+    DescentAlgebraicOracle, FrobeniusMitmOracle, GlvOrbitBase, KnownLogBase, KoblitzClosureBase,
+    KoblitzOrbitBase, KoblitzSymmetrisedBase, KoblitzTraceZeroBase, MitmOracle, PrimeAbscissaBase,
+    PrimeBatchMitmOracle, RootfindSubtractOracle, SubtractOracle, SymmetrisedOracle,
 };
 use crypto_lib::cryptanalysis::ic_framework::solvers::{
     solver_by_name, solver_registry, validate_solver_params,
@@ -50,6 +54,19 @@ pub struct BenchArgs {
     /// each plug-in reads, and exit.
     #[arg(long)]
     pub list: bool,
+    /// Verified local factory cache (populate with factor-base fetch).
+    #[arg(long, requires = "archive_manifest", conflicts_with_all = ["bits", "char2_degree", "koblitz_degree", "sweep", "model_b", "koblitz_a", "auto"])]
+    pub archive_store: Option<std::path::PathBuf>,
+    /// Content-addressed manifest: supplies the exact curve and generator.
+    #[arg(long, requires = "archive_store")]
+    pub archive_manifest: Option<String>,
+    /// Archive column symmetry: none, negation, frobenius, cubic or quartic.
+    /// Every multiplier is verified; Frobenius needs a closed Koblitz archive.
+    #[arg(long, requires = "archive_manifest", value_parser = ["none", "negation", "frobenius", "cubic", "quartic"])]
+    pub archive_symmetry: Option<String>,
+    /// Verify every relation and retain useful-rank receipts (automatic for archives).
+    #[arg(long)]
+    pub audit_rank: bool,
     /// Let the planner (`ic plan`) choose every stage this command line
     /// leaves at its default: factor base and size, oracle, relation
     /// matrix and target source, from the measured evidence for this
@@ -61,6 +78,10 @@ pub struct BenchArgs {
     /// With `--auto`: memory the planned pair table may take, in GiB.
     #[arg(long, default_value_t = 8.0)]
     pub max_table_gib: f64,
+    /// With `--auto`: plan for this AGENTS.md §5a weight (GAE per unpriced
+    /// native operation); 0 plans for counted S.
+    #[arg(long, default_value_t = 0.0)]
+    pub native_weight: f64,
     /// Prime-field instance of this subgroup bit length.
     #[arg(long)]
     pub bits: Option<u32>,
@@ -140,7 +161,7 @@ pub struct BenchArgs {
     /// 0 (the classic oracle), 1 or 2.  Injected as the oracle's
     /// `large_primes` parameter into every configuration that does not
     /// set it; see `ic_framework::large_prime`.
-    #[arg(long)]
+    #[arg(long, value_parser = clap::value_parser!(u32).range(0..=2))]
     pub large_primes: Option<u32>,
     /// Size of the large-prime domain `D` as a multiple of `|F|` in signed
     /// points; injected as `lp_domain_factor` where the configuration
@@ -232,22 +253,58 @@ fn listing() -> Value {
         })
         .collect();
     json!({
+        "archive_techniques": [
+            {"technique": "column_symmetry", "options": archive::SYMMETRIES,
+             "status": "implemented", "gate": "exact curve action and every point multiplier; signed closure for Frobenius"},
+            {"technique": "one_or_two_large_primes", "options": [0, 1, 2],
+             "status": "implemented_for_closed_koblitz_archives",
+             "gate": "symmetry=frobenius; mitm-frobenius or mitm-frobenius-counted; m=3; bounded disjoint residual domain; only fully eliminated verified rows contribute rank"},
+            {"technique": "torsion_symmetrisation", "status": "native_control_base",
+             "gate": "koblitz-symmetrised with its matching symmetrised oracle and divisor; explicit factor-base replacement on the imported instance; not an archive point translation"},
+            {"technique": "subspaces_trace_zero_offsets_orbit_recipes", "status": "factory_recipes",
+             "gate": "recipe field checks; algebraic oracles additionally need a supported exact domain encoding"},
+            {"technique": "mitm_batching_walk_targets_and_polynomial_solvers", "status": "stage_plugins",
+             "gate": "see the registered stages and each plugin's parameters"},
+            {"technique": "gls_subfield_maps_isogenies_covers_and_new_models", "status": "extension_required",
+             "gate": "exact field/model codec, certified subgroup map and counted native backend; no transfer inferred from a curve label"}
+        ],
         "stages": [
             {
                 "stage": "factor base",
                 "trait": "FactorBaseBuilder",
                 "what_it_chooses": "which points relations are written over, and which unknown each point contributes to",
                 "plugins": [
+                    {"name": "archive", "regimes": ["prime", "char2", "koblitz"],
+                     "parameters": [{"name": "store", "means": "local verified factory cache"}, {"name": "manifest", "means": "immutable SHA-256 manifest"},
+                                    {"name": "symmetry", "means": "none, negation (default), frobenius (certified closed Koblitz archive), cubic (j=0), quartic (j=1728); every point coefficient is replayed"}]},
                     {"name": "prime-abscissa", "regimes": ["prime"],
                      "parameters": [{"name": "size", "means": "abscissae in the base; the family optimum is about #E^(1/3)"}]},
+                    {"name": "known-log", "regimes": ["prime"],
+                     "parameters": [{"name": "size", "means": "multiples [i]G, 1 <= i <= size, one column each, every logarithm known so linear algebra is skipped"}]},
                     {"name": "glv-orbit", "regimes": ["prime"],
                      "parameters": [
                         {"name": "size", "means": "seed abscissae; the base is their closure under the curve's automorphism group"},
                         {"name": "group", "means": "auto, negation, j0 or j1728 (use --family j0 or j1728 for a curve that has one)"},
                         {"name": "no_fold", "means": "1 to fold the same points by negation only: the control that shows what the fold buys"}]},
+                    {"name": "cm-multiplier", "regimes": ["prime"],
+                     "parameters": [
+                        {"name": "size", "means": "seed abscissae (columns)"},
+                        {"name": "norm", "means": "include alpha(P) = [a]P + [b]phi(P) for every alpha = a + b*phi of norm <= this (needs --family j0, j1728, d7 or d8); 0 for the seeds alone"},
+                        {"name": "endo", "means": "index of the curve's CM endomorphism; default 0"}]},
+                    {"name": "hashed-affine", "regimes": ["prime"],
+                     "parameters": [
+                        {"name": "slots", "means": "independent affine-hashed slot bases, 2..=8; must match the oracle"},
+                        {"name": "seed", "means": "SplitMix64 seed for the affine hash seeds; default 1"},
+                        {"name": "tau", "means": "shared threshold; default the Lemma 13 integer ceiling"},
+                        {"name": "s", "means": "shared hash prime in [2p,4p]; default the first prime there"},
+                        {"name": "steps", "means": "enumeration work budget in charged primitive steps"}]},
                     {"name": "gls-line", "regimes": ["gls (examples/glv_invariant_bench.rs)"],
                      "parameters": [
                         {"name": "no_fold", "means": "1 to fold the same points by negation only"}]},
+                    {"name": "binary-multiplier", "regimes": ["char2", "koblitz"],
+                     "parameters": [
+                        {"name": "size", "means": "seed abscissae (columns)"},
+                        {"name": "mult", "means": "include [m]P for m = 2..=mult with weight m; 1 for the seeds alone"}]},
                     {"name": "binary-subspace", "regimes": ["char2", "koblitz"],
                      "parameters": [{"name": "dimension", "means": "F_2-dimension of the abscissa subspace"}]},
                     {"name": "koblitz-orbit", "regimes": ["koblitz"],
@@ -289,6 +346,14 @@ fn listing() -> Value {
                     {"name": "mitm", "summands": "2 or 3", "regimes": ["prime", "char2", "koblitz"],
                      "parameters": [{"name": "negation_folded", "means": "1 to halve the table's additions"},
                                     {"name": "m", "means": "summands, 2 or 3"}]},
+                    {"name": "hashed-tensor", "summands": "2..8", "regimes": ["prime"],
+                     "parameters": [
+                        {"name": "slots", "means": "independent affine-hashed slot bases, 2..=8; must match hashed-affine"},
+                        {"name": "seed", "means": "SplitMix64 seed for the affine hash seeds; default 1"},
+                        {"name": "tau", "means": "shared threshold; must match hashed-affine"},
+                        {"name": "s", "means": "shared hash prime; must match hashed-affine"},
+                        {"name": "steps", "means": "per-target contraction budget in charged primitive steps"}],
+                     "needs": "the hashed-affine factor base with identical slots, seed, tau and s; contraction steps are reported uncalibrated, so do not read its S as a priced end-to-end cost"},
                     {"name": "mitm-frobenius", "summands": "2 or 3", "regimes": ["koblitz"],
                      "parameters": [{"name": "m", "means": "summands, 2 or 3"},
                                     {"name": "large_primes", "means": "0, 1 or 2 residuals outside the base a partial relation may carry (m=3 only); --large-primes sets it for every configuration"},
@@ -545,12 +610,20 @@ fn run_prime(
     let or_name = spec.oracle.as_str();
     let abscissa = PrimeAbscissaBase { instance: inst };
     let orbit = GlvOrbitBase { instance: inst };
+    let archive = PrimeArchiveBase { instance: inst };
+    let known_log = KnownLogBase;
+    let multiplier = CmMultiplierBase { instance: inst };
+    let hashed = HashedAffineBase { instance: inst };
     let base: &dyn FactorBaseBuilder<_> = match fb_name {
+        "archive" => &archive,
         "prime-abscissa" => &abscissa,
         "glv-orbit" => &orbit,
+        "known-log" => &known_log,
+        "cm-multiplier" => &multiplier,
+        "hashed-affine" => &hashed,
         other => {
             return Err(format!(
-                "factor base `{other}` is not available on a prime-field curve; try prime-abscissa or glv-orbit"
+                "factor base `{other}` is not available on a prime-field curve; try prime-abscissa, glv-orbit, known-log, cm-multiplier or hashed-affine"
             ))
         }
     };
@@ -578,16 +651,18 @@ fn run_prime(
         let mut batch = PrimeBatchMitmOracle::new();
         let mut blocked = PrimeBatchMitmOracle::blocked();
         let mut rootfind = RootfindSubtractOracle::new(m, inst);
+        let mut hashed = HashedTensorOracle::new();
         let oracle: &mut dyn DecompositionOracle<_> = match or_name {
             "subtract" => &mut subtract,
             "mitm" => &mut mitm,
             "mitm-prime-batch" => &mut batch,
             "mitm-prime-blocked" => &mut blocked,
             "rootfind-subtract" => &mut rootfind,
+            "hashed-tensor" => &mut hashed,
             other => {
                 return Err(format!(
                     "oracle `{other}` is not available on a prime-field curve; try subtract, mitm, \
-                     mitm-prime-batch, mitm-prime-blocked or rootfind-subtract"
+                     mitm-prime-batch, mitm-prime-blocked, rootfind-subtract or hashed-tensor"
                 ))
             }
         };
@@ -610,13 +685,25 @@ fn run_binary(
     let fb_name = spec.factor_base.as_str();
     let or_name = spec.oracle.as_str();
     let g = BinaryGroup(&inst.fast);
+    if fb_name == "archive" && matches!(or_name, "mitm-frobenius" | "mitm-frobenius-counted") {
+        if inst.koblitz.is_none() {
+            return Err("archive Frobenius oracle requires a certified Koblitz instance".into());
+        }
+        if spec.factor_base_params.get("symmetry") != Some("frobenius") {
+            return Err("archive Frobenius oracle requires --archive-symmetry frobenius (including closure verification)".into());
+        }
+    }
+    let archive = BinaryArchiveBase { instance: inst };
     let subspace = BinarySubspaceBase { instance: inst };
     let orbit = KoblitzOrbitBase { instance: inst };
     let trace_zero = KoblitzTraceZeroBase { instance: inst };
     let symmetrised_base = KoblitzSymmetrisedBase { instance: inst };
     let compact_orbit = CompactOrbitScanBase { instance: inst };
     let closure = KoblitzClosureBase { instance: inst };
+    let multiplier = BinaryMultiplierBase { instance: inst };
     let base: &dyn FactorBaseBuilder<BinaryGroup> = match fb_name {
+        "archive" => &archive,
+        "binary-multiplier" => &multiplier,
         "koblitz-closure" => &closure,
         "binary-subspace" => &subspace,
         "koblitz-orbit" => &orbit,
@@ -783,6 +870,7 @@ fn spec_from(
         .get("factor_base")
         .cloned()
         .or_else(|| defaults.factor_base.clone())
+        .or_else(|| defaults.archive_manifest.as_ref().map(|_| "archive".into()))
         .ok_or("a configuration needs a `factor_base`")?;
     let or = cfg
         .get("oracle")
@@ -793,11 +881,35 @@ fn spec_from(
         .get("targets")
         .cloned()
         .unwrap_or_else(|| defaults.targets.clone());
-    let (fb_name, fb_params) = parse_plugin(&fb)?;
+    let (fb_name, mut fb_params) = parse_plugin(&fb)?;
     let (or_name, mut or_params) = parse_plugin(&or)?;
+    if fb_name == "archive" {
+        if let (Some(root), Some(id)) = (&defaults.archive_store, &defaults.archive_manifest) {
+            fb_params.set("store", root.to_string_lossy().into_owned());
+            fb_params.set("manifest", id.clone());
+        }
+    }
+    if let Some(selected) = &defaults.archive_symmetry {
+        if fb_name != "archive" {
+            return Err("--archive-symmetry requires the archive factor base".into());
+        }
+        if fb_params
+            .get("symmetry")
+            .is_some_and(|value| value != selected)
+        {
+            return Err("conflicting archive symmetry selections".into());
+        }
+        fb_params.set("symmetry", selected.clone());
+    }
+    if defaults.audit_rank {
+        or_params.set("audit_rank", "true");
+    }
     // The large-prime flags are defaults for the Frobenius table oracle;
     // a configuration that names them itself wins.
-    if or_name == "mitm-frobenius" {
+    if matches!(
+        or_name.as_str(),
+        "mitm-frobenius" | "mitm-frobenius-counted"
+    ) {
         if let Some(lp) = defaults.large_primes {
             if or_params.get("large_primes").is_none() {
                 or_params.set("large_primes", lp.to_string());
@@ -808,6 +920,12 @@ fn spec_from(
                 or_params.set("lp_domain_factor", c.to_string());
             }
         }
+    } else if defaults.large_primes.is_some()
+        || defaults.lp_domain_factor.is_some()
+        || or_params.get("large_primes").is_some()
+        || or_params.get("lp_domain_factor").is_some()
+    {
+        return Err("large-prime options require mitm-frobenius or mitm-frobenius-counted; no generic prime/binary residual collector is registered".into());
     }
     Ok(PipelineSpec {
         factor_base: fb_name,
@@ -833,8 +951,21 @@ fn spec_from(
 /// The instance `--bits`, `--char2-degree` or `--koblitz-degree` names.
 fn build_instance(regime: &str, degree: u32, args: &BenchArgs) -> Result<Instance, String> {
     Ok(match regime {
+        "archive" => {
+            let root = args.archive_store.as_deref().ok_or("archive store required")?;
+            let id = args.archive_manifest.as_deref().ok_or("archive manifest required")?;
+            match archive::instance(root, id)? {
+                ArchiveInstance::Prime(i) => Instance::Prime(i),
+                ArchiveInstance::Binary(i) => Instance::Binary(*i),
+            }
+        }
         "prime" => Instance::Prime(match CmFamily::parse(&args.family)? {
             CmFamily::Generic => roster_prime_instance(degree)
+                .or_else(|| {
+                    (8..=32)
+                        .contains(&degree)
+                        .then(|| find_prime_order_curve(degree, args.seed))
+                })
                 .ok_or_else(|| format!("no prime instance at {degree} bits"))?,
             family => generate_cm_instance(family, degree, args.seed, args.max_cofactor)?,
         }),
@@ -868,6 +999,9 @@ fn build_instance(regime: &str, degree: u32, args: &BenchArgs) -> Result<Instanc
 }
 
 pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
+    if args.auto && args.archive_manifest.is_some() {
+        return Err("--auto cannot be combined with an archive source".into());
+    }
     if args.list {
         let l = listing();
         if !json_only {
@@ -924,14 +1058,15 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
             )
         }
         None => {
-            let (regime, degree) = match (args.bits, args.char2_degree, args.koblitz_degree) {
-                (Some(b), None, None) => ("prime".to_string(), b),
-                (None, Some(n), None) => ("char2".to_string(), n),
-                (None, None, Some(n)) => ("koblitz".to_string(), n),
-                _ => return Err(
-                    "choose exactly one of --bits, --char2-degree, --koblitz-degree, or --sweep"
-                        .into(),
-                ),
+            let (regime, degree) = if args.archive_manifest.is_some() {
+                ("archive".to_string(), 0)
+            } else {
+                match (args.bits, args.char2_degree, args.koblitz_degree) {
+                    (Some(b), None, None) => ("prime".to_string(), b),
+                    (None, Some(n), None) => ("char2".to_string(), n),
+                    (None, None, Some(n)) => ("koblitz".to_string(), n),
+                    _ => return Err("choose exactly one curve source (see ic bench --help)".into()),
+                }
             };
             let mut one = std::collections::BTreeMap::new();
             if let Some(v) = &args.factor_base {
@@ -948,6 +1083,12 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
     // `--auto`: the instance first, then the planner's stages for it.
     let mut early_instance = None;
     let mut plan_report = Value::Null;
+    if !(args.native_weight.is_finite() && args.native_weight >= 0.0) {
+        return Err(
+            "--native-weight must be a finite number of GAE per native operation, at least 0"
+                .into(),
+        );
+    }
     let (configs, args) = if args.auto {
         if args.sweep.is_some() {
             return Err(
@@ -965,6 +1106,7 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
             &profile,
             &PlanOptions {
                 max_table_bytes: args.max_table_gib * (1u64 << 30) as f64,
+                native_weight: args.native_weight,
                 ..PlanOptions::default()
             },
         );
@@ -1029,12 +1171,20 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         .map(|cfg| spec_from(cfg, &args))
         .collect::<Result<Vec<_>, _>>()?;
 
-    let (regime, degree) = instance_spec;
+    let (mut regime, degree) = instance_spec;
     let instance = match early_instance {
         Some(i) => i,
         None => build_instance(&regime, degree, &args)?,
     };
 
+    if regime == "archive" {
+        regime = match &instance {
+            Instance::Prime(_) => "prime",
+            Instance::Binary(i) if i.koblitz.is_some() => "koblitz",
+            Instance::Binary(_) => "char2",
+        }
+        .into();
+    }
     let (calib, pins) = match &instance {
         Instance::Prime(i) => {
             calibration_for(&i.curve, &sample_prime_points(i), "prime", &i.name, i.r)
@@ -1110,7 +1260,7 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
             .map_err(|e| format!("cannot create {}: {e}", path.display()))?;
         serde_json::to_writer_pretty(file, &doc).map_err(|e| e.to_string())?;
     }
-    let all_verified = !rows.is_empty() && rows.iter().all(|r| r.verified);
+    let all_verified = failures.is_empty() && !rows.is_empty() && rows.iter().all(|r| r.verified);
     let markdown = format_markdown(&rows);
     if !json_only {
         eprintln!("\n{markdown}");
@@ -1122,9 +1272,10 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         "schema_version": 1,
         "operation": "bench",
         "status": if all_verified { "complete" } else { "incomplete" },
-        "what_this_is": "Index-calculus configurations -- each a choice of factor base, target source, decomposition oracle, polynomial solver and relation matrix -- run end to end against a planted logarithm, with every stage's cost in group-addition equivalents and the total divided by sqrt(r).",
+        "cost_qualification": rows.iter().find_map(|r| r.cost_qualification.as_ref()),
+        "what_this_is": "Index-calculus configurations -- each a choice of factor base, target source, decomposition oracle, polynomial solver and relation matrix -- run end to end against a planted logarithm, with counted phase costs in group-addition equivalents divided by sqrt(r); consult cost_qualification for unpriced work.",
         "what_this_is_not": [
-            "not a speed claim: a configuration on a toy instance is a measurement, and a comparison needs the matched reference rows AGENTS.md section 1 asks for",
+            "not a speed claim: a configuration on a known-answer instance is a measurement, and a comparison needs the matched reference rows AGENTS.md section 1 asks for",
             "not a wall-clock benchmark: operation counts are the metric, wall time rides along",
             "not a claim about any deployed curve"
         ],
@@ -1163,6 +1314,97 @@ mod tests {
 
     fn bench_args(flags: &[&str]) -> BenchArgs {
         Cli::parse_from(std::iter::once("ic-bench").chain(flags.iter().copied())).bench
+    }
+
+    #[test]
+    fn archive_flags_bind_instance_and_base_without_parsing_the_path_as_a_plugin() {
+        let args = bench_args(&[
+            "--archive-store",
+            "/tmp/cache,with spaces",
+            "--archive-manifest",
+            "abc",
+            "--oracle",
+            "subtract",
+        ]);
+        let spec = spec_from(&Default::default(), &args).unwrap();
+        assert_eq!(spec.factor_base, "archive");
+        assert_eq!(
+            spec.factor_base_params.get("store"),
+            Some("/tmp/cache,with spaces")
+        );
+        assert_eq!(spec.factor_base_params.get("manifest"), Some("abc"));
+    }
+
+    #[test]
+    fn archive_flags_require_a_pair_and_reject_generated_instance_flags() {
+        assert!(Cli::try_parse_from(["ic-bench", "--archive-manifest", "abc"]).is_err());
+        assert!(Cli::try_parse_from([
+            "ic-bench",
+            "--archive-store",
+            "/tmp/cache",
+            "--archive-manifest",
+            "abc",
+            "--bits",
+            "16"
+        ])
+        .is_err());
+    }
+
+    #[test]
+    fn auto_cannot_replace_an_explicit_archive() {
+        let flags = [
+            "--archive-store",
+            "/nonexistent-cache",
+            "--archive-manifest",
+            "abc",
+        ];
+        assert!(
+            Cli::try_parse_from(std::iter::once("ic-bench").chain(flags).chain(["--auto"]))
+                .is_err()
+        );
+        // Check callers that construct BenchArgs without clap as well, before
+        // any archive lookup or calibration can occur.
+        let mut args = bench_args(&flags);
+        args.auto = true;
+        assert!(run(args, true).unwrap_err().contains("archive source"));
+    }
+
+    #[test]
+    fn symmetry_and_large_prime_options_are_explicit_and_never_ignored() {
+        let mut args = bench_args(&[
+            "--archive-store",
+            "/tmp/cache",
+            "--archive-manifest",
+            "abc",
+            "--archive-symmetry",
+            "frobenius",
+            "--oracle",
+            "mitm-frobenius-counted:m=3",
+            "--large-primes",
+            "2",
+            "--lp-domain-factor",
+            "3",
+        ]);
+        let spec = spec_from(&Default::default(), &args).unwrap();
+        assert_eq!(spec.factor_base_params.get("symmetry"), Some("frobenius"));
+        assert_eq!(spec.oracle_params.get("large_primes"), Some("2"));
+        assert_eq!(spec.oracle_params.get("lp_domain_factor"), Some("3"));
+        args.oracle = Some("subtract".into());
+        assert!(spec_from(&Default::default(), &args)
+            .unwrap_err()
+            .contains("large-prime options"));
+        args.large_primes = None;
+        args.lp_domain_factor = None;
+        args.factor_base = Some("binary-subspace:dim=3".into());
+        assert!(spec_from(&Default::default(), &args)
+            .unwrap_err()
+            .contains("archive factor base"));
+        args.factor_base = Some("archive:symmetry=negation".into());
+        assert!(spec_from(&Default::default(), &args)
+            .unwrap_err()
+            .contains("conflicting archive symmetry"));
+        assert!(Cli::try_parse_from(["ic-bench", "--large-primes", "3"]).is_err());
+        assert!(Cli::try_parse_from(["ic-bench", "--archive-symmetry", "frobenius"]).is_err());
     }
 
     /// `--model-b` without `--koblitz-a` is refused when the instance is

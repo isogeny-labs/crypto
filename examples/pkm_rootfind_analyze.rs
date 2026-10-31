@@ -74,8 +74,12 @@ fn read(dir: &str) -> Result<(String, Vec<Run>), String> {
         let mut unpriced = BTreeMap::new();
         for u in r["cost"]["unpriced"].as_array().cloned().unwrap_or_default() {
             let name = u.as_str().unwrap_or("").trim_end_matches("_uncharged").to_string();
+            // The solver's count, a phase's native counter, or (rho) the
+            // record's own `counters` entry under the unpriced name.
             let count = if name.starts_with("solver_") {
                 solver_ops
+            } else if let Some(c) = r["counters"][u.as_str().unwrap_or("")].as_u64() {
+                c
             } else {
                 phases.iter().map(|p| p["native"][&name].as_u64().unwrap_or(0)).sum()
             };

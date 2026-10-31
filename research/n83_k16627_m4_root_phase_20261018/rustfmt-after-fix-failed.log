@@ -1,0 +1,40 @@
+Diff in /private/tmp/crypto-n83-k16627-planted/research/koblitz_n83_factor_base_sweep_20261008/primary_adapter.rs:1129:
+         "selected_best_total_runtime":Value::Null,
+     });
+     if checkpoint_root {
+-        receipt["source_sat_blake3"] = json!(
+-            blake3::hash(include_bytes!("../../src/cryptanalysis/sat.rs"))
+-                .to_hex()
+-                .to_string()
+-        );
+-        receipt["root_propagation_result"] =
+-            json!(root_result.map(|result| format!("{result:?}")));
++        receipt["source_sat_blake3"] = json!(blake3::hash(include_bytes!(
++            "../../src/cryptanalysis/sat.rs"
++        ))
++        .to_hex()
++        .to_string());
++        receipt["root_propagation_result"] = json!(root_result.map(|result| format!("{result:?}")));
+     }
+     write_new_json(output, &receipt)?;
+     Ok(receipt)
+Diff in /private/tmp/crypto-n83-k16627-planted/examples/../research/koblitz_n83_factor_base_sweep_20261008/primary_adapter.rs:1129:
+         "selected_best_total_runtime":Value::Null,
+     });
+     if checkpoint_root {
+-        receipt["source_sat_blake3"] = json!(
+-            blake3::hash(include_bytes!("../../src/cryptanalysis/sat.rs"))
+-                .to_hex()
+-                .to_string()
+-        );
+-        receipt["root_propagation_result"] =
+-            json!(root_result.map(|result| format!("{result:?}")));
++        receipt["source_sat_blake3"] = json!(blake3::hash(include_bytes!(
++            "../../src/cryptanalysis/sat.rs"
++        ))
++        .to_hex()
++        .to_string());
++        receipt["root_propagation_result"] = json!(root_result.map(|result| format!("{result:?}")));
+     }
+     write_new_json(output, &receipt)?;
+     Ok(receipt)

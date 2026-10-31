@@ -7,9 +7,10 @@
 
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
+use serde::{Deserialize, Serialize};
 
 /// An element in Montgomery form (`x·R mod p`, `R = 2^256`).
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Fe(pub [u64; 4]);
 
 /// The field `GF(p)`.

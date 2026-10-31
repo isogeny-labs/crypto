@@ -1,0 +1,111 @@
+Boundary ledger: "complete"; 5 instances, all verified: true; 66.5 s
+Unit: S = group-addition equivalents / sqrt(r); native counts exact, conversions measured per instance
+
+| regime | instance | log₂ r | variant | m | \|F\| | K | table | targets | trials | yield/ceiling | y/c exact | S | S rho | rho walk | vs rho | vs floor | FB | rel | LA | ok |
+|:--|:--|--:|:--|--:|--:|--:|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|:--|
+| char2 | icv1-f2m15-t131-ed7256f0 | 14.0 | mitm_m3 | 3 | 30 | 15 | full | random | 116 | 0.89 | 0.90 | 74.2 | 2.02 | 1.31 | 36.7× | 83.8× | 15.5 | 58.5 | 0.04 | ✓ |
+| char2 | icv1-f2m15-t131-ed7256f0 | 14.0 | mitm_m3_negfold | 3 | 30 | 15 | negation_folded | random | 116 | 0.89 | 0.90 | 72.5 | 2.02 | 1.31 | 35.8× | 81.8× | 13.8 | 58.5 | 0.04 | ✓ |
+| char2 | icv1-f2m15-t131-ed7256f0 | 14.0 | mitm_m3_negfold_walk | 3 | 30 | 15 | negation_folded | walk | 116 | 0.84 | 0.84 | 45.1 | 2.02 | 1.31 | 22.3× | 50.9× | 13.8 | 31.1 | 0.03 | ✓ |
+| char2 | icv1-f2m15-t131-ed7256f0 | 14.0 | mitm_m2_negfold | 2 | 30 | 15 | negation_folded | random | 736 | 0.98 | 0.94 | 227.2 | 2.02 | 1.31 | 112.2× | 256.3× | 13.8 | 213.2 | 0.01 | ✓ |
+| char2 | icv1-f2m15-t131-ed7256f0 | 14.0 | mitm_m2_negfold_walk | 2 | 30 | 15 | negation_folded | walk | 692 | 1.09 | 1.06 | 27.8 | 2.02 | 1.31 | 13.7× | 31.3× | 13.8 | 13.8 | 0.01 | ✓ |
+| char2 | icv1-f2m15-t131-ed7256f0 | 14.0 | mitm_m2_negfold_walk_balanced | 2 | 14 | 7 | negation_folded | walk | 1764 | 1.35 | 1.24 | 24.0 | 2.02 | 1.31 | 11.9× | 27.1× | 0.44 | 23.4 | 0.01 | ✓ |
+| char2 | icv1-f2m15-t131-ed7256f0 | 14.0 | mitm_m2_negfold_walk_projected | 2 | 30 | 15 | negation_folded | walk | 421 | 2.16 | 1.08 | 12.4 | 2.02 | 1.31 | 6.10× | 13.9× | 2.01 | 10.2 | 0.01 | ✓ |
+| char2 | icv1-f2m15-t131-ed7256f0 | 14.0 | mitm_m2_negfold_walk_subgroup | 2 | 30 | 15 | negation_folded | walk | 424 | 1.98 | 0.99 | 12.2 | 2.02 | 1.31 | 6.01× | 13.7× | 1.91 | 10.1 | 0.01 | ✓ |
+| char2 | icv1-f2m15-t131-ed7256f0 | 14.0 | mitm_m2_negfold_walk_projected_balanced | 2 | 14 | 7 | negation_folded | walk | 1083 | 2.69 | 1.35 | 18.2 | 2.02 | 1.31 | 8.99× | 20.5× | 0.50 | 17.6 | 0.01 | ✓ |
+| char2 | icv1-f2m15-t131-ed7256f0 | 14.0 | mitm_m2_negfold_walk_subgroup_balanced | 2 | 14 | 7 | negation_folded | walk | 1058 | 2.39 | 1.20 | 18.0 | 2.02 | 1.31 | 8.88× | 20.3× | 0.45 | 17.4 | 0.01 | ✓ |
+| char2 | icv1-f2m18-t393-d2c04152 | 15.0 | mitm_m3 | 3 | 64 | 32 | full | random | 99 | 1.60 | 0.83 | 80.5 | 1.91 | 1.35 | 42.2× | 90.8× | 30.2 | 50.1 | 0.05 | ✓ |
+| char2 | icv1-f2m18-t393-d2c04152 | 15.0 | mitm_m3_negfold | 3 | 64 | 32 | negation_folded | random | 99 | 1.60 | 0.83 | 74.8 | 1.91 | 1.35 | 39.2× | 84.4× | 24.6 | 50.1 | 0.05 | ✓ |
+| char2 | icv1-f2m18-t393-d2c04152 | 15.0 | mitm_m3_negfold_walk | 3 | 64 | 32 | negation_folded | walk | 112 | 1.58 | 0.82 | 61.0 | 1.91 | 1.35 | 32.0× | 68.9× | 24.6 | 36.3 | 0.07 | ✓ |
+| char2 | icv1-f2m18-t393-d2c04152 | 15.0 | mitm_m2_negfold | 2 | 64 | 32 | negation_folded | random | 970 | 2.05 | 0.93 | 239.4 | 1.91 | 1.35 | 125.4× | 270.1× | 24.6 | 214.7 | 0.01 | ✓ |
+| char2 | icv1-f2m18-t393-d2c04152 | 15.0 | mitm_m2_negfold_walk | 2 | 64 | 32 | negation_folded | walk | 942 | 2.29 | 1.04 | 35.9 | 1.91 | 1.35 | 18.8× | 40.5× | 24.6 | 11.2 | 0.01 | ✓ |
+| char2 | icv1-f2m18-t393-d2c04152 | 15.0 | mitm_m2_negfold_walk_balanced | 2 | 30 | 15 | negation_folded | walk | 2128 | 2.51 | 1.04 | 20.2 | 1.91 | 1.35 | 10.6× | 22.8× | 1.33 | 18.8 | 0.00 | ✓ |
+| char2 | icv1-f2m18-t393-d2c04152 | 15.0 | mitm_m2_negfold_walk_projected | 2 | 64 | 32 | negation_folded | walk | 341 | 7.84 | 0.98 | 12.7 | 1.91 | 1.35 | 6.68× | 14.4× | 6.38 | 6.24 | 0.02 | ✓ |
+| char2 | icv1-f2m18-t393-d2c04152 | 15.0 | mitm_m2_negfold_walk_subgroup | 2 | 64 | 32 | negation_folded | walk | 334 | 7.59 | 0.95 | 35.5 | 1.91 | 1.35 | 18.6× | 40.1× | 29.2 | 6.20 | 0.01 | ✓ |
+| char2 | icv1-f2m18-t393-d2c04152 | 15.0 | mitm_m2_negfold_walk_projected_balanced | 2 | 30 | 15 | negation_folded | walk | 824 | 8.82 | 1.10 | 12.3 | 1.91 | 1.35 | 6.42× | 13.8× | 1.58 | 10.6 | 0.01 | ✓ |
+| char2 | icv1-f2m18-t393-d2c04152 | 15.0 | mitm_m2_negfold_walk_subgroup_balanced | 2 | 30 | 15 | negation_folded | walk | 866 | 7.72 | 0.96 | 25.8 | 1.91 | 1.35 | 13.5× | 29.1× | 14.7 | 10.9 | 0.01 | ✓ |
+| char2 | icv1-f2m21-t2591-de54d72e | 20.0 | mitm_m3 | 3 | 122 | 61 | full | random | 434 | 0.91 | 0.91 | 85.7 | 1.24 | 1.05 | 68.9× | 96.7× | 15.2 | 70.4 | 0.04 | ✓ |
+| char2 | icv1-f2m21-t2591-de54d72e | 20.0 | mitm_m3_negfold | 3 | 122 | 61 | negation_folded | random | 434 | 0.91 | 0.91 | 82.0 | 1.24 | 1.05 | 66.0× | 92.6× | 11.6 | 70.4 | 0.04 | ✓ |
+| char2 | icv1-f2m21-t2591-de54d72e | 20.0 | mitm_m3_negfold_walk | 3 | 122 | 61 | negation_folded | walk | 426 | 0.91 | 0.91 | 59.0 | 1.24 | 1.05 | 47.5× | 66.6× | 11.6 | 47.4 | 0.04 | ✓ |
+| char2 | icv1-f2m21-t2591-de54d72e | 20.0 | mitm_m2_negfold | 2 | 122 | 61 | negation_folded | random | 8922 | 1.00 | 0.99 | 491.3 | 1.24 | 1.05 | 395.4× | 554.4× | 11.6 | 479.7 | 0.00 | ✓ |
+| char2 | icv1-f2m21-t2591-de54d72e | 20.0 | mitm_m2_negfold_walk | 2 | 122 | 61 | negation_folded | walk | 10046 | 1.02 | 1.01 | 23.3 | 1.24 | 1.05 | 18.8× | 26.3× | 11.6 | 11.7 | 0.00 | ✓ |
+| char2 | icv1-f2m21-t2591-de54d72e | 20.0 | mitm_m2_negfold_walk_balanced | 2 | 62 | 31 | negation_folded | walk | 20187 | 1.04 | 1.02 | 22.8 | 1.24 | 1.05 | 18.4× | 25.8× | 0.97 | 21.8 | 0.00 | ✓ |
+| char2 | icv1-f2m21-t2591-de54d72e | 20.0 | mitm_m2_negfold_walk_projected | 2 | 122 | 61 | negation_folded | walk | 4887 | 2.03 | 1.01 | 10.1 | 1.24 | 1.05 | 8.14× | 11.4× | 3.76 | 6.32 | 0.00 | ✓ |
+| char2 | icv1-f2m21-t2591-de54d72e | 20.0 | mitm_m2_negfold_walk_subgroup | 2 | 122 | 61 | negation_folded | walk | 5552 | 1.93 | 0.96 | 10.8 | 1.24 | 1.05 | 8.72× | 12.2× | 3.71 | 7.09 | 0.00 | ✓ |
+| char2 | icv1-f2m21-t2591-de54d72e | 20.0 | mitm_m2_negfold_walk_projected_balanced | 2 | 62 | 31 | negation_folded | walk | 11565 | 2.01 | 1.00 | 14.3 | 1.24 | 1.05 | 11.5× | 16.1× | 1.00 | 13.3 | 0.00 | ✓ |
+| char2 | icv1-f2m21-t2591-de54d72e | 20.0 | mitm_m2_negfold_walk_subgroup_balanced | 2 | 62 | 31 | negation_folded | walk | 11572 | 2.00 | 1.00 | 14.3 | 1.24 | 1.05 | 11.5× | 16.1× | 0.98 | 13.3 | 0.00 | ✓ |
+| char2 | icv1-f2m24-tm3047-2d0c0e8c | 21.0 | mitm_m3 | 3 | 274 | 137 | full | random | 376 | 1.65 | 0.82 | 104.9 | 1.28 | 1.13 | 82.0× | 118.4× | 36.7 | 68.1 | 0.15 | ✓ |
+| char2 | icv1-f2m24-tm3047-2d0c0e8c | 21.0 | mitm_m3_negfold | 3 | 274 | 137 | negation_folded | random | 376 | 1.65 | 0.82 | 92.0 | 1.28 | 1.13 | 71.9× | 103.8× | 23.7 | 68.1 | 0.15 | ✓ |
+| char2 | icv1-f2m24-tm3047-2d0c0e8c | 21.0 | mitm_m3_negfold_walk | 3 | 274 | 137 | negation_folded | walk | 374 | 1.67 | 0.83 | 77.4 | 1.28 | 1.13 | 60.5× | 87.3× | 23.7 | 53.5 | 0.15 | ✓ |
+| char2 | icv1-f2m24-tm3047-2d0c0e8c | 21.0 | mitm_m2_negfold | 2 | 274 | 137 | negation_folded | random | 13055 | 1.99 | 0.98 | 546.7 | 1.28 | 1.13 | 427.4× | 616.9× | 23.7 | 523.0 | 0.00 | ✓ |
+| char2 | icv1-f2m24-tm3047-2d0c0e8c | 21.0 | mitm_m2_negfold_walk | 2 | 274 | 137 | negation_folded | walk | 13724 | 2.05 | 1.01 | 34.7 | 1.28 | 1.13 | 27.1× | 39.1× | 23.7 | 10.9 | 0.00 | ✓ |
+| char2 | icv1-f2m24-tm3047-2d0c0e8c | 21.0 | mitm_m2_negfold_walk_balanced | 2 | 134 | 67 | negation_folded | walk | 26084 | 2.20 | 1.01 | 22.7 | 1.28 | 1.13 | 17.8× | 25.7× | 3.15 | 19.6 | 0.00 | ✓ |
+| char2 | icv1-f2m24-tm3047-2d0c0e8c | 21.0 | mitm_m2_negfold_walk_projected | 2 | 274 | 137 | negation_folded | walk | 4020 | 7.72 | 0.97 | 17.1 | 1.28 | 1.13 | 13.4× | 19.3× | 13.3 | 3.71 | 0.01 | ✓ |
+| char2 | icv1-f2m24-tm3047-2d0c0e8c | 21.0 | mitm_m2_negfold_walk_subgroup | 2 | 274 | 137 | negation_folded | walk | 3965 | 7.88 | 0.99 | 27.8 | 1.28 | 1.13 | 21.7× | 31.4× | 24.1 | 3.68 | 0.01 | ✓ |
+| char2 | icv1-f2m24-tm3047-2d0c0e8c | 21.0 | mitm_m2_negfold_walk_projected_balanced | 2 | 134 | 67 | negation_folded | walk | 9092 | 8.63 | 1.08 | 10.9 | 1.28 | 1.13 | 8.55× | 12.3× | 3.29 | 7.63 | 0.00 | ✓ |
+| char2 | icv1-f2m24-tm3047-2d0c0e8c | 21.0 | mitm_m2_negfold_walk_subgroup_balanced | 2 | 134 | 67 | negation_folded | walk | 9168 | 7.89 | 0.99 | 16.5 | 1.28 | 1.13 | 12.9× | 18.6× | 8.81 | 7.66 | 0.00 | ✓ |
+| char2 | icv1-f2m27-t12543-569dca8b | 24.4 | mitm_m3 | 3 | 526 | 263 | full | random | 1512 | 0.88 | 0.88 | 208.2 | 1.02 | 0.93 | 203.6× | 235.0× | 37.3 | 170.6 | 0.22 | ✓ |
+| char2 | icv1-f2m27-t12543-569dca8b | 24.4 | mitm_m3_negfold | 3 | 526 | 263 | negation_folded | random | 1512 | 0.88 | 0.88 | 193.6 | 1.02 | 0.93 | 189.3× | 218.5× | 22.7 | 170.6 | 0.22 | ✓ |
+| char2 | icv1-f2m27-t12543-569dca8b | 24.4 | mitm_m3_negfold_walk | 3 | 526 | 263 | negation_folded | walk | 1488 | 0.90 | 0.90 | 169.8 | 1.02 | 0.93 | 166.0× | 191.6× | 22.7 | 146.8 | 0.24 | ✓ |
+| char2 | icv1-f2m27-t12543-569dca8b | 24.4 | mitm_m2_negfold | 2 | 526 | 263 | negation_folded | random | 96445 | 1.03 | 1.01 | 1410 | 1.02 | 0.93 | 1379× | 1591× | 22.7 | 1387 | 0.00 | ✓ |
+| char2 | icv1-f2m27-t12543-569dca8b | 24.4 | mitm_m2_negfold_walk | 2 | 526 | 263 | negation_folded | walk | 94898 | 1.03 | 1.02 | 43.6 | 1.02 | 0.93 | 42.6× | 49.2× | 22.7 | 20.8 | 0.00 | ✓ |
+| char2 | icv1-f2m27-t12543-569dca8b | 24.4 | mitm_m2_negfold_walk_balanced | 2 | 254 | 127 | negation_folded | walk | 219415 | 1.06 | 1.03 | 51.0 | 1.02 | 0.93 | 49.9× | 57.5× | 3.44 | 47.5 | 0.00 | ✓ |
+| char2 | icv1-f2m27-t12543-569dca8b | 24.4 | mitm_m2_negfold_walk_projected | 2 | 526 | 263 | negation_folded | walk | 21055 | 5.89 | 0.98 | 19.8 | 1.02 | 0.93 | 19.4× | 22.3× | 14.9 | 4.93 | 0.00 | ✓ |
+| char2 | icv1-f2m27-t12543-569dca8b | 24.4 | mitm_m2_negfold_walk_subgroup | 2 | 526 | 263 | negation_folded | walk | 20211 | 6.10 | 1.02 | 31.3 | 1.02 | 0.93 | 30.6× | 35.3× | 26.5 | 4.74 | 0.00 | ✓ |
+| char2 | icv1-f2m27-t12543-569dca8b | 24.4 | mitm_m2_negfold_walk_projected_balanced | 2 | 254 | 127 | negation_folded | walk | 50074 | 5.90 | 0.98 | 14.8 | 1.02 | 0.93 | 14.4× | 16.6× | 3.52 | 11.2 | 0.00 | ✓ |
+| char2 | icv1-f2m27-t12543-569dca8b | 24.4 | mitm_m2_negfold_walk_subgroup_balanced | 2 | 254 | 127 | negation_folded | walk | 45265 | 6.35 | 1.06 | 18.8 | 1.02 | 0.93 | 18.4× | 21.3× | 8.65 | 10.2 | 0.00 | ✓ |
+
+| regime | variant | phase | α (ops ∝ r^α) | R² | α vs #E | points |
+|:--|:--|:--|--:|--:|--:|--:|
+| char2 | mitm_m2_negfold | factor_base | 0.528 | 0.956 | 0.494 | 5 |
+| char2 | mitm_m2_negfold | linear_algebra | 0.267 | 0.970 | 0.246 | 5 |
+| char2 | mitm_m2_negfold | relations | 0.752 | 0.995 | 0.670 | 5 |
+| char2 | mitm_m2_negfold | total | 0.742 | 0.995 | 0.662 | 5 |
+| char2 | mitm_m2_negfold | trials | 0.666 | 0.992 | 0.594 | 5 |
+| char2 | mitm_m2_negfold_walk | factor_base | 0.528 | 0.956 | 0.494 | 5 |
+| char2 | mitm_m2_negfold_walk | linear_algebra | 0.265 | 0.973 | 0.241 | 5 |
+| char2 | mitm_m2_negfold_walk | relations | 0.546 | 0.981 | 0.485 | 5 |
+| char2 | mitm_m2_negfold_walk | total | 0.534 | 0.982 | 0.489 | 5 |
+| char2 | mitm_m2_negfold_walk | trials | 0.677 | 0.996 | 0.602 | 5 |
+| char2 | mitm_m2_negfold_walk_balanced | factor_base | 0.731 | 0.952 | 0.685 | 5 |
+| char2 | mitm_m2_negfold_walk_balanced | linear_algebra | 0.271 | 0.991 | 0.246 | 5 |
+| char2 | mitm_m2_negfold_walk_balanced | relations | 0.583 | 0.974 | 0.517 | 5 |
+| char2 | mitm_m2_negfold_walk_balanced | total | 0.589 | 0.979 | 0.525 | 5 |
+| char2 | mitm_m2_negfold_walk_balanced | trials | 0.659 | 0.986 | 0.584 | 5 |
+| char2 | mitm_m2_negfold_walk_projected | factor_base | 0.716 | 0.940 | 0.675 | 5 |
+| char2 | mitm_m2_negfold_walk_projected | linear_algebra | 0.258 | 0.931 | 0.244 | 5 |
+| char2 | mitm_m2_negfold_walk_projected | relations | 0.408 | 0.960 | 0.352 | 5 |
+| char2 | mitm_m2_negfold_walk_projected | total | 0.557 | 0.985 | 0.507 | 5 |
+| char2 | mitm_m2_negfold_walk_projected | trials | 0.574 | 0.970 | 0.495 | 5 |
+| char2 | mitm_m2_negfold_walk_projected_balanced | factor_base | 0.713 | 0.945 | 0.670 | 5 |
+| char2 | mitm_m2_negfold_walk_projected_balanced | linear_algebra | 0.284 | 0.965 | 0.263 | 5 |
+| char2 | mitm_m2_negfold_walk_projected_balanced | relations | 0.451 | 0.962 | 0.389 | 5 |
+| char2 | mitm_m2_negfold_walk_projected_balanced | total | 0.481 | 0.984 | 0.422 | 5 |
+| char2 | mitm_m2_negfold_walk_projected_balanced | trials | 0.564 | 0.964 | 0.484 | 5 |
+| char2 | mitm_m2_negfold_walk_subgroup | factor_base | 0.693 | 0.769 | 0.691 | 5 |
+| char2 | mitm_m2_negfold_walk_subgroup | linear_algebra | 0.257 | 0.967 | 0.238 | 5 |
+| char2 | mitm_m2_negfold_walk_subgroup | relations | 0.408 | 0.955 | 0.349 | 5 |
+| char2 | mitm_m2_negfold_walk_subgroup | total | 0.551 | 0.905 | 0.526 | 5 |
+| char2 | mitm_m2_negfold_walk_subgroup | trials | 0.573 | 0.960 | 0.490 | 5 |
+| char2 | mitm_m2_negfold_walk_subgroup_balanced | factor_base | 0.692 | 0.677 | 0.707 | 5 |
+| char2 | mitm_m2_negfold_walk_subgroup_balanced | linear_algebra | 0.283 | 0.957 | 0.264 | 5 |
+| char2 | mitm_m2_negfold_walk_subgroup_balanced | relations | 0.439 | 0.967 | 0.379 | 5 |
+| char2 | mitm_m2_negfold_walk_subgroup_balanced | total | 0.470 | 0.981 | 0.430 | 5 |
+| char2 | mitm_m2_negfold_walk_subgroup_balanced | trials | 0.552 | 0.968 | 0.474 | 5 |
+| char2 | mitm_m3 | factor_base | 0.578 | 0.953 | 0.541 | 5 |
+| char2 | mitm_m3 | linear_algebra | 0.721 | 0.954 | 0.670 | 5 |
+| char2 | mitm_m3 | relations | 0.635 | 0.983 | 0.565 | 5 |
+| char2 | mitm_m3 | total | 0.620 | 0.988 | 0.559 | 5 |
+| char2 | mitm_m3 | trials | 0.360 | 0.951 | 0.311 | 5 |
+| char2 | mitm_m3_negfold | factor_base | 0.528 | 0.956 | 0.494 | 5 |
+| char2 | mitm_m3_negfold | linear_algebra | 0.721 | 0.954 | 0.670 | 5 |
+| char2 | mitm_m3_negfold | relations | 0.635 | 0.983 | 0.565 | 5 |
+| char2 | mitm_m3_negfold | total | 0.614 | 0.986 | 0.552 | 5 |
+| char2 | mitm_m3_negfold | trials | 0.360 | 0.951 | 0.311 | 5 |
+| char2 | mitm_m3_negfold_walk | factor_base | 0.528 | 0.956 | 0.494 | 5 |
+| char2 | mitm_m3_negfold_walk | linear_algebra | 0.716 | 0.932 | 0.674 | 5 |
+| char2 | mitm_m3_negfold_walk | relations | 0.684 | 0.985 | 0.615 | 5 |
+| char2 | mitm_m3_negfold_walk | total | 0.646 | 0.983 | 0.586 | 5 |
+| char2 | mitm_m3_negfold_walk | trials | 0.348 | 0.955 | 0.303 | 5 |
+| char2 | rho_reference | total | 0.403 | 0.999 | 0.362 | 5 |
+
+Report saved: research/lead19_projected_base/char2_repeats20.json

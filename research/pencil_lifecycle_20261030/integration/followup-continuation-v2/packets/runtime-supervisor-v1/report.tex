@@ -1,0 +1,19 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.7in]{geometry}
+\setlength{\parskip}{7pt}
+\begin{document}
+\section*{Prepared runtime qualification supervisor}
+The private Python supervisor implements source-only Q0--Q4 preparation around explicit final image ID and binary hash arguments. Only AST parsing was performed. No Docker, binary, owner or cloud command was run. Binding fields remain null and admission false.
+
+Q0 inspects exact stopped-container bytes, hashes, executable modes and ELF metadata. A proposed bounded read of /opt with a strict member allowlist checks recovery ancestor traversal and runtime modes without starting a process. Q1 requires exact static diagnostic JSON. Q2 requires request-hash rejection and exit2. Q3 requires owner config-hash rejection and exit125, matching actual owner main. Q4 verifies terminal identity, exact removal, fixture stability and no writable-layer diff.
+
+The route is noninteractive sudo with an empty environment/configuration and an explicit local Docker socket. Creation uses pull-never, an already-inspected image ID and one UUID-owned container at a time. Container controls include UID1000, network-none, read-only rootfs, cap-drop ALL, no-new-privileges, pids1,512MiB memory,1CPU and only the read-only fixtures plus bounded tmpfs mounts.
+
+Every Docker call has a native receipt and at most20seconds client time. One300-second deadline reserves30seconds for exact-identity cleanup; active cases have a20-second deadline. Timeout is not evidence of daemon cancellation. Ambiguous ownership or unconfirmed termination retains CLEANUP-INCOMPLETE and prevents further cases. No broad cleanup exists.
+
+One draft requirement is deliberately unresolved: effective kernel pids.max=1 before start. HostConfig and daemon support are checked, and any after-start cgroup observation is separately recorded; neither is misrepresented as a pre-start kernel observation. The supervisor therefore leaves qualification complete false, even if all fixed checks pass. It exits3 for otherwise successful checks pending this evidence/design gate.
+
+Next review must assess the supervisor, exact bindings, local route and the /opt allowlist extension, then resolve the pre-start PID evidence requirement prospectively. The template cannot be used as scientific admission or a full lifecycle/timing qualifier. Controller/IAM, publication and scientific budget remain unchanged.
+
+Artifacts: supervise.py, PLAN.md, binding.template.json, syntax-check.json, status.json and diagram.svg. Final binary and image slots remain null.
+\end{document}

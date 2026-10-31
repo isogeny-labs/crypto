@@ -589,6 +589,42 @@ impl MumfordDivisor {
         Ok(divisor)
     }
 
+    /// Canonical reduced representative of the class `[D − deg(u)·∞]`, where
+    /// `D` is the effective divisor given by the Mumford pair `(u, v)` with
+    /// `u` monic of **any** degree and `u | v² + h·v + f`.
+    ///
+    /// `v` is first reduced modulo `u`; then the Cantor reduction step is
+    /// applied until `deg u ≤ g`.  This is the entry point for divisors that
+    /// arise from a map into the Jacobian and have degree above `g` (for
+    /// example the norm of a conorm divisor in a GHS descent).  A pair that
+    /// does not satisfy the divisibility condition is rejected with
+    /// [`HyperellipticError::DivisorEquationNotDivisible`].
+    pub fn try_from_unreduced(
+        curve: &HyperellipticCurve,
+        u: F2mPoly,
+        v: F2mPoly,
+    ) -> Result<Self, HyperellipticError> {
+        curve.validate()?;
+        curve.validate_polynomial("u", &u)?;
+        curve.validate_polynomial("v", &v)?;
+        if u.is_zero() {
+            return Err(HyperellipticError::ZeroDivisorPolynomial);
+        }
+        if u.lead() != F2mElement::one(curve.m) {
+            return Err(HyperellipticError::NonMonicDivisorPolynomial);
+        }
+        let v = v.rem(&u, &curve.irr);
+        let vsq = v.mul(&v, &curve.irr);
+        let hv = curve.h.mul(&v, &curve.irr);
+        let target = vsq.add(&hv).add(&curve.f);
+        if !target.rem(&u, &curve.irr).is_zero() {
+            return Err(HyperellipticError::DivisorEquationNotDivisible);
+        }
+        let reduced = Self { u, v }.try_reduce(curve)?;
+        reduced.validate_on_valid_curve(curve)?;
+        Ok(reduced)
+    }
+
     /// Embed an affine point `P = (x_0, y_0)` on `C` into `Jac(C)` as
     /// the class of `[P] − [∞]`.
     ///

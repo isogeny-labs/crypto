@@ -1,0 +1,94 @@
+{
+  "schema": "isolab.eks.recovery-state/v1",
+  "request": {
+    "schema": "isolab.eks.resumable/v1",
+    "run_name": "ic-criu-n32-20261026-v1",
+    "deadline_unix_seconds": 1793051205,
+    "build": {
+      "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581",
+      "source_revision": "cb2ec6873f30b683f7885b53c410d69965f02c20",
+      "ecbench_sha256": "583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9"
+    },
+    "runtime_image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:5a12f51fa0e287f8024e66d2880549f71af56dfa397c9f0fc2f7f3d7affa221d",
+    "spec": {
+      "arms": [
+        {
+          "method": {
+            "id": "rho.negation"
+          },
+          "name": "rho-neg",
+          "role": "reference"
+        },
+        {
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=32",
+              "oracle": "mitm:negation_folded=1"
+            }
+          },
+          "name": "ic-mitm",
+          "role": "candidate"
+        },
+        {
+          "method": {
+            "id": "rho.negation"
+          },
+          "name": "rho-neg-aa",
+          "role": "control"
+        }
+      ],
+      "description": "One-target IC pipeline versus matched rho; infrastructure and correctness validation, no speed claim.",
+      "label": "IC curve-size sweep n32, public synthetic one-target fixture",
+      "measurement": {
+        "isolation_required": "L2",
+        "order": "alternate",
+        "rounds": 5,
+        "seed": 1,
+        "timeout_seconds": 120,
+        "warmup": 1
+      },
+      "schema": "ecbench.spec/v1",
+      "workloads": {
+        "curves": [
+          {
+            "bits": 32,
+            "kind": "prime_search",
+            "seed": 59297
+          }
+        ],
+        "target_seed": 20261002,
+        "targets_per_curve": 1
+      }
+    },
+    "instance_type": "c8a.2xlarge",
+    "checkpoint_interval_seconds": 30,
+    "max_restores": 2
+  },
+  "request_sha256": "1002adf4c6a3884c89b77938826499fad6c88f4854e263f8149dae2557b75f09",
+  "owner_build": "isolab-recovery-controller:2e01f834-1b0b-44d2-a384-feee17ae68cb",
+  "phase": "failed",
+  "attempt": 0,
+  "restores": 0,
+  "next_generation": 1,
+  "checkpoint_generation": 1,
+  "current_pod_uid": "08c615a7-4f89-4e08-9394-0b1d09a8f63d",
+  "current_instance": "i-02ccfb4949a67adc9",
+  "original_node_runtime": {
+    "architecture": "amd64",
+    "containerRuntimeVersion": "containerd://2.3.5+unknown",
+    "kernelVersion": "6.18.54-121.166.amzn2023.x86_64",
+    "osImage": "Amazon Linux 2023.12.20261012"
+  },
+  "terminated_instances": [
+    "i-02ccfb4949a67adc9"
+  ],
+  "generations": [],
+  "last_checkpoint_at": 1793047652,
+  "selected_generation": null,
+  "failure": "no valid committed generation; refusing to restart from zero",
+  "benchmark_job": null,
+  "benchmark_uid": null,
+  "benchmark_manifest": null,
+  "benchmark_create_attempted": false
+}

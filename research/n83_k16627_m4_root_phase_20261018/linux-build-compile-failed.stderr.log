@@ -1,0 +1,18 @@
+   Compiling crypto v0.1.0 (/src)
+error: recursion limit reached while expanding `$crate::json_internal!`
+    --> examples/../research/koblitz_n83_factor_base_sweep_20261008/primary_adapter.rs:1101:19
+     |
+1101 |       let receipt = json!({
+     |  ___________________^
+1102 | |         "schema":if checkpoint_root {"n83.k16627-m4-root-phase/v1"} else {"n83.k16627-m4-witness/v1"},
+1103 | |         "status":status,
+1104 | |         "curve_a":0, "orbit_columns":16_627, "summands":4, "identity_mask":0,
+...    |
+1131 | |         "selected_best_total_runtime":Value::Null,
+1132 | |     });
+     | |______^
+     |
+     = help: consider increasing the recursion limit by adding a `#![recursion_limit = "256"]` attribute to your crate (`koblitz_n83_factor_base_export`)
+     = note: this error originates in the macro `$crate::json_internal` which comes from the expansion of the macro `json` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: could not compile `crypto` (example "koblitz_n83_factor_base_export") due to 1 previous error

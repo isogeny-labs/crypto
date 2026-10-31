@@ -1,0 +1,187 @@
+{
+  "id": "IDC1h9451979b555ea40d",
+  "independence": "same-agent native issuance and separate128 extra checks;exact universal Lean identities",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": {
+    "kind": "lean4",
+    "path": "research/koblitz_modular_ic_20261018/lean/KoblitzRound10.lean",
+    "sha256": "e999b42fa3f64c55c24659a19ba14c6230c4ab8463d017dd3fc3aaa02291b127"
+  },
+  "schema": "identity.certificate/v1",
+  "seed": 2026101910,
+  "statement": {
+    "degree_bound": 3,
+    "lhs": {
+      "args": [
+        {
+          "args": "h",
+          "op": "var"
+        },
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "z",
+                  "op": "var"
+                },
+                {
+                  "args": "u",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": -1,
+                  "op": "const"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "y",
+                      "op": "var"
+                    },
+                    {
+                      "args": "h",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        }
+      ],
+      "op": "mul"
+    },
+    "name": "homogeneous-saturation",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": "y",
+              "op": "var"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "x",
+                      "op": "var"
+                    },
+                    {
+                      "args": "u",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": [
+                    {
+                      "args": -1,
+                      "op": "const"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "h",
+                          "op": "var"
+                        },
+                        {
+                          "args": "h",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": -1,
+              "op": "const"
+            },
+            {
+              "args": [
+                {
+                  "args": "u",
+                  "op": "var"
+                },
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "x",
+                          "op": "var"
+                        },
+                        {
+                          "args": "y",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": -1,
+                          "op": "const"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": "z",
+                              "op": "var"
+                            },
+                            {
+                              "args": "h",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "source": "KoblitzRound10.homogeneous_saturation_certificate; exact missing relation on the localized projective prototype",
+    "variables": [
+      "x",
+      "y",
+      "z",
+      "u",
+      "h"
+    ]
+  },
+  "value_digest": "0d6c9ef6e33087c2a7d39f99a76e50eb9a2196b6647c7af86f2941fca65d93be"
+}

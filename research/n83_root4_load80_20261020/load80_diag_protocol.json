@@ -1,0 +1,101 @@
+{
+  "algorithm_flags": {
+    "KIC_INDEXED4_FIXED31": "0",
+    "KIC_INDEXED5_FIXED30": "0",
+    "KIC_INDEXED5_ID30": "1",
+    "KIC_INDEXED_ROOT4": "0",
+    "KIC_INDEXED_ROOT5": "1",
+    "KIC_INDEX_ROOT_BATCH": "1",
+    "KIC_PACKED_ROOT_TABLE": "1",
+    "KIC_PACKED_ROOT_TABLE_DENSE": "0",
+    "KIC_PACKED_ROOT_TABLE_LOAD75": "0",
+    "KIC_RANK_THREADS": "4",
+    "KIC_ROOT_BLOOM": "1",
+    "KIC_ROOT_BLOOM_PROFILE": "wide3",
+    "KIC_ROOT_ONLY11": "1",
+    "KIC_ROOT_ONLY21": "0",
+    "KIC_ROOT_ONLY22": "0",
+    "KIC_SPARSE_CANONICAL": "1",
+    "KIC_STATE26": "0",
+    "KIC_STATE28": "0",
+    "KIC_SYMMETRIC_S3": "1",
+    "KIC_TARGET_CANCEL": "1",
+    "KIC_TARGET_THREADS": "2"
+  },
+  "answer_source_sha256": "bfca94938ee5e97c73580fe41ef6ca206b96189379d48cbc88a831eba5b1b527",
+  "archive_reserve_seconds": 900,
+  "cost_per_hr": "0.13",
+  "cpu_affinity_ids": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "curve_id": "EC1N83Ckb1a1haacb69ee9f37",
+  "global_cap_seconds": 7200,
+  "machine_id": "0h2bmdx95lus",
+  "per_run_cap_seconds": 1200,
+  "pod_id": "au4gfwhcycebyy",
+  "points": [
+    {
+      "answer_line_sha256": "f5533f93b727a7520d0457ca69700dbf3eaad7d5346409fdcdbf252d5cff617d",
+      "point_index": 0,
+      "scalar": "8171303969165027",
+      "sha256": "1c9b53960953fd252d09af08afbfdff9229fbeca151285e698b3e90cb79cd656",
+      "source_path": "/workspace/load80_diag_input/p00.jsonl"
+    },
+    {
+      "answer_line_sha256": "0b3f36cf6de459abe561f7c0a40e3ee9502b3e97a048d67964b2fc4ee1bc9033",
+      "point_index": 1,
+      "scalar": "3903092757833929",
+      "sha256": "f9641c0cd4e67bfdd7f99139224048646c202975750ab889707428b22e160837",
+      "source_path": "/workspace/load80_diag_input/p01.jsonl"
+    }
+  ],
+  "provider_stop_utc": "2026-10-20T08:57:30Z",
+  "rss_cap_bytes": 25769803776,
+  "runner_sha256": "a4d4d13159b160535c28d80b417bc0f247ab4bd48988d3ab296caf95dc6766ac",
+  "runs": [
+    {
+      "k": 4405,
+      "load": "75",
+      "name": "p00_k4405_load75",
+      "point_index": 0
+    },
+    {
+      "k": 4405,
+      "load": "80",
+      "name": "p00_k4405_load80",
+      "point_index": 0
+    },
+    {
+      "k": 4405,
+      "load": "80",
+      "name": "p01_k4405_load80",
+      "point_index": 1
+    },
+    {
+      "k": 4405,
+      "load": "75",
+      "name": "p01_k4405_load75",
+      "point_index": 1
+    },
+    {
+      "k": 4500,
+      "load": "80",
+      "name": "p00_k4500_load80",
+      "point_index": 0
+    },
+    {
+      "k": 4549,
+      "load": "80",
+      "name": "p00_k4549_load80",
+      "point_index": 0
+    }
+  ],
+  "rust_source_commit": "f554dc9379462d47243b5b06e8ee28a2d895a131",
+  "rust_source_sha256": "716b4a688c23e4c02d852a6bfc5fca90d706ed3d4a922aec4894416e147ab9d4",
+  "schema": "n83.load80-runpod-diagnostic/v1",
+  "status": "FROZEN_CONDITIONAL_AFTER_SEALED_TIE_SCREEN",
+  "target_source_sha256": "0617ee4c55b08e3b4379d99490cad9c249c50ef2b0cc6ab321fe63a0bb1ba0b3"
+}

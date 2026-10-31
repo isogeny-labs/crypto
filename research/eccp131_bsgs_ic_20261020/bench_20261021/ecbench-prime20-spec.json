@@ -1,0 +1,16 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "ECCp-131 exact-probe context: separate prime-20 IC/rho operation control",
+  "description": "Registered 20-bit small-x IC/rho control; not a measurement on ECCp-131.",
+  "workloads": {
+    "curves": [{"kind": "prime_search", "bits": 20, "seed": 59297}],
+    "targets_per_curve": 2,
+    "target_seed": 20261021
+  },
+  "arms": [
+    {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+    {"name": "ic-mitm", "role": "candidate", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=32", "oracle": "mitm:negation_folded=1"}}},
+    {"name": "rho-neg-aa", "role": "control", "method": {"id": "rho.negation"}}
+  ],
+  "measurement": {"rounds": 3, "warmup": 1, "order": "alternate", "seed": 131, "isolation_required": "L0", "timeout_seconds": 120}
+}

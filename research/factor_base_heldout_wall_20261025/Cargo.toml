@@ -1,0 +1,24 @@
+[package]
+name = "factor-base-heldout-wall-study"
+version = "0.1.0"
+edition = "2021"
+autobins = false
+
+[dependencies]
+divisor-arithmetic = { git = "https://github.com/salindne/divisor-arithmetic", rev = "87e2ebc1b59e5313b67bf81d11e42ec094251518" }
+five-leads-study = { path = "../five_leads_e2e_20261019/native" }
+serde_json = "1"
+sha2 = "0.10"
+rand = "0.8"
+
+[[bin]]
+name = "heldout-wall"
+path = "src/bin/wall.rs"
+
+[[bin]]
+name = "wall-run"
+path = "src/bin/wall_run.rs"
+
+[[bin]]
+name = "validate-wall"
+path = "src/bin/validate_wall.rs"

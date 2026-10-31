@@ -70,7 +70,7 @@ The solver's flags in `card.json` are provisional; the builder lane fixes them.
 ## Measured cost (2026-10-15)
 
 Study: [`research/pkm_isogeny_tower_p192_20261015/`](../../research/pkm_isogeny_tower_p192_20261015/README.md)
-(pre-registered protocol, branch `claude/isogeny-tower-p192`). The solver
+(pre-registered protocol; merged as PR #1925, `700f7d311`). The solver
 `pkm-aux-search` is built there (`src/bin/pkm_aux_search.rs`; library
 `src/cryptanalysis/two_sylow_search.rs`).
 

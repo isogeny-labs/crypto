@@ -43,6 +43,7 @@ def bars(field, ylabel, title, fname):
     ax.legend(fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.1), ncol=3)
     fig.tight_layout()
     fig.savefig(fname, bbox_inches="tight")
+    fig.savefig(fname.replace(".svg", ".png"), bbox_inches="tight", dpi=150)
 
 
 bars("s", "S = charged GAE / sqrt(r) (log scale)",

@@ -19,7 +19,9 @@ aburan28/crypto-autoresearcher). Frontier and core models decided the
 experiment; you write the instructions a judgment-free executor runs, and you
 read back what it did. Read AGENTS.md "Model tiers", "Reading discipline", §12
 and the skill that owns the measurement (`ecbench-measure`, `perf-ipc`,
-`ic-autolab`, `ecbench-independent-runner`) before acting.
+`ic-autolab`, `ecbench-independent-runner`) before acting. For default x86
+experiment execution, also read `.agents/skills/isolab-eks/SKILL.md` and its
+`references/submission.md` task-card instructions (AGENTS.md §9a).
 
 The dispatch says `compile` or `assess`.
 
@@ -39,6 +41,10 @@ Input: the frozen spec or protocol path and the main session's dispatch.
 
 1. Read the spec and the preregistration. Run `sha256sum` on every file the
    commands read (spec JSON, protocol, fixture) and on the binary once built.
+   The main session supplies a validated EKS request, tested image identity,
+   deployment selection and exact client timeout. If any is missing, return
+   `specification_error`; do not substitute a local run or the default fixture.
+   Use existing process credentials; the card contains no credential values.
 2. Write `research/<topic>_<date>/cards/<card_id>.yaml` (write-once; a new
    card gets a new `card_id`, `CARD-<topic>-<YYYYMMDD>-<n>`) in the one card
    format every repository of the owner uses
@@ -54,38 +60,47 @@ Input: the frozen spec or protocol path and the main session's dispatch.
    kind: frozen_command
    commit: <git rev-parse HEAD>
    receipt: research/<topic>_<date>/cards/<card_id>.receipt.json
-   binds:                        # spec, protocol, fixture: every file an argv names
+   binds:                        # include scripts and their dependencies too
      - {path: <spec>, sha256: <hex>}
      - {path: <protocol>, sha256: <hex>}
-   must_not_exist: [<OUT_DIR>]   # ecbench run claims OUT_DIR atomically
+     - {path: <request>, sha256: <hex>}
+     - {path: taskq/deploy/eks-karpenter/remote/validate-request, sha256: <hex>}
+     - {path: taskq/deploy/eks-karpenter/remote/launch-remote, sha256: <hex>}
+   must_not_exist: [<receipt_directory>]
    commands:
-     - id: build
-       argv: [cargo, build, --release, --bin, ecbench]
+     - id: validate
+       argv: [taskq/deploy/eks-karpenter/remote/validate-request, <request>]
        timeout_seconds: <n>
        success_exit_codes: [0]
-       outputs: [target/release/ecbench]
-     - id: run
-       argv: [./target/release/ecbench, run, --wait, --spec, <spec>, --out, <OUT_DIR>, --cpus, auto]
+     - id: submit-and-verify
+       argv: [taskq/deploy/eks-karpenter/remote/launch-remote, <request>]
+       env:
+         AWS_REGION: us-east-2
+         ISOLAB_BUCKET: isolab-results-104186811093-us-east-2
+         ISOLAB_CODEBUILD_PROJECT: isolab-experiment-launcher
+         ISOLAB_CLIENT_OUTPUT: <receipt_directory>
        timeout_seconds: <n>
        success_exit_codes: [0]
        stdout: research/<topic>_<date>/cards/<card_id>.run.stdout
-     - id: verify
-       argv: [./target/release/ecbench, verify, --dir, <OUT_DIR>, --replay, "<N from spec/protocol>", --out, <OUT_DIR>.audit.json]
-       timeout_seconds: <n>
-       success_exit_codes: [0]
-       outputs: [<OUT_DIR>.audit.json]
+       stderr: research/<topic>_<date>/cards/<card_id>.run.stderr
+       outputs: [<receipt_directory>/result.json]
    bus_address: executor-mechanical-<topic>
    background: <true when the run exceeds ten minutes>
-   write_scope: [research/<topic>_<date>/, target/]
+   write_scope: [research/<topic>_<date>/]
    stop_when:
-     - The run command exits with status 2.
+     - Any command exits nonzero or reaches its timeout; retain the original request and build identity.
    ```
 
    - argv arrays only: no shell syntax, no pipes, no globs, no `~`, no
      unfilled `<placeholder>`. Every seed, replay count, size, arm name,
      `--cpus` value and output path is copied from the spec or protocol.
-   - A `retry` (`exit_codes`, `max_attempts` 2 or 3) only for an
-     infrastructure exit code the tool documents, such as a busy-host
+   - The sample is the ordinary EKS request-v1 route. A requested resumable
+     experiment uses the recovery client's frozen commands instead. An explicitly
+     selected local/legacy backend uses its own measurement commands. Do not
+     modify the canonical `tools/task_card.py` or add a new card schema.
+   - Do not add `retry` to EKS submission. Reconcile ambiguous results in the
+     main session. For other backends, a `retry` (`exit_codes`, `max_attempts`
+     2 or 3) is only for an infrastructure exit code the tool documents, such as a busy-host
      refusal; never to change a result.
    - Copy the measurement skill's commands as written; add none it does
      not name. `compare`, `table`, `claim build` and `db sql` are analysis
@@ -112,6 +127,10 @@ Input: the card and the executor's returned text, saved to a file.
    (`ecbench verify` receipt and its printed SHA-256), the `perf-ipc` JSON
    lines and isolation records, the autolab round outputs. A rounded,
    reordered, recomputed or missing number is a deviation.
+   For EKS, also check the launcher result and downloaded S3 verification:
+   request/image/source identity, Job/Pod UIDs, L2 and native replay counts,
+   A/A admission and manifest hashes. Use the frozen acceptance criteria.
+   Submission success alone does not establish `executed_as_specified`.
 2. Check that only the card's argv ran, in order, and that nothing was
    written outside `write_scope` (`git status --porcelain`).
 3. Write `research/<topic>_<date>/cards/<card_id>.assessment.yaml`

@@ -1,5 +1,24 @@
 # Fresh photographed-curve volcano campaign
 
+## Final measured coverage, 2026-10-25
+
+All **4600 rho and 4600 BSGS cases** and **9200 independently matched modular-operation replays** are verified over the complete selected rational degree-2 component: **46 curves, 90 directed maps, five levels**. Independent PARI checks cover all 9200 recovered-log equations, 46 cardinalities and 9200 point orders. Every benchmark point retains prime order 18014494963342201.
+
+[Final curve-by-curve tables and figures](reports/completion_20261025/README.md) · [Modular replay figures](reports/field_complete_20261025_corrected/README.md) · [All IC/order/map/transport observations](reports/supplement_tables_20261025/README.md) · [Requirement status](reports/completion_20261025/requirements.csv)
+
+Exact certificate-derived regularity is verified for all **14720 generator-homogenized systems**: reg(J)=26 for random setup/target systems and 25 for planted controls. These values differ from the earlier Hilbert cutoff 13, temporary polynomial degree 23 and pair sugar 26. See [protocol](REGULARITY_CERT_PROTOCOL.md) and the independent audit in the final report.
+
+[Counter-definition correction](FIELD_COUNTER_SEMANTICS_CORRECTION.md): native Montgomery multiply and square counters are disjoint. Earlier inclusion labels and subset metadata were wrong; all original raw counts, answers and timings are unchanged. Per-case M+S totals are derived before computing extrema. Plot legends now distinguish very narrow numeric ranges.
+
+The frozen IC candidate still has **zero random relations and zero random-corpus recoveries**. Successful full IC recovery remains blocked; neither planted controls nor generic solves discharge it. This completes graph-wide generic solves and the requested diagnostic measurements, without declaring the entire three-solver success requirement complete. The selected 2-component is not the class over all prime degrees.
+
+PR #2065 merged before the later completed-result commits. Those later commits remained public on its feature branch; this follow-up brings the completed evidence into review. Historical [native results](https://github.com/aburan28/crypto/tree/42cfe866e0ff33e4321a0b7995d875a3acad0ad3/research/photo_volcano_restart_20261017/reports/native_complete_1823_v2_visuals) and [cost ledger](https://github.com/aburan28/crypto/tree/42cfe866e0ff33e4321a0b7995d875a3acad0ad3/research/photo_volcano_restart_20261017/reports/costs_complete_1821) stay at immutable commits.
+
+New PDFs and 150 dpi PNGs have been rendered and inspected locally. Repository policy requires their S3 upload; this runtime has no AWS client or configured outbound identity. [Document hashes and local availability](LOCAL_DOCUMENT_ARTIFACTS.json) record that gap. SVG/HTML figures, natural per-curve/per-point CSV projections and readable source are published here. All private scalar-bearing records, raw randomness, failed attempts and complete local checkpoints are retained. No unperformed object-store upload or whole-private-archive publication is claimed. These descriptive research measurements are not promoted to the benchmark index or IC leaderboard under the current validation gate.
+
+## Historical protocol and earlier snapshots
+
+
 **New run authorized after the historical artifacts became unavailable.** The
 old experiment is not recovered or pooled. This replacement uses the same exact
 photographed source curve with new securely sampled fixtures and a new frozen
@@ -175,3 +194,4 @@ cold-cost claim is made. `source/monitor.mjs` observes the real native workers,
 appends local status, and generates a new local report on native completion.
 It sends no data externally; that final report still requires PDF inspection
 and a later PR update. It never restarts a solver or declares full IC complete.
+

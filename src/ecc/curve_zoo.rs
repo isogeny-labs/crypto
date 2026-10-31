@@ -472,6 +472,39 @@ impl CurveParams {
             h: 1,
         }
     }
+
+    // ── Certicom ECC Challenge (prime field) ───────────────────────────────
+
+    /// **ECCp-131**, the Certicom ECC Challenge's 131-bit prime-field
+    /// curve: `y² = x³ + ax + b` over `F_p`, `p < 2^131`, prime order
+    /// `n` (cofactor 1).  Its published target is
+    /// [`CurveParams::certicom_eccp131_target`].
+    ///
+    /// Constants are those of
+    /// `certicom131-native-20261018/gpu/certicom131/params131.h` (the native
+    /// worktree's generated header, from the Certicom challenge list),
+    /// converted from little-endian 32-bit limbs; the tests check `G` and
+    /// `Q` on the curve, `n` prime and `n·G = n·Q = O`.  Open challenge.
+    pub fn certicom_eccp131() -> Self {
+        CurveParams {
+            name: "ECCp-131",
+            p: hexp("48E1D43F293469E33194C43186B3ABC0B"),
+            a: hexp("41CB121CE2B31F608A76FC8F23D73CB66"),
+            b: hexp("2F74F717E8DEC90991E5EA9B2FF03DA58"),
+            gx: hexp("3DF84A96B5688EF574FA91A32E197198A"),
+            gy: hexp("14721161917A44FB7B4626F36F0942E71"),
+            n: hexp("48E1D43F293469E317F7ED728F6B8E6F1"),
+            h: 1,
+        }
+    }
+
+    /// The published ECCp-131 challenge point `Q = (x, y)`.
+    pub fn certicom_eccp131_target() -> (BigUint, BigUint) {
+        (
+            hexp("3AA6F004FC62E2DA1ED0BFB62C3FFB568"),
+            hexp("9C21C284BA8A445BB2701BF55E3A67ED"),
+        )
+    }
 }
 
 /// Parse a big-endian hex string into a `BigUint`.  Panics on malformed
@@ -676,6 +709,35 @@ mod tests {
         .unwrap();
         assert_eq!(x, want_x);
         assert_eq!(y, want_y);
+    }
+
+    /// **ECCp-131**: `G` and the published `Q` lie on the curve, `n` is
+    /// prime, `n·G = n·Q = O`, and `p`, `n` are 131-bit with `n` inside the
+    /// Hasse interval of `p` (so cofactor 1 is the only possibility).
+    #[test]
+    fn certicom_eccp131_is_consistent() {
+        use crate::cryptanalysis::curve_traits::arith::is_prime;
+        let c = CurveParams::certicom_eccp131();
+        let a = c.a_fe();
+        assert_eq!(c.p.bits(), 131);
+        assert_eq!(c.n.bits(), 131);
+        assert!(is_prime(&c.p), "p prime");
+        assert!(is_prime(&c.n), "n prime");
+        // |p + 1 − n| ≤ 2√p.
+        let (lo, hi) = (&c.p + 1u32, c.n.clone());
+        let t = if lo > hi { &lo - &hi } else { &hi - &lo };
+        assert!(&t * &t <= &c.p * 4u32, "Hasse bound");
+        let g = c.generator();
+        assert!(c.is_on_curve(&g));
+        assert!(matches!(g.scalar_mul(&c.n, &a), Point::Infinity));
+        let (qx, qy) = CurveParams::certicom_eccp131_target();
+        let q = Point::Affine {
+            x: c.fe(qx),
+            y: c.fe(qy),
+        };
+        assert!(c.is_on_curve(&q));
+        assert!(matches!(q.scalar_mul(&c.n, &a), Point::Infinity));
+        assert!(!matches!(q, Point::Infinity));
     }
 
     /// **NIST P-256 reuses the existing constructor**: the new curves

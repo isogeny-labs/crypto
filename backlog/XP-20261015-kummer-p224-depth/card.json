@@ -3,9 +3,12 @@
   "id": "XP-20261015-kummer-p224-depth",
   "title": "Kummer tower solving degree at a prime with v2(p - 1) = 40 and at the NIST P-224 prime",
   "created": "2026-10-15",
-  "authors": ["backlog lane", "coordinator"],
+  "authors": [
+    "backlog lane",
+    "coordinator"
+  ],
   "status": "draft",
-  "status_note": "Unblocked: the generic-field F4 engine exists on branch claude/f4-generic-field (f4_tower_generic over fp_backend; pkm_tower_pilot --engine generic picks Fp52 at 45 bits and Fp224 at P-224; above 2^63 the wide builder builds the system and --verify checks it exhaustively with BigUint re-checks). research/f4_generic_field_20261015 already measured, at 27*2^40 + 1 and at P-224, m = 2 N <= 18 (N = 20 one target), m = 3 N <= 12 (N = 15 at 27*2^40 + 1), m = 4 N = 8 and 12, all with the recorded p1/p2 D; what this card adds is the second target in those one-target cells and m = 3, N = 15 at P-224 (3.2e12 multiply-adds, about 13 h of one core at the measured 14.5 ns each). Measured cost multiple F (ns per multiply-add against Fp32 at p1, one core): 1.5 at 45 bits (Fp52, AVX-512 IFMA), 30 at P-224. Draft until a PROTOCOL.md is frozen and the engine is merged; the P-224 shard's rows carry p as a string and are verified in-row (--verify), not by pkm_tower_check verify.",
+  "status_note": "Protocol frozen (PROTOCOL.md) and running on a 32-vCPU, 124 GB EC2 spot host from 2026-10-18 under research/pkm_kummer_wide_field_depth_20261018/ (PR #2160). The card stays draft because the engine has no checkpoint (ready needs checkpoint.file and resume_flag); each (prime, m, N, target) is its own process so a host loss costs one process. The engine is merged (PR #1942). P-224 rows are verified in-row (--verify); 45-bit rows by pkm_tower_check verify.",
   "blocked_on": [],
   "links": {
     "lead": "docs/ic/factor-base-encyclopedia/README.md §0.1 (Kummer tower, the P-224 shape: v2(p - 1) = 96)",
@@ -17,41 +20,69 @@
   },
   "question": "Is the Kummer tower's F4 solving degree D at fixed (m, N) the same at a 45-bit prime with v2(p - 1) = 40 and at the P-224 prime as at the 31-bit p1 where every recorded value was measured?",
   "decision_value": "Every PKM solving-degree number in the repository is measured over a prime below 2^32; whether it transfers to the field of the curve it is about has never been checked. If D at p = 27*2^40 + 1 and at the P-224 prime equals the p1 value in every cell, lead 1's answer (from the cheaper p1 runs) speaks for P-224 and the small-prime ladder stays the instrument; if D differs in any cell, every p1 extrapolation in the encyclopedia is suspect and lead 1 has to be rerun at the real field. Depths beyond 27 tower levels exist only at these primes, so this card is also the first place a deeper Kummer tower can be built at all.",
-  "protocol": {"path": null, "blob": null},
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": "46128ae37dfae2dfb307feee89ae2a332648aa9a"
+  },
   "code": {
     "repo": "crypto",
-    "commit": null,
-    "branch": "claude/f4-generic-field",
-    "build": [["cargo", "build", "--release", "--example", "pkm_tower_pilot"]]
+    "commit": "b7cafe04485eb97d873dffef698e7337cfb38cfe",
+    "branch": "main",
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--example",
+        "pkm_tower_pilot",
+        "--example",
+        "pkm_tower_check"
+      ]
+    ]
   },
   "resources": {
-    "cpus": 1,
-    "ram_gb": 16,
+    "cpus": 2,
+    "ram_gb": 32,
     "disk_gb": 5,
     "gpu": null,
-    "est_core_hours": null,
-    "est_wall_hours": null,
-    "notes": "Cost = (recorded p1 cost of the same cell) x F, F the multi-limb slowdown of the generic-field engine at 45 and 224 bits, which the generic-field lane measures. The p1 cells this card repeats are small (m = 3, N = 15: 1.1 GB, 6.0 min; m = 2, N <= 20 and m = 4, N <= 12 below that), so with F in the tens the whole card is hours to a few days of one core; memory grows with the limb count (x2 at 45 bits, x7 at 224 bits for 32-bit limbs)."
+    "est_core_hours": 40,
+    "est_wall_hours": 14,
+    "notes": "Stage 1 (the card): derived from the study's recorded 2-thread times: P-224 m=3 N=15 is 3.2e12 multiply-adds at 14.47 ns, about 12.9 core-hours per target; the other stage-1 cells total under 6 core-hours at both primes. Memory is unmeasured at P-224; stage 0 measures it. Stage 2 (m=4 N=16, m=3 N=18, pre-registered in PROTOCOL.md section 3) adds a derived 5-361 core-hours per cell and up to about 100 GB at P-224, admitted by the protocol's memory rule."
   },
   "run": {
     "argv": [
       "target/release/examples/pkm_tower_pilot",
-      "--engine", "generic",
-      "--p", "{p}",
-      "--kinds", "kummer",
-      "--m", "2,3,4",
-      "--t-min", "1",
-      "--max-t", "10",
-      "--max-t-m3", "5",
-      "--max-t-m4", "3",
-      "--controls", "tower",
-      "--ladder-t", "none",
-      "--planted", "0",
-      "--random", "2",
+      "--engine",
+      "generic",
+      "--p",
+      "{p}",
+      "--kinds",
+      "kummer",
+      "--m",
+      "2,3,4",
+      "--t-min",
+      "1",
+      "--max-t",
+      "10",
+      "--max-t-m3",
+      "5",
+      "--max-t-m4",
+      "3",
+      "--controls",
+      "tower",
+      "--ladder-t",
+      "none",
+      "--planted",
+      "0",
+      "--random",
+      "2",
       "--verify",
-      "--out", "{out}/rows.jsonl"
+      "--out",
+      "{out}/rows.jsonl"
     ],
-    "env": {"RAYON_NUM_THREADS": "1"},
+    "env": {
+      "RAYON_NUM_THREADS": "1"
+    },
     "timeout_per_shard_s": 604800
   },
   "shards": {
@@ -59,23 +90,45 @@
     "scheme": "list",
     "params": {
       "items": [
-        {"name": "v2-40", "vars": {"p": "29686813949953"}, "note": "27*2^40 + 1, prime (GNU factor), v2(p - 1) = 40, 45 bits"},
-        {"name": "p224", "vars": {"p": "26959946667150639794667015087019630673557916260026308143510066298881"}, "note": "NIST P-224 prime 2^224 - 2^96 + 1, v2(p - 1) = 96"}
+        {
+          "name": "v2-40",
+          "vars": {
+            "p": "29686813949953"
+          },
+          "note": "27*2^40 + 1, prime (GNU factor), v2(p - 1) = 40, 45 bits"
+        },
+        {
+          "name": "p224",
+          "vars": {
+            "p": "26959946667150639794667015087019630673557916260026308143510066298881"
+          },
+          "note": "NIST P-224 prime 2^224 - 2^96 + 1, v2(p - 1) = 96"
+        }
       ]
     },
     "stop": "all"
   },
-  "checkpoint": {"file": null, "resume_flag": null},
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
   "outputs": {
     "result_schema": "pkm_tower_pilot JSONL rows, compared cell by cell with the recorded p1 rows",
-    "verify": ["target/release/examples/pkm_tower_check", "verify", "{out}/rows.jsonl"],
-    "land": "research/pkm_kummer_wide_field_depth"
+    "verify": [
+      "target/release/examples/pkm_tower_check",
+      "verify",
+      "{out}/rows.jsonl"
+    ],
+    "land": "research/pkm_kummer_wide_field_depth_20261018"
   },
   "cairn": {
     "mode": "lab-task",
     "notes": "Two single runs, one per prime. Not preemptible until the engine checkpoints.",
     "space": "TBD",
-    "tasks": ["XP-20261015-kummer-p224-depth/shard-0", "XP-20261015-kummer-p224-depth/shard-1"],
+    "tasks": [
+      "XP-20261015-kummer-p224-depth/shard-0",
+      "XP-20261015-kummer-p224-depth/shard-1"
+    ],
     "ttl_s": 86400,
     "env": {
       "name": "crypto-f4-generic",

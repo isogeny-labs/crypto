@@ -1,0 +1,22 @@
+{
+  "schema": "rho-batch-lane-validation-v1",
+  "status": "local_correctness_only",
+  "source_path": "src/cryptanalysis/pollard_collab/worker.rs",
+  "source_sha256": "49d98c29aeecb2f87cb18c2138207b8fa570f74e5fb4e8bf58ac8f937a6ca47f",
+  "test_command": "cargo test --offline --release --lib",
+  "first_run": {
+    "status": "censored_interrupted_after_2247_passes",
+    "reason": "random_barrett_curve_search_remained_cpu_active_after_15_minutes",
+    "log": "batch-lane-full-test-censored.log",
+    "log_sha256": "d7a7096678fc8b9b8521783b97a630b8c74440953b283c9accbea7621bc9d5c7"
+  },
+  "retry": {
+    "status": "passed",
+    "log": "batch-lane-full-test-passed.log",
+    "log_sha256": "3af38021c9b3e8ef6d6fd585be13ec7680bf4086bcf687708fa46bd811a8c028",
+    "passed": 2248,
+    "failed": 0,
+    "ignored": 94
+  },
+  "performance_claim": null
+}

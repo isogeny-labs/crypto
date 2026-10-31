@@ -344,6 +344,7 @@ impl F2mElement {
 
     /// `self + other` = bitwise XOR.
     pub fn add(&self, other: &Self) -> Self {
+        super::operation_tally::tick(self.m, "add");
         debug_assert_eq!(self.m, other.m);
         let mut out = self.clone();
         for (a, b) in out.bits.iter_mut().zip(other.bits.iter()) {
@@ -354,6 +355,7 @@ impl F2mElement {
 
     /// `self += other` in place (XOR), without allocating.
     pub fn add_assign(&mut self, other: &Self) {
+        super::operation_tally::tick(self.m, "add");
         debug_assert_eq!(self.m, other.m);
         for (a, b) in self.bits.iter_mut().zip(other.bits.iter()) {
             *a ^= *b;
@@ -458,6 +460,7 @@ impl F2mElement {
     /// Bit-for-bit equal to [`Self::schoolbook_mul`] and
     /// [`Self::karatsuba_mul`], which are kept as independent references.
     pub fn mul(&self, other: &Self, irreducible: &IrreduciblePoly) -> Self {
+        super::operation_tally::tick(self.m, "mul");
         debug_assert_eq!(self.m, other.m);
         let m = self.m;
         let nw = self.bits.len().max(other.bits.len());
@@ -476,6 +479,7 @@ impl F2mElement {
     /// goes to bit `2i` of the result, other bits zero.  Then
     /// reduce mod `m(z)`.
     pub fn square(&self, irreducible: &IrreduciblePoly) -> Self {
+        super::operation_tally::tick(self.m, "square");
         let m = self.m;
         let nw = self.bits.len();
         let mut out = Self::zero(m);
@@ -529,6 +533,7 @@ impl F2mElement {
     ///   2. Combine `b_k`'s per the binary expansion of `m − 1`.
     ///   3. Final squaring: result = `(combined)²`.
     pub fn flt_inverse(&self, irreducible: &IrreduciblePoly) -> Option<Self> {
+        super::operation_tally::tick(self.m, "inverse_informational");
         if self.is_zero() {
             return None;
         }

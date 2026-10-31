@@ -164,3 +164,52 @@ bound; use the observed `n1` to decide whether a volcano is cyclic.
 | Binary-field tall volcanoes (Koblitz) | not attempted | needs a bivariate `Phi_ell` mod 2 |
 | `cargo test --release --lib` | not run | no Rust file touched |
 | Conductor reservation | blocked | control plane unreachable; warn-through path |
+
+---
+
+## Addendum 2026-10-18: correction of the interval claim, and status of the tooling
+
+This addendum corrects statements above. The text above is left as written.
+
+**1. The "about ±8%" statement was too tight, and the intervals under it were
+optimistic.** Section 1 item 4 and section 5 say the generic cost shows no layer
+difference beyond its bootstrap intervals, "about ±8%". Those were 95% percentile
+intervals that treated every solve as independent. The study's own null control
+(negation versus automorphism solvers on non-crater layers, which run identical
+code, so the true ratio is 1) already fell outside its interval at the floor,
+which is the sign that they were too narrow. Resampling hierarchically instead
+(volcano, then vertex within the volcano, then solve within the vertex; 4000
+resamples; same data, nothing rerun) gives the intervals a reader should use:
+
+| solver | ratio of mean normalised cost | 95% interval |
+|---|--:|---|
+| negation | crater / middle 0.923 | [0.813, 1.062] |
+| negation | floor / middle 1.054 | [0.913, 1.197] |
+| negation | floor / crater 1.142 | [0.927, 1.385] |
+| plain | crater / middle 0.939 | [0.842, 1.065] |
+| plain | floor / middle 1.046 | [0.928, 1.169] |
+| plain | floor / crater 1.114 | [0.947, 1.294] |
+| null control: negation / automorphism, middle layers | 1.020 | [0.971, 1.073] |
+| null control: negation / automorphism, floor | 0.875 | [0.759, 1.021] |
+
+All six layer intervals contain 1. The right reading is that this data shows no
+layer difference and cannot exclude one of up to about +20% (floor against middle)
+or +39% (floor against crater, the widest). It does not support "within ±8%".
+The crater effect in E2 (negation / orbit 1.48 and 1.31) is outside the control's
+spread and stands, with the same caveat that its intervals are optimistic.
+
+**2. Tooling status.** The harness in this directory is Python (PARI via `cypari`,
+a pure-Python rho). AGENTS.md ("Implementation language: no Python") forbids that
+for this work, and its counted unit is not ecbench's. It is kept as frozen
+evidence and is not extended. Native replacements, all built on the repository's
+own code:
+
+* `crypto volcano` (`docs/volcano/README.md`): `profile`, `explore` (build,
+  explore and verify a prime-field volcano), `descend` (blind descent), `level1`,
+  `koblitz-step`, `ecbench-spec`.
+* ECDLP cost per layer measured with `ecbench`:
+  `research/volcano_prime_layers_20261018/` (this study's volcanoes, redone at
+  `r` of 40 and 44 bits) and `research/volcano_koblitz_layers_20261018/`
+  (binary fields, crater against level-1 neighbours).
+
+Where a figure above disagrees with those studies, the ecbench studies govern.

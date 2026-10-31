@@ -1,0 +1,473 @@
+{
+ "kind": "replay-certificate",
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "date": "2026-10-22",
+ "validator": "Validator role (crypto-autoresearcher agents/validator.md), Claude Opus 5.5 subagent; not the producer of the runs",
+ "method": "Re-ran both hashed binaries sequentially on the identity commands (<bin> n 0 signed_frobenius c strong for n41 c16, n53 c16, n61 c4), with no environment changes, and compared each output line with the recorded identity file after removing peak_rss_bytes and every *_ms key (exact JSON equality of the remaining keys, floats included). Every recovered scalar d, recorded and replayed, was then checked with verify_scalars.py, which uses the Python standard library only and imports no repository code. It builds GF(2^n) = GF(2)[x]/(x^n + sum x^t, t in field_modulus_low_terms), checks the modulus is irreducible (Rabin), and on y^2 + xy = x^3 + a x^2 + 1 checks G and Q on the curve, subgroup_order | #E (Frobenius trace recurrence), G of exact order subgroup_order, 1 <= d < subgroup_order, d == published_fixture_scalar, d*G == published_q, and Frobenius(G) == lambda*G. Callgrind Ir was also replayed for both arms at n41 and n53.",
+ "subject": {
+  "change": "Gf2::batch_inv_clmul in src/cryptanalysis/semaev_decomp.rs: fixed-width as_chunks::<4>() loops",
+  "baseline_commit": "412b60289db97ad1ba13a2bffe1120fadc7fb7d6",
+  "change_commit": "393a1a9359e23e21591a250f0691eb576dd45785",
+  "head_at_certification": "2c67a23c94b1cedc04d1dcc50ab0ddaeb2525eb2",
+  "research_dir": "research/rho_batchinv_20261022"
+ },
+ "binaries": [
+  {
+   "arm": "baseline",
+   "path": "/tmp/claude-0/arms7/bin/base",
+   "sha256": "7ce6504a134ba12125e37b07ef72e095100f2055db11dc2f78ea0310e4b8ecbf",
+   "matches_claimed_sha256": true
+  },
+  {
+   "arm": "candidate",
+   "path": "/tmp/claude-0/arms7/bin/cand",
+   "sha256": "cb5f1d2eabec25155aca0d05bfa04699d35c11e92636cb2d71193f5ddec98c78",
+   "matches_claimed_sha256": true
+  }
+ ],
+ "runs": [
+  {
+   "arm": "baseline",
+   "command": "/tmp/claude-0/arms7/bin/base 41 0 signed_frobenius 16 strong",
+   "binary": "/tmp/claude-0/arms7/bin/base",
+   "binary_sha256": "7ce6504a134ba12125e37b07ef72e095100f2055db11dc2f78ea0310e4b8ecbf",
+   "n": 41,
+   "fixtures": 16,
+   "exit_status": 0,
+   "recorded_file": "research/rho_batchinv_20261022/runs/identity/fixture-n41-baseline.jsonl",
+   "recorded_sha256": "2b32c3c980c08db9c179f43eb769ecede6fd9a4cd274e17d6e9c6e6732b236d2",
+   "rows_recorded": 16,
+   "rows_replayed": 16,
+   "keys_excluded_from_comparison": [
+    "peak_rss_bytes",
+    "setup_ms",
+    "target_generation_ms",
+    "total_ms",
+    "validation_ms",
+    "walk_ms"
+   ],
+   "stripped_output_sha256_recorded": "0f6e1930ed0a3041a0e95ed6cd70bc27d84c3e9eab7b5558b9ff7406a7f61cfb",
+   "stripped_output_sha256_replayed": "0f6e1930ed0a3041a0e95ed6cd70bc27d84c3e9eab7b5558b9ff7406a7f61cfb",
+   "reproduced": true,
+   "scalars_checked": [
+    316434419199,
+    215492451289,
+    526355739341,
+    149421053477,
+    527988366966,
+    252762341593,
+    127302775523,
+    438425122518,
+    333718163891,
+    468317432824,
+    454705593834,
+    503320293005,
+    403680170514,
+    421306257429,
+    260096254762,
+    540013223152
+   ],
+   "scalars_verified_recorded": true,
+   "scalars_verified_replayed": true
+  },
+  {
+   "arm": "candidate",
+   "command": "/tmp/claude-0/arms7/bin/cand 41 0 signed_frobenius 16 strong",
+   "binary": "/tmp/claude-0/arms7/bin/cand",
+   "binary_sha256": "cb5f1d2eabec25155aca0d05bfa04699d35c11e92636cb2d71193f5ddec98c78",
+   "n": 41,
+   "fixtures": 16,
+   "exit_status": 0,
+   "recorded_file": "research/rho_batchinv_20261022/runs/identity/fixture-n41-candidate.jsonl",
+   "recorded_sha256": "f763998656e3db717639165969af0706019010c6a1d929a74762e9a4a29362ac",
+   "rows_recorded": 16,
+   "rows_replayed": 16,
+   "keys_excluded_from_comparison": [
+    "peak_rss_bytes",
+    "setup_ms",
+    "target_generation_ms",
+    "total_ms",
+    "validation_ms",
+    "walk_ms"
+   ],
+   "stripped_output_sha256_recorded": "0f6e1930ed0a3041a0e95ed6cd70bc27d84c3e9eab7b5558b9ff7406a7f61cfb",
+   "stripped_output_sha256_replayed": "0f6e1930ed0a3041a0e95ed6cd70bc27d84c3e9eab7b5558b9ff7406a7f61cfb",
+   "reproduced": true,
+   "scalars_checked": [
+    316434419199,
+    215492451289,
+    526355739341,
+    149421053477,
+    527988366966,
+    252762341593,
+    127302775523,
+    438425122518,
+    333718163891,
+    468317432824,
+    454705593834,
+    503320293005,
+    403680170514,
+    421306257429,
+    260096254762,
+    540013223152
+   ],
+   "scalars_verified_recorded": true,
+   "scalars_verified_replayed": true
+  },
+  {
+   "arm": "baseline",
+   "command": "/tmp/claude-0/arms7/bin/base 53 0 signed_frobenius 16 strong",
+   "binary": "/tmp/claude-0/arms7/bin/base",
+   "binary_sha256": "7ce6504a134ba12125e37b07ef72e095100f2055db11dc2f78ea0310e4b8ecbf",
+   "n": 53,
+   "fixtures": 16,
+   "exit_status": 0,
+   "recorded_file": "research/rho_batchinv_20261022/runs/identity/fixture-n53-baseline.jsonl",
+   "recorded_sha256": "e438b97d76e07c9d46f2f2ed4b851fa6ccc8e529b74e8fcf634517ffb781a13b",
+   "rows_recorded": 16,
+   "rows_replayed": 16,
+   "keys_excluded_from_comparison": [
+    "peak_rss_bytes",
+    "setup_ms",
+    "target_generation_ms",
+    "total_ms",
+    "validation_ms",
+    "walk_ms"
+   ],
+   "stripped_output_sha256_recorded": "ed444e66f793caf950c5415e8f0305b1c889bd56b8250ed03a823d8fa0032d0c",
+   "stripped_output_sha256_replayed": "ed444e66f793caf950c5415e8f0305b1c889bd56b8250ed03a823d8fa0032d0c",
+   "reproduced": true,
+   "scalars_checked": [
+    10537240120764,
+    11669307303329,
+    20138173878640,
+    15158679418725,
+    3329047950085,
+    16344037969503,
+    19785901849497,
+    15013827638951,
+    19518904803401,
+    7951856723350,
+    1602770019867,
+    2537492764378,
+    9320755260583,
+    18681011616923,
+    4766723502048,
+    9959939812442
+   ],
+   "scalars_verified_recorded": true,
+   "scalars_verified_replayed": true
+  },
+  {
+   "arm": "candidate",
+   "command": "/tmp/claude-0/arms7/bin/cand 53 0 signed_frobenius 16 strong",
+   "binary": "/tmp/claude-0/arms7/bin/cand",
+   "binary_sha256": "cb5f1d2eabec25155aca0d05bfa04699d35c11e92636cb2d71193f5ddec98c78",
+   "n": 53,
+   "fixtures": 16,
+   "exit_status": 0,
+   "recorded_file": "research/rho_batchinv_20261022/runs/identity/fixture-n53-candidate.jsonl",
+   "recorded_sha256": "80017bd3cb0b3dfe02c5d2b7756258708a353064526228dc3884f528d57cd914",
+   "rows_recorded": 16,
+   "rows_replayed": 16,
+   "keys_excluded_from_comparison": [
+    "peak_rss_bytes",
+    "setup_ms",
+    "target_generation_ms",
+    "total_ms",
+    "validation_ms",
+    "walk_ms"
+   ],
+   "stripped_output_sha256_recorded": "ed444e66f793caf950c5415e8f0305b1c889bd56b8250ed03a823d8fa0032d0c",
+   "stripped_output_sha256_replayed": "ed444e66f793caf950c5415e8f0305b1c889bd56b8250ed03a823d8fa0032d0c",
+   "reproduced": true,
+   "scalars_checked": [
+    10537240120764,
+    11669307303329,
+    20138173878640,
+    15158679418725,
+    3329047950085,
+    16344037969503,
+    19785901849497,
+    15013827638951,
+    19518904803401,
+    7951856723350,
+    1602770019867,
+    2537492764378,
+    9320755260583,
+    18681011616923,
+    4766723502048,
+    9959939812442
+   ],
+   "scalars_verified_recorded": true,
+   "scalars_verified_replayed": true
+  },
+  {
+   "arm": "baseline",
+   "command": "/tmp/claude-0/arms7/bin/base 61 0 signed_frobenius 4 strong",
+   "binary": "/tmp/claude-0/arms7/bin/base",
+   "binary_sha256": "7ce6504a134ba12125e37b07ef72e095100f2055db11dc2f78ea0310e4b8ecbf",
+   "n": 61,
+   "fixtures": 4,
+   "exit_status": 0,
+   "recorded_file": "research/rho_batchinv_20261022/runs/identity/fixture-n61-baseline.jsonl",
+   "recorded_sha256": "389d4535f543fe618c4a166e219c612f81478da4c119f84db2ec8afcf7019b41",
+   "rows_recorded": 4,
+   "rows_replayed": 4,
+   "keys_excluded_from_comparison": [
+    "peak_rss_bytes",
+    "setup_ms",
+    "target_generation_ms",
+    "total_ms",
+    "validation_ms",
+    "walk_ms"
+   ],
+   "stripped_output_sha256_recorded": "c9742f330b36a4906bcd0592f59e7a10de9b94e537e3b988edf87a2154022efd",
+   "stripped_output_sha256_replayed": "c9742f330b36a4906bcd0592f59e7a10de9b94e537e3b988edf87a2154022efd",
+   "reproduced": true,
+   "scalars_checked": [
+    15465751840076,
+    36897207532615,
+    22655597579480,
+    44864448646062
+   ],
+   "scalars_verified_recorded": true,
+   "scalars_verified_replayed": true
+  },
+  {
+   "arm": "candidate",
+   "command": "/tmp/claude-0/arms7/bin/cand 61 0 signed_frobenius 4 strong",
+   "binary": "/tmp/claude-0/arms7/bin/cand",
+   "binary_sha256": "cb5f1d2eabec25155aca0d05bfa04699d35c11e92636cb2d71193f5ddec98c78",
+   "n": 61,
+   "fixtures": 4,
+   "exit_status": 0,
+   "recorded_file": "research/rho_batchinv_20261022/runs/identity/fixture-n61-candidate.jsonl",
+   "recorded_sha256": "06e9831e3c52a3d1f0b2781cb652e3f8cf2e4a66a94445fd1b906738a124a369",
+   "rows_recorded": 4,
+   "rows_replayed": 4,
+   "keys_excluded_from_comparison": [
+    "peak_rss_bytes",
+    "setup_ms",
+    "target_generation_ms",
+    "total_ms",
+    "validation_ms",
+    "walk_ms"
+   ],
+   "stripped_output_sha256_recorded": "c9742f330b36a4906bcd0592f59e7a10de9b94e537e3b988edf87a2154022efd",
+   "stripped_output_sha256_replayed": "c9742f330b36a4906bcd0592f59e7a10de9b94e537e3b988edf87a2154022efd",
+   "reproduced": true,
+   "scalars_checked": [
+    15465751840076,
+    36897207532615,
+    22655597579480,
+    44864448646062
+   ],
+   "scalars_verified_recorded": true,
+   "scalars_verified_replayed": true
+  }
+ ],
+ "cross_arm_identity": {
+  "41": {
+   "baseline_equals_candidate_stripped": true,
+   "recovered_equals_published_all": true
+  },
+  "53": {
+   "baseline_equals_candidate_stripped": true,
+   "recovered_equals_published_all": true
+  },
+  "61": {
+   "baseline_equals_candidate_stripped": true,
+   "recovered_equals_published_all": true
+  }
+ },
+ "scalar_verifier": {
+  "path": "benchmarks/20261022-strong-rho-batchinv/verify_scalars.py",
+  "sha256": "c88342e226d90fc21b6db6bbf75bc47ef2a8656990cac59eb115d3b6b24ff56a",
+  "imports_repository_code": false,
+  "records_checked": {
+   "recorded_identity": 72,
+   "replayed_identity": 72,
+   "recorded_callgrind_and_time": 144
+  },
+  "all_ok": {
+   "recorded": true,
+   "replayed": true,
+   "callgrind_and_time": true
+  },
+  "curves": [
+   {
+    "n": 41,
+    "a": 0,
+    "modulus_low_terms": [
+     0,
+     3
+    ],
+    "modulus_irreducible": true,
+    "curve_order": 2199025563772,
+    "subgroup_order": 549756390943,
+    "subgroup_order_prime": true,
+    "subgroup_order_factors": [
+     549756390943
+    ],
+    "subgroup_order_divides_curve_order": true,
+    "cofactor": 4,
+    "generator_on_curve": true,
+    "generator_has_order_subgroup_order": true,
+    "frobenius_eigenvalue_lambda_ok": true
+   },
+   {
+    "n": 53,
+    "a": 0,
+    "modulus_low_terms": [
+     0,
+     1,
+     2,
+     6
+    ],
+    "modulus_irreducible": true,
+    "curve_order": 9007199311360364,
+    "subgroup_order": 21044858204113,
+    "subgroup_order_prime": true,
+    "subgroup_order_factors": [
+     21044858204113
+    ],
+    "subgroup_order_divides_curve_order": true,
+    "cofactor": 428,
+    "generator_on_curve": true,
+    "generator_has_order_subgroup_order": true,
+    "frobenius_eigenvalue_lambda_ok": true
+   },
+   {
+    "n": 61,
+    "a": 0,
+    "modulus_low_terms": [
+     0,
+     1,
+     2,
+     5
+    ],
+    "modulus_irreducible": true,
+    "curve_order": 2305843009055095052,
+    "subgroup_order": 162888033982417,
+    "subgroup_order_prime": true,
+    "subgroup_order_factors": [
+     162888033982417
+    ],
+    "subgroup_order_divides_curve_order": true,
+    "cofactor": 14156,
+    "generator_on_curve": true,
+    "generator_has_order_subgroup_order": true,
+    "frobenius_eigenvalue_lambda_ok": true
+   }
+  ],
+  "negative_controls": [
+   {
+    "mutation": "d+1 (published scalar moved with it)",
+    "result": "rejected: dG_equals_Q false"
+   },
+   {
+    "mutation": "flip bit 0 of Q.x",
+    "result": "rejected: q_on_curve and dG_equals_Q false"
+   },
+   {
+    "mutation": "a = 1 instead of 0",
+    "result": "rejected: G off curve, order and lambda checks false"
+   },
+   {
+    "mutation": "modulus low terms [0,1,2,7] at n53",
+    "result": "rejected: reducible modulus, inversion fails"
+   },
+   {
+    "mutation": "subgroup_order + 2",
+    "result": "rejected: not prime, does not divide #E, G order check false"
+   },
+   {
+    "mutation": "lambda + 1",
+    "result": "rejected: Frobenius eigenvalue check false"
+   },
+   {
+    "mutation": "d + subgroup_order",
+    "result": "rejected: scalar out of range"
+   }
+  ],
+  "positive_control_external": "GF(2^163) with x^163+x^7+x^6+x^3+1 and a = 1 (NIST K-163): field axioms hold on 200 random triples, the trace recurrence gives #E = 2r with r = 5846006549323611672814741753598448348329118574063 prime, and random curve points P satisfy 2rP = O, about half with rP = O. The NIST base point was recalled from memory, did not lie on the curve, and is not used as a control (bad recall, not a verifier defect: the group-law checks above pass)."
+ },
+ "additional_replays": {
+  "callgrind": [
+   {
+    "command": "valgrind --tool=callgrind bin/base 41 0 signed_frobenius 4 strong (cwd /tmp/claude-0/arms7)",
+    "binary_sha256": "7ce6504a134ba12125e37b07ef72e095100f2055db11dc2f78ea0310e4b8ecbf",
+    "n": 41,
+    "arm": "baseline",
+    "fixtures": 4,
+    "ir_recorded": 244684552,
+    "ir_replayed": 244684628,
+    "ir_rel_diff": 3.106039975911516e-07,
+    "outputs_reproduced": true
+   },
+   {
+    "command": "valgrind --tool=callgrind bin/cand 41 0 signed_frobenius 4 strong (cwd /tmp/claude-0/arms7)",
+    "binary_sha256": "cb5f1d2eabec25155aca0d05bfa04699d35c11e92636cb2d71193f5ddec98c78",
+    "n": 41,
+    "arm": "candidate",
+    "fixtures": 4,
+    "ir_recorded": 235163781,
+    "ir_replayed": 235163727,
+    "ir_rel_diff": -2.29627197565768e-07,
+    "outputs_reproduced": true
+   },
+   {
+    "command": "valgrind --tool=callgrind bin/base 53 0 signed_frobenius 4 strong (cwd /tmp/claude-0/arms7)",
+    "binary_sha256": "7ce6504a134ba12125e37b07ef72e095100f2055db11dc2f78ea0310e4b8ecbf",
+    "n": 53,
+    "arm": "baseline",
+    "fixtures": 4,
+    "ir_recorded": 2145944102,
+    "ir_replayed": 2145944126,
+    "ir_rel_diff": 1.1183888703173686e-08,
+    "outputs_reproduced": true
+   },
+   {
+    "command": "valgrind --tool=callgrind bin/cand 53 0 signed_frobenius 4 strong (cwd /tmp/claude-0/arms7)",
+    "binary_sha256": "cb5f1d2eabec25155aca0d05bfa04699d35c11e92636cb2d71193f5ddec98c78",
+    "n": 53,
+    "arm": "candidate",
+    "fixtures": 4,
+    "ir_recorded": 2062553397,
+    "ir_replayed": 2062553421,
+    "ir_rel_diff": 1.163606238505543e-08,
+    "outputs_reproduced": true
+   }
+  ],
+  "callgrind_ratio": {
+   "41": {
+    "recorded": 1.0404857030258414,
+    "replayed": 1.0404862651288054
+   },
+   "53": {
+    "recorded": 1.040430810238073,
+    "replayed": 1.0404308097676176
+   }
+  },
+  "callgrind_run_to_run": {
+   "n41_baseline_ir_three_replays": [
+    244684628,
+    244684428,
+    244684701
+   ],
+   "note": "Ir is not bit-reproducible between identical invocations; spread is a few hundred instructions (about 1e-6 relative)"
+  }
+ },
+ "not_reproduced": [
+  "Native timing: the A/B effect at n53 (claimed 1.117x, established) did not reproduce in a supplementary 16-round paired replication (ratio of medians 0.964, paired median 0.989; see validator-report.json findings F1). This certificate covers output identity and scalars, not native time."
+ ],
+ "scope_and_limits": [
+  "The binaries were not rebuilt from source (no build, as instructed: disk about 1 GB free). That base is origin/main 412b60289 and cand is the change is the producer's assertion, bound here only by sha256.",
+  "The binaries live in /tmp/claude-0/arms7/bin, outside the repository, and are not durable artifacts.",
+  "These are known-scalar fixtures: Q is constructed from published_fixture_scalar, and the binary itself asserts recovery. The independent check confirms d*G == Q and the group structure. It cannot show that the walk did not read the known scalar.",
+  "Field degrees are 41, 53 and 61. The prime subgroups are about 2^39.0, 2^44.3 and 2^47.2 (cofactors 4, 428, 14156)."
+ ]
+}

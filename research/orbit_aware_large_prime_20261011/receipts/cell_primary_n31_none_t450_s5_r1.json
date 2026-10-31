@@ -1,0 +1,232 @@
+{
+  "arm": "none",
+  "cpu_instance_ns": 1045973,
+  "cpu_process_ns": 50772367646,
+  "curve": {
+    "a": 0,
+    "b": 1,
+    "cofactor": 1492,
+    "group_order": 2147574356,
+    "name": "icv1-f2m31-tm90707-c95f16f5",
+    "r": 1439393
+  },
+  "n": 31,
+  "peak_rss_bytes": 220614656,
+  "planted_log": 461501,
+  "recovered_matches_planted": null,
+  "rep": 1,
+  "report": {
+    "config": {
+      "envelope_dimension": 10,
+      "large_prime_graph": "filter",
+      "max_large_primes": 0,
+      "max_states": 3000000,
+      "max_trials": 450,
+      "seed": 5,
+      "small_dimension": 7,
+      "summands": 4
+    },
+    "counters": {
+      "accepted_relations": 3,
+      "combination_states_uncharged": 1109862,
+      "decompositions": 3,
+      "eliminated_full_relations": 0,
+      "independent_rows": 3,
+      "lp_merge_ops_uncharged": 0,
+      "lp_pivots": 0,
+      "matrix_rank": 3,
+      "mitm_lookups_uncharged": 248107517,
+      "rejected_large_prime_count": 0,
+      "relation_histogram": [
+        3,
+        0,
+        0,
+        0
+      ],
+      "row_ops_uncharged": 17,
+      "trials": 450
+    },
+    "exhausted": true,
+    "factor_base": {
+      "columns": 525,
+      "large_columns": 460,
+      "raw_points": 1053,
+      "small_columns": 65,
+      "small_raw_points": 133
+    },
+    "filter_pipeline": {
+      "complete_relations": 3,
+      "cpu_ns": {
+        "audit": 11475,
+        "collect": 50139048750,
+        "filter": 12997,
+        "replay": 25156,
+        "setup": 410346544
+      },
+      "dependent_verified": 0,
+      "filter": {
+        "complete_relations": 3,
+        "core_large_vertices": 0,
+        "core_relations": 0,
+        "cycles_closed": 0,
+        "duplicate_relations": 0,
+        "input_large_vertices": 0,
+        "input_relations": 3,
+        "merges": 0,
+        "peeled_relations": 0,
+        "pivots": 0,
+        "rejected_fill": 0
+      },
+      "graph": "filter",
+      "independent_verified": 3,
+      "partial_audit_failed": 0,
+      "partials_by_class": [
+        3,
+        0,
+        0
+      ],
+      "rank": 3,
+      "replay_failed_curve": 0,
+      "replay_failed_linear": 0,
+      "replays_failed": 0,
+      "replays_verified": 3
+    },
+    "mitm": {
+      "left_states": 554931,
+      "left_terms": 2,
+      "right_states": 554931,
+      "right_terms": 2
+    },
+    "phase_group_ops": {
+      "factor_base": {
+        "adds": 5265,
+        "doubles": 10530,
+        "scalar_mults": 1053
+      },
+      "oracle_setup": {
+        "adds": 1111968,
+        "doubles": 0,
+        "scalar_mults": 0
+      },
+      "relations": {
+        "adds": 248116014,
+        "doubles": 16633,
+        "scalar_mults": 900
+      },
+      "verification": {
+        "adds": 12,
+        "doubles": 0,
+        "scalar_mults": 0
+      }
+    },
+    "recovered": null,
+    "relation_samples": [
+      {
+        "a": 464900,
+        "b": 1013286,
+        "class": "full",
+        "columns": [
+          [
+            32,
+            1439392
+          ],
+          [
+            47,
+            1439392
+          ],
+          [
+            55,
+            1439391
+          ],
+          [
+            65,
+            979331
+          ]
+        ],
+        "raw_terms": [
+          41,
+          98,
+          19,
+          41
+        ],
+        "trial": 338
+      },
+      {
+        "a": 561394,
+        "b": 1027004,
+        "class": "full",
+        "columns": [
+          [
+            2,
+            1
+          ],
+          [
+            15,
+            1
+          ],
+          [
+            46,
+            1439392
+          ],
+          [
+            58,
+            1
+          ],
+          [
+            65,
+            663577
+          ]
+        ],
+        "raw_terms": [
+          127,
+          130,
+          17,
+          32
+        ],
+        "trial": 362
+      },
+      {
+        "a": 723020,
+        "b": 554317,
+        "class": "full",
+        "columns": [
+          [
+            1,
+            1439392
+          ],
+          [
+            23,
+            1
+          ],
+          [
+            24,
+            1
+          ],
+          [
+            53,
+            1439392
+          ],
+          [
+            65,
+            610011
+          ]
+        ],
+        "raw_terms": [
+          81,
+          103,
+          15,
+          44
+        ],
+        "trial": 416
+      }
+    ],
+    "solve_wall_ns": 51103844067,
+    "verification_performed": true,
+    "verified_fast": false,
+    "verified_independent": false
+  },
+  "schema": "orbit-lp-cell/v1",
+  "seed": 5,
+  "series": "primary",
+  "wall_ns": 51326787485
+}

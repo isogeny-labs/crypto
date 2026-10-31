@@ -26,6 +26,15 @@
 #[path = "../pdp_speedup/arms.rs"]
 mod arms;
 #[allow(dead_code)]
+#[path = "../pdp_speedup/bitslice.rs"]
+mod bitslice;
+#[allow(dead_code)]
+#[path = "../pdp_speedup/bskernel.rs"]
+mod bskernel;
+#[allow(dead_code)]
+#[path = "../pdp_speedup/bspairs.rs"]
+mod bspairs;
+#[allow(dead_code)]
 #[path = "../pdp_speedup/common.rs"]
 mod common;
 #[allow(dead_code)]
@@ -37,6 +46,13 @@ mod group;
 #[allow(dead_code)]
 #[path = "../pdp_speedup/kernel.rs"]
 mod kernel;
+#[cfg(target_arch = "x86_64")]
+#[allow(dead_code)]
+#[path = "../pdp_speedup/lanes_x86.rs"]
+mod lanes_x86;
+#[allow(dead_code)]
+#[path = "../pdp_speedup/mitm.rs"]
+mod mitm;
 
 mod analyze;
 mod binrf;

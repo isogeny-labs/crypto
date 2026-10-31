@@ -436,6 +436,13 @@ pub struct Prepared {
     tr: Vec<Vec<u64>>,
 }
 
+impl Prepared {
+    /// The transform length (points per prime).
+    pub fn points(&self) -> usize {
+        self.n
+    }
+}
+
 /// Transforms `b` for products with operands of at most `max_len` entries, mod x^cyc - 1 when
 /// `cyc` is below the product length (`usize::MAX`: plain products).
 pub fn prepare<const N: usize>(

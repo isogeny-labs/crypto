@@ -1,0 +1,25 @@
+[package]
+name = "factor-base-replication-study"
+version = "0.1.0"
+edition = "2021"
+autobins = false
+
+[dependencies]
+divisor-arithmetic = { git = "https://github.com/salindne/divisor-arithmetic", rev = "87e2ebc1b59e5313b67bf81d11e42ec094251518" }
+five-leads-study = { path = "../five_leads_e2e_20261019/native" }
+serde_json = "1"
+serde = { version = "1", features = ["derive"] }
+sha2 = "0.10"
+rand = "0.8"
+
+[[bin]]
+name = "factor-base-replication"
+path = "src/bin/factor_base_replication.rs"
+
+[[bin]]
+name = "analyze-replication"
+path = "src/bin/analyze_replication.rs"
+
+[[bin]]
+name = "validate-replication"
+path = "src/bin/validate_replication.rs"
