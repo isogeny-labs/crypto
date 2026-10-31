@@ -38,3 +38,75 @@ executions: one61-bit recovery and one61-bit memory refusal; both62-bit cells
 were unattempted by the stopping rule. The [two-page v9 report](e2e-v9-report.pdf),
 [SVG](e2e-scaling-v9.svg) and [PNG](e2e-scaling-v9.png) preserve this incomplete
 rung. Both PDF pages were inspected. Earlier report copies remain unchanged.
+
+V11 completed all 12 prescribed executions, including both fixed 61-bit and
+62-bit targets. The [two-page v11 report](e2e-v11-report.pdf),
+[SVG](e2e-scaling-v11.svg) and [150-dpi PNG](e2e-scaling-v11.png) retain every
+row. Both report pages were visually inspected after raw commit `099dff2edd81`.
+These are unadmitted L0 observations with no matched rho or independent
+scientific validation; 62 bits is the complete prescribed rung, not a global
+hardware maximum. Earlier panels and their failures remain unchanged.
+
+V13 also completed all 12 prescribed executions, with complete right caches
+in both 61-bit and both 62-bit cells. The [two-page v13 report](e2e-v13-report.pdf),
+[SVG](e2e-scaling-v13.svg) and [150-dpi PNG](e2e-scaling-v13.png) retain every
+execution. Both PDF pages were visually inspected after raw commit `84d5159e3635`.
+These remain unadmitted L0 observations; no cross-version timing advantage,
+matched-rho result or global hardware maximum is inferred. V15 failed source
+checkout before compilation or trials; its failure is preserved separately.
+
+V19 ran on one RTX4090 (24,564MiB). All eight 52-bit-field executions recovered
+and passed fresh certificate replay; all four 63-bit memory/work limits remain
+visible. Twelve slots used251/261 relations versus743/709 for eight slots on
+the two fixed targets. The [two-page V19 report](e2e-v19-report.pdf),
+[SVG](e2e-scaling-v19.svg) and [150-dpi PNG](e2e-scaling-v19.png) preserve all
+12 outcomes. Report pages were inspected after raw commit `e1db39a661f3`;
+these copies are hash-bound. Clocks remain L0 descriptions on fixed inputs;
+intermediate field sizes53–62 were not measured here. External comparison:
+not run in this configuration/admission panel. The original frozen analyzer's
+raw SVG retains an inherited PRO6000 title; this derived report correctly
+labels the actual4090 telemetry without rewriting raw output.
+
+V21 completed all ten prescribed executions on one RTX4090, including both
+63-bit public targets. Fresh CPU replay and corrupted-scalar rejection passed
+for every cell. The [two-page V21 report](e2e-v21-report.pdf),
+[SVG](e2e-scaling-v21.svg) and [150-dpi PNG](e2e-scaling-v21.png) retain every
+execution; both PDF pages were inspected after raw commit `ee2a1cb4c613` was
+pushed. The 63-bit targets used338/344 relations and15737/13733 queries.
+Audit totals2600.976385/1192.904874 seconds are descriptive L0 observations.
+The smaller52-bit bases required more queries and longer cold time than the
+larger-base controls. This panel measures completion of the prescribed rung,
+not a global hardware maximum. Exact10-cell coverage passes; the canonical
+rectangular checker retains five findings. External comparison: not run in
+this configuration/admission panel. All earlier outcomes remain unchanged.
+
+The [affine-subtraction comparison](../../research/explicit_relations_affine_20261030/RESULTS.md)
+completed all 12 recoveries on one RTX 4090. Certificates and relation/query
+counts agree across both formulas and baseline repeats. The two 52-bit targets
+used 3.00% and 1.47% less cold solve time; the two 63-bit targets used 0.31% more
+and 1.37% less time. These are per-input L0 descriptions, not a uniform gain.
+The [two-page PDF](affine-v1-report.pdf), [SVG](affine-v1-scaling.svg), and
+[150-dpi PNG](affine-v1-scaling.png) retain every execution. Both pages were
+visually inspected after raw commit `c79bd38363f9` was pushed. Canonical schema
+and coverage checks passed with zero findings. Formula remains opt-in; next
+measure the costs within relation queries. No external-tool timing arm was
+prescribed for this formula-only comparison. Earlier records are unchanged.
+
+The [query-cost profile](../../research/explicit_relations_profile_20261031/RESULTS.md)
+replayed 240 queries in 30 cells with exact response equality on the same full
+63-bit tables. Lookup and normalization account for the largest instrumented
+block-cycle intervals; these shares include synchronization and cannot partition
+production wall time. The [two-page PDF](query-profile-v1-report.pdf),
+[SVG](query-profile-v1-stages.svg) and [150-dpi PNG](query-profile-v1-stages.png)
+are hash-bound diagnostic companions to the affine comparison, not a new speedup
+claim. All five v1 external-profiler setup failures are retained; a separate
+frozen supplement repairs their prerequisites without repeating the panel.
+
+The [profiler-only follow-up PDF](query-profile-v2-report.pdf) records two
+successful Nsight Systems traces: kernel coverage 99.10% / 98.70% of their
+first-to-last kernel spans, with exact replies preserved. Both Nsight Compute
+attempts were refused by provider hardware-counter permissions; no counters
+were estimated. [Seed101 graph](query-profile-v2-kernels-101.svg) and
+[seed202 graph](query-profile-v2-kernels-202.svg), plus corresponding PNGs,
+are byte/hash-bound presentation copies. Raw supplement was pushed as
+`5d4713f59fa3` before rendering; both PDF pages were visually inspected.

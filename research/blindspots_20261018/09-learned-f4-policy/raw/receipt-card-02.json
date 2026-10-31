@@ -1,0 +1,311 @@
+{
+  "card_id": "CARD-BLINDSPOT-09-02",
+  "card_path": "research/blindspots_20261018/09-learned-f4-policy/card-02.yaml",
+  "card_sha256": "ee54172bb91bf5a192534439c2308b1333b9b569ecd7eae15d022d37a4761dbd",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-09/card-02"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-09/card-02/b09",
+        "examples/blindspots_09_learned_f4.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 11.155,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 11.155,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-09/card-02/b09",
+        "train",
+        "--n",
+        "17",
+        "--ell",
+        "4",
+        "--m",
+        "3",
+        "--seed",
+        "20261018",
+        "--from",
+        "0",
+        "--to",
+        "16",
+        "--cap",
+        "6000000000",
+        "--out",
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-17-4-3"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 69.219,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "train-17-4-3-00-16",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-17-4-3.samples.0": "3e38a45a55827608aa1624945a986dba314dac0cd7b47504b1e42c7bf708fc51",
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-17-4-3.trace.0": "faf9726f53646c396f1d79b020c7f76a0dbc37317b1944182ddbd4fdf5c988a0"
+      },
+      "seconds": 69.219,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "9f6808af86e0cbff6871148c16899c797fdcb73fbe418c7828484a71a271396b",
+      "stdout_tail": [
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":0,\"arm\":\"a\",\"x_r\":32971,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1833497409,\"xors\":1818488772,\"mat_words\":15008637,\"rows\":46661,\"steps\":7,\"pairs\":6145,\"field_pairs\":3122,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29742,\"cols_max\":27418,\"divisor_tests\":7503619,\"label_xors\":3358494462,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":549,\"peak_matrix_mb\":97,\"wall_ms\":4560,\"rss_kb\":69336}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":1,\"arm\":\"a\",\"x_r\":129797,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":2159082551,\"xors\":2144084311,\"mat_words\":14998240,\"rows\":46907,\"steps\":7,\"pairs\":6496,\"field_pairs\":3111,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29653,\"cols_max\":27393,\"divisor_tests\":8285828,\"label_xors\":3827139582,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":607,\"peak_matrix_mb\":97,\"wall_ms\":4977,\"rss_kb\":69428}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":2,\"arm\":\"a\",\"x_r\":93415,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1821740694,\"xors\":1807043448,\"mat_words\":14697246,\"rows\":46523,\"steps\":7,\"pairs\":6197,\"field_pairs\":3143,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29349,\"cols_max\":26990,\"divisor_tests\":7444374,\"label_xors\":3335078492,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":580,\"peak_matrix_mb\":94,\"wall_ms\":4566,\"rss_kb\":72932}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":3,\"arm\":\"a\",\"x_r\":129748,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1916713940,\"xors\":1902048074,\"mat_words\":14665866,\"rows\":46437,\"steps\":7,\"pairs\":6183,\"field_pairs\":3143,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29333,\"cols_max\":26984,\"divisor_tests\":7435587,\"label_xors\":3591794916,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":540,\"peak_matrix_mb\":94,\"wall_ms\":3964,\"rss_kb\":72932}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":4,\"arm\":\"a\",\"x_r\":69338,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1887291235,\"xors\":1872329157,\"mat_words\":14962078,\"rows\":46933,\"steps\":7,\"pairs\":6485,\"field_pairs\":3081,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29537,\"cols_max\":27333,\"divisor_tests\":8333826,\"label_xors\":3430440285,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":604,\"peak_matrix_mb\":96,\"wall_ms\":4546,\"rss_kb\":75808}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":5,\"arm\":\"a\",\"x_r\":59676,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1937343995,\"xors\":1922429461,\"mat_words\":14914534,\"rows\":47454,\"steps\":8,\"pairs\":6614,\"field_pairs\":3131,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29498,\"cols_max\":27302,\"divisor_tests\":8301685,\"label_xors\":3417452946,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":3192,\"peak_matrix_mb\":96,\"wall_ms\":4488,\"rss_kb\":75808}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":6,\"arm\":\"a\",\"x_r\":73817,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1847168063,\"xors\":1832487001,\"mat_words\":14681062,\"rows\":46474,\"steps\":7,\"pairs\":6196,\"field_pairs\":3143,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29342,\"cols_max\":26984,\"divisor_tests\":7427434,\"label_xors\":3349770891,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":583,\"peak_matrix_mb\":94,\"wall_ms\":4153,\"rss_kb\":75808}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":7,\"arm\":\"a\",\"x_r\":53029,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":2135555495,\"xors\":2120623260,\"mat_words\":14932235,\"rows\":46898,\"steps\":7,\"pairs\":6483,\"field_pairs\":3108,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29581,\"cols_max\":27318,\"divisor_tests\":8294186,\"label_xors\":3862869242,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":559,\"peak_matrix_mb\":96,\"wall_ms\":4420,\"rss_kb\":75808}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":8,\"arm\":\"a\",\"x_r\":109047,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1607938185,\"xors\":1592986491,\"mat_words\":14951694,\"rows\":46693,\"steps\":7,\"pairs\":6067,\"field_pairs\":3083,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29535,\"cols_max\":27333,\"divisor_tests\":7572049,\"label_xors\":3081229453,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":587,\"peak_matrix_mb\":96,\"wall_ms\":4381,\"rss_kb\":75808}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":9,\"arm\":\"a\",\"x_r\":119441,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1809949932,\"xors\":1795264371,\"mat_words\":14685561,\"rows\":46468,\"steps\":7,\"pairs\":6196,\"field_pairs\":3143,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29346,\"cols_max\":26987,\"divisor_tests\":7431857,\"label_xors\":3303342507,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":580,\"peak_matrix_mb\":94,\"wall_ms\":4415,\"rss_kb\":75808}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":10,\"arm\":\"a\",\"x_r\":105359,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":2118258024,\"xors\":2103279037,\"mat_words\":14978987,\"rows\":46974,\"steps\":7,\"pairs\":6484,\"field_pairs\":3081,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29571,\"cols_max\":27380,\"divisor_tests\":8345717,\"label_xors\":3890406788,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":601,\"peak_matrix_mb\":96,\"wall_ms\":4027,\"rss_kb\":75808}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":11,\"arm\":\"a\",\"x_r\":59091,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":2116995083,\"xors\":2102014442,\"mat_words\":14980641,\"rows\":46821,\"steps\":7,\"pairs\":6457,\"field_pairs\":3090,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29640,\"cols_max\":27431,\"divisor_tests\":8308947,\"label_xors\":3835733213,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":560,\"peak_matrix_mb\":97,\"wall_ms\":3918,\"rss_kb\":75808}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":12,\"arm\":\"a\",\"x_r\":23422,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":2068995113,\"xors\":2054074131,\"mat_words\":14920982,\"rows\":46665,\"steps\":7,\"pairs\":6198,\"field_pairs\":3143,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29655,\"cols_max\":27298,\"divisor_tests\":7459348,\"label_xors\":3722521471,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":540,\"peak_matrix_mb\":96,\"wall_ms\":3843,\"rss_kb\":75808}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":13,\"arm\":\"a\",\"x_r\":128776,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1954704386,\"xors\":1939677076,\"mat_words\":15027310,\"rows\":47040,\"steps\":7,\"pairs\":6494,\"field_pairs\":3081,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29599,\"cols_max\":27403,\"divisor_tests\":8361882,\"label_xors\":3513341137,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":601,\"peak_matrix_mb\":96,\"wall_ms\":4064,\"rss_kb\":77604}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":14,\"arm\":\"a\",\"x_r\":119698,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":2053322857,\"xors\":2038327319,\"mat_words\":14995538,\"rows\":46808,\"steps\":7,\"pairs\":6190,\"field_pairs\":3113,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29692,\"cols_max\":27367,\"divisor_tests\":7526982,\"label_xors\":3803774331,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":587,\"peak_matrix_mb\":96,\"wall_ms\":4135,\"rss_kb\":77604}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":15,\"arm\":\"a\",\"x_r\":59723,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":2121154836,\"xors\":2106131002,\"mat_words\":15023834,\"rows\":47022,\"steps\":7,\"pairs\":6488,\"field_pairs\":3081,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29593,\"cols_max\":27398,\"divisor_tests\":8353684,\"label_xors\":3874844269,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":601,\"peak_matrix_mb\":96,\"wall_ms\":4602,\"rss_kb\":77604}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-09/card-02/b09",
+        "train",
+        "--n",
+        "17",
+        "--ell",
+        "4",
+        "--m",
+        "3",
+        "--seed",
+        "20261018",
+        "--from",
+        "16",
+        "--to",
+        "32",
+        "--cap",
+        "6000000000",
+        "--out",
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-17-4-3"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 67.828,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "train-17-4-3-16-32",
+      "index": 4,
+      "outputs": {
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-17-4-3.samples.16": "7c71efa797cff8ed8c21d364ea8deba4c647f8385549c12423a59d6138f64e39",
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-17-4-3.trace.16": "431c46d3b5565e57df07d05975fa5868bf2e139fe434f87a79aebe9ca5f9a660"
+      },
+      "seconds": 67.828,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a8bdb4e7d920df559a11fe38dde8057893300da65bd6431682f6616c6531fcb0",
+      "stdout_tail": [
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":16,\"arm\":\"a\",\"x_r\":31058,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1987082743,\"xors\":1972336111,\"mat_words\":14746632,\"rows\":46476,\"steps\":7,\"pairs\":6183,\"field_pairs\":3143,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29483,\"cols_max\":27134,\"divisor_tests\":7436727,\"label_xors\":3582494706,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":540,\"peak_matrix_mb\":95,\"wall_ms\":4078,\"rss_kb\":64240}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":17,\"arm\":\"a\",\"x_r\":90343,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1931409420,\"xors\":1916509718,\"mat_words\":14899702,\"rows\":46753,\"steps\":7,\"pairs\":6358,\"field_pairs\":3051,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29452,\"cols_max\":27390,\"divisor_tests\":8369332,\"label_xors\":3578987360,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":601,\"peak_matrix_mb\":96,\"wall_ms\":3733,\"rss_kb\":64852}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":18,\"arm\":\"a\",\"x_r\":49374,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1901089678,\"xors\":1886147971,\"mat_words\":14941707,\"rows\":46887,\"steps\":7,\"pairs\":6497,\"field_pairs\":3081,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29571,\"cols_max\":27375,\"divisor_tests\":8327020,\"label_xors\":3450409801,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":601,\"peak_matrix_mb\":96,\"wall_ms\":4291,\"rss_kb\":76248}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":19,\"arm\":\"a\",\"x_r\":100026,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1995444365,\"xors\":1980433781,\"mat_words\":15010584,\"rows\":47025,\"steps\":7,\"pairs\":6493,\"field_pairs\":3111,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29637,\"cols_max\":27378,\"divisor_tests\":8324617,\"label_xors\":3576648424,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":556,\"peak_matrix_mb\":96,\"wall_ms\":4107,\"rss_kb\":76248}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":20,\"arm\":\"a\",\"x_r\":5484,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1738975158,\"xors\":1724136390,\"mat_words\":14838768,\"rows\":46668,\"steps\":7,\"pairs\":6387,\"field_pairs\":3081,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29418,\"cols_max\":27286,\"divisor_tests\":8302698,\"label_xors\":3107910149,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":594,\"peak_matrix_mb\":95,\"wall_ms\":4009,\"rss_kb\":76248}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":21,\"arm\":\"a\",\"x_r\":36409,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":2058608642,\"xors\":2043679612,\"mat_words\":14929030,\"rows\":46799,\"steps\":7,\"pairs\":6398,\"field_pairs\":3081,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29519,\"cols_max\":27392,\"divisor_tests\":8337305,\"label_xors\":3657521019,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":627,\"peak_matrix_mb\":96,\"wall_ms\":3985,\"rss_kb\":76248}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":22,\"arm\":\"a\",\"x_r\":3513,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1732606461,\"xors\":1717634804,\"mat_words\":14971657,\"rows\":46823,\"steps\":7,\"pairs\":6183,\"field_pairs\":3113,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29649,\"cols_max\":27325,\"divisor_tests\":7541246,\"label_xors\":3292875385,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":587,\"peak_matrix_mb\":96,\"wall_ms\":4596,\"rss_kb\":76248}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":23,\"arm\":\"a\",\"x_r\":6486,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1942062000,\"xors\":1927068988,\"mat_words\":14993012,\"rows\":46879,\"steps\":7,\"pairs\":6236,\"field_pairs\":3083,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29664,\"cols_max\":27391,\"divisor_tests\":7566874,\"label_xors\":3625114781,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":601,\"peak_matrix_mb\":96,\"wall_ms\":4031,\"rss_kb\":76248}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":24,\"arm\":\"a\",\"x_r\":97530,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1917994801,\"xors\":1903085417,\"mat_words\":14909384,\"rows\":46879,\"steps\":7,\"pairs\":6489,\"field_pairs\":3081,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29518,\"cols_max\":27322,\"divisor_tests\":8316058,\"label_xors\":3482246576,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":601,\"peak_matrix_mb\":96,\"wall_ms\":4947,\"rss_kb\":76560}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":25,\"arm\":\"a\",\"x_r\":108061,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1891958891,\"xors\":1877268339,\"mat_words\":14690552,\"rows\":46478,\"steps\":7,\"pairs\":6188,\"field_pairs\":3143,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29358,\"cols_max\":27004,\"divisor_tests\":7436705,\"label_xors\":3407644788,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":580,\"peak_matrix_mb\":94,\"wall_ms\":4403,\"rss_kb\":76560}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":26,\"arm\":\"a\",\"x_r\":103071,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":2098945879,\"xors\":2083943808,\"mat_words\":15002071,\"rows\":46911,\"steps\":7,\"pairs\":6422,\"field_pairs\":3111,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29601,\"cols_max\":27403,\"divisor_tests\":8310745,\"label_xors\":3684024890,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":598,\"peak_matrix_mb\":96,\"wall_ms\":3885,\"rss_kb\":76408}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":27,\"arm\":\"a\",\"x_r\":87899,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1880934462,\"xors\":1865874231,\"mat_words\":15060231,\"rows\":46860,\"steps\":7,\"pairs\":6172,\"field_pairs\":3111,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29739,\"cols_max\":27416,\"divisor_tests\":7547247,\"label_xors\":3486145393,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":612,\"peak_matrix_mb\":97,\"wall_ms\":4373,\"rss_kb\":76408}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":28,\"arm\":\"a\",\"x_r\":54168,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1799728436,\"xors\":1784855512,\"mat_words\":14872924,\"rows\":46563,\"steps\":7,\"pairs\":6074,\"field_pairs\":3083,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29528,\"cols_max\":27318,\"divisor_tests\":7546275,\"label_xors\":3468909560,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":547,\"peak_matrix_mb\":96,\"wall_ms\":3647,\"rss_kb\":76408}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":29,\"arm\":\"a\",\"x_r\":118764,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1941865156,\"xors\":1926860712,\"mat_words\":15004444,\"rows\":46968,\"steps\":7,\"pairs\":6473,\"field_pairs\":3081,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29600,\"cols_max\":27407,\"divisor_tests\":8350607,\"label_xors\":3470198138,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":561,\"peak_matrix_mb\":96,\"wall_ms\":4764,\"rss_kb\":79148}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":30,\"arm\":\"a\",\"x_r\":68149,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":2069720822,\"xors\":2054753180,\"mat_words\":14967642,\"rows\":46800,\"steps\":7,\"pairs\":6320,\"field_pairs\":3110,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29616,\"cols_max\":27375,\"divisor_tests\":7876513,\"label_xors\":3860989926,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":547,\"peak_matrix_mb\":96,\"wall_ms\":4154,\"rss_kb\":79148}",
+        "{\"tool\":\"b09\",\"cell\":\"17-4-3\",\"role\":\"train\",\"idx\":31,\"arm\":\"a\",\"x_r\":123621,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1732028015,\"xors\":1717098562,\"mat_words\":14929453,\"rows\":46720,\"steps\":7,\"pairs\":6171,\"field_pairs\":3113,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":29615,\"cols_max\":27308,\"divisor_tests\":7513487,\"label_xors\":3196397053,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":591,\"peak_matrix_mb\":96,\"wall_ms\":4663,\"rss_kb\":79148}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-09/card-02/b09",
+        "fit",
+        "--n",
+        "17",
+        "--ell",
+        "4",
+        "--m",
+        "3",
+        "--seed",
+        "20261018",
+        "--out",
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-17-4-3",
+        "--samples",
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-17-4-3.samples.0,research/blindspots_20261018/09-learned-f4-policy/raw/model-17-4-3.samples.16"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.214,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fit-17-4-3",
+      "index": 5,
+      "outputs": {
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-17-4-3.model": "d8a4bd1fd6f77ef1f468189eaba39b56cf08845b17f1ff72c65b04f2024685e2"
+      },
+      "seconds": 0.214,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "826afd260cc9ca528bad48264f639b88f6836109d75b7fa6fc5dd70fa233def7",
+      "stdout_tail": [
+        "{\"tool\":\"b09\",\"mode\":\"fit\",\"cell\":\"17-4-3\",\"pair_samples\":91337,\"pos_rate\":0.142987,\"recall_at_tau\":0.9800,\"sel_rate_at_tau\":0.5276,\"precision_at_tau\":0.2656,\"row_samples\":9600,\"ridge_r2\":0.3216,\"order_wins\":[26, 0, 0, 6, 0],\"order_matrices\":32,\"order_best_xors\":7994539089,\"order_default_xors\":8053220020}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-09/card-02/b09"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-09/card-02"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 7,
+  "commit": "24281e84e368823ddfd86321f934954a554940d2",
+  "dirty_after": [
+    "research/blindspots_20261018/09-learned-f4-policy/raw/fit-17-4-3.json",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/fit-17-4-3.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-17-4-3.model",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-17-4-3.samples.16",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-17-4-3.trace.16",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/train-17-4-3-16-32.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/train-17-4-3-16-32.stderr.log"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}
