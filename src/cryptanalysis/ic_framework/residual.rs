@@ -65,6 +65,9 @@ pub const TABLE_CAP: usize = 1 << 22;
 
 /// Collect relations by residual collisions until the target column is
 /// pinned, then verify.  `max_trials` bounds the walk steps.
+///
+/// This is the frozen baseline: two group additions per step (the jump,
+/// then the hashed base-point subtraction).
 #[allow(clippy::too_many_arguments)]
 pub fn collect_residual_and_solve<G: CountedGroup, L: RelationSolver + ?Sized>(
     g: &G,
@@ -76,6 +79,50 @@ pub fn collect_residual_and_solve<G: CountedGroup, L: RelationSolver + ?Sized>(
     seed: u64,
     max_trials: u64,
     matrix: &mut L,
+) -> PipelineOutcome {
+    collect_residual_core(g, generator, target, r, h, fb, seed, max_trials, matrix, false)
+}
+
+/// The same collector with the jump and the base-point subtraction fused
+/// into **one** group addition per step.
+///
+/// Both the jump index `j` and the base index `i` are functions of the
+/// current residual's key, so a step is `L <- L + (J_j - P_i)`.  The
+/// `16 * |F|` sums `J_j - P_i` are computed once (and counted, as setup
+/// additions) instead of one extra addition on every step.  The walk is
+/// still collision-preserving (equal residuals take equal steps), every
+/// residual is still stored and probed, and a relation is formed exactly as
+/// in the baseline; only the number of group additions per step changes
+/// (one instead of two).  The trajectory differs from the baseline's, because
+/// the base index is now chosen from the pre-step residual, so the two arms
+/// are paired by instance and seed, not by trajectory.
+#[allow(clippy::too_many_arguments)]
+pub fn collect_residual_fused_and_solve<G: CountedGroup, L: RelationSolver + ?Sized>(
+    g: &G,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    h: u64,
+    fb: &FactorBase<G::Elt>,
+    seed: u64,
+    max_trials: u64,
+    matrix: &mut L,
+) -> PipelineOutcome {
+    collect_residual_core(g, generator, target, r, h, fb, seed, max_trials, matrix, true)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn collect_residual_core<G: CountedGroup, L: RelationSolver + ?Sized>(
+    g: &G,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    h: u64,
+    fb: &FactorBase<G::Elt>,
+    seed: u64,
+    max_trials: u64,
+    matrix: &mut L,
+    fused: bool,
 ) -> PipelineOutcome {
     let mut rng = StdRng::seed_from_u64(seed ^ 0x5245_5349_4455_414C);
     let mut rel = PhaseCost::default();
@@ -111,6 +158,20 @@ pub fn collect_residual_and_solve<G: CountedGroup, L: RelationSolver + ?Sized>(
             (p, c, d)
         })
         .collect();
+
+    // Fused step sums J_j - P_i, row-major by jump: entry j * f + i.  Counted
+    // once as setup additions; the baseline pays one addition per step instead.
+    let fused_sums: Vec<G::Elt> = if fused {
+        let mut v = Vec::with_capacity(jump_count * f);
+        for &(jp, _, _) in &jumps {
+            for i in 0..f {
+                v.push(g.add(&mut rel.group_ops, jp, fb.points[fb.neg_index[i]]));
+            }
+        }
+        v
+    } else {
+        Vec::new()
+    };
 
     let mut table: HashMap<u64, Stored> = HashMap::new();
     let mut fresh = true;
@@ -156,6 +217,9 @@ pub fn collect_residual_and_solve<G: CountedGroup, L: RelationSolver + ?Sized>(
     };
 
     while trials < max_trials {
+        // `stepped`: this iteration already did its base-point subtraction
+        // (the fused step); the identity check before it does not apply.
+        let mut stepped = false;
         if fresh {
             a = rng.gen_range(1..r);
             b = rng.gen_range(1..r);
@@ -165,6 +229,19 @@ pub fn collect_residual_and_solve<G: CountedGroup, L: RelationSolver + ?Sized>(
             row.iter_mut().for_each(|c| *c = 0);
             fresh = false;
             restarts += 1;
+        } else if fused {
+            // One addition: L <- L + (J_j - P_i), j and i both chosen by the
+            // residual's key, so equal residuals take equal steps.
+            let kp = g.key(&point);
+            let j = (mix(kp) as usize >> 8) % jump_count;
+            let i = (mix(kp ^ 0xA5A5) as usize >> 4) % f;
+            let (_, aj, bj) = jumps[j];
+            point = g.add(&mut rel.group_ops, point, fused_sums[j * f + i]);
+            a = addmod(a, aj, r);
+            b = addmod(b, bj, r);
+            let c = fb.col_of[i];
+            row[c] = addmod(row[c], fb.coef_of[i], r);
+            stepped = true;
         } else {
             let hsh = mix(g.key(&point));
             let j = (hsh as usize >> 8) % jump_count;
@@ -173,16 +250,18 @@ pub fn collect_residual_and_solve<G: CountedGroup, L: RelationSolver + ?Sized>(
             a = addmod(a, aj, r);
             b = addmod(b, bj, r);
         }
-        if g.is_identity(&point) {
+        if !stepped && g.is_identity(&point) {
             fresh = true;
             continue;
         }
-        // Subtract one base point chosen by the residual itself, so that
-        // equal residuals take equal steps.
-        let i = (mix(g.key(&point) ^ 0xA5A5) as usize >> 4) % f;
-        point = g.add(&mut rel.group_ops, point, fb.points[fb.neg_index[i]]);
-        let c = fb.col_of[i];
-        row[c] = addmod(row[c], fb.coef_of[i], r);
+        if !stepped {
+            // Subtract one base point chosen by the residual itself, so that
+            // equal residuals take equal steps.
+            let i = (mix(g.key(&point) ^ 0xA5A5) as usize >> 4) % f;
+            point = g.add(&mut rel.group_ops, point, fb.points[fb.neg_index[i]]);
+            let c = fb.col_of[i];
+            row[c] = addmod(row[c], fb.coef_of[i], r);
+        }
         trials += 1;
         if g.is_identity(&point) {
             // [a]G + [b]Q = Σ P_j exactly: a classic relation.
@@ -301,6 +380,9 @@ pub fn collect_residual_and_solve<G: CountedGroup, L: RelationSolver + ?Sized>(
     rel.count("lookups", table_probes + trials);
     rel.count("walk_restarts", restarts);
     rel.count("walk_jumps", jump_count as u64);
+    if fused {
+        rel.count("residual_fused_sums", fused_sums.len() as u64);
+    }
     la.wall_ns = la_ns;
     let (work, work_unit) = matrix.work();
     la.count(work_unit, work);
@@ -397,5 +479,87 @@ mod tests {
         assert!(native.get("residual_table_entries").copied().unwrap_or(0) > 0);
         assert!(native.get("trials").copied().unwrap_or(0) >= report.decomposition.relations_found);
         assert_eq!(report.spec.targets.name(), "residual");
+    }
+
+    /// Run one pipeline with the given target mode on the planted instance and
+    /// return `(verified, recovered, trials, group additions + doublings)`.
+    fn run_mode(targets: Targets, seed: u64, size: &str) -> (bool, Option<u64>, u64, u64) {
+        let inst = roster_prime_instance(14).unwrap();
+        let g = inst.generator_point();
+        let mut ops = GroupOps::default();
+        let planted = 30_011 % inst.r;
+        let q = inst.curve.mul(&mut ops, g, planted);
+        let ctx = InstanceCtx {
+            group: &inst.curve,
+            generator: g,
+            target: q,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: None,
+        };
+        let base = PrimeAbscissaBase { instance: &inst };
+        let mut spec = PipelineSpec {
+            factor_base: "prime-abscissa".into(),
+            oracle: "mitm".into(),
+            targets,
+            max_trials: 4_000_000,
+            seed,
+            ..Default::default()
+        };
+        spec.factor_base_params = Params::default();
+        spec.factor_base_params.set("size", size);
+        spec.oracle_params.set("negation_folded", "1");
+        let mut oracle = MitmOracle::new(2);
+        let report = run_pipeline(
+            &ctx,
+            &spec,
+            &base,
+            &mut oracle,
+            planted,
+            &Calibration::default(),
+            None,
+        )
+        .expect("the residual configuration should run");
+        let native = &report.decomposition.cost.native;
+        let trials = native.get("trials").copied().unwrap_or(0);
+        let adds = report.decomposition.cost.group_ops.adds + report.decomposition.cost.group_ops.doubles;
+        (report.verified, report.recovered, trials, adds)
+    }
+
+    /// **The fused collector recovers the planted logarithm** for several seeds
+    /// and base sizes, and does close to one group operation per step where the
+    /// baseline does two.
+    #[test]
+    fn fused_residual_collector_recovers_and_halves_the_additions_per_step() {
+        let planted = 30_011 % roster_prime_instance(14).unwrap().r;
+        let (mut base_ops, mut base_steps, mut fused_ops, mut fused_steps) = (0u64, 0u64, 0u64, 0u64);
+        for seed in 1..=6u64 {
+            for size in ["2", "4", "24"] {
+                let (ok, rec, trials, adds) = run_mode(Targets::ResidualFused, seed, size);
+                assert!(ok, "fused did not recover (seed {seed}, size {size})");
+                assert_eq!(rec, Some(planted));
+                assert!(trials > 0);
+                let (ok0, rec0, trials0, adds0) = run_mode(Targets::Residual, seed, size);
+                assert!(ok0 && rec0 == Some(planted));
+                // Per-step operation counts only for the small bases, where the
+                // collector is meant to run: for a large base the 16 * |F| setup
+                // sums are comparable to the steps of a 14-bit instance.
+                if size != "24" {
+                    fused_ops += adds;
+                    fused_steps += trials;
+                    base_ops += adds0;
+                    base_steps += trials0;
+                }
+            }
+        }
+        let per_step_fused = fused_ops as f64 / fused_steps as f64;
+        let per_step_base = base_ops as f64 / base_steps as f64;
+        // Baseline: two additions per step plus restarts; fused: one plus restarts
+        // and the setup sums.  The ratio of per-step operations must be well below 1.
+        assert!(per_step_base > 1.8, "baseline per-step {per_step_base}");
+        assert!(per_step_fused < 1.35, "fused per-step {per_step_fused}");
+        assert_eq!(Targets::parse("residual-fused").unwrap().name(), "residual-fused");
     }
 }
