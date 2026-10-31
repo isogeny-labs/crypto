@@ -110,13 +110,19 @@ def main():
             require(any(a["role"] == "all-visited-pdp-transitions" for a in manifest["artifacts"]),
                     f"archive {index} method artifact")
         statuses[status["native_status"]] += 1
+        public_core = {name: public[name] for name in ("field", "curve", "generator", "target")}
+        public_core_sha = digest(json.dumps(public_core, sort_keys=True).encode())
         rows.append({"index": index, "method": method, "m": arity, "twist": twist,
             "generator_index": generator, "key_index": key, "native_status": status["native_status"],
             "archive_sha256": custody["archive_sha256"],
             "manifest_sha256": digest(manifest_raw), "public_sha256": digest(public_raw),
+            "public_core_sha256": public_core_sha,
             "s3_uri": custody["s3_uri"]})
-    require(all(rows[2*j]["public_sha256"] != rows[2*j+1]["public_sha256"]
-                for j in range(13)), "opposite twists must differ at each arity")
+    require(all(rows[2*j]["public_core_sha256"] == rows[0]["public_core_sha256"] and
+                rows[2*j+1]["public_core_sha256"] == rows[1]["public_core_sha256"]
+                for j in range(13)) and
+            rows[0]["public_core_sha256"] != rows[1]["public_core_sha256"],
+            "public curve, generator and target must be fixed by twist across arities")
     export = read(HERE / "experiment-export.json")
     receipt = read(HERE / "experiment-export-producer-receipt.json")
     flow = export["flow"]
