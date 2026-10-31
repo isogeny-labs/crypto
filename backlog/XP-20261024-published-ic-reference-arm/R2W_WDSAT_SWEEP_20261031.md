@@ -136,3 +136,9 @@ At l = 3 the solver-only figure is the whole WDSat cost less about 1.39e7 per ca
 - Build and scratch location: `/Volumes/SSD990-2/r2w-build` (cargo target ~0.8 GB copied from R5's build, tree 123 MB, WDSat binaries ~12 MB, ANF dumps ~40 MB, runs; first-build sessions in `runs_firstbuild`, aborted ones in `runs_aborted`). Not committed.
   `/Volumes/SSD990-2/r5-wdsat-build` was read (tree and target copied), never modified or deleted.
 - No push, no PR, no download. WDSat source is not in the repository; the clone `/tmp/claude-501/wdsat_src` was used read-only, its prebuilt binary was never run.
+
+## Amendment 2 (written after the WDSat sweep was complete, before any new lab run)
+
+The WDSat side was swept over every valid l (3..13 at n = 15) while R2's lab sweep is shorter (one point above the minimum at K_0 n=9 and K_1 n=11; l <= 6 at n <= 11, <= 8 at n = 13, <= 9 at n = 15), and the WDSat sweep showed that a late drop in cost can sit well past a local rise.
+Fit A is unchanged (pre-fixed grid, R2's lab values). **Fit B is reported twice**: B1 = extended WDSat grid against R2's lab values (as in the table above); B2 = extended WDSat grid against a lab arm extended over the same l values WDSat was run at in that cell
+(K_0 n=9: l=7, 8; K_1 n=9: l=6..8; K_1 n=11: l=7..10; K_0 n=13: l=9..12; K_0 n=15: l=10..13), lab-only sessions, same session law. B2 is the like-for-like fit; a lab point that fails (`exhausted`, budget) counts as failed 0/8. The verdict rule is unchanged and is applied to A (decides), B1 and B2 (post hoc).
