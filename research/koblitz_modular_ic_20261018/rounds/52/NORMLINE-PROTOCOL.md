@@ -25,3 +25,7 @@ randomization,blinding or performance inference. Same local authorized lane:
 seed52,one Singular/FLINT thread,4GiBvirtual,1200s,serialize after earlier
 math terminates. Freeze input and protocol before data. Strict exit0,no?
 errorlines,NORMLINE52_ALL_CHECKS_PASS;retain all attempts/partials/caps.
+
+Before first norm run: keep lambda,nu as polynomial variables after t,
+with coefficient field F2(b,c),so the entire sign substitution and its
+source-ideal products are polynomial in the packet coordinates.
