@@ -911,6 +911,9 @@ pub fn generate(config: &CaseConfig) -> Result<CaseData, String> {
 /// artifact and charge the ordinary constructor work performed before this
 /// control replaces its target and factor base.
 pub fn generate_planted(config: &CaseConfig) -> Result<CaseData, String> {
+    if config.factor_base_size == 0 || config.factor_base_size > 4096 {
+        return Err("invalid planted factor-base size".into());
+    }
     let mut case = generate(config)?;
     let c = arithmetic(&case.public_instance)?;
     let generator = point_words(&case.public_instance["generator"])?;
@@ -1901,6 +1904,9 @@ mod tests {
     #[test]
     fn planted_control_is_deterministic_and_independently_replayed() {
         let mut cfg = config("koblitz", 23, false);
+        let mut invalid_size = cfg.clone();
+        invalid_size.factor_base_size = usize::MAX;
+        assert!(generate_planted(&invalid_size).is_err());
         cfg.factor_base_size = 4;
         cfg.m = 15; // Terms are sampled with replacement, even above base size.
         let natural = generate(&cfg).unwrap();
