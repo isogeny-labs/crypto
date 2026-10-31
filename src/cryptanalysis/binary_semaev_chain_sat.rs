@@ -603,6 +603,43 @@ impl ChainedS3Encoding {
         Ok(())
     }
 
+    /// Restrict the affine intermediate `y_step` (the x-coordinate of the
+    /// partial sum after summand `step + 1`, `1 <= step <= m - 2`) to a
+    /// finite set of codes, by the same trie as a summand domain. The caller
+    /// must pass a set that contains every value the intermediate can take
+    /// in a decomposition (for example all x-coordinates of sums of
+    /// `step + 1` base points, or of `R` minus sums of `m - step - 1`), so
+    /// that no decomposition is lost. Refused for an identity step, whose
+    /// block is fixed to zero, and before the summand domain is installed.
+    pub fn constrain_intermediate(
+        &mut self,
+        step: usize,
+        codes: &[BigUint],
+        max_domain_clauses: usize,
+    ) -> Result<usize, ChainBuildError> {
+        if !self.domain_installed
+            || step == 0
+            || step + 2 > self.m
+            || (self.identity_mask & (1 << (step - 1))) != 0
+        {
+            return Err(ChainBuildError::Unsupported);
+        }
+        let required =
+            finite_domain_clause_count(codes, self.n, 1).ok_or(ChainBuildError::Unsupported)?;
+        if required > max_domain_clauses {
+            return Err(ChainBuildError::DomainClauseCap {
+                required,
+                maximum: max_domain_clauses,
+            });
+        }
+        let mut codes = codes.to_vec();
+        codes.sort_unstable();
+        codes.dedup();
+        let block = self.blocks[self.m + step - 1].clone();
+        add_coordinate_domain(&mut self.solver, &block, &codes, self.n as usize);
+        Ok(required)
+    }
+
     /// Keep one representative of every summand permutation:
     /// `x_1 <= x_2 <= ... <= x_m` as unsigned codes. A decomposition
     /// `R = P_1 + ... + P_m` has a chain witness in every summand order, its

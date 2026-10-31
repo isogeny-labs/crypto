@@ -13,9 +13,12 @@
 //! n83_chain_sat_bench <m> <union_dim> <public> <planted> <conflict_budget> <seed> <arms>
 //! ```
 //! `arms` is a comma list of `unordered`, `first-pair`, `all-summands`, each
-//! optionally suffixed `+affine` to search only the all-affine identity
-//! pattern ([`ChainS3Patterns::AffineOnly`]: complete for decompositions
-//! with no zero-sum sub-multiset). One JSON line per (target, arm).
+//! optionally followed by `+affine` (search only the all-affine identity
+//! pattern, [`ChainS3Patterns::AffineOnly`]: complete for decompositions with
+//! no zero-sum sub-multiset) and `+t<F>.<B>` (root-finder tables of
+//! intermediate x-coordinates, [`ChainS3Tables`] with front depth `F`, back
+//! depth `B`, at most 300,000 points per table). One JSON line per
+//! (target, arm).
 use crypto_lib::binary_ecc::{BinaryPoint, F2mElement};
 use crypto_lib::cryptanalysis::koblitz_index_calculus::*;
 use num_bigint::BigUint;
@@ -35,20 +38,37 @@ fn main() {
     let planted: usize = a[3].parse().expect("planted");
     let budget: u64 = a[4].parse().expect("conflict_budget");
     let seed: u64 = a[5].parse().expect("seed");
-    let arms: Vec<(String, ChainS3Order, ChainS3Patterns)> = a[6]
+    let arms: Vec<(String, ChainS3Options)> = a[6]
         .split(',')
-        .map(|s| {
-            let (base, patterns) = match s.strip_suffix("+affine") {
-                Some(base) => (base, ChainS3Patterns::AffineOnly),
-                None => (s, ChainS3Patterns::All),
-            };
-            let o = match base {
+        .map(|spec| {
+            let mut parts = spec.split('+');
+            let order = match parts.next().unwrap_or("") {
                 "unordered" => ChainS3Order::Unordered,
                 "first-pair" => ChainS3Order::FirstPair,
                 "all-summands" => ChainS3Order::AllSummands,
-                other => panic!("unknown arm {other}"),
+                other => panic!("unknown order {other}"),
             };
-            (s.to_string(), o, patterns)
+            let mut options = ChainS3Options {
+                frobenius_orbits: false,
+                order,
+                patterns: ChainS3Patterns::All,
+                tables: ChainS3Tables::default(),
+            };
+            for part in parts {
+                if part == "affine" {
+                    options.patterns = ChainS3Patterns::AffineOnly;
+                } else if let Some(depths) = part.strip_prefix('t') {
+                    let (f, b) = depths.split_once('.').expect("t<F>.<B>");
+                    options.tables = ChainS3Tables {
+                        front: f.parse().expect("front depth"),
+                        back: b.parse().expect("back depth"),
+                        max_points: 300_000,
+                    };
+                } else {
+                    panic!("unknown arm modifier {part}");
+                }
+            }
+            (spec.to_string(), options)
         })
         .collect();
 
@@ -78,11 +98,10 @@ fn main() {
     }
     for (t, (kind, target)) in targets.iter().enumerate() {
         for j in 0..arms.len() {
-            let (name, order, patterns) = &arms[(t + j) % arms.len()];
+            let (name, options) = &arms[(t + j) % arms.len()];
             let start = Instant::now();
-            let (found, stats) = sat_decompose_chained_s3_patterns(
-                &kc, &fb, target, m, limits, false, *order, *patterns,
-            );
+            let (found, stats) =
+                sat_decompose_chained_s3_with(&kc, &fb, target, m, limits, *options);
             let seconds = start.elapsed().as_secs_f64();
             let verified = found.as_ref().is_some_and(|idx| {
                 idx.len() == m
@@ -105,7 +124,7 @@ fn main() {
                     "curve": kc.label(), "m": m, "union_dim": dim,
                     "base_points": fb.points.len(), "target": t, "kind": kind,
                     "arm": name, "position": j, "verdict": verdict,
-                    "patterns_mode": format!("{patterns:?}"),
+                    "options": serde_json::to_value(options).unwrap_or_default(),
                     "verified": verified, "conflicts": stats.conflicts,
                     "conflict_budget": budget, "seconds": seconds,
                     "patterns_attempted": stats.patterns_attempted,
