@@ -6633,3 +6633,148 @@ mod signed_shared_counter_tests {
         );
     }
 }
+
+/// One-use terminal encoding allowance, debited before native execution.
+/// Retains partial raw bytes on failure; only `complete` permits canonical use.
+struct TerminalEncoding {
+    bytes: Vec<u8>,
+    cap: usize,
+    deadline: Instant,
+    reserved_work: u64,
+    performed_work: u64,
+    attempted: bool,
+    complete: bool,
+    stop: Option<Stop>,
+}
+impl TerminalEncoding {
+    fn admit(cap: usize, budget: &mut Budget) -> Result<Self, Stop> {
+        if cap == 0 || cap > 128 * 1024 || budget.phase != Phase::Setup {
+            return budget.fail(Stop::InvalidLimits);
+        }
+        let work = (cap as u64).checked_mul(8).ok_or(Stop::Overflow)?;
+        let bytes = (cap as u64)
+            .checked_add(std::mem::size_of::<Self>() as u64)
+            .ok_or(Stop::Overflow)?;
+        budget.reserve_checking(work, bytes, Instant::now())?;
+        budget.reserve_trace(cap as u64, Instant::now())?;
+        let mut buffer = Vec::new();
+        if buffer.try_reserve_exact(cap).is_err() {
+            return budget.fail(Stop::Allocation);
+        }
+        Ok(Self {
+            bytes: buffer,
+            cap,
+            deadline: budget.deadline,
+            reserved_work: work,
+            performed_work: 0,
+            attempted: false,
+            complete: false,
+            stop: None,
+        })
+    }
+    fn encode<T: serde::Serialize>(&mut self, view: &T) -> Result<(), Stop> {
+        use std::io::Write;
+        if self.attempted {
+            return Err(self.stop.unwrap_or(Stop::Phase));
+        }
+        self.attempted = true;
+        if Instant::now() >= self.deadline {
+            self.stop = Some(Stop::Deadline);
+            return Err(Stop::Deadline);
+        }
+        if serde_json::to_writer(&mut *self, view).is_err() || self.write_all(b"\n").is_err() {
+            let stop = *self.stop.get_or_insert(Stop::Serialization);
+            return Err(stop);
+        }
+        if Instant::now() >= self.deadline {
+            self.stop = Some(Stop::Deadline);
+            return Err(Stop::Deadline);
+        }
+        self.complete = true;
+        Ok(())
+    }
+}
+impl std::io::Write for TerminalEncoding {
+    fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+        let stop = if Instant::now() >= self.deadline {
+            Some(Stop::Deadline)
+        } else if bytes.len() > self.cap - self.bytes.len() {
+            Some(Stop::Trace)
+        } else {
+            None
+        };
+        if let Some(stop) = stop {
+            self.stop.get_or_insert(stop);
+            return Err(std::io::Error::other("terminal allowance exhausted"));
+        }
+        let work = (bytes.len() as u64)
+            .checked_mul(8)
+            .ok_or_else(|| std::io::Error::other("terminal work overflow"))?;
+        if work > self.reserved_work - self.performed_work {
+            self.stop.get_or_insert(Stop::Work);
+            return Err(std::io::Error::other("terminal work exhausted"));
+        }
+        self.performed_work += work;
+        self.bytes.extend_from_slice(bytes);
+        Ok(bytes.len())
+    }
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
+    }
+}
+#[cfg(test)]
+mod terminal_encoding_tests {
+    use super::*;
+    #[test]
+    fn terminal_uses_only_precharged_allowance_after_producer_stop() {
+        let mut b = construction_tests::budget();
+        let mut terminal = TerminalEncoding::admit(2048, &mut b).unwrap();
+        let work = b.checking_work;
+        let trace = b.trace_bytes;
+        let bytes = b.adapter_bytes;
+        assert_eq!(b.fail::<()>(Stop::Observer), Err(Stop::Observer));
+        terminal.encode(&b.saved_ledger()).unwrap();
+        assert!(terminal.complete && terminal.stop.is_none());
+        assert_eq!(b.stopped, Some(Stop::Observer));
+        assert_eq!(
+            (b.checking_work, b.trace_bytes, b.adapter_bytes),
+            (work, trace, bytes)
+        );
+        assert_eq!(terminal.performed_work, terminal.bytes.len() as u64 * 8);
+        assert!(terminal.performed_work <= terminal.reserved_work);
+        verify_budget_ledger(&terminal.bytes, b.original_limits()).unwrap();
+        let retained = terminal.bytes.clone();
+        assert_eq!(terminal.encode(&b.saved_ledger()), Err(Stop::Phase));
+        assert_eq!(terminal.bytes, retained);
+    }
+    #[test]
+    fn terminal_cap_retains_partial_bytes_and_does_not_promote_them() {
+        let mut b = construction_tests::budget();
+        let mut terminal = TerminalEncoding::admit(10, &mut b).unwrap();
+        assert_eq!(
+            terminal.encode(&serde_json::json!({"value":"long payload"})),
+            Err(Stop::Trace)
+        );
+        assert!(!terminal.complete && !terminal.bytes.is_empty());
+        assert!(terminal.bytes.len() <= 10);
+        let retained = terminal.bytes.clone();
+        assert_eq!(terminal.encode(&0), Err(Stop::Trace));
+        assert_eq!(terminal.bytes, retained);
+    }
+    #[test]
+    fn original_deadline_and_admission_limits_are_not_reset_for_terminal_output() {
+        let mut b = construction_tests::budget();
+        let mut terminal = TerminalEncoding::admit(64, &mut b).unwrap();
+        // Fault injection after admission: the original terminal deadline has elapsed.
+        terminal.deadline = Instant::now();
+        assert_eq!(terminal.encode(&0), Err(Stop::Deadline));
+        assert!(terminal.bytes.is_empty() && !terminal.complete);
+        let mut b = construction_tests::budget();
+        b.trace_limit = 63;
+        assert!(matches!(
+            TerminalEncoding::admit(64, &mut b),
+            Err(Stop::Trace)
+        ));
+        assert_eq!(b.stopped, Some(Stop::Trace));
+    }
+}
