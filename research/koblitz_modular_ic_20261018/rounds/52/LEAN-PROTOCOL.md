@@ -13,3 +13,9 @@ Before second compile: first source reports missing range import and an
 elaboration error in the sup inclusion. Import Submodule.Range and give the
 inclusion its full module type. Preserve first compile receipt; same four
 mathematical propositions and toolchain.
+
+Before second compile add two relevant implications: unit scalar cancellation
+in a submodule,and degree-pattern compatibility for(8,8) versus(2,14).
+Total six declarations. Neither actual fibers nor monic specialization
+premises are asserted. The latter is a new proposed route for primality
+of the larger source without requiring an impossible irreducible16fiber.

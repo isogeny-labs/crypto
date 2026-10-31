@@ -54,4 +54,22 @@ theorem next_eq_iff_stable (f : M →ₗ[R] M) (S : Submodule R M) :
       exact h y hy
     · exact le_sup_left
 
+/-- The scalar recovery product yields full recovery after making its scalar
+unit. The native annihilator and localization construction are external. -/
+theorem mem_of_unit_smul_mem (S : Submodule R M) (d : R) (x : M)
+    (hd : IsUnit d) (hx : d • x ∈ S) : x ∈ S := by
+  obtain ⟨u, hu⟩ := hd
+  have h := S.smul_mem (↑(u⁻¹) : R) hx
+  simpa [← hu, ← smul_smul] using h
+
+/-- Two reducible factorization patterns can exclude every proper global
+factor degree. Specialization/monicity and actual fiber patterns are external. -/
+theorem two_patterns_exclude_proper_degree (d : ℕ)
+    (h88 : d = 0 ∨ d = 8 ∨ d = 16)
+    (h214 : d = 0 ∨ d = 2 ∨ d = 14 ∨ d = 16) : d = 0 ∨ d = 16 := by
+  rcases h88 with h | h | h
+  · exact Or.inl h
+  · rcases h214 with h' | h' | h' | h' <;> simp_all
+  · exact Or.inr h
+
 end Closure52
