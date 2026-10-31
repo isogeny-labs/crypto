@@ -50,7 +50,7 @@ def readTrusted (path : String) : IO (List Name) := do
     if n.isEmpty then none else some n.toName
 
 def main (args : List String) : IO UInt32 := do
-  -- Older Lean releases consume this separator; newer ones pass it to main.
+  -- Lean 4.19 consumes the separator; newer Lean versions pass it to main.
   let args := match args with
     | "--" :: rest => rest
     | _ => args

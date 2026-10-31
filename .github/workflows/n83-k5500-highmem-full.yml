@@ -1,0 +1,126 @@
+name: N83 K5500 approved high-memory full control
+
+on:
+  push:
+    branches: [codex/n83-k5500-highmem-full-20261021]
+    paths:
+      - .github/n83-k5500-highmem-approved.json
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: n83-k5500-highmem-full
+  cancel-in-progress: false
+
+jobs:
+  approved-full-control:
+    if: github.repository == 'aburan28/crypto'
+    runs-on: ${{ 'crypto-eks-highmem' }}
+    timeout-minutes: 300
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download the approved capacity receipt
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          marker=.github/n83-k5500-highmem-approved.json
+          artifact_id=$(python3 - "$marker" <<'PY'
+          import json
+          import sys
+          value = json.load(open(sys.argv[1])).get('capacity_artifact_id')
+          if type(value) is not int or value <= 0:
+              raise SystemExit('capacity artifact ID is absent')
+          print(value)
+          PY
+          )
+          run_id=$(python3 - "$marker" <<'PY'
+          import json
+          import sys
+          value = json.load(open(sys.argv[1])).get('capacity_run_id')
+          if type(value) is not int or value <= 0:
+              raise SystemExit('capacity run ID is absent')
+          print(value)
+          PY
+          )
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/$run_id" > "$RUNNER_TEMP/capacity-run.json"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/$artifact_id" > "$RUNNER_TEMP/capacity-artifact.json"
+          python3 - "$marker" "$RUNNER_TEMP/capacity-run.json" "$RUNNER_TEMP/capacity-artifact.json" <<'PY'
+          import json
+          import sys
+          marker, run, artifact = [json.load(open(path)) for path in sys.argv[1:]]
+          if (run.get('id') != marker['capacity_run_id'] or
+                  run.get('head_sha') != marker['capacity_head_sha'] or
+                  run.get('conclusion') != 'success' or
+                  run.get('name') != 'N83 K5500 existing high-memory runner capacity' or
+                  artifact.get('id') != marker['capacity_artifact_id'] or
+                  artifact.get('expired') is not False or
+                  artifact.get('workflow_run', {}).get('id') != run['id'] or
+                  artifact.get('workflow_run', {}).get('head_sha') != run['head_sha']):
+              raise SystemExit('capacity Actions provenance differs')
+          PY
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/$artifact_id/zip" > "$RUNNER_TEMP/capacity.zip"
+          unzip -p "$RUNNER_TEMP/capacity.zip" n83-k5500-highmem-capacity.json > "$RUNNER_TEMP/capacity.json"
+
+      - name: Verify approval and live host before build
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 research/n83_k5500_highmem_full_20261021/preflight.py \
+            --approval .github/n83-k5500-highmem-approved.json \
+            --capacity "$RUNNER_TEMP/capacity.json" \
+            --output "$RUNNER_TEMP/k5500-preflight.json"
+
+      - name: Build pinned producer and run release tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.99.1 --profile minimal
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/n83-k5500-target"
+          export CARGO_BUILD_JOBS=4
+          cargo +1.99.1 test --release --locked --lib
+          cargo +1.99.1 test --release --locked --example koblitz_orbit_dlp_fast
+          cargo +1.99.1 build --release --locked --example koblitz_orbit_dlp_fast
+          python3 research/n83_highk_beyond4405_20261021/run_k5500_full_control.py \
+            --binary "$CARGO_TARGET_DIR/release/examples/koblitz_orbit_dlp_fast" \
+            --output "$RUNNER_TEMP/n83-k5500-full" --preflight-only
+
+      - name: Run bounded K5500 control
+        id: full
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/n83-k5500-target"
+          python3 research/n83_highk_beyond4405_20261021/run_k5500_full_control.py \
+            --binary "$CARGO_TARGET_DIR/release/examples/koblitz_orbit_dlp_fast" \
+            --output "$RUNNER_TEMP/n83-k5500-full"
+
+      - name: Replay K5500 result independently
+        if: always() && steps.full.outcome != 'skipped'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if test -d "$RUNNER_TEMP/n83-k5500-full"; then
+            python3 research/n83_highk_beyond4405_20261021/verify_k5500_full_control.py \
+              --output "$RUNNER_TEMP/n83-k5500-full"
+          fi
+
+      - name: Preserve accepted and rejected receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n83-k5500-highmem-full-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/capacity-run.json
+            ${{ runner.temp }}/capacity-artifact.json
+            ${{ runner.temp }}/capacity.json
+            ${{ runner.temp }}/k5500-preflight.json
+            ${{ runner.temp }}/n83-k5500-full/**
+          if-no-files-found: warn
+          retention-days: 14
