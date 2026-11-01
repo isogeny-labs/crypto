@@ -1,0 +1,120 @@
+{
+  "schema": "n83.factor-base-output-index-summary/v1",
+  "candidate_id": "spike29",
+  "coordinate_bit": 29,
+  "n": 83,
+  "ell": 27,
+  "coordinate_positions": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    29
+  ],
+  "candidate_x_count_per_curve": 134217728,
+  "index_complete": true,
+  "index_sha256": "f6787fb737fb988bcd5089fb1cb755b81f8745a7016e93d37d7c15bf87874236",
+  "index_validation": true,
+  "same_factor_base_reused_for_m": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "family_count": 3,
+  "shard_count": 384,
+  "payload_and_receipt_pairs": 384,
+  "families": [
+    {
+      "family": "koblitz",
+      "manifest_sha256": "852f773550a05dc4aec23eceb616b11378c17cb34794e8a7ce00290d46917a73",
+      "shards": 128,
+      "candidate_x_count": 134217728,
+      "point_count": 134195671,
+      "liftable_x": 67097836,
+      "compressed_bytes": 1329138437,
+      "same_base_for_m": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "family": "binary",
+      "manifest_sha256": "1e4161c9fba93f02bcb64659581037cc631a7ae4086ab8d809613e949e808d8c",
+      "shards": 128,
+      "candidate_x_count": 134217728,
+      "point_count": 134226535,
+      "liftable_x": 67113268,
+      "compressed_bytes": 1329445027,
+      "same_base_for_m": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "family": "prime",
+      "manifest_sha256": "058c490c8a3f56a50fa717d64edd04ef009bea301cc42d598744f935ea56054b",
+      "shards": 128,
+      "candidate_x_count": 134217728,
+      "point_count": 134206522,
+      "liftable_x": 67103261,
+      "compressed_bytes": 1849394724,
+      "same_base_for_m": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    }
+  ],
+  "layout": {
+    "index": "data/index.json",
+    "family_manifest": "data/{family}/manifest.json",
+    "payload": "data/{family}/part-NNNN.bin.zst",
+    "receipt": "data/{family}/part-NNNN.json",
+    "payload_format": "N83FB02 zstd shards; 32-byte header and 20-byte (selector index,y) records"
+  },
+  "validation": "All 384 receipt spans are contiguous 2^20 selector blocks; each family manifest SHA matches index.json; every local compressed payload exists with the recorded byte length. Generator marked every shard verified_all_candidates and top-level index-validation is true."
+}
