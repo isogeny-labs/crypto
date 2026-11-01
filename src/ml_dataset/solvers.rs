@@ -20,8 +20,7 @@ mod binary_m3_original;
 #[path = "koblitz_m3.rs"]
 mod koblitz_m3;
 
-// Pure ordinary-binary component controls; runtime original-token integration is pending.
-#[cfg(test)]
+// Ordinary finite-selector construction; only original-bound supervised dispatch.
 #[path = "binary_m3_resultant.rs"]
 mod binary_m3_resultant;
 pub(in crate::ml_dataset) use koblitz_m3::AdmittedKoblitzNative;
@@ -364,20 +363,64 @@ pub(super) fn verify_and_store_worker_originals<'a>(
     })
 }
 
+/// Retained, unacknowledged bytes and rejected actual receipts. This transport
+/// performs no storage retry and makes no durable-publication claim.
+#[derive(Default)]
+pub(super) struct WorkerResidualCustody {
+    items: Vec<WorkerResidualArtifact>,
+}
+pub(super) struct WorkerResidualArtifact {
+    path: &'static str,
+    bytes: Vec<u8>,
+    untransferred_root: Option<super::types::Artifact>,
+}
+impl WorkerResidualCustody {
+    const CAPACITY: usize = 10;
+    fn admit(charge: impl FnOnce(u64, u64) -> Result<(), String>) -> Result<Self, String> {
+        charge(
+            4096,
+            (Self::CAPACITY * std::mem::size_of::<WorkerResidualArtifact>()) as u64,
+        )?;
+        let mut items = Vec::new();
+        items
+            .try_reserve_exact(Self::CAPACITY)
+            .map_err(|e| e.to_string())?;
+        Ok(Self { items })
+    }
+    fn retain(&mut self, item: WorkerResidualArtifact) -> Result<(), WorkerResidualArtifact> {
+        if self.items.len() == Self::CAPACITY || self.items.capacity() < Self::CAPACITY {
+            return Err(item);
+        }
+        self.items.push(item);
+        Ok(())
+    }
+    pub(super) fn has_untransferred_roots(&self) -> bool {
+        self.items.iter().any(|a| a.untransferred_root.is_some())
+    }
+}
+
 /// Private worker transport: acknowledged roots never re-enter payload writers.
 pub(super) struct WorkerSolveOutput {
     data: SolverData,
     stored: Vec<super::types::Artifact>,
+    residual: WorkerResidualCustody,
 }
 impl WorkerSolveOutput {
     pub(super) fn legacy(data: SolverData) -> Self {
         Self {
             data,
             stored: Vec::new(),
+            residual: WorkerResidualCustody::default(),
         }
     }
-    pub(super) fn into_parts(self) -> (SolverData, Vec<super::types::Artifact>) {
-        (self.data, self.stored)
+    pub(super) fn into_parts(
+        self,
+    ) -> (
+        SolverData,
+        Vec<super::types::Artifact>,
+        WorkerResidualCustody,
+    ) {
+        (self.data, self.stored, self.residual)
     }
 }
 
@@ -441,6 +484,7 @@ impl<'a> WorkerStoredReceipts<'a> {
         WorkerSolveOutput {
             data,
             stored: self.records,
+            residual: WorkerResidualCustody::default(),
         }
     }
 }
@@ -449,7 +493,13 @@ impl<'a> WorkerStoredReceipts<'a> {
 /// Original worker verification has already authenticated these public values.
 /// This bounded shape check allocates no curve, domain, or payload buffers.
 fn koblitz_worker_profile(config: &CaseConfig, case: &CaseData) -> bool {
-    if config.family != "koblitz"
+    binary_m3_worker_shape(config, case, "koblitz")
+}
+fn ordinary_worker_profile(config: &CaseConfig, case: &CaseData) -> bool {
+    binary_m3_worker_shape(config, case, "binary")
+}
+fn binary_m3_worker_shape(config: &CaseConfig, case: &CaseData, family: &str) -> bool {
+    if config.family != family
         || config.m != 3
         || !((23..=31).contains(&config.n) || (47..=61).contains(&config.n))
         || !matches!(config.solver.as_str(), "f4" | "f5")
@@ -513,6 +563,25 @@ pub(super) fn project_koblitz_m3_prefixes(
     koblitz_m3::project_worker_prefixes(dir, config, outcome, artifacts, emit)
 }
 
+pub(super) fn is_ordinary_m3_native_source(
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+) -> bool {
+    outcome["strategy"] == "ordinary-binary-profile-unsupported"
+        || koblitz_m3::ordinary_construction::persisted::native_ownership::replay::is_source(
+            outcome, artifacts,
+        )
+}
+pub(super) fn project_ordinary_m3_prefixes(
+    dir: &Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+    emit: &mut impl FnMut(Option<Value>, Value) -> Result<(), String>,
+) -> Result<Value, String> {
+    koblitz_m3::project_ordinary_worker_prefixes(dir, config, outcome, artifacts, emit)
+}
+
 /// Always invoked by central replay, independently of mutable outcome strategy.
 pub(super) fn verify_koblitz_m3_cell(
     dir: &Path,
@@ -538,6 +607,26 @@ pub(super) fn solve_with_verified_worker_originals(
     if context.is_some_and(|c| c.launch.binding != binding) {
         return Err("verified worker originals differ from execution attempt".into());
     }
+    if config.family == "binary" && config.m == 3 && matches!(config.solver.as_str(), "f4" | "f5") {
+        if !ordinary_worker_profile(config, case) {
+            return Ok(WorkerSolveOutput::legacy(SolverData {
+                outcome: json!({"strategy":"ordinary-binary-profile-unsupported","status":"unsupported",
+                    "reason":"requires original n23..31 or n47..61, both twists, m3, degree1..6 and four signed points/two x codes",
+                    "solver_completed":false,"scalar_recovered_without_witness":false}),
+                artifacts: Vec::new(),
+            }));
+        }
+        let context = context.ok_or("ordinary m3 requires original execution context")?;
+        if LIVE_SINK.with(|slot| slot.borrow().is_some()) {
+            return Err("nested live solver sink".into());
+        }
+        let emitter = CaptureEmitter::create(directory, binding.clone(), limits.clone())?;
+        LIVE_SINK.with(|slot| *slot.borrow_mut() = Some(EventSink::Bound(emitter)));
+        let _guard = LiveSinkGuard;
+        return koblitz_m3::ordinary_construction::persisted::native_ownership::worker::run(
+            original, case, context, &binding, &limits,
+        );
+    }
     if koblitz_worker_profile(config, case) {
         let context = context.ok_or("Koblitz m3 worker requires original execution context")?;
         if LIVE_SINK.with(|slot| slot.borrow().is_some()) {
@@ -552,6 +641,17 @@ pub(super) fn solve_with_verified_worker_originals(
     }
     solve_with_bound_event_sink_context(config, case, directory, binding, limits, context)
         .map(WorkerSolveOutput::legacy)
+}
+
+pub(super) fn verify_ordinary_m3_cell(
+    dir: &Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+) -> Result<Option<Value>, String> {
+    koblitz_m3::ordinary_construction::persisted::native_ownership::replay::verify(
+        dir, config, outcome, artifacts,
+    )
 }
 
 pub fn solve_with_event_sink(
@@ -703,6 +803,7 @@ pub(super) fn solve_with_bound_event_sink_context(
 }
 
 pub fn capabilities() -> Value {
+    let ordinary_m3_profile = json!({"adapter_id":"binary-m3-native-v1","family":"binary","m":[3,3],"n_ranges_inclusive":[[23,31],[47,61]],"twists":[false,true],"degree_bound_inclusive":[1,6],"factor_base_size":4,"signed_domain_points":4,"distinct_x_codes":2,"requires_sign_closed_factor_base":true,"requires_distinct_signed_points":true,"requires_positive_work_limit":true,"requires_verified_worker_originals":true,"requires_original_execution_context":true,"requires_bound_capture":true,"curve":"authenticated original a, nonzero b, modulus and twist; no Koblitz substitution","construction":"finite-selector determinant/coordinate ANF with independent replay","extraction":"bounded ordered signed triples including infinity prefixes","replay":"original equations, actual native/signed committed prefix, group witness and receipt delivery","costs":"one original cumulative ledger; modeled reservations and actual group-addition calls","scope":"all listed field degrees and both twists are eligible; original policy/domain and resource refusals are retained","gaps":["independent matrix basis derivation","retired hardware instructions","first and last fall degree certification","larger factor bases","m greater than 3"]});
     let koblitz_m3_profile = json!({"adapter_id":"koblitz-m3-native-v1","family":"koblitz","m":[3,3],"n_ranges_inclusive":[[23,31],[47,61]],"degree_bound_inclusive":[1,6],"factor_base_size":4,"signed_domain_points":4,"distinct_x_codes":2,"requires_sign_closed_factor_base":true,"requires_positive_work_limit":true,"requires_original_execution_context":true,"requires_bound_capture":true,"twists":[false,true],"extraction":"bounded ordered signed triples including infinity prefixes","replay":"original input, native boundary consistency, signed group prefix and canonical delivery","costs":"modeled work and memory reservations; actual group addition calls","gaps":["independent matrix basis derivation","retired hardware instructions","first and last fall degree certification","larger factor bases","generic binary curves","m greater than 3"],"requires_verified_worker_originals":true,"requires_distinct_signed_points":true,"scope":"dispatch eligibility; completion remains subject to original resource and evidence gates"});
     json!({
         "schema":"ml-dataset.capabilities/v1",
@@ -712,8 +813,8 @@ pub fn capabilities() -> Value {
             {"id":"bsgs","families":["koblitz","binary","prime"],"m":[2,15],"kind":"independent ECDLP baseline","trace":"baby table and giant probes"},
             {"id":"sat","families":["koblitz","binary"],"m":[2,15],"kind":"native chained S3 CNF/XOR subject to preflight caps","trace":"bounded native decisions, assignments and copied reasons, conflicts, analysis reasons, learned/deleted clauses, backjumps, restarts, XOR row operations; original formulas and checked models","gaps":["independently checked UNSAT proof","internal watch/heap operations and minimization derivations","full gate semantic map"]},
             {"id":"weil","families":["koblitz","binary"],"m":[2,2],"kind":"exact finite-domain selector Weil restriction","trace":"complete ANF equations and coordinate lift map","solver_completed":false},
-            {"id":"f4","families":["koblitz","binary","prime"],"m":[2,15],"m_by_family":{"koblitz":[2,2],"binary":[2,2],"prime":[2,15]},"prime_modulus_limit_exclusive":"4294967296","supervised_wide_prime_profile":{"m":[2,2],"modulus_min_inclusive":"4294967296","modulus_max_inclusive":"2305843009213693951","requires_original_execution_context":true},"supervised_wide_prime_m3_profile":{"m":[3,3],"modulus_min_inclusive":"4294967296","modulus_max_inclusive":"2305843009213693951","requires_original_execution_context":true,"extraction":"bounded ordered signed triples including infinity prefixes"},"m_scope":"base routes; additional supervised profiles are separately gated","supervised_koblitz_m3_profile":koblitz_m3_profile.clone(),"kind":"native Boolean matrix F4 plus splitting; prime m2 finite-domain reference; prime m3..15 affine S3-chain traced visitor","trace":"original systems also retained for unsupported wide primes; bounded recursive systems, branch assignments, native bases and useful-row schedules, candidate and independent group-lift events","gaps":["wide-prime elimination under solver id f4 requires supervised context and m2 or m3; m4..15 uses separate f4-wide-dynamic-v1","affine-chain exceptional infinity branches prevent general negative PDP conclusions","private pivot operations and zero rows","internal univariate factorization/GCD states","complete critical-pair stream"]},
-            {"id":"f5","families":["koblitz","binary"],"m":[2,2],"m_scope":"base routes; additional supervised profiles are separately gated","supervised_koblitz_m3_profile":koblitz_m3_profile.clone(),"kind":"native Boolean matrix F5 row criterion plus splitting; not general incremental F5","trace":"original ANF, bounded reduced rows, F5 report, splitting nodes","gaps":["per-row signatures and rejected signature witnesses"]},
+            {"id":"f4","families":["koblitz","binary","prime"],"m":[2,15],"m_by_family":{"koblitz":[2,2],"binary":[2,2],"prime":[2,15]},"prime_modulus_limit_exclusive":"4294967296","supervised_wide_prime_profile":{"m":[2,2],"modulus_min_inclusive":"4294967296","modulus_max_inclusive":"2305843009213693951","requires_original_execution_context":true},"supervised_wide_prime_m3_profile":{"m":[3,3],"modulus_min_inclusive":"4294967296","modulus_max_inclusive":"2305843009213693951","requires_original_execution_context":true,"extraction":"bounded ordered signed triples including infinity prefixes"},"m_scope":"base routes; additional supervised profiles are separately gated","supervised_koblitz_m3_profile":koblitz_m3_profile.clone(),"supervised_ordinary_binary_m3_profile":ordinary_m3_profile.clone(),"kind":"native Boolean matrix F4 plus splitting; prime m2 finite-domain reference; prime m3..15 affine S3-chain traced visitor","trace":"original systems also retained for unsupported wide primes; bounded recursive systems, branch assignments, native bases and useful-row schedules, candidate and independent group-lift events","gaps":["wide-prime elimination under solver id f4 requires supervised context and m2 or m3; m4..15 uses separate f4-wide-dynamic-v1","affine-chain exceptional infinity branches prevent general negative PDP conclusions","private pivot operations and zero rows","internal univariate factorization/GCD states","complete critical-pair stream"]},
+            {"id":"f5","families":["koblitz","binary"],"m":[2,2],"m_scope":"base routes; additional supervised profiles are separately gated","supervised_koblitz_m3_profile":koblitz_m3_profile.clone(),"supervised_ordinary_binary_m3_profile":ordinary_m3_profile.clone(),"kind":"native Boolean matrix F5 row criterion plus splitting; not general incremental F5","trace":"original ANF, bounded reduced rows, F5 report, splitting nodes","gaps":["per-row signatures and rejected signature witnesses"]},
             {"id":"f6","families":["koblitz","binary"],"m":[4,4],"kind":"native F6WidePairIndex geometric four-sum; not a general Groebner algorithm","trace":"pair sums, domain, verified indices","gaps":["native internal lookup sequence"]},
             {"id":"root","families":["koblitz","binary","prime"],"m":[2,2],"kind":"native S3 univariate root finding with exact domain and group lift","trace":"prime bounded field, power, GCD and split states; binary bounded quadratic, trace, half-trace and matrix states; independent distinct-root certificates","gaps":["higher-m root elimination","complete execution and total cost verification"]},
             {"id":"pkm","families":["prime"],"m":[2,3],"modulus_limit_exclusive":"2147483648","kind":"native PKM Kummer-tower F4 with finite-grid extraction","trace":"exact alternative Kummer base, quotient rules, prepared and specialized equations, native F4 report, extracted roots","gaps":["private elimination pivots and row operations","m>3 or p>=2^31"]},
@@ -6206,6 +6307,79 @@ mod verified_worker_original_tests {
             positive_control: bool,
             policy: Option<crate::ml_dataset::types::FactorBasePolicy>,
         ) -> Self {
+            Self::with_family_policy_profile(
+                n,
+                twist,
+                factor_base_size,
+                solver,
+                work_limit,
+                execution_required,
+                positive_control,
+                policy,
+                "koblitz",
+            )
+        }
+        pub(super) fn with_ordinary_runtime_shape(n: u32, twist: bool, solver: &str) -> Self {
+            Self::with_ordinary_control_shape(n, twist, solver, false)
+        }
+        pub(super) fn with_ordinary_control_shape(
+            n: u32,
+            twist: bool,
+            solver: &str,
+            controlled: bool,
+        ) -> Self {
+            let fixture = Self::with_family_policy_profile(
+                n,
+                twist,
+                4,
+                solver,
+                16384,
+                true,
+                controlled,
+                Some(crate::ml_dataset::types::FactorBasePolicy::Legacy {}),
+                "binary",
+            );
+            // Test-only supervisor setup: these are the original frozen attempt
+            // and trace limits, not permission to activate ordinary dispatch.
+            dataset::telemetry::checked::install_policy(&fixture.root).unwrap();
+            let binding = AttemptBinding::from_cell_files(&fixture.root).unwrap();
+            assert_eq!(binding, fixture.binding);
+            let run: Value = dataset::read_json(&fixture.root.join("run.json")).unwrap();
+            let limits =
+                dataset::capture::capture_limits(run["trace_mib"].as_u64().unwrap()).unwrap();
+            storage::write_json(
+                &fixture.root,
+                "capture-binding.json",
+                "partial-capture-binding",
+                &binding,
+            )
+            .unwrap();
+            storage::write_json(
+                &fixture.root,
+                "capture-limits.json",
+                "partial-capture-limits",
+                &limits,
+            )
+            .unwrap();
+            let admitted = dataset::admit_capture_context(&fixture.root)
+                .unwrap()
+                .unwrap();
+            assert_eq!(admitted, (binding, limits));
+            assert!(!fixture.root.join("public.json").exists());
+            assert!(!fixture.root.join("factor-base.json").exists());
+            fixture
+        }
+        fn with_family_policy_profile(
+            n: u32,
+            twist: bool,
+            factor_base_size: usize,
+            solver: &str,
+            work_limit: u64,
+            execution_required: bool,
+            positive_control: bool,
+            policy: Option<crate::ml_dataset::types::FactorBasePolicy>,
+            family: &str,
+        ) -> Self {
             let nonce = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
@@ -6219,6 +6393,7 @@ mod verified_worker_original_tests {
                     "population":"conditioned-positive-pdp-software-control",
                     "field_degree":23,
                     "target_rule":"first nonzero retained factor-base point P; valid tuple P,P,-P",
+                    "negative_control_rule":"first scalar in 1..=65 whose nonzero generator multiple is outside all 64 ordered signed factor-base triples; preserve curve generator and factor base",
                     "known_answer_rule":"bounded native-arithmetic BSGS relative to unchanged original generator, then independent curves::verify",
                     "bsgs_baby_slot_cap":4096,
                     "freeze_boundary":"control rule before generation; all original bytes final before token/capture admission",
@@ -6238,7 +6413,7 @@ mod verified_worker_original_tests {
                 .into(),
                 field_sizes: vec![n],
                 arities: vec![3],
-                families: vec!["koblitz".into()],
+                families: vec![family.into()],
                 solvers: vec![solver.into()],
                 curve_seeds: 1,
                 generators: 1,

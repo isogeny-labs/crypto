@@ -326,6 +326,151 @@ pub(super) fn check_native_export_rows(
     fs::remove_dir_all(root).unwrap();
 }
 
+fn export_ordinary_prefix_rows(
+    dir: &Path,
+    config: &super::types::CaseConfig,
+    outcome: &Value,
+    artifacts: &[Artifact],
+    target_id: &str,
+    group: &str,
+    partition: &str,
+    prefix_features: &mut Sorter,
+    prefix_records: &mut Sorter,
+    prefix_occurrences: &mut u64,
+) -> Result<(), String> {
+    // This call verifies original recipe, central semantics, complete
+    // committed custody and all retained group additions before callbacks.
+    // Source descriptors and replay summaries remain restricted.
+    let source_artifacts: Vec<_> = artifacts
+        .iter()
+        .filter(|a| {
+            matches!(
+                a.path.as_str(),
+                "live/events.jsonl"
+                    | "live/committed.json"
+                    | "capture-binding.json"
+                    | "capture-limits.json"
+            )
+        })
+        .collect();
+    let mut occurrence = 0u64;
+    let replay = super::solvers::project_ordinary_m3_prefixes(
+        dir,
+        config,
+        outcome,
+        artifacts,
+        &mut |feature, record| {
+            occurrence += 1;
+            let record_id = super::digest(
+                format!("{target_id}\nordinary-prefix-record\n{occurrence}").as_bytes(),
+            );
+            let prefix_id = if let Some(feature) = feature {
+                let prefix_id = super::digest(bounded_json(&feature, MAX_RECORD_BYTES)?.as_bytes());
+                prefix_features.push(&prefix_id, &json!({"schema":"ml-dataset.prefix-features/v1",
+                                        "feature_id":prefix_id,"split_component":group,"split":partition,"inputs":feature}))?;
+                *prefix_occurrences += 1;
+                Some(prefix_id)
+            } else {
+                None
+            };
+            prefix_records.push(&record_id, &json!({"schema":"ml-dataset.restricted-prefix-record/v1",
+                                    "record_id":record_id,"source_target_id":target_id,"source_event_artifacts":source_artifacts,
+                                    "feature_id":prefix_id,"split_component":group,"split":partition,"record":record}))
+        },
+    )?;
+    let record_id =
+        super::digest(format!("{target_id}\nordinary-prefix-replay-summary").as_bytes());
+    prefix_records.push(&record_id, &json!({"schema":"ml-dataset.restricted-prefix-record/v1",
+                            "record_id":record_id,"source_target_id":target_id,"source_event_artifacts":source_artifacts,
+                            "feature_id":null,"split_component":group,"split":partition,"record":replay}))?;
+    Ok(())
+}
+
+/// Uses the production replay, row assembly, hashing and external-sort path.
+/// It does not substitute synthetic events or manufacture a whole-cell seal.
+#[cfg(test)]
+pub(super) fn check_ordinary_export_rows(
+    dir: &Path,
+    config: &super::types::CaseConfig,
+    outcome: &Value,
+    artifacts: &[Artifact],
+    expected: u64,
+) {
+    let root = dir.join("ordinary-export-software-control");
+    fs::create_dir(&root).unwrap();
+    let mut features = Sorter::new(&root, "native-feature");
+    let mut records = Sorter::new(&root, "native-record");
+    let mut count = 0;
+    let (group, partition) = split_for_size(config.n as u64);
+    export_ordinary_prefix_rows(
+        dir,
+        config,
+        outcome,
+        artifacts,
+        "software-control",
+        &group,
+        partition,
+        &mut features,
+        &mut records,
+        &mut count,
+    )
+    .unwrap();
+    assert_eq!(count, expected);
+    let public_path = root.join("prefix-features.jsonl");
+    let restricted_path = root.join("prefix-records.jsonl");
+    let unique = features.finish(&public_path).unwrap();
+    records.finish(&restricted_path).unwrap();
+    assert_eq!(unique > 0, expected > 0);
+    for line in fs::read_to_string(public_path).unwrap().lines() {
+        let row: Value = serde_json::from_str(line).unwrap();
+        assert_eq!(
+            row["feature_id"],
+            super::digest(
+                bounded_json(&row["inputs"], MAX_RECORD_BYTES)
+                    .unwrap()
+                    .as_bytes()
+            )
+        );
+        assert_eq!(
+            row["inputs"]["static_inputs"]["source_factor_base_policy"],
+            config
+                .factor_base_policy
+                .as_ref()
+                .map(|p| policy_projection(&serde_json::to_value(p).unwrap()).unwrap())
+                .unwrap_or(Value::Null)
+        );
+        for forbidden in [
+            "sampling_seed",
+            "construction_status",
+            "construction_counters",
+            "matches_target",
+            "label",
+            "source_capture_sequence",
+            "source_binding_sha256",
+            "known_answer_scalar",
+        ] {
+            assert!(!line.contains(forbidden), "{forbidden}");
+        }
+    }
+    let restricted = fs::read_to_string(restricted_path).unwrap();
+    if outcome["status"] == "unsupported" {
+        assert_eq!(expected, 0);
+        let rows: Vec<Value> = restricted
+            .lines()
+            .map(|line| serde_json::from_str(line).unwrap())
+            .collect();
+        assert_eq!(rows.len(), 1);
+        assert!(rows[0]["feature_id"].is_null());
+        assert_eq!(
+            rows[0]["record"]["admission_status"],
+            "unsupported_original_profile"
+        );
+    } else {
+        assert!(restricted.contains("matrix_projection_status"));
+    }
+    fs::remove_dir_all(root).unwrap();
+}
+
 /// Only the public mathematical definition enters the identity. Cost, logs,
 /// seeds, construction history, and future fields on the artifact stay out.
 fn kummer_definition_projection(definition: &Value) -> Result<Value, String> {
@@ -1237,6 +1382,23 @@ fn export_with_graph_projector(
                             &mut prefix_occurrences,
                         )?;
                     }
+                    if super::solvers::is_ordinary_m3_native_source(
+                        &manifest.outcome,
+                        &manifest.artifacts,
+                    ) {
+                        export_ordinary_prefix_rows(
+                            &dir,
+                            &manifest.config,
+                            &manifest.outcome,
+                            &manifest.artifacts,
+                            &target_id,
+                            &group,
+                            partition,
+                            &mut prefix_features,
+                            &mut prefix_records,
+                            &mut prefix_occurrences,
+                        )?;
+                    }
                     let row = json!({"schema":"ml-dataset.features/v1","feature_id":id,"split_component":group,"split":partition,"inputs":inputs});
                     features.push(&id, &row)?;
                     feature_occurrences += 1;
@@ -1392,6 +1554,7 @@ fn export_with_graph_projector(
             "algebraic_task":"prime-polynomial-consequence/v1; pre-native equations only; independently checked identities for retained native basis rows, with separately searched witnesses",
             "algebraic_claim_limits":["recursive prime m3..15 and p<2^32 only","admission requires a previously certified equality node","separate cumulative consequence-channel caps preserve existing branch budget","witness-dependent cancellation is not exact first/last fall degree","no native-operation or native-instruction witness"],
             "koblitz_prefix_task":"crypto.ml-dataset.koblitz-causal-input/v1: independently replayed signed additions only; no native equation or matrix prefixes",
+            "ordinary_binary_prefix_task":"crypto.ml-dataset.binary-causal-input/v1: original-bound independently replayed committed signed additions; unknown suffix retained; matrix/equation/construction projections not implemented",
             "prefix_task":"prime-chain-next-branch-attempt/v1; replayed recursive state and independently derived iterator; observed imitation labels only, no optimality or counterfactual cost",
             "prefix_claim_limits":["bounded ideal-certificate search can exclude a suffix","no complete native execution or instruction proof","no exact first/last fall degree","no complete Groebner basis claim"],
             "prime_chain_graph":"prime-chain-graph/v1 static equations/domains and signed-point incidence, reconstructed before publication; no solver-prefix/action features; missing or oversized graphs excluded with restricted provenance",

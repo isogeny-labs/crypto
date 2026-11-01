@@ -245,6 +245,16 @@ pub struct EventRecord {
     pub event: Value,
 }
 
+/// Snapshot of an installed durable head, minted without rehashing its bytes.
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub(super) struct CommittedEventPosition {
+    pub binding_sha256: String,
+    pub event_count: u64,
+    pub byte_end: u64,
+    pub last_event_sha256: String,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct CommittedHead {
@@ -333,6 +343,8 @@ impl Write for LimitedBytes {
 /// Closed kinds for typed solver events. Payload commits remain emitter-owned.
 #[derive(Clone, Copy, Debug, Serialize)]
 pub enum TypedEventKind {
+    #[serde(rename = "binary_m3_native")]
+    OrdinaryBinaryM3Native,
     #[serde(rename = "wide_prime_dynamic")]
     WidePrimeDynamic,
     #[serde(rename = "koblitz_m3")]
@@ -352,6 +364,16 @@ impl TypedEventBuffer {
     /// establishes acknowledgement; this accessor alone does not.
     pub(super) fn encoded_len(&self) -> usize {
         self.bytes.len()
+    }
+
+    /// Move already allocated encoded bytes to a failure owner. This does not
+    /// establish publication or acknowledge any event.
+    pub(super) fn clear_encoded(&mut self) {
+        self.bytes.clear();
+    }
+
+    pub(super) fn take_encoded(&mut self) -> Vec<u8> {
+        std::mem::take(&mut self.bytes)
     }
 
     pub fn requested_bytes(event_cap: u64) -> Result<u64, CaptureError> {
@@ -881,7 +903,24 @@ fn witness_write(
     Ok(())
 }
 impl CaptureEmitter {
+    /// Read-only directory ownership check; never creates or substitutes a sink.
+    pub(super) fn verify_directory(&self, expected: &Path) -> Result<(), String> {
+        if self.directory != storage::root_dir(expected, false)? {
+            return Err("capture sink differs from original live directory".into());
+        }
+        Ok(())
+    }
+
     /// Actual acknowledged stream head for worker-only adapter admission.
+    pub(super) fn committed_event_position(&self) -> CommittedEventPosition {
+        CommittedEventPosition {
+            binding_sha256: self.head.binding_sha256.clone(),
+            event_count: self.head.event_count,
+            byte_end: self.head.byte_end,
+            last_event_sha256: self.head.last_event_sha256.clone(),
+        }
+    }
+
     pub(super) fn committed_event_count(&self) -> u64 {
         self.head.event_count
     }
@@ -1547,6 +1586,26 @@ impl CaptureEmitter {
         event_cap: usize,
         before_commit: &mut impl FnMut(&[u8]) -> Result<(), CaptureError>,
     ) -> Result<(), CaptureError> {
+        self.event_typed_admit_encoding_with_limit(
+            kind,
+            payload,
+            buffer,
+            event_cap,
+            &mut |_| Ok(()),
+            before_commit,
+        )
+    }
+
+    /// Admit the second pass after counting, before writing encoded bytes.
+    pub(super) fn event_typed_admit_encoding_with_limit<T: Serialize + ?Sized>(
+        &mut self,
+        kind: TypedEventKind,
+        payload: &T,
+        buffer: &mut TypedEventBuffer,
+        event_cap: usize,
+        before_encoding: &mut impl FnMut(usize) -> Result<(), CaptureError>,
+        before_commit: &mut impl FnMut(&[u8]) -> Result<(), CaptureError>,
+    ) -> Result<(), CaptureError> {
         self.ready()?;
         buffer.bytes.clear();
         let result = (|| {
@@ -1575,6 +1634,7 @@ impl CaptureEmitter {
             serde_json::to_writer(&mut counted, &record).map_err(typed_encoding_error)?;
             let expected = counted.len + 1;
             self.check_reservation(expected, self.head.payload_count, self.head.payload_bytes)?;
+            before_encoding(expected)?;
             let mut writer = AdmittedEventBytes {
                 bytes: &mut buffer.bytes,
                 limit: limit - 1,
@@ -2443,6 +2503,104 @@ mod tests {
 
     fn typed_buffer(cap: u64) -> TypedEventBuffer {
         TypedEventBuffer::try_new(cap, TypedEventBuffer::requested_bytes(cap).unwrap()).unwrap()
+    }
+
+    #[test]
+    fn second_encoding_pass_is_admitted_before_any_bytes_or_commit() {
+        for allow in [false, true] {
+            let fixture = Fixture::new();
+            let mut emitter = fixture.emitter();
+            let mut buffer = typed_buffer(1024);
+            let before = emitter.committed_event_position();
+            let previous = std::fs::read(fixture.live().join("events.jsonl")).unwrap();
+            let expected = std::cell::Cell::new(0usize);
+            let mut commits = 0;
+            let payload = serde_json::json!({"bounded":"escaping \" and newline\n"});
+            let result = emitter.event_typed_admit_encoding_with_limit(
+                TypedEventKind::OrdinaryBinaryM3Native,
+                &payload,
+                &mut buffer,
+                1024,
+                &mut |n| {
+                    assert_eq!(expected.get(), 0);
+                    assert!(n > 0 && n <= 1024);
+                    expected.set(n);
+                    if allow {
+                        Ok(())
+                    } else {
+                        Err(CaptureError::Integrity(
+                            "refused exact encoding allowance".into(),
+                        ))
+                    }
+                },
+                &mut |wire| {
+                    commits += 1;
+                    assert_eq!(wire.len(), expected.get());
+                    Ok(())
+                },
+            );
+            assert!(expected.get() > 0, "count pass must reach admission");
+            assert_eq!(result.is_ok(), allow);
+            assert_eq!(commits, usize::from(allow));
+            if allow {
+                assert_eq!(buffer.encoded_len(), expected.get());
+                assert_eq!(emitter.committed_event_count(), before.event_count + 1);
+            } else {
+                assert_eq!(buffer.encoded_len(), 0);
+                assert_eq!(emitter.committed_event_position(), before);
+                assert_eq!(
+                    std::fs::read(fixture.live().join("events.jsonl")).unwrap(),
+                    previous
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn cleared_current_encoding_does_not_relabel_previous_ack_on_ready_refusal() {
+        let fixture = Fixture::new();
+        let mut emitter = fixture.emitter();
+        let mut buffer = typed_buffer(1024);
+        let payload = serde_json::json!({"bounded":12345});
+        emitter
+            .event_typed(
+                TypedEventKind::OrdinaryBinaryM3Native,
+                &payload,
+                &mut buffer,
+            )
+            .unwrap();
+        assert!(buffer.encoded_len() > 0);
+        let previous = std::fs::read(fixture.live().join("events.jsonl")).unwrap();
+        let count = emitter.committed_event_count();
+        let position = emitter.committed_event_position();
+        assert_eq!(position.byte_end, previous.len() as u64);
+        assert_eq!(
+            position.last_event_sha256,
+            crate::ml_dataset::digest(&previous)
+        );
+        emitter.failed = true;
+        buffer.clear_encoded();
+        let mut called = false;
+        assert!(emitter
+            .event_typed_precommit_with_limit(
+                TypedEventKind::OrdinaryBinaryM3Native,
+                &payload,
+                &mut buffer,
+                1024,
+                &mut |_| {
+                    called = true;
+                    Ok(())
+                }
+            )
+            .is_err());
+        assert!(!called);
+        assert!(buffer.take_encoded().is_empty());
+        assert_eq!(emitter.committed_event_count(), count);
+        assert_eq!(emitter.committed_event_position(), position);
+        assert_eq!(
+            std::fs::read(fixture.live().join("events.jsonl")).unwrap(),
+            previous
+        );
     }
 
     #[test]
