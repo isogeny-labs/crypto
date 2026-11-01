@@ -266,3 +266,22 @@ Commit report/scaling preparation,seal custody,PR and nextdegree112data.
 
 ### Errors
 First staged whitespace check exited2 on generated SVG output;corrected.
+
+## Publication base-reference correction before seal
+
+### What was done
+Branch-name fetch populated FETCH_HEAD108513a7dc0f6fe9459dcd077a5c1a38f125c792
+but left local origin/base at4bbae5cd24b408dccdaf509d9c5be1a4f1f08c93.
+Initial diff check against stale local ref listed sealedR54/R61 whitespace.
+Actual fetched-base diff contains onlyR62/R63. Preserve stale-baseline logs
+and rerun integrity checks against the exact fetched108513commit.
+
+### Decisions made
+Use explicit actualbaseSHA,no sealedscience edits,localmerge or retarget.
+
+### Open threads
+Fresh base gates,one-time science seal/S3custody,regularPR,nextdegree112data.
+
+### Errors
+I treated a branch-name fetch as updating the remote-tracking ref;corrected
+the check baseline using authoritative FETCH_HEAD/remote merge evidence.
