@@ -4880,9 +4880,9 @@ mod tests {
         used: &mut [bool],
         check: &mut impl FnMut(&[(u32, u32)]),
     ) {
-        // `LpGraph::ensure` allocates contiguous IDs. Restrict the exhaustive
-        // comparison to sequences in which all three allocated LP vertices
-        // actually occur, matching the production ID allocator.
+        // `LpGraph::ensure` allocates contiguous IDs. Admit every nonempty
+        // sequence whose used labels are exactly 1, 1..=2, or 1..=3; reject
+        // only label sets with a gap, which cannot be emitted by production.
         let seen = chosen.iter().fold(0u8, |mask, &(a, b)| {
             let mut mask = mask;
             if a != 0 {
@@ -4893,7 +4893,7 @@ mod tests {
             }
             mask
         });
-        if seen == 0b111 {
+        if matches!(seen, 0b001 | 0b011 | 0b111) {
             check(chosen);
         }
         for i in 0..available.len() {
@@ -4942,7 +4942,7 @@ mod tests {
                 checked += 1;
             },
         );
-        assert!(checked > 1_000, "exhaustive order census unexpectedly small: {checked}");
+        assert_eq!(checked, 1_928, "exact simple-graph order census");
     }
 
     #[test]
@@ -4963,7 +4963,7 @@ mod tests {
                 }
                 mask
             });
-            if seen == 0b111 {
+            if matches!(seen, 0b001 | 0b011 | 0b111) {
                 assert_materialized_dependency_dimension(sequence);
                 *checked += 1;
             }
@@ -4980,7 +4980,7 @@ mod tests {
         let available = [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)];
         let mut checked = 0usize;
         recurse(&available, &mut vec![], 6, &mut checked);
-        assert!(checked > 40_000, "multigraph stream census unexpectedly small: {checked}");
+        assert_eq!(checked, 53_814, "exact multigraph stream census");
     }
 
     #[test]

@@ -112,6 +112,7 @@
           [
             "cargo",
             "build",
+            "--locked",
             "--release",
             "--example",
             "lead15_diem_quartic"
@@ -241,7 +242,7 @@
           "dt-common-cover",
           "matched-formula-references"
         ],
-        "how": "up to 24 durable authenticated candidate identities emit one attempted row each, with deterministic formula-reference fields attached in analysis; planned remains 24 and absent identities or zero-attempt cells never become fictional run rows"
+        "how": "up to 24 durable lineage-validated candidate identities emit one attempted row each under the trusted-acquisition assumption, with deterministic formula-reference fields attached in analysis; planned remains 24 and absent identities or zero-attempt cells never become fictional run rows"
       }
     ],
     "comparisons": [
@@ -412,13 +413,13 @@
       "kernel as provenance",
       "threads",
       "node name",
-      "locally hashed exact request bytes and read-back S3 head/version",
+      "locally hashed exact request bytes and version-specific S3 SHA-256 checksum/head",
       "locally hashed raw Kubernetes Job and Pod bytes",
-      "locally hashed status, complete result listing, object-head, worker, and payload bytes",
+      "locally hashed status, complete result listing, version-specific SHA-256 object-head, worker, and payload bytes",
       "Job UID",
       "Pod UID",
       "Pod restart count",
-      "payload S3 URI/SHA-256/bytes/ETag/version ID",
+      "payload S3 URI/local SHA-256/S3 ChecksumSHA256/bytes/ETag/version ID",
       "source-manifest identity"
     ],
     "timed_primary_justification": null
@@ -584,7 +585,45 @@
       "outer_job_deadline_seconds": 7200,
       "termination_grace_seconds": 60,
       "deadline_semantics": "the tracked wrapper starts one native child with a 3600-second timeout after Pod start; Kubernetes activeDeadlineSeconds=7200 bounds provisioning plus wrapper execution and leaves upload/receipt slack",
-      "retry_semantics": "max_attempts=1 and Kubernetes backoffLimit=0 permit no replacement or retry; infrastructure_only is the canonical protocol-schema retry category, not permission for a second attempt"
+      "retry_semantics": "max_attempts=1 and Kubernetes backoffLimit=0 permit no replacement or retry; infrastructure_only is the canonical protocol-schema retry category, not permission for a second attempt",
+      "kubernetes_execution_contract": {
+        "launcher_source": "taskq/deploy/eks-karpenter/submit-job",
+        "kubernetes_version": "1.36",
+        "kubernetes_version_source": "taskq/deploy/eks-karpenter/cluster.yaml",
+        "ttl_seconds_after_finished": 86400,
+        "container_name": "task",
+        "job_metadata_generation": 1,
+        "pod_metadata_generation": 1,
+        "pod_status_observed_generation": "scheduled terminal Pods require integer 1 equal to metadata.generation; unscheduled terminal Pods may omit it but any present value must equal 1",
+        "template_metadata_defaults": "creationTimestamp, name, and namespace are absent or null; non-null values are invalid",
+        "field_ref_api_version": "absent or v1; explicit null and every other value are invalid",
+        "required_template_annotation": "karpenter.sh/do-not-disrupt=true",
+        "required_volume_mounts": ["work:/work", "tmp:/tmp"],
+        "required_empty_dir_limits": ["work:8Gi", "tmp:1Gi"],
+        "irsa_admission": {
+          "service_account_source": "taskq/deploy/eks-karpenter/workloads.yaml#runner",
+          "production_status_evidence": "taskq/deploy/eks-karpenter/validation/pr2342-premerge-20261021/launcher/status.json",
+          "role_arn": "arn:aws:iam::104186811093:role/isolab-job",
+          "token_file": "/var/run/secrets/eks.amazonaws.com/serviceaccount/token",
+          "volume_name": "aws-iam-token",
+          "mount_path": "/var/run/secrets/eks.amazonaws.com/serviceaccount",
+          "audience": "sts.amazonaws.com",
+          "expiration_seconds": 86400
+        },
+        "resources": {
+          "requests": {"cpu": "4", "memory": "16Gi", "ephemeral-storage": "10Gi"},
+          "limits": {"cpu": "4", "memory": "16Gi", "ephemeral-storage": "10Gi"}
+        },
+        "selector_and_labels": "selector is exactly batch.kubernetes.io/controller-uid=Job UID; template and Pod carry current and legacy controller/job labels plus isolab.dev/job=true; Pod ownerReference is the exact Job identity",
+        "normalization": "actual Pod spec equals the Job template after removing only enumerated Kubernetes defaults and scheduled nodeName; a coherent optional us-east-2 topology region/zone label pair is the sole admitted metadata addition",
+        "forbidden_execution_surfaces": ["args", "envFrom", "lifecycle", "workingDir drift", "volume overlays", "volumeDevices", "resource claims", "extended device resources", "initContainers", "ephemeralContainers", "sidecars", "stdin", "stdinOnce", "tty", "unlisted spec or metadata keys"]
+      },
+      "evidence_trust_boundary": {
+        "assumption": "request, Kubernetes, status, result-listing, and S3 head bytes are acquired byte-for-byte by the trusted study operator through the intended provider sessions before offline collection",
+        "offline_guarantee": "local hashes, version/checksum fields, collector receipts, and native revalidation prove internal bundle consistency and frozen-identity coherence only",
+        "excluded_claim": "the offline directory is not independently signed provider attestation and is not cryptographically authentic if the whole acquisition directory is attacker-controlled",
+        "failure_rule": "untrusted acquisition or loss of provider-session custody invalidates the study rather than producing a scientific terminal class"
+      }
     }
   }
 }

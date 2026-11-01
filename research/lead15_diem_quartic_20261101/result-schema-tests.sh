@@ -14,7 +14,7 @@ jq -n --arg c "$h40" --arg h "$h64" --arg d "$digest" '
   {schema:"lead15.diem-quartic/v1",record:"run_start",protocol_id:"LEAD15-DT-E5-20261101",
    q:257,curves:6,base_seed:20261023,max_candidates:200000,retain_factor:8,
    runtime_provenance:{isolation:"none",cpu_model:null,available_parallelism:1,
-     kubernetes_node:null,kubernetes_job:null,kubernetes_job_uid:null,
+     kubernetes_node:null,kubernetes_job:null,
      kubernetes_pod:null,kubernetes_pod_uid:null},commit:$c,protocol_sha256:$h,
    binary_sha256:$h,image_digest:$d}' > "$tmp/run-start.json"
 
@@ -71,6 +71,12 @@ jq -n --arg c "$h40" --arg h "$h64" --arg d "$digest" '
 for record in run-start instance harvest run-end; do
   "$validator" -i "$tmp/$record.json" "$root/result.schema.json" >/dev/null
 done
+jq '.selection_sge.rows_after_lp_sge=0 |
+  .selection_sge.total_row_weight_after_lp_sge=0 |
+  .selection_sge.mean_row_weight_after_lp_sge=0 |
+  .selection_sge.max_row_weight_after_lp_sge=0' \
+  "$tmp/harvest.json" > "$tmp/zero-row-harvest.json"
+"$validator" -i "$tmp/zero-row-harvest.json" "$root/result.schema.json" >/dev/null
 
 expect_reject() {
   local name=$1 source=$2 filter=$3
@@ -83,9 +89,74 @@ expect_reject() {
 expect_reject top-extra harvest '.unregistered=1'
 expect_reject nested-extra harvest '.selection_sge.unregistered=1'
 expect_reject missing-certificate harvest 'del(.selection_sge.materialized_dependency_dimension)'
+expect_reject zero-row-weight harvest '.selection_sge.max_row_weight_after_lp_sge=0'
+expect_reject inconsistent-empty-matrix harvest '.selection_sge.rows_after_lp_sge=0 |
+  .selection_sge.total_row_weight_after_lp_sge=1 |
+  .selection_sge.mean_row_weight_after_lp_sge=0 |
+  .selection_sge.max_row_weight_after_lp_sge=0'
 expect_reject counter-string harvest '.counters.lines="1"'
 expect_reject wrong-cost-order harvest '.cost_receipts[0].mod_ell_price=9'
 expect_reject builder-extra instance '.builder_setup.cost_receipts[0].extra=1'
 expect_reject malformed-k instance '.m3_certificate.r=[0,0]'
 expect_reject fictional-row run-end '.record="formula_reference"'
+
+# Completion receipts independently bind each supported q to the corresponding
+# Job name, worker argv, and immutable request object. These are control-plane
+# fixtures only; no scientific worker or target-size path is invoked.
+checksum=$(printf '%043d=' 0)
+jq -n --arg c "$h40" --arg h "$h64" --arg d "$digest" --arg checksum "$checksum" '
+  def lf($path): {path:$path,sha256:$h,bytes:1};
+  {schema:"lead15.completion-receipt/v1",protocol_id:"LEAD15-DT-E5-20261101",q:257,
+   source_manifest_sha256:$h,collector_sha256:$h,request_sha256:$h,
+   request_artifact:{path:"request.json",sha256:$h,checksum_sha256:$checksum,bytes:1,
+     s3_uri:"s3://setec-astronomy-artifacts/lead15-diem-quartic-20261101/requests/q-257.json",
+     etag:"\"request-etag\"",version_id:"request-version",readback_verified:true},
+   image_uri:("example.invalid/lead15@"+$d),image_digest:$d,
+   argv:["/opt/lead15/lead15-worker","257",$h,$c,$h,$h,$d,"3600"],
+   requested_resources:{cpu:4,memory_gib:16,spot:true},
+   scientific_environment:{RAYON_NUM_THREADS:"1",OMP_NUM_THREADS:"1"},
+   scientific_deadline_seconds:3600,outer_job_deadline_seconds:7200,
+   termination_grace_seconds:60,retries:0,attempts:0,pod_restarts:null,
+   job:{name:"lead15-dt-e5-q257-aaaaaaaa",uid:"job-uid"},pod:null,
+   terminal_class:"infrastructure_failure",deadline_reached:false,exit_code:null,
+   payload:{present:false,s3_uri:null,sha256:null,checksum_sha256:null,bytes:0,
+     etag:null,version_id:null,uploaded:false,readback_verified:false,final_newline:false},
+   resource_provenance:null,
+   lineage_artifacts:{request:lf("request.json"),request_head:lf("request-head.json"),
+     submission:lf("submission.json"),job:lf("job.json"),pod:null,status:lf("status.json"),
+     results:lf("results.json"),object_heads:lf("object-heads.json"),payload:null,
+     worker_start:null,worker_exit:null,worker_upload:null,runtime_provenance:null,
+     build_info:null,binary_sha256:null,stdout:null,stderr:null,sha256sums:null,
+     timeout_events:null},
+   started_at:null,finished_at:null,collected_at:"2026-11-01T00:00:00Z"}
+' > "$tmp/completion.json"
+
+for q in 257 2053 32771 4194301; do
+  jq --argjson q "$q" --arg qstr "$q" '
+    .q=$q |
+    .job.name=("lead15-dt-e5-q"+$qstr+"-aaaaaaaa") |
+    .argv[1]=$qstr |
+    .request_artifact.s3_uri=("s3://setec-astronomy-artifacts/lead15-diem-quartic-20261101/requests/q-"+$qstr+".json")
+  ' "$tmp/completion.json" > "$tmp/completion-q$q.json"
+  "$validator" -i "$tmp/completion-q$q.json" "$root/completion-receipt.schema.json" >/dev/null
+done
+
+for q in 257 2053 32771 4194301; do
+  bad_q=257
+  [[ $q == 257 ]] && bad_q=2053
+  for field in job argv request-uri; do
+    case "$field" in
+      job) filter='.job.name=("lead15-dt-e5-q"+$bad+"-bbbbbbbb")' ;;
+      argv) filter='.argv[1]=$bad' ;;
+      request-uri)
+        filter='.request_artifact.s3_uri=("s3://setec-astronomy-artifacts/lead15-diem-quartic-20261101/requests/q-"+$bad+".json")'
+        ;;
+    esac
+    jq --arg bad "$bad_q" "$filter" "$tmp/completion-q$q.json" > "$tmp/completion-$field-q$q.json"
+    if "$validator" -i "$tmp/completion-$field-q$q.json" "$root/completion-receipt.schema.json" >/dev/null 2>&1; then
+      echo "result-schema-tests: completion mutation $field-q$q was accepted" >&2
+      exit 1
+    fi
+  done
+done
 echo "result schema tests passed"

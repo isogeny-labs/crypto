@@ -52,7 +52,7 @@
       "type": "object", "additionalProperties": false,
       "required": [
         "isolation", "cpu_model", "available_parallelism", "kubernetes_node",
-        "kubernetes_job", "kubernetes_job_uid", "kubernetes_pod", "kubernetes_pod_uid"
+        "kubernetes_job", "kubernetes_pod", "kubernetes_pod_uid"
       ],
       "properties": {
         "isolation": { "const": "none" },
@@ -60,7 +60,6 @@
         "available_parallelism": { "type": ["integer", "null"], "minimum": 1 },
         "kubernetes_node": { "type": ["string", "null"] },
         "kubernetes_job": { "type": ["string", "null"] },
-        "kubernetes_job_uid": { "type": ["string", "null"] },
         "kubernetes_pod": { "type": ["string", "null"] },
         "kubernetes_pod_uid": { "type": ["string", "null"] }
       }
@@ -271,7 +270,20 @@
         "mean_row_weight_after_lp_sge": { "$ref": "#/$defs/nonnegative_number" },
         "max_row_weight_after_lp_sge": { "$ref": "#/$defs/uint" },
         "mean_pivot_weight_after_rank_sge": { "$ref": "#/$defs/nonnegative_number" }
-      }
+      },
+      "allOf": [{
+        "if": { "properties": { "rows_after_lp_sge": { "const": 0 } } },
+        "then": { "properties": {
+          "total_row_weight_after_lp_sge": { "const": 0 },
+          "mean_row_weight_after_lp_sge": { "const": 0 },
+          "max_row_weight_after_lp_sge": { "const": 0 }
+        } },
+        "else": { "properties": {
+          "total_row_weight_after_lp_sge": { "$ref": "#/$defs/positive_uint" },
+          "mean_row_weight_after_lp_sge": { "type": "number", "exclusiveMinimum": 0 },
+          "max_row_weight_after_lp_sge": { "$ref": "#/$defs/positive_uint" }
+        } }
+      }]
     },
     "linear_algebra": {
       "type": "object", "additionalProperties": false,

@@ -72,7 +72,7 @@ Before freeze, unit tests may use only:
 No generator, factor base, yield, graph, row, rank, or cost value at any frozen target
 size may be observed before the protocol hash, commit, and S3 pre-run receipt exist.
 
-The four exact non-target analyzer/schema regressions are currently blocked by the
+The eight exact non-target Rust analyzer regressions are currently blocked by the
 local 16-GiB Cargo test-profile build envelope, as recorded in
 [`problems/lead15-analyzer-test-profile-memory.md`](../../problems/lead15-analyzer-test-profile-memory.md).
 This is a pre-freeze validation dependency, not a scientific outcome; the smaller
@@ -202,7 +202,8 @@ The exact byte-level launch and recovery interface is specified in `LINEAGE.md`.
 
 - Build the committed `lead15_diem_quartic` example in release mode once per immutable
   image; record commit and binary SHA-256.
-- Backend: the supported non-resumable `isolab_k8s_run` custom-job route on Iso Lab EKS
+- Backend: the supported non-resumable `isolab_k8s_run` custom-job route on the
+  version-pinned Iso Lab EKS 1.36 deployment
   Spot, with a digest-pinned image, the tracked wrapper as the sole container command,
   exact argv, `retries=0`, one scientific thread per size cell,
   durable S3 upload, and four size cells submitted concurrently if governance/quotas
@@ -219,6 +220,30 @@ The exact byte-level launch and recovery interface is specified in `LINEAGE.md`.
   terminal, censored/incomplete cell outcome: it receives no
   replacement or retry and cannot be described as an algorithmic failure or as zero
   cost or a performance datum. The serial resumable controller is not substituted.
+- The retained Job must match the standard Iso Lab launcher exactly, including its
+  server-emitted integer `metadata.generation=1`; absent-or-null template creation
+  timestamp and name; absent-or-null template namespace; 86,400-second post-finish
+  TTL; controller-UID selector; generated current and legacy
+  Job labels, Karpenter no-disrupt annotation, CPU toleration, required pod
+  anti-affinity, non-root pod/container security contexts, and the fixed `/work` and
+  `/tmp` `emptyDir` volumes and mounts. The terminal Pod must have the exact Job owner
+  reference and the same normalized template spec. Normalization removes only named
+  Kubernetes API defaults (container termination/image-pull defaults, service-account
+  alias, scheduler/DNS/link/priority defaults, the two standard 300-second NoExecute
+  tolerations, and scheduled `nodeName`). The actual Pod must also contain exactly the
+  `runner` service account's IRSA admission: the fixed `AWS_ROLE_ARN` and
+  `AWS_WEB_IDENTITY_TOKEN_FILE` values plus the read-only `aws-iam-token` projected
+  volume/mount; those fields alone are removed for comparison with the pre-admission
+  Job template. Raw Pod metadata additionally requires the server-emitted integer
+  `generation=1`. On a scheduled terminal Pod, EKS 1.36 status must report the
+  same integer as `status.observedGeneration`; an unscheduled terminal Pod may
+  omit that field but may not report a different value. Optional Pod topology labels are limited to a coherent `us-east-2`
+  region/zone pair. Downward-API `fieldRef.apiVersion` is either absent or exactly
+  `v1`; explicit null or any other value is invalid. Extra args, environment sources, lifecycle
+  hooks, working-directory changes, volume/device overlays, resource claims or device
+  resources, init/ephemeral/sidecar containers, labels, annotations, or other spec keys
+  invalidate the cell. The sole terminal container status must be named `task`, while
+  image identity remains the digest-pinned Pod spec plus the matching runtime `imageID`.
 - Evaluator e5 gives the explicitly unvalidated desk estimate “run under 1 CPU-hour.”
   For canonical preflight metadata only, this is encoded as a conservative 3600-second
   total planning ceiling and 150 seconds per one of 24 curves. It was not measured,
@@ -228,14 +253,42 @@ The exact byte-level launch and recovery interface is specified in `LINEAGE.md`.
   as partial evidence and may be reconciled only under the original request/Job identity;
   it does not authorize another scientific measurement. Scientific failures and
   deadline expirations are never retried.
-- Before submission, checkpoint the frozen source commit, canonical protocol, manifest,
-  image digest, and exact request bytes to private S3 and verify their versioned
-  read-back receipts. Workers write JSONL, environment, stdout/stderr, resource, and
+- Before finalizing the source manifest, checkpoint a deterministic preregistration
+  package containing the frozen source commit, canonical protocol, evidence schemas,
+  build receipt, and externally known image digest to private S3, and verify its
+  versioned read-back receipt at exactly
+  `s3://setec-astronomy-artifacts/lead15-diem-quartic-20261101/pre-manifest-package.tar`.
+  That package deliberately excludes the final
+  `source-manifest.json` and every request byte: the manifest embeds this receipt, and
+  including itself would create a hash cycle. After the manifest hash exists, create
+  each exact `requests/q-<q>.json`, upload it with an S3 SHA-256 checksum, and retain a
+  version-specific checksum-enabled head plus read-back bytes before submission.
+  Workers write JSONL, environment, stdout/stderr, resource, and
   terminal/partial manifests to the exact injected
   `s3://isolab-results-104186811093-us-east-2/runs/<job>/<pod>/` prefix. Collection
   retains and locally hashes the exact request, request head, submission response, raw
   Job, raw Pod when created, terminal status, complete paginated result listing,
-  per-object heads/version IDs, downloaded worker artifacts, and payload bytes.
+  per-object heads/version IDs, downloaded worker artifacts, the exact GNU-timeout
+  TERM/KILL event log, and payload bytes. Scientific terminal classes require the raw
+  Pod's terminal exit/reason to agree with the worker; `OOMKilled` is infrastructure.
+  Worker start, exit, upload, runtime-provenance, and build receipts have closed object
+  shapes. Exit class, deadline/timeout flags, exit code, and elapsed seconds must be
+  mutually coherent; the upload boolean must equal whether its bounded integer upload
+  exit is zero; and runtime provenance must bind the raw Pod name as well as its UID,
+  node, and Job name. For a retained start/exit pair, `worker-start.started_at` must
+  equal `worker-exit.started_at`; these timestamps remain lifecycle provenance only and
+  never support a wall-time or performance claim.
+- Evidence acquisition is a stated trust boundary. A trusted operator must obtain the
+  request head/read-back, submission, raw Job/Pod, status, complete result listing,
+  version-specific object heads, and object bytes through the intended Kubernetes/AWS
+  provider sessions and preserve them without rewriting before offline collection.
+  Local hashes, S3 checksum/version fields copied into the bundle, the collector receipt,
+  and native revalidation prove internal byte consistency and frozen-identity coherence;
+  they are not independently signed provider attestation. If the whole acquisition
+  directory is attacker-controlled, or provider-session custody is not established, the
+  study is invalid and no scientific terminal claim is permitted. In code and legacy
+  field names, “authenticated” means this lineage validation under trusted acquisition,
+  not standalone cryptographic authenticity of the offline directory.
 - Required derived artifacts: validated raw JSONL, instance manifest, analysis JSON,
   K1–K4 receipt, complete-cost table, report source/PDF, one explanatory SVG, source
   manifest, and session-log update.
@@ -245,22 +298,30 @@ The exact byte-level launch and recovery interface is specified in `LINEAGE.md`.
   externally bound image URI/digest,
   the exact K4-reference and evidence-schema hashes, exact argv template (whose only
   post-freeze substitution is the manifest byte hash), fixed Job name/request URI/result
-  prefix, both deadlines, retry count, checkpoint receipt, requested resources, and
+  prefix, both deadlines, retry count, the explicitly scoped pre-manifest-package
+  receipt, requested resources, and
   durable results root. The request hash is deliberately not embedded in the manifest
   or request argv, which would create a self-referential hash cycle. Each
   immutable completion receipt binds that
-  manifest hash and a versioned, read-back-verified request artifact to locally rehashed
+  manifest hash and a versioned request artifact whose S3 `ChecksumSHA256` matches the
+  locally rehashed bytes, to locally rehashed
   raw Job/Pod/status/result/head/worker bytes, Job/Pod UIDs, node, restart count,
-  terminal class, and the payload S3 URI/SHA-256/byte count/ETag/version ID.
-  Strict analysis accepts the protocol, manifest, exactly four completion receipts and
-  four JSONL payloads. It parses only the newline-terminated prefix and preserves any
-  trailing fragment by digest. Any size other than `complete_valid` makes the whole study
+  terminal class, and the payload S3 URI/SHA-256/S3-checksum/byte count/ETag/version ID.
+  The completion-receipt schema couples each `q` to its exact Job-name pattern,
+  `argv[1]`, and versioned `requests/q-<q>.json` URI; the native analyzer repeats that
+  coupling from the frozen manifest. Strict analysis always accepts the protocol,
+  manifest, and exactly four completion receipts. The four-cell `complete_valid` path
+  additionally requires one lineage-validated JSONL payload for each size cell (four
+  total); incomplete terminal paths instead preserve the lineage-validated strict prefix,
+  including an explicit missing or partial payload state.
+  It parses only the newline-terminated prefix and preserves any trailing fragment by
+  digest. Any size other than `complete_valid` makes the whole study
   `invalid_or_incomplete` and K1--K4 `not_evaluated`; partial records never determine the
   terminal cause.
 - Canonical flow records `planned=24` and emits up to 24 evidenced attempted candidate
   rows, all with `wall_valid=false`. A terminal cell attempt may fan out only to the
-  durable per-instance identities actually authenticated for that attempt. A zero-Pod
-  cell, a missing per-instance identity, or an unauthenticated record produces no
+  durable per-instance identities actually lineage-validated for that attempt. A zero-Pod
+  cell, a missing per-instance identity, or a record that fails lineage validation produces no
   fictional run row; the cell-level classification and planned-minus-observed count
   preserve the incompleteness. The paired formula-reference values are analysis-only
   columns/receipts attached to evidenced candidate rows; they are not synthetic

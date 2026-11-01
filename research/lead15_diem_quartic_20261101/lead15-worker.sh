@@ -51,19 +51,21 @@ preflight_failure() {
   jq -n --arg results "$ISOLAB_RESULTS_URI" --arg job "$ISOLAB_JOB_ID" \
     --arg pod "$POD_UID" --arg node "$NODE_NAME" --arg started "$started_at" --arg finished "$finished" \
     '{schema:"lead15.worker-exit/v1",terminal_class:"infrastructure_failure",
-      deadline_reached:false,exit_code:44,child_elapsed_seconds:0,
+      deadline_reached:false,timeout_fired:false,exit_code:44,child_elapsed_seconds:0,
       payload:{path:"records.jsonl",sha256:"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         bytes:0,final_newline:false},started_at:$started,finished_at:$finished,
       results_uri:$results,job_name:$job,pod_uid:$pod,node_name:$node}' \
     > "$ISOLAB_OUTPUT_DIR/worker-exit.json"
-  aws s3 cp "$ISOLAB_OUTPUT_DIR/worker-exit.json" "${ISOLAB_RESULTS_URI}worker-exit.json" --only-show-errors || upload_exit=$?
+  aws s3 cp "$ISOLAB_OUTPUT_DIR/worker-exit.json" "${ISOLAB_RESULTS_URI}worker-exit.json" \
+    --checksum-algorithm SHA256 --only-show-errors || upload_exit=$?
   jq -n --argjson uploaded "$([[ $upload_exit == 0 ]] && echo true || echo false)" \
     --argjson upload_exit "$upload_exit" --arg results "$ISOLAB_RESULTS_URI" \
     '{schema:"lead15.worker-upload/v1",uploaded:$uploaded,upload_exit:$upload_exit,
       terminal_class:"infrastructure_failure",child_exit_code:44,results_uri:$results,
       payload_sha256:"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       payload_bytes:0}' > "$ISOLAB_OUTPUT_DIR/worker-upload.json"
-  aws s3 cp "$ISOLAB_OUTPUT_DIR/worker-upload.json" "${ISOLAB_RESULTS_URI}worker-upload.json" --only-show-errors \
+  aws s3 cp "$ISOLAB_OUTPUT_DIR/worker-upload.json" "${ISOLAB_RESULTS_URI}worker-upload.json" \
+    --checksum-algorithm SHA256 --only-show-errors \
     || receipt_upload_exit=$?
   if [[ $upload_exit != 0 || $receipt_upload_exit != 0 ]]; then
     exit 91
@@ -134,6 +136,7 @@ export OMP_NUM_THREADS=1
 child_pid=''
 signal_name=''
 escalation_pid=''
+timeout_events="$ISOLAB_OUTPUT_DIR/timeout-events.log"
 forward_signal() {
   signal_name=$1
   if [[ -n "$child_pid" ]]; then
@@ -149,9 +152,10 @@ trap 'forward_signal INT' INT
 
 set +e
 child_started_epoch=$(date +%s)
-setsid timeout --foreground --signal=TERM --kill-after=30 "${scientific_seconds}s" \
-  "$binary" run-size "$q" "$records" \
-  > "$ISOLAB_OUTPUT_DIR/stdout.log" 2> "$ISOLAB_OUTPUT_DIR/stderr.log" &
+LC_ALL=C setsid timeout --verbose --foreground --signal=TERM --kill-after=30 "${scientific_seconds}s" \
+  bash -c 'stderr=$1; shift; exec "$@" 2>"$stderr"' _ \
+  "$ISOLAB_OUTPUT_DIR/stderr.log" "$binary" run-size "$q" "$records" \
+  > "$ISOLAB_OUTPUT_DIR/stdout.log" 2> "$timeout_events" &
 child_pid=$!
 wait "$child_pid"
 child_exit=$?
@@ -170,11 +174,20 @@ child_elapsed_seconds=$(( $(date +%s) - child_started_epoch ))
 
 terminal_class=scientific_failure
 deadline_reached=false
+timeout_fired=false
+term_event="timeout: sending signal TERM to command 'bash'"
+kill_event="timeout: sending signal KILL to command 'bash'"
+timeout_event_text=$(<"$timeout_events")
+if [[ $child_exit == 124 && "$timeout_event_text" == "$term_event" ]]; then
+  timeout_fired=true
+elif [[ $child_exit == 137 && "$timeout_event_text" == "$term_event"$'\n'"$kill_event" ]]; then
+  timeout_fired=true
+fi
 if [[ -n "$signal_name" ]]; then
   terminal_class=infrastructure_failure
 elif [[ $child_exit == 0 ]]; then
   terminal_class=completed
-elif [[ $child_exit == 124 || ( $child_exit == 137 && $child_elapsed_seconds -ge $((scientific_seconds - 1)) ) ]]; then
+elif [[ $timeout_fired == true && $child_elapsed_seconds -ge $((scientific_seconds - 1)) ]]; then
   terminal_class=deadline
   deadline_reached=true
 elif [[ $child_exit == 130 || $child_exit == 137 || $child_exit == 143 ]]; then
@@ -194,6 +207,7 @@ fi
 jq -n \
   --arg terminal "$terminal_class" \
   --argjson deadline "$deadline_reached" \
+  --argjson timeout_fired "$timeout_fired" \
   --argjson exit "$child_exit" \
   --argjson elapsed "$child_elapsed_seconds" \
   --arg payload_sha "$payload_sha" \
@@ -206,7 +220,8 @@ jq -n \
   --arg pod "$POD_UID" \
   --arg node "$NODE_NAME" \
   '{schema:"lead15.worker-exit/v1",terminal_class:$terminal,
-    deadline_reached:$deadline,exit_code:$exit,child_elapsed_seconds:$elapsed,
+    deadline_reached:$deadline,timeout_fired:$timeout_fired,
+    exit_code:$exit,child_elapsed_seconds:$elapsed,
     payload:{path:"records.jsonl",
     sha256:$payload_sha,bytes:$payload_bytes,final_newline:$final_newline},
     started_at:$started,finished_at:$finished,results_uri:$results,
@@ -219,7 +234,8 @@ jq -n \
 ) > "$ISOLAB_OUTPUT_DIR/SHA256SUMS"
 
 upload_exit=0
-aws s3 cp "$ISOLAB_OUTPUT_DIR/" "$ISOLAB_RESULTS_URI" --recursive --only-show-errors || upload_exit=$?
+aws s3 cp "$ISOLAB_OUTPUT_DIR/" "$ISOLAB_RESULTS_URI" --recursive \
+  --checksum-algorithm SHA256 --only-show-errors || upload_exit=$?
 jq -n \
   --argjson uploaded "$([[ $upload_exit == 0 ]] && echo true || echo false)" \
   --argjson upload_exit "$upload_exit" \
@@ -233,7 +249,8 @@ jq -n \
     payload_sha256:$payload_sha,payload_bytes:$payload_bytes}' \
   > "$ISOLAB_OUTPUT_DIR/worker-upload.json"
 receipt_upload_exit=0
-aws s3 cp "$ISOLAB_OUTPUT_DIR/worker-upload.json" "${ISOLAB_RESULTS_URI}worker-upload.json" --only-show-errors || receipt_upload_exit=$?
+aws s3 cp "$ISOLAB_OUTPUT_DIR/worker-upload.json" "${ISOLAB_RESULTS_URI}worker-upload.json" \
+  --checksum-algorithm SHA256 --only-show-errors || receipt_upload_exit=$?
 if [[ $upload_exit == 0 && $receipt_upload_exit != 0 ]]; then
   upload_exit=$receipt_upload_exit
 fi

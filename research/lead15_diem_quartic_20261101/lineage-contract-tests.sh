@@ -15,6 +15,8 @@ hex40=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 hex64=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 hex64c=cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 image="example.invalid/lead15@sha256:$hex64c"
+checksum=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+noncanonical_checksum=${checksum:0:42}B=
 
 jq -n --arg c "$hex40" --arg h "$hex64" --arg worker "$hex64c" '
   {schema:"lead15.build-info/v1",source_revision:$c,cargo_lock_sha256:$h,
@@ -53,13 +55,16 @@ expect_request_reject mutable-image '.arguments.image="example.invalid/lead15:la
 expect_request_reject self-hash-argument '.arguments.command += ["bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"]'
 
 local_file=$(jq -cn --arg h "$hex64" '{path:"artifact.json",sha256:$h,bytes:1}')
-remote_file=$(jq -cn --arg h "$hex64" \
-  '{path:"request.json",sha256:$h,bytes:1,s3_uri:"s3://setec-astronomy-artifacts/lead15-diem-quartic-20261101/requests/request.json",etag:"\"etag\"",version_id:"version-1",readback_verified:true}')
+remote_file=$(jq -cn --arg h "$hex64" --arg checksum "$checksum" \
+  '{path:"request.json",sha256:$h,checksum_sha256:$checksum,bytes:1,
+    s3_uri:"s3://setec-astronomy-artifacts/lead15-diem-quartic-20261101/requests/q-257.json",
+    etag:"\"etag\"",version_id:"version-1",readback_verified:true}')
 lineage=$(jq -cn --argjson f "$local_file" '
   {request:$f,request_head:$f,submission:$f,job:$f,pod:$f,status:$f,results:$f,
    object_heads:$f,payload:$f,worker_start:$f,worker_exit:$f,worker_upload:$f,
-   runtime_provenance:$f,build_info:$f,sha256sums:$f}')
-jq -n --arg h "$hex64" --arg c "$hex40" --arg image "$image" --arg digest "sha256:$hex64c" \
+   runtime_provenance:$f,build_info:$f,binary_sha256:$f,stdout:$f,stderr:$f,
+   sha256sums:$f,timeout_events:$f}')
+jq -n --arg h "$hex64" --arg checksum "$checksum" --arg c "$hex40" --arg image "$image" --arg digest "sha256:$hex64c" \
   --argjson request "$remote_file" --argjson lineage "$lineage" '
   {schema:"lead15.completion-receipt/v1",protocol_id:"LEAD15-DT-E5-20261101",q:257,
    source_manifest_sha256:$h,collector_sha256:$h,request_sha256:$h,request_artifact:$request,
@@ -73,7 +78,7 @@ jq -n --arg h "$hex64" --arg c "$hex40" --arg image "$image" --arg digest "sha25
    pod:{name:"pod-name",uid:"pod-uid",node_name:"node-name"},terminal_class:"completed",
    deadline_reached:false,exit_code:0,
    payload:{present:true,s3_uri:"s3://isolab-results-104186811093-us-east-2/runs/lead15-dt-e5-q257-aaaaaaaa/pod-uid/records.jsonl",
-     sha256:$h,bytes:1,etag:"\"etag\"",version_id:"version-2",uploaded:true,
+     sha256:$h,checksum_sha256:$checksum,bytes:1,etag:"\"etag\"",version_id:"version-2",uploaded:true,
      readback_verified:true,final_newline:true},
    resource_provenance:{cpu_model:"fixture",logical_cpus:4,memory_bytes:1,kernel:"fixture",node_name:"node-name"},
    lineage_artifacts:$lineage,started_at:"2026-11-01T00:00:00Z",finished_at:"2026-11-01T00:00:01Z",
@@ -91,9 +96,31 @@ expect_completion_reject() {
 }
 expect_completion_reject copied-metadata-only 'del(.lineage_artifacts.job)'
 expect_completion_reject unverified-payload '.payload.readback_verified=false'
+expect_completion_reject missing-request-checksum 'del(.request_artifact.checksum_sha256)'
+expect_completion_reject noncanonical-request-checksum \
+  ".request_artifact.checksum_sha256=\"$noncanonical_checksum\""
+expect_completion_reject unicode-one-character-request-etag '.request_artifact.etag="é"'
+expect_completion_reject missing-payload-checksum 'del(.payload.checksum_sha256)'
 expect_completion_reject wrong-results-bucket '.payload.s3_uri="s3://setec-astronomy-artifacts/result.jsonl"'
 expect_completion_reject outer-deadline-collapsed '.outer_job_deadline_seconds=3600'
 expect_completion_reject restarted-pod '.pod_restarts=1'
+expect_completion_reject extra-job-identity-field '.job.extra=true'
+expect_completion_reject invalid-collected-at '.collected_at="not-a-date-time"'
+expect_completion_reject pre-epoch-collected-at '.collected_at="1969-12-31T23:59:59Z"'
+expect_completion_reject null-payload-present '.payload.present=null'
+expect_completion_reject string-payload-present '.payload.present="false"'
+expect_completion_reject number-payload-present '.payload.present=0'
+expect_completion_reject object-payload-present '.payload.present={}'
+expect_completion_reject invalid-deadline-exit '.terminal_class="deadline" | .deadline_reached=true | .exit_code=1'
+expect_completion_reject signaled-scientific-failure \
+  '.terminal_class="scientific_failure" | .deadline_reached=false | .exit_code=137'
+expect_completion_reject deadline-without-worker-lineage '
+  .terminal_class="deadline" | .deadline_reached=true | .exit_code=124 |
+  .attempts=0 | .pod_restarts=null | .pod=null | .resource_provenance=null |
+  .lineage_artifacts.worker_start=null | .lineage_artifacts.worker_exit=null |
+  .lineage_artifacts.worker_upload=null | .lineage_artifacts.runtime_provenance=null |
+  .lineage_artifacts.build_info=null | .lineage_artifacts.sha256sums=null |
+  .lineage_artifacts.timeout_events=null'
 
 "$validator" -i "$root/source-manifest.json" "$root/source-manifest.schema.json" >/dev/null
 echo "lineage contract schema tests passed"

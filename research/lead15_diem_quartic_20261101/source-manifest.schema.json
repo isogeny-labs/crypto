@@ -15,7 +15,7 @@
     "build_info_path_in_image", "image_uri", "image_digest", "launch_tool", "isolation",
     "threads_per_cell", "scientific_environment", "scientific_deadline_seconds",
     "outer_job_deadline_seconds", "termination_grace_seconds", "retries",
-    "requested_resources", "jobs", "durable_output_prefix", "checkpoint_receipt",
+    "requested_resources", "jobs", "durable_output_prefix", "pre_manifest_package_receipt",
     "frozen_at"
   ],
   "properties": {
@@ -74,7 +74,7 @@
       "type": ["string", "null"],
       "pattern": "^s3://isolab-results-104186811093-us-east-2/runs/$"
     },
-    "checkpoint_receipt": { "$ref": "#/$defs/checkpoint_receipt" },
+    "pre_manifest_package_receipt": { "$ref": "#/$defs/pre_manifest_package_receipt" },
     "frozen_at": { "type": ["string", "null"], "format": "date-time" }
   },
   "allOf": [{
@@ -99,13 +99,13 @@
       "image_uri": { "type": "string", "pattern": "^[^\\s@]+@sha256:[0-9a-f]{64}$" },
       "image_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
       "durable_output_prefix": { "const": "s3://isolab-results-104186811093-us-east-2/runs/" },
-      "checkpoint_receipt": { "$ref": "#/$defs/frozen_checkpoint_receipt" },
+      "pre_manifest_package_receipt": { "$ref": "#/$defs/frozen_pre_manifest_package_receipt" },
       "frozen_at": { "type": "string", "format": "date-time" },
       "jobs": { "prefixItems": [
-        { "allOf": [{ "$ref": "#/$defs/q257" }, { "$ref": "#/$defs/frozen_job" }] },
-        { "allOf": [{ "$ref": "#/$defs/q2053" }, { "$ref": "#/$defs/frozen_job" }] },
-        { "allOf": [{ "$ref": "#/$defs/q32771" }, { "$ref": "#/$defs/frozen_job" }] },
-        { "allOf": [{ "$ref": "#/$defs/q4194301" }, { "$ref": "#/$defs/frozen_job" }] }
+        { "$ref": "#/$defs/frozen_q257" },
+        { "$ref": "#/$defs/frozen_q2053" },
+        { "$ref": "#/$defs/frozen_q32771" },
+        { "$ref": "#/$defs/frozen_q4194301" }
       ] }
     } }
   }],
@@ -114,10 +114,11 @@
     "nullable_sha256": { "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
     "git_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
     "nullable_git_sha": { "anyOf": [{ "$ref": "#/$defs/git_sha" }, { "type": "null" }] },
-    "checkpoint_receipt": {
+    "pre_manifest_package_receipt": {
       "type": "object", "additionalProperties": false,
-      "required": ["s3_uri", "sha256", "bytes", "version_id", "readback_verified"],
+      "required": ["scope", "s3_uri", "sha256", "bytes", "version_id", "readback_verified"],
       "properties": {
+        "scope": { "const": "pre_manifest_package_excluding_source_manifest_and_requests" },
         "s3_uri": { "type": ["string", "null"] },
         "sha256": { "$ref": "#/$defs/nullable_sha256" },
         "bytes": { "type": ["integer", "null"], "minimum": 1 },
@@ -125,11 +126,12 @@
         "readback_verified": { "type": ["boolean", "null"] }
       }
     },
-    "frozen_checkpoint_receipt": {
+    "frozen_pre_manifest_package_receipt": {
       "type": "object", "additionalProperties": false,
-      "required": ["s3_uri", "sha256", "bytes", "version_id", "readback_verified"],
+      "required": ["scope", "s3_uri", "sha256", "bytes", "version_id", "readback_verified"],
       "properties": {
-        "s3_uri": { "type": "string", "pattern": "^s3://setec-astronomy-artifacts/lead15-diem-quartic-20261101/" },
+        "scope": { "const": "pre_manifest_package_excluding_source_manifest_and_requests" },
+        "s3_uri": { "const": "s3://setec-astronomy-artifacts/lead15-diem-quartic-20261101/pre-manifest-package.tar" },
         "sha256": { "$ref": "#/$defs/sha256" },
         "bytes": { "type": "integer", "minimum": 1 },
         "version_id": { "type": "string", "minLength": 1 },
@@ -172,6 +174,50 @@
         "request_artifact_s3_uri": { "type": "string", "pattern": "^s3://setec-astronomy-artifacts/lead15-diem-quartic-20261101/requests/" },
         "results_prefix": { "type": "string", "pattern": "^s3://isolab-results-104186811093-us-east-2/runs/lead15-dt-e5-q(257|2053|32771|4194301)-[0-9a-f]{8,12}/$" }
       }
+    },
+    "frozen_q257": {
+      "allOf": [
+        { "$ref": "#/$defs/q257" }, { "$ref": "#/$defs/frozen_job" },
+        { "properties": {
+          "job_name": { "pattern": "^lead15-dt-e5-q257-[0-9a-f]{8,12}$" },
+          "argv_template": { "prefixItems": [{}, { "const": "257" }] },
+          "request_artifact_s3_uri": { "const": "s3://setec-astronomy-artifacts/lead15-diem-quartic-20261101/requests/q-257.json" },
+          "results_prefix": { "pattern": "^s3://isolab-results-104186811093-us-east-2/runs/lead15-dt-e5-q257-[0-9a-f]{8,12}/$" }
+        } }
+      ]
+    },
+    "frozen_q2053": {
+      "allOf": [
+        { "$ref": "#/$defs/q2053" }, { "$ref": "#/$defs/frozen_job" },
+        { "properties": {
+          "job_name": { "pattern": "^lead15-dt-e5-q2053-[0-9a-f]{8,12}$" },
+          "argv_template": { "prefixItems": [{}, { "const": "2053" }] },
+          "request_artifact_s3_uri": { "const": "s3://setec-astronomy-artifacts/lead15-diem-quartic-20261101/requests/q-2053.json" },
+          "results_prefix": { "pattern": "^s3://isolab-results-104186811093-us-east-2/runs/lead15-dt-e5-q2053-[0-9a-f]{8,12}/$" }
+        } }
+      ]
+    },
+    "frozen_q32771": {
+      "allOf": [
+        { "$ref": "#/$defs/q32771" }, { "$ref": "#/$defs/frozen_job" },
+        { "properties": {
+          "job_name": { "pattern": "^lead15-dt-e5-q32771-[0-9a-f]{8,12}$" },
+          "argv_template": { "prefixItems": [{}, { "const": "32771" }] },
+          "request_artifact_s3_uri": { "const": "s3://setec-astronomy-artifacts/lead15-diem-quartic-20261101/requests/q-32771.json" },
+          "results_prefix": { "pattern": "^s3://isolab-results-104186811093-us-east-2/runs/lead15-dt-e5-q32771-[0-9a-f]{8,12}/$" }
+        } }
+      ]
+    },
+    "frozen_q4194301": {
+      "allOf": [
+        { "$ref": "#/$defs/q4194301" }, { "$ref": "#/$defs/frozen_job" },
+        { "properties": {
+          "job_name": { "pattern": "^lead15-dt-e5-q4194301-[0-9a-f]{8,12}$" },
+          "argv_template": { "prefixItems": [{}, { "const": "4194301" }] },
+          "request_artifact_s3_uri": { "const": "s3://setec-astronomy-artifacts/lead15-diem-quartic-20261101/requests/q-4194301.json" },
+          "results_prefix": { "pattern": "^s3://isolab-results-104186811093-us-east-2/runs/lead15-dt-e5-q4194301-[0-9a-f]{8,12}/$" }
+        } }
+      ]
     },
     "q257": { "allOf": [{ "$ref": "#/$defs/job" }, { "properties": { "q": { "const": 257 } } }] },
     "q2053": { "allOf": [{ "$ref": "#/$defs/job" }, { "properties": { "q": { "const": 2053 } } }] },
