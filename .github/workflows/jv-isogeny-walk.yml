@@ -26,7 +26,111 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Run the complete p=101 isogeny walk and sieve check
-        run: >-
+        run: |
           cargo test --release --locked --lib
           cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies
+          -- --exact --test-threads=1
+          cargo test --release --locked --lib
+          cryptanalysis::jv_isogeny_walk::tests::counted_end_to_end_keeps_the_legacy_counts_and_charges_every_phase
           -- --exact --ignored --test-threads=1
+      - name: Gate corrected rho accounting and frozen prospective tools
+        if: github.event_name == 'workflow_dispatch' && github.ref_name == 'codex/jv-validation'
+        run: |
+          cargo test --release --locked --lib \
+            cryptanalysis::jv_rho_strong::tests::counted_runs_match_the_uncounted_run_and_verify \
+            -- --exact --test-threads=1
+          cargo test --release --locked --lib \
+            cryptanalysis::jv_rho_strong::tests::rho_on_the_challenge_curve_recovers_the_planted_logarithm \
+            -- --exact --test-threads=1
+          cargo test --release --locked --lib \
+            cryptanalysis::jv_bitops::tests::hooks_classify_by_modulus \
+            -- --exact --test-threads=1
+          cargo build --release --locked \
+            --example jv_cover_ic_vs_rho_bitops \
+            --example jv_validation_analyse \
+            --example jv_validation_verify
+          python3 -m json.tool research/jv_sieve_validation_20261101/protocol.json >/dev/null
+          test "$(jq -r '.freeze.status' research/jv_sieve_validation_20261101/protocol.json)" = frozen
+
+  prospective-panels:
+    if: github.event_name == 'workflow_dispatch' && github.ref_name == 'codex/jv-validation'
+    needs: end-to-end
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        p: [1009, 1511, 1823]
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|jv-isogeny-walk.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|jv-isogeny-walk.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Build frozen producer and analysis
+        run: >-
+          cargo build --release --locked
+          --example jv_cover_ic_vs_rho_bitops
+          --example jv_validation_analyse
+      - name: Run prospective p=${{ matrix.p }} panel
+        env:
+          JV_VALIDATION_JOBS: '4'
+        run: bash research/jv_sieve_validation_20261101/run_panel.sh ${{ matrix.p }}
+      - name: Upload complete p=${{ matrix.p }} attempt census
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jv-validation-panel-${{ matrix.p }}
+          path: research/jv_sieve_validation_20261101/runs/p${{ matrix.p }}
+          if-no-files-found: error
+          retention-days: 30
+
+  prospective-validation:
+    if: github.event_name == 'workflow_dispatch' && github.ref_name == 'codex/jv-validation'
+    needs: prospective-panels
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        p: [1009, 1511, 1823]
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|jv-isogeny-walk.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|jv-isogeny-walk.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Download sealed producer panel
+        uses: actions/download-artifact@v4
+        with:
+          name: jv-validation-panel-${{ matrix.p }}
+          path: research/jv_sieve_validation_20261101/runs/p${{ matrix.p }}
+      - name: Build replay producer and independent verifier
+        run: >-
+          cargo build --release --locked
+          --example jv_cover_ic_vs_rho_bitops
+          --example jv_validation_verify
+      - name: Replay and recompute p=${{ matrix.p }}
+        run: |
+          set +e
+          bash research/jv_sieve_validation_20261101/replay_panel.sh \
+            ${{ matrix.p }} \
+            research/jv_sieve_validation_20261101/runs/p${{ matrix.p }} \
+            research/jv_sieve_validation_20261101/validation/replay
+          echo $? > research/jv_sieve_validation_20261101/validation/replay-p${{ matrix.p }}.exit
+          ./target/release/examples/jv_validation_verify \
+            --panel research/jv_sieve_validation_20261101/runs/p${{ matrix.p }} \
+            --analysis research/jv_sieve_validation_20261101/runs/p${{ matrix.p }}/analysis.json \
+            --out research/jv_sieve_validation_20261101/validation/p${{ matrix.p }}/validator-report.json
+          echo $? > research/jv_sieve_validation_20261101/validation/validator-p${{ matrix.p }}.exit
+          exit 0
+      - name: Upload p=${{ matrix.p }} validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jv-validation-evidence-${{ matrix.p }}
+          path: research/jv_sieve_validation_20261101/validation
+          if-no-files-found: error
+          retention-days: 30
+      - name: Enforce replay and validator verdicts
+        run: |
+          test "$(cat research/jv_sieve_validation_20261101/validation/replay-p${{ matrix.p }}.exit)" = 0
+          test "$(cat research/jv_sieve_validation_20261101/validation/validator-p${{ matrix.p }}.exit)" = 0
