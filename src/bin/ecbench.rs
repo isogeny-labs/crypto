@@ -8,6 +8,8 @@
 //! ecbench verify --dir D [--replay N]  re-derive a session; replay runs exactly
 //! ecbench compare --dir D --a X --b Y  paired ratio with a bootstrap interval
 //! ecbench table  --dir D... [--reference ARM]   the one-unit table AGENTS.md §2 asks for
+//! ecbench report --dir D --out R        Markdown, SVG graphs, Typst source and JSON of a session
+//! ecbench sweep  --family prime|koblitz --bits 16,18,.. --methods A,B --out spec.json   a method × size scaling spec
 //! ecbench resources --dir D [--out F]   cold native-work, memory and PMU vectors
 //! ecbench fb --curve C --factor-base F a factor base with its points
 //! ecbench fbm --curve C --factor-base F --oracle O [--solver S]  seal an FBM1 measurement id
@@ -48,8 +50,7 @@ use clap::{Parser, Subcommand};
 
 use crypto_lib::cryptanalysis::ecbench::{
     audit, bounds, calibration, callgrind, canonical, challenge, claim, compare, db, fbm, frontier,
-    full_price, gpu, host, isolab, isolation, methods, record, resources, runner, signals, spec,
-    stats, trend, wordram_price, workload,
+    full_price, gpu, host, isolab, isolation, methods, record, report, resources, runner, signals, spec, stats, sweep, trend, workload, wordram_price,
 };
 
 #[derive(Parser)]
@@ -397,6 +398,58 @@ enum Cmd {
         /// `reference` arm).
         #[arg(long)]
         reference: Option<String>,
+    },
+    /// A session directory as `report.md`, SVG graphs (with their CSVs),
+    /// `report.typ` (compile it with `typst compile`) and `report.json`.
+    Report {
+        #[arg(long)]
+        dir: PathBuf,
+        /// A directory for the report files (created; files are replaced).
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Write one `ecbench.spec/v1` for a method × size scaling study: one
+    /// curve per size, the same arms on every curve.
+    Sweep {
+        /// `prime` (sizes are bits of p, 8..=32) or `koblitz` (sizes are
+        /// extension degrees n of K_a/F_2^n).
+        #[arg(long)]
+        family: String,
+        /// Sizes: `16,18,20` or `16..30:2` (lo..hi:step).
+        #[arg(long, alias = "degrees")]
+        bits: String,
+        /// Comma-separated method ids (see `ecbench methods`).
+        #[arg(long)]
+        methods: String,
+        /// Add an `ic.pipeline` arm: `factor_base=...;oracle=...`.
+        #[arg(long)]
+        ic: Option<String>,
+        /// Independent single-target workloads per curve.
+        #[arg(long, default_value_t = 2)]
+        targets: u64,
+        #[arg(long, default_value_t = 3)]
+        rounds: u32,
+        #[arg(long, default_value_t = 300)]
+        timeout: u64,
+        /// Do not add the A/A control arm (a repeat of the reference).
+        #[arg(long)]
+        no_control: bool,
+        /// K_a of a Koblitz sweep.
+        #[arg(long, default_value_t = 1)]
+        a: u8,
+        /// `prime_search` seed.
+        #[arg(long, default_value_t = 59297)]
+        curve_seed: u64,
+        #[arg(long, default_value_t = 20261002)]
+        target_seed: u64,
+        /// Level a wall-clock figure needs (L0..L3).
+        #[arg(long, default_value = "L2")]
+        isolation: String,
+        #[arg(long)]
+        label: Option<String>,
+        /// Write the spec here (default: stdout).
+        #[arg(long)]
+        out: Option<PathBuf>,
     },
     /// The pricing band of AGENTS.md §5a: every arm's unpriced native work,
     /// and any calibration-priced native work, charged alike at each weight
@@ -1631,6 +1684,72 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             }
         }
         Cmd::Table { dir, reference } => table(&dir, reference.as_deref())?,
+        Cmd::Report { dir, out } => {
+            let (r, paths) = report::write_report(&dir, &out)?;
+            for p in &paths {
+                eprintln!("wrote {}", p.display());
+            }
+            eprintln!(
+                "report {}: {} arms, {} workloads, {} measured records, {} verified, {} not verified{}",
+                r.session_id,
+                r.arms.len(),
+                r.workloads.len(),
+                r.runs.measured_records,
+                r.runs.verified,
+                r.runs.failed,
+                if r.scaling.is_empty() { "" } else { ", scaling fitted" }
+            );
+        }
+        Cmd::Sweep {
+            family,
+            bits,
+            methods,
+            ic,
+            targets,
+            rounds,
+            timeout,
+            no_control,
+            a,
+            curve_seed,
+            target_seed,
+            isolation,
+            label,
+            out,
+        } => {
+            let opts = sweep::SweepOptions {
+                family: sweep::Family::parse(&family)?,
+                sizes: sweep::parse_sizes(&bits)?,
+                methods: methods
+                    .split(',')
+                    .map(str::trim)
+                    .filter(|m| !m.is_empty())
+                    .map(String::from)
+                    .collect(),
+                ic,
+                targets,
+                rounds,
+                timeout_seconds: timeout,
+                control: !no_control,
+                koblitz_a: a,
+                curve_seed,
+                target_seed,
+                isolation_required: spec::Level::parse(&isolation)
+                    .ok_or_else(|| format!("--isolation is L0..L3, not `{isolation}`"))?,
+                label,
+            };
+            let s = sweep::generate(&opts)?;
+            write_or_print(out.as_deref(), &sweep::to_json(&s)?)?;
+            if let Some(p) = &out {
+                eprintln!(
+                    "wrote {}: {} arms on {} curves x {} target(s); check with `ecbench plan --spec {}`",
+                    p.display(),
+                    s.arms.len(),
+                    s.workloads.curves.len(),
+                    s.workloads.targets_per_curve,
+                    p.display()
+                );
+            }
+        }
         Cmd::Band {
             dir,
             weights,
