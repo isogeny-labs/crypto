@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Whole-book finite-field formalization](finite-field-handbook-formalization.md) | investigating | complete extraction, truth validation and Lean coverage of the supplied handbook | semantic coverage including unnumbered claims; faithful per-claim proofs and corrections; current conjecture status and independent fidelity review |
 | [N83 mixed-orbit factor-base total-runtime selection](n83-mixed-orbit-factor-base-selection.md) | investigating | natural relation yield, closure/rank/logs, unseen-target solve and same-target rho across the frozen finite grid | resource-qualified native full-D18 positive/natural run with exact S3 replay, then full downstream charged gates |
 | [GHS descent with magic number two or more is not executable](ghs-higher-magic-descent-not-executable.md) | open | executed subgroup-preservation certificates and relation counts for composite-degree binary curves with `m >= 2` (transfer-audit family A) | a smooth model of the GHS curve and the norm-conorm point map on one toy tower, checked on all point pairs, then a binary-Jacobian relation search in the `S = ops/sqrt(r)` unit |
 | [N12 held-out paired wall isolation](n12-heldout-wall-isolation.md) | open | isolated A/A plus five-round candidate/rho wall ratio for the frozen 420 targets | authorized quiet host window, then complete uncontended 5,040-row source-verified schedule |
