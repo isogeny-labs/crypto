@@ -6,6 +6,7 @@ a = json.load(open("results/analysis-main.json")); L = a["lines"]
 def get(kind, theta, x):
     return next(l for l in L if l["kind"] == kind and l["theta"] == theta and (l.get("d") == x or l.get("gamma") == x))
 W, H = 980, 420
+FAM = {1: "Dickson", 2: "geometric", 3: "quadratic"}
 def p1(x0, w):
     ymin, ymax = 0.7, 500
     X = lambda v: x0 + 60 + (v - 15) / 18 * (w - 110)
@@ -32,7 +33,7 @@ def p2(x0, w):
     o = [f'<text x="{x0+20}" y="16" font-size="13" font-weight="600">five-rung slope of log2 kappa (95% interval) vs break-even 1/3</text>']
     for v in (0, 0.1, 0.2, 0.3, 0.4, 0.5): o.append(f'<line x1="{X(v)}" x2="{X(v)}" y1="28" y2="326" stroke="#eee"/><text x="{X(v)}" y="340" font-size="10" text-anchor="middle">{v:g}</text>')
     o.append(f'<line x1="{X(1/3)}" x2="{X(1/3)}" y1="28" y2="326" stroke="#a02020" stroke-width="2" stroke-dasharray="5 3"/><text x="{X(1/3)+4}" y="38" font-size="10" fill="#a02020">break-even 1/3</text>')
-    rows = [(f"structured theta={th:.2f} d={d}", get("struct", th, d), "#1f77b4") for th in (0.3, 0.35) for d in (1, 2, 3)]
+    rows = [(f"{FAM[d]} theta={th:.2f}", get("struct", th, d), "#1f77b4") for th in (0.3, 0.35) for d in (1, 2, 3)]
     rows += [(f"planted gamma {g} (theta 0.35)", get("plant", 0.35, g), c) for g, c in (("1/6", "#e69f00"), ("1/3", "#d55e00"), ("1/2", "#a02020"))]
     for i, (n, l, c) in enumerate(rows):
         y = 56 + i * 30
