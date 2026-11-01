@@ -35,6 +35,8 @@ use std::process::{ExitStatus, Stdio};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 #[cfg(target_os = "linux")]
+use telemetry::pmu_containment;
+#[cfg(target_os = "linux")]
 use telemetry::whole_worker::{Collector, GatedWorker};
 use types::{Artifact, CaseConfig};
 
@@ -1815,6 +1817,8 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
                 }
             };
             #[cfg(target_os = "linux")]
+            let cgroup_start = pmu_containment::Start::capture(child.pid());
+            #[cfg(target_os = "linux")]
             child.child.release().map_err(|error| {
                 let _ = child.stop();
                 format!("worker gate release failed: {error}")
@@ -1849,6 +1853,10 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             };
             #[cfg(target_os = "linux")]
             let counter_status = {
+                let cgroup_diagnostic = match cgroup_start {
+                    Ok(start) => start.finish(),
+                    Err(error) => pmu_containment::unavailable(child.pid(), error),
+                };
                 let (status, observation, error, event_id, attr_size, attr_flags) =
                     if let Some(collector) = collector.as_ref() {
                         match collector.read() {
@@ -1895,6 +1903,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
                         })),
                         "status":status,"error":error,
                         "worker_exit_success":exit.success(),"worker_exit_code":exit.code(),
+                        "cgroup_diagnostic":cgroup_diagnostic,
                         "descendants_terminated_and_accounted":false,
                         "platform_admitted":false,"eligible_instructions":null,
                     }),
@@ -2715,6 +2724,10 @@ fn verify_whole_worker_counter(
         .ok_or("worker process lacks positive PID")?;
     let status = counter["status"].as_str().ok_or("counter lacks status")?;
     let event_id = counter["event_id"].as_u64();
+    #[cfg(target_os = "linux")]
+    if let Some(diagnostic) = counter.get("cgroup_diagnostic") {
+        pmu_containment::verify_diagnostic(diagnostic, pid)?;
+    }
     let observation = &counter["observation"];
     let valid_status = match status {
         "perf_unavailable" | "attach_failed" => {
@@ -6757,6 +6770,19 @@ mod tests {
             verify_whole_worker_counter(&dir, std::slice::from_ref(&artifact), &outcome)
         };
         check(&baseline).unwrap();
+        #[cfg(target_os = "linux")]
+        {
+            let mut with_diagnostic = baseline.clone();
+            with_diagnostic["cgroup_diagnostic"] = json!({
+                "status":"empty_observed_no_migration_proof","worker_pid":4242,
+                "relative_path":"/worker","cgroup_inode":17,
+                "shared_with_supervisor":false,"populated_after_exit":false,
+                "direct_members_after_exit":0,"no_migration_proven":false,
+            });
+            check(&with_diagnostic).unwrap();
+            with_diagnostic["cgroup_diagnostic"]["no_migration_proven"] = json!(true);
+            assert!(check(&with_diagnostic).is_err());
+        }
         for (path, value) in [
             ("gate_pid", json!(4243)),
             ("event_id", json!(18)),
