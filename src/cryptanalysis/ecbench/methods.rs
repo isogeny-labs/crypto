@@ -7022,24 +7022,27 @@ mod koblitz_batched_tests {
         assert_eq!(online.phases_ns.values().sum::<u64>(), online.wall_ns);
         // The trials are whole batches (the last may be cut by max_trials).
         assert_eq!(rep.counters["collection_trials"] % 64, 0);
-        assert_eq!(
-            rep.counters["solve_attempts"],
-            rep.counters["collection_batches"]
+        // A solve is attempted only once the relations can cover the
+        // columns, so it never runs more often than a batch is collected
+        // (the tournament worker's `solve_attempts` behaves the same way).
+        let attempts = rep.counters["solve_attempts"];
+        assert!(
+            (1..=rep.counters["collection_batches"]).contains(&attempts),
+            "{attempts}"
         );
     }
 
     #[test]
-    fn batch_trials_changes_the_rank_checks_and_nothing_else_about_the_relations() {
-        // Same seed, same factor base, same probes: a smaller batch checks
-        // the rank more often and may stop earlier, but every probe it
-        // draws is a probe the larger batch draws too (the work units are
-        // indexed by trial), so the relations of the shorter run are a
-        // prefix of the longer one's.
+    fn a_smaller_batch_stops_no_later_and_draws_whole_batches() {
+        // Same seed, same factor base, same probes (the work units are
+        // indexed by trial): 16 divides 64, so the narrow run reaches a
+        // solvable relation set at a batch boundary no later than the wide
+        // run does, and both recover the same scalar.
         let wide = solve_at("64", 1_234);
         let narrow = solve_at("16", 1_234);
         assert_eq!(narrow.recovered, Some(1_234));
+        assert_eq!(wide.recovered, Some(1_234));
         assert!(narrow.counters["collection_trials"] <= wide.counters["collection_trials"]);
-        assert!(narrow.counters["solve_attempts"] >= wide.counters["solve_attempts"]);
         assert_eq!(narrow.counters["collection_trials"] % 16, 0);
     }
 

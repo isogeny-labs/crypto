@@ -359,61 +359,134 @@ mod tests {
     use crate::binary_ecc::F2mElement;
     use num_bigint::BigUint;
 
-    /// Round 0026's first A/A job on `K_0/GF(2^13)` (`n13a0-000` in
-    /// `research/ic_candidate_tournament_20260915/runs/round-0026/fixtures.json`):
-    /// the public target and the job's algorithm seed.
-    const TARGET: (&str, &str) = ("2388", "192");
-    const ALGORITHM_SEED: u64 = 4_753_082_171_431_670_784;
+    /// One public job of round 0026 (`research/ic_candidate_tournament_20260915/
+    /// runs/round-0026/fixtures.json`), with what `examples/ic_tournament_worker.rs`
+    /// itself reports for it, run from the worker's own binary.
+    struct Cell {
+        name: &'static str,
+        a: u8,
+        n: u32,
+        /// The public target.
+        target: (&'static str, &'static str),
+        /// The job's algorithm seed.
+        seed: u64,
+        /// The job's subgroup-orbit factor base (seed 43 in every cell).
+        points: usize,
+        /// The scalar the worker recovers, and the projected columns.
+        scalar: &'static str,
+        columns: usize,
+        /// `(batch_trials, queries drawn, relations accepted)`.  Every
+        /// cell is solved on its first solve attempt, with no rejected or
+        /// duplicate relation.
+        runs: &'static [(u64, u64, usize)],
+    }
 
-    fn params(batch_trials: u64) -> BatchedParams {
+    const CELLS: &[Cell] = &[
+        Cell {
+            name: "n13a0-000",
+            a: 0,
+            n: 13,
+            target: ("2388", "192"),
+            seed: 4_753_082_171_431_670_784,
+            points: 78,
+            scalar: "33",
+            columns: 7,
+            runs: &[(64, 64, 64), (16, 16, 16), (4, 8, 8), (2, 8, 8)],
+        },
+        Cell {
+            name: "n17a1-000",
+            a: 1,
+            n: 17,
+            target: ("72229", "22981"),
+            seed: 1_904_932_568_182_942_595,
+            points: 102,
+            scalar: "26461",
+            columns: 8,
+            runs: &[(64, 64, 64), (16, 16, 16), (4, 8, 8), (2, 8, 8)],
+        },
+        Cell {
+            name: "n19a0-000",
+            a: 0,
+            n: 19,
+            target: ("257541", "143934"),
+            seed: 13_349_067_008_857_821_907,
+            points: 114,
+            scalar: "124122",
+            columns: 8,
+            runs: &[(64, 64, 64), (16, 16, 16), (4, 8, 8), (2, 8, 8)],
+        },
+        // The registered round's holdout cell (confirmation stage).
+        Cell {
+            name: "n19a1-000",
+            a: 1,
+            n: 19,
+            target: ("514088", "475569"),
+            seed: 17_260_057_922_115_205_155,
+            points: 114,
+            scalar: "218833",
+            columns: 8,
+            runs: &[(64, 64, 64), (16, 16, 16)],
+        },
+    ];
+
+    fn params(cell: &Cell, batch_trials: u64) -> BatchedParams {
         BatchedParams {
-            factor_base_points: 78,
+            factor_base_points: cell.points,
             fb_seed: 43,
             batch_trials,
             max_trials: 4096,
             summands: 3,
-            seed: ALGORITHM_SEED,
+            seed: cell.seed,
         }
     }
 
-    fn run_cell(batch_trials: u64) -> DescentOutcome {
-        let kc = KoblitzCurve::new(0, 13).expect("K_0/GF(2^13)");
-        let coord = |s: &str| F2mElement::from_biguint(&s.parse::<BigUint>().unwrap(), 13);
+    fn run_cell(cell: &Cell, batch_trials: u64) -> DescentOutcome {
+        let kc = KoblitzCurve::new(cell.a, cell.n).expect("Koblitz curve");
+        let coord = |s: &str| F2mElement::from_biguint(&s.parse::<BigUint>().unwrap(), cell.n);
         let q = BinaryPoint::Affine {
-            x: coord(TARGET.0),
-            y: coord(TARGET.1),
+            x: coord(cell.target.0),
+            y: coord(cell.target.1),
         };
-        assert!(kc.curve.is_on_curve(&q));
-        run(&kc, &q, &params(batch_trials)).expect("the pipeline runs")
+        assert!(kc.curve.is_on_curve(&q), "{}", cell.name);
+        run(&kc, &q, &params(cell, batch_trials)).expect("the pipeline runs")
     }
 
-    /// **Same algorithm as the tournament worker.**  The numbers are what
-    /// `examples/ic_tournament_worker.rs` itself reports for this job
-    /// (`mode` `ic`, `pair_table`, `sparse`, `max_trials` 4096) at
-    /// `batch_trials` 64 and 16, run from the worker's own binary: the
-    /// queries drawn, the rank checks made, the relations accepted, the
-    /// columns, and the recovered scalar.  A drift here means this method
+    /// **Same algorithm as the tournament worker.**  Each row is what the
+    /// worker's own binary reports for the cell's job (`mode` `ic`,
+    /// `pair_table`, `sparse`, `max_trials` 4096) at that `batch_trials`:
+    /// the queries drawn, the relations accepted, the columns, one solve
+    /// attempt, and the recovered scalar.  A drift here means this method
     /// no longer measures what the tournament measured.
+    ///
+    /// Batches 4 and 2 draw eight queries, the fewest that cover the
+    /// columns, in several batches: the rank check runs every batch but a
+    /// solve is attempted only once the relations can cover the columns.
+    /// Batches 64 and 16 draw one whole batch, so `batch_trials` moves the
+    /// surplus collected after the columns are covered (round 0026's
+    /// `batch16`).
     #[test]
-    fn it_reproduces_the_tournament_workers_counts_on_the_round_0026_cell() {
-        for (batch, trials, relations) in [(64u64, 64u64, 64usize), (16, 16, 16)] {
-            let out = run_cell(batch);
-            assert!(out.single_thread, "batch {batch}");
-            assert!(out.verified, "batch {batch}");
-            assert_eq!(
-                out.recovered.as_ref().map(ToString::to_string),
-                Some("33".into()),
-                "batch {batch}"
-            );
-            assert_eq!(out.counts.trials, trials, "batch {batch}");
-            assert_eq!(out.counts.relations_collected, relations, "batch {batch}");
-            assert_eq!(out.counts.relations_accepted, relations, "batch {batch}");
-            assert_eq!(out.counts.relations_rejected, 0, "batch {batch}");
-            assert_eq!(out.counts.relations_duplicate, 0, "batch {batch}");
-            assert_eq!(out.counts.solve_attempts, 1, "batch {batch}");
-            assert_eq!(out.counts.log_columns, 7, "batch {batch}");
-            let names: Vec<&str> = out.phases.iter().map(|p| p.name.as_str()).collect();
-            assert_eq!(names, PHASES, "batch {batch}");
+    fn it_reproduces_the_tournament_workers_counts_on_four_round_0026_cells() {
+        for cell in CELLS {
+            for &(batch, trials, relations) in cell.runs {
+                let at = format!("{} batch_trials {batch}", cell.name);
+                let out = run_cell(cell, batch);
+                assert!(out.single_thread, "{at}");
+                assert!(out.verified, "{at}");
+                assert_eq!(
+                    out.recovered.as_ref().map(ToString::to_string).as_deref(),
+                    Some(cell.scalar),
+                    "{at}"
+                );
+                assert_eq!(out.counts.trials, trials, "{at}");
+                assert_eq!(out.counts.relations_collected, relations, "{at}");
+                assert_eq!(out.counts.relations_accepted, relations, "{at}");
+                assert_eq!(out.counts.relations_rejected, 0, "{at}");
+                assert_eq!(out.counts.relations_duplicate, 0, "{at}");
+                assert_eq!(out.counts.solve_attempts, 1, "{at}");
+                assert_eq!(out.counts.log_columns, cell.columns, "{at}");
+                let names: Vec<&str> = out.phases.iter().map(|p| p.name.as_str()).collect();
+                assert_eq!(names, PHASES, "{at}");
+            }
         }
     }
 
@@ -421,8 +494,9 @@ mod tests {
     /// group operations in every phase.
     #[test]
     fn it_counts_deterministically() {
-        let a = run_cell(16);
-        let b = run_cell(16);
+        let cell = &CELLS[0];
+        let a = run_cell(cell, 16);
+        let b = run_cell(cell, 16);
         for (x, y) in a.phases.iter().zip(&b.phases) {
             assert_eq!(x.name, y.name);
             assert_eq!(x.ops.adds, y.ops.adds, "{}", x.name);
