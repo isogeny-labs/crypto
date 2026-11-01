@@ -97,6 +97,9 @@
 )
 
 
+#block(fill: luma(235), inset: 6pt, width: 100%)[#text(size: 8pt)[Correction 2026-10-20 (validation sweep B, verdict 108.1: contradicted). The n=61 13.9x \[9.8, 19.1\] and N83 18.5x online ratios below compare against rho with an empty distinguished-point table. They are superseded and are not improvements: Bernstein-Lange rho at equal advice is 53-317x faster online (benchmarks/20261014-ic-next10-09-equal-advice) and precomputed rho beats the N83 IC (benchmarks/20261016-n83-precomputed-rho-control). The cold conclusion (signed-Frobenius rho remains best) stands.]]
+
+
 = An encyclopedia of the factor bases we have tried
 #strong[Date:] 2026-10-15. #strong[Scope:] every factor-base
 construction for elliptic-curve and Jacobian index calculus that this
@@ -1649,10 +1652,11 @@ never landed: its evidence file is missing on `main`.
     #strong[IC/rho 218.03 \[172.36, 285.57\]]; prepared-online IC/rho
     1.382 \[1.036, 1.882\]. IC took 1,054.6 s per fresh process (1,047.9
     s of it reusable preparation; 5.8 GB peak) against 5.07 s for rho.
+  - #strong[Superseded 2026-10-20:] the 54.10 below compares against an empty-table rho with 580--640 s IC setup excluded; the matched Bernstein-Lange control (`research/20261016-n83-precomputed-rho-control/`, K3300 and K600, not K3240) has precomputed rho faster online in every matched arm (IC/rho 3.74x to 395x). Median of per-point ratios; ratio of means 44.09.
   - #emph[Online, Tier 1, K3240 `root21`]
     (#link("../../../research/n83_tier1_final_results_20261014/RESULT.md")[`n83_tier1_final_results_20261014/RESULT.md`],
     PR \#1824; five unseen public points, one GitHub Actions
-    allocation): median #strong[rho/IC 54.10], bootstrap interval
+    allocation): median #strong[rho/IC 54.10 (SUPERSEDED 2026-10-20, empty-table rho)], bootstrap interval
     #strong[\[17.18, 58.90\]], every relation and scalar replayed. The
     IC clock starts after base, index and factor logs are ready: setup,
     580–640 s per process and rebuilt for each point, is excluded,

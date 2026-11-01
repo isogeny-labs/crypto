@@ -4,6 +4,9 @@
 #set heading(numbering: "1.")
 #show table: set text(size: 7.8pt)
 
+#block(fill: luma(235), inset: 6pt, width: 100%)[#text(size: 8pt)[Correction 2026-10-20 (validation sweep B, verdict 108.1: contradicted). The n=61 13.9x \[9.8, 19.1\] and N83 18.5x online ratios below compare against rho with an empty distinguished-point table. They are superseded and are not improvements: Bernstein-Lange rho at equal advice is 53-317x faster online (benchmarks/20261014-ic-next10-09-equal-advice) and precomputed rho beats the N83 IC (benchmarks/20261016-n83-precomputed-rho-control). The cold conclusion (signed-Frobenius rho remains best) stands. The 120/168 replay-all is likewise superseded: 72/168 identical on current main, 96 mismatches in all four IC arms, an open regression (sweep D, PR \#2290).]]
+
+
 #align(center)[
   #text(size: 16pt, weight: "bold")[The ECBench ECDLP performance frontier] \
   #text(size: 10pt)[Factor bases, symmetry, F4/F5/F6, and root finding] \
@@ -180,7 +183,7 @@ hardware class `ECBHW1h7373da65e433`.
   [factor bases K17], [8/8 identical], [`9306d33e…`], [current-binary pass],
   [F4/F5/F6 K13], [7/7 identical], [`0304c496…`], [representative pass covering all six arms; not replay-all],
   [rootfinder K13 sample], [8/8 identical], [`4814136e…`], [sampler selected rho only],
-  [rootfinder K13 replay-all], [120/168 identical; 48 failures], [`6110727a…`], [all rootfinder/rho rows pass; every old inherited-F4 row differs in solver phase counts],
+  [rootfinder K13 replay-all], [120/168 identical; 48 failures (superseded 2026-10-20: 72/168 on current main)], [`6110727a…`], ["all rootfinder/rho rows pass" is superseded: 96 mismatches in all four IC arms on current main, an open regression (sweep D, PR \#2290); every old inherited-F4 row differs in solver phase counts],
 )
 
 The replay-all failure is preserved. It changes no scalar, factor base, trial
