@@ -1,0 +1,19 @@
+import DispatchConsequences
+set_option autoImplicit false
+namespace DispatchControls
+open SignedWord EdgeDispatch
+def state : UnionState 2 := ⟨⟨id,fun _=>ident⟩,fun _=>none⟩
+def tied : UnionSize.Sizes 2 := ⟨#[1,1],rfl⟩
+def reverseSizes : UnionSize.Sizes 2 := ⟨#[2,1],rfl⟩
+theorem same_redundant : (run 7 state state.graph tied 0 0 ident ident 1 (-1) 0 0).result=.none := by decide
+theorem same_inconsistent : (run 7 state state.graph tied 0 0 ident ident 1 (-1) 1 0).result=.inconsistent := by decide
+theorem same_answer : (run 7 state state.graph tied 0 0 ident ident 1 (-1) 1 1).result=.answer 6 := by decide
+theorem positive_anchor : (run 7 state state.graph tied 0 0 ident ident 1 1 2 0).state.fixed 0=some (1,0) := by decide
+theorem negative_anchor : (run 7 state state.graph tied 0 0 ident ident (-1) (-1) 2 0).state.fixed 0=some (6,0) := by decide
+theorem tie_parent (h : System.Platform.numBits=64) :
+ (run 7 state state.graph tied 0 1 ident ident 1 1 0 0).state.graph.parent 0=1 := by
+ simp [run,state,tied,UnionSize.forward,UnionSize.sizeAt,USize.le_iff_toNat_le,USize.toNat_ofNat,USize.size,h,branchWord,joinWord,compress]
+theorem reverse_parent (h : System.Platform.numBits=64) :
+ (run 7 state state.graph reverseSizes 0 1 ident ident 1 1 0 0).state.graph.parent 1=0 := by
+ simp [run,state,reverseSizes,UnionSize.forward,UnionSize.sizeAt,USize.le_iff_toNat_le,USize.toNat_ofNat,USize.size,h,branchWord,joinWord,compress]
+end DispatchControls
