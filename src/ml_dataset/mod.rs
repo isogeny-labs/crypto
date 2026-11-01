@@ -1225,7 +1225,7 @@ impl SupervisedChild {
     fn stop(&mut self) -> Result<ExitStatus, String> {
         #[cfg(target_os = "linux")]
         {
-            return self.child.stop().map_err(|e| e.to_string());
+            self.child.stop().map_err(|e| e.to_string())
         }
         #[cfg(not(target_os = "linux"))]
         {
