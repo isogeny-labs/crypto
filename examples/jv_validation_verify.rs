@@ -118,7 +118,13 @@ fn main() {
         let name = path.file_name().unwrap().to_str().unwrap().to_string();
         if name.starts_with("ic_s") || name.starts_with("rho_R3_run0_") {
             let x = sample(one_line(&path));
-            files.push(path.display().to_string());
+            let evidence_root = Path::new("research/jv_sieve_validation_20261101");
+            files.push(
+                path.strip_prefix(evidence_root)
+                    .unwrap_or(&path)
+                    .display()
+                    .to_string(),
+            );
             if name.starts_with("ic_s") {
                 ic.push(x);
             } else {
@@ -128,6 +134,28 @@ fn main() {
     }
     ic.sort_by_key(|x| x.seed);
     rho.sort_by_key(|x| x.seed);
+    files.sort();
+    let symmetry_path = panel.join("raw/symmetry.jsonl");
+    let symmetry_rows: Vec<Value> = fs::read_to_string(&symmetry_path)
+        .unwrap()
+        .lines()
+        .filter(|line| !line.trim().is_empty())
+        .map(|line| serde_json::from_str(line).unwrap())
+        .collect();
+    let symmetry_verified = symmetry_rows.len() == 8
+        && symmetry_rows.iter().all(|row| {
+            row["p"].as_u64() == Some(p)
+                && row["j_in_Fp2"].as_bool() == Some(false)
+                && row["j_in_Fp3"].as_bool() == Some(false)
+        });
+    let evidence_root = Path::new("research/jv_sieve_validation_20261101");
+    files.push(
+        symmetry_path
+            .strip_prefix(evidence_root)
+            .unwrap_or(&symmetry_path)
+            .display()
+            .to_string(),
+    );
     files.sort();
     let fq = &rho[0].row["fq3_prices"];
     let bits = (64 - p.leading_zeros()) as f64;
@@ -176,7 +204,9 @@ fn main() {
         x.row["correct"].as_bool() == Some(true)
             && x.row["verified_on_challenge"].as_bool() == Some(true)
     });
-    let pass = checks.iter().all(|x| x["pass"].as_bool() == Some(true)) && scalars_verified;
+    let pass = checks.iter().all(|x| x["pass"].as_bool() == Some(true))
+        && scalars_verified
+        && symmetry_verified;
     let mut headline = Vec::new();
     for check in &checks {
         for (index, suffix) in ["point", "lo95", "hi95"].into_iter().enumerate() {
@@ -197,6 +227,7 @@ fn main() {
         "raw_data": files,
         "runs": ic.iter().map(|x| x.seed).collect::<Vec<_>>(),
         "scalars_verified": scalars_verified,
+        "symmetry_verified": symmetry_verified,
         "headline": headline,
         "checks": checks,
         "tolerance": "relative 1e-12",

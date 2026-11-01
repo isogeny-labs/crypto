@@ -9,19 +9,25 @@
 //!
 //! ```sh
 //! cargo run --release --example jv_endo_check -- --sizes 251,503,1009,1511,1823 --seeds 16
+//! cargo run --release --example jv_endo_check -- --sizes 1009 --first-seed 33 --seeds 8 --challenge-moves 8
 //! ```
 
 use crypto_lib::cryptanalysis::jv_cover::{generate_spec, Fld, Fq3, E6};
+use crypto_lib::cryptanalysis::jv_isogeny_walk::challenge_instance;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let mut sizes = vec![251u64, 503, 1009, 1511, 1823];
     let mut seeds = 16u64;
+    let mut first_seed = 1u64;
+    let mut challenge_moves: Option<usize> = None;
     let mut i = 1;
     while i < args.len() {
         match args[i].as_str() {
             "--sizes" => sizes = args[i + 1].split(',').map(|s| s.parse().unwrap()).collect(),
             "--seeds" => seeds = args[i + 1].parse().unwrap(),
+            "--first-seed" => first_seed = args[i + 1].parse().unwrap(),
+            "--challenge-moves" => challenge_moves = Some(args[i + 1].parse().unwrap()),
             x => panic!("unknown argument {x}"),
         }
         i += 2;
@@ -29,17 +35,25 @@ fn main() {
     let mut any = false;
     for &p in &sizes {
         let f = Fq3::new(p);
-        for seed in 1..=seeds {
+        for seed in first_seed..first_seed + seeds {
             let spec = generate_spec(p, seed);
-            let a = spec.alpha;
-            let lam = f.mul(&f.sigma(&a), &f.inv(&a));
-            let one = f.one();
-            let l2 = f.mul(&lam, &lam);
-            let t = f.add(&f.sub(&l2, &lam), &one);
-            let num = f.mul(&f.mul(&f.mul(&t, &t), &t), &f.from_fq(f.f.from_fp(256)));
-            let lm1 = f.sub(&lam, &one);
-            let den = f.mul(&l2, &f.mul(&lm1, &lm1));
-            let j: E6 = f.mul(&num, &f.inv(&den));
+            let j: E6 = if let Some(moves) = challenge_moves {
+                challenge_instance(p, seed, moves, &[3, 5, 7])
+                    .expect("challenge instance")
+                    .curve
+                    .j(&f)
+            } else {
+                let a = spec.alpha;
+                let lam = f.mul(&f.sigma(&a), &f.inv(&a));
+                let one = f.one();
+                let l2 = f.mul(&lam, &lam);
+                let t = f.add(&f.sub(&l2, &lam), &one);
+                let num =
+                    f.mul(&f.mul(&f.mul(&t, &t), &t), &f.from_fq(f.f.from_fp(256)));
+                let lm1 = f.sub(&lam, &one);
+                let den = f.mul(&l2, &f.mul(&lm1, &lm1));
+                f.mul(&num, &f.inv(&den))
+            };
             let p2 = (p as u128).pow(2);
             let p3 = (p as u128).pow(3);
             let in_fp2 = f.pow(&j, p2) == j;

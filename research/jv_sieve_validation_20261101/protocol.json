@@ -524,10 +524,11 @@
   "analysis_plan": {
     "script": {
       "path": "examples/jv_validation_analyse.rs",
-      "sha256": "4a63371293151bda9fb1715b3afde5bb23a1cf0a42c981865c61ec2b996c21c4"
+      "sha256": "ec0dfd86571ac76085d3530e88ffecc1d16ab05d0adc8c04033b04a658fcedd4"
     },
     "inputs": [
       "research/jv_sieve_validation_20261101/runs/p<P>/attempts.json",
+      "research/jv_sieve_validation_20261101/runs/p<P>/symmetry-status.json",
       "research/jv_sieve_validation_20261101/runs/p<P>/raw/*.jsonl"
     ],
     "outputs": [
@@ -554,13 +555,26 @@
     "attempts_per_prime": 33,
     "rho_aa_replicate": "run index 1 for every seed",
     "ic_aa_replicate": "seed 33 repeated once in a separate process",
+    "symmetry_diagnostic": "jv_endo_check over seeds 33..40; every j must be in neither F_(p^2) nor F_(p^3)",
+    "producer_script": {
+      "path": "research/jv_sieve_validation_20261101/run_panel.sh",
+      "sha256": "3e8a3a3b2632a109ba199ba1cf5646d94cc3caca307d889565ba807231301d76"
+    },
+    "symmetry_script": {
+      "path": "examples/jv_endo_check.rs",
+      "sha256": "c7392f223b30c32a1189fa271a5b8b9a5dbafdda7a75cd43e451784d32cd4b40"
+    },
     "replay_script": {
       "path": "research/jv_sieve_validation_20261101/replay_panel.sh",
       "sha256": "ac1e6e9b3ffb6430942a92b68cb38148bd5d9d70d499727e809a76e2498afbc5"
     },
     "validator_script": {
       "path": "examples/jv_validation_verify.rs",
-      "sha256": "46147a8c8bfe189be798dcfa7bddfd053a1a36eec53d89b1e262ab7e75efab60"
+      "sha256": "3a7c9a72bf0c9fc66840f2a51305ca0c51b3c37111b136221f1497439b30ea6d"
+    },
+    "validation_assembler": {
+      "path": "research/jv_sieve_validation_20261101/assemble_validation.sh",
+      "sha256": "f34118da0c3df61eb1b4d0a582f0723bbd4084e6461186642b806c27f1401789"
     }
   },
   "amendments": [],

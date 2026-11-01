@@ -53,6 +53,13 @@ Each prime is a separate panel with 33 planned attempts:
 - 8 R0 attempts (positive control);
 - one exact IC A/A repeat, seed 33 in a separate process.
 
+Before those attempts, the panel records a symmetry diagnostic for all eight
+challenge instances: `jv_endo_check --first-seed 33 --seeds 8
+--challenge-moves 8`. Any `j` in `F_(p^2)` or
+`F_(p^3)` withholds the prime because R3 would not be established as the
+strongest available rho. The diagnostic is not an attack attempt and is not
+added to the 33-arm census.
+
 Panels run concurrently only after the frozen-protocol build and unit-test
 gate. Within a panel, attempts are submitted in the fixed interleaving
 `IC, R3-0, R0, R3-1` by seed, with four independent one-thread processes in
@@ -127,14 +134,16 @@ prime; thresholds do not move.
    `modr_mul` and `modr_add`.
 5. **Corrected hashes:** the exact R3 and R0 identities above hold for every
    rho row.
-6. **IC A/A:** all non-wall producer fields for the seed-33 repeat are
+6. **Strongest-rho symmetry:** every instance has `j` in neither `F_(p^2)`
+   nor `F_(p^3)`.
+7. **IC A/A:** all non-wall producer fields for the seed-33 repeat are
    bit-identical to the first attempt.
-7. **R3 A/A:** at each prime, the paired ratio of means
+8. **R3 A/A:** at each prime, the paired ratio of means
    `bitops(run1)/bitops(run0)` has point estimate in `[0.50,2.00]` and its
    95% paired-bootstrap interval contains 1. This deliberately broad window
    was chosen from the pre-existing 8-per-arm intervals in the 2026-10-21
    study, before seeing these seeds.
-8. **Positive rho:** at each prime, mean `steps/sqrt(l)` is in `[0.90,1.70]`
+9. **Positive rho:** at each prime, mean `steps/sqrt(l)` is in `[0.90,1.70]`
    for R0 and `[0.55,1.30]` for R3. The theory anchors are approximately
    1.25 and 0.89 respectively.
 

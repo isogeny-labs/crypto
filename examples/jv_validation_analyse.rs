@@ -153,7 +153,24 @@ fn main() {
         .expect("frozen protocol hash");
     let attempts = read_json(&panel.join("attempts.json"));
     let attempt_rows = attempts.as_array().expect("attempt array");
-    let producer_complete = attempt_rows.len() == 33
+    let symmetry_status = read_json(&panel.join("symmetry-status.json"));
+    let symmetry_rows: Vec<Value> = fs::read_to_string(panel.join("raw/symmetry.jsonl"))
+        .unwrap_or_default()
+        .lines()
+        .filter(|line| !line.trim().is_empty())
+        .filter_map(|line| serde_json::from_str(line).ok())
+        .collect();
+    let symmetry_pass = symmetry_status["exit_code"].as_i64() == Some(0)
+        && symmetry_status["output_valid"].as_bool() == Some(true)
+        && symmetry_rows.len() == 8
+        && symmetry_rows.iter().enumerate().all(|(i, row)| {
+            row["p"].as_u64() == Some(p)
+                && row["seed"].as_u64() == Some(EXPECTED_SEEDS[i])
+                && row["j_in_Fp2"].as_bool() == Some(false)
+                && row["j_in_Fp3"].as_bool() == Some(false)
+        });
+    let producer_complete = symmetry_pass
+        && attempt_rows.len() == 33
         && attempt_rows.iter().all(|r| {
             r["exit_code"].as_i64() == Some(0) && r["output_valid"].as_bool() == Some(true)
         });
@@ -259,9 +276,13 @@ fn main() {
         let gae = gae.expect("R3 GAE price");
         for (k, w) in BAND.into_iter().enumerate() {
             let price = |x: &Obs| x.bitops - x.native_bitops + w * gae * x.native_ops;
+            let ic_mean = mean(&ic.iter().map(&price).collect::<Vec<_>>());
+            let rho_mean = mean(&r3.iter().map(&price).collect::<Vec<_>>());
             band.push(json!({
                 "w_gae": w,
                 "gae_bitops": gae,
+                "ic_mean": ic_mean,
+                "rho_mean": rho_mean,
                 "result": paired_ratio(&ic, &r3, price, (p << 8) ^ 0x40 ^ k as u64),
             }));
         }
@@ -351,6 +372,7 @@ fn main() {
             "counter_completeness": {"pass": completeness},
             "walk_f4_la_present": {"pass": route_phases},
             "corrected_hash_accounting": {"pass": corrected_hashes, "R3_identity": "hash = steps + 3*dp_check", "R0_identity": "hash = steps + dp_check"},
+            "strongest_rho_symmetry": {"pass": symmetry_pass, "rows": symmetry_rows.len(), "rule": "j is in neither Fp2 nor Fp3 for every seed"},
             "ic_aa": {"pass": ic_aa_identical, "seed": 33, "rule": "all non-wall producer fields identical"},
             "rho_aa": {"pass": rho_aa_pass, "accept_point": [0.50, 2.00], "accept_ci_contains": 1.0, "result": rho_aa},
             "positive_rho": {"pass": positive_pass, "R0_mean_steps_sqrt_l": r0_mean, "R0_window": [0.90, 1.70], "R3_mean_steps_sqrt_l": r3_mean, "R3_window": [0.55, 1.30]},

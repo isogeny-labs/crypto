@@ -19,15 +19,34 @@ ROOT=${2:-$STUDY/runs}
 PANEL=$ROOT/p$P
 BIN=./target/release/examples/jv_cover_ic_vs_rho_bitops
 ANALYSE=./target/release/examples/jv_validation_analyse
+ENDO=./target/release/examples/jv_endo_check
 PROTOCOL=$STUDY/protocol.json
 JOBS=${JV_VALIDATION_JOBS:-4}
 SEEDS=(33 34 35 36 37 38 39 40)
 
 mkdir -p "$PANEL/raw" "$PANEL/status" "$PANEL/stdout" "$PANEL/stderr"
-if [[ ! -x "$BIN" || ! -x "$ANALYSE" ]]; then
+if [[ ! -x "$BIN" || ! -x "$ANALYSE" || ! -x "$ENDO" ]]; then
   echo "build the frozen examples before running the panel" >&2
   exit 2
 fi
+
+set +e
+"$ENDO" --sizes "$P" --first-seed 33 --seeds 8 --challenge-moves 8 \
+  > "$PANEL/raw/symmetry.jsonl" 2> "$PANEL/stderr/symmetry.log"
+symmetry_rc=$?
+set -e
+symmetry_valid=false
+if [[ $symmetry_rc -eq 0 ]] && [[ $(wc -l < "$PANEL/raw/symmetry.jsonl") -eq 8 ]] \
+  && jq -s -e 'all(.[]; (.j_in_Fp2 == false and .j_in_Fp3 == false))' \
+    "$PANEL/raw/symmetry.jsonl" >/dev/null; then
+  symmetry_valid=true
+fi
+jq -n --arg schema 'jv_sieve_validation_symmetry/v1' --argjson p "$P" \
+  --argjson exit_code "$symmetry_rc" --argjson output_valid "$symmetry_valid" \
+  --arg raw "$PANEL/raw/symmetry.jsonl" \
+  --arg raw_sha256 "$(sha256sum "$PANEL/raw/symmetry.jsonl" | awk '{print $1}')" \
+  '{schema:$schema,p:$p,exit_code:$exit_code,output_valid:$output_valid,
+    raw:$raw,raw_sha256:$raw_sha256}' > "$PANEL/symmetry-status.json"
 
 {
   for seed in "${SEEDS[@]}"; do
@@ -46,13 +65,15 @@ jq -n \
   --arg protocol_sha256 "$(jq -r '.freeze.protocol_sha256' "$PROTOCOL")" \
   --arg producer_sha256 "$(sha256sum "$BIN" | awk '{print $1}')" \
   --arg analysis_sha256 "$(sha256sum "$ANALYSE" | awk '{print $1}')" \
+  --arg symmetry_binary_sha256 "$(sha256sum "$ENDO" | awk '{print $1}')" \
   --arg kernel "$(uname -srvmo)" \
   --arg cpu "$(awk -F: '/model name/{sub(/^ /,"",$2); print $2; exit}' /proc/cpuinfo)" \
   --arg memory_bytes "$(awk '/MemTotal/{print $2 * 1024}' /proc/meminfo)" \
   --argjson jobs "$JOBS" \
   '{schema:$schema,p:$p,source_commit:$source_commit,git_dirty:false,
     protocol_sha256:$protocol_sha256,producer_sha256:$producer_sha256,
-    analysis_sha256:$analysis_sha256,kernel:$kernel,cpu:$cpu,
+    analysis_sha256:$analysis_sha256,symmetry_binary_sha256:$symmetry_binary_sha256,
+    kernel:$kernel,cpu:$cpu,
     memory_bytes:$memory_bytes,jobs:$jobs,primary_clock:"counted",
     wall_time:"diagnostic_only",seeds:[33,34,35,36,37,38,39,40]}' \
   > "$PANEL/execution.json"
@@ -114,5 +135,6 @@ jq -s 'sort_by(.id)' "$PANEL"/status/*.json > "$PANEL/attempts.json"
 "$ANALYSE" --panel "$PANEL" --protocol "$PROTOCOL" --out "$PANEL/analysis.json" \
   > "$PANEL/analysis.stdout"
 sha256sum "$PANEL"/execution.json "$PANEL"/plan.tsv "$PANEL"/attempts.json \
+  "$PANEL"/symmetry-status.json \
   "$PANEL"/analysis.json "$PANEL"/raw/*.jsonl > "$PANEL/SHA256SUMS"
 

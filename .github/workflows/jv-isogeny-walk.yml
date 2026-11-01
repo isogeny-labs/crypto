@@ -47,6 +47,7 @@ jobs:
             -- --exact --test-threads=1
           cargo build --release --locked \
             --example jv_cover_ic_vs_rho_bitops \
+            --example jv_endo_check \
             --example jv_validation_analyse \
             --example jv_validation_verify
           python3 -m json.tool research/jv_sieve_validation_20261101/protocol.json >/dev/null
@@ -60,7 +61,7 @@ jobs:
       max-parallel: 3
       matrix:
         p: [1009, 1511, 1823]
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|jv-isogeny-walk.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|jv-isogeny-walk.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    runs-on: crypto-eks-highmem
     timeout-minutes: 360
     steps:
       - uses: actions/checkout@v4
@@ -70,6 +71,7 @@ jobs:
         run: >-
           cargo build --release --locked
           --example jv_cover_ic_vs_rho_bitops
+          --example jv_endo_check
           --example jv_validation_analyse
       - name: Run prospective p=${{ matrix.p }} panel
         env:
@@ -92,7 +94,7 @@ jobs:
       max-parallel: 3
       matrix:
         p: [1009, 1511, 1823]
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|jv-isogeny-walk.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|jv-isogeny-walk.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    runs-on: crypto-eks-highmem
     timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
