@@ -1,0 +1,31 @@
+{
+  "label": "missing",
+  "command": [
+    "python3",
+    "/var/tmp/pencil-graph-gate-repair-review-20261101/subject/gate.py",
+    "ReviewerDefinitelyMissingModule20261101"
+  ],
+  "exit": 1,
+  "expected_exit": 1,
+  "stdout": "ReviewerDefinitelyMissingModule20261101 1\n/var/tmp/pencil-graph-gate-repair-review-20261101/subject/invocation-oo_653s3\n",
+  "stderr": "",
+  "receipt": {
+    "modules": [
+      {
+        "module": "ReviewerDefinitelyMissingModule20261101",
+        "command": [
+          "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+          "-j1",
+          "-M4096",
+          "-o",
+          "/var/tmp/pencil-graph-gate-repair-review-20261101/subject/invocation-oo_653s3/snapshot/ReviewerDefinitelyMissingModule20261101.olean",
+          "/var/tmp/pencil-graph-gate-repair-review-20261101/subject/invocation-oo_653s3/snapshot/ReviewerDefinitelyMissingModule20261101.lean"
+        ],
+        "native_exit": 1
+      }
+    ],
+    "gate_exit": 1,
+    "bindings_unchanged": true,
+    "directory": "/var/tmp/pencil-graph-gate-repair-review-20261101/subject/invocation-oo_653s3"
+  }
+}

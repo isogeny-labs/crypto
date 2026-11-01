@@ -3,24 +3,24 @@
  "generated_by": "scripts/build_lab_browser.py",
  "what_this_is": "A searchable index of the curves, methods, factor bases, candidate identities, tournament rounds and ecbench sessions this repository names, joined on the identities it already computes (ICV1 slugs, EC1 aliases, ECM1 method ids, FB1 factor-base ids, IC1 candidate ids). Every figure is quoted from a committed file named in `sources` or in the row; nothing is computed here beyond means over a session's own verified runs.",
  "counts": {
-  "curves": 20817,
-  "cover_assessed": 20817,
+  "curves": 20848,
+  "cover_assessed": 20848,
   "cover_unassessed": 0,
   "methods": 220,
   "factor_bases": 677,
-  "candidates": 277,
+  "candidates": 278,
   "rounds": 31,
   "sessions": 257,
   "yields": 16998,
-  "store_objects": 29
+  "store_objects": 38
  },
  "sources": {
-  "docs/curves/registry.json": "88390d7b472098e3c41e7a8d366f9c3fb5ad0efe1e0bd43c6811ba2ee6525283",
-  "docs/curves/covers.json": "25d0ce07f0c4a3ff7a8c6cde800f826d31f16f623a344f27b4c5c8b0d4ff9b39",
-  "docs/curves/cover-links.yaml": "2b12570405cd04d39105a179738849afe26dbb6a43fd9d7fa0b5384a5d9925e5",
+  "docs/curves/registry.json": "6dce2c6f17bb1b3b68d078658a0eadb18de5f761da749f2876b0a44b16c2dedf",
+  "docs/curves/covers.json": "3f3aa32c36d63638a5cf62f941fc6e617c70dbf1fb2cfee8ccad25dcb7ef9a57",
+  "docs/curves/cover-links.yaml": "c7799ebe0d13a0dbe1cfb5a45b2531980903b1ded415f35c0a302cedded05ef5",
   "docs/curves/standards/coverage.json": "80cb0d6d5400904a34115be076d7463f5adf9ad0b40ffc2ce92f741a16985f56",
-  "docs/ic/leaderboard.json": "f32e43e955a4fb37eae6eac4d16abf4ccd9879ee090fc26acfe06b510f867c7e",
-  "store/index.json": "9eb88295b5cc8ad1d14c276aa9162ebe645b5b7575fb5e44d8399d5f767ef841",
+  "docs/ic/leaderboard.json": "06f9d7efc8921ab4f922ee4746ec43607e3e6bb0ff4c252163a65c114f4e325b",
+  "store/index.json": "f2e86d6a772fee0d9d9206d0d0e23be5bed91c1ff947df0c4a1eda00c81b6ffe",
   "store/config.json": "5038b35b298c7c3b88647719229586d3a3d4fb00c1d20bf09d0f95de272cc1c1",
   "research/ecbench_all_candidates_20261003/sessions/koblitz-followup-3/records.jsonl": "961d18b9c05face1afcf8e96db9cec8f45a0326319b2c65baecb27b633d72881",
   "research/ecbench_all_candidates_20261003/sessions/koblitz-followup/records.jsonl": "9777304a8050bf3ae4201dc985ca729e250117db4e00a97109889e6de64240d0",
@@ -17077,17 +17077,24 @@
    "trace": "-6151469093347",
    "order": "9671406556923184866742756",
    "order_bits": 83.0,
-   "r": null,
-   "r_bits": null,
-   "cofactor": null,
-   "generator": null,
-   "target_group": null,
+   "r": "2417851639230796216685689",
+   "r_bits": 81.0,
+   "cofactor": 4,
+   "generator": [
+    "0x477f77103dfad59850800",
+    "0x2fa5e737d542c4e4fd5c3"
+   ],
+   "target_group": "prime-order subgroup",
    "j": "0x1",
    "endomorphism_discriminant": "-7",
    "model_json": "{\"a\":\"0x0\",\"b\":\"0x1\",\"field\":\"f2m-83-a1d5abfa\",\"form\":\"y^2+xy=x^3+a*x^2+b\",\"modulus\":\"0x800000000200000000007\",\"v\":\"1\"}",
-   "ec1": [],
-   "curve_uid": [],
-   "ec1_unresolved": "no generator recorded; KoblitzCurve covers n <= 63 and no tracked record carries this model's subgroup and generator",
+   "ec1": [
+    "EC1N83Ce0h5ad08e3bea59"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:5ad08e3bea59aae5a686e5c0796ddda536d455b2fb3371f2641d4524ccbdd618"
+   ],
+   "ec1_unresolved": null,
    "retired_names": [
     "k0n83",
     "K_0 / GF(2^83)",
@@ -17096,6 +17103,7 @@
    ],
    "sources": [
     "the m = 83 confidence gate (AGENTS.md §8a)",
+    "research/n83_genus3_image_solver_20261031/n83_curve_records.json",
     "prose, by the constructor rule: docs/ic-leaderboard.html"
    ],
    "on_leaderboard": false,
@@ -32945,6 +32953,287 @@
    "store_objects": []
   },
   {
+   "slug": "icv1-fp3-t0-0388b21e",
+   "icv1": "ICV1:fp-5:0:6:0:unk:unk:r:0388b21e05d1",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "5",
+    "bits": 3,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "0",
+   "b": "1",
+   "construction": null,
+   "trace": "0",
+   "order": "6",
+   "order_bits": 2.5,
+   "r": "3",
+   "r_bits": 1.5,
+   "cofactor": 2,
+   "generator": [
+    "0x0",
+    "0x1"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "0",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"0\",\"b\":\"1\",\"field\":\"fp-5\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"5\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P3Cfphe20cb33f3186"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:e20cb33f3186b70438ea6cbb73835323433b59250ccc521360aa8328a31c296c"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [],
+   "sources": [
+    "research/prime_ic_zero_filter_20261030/implementation/implementation.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x1",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "0388b21e05d1f549724ddbaa09467e992d75c51e9ce10f1afca24b685d2b2b97",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp3-t0-0388b21e",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:417bded3de36d7e13a8d9f867ddb8d1c6d5ed81e663bc7f9eb93a38714398457",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:0d8d71d2d9eef0e2918d52bb2fc4b13a78db7f2a31e11d84c870fa2972ef7743",
+     "cover_id": "HC1G2h417bded3de36",
+     "map_id": "CV1D2h0d8d71d2d9ee"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp5-tm1-a77cc6af",
+   "icv1": "ICV1:fp-17:-1:19:3:unk:unk:r:a77cc6af177e",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "17",
+    "bits": 5,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "2",
+   "b": "2",
+   "construction": null,
+   "trace": "-1",
+   "order": "19",
+   "order_bits": 4.188,
+   "r": null,
+   "r_bits": null,
+   "cofactor": null,
+   "generator": null,
+   "target_group": null,
+   "j": "3",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"2\",\"b\":\"2\",\"field\":\"fp-17\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"17\",\"v\":\"1\"}",
+   "ec1": [],
+   "curve_uid": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "retired_names": [],
+   "sources": [
+    "research/prime_factor_base_degree_20261031/parallel_20261031/audit/protocol.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x2",
+      "0x0",
+      "0x2",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "a77cc6af177e2c7c940e01071c54562da5959666c430d7f6ab7555f32930380d",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp5-tm1-a77cc6af",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:f5106c4c186e8e7a180a5a44c108bcd85c5e4e66950bcd7ff001bb30e9c668ad",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:33909ba4b30752ea80c4efae6df524c1b8c592f016d15338eb16cd68d4bf2033",
+     "cover_id": "HC1G2hf5106c4c186e",
+     "map_id": "CV1D2h33909ba4b307"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp5-t0-c58356fb",
+   "icv1": "ICV1:fp-19:0:20:18:unk:unk:r:c58356fb1908",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "19",
+    "bits": 5,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "1",
+   "b": "0",
+   "construction": null,
+   "trace": "0",
+   "order": "20",
+   "order_bits": 4.25,
+   "r": "5",
+   "r_bits": 2.25,
+   "cofactor": 4,
+   "generator": [
+    "0x5",
+    "0x4"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "18",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"1\",\"b\":\"0\",\"field\":\"fp-19\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"19\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P5Cfphc371c6ca070b"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:c371c6ca070b7907e57fa5748c61a10e21004e2a9cc2e531dfe433df18cfbb5f"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [],
+   "sources": [
+    "research/prime_ic_zero_filter_20261030/implementation/implementation.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x2",
+      "0x0",
+      "0x4",
+      "0x0",
+      "0x3",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x1",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "c58356fb190856a3f0244f689bc5f9d9261286fb2f506db17a6d187bd5abed5e",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp5-t0-c58356fb",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:eae02a3bce6f7e379731c420a3c938f31b581e7c29bbf5598e1f28a608956087",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:83c56090791a9bb14b2a6f4225c49ea4501acdb974a30c49a5e437da03dc5889",
+     "cover_id": "HC1G2heae02a3bce6f",
+     "map_id": "CV1D2h83c56090791a"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
    "slug": "icv1-fp6-tm7-fc20da94",
    "icv1": "ICV1:fp-59:-7:67:52:unk:unk:r:fc20da944826",
    "family": "prime",
@@ -34146,6 +34435,104 @@
    "store_objects": []
   },
   {
+   "slug": "icv1-fp9-t25-33fa1ca2",
+   "icv1": "ICV1:fp-257:25:233:155:unk:unk:r:33fa1ca26328",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "257",
+    "bits": 9,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "255",
+   "b": "179",
+   "construction": "find_prime_order_curve(9, 17)",
+   "trace": "25",
+   "order": "233",
+   "order_bits": 7.82,
+   "r": "233",
+   "r_bits": 7.82,
+   "cofactor": 1,
+   "generator": [
+    "0xa2",
+    "0xcb"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "155",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"255\",\"b\":\"179\",\"field\":\"fp-257\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"257\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P9Cfph45ab75b5d9ef"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:45ab75b5d9eff96350887fd3af2ec4cd110dab1111e29465b39afe07b0fc692a"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "generated-9bit-257"
+   ],
+   "sources": [
+    "docs/curves/sources/generated.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0xb3",
+      "0x0",
+      "0xff",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "33fa1ca26328e5910f70ee18b28cdfcb9513fe061e091aa9102cdf6ec97fb3cd",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp9-t25-33fa1ca2",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:5e16d713743d649a2f217363fb7520595595ac46e1a39d764858f08950d9377b",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:d468fbec00a8c6110a7bd71842cb4fbb7291e5e7df6cf6abffeb8d3d69a47130",
+     "cover_id": "HC1G2h5e16d713743d",
+     "map_id": "CV1D2hd468fbec00a8"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
    "slug": "icv1-fp9-tm23-2397caf5",
    "icv1": "ICV1:fp-307:-23:331:148:unk:unk:r:2397caf589fb",
    "family": "prime",
@@ -34646,6 +35033,104 @@
      "map_uid": "urn:curve-cover-map:1:sha256:5768ce11909c0f56d84f05e70d71dfb6a46fb175b6f9cc0ed727eec14aef9c8e",
      "cover_id": "HC1G2h998582908336",
      "map_id": "CV1D2h5768ce11909c"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp11-t43-4d73e7f7",
+   "icv1": "ICV1:fp-1409:43:1367:1215:unk:unk:r:4d73e7f7382d",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "1409",
+    "bits": 11,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "1068",
+   "b": "1408",
+   "construction": "find_prime_order_curve(11, 20)",
+   "trace": "43",
+   "order": "1367",
+   "order_bits": 10.335,
+   "r": "1367",
+   "r_bits": 10.335,
+   "cofactor": 1,
+   "generator": [
+    "0x195",
+    "0x4d1"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "1215",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"1068\",\"b\":\"1408\",\"field\":\"fp-1409\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"1409\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P11Cfphf96a48bbeef6"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:f96a48bbeef62a54e1905cc2cb17dfab6b514e8056506d60fa569e88beeb6bbb"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "generated-11bit-1409"
+   ],
+   "sources": [
+    "docs/curves/sources/generated.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x580",
+      "0x0",
+      "0x42c",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "4d73e7f7382d46b317866a627e99ea5b4010f9cc3116c4076d9f3732198ae12c",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp11-t43-4d73e7f7",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:b3d3c7a57bf4630cfc0693c43147f9bd99521dbdf590ac030412f808f45d8477",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:b5d34c963405f4d4887dec0d1369d04b0cbee60274dfbcb5e9b1d7f29bcea160",
+     "cover_id": "HC1G2hb3d3c7a57bf4",
+     "map_id": "CV1D2hb5d34c963405"
     }
    ],
    "standards_provenance": [],
@@ -35257,6 +35742,104 @@
      "map_uid": "urn:curve-cover-map:1:sha256:1f80e65a3fa380427f09edd49720ba53a907541863529de5a4533865770d6b58",
      "cover_id": "HC1G2he3cd03fe5fbc",
      "map_id": "CV1D2h1f80e65a3fa3"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp13-tm41-756f569a",
+   "icv1": "ICV1:fp-7681:-41:7723:647:unk:unk:r:756f569a1f53",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "7681",
+    "bits": 13,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "6248",
+   "b": "4914",
+   "construction": "find_prime_order_curve(13, 35)",
+   "trace": "-41",
+   "order": "7723",
+   "order_bits": 12.885,
+   "r": "7723",
+   "r_bits": 12.885,
+   "cofactor": 1,
+   "generator": [
+    "0x1cd",
+    "0xef5"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "647",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"6248\",\"b\":\"4914\",\"field\":\"fp-7681\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"7681\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P13Cfphd61257c74c06"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:d61257c74c06b25161c0d794ef22ac3ee03de131903a38317b5ecdb6eead1d44"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "generated-13bit-7681"
+   ],
+   "sources": [
+    "docs/curves/sources/generated.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x1332",
+      "0x0",
+      "0x1868",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "756f569a1f530ea7b79b999d283f90ade497c5143cea2d7885cc73d4de3b99ec",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp13-tm41-756f569a",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:9a09918879b4d036c8ad89b70ee78941bf51c66617ee6fb15919330df170e5ae",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:107fa407e7343889c13db8e68909d3f11fea607e54201628cac6e0d402df9ff7",
+     "cover_id": "HC1G2h9a09918879b4",
+     "map_id": "CV1D2h107fa407e734"
     }
    ],
    "standards_provenance": [],
@@ -43746,6 +44329,104 @@
      "map_uid": "urn:curve-cover-map:1:sha256:b4c9437fe39e5e5daeaf470dddd87624391c479baa7291d534f83e066d2bdaf6",
      "cover_id": "HC1G2hd45aa59dcef5",
      "map_id": "CV1D2hb4c9437fe39e"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp15-t181-50ff72d2",
+   "icv1": "ICV1:fp-18433:181:18253:839:unk:unk:r:50ff72d2e301",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "18433",
+    "bits": 15,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "9382",
+   "b": "15153",
+   "construction": "find_prime_order_curve(15, 115)",
+   "trace": "181",
+   "order": "18253",
+   "order_bits": 14.114,
+   "r": "18253",
+   "r_bits": 14.114,
+   "cofactor": 1,
+   "generator": [
+    "0xc36",
+    "0x379a"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "839",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"9382\",\"b\":\"15153\",\"field\":\"fp-18433\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"18433\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P15Cfphb4aaed2dc848"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:b4aaed2dc848b5e3307fd0f7e9c22858c2023c94a5643da6d2e746e462c37337"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "generated-15bit-18433"
+   ],
+   "sources": [
+    "docs/curves/sources/generated.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x3b31",
+      "0x0",
+      "0x24a6",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "50ff72d2e30178e9923f3e46f4adf4dfc0676f8f8b779fce3297911a9d1191a6",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp15-t181-50ff72d2",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:af0563c2acf44c70bf6ea1e2e8e7883ddcd052e0896f7f12e2d4ae9ac5e46b97",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:d05d43a9ea3db8b7baa04409a427d061115624d723551ddd673e64d5064b83b2",
+     "cover_id": "HC1G2haf0563c2acf4",
+     "map_id": "CV1D2hd05d43a9ea3d"
     }
    ],
    "standards_provenance": [],
@@ -55068,6 +55749,300 @@
    "store_objects": []
   },
   {
+   "slug": "icv1-fp20-tm1079-bf1bb5fd",
+   "icv1": "ICV1:fp-584767:-1079:585847:574173:unk:unk:r:bf1bb5fdd477",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "584767",
+    "bits": 20,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "198133",
+   "b": "297747",
+   "construction": null,
+   "trace": "-1079",
+   "order": "585847",
+   "order_bits": 19.117,
+   "r": "585847",
+   "r_bits": 19.117,
+   "cofactor": 1,
+   "generator": [
+    "0x6d818",
+    "0x227af"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "574173",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"198133\",\"b\":\"297747\",\"field\":\"fp-584767\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"584767\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P20Cfph62330334fb40"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:62330334fb40806a10a65e506f2a5059584900721c895f88d5d5ad9a1159fc8f"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp20-tm1079-bf1bb5fd"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x48b13",
+      "0x0",
+      "0x305f5",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "bf1bb5fdd47706bc61da991a40e0453ef5d65efbcda93b6e9aee93ab293c046c",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp20-tm1079-bf1bb5fd",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:699e65fcb840efcd447b80037c24bafbacc8ef3c1a2ca20cb8618671943e8081",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:6605f9adb85c3f4c1b84cc17b9b0d5c3d1a5b28d3ca51223ef7cf232fc0b19c1",
+     "cover_id": "HC1G2h699e65fcb840",
+     "map_id": "CV1D2h6605f9adb85c"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp20-tm985-4efa604e",
+   "icv1": "ICV1:fp-641471:-985:642457:216044:unk:unk:r:4efa604e6a4a",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "641471",
+    "bits": 20,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "382170",
+   "b": "201538",
+   "construction": null,
+   "trace": "-985",
+   "order": "642457",
+   "order_bits": 19.225,
+   "r": "642457",
+   "r_bits": 19.225,
+   "cofactor": 1,
+   "generator": [
+    "0x44505",
+    "0x1b8a5"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "216044",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"382170\",\"b\":\"201538\",\"field\":\"fp-641471\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"641471\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P20Cfph77abb1434cd5"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:77abb1434cd5d199186864fde0689a6aff015597a78630ab19f9ff750177dd37"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp20-tm985-4efa604e"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x31342",
+      "0x0",
+      "0x5d4da",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "4efa604e6a4af3f67e503ffb944e42cb28b5757600466fef4cb66ff373400c5f",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp20-tm985-4efa604e",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:77b086c9a67c541c495b432ffa60ecf87a9c27f08d8759ed12a8a6249b4736a2",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:8674fe822f8b206203b280851eb2addd8039f37ff03a5840a9cbcd55138d700c",
+     "cover_id": "HC1G2h77b086c9a67c",
+     "map_id": "CV1D2h8674fe822f8b"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp20-t457-f60a16c1",
+   "icv1": "ICV1:fp-658199:457:657743:387152:unk:unk:r:f60a16c111cc",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "658199",
+    "bits": 20,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "423941",
+   "b": "256755",
+   "construction": null,
+   "trace": "457",
+   "order": "657743",
+   "order_bits": 19.255,
+   "r": "657743",
+   "r_bits": 19.255,
+   "cofactor": 1,
+   "generator": [
+    "0x80f3",
+    "0x785a4"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "387152",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"423941\",\"b\":\"256755\",\"field\":\"fp-658199\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"658199\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P20Cfph5e2fef5fb23b"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:5e2fef5fb23b3a0e7d713172b27c154504255915a8944d93dd48d8b8f68efbf2"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp20-t457-f60a16c1"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x3eaf3",
+      "0x0",
+      "0x67805",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "f60a16c111cc4e2c375be0852ca6388287ce63dc5bc9843e3af6e96b7a5b69ed",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp20-t457-f60a16c1",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:8254403ee4a17e0771368b786ee8d61adc0d82eb4b24267f47282386ac13f194",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:66f7f76b06f3af784390ec40293ab03e4bb962eb0a13204c8444e4c17374d7cd",
+     "cover_id": "HC1G2h8254403ee4a1",
+     "map_id": "CV1D2h66f7f76b06f3"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
    "slug": "icv1-fp20-t99-a84fb1f1",
    "icv1": "ICV1:fp-684289:99:684191:417148:unk:unk:r:a84fb1f15744",
    "family": "prime",
@@ -55338,6 +56313,104 @@
      "map_uid": "urn:curve-cover-map:1:sha256:7d2beac3c69940fdb4cac446c0fa9cd4e081300597e73104722ba0a890f849c3",
      "cover_id": "HC1G2hc8622b4558c2",
      "map_id": "CV1D2h7d2beac3c699"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp20-tm1141-c50333f6",
+   "icv1": "ICV1:fp-731999:-1141:733141:79528:unk:unk:r:c50333f60320",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "731999",
+    "bits": 20,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "393706",
+   "b": "663716",
+   "construction": null,
+   "trace": "-1141",
+   "order": "733141",
+   "order_bits": 19.398,
+   "r": "733141",
+   "r_bits": 19.398,
+   "cofactor": 1,
+   "generator": [
+    "0x6671",
+    "0x92d6"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "79528",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"393706\",\"b\":\"663716\",\"field\":\"fp-731999\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"731999\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P20Cfph226bac92e011"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:226bac92e011ba4672183496a61ead48288c9bee8a41a9cbe67b7cddca458e4a"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp20-tm1141-c50333f6"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0xa20a4",
+      "0x0",
+      "0x601ea",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "c50333f60320d0f9ba8e33b3435d8fc78fb64fa638316d92b1f749cdc71ac6cc",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp20-tm1141-c50333f6",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:aac9c09c4b793e9ddbb28bcabbdd35099d2cdc15699b305280a91cf8cefa5543",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:31c3a0170c979bde7824c392180b3ad7cb8580b57613baeea0ae5df420e50d7a",
+     "cover_id": "HC1G2haac9c09c4b79",
+     "map_id": "CV1D2h31c3a0170c97"
     }
    ],
    "standards_provenance": [],
@@ -56349,6 +57422,202 @@
      "map_uid": "urn:curve-cover-map:1:sha256:c7acf0c2e48d98e840fcb45c25fb132d249287f12df05357548f5be722ccd579",
      "cover_id": "HC1G2h07e5ba61ce49",
      "map_id": "CV1D2hc7acf0c2e48d"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp20-t1239-d852a683",
+   "icv1": "ICV1:fp-921517:1239:920279:29553:unk:unk:r:d852a6839db7",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "921517",
+    "bits": 20,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "292594",
+   "b": "695767",
+   "construction": null,
+   "trace": "1239",
+   "order": "920279",
+   "order_bits": 19.755,
+   "r": "920279",
+   "r_bits": 19.755,
+   "cofactor": 1,
+   "generator": [
+    "0xa4e16",
+    "0x4470"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "29553",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"292594\",\"b\":\"695767\",\"field\":\"fp-921517\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"921517\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P20Cfphe21a84313cac"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:e21a84313cacf9ce22b44d6cf5158f4f7f2e7a8e5f8a4390d2bbde9259f71959"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp20-t1239-d852a683"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0xa9dd7",
+      "0x0",
+      "0x476f2",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "d852a6839db76db6b6178030620e85ab3aa4d91f9de84038306695bba748e8ff",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp20-t1239-d852a683",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:f94b81dbe32f1c4e5c08b5602c2e642354a3e598f27065bfb6083ca9889be94d",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:db225d142ca3574127b328b3b6ff000b0ba86317c153f1c42b00641723e4efbc",
+     "cover_id": "HC1G2hf94b81dbe32f",
+     "map_id": "CV1D2hdb225d142ca3"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp20-t375-aef80152",
+   "icv1": "ICV1:fp-923743:375:923369:898026:unk:unk:r:aef80152ad2e",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "923743",
+    "bits": 20,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "891514",
+   "b": "586300",
+   "construction": null,
+   "trace": "375",
+   "order": "923369",
+   "order_bits": 19.761,
+   "r": "923369",
+   "r_bits": 19.761,
+   "cofactor": 1,
+   "generator": [
+    "0x3d520",
+    "0xafce3"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "898026",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"891514\",\"b\":\"586300\",\"field\":\"fp-923743\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"923743\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P20Cfph7f8b5291f6f7"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:7f8b5291f6f78c4de277fcdc30bb89109583aeeb4f206f8931f55448db27938d"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp20-t375-aef80152"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x8f23c",
+      "0x0",
+      "0xd9a7a",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "aef80152ad2e613316b79789c0608d5feac8ec590e03b126eef22d6581c55342",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp20-t375-aef80152",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:bd9e32de459e0c619e2fba1371fa1fd8a087c57f81d4742c24af1617ae7482cc",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:3e7480c3b161c40fbb52995095e974b5987cfff74acbf0aea3feead1b11bd0a8",
+     "cover_id": "HC1G2hbd9e32de459e",
+     "map_id": "CV1D2h3e7480c3b161"
     }
    ],
    "standards_provenance": [],
@@ -128881,6 +130150,104 @@
      "map_uid": "urn:curve-cover-map:1:sha256:4b1c720c4f643b467d0a0c6e472451c8d0d0fd5bebfadb61a187c07f3819586d",
      "cover_id": "HC1G2he1b0af9be00c",
      "map_id": "CV1D2h4b1c720c4f64"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp24-tm2615-5e182037",
+   "icv1": "ICV1:fp-9845107:-2615:9847723:3042839:unk:unk:r:5e1820370d0e",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "9845107",
+    "bits": 24,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "8171369",
+   "b": "9819050",
+   "construction": null,
+   "trace": "-2615",
+   "order": "9847723",
+   "order_bits": 23.174,
+   "r": "9847723",
+   "r_bits": 23.174,
+   "cofactor": 1,
+   "generator": [
+    "0x19ac2d",
+    "0x4a7ff0"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "3042839",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"8171369\",\"b\":\"9819050\",\"field\":\"fp-9845107\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"9845107\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P24Cfphb5dc58176a20"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:b5dc58176a20b021164e9c28539f0658f962fc73366e404da810e06fe944d506"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp24-tm2615-5e182037"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x95d3aa",
+      "0x0",
+      "0x7caf69",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "5e1820370d0e240dbe98ea79dcd83d9b0ecaee1647d320b2cc06fabef914cfe9",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp24-tm2615-5e182037",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:b55390adbc7b2f07ee16b394fb35500fd2bf9fccab4805556e3d9799f4231b36",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:503506ea2d72e86a2692b5b2217bada0cebfd4d66d86358266cbaa2bcc52060d",
+     "cover_id": "HC1G2hb55390adbc7b",
+     "map_id": "CV1D2h503506ea2d72"
     }
    ],
    "standards_provenance": [],
@@ -466576,6 +467943,104 @@
    "store_objects": []
   },
   {
+   "slug": "icv1-fp24-tm3353-1a46dbd1",
+   "icv1": "ICV1:fp-12570703:-3353:12574057:8865301:unk:unk:r:1a46dbd14909",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "12570703",
+    "bits": 24,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "11707519",
+   "b": "9091877",
+   "construction": null,
+   "trace": "-3353",
+   "order": "12574057",
+   "order_bits": 23.499,
+   "r": "12574057",
+   "r_bits": 23.499,
+   "cofactor": 1,
+   "generator": [
+    "0xa30ce5",
+    "0xbe8d88"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "8865301",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"11707519\",\"b\":\"9091877\",\"field\":\"fp-12570703\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"12570703\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P24Cfph4d32c81ae8f1"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:4d32c81ae8f1236bf813c17759ecec284feb4c5c1cfa462d30de3060b9993202"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp24-tm3353-1a46dbd1"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x8abb25",
+      "0x0",
+      "0xb2a47f",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "1a46dbd14909124bc49aed9efc60ca94c9304d964e000085695eb24dfcaf974a",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp24-tm3353-1a46dbd1",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:6f60c640bb0a6b90fbfefc6302839d9840ae127aa378c5badc2fc21f62b634b5",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:07f57b1f41346765a8dcfea5515328a21962515965bb261187edc30b871035f5",
+     "cover_id": "HC1G2h6f60c640bb0a",
+     "map_id": "CV1D2h07f57b1f4134"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
    "slug": "icv1-fp24-t62-008f1b92",
    "icv1": "ICV1:fp-12588977:62:12588916:12208574:unk:unk:r:008f1b92d774",
    "family": "prime",
@@ -523018,6 +524483,104 @@
      "map_uid": "urn:curve-cover-map:1:sha256:61f32797562d713350ea793ec989d8aa76a8df98a69be5ce604032f817d6672c",
      "cover_id": "HC1G2hb4e96b27efe3",
      "map_id": "CV1D2h61f32797562d"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp24-t5097-1f48e65c",
+   "icv1": "ICV1:fp-13115629:5097:13110533:8849449:unk:unk:r:1f48e65ccf2f",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "13115629",
+    "bits": 24,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "7911932",
+   "b": "1797942",
+   "construction": null,
+   "trace": "5097",
+   "order": "13110533",
+   "order_bits": 23.563,
+   "r": "13110533",
+   "r_bits": 23.563,
+   "cofactor": 1,
+   "generator": [
+    "0x2d082c",
+    "0x4a2f9f"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "8849449",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"7911932\",\"b\":\"1797942\",\"field\":\"fp-13115629\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"13115629\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P24Cfphe75d406589ce"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:e75d406589ce8c25541150a18c1b2a2a24995301c803a06b710015427d6a7316"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp24-t5097-1f48e65c"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x1b6f36",
+      "0x0",
+      "0x78b9fc",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "1f48e65ccf2ff571c000be4fbdf9effe5d83adc145844ded7d3c59cdbfa67891",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp24-t5097-1f48e65c",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:87cf2f3010423d31c15313b8fd7e8c57094f0fd0e9d54d4b45b02fe1c6c5cd3f",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:d77959e8e50246b4efea9254f149920f48846a08575db67983ae480aa0f792e5",
+     "cover_id": "HC1G2h87cf2f301042",
+     "map_id": "CV1D2hd77959e8e502"
     }
    ],
    "standards_provenance": [],
@@ -619941,6 +621504,104 @@
    "store_objects": []
   },
   {
+   "slug": "icv1-fp24-tm3365-ba8f1013",
+   "icv1": "ICV1:fp-13881823:-3365:13885189:448645:unk:unk:r:ba8f10138b31",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "13881823",
+    "bits": 24,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "514726",
+   "b": "10178410",
+   "construction": null,
+   "trace": "-3365",
+   "order": "13885189",
+   "order_bits": 23.655,
+   "r": "13885189",
+   "r_bits": 23.655,
+   "cofactor": 1,
+   "generator": [
+    "0x65e9c9",
+    "0xa12645"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "448645",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"514726\",\"b\":\"10178410\",\"field\":\"fp-13881823\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"13881823\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P24Cfphd0b3d9e890ac"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:d0b3d9e890ac9dadd0ebcb9fff0238e5213c8d4e3b2862ffd646d05179df63af"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp24-tm3365-ba8f1013"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x9b4f6a",
+      "0x0",
+      "0x7daa6",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "ba8f10138b31a354c28db565ae2e3466c25867a25ff513e4356310f7432fe3a2",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp24-tm3365-ba8f1013",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:8ed5a064ab3f2e0b32964b987036eaa3230f8c11be70dc79256040c07941c53a",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:56adbb65e535bf5a7cb852c991dd23604e61b0d30f02927c3032cced39479e29",
+     "cover_id": "HC1G2h8ed5a064ab3f",
+     "map_id": "CV1D2h56adbb65e535"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
    "slug": "icv1-fp24-tm6778-008ff0ff",
    "icv1": "ICV1:fp-13897337:-6778:13904116:6388225:unk:unk:r:008ff0ff36f2",
    "family": "prime",
@@ -643868,6 +645529,104 @@
      "map_uid": "urn:curve-cover-map:1:sha256:6c3419440d36f3abe550401cceae868cd19cf8a69cc9e8a33dac04b4a315aada",
      "cover_id": "HC1G2h488f34affbac",
      "map_id": "CV1D2h6c3419440d36"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp24-t3415-63d6e400",
+   "icv1": "ICV1:fp-14025293:3415:14021879:1770443:unk:unk:r:63d6e400ca1b",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "14025293",
+    "bits": 24,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "639517",
+   "b": "7135581",
+   "construction": null,
+   "trace": "3415",
+   "order": "14021879",
+   "order_bits": 23.672,
+   "r": "14021879",
+   "r_bits": 23.672,
+   "cofactor": 1,
+   "generator": [
+    "0xb6acf4",
+    "0x7c75d0"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "1770443",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"639517\",\"b\":\"7135581\",\"field\":\"fp-14025293\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"14025293\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P24Cfph66cc15c69a45"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:66cc15c69a4540bdbeef8ef110756bea2d57b25e3baba7e4f2c30e41ee21d93b"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp24-t3415-63d6e400"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x6ce15d",
+      "0x0",
+      "0x9c21d",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "63d6e400ca1b0095915b467941a5f5b4ceba277bb2bf2df595b51d683bb9041a",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp24-t3415-63d6e400",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:447a6c3017bdd91f23b326bd58e798119244a53a56c9faac22b5c6de15009f45",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:5c5a00cd99063716ec67aa44973210af7b7e3ff533ccac9d49b73e25aca108f5",
+     "cover_id": "HC1G2h447a6c3017bd",
+     "map_id": "CV1D2h5c5a00cd9906"
     }
    ],
    "standards_provenance": [],
@@ -745207,6 +746966,104 @@
      "map_uid": "urn:curve-cover-map:1:sha256:4766bb2d0f1bf935ea38591b5eba71c6ce4fcf8fdaf9566fa3c29f1b8476ae78",
      "cover_id": "HC1G2hff3a2c1fd433",
      "map_id": "CV1D2h4766bb2d0f1b"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp24-tm1215-254f2c18",
+   "icv1": "ICV1:fp-15155017:-1215:15156233:11959795:unk:unk:r:254f2c186d2a",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "15155017",
+    "bits": 24,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "3658211",
+   "b": "6153727",
+   "construction": null,
+   "trace": "-1215",
+   "order": "15156233",
+   "order_bits": 23.807,
+   "r": "15156233",
+   "r_bits": 23.807,
+   "cofactor": 1,
+   "generator": [
+    "0x218c77",
+    "0xb2c989"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "11959795",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"3658211\",\"b\":\"6153727\",\"field\":\"fp-15155017\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"15155017\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P24Cfphdfa8746c4db8"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:dfa8746c4db80fc07045d4ab1751e5a63bb07888c416e46f1010db4baa9b17ca"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp24-tm1215-254f2c18"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x5de5ff",
+      "0x0",
+      "0x37d1e3",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "254f2c186d2a66c45ef1d5a866608c8fc0b290d528dd457e7b4a8f77b047dd4d",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp24-tm1215-254f2c18",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:4c37755283fba2cfadc37e1860b6c77f47f1cbd9e81de334457d5b0325a36808",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:3826408a4144c5a5ccdad63498f06637e99fc73d2050d7ded93c6577fdf0e87e",
+     "cover_id": "HC1G2h4c37755283fb",
+     "map_id": "CV1D2h3826408a4144"
     }
    ],
    "standards_provenance": [],
@@ -1661113,6 +1662970,104 @@
    "store_objects": []
   },
   {
+   "slug": "icv1-fp28-tm5475-0f58a032",
+   "icv1": "ICV1:fp-146781643:-5475:146787119:79537464:unk:unk:r:0f58a032f26c",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "146781643",
+    "bits": 28,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "51738534",
+   "b": "54545012",
+   "construction": null,
+   "trace": "-5475",
+   "order": "146787119",
+   "order_bits": 27.094,
+   "r": "146787119",
+   "r_bits": 27.094,
+   "cofactor": 1,
+   "generator": [
+    "0x166f022",
+    "0x5688578"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "79537464",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"51738534\",\"b\":\"54545012\",\"field\":\"fp-146781643\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"146781643\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P28Cfphcc8aad2362ee"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:cc8aad2362ee93066d44009a4200aed0fa803f71e3465b53e2cc97ccc7bef459"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp28-tm5475-0f58a032"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x3404a74",
+      "0x0",
+      "0x31577a6",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "0f58a032f26c83615fb41ef1f268feff4b7c0e87bcbdf1f5c15c6673ea8e86a6",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp28-tm5475-0f58a032",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:b0d8b637047fcb4ddf572490f3486a91aa73626c5830844ab2c98b949d7a62f2",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:65e9d7399aea0f2411052f0499debe5618f611a66bf84dd36d47f2dbe2bc7ab7",
+     "cover_id": "HC1G2hb0d8b637047f",
+     "map_id": "CV1D2h65e9d7399aea"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
    "slug": "icv1-fp28-t24675-0fc2ae58",
    "icv1": "ICV1:fp-152283451:24675:152258777:115656406:unk:unk:r:0fc2ae586cac",
    "family": "prime",
@@ -1662594,6 +1664549,104 @@
      "map_uid": "urn:curve-cover-map:1:sha256:e15057fd70805f54d4218c4170f021bbdf8631d19c5df37be70596fd7d3c04de",
      "cover_id": "HC1G2he00279cba3c2",
      "map_id": "CV1D2he15057fd7080"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp28-t20259-8fb841e7",
+   "icv1": "ICV1:fp-155913907:20259:155893649:36861987:unk:unk:r:8fb841e70495",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "155913907",
+    "bits": 28,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "146268840",
+   "b": "128469689",
+   "construction": null,
+   "trace": "20259",
+   "order": "155893649",
+   "order_bits": 27.161,
+   "r": "155893649",
+   "r_bits": 27.161,
+   "cofactor": 1,
+   "generator": [
+    "0x66ef33c",
+    "0x75cbf7e"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "36861987",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"146268840\",\"b\":\"128469689\",\"field\":\"fp-155913907\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"155913907\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P28Cfphd86289dc94e1"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:d86289dc94e19ad707045f6f608d262b10ae46e388b28907588d50f15da98fd7"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp28-t20259-8fb841e7"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x7a84ab9",
+      "0x0",
+      "0x8b7e2a8",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "8fb841e704953c211d6db3711f067767c02958e420d88554e0607b2ca207f140",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp28-t20259-8fb841e7",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:a7241d19465b30aa8a97c256764456ac4c6075c7d085cf07d25746c02dc97f16",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:2e8b5c02e8df40e21c65e09d1c66ffe187595970e6e2d73f3ad3f8b83c9a489b",
+     "cover_id": "HC1G2ha7241d19465b",
+     "map_id": "CV1D2h2e8b5c02e8df"
     }
    ],
    "standards_provenance": [],
@@ -1665329,6 +1667382,104 @@
    "store_objects": []
   },
   {
+   "slug": "icv1-fp28-t2985-10809654",
+   "icv1": "ICV1:fp-187745293:2985:187742309:104039225:unk:unk:r:108096540f3c",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "187745293",
+    "bits": 28,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "146669529",
+   "b": "872892",
+   "construction": null,
+   "trace": "2985",
+   "order": "187742309",
+   "order_bits": 27.399,
+   "r": "187742309",
+   "r_bits": 27.399,
+   "cofactor": 1,
+   "generator": [
+    "0x6ad1f3c",
+    "0x2beffee"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "104039225",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"146669529\",\"b\":\"872892\",\"field\":\"fp-187745293\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"187745293\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P28Cfph2271eb8425ab"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:2271eb8425ab02a6b34effb14647adf72258fffd898cf9e1e7eacfe7150429f8"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp28-t2985-10809654"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0xd51bc",
+      "0x0",
+      "0x8bdffd9",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "108096540f3cf1a8f5cad8431f862506a520d4f6b5bd3aca1f3cbd602731354c",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp28-t2985-10809654",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:236dadbfee59d656dd2ccd5c4157a12b90dd6127f6bfe5c8e42d15669708d16d",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:38630f299bb6c5c0bf0d1ea46562f4419b2b8dac75831eb6f795821a45bdd33a",
+     "cover_id": "HC1G2h236dadbfee59",
+     "map_id": "CV1D2h38630f299bb6"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
    "slug": "icv1-fp28-t19436-2c5ecd4b",
    "icv1": "ICV1:fp-194418247:19436:194398812:183268278:unk:unk:r:2c5ecd4bc8db",
    "family": "prime",
@@ -1665607,6 +1667758,202 @@
    "store_objects": []
   },
   {
+   "slug": "icv1-fp28-tm18917-dbe6b497",
+   "icv1": "ICV1:fp-199324519:-18917:199343437:65080820:unk:unk:r:dbe6b497ed22",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "199324519",
+    "bits": 28,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "183493953",
+   "b": "160573064",
+   "construction": null,
+   "trace": "-18917",
+   "order": "199343437",
+   "order_bits": 27.485,
+   "r": "199343437",
+   "r_bits": 27.485,
+   "cofactor": 1,
+   "generator": [
+    "0x9af3d8b",
+    "0xb057b96"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "65080820",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"183493953\",\"b\":\"160573064\",\"field\":\"fp-199324519\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"199324519\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P28Cfphd88ae68f34e2"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:d88ae68f34e2fa5dbdf110ea502aed442dbf144aa12287cadb805de150238748"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp28-tm18917-dbe6b497"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x9922688",
+      "0x0",
+      "0xaefe541",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "dbe6b497ed22d2d539a0b44cbccd5b04c86fe9a75c810bd39cf43f6d01bc27ee",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp28-tm18917-dbe6b497",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:46ef975db1a37abf116dd321068aef7bde8b64ea9b9a6af83e5b3699779a0d22",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:2f2e72c04d51c32898dd0686dec38cac16dddbad9865ba54164fcff943cba9b2",
+     "cover_id": "HC1G2h46ef975db1a3",
+     "map_id": "CV1D2h2f2e72c04d51"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp28-t24271-da5b2687",
+   "icv1": "ICV1:fp-204948281:24271:204924011:111650691:unk:unk:r:da5b26876c48",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "204948281",
+    "bits": 28,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "148287127",
+   "b": "84954211",
+   "construction": null,
+   "trace": "24271",
+   "order": "204924011",
+   "order_bits": 27.527,
+   "r": "204924011",
+   "r_bits": 27.527,
+   "cofactor": 1,
+   "generator": [
+    "0x17a469c",
+    "0x3467c82"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "111650691",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"148287127\",\"b\":\"84954211\",\"field\":\"fp-204948281\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"204948281\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P28Cfphc0f475f23dbb"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:c0f475f23dbb7046b470227bf4a255cdacd01e1b5bcd26c9946935a84849b4c9"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp28-t24271-da5b2687"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x5104c63",
+      "0x0",
+      "0x8d6ae97",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "da5b26876c48f06123323693565a10187689b5c276f4b1f435a5640fe53b967d",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp28-t24271-da5b2687",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:8455961c1967ec53c6169eb370cdbb17d2ea8f172d664a105bc3ed0ccba15dcc",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:25555f6880a99f7148600d5a45ec67115855207ee2afd3c271de817d14e0f729",
+     "cover_id": "HC1G2h8455961c1967",
+     "map_id": "CV1D2h25555f6880a9"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
    "slug": "icv1-fp28-tm5065-1146b4a5",
    "icv1": "ICV1:fp-212738657:-5065:212743723:88321037:unk:unk:r:1146b4a56e3a",
    "family": "prime",
@@ -1665699,6 +1668046,104 @@
      "map_uid": "urn:curve-cover-map:1:sha256:3ac1285d831c69c422ccc1cf7c5ef810d773deac66bfbab9223e43374470e4b0",
      "cover_id": "HC1G2h5525cb3ca881",
      "map_id": "CV1D2h3ac1285d831c"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp28-t12791-9e92c6c2",
+   "icv1": "ICV1:fp-213708647:12791:213695857:86410565:unk:unk:r:9e92c6c249db",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "213708647",
+    "bits": 28,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "186338265",
+   "b": "118330842",
+   "construction": null,
+   "trace": "12791",
+   "order": "213695857",
+   "order_bits": 27.592,
+   "r": "213695857",
+   "r_bits": 27.592,
+   "cofactor": 1,
+   "generator": [
+    "0x8f1bb8f",
+    "0xa2800e0"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "86410565",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"186338265\",\"b\":\"118330842\",\"field\":\"fp-213708647\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"213708647\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P28Cfph0bc85ff78582"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:0bc85ff78582acaaf44f8cbc4b17499ed2d598e796b86ef696cc93f1d5072f9b"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp28-t12791-9e92c6c2"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x70d95da",
+      "0x0",
+      "0xb1b4bd9",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "9e92c6c249db9a8b56f7821ee34686aee3a80f6b58f20dd52e73234e3100d3e1",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp28-t12791-9e92c6c2",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:6cc0fac926746fbc2d40b6307eaa306d5f3a2ab73c93ab0f62b2f54808bb5e23",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:f0a8ddfcb1827e06ec9c239c9cdee7a6175ce329729fdae81f5b32c4e0aac020",
+     "cover_id": "HC1G2h6cc0fac92674",
+     "map_id": "CV1D2hf0a8ddfcb182"
     }
    ],
    "standards_provenance": [],
@@ -1673359,6 +1675804,104 @@
    "store_objects": []
   },
   {
+   "slug": "icv1-fp32-tm70799-e5f3e6f2",
+   "icv1": "ICV1:fp-2468872309:-70799:2468943109:653299414:unk:unk:r:e5f3e6f2b045",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "2468872309",
+    "bits": 32,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "740848899",
+   "b": "111551246",
+   "construction": null,
+   "trace": "-70799",
+   "order": "2468943109",
+   "order_bits": 31.15,
+   "r": "2468943109",
+   "r_bits": 31.15,
+   "cofactor": 1,
+   "generator": [
+    "0x87d6d310",
+    "0x7eced129"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "653299414",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"740848899\",\"b\":\"111551246\",\"field\":\"fp-2468872309\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"2468872309\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P32Cfphabeda8cc1d8c"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:abeda8cc1d8cbe32d8bd72c4b3a8c28f0c6bb29327937bceef7334425e9a3993"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp32-tm70799-e5f3e6f2"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x6a6230e",
+      "0x0",
+      "0x2c287503",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "e5f3e6f2b045ed598bdd4e08036708bb7983967d638bd8c59b80606ebbdb397f",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp32-tm70799-e5f3e6f2",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:c27593d97c333bd743ae163319e3af77e8823b79f40db1bea9358ed83d2d0096",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:a92d0eba61a95f98cf974d341c494c374b6ece65d737691b25765716e91e0e78",
+     "cover_id": "HC1G2hc27593d97c33",
+     "map_id": "CV1D2ha92d0eba61a9"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
    "slug": "icv1-fp32-tm11535-8e4578de",
    "icv1": "ICV1:fp-2469181963:-11535:2469193499:135475565:unk:unk:r:8e4578de7069",
    "family": "prime",
@@ -1673994,6 +1676537,104 @@
    "store_objects": []
   },
   {
+   "slug": "icv1-fp32-t8395-a5210489",
+   "icv1": "ICV1:fp-2981198323:8395:2981189929:1964501035:unk:unk:r:a5210489d43f",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "2981198323",
+    "bits": 32,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "1238630014",
+   "b": "2744266586",
+   "construction": null,
+   "trace": "8395",
+   "order": "2981189929",
+   "order_bits": 31.388,
+   "r": "2981189929",
+   "r_bits": 31.388,
+   "cofactor": 1,
+   "generator": [
+    "0x283e2682",
+    "0x99390ed0"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "1964501035",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"1238630014\",\"b\":\"2744266586\",\"field\":\"fp-2981198323\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"2981198323\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P32Cfph7e3c089ce4fb"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:7e3c089ce4fbc463f67c1ca69f5fd1d72ae3d69a1dd7a236597fc54f0151b5df"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp32-t8395-a5210489"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0xa3922f5a",
+      "0x0",
+      "0x49d3fe7e",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "a5210489d43fd0fad5cec5b8b95bb7936fb681d3f99300e76694e883e180a4db",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp32-t8395-a5210489",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:cb90f6215a565978ef2b3b663300eedc4f2db91db1d0a9a7350901b119c056a4",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:a93f03a710f5b557ffb6d593a011d6a9619f6584325b418c38ffb09c50970f60",
+     "cover_id": "HC1G2hcb90f6215a56",
+     "map_id": "CV1D2ha93f03a710f5"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
    "slug": "icv1-fp32-tm101415-9b187f52",
    "icv1": "ICV1:fp-3094378543:-101415:3094479959:3042964895:unk:unk:r:9b187f52394e",
    "family": "prime",
@@ -1674086,6 +1676727,202 @@
      "map_uid": "urn:curve-cover-map:1:sha256:1030649b7cf543df47e7c409809e02a5d8c1590e70f39038bd3fa60262dc45f1",
      "cover_id": "HC1G2hd77b96c75e69",
      "map_id": "CV1D2h1030649b7cf5"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp32-tm30557-158f1cf7",
+   "icv1": "ICV1:fp-3101101781:-30557:3101132339:1674257571:unk:unk:r:158f1cf72cd9",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "3101101781",
+    "bits": 32,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "832459755",
+   "b": "1784514525",
+   "construction": null,
+   "trace": "-30557",
+   "order": "3101132339",
+   "order_bits": 31.444,
+   "r": "3101132339",
+   "r_bits": 31.444,
+   "cofactor": 1,
+   "generator": [
+    "0x6c75ac89",
+    "0x485c2e52"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "1674257571",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"832459755\",\"b\":\"1784514525\",\"field\":\"fp-3101101781\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"3101101781\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P32Cfpha15f56ed03ce"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:a15f56ed03ce331d6715aceb8829f3d5ce1a785e779ee528e5a3ebbe8e0db7f6"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp32-tm30557-158f1cf7"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x6a5d87dd",
+      "0x0",
+      "0x319e53eb",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "158f1cf72cd99fb32d6c072af671f70988101db9311dfc3573d15fc6c6dd38d9",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp32-tm30557-158f1cf7",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:a31c6018cc06e8f722a384f51848b57305563f2f2dece6494d3da04457363e5f",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:e597cbe664b09755cba0e136a21142465b083383ab531742e8bbdf32e1e89660",
+     "cover_id": "HC1G2ha31c6018cc06",
+     "map_id": "CV1D2he597cbe664b0"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp32-tm14249-af783d1f",
+   "icv1": "ICV1:fp-3149148911:-14249:3149163161:1941955689:unk:unk:r:af783d1f200d",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "3149148911",
+    "bits": 32,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "711291984",
+   "b": "671517315",
+   "construction": null,
+   "trace": "-14249",
+   "order": "3149163161",
+   "order_bits": 31.466,
+   "r": "3149163161",
+   "r_bits": 31.466,
+   "cofactor": 1,
+   "generator": [
+    "0x9093cc38",
+    "0xaedfb3c2"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "1941955689",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"711291984\",\"b\":\"671517315\",\"field\":\"fp-3149148911\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"3149148911\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P32Cfph774a2a737026"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:774a2a7370266f1e048ac8e210c105d4d74b30a53ab3fceadfad692cc0303c8e"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp32-tm14249-af783d1f"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x28068a83",
+      "0x0",
+      "0x2a657450",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "af783d1f200de8c5c363cc42dafb67cd462962849b3c218c2837d34fff968ba1",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp32-tm14249-af783d1f",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:6caa3d88baea07060899b42d9e3bde26bc84ed5ac330ccf53f2d45e9883eaaaa",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:535f94da548a07ced61c8d23bfa08be0d1bfa93c11bca2f7e23bbab1542925a5",
+     "cover_id": "HC1G2h6caa3d88baea",
+     "map_id": "CV1D2h535f94da548a"
     }
    ],
    "standards_provenance": [],
@@ -1674741,6 +1677578,104 @@
    "store_objects": []
   },
   {
+   "slug": "icv1-fp32-tm34607-b8d05587",
+   "icv1": "ICV1:fp-3546476803:-34607:3546511411:2452034776:unk:unk:r:b8d0558798a1",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "3546476803",
+    "bits": 32,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "2720091890",
+   "b": "1740131956",
+   "construction": null,
+   "trace": "-34607",
+   "order": "3546511411",
+   "order_bits": 31.651,
+   "r": "3546511411",
+   "r_bits": 31.651,
+   "cofactor": 1,
+   "generator": [
+    "0x4c72c23d",
+    "0x2dc66815"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "2452034776",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"2720091890\",\"b\":\"1740131956\",\"field\":\"fp-3546476803\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"3546476803\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P32Cfphc4f0f0be2232"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:c4f0f0be2232663f9bd10fa63a15a8cde93d386603399c587704eeaefaba4ae5"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp32-tm34607-b8d05587"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x67b84e74",
+      "0x0",
+      "0xa2214ef2",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "b8d0558798a1a23c620a37b18264d29fe871f163800844a2ea58353b80a23f45",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp32-tm34607-b8d05587",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:84df7f3fe0b2ad973418baa1215a0d70def400b8d66fe40d6b7e63df50f070cf",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:82eae3949b8435c6dda77886c25a36a1c2aaf5fea46928270a5dfc1dec97cded",
+     "cover_id": "HC1G2h84df7f3fe0b2",
+     "map_id": "CV1D2h82eae3949b84"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
    "slug": "icv1-fp32-t93403-ef655380",
    "icv1": "ICV1:fp-3642104651:93403:3642011249:3455714807:unk:unk:r:ef6553807a3e",
    "family": "prime",
@@ -1675124,6 +1678059,104 @@
      "map_uid": "urn:curve-cover-map:1:sha256:a8ee63bcd724e38eddea14161dc58787d03733c3882958083af097a2537c611f",
      "cover_id": "HC1G2h645b48e03718",
      "map_id": "CV1D2ha8ee63bcd724"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp32-t14279-7d108a60",
+   "icv1": "ICV1:fp-4219792397:14279:4219778119:275535077:unk:unk:r:7d108a606059",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "4219792397",
+    "bits": 32,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "520906769",
+   "b": "80774089",
+   "construction": null,
+   "trace": "14279",
+   "order": "4219778119",
+   "order_bits": 31.965,
+   "r": "4219778119",
+   "r_bits": 31.965,
+   "cofactor": 1,
+   "generator": [
+    "0x1cfd7d4d",
+    "0x5422a19"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "275535077",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"520906769\",\"b\":\"80774089\",\"field\":\"fp-4219792397\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"4219792397\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P32Cfph0ef6203b6a43"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:0ef6203b6a432f949d67d89442ba7f80673eea97a37f2cc3b6ec53912f59137f"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "icv1-fp32-t14279-7d108a60"
+   ],
+   "sources": [
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x4d083c9",
+      "0x0",
+      "0x1f0c6811",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "7d108a606059259d7732e33f15794ce3647a3b4a2070102778534433749efcf9",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp32-t14279-7d108a60",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:cec09bfd5057167315ed0968a0ef8c1b60d2d5f06ce2e1588ceb7830bb23553f",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:b6191ee0d0d14deb1f1c2917fb0d1e1d259494be527e36589b6b36a608cc4393",
+     "cover_id": "HC1G2hcec09bfd5057",
+     "map_id": "CV1D2hb6191ee0d0d1"
     }
    ],
    "standards_provenance": [],
@@ -1824021,8 +1827054,8 @@
    "field": {
     "characteristic": "p",
     "p": "5",
-    "bits": 1,
-    "degree": null,
+    "bits": 5,
+    "degree": 2,
     "modulus": 2
    },
    "a": "8",
@@ -1824110,8 +1827143,8 @@
    "field": {
     "characteristic": "p",
     "p": "5",
-    "bits": 1,
-    "degree": null,
+    "bits": 5,
+    "degree": 2,
     "modulus": 2
    },
    "a": "7",
@@ -1824199,8 +1827232,8 @@
    "field": {
     "characteristic": "p",
     "p": "7",
-    "bits": 1,
-    "degree": null,
+    "bits": 6,
+    "degree": 2,
     "modulus": 1
    },
    "a": "11",
@@ -1824288,8 +1827321,8 @@
    "field": {
     "characteristic": "p",
     "p": "7",
-    "bits": 1,
-    "degree": null,
+    "bits": 6,
+    "degree": 2,
     "modulus": 1
    },
    "a": "10",
@@ -1824377,8 +1827410,8 @@
    "field": {
     "characteristic": "p",
     "p": "7",
-    "bits": 1,
-    "degree": null,
+    "bits": 6,
+    "degree": 2,
     "modulus": 1
    },
    "a": "9",
@@ -1861476,8 +1864509,8 @@
    "field": {
     "characteristic": "p",
     "p": "311",
-    "bits": 1,
-    "degree": null,
+    "bits": 17,
+    "degree": 2,
     "modulus": 1
    },
    "a": "72941",
@@ -1861565,8 +1864598,8 @@
    "field": {
     "characteristic": "p",
     "p": "367",
-    "bits": 1,
-    "degree": null,
+    "bits": 18,
+    "degree": 2,
     "modulus": 1
    },
    "a": "115749",
@@ -1861654,8 +1864687,8 @@
    "field": {
     "characteristic": "p",
     "p": "379",
-    "bits": 1,
-    "degree": null,
+    "bits": 18,
+    "degree": 2,
     "modulus": 1
    },
    "a": "131927",
@@ -1862051,8 +1865084,8 @@
    "field": {
     "characteristic": "p",
     "p": "739",
-    "bits": 1,
-    "degree": null,
+    "bits": 20,
+    "degree": 2,
     "modulus": 1
    },
    "a": "493102",
@@ -1862140,8 +1865173,8 @@
    "field": {
     "characteristic": "p",
     "p": "823",
-    "bits": 1,
-    "degree": null,
+    "bits": 20,
+    "degree": 2,
     "modulus": 1
    },
    "a": "133947",
@@ -1862229,8 +1865262,8 @@
    "field": {
     "characteristic": "p",
     "p": "859",
-    "bits": 1,
-    "degree": null,
+    "bits": 20,
+    "degree": 2,
     "modulus": 1
    },
    "a": "47422",
@@ -1862318,8 +1865351,8 @@
    "field": {
     "characteristic": "p",
     "p": "883",
-    "bits": 1,
-    "degree": null,
+    "bits": 20,
+    "degree": 2,
     "modulus": 1
    },
    "a": "582462",
@@ -1863247,8 +1866280,8 @@
    "field": {
     "characteristic": "p",
     "p": "1151",
-    "bits": 1,
-    "degree": null,
+    "bits": 21,
+    "degree": 2,
     "modulus": 1
    },
    "a": "1004627",
@@ -1863336,8 +1866369,8 @@
    "field": {
     "characteristic": "p",
     "p": "1187",
-    "bits": 1,
-    "degree": null,
+    "bits": 21,
+    "degree": 2,
     "modulus": 1
    },
    "a": "1057042",
@@ -1863739,8 +1866772,8 @@
    "field": {
     "characteristic": "p",
     "p": "3163",
-    "bits": 1,
-    "degree": null,
+    "bits": 24,
+    "degree": 2,
     "modulus": 1
    },
    "a": "5643905",
@@ -1863828,8 +1866861,8 @@
    "field": {
     "characteristic": "p",
     "p": "3191",
-    "bits": 1,
-    "degree": null,
+    "bits": 24,
+    "degree": 2,
     "modulus": 1
    },
    "a": "6391076",
@@ -1863917,8 +1866950,8 @@
    "field": {
     "characteristic": "p",
     "p": "3251",
-    "bits": 1,
-    "degree": null,
+    "bits": 24,
+    "degree": 2,
     "modulus": 1
    },
    "a": "1869394",
@@ -1864006,8 +1867039,8 @@
    "field": {
     "characteristic": "p",
     "p": "3371",
-    "bits": 1,
-    "degree": null,
+    "bits": 24,
+    "degree": 2,
     "modulus": 1
    },
    "a": "9527263",
@@ -1864095,8 +1867128,8 @@
    "field": {
     "characteristic": "p",
     "p": "3527",
-    "bits": 1,
-    "degree": null,
+    "bits": 24,
+    "degree": 2,
     "modulus": 1
    },
    "a": "2233623",
@@ -1864184,8 +1867217,8 @@
    "field": {
     "characteristic": "p",
     "p": "3931",
-    "bits": 1,
-    "degree": null,
+    "bits": 24,
+    "degree": 2,
     "modulus": 1
    },
    "a": "6140486",
@@ -1864473,8 +1867506,8 @@
    "field": {
     "characteristic": "p",
     "p": "11731",
-    "bits": 1,
-    "degree": null,
+    "bits": 28,
+    "degree": 2,
     "modulus": 1
    },
    "a": "88375897",
@@ -1864562,8 +1867595,8 @@
    "field": {
     "characteristic": "p",
     "p": "11887",
-    "bits": 1,
-    "degree": null,
+    "bits": 28,
+    "degree": 2,
     "modulus": 1
    },
    "a": "50634121",
@@ -1864651,8 +1867684,8 @@
    "field": {
     "characteristic": "p",
     "p": "12143",
-    "bits": 1,
-    "degree": null,
+    "bits": 28,
+    "degree": 2,
     "modulus": 1
    },
    "a": "110180958",
@@ -1864740,8 +1867773,8 @@
    "field": {
     "characteristic": "p",
     "p": "12451",
-    "bits": 1,
-    "degree": null,
+    "bits": 28,
+    "degree": 2,
     "modulus": 1
    },
    "a": "133463270",
@@ -1864829,8 +1867862,8 @@
    "field": {
     "characteristic": "p",
     "p": "12487",
-    "bits": 1,
-    "degree": null,
+    "bits": 28,
+    "degree": 2,
     "modulus": 1
    },
    "a": "123274306",
@@ -1864918,8 +1867951,8 @@
    "field": {
     "characteristic": "p",
     "p": "12503",
-    "bits": 1,
-    "degree": null,
+    "bits": 28,
+    "degree": 2,
     "modulus": 1
    },
    "a": "55750308",
@@ -1871373,8 +1874406,8 @@
    "field": {
     "characteristic": "p",
     "p": "48383",
-    "bits": 1,
-    "degree": null,
+    "bits": 32,
+    "degree": 2,
     "modulus": 1
    },
    "a": "1188265641",
@@ -1871462,8 +1874495,8 @@
    "field": {
     "characteristic": "p",
     "p": "48823",
-    "bits": 1,
-    "degree": null,
+    "bits": 32,
+    "degree": 2,
     "modulus": 1
    },
    "a": "1859678294",
@@ -1871551,8 +1874584,8 @@
    "field": {
     "characteristic": "p",
     "p": "49199",
-    "bits": 1,
-    "degree": null,
+    "bits": 32,
+    "degree": 2,
     "modulus": 1
    },
    "a": "497488301",
@@ -1871640,8 +1874673,8 @@
    "field": {
     "characteristic": "p",
     "p": "49207",
-    "bits": 1,
-    "degree": null,
+    "bits": 32,
+    "degree": 2,
     "modulus": 1
    },
    "a": "1687274424",
@@ -1871729,8 +1874762,8 @@
    "field": {
     "characteristic": "p",
     "p": "49391",
-    "bits": 1,
-    "degree": null,
+    "bits": 32,
+    "degree": 2,
     "modulus": 1
    },
    "a": "1619443312",
@@ -1871818,8 +1874851,8 @@
    "field": {
     "characteristic": "p",
     "p": "49451",
-    "bits": 1,
-    "degree": null,
+    "bits": 32,
+    "degree": 2,
     "modulus": 1
    },
    "a": "2050048520",
@@ -1872531,8 +1875564,8 @@
    "field": {
     "characteristic": "p",
     "p": "186379",
-    "bits": 1,
-    "degree": null,
+    "bits": 36,
+    "degree": 2,
     "modulus": 1
    },
    "a": "32257112622",
@@ -1872620,8 +1875653,8 @@
    "field": {
     "characteristic": "p",
     "p": "186451",
-    "bits": 1,
-    "degree": null,
+    "bits": 36,
+    "degree": 2,
     "modulus": 1
    },
    "a": "25220622765",
@@ -1872709,8 +1875742,8 @@
    "field": {
     "characteristic": "p",
     "p": "186583",
-    "bits": 1,
-    "degree": null,
+    "bits": 36,
+    "degree": 2,
     "modulus": 1
    },
    "a": "4676670217",
@@ -1872798,8 +1875831,8 @@
    "field": {
     "characteristic": "p",
     "p": "196643",
-    "bits": 1,
-    "degree": null,
+    "bits": 36,
+    "degree": 2,
     "modulus": 1
    },
    "a": "12881175837",
@@ -1872887,8 +1875920,8 @@
    "field": {
     "characteristic": "p",
     "p": "196699",
-    "bits": 1,
-    "degree": null,
+    "bits": 36,
+    "degree": 2,
     "modulus": 1
    },
    "a": "21822298847",
@@ -1872976,8 +1876009,8 @@
    "field": {
     "characteristic": "p",
     "p": "196727",
-    "bits": 1,
-    "degree": null,
+    "bits": 36,
+    "degree": 2,
     "modulus": 1
    },
    "a": "24280851789",
@@ -1885776,8 +1888809,8 @@
    "field": {
     "characteristic": "p",
     "p": "741967",
-    "bits": 1,
-    "degree": null,
+    "bits": 40,
+    "degree": 2,
     "modulus": 1
    },
    "a": "369280607796",
@@ -1885865,8 +1888898,8 @@
    "field": {
     "characteristic": "p",
     "p": "748807",
-    "bits": 1,
-    "degree": null,
+    "bits": 40,
+    "degree": 2,
     "modulus": 1
    },
    "a": "279748012072",
@@ -1885954,8 +1888987,8 @@
    "field": {
     "characteristic": "p",
     "p": "749299",
-    "bits": 1,
-    "degree": null,
+    "bits": 40,
+    "degree": 2,
     "modulus": 1
    },
    "a": "185078984544",
@@ -1886043,8 +1889076,8 @@
    "field": {
     "characteristic": "p",
     "p": "786587",
-    "bits": 1,
-    "degree": null,
+    "bits": 40,
+    "degree": 2,
     "modulus": 1
    },
    "a": "306003387410",
@@ -1886132,8 +1889165,8 @@
    "field": {
     "characteristic": "p",
     "p": "786659",
-    "bits": 1,
-    "degree": null,
+    "bits": 40,
+    "degree": 2,
     "modulus": 1
    },
    "a": "489774797476",
@@ -1886221,8 +1889254,8 @@
    "field": {
     "characteristic": "p",
     "p": "786691",
-    "bits": 1,
-    "degree": null,
+    "bits": 40,
+    "degree": 2,
     "modulus": 1
    },
    "a": "55737748173",
@@ -1886510,8 +1889543,8 @@
    "field": {
     "characteristic": "p",
     "p": "2967343",
-    "bits": 1,
-    "degree": null,
+    "bits": 44,
+    "degree": 2,
     "modulus": 1
    },
    "a": "4255430436932",
@@ -1886599,8 +1889632,8 @@
    "field": {
     "characteristic": "p",
     "p": "2968367",
-    "bits": 1,
-    "degree": null,
+    "bits": 44,
+    "degree": 2,
     "modulus": 1
    },
    "a": "6216410651083",
@@ -1886688,8 +1889721,8 @@
    "field": {
     "characteristic": "p",
     "p": "2972219",
-    "bits": 1,
-    "degree": null,
+    "bits": 44,
+    "degree": 2,
     "modulus": 1
    },
    "a": "8234028488351",
@@ -1990394,6 +1993427,25 @@
     "research/ic_candidate_tournament_20260915/goal_20260924/public-inputs/audits/final-pairinv.json"
    ],
    "slug": null
+  },
+  {
+   "candidate_id": "IC1N71Ckb0fb85200PDP4s3rootindexRCguidedLAdenseTDsingleISO0h6367473b54e6",
+   "n": 71,
+   "curve_tag": "kb0",
+   "factor_base_points": 85200,
+   "summands": 4,
+   "solver": "s3rootindex",
+   "collector": "guided",
+   "linear_algebra": "dense",
+   "descent": "single",
+   "isogeny": 0,
+   "record_sha12": "6367473b54e6",
+   "mentions": 1,
+   "files": 1,
+   "where": [
+    "docs/ic/boundary_targets.json"
+   ],
+   "slug": "icv1-f2m71-t48653080717-2cafaea3"
   },
   {
    "candidate_id": "IC1N83Ckb1a1fb183264PDP4rootRCguidedLAgaussTDdirectISO0h6f30a77abf9e",
@@ -2971932,6 +2974984,132 @@
     "description": "Round21 complete validation, failed attempts, fresh extraction and strict native replay",
     "tags": [],
     "provenance": "remote=s3://setec-astronomy-artifacts/store; R21 archive-validation.sh: deterministic tar mtime 2026-10-24 00:00:00Z, owner/group0, GNU, xz -6 -T1; see rounds/21/ARCHIVE_VALIDATION.txt",
+    "superseded": [],
+    "recorded_curve": null,
+    "curve": null,
+    "fb_id": null,
+    "recorded_fb_id": null
+   },
+   {
+    "name": "evidence/n83-k2304-current-source-control-20261026/base_dump.jsonl.gz",
+    "kind": "evidence",
+    "sha256": "3e0b7c9bad6a2abe2588a9f2b84d36f5fbe5991f3a6e0ef84f59135e3e40ec46",
+    "bytes": 9135776,
+    "description": "N83 a1 K2304 current-source ordered factor base from verified full-process control",
+    "tags": [],
+    "provenance": "research/n83_k2304_current_source_control_20261026/run.py; candidate IC1N83Ckb1a1fb382464PDP4rootRCguidedLAgaussTDdirectISO0h06c953ec903b; fixture zero; raw SHA-256 f51e436c399688ebd710075f16a57cd631a6799ce79891d53250b46bfd6c4534",
+    "superseded": [],
+    "recorded_curve": null,
+    "curve": null,
+    "fb_id": null,
+    "recorded_fb_id": null
+   },
+   {
+    "name": "evidence/n83-root4-frontier_20261019/cargo_lib_pr.log.gz",
+    "kind": "evidence",
+    "sha256": "5a0c56c433ce28310085fb5020657c2fd78c88dad1f9829ce516167a33dfc6b9",
+    "bytes": 68144,
+    "description": "Preserved nonpassing PR-branch release-library verification attempt",
+    "tags": [],
+    "provenance": "N83 high-K PR branch release library verification: sparse-fixture or intermittent test failure; see highk_20261019/verification_receipt.json",
+    "superseded": [],
+    "recorded_curve": null,
+    "curve": null,
+    "fb_id": null,
+    "recorded_fb_id": null
+   },
+   {
+    "name": "evidence/n83-root4-frontier_20261019/cargo_lib_pr_final.log.gz",
+    "kind": "evidence",
+    "sha256": "e289da386fd8f8f604a8d67318f912ad73b77d10a5d0999873d1a6476d561831",
+    "bytes": 66692,
+    "description": "Passed PR-branch Rust release library suite, 4162 passed, 117 ignored",
+    "tags": [],
+    "provenance": "TMPDIR=/Volumes/SSD990-2/tmp CARGO_TARGET_DIR=/Volumes/SSD990-2/tmp/n83_id30_current_build cargo test --release --offline --lib -- --test-threads=2; source commit c4f8154e; raw SHA-256 1c0831c7f2e0b8f5017c51b802dd83292e7f5e819e144e2c7e84df29fbc738ad",
+    "superseded": [],
+    "recorded_curve": null,
+    "curve": null,
+    "fb_id": null,
+    "recorded_fb_id": null
+   },
+   {
+    "name": "evidence/n83-root4-frontier_20261019/cargo_lib_pr_rerun.log.gz",
+    "kind": "evidence",
+    "sha256": "c4d7704cae8e2312852b1457266cd6ee28e34f898b72917e2b082a69d5fc4b9a",
+    "bytes": 67445,
+    "description": "Preserved nonpassing PR-branch release-library verification attempt",
+    "tags": [],
+    "provenance": "N83 high-K PR branch release library verification: sparse-fixture or intermittent test failure; see highk_20261019/verification_receipt.json",
+    "superseded": [],
+    "recorded_curve": null,
+    "curve": null,
+    "fb_id": null,
+    "recorded_fb_id": null
+   },
+   {
+    "name": "evidence/n83-root4-frontier_20261019/cargo_lib_sparse_failure.log.gz",
+    "kind": "evidence",
+    "sha256": "2ca470cf2b59ce82b53c2ef1a43ef7f4904bc6af23d9574b2257f1be44690fa4",
+    "bytes": 1582,
+    "description": "Preserved nonpassing PR-branch release-library verification attempt",
+    "tags": [],
+    "provenance": "N83 high-K PR branch release library verification: sparse-fixture or intermittent test failure; see highk_20261019/verification_receipt.json",
+    "superseded": [],
+    "recorded_curve": null,
+    "curve": null,
+    "fb_id": null,
+    "recorded_fb_id": null
+   },
+   {
+    "name": "evidence/n83-root4-frontier_20261019/k4096_base_dump.jsonl.gz",
+    "kind": "evidence",
+    "sha256": "ca24c2cbeaac2dc81035b254922e2e29cc25bcfa84f26fceebfe995e268a23e4",
+    "bytes": 16295315,
+    "description": "Replayed K4096 ID30 N83 factor-base dump, gzip mtime zero",
+    "tags": [],
+    "provenance": "pilot_k4096_16.py construct:83:1:4096; source 08660bd57ae1ea79f1d2d34639a0d3d36d0286fa; raw SHA-256 cb56c16620afc771d377102f9c4dc53d285cb9c5c2b38606d8cb202782fe39ed",
+    "superseded": [],
+    "recorded_curve": null,
+    "curve": null,
+    "fb_id": null,
+    "recorded_fb_id": null
+   },
+   {
+    "name": "evidence/n83-root4-frontier_20261019/k4300_base_dump.jsonl.gz",
+    "kind": "evidence",
+    "sha256": "43274cecad77b29806f15404109bb7ae9beb07214b5d470f651704be4048d7f6",
+    "bytes": 17107799,
+    "description": "Replayed K4300 ID30 N83 factor-base dump, gzip mtime zero",
+    "tags": [],
+    "provenance": "pilot_k4300_16.py construct:83:1:4300; source 08660bd57ae1ea79f1d2d34639a0d3d36d0286fa; raw SHA-256 06cf0ee56506c5674afac988b2809e1287d6be86de4cb0d8738e8dc989d1fd72",
+    "superseded": [],
+    "recorded_curve": null,
+    "curve": null,
+    "fb_id": null,
+    "recorded_fb_id": null
+   },
+   {
+    "name": "evidence/n83-root4-frontier_20261019/k4405_base_dump.jsonl.gz",
+    "kind": "evidence",
+    "sha256": "7e9009da4315ca14445184c4830a9c9e640ecba4d5151a5dc713b930ef15858b",
+    "bytes": 17525461,
+    "description": "Replayed K4405 ID30 N83 factor-base dump shared by standard and wide3, gzip mtime zero",
+    "tags": [],
+    "provenance": "pilot_k4405.py and pilot_k4405_wide3.py construct:83:1:4405; source 08660bd57ae1ea79f1d2d34639a0d3d36d0286fa; raw SHA-256 d5e172ea5ac62e99770607a1470ea95c52d8a53dedbd5cfced7b2a3173421e9e",
+    "superseded": [],
+    "recorded_curve": null,
+    "curve": null,
+    "fb_id": null,
+    "recorded_fb_id": null
+   },
+   {
+    "name": "evidence/n83-wide3-fresh4096_20261019/k4250_base_dump.jsonl.gz",
+    "kind": "evidence",
+    "sha256": "6f56a7ea520e8f5fd965a105231220b3b4f919707dc0e26193310f97d58604be",
+    "bytes": 16851506,
+    "description": "K4250 wide3 N83 independently replayed ordered factor base",
+    "tags": [],
+    "provenance": "construct:83:1:4250 source SHA-256 4a94e4e570f0cc4e39ba5c0846e411a6c43820c28119f7b9802e549023596507",
     "superseded": [],
     "recorded_curve": null,
     "curve": null,

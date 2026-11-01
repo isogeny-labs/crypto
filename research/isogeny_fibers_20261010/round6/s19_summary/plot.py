@@ -27,10 +27,11 @@ for i, L in enumerate(leads):
     ax.scatter([c * SP], [y], s=170, marker=markers[c], facecolor=face, edgecolor=colors[c], linewidth=2, zorder=3)
     if not L["merged"]:
         ax.text(c * SP, y - 0.42, "UNMERGED", ha="center", va="center", fontsize=6.5, color=ink2)
-    if L.get("defects"):
-        ax.text(c * SP, y - 0.42, "defects pending", ha="center", va="center", fontsize=6.5, color=ink2)
+    if L.get("corrected_by"):
+        ax.text(c * SP, y - 0.5, f'corrected, #{L["corrected_by"]} (merged)', ha="center", va="center", fontsize=6.5, color=ink2)
     ax.text(-0.62, y, f'{L["lead"]}  {L["title"]}', ha="right", va="center", fontsize=9, color=ink)
-    ax.text(HX, y, f'#{L["pr"]}: {L["headline"]}', ha="left", va="center", fontsize=7.4, color=ink2)
+    pr = f'#{L["pr"]}' + (f' + #{L["corrected_by"]}' if L.get("corrected_by") else "")
+    ax.text(HX, y, f'{pr}: {L["headline"]}', ha="left", va="center", fontsize=7.4, color=ink2)
 ax.set_xlim(-0.6, HX + 5.6)
 ax.set_ylim(-0.9, n - 0.4)
 ax.set_xticks([i * SP for i in range(len(cols))])
@@ -41,10 +42,10 @@ ax.set_yticks([])
 for s in ax.spines.values():
     s.set_visible(False)
 ax.text(HX, n - 0.1, "PR and headline (as in the lead's RESULTS.md)", fontsize=8, color=ink, ha="left", va="bottom", weight="bold")
-fig.text(0.01, 0.015,
-         "Filled marker: merged into main (2026-10-24). Hollow marker: pull request still open (UNMERGED). One verdict class per lead; "
-         "see section 19.16 for the wording. Toy instances only. Source: verdicts.json.",
+fig.text(0.01, 0.01,
+         "Filled marker: merged into main (status read 2026-10-31; R5.3, R6.1, R6.4, R6.8, R6.9 were open and UNMERGED on 2026-10-24).\n"
+         "R6.2: verdict still open after the merged correction. One verdict class per lead; see section 19.16. Toy instances only. Source: verdicts.json.",
          fontsize=7.2, color=ink2, ha="left")
-fig.subplots_adjust(left=0.2, right=0.995, top=0.88, bottom=0.07)
+fig.subplots_adjust(left=0.2, right=0.995, top=0.88, bottom=0.09)
 fig.savefig(here / "verdicts.svg")
 fig.savefig(here / "verdicts.png", dpi=150)
