@@ -1,0 +1,125 @@
+{
+  "schema": "pencil.saved-counter-review/v1",
+  "published_commit": "60346e7f2b831aa88f89d7967b9e74e21220422c",
+  "machine_status": "passed",
+  "fidelity": "faithful_scoped",
+  "review_outcome": "validated_scoped",
+  "scope": "Saved aggregate counters conserve declared phase sums",
+  "arms": {
+    "factor_base/full_16": {
+      "candidate_phase_conservation_pass": 1260,
+      "rho_phase_conservation_pass": 1260,
+      "standard_rows": 1260
+    },
+    "factor_base/full_32": {
+      "candidate_phase_conservation_pass": 1260,
+      "rho_phase_conservation_pass": 1260,
+      "standard_rows": 1260
+    },
+    "factor_base/full_8": {
+      "candidate_phase_conservation_pass": 1260,
+      "rho_phase_conservation_pass": 1260,
+      "standard_rows": 1260
+    },
+    "factor_base/half_16": {
+      "candidate_phase_conservation_pass": 1260,
+      "rho_phase_conservation_pass": 1260,
+      "standard_rows": 1260
+    },
+    "factor_base/quarter_16": {
+      "candidate_phase_conservation_pass": 1260,
+      "rho_phase_conservation_pass": 1260,
+      "standard_rows": 1260
+    },
+    "projective_law/retained_state": {
+      "candidate_phase_conservation_pass": 1260,
+      "rho_phase_conservation_pass": 1260,
+      "standard_rows": 1260
+    },
+    "projective_law/wrapper": {
+      "candidate_phase_conservation_pass": 1260,
+      "rho_phase_conservation_pass": 1260,
+      "standard_rows": 1260
+    }
+  },
+  "standard_rows": 8820,
+  "candidate_and_rho_checks": 17640,
+  "issues": [],
+  "controls": {
+    "schema": "readonly-negative-controls/v1",
+    "controls": [
+      {
+        "name": "altered_bits",
+        "reporter_exit": 0,
+        "review_gate_exit": 1,
+        "expected_rejection": true
+      },
+      {
+        "name": "duplicate_native",
+        "reporter_exit": 101,
+        "review_gate_exit": 2,
+        "expected_rejection": true
+      },
+      {
+        "name": "duplicate_standard",
+        "reporter_exit": 101,
+        "review_gate_exit": 2,
+        "expected_rejection": true
+      },
+      {
+        "name": "empty_cohort",
+        "reporter_exit": 0,
+        "review_gate_exit": 1,
+        "expected_rejection": true
+      },
+      {
+        "name": "empty_phases",
+        "reporter_exit": 0,
+        "review_gate_exit": 1,
+        "expected_rejection": true
+      },
+      {
+        "name": "omitted_phase",
+        "reporter_exit": 0,
+        "review_gate_exit": 1,
+        "expected_rejection": true
+      },
+      {
+        "name": "unsigned_counter",
+        "reporter_exit": 0,
+        "review_gate_exit": 1,
+        "expected_rejection": true
+      },
+      {
+        "name": "wrong_workload",
+        "reporter_exit": 0,
+        "review_gate_exit": 1,
+        "expected_rejection": true
+      }
+    ],
+    "all_rejected": true
+  },
+  "acceptance_predicate": "accept.jq",
+  "reporter_exit_sufficient": false,
+  "physical_cost_completeness": "not_established",
+  "new_cost_ratio": null,
+  "scientific_execution": false,
+  "source_verified_against_published_commit": true,
+  "producer_result_matches": true,
+  "raw_files": 50,
+  "original_inputs_unchanged": true,
+  "reviewer_prior_access": "Historical context and producer result used for input discovery; source inspected before replay; not blind",
+  "independent_review_joint": "phase-accounting",
+  "source_refs": [
+    "src/main.rs",
+    "published-review-plan.json",
+    "raw-inputs.sha256"
+  ],
+  "limits": [
+    "Declared counter conservation does not establish instrumentation coverage",
+    "No solver, scalar or curve replay",
+    "No physical-row cold/warm/setup allocation audit",
+    "No timing, price or resource accounting established",
+    "CSV parsing is line-oriented and assumes native saved schema"
+  ]
+}

@@ -1,0 +1,43 @@
+import ReductionWordMonic
+import ListGuards
+set_option autoImplicit false
+namespace ReductionWord
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest MonicTermination PencilWordRefinement
+
+theorem normal_natDegree (p : UInt64) [Fact p.toNat.Prime] (xs : List UInt64)
+ (hp : 1 < p.toNat) (hc : Canon p xs) (hn : Normal xs) (he : xs ≠ []) :
+ (wordsPoly p xs).natDegree=xs.length-1 := by
+ apply natDegree_eq_of_le_of_coeff_ne_zero
+ · rw [natDegree_le_iff_coeff_eq_zero]
+   intro i hi
+   rw [wordsPoly_coefficient]
+   simp [List.getElem?_eq_none (by omega : xs.length ≤ i)]
+ · have hl : xs.getLast?=some (xs.getLast he) := List.getLast?_eq_some_getLast he
+   have ha : (xs.getLast he).toNat < p.toNat := hc _ (List.getLast_mem he)
+   have hz : xs.getLast he ≠ 0 := by intro h; exact hn (by simp [hl,h])
+   rw [top_coefficient,hl]
+   exact canonical_word_nonzero p _ (by omega) ha hz
+
+theorem monic_polynomial (p : UInt64) [Fact p.toNat.Prime] (xs : List UInt64)
+ (hp : 1 < p.toNat) (hb : p.toNat < 2^31) (hc : Canon p xs) (hn : Normal xs) (he : xs ≠ []) :
+ (wordsPoly p (monic p xs)).Monic :=
+ ResidualAcceptance.monic_list p _ (monic_shape p xs hp hb hc hn he).2.2.2.1
+
+theorem normalization_valid (p : UInt64) [Fact p.toNat.Prime] (xs : List UInt64)
+ (f v : (ZMod p.toNat)[X])
+ (hp : 1 < p.toNat) (hb : p.toNat < 2^31) (hc : Canon p xs) (hn : Normal xs) (he : xs ≠ [])
+ (hv : wordsPoly p xs ∣ f-v*v) :
+ (wordsPoly p (monic p xs)).Monic ∧ wordsPoly p (monic p xs) ∣ f-v*v ∧
+ (wordsPoly p (monic p xs)).natDegree=(wordsPoly p xs).natDegree := by
+ have hs := monic_shape p xs hp hb hc hn he
+ obtain ⟨c,hcn,hdec⟩ := hs.2.2.2.2
+ refine ⟨monic_polynomial p xs hp hb hc hn he,?_,?_⟩
+ · rw [hdec]
+   obtain ⟨q,hq⟩ := hv
+   refine ⟨C c⁻¹*q,?_⟩
+   rw [hq]
+   calc
+    wordsPoly p xs*q=(C c*C c⁻¹)*(wordsPoly p xs*q) := by simp [←C_mul,hcn]
+    _ = (C c*wordsPoly p xs)*(C c⁻¹*q) := by ring
+ · rw [ResidualAcceptance.monic_list_natDegree p _ hs.2.2.2.1,hs.2.2.1,normal_natDegree p xs hp hc hn he]
+end ReductionWord

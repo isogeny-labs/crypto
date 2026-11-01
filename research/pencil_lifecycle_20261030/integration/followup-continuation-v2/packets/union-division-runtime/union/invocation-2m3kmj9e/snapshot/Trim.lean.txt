@@ -1,0 +1,88 @@
+import Scale
+set_option autoImplicit false
+namespace ScaleTrim
+open Polynomial
+variable {K : Type*} [CommRing K]
+noncomputable def listPoly : List K → K[X]
+ | [] => 0
+ | x::xs => C x+X*listPoly xs
+
+theorem listPoly_append (xs ys : List K) :
+ listPoly (xs++ys)=listPoly xs+X^xs.length*listPoly ys := by
+ induction xs with
+ | nil => simp [listPoly]
+ | cons x xs ih => simp only [List.cons_append,listPoly,ih,List.length_cons,pow_succ]; ring
+
+theorem listPoly_zeros (n : Nat) : listPoly (List.replicate n (0:K))=0 := by
+ induction n with
+ | zero => rfl
+ | succ n ih => simp [List.replicate_succ,listPoly,ih]
+
+noncomputable def wordsPoly (p : UInt64) (xs : List UInt64) : (ZMod p.toNat)[X] :=
+ listPoly (xs.map fun w => (w.toNat : ZMod p.toNat))
+
+theorem words_append_zero (p : UInt64) (xs : List UInt64) :
+ wordsPoly p (xs++[0])=wordsPoly p xs := by
+ simp [wordsPoly,List.map_append,listPoly_append,listPoly]
+
+def trimFuel : Nat → List UInt64 → List UInt64
+ | 0,xs => xs
+ | fuel+1,xs => if xs.getLast?=some 0 then trimFuel fuel xs.dropLast else xs
+
+theorem trim_preserves (p : UInt64) (fuel : Nat) (xs : List UInt64) :
+ wordsPoly p (trimFuel fuel xs)=wordsPoly p xs := by
+ induction fuel generalizing xs with
+ | zero => rfl
+ | succ fuel ih =>
+   simp only [trimFuel]
+   split_ifs with h
+   · rw [ih]
+     have he : xs.dropLast++[0]=xs := List.dropLast_append_getLast? 0 (by simpa [h])
+     calc
+      wordsPoly p xs.dropLast = wordsPoly p (xs.dropLast++[0]) := (words_append_zero p xs.dropLast).symm
+      _ = wordsPoly p xs := congrArg (wordsPoly p) he
+   · rfl
+
+theorem trim_length (fuel : Nat) (xs : List UInt64) : (trimFuel fuel xs).length≤xs.length := by
+ induction fuel generalizing xs with
+ | zero => rfl
+ | succ fuel ih =>
+   simp only [trimFuel]
+   split_ifs
+   · have h := ih xs.dropLast
+     simp only [List.length_dropLast] at h
+     exact le_trans h (Nat.sub_le xs.length 1)
+   · exact le_rfl
+
+theorem trim_finished (fuel : Nat) (xs : List UInt64) (h : xs.length≤fuel) :
+ (trimFuel fuel xs).getLast?≠some 0 := by
+ induction fuel generalizing xs with
+ | zero =>
+   have he : xs=[] := by simpa using h
+   subst xs; simp [trimFuel]
+ | succ fuel ih =>
+   simp only [trimFuel]
+   split_ifs with hl
+   · apply ih
+     simp only [List.length_dropLast]
+     omega
+   · exact hl
+
+def pad (capacity : Nat) (xs : List UInt64) : List UInt64 :=
+ xs++List.replicate (capacity-xs.length) 0
+
+theorem pad_length (capacity : Nat) (xs : List UInt64) (h : xs.length≤capacity) :
+ (pad capacity xs).length=capacity := by simp [pad]; omega
+
+theorem pad_preserves (p : UInt64) (capacity : Nat) (xs : List UInt64) :
+ wordsPoly p (pad capacity xs)=wordsPoly p xs := by
+ simp [pad,wordsPoly,List.map_append,List.map_replicate,listPoly_append,listPoly_zeros]
+
+theorem trim_pad_preserves (p : UInt64) (capacity : Nat) (xs : List UInt64) :
+ wordsPoly p (pad capacity (trimFuel xs.length xs))=wordsPoly p xs := by
+ rw [pad_preserves,trim_preserves]
+
+theorem trim_pad_capacity (capacity : Nat) (xs : List UInt64) (h : xs.length≤capacity) :
+ (pad capacity (trimFuel xs.length xs)).length=capacity :=
+ pad_length _ _ (le_trans (trim_length _ _) h)
+end ScaleTrim
