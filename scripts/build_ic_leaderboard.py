@@ -81,6 +81,8 @@ SOURCES = {
     "n83_fourbyte_pair_plain_fp2": "research/n83_fourbyte_pair_20261027/runs/plain_fp2/independent_replay.json",
     "n83_fourbyte_pair_fp2_plain": "research/n83_fourbyte_pair_20261027/runs/fp2_plain/independent_replay.json",
     "n83_fourbyte_pair_readme": "research/n83_fourbyte_pair_20261027/README.md",
+    "n83_image_closed_degree2": "research/n83_image_closed_degree2_20261101/ASSESSMENT.json",
+    "n83_image_closed_degree2_readme": "research/n83_image_closed_degree2_20261101/README.md",
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "f4_fp_ic_effect": "research/f4_fp_ic_effect_20261018/summary.json",
@@ -1845,6 +1847,45 @@ def build(allow_unvalidated: bool = False) -> dict:
         "matched_rho_speedup": None,
         "tier1_speedup": None,
     }
+    n83_image = load(SOURCES["n83_image_closed_degree2"])
+    n83_image_readme = (REPO / SOURCES["n83_image_closed_degree2_readme"]).read_text()
+    relation = n83_image.get("projected_relation", {})
+    image_cost = n83_image.get("complete_cost", {})
+    if (n83_image.get("schema") != "crypto.transfer-assessment/v3"
+            or n83_image.get("case_id") != "n83-image-closed-degree-two-fiber"
+            or n83_image.get("status") != "rejected_by_structural_and_cost_gates"
+            or relation.get("identity") != "[3]P=P+[2]P"
+            or relation.get("new_information") is not False
+            or relation.get("useful_relation_probability") != 0
+            or relation.get("independent_rank_per_identity") != 0
+            or any(image_cost.get(key) is not False for key in
+                   ("finite_crossover_against_strong_source_rho", "collector_admitted",
+                    "eks_timing_admitted", "speedup_claim"))
+            or len(n83_image.get("controls", [])) != 5
+            or "scoped rejection" not in n83_image_readme
+            or "No result in this directory establishes a discrete-log speedup" not in n83_image_readme):
+        raise SystemExit("review the N83 degree-two image-calculus assessment before updating the leaderboard")
+    n83_image_diagnostic = {
+        "curve": "icv1-f2m83-t6151469093347-9eba6cd5",
+        "source": SOURCES["n83_image_closed_degree2"],
+        "readme": SOURCES["n83_image_closed_degree2_readme"],
+        "case_id": n83_image["case_id"],
+        "status": n83_image["status"],
+        "class": "structural transfer rejection; collector and timing stopped before performance measurement",
+        "map": n83_image["transformation"]["map"],
+        "fiber_support_degrees": [1, 2],
+        "projected_identity": relation["identity"],
+        "useful_relation_probability": relation["useful_relation_probability"],
+        "independent_rank_per_identity": relation["independent_rank_per_identity"],
+        "source_rho_exponent": image_cost["source_rho_exponent"],
+        "ambient_collection_exponent": image_cost["ordinary_ambient_genus3_collection_exponent"],
+        "ambient_gap_bits": image_cost["ordinary_ambient_gap_bits"],
+        "controls": n83_image["controls"],
+        "open_obligations": n83_image["open_obligations"],
+        "collector_admitted": image_cost["collector_admitted"],
+        "timing_admitted": image_cost["eks_timing_admitted"],
+        "speedup_claim": image_cost["speedup_claim"],
+    }
     rank_columns = load(SOURCES["n37_rank_columns"])
     if (rank_columns["status"] != "independently_replayed_l0_bounded_diagnostic"
             or rank_columns["selection"]["decision"] != "COUNTED_ENGINEERING_LEAD"
@@ -2078,6 +2119,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "f4_f5_f6_cross_family_diagnostic": cross_diagnostic,
         "pfdr_other_families_diagnostic": pfdr_diagnostic,
         "n83_root_index_diagnostic": n83_root_index_diagnostic,
+        "n83_image_closed_degree2_diagnostic": n83_image_diagnostic,
         "latest_frontier_audit": frontier_audit,
         "n83_tier1_cold_holdout": {
             "source": SOURCES["n83_tier1_cold_holdout"],
@@ -2821,6 +2863,18 @@ def markdown(doc: dict) -> str:
           "substantially; two pairs do not select the K5500 layout. This is a correctness-backed "
           "optimization diagnostic, not a Tier 1 result or a matched-rho speedup, so no ranked row moves. "
           f"Read the [study and limits](../../{n83['readme']}).", ""]
+    image = doc["n83_image_closed_degree2_diagnostic"]
+    L += ["## N83 degree-two image calculus, outside tables A–C", "",
+          f"The exact `{image['case_id']}` transfer audit is `{image['status']}`. Generic odd-degree "
+          f"fibers of `{image['map']}` split into closed support degrees 1+2, but their projected "
+          f"labels give only `{image['projected_identity']}`. Useful relation probability and independent "
+          f"rank per identity are both {image['useful_relation_probability']}; the collector and timing "
+          "stages therefore stop under the frozen protocol.", "",
+          f"The ordinary ambient genus-three scale is `{image['ambient_collection_exponent']}`, about "
+          f"{image['ambient_gap_bits']} bits above `{image['source_rho_exponent']}`. This is a scoped "
+          "structural rejection, not zero-cost attack data: no wall time or speedup was measured, and no "
+          "ranked row moves. A compact growing-degree or adaptive target-local router remains open. "
+          f"Read the [assessment](../../{image['source']}) and [scope](../../{image['readme']}).", ""]
     pb = doc["prime_base_size_component"]
     L += ["## Prime-field baseline: factor-base size and oracle tuning (2026-10-29, engineering)", "",
           "Frozen protocol (backlog XP-20261016): joint choice of the low-x factor-base size N and the exact "
@@ -3794,6 +3848,25 @@ def page(doc: dict, standalone: bool) -> str:
              'varied substantially; two pairs do not select the K5500 layout. This is a correctness-backed '
              'optimization diagnostic, not a Tier 1 result or a matched-rho speedup, so no ranked row moves. '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(n83["readme"])}">Study and limits</a>.'
+             '</p></section>')
+
+    image = doc["n83_image_closed_degree2_diagnostic"]
+    P.append('<section class="card" id="n83-image-degree2"><h2>N83 degree-two image calculus, '
+             'outside the priced tables</h2>'
+             f'<p>The exact <code>{esc(image["case_id"])}</code> transfer audit is '
+             f'<code>{esc(image["status"])}</code>. Generic odd-degree fibers of '
+             f'<code>{esc(image["map"])}</code> split into closed support degrees 1+2, but their '
+             f'projected labels give only <code>{esc(image["projected_identity"])}</code>. Useful '
+             f'relation probability and independent rank per identity are both '
+             f'{image["useful_relation_probability"]}; the collector and timing stages stop under '
+             'the frozen protocol.</p>'
+             f'<p>The ordinary ambient genus-three scale is <code>{esc(image["ambient_collection_exponent"])}</code>, '
+             f'{esc(image["ambient_gap_bits"])} bits above <code>{esc(image["source_rho_exponent"])}</code>. '
+             'This is a scoped structural rejection, not zero-cost attack data: no wall time or speedup '
+             'was measured, and no ranked row moves. A compact growing-degree or adaptive target-local '
+             'router remains open. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(image["source"])}">Assessment</a> · '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(image["readme"])}">scope</a>.'
              '</p></section>')
 
     pb = doc["prime_base_size_component"]

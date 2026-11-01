@@ -122,6 +122,14 @@
    "path": "research/n83_fourbyte_pair_20261027/README.md",
    "sha256": "51e6392e1c20509d4e13d90b727fa09e56f3cb2b462ac55c80cd77c3dac7ebf8"
   },
+  "n83_image_closed_degree2": {
+   "path": "research/n83_image_closed_degree2_20261101/ASSESSMENT.json",
+   "sha256": "4064a295346153496c3c32ac3d8bc5712eb10dd6d9984d488e5ce64ac5b37984"
+  },
+  "n83_image_closed_degree2_readme": {
+   "path": "research/n83_image_closed_degree2_20261101/README.md",
+   "sha256": "6de3fa411f8c52d1a0622309f0a828d6f45fd0ea6f102ee7d540049dab623b5a"
+  },
   "n41_n53_counted": {
    "path": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
    "sha256": "fe55908f837840eeee173cfeae463368bb272e3c65ef03fa2b66efeead769331"
@@ -14031,6 +14039,39 @@
   "candidate_id": null,
   "matched_rho_speedup": null,
   "tier1_speedup": null
+ },
+ "n83_image_closed_degree2_diagnostic": {
+  "curve": "icv1-f2m83-t6151469093347-9eba6cd5",
+  "source": "research/n83_image_closed_degree2_20261101/ASSESSMENT.json",
+  "readme": "research/n83_image_closed_degree2_20261101/README.md",
+  "case_id": "n83-image-closed-degree-two-fiber",
+  "status": "rejected_by_structural_and_cost_gates",
+  "class": "structural transfer rejection; collector and timing stopped before performance measurement",
+  "map": "phi(u,v)=(u^3,uv+1)",
+  "fiber_support_degrees": [
+   1,
+   2
+  ],
+  "projected_identity": "[3]P=P+[2]P",
+  "useful_relation_probability": 0,
+  "independent_rank_per_identity": 0,
+  "source_rho_exponent": "0.5*log2(r)",
+  "ambient_collection_exponent": "(4/3)*83",
+  "ambient_gap_bits": "approximately 70.17",
+  "controls": [
+   "n=2 split fiber",
+   "n=9,13,19,23,83 odd-degree fibers",
+   "n=83 exceptional ramified point",
+   "pinned order-r generator",
+   "general arbitrary-class Jacobian norm"
+  ],
+  "open_obligations": [
+   "a compact growing-degree or adaptive target-local router remains unclassified",
+   "any future router must name relation search, projected rank, matrix, memory, blind individual-log descent, verification, and a finite crossover"
+  ],
+  "collector_admitted": false,
+  "timing_admitted": false,
+  "speedup_claim": false
  },
  "latest_frontier_audit": {
   "date": "2026-10-14",

@@ -55,6 +55,10 @@ clear:
    whole-process ratios (plain/FP2 1.017 and 1.294), but the shared host load
    varied sharply and the K5500 Tier-1 comparison remains unmeasured; this is
    an unranked implementation diagnostic, not a new Koblitz frontier row.
+   The separate N83 degree-two image-compatible calculus is now closed as a
+   scoped negative: its 1+2 closed fiber projects only to the tautology
+   $[3]P=P+[2]P$, so useful independent rank is zero and no collector or timing
+   run is admitted.
 2. **One restricted curve family is IC-led.** The plane-quartic attack on the
    special GHS-weak family $E_0/\mathbb F_{q^3}$, with
    $\#E_0(\mathbb F_{q^3})=4\ell$, is below matched rho in its own cold,
@@ -514,6 +518,27 @@ and FP2 adds a side array. At the projected K5500 split it still saves 2.25 GiB
 against the five-byte layout but adds 0.75 GiB against plain four-byte ID31.
 Peak RSS, full K5500 work, and a same-point Tier-1 IC/rho panel remain open.
 
+### N83 degree-two image-compatible calculus
+
+The exact cubic-cover transfer audit tests the first natural higher-degree
+image-compatible construction. On every requested odd extension, including
+n=83, a generic rational fiber has closed support degrees 1+2. The two elliptic
+labels are exactly $P$ and $[2]P$, so their sum is only
+$[3]P=P+[2]P$. A source-labelled point supplies already-known labels $a$ and
+$2a$; applying the identity to an unknown target supplies no logarithm.
+Consequently the frozen gate records useful relation probability zero and
+independent rank per identity zero, and stops relation collection, matrix work,
+memory measurement, individual-log descent, and EKS timing.
+
+The early stop is not a zero-cost attack. Ordinary ambient genus-three
+collection has exponent $(4/3)83=110.6667$ bits, about 70.17 bits above the
+source strong-rho exponent 40.5; fixed bounded-degree branching is
+$\Omega(r)$ before linear algebra. The exact controls cover n=9,13,19,23,83,
+an even-degree split fiber, the exceptional ramified point, the pinned
+order-r generator, and the general Jacobian norm. The rejection is deliberately
+narrow: a compact growing-degree or adaptive target-local router remains
+unclassified.
+
 # The restricted GHS-weak exception
 
 The repository's only clear IC-led elliptic-curve domain is the special
@@ -688,6 +713,7 @@ For the new campaign:
 | Structured factor-base yield | six PFDR lines over three families and 16--32 bits have slope -0.0047 to 0.0068; largest upper 95% limit 0.0147 versus 1/3 | the tested structures do not make useful coincidences grow fast enough | test a new mechanism or integrate the base constraint into a fully priced E2E solver; do not extend these families by default |
 | Factor-base and pair-table setup | 98.7–99.6% of central cold Koblitz rows; $O(|F|^2)$ pair materialization | online-only improvements disappear when one target pays setup | cold primary result; equal-advice online secondary result |
 | N83 root-index layout | two independently replayed K1107 pairs favor FP2 by 1.017× and 1.294× whole-process, but shared-host load changes sharply | the fingerprint trades reconstruction work for side-array memory; K1107 does not predict K5500 peak RSS or cost | larger-memory K5500 paired Tier-1 run with matched rho, fixed order policy, and peak-RSS receipt |
+| N83 degree-two image transfer | exact 1+2 fiber labels are $P,[2]P$ and contribute zero independent logarithmic rank | raw upstairs components collapse to a known source-group identity; ambient fallback remains about 70.17 exponent bits above rho | require a mechanism-distinct growing-degree or target-local router and freeze its information-rank model before collection |
 | Tensor contraction separator | exact finite nonzero-minor certificates and the linear-separator implication are proved; production family lemma absent | finite architecture bounds do not establish the rank growth or cover other algorithms | generate a production semantic cut and prove a uniform family lower bound before making an asymptotic claim |
 | F6 closure additions | historical binary: 64.6–1,352.6× inherited F4 in lower-bound S; current replay 72/144 overall | local word-XOR savings are overwhelmed by exact group work, while current counts need remeasurement | price closure and solver in one common unit; rerun current source; change closure algorithm, not label |
 | Matrix F4/F5 scale | m=19 matrix arms time out at 1,800 s | symbolic preprocessing and matrix construction explode before useful scaling | memory/degree receipts and retained timeout curve |
@@ -833,6 +859,10 @@ The performance frontier is now explicit:
   alternating full K1107 replays and is faster in both observed pairs, but
   remains unselected until a stable K5500 Tier-1 comparison prices its added
   side-array memory and includes matched rho.
+- **N83 image calculus:** the natural degree-two closed-fiber construction is
+  rejected at the information gate; its projected relation is a known
+  scalar-multiplication identity, not an independent relation. No timing or
+  speedup claim follows, and broader growing-degree routers remain open.
 - **Tensor contraction:** finite linear-separator rank certificates and their
   proof bridge are established; the production-family rank-growth lemma is
   still open, so no ECDLP or leaderboard claim follows.
@@ -851,8 +881,10 @@ The highest-value next work is therefore:
    are already a small share;
 4. integrate the GPU relation engine with a matched ECBench reference;
 5. run the paired N83 four-byte/FP2 K5500 Tier-1 memory and E2E gate;
-6. prove or falsify the production tensor-family rank-growth obligation;
-7. preserve the GHS-weak win as a separate domain rather than using it to
+6. specify and information-rank a mechanism-distinct N83 growing-degree or
+   target-local router before any collector run;
+7. prove or falsify the production tensor-family rank-growth obligation;
+8. preserve the GHS-weak win as a separate domain rather than using it to
    headline generic curves.
 
 # Reproduction and evidence index
@@ -870,6 +902,7 @@ sources are:
 - [prime factor-base second-host replay](../prime_base_oracle_tuning_20261029/second-host/README.md);
 - [PFDR structured-factor-base screen](../pfdr_other_families_20261101/README.md);
 - [N83 four-byte paired root-index replay](../n83_fourbyte_pair_20261027/README.md);
+- [N83 degree-two image-calculus rejection](../n83_image_closed_degree2_20261101/RESULTS.md);
 - [rigorous tensor boundary-rank report](../tensor_boolean_breakthrough_20261031/BOUNDS_REPORT.md);
 - [GPU explicit-relations result](../explicit_relations_e2e_20261030/RESULTS.md);
 - [literature and prior-evidence ledger](LITERATURE.md);
