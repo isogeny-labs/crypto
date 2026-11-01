@@ -8,14 +8,12 @@
 //! refuted, or a witness that does not re-add to its target).
 //!
 //! ```text
-//! n83_chain_sat_analyze <study_dir>
+//! n83_chain_sat_analyze <study_dir> [baseline_arm]   (default `unordered`)
 //! ```
 use serde_json::{json, Value};
 use std::collections::BTreeMap;
 use std::fs;
 use std::path::Path;
-
-const BASELINE: &str = "unordered";
 
 fn median(mut v: Vec<f64>) -> Option<f64> {
     if v.is_empty() {
@@ -31,11 +29,14 @@ fn median(mut v: Vec<f64>) -> Option<f64> {
 }
 
 fn main() {
-    let study = std::env::args()
-        .nth(1)
-        .expect("usage: n83_chain_sat_analyze <study_dir>");
-    let study = Path::new(&study);
+    let args: Vec<String> = std::env::args().collect();
+    let study_arg = args
+        .get(1)
+        .expect("usage: n83_chain_sat_analyze <study_dir> [baseline_arm]");
+    let baseline: &str = args.get(2).map_or("unordered", String::as_str);
+    let study = Path::new(study_arg);
     let mut rows: Vec<Value> = Vec::new();
+    let mut warmups: Vec<Value> = Vec::new();
     let mut shards: Vec<_> = fs::read_dir(study.join("raw"))
         .expect("raw/")
         .flatten()
@@ -56,6 +57,10 @@ fn main() {
         {
             for line in fs::read_to_string(f).unwrap_or_default().lines() {
                 if let Ok(mut v) = serde_json::from_str::<Value>(line) {
+                    if v["record"] == "warmup" {
+                        warmups.push(v);
+                        continue;
+                    }
                     v["record"] = json!(f.strip_prefix(study).unwrap_or(f).to_string_lossy());
                     rows.push(v);
                 }
@@ -84,6 +89,9 @@ fn main() {
             "median_conflicts_decided": median(decided.iter().filter_map(|r| r["conflicts"].as_f64()).collect()),
             "median_seconds_decided": median(decided.iter().filter_map(|r| r["seconds"].as_f64()).collect()),
             "median_seconds_all": median(rs.iter().filter_map(|r| r["seconds"].as_f64()).collect()),
+            "meet_domains": rs.iter().map(|r| r["meet_domain"].clone()).collect::<Vec<Value>>(),
+            "patterns_refuted_by_lookup": rs.iter().filter_map(|r| r["patterns_refuted_by_lookup"].as_u64()).sum::<u64>(),
+            "median_conflicts_all": median(rs.iter().filter_map(|r| r["conflicts"].as_f64()).collect()),
         }));
     }
     // Paired comparison against the baseline on the same (m, target).
@@ -99,11 +107,11 @@ fn main() {
     }
     let mut pairs: BTreeMap<(u64, String), Vec<Value>> = BTreeMap::new();
     for ((m, t), arms) in &by_target {
-        let Some(base) = arms.get(BASELINE) else {
+        let Some(base) = arms.get(baseline) else {
             continue;
         };
         for (arm, r) in arms {
-            if arm == BASELINE {
+            if arm == baseline {
                 continue;
             }
             pairs.entry((*m, arm.clone())).or_default().push(json!({
@@ -152,8 +160,9 @@ fn main() {
         .collect();
     let analysis = json!({
         "schema": "n83-chain-sat-analysis/v1",
-        "study": "research/n83_chain_sat_order_20261031",
-        "baseline_arm": BASELINE,
+        "study": study_arg,
+        "baseline_arm": baseline,
+        "warmups": warmups,
         "records": rows.len(),
         "derivations": {
             "conflict_ratio_arm_over_baseline_on_both": "arm conflicts / baseline conflicts per target both decided (refuted or witness)",
