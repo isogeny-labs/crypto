@@ -29,6 +29,25 @@ It holds:
   In total 10,760 records and 24,096 measurements. The 9,189 prime-field
   dataset curves among them are ecdb curves (family `dataset`) under their
   computed ICV1 slugs.
+- curves generated with Sage and re-verified on import
+  ([`../sage/README.md`](../sage/README.md)):
+  - family `census-fp`: every curve over F_p, p < 2^10, up to isomorphism;
+  - family `census-f2m`: every ordinary curve over GF(2^m), m ≤ 10;
+  - families `crypto-prime`, `crypto-prime-twist`, `crypto-cm`: 32–256-bit
+    curves;
+  - families `pairing-bn`, `pairing-bls12`, `pairing-bls24`, `pairing-kss16`,
+    `pairing-kss18`;
+  - family `genus2-random`: genus-2 Jacobians.
+
+  Filter by `family` to keep a census from swamping a search.
+- 485,291 verified Vélu isogenies (ℓ = 2, 3, 5): the complete ℓ-isogeny
+  graphs over every F_p with p < 2^10, and the ℓ-neighbours of the crypto
+  and pairing curves. Walk them with `ecdb_curve_detail part=graph` or
+  `GET /v1/curves/{ref}/graph?ell=&depth=`.
+- the ℓ-volcanoes of those graphs: each curve's level (`endomorphism_level`),
+  the components (`isogeny_volcano`, `volcano_vertex`) and each edge's
+  direction (horizontal, ascending, descending). End(E) is stored for 149,593
+  census curves whose conductor is {2, 3, 5}-smooth.
 
 The design and the full table list are in [`SCHEMA.md`](SCHEMA.md). The
 routes are in [`../openapi.yaml`](../openapi.yaml).

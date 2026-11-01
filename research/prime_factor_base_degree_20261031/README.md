@@ -1,5 +1,29 @@
 # Prime-field factor bases: certificates and a secant degree reduction
 
+## Boolean ordinate offsets, 2026-11-01
+
+The [new offset-base search](pencil_search_20261101/README.md) removes the
+complete-splitting requirement and keeps both summands' Boolean labels
+variable. Lean proves exact group semantics and canonical degree2k+3,
+counting all2k selectors. The new F17 base has eight columns/sixteen signed
+points, with canonical degree7 versus same-base dense9. Exact single-bit
+projection is also proved. Actual affine degree, yield and solving work
+remain unmeasured; the report exposes the variable/column tax and prospective
+matched controls. Earlier sealed records and measured graphs are unchanged.
+
+## Concrete semantic/degree theorem, 2026-10-31
+
+The [concrete F17 continuation](fixture_bridge_20261031/README.md) now joins
+the actual polynomial generator set, exact signed factor-base group
+relations and canonical degree 3 versus the inherited dense degree 5 in one
+Lean theorem. All four signs and identity inverse pairs are covered. The
+unchanged transitive auditor checks 159 declarations in fourteen modules:
+zero failures and zero native trust. The published generic group project
+also rebuilt and passed its complete 22-declaration audit, closing the
+specific outage verification gaps recorded below. Existing sealed records
+remain historical. This is formal semantic integration of the earlier degree
+result, without a new degree measurement or runtime claim.
+
 ## Checked Lean continuation, 2026-10-31
 
 The [formalization](proof/FORMALIZATION.md) now proves the polynomial-ring

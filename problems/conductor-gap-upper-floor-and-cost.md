@@ -120,6 +120,34 @@ universal lower bound. The explicit 80-bit construction, point evaluation
 and paired ECDLP times remain missing, rather than inferred from a smaller
 fixture or assigned zero.
 
+The [S3 root-chunk fixture](../research/prime_conductor_gap80_20261031/s3-chunks/README.md)
+adds bounded native preparation of 4,096 baby roots and independent PARI
+verification of every coordinate, with deterministic offset restart and
+immutable object hashes. This removes the need to allocate a full root
+vector during that preparation stage. It does not convert the existing
+contiguous FLINT polynomial/tree routines to external-memory processing;
+that schedule and the full point evaluator remain open. Only the small
+storage fixture is prepared, not the full multi-terabyte root window.
+
+The [native polynomial-block stage](../research/prime_conductor_gap80_20261031/poly-blocks/README.md)
+now prepares and evaluates bounded products, accumulating six reciprocal
+power sums over supplied blocks. The 4,096-root prefix agrees with direct
+inversion at 32 source and 32 actual giant contexts (384 values), with
+independent PARI context checks, split-block consistency and nine negative
+controls. This checks the first native processing primitive for stored
+blocks; full baby/giant coverage, codomain moments, complete point images
+and feasible total-work accounting remain open.
+
+The [complete native control runner](../research/prime_conductor_gap80_20261031/complete-pipeline/README.md)
+now wires canonical coverage, codomain moments, full point evaluation and
+paired known-answer recovery on complete ordinary-curve fixtures. PARI
+matches both codomains and 42 evaluated inputs; 34 paired targets recover
+on both endpoints (q=3 and q=37). Six negative coverage controls pass.
+These are software controls, not certified conductor-gap records or timing
+measurements. The 80-bit prefix gate refuses assembly. Durable S3-manifest
+coverage/resumption, complete target data and feasible total-work execution
+remain prerequisites to the requested endpoint measurements.
+
 ### Historical 60-bit-prime instance imported on 2026-10-31
 
 The [archived gap60 study](../research/prime_conductor_gap60_20261031/README.md)
