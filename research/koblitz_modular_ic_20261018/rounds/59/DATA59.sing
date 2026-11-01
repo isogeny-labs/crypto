@@ -1,0 +1,100 @@
+proc require59(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump59(link out,string name,matrix A){int i;int j;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");for(i=1;i<=nrows(A);i++){for(j=1;j<=ncols(A);j++){if(A[i,j]!=0){write(out,name+"["+string(i)+","+string(j)+"]="+string(A[i,j])+";");}}}}
+execute(read("../../../55/runs/quotient55-02/source-annihilator55.sing"));
+execute(read("../../../52/source-data/compact-pid51.sing"));
+execute(read("../../../52/source-data/rr-table50.sing"));
+execute(read("../../../52/source-data/nu-pid-certificate51.sing"));
+execute(read("../../../58/runs/space58-01/complete-space58.sing"));
+ring normalData59=2,(u),(c,dp);short=0;
+map aMap59=sourceAnnihilator55,u;matrix A59=aMap59(A55);matrix conjugate59=aMap59(conjugate55);matrix one59=aMap59(one55);poly f59=aMap59(f55);
+map compactMap59=compactPid51,u;matrix H59=matrix(compactMap59(basis51));poly D59=compactMap59(commonDenominator51);
+map tableMap59=tablePidCertificate50,u;matrix lift59=tableMap59(sourceLift50);matrix table59=tableMap59(table50);intmat parents59=parents50;
+map nuMap59=nuPidCertificate51,u;matrix nu59=nuMap59(lift51);vector targetNu59=nuMap59(target51);matrix fullTargetNu59[32][1];
+map controlsMap59=completeSpace58,0;matrix small59=controlsMap59(smallControls58);matrix sigma59=controlsMap59(sigmaRestricted58);
+int i59;int j59;int k59;matrix identity59=unitmat(32);matrix zero59[32][32];matrix DIdentity59[32][32];matrix fIdentity59[32][32];
+for(i59=1;i59<=32;i59++){DIdentity59[i59,i59]=D59;fIdentity59[i59,i59]=f59;fullTargetNu59[i59,1]=targetNu59[i59];}
+require59(H59*lift59==DIdentity59 && H59*nu59==fullTargetNu59,"DATA59_GLOBAL_NORMAL_SOURCE_AND_NU_BINDINGS");
+require59(A59*conjugate59==fIdentity59 && conjugate59*A59==fIdentity59,"DATA59_BOTH_GLOBAL_ANNIHILATOR_PRODUCTS");
+proc multiply59(matrix x,matrix tab,intmat parents){
+ matrix M[32][32];int p;int i;int j;int k;
+ for(p=1;p<=528;p++){i=parents[p,1];j=parents[p,2];for(k=1;k<=32;k++){M[k,j]=M[k,j]+x[i,1]*tab[k,p];if(i!=j){M[k,i]=M[k,i]+x[j,1]*tab[k,p];}}}return(M);
+}
+matrix lambda59[32][1];matrix Vvector59[32][1];
+for(i59=1;i59<=32;i59++){lambda59[i59,1]=lift59[i59,2];Vvector59[i59,1]=lift59[i59,17];require59(one59[i59,1]==lift59[i59,1],"DATA59_SOURCE_UNIT_VECTOR");}
+require59(multiply59(one59,table59,parents59)==identity59,"DATA59_ACTUAL_NORMAL_UNIT");
+poly modulus59=f59^4;require59(modulus59==u^20+u^8+1,"DATA59_EXACT_FOURTH_POWER_MODULUS");ideal modGB59=std(ideal(modulus59));
+matrix Ared59=reduce(A59,modGB59);matrix A2red59=reduce(Ared59*Ared59,modGB59);matrix A4red59=reduce(A2red59*A2red59,modGB59);
+matrix Vred59=reduce(multiply59(Vvector59,table59,parents59),modGB59);matrix Lred59=reduce(multiply59(lambda59,table59,parents59),modGB59);matrix Nred59=reduce(multiply59(nu59,table59,parents59),modGB59);
+matrix R59[32][32];matrix expectedA59[32][32];matrix bRed59[32][32];matrix zRed59[32][32];
+for(i59=1;i59<=32;i59++){for(j59=1;j59<=32;j59++){R59[i59,j59]=reduce((1+u)*Vred59[i59,j59]+u^3*identity59[i59,j59],modGB59);expectedA59[i59,j59]=reduce(identity59[i59,j59]+u*(R59[i59,j59]+identity59[i59,j59]),modGB59);zRed59[i59,j59]=u*identity59[i59,j59];}}
+require59(expectedA59==Ared59,"DATA59_ACTUAL_A_COORDINATE_BINDING");
+matrix bWork59=reduce(R59*(R59+identity59),modGB59);
+for(i59=1;i59<=32;i59++){for(j59=1;j59<=32;j59++){bRed59[i59,j59]=reduce(u*bWork59[i59,j59],modGB59);}}
+require59(reduce(Ared59*Nred59+Nred59*Ared59,modGB59)==zero59,"DATA59_NU_A_COMMUTE");
+// Current source parameter is inverted; v_current=V_old/z².
+execute(read("../../../58/runs/field58-01/field-space58.sing"));
+execute(read("../../source-data/parameter-helper59.sing"));
+number parameterControl59=(u+1)/(u^2+u+1);
+require59(inverseParameter59(parameterControl59)==(u^2+u)/(u^2+u+1) && inverseParameter59(inverseParameter59(parameterControl59))==parameterControl59,"DATA59_PARAMETER_CONTROL");
+matrix transported59[32][100];poly remaining59;intvec exp59;int position59;number oldCoefficient59;number changedCoefficient59;
+for(j59=1;j59<=100;j59++){
+ remaining59=completeValues58[j59];
+ while(remaining59!=0){
+  exp59=leadexp(remaining59);require59(exp59[1]<16 && exp59[2]<2,"DATA59_CANONICAL_FIELD_BASIS_SHAPE");
+  position59=exp59[1]+16*exp59[2]+1;oldCoefficient59=leadcoef(remaining59);
+  changedCoefficient59=inverseParameter59(oldCoefficient59)/u^(2*exp59[2]);
+  require59(inverseParameter59(changedCoefficient59)/u^(2*exp59[2])==oldCoefficient59,"DATA59_ALL_COEFFICIENT_ROUNDTRIPS");
+  transported59[position59,j59]=transported59[position59,j59]+changedCoefficient59;remaining59=remaining59-lead(remaining59);
+ }
+}
+map liftToField59=normalData59,u;matrix normalField59=liftToField59(lift59)*transported59;
+matrix reconstructedField59=liftToField59(H59)*normalField59;matrix expectedField59[32][100];
+for(i59=1;i59<=32;i59++){for(j59=1;j59<=100;j59++){expectedField59[i59,j59]=liftToField59(D59)*transported59[i59,j59];}}
+require59(reconstructedField59==expectedField59,"DATA59_ALL100_FULL_NORMAL_FIELD_RECONSTRUCTIONS");
+string numeratorString59;string denominatorString59;number coeff59;
+setring normalData59;matrix reducedF59[32][100];poly num59;poly den59;poly inv59;ideal denominators59;ideal inverses59;matrix bezout59;int cacheIndex59;int denominatorChecks59=0;
+for(j59=1;j59<=100;j59++){for(i59=1;i59<=32;i59++){
+ setring fieldSpace58;coeff59=leadcoef(normalField59[i59,j59]);numeratorString59=string(numerator(coeff59));denominatorString59=string(denominator(coeff59));
+ setring normalData59;execute("num59="+numeratorString59+";den59="+denominatorString59+";");
+ cacheIndex59=0;for(k59=1;k59<=size(denominators59);k59++){if(denominators59[k59]==den59){cacheIndex59=k59;}}
+ if(cacheIndex59==0){
+  require59(gcd(den59,modulus59)==1,"DATA59_ALL_NORMAL_DENOMINATORS_ARE_UNITS");
+  bezout59=lift(ideal(den59,modulus59),ideal(1));require59(den59*bezout59[1,1]+modulus59*bezout59[2,1]==1,"DATA59_FULL_DENOMINATOR_BEZOUT");
+  cacheIndex59=size(denominators59)+1;denominators59[cacheIndex59]=den59;inverses59[cacheIndex59]=reduce(bezout59[1,1],modGB59);
+ }
+ inv59=inverses59[cacheIndex59];require59(reduce(den59*inv59+1,modGB59)==0,"DATA59_DENOMINATOR_INVERSE_PRODUCT");denominatorChecks59++;
+ reducedF59[i59,j59]=reduce(num59*inv59,modGB59);
+}}
+matrix controlOne59[100][1];matrix controlA259[100][1];
+for(i59=1;i59<=100;i59++){controlOne59[i59,1]=small59[i59,1];controlA259[i59,1]=small59[i59,2];}
+matrix reducedOne59=reduce(one59,modGB59);
+require59(reducedF59*controlOne59==reducedOne59 && reducedF59*controlA259==reduce(A2red59*reducedOne59,modGB59),"DATA59_NORMAL_1_AND_A_SQUARED_CONTROLS");
+matrix badF59=reducedF59;int changedColumn59=1;while(controlOne59[changedColumn59,1]==0){changedColumn59++;}
+for(i59=1;i59<=32;i59++){badF59[i59,changedColumn59]=badF59[i59,changedColumn59]+reducedOne59[i59,1];}
+require59(badF59*controlOne59!=reducedOne59,"DATA59_CHANGED_NORMAL_CONTROL_REJECTED");
+// All strings below are exact sparse binary vector data, not module products.
+proc codeColumn59(matrix M,int col){poly code=0;poly entry;int i;int degreeEntry59;for(i=1;i<=nrows(M);i++){entry=M[i,col];while(entry!=0){degreeEntry59=deg(lead(entry));code=code+u^(32*degreeEntry59+i-1);entry=entry-lead(entry);}}return(code);}
+proc writeOperator59(link out,string name,matrix M){int k;int i;int j;poly entry;matrix shifted[32][32];for(k=0;k<20;k++){for(i=1;i<=32;i++){for(j=1;j<=32;j++){shifted[i,j]=reduce(u^k*M[i,j],modGB59);}}for(j=1;j<=32;j++){entry=codeColumn59(shifted,j);write(out,name+" "+string(32*k+j)+" "+string(entry));}}}
+link dataOut59="ASCII:w data59.txt";open(dataOut59);write(dataOut59,"FORMAT DATA59v1");write(dataOut59,"MOD 1 "+string(modulus59));
+writeOperator59(dataOut59,"A",Ared59);writeOperator59(dataOut59,"A4",A4red59);writeOperator59(dataOut59,"NU",Nred59);writeOperator59(dataOut59,"B",bRed59);writeOperator59(dataOut59,"Z",zRed59);writeOperator59(dataOut59,"L",Lred59);writeOperator59(dataOut59,"V",Vred59);
+write(dataOut59,"ONE 1 "+string(codeColumn59(reducedOne59,1)));
+for(j59=1;j59<=100;j59++){write(dataOut59,"F "+string(j59)+" "+string(codeColumn59(reducedF59,j59)));}
+poly bits59;
+for(j59=1;j59<=100;j59++){
+ bits59=0;for(i59=1;i59<=100;i59++){require59(sigma59[i59,j59]==0 || sigma59[i59,j59]==1,"DATA59_BINARY_SIGMA_ENTRY");if(sigma59[i59,j59]==1){bits59=bits59+u^(i59-1);}}write(dataOut59,"SIG "+string(j59)+" "+string(bits59));
+}
+for(j59=1;j59<=2;j59++){bits59=0;for(i59=1;i59<=100;i59++){if(small59[i59,j59]==1){bits59=bits59+u^(i59-1);}}write(dataOut59,"CTRL "+string(j59)+" "+string(bits59));}
+close(dataOut59);
+link normalOut59="ASCII:w normal-rr59.sing";open(normalOut59);write(normalOut59,"ring normalRR59=2,(u),(c,dp);short=0;poly modulus59="+string(modulus59)+";");dump59(normalOut59,"reducedF59",reducedF59);close(normalOut59);
+int distinctDenominators59=size(denominators59);
+execute(read("../../../55/runs/quotient55-02/crt-quotient55.sing"));short=0;poly crtBits59;
+poly normPower59=norm55^4;ideal normGB59=std(ideal(normPower59));matrix idempotentFourth59[1][4];poly sum59=0;
+for(i59=1;i59<=4;i59++){idempotentFourth59[1,i59]=idempotents55[1,i59]^4;sum59=sum59+idempotentFourth59[1,i59];}
+require59(reduce(sum59+1,normGB59)==0,"DATA59_FOURTH_CRT_PARTITION");
+for(i59=1;i59<=4;i59++){for(j59=1;j59<=4;j59++){require59(reduce(idempotentFourth59[1,i59]*idempotentFourth59[1,j59]+(i59==j59)*idempotentFourth59[1,i59],normGB59)==0,"DATA59_ALL_FOURTH_CRT_IDEMPOTENT_PRODUCTS");}}
+link appendOut59="ASCII:a data59.txt";open(appendOut59);write(appendOut59,"NORMALL 1 "+string(norm55));write(appendOut59,"RHO 1 "+string(rho55));
+write(appendOut59,"NORM 1 "+string(norm155));write(appendOut59,"NORM 2 "+string(norm255));write(appendOut59,"NORM 3 "+string(norm355));write(appendOut59,"NORM 4 "+string(norm455));
+for(i59=1;i59<=4;i59++){write(appendOut59,"CRT "+string(i59)+" "+string(idempotentFourth59[1,i59]));}
+for(j59=1;j59<=160;j59++){crtBits59=0;for(i59=1;i59<=80;i59++){if(evaluation55[i59,j59]==1){crtBits59=crtBits59+w^(i59-1);}}write(appendOut59,"EOLD "+string(j59)+" "+string(crtBits59));}close(appendOut59);
+print("DATA59_RESULT normal_basis=32 scalar_modulus_degree=20 binary_coordinates=640 rr_numerators=100 denominator_unit_checks="+string(denominatorChecks59)+" distinct_denominators="+string(distinctDenominators59)+" source_generators=7 old_evaluation_columns=160 CRT_labels=4 full_field_reconstruction=1 changed_control_rejected=1");
+print("DATA59_ALL_CHECKS_PASS");quit;

@@ -1,0 +1,122 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R59-NORMAL-A4-DATA",
+  "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
+  "claims": [
+    {
+      "id": "source-data",
+      "class": "exact_computation",
+      "statement": "Assemble actual normal multiplicationA^4 modulof^4,allsourcegeneratoroperators,100integralnumeratorvectors withfullrationalparametertransport/sourcebasisidentities."
+    },
+    {
+      "id": "next-quotient",
+      "class": "out_of_scope",
+      "statement": "The640-coordinatepresentation and100vectors are not yet a320quotient ormap;requirefrozenbinarycokernel/CRT/cohortstage."
+    }
+  ],
+  "arms": {
+    "reference": "R55normalA andsourceannihilator;R52normalbasis/table/nu;R58complete100functions",
+    "baseline": "reducedB/A80sourcequotient",
+    "candidate": "B/f^4 640-coordinatepresentation,operatorA4 and100normalnumeratorvectors",
+    "positive": [
+      "fullnormalbasis/sourceLiftidentity",
+      "nuintegralcoordinateidentity",
+      "AconjugateA=fI",
+      "all100coefficientinversionroundtrips",
+      "all100fullnormalfieldreconstructions",
+      "everycoefficientdenominatorunitmodf4",
+      "1 andA\u00b2normalcontrols",
+      "CRTscalarpolynomialidentitiesmodnorm^4"
+    ],
+    "negative": [
+      "changed100-vectorcontrolmustfailunitreconstruction"
+    ],
+    "A_A": {
+      "not_applicable_reason": "fixedexactproducts,no noisycomparison"
+    }
+  },
+  "variables": {
+    "fixed": [
+      "donorbytes",
+      "seed59",
+      "4GiBvirtual/1200s",
+      "oneSingularFLINTthread",
+      "32normalbasisvectors",
+      "fdegree5 fourthpowerdegree20",
+      "all100numerators"
+    ],
+    "measured": [
+      "binaryhash",
+      "nativeUTC",
+      "exit/errors"
+    ],
+    "statistical": "notapplicable"
+  },
+  "randomization": {
+    "method": "fixed",
+    "reason": "exhaustive prescribed polynomial identities",
+    "seeds": [
+      59
+    ]
+  },
+  "blinding": {
+    "method": "none",
+    "reason": "exactpredeclaredproducts"
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": "notapplicable"
+  },
+  "metrics": [
+    "fullnormal-sourceidentities",
+    "100coefficienttransportcolumns",
+    "3200denominatorunits",
+    "640presentationcoordinates",
+    "allsourcegenerators",
+    "all4CRTpolynomialidentities"
+  ],
+  "execution": {
+    "launcher": "REPLAY_CAS.sh data59-01 DATA59.sing DATA59_ALL_CHECKS_PASS",
+    "timeout_seconds": 1200,
+    "virtual_KiB": 4194304,
+    "threads": 1,
+    "seed": 59,
+    "queue": "one mathematical job atonce",
+    "checkpoint": "immutable raw sources,logs,exit,binaryhash,tar",
+    "source_gate": "sixexecutedfiles matchGit;all donor hashes",
+    "backend": "existing user-authorized manual local exact algebra; no EKS submission"
+  },
+  "stopping": {
+    "accepted": "exit0,exactmarker,no nativeerrorlines,allprescribedchecks",
+    "failure": "retain errors/caps/partials;freeze repairbeforefreshattempt",
+    "no_duplicate": "reconcilelivehandlebeforeretry"
+  },
+  "decision": {
+    "accept": "exit0,exactmarker,no nativeerrorlines,allpredeclaredsourceproducts",
+    "failure": "preserveeverycap/error/partial;freezearepairbeforefreshattempt",
+    "scope": "normalA4dataonly;full640rank320/cokernel/CRT/all18patternsnext"
+  },
+  "analysis": {
+    "kind": "exactpolynomialmatrix/rationalcoefficienttransportandbinarypresentation",
+    "comparative": false,
+    "precision": "exact,no seriestruncationinthisstage"
+  },
+  "literature": [
+    {
+      "source": "R55QUOTIENT55source-annihilator;R52CLOSURE52/table/compact/nu;R50RR_PIDparameterinversion;R58complete100andNEXT",
+      "use": "actualnormalbasisandcoordinatebridge,avoidingunnormalizedlambda-jets"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Singular/Singular/spielwiese/doc/reference.doc",
+      "use": "nativepolynomial/rationalcoefficientmapping,unitlifts;officialmanualwebsiteinaccessible;reusealreadycheckedinverseParameterprocedure"
+    }
+  ],
+  "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
+  "version": 1,
+  "amendment": {
+    "before_affected_data": true,
+    "reason": "newR59;R58sealed;fullnormalA4source-data assembly beforebinary640/320 quotient andall18stablepatterns"
+  }
+}

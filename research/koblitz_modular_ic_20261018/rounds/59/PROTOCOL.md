@@ -1,0 +1,9 @@
+# R59 normal A4 source data, frozen before data
+
+Continue existing manual local exact mathematics with seed59,4GiBvirtual,1200seconds per nativeinvocation,oneSingular/FLINTthread andone mathematicaljob. Mathematical implementation Rust/Singular/Lean only;Python/shell forliteralassembly/hash/rendering only. No newEKS/Diem/freezer/claim/delegation/merge/retarget/auto-mergeaction. R27-R58science immutable.
+
+Stage1:bind actualnormalB basis32,sourceLift,multiplicationtable,nu andAannihilator. WorkoverF2[z] withf=z5+z2+1,modf4=z20+z8+1. Exportfull640-coordinateoperatorsA,A4,z,V,lambda,nu,b,normalunit andall100R58numeratorsf (notf/A²). Transport currentfieldparameteru toz=1/u with the retained exactR50 inverseParameterprocedure andV_old=z²*v_current. Checkeverycoefficientroundtrip,fullnormalfieldmapH*normalF=D*canonicalF,denominatorunitsmodf4 andsourcecontrols1,A². Nativepolynomialbitsare data,not polynomialmoduleoperations. Keepall4CRTnormlabels fromR55,withidempotentfourthpowersverifiedmodnorm80^4. Wrongnormalcontrolmustfail.
+
+Subsequentstage,freezebeforeitsdata:exactbinary640cokernelofA4,rank320,fullE/G/Hidentities;allinducedmultiplications,nilpotentA ranks320/240/160/80/0,CRTfourblocks80;complete18stableO/Tpatterns withvanishing4atT,2outsideO/T. Requirekernel0or1orstopgeometryaudit. All18cohortmembersmustberecorded. For eachsurvivingx0,all31F32scalars andbothordinarysigns remainauthorized,nextASstage. Do notshrinkbroaderF32support/general500-bitcompiler/originalquotientgeometry/11action/reverse/largersourcelanes.
+
+Acceptanceexit0,exactmarker,noquestion-markerrors;preserveallfailed/cappedrawcopies andfreezechangesbeforefreshattempts. Noacceptedproducerrerunforpublication. Fixedexhaustiveproducts:A/A,statisticalpower/randomization/blindingnotapplicable;walltimestampscustodydiagnosticsonly. Canonicalprotocolcheckerabsentfromselectedindexes;manualrecorddoesnotclaimschema-validation.
