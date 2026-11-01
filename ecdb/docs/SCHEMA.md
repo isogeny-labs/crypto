@@ -231,6 +231,35 @@ Other polynomials sit beside the object they define:
 - Roles: `ecdb_reader` has SELECT only. `ecdb_writer` has INSERT and UPDATE
   but no DELETE.
 
+### Factor bases of the IC work (`0011`)
+
+- `ec.factor_base` holds one row per factor base, under the id its
+  producer gave it:
+  - `fb1`: ecbench FB1, a point set. `digest_verified` says whether ecdb
+    recomputed the id from its preimage `{schema, curve, family, params,
+    columns, signed_points, points_sha256}`.
+  - `fbarchive`: the cryptanalysis archive digest, keyed by that repo's EC1.
+    Its `kb1` EC1 form does not resolve to ecdb curves, so `curve_id` stays
+    NULL.
+  - `spec`: FBS1, an ecdb id over `{curve, family, params}`, for results
+    that never materialised a point set (large-prime receipts, SECG small-x).
+- `ec.factor_base_alias` holds other names: plug-in strings, catalog ids,
+  store paths, PS1 labels, cited digests and file digests.
+- `ec.factor_base_point` holds the points, where a dump exists.
+- `ec.factor_base_measurement` holds FBM1 configurations: curve × FB1 ×
+  oracle × solver × linalg × instrument. Each is rebuilt the way
+  `ecbench::fbm::config_from_ic_method` builds it and re-hashed.
+- `ec.ecbench_run.factor_base_id`, `fb_id` and `fbm_id` link IC runs to
+  their factor base and configuration.
+- `ec.factor_base_result` holds results outside ecbench.
+- `ec.v_factor_base_result` is the union of runs and results. A run is
+  `solved` when it was verified and matched its target.
+- `ec.v_factor_base_summary` has one row per base: size, result count,
+  solved count, best and median solved S, and largest relations, rank and
+  yield.
+- `ec.ic_board_row.factor_base_id` links a leaderboard row whose
+  `factor_base` names an FB1 id.
+
 ## 4. Coverage of the brief
 
 | Asked for | Where it lives |
@@ -322,6 +351,21 @@ These tables exist and still wait for a producer:
   `ec_curvedata` / `ec_nfcurves` exports);
 - `field_embedding` (the subfield constructions);
 - division polynomials over binary and extension fields, and l > 5.
+
+**Factor bases** (`ecdb import factor-bases`, `src/import/factor_bases.rs`), loaded into a full copy of the deployed database:
+
+| Table | Rows |
+|:--|:--|
+| `factor_base`, scheme `fb1` | 11,019. These are 11,016 from ecbench records plus 3 catalog dumps. Every FB1 id was recomputed from its preimage: 11,019 match and none fail. 10,968 link to an ecdb curve. |
+| `factor_base`, scheme `fbarchive` | 2,682, from the cryptanalysis archive index (2,685 rows, 3 repeated digests). They are kept unlinked: the archive's `kb1` EC1 form names no ecdb curve. |
+| `factor_base`, scheme `spec` | 213 FBS1 constructions, from large-prime receipts and SECG small-x. 151 link to a curve; the rest are toy and unregistered curves. |
+| `factor_base_measurement` | 535 FBM1 configurations. All 535 recomputed to the recorded id. |
+| `ecbench_run.factor_base_id` | 219,726 of the 219,915 runs that carry an FB1 id. The other 189 belong to records that `ec.ecbench_run` does not hold. |
+| `factor_base_result` | 557 large-prime cells (450 solved) and 257 SECG small-x yields |
+| `factor_base_point` | 1,590 points from the catalog dumps |
+| `factor_base_alias` | 13,726 aliases: plug-in strings, catalog ids, store paths, archive aliases, file digests |
+
+The leaderboard's `factor_base` fields are recipe links, not FB1 records, so no `ic_board_row` links yet.
 
 ## 6. Query recipes
 

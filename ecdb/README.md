@@ -104,10 +104,11 @@ record it refused, with the reason.
 | `GET /v1/polynomials/{sha256}` | the content-addressed polynomial store |
 | `GET /v1/modular-polynomials?level=&coefficients=` | Phi_l over Z, l = 2..19 |
 | `GET /v1/class-polynomials`, `GET /v1/summation-polynomials` | H_D for class number one; Semaev S_2, S_3 |
+| `GET /v1/factor-bases`, `GET /v1/factor-bases/{key}`, `GET /v1/factor-bases/{key}/results?points=` | factor bases of the IC work (FB1, FBM1, archive and FBS1 spec ids) with their sizes, aliases, measurement configurations, results and points |
 | `POST /v1/sql` | one read-only query |
 | `GET /v1/export`, `GET /v1/export/{table}?offset=&limit=` | bulk export for mirrors: the manifest (tables, copyable columns, primary keys, exact row counts), then gzipped COPY-text pages in primary-key order, at most 4 MiB each (413 asks for a smaller `limit`) |
 | `POST /v1/evidence`, `POST /v1/isogenies` | token-gated agent writes |
-| `POST /mcp` | MCP (streamable HTTP, JSON responses, stateless): eleven tools over the routes above |
+| `POST /mcp` | MCP (streamable HTTP, JSON responses, stateless): twelve tools over the routes above |
 
 Integers beyond 2^53 come back as decimal strings. Unknown values are
 `null` with a status, never 0. An ambiguous name returns 409 with the

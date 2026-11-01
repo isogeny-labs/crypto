@@ -1,0 +1,37 @@
+import FastQuotientShape
+import FastCRTInterpolationControls
+set_option autoImplicit false
+namespace FastQuotientControls
+open Polynomial FastCRT
+
+theorem fixture_degree : FastCRTInterpolationControls.fixture.natDegree=5 := by
+ have h1 : ((X:ℚ[X])^5-X^4).natDegree=5 := by
+  rw [natDegree_sub_eq_left_of_natDegree_lt (by simp)];simp
+ have h2 : ((X:ℚ[X])^5-X^4-X^3).natDegree=5 := by
+  rw [natDegree_sub_eq_left_of_natDegree_lt (by rw [h1];simp),h1]
+ unfold FastCRTInterpolationControls.fixture
+ rw [natDegree_add_eq_left_of_natDegree_lt (by rw [h2];simp),h2]
+
+theorem complete_source_quotient :
+ ∃ q : ℚ[X], FastCRTInterpolationControls.fixture-(interpolant 0 0 0 1 0 1 1 1)^2=
+ (FastCRT.support 0 0*FastCRT.support 0 1)*q ∧ q.natDegree=2 ∧ q.leadingCoeff = -1 := by
+ have h := source_quotient_exists (0:ℚ) 0 0 1 0 1 1 1 FastCRTInterpolationControls.fixture
+  (by norm_num [norm]) (by norm_num [slopeOne]) fixture_degree
+  (show FastCRT.support 0 0 ∣ FastCRTInterpolationControls.fixture-(delta 0 1)^2 from by
+   refine ⟨X^3-X^2-X,?_⟩
+   simp only [FastCRTInterpolationControls.fixture,delta,FastCRT.support,map_zero,map_one]
+   ring)
+  (show FastCRT.support 0 1 ∣ FastCRTInterpolationControls.fixture-(delta 1 1)^2 from by
+   refine ⟨X^3-X^2-2*X,?_⟩
+   simp only [FastCRTInterpolationControls.fixture,delta,FastCRT.support,map_zero,map_one]
+   ring)
+ norm_num [norm,slopeOne] at h
+ exact h
+
+theorem nonunit_inverse_lead : (-(3/2:ℚ)^2)*(-(2/3:ℚ)^2)=1 :=
+ inverse_lead_identity 3 2 (by norm_num) (by norm_num)
+
+theorem missing_minus_fails : ((3/2:ℚ)^2)*(-(2/3:ℚ)^2) ≠ 1 := by norm_num
+
+theorem sextic_cancellation : ((X:ℚ[X])^6-(X^3)^2)=0 := by ring
+end FastQuotientControls
