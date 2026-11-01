@@ -53,9 +53,10 @@ identities and rejects a changed kernel column.
 
 The actual restricted involution has N=sigma+I with N²=0 and rank10,
 so its fixed kernel has dimension14 and fixed space modulo trace image
-has dimension4. TRACE57 is the frozen investigation of explicit complete
-splitting, all source substitution identities and actual representatives;
-its terminal result and constant1 trace membership are recorded in results.json.
+has dimension4. TRACE57 certifies explicit complete splitting, all24 source substitution
+identities, four actual fixed functions and ten actual trace preimages.
+Both1 andA are traces in L(D); actual preimages are saved. Its terminal
+result is recorded in results.json.
 The four directions are candidates to test, not an identification with the
 intended modular factor or with RR special cohomology.
 
