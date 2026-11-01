@@ -1,0 +1,49 @@
+FINDING: schema: <root>: Additional properties are not allowed ('analysis', 'purpose', 'stopping' were unexpected)
+FINDING: schema: <root>: 'protocol_id' is a required property
+FINDING: schema: <root>: 'created' is a required property
+FINDING: schema: <root>: 'repository' is a required property
+FINDING: schema: <root>: 'question' is a required property
+FINDING: schema: <root>: 'controls' is a required property
+FINDING: schema: <root>: 'measurement' is a required property
+FINDING: schema: <root>: 'stopping_rules' is a required property
+FINDING: schema: <root>: 'decision_rule' is a required property
+FINDING: schema: <root>: 'analysis_plan' is a required property
+FINDING: schema: <root>: 'inadmissible' is a required property
+FINDING: schema: <root>: 'amendments' is a required property
+FINDING: schema: arms: {'aa': {'not_applicable_reason': 'No timed or statistical claim'}, 'baseline': {'not_applicable_reason': 'No before/after metric'}, 'candidate': {'arities': [2], 'engine': 'native dataset enumerate', 'families': ['koblitz', 'binary', 'prime'], 'field_bits': [24, 25], 'twists': [False, True]}, 'negative_control': {'not_applicable_reason': 'No statistical null claim'}, 'positive_control': {'not_applicable_reason': 'This functional replay claim checks the known-answer identity on every generated cell; no decomposition detector is being evaluated'}, 'reference': {'not_applicable_reason': 'Functional integration check; no algorithm comparison'}} is not of type 'array'
+FINDING: schema: claims/0: Additional properties are not allowed ('statement' was unexpected)
+FINDING: schema: claims/0: 'text' is a required property
+FINDING: schema: claims/0: 'decided_by' is a required property
+FINDING: schema: execution: Additional properties are not allowed ('cloud_budget', 'max_cases', 'memory_mib', 'seconds_per_case', 'trace_mib', 'work_limit' were unexpected)
+FINDING: schema: execution: 'timeout_seconds' is a required property
+FINDING: schema: execution: 'retries' is a required property
+FINDING: schema: execution/backend: 'local diagnostic' is not one of ['local', 'taskq', 'isolab', 'isolab-k8s', 'spotlab', 'spot-system', 'ephemeral', 'modal', 'runpod', 'cairn', 'slurm', 'manual', 'mixed']
+FINDING: schema: execution/checkpoint: 'native per-cell durable result; no infrastructure retry; stop on a persistence or replay error' is not of type 'object'
+FINDING: schema: freeze: 'commit' is a required property
+FINDING: schema: literature/0: Additional properties are not allowed ('role', 'source' were unexpected)
+FINDING: schema: literature/0: 'ref' is a required property
+FINDING: schema: literature/0: 'provenance' is a required property
+FINDING: schema: literature/0: 'claim' is a required property
+FINDING: schema: literature/1: Additional properties are not allowed ('role', 'source' were unexpected)
+FINDING: schema: literature/1: 'ref' is a required property
+FINDING: schema: literature/1: 'provenance' is a required property
+FINDING: schema: literature/1: 'claim' is a required property
+FINDING: schema: literature/2: Additional properties are not allowed ('role', 'source' were unexpected)
+FINDING: schema: literature/2: 'ref' is a required property
+FINDING: schema: literature/2: 'provenance' is a required property
+FINDING: schema: literature/2: 'claim' is a required property
+FINDING: schema: metrics: [{'aggregation': 'all 12 planned cells', 'kind': 'categorical', 'name': 'attempt_status', 'source': 'cell result and native dataset verify'}, {'aggregation': 'per cell', 'kind': 'counted', 'name': 'retained_artifacts', 'source': 'cell artifact manifest', 'unit': 'files'}, {'aggregation': 'per cell; null if no complete native counter', 'kind': 'counted', 'name': 'complete_candidate_tests', 'source': 'native enumerate telemetry', 'unit': 'candidates'}] is not of type 'object'
+FINDING: schema: randomization: Additional properties are not allowed ('seed_rule' was unexpected)
+FINDING: schema: randomization: 'arm_order' is a required property
+FINDING: schema: randomization: 'seed_derivation' is a required property
+FINDING: schema: randomization: 'instance_sampling' is a required property
+FINDING: schema: randomization/blinding: 'not applicable; no arm comparison' is not of type 'object'
+FINDING: schema: sample_size: Additional properties are not allowed ('rationale' was unexpected)
+FINDING: schema: sample_size: 'power' is a required property
+FINDING: schema: sample_size: 'preflight_runtime' is a required property
+FINDING: schema: variable_ledger: Additional properties are not allowed ('binary_sha256', 'host', 'inputs', 'order', 'source_commit', 'threads', 'wall_time' were unexpected)
+FINDING: schema: variable_ledger: 'independent' is a required property
+FINDING: schema: variable_ledger: 'factors' is a required property
+FINDING: schema: variable_ledger: 'comparisons' is a required property
+FINDING: schema: variable_ledger: 'crosses_map' is a required property
+FAIL: experiment.protocol/v1 research/ml_dataset_n24_n25_20261101/protocol.json (48 finding(s))
