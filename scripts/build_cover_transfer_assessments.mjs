@@ -544,7 +544,7 @@ const resultTemplates = {
     rationale:
       "The fixture checks a nonidentity G with [29]G=O; primality of 29 proves exact source order 29.",
     evidence_refs: [
-      "src/binary_ecc/cover_transfer.rs#subgroup_status_and_arbitrary_pushforward_boundary",
+      "src/binary_ecc/cover_transfer.rs#subgroup_status_general_pushforward_and_projector",
       "research/hyperelliptic_cover_infrastructure_20261006/evidence.json#subgroup_transfer",
     ],
   },
@@ -555,7 +555,7 @@ const resultTemplates = {
     rationale:
       "The image is nonidentity and is killed by the prime 29, hence its exact order is 29.",
     evidence_refs: [
-      "src/binary_ecc/cover_transfer.rs#subgroup_status_and_arbitrary_pushforward_boundary",
+      "src/binary_ecc/cover_transfer.rs#subgroup_status_general_pushforward_and_projector",
     ],
   },
   "map.f2m7-geometry.supported": {
@@ -1413,7 +1413,7 @@ async function buildLedger() {
         },
         evidence_additions: [
           "research/hyperelliptic_cover_infrastructure_20261006/evidence.json#subgroup_transfer",
-          "src/binary_ecc/cover_transfer.rs#subgroup_status_and_arbitrary_pushforward_boundary",
+          "src/binary_ecc/cover_transfer.rs#subgroup_status_general_pushforward_and_projector",
         ],
         boundary:
           "Exact order-29 evidence upgrades only this triple's numeric source- and image-order claims; arbitrary Jacobian recovery remains unknown.",
