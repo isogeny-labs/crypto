@@ -1,0 +1,24 @@
+import WordAfter
+set_option autoImplicit false
+namespace SignedWordControls
+open SignedWord
+
+def fixture : Anchored 2 := ⟨⟨id,fun _=>ident⟩,fun i=>if i=0 then some (0,0) else none⟩
+theorem opposite_answer : (sameRoot 7 fixture 1 1 (-1) 1 1).2=.answer 6 := by decide
+theorem consistent_zero : (sameRoot 7 fixture 1 1 (-1) 0 0).2=.none := by decide
+theorem inconsistent_zero : (sameRoot 7 fixture 1 1 (-1) 1 0).2=.inconsistent := by decide
+theorem positive_anchor : (sameRoot 7 fixture 1 1 1 4 0).1.fixed 1=some (2,0) := by decide
+theorem negative_anchor : (sameRoot 7 fixture 1 (-1) (-1) 4 0).1.fixed 1=some (5,0) := by decide
+theorem existing_anchor_answer : (sameRoot 7 fixture 0 1 1 2 2).2=.answer 6 := by decide
+theorem sign_zero_not_valid : ¬Sign (0:Int8) := by norm_num [Sign]
+
+def chain : State 2 := ⟨fun _=>0,fun i=>if i=0 then ident else ⟨-1,2,3⟩⟩
+def found : Pot := compose 7 (chain.pot 1) ident
+def compressed : State 2 := compress chain 1 0 found
+theorem actual_find : Run 7 chain 1 compressed 0 found :=
+ Run.step chain chain 1 0 ident (by decide) (Run.root chain 0 (by decide))
+theorem actual_second_find : Run 7 compressed 0 compressed 0 ident := Run.root compressed 0 (by decide)
+theorem found_coefficients : found.s= -1 ∧ found.a=2 ∧ found.b=3 := by decide
+def anchoredChain : Anchored 2 := ⟨chain,fun i=>if i=0 then some (0,0) else none⟩
+theorem word_after_answer : (after 7 anchoredChain compressed 0 found ident 1 1 1 4).2=.answer 1 := by decide
+end SignedWordControls
