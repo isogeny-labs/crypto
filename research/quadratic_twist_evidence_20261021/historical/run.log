@@ -1,0 +1,32 @@
+Started UTC: 2026-10-21T05:58:27.657211+00:00
+Python: 3.12.14
+SymPy: 1.14.0
+Experiment SHA-256: e7c4e31fab0a5de1844d5c160c08a19c3d785d62bdab9e7b34781cd1b47fbe8e
+Command: ["/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python", "-u", "/workspace/twist_experiments/experiments.py", "--out", "/tmp/twist-experiments-1rnu7psm"]
+exhaustive p=5: 20 nonsingular models checked
+exhaustive p=7: 42 nonsingular models checked
+exhaustive p=11: 110 nonsingular models checked
+exhaustive p=13: 156 nonsingular models checked
+exhaustive p=17: 272 nonsingular models checked
+exhaustive p=19: 342 nonsingular models checked
+trace-zero p=5, n=2: kernel order 3, dimension 1
+trace-zero p=5, n=3: kernel order 12, dimension 2
+trace-zero p=5, n=5: kernel order 341, dimension 4
+trace-zero p=7, n=3: kernel order 76, dimension 2
+pairing/index calculus p=43, r=11: all 11 logs recovered
+pairing/index calculus p=67, r=17: all 17 logs recovered
+pairing/index calculus p=211, r=53: all 53 logs recovered
+{
+  "curves": 942,
+  "s3_triples": 4188162,
+  "pairing_logs": 81,
+  "seconds": 29.62
+}
+Results: /tmp/twist-experiments-1rnu7psm/results.json
+Experiment exit code: 0
+Scientific results match previous reference: True
+Command: ["/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python", "/workspace/twist_experiments/report.py"]
+/workspace/twist_experiments/report.html
+Verified summary: {"complete_dlp_recoveries": 81, "curve_models": 942, "s3_triples": 4188162, "s4_quadruples": 113342}
+Finished UTC: 2026-10-21T05:58:57.401443+00:00
+Runner exit code: 0

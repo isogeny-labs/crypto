@@ -6,11 +6,15 @@
 //! ICV1 (`docs/curves/ICV1.md`) names a curve model, EC1
 //! (`docs/curve-identities.md`) a representation with subgroup and generator.
 
+#![recursion_limit = "512"]
+
 pub mod api;
 pub mod db;
+pub mod ec;
 pub mod field;
 pub mod import;
 pub mod json;
 pub mod lambda;
 pub mod math;
 pub mod migrate;
+pub mod sync;

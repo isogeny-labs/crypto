@@ -1,0 +1,621 @@
+'PencilWordRefinement.FullMixed.source_order_total_valid' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PencilWordRefinement.FullMixed.none_excluded' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PencilWordRefinement.FullMixed.returned_payload_valid' depends on axioms: [propext, Classical.choice, Quot.sound]
+theorem PencilWordRefinement.FullMixed.source_order_total_valid : ∀ (p : UInt64) [inst : Fact (Nat.Prime p.toNat)],
+  5 ≤ p.toNat →
+    p.toNat < 2 ^ 31 →
+      ∀ (a0 a1 a2 a3 : UInt64) (a : PencilWordRefinement.WordD1) (b : PencilWordRefinement.WeightedWord),
+        a0.toNat < p.toNat →
+          a1.toNat < p.toNat →
+            a2.toNat < p.toNat →
+              a3.toNat < p.toNat →
+                PencilWordRefinement.WordD1.canonical p a →
+                  PencilWordRefinement.WeightedWord.canonical p b →
+                    a.z ≠ 0 →
+                      a.w ≠ 0 →
+                        b.z ≠ 0 →
+                          b.w ≠ 0 →
+                            PencilWordRefinement.WordD1.normalizedValid p
+                                (MixedGeneric.curve ↑a0.toNat ↑a1.toNat ↑a2.toNat ↑a3.toNat) a →
+                              PencilWordRefinement.WeightedWord.normalizedValid p
+                                  (MixedGeneric.curve ↑a0.toNat ↑a1.toNat ↑a2.toNat ↑a3.toNat) b →
+                                ∃ v tag,
+                                  PencilWordRefinement.FullMixed.dispatch p a0 a1 a2 a3 a b = (some v, tag) ∧
+                                    PencilWordRefinement.FullMixed.valid p
+                                        (MixedGeneric.curve ↑a0.toNat ↑a1.toNat ↑a2.toNat ↑a3.toNat) v ∧
+                                      tag ≠ PencilWordRefinement.FullMixed.Tag.mismatch :=
+fun p [Fact (Nat.Prime p.toNat)] hfive hbound a0 a1 a2 a3 a b h0 h1 h2 h3 ha hb haz haw hbz hbw hva hvb =>
+  And.casesOn
+    (PencilWordRefinement.mixed_word_branch_invariant p (MixedGeneric.curve ↑a0.toNat ↑a1.toNat ↑a2.toNat ↑a3.toNat) a b
+      hfive hbound ha hb haz haw hbz hbw hva hvb)
+    fun hn hcancel =>
+    if hk : (PencilWordRefinement.mixedWords p a b).k = 0 then
+      if hc :
+          (PencilWordRefinement.mixedWords p a b).l =
+            PencilWordRefinement.wordNeg p (PencilWordRefinement.mixedWords p a b).ry then
+        have cls :=
+          of_eq_true
+            (Eq.trans
+              (congrFun'
+                (congrArg Eq
+                  (Eq.trans
+                    (ite_congr
+                      (Eq.trans (congrFun' (congrArg Ne hk) 0) (Eq.trans (congrArg Not (eq_self 0)) not_true_eq_false))
+                      (fun a => Eq.refl MixedCancellation.Branch.common) fun a_1 =>
+                      Eq.trans
+                        (ite_congr
+                          (Eq.trans
+                            (congrFun' (congrArg Eq hc)
+                              (PencilWordRefinement.wordNeg p (PencilWordRefinement.mixedWords p a b).ry))
+                            (eq_self (PencilWordRefinement.wordNeg p (PencilWordRefinement.mixedWords p a b).ry)))
+                          (fun a => Eq.refl MixedCancellation.Branch.cancellation) fun a_2 =>
+                          ite_congr (congrFun' (congrArg Ne hc) (PencilWordRefinement.mixedWords p a b).ry)
+                            (fun a => Eq.refl MixedCancellation.Branch.mismatch) fun a =>
+                            Eq.refl MixedCancellation.Branch.positiveCoincidence)
+                        (ite_true MixedCancellation.Branch.cancellation
+                          (if
+                              ¬PencilWordRefinement.wordNeg p (PencilWordRefinement.mixedWords p a b).ry =
+                                  (PencilWordRefinement.mixedWords p a b).ry then
+                            MixedCancellation.Branch.mismatch
+                          else MixedCancellation.Branch.positiveCoincidence)))
+                    (ite_false MixedCancellation.Branch.common MixedCancellation.Branch.cancellation)))
+                MixedCancellation.Branch.cancellation)
+              (eq_self MixedCancellation.Branch.cancellation));
+        Exists.intro (Sum.inl (PencilWordRefinement.mixedWords p a b).point)
+          (Exists.intro PencilWordRefinement.FullMixed.Tag.cancellation
+            ⟨of_eq_true
+                (Eq.trans
+                  (congrFun'
+                    (congrArg Eq
+                      (Eq.trans
+                        (ite_congr
+                          (Eq.trans (congrFun' (congrArg Ne hk) 0)
+                            (Eq.trans (congrArg Not (eq_self 0)) not_true_eq_false))
+                          (fun a_1 =>
+                            Eq.refl
+                              (Option.map Sum.inr (PencilWordRefinement.genericWordDispatch p a b a3),
+                                PencilWordRefinement.FullMixed.Tag.common))
+                          fun a_1 =>
+                          Eq.trans
+                            (ite_congr
+                              (Eq.trans
+                                (congrFun' (congrArg Eq hc)
+                                  (PencilWordRefinement.wordNeg p (PencilWordRefinement.mixedWords p a b).ry))
+                                (eq_self (PencilWordRefinement.wordNeg p (PencilWordRefinement.mixedWords p a b).ry)))
+                              (fun a_2 =>
+                                Eq.refl
+                                  (some (Sum.inl (PencilWordRefinement.mixedWords p a b).point),
+                                    PencilWordRefinement.FullMixed.Tag.cancellation))
+                              fun a_2 =>
+                              ite_congr (congrFun' (congrArg Ne hc) (PencilWordRefinement.mixedWords p a b).ry)
+                                (fun a => Eq.refl (none, PencilWordRefinement.FullMixed.Tag.mismatch)) fun a_3 =>
+                                Eq.refl
+                                  (if
+                                      PencilWordRefinement.positiveXz p a b =
+                                        (PencilWordRefinement.mixedWords p a b).point.x then
+                                    (some (Sum.inr (PencilWordRefinement.tripleWords p a1 a2 a3 a)),
+                                      PencilWordRefinement.FullMixed.Tag.tripling)
+                                  else
+                                    (Option.map Sum.inr
+                                        (PencilWordRefinement.genericWordDispatch p
+                                          (PencilWordRefinement.mixedWords p a b).point
+                                          (PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a) a3),
+                                      PencilWordRefinement.FullMixed.Tag.positiveDistinct)))
+                            (ite_true
+                              (some (Sum.inl (PencilWordRefinement.mixedWords p a b).point),
+                                PencilWordRefinement.FullMixed.Tag.cancellation)
+                              (if
+                                  ¬PencilWordRefinement.wordNeg p (PencilWordRefinement.mixedWords p a b).ry =
+                                      (PencilWordRefinement.mixedWords p a b).ry then
+                                (none, PencilWordRefinement.FullMixed.Tag.mismatch)
+                              else
+                                if
+                                    PencilWordRefinement.positiveXz p a b =
+                                      (PencilWordRefinement.mixedWords p a b).point.x then
+                                  (some (Sum.inr (PencilWordRefinement.tripleWords p a1 a2 a3 a)),
+                                    PencilWordRefinement.FullMixed.Tag.tripling)
+                                else
+                                  (Option.map Sum.inr
+                                      (PencilWordRefinement.genericWordDispatch p
+                                        (PencilWordRefinement.mixedWords p a b).point
+                                        (PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a) a3),
+                                    PencilWordRefinement.FullMixed.Tag.positiveDistinct))))
+                        (ite_false
+                          (Option.map Sum.inr (PencilWordRefinement.genericWordDispatch p a b a3),
+                            PencilWordRefinement.FullMixed.Tag.common)
+                          (some (Sum.inl (PencilWordRefinement.mixedWords p a b).point),
+                            PencilWordRefinement.FullMixed.Tag.cancellation))))
+                    (some (Sum.inl (PencilWordRefinement.mixedWords p a b).point),
+                      PencilWordRefinement.FullMixed.Tag.cancellation))
+                  (eq_self
+                    (some (Sum.inl (PencilWordRefinement.mixedWords p a b).point),
+                      PencilWordRefinement.FullMixed.Tag.cancellation))),
+              ⟨hcancel cls, of_decide_eq_true (id (Eq.refl true))⟩⟩)
+      else
+        have hp :=
+          Decidable.byContradiction fun hm =>
+            hn
+              (Eq.mpr
+                (id
+                  (congrFun'
+                    (congrArg Eq
+                      (Eq.trans
+                        (ite_congr
+                          (Eq.trans (congrFun' (congrArg Ne hk) 0)
+                            (Eq.trans (congrArg Not (eq_self 0)) not_true_eq_false))
+                          (fun a => Eq.refl MixedCancellation.Branch.common) fun a_1 =>
+                          ite_congr
+                            (Eq.refl
+                              ((PencilWordRefinement.mixedWords p a b).l =
+                                PencilWordRefinement.wordNeg p (PencilWordRefinement.mixedWords p a b).ry))
+                            (fun a => Eq.refl MixedCancellation.Branch.cancellation) fun a_2 =>
+                            Eq.refl
+                              (if
+                                  ¬(PencilWordRefinement.mixedWords p a b).l =
+                                      (PencilWordRefinement.mixedWords p a b).ry then
+                                MixedCancellation.Branch.mismatch
+                              else MixedCancellation.Branch.positiveCoincidence))
+                        (ite_false MixedCancellation.Branch.common
+                          (if
+                              (PencilWordRefinement.mixedWords p a b).l =
+                                PencilWordRefinement.wordNeg p (PencilWordRefinement.mixedWords p a b).ry then
+                            MixedCancellation.Branch.cancellation
+                          else
+                            if
+                                ¬(PencilWordRefinement.mixedWords p a b).l =
+                                    (PencilWordRefinement.mixedWords p a b).ry then
+                              MixedCancellation.Branch.mismatch
+                            else MixedCancellation.Branch.positiveCoincidence))))
+                    MixedCancellation.Branch.mismatch))
+                (Eq.mpr (id (congrArg (fun _a => _a = MixedCancellation.Branch.mismatch) (if_neg hc)))
+                  (of_eq_true
+                    (Eq.trans
+                      (congrFun'
+                        (congrArg Eq
+                          (ite_eq_left_of_eq_true MixedCancellation.Branch.mismatch
+                            MixedCancellation.Branch.positiveCoincidence
+                            (Eq.trans (congrArg Not (eq_false hm)) not_false_eq_true)))
+                        MixedCancellation.Branch.mismatch)
+                      (eq_self MixedCancellation.Branch.mismatch)))));
+        have cls :=
+          Eq.mpr
+            (id
+              (congrFun'
+                (congrArg Eq
+                  (Eq.trans
+                    (ite_congr
+                      (Eq.trans (congrFun' (congrArg Ne hk) 0) (Eq.trans (congrArg Not (eq_self 0)) not_true_eq_false))
+                      (fun a => Eq.refl MixedCancellation.Branch.common) fun a_1 =>
+                      ite_congr
+                        (Eq.refl
+                          ((PencilWordRefinement.mixedWords p a b).l =
+                            PencilWordRefinement.wordNeg p (PencilWordRefinement.mixedWords p a b).ry))
+                        (fun a => Eq.refl MixedCancellation.Branch.cancellation) fun a_2 =>
+                        Eq.refl
+                          (if
+                              ¬(PencilWordRefinement.mixedWords p a b).l =
+                                  (PencilWordRefinement.mixedWords p a b).ry then
+                            MixedCancellation.Branch.mismatch
+                          else MixedCancellation.Branch.positiveCoincidence))
+                    (ite_false MixedCancellation.Branch.common
+                      (if
+                          (PencilWordRefinement.mixedWords p a b).l =
+                            PencilWordRefinement.wordNeg p (PencilWordRefinement.mixedWords p a b).ry then
+                        MixedCancellation.Branch.cancellation
+                      else
+                        if ¬(PencilWordRefinement.mixedWords p a b).l = (PencilWordRefinement.mixedWords p a b).ry then
+                          MixedCancellation.Branch.mismatch
+                        else MixedCancellation.Branch.positiveCoincidence))))
+                MixedCancellation.Branch.positiveCoincidence))
+            (Eq.mpr (id (congrArg (fun _a => _a = MixedCancellation.Branch.positiveCoincidence) (if_neg hc)))
+              (of_eq_true
+                (Eq.trans
+                  (congrFun'
+                    (congrArg Eq
+                      (Eq.trans
+                        (ite_congr
+                          (Eq.trans
+                            (congrArg Not
+                              (Eq.trans (congrFun' (congrArg Eq hp) (PencilWordRefinement.mixedWords p a b).ry)
+                                (eq_self (PencilWordRefinement.mixedWords p a b).ry)))
+                            not_true_eq_false)
+                          (fun a => Eq.refl MixedCancellation.Branch.mismatch) fun a =>
+                          Eq.refl MixedCancellation.Branch.positiveCoincidence)
+                        (ite_false MixedCancellation.Branch.mismatch MixedCancellation.Branch.positiveCoincidence)))
+                    MixedCancellation.Branch.positiveCoincidence)
+                  (eq_self MixedCancellation.Branch.positiveCoincidence))));
+        if he : PencilWordRefinement.positiveXz p a b = (PencilWordRefinement.mixedWords p a b).point.x then
+          And.casesOn
+            (PencilWordRefinement.repeated_word_preserves p hfive hbound a0 a1 a2 a3 a b h1 h2 h3 ha hb haz haw hbz hbw
+              hva hvb hk hc he)
+            fun left right =>
+            And.casesOn right fun left right =>
+              And.casesOn right fun cc right =>
+                And.casesOn right fun cz right =>
+                  And.casesOn right fun cw cv =>
+                    Exists.intro (Sum.inr (PencilWordRefinement.tripleWords p a1 a2 a3 a))
+                      (Exists.intro PencilWordRefinement.FullMixed.Tag.tripling
+                        ⟨Eq.mpr
+                            (id
+                              (congrFun'
+                                (congrArg Eq
+                                  (Eq.trans
+                                    (ite_congr
+                                      (Eq.trans (congrFun' (congrArg Ne hk) 0)
+                                        (Eq.trans (congrArg Not (eq_self 0)) not_true_eq_false))
+                                      (fun a_1 =>
+                                        Eq.refl
+                                          (Option.map Sum.inr (PencilWordRefinement.genericWordDispatch p a b a3),
+                                            PencilWordRefinement.FullMixed.Tag.common))
+                                      fun a_1 =>
+                                      ite_congr
+                                        (Eq.refl
+                                          ((PencilWordRefinement.mixedWords p a b).l =
+                                            PencilWordRefinement.wordNeg p (PencilWordRefinement.mixedWords p a b).ry))
+                                        (fun a_2 =>
+                                          Eq.refl
+                                            (some (Sum.inl (PencilWordRefinement.mixedWords p a b).point),
+                                              PencilWordRefinement.FullMixed.Tag.cancellation))
+                                        fun a_2 =>
+                                        Eq.refl
+                                          (if
+                                              ¬(PencilWordRefinement.mixedWords p a b).l =
+                                                  (PencilWordRefinement.mixedWords p a b).ry then
+                                            (none, PencilWordRefinement.FullMixed.Tag.mismatch)
+                                          else
+                                            if
+                                                PencilWordRefinement.positiveXz p a b =
+                                                  (PencilWordRefinement.mixedWords p a b).point.x then
+                                              (some (Sum.inr (PencilWordRefinement.tripleWords p a1 a2 a3 a)),
+                                                PencilWordRefinement.FullMixed.Tag.tripling)
+                                            else
+                                              (Option.map Sum.inr
+                                                  (PencilWordRefinement.genericWordDispatch p
+                                                    (PencilWordRefinement.mixedWords p a b).point
+                                                    (PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a) a3),
+                                                PencilWordRefinement.FullMixed.Tag.positiveDistinct)))
+                                    (ite_false
+                                      (Option.map Sum.inr (PencilWordRefinement.genericWordDispatch p a b a3),
+                                        PencilWordRefinement.FullMixed.Tag.common)
+                                      (if
+                                          (PencilWordRefinement.mixedWords p a b).l =
+                                            PencilWordRefinement.wordNeg p
+                                              (PencilWordRefinement.mixedWords p a b).ry then
+                                        (some (Sum.inl (PencilWordRefinement.mixedWords p a b).point),
+                                          PencilWordRefinement.FullMixed.Tag.cancellation)
+                                      else
+                                        if
+                                            ¬(PencilWordRefinement.mixedWords p a b).l =
+                                                (PencilWordRefinement.mixedWords p a b).ry then
+                                          (none, PencilWordRefinement.FullMixed.Tag.mismatch)
+                                        else
+                                          if
+                                              PencilWordRefinement.positiveXz p a b =
+                                                (PencilWordRefinement.mixedWords p a b).point.x then
+                                            (some (Sum.inr (PencilWordRefinement.tripleWords p a1 a2 a3 a)),
+                                              PencilWordRefinement.FullMixed.Tag.tripling)
+                                          else
+                                            (Option.map Sum.inr
+                                                (PencilWordRefinement.genericWordDispatch p
+                                                  (PencilWordRefinement.mixedWords p a b).point
+                                                  (PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a) a3),
+                                              PencilWordRefinement.FullMixed.Tag.positiveDistinct)))))
+                                (some (Sum.inr (PencilWordRefinement.tripleWords p a1 a2 a3 a)),
+                                  PencilWordRefinement.FullMixed.Tag.tripling)))
+                            (Eq.mpr
+                              (id
+                                (congrArg
+                                  (fun _a =>
+                                    _a =
+                                      (some (Sum.inr (PencilWordRefinement.tripleWords p a1 a2 a3 a)),
+                                        PencilWordRefinement.FullMixed.Tag.tripling))
+                                  (if_neg hc)))
+                              (of_eq_true
+                                (Eq.trans
+                                  (congrFun'
+                                    (congrArg Eq
+                                      (Eq.trans
+                                        (ite_congr
+                                          (Eq.trans
+                                            (congrArg Not
+                                              (Eq.trans
+                                                (congrFun' (congrArg Eq hp) (PencilWordRefinement.mixedWords p a b).ry)
+                                                (eq_self (PencilWordRefinement.mixedWords p a b).ry)))
+                                            not_true_eq_false)
+                                          (fun a => Eq.refl (none, PencilWordRefinement.FullMixed.Tag.mismatch))
+                                          fun a_1 =>
+                                          Eq.trans
+                                            (ite_congr
+                                              (Eq.trans
+                                                (congrFun' (congrArg Eq he)
+                                                  (PencilWordRefinement.mixedWords p a b).point.x)
+                                                (eq_self (PencilWordRefinement.mixedWords p a b).point.x))
+                                              (fun a_2 =>
+                                                Eq.refl
+                                                  (some (Sum.inr (PencilWordRefinement.tripleWords p a1 a2 a3 a)),
+                                                    PencilWordRefinement.FullMixed.Tag.tripling))
+                                              fun a_2 =>
+                                              Eq.refl
+                                                (Option.map Sum.inr
+                                                    (PencilWordRefinement.genericWordDispatch p
+                                                      (PencilWordRefinement.mixedWords p a b).point
+                                                      (PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a) a3),
+                                                  PencilWordRefinement.FullMixed.Tag.positiveDistinct))
+                                            (ite_true
+                                              (some (Sum.inr (PencilWordRefinement.tripleWords p a1 a2 a3 a)),
+                                                PencilWordRefinement.FullMixed.Tag.tripling)
+                                              (Option.map Sum.inr
+                                                  (PencilWordRefinement.genericWordDispatch p
+                                                    (PencilWordRefinement.mixedWords p a b).point
+                                                    (PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a) a3),
+                                                PencilWordRefinement.FullMixed.Tag.positiveDistinct)))
+                                        (ite_false (none, PencilWordRefinement.FullMixed.Tag.mismatch)
+                                          (some (Sum.inr (PencilWordRefinement.tripleWords p a1 a2 a3 a)),
+                                            PencilWordRefinement.FullMixed.Tag.tripling))))
+                                    (some (Sum.inr (PencilWordRefinement.tripleWords p a1 a2 a3 a)),
+                                      PencilWordRefinement.FullMixed.Tag.tripling))
+                                  (eq_self
+                                    (some (Sum.inr (PencilWordRefinement.tripleWords p a1 a2 a3 a)),
+                                      PencilWordRefinement.FullMixed.Tag.tripling))))),
+                          ⟨⟨cc, ⟨cz, ⟨cw, cv⟩⟩⟩, of_decide_eq_true (id (Eq.refl true))⟩⟩)
+        else
+          And.casesOn
+            (PencilWordRefinement.positive_word_preserves p hfive hbound a0 a1 a2 a3 a b h0 h1 h2 h3 ha hb haz haw hbz
+              hbw hva hvb hk hc he)
+            fun left right =>
+            And.casesOn right fun hd right =>
+              And.casesOn right fun cc right =>
+                And.casesOn right fun cz right =>
+                  And.casesOn right fun cw cv =>
+                    have gd :=
+                      Eq.mp
+                        (congrFun'
+                          (congrArg Eq
+                            (Eq.trans
+                              (ite_congr
+                                (Eq.trans (congrFun' (congrArg Eq cls) MixedCancellation.Branch.positiveCoincidence)
+                                  (eq_self MixedCancellation.Branch.positiveCoincidence))
+                                (fun a_1 =>
+                                  Eq.trans
+                                    (ite_congr (eq_false he) (fun a => Eq.refl none) fun a_2 =>
+                                      Eq.refl
+                                        (PencilWordRefinement.genericWordDispatch p
+                                          (PencilWordRefinement.mixedWords p a b).point
+                                          (PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a) a3))
+                                    (ite_false none
+                                      (PencilWordRefinement.genericWordDispatch p
+                                        (PencilWordRefinement.mixedWords p a b).point
+                                        (PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a) a3)))
+                                fun a => Eq.refl none)
+                              (ite_true
+                                (PencilWordRefinement.genericWordDispatch p
+                                  (PencilWordRefinement.mixedWords p a b).point
+                                  (PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a) a3)
+                                none)))
+                          (some
+                            (PencilWordRefinement.genericWords p (PencilWordRefinement.mixedWords p a b).point
+                                (PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a) a3).payload))
+                        hd;
+                    Exists.intro
+                      (Sum.inr
+                        (PencilWordRefinement.genericWords p (PencilWordRefinement.mixedWords p a b).point
+                            (PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a) a3).payload)
+                      (Exists.intro PencilWordRefinement.FullMixed.Tag.positiveDistinct
+                        ⟨Eq.mpr
+                            (id
+                              (congrFun'
+                                (congrArg Eq
+                                  (Eq.trans
+                                    (ite_congr
+                                      (Eq.trans (congrFun' (congrArg Ne hk) 0)
+                                        (Eq.trans (congrArg Not (eq_self 0)) not_true_eq_false))
+                                      (fun a_1 =>
+                                        Eq.refl
+                                          (Option.map Sum.inr (PencilWordRefinement.genericWordDispatch p a b a3),
+                                            PencilWordRefinement.FullMixed.Tag.common))
+                                      fun a_1 =>
+                                      ite_congr
+                                        (Eq.refl
+                                          ((PencilWordRefinement.mixedWords p a b).l =
+                                            PencilWordRefinement.wordNeg p (PencilWordRefinement.mixedWords p a b).ry))
+                                        (fun a_2 =>
+                                          Eq.refl
+                                            (some (Sum.inl (PencilWordRefinement.mixedWords p a b).point),
+                                              PencilWordRefinement.FullMixed.Tag.cancellation))
+                                        fun a_2 =>
+                                        Eq.refl
+                                          (if
+                                              ¬(PencilWordRefinement.mixedWords p a b).l =
+                                                  (PencilWordRefinement.mixedWords p a b).ry then
+                                            (none, PencilWordRefinement.FullMixed.Tag.mismatch)
+                                          else
+                                            if
+                                                PencilWordRefinement.positiveXz p a b =
+                                                  (PencilWordRefinement.mixedWords p a b).point.x then
+                                              (some (Sum.inr (PencilWordRefinement.tripleWords p a1 a2 a3 a)),
+                                                PencilWordRefinement.FullMixed.Tag.tripling)
+                                            else
+                                              (Option.map Sum.inr
+                                                  (PencilWordRefinement.genericWordDispatch p
+                                                    (PencilWordRefinement.mixedWords p a b).point
+                                                    (PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a) a3),
+                                                PencilWordRefinement.FullMixed.Tag.positiveDistinct)))
+                                    (ite_false
+                                      (Option.map Sum.inr (PencilWordRefinement.genericWordDispatch p a b a3),
+                                        PencilWordRefinement.FullMixed.Tag.common)
+                                      (if
+                                          (PencilWordRefinement.mixedWords p a b).l =
+                                            PencilWordRefinement.wordNeg p
+                                              (PencilWordRefinement.mixedWords p a b).ry then
+                                        (some (Sum.inl (PencilWordRefinement.mixedWords p a b).point),
+                                          PencilWordRefinement.FullMixed.Tag.cancellation)
+                                      else
+                                        if
+                                            ¬(PencilWordRefinement.mixedWords p a b).l =
+                                                (PencilWordRefinement.mixedWords p a b).ry then
+                                          (none, PencilWordRefinement.FullMixed.Tag.mismatch)
+                                        else
+                                          if
+                                              PencilWordRefinement.positiveXz p a b =
+                                                (PencilWordRefinement.mixedWords p a b).point.x then
+                                            (some (Sum.inr (PencilWordRefinement.tripleWords p a1 a2 a3 a)),
+                                              PencilWordRefinement.FullMixed.Tag.tripling)
+                                          else
+                                            (Option.map Sum.inr
+                                                (PencilWordRefinement.genericWordDispatch p
+                                                  (PencilWordRefinement.mixedWords p a b).point
+                                                  (PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a) a3),
+                                              PencilWordRefinement.FullMixed.Tag.positiveDistinct)))))
+                                (some
+                                    (Sum.inr
+                                      (PencilWordRefinement.genericWords p (PencilWordRefinement.mixedWords p a b).point
+                                          (PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a) a3).payload),
+                                  PencilWordRefinement.FullMixed.Tag.positiveDistinct)))
+                            (Eq.mpr
+                              (id
+                                (congrArg
+                                  (fun _a =>
+                                    _a =
+                                      (some
+                                          (Sum.inr
+                                            (PencilWordRefinement.genericWords p
+                                                (PencilWordRefinement.mixedWords p a b).point
+                                                (PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a) a3).payload),
+                                        PencilWordRefinement.FullMixed.Tag.positiveDistinct))
+                                  (if_neg hc)))
+                              (of_eq_true
+                                (Eq.trans
+                                  (congrFun'
+                                    (congrArg Eq
+                                      (Eq.trans
+                                        (ite_congr
+                                          (Eq.trans
+                                            (congrArg Not
+                                              (Eq.trans
+                                                (congrFun' (congrArg Eq hp) (PencilWordRefinement.mixedWords p a b).ry)
+                                                (eq_self (PencilWordRefinement.mixedWords p a b).ry)))
+                                            not_true_eq_false)
+                                          (fun a => Eq.refl (none, PencilWordRefinement.FullMixed.Tag.mismatch))
+                                          fun a_1 =>
+                                          Eq.trans
+                                            (ite_congr (eq_false he)
+                                              (fun a_2 =>
+                                                Eq.refl
+                                                  (some (Sum.inr (PencilWordRefinement.tripleWords p a1 a2 a3 a)),
+                                                    PencilWordRefinement.FullMixed.Tag.tripling))
+                                              fun a_2 =>
+                                              congrFun' (congrArg Prod.mk (congrArg (Option.map Sum.inr) gd))
+                                                PencilWordRefinement.FullMixed.Tag.positiveDistinct)
+                                            (ite_false
+                                              (some (Sum.inr (PencilWordRefinement.tripleWords p a1 a2 a3 a)),
+                                                PencilWordRefinement.FullMixed.Tag.tripling)
+                                              (some
+                                                  (Sum.inr
+                                                    (PencilWordRefinement.genericWords p
+                                                        (PencilWordRefinement.mixedWords p a b).point
+                                                        (PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a)
+                                                        a3).payload),
+                                                PencilWordRefinement.FullMixed.Tag.positiveDistinct)))
+                                        (ite_false (none, PencilWordRefinement.FullMixed.Tag.mismatch)
+                                          (some
+                                              (Sum.inr
+                                                (PencilWordRefinement.genericWords p
+                                                    (PencilWordRefinement.mixedWords p a b).point
+                                                    (PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a) a3).payload),
+                                            PencilWordRefinement.FullMixed.Tag.positiveDistinct))))
+                                    (some
+                                        (Sum.inr
+                                          (PencilWordRefinement.genericWords p
+                                              (PencilWordRefinement.mixedWords p a b).point
+                                              (PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a) a3).payload),
+                                      PencilWordRefinement.FullMixed.Tag.positiveDistinct))
+                                  (eq_self
+                                    (some
+                                        (Sum.inr
+                                          (PencilWordRefinement.genericWords p
+                                              (PencilWordRefinement.mixedWords p a b).point
+                                              (PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a) a3).payload),
+                                      PencilWordRefinement.FullMixed.Tag.positiveDistinct))))),
+                          ⟨⟨cc, ⟨cz, ⟨cw, cv⟩⟩⟩, of_decide_eq_true (id (Eq.refl true))⟩⟩)
+    else
+      have fg := fun hzero =>
+        have hz := (PencilWordRefinement.generic_guard_decode p hfive hbound a b a3 ha hb h3).mpr hzero;
+        hk
+          (Eq.mp (congrArg (fun _a => _a = 0) (PencilWordRefinement.generic_outer_guard p hfive hbound a b a3 ha hb h3))
+            hz);
+      And.casesOn
+        (PencilWordRefinement.generic_word_preserves p (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) a3 a b hfive hbound ha hb h3
+          haz haw hbz hbw hva hvb fg)
+        fun hd right =>
+        And.casesOn right fun cc right =>
+          And.casesOn right fun cz right =>
+            And.casesOn right fun cw cv =>
+              Exists.intro (Sum.inr (PencilWordRefinement.genericWords p a b a3).payload)
+                (Exists.intro PencilWordRefinement.FullMixed.Tag.common
+                  ⟨of_eq_true
+                      (Eq.trans
+                        (congrFun'
+                          (congrArg Eq
+                            (Eq.trans
+                              (ite_congr (Eq.trans (congrArg Not (eq_false hk)) not_false_eq_true)
+                                (fun a_1 =>
+                                  congrFun' (congrArg Prod.mk (congrArg (Option.map Sum.inr) hd))
+                                    PencilWordRefinement.FullMixed.Tag.common)
+                                fun a_1 =>
+                                ite_congr
+                                  (Eq.refl
+                                    ((PencilWordRefinement.mixedWords p a b).l =
+                                      PencilWordRefinement.wordNeg p (PencilWordRefinement.mixedWords p a b).ry))
+                                  (fun a_2 =>
+                                    Eq.refl
+                                      (some (Sum.inl (PencilWordRefinement.mixedWords p a b).point),
+                                        PencilWordRefinement.FullMixed.Tag.cancellation))
+                                  fun a_2 =>
+                                  Eq.refl
+                                    (if
+                                        ¬(PencilWordRefinement.mixedWords p a b).l =
+                                            (PencilWordRefinement.mixedWords p a b).ry then
+                                      (none, PencilWordRefinement.FullMixed.Tag.mismatch)
+                                    else
+                                      if
+                                          PencilWordRefinement.positiveXz p a b =
+                                            (PencilWordRefinement.mixedWords p a b).point.x then
+                                        (some (Sum.inr (PencilWordRefinement.tripleWords p a1 a2 a3 a)),
+                                          PencilWordRefinement.FullMixed.Tag.tripling)
+                                      else
+                                        (Option.map Sum.inr
+                                            (PencilWordRefinement.genericWordDispatch p
+                                              (PencilWordRefinement.mixedWords p a b).point
+                                              (PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a) a3),
+                                          PencilWordRefinement.FullMixed.Tag.positiveDistinct)))
+                              (ite_true
+                                (some (Sum.inr (PencilWordRefinement.genericWords p a b a3).payload),
+                                  PencilWordRefinement.FullMixed.Tag.common)
+                                (if
+                                    (PencilWordRefinement.mixedWords p a b).l =
+                                      PencilWordRefinement.wordNeg p (PencilWordRefinement.mixedWords p a b).ry then
+                                  (some (Sum.inl (PencilWordRefinement.mixedWords p a b).point),
+                                    PencilWordRefinement.FullMixed.Tag.cancellation)
+                                else
+                                  if
+                                      ¬(PencilWordRefinement.mixedWords p a b).l =
+                                          (PencilWordRefinement.mixedWords p a b).ry then
+                                    (none, PencilWordRefinement.FullMixed.Tag.mismatch)
+                                  else
+                                    if
+                                        PencilWordRefinement.positiveXz p a b =
+                                          (PencilWordRefinement.mixedWords p a b).point.x then
+                                      (some (Sum.inr (PencilWordRefinement.tripleWords p a1 a2 a3 a)),
+                                        PencilWordRefinement.FullMixed.Tag.tripling)
+                                    else
+                                      (Option.map Sum.inr
+                                          (PencilWordRefinement.genericWordDispatch p
+                                            (PencilWordRefinement.mixedWords p a b).point
+                                            (PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a) a3),
+                                        PencilWordRefinement.FullMixed.Tag.positiveDistinct)))))
+                          (some (Sum.inr (PencilWordRefinement.genericWords p a b a3).payload),
+                            PencilWordRefinement.FullMixed.Tag.common))
+                        (eq_self
+                          (some (Sum.inr (PencilWordRefinement.genericWords p a b a3).payload),
+                            PencilWordRefinement.FullMixed.Tag.common))),
+                    ⟨⟨cc, ⟨cz, ⟨cw, cv⟩⟩⟩, of_decide_eq_true (id (Eq.refl true))⟩⟩)

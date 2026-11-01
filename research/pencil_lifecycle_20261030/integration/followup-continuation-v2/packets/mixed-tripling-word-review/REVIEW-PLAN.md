@@ -1,0 +1,15 @@
+# Prospective UInt64 tripling review
+
+Frozen before inspecting mutable word producer source/results. Await exact sealed claim and hashes. Scope assigned: UInt64 correspondence for retained triple and original-input repeated-support branch. No producer/root edits, scientific runs, runtime or compiler inference. Fresh private Lean module/control/readback validation permitted with existing pinned toolchain/dependencies,120s+5s per invocation; retain all failures.
+
+Prior: the reviewed field rawOutput is well formed under original branch premises, but constants5/8/10 need distinct word treatment when p=5 or7; generic canonical-operands multiplication lemmas cannot be applied to those literal words blindly. Reviewer independently reviewed tripling field source/proposition, authored imported positive-distinct field dependency, and reviewed earlier word dependencies; did not author this word candidate. Disclose this dependency involvement.
+
+Joints and attacks, reviewer owns all:
+1. Pin actual Field::mul/add/sub/sq and Rust triple source. Compare AST association for fp/fpp/k/aa/bb/cc and all six payload fields. Do not substitute field-associative trees before proving word decode.
+2. Literal operands: enumerate every source literal2,3,4,5,8,10 and its location. For c>=p require a justified unreduced-literal multiplication bridge. Check actual UInt64 multiplication (or wider cast) semantics, c*a bound strictly below2^64, p positivity, and resulting residue canonicality. Exercise p5,p7 and inspect largest literal10 bound at upper p envelope. Distinguish ordinary product p² bound from literal c*p bound.
+3. Generic operations: all dynamic word inputs canonical; zero/nonzero reflection correct; intermediates/outputs proved canonical rather than asserted. Ensure no guard's rawWord zero is silently replaced by decoded zero absent canonicality.
+4. Branch identity: outer K0, cancellationfalse and repeated-x guard must correspond to actual field premises, positive ordinate derived from original valid inputs, payload exact. Full dispatcher versus scoped branch conditional must be named accurately.
+5. Composition: original validPoint/validTwo, four nonzero representation weights and prime/range constraints only. No output validity, derivative nonzero or normalized formula assumed as input. Derive six payload decode/nonzero weights and field-validity transfer.
+6. Fresh kernel verification/axiom readback: inspect exact named statements and imports, no sorry/admit/new axiom/native_decide loophole; use existing pinned proof checker in isolated directory. Standard axiom use reported; binary/kernel trust remains. Freeze reviewer controls before executing them.
+
+Provisional controls: modulus5 and7 with literals8/10 noncanonical; literal5 atp5; canonical max inputp-1; rawzero/one cases; complete known valid repeated-support point atx0,y1 onf=X5+1 if admissible. Distinct invalid noncanonical input should not be silently accepted by theorem premises. No generated trajectories, performance measurements or empirical security claims.
