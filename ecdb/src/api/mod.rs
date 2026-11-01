@@ -216,6 +216,8 @@ pub fn router(state: Shared) -> Router {
         .route("/v1/class-polynomials", get(catalog::class_polynomials))
         .route("/v1/summation-polynomials", get(catalog::summation_polynomials))
         .route("/v1/factor-bases", get(factor_bases::list))
+        .route("/v1/factor-base-designs", get(factor_bases::designs))
+        .route("/v1/ic/claims", get(factor_bases::claims))
         .route("/v1/factor-bases/{key}", get(factor_bases::document))
         .route("/v1/factor-bases/{key}/results", get(factor_bases::results))
         .route("/v1/sql", post(sql::run))
