@@ -109,3 +109,17 @@ Lean02,trace stage,records/report/custody/PR update.
 
 ### Errors
 No checker error. Lean01 and native2 failed attempts retained.
+
+## 2026-11-01T05:03:57.520416+00:00 — trace representation repair
+
+### What was done
+Lean02 compile0/audit0,4 authored declarations,0failing/trusted. trace57-01 rejected: trailing-zero vector rows trimmed controls to6x1 against24x24 matrix; source map named serialized ring rather than live completeSpace57. Raw partials retained.
+
+### Decisions made
+Use full24-row matrices and actual live source ring; freeze before fresh trace02. Both trace01 membership flags and late marker excluded. Add written ordinary y/x double-pole obstruction selecting full100-section L(2P) as next larger construction.
+
+### Open threads
+Trace02,report/custody/delivery; futureR58 double-pole100-space with196 ambient independence gate.
+
+### Errors
+Two trace representation issues,not a source-field mathematical obstruction.

@@ -27,26 +27,27 @@ matrix fixedCoordinates57=lift(module(splitting57),module(fixed57));
 require57(splitting57*fixedCoordinates57==fixed57,"TRACE57_COMPLETE_FIXED_KERNEL_SPAN");
 matrix tracePreimages57=lift(module(N57),module(traceBasis57));
 require57(N57*tracePreimages57==traceBasis57,"TRACE57_ALL_TEN_TRACE_PREIMAGES");
-int oneTrace57=0;int ATrace57=0;matrix controlPreimages57[24][2];
+int oneTrace57=0;int ATrace57=0;matrix controlPreimages57[24][2];matrix fullControl57[24][1];
 for(j57=1;j57<=2;j57++){
  candidate57=0;for(i57=1;i57<=24;i57++){candidate57=candidate57+smallControls57[i57,j57]*gen(i57);}
  residual57=reduce(candidate57,traceGB57);
  if(residual57==0){
-  matrix liftControl57=lift(module(N57),module(candidate57));
-  require57(N57*liftControl57==matrix(module(candidate57)),"TRACE57_ACTUAL_CONTROL_TRACE_PREIMAGE");
+  for(i57=1;i57<=24;i57++){fullControl57[i57,1]=smallControls57[i57,j57];}
+  matrix liftControl57=lift(module(N57),module(fullControl57));
+  require57(N57*liftControl57==fullControl57,"TRACE57_ACTUAL_CONTROL_TRACE_PREIMAGE");
   for(i57=1;i57<=24;i57++){controlPreimages57[i57,j57]=liftControl57[i57,1];}
   if(j57==1){oneTrace57=1;}else{ATrace57=1;}
  }
 }
 require57(ATrace57==1,"TRACE57_LAMBDA_TRACES_TO_A");
-vector lambdaColumn57=0;vector AColumn57=0;
-for(i57=1;i57<=24;i57++){lambdaColumn57=lambdaColumn57+smallControls57[i57,3]*gen(i57);AColumn57=AColumn57+smallControls57[i57,2]*gen(i57);}
+matrix lambdaColumn57[24][1];matrix AColumn57[24][1];
+for(i57=1;i57<=24;i57++){lambdaColumn57[i57,1]=smallControls57[i57,3];AColumn57[i57,1]=smallControls57[i57,2];}
 require57(N57*lambdaColumn57==AColumn57,"TRACE57_EXACT_REGISTERED_LAMBDA_TRACE");
 link matrixOut57="ASCII:w trace-space57.sing";open(matrixOut57);write(matrixOut57,"ring traceSpace57=2,(w),dp;short=0;");
 dump57(matrixOut57,"N57",N57);dump57(matrixOut57,"fixed57",fixed57);dump57(matrixOut57,"traceBasis57",traceBasis57);dump57(matrixOut57,"exceptional57",exceptional57);dump57(matrixOut57,"splitting57",splitting57);dump57(matrixOut57,"fixedRecovery57",fixedRecovery57);dump57(matrixOut57,"fixedCoordinates57",fixedCoordinates57);dump57(matrixOut57,"tracePreimages57",tracePreimages57);dump57(matrixOut57,"controlPreimages57",controlPreimages57);close(matrixOut57);
 execute(read("../field57-01/field-space57.sing"));ideal GB57=std(sourceIdeal57);
 map matrixMap57=completeSpace57,0;matrix actualSigma57=matrixMap57(sigmaRestricted57);
-map traceMap57=traceSpace57,0;matrix actualExceptional57=traceMap57(exceptional57);matrix actualTraces57=traceMap57(traceBasis57);matrix actualPreimages57=traceMap57(tracePreimages57);
+map traceMap57=completeSpace57,0;matrix actualExceptional57=traceMap57(exceptional57);matrix actualTraces57=traceMap57(traceBasis57);matrix actualPreimages57=traceMap57(tracePreimages57);
 poly value57;poly preimage57;poly image57;ideal exceptionalValues57;ideal traceValues57;ideal traceSourceValues57;
 require57(reduce(subst(actualA57,l,l+actualA57)+actualA57,GB57)==0,"TRACE57_A_FIXED");
 for(j57=1;j57<=24;j57++){

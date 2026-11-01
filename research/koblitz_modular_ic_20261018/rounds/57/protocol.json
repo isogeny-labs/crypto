@@ -78,7 +78,7 @@
     "constant1/A trace membership"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh trace57-01 TRACE57.sing TRACE57_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_CAS.sh trace57-02 TRACE57.sing TRACE57_ALL_CHECKS_PASS",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
     "threads": 1,
@@ -113,9 +113,10 @@
     }
   ],
   "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
-  "version": 7,
+  "version": 8,
   "amendment": {
     "before_affected_data": true,
-    "reason": "complete checker accepted; freeze actual fixed-modulo-trace representatives and source action"
+    "reason": "trace57-01 rejected trimmed vector shapes and live matrix source ring mismatch; use full24-row control matrices and actual completeSpace57 ring",
+    "prior_attempt": "retain every partial; no trace flags or late result accepted"
   }
 }
