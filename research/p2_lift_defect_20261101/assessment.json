@@ -1,0 +1,107 @@
+{
+  "format": "correspondence-assessment-draft-v1",
+  "assessment_state": "preregistered",
+  "authority": "companion artifact; not a ledger record or certificate",
+  "source": {
+    "object_uid": "generic-prime-field-prime-order-elliptic-subgroup",
+    "representation_uid": "canonical-scalar-fixed-generator-target",
+    "equations": "E/F_p: y^2=x^3+a*x+b; Q=[k]P",
+    "field": "F_p",
+    "dimension": 1,
+    "subgroup_order": "odd prime r with r != p"
+  },
+  "destination": {
+    "object_uid": "first-formal-layer-section-defect",
+    "representation_uid": "tau_0(Q)=t([r]s_0(Q))/p",
+    "equations": "s_u(Q) in E(Z/p^2Z); [r]s_u(Q) in ker(red); t=-XZ/Y",
+    "field": "Z/p^2Z with output F_p embedded into F_r",
+    "dimension": 1,
+    "ambient_group_order": "not used as a replacement DLP group"
+  },
+  "transformation": {
+    "kind": "characteristic-zero first-order lift followed by a formal-kernel coordinate",
+    "family": "deterministic Hensel section defect cocycle",
+    "degree": "candidate scalar interpolation degree measured exactly below r-1",
+    "field_of_definition": "Z/p^2Z",
+    "formulas": "X=x+p*u; Y=y+p*(c_Q+(3*x^2+a)u)/(2y); tau_u=t([r]s_u(Q))/p",
+    "exceptional_cases": ["singular reduction", "y=0", "r=p anomalous curve", "nonunit Jacobian Y", "formal parameter not divisible by p", "interpolation or root mismatch"],
+    "normalization": "least nonnegative coordinates, u=0 canonical section, t=-XZ/Y"
+  },
+  "obligations": {
+    "existence": {"state": "supported", "evidence": ["Hensel formula is explicit when y is nonzero", "odd prime whole-order curves have no nonidentity 2-torsion"], "scope": "frozen short-Weierstrass curves modulo p^2"},
+    "explicit_construction": {"state": "unknown", "evidence": [], "scope": "implementation and exact projective checks pending"},
+    "map_correctness": {"state": "unknown", "evidence": [], "scope": "reduction, kernel, formal-coordinate, section-linearity, and coordinate-isomorphism checks pending"},
+    "subgroup_preservation": {"state": "unknown", "evidence": ["reduction of [r]s_u(Q) is predicted to be [r]Q=O"], "scope": "the set section is explicitly not a homomorphism"},
+    "computational_advantage": {"state": "unknown", "evidence": [], "scope": "degree/root/recovery experiment pending"},
+    "scaling_support": {"state": "unknown", "evidence": [], "scope": "uniform degree and total-cost proof pending"}
+  },
+  "preservation_certificate": {
+    "identity": "red(s_u(Q))=Q and red([r]s_u(Q))=O",
+    "kernel_intersection": "not applicable: tau is an observable, not a replacement subgroup embedding",
+    "recovery_map": "roots of F_G(z)-tau_0(Q), filtered by [z]G=Q",
+    "scalar_multiplier": "identity on verified roots",
+    "proof_artifact": "planned H110P2LiftDefect.lean"
+  },
+  "mechanism": {
+    "proposed_benefit": "a canonical section's nonhomomorphic defect may have polylogarithmic scalar degree even though arbitrary lifts do not preserve the scalar relation",
+    "prediction": "complete interpolation degree at most ceil(log2(r))^2 on all 28 rows and separated from matched controls",
+    "falsification_condition": "any transfer check fails, any row exceeds the degree gate, controls match the degree, coordinate-isomorphic models disagree without a public normalization theorem, or total cost exceeds the gate",
+    "assumptions": ["good reduction", "r prime and r != p", "sound Jacobian arithmetic over Z/p^2Z", "uniform low-degree theorem", "polynomial factorization charged"]
+  },
+  "cost_comparison": {
+    "workload": "seven curves, four generators, every nonzero target, 32 matched controls, two coordinate-isomorphic controls",
+    "baseline": "generic BSGS/rho references, H109 scoped null, and full scalar interpolation accounting",
+    "units": "modular operations, Jacobian additions/doublings, interpolation operations, roots, EC validations, memory, advice",
+    "construction": "unmeasured",
+    "transfer": "unmeasured",
+    "destination": "unmeasured",
+    "recovery": "conditional on degree at most ceil(log2(r))^2",
+    "verification": "full lift/reduction/kernel/formal/interpolation/root/EC checks and Lean interfaces",
+    "failed_attempts_and_duplicates": "Smart applies only to r=p; arbitrary p-adic lifts are known not to preserve the relation; H110 tests the algebraic complexity of that failure rather than claiming a homomorphic lift",
+    "memory_and_data": "unmeasured",
+    "setup_reuse": "only D(r)+1 public small multiples allowed in the proposed path; full words are measurement-only",
+    "uncertainty": "bounded literature search and toy curves cannot establish novelty or asymptotics",
+    "evidence_label": "unmeasured"
+  },
+  "controls": [
+    "eight randomized Hensel sections on each of E101 and E127",
+    "eight collision-preserving output permutations on each of E101 and E127",
+    "coordinate-isomorphic primary models",
+    "unique torsion-lift correction with tau=0",
+    "generic square-root operation references"
+  ],
+  "protocol": {
+    "parameter_scope": "p,r from E101 through E907; r prime, r != p; multipliers 1,2,3,5; D(r)=ceil(log2(r))^2",
+    "sample_selection": "every nonzero subgroup point",
+    "stopping_rules": "complete every frozen target, control, interpolation, and eligible decoder",
+    "invalidation_rules": "any lift, reduction, projective curve, kernel, formal parameter, section linearity, interpolation, root, or EC mismatch",
+    "hardware_manifest": null,
+    "execution_route": "p2_lift_defect_cocycle_lab.py"
+  },
+  "exploration_boundary": {
+    "families": ["coordinate-fixed Hensel sections modulo p^2", "degree-bounded scalar interpolation over F_r"],
+    "parameters": "seven frozen curves, four generators, 32 matched controls",
+    "completed_scope": null,
+    "completeness_claim": "complete only for the frozen cohort and scalar polynomial representation"
+  },
+  "composition": {
+    "edge_ids": ["hensel-section", "multiply-by-r", "first-formal-coordinate", "scalar-polynomial-decoder"],
+    "junction_compatibility": "pending executable checks",
+    "weakest_open_obligation": "uniform low-degree theorem and total subexponential cost"
+  },
+  "sources": [
+    "10.1007/S001459900052",
+    "10.1007/10722028_22",
+    "10.1007/978-3-642-04159-4_6",
+    "10.1007/978-3-642-12827-1_9"
+  ],
+  "open_obligations": [
+    "open paired draft PRs before executing the frozen cohort",
+    "implement independent projective and formal checks",
+    "measure the complete degrees and matched controls",
+    "compile Lean transport, recovery, and conditional cost interfaces",
+    "establish or reject a uniform low-degree theorem"
+  ],
+  "recommended_next_action": "open the canonical crypto and paired cryptanalysis draft H110 PRs",
+  "official_status_change": "none"
+}
