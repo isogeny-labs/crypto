@@ -1,8 +1,8 @@
 //! Versioned synthetic research datasets with explicit capabilities and durable receipts.
 pub mod budget;
 pub mod capture;
-pub mod custody;
 pub mod curves;
+pub mod custody;
 mod execution;
 pub mod export;
 pub mod relations;
