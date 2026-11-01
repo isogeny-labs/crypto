@@ -492,6 +492,12 @@ const POLICIES: &[PolicyDecl] = &[
         StandardBand
     ),
     policy!(
+        "ic.koblitz_batched",
+        NativeAdaptive,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
         "rho.negation_v2",
         ImplementationAb,
         FrontierEligible,
@@ -562,7 +568,7 @@ const POLICIES: &[PolicyDecl] = &[
 fn parameter_role(name: &str) -> Option<ParameterRole> {
     use ParameterRole::*;
     Some(match name {
-        "base_seed" | "rank_seed" | "seed" | "table_seed" => Seed,
+        "base_seed" | "fb_seed" | "rank_seed" | "seed" | "table_seed" => Seed,
         "batch" => WorkloadScope,
         "backend" => ExternalBinding,
         "backend_sha256" | "c4" => IdentityOrPrice,
@@ -594,6 +600,7 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "base"
         | "base_multiplier"
         | "base_scale"
+        | "batch_trials"
         | "beta"
         | "branches"
         | "collection_aim"
