@@ -111,6 +111,23 @@ pub fn collect_residual_fused_and_solve<G: CountedGroup, L: RelationSolver + ?Si
     collect_residual_core(g, generator, target, r, h, fb, seed, max_trials, matrix, 1)
 }
 
+/// Negation-equivariant walk on a 64-jump pair-sum step set plus distinguished
+/// points (`residual-fused-eq`): see `mode == 4` in [`collect_residual_core`].
+#[allow(clippy::too_many_arguments)]
+pub fn collect_residual_fused_eq_and_solve<G: CountedGroup, L: RelationSolver + ?Sized>(
+    g: &G,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    h: u64,
+    fb: &FactorBase<G::Elt>,
+    seed: u64,
+    max_trials: u64,
+    matrix: &mut L,
+) -> PipelineOutcome {
+    collect_residual_core(g, generator, target, r, h, fb, seed, max_trials, matrix, 4)
+}
+
 /// Fused step plus distinguished points (`residual-fused-dp`): see `mode == 3`
 /// in [`collect_residual_core`].
 #[allow(clippy::too_many_arguments)]
@@ -142,18 +159,20 @@ fn collect_residual_core<G: CountedGroup, L: RelationSolver + ?Sized>(
     mode: u8,
 ) -> PipelineOutcome {
     // mode 0: baseline (two additions per step); 1: fused; 3: fused + distinguished points.
-    let fused = mode != 0;
+    let fused = mode == 1 || mode == 3;
+    // mode 4: negation-equivariant walk on a large step set, with distinguished points.
+    let eq = mode == 4;
     // mode 3: fused + distinguished points.  Only residuals whose x-key hashes into
     // a 2^-dp_bits fraction are tested against F, probed and stored; every step still
     // pays one distinguished-point test (counted as `dp_tests`, the analogue of rho's
     // canonicalisation per step).  dp_bits = floor(log2(r)/2) - 9, so a collision is
     // detected about 2^dp_bits steps late, a few hundred steps against ~sqrt(r).
-    let dp_bits: u32 = if mode == 3 {
+    let dp_bits: u32 = if mode >= 3 {
         ((63 - r.max(2).leading_zeros()) / 2).saturating_sub(9)
     } else {
         0
     };
-    let walk_cap: u64 = 40u64 << dp_bits;
+    let walk_cap: u64 = (if eq { 16u64 } else { 40u64 }) << dp_bits;
     let (mut dp_tests, mut f_checks, mut walk_len, mut walks_capped) = (0u64, 0u64, 0u64, 0u64);
     let mut rng = StdRng::seed_from_u64(seed ^ 0x5245_5349_4455_414C);
     let mut rel = PhaseCost::default();
@@ -178,7 +197,7 @@ fn collect_residual_core<G: CountedGroup, L: RelationSolver + ?Sized>(
     }
 
     // Sixteen jumps with tracked coefficients.
-    let jump_count = 16usize;
+    let jump_count = if eq { 64usize } else { 16usize };
     let jumps: Vec<(G::Elt, u64, u64)> = (0..jump_count)
         .map(|_| {
             let c = rng.gen_range(1..r);
@@ -203,6 +222,25 @@ fn collect_residual_core<G: CountedGroup, L: RelationSolver + ?Sized>(
     } else {
         Vec::new()
     };
+
+    // Mode 4 step set: s_{u<v,i} = J_u + J_v - P_i with its coefficients.  Counted as
+    // setup additions (one per pair, one per pair and base point).
+    let pair_table: Vec<(G::Elt, u64, u64, usize)> = if eq {
+        let mut v = Vec::with_capacity(jump_count * (jump_count - 1) / 2 * f);
+        for u in 0..jump_count {
+            for w in (u + 1)..jump_count {
+                let sum = g.add(&mut rel.group_ops, jumps[u].0, jumps[w].0);
+                let (au, bu) = (addmod(jumps[u].1, jumps[w].1, r), addmod(jumps[u].2, jumps[w].2, r));
+                for i in 0..f {
+                    v.push((g.add(&mut rel.group_ops, sum, fb.points[fb.neg_index[i]]), au, bu, i));
+                }
+            }
+        }
+        v
+    } else {
+        Vec::new()
+    };
+    let (mut x_prev, mut cycle_escapes, mut step_negations) = (u64::MAX, 0u64, 0u64);
 
     let mut table: HashMap<u64, Stored> = HashMap::new();
     let mut fresh = true;
@@ -259,8 +297,43 @@ fn collect_residual_core<G: CountedGroup, L: RelationSolver + ?Sized>(
             point = g.add(&mut rel.group_ops, ag, bq);
             row.iter_mut().for_each(|c| *c = 0);
             walk_len = 0;
+            x_prev = u64::MAX;
             fresh = false;
             restarts += 1;
+        } else if eq {
+            // Negation-equivariant step: the step index comes from the x-part of the key
+            // and is applied with the sign of the point's orientation bit, so (-L)' = -(L')
+            // and the paths of L and -L merge (a collision of L with -L is found at a
+            // distinguished point).  A 2-cycle of classes is escaped with the next step.
+            let kp = g.key(&point);
+            let kx = kp >> 1;
+            let flip = (kp & 1) == 1;
+            let m = pair_table.len();
+            let mut idx = (mix(kx) as usize >> 8) % m;
+            let apply = |g: &G, ops: &mut GroupOps, p: G::Elt, e: G::Elt| g.add(ops, p, if flip { g.neg(e) } else { e });
+            let mut np = apply(g, &mut rel.group_ops, point, pair_table[idx].0);
+            if (g.key(&np) >> 1) == x_prev {
+                cycle_escapes += 1;
+                idx = (idx + 1) % m;
+                np = apply(g, &mut rel.group_ops, point, pair_table[idx].0);
+            }
+            if flip {
+                step_negations += 1;
+            }
+            x_prev = kx;
+            point = np;
+            let (_, ea, eb, ei) = pair_table[idx];
+            let c = fb.col_of[ei];
+            if flip {
+                a = submod(a, ea, r);
+                b = submod(b, eb, r);
+                row[c] = submod(row[c], fb.coef_of[ei], r);
+            } else {
+                a = addmod(a, ea, r);
+                b = addmod(b, eb, r);
+                row[c] = addmod(row[c], fb.coef_of[ei], r);
+            }
+            stepped = true;
         } else if fused {
             // One addition: L <- L + (J_j - P_i), j and i both chosen by the
             // residual's key, so equal residuals take equal steps.
@@ -424,9 +497,18 @@ fn collect_residual_core<G: CountedGroup, L: RelationSolver + ?Sized>(
     );
     rel.count("lookups", table_probes + if dp_bits > 0 { f_checks } else { trials });
     if dp_bits > 0 {
-        rel.count("dp_tests", dp_tests);
+        // Native work of every step, named `_uncharged` so that the band prices it
+        // (AGENTS.md section 5a) like rho's per-step canonicalisation: one DP hash test per
+        // step; in the equivariant mode also one orientation read per step and one
+        // negation per flipped step.
+        rel.count("dp_tests_uncharged", dp_tests);
+        if eq {
+            rel.count("orientations_uncharged", dp_tests);
+            rel.count("step_negations_uncharged", step_negations);
+        }
         rel.count("dp_bits", dp_bits as u64);
         rel.count("walks_capped", walks_capped);
+        rel.count("cycle_escapes", cycle_escapes);
     }
     rel.count("walk_restarts", restarts);
     rel.count("walk_jumps", jump_count as u64);

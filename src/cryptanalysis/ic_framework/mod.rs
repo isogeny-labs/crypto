@@ -515,7 +515,7 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         Targets::StrideRenew => TargetSource::StrideRenew,
         Targets::StrideGenerator => TargetSource::StrideGenerator,
         Targets::StrideRenewDeferredGuard => TargetSource::StrideRenewDeferredGuard,
-        Targets::Walk | Targets::Residual | Targets::ResidualFused | Targets::ResidualFusedDp => TargetSource::Walk,
+        Targets::Walk | Targets::Residual | Targets::ResidualFused | Targets::ResidualFusedDp | Targets::ResidualFusedEq => TargetSource::Walk,
         Targets::WalkPrimeFast => TargetSource::WalkPrimeFast,
         Targets::WalkPrimeSerial4 => TargetSource::WalkPrimeLanes {
             lanes: 4,
@@ -564,7 +564,7 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     };
     let mut outcome: PipelineOutcome = if matches!(
         spec.targets,
-        Targets::Residual | Targets::ResidualFused | Targets::ResidualFusedDp
+        Targets::Residual | Targets::ResidualFused | Targets::ResidualFusedDp | Targets::ResidualFusedEq
     ) {
         if completion != CompletionRule::TargetPinned {
             return Err(
@@ -572,7 +572,9 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
                     .into(),
             );
         }
-        let collect = if spec.targets == Targets::ResidualFusedDp {
+        let collect = if spec.targets == Targets::ResidualFusedEq {
+            residual_mod::collect_residual_fused_eq_and_solve
+        } else if spec.targets == Targets::ResidualFusedDp {
             residual_mod::collect_residual_fused_dp_and_solve
         } else if spec.targets == Targets::ResidualFused {
             residual_mod::collect_residual_fused_and_solve
