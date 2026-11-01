@@ -515,7 +515,11 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         Targets::StrideRenew => TargetSource::StrideRenew,
         Targets::StrideGenerator => TargetSource::StrideGenerator,
         Targets::StrideRenewDeferredGuard => TargetSource::StrideRenewDeferredGuard,
-        Targets::Walk | Targets::Residual | Targets::ResidualFused | Targets::ResidualFusedDp | Targets::ResidualFusedEq => TargetSource::Walk,
+        Targets::Walk
+        | Targets::Residual
+        | Targets::ResidualFused
+        | Targets::ResidualFusedDp
+        | Targets::ResidualFusedEq => TargetSource::Walk,
         Targets::WalkPrimeFast => TargetSource::WalkPrimeFast,
         Targets::WalkPrimeSerial4 => TargetSource::WalkPrimeLanes {
             lanes: 4,
@@ -564,7 +568,10 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     };
     let mut outcome: PipelineOutcome = if matches!(
         spec.targets,
-        Targets::Residual | Targets::ResidualFused | Targets::ResidualFusedDp | Targets::ResidualFusedEq
+        Targets::Residual
+            | Targets::ResidualFused
+            | Targets::ResidualFusedDp
+            | Targets::ResidualFusedEq
     ) {
         if completion != CompletionRule::TargetPinned {
             return Err(

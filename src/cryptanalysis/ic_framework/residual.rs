@@ -230,9 +230,17 @@ fn collect_residual_core<G: CountedGroup, L: RelationSolver + ?Sized>(
         for u in 0..jump_count {
             for w in (u + 1)..jump_count {
                 let sum = g.add(&mut rel.group_ops, jumps[u].0, jumps[w].0);
-                let (au, bu) = (addmod(jumps[u].1, jumps[w].1, r), addmod(jumps[u].2, jumps[w].2, r));
+                let (au, bu) = (
+                    addmod(jumps[u].1, jumps[w].1, r),
+                    addmod(jumps[u].2, jumps[w].2, r),
+                );
                 for i in 0..f {
-                    v.push((g.add(&mut rel.group_ops, sum, fb.points[fb.neg_index[i]]), au, bu, i));
+                    v.push((
+                        g.add(&mut rel.group_ops, sum, fb.points[fb.neg_index[i]]),
+                        au,
+                        bu,
+                        i,
+                    ));
                 }
             }
         }
@@ -310,7 +318,9 @@ fn collect_residual_core<G: CountedGroup, L: RelationSolver + ?Sized>(
             let flip = (kp & 1) == 1;
             let m = pair_table.len();
             let mut idx = (mix(kx) as usize >> 8) % m;
-            let apply = |g: &G, ops: &mut GroupOps, p: G::Elt, e: G::Elt| g.add(ops, p, if flip { g.neg(e) } else { e });
+            let apply = |g: &G, ops: &mut GroupOps, p: G::Elt, e: G::Elt| {
+                g.add(ops, p, if flip { g.neg(e) } else { e })
+            };
             let mut np = apply(g, &mut rel.group_ops, point, pair_table[idx].0);
             if (g.key(&np) >> 1) == x_prev {
                 cycle_escapes += 1;
@@ -495,7 +505,10 @@ fn collect_residual_core<G: CountedGroup, L: RelationSolver + ?Sized>(
         "residual_table_bytes_uncharged",
         (table.len() * (16 + 8 * d_col)) as u64,
     );
-    rel.count("lookups", table_probes + if dp_bits > 0 { f_checks } else { trials });
+    rel.count(
+        "lookups",
+        table_probes + if dp_bits > 0 { f_checks } else { trials },
+    );
     if dp_bits > 0 {
         // Native work of every step, named `_uncharged` so that the band prices it
         // (AGENTS.md section 5a) like rho's per-step canonicalisation: one DP hash test per
@@ -656,7 +669,8 @@ mod tests {
         .expect("the residual configuration should run");
         let native = &report.decomposition.cost.native;
         let trials = native.get("trials").copied().unwrap_or(0);
-        let adds = report.decomposition.cost.group_ops.adds + report.decomposition.cost.group_ops.doubles;
+        let adds =
+            report.decomposition.cost.group_ops.adds + report.decomposition.cost.group_ops.doubles;
         (report.verified, report.recovered, trials, adds)
     }
 
@@ -666,7 +680,8 @@ mod tests {
     #[test]
     fn fused_residual_collector_recovers_and_halves_the_additions_per_step() {
         let planted = 30_011 % roster_prime_instance(14).unwrap().r;
-        let (mut base_ops, mut base_steps, mut fused_ops, mut fused_steps) = (0u64, 0u64, 0u64, 0u64);
+        let (mut base_ops, mut base_steps, mut fused_ops, mut fused_steps) =
+            (0u64, 0u64, 0u64, 0u64);
         for seed in 1..=6u64 {
             for size in ["2", "4", "24"] {
                 let (ok, rec, trials, adds) = run_mode(Targets::ResidualFused, seed, size);
@@ -692,6 +707,9 @@ mod tests {
         // and the setup sums.  The ratio of per-step operations must be well below 1.
         assert!(per_step_base > 1.8, "baseline per-step {per_step_base}");
         assert!(per_step_fused < 1.35, "fused per-step {per_step_fused}");
-        assert_eq!(Targets::parse("residual-fused").unwrap().name(), "residual-fused");
+        assert_eq!(
+            Targets::parse("residual-fused").unwrap().name(),
+            "residual-fused"
+        );
     }
 }
