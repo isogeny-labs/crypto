@@ -1,6 +1,6 @@
 {
   "format": "correspondence-assessment-draft-v1",
-  "assessment_state": "preregistered",
+  "assessment_state": "executed",
   "authority": "companion artifact; not a ledger record or certificate",
   "source": {
     "object_uid": "generic-prime-field-prime-order-elliptic-subgroup",
@@ -28,12 +28,12 @@
     "normalization": "least primitive root and canonical scalar parity"
   },
   "obligations": {
-    "existence": {"state": "unknown", "evidence": [], "scope": "complete constant-size formula enumeration pending"},
-    "explicit_construction": {"state": "unknown", "evidence": [], "scope": "dual recurrence implementation pending"},
-    "map_correctness": {"state": "unknown", "evidence": [], "scope": "local identity, independent product, decoder, and Lean checks pending"},
+    "existence": {"state": "unsupported", "evidence": ["0 of 28 rows had an exact formula after complete enumeration of 8832 coefficient tuples"], "scope": "frozen five-input coefficient family on seven curves and four generator relabelings"},
+    "explicit_construction": {"state": "supported", "evidence": ["memoized dual recurrence executed on 9096 targets", "412328 non-base recurrence nodes", "symbolic derivative and sequential value controls had zero failures", "artifact SHA-256 940123c44c6194b247fab3596a9ed2e331ee7e01b2fb8830fc7e8465e354993a", "independent scientific-content SHA-256 3991b25d2a2ddac0ebb1d25370c8b110051a40acca64a6bda3dd3baba4191b69"], "scope": "evaluation of delta_r, psi_(r-1), and psi_(r+1) on the frozen cohort"},
+    "map_correctness": {"state": "supported", "evidence": ["all 9096 psi_r zero, nonvanishing, and squared local-identity checks passed", "Lean certificate interfaces and conditional cost composition compiled"], "scope": "frozen arithmetic and conditional interfaces; full division-polynomial local theorem is not formalized"},
     "subgroup_preservation": {"state": "supported", "evidence": ["all functions and derivatives are evaluated at the original target Q"], "scope": "abstract mechanism"},
-    "computational_advantage": {"state": "unknown", "evidence": [], "scope": "formula exactness and total cost pending"},
-    "scaling_support": {"state": "unknown", "evidence": [], "scope": "uniform formula and recurrence-cost proof pending"}
+    "computational_advantage": {"state": "unsupported", "evidence": ["no exact formula and therefore no decoder row", "candidate best-match range 0.5 to 0.611111 overlapped matched controls 0.5 to 0.629630"], "scope": "H109 frozen formula family"},
+    "scaling_support": {"state": "unsupported", "evidence": ["memoized evaluation used 26 to 54 recurrence nodes per target", "no phase-to-parity bridge exists in the tested family"], "scope": "fast evaluation is supported empirically; end-to-end subexponential ECDLP is not"}
   },
   "mechanism": {
     "proposed_benefit": "the local derivative may retain the scalar-multiplication differential factor while requiring only a constant-size public phase formula",
@@ -45,16 +45,16 @@
     "workload": "seven curves, four generators, every nonzero target, 32 matched controls",
     "baseline": "H107/H108 exact linear-support character modules and generic square-root algorithms",
     "units": "recurrence nodes, field operations, phase evaluations, formula candidates, decoder steps, memory and advice",
-    "construction": "unmeasured",
+    "construction": "412328 recurrence nodes, 10674040 field multiplications, 211712 inversions, 6.3530 diagnostic seconds in the committed run",
     "transfer": "none; target remains on E(F_p)",
-    "destination": "unmeasured",
-    "recovery": "conditional on an exact formula",
+    "destination": "8832 formula tuples, 749289149 ns diagnostic enumeration time in the committed run",
+    "recovery": "not executed because zero rows met the exact-formula gate",
     "verification": "full local identities, independent products, EC validations, and Lean",
     "failed_attempts_and_duplicates": "closest internal predecessor is ECDLP-IDEA-006 and its P1540 audit; it studies elliptic-net annihilators/QRT index location, not the torsion-local derivative phase, and must remain a paired no-free-linearization control",
-    "memory_and_data": "unmeasured",
+    "memory_and_data": "constant five coefficients per formula; at most a small memoized dual cache per target; raw artifact includes 9096 target records",
     "setup_reuse": "none allowed for the full-runtime claim",
     "uncertainty": "bounded literature search and toy curves cannot establish novelty or asymptotics",
-    "evidence_label": "unmeasured"
+    "evidence_label": "complete frozen toy-cohort measurement; unisolated timing"
   },
   "controls": [
     "16 symmetry-matched E101 label controls",
@@ -73,11 +73,10 @@
     "execution_route": "torsion_division_derivative_lab.py"
   },
   "open_obligations": [
-    "open the paired draft H109 PRs before implementation",
-    "implement and execute the dual recurrence",
-    "compile the Lean certificate and any claimed cost theorem",
-    "independently extend the prior-art review"
+    "independently replay the portable result in the paired reference PR",
+    "formalize the full division-polynomial local identity if it is reused",
+    "independently extend the prior-art review before any novelty claim"
   ],
-  "recommended_next_action": "open the canonical crypto and paired cryptanalysis draft H109 PRs",
+  "recommended_next_action": "record the scoped null result, merge its evidence PRs after review, and assign the next H-number only to a mechanism that does not widen the same five-input character formula",
   "official_status_change": "none"
 }
