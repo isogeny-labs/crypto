@@ -1,6 +1,6 @@
 \documentclass[10pt]{article}
 \usepackage[letterpaper,margin=0.8in]{geometry}
-\usepackage{amsmath,amssymb,booktabs}
+\usepackage{amsmath,amssymb,booktabs,graphicx}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage[hidelinks]{hyperref}
@@ -63,9 +63,15 @@ positions in a field, $2U=2KH+K(K+1)-\sum_{i\in\mathrm{published}}r_i$.
 Both methods retain tied values as distinct labelled positions.
 
 \begin{center}\small\input{tables/fields.tex}\end{center}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\linewidth]{figures/allocation-distribution.pdf}
+\caption{Exact counts across all 20,037,600 labelled allocations. The vertical line marks the observed doubled score $2U=117$; the shaded inclusive upper tail contains 5,869,345 assignments. The distribution is derived from the committed exact TSV, not new sampling.}
+\label{fig:allocation-distribution}
+\end{figure}
 ``Higher'' means additional $>$ published. The observed fraction is
 $(55+7/2)/102=117/204\simeq\PairFraction$. Exactly \TailNumerator{} assignments
-have $2U\ge117$, giving the tail above. It does not meet the source's nominal
+have $2U\ge117$, giving the tail above. Figure~\ref{fig:allocation-distribution} shows the exact committed histogram and marks this observed threshold. It does not meet the source's nominal
 0.05 replication threshold within this allocation model. A p-value
 interpretation requires within-field label exchangeability; the exact finite
 fraction itself assumes no real-curve sampling model. It neither proves an
