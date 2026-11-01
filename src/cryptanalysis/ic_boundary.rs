@@ -873,6 +873,18 @@ fn powmod(mut a: u64, mut e: u64, m: u64) -> u64 {
 /// most `m`.  The inverse is unique, so the result is the one the
 /// 128-bit form returned.
 pub fn invmod(a: u64, m: u64) -> Option<u64> {
+    if m <= u64::from(u32::MAX) {
+        // Every curve `ecbench` registers: the same steps on 32-bit words,
+        // whose divisions are several times faster than 64-bit ones on
+        // x86-64.  Remainders and coefficient magnitudes stay at most `m`,
+        // so nothing overflows and every value is the 64-bit loop's.
+        return invmod_u32((a % m) as u32, m as u32).map(u64::from);
+    }
+    invmod_u64(a, m)
+}
+
+/// [`invmod`] on 64-bit words, for any modulus.
+fn invmod_u64(a: u64, m: u64) -> Option<u64> {
     let (mut r0, mut r1) = (m, a % m);
     // `r0 ≡ ±t0·a`, `r1 ≡ ∓t1·a (mod m)`; `neg0` is the sign of `t0`'s
     // coefficient.  Initially `m ≡ 0·a` and `a ≡ +1·a`.
@@ -893,6 +905,25 @@ pub fn invmod(a: u64, m: u64) -> Option<u64> {
     } else {
         t0 % m
     })
+}
+
+/// [`invmod`] for a modulus and a reduced operand that fit 32 bits: the
+/// same extended Euclid, step for step.
+#[inline]
+fn invmod_u32(a: u32, m: u32) -> Option<u32> {
+    let (mut r0, mut r1) = (m, a);
+    let (mut t0, mut t1) = (0u32, 1u32);
+    let mut neg0 = true;
+    while r1 != 0 {
+        let q = r0 / r1;
+        (r0, r1) = (r1, r0 - q * r1);
+        (t0, t1) = (t1, t0 + q * t1);
+        neg0 = !neg0;
+    }
+    if r0 != 1 {
+        return None;
+    }
+    Some(if neg0 { (m - t0) % m } else { t0 % m })
 }
 
 // ── Incremental Gauss–Jordan over Z/rZ ─────────────────────────────
@@ -2133,6 +2164,12 @@ struct TunedWalker<'a, G: CountedGroup, C: RhoClasses<G>> {
     brent: bool,
     /// `(key, point, a, b)` of the walk's most recent points, oldest first.
     recent: VecDeque<(u64, G::Elt, u64, u64)>,
+    /// The keys of `recent` in a ring (`recent_next` is where the next one
+    /// goes), scanned every step without a branch per key; `recent` is
+    /// read only when the ring holds the key (a cycle, rare).  The two
+    /// hold the same set of keys at every step.
+    recent_keys: Vec<u64>,
+    recent_next: usize,
 }
 
 impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
@@ -2155,6 +2192,8 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
             window: walk.cycle_window,
             brent: false,
             recent: VecDeque::with_capacity(walk.cycle_window + 1),
+            recent_keys: Vec::with_capacity(walk.cycle_window),
+            recent_next: 0,
         }
     }
 
@@ -2176,6 +2215,48 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
         } else {
             h % n
         }) as usize
+    }
+
+    /// Forget the recent points (a new walk, or a cycle left).
+    #[inline]
+    fn forget_recent(&mut self) {
+        self.recent.clear();
+        self.recent_keys.clear();
+        self.recent_next = 0;
+    }
+
+    /// Remember a point among the last `window`, dropping the oldest.
+    #[inline]
+    fn remember(&mut self, entry: (u64, G::Elt, u64, u64)) {
+        if self.recent_keys.len() < self.window {
+            self.recent_keys.push(entry.0);
+        } else {
+            self.recent_keys[self.recent_next] = entry.0;
+        }
+        self.recent_next = if self.recent_next + 1 == self.window {
+            0
+        } else {
+            self.recent_next + 1
+        };
+        self.recent.push_back(entry);
+        if self.recent.len() > self.window {
+            self.recent.pop_front();
+        }
+    }
+
+    /// Where `key` stands among the recent points, oldest first: the
+    /// ring answers "not there" for every key at once (the common case),
+    /// and the deque gives the position only on a hit.
+    #[inline]
+    fn recent_position(&self, key: u64) -> Option<usize> {
+        let hit = self
+            .recent_keys
+            .iter()
+            .fold(false, |any, &k| any | (k == key));
+        if !hit {
+            return None;
+        }
+        self.recent.iter().position(|e| e.0 == key)
     }
 
     /// One walk from `[a]G + [b]Q = start`, until a distinguished point
@@ -2201,7 +2282,7 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
             r,
             &mut tally.canonicalisations,
         );
-        self.recent.clear();
+        self.forget_recent();
         let mut last_escape: Option<u64> = None;
         let mut len = 0u64;
         // The walk operations at the start: what a lost walk has spent.
@@ -2222,7 +2303,13 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
             let j0 = self.index_of(h);
             let mut tried = 0usize;
             let (y, ya, yb, ky, hy) = loop {
-                let j = (j0 + tried) % jump_count;
+                // `j0` and `tried` are below `jump_count`, so one
+                // subtraction is the remainder (no division per attempt).
+                let j = if j0 + tried >= jump_count {
+                    j0 + tried - jump_count
+                } else {
+                    j0 + tried
+                };
                 let (m, aj, bj) = self.jumps[j];
                 let sum = g.add(ops, x, m);
                 let (y, ya, yb, flipped) = rho_canon(
@@ -2262,7 +2349,7 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
             }
             // A short cycle: this point is one of the last `window`.
             if self.window > 0 {
-                if let Some(pos) = self.recent.iter().position(|e| e.0 == key) {
+                if let Some(pos) = self.recent_position(key) {
                     // The cycle is the `c` most recent points.
                     let c = self.recent.len() - pos;
                     match c {
@@ -2301,7 +2388,7 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
                     b = eb;
                     key = g.key(&x);
                     h = mix(key);
-                    self.recent.clear();
+                    self.forget_recent();
                     if g.is_identity(&x) {
                         tally.lose(ops0, LostHow::Identity);
                         return WalkEnd::Lost;
@@ -2312,10 +2399,7 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
                         (since, power) = (0, 1);
                     }
                 }
-                self.recent.push_back((key, x, a, b));
-                if self.recent.len() > self.window {
-                    self.recent.pop_front();
-                }
+                self.remember((key, x, a, b));
             }
             if h & self.dp_mask == 0 {
                 return WalkEnd::Distinguished(x, a, b);
@@ -2354,13 +2438,13 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
                     b = eb;
                     key = g.key(&x);
                     h = mix(key);
-                    self.recent.clear();
+                    self.forget_recent();
                     if g.is_identity(&x) {
                         tally.lose(ops0, LostHow::Identity);
                         return WalkEnd::Lost;
                     }
                     if self.window > 0 {
-                        self.recent.push_back((key, x, a, b));
+                        self.remember((key, x, a, b));
                     }
                     checkpoint = key;
                     since_min = (checkpoint, x, a, b);
@@ -11059,6 +11143,37 @@ mod tests {
                 reference::invmod(a, m),
                 "invmod({a}, {m})"
             );
+        }
+    }
+
+    #[test]
+    fn invmod_32_bit_path_matches_the_64_bit_loop() {
+        // Moduli at and near the 32-bit edge, primes and composites, and
+        // operands across the range: the word-size path is the same loop.
+        let mut x = 0x9E37_79B9_7F4A_7C15u64;
+        for m in [
+            2u64,
+            3,
+            65_521,
+            3_852_015_119,
+            4_294_967_291,
+            4_294_967_295,
+            4_294_967_294,
+            1 << 31,
+            (1 << 31) - 1,
+        ] {
+            for _ in 0..4096 {
+                x ^= x << 13;
+                x ^= x >> 7;
+                x ^= x << 17;
+                for a in [x % m, x, m - 1, 1, 0] {
+                    assert_eq!(
+                        super::invmod(a, m),
+                        super::invmod_u64(a, m),
+                        "invmod({a}, {m})"
+                    );
+                }
+            }
         }
     }
 
