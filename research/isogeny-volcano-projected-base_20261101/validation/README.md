@@ -4,6 +4,14 @@ No result or benchmark row may be produced until all gates below pass. This
 directory is prospective; it contains no claim that a run or validation has
 already happened.
 
+The plan-only preflight is complete: all 104 frozen cells planned successfully
+and reproduced byte-for-byte on a second pass. Its compact, source-bound record
+is in [`plan-receipts/receipts.json`](plan-receipts/receipts.json). The raw-plan
+archive is not claimed as remotely stored: the canonical artifact-store upload
+failed closed on an authorization error, recorded in the adjacent README. This
+preflight executed no scientific cell and does not satisfy any execution,
+replay, or publication gate below.
+
 ## Execution gate
 
 - Every cell in `../specs/manifest.json` has exactly one immutable EKS request,
