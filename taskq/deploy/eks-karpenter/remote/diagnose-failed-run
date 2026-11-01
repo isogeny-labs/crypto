@@ -21,10 +21,9 @@ trap 'rm -rf "$tmp"' EXIT
 launcher_dir="$tmp/launcher"
 mkdir -p "$launcher_dir"
 launcher_prefix="runs/$job/launcher/$launcher"
-"$aws_bin" s3 cp "s3://$ISOLAB_BUCKET/$launcher_prefix/" "$launcher_dir/" \
-  --recursive --only-show-errors
-
 for required in result.json request.json status.json objects.json; do
+  "$aws_bin" s3 cp "s3://$ISOLAB_BUCKET/$launcher_prefix/$required" \
+    "$launcher_dir/$required" --only-show-errors
   [[ -s "$launcher_dir/$required" ]] || {
     printf 'Missing launcher receipt: %s\n' "$required" >&2
     exit 3
