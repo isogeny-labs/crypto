@@ -950,6 +950,15 @@ Every cross-method comparison and every ranking must:
 - **Never compare a calibrated cost on one side with an uncalibrated one
   on the other.** If a calibration exists for only some arms or sizes,
   use the band alone.
+- **The band prices operations, not bytes** (owner, 2026-11-01). A
+  memory-size counter (`residual_table_bytes_uncharged`,
+  `factor_base_vec_bytes_floor_uncharged`, `native_table_bytes_uncharged`)
+  is still listed with its count for every arm, but is not charged `w` and
+  cannot block a ranking. The list is `NON_OPERATION_COUNTERS` in
+  `src/cryptanalysis/ecbench/band.rs`, by name, so committed records replay
+  unchanged. A new byte-valued counter is added there; do not name a byte
+  count `*_uncharged` without doing so. The audit and the re-run studies are
+  in `research/ic_byte_counter_pricing_20261101/`.
 
 This applies to `ecbench compare` read-outs, tables, frontier syntheses,
 ledger rows, papers and PR descriptions. A ratio produced before this rule

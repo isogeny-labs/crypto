@@ -383,6 +383,7 @@ fn orbit_json(rep: &OrbitIcReport, targets: &[(u64, FastPoint)], opts: &OrbitIcO
             "solved_columns": logs.system.solved_columns,
             "certified_columns": logs.certified_columns,
             "uncertified_columns": logs.uncertified_columns,
+            "collection_seconds": logs.collection_ns as f64 / 1e9,
             "seconds": logs.seconds,
         },
         "descent": {

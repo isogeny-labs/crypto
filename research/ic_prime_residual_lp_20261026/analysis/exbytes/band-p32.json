@@ -1,0 +1,323 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "plan",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        29.398781725753064,
+        33.2586835835568,
+        67.9978003037904
+      ],
+      "charged_sum": 46240246.0,
+      "native_sum": 60710955,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "res16",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        7.046369837665503,
+        7.749385700868717,
+        14.076528469697644
+      ],
+      "charged_sum": 11082972.0,
+      "native_sum": 11057474,
+      "uncounted": [],
+      "exempt_mean_counts": {
+        "residual_table_bytes_uncharged": 33008742.0
+      }
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "res32",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        10.04228303624201,
+        11.059586289468948,
+        20.215315568511418
+      ],
+      "charged_sum": 15795132.0,
+      "native_sum": 16000783,
+      "uncounted": [],
+      "exempt_mean_counts": {
+        "residual_table_bytes_uncharged": 88746278.66666667
+      }
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "res4",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        3.506203143694815,
+        3.853977373586386,
+        6.983945442610531
+      ],
+      "charged_sum": 5514776.0,
+      "native_sum": 5470011,
+      "uncounted": [],
+      "exempt_mean_counts": {
+        "residual_table_bytes_uncharged": 5467300.0
+      }
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "res64",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        13.417190545951973,
+        14.891621696412585,
+        28.16150205055803
+      ],
+      "charged_sum": 21103398.0,
+      "native_sum": 23190777,
+      "uncounted": [],
+      "exempt_mean_counts": {
+        "residual_table_bytes_uncharged": 229066728.0
+      }
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "res8",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        5.315965098114956,
+        5.844572345022443,
+        10.602037567189841
+      ],
+      "charged_sum": 8361283.0,
+      "native_sum": 8314266,
+      "uncounted": [],
+      "exempt_mean_counts": {
+        "residual_table_bytes_uncharged": 13839546.666666666
+      }
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "resN0",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        58.321421433855384,
+        308.6046693817275,
+        2561.153900912576
+      ],
+      "charged_sum": 91731586.0,
+      "native_sum": 3936611749,
+      "uncounted": [],
+      "exempt_mean_counts": {
+        "residual_table_bytes_uncharged": 10053827231.666666
+      }
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "rho",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        0.8875689125856443,
+        0.9757121456875955,
+        1.7690012436051579
+      ],
+      "charged_sum": 1396024.0,
+      "native_sum": 1386372,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "plan",
+      "b": "res16",
+      "verdict": "res16 < plan"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "plan",
+      "b": "res32",
+      "verdict": "res32 < plan"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "plan",
+      "b": "res4",
+      "verdict": "res4 < plan"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "plan",
+      "b": "res64",
+      "verdict": "res64 < plan"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "plan",
+      "b": "res8",
+      "verdict": "res8 < plan"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "plan",
+      "b": "resN0",
+      "verdict": "plan < resN0"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "plan",
+      "b": "rho",
+      "verdict": "rho < plan"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "res16",
+      "b": "res32",
+      "verdict": "res16 < res32"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "res16",
+      "b": "res4",
+      "verdict": "res4 < res16"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "res16",
+      "b": "res64",
+      "verdict": "res16 < res64"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "res16",
+      "b": "res8",
+      "verdict": "res8 < res16"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "res16",
+      "b": "resN0",
+      "verdict": "res16 < resN0"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "res16",
+      "b": "rho",
+      "verdict": "rho < res16"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "res32",
+      "b": "res4",
+      "verdict": "res4 < res32"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "res32",
+      "b": "res64",
+      "verdict": "res32 < res64"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "res32",
+      "b": "res8",
+      "verdict": "res8 < res32"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "res32",
+      "b": "resN0",
+      "verdict": "res32 < resN0"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "res32",
+      "b": "rho",
+      "verdict": "rho < res32"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "res4",
+      "b": "res64",
+      "verdict": "res4 < res64"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "res4",
+      "b": "res8",
+      "verdict": "res4 < res8"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "res4",
+      "b": "resN0",
+      "verdict": "res4 < resN0"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "res4",
+      "b": "rho",
+      "verdict": "rho < res4"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "res64",
+      "b": "res8",
+      "verdict": "res8 < res64"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "res64",
+      "b": "resN0",
+      "verdict": "res64 < resN0"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "res64",
+      "b": "rho",
+      "verdict": "rho < res64"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "res8",
+      "b": "resN0",
+      "verdict": "res8 < resN0"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "res8",
+      "b": "rho",
+      "verdict": "rho < res8"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "resN0",
+      "b": "rho",
+      "verdict": "rho < resN0"
+    }
+  ]
+}

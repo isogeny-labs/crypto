@@ -24,7 +24,7 @@
   },
   "progress_timeline": {
    "path": "docs/ic/progress-timeline.json",
-   "sha256": "6c62c182babfb64b711af9e2e0b9da8d8303dcc4da44624f0e0ed2f119fbdb1a"
+   "sha256": "fd19ac4eea242e74769757d08a9514cedb618e9839b8bdb2aacae9d4c7b2a690"
   },
   "native_tournament26": {
    "path": "research/ic_candidate_tournament_20260915/runs/round-0026/measurements.json",
@@ -102,6 +102,34 @@
    "path": "research/ecbench_e2e_frontier_20261031/establishment/certificate.json",
    "sha256": "fb5759832dd0f80a8b1139633c5fe9ea7d7838715bc07947422fd9f5abf93c25"
   },
+  "pfdr_other_families": {
+   "path": "research/pfdr_other_families_20261101/results/analysis-main.json",
+   "sha256": "2ccae7f1ac7a97a867e75f45a42b7dd1e46cd5596331b6f18acc5fa67d2bd290"
+  },
+  "pfdr_other_families_readme": {
+   "path": "research/pfdr_other_families_20261101/README.md",
+   "sha256": "2697b3eb35f65e6dbbe84ea90c9e2f759f04a4044a45cb4929b60a0dfe06dd1b"
+  },
+  "n83_fourbyte_pair_plain_fp2": {
+   "path": "research/n83_fourbyte_pair_20261027/runs/plain_fp2/independent_replay.json",
+   "sha256": "dacd097373ef436c8ab1e4f16f1838b17eaf3bde0e73bbfc16af3cbed4241486"
+  },
+  "n83_fourbyte_pair_fp2_plain": {
+   "path": "research/n83_fourbyte_pair_20261027/runs/fp2_plain/independent_replay.json",
+   "sha256": "62960a9ec213b858a70be7c92e3b2abd312680bb0998d2dbb7af2a8543e79932"
+  },
+  "n83_fourbyte_pair_readme": {
+   "path": "research/n83_fourbyte_pair_20261027/README.md",
+   "sha256": "51e6392e1c20509d4e13d90b727fa09e56f3cb2b462ac55c80cd77c3dac7ebf8"
+  },
+  "n83_image_closed_degree2": {
+   "path": "research/n83_image_closed_degree2_20261101/ASSESSMENT.json",
+   "sha256": "4064a295346153496c3c32ac3d8bc5712eb10dd6d9984d488e5ce64ac5b37984"
+  },
+  "n83_image_closed_degree2_readme": {
+   "path": "research/n83_image_closed_degree2_20261101/README.md",
+   "sha256": "6de3fa411f8c52d1a0622309f0a828d6f45fd0ea6f102ee7d540049dab623b5a"
+  },
   "n41_n53_counted": {
    "path": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
    "sha256": "fe55908f837840eeee173cfeae463368bb272e3c65ef03fa2b66efeead769331"
@@ -109,6 +137,18 @@
   "conductor_gap_counts": {
    "path": "research/ecbench_conductor_gap_20261012/analysis.json",
    "sha256": "0ff9b20fd773ea67fa8fc2c434635e77f97422b2904d687b61eac75a02c04279"
+  },
+  "f4_fp_ic_effect": {
+   "path": "research/f4_fp_ic_effect_20261018/summary.json",
+   "sha256": "7eff13424e0e9b1a9dca5117f7598d797bb2a27366b60ecf7c61aadc45c13a60"
+  },
+  "f4_fp_ic_main": {
+   "path": "research/f4_fp_ic_effect_20261018/reports/run-20261018T1548Z/raw/dlp_main.json",
+   "sha256": "bca0162f22f19c74c3e105e79d038d7e9dbb813709bcd58d6face0f9cb6ff9ca"
+  },
+  "f4_fp_ic_new": {
+   "path": "research/f4_fp_ic_effect_20261018/reports/run-20261018T1548Z/raw/dlp_new.json",
+   "sha256": "114f27cd5a3eb09113ddc5f0555375a1fd7d8ef2996dd9ce2405850752f43ed7"
   },
   "la_engines": {
    "path": "research/la_engines_20261014/summary.json",
@@ -739,7 +779,7 @@
  },
  "progress": {
   "source": "docs/ic/progress-timeline.json",
-  "updated": "2026-10-31",
+  "updated": "2026-11-01",
   "series_id": "ec-cold",
   "label": "Elliptic curve, whole method, cold, one target",
   "points": [
@@ -986,6 +1026,17 @@
     "class": "engineering",
     "anchor": "#rho-parity-ledger",
     "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
+   },
+   {
+    "anchor": "#late-main-79th-method-reconciliation",
+    "class": "diagnostic",
+    "date": "2026-11-01",
+    "detail": "The late-main prime-orbit relation collector was admitted to the fail-closed 79-method optimization inventory. On one planted generic a=-3 toy target, the affine eight-orbit candidate costs 5.4169 [3.389, 8.658] times same-target rho.negation_v2 in counted GAE; pricing every uncharged native operation at 0, 0.1 and 1 GAE leaves ratios 5.4169, 5.0235 and 3.0548. Prospective j=0 and j=1728 cross-checks remain 4.2011 and 5.7901 times their cubic/quartic rho references. All 90 records verified and all 72 measured deterministic executions replayed exactly. Factor-base draws remain unpriced, all clocks are L0, each comparison has one workload and four measured pairs, and no ranked leaderboard row or shipped default changes.",
+    "label": "Prime-orbit relation collector, affine eight-orbit candidate vs negation rho, generic 14-bit toy curve",
+    "reference": "matched",
+    "source": "https://github.com/isogeny-labs/crypto/blob/main/research/ecbench_e2e_frontier_20261031/REPORT.md#late-main-79th-method-reconciliation",
+    "unit": "counted GAE lower-bound diagnostic",
+    "value": 5.41693461951
    }
   ]
  },
@@ -13816,6 +13867,211 @@
   },
   "online_speedup": null,
   "fully_priced_cold_speedup": null
+ },
+ "pfdr_other_families_diagnostic": {
+  "source": "research/pfdr_other_families_20261101/results/analysis-main.json",
+  "readme": "research/pfdr_other_families_20261101/README.md",
+  "experiment": "EXP-PFDR-2d36f9-R2-FAM",
+  "reading": "O-SUB-BE",
+  "class": "structural factor-base diagnostic; no E2E IC price and no rho comparison",
+  "jobs": 19887,
+  "cells": 30,
+  "bits": [
+   16,
+   20,
+   24,
+   28,
+   32
+  ],
+  "break_even_slope": 0.333333333333,
+  "selftest_pass": true,
+  "controls_pass": true,
+  "calibration": {
+   "n": 10,
+   "mean": 0.219333485239,
+   "sd": 0.878828385903
+  },
+  "lines": [
+   {
+    "family": "Dickson",
+    "theta": 0.3,
+    "delta_hat": -0.00466659603686,
+    "ci95": [
+     -0.0129528975933,
+     0.00408327353472
+    ],
+    "class": "SUB-BE"
+   },
+   {
+    "family": "Dickson",
+    "theta": 0.35,
+    "delta_hat": -0.00141822161319,
+    "ci95": [
+     -0.00880823997916,
+     0.00696710218431
+    ],
+    "class": "SUB-BE"
+   },
+   {
+    "family": "geometric progression",
+    "theta": 0.3,
+    "delta_hat": 0.00544335757492,
+    "ci95": [
+     -0.00311651852005,
+     0.01359729243
+    ],
+    "class": "SUB-BE"
+   },
+   {
+    "family": "geometric progression",
+    "theta": 0.35,
+    "delta_hat": 0.00239130826292,
+    "ci95": [
+     -0.00485870688162,
+     0.00981977205979
+    ],
+    "class": "SUB-BE"
+   },
+   {
+    "family": "quadratic progression",
+    "theta": 0.3,
+    "delta_hat": 0.00657434733789,
+    "ci95": [
+     -0.00167487289919,
+     0.0146885602679
+    ],
+    "class": "SUB-BE"
+   },
+   {
+    "family": "quadratic progression",
+    "theta": 0.35,
+    "delta_hat": 0.00682881687581,
+    "ci95": [
+     -0.000377391773355,
+     0.0144128470591
+    ],
+    "class": "SUB-BE"
+   }
+  ],
+  "slope_range": [
+   -0.00466659603686,
+   0.00682881687581
+  ],
+  "largest_upper_ci95": 0.0146885602679,
+  "online_speedup": null,
+  "fully_priced_cold_speedup": null
+ },
+ "n83_root_index_diagnostic": {
+  "curve": "icv1-f2m83-t6151469093347-9eba6cd5",
+  "sources": [
+   "research/n83_fourbyte_pair_20261027/runs/plain_fp2/independent_replay.json",
+   "research/n83_fourbyte_pair_20261027/runs/fp2_plain/independent_replay.json"
+  ],
+  "readme": "research/n83_fourbyte_pair_20261027/README.md",
+  "class": "alternating shared-host full-process diagnostic; no Tier 1 or matched-rho promotion",
+  "base_columns": 1107,
+  "pairs": [
+   {
+    "order": [
+     "plain",
+     "fp2"
+    ],
+    "plain_over_fp2_index_build": 1.00144691089,
+    "plain_over_fp2_process_wall": 1.01737302783,
+    "arms": [
+     {
+      "layout": "plain",
+      "index_build_ms": 57847.070042,
+      "process_wall_seconds": 154.066279042,
+      "online_ms": 363.975375,
+      "peak_rss_bytes": 1436827648,
+      "root_fp2_bytes": 0,
+      "status": "PASS_INDEPENDENT_FULL_REPLAY"
+     },
+     {
+      "layout": "fp2",
+      "index_build_ms": 57763.491417,
+      "process_wall_seconds": 151.435387834,
+      "online_ms": 370.574833,
+      "peak_rss_bytes": 1477640192,
+      "root_fp2_bytes": 41943040,
+      "status": "PASS_INDEPENDENT_FULL_REPLAY"
+     }
+    ]
+   },
+   {
+    "order": [
+     "fp2",
+     "plain"
+    ],
+    "plain_over_fp2_index_build": 1.49349433446,
+    "plain_over_fp2_process_wall": 1.29431642594,
+    "arms": [
+     {
+      "layout": "fp2",
+      "index_build_ms": 93047.561292,
+      "process_wall_seconds": 193.284082583,
+      "online_ms": 384.498542,
+      "peak_rss_bytes": 1458618368,
+      "root_fp2_bytes": 41943040,
+      "status": "PASS_INDEPENDENT_FULL_REPLAY"
+     },
+     {
+      "layout": "plain",
+      "index_build_ms": 138966.005625,
+      "process_wall_seconds": 250.170762959,
+      "online_ms": 1132.298875,
+      "peak_rss_bytes": 1420460032,
+      "root_fp2_bytes": 0,
+      "status": "PASS_INDEPENDENT_FULL_REPLAY"
+     }
+    ]
+   }
+  ],
+  "plain_over_fp2_index_build_range": [
+   1.00144691089,
+   1.49349433446
+  ],
+  "plain_over_fp2_process_wall_range": [
+   1.01737302783,
+   1.29431642594
+  ],
+  "candidate_id": null,
+  "matched_rho_speedup": null,
+  "tier1_speedup": null
+ },
+ "n83_image_closed_degree2_diagnostic": {
+  "curve": "icv1-f2m83-t6151469093347-9eba6cd5",
+  "source": "research/n83_image_closed_degree2_20261101/ASSESSMENT.json",
+  "readme": "research/n83_image_closed_degree2_20261101/README.md",
+  "case_id": "n83-image-closed-degree-two-fiber",
+  "status": "rejected_by_structural_and_cost_gates",
+  "class": "structural transfer rejection; collector and timing stopped before performance measurement",
+  "map": "phi(u,v)=(u^3,uv+1)",
+  "fiber_support_degrees": [
+   1,
+   2
+  ],
+  "projected_identity": "[3]P=P+[2]P",
+  "useful_relation_probability": 0,
+  "independent_rank_per_identity": 0,
+  "source_rho_exponent": "0.5*log2(r)",
+  "ambient_collection_exponent": "(4/3)*83",
+  "ambient_gap_bits": "approximately 70.17",
+  "controls": [
+   "n=2 split fiber",
+   "n=9,13,19,23,83 odd-degree fibers",
+   "n=83 exceptional ramified point",
+   "pinned order-r generator",
+   "general arbitrary-class Jacobian norm"
+  ],
+  "open_obligations": [
+   "a compact growing-degree or adaptive target-local router remains unclassified",
+   "any future router must name relation search, projected rank, matrix, memory, blind individual-log descent, verification, and a finite crossover"
+  ],
+  "collector_admitted": false,
+  "timing_admitted": false,
+  "speedup_claim": false
  },
  "latest_frontier_audit": {
   "date": "2026-10-14",
@@ -313635,6 +313891,203 @@
   "report": "research/ecbench_lazy_columns2_20261018/REPORT.pdf",
   "source": "research/ecbench_lazy_columns2_20261018/figures/ratios.json",
   "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates."
+ },
+ "f4_fp_ic_component": {
+  "study": "research/f4_fp_ic_effect_20261018",
+  "run": "run-20261018T1548Z",
+  "pipeline": "examples/jv_cover.rs (Nagao decompositions on a genus-2 cover of E(F_{p^6}); every decomposition one f4_fp solve)",
+  "change": "f4_fp as on main before #1717 (4b6e09b78) against after #1717",
+  "class": "engineering",
+  "unit": "S counted by jv_cover (field multiplications priced in group additions); unpriced native work is not emitted by either arm, so S/rho is a lower-bound comparison",
+  "ccov": [
+   {
+    "p": 53,
+    "tests": 120,
+    "planted_found": [
+     20,
+     20
+    ],
+    "constructed": 20,
+    "c_cov_before": 6157721.75,
+    "c_cov_after": 1224314.95833,
+    "f4_muls_before": 5671366.45833,
+    "f4_muls_after": 737959.666667,
+    "lin_muls": [
+     482158.808333,
+     482158.808333
+    ],
+    "f4_degree": [
+     9.95833333333,
+     7.95833333333
+    ],
+    "max_rows": [
+     769.166666667,
+     234.583333333
+    ],
+    "total_ms": [
+     22.9666666667,
+     10.825
+    ],
+    "c_cov_ratio": 5.02952423156,
+    "f4_ratio": 7.68519841193
+   },
+   {
+    "p": 101,
+    "tests": 120,
+    "planted_found": [
+     20,
+     20
+    ],
+    "constructed": 20,
+    "c_cov_before": 6172092.33333,
+    "c_cov_after": 1222626.66667,
+    "f4_muls_before": 5686392.225,
+    "f4_muls_after": 736926.558333,
+    "lin_muls": [
+     481526.158333,
+     481526.158333
+    ],
+    "f4_degree": [
+     9.95833333333,
+     7.98333333333
+    ],
+    "max_rows": [
+     766.583333333,
+     231.283333333
+    ],
+    "total_ms": [
+     23.5583333333,
+     8.85833333333
+    ],
+    "c_cov_ratio": 5.04822322431,
+    "f4_ratio": 7.71636218114
+   },
+   {
+    "p": 251,
+    "tests": 120,
+    "planted_found": [
+     20,
+     20
+    ],
+    "constructed": 20,
+    "c_cov_before": 6252565.74167,
+    "c_cov_after": 1284448.725,
+    "f4_muls_before": 5712778.63333,
+    "f4_muls_after": 744661.616667,
+    "lin_muls": [
+     534854.541667,
+     534854.541667
+    ],
+    "f4_degree": [
+     9.95,
+     7.975
+    ],
+    "max_rows": [
+     766.566666667,
+     231.216666667
+    ],
+    "total_ms": [
+     23.725,
+     9.06666666667
+    ],
+    "c_cov_ratio": 4.86789828194,
+    "f4_ratio": 7.67164374458
+   }
+  ],
+  "dlp": [
+   {
+    "p": 53,
+    "seed": 1,
+    "bits": 32.367524182,
+    "residuals": 19020,
+    "relations": 31,
+    "solved": [
+     true,
+     true
+    ],
+    "correct": [
+     true,
+     true
+    ],
+    "s_before": 4734.31642876,
+    "s_after": 936.893173124,
+    "s_ratio": 5.05320837484,
+    "rho_s_mean": 1.10181839577,
+    "rho_s_sd": 0.203886577414,
+    "rho_runs": 4,
+    "s_over_rho_before": 4296.82100694,
+    "s_over_rho_after": 850.315421057
+   },
+   {
+    "p": 53,
+    "seed": 2,
+    "bits": 32.367516421,
+    "residuals": 8486,
+    "relations": 33,
+    "solved": [
+     true,
+     true
+    ],
+    "correct": [
+     true,
+     true
+    ],
+    "s_before": 2120.62816189,
+    "s_after": 425.190667611,
+    "s_ratio": 4.98747579245,
+    "rho_s_mean": 1.15071081783,
+    "rho_s_sd": 0.68853994202,
+    "rho_runs": 4,
+    "s_over_rho_before": 1842.8853966,
+    "s_over_rho_after": 369.502624833
+   },
+   {
+    "p": 101,
+    "seed": 1,
+    "bits": 37.9492681424,
+    "residuals": 40100,
+    "relations": 53,
+    "solved": [
+     true,
+     true
+    ],
+    "correct": [
+     true,
+     true
+    ],
+    "s_before": 1454.61532544,
+    "s_after": 287.523438271,
+    "s_ratio": 5.05911912497,
+    "rho_s_mean": 1.48264380916,
+    "rho_s_sd": 0.521461378759,
+    "rho_runs": 4,
+    "s_over_rho_before": 981.095605333,
+    "s_over_rho_after": 193.926171948
+   },
+   {
+    "p": 101,
+    "seed": 2,
+    "bits": 37.9492710976,
+    "residuals": 65422,
+    "relations": 50,
+    "solved": [
+     true,
+     true
+    ],
+    "correct": [
+     true,
+     true
+    ],
+    "s_before": 2370.4731038,
+    "s_after": 466.435697425,
+    "s_ratio": 5.08210052722,
+    "rho_s_mean": 1.24943925903,
+    "rho_s_sd": 0.577182217748,
+    "rho_runs": 4,
+    "s_over_rho_before": 1897.22956653,
+    "s_over_rho_after": 373.316024814
+   }
+  ]
  },
  "jv_cover_linear_stage_component": {
   "study": "research/jv_cover_sparse_fglm_20261018",
