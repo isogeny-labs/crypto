@@ -81,6 +81,14 @@ mismatch is reported.
   preprocessing and is the same for both exact kernels; P1 and P2 test that claim on
   35 cells.
 
+- **Deviation D1 (recorded 2026-11-01 at 20:07Z, during stage 2, before reading any
+  stage-2 result beyond four cell status lines).** `run_stage.sh c2m` copies all 32
+  committed M inputs (models 0 to 7 per side), while A3 above and the frozen C2 design
+  name 16 (models 0 to 3; the original stage was called with a model limit of 4). The
+  card runs as compiled. The frozen rule is evaluated on the 16 cells of models 0 to 3
+  only; the cells of models 4 to 7 are reported beside it as additional observations
+  and enter no decision.
+
 ## Decision rules (unchanged, copied for the reader)
 
 - **L2a** (`../PLAN.md`): bootstrap interval of e entirely below 0.5 reopens; an
