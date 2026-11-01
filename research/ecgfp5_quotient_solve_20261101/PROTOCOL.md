@@ -62,7 +62,7 @@ about 2^{115.5 + log2(c)/3} word operations (G1). The verdict depends on c, not 
   4 − 4b are non-squares in F_q (EcGFp5 is b = 263z, m = 5, p = 2^64 − 2^32 + 1,
   z^5 − 3; Pornin 2022/274, *recorded*). β is the smallest non-square of F_p and λ the
   Tonelli–Shanks root of b/β in F_q; the factor base is {P : x(P)/λ ∈ F_p}.
-- **Primes**: p ∈ {4111, 65551, 33554371}, all ≡ 1 (mod 15), log2 p = 12.005, 16.000,
+- **Primes** (65551 replaced by 262231 in amendment A1, §10): p ∈ {4111, 65551, 33554371}, all ≡ 1 (mod 15), log2 p = 12.005, 16.000,
   25.000: they span 12.99 bits (*derived*) and straddle msolve's 16-bit and 32-bit
   arithmetic paths. 4111 is the prime of the earlier ladder (`EXP-GFPN-05ff43`); the
   third prime replaces 16777291, which spans only 11.995 bits from 4111.
@@ -176,3 +176,34 @@ statement that it is below 128 or 142 bits routes to review-breakthrough
 `run_cells.sh` (the frozen commands), `results/<cell>/` (meta.json, the `.ms` systems,
 msolve logs, `run.json`, `check.json`), `analyze.py` and `plot.py` (analysis and
 rendering only), `README.md` and `report.pdf`.
+
+## 10. Amendment A1 (2026-11-01T01:40Z, before any m = 5 cell and before any cell at 262231 or 33554371)
+
+**What happened** (*recorded*, `results/`). The first execution of the card
+(`cards/RUN_CARD.md`) ran `build.sh`, `run_cells.sh host` and `run_cells.sh m3`. The
+m = 3 cells at 4111 (planted and random) completed with every prediction met
+(`results/m3_p4111_*`, `results/m3.run1.stdout`). At 65551 msolve 0.6.5 died with
+SIGSEGV on all five arms within its first F4 rounds (`results/m3_p65551_planted/*.run.json`,
+signal 11). `run_cells.sh` then stopped under `set -o pipefail`, because its summary
+`grep` found nothing; the executor reported that step as exit 0, which it was not.
+Step d then started `m5all`; the main session stopped it 72 s into the 4111 solve (F4
+degree 20, 214 CPU-s), before any m = 5 result, because the m = 3 validation had not
+finished. That directory is kept, unread as data, under
+`results/_aborted_launch_20261101T0129Z/`.
+
+**The solver defect** (*recorded*, a two-variable toy system x² + y² − 5, xy − 2):
+msolve 0.6.5 (Ubuntu `0.6.5-1build2`) exits with SIGSEGV for every tested prime from
+65537 to 253229 (65537, 65993, 92681, 131101, 150571, 172969, 185363, 198673, 228211,
+244589, 253229) and solves at 61151, 262147, 262231 and 33554371, with 1 or 4 threads.
+
+**Changes.**
+1. The middle prime 65551 becomes **262231** (≡ 1 mod 15, log2 = 18.0005). The span
+   4111 → 33554371 (12.99 bits) is unchanged. `results/m3_p65551_planted/` stays as the
+   record of the defect; 65551 is not a protocol prime any more.
+2. `run_cells.sh`: summary lines can no longer stop the script; `m3` takes a prime
+   list; the m = 5 order is 4111, 262231, 33554371; `launch-m5all` starts the chain
+   detached and writes its own pid file.
+3. The 4111 m = 3 cells of the first execution are protocol data (same frozen commands,
+   unchanged prime). The remaining m = 3 cells run with `run_cells.sh m3 262231 33554371`.
+
+Nothing else changes: arms, seeds, caps, units, criteria and predictions are as in §2–§7.
