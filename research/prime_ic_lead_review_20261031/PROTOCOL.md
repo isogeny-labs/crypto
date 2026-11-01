@@ -1,285 +1,182 @@
 # Draft protocol: arity-three prime-field CDCL(T) exponent screen
 
-**Status:** design complete enough for review, **not frozen and not executable
-yet**. No affected data may be taken until the native instrument, the exact
-CaDiCaL external-propagator source, theory-explanation checker, external solver
-versions and hashes, preflight runtime, power justification and analysis script
-are filled into `protocol.draft.json`, the record validates, is frozen, and is
-committed.
+**Status:** hardened draft, not frozen and not scientifically run. The native
+development oracle merged in `cryptanalysis#1347`; the production propagator,
+certificate route, complete accounting, power source and held-out freeze are
+still missing.
 
-## Question
+## Question and complete-cost gate
 
-At fixed arity `m=3`, does hybrid CDCL(T) with an `F_p` theory, or cvc5
-`QF_FF`, achieve point-decomposition work `2^(e s)` with the upper corrected
-95% interval for `e` strictly below `0.5`, while returning the exact model
-status and surviving enumeration, planted, UNSAT, curve-free-null and A/A
-controls?
+At fixed arity `m=3`, does hybrid CDCL(T) with a source-bound `F_p` theory
+achieve natural point-decomposition query work `Q(s)=2^(e s)` while reusable
+setup costs `S(s)=2^(a s)`, with corrected upper intervals strictly below
+`e=0.5` and `a=1.5` on the complete verified panel?
 
-The experiment tests a solver/representation family. It cannot prove a
-subexponential ECDLP algorithm. A failing arm refutes only that frozen
-representation, solver version, parameter ladder and budget.
+Relation collection has `Theta(2^s)` natural queries, so its work is
 
-## Semantic instance, fixed before representation
+```text
+S(s) + 2^s Q(s) = 2^(a s) + 2^((e+1)s)
+```
 
-Use a nonsingular `E/F_p` with known prime whole-group order and the corrected
-arity-three predicate:
+up to polynomial factors. Both gates are necessary. This screen measures a
+frozen finite-range solver/representation bundle; it cannot prove a
+subexponential ECDLP algorithm.
 
-- three disjoint one-hot windows of rational factor-base points;
-- exactly-one and forbidden-word clauses in the Boolean skeleton;
-- two chained `S3` relations through an intermediate point and the quadratic
-  lambda lift; no expanded `S4` polynomial;
-- the nonzero-displacement chart, with every zero-displacement exceptional case
-  represented explicitly;
-- the guarded three-summand/disjoint-window rationality argument, so no
-  additional rationality circuit is present at `m=3`;
-- sign recovery, curve membership and independent group-law replay.
+## Semantic instance
 
-The lambda equation `(2t*lambda-s0)^2=f(x)` has discriminant
-`16*t^2*f(x)`. For nonzero `t` it gives a rational lambda exactly when `x`
-has a rational curve lift. The construction and its exceptional branch are
-specified in [`DEC-20261031-cd6460.md`](DEC-20261031-cd6460.md).
+One native generator emits a canonical typed IR. Every exporter consumes those
+same bytes; no arm regenerates the mathematical instance. The predicate uses:
 
-One native Rust generator emits a canonical typed polynomial/Boolean IR.
-Representation exporters consume that IR. An arm may not regenerate the
-mathematical instance independently.
+- a nonsingular `E/F_p` with known odd prime whole-group order and a rational
+  non-2-torsion target;
+- three disjoint abscissa windows and exactly one selected abscissa per window;
+- a rational lift sign bound to each selection;
+- two chained `S3` relations through the quadratic lambda lift, with no
+  expanded `S4` polynomial;
+- every exceptional chart, including `t=0`, represented explicitly; and
+- independent signed group-law replay of every model.
 
-### Fixed ladder
+Chained `S3` is sign-blind and cannot by itself establish the signed point
+relation. The nonexceptional lift equation
+`(2t lambda-s0)^2=f(x)` has discriminant `16t^2 f(x)`. Under the stated
+odd-prime-order, target and disjoint-window guards, the three-summand
+Frobenius argument makes every accepted lift rational. Arity four and higher
+retain explicit rationality circuits.
 
-| rungs | arity `m` | scale `s` | approximate field bits | target classes |
-|---:|---:|---:|---:|---|
-| 1--9 | 3 | every integer 6--14 | 18--42 | natural, planted, exact UNSAT |
+The complete derivation and provenance are in
+[`PDP_ARITY_CORRECTION.md`](PDP_ARITY_CORRECTION.md).
 
-There are eight independent held-out instances per target class per rung: 216
-instances. `s` is the declared scale and the manifest records the actual
-`log2(p)/3` after prime rounding. Seeds are derived from the frozen protocol
-hash. Prime/curve/base/window generation must finish before arm labels are
-assigned and is independent of the solver arm.
+## Boolean and range encodings
 
-Canonical two-window enumeration is attempted at every rung and is expected to
-scale as `2^(2s)` up to polynomial factors. The largest exactly enumerable
-prefix is fixed in preflight; later timeouts stay in the export. A continuation
-may extend `s=15..27` (approximately 45--81-bit fields) under a separately
-frozen amendment, never by changing this first ladder after data.
+For `s=6..14`, exactly-one is Sinz sequential at-most-one plus one
+at-least-one clause. A window of size `n>=2` has `n-1` auxiliary variables and
+`3n-3` clauses. The cryptanalysis development oracle exhaustively checks this
+construction through `n=8`.
 
-## Arms
+Field/index membership is the compact semantic predicate
+`0 <= word < domain`, exported as an unsigned comparator or native theory
+check. One clause per forbidden word is allowed only below a frozen cap that
+admits the complete enumeration.
 
-| id | role | representation/backend | purpose |
-|---|---|---|---|
-| `enum-ref` | reference | canonical exact two-window enumeration | complete model-set oracle at small sizes and `e=2` cost control |
-| `f4-base` | baseline | identical polynomial IR to msolve/F4 | established algebraic solver reference |
-| `cdcl-t-fp` | candidate | CaDiCaL Boolean skeleton plus external `F_p` theory propagator | primary hybrid hypothesis |
-| `qf-ff` | candidate | `QF_FF` to cvc5 | independent finite-field solver route |
-| `cnf-cost` | control | complete pure-CNF bit-blast | expose `Theta(log^2 p)` multiplication expansion; not a theorem route |
-| `cdcl-t-aa` | A/A | same binary, input, theory and seed as `cdcl-t-fp`, fresh process/layout | runtime/instruction noise floor |
-| `planted-positive` | positive | same CDCL(T) path on the planted class | detector, theory-explanation and witness-extraction power |
-| `matched-null` | negative | same CDCL(T) path on a support/model-count matched curve-free predicate | distinguish elliptic structure from generic sparse-system behavior |
+Pure CNF is an encoding-cost control. Its multiplier, gate basis and modular
+reduction are frozen before data. The selected schoolbook multiplier may have
+`Theta((log p)^2)` gates by construction; this is not a general Boolean
+multiplication lower bound. Actual gate, variable, clause and byte counts are
+reported.
 
-The candidate is a solver-plus-faithful-theory bundle. CaDiCaL owns Boolean
-search; the `F_p` theory owns field arithmetic and must emit a checkable
-explanation clause for every propagated literal or conflict. Theory calls,
-field operations and explanation checking are charged. The quotient-ring
-relations `z^2-z` avoid carries algebraically, but they do not make a pure CNF
-field multiplication constant-size.
+## Ladder, classes and continuation
 
-## Controls
+The initial ladder is every integer `s=6..14` at `m=3`. The regression
+coordinate is actual recorded `log2(p)/3`. At each rung generate eight
+independent natural, eight planted and eight exact-UNSAT instances before arm
+labels are assigned, for 216 semantic instances. Seeds derive from the frozen
+protocol hash.
 
-### Exact semantics
+The selected one-hot encoding has these exact structural sizes at `s=27`:
 
-At every enumerable cell, compare the complete projected model set after
-canonicalization. SAT/UNSAT agreement alone is insufficient. At larger cells,
-every SAT witness is checked by the canonical IR evaluator and independent
-group law; every claimed UNSAT requires a checked proof object when the backend
-supports one. An unproved UNSAT is `unknown`, not `unsat`.
+```text
+402,653,184 selector variables
+402,653,181 Sinz auxiliary variables
+805,306,365 total Boolean variables before theory auxiliaries
+1,207,959,543 exactly-one clauses
+```
 
-### Positive control
+Thus `s=15..27` is not an admitted continuation. A prospective amendment must
+either pass a measured resource preflight for this exact representation or
+freeze a compact/lazy selector after complete small-cell projected-model-set
+equivalence, A/A, setup-exponent, serialized-size and peak-RSS preflights.
 
-Each planted instance contains a decomposition generated before solver input
-serialization. The solver receives only the public curve, target and system.
-Every backend must return a valid model whose replay sums to the target; it need
-not return the originally planted tuple if another valid model exists. A miss
-invalidates that backend/rung's negative reading.
+## Arms and eligibility
 
-Mutation controls change one field coefficient, admit one forbidden word,
-force two windows to share an abscissa, corrupt one theory-explanation clause
-and corrupt one extracted root. The canonical evaluator/explanation checker
-must reject all five.
+| id | role | requirement |
+| --- | --- | --- |
+| `enum-ref` | exact reference | two-window projected-model oracle where complete; `e=2` cost control |
+| `f4-base` | algebraic baseline | identical polynomial IR to a pinned F4 backend |
+| `cdcl-t-fp` | sole slope candidate | CaDiCaL skeleton plus source-bound `F_p` theory and checked explanations/proof |
+| `qf-ff` | diagnostic | cvc5 QF_FF SAT models replayed; UNSAT is ineligible at the inspected source |
+| `cnf-cost` | encoding control | complete selected schoolbook bit-blast and size/proof ledger |
+| `cdcl-t-aa` | A/A | byte-identical fresh-process CDCL(T) run |
+| `planted-positive` | positive control | witness, sign binding and explanation path |
+| `matched-null` | negative control | curve-free sparse system matched on field, variables, degrees, incidence, encoding and small-cell model count |
 
-### Negative control
+The `cdcl-t-fp` theory owns field arithmetic, inversion guards, chained
+group-law constraints, sign binding and exceptional-chart consistency. Every
+propagation/conflict returns a Boolean explanation replayed by an independent
+checker. UNSAT additionally requires a log whose Boolean steps and admitted
+theory lemmas both replay.
 
-For each natural instance, generate a curve-free sparse system with the same:
+Inspected cvc5 source head
+`02f77af402b4be82f27e5cc00b86b265a90dea3d` has no finite-field proof checker.
+Therefore `qf-ff` is a SAT/model diagnostic outside `C-slope`. An unproved
+`unsat` is `unknown`. A future proof-capable candidate requires a prospective
+amendment before affected data; only then may a multiple-comparison family be
+added.
 
-- field and bit length;
-- variable/equation counts and degree multiset;
-- monomial-support incidence graph;
-- selected chart, one-hot/window shape and field equations;
-- exact model count on enumerable cells, or the same planted/UNSAT class at
-  larger cells.
+## Controls and mutations
 
-Randomize coefficients subject to the planted model where applicable. If the
-model-count match cannot be obtained within the preregistered generator budget,
-the pair is invalid; do not substitute an easier null after observing solver
-behavior.
+At every enumerable cell compare complete canonical projected model sets.
+Elsewhere replay every SAT witness and require an independently checked proof
+for UNSAT. Planted instances accept any valid decomposition, not necessarily
+the planted tuple. Matched-null generation is bounded and fixed before data;
+failure to produce the preregistered match invalidates the pair.
 
-### A/A
+Mutation controls alter one field coefficient, admit one out-of-range word,
+overlap two windows, corrupt one lift sign/root, corrupt one theory explanation
+and corrupt one UNSAT proof step. The canonical evaluator and certificate
+checkers must reject all six.
 
-`cdcl-t-aa` uses a fresh process and independently randomized memory layout but
-the same Boolean bytes, theory instance and solver seed as `cdcl-t-fp`. Its
-retired-instruction and wall-time spread is the noise floor. A second
-diagnostic A/A with a protocol-derived variable renaming may be reported, but
-it is not the primary A/A because variable order can alter CDCL search.
+## Complete accounting
 
-## Variable ledger
+Each fresh process records non-overlapping stages:
 
-| factor | treatment | rule |
-|---|---|---|
-| mathematical instance | fixed within pair | one canonical IR hash supplied to every backend |
-| solver/representation bundle | crossed | the independent variable |
-| rung and target class | crossed | all declared cells, no favorable subset |
-| curve, target and null draw | randomized | protocol-hash seeds, independent of arm |
-| compiler, wrapper and exporter | fixed | one commit and one binary hash |
-| external solver/theory | fixed within arm | solver version, propagator source, binary hash, flags and explanation checker frozen |
-| threads | fixed | one thread in all arms |
-| arm order | interleaved | randomized within instance/rung round |
-| warm-up | fixed | one discarded warm-up per binary/size class |
-| host, kernel, frequency, SMT, NUMA, pressure | measured | isolab L2 receipt on every row |
-| process layout | randomized | fresh process per replicate |
-| spot interruption | measured | no scientific retry; interrupted rows retained; restored clocks invalid |
-| analyst | masked | method labels withheld until the frozen analysis completes |
+1. **cold setup:** process start through target-independent IR construction,
+   parsing, solver initialization and preprocessing;
+2. **online query:** first target-dependent instruction through backend exit;
+3. **certificate/replay:** extraction, explanation/proof checking and signed
+   group-law verification.
 
-## Metrics
+Primary counters are complete cold instructions, setup instructions,
+online-plus-verification instructions and peak RSS over the cold interval.
+Also retain field-operation vectors, CDCL decisions/conflicts/propagations/
+restarts/learned bytes and per-stage bytes. The stages must reconcile exactly
+to the cold total.
 
-### Primary
+The query exponent `e` is fit only from natural instances. Planted and
+exact-UNSAT classes are correctness/control strata with separately reported
+descriptive slopes; they never enter `e`. The setup exponent `a` is fit from
+the target-independent stage once per generated predicate.
 
-1. **Verified status/model set** (`exact`): canonical projected models on exact
-   cells; otherwise verified SAT witness, proof-checked UNSAT, unknown or
-   timeout.
-2. **Complete counted work** (`counted`): retired instructions from the first
-   target-dependent IR compilation instruction through solver exit and
-   independent verification, including parse/serialization, every theory call
-   and explanation check, and proof/model extraction. Theory field operations
-   are also reported as a separate exact counter vector. Reusable target-
-   independent setup is reported separately.
-3. **Peak resident bytes** (`counted`): maximum RSS over the complete interval.
-4. **PDP exponent `e`** (`derived`): robust slope of
-   `log2(complete counted work)` directly against declared scale `s`, with a
-   paired bootstrap interval over instances. Candidate-space size is not the
-   normalization axis.
+## Analysis and decision
 
-### Mechanism diagnostics
+Primary Theil--Sen regressions use actual `log2(p)/3`. Bootstrap resampling
+units and one-sided intervals are frozen in analysis source before data. There
+is one eligible slope candidate and therefore no artificial Holm correction.
 
-- CDCL(T): decisions, conflicts, Boolean propagations, restarts, learned
-  clauses/bytes, theory calls, theory propagations/conflicts, field additions,
-  multiplications and inversions, and explanation clauses checked;
-- pure CNF: variables, clauses and gates by field operation, including the
-  measured `Theta(log^2 p)` multiplication expansion;
-- F4: solving degree, rows, columns, nonzeros and multiply-adds;
-- QF_FF: backend-native conflicts/lemmas/field reductions where emitted;
-- all arms: input variables, constraints, bytes, setup instructions, solve
-  instructions, verification instructions and failure class.
+**Advance:** every preregistered natural row at every rung completes with a
+verified exact status; every planted and exact-UNSAT control completes and
+verifies; the frozen power condition holds; upper intervals satisfy `e<0.5`
+and `a<1.5`; both are outside A/A spread; and cold/stage ledgers reconcile.
 
-Report the Boolean native-work sensitivity band
-`W(w)=decisions+conflicts+w*propagations`, `w in {0,0.1,1}`, next to—not in
-place of—the complete counted work and theory ledger. A conclusion that exists
-only after assigning zero cost to theory work is invalid.
+**Do not advance:** the same complete verified panel and power condition hold,
+and either corrected lower interval has `e>=0.5` or `a>=1.5`.
 
-Wall time is secondary, only from L2 rows, and is read against the A/A interval.
-No stage count is promoted to a complete ECDLP or rho comparison.
+**Inconclusive:** anything else, including any natural timeout, OOM, unknown,
+unproved UNSAT, incomplete rung, completed-row subset, failed positive
+control, explanation/proof rejection, insufficient power or a favorable
+conclusion obtained only by excluding setup/theory/verification work.
 
-## Sample size and analysis
+No imputation or favorable subset can satisfy the advance gate. Censored rows
+remain in the export and may support a separately preregistered conservative
+lower-bound analysis, but never this decision statistic.
 
-The current draft specifies 24 instances per rung (eight per target class),
-three measured fresh-process replicates and one warm-up. Before freezing:
+## Freeze blockers
 
-1. time one complete call per arm and rung on scratch instances;
-2. separate fixed from per-instance cost;
-3. run the full analysis on scratch output;
-4. justify power to distinguish an exponent below `0.5` from the boundary and
-   a 1.5x paired instruction ratio under the observed log-ratio variance;
-5. retain 216 instances unless power requires more—never reduce power to fit a
-   preferred budget.
+- production typed IR/generator beyond the landed development fixture;
+- source-bound prime-field propagator and independent explanation/proof checker;
+- pinned backend builds and QF_FF diagnostic/export decision;
+- exact cold/setup/online/certificate instrumentation and reconciliation;
+- frozen analysis, multiplicity statement, power calculation and resource preflight;
+- immutable held-out manifest and protocol hash.
 
-The draft currently marks power as not established. That is a freeze blocker,
-not permission to take pilot data on the target cells. Scratch preflight uses
-separate disclosed instances.
-
-## Decision rules
-
-The family has two candidate solver bundles; use Holm correction at family
-alpha `0.05`.
-
-### `sat_screen_advanced`
-
-At least one preregistered finite-field solver bundle must satisfy all of:
-
-1. every positive control at every attempted rung verifies;
-2. no wrong answer or unproved UNSAT;
-3. enough completed natural cells to meet the frozen power calculation, with
-   no favorable-subset choice;
-4. Holm-corrected upper 95% interval for `e` strictly below `0.5` over the
-   preregistered `s=6..14` ladder;
-5. the exponent conclusion lies outside A/A spread and is unchanged when all
-   theory work and independent verification are included.
-
-### `sat_screen_not_advanced`
-
-Use this verdict only when the corrected lower 95% interval for `e` is at least
-`0.5` over the preregistered ladder with valid controls and sufficient power.
-
-### `inconclusive`
-
-All other censoring, failed positive controls, missing perf counters, unmatched
-nulls, invalid isolation for clock claims or insufficient power is
-`inconclusive`. Wrong answers are reported explicitly and invalidate that arm;
-they are not folded into a runtime loss.
-
-The structure comparison (`cdcl-t-fp` versus `matched-null`) is separate. An
-elliptic-structure effect requires a corrected paired instruction ratio at most
-`0.8` on the three largest completed rungs with an interval excluding 1.
-Absence of that effect does not by itself refute a generic SAT-engine
-improvement.
-
-## Stopping and budgets
-
-- Fixed cells and fixed instance count; no stopping when a favorable slope
-  appears.
-- Per-row timeout and memory limits are identical across arms after preflight.
-- Infrastructure failures may retry once; solver timeouts and nonzero solver
-  exits are outcomes and never retry.
-- If a row is restored after interruption, counted units remain valid and wall
-  time is invalid.
-- The positive-control block runs first. A failed detector stops affected
-  negative readings but all attempted rows remain in the export.
-
-## Inadmissible moves
-
-- changing primes, curves, cells, seeds, target class or the null after seeing
-  solver output;
-- comparing SAT on a selected chart with F4 on an unselected/repeated-root
-  chart;
-- omitting theory calls, field operations, explanation checking, extraction,
-  setup, proof or verification costs from one arm;
-- calling pure CNF and a field-theory propagator the same solver model;
-- fitting against candidate-space size instead of `s`, or using a non-strict
-  threshold at `e=0.5`;
-- treating `unknown`, timeout or unproved UNSAT as no solution;
-- quoting a candidate-only completion as a speedup;
-- replacing one-target evidence with a multi-target average;
-- calling a finite slope a proof of subexponential complexity;
-- selecting propagation weights after seeing which one wins.
-
-## Required artifacts
-
-- frozen `protocol.json` and generated seed list;
-- canonical instance IRs and every representation, all hashed;
-- native wrapper and analysis source/hash;
-- solver binaries, versions, flags and image digest;
-- exact external-propagator source binding, theory-operation ledger and
-  independently checked explanation clauses;
-- raw row per execution, including failures;
-- one `experiment.export/v1` passing `check-export --verify-files`;
-- masked analysis output, unmask key hash and flow table;
-- independent replay/review record;
-- run report, quantitative graphs and inspected PDF.
-
-The formal draft is [protocol.draft.json](protocol.draft.json). It is expected
-to remain `draft` until every freeze blocker named above is resolved.
+Until every item is present and the machine record validates and freezes in a
+reviewed commit, only disclosed development-fixture validation is authorized.

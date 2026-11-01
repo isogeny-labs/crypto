@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "EXP-prime-m3-cdclt-exponent-screen-20261031",
-  "version": 1,
+  "version": 2,
   "created": "2026-10-31",
   "repository": "crypto",
   "study_dir": "research/prime_ic_lead_review_20261031",
@@ -10,10 +10,12 @@
   ],
   "links": {
     "narrative": "research/prime_ic_lead_review_20261031/PROTOCOL.md",
-    "construction": "research/prime_ic_lead_review_20261031/DEC-20261031-cd6460.md",
+    "construction": "research/prime_ic_lead_review_20261031/PDP_ARITY_CORRECTION.md",
+    "development_oracle": "cryptanalysis@3c769002f0f68d63a5055f6f3e24a9500393180e:experiments/prime-field-m3-cdclt-20261031",
+    "additive_decision": "crypto-autoresearcher:ledger/decisions/DEC-20261101-26f1fa.yaml",
     "prior_sat_design": "research/sat_smt_prime_ic_design_20261030/DESIGN.md"
   },
-  "question": "At fixed arity m=3, does hybrid CDCL(T) with an F_p theory or cvc5 QF_FF achieve point-decomposition work 2^(e s) with the upper corrected 95% interval for e strictly below 0.5, while passing exact enumeration, planted, UNSAT, curve-free-null and A/A controls?",
+  "question": "At fixed arity m=3, does source-bound hybrid CDCL(T) with an F_p theory have reusable setup exponent a below 1.5 and natural point-decomposition query exponent e below 0.5 on the complete verified s=6..14 panel, while passing exact enumeration, planted, UNSAT, curve-free-null and A/A controls?",
   "claims": [
     {
       "id": "C1",
@@ -23,12 +25,12 @@
     },
     {
       "id": "C2",
-      "text": "At least one preregistered finite-field solver bundle has a complete-work exponent e whose corrected upper 95% interval is strictly below the arity-three rho crossover 0.5, outside A/A spread.",
+      "text": "The preregistered CDCL(T)/F_p bundle has a natural-query exponent e whose upper 95% interval is below 0.5 and a reusable-setup exponent a whose upper interval is below 1.5, outside A/A spread, on the complete verified panel.",
       "class": "comparative",
       "decided_by": [
         "C-slope"
       ],
-      "if_supported": "the frozen bundle advances to the separately frozen s=15..27 continuation; no asymptotic or ECDLP speedup claim",
+      "if_supported": "the frozen bundle merits a separately frozen continuation proposal, but the current one-hot s=15..27 representation remains unadmitted and no asymptotic or ECDLP speedup is claimed",
       "if_not_supported": "the frozen bundle is not advanced under the stated ladder and limits; no universal SAT or CDCL(T) impossibility claim"
     },
     {
@@ -53,14 +55,14 @@
   "hypotheses": [
     {
       "id": "H1",
-      "statement": "The arity-three one-hot chained-S3 predicate exposes enough Boolean and finite-field structure that at least one hybrid solver bundle has complete-work exponent e below 0.5.",
+      "statement": "The arity-three one-hot chained-S3 predicate exposes enough Boolean and finite-field structure that the CDCL(T)/F_p bundle has natural-query exponent e below 0.5 while reusable setup has exponent a below 1.5.",
       "mechanism": "CaDiCaL owns the one-hot Boolean skeleton while an F_p theory propagator owns field arithmetic and checked explanations; disjoint windows provide guarded three-summand rationality without an S4 expansion.",
       "predictions": [
         {
           "id": "P1",
           "metric": "pdp_exponent_e",
           "direction": "lower",
-          "minimum_effect": "upper corrected 95% interval strictly below 0.5 over the preregistered s=6..14 ladder",
+          "minimum_effect": "natural-only upper 95% interval strictly below 0.5 and setup upper interval strictly below 1.5 over the complete preregistered s=6..14 ladder",
           "provenance": {
             "written_at": "2026-10-31",
             "first_recorded_in": "research/prime_ic_lead_review_20261031/PROTOCOL.md",
@@ -88,7 +90,7 @@
       "predictions": [
         {
           "id": "P2",
-          "metric": "retired_instructions",
+          "metric": "cold_retired_instructions",
           "direction": "lower",
           "minimum_effect": "paired candidate/null median ratio at most 0.8 on the three largest rungs with corrected 95% interval below 1",
           "provenance": {
@@ -173,14 +175,17 @@
       },
       "parameters": {
         "encoding": "one-hot-chained-s3-cdcl-t-fp",
+        "selector_semantics": "abscissa plus rational-lift sign; chained S3 alone is insufficient",
+        "exactly_one": "Sinz sequential at-most-one plus one at-least-one clause",
+        "range_encoding": "native unsigned word<domain predicate; forbidden-word enumeration only under a frozen cap",
         "theory_explanations": "required and independently checked",
-        "proof_logging": "required for UNSAT"
+        "proof_logging": "Boolean and admitted finite-field theory steps independently replayed for UNSAT"
       }
     },
     {
       "id": "cnf-cost",
       "role": "baseline",
-      "description": "Complete pure-CNF bit-blast retained only as an encoding-cost control; general field multiplication pays Theta(log^2 p) gates.",
+      "description": "Complete pure-CNF bit-blast retained only as an encoding-cost control; the selected schoolbook field multiplier has Theta((log p)^2) gates by construction, not as a universal lower bound.",
       "instrument": {
         "repo": "crypto",
         "commit": null,
@@ -198,13 +203,15 @@
       },
       "parameters": {
         "encoding": "complete-field-bitblast-cnf",
+        "multiplier": "schoolbook Boolean multiplication with frozen gate basis and modular-reduction circuit",
+        "range_encoding": "unsigned less-than-p comparator; per-forbidden-word clauses only below a frozen complete-enumeration cap",
         "proof_logging": "required for UNSAT"
       }
     },
     {
       "id": "qf-ff",
-      "role": "candidate",
-      "description": "Finite-field SMT export solved by a pinned single-thread cvc5 binary.",
+      "role": "baseline",
+      "description": "Finite-field SMT SAT/model diagnostic solved by a pinned single-thread cvc5 binary; excluded from the slope decision unless a prospective amendment binds an independently checked finite-field UNSAT certificate.",
       "instrument": {
         "repo": "crypto",
         "commit": null,
@@ -222,7 +229,9 @@
       },
       "parameters": {
         "encoding": "QF_FF",
-        "model_recovery": "required"
+        "model_recovery": "required and independently replayed",
+        "unsat_status": "unknown unless an independently checked finite-field certificate route is frozen before affected data",
+        "inspected_source": "cvc5@02f77af402b4be82f27e5cc00b86b265a90dea3d; TheoryFiniteFields::getProofChecker returns nullptr"
       }
     },
     {
@@ -464,15 +473,14 @@
       {
         "id": "C-slope",
         "arms": [
-          "cdcl-t-fp",
-          "qf-ff"
+        "cdcl-t-fp"
         ],
         "differs_in": [
           "rung"
         ],
         "design": "absolute",
-        "reason": "Each candidate is fit directly against scale s and read against the arity-three rho crossover.",
-        "threshold": "upper corrected 95% interval of e strictly below 0.5"
+      "reason": "The sole proof-eligible candidate is fit directly against actual log2(p)/3; QF_FF is diagnostic at the inspected source.",
+      "threshold": "complete natural panel; upper 95% intervals e<0.5 and a<1.5"
       },
       {
         "id": "C-aa",
@@ -508,7 +516,7 @@
         ],
         "design": "absolute",
         "reason": "Detector-power gate through the same CDCL path.",
-        "threshold": "100% verified decompositions on completed planted rows"
+      "threshold": "100% verified decompositions on every preregistered planted row"
       }
     ],
     "aa_not_applicable": null,
@@ -540,12 +548,12 @@
     "power": {
       "method": "paired_bootstrap",
       "alpha": 0.05,
-      "tests_in_family": 2,
-      "correction": "holm",
+    "tests_in_family": 1,
+    "correction": "none",
       "rank_test_n": null,
       "min_attainable_two_sided_p": null,
       "passes": false,
-      "note": "Draft freeze blocker: preflight must justify power to distinguish an exponent below 0.5 from the boundary and a 1.5x paired instruction ratio under observed log-ratio variance. Passing p-value resolution alone would not establish this power."
+    "note": "Draft freeze blocker: preflight must justify power for both natural-query e<0.5 and setup a<1.5, plus the separately reported 1.5x paired instruction diagnostic. QF_FF is not in the slope family at the inspected source."
     },
     "preflight_runtime": {
       "fixed_seconds": null,
@@ -570,12 +578,36 @@
         "uncertainty": "none_exact"
       },
       {
-        "id": "retired_instructions",
-        "name": "complete retired instructions",
+        "id": "cold_retired_instructions",
+        "name": "complete cold retired instructions",
         "unit": "hardware retired instructions",
         "kind": "counted",
-        "definition": "First target-dependent IR compilation instruction through backend exit, model/proof extraction and independent verification; includes serialization, parsing, every theory call and explanation check, and excludes only separately reported reusable target-independent setup.",
-        "source": "rows.jsonl perf.instructions",
+        "definition": "Process start through target-independent setup, preprocessing, target-dependent solve, certificate extraction, explanation/proof checking and independent signed replay. Nothing is excluded from the cold total.",
+        "source": "rows.jsonl stages.cold.instructions",
+        "formula": null,
+        "aggregation": "median",
+        "resolution": "1 instruction",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "setup_instructions",
+        "name": "reusable target-independent setup instructions",
+        "unit": "hardware retired instructions",
+        "kind": "counted",
+        "definition": "Process start through target-independent IR construction, parsing, solver initialization and preprocessing, ending before the first target-dependent instruction.",
+        "source": "rows.jsonl stages.setup.instructions",
+        "formula": null,
+        "aggregation": "median",
+        "resolution": "1 instruction",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "online_verification_instructions",
+        "name": "online query plus certificate/replay instructions",
+        "unit": "hardware retired instructions",
+        "kind": "counted",
+        "definition": "First target-dependent instruction through backend exit, certificate extraction, explanation/proof checking and independent signed replay.",
+        "source": "rows.jsonl stages.online_plus_verification.instructions",
         "formula": null,
         "aggregation": "median",
         "resolution": "1 instruction",
@@ -586,7 +618,7 @@
         "name": "peak resident memory",
         "unit": "bytes",
         "kind": "counted",
-        "definition": "Maximum resident set of the wrapper and all solver descendants over the complete target-dependent interval.",
+        "definition": "Maximum resident set of the wrapper and all solver descendants over the complete cold interval.",
         "source": "rows.jsonl rusage.max_rss_bytes",
         "formula": null,
         "aggregation": "max",
@@ -595,12 +627,24 @@
       },
       {
         "id": "pdp_exponent_e",
-        "name": "arity-three PDP complete-work exponent",
-        "unit": "delta log2(complete counted work) / delta s",
+        "name": "arity-three natural-query exponent",
+        "unit": "delta log2(online plus verification instructions) / delta actual log2(p)/3",
         "kind": "derived",
-        "definition": "Robust slope over the fixed-m=3, s=6..14 ladder, paired by instance class; no imputation for timeouts and no normalization by candidate-space size.",
-        "source": "analysis output from retired_instructions and instance.scale_s",
-        "formula": "Theil-Sen slope of log2(retired_instructions) on s",
+        "definition": "Theil-Sen slope using natural instances only and every preregistered natural row. The coordinate is actual log2(p)/3; planted and exact-UNSAT controls are never pooled, and no timeout/unknown/OOM is imputed or omitted.",
+        "source": "analysis output from online_verification_instructions and instance.actual_log2_p_over_3",
+        "formula": "Theil-Sen slope of log2(online_verification_instructions) on actual_log2_p_over_3 over the complete natural panel",
+        "aggregation": "distribution",
+        "resolution": null,
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "setup_exponent_a",
+        "name": "reusable setup exponent",
+        "unit": "delta log2(setup instructions) / delta actual log2(p)/3",
+        "kind": "derived",
+        "definition": "Theil-Sen slope of the target-independent setup stage across the complete ladder; no preprocessing or initialization may be moved outside this stage.",
+        "source": "analysis output from setup_instructions and instance.actual_log2_p_over_3",
+        "formula": "Theil-Sen slope of log2(setup_instructions) on actual_log2_p_over_3",
         "aggregation": "distribution",
         "resolution": null,
         "uncertainty": "paired_bootstrap_ci95"
@@ -636,7 +680,7 @@
         "name": "complete cold wall time",
         "unit": "seconds",
         "kind": "timed",
-        "definition": "The same complete target-dependent interval as retired_instructions on an L2 row; invalid after restore or below L2.",
+        "definition": "The complete cold interval from process start through independent verification on an L2 row; invalid after restore or below L2.",
         "source": "rows.jsonl time.complete_wall_ns",
         "formula": null,
         "aggregation": "median",
@@ -651,7 +695,7 @@
     "order": "randomized",
     "clock": "perf",
     "counters": [
-      "retired_instructions",
+    "cold_retired_instructions",
       "cpu_cycles",
       "peak_rss_bytes",
       "decisions",
@@ -675,7 +719,9 @@
       "f4_multiply_adds",
       "setup_instructions",
       "solve_instructions",
-      "verification_instructions"
+    "verification_instructions",
+    "stage_reconciliation_delta",
+    "actual_log2_p_over_3"
     ],
     "record": [
       "cpu_model",
@@ -741,25 +787,28 @@
   ],
   "invalidation_rules": [
     "a SAT witness that fails canonical evaluation or independent group replay is wrong_answer and invalidates that arm/cell",
+    "a model that selects an abscissa without binding and replaying its rational-lift sign is underconstrained and invalidates the exporter",
     "a CDCL(T) propagation or conflict with an explanation clause rejected by the independent checker is wrong_answer and invalidates that arm/cell",
     "an UNSAT result without a checked proof object is unknown, not unsat",
     "a natural/null pair without the preregistered shape and model-class/count match is excluded from C-structure and reported",
     "a row without valid retired-instruction counters is excluded from instruction comparisons and reported",
     "wall time below L2 or after restore is descriptive only with wall_valid false",
     "a failed planted control makes the corresponding negative reading inconclusive",
-    "a row that omits theory calls or field-operation counters from the complete interval is invalid_measurement"
+    "a row that omits theory calls or field-operation counters from the complete interval is invalid_measurement",
+    "a cold/setup/online/certificate ledger that does not reconcile exactly is invalid_measurement",
+    "any timeout, OOM, unknown, unproved UNSAT or missing row in the preregistered natural panel makes C-slope inconclusive; completed rows cannot substitute"
   ],
   "decision_rule": {
-    "text": "C2 is supported within scope only when one preregistered finite-field solver bundle verifies every completed row, completes enough natural cells for the frozen power calculation without favorable-subset selection, and has a Holm-corrected upper 95% interval for e strictly below 0.5 over s=6..14, outside A/A spread and with all theory work charged. It is not advanced only when the corrected lower interval is at least 0.5 with valid controls and sufficient power. Other censoring is inconclusive. C3 is separate and requires candidate/null ratio <=0.8 on the three largest completed rungs with corrected interval below 1.",
+    "text": "C2 is supported only when the CDCL(T)/F_p bundle has every preregistered natural row at every rung complete with verified exact status, every planted and exact-UNSAT control complete and verified, valid frozen power, upper 95% intervals e<0.5 and a<1.5, both outside A/A spread, and a reconciled cold/setup/online/certificate ledger. It is not advanced only on that same complete valid panel when either lower interval has e>=0.5 or a>=1.5. Any natural censoring, unknown, unproved UNSAT, incomplete rung, favorable subset or failed control is inconclusive. C3 is separate.",
     "comparison_ids": [
       "C-slope",
       "C-structure"
     ],
-    "threshold": "upper corrected interval e<0.5 for advance; lower corrected interval e>=0.5 for not-advanced; structure ratio <=0.8 for C3",
-    "statistic": "Theil-Sen slope of log2 complete counted work on s and paired median instruction ratios, bootstrapped over held-out instances",
-    "interval": "paired bootstrap 95% intervals, Holm-adjusted over two candidate bundles",
-    "multiple_comparison_correction": "holm",
-    "effect_size_measure": "instruction ratio, slope difference, and candidate/null instruction ratio, each shown against A/A spread",
+    "threshold": "complete natural panel and controls; upper intervals e<0.5 and a<1.5 for advance; either lower interval e>=0.5 or a>=1.5 for not-advanced; structure ratio <=0.8 for C3",
+    "statistic": "Natural-only Theil-Sen slope of log2 online-plus-verification instructions and setup slope of log2 setup instructions against actual log2(p)/3, plus paired instruction ratios",
+    "interval": "paired bootstrap 95% intervals for one proof-eligible slope candidate; no multiplicity correction",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "natural query exponent e, setup exponent a, instruction ratio and candidate/null instruction ratio, each shown against A/A spread",
     "verdict_vocabulary": [
       "sat_screen_advanced",
       "sat_screen_not_advanced",
@@ -792,7 +841,8 @@
     "export_schema": "experiment.export/v1",
     "review_schema": "experiment.review/v1",
     "graphs": [
-      "log2 complete counted work versus s by opaque arm, with the strict e=0.5 boundary",
+      "natural-only log2 online-plus-verification work versus actual log2(p)/3 for the proof-eligible arm, with strict e=0.5 boundary",
+      "log2 reusable setup instructions versus actual log2(p)/3, with strict a=1.5 boundary",
       "pure-CNF gate expansion and paired solver/F4 instruction ratios with A/A interval",
       "candidate/null ratios by rung",
       "solver-native counter vectors under weights 0,0.1,1"
@@ -804,6 +854,12 @@
     "changing cells, seeds, primes, curves, target class, null generator, budgets or thresholds after seeing output",
     "comparing different selected/repeated-root charts across solver arms",
     "omitting theory calls, field operations, explanation checks, extraction, proof, setup or verification work from one arm",
+    "pooling planted or exact-UNSAT controls into the natural-query exponent",
+    "dropping a censored natural row or fitting a completed-row subset",
+    "representing the field domain by one clause per forbidden word without a frozen cap that admits the complete enumeration",
+    "calling the selected schoolbook Theta((log p)^2) circuit a lower bound for all Boolean multiplication",
+    "treating cvc5 QF_FF as an UNSAT-eligible slope candidate without an independently checked finite-field certificate",
+    "continuing the selected one-hot encoding to s=15..27 without a prospective resource or compact-representation admission amendment",
     "calling a pure-CNF bit-blast and a CDCL(T) finite-field propagator the same solver model",
     "treating timeout, unknown or unproved UNSAT as no solution",
     "selecting favorable solver seeds, variable orders or propagation weights",
@@ -841,7 +897,7 @@
       "ref": "crypto:research/prime_factor_base_degree_20261031/README.md",
       "provenance": "internal",
       "claim": "The split-graph degree theorems and completed F4 component study are all two-summand results and do not satisfy the arity-three cost bridge.",
-      "verified_by": "Repository review at c5d13654; see DEC-20261031-cd6460.md."
+      "verified_by": "Repository review at c5d13654; see PDP_ARITY_CORRECTION.md and immutable decision DEC-20261031-b51282."
     },
     {
       "ref": "crypto:research/sat_smt_prime_ic_design_20261030/DESIGN.md",
@@ -854,9 +910,60 @@
       "provenance": "internal",
       "claim": "Current main exposes a native Rust solve_with_lazy_clauses theory callback, not a source-identified CaDiCaL ExternalPropagator implementation; the latter must be bound before freeze.",
       "verified_by": "Source inspection at correction base c5d13654."
+    },
+    {
+      "ref": "https://doi.org/10.1007/11564751_73",
+      "provenance": "retrieved",
+      "claim": "Sinz is the cited source for sequential CNF cardinality encodings; the selected exactly-one construction is independently exhaustively checked by the native development oracle.",
+      "verified_by": "Bibliographic metadata checked 2026-11-01; full text was unavailable in this environment, so no fresh full-text claim is made."
+    },
+    {
+      "ref": "https://doi.org/10.4007/annals.2021.193.2.4",
+      "provenance": "retrieved",
+      "claim": "Fast integer multiplication rules out treating a quadratic schoolbook Boolean circuit as a universal multiplication lower bound.",
+      "verified_by": "Official bibliographic metadata checked 2026-11-01; the claim used here is only that the protocol must scope its selected circuit, not a gate-complexity theorem."
+    },
+    {
+      "ref": "https://github.com/cvc5/cvc5/blob/02f77af402b4be82f27e5cc00b86b265a90dea3d/src/theory/ff/theory_ff.cpp",
+      "provenance": "retrieved",
+      "claim": "At the inspected source head, TheoryFiniteFields::getProofChecker returns nullptr, so QF_FF is not assigned finite-field UNSAT eligibility here.",
+      "verified_by": "Official source inspected 2026-11-01 at commit 02f77af402b4be82f27e5cc00b86b265a90dea3d."
+    },
+    {
+      "ref": "cryptanalysis@3c769002f0f68d63a5055f6f3e24a9500393180e:experiments/prime-field-m3-cdclt-20261031",
+      "provenance": "internal",
+      "claim": "The native development fixture checks signed semantics, lift identity, compact range membership, Sinz exactly-one and exact one-hot sizing, but contains no held-out exponent result.",
+      "verified_by": "Merged cryptanalysis PR #1347, development oracle and validation receipt."
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "A-20261101-protocol-hardening",
+      "filed": "2026-11-01",
+      "filed_before_affected_data": true,
+      "reason": "Correct preprocessing accounting, natural-population censoring, target-class pooling, one-hot continuation admission, multiplier scope, signed point semantics, finite-field UNSAT eligibility, compact range encoding and decision provenance before any held-out run.",
+      "changes": [
+        "Add setup exponent a<1.5 beside the natural-query e<0.5 gate and require a reconciled cold ledger.",
+        "Use the complete natural panel only; report planted and exact-UNSAT controls separately and make any natural censoring inconclusive.",
+        "Freeze Sinz exactly-one and compact range/sign semantics; do not admit the one-hot s=15..27 continuation.",
+        "Make QF_FF diagnostic at the inspected proof capability and scope quadratic multiplication to the selected schoolbook control.",
+        "Bind the additive DEC-20261101-26f1fa provenance and cryptanalysis#1347 development evidence."
+      ],
+      "supersedes_fields": [
+        "question",
+        "claims.C2",
+        "hypotheses.H1",
+        "arms.cnf-cost",
+        "arms.qf-ff",
+        "metrics.primary",
+        "sample_size.power",
+        "variable_ledger.comparisons.C-slope",
+        "decision_rule",
+        "invalidation_rules",
+        "inadmissible"
+      ]
+    }
+  ],
   "freeze": {
     "status": "draft",
     "protocol_sha256": null,

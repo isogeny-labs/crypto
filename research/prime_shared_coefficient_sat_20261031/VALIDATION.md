@@ -21,6 +21,8 @@
 | msolve semantic tool smoke | `x^2+1` over F3 yields an algebraic-closure parametrization with no F3 root; adding `x^3-x` yields `[-1]` |
 | cvc5 finite-field proof smoke | trust-free complete checking stops at `THEORY_FF`; Alethe export rejects `CONST_FINITE_FIELD`; cvc5 is not proof-bearing for E1 |
 | Comparator input hash register | 12/12 source, protocol, witness and E0-reference hashes verify |
+| Earlier SAT input hash register | 12/12 verify at its declared frozen source commit `8cc48bdeedbe6284a4df2ab0d0a049feb1b11523`; current-head `lib.rs` and `main.rs` intentionally differ because comparator modules/CLI were added later |
+| Parent protocol reconciliation | frozen E1 files retained byte-for-byte; unrun variable-arity E3 and `0.85/0.95` thresholds retired in favor of fixed-`m=3` `e<0.5`, `a<1.5` complete-cost gates |
 | CLI m3/t4 smoke | JSON has 33 variables, 35 equations and 6 projected variables; msolve emits 37 lines; QF_FF emits 33 declarations, 35 assertions, `check-sat` and `get-value` |
 | Repository release-library gate | completed in 1,673.72 s: 5,796 passed, 12 failed, 128 ignored; see exact failure boundary below |
 
@@ -51,6 +53,12 @@ The final compiler checks used locally installed Rust 1.78 and 1.98
 toolchains with build targets under `/tmp`; generated target files are not part
 of the study tree.
 
+The two E1 subgates have distinct source revisions. Verify and run the SAT
+panel from `8cc48bdeedbe6284a4df2ab0d0a049feb1b11523` with `inputs.sha256`;
+verify and run the later msolve comparator from its exact launch revision with
+`e1-comparator-inputs.sha256`. Updating the older register to match current
+CLI wiring would silently rewrite a frozen experiment and is not permitted.
+
 ## Environment and exclusions
 
 Pinned local development builds now exist for msolve 0.11.0, cvc5 1.4.2,
@@ -68,7 +76,8 @@ Consequently:
 - QF_FF artifacts remain syntax-shaped and deterministic, while cvc5 1.4.2 is
   proof-ineligible for finite-field UNSAT under the frozen policy;
 - both frozen CNF/CNF-XOR and msolve panels remain E1 obligations;
-- E2 power, detector and isolation gates remain open.
+- parent-protocol semantic integration, E2 power, detector and isolation gates
+  remain open.
 
 `scripts/checkpoint.sh status` recognizes the resume/spec state but reports the
 last durable push as stale or absent. No solver panel may launch until an
@@ -83,5 +92,7 @@ the semantic projection, not asymptotic scaling. The historical m5/m7 rows are
 known-answer conformance checks, not unknown solve results. The enumerator and
 group/interpolation oracle are algorithmically separate but same-author and
 share basic finite-field/polynomial primitives; they are not an independent
-external replication. The protocol was kept draft; no affected performance
-data exist.
+external replication. The variable-arity performance draft was retired before
+data because it did not implement the parent complete-cost bridge. No affected
+performance data exist, and E1 success alone would not admit this
+representation to the fixed-`m=3` screen.
