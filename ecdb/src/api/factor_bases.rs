@@ -15,6 +15,8 @@ pub struct ListQuery {
     curve: Option<String>,
     family: Option<String>,
     scheme: Option<String>,
+    /// Only members of this design grid (its study name).
+    design: Option<String>,
     min_columns: Option<i64>,
     max_columns: Option<i64>,
     /// true: only bases with at least one solved result.
@@ -31,6 +33,11 @@ pub async fn list(State(state): State<Shared>, Query(q): Query<ListQuery>) -> Ap
     f.opt("(curve_id IN (SELECT x.id FROM ec.resolve_curve({}) x(id)) OR curve_name = {} OR icv1_slug = {})", &q.curve);
     f.opt("family = {}", &q.family);
     f.opt("scheme = {}", &q.scheme);
+    f.opt(
+        "id IN (SELECT m.factor_base_id FROM ec.factor_base_design_member m
+                 JOIN ec.factor_base_design d ON d.id = m.design_id WHERE d.study = {})",
+        &q.design,
+    );
     f.opt("columns >= {}::bigint", &q.min_columns);
     f.opt("columns <= {}::bigint", &q.max_columns);
     if q.solved == Some(true) {
@@ -136,4 +143,59 @@ pub async fn results(
     let total = rows.first().map(|r| r["total"].clone()).unwrap_or(json!(0));
     let items: Vec<Value> = rows.into_iter().map(|mut r| r["row"].take()).collect();
     Ok(Json(json!({ "factor_base_id": id, "total": total, "limit": limit, "offset": offset, "items": items })))
+}
+
+/// The factor-base design grids, without their verbatim records.
+pub async fn designs(State(state): State<Shared>) -> ApiResult<Json<Value>> {
+    let client = state.read.get().await?;
+    let rows = json_rows(
+        &client,
+        "SELECT (to_jsonb(d) - 'record' || jsonb_build_object('members',
+                  (SELECT count(*) FROM ec.factor_base_design_member m WHERE m.design_id = d.id)))::text
+           FROM ec.factor_base_design d ORDER BY d.study",
+        &[],
+    )
+    .await?;
+    Ok(Json(json!({ "items": rows })))
+}
+
+#[derive(Deserialize)]
+pub struct ClaimQuery {
+    /// true: per rule version and candidate (ec.v_ic_claim_summary) instead of single claims.
+    summary: Option<bool>,
+    rule_version: Option<String>,
+    curve: Option<String>,
+    candidate_id: Option<String>,
+    validation_status: Option<String>,
+    limit: Option<i64>,
+    offset: Option<i64>,
+}
+
+/// IC tool-program claims: IC online against matched rho per target, with the
+/// producer's cold ratio (set-up included) beside the online speedup.
+pub async fn claims(State(state): State<Shared>, Query(q): Query<ClaimQuery>) -> ApiResult<Json<Value>> {
+    let (limit, offset) = page(q.limit, q.offset)?;
+    let mut f = Filters::default();
+    f.opt("rule_version = {}", &q.rule_version);
+    f.opt("curve_slug = {}", &q.curve);
+    f.opt("candidate_id = {}", &q.candidate_id);
+    let (table, order, drop) = if q.summary == Some(true) {
+        ("ec.v_ic_claim_summary", "curve_slug, rule_version", "'-'")
+    } else {
+        f.opt("validation_status = {}", &q.validation_status);
+        ("ec.ic_claim", "curve_slug, rule_version, row_key", "'record'")
+    };
+    let sql = format!(
+        "SELECT jsonb_build_object('total', count(*) OVER (), 'row', to_jsonb(t) - {drop})::text
+           FROM {table} t {} ORDER BY {order} LIMIT {limit} OFFSET {offset}",
+        f.where_sql()
+    );
+    let client = state.read.get().await?;
+    let rows = json_rows(&client, &sql, &f.params).await?;
+    let total = rows.first().map(|r| r["total"].clone()).unwrap_or(json!(0));
+    let items: Vec<Value> = rows.into_iter().map(|mut r| r["row"].take()).collect();
+    Ok(Json(json!({
+        "note": "online_speedup excludes the IC reusable set-up; cold_ratio_ic_over_rho includes it (above 1: rho is cheaper cold).",
+        "total": total, "limit": limit, "offset": offset, "items": items,
+    })))
 }

@@ -16,7 +16,11 @@ jq -n --arg project "$ISOLAB_CODEBUILD_PROJECT" --arg key "$key" --arg token "$d
 aws codebuild start-build --cli-input-json "file://$output/start-request.json" > "$output/build-start.json"
 build_id=$(jq -er .build.id "$output/build-start.json")
 printf 'Launcher: %s\n' "$build_id"
-deadline=$((SECONDS+5400))
+# The CodeBuild project has a 100-minute terminal bound. Allow one hour beyond
+# the requested EKS deadline for provisioning, receipt verification and a
+# definitive launcher status, while remaining below the Actions job bound.
+duration=$(jq -er .job.seconds "$output/request.json")
+deadline=$((SECONDS+duration+3600))
 while (( SECONDS < deadline )); do
   aws codebuild batch-get-builds --ids "$build_id" > "$output/build.json"
   status=$(jq -er '.builds[0].buildStatus' "$output/build.json")

@@ -147,8 +147,10 @@ for pod in "${pods[@]}"; do
     continue
   fi
 
+  # The GitHub diagnostic role can read only identity and gate receipts. Raw
+  # records, stdout and stderr deliberately remain inaccessible.
   names=(job-exit.json build-info.json binary.sha256 input-spec.json l2-gate.json audit.json
-    control-comparison.json run.stderr audit.stderr owner-run-check.json owner-replay-check.json)
+    control-comparison.json owner-run-check.json owner-replay-check.json)
   payload_read_failed=0
   for name in "${names[@]}"; do
     object_status=0
