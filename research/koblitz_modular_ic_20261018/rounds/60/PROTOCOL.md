@@ -54,3 +54,11 @@ survivor and complete C/K/R/H certificates. Count404 exactly; no degree11
 filter or omission of either trace parity. Changed constraint recovery
 must fail. This stage only tests principal x; all31scalars/bothsigns and
 bothparities with AS and whole-source/action checks are next.
+
+## Stage3 fresh complete certificate check
+cohort60-01 accepted404rank18/kernel0,regularcontrolkernel1. Freeze a fresh
+checker rebuilding every local constraint as selected100-space rows followed
+by the independently retained fixed-basis product, rather than selecting
+already fixed profiles as the producer does. Verify all404C/H products,
+complete mixed/fixed splitting,oddparticular,regular injection and changed
+source-row negative control. No producer rerun.

@@ -39,3 +39,17 @@ All404kernelcertificates;then sharedASover18F32fixedfunctions90bits/expectedrank
 
 ### Errors
 Earlierconcurrentgitcommit causedindexlock;no lock removed. Bothhandles terminal;stagedR59custody/R60syntaxrepairlandedtogetherinfe0ba4bb4. Scientificbytes unchanged. Serializemutations henceforth. Initialmixed60-01 indexed++failure retained/excluded.
+
+## 2026-11-01T17:48:57.830523+00:00 — all404infinity patterns excluded
+
+### What was done
+cohort60-01 accepted all404patterns,eachrank18/kernel0withH C=I18. Regularcontrolrank17/kernel1 contains1. Bothparities had remainedfeasible,but no principalx survives. All404rawrows/certificates retained;noASbranchesremaininthiscohort.
+
+### Decisions made
+Freeze freshchecker of full404source-rowreconstructions and all mixed/fixed identities. Nextenlargement:3D mixedbound34,12,20,2 degree136,expected RRdimension76; minorcaps6,10,1 yield818patterns. Must firstcertify actualcubicambient324with385F4jets andallpolebounds;no dimensionguess substitute.
+
+### Open threads
+Checker,threeLeanclaims,report/custody/continuationPR. Completecubicspace and818patterns;other original leads preserved.
+
+### Errors
+Only initial indexed++failure rejected sofar;no accepted producer repeated.

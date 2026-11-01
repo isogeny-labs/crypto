@@ -1,6 +1,6 @@
 {
   "schema": "experiment.protocol/v1",
-  "id": "KOBLITZ-R60-INFINITY-404",
+  "id": "KOBLITZ-R60-CERTIFICATE-CHECK",
   "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
   "claims": [
     {
@@ -73,7 +73,7 @@
     "regular control dimension1"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh cohort60-01 COHORT60.sing COHORT60_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_CAS.sh check60-01 CHECK60.sing CHECK60_ALL_CHECKS_PASS",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
     "threads": 1,
@@ -109,9 +109,9 @@
     }
   ],
   "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
-  "version": 2,
+  "version": 3,
   "amendment": {
     "before_affected_data": true,
-    "reason": "mixed60-02 accepted dimension36/fixed18/trace18; freeze exhaustive404case computation"
+    "reason": "accepted complete404principal exclusions; fresh source-row reconstruction checker"
   }
 }
