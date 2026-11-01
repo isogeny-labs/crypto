@@ -4,6 +4,12 @@ Date: 2026-11-01
 Status: exact census core implemented and locally verified; protocol remains draft
 Affected E1 data: none
 
+> Follow-up: the initial receipt below is historical. Later on 2026-11-01 the
+> semantic cut, equality quotient and typed rewiring diagnostics were
+> implemented and run under separately frozen screens. See
+> [`../prime_ic_elimination_20261101/RANK1_QUOTIENT_RESULT.md`](../prime_ic_elimination_20261101/RANK1_QUOTIENT_RESULT.md).
+> The full E1 protocol remains draft and no full-E1 row was promoted.
+
 ## Outcome
 
 The missing `tensor-census` core now contracts one explicitly selected side of
@@ -108,3 +114,24 @@ Before E1 freezes, the workstream still needs:
 - fresh-process A/A and known-rank control records from the same runner;
 - disjoint preflight, final cap and ladder, power justification and hashes;
 - a committed source revision and verified Iso Lab execution image.
+
+## 2026-11-01 follow-up boundary
+
+The production encoder now binds semantic slot regions into canonical
+predicate parameters and assigns equality/fanout wiring to the producer
+region. A shape preflight showed why the original contractor cannot run the
+declared object: F5 has raw cut width 154 and free enumeration exponents
+15,959--31,918.
+
+An exact functional quotient maps the raw cut copies back to seven typed
+signals on F5 and 9--15 signals on four held-out fields. Exact raw balanced
+ranks are computed from the quotient without materializing zero copy rows or
+columns; exhaustive tiny controls validate the symmetry reduction. A
+support-matched sparse null advanced, but a frozen one-pair typed topology null
+returned the same conditioned rank in all four fields and rejected that
+minimal global-wiring mechanism.
+
+This follow-up does not satisfy the draft protocol's arbitrary all-interior
+rewired null. Such a null destroys the parsimonious program and needs an exact
+projected model counter. Binary/image/power/final-ladder fields therefore
+remain open and the protocol remains draft.

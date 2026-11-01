@@ -13,7 +13,7 @@ use crate::network::Network;
 use crate::{integrity, invalid, overflow, BigUint, Error, Meter, Result};
 use num_integer::Integer;
 use num_traits::{One, ToPrimitive, Zero};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 /// One independent affine-hash seed over the common public prime.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -125,18 +125,63 @@ pub fn decomposition_network(
     target: &Point,
     meter: &mut Meter,
 ) -> Result<Network> {
+    Ok(decomposition_network_impl(curve, bases, target, false, meter)?.0)
+}
+
+/// Build the same decomposition language with semantic slot regions and return
+/// the canonical vertex side immediately after slot `ceil(m/2)`.
+///
+/// Region labels are bound into every production predicate tag. Equality,
+/// fanout and endpoint vertices inherit the region in which their signal was
+/// produced, placing the wiring needed to legalize a crossing on the producer
+/// side of the cut.
+pub fn decomposition_network_with_semantic_cut(
+    curve: &Curve,
+    bases: &[FactorBase],
+    target: &Point,
+    meter: &mut Meter,
+) -> Result<(Network, Vec<usize>)> {
+    decomposition_network_impl(curve, bases, target, true, meter)
+}
+
+fn decomposition_network_impl(
+    curve: &Curve,
+    bases: &[FactorBase],
+    target: &Point,
+    semantic_cut: bool,
+    meter: &mut Meter,
+) -> Result<(Network, Vec<usize>)> {
     if bases.len() < 2 || !curve.in_subgroup(target, meter)? {
         return Err(invalid("decomposition target or arity"));
     }
     let mut encoder = Encoder::new();
+    if semantic_cut {
+        encoder.set_semantic_region("setup")?;
+    }
     let mut sum = Encoder::constant_point(curve, &Point::Infinity)?;
-    for base in bases {
+    let cut_after_slots = bases.len().div_ceil(2);
+    let mut left_regions = BTreeSet::new();
+    for (slot, base) in bases.iter().enumerate() {
+        let input_region = format!("slot.{slot}.input");
+        let membership_region = format!("slot.{slot}.membership");
+        let addition_region = format!("slot.{slot}.addition");
+        if slot < cut_after_slots {
+            left_regions.insert(input_region.clone());
+            left_regions.insert(membership_region.clone());
+            left_regions.insert(addition_region.clone());
+        }
+        if semantic_cut {
+            encoder.set_semantic_region(&input_region)?;
+        }
         let point = if curve.cofactor().is_one() {
             encoder.input_point(curve, false, meter)?
         } else {
             let source = encoder.input_point(curve, true, meter)?;
             encoder.clear_cofactor(curve, &source, meter)?
         };
+        if semantic_cut {
+            encoder.set_semantic_region(&membership_region)?;
+        }
         encoder.hash_member(
             curve,
             &point,
@@ -147,10 +192,38 @@ pub fn decomposition_network(
             meter,
         )?;
         encoder.mark_point_interface(&point, meter)?;
+        if semantic_cut {
+            encoder.set_semantic_region(&addition_region)?;
+        }
         sum = encoder.point_add(curve, &sum, &point, meter)?;
     }
+    if semantic_cut {
+        encoder.set_semantic_region("target.assertion")?;
+    }
     encoder.assert_point_equal(&sum, &Encoder::constant_point(curve, target)?, meter)?;
-    encoder.finish(meter)
+    let network = encoder.finish(meter)?;
+    if !semantic_cut {
+        return Ok((network, Vec::new()));
+    }
+    let mut left_vertices = Vec::new();
+    for (vertex_id, vertex) in network.vertices.iter().enumerate() {
+        let tag = vertex
+            .predicate
+            .canonical_tag()
+            .ok_or_else(|| integrity("semantic-cut vertex lacks canonical tag"))?;
+        let region = tag
+            .parameters
+            .iter()
+            .find_map(|(key, value)| (key == "semantic_region").then_some(value))
+            .ok_or_else(|| integrity("semantic-cut vertex lacks region"))?;
+        if left_regions.contains(region) {
+            left_vertices.push(vertex_id);
+        }
+    }
+    if left_vertices.is_empty() || left_vertices.len() == network.vertex_count() {
+        return Err(integrity("semantic mid-slot cut is not proper"));
+    }
+    Ok((network, left_vertices))
 }
 
 /// Deterministic prefix-count decomposition. `None` certifies zero assignments;
@@ -762,8 +835,115 @@ pub fn verify_with_rng(
 mod tests {
     use super::*;
     use crate::arithmetic::Seeded;
+    use crate::canonical::{CanonicalNetwork, ExportPolicy, IrProvenance};
+    use crate::census::{
+        boundary_shape, contract_functional_boundary, rewire_functional_definitions,
+    };
     use crate::contraction::Backend;
     use crate::Limits;
+
+    #[test]
+    fn semantic_mid_slot_cut_is_bound_into_the_canonical_ir() {
+        let mut meter = Meter::new(Limits {
+            steps: 1_000_000_000,
+            vector: 20_000_000,
+            bits: 1_000_000,
+        });
+        let curve = crate::curve::tiny(&mut meter);
+        let bases = [(7u8, 3u8), (2, 1), (3, 4)]
+            .into_iter()
+            .map(|(alpha, beta)| {
+                FactorBase::new(
+                    &curve,
+                    11u8.into(),
+                    5u8.into(),
+                    HashSeed {
+                        alpha: alpha.into(),
+                        beta: beta.into(),
+                    },
+                    &mut meter,
+                )
+                .unwrap()
+            })
+            .collect::<Vec<_>>();
+        let (network, left_vertices) =
+            decomposition_network_with_semantic_cut(&curve, &bases, curve.generator(), &mut meter)
+                .unwrap();
+        assert!(!left_vertices.is_empty());
+        assert!(left_vertices.len() < network.vertex_count());
+        assert!(left_vertices.windows(2).all(|pair| pair[0] < pair[1]));
+        let canonical = CanonicalNetwork::capture(
+            &network,
+            &vec![None; network.edge_count()],
+            IrProvenance {
+                source: "semantic-cut-control".into(),
+                generator: "unit-test".into(),
+                revision: "test-v1".into(),
+            },
+            ExportPolicy::RequireTagged,
+            &mut meter,
+        )
+        .unwrap();
+        assert!(canonical.vertices.iter().all(|vertex| vertex
+            .predicate
+            .tag
+            .parameters
+            .iter()
+            .any(|(key, value)| key == "semantic_region" && !value.is_empty())));
+        let shape = boundary_shape(&canonical, &left_vertices, &mut meter).unwrap();
+        assert!(!shape.cut_edges.is_empty());
+        assert_eq!(
+            shape.enumerated_free_width,
+            shape.cut_edges.len() + shape.free_internal_edges.len()
+        );
+        let mut corrupted = canonical.clone();
+        let region = corrupted.vertices[0]
+            .predicate
+            .tag
+            .parameters
+            .iter_mut()
+            .find(|(key, _)| key == "semantic_region")
+            .unwrap();
+        region.1.push_str(".mutation");
+        assert!(corrupted.validate(&mut meter).is_err());
+
+        let (rewired, receipt) =
+            rewire_functional_definitions(&network, &left_vertices, 17, &mut meter).unwrap();
+        assert!(receipt.candidate_definitions >= receipt.definition_pairs * 2);
+        assert!(receipt.definition_pairs > 0);
+        assert!(receipt.edge_endpoint_swaps > 0);
+        let rewired_canonical = CanonicalNetwork::capture(
+            &rewired,
+            &vec![None; rewired.edge_count()],
+            IrProvenance {
+                source: "semantic-cut-control-rewired".into(),
+                generator: "unit-test".into(),
+                revision: "test-v1".into(),
+            },
+            ExportPolicy::RequireTagged,
+            &mut meter,
+        )
+        .unwrap();
+        assert!(rewired_canonical
+            .vertices
+            .iter()
+            .zip(&canonical.vertices)
+            .all(|(left, right)| left.predicate == right.predicate));
+        let rewired_shape = boundary_shape(&rewired_canonical, &left_vertices, &mut meter).unwrap();
+        assert_eq!(rewired_shape.cut_edges.len(), shape.cut_edges.len());
+        assert_eq!(
+            rewired_shape.internal_edges.len(),
+            shape.internal_edges.len()
+        );
+        let rewired_tensor =
+            contract_functional_boundary(&rewired, &left_vertices, 16, 20, &mut meter).unwrap();
+        let (repeated, repeated_receipt) =
+            rewire_functional_definitions(&network, &left_vertices, 17, &mut meter).unwrap();
+        let repeated_tensor =
+            contract_functional_boundary(&repeated, &left_vertices, 16, 20, &mut meter).unwrap();
+        assert_eq!(receipt, repeated_receipt);
+        assert_eq!(rewired_tensor, repeated_tensor);
+    }
 
     #[test]
     fn inverse_hash_enumeration_matches_independent_subgroup_scan() {

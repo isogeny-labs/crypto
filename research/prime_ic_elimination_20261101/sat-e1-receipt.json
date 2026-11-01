@@ -1,0 +1,37 @@
+{
+  "schema": "prime-ic-elimination.sat-e1-receipt/v1",
+  "date": "2026-11-01",
+  "protocol": "research/prime_shared_coefficient_sat_20261031/E1_PROTOCOL.md",
+  "source_revision": "3d76699b00ea089d63cd30072c294b5a0d3a2bae",
+  "runner_sha256": "50531f04354ad621848cb0777ff2c5d457e32109883edecdddcd1e1f5731ccc9",
+  "aggregate_sha256": "ed74dc6df578a3d03781277c194ed653d6fcea8055c535ad19e49523fc1af04f",
+  "raw_tree": {
+    "files": 451,
+    "bytes": 6920083569,
+    "durable_remote_location": null,
+    "durability_status": "blocked_missing_checkpoint_and_aws_identity"
+  },
+  "local_archive": {
+    "path": "/workspace/prime-e1-sat-elimination-20261101-full.tar.zst",
+    "bytes": 1777011716,
+    "sha256": "b61ba10fc8bbcad0768903a04e6b9be5da5cecdd63dc60be1dc2a2785261e82c",
+    "zstd_test": "passed",
+    "aggregate_stream_sha256_match": true
+  },
+  "panel": {
+    "targets": 18,
+    "sat_targets": 6,
+    "unsat_targets": 12,
+    "target_backend_matches": 36,
+    "expected_target_backend_matches": 36,
+    "target_attempts": 48,
+    "target_sat_attempts": 12,
+    "target_unsat_attempts": 36,
+    "fixed_controls": 6,
+    "checked_unsat_proofs": 42,
+    "rejected_truncated_proofs": 42,
+    "timing_collected": false
+  },
+  "verdict": "sat_boolean_subgate_passed_msolve_cvc5_open",
+  "claim_scope": "exact F17 representation equivalence and independently checked UNSAT only; no solver-scaling or index-calculus performance claim"
+}

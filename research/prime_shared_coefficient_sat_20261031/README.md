@@ -28,10 +28,13 @@ The implemented E0 gate passes:
 - the census is 6 SAT targets, 12 UNSAT targets, and 6 models in each
   implementation, with 18/18 exact set matches.
 
-This is development correctness, not solver evidence. E0 ran no external
-solver. Subsequent preparation built and validated pinned solver toolchains,
-but no external solver has seen a study instance, no timing was collected, and
-no index-calculus speedup is claimed.
+This was initially development correctness rather than solver evidence.  A
+2026-11-01 follow-up subsequently ran the frozen Boolean E1 subgate: the exact
+F17 panel passed 36/36 target/backend projected-model-set comparisons and
+42/42 independently checked UNSAT proofs.  See
+[`../prime_ic_elimination_20261101/RANK2_SAT_E1_RESULT.md`](../prime_ic_elimination_20261101/RANK2_SAT_E1_RESULT.md).
+No timing or solver-scaling data was collected, the msolve subgate remains
+open, and no index-calculus speedup is claimed.
 
 ## Claim ledger
 
@@ -39,7 +42,7 @@ no index-calculus speedup is claimed.
 |---|---|---|
 | The selected-chart remainder construction has a deterministic quadratic IR | supported for the implemented construction | strict generator/parser plus legacy fixture conformance |
 | The arity-three F17 predicate represents the intended rational, distinct-root decompositions | supported on the complete fixed toy panel | 18/18 exact projected coefficient-model-set matches against an algorithmically separate same-author group/interpolation oracle |
-| SAT/XOR beats F4 or enumeration | unknown | E1 exporter equivalence has not run; no performance screen is admitted |
+| SAT/XOR beats F4 or enumeration | unknown | Boolean E1 representation equivalence passed exactly; no performance screen is admitted |
 | The mechanism has exponent-changing scaling | unknown | requires a prospectively frozen fixed-`m=3` complete-cost panel with `e<0.5` and `a<1.5` |
 | The mechanism improves relation collection or ECDLP | unknown | requires E4 relation extraction, matrix construction, log replay and complete cost accounting |
 | A finite solver panel proves a subexponential algorithm | out of scope | requires a family theorem and a complete asymptotic cost proof |
@@ -82,10 +85,10 @@ The native tool in [`native`](native/) emits:
 - the exhaustive E0 F17 census.
 
 The Boolean lowering and a fail-closed external-solver runner are implemented
-and frozen in [E1_PROTOCOL.md](E1_PROTOCOL.md). The fixed study panel has not
-yet run. Its CaDiCaL/CNF and CryptoMiniSat/CNF-XOR projected model sets and
-checked UNSAT proofs must agree with the exact oracle before any performance
-row is admissible. The separate
+and frozen in [E1_PROTOCOL.md](E1_PROTOCOL.md). The fixed CaDiCaL/CNF and
+CryptoMiniSat/CNF-XOR study panel passed on 2026-11-01: its projected model
+sets agreed with the exact oracle and every terminal UNSAT had an independently
+accepted proof. The separate
 [comparator protocol](E1_COMPARATOR_PROTOCOL.md) freezes an msolve 0.11.0
 base-field cross-check; it is also unrun. cvc5 1.4.2 is proof-ineligible for
 finite-field UNSAT under the checked-proof policy and remains optional for SAT
@@ -100,7 +103,7 @@ status is in [experiment-matrix.json](experiment-matrix.json).
 | Stage | Question | Current status | Decisive output |
 |---|---|---|---|
 | E0 | Is the canonical predicate internally and independently correct on tiny complete domains? | complete | exact set equality, legacy conformance, mutation rejection |
-| E1 | Do JSON, msolve, QF_FF, CNF and CNF-XOR preserve the same projected models? | SAT and msolve subgates frozen, not run; cvc5 proof-ineligible | exhaustive model-set equivalence; independent checked certificates for every accepted UNSAT |
+| E1 | Do JSON, msolve, QF_FF, CNF and CNF-XOR preserve the same projected models? | SAT Boolean subgate passed; msolve unrun; cvc5 proof-ineligible | 36/36 target/backend projected-set matches and 42/42 independently checked UNSAT proofs |
 | E2 | Can this representation be integrated into an admissible fixed-`m=3` complete-cost protocol? | blocked | semantic-object decision, source-bound `F_p` theory, setup/query ledger, power and resource receipts |
 | E3 | At fixed `m=3`, can one proof-eligible CDCL(T)/`F_p` bundle achieve natural-query `e<0.5` and reusable-setup `a<1.5`? | parent protocol is a hardened draft; this subtree is not admitted | complete `s=6..14` natural panel plus separately reported planted/UNSAT controls |
 | E4 | Does an advancing bundle improve a complete relation-collection pipeline? | conditional | verified relations, matrix rank/log replay and end-to-end cost |
@@ -146,8 +149,9 @@ selected chart with F4 on a larger repeated-root chart.
   finite-field proof behavior, CaDiCaL DIMACS/LRAT documentation and
   CryptoMiniSat CNF-XOR/XLRUP documentation were checked for exporter,
   parametrization and certificate obligations. The pinned development
-  toolchains passed non-study smoke checks; none was benchmarked or run on E0
-  study inputs.
+  toolchains passed non-study smoke checks at the original handoff. The later
+  frozen SAT Boolean panel ran with exact checked outputs, but was deliberately
+  untimed; msolve and cvc5 still have not supplied a study result.
 
 No novelty claim is made for divisor coefficients, quotient/remainder
 membership, SAT, XOR reasoning, F4, or PKM factor bases. The open contribution

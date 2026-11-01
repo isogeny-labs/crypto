@@ -239,3 +239,20 @@ No production semantic cut, matched natural/null pair, rank ladder or timing
 was generated. The E1 protocol remains draft. The production cut generator,
 rewired-null constructor, fresh-process A/A runner, disjoint preflight, power
 record, final ladder, source commit and image digest remain open.
+
+## 2026-11-01 semantic-cut and quotient follow-up
+
+Later work implemented the production semantic cut, exact equality-signal
+quotient, symmetry-reduced raw rank, typed functional rewiring, and create-once
+development runners. The retained result and artifact hashes are in
+[`../prime_ic_elimination_20261101/RANK1_QUOTIENT_RESULT.md`](../prime_ic_elimination_20261101/RANK1_QUOTIENT_RESULT.md).
+
+Focused controls include 48 synthetic quotient tensors checked against every
+raw balanced split, direct raw contraction of a fanout fixture, metadata-
+absence rejection, semantic-tag mutation, rewired graph replay, draw repeats
+and seed mutations. The four held-out natural constructions reproduce exactly.
+
+The full E1 protocol is still not frozen: the arbitrary interior-rewired null,
+projected model counter, fresh-process final runner, power record, final ladder,
+source commit and image digest remain open. No follow-up timing or speed claim
+was admitted.
