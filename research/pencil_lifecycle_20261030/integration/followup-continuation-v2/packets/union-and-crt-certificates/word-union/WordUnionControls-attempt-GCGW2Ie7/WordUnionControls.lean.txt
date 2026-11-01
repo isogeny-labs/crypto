@@ -1,0 +1,11 @@
+import WordUnionGlobal
+set_option autoImplicit false
+namespace SignedWord
+
+theorem control_forward_sign : (unionPot 17 1 (-1) 3 4).s=1 := by decide
+theorem control_reverse_offsets :
+ (reversePot 17 (unionPot 17 1 (-1) 3 4)).a=14 ∧
+ (reversePot 17 (unionPot 17 1 (-1) 3 4)).b=13 := by decide
+theorem control_negative_transport : transportPair 17 ⟨-1,3,4⟩ (7,8)=(13,13) := by decide
+theorem control_invalid_sign : ¬Sign (0:Int8) := by simp [Sign]
+end SignedWord
