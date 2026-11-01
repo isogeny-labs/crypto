@@ -13,11 +13,13 @@
 //! (`canonical::derive_u64`), never from an RNG stream, and no solver is
 //! handed it: the runner verifies the solver's answer afterwards.
 
+use num_traits::ToPrimitive;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::sync::OnceLock;
 
 use crate::binary_ecc::IrreduciblePoly;
+use crate::cryptanalysis::ec_index_calculus_curves::CurveKind;
 use crate::cryptanalysis::ecbench::canonical::{bare_id, compat_u128, derive_u128, derive_u64};
 use crate::cryptanalysis::ecbench::conductor_gap::{self, GapLevel};
 use crate::cryptanalysis::ecbench::ext::ExtInstance;
@@ -38,6 +40,9 @@ use crate::cryptanalysis::ic_boundary::{
 use crate::cryptanalysis::isogeny_eval::counted_fp::is_prime_u64;
 use crate::cryptanalysis::koblitz_strong_rho::{RawPointG, WideStrongRho};
 use crate::cryptanalysis::koblitz_wide::WideKoblitz;
+use crate::cryptanalysis::prime_orbit_index_calculus::{
+    generate_instance, Coefficient, ScaledShape,
+};
 
 /// How to build the curve.  Each variant is a constructor the repository
 /// already has, so the registry's `generator_call` names the same curve.
@@ -47,6 +52,12 @@ pub enum CurveSpec {
     /// `ic_boundary::find_prime_order_curve(bits, seed)`: prime order,
     /// cofactor 1, `8 ≤ bits ≤ 32`.
     PrimeSearch { bits: u32, seed: u64 },
+    /// `prime_orbit_index_calculus::generate_instance`: a certified
+    /// scaled curve retaining the requested shape (`generic`,
+    /// `generic_a_minus_3`, `j0`, `j0_b7`, or `j1728`).
+    /// The runner converts it to an explicit prime curve before starting
+    /// a measured child, so curve search is never in the timed region.
+    PrimeOrbitShape { shape: String, bits: u32, seed: u64 },
     /// `ic_boundary::roster_prime_instance(bits)`: the bench roster.
     PrimeRoster { bits: u32 },
     /// `ic_boundary::koblitz_instance(a, n)`: `K_a / F_{2^n}`, `n ≤ 62`;
@@ -370,6 +381,59 @@ impl CurveSpec {
                 }
                 Ok(Instance::Prime(find_prime_order_curve(bits, seed)))
             }
+            CurveSpec::PrimeOrbitShape {
+                ref shape,
+                bits,
+                seed,
+            } => {
+                let scaled = match shape.as_str() {
+                    "generic" => ScaledShape::of_kind(CurveKind::Generic),
+                    "generic_a_minus_3" => ScaledShape {
+                        kind: CurveKind::Generic,
+                        a: Coefficient::Fixed(-3),
+                        b: Coefficient::Random,
+                        max_cofactor: 1,
+                    },
+                    "j0" => ScaledShape::of_kind(CurveKind::J0),
+                    "j0_b7" => ScaledShape {
+                        kind: CurveKind::J0,
+                        a: Coefficient::Fixed(0),
+                        b: Coefficient::Fixed(7),
+                        max_cofactor: 1,
+                    },
+                    "j1728" => ScaledShape::of_kind(CurveKind::J1728),
+                    other => {
+                        return Err(format!(
+                            "prime_orbit_shape is generic, generic_a_minus_3, j0, j0_b7 or j1728, not `{other}`"
+                        ))
+                    }
+                };
+                let generated = generate_instance(scaled, bits, Some(1), seed)?;
+                let params = generated.curve.params("ecbench-prime-orbit-shape");
+                let word = |name: &str, value: &num_bigint::BigUint| {
+                    value
+                        .to_u64()
+                        .ok_or_else(|| format!("generated {name} does not fit a word"))
+                };
+                let curve = PrimeCurve {
+                    p: word("prime", &params.p)?,
+                    a: word("a", &params.a)?,
+                    b: word("b", &params.b)?,
+                };
+                let mut instance = PrimeInstance {
+                    name: String::new(),
+                    curve,
+                    group_order: generated.certificate.group_order,
+                    r: generated.certificate.subgroup_order,
+                    cofactor: generated.certificate.cofactor,
+                    generator: (
+                        word("generator x", &params.gx)?,
+                        word("generator y", &params.gy)?,
+                    ),
+                };
+                instance.name = instance.curve_id().slug;
+                Ok(Instance::Prime(instance))
+            }
             CurveSpec::PrimeRoster { bits } => roster_prime_instance(bits)
                 .map(Instance::Prime)
                 .ok_or_else(|| format!("the bench roster has no {bits}-bit curve")),
@@ -642,6 +706,13 @@ impl CurveSpec {
             CurveSpec::PrimeSearch { bits, seed } => {
                 format!("find_prime_order_curve({bits}, {seed})")
             }
+            CurveSpec::PrimeOrbitShape {
+                ref shape,
+                bits,
+                seed,
+            } => format!(
+                "prime_orbit_index_calculus::generate_instance({shape}, {bits}, {seed})"
+            ),
             CurveSpec::PrimeRoster { bits } => format!("roster_prime_instance({bits})"),
             CurveSpec::Koblitz { a, n } if n >= 64 => {
                 format!("WideKoblitz::new({a}, registry modulus for n = {n})")
@@ -1789,6 +1860,52 @@ impl Workload {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn prime_orbit_shapes_keep_the_requested_coefficients_and_freeze_explicitly() {
+        for (shape, seed) in [
+            ("generic_a_minus_3", 2026110101),
+            ("j0_b7", 2026110103),
+            ("j1728", 2026110105),
+        ] {
+            let spec = CurveSpec::PrimeOrbitShape {
+                shape: shape.into(),
+                bits: 14,
+                seed,
+            };
+            let instance = spec.build().unwrap();
+            let Instance::Prime(prime) = &instance else {
+                panic!("prime orbit shapes build prime instances")
+            };
+            match shape {
+                "generic_a_minus_3" => assert_eq!(prime.curve.a, prime.curve.p - 3),
+                "j0_b7" => assert_eq!((prime.curve.a, prime.curve.b), (0, 7)),
+                "j1728" => assert_eq!(prime.curve.b, 0),
+                _ => unreachable!(),
+            }
+            let frozen = spec.for_child(&instance);
+            assert!(matches!(frozen, CurveSpec::PrimeExplicit { .. }));
+            let Instance::Prime(rebuilt) = frozen.build().unwrap() else {
+                panic!()
+            };
+            assert_eq!(
+                (
+                    rebuilt.curve.p,
+                    rebuilt.curve.a,
+                    rebuilt.curve.b,
+                    rebuilt.r,
+                    rebuilt.generator,
+                ),
+                (
+                    prime.curve.p,
+                    prime.curve.a,
+                    prime.curve.b,
+                    prime.r,
+                    prime.generator,
+                )
+            );
+        }
+    }
 
     #[test]
     fn extension_variants_have_distinct_constructors_and_subgroup_arithmetic() {
