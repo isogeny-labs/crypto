@@ -309,3 +309,24 @@ basis size, Singular's syz and rewrite criterion counts.
 reported to need much more time than F4 implementations on large dense systems; its manual
 advises `std`/`slimgb` when memory grows), so no improvement is measured; a positive result
 would need a signature-based F4 (matrix-F5, GVW/F4-style) that this host lacks.
+
+## 13. Amendment A4 (2026-11-01T08:05Z): container restart, queue reordered; no criterion changes
+
+**What happened** (*recorded*). The session container restarted between 06:11Z and 07:52Z
+(`uptime` 0 min at 07:53Z), most likely reclaimed while the session was idle. It killed
+`run_probes.sh drive` and Singular during arm F5a. At 06:11Z F5a had run 7,179 CPU-s
+(2 h 00 min, 4.63 GB RSS) without finishing. No run record was written, and its `sing.log`
+is empty because the log is written when the run ends. The arm directory and the driver log
+are kept, unchanged, under `results/_lost_restart_20261101T0753Z/`. Everything already
+finished survived on disk, including the checked baseline 4111 cell. F5a's lost attempt is
+not an outcome: it is neither a cap stop nor a completion, and the only fact it records is
+that F5a needs more than 7,179 CPU-s on this system.
+
+**Change.** `run_queue.sh` replaces `run_probes.sh drive` for the rest of the queue. Its
+order is: `run_cells.sh m5 262231`, `run_cells.sh m5 33554371`, then F5a, F5b, W1, W3, W2.
+The two baseline cells move to the front because they decide G1 at the other two primes
+(§7). The probe arms are compared only against the 4111 cell, so their position does not
+change what they measure. Arms, commands, caps (12,996 s for sba and 3,903 s for weighted,
+the values `run_probes.sh` derived from the 4111 cell's `quot.log`) and every criterion of
+§7, §11 and §12 are unchanged. To keep the container alive, the session holds a running
+background task for as long as the queue runs.
