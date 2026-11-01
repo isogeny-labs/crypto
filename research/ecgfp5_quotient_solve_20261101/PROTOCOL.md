@@ -330,3 +330,17 @@ change what they measure. Arms, commands, caps (12,996 s for sba and 3,903 s for
 the values `run_probes.sh` derived from the 4111 cell's `quot.log`) and every criterion of
 §7, §11 and §12 are unchanged. To keep the container alive, the session holds a running
 background task for as long as the queue runs.
+
+## 14. Amendment A5 (2026-11-01T20:25Z): F5b stopped by owner request; no criterion changes
+
+At 20:20:57Z, on the owner's instruction ("skip F5b and run the weighted arms now"), the
+session sent SIGTERM to arm F5b's Singular process (pid 8202). At that point F5b had used
+9,032 user CPU-s (2 h 32 m wall) with a peak RSS of 9.37 GB and had not returned a basis.
+Singular caught the signal and exited with status 1, so the wrapper's `run.json`
+records `exit_code: 1, signal: null, killed_by_wall_cap: false, killed_by_rss_cap: false`.
+That record is kept as written. It is read as **stopped by owner, incomplete**. It is not a
+completion, not a solver error and not a cap stop, and no vdim or criterion count exists
+for it. F5b shows only a lower bound: more than 9,032 CPU-s, already past the §12 bar of
+"at least 1.5x less CPU than W0's F4 (at most 6,900 CPU-s)", so it cannot be an
+improvement whatever it would have done. The queue continued unchanged to W1, W3 and W2,
+whose arms, caps (3,903 s) and §11 criteria are unchanged.
