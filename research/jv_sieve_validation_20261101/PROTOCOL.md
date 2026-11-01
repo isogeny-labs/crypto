@@ -1,9 +1,36 @@
 # Prospective protocol: corrected full-route Joux–Vitse validation
 
-Frozen on 2026-11-01 before the first datum of this study. The machine-readable
-record is [`protocol.json`](protocol.json). This protocol supersedes neither
-the 2026-10-19 historical run nor the 2026-10-23 unexecuted weak-curve-only
-protocol; it is a new prospective measurement.
+Version 1 was frozen on 2026-11-01 before the first datum of this study. The
+machine-readable version 2 record is [`protocol.json`](protocol.json), and the
+exact frozen version 1 bytes remain in [`protocol-v1.json`](protocol-v1.json).
+This protocol supersedes neither the 2026-10-19 historical run nor the
+2026-10-23 unexecuted weak-curve-only protocol; it is a new prospective
+measurement.
+
+## Version 2 administrative amendment
+
+Frozen version 1 run
+[`41345698056`](https://github.com/isogeny-labs/crypto/actions/runs/41345698056)
+ended `infrastructure_incomplete`: the first p=101 recovery test passed in
+1414.95 seconds, but the independent counted p=101 test had not completed when
+the combined prerequisite job reached its 90-minute workflow limit. The
+corrected-rho/tools gate and all requested-prime panels were skipped. The run
+created no artifacts and observed no p=1009, p=1511, or p=1823 study data.
+[`v1-infrastructure-incomplete.json`](v1-infrastructure-incomplete.json)
+retains the run/job identities, exact timing facts, and the complete retrieved
+log's SHA-256. The exact 123489-byte log is retained as
+[`v1-run-41345698056.log`](v1-run-41345698056.log), SHA-256
+`eeedd6508bb7f91ac2d516270e326d787d99ba18ff9b350238a0b0081fb44920`.
+
+Version 2 changes only prerequisite execution topology and budgets. It runs
+fresh, parallel `ubuntu-latest` jobs for the p=101 recovery test (180 minutes),
+the counted p=101 phase-accounting test (180 minutes), and the corrected-rho
+and frozen-tools gate (120 minutes). All three must pass before the three
+`crypto-eks-highmem` requested-prime panels start. No version 1 pass is reused.
+Every scientific arm, prime, seed, producer, metric, tolerance, stopping rule,
+decision rule, 21600-second panel budget, and independent validation obligation
+is unchanged. Version 1 and its incomplete attempt remain reportable alongside
+version 2; this amendment is filed before every datum it affects.
 
 ## Question and scope
 

@@ -1,0 +1,984 @@
+end-to-end	Set up job	﻿2026-11-01T20:13:05.1325707Z Current runner version: '2.338.2'
+end-to-end	Set up job	2026-11-01T20:13:05.1352941Z ##[group]Runner Image Provisioner
+end-to-end	Set up job	2026-11-01T20:13:05.1353851Z Hosted Compute Agent
+end-to-end	Set up job	2026-11-01T20:13:05.1354533Z Version: 20261021.618
+end-to-end	Set up job	2026-11-01T20:13:05.1355171Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+end-to-end	Set up job	2026-11-01T20:13:05.1355897Z Build Date: 2026-10-21T00:45:21Z
+end-to-end	Set up job	2026-11-01T20:13:05.1356703Z Worker ID: {e6f6c6b9-950d-4f11-8fdd-38c6fa21c74d}
+end-to-end	Set up job	2026-11-01T20:13:05.1357413Z Region: westus3
+end-to-end	Set up job	2026-11-01T20:13:05.1357985Z Cloud: Azure
+end-to-end	Set up job	2026-11-01T20:13:05.1358900Z ##[endgroup]
+end-to-end	Set up job	2026-11-01T20:13:05.1360411Z ##[group]Operating System
+end-to-end	Set up job	2026-11-01T20:13:05.1361209Z Ubuntu
+end-to-end	Set up job	2026-11-01T20:13:05.1361726Z 26.04.1
+end-to-end	Set up job	2026-11-01T20:13:05.1362268Z LTS
+end-to-end	Set up job	2026-11-01T20:13:05.1362795Z ##[endgroup]
+end-to-end	Set up job	2026-11-01T20:13:05.1363334Z ##[group]Runner Image
+end-to-end	Set up job	2026-11-01T20:13:05.1364001Z Image: ubuntu-26.04
+end-to-end	Set up job	2026-11-01T20:13:05.1364554Z Version: 20261025.179.1
+end-to-end	Set up job	2026-11-01T20:13:05.1365608Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261025.179/images/ubuntu/Ubuntu2604-Readme.md
+end-to-end	Set up job	2026-11-01T20:13:05.1367433Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261025.179
+end-to-end	Set up job	2026-11-01T20:13:05.1368923Z ##[endgroup]
+end-to-end	Set up job	2026-11-01T20:13:05.1370110Z ##[group]GITHUB_TOKEN Permissions
+end-to-end	Set up job	2026-11-01T20:13:05.1372295Z Contents: read
+end-to-end	Set up job	2026-11-01T20:13:05.1372936Z Metadata: read
+end-to-end	Set up job	2026-11-01T20:13:05.1373631Z ##[endgroup]
+end-to-end	Set up job	2026-11-01T20:13:05.1375687Z Secret source: Actions
+end-to-end	Set up job	2026-11-01T20:13:05.1376611Z Cache mode: write
+end-to-end	Set up job	2026-11-01T20:13:05.1377405Z Prepare workflow directory
+end-to-end	Set up job	2026-11-01T20:13:05.1772397Z Prepare all required actions
+end-to-end	Set up job	2026-11-01T20:13:05.1820514Z Getting action download info
+end-to-end	Set up job	2026-11-01T20:13:05.4718788Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+end-to-end	Set up job	2026-11-01T20:13:05.5773350Z Download action repository 'dtolnay/rust-toolchain@stable' (SHA:b725eda525362e7cf34af9a7243cac1e3f01a7ec)
+end-to-end	Set up job	2026-11-01T20:13:05.7960823Z Download action repository 'Swatinem/rust-cache@v2' (SHA:d1527c8f67ef9af357290475d4af4b0fab8f12e0)
+end-to-end	Set up job	2026-11-01T20:13:06.5399110Z Complete job name: end-to-end
+end-to-end	Run actions/checkout@v4	﻿2026-11-01T20:13:06.6321125Z ##[group]Run actions/checkout@v4
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.6322149Z with:
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.6322665Z   repository: isogeny-labs/crypto
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.6326868Z   token: ***
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.6327366Z   ssh-strict: true
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.6327852Z   ssh-user: git
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.6328552Z   persist-credentials: true
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.6329127Z   clean: true
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.6329617Z   sparse-checkout-cone-mode: true
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.6330205Z   fetch-depth: 1
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.6330681Z   fetch-tags: false
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.6331174Z   show-progress: true
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.6331673Z   lfs: false
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.6332134Z   submodules: false
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.6332647Z   set-safe-directory: true
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.6333209Z   allow-unsafe-pr-checkout: false
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.6334072Z ##[endgroup]
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9477676Z Syncing repository: isogeny-labs/crypto
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9480337Z ##[group]Getting Git version info
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9481179Z Working directory is '/home/runner/work/crypto/crypto'
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9482858Z [command]/usr/bin/git version
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9501114Z git version 2.56.0
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9526956Z ##[endgroup]
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9543354Z Temporarily overriding HOME='/home/runner/work/_temp/9227d8ab-5b71-42cd-822c-3e53de8cbf4a' before making global git config changes
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9546227Z Adding repository directory to the temporary git global config as a safe directory
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9550352Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9639903Z Deleting the contents of '/home/runner/work/crypto/crypto'
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9643687Z ##[group]Initializing the repository
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9649083Z [command]/usr/bin/git init /home/runner/work/crypto/crypto
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9790110Z hint: Using 'master' as the name for the initial branch. This default branch name
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9792219Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9793795Z hint: to use in all of your new repositories, which will suppress this warning,
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9794893Z hint: call:
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9795881Z hint:
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9796908Z hint: 	git config --global init.defaultBranch <name>
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9798024Z hint:
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9799313Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9800992Z hint: 'development'. The just-created branch can be renamed via this command:
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9802335Z hint:
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9803055Z hint: 	git branch -m <name>
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9803898Z hint:
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9805037Z hint: Disable this message with "git config set advice.defaultBranchName false"
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9806824Z Initialized empty Git repository in /home/runner/work/crypto/crypto/.git/
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9818737Z [command]/usr/bin/git remote add origin https://github.com/isogeny-labs/crypto
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9873542Z ##[endgroup]
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9875100Z ##[group]Disabling automatic garbage collection
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9877061Z [command]/usr/bin/git config --local gc.auto 0
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9924991Z ##[endgroup]
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9925997Z ##[group]Setting up auth
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9933802Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:06.9972249Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:07.0467268Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:07.0520598Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:07.0794326Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:07.0832028Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:07.1117002Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:07.1159709Z ##[endgroup]
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:07.1160695Z ##[group]Fetching the repository
+end-to-end	Run actions/checkout@v4	2026-11-01T20:13:07.1169929Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +d17acec256efb2f67d8500b4dbeb7a28d655b119:refs/remotes/origin/codex/jv-validation
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:19.0755615Z From https://github.com/isogeny-labs/crypto
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:19.0762251Z  * [new ref]             d17acec256efb2f67d8500b4dbeb7a28d655b119 -> origin/codex/jv-validation
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:19.0766466Z ##[endgroup]
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:19.0767356Z ##[group]Determining the checkout info
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:19.0768153Z ##[endgroup]
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:19.0769224Z [command]/usr/bin/git sparse-checkout disable
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:19.0822031Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:19.0856385Z ##[group]Checking out the ref
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:19.0862781Z [command]/usr/bin/git checkout --progress --force -B codex/jv-validation refs/remotes/origin/codex/jv-validation
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:20.4695158Z Updating files:   1% (3441/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:21.2525086Z Updating files:   2% (4296/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:21.5993632Z Updating files:   2% (5581/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:21.9110017Z Updating files:   3% (6443/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:22.0429973Z Updating files:   4% (8591/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:22.2523856Z Updating files:   5% (10739/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:22.3067642Z Updating files:   5% (12333/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:22.4555893Z Updating files:   6% (12886/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:22.9696928Z Updating files:   7% (15034/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:23.1500574Z Updating files:   8% (17182/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:23.2525475Z Updating files:   9% (19329/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:23.5288391Z Updating files:   9% (20119/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:23.6622862Z Updating files:  10% (21477/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:24.2986947Z Updating files:  11% (23625/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:24.8910600Z Updating files:  11% (24689/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:25.2641496Z Updating files:  12% (25772/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:25.8607000Z Updating files:  12% (26994/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:26.3002366Z Updating files:  13% (27920/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:26.9548766Z Updating files:  13% (27949/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:27.2267089Z Updating files:  14% (30067/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:27.2522345Z Updating files:  15% (32215/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:27.3786509Z Updating files:  15% (32703/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:27.8447017Z Updating files:  16% (34363/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:28.0212047Z Updating files:  17% (36510/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:28.2732202Z Updating files:  18% (38658/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:28.5727354Z Updating files:  18% (40216/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:28.8467594Z Updating files:  19% (40806/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:29.0203898Z Updating files:  20% (42953/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:29.1823623Z Updating files:  21% (45101/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:29.2522632Z Updating files:  22% (47249/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:29.3090620Z Updating files:  22% (48519/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:29.4540347Z Updating files:  23% (49396/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:29.5883644Z Updating files:  24% (51544/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:29.8096716Z Updating files:  25% (53691/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:29.9891023Z Updating files:  26% (55839/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:30.2526690Z Updating files:  27% (57987/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:30.2796842Z Updating files:  27% (60065/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:30.8859576Z Updating files:  28% (60134/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:31.0533638Z Updating files:  29% (62282/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:31.2061160Z Updating files:  30% (64430/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:31.2522347Z Updating files:  31% (66577/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:31.3609813Z Updating files:  31% (67195/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:31.6852322Z Updating files:  32% (68725/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:32.3173658Z Updating files:  33% (70873/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:33.2822200Z Updating files:  33% (71420/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:34.2532328Z Updating files:  33% (71453/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:34.6658435Z Updating files:  33% (72381/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:34.8205676Z Updating files:  34% (73020/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:34.9426132Z Updating files:  35% (75168/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:35.1986702Z Updating files:  36% (77316/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:35.2522344Z Updating files:  37% (79463/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:35.3554278Z Updating files:  37% (80324/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:35.4908756Z Updating files:  38% (81611/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:35.6373568Z Updating files:  39% (83758/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:35.8280718Z Updating files:  40% (85906/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:35.9479743Z Updating files:  41% (88054/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:36.1169902Z Updating files:  42% (90201/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:36.2243939Z Updating files:  43% (92349/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:36.2521895Z Updating files:  44% (94497/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:36.3411865Z Updating files:  44% (94965/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:36.4509503Z Updating files:  45% (96644/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:36.5624185Z Updating files:  46% (98792/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:36.6755108Z Updating files:  47% (100940/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:36.8002940Z Updating files:  48% (103087/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:36.9122812Z Updating files:  49% (105235/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:37.0545721Z Updating files:  50% (107382/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:37.2630699Z Updating files:  51% (109530/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:37.4285557Z Updating files:  51% (110196/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:37.7835192Z Updating files:  52% (111678/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:37.8686538Z Updating files:  53% (113825/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:38.2524267Z Updating files:  54% (115973/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:38.4228681Z Updating files:  54% (117366/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:39.2557675Z Updating files:  55% (118121/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:39.3843797Z Updating files:  55% (119754/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:39.6838994Z Updating files:  56% (120268/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:39.8181343Z Updating files:  57% (122416/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:39.9684007Z Updating files:  58% (124564/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:40.1331745Z Updating files:  59% (126711/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:40.2523899Z Updating files:  60% (128859/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:40.3442820Z Updating files:  60% (130165/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:40.6121395Z Updating files:  61% (131007/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:41.1474996Z Updating files:  62% (133154/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:41.2522448Z Updating files:  63% (135302/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:41.3650602Z Updating files:  63% (136080/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:41.7091187Z Updating files:  64% (137449/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:42.1795471Z Updating files:  65% (139597/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:42.2541752Z Updating files:  66% (141745/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:43.0462927Z Updating files:  66% (141883/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:43.2698938Z Updating files:  67% (143892/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:43.5130374Z Updating files:  67% (144941/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:43.9850629Z Updating files:  68% (146040/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:44.2574884Z Updating files:  69% (148188/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:45.2578022Z Updating files:  69% (148336/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:45.8635704Z Updating files:  69% (148760/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:46.1823719Z Updating files:  70% (150335/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:46.2522988Z Updating files:  71% (152483/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:46.3210791Z Updating files:  71% (153591/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:46.4572624Z Updating files:  72% (154631/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:46.5981163Z Updating files:  73% (156778/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:46.7168920Z Updating files:  74% (158926/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:46.9306732Z Updating files:  75% (161073/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:47.0991351Z Updating files:  76% (163221/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:47.2522616Z Updating files:  77% (165369/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:47.2718005Z Updating files:  77% (167246/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:47.4746742Z Updating files:  78% (167516/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:47.6042114Z Updating files:  79% (169664/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:47.7325391Z Updating files:  80% (171812/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:47.8718741Z Updating files:  81% (173959/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:48.0499856Z Updating files:  82% (176107/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:48.2620387Z Updating files:  83% (178255/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:48.4132866Z Updating files:  83% (179900/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:48.5177506Z Updating files:  84% (180402/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:48.9183637Z Updating files:  85% (182550/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:49.0226424Z Updating files:  86% (184698/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:49.1219069Z Updating files:  87% (186845/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:49.2629653Z Updating files:  88% (188993/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:49.3444657Z Updating files:  88% (190350/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:50.2889487Z Updating files:  89% (191140/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:50.8361282Z Updating files:  89% (192880/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:51.0025694Z Updating files:  90% (193288/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:51.1369086Z Updating files:  91% (195436/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:51.2522928Z Updating files:  92% (197583/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:51.5194869Z Updating files:  92% (198157/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:51.7319091Z Updating files:  93% (199731/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:51.9146406Z Updating files:  94% (201879/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:52.1732550Z Updating files:  95% (204026/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:52.2523776Z Updating files:  96% (206174/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:52.4494426Z Updating files:  96% (207002/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:53.2529634Z Updating files:  97% (208322/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:54.3176188Z Updating files:  97% (209085/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:54.9630064Z Updating files:  97% (210333/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:55.2793020Z Updating files:  98% (210469/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:55.7970755Z Updating files:  98% (210504/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:56.0804905Z Updating files:  99% (212617/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:56.0806016Z Updating files: 100% (214764/214764)
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:56.0806400Z Updating files: 100% (214764/214764), done.
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:56.3158409Z Switched to a new branch 'codex/jv-validation'
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:56.3161020Z branch 'codex/jv-validation' set up to track 'origin/codex/jv-validation'.
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:56.3879961Z ##[endgroup]
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:56.3912071Z [command]/usr/bin/git log -1 --format=%H
+end-to-end	Run actions/checkout@v4	2026-11-01T20:14:56.3941294Z d17acec256efb2f67d8500b4dbeb7a28d655b119
+end-to-end	Run dtolnay/rust-toolchain@stable	﻿2026-11-01T20:14:56.4503186Z ##[group]Run dtolnay/rust-toolchain@stable
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4503511Z with:
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4503709Z   toolchain: stable
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4503924Z ##[endgroup]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4586843Z ##[start-action display=Parse toolchain version;id=__dtolnay_rust-toolchain.parse]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4650185Z ##[group]Run if [[ -z $toolchain ]]; then
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4650580Z [36;1mif [[ -z $toolchain ]]; then[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4651137Z [36;1m  # GitHub does not enforce `required: true` inputs itself. https://github.com/actions/runner/issues/1070[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4651730Z [36;1m  echo "'toolchain' is a required input" >&2[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4652033Z [36;1m  exit 1[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4652369Z [36;1melif [[ $toolchain =~ ^stable' '[0-9]+' '(year|month|week|day)s?' 'ago$ ]]; then[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4652789Z [36;1m  if [[ Linux == macOS ]]; then[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4653323Z [36;1m    echo "toolchain=1.$((($(date -v-$(sed 's/stable \([0-9]*\) \(.\).*/\1\2/' <<< $toolchain) +%s)/60/60/24-16569)/7/6))" >> $GITHUB_OUTPUT[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4653878Z [36;1m  else[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4654282Z [36;1m    echo "toolchain=1.$((($(date --date "${toolchain#stable }" +%s)/60/60/24-16569)/7/6))" >> $GITHUB_OUTPUT[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4654745Z [36;1m  fi[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4655041Z [36;1melif [[ $toolchain =~ ^stable' 'minus' '[0-9]+' 'releases?$ ]]; then[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4655578Z [36;1m  echo "toolchain=1.$((($(date +%s)/60/60/24-16569)/7/6-${toolchain//[^0-9]/}))" >> $GITHUB_OUTPUT[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4656062Z [36;1melif [[ $toolchain =~ ^1\.[0-9]+$ ]]; then[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4656606Z [36;1m  echo "toolchain=1.$((i=${toolchain#1.}, c=($(date +%s)/60/60/24-16569)/7/6, i+9*i*(10*i<=c)+90*i*(100*i<=c)))" >> $GITHUB_OUTPUT[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4657125Z [36;1melse[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4657330Z [36;1m  delimiter=EOF[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4657650Z [36;1m  while [[ $toolchain == *$delimiter* ]]; do delimiter+=_; done[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4658420Z [36;1m  printf 'toolchain<<%s\n%s\n%s\n' "$delimiter" "$toolchain" "$delimiter" >> $GITHUB_OUTPUT[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4658857Z [36;1mfi[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4787299Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4787733Z env:
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4787957Z   toolchain: stable
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4788373Z ##[endgroup]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4931300Z ##[end-action id=__dtolnay_rust-toolchain.parse;outcome=success;conclusion=success;duration_ms=34]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4935992Z ##[start-action display=Set $CARGO_HOME;id=__dtolnay_rust-toolchain.__run]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4968623Z ##[group]Run echo CARGO_HOME=${CARGO_HOME:-"$HOME/.cargo"} >> $GITHUB_ENV
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4969132Z [36;1mecho CARGO_HOME=${CARGO_HOME:-"$HOME/.cargo"} >> $GITHUB_ENV[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4998953Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.4999311Z ##[endgroup]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5057405Z ##[end-action id=__dtolnay_rust-toolchain.__run;outcome=success;conclusion=success;duration_ms=12]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5059892Z ##[start-action display=Install rustup if needed;id=__dtolnay_rust-toolchain.__run_2]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5085450Z ##[group]Run if ! command -v rustup &>/dev/null; then
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5085828Z [36;1mif ! command -v rustup &>/dev/null; then[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5086604Z [36;1m  curl --proto '=https' --tlsv1.2 --retry 10 --retry-connrefused --location --silent --show-error --fail https://sh.rustup.rs | sh -s -- --default-toolchain none -y[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5087538Z [36;1m  echo "$CARGO_HOME/bin" >> $GITHUB_PATH[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5087830Z [36;1mfi[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5116643Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5116989Z env:
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5117191Z   CARGO_HOME: /home/runner/.cargo
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5117446Z ##[endgroup]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5172164Z ##[end-action id=__dtolnay_rust-toolchain.__run_2;outcome=success;conclusion=success;duration_ms=11]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5174588Z ##[start-action display=Install rustup if needed on windows;id=__dtolnay_rust-toolchain.__run_3]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5181111Z ##[end-action id=__dtolnay_rust-toolchain.__run_3;outcome=skipped;conclusion=skipped;duration_ms=0]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5195052Z ##[start-action display=rustup toolchain install stable;id=__dtolnay_rust-toolchain.__run_4]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5220518Z ##[group]Run set -f  # split targets and components on commas and whitespace, without glob expansion
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5221223Z [36;1mset -f  # split targets and components on commas and whitespace, without glob expansion[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5221675Z [36;1mflags=()[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5221958Z [36;1mfor t in ${targets//,/ }; do flags+=(--target "$t"); done[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5222373Z [36;1mfor c in ${components//,/ }; do flags+=(--component "$c"); done[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5222875Z [36;1mif [[ $toolchain == nightly && -n $components ]]; then flags+=(--allow-downgrade); fi[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5223297Z [36;1mlog=$(mktemp)[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5223543Z [36;1mtrap 'rm -f "$log"' EXIT[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5223802Z [36;1mfor attempt in 1 2 3 4 5; do[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5224381Z [36;1m  if rustup toolchain install "$toolchain" "${flags[@]}" --profile minimal --no-self-update --force-non-host 2>&1 | tee "$log"; then[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5224974Z [36;1m    break[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5225224Z [36;1m  else[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5225419Z [36;1m    status=$?[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5225642Z [36;1m  fi[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5225933Z [36;1m  if [[ $attempt == 5 ]] || ! grep -Fq 'checksum failed for ' "$log" \[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5226504Z [36;1m      || ! grep -Fq 'this is likely due to an ongoing update of the official release server' "$log"; then[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5226978Z [36;1m    exit "$status"[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5227202Z [36;1m  fi[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5227551Z [36;1m  echo "Retrying rustup toolchain install in 30 seconds (retry $attempt of 4)" >&2[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5227978Z [36;1m  sleep 30[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5228410Z [36;1mdone[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5257514Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5257877Z env:
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5258081Z   CARGO_HOME: /home/runner/.cargo
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5258612Z   toolchain: stable
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5258828Z   targets: 
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5259013Z   components: 
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5259225Z   RUSTUP_PERMIT_COPY_RENAME: 1
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.5259467Z ##[endgroup]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.7571584Z info: syncing channel updates for stable-x86_64-unknown-linux-gnu
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9030893Z 
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9117284Z   stable-x86_64-unknown-linux-gnu unchanged - rustc 1.99.1 (58cf8f9c3 2026-10-13)
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9117842Z 
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9185630Z ##[end-action id=__dtolnay_rust-toolchain.__run_4;outcome=success;conclusion=success;duration_ms=398]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9192078Z ##[start-action display=rustup default stable;id=__dtolnay_rust-toolchain.__run_5]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9211494Z ##[group]Run rustup default "$toolchain" --force-non-host
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9211911Z [36;1mrustup default "$toolchain" --force-non-host[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9244739Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9245090Z env:
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9245363Z   CARGO_HOME: /home/runner/.cargo
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9283317Z   toolchain: stable
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9283680Z ##[endgroup]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9383568Z info: using existing install for stable-x86_64-unknown-linux-gnu
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9409167Z info: default toolchain set to stable-x86_64-unknown-linux-gnu
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9409514Z 
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9491215Z   stable-x86_64-unknown-linux-gnu unchanged - rustc 1.99.1 (58cf8f9c3 2026-10-13)
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9491659Z 
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9509780Z ##[end-action id=__dtolnay_rust-toolchain.__run_5;outcome=success;conclusion=success;duration_ms=31]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9513689Z ##[start-action display=Create cachekey;id=__dtolnay_rust-toolchain.rustc-version]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9533527Z ##[group]Run DATE=$(rustc +"$toolchain" --version --verbose | sed -ne 's/^commit-date: \(20[0-9][0-9]\)-\([01][0-9]\)-\([0-3][0-9]\)$/\1\2\3/p')
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9534421Z [36;1mDATE=$(rustc +"$toolchain" --version --verbose | sed -ne 's/^commit-date: \(20[0-9][0-9]\)-\([01][0-9]\)-\([0-3][0-9]\)$/\1\2\3/p')[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9535123Z [36;1mHASH=$(rustc +"$toolchain" --version --verbose | sed -ne 's/^commit-hash: //p')[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9535662Z [36;1mecho "cachekey=$(echo $DATE$HASH | head -c12)" >> $GITHUB_OUTPUT[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9571736Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9572086Z env:
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9572290Z   CARGO_HOME: /home/runner/.cargo
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9572545Z   toolchain: stable
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9572748Z ##[endgroup]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9984640Z ##[end-action id=__dtolnay_rust-toolchain.rustc-version;outcome=success;conclusion=success;duration_ms=46]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:56.9987239Z ##[start-action display=Disable incremental compilation;id=__dtolnay_rust-toolchain.__run_6]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0006830Z ##[group]Run if [ -z "${CARGO_INCREMENTAL+set}" ]; then
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0007222Z [36;1mif [ -z "${CARGO_INCREMENTAL+set}" ]; then[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0007558Z [36;1m  echo CARGO_INCREMENTAL=0 >> $GITHUB_ENV[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0007846Z [36;1mfi[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0040653Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0041040Z env:
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0041301Z   CARGO_HOME: /home/runner/.cargo
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0041595Z ##[endgroup]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0105000Z ##[end-action id=__dtolnay_rust-toolchain.__run_6;outcome=success;conclusion=success;duration_ms=11]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0107178Z ##[start-action display=Enable colors in Cargo output;id=__dtolnay_rust-toolchain.__run_7]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0125853Z ##[group]Run if [ -z "${CARGO_TERM_COLOR+set}" ]; then
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0126221Z [36;1mif [ -z "${CARGO_TERM_COLOR+set}" ]; then[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0126583Z [36;1m  echo CARGO_TERM_COLOR=always >> $GITHUB_ENV[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0126884Z [36;1mfi[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0157061Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0157410Z env:
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0157615Z   CARGO_HOME: /home/runner/.cargo
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0157874Z   CARGO_INCREMENTAL: 0
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0158087Z ##[endgroup]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0217282Z ##[end-action id=__dtolnay_rust-toolchain.__run_7;outcome=success;conclusion=success;duration_ms=10]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0222578Z ##[start-action display=Enable Cargo sparse registry;id=__dtolnay_rust-toolchain.__run_8]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0252381Z ##[group]Run # implemented in 1.66, stabilized in 1.68, made default in 1.70
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0253308Z [36;1m# implemented in 1.66, stabilized in 1.68, made default in 1.70[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0254701Z [36;1mif [ -z "${CARGO_REGISTRIES_CRATES_IO_PROTOCOL+set}" -o -f "/home/runner/work/_temp"/.implicit_cargo_registries_crates_io_protocol ]; then[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0256072Z [36;1m  if rustc +"$toolchain" --version --verbose | grep -q '^release: 1\.6[89]\.'; then[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0257144Z [36;1m    touch "/home/runner/work/_temp"/.implicit_cargo_registries_crates_io_protocol || true[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0258127Z [36;1m    echo CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse >> $GITHUB_ENV[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0259316Z [36;1m  elif rustc +"$toolchain" --version --verbose | grep -q '^release: 1\.6[67]\.'; then[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0260631Z [36;1m    touch "/home/runner/work/_temp"/.implicit_cargo_registries_crates_io_protocol || true[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0261576Z [36;1m    echo CARGO_REGISTRIES_CRATES_IO_PROTOCOL=git >> $GITHUB_ENV[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0262197Z [36;1m  fi[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0262538Z [36;1mfi[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0304981Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0305579Z env:
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0305936Z   CARGO_HOME: /home/runner/.cargo
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0306674Z   CARGO_INCREMENTAL: 0
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0307087Z   CARGO_TERM_COLOR: always
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0307490Z   toolchain: stable
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0307846Z ##[endgroup]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0652692Z ##[end-action id=__dtolnay_rust-toolchain.__run_8;outcome=success;conclusion=success;duration_ms=42]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0656947Z ##[start-action display=Work around spurious network errors in curl 8.0;id=__dtolnay_rust-toolchain.__run_9]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0675418Z ##[group]Run # https://rust-lang.zulipchat.com/#narrow/stream/246057-t-cargo/topic/timeout.20investigation
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0676189Z [36;1m# https://rust-lang.zulipchat.com/#narrow/stream/246057-t-cargo/topic/timeout.20investigation[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0676828Z [36;1mif rustc +"$toolchain" --version --verbose | grep -q '^release: 1\.7[01]\.'; then[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0677311Z [36;1m  echo CARGO_HTTP_MULTIPLEXING=false >> $GITHUB_ENV[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0677625Z [36;1mfi[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0710226Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0710599Z env:
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0710808Z   CARGO_HOME: /home/runner/.cargo
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0711072Z   CARGO_INCREMENTAL: 0
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0711297Z   CARGO_TERM_COLOR: always
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0711524Z   toolchain: stable
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0711727Z ##[endgroup]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0907646Z ##[end-action id=__dtolnay_rust-toolchain.__run_9;outcome=success;conclusion=success;duration_ms=24]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0912812Z ##[start-action display=rustc +stable --version --verbose;id=__dtolnay_rust-toolchain.__run_10]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0932265Z ##[group]Run rustc +"$toolchain" --version --verbose
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0932647Z [36;1mrustc +"$toolchain" --version --verbose[0m
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0964470Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0964817Z env:
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0965020Z   CARGO_HOME: /home/runner/.cargo
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0965281Z   CARGO_INCREMENTAL: 0
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0965518Z   CARGO_TERM_COLOR: always
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0965739Z   toolchain: stable
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.0965940Z ##[endgroup]
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.1131256Z rustc 1.99.1 (58cf8f9c3 2026-10-13)
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.1131747Z binary: rustc
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.1132171Z commit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.1132684Z commit-date: 2026-10-13
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.1133074Z host: x86_64-unknown-linux-gnu
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.1133457Z release: 1.99.1
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.1133972Z LLVM version: 23.1.1
+end-to-end	Run dtolnay/rust-toolchain@stable	2026-11-01T20:14:57.1160541Z ##[end-action id=__dtolnay_rust-toolchain.__run_10;outcome=success;conclusion=success;duration_ms=24]
+end-to-end	Run Swatinem/rust-cache@v2	﻿2026-11-01T20:14:57.1278982Z ##[group]Run Swatinem/rust-cache@v2
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:14:57.1279291Z with:
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:14:57.1279496Z   prefix-key: v0-rust
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:14:57.1279725Z   add-job-id-key: true
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:14:57.1279973Z   add-rust-environment-hash-key: true
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:14:57.1280246Z   cache-targets: true
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:14:57.1280466Z   cache-all-crates: false
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:14:57.1280707Z   cache-workspace-crates: false
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:14:57.1280951Z   save-if: true
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:14:57.1281161Z   cache-provider: github
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:14:57.1281385Z   cache-bin: true
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:14:57.1281585Z   lookup-only: false
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:14:57.1282081Z   cmd-format: {0}
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:14:57.1282276Z env:
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:14:57.1282469Z   CARGO_HOME: /home/runner/.cargo
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:14:57.1282724Z   CARGO_INCREMENTAL: 0
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:14:57.1282947Z   CARGO_TERM_COLOR: always
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:14:57.1283358Z ##[endgroup]
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4456109Z ##[group]Cache Configuration
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4456644Z Cache Provider:
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4457115Z     github
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4457456Z Workspaces:
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4457852Z     /home/runner/work/crypto/crypto
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4458608Z Cache Paths:
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4458974Z     /home/runner/.cargo/bin
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4459417Z     /home/runner/.cargo/.crates.toml
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4460022Z     /home/runner/.cargo/.crates2.json
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4460679Z     /home/runner/.cargo/registry
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4461307Z     /home/runner/.cargo/git
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4462124Z     /home/runner/work/crypto/crypto/target
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4462707Z Restore Key:
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4463303Z     v0-rust-end-to-end-Linux-x64-01b81e85
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4463982Z Cache Key:
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4464588Z     v0-rust-end-to-end-Linux-x64-01b81e85-afd7cff2
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4465442Z .. Prefix:
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4466002Z   - v0-rust-end-to-end-Linux-x64
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4466778Z .. Environment considered:
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4467417Z   - Rust Versions:
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4468462Z     - 1.99.1 x86_64-unknown-linux-gnu 58cf8f9c35b355199727627d07ae34a4e2846d67
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4469408Z   - CARGO_HOME
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4469875Z   - CARGO_INCREMENTAL
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4470327Z   - CARGO_TERM_COLOR
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4470890Z .. Lockfiles considered:
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4471519Z   - /home/runner/work/crypto/crypto/Cargo.lock
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4472404Z   - /home/runner/work/crypto/crypto/Cargo.toml
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4473543Z   - /home/runner/work/crypto/crypto/research/prime_tensor_variants_20261030/identity/rust-toolchain.toml
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4474921Z   - /home/runner/work/crypto/crypto/tools/backend-leaderboard/rust-toolchain.toml
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4539230Z ##[endgroup]
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4539512Z 
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.4539684Z ... Restoring cache ...
+end-to-end	Run Swatinem/rust-cache@v2	2026-11-01T20:15:11.6609253Z No cache found.
+end-to-end	Run the complete p=101 isogeny walk and sieve check	﻿2026-11-01T20:15:11.6859126Z ##[group]Run if [[ "$(jq -r '.freeze.status // "frozen"' research/jv_sieve_validation_20261101/protocol.json 2>/dev/null || echo frozen)" = draft ]]; then
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:11.6860228Z [36;1mif [[ "$(jq -r '.freeze.status // "frozen"' research/jv_sieve_validation_20261101/protocol.json 2>/dev/null || echo frozen)" = draft ]]; then[0m
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:11.6861101Z [36;1m  echo "draft preflight: requested-prime panels remain gated; defer the long p=101 gate to the frozen run"[0m
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:11.6861609Z [36;1m  exit 0[0m
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:11.6861808Z [36;1mfi[0m
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:11.6862035Z [36;1mcargo test --release --locked --lib \[0m
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:11.6862539Z [36;1m  cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies \[0m
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:11.6863047Z [36;1m  -- --exact --test-threads=1[0m
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:11.6863342Z [36;1mcargo test --release --locked --lib \[0m
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:11.6863873Z [36;1m  cryptanalysis::jv_isogeny_walk::tests::counted_end_to_end_keeps_the_legacy_counts_and_charges_every_phase \[0m
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:11.6864463Z [36;1m  -- --exact --ignored --test-threads=1[0m
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:11.6894873Z shell: /usr/bin/bash -e {0}
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:11.6895139Z env:
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:11.6895346Z   CARGO_HOME: /home/runner/.cargo
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:11.6895614Z   CARGO_INCREMENTAL: 0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:11.6895840Z   CARGO_TERM_COLOR: always
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:11.6896072Z   CACHE_ON_FAILURE: false
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:11.6896296Z ##[endgroup]
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:11.7736601Z [1m[92m    Updating[0m crates.io index
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.2909448Z [1m[92m Downloading[0m crates ...
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.3957172Z [1m[92m  Downloaded[0m adler2 v2.0.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4057962Z [1m[92m  Downloaded[0m anstream v1.0.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4082809Z [1m[92m  Downloaded[0m anstyle v1.0.14
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4096409Z [1m[92m  Downloaded[0m ahash v0.8.12
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4123630Z [1m[92m  Downloaded[0m anstyle-parse v1.0.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4149328Z [1m[92m  Downloaded[0m foreign-types v0.3.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4156348Z [1m[92m  Downloaded[0m crypto-common v0.1.7
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4166678Z [1m[92m  Downloaded[0m heck v0.5.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4178401Z [1m[92m  Downloaded[0m futures-channel v0.3.34
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4204247Z [1m[92m  Downloaded[0m bytes-utils v0.1.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4224611Z [1m[92m  Downloaded[0m clap_derive v4.6.7
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4253485Z [1m[92m  Downloaded[0m aws-smithy-schema v0.2.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4276755Z [1m[92m  Downloaded[0m base64 v0.21.7
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4317775Z [1m[92m  Downloaded[0m urlencoding v2.1.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4328640Z [1m[92m  Downloaded[0m arc-swap v1.9.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4369298Z [1m[92m  Downloaded[0m base64-simd v0.8.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4383457Z [1m[92m  Downloaded[0m aws-smithy-observability v0.3.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4397491Z [1m[92m  Downloaded[0m anstyle-query v1.1.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4409960Z [1m[92m  Downloaded[0m arcstr v1.2.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4423838Z [1m[92m  Downloaded[0m atomic-waker v1.1.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4435991Z [1m[92m  Downloaded[0m block-buffer v0.12.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4448147Z [1m[92m  Downloaded[0m futures-core v0.3.34
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4463492Z [1m[92m  Downloaded[0m colorchoice v1.0.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4476954Z [1m[92m  Downloaded[0m cpufeatures v0.3.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4510053Z [1m[92m  Downloaded[0m clap_lex v1.1.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4510712Z [1m[92m  Downloaded[0m autocfg v1.5.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4532416Z [1m[92m  Downloaded[0m aws-credential-types v1.3.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4551947Z [1m[92m  Downloaded[0m fallible-iterator v0.3.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4567151Z [1m[92m  Downloaded[0m foldhash v0.2.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4583772Z [1m[92m  Downloaded[0m hex v0.4.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4603423Z [1m[92m  Downloaded[0m fnv v1.0.7
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4612380Z [1m[92m  Downloaded[0m form_urlencoded v1.2.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4619508Z [1m[92m  Downloaded[0m generic-array v0.14.7
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4639466Z [1m[92m  Downloaded[0m cfg-if v1.0.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4658298Z [1m[92m  Downloaded[0m cpufeatures v0.2.17
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4683473Z [1m[92m  Downloaded[0m foreign-types-shared v0.1.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4694041Z [1m[92m  Downloaded[0m futures-task v0.3.34
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4707787Z [1m[92m  Downloaded[0m http-body v1.1.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4729190Z [1m[92m  Downloaded[0m zeroize_derive v1.5.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4755901Z [1m[92m  Downloaded[0m displaydoc v0.2.7
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4794393Z [1m[92m  Downloaded[0m getrandom v0.2.17
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4851243Z [1m[92m  Downloaded[0m aws-smithy-http v0.64.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4892794Z [1m[92m  Downloaded[0m version_check v0.9.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4908679Z [1m[92m  Downloaded[0m yoke-derive v0.8.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4920921Z [1m[92m  Downloaded[0m aws-smithy-async v1.3.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4941643Z [1m[92m  Downloaded[0m aws-smithy-checksums v0.65.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4955831Z [1m[92m  Downloaded[0m aws-smithy-eventstream v0.61.6
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4980637Z [1m[92m  Downloaded[0m aws-smithy-runtime-api-macros v1.2.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.4993841Z [1m[92m  Downloaded[0m aws-types v1.7.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5018479Z [1m[92m  Downloaded[0m constant_time_eq v0.4.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5039358Z [1m[92m  Downloaded[0m crc32fast v1.5.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5060227Z [1m[92m  Downloaded[0m crossbeam-deque v0.8.8
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5075672Z [1m[92m  Downloaded[0m crossbeam-utils v0.8.23
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5103664Z [1m[92m  Downloaded[0m crypto-common v0.2.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5115950Z [1m[92m  Downloaded[0m ctutils v0.4.6
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5137294Z [1m[92m  Downloaded[0m digest v0.10.7
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5155631Z [1m[92m  Downloaded[0m digest v0.11.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5179536Z [1m[92m  Downloaded[0m either v1.18.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5194751Z [1m[92m  Downloaded[0m equivalent v1.0.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5207409Z [1m[92m  Downloaded[0m fallible-streaming-iterator v0.1.9
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5218813Z [1m[92m  Downloaded[0m find-msvc-tools v0.1.14
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5235384Z [1m[92m  Downloaded[0m futures-sink v0.3.34
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5243221Z [1m[92m  Downloaded[0m hashlink v0.9.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5259959Z [1m[92m  Downloaded[0m http-body-util v0.1.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5278802Z [1m[92m  Downloaded[0m ipnet v2.12.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5294804Z [1m[92m  Downloaded[0m potential_utf v0.1.6
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5305497Z [1m[92m  Downloaded[0m stable_deref_trait v1.2.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5314270Z [1m[92m  Downloaded[0m zeroize v1.9.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5328408Z [1m[92m  Downloaded[0m anyhow v1.0.104
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5366585Z [1m[92m  Downloaded[0m arrayvec v0.7.8
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5386368Z [1m[92m  Downloaded[0m aws-smithy-json v0.63.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5409415Z [1m[92m  Downloaded[0m aws-smithy-query v0.62.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5421916Z [1m[92m  Downloaded[0m bitflags v2.13.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5464698Z [1m[92m  Downloaded[0m block-buffer v0.10.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5474774Z [1m[92m  Downloaded[0m cmov v0.5.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5491639Z [1m[92m  Downloaded[0m const-oid v0.10.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5514369Z [1m[92m  Downloaded[0m deranged v0.5.9
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5527853Z [1m[92m  Downloaded[0m fastrand v2.5.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5541374Z [1m[92m  Downloaded[0m hmac v0.13.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5561446Z [1m[92m  Downloaded[0m httparse v1.10.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5585229Z [1m[92m  Downloaded[0m bytes v1.12.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5618920Z [1m[92m  Downloaded[0m icu_provider v2.3.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5644390Z [1m[92m  Downloaded[0m sha2 v0.10.9
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5668740Z [1m[92m  Downloaded[0m aws-runtime v1.10.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.5710105Z [1m[92m  Downloaded[0m aws-sigv4 v1.6.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.6189389Z [1m[92m  Downloaded[0m aws-smithy-json v0.65.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.6228982Z [1m[92m  Downloaded[0m aws-smithy-runtime v1.16.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.6319086Z [1m[92m  Downloaded[0m aws-smithy-runtime-api v1.19.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.6369378Z [1m[92m  Downloaded[0m aws-smithy-types v1.9.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.6421444Z [1m[92m  Downloaded[0m aws-smithy-xml v0.62.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.6441976Z [1m[92m  Downloaded[0m aws-smithy-xml v0.64.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.6466692Z [1m[92m  Downloaded[0m base64 v0.22.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.6503339Z [1m[92m  Downloaded[0m base64 v0.23.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.6540898Z [1m[92m  Downloaded[0m cc v1.6.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.6574070Z [1m[92m  Downloaded[0m clap v4.6.7
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.6670767Z [1m[92m  Downloaded[0m combine v4.6.8
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.6704946Z [1m[92m  Downloaded[0m crossbeam-epoch v0.9.21
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.6728254Z [1m[92m  Downloaded[0m flate2 v1.1.10
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.6774850Z [1m[92m  Downloaded[0m http v1.5.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.6810271Z [1m[92m  Downloaded[0m num-bigint v0.5.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.6857172Z [1m[92m  Downloaded[0m openssl-sys v0.9.117
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.6910090Z [1m[92m  Downloaded[0m try-lock v0.2.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.6918017Z [1m[92m  Downloaded[0m utf8_iter v1.0.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.6928041Z [1m[92m  Downloaded[0m aws-smithy-schema v1.1.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.6971985Z [1m[92m  Downloaded[0m blake3 v1.8.7
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.7048288Z [1m[92m  Downloaded[0m clap_builder v4.6.7
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.7110135Z [1m[92m  Downloaded[0m futures-util v0.3.34
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.7236606Z [1m[92m  Downloaded[0m h2 v0.4.20
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.7300351Z [1m[92m  Downloaded[0m hashbrown v0.14.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.7345412Z [1m[92m  Downloaded[0m hashbrown v0.17.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.7396102Z [1m[92m  Downloaded[0m hyper v1.12.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.7463728Z [1m[92m  Downloaded[0m rayon v1.12.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.7553959Z [1m[92m  Downloaded[0m rayon-core v1.13.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.7589415Z [1m[92m  Downloaded[0m ryu v1.0.23
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.7620361Z [1m[92m  Downloaded[0m aws-sdk-sts v1.119.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.7740238Z [1m[92m  Downloaded[0m proc-macro2 v1.0.107
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.7770410Z [1m[92m  Downloaded[0m regex-lite v0.1.9
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.7794626Z [1m[92m  Downloaded[0m spin v0.10.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.7816938Z [1m[92m  Downloaded[0m streebog v0.10.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.7833370Z [1m[92m  Downloaded[0m strsim v0.11.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.7845615Z [1m[92m  Downloaded[0m tower-service v0.3.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.7852862Z [1m[92m  Downloaded[0m vcpkg v0.2.15
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.8357281Z [1m[92m  Downloaded[0m zerofrom v0.1.8
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.8366487Z [1m[92m  Downloaded[0m zerofrom-derive v0.1.8
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.8376454Z [1m[92m  Downloaded[0m md-5 v0.11.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.8392671Z [1m[92m  Downloaded[0m memchr v2.8.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.8444803Z [1m[92m  Downloaded[0m openssl v0.10.81
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.8539107Z [1m[92m  Downloaded[0m simd-adler32 v0.3.10
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.8556818Z [1m[92m  Downloaded[0m aws-smithy-http-client v1.5.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.8664823Z [1m[92m  Downloaded[0m hyper-rustls v0.27.10
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.8678435Z [1m[92m  Downloaded[0m yoke v0.8.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.8695976Z [1m[92m  Downloaded[0m ppv-lite86 v0.2.21
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.8708551Z [1m[92m  Downloaded[0m rand_chacha v0.3.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.8719304Z [1m[92m  Downloaded[0m xxhash-rust v0.8.19
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.8735901Z [1m[92m  Downloaded[0m hyper-util v0.1.21
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.8796853Z [1m[92m  Downloaded[0m icu_normalizer v2.3.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.8892928Z [1m[92m  Downloaded[0m num-conv v0.2.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.8901242Z [1m[92m  Downloaded[0m zerocopy v0.8.60
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.9106616Z [1m[92m  Downloaded[0m redis v1.7.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.9242134Z [1m[92m  Downloaded[0m openssl-macros v0.1.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.9249659Z [1m[92m  Downloaded[0m shlex v2.0.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.9261959Z [1m[92m  Downloaded[0m subtle v2.6.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.9272925Z [1m[92m  Downloaded[0m url v2.5.8
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.9297617Z [1m[92m  Downloaded[0m zerotrie v0.2.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.9335929Z [1m[92m  Downloaded[0m crc-fast v1.10.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.9520440Z [1m[92m  Downloaded[0m hybrid-array v0.4.15
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.9541142Z [1m[92m  Downloaded[0m quote v1.0.47
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.9567011Z [1m[92m  Downloaded[0m rustls v0.23.46
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.9682862Z [1m[92m  Downloaded[0m icu_collections v2.3.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.9742608Z [1m[92m  Downloaded[0m slab v0.4.12
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.9755049Z [1m[92m  Downloaded[0m litemap v0.8.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.9776997Z [1m[92m  Downloaded[0m serde_core v1.0.229
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.9803399Z [1m[92m  Downloaded[0m itoa v1.0.18
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.9817108Z [1m[92m  Downloaded[0m sha1_smol v1.0.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.9831706Z [1m[92m  Downloaded[0m pin-project-lite v0.2.17
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:12.9887775Z [1m[92m  Downloaded[0m aws-sdk-s3 v1.155.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.0933706Z [1m[92m  Downloaded[0m percent-encoding v2.3.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.0941870Z [1m[92m  Downloaded[0m pkg-config v0.3.34
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.0956783Z [1m[92m  Downloaded[0m openssl-probe v0.2.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.0967634Z [1m[92m  Downloaded[0m semver v1.0.28
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.0989587Z [1m[92m  Downloaded[0m socket2 v0.6.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1006897Z [1m[92m  Downloaded[0m rustversion v1.0.23
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1033692Z [1m[92m  Downloaded[0m lru v0.18.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1045284Z [1m[92m  Downloaded[0m smallvec v1.16.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1058244Z [1m[92m  Downloaded[0m rustls-pki-types v1.15.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1083117Z [1m[92m  Downloaded[0m rustc_version v0.4.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1095747Z [1m[92m  Downloaded[0m rand_core v0.6.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1108694Z [1m[92m  Downloaded[0m rustls-webpki v0.103.16
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1143067Z [1m[92m  Downloaded[0m untrusted v0.9.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1159149Z [1m[92m  Downloaded[0m utf8parse v0.2.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1167890Z [1m[92m  Downloaded[0m icu_normalizer_data v2.3.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1188176Z [1m[92m  Downloaded[0m icu_properties v2.3.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1219607Z [1m[92m  Downloaded[0m idna_adapter v1.2.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1228030Z [1m[92m  Downloaded[0m rand v0.8.8
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1259993Z [1m[92m  Downloaded[0m native-tls v0.2.18
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1274208Z [1m[92m  Downloaded[0m is_terminal_polyfill v1.70.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1283964Z [1m[92m  Downloaded[0m num-rational v0.4.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1296167Z [1m[92m  Downloaded[0m once_cell v1.21.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1319872Z [1m[92m  Downloaded[0m powerfmt v0.2.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1332602Z [1m[92m  Downloaded[0m rustls-native-certs v0.8.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1344881Z [1m[92m  Downloaded[0m tower-layer v0.3.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1354341Z [1m[92m  Downloaded[0m log v0.4.34
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1377760Z [1m[92m  Downloaded[0m num-integer v0.1.47
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1393462Z [1m[92m  Downloaded[0m outref v0.5.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1408315Z [1m[92m  Downloaded[0m serde_derive v1.0.229
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1446056Z [1m[92m  Downloaded[0m sha1 v0.11.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1467397Z [1m[92m  Downloaded[0m zerovec v0.11.8
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1542931Z [1m[92m  Downloaded[0m icu_locale_core v2.3.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1618617Z [1m[92m  Downloaded[0m mio v1.2.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1676552Z [1m[92m  Downloaded[0m rusqlite v0.32.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1736458Z [1m[92m  Downloaded[0m serde v1.0.229
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1772008Z [1m[92m  Downloaded[0m want v0.3.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1781222Z [1m[92m  Downloaded[0m indexmap v2.14.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1821604Z [1m[92m  Downloaded[0m num-bigint v0.4.8
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1866599Z [1m[92m  Downloaded[0m num-traits v0.2.19
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1891860Z [1m[92m  Downloaded[0m miniz_oxide v0.9.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1915271Z [1m[92m  Downloaded[0m serde_json v1.0.151
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.1984824Z [1m[92m  Downloaded[0m idna v1.1.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.2018574Z [1m[92m  Downloaded[0m sha2 v0.11.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.2052777Z [1m[92m  Downloaded[0m time-core v0.1.9
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.2063806Z [1m[92m  Downloaded[0m icu_properties_data v2.3.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.2169987Z [1m[92m  Downloaded[0m tinystr v0.8.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.2189585Z [1m[92m  Downloaded[0m vsimd v0.8.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.2209999Z [1m[92m  Downloaded[0m zerovec-derive v0.11.6
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.2226445Z [1m[92m  Downloaded[0m xmlparser v0.13.6
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.2248301Z [1m[92m  Downloaded[0m synstructure v0.14.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.2257513Z [1m[92m  Downloaded[0m zmij v1.0.23
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.2274352Z [1m[92m  Downloaded[0m tokio-rustls v0.26.6
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.2290041Z [1m[92m  Downloaded[0m writeable v0.6.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.2309965Z [1m[92m  Downloaded[0m tracing-attributes v0.1.31
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.2334857Z [1m[92m  Downloaded[0m unicode-ident v1.0.26
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.2361596Z [1m[92m  Downloaded[0m libc v0.2.190
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.2809983Z [1m[92m  Downloaded[0m ring v0.17.14
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.3213223Z [1m[92m  Downloaded[0m time-macros v0.2.32
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.3237396Z [1m[92m  Downloaded[0m typenum v1.20.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.3272980Z [1m[92m  Downloaded[0m tracing-core v0.1.36
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.3298508Z [1m[92m  Downloaded[0m uuid v1.29.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.3328095Z [1m[92m  Downloaded[0m tower v0.5.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.3425235Z [1m[92m  Downloaded[0m libsqlite3-sys v0.30.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.4009918Z [1m[92m  Downloaded[0m tokio-util v0.7.20
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.4086026Z [1m[92m  Downloaded[0m zlib-rs v0.6.8
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.4138601Z [1m[92m  Downloaded[0m syn v2.0.119
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.4240706Z [1m[92m  Downloaded[0m time v0.3.55
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.4380485Z [1m[92m  Downloaded[0m syn v3.0.6
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.4483991Z [1m[92m  Downloaded[0m tracing v0.1.44
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.4639014Z [1m[92m  Downloaded[0m tokio v1.54.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.6074291Z [1m[92m   Compiling[0m proc-macro2 v1.0.107
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.6075183Z [1m[92m   Compiling[0m quote v1.0.47
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.6076839Z [1m[92m   Compiling[0m unicode-ident v1.0.26
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.6077318Z [1m[92m   Compiling[0m libc v0.2.190
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.8855376Z [1m[92m   Compiling[0m cfg-if v1.0.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:13.9257636Z [1m[92m   Compiling[0m bytes v1.12.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:14.0670171Z [1m[92m   Compiling[0m itoa v1.0.18
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:14.3759751Z [1m[92m   Compiling[0m pin-project-lite v0.2.17
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:14.4246418Z [1m[92m   Compiling[0m autocfg v1.5.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:14.7429680Z [1m[92m   Compiling[0m once_cell v1.21.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:14.8669667Z [1m[92m   Compiling[0m num-traits v0.2.19
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:14.9429842Z [1m[92m   Compiling[0m syn v2.0.119
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:14.9679960Z [1m[92m   Compiling[0m syn v3.0.6
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:15.0619640Z [1m[92m   Compiling[0m futures-core v0.3.34
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:15.2790315Z [1m[92m   Compiling[0m socket2 v0.6.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:16.2099771Z [1m[92m   Compiling[0m mio v1.2.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:16.2989670Z [1m[92m   Compiling[0m num-integer v0.1.47
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:16.8839906Z [1m[92m   Compiling[0m tokio v1.54.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:16.9160125Z [1m[92m   Compiling[0m http v1.5.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:19.0746473Z [1m[92m   Compiling[0m shlex v2.0.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:19.1969513Z [1m[92m   Compiling[0m find-msvc-tools v0.1.14
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:19.3649434Z [1m[92m   Compiling[0m futures-sink v0.3.34
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:19.4269440Z [1m[92m   Compiling[0m cc v1.6.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:20.1021175Z [1m[92m   Compiling[0m zeroize_derive v1.5.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:20.2724930Z [1m[92m   Compiling[0m http-body v1.1.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:20.3649813Z [1m[92m   Compiling[0m tracing-attributes v0.1.31
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:20.5101522Z [1m[92m   Compiling[0m zeroize v1.9.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:20.6660064Z [1m[92m   Compiling[0m tracing-core v0.1.36
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:21.0784890Z [1m[92m   Compiling[0m typenum v1.20.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:21.4959663Z [1m[92m   Compiling[0m tracing v0.1.44
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:21.6839639Z [1m[92m   Compiling[0m futures-task v0.3.34
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:21.7630279Z [1m[92m   Compiling[0m either v1.18.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:21.8029479Z [1m[92m   Compiling[0m futures-util v0.3.34
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:21.9349506Z [1m[92m   Compiling[0m tokio-util v0.7.20
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:22.1029565Z [1m[92m   Compiling[0m powerfmt v0.2.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:22.2602608Z [1m[92m   Compiling[0m num-conv v0.2.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:22.4009801Z [1m[92m   Compiling[0m vsimd v0.8.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:22.9420068Z [1m[92m   Compiling[0m time-core v0.1.9
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:23.1289707Z [1m[92m   Compiling[0m deranged v0.5.9
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:23.1809618Z [1m[92m   Compiling[0m outref v0.5.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:23.2250703Z [1m[92m   Compiling[0m ryu v1.0.23
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:23.2449589Z [1m[92m   Compiling[0m base64-simd v0.8.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:23.4989711Z [1m[92m   Compiling[0m bytes-utils v0.1.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:23.7570617Z [1m[92m   Compiling[0m http-body-util v0.1.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:23.7659339Z [1m[92m   Compiling[0m version_check v0.9.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:24.0024663Z [1m[92m   Compiling[0m aws-smithy-async v1.3.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:24.0249047Z [1m[92m   Compiling[0m aws-smithy-runtime-api-macros v1.2.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:24.2309760Z [1m[92m   Compiling[0m synstructure v0.14.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:24.2459607Z [1m[92m   Compiling[0m stable_deref_trait v1.2.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:24.2833071Z [1m[92m   Compiling[0m generic-array v0.14.7
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:24.3801081Z [1m[92m   Compiling[0m zerovec-derive v0.11.6
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:24.5345133Z [1m[92m   Compiling[0m time v0.3.55
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:24.7916866Z [1m[92m   Compiling[0m zerofrom-derive v0.1.8
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:25.3440045Z [1m[92m   Compiling[0m yoke-derive v0.8.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:25.9139704Z [1m[92m   Compiling[0m zerofrom v0.1.8
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:26.0224780Z [1m[92m   Compiling[0m getrandom v0.2.17
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:26.2189996Z [1m[92m   Compiling[0m percent-encoding v2.3.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:26.3988038Z [1m[92m   Compiling[0m yoke v0.8.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:26.4649612Z [1m[92m   Compiling[0m pkg-config v0.3.34
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:26.7079909Z [1m[92m   Compiling[0m vcpkg v0.2.15
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:26.9356069Z [1m[92m   Compiling[0m aws-smithy-types v1.9.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:27.2490563Z [1m[92m   Compiling[0m zerocopy v0.8.60
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:27.4794045Z [1m[92m   Compiling[0m zerovec v0.11.8
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:28.2199775Z [1m[92m   Compiling[0m aws-smithy-runtime-api v1.19.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:28.3319664Z [1m[92m   Compiling[0m hybrid-array v0.4.15
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:28.9229569Z [1m[92m   Compiling[0m displaydoc v0.2.7
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:29.3230123Z [1m[92m   Compiling[0m serde_core v1.0.229
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:29.4659644Z [1m[92m   Compiling[0m smallvec v1.16.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:30.1689677Z [1m[92m   Compiling[0m crc32fast v1.5.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:30.3159874Z [1m[92m   Compiling[0m cmov v0.5.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:30.5480109Z [1m[92m   Compiling[0m ctutils v0.4.6
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:30.8639673Z [1m[92m   Compiling[0m crypto-common v0.2.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:32.3109719Z [1m[92m   Compiling[0m block-buffer v0.12.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:32.4369824Z [1m[92m   Compiling[0m const-oid v0.10.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:32.4919867Z [1m[92m   Compiling[0m serde v1.0.229
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:32.6890281Z [1m[92m   Compiling[0m digest v0.11.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:32.8469571Z [1m[92m   Compiling[0m block-buffer v0.10.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:32.9538467Z [1m[92m   Compiling[0m crypto-common v0.1.7
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:33.0342031Z [1m[92m   Compiling[0m tinystr v0.8.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:33.0810262Z [1m[92m   Compiling[0m serde_derive v1.0.229
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:33.2139942Z [1m[92m   Compiling[0m litemap v0.8.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:33.3919929Z [1m[92m   Compiling[0m foldhash v0.2.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:33.4919711Z [1m[92m   Compiling[0m writeable v0.6.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:33.5769996Z [1m[92m   Compiling[0m hashbrown v0.17.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:33.7569632Z [1m[92m   Compiling[0m icu_locale_core v2.3.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:34.2639567Z [1m[92m   Compiling[0m digest v0.10.7
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:34.3499581Z [1m[92m   Compiling[0m zerotrie v0.2.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:34.4331223Z [1m[92m   Compiling[0m potential_utf v0.1.6
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:34.5459941Z [1m[92m   Compiling[0m ring v0.17.14
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:34.7694595Z [1m[92m   Compiling[0m icu_properties_data v2.3.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:34.8685738Z [1m[92m   Compiling[0m cpufeatures v0.3.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:34.9145490Z [1m[92m   Compiling[0m icu_normalizer_data v2.3.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:34.9230770Z [1m[92m   Compiling[0m utf8_iter v1.0.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:35.0290027Z [1m[92m   Compiling[0m icu_collections v2.3.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:35.7569687Z [1m[92m   Compiling[0m icu_provider v2.3.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:36.3291064Z [1m[92m   Compiling[0m aws-smithy-eventstream v0.61.6
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:36.7939401Z [1m[92m   Compiling[0m aws-smithy-schema v1.1.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:37.0256905Z [1m[92m   Compiling[0m openssl-sys v0.9.117
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:37.0939587Z [1m[92m   Compiling[0m zmij v1.0.23
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:37.2319562Z [1m[92m   Compiling[0m semver v1.0.28
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:37.3829587Z [1m[92m   Compiling[0m memchr v2.8.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:37.4739926Z [1m[92m   Compiling[0m rustc_version v0.4.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:37.7629701Z [1m[92m   Compiling[0m aws-smithy-http v0.64.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:38.7509568Z [1m[92m   Compiling[0m form_urlencoded v1.2.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:38.7929627Z [1m[92m   Compiling[0m ahash v0.8.12
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:38.9023913Z [1m[92m   Compiling[0m rustls-pki-types v1.15.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:38.9406960Z [1m[92m   Compiling[0m serde_json v1.0.151
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:39.0479690Z [1m[92m   Compiling[0m equivalent v1.0.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:39.0959559Z [1m[92m   Compiling[0m crossbeam-utils v0.8.23
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:39.2579696Z [1m[92m   Compiling[0m untrusted v0.9.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:39.3420025Z [1m[92m   Compiling[0m httparse v1.10.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:39.5829547Z [1m[92m   Compiling[0m indexmap v2.14.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:39.8259394Z [1m[92m   Compiling[0m icu_properties v2.3.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:40.5239508Z [1m[92m   Compiling[0m icu_normalizer v2.3.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:41.8201893Z [1m[92m   Compiling[0m aws-types v1.7.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:41.9369519Z [1m[92m   Compiling[0m sha2 v0.11.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:42.0302500Z [1m[92m   Compiling[0m ppv-lite86 v0.2.21
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:42.4039472Z [1m[92m   Compiling[0m aws-credential-types v1.3.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:42.5689779Z [1m[92m   Compiling[0m rand_core v0.6.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:42.7819530Z [1m[92m   Compiling[0m slab v0.4.12
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:42.9329731Z [1m[92m   Compiling[0m rustls v0.23.46
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:43.0237751Z [1m[92m   Compiling[0m bitflags v2.13.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:43.3363229Z [1m[92m   Compiling[0m hex v0.4.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:43.3479490Z [1m[92m   Compiling[0m openssl-probe v0.2.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:43.5789689Z [1m[92m   Compiling[0m atomic-waker v1.1.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:43.6300664Z [1m[92m   Compiling[0m xmlparser v0.13.6
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:43.6735053Z [1m[92m   Compiling[0m try-lock v0.2.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:43.7380333Z [1m[92m   Compiling[0m crossbeam-epoch v0.9.21
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:43.9000099Z [1m[92m   Compiling[0m rustversion v1.0.23
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:44.1059718Z [1m[92m   Compiling[0m fnv v1.0.7
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:44.1669582Z [1m[92m   Compiling[0m h2 v0.4.20
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:44.2419570Z [1m[92m   Compiling[0m want v0.3.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:44.3619701Z [1m[92m   Compiling[0m rand_chacha v0.3.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:44.9787036Z [1m[92m   Compiling[0m idna_adapter v1.2.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:46.3539511Z [1m[92m   Compiling[0m hmac v0.13.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:46.4749693Z [1m[92m   Compiling[0m aws-smithy-observability v0.3.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:46.7929592Z [1m[92m   Compiling[0m aws-smithy-schema v0.2.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:48.3259674Z [1m[92m   Compiling[0m rustls-webpki v0.103.16
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:48.7049720Z [1m[92m   Compiling[0m libsqlite3-sys v0.30.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:48.9049685Z [1m[92m   Compiling[0m futures-channel v0.3.34
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:49.1219647Z [1m[92m   Compiling[0m openssl v0.10.81
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:49.2601390Z [1m[92m   Compiling[0m tower-service v0.3.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:49.3159610Z [1m[92m   Compiling[0m cpufeatures v0.2.17
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:49.3659727Z [1m[92m   Compiling[0m fastrand v2.5.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:49.6289610Z [1m[92m   Compiling[0m subtle v2.6.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:49.7569714Z [1m[92m   Compiling[0m crossbeam-deque v0.8.8
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:49.8960084Z [1m[92m   Compiling[0m foreign-types-shared v0.1.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:49.9459806Z [1m[92m   Compiling[0m utf8parse v0.2.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:50.0069772Z [1m[92m   Compiling[0m anstyle-parse v1.0.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:50.1671971Z [1m[92m   Compiling[0m foreign-types v0.3.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:50.7969734Z [1m[92m   Compiling[0m aws-smithy-runtime v1.16.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:50.9759645Z [1m[92m   Compiling[0m sha2 v0.10.9
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:51.6449670Z [1m[92m   Compiling[0m hyper v1.12.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:55.7209845Z [1m[92m   Compiling[0m aws-sigv4 v1.6.4
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:15:59.8989625Z [1m[92m   Compiling[0m hashbrown v0.14.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:00.3129616Z [1m[92m   Compiling[0m idna v1.1.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:01.9908437Z [1m[92m   Compiling[0m rand v0.8.8
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:03.1089751Z [1m[92m   Compiling[0m openssl-macros v0.1.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:03.2789646Z [1m[92m   Compiling[0m ipnet v2.12.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:03.4339571Z [1m[92m   Compiling[0m anstyle-query v1.1.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:03.4969733Z [1m[92m   Compiling[0m uuid v1.29.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:04.0039464Z [1m[92m   Compiling[0m base64 v0.23.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:04.6573315Z [1m[92m   Compiling[0m spin v0.10.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:04.7459937Z [1m[92m   Compiling[0m native-tls v0.2.18
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:04.8229551Z [1m[92m   Compiling[0m anyhow v1.0.104
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:04.8649851Z [1m[92m   Compiling[0m is_terminal_polyfill v1.70.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:04.9184363Z [1m[92m   Compiling[0m colorchoice v1.0.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:04.9899731Z [1m[92m   Compiling[0m rayon-core v1.13.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:04.9959337Z [1m[92m   Compiling[0m anstyle v1.0.14
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:05.1609830Z [1m[92m   Compiling[0m anstream v1.0.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:05.2399704Z [1m[92m   Compiling[0m crc-fast v1.10.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:05.6439729Z [1m[92m   Compiling[0m hyper-util v0.1.21
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:08.2579662Z [1m[92m   Compiling[0m aws-runtime v1.10.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:12.8144638Z [1m[92m   Compiling[0m arc-swap v1.9.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:13.0801338Z [1m[92m   Compiling[0m num-bigint v0.4.8
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:15.9329568Z [1m[92m   Compiling[0m url v2.5.8
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:18.0349688Z [1m[92m   Compiling[0m hashlink v0.9.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:18.2379640Z [1m[92m   Compiling[0m tokio-rustls v0.26.6
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:18.3869559Z [1m[92m   Compiling[0m aws-smithy-xml v0.62.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:18.4959525Z [1m[92m   Compiling[0m rustls-native-certs v0.8.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:18.6479923Z [1m[92m   Compiling[0m num-bigint v0.5.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:19.4399590Z [1m[92m   Compiling[0m sha1 v0.11.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:19.9179600Z [1m[92m   Compiling[0m md-5 v0.11.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:20.1495588Z [1m[92m   Compiling[0m blake3 v1.8.7
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:20.3579575Z [1m[92m   Compiling[0m tower-layer v0.3.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:20.5449584Z [1m[92m   Compiling[0m simd-adler32 v0.3.10
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:21.5029453Z [1m[92m   Compiling[0m strsim v0.11.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:22.3793157Z [1m[92m   Compiling[0m regex-lite v0.1.9
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:22.4829661Z [1m[92m   Compiling[0m log v0.4.34
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:22.6670191Z [1m[92m   Compiling[0m fallible-iterator v0.3.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:23.0349685Z [1m[92m   Compiling[0m adler2 v2.0.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:23.1449785Z [1m[92m   Compiling[0m clap_lex v1.1.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:23.4369805Z [1m[92m   Compiling[0m urlencoding v2.1.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:23.5206440Z [1m[92m   Compiling[0m heck v0.5.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:23.6279988Z [1m[92m   Compiling[0m fallible-streaming-iterator v0.1.9
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:23.6810128Z [1m[92m   Compiling[0m clap_derive v4.6.7
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:23.7479815Z [1m[92m   Compiling[0m aws-smithy-query v0.62.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:24.8379759Z [1m[92m   Compiling[0m clap_builder v4.6.7
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:25.3114066Z [1m[92m   Compiling[0m miniz_oxide v0.9.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:25.9268622Z [1m[92m   Compiling[0m tower v0.5.3
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:26.4522011Z [1m[92m   Compiling[0m aws-smithy-checksums v0.65.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:27.0389777Z [1m[92m   Compiling[0m hyper-rustls v0.27.10
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:29.3429631Z [1m[92m   Compiling[0m aws-smithy-json v0.63.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:29.3710024Z [1m[92m   Compiling[0m aws-smithy-xml v0.64.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:33.0129951Z [1m[92m   Compiling[0m aws-smithy-json v0.65.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:33.8369651Z [1m[92m   Compiling[0m combine v4.6.8
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:37.0439687Z [1m[92m   Compiling[0m lru v0.18.5
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:37.2049536Z [1m[92m   Compiling[0m num-rational v0.4.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:37.4029577Z [1m[92m   Compiling[0m sha1_smol v1.0.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:37.6799719Z [1m[92m   Compiling[0m constant_time_eq v0.4.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:37.8189487Z [1m[92m   Compiling[0m base64 v0.22.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:38.3139703Z [1m[92m   Compiling[0m arrayvec v0.7.8
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:38.4288651Z [1m[92m   Compiling[0m xxhash-rust v0.8.19
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:38.5089929Z [1m[92m   Compiling[0m isogeny_algos v0.1.0 (/home/runner/work/crypto/crypto/isogeny_algos)
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:38.6890781Z [1m[92m   Compiling[0m arcstr v1.2.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:38.9715797Z [1m[92m   Compiling[0m redis v1.7.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:39.6590217Z [1m[92m   Compiling[0m factor-base v0.1.0 (/home/runner/work/crypto/crypto/tools/factor-base)
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:54.3084129Z [1m[92m   Compiling[0m hashed-ecdl-tensor v0.1.0 (/home/runner/work/crypto/crypto/crates/hashed-ecdl-tensor)
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:16:55.3059600Z [1m[92m   Compiling[0m aws-sdk-s3 v1.155.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:17:15.8549573Z [1m[92m   Compiling[0m rusqlite v0.32.1
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:17:16.9670405Z [1m[92m   Compiling[0m volcano-cli v0.1.0 (/home/runner/work/crypto/crypto/tools/volcano-cli)
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:17:18.1619791Z [1m[92m   Compiling[0m aws-sdk-sts v1.119.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:17:27.8109597Z [1m[92m   Compiling[0m rayon v1.12.0
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:17:30.5651527Z [1m[92m   Compiling[0m clap v4.6.7
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:17:30.6129939Z [1m[92m   Compiling[0m aws-smithy-http-client v1.5.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:17:41.4679475Z [1m[92m   Compiling[0m flate2 v1.1.10
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:17:42.0070146Z [1m[92m   Compiling[0m ecdl-tensor-ic v0.1.0 (/home/runner/work/crypto/crypto/crates/ecdl-tensor-ic)
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:17:51.7909947Z [1m[92m   Compiling[0m pencil-symbolic-graph v0.1.0 (/home/runner/work/crypto/crypto/research/pencil_large_prime_20261029)
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:17:53.4694448Z [1m[92m   Compiling[0m streebog v0.10.2
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:17:53.6759635Z [1m[92m   Compiling[0m base64 v0.21.7
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:21:26.7824421Z [1m[92m   Compiling[0m crypto v0.1.0 (/home/runner/work/crypto/crypto)
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:30:43.8576702Z [1m[92m    Finished[0m `release` profile [optimized] target(s) in 15m 32s
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:30:45.6350285Z [1m[92m     Running[0m unittests src/lib.rs (target/release/deps/crypto_lib-68f0c4e7d1291d56)
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:30:45.6422177Z 
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:30:45.6426503Z running 1 test
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:54:20.5939246Z test cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies ... ok
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:54:20.5941484Z 
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:54:20.5943284Z test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5935 filtered out; finished in 1414.95s
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:54:20.5945205Z 
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:54:21.1404867Z [1m[92m    Finished[0m `release` profile [optimized] target(s) in 0.46s
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:54:21.1503729Z [1m[92m     Running[0m unittests src/lib.rs (target/release/deps/crypto_lib-68f0c4e7d1291d56)
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:54:21.1541366Z 
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T20:54:21.1541861Z running 1 test
+end-to-end	Run the complete p=101 isogeny walk and sieve check	2026-11-01T21:43:22.4384699Z ##[error]The operation was canceled.
+end-to-end	Post Run actions/checkout@v4	﻿2026-11-01T21:43:22.4762392Z Post job cleanup.
+end-to-end	Post Run actions/checkout@v4	2026-11-01T21:43:22.7213800Z [command]/usr/bin/git version
+end-to-end	Post Run actions/checkout@v4	2026-11-01T21:43:22.7273957Z git version 2.56.0
+end-to-end	Post Run actions/checkout@v4	2026-11-01T21:43:22.7330806Z Temporarily overriding HOME='/home/runner/work/_temp/20eba75b-d0b9-4826-a09a-602c7a8083c9' before making global git config changes
+end-to-end	Post Run actions/checkout@v4	2026-11-01T21:43:22.7332381Z Adding repository directory to the temporary git global config as a safe directory
+end-to-end	Post Run actions/checkout@v4	2026-11-01T21:43:22.7337117Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto
+end-to-end	Post Run actions/checkout@v4	2026-11-01T21:43:22.7389849Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+end-to-end	Post Run actions/checkout@v4	2026-11-01T21:43:22.7439980Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+end-to-end	Post Run actions/checkout@v4	2026-11-01T21:43:22.8532313Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+end-to-end	Post Run actions/checkout@v4	2026-11-01T21:43:22.8579350Z http.https://github.com/.extraheader
+end-to-end	Post Run actions/checkout@v4	2026-11-01T21:43:22.8597252Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+end-to-end	Post Run actions/checkout@v4	2026-11-01T21:43:22.8715827Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+end-to-end	Post Run actions/checkout@v4	2026-11-01T21:43:22.9341570Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+end-to-end	Post Run actions/checkout@v4	2026-11-01T21:43:22.9351266Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+end-to-end	Complete job	﻿2026-11-01T21:43:23.0279681Z Cleaning up orphan processes
+end-to-end	Complete job	2026-11-01T21:43:23.0653964Z Terminate orphan process: pid (6913) (cargo)
+end-to-end	Complete job	2026-11-01T21:43:23.0680512Z Terminate orphan process: pid (6920) (crypto_lib-68f0c4e7d1291d56)
+end-to-end	Complete job	2026-11-01T21:43:23.0933956Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

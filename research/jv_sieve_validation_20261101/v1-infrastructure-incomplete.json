@@ -1,0 +1,73 @@
+{
+  "schema": "jv.gate-attempt/v1",
+  "classification": "infrastructure_incomplete",
+  "protocol_id": "JV-FULLROUTE-CORRECTED-20261101",
+  "protocol_version": 1,
+  "protocol_canonical_sha256": "397768e24c3cbc7822d63a68a98bde14a3555c787786c442252ebf1da6374e6f",
+  "protocol_file": "research/jv_sieve_validation_20261101/protocol-v1.json",
+  "protocol_file_sha256": "24866b1dfcb48bd7b6ae645346e263c0302cc7c58357d9489c84645f86b15ed3",
+  "source_commit_bound_by_freeze": "60e580a85544f4070d8c76d86792f6093c14fe79",
+  "frozen_record_commit": "d17acec256efb2f67d8500b4dbeb7a28d655b119",
+  "workflow_run": {
+    "id": 41345698056,
+    "url": "https://github.com/isogeny-labs/crypto/actions/runs/41345698056",
+    "event": "workflow_dispatch",
+    "head_branch": "codex/jv-validation",
+    "head_sha": "d17acec256efb2f67d8500b4dbeb7a28d655b119",
+    "created_at": "2026-11-01T20:13:00Z",
+    "updated_at": "2026-11-01T21:43:26Z",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "artifacts_total": 0
+  },
+  "gate_job": {
+    "id": 124964915803,
+    "url": "https://github.com/isogeny-labs/crypto/actions/runs/41345698056/job/124964915803",
+    "runner_label": "ubuntu-latest",
+    "runner_name": "GitHub Actions 1000130852",
+    "started_at": "2026-11-01T20:13:04Z",
+    "completed_at": "2026-11-01T21:43:25Z",
+    "timeout_seconds": 5400,
+    "conclusion": "cancelled",
+    "annotation": "The job has exceeded the maximum execution time of 1h30m0s"
+  },
+  "observations": {
+    "release_build_seconds": 932,
+    "first_p101_test": {
+      "name": "cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies",
+      "status": "passed",
+      "elapsed_seconds": 1414.95,
+      "completed_at": "2026-11-01T20:54:20Z"
+    },
+    "counted_p101_test": {
+      "name": "cryptanalysis::jv_isogeny_walk::tests::counted_end_to_end_keeps_the_legacy_counts_and_charges_every_phase",
+      "status": "not_completed",
+      "minimum_observed_elapsed_seconds": 2941,
+      "started_at": "2026-11-01T20:54:21Z",
+      "cancelled_at": "2026-11-01T21:43:22Z",
+      "scientific_verdict": null
+    },
+    "corrected_rho_tools_gate": "skipped",
+    "prospective_panels_job_id": 124988410943,
+    "prospective_panels_status": "skipped",
+    "prospective_validation_job_id": 124988410930,
+    "prospective_validation_status": "skipped"
+  },
+  "target_flow": {
+    "planned_attempts": 99,
+    "attempted": 0,
+    "completed": 0,
+    "not_started": 99,
+    "requested_prime_data_observed": false
+  },
+  "log": {
+    "retrieval_command": "gh run view 41345698056 --job 124964915803 --log",
+    "retrieved_at": "2026-11-01T21:43:33Z",
+    "path": "research/jv_sieve_validation_20261101/v1-run-41345698056.log",
+    "bytes": 123489,
+    "lines": 984,
+    "sha256": "eeedd6508bb7f91ac2d516270e326d787d99ba18ff9b350238a0b0081fb44920",
+    "canonical_copy_retained": true
+  },
+  "interpretation": "The prerequisite gate exceeded its workflow job budget while the counted p=101 test was still running. This is retained as an infrastructure-incomplete attempt, not a scientific assertion failure and not evidence about any requested-prime panel."
+}

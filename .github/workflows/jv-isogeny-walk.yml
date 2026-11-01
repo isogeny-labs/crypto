@@ -18,27 +18,42 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  end-to-end:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|jv-isogeny-walk.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|jv-isogeny-walk.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
-    timeout-minutes: 90
+  p101-recovery-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      - name: Run the complete p=101 isogeny walk and sieve check
-        run: |
-          if [[ "$(jq -r '.freeze.status // "frozen"' research/jv_sieve_validation_20261101/protocol.json 2>/dev/null || echo frozen)" = draft ]]; then
-            echo "draft preflight: requested-prime panels remain gated; defer the long p=101 gate to the frozen run"
-            exit 0
-          fi
-          cargo test --release --locked --lib \
-            cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies \
-            -- --exact --test-threads=1
-          cargo test --release --locked --lib \
-            cryptanalysis::jv_isogeny_walk::tests::counted_end_to_end_keeps_the_legacy_counts_and_charges_every_phase \
-            -- --exact --ignored --test-threads=1
+      - name: Run the complete p=101 recovery check
+        run: >-
+          cargo test --release --locked --lib
+          cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies
+          -- --exact --test-threads=1
+
+  p101-counted-gate:
+    if: github.event_name == 'workflow_dispatch' && github.ref_name == 'codex/jv-validation'
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Run the counted p=101 phase-accounting check
+        run: >-
+          cargo test --release --locked --lib
+          cryptanalysis::jv_isogeny_walk::tests::counted_end_to_end_keeps_the_legacy_counts_and_charges_every_phase
+          -- --exact --ignored --test-threads=1
+
+  corrected-rho-tools-gate:
+    if: github.event_name == 'workflow_dispatch' && github.ref_name == 'codex/jv-validation'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
       - name: Gate corrected rho accounting and frozen prospective tools
-        if: github.event_name == 'workflow_dispatch' && github.ref_name == 'codex/jv-validation'
         run: |
           cargo test --release --locked --lib \
             cryptanalysis::jv_rho_strong::tests::counted_runs_match_the_uncounted_run_and_verify \
@@ -59,7 +74,10 @@ jobs:
 
   prospective-panels:
     if: github.event_name == 'workflow_dispatch' && github.ref_name == 'codex/jv-validation'
-    needs: end-to-end
+    needs:
+      - p101-recovery-gate
+      - p101-counted-gate
+      - corrected-rho-tools-gate
     strategy:
       fail-fast: false
       max-parallel: 3

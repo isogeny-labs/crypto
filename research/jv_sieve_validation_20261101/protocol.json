@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "JV-FULLROUTE-CORRECTED-20261101",
-  "version": 1,
+  "version": 2,
   "created": "2026-11-01",
   "repository": "crypto",
   "study_dir": "research/jv_sieve_validation_20261101",
@@ -10,6 +10,9 @@
   ],
   "links": {
     "human_protocol": "research/jv_sieve_validation_20261101/PROTOCOL.md",
+    "version_1_protocol": "research/jv_sieve_validation_20261101/protocol-v1.json",
+    "version_1_infrastructure_attempt": "research/jv_sieve_validation_20261101/v1-infrastructure-incomplete.json",
+    "version_1_job_log": "research/jv_sieve_validation_20261101/v1-run-41345698056.log",
     "historical_run": "research/jv_sieve_strong_rho_20261019",
     "historical_review": "research/jv_sieve_strong_rho_20261019/review-20261020",
     "prior_full_route_accounting": "research/ic_acct1_cover_bitop_20261021",
@@ -540,9 +543,30 @@
   },
   "execution": {
     "backend": "isolab-k8s",
-    "queue": "GitHub Actions jv-isogeny-walk workflow routed to crypto-eks-highmem or crypto-eks-linux",
+    "queue": "GitHub Actions jv-isogeny-walk workflow: three explicit ubuntu-latest prerequisite gates, then crypto-eks-highmem requested-prime and validation panels",
     "placement": {
+      "prerequisite_gates": [
+        {
+          "id": "p101-recovery-gate",
+          "runner": "ubuntu-latest",
+          "timeout_seconds": 10800
+        },
+        {
+          "id": "p101-counted-gate",
+          "runner": "ubuntu-latest",
+          "timeout_seconds": 10800
+        },
+        {
+          "id": "corrected-rho-tools-gate",
+          "runner": "ubuntu-latest",
+          "timeout_seconds": 7200
+        }
+      ],
+      "prerequisite_parallel": true,
+      "reuse_version_1_gate_results": false,
       "prime_panels": 3,
+      "prime_panel_runner": "crypto-eks-highmem",
+      "prime_panel_timeout_seconds": 21600,
       "concurrent_compute_processes_per_panel": 4,
       "threads_per_attempt": 1,
       "wall_time_claim": false
@@ -624,6 +648,22 @@
     "Calling producer output validated before independent replay and recomputation pass."
   ],
   "extensions": {
+    "version_1_infrastructure_evidence": {
+      "protocol": {
+        "path": "research/jv_sieve_validation_20261101/protocol-v1.json",
+        "sha256": "24866b1dfcb48bd7b6ae645346e263c0302cc7c58357d9489c84645f86b15ed3"
+      },
+      "receipt": {
+        "path": "research/jv_sieve_validation_20261101/v1-infrastructure-incomplete.json",
+        "sha256": "f381642592020438e98f0d2ae74a7b950f4ab146b800aeeff2bcd4bed92cdd17"
+      },
+      "job_log": {
+        "path": "research/jv_sieve_validation_20261101/v1-run-41345698056.log",
+        "sha256": "eeedd6508bb7f91ac2d516270e326d787d99ba18ff9b350238a0b0081fb44920",
+        "bytes": 123489,
+        "lines": 984
+      }
+    },
     "attempts_per_prime": 33,
     "rho_aa_replicate": "run index 1 for every seed",
     "ic_aa_replicate": "seed 33 repeated once in a separate process",
@@ -649,12 +689,31 @@
       "sha256": "f34118da0c3df61eb1b4d0a582f0723bbd4084e6461186642b806c27f1401789"
     }
   },
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "AMD-JV-GATE-TIMEOUT-20261101",
+      "filed": "2026-11-01",
+      "filed_before_affected_data": true,
+      "reason": "Version 1 run 41345698056 exhausted its 90-minute prerequisite-job budget after the first p=101 test passed and while the separate counted p=101 test was still running. No p=1009, p=1511, or p=1823 panel began, the run emitted no artifacts, and the retained attempt is infrastructure_incomplete rather than a scientific failure.",
+      "changes": [
+        "Preserve the exact frozen version 1 bytes and a receipt for run 41345698056; report version 1 and version 2 together.",
+        "Run the recovery p=101 test, counted p=101 test, and corrected-rho/tools gate as three parallel fresh prerequisite jobs on explicit ubuntu-latest runners.",
+        "Budget 180 minutes independently for each p=101 job and 120 minutes for the corrected-rho/tools job; the requested-prime panel budget remains 21600 seconds.",
+        "Require all three version 2 prerequisite jobs to succeed before any requested-prime panel starts, and do not reuse the passing version 1 test.",
+        "Leave every scientific arm, prime, seed, metric, producer, analysis, tolerance, stopping rule, decision rule, and validation requirement unchanged."
+      ],
+      "supersedes_fields": [
+        "version",
+        "execution.queue",
+        "execution.placement"
+      ]
+    }
+  ],
   "freeze": {
-    "status": "frozen",
-    "protocol_sha256": "397768e24c3cbc7822d63a68a98bde14a3555c787786c442252ebf1da6374e6f",
-    "commit": "60e580a85544f4070d8c76d86792f6093c14fe79",
-    "frozen_at": "2026-11-01T20:12:41Z",
-    "filed_before_affected_data": true
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
   }
 }
