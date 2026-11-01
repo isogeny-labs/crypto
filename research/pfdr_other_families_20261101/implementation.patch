@@ -1,0 +1,87 @@
+1c1,3
+< """EXP-PFDR-2d36f9-R2 (rerun of EXP-PFDR-2d36f9 with two pre-registered design corrections, see ../PROTOCOL.md).
+---
+> """EXP-PFDR-2d36f9-R2-FAM: R2 driver with the structured-base families replaced (d = 1 Dickson, d = 2 geometric progression, d = 3 quadratic progression; see ../PROTOCOL.md).
+> 
+> Previous docstring: EXP-PFDR-2d36f9-R2 (rerun of EXP-PFDR-2d36f9 with two pre-registered design corrections, see ../PROTOCOL.md).
+44c46
+< EXP = "EXP-PFDR-2d36f9-R2"
+---
+> EXP = "EXP-PFDR-2d36f9-R2-FAM"
+54c56
+< SEED_BLOCK = {"pilot": 7_000_000, "main": 7_100_000, "rep": 7_200_000, "selftest": 7_900_000}
+---
+> SEED_BLOCK = {"pilot": 8_000_000, "main": 8_100_000, "rep": 8_200_000, "selftest": 8_900_000}
+214a217,281
+> def _fill(E, b: int, xs, meta: dict) -> tuple[list, dict]:
+>     """First b points (b/2 distinct liftable abscissae, each with both signs) of the abscissa stream xs."""
+>     pts: list = []
+>     seen: set = set()
+>     n = 0
+>     for x in xs:
+>         _add_pair(E, pts, seen, x % E.p)
+>         n += 1
+>         if len(pts) >= b:
+>             break
+>         if n > 50 * b + 1000:
+>             raise RuntimeError("abscissa stream did not reach b points")
+>     meta = dict(meta)
+>     meta["enumerated"] = n
+>     return pts, meta
+> 
+> 
+> def dickson_base(E, b: int, rng: random.Random) -> tuple[list, dict]:
+>     """x_k = D_k(x_1) = u^k + u^-k (Chebyshev recurrence D_{k+1} = x_1 D_k - D_{k-1}, D_0 = 2), u random in F_p^*."""
+>     p = E.p
+>     u = rng.randrange(2, p - 1)
+>     x1 = (u + pow(u, -1, p)) % p
+> 
+>     def stream():
+>         dprev, dcur = 2, x1
+>         while True:
+>             yield dcur
+>             dprev, dcur = dcur, (x1 * dcur - dprev) % p
+> 
+>     return _fill(E, b, stream(), {"family": "dickson", "u": u, "x1": x1})
+> 
+> 
+> def gp_base(E, b: int, rng: random.Random) -> tuple[list, dict]:
+>     """Geometric progression x_k = x0 * rho^k, rho random in F_p^*."""
+>     p = E.p
+>     x0 = rng.randrange(1, p)
+>     rho = rng.randrange(2, p - 1)
+> 
+>     def stream():
+>         x = x0
+>         while True:
+>             yield x
+>             x = x * rho % p
+> 
+>     return _fill(E, b, stream(), {"family": "gp", "x0": x0, "rho": rho})
+> 
+> 
+> def quad_base(E, b: int, rng: random.Random) -> tuple[list, dict]:
+>     """Quadratic progression x_k = x0 + k^2."""
+>     x0 = rng.randrange(E.p)
+> 
+>     def stream():
+>         k = 0
+>         while True:
+>             yield x0 + k * k
+>             k += 1
+> 
+>     return _fill(E, b, stream(), {"family": "quad", "x0": x0})
+> 
+> 
+> def family_base(E, b: int, d: int, rng: random.Random) -> tuple[list, dict]:
+>     """d = 1 Dickson, d = 2 geometric progression, d = 3 quadratic progression (this study's three structured families)."""
+>     return {1: dickson_base, 2: gp_base, 3: quad_base}[d](E, b, rng)
+> 
+> 
+285,288c352
+<         if d == 1:
+<             sb, meta = window_base(E, b, _rng("struct", block, bits, theta, d, c))
+<         else:
+<             sb, meta = gap_base(E, b, d, _rng("struct", block, bits, theta, d, c))
+---
+>         sb, meta = family_base(E, b, d, _rng("struct", block, bits, theta, d, c))
