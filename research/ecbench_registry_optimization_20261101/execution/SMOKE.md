@@ -20,9 +20,10 @@ Status: replay-verified L0 development evidence; not a leaderboard result.
   session exposed cross-record cache charging (13/16 replays); it is retained
   as a failed negative control. After resetting the cache once per independent
   pipeline invocation, the corrected session passed 16/16.
-- Those three post-merge raw JSONL payloads are local pending artifact-store
-  delivery; tracked receipts bind their hashes and results. They are not a
-  remotely hydrated evidence bundle and cannot support promotion.
+- All 37 raw JSONL payloads are local pending artifact-store delivery; tracked
+  receipts bind their hashes and results. They were untracked without deleting
+  the local bytes, are not a remotely hydrated evidence bundle, and cannot
+  support promotion.
 
 Every timing here is L0 and descriptive. The completion and nested panels use
 one target, one warm-up, and four measured rounds. Deterministic work can select

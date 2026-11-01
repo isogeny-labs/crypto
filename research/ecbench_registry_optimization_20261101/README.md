@@ -37,10 +37,11 @@ into a speed claim.
 - Confirmatory execution is blocked because this managed runtime has no ready
   checkpoint upload identity. EKS submission is not attempted without the
   mandatory resumable-output gate.
-- The three post-merge raw `records.jsonl` payloads also remain local: the
-  repository artifact uploader found them but this runtime has neither the AWS
-  CLI nor an artifact identity. Their hash-bound audit receipts and compact
-  comparisons are tracked; they are not promotion evidence until hydrated.
+- All 37 raw `records.jsonl` payloads remain local and untracked under the
+  repository artifact policy: the uploader found them, but this runtime has
+  neither the AWS CLI nor an artifact identity. Their hash-bound audit receipts
+  and compact comparisons are tracked; they are not promotion evidence until
+  hydrated.
 
 The admitted roster receipt is
 [`execution/full-development-audit.json`](execution/full-development-audit.json).

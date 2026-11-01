@@ -9,12 +9,13 @@ mandatory checkpoint upload. The repository requires a durable checkpoint
 before queue submission. Therefore no EKS job was submitted, and local wall
 timing is recorded as descriptive rather than substituted for EKS L2 evidence.
 
-The artifact-policy dry run selected the three post-merge `records.jsonl`
-payloads (0.6 MiB total), but the actual repository uploader stopped because
-`aws` is unavailable and no alternate `ARTIFACTS_AWS`/checkpoint identity is
-configured. The raw files remain local and uncommitted. Their exact hashes,
-audit results, and compact comparisons are retained in tracked receipts; this
-does not satisfy remote evidence delivery or promotion.
+The artifact-policy sweep selected all 37 raw `records.jsonl` payloads (about
+8.2 MiB total), including the 34 earlier campaign files and three post-merge
+files. The actual repository uploader stopped because `aws` is unavailable and
+no alternate `ARTIFACTS_AWS`/checkpoint identity is configured. The raw files
+remain local and untracked, not deleted. Their exact hashes, audit results, and
+compact comparisons are retained in tracked receipts; this does not satisfy
+remote evidence delivery or promotion.
 
 The all-method roster blocker is resolved. `full-development-audit.json` admits
 111 development specs covering all 78 current methods and all 24 nested
