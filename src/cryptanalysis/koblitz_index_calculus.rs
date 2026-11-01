@@ -9609,9 +9609,8 @@ fn chain_s3_enumerate(
                     return false;
                 }
                 let next = point_add(curve, start, &signed[i]);
-                if !chain_s3_enumerate(
-                    curve, &next, signed, depth - 1, i, deadline, scratch, visit,
-                ) {
+                if !chain_s3_enumerate(curve, &next, signed, depth - 1, i, deadline, scratch, visit)
+                {
                     return false;
                 }
             }
@@ -9648,8 +9647,7 @@ pub fn chain_s3_meet_front(
     let multisets = (0..depth).fold(1u128, |acc, i| {
         acc * (signed.len() + i) as u128 / (i as u128 + 1)
     });
-    let mut fingerprints: Vec<u64> =
-        Vec::with_capacity(usize::try_from(multisets).unwrap_or(0));
+    let mut fingerprints: Vec<u64> = Vec::with_capacity(usize::try_from(multisets).unwrap_or(0));
     let mut scratch = ChainS3Scratch::default();
     chain_s3_enumerate(
         &kc.curve,
@@ -23642,17 +23640,47 @@ mod chain_s3_tables_tests {
     fn n83_meet_keeps_witnesses_and_refutes_by_lookup() {
         let kc = KoblitzCurve::known_n83_k1().expect("fixture");
         let fb = union_base(&kc);
-        for target in [sum_of(&kc, &fb, &[3, 40, 97]), fb.points[11].clone()] {
-            let (found, stats) =
-                sat_decompose_chained_s3_with(&kc, &fb, &target, 3, LIMITS, meet_options(2));
-            let found = found.unwrap_or_else(|| panic!("witness lost: {stats:?}"));
-            assert_eq!(found.len(), 3);
-            assert_eq!(sum_of(&kc, &fb, &found), target);
+        // The planted case carries the depth-2 tables as well (intersected with
+        // the lookup at the same step), which keeps its search short.
+        let with_tables = options(ChainS3Tables {
+            front: 2,
+            back: 1,
+            max_points: 300_000,
+            meet: 2,
+        });
+        let planted = sum_of(&kc, &fb, &[3, 40, 97]);
+        let (found, stats) =
+            sat_decompose_chained_s3_with(&kc, &fb, &planted, 3, LIMITS, with_tables);
+        let found = found.unwrap_or_else(|| panic!("planted witness lost: {stats:?}"));
+        assert_eq!(sum_of(&kc, &fb, &found), planted);
+        // A base point decomposes as P + (-P) + R, which puts the identity at
+        // the looked-up step: the lookup must leave that pattern to the
+        // solver, so the query is never refuted (a short budget suffices).
+        let short = fb.points[11].clone();
+        let short_limits = ChainS3Limits {
+            conflict_budget: 2_000,
+            ..LIMITS
+        };
+        let (found, stats) =
+            sat_decompose_chained_s3_with(&kc, &fb, &short, 3, short_limits, with_tables);
+        assert!(
+            !stats.refuted,
+            "a decomposable target was refuted: {stats:?}"
+        );
+        assert!(
+            stats.patterns_refuted_by_lookup == 0,
+            "the identity pattern was refuted by lookup: {stats:?}"
+        );
+        if let Some(found) = found {
+            assert_eq!(sum_of(&kc, &fb, &found), short);
         }
         let target = kc.mul(kc.generator(), &BigUint::from(0x5eed_83u64));
         let (found, stats) =
             sat_decompose_chained_s3_with(&kc, &fb, &target, 3, LIMITS, meet_options(2));
-        assert!(found.is_none() && stats.refuted && !stats.exhausted, "{stats:?}");
+        assert!(
+            found.is_none() && stats.refuted && !stats.exhausted,
+            "{stats:?}"
+        );
         assert_eq!(stats.patterns_refuted_by_lookup, 2);
         assert_eq!(stats.conflicts, 0);
         assert_eq!(stats.meet_domain, Some(0));
