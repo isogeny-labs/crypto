@@ -1,6 +1,6 @@
 {
   "format": "correspondence-assessment-draft-v1",
-  "assessment_state": "preregistered",
+  "assessment_state": "executed_scoped_null",
   "authority": "companion artifact; not a ledger record or certificate",
   "source": {
     "object_uid": "generic-prime-field-prime-order-elliptic-subgroup",
@@ -29,18 +29,18 @@
   },
   "obligations": {
     "existence": {"state": "supported", "evidence": ["Hensel formula is explicit when y is nonzero", "odd prime whole-order curves have no nonidentity 2-torsion"], "scope": "frozen short-Weierstrass curves modulo p^2"},
-    "explicit_construction": {"state": "unknown", "evidence": [], "scope": "implementation and exact projective checks pending"},
-    "map_correctness": {"state": "unknown", "evidence": [], "scope": "reduction, kernel, formal-coordinate, section-linearity, and coordinate-isomorphism checks pending"},
-    "subgroup_preservation": {"state": "unknown", "evidence": ["reduction of [r]s_u(Q) is predicted to be [r]Q=O"], "scope": "the set section is explicitly not a homomorphism"},
-    "computational_advantage": {"state": "unknown", "evidence": [], "scope": "degree/root/recovery experiment pending"},
-    "scaling_support": {"state": "unknown", "evidence": [], "scope": "uniform degree and total-cost proof pending"}
+    "explicit_construction": {"state": "supported", "evidence": ["36384 Hensel lifts, kernel multiplications, and formal extractions completed", "independent split computations agreed on all 9096 canonical targets", "artifact SHA-256 7d6c390d0156a4ed101bddd0969132a85505fa884282ef505dc4621b7852124e"], "scope": "frozen seven-curve cohort and its controls"},
+    "map_correctness": {"state": "supported", "evidence": ["all lifted/projective curve, reduction-kernel, divisibility, split, section-slope, and torsion-zero checks passed", "independent standard-library verifier replayed all 9096 targets and 32 controls", "Lean transport and verified-candidate interfaces compiled"], "scope": "first formal layer modulo p^2; the scalar-degree claim is separate"},
+    "subgroup_preservation": {"state": "supported", "evidence": ["red(s_u(Q))=Q and red([r]s_u(Q))=O on every checked lift", "the unique solved torsion correction gave tau=0 on every target"], "scope": "reduction/kernel path only; the set section remains nonhomomorphic"},
+    "computational_advantage": {"state": "refuted", "evidence": ["all 28 candidate rows had maximum possible degree r-2", "degrees 81 through 945 exceeded gates 49 through 100", "zero decoder rows opened", "all 32 matched controls also had maximum degree"], "scope": "frozen canonical-section scalar-polynomial bridge"},
+    "scaling_support": {"state": "refuted", "evidence": ["observed degree equals r-2 on every curve and generator relabeling", "complete interpolation is quadratic measurement work and cannot be used as proposed setup"], "scope": "frozen representation; not a lower bound for every lift-derived observable"}
   },
   "preservation_certificate": {
     "identity": "red(s_u(Q))=Q and red([r]s_u(Q))=O",
     "kernel_intersection": "not applicable: tau is an observable, not a replacement subgroup embedding",
     "recovery_map": "roots of F_G(z)-tau_0(Q), filtered by [z]G=Q",
     "scalar_multiplier": "identity on verified roots",
-    "proof_artifact": "planned H110P2LiftDefect.lean"
+    "proof_artifact": "formal/H110P2LiftDefect.lean"
   },
   "mechanism": {
     "proposed_benefit": "a canonical section's nonhomomorphic defect may have polylogarithmic scalar degree even though arbitrary lifts do not preserve the scalar relation",
@@ -52,16 +52,16 @@
     "workload": "seven curves, four generators, every nonzero target, 32 matched controls, two coordinate-isomorphic controls",
     "baseline": "generic BSGS/rho references, H109 scoped null, and full scalar interpolation accounting",
     "units": "modular operations, Jacobian additions/doublings, interpolation operations, roots, EC validations, memory, advice",
-    "construction": "unmeasured",
-    "transfer": "unmeasured",
-    "destination": "unmeasured",
-    "recovery": "conditional on degree at most ceil(log2(r))^2",
-    "verification": "full lift/reduction/kernel/formal/interpolation/root/EC checks and Lean interfaces",
+    "construction": "36384 lift constructions; 72768 scalar multiplications; 296560 affine additions; 521064 affine doublings",
+    "transfer": "6456536 modular additions, 7820632 modular multiplications, 890392 inversions, 36384 mixed kernel additions and formal extractions",
+    "destination": "complete finite-difference interpolation on 28 rows; candidate degrees 81--945, all exactly r-2",
+    "recovery": "not executed because zero rows met the frozen degree gate",
+    "verification": "all 9096 transfer records, 32 controls, two coordinate-isomorphic words, two-run scientific digest, independent verifier, and Lean interfaces passed",
     "failed_attempts_and_duplicates": "Smart applies only to r=p; arbitrary p-adic lifts are known not to preserve the relation; H110 tests the algebraic complexity of that failure rather than claiming a homomorphic lift",
-    "memory_and_data": "unmeasured",
+    "memory_and_data": "9096 stored canonical output elements plus target/control receipts; no full word is admitted as algorithmic advice",
     "setup_reuse": "only D(r)+1 public small multiples allowed in the proposed path; full words are measurement-only",
     "uncertainty": "bounded literature search and toy curves cannot establish novelty or asymptotics",
-    "evidence_label": "unmeasured"
+    "evidence_label": "measured scoped null"
   },
   "controls": [
     "eight randomized Hensel sections on each of E101 and E127",
@@ -81,13 +81,13 @@
   "exploration_boundary": {
     "families": ["coordinate-fixed Hensel sections modulo p^2", "degree-bounded scalar interpolation over F_r"],
     "parameters": "seven frozen curves, four generators, 32 matched controls",
-    "completed_scope": null,
+    "completed_scope": "all 28 rows, 9096 targets, 32 matched controls, and two coordinate-isomorphic primary words",
     "completeness_claim": "complete only for the frozen cohort and scalar polynomial representation"
   },
   "composition": {
     "edge_ids": ["hensel-section", "multiply-by-r", "first-formal-coordinate", "scalar-polynomial-decoder"],
-    "junction_compatibility": "pending executable checks",
-    "weakest_open_obligation": "uniform low-degree theorem and total subexponential cost"
+    "junction_compatibility": "supported through the first formal coordinate on the frozen cohort; polynomial-decoder junction rejected by degree",
+    "weakest_open_obligation": "no degree-bounded certificate exists in the frozen family"
   },
   "sources": [
     "10.1007/S001459900052",
@@ -96,12 +96,10 @@
     "10.1007/978-3-642-12827-1_9"
   ],
   "open_obligations": [
-    "open paired draft PRs before executing the frozen cohort",
-    "implement independent projective and formal checks",
-    "measure the complete degrees and matched controls",
-    "compile Lean transport, recovery, and conditional cost interfaces",
-    "establish or reject a uniform low-degree theorem"
+    "a different lift-derived invariant would need a new freeze and must not reuse the rejected full-degree scalar word",
+    "external novelty remains unestablished",
+    "a generic subexponential ECDLP construction remains open"
   ],
-  "recommended_next_action": "open the canonical crypto and paired cryptanalysis draft H110 PRs",
+  "recommended_next_action": "preserve the maximum-degree null and pivot to a mechanism that does not interpolate a target-indexed word",
   "official_status_change": "none"
 }
