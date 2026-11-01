@@ -10,13 +10,13 @@ Leads L2a, L2b (catalogue M008) and C2 of the note above. Null predictions: L2a 
 research/prime_field_leads_20261031/rerun_20261101/RERUN_PLAN.md (frozen before data), driver run_stage.sh in the same directory. Inputs: committed C2 .ms files (sha256 in each stage's inputs.sha256), seeded generators.
 
 ## State
-Instruments ported to Linux; generator reproduces all original instance parameters. First parity attempt (card R0 at 122535fb3) found msolve 0.6.5 segfaults with its default kernel above 2^16 (evidence in attempt1_msolve065_l2/); L2b probe parity passed. Amendment A5: every msolve call uses -l 1, which reproduced one C2 cell exactly. Binaries rebuilt (binaries.sha256). Cards to be recompiled for the new commit; then R0 again, R1, R2, R3 in order.
+Done 2026-11-01 20:50Z. Parity passed with msolve -l 1 (A5). L2b: 70 cells, 68 ok; ratio 4.00 vs 4.00, null_confirmed. C2 M: 32/32 cells complete, max degree 55 on both sides, null_confirmed. L2a s=6..12: e = 1.97 [1.95, 2.00] (G), 2.19 [2.16, 2.22] (S); does not reopen, G closes. REPORT.md, ASSESSMENT.md, receipts, lead reports, note §5 and SYNTHESIS.md updated.
 
 ## Next steps
-cd research/prime_field_leads_20261031/rerun_20261101; for s in parity_c2 parity_l2b l2b c2m l2a l2a_fit; do ./run_stage.sh $s; done (one at a time; ./run_stage.sh build first in a fresh container; apt-get install msolve). Then write REPORT.md, graphs, PDF; update lead reports, note §5, SYNTHESIS.md; PR with auto-merge.
+Land the PR (auto-merge). Nothing in the round remains unrun.
 
 ## Runs in flight
-None yet. Each stage writes under rerun_20261101/<stage dir>/; logs there.
+None.
 
 ## Stop and success conditions
 Stop rules per RERUN_PLAN.md (caps 300/600/1500/3600 s, 6 GiB, 20-min L2a guard). Success = every cell attempted and reported, decisions read off the frozen rules; no speedup is expected or claimed.
