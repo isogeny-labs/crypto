@@ -1,0 +1,391 @@
+{
+  "card_id": "CARD-BLINDSPOT-20-06",
+  "card_path": "research/blindspots_20261018/20-quantum-classical-processing/card-06.yaml",
+  "card_sha256": "9e9dbd2725b42787e4c41cc2fa80becd194deae230268651940bdf956a1ae94a",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-20/card-06"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-o",
+        "target/blindspots-20/card-06/b20",
+        "examples/blindspots_20_quantum_classical.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 2.379,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 2.379,
+      "stderr_sha256": "37075a5136d93b0a585fb378292988546e0f65b4ed0f2fcf09466e6cf9214e5f",
+      "stderr_tail": [
+        "warning: field `sigma` is never read",
+        "   --> examples/blindspots_20_quantum_classical.rs:250:5",
+        "    |",
+        "248 | struct Params {",
+        "    |        ------ field in this struct",
+        "249 |     m: u32,",
+        "250 |     sigma: u32,",
+        "    |     ^^^^^",
+        "    |",
+        "    = note: `Params` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis",
+        "    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default",
+        "",
+        "warning: 1 warning emitted",
+        ""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-20/card-06/b20",
+        "--mode",
+        "selftest"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.095,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "selftest",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.095,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "fc9da4942ff579ecb48c3f8329f4aaead3b4a98624fa6e47c89005076476a6d3",
+      "stdout_tail": [
+        "{\"kind\":\"selftest\",\"gate\":\"rnsl_formulas\",\"pass\":true,\"detail\":\"qubits=2330 toffoli_over_table=1.0218\"}",
+        "{\"kind\":\"selftest\",\"gate\":\"sampler_exact_r29_s1_l4\",\"pass\":true,\"detail\":\"max_abs_diff=6.245e-17 sum=1.000000000000\"}",
+        "{\"kind\":\"selftest\",\"gate\":\"sampler_exact_r31_s2_l3\",\"pass\":true,\"detail\":\"max_abs_diff=1.978e-16 sum=1.000000000000\"}",
+        "{\"kind\":\"selftest\",\"gate\":\"sampler_exact_r13_s0_l4\",\"pass\":true,\"detail\":\"max_abs_diff=5.551e-17 sum=1.000000000000\"}",
+        "{\"kind\":\"selftest\",\"gate\":\"lll_babai\",\"pass\":true,\"detail\":\"determinant preserved, planted point recovered (50 bases)\"}",
+        "{\"kind\":\"selftest\",\"gate\":\"bsgs\",\"pass\":true,\"detail\":\"recovered_all=true mean_adds=30.4 model=39.5 ratio=0.769\"}",
+        "{\"kind\":\"selftest\",\"gate\":\"window_vs_haner\",\"pass\":true,\"detail\":\"best_window=16 model_T=9.823e8 haner_range=[2.319e9,7.387e9]\"}",
+        "{\"kind\":\"selftest\",\"gate\":\"search_vs_criterion\",\"pass\":true,\"detail\":\"mismatches=0/150\"}",
+        "{\"kind\":\"selftest_done\",\"all_pass\":true}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-20/card-06/b20",
+        "--mode",
+        "lattice",
+        "--m",
+        "12",
+        "--sigma",
+        "4,7",
+        "--s",
+        "2,3",
+        "--extra",
+        "3",
+        "--trials",
+        "400",
+        "--seed",
+        "6"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.2,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "lat-m12",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.2,
+      "stderr_sha256": "5f2dfc8272fb2b89cb1d50ddd7a6166eed5eca0009427285cdda8341861d9f47",
+      "stderr_tail": [
+        "lattice m=12 s=2 sigma=4 trials=400 0.0s",
+        "lattice m=12 s=2 sigma=7 trials=400 0.1s",
+        "lattice m=12 s=3 sigma=4 trials=400 0.0s",
+        "lattice m=12 s=3 sigma=7 trials=400 0.1s"
+      ],
+      "stdout_sha256": "26a106f65e185a9e68b49a5d09dc8621511b8578062ed25d8c4efac3eb9cb193",
+      "stdout_tail": [
+        "{\"kind\":\"lattice_cell\",\"m\":12,\"r\":4093,\"sigma\":4,\"s\":2,\"ell\":6,\"runs\":2,\"trials\":400,\"success\":324,\"rate\":0.81,\"ci_lo\":0.7686754184345865,\"ci_hi\":0.8454267443936117,\"quantum_ops_total\":44,\"mean_flops_to_stop\":1044.1775,\"mean_reductions_to_stop\":1.3075,\"mean_candidates_to_stop\":19.1325,\"mean_group_adds_to_stop\":106.2475,\"mean_runs_to_stop\":2.1925}",
+        "{\"kind\":\"lattice_cell\",\"m\":12,\"r\":4093,\"sigma\":4,\"s\":2,\"ell\":6,\"runs\":3,\"trials\":400,\"success\":399,\"rate\":0.9975,\"ci_lo\":0.9859763590327523,\"ci_hi\":0.9995585635705656,\"quantum_ops_total\":66,\"mean_flops_to_stop\":1044.1775,\"mean_reductions_to_stop\":1.3075,\"mean_candidates_to_stop\":19.1325,\"mean_group_adds_to_stop\":106.2475,\"mean_runs_to_stop\":2.1925}",
+        "{\"kind\":\"lattice_cell\",\"m\":12,\"r\":4093,\"sigma\":4,\"s\":2,\"ell\":6,\"runs\":4,\"trials\":400,\"success\":400,\"rate\":1,\"ci_lo\":0.9904873594003194,\"ci_hi\":1,\"quantum_ops_total\":88,\"mean_flops_to_stop\":1044.1775,\"mean_reductions_to_stop\":1.3075,\"mean_candidates_to_stop\":19.1325,\"mean_group_adds_to_stop\":106.2475,\"mean_runs_to_stop\":2.1925}",
+        "{\"kind\":\"lattice_cell\",\"m\":12,\"r\":4093,\"sigma\":4,\"s\":2,\"ell\":6,\"runs\":5,\"trials\":400,\"success\":400,\"rate\":1,\"ci_lo\":0.9904873594003194,\"ci_hi\":1,\"quantum_ops_total\":110,\"mean_flops_to_stop\":1044.1775,\"mean_reductions_to_stop\":1.3075,\"mean_candidates_to_stop\":19.1325,\"mean_group_adds_to_stop\":106.2475,\"mean_runs_to_stop\":2.1925}",
+        "{\"kind\":\"lattice_cell\",\"m\":12,\"r\":4093,\"sigma\":7,\"s\":2,\"ell\":6,\"runs\":2,\"trials\":400,\"success\":329,\"rate\":0.8225,\"ci_lo\":0.7820396924303856,\"ci_hi\":0.8568246543828204,\"quantum_ops_total\":50,\"mean_flops_to_stop\":1094.9975,\"mean_reductions_to_stop\":1.3,\"mean_candidates_to_stop\":19.7375,\"mean_group_adds_to_stop\":107.82,\"mean_runs_to_stop\":2.185}",
+        "{\"kind\":\"lattice_cell\",\"m\":12,\"r\":4093,\"sigma\":7,\"s\":2,\"ell\":6,\"runs\":3,\"trials\":400,\"success\":397,\"rate\":0.9925,\"ci_lo\":0.9781838919722998,\"ci_hi\":0.9974461570370148,\"quantum_ops_total\":75,\"mean_flops_to_stop\":1094.9975,\"mean_reductions_to_stop\":1.3,\"mean_candidates_to_stop\":19.7375,\"mean_group_adds_to_stop\":107.82,\"mean_runs_to_stop\":2.185}",
+        "{\"kind\":\"lattice_cell\",\"m\":12,\"r\":4093,\"sigma\":7,\"s\":2,\"ell\":6,\"runs\":4,\"trials\":400,\"success\":400,\"rate\":1,\"ci_lo\":0.9904873594003194,\"ci_hi\":1,\"quantum_ops_total\":100,\"mean_flops_to_stop\":1094.9975,\"mean_reductions_to_stop\":1.3,\"mean_candidates_to_stop\":19.7375,\"mean_group_adds_to_stop\":107.82,\"mean_runs_to_stop\":2.185}",
+        "{\"kind\":\"lattice_cell\",\"m\":12,\"r\":4093,\"sigma\":7,\"s\":2,\"ell\":6,\"runs\":5,\"trials\":400,\"success\":400,\"rate\":1,\"ci_lo\":0.9904873594003194,\"ci_hi\":1,\"quantum_ops_total\":125,\"mean_flops_to_stop\":1094.9975,\"mean_reductions_to_stop\":1.3,\"mean_candidates_to_stop\":19.7375,\"mean_group_adds_to_stop\":107.82,\"mean_runs_to_stop\":2.185}",
+        "{\"kind\":\"lattice_cell\",\"m\":12,\"r\":4093,\"sigma\":4,\"s\":3,\"ell\":4,\"runs\":3,\"trials\":400,\"success\":307,\"rate\":0.7675,\"ci_lo\":0.7236764828773743,\"ci_hi\":0.8062342544017964,\"quantum_ops_total\":60,\"mean_flops_to_stop\":5891.165,\"mean_reductions_to_stop\":1.6625,\"mean_candidates_to_stop\":102.0075,\"mean_group_adds_to_stop\":532.9525,\"mean_runs_to_stop\":3.2675}",
+        "{\"kind\":\"lattice_cell\",\"m\":12,\"r\":4093,\"sigma\":4,\"s\":3,\"ell\":4,\"runs\":4,\"trials\":400,\"success\":388,\"rate\":0.97,\"ci_lo\":0.9483009668703324,\"ci_hi\":0.9827571509659678,\"quantum_ops_total\":80,\"mean_flops_to_stop\":5891.165,\"mean_reductions_to_stop\":1.6625,\"mean_candidates_to_stop\":102.0075,\"mean_group_adds_to_stop\":532.9525,\"mean_runs_to_stop\":3.2675}",
+        "{\"kind\":\"lattice_cell\",\"m\":12,\"r\":4093,\"sigma\":4,\"s\":3,\"ell\":4,\"runs\":5,\"trials\":400,\"success\":398,\"rate\":0.995,\"ci_lo\":0.9819547100278873,\"ci_hi\":0.9986277757784289,\"quantum_ops_total\":100,\"mean_flops_to_stop\":5891.165,\"mean_reductions_to_stop\":1.6625,\"mean_candidates_to_stop\":102.0075,\"mean_group_adds_to_stop\":532.9525,\"mean_runs_to_stop\":3.2675}",
+        "{\"kind\":\"lattice_cell\",\"m\":12,\"r\":4093,\"sigma\":4,\"s\":3,\"ell\":4,\"runs\":6,\"trials\":400,\"success\":400,\"rate\":1,\"ci_lo\":0.9904873594003194,\"ci_hi\":1,\"quantum_ops_total\":120,\"mean_flops_to_stop\":5891.165,\"mean_reductions_to_stop\":1.6625,\"mean_candidates_to_stop\":102.0075,\"mean_group_adds_to_stop\":532.9525,\"mean_runs_to_stop\":3.2675}",
+        "{\"kind\":\"lattice_cell\",\"m\":12,\"r\":4093,\"sigma\":7,\"s\":3,\"ell\":4,\"runs\":3,\"trials\":400,\"success\":309,\"rate\":0.7725,\"ci_lo\":0.7289382239883379,\"ci_hi\":0.8108773868848361,\"quantum_ops_total\":69,\"mean_flops_to_stop\":5562.0375,\"mean_reductions_to_stop\":1.6175,\"mean_candidates_to_stop\":92.5575,\"mean_group_adds_to_stop\":490.4025,\"mean_runs_to_stop\":3.26}",
+        "{\"kind\":\"lattice_cell\",\"m\":12,\"r\":4093,\"sigma\":7,\"s\":3,\"ell\":4,\"runs\":4,\"trials\":400,\"success\":388,\"rate\":0.97,\"ci_lo\":0.9483009668703324,\"ci_hi\":0.9827571509659678,\"quantum_ops_total\":92,\"mean_flops_to_stop\":5562.0375,\"mean_reductions_to_stop\":1.6175,\"mean_candidates_to_stop\":92.5575,\"mean_group_adds_to_stop\":490.4025,\"mean_runs_to_stop\":3.26}",
+        "{\"kind\":\"lattice_cell\",\"m\":12,\"r\":4093,\"sigma\":7,\"s\":3,\"ell\":4,\"runs\":5,\"trials\":400,\"success\":399,\"rate\":0.9975,\"ci_lo\":0.9859763590327523,\"ci_hi\":0.9995585635705656,\"quantum_ops_total\":115,\"mean_flops_to_stop\":5562.0375,\"mean_reductions_to_stop\":1.6175,\"mean_candidates_to_stop\":92.5575,\"mean_group_adds_to_stop\":490.4025,\"mean_runs_to_stop\":3.26}",
+        "{\"kind\":\"lattice_cell\",\"m\":12,\"r\":4093,\"sigma\":7,\"s\":3,\"ell\":4,\"runs\":6,\"trials\":400,\"success\":400,\"rate\":1,\"ci_lo\":0.9904873594003194,\"ci_hi\":1,\"quantum_ops_total\":138,\"mean_flops_to_stop\":5562.0375,\"mean_reductions_to_stop\":1.6175,\"mean_candidates_to_stop\":92.5575,\"mean_group_adds_to_stop\":490.4025,\"mean_runs_to_stop\":3.26}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-20/card-06/b20",
+        "--mode",
+        "lattice",
+        "--m",
+        "16",
+        "--sigma",
+        "4,7",
+        "--s",
+        "2,3",
+        "--extra",
+        "3",
+        "--trials",
+        "400",
+        "--seed",
+        "7"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 2.199,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "lat-m16",
+      "index": 5,
+      "outputs": {},
+      "seconds": 2.199,
+      "stderr_sha256": "9e00e9a90ef304bcf1c950f7b6efbc6cf33cfffb2ef8859538db56e9b0a5fb60",
+      "stderr_tail": [
+        "lattice m=16 s=2 sigma=4 trials=400 0.5s",
+        "lattice m=16 s=2 sigma=7 trials=400 0.7s",
+        "lattice m=16 s=3 sigma=4 trials=400 0.5s",
+        "lattice m=16 s=3 sigma=7 trials=400 0.6s"
+      ],
+      "stdout_sha256": "cb7795e9f30ba61d80d8c7bbed56be51f0021466c0c3ae570ba93d6bd9394f1b",
+      "stdout_tail": [
+        "{\"kind\":\"lattice_cell\",\"m\":16,\"r\":65521,\"sigma\":4,\"s\":2,\"ell\":8,\"runs\":2,\"trials\":400,\"success\":298,\"rate\":0.745,\"ci_lo\":0.7000948146222626,\"ci_hi\":0.7852439914838939,\"quantum_ops_total\":56,\"mean_flops_to_stop\":1579.3425,\"mean_reductions_to_stop\":1.4575,\"mean_candidates_to_stop\":24.8725,\"mean_group_adds_to_stop\":179.275,\"mean_runs_to_stop\":2.27}",
+        "{\"kind\":\"lattice_cell\",\"m\":16,\"r\":65521,\"sigma\":4,\"s\":2,\"ell\":8,\"runs\":3,\"trials\":400,\"success\":394,\"rate\":0.985,\"ci_lo\":0.9676649364884468,\"ci_hi\":0.993107802129863,\"quantum_ops_total\":84,\"mean_flops_to_stop\":1579.3425,\"mean_reductions_to_stop\":1.4575,\"mean_candidates_to_stop\":24.8725,\"mean_group_adds_to_stop\":179.275,\"mean_runs_to_stop\":2.27}",
+        "{\"kind\":\"lattice_cell\",\"m\":16,\"r\":65521,\"sigma\":4,\"s\":2,\"ell\":8,\"runs\":4,\"trials\":400,\"success\":400,\"rate\":1,\"ci_lo\":0.9904873594003194,\"ci_hi\":1,\"quantum_ops_total\":112,\"mean_flops_to_stop\":1579.3425,\"mean_reductions_to_stop\":1.4575,\"mean_candidates_to_stop\":24.8725,\"mean_group_adds_to_stop\":179.275,\"mean_runs_to_stop\":2.27}",
+        "{\"kind\":\"lattice_cell\",\"m\":16,\"r\":65521,\"sigma\":4,\"s\":2,\"ell\":8,\"runs\":5,\"trials\":400,\"success\":400,\"rate\":1,\"ci_lo\":0.9904873594003194,\"ci_hi\":1,\"quantum_ops_total\":140,\"mean_flops_to_stop\":1579.3425,\"mean_reductions_to_stop\":1.4575,\"mean_candidates_to_stop\":24.8725,\"mean_group_adds_to_stop\":179.275,\"mean_runs_to_stop\":2.27}",
+        "{\"kind\":\"lattice_cell\",\"m\":16,\"r\":65521,\"sigma\":7,\"s\":2,\"ell\":8,\"runs\":2,\"trials\":400,\"success\":329,\"rate\":0.8225,\"ci_lo\":0.7820396924303856,\"ci_hi\":0.8568246543828204,\"quantum_ops_total\":62,\"mean_flops_to_stop\":1310.5925,\"mean_reductions_to_stop\":1.2875,\"mean_candidates_to_stop\":18.65,\"mean_group_adds_to_stop\":138.8025,\"mean_runs_to_stop\":2.1825}",
+        "{\"kind\":\"lattice_cell\",\"m\":16,\"r\":65521,\"sigma\":7,\"s\":2,\"ell\":8,\"runs\":3,\"trials\":400,\"success\":398,\"rate\":0.995,\"ci_lo\":0.9819547100278873,\"ci_hi\":0.9986277757784289,\"quantum_ops_total\":93,\"mean_flops_to_stop\":1310.5925,\"mean_reductions_to_stop\":1.2875,\"mean_candidates_to_stop\":18.65,\"mean_group_adds_to_stop\":138.8025,\"mean_runs_to_stop\":2.1825}",
+        "{\"kind\":\"lattice_cell\",\"m\":16,\"r\":65521,\"sigma\":7,\"s\":2,\"ell\":8,\"runs\":4,\"trials\":400,\"success\":400,\"rate\":1,\"ci_lo\":0.9904873594003194,\"ci_hi\":1,\"quantum_ops_total\":124,\"mean_flops_to_stop\":1310.5925,\"mean_reductions_to_stop\":1.2875,\"mean_candidates_to_stop\":18.65,\"mean_group_adds_to_stop\":138.8025,\"mean_runs_to_stop\":2.1825}",
+        "{\"kind\":\"lattice_cell\",\"m\":16,\"r\":65521,\"sigma\":7,\"s\":2,\"ell\":8,\"runs\":5,\"trials\":400,\"success\":400,\"rate\":1,\"ci_lo\":0.9904873594003194,\"ci_hi\":1,\"quantum_ops_total\":155,\"mean_flops_to_stop\":1310.5925,\"mean_reductions_to_stop\":1.2875,\"mean_candidates_to_stop\":18.65,\"mean_group_adds_to_stop\":138.8025,\"mean_runs_to_stop\":2.1825}",
+        "{\"kind\":\"lattice_cell\",\"m\":16,\"r\":65521,\"sigma\":4,\"s\":3,\"ell\":6,\"runs\":3,\"trials\":400,\"success\":352,\"rate\":0.88,\"ci_lo\":0.8444853274321313,\"ci_hi\":0.9082850657121113,\"quantum_ops_total\":78,\"mean_flops_to_stop\":5419.0075,\"mean_reductions_to_stop\":1.335,\"mean_candidates_to_stop\":57.8925,\"mean_group_adds_to_stop\":386.0525,\"mean_runs_to_stop\":3.135}",
+        "{\"kind\":\"lattice_cell\",\"m\":16,\"r\":65521,\"sigma\":4,\"s\":3,\"ell\":6,\"runs\":4,\"trials\":400,\"success\":394,\"rate\":0.985,\"ci_lo\":0.9676649364884468,\"ci_hi\":0.993107802129863,\"quantum_ops_total\":104,\"mean_flops_to_stop\":5419.0075,\"mean_reductions_to_stop\":1.335,\"mean_candidates_to_stop\":57.8925,\"mean_group_adds_to_stop\":386.0525,\"mean_runs_to_stop\":3.135}",
+        "{\"kind\":\"lattice_cell\",\"m\":16,\"r\":65521,\"sigma\":4,\"s\":3,\"ell\":6,\"runs\":5,\"trials\":400,\"success\":400,\"rate\":1,\"ci_lo\":0.9904873594003194,\"ci_hi\":1,\"quantum_ops_total\":130,\"mean_flops_to_stop\":5419.0075,\"mean_reductions_to_stop\":1.335,\"mean_candidates_to_stop\":57.8925,\"mean_group_adds_to_stop\":386.0525,\"mean_runs_to_stop\":3.135}",
+        "{\"kind\":\"lattice_cell\",\"m\":16,\"r\":65521,\"sigma\":4,\"s\":3,\"ell\":6,\"runs\":6,\"trials\":400,\"success\":400,\"rate\":1,\"ci_lo\":0.9904873594003194,\"ci_hi\":1,\"quantum_ops_total\":156,\"mean_flops_to_stop\":5419.0075,\"mean_reductions_to_stop\":1.335,\"mean_candidates_to_stop\":57.8925,\"mean_group_adds_to_stop\":386.0525,\"mean_runs_to_stop\":3.135}",
+        "{\"kind\":\"lattice_cell\",\"m\":16,\"r\":65521,\"sigma\":7,\"s\":3,\"ell\":6,\"runs\":3,\"trials\":400,\"success\":332,\"rate\":0.83,\"ci_lo\":0.7900900795523471,\"ci_hi\":0.8636315776518637,\"quantum_ops_total\":87,\"mean_flops_to_stop\":5911.3725,\"mean_reductions_to_stop\":1.4,\"mean_candidates_to_stop\":68.885,\"mean_group_adds_to_stop\":423.1525,\"mean_runs_to_stop\":3.18}",
+        "{\"kind\":\"lattice_cell\",\"m\":16,\"r\":65521,\"sigma\":7,\"s\":3,\"ell\":6,\"runs\":4,\"trials\":400,\"success\":397,\"rate\":0.9925,\"ci_lo\":0.9781838919722998,\"ci_hi\":0.9974461570370148,\"quantum_ops_total\":116,\"mean_flops_to_stop\":5911.3725,\"mean_reductions_to_stop\":1.4,\"mean_candidates_to_stop\":68.885,\"mean_group_adds_to_stop\":423.1525,\"mean_runs_to_stop\":3.18}",
+        "{\"kind\":\"lattice_cell\",\"m\":16,\"r\":65521,\"sigma\":7,\"s\":3,\"ell\":6,\"runs\":5,\"trials\":400,\"success\":399,\"rate\":0.9975,\"ci_lo\":0.9859763590327523,\"ci_hi\":0.9995585635705656,\"quantum_ops_total\":145,\"mean_flops_to_stop\":5911.3725,\"mean_reductions_to_stop\":1.4,\"mean_candidates_to_stop\":68.885,\"mean_group_adds_to_stop\":423.1525,\"mean_runs_to_stop\":3.18}",
+        "{\"kind\":\"lattice_cell\",\"m\":16,\"r\":65521,\"sigma\":7,\"s\":3,\"ell\":6,\"runs\":6,\"trials\":400,\"success\":400,\"rate\":1,\"ci_lo\":0.9904873594003194,\"ci_hi\":1,\"quantum_ops_total\":174,\"mean_flops_to_stop\":5911.3725,\"mean_reductions_to_stop\":1.4,\"mean_candidates_to_stop\":68.885,\"mean_group_adds_to_stop\":423.1525,\"mean_runs_to_stop\":3.18}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-20/card-06/b20",
+        "--mode",
+        "lattice",
+        "--m",
+        "20",
+        "--sigma",
+        "4",
+        "--s",
+        "2,3",
+        "--extra",
+        "3",
+        "--trials",
+        "400",
+        "--seed",
+        "8"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 16.045,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "lat-m20",
+      "index": 6,
+      "outputs": {},
+      "seconds": 16.045,
+      "stderr_sha256": "58acd3e01eee6ee6ccc491c6643951b36d12c550930b051f618cf780da193f9e",
+      "stderr_tail": [
+        "lattice m=20 s=2 sigma=4 trials=400 8.1s",
+        "lattice m=20 s=3 sigma=4 trials=400 8.0s"
+      ],
+      "stdout_sha256": "43297531ed67a22dc43e4b2de2c1843ba279eef2336f9abfa31cbec4664de4d0",
+      "stdout_tail": [
+        "{\"kind\":\"lattice_cell\",\"m\":20,\"r\":1048573,\"sigma\":4,\"s\":2,\"ell\":10,\"runs\":2,\"trials\":400,\"success\":306,\"rate\":0.765,\"ci_lo\":0.7210486102094291,\"ci_hi\":0.8039096902727403,\"quantum_ops_total\":68,\"mean_flops_to_stop\":1788.2975,\"mean_reductions_to_stop\":1.4,\"mean_candidates_to_stop\":22.755,\"mean_group_adds_to_stop\":208.39,\"mean_runs_to_stop\":2.245}",
+        "{\"kind\":\"lattice_cell\",\"m\":20,\"r\":1048573,\"sigma\":4,\"s\":2,\"ell\":10,\"runs\":3,\"trials\":400,\"success\":396,\"rate\":0.99,\"ci_lo\":0.9745730330055918,\"ci_hi\":0.9961045792067212,\"quantum_ops_total\":102,\"mean_flops_to_stop\":1788.2975,\"mean_reductions_to_stop\":1.4,\"mean_candidates_to_stop\":22.755,\"mean_group_adds_to_stop\":208.39,\"mean_runs_to_stop\":2.245}",
+        "{\"kind\":\"lattice_cell\",\"m\":20,\"r\":1048573,\"sigma\":4,\"s\":2,\"ell\":10,\"runs\":4,\"trials\":400,\"success\":400,\"rate\":1,\"ci_lo\":0.9904873594003194,\"ci_hi\":1,\"quantum_ops_total\":136,\"mean_flops_to_stop\":1788.2975,\"mean_reductions_to_stop\":1.4,\"mean_candidates_to_stop\":22.755,\"mean_group_adds_to_stop\":208.39,\"mean_runs_to_stop\":2.245}",
+        "{\"kind\":\"lattice_cell\",\"m\":20,\"r\":1048573,\"sigma\":4,\"s\":2,\"ell\":10,\"runs\":5,\"trials\":400,\"success\":400,\"rate\":1,\"ci_lo\":0.9904873594003194,\"ci_hi\":1,\"quantum_ops_total\":170,\"mean_flops_to_stop\":1788.2975,\"mean_reductions_to_stop\":1.4,\"mean_candidates_to_stop\":22.755,\"mean_group_adds_to_stop\":208.39,\"mean_runs_to_stop\":2.245}",
+        "{\"kind\":\"lattice_cell\",\"m\":20,\"r\":1048573,\"sigma\":4,\"s\":3,\"ell\":7,\"runs\":3,\"trials\":400,\"success\":324,\"rate\":0.81,\"ci_lo\":0.7686754184345865,\"ci_hi\":0.8454267443936117,\"quantum_ops_total\":93,\"mean_flops_to_stop\":7120.6075,\"mean_reductions_to_stop\":1.4475,\"mean_candidates_to_stop\":68.69,\"mean_group_adds_to_stop\":600.8675,\"mean_runs_to_stop\":3.2125}",
+        "{\"kind\":\"lattice_cell\",\"m\":20,\"r\":1048573,\"sigma\":4,\"s\":3,\"ell\":7,\"runs\":4,\"trials\":400,\"success\":391,\"rate\":0.9775,\"ci_lo\":0.9577968763972683,\"ci_hi\":0.9881185518300367,\"quantum_ops_total\":124,\"mean_flops_to_stop\":7120.6075,\"mean_reductions_to_stop\":1.4475,\"mean_candidates_to_stop\":68.69,\"mean_group_adds_to_stop\":600.8675,\"mean_runs_to_stop\":3.2125}",
+        "{\"kind\":\"lattice_cell\",\"m\":20,\"r\":1048573,\"sigma\":4,\"s\":3,\"ell\":7,\"runs\":5,\"trials\":400,\"success\":400,\"rate\":1,\"ci_lo\":0.9904873594003194,\"ci_hi\":1,\"quantum_ops_total\":155,\"mean_flops_to_stop\":7120.6075,\"mean_reductions_to_stop\":1.4475,\"mean_candidates_to_stop\":68.69,\"mean_group_adds_to_stop\":600.8675,\"mean_runs_to_stop\":3.2125}",
+        "{\"kind\":\"lattice_cell\",\"m\":20,\"r\":1048573,\"sigma\":4,\"s\":3,\"ell\":7,\"runs\":6,\"trials\":400,\"success\":400,\"rate\":1,\"ci_lo\":0.9904873594003194,\"ci_hi\":1,\"quantum_ops_total\":186,\"mean_flops_to_stop\":7120.6075,\"mean_reductions_to_stop\":1.4475,\"mean_candidates_to_stop\":68.69,\"mean_group_adds_to_stop\":600.8675,\"mean_runs_to_stop\":3.2125}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-20/card-06/b20"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-20/card-06"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 8,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 8,
+  "commit": "3f4ee28ac0494e3797c8116ad8635e5d217ffbc0",
+  "dirty_after": [
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-18-r2-build.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-18-r2-build.stdout.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/eval-21-5-3-test-09-12-r2.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/eval-21-5-3-test-09-12-r2.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/fit-21-5-3-c18-r2.json",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/fit-21-5-3-c18-r2.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2-c18.model",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/receipt-card-17-r2.json",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/card-06-build.stderr.log",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/card-06-build.stdout.log",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/lattice-m12.jsonl",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/lattice-m12.log",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/lattice-m16.jsonl",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/lattice-m16.log",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/lattice-m20.jsonl",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/lattice-m20.log",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/receipt-card-05.json",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/s20.jsonl",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/s20.log",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/selftest-card-06.jsonl",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/selftest-card-06.log"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/09-learned-f4-policy/raw/eval-21-5-3-test-09-12-r2.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/eval-21-5-3-test-09-12-r2.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/receipt-card-17-r2.json",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/receipt-card-05.json",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/s20.jsonl",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/s20.log"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

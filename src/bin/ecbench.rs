@@ -2,6 +2,8 @@
 //!
 //! ```text
 //! ecbench methods                      what can be measured
+//! ecbench optimize inventory           registry-wide optimization coverage
+//! ecbench optimize audit --development S... --holdout H...
 //! ecbench host                         the host capsule and its class id
 //! ecbench plan   --spec S              validate a spec, print its workloads and identities
 //! ecbench run    --spec S --out D      run a session (pinned, interleaved, sealed records)
@@ -35,6 +37,8 @@
 mod pdp3_koblitz;
 #[path = "ecbench/pdp_split_oracle.rs"]
 mod pdp_split_oracle;
+#[path = "ecbench/pkm_tower.rs"]
+mod pkm_tower;
 #[path = "ecbench/structured_s4.rs"]
 mod structured_s4;
 
@@ -46,8 +50,8 @@ use clap::{Parser, Subcommand};
 
 use crypto_lib::cryptanalysis::ecbench::{
     audit, bounds, calibration, callgrind, canonical, challenge, claim, compare, db, fbm, frontier,
-    full_price, gpu, host, isolab, isolation, methods, record, resources, runner, signals, spec,
-    stats, trend, wordram_price, workload,
+    full_price, gpu, host, isolab, isolation, methods, optimization, record, resources, runner,
+    signals, spec, stats, trend, wordram_price, workload,
 };
 
 #[derive(Parser)]
@@ -63,6 +67,13 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Cmd {
+    /// Check pinned diagnostic metadata without launching work.
+    DiagnosticPreflight {
+        #[arg(long)]
+        request: PathBuf,
+        #[arg(long)]
+        request_sha256: String,
+    },
     /// Push, pull and index large files (factor bases, tables) in the object store.
     Store(crypto_lib::store::cli::StoreArgs),
     /// Run the existing CUDA ECC binary as a separately labelled GPU stage.
@@ -188,6 +199,8 @@ enum Cmd {
         #[arg(long)]
         json: bool,
     },
+    /// Inventory and audit the registry-wide optimization loop.
+    Optimize(OptimizeArgs),
     /// Measure the full-pricing units (src/cryptanalysis/ecbench/full_prices.json) on
     /// this host for Koblitz curves `a:n`, median of `reps` passes each.
     PriceUnits {
@@ -238,6 +251,9 @@ enum Cmd {
     },
     /// Run a session.
     Run {
+        /// Explicit diagnostic launch provenance (producer activation pending).
+        #[arg(long)]
+        diagnostic_launch: Option<PathBuf>,
         /// An `ecbench.spec/v1` file; `plan` shows what it expands to.
         #[arg(long)]
         spec: PathBuf,
@@ -509,6 +525,38 @@ enum Cmd {
     Challenge {
         #[command(subcommand)]
         cmd: ChallengeCmd,
+    },
+}
+
+#[derive(clap::Args)]
+struct OptimizeArgs {
+    #[command(subcommand)]
+    action: OptimizeAction,
+}
+
+#[derive(Subcommand)]
+enum OptimizeAction {
+    /// List every registered method, tuning role, and nested solver/engine.
+    Inventory {
+        /// Print the machine-readable inventory instead of the compact table.
+        #[arg(long)]
+        json: bool,
+    },
+    /// Audit adaptive-development and fresh-holdout ecbench specs.
+    Audit {
+        /// Development specs; every live method/engine belongs here before
+        /// `--require-all` admits the campaign.
+        #[arg(long, num_args = 1.., required = true)]
+        development: Vec<PathBuf>,
+        /// Fresh winner-only confirmatory specs. Seeds must be disjoint from
+        /// development; holdouts require public targets and L2 isolation.
+        #[arg(long, num_args = 1..)]
+        holdout: Vec<PathBuf>,
+        /// Refuse admission unless development covers the live method registry,
+        /// every system solver, every PDP3 engine, and every prime PKM tower
+        /// engine.
+        #[arg(long)]
+        require_all: bool,
     },
 }
 
@@ -809,6 +857,7 @@ pub fn main() -> ExitCode {
     // Oracles this binary links that the library cannot name (see
     // `pdp3_koblitz`); registered before any run, child or replay.
     crypto_lib::cryptanalysis::ecbench::methods::register_binary_plugins(binary_plugins());
+    crypto_lib::cryptanalysis::ecbench::methods::register_prime_plugins(pkm_tower::plugins());
     match run(Cli::parse()) {
         Ok(code) => code,
         Err(e) => {
@@ -878,6 +927,18 @@ fn emit_claim(
 
 fn run(cli: Cli) -> Result<ExitCode, String> {
     match cli.cmd {
+        Cmd::DiagnosticPreflight {
+            request,
+            request_sha256,
+        } => {
+            let path = request.to_str().ok_or("request path must be UTF-8")?;
+            print_json(
+                &crypto_lib::cryptanalysis::ecbench::diagnostic_file_adapter::check_file(
+                    path,
+                    &request_sha256,
+                )?,
+            )?;
+        }
         Cmd::Store(args) => crypto_lib::store::cli::run(&args)?,
         Cmd::Work {
             sessions,
@@ -1054,6 +1115,45 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 }
             }
         }
+        Cmd::Optimize(args) => match args.action {
+            OptimizeAction::Inventory { json } => {
+                if json {
+                    print_json(&optimization::inventory_json()?)?;
+                } else {
+                    let profiles = optimization::profiles()?;
+                    println!(
+                        "{:<43} {:<20} {:<21} {:>5}",
+                        "method", "search", "claim scope", "knobs"
+                    );
+                    for p in profiles {
+                        let knobs = p
+                            .parameters
+                            .iter()
+                            .filter(|parameter| parameter.role == optimization::ParameterRole::Knob)
+                            .count();
+                        println!(
+                            "{:<43} {:<20?} {:<21?} {:>5}",
+                            p.id, p.strategy, p.claim_scope, knobs
+                        );
+                    }
+                    println!(
+                        "\nUse `ecbench optimize inventory --json` for parameter roles and nested solvers/engines."
+                    );
+                }
+            }
+            OptimizeAction::Audit {
+                development,
+                holdout,
+                require_all,
+            } => {
+                let report = optimization::audit_campaign(&development, &holdout, require_all)?;
+                let admissible = report["admissible"].as_bool().unwrap_or(false);
+                print_json(&report)?;
+                if !admissible {
+                    return Ok(ExitCode::from(1));
+                }
+            }
+        },
         Cmd::PriceUnits { curve, reps } => {
             let mut rows = serde_json::Map::new();
             for c in &curve {
@@ -1234,6 +1334,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             }
         }
         Cmd::Run {
+            diagnostic_launch,
             spec: path,
             out,
             cpus,
@@ -1256,6 +1357,10 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 req = isolation::CpuRequest::None;
             }
             let opts = runner::RunOptions {
+                diagnostic_launch: diagnostic_launch
+                    .as_deref()
+                    .map(crypto_lib::cryptanalysis::ecbench::diagnostic_launch::DiagnosticLaunch::load)
+                    .transpose()?,
                 cpus: req,
                 lock_path: lock,
                 wait_for_lock: wait,
@@ -2191,6 +2296,8 @@ fn profile_input(path: &Path, seq: u64) -> Result<record::ChildInput, String> {
     let w = &p.workloads[ex.workload];
     Ok(record::ChildInput {
         schema: record::CHILD_INPUT_SCHEMA.into(),
+        diagnostics: None,
+        diagnostic_lifecycle: None,
         curve: workload::CurveSpec::explicit(p.instance(ex.workload))
             .unwrap_or_else(|| w.curve_spec.clone()),
         target_seed: w.target_seed,

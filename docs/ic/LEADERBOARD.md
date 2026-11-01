@@ -27,11 +27,13 @@ The [canonical timeline](../index-calculus-scoreboard.html#lab-progress) shows t
 | 2026-10-16 | [n83 K1120 five-point cold factor-base holdout, selected ID null](https://github.com/aburan28/crypto/blob/main/research/n83_e2e_holdout_20261016/RESULT.md) | 55.4× | matched | Tier 1 cloud-instance cold IC / same-point rho online wall |
 | 2026-10-17 | [Volcano projected-base control/pilot; best bounded IC cell](https://github.com/aburan28/crypto/blob/main/research/full_volcano_graphwide_ic_20261017/execution/pilot-summary/two-comparison.json) | 19.2× | matched | quotient of incomplete cold GAE lower bounds; diagnostic |
 | 2026-10-18 | [Lazy orbit-member index, fully priced (*_full), stride-renew, vs rho-frob: best cell icv1-f2m29-tm40309-30c52b96 (r = 2^15.4)](https://github.com/aburan28/crypto/blob/main/research/ecbench_lazy_orbit_members_20261018/REPORT.pdf) | 1.27× | matched | S |
+| 2026-10-18 | [Two orbit columns under the lazy oracle, fully priced (*_full), stride-renew, vs rho-frob: best cell icv1-f2m29-tm40309-30c52b96 (r = 2^15.4), frozen c = 1](https://github.com/aburan28/crypto/blob/main/research/ecbench_lazy_columns2_20261018/REPORT.pdf) | 1.29× | matched | S |
 | 2026-10-20 | [Rule v8: the Koblitz descent at baseline v8 against a matched rho, one target cold, closest size 2^36.6](https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v8/README.md) | 4.67× | matched | source-specific; see result |
 | 2026-10-21 | [Planner validation (ic-planner/1): plan vs rho.negation, best registered cell icv1-fp24-tm5099-a6f137c6 (r = 2^24.0)](https://github.com/aburan28/crypto/blob/main/research/ic_planner_validation_20261020/README.md) | 14.4× | matched | source-specific; see result |
 | 2026-10-27 | [Residual collector res2 vs rho.negation, one target cold, best cell icv1-fp36-t454193-44a20818 (r = 2^36.0)](https://github.com/aburan28/crypto/blob/main/research/ic_planner_exhaustive_20261026/README.md) | 2.59× | matched | S |
 | 2026-10-17 | [n83 K1107/root11 sixteen-point cold factor-base frontier](https://github.com/aburan28/crypto/blob/main/research/n83_e2e_finalist_results_20261017/RESULT.md) | 47.1× | matched | Tier 1 cloud-instance cold IC / same-point rho online wall |
 | 2026-10-20 | [k = 5 2-torsion Edwards route, F4 trace replay, complete DLP at p = 61 (ell = 2^27.7)](https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md) | 1,236,267× | matched | F_p multiplications |
+| 2026-11-01 | [Prime-orbit relation collector, affine eight-orbit candidate vs negation rho, generic 14-bit toy curve](https://github.com/isogeny-labs/crypto/blob/main/research/ecbench_e2e_frontier_20261031/REPORT.md#late-main-79th-method-reconciliation) | 5.42× | matched | counted GAE lower-bound diagnostic |
 
 ## Native candidate tournament, round 0026 (separate Ir unit)
 
@@ -112,6 +114,40 @@ The Frobenius-folded pair table no longer names `σ^t(P_i)` for every base point
 | `icv1-f2m41-tm2308219-7f48b14a` | 39.0 | **1.014 [1.013, 1.015]** | 16.090 [11.706, 22.265] | 15.868 [11.525, 21.979] |
 
 [Report](../../research/ecbench_lazy_orbit_members_20261018/REPORT.pdf) · [study](../../research/ecbench_lazy_orbit_members_20261018/) · [data](../../research/ecbench_lazy_orbit_members_20261018/figures/ratios.json). Distance to rho is reported, not a gate; no ranking against rho is claimed.
+
+Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
+
+## Component improvement: orbit-layout table and generator-orbit base (2026-10-22, engineering)
+
+Against the lazy orbit IC (the section above): `mitm-frobenius-layout-counted` names a hit's Frobenius images by index and adds each orbit's own pairs once per rotation class (the same relations as the lazy table on 960/960 run pairs); `generator_orbit=1` makes column 0 the orbit of G, whose logarithm is known, and `stride-generator` draws targets Q + [k]G with no scalar multiplication. ecbench.gae, paired by target, cluster-bootstrap 95% CI; above 1 the second-named arm is cheaper. Band: mean S with native work at w = 0 / 0.1 / 1 GAE (AGENTS.md §5a).
+
+| curve | log₂ r | c | lazy ÷ layout | lazy ÷ gen-layout (net) | gen-layout ÷ rho-frob | band S gen-layout | band S rho-frob |
+|:--|--:|--:|:--|:--|:--|:--|:--|
+| `icv1-f2m13-t181-515ee569` | 11.0 | 1 | 1.080 [1.078, 1.081] | **3.178 [2.772, 3.612]** | 0.739 [0.629, 0.866] | 1.406 / 1.536 / 2.706 | 1.987 / 1.987 / 1.987 |
+| `icv1-f2m29-tm40309-30c52b96` | 15.4 | 1 | 1.093 [1.091, 1.096] | **3.200 [2.948, 3.447]** | 0.366 [0.241, 0.523] | 0.546 / 0.611 / 1.196 | 1.569 / 1.569 / 1.569 |
+| `icv1-f2m17-tm101-00378d4e` | 16.0 | 1 | 1.032 [1.028, 1.036] | **1.274 [1.012, 1.670]** | 1.591 [1.115, 2.189] | 1.845 / 2.142 / 4.810 | 1.240 / 1.240 / 1.240 |
+| `icv1-f2m19-t797-b6cf2467` | 17.0 | 2 | 1.067 [1.064, 1.070] | **1.717 [1.532, 1.903]** | 1.154 [0.888, 1.468] | 1.081 / 1.081 / 1.081 | 0.937 / 0.937 / 0.937 |
+| `icv1-f2m31-tm90707-c95f16f5` | 20.5 | 2 | 1.052 [1.048, 1.057] | **1.916 [1.622, 2.285]** | 1.154 [0.878, 1.502] | 0.559 / 0.632 / 1.286 | 0.512 / 0.512 / 0.512 |
+| `icv1-f2m23-t5197-69e76b73` | 21.0 | 3 | 1.041 [1.038, 1.044] | **1.553 [1.362, 1.764]** | 1.934 [1.414, 2.475] | 0.838 / 0.945 / 1.908 | 0.443 / 0.443 / 0.443 |
+| `icv1-f2m37-tm534059-32aad96b` | 27.8 | 8 | 1.021 [1.018, 1.023] | **1.261 [1.071, 1.511]** | 3.886 [3.165, 4.790] | 0.772 / 0.892 / 1.965 | 0.211 / 0.211 / 0.211 |
+
+[Report](../../research/ecbench_generator_orbit_20261022/REPORT.pdf) · [study](../../research/ecbench_generator_orbit_20261022/) · [data](../../research/ecbench_generator_orbit_20261022/figures/summary.json). At n = 29 (c = 1) the IC arm is below rho-frob at every band weight; at one column the pipeline is a Frobenius-folded baby-step giant-step and the crossing rests on rho-frob's fixed set-up at log₂ r = 15.4, so it is not "faster than rho": the gap grows with r. At n = 19 no pinned calibration row exists and the band does not re-price the IC natives.
+
+Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates. Gate: validator report raw_data sessions/a1-n29/records.jsonl: sessions/a1-n29/records.jsonl is not a file; validator report raw_data sessions/a0-n13/records.jsonl: sessions/a0-n13/records.jsonl is not a file; validator report raw_data sessions/a1-n17/records.jsonl: sessions/a1-n17/records.jsonl is not a file; validator report raw_data sessions/a0-n19/records.jsonl: sessions/a0-n19/records.jsonl is not a file; validator report raw_data sessions/a0-n23/records.jsonl: sessions/a0-n23/records.jsonl is not a file; validator report raw_data sessions/a0-n31/records.jsonl: sessions/a0-n31/records.jsonl is not a file; validator report raw_data sessions/a0-n37/records.jsonl: sessions/a0-n37/records.jsonl is not a file.
+
+## Component tuning: two orbit columns under the lazy oracle (2026-10-18, engineering)
+
+Does `columns = 2` beat the per-curve column count frozen on 2026-10-14 now that the member-index set-up is gone? One cell of five: it is cheaper at n17 a1 and dearer at the other four, so the frozen counts stay the better choice on four of five curves. The n17 gain is a tuning result on these seeds and needs fresh seeds before it is a rule. It moves no row of tables A–C. ecbench.gae, paired by target, cluster-bootstrap 95% CI; 95 % intervals; below 1 the numerator is cheaper.
+
+| curve | log₂ r | frozen c | frozen ÷ c=2 | frozen ÷ rho-strong | c=2 ÷ rho-strong | frozen ÷ rho-frob | c=2 ÷ rho-frob |
+|:--|--:|--:|:--|:--|:--|:--|:--|
+| `icv1-f2m13-t181-515ee569` | 11.0 | 1 | **0.637 [0.630, 0.645]** | 0.325 [0.319, 0.330] | 0.510 [0.503, 0.516] | 2.430 [2.315, 2.538] | 3.816 [3.644, 3.974] |
+| `icv1-f2m17-tm101-00378d4e` | 16.0 | 1 | **1.176 [1.063, 1.297]** | 0.602 [0.545, 0.665] | 0.512 [0.490, 0.535] | 2.152 [1.592, 2.752] | 1.830 [1.397, 2.255] |
+| `icv1-f2m23-t5197-69e76b73` | 21.0 | 3 | **0.778 [0.695, 0.874]** | 1.091 [1.009, 1.176] | 1.403 [1.236, 1.578] | 2.775 [2.252, 3.408] | 3.569 [2.848, 4.497] |
+| `icv1-f2m29-tm40309-30c52b96` | 15.4 | 1 | **0.644 [0.625, 0.665]** | 0.396 [0.381, 0.411] | 0.615 [0.602, 0.627] | 1.287 [0.971, 1.686] | 1.998 [1.511, 2.612] |
+| `icv1-f2m37-tm534059-32aad96b` | 27.8 | 8 | **0.246 [0.200, 0.309]** | 3.798 [3.266, 4.403] | 15.422 [12.280, 18.614] | 4.538 [3.752, 5.497] | 18.426 [14.428, 23.225] |
+
+[Report](../../research/ecbench_lazy_columns2_20261018/REPORT.pdf) · [study](../../research/ecbench_lazy_columns2_20261018/) · [data](../../research/ecbench_lazy_columns2_20261018/figures/ratios.json). Distance to rho is reported, not a gate; no ranking against rho is claimed (§5a band not applied).
 
 Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
 
@@ -235,7 +271,7 @@ Shares are fractions of each row's own `S`, so they carry no unit; read each row
 
 ## Curve records and factor bases
 
-Identity: [`docs/curves/registry.json`](../../docs/curves/registry.json). IC curve records: schema [`docs/curves/ic/curves.schema.json`](../../docs/curves/ic/curves.schema.json), records [`docs/curves/ic/curves.yaml`](../../docs/curves/ic/curves.yaml) (27 records). 24 of the 24 board curves have a record there; 0 have a reconciled factor base.
+Identity: [`docs/curves/registry.json`](../../docs/curves/registry.json). IC curve records: schema [`docs/curves/ic/curves.schema.json`](../../docs/curves/ic/curves.schema.json), records [`docs/curves/ic/curves.yaml`](../../docs/curves/ic/curves.yaml) (31 records). 24 of the 24 board curves have a record there; 0 have a reconciled factor base.
 
 The registry overview below uses current links. Frozen measurement rows retain their original link metadata; refreshing registry links does not change their validation status.
 
@@ -302,7 +338,7 @@ The preregistered one-target workload `f6d79f6dd9f2` on `icv1-f2m9-tm5-4a3ea183`
 
 ## F4, F5 and F6-IC on Koblitz and generic binary curves, outside tables A–C
 
-Matrix F4, matrix F5, inherited F4 and F6-IC through `pdp3-binary` on eight public one-target workloads per cell, beside same-target rho. IC `S` is a lower bound (solver word XORs unpriced; F6-IC's geometric additions charged). `W` is counted solver word XORs. Prime curves have no algebraic oracle in `ecbench`. Read the [analysis](../../research/f4_f5_f6_cross_family_20261011/ANALYSIS.json).
+Matrix F4, matrix F5, inherited F4 and F6-IC through `pdp3-binary` on eight public one-target workloads per cell, beside same-target rho. IC `S` is a lower bound (solver word XORs unpriced; F6-IC's geometric additions charged). `W` is counted solver word XORs. Prime curves have no algebraic oracle in `ecbench`. These rows remain bound to their historical binary: a 2026-10-31 current-binary all-replay audit reproduced 72/144 deterministic rows; the other 72 changed counted phase work. Read the [historical analysis](../../research/f4_f5_f6_cross_family_20261011/ANALYSIS.json) and [current-binary replay certificate](../../research/ecbench_e2e_frontier_20261031/establishment/certificate.json).
 
 | family | m | curve | base points | rho-negation S | strong rho S | inherited F4 S | F6-IC S | W F5/F4 | W F4 matrix/inherited | median log2(W inh/W F6) |
 |:--|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|
@@ -328,6 +364,40 @@ The four n37 arms (strong signed-Frobenius rho, K8, K16 and an identical K16 con
 | `icv1-f2m53-tm56619371-dac20a85` | 44.26 | ic-k16-control | 0/80 | — | — | — | A/A control |
 | `icv1-f2m53-tm56619371-dac20a85` | 44.26 | K16 / K8 | — | — | — | — | unknown (0 verified pairs) |
 
+## Structured factor-base growth screen, outside tables A–C
+
+The preregistered `EXP-PFDR-2d36f9-R2-FAM` census ran 19,887 deterministic local jobs across 30 cells and five sizes (16–32 bits). It asks whether the coincidence multiplier κ for Dickson, geometric-progression, or quadratic-progression x-bases grows with N fast enough to reach the frozen break-even slope δ* = 0.333. It does not price a complete index-calculus pipeline and has no matched rho arm.
+
+All six structured lines are valid and read `O-SUB-BE`. Their five-rung slopes range from -0.0047 to 0.0068; the largest upper 95% limit is 0.0147, far below 1/3. Self-test and controls C3–C6 pass; the null calibration is n=10, mean 0.22, sd 0.88.
+
+| family | θ | slope of log2 κ on log2 N | 95% interval | reading |
+|:--|--:|--:|:--|:--|
+| Dickson | 0.30 | -0.0047 | [-0.0130, 0.0041] | `SUB-BE` |
+| Dickson | 0.35 | -0.0014 | [-0.0088, 0.0070] | `SUB-BE` |
+| geometric progression | 0.30 | 0.0054 | [-0.0031, 0.0136] | `SUB-BE` |
+| geometric progression | 0.35 | 0.0024 | [-0.0049, 0.0098] | `SUB-BE` |
+| quadratic progression | 0.30 | 0.0066 | [-0.0017, 0.0147] | `SUB-BE` |
+| quadratic progression | 0.35 | 0.0068 | [-0.0004, 0.0144] | `SUB-BE` |
+
+This is negative structural evidence, not a performance promotion: no ranked row moves and rho is not being inferred from an unpriced component. Read the [analysis](../../research/pfdr_other_families_20261101/results/analysis-main.json) and [study limits](../../research/pfdr_other_families_20261101/README.md).
+
+## N83 four-byte root-index loop, outside tables A–C
+
+The plain four-byte ID31 root index and its packed two-bit fingerprint (FP2) variant ran in both alternating orders on the same K1107 base and public point. Every arm completed the full process, recovered the same scalar, and passed independent replay. Ratios below are plain / FP2, so values above 1 favor FP2.
+
+| order | plain / FP2 index build | plain / FP2 whole process | plain wall (s) | FP2 wall (s) |
+|:--|--:|--:|--:|--:|
+| plain → fp2 | 1.001× | 1.017× | 154.066 | 151.435 |
+| fp2 → plain | 1.493× | 1.294× | 250.171 | 193.284 |
+
+The observed index-build range is 1.001–1.493× and the whole-process range is 1.017–1.294×. The host was shared and its load varied substantially; two pairs do not select the K5500 layout. This is a correctness-backed optimization diagnostic, not a Tier 1 result or a matched-rho speedup, so no ranked row moves. Read the [study and limits](../../research/n83_fourbyte_pair_20261027/README.md).
+
+## N83 degree-two image calculus, outside tables A–C
+
+The exact `n83-image-closed-degree-two-fiber` transfer audit is `rejected_by_structural_and_cost_gates`. Generic odd-degree fibers of `phi(u,v)=(u^3,uv+1)` split into closed support degrees 1+2, but their projected labels give only `[3]P=P+[2]P`. Useful relation probability and independent rank per identity are both 0; the collector and timing stages therefore stop under the frozen protocol.
+
+The ordinary ambient genus-three scale is `(4/3)*83`, about approximately 70.17 bits above `0.5*log2(r)`. This is a scoped structural rejection, not zero-cost attack data: no wall time or speedup was measured, and no ranked row moves. A compact growing-degree or adaptive target-local router remains open. Read the [assessment](../../research/n83_image_closed_degree2_20261101/ASSESSMENT.json) and [scope](../../research/n83_image_closed_degree2_20261101/README.md).
+
 ## Prime-field baseline: factor-base size and oracle tuning (2026-10-29, engineering)
 
 Frozen protocol (backlog XP-20261016): joint choice of the low-x factor-base size N and the exact decomposition oracle, selected on train curves, decided per size on a fresh holdout curve (48 targets × 2 rounds, every arm in one session). Train picked the incumbent `ic-pair` oracle (`mitm:negation_folded=1`) at every size; only N changed. S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation. Ratios are paired Σ selected ÷ Σ incumbent with cluster-bootstrap 95% intervals.
@@ -345,7 +415,7 @@ Second-host replay (PROTOCOL.md §13): the 20-bit holdout re-executed on isolab-
 
 [Report](../../research/prime_base_oracle_tuning_20261029/README.pdf) · [study](../../research/prime_base_oracle_tuning_20261029/).
 
-validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band (research/prime_base_oracle_tuning_20261029/VALIDATION.json)
+Validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band are filed in `research/prime_base_oracle_tuning_20261029/VALIDATION.json`. The promoted result is the 20-bit `N=45` engineering baseline only; it is one curve, counted pricing-band evidence, and not a scaling or wall-time claim.
 
 ## Linear-algebra engine, outside tables A–C
 
@@ -459,6 +529,17 @@ Copied from native analysis: eight independent one-target workloads per fixed cu
 |---:|---:|---|
 | 8209 | 0.975242 | 0.603463 to 1.450934 |
 | 131101 | 1.127134 | 0.922471 to 1.341694 |
+
+## F_p Gröbner engine (`f4_fp`) in the Jacobian-cover IC
+
+Component speed-up, class engineering: `f4_fp` before and after #1717 in examples/jv_cover.rs (Nagao decompositions on a genus-2 cover of E(F_{p^6}); every decomposition one f4_fp solve), same seeds and the same relations. Both builds recorded `solved=true` and `correct=true` for every DLP row (`research/f4_fp_ic_effect_20261018`, run-20261018T1548Z); the archived rows have no recovered-scalar certificate for an independent replay. It moves no row of tables A–C. S/rho is a lower-bound comparison (unpriced native work is not emitted).
+
+| p | seed | relations | S before | S after | before ÷ after | S/rho before | S/rho after (distance to rho) |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 53 | 1 | 31 | 4734 | 936.9 | 5.05 | 4297 | 850 |
+| 53 | 2 | 33 | 2121 | 425.2 | 4.99 | 1843 | 370 |
+| 101 | 1 | 53 | 1455 | 287.5 | 5.06 | 981 | 194 |
+| 101 | 2 | 50 | 2370 | 466.4 | 5.08 | 1897 | 373 |
 
 ## GHS-weak E0/F_{q^3} with 4 | #E0(K): plane-quartic index calculus against matched rho
 
@@ -753,7 +834,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
 - `research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `c810d351d86e3b09…`
 - `research/ic_rho_reference_20260923/analysis.json` — sha256 `6fd61dd71a33b809…`
-- `docs/ic/progress-timeline.json` — sha256 `66e8e1348cc77246…`
+- `docs/ic/progress-timeline.json` — sha256 `fd19ac4eea242e74…`
 - `research/ic_candidate_tournament_20260915/runs/round-0026/measurements.json` — sha256 `0a2b51a5051bd518…`
 - `research/ic_exponent_20260926/analysis.json` — sha256 `744fd51ea01f1046…`
 - `research/ic_constructions_20260926/analysis.json` — sha256 `e0758400806dc97f…`
@@ -772,11 +853,24 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/f6_ic_geometric_closure_20261003/small_cold/replay-certificate.json` — sha256 `307f02ce84e5cb46…`
 - `research/f6_ic_ecbench_ladder_20261005/ANALYSIS.json` — sha256 `69ca54385c62a50e…`
 - `research/f4_f5_f6_cross_family_20261011/ANALYSIS.json` — sha256 `143247c6b81d3539…`
+- `research/ecbench_e2e_frontier_20261031/establishment/certificate.json` — sha256 `fb5759832dd0f80a…`
+- `research/pfdr_other_families_20261101/results/analysis-main.json` — sha256 `2ccae7f1ac7a97a8…`
+- `research/pfdr_other_families_20261101/README.md` — sha256 `2697b3eb35f65e6d…`
+- `research/n83_fourbyte_pair_20261027/runs/plain_fp2/independent_replay.json` — sha256 `dacd097373ef436c…`
+- `research/n83_fourbyte_pair_20261027/runs/fp2_plain/independent_replay.json` — sha256 `62960a9ec213b858…`
+- `research/n83_fourbyte_pair_20261027/README.md` — sha256 `51e6392e1c20509d…`
+- `research/n83_image_closed_degree2_20261101/ASSESSMENT.json` — sha256 `4064a29534615349…`
+- `research/n83_image_closed_degree2_20261101/README.md` — sha256 `6de3fa411f8c52d1…`
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
+- `research/f4_fp_ic_effect_20261018/summary.json` — sha256 `7eff13424e0e9b1a…`
+- `research/f4_fp_ic_effect_20261018/reports/run-20261018T1548Z/raw/dlp_main.json` — sha256 `bca0162f22f19c74…`
+- `research/f4_fp_ic_effect_20261018/reports/run-20261018T1548Z/raw/dlp_new.json` — sha256 `114f27cd5a3eb091…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/ecbench_lazy_orbit_members_20261018/figures/ratios.json` — sha256 `c86743775097e0e1…`
+- `research/ecbench_generator_orbit_20261022/figures/summary.json` — sha256 `c4f567d49a2875e7…`
 - `research/jv_cover_sparse_fglm_20261018/summary.json` — sha256 `4217cb1de3458ee8…`
+- `research/ecbench_lazy_columns2_20261018/figures/ratios.json` — sha256 `e97bc0f02c39695a…`
 - `research/postgb_linear_stage_20261026/analysis/summary.json` — sha256 `ef9aae284eceddb7…`
 - `research/ic_m2_linear_ladder_20261024/fit.json` — sha256 `f69558da047b752a…`
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
@@ -823,9 +917,9 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/n83_e2e_final_holdout_20261016/validated_rows.json` — sha256 `b296172d92739c4d…`
 - `research/n83_e2e_final_holdout_20261016/selection.json` — sha256 `860d24e60baa552d…`
 - `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
-- `docs/curves/registry.json` — sha256 `88390d7b472098e3…`
+- `docs/curves/registry.json` — sha256 `6dce2c6f17bb1b3b…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
-- `docs/curves/ic/curves.yaml` — sha256 `d746982903f0f87a…`
+- `docs/curves/ic/curves.yaml` — sha256 `0bbdf920814f5946…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_v1.json` — sha256 `af8cfaf233c6b992…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_aa_v1.json` — sha256 `7469d776730297e9…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_audit_v1.json` — sha256 `ed0816775b6c9ae0…`

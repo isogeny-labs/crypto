@@ -1,0 +1,51 @@
+{
+  "schema": "research.runtime-qualification-proposal/v1",
+  "status": "draft_not_frozen_not_executed",
+  "claim_class": "exact_computation",
+  "tests": [
+    "static_image_custody_modes_elf",
+    "static_inventory_positive",
+    "request_hash_negative",
+    "owner_early_hash_rejection",
+    "exact_identity_cleanup"
+  ],
+  "software_seconds_proposed": 300,
+  "cleanup_reserve_seconds": 30,
+  "active_containers_max": 1,
+  "container_pids_max": 1,
+  "container_memory_mib": 512,
+  "container_seconds_max": 20,
+  "automatic_retries": 0,
+  "final_binary_sha256": null,
+  "final_image_id": null,
+  "fixture_request_sha256": null,
+  "publication_authorized": false,
+  "scientific_execution_admitted": false,
+  "scientific_authorization": {
+    "worker_seconds": 25200,
+    "deadline_utc": "2026-10-31T06:00:00Z",
+    "scope": "planning_limits_only"
+  },
+  "direct_socket_access": false,
+  "historical_route": "bounded sudo -n docker; current availability and scoped authorization require reconciliation",
+  "full_owner_lifecycle_qualified": false,
+  "production_owner_custody_qualified": false,
+  "statistical_power": {
+    "not_applicable_reason": "fixed exact software checks, no sampling or statistical comparison"
+  },
+  "reference": "retained source and immutable artifact hashes",
+  "positive_control": "Q1 exact retained inventory",
+  "negative_controls": [
+    "Q2 wrong request hash",
+    "Q3 wrong owner config hash"
+  ],
+  "aa": {
+    "not_applicable_reason": "no timing or comparative performance claim"
+  },
+  "pending": [
+    "final binary/source and image identities",
+    "exact relocated fixture bytes and hashes",
+    "root review and executable protocol bindings",
+    "existing Docker route availability and scoped authorization"
+  ]
+}

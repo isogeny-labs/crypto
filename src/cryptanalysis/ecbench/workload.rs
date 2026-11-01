@@ -13,11 +13,13 @@
 //! (`canonical::derive_u64`), never from an RNG stream, and no solver is
 //! handed it: the runner verifies the solver's answer afterwards.
 
+use num_traits::ToPrimitive;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::sync::OnceLock;
 
 use crate::binary_ecc::IrreduciblePoly;
+use crate::cryptanalysis::ec_index_calculus_curves::CurveKind;
 use crate::cryptanalysis::ecbench::canonical::{bare_id, compat_u128, derive_u128, derive_u64};
 use crate::cryptanalysis::ecbench::conductor_gap::{self, GapLevel};
 use crate::cryptanalysis::ecbench::ext::ExtInstance;
@@ -38,6 +40,9 @@ use crate::cryptanalysis::ic_boundary::{
 use crate::cryptanalysis::isogeny_eval::counted_fp::is_prime_u64;
 use crate::cryptanalysis::koblitz_strong_rho::{RawPointG, WideStrongRho};
 use crate::cryptanalysis::koblitz_wide::WideKoblitz;
+use crate::cryptanalysis::prime_orbit_index_calculus::{
+    generate_instance, Coefficient, ScaledShape,
+};
 
 /// How to build the curve.  Each variant is a constructor the repository
 /// already has, so the registry's `generator_call` names the same curve.
@@ -47,6 +52,12 @@ pub enum CurveSpec {
     /// `ic_boundary::find_prime_order_curve(bits, seed)`: prime order,
     /// cofactor 1, `8 ≤ bits ≤ 32`.
     PrimeSearch { bits: u32, seed: u64 },
+    /// `prime_orbit_index_calculus::generate_instance`: a certified
+    /// scaled curve retaining the requested shape (`generic`,
+    /// `generic_a_minus_3`, `j0`, `j0_b7`, or `j1728`).
+    /// The runner converts it to an explicit prime curve before starting
+    /// a measured child, so curve search is never in the timed region.
+    PrimeOrbitShape { shape: String, bits: u32, seed: u64 },
     /// `ic_boundary::roster_prime_instance(bits)`: the bench roster.
     PrimeRoster { bits: u32 },
     /// `ic_boundary::koblitz_instance(a, n)`: `K_a / F_{2^n}`, `n ≤ 62`;
@@ -370,6 +381,59 @@ impl CurveSpec {
                 }
                 Ok(Instance::Prime(find_prime_order_curve(bits, seed)))
             }
+            CurveSpec::PrimeOrbitShape {
+                ref shape,
+                bits,
+                seed,
+            } => {
+                let scaled = match shape.as_str() {
+                    "generic" => ScaledShape::of_kind(CurveKind::Generic),
+                    "generic_a_minus_3" => ScaledShape {
+                        kind: CurveKind::Generic,
+                        a: Coefficient::Fixed(-3),
+                        b: Coefficient::Random,
+                        max_cofactor: 1,
+                    },
+                    "j0" => ScaledShape::of_kind(CurveKind::J0),
+                    "j0_b7" => ScaledShape {
+                        kind: CurveKind::J0,
+                        a: Coefficient::Fixed(0),
+                        b: Coefficient::Fixed(7),
+                        max_cofactor: 1,
+                    },
+                    "j1728" => ScaledShape::of_kind(CurveKind::J1728),
+                    other => {
+                        return Err(format!(
+                            "prime_orbit_shape is generic, generic_a_minus_3, j0, j0_b7 or j1728, not `{other}`"
+                        ))
+                    }
+                };
+                let generated = generate_instance(scaled, bits, Some(1), seed)?;
+                let params = generated.curve.params("ecbench-prime-orbit-shape");
+                let word = |name: &str, value: &num_bigint::BigUint| {
+                    value
+                        .to_u64()
+                        .ok_or_else(|| format!("generated {name} does not fit a word"))
+                };
+                let curve = PrimeCurve {
+                    p: word("prime", &params.p)?,
+                    a: word("a", &params.a)?,
+                    b: word("b", &params.b)?,
+                };
+                let mut instance = PrimeInstance {
+                    name: String::new(),
+                    curve,
+                    group_order: generated.certificate.group_order,
+                    r: generated.certificate.subgroup_order,
+                    cofactor: generated.certificate.cofactor,
+                    generator: (
+                        word("generator x", &params.gx)?,
+                        word("generator y", &params.gy)?,
+                    ),
+                };
+                instance.name = instance.curve_id().slug;
+                Ok(Instance::Prime(instance))
+            }
             CurveSpec::PrimeRoster { bits } => roster_prime_instance(bits)
                 .map(Instance::Prime)
                 .ok_or_else(|| format!("the bench roster has no {bits}-bit curve")),
@@ -475,10 +539,12 @@ impl CurveSpec {
                 seed,
                 max_cofactor,
             } => {
-                // Points pack into 4m ≤ 60 bits; the order search takes
-                // ≈ 2q baby and giant steps per point.
-                if !(4..=15).contains(&m) {
-                    return Err(format!("f2m4_torsion takes m from 4 to 15, not {m}"));
+                // Points pack into 4m ≤ 80 bits (one word while m ≤ 15;
+                // past that the orders are u128 and the methods go
+                // through `ic_wide`); the order search takes ≈ 2q baby
+                // and giant steps per point.
+                if !(4..=20).contains(&m) {
+                    return Err(format!("f2m4_torsion takes m from 4 to 20, not {m}"));
                 }
                 find_bin_curve(m, seed, max_cofactor).map(|c| Instance::F2m4(Box::new(c)))
             }
@@ -640,6 +706,13 @@ impl CurveSpec {
             CurveSpec::PrimeSearch { bits, seed } => {
                 format!("find_prime_order_curve({bits}, {seed})")
             }
+            CurveSpec::PrimeOrbitShape {
+                ref shape,
+                bits,
+                seed,
+            } => format!(
+                "prime_orbit_index_calculus::generate_instance({shape}, {bits}, {seed})"
+            ),
             CurveSpec::PrimeRoster { bits } => format!("roster_prime_instance({bits})"),
             CurveSpec::Koblitz { a, n } if n >= 64 => {
                 format!("WideKoblitz::new({a}, registry modulus for n = {n})")
@@ -990,7 +1063,7 @@ impl Instance {
             Instance::Wide(i) => i.kc.r,
             Instance::Fp4(i) => u128::from(i.r),
             Instance::Fp4Torsion(i) => u128::from(i.r),
-            Instance::F2m4(i) => u128::from(i.r),
+            Instance::F2m4(i) => i.r,
             Instance::Ext(i) => u128::from(i.r()),
             Instance::Genus2(i) => u128::from(i.r),
             Instance::Quartic(i) => u128::from(i.r),
@@ -1216,11 +1289,11 @@ impl Instance {
                     "extension",
                     None,
                     Some(f.f.m),
-                    u128::from(i.group_order),
-                    u128::from(i.r),
-                    u128::from(i.cofactor),
-                    u128::from(f.pack(&i.generator.x)),
-                    u128::from(f.pack(&i.generator.y)),
+                    i.group_order,
+                    i.r,
+                    i.cofactor,
+                    f.pack(&i.generator.x),
+                    f.pack(&i.generator.y),
                     2,
                 )
             }
@@ -1257,6 +1330,18 @@ impl Instance {
                 RawPointG::Affine { x, y } => Some([format!("0x{x:x}"), format!("0x{y:x}")]),
                 RawPointG::Infinity => None,
             };
+        }
+        // A curve over F_{(2^m)^4} may have a two-word order (m ≥ 16);
+        // its own u128 double-and-add gives the same point either way.
+        if let Instance::F2m4(i) = self {
+            let c = &i.curve;
+            let pt = c.mul(&i.generator, k % i.r);
+            return (!pt.inf).then(|| {
+                [
+                    format!("0x{:x}", c.f.pack(&pt.x)),
+                    format!("0x{:x}", c.f.pack(&pt.y)),
+                ]
+            });
         }
         // A one-word instance's subgroup order fits a word, so a reduced
         // scalar does too.
@@ -1344,17 +1429,13 @@ impl Instance {
         let model = model_hash(curve);
         let mut scratch = GroupOps::default();
         if let Instance::Fp4(_)
-            | Instance::Fp4Torsion(_)
-            | Instance::F2m4(_)
-            | Instance::ThreeLeads(_)
-            | Instance::Hyper(_) = self
+        | Instance::Fp4Torsion(_)
+        | Instance::F2m4(_)
+        | Instance::ThreeLeads(_)
+        | Instance::Hyper(_) = self
         {
             // Planted targets only on E(F_{p^4}), the tower, the three-leads
             // study and the hyperelliptic Jacobians: no public-target law yet.
-            return None;
-        }
-            // Planted targets only on E(F_{p⁴}) and on the hyperelliptic
-            // Jacobians: no public-target law yet.
             return None;
         }
         if let Instance::Wide(i) = self {
@@ -1454,14 +1535,23 @@ impl Instance {
                 Instance::F2m4(i) => {
                     let c = &i.curve;
                     let bits = 4 * c.f.f.m;
-                    let x = c.f.unpack(h & ((1u64 << bits) - 1));
+                    // One word of hash while 4m < 64 (every committed
+                    // target); past that a second, derived word on top.
+                    let raw = if bits < 64 {
+                        u128::from(h & ((1u64 << bits) - 1))
+                    } else {
+                        let hi = h.rotate_left(32).wrapping_mul(0x9e37_79b9_7f4a_7c15);
+                        (u128::from(h) | (u128::from(hi) << 64)) & ((1u128 << bits) - 1)
+                    };
+                    let x = c.f.unpack(raw);
                     let mut rng = <rand::rngs::StdRng as rand::SeedableRng>::seed_from_u64(h);
                     let Some(pt) = c.lift_x(&x, &mut rng) else {
                         continue;
                     };
                     let k = CountedGroup::key(c, &pt);
                     let pt = if (k & 1 == 1) != flip { pt } else { c.neg(&pt) };
-                    let q: PtB = CountedGroup::mul(c, &mut scratch, pt, i.cofactor);
+                    let cof = u64::try_from(i.cofactor).expect("a small cofactor");
+                    let q: PtB = CountedGroup::mul(c, &mut scratch, pt, cof);
                     if !q.inf {
                         return Some((
                             [
@@ -1772,6 +1862,52 @@ mod tests {
     use super::*;
 
     #[test]
+    fn prime_orbit_shapes_keep_the_requested_coefficients_and_freeze_explicitly() {
+        for (shape, seed) in [
+            ("generic_a_minus_3", 2026110101),
+            ("j0_b7", 2026110103),
+            ("j1728", 2026110105),
+        ] {
+            let spec = CurveSpec::PrimeOrbitShape {
+                shape: shape.into(),
+                bits: 14,
+                seed,
+            };
+            let instance = spec.build().unwrap();
+            let Instance::Prime(prime) = &instance else {
+                panic!("prime orbit shapes build prime instances")
+            };
+            match shape {
+                "generic_a_minus_3" => assert_eq!(prime.curve.a, prime.curve.p - 3),
+                "j0_b7" => assert_eq!((prime.curve.a, prime.curve.b), (0, 7)),
+                "j1728" => assert_eq!(prime.curve.b, 0),
+                _ => unreachable!(),
+            }
+            let frozen = spec.for_child(&instance);
+            assert!(matches!(frozen, CurveSpec::PrimeExplicit { .. }));
+            let Instance::Prime(rebuilt) = frozen.build().unwrap() else {
+                panic!()
+            };
+            assert_eq!(
+                (
+                    rebuilt.curve.p,
+                    rebuilt.curve.a,
+                    rebuilt.curve.b,
+                    rebuilt.r,
+                    rebuilt.generator,
+                ),
+                (
+                    prime.curve.p,
+                    prime.curve.a,
+                    prime.curve.b,
+                    prime.r,
+                    prime.generator,
+                )
+            );
+        }
+    }
+
+    #[test]
     fn extension_variants_have_distinct_constructors_and_subgroup_arithmetic() {
         for spec in [
             CurveSpec::Fp4Torsion {
@@ -1795,18 +1931,15 @@ mod tests {
             assert!(inst.mul_generator_hex(0).is_none());
             assert!(inst.mul_generator_hex(inst.r()).is_none());
             assert!(inst.mul_generator_hex(2).is_some());
-            let target = inst.hash_to_subgroup(&facts, 1, 0);
-            if matches!(&inst, Instance::Fp4(_)) {
-                assert!(
-                    target.is_none(),
-                    "translation public-target law is unavailable"
-                );
-            } else {
-                let (target, counter) = target.expect("torsion public-target law from main");
-                assert_eq!(
-                    inst.hash_to_subgroup(&facts, 1, 0),
-                    Some((target.clone(), counter))
-                );
+            assert!(
+                inst.hash_to_subgroup(&facts, 1, 0).is_none(),
+                "quartic translation and torsion variants retain planted-only policy"
+            );
+            if !matches!(&inst, Instance::Fp4(_)) {
+                // Check subgroup arithmetic on the known fixture 2G, without
+                // enabling the deliberately unavailable public-target route.
+                let target = inst.mul_generator_hex(2).unwrap();
+                assert_eq!(inst.mul_generator_hex(2), Some(target.clone()));
                 let x = u64::from_str_radix(target[0].trim_start_matches("0x"), 16).unwrap();
                 let y = u64::from_str_radix(target[1].trim_start_matches("0x"), 16).unwrap();
                 let mut scratch = GroupOps::default();
@@ -1824,12 +1957,20 @@ mod tests {
                     Instance::F2m4(i) => {
                         let c = &i.curve;
                         let point = crate::cryptanalysis::gaudry_quartic_bin::PtB {
-                            x: c.f.unpack(x),
-                            y: c.f.unpack(y),
+                            x: c.f.unpack(u128::from(x)),
+                            y: c.f.unpack(u128::from(y)),
                             inf: false,
                         };
                         assert!(c.on_curve(&point));
-                        assert!(CountedGroup::mul(c, &mut scratch, point, i.r).inf);
+                        assert!(
+                            CountedGroup::mul(
+                                c,
+                                &mut scratch,
+                                point,
+                                u64::try_from(i.r).expect("small test subgroup order"),
+                            )
+                            .inf
+                        );
                     }
                     _ => unreachable!(),
                 }

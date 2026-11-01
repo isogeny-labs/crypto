@@ -1,0 +1,24 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage[T1]{fontenc}
+\begin{document}
+\section*{Independent add11 distinct review}
+31 October 2026 UTC. Scope: unit-weight field formula, normalized divisor validity and distinct-input branch selection.
+
+\textbf{Checks.} All 52 producer manifest entries match. Private Add11, producer Controls, separate Readback and ReviewerControls compilations exited 0. Four non-fatal unnecessarySeqFocus warnings are retained. Axiom readback contains only propext, Classical.choice and Quot.sound.
+
+\textbf{Source correspondence.} With unit weights, Rust add11 yields
+\[q=-(x_1+x_2),\quad r=x_1x_2,\quad s=y_1-y_2,\quad t=x_1y_2-x_2y_1,\]
+\[z=1,\qquad w=x_1-x_2.\]
+Distinct $x$ excludes both guards, which test inverse before doubling, and satisfies the source assertion. The formal output retains this field specialization.
+
+\textbf{Derivation.} The support polynomial is $(X-x_1)(X-x_2)$ and $v=(sX+t)/w$ interpolates the two input values. The proof factors $v-y_i$ by $X-x_i$, transfers input support divisibility to $f-v^2$, and explicitly constructs a constant Bezout identity to combine distinct factors. It establishes nonzero weights and normalized output validity without assuming coefficient identities or the desired product divisibility.
+
+\textbf{Controls.} Producer tests instantiate full validity on $X^5-X+1$ with points $(0,1),(1,1)$ and check inverse precedence, doubling and equal-$x$ denominator. Reviewer tests add a full nonzero-slope instance on $X^5-X+X^2$ with points $(0,0),(1,1)$. All compile successfully.
+
+\textbf{Classifier boundary.} A reviewer control shows that invalid equal-$x$ points $(0,1),(0,2)$ fall through the modeled classifier to distinct, while Rust then asserts unequal $x$. The theorem requires distinct $x$, so this is outside its premises; it prevents reading the model as a total native classifier correspondence.
+
+\textbf{Scope.} No blocking discrepancy was found. An explicit prospective amendment uses degree-one support divisibility instead of an unavailable evaluation API. Native Jacobian validity refinement remains external. This is not a machine-word, generic weighted, class-sum or whole-walk theorem. No scientific run or cost measurement occurred.
+
+Artifacts: PLAN.md, review.json, REVIEW.md, overview.svg, replay/ sources and separate native receipts/readback. Producer failures remain in the unchanged source packet.
+\end{document}

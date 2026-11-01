@@ -1,0 +1,129 @@
+TwistEmbedding.lean:13:3: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  OfNat F 0
+numerals are polymorphic in Lean, but the numeral `0` cannot be used in a context where the expected type is
+  F
+due to the absence of the instance above
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+TwistEmbedding.lean:13:6: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  OfNat F 0
+numerals are polymorphic in Lean, but the numeral `0` cannot be used in a context where the expected type is
+  F
+due to the absence of the instance above
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+TwistEmbedding.lean:13:9: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  OfNat F 0
+numerals are polymorphic in Lean, but the numeral `0` cannot be used in a context where the expected type is
+  F
+due to the absence of the instance above
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+TwistEmbedding.lean:18:0: warning: automatically included section variable(s) unused in theorem `TwistEmbedding.nonsquare_ne_zero`:
+  [Fintype k]
+  [DecidableEq k]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Fintype k] [DecidableEq k] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+TwistEmbedding.lean:22:0: warning: automatically included section variable(s) unused in theorem `TwistEmbedding.frobenius_root_neg`:
+  [DecidableEq K]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [DecidableEq K] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+TwistEmbedding.lean:41:37: error: Type mismatch
+  map_ne_zero ?m.77
+has type
+  ?m.77 ?m.78 ≠ 0 ↔ ?m.78 ≠ 0
+but is expected to have type
+  (algebraMap k K) d ≠ 0
+TwistEmbedding.lean:41:49: error: Application type mismatch: The argument
+  hd
+has type
+  d ≠ 0
+of sort `Prop` but is expected to have type
+  ?m.71
+of sort `Type ?u.75` in the application
+  @map_ne_zero ?m.69 ?m.70 ?m.71 ?m.72 ?m.73 ?m.74 ?m.75 ?m.76 hd
+TwistEmbedding.lean:59:19: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  WeierstrassCurve.IsElliptic (short a b)⁄K
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+TwistEmbedding.lean:68:9: error: unsolved goals
+case zero
+k : Type u_1
+K : Type u_2
+inst✝⁶ : Field k
+inst✝⁵ : Fintype k
+inst✝⁴ : Field K
+inst✝³ : Algebra k K
+inst✝² : DecidableEq k
+inst✝¹ : DecidableEq K
+a b d : k
+inst✝ : WeierstrassCurve.IsElliptic (short a b)
+hchar : ringChar k ≠ 2
+hd : ¬IsSquare d
+u : K
+hu : u ^ 2 = (algebraMap k K) d
+⊢ (Point.map (FiniteField.frobeniusAlgHom k K)) Point.zero = -Point.zero
+TwistEmbedding.lean:72:4: error: Tactic `constructor` failed: no applicable constructor found
+
+case some
+k : Type u_1
+K : Type u_2
+inst✝⁶ : Field k
+inst✝⁵ : Fintype k
+inst✝⁴ : Field K
+inst✝³ : Algebra k K
+inst✝² : DecidableEq k
+inst✝¹ : DecidableEq K
+a b d : k
+inst✝ : WeierstrassCurve.IsElliptic (short a b)
+hchar : ringChar k ≠ 2
+hd : ¬IsSquare d
+u : K
+hu : u ^ 2 = (algebraMap k K) d
+x y : k
+h : (twist a b d).Nonsingular x y
+⊢ (Point.map (FiniteField.frobeniusAlgHom k K)) sorry = -sorry
+TwistEmbedding.lean:68:18: warning: declaration uses `sorry`
+TwistEmbedding.lean:68:56: warning: This simp argument is unused:
+  Point.zero_def
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [lift, FrobeniusBridge.curveFrobenius]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+TwistEmbedding.lean:70:21: warning: This simp argument is unused:
+  Point.mk
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [lift, FrobeniusBridge.curveFrobenius, Point.map_some, Point.neg_some, Point.some.injEq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+TwistEmbedding.lean:70:63: warning: This simp argument is unused:
+  Point.map_some
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [lift, Point.mk, FrobeniusBridge.curveFrobenius, Point.neg_some, Point.some.injEq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+TwistEmbedding.lean:71:6: warning: This simp argument is unused:
+  Point.neg_some
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [lift, Point.mk, FrobeniusBridge.curveFrobenius, Point.map_some, Point.some.injEq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+TwistEmbedding.lean:71:22: warning: This simp argument is unused:
+  Point.some.injEq
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [lift, Point.mk, FrobeniusBridge.curveFrobenius, Point.map_some, Point.neg_some]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+'TwistEmbedding.nonsquare_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'TwistEmbedding.frobenius_root_neg' depends on axioms: [propext, Classical.choice, Quot.sound]
+'TwistEmbedding.twist_image_equation' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'TwistEmbedding.frobenius_lift_neg' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

@@ -1,0 +1,308 @@
+CELL n13a0
+FILE research/ecbench_batched_screen_20261101/sessions/n13a0/host.json 3739
+FILE research/ecbench_batched_screen_20261101/sessions/n13a0/plan.json 287151
+FILE research/ecbench_batched_screen_20261101/sessions/n13a0/records.jsonl 17681040
+FILE research/ecbench_batched_screen_20261101/sessions/n13a0/session.json 1996
+FILE research/ecbench_batched_screen_20261101/sessions/n13a0/spec.json 2938
+FILE research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b1.json 16678
+FILE research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b128.json 16717
+FILE research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b16.json 16670
+FILE research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b2.json 16682
+FILE research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b256.json 16683
+FILE research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b32.json 16719
+FILE research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b4.json 16681
+FILE research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b64-aa.json 15760
+FILE research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b8.json 16677
+FILE research/ecbench_batched_screen_20261101/audits/n13a0.gate.txt 193
+FILE research/ecbench_batched_screen_20261101/audits/n13a0.verify.stderr.txt 75
+FILE research/ecbench_batched_screen_20261101/audits/n13a0.verify.txt 162071
+FILE research/ecbench_batched_screen_20261101/tables/n13a0.table.txt 2938
+FILE research/ecbench_batched_screen_20261101/comparisons/n13a0/aa-gate.txt 171
+FILE research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b1.txt 4568
+FILE research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b128.txt 4614
+FILE research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b16.txt 4573
+FILE research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b2.txt 4568
+FILE research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b256.txt 4614
+FILE research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b32.txt 4606
+FILE research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b4.txt 4567
+FILE research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b64-aa.txt 4582
+FILE research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b8.txt 4567
+VERDICT n13a0 audit OK: 1600 records, 1600 verified, 1280 replays reproduced, 0 problems
+AUDIT-JSON n13a0 ok True session_status complete records 1600 verified_records 1600 problems 0
+AA-TEXT n13a0
+ops (ok): ic-b64-aa / ic-b64 = 1.0000 [1.000, 1.000] (linearised_t, df 31) over 128 pairs on 32 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.0000, w=0.1: n/a, w=1: n/a): unrankable (uncounted unpriced work); wall: admitted ns/GAE ic-b64-aa/ic-b64 1.0099 [0.962, 1.061], an A/A control (nothing to correct); end-to-end wall 1.0099 [0.962, 1.061]; ns/GAE of ic-b64, ic-b64-aa is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 0 / 100; paired attempts 128, verified 128, admitted 0; levels {"L0": 128}; p95 foreign busy unknown%, p95 run queue 0.00%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2; contention telemetry is incomplete
+arm ic-b64: verified 128/128 (0 censored); max/median S 1.00, top run 1% of total; unpriced: field_arithmetic_uncharged=uncounted, frobenius_maps_uncharged=229120, hash_and_allocation_uncharged=uncounted, la_row_ops_uncharged=195898, modular_combination_uncharged=uncounted, pair_bucket_reads_uncharged=1522560, pair_filter_probes_uncharged=16640, vector_declined_lanes_uncharged=uncounted
+arm ic-b64-aa: verified 128/128 (0 censored); max/median S 1.00, top run 1% of total; unpriced: field_arithmetic_uncharged=uncounted, frobenius_maps_uncharged=229120, hash_and_allocation_uncharged=uncounted, la_row_ops_uncharged=195898, modular_combination_uncharged=uncounted, pair_bucket_reads_uncharged=1522560, pair_filter_probes_uncharged=16640, vector_declined_lanes_uncharged=uncounted
+| curve | log2 r | workloads | ic-b64-aa / ic-b64 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m13-t181-515ee569 | 10.97 | 32 | 1.0000 | [1.0000, 1.0000] | linearised_t |
+
+| workload | curve | log2 r | ic-b64 mean S | ic-b64-aa mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W133a57cb18d0 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.4358 | 1329.4358 | 1.0000 |
+| W1a06dac71990 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.1509 | 1329.1509 | 1.0000 |
+| W1ce6a4fa7e4d | icv1-f2m13-t181-515ee569 | 10.97 | 1328.7711 | 1328.7711 | 1.0000 |
+| W29c2a22772b0 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.0504 | 1329.0504 | 1.0000 |
+| W2dfb675a1ebf | icv1-f2m13-t181-515ee569 | 10.97 | 1329.5028 | 1329.5028 | 1.0000 |
+| W35418bbf6bee | icv1-f2m13-t181-515ee569 | 10.97 | 1329.1174 | 1329.1174 | 1.0000 |
+| W3755fa01cbd0 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.8771 | 1329.8771 | 1.0000 |
+| W3d0bccb17870 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.5979 | 1328.5979 | 1.0000 |
+| W49cae2f53432 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.2963 | 1328.2963 | 1.0000 |
+| W49effbf55306 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.4358 | 1329.4358 | 1.0000 |
+| W5942c4a18d2f | icv1-f2m13-t181-515ee569 | 10.97 | 1328.8437 | 1328.8437 | 1.0000 |
+| W5f9a1d68304f | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7710 | 1329.7710 | 1.0000 |
+| W60b84d2e7bfb | icv1-f2m13-t181-515ee569 | 10.97 | 1329.0224 | 1329.0224 | 1.0000 |
+| W8915940c4cb3 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.9720 | 1329.9720 | 1.0000 |
+| W9713fa0c64c9 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.8773 | 1327.8773 | 1.0000 |
+| W988c19ee5cc3 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.8604 | 1328.8604 | 1.0000 |
+| Wa36f958d46c7 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.3855 | 1329.3855 | 1.0000 |
+| Wa80439720178 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6369 | 1329.6369 | 1.0000 |
+| Wb369860844b9 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.4136 | 1328.4136 | 1.0000 |
+| Wb948adcd0166 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.1900 | 1329.1900 | 1.0000 |
+| Wb96672143b21 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.5644 | 1328.5644 | 1.0000 |
+| Wb98496f749cb | icv1-f2m13-t181-515ee569 | 10.97 | 1330.2569 | 1330.2569 | 1.0000 |
+| Wc4dfe486c105 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6872 | 1329.6872 | 1.0000 |
+| Wc53c0c628082 | icv1-f2m13-t181-515ee569 | 10.97 | 1326.5925 | 1326.5925 | 1.0000 |
+| Wcbf4684f61a1 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.9051 | 1328.9051 | 1.0000 |
+| Wd1394f9346ed | icv1-f2m13-t181-515ee569 | 10.97 | 1328.6705 | 1328.6705 | 1.0000 |
+| We04998039864 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.9276 | 1327.9276 | 1.0000 |
+| Web7c1ded2e31 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2012 | 1329.2012 | 1.0000 |
+| Wf872ae998b11 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7151 | 1329.7151 | 1.0000 |
+| Wfc5f3e005896 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.0616 | 1328.0616 | 1.0000 |
+| Wfd272fdb798e | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2626 | 1329.2626 | 1.0000 |
+| Wfd9ae173df7c | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7486 | 1329.7486 | 1.0000 |
+
+AA-JSON n13a0 ops.ratio_b_over_a 1.0 ops.ci95 [1.0, 1.0]
+CELL n17a1
+FILE research/ecbench_batched_screen_20261101/sessions/n17a1/host.json 3739
+FILE research/ecbench_batched_screen_20261101/sessions/n17a1/plan.json 287616
+FILE research/ecbench_batched_screen_20261101/sessions/n17a1/records.jsonl 17708664
+FILE research/ecbench_batched_screen_20261101/sessions/n17a1/session.json 1996
+FILE research/ecbench_batched_screen_20261101/sessions/n17a1/spec.json 2948
+FILE research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b1.json 16804
+FILE research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b128.json 16768
+FILE research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b16.json 16777
+FILE research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b2.json 16781
+FILE research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b256.json 16770
+FILE research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b32.json 16790
+FILE research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b4.json 16787
+FILE research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b64-aa.json 15828
+FILE research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b8.json 16780
+FILE research/ecbench_batched_screen_20261101/audits/n17a1.gate.txt 193
+FILE research/ecbench_batched_screen_20261101/audits/n17a1.verify.stderr.txt 75
+FILE research/ecbench_batched_screen_20261101/audits/n17a1.verify.txt 162071
+FILE research/ecbench_batched_screen_20261101/tables/n17a1.table.txt 2932
+FILE research/ecbench_batched_screen_20261101/comparisons/n17a1/aa-gate.txt 171
+FILE research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b1.txt 4569
+FILE research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b128.txt 4583
+FILE research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b16.txt 4575
+FILE research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b2.txt 4569
+FILE research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b256.txt 4584
+FILE research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b32.txt 4577
+FILE research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b4.txt 4569
+FILE research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b64-aa.txt 4551
+FILE research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b8.txt 4568
+VERDICT n17a1 audit OK: 1600 records, 1600 verified, 1280 replays reproduced, 0 problems
+AUDIT-JSON n17a1 ok True session_status complete records 1600 verified_records 1600 problems 0
+AA-TEXT n17a1
+ops (ok): ic-b64-aa / ic-b64 = 1.0000 [1.000, 1.000] (linearised_t, df 31) over 128 pairs on 32 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.0000, w=0.1: n/a, w=1: n/a): unrankable (uncounted unpriced work); wall: admitted ns/GAE ic-b64-aa/ic-b64 0.9962 [0.946, 1.049], an A/A control (nothing to correct); end-to-end wall 0.9962 [0.946, 1.049]; ns/GAE of ic-b64, ic-b64-aa is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 0 / 100; paired attempts 128, verified 128, admitted 0; levels {"L0": 128}; p95 foreign busy unknown%, p95 run queue 0.00%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2; contention telemetry is incomplete
+arm ic-b64: verified 128/128 (0 censored); max/median S 1.00, top run 1% of total; unpriced: field_arithmetic_uncharged=uncounted, frobenius_maps_uncharged=339968, hash_and_allocation_uncharged=uncounted, la_row_ops_uncharged=327493, modular_combination_uncharged=uncounted, pair_bucket_reads_uncharged=2271427, pair_filter_probes_uncharged=28827, vector_declined_lanes_uncharged=uncounted
+arm ic-b64-aa: verified 128/128 (0 censored); max/median S 1.00, top run 1% of total; unpriced: field_arithmetic_uncharged=uncounted, frobenius_maps_uncharged=339968, hash_and_allocation_uncharged=uncounted, la_row_ops_uncharged=327493, modular_combination_uncharged=uncounted, pair_bucket_reads_uncharged=2271427, pair_filter_probes_uncharged=28827, vector_declined_lanes_uncharged=uncounted
+| curve | log2 r | workloads | ic-b64-aa / ic-b64 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m17-tm101-00378d4e | 16.00 | 32 | 1.0000 | [1.0000, 1.0000] | linearised_t |
+
+| workload | curve | log2 r | ic-b64 mean S | ic-b64-aa mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W047fd77c3fbc | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5515 | 442.5515 | 1.0000 |
+| W0727ce63b458 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4109 | 442.4109 | 1.0000 |
+| W095da1236c66 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4119 | 442.4119 | 1.0000 |
+| W0ec189de34d8 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4724 | 442.4724 | 1.0000 |
+| W0f773472f577 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5154 | 442.5154 | 1.0000 |
+| W12f11c16af04 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3621 | 442.3621 | 1.0000 |
+| W187f16ecbec4 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3543 | 442.3543 | 1.0000 |
+| W28a9fa1d5a91 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3162 | 442.3162 | 1.0000 |
+| W28cf5ff7a455 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4304 | 442.4304 | 1.0000 |
+| W319303a8f90e | icv1-f2m17-tm101-00378d4e | 16.00 | 442.1210 | 442.1210 | 1.0000 |
+| W3e39e4f6f619 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4841 | 442.4841 | 1.0000 |
+| W45cfc0c805dc | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4138 | 442.4138 | 1.0000 |
+| W63197d97fd44 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5232 | 442.5232 | 1.0000 |
+| W63790eab5880 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3494 | 442.3494 | 1.0000 |
+| W65a1d9f1e3ec | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3601 | 442.3601 | 1.0000 |
+| W8085a34456ac | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3133 | 442.3133 | 1.0000 |
+| W84f38f367a88 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4568 | 442.4568 | 1.0000 |
+| W9f7d4e217843 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3660 | 442.3660 | 1.0000 |
+| Wa1e594b3d8fb | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4656 | 442.4656 | 1.0000 |
+| Wa6a08c3ef4b6 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4519 | 442.4519 | 1.0000 |
+| Wc1f932a711ee | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3426 | 442.3426 | 1.0000 |
+| Wc26d80f04f2e | icv1-f2m17-tm101-00378d4e | 16.00 | 442.2986 | 442.2986 | 1.0000 |
+| Wc3e5f287d2b7 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4089 | 442.4089 | 1.0000 |
+| Wccde4d6ee330 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5300 | 442.5300 | 1.0000 |
+| Wcf8afdf96425 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3221 | 442.3221 | 1.0000 |
+| Wd5c046863dba | icv1-f2m17-tm101-00378d4e | 16.00 | 442.2859 | 442.2859 | 1.0000 |
+| Wd61425e67a3f | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4587 | 442.4587 | 1.0000 |
+| We6158014a30d | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3289 | 442.3289 | 1.0000 |
+| Wf176fb2fe0e5 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5671 | 442.5671 | 1.0000 |
+| Wf47297ef2e1e | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4207 | 442.4207 | 1.0000 |
+| Wf85df2fb0f51 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3465 | 442.3465 | 1.0000 |
+| Wf98c31479f9b | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4656 | 442.4656 | 1.0000 |
+
+AA-JSON n17a1 ops.ratio_b_over_a 1.0 ops.ci95 [1.0, 1.0]
+CELL n19a0
+FILE research/ecbench_batched_screen_20261101/sessions/n19a0/host.json 3739
+FILE research/ecbench_batched_screen_20261101/sessions/n19a0/plan.json 287642
+FILE research/ecbench_batched_screen_20261101/sessions/n19a0/records.jsonl 17705866
+FILE research/ecbench_batched_screen_20261101/sessions/n19a0/session.json 1996
+FILE research/ecbench_batched_screen_20261101/sessions/n19a0/spec.json 2948
+FILE research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b1.json 16753
+FILE research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b128.json 16754
+FILE research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b16.json 16755
+FILE research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b2.json 16750
+FILE research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b256.json 16729
+FILE research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b32.json 16756
+FILE research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b4.json 16749
+FILE research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b64-aa.json 15805
+FILE research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b8.json 16748
+FILE research/ecbench_batched_screen_20261101/audits/n19a0.gate.txt 193
+FILE research/ecbench_batched_screen_20261101/audits/n19a0.verify.stderr.txt 75
+FILE research/ecbench_batched_screen_20261101/audits/n19a0.verify.txt 162071
+FILE research/ecbench_batched_screen_20261101/tables/n19a0.table.txt 2922
+FILE research/ecbench_batched_screen_20261101/comparisons/n19a0/aa-gate.txt 171
+FILE research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b1.txt 4535
+FILE research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b128.txt 4550
+FILE research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b16.txt 4542
+FILE research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b2.txt 4536
+FILE research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b256.txt 4552
+FILE research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b32.txt 4544
+FILE research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b4.txt 4535
+FILE research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b64-aa.txt 4518
+FILE research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b8.txt 4535
+VERDICT n19a0 audit OK: 1600 records, 1600 verified, 1280 replays reproduced, 0 problems
+AUDIT-JSON n19a0 ok True session_status complete records 1600 verified_records 1600 problems 0
+AA-TEXT n19a0
+ops (ok): ic-b64-aa / ic-b64 = 1.0000 [1.000, 1.000] (linearised_t, df 31) over 128 pairs on 32 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.0000, w=0.1: n/a, w=1: n/a): unrankable (uncounted unpriced work); wall: admitted ns/GAE ic-b64-aa/ic-b64 1.0056 [0.963, 1.050], an A/A control (nothing to correct); end-to-end wall 1.0056 [0.963, 1.050]; ns/GAE of ic-b64, ic-b64-aa is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 0 / 100; paired attempts 128, verified 128, admitted 0; levels {"L0": 128}; p95 foreign busy unknown%, p95 run queue 0.00%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2; contention telemetry is incomplete
+arm ic-b64: verified 128/128 (0 censored); max/median S 1.00, top run 1% of total; unpriced: field_arithmetic_uncharged=uncounted, frobenius_maps_uncharged=380928, hash_and_allocation_uncharged=uncounted, la_row_ops_uncharged=315069, modular_combination_uncharged=uncounted, pair_bucket_reads_uncharged=2537820, pair_filter_probes_uncharged=37695, vector_declined_lanes_uncharged=uncounted
+arm ic-b64-aa: verified 128/128 (0 censored); max/median S 1.00, top run 1% of total; unpriced: field_arithmetic_uncharged=uncounted, frobenius_maps_uncharged=380928, hash_and_allocation_uncharged=uncounted, la_row_ops_uncharged=315069, modular_combination_uncharged=uncounted, pair_bucket_reads_uncharged=2537820, pair_filter_probes_uncharged=37695, vector_declined_lanes_uncharged=uncounted
+| curve | log2 r | workloads | ic-b64-aa / ic-b64 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m19-t797-b6cf2467 | 17.00 | 32 | 1.0000 | [1.0000, 1.0000] | linearised_t |
+
+| workload | curve | log2 r | ic-b64 mean S | ic-b64-aa mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W04dc09c96b64 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6194 | 376.6194 | 1.0000 |
+| W275e5a40bf84 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5911 | 376.5911 | 1.0000 |
+| W28764392338a | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6319 | 376.6319 | 1.0000 |
+| W34e942bdcdf9 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4702 | 376.4702 | 1.0000 |
+| W37caef33acf1 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5759 | 376.5759 | 1.0000 |
+| W39b65efa3537 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5441 | 376.5441 | 1.0000 |
+| W4c9c39a19223 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5158 | 376.5158 | 1.0000 |
+| W52b57a940f71 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6567 | 376.6567 | 1.0000 |
+| W55d5fa774e1e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6367 | 376.6367 | 1.0000 |
+| W561e7f951026 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.7245 | 376.7245 | 1.0000 |
+| W5874fabbe0f1 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5420 | 376.5420 | 1.0000 |
+| W67c754843634 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5455 | 376.5455 | 1.0000 |
+| W6a3f54af3eae | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6671 | 376.6671 | 1.0000 |
+| W845c0c01f882 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5552 | 376.5552 | 1.0000 |
+| W866579fbd92b | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.7791 | 376.7791 | 1.0000 |
+| W8794da23d18d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5448 | 376.5448 | 1.0000 |
+| W8c00090ce95f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5911 | 376.5911 | 1.0000 |
+| W8dbc90c05ace | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5856 | 376.5856 | 1.0000 |
+| W903fa611153e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4916 | 376.4916 | 1.0000 |
+| W916437ae5228 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5683 | 376.5683 | 1.0000 |
+| W92f7b96aa2da | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5026 | 376.5026 | 1.0000 |
+| Wa0ac4757b2ad | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6091 | 376.6091 | 1.0000 |
+| Wa4467c780295 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5185 | 376.5185 | 1.0000 |
+| Waa8dabb4ea1d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5876 | 376.5876 | 1.0000 |
+| Wb4792e82c500 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6291 | 376.6291 | 1.0000 |
+| Wb55a289b1b58 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4909 | 376.4909 | 1.0000 |
+| Wb9565fe79765 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5310 | 376.5310 | 1.0000 |
+| Wba900ac81694 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6084 | 376.6084 | 1.0000 |
+| Wc1cbf83f36c9 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6270 | 376.6270 | 1.0000 |
+| Wcb07d3656adc | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5593 | 376.5593 | 1.0000 |
+| Weda39558ff0e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5165 | 376.5165 | 1.0000 |
+| Wf84fd913b05f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6160 | 376.6160 | 1.0000 |
+
+AA-JSON n19a0 ops.ratio_b_over_a 1.0 ops.ci95 [1.0, 1.0]
+CELL n23a0
+FILE research/ecbench_batched_screen_20261101/sessions/n23a0/host.json 3739
+FILE research/ecbench_batched_screen_20261101/sessions/n23a0/plan.json 287862
+FILE research/ecbench_batched_screen_20261101/sessions/n23a0/records.jsonl 17745071
+FILE research/ecbench_batched_screen_20261101/sessions/n23a0/session.json 1996
+FILE research/ecbench_batched_screen_20261101/sessions/n23a0/spec.json 2948
+FILE research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b1.json 16837
+FILE research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b128.json 16850
+FILE research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b16.json 16856
+FILE research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b2.json 16840
+FILE research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b256.json 16855
+FILE research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b32.json 16861
+FILE research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b4.json 16843
+FILE research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b64-aa.json 15896
+FILE research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b8.json 16835
+FILE research/ecbench_batched_screen_20261101/audits/n23a0.gate.txt 193
+FILE research/ecbench_batched_screen_20261101/audits/n23a0.verify.stderr.txt 75
+FILE research/ecbench_batched_screen_20261101/audits/n23a0.verify.txt 162071
+FILE research/ecbench_batched_screen_20261101/tables/n23a0.table.txt 2923
+FILE research/ecbench_batched_screen_20261101/comparisons/n23a0/aa-gate.txt 171
+FILE research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b1.txt 4555
+FILE research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b128.txt 4585
+FILE research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b16.txt 4577
+FILE research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b2.txt 4559
+FILE research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b256.txt 4587
+FILE research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b32.txt 4579
+FILE research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b4.txt 4566
+FILE research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b64-aa.txt 4553
+FILE research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b8.txt 4568
+VERDICT n23a0 audit OK: 1600 records, 1600 verified, 1280 replays reproduced, 0 problems
+AUDIT-JSON n23a0 ok True session_status complete records 1600 verified_records 1600 problems 0
+AA-TEXT n23a0
+ops (ok): ic-b64-aa / ic-b64 = 1.0000 [1.000, 1.000] (linearised_t, df 31) over 128 pairs on 32 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.0000, w=0.1: n/a, w=1: n/a): unrankable (uncounted unpriced work); wall: admitted ns/GAE ic-b64-aa/ic-b64 0.9779 [0.930, 1.028], an A/A control (nothing to correct); end-to-end wall 0.9779 [0.930, 1.028]; ns/GAE of ic-b64, ic-b64-aa is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 0 / 100; paired attempts 128, verified 128, admitted 0; levels {"L0": 128}; p95 foreign busy unknown%, p95 run queue 0.00%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2; contention telemetry is incomplete
+arm ic-b64: verified 128/128 (0 censored); max/median S 1.00, top run 1% of total; unpriced: field_arithmetic_uncharged=uncounted, frobenius_maps_uncharged=462848, hash_and_allocation_uncharged=uncounted, la_row_ops_uncharged=502418, modular_combination_uncharged=uncounted, pair_bucket_reads_uncharged=3003255, pair_filter_probes_uncharged=383746, vector_declined_lanes_uncharged=uncounted
+arm ic-b64-aa: verified 128/128 (0 censored); max/median S 1.00, top run 1% of total; unpriced: field_arithmetic_uncharged=uncounted, frobenius_maps_uncharged=462848, hash_and_allocation_uncharged=uncounted, la_row_ops_uncharged=502418, modular_combination_uncharged=uncounted, pair_bucket_reads_uncharged=3003255, pair_filter_probes_uncharged=383746, vector_declined_lanes_uncharged=uncounted
+| curve | log2 r | workloads | ic-b64-aa / ic-b64 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m23-t5197-69e76b73 | 21.00 | 32 | 1.0000 | [1.0000, 1.0000] | linearised_t |
+
+| workload | curve | log2 r | ic-b64 mean S | ic-b64-aa mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W0056c23cd311 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0331 | 130.0331 | 1.0000 |
+| W07d8864b17f2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.6128 | 129.6128 | 1.0000 |
+| W19692d22fd28 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7043 | 129.7043 | 1.0000 |
+| W1de600b9d63a | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0126 | 130.0126 | 1.0000 |
+| W26b75268c81c | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0803 | 130.0803 | 1.0000 |
+| W38a2bff5ba5c | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9844 | 129.9844 | 1.0000 |
+| W3e9859dda3f0 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9915 | 129.9915 | 1.0000 |
+| W59dba6d460e5 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8613 | 129.8613 | 1.0000 |
+| W65d92d49ff88 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9839 | 129.9839 | 1.0000 |
+| W6c8047f0680a | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7361 | 129.7361 | 1.0000 |
+| W6ec85adda007 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0589 | 130.0589 | 1.0000 |
+| W76acf45c26e0 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0728 | 130.0728 | 1.0000 |
+| W861885a011fb | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7238 | 129.7238 | 1.0000 |
+| W8c6e802e1fe1 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0713 | 130.0713 | 1.0000 |
+| W8ed16cb960f0 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.2282 | 129.2282 | 1.0000 |
+| W996bf0ab8653 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.1468 | 130.1468 | 1.0000 |
+| W9fef0dc3ce91 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0519 | 130.0519 | 1.0000 |
+| Wab248e9c4cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.5967 | 129.5967 | 1.0000 |
+| Wae253fbf4cff | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7537 | 129.7537 | 1.0000 |
+| Wae78a69bfe1a | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7180 | 129.7180 | 1.0000 |
+| Wb973a5dc17fb | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8473 | 129.8473 | 1.0000 |
+| Wc3efc9bbaf8f | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0483 | 130.0483 | 1.0000 |
+| Wc4d776b066da | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9195 | 129.9195 | 1.0000 |
+| Wcada2793e8e3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.6644 | 129.6644 | 1.0000 |
+| Wdb98621d3c25 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7295 | 129.7295 | 1.0000 |
+| Wde14e2db4679 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7513 | 129.7513 | 1.0000 |
+| Web66ce7183ee | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8382 | 129.8382 | 1.0000 |
+| Wefda032857c3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9014 | 129.9014 | 1.0000 |
+| Wf5f1893d1cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9413 | 129.9413 | 1.0000 |
+| Wfa2fea42dad4 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8696 | 129.8696 | 1.0000 |
+| Wfd0f96cf9cfe | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9722 | 129.9722 | 1.0000 |
+| Wffcb55890c2b | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.2101 | 130.2101 | 1.0000 |
+
+AA-JSON n23a0 ops.ratio_b_over_a 1.0 ops.ci95 [1.0, 1.0]
