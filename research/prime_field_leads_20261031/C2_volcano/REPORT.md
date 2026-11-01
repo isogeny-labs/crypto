@@ -98,3 +98,19 @@ Every attempted cell is listed in the CSV files named above, including the 11 M 
 Directories `S_ctrl_a0` and `S_ctrl_b0` hold two extra S-instance control runs (4 cells each, all completed, max step degree 20, identical
 trajectories on crater and floor within each directory). Their construction is not described in the frozen text or in the logs kept, so they
 are listed here but not interpreted and not used in the decision.
+
+## Rerun 2026-11-01: msolve leg on M to completion (appended; the sections above are unchanged)
+
+Plan `../rerun_20261101/RERUN_PLAN.md`, report `../rerun_20261101/REPORT.md`, data
+`../rerun_20261101/C2_M/`. The committed M inputs ran with msolve 0.6.5, exact
+sparse/dense kernel (`-l 1`), cap 3600 s. On the S instance this kernel reproduces all
+32 cells above, reduced bases included; on M it reproduces all 16 original records over
+the rounds they recorded.
+
+All 16 decision cells (models 0 to 3) completed: maximal step degree 55 in every
+crater and every floor cell, 2037 to 2089 rounds and the same matrix-profile ranges on
+both sides. The 95-round prefix values are those reported above. The 16 cells of models
+4 to 7 also ran (driver deviation D1) with the same profile and enter no decision.
+**Decision: null_confirmed** stands, now with every msolve cell completed. The
+weakness stated in advance (three quarters of the counted work is fixed by B) still
+applies to the counted-work leg, which was not rerun.

@@ -1923,8 +1923,13 @@ fn rho_canon<G: CountedGroup, C: RhoClasses<G>>(
     let (rep, mu) = classes.canon(g, ops, p);
     if mu == 1 {
         (rep, a, b, false)
+    } else if mu == r - 1 {
+        // The negation: `a·(r − 1) ≡ −a (mod r)`, so the reduced
+        // coefficients are negated outright; the same values the two
+        // modular multiplications gave, without their divisions.
+        (rep, negmod(a, r), negmod(b, r), true)
     } else {
-        (rep, mulmod(a, mu, r), mulmod(b, mu, r), mu == r - 1)
+        (rep, mulmod(a, mu, r), mulmod(b, mu, r), false)
     }
 }
 
@@ -2159,8 +2164,18 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
         self
     }
 
-    fn index(&self, x: &G::Elt) -> usize {
-        ((mix(self.g.key(x)) >> 24) % self.jumps.len() as u64) as usize
+    /// The jump a point's mixed key selects.  The table holds 4, 8 or 16
+    /// jumps ([`rho_jumps_for`]), so the remainder is a mask; any other
+    /// size keeps the division, for the same value.
+    #[inline]
+    fn index_of(&self, h: u64) -> usize {
+        let n = self.jumps.len() as u64;
+        let h = h >> 24;
+        (if n.is_power_of_two() {
+            h & (n - 1)
+        } else {
+            h % n
+        }) as usize
     }
 
     /// One walk from `[a]G + [b]Q = start`, until a distinguished point
@@ -2194,14 +2209,19 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
         // Brent's checkpoint: the key of the point the walk stood on at the
         // last power-of-two step, the least-key point since (a cycle's
         // escape point, as the window picks it), and the steps since.
-        let mut checkpoint = if self.brent { g.key(&x) } else { 0 };
+        // The point's key and its mix are computed once per step: the jump
+        // index, the cycle window, the distinguished-point test and Brent's
+        // checkpoint all read them.
+        let mut key = g.key(&x);
+        let mut h = mix(key);
+        let mut checkpoint = if self.brent { key } else { 0 };
         let mut since_min = (checkpoint, x, a, b);
         let (mut since, mut power) = (0u64, 1u64);
         loop {
             // One step, with the look-ahead when it is on.
-            let j0 = self.index(&x);
+            let j0 = self.index_of(h);
             let mut tried = 0usize;
-            let (y, ya, yb) = loop {
+            let (y, ya, yb, ky, hy) = loop {
                 let j = (j0 + tried) % jump_count;
                 let (m, aj, bj) = self.jumps[j];
                 let sum = g.add(ops, x, m);
@@ -2216,20 +2236,24 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
                     &mut tally.canonicalisations,
                 );
                 tried += 1;
+                let ky = g.key(&y);
+                let hy = mix(ky);
                 if self.look_ahead
                     && flipped
                     && tried < jump_count
                     && !g.is_identity(&y)
-                    && self.index(&y) == j
+                    && self.index_of(hy) == j
                 {
                     tally.look_ahead_adds += 1;
                     continue;
                 }
-                break (y, ya, yb);
+                break (y, ya, yb, ky, hy);
             };
             x = y;
             a = ya;
             b = yb;
+            key = ky;
+            h = hy;
             tally.steps += 1;
             len += 1;
             if g.is_identity(&x) {
@@ -2238,7 +2262,6 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
             }
             // A short cycle: this point is one of the last `window`.
             if self.window > 0 {
-                let key = g.key(&x);
                 if let Some(pos) = self.recent.iter().position(|e| e.0 == key) {
                     // The cycle is the `c` most recent points.
                     let c = self.recent.len() - pos;
@@ -2276,30 +2299,31 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
                     x = e;
                     a = ea;
                     b = eb;
+                    key = g.key(&x);
+                    h = mix(key);
                     self.recent.clear();
                     if g.is_identity(&x) {
                         tally.lose(ops0, LostHow::Identity);
                         return WalkEnd::Lost;
                     }
                     if self.brent {
-                        checkpoint = g.key(&x);
+                        checkpoint = key;
                         since_min = (checkpoint, x, a, b);
                         (since, power) = (0, 1);
                     }
                 }
-                self.recent.push_back((g.key(&x), x, a, b));
+                self.recent.push_back((key, x, a, b));
                 if self.recent.len() > self.window {
                     self.recent.pop_front();
                 }
             }
-            if mix(g.key(&x)) & self.dp_mask == 0 {
+            if h & self.dp_mask == 0 {
                 return WalkEnd::Distinguished(x, a, b);
             }
             if self.brent {
                 // The walk is a function of its point, so a point seen twice
                 // closes a cycle.  `since_min` runs over every point since the
                 // checkpoint, which on a return to it is the whole cycle.
-                let key = g.key(&x);
                 since += 1;
                 if key < since_min.0 {
                     since_min = (key, x, a, b);
@@ -2328,15 +2352,17 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
                     x = e;
                     a = ea;
                     b = eb;
+                    key = g.key(&x);
+                    h = mix(key);
                     self.recent.clear();
                     if g.is_identity(&x) {
                         tally.lose(ops0, LostHow::Identity);
                         return WalkEnd::Lost;
                     }
                     if self.window > 0 {
-                        self.recent.push_back((g.key(&x), x, a, b));
+                        self.recent.push_back((key, x, a, b));
                     }
-                    checkpoint = g.key(&x);
+                    checkpoint = key;
                     since_min = (checkpoint, x, a, b);
                     (since, power) = (0, 1);
                 } else if since == power {
