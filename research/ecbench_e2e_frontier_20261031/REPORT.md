@@ -142,6 +142,27 @@ domain; it does show that the historical exception cannot be generalized to
 the new GHS roster. The new GHS study has no ECBench replay certificate and is
 not leaderboard evidence.
 
+Two later mainline packages extend the negative/control side of the frontier.
+The skeptic-reviewed evaluation of 12 prime-field IC leads reports no exponent
+movement. Sparse, dense, and Bochum-style factor bases match size-matched
+random nulls within about 0.0003--0.005 at the tested sizes. A characteristic-2
+SAT gadget has conflict slope about 2.58 against the 0.5 m=3 ladder bar and is
+3 times slower in CPU at its largest cell. Per-adder multiplier encoding is
+0.78 [0.67, 0.92] of schoolbook conflicts at one b=9 prime, but reverses at
+b=6 and is censored at larger sizes. Clause retention moves a large setup into
+advice, and the proposed ring-linear propagator was not run. The surviving
+exponent questions are PKM at m>=4 and the contractor exponent; none of these
+rows is an ECBench speed claim.
+
+R7.4 provides a separate binary-Edwards structural control. It proves that
+symmetrising by rational 2-power torsion gives the same algebraic system after
+an F2-linear substitution and checks 11 identity families on 46 toy curves
+with zero exceptions. The pair-table quotient sweep returns exactly the same
+relations with 1/mu lookups in all 268,000 checks. Its toy finite-size yield
+can lie on either side of parity depending on whether c or c+1 columns are
+charged and trends toward the null at n=13,14. No Groebner/F4 oracle or matched
+end-to-end rho run was performed, so this is not a new performance row.
+
 ## Boundary by domain
 
 | Domain | Current finite boundary | Leader | Evidence reading |

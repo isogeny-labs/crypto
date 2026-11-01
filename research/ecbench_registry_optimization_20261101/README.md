@@ -56,6 +56,20 @@ into a speed claim.
   restricted historical exception from being generalized to the new GHS
   roster. The new experiment has no ECBench receipt and is leaderboard
   ineligible.
+- A subsequent skeptic-reviewed package evaluates 12 prime-field IC leads.
+  None changes the exponent boundary: sparse/dense/Bochum-style bases match a
+  size-matched null at the tested sizes, the characteristic-2 SAT gadget has a
+  2.58 conflict slope and 3x worse CPU at its largest cell, retained clauses
+  move setup into advice, and the best multiplier-encoding result is a 0.78
+  [0.67, 0.92] one-size constant. The ring-linear propagator was not run. The
+  surviving exponent questions are PKM at m>=4 and the contractor exponent,
+  not a measured speedup.
+- R7.4 separately proves and toy-checks that binary-Edwards 2-power-torsion
+  symmetrisation has the same algebraic systems after a linear substitution.
+  Its pair-table experiment approaches the predicted null after quotienting,
+  with finite-size results depending on whether `c` or `c+1` columns are
+  charged. No Groebner/F4 oracle or end-to-end ECDLP comparison was run, so it
+  adds no frontier or leaderboard row.
 - No leaderboard row changes. These are one-target/four-round development
   diagnostics, not L2 confirmatory holdouts.
 - Confirmatory execution is blocked because this managed runtime has no ready

@@ -97,6 +97,23 @@ refused the 18-unknown/17-equation system; Buchberger hit the common cap.
   family and protocol; it remains historical evidence for that exact domain,
   not a contradiction and not a general GHS win. R7.2 has no ECBench replay
   certificate or L2 holdout and cannot update the leaderboard.
+- The newly merged 12-lead prime-field review is also outside ECBench and finds
+  no exponent movement. Its strongest measured engineering constants are
+  per-adder multiplier encoding at 0.78 [0.67, 0.92] of schoolbook conflicts
+  for one b=9 prime and sparse/hash factor bases matching a size-matched random
+  null to about 0.0003--0.005 at b<=22. The characteristic-2 SAT gadget has
+  conflict slope about 2.58 versus the 0.5 m=3 ladder bar and is 3x slower in
+  CPU at its largest cell. Clause retention is retained-setup/advice with its
+  setup uncharged against enumeration; the proposed ring-linear propagator was
+  not run. The review leaves PKM m>=4 and the contractor exponent open.
+- R7.4's standalone binary-Edwards panel proves the 2-power-torsion
+  symmetrised algebraic system is a linear change of the plain system and
+  checks its identities on 46 toy curves with zero exceptions. The pair-table
+  quotient sweep reproduces the same relations with 1/mu lookups in all
+  268,000 checks, but finite-size yield changes sign under `c` versus `c+1`
+  accounting and trends toward the null at n=13,14. It ran no Groebner/F4
+  oracle and no matched end-to-end rho comparison, so it is a structural
+  control rather than a performance candidate.
 - The distinct `ic bench` chained-x oracle was measured after it appeared on
   current `main`. On Koblitz a=0, n=13 with a fixed dimension-6 subspace base,
   four repeats, and matched rho, inherited F4 is the best completed engine but

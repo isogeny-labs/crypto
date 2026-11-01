@@ -46,6 +46,14 @@ generic reference, replay receipts, and the same disjoint L2 holdout gate. The
 historical restricted `E_0/F_(q^3)` result cannot be substituted for those
 missing obligations because it is a different domain and protocol.
 
+The 12-lead prime-field review closes or narrows the tested SAT, factor-base,
+retained-clause, encoding, tree-decomposition and Frobenius-transfer ideas but
+does not run the proposed ring-linear CaDiCaL external propagator. Its two
+remaining exponent questions are PKM at m>=4 and improving the contractor
+exponent; neither has a current ECBench holdout. R7.4's binary-Edwards work is
+likewise blocked from performance standing because no Groebner/F4 oracle,
+complete pipeline pricing, matched rho, or L2 holdout was run.
+
 New paid execution remains gated on a durable checkpoint identity and a fresh,
 disjoint confirmatory roster passing:
 
