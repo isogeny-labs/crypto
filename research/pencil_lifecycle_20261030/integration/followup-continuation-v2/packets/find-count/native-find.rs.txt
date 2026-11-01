@@ -1,0 +1,17 @@
+    fn find(&mut self, x: usize) -> (usize, Potential) {
+        self.operations += 1;
+        let parent = self.parent[x];
+        if parent == x {
+            return (x, Potential::ID);
+        }
+        let (root, q) = self.find(parent);
+        let p = self.pot[x];
+        let out = Potential {
+            s: p.s * q.s,
+            a: self.ring.add(p.a, self.ring.signed(p.s, q.a)),
+            b: self.ring.add(p.b, self.ring.signed(p.s, q.b)),
+        };
+        self.parent[x] = root;
+        self.pot[x] = out;
+        (root, out)
+    }
