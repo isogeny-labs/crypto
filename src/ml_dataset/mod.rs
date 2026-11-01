@@ -373,6 +373,25 @@ impl DatasetPlan {
                 return Err("empty, duplicate or unknown family/solver axis".into());
             }
         }
+        if self.planted() {
+            if self
+                .solvers
+                .iter()
+                .any(|solver| solver == "double-large-prime")
+            {
+                return Err(
+                    "planted PDP double-large-prime requires restricted factor-base replay".into(),
+                );
+            }
+            if self.families.iter().any(|family| family == "prime")
+                && self.field_sizes.iter().any(|n| *n >= 33)
+                && self.solvers.iter().any(|solver| solver == "f4")
+            {
+                return Err(
+                    "planted PDP wide-prime F4 requires restricted factor-base replay".into(),
+                );
+            }
+        }
         if self.field_sizes.iter().collect::<BTreeSet<_>>().len() != self.field_sizes.len()
             || self.arities.iter().collect::<BTreeSet<_>>().len() != self.arities.len()
             || self.curve_seeds == 0
@@ -3881,6 +3900,28 @@ mod tests {
             planted.binding_sha256().unwrap(),
             natural.binding_sha256().unwrap()
         );
+    }
+
+    #[test]
+    fn planted_plan_rejects_natural_only_factor_base_replay_paths() {
+        let mut planted = plan();
+        planted.schema = PLANTED_PLAN_SCHEMA.into();
+        planted.solvers = vec!["double-large-prime".into()];
+        assert!(planted
+            .validate()
+            .unwrap_err()
+            .contains("restricted factor-base replay"));
+
+        planted.solvers = vec!["f4".into()];
+        planted.families = vec!["prime".into()];
+        planted.field_sizes = vec![47];
+        assert!(planted.validate().unwrap_err().contains("wide-prime F4"));
+
+        planted.field_sizes = vec![23];
+        planted.validate().unwrap();
+        planted.schema = NATURAL_PLAN_SCHEMA.into();
+        planted.field_sizes = vec![47];
+        planted.validate().unwrap();
     }
 
     #[test]
