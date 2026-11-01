@@ -106,3 +106,9 @@ retains separate version1 preflight and version 2 interruption accounting. The
 full exporter previously exceeded its 60-second limit with both changed and
 unchanged versions on this workspace; focused committed-state checks cover this
 study without claiming that broader runtime check passed.
+
+[Inspected two-page version3 report](reports/run-20261101T1915Z/report.pdf)
+and [report source](reports/run-20261101T1915Z/report.typ). Raw records were
+published as `fd8c4bd2051f` before rendering. Focused committed-state metrics
+passed for all three new recoveries and retained historical interruption counts;
+[check record](metrics-v3-verification.json).
