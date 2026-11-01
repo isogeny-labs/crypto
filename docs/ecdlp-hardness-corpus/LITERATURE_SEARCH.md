@@ -58,6 +58,12 @@ are scoped to the precise text read. MOV, Frey--Rueck, Pollard's original paper,
 Silverman's original xedni proposal, Gaudry 2009, Joux--Vitse, PKM, FPPR, and several
 solver papers remain visibly marked metadata/secondary where primary access failed.
 
+After the primary search, the merged 2026 repository Lean audit of JKSST was read in
+full. Its proof map records 294 kernel-checked theorems with zero trusted declarations.
+It proves finite components and counterexamples, while preserving eight explicit
+algorithm-specific bridge obligations; it is repository evidence, not a substitute for
+the primary paper or a proof of Lang's conjecture.
+
 ## Coverage by research branch
 
 | Branch | Load-bearing literature located | Corpus conclusion |
@@ -71,7 +77,7 @@ solver papers remain visibly marked metadata/secondary where primary access fail
 | Weil descent to Jacobians | GHS; Jacobson--Menezes--Stein; later hyperelliptic algorithms | Powerful on specified extension-field families, but map kernels, genus, and extension structure are decisive |
 | Summation-polynomial IC | Semaev; Gaudry; Diem; Joux--Vitse; FGHR; FPPR; Petit--Quisquater; HKY; Galbraith--Gebregiyorgis | Every exponent rests on distinct yield, dimension, solver-degree, rank, linear-algebra, and descent obligations |
 | Prime-field algebraic routes | PKM; APS; McGuire--Mueller; Semaev 2015; repository PKM and solution-count work | No verified end-to-end prime-field sub-rho exponent is established; solver scaling remains live |
-| Xedni / lifting | Silverman proposal; JKSST analysis; exact repository function-field density | Historical characteristic-zero xedni is conditionally obstructed by canonical height; the frozen function-field variant has exact density Theta(p^-3) |
+| Xedni / lifting | Silverman proposal; JKSST analysis; kernel-checked finite-core audit; exact repository function-field density | Classic xedni has a conditional height/probability obstruction; its finite core is formalized but selected-lift and adaptive-trial bridges remain open; the frozen function-field variant has exact density Theta(p^-3) |
 | Isogeny transport | Jao--Miller--Venkatesan; Galbraith isogeny work; repository correction history | Random reducibility is scoped by endomorphism ring/GRH; coordinate-generated transport is not covered by a generic same-cost theorem |
 | Quantum | Shor; Proos--Zalka line; Roetteler 2017; Haener 2020; Gouzien 2023; 2026 trapped-ion preprint | Asymptotic hardness is gone on a fault-tolerant quantum computer; physical cost is an architecture scenario, not one canonical number |
 | Protocol layer | CDH/DDH reductions; gap-DH; Pointcheval--Stern; standards validation | “ECDLP-based” is too coarse: each protocol needs its actual assumption, proof model, reduction loss, and validation boundary |

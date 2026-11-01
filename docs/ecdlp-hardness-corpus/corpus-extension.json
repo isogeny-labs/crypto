@@ -226,6 +226,15 @@
       "notes": "Author-hosted PDF read. Theorem 4.1 is conditional on its height lemma/Lang-type assumptions and bounds per-lift success by C0/p; the conclusion derives at least linear-in-p repetition asymptotics and prohibitively low practical success."
     },
     {
+      "id": "S-JKSST-LEAN-AUDIT-2026",
+      "title": "JKSST xedni analysis: skeptical Lean audit",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "Kernel-checked audit of the finite JKSST counting, height, scalar-reduction, probability, Hasse/cofactor, and waiting-time chain; merged in PR 3252.",
+      "repository_path": "research/jksst_xedni_audit_20261101/PROOF_MAP.md",
+      "notes": "The proof gate reports 294 theorems and zero trusted declarations. The audit proves finite components from explicit hypotheses and identifies the uncomposed selected-lift, reduction, useful-relation, cofactor, and adaptive-trial bridges."
+    },
+    {
       "id": "S-XEDNI-EXACT-2026",
       "title": "Exact function-field xedni lift density",
       "kind": "repository_proof",
@@ -715,16 +724,45 @@
       "kind": "structural_theorem",
       "status": "proved_external",
       "model": "algebraic_coordinate",
-      "statement": "Under the paper's height/discriminant hypothesis and Lang's canonical-height conjecture, useful dependence coefficients are absolutely bounded and one xedni lift succeeds with probability below C0/p; hence asymptotically at least order-p repetitions are required, worse than square-root attacks.",
-      "scope": "JKSST Theorem 4.1 is conditional and its constant C0 is large; the paper separately reports experiments showing practical lift odds are already prohibitive in the cryptographic range.",
-      "assumptions": ["log|D| is at least a fixed multiple of the maximum lifted-point canonical height", "Lang's canonical-height conjecture in the form used", "Lifted reductions behave as random points for the probability estimate"],
-      "source_refs": ["S-JKSST-XEDNI-2000"],
+      "statement": "JKSST's displayed C0/p success bound and linear waiting-time obstruction require a chain of height/discriminant, Lang, selected-lift, scalar-reduction, useful-relation, subgroup/cofactor, and repeated-trial hypotheses; under that complete chain classic xedni is asymptotically worse than square-root attacks.",
+      "scope": "The external theorem is a strong conditional obstruction, not an unconditional refutation. A kernel-checked audit proves many finite components but leaves the algorithm-specific bridges explicit; the paper separately reports prohibitive practical lift odds.",
+      "assumptions": ["Selected lifts satisfy a family-uniform global-minimal-discriminant height comparison", "Lang's canonical-height conjecture or a direct uniform height gap", "Mordell-Weil packing hypotheses apply to the selected lifts", "Good reduction and exact subgroup sampling correspondence", "Every success selects a bounded relation with nonzero denominator", "Uniform cofactor and Hasse conversion from subgroup order q to field prime p", "A history-uniform conditional-hazard recurrence for adaptive trials"],
+      "source_refs": ["S-JKSST-XEDNI-2000", "S-JKSST-LEAN-AUDIT-2026"],
       "tags": ["xedni", "height", "obstruction"],
-      "formula": "Pr[success per lift] < C0/p; expected repetitions > p/C0",
-      "parameters": ["p", "C0"],
-      "quantifiers": "For the xedni construction and fixed lifted-point count under Theorem 4.1's assumptions as p grows.",
+      "formula": "one-shot Pr[success] <= C0/p (conditional); history-uniform hazard <= C0/p => E[T]=Omega(p)",
+      "parameters": ["p", "q", "C0", "cofactor"],
+      "quantifiers": "For the classic xedni construction and fixed lifted-point count, after every stated bridge is instantiated uniformly as p grows.",
       "evidence_class": "conditional_theorem",
-      "non_implications": ["Does not prove an unrestricted classical lower bound for every lifting algorithm"]
+      "non_implications": ["Does not prove an unrestricted classical lower bound for every lifting algorithm", "A one-shot event bound alone does not prove an adaptive waiting-time lower bound", "The scalar modulus is subgroup order q; replacing q by p needs an explicit bounded-cofactor bridge"]
+    },
+    {
+      "id": "THEOREM-XEDNI-FINITE-CORE",
+      "label": "Kernel-checked finite xedni core",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "The Lean audit proves exact coefficient-box counts, a finite packing bound with visible fiber multiplicity, cyclic ECDLP extraction for a nonzero denominator, exact fixed-direction relation probabilities, Hasse/cofactor conversions from q to p, and a conditional finite-horizon hazard-to-Omega(p) waiting theorem.",
+      "scope": "Kernel-checked finite and conditional components only. The audit deliberately does not assert that the xedni lift algorithm satisfies their bridge hypotheses.",
+      "assumptions": ["Each individual theorem's displayed finite hypotheses", "Prime subgroup order q for the exact useful-event formula", "History-uniform inverse-order hazard for the waiting theorem"],
+      "source_refs": ["S-JKSST-LEAN-AUDIT-2026", "S-JKSST-XEDNI-2000"],
+      "tags": ["xedni", "Lean", "finite-counting", "probability", "conditional-runtime"],
+      "formula": "Pr[fixed useful relation]=(q-1)/q^2; uniform hazard O(1/p) => E[T]=Omega(p)",
+      "parameters": ["p", "q", "cofactor", "rank", "radius", "separation", "fiber bound"],
+      "evidence_class": "theorem",
+      "non_implications": ["Does not prove Lang's conjecture", "Does not compose rational lifts with finite-field sampling", "Does not establish the adaptive hazard premise for xedni"]
+    },
+    {
+      "id": "GAP-XEDNI-END-TO-END",
+      "label": "Xedni end-to-end bridge obligations",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "An end-to-end xedni obstruction still needs a specified lift-selection algorithm, a selected-point height/minimal-discriminant theorem, Lang or a direct height gap, Mordell-Weil packing data, good-reduction and subgroup correspondence, useful-relation selection, a uniform cofactor bound, and an adaptive repeated-trial recurrence.",
+      "scope": "These are the exact missing interfaces between the proved finite core and the conditional asymptotic conclusion; failure to close them is not evidence that xedni succeeds.",
+      "assumptions": [],
+      "source_refs": ["S-JKSST-LEAN-AUDIT-2026", "S-JKSST-XEDNI-2000"],
+      "tags": ["xedni", "open-obligation", "height", "reduction", "probability"],
+      "evidence_class": "open"
     },
     {
       "id": "THEOREM-XEDNI-FF-DENSITY",
@@ -973,6 +1011,10 @@
     ,{"id":"EX-069","from":"OBSTRUCTION-XEDNI-HEIGHT","to":"ALG-POLLARD-RHO","relation":"qualifies","statement":"The conditional xedni repetition scale is linear in p, asymptotically worse than rho's square-root scale.","source_refs":["S-JKSST-XEDNI-2000"]}
     ,{"id":"EX-070","from":"THEOREM-XEDNI-FF-DENSITY","to":"DEF-XEDNI-CALCULUS","relation":"obstructs","statement":"The frozen function-field variant has an exact p^-3 relation-source density, far below a square-root-competitive gate.","source_refs":["S-XEDNI-EXACT-2026","S-SYNTHESIS"]}
     ,{"id":"EX-071","from":"THEOREM-XEDNI-FF-DENSITY","to":"OBSTRUCTION-XEDNI-HEIGHT","relation":"qualifies","statement":"The internal exact density is an independent scoped negative and does not strengthen the external theorem outside its frozen family.","source_refs":["S-XEDNI-EXACT-2026","S-JKSST-XEDNI-2000"]}
+    ,{"id":"EX-072","from":"THEOREM-XEDNI-FINITE-CORE","to":"OBSTRUCTION-XEDNI-HEIGHT","relation":"instantiates","statement":"The kernel-checked finite counts, scalar extraction, exact event probabilities, q-to-p conversion, and conditional waiting theorem supply components of the JKSST chain without asserting its algorithm-specific bridges.","source_refs":["S-JKSST-LEAN-AUDIT-2026","S-JKSST-XEDNI-2000"]}
+    ,{"id":"EX-073","from":"GAP-XEDNI-END-TO-END","to":"OBSTRUCTION-XEDNI-HEIGHT","relation":"qualifies","statement":"The displayed asymptotic obstruction becomes end-to-end only after the selected-lift, height, reduction, usefulness, cofactor, and adaptive-trial interfaces are composed.","source_refs":["S-JKSST-LEAN-AUDIT-2026"]}
+    ,{"id":"EX-074","from":"GAP-XEDNI-END-TO-END","to":"DEF-XEDNI-CALCULUS","relation":"leaves_open","statement":"The classic lift algorithm has not been shown to satisfy every premise needed by the finite core and conditional obstruction.","source_refs":["S-JKSST-LEAN-AUDIT-2026","S-JKSST-XEDNI-2000"]}
+    ,{"id":"EX-075","from":"THEOREM-XEDNI-FINITE-CORE","to":"GAP-XEDNI-END-TO-END","relation":"leaves_open","statement":"Kernel-checked endpoint theorems do not by themselves establish the missing correspondence with selected rational lifts and adaptive trials.","source_refs":["S-JKSST-LEAN-AUDIT-2026"]}
   ],
   "research_targets": [
     {
@@ -1018,6 +1060,17 @@
       "acceptance": "Each protocol node names the security notion, adversary interface, proof model, source theorem, exact assumption, reduction direction, and loss; implementation validation requirements are separate edges.",
       "next_step": "Add Schnorr/EdDSA, ECDH/HPKE, ECDSA, and pairing protocols as separate families after primary proof verification.",
       "source_refs": ["S-POINTCHEVAL-STERN-1996", "S-FST-2010"]
+    },
+    {
+      "id": "RT-XEDNI-END-TO-END",
+      "label": "Xedni bridge-composition audit",
+      "status": "ready",
+      "priority": 5,
+      "objective": "Turn the kernel-checked finite xedni core into either a fully scoped end-to-end conditional theorem for a specified lift family or a counterexample showing that one required bridge fails.",
+      "depends_on": ["THEOREM-XEDNI-FINITE-CORE", "GAP-XEDNI-END-TO-END", "OBSTRUCTION-XEDNI-HEIGHT"],
+      "acceptance": "A machine-checked interface ledger instantiates lift selection, minimal-discriminant height comparison, Mordell-Weil packing, good reduction, subgroup sampling, nonzero-denominator selection, cofactor control, and adaptive conditional hazards; every unproved premise remains a named theorem hypothesis.",
+      "next_step": "Choose one explicit prime-field lift family and formalize the selected-lift-to-finite-subgroup correspondence before attempting the height or adaptive-hazard steps.",
+      "source_refs": ["S-JKSST-LEAN-AUDIT-2026", "S-JKSST-XEDNI-2000"]
     }
   ]
 }

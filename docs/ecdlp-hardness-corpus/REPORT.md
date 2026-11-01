@@ -14,12 +14,13 @@ header-includes:
     \usepackage{longtable}
     \usepackage{booktabs}
     \usepackage{microtype}
+    \usepackage{needspace}
 ---
 
 # Executive result
 
-The assembled corpus contains **80 claims, 115 typed logical edges, 48 source
-records, and 11 prioritized research targets**. It separates five propositions that are
+The assembled corpus contains **82 claims, 119 typed logical edges, 49 source
+records, and 12 prioritized research targets**. It separates five propositions that are
 often collapsed into “elliptic curves are secure”:
 
 1. the selected subgroup is large and avoids known exceptional attacks;
@@ -43,7 +44,7 @@ most credible active branch is coordinate algebra, but it does not become an att
 until factor-base generation, relation yield, polynomial solving, rank, sparse linear
 algebra, individual descent, memory, and verification all fit one sub-rho cost bound.
 
-![Seven-layer overview of the corpus. The full 80-node graph is in `graph.svg`.](overview.pdf){ width=100% }
+![Seven-layer overview of the corpus. The full 82-node graph is in `graph.svg`.](overview.pdf){ width=100% }
 
 # Scope and terminology
 
@@ -85,7 +86,7 @@ new ECDLP break. Exact records are in `corpus.json`, `corpus-extension.json`,
 | Gaudry fixed extension | quoted `soft-O(q^(2-2/n))` for fixed `n>=3` under PDP hypotheses | extension field; decomposition/solver/rank assumptions; hidden exponential dependence on `n` | a prime-field result obtained by putting `n=1` |
 | Diem 2011 | expected `exp(O(max(log q,n^2)))` in the paper's input model | specified extension-field sequence and randomized construction | a uniform subexponential attack on named prime curves |
 | Shor | polynomial-time DLP in finite abelian groups | scalable fault-tolerant quantum computation | practical physical resources on one architecture |
-| JKSST xedni analysis | per-lift success `< C0/p`, hence order-`p` repetitions under the theorem's height assumptions | discriminant/height hypothesis, Lang-type conjecture, random-reduction estimate | an unconditional lower bound on every lifting algorithm |
+| JKSST xedni analysis | one-shot `<= C0/p`; uniform conditional hazard gives `E[T]=Omega(p)` | selected-lift height/Lang; reduction, usefulness, bounded cofactor, adaptive recurrence | an unconditional lower bound on every lifting algorithm |
 
 The logical asymmetry is essential. Generic lower bounds are rigorous but narrow;
 unrestricted classical hardness is broad but assumed.
@@ -236,12 +237,21 @@ them to rational points on an elliptic curve over `Q`, and hopes for a Mordell--
 linear dependence. Reducing such a dependence modulo `p` gives the desired scalar
 relation.
 
-Jacobson, Koblitz, Silverman, Stein, and Teske analyze this mechanism directly. Under
-their discriminant/height hypothesis and Lang's canonical-height conjecture, dependence
-coefficients are absolutely bounded. Random reduced points have a useful bounded
-relation with probability below `C0/p`; expected repetitions are therefore at least
-linear in `p`, asymptotically worse than rho. Their experiments also find suitable lifts
-prohibitively unlikely at practical sizes.
+Jacobson, Koblitz, Silverman, Stein, and Teske analyze this mechanism directly. Their
+displayed `C0/p` success bound and linear waiting-time obstruction depend on a chain:
+selected-point height versus a global minimal discriminant, Lang's height gap,
+Mordell--Weil packing, good reduction and subgroup sampling, selection of a relation
+with nonzero denominator, a bounded-cofactor conversion from subgroup order `q` to
+field prime `p`, and a history-uniform hazard statement for repeated adaptive trials.
+Under that complete chain the runtime is `Omega(p)`, asymptotically worse than rho.
+Their experiments also find suitable lifts prohibitively unlikely at practical sizes.
+
+A 2026 kernel-checked Lean audit proves the finite core without erasing those bridges:
+exact coefficient-box counts, a packing theorem with fiber multiplicity, cyclic-log
+extraction, fixed-direction useful-event probability `(q-1)/q^2`, the Hasse/cofactor
+conversion, and the conditional hazard-to-`Omega(p)` theorem. It also gives explicit
+counterexamples to several overbroad readings. Passing the proof gate establishes
+these endpoint theorems, not their correspondence to the actual lift algorithm.
 
 The repository studied a different, frozen function-field lifting family. For that exact
 family it derives
@@ -249,9 +259,9 @@ family it derives
 `P_lift(p) = (1-2/p+p^-3)/(2p^3) = Theta(p^-3)`.
 
 The equality is exact within its family, not a universal theorem about every lifting
-construction. Together the results make xedni a well-supported closed direction in its
-historical and frozen forms, while preserving the logical possibility of a mechanism
-that genuinely evades both obstructions.
+construction. Together the results strongly disfavor the historical and frozen routes,
+but the graph keeps the end-to-end JKSST bridge as an explicit open obligation rather
+than calling every conceivable lifting strategy unconditionally closed.
 
 # Special-family and transfer attacks
 
@@ -292,7 +302,7 @@ and assume different error correction, routing, factories, clocks, and success b
 The last item is retained as a primary-read preprint, not treated as independently
 replicated.
 
-\newpage
+\needspace{18\baselineskip}
 
 # Research priorities
 
@@ -304,6 +314,7 @@ replicated.
 | 3 | PKM solving-degree growth | uncensored larger rungs plus checked Hilbert-series prediction |
 | 4 | Binary m=4 degree ladder | matched larger cells and shared cost-unit conversion |
 | 5 | Coordinate transport theorem | explicit interface and proof or counterexample after the withdrawn overclaim |
+| 5 | Xedni bridge-composition audit | instantiate selected lifts, height, reduction, usefulness, cofactor, and adaptive hazards for one explicit family |
 | 6 | Automorphism preprocessing model | GA oracle theorem or cost-preserving reduction with orbit/stabilizer accounting |
 | 7 | Named-curve quantum ladder | verified circuits and architecture/error assumptions |
 | 8 | Multi-target/nonuniform model | target distribution and all advice/setup units matched to CGK |

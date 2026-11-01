@@ -128,6 +128,21 @@ pub fn collect_residual_fused_eq_and_solve<G: CountedGroup, L: RelationSolver + 
     collect_residual_core(g, generator, target, r, h, fb, seed, max_trials, matrix, 4)
 }
 
+/// `residual-fused-eq` with chained restarts: see `mode == 5` in [`collect_residual_core`].
+pub fn collect_residual_fused_eq_chain_and_solve<G: CountedGroup, L: RelationSolver + ?Sized>(
+    g: &G,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    h: u64,
+    fb: &FactorBase<G::Elt>,
+    seed: u64,
+    max_trials: u64,
+    matrix: &mut L,
+) -> PipelineOutcome {
+    collect_residual_core(g, generator, target, r, h, fb, seed, max_trials, matrix, 5)
+}
+
 /// Fused step plus distinguished points (`residual-fused-dp`): see `mode == 3`
 /// in [`collect_residual_core`].
 #[allow(clippy::too_many_arguments)]
@@ -161,7 +176,10 @@ fn collect_residual_core<G: CountedGroup, L: RelationSolver + ?Sized>(
     // mode 0: baseline (two additions per step); 1: fused; 3: fused + distinguished points.
     let fused = mode == 1 || mode == 3;
     // mode 4: negation-equivariant walk on a large step set, with distinguished points.
-    let eq = mode == 4;
+    let eq = mode == 4 || mode == 5;
+    // mode 5: mode 4 whose restarts take one addition (the previous start plus a
+    // random jump) instead of two scalar multiplications.
+    let chain = mode == 5;
     // mode 3: fused + distinguished points.  Only residuals whose x-key hashes into
     // a 2^-dp_bits fraction are tested against F, probed and stored; every step still
     // pays one distinguished-point test (counted as `dp_tests`, the analogue of rho's
@@ -252,6 +270,7 @@ fn collect_residual_core<G: CountedGroup, L: RelationSolver + ?Sized>(
 
     let mut table: HashMap<u64, Stored> = HashMap::new();
     let mut fresh = true;
+    let mut chain_start: Option<(G::Elt, u64, u64)> = None;
     let (mut point, mut a, mut b) = (g.identity(), 0u64, 0u64);
     let mut row = vec![0u64; d_col];
 
@@ -298,11 +317,22 @@ fn collect_residual_core<G: CountedGroup, L: RelationSolver + ?Sized>(
         // (the fused step); the identity check before it does not apply.
         let mut stepped = false;
         if fresh {
-            a = rng.gen_range(1..r);
-            b = rng.gen_range(1..r);
-            let ag = g.mul(&mut rel.group_ops, generator, a);
-            let bq = g.mul(&mut rel.group_ops, target, b);
-            point = g.add(&mut rel.group_ops, ag, bq);
+            if let (true, Some((sp, sa, sb))) = (chain, chain_start) {
+                // One addition: the next start is the previous one plus a random jump.
+                let (jp, ja, jb) = jumps[rng.gen_range(0..jump_count)];
+                point = g.add(&mut rel.group_ops, sp, jp);
+                a = addmod(sa, ja, r);
+                b = addmod(sb, jb, r);
+            } else {
+                a = rng.gen_range(1..r);
+                b = rng.gen_range(1..r);
+                let ag = g.mul(&mut rel.group_ops, generator, a);
+                let bq = g.mul(&mut rel.group_ops, target, b);
+                point = g.add(&mut rel.group_ops, ag, bq);
+            }
+            if chain {
+                chain_start = Some((point, a, b));
+            }
             row.iter_mut().for_each(|c| *c = 0);
             walk_len = 0;
             x_prev = u64::MAX;

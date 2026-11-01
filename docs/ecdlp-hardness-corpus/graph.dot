@@ -42,7 +42,8 @@ digraph ecdlp_claims {
     "THEOREM-SEMAEV-DEGREE" [label="THEOREM-SEMAEV-DEGREE\\nSummation-polynomial degree growth\\ndeg_Xi S_m=2^(m-2)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "FACT-GROEBNER-COST-DEPENDENCE" [label="FACT-GROEBNER-COST-DEPENDENCE\\nGroebner cost depends on solving geometry\\nFGLM=O(n D^3); F4/F5 matrix cost depends on d_reg/d_solve", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "FACT-PRIME-FIELD-NO-EXTENSION-GAIN" [label="FACT-PRIME-FIELD-NO-EXTENSION-GAIN\\nPrime-field boundary for extension index calculus", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
-    "OBSTRUCTION-XEDNI-HEIGHT" [label="OBSTRUCTION-XEDNI-HEIGHT\\nCanonical-height obstruction to xedni\\nPr[success per lift] < C0/p; expected repetitions > p/C0", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "OBSTRUCTION-XEDNI-HEIGHT" [label="OBSTRUCTION-XEDNI-HEIGHT\\nCanonical-height obstruction to xedni\\none-shot Pr[success] <= C0/p (conditional); history-uniform hazard <= C0/p => E[T]=Omega(p)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "THEOREM-XEDNI-FINITE-CORE" [label="THEOREM-XEDNI-FINITE-CORE\\nKernel-checked finite xedni core\\nPr[fixed useful relation]=(q-1)/q^2; uniform hazard O(1/p) => E[T]=Omega(p)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "THEOREM-XEDNI-FF-DENSITY" [label="THEOREM-XEDNI-FF-DENSITY\\nExact codimension-three function-field lift density\\nP_lift(p)=(1-2/p+p^-3)/(2p^3)=Theta(p^-3)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "FACT-S3-ROOTS-ARE-GROUP-LAW" [label="FACT-S3-ROOTS-ARE-GROUP-LAW\\nS3 rootfinding collapses to group subtraction\\nS3(x_R,x_F,X)=(x_R-x_F)^2 (X-x(R-F))(X-x(R+F))", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
   }
@@ -93,6 +94,7 @@ digraph ecdlp_claims {
     "GAP-BINARY-M4-DEGREE" [label="GAP-BINARY-M4-DEGREE\\nBinary m=4 Weil-descent degree growth", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-TRANSPORT-ORACLE-SIM" [label="GAP-TRANSPORT-ORACLE-SIM\\nCoordinate transport-oracle simulation", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-QUANTUM-RESOURCES" [label="GAP-QUANTUM-RESOURCES\\nConcrete fault-tolerant quantum resources", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-XEDNI-END-TO-END" [label="GAP-XEDNI-END-TO-END\\nXedni end-to-end bridge obligations", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-MULTITARGET-NONUNIFORM" [label="GAP-MULTITARGET-NONUNIFORM\\nMulti-target/nonuniform security conversion", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-END-TO-END-IC-EXPONENT" [label="GAP-END-TO-END-IC-EXPONENT\\nEnd-to-end index-calculus exponent obligation", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-PROTOCOL-ASSUMPTION-MAPPING" [label="GAP-PROTOCOL-ASSUMPTION-MAPPING\\nProtocol-to-problem assumption mapping", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
@@ -212,4 +214,8 @@ digraph ecdlp_claims {
   "OBSTRUCTION-XEDNI-HEIGHT" -> "ALG-POLLARD-RHO" [label="qualifies", color="#66788a", style="dashed"];
   "THEOREM-XEDNI-FF-DENSITY" -> "DEF-XEDNI-CALCULUS" [label="obstructs", color="#a33a3a", style="solid"];
   "THEOREM-XEDNI-FF-DENSITY" -> "OBSTRUCTION-XEDNI-HEIGHT" [label="qualifies", color="#66788a", style="dashed"];
+  "THEOREM-XEDNI-FINITE-CORE" -> "OBSTRUCTION-XEDNI-HEIGHT" [label="instantiates", color="#66788a", style="solid"];
+  "GAP-XEDNI-END-TO-END" -> "OBSTRUCTION-XEDNI-HEIGHT" [label="qualifies", color="#66788a", style="dashed"];
+  "GAP-XEDNI-END-TO-END" -> "DEF-XEDNI-CALCULUS" [label="leaves_open", color="#66788a", style="dashed"];
+  "THEOREM-XEDNI-FINITE-CORE" -> "GAP-XEDNI-END-TO-END" [label="leaves_open", color="#66788a", style="dashed"];
 }

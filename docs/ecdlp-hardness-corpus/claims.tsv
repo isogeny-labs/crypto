@@ -66,7 +66,9 @@ FACT-PRIME-FIELD-NO-EXTENSION-GAIN	structural_theorem	conditional	algebraic_coor
 COND-PKM-PRIME-ALGEBRAIC	conditional_attack	conditional	algebraic_coordinate	conditional_theorem	-	S-PKM-2016,S-PRIME-PROGRAM,S-SYNTHESIS
 COND-BINARY-WEIL-DESCENT	conditional_attack	conditional	algebraic_coordinate	conditional_theorem	-	S-FPPR-2012,S-PETIT-QUISQUATER-2012,S-HKY-2015,S-KOBLITZ-PROGRAM
 DEF-XEDNI-CALCULUS	definition	definition	algebraic_coordinate	definition	-	S-SILVERMAN-XEDNI-2000,S-JKSST-XEDNI-2000
-OBSTRUCTION-XEDNI-HEIGHT	structural_theorem	proved_external	algebraic_coordinate	conditional_theorem	Pr[success per lift] < C0/p; expected repetitions > p/C0	S-JKSST-XEDNI-2000
+OBSTRUCTION-XEDNI-HEIGHT	structural_theorem	proved_external	algebraic_coordinate	conditional_theorem	one-shot Pr[success] <= C0/p (conditional); history-uniform hazard <= C0/p => E[T]=Omega(p)	S-JKSST-XEDNI-2000,S-JKSST-LEAN-AUDIT-2026
+THEOREM-XEDNI-FINITE-CORE	structural_theorem	proved_internal_unreviewed	algebraic_coordinate	theorem	Pr[fixed useful relation]=(q-1)/q^2; uniform hazard O(1/p) => E[T]=Omega(p)	S-JKSST-LEAN-AUDIT-2026,S-JKSST-XEDNI-2000
+GAP-XEDNI-END-TO-END	open_obligation	open	algebraic_coordinate	open	-	S-JKSST-LEAN-AUDIT-2026,S-JKSST-XEDNI-2000
 THEOREM-XEDNI-FF-DENSITY	structural_theorem	proved_internal_unreviewed	algebraic_coordinate	theorem	P_lift(p)=(1-2/p+p^-3)/(2p^3)=Theta(p^-3)	S-XEDNI-EXACT-2026,S-SYNTHESIS
 FACT-S3-ROOTS-ARE-GROUP-LAW	structural_theorem	proved_internal_unreviewed	generic_group	theorem	S3(x_R,x_F,X)=(x_R-x_F)^2 (X-x(R-F))(X-x(R+F))	S-METHOD-CLASSIFICATION,S-SCOPED-BOUNDARIES,S-GENERIC-AUDIT
 ESTIMATE-QUANTUM-ROETTELER	algorithmic_upper_bound	proved_external	quantum	concrete_estimate	Q<=9n+2 ceil(log2 n)+10; Toffoli<=448 n^3 log2(n)+4090 n^3	S-ROETTELER-2017

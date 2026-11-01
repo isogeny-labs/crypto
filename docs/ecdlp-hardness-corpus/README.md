@@ -10,10 +10,10 @@ and every edge says how one claim depends on or limits another.
 
 ## Current snapshot
 
-- 80 claim nodes
-- 115 typed dependency edges
-- 48 source records
-- 11 prioritized research targets
+- 82 claim nodes
+- 119 typed dependency edges
+- 49 source records
+- 12 prioritized research targets
 
 Run `node validate.mjs` for the authoritative assembled counts; generated counts are in
 `stats.tsv`.
@@ -71,9 +71,11 @@ The corpus treats these as different branches:
 - **Index calculus** uses a factor base, relation decomposition, sparse linear algebra,
   and individual logarithm/descent. Semaev/Gaudry/Diem/PKM work belongs here.
 - **Xedni calculus** (“index” reversed) lifts finite-field points to a curve over the
-  rationals and searches for a Mordell–Weil dependence. JKSST's canonical-height
-  analysis conditionally makes the original construction asymptotically worse than
-  rho; a separate repository function-field family has exact lift density
+  rationals and searches for a Mordell–Weil dependence. JKSST gives a conditional
+  canonical-height obstruction. A kernel-checked audit proves its finite counting,
+  scalar-extraction, event-probability, cofactor, and conditional waiting-time pieces,
+  while exposing the selected-lift and adaptive-trial bridges still needed for an
+  end-to-end theorem. A separate frozen function-field family has exact lift density
   `Theta(p^-3)`.
 
 ## Rebuild and validate
