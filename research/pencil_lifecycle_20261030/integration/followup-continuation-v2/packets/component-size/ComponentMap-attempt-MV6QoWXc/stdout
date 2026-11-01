@@ -1,0 +1,24 @@
+/var/tmp/pencil-component-size-20261101-v1/ComponentMap.lean:13:1: error: Too many variable names provided at alternative `root`: 3 provided, but 2 expected
+/var/tmp/pencil-component-size-20261101-v1/ComponentMap.lean:13:34: error: Application type mismatch: The argument
+  x
+has type
+  s✝.parent s = s
+of sort `Prop` but is expected to have type
+  Fin n
+of sort `Type` in the application
+  hv.right x
+/var/tmp/pencil-component-size-20261101-v1/ComponentMap.lean:13:41: error(lean.unknownIdentifier): Unknown identifier `hr`
+/var/tmp/pencil-component-size-20261101-v1/ComponentMap.lean:13:44: error(lean.unknownIdentifier): Unknown identifier `hr`
+/var/tmp/pencil-component-size-20261101-v1/ComponentMap.lean:14:1: error: Too many variable names provided at alternative `step`: 8 provided, but 7 expected
+/var/tmp/pencil-component-size-20261101-v1/ComponentMap.lean:15:25: error(lean.unknownIdentifier): Unknown identifier `ih`
+/var/tmp/pencil-component-size-20261101-v1/ComponentMap.lean:15:10: error: Tactic `rcases` failed: `x✝ : ?m.45` is not an inductive datatype
+/var/tmp/pencil-component-size-20261101-v1/ComponentMap.lean:44:25: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+/var/tmp/pencil-component-size-20261101-v1/ComponentMap.lean:49:25: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+/var/tmp/pencil-component-size-20261101-v1/ComponentMap.lean:51:11: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+/var/tmp/pencil-component-size-20261101-v1/ComponentMap.lean:56:11: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+/var/tmp/pencil-component-size-20261101-v1/ComponentMap.lean:34:0: warning: automatically included section variable(s) unused in theorem `ComponentMap.attach_preserves_owner`:
+  [Field K]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Field K] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`

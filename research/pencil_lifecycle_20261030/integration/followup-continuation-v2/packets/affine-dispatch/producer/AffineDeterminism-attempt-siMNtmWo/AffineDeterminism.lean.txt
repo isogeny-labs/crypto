@@ -1,0 +1,56 @@
+import AffineTotal
+set_option autoImplicit false
+namespace AffineDispatch
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest DivisorArrayCopy StoredInput FastPrelude FastCalls
+
+theorem pegcd_unique (p : UInt64) (z x y : PegcdWord.Registers)
+ (hx : PegcdWord.Run p z x) (hy : PegcdWord.Run p z y) : x=y := by
+ induction hx generalizing y with
+ | stop z he =>
+  cases hy with
+  | stop => rfl
+  | next z last q r out hl hd ht => simp [he] at hl
+ | next z last q r x hl hd ht ih =>
+  cases hy with
+  | stop z he => simp [he] at hl
+  | next z last' q' r' y hl' hd' ht' =>
+   have el : last=last' := Option.some.inj (hl.symm.trans hl')
+   subst last'
+   have eqr : (q,r)=(q',r') := Option.some.inj (hd.symm.trans hd')
+   cases eqr
+   exact ih y ht'
+
+theorem reduction_unique (p : UInt64) (f u v a b c d : List UInt64)
+ (hx : ReductionWord.Run p f u v a b) (hy : ReductionWord.Run p f u v c d) : a=c ∧ b=d := by
+ induction hx generalizing c d with
+ | stop u v hs =>
+  cases hy with
+  | stop => exact ⟨rfl,rfl⟩
+  | step u v q r a b hl => omega
+ | step u v q r a b hl hq hr ht ih =>
+  cases hy with
+  | stop u v hs => omega
+  | step u v q' r' c d hl' hq' hr' ht' =>
+   have eq : q=q' := Option.some.inj (hq.symm.trans hq')
+   subst q'
+   have er : r=r' := Option.some.inj (hr.symm.trans hr')
+   subst r'
+   exact ih c d ht'
+
+theorem chain_unique (p : UInt64) [Fact p.toNat.Prime] (ua ub va vb : List UInt64)
+ (x y : FallbackWord.Chain p ua ub va vb) :
+ x.d1=y.d1 ∧ x.e1=y.e1 ∧ x.e2=y.e2 ∧ x.d=y.d ∧ x.c1=y.c1 ∧ x.c2=y.c2 := by
+ have ez1 := pegcd_unique p _ x.z1 y.z1 x.run1 y.run1
+ have first : (x.d1,x.e1,x.e2)=(y.d1,y.e1,y.e2) := by
+  apply Option.some.inj
+  rw [←x.finish1,←y.finish1,ez1]
+ have ed1 : x.d1=y.d1 := congrArg Prod.fst first
+ have ee1 : x.e1=y.e1 := congrArg (fun t => t.2.1) first
+ have ee2 : x.e2=y.e2 := congrArg (fun t => t.2.2) first
+ have yr : PegcdWord.Run p (PegcdWord.initial x.d1 (ResidualWord.padd p va vb)) y.z2 := by rw [ed1];exact y.run2
+ have ez2:=pegcd_unique p _ x.z2 y.z2 x.run2 yr
+ have second : (x.d,x.c1,x.c2)=(y.d,y.c1,y.c2) := by
+  apply Option.some.inj
+  rw [←x.finish2,←y.finish2,ez2]
+ exact ⟨ed1,ee1,ee2,congrArg Prod.fst second,congrArg (fun t => t.2.1) second,congrArg (fun t => t.2.2) second⟩
+end AffineDispatch

@@ -1,0 +1,5 @@
+# Prospective independent review
+
+Bind immutable published sources, native SignedGraph snapshot, toolchain and all imported packets before review. Use a separate non-author reviewer, disclose inherited context, replay explicit source modules and all sixteen named readbacks with fresh target caches. Check false theorem and three inventory controls, retain all failures, and report machine verification separately from source fidelity.
+
+Attack the <= tie orientation, signed potential reversal, UInt-size semantics, strict representability bound, disjoint-cardinality premise, fixed-size Array access and exact updated/unchanged slots. Check that no statement assumes the full size/component invariant has already been proved for dynamic native execution. Add reviewer-owned boundary controls for equal sizes, reversed orientation, maximum sum, and invalid overlapping component sets. Require separate treatment of both-anchor returns and counters. Publish PDF/SVG/JSON; no experiment or budget renewal is implied.

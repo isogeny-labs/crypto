@@ -1,0 +1,533 @@
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:7:182: error(lean.unknownIdentifier): Unknown identifier `ResidualWord.square_value`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:7:208: error(lean.unknownIdentifier): Unknown identifier `ResidualWord.empty_square`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:7:339: error: Tactic `decide` failed for proposition
+  (if 0 ≤ 2 then
+      if [1, 7, 8][0]? = some 1 then
+        decide
+          (FallbackGeometry.remainder 17
+              (trimFuel
+                (ResidualWord.slots 17 [0, 0, 0, 0, 0, 1]
+                    (List.map (PencilWordRefinement.wordNeg 17)
+                      (ProductPolynomial.product 17 (trimFuel (List.take 0 [9, 10]).length (List.take 0 [9, 10]))
+                        (trimFuel (List.take 0 [9, 10]).length (List.take 0 [9, 10]))))).length
+                (ResidualWord.slots 17 [0, 0, 0, 0, 0, 1]
+                  (List.map (PencilWordRefinement.wordNeg 17)
+                    (ProductPolynomial.product 17 (trimFuel (List.take 0 [9, 10]).length (List.take 0 [9, 10]))
+                      (trimFuel (List.take 0 [9, 10]).length (List.take 0 [9, 10]))))))
+              (List.take (0 + 1) [1, 7, 8]) =
+            some [])
+      else false
+    else false) =
+    true
+because its `Decidable` instance
+  instDecidableEqBool
+    (if 0 ≤ 2 then
+      if [1, 7, 8][0]? = some 1 then
+        decide
+          (FallbackGeometry.remainder 17
+              (trimFuel
+                (ResidualWord.slots 17 [0, 0, 0, 0, 0, 1]
+                    (List.map (PencilWordRefinement.wordNeg 17)
+                      (ProductPolynomial.product 17 (trimFuel (List.take 0 [9, 10]).length (List.take 0 [9, 10]))
+                        (trimFuel (List.take 0 [9, 10]).length (List.take 0 [9, 10]))))).length
+                (ResidualWord.slots 17 [0, 0, 0, 0, 0, 1]
+                  (List.map (PencilWordRefinement.wordNeg 17)
+                    (ProductPolynomial.product 17 (trimFuel (List.take 0 [9, 10]).length (List.take 0 [9, 10]))
+                      (trimFuel (List.take 0 [9, 10]).length (List.take 0 [9, 10]))))))
+              (List.take (0 + 1) [1, 7, 8]) =
+            some [])
+      else false
+    else false)
+    true
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBitVec`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqUInt64`, `BitVec.decEq`, `Bool.decEq`, `Nat.decEq`, `Nat.decLe`, `Option.instDecidableEq`, and `UInt64.decEq`, reduction got stuck at the `Decidable` instance
+  match
+    if 0 ≤ 2 then
+      if [1, 7, 8][0]? = some 1 then
+        decide
+          (FallbackGeometry.remainder 17
+              (trimFuel
+                (ResidualWord.slots 17 [0, 0, 0, 0, 0, 1]
+                    (List.map (PencilWordRefinement.wordNeg 17)
+                      (ProductPolynomial.product 17 (trimFuel (List.take 0 [9, 10]).length (List.take 0 [9, 10]))
+                        (trimFuel (List.take 0 [9, 10]).length (List.take 0 [9, 10]))))).length
+                (ResidualWord.slots 17 [0, 0, 0, 0, 0, 1]
+                  (List.map (PencilWordRefinement.wordNeg 17)
+                    (ProductPolynomial.product 17 (trimFuel (List.take 0 [9, 10]).length (List.take 0 [9, 10]))
+                      (trimFuel (List.take 0 [9, 10]).length (List.take 0 [9, 10]))))))
+              (List.take (0 + 1) [1, 7, 8]) =
+            some [])
+      else false
+    else false,
+    true with
+  | false, false => isTrue ⋯
+  | false, true => isFalse ⋯
+  | true, false => isFalse ⋯
+  | true, true => isTrue ⋯
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:7:141: warning: This simp argument is unused:
+  ScaleTrim.trimFuel
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ResidualWord.residual, ResidualWord.square_value,
+    ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg, ResidualWord.slots,
+    List.map_cons, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:7:288: warning: This simp argument is unused:
+  ResidualWord.slots
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ScaleTrim.trimFuel, ResidualWord.residual,
+    ResidualWord.square_value, ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg,
+    List.map_cons, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:7:307: warning: This simp argument is unused:
+  List.map_cons
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ScaleTrim.trimFuel, ResidualWord.residual,
+    ResidualWord.square_value, ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg,
+    ResidualWord.slots, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:7:321: warning: This simp argument is unused:
+  List.map_nil
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ScaleTrim.trimFuel, ResidualWord.residual,
+    ResidualWord.square_value, ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg,
+    ResidualWord.slots, List.map_cons]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:9:151: error(lean.unknownIdentifier): Unknown identifier `ResidualWord.square_value`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:9:177: error(lean.unknownIdentifier): Unknown identifier `ResidualWord.empty_square`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:9:80: warning: This simp argument is unused:
+  StoredControls.paddedIdentity
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, ScaleTrim.trimFuel, ResidualWord.residual, ResidualWord.square_value,
+    ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg, ResidualWord.slots,
+    List.map_cons, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:9:110: warning: This simp argument is unused:
+  ScaleTrim.trimFuel
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ResidualWord.residual, ResidualWord.square_value,
+    ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg, ResidualWord.slots,
+    List.map_cons, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:9:257: warning: This simp argument is unused:
+  ResidualWord.slots
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ScaleTrim.trimFuel, ResidualWord.residual,
+    ResidualWord.square_value, ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg,
+    List.map_cons, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:9:276: warning: This simp argument is unused:
+  List.map_cons
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ScaleTrim.trimFuel, ResidualWord.residual,
+    ResidualWord.square_value, ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg,
+    ResidualWord.slots, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:9:290: warning: This simp argument is unused:
+  List.map_nil
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ScaleTrim.trimFuel, ResidualWord.residual,
+    ResidualWord.square_value, ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg,
+    ResidualWord.slots, List.map_cons]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:11:160: error(lean.unknownIdentifier): Unknown identifier `ResidualWord.square_value`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:11:186: error(lean.unknownIdentifier): Unknown identifier `ResidualWord.empty_square`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:11:89: warning: This simp argument is unused:
+  StoredControls.paddedIdentity
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, ScaleTrim.trimFuel, ResidualWord.residual, ResidualWord.square_value,
+    ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg, ResidualWord.slots,
+    List.map_cons, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:11:119: warning: This simp argument is unused:
+  ScaleTrim.trimFuel
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ResidualWord.residual, ResidualWord.square_value,
+    ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg, ResidualWord.slots,
+    List.map_cons, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:11:266: warning: This simp argument is unused:
+  ResidualWord.slots
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ScaleTrim.trimFuel, ResidualWord.residual,
+    ResidualWord.square_value, ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg,
+    List.map_cons, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:11:285: warning: This simp argument is unused:
+  List.map_cons
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ScaleTrim.trimFuel, ResidualWord.residual,
+    ResidualWord.square_value, ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg,
+    ResidualWord.slots, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:11:299: warning: This simp argument is unused:
+  List.map_nil
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ScaleTrim.trimFuel, ResidualWord.residual,
+    ResidualWord.square_value, ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg,
+    ResidualWord.slots, List.map_cons]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:13:169: error(lean.unknownIdentifier): Unknown identifier `ResidualWord.square_value`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:13:195: error(lean.unknownIdentifier): Unknown identifier `ResidualWord.empty_square`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:13:326: error: Tactic `decide` failed for proposition
+  (if 1 ≤ 2 then
+      if [0, 1, 0][1]? = some 1 then
+        decide
+          (FallbackGeometry.remainder 17
+              (trimFuel
+                (ResidualWord.slots 17 [1]
+                    (List.map (PencilWordRefinement.wordNeg 17)
+                      (ProductPolynomial.product 17 (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))
+                        (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))))).length
+                (ResidualWord.slots 17 [1]
+                  (List.map (PencilWordRefinement.wordNeg 17)
+                    (ProductPolynomial.product 17 (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))
+                      (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))))))
+              (List.take (1 + 1) [0, 1, 0]) =
+            some [])
+      else false
+    else false) =
+    false
+because its `Decidable` instance
+  instDecidableEqBool
+    (if 1 ≤ 2 then
+      if [0, 1, 0][1]? = some 1 then
+        decide
+          (FallbackGeometry.remainder 17
+              (trimFuel
+                (ResidualWord.slots 17 [1]
+                    (List.map (PencilWordRefinement.wordNeg 17)
+                      (ProductPolynomial.product 17 (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))
+                        (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))))).length
+                (ResidualWord.slots 17 [1]
+                  (List.map (PencilWordRefinement.wordNeg 17)
+                    (ProductPolynomial.product 17 (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))
+                      (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))))))
+              (List.take (1 + 1) [0, 1, 0]) =
+            some [])
+      else false
+    else false)
+    false
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBitVec`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqUInt64`, `BitVec.decEq`, `Bool.decEq`, `Nat.decEq`, `Nat.decLe`, `Option.instDecidableEq`, and `UInt64.decEq`, reduction got stuck at the `Decidable` instance
+  match
+    if 1 ≤ 2 then
+      if [0, 1, 0][1]? = some 1 then
+        decide
+          (FallbackGeometry.remainder 17
+              (trimFuel
+                (ResidualWord.slots 17 [1]
+                    (List.map (PencilWordRefinement.wordNeg 17)
+                      (ProductPolynomial.product 17 (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))
+                        (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))))).length
+                (ResidualWord.slots 17 [1]
+                  (List.map (PencilWordRefinement.wordNeg 17)
+                    (ProductPolynomial.product 17 (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))
+                      (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))))))
+              (List.take (1 + 1) [0, 1, 0]) =
+            some [])
+      else false
+    else false,
+    false with
+  | false, false => isTrue ⋯
+  | false, true => isFalse ⋯
+  | true, false => isFalse ⋯
+  | true, true => isTrue ⋯
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:13:98: warning: This simp argument is unused:
+  StoredControls.paddedIdentity
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, ScaleTrim.trimFuel, ResidualWord.residual, ResidualWord.square_value,
+    ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg, ResidualWord.slots,
+    List.map_cons, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:13:128: warning: This simp argument is unused:
+  ScaleTrim.trimFuel
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ResidualWord.residual, ResidualWord.square_value,
+    ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg, ResidualWord.slots,
+    List.map_cons, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:13:275: warning: This simp argument is unused:
+  ResidualWord.slots
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ScaleTrim.trimFuel, ResidualWord.residual,
+    ResidualWord.square_value, ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg,
+    List.map_cons, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:13:294: warning: This simp argument is unused:
+  List.map_cons
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ScaleTrim.trimFuel, ResidualWord.residual,
+    ResidualWord.square_value, ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg,
+    ResidualWord.slots, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:13:308: warning: This simp argument is unused:
+  List.map_nil
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ScaleTrim.trimFuel, ResidualWord.residual,
+    ResidualWord.square_value, ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg,
+    ResidualWord.slots, List.map_cons]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:15:159: error(lean.unknownIdentifier): Unknown identifier `ResidualWord.square_value`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:15:185: error(lean.unknownIdentifier): Unknown identifier `ResidualWord.empty_square`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:15:316: error: Tactic `decide` failed for proposition
+  (if 1 ≤ 2 then
+      if [0, 1, 0][1]? = some 1 then
+        decide
+          (FallbackGeometry.remainder 17
+              (trimFuel
+                (ResidualWord.slots 17 []
+                    (List.map (PencilWordRefinement.wordNeg 17)
+                      (ProductPolynomial.product 17 (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))
+                        (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))))).length
+                (ResidualWord.slots 17 []
+                  (List.map (PencilWordRefinement.wordNeg 17)
+                    (ProductPolynomial.product 17 (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))
+                      (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))))))
+              (List.take (1 + 1) [0, 1, 0]) =
+            some [])
+      else false
+    else false) =
+    true
+because its `Decidable` instance
+  instDecidableEqBool
+    (if 1 ≤ 2 then
+      if [0, 1, 0][1]? = some 1 then
+        decide
+          (FallbackGeometry.remainder 17
+              (trimFuel
+                (ResidualWord.slots 17 []
+                    (List.map (PencilWordRefinement.wordNeg 17)
+                      (ProductPolynomial.product 17 (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))
+                        (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))))).length
+                (ResidualWord.slots 17 []
+                  (List.map (PencilWordRefinement.wordNeg 17)
+                    (ProductPolynomial.product 17 (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))
+                      (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))))))
+              (List.take (1 + 1) [0, 1, 0]) =
+            some [])
+      else false
+    else false)
+    true
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBitVec`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqUInt64`, `BitVec.decEq`, `Bool.decEq`, `Nat.decEq`, `Nat.decLe`, `Option.instDecidableEq`, and `UInt64.decEq`, reduction got stuck at the `Decidable` instance
+  match
+    if 1 ≤ 2 then
+      if [0, 1, 0][1]? = some 1 then
+        decide
+          (FallbackGeometry.remainder 17
+              (trimFuel
+                (ResidualWord.slots 17 []
+                    (List.map (PencilWordRefinement.wordNeg 17)
+                      (ProductPolynomial.product 17 (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))
+                        (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))))).length
+                (ResidualWord.slots 17 []
+                  (List.map (PencilWordRefinement.wordNeg 17)
+                    (ProductPolynomial.product 17 (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))
+                      (trimFuel (List.take 1 [0, 0]).length (List.take 1 [0, 0]))))))
+              (List.take (1 + 1) [0, 1, 0]) =
+            some [])
+      else false
+    else false,
+    true with
+  | false, false => isTrue ⋯
+  | false, true => isFalse ⋯
+  | true, false => isFalse ⋯
+  | true, true => isTrue ⋯
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:15:88: warning: This simp argument is unused:
+  StoredControls.paddedIdentity
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, ScaleTrim.trimFuel, ResidualWord.residual, ResidualWord.square_value,
+    ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg, ResidualWord.slots,
+    List.map_cons, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:15:118: warning: This simp argument is unused:
+  ScaleTrim.trimFuel
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ResidualWord.residual, ResidualWord.square_value,
+    ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg, ResidualWord.slots,
+    List.map_cons, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:15:265: warning: This simp argument is unused:
+  ResidualWord.slots
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ScaleTrim.trimFuel, ResidualWord.residual,
+    ResidualWord.square_value, ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg,
+    List.map_cons, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:15:284: warning: This simp argument is unused:
+  List.map_cons
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ScaleTrim.trimFuel, ResidualWord.residual,
+    ResidualWord.square_value, ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg,
+    ResidualWord.slots, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:15:298: warning: This simp argument is unused:
+  List.map_nil
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ScaleTrim.trimFuel, ResidualWord.residual,
+    ResidualWord.square_value, ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg,
+    ResidualWord.slots, List.map_cons]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:30:96: error(lean.unknownIdentifier): Unknown identifier `ResidualWord.square_value`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:30:122: error(lean.unknownIdentifier): Unknown identifier `ResidualWord.empty_square`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:30:253: error: Tactic `decide` failed for proposition
+  (if 0 ≤ 2 then
+      if [1, 17, 0][0]? = some 1 then
+        decide
+          (FallbackGeometry.remainder 17
+              (trimFuel
+                (ResidualWord.slots 17 []
+                    (List.map (PencilWordRefinement.wordNeg 17)
+                      (ProductPolynomial.product 17 (trimFuel (List.take 0 [0, 0]).length (List.take 0 [0, 0]))
+                        (trimFuel (List.take 0 [0, 0]).length (List.take 0 [0, 0]))))).length
+                (ResidualWord.slots 17 []
+                  (List.map (PencilWordRefinement.wordNeg 17)
+                    (ProductPolynomial.product 17 (trimFuel (List.take 0 [0, 0]).length (List.take 0 [0, 0]))
+                      (trimFuel (List.take 0 [0, 0]).length (List.take 0 [0, 0]))))))
+              (List.take (0 + 1) [1, 17, 0]) =
+            some [])
+      else false
+    else false) =
+    true
+because its `Decidable` instance
+  instDecidableEqBool
+    (if 0 ≤ 2 then
+      if [1, 17, 0][0]? = some 1 then
+        decide
+          (FallbackGeometry.remainder 17
+              (trimFuel
+                (ResidualWord.slots 17 []
+                    (List.map (PencilWordRefinement.wordNeg 17)
+                      (ProductPolynomial.product 17 (trimFuel (List.take 0 [0, 0]).length (List.take 0 [0, 0]))
+                        (trimFuel (List.take 0 [0, 0]).length (List.take 0 [0, 0]))))).length
+                (ResidualWord.slots 17 []
+                  (List.map (PencilWordRefinement.wordNeg 17)
+                    (ProductPolynomial.product 17 (trimFuel (List.take 0 [0, 0]).length (List.take 0 [0, 0]))
+                      (trimFuel (List.take 0 [0, 0]).length (List.take 0 [0, 0]))))))
+              (List.take (0 + 1) [1, 17, 0]) =
+            some [])
+      else false
+    else false)
+    true
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBitVec`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqUInt64`, `BitVec.decEq`, `Bool.decEq`, `Nat.decEq`, `Nat.decLe`, `Option.instDecidableEq`, and `UInt64.decEq`, reduction got stuck at the `Decidable` instance
+  match
+    if 0 ≤ 2 then
+      if [1, 17, 0][0]? = some 1 then
+        decide
+          (FallbackGeometry.remainder 17
+              (trimFuel
+                (ResidualWord.slots 17 []
+                    (List.map (PencilWordRefinement.wordNeg 17)
+                      (ProductPolynomial.product 17 (trimFuel (List.take 0 [0, 0]).length (List.take 0 [0, 0]))
+                        (trimFuel (List.take 0 [0, 0]).length (List.take 0 [0, 0]))))).length
+                (ResidualWord.slots 17 []
+                  (List.map (PencilWordRefinement.wordNeg 17)
+                    (ProductPolynomial.product 17 (trimFuel (List.take 0 [0, 0]).length (List.take 0 [0, 0]))
+                      (trimFuel (List.take 0 [0, 0]).length (List.take 0 [0, 0]))))))
+              (List.take (0 + 1) [1, 17, 0]) =
+            some [])
+      else false
+    else false,
+    true with
+  | false, false => isTrue ⋯
+  | false, true => isFalse ⋯
+  | true, false => isFalse ⋯
+  | true, true => isTrue ⋯
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:30:25: warning: This simp argument is unused:
+  StoredControls.paddedIdentity
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, ScaleTrim.trimFuel, ResidualWord.residual, ResidualWord.square_value,
+    ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg, ResidualWord.slots,
+    List.map_cons, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:30:55: warning: This simp argument is unused:
+  ScaleTrim.trimFuel
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ResidualWord.residual, ResidualWord.square_value,
+    ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg, ResidualWord.slots,
+    List.map_cons, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:30:202: warning: This simp argument is unused:
+  ResidualWord.slots
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ScaleTrim.trimFuel, ResidualWord.residual,
+    ResidualWord.square_value, ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg,
+    List.map_cons, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:30:221: warning: This simp argument is unused:
+  List.map_cons
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ScaleTrim.trimFuel, ResidualWord.residual,
+    ResidualWord.square_value, ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg,
+    ResidualWord.slots, List.map_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:30:235: warning: This simp argument is unused:
+  List.map_nil
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [test, vp, up, StoredControls.paddedIdentity, ScaleTrim.trimFuel, ResidualWord.residual,
+    ResidualWord.square_value, ResidualWord.empty_square, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg,
+    ResidualWord.slots, List.map_cons]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

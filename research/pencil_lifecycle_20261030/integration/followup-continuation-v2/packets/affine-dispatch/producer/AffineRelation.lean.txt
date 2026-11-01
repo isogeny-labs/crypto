@@ -1,0 +1,57 @@
+import AffineConstruct
+set_option autoImplicit false
+namespace AffineDispatch
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest DivisorArrayCopy StoredInput FastPrelude FastCalls
+
+inductive Tag | leftIdentity | rightIdentity | fast | degreeFallback | normZero | slopeZero
+ deriving DecidableEq, Repr
+
+def classify (p : UInt64) (a b : Stored) : Tag :=
+ if a.degree=0 then .leftIdentity
+ else if b.degree=0 then .rightIdentity
+ else if a.degree=2 ∧ b.degree=2 then
+  if normWord p (extract a b)=0 then .normZero
+  else if s1Word p (extract a b)=0 then .slopeZero else .fast
+ else .degreeFallback
+
+def IsFallback (t : Tag) : Prop := t=.degreeFallback ∨ t=.normZero ∨ t=.slopeZero
+
+inductive Runs (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64) (a b : Stored) : Tag → Stored → Prop
+ | left (h : a.degree=0) : Runs p f a b .leftIdentity b
+ | right (ha : a.degree≠0) (hb : b.degree=0) : Runs p f a b .rightIdentity a
+ | fast (h : classify p a b=.fast) (q r : List UInt64) (out : Stored)
+   (hq : FallbackWord.exactDiv p (ResidualWord.residual p f (v p (extract a b))) (u p (extract a b))=some q)
+   (hr : FallbackGeometry.remainder p (ResidualWord.pneg p (v p (extract a b))) (scaled p (extract a b) q)=some r)
+   (hl : (scaled p (extract a b) q).getLast?=some 1)
+   (hc : construct (scaled p (extract a b) q) r=some out) : Runs p f a b .fast out
+ | fallback (tag : Tag) (h : classify p a b=tag) (ht : IsFallback tag)
+   (ch : FallbackWord.Chain p (up a) (up b) (vp a) (vp b))
+   (u w r v0 au bv : List UInt64) (out : Stored)
+   (hd : FallbackWord.Divided p (up a) (up b) (vp a) (vp b) f ch u w)
+   (hr : FallbackGeometry.remainder p w u=some r)
+   (hv : FallbackGeometry.remainder p r (ReductionWord.monic p u)=some v0)
+   (run : ReductionWord.Run p f (ReductionWord.monic p u) v0 au bv)
+   (hc : construct au bv=some out) : Runs p f a b tag out
+
+theorem runs_tag (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64) (a b out : Stored)
+ (tag : Tag) (h : Runs p f a b tag out) : classify p a b=tag := by
+ cases h with
+ | left ha => simp [classify,ha]
+ | right ha hb => simp [classify,ha,hb]
+ | fast h => exact h
+ | fallback _ h => exact h
+
+theorem tag_unique (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64) (a b x y : Stored)
+ (tx ty : Tag) (hx : Runs p f a b tx x) (hy : Runs p f a b ty y) : tx=ty := by
+ rw [←runs_tag p f a b x tx hx,←runs_tag p f a b y ty hy]
+
+theorem classify_fast_iff (p : UInt64) (a b : Stored) : classify p a b=.fast ↔
+ a.degree=2 ∧ b.degree=2 ∧ normWord p (extract a b)≠0 ∧ s1Word p (extract a b)≠0 := by
+ unfold classify
+ split_ifs <;> simp_all
+
+theorem nonidentity_partition (p : UInt64) (a b : Stored) (ha : a.degree≠0) (hb : b.degree≠0) :
+ classify p a b=.fast ∨ IsFallback (classify p a b) := by
+ unfold classify IsFallback
+ split_ifs <;> simp_all
+end AffineDispatch

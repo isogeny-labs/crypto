@@ -1,0 +1,32 @@
+import StoredValid
+import StoredControls
+set_option autoImplicit false
+namespace StoredValidityControls
+open StoredValidity DivisorArrayCopy StoredInput ScaleTrim MonicRemainder
+
+theorem padded_identity : test 17 [0,0,0,0,0,1] StoredControls.paddedIdentity=true := by simp [test,vp,up,StoredControls.paddedIdentity,ScaleTrim.trimFuel,ResidualWord.residual,ProductPolynomial.product,ResidualWord.psub,ResidualWord.padd,ResidualWord.pneg,ResidualWord.slots,List.map_cons,List.map_nil] <;> decide
+
+theorem degree_guard : test 17 [] ⟨3,#[],#[]⟩=false := by simp [test,vp,up,StoredControls.paddedIdentity,ScaleTrim.trimFuel,ResidualWord.residual,ProductPolynomial.product,ResidualWord.psub,ResidualWord.padd,ResidualWord.pneg,ResidualWord.slots,List.map_cons,List.map_nil] <;> decide
+
+theorem leading_guard : test 17 [] ⟨0,#[2,0,0],#[0,0]⟩=false := by simp [test,vp,up,StoredControls.paddedIdentity,ScaleTrim.trimFuel,ResidualWord.residual,ProductPolynomial.product,ResidualWord.psub,ResidualWord.padd,ResidualWord.pneg,ResidualWord.slots,List.map_cons,List.map_nil] <;> decide
+
+theorem nondivisible_rejected : test 17 [1] ⟨1,#[0,1,0],#[0,0]⟩=false := by simp [test,vp,up,StoredControls.paddedIdentity,ScaleTrim.trimFuel,ResidualWord.residual,ProductPolynomial.product,ResidualWord.psub,ResidualWord.padd,ResidualWord.pneg,ResidualWord.slots,List.map_cons,List.map_nil] <;> decide
+
+theorem zero_residual : test 17 [] ⟨1,#[0,1,0],#[0,0]⟩=true := by simp [test,vp,up,StoredControls.paddedIdentity,ScaleTrim.trimFuel,ResidualWord.residual,ProductPolynomial.product,ResidualWord.psub,ResidualWord.padd,ResidualWord.pneg,ResidualWord.slots,List.map_cons,List.map_nil] <;> decide
+
+theorem actual_fixture : test 17 FastCallControls.fwords StoredControls.a=true ∧
+ test 17 FastCallControls.fwords StoredControls.b=true := by
+ constructor
+ · exact test_accepts_wellformed 17 _ _ (by decide) (by decide)
+     (by simp [Canon,FastCallControls.fwords]) StoredControls.actual_inputs_valid.1
+ · exact test_accepts_wellformed 17 _ _ (by decide) (by decide)
+     (by simp [Canon,FastCallControls.fwords]) StoredControls.actual_inputs_valid.2
+
+-- Canonical storage is an explicit external representation premise, not checked by native valid.
+theorem inactive_noncanonical_accepted :
+ test 17 [] ⟨0,#[1,17,0],#[0,0]⟩=true ∧
+ ¬WellFormed 17 (wordsPoly 17 []) ⟨0,#[1,17,0],#[0,0]⟩ := by
+ constructor
+ · simp [test,vp,up,StoredControls.paddedIdentity,ScaleTrim.trimFuel,ResidualWord.residual,ProductPolynomial.product,ResidualWord.psub,ResidualWord.padd,ResidualWord.pneg,ResidualWord.slots,List.map_cons,List.map_nil] <;> decide
+ · simp [WellFormed,Stored.canonical,Canon]
+end StoredValidityControls

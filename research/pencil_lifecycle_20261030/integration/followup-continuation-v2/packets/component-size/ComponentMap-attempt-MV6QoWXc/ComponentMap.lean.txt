@@ -1,0 +1,57 @@
+import SizeComposition
+set_option autoImplicit false
+namespace ComponentMap
+open GraphFind
+variable {K : Type*} [Field K] {n : Nat}
+def Valid (s : State K n) (owner : Fin n→Fin n) : Prop :=
+ (∀ x, owner (s.parent x)=owner x) ∧ (∀ x, owner x=x ↔ s.parent x=x)
+
+theorem run_preserves_owner (s t : State K n) (owner : Fin n→Fin n)
+ (x r : Fin n) (p : SignedGraphAlgebra.Potential K) (run : Run s x t r p)
+ (hv : Valid s owner) : Valid t owner ∧ owner x=r ∧ t.parent r=r := by
+ induction run with
+ | root s x hr => exact ⟨hv,(hv.2 x).mpr hr,hr⟩
+ | step s t x r q hne rec ih =>
+   obtain ⟨ht,ho,hroot⟩:=ih hv
+   have hx : owner x=r := (hv.1 x).symm.trans ho
+   have hxr : r≠x := by intro h;exact hne ((hv.2 x).mp (hx.trans h))
+   refine ⟨⟨?_,?_⟩,hx,?_⟩
+   · intro y
+     by_cases hy : y=x
+     · subst y
+       simpa [compress,hx] using (ht.2 r).mpr hroot
+     · simpa [compress,hy] using ht.1 y
+   · intro y
+     by_cases hy : y=x
+     · subst y
+       simp [compress,hx,hxr]
+     · simpa [compress,hy] using ht.2 y
+   · simpa [compress,hxr] using hroot
+
+def merged (owner : Fin n→Fin n) (c p : Fin n) (x : Fin n) : Fin n :=
+ if owner x=c then p else owner x
+
+theorem attach_preserves_owner (s : State K n) (owner : Fin n→Fin n)
+ (c p : Fin n) (pot : SignedGraphAlgebra.Potential K)
+ (hv : Valid s owner) (hc : s.parent c=c) (hp : s.parent p=p) (hd : c≠p) :
+ Valid (compress s c p pot) (merged owner c p) := by
+ have hoc := (hv.2 c).mpr hc
+ have hop := (hv.2 p).mpr hp
+ constructor
+ · intro x
+   by_cases hx : x=c
+   · subst x;simp [compress,merged,hoc,hop,Ne.symm hd]
+   · simp only [compress,if_neg hx,merged]
+     rw [hv.1 x]
+ · intro x
+   by_cases hx : x=c
+   · subst x;simp [compress,merged,hoc,Ne.symm hd]
+   · simp only [compress,if_neg hx,merged]
+     by_cases ho : owner x=c
+     · rw [if_pos ho]
+       have hpx : p≠x := by intro h;subst x;exact hd (ho.symm.trans hop)
+       have hroot : s.parent x≠x := by
+         intro h;exact hx (ho.symm.trans ((hv.2 x).mpr h) |>.symm)
+       simp [hpx,hroot]
+     · rw [if_neg ho];exact hv.2 x
+end ComponentMap

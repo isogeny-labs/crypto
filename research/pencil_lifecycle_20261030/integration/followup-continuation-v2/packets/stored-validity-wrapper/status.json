@@ -1,0 +1,42 @@
+{
+  "schema": "formal.construction/v1",
+  "source_commit": "4bc1aa36a864cbd90f0b8d89a95e5819860459a7",
+  "native_sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+  "machine_status": "passed",
+  "independent_review": "pending",
+  "main_declarations": 5,
+  "controls": 7,
+  "readbacks": 12,
+  "modules": 4,
+  "expected_false_exit": 1,
+  "checker_rejections": 3,
+  "premises": [
+    "prime modulus",
+    "1<p<2^31",
+    "canonical polynomial coefficients",
+    "U size3 and V size2",
+    "all stored coefficients canonical"
+  ],
+  "derived": [
+    "source guards",
+    "residual divisibility iff test true"
+  ],
+  "representation_boundary": [
+    "modeled values and loop",
+    "n1 no-tables source branch",
+    "native odd validation requires p>=5",
+    "no physical memory/compiler/counter semantics"
+  ],
+  "failed_attempts": [
+    "StoredValid-attempt-4iFlY6x4",
+    "StoredValidControls-attempt-AT9kFL7L",
+    "StoredValidControls-attempt-8qh3hQaa"
+  ],
+  "sources": {
+    "StoredRemainder.lean": "3488b515043801d741cc3df1f8edb107b17675b29eaf704e75c9782db161ea52",
+    "StoredValid.lean": "d82e6d3761c0a34bf3f70459aebebaf6355a5cb77893636578234a00b2fb3432",
+    "StoredValidControls.lean": "569fd12b5522a167e10a4b67ab2d6623ffbdbd456d8de1b8d7392babab63d096",
+    "StoredValidReadback.lean": "9960ce5daa02e9b45a98491016d9277dad6f47309f1bf348367b75bacbd4cbe8",
+    "ExpectedFailure.lean": "162bcf160a326aba9369e1b2951e92dd4f0d2958d04dd4e20e3677f6926300ee"
+  }
+}

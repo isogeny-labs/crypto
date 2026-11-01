@@ -1,0 +1,25 @@
+/var/tmp/pencil-component-size-20261101-v1/ComponentSizes.lean:25:51: error: unsolved goals
+case pos
+n : ℕ
+owner : Fin n → Fin n
+c p root x : Fin n
+hc : ¬root = c
+hp : ¬root = p
+h : owner x = c
+⊢ x ∉ {x | (if owner x = c then p else owner x) = root}
+
+case neg
+n : ℕ
+owner : Fin n → Fin n
+c p root x : Fin n
+hc : ¬root = c
+hp : ¬root = p
+h : ¬owner x = c
+⊢ x ∈ {x | (if owner x = c then p else owner x) = root} ↔ owner x = root
+/var/tmp/pencil-component-size-20261101-v1/ComponentSizes.lean:27:62: warning: This simp argument is unused:
+  Ne.symm hp
+
+Hint: Omit it from the simp argument list.
+  [apply] simp_all [fiber, merged, Ne.symm hc]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

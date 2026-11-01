@@ -1,0 +1,37 @@
+import StoredFast
+import StrictFallback
+set_option autoImplicit false
+namespace AffineDispatch
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest DivisorArrayCopy StoredInput
+
+theorem monic_last (p : UInt64) [Fact p.toNat.Prime] (u : List UInt64)
+ (hp : 1<p.toNat) (hc : Canon p u) (hn : Normal u) (hm : (wordsPoly p u).Monic) :
+ u.getLast?=some 1 := by
+ have he : u≠[] := by intro hz;apply hm.ne_zero;simp [hz,wordsPoly,listPoly]
+ have hd:=ReductionWord.normal_natDegree p u hp hc hn he
+ have hcast : ((u.getLast he).toNat : ZMod p.toNat)=1 := by
+  rw [←MonicTermination.last_coefficient p u he,←hd]
+  exact hm
+ have hv : (u.getLast he).toNat=1 :=
+  (PencilWordRefinement.canonical_equality p.toNat _ 1 (hc _ (List.getLast_mem he)) hp).mp (by simpa using hcast)
+ have hw : u.getLast he=1 := UInt64.toNat.inj (by simpa using hv)
+ rw [List.getLast?_eq_some_getLast he,hw]
+
+theorem raw_active_last (u v : List UInt64) (hs : shape u v) :
+ (raw u v).u.toList[(raw u v).degree]?=u.getLast? := by
+ rcases bounded_lists u v hs with ⟨a,rfl,rfl⟩ | ⟨a,b,rfl,hv⟩ | ⟨a,b,c,rfl,hv⟩
+ · simp [raw,identity,copyPrefix,Array.setIfInBounds]
+ · rcases hv with rfl | ⟨x,rfl⟩ <;> simp [raw,identity,copyPrefix,Array.setIfInBounds]
+ · rcases hv with rfl | ⟨x,rfl⟩ | ⟨x,y,rfl⟩ <;> simp [raw,identity,copyPrefix,Array.setIfInBounds]
+
+theorem construct_wellformed (p : UInt64) [Fact p.toNat.Prime] (f : Polynomial (ZMod p.toNat))
+ (u v : List UInt64) (hp : 1<p.toNat) (hu : Canon p u) (hv : Canon p v)
+ (hun : Normal u) (hvn : Normal v) (hvalid : MumfordValidity.Valid f (wordsPoly p u) (wordsPoly p v)) :
+ construct u v=some (raw u v) ∧ WellFormed p f (raw u v) := by
+ have hs:=shape_of_normalized_valid p u v f hp hu hv hun hvn hvalid
+ obtain ⟨_,hd,hus,hvs,hup⟩:=raw_shape u v hs
+ have hvp:=vp_roundtrip u v hs hvn
+ refine ⟨from_success u v hs,hd,hus,hvs,raw_canonical p u v (by omega) hs hu hv,?_,?_⟩
+ · rw [raw_active_last u v hs];exact monic_last p u hp hu hun hvalid.1
+ · rw [hup,hvp];exact hvalid.2.2.2
+end AffineDispatch

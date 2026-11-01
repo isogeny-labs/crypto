@@ -1,0 +1,14 @@
+import ComponentInitial
+set_option autoImplicit false
+namespace ComponentControls
+open ComponentMap
+
+def owner : Fin 3→Fin 3 := fun x=>if x=1 then 0 else x
+
+theorem old_sizes : (fiber owner 0).card=2 ∧ (fiber owner 2).card=1 := by decide
+theorem union_size : (fiber (merged owner 0 2) 2).card=3 := by decide
+theorem old_child_empty : (fiber (merged owner 0 2) 0).card=0 := by decide
+theorem reverse_union_size : (fiber (merged owner 2 0) 0).card=3 := by decide
+theorem distinct_disjoint : Disjoint (fiber owner 0) (fiber owner 2) := by decide
+theorem overlapping_not_disjoint : ¬Disjoint (fiber owner 0) (fiber owner 0) := by decide
+end ComponentControls
