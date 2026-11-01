@@ -1,0 +1,669 @@
+{
+  "schema": "crypto.ml-dataset.software-cases/v1",
+  "cases": [
+    {
+      "id": "native-0",
+      "panel": "native",
+      "index": 0,
+      "family": "koblitz",
+      "n": 23,
+      "m": 3,
+      "solver": "f4",
+      "twist": false,
+      "recipe": null
+    },
+    {
+      "id": "native-1",
+      "panel": "native",
+      "index": 1,
+      "family": "koblitz",
+      "n": 23,
+      "m": 3,
+      "solver": "f5",
+      "twist": false,
+      "recipe": null
+    },
+    {
+      "id": "native-2",
+      "panel": "native",
+      "index": 2,
+      "family": "koblitz",
+      "n": 23,
+      "m": 3,
+      "solver": "f4",
+      "twist": true,
+      "recipe": null
+    },
+    {
+      "id": "native-3",
+      "panel": "native",
+      "index": 3,
+      "family": "koblitz",
+      "n": 23,
+      "m": 3,
+      "solver": "f5",
+      "twist": true,
+      "recipe": null
+    },
+    {
+      "id": "legacy-0",
+      "panel": "legacy",
+      "index": 0,
+      "family": "koblitz",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": false,
+      "recipe": null
+    },
+    {
+      "id": "legacy-1",
+      "panel": "legacy",
+      "index": 1,
+      "family": "koblitz",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": true,
+      "recipe": null
+    },
+    {
+      "id": "legacy-2",
+      "panel": "legacy",
+      "index": 2,
+      "family": "binary",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": false,
+      "recipe": null
+    },
+    {
+      "id": "legacy-3",
+      "panel": "legacy",
+      "index": 3,
+      "family": "binary",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": true,
+      "recipe": null
+    },
+    {
+      "id": "legacy-4",
+      "panel": "legacy",
+      "index": 4,
+      "family": "prime",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": false,
+      "recipe": null
+    },
+    {
+      "id": "legacy-5",
+      "panel": "legacy",
+      "index": 5,
+      "family": "prime",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": true,
+      "recipe": null
+    },
+    {
+      "id": "policies-0",
+      "panel": "policies",
+      "index": 0,
+      "family": "koblitz",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": false,
+      "recipe": {
+        "kind": "legacy"
+      }
+    },
+    {
+      "id": "policies-1",
+      "panel": "policies",
+      "index": 1,
+      "family": "koblitz",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": false,
+      "recipe": {
+        "kind": "sampled_x_projected_control",
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "policies-2",
+      "panel": "policies",
+      "index": 2,
+      "family": "koblitz",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": false,
+      "recipe": {
+        "kind": "binary_subspace_intersection",
+        "basis": [
+          1,
+          2,
+          4
+        ],
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "policies-3",
+      "panel": "policies",
+      "index": 3,
+      "family": "koblitz",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": false,
+      "recipe": {
+        "kind": "binary_frobenius_union_intersection",
+        "basis": [
+          1,
+          2,
+          4
+        ],
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "policies-4",
+      "panel": "policies",
+      "index": 4,
+      "family": "koblitz",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": true,
+      "recipe": {
+        "kind": "legacy"
+      }
+    },
+    {
+      "id": "policies-5",
+      "panel": "policies",
+      "index": 5,
+      "family": "koblitz",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": true,
+      "recipe": {
+        "kind": "sampled_x_projected_control",
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "policies-6",
+      "panel": "policies",
+      "index": 6,
+      "family": "koblitz",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": true,
+      "recipe": {
+        "kind": "binary_subspace_intersection",
+        "basis": [
+          1,
+          2,
+          4
+        ],
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "policies-7",
+      "panel": "policies",
+      "index": 7,
+      "family": "koblitz",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": true,
+      "recipe": {
+        "kind": "binary_frobenius_union_intersection",
+        "basis": [
+          1,
+          2,
+          4
+        ],
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "policies-8",
+      "panel": "policies",
+      "index": 8,
+      "family": "binary",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": false,
+      "recipe": {
+        "kind": "legacy"
+      }
+    },
+    {
+      "id": "policies-9",
+      "panel": "policies",
+      "index": 9,
+      "family": "binary",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": false,
+      "recipe": {
+        "kind": "sampled_x_projected_control",
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "policies-10",
+      "panel": "policies",
+      "index": 10,
+      "family": "binary",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": false,
+      "recipe": {
+        "kind": "binary_subspace_intersection",
+        "basis": [
+          1,
+          2,
+          4
+        ],
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "policies-11",
+      "panel": "policies",
+      "index": 11,
+      "family": "binary",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": false,
+      "recipe": {
+        "kind": "binary_frobenius_union_intersection",
+        "basis": [
+          1,
+          2,
+          4
+        ],
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "policies-12",
+      "panel": "policies",
+      "index": 12,
+      "family": "binary",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": true,
+      "recipe": {
+        "kind": "legacy"
+      }
+    },
+    {
+      "id": "policies-13",
+      "panel": "policies",
+      "index": 13,
+      "family": "binary",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": true,
+      "recipe": {
+        "kind": "sampled_x_projected_control",
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "policies-14",
+      "panel": "policies",
+      "index": 14,
+      "family": "binary",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": true,
+      "recipe": {
+        "kind": "binary_subspace_intersection",
+        "basis": [
+          1,
+          2,
+          4
+        ],
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "policies-15",
+      "panel": "policies",
+      "index": 15,
+      "family": "binary",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": true,
+      "recipe": {
+        "kind": "binary_frobenius_union_intersection",
+        "basis": [
+          1,
+          2,
+          4
+        ],
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "policies-16",
+      "panel": "policies",
+      "index": 16,
+      "family": "prime",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": false,
+      "recipe": {
+        "kind": "legacy"
+      }
+    },
+    {
+      "id": "policies-17",
+      "panel": "policies",
+      "index": 17,
+      "family": "prime",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": false,
+      "recipe": {
+        "kind": "sampled_x_projected_control",
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "policies-18",
+      "panel": "policies",
+      "index": 18,
+      "family": "prime",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": false,
+      "recipe": {
+        "kind": "binary_subspace_intersection",
+        "basis": [
+          1,
+          2,
+          4
+        ],
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "policies-19",
+      "panel": "policies",
+      "index": 19,
+      "family": "prime",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": false,
+      "recipe": {
+        "kind": "binary_frobenius_union_intersection",
+        "basis": [
+          1,
+          2,
+          4
+        ],
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "policies-20",
+      "panel": "policies",
+      "index": 20,
+      "family": "prime",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": true,
+      "recipe": {
+        "kind": "legacy"
+      }
+    },
+    {
+      "id": "policies-21",
+      "panel": "policies",
+      "index": 21,
+      "family": "prime",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": true,
+      "recipe": {
+        "kind": "sampled_x_projected_control",
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "policies-22",
+      "panel": "policies",
+      "index": 22,
+      "family": "prime",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": true,
+      "recipe": {
+        "kind": "binary_subspace_intersection",
+        "basis": [
+          1,
+          2,
+          4
+        ],
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "policies-23",
+      "panel": "policies",
+      "index": 23,
+      "family": "prime",
+      "n": 7,
+      "m": 2,
+      "solver": "enumerate",
+      "twist": true,
+      "recipe": {
+        "kind": "binary_frobenius_union_intersection",
+        "basis": [
+          1,
+          2,
+          4
+        ],
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "domains-0",
+      "panel": "domains",
+      "index": 0,
+      "family": "prime",
+      "n": 7,
+      "m": 2,
+      "solver": "pkm",
+      "twist": false,
+      "recipe": {
+        "kind": "legacy"
+      }
+    },
+    {
+      "id": "domains-1",
+      "panel": "domains",
+      "index": 1,
+      "family": "prime",
+      "n": 7,
+      "m": 2,
+      "solver": "double-large-prime",
+      "twist": false,
+      "recipe": {
+        "kind": "legacy"
+      }
+    },
+    {
+      "id": "domains-2",
+      "panel": "domains",
+      "index": 2,
+      "family": "prime",
+      "n": 7,
+      "m": 2,
+      "solver": "pkm",
+      "twist": false,
+      "recipe": {
+        "kind": "sampled_x_projected_control",
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "domains-3",
+      "panel": "domains",
+      "index": 3,
+      "family": "prime",
+      "n": 7,
+      "m": 2,
+      "solver": "double-large-prime",
+      "twist": false,
+      "recipe": {
+        "kind": "sampled_x_projected_control",
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "domains-4",
+      "panel": "domains",
+      "index": 4,
+      "family": "prime",
+      "n": 7,
+      "m": 2,
+      "solver": "pkm",
+      "twist": true,
+      "recipe": {
+        "kind": "legacy"
+      }
+    },
+    {
+      "id": "domains-5",
+      "panel": "domains",
+      "index": 5,
+      "family": "prime",
+      "n": 7,
+      "m": 2,
+      "solver": "double-large-prime",
+      "twist": true,
+      "recipe": {
+        "kind": "legacy"
+      }
+    },
+    {
+      "id": "domains-6",
+      "panel": "domains",
+      "index": 6,
+      "family": "prime",
+      "n": 7,
+      "m": 2,
+      "solver": "pkm",
+      "twist": true,
+      "recipe": {
+        "kind": "sampled_x_projected_control",
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "domains-7",
+      "panel": "domains",
+      "index": 7,
+      "family": "prime",
+      "n": 7,
+      "m": 2,
+      "solver": "double-large-prime",
+      "twist": true,
+      "recipe": {
+        "kind": "sampled_x_projected_control",
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "causal-0",
+      "panel": "causal",
+      "index": 0,
+      "family": "prime",
+      "n": 7,
+      "m": 3,
+      "solver": "f4",
+      "twist": false,
+      "recipe": {
+        "kind": "legacy"
+      }
+    },
+    {
+      "id": "causal-1",
+      "panel": "causal",
+      "index": 1,
+      "family": "prime",
+      "n": 7,
+      "m": 3,
+      "solver": "f4",
+      "twist": false,
+      "recipe": {
+        "kind": "sampled_x_projected_control",
+        "candidate_limit": 128
+      }
+    },
+    {
+      "id": "causal-2",
+      "panel": "causal",
+      "index": 2,
+      "family": "prime",
+      "n": 7,
+      "m": 3,
+      "solver": "f4",
+      "twist": true,
+      "recipe": {
+        "kind": "legacy"
+      }
+    },
+    {
+      "id": "causal-3",
+      "panel": "causal",
+      "index": 3,
+      "family": "prime",
+      "n": 7,
+      "m": 3,
+      "solver": "f4",
+      "twist": true,
+      "recipe": {
+        "kind": "sampled_x_projected_control",
+        "candidate_limit": 128
+      }
+    }
+  ],
+  "planned": 46,
+  "scientific_corpus_rows": 0
+}
