@@ -16,6 +16,27 @@ fn partial(reason: &str) -> solvers::WorkerSolveOutput {
         artifacts: Vec::new(),
     })
 }
+// Only reachable after the full terminal work/memory allowance was reserved.
+// This uses that allowance once; it does not retry capture or write new roots.
+fn partial_admitted(reason: &'static str, budget: &mut Budget) -> solvers::WorkerSolveOutput {
+    if budget.stopped.is_none() {
+        let _ = budget.observer_failed();
+    }
+    let ledger = budget.saved_ledger();
+    let mut output = partial(reason);
+    output.data.outcome["admission_ledger"] = json!(ledger);
+    output.data.outcome["first_stop"] = json!(ledger.first_stop);
+    output.data.outcome["adapter_reserved_native_work"] = json!(ledger.native_reserved.work);
+    output.data.outcome["adapter_reserved_checking_work"] = json!(ledger.checking_reserved_work);
+    output.data.outcome["adapter_reserved_bytes"] = json!(ledger.adapter_reserved_bytes);
+    output.data.outcome["native_reserved_bytes"] = json!(ledger.native_reserved.bytes);
+    output.data.outcome["charged_trace_bytes"] = json!(ledger.charged_trace_bytes);
+    output.data.outcome["performed_group_additions"] = json!(ledger.group_additions);
+    // Closed fixed keys, one bounded ledger and static reason. No encoded copy.
+    assert!(worker_terminal_encoded_size(&output.data.outcome, WORKER_TERMINAL_CAP).is_ok());
+    output
+}
+
 fn residual(
     custody: &mut solvers::WorkerResidualCustody,
     path: &'static str,
@@ -61,11 +82,19 @@ pub(in crate::ml_dataset::solvers) fn run(
             Instant::now(),
         )
         .is_err()
-        || budget
-            .reserve_trace(4 * WORKER_TERMINAL_CAP as u64 + 4096, Instant::now())
-            .is_err()
     {
+        // No terminal allowance was admitted: retain the existing minimal
+        // refusal rather than spend a failed allowance on ledger encoding.
         return Ok(partial("ordinary terminal output admission refused"));
+    }
+    if budget
+        .reserve_trace(4 * WORKER_TERMINAL_CAP as u64 + 4096, Instant::now())
+        .is_err()
+    {
+        return Ok(partial_admitted(
+            "ordinary terminal capture admission refused",
+            &mut budget,
+        ));
     }
     // Re-admission may only shorten the original absolute deadline. Pass this
     // exact admitted deadline to construction/persistence, never renew it.
@@ -79,11 +108,21 @@ pub(in crate::ml_dataset::solvers) fn run(
             .map_err(|s| format!("{s:?}"))
     }) {
         Ok(c) => c,
-        Err(_) => return Ok(partial("ordinary residual transport admission refused")),
+        Err(_) => {
+            return Ok(partial_admitted(
+                "ordinary residual transport admission refused",
+                &mut budget,
+            ))
+        }
     };
     let mut registry = match OrdinaryRootRegistry::admit(original, &mut budget, limits) {
         Ok(r) => r,
-        Err(_) => return Ok(partial("ordinary root registry admission refused")),
+        Err(_) => {
+            return Ok(partial_admitted(
+                "ordinary root registry admission refused",
+                &mut budget,
+            ))
+        }
     };
     let mut domain = false;
     let mut witness = false;
@@ -455,17 +494,17 @@ mod tests {
     }
 
     #[test]
-    fn genuine_unsupported_ordinary_profile_exports_only_restricted_summary() {
-        // n19 is supported by the curve constructor, outside this adapter's
-        // n23..31/n47..61 profile. Do not forge a supported cell's outcome.
-        for twist in [false, true] {
-            let f = solvers::verified_worker_original_tests::Fixture::with_ordinary_runtime_shape(
-                19, twist, "f4",
+    fn early_ordinary_refusals_retain_paid_terminal_ledger_without_capture_retry() {
+        for (work, reserved) in [(390, 397312), (391, 397312), (392, 401408)] {
+            let f = solvers::verified_worker_original_tests::Fixture::with_ordinary_limits_shape(
+                23, false, "f4", false, 3, work,
             );
             execution::create(&f.root).unwrap();
             let context = execution::admit(&f.root).unwrap().unwrap();
             let (_, limits) = dataset::admit_capture_context(&f.root).unwrap().unwrap();
             let mut registry = Vec::new();
+            // The checked original verifier requires the real construction
+            // measurement predecessor, just like the production worker.
             let case = telemetry::measured(&f.root, &mut registry, "curve-construction", || {
                 solvers::curves::generate(&f.config)
             })
@@ -484,21 +523,30 @@ mod tests {
                     &case,
                     &f.root.join("live"),
                     f.binding.clone(),
-                    limits.clone(),
+                    limits,
                     Some(&context),
                     &original,
                 )
             })
             .unwrap();
             let (data, stored, residual) = output.into_parts();
-            assert_eq!(data.outcome["status"], "unsupported");
+            assert!(stored.is_empty() && residual.items.is_empty() && data.artifacts.is_empty());
+            assert_eq!(data.outcome["status"], "partial");
+            assert_eq!(data.outcome["strategy"], "binary-m3-native-v1");
+            assert_eq!(data.outcome["first_stop"], json!(Stop::Work));
             assert_eq!(
-                data.outcome["strategy"],
-                "ordinary-binary-profile-unsupported"
+                data.outcome["adapter_reserved_checking_work"],
+                json!(reserved)
             );
-            assert!(data.artifacts.is_empty());
-            assert!(stored.is_empty());
-            assert!(residual.items.is_empty());
+            assert_eq!(data.outcome["charged_trace_bytes"], json!(36864));
+            assert_eq!(data.outcome["performed_group_additions"], json!(0));
+            assert!(worker_terminal_encoded_size(&data.outcome, WORKER_TERMINAL_CAP).is_ok());
+            assert!(!f.root.join(INPUT_PATH).exists());
+            let head: capture::CommittedHead =
+                dataset::read_json(&f.root.join("live/committed.json")).unwrap();
+            assert_eq!(head.event_count, 0);
+            assert_eq!(head.byte_end, 0);
+            assert_eq!(head.payload_count, 0);
             storage::write_json(
                 &f.root,
                 "worker-artifacts.json",
@@ -507,8 +555,98 @@ mod tests {
             )
             .unwrap();
             let artifacts = dataset::collect_cell_artifacts(&f.root).unwrap();
-            let mut callbacks = 0;
-            let summary =
+            assert!(
+                replay::verify(&f.root, &f.config, &data.outcome, &artifacts)
+                    .unwrap()
+                    .is_some()
+            );
+            for mutation in 0..3 {
+                let mut bad = data.outcome.clone();
+                match mutation {
+                    0 => bad["adapter_reserved_checking_work"] = json!(0),
+                    1 => bad["admission_ledger"]["original_limits"]["native_work"] = json!(1),
+                    _ => bad["first_stop"] = serde_json::Value::Null,
+                }
+                assert!(replay::verify(&f.root, &f.config, &bad, &artifacts).is_err());
+            }
+        }
+    }
+
+    #[test]
+    fn genuine_unsupported_ordinary_profile_exports_only_restricted_summary() {
+        // Freeze genuine unsupported degrees before original generation. The
+        // n19 control remains; all controls use unchanged 16384 work/capture caps.
+        for (n, degree) in [(19, 3), (23, 7), (23, 32)] {
+            for engine in ["f4", "f5"] {
+                for twist in [false, true] {
+                    let f = solvers::verified_worker_original_tests::Fixture::with_ordinary_degree_shape(
+                n, twist, engine, false, degree,
+            );
+                    execution::create(&f.root).unwrap();
+                    let context = execution::admit(&f.root).unwrap().unwrap();
+                    let (_, limits) = dataset::admit_capture_context(&f.root).unwrap().unwrap();
+                    let mut registry = Vec::new();
+                    let case =
+                        telemetry::measured(&f.root, &mut registry, "curve-construction", || {
+                            solvers::curves::generate(&f.config)
+                        })
+                        .unwrap();
+                    let original = solvers::verify_and_store_worker_originals(
+                        &f.config,
+                        &case,
+                        &f.root,
+                        Some(&f.binding),
+                        &mut registry,
+                    )
+                    .unwrap();
+                    let output = telemetry::measured(&f.root, &mut registry, "solver", || {
+                        solvers::solve_with_verified_worker_originals(
+                            &f.config,
+                            &case,
+                            &f.root.join("live"),
+                            f.binding.clone(),
+                            limits.clone(),
+                            Some(&context),
+                            &original,
+                        )
+                    })
+                    .unwrap();
+                    let (data, stored, residual) = output.into_parts();
+                    assert_eq!(data.outcome["status"], "unsupported");
+                    assert_eq!(
+                        data.outcome["strategy"],
+                        "ordinary-binary-profile-unsupported"
+                    );
+                    assert!(data.artifacts.is_empty());
+                    assert!(stored.is_empty());
+                    assert!(residual.items.is_empty());
+                    storage::write_json(
+                        &f.root,
+                        "worker-artifacts.json",
+                        "artifact-registry",
+                        &registry,
+                    )
+                    .unwrap();
+                    let artifacts = dataset::collect_cell_artifacts(&f.root).unwrap();
+                    assert!(
+                        replay::verify(&f.root, &f.config, &data.outcome, &artifacts)
+                            .unwrap()
+                            .is_none()
+                    );
+                    // First accept the actual worker outcome; then reject claims that
+                    // relabel unsupported originals as a native source or success.
+                    for mutation in 0..4 {
+                        let mut bad = data.outcome.clone();
+                        match mutation {
+                            0 => bad["adapter_id"] = json!("binary-m3-native-v1"),
+                            1 => bad["solver_completed"] = json!(true),
+                            2 => bad["pdp_witness_verified"] = json!(true),
+                            _ => bad["status"] = json!("verified"),
+                        }
+                        assert!(replay::verify(&f.root, &f.config, &bad, &artifacts).is_err());
+                    }
+                    let mut callbacks = 0;
+                    let summary =
                 crate::ml_dataset::solvers::koblitz_m3::ordinary_causal_projection::project(
                     &f.root,
                     &f.config,
@@ -520,18 +658,20 @@ mod tests {
                     },
                 )
                 .unwrap();
-            assert_eq!(callbacks, 0);
-            assert_eq!(summary["admission_status"], "unsupported_original_profile");
-            assert_eq!(summary["group_examples"], 0);
-            assert_eq!(summary["unknown_group_suffix"], true);
-            assert_eq!(summary["source_completion_claimed"], false);
-            crate::ml_dataset::export::check_ordinary_export_rows(
-                &f.root,
-                &f.config,
-                &data.outcome,
-                &artifacts,
-                0,
-            );
+                    assert_eq!(callbacks, 0);
+                    assert_eq!(summary["admission_status"], "unsupported_original_profile");
+                    assert_eq!(summary["group_examples"], 0);
+                    assert_eq!(summary["unknown_group_suffix"], true);
+                    assert_eq!(summary["source_completion_claimed"], false);
+                    crate::ml_dataset::export::check_ordinary_export_rows(
+                        &f.root,
+                        &f.config,
+                        &data.outcome,
+                        &artifacts,
+                        0,
+                    );
+                }
+            }
         }
     }
     #[test]
