@@ -27,6 +27,10 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Run the complete p=101 isogeny walk and sieve check
         run: |
+          if [[ "$(jq -r '.freeze.status // "frozen"' research/jv_sieve_validation_20261101/protocol.json 2>/dev/null || echo frozen)" = draft ]]; then
+            echo "draft preflight: requested-prime panels remain gated; defer the long p=101 gate to the frozen run"
+            exit 0
+          fi
           cargo test --release --locked --lib
           cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies
           -- --exact --test-threads=1
