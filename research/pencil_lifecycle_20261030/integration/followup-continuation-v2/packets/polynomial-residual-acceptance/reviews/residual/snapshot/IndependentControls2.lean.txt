@@ -1,0 +1,29 @@
+import Acceptance
+import ResidualControls
+open ResidualAcceptance ResidualWord
+-- Exact square subtraction and unequal operand lengths.
+theorem exact_square_residual : residual 17 [1,2,1] [1,1] = [] := by
+  simp only [residual,square_value,empty_square,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+theorem padded_subtraction : psub 17 [2] [1,2,3] = [1,15,14] := by
+  simp only [residual,square_value,empty_square,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+-- Identity-shaped input and a nonzero residual division.
+theorem identity_accepts : accepts 17 0 [1] [] [3,4] 2 := by
+  have hs : ProductPolynomial.product 17 [1] [1]=[1] := by decide
+  simp only [accepts,residual,square_value,empty_square,hs,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+theorem degree_guard_rejects : ¬accepts 17 3 [1] [] [] 0 := by
+  have hs : ProductPolynomial.product 17 [1] [1]=[1] := by decide
+  simp only [accepts,residual,square_value,empty_square,hs,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+-- Algebraic validity alone does not force representation guard: last stored zero is rejected.
+theorem trailing_zero_divisor_rejects : ¬accepts 17 0 [1,0] [] [] 0 := by
+  have hs : ProductPolynomial.product 17 [1] [1]=[1] := by decide
+  simp only [accepts,residual,square_value,empty_square,hs,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+-- Acceptance predicate alone omits the shape restriction on v.
+theorem shape_premise_needed : accepts 17 0 [1] [1] [1] 0 := by
+  have hs : ProductPolynomial.product 17 [1] [1]=[1] := by decide
+  simp only [accepts,residual,square_value,empty_square,hs,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+#print axioms exact_square_residual
+#print axioms padded_subtraction
+#print axioms identity_accepts
+#print axioms degree_guard_rejects
+#print axioms trailing_zero_divisor_rejects
+#print axioms shape_premise_needed

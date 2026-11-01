@@ -1,0 +1,11 @@
+# Symmetric membership: future proof and encoding preflight
+
+The complete F37 size-three caps 0–12 frontier now has zero strongest-source joint records; another identical cap extension is not the next lead. This draft proposes a different algebraic encoding on the SAME actual transferable E/F37(7,19) /nonsquare35 twist T(28,33), within the already checked order19 source map hypotheses.
+
+First check the existing symmetric S3 identity and primary/atlas literature, then prove a complete cubic-product membership split in symmetric coordinates, covering distinct roots and diagonal/repeated roots, characteristic/denominator assumptions, duplicate branches and reconstruction of original coordinates. Require faithful pinned Lean attempts and a successful unchanged gate. The branch construction and generic completeness are not yet proved, implemented or executed. No displayed lower unweighted degree is a claim about weighted/original witness degree, intrinsic regularity or runtime.
+
+Only after proof/control preflight, freeze a new versioned independent native solver/auditor/protocol on all declared policies/targets, complete source-policy frontier and matched/direct-enumeration controls. Retain all branches, failures, blocked public setups and actual original-source scalar checks; never supply target labels or an exhaustive oracle to candidate stopping. Track matrix degree, weighted/pulled-back witness degree and complete pricing separately. New scientific window <=3600sec, stage caps600sec, two existing local workers, truthful approved official checkpoints. No paid provisioning, arbitrary result upload or Cairn lease. Card stays draft/code.commit null, not ready/funded or a main-ancestry task.
+
+[Executed upper-range evidence](../../research/quadratic_twist_evidence_20261021/reports/cm8-37-b3-high-20261030/README.md). Stronger useful-yield/degree/original-main-DLP goal remains open. This draft records next work, not a scientific result or a reason to reset unchanged cadence by itself.
+
+The card argv is PROSPECTIVE ONLY: `run-symmetric-membership-preflight.sh` does not exist. Implement/freeze its actual proof/control contract before invocation; no command or execution is implied by draft schema validation.

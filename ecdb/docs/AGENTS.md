@@ -13,7 +13,41 @@ It holds:
 - Frobenius data, End(E), volcano levels, embedding degrees, twists and
   subgroups;
 - division, modular, class and summation polynomials, GLV endomorphisms with
-  decomposition lattices, typed curve relations, group structures and p-ranks.
+  decomposition lattices, typed curve relations, group structures and p-ranks;
+- measured results of this repository: the IC leaderboard (28 priced curves,
+  122 recipes), the progress timeline (16 series, 94 points), the boundary
+  ledger, the `benchmarks/` index (385 entries with their `VALIDATION.json`),
+  and 1,103 ecbench sessions with 543,290 runs and 1,082 paired comparisons;
+- the sibling repositories' records:
+  - cryptanalysis: the IC candidate catalogue, factor bases, identity fixtures
+    and the challenge index;
+  - crypto-autoresearcher: curve capsules, the trait snapshot, NIST-seed
+    candidates, the endomorphism sweep and the solver fixtures;
+  - cryptanalysis-rl: the tool-policy census and stage 0b;
+  - ml-cryptanalysis: the rho-measured curve corpora.
+
+  In total 10,760 records and 24,096 measurements. The 9,189 prime-field
+  dataset curves among them are ecdb curves (family `dataset`) under their
+  computed ICV1 slugs.
+- curves generated with Sage and re-verified on import
+  ([`../sage/README.md`](../sage/README.md)):
+  - family `census-fp`: every curve over F_p, p < 2^10, up to isomorphism;
+  - family `census-f2m`: every ordinary curve over GF(2^m), m ≤ 10;
+  - families `crypto-prime`, `crypto-prime-twist`, `crypto-cm`: 32–256-bit
+    curves;
+  - families `pairing-bn`, `pairing-bls12`, `pairing-bls24`, `pairing-kss16`,
+    `pairing-kss18`;
+  - family `genus2-random`: genus-2 Jacobians.
+
+  Filter by `family` to keep a census from swamping a search.
+- 485,291 verified Vélu isogenies (ℓ = 2, 3, 5): the complete ℓ-isogeny
+  graphs over every F_p with p < 2^10, and the ℓ-neighbours of the crypto
+  and pairing curves. Walk them with `ecdb_curve_detail part=graph` or
+  `GET /v1/curves/{ref}/graph?ell=&depth=`.
+- the ℓ-volcanoes of those graphs: each curve's level (`endomorphism_level`),
+  the components (`isogeny_volcano`, `volcano_vertex`) and each edge's
+  direction (horizontal, ascending, descending). End(E) is stored for 149,593
+  census curves whose conductor is {2, 3, 5}-smooth.
 
 The design and the full table list are in [`SCHEMA.md`](SCHEMA.md). The
 routes are in [`../openapi.yaml`](../openapi.yaml).
@@ -55,6 +89,10 @@ export ECDB_TOKEN=$(aws secretsmanager get-secret-value --region us-west-2 \
   `ECDB_TOKEN` before the runtime starts. Without it, the handshake and tool
   list still work, but every tool call returns an error that names the
   secret.
+- **A LAN mirror.** When `ECDB_URL` points at a mirror built from
+  `ecdb/deploy/nas/` (for example `http://<nas>:8080`), everything here works
+  the same. Its token is `ECDB_LAN_TOKEN`, or none at all. A mirror has the
+  data of its last `sync`, so check `/v1/meta` before relying on recent rows.
 - **HTTP.** For example:
 
   ```sh
@@ -76,16 +114,24 @@ Rules for the token:
 | `ecdb_schema` | tables and views with comments; with `table`, its columns, types, keys and CHECKs | `GET /v1/schema` |
 | `ecdb_search_curves` | filtered, sorted page of `v_curve_summary` (field, genus, model, family, trace, j, CM, class number, End, subgroup bits, cofactor, embedding degree, twist security, ...) | `GET /v1/curves` |
 | `ecdb_get_curve` | the whole curve document | `GET /v1/curves/{ref}` |
-| `ecdb_curve_detail` | one part: `isogenies`, `graph` (with `depth`, `ell`), `transfers`, `covers`, `traits`, `relations`, `endomorphisms`, `division-polynomials` | `GET /v1/curves/{ref}/{part}` |
+| `ecdb_curve_detail` | one part: `isogenies`, `graph` (with `depth`, `ell`), `transfers`, `covers`, `traits`, `relations`, `endomorphisms`, `division-polynomials`, `measurements` (leaderboard rows, ecbench arms, dataset measurements, sibling records) | `GET /v1/curves/{ref}/{part}` |
 | `ecdb_isogeny_class` | one isogeny class over F_q (any dimension) by label `g.q.a1_..._ag` or id | `GET /v1/isogeny-classes/{label}` |
 | `ecdb_transfers` | transfer routes across all curves, by route kind, verdict, target and minimum ratio | `GET /v1/transfers` |
 | `ecdb_polynomials` | `modular` (Phi_l, l = 2..19), `class` (H_D, class number one) or `summation` (Semaev S_2, S_3) | `GET /v1/*-polynomials` |
+| `ecdb_results` | `leaderboard` (filters `family`, `regime`, `validation`; `recipes=true`), `progress` (`series`), `boundary` (`regime`, `stage`), `benchmarks` (`listed`, `q`) | `GET /v1/ic/*`, `GET /v1/benchmarks` |
+| `ecdb_ecbench` | a page of ecbench sessions (filters `method`, `curve`, `label`, `path`); with `session_id`, its per-arm summaries and comparisons | `GET /v1/ecbench/sessions[/{id}]` |
 | `ecdb_sql` | one read-only SELECT over schema `ec` (15 s timeout, 5,000 rows) | `POST /v1/sql` |
 | `ecdb_record_evidence` | attach a claim, with its artifact, to a curve; needs the write token | `POST /v1/evidence` |
 
 Start with `ecdb_schema` (no argument) to see the relations, then
 `ecdb_schema {"table": "..."}` before writing SQL against a table you have
 not used.
+
+Without MCP, `scripts/ecdb.sh` (in each repository that reads ecdb) does the
+same over HTTP: `ecdb.sh curve <ref> [part]`, `ecdb.sh sql '<query>'`,
+`ecdb.sh results leaderboard 'family=A'`, `ecdb.sh ecbench [session]`, and
+`ecdb.sh check`, which reports whether ecdb's pinned copy of the current
+repository's files matches the checkout.
 
 ## Reading the answers
 
@@ -126,6 +172,49 @@ not used.
   its SHA-256 and commit, or a computation (`ecdb:enrich`, `agent:<name>`).
   Rows another agent wrote through `ecdb_record_evidence` are claims with
   that agent's status, not established results.
+
+## Measured results
+
+These rows are copies of the producers' frozen files, with their source file
+and SHA-256. They are not new measurements. Read them under the repository's
+own rules:
+
+- **Leaderboard.** `ic_board_row.best_ratio_rho` is IC / rho:
+  - it is the best recipe's cold cost against the matched rho of the row's
+    family, in that family's unit (`ic_family.unit`; table A batched-addition
+    units, table B GAE, table C historical batch);
+  - compare ratios only within one family;
+  - `validation_status` is the gate's standing, and
+    `unvalidated (pre-gate)` rows are not admitted results;
+  - quote a row with its gap to rho, as the distance remaining (the success
+    criterion), never as a pass or fail.
+- **ecbench runs.**
+  - `s` is cost in GAE per sqrt(r).
+  - `lower_bound = true` means native work went unpriced; it is listed in
+    `unpriced`.
+  - Rank two arms only where the order holds at 0, 0.1 and 1 GAE per
+    unpriced operation (AGENTS.md §5a).
+  - `v_ecbench_arm` excludes warm-up runs.
+  - A session's replay audit, when it has one, is in
+    `ecbench_session.audit`.
+- **Sibling measurements.** `measurement` keeps each producer's metric and
+  unit:
+  - ml-cryptanalysis S of plain and automorphism-class rho, with SEM and
+    seed count;
+  - cryptanalysis-rl group operations and ratio to expected rho.
+
+  Compare within one dataset and metric only.
+- **Sibling records.** `external_curve_record.match` says how a record was
+  linked:
+  - `ec1` and `curve_uid`: exact representation;
+  - `icv1_slug`: same model, possibly another representation;
+  - `computed_icv1`: a dataset curve named by its computed slug;
+  - `standard_name`: a unique standard name;
+  - `none`: kept unlinked.
+
+  Never link records by j or by group order.
+- **Citations.** A claim cites the producer's file or run, which `source`
+  names, not the ecdb row.
 
 ## SQL
 
@@ -179,8 +268,15 @@ re-imports every catalogue and the computed enrichment:
 `ecdb/deploy/build-lambda.sh`, then `ecdb/deploy/deploy-aws.sh`
 (`deploy/README.md`).
 
-- Do this after a change to `docs/curves/registry.json`, `traits.json`,
-  `covers.json`, `jacobian-transfers.json`, the certificates, or a walk
-  output that ecdb imports.
+- Do this after a change to anything ecdb imports:
+  - `docs/curves/registry.json`, `traits.json`, `covers.json`,
+    `jacobian-transfers.json`, the certificates, or a walk output;
+  - `docs/ic/leaderboard.json`, `progress-timeline.json`,
+    `boundary_targets.json` or `benchmarks/`;
+  - a new ecbench session;
+  - the sibling files listed in `ecdb/src/import/siblings.rs`.
+
+  `scripts/ecdb.sh check` lists the files whose checkout differs from what
+  ecdb holds.
 - A new importer or producer goes in `ecdb/src/import/`, in Rust, with a test
   that checks its values (the repository's no-Python rule applies).

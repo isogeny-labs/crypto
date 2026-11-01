@@ -18,6 +18,8 @@ covers and priced DLP transfers from the isogeny-labs repositories. Name curves 
 or standard name (secp256k1, P-256, sect163k1). Integers beyond 2^53 are decimal strings; field elements are \
 strings in the field's encoding. Every derived value has a status (proved, probable, bounded, heuristic, \
 conjectural, unknown, ...); unknown is null, never 0. Transfer costs are formula estimates, not measured speedups. \
+Measured results (IC leaderboard, progress, boundary ledger, benchmarks, ecbench sessions and runs, sibling-repository \
+datasets) keep their producer's unit and reference: ecdb_results, ecdb_ecbench, ecdb_curve_detail part=measurements. \
 Start with ecdb_schema or ecdb_search_curves; use ecdb_sql for anything the other tools do not cover.";
 
 fn tools() -> Value {
@@ -63,7 +65,7 @@ fn tools() -> Value {
             "description": "One part of a curve in full: isogenies (kernel polynomials, codomains, certificates), graph (recorded isogeny graph; depth 0-8, optional ell), transfers (priced DLP routes), covers (cover curves and maps), traits (verbatim producer records), relations (twists, isomorphisms, model changes), endomorphisms (with GLV lattices), division-polynomials (coefficients).",
             "inputSchema": s(json!({
                 "ref": curve_ref,
-                "part": { "type": "string", "enum": ["isogenies", "graph", "transfers", "covers", "traits", "relations", "endomorphisms", "division-polynomials"] },
+                "part": { "type": "string", "enum": ["isogenies", "graph", "transfers", "covers", "traits", "relations", "endomorphisms", "division-polynomials", "measurements"], "description": "measurements: the curve's IC leaderboard rows with recipes, ecbench arm summaries, sibling-dataset measurements and sibling-repository records" },
                 "depth": { "type": "integer", "minimum": 0, "maximum": 8 }, "ell": { "type": "string" }
             }), &["ref", "part"]),
         },
@@ -89,6 +91,27 @@ fn tools() -> Value {
                 "kind": { "type": "string", "enum": ["modular", "class", "summation"] },
                 "level": { "type": "integer" }, "coefficients": { "type": "boolean" }
             }), &["kind"]),
+        },
+        {
+            "name": "ecdb_results",
+            "description": "Measured results of the crypto repository as frozen there. kind=leaderboard: IC leaderboard rows (best recipe's cold cost over matched rho, per family A/B/C; filters family, regime, validation; recipes=true adds every recipe). kind=progress: the progress timeline (filter series). kind=boundary: the boundary ledger (filters regime, stage). kind=benchmarks: the benchmarks/ index with VALIDATION.json (filters listed=admitted|archive|unlisted, q, limit, offset). Ratios compare only within one family or series.",
+            "inputSchema": s(json!({
+                "kind": { "type": "string", "enum": ["leaderboard", "progress", "boundary", "benchmarks"] },
+                "family": { "type": "string", "enum": ["A", "B", "C"] }, "regime": { "type": "string" },
+                "validation": { "type": "string" }, "recipes": { "type": "boolean" },
+                "series": { "type": "string" }, "stage": { "type": "string" },
+                "listed": { "type": "string", "enum": ["admitted", "archive", "unlisted"] }, "q": { "type": "string" },
+                "limit": { "type": "integer" }, "offset": { "type": "integer" }
+            }), &["kind"]),
+        },
+        {
+            "name": "ecdb_ecbench",
+            "description": "ecbench sessions (sealed measurement runs of rho, BSGS, kangaroo and IC methods). Without session_id: a page of sessions (filters method, curve slug, label, path). With session_id: the session, per-arm summaries (runs, verified, mean S with standard error, mean ratio to the floor) and paired comparisons. S is GAE per sqrt(r); lower_bound means unpriced native work.",
+            "inputSchema": s(json!({
+                "session_id": { "type": "string" }, "method": { "type": "string" }, "curve": { "type": "string" },
+                "label": { "type": "string" }, "path": { "type": "string" },
+                "limit": { "type": "integer" }, "offset": { "type": "integer" }
+            }), &[]),
         },
         {
             "name": "ecdb_sql",
@@ -158,6 +181,7 @@ fn route(name: &str, args: &Map<String, Value>) -> Result<(Method, String, Optio
                 "relations",
                 "endomorphisms",
                 "division-polynomials",
+                "measurements",
             ];
             if !PARTS.contains(&part) {
                 return Err(format!("part must be one of {PARTS:?}"));
@@ -175,6 +199,17 @@ fn route(name: &str, args: &Map<String, Value>) -> Result<(Method, String, Optio
             "class" => (Method::GET, "/v1/class-polynomials".into(), None),
             "summation" => (Method::GET, "/v1/summation-polynomials".into(), None),
             other => return Err(format!("unknown polynomial kind {other:?}")),
+        },
+        "ecdb_results" => match arg(args, "kind")? {
+            "leaderboard" => (Method::GET, format!("/v1/ic/leaderboard{}", query(args, &["kind"])), None),
+            "progress" => (Method::GET, format!("/v1/ic/progress{}", query(args, &["kind"])), None),
+            "boundary" => (Method::GET, format!("/v1/ic/boundary{}", query(args, &["kind"])), None),
+            "benchmarks" => (Method::GET, format!("/v1/benchmarks{}", query(args, &["kind"])), None),
+            other => return Err(format!("unknown results kind {other:?}")),
+        },
+        "ecdb_ecbench" => match args.get("session_id").and_then(Value::as_str) {
+            Some(id) => (Method::GET, format!("/v1/ecbench/sessions/{}", enc(id)), None),
+            None => (Method::GET, format!("/v1/ecbench/sessions{}", query(args, &["session_id"])), None),
         },
         "ecdb_sql" => (Method::POST, "/v1/sql".into(), Some(Value::Object(args.clone()))),
         "ecdb_record_evidence" => (Method::POST, "/v1/evidence".into(), Some(Value::Object(args.clone()))),
@@ -314,6 +349,13 @@ mod tests {
         q.insert("end_is_maximal".into(), json!(true));
         assert_eq!(route("ecdb_search_curves", &q).unwrap().1, "/v1/curves?end_is_maximal=true&family=koblitz");
         assert!(route("ecdb_nope", &Map::new()).is_err());
-        assert_eq!(tools().as_array().unwrap().len(), 9);
+        let mut r = Map::new();
+        r.insert("kind".into(), json!("leaderboard"));
+        r.insert("family".into(), json!("A"));
+        assert_eq!(route("ecdb_results", &r).unwrap().1, "/v1/ic/leaderboard?family=A");
+        let mut e = Map::new();
+        e.insert("session_id".into(), json!("ECBS1hffaa276d8a5c"));
+        assert_eq!(route("ecdb_ecbench", &e).unwrap().1, "/v1/ecbench/sessions/ECBS1hffaa276d8a5c");
+        assert_eq!(tools().as_array().unwrap().len(), 11);
     }
 }
