@@ -23,6 +23,20 @@ run `tools/lean/proof-gate.sh research/p2_halving_carry_20261101` to build the
 source and audit its transitive theorem axioms. The targeted pull request
 workflow runs that same command and retains its receipt.
 
+| Lean theorem | Exact condition used | What it establishes |
+| --- | --- | --- |
+| `carry_mem_reduction_kernel` | The reduction is additive, the section reduces to its input, and twice the chosen half equals the target. | Reduction of the carry is zero. |
+| `homomorphic_section_carry_zero` | The section is additive and twice the half equals the target. | Its carry is zero. |
+| `exact_predicate_supplies_parity` | The predicate is already exact for every point. | The queried bit equals scalar parity. |
+| `reconstruct_eq` | The oracle returns integer parity for every nonnegative input. | Recursive reconstruction returns that integer. |
+| `verified_scalar_unique` | Both scalar images equal the target and the scalar-action map is injective on the admitted domain. | The two scalars are equal. |
+| `totalCost_bound` | The full seven-term cost sum is at most the stated budget. | The defined total cost is at most that budget. |
+
+The Lean file does not prove that a frozen H111 predicate is exact, that an EC
+scalar-action map is injective without restricting representatives, or a
+numerical budget bound. Those remain separate empirical or application
+premises.
+
 ## Reproduce
 
 ```bash
