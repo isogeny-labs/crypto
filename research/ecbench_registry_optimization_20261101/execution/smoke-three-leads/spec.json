@@ -1,0 +1,26 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Registry optimization development: three-leads implementations",
+  "description": "Frozen p=739 Scholten fixture covering pencil, follow-up collectors, generic/Jacobian rho, signed large-prime IC, and decomposition controls. Low development caps retain exhaustion instead of fabricating wins.",
+  "workloads": {
+    "curves": [{"kind": "three_leads", "p": 739, "n": 2, "modulus": 1, "a": 493102, "b": 193650, "group_order": 546352, "r": 34147, "gx": 433246, "gy": 59741, "family": "scholten", "parameter": 0}],
+    "targets_per_curve": 1,
+    "target_seed": 202611010401,
+    "target_kind": "planted"
+  },
+  "arms": [
+    {"name": "rho-neg-reference", "role": "reference", "method": {"id": "rho.three_leads_negation_v1", "params": {"trial_cap": "2000"}}},
+    {"name": "rho-neg-aa", "role": "control", "method": {"id": "rho.three_leads_negation_v1", "params": {"trial_cap": "2000"}}},
+    {"name": "pencil-symbolic", "role": "candidate", "method": {"id": "ic.three_leads_genus2_pencil_symbolic_v2", "params": {"small_denominator": "2", "matrix_coefficient_cap": "1000000"}}},
+    {"name": "choice2", "role": "candidate", "method": {"id": "ic.three_leads_genus2_choice2_v1", "params": {"trial_cap": "2000"}}},
+    {"name": "projective-chart", "role": "candidate", "method": {"id": "ic.three_leads_genus2_projective_chart_v1", "params": {"trial_cap": "2000"}}},
+    {"name": "target-rank", "role": "candidate", "method": {"id": "ic.three_leads_genus2_target_rank_v1", "params": {"trial_cap": "2000"}}},
+    {"name": "rho-plain", "role": "baseline", "method": {"id": "rho.three_leads_plain_v1", "params": {"trial_cap": "2000"}}},
+    {"name": "rho-jacobian", "role": "candidate", "method": {"id": "rho.three_leads_jacobian_v1", "params": {"trial_cap": "2000"}}},
+    {"name": "genus2-v1", "role": "baseline", "method": {"id": "ic.three_leads_genus2_v1", "params": {"trial_cap": "2000", "independent": "1", "unique_relations": "1"}}},
+    {"name": "genus2-v2", "role": "candidate", "method": {"id": "ic.three_leads_genus2_v2", "params": {"trial_cap": "2000", "independent": "1", "unique_relations": "1"}}},
+    {"name": "decomposition-v1", "role": "baseline", "method": {"id": "ic.three_leads_decomposition_v1", "params": {"trial_cap": "2000", "oracle": "subtract", "random_base": "0", "base_seed": "17"}}},
+    {"name": "decomposition-v2", "role": "candidate", "method": {"id": "ic.three_leads_decomposition_v2", "params": {"trial_cap": "2000", "oracle": "subtract", "random_base": "0", "base_seed": "17"}}}
+  ],
+  "measurement": {"rounds": 4, "warmup": 1, "order": "alternate", "seed": 202611010402, "isolation_required": "L2", "timeout_seconds": 180}
+}

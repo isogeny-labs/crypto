@@ -3,12 +3,17 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 COMMIT = "ff7ad61cfed11908fb79de9dd485b696d0ada779"
 BINARY = "924d090c1d83a20ce954848c04b116cee4d5a7cb04187bb618dff60958bfd64d"
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def instrument() -> dict:
@@ -37,7 +42,7 @@ def protocol() -> dict:
             "role": "candidate",
             "description": "current factor-base, root-finding, BSGS and kangaroo prime arms",
             "instrument": instrument(),
-            "parameters": {"manifest": "execution/manifest.json", "cell": "prime"},
+            "parameters": {"manifest": "execution/shard-manifest.json", "cell": "prime"},
             "same_instrument_as": "prime-rho-v2",
         },
         {
@@ -48,7 +53,8 @@ def protocol() -> dict:
             "parameters": {
                 "method": "rho.signed_frobenius_strong_v2",
                 "additional_reference": "rho.signed_frobenius_strong_escape",
-                "specs": "draft koblitz-n13,n19,n23,n31; final shards pending",
+                "reference_rule": "paired minimum common-accounting S; union of both A/A envelopes",
+                "specs": "specs/shards/koblitz-n13,n19,n23,n31 groups",
             },
             "same_instrument_as": "prime-rho-v2",
         },
@@ -57,7 +63,7 @@ def protocol() -> dict:
             "role": "candidate",
             "description": "root finding, inherited F4, F6-IC and pair-claw Koblitz arms",
             "instrument": instrument(),
-            "parameters": {"manifest": "execution/manifest.json", "cell": "koblitz"},
+            "parameters": {"manifest": "execution/shard-manifest.json", "cell": "koblitz"},
             "same_instrument_as": "prime-rho-v2",
         },
         {
@@ -65,7 +71,103 @@ def protocol() -> dict:
             "role": "candidate",
             "description": "all 11 live nested algebraic solver backends on one matched E2E cell",
             "instrument": instrument(),
-            "parameters": {"spec": "specs/solver-backends-k17.json"},
+            "parameters": {"manifest": "execution/shard-manifest.json", "cell": "solver-backends"},
+            "same_instrument_as": "prime-rho-v2",
+        },
+        {
+            "id": "random-rho-v2",
+            "role": "reference",
+            "description": "rho.negation_v2 on the four random-binary sizes",
+            "instrument": instrument(),
+            "parameters": {"method": "rho.negation_v2", "cell": "random-binary"},
+            "same_instrument_as": "prime-rho-v2",
+        },
+        {
+            "id": "random-candidates",
+            "role": "candidate",
+            "description": "matrix F4/F5 and inherited F4/F6 on matched random-binary systems",
+            "instrument": instrument(),
+            "parameters": {"manifest": "execution/shard-manifest.json", "cell": "random-binary"},
+            "same_instrument_as": "prime-rho-v2",
+        },
+        {
+            "id": "j0-rho-v2",
+            "role": "reference",
+            "description": "rho.cubic_v2 on the certified j=0 subgroup",
+            "instrument": instrument(),
+            "parameters": {"method": "rho.cubic_v2", "cell": "symmetry-j0"},
+            "same_instrument_as": "prime-rho-v2",
+        },
+        {
+            "id": "j0-candidates",
+            "role": "candidate",
+            "description": "legacy cubic rho and current generic algorithms on the j=0 fixture",
+            "instrument": instrument(),
+            "parameters": {"manifest": "execution/shard-manifest.json", "cell": "symmetry-j0"},
+            "same_instrument_as": "prime-rho-v2",
+        },
+        {
+            "id": "j1728-rho-v2",
+            "role": "reference",
+            "description": "rho.quartic_v2 on the certified j=1728 subgroup",
+            "instrument": instrument(),
+            "parameters": {"method": "rho.quartic_v2", "cell": "symmetry-j1728"},
+            "same_instrument_as": "prime-rho-v2",
+        },
+        {
+            "id": "j1728-candidates",
+            "role": "candidate",
+            "description": "legacy quartic rho and current generic algorithms on the j=1728 fixture",
+            "instrument": instrument(),
+            "parameters": {"manifest": "execution/shard-manifest.json", "cell": "symmetry-j1728"},
+            "same_instrument_as": "prime-rho-v2",
+        },
+        {
+            "id": "generator-rho-full",
+            "role": "reference",
+            "description": "both full-price Frobenius rho references on the n=29 engineering panel",
+            "instrument": instrument(),
+            "parameters": {"cell": "generator-orbit", "unit": "full-price"},
+            "same_instrument_as": "prime-rho-v2",
+        },
+        {
+            "id": "generator-candidates",
+            "role": "candidate",
+            "description": "lazy, layout and generator-orbit one-column full-price pipelines",
+            "instrument": instrument(),
+            "parameters": {"manifest": "execution/shard-manifest.json", "cell": "generator-orbit"},
+            "same_instrument_as": "prime-rho-v2",
+        },
+        {
+            "id": "f2m4-rho",
+            "role": "reference",
+            "description": "counted strong negation rho on one-word fixtures and the implemented wide rho at m=16",
+            "instrument": instrument(),
+            "parameters": {"cells": "f2m4-specialized,f2m4-wide", "target_kind": "planted"},
+            "same_instrument_as": "prime-rho-v2",
+        },
+        {
+            "id": "f2m4-candidates",
+            "role": "candidate",
+            "description": "dense/Wiedemann Gaudry-D4 binary pipelines; planted-target implementation panel only",
+            "instrument": instrument(),
+            "parameters": {"manifest": "execution/shard-manifest.json", "cells": "f2m4-specialized,f2m4-wide"},
+            "same_instrument_as": "prime-rho-v2",
+        },
+        {
+            "id": "large-prime-rho",
+            "role": "reference",
+            "description": "both current Koblitz strong-rho references on the explicit n=11 fixture",
+            "instrument": instrument(),
+            "parameters": {"cell": "binary-large-prime"},
+            "same_instrument_as": "prime-rho-v2",
+        },
+        {
+            "id": "large-prime-candidate",
+            "role": "candidate",
+            "description": "exact n-1 double-large-prime v2 candidate",
+            "instrument": instrument(),
+            "parameters": {"manifest": "execution/shard-manifest.json", "cell": "binary-large-prime"},
             "same_instrument_as": "prime-rho-v2",
         },
         {
@@ -87,6 +189,9 @@ def protocol() -> dict:
         "authors": ["Codex frontier review"],
         "links": {
             "manifest": "execution/manifest.json",
+            "shard_manifest": "execution/shard-manifest.json",
+            "shard_preflight": "execution/shard-preflight-plans.json",
+            "sharding": "SHARDS.md",
             "coverage": "coverage.json",
             "implementations": "IMPLEMENTATIONS.md",
             "literature": "LITERATURE.md",
@@ -106,9 +211,18 @@ def protocol() -> dict:
             },
             {
                 "id": "C2",
-                "text": "A candidate moves a domain frontier only if its paired cold E2E cost is below the matched rho outside the A/A spread across the full pricing band.",
+                "text": "A candidate moves a domain frontier only if its paired cold E2E cost is below the matched rho outside the A/A spread across the full pricing band; planted extension-field panels cannot decide a public-target claim.",
                 "class": "comparative",
-                "decided_by": ["C-prime", "C-koblitz"],
+                "decided_by": [
+                    "C-prime",
+                    "C-koblitz",
+                    "C-random",
+                    "C-j0",
+                    "C-j1728",
+                    "C-generator",
+                    "C-f2m4",
+                    "C-large-prime",
+                ],
                 "if_supported": "promote only the exact domain, sizes, target law, unit and evidence level measured",
                 "if_not_supported": "retain the row as dominated, tied, censored or unranked; do not extrapolate a win",
             },
@@ -152,7 +266,7 @@ def protocol() -> dict:
                 "present": False,
                 "arm": None,
                 "expected_detection": None,
-                "not_applicable_reason": "every public synthetic workload is a known-answer instance and [d]G=Q is checked on every row",
+                "not_applicable_reason": "every workload has an independently checked discrete-log recovery path; planted scalars are retained only by the runner and public targets are checked by [d]G=Q",
             },
             "negative": {
                 "present": False,
@@ -165,13 +279,24 @@ def protocol() -> dict:
             "independent": [
                 {
                     "name": "algorithm",
-                    "levels": ["matched rho", "prime candidates", "Koblitz candidates", "solver backends"],
+                    "levels": [
+                        "matched rho",
+                        "prime candidates",
+                        "Koblitz candidates",
+                        "random-binary candidates",
+                        "symmetry candidates",
+                        "generator-orbit candidates",
+                        "extension-field candidates",
+                        "large-prime candidate",
+                        "solver backends",
+                    ],
                 }
             ],
             "factors": [
-                {"name": "domain", "treatment": "fixed", "value": "prime or Koblitz", "how": "never pooled across domains"},
-                {"name": "size", "treatment": "fixed", "value": "four preregistered sizes per domain", "how": "one EKS job per size"},
-                {"name": "target", "treatment": "randomized", "how": "eight public targets from frozen target_seed per spec"},
+                {"name": "domain", "treatment": "fixed", "value": "the panel named in shard-manifest.json", "how": "never pooled across domains"},
+                {"name": "size", "treatment": "fixed", "value": "four preregistered sizes in each scaling domain", "how": "two EKS target blocks per comparison group and size"},
+                {"name": "target", "treatment": "randomized", "how": "two frozen four-target blocks, eight targets per comparison cell"},
+                {"name": "target_law", "treatment": "fixed", "value": "public except planted f2m4 implementation panels", "how": "never pool planted and public rows; planted rows cannot decide a public-target claim"},
                 {"name": "pricing_weight", "treatment": "fixed", "value": "0, 0.1, 1 GAE/native op", "how": "all three reported"},
                 {"name": "arm_order", "treatment": "randomized", "how": "six alternate measured rounds after one warmup"},
                 {"name": "host_load", "treatment": "measured", "how": "native isolation capsule and per-row L2 grade"},
@@ -179,6 +304,12 @@ def protocol() -> dict:
             "comparisons": [
                 {"id": "C-prime", "arms": ["prime-rho-v2", "prime-candidates"], "differs_in": ["algorithm"], "design": "one_factor"},
                 {"id": "C-koblitz", "arms": ["koblitz-rho-v2", "koblitz-candidates"], "differs_in": ["algorithm"], "design": "one_factor"},
+                {"id": "C-random", "arms": ["random-rho-v2", "random-candidates"], "differs_in": ["algorithm"], "design": "one_factor"},
+                {"id": "C-j0", "arms": ["j0-rho-v2", "j0-candidates"], "differs_in": ["algorithm"], "design": "one_factor"},
+                {"id": "C-j1728", "arms": ["j1728-rho-v2", "j1728-candidates"], "differs_in": ["algorithm"], "design": "one_factor"},
+                {"id": "C-generator", "arms": ["generator-rho-full", "generator-candidates"], "differs_in": ["algorithm"], "design": "one_factor"},
+                {"id": "C-f2m4", "arms": ["f2m4-rho", "f2m4-candidates"], "differs_in": ["algorithm"], "design": "one_factor"},
+                {"id": "C-large-prime", "arms": ["large-prime-rho", "large-prime-candidate"], "differs_in": ["algorithm"], "design": "one_factor"},
                 {"id": "C-solver", "arms": ["koblitz-rho-v2", "solver-candidates"], "differs_in": ["algorithm"], "design": "one_factor"},
                 {"id": "C-aa", "arms": ["prime-rho-v2", "rho-aa"], "differs_in": [], "design": "aa"},
             ],
@@ -194,17 +325,17 @@ def protocol() -> dict:
                 "nonce": None,
                 "note": "ecbench derives every algorithm seed from the frozen spec, workload and round",
             },
-            "instance_sampling": {"rule": "eight public targets per spec from frozen SHA-256 target law", "independent_of_arm": True},
+            "instance_sampling": {"rule": "two frozen four-target blocks per comparison cell; public SHA-256 targets except the disclosed planted f2m4 panels", "independent_of_arm": True},
             "blinding": {"analysis_labels_masked": False, "how": "method identities are required for accounting audits", "unmasked_at": None},
         },
         "sample_size": {
-            "instances": 72,
+            "instances": 8,
             "replicates": 6,
             "warmups": 1,
             "power": {
                 "method": "paired_bootstrap",
                 "alpha": 0.05,
-                "tests_in_family": 3,
+                "tests_in_family": 9,
                 "correction": "holm",
                 "rank_test_n": None,
                 "min_attainable_two_sided_p": None,
@@ -212,11 +343,11 @@ def protocol() -> dict:
                 "note": "eight targets and six rounds per cell; inference clusters by workload and never pools domains",
             },
             "preflight_runtime": {
-                "fixed_seconds": 60,
+                "fixed_seconds": 0,
                 "per_sample_seconds": 0,
                 "threads": 1,
                 "estimated_total_seconds": 0,
-                "measured_on": "unknown until the trusted EKS image and dry-run receipt exist",
+                "measured_on": "plan-only expansion complete; exact-image per-arm runtime preflight remains a freeze blocker and no local wall timing is substituted",
             },
         },
         "metrics": {
@@ -283,7 +414,7 @@ def protocol() -> dict:
             "retries": {"infrastructure_only": True, "max_attempts": 1},
         },
         "stopping_rules": [
-            {"rule": "draft design: candidate/reference/A-A shards, eight targets, one warmup and six measured rounds; exact shard roster must be fixed before freeze", "kind": "fixed_n", "preregistered": True},
+            {"rule": "92 plan-valid candidate/reference/A-A shards, two four-target blocks, one warmup and six measured rounds; the exact IDs remain draft until runtime preflight and analysis hashing", "kind": "fixed_n", "preregistered": True},
             {"rule": "a per-execution timeout is a censored row, never a zero-cost row and never silently retried", "kind": "budget", "preregistered": True},
             {"rule": "stop without rank promotion if no authenticated EKS route or trusted image digest is available", "kind": "invalidation", "preregistered": True},
         ],
@@ -291,11 +422,22 @@ def protocol() -> dict:
             "wrong answers are retained and exclude the affected arm from decisive ranking",
             "wall time below L2 is descriptive only",
             "a native solver counter with incomplete scope is backend-local and cannot decide a global rank",
+            "a planted f2m4 row cannot decide a public-target frontier claim",
             "a missing result is blocked/unmeasured, not a loss",
         ],
         "decision_rule": {
-            "text": "Promote only when the candidate/reference paired ratio has a Holm-adjusted 95% interval below 1, exceeds the A/A spread, remains below 1 at weights 0, 0.1 and 1, verifies every decisive answer, and has no hidden/unpriced work outside the declared band.",
-            "comparison_ids": ["C-prime", "C-koblitz", "C-solver"],
+            "text": "Promote only when the candidate/reference paired ratio has a Holm-adjusted 95% interval below 1, exceeds the applicable A/A spread, remains below 1 at weights 0, 0.1 and 1, verifies every decisive answer, has no hidden/unpriced work outside the declared band, and matches the claim's target law.",
+            "comparison_ids": [
+                "C-prime",
+                "C-koblitz",
+                "C-random",
+                "C-j0",
+                "C-j1728",
+                "C-generator",
+                "C-f2m4",
+                "C-large-prime",
+                "C-solver",
+            ],
             "threshold": "upper interval below 1 across the pricing band and outside A/A",
             "statistic": "ratio of summed paired S; L2 wall reported separately",
             "interval": "cluster bootstrap by workload, 95%, 4000 resamples",
@@ -304,7 +446,10 @@ def protocol() -> dict:
             "verdict_vocabulary": ["frontier_promoted", "dominated", "tied_within_control", "censored", "unranked_incomplete_accounting", "blocked_infrastructure"],
         },
         "analysis_plan": {
-            "script": None,
+            "script": {
+                "path": "research/ecbench_e2e_frontier_20261031/analyze_shards.py",
+                "sha256": sha256(ROOT / "analyze_shards.py"),
+            },
             "inputs": ["session/records.jsonl", "session/session.json", "audit.json", "l2-gate.json"],
             "outputs": ["comparison JSON", "pricing-band table", "Pareto frontier", "REPORT.pdf"],
             "blinded": False,
