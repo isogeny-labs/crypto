@@ -11,3 +11,7 @@ The bounded local invocation is one attempt per cell, 30 seconds, 2 GiB memory, 
 The construction context is [Semaev's summation-polynomial paper](https://eprint.iacr.org/2004/031.pdf), whose initial prime-field construction assumes characteristic other than two or three, and [On Index Calculus Algorithms for Subfield Curves](https://sacworkshop.org/SAC20/files/preproceedings/18-IndexCalculus.pdf), which derives Frobenius-invariant factor-base conditions for Koblitz curves. This panel reuses the native bounded enumeration adapter; it does not import either paper's asymptotic claims. The earlier [ordinary-binary n23 report](../ml_dataset_binary23_m3_15_enum_20261031/report/run.md) supplies the same paired-twist custody and censoring precedent.
 
 Pre-data file SHA-256: protocol `00b56f3bca568dfa4bdfb2a4d7d4972d7b90f255f0f001f2428fb6dc1845c6fc`; plan `aaf4f3abb59fea7b5aad3e6059504e0ab59c11d84f031f786b2d7b447be86e19`. The canonical protocol body hash is `5e1b765211297eff92cd763c9ac34023dc7a9d2b9d71d024dbaf89f37d5aecdf`.
+
+## Protocol admission correction before data
+
+The native `dataset preflight` accepted v1 and recorded 12 planned, zero generated cells, but the independently fetched official `experiment_protocol.py validate` checker rejected v1 with 48 schema findings (exit 1). Its full output is [retained here](official-protocol-v1-check.log). The v1 freeze and bound plan are immutable pre-data evidence; no `dataset generate` command has run. A v2 protocol in the official schema and a new bound plan are required before generation.
