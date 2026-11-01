@@ -1,0 +1,15 @@
+# Literal slope and inverse-leading payload
+
+Five main declarations compile. slope_words_decode derives canonical UInt64 coefficient words (s0*ni)%p and (s1*ni)%p and decodes them to S0/N and S1/N. inverse_lead_decode follows native order (N*si)%p, its reduced UInt64 square, then wordNeg, proving canonicality and decoding to -(N/S1)^2. Both compose the prior literal coefficient prelude and generated batch inverse from eight canonical inputs and actual nonzero norm/s1 guards; no target correspondence is assumed.
+
+slope_polynomial_decode proves that C(decoded slope0)+C(decoded slope1)*X equals the field CRT slope. literal_scale_monic composes the actual inverseLead word with the previously established quotient-leading-coefficient formula. The strongest source_payload_quotient theorem constructs Q from both original input residuals and degree(f)=5, with f-decodedV^2=sourceU*Q, degree Q=2, and C(decoded inverseLead)*Q monic. It does not assume a quotient witness or a predecoded source slope.
+
+Scope: prime2<p<2^31, eight canonical input coefficient words, actual nonzero norm/s1 guards, and quintic/input-residual assumptions for the quotient endpoint. Native interpretation concerns Field.n=1 and diagnostic tables absent. The decoded polynomial construction is connected to actual coefficient words; native pmul/padd/pexact/pscale list calls, allocation/counters/compiler and final arrays remain separate. The theorem's C(decoded inverseLead)*Q is polynomial scaling, not yet a claim that a native pscale invocation returned particular words. No divisor-class addition claim.
+
+Checks: FastPayloadWords-attempt-AUtKdS6J, FastPayloadPolynomial-attempt-XwNbOLLo, FastPayloadControls-attempt-4iISB1V8 and FastPayloadReadback-attempt-CCEeM31a exit0 with unchanged bindings. Eleven exact named readbacks contain standard propext/Classical.choice/Quot.sound subsets. ExpectedFailure-attempt-PrbwzFIV rejects 0=1 with exit1. Existing compiler/dependency cache trust remains explicit; independent review pending.
+
+Six fixed controls: p17 nonunit prelude produces slope words12,8 and inverseLead13; concrete quintic degree; complete word-to-monic theorem for Ua=X2,Ub=X2+1,Va=1,Vb=X+1,f=X5-X4-X3+1 over F17 with both input residual witnesses; p3 payload values; missing minus-sign mismatch; excluded zero slope guard. No smoothness is claimed for the polynomial fixture.
+
+Retained failure FastPayloadControls-attempt-N4NFxZAA: broad simp left natDegree X goals in the concrete ZMod type. Explicit natDegree_X_pow rewrites closed the unchanged fixture-degree statement. No main theorem attempts failed. Prior packets unchanged; no repository edits, cloud/scientific execution, timing or costs. Frozen cohort and campaign limits preserved.
+
+Next joint: instantiate existing native polynomial product/addition/exact-division/scale/remainder models using these canonical coefficients and the constructed quotient, then establish final stored output and equality to the generic fallback. Reuse existing pscale model there rather than equating abstract polynomial scaling with the native call here.

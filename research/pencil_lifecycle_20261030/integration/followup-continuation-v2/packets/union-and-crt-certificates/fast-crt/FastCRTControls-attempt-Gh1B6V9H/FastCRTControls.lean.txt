@@ -1,0 +1,26 @@
+import FastCRTCertificates
+set_option autoImplicit false
+namespace FastCRTControls
+open Polynomial FastCRT
+-- Identical quadratic supports force the first guard to fail.
+theorem identical_support_norm_zero : norm (0:ℚ) 0 2 3=0 := by norm_num [norm]
+-- Distinct coprime supports may still fail the slope guard.
+theorem nonzero_norm_zero_slope : norm (0:ℚ) 1 0 1=1 ∧ slopeOne (0:ℚ) 1 0 2=0 := by
+ norm_num [norm,slopeOne]
+-- Ua=X^2 has a repeated root; Ub=X^2+1 is coprime to it.
+theorem repeated_support_certificate :
+ (support (0:ℚ) 0-support 0 1)*adjugate 0 (-1) 0 = C 1 := by
+ have h := support_inverse_certificate (0:ℚ) 0 0 1
+ norm_num [norm,adjugate] at h ⊢
+ exact h
+-- Native coefficient orientation; negating sb-sa flips the slope term.
+theorem native_orientation :
+ slopeZero (1:ℚ) 2 3 4 5 6=6 ∧ slopeOne (1:ℚ) 2 3 4=2 ∧
+ slopeOne (1:ℚ) 2 (-3) (-4) ≠ 2 := by norm_num [slopeZero,slopeOne]
+-- Instantiate the full divisibility certificate with both differences nonzero.
+theorem source_instantiation :
+ support (5:ℚ) 6 ∣ delta (3:ℚ) 4*adjugate 1 2 5-(C (6:ℚ)+C (2:ℚ)*X) := by
+ have h := crt_slope_certificate (6:ℚ) 8 1 2 5 6 4 6
+ norm_num [slopeZero,slopeOne] at h
+ exact h
+end FastCRTControls
