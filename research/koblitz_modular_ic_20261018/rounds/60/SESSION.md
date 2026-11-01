@@ -11,3 +11,17 @@ Actualfourchartprofiles,full64rowkernel/involution/tracegate,then404patterns,sha
 
 ### Errors
 No R60 invocation yet. R59 initial missinglibraryfailure remains recorded.
+
+## 2026-11-01T17:42:08.348038+00:00 — first native attempt rejected and syntax repaired
+
+### What was done
+mixed60-01 terminalexit0butrejected: Singular cannot increment an indexed intvec entry with postfix++. All four chart bodies failed; latePASS excluded. Raw/protocol/source/errors retained.
+
+### Decisions made
+Replace indexed++ by explicit indexed assignment, freezebeforefresh02. No data01 counts used. Keep original cap and full fourchart/trace scope.
+
+### Open threads
+mixed60-02 actualprofiles/fullmixedkernel then404cases.
+
+### Errors
+Native indexedincrement syntax,not geometrynull. No live job repeated.

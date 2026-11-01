@@ -16,7 +16,7 @@ for(chartid60=1;chartid60<=20;chartid60++){
  if(ci60==1 && coords60[2][2]==-4*ram60){if(ram60==7){point60=1;}if(ram60==1){point60=2;}}
  if(ci60==4 && coords60[2][2]==-ram60){if(ram60==7){point60=3;}if(ram60==1){point60=4;}}
  if(point60!=0){
-  selected60[point60]++;cache60=cache58(coords60,chart60[2],chart60[3]);old60=list();vals60=list();sig60=list();products60=list();f60=list();
+  selected60[point60]=selected60[point60]+1;cache60=cache58(coords60,chart60[2],chart60[3]);old60=list();vals60=list();sig60=list();products60=list();f60=list();
   for(jj60=1;jj60<=68;jj60++){old60[jj60]=eval58(terms58[jj60],cache60);}
   for(jj60=1;jj60<=68;jj60++){
    v60=lc(0);supp60=sigmaSupports58[jj60];
