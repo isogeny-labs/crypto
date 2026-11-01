@@ -1,0 +1,48 @@
+{
+  "schema": "crypto.prime-route-current-head-acceptance/v1",
+  "checked_at_utc": "2026-10-24T05:19:35Z",
+  "source_commits": {
+    "crypto": "e7e69fdaeefb047400b0e40df20ee79daeb5c57e",
+    "cryptanalysis": "a29ac3021"
+  },
+  "binary_sha256": {
+    "ic": "5f9b27188bc60441aad55d50e116a4e9a61fed51ecd9ac6c1f2538633018d0f3",
+    "isogeny_walk": "97cc7ec7ea2a6dcac8675c1446579803cb88496ac832f35a13b1656408040df6",
+    "crax": "dec0d583a6842114cebb0970593c26fde52826fc5d3bc57a4ce2814229b52cbb"
+  },
+  "input": "../prime271_target_input_20261023.json",
+  "walk_parameters": {
+    "p": 271,
+    "a": 1,
+    "b": 19,
+    "subgroup_order": 281,
+    "generator": [3, 7],
+    "primes": [11],
+    "max_curves": 3,
+    "max_depth": 1,
+    "threads": 1
+  },
+  "checks": {
+    "curves_enumerated": 3,
+    "edges_verified": 2,
+    "walk_failures": 0,
+    "verify_result": "pass",
+    "ic_status": "complete",
+    "ic_scalar": "190",
+    "ic_verified": true,
+    "route_id": "IW1E11h1h1a619f4ab250",
+    "ic_graph_edges_verified": 2,
+    "crax_status": "ok",
+    "crax_scalar": "190",
+    "crax_verified": true
+  },
+  "artifacts_sha256": {
+    "curves.yaml": "c7d5db35487e77fbbac1c4360eac0c1ac2d3459b95eef47c5c317109983058ae",
+    "isogeny_routes.json": "0670adb35b443841c5974ada7b37fb6f4d8cd9ab60746b7622264abe05a53af7",
+    "walk.json": "97afc055ee8f07a1a31c5704a28b76eedfc981902c409013e9d27c1745c412ac",
+    "verify.json": "b5d689c24fe3b9b27ed0943702233b3a2f06341904c1611de4375a8ab8ec6157",
+    "ic_report.json": "4d4271ec7e7586dee5540b0cf88302a410ad4dbb1947843a3f8928bb64483d7e",
+    "crax_report.json": "db11a7c0a6968adffdb72a993a0af5f1bf579d330028466ca6450b14ad730969"
+  },
+  "scope": "Public F_271 degree-11 depth-one three-curve walk and one selected route. This does not establish complete graph coverage, arbitrary field sizes, or an end-to-end IC speed claim. The IC run used --rho-steps 0 for deterministic relation replay."
+}

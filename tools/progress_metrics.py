@@ -13,6 +13,22 @@ Sources (all committed, read at --ref unless noted):
                                 certified factorization status and recorded raw relation counts
   research/nist_skip_criterion_20261025/factor_followup_20261026/results/factor-summary.json
                                 proved complete integer records in the all-21 selection census
+  research/nist_skip_criterion_20261025/period_ecpp_20261026/results/summary.json
+                                retained original orders in the period-software trial
+  research/nist_skip_criterion_20261025/freelip_replay_20261027/results/summary.json
+                                distinct original orders in the recovered FreeLIP replay
+  research/nist_skip_criterion_20261025/period_work_20261027/results/verification.json
+                                independently checked saved work-count cells, not security
+  research/nist_skip_criterion_20261025/generator_b_execution_20261029/results/verification.json
+                                verified point-trait cells on 21 choices; repeated controls, not security
+  research/nist_skip_criterion_20261025/expanded_cutoff_reanalysis_20261030/results/verification.json
+                                verified fixed-cohort cutoff coverage, not random sampling or security
+  research/nist_skip_criterion_20261025/broader_census_reanalysis_20261030/results/verification.json
+                                verified broader recorded-census coverage, not historical use or security
+  research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json
+                                IC collect-phase component: paired native ratio and its A/A floor
+  research/explicit_relations_e2e_20261030/results-v*/
+                                exact recovery counts and bounded two-target frontier; no L0 timing rank
 Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 """
 # ---- progress-metrics exporter boilerplate (copied verbatim into each repo's tools/progress_metrics.py) ----
@@ -20,8 +36,7 @@ Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 # problem, unit, better (higher|lower|neutral), kind (gauge|event), label, source.
 # Reads committed state at --ref via `git show`; never the working tree. stdlib only.
 import argparse
-from concurrent.futures import ThreadPoolExecutor
-from functools import lru_cache
+import atexit
 import datetime as dt
 import json
 import os
@@ -40,16 +55,48 @@ def _git(*args, check=True):
     return p.stdout
 
 
+_object_reader = None
+
+
+def _close_object_reader():
+    global _object_reader
+    if _object_reader is not None:
+        _object_reader.stdin.close()
+        _object_reader.stdout.close()
+        _object_reader.wait()
+        _object_reader = None
+
+
+atexit.register(_close_object_reader)
+
+
 def show(ref, path):
-    p = subprocess.run(["git", "-C", str(REPO), "show", f"{ref}:{path}"], capture_output=True, text=True)
-    return p.stdout if p.returncode == 0 else None
+    """Read committed blobs through one Git process, preserving missing=None."""
+    global _object_reader
+    if _object_reader is None:
+        _object_reader = subprocess.Popen(
+            ["git", "-C", str(REPO), "cat-file", "--batch"],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    reader = _object_reader
+    reader.stdin.write(f"{ref}:{path}\n".encode())
+    reader.stdin.flush()
+    header = reader.stdout.readline().split()
+    if header and header[-1] == b"missing":
+        return None
+    if len(header) != 3 or header[1] != b"blob":
+        raise RuntimeError(f"invalid committed metrics source: {path}")
+    size = int(header[2])
+    data = reader.stdout.read(size)
+    if len(data) != size or reader.stdout.read(1) != b"\n":
+        raise RuntimeError(f"truncated committed metrics source: {path}")
+    return data.decode()
 
 
 def ls(ref, path=""):
     return [l for l in _git("ls-tree", "-r", "--name-only", ref, "--", path, check=False).splitlines() if l]
 
 
-def _uncached_file_history(ref, path, since):
+def file_history(ref, path, since):
     """Yield (date, commit, text) for the newest commit per day touching `path`, newest first."""
     out = _git("log", "--first-parent", ref, f"--since={since}", "--format=%H %cs", "--", path, check=False)
     seen = set()
@@ -61,45 +108,6 @@ def _uncached_file_history(ref, path, since):
         txt = show(h, path)
         if txt is not None:
             yield d, h[:12], txt
-
-
-@lru_cache(maxsize=None)
-def _history_rows(ref, path, since):
-    return tuple(_uncached_file_history(ref, path, since))
-
-
-def file_history(ref, path, since):
-    return iter(_history_rows(ref, path, since))
-
-
-def show_many(ref, paths):
-    """Read committed text blobs in one size-framed Git batch."""
-    if not paths:
-        return []
-    requests = "".join(f"{ref}:{path}\n" for path in paths).encode()
-    proc = subprocess.run(["git", "-C", str(REPO), "cat-file", "--batch"],
-                          input=requests, capture_output=True, check=True)
-    data = proc.stdout
-    pos = 0
-    values = []
-    for path in paths:
-        end = data.index(b"\n", pos)
-        header = data[pos:end].split()
-        pos = end + 1
-        if header[-1] == b"missing":
-            values.append(None)
-            continue
-        if len(header) != 3 or header[1] != b"blob":
-            raise ValueError(f"unexpected Git object for {path}")
-        size = int(header[2])
-        values.append(data[pos:pos + size].decode())
-        pos += size
-        if data[pos:pos + 1] != b"\n":
-            raise ValueError("invalid Git batch framing")
-        pos += 1
-    if pos != len(data):
-        raise ValueError("extra Git batch output")
-    return values
 
 
 def emit(metric, value, *, date=None, problem="misc", unit="", better="neutral", kind="gauge", label="", source=""):
@@ -283,6 +291,16 @@ def nist_selection_factor_census(ref, since):
                  label=f"NIST all-21 census: complete {family} records", source=source)
 
 
+def nist_selection_period_ecpp(ref, since):
+    path = "research/nist_skip_criterion_20261025/period_ecpp_20261026/results/summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_period_ecpp.retained_rows", data.get("rows"),
+             date=date, problem="nist-candidate-selection", unit="orders", better="neutral",
+             label="Period ECPP trial: original cohort rows retained, including indeterminate",
+             source=f"{path}@{commit}")
+
+
 def nist_selection_exact_embedding(ref, since):
     path = "research/nist_skip_criterion_20261025/exact_embedding_20261026/results/verification.json"
     for date, commit, text in file_history(ref, path, since):
@@ -291,6 +309,79 @@ def nist_selection_exact_embedding(ref, since):
              date=date, problem="nist-candidate-selection", unit="curves", better="higher",
              label="NIST all-21 census: exact embedding degrees with direct-power certificates",
              source=f"{path}@{commit}")
+
+
+def nist_selection_freelip(ref, since):
+    path = "research/nist_skip_criterion_20261025/freelip_replay_20261027/results/summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_freelip.distinct_orders", data.get("distinct_orders"),
+             date=date, problem="nist-candidate-selection", unit="orders", better="neutral",
+             label="Recovered FreeLIP replay: distinct original orders, not repeated-call count",
+             source=f"{path}@{commit}")
+
+
+def nist_selection_period_work(ref, since):
+    path = "research/nist_skip_criterion_20261025/period_work_20261027/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_period_work.verified_cells", data.get("cells_checked"),
+             date=date, problem="nist-candidate-selection", unit="cells", better="neutral",
+             label="Saved ECPP work: independently checked count cells; no historical-rule claim",
+             source=f"{path}@{commit}")
+
+
+
+
+def nist_selection_generator_traits(ref, since):
+    """Export recorded coverage only; do not compute curve traits or estimates."""
+    path = "research/nist_skip_criterion_20261025/generator_b_execution_20261029/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_generator_traits.verified_cells", data.get("trait_cells_checked"),
+             date=date, problem="nist-candidate-selection", unit="cells", better="neutral",
+             label="21 curve choices: verified point-trait cells under repeated controls; not security",
+             source=f"{path}@{commit}")
+
+
+def nist_selection_strict_elkies(ref, since):
+    """Export recorded exact-character coverage, without recomputing a result."""
+    path = "research/nist_skip_criterion_20261025/strict_elkies_20261029/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_strict_elkies.verified_character_cells",
+             data.get("odd_prime_character_cells_checked"), date=date,
+             problem="nist-candidate-selection", unit="cells", better="neutral",
+             label="21 curve choices: strict-character cells verified; no historical-use or security claim",
+             source=f"{path}@{commit}")
+
+
+def nist_selection_expanded_cutoff(ref, since):
+    """Export independently verified coverage from committed records only."""
+    path = "research/nist_skip_criterion_20261025/expanded_cutoff_reanalysis_20261030/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        if data.get("all_five_files_equal") is not True:
+            continue
+        for field, unit in (("character_cells", "cells"), ("integer_cutoffs", "cutoffs")):
+            emit(f"nist.selection_expanded_cutoff.verified_{field}", data.get(field),
+                 date=date, problem="nist-candidate-selection", unit=unit, better="neutral",
+                 label="Fixed 21-curve cohort: independently verified coverage; not security or sampling",
+                 source=f"{path}@{commit}")
+
+
+def nist_selection_broader_census(ref, since):
+    """Export recorded exact coverage only, without computing a new curve trait."""
+    path = "research/nist_skip_criterion_20261025/broader_census_reanalysis_20261030/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        if data.get("all_six_files_equal") is not True:
+            continue
+        for field, unit in (("character_cells", "cells"), ("seed_positions", "positions")):
+            emit(f"nist.selection_broader_census.verified_{field}", data.get(field),
+                 date=date, problem="nist-candidate-selection", unit=unit, better="neutral",
+                 label="Broader recorded census: independently verified coverage; not security or sampling",
+                 source=f"{path}@{commit}")
 
 
 def koblitz_modular_augmentation(ref, since):
@@ -392,302 +483,6 @@ def koblitz_modular_geometry(ref, since):
                  source=f"{path}@{commit}")
 
 
-    path = f"{base}33/results.json"
-    for date, commit, text in file_history(ref, path, since):
-        record = json.loads(text)
-        for key, metric, unit, label in (
-            ("twist_projective_quadrics", "koblitz_modular.twist_projective_quadrics", "homogeneous equations",
-             "Exact twist I2 equations; proper curve interpretation uses written bridge, no polarized factor embedding"),
-            ("descended_sections", "koblitz_modular.twist_rr_sections", "sections",
-             "Explicit descended complete RR sections; inherited written pole bridge"),
-            ("evaluated_degree83_points", "koblitz_modular.twist_rr_evaluated_degree83_points", "closed points",
-             "Complete section evaluation at actual degree83 twist points; not IC relation rank"),
-            ("padding_closed_points", "koblitz_modular.twist_rational_padding_closed_points", "closed points",
-             "Native closed degree5 twist points; proper local binding remains separate")):
-            value = record.get("construction_counts", {}).get(key)
-            emit(metric, value, date=date, problem=P_IC, unit=unit, better="neutral",
-                 label=label, source=f"{path}@{commit}")
-
-
-    path = f"{base}34/results.json"
-    for date, commit, text in file_history(ref, path, since):
-        record = json.loads(text)
-        for key, metric, unit, label in (
-            ("local_source_presentations", "koblitz_modular.ordinary_source_local_presentations", "closed supports",
-             "Exact source-bound standard-etale witnesses; global quotient saturation remains separate"),
-            ("complete_coupled_divisors", "koblitz_modular.complete_coupled_degree128_divisors", "divisor representations",
-             "Complete ordinary P+9Q vanishing spaces; no projected factor image or IC-rank claim")):
-            value = record.get("construction_counts", {}).get(key)
-            emit(metric, value, date=date, problem=P_IC, unit=unit, better="neutral",
-                 label=label, source=f"{path}@{commit}")
-
-
-    path = f"{base}35/results.json"
-    for date, commit, text in file_history(ref, path, since):
-        record = json.loads(text)
-        for key, metric, unit, label in (
-            ("closed_point_algebra_dimension", "koblitz_modular.closed_point_algebra_dimension", "F2 dimensions",
-             "Exact closed-point algebra and complete inverse basis; not IC relation rank"),
-            ("source_jet_precision", "koblitz_modular.source_jet_precision", "local coefficients",
-             "Complete source/descent jets at fixed degree5 point; no target factor action"),
-            ("multiplication_space_dimension", "koblitz_modular.large_model_product_dimension", "F2 dimensions",
-             "Exact full product space; RR interpretation uses retained proper and pole bridge"),
-            ("large_model_vanishing_spaces", "koblitz_modular.large_model_vanishing_spaces", "divisor representations",
-             "Actual L3D vanishing spaces; signed Picard and order11 images remain separate")):
-            value = record.get("construction_counts", {}).get(key)
-            emit(metric, value, date=date, problem=P_IC, unit=unit, better="neutral",
-                 label=label, source=f"{path}@{commit}")
-
-
-    path = f"{base}36/results.json"
-    for date, commit, text in file_history(ref, path, since):
-        record = json.loads(text)
-        for key, metric, unit, label in (
-            ("exact_subspace_divisions", "koblitz_modular.exact_subspace_divisions", "certified computations",
-             "Exact all-generator quotient controls; no IC performance claim"),
-            ("actual_source_classes_tested", "koblitz_modular.actual_source_classes_with_group_controls", "source classes",
-             "Native class equality, negation and cancellation; target factor action remains separate")):
-            value = record.get("construction_counts", {}).get(key)
-            emit(metric, value, date=date, problem=P_IC, unit=unit, better="neutral",
-                 label=label, source=f"{path}@{commit}")
-
-
-
-def koblitz_larger_constructions(ref, since):
-    """Exact R42/R43 construction counters; never attack or timing metrics."""
-    base = "research/koblitz_modular_ic_20261018/rounds/"
-    path = base + "42/results.json"
-    for date, commit, text in file_history(ref, path, since):
-        record = json.loads(text)
-        if not isinstance(record.get("cases"), list):
-            continue
-        certified = [row for row in record["cases"]
-                     if row.get("global_recovery_status") == "certified"]
-        rows = (
-            ("koblitz_modular.cm_block_inverse_cases", len(certified), "fixed cases",
-             "Explicit CM-block polynomial inverses; no evaluated geometric transfer"),
-            ("koblitz_modular.cm_block_recovery_max_n",
-             max((row["n"] for row in certified), default=None), "cyclic length",
-             "Largest actual CM-block inverse case; not a larger-n point transfer"),
-            ("koblitz_modular.cm_denominator_lattices",
-             len(record["integer_lattices"]) if isinstance(record.get("integer_lattices"), list) else None,
-             "fixed integral lattices",
-             "Exact least scalar for fixed denominator maps; not full modular Hom lattices"),
-        )
-        for metric, value, unit, label in rows:
-            emit(metric, value, date=date, problem=P_IC, unit=unit, better="neutral",
-                 label=label, source=f"{path}@{commit}")
-    path = base + "43/results.json"
-    for date, commit, text in file_history(ref, path, since):
-        record = json.loads(text)
-        emit("koblitz_modular.source_jet_precision", record.get("source_precision"),
-             date=date, problem=P_IC, unit="local coefficients", better="neutral",
-             label="Actual source jets with full R35 regression; no target factor map",
-             source=f"{path}@{commit}")
-        for stage in record.get("product_stages", []):
-            if stage.get("stop") != "expected_rank_reached":
-                continue
-            emit("koblitz_modular.complete_rr_" + stage["label"] + "_dimension",
-                 stage.get("output_rank"), date=date, problem=P_IC,
-                 unit="F2 dimensions", better="neutral",
-                 label="Exact product rank; completeness uses retained proper/pole/RR bridge, not IC rank",
-                 source=f"{path}@{commit}")
-
-
-def koblitz_ordinary_orientation(ref, since):
-    """Fixed n5 source-algebra counters; not larger-n Koblitz or IC performance."""
-    path = "research/koblitz_modular_ic_20261018/rounds/44/results.json"
-    for date, commit, text in file_history(ref, path, since):
-        counts = json.loads(text).get("construction_counts")
-        if not isinstance(counts, dict):
-            continue
-        for key, metric, unit, label in (
-            ("actual_source_blocks", "koblitz_modular.ordinary_source_algebra_blocks", "fixed source blocks",
-             "Actual nonsplit-kernel source checks; proper/moduli interpretation retained, not IC rank"),
-            ("exact_orientation_trace_cases", "koblitz_modular.orientation_trace_cases", "fixed middle cases",
-             "Independent seven-kernel/Tate-twist trace decomposition; not a success distribution"),
-            ("orientation_filter_control_blocks", "koblitz_modular.orientation_filter_control_blocks", "retained controls",
-             "Trace screen against recorded83/284source algebras; not independent collector images"),
-            ("max_actual_source_tuple_degree", "koblitz_modular.max_ordinary_source_tuple_degree", "absolute residue degree",
-             "Largest certified source tuple on fixed n5carrier; not a larger-n Koblitz transfer"),
-        ):
-            emit(metric, counts.get(key), date=date, problem=P_IC, unit=unit,
-                 better="neutral", label=label, source=f"{path}@{commit}")
-
-def koblitz_source_collector(ref, since):
-    """Actual fixed-n5 chart enumeration; neither Picard rank nor target recovery."""
-    path = "research/koblitz_modular_ic_20261018/rounds/45/results.json"
-    for date, commit, text in file_history(ref, path, since):
-        for row in json.loads(text).get("collector_cases", []):
-            if row.get("status") != "accepted" or row.get("role") == "control":
-                continue
-            degree = row["extension_degree"]
-            for key, unit in (("rational_source_points", "rational source points"),
-                              ("closed_points", "closed source points"),
-                              ("deck_orbits", "deck orbits")):
-                emit(f"koblitz_modular.collector_degree{degree}_{key}", row.get(key),
-                     date=date, problem=P_IC, unit=unit, better="neutral",
-                     label=f"Complete fixed chart over F2^{degree}; fixed n5 carrier, Picard images unevaluated",
-                     source=f"{path}@{commit}")
-
-
-def koblitz_root_collector(ref, since):
-    """Exact candidate counts and equality controls, not measured execution cost."""
-    path = "research/koblitz_modular_ic_20261018/rounds/46/results.json"
-    for date, commit, text in file_history(ref, path, since):
-        record = json.loads(text)
-        for row in record.get("collector_cases", []):
-            if row.get("status") == "accepted":
-                degree = row["extension_degree"]
-                emit(f"koblitz_modular.root_collector_degree{degree}_candidates",
-                     row.get("lambda_candidates"), date=date, problem=P_IC,
-                     unit="algebraic root candidates", better="neutral",
-                     label="Exact root collector; total cost and Picard images unevaluated",
-                     source=f"{path}@{commit}")
-        comparisons = record.get("point_set_comparisons", [])
-        emit("koblitz_modular.root_collector_complete_set_controls",
-             sum(x.get("byte_identical") is True for x in comparisons),
-             date=date, problem=P_IC, unit="complete point-set comparisons",
-             better="neutral", label="Compared with exhaustive fixed-chart detector; not IC rank",
-             source=f"{path}@{commit}")
-
-
-def koblitz_degree13_divisors(ref, since):
-    """Actual fixed-input divisor computations; retained geometric bridge, no IC rank."""
-    path = "research/koblitz_modular_ic_20261018/rounds/47/results.json"
-    for date, commit, text in file_history(ref, path, since):
-        counts = json.loads(text).get("construction_counts", {})
-        for key, unit, label in (
-            ("full_jet_cases", "closed source points", "Degree13 source jets; fixed n5 carrier, not a larger-n transfer"),
-            ("complete_divisor_representations", "effective divisors", "Complete 23Q+P kernels under retained proper/RR bridge"),
-            ("signed_class_cases", "actual source classes", "Degree13 collected signed sums; chosen target images not evaluated"),
-        ):
-            emit("koblitz_modular.degree13_" + key, counts.get(key), date=date,
-                 problem=P_IC, unit=unit, better="neutral", label=label,
-                 source=f"{path}@{commit}")
-
-
-def koblitz_degree13_characters(ref, since):
-    """Fixed source character tests and finite old-line matches; no target rank."""
-    path = "research/koblitz_modular_ic_20261018/rounds/48/results.json"
-    for date, commit, text in file_history(ref, path, since):
-        counts = json.loads(text).get("construction_counts", {})
-        for key, unit, label in (
-            ("character_components_tested", "source components", "Degree13 actual diamond characters under retained proper/Picard bridge"),
-            ("old_line_scalar_comparisons", "complete scalar tests", "All eleven multiples in each tested old source line"),
-            ("matched_old_coordinates", "matched source components", "Exact cyclic-line coordinates; independent target rank unevaluated"),
-            ("crossed_source_operator_images", "source operator images", "Full retained crossed operators on a collected class; chosen-model map open"),
-        ):
-            emit("koblitz_modular.degree13_" + key, counts.get(key), date=date,
-                 problem=P_IC, unit=unit, better="neutral", label=label,
-                 source=f"{path}@{commit}")
-
-
-def koblitz_affine_normalization(ref, since):
-    """Neutral exact-work counters; output computation and verification stay separate."""
-    path = "research/koblitz_modular_ic_20261018/rounds/49/results.json"
-    for date, commit, text in file_history(ref, path, since):
-        counts = json.loads(text).get("construction_counts", {})
-        for key, unit, label in (
-            ("normalization_control_cases", "control cases", "Smooth and cusp normalization API controls over F2"),
-            ("source_preparation_cases", "prepared source ideals", "Exact twisted F2 source input; not a normalization"),
-            ("generic_source_prime", "certified generic fields", "Exact generic primeness; affine contraction and normalization separate"),
-            ("integral_lambda_plane_models", "integral plane models", "Accepted monic lambda-plane models; normalization separate"),
-            ("primitive_presentations", "two-way field presentations", "Fixed primitive-element test; integral model and normalization separate"),
-            ("normalization_outputs_computed", "normalizer outputs", "Computed affine presentations; independent exported-data checks counted separately"),
-            ("verified_affine_normalizations", "checked affine presentations", "Affine normalization only; proper projective and modular-factor geometry remain open"),
-            ("audited_conditional_declarations", "audited declarations", "Conditional field-degree lemmas; concrete native ideals not formalized"),
-        ):
-            emit("koblitz_modular.affine_" + key, counts.get(key), date=date,
-                 problem=P_IC, unit=unit, better="neutral", label=label,
-                 source=f"{path}@{commit}")
-
-
-def koblitz_checked_source_geometry(ref, since):
-    """Exact source geometry and RR algebra counters, with neutral direction."""
-    path = "research/koblitz_modular_ic_20261018/rounds/50/results.json"
-    for date, commit, text in file_history(ref, path, since):
-        counts = json.loads(text).get("construction_counts", {})
-        for key, unit, label in (
-            ("proper_monic_charts", "checked source charts", "Monic rank32 charts with exact overlap products"),
-            ("integral_v_charts", "checked source charts", "Integral quadratic-base refinement on both charts"),
-            ("proper_sign_quotient_charts", "checked quotient charts", "Known sign quotient with explicit monic rank16 equations"),
-            ("complete_forward_source_products", "complete polynomial products", "All four original source equations under the rational map"),
-            ("boundary_cyclic_F2_dimension", "F2 dimensions", "Exact source coordinate-defect block at the degree2 boundary"),
-            ("boundary_exact_saturation_exponent", "parameter powers", "Least power of u+1 annihilating the checked cyclic block"),
-            ("global_coordinate_defect_F2_dimension", "F2 dimensions", "Complete plane-to-integral-v coordinate defect on the proper model"),
-            ("RR_product_columns", "checked field columns", "All196 complete-RR products in the actual32-element field basis"),
-            ("RR_PID_basis_rank", "module generators", "Checked complete-RR polynomial module with original-column lifts"),
-            ("RR_PID_normalization_index", "F2 dimensions", "Exact source lattice index under the retained complete-RR bridge"),
-            ("RR_algebra_product_pairs", "complete product pairs", "All528 source-bound multiplication identities of the RR algebra"),
-            ("marked23_base_generic_degree", "field degrees", "Actual prime characteristic2 marked23 base field"),
-            ("marked23_point_exact_order", "point order", "Exact order23 point verified in the actual larger base field"),
-            ("normalization_presentations_computed", "normalizer outputs", "Accepted serialized presentations; independent ring checks separate"),
-            ("verified_affine_normalizations", "checked presentations", "Independent full affine-presentation verification receipts"),
-            ("audited_unique_theorems", "audited declarations", "Unique conditional algebra lemmas; concrete arrays remain native data"),
-        ):
-            emit("koblitz_modular.geometry50_" + key, counts.get(key), date=date,
-                 problem=P_IC, unit=unit, better="neutral", label=label,
-                 source=f"{path}@{commit}")
-
-
-
-def koblitz_integral_chart_transfers(ref, since):
-    """Neutral exact chart, packet and kernel-geometry counters from R51 receipts."""
-    path = "research/koblitz_modular_ic_20261018/rounds/51/results.json"
-    for date, commit, text in file_history(ref, path, since):
-        counts = json.loads(text).get("construction_counts", {})
-        for key, unit, label in (
-            ("localized_generator_compatibilities", "complete generator identities", "Independent source-bound normal-generator compatibility checks"),
-            ("localized_normal_chart_maps", "localized chart maps", "Actual first and inverse diamond maps on the complete normal basis"),
-            ("universal_certificate_denominator_degree", "polynomial degrees", "Actual denominator of the portable QR polynomial certificate"),
-            ("structured_marked23_algebra_dimension", "algebra dimensions", "Complete structured marked23 source algebra over F2(x)"),
-            ("structured_marked23_source_equations", "coupled source equations", "All QR and marked-base equations in the structured presentation"),
-            ("integral_nu_normal_chart_coordinates", "integral source coordinates", "Actual descended nu with a complete normal-module lift"),
-            ("QR_square_determinant_actions", "finite matrix actions", "Exhaustive QR7 square-determinant action checks"),
-            ("QR_largest_cycle", "cycle lengths", "Largest cycle in the complete QR7 action enumeration"),
-            ("Hecke3_kernel_parameter_degree", "algebra dimensions", "Generic separable Tate3 kernel-parameter algebra"),
-            ("Hecke3_isogeny_degree", "isogeny degrees", "Generic Tate quotient with full function and unit certificates"),
-            ("ordinary_QR_point_algebra_dimension", "algebra dimensions", "Actual ordinary QR line-packet point algebra"),
-            ("coprime_kernel_Bezout_Delta_exponent", "discriminant powers", "Full polynomial coprime3/7 kernel collision certificate"),
-            ("nu_diamond_PID_entries", "complete module entries", "Actual nu diamond transport in the retained normal module"),
-            ("nu_diamond_clearing_power", "principal-open powers", "Fixed source-bound clearing exponent for nu diamond transport"),
-            ("audited_unique_theorems", "audited declarations", "Unique locally audited R51 algebra and packet lemmas"),
-        ):
-            emit("koblitz_modular.geometry51_" + key, counts.get(key), date=date,
-                 problem=P_IC, unit=unit, better="neutral", label=label,
-                 source=f"{path}@{commit}")
-
-
-
-def koblitz_normal_closure52(ref, since):
-    """Neutral exact closure, finite factor-certificate and local-model counters."""
-    path = "research/koblitz_modular_ic_20261018/rounds/52/results.json"
-    for date, commit, text in file_history(ref, path, since):
-        counts = json.loads(text).get("construction_counts", {})
-        for key, unit, label in (
-            ("normal_chart_rank", "module rank", "Complete retained normal-chart module rank"),
-            ("source_index_length", "F2 dimensions", "Source lattice index before adjoining actual nu"),
-            ("nu_adjoined_index_length", "F2 dimensions", "Exact remaining index after stable complete nu adjunction"),
-            ("nu_closure_extensions", "complete module extensions", "Extensions before verified nu stability"),
-            ("least_zero_exponent", "scalar denominator exponents", "Least z exponent in residual cokernel annihilator"),
-            ("least_one_exponent", "scalar denominator exponents", "Least z plus one exponent in residual cokernel annihilator"),
-            ("local_filtration_levels", "complete module levels", "All local filtration levels with both matrix products"),
-            ("candidate_semigroup_gaps", "numerical semigroup gaps", "Candidate 7,11 model gaps; actual local-ring identification separate"),
-            ("candidate_semigroup_conductor", "numerical semigroup conductor", "Candidate 7,11 model conductor; actual local-ring identification separate"),
-            ("large_good_packet_fibers", "finite fibers", "Complete good source specializations over fields1024 and2048"),
-            ("large_patterns88", "finite factorization certificates", "Good larger fibers with factor degrees8 and8"),
-            ("large_patterns214", "finite factorization certificates", "Good larger fibers with factor degrees2 and14"),
-            ("large_odd_degree11_packet_factors", "irreducible factors", "Odd degree packet factors over field2048"),
-            ("fresh_verified_packet_fibers", "fresh checked finite fibers", "All stored source specializations and irreducible factors rechecked"),
-            ("generic_norm_line_maps", "generic line maps", "Full degree3 isogeny line norm and sign products"),
-            ("audited_unique_theorems", "audited declarations", "Unique R52 module and polynomial implications; source premises external"),
-        ):
-            emit("koblitz_modular.geometry52_" + key, counts.get(key), date=date,
-                 problem=P_IC, unit=unit, better="neutral", label=label,
-                 source=f"{path}@{commit}")
-
-
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
     path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
@@ -715,8 +510,8 @@ def fall_degree(ref):
         or ("/out/E_" in f and (f.startswith(base + "e9/") or f.startswith(base + "e10/") or f.startswith(base + "e12/"))))]
     draws = censored = 0
     max_n = min_censored_n = None
-    for text in show_many(ref, files):
-        for line in (text or "").splitlines():
+    for f in files:
+        for line in (show(ref, f) or "").splitlines():
             if not line.startswith("{"):
                 continue
             r = json.loads(line)
@@ -765,15 +560,151 @@ def curve_traits(ref):
          label="Proved primes in docs/curves/factor-hints.txt", source="docs/curves/factor-hints.txt")
 
 
+def pencil_gate_observations(ref, since):
+    """Copy committed native gate counts; do not derive costs or clock admission."""
+    path = "research/pencil_large_prime_20261029/validation/actual_gate_results_20261030/analysis-receipt.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        if record.get("schema") != "pencil-actual-gate-analysis-receipt/v1":
+            continue
+        for field, unit in (
+            ("observed_executions", "execution records including warmups"),
+            ("observed_warmup_executions", "warmup execution records"),
+        ):
+            emit("pencil.p739_gate." + field, record.get(field), date=date,
+                 problem=P_IC, unit=unit, better="neutral",
+                 label="Recorded synthetic p739 gate; no wall-time qualification",
+                 source=f"{path}@{commit}")
+        if record.get("all_expected_records_present") is True:
+            emit("pencil.p739_gate.observed_workloads", record.get("expected_workloads"),
+                 date=date, problem=P_IC, unit="distinct prescribed workloads",
+                 better="neutral", label="Complete 60-target gate inventory; not the 1260-target cohort",
+                 source=f"{path}@{commit}")
+def ic_aimed_gather(ref, since):
+    """The aimed-subset gather component (a stage measurement, not a whole-pipeline row):
+    the 42-round paired collect-phase ratio main / candidate and the lower end of its
+    corrected 95% interval, with the same-session A/A's upper end beside it."""
+    path = "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json"
+    for date, commit, text in file_history(ref, path, since):
+        s = json.loads(text).get("sessions", {}).get("2026-10-29", {})
+        ab, aa = s.get("ab_collect", {}), s.get("aa_collect", {})
+        src = f"{path}@{commit}"
+        emit("ic_component.aimed_gather.collect_ratio", ab.get("median"), date=date, problem=P_IC,
+             unit="ratio", better="higher", label="IC collect phase, main / aimed-gather candidate, median of 42 paired rounds (stage)",
+             source=src)
+        emit("ic_component.aimed_gather.collect_ratio_ci95_lo", (ab.get("ci95") or {}).get("lo"), date=date, problem=P_IC,
+             unit="ratio", better="higher", label="IC collect phase, main / candidate: lower end of the corrected 95% interval (stage)",
+             source=src)
+        emit("ic_component.aimed_gather.aa_ci95_hi", (aa.get("ci95") or {}).get("hi"), date=date, problem=P_IC,
+             unit="ratio", better="lower", label="IC collect phase, same-session A/A upper end of the corrected 95% interval (stage)",
+             source=src)
+
+
+def explicit_gpu_frontier(ref, since, study="research/explicit_relations_e2e_20261030",
+                          metric_prefix="gpu.explicit_relations"):
+    """Exact completed-panel counts; no timing or global-maximum claims."""
+    revision = _git("rev-parse", ref).strip()[:12]
+    paths = [p for p in ls(ref, study) if p.endswith("/coverage.json")]
+    requested = [f"{p.rsplit('/', 1)[0]}/{name}" for p in paths
+                 for name in ("coverage.json", "export.json", "frontier.txt")]
+    # One Git process avoids per-file process and remote-filesystem overhead.
+    batch = subprocess.run(["git", "-C", str(REPO), "cat-file", "--batch"],
+                           input="".join(f"{ref}:{p}\n" for p in requested).encode(),
+                           capture_output=True, check=True).stdout
+    blobs, offset = {}, 0
+    for path in requested:
+        end = batch.index(b"\n", offset)
+        header = batch[offset:end].split()
+        offset = end + 1
+        if header[-1] == b"missing":
+            continue
+        if len(header) != 3 or header[1] != b"blob":
+            raise ValueError(f"invalid committed GPU source: {path}")
+        size = int(header[2])
+        blobs[path] = batch[offset:offset + size].decode()
+        if batch[offset + size:offset + size + 1] != b"\n":
+            raise ValueError(f"truncated committed GPU source: {path}")
+        offset += size + 1
+    for path in paths:
+        directory = path.rsplit("/", 1)[0]
+        name = directory.rsplit("/", 1)[-1]
+        if not name.startswith("results-v") or not name[9:].isdigit():
+            continue
+        coverage_text = blobs.get(path)
+        export_text = blobs.get(f"{directory}/export.json")
+        if not coverage_text or not export_text:
+            continue
+        coverage, export = json.loads(coverage_text), json.loads(export_text)
+        date = export.get("created", "")[:10]
+        if len(date) != 10 or date < since:
+            continue
+        runs = export.get("runs", [])
+        verified = sum(r.get("status") == "succeeded" and
+                       r.get("verification", {}).get("status") == "verified" for r in runs)
+        if len(runs) != coverage.get("attempted") or verified != coverage.get("verified_recoveries"):
+            raise ValueError(f"inconsistent completed GPU panel: {path}")
+        prefix = f"{metric_prefix}.{name[8:]}"
+        source = f"{path}@{revision}"
+        for suffix, value, label in (
+            ("attempted", coverage["attempted"], "recorded executions"),
+            ("verified_recoveries", verified, "fresh CPU-replayed recoveries"),
+            ("timeouts", sum(r.get("status") == "timeout" for r in runs), "retained solve timeouts"),
+        ):
+            emit(f"{prefix}.{suffix}", value, date=date, problem="gpu-generic-decomposition",
+                 unit="count", better="neutral", label=f"GPU {name}: {label}; fixed bounded panel, L0",
+                 source=source)
+        frontier = blobs.get(f"{directory}/frontier.txt")
+        if frontier:
+            key, _, value = frontier.strip().partition("=")
+            if key == "largest_complete_bits" and value.isdigit():
+                emit(f"{prefix}.complete_field_bits", int(value), date=date,
+                     problem="gpu-generic-decomposition", unit="field bits", better="neutral",
+                     label=f"GPU {name}: complete two-target rung under fixed limits; not a global maximum",
+                     source=f"{directory}/frontier.txt@{revision}")
+
+
+
+def explicit_gpu_profile(ref, since):
+    """Committed diagnostic coverage only; no recovery or timing promotion."""
+    study = "research/explicit_relations_profile_20261031"
+    revision = _git("rev-parse", ref).strip()[:12]
+    for version in (1, 2):
+        path = f"{study}/results-v{version}/export.json"
+        text = show(ref, path)
+        if text is None:
+            continue
+        export = json.loads(text)
+        date = export.get("created", "")[:10]
+        if len(date) != 10 or date < since:
+            continue
+        runs = export.get("runs", [])
+        if len(runs) != export.get("flow", {}).get("attempted"):
+            raise ValueError(f"inconsistent GPU profile coverage: {path}")
+        verified = [r for r in runs if r.get("status") == "succeeded" and
+                    r.get("verification", {}).get("status") == "verified"]
+        if version == 1:
+            samples = (
+                ("verified_cells", len(verified), "byte-exact query replay cells"),
+                ("verified_queries", sum(r["measurements"]["counted"]["verified_queries"]
+                                         for r in verified), "byte-exact query replies"),
+            )
+        else:
+            samples = (
+                ("timeline_profiles", sum(r["arm"] == "t" for r in verified),
+                 "successful Nsight Systems traces"),
+                ("counter_unavailable", sum(r["measurements"]["counters"].get("native_status")
+                                             == "unsupported" for r in runs),
+                 "retained unavailable hardware-counter profiles"),
+            )
+        for suffix, value, label in samples:
+            emit(f"gpu.explicit_relations.profile.v{version}.{suffix}", value,
+                 date=date, problem="gpu-query-diagnostics", unit="count",
+                 better="neutral", label=f"GPU profile v{version}: {label}; fixed prefixes",
+                 source=f"{path}@{revision}")
+
+
 def main():
     a = args()
-    # Independent histories are prefetched without emitting output; metric
-    # ordering and the original first-parent/per-day semantics stay unchanged.
-    base = "research/koblitz_modular_ic_20261018/rounds/"
-    paths = [base + "22/ledger.json"] + [base + f"{n}/results.json"
-             for n in (24, 25, 26, 27, 28, 29, 30, 33, 34, 35, 36, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52)]
-    pool = ThreadPoolExecutor(max_workers=4)
-    histories = [pool.submit(_history_rows, a.ref, path, a.since) for path in paths]
     jacobian_catalog(a.ref, a.since)
     leaderboard(a.ref, a.since)
     timeline(a.ref)
@@ -783,26 +714,28 @@ def main():
     photo_volcano(a.ref)
     nist_factorization(a.ref, a.since)
     nist_selection_factor_census(a.ref, a.since)
+    nist_selection_period_ecpp(a.ref, a.since)
     nist_selection_exact_embedding(a.ref, a.since)
+    nist_selection_freelip(a.ref, a.since)
+    nist_selection_period_work(a.ref, a.since)
+    nist_selection_generator_traits(a.ref, a.since)
+    nist_selection_strict_elkies(a.ref, a.since)
+    nist_selection_expanded_cutoff(a.ref, a.since)
+    nist_selection_broader_census(a.ref, a.since)
+
+
     ghs_ipsec_archive(a.ref, a.since)
     fall_degree(a.ref)
     curve_traits(a.ref)
 
-    for history in histories:
-        history.result()
-    pool.shutdown()
     koblitz_modular_augmentation(a.ref, a.since)
     koblitz_modular_geometry(a.ref, a.since)
-    koblitz_larger_constructions(a.ref, a.since)
-    koblitz_ordinary_orientation(a.ref, a.since)
-    koblitz_source_collector(a.ref, a.since)
-    koblitz_root_collector(a.ref, a.since)
-    koblitz_degree13_divisors(a.ref, a.since)
-    koblitz_degree13_characters(a.ref, a.since)
-    koblitz_affine_normalization(a.ref, a.since)
-    koblitz_checked_source_geometry(a.ref, a.since)
-    koblitz_integral_chart_transfers(a.ref, a.since)
-    koblitz_normal_closure52(a.ref, a.since)
+    pencil_gate_observations(a.ref, a.since)
+    ic_aimed_gather(a.ref, a.since)
+    explicit_gpu_frontier(a.ref, a.since)
+    explicit_gpu_frontier(a.ref, a.since, "research/explicit_relations_affine_20261030",
+                          "gpu.explicit_relations.affine")
+    explicit_gpu_profile(a.ref, a.since)
 
 if __name__ == "__main__":
     main()

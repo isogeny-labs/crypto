@@ -96,6 +96,13 @@ current 2026-10-21 cold-base fixtures and the merged branch's K5500 screen.
 The initial 33,368-point audit remains versioned; `fresh_exclusion_audit_v2.json`
 is the expanded current inventory. Answer sidecars are excluded from timed
 inputs. [PROTOCOL.md](PROTOCOL.md) fixes the comparison and promotion gates.
+Replay the expanded exclusion inventory from the repository root with
+`cargo run --release --locked --bin n83-exclusion-audit`. The native verifier
+checks each sealed Git blob and SHA-256; migrated HEAD blobs additionally
+require the versioned artifact manifest's digest and byte count before replay
+from the pinned pre-migration parent. It compares the resulting audit byte for
+byte with `fresh_exclusion_audit_v2.json` and refuses to replace a differing
+report.
 `seal_dispatch.py` checks the source, candidate identities, independent base
 replay and fixture exclusion before writing the immutable `dispatch.json`.
 The dispatch pins the four arms, alternating screen blocks, one-target holdout,

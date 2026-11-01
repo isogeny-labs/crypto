@@ -26,7 +26,7 @@ for f in "$here"/pass/*.lean "$here"/fail/*.lean; do
 done
 # A Lake default target can omit a registered Lean module. The gate must
 # explicitly build and audit the omitted tracked source before passing.
-for project in "$rel/project-omitted" "./$rel/project-omitted" "$rel/project-omitted/"; do
+for project in "$rel/project-omitted" "./$rel/project-omitted" "$rel/project-omitted/" "$rel/project-quoted"; do
   LEAN_GATE_TRUSTED="$here/trusted-native.txt" "$gate" "$project" > /tmp/lean-selftest.$$ 2>&1
   rc=$?
   if [ "$rc" -eq 1 ] && grep -q 'FAIL_audit' /tmp/lean-selftest.$$ && \

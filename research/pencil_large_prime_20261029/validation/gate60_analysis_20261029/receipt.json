@@ -1,0 +1,53 @@
+{
+  "schema": "pencil-gate60-analysis-software-validation/v1",
+  "created": "2026-10-29T23:51:41Z",
+  "scope": "Exact prepared p73960 analysis support; same cost mathematics; zero solver execution",
+  "gate": {
+    "plan_sha256": "bc57819e43862f5d9c9aee0f13b983fec186b2dd14dbc8b921d8999acc4b6776",
+    "workloads": 60,
+    "execution_slots": 1080,
+    "warmup_slots": 180,
+    "measured_slots": 900,
+    "measured_pairs": 300
+  },
+  "full_default_workloads": 1260,
+  "price_tests": {
+    "passed": 30,
+    "unit": 29,
+    "cli": 1,
+    "failed": 0,
+    "log": "gate60-price-final-tests.log",
+    "sha256": "c98c4ac88c3f4cc7476ff2e51ba7ff1b6b6e9e4e3cb804395e6440d6406d75f1"
+  },
+  "export_tests": {
+    "passed": 41,
+    "private_units": 37,
+    "protocol_cli": 1,
+    "historical_hash": 1,
+    "production_scope_tests": 2,
+    "failed": 0,
+    "production_seconds": 206.71,
+    "log": "gate60-export-tests.log",
+    "sha256": "187bcdfa23183dbce9766344af7b384b658dae20c3398c5e4f918df03697a949"
+  },
+  "fmt_passed": true,
+  "clippy_all_targets_passed": true,
+  "adapter_sha256": "41a5f1cbec3d17a25ec9658dc8f043d223af0dc8e9b7c91eec48397480f85b18",
+  "analysis_support": {
+    "path": "analysis-support.sha256",
+    "sha256": "9618895ede7542e314167822e25ad1ecaf1bdc9da6da84cceb2499ec8a1acb24"
+  },
+  "implementation": {
+    "path": "gate-implementation.sha256",
+    "sha256": "f32cffde94c7a66efaaab35b5933ad78ae51d632c9ad9ffad9e02c894ecc204c"
+  },
+  "binaries": {
+    "path": "binaries.sha256",
+    "sha256": "581f4f3f103f3c69af738189f7811eda12d7ae0653fc87e4fe2d64f3288e5742"
+  },
+  "previous_source_snapshot": "/home/ec2-user/pencil-accounting-review-20261029/pre-gate60-native-snapshot",
+  "source_commit_binding": "pending root commit and build receipt reconciliation",
+  "independent_review": "pending ci_audit",
+  "solver_executions": 0,
+  "qualified_ratios": null
+}
