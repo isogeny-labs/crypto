@@ -751,6 +751,11 @@ requires explicit authorization for that merge, and it follows these rules:
     wait; say in the PR why you stepped in.
   - Conflicts in frozen evidence, ledger rows, or claim files are never
     resolved by picking a side: report them to the user.
+  - A conflicted binary file (PDF, PNG, archive) is never resolved by keeping
+    both sides, which concatenates the two versions: take one side and
+    regenerate it. `binary-merges.yml` fails a merge whose result matches
+    neither parent unless the merge names the file with a
+    `Binary-Regenerated: <path>` trailer.
   - If Copilot is unavailable in the session (no GitHub MCP access, plan
     limits), say so and fall back to resolving it yourself.
 - If a documentation-only change legitimately triggers no CI, verify the
