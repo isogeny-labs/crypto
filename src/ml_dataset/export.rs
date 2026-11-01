@@ -1220,7 +1220,7 @@ fn export_with_graph_projector(
             "occurrences_by_partition":split_counts,"all_same_size_families_twists_generators_keys_stay_together":true,
             "cross_size_algebraic_links_merged":false,"row_random_split_permitted":false},
         "feature_policy":{"version":if planted {"strict-structural-allowlist-v7-planted"} else {"strict-structural-allowlist-v6"},
-            "cross_population_pooling_permitted":!planted,
+            "cross_population_pooling_permitted":false,
             "only_features_jsonl_is_model_input":false,
             "model_input_files":["features.jsonl","prefix-features.jsonl","algebraic-features.jsonl"],
             "algebraic_task":"prime-polynomial-consequence/v1; pre-native equations only; independently checked identities for retained native basis rows, with separately searched witnesses",
