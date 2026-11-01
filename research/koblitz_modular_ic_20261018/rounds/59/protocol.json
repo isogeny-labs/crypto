@@ -1,35 +1,44 @@
 {
   "schema": "experiment.protocol/v1",
-  "id": "KOBLITZ-R59-NORMAL-A4-DATA",
+  "id": "KOBLITZ-R59-FULL-320-18-COHORT",
   "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
   "claims": [
     {
-      "id": "source-data",
+      "id": "A4-quotient",
       "class": "exact_computation",
-      "statement": "Assemble actual normal multiplicationA^4 modulof^4,allsourcegeneratoroperators,100integralnumeratorvectors withfullrationalparametertransport/sourcebasisidentities."
+      "statement": "Full640binarypresentationA4rank320/cokernel320,completeE/G/Hrecovery;normalA4pointjetscertifiedbyfour80-blockJordanbases."
     },
     {
-      "id": "next-quotient",
+      "id": "old-replay",
+      "class": "exact_computation",
+      "statement": "Inducedw=nu/b andcanonical80basisreproduceall160oldR55evaluationcolumns."
+    },
+    {
+      "id": "cohort",
+      "class": "exact_computation",
+      "statement": "All18stableO/Tpatterns evaluatedwithfullkernelcertificates;positiveglobalregularcontrolrank99/knownA\u00b2 andnegative1/A\u00b2."
+    },
+    {
+      "id": "map",
       "class": "out_of_scope",
-      "statement": "The640-coordinatepresentation and100vectors are not yet a320quotient ormap;requirefrozenbinarycokernel/CRT/cohortstage."
+      "statement": "Principalxdivisoriscandidateonly;all31F32scalars/bothsigns/ASsourceidentities/intended11action remainrequiredifanypatternsurvives."
     }
   ],
   "arms": {
     "reference": "R55normalA andsourceannihilator;R52normalbasis/table/nu;R58complete100functions",
     "baseline": "reducedB/A80sourcequotient",
-    "candidate": "B/f^4 640-coordinatepresentation,operatorA4 and100normalnumeratorvectors",
+    "candidate": "640/320normalA4quotientwithcomplete18-patternprincipaldivisortest",
     "positive": [
-      "fullnormalbasis/sourceLiftidentity",
-      "nuintegralcoordinateidentity",
-      "AconjugateA=fI",
-      "all100coefficientinversionroundtrips",
-      "all100fullnormalfieldreconstructions",
-      "everycoefficientdenominatorunitmodf4",
-      "1 andA\u00b2normalcontrols",
-      "CRTscalarpolynomialidentitiesmodnorm^4"
+      "allE M4=0,E G=I320,M4H+GE=I640",
+      "fourpoint-labelled80-dimensionalnilpotentJordanblocks",
+      "full100-columnfiniteevaluationleftinverse",
+      "all160oldCRTcolumnsrecovered",
+      "globallyregularxspacepositivekernelA\u00b2dimension1",
+      "all18completeC K/R K/K R+H Cproducts"
     ],
     "negative": [
-      "changed100-vectorcontrolmustfailunitreconstruction"
+      "knownx=1/A\u00b2failsglobalregularconditions",
+      "changedcokernelprojectionfailsinverseproduct"
     ],
     "A_A": {
       "not_applicable_reason": "fixedexactproducts,no noisycomparison"
@@ -70,15 +79,16 @@
     "power": "notapplicable"
   },
   "metrics": [
-    "fullnormal-sourceidentities",
-    "100coefficienttransportcolumns",
-    "3200denominatorunits",
-    "640presentationcoordinates",
-    "allsourcegenerators",
-    "all4CRTpolynomialidentities"
+    "quotient320",
+    "nilpotentA rankladder320/240/160/80/0",
+    "4localblocks80",
+    "finiteRRrank100",
+    "positivecontrolrank99",
+    "all18ranks/kerneldimensions",
+    "principal/excludedpatterncounts"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh data59-02 DATA59.sing DATA59_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_RUST.sh cohort59-01",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
     "threads": 1,
@@ -86,7 +96,11 @@
     "queue": "one mathematical job atonce",
     "checkpoint": "immutable raw sources,logs,exit,binaryhash,tar",
     "source_gate": "sixexecutedfiles matchGit;all donor hashes",
-    "backend": "existing user-authorized manual local exact algebra; no EKS submission"
+    "backend": "existing user-authorized local exact Rust bit arithmetic",
+    "compiler_timeout_seconds": 1200,
+    "run_timeout_seconds": 1200,
+    "compiler": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+    "CPU_affinity": "0"
   },
   "stopping": {
     "accepted": "exit0,exactmarker,no nativeerrorlines,allprescribedchecks",
@@ -114,9 +128,9 @@
     }
   ],
   "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
-  "version": 2,
+  "version": 3,
   "amendment": {
     "before_affected_data": true,
-    "reason": "data59-01 rejected missing linalg.lib needed by unitmat;retaineverypartial/latePASSexcluded"
+    "reason": "data59-02accepted fullsourceassembly;freeze binary640/320cokernel,pointCRT andall18stablepatterns"
   }
 }

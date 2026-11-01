@@ -25,3 +25,17 @@ Acceptedfullsource-dataassembly,thenbinary640/320quotientandall18cohort.
 
 ### Errors
 Missinghelperlibrary,notamathematicalnull.
+
+## 2026-11-01T06:35:12.527158+00:00 — normal data accepted; binary cohort frozen
+
+### What was done
+data59-02acceptedall100fullnormalfieldbindings,3200coefficientunitchecks(distinctdenominator1),globalA/nu/sourceidentities,all7operators/4CRTpolynomialsand160oldcolumns. Data01retained/rejected.
+
+### Decisions made
+FreezeRustbinary640/320cokernelandall18cohortwithcompleteproducts/Jordanblocks/oldCRTanchor/globalregularpositivecontrol. Build/runlocallyunderoriginalmathlanguageandresourceauthorization;noEKS/newclaim.
+
+### Open threads
+Rustproducer/checker,all18resultinterpretation;AS31scalars/bothsignsifprincipalpatterns;Lean/report/custody.
+
+### Errors
+Noacceptedproducerrepeated;onlyinitialmissinglibraryfailure.

@@ -1,0 +1,8 @@
+# R59 exact bit quotient and eighteen-pattern cohort
+Frozen before Rustbuild/execution. StandaloneRust,no dependencies,no RNG,no variable box. Source/input/protocol bytes pinned. Build andrun eachcap1200seconds,4GiBvirtual,CPU0;codegenunits1,one mathematicaljob. Preservebuildfails/panics/caps,allpartialmatrices;freezechangesbeforefreshattempt. No acceptedproducer rerunforpublication.
+
+Computefull640A4cokernelwithE M4=0,E G=I320,M4H+GE=I640. Checkactualsourceoperatorinduction. Invertb,formw=nu/b,constructfourCRTprojectorsbyretainedpolynomials. Checkallidempotents/sum andfourpointlabelledlength4Jordanblocks (80dim each);A rankladder320/240/160/80/0. FurtherquotientA andcyclicunit/wbasis mustreproduceALL160oldR55evaluationcolumns. FurtherquotientA² givescompleteorder2jetprojection. All100RRnumeratorshavefiniteevaluationleftinverse.
+
+Positivecontrol:globalregularx imposesorder2 atallfourP;itskernelmustbeexactlyknownA²,rank99. Negativecontrolactualnumerator1givesx=1/A²andmustfail. EvaluateALL18patterns:12ordered-singlepairsdegree20 and6complementarydoublepairsdegree40. Vanishing4atT and2outsideO/T give640x100constraints. SavefullC K=0,R K=I,K R+H C=I100foreachcase,includingemptykernels. Dimension>1 triggersgeometryaudit,neverdiscarded. Principalvector mustsigmafix. Keepall18flowrows andcoefficientvectors;do notclaimtargetmapsbeforeAS/fullfield/11action.
+
+Separate checker mode --check consumesimmutable data/certificate,doesnotrerunproducer. It checksproductsusingrow-dot-columnparity ratherthanproducercolumn-XOR arithmetic,includingallsourceinclusions and18kernelproducts;itsownsource isalreadyfrozenhere. Rununderseparatecap,withcopiedbinary/protocol/data/certificateandreceipt. No independent scientificrevieworstatuspromotionisinferredfromthischecker.
