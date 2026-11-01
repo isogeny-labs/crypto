@@ -83,13 +83,27 @@ longer matches the row is ignored.
 **Validation sweep verdicts.** Slice A lands
 `research/validation_sweep_20261019/A-leaderboard/verdicts.jsonl`, slice B
 `…/B-benchmarks/verdicts.jsonl`; the builder and the check read them when they
-exist. One JSON object per line: `row` (a board key `board:<slug>:<source>`, a
-slug, or a benchmarks directory), `verdict` (`validated` | `failed`), the three
-keys `replay_certificate`, `validator_report`, `rho_reference` (non-empty: where
-each artifact is), and optionally `row_digest`. **The sweeps had not landed when
-this gate was written, so this line format is the gate's assumption**; a sweep
-that writes another shape needs the reader in `scripts/validation_gate.py`
-(`load_verdicts`, `verdict_status`) adjusted in the same PR.
+exist (`load_verdicts`, `verdict_status` in `scripts/validation_gate.py`). One
+JSON object per line:
+
+- **The row:** `row`, as the gate names it (a board key `board:<slug>:<source>`,
+  `<slug>@<source>`, a slug, or a benchmarks directory), or the sweep's own
+  `row_id`. A `row_id` of `A:<slug>`, `B:<slug>` or `C:<slug>` reaches only that
+  table's board row. It is never reduced to the bare slug, because Tables A and C
+  share curves and one table's verdict must not reach the other's row.
+- **`verdict`:** `validated` (or `pass`, `passed`, `ok`) validates only with the
+  three keys `replay_certificate`, `validator_report` and `rho_reference` set,
+  and with every caveat field present (`pricing_ok`, `rho_reference_ok`,
+  `replay_ok`, `recomputed_ok`, `protocol_frozen_ok`) set to `true` or
+  `not_applicable`. `failed` and `contradicted` (and `fail`, `invalid`,
+  `refuted`, `rejected`) fail the row. `validated_with_caveats` and `unvalidated`
+  are recognized but never pass: the row keeps its standing, with the verdict and
+  its caveats shown under `validation.sweep`.
+- **Optional:** `row_digest`.
+
+A line that names no row, or carries an unrecognized verdict word, stops the
+gate rather than being skipped. Later lines win, except that nothing overrides
+a failing verdict.
 
 ## Mechanics
 

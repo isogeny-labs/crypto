@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Whole-book finite-field formalization](finite-field-handbook-formalization.md) | investigating | complete extraction, truth validation and Lean coverage of the supplied handbook | semantic coverage including unnumbered claims; faithful per-claim proofs and corrections; current conjecture status and independent fidelity review |
 | [Prime-IC line-layout EKS payload failure cause](ic-line-layout-eks-failure-cause.md) | investigating | the frozen fp20 line-layout tournament's required end-to-end performance decision | fixed-identity, hash-verified classification of both private launcher/payload receipts, followed by a scoped repair only if the evidence attributes one |
 | [Genus-3 image destination calculus and common-cost calibration](genus3-image-destination-calculus-and-common-cost-missing.md) | open | claiming that the executed n=83 genus-3 transfer weakens the DLP or yields a net speedup | complete non-generic solver over the exact image plus common-unit accounting, or paired L2+ complete-cost wall evidence on two hosts |
 | [PQC cross-platform performance and leakage validation](pqc-cross-platform-validation.md) | open | ML-KEM/ML-DSA speed and side-channel claims across platforms | qualified PQC benchmark route, native target correctness, emitted-code audit and target-specific leakage evidence |

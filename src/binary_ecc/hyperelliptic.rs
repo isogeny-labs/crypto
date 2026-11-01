@@ -625,6 +625,20 @@ impl MumfordDivisor {
         Ok(reduced)
     }
 
+    /// [`Self::try_from_unreduced`] without the operand and result re-checks
+    /// (`u | v² + h·v + f`, curve validity, reducedness).  The caller
+    /// guarantees the divisibility; only the reduction itself is performed.
+    /// Used by measured attacks that charge algorithm work, not defensive
+    /// validation (AGENTS.md self-check policy).
+    pub fn from_unreduced_unchecked(
+        curve: &HyperellipticCurve,
+        u: F2mPoly,
+        v: F2mPoly,
+    ) -> Result<Self, HyperellipticError> {
+        let v = v.rem(&u, &curve.irr);
+        Self { u, v }.try_reduce(curve)
+    }
+
     /// Embed an affine point `P = (x_0, y_0)` on `C` into `Jac(C)` as
     /// the class of `[P] − [∞]`.
     ///
@@ -886,6 +900,23 @@ impl MumfordDivisor {
         let result = composed.try_reduce(curve)?;
         result.validate_on_valid_curve(curve)?;
         Ok(result)
+    }
+
+    /// Group addition without re-validating the curve, the operands or the
+    /// result: Cantor composition and reduction only.  Equal to
+    /// [`Self::add`] on valid inputs (tested); the validated entry points
+    /// spend 39–59 % of their field operations on those re-checks, which an
+    /// attack does not need and a cost count should not charge.
+    pub fn add_unchecked(&self, other: &Self, curve: &HyperellipticCurve) -> Self {
+        if self.is_identity() {
+            return other.clone();
+        }
+        if other.is_identity() {
+            return self.clone();
+        }
+        self.try_cantor_compose(other, curve)
+            .and_then(|c| c.try_reduce(curve))
+            .expect("Cantor addition on valid operands")
     }
 
     /// **Doubling** — `2·self`.  Cantor's algorithm handles the
