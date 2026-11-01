@@ -1,0 +1,169 @@
+{
+  "accepted": true,
+  "cases": [
+    {
+      "accepted": true,
+      "name": "independent-Q1"
+    },
+    {
+      "accepted": true,
+      "name": "independent-Q2"
+    },
+    {
+      "accepted": true,
+      "name": "independent-Q3"
+    },
+    {
+      "accepted": false,
+      "error": "terminal state",
+      "name": "boolean-exit"
+    },
+    {
+      "accepted": false,
+      "error": "terminal state",
+      "name": "negative-exit"
+    },
+    {
+      "accepted": false,
+      "error": "terminal state",
+      "name": "missing-exit"
+    },
+    {
+      "accepted": false,
+      "error": "resource limits",
+      "name": "float-pids"
+    },
+    {
+      "accepted": false,
+      "error": "resource limits",
+      "name": "string-memory"
+    },
+    {
+      "accepted": false,
+      "error": "readonly root/network",
+      "name": "null-rootfs"
+    },
+    {
+      "accepted": false,
+      "error": "device/capability additions",
+      "name": "object-devices"
+    },
+    {
+      "accepted": false,
+      "error": "privilege restrictions",
+      "name": "duplicate-security-option"
+    },
+    {
+      "accepted": false,
+      "error": "tmpfs options",
+      "name": "tmpfs-type"
+    },
+    {
+      "accepted": false,
+      "error": "tmpfs options",
+      "name": "unknown-tmpfs-option"
+    },
+    {
+      "accepted": false,
+      "error": "readonly bind identity",
+      "name": "gate-writable"
+    },
+    {
+      "accepted": false,
+      "error": "readonly bind identity",
+      "name": "gate-source"
+    },
+    {
+      "accepted": false,
+      "error": "duplicate mount destination",
+      "name": "duplicate-tmpfs"
+    },
+    {
+      "accepted": false,
+      "error": "tmpfs destination",
+      "name": "unapproved-tmpfs"
+    },
+    {
+      "accepted": false,
+      "error": "owner label",
+      "name": "label-type"
+    },
+    {
+      "accepted": false,
+      "error": "user/entrypoint",
+      "name": "entrypoint-extra"
+    },
+    {
+      "accepted": false,
+      "error": "string container_id",
+      "name": "context-missing-id"
+    },
+    {
+      "accepted": false,
+      "error": "full container/image IDs",
+      "name": "uppercase-id"
+    },
+    {
+      "accepted": false,
+      "error": "owner name/nonce",
+      "name": "nonce-mismatch"
+    },
+    {
+      "accepted": false,
+      "error": "absolute mount sources",
+      "name": "relative-fixture"
+    },
+    {
+      "accepted": false,
+      "error": "diff final newline",
+      "name": "nul-suffix"
+    },
+    {
+      "accepted": false,
+      "error": "exact three additions",
+      "name": "leading-newline"
+    },
+    {
+      "accepted": false,
+      "error": "exact three additions",
+      "name": "bare-cr"
+    },
+    {
+      "accepted": false,
+      "error": "exact three additions",
+      "name": "parent-path"
+    },
+    {
+      "accepted": false,
+      "error": "active case Q1-Q3",
+      "name": "wrong-case"
+    },
+    {
+      "accepted": false,
+      "error": "diff transport exit",
+      "name": "transport-signal"
+    },
+    {
+      "accepted": false,
+      "error": "diff transport exit",
+      "name": "transport-failure"
+    },
+    {
+      "accepted": true,
+      "name": "duplicate-identical-tmpfs-option",
+      "scope": "options are a set, matching original source"
+    },
+    {
+      "accepted": true,
+      "name": "matched-noncanonical-absolute-source",
+      "scope": "filesystem canonicalization and fixture custody belong to unported supervisor"
+    }
+  ],
+  "docker_invoked": false,
+  "full_supervisor_integrated": false,
+  "independent_count": 32,
+  "producer_controls": 58,
+  "schema": "native-adapter-independent-review/v1",
+  "scientific_execution": false,
+  "supervisor_invoked": false
+}

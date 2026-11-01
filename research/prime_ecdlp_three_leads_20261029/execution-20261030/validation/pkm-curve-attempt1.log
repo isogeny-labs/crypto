@@ -1,0 +1,15 @@
+/workspace/pkm-curve-scratch.lean:11:4: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  HAdd W.Point W.Point ?m.16
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/workspace/pkm-curve-scratch.lean:12:8: error: Tactic `introN` failed: There are no additional binders or `let` bindings in the goal to introduce
+
+K : Type u_1
+inst✝ : Field K
+W : WeierstrassCurve.Affine K
+x₀ y₀ x₁ y₁ : K
+h₀ : W.Nonsingular x₀ y₀
+h₁ : W.Nonsingular x₁ y₁
+hx : x₀ ≠ x₁
+⊢ sorry
+'PKMChainCoverage.affine_pair_nonzero' does not depend on any axioms

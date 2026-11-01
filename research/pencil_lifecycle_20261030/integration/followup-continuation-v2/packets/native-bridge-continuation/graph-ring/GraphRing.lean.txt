@@ -1,0 +1,55 @@
+import Wide
+import WordAdd11
+set_option autoImplicit false
+namespace GraphRingWord
+
+def add (r a b : UInt64) : UInt64 := (a+b)%r
+def neg (r a : UInt64) : UInt64 := (r-a)%r
+def sub (r a b : UInt64) : UInt64 := add r a (neg r b)
+def mul (r a b : UInt64) : UInt64 := WideModPow.wideMul r a b
+-- The Int sign models the native branch after decoding its i8; range bridge separate.
+def signed (r : UInt64) (s : Int) (a : UInt64) : UInt64 := if s=1 then a else neg r a
+
+theorem add_headroom (r a b : UInt64) (hr : r.toNat≤2^63)
+ (ha : a.toNat<r.toNat) (hb : b.toNat<r.toNat) : a.toNat+b.toNat<2^64 := by omega
+
+theorem add_correct (r a b : UInt64) (hp : 0<r.toNat) (hr : r.toNat≤2^63)
+ (ha : a.toNat<r.toNat) (hb : b.toNat<r.toNat) :
+ (add r a b).toNat<r.toNat ∧ ((add r a b).toNat : ZMod r.toNat)=
+ (a.toNat : ZMod r.toNat)+(b.toNat : ZMod r.toNat) := by
+ have hh:=add_headroom r a b hr ha hb
+ constructor
+ · rw [add,UInt64.toNat_mod]; exact Nat.mod_lt _ hp
+ · simp only [add,UInt64.toNat_mod,UInt64.toNat_add,Nat.mod_eq_of_lt hh,ZMod.natCast_mod,Nat.cast_add]
+
+theorem neg_literal_bridge (r a : UInt64) (ha : a.toNat<r.toNat) :
+ neg r a=PencilWordRefinement.wordNeg r a := by
+ have hm : a%r=a := UInt64.toNat_inj.mp (by rw [UInt64.toNat_mod,Nat.mod_eq_of_lt ha])
+ simp only [neg,PencilWordRefinement.wordNeg,hm]
+
+theorem neg_correct (r a : UInt64) (hp : 0<r.toNat) (ha : a.toNat<r.toNat) :
+ (neg r a).toNat<r.toNat ∧ ((neg r a).toNat : ZMod r.toNat)= -(a.toNat : ZMod r.toNat) := by
+ rw [neg_literal_bridge r a ha]
+ exact PencilWordRefinement.wordNeg_composition r a hp ha
+
+theorem sub_correct (r a b : UInt64) (hp : 0<r.toNat) (hr : r.toNat≤2^63)
+ (ha : a.toNat<r.toNat) (hb : b.toNat<r.toNat) :
+ (sub r a b).toNat<r.toNat ∧ ((sub r a b).toNat : ZMod r.toNat)=
+ (a.toNat : ZMod r.toNat)-(b.toNat : ZMod r.toNat) := by
+ have hn:=neg_correct r b hp hb
+ have hh:=add_correct r a (neg r b) hp hr ha hn.1
+ exact ⟨hh.1,by simpa only [sub,hn.2,sub_eq_add_neg] using hh.2⟩
+
+theorem mul_correct (r a b : UInt64) (hp : 0<r.toNat) :
+ (mul r a b).toNat<r.toNat ∧ ((mul r a b).toNat : ZMod r.toNat)=
+ (a.toNat : ZMod r.toNat)*(b.toNat : ZMod r.toNat) :=
+ ⟨WideModPow.wideMul_canonical r a b hp,WideModPow.wideMul_decode r a b hp⟩
+
+theorem signed_correct (r a : UInt64) (s : Int) (hp : 0<r.toNat)
+ (ha : a.toNat<r.toNat) (hs : s=1 ∨ s= -1) :
+ (signed r s a).toNat<r.toNat ∧ ((signed r s a).toNat : ZMod r.toNat)=
+ (s : ZMod r.toNat)*(a.toNat : ZMod r.toNat) := by
+ rcases hs with rfl|rfl
+ · simpa [signed] using ha
+ · simpa [signed] using neg_correct r a hp ha
+end GraphRingWord

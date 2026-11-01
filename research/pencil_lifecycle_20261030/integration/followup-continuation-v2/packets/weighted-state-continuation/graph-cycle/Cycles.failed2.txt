@@ -1,0 +1,59 @@
+import GraphAlgebra
+set_option autoImplicit false
+namespace GraphCycle
+variable {K : Type*} [Field K]
+
+theorem constraint_solution (a b k : K) (hb : b≠0) (he : a+b*k=0) :
+ (-a)*b⁻¹=k := by
+ apply (mul_left_cancel₀ hb)
+ calc
+  b*((-a)*b⁻¹) = -a := by field_simp
+  _ = b*k := by exact (eq_neg_of_add_eq_zero_right he).symm
+
+theorem zero_coefficient (a k : K) (he : a+0*k=0) : a=0 := by simpa using he
+
+theorem opposite_cycle (cu cv root a b k : K) (hc : cu+cv=0)
+ (he : cu*root+cv*root=a+b*k) : (-a)+(-b)*k=0 := by
+ have hh : a+b*k=0 := by rw [←he,←add_mul,hc,zero_mul]
+ calc (-a)+(-b)*k= -(a+b*k) := by ring
+      _=0 := by rw [hh,neg_zero]
+
+theorem opposite_cycle_solution (cu cv root a b k : K) (hc : cu+cv=0)
+ (hb : b≠0) (he : cu*root+cv*root=a+b*k) : (-(-a))*(-b)⁻¹=k :=
+ constraint_solution (-a) (-b) k (neg_ne_zero.mpr hb) (opposite_cycle cu cv root a b k hc he)
+
+theorem same_cycle_anchor (c root a b k : K) (h2 : (2:K)≠0) (hc : c≠0)
+ (he : c*root+c*root=a+b*k) : root=a*(2*c)⁻¹+(b*(2*c)⁻¹)*k := by
+ have hn : 2*c≠0 := mul_ne_zero h2 hc
+ apply (mul_left_cancel₀ hn)
+ calc
+  (2*c)*root=c*root+c*root := by ring
+  _=a+b*k := he
+  _=(2*c)*(a*(2*c)⁻¹+(b*(2*c)⁻¹)*k) := by field_simp <;> ring
+
+theorem existing_anchor_equation (root x y a b k : K)
+ (hold : root=x+y*k) (hnew : root=a+b*k) : (x-a)+(y-b)*k=0 := by
+ calc (x-a)+(y-b)*k=(x+y*k)-(a+b*k) := by ring
+      _=0 := by rw [←hold,←hnew,sub_self]
+
+theorem existing_anchor_solution (root x y a b k : K) (hb : y-b≠0)
+ (hold : root=x+y*k) (hnew : root=a+b*k) : (-(x-a))*(y-b)⁻¹=k :=
+ constraint_solution _ _ _ hb (existing_anchor_equation root x y a b k hold hnew)
+
+theorem existing_anchor_zero (root x y a b k : K) (hb : y-b=0)
+ (hold : root=x+y*k) (hnew : root=a+b*k) : x-a=0 := by
+ have h:=existing_anchor_equation root x y a b k hold hnew
+ rw [hb] at h
+ exact zero_coefficient _ _ h
+theorem same_sign_branch (cu cv : K) (hu : cu=1 ∨ cu= -1) (hv : cv=1 ∨ cv= -1)
+ (hn : cu+cv≠0) : cu=cv := by
+ rcases hu with rfl|rfl <;> rcases hv with rfl|rfl <;> simp_all
+
+theorem native_denominator (c : K) (hc : c=1 ∨ c= -1) :
+ (if c=1 then (2:K) else -2)=2*c := by
+ rcases hc with rfl|rfl
+ · simp
+ · split_ifs with h
+   · rw [←h]; ring
+   · ring
+end GraphCycle

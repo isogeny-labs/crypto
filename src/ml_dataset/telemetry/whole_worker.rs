@@ -22,7 +22,7 @@ const PERF_ATTR_INHERIT: u64 = 1 << 1;
 const PERF_ATTR_EXCLUDE_KERNEL: u64 = 1 << 5;
 const PERF_ATTR_EXCLUDE_HV: u64 = 1 << 6;
 const PERF_ATTR_ENABLE_ON_EXEC: u64 = 1 << 12;
-const PERF_EVENT_IOC_ID: libc::c_ulong = 0x8008_2407;
+const PERF_EVENT_IOC_ID: libc::Ioctl = 0x8008_2407_u32 as libc::Ioctl;
 
 #[repr(C)]
 #[derive(Clone, Copy)]
