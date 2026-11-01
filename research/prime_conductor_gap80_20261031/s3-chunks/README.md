@@ -42,6 +42,10 @@ exact ordinal interval so regeneration does not need preceding chunks.
 
 `producer-state.tar.xz` holds the native source, build entry point, exact
 parameters, certificate, fixture bytes/metadata and this fixture's report.
+Its S3 upload/full-byte readback completed in migration commit `cf5253cf6`
+(artifact-autofix run `41257164940`); the artifact pointer matches its
+165,932-byte manifest. A local restore rebuilt the native tools and passed
+both the 4,096-root PARI check and the frozen field-prime certificate replay.
 It is a portable source/input snapshot, not a process-memory checkpoint or
 a claim that a computation resumed. Its adjacent checksum pins the bytes;
 it is also subject to verified S3 migration. Hydrate this directory first,
