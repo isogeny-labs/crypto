@@ -120,6 +120,15 @@ universal lower bound. The explicit 80-bit construction, point evaluation
 and paired ECDLP times remain missing, rather than inferred from a smaller
 fixture or assigned zero.
 
+The [S3 root-chunk fixture](../research/prime_conductor_gap80_20261031/s3-chunks/README.md)
+adds bounded native preparation of 4,096 baby roots and independent PARI
+verification of every coordinate, with deterministic offset restart and
+immutable object hashes. This removes the need to allocate a full root
+vector during that preparation stage. It does not convert the existing
+contiguous FLINT polynomial/tree routines to external-memory processing;
+that schedule and the full point evaluator remain open. Only the small
+storage fixture is prepared, not the full multi-terabyte root window.
+
 ### Historical 60-bit-prime instance imported on 2026-10-31
 
 The [archived gap60 study](../research/prime_conductor_gap60_20261031/README.md)

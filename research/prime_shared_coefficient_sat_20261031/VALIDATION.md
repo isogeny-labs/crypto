@@ -4,7 +4,7 @@
 
 | Check | Result |
 |---|---|
-| Rust 1.78 locked release tests | 6 passed, 0 failed; library, binary and doc tests exit zero |
+| Rust 1.78 locked release tests | 14 passed, 0 failed; library, binary and doc tests exit zero |
 | Rust 1.98 `cargo clippy --all-targets -- -D warnings` | exit zero |
 | Rustfmt check | exit zero |
 | Legacy m3/m5/m7 witness evaluation | exact variable/equation counts and zero failed equations |
@@ -12,6 +12,9 @@
 | Complete F17 all-target census | 18/18 exact projected coefficient-model-set matches; 6 SAT, 12 UNSAT, 6 models per implementation |
 | Strict parser controls | unknown fields, trailing text, malformed decimals/order rejected |
 | Exporter determinism | byte-identical repeated JSON/msolve/QF_FF output in unit tests |
+| Boolean arithmetic and canonical range | all 289 F17 operand pairs and all 32 five-bit words pass exhaustive checks |
+| CNF/CNF-XOR gate exactness | every truth-table row for positive and negated AND/XOR gates passes in both renderings |
+| E1 parser/control construction | malformed/truncated/trailing/XOR-as-CNF controls reject; m3/m5/m7 fixed controls construct and replay |
 | CLI m3/t4 smoke | JSON has 33 variables, 35 equations and 6 projected variables; msolve emits 37 lines; QF_FF emits 33 declarations, 35 assertions, `check-sat` and `get-value` |
 | Repository release-library gate | completed in 1,673.72 s: 5,796 passed, 12 failed, 128 ignored; see exact failure boundary below |
 
@@ -44,15 +47,16 @@ of the study tree.
 
 ## Environment and exclusions
 
-`msolve`, `cvc5`, `cadical`, `cryptominisat` and `perf` were not installed on
-the current host. No AWS identity or authorized isolated runner was configured.
-Consequently:
+`msolve`, `cvc5` and `perf` are not installed on the current host. Pinned local
+builds of CaDiCaL, `lrat-trim`, CryptoMiniSat and `cake_xlrup` passed a
+two-clause contradictory proof smoke, but no study instance has run. No AWS
+identity or compatible isolated runner image was configured. Consequently:
 
 - no solver benchmark or scientific timing run occurred;
-- no SAT or UNSAT result from an external backend is reported;
+- no SAT or UNSAT result from an external backend on a study instance is reported;
 - QF_FF and msolve artifacts were syntax-shaped and determinism-tested, but not
   accepted by their external parsers in E0;
-- CNF/CNF-XOR exporters and proof checkers remain E1 obligations;
+- the frozen CNF/CNF-XOR study panel and msolve/cvc5 equivalence remain E1 obligations;
 - E2 power, detector and isolation gates remain open.
 
 ## Evidence boundary
