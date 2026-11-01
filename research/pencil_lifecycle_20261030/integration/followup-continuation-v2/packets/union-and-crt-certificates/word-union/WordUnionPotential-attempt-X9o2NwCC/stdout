@@ -1,0 +1,28 @@
+/var/tmp/pencil-word-union-20261101-v1/WordUnionPotential.lean:25:7: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  sd r (-cu * cv)
+in the target expression
+  sd r (unionPot r cu cv a b).s = -sd r cu * sd r cv
+
+case e_s
+r a b : UInt64
+cu cv : Int8
+hp : 0 < r.toNat
+ha : a.toNat < r.toNat
+hb : b.toNat < r.toNat
+hcu : Sign cu
+hcv : Sign cv
+hsa : (signed r cu a).toNat < r.toNat ∧ ↑(signed r cu a).toNat = sd r cu * ↑a.toNat
+hsb : (signed r cu b).toNat < r.toNat ∧ ↑(signed r cu b).toNat = sd r cu * ↑b.toNat
+⊢ sd r (unionPot r cu cv a b).s = -sd r cu * sd r cv
+/var/tmp/pencil-word-union-20261101-v1/WordUnionPotential.lean:36:3: error: Type mismatch: After simplification, term
+  hsa.right
+ has type
+  @Eq (ZMod r.toNat) (↑(signed r (-p.s) p.a).toNat) (-(sd r p.s * ↑p.a.toNat))
+but is expected to have type
+  @Eq (ZMod r.toNat) (↑(reversePot r p).a.toNat) (-((decPot r p).s * (decPot r p).a))
+/var/tmp/pencil-word-union-20261101-v1/WordUnionPotential.lean:37:3: error: Type mismatch: After simplification, term
+  hsb.right
+ has type
+  @Eq (ZMod r.toNat) (↑(signed r (-p.s) p.b).toNat) (-(sd r p.s * ↑p.b.toNat))
+but is expected to have type
+  @Eq (ZMod r.toNat) (↑(reversePot r p).b.toNat) (-((decPot r p).s * (decPot r p).b))

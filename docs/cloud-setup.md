@@ -17,9 +17,12 @@ session's setup.
 ## What it does
 
 1. **Disk.** Applies the `harness` sparse profile to the crypto checkout
-   (`scripts/sparse-checkout.sh`; [sparse-checkout.md](sparse-checkout.md)).
-   The large `research/` archives stay in git but off disk.
-   `CRYPTO_SPARSE_PROFILE=minimal|full` changes the profile.
+   (`scripts/sparse-checkout.sh`; [sparse-checkout.md](sparse-checkout.md))
+   and to the crypto-autoresearcher checkout (`tools/sparse_checkout.py`; its
+   `docs/sparse-checkout.md`). The large `research/` archives, experiment run
+   directories and reference bundles stay in git but off disk, and each tool's
+   `add --path P/` brings a path back. `CRYPTO_SPARSE_PROFILE=minimal|full`
+   and `CRYPTO_AR_SPARSE_PROFILE=full` change the profiles.
 2. **Tools and repositories.** Runs `scripts/setup-workstation.sh` without its
    control-plane step. That covers apt build tools, PARI/GP, FLINT,
    PostgreSQL, Rust, Go, Node, uv, Conductor, cairn, the codex, opencode and gh
@@ -66,10 +69,24 @@ The script writes no credentials. Set them in the environment's settings:
 ## Disk
 
 Claude Code clones the repositories attached to the environment in full before
-the setup script runs. With all four attached, that is about 30 GB, and the
-lean Sage build no longer fits. Attach only the repositories a session works
-in and let this script partial-clone the others. The sparse profile frees the
-crypto checkout's research archives either way.
+the setup script runs. With all four attached, that left 821 MiB free in a
+session on 2026-11-01. The two harness profiles freed 11.3 GiB there:
+5.6 GiB from crypto (39,782 of 164,471 files off disk) and 5.7 GiB from
+crypto-autoresearcher (44,704 of 151,565). That leaves room for the lean Sage
+build.
+
+crypto-autoresearcher's whole-ledger sweeps (`validate_ledger`,
+`goal_portfolio_health`, `portfolio_kpis`) refuse a sparse checkout, and the
+coordination skills run them. For a coordination session, opt that checkout
+out on the setup line itself, since the setup script cannot read the
+environment's variables in Claude Code:
+
+```sh
+CRYPTO_AR_SPARSE_PROFILE=full bash crypto/scripts/cloud-setup.sh
+```
+
+or run `python3 tools/sparse_checkout.py disable` in the session. That needs
+about 6 GiB free again.
 
 `WITH_SAGE=0` skips Sage, `WITH_LEAN=1` adds elan for cryptanalysis's Lean
 proofs, and `SETUP_SKIP` takes more `setup-workstation.sh` components to skip

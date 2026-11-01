@@ -1,0 +1,287 @@
+{
+  "schema": "pkm.native-prerequisites-validation/v1",
+  "updated_utc": "2026-10-30T06:03:56.982945+00:00",
+  "scope": "native software/proof development only; G1-G6 scientific acceptance incomplete",
+  "base_revision": "edf3db4457bc286099d08365f12c9b1300949d6c",
+  "initial_implementation_commit": "6970ab05d85e562308b06ae4246912ad00b00bef",
+  "changes_after_initial_commit": "strengthened positive two-sum test; two Mathlib affine lemmas; versioned validation/report/metadata. Production Rust source unchanged.",
+  "source_sha256": {
+    "examples/pkm_oracle_program.rs": "43582d10267696fdc9fb11581bc5672496439dbd52d552f73959de300a218f1a",
+    "examples/pkm_oracle_program/algebra.rs": "57c67869f969a89ef0a9aefd85a13f0e5058c395664d96547d95425541e2f891",
+    "examples/pkm_oracle_program/pipeline.rs": "4cd50577ddf6e291d3812bdfec9cdd3bec358f47696efdf05e8aff16acb33f01",
+    "examples/pkm_oracle_program/reference.rs": "9fee14b1bf35b324dabb7c39a226abaa50e4b46689e6a33f1149fa6d57f76ba9",
+    "examples/pkm_oracle_program/tests.rs": "dabee762708cf2334b398fb2c6a713111a98a2cf582d9b962201cbfbdf8550f9",
+    "research/prime_ecdlp_three_leads_20261029/lean/ThreeLeads/PKMChainCoverage.lean": "eea5296b4d44e4fcdec8d7c0df6cbde2e8f7955a4ca2650b913fa0e0ccd55847",
+    "research/prime_ecdlp_three_leads_20261029/execution-20261030/README.md": "4f5b972ece0c0285cae3198109b92a2cffa8a0aab0ef52ace9641d6194ecd495",
+    "research/prime_ecdlp_three_leads_20261029/execution-20261030/report.typ": "8d3de3c69ca50a2319a8cb466f30af0b62daa8ed7d07884502d47480e267fcee",
+    "research/prime_ecdlp_three_leads_20261029/execution-20261030/report.pdf": "e4624b2e8627e5a9d08fe2e31c182dbe04468a22a36402ec25afb16fb9bdaa4b",
+    "research/prime_ecdlp_three_leads_20261029/execution-20261030/goal-state.json": "b75c8638198615aa83eaf628b764e32d7b17c03fbe78fc71386ff5bbc31064d9",
+    "research/prime_ecdlp_three_leads_20261029/execution-20261030/architecture.svg": "ff292b6d56869bee6e807a3940f6868533baec166d9dedcb586361d0a9ac4db4",
+    "research/prime_ecdlp_three_leads_20261029/execution-20261030/fixtures/m4-public-point.json": "3fe62ab9505830cdb3ce98c1a5bcfd3e88b7871d27863a5d775917235fda0a2d",
+    "research/prime_ecdlp_three_leads_20261029/execution-20261030/fixtures/cold-toy-dlp.json": "36b0d17bf24cc67baa23b35d1a240f07cb4573b66bfc5ed9b9c2f11eb9943fd1"
+  },
+  "commands": [
+    {
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--example",
+        "pkm_oracle_program",
+        "-j2",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "log": "native-tests-final.log",
+      "passed": 12,
+      "failed": 0,
+      "fixture_finite_targets_checked": 35,
+      "target_dir": "/workspace/three-leads-clippy-target"
+    },
+    {
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--example",
+        "pkm_symmetric_complete",
+        "--example",
+        "hecke_target_router",
+        "-j2",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "log": "legacy-tests.log",
+      "passed": 8,
+      "failed": 0,
+      "target_dir": "/workspace/three-leads-clippy-target"
+    },
+    {
+      "argv": [
+        "cargo",
+        "clippy",
+        "--release",
+        "--locked",
+        "--example",
+        "pkm_oracle_program",
+        "--no-deps",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "log": "clippy-final.log"
+    },
+    {
+      "argv": [
+        "rustfmt",
+        "--edition",
+        "2021",
+        "--check",
+        "examples/pkm_oracle_program.rs"
+      ],
+      "exit": 0,
+      "log": "rustfmt.log"
+    },
+    {
+      "argv": [
+        "cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--example",
+        "pkm_oracle_program",
+        "-j2"
+      ],
+      "exit": 0,
+      "log": "cli-build.log"
+    },
+    {
+      "argv": [
+        "/workspace/three-leads-clippy-target/release/examples/pkm_oracle_program",
+        "run",
+        "/workspace/pkm-do-not-exist-request-20261030.json"
+      ],
+      "expected_exit": 1,
+      "observed_exit": 1,
+      "log": "cli-gate.log",
+      "scope": "negative gate-refusal test; nonexistent input guarantees no algorithm launch even if access changes"
+    },
+    {
+      "argv": [
+        "/workspace/three-leads-clippy-target/release/backlog",
+        "validate",
+        "XP-20261029-pkm-verified-oracle-program"
+      ],
+      "exit": 0,
+      "log": "backlog-validate.log"
+    },
+    {
+      "argv": [
+        "lake",
+        "build",
+        "+ThreeLeads.PKMChainCoverage"
+      ],
+      "exit": 0,
+      "log": "affine-lean-build.log"
+    },
+    {
+      "argv": [
+        "tools/lean/proof-gate.sh",
+        "--out",
+        "/workspace/pkm-program-affine-proof-receipts",
+        "research/prime_ecdlp_three_leads_20261029/lean"
+      ],
+      "exit": 0,
+      "log": "affine-proof-gate.log",
+      "audited_declarations": 13,
+      "trusted_exceptions": 0
+    },
+    {
+      "argv": [
+        "lake",
+        "env",
+        "leanchecker",
+        "ThreeLeads.PKMChainCoverage"
+      ],
+      "exit": 0,
+      "log": "affine-kernel.log",
+      "mode": "module replay against imports; not --fresh or external prover"
+    },
+    {
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--lib",
+        "--locked",
+        "-j2",
+        "--no-run"
+      ],
+      "exit": 0,
+      "log": "library-build.log"
+    },
+    {
+      "argv": [
+        "timeout",
+        "2400",
+        "cargo",
+        "test",
+        "--release",
+        "--lib",
+        "--locked",
+        "-j2",
+        "--",
+        "--test-threads=1"
+      ],
+      "status": "capped incomplete",
+      "wrapper_exit": 124,
+      "log": "full-library-excerpt.log",
+      "detail": "full-library-status.json"
+    }
+  ],
+  "full_library": {
+    "status": "capped incomplete; no full-suite pass",
+    "declared": 5553,
+    "passed_observed": 2173,
+    "failed_observed": 0,
+    "ignored_observed": 47,
+    "active_at_cap": [
+      "cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies"
+    ],
+    "not_reached": 3332,
+    "execution_budget_seconds": 2400,
+    "wrapper_exit": 124,
+    "cargo_exit": null,
+    "raw_log_status": "NOT_UPLOADED",
+    "raw_log": {
+      "local_path": "/workspace/pkm-program-full-library.log",
+      "bytes": 210576,
+      "sha256": "b9992777b453ef20c6e3b464b4d353b49b6db86c61935d97d6da841d7ee6e885"
+    }
+  },
+  "binaries": [
+    {
+      "path": "/workspace/three-leads-clippy-target/release/examples/pkm_oracle_program",
+      "bytes": 6511112,
+      "sha256": "028c29396745b9a35edccdd2d286b5ec538b7d70e6a1ebefb4a1a56978b87b8d"
+    },
+    {
+      "path": "/workspace/three-leads-clippy-target/release/examples/pkm_oracle_program-9b34922ca9c096c6",
+      "bytes": 6926336,
+      "sha256": "c375c94d2058ae1cb5027a745ba76ff1bb97ef43cf8d778649ff59d67180aeaa"
+    },
+    {
+      "path": "/workspace/three-leads-clippy-target/release/backlog",
+      "bytes": 5694840,
+      "sha256": "05159085c779e9588b07726728a4b8941c2564e1479c0420e08d8ee3b0d6a23a"
+    }
+  ],
+  "toolchains": {
+    "rustc": "1.99.1 (58cf8f9c3 2026-10-13)",
+    "lean": "4.34.1 (5045d0056413266e57c625dcd7c365b10e377c52)",
+    "mathlib": "d13f23b723b8a846827a245b89c10fc7d3f11612"
+  },
+  "scientific_panels_run": 0,
+  "comparison_admissible": false,
+  "pdf_pages_inspected": 2,
+  "checkpoint_gate_exit": 1,
+  "checkpoint_reason": "no upload token/AWS profile",
+  "backlog_status": "blocked/unfunded; whole-panel entrypoint not implemented",
+  "historical_sources_and_receipts_unchanged": true,
+  "prior_logs": "original 12-test/11-declaration version retained, final 12-test/13-declaration version recorded separately",
+  "initial_failures": [
+    {
+      "log": "lean-build-initial.log",
+      "reason": "duplicated relative path; no theorem compiled"
+    },
+    {
+      "log": "pkm-curve-attempt1.log",
+      "source": "pkm-curve-attempt1.txt",
+      "reason": "missing explicit decidable-equality instance; failed scratch attempt is not a proof"
+    },
+    {
+      "log": "clippy-lock-wait.log",
+      "reason": "stopped Cargo waiter and reused separate cached target"
+    }
+  ],
+  "log_sha256": {
+    "affine-kernel.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "affine-lean-build.log": "63e0caaff7f826561ba5af8c105d0245d1ea1098c12ba551e913fdc0bf202ceb",
+    "affine-proof-gate/audit.log": "de12afe11d30559853196e2fbf22be1db9ff58e4e4fd8f28dd873152635cb103",
+    "affine-proof-gate/build.log": "fd3f4c2f41d4fc2b7334d43d37dd0854abe3c6ba7a24c866d270ce050a5e8cc4",
+    "affine-proof-gate/cache.log": "29e284dc7d8024aa6a333a92d0b23035028d78ada47b37f7dd77d8e1a0293483",
+    "affine-proof-gate/source-build.log": "135168bc793be9b3a0a36597b956c815c150d414b2818743c3151b2ae11f669d",
+    "affine-proof-gate.log": "38f342d580df9f4fafc7ea0f0a38bf1d975fdc45f17df3784048983ca38f1d7f",
+    "artifacts.log": "30a8346d1f9f41872ce54a60a20c0c053f57632ebd6e32f1e9be5529224fa934",
+    "backlog-build.log": "632bfbe0dcb0f88fc6e58b55e84755dae1156dcbbe8e0a2dfb480d432162aff2",
+    "backlog-validate.log": "00c228dbeecbb17c54e2ba4cba835117d7849e10c05f255aec11e31877b78e2e",
+    "checkpoint-gate.log": "2f1014b06fd1d5dbb602d7aef98a2e484b85b75101c52555f59d783097048012",
+    "cli-build.log": "66bfeb010590be0249e6f9a014d2b2245960d54dbdccfdddf428f8627931303b",
+    "cli-gate.log": "a89f01f0046ad87792f10745e614b650f3ab2f8c6c8129ef26aede343c438b33",
+    "clippy-final.log": "3feb3289f7788d01e0b0c17fdc285884f064450084c0404dfd6358b7d9ec46bd",
+    "clippy-lock-wait.log": "256920d31a6e3c8c7b7c6e25b6976dd361363b398cfdd33869c4affe88178eb2",
+    "conductor.log": "8fcfd0a01eb89b2a59a6cdef933bebc784f60be1c4681c07d30969ce40cb2f67",
+    "full-library-excerpt.log": "b2217c03c6b046303dcce906226d8c278332b3092bcc47643b575c9080bba3e8",
+    "kernel.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "lean-build-initial.log": "835e0a85552b84490b953c0743d5507999a168d3ef0ee22cb9f2992acf96adf4",
+    "lean-build.log": "4f8113d670799b2f0fda64febaafdd40d42ae5011b051a72d5252f2f43b32d0a",
+    "legacy-tests.log": "a9b9c50107d2193f13e856dc1cc244368218fe5ac40b13af0a05d38f72fbda9c",
+    "library-build.log": "9c35fd41535bfb3c2f8f1f1c290e309446b47bef6540e66a67d34926fcdaca84",
+    "native-tests-final.log": "21576f242bc480f7526deef8b9b9d522c2f99fb7eb0ddd510e9eb3fbf3336129",
+    "native-tests.log": "a59ae6600e012182948ba3d53b6c146e227cd4452b850f27f51e588f32275299",
+    "pkm-curve-attempt1.log": "6f501297aa1eba5b4ad6f12d4c4861b90b7e33ca95e22799e0ed5684f89f9987",
+    "proof-gate/audit.log": "40760de5f7bd6cdcfbaf6f009f1551c38096f1d5b2c41244d4eb2114109acd74",
+    "proof-gate/build.log": "fd3f4c2f41d4fc2b7334d43d37dd0854abe3c6ba7a24c866d270ce050a5e8cc4",
+    "proof-gate/cache.log": "29e284dc7d8024aa6a333a92d0b23035028d78ada47b37f7dd77d8e1a0293483",
+    "proof-gate/source-build.log": "a11576b256b8047caf73da2e6a482824b54674608add563badffbb9c49b37c50",
+    "proof-gate.log": "e31a0c4938e76569eb53304a23ab2931a61ae2dbdae41bd6019837cec8ffeb81",
+    "rustfmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size.log": "322761bcb838f5da662927750da20634e40f03f900e2c31c260a13cd2d9a78ec"
+  }
+}
