@@ -2,8 +2,7 @@ from pathlib import Path
 import hashlib,json,base64,gzip
 src=Path(__file__).parent
 dst=Path('/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/weighted-state-continuation')
-assert not dst.exists()
-dst.mkdir(parents=True);files=[]
+dst.mkdir(parents=True,exist_ok=True);files=[]
 for p in sorted(src.rglob('*')):
  if not p.is_file() or p.is_symlink():continue
  rel=p.relative_to(src)
