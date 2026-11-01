@@ -1,0 +1,76 @@
+/var/tmp/independent-residual-review-20261101/snapshot/IndependentControls.lean:4:69: error: Tactic `decide` failed for proposition
+  residual 17 [1, 2, 1] [1, 1] = []
+because its `Decidable` instance
+  (residual 17 [1, 2, 1] [1, 1]).instDecidableEqNil
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instance `List.instDecidableEqNil`, reduction got stuck at the `Decidable` instance
+  match residual 17 [1, 2, 1] [1, 1] with
+  | [] => isTrue ⋯
+  | head :: tail => isFalse ⋯
+/var/tmp/independent-residual-review-20261101/snapshot/IndependentControls.lean:5:67: error: Tactic `decide` failed for proposition
+  psub 17 [2] [1, 2, 3] = [1, 15, 14]
+because its `Decidable` instance
+  instDecidableEqList (psub 17 [2] [1, 2, 3]) [1, 15, 14]
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instance `instDecidableEqList`, reduction got stuck at the `Decidable` instance
+  match psub 17 [2] [1, 2, 3] with
+  | [] =>
+    match [1, 15, 14] with
+    | [] => isTrue ⋯
+    | head :: tail => isFalse ⋯
+  | a :: as =>
+    match [1, 15, 14] with
+    | [] => isFalse ⋯
+    | b :: bs =>
+      match decEq a b with
+      | isTrue hab =>
+        match as.hasDecEq bs with
+        | isTrue habs => isTrue ⋯
+        | isFalse nabs => isFalse ⋯
+      | isFalse nab => isFalse ⋯
+/var/tmp/independent-residual-review-20261101/snapshot/IndependentControls.lean:7:77: error: Tactic `decide` failed for proposition
+  0 ≤ 2 ∧ [1].getLast? = some 1 ∧ MonicRemainder.checkedPrem 17 [1] (residual 17 [3, 4] []) 2 = some []
+because its `Decidable` instance
+  instDecidableAnd
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableAnd`, `instDecidableEqBitVec`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqUInt64`, `BitVec.decEq`, `Bool.decEq`, `List.instDecidableEqNil`, `Nat.decEq`, `Nat.decLe`, `Option.instDecidableEq`, and `UInt64.decEq`, reduction got stuck at the `Decidable` instance
+  match MonicRemainder.checkedPrem 17 [1] (residual 17 [3, 4] []) 2 with
+  | none =>
+    match some [] with
+    | none => isTrue ⋯
+    | some val => isFalse ⋯
+  | some a =>
+    match some [] with
+    | none => isFalse ⋯
+    | some b =>
+      match (fun a b => instDecidableEqList a b) a b with
+      | isTrue h => isTrue ⋯
+      | isFalse n => isFalse ⋯
+/var/tmp/independent-residual-review-20261101/snapshot/IndependentControls.lean:12:80: error: Tactic `decide` failed for proposition
+  0 ≤ 2 ∧ [1].getLast? = some 1 ∧ MonicRemainder.checkedPrem 17 [1] (residual 17 [1] [1]) 0 = some []
+because its `Decidable` instance
+  instDecidableAnd
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableAnd`, `instDecidableEqBitVec`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqUInt64`, `BitVec.decEq`, `Bool.decEq`, `List.instDecidableEqNil`, `Nat.decEq`, `Nat.decLe`, `Option.instDecidableEq`, and `UInt64.decEq`, reduction got stuck at the `Decidable` instance
+  match MonicRemainder.checkedPrem 17 [1] (residual 17 [1] [1]) 0 with
+  | none =>
+    match some [] with
+    | none => isTrue ⋯
+    | some val => isFalse ⋯
+  | some a =>
+    match some [] with
+    | none => isFalse ⋯
+    | some b =>
+      match (fun a b => instDecidableEqList a b) a b with
+      | isTrue h => isTrue ⋯
+      | isFalse n => isFalse ⋯
+'exact_square_residual' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'padded_subtraction' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'identity_accepts' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'degree_guard_rejects' depends on axioms: [propext, Classical.choice, Quot.sound]
+'trailing_zero_divisor_rejects' depends on axioms: [propext, Classical.choice, Quot.sound]
+'shape_premise_needed' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

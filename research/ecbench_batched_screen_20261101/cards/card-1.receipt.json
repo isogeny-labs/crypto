@@ -1,0 +1,3170 @@
+{
+  "card_id": "CARD-ecbench-batched-screen-20261101-1",
+  "card_path": "research/ecbench_batched_screen_20261101/cards/card-1.json",
+  "card_sha256": "62b2be31379b6b6580e12d88386dcf9ee0daba7aa80cae584187ce5443da7689",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "scripts/checkpoint.sh",
+        "gate"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.596,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "checkpoint-gate",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.596,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "0d64a22ab5281afeedfaeb57591c2f78078099c62b5a0159102532e090d9bb2a",
+      "stdout_tail": [
+        "checkpoint: unchanged since 20261101T175124Z-39f147d96bc7 s3://setec-astronomy-artifacts/checkpoints/crypto/claude__ecbench-batched-screen/20261101T175124Z-39f147d96bc7/"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "record-head",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "f6c158e1cf86a32c2160d691ae6ef26796d823cca8ef4472d3f359b8c0ca1fac",
+      "stdout_tail": [
+        "39f147d96bc78a46a2e124ec466f9b8abb44f7f6"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "status",
+        "--porcelain",
+        "--untracked-files=all"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.434,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "record-status",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.434,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "785b4fe634a85aa075ed606b7a1b43ea9ea559536596830fb28af2508bcc4c9a",
+      "stdout_tail": [
+        "?? research/ecbench_batched_screen_20261101/cards/card-1.checkpoint-gate.stderr",
+        "?? research/ecbench_batched_screen_20261101/cards/card-1.checkpoint-gate.stdout",
+        "?? research/ecbench_batched_screen_20261101/cards/card-1.head.stdout"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "df",
+        "-h",
+        "/"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "record-disk-start",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "0f5631307682019f82b89770d5fcee35e5ad37008bdbf62efa47eba5def53991",
+      "stdout_tail": [
+        "Filesystem      Size  Used Avail Use% Mounted on",
+        "/dev/vda        252G   39G  415M  99% /"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "host"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.053,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "record-host",
+      "index": 5,
+      "outputs": {},
+      "seconds": 1.053,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "3c567137095cf1599764ae34c61626d1f57067bea976b869edffdd059777c29c",
+      "stdout_tail": [
+        "env class   ECBENV3hc4d998f5ae3f",
+        "cpu         Intel(R) Xeon(R) Processor @ 2.10GHz (4 logical, Some(4) cores, 1 NUMA nodes)",
+        "features    adx aes avx avx2 avx512bw avx512dq avx512f avx512ifma avx512vbmi avx512vl bmi1 bmi2 fma gfni pclmulqdq popcnt sha sse4.2 vaes vpclmulqdq",
+        "os          linux x86_64 6.18.44-fc-v185",
+        "virtual     Some(true)",
+        "binary      447a6d3c4842b5dadb5c1601e9648cda5cc08c41668bfd87741e6fc369bc24c0",
+        "commit      39f147d96bc78a46a2e124ec466f9b8abb44f7f6 (dirty: Some(false), source: runtime_worktree)"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ecbench_batched_screen_20261101/specs/n13a0.json",
+        "--out",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--settle",
+        "1",
+        "--quiet"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 120.838,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-n13a0",
+      "index": 6,
+      "outputs": {
+        "research/ecbench_batched_screen_20261101/sessions/n13a0/records.jsonl": "f84da25517c647e0237a40fd54834ee90bdbfd7e77c7bddcf4acc29c71224cf7",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0/session.json": "4ffbc4613f179bbb2966d3eb40aef30a47016ca3b1c74927b9b23548c34d0d70"
+      },
+      "seconds": 120.838,
+      "stderr_sha256": "8616a8d515be45639ff9f19ee5a1791296e13db354f86b3f371bb912f5ebd875",
+      "stderr_tail": [
+        "session ECBS1hdaaf5e8715d0 complete -> research/ecbench_batched_screen_20261101/sessions/n13a0 (1600 records: {\"verified\": 1600})"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--replay-all"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 9.94,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-n13a0",
+      "index": 7,
+      "outputs": {},
+      "seconds": 9.94,
+      "stderr_sha256": "848c587056fcef6098bb874e44644dd6ef89f2d30bde29f621e730c3ec0d05a0",
+      "stderr_tail": [
+        "audit OK: 1600 records, 1600 verified, 1280 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "98409e898817f1af1a7f3da8f4bc7222f16ff0a0aa47bf733bd511f247095584",
+      "stdout_tail": [
+        "      \"seq\": 1599,",
+        "      \"record_id\": \"ECR1he4e261b775a1\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"replay_selection\": \"all\",",
+        "  \"replay_candidates\": 1280,",
+        "  \"files\": {",
+        "    \"host.json\": \"9c28a48a9c9700c811c8f489432202f376db6dfa42d55aaa88d44386c106d1de\",",
+        "    \"plan.json\": \"a6a6929961c15ec5e140604e0512a4f83f28ad11425a51aaf1dad9f9d0ba6241\",",
+        "    \"records.jsonl\": \"f84da25517c647e0237a40fd54834ee90bdbfd7e77c7bddcf4acc29c71224cf7\",",
+        "    \"session.json\": \"4ffbc4613f179bbb2966d3eb40aef30a47016ca3b1c74927b9b23548c34d0d70\",",
+        "    \"spec.json\": \"6aead47e62927837a60ee048558f87608afdcde3382128c401bc0ac05d7483c4\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"447a6d3c4842b5dadb5c1601e9648cda5cc08c41668bfd87741e6fc369bc24c0\",",
+        "  \"auditor_env_class_id\": \"ECBENV3hc4d998f5ae3f\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h33f0d9a6b3db\",",
+        "  \"audited_unix_ms\": 1793555641583",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "research/ecbench_batched_screen_20261101/cards/audit_gate.py",
+        "research/ecbench_batched_screen_20261101/audits/n13a0.verify.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.026,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "audit-gate-n13a0",
+      "index": 8,
+      "outputs": {},
+      "seconds": 0.026,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "962f31ff9f5c77f958a2c757f5cd3cf5403000e91efbe6ba67d65c3f7470d389",
+      "stdout_tail": [
+        "AUDIT-GATE research/ecbench_batched_screen_20261101/audits/n13a0.verify.txt ok True status complete records 1600 verified_records 1600 replays 1280 reproduced 1280 problems 0",
+        "AUDIT-GATE PASSED"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "table",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.578,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "table-n13a0",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.578,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "908442043264d59bcdbc8576389f9b3afb7d64c7fc294c9f449940ae67a81352",
+      "stdout_tail": [
+        "| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels | flags |",
+        "|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|---|",
+        "| ECBS1hdaaf5e8715d0 | ic-b1 | ic.koblitz_batched | icv1-f2m13-t181-515ee569 | 10.97 | 128/128 | 854.061 | [848.128, 860.036] | \u2013 | \u2013 | 3474.687 | \u2013 | yes | 2.608 | L0\u00d7128 | log2 r = 11.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1hdaaf5e8715d0 | ic-b2 | ic.koblitz_batched | icv1-f2m13-t181-515ee569 | 10.97 | 128/128 | 859.581 | [853.746, 865.456] | \u2013 | \u2013 | 3497.144 | \u2013 | yes | 2.511 | L0\u00d7128 | log2 r = 11.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1hdaaf5e8715d0 | ic-b4 | ic.koblitz_batched | icv1-f2m13-t181-515ee569 | 10.97 | 128/128 | 864.822 | [858.688, 870.999] | \u2013 | \u2013 | 3518.465 | \u2013 | yes | 2.600 | L0\u00d7128 | log2 r = 11.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1hdaaf5e8715d0 | ic-b8 | ic.koblitz_batched | icv1-f2m13-t181-515ee569 | 10.97 | 128/128 | 877.207 | [870.389, 884.079] | \u2013 | \u2013 | 3568.856 | \u2013 | yes | 2.705 | L0\u00d7128 | log2 r = 11.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1hdaaf5e8715d0 | ic-b16 | ic.koblitz_batched | icv1-f2m13-t181-515ee569 | 10.97 | 128/128 | 916.834 | [910.805, 922.903] | \u2013 | \u2013 | 3730.073 | \u2013 | yes | 3.113 | L0\u00d7128 | log2 r = 11.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1hdaaf5e8715d0 | ic-b32 | ic.koblitz_batched | icv1-f2m13-t181-515ee569 | 10.97 | 128/128 | 1046.843 | [1046.635, 1047.051] | \u2013 | \u2013 | 4259.006 | \u2013 | yes | 3.301 | L0\u00d7128 | log2 r = 11.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1hdaaf5e8715d0 | ic-b64 | ic.koblitz_batched | icv1-f2m13-t181-515ee569 | 10.97 | 128/128 | 1329.025 | [1328.756, 1329.294] | \u2013 | \u2013 | 5407.044 | \u2013 | yes | 4.392 | L0\u00d7128 | log2 r = 11.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1hdaaf5e8715d0 | ic-b128 | ic.koblitz_batched | icv1-f2m13-t181-515ee569 | 10.97 | 128/128 | 1893.356 | [1892.944, 1893.768] | \u2013 | \u2013 | 7702.985 | \u2013 | yes | 6.538 | L0\u00d7128 | log2 r = 11.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1hdaaf5e8715d0 | ic-b256 | ic.koblitz_batched | icv1-f2m13-t181-515ee569 | 10.97 | 128/128 | 3021.829 | [3021.295, 3022.364] | \u2013 | \u2013 | 12294.098 | \u2013 | yes | 10.559 | L0\u00d7128 | log2 r = 11.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1hdaaf5e8715d0 | ic-b64-aa | ic.koblitz_batched | icv1-f2m13-t181-515ee569 | 10.97 | 128/128 | 1329.025 | [1328.756, 1329.294] | \u2013 | \u2013 | 5407.044 | \u2013 | yes | 4.262 | L0\u00d7128 | log2 r = 11.0 is below the calibrated range (2^39); S has not reached its constant |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b1",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.859,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n13a0-ic-b1",
+      "index": 10,
+      "outputs": {},
+      "seconds": 0.859,
+      "stderr_sha256": "df0b0f80f3127d20931f74d280b5d7f456b1ac392cb0bb0170782c5538e30b20",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b1.json"
+      ],
+      "stdout_sha256": "fc28d5302d2806b9b90ea222870fb6be0e8ce69c20164f2352d0a322656e6528",
+      "stdout_tail": [
+        "| W60b84d2e7bfb | icv1-f2m13-t181-515ee569 | 10.97 | 1329.0224 | 872.6030 | 0.6566 |",
+        "| W8915940c4cb3 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.9720 | 859.5206 | 0.6463 |",
+        "| W9713fa0c64c9 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.8773 | 843.7626 | 0.6354 |",
+        "| W988c19ee5cc3 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.8604 | 865.9389 | 0.6516 |",
+        "| Wa36f958d46c7 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.3855 | 837.7744 | 0.6302 |",
+        "| Wa80439720178 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6369 | 846.2930 | 0.6365 |",
+        "| Wb369860844b9 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.4136 | 881.4121 | 0.6635 |",
+        "| Wb948adcd0166 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.1900 | 864.0341 | 0.6500 |",
+        "| Wb96672143b21 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.5644 | 843.0755 | 0.6346 |",
+        "| Wb98496f749cb | icv1-f2m13-t181-515ee569 | 10.97 | 1330.2569 | 857.8951 | 0.6449 |",
+        "| Wc4dfe486c105 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6872 | 839.9194 | 0.6317 |",
+        "| Wc53c0c628082 | icv1-f2m13-t181-515ee569 | 10.97 | 1326.5925 | 843.9749 | 0.6362 |",
+        "| Wcbf4684f61a1 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.9051 | 837.3275 | 0.6301 |",
+        "| Wd1394f9346ed | icv1-f2m13-t181-515ee569 | 10.97 | 1328.6705 | 852.8566 | 0.6419 |",
+        "| We04998039864 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.9276 | 868.6146 | 0.6541 |",
+        "| Web7c1ded2e31 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2012 | 837.5677 | 0.6301 |",
+        "| Wf872ae998b11 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7151 | 855.3870 | 0.6433 |",
+        "| Wfc5f3e005896 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.0616 | 843.8799 | 0.6354 |",
+        "| Wfd272fdb798e | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2626 | 872.7203 | 0.6565 |",
+        "| Wfd9ae173df7c | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7486 | 897.0584 | 0.6746 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b2",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.729,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n13a0-ic-b2",
+      "index": 11,
+      "outputs": {},
+      "seconds": 0.729,
+      "stderr_sha256": "4f1c9abe888d3ff2a94ba581c7fae2b95c19de86f6184fc3bbc1b78ff40ea26d",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b2.json"
+      ],
+      "stdout_sha256": "72929d5cbd8bed3e83496da4c434b1f4504cfdffb60d070519816a9777321d90",
+      "stdout_tail": [
+        "| W60b84d2e7bfb | icv1-f2m13-t181-515ee569 | 10.97 | 1329.0224 | 879.2392 | 0.6616 |",
+        "| W8915940c4cb3 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.9720 | 866.1903 | 0.6513 |",
+        "| W9713fa0c64c9 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.8773 | 848.2090 | 0.6388 |",
+        "| W988c19ee5cc3 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.8604 | 870.3965 | 0.6550 |",
+        "| Wa36f958d46c7 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.3855 | 839.9641 | 0.6318 |",
+        "| Wa80439720178 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6369 | 852.8957 | 0.6415 |",
+        "| Wb369860844b9 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.4136 | 888.0929 | 0.6685 |",
+        "| Wb948adcd0166 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.1900 | 870.6591 | 0.6550 |",
+        "| Wb96672143b21 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.5644 | 851.8902 | 0.6412 |",
+        "| Wb98496f749cb | icv1-f2m13-t181-515ee569 | 10.97 | 1330.2569 | 862.3527 | 0.6483 |",
+        "| Wc4dfe486c105 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6872 | 844.3100 | 0.6350 |",
+        "| Wc53c0c628082 | icv1-f2m13-t181-515ee569 | 10.97 | 1326.5925 | 848.3543 | 0.6395 |",
+        "| Wcbf4684f61a1 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.9051 | 839.5619 | 0.6318 |",
+        "| Wd1394f9346ed | icv1-f2m13-t181-515ee569 | 10.97 | 1328.6705 | 852.8566 | 0.6419 |",
+        "| We04998039864 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.9276 | 870.8043 | 0.6558 |",
+        "| Web7c1ded2e31 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2012 | 844.2039 | 0.6351 |",
+        "| Wf872ae998b11 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7151 | 862.0120 | 0.6483 |",
+        "| Wfc5f3e005896 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.0616 | 852.6611 | 0.6420 |",
+        "| Wfd272fdb798e | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2626 | 879.2447 | 0.6615 |",
+        "| Wfd9ae173df7c | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7486 | 901.4714 | 0.6779 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b4",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.759,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n13a0-ic-b4",
+      "index": 12,
+      "outputs": {},
+      "seconds": 0.759,
+      "stderr_sha256": "0a38e62285aa25c11b78a21814502e65b8d2cff8e6b956b8f969591f22e72ab5",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b4.json"
+      ],
+      "stdout_sha256": "27b91b620b69a80b72291205eb4eb74915aa27367f81246b59053a749fa3f868",
+      "stdout_tail": [
+        "| W60b84d2e7bfb | icv1-f2m13-t181-515ee569 | 10.97 | 1329.0224 | 879.2392 | 0.6616 |",
+        "| W8915940c4cb3 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.9720 | 870.5697 | 0.6546 |",
+        "| W9713fa0c64c9 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.8773 | 852.6108 | 0.6421 |",
+        "| W988c19ee5cc3 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.8604 | 879.2447 | 0.6617 |",
+        "| Wa36f958d46c7 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.3855 | 844.3882 | 0.6352 |",
+        "| Wa80439720178 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6369 | 852.8957 | 0.6415 |",
+        "| Wb369860844b9 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.4136 | 896.8741 | 0.6751 |",
+        "| Wb948adcd0166 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.1900 | 879.5743 | 0.6617 |",
+        "| Wb96672143b21 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.5644 | 851.8902 | 0.6412 |",
+        "| Wb98496f749cb | icv1-f2m13-t181-515ee569 | 10.97 | 1330.2569 | 880.0044 | 0.6615 |",
+        "| Wc4dfe486c105 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6872 | 853.2029 | 0.6417 |",
+        "| Wc53c0c628082 | icv1-f2m13-t181-515ee569 | 10.97 | 1326.5925 | 852.7784 | 0.6428 |",
+        "| Wcbf4684f61a1 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.9051 | 844.0084 | 0.6351 |",
+        "| Wd1394f9346ed | icv1-f2m13-t181-515ee569 | 10.97 | 1328.6705 | 852.8566 | 0.6419 |",
+        "| We04998039864 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.9276 | 879.7084 | 0.6625 |",
+        "| Web7c1ded2e31 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2012 | 844.2039 | 0.6351 |",
+        "| Wf872ae998b11 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7151 | 870.8155 | 0.6549 |",
+        "| Wfc5f3e005896 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.0616 | 852.6611 | 0.6420 |",
+        "| Wfd272fdb798e | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2626 | 879.2447 | 0.6615 |",
+        "| Wfd9ae173df7c | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7486 | 905.8173 | 0.6812 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b8",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.748,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n13a0-ic-b8",
+      "index": 13,
+      "outputs": {},
+      "seconds": 0.748,
+      "stderr_sha256": "5e9ed6f97a7e24becc9a53009f666084da5be3ec6dbfffaffdd036ed06f54e2f",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b8.json"
+      ],
+      "stdout_sha256": "47734ae3a12166884a1d23b5b55591496cf8768e96d7f40ef6fdd968550d7019",
+      "stdout_tail": [
+        "| W60b84d2e7bfb | icv1-f2m13-t181-515ee569 | 10.97 | 1329.0224 | 905.6050 | 0.6814 |",
+        "| W8915940c4cb3 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.9720 | 888.2549 | 0.6679 |",
+        "| W9713fa0c64c9 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.8773 | 870.0837 | 0.6552 |",
+        "| W988c19ee5cc3 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.8604 | 887.9589 | 0.6682 |",
+        "| Wa36f958d46c7 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.3855 | 853.2252 | 0.6418 |",
+        "| Wa80439720178 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6369 | 852.8957 | 0.6415 |",
+        "| Wb369860844b9 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.4136 | 905.6664 | 0.6818 |",
+        "| Wb948adcd0166 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.1900 | 905.8843 | 0.6815 |",
+        "| Wb96672143b21 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.5644 | 851.8902 | 0.6412 |",
+        "| Wb98496f749cb | icv1-f2m13-t181-515ee569 | 10.97 | 1330.2569 | 906.5379 | 0.6815 |",
+        "| Wc4dfe486c105 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6872 | 870.7541 | 0.6549 |",
+        "| Wc53c0c628082 | icv1-f2m13-t181-515ee569 | 10.97 | 1326.5925 | 852.7784 | 0.6428 |",
+        "| Wcbf4684f61a1 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.9051 | 852.8119 | 0.6417 |",
+        "| Wd1394f9346ed | icv1-f2m13-t181-515ee569 | 10.97 | 1328.6705 | 870.5865 | 0.6552 |",
+        "| We04998039864 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.9276 | 888.4672 | 0.6691 |",
+        "| Web7c1ded2e31 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2012 | 852.9850 | 0.6417 |",
+        "| Wf872ae998b11 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7151 | 888.4449 | 0.6681 |",
+        "| Wfc5f3e005896 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.0616 | 870.3574 | 0.6554 |",
+        "| Wfd272fdb798e | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2626 | 887.9700 | 0.6680 |",
+        "| Wfd9ae173df7c | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7486 | 905.8173 | 0.6812 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b16",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.778,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n13a0-ic-b16",
+      "index": 14,
+      "outputs": {},
+      "seconds": 0.778,
+      "stderr_sha256": "c633a22c7d9df0e967aaebd25b4a1dcdab21da10b9c0c3a35d8cf9df859afb5b",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b16.json"
+      ],
+      "stdout_sha256": "3b4679b134e2912ce4cf1380584e4bbcf6c1e7c4b007942328f98d4ada6e7b91",
+      "stdout_tail": [
+        "| W60b84d2e7bfb | icv1-f2m13-t181-515ee569 | 10.97 | 1329.0224 | 940.9866 | 0.7080 |",
+        "| W8915940c4cb3 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.9720 | 941.4670 | 0.7079 |",
+        "| W9713fa0c64c9 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.8773 | 905.3425 | 0.6818 |",
+        "| W988c19ee5cc3 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.8604 | 905.5771 | 0.6815 |",
+        "| Wa36f958d46c7 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.3855 | 906.0575 | 0.6816 |",
+        "| Wa80439720178 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6369 | 905.8396 | 0.6813 |",
+        "| Wb369860844b9 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.4136 | 940.9698 | 0.7083 |",
+        "| Wb948adcd0166 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.1900 | 941.2212 | 0.7081 |",
+        "| Wb96672143b21 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.5644 | 904.7559 | 0.6810 |",
+        "| Wb98496f749cb | icv1-f2m13-t181-515ee569 | 10.97 | 1330.2569 | 906.5379 | 0.6815 |",
+        "| Wc4dfe486c105 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6872 | 905.8675 | 0.6813 |",
+        "| Wc53c0c628082 | icv1-f2m13-t181-515ee569 | 10.97 | 1326.5925 | 904.6721 | 0.6820 |",
+        "| Wcbf4684f61a1 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.9051 | 905.4765 | 0.6814 |",
+        "| Wd1394f9346ed | icv1-f2m13-t181-515ee569 | 10.97 | 1328.6705 | 904.8062 | 0.6810 |",
+        "| We04998039864 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.9276 | 906.1301 | 0.6824 |",
+        "| Web7c1ded2e31 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2012 | 905.8508 | 0.6815 |",
+        "| Wf872ae998b11 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7151 | 941.4558 | 0.7080 |",
+        "| Wfc5f3e005896 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.0616 | 905.5380 | 0.6818 |",
+        "| Wfd272fdb798e | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2626 | 941.2491 | 0.7081 |",
+        "| Wfd9ae173df7c | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7486 | 905.8173 | 0.6812 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b32",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.872,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n13a0-ic-b32",
+      "index": 15,
+      "outputs": {},
+      "seconds": 0.872,
+      "stderr_sha256": "6d57af43994ce75b56d18b6b01cc7d9296e2a6952302d5b48a5e939d1a954353",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b32.json"
+      ],
+      "stdout_sha256": "359f1d3f2f05f5a73239f22c382cf8645707cbb27574a74c580a329d010277b6",
+      "stdout_tail": [
+        "| W60b84d2e7bfb | icv1-f2m13-t181-515ee569 | 10.97 | 1329.0224 | 1046.9527 | 0.7878 |",
+        "| W8915940c4cb3 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.9720 | 1047.1761 | 0.7874 |",
+        "| W9713fa0c64c9 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.8773 | 1045.9863 | 0.7877 |",
+        "| W988c19ee5cc3 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.8604 | 1046.9024 | 0.7878 |",
+        "| Wa36f958d46c7 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.3855 | 1047.5169 | 0.7880 |",
+        "| Wa80439720178 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6369 | 1047.1314 | 0.7875 |",
+        "| Wb369860844b9 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.4136 | 1046.6901 | 0.7879 |",
+        "| Wb948adcd0166 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.1900 | 1047.2208 | 0.7879 |",
+        "| Wb96672143b21 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.5644 | 1046.0478 | 0.7874 |",
+        "| Wb98496f749cb | icv1-f2m13-t181-515ee569 | 10.97 | 1330.2569 | 1047.7738 | 0.7876 |",
+        "| Wc4dfe486c105 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6872 | 1046.8354 | 0.7873 |",
+        "| Wc53c0c628082 | icv1-f2m13-t181-515ee569 | 10.97 | 1326.5925 | 1045.4501 | 0.7881 |",
+        "| Wcbf4684f61a1 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.9051 | 1046.4444 | 0.7874 |",
+        "| Wd1394f9346ed | icv1-f2m13-t181-515ee569 | 10.97 | 1328.6705 | 1046.0869 | 0.7873 |",
+        "| We04998039864 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.9276 | 1046.4053 | 0.7880 |",
+        "| Web7c1ded2e31 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2012 | 1046.6399 | 0.7874 |",
+        "| Wf872ae998b11 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7151 | 1047.3772 | 0.7877 |",
+        "| Wfc5f3e005896 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.0616 | 1046.0142 | 0.7876 |",
+        "| Wfd272fdb798e | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2626 | 1046.7572 | 0.7875 |",
+        "| Wfd9ae173df7c | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7486 | 1047.0197 | 0.7874 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b128",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.814,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n13a0-ic-b128",
+      "index": 16,
+      "outputs": {},
+      "seconds": 0.814,
+      "stderr_sha256": "018396bc059fc2188c6319a4480f2d22f29645f1f865cd99ba6c52cf11a493fe",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b128.json"
+      ],
+      "stdout_sha256": "580ee02b4749b3a84b892281bcf982a1a1817c18bad0cfd15a5b426df3c163dc",
+      "stdout_tail": [
+        "| W60b84d2e7bfb | icv1-f2m13-t181-515ee569 | 10.97 | 1329.0224 | 1893.4412 | 1.4247 |",
+        "| W8915940c4cb3 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.9720 | 1894.3685 | 1.4244 |",
+        "| W9713fa0c64c9 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.8773 | 1891.3800 | 1.4244 |",
+        "| W988c19ee5cc3 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.8604 | 1892.5419 | 1.4242 |",
+        "| Wa36f958d46c7 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.3855 | 1893.6032 | 1.4244 |",
+        "| Wa80439720178 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6369 | 1894.1562 | 1.4246 |",
+        "| Wb369860844b9 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.4136 | 1892.6201 | 1.4247 |",
+        "| Wb948adcd0166 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.1900 | 1894.1004 | 1.4250 |",
+        "| Wb96672143b21 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.5644 | 1891.3409 | 1.4236 |",
+        "| Wb98496f749cb | icv1-f2m13-t181-515ee569 | 10.97 | 1330.2569 | 1895.1226 | 1.4246 |",
+        "| Wc4dfe486c105 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6872 | 1894.6422 | 1.4249 |",
+        "| Wc53c0c628082 | icv1-f2m13-t181-515ee569 | 10.97 | 1326.5925 | 1891.0784 | 1.4255 |",
+        "| Wcbf4684f61a1 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.9051 | 1893.3127 | 1.4247 |",
+        "| Wd1394f9346ed | icv1-f2m13-t181-515ee569 | 10.97 | 1328.6705 | 1893.3686 | 1.4250 |",
+        "| We04998039864 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.9276 | 1892.3687 | 1.4251 |",
+        "| Web7c1ded2e31 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2012 | 1893.6758 | 1.4247 |",
+        "| Wf872ae998b11 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7151 | 1894.3462 | 1.4246 |",
+        "| Wfc5f3e005896 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.0616 | 1893.4189 | 1.4257 |",
+        "| Wfd272fdb798e | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2626 | 1894.0054 | 1.4249 |",
+        "| Wfd9ae173df7c | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7486 | 1894.3797 | 1.4246 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b256",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.752,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n13a0-ic-b256",
+      "index": 17,
+      "outputs": {},
+      "seconds": 0.752,
+      "stderr_sha256": "d0909ae0c3c266709016919aaccedf7a9aadcea660512c051ba70a3ed2edf691",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b256.json"
+      ],
+      "stdout_sha256": "d82b9fb565b197576ab6cf6f990f8bad82b3971dda879573fe11336e5aac88e1",
+      "stdout_tail": [
+        "| W60b84d2e7bfb | icv1-f2m13-t181-515ee569 | 10.97 | 1329.0224 | 3019.9327 | 2.2723 |",
+        "| W8915940c4cb3 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.9720 | 3023.5748 | 2.2734 |",
+        "| W9713fa0c64c9 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.8773 | 3017.9050 | 2.2727 |",
+        "| W988c19ee5cc3 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.8604 | 3021.3571 | 2.2736 |",
+        "| Wa36f958d46c7 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.3855 | 3021.8040 | 2.2731 |",
+        "| Wa80439720178 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6369 | 3023.4407 | 2.2739 |",
+        "| Wb369860844b9 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.4136 | 3021.6699 | 2.2746 |",
+        "| Wb948adcd0166 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.1900 | 3022.1001 | 2.2736 |",
+        "| Wb96672143b21 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.5644 | 3020.7036 | 2.2737 |",
+        "| Wb98496f749cb | icv1-f2m13-t181-515ee569 | 10.97 | 1330.2569 | 3023.5021 | 2.2729 |",
+        "| Wc4dfe486c105 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6872 | 3024.2618 | 2.2744 |",
+        "| Wc53c0c628082 | icv1-f2m13-t181-515ee569 | 10.97 | 1326.5925 | 3020.4634 | 2.2769 |",
+        "| Wcbf4684f61a1 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.9051 | 3021.5359 | 2.2737 |",
+        "| Wd1394f9346ed | icv1-f2m13-t181-515ee569 | 10.97 | 1328.6705 | 3021.1784 | 2.2738 |",
+        "| We04998039864 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.9276 | 3019.6869 | 2.2740 |",
+        "| Web7c1ded2e31 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2012 | 3022.1001 | 2.2736 |",
+        "| Wf872ae998b11 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7151 | 3022.6363 | 2.2731 |",
+        "| Wfc5f3e005896 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.0616 | 3020.4913 | 2.2744 |",
+        "| Wfd272fdb798e | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2626 | 3022.4073 | 2.2737 |",
+        "| Wfd9ae173df7c | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7486 | 3023.3848 | 2.2737 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b64-aa",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.719,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n13a0-ic-b64-aa",
+      "index": 18,
+      "outputs": {},
+      "seconds": 0.719,
+      "stderr_sha256": "2d1935a5236728f048df8376837aa165ccb93804942237e75ce6b0b6ac6dedd8",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b64-aa.json"
+      ],
+      "stdout_sha256": "6c1954b01140fd6493096501bd5293fe5dbf76104b1bfc3ea5a308315ce5caf2",
+      "stdout_tail": [
+        "| W60b84d2e7bfb | icv1-f2m13-t181-515ee569 | 10.97 | 1329.0224 | 1329.0224 | 1.0000 |",
+        "| W8915940c4cb3 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.9720 | 1329.9720 | 1.0000 |",
+        "| W9713fa0c64c9 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.8773 | 1327.8773 | 1.0000 |",
+        "| W988c19ee5cc3 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.8604 | 1328.8604 | 1.0000 |",
+        "| Wa36f958d46c7 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.3855 | 1329.3855 | 1.0000 |",
+        "| Wa80439720178 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6369 | 1329.6369 | 1.0000 |",
+        "| Wb369860844b9 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.4136 | 1328.4136 | 1.0000 |",
+        "| Wb948adcd0166 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.1900 | 1329.1900 | 1.0000 |",
+        "| Wb96672143b21 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.5644 | 1328.5644 | 1.0000 |",
+        "| Wb98496f749cb | icv1-f2m13-t181-515ee569 | 10.97 | 1330.2569 | 1330.2569 | 1.0000 |",
+        "| Wc4dfe486c105 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6872 | 1329.6872 | 1.0000 |",
+        "| Wc53c0c628082 | icv1-f2m13-t181-515ee569 | 10.97 | 1326.5925 | 1326.5925 | 1.0000 |",
+        "| Wcbf4684f61a1 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.9051 | 1328.9051 | 1.0000 |",
+        "| Wd1394f9346ed | icv1-f2m13-t181-515ee569 | 10.97 | 1328.6705 | 1328.6705 | 1.0000 |",
+        "| We04998039864 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.9276 | 1327.9276 | 1.0000 |",
+        "| Web7c1ded2e31 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2012 | 1329.2012 | 1.0000 |",
+        "| Wf872ae998b11 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7151 | 1329.7151 | 1.0000 |",
+        "| Wfc5f3e005896 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.0616 | 1328.0616 | 1.0000 |",
+        "| Wfd272fdb798e | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2626 | 1329.2626 | 1.0000 |",
+        "| Wfd9ae173df7c | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7486 | 1329.7486 | 1.0000 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "research/ecbench_batched_screen_20261101/cards/aa_gate.py",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b64-aa.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.037,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "aa-gate-n13a0",
+      "index": 19,
+      "outputs": {},
+      "seconds": 0.037,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "80d3461bc0e716cb28beeb8f04066590a5581548f0b0066e6f4ef56ce11ea5ad",
+      "stdout_tail": [
+        "AA-GATE research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b64-aa.json ops.ratio_b_over_a 1.0 ops.ci95 [1.0, 1.0] ops.status ok",
+        "AA-GATE PASSED"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ecbench_batched_screen_20261101/specs/n17a1.json",
+        "--out",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--settle",
+        "1",
+        "--quiet"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 91.377,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-n17a1",
+      "index": 20,
+      "outputs": {
+        "research/ecbench_batched_screen_20261101/sessions/n17a1/records.jsonl": "950e101e80c8b7298e5c26b05d816a981e18d74e3b72b81f374b0da712c00c87",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1/session.json": "66d758a9282adf884aedf7fda0ff2abd804e80abb18a637da00ba995334cccd7"
+      },
+      "seconds": 91.377,
+      "stderr_sha256": "30a6aabd3a65913e5dd9d544274e049a97aa121da7abc31d7beb88e4aa771717",
+      "stderr_tail": [
+        "session ECBS1hc2bfbf371f15 complete -> research/ecbench_batched_screen_20261101/sessions/n17a1 (1600 records: {\"verified\": 1600})"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--replay-all"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 13.576,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-n17a1",
+      "index": 21,
+      "outputs": {},
+      "seconds": 13.576,
+      "stderr_sha256": "848c587056fcef6098bb874e44644dd6ef89f2d30bde29f621e730c3ec0d05a0",
+      "stderr_tail": [
+        "audit OK: 1600 records, 1600 verified, 1280 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "abc5063c476338e9677a54f86090630ab695b83288e445fee6c345f8657fc870",
+      "stdout_tail": [
+        "      \"seq\": 1599,",
+        "      \"record_id\": \"ECR1h3df476ca7f99\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"replay_selection\": \"all\",",
+        "  \"replay_candidates\": 1280,",
+        "  \"files\": {",
+        "    \"host.json\": \"318d1b302dd1b413bcf4c4bf13a3dbc1ed09b9084bfe9c938a04bdc89601e8a8\",",
+        "    \"plan.json\": \"a665fb5f4d2b5c954b42f0ec78f8e3184fdc45450f8d3320c185a2b3453945ec\",",
+        "    \"records.jsonl\": \"950e101e80c8b7298e5c26b05d816a981e18d74e3b72b81f374b0da712c00c87\",",
+        "    \"session.json\": \"66d758a9282adf884aedf7fda0ff2abd804e80abb18a637da00ba995334cccd7\",",
+        "    \"spec.json\": \"6fd12efde32a191d1cd9c8da3d4223630317c47aa05a61ae6bda00dde87bcb61\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"447a6d3c4842b5dadb5c1601e9648cda5cc08c41668bfd87741e6fc369bc24c0\",",
+        "  \"auditor_env_class_id\": \"ECBENV3hc4d998f5ae3f\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h33f0d9a6b3db\",",
+        "  \"audited_unix_ms\": 1793555754241",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "research/ecbench_batched_screen_20261101/cards/audit_gate.py",
+        "research/ecbench_batched_screen_20261101/audits/n17a1.verify.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.031,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "audit-gate-n17a1",
+      "index": 22,
+      "outputs": {},
+      "seconds": 0.031,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e5c174762dd4c82cd218f50ea06dc99b9a3dbd8f18286188e8c22619dfb04fd2",
+      "stdout_tail": [
+        "AUDIT-GATE research/ecbench_batched_screen_20261101/audits/n17a1.verify.txt ok True status complete records 1600 verified_records 1600 replays 1280 reproduced 1280 problems 0",
+        "AUDIT-GATE PASSED"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "table",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.561,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "table-n17a1",
+      "index": 23,
+      "outputs": {},
+      "seconds": 0.561,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "b05ffe55da74c8ebb2d4e85ccf4c75fe3f7af26b3d3027e81c28f0011abe5c6d",
+      "stdout_tail": [
+        "| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels | flags |",
+        "|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|---|",
+        "| ECBS1hc2bfbf371f15 | ic-b1 | ic.koblitz_batched | icv1-f2m17-tm101-00378d4e | 16.00 | 128/128 | 319.366 | [317.435, 321.309] | \u2013 | \u2013 | 1485.827 | \u2013 | yes | 4.454 | L0\u00d7128 | log2 r = 16.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1hc2bfbf371f15 | ic-b2 | ic.koblitz_batched | icv1-f2m17-tm101-00378d4e | 16.00 | 128/128 | 320.014 | [318.031, 322.009] | \u2013 | \u2013 | 1488.840 | \u2013 | yes | 4.273 | L0\u00d7128 | log2 r = 16.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1hc2bfbf371f15 | ic-b4 | ic.koblitz_batched | icv1-f2m17-tm101-00378d4e | 16.00 | 128/128 | 321.672 | [319.562, 323.797] | \u2013 | \u2013 | 1496.557 | \u2013 | yes | 4.249 | L0\u00d7128 | log2 r = 16.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1hc2bfbf371f15 | ic-b8 | ic.koblitz_batched | icv1-f2m17-tm101-00378d4e | 16.00 | 128/128 | 325.633 | [323.089, 328.197] | \u2013 | \u2013 | 1514.985 | \u2013 | yes | 4.555 | L0\u00d7128 | log2 r = 16.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1hc2bfbf371f15 | ic-b16 | ic.koblitz_batched | icv1-f2m17-tm101-00378d4e | 16.00 | 128/128 | 335.275 | [332.937, 337.629] | \u2013 | \u2013 | 1559.841 | \u2013 | yes | 4.836 | L0\u00d7128 | log2 r = 16.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1hc2bfbf371f15 | ic-b32 | ic.koblitz_batched | icv1-f2m17-tm101-00378d4e | 16.00 | 128/128 | 368.673 | [368.645, 368.701] | \u2013 | \u2013 | 1715.226 | \u2013 | yes | 4.861 | L0\u00d7128 | log2 r = 16.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1hc2bfbf371f15 | ic-b64 | ic.koblitz_batched | icv1-f2m17-tm101-00378d4e | 16.00 | 128/128 | 442.403 | [442.370, 442.437] | \u2013 | \u2013 | 2058.249 | \u2013 | yes | 6.381 | L0\u00d7128 | log2 r = 16.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1hc2bfbf371f15 | ic-b128 | ic.koblitz_batched | icv1-f2m17-tm101-00378d4e | 16.00 | 128/128 | 589.854 | [589.804, 589.904] | \u2013 | \u2013 | 2744.253 | \u2013 | yes | 8.072 | L0\u00d7128 | log2 r = 16.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1hc2bfbf371f15 | ic-b256 | ic.koblitz_batched | icv1-f2m17-tm101-00378d4e | 16.00 | 128/128 | 884.759 | [884.700, 884.818] | \u2013 | \u2013 | 4116.277 | \u2013 | yes | 13.239 | L0\u00d7128 | log2 r = 16.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1hc2bfbf371f15 | ic-b64-aa | ic.koblitz_batched | icv1-f2m17-tm101-00378d4e | 16.00 | 128/128 | 442.403 | [442.370, 442.437] | \u2013 | \u2013 | 2058.249 | \u2013 | yes | 6.247 | L0\u00d7128 | log2 r = 16.0 is below the calibrated range (2^39); S has not reached its constant |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b1",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.755,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n17a1-ic-b1",
+      "index": 24,
+      "outputs": {},
+      "seconds": 0.755,
+      "stderr_sha256": "ce03cf169bddd83d778867c87a3916d16e1370160c0c9aa9340f709dd639662e",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b1.json"
+      ],
+      "stdout_sha256": "7bdcc327759396f441ddbdbdad7e49fa22c708346c4d05420de173b7a2042461",
+      "stdout_tail": [
+        "| W63197d97fd44 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5232 | 314.5651 | 0.7108 |",
+        "| W63790eab5880 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3494 | 318.5362 | 0.7201 |",
+        "| W65a1d9f1e3ec | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3601 | 315.6575 | 0.7136 |",
+        "| W8085a34456ac | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3133 | 320.8722 | 0.7254 |",
+        "| W84f38f367a88 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4568 | 330.6253 | 0.7472 |",
+        "| W9f7d4e217843 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3660 | 324.8844 | 0.7344 |",
+        "| Wa1e594b3d8fb | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4656 | 323.8184 | 0.7318 |",
+        "| Wa6a08c3ef4b6 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4519 | 316.2939 | 0.7149 |",
+        "| Wc1f932a711ee | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3426 | 315.1303 | 0.7124 |",
+        "| Wc26d80f04f2e | icv1-f2m17-tm101-00378d4e | 16.00 | 442.2986 | 315.6702 | 0.7137 |",
+        "| Wc3e5f287d2b7 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4089 | 331.2569 | 0.7488 |",
+        "| Wccde4d6ee330 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5300 | 316.3291 | 0.7148 |",
+        "| Wcf8afdf96425 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3221 | 323.7432 | 0.7319 |",
+        "| Wd5c046863dba | icv1-f2m17-tm101-00378d4e | 16.00 | 442.2859 | 318.5392 | 0.7202 |",
+        "| Wd61425e67a3f | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4587 | 318.5733 | 0.7200 |",
+        "| We6158014a30d | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3289 | 314.4568 | 0.7109 |",
+        "| Wf176fb2fe0e5 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5671 | 326.6552 | 0.7381 |",
+        "| Wf47297ef2e1e | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4207 | 313.3908 | 0.7084 |",
+        "| Wf85df2fb0f51 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3465 | 315.7160 | 0.7137 |",
+        "| Wf98c31479f9b | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4656 | 317.4576 | 0.7175 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b2",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.77,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n17a1-ic-b2",
+      "index": 25,
+      "outputs": {},
+      "seconds": 0.77,
+      "stderr_sha256": "5e4c031d7c55e04490cdb54837afcc3ab719a87fdd90f08fcfca5b23425103c4",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b2.json"
+      ],
+      "stdout_sha256": "782aa80729a13a2509c6a3510406598ae2e4ce208698c077c4cba572f8b72523",
+      "stdout_tail": [
+        "| W63197d97fd44 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5232 | 314.5651 | 0.7108 |",
+        "| W63790eab5880 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3494 | 320.2699 | 0.7240 |",
+        "| W65a1d9f1e3ec | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3601 | 315.6575 | 0.7136 |",
+        "| W8085a34456ac | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3133 | 321.4423 | 0.7267 |",
+        "| W84f38f367a88 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4568 | 331.7772 | 0.7499 |",
+        "| W9f7d4e217843 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3660 | 324.8844 | 0.7344 |",
+        "| Wa1e594b3d8fb | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4656 | 323.8184 | 0.7318 |",
+        "| Wa6a08c3ef4b6 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4519 | 318.0218 | 0.7188 |",
+        "| Wc1f932a711ee | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3426 | 315.7082 | 0.7137 |",
+        "| Wc26d80f04f2e | icv1-f2m17-tm101-00378d4e | 16.00 | 442.2986 | 315.6702 | 0.7137 |",
+        "| Wc3e5f287d2b7 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4089 | 332.9828 | 0.7527 |",
+        "| Wccde4d6ee330 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5300 | 316.9031 | 0.7161 |",
+        "| Wcf8afdf96425 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3221 | 324.8970 | 0.7345 |",
+        "| Wd5c046863dba | icv1-f2m17-tm101-00378d4e | 16.00 | 442.2859 | 319.1171 | 0.7215 |",
+        "| Wd61425e67a3f | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4587 | 319.1434 | 0.7213 |",
+        "| We6158014a30d | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3289 | 314.4568 | 0.7109 |",
+        "| Wf176fb2fe0e5 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5671 | 327.2252 | 0.7394 |",
+        "| Wf47297ef2e1e | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4207 | 313.3908 | 0.7084 |",
+        "| Wf85df2fb0f51 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3465 | 316.8699 | 0.7163 |",
+        "| Wf98c31479f9b | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4656 | 318.0335 | 0.7188 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b4",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.863,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n17a1-ic-b4",
+      "index": 26,
+      "outputs": {},
+      "seconds": 0.863,
+      "stderr_sha256": "53f05541864e07a6b9309063635c32fcb98719b2ac97544ef1e75104e1015b91",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b4.json"
+      ],
+      "stdout_sha256": "fb53ba402f8bf73ee1327348745fdf8a0c842d8a384f9935b3b4914456ed73a0",
+      "stdout_tail": [
+        "| W63197d97fd44 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5232 | 315.7229 | 0.7135 |",
+        "| W63790eab5880 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3494 | 324.8853 | 0.7345 |",
+        "| W65a1d9f1e3ec | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3601 | 315.6575 | 0.7136 |",
+        "| W8085a34456ac | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3133 | 322.5981 | 0.7293 |",
+        "| W84f38f367a88 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4568 | 334.0712 | 0.7550 |",
+        "| W9f7d4e217843 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3660 | 327.1823 | 0.7396 |",
+        "| Wa1e594b3d8fb | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4656 | 327.2721 | 0.7397 |",
+        "| Wa6a08c3ef4b6 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4519 | 320.3353 | 0.7240 |",
+        "| Wc1f932a711ee | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3426 | 315.7082 | 0.7137 |",
+        "| Wc26d80f04f2e | icv1-f2m17-tm101-00378d4e | 16.00 | 442.2986 | 317.9798 | 0.7189 |",
+        "| Wc3e5f287d2b7 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4089 | 334.1327 | 0.7553 |",
+        "| Wccde4d6ee330 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5300 | 318.0530 | 0.7187 |",
+        "| Wcf8afdf96425 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3221 | 327.2106 | 0.7398 |",
+        "| Wd5c046863dba | icv1-f2m17-tm101-00378d4e | 16.00 | 442.2859 | 320.2748 | 0.7241 |",
+        "| Wd61425e67a3f | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4587 | 320.2953 | 0.7239 |",
+        "| We6158014a30d | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3289 | 315.6165 | 0.7135 |",
+        "| Wf176fb2fe0e5 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5671 | 329.5310 | 0.7446 |",
+        "| Wf47297ef2e1e | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4207 | 313.3908 | 0.7084 |",
+        "| Wf85df2fb0f51 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3465 | 320.3432 | 0.7242 |",
+        "| Wf98c31479f9b | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4656 | 320.3353 | 0.7240 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b8",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.853,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n17a1-ic-b8",
+      "index": 27,
+      "outputs": {},
+      "seconds": 0.853,
+      "stderr_sha256": "b4567a4fd9ea7822822ed244e3de84b07c81f3d77f245ab498f60200e746ebc2",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b8.json"
+      ],
+      "stdout_sha256": "6fd894cc4759d846de1dd820ebc08e84aef51f8f6227ec48642bbc81e95abf90",
+      "stdout_tail": [
+        "| W63197d97fd44 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5232 | 318.0306 | 0.7187 |",
+        "| W63790eab5880 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3494 | 331.7948 | 0.7501 |",
+        "| W65a1d9f1e3ec | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3601 | 317.9632 | 0.7188 |",
+        "| W8085a34456ac | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3133 | 327.2096 | 0.7398 |",
+        "| W84f38f367a88 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4568 | 341.0021 | 0.7707 |",
+        "| W9f7d4e217843 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3660 | 331.7821 | 0.7500 |",
+        "| Wa1e594b3d8fb | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4656 | 331.8953 | 0.7501 |",
+        "| Wa6a08c3ef4b6 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4519 | 327.2682 | 0.7397 |",
+        "| Wc1f932a711ee | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3426 | 318.0159 | 0.7189 |",
+        "| Wc26d80f04f2e | icv1-f2m17-tm101-00378d4e | 16.00 | 442.2986 | 322.5913 | 0.7294 |",
+        "| Wc3e5f287d2b7 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4089 | 336.4365 | 0.7605 |",
+        "| Wccde4d6ee330 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5300 | 322.6665 | 0.7291 |",
+        "| Wcf8afdf96425 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3221 | 331.8240 | 0.7502 |",
+        "| Wd5c046863dba | icv1-f2m17-tm101-00378d4e | 16.00 | 442.2859 | 322.5728 | 0.7293 |",
+        "| Wd61425e67a3f | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4587 | 322.5972 | 0.7291 |",
+        "| We6158014a30d | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3289 | 317.9183 | 0.7187 |",
+        "| Wf176fb2fe0e5 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5671 | 336.4424 | 0.7602 |",
+        "| Wf47297ef2e1e | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4207 | 313.3908 | 0.7084 |",
+        "| Wf85df2fb0f51 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3465 | 327.2701 | 0.7399 |",
+        "| Wf98c31479f9b | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4656 | 322.6294 | 0.7292 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b16",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.855,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n17a1-ic-b16",
+      "index": 28,
+      "outputs": {},
+      "seconds": 0.855,
+      "stderr_sha256": "790383138a3baafda3971834c208dd4c79c83f4d16efd608cb113fcc53624436",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b16.json"
+      ],
+      "stdout_sha256": "e0850fd08082f582d90d4869554be9fce276d7b4f90acecf19c7e3f85765609d",
+      "stdout_tail": [
+        "| W63197d97fd44 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5232 | 331.8943 | 0.7500 |",
+        "| W63790eab5880 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3494 | 331.7948 | 0.7501 |",
+        "| W65a1d9f1e3ec | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3601 | 331.7430 | 0.7499 |",
+        "| W8085a34456ac | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3133 | 331.8035 | 0.7502 |",
+        "| W84f38f367a88 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4568 | 350.2348 | 0.7916 |",
+        "| W9f7d4e217843 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3660 | 350.1812 | 0.7916 |",
+        "| Wa1e594b3d8fb | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4656 | 341.0792 | 0.7709 |",
+        "| Wa6a08c3ef4b6 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4519 | 331.8660 | 0.7501 |",
+        "| Wc1f932a711ee | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3426 | 331.8035 | 0.7501 |",
+        "| Wc26d80f04f2e | icv1-f2m17-tm101-00378d4e | 16.00 | 442.2986 | 331.8123 | 0.7502 |",
+        "| Wc3e5f287d2b7 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4089 | 350.2436 | 0.7917 |",
+        "| Wccde4d6ee330 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5300 | 331.8641 | 0.7499 |",
+        "| Wcf8afdf96425 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3221 | 331.8240 | 0.7502 |",
+        "| Wd5c046863dba | icv1-f2m17-tm101-00378d4e | 16.00 | 442.2859 | 331.8016 | 0.7502 |",
+        "| Wd61425e67a3f | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4587 | 331.7987 | 0.7499 |",
+        "| We6158014a30d | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3289 | 331.7547 | 0.7500 |",
+        "| Wf176fb2fe0e5 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5671 | 341.0792 | 0.7707 |",
+        "| Wf47297ef2e1e | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4207 | 331.8172 | 0.7500 |",
+        "| Wf85df2fb0f51 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3465 | 331.8738 | 0.7503 |",
+        "| Wf98c31479f9b | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4656 | 331.8484 | 0.7500 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b32",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.772,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n17a1-ic-b32",
+      "index": 29,
+      "outputs": {},
+      "seconds": 0.772,
+      "stderr_sha256": "0014b09e7bd6f20bfaae77f31e4d48c3a6207cd2ffaa974a023eb2e9620b8f79",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b32.json"
+      ],
+      "stdout_sha256": "e824fbe242ef2c537a1c771d886c01b601688d324ded37b16dfa4b8451192a4b",
+      "stdout_tail": [
+        "| W63197d97fd44 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5232 | 368.7140 | 0.8332 |",
+        "| W63790eab5880 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3494 | 368.6183 | 0.8333 |",
+        "| W65a1d9f1e3ec | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3601 | 368.5978 | 0.8333 |",
+        "| W8085a34456ac | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3133 | 368.6486 | 0.8335 |",
+        "| W84f38f367a88 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4568 | 368.7257 | 0.8334 |",
+        "| W9f7d4e217843 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3660 | 368.6427 | 0.8333 |",
+        "| Wa1e594b3d8fb | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4656 | 368.7286 | 0.8333 |",
+        "| Wa6a08c3ef4b6 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4519 | 368.7189 | 0.8334 |",
+        "| Wc1f932a711ee | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3426 | 368.6369 | 0.8334 |",
+        "| Wc26d80f04f2e | icv1-f2m17-tm101-00378d4e | 16.00 | 442.2986 | 368.6554 | 0.8335 |",
+        "| Wc3e5f287d2b7 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4089 | 368.6818 | 0.8334 |",
+        "| Wccde4d6ee330 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5300 | 368.7931 | 0.8334 |",
+        "| Wcf8afdf96425 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3221 | 368.6515 | 0.8334 |",
+        "| Wd5c046863dba | icv1-f2m17-tm101-00378d4e | 16.00 | 442.2859 | 368.6818 | 0.8336 |",
+        "| Wd61425e67a3f | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4587 | 368.6632 | 0.8332 |",
+        "| We6158014a30d | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3289 | 368.6115 | 0.8333 |",
+        "| Wf176fb2fe0e5 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5671 | 368.7247 | 0.8331 |",
+        "| Wf47297ef2e1e | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4207 | 368.6896 | 0.8333 |",
+        "| Wf85df2fb0f51 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3465 | 368.7599 | 0.8336 |",
+        "| Wf98c31479f9b | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4656 | 368.7384 | 0.8334 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b128",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.708,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n17a1-ic-b128",
+      "index": 30,
+      "outputs": {},
+      "seconds": 0.708,
+      "stderr_sha256": "a1d6ca6d8e8349de9d11dcfe0762b33ea002befb639ee8d7a1d20e8e684ada1a",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b128.json"
+      ],
+      "stdout_sha256": "2ec1639380024b82989f66b9c4e63902d543c7e78c4f7e6e634271ec8f3e919b",
+      "stdout_tail": [
+        "| W63197d97fd44 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5232 | 589.7842 | 1.3328 |",
+        "| W63790eab5880 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3494 | 589.9053 | 1.3336 |",
+        "| W65a1d9f1e3ec | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3601 | 589.7403 | 1.3332 |",
+        "| W8085a34456ac | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3133 | 589.8535 | 1.3336 |",
+        "| W84f38f367a88 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4568 | 590.0400 | 1.3336 |",
+        "| W9f7d4e217843 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3660 | 589.7286 | 1.3331 |",
+        "| Wa1e594b3d8fb | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4656 | 589.9121 | 1.3332 |",
+        "| Wa6a08c3ef4b6 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4519 | 589.8633 | 1.3332 |",
+        "| Wc1f932a711ee | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3426 | 589.8574 | 1.3335 |",
+        "| Wc26d80f04f2e | icv1-f2m17-tm101-00378d4e | 16.00 | 442.2986 | 589.7159 | 1.3333 |",
+        "| Wc3e5f287d2b7 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4089 | 589.8555 | 1.3333 |",
+        "| Wccde4d6ee330 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5300 | 589.9433 | 1.3331 |",
+        "| Wcf8afdf96425 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3221 | 589.6456 | 1.3331 |",
+        "| Wd5c046863dba | icv1-f2m17-tm101-00378d4e | 16.00 | 442.2859 | 589.7130 | 1.3333 |",
+        "| Wd61425e67a3f | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4587 | 590.1083 | 1.3337 |",
+        "| We6158014a30d | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3289 | 589.7208 | 1.3332 |",
+        "| Wf176fb2fe0e5 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5671 | 589.9668 | 1.3331 |",
+        "| Wf47297ef2e1e | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4207 | 589.7442 | 1.3330 |",
+        "| Wf85df2fb0f51 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3465 | 589.7403 | 1.3332 |",
+        "| Wf98c31479f9b | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4656 | 590.0000 | 1.3334 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b256",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.806,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n17a1-ic-b256",
+      "index": 31,
+      "outputs": {},
+      "seconds": 0.806,
+      "stderr_sha256": "bfa373b464ea80d5b0c643cb7930c8c9823b9c5282796a2523eff605e8191cb7",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b256.json"
+      ],
+      "stdout_sha256": "cce6bea15e13013bfc39b7e5384b26d75b4a9e81d7d27a89cd2e4bb3e8c87233",
+      "stdout_tail": [
+        "| W63197d97fd44 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5232 | 884.7320 | 1.9993 |",
+        "| W63790eab5880 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3494 | 884.8296 | 2.0003 |",
+        "| W65a1d9f1e3ec | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3601 | 884.7935 | 2.0002 |",
+        "| W8085a34456ac | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3133 | 885.0395 | 2.0009 |",
+        "| W84f38f367a88 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4568 | 885.0131 | 2.0002 |",
+        "| W9f7d4e217843 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3660 | 884.7935 | 2.0001 |",
+        "| Wa1e594b3d8fb | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4656 | 884.8755 | 1.9999 |",
+        "| Wa6a08c3ef4b6 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4519 | 884.6627 | 1.9995 |",
+        "| Wc1f932a711ee | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3426 | 884.8501 | 2.0004 |",
+        "| Wc26d80f04f2e | icv1-f2m17-tm101-00378d4e | 16.00 | 442.2986 | 884.5797 | 2.0000 |",
+        "| Wc3e5f287d2b7 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4089 | 884.5592 | 1.9994 |",
+        "| Wccde4d6ee330 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5300 | 884.9633 | 1.9998 |",
+        "| Wcf8afdf96425 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3221 | 884.5719 | 1.9998 |",
+        "| Wd5c046863dba | icv1-f2m17-tm101-00378d4e | 16.00 | 442.2859 | 884.6236 | 2.0001 |",
+        "| Wd61425e67a3f | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4587 | 884.9214 | 2.0000 |",
+        "| We6158014a30d | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3289 | 884.4030 | 1.9994 |",
+        "| Wf176fb2fe0e5 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5671 | 884.8052 | 1.9993 |",
+        "| Wf47297ef2e1e | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4207 | 884.7447 | 1.9998 |",
+        "| Wf85df2fb0f51 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3465 | 884.5299 | 1.9996 |",
+        "| Wf98c31479f9b | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4656 | 884.8150 | 1.9997 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b64-aa",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.938,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n17a1-ic-b64-aa",
+      "index": 32,
+      "outputs": {},
+      "seconds": 0.938,
+      "stderr_sha256": "f29a352c89bbb6287475f8df52ee03e518e124ba8db48edd5b65f25f01f72534",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b64-aa.json"
+      ],
+      "stdout_sha256": "4d51546a516318a47dacc673b84d69b1673f8a1e140d41d842a4c4badfd81003",
+      "stdout_tail": [
+        "| W63197d97fd44 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5232 | 442.5232 | 1.0000 |",
+        "| W63790eab5880 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3494 | 442.3494 | 1.0000 |",
+        "| W65a1d9f1e3ec | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3601 | 442.3601 | 1.0000 |",
+        "| W8085a34456ac | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3133 | 442.3133 | 1.0000 |",
+        "| W84f38f367a88 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4568 | 442.4568 | 1.0000 |",
+        "| W9f7d4e217843 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3660 | 442.3660 | 1.0000 |",
+        "| Wa1e594b3d8fb | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4656 | 442.4656 | 1.0000 |",
+        "| Wa6a08c3ef4b6 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4519 | 442.4519 | 1.0000 |",
+        "| Wc1f932a711ee | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3426 | 442.3426 | 1.0000 |",
+        "| Wc26d80f04f2e | icv1-f2m17-tm101-00378d4e | 16.00 | 442.2986 | 442.2986 | 1.0000 |",
+        "| Wc3e5f287d2b7 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4089 | 442.4089 | 1.0000 |",
+        "| Wccde4d6ee330 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5300 | 442.5300 | 1.0000 |",
+        "| Wcf8afdf96425 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3221 | 442.3221 | 1.0000 |",
+        "| Wd5c046863dba | icv1-f2m17-tm101-00378d4e | 16.00 | 442.2859 | 442.2859 | 1.0000 |",
+        "| Wd61425e67a3f | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4587 | 442.4587 | 1.0000 |",
+        "| We6158014a30d | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3289 | 442.3289 | 1.0000 |",
+        "| Wf176fb2fe0e5 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.5671 | 442.5671 | 1.0000 |",
+        "| Wf47297ef2e1e | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4207 | 442.4207 | 1.0000 |",
+        "| Wf85df2fb0f51 | icv1-f2m17-tm101-00378d4e | 16.00 | 442.3465 | 442.3465 | 1.0000 |",
+        "| Wf98c31479f9b | icv1-f2m17-tm101-00378d4e | 16.00 | 442.4656 | 442.4656 | 1.0000 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "research/ecbench_batched_screen_20261101/cards/aa_gate.py",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b64-aa.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.033,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "aa-gate-n17a1",
+      "index": 33,
+      "outputs": {},
+      "seconds": 0.033,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ba0f932bbcd56dc9a6b15e891144fc89a932a66237daec8a31d95b6521bc50d1",
+      "stdout_tail": [
+        "AA-GATE research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b64-aa.json ops.ratio_b_over_a 1.0 ops.ci95 [1.0, 1.0] ops.status ok",
+        "AA-GATE PASSED"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ecbench_batched_screen_20261101/specs/n19a0.json",
+        "--out",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--settle",
+        "1",
+        "--quiet"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 95.32,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-n19a0",
+      "index": 34,
+      "outputs": {
+        "research/ecbench_batched_screen_20261101/sessions/n19a0/records.jsonl": "7618c62d3a0d20df99fe218230c29fc3002c83b27535564bd9ed35cd96d86d82",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0/session.json": "ec8b6fafb2763014819458e09763585d2d713d7b928d51f7c1cf77978b197688"
+      },
+      "seconds": 95.32,
+      "stderr_sha256": "29ed1cb5c018ebeaf165f927b6b81817a91982b74fdd5d76794726e7554476bc",
+      "stderr_tail": [
+        "session ECBS1he88cf814fec7 complete -> research/ecbench_batched_screen_20261101/sessions/n19a0 (1600 records: {\"verified\": 1600})"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--replay-all"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 14.636,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-n19a0",
+      "index": 35,
+      "outputs": {},
+      "seconds": 14.636,
+      "stderr_sha256": "848c587056fcef6098bb874e44644dd6ef89f2d30bde29f621e730c3ec0d05a0",
+      "stderr_tail": [
+        "audit OK: 1600 records, 1600 verified, 1280 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "1c04efc5a6a8acdaf42e81d5a7f86dd7f59a665607f74097fd22289898202b75",
+      "stdout_tail": [
+        "      \"seq\": 1599,",
+        "      \"record_id\": \"ECR1h61a9b8cd1d87\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"replay_selection\": \"all\",",
+        "  \"replay_candidates\": 1280,",
+        "  \"files\": {",
+        "    \"host.json\": \"2365281eaa62f92206716a7acbb0e4f7ecd2adee1446d5e11aaf8ec25cc9d70d\",",
+        "    \"plan.json\": \"80d34edf2a477db6be223286c2b5ee7c365d069c4d33f2bce89b3e285dafa68b\",",
+        "    \"records.jsonl\": \"7618c62d3a0d20df99fe218230c29fc3002c83b27535564bd9ed35cd96d86d82\",",
+        "    \"session.json\": \"ec8b6fafb2763014819458e09763585d2d713d7b928d51f7c1cf77978b197688\",",
+        "    \"spec.json\": \"5e8e647b97779f40d8636cfd134e62dfa5ea048aa5805f6ddd77ac924d0c554f\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"447a6d3c4842b5dadb5c1601e9648cda5cc08c41668bfd87741e6fc369bc24c0\",",
+        "  \"auditor_env_class_id\": \"ECBENV3hc4d998f5ae3f\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h33f0d9a6b3db\",",
+        "  \"audited_unix_ms\": 1793555872188",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "research/ecbench_batched_screen_20261101/cards/audit_gate.py",
+        "research/ecbench_batched_screen_20261101/audits/n19a0.verify.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.028,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "audit-gate-n19a0",
+      "index": 36,
+      "outputs": {},
+      "seconds": 0.028,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ffb41f421d1cefaf44f13a4ad9d6d90b6119085b91bf1b95029b6ba6dcfee773",
+      "stdout_tail": [
+        "AUDIT-GATE research/ecbench_batched_screen_20261101/audits/n19a0.verify.txt ok True status complete records 1600 verified_records 1600 replays 1280 reproduced 1280 problems 0",
+        "AUDIT-GATE PASSED"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "table",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.584,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "table-n19a0",
+      "index": 37,
+      "outputs": {},
+      "seconds": 0.584,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "d3f7092377954908b05bb753d762d04231c7cddfe0a7541b8ca94efda752dc1c",
+      "stdout_tail": [
+        "| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels | flags |",
+        "|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|---|",
+        "| ECBS1he88cf814fec7 | ic-b1 | ic.koblitz_batched | icv1-f2m19-t797-b6cf2467 | 17.00 | 128/128 | 278.871 | [277.694, 280.053] | \u2013 | \u2013 | 1371.626 | \u2013 | yes | 4.793 | L0\u00d7128 | log2 r = 17.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1he88cf814fec7 | ic-b2 | ic.koblitz_batched | icv1-f2m19-t797-b6cf2467 | 17.00 | 128/128 | 279.453 | [278.222, 280.690] | \u2013 | \u2013 | 1374.488 | \u2013 | yes | 4.920 | L0\u00d7128 | log2 r = 17.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1he88cf814fec7 | ic-b4 | ic.koblitz_batched | icv1-f2m19-t797-b6cf2467 | 17.00 | 128/128 | 280.561 | [279.165, 281.963] | \u2013 | \u2013 | 1379.935 | \u2013 | yes | 4.802 | L0\u00d7128 | log2 r = 17.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1he88cf814fec7 | ic-b8 | ic.koblitz_batched | icv1-f2m19-t797-b6cf2467 | 17.00 | 128/128 | 283.628 | [281.757, 285.512] | \u2013 | \u2013 | 1395.023 | \u2013 | yes | 5.182 | L0\u00d7128 | log2 r = 17.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1he88cf814fec7 | ic-b16 | ic.koblitz_batched | icv1-f2m19-t797-b6cf2467 | 17.00 | 128/128 | 291.232 | [289.900, 292.570] | \u2013 | \u2013 | 1432.421 | \u2013 | yes | 5.873 | L0\u00d7128 | log2 r = 17.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1he88cf814fec7 | ic-b32 | ic.koblitz_batched | icv1-f2m19-t797-b6cf2467 | 17.00 | 128/128 | 318.474 | [318.460, 318.489] | \u2013 | \u2013 | 1566.414 | \u2013 | yes | 6.024 | L0\u00d7128 | log2 r = 17.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1he88cf814fec7 | ic-b64 | ic.koblitz_batched | icv1-f2m19-t797-b6cf2467 | 17.00 | 128/128 | 376.582 | [376.558, 376.607] | \u2013 | \u2013 | 1852.216 | \u2013 | yes | 7.206 | L0\u00d7128 | log2 r = 17.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1he88cf814fec7 | ic-b128 | ic.koblitz_batched | icv1-f2m19-t797-b6cf2467 | 17.00 | 128/128 | 492.807 | [492.779, 492.835] | \u2013 | \u2013 | 2423.866 | \u2013 | yes | 9.299 | L0\u00d7128 | log2 r = 17.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1he88cf814fec7 | ic-b256 | ic.koblitz_batched | icv1-f2m19-t797-b6cf2467 | 17.00 | 128/128 | 725.269 | [725.230, 725.309] | \u2013 | \u2013 | 3567.231 | \u2013 | yes | 13.698 | L0\u00d7128 | log2 r = 17.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1he88cf814fec7 | ic-b64-aa | ic.koblitz_batched | icv1-f2m19-t797-b6cf2467 | 17.00 | 128/128 | 376.582 | [376.558, 376.607] | \u2013 | \u2013 | 1852.216 | \u2013 | yes | 7.124 | L0\u00d7128 | log2 r = 17.0 is below the calibrated range (2^39); S has not reached its constant |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b1",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.841,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n19a0-ic-b1",
+      "index": 38,
+      "outputs": {},
+      "seconds": 0.841,
+      "stderr_sha256": "c7bcb9c3abc9511586378ee0ee6ad75404f20efdfb086f3af89a21b576cca0b7",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b1.json"
+      ],
+      "stdout_sha256": "70186902c52fe3e99ca8fce479e9d94f510514813f86010a127fc4b3a445684e",
+      "stdout_tail": [
+        "| W6a3f54af3eae | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6671 | 281.7115 | 0.7479 |",
+        "| W845c0c01f882 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5552 | 283.5304 | 0.7530 |",
+        "| W866579fbd92b | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.7791 | 279.4379 | 0.7416 |",
+        "| W8794da23d18d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5448 | 275.3309 | 0.7312 |",
+        "| W8c00090ce95f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5911 | 274.8797 | 0.7299 |",
+        "| W8dbc90c05ace | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5856 | 276.2065 | 0.7334 |",
+        "| W903fa611153e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4916 | 276.2507 | 0.7338 |",
+        "| W916437ae5228 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5683 | 279.8781 | 0.7432 |",
+        "| W92f7b96aa2da | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5026 | 278.5077 | 0.7397 |",
+        "| Wa0ac4757b2ad | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6091 | 283.9947 | 0.7541 |",
+        "| Wa4467c780295 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5185 | 279.8436 | 0.7432 |",
+        "| Waa8dabb4ea1d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5876 | 276.7117 | 0.7348 |",
+        "| Wb4792e82c500 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6291 | 287.5931 | 0.7636 |",
+        "| Wb55a289b1b58 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4909 | 281.6804 | 0.7482 |",
+        "| Wb9565fe79765 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5310 | 276.2445 | 0.7337 |",
+        "| Wba900ac81694 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6084 | 284.4184 | 0.7552 |",
+        "| Wc1cbf83f36c9 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6270 | 276.2618 | 0.7335 |",
+        "| Wcb07d3656adc | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5593 | 280.3335 | 0.7445 |",
+        "| Weda39558ff0e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5165 | 275.7518 | 0.7324 |",
+        "| Wf84fd913b05f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6160 | 278.5520 | 0.7396 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b2",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.922,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n19a0-ic-b2",
+      "index": 39,
+      "outputs": {},
+      "seconds": 0.922,
+      "stderr_sha256": "ae93a0db3d587c2c3a0f8def32d8eb08f70bc5aef9f5ec019066c8dbc3d09b65",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b2.json"
+      ],
+      "stdout_sha256": "10b881b70e2e6af9b353bbbd48b1ec1f58dc33b83daddba6e3fc81d4d6fca7ce",
+      "stdout_tail": [
+        "| W6a3f54af3eae | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6671 | 282.1634 | 0.7491 |",
+        "| W845c0c01f882 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5552 | 283.9906 | 0.7542 |",
+        "| W866579fbd92b | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.7791 | 279.4379 | 0.7416 |",
+        "| W8794da23d18d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5448 | 275.7884 | 0.7324 |",
+        "| W8c00090ce95f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5911 | 274.8797 | 0.7299 |",
+        "| W8dbc90c05ace | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5856 | 276.6626 | 0.7347 |",
+        "| W903fa611153e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4916 | 276.7041 | 0.7350 |",
+        "| W916437ae5228 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5683 | 280.3356 | 0.7444 |",
+        "| W92f7b96aa2da | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5026 | 278.5077 | 0.7397 |",
+        "| Wa0ac4757b2ad | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6091 | 283.9947 | 0.7541 |",
+        "| Wa4467c780295 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5185 | 280.2955 | 0.7444 |",
+        "| Waa8dabb4ea1d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5876 | 277.6197 | 0.7372 |",
+        "| Wb4792e82c500 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6291 | 288.5053 | 0.7660 |",
+        "| Wb55a289b1b58 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4909 | 282.1365 | 0.7494 |",
+        "| Wb9565fe79765 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5310 | 277.6031 | 0.7373 |",
+        "| Wba900ac81694 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6084 | 285.7825 | 0.7588 |",
+        "| Wc1cbf83f36c9 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6270 | 276.7207 | 0.7347 |",
+        "| Wcb07d3656adc | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5593 | 282.1413 | 0.7493 |",
+        "| Weda39558ff0e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5165 | 276.6612 | 0.7348 |",
+        "| Wf84fd913b05f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6160 | 279.4600 | 0.7420 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b4",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.853,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n19a0-ic-b4",
+      "index": 40,
+      "outputs": {},
+      "seconds": 0.853,
+      "stderr_sha256": "ea7e1d7a79e29b422387cacc092c756a794b5baad9a48304dc6d37cbf3c0a3d2",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b4.json"
+      ],
+      "stdout_sha256": "78b9bbe64010c40cbf915848f6ead134b1181f7bc71c3489eb8cdfeecaed5449",
+      "stdout_tail": [
+        "| W6a3f54af3eae | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6671 | 282.1634 | 0.7491 |",
+        "| W845c0c01f882 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5552 | 285.8164 | 0.7590 |",
+        "| W866579fbd92b | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.7791 | 280.3460 | 0.7441 |",
+        "| W8794da23d18d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5448 | 276.6909 | 0.7348 |",
+        "| W8c00090ce95f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5911 | 274.8797 | 0.7299 |",
+        "| W8dbc90c05ace | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5856 | 276.6626 | 0.7347 |",
+        "| W903fa611153e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4916 | 276.7041 | 0.7350 |",
+        "| W916437ae5228 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5683 | 280.3356 | 0.7444 |",
+        "| W92f7b96aa2da | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5026 | 280.3225 | 0.7445 |",
+        "| Wa0ac4757b2ad | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6091 | 283.9947 | 0.7541 |",
+        "| Wa4467c780295 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5185 | 280.2955 | 0.7444 |",
+        "| Waa8dabb4ea1d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5876 | 278.5388 | 0.7396 |",
+        "| Wb4792e82c500 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6291 | 289.4147 | 0.7684 |",
+        "| Wb55a289b1b58 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4909 | 282.1365 | 0.7494 |",
+        "| Wb9565fe79765 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5310 | 280.3411 | 0.7445 |",
+        "| Wba900ac81694 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6084 | 289.4189 | 0.7685 |",
+        "| Wc1cbf83f36c9 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6270 | 278.5368 | 0.7396 |",
+        "| Wcb07d3656adc | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5593 | 283.9560 | 0.7541 |",
+        "| Weda39558ff0e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5165 | 278.4760 | 0.7396 |",
+        "| Wf84fd913b05f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6160 | 282.1786 | 0.7492 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b8",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.769,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n19a0-ic-b8",
+      "index": 41,
+      "outputs": {},
+      "seconds": 0.769,
+      "stderr_sha256": "1b04235d1a83e773678cb6f8e41cb094151ed0168c8f5d56841d72bee600a47a",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b8.json"
+      ],
+      "stdout_sha256": "306043f01668988418aaad3df123126e5acec6a73ad465878a49c74eefd8a7f1",
+      "stdout_tail": [
+        "| W6a3f54af3eae | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6671 | 285.7943 | 0.7587 |",
+        "| W845c0c01f882 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5552 | 289.4610 | 0.7687 |",
+        "| W866579fbd92b | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.7791 | 282.1634 | 0.7489 |",
+        "| W8794da23d18d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5448 | 278.5126 | 0.7397 |",
+        "| W8c00090ce95f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5911 | 274.8797 | 0.7299 |",
+        "| W8dbc90c05ace | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5856 | 278.4870 | 0.7395 |",
+        "| W903fa611153e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4916 | 278.5257 | 0.7398 |",
+        "| W916437ae5228 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5683 | 282.1586 | 0.7493 |",
+        "| W92f7b96aa2da | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5026 | 282.1358 | 0.7494 |",
+        "| Wa0ac4757b2ad | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6091 | 289.4790 | 0.7686 |",
+        "| Wa4467c780295 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5185 | 285.7424 | 0.7589 |",
+        "| Waa8dabb4ea1d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5876 | 282.1835 | 0.7493 |",
+        "| Wb4792e82c500 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6291 | 296.6833 | 0.7877 |",
+        "| Wb55a289b1b58 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4909 | 282.1365 | 0.7494 |",
+        "| Wb9565fe79765 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5310 | 285.7853 | 0.7590 |",
+        "| Wba900ac81694 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6084 | 293.0455 | 0.7781 |",
+        "| Wc1cbf83f36c9 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6270 | 282.1704 | 0.7492 |",
+        "| Wcb07d3656adc | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5593 | 289.4099 | 0.7686 |",
+        "| Weda39558ff0e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5165 | 282.0957 | 0.7492 |",
+        "| Wf84fd913b05f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6160 | 285.8067 | 0.7589 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b16",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.789,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n19a0-ic-b16",
+      "index": 42,
+      "outputs": {},
+      "seconds": 0.789,
+      "stderr_sha256": "e6a7389fadee833ba996676be92464b8be496088e23e266339c0dd64dc2ddeb7",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b16.json"
+      ],
+      "stdout_sha256": "4c492be3db5b9751c311e3f8e6e8e4c268ed688138c5783615db5ad9bbba7220",
+      "stdout_tail": [
+        "| W6a3f54af3eae | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6671 | 296.7075 | 0.7877 |",
+        "| W845c0c01f882 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5552 | 296.7406 | 0.7880 |",
+        "| W866579fbd92b | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.7791 | 289.4431 | 0.7682 |",
+        "| W8794da23d18d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5448 | 289.3802 | 0.7685 |",
+        "| W8c00090ce95f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5911 | 289.4030 | 0.7685 |",
+        "| W8dbc90c05ace | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5856 | 289.4044 | 0.7685 |",
+        "| W903fa611153e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4916 | 289.4237 | 0.7687 |",
+        "| W916437ae5228 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5683 | 289.4064 | 0.7685 |",
+        "| W92f7b96aa2da | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5026 | 289.3961 | 0.7686 |",
+        "| Wa0ac4757b2ad | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6091 | 296.7420 | 0.7879 |",
+        "| Wa4467c780295 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5185 | 289.3774 | 0.7686 |",
+        "| Waa8dabb4ea1d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5876 | 289.4175 | 0.7685 |",
+        "| Wb4792e82c500 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6291 | 303.9670 | 0.8071 |",
+        "| Wb55a289b1b58 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4909 | 289.3691 | 0.7686 |",
+        "| Wb9565fe79765 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5310 | 289.4424 | 0.7687 |",
+        "| Wba900ac81694 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6084 | 296.6695 | 0.7877 |",
+        "| Wc1cbf83f36c9 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6270 | 289.4486 | 0.7685 |",
+        "| Wcb07d3656adc | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5593 | 289.4099 | 0.7686 |",
+        "| Weda39558ff0e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5165 | 289.3587 | 0.7685 |",
+        "| Wf84fd913b05f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6160 | 289.4458 | 0.7685 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b32",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.739,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n19a0-ic-b32",
+      "index": 43,
+      "outputs": {},
+      "seconds": 0.739,
+      "stderr_sha256": "eeda48a2f94a522320a108b62adef9443c794efabd786e82d3156e4e16efd327",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b32.json"
+      ],
+      "stdout_sha256": "4c444a5f33ab2753cfcdf1a230bc3260097075cb5350afff16b8d4f167bb7d84",
+      "stdout_tail": [
+        "| W6a3f54af3eae | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6671 | 318.5187 | 0.8456 |",
+        "| W845c0c01f882 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5552 | 318.5173 | 0.8459 |",
+        "| W866579fbd92b | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.7791 | 318.5657 | 0.8455 |",
+        "| W8794da23d18d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5448 | 318.4143 | 0.8456 |",
+        "| W8c00090ce95f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5911 | 318.4578 | 0.8456 |",
+        "| W8dbc90c05ace | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5856 | 318.5256 | 0.8458 |",
+        "| W903fa611153e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4916 | 318.4551 | 0.8458 |",
+        "| W916437ae5228 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5683 | 318.4820 | 0.8457 |",
+        "| W92f7b96aa2da | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5026 | 318.4316 | 0.8458 |",
+        "| Wa0ac4757b2ad | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6091 | 318.5090 | 0.8457 |",
+        "| Wa4467c780295 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5185 | 318.4129 | 0.8457 |",
+        "| Waa8dabb4ea1d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5876 | 318.4461 | 0.8456 |",
+        "| Wb4792e82c500 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6291 | 318.5124 | 0.8457 |",
+        "| Wb55a289b1b58 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4909 | 318.4185 | 0.8458 |",
+        "| Wb9565fe79765 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5310 | 318.4807 | 0.8458 |",
+        "| Wba900ac81694 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6084 | 318.5055 | 0.8457 |",
+        "| Wc1cbf83f36c9 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6270 | 318.4813 | 0.8456 |",
+        "| Wcb07d3656adc | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5593 | 318.4648 | 0.8457 |",
+        "| Weda39558ff0e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5165 | 318.4468 | 0.8458 |",
+        "| Wf84fd913b05f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6160 | 318.4772 | 0.8456 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b128",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.784,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n19a0-ic-b128",
+      "index": 44,
+      "outputs": {},
+      "seconds": 0.784,
+      "stderr_sha256": "0938e605fba1acf0b1a3ff6fe3f804036b916f4b3c873a2f6caf5efce6199207",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b128.json"
+      ],
+      "stdout_sha256": "b936a47065b52be4689c7801bb2ef88c1956b85a71425cb7fe6553d741c70b90",
+      "stdout_tail": [
+        "| W6a3f54af3eae | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6671 | 492.8825 | 1.3085 |",
+        "| W845c0c01f882 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5552 | 492.8451 | 1.3088 |",
+        "| W866579fbd92b | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.7791 | 492.9557 | 1.3083 |",
+        "| W8794da23d18d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5448 | 492.8265 | 1.3088 |",
+        "| W8c00090ce95f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5911 | 492.8369 | 1.3087 |",
+        "| W8dbc90c05ace | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5856 | 492.7899 | 1.3086 |",
+        "| W903fa611153e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4916 | 492.7235 | 1.3087 |",
+        "| W916437ae5228 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5683 | 492.7477 | 1.3085 |",
+        "| W92f7b96aa2da | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5026 | 492.8189 | 1.3089 |",
+        "| Wa0ac4757b2ad | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6091 | 492.8369 | 1.3086 |",
+        "| Wa4467c780295 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5185 | 492.6330 | 1.3084 |",
+        "| Waa8dabb4ea1d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5876 | 492.8445 | 1.3087 |",
+        "| Wb4792e82c500 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6291 | 492.8693 | 1.3086 |",
+        "| Wb55a289b1b58 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4909 | 492.7712 | 1.3089 |",
+        "| Wb9565fe79765 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5310 | 492.7823 | 1.3087 |",
+        "| Wba900ac81694 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6084 | 492.9440 | 1.3089 |",
+        "| Wc1cbf83f36c9 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6270 | 492.8120 | 1.3085 |",
+        "| Wcb07d3656adc | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5593 | 492.6696 | 1.3083 |",
+        "| Weda39558ff0e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5165 | 492.7982 | 1.3088 |",
+        "| Wf84fd913b05f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6160 | 492.8838 | 1.3087 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b256",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.864,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n19a0-ic-b256",
+      "index": 45,
+      "outputs": {},
+      "seconds": 0.864,
+      "stderr_sha256": "70a16807ea9e0e2ecfd967e6fa237a0ff388b5bcf33ed3b5aa1d9407c7bbdc7e",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b256.json"
+      ],
+      "stdout_sha256": "3f9b5961093227e2b06a67c4201013cba5068faf20fc82c95508e4b7b520d5a1",
+      "stdout_tail": [
+        "| W6a3f54af3eae | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6671 | 725.3726 | 1.9258 |",
+        "| W845c0c01f882 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5552 | 725.3215 | 1.9262 |",
+        "| W866579fbd92b | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.7791 | 725.3726 | 1.9252 |",
+        "| W8794da23d18d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5448 | 725.2503 | 1.9261 |",
+        "| W8c00090ce95f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5911 | 725.1528 | 1.9256 |",
+        "| W8dbc90c05ace | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5856 | 725.1528 | 1.9256 |",
+        "| W903fa611153e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4916 | 725.2095 | 1.9262 |",
+        "| W916437ae5228 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5683 | 725.1950 | 1.9258 |",
+        "| W92f7b96aa2da | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5026 | 725.3090 | 1.9264 |",
+        "| Wa0ac4757b2ad | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6091 | 725.3049 | 1.9259 |",
+        "| Wa4467c780295 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5185 | 725.1107 | 1.9258 |",
+        "| Waa8dabb4ea1d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5876 | 725.3498 | 1.9261 |",
+        "| Wb4792e82c500 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6291 | 725.3263 | 1.9258 |",
+        "| Wb55a289b1b58 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4909 | 725.2365 | 1.9263 |",
+        "| Wb9565fe79765 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5310 | 725.2088 | 1.9260 |",
+        "| Wba900ac81694 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6084 | 725.3291 | 1.9260 |",
+        "| Wc1cbf83f36c9 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6270 | 725.3671 | 1.9260 |",
+        "| Wcb07d3656adc | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5593 | 725.1141 | 1.9256 |",
+        "| Weda39558ff0e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5165 | 725.1971 | 1.9261 |",
+        "| Wf84fd913b05f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6160 | 725.3712 | 1.9260 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b64-aa",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.801,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n19a0-ic-b64-aa",
+      "index": 46,
+      "outputs": {},
+      "seconds": 0.801,
+      "stderr_sha256": "fb8152673aae1268d51e0279d1239246c4c3691078fbb88ce356b5305c19e646",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b64-aa.json"
+      ],
+      "stdout_sha256": "b122f9b0b06841867e9b4e5f03c181d58c9537ec1710dfa23da8f8720e6cff0e",
+      "stdout_tail": [
+        "| W6a3f54af3eae | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6671 | 376.6671 | 1.0000 |",
+        "| W845c0c01f882 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5552 | 376.5552 | 1.0000 |",
+        "| W866579fbd92b | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.7791 | 376.7791 | 1.0000 |",
+        "| W8794da23d18d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5448 | 376.5448 | 1.0000 |",
+        "| W8c00090ce95f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5911 | 376.5911 | 1.0000 |",
+        "| W8dbc90c05ace | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5856 | 376.5856 | 1.0000 |",
+        "| W903fa611153e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4916 | 376.4916 | 1.0000 |",
+        "| W916437ae5228 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5683 | 376.5683 | 1.0000 |",
+        "| W92f7b96aa2da | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5026 | 376.5026 | 1.0000 |",
+        "| Wa0ac4757b2ad | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6091 | 376.6091 | 1.0000 |",
+        "| Wa4467c780295 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5185 | 376.5185 | 1.0000 |",
+        "| Waa8dabb4ea1d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5876 | 376.5876 | 1.0000 |",
+        "| Wb4792e82c500 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6291 | 376.6291 | 1.0000 |",
+        "| Wb55a289b1b58 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4909 | 376.4909 | 1.0000 |",
+        "| Wb9565fe79765 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5310 | 376.5310 | 1.0000 |",
+        "| Wba900ac81694 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6084 | 376.6084 | 1.0000 |",
+        "| Wc1cbf83f36c9 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6270 | 376.6270 | 1.0000 |",
+        "| Wcb07d3656adc | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5593 | 376.5593 | 1.0000 |",
+        "| Weda39558ff0e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5165 | 376.5165 | 1.0000 |",
+        "| Wf84fd913b05f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6160 | 376.6160 | 1.0000 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "research/ecbench_batched_screen_20261101/cards/aa_gate.py",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b64-aa.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.023,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "aa-gate-n19a0",
+      "index": 47,
+      "outputs": {},
+      "seconds": 0.023,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "84a8736c706472de28d112cb2e592282ab7cae063a9458423628ad4d69bee454",
+      "stdout_tail": [
+        "AA-GATE research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b64-aa.json ops.ratio_b_over_a 1.0 ops.ci95 [1.0, 1.0] ops.status ok",
+        "AA-GATE PASSED"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ecbench_batched_screen_20261101/specs/n23a0.json",
+        "--out",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--settle",
+        "1",
+        "--quiet"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 97.105,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-n23a0",
+      "index": 48,
+      "outputs": {
+        "research/ecbench_batched_screen_20261101/sessions/n23a0/records.jsonl": "174caeaebb7414f3d90a1f4468ecc86230d982605cbe188380ab56489a19cb5f",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0/session.json": "76c2a4d14507098b5639d3029320c1864a209e299628f79c43e74c9846509252"
+      },
+      "seconds": 97.105,
+      "stderr_sha256": "3919f5d588da454e6e33fddea9c561438bd187015113bb17c5ce0aafe74e5597",
+      "stderr_tail": [
+        "session ECBS1h9eae06c9dcfb complete -> research/ecbench_batched_screen_20261101/sessions/n23a0 (1600 records: {\"verified\": 1600})"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--replay-all"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 19.424,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-n23a0",
+      "index": 49,
+      "outputs": {},
+      "seconds": 19.424,
+      "stderr_sha256": "848c587056fcef6098bb874e44644dd6ef89f2d30bde29f621e730c3ec0d05a0",
+      "stderr_tail": [
+        "audit OK: 1600 records, 1600 verified, 1280 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "4d47846635abec8341e87a0fb68cd6e18bd5bc1d7aeffc5f72425a5598cf169c",
+      "stdout_tail": [
+        "      \"seq\": 1599,",
+        "      \"record_id\": \"ECR1h737d233c6ca8\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"replay_selection\": \"all\",",
+        "  \"replay_candidates\": 1280,",
+        "  \"files\": {",
+        "    \"host.json\": \"30a037533454b577b714d4e63483f3ade080fc101d19cb1922436d7cf001c092\",",
+        "    \"plan.json\": \"7cf98283ba5d0035efcb3ef2e5ccd337cafb44599daebafebc8b07b3f652359a\",",
+        "    \"records.jsonl\": \"174caeaebb7414f3d90a1f4468ecc86230d982605cbe188380ab56489a19cb5f\",",
+        "    \"session.json\": \"76c2a4d14507098b5639d3029320c1864a209e299628f79c43e74c9846509252\",",
+        "    \"spec.json\": \"37504b151ae9aca2bea74cfdc733ef135559929d569a99c971cd4f7a9c562e94\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"447a6d3c4842b5dadb5c1601e9648cda5cc08c41668bfd87741e6fc369bc24c0\",",
+        "  \"auditor_env_class_id\": \"ECBENV3hc4d998f5ae3f\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h33f0d9a6b3db\",",
+        "  \"audited_unix_ms\": 1793555996742",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "research/ecbench_batched_screen_20261101/cards/audit_gate.py",
+        "research/ecbench_batched_screen_20261101/audits/n23a0.verify.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.037,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "audit-gate-n23a0",
+      "index": 50,
+      "outputs": {},
+      "seconds": 0.037,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ea45613e7a7dfe82cca13211c47ba3b071a9eb53c0c686c090ebb6e28494ee49",
+      "stdout_tail": [
+        "AUDIT-GATE research/ecbench_batched_screen_20261101/audits/n23a0.verify.txt ok True status complete records 1600 verified_records 1600 replays 1280 reproduced 1280 problems 0",
+        "AUDIT-GATE PASSED"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "table",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.53,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "table-n23a0",
+      "index": 51,
+      "outputs": {},
+      "seconds": 0.53,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "babdee2c54b42f79bd32a116649cf92c91c4734f11b637f212af7e81233a0874",
+      "stdout_tail": [
+        "| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels | flags |",
+        "|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|---|",
+        "| ECBS1h9eae06c9dcfb | ic-b1 | ic.koblitz_batched | icv1-f2m23-t5197-69e76b73 | 21.00 | 128/128 | 100.127 | [99.931, 100.324] | \u2013 | \u2013 | 541.840 | \u2013 | yes | 6.776 | L0\u00d7128 | log2 r = 21.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1h9eae06c9dcfb | ic-b2 | ic.koblitz_batched | icv1-f2m23-t5197-69e76b73 | 21.00 | 128/128 | 100.317 | [100.111, 100.523] | \u2013 | \u2013 | 542.865 | \u2013 | yes | 6.393 | L0\u00d7128 | log2 r = 21.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1h9eae06c9dcfb | ic-b4 | ic.koblitz_batched | icv1-f2m23-t5197-69e76b73 | 21.00 | 128/128 | 100.691 | [100.453, 100.930] | \u2013 | \u2013 | 544.892 | \u2013 | yes | 6.716 | L0\u00d7128 | log2 r = 21.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1h9eae06c9dcfb | ic-b8 | ic.koblitz_batched | icv1-f2m23-t5197-69e76b73 | 21.00 | 128/128 | 101.586 | [101.261, 101.912] | \u2013 | \u2013 | 549.734 | \u2013 | yes | 6.446 | L0\u00d7128 | log2 r = 21.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1h9eae06c9dcfb | ic-b16 | ic.koblitz_batched | icv1-f2m23-t5197-69e76b73 | 21.00 | 128/128 | 103.824 | [103.688, 103.961] | \u2013 | \u2013 | 561.848 | \u2013 | yes | 6.779 | L0\u00d7128 | log2 r = 21.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1h9eae06c9dcfb | ic-b32 | ic.koblitz_batched | icv1-f2m23-t5197-69e76b73 | 21.00 | 128/128 | 112.460 | [112.410, 112.509] | \u2013 | \u2013 | 608.577 | \u2013 | yes | 7.790 | L0\u00d7128 | log2 r = 21.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1h9eae06c9dcfb | ic-b64 | ic.koblitz_batched | icv1-f2m23-t5197-69e76b73 | 21.00 | 128/128 | 129.879 | [129.806, 129.951] | \u2013 | \u2013 | 702.840 | \u2013 | yes | 9.126 | L0\u00d7128 | log2 r = 21.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1h9eae06c9dcfb | ic-b128 | ic.koblitz_batched | icv1-f2m23-t5197-69e76b73 | 21.00 | 128/128 | 164.661 | [164.559, 164.762] | \u2013 | \u2013 | 891.064 | \u2013 | yes | 11.482 | L0\u00d7128 | log2 r = 21.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1h9eae06c9dcfb | ic-b256 | ic.koblitz_batched | icv1-f2m23-t5197-69e76b73 | 21.00 | 128/128 | 234.366 | [234.253, 234.479] | \u2013 | \u2013 | 1268.275 | \u2013 | yes | 16.575 | L0\u00d7128 | log2 r = 21.0 is below the calibrated range (2^39); S has not reached its constant |",
+        "| ECBS1h9eae06c9dcfb | ic-b64-aa | ic.koblitz_batched | icv1-f2m23-t5197-69e76b73 | 21.00 | 128/128 | 129.879 | [129.806, 129.951] | \u2013 | \u2013 | 702.840 | \u2013 | yes | 8.686 | L0\u00d7128 | log2 r = 21.0 is below the calibrated range (2^39); S has not reached its constant |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b1",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.852,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n23a0-ic-b1",
+      "index": 52,
+      "outputs": {},
+      "seconds": 0.852,
+      "stderr_sha256": "e5652a0d506caceb4a28d9c9d9f188cbf70493d8ab2ad3ae57db3c028077da5e",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b1.json"
+      ],
+      "stdout_sha256": "fe3e571179524eef2949ea5d0bd8aa68048750b07a2b29eae0cd0082a9ee816d",
+      "stdout_tail": [
+        "| W861885a011fb | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7238 | 101.2412 | 0.7804 |",
+        "| W8c6e802e1fe1 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0713 | 100.5456 | 0.7730 |",
+        "| W8ed16cb960f0 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.2282 | 99.4314 | 0.7694 |",
+        "| W996bf0ab8653 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.1468 | 100.4701 | 0.7720 |",
+        "| W9fef0dc3ce91 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0519 | 99.8497 | 0.7678 |",
+        "| Wab248e9c4cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.5967 | 100.2070 | 0.7732 |",
+        "| Wae253fbf4cff | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7537 | 99.4432 | 0.7664 |",
+        "| Wae78a69bfe1a | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7180 | 99.7167 | 0.7687 |",
+        "| Wb973a5dc17fb | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8473 | 100.0693 | 0.7707 |",
+        "| Wc3efc9bbaf8f | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0483 | 100.4080 | 0.7721 |",
+        "| Wc4d776b066da | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9195 | 100.2679 | 0.7718 |",
+        "| Wcada2793e8e3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.6644 | 101.3754 | 0.7818 |",
+        "| Wdb98621d3c25 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7295 | 99.7882 | 0.7692 |",
+        "| Wde14e2db4679 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7513 | 100.4757 | 0.7744 |",
+        "| Web66ce7183ee | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8382 | 99.8545 | 0.7691 |",
+        "| Wefda032857c3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9014 | 100.1313 | 0.7708 |",
+        "| Wf5f1893d1cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9413 | 99.8459 | 0.7684 |",
+        "| Wfa2fea42dad4 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8696 | 100.0624 | 0.7705 |",
+        "| Wfd0f96cf9cfe | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9722 | 99.6594 | 0.7668 |",
+        "| Wffcb55890c2b | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.2101 | 100.9578 | 0.7753 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b2",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.731,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n23a0-ic-b2",
+      "index": 53,
+      "outputs": {},
+      "seconds": 0.731,
+      "stderr_sha256": "d40e0e35496839efdf477743ab5e485ffbf165d4de3ba7a4e9d5db6341faf188",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b2.json"
+      ],
+      "stdout_sha256": "ba7a92f6545798e6be3d1f74489001ecef73f83562d878a2a61e1bcc78c7defa",
+      "stdout_tail": [
+        "| W861885a011fb | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7238 | 101.5199 | 0.7826 |",
+        "| W8c6e802e1fe1 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0713 | 100.6838 | 0.7741 |",
+        "| W8ed16cb960f0 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.2282 | 99.4314 | 0.7694 |",
+        "| W996bf0ab8653 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.1468 | 100.4701 | 0.7720 |",
+        "| W9fef0dc3ce91 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0519 | 99.8497 | 0.7678 |",
+        "| Wab248e9c4cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.5967 | 100.4829 | 0.7754 |",
+        "| Wae253fbf4cff | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7537 | 99.4432 | 0.7664 |",
+        "| Wae78a69bfe1a | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7180 | 99.8549 | 0.7698 |",
+        "| Wb973a5dc17fb | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8473 | 100.2068 | 0.7717 |",
+        "| Wc3efc9bbaf8f | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0483 | 100.5458 | 0.7731 |",
+        "| Wc4d776b066da | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9195 | 100.5418 | 0.7739 |",
+        "| Wcada2793e8e3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.6644 | 101.6524 | 0.7840 |",
+        "| Wdb98621d3c25 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7295 | 99.9267 | 0.7703 |",
+        "| Wde14e2db4679 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7513 | 100.8898 | 0.7776 |",
+        "| Web66ce7183ee | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8382 | 99.9916 | 0.7701 |",
+        "| Wefda032857c3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9014 | 100.2695 | 0.7719 |",
+        "| Wf5f1893d1cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9413 | 100.1201 | 0.7705 |",
+        "| Wfa2fea42dad4 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8696 | 100.1989 | 0.7715 |",
+        "| Wfd0f96cf9cfe | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9722 | 99.9378 | 0.7689 |",
+        "| Wffcb55890c2b | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.2101 | 101.0956 | 0.7764 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b4",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.864,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n23a0-ic-b4",
+      "index": 54,
+      "outputs": {},
+      "seconds": 0.864,
+      "stderr_sha256": "3db16f8706d886052aceb0082828c159b00f02d3ca38aca98847a3913c7d37a0",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b4.json"
+      ],
+      "stdout_sha256": "5e15669e9d4ff350cc9cc9cbe47cb4629a9fac20b1ccbbac6d57dcd43d0a9fcd",
+      "stdout_tail": [
+        "| W861885a011fb | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7238 | 101.5199 | 0.7826 |",
+        "| W8c6e802e1fe1 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0713 | 101.2346 | 0.7783 |",
+        "| W8ed16cb960f0 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.2282 | 99.4314 | 0.7694 |",
+        "| W996bf0ab8653 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.1468 | 100.4701 | 0.7720 |",
+        "| W9fef0dc3ce91 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0519 | 100.4012 | 0.7720 |",
+        "| Wab248e9c4cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.5967 | 101.0341 | 0.7796 |",
+        "| Wae253fbf4cff | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7537 | 99.4432 | 0.7664 |",
+        "| Wae78a69bfe1a | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7180 | 100.4085 | 0.7741 |",
+        "| Wb973a5dc17fb | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8473 | 100.4821 | 0.7738 |",
+        "| Wc3efc9bbaf8f | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0483 | 100.5458 | 0.7731 |",
+        "| Wc4d776b066da | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9195 | 100.5418 | 0.7739 |",
+        "| Wcada2793e8e3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.6644 | 102.2001 | 0.7882 |",
+        "| Wdb98621d3c25 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7295 | 100.4790 | 0.7745 |",
+        "| Wde14e2db4679 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7513 | 101.4379 | 0.7818 |",
+        "| Web66ce7183ee | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8382 | 99.9916 | 0.7701 |",
+        "| Wefda032857c3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9014 | 101.0283 | 0.7777 |",
+        "| Wf5f1893d1cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9413 | 100.3950 | 0.7726 |",
+        "| Wfa2fea42dad4 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8696 | 100.4755 | 0.7737 |",
+        "| Wfd0f96cf9cfe | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9722 | 100.4907 | 0.7732 |",
+        "| Wffcb55890c2b | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.2101 | 101.6468 | 0.7806 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b8",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.744,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n23a0-ic-b8",
+      "index": 55,
+      "outputs": {},
+      "seconds": 0.744,
+      "stderr_sha256": "47ca1b9f10a7793e1b07e673f180b2fd2051b69b0887afd0dafe44a1ad0e7dd5",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b8.json"
+      ],
+      "stdout_sha256": "85538eeef3acad77291daefd9d3e316113cee6c5bc45deb588aefe0adfc5f44d",
+      "stdout_tail": [
+        "| W861885a011fb | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7238 | 102.6213 | 0.7911 |",
+        "| W8c6e802e1fe1 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0713 | 101.7865 | 0.7825 |",
+        "| W8ed16cb960f0 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.2282 | 99.4314 | 0.7694 |",
+        "| W996bf0ab8653 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.1468 | 100.4701 | 0.7720 |",
+        "| W9fef0dc3ce91 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0519 | 101.5071 | 0.7805 |",
+        "| Wab248e9c4cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.5967 | 102.6906 | 0.7924 |",
+        "| Wae253fbf4cff | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7537 | 99.4432 | 0.7664 |",
+        "| Wae78a69bfe1a | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7180 | 101.5113 | 0.7826 |",
+        "| Wb973a5dc17fb | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8473 | 101.5807 | 0.7823 |",
+        "| Wc3efc9bbaf8f | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0483 | 100.5458 | 0.7731 |",
+        "| Wc4d776b066da | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9195 | 101.6342 | 0.7823 |",
+        "| Wcada2793e8e3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.6644 | 102.7486 | 0.7924 |",
+        "| Wdb98621d3c25 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7295 | 101.5769 | 0.7830 |",
+        "| Wde14e2db4679 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7513 | 102.5417 | 0.7903 |",
+        "| Web66ce7183ee | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8382 | 100.5380 | 0.7743 |",
+        "| Wefda032857c3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9014 | 102.6857 | 0.7905 |",
+        "| Wf5f1893d1cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9413 | 101.4982 | 0.7811 |",
+        "| Wfa2fea42dad4 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8696 | 101.5804 | 0.7822 |",
+        "| Wfd0f96cf9cfe | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9722 | 101.5952 | 0.7817 |",
+        "| Wffcb55890c2b | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.2101 | 101.6468 | 0.7806 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b16",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.787,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n23a0-ic-b16",
+      "index": 56,
+      "outputs": {},
+      "seconds": 0.787,
+      "stderr_sha256": "46e348054800fb3840d9a93d05eda56e98ccce54008e9bfc7c0b54a0e0469441",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b16.json"
+      ],
+      "stdout_sha256": "ccbdd5779008a1057a74bbf0699d5ba71211a2380088ed3c45d584d46d3e15e6",
+      "stdout_tail": [
+        "| W861885a011fb | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7238 | 105.8573 | 0.8160 |",
+        "| W8c6e802e1fe1 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0713 | 103.9206 | 0.7990 |",
+        "| W8ed16cb960f0 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.2282 | 103.7664 | 0.8030 |",
+        "| W996bf0ab8653 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.1468 | 103.7792 | 0.7974 |",
+        "| W9fef0dc3ce91 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0519 | 103.7113 | 0.7975 |",
+        "| Wab248e9c4cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.5967 | 103.7899 | 0.8009 |",
+        "| Wae253fbf4cff | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7537 | 103.8381 | 0.8003 |",
+        "| Wae78a69bfe1a | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7180 | 103.7075 | 0.7995 |",
+        "| Wb973a5dc17fb | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8473 | 103.7092 | 0.7987 |",
+        "| Wc3efc9bbaf8f | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0483 | 103.8486 | 0.7985 |",
+        "| Wc4d776b066da | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9195 | 103.8394 | 0.7993 |",
+        "| Wcada2793e8e3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.6644 | 103.7811 | 0.8004 |",
+        "| Wdb98621d3c25 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7295 | 103.7825 | 0.8000 |",
+        "| Wde14e2db4679 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7513 | 103.6441 | 0.7988 |",
+        "| Web66ce7183ee | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8382 | 103.7671 | 0.7992 |",
+        "| Wefda032857c3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9014 | 103.7868 | 0.7990 |",
+        "| Wf5f1893d1cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9413 | 103.6429 | 0.7976 |",
+        "| Wfa2fea42dad4 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8696 | 103.7731 | 0.7991 |",
+        "| Wfd0f96cf9cfe | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9722 | 103.7279 | 0.7981 |",
+        "| Wffcb55890c2b | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.2101 | 103.8517 | 0.7976 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b32",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.727,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n23a0-ic-b32",
+      "index": 57,
+      "outputs": {},
+      "seconds": 0.727,
+      "stderr_sha256": "c95df4c6bc39a774a473a3644d60e6d5c9eb2368aefc5324ddc8e7fe7c175679",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b32.json"
+      ],
+      "stdout_sha256": "d2a5ea7eb2748d6c1b39e728b01eb603d003175a6fbfb75b88327abffa0d3193",
+      "stdout_tail": [
+        "| W861885a011fb | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7238 | 112.2514 | 0.8653 |",
+        "| W8c6e802e1fe1 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0713 | 112.4510 | 0.8645 |",
+        "| W8ed16cb960f0 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.2282 | 112.2977 | 0.8690 |",
+        "| W996bf0ab8653 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.1468 | 112.5306 | 0.8646 |",
+        "| W9fef0dc3ce91 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0519 | 112.5173 | 0.8652 |",
+        "| Wab248e9c4cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.5967 | 112.3161 | 0.8667 |",
+        "| Wae253fbf4cff | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7537 | 112.4956 | 0.8670 |",
+        "| Wae78a69bfe1a | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7180 | 112.5322 | 0.8675 |",
+        "| Wb973a5dc17fb | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8473 | 112.4584 | 0.8661 |",
+        "| Wc3efc9bbaf8f | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0483 | 112.5726 | 0.8656 |",
+        "| Wc4d776b066da | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9195 | 112.6361 | 0.8670 |",
+        "| Wcada2793e8e3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.6644 | 112.4475 | 0.8672 |",
+        "| Wdb98621d3c25 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7295 | 112.3229 | 0.8658 |",
+        "| Wde14e2db4679 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7513 | 112.2476 | 0.8651 |",
+        "| Web66ce7183ee | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8382 | 112.4265 | 0.8659 |",
+        "| Wefda032857c3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9014 | 112.6159 | 0.8669 |",
+        "| Wf5f1893d1cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9413 | 112.3831 | 0.8649 |",
+        "| Wfa2fea42dad4 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8696 | 112.5227 | 0.8664 |",
+        "| Wfd0f96cf9cfe | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9722 | 112.4840 | 0.8654 |",
+        "| Wffcb55890c2b | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.2101 | 112.6601 | 0.8652 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b128",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.87,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n23a0-ic-b128",
+      "index": 58,
+      "outputs": {},
+      "seconds": 0.87,
+      "stderr_sha256": "3e178678d1293ef1619d7b60bd076e701d8373cf27db15e1440401f736589e18",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b128.json"
+      ],
+      "stdout_sha256": "30b0e393cf1419ffd7cec867873e3883893abc72ef7b095df19f5b9a154f4865",
+      "stdout_tail": [
+        "| W861885a011fb | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7238 | 164.5973 | 1.2688 |",
+        "| W8c6e802e1fe1 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0713 | 164.6879 | 1.2661 |",
+        "| W8ed16cb960f0 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.2282 | 164.1911 | 1.2706 |",
+        "| W996bf0ab8653 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.1468 | 165.0397 | 1.2681 |",
+        "| W9fef0dc3ce91 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0519 | 164.6365 | 1.2659 |",
+        "| Wab248e9c4cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.5967 | 163.9058 | 1.2647 |",
+        "| Wae253fbf4cff | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7537 | 164.5481 | 1.2682 |",
+        "| Wae78a69bfe1a | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7180 | 164.3303 | 1.2668 |",
+        "| Wb973a5dc17fb | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8473 | 164.1395 | 1.2641 |",
+        "| Wc3efc9bbaf8f | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0483 | 164.7954 | 1.2672 |",
+        "| Wc4d776b066da | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9195 | 164.8263 | 1.2687 |",
+        "| Wcada2793e8e3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.6644 | 164.4436 | 1.2682 |",
+        "| Wdb98621d3c25 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7295 | 164.7964 | 1.2703 |",
+        "| Wde14e2db4679 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7513 | 164.6332 | 1.2688 |",
+        "| Web66ce7183ee | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8382 | 164.7760 | 1.2691 |",
+        "| Wefda032857c3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9014 | 164.6548 | 1.2675 |",
+        "| Wf5f1893d1cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9413 | 164.7600 | 1.2680 |",
+        "| Wfa2fea42dad4 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8696 | 164.6652 | 1.2679 |",
+        "| Wfd0f96cf9cfe | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9722 | 164.9392 | 1.2690 |",
+        "| Wffcb55890c2b | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.2101 | 165.2450 | 1.2691 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b256",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.85,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n23a0-ic-b256",
+      "index": 59,
+      "outputs": {},
+      "seconds": 0.85,
+      "stderr_sha256": "436322e5ae1c2e6e476f523a4f7f04acd86e83572dce332f0c860d6e54d19e46",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b256.json"
+      ],
+      "stdout_sha256": "8788ffdde5637b097c02e9f9af379a293811f65fa25c5d13ce888190b69b3204",
+      "stdout_tail": [
+        "| W861885a011fb | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7238 | 234.2040 | 1.8054 |",
+        "| W8c6e802e1fe1 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0713 | 234.3965 | 1.8021 |",
+        "| W8ed16cb960f0 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.2282 | 234.1250 | 1.8117 |",
+        "| W996bf0ab8653 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.1468 | 234.8021 | 1.8041 |",
+        "| W9fef0dc3ce91 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0519 | 234.0822 | 1.7999 |",
+        "| Wab248e9c4cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.5967 | 233.8047 | 1.8041 |",
+        "| Wae253fbf4cff | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7537 | 234.1689 | 1.8047 |",
+        "| Wae78a69bfe1a | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7180 | 233.8743 | 1.8029 |",
+        "| Wb973a5dc17fb | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8473 | 234.0461 | 1.8025 |",
+        "| Wc3efc9bbaf8f | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0483 | 234.5730 | 1.8037 |",
+        "| Wc4d776b066da | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9195 | 234.3720 | 1.8040 |",
+        "| Wcada2793e8e3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.6644 | 234.3162 | 1.8071 |",
+        "| Wdb98621d3c25 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7295 | 234.6243 | 1.8086 |",
+        "| Wde14e2db4679 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7513 | 234.2470 | 1.8054 |",
+        "| Web66ce7183ee | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8382 | 234.6181 | 1.8070 |",
+        "| Wefda032857c3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9014 | 234.6450 | 1.8063 |",
+        "| Wf5f1893d1cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9413 | 234.6341 | 1.8057 |",
+        "| Wfa2fea42dad4 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8696 | 234.3148 | 1.8042 |",
+        "| Wfd0f96cf9cfe | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9722 | 234.6744 | 1.8056 |",
+        "| Wffcb55890c2b | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.2101 | 234.7167 | 1.8026 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b64-aa",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.789,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-n23a0-ic-b64-aa",
+      "index": 60,
+      "outputs": {},
+      "seconds": 0.789,
+      "stderr_sha256": "5bf0882e880b431dcd44431abe32f97de3471dfee775b135afba261e160581bf",
+      "stderr_tail": [
+        "saved research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b64-aa.json"
+      ],
+      "stdout_sha256": "3ce1a9d75ae28ba1cc62726f02cd5776907e0e7acb8aa64483218d76e57133ca",
+      "stdout_tail": [
+        "| W861885a011fb | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7238 | 129.7238 | 1.0000 |",
+        "| W8c6e802e1fe1 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0713 | 130.0713 | 1.0000 |",
+        "| W8ed16cb960f0 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.2282 | 129.2282 | 1.0000 |",
+        "| W996bf0ab8653 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.1468 | 130.1468 | 1.0000 |",
+        "| W9fef0dc3ce91 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0519 | 130.0519 | 1.0000 |",
+        "| Wab248e9c4cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.5967 | 129.5967 | 1.0000 |",
+        "| Wae253fbf4cff | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7537 | 129.7537 | 1.0000 |",
+        "| Wae78a69bfe1a | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7180 | 129.7180 | 1.0000 |",
+        "| Wb973a5dc17fb | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8473 | 129.8473 | 1.0000 |",
+        "| Wc3efc9bbaf8f | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0483 | 130.0483 | 1.0000 |",
+        "| Wc4d776b066da | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9195 | 129.9195 | 1.0000 |",
+        "| Wcada2793e8e3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.6644 | 129.6644 | 1.0000 |",
+        "| Wdb98621d3c25 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7295 | 129.7295 | 1.0000 |",
+        "| Wde14e2db4679 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7513 | 129.7513 | 1.0000 |",
+        "| Web66ce7183ee | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8382 | 129.8382 | 1.0000 |",
+        "| Wefda032857c3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9014 | 129.9014 | 1.0000 |",
+        "| Wf5f1893d1cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9413 | 129.9413 | 1.0000 |",
+        "| Wfa2fea42dad4 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8696 | 129.8696 | 1.0000 |",
+        "| Wfd0f96cf9cfe | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9722 | 129.9722 | 1.0000 |",
+        "| Wffcb55890c2b | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.2101 | 130.2101 | 1.0000 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "research/ecbench_batched_screen_20261101/cards/aa_gate.py",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b64-aa.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.034,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "aa-gate-n23a0",
+      "index": 61,
+      "outputs": {},
+      "seconds": 0.034,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ceb125e874a4fbde071500e8d7c50ec7a708aab6e6f989a49b21b4cf1b8fc5a8",
+      "stdout_tail": [
+        "AA-GATE research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b64-aa.json ops.ratio_b_over_a 1.0 ops.ci95 [1.0, 1.0] ops.status ok",
+        "AA-GATE PASSED"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "df",
+        "-h",
+        "/"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "record-disk-end",
+      "index": 62,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "6eeeb859718c2594693e5a0227b31a9a0a050b212b5d130a746943c74bfe0ce8",
+      "stdout_tail": [
+        "Filesystem      Size  Used Avail Use% Mounted on",
+        "/dev/vda        252G   39G  345M 100% /"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "research/ecbench_batched_screen_20261101/cards/list_outputs.py",
+        "research/ecbench_batched_screen_20261101",
+        "n13a0",
+        "n17a1",
+        "n19a0",
+        "n23a0"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.04,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "list-outputs",
+      "index": 63,
+      "outputs": {},
+      "seconds": 0.04,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "b373bf16cd4dc4eaaeaff2b3fdfa16372eceb95f656f18db0685371a2564c539",
+      "stdout_tail": [
+        "| W8ed16cb960f0 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.2282 | 129.2282 | 1.0000 |",
+        "| W996bf0ab8653 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.1468 | 130.1468 | 1.0000 |",
+        "| W9fef0dc3ce91 | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0519 | 130.0519 | 1.0000 |",
+        "| Wab248e9c4cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.5967 | 129.5967 | 1.0000 |",
+        "| Wae253fbf4cff | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7537 | 129.7537 | 1.0000 |",
+        "| Wae78a69bfe1a | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7180 | 129.7180 | 1.0000 |",
+        "| Wb973a5dc17fb | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8473 | 129.8473 | 1.0000 |",
+        "| Wc3efc9bbaf8f | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.0483 | 130.0483 | 1.0000 |",
+        "| Wc4d776b066da | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9195 | 129.9195 | 1.0000 |",
+        "| Wcada2793e8e3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.6644 | 129.6644 | 1.0000 |",
+        "| Wdb98621d3c25 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7295 | 129.7295 | 1.0000 |",
+        "| Wde14e2db4679 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.7513 | 129.7513 | 1.0000 |",
+        "| Web66ce7183ee | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8382 | 129.8382 | 1.0000 |",
+        "| Wefda032857c3 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9014 | 129.9014 | 1.0000 |",
+        "| Wf5f1893d1cb2 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9413 | 129.9413 | 1.0000 |",
+        "| Wfa2fea42dad4 | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.8696 | 129.8696 | 1.0000 |",
+        "| Wfd0f96cf9cfe | icv1-f2m23-t5197-69e76b73 | 21.00 | 129.9722 | 129.9722 | 1.0000 |",
+        "| Wffcb55890c2b | icv1-f2m23-t5197-69e76b73 | 21.00 | 130.2101 | 130.2101 | 1.0000 |",
+        "",
+        "AA-JSON n23a0 ops.ratio_b_over_a 1.0 ops.ci95 [1.0, 1.0]"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 63,
+  "commit": "39f147d96bc78a46a2e124ec466f9b8abb44f7f6",
+  "dirty_after": [
+    "research/ecbench_batched_screen_20261101/audits/n13a0.gate.txt",
+    "research/ecbench_batched_screen_20261101/audits/n13a0.verify.stderr.txt",
+    "research/ecbench_batched_screen_20261101/audits/n13a0.verify.txt",
+    "research/ecbench_batched_screen_20261101/audits/n17a1.gate.txt",
+    "research/ecbench_batched_screen_20261101/audits/n17a1.verify.stderr.txt",
+    "research/ecbench_batched_screen_20261101/audits/n17a1.verify.txt",
+    "research/ecbench_batched_screen_20261101/audits/n19a0.gate.txt",
+    "research/ecbench_batched_screen_20261101/audits/n19a0.verify.stderr.txt",
+    "research/ecbench_batched_screen_20261101/audits/n19a0.verify.txt",
+    "research/ecbench_batched_screen_20261101/audits/n23a0.gate.txt",
+    "research/ecbench_batched_screen_20261101/audits/n23a0.verify.stderr.txt",
+    "research/ecbench_batched_screen_20261101/audits/n23a0.verify.txt",
+    "research/ecbench_batched_screen_20261101/cards/card-1.checkpoint-gate.stderr",
+    "research/ecbench_batched_screen_20261101/cards/card-1.checkpoint-gate.stdout",
+    "research/ecbench_batched_screen_20261101/cards/card-1.disk-end.stdout",
+    "research/ecbench_batched_screen_20261101/cards/card-1.disk-start.stdout",
+    "research/ecbench_batched_screen_20261101/cards/card-1.final-listing.stdout",
+    "research/ecbench_batched_screen_20261101/cards/card-1.git-status.stdout",
+    "research/ecbench_batched_screen_20261101/cards/card-1.head.stdout",
+    "research/ecbench_batched_screen_20261101/cards/card-1.host.stdout",
+    "research/ecbench_batched_screen_20261101/comparisons/n13a0/aa-gate.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b1.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b128.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b16.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b2.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b256.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b32.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b4.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b64-aa.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b8.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n17a1/aa-gate.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b1.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b128.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b16.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b2.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b256.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b32.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b4.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b64-aa.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b8.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n19a0/aa-gate.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b1.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b128.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b16.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b2.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b256.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b32.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b4.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b64-aa.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b8.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n23a0/aa-gate.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b1.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b128.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b16.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b2.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b256.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b32.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b4.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b64-aa.txt",
+    "research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b8.txt",
+    "research/ecbench_batched_screen_20261101/sessions/n13a0.run.stderr",
+    "research/ecbench_batched_screen_20261101/sessions/n13a0.run.stdout",
+    "research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b1.json",
+    "research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b128.json",
+    "research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b16.json",
+    "research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b2.json",
+    "research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b256.json",
+    "research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b32.json",
+    "research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b4.json",
+    "research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b64-aa.json",
+    "research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b8.json",
+    "research/ecbench_batched_screen_20261101/sessions/n13a0/host.json",
+    "research/ecbench_batched_screen_20261101/sessions/n13a0/plan.json",
+    "research/ecbench_batched_screen_20261101/sessions/n13a0/records.jsonl",
+    "research/ecbench_batched_screen_20261101/sessions/n13a0/session.json",
+    "research/ecbench_batched_screen_20261101/sessions/n13a0/spec.json",
+    "research/ecbench_batched_screen_20261101/sessions/n17a1.run.stderr",
+    "research/ecbench_batched_screen_20261101/sessions/n17a1.run.stdout",
+    "research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b1.json",
+    "research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b128.json",
+    "research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b16.json",
+    "research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b2.json",
+    "research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b256.json",
+    "research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b32.json",
+    "research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b4.json",
+    "research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b64-aa.json",
+    "research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b8.json",
+    "research/ecbench_batched_screen_20261101/sessions/n17a1/host.json",
+    "research/ecbench_batched_screen_20261101/sessions/n17a1/plan.json",
+    "research/ecbench_batched_screen_20261101/sessions/n17a1/records.jsonl",
+    "research/ecbench_batched_screen_20261101/sessions/n17a1/session.json",
+    "research/ecbench_batched_screen_20261101/sessions/n17a1/spec.json",
+    "research/ecbench_batched_screen_20261101/sessions/n19a0.run.stderr",
+    "research/ecbench_batched_screen_20261101/sessions/n19a0.run.stdout",
+    "research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b1.json",
+    "research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b128.json",
+    "research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b16.json",
+    "research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b2.json",
+    "research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b256.json",
+    "research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b32.json",
+    "research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b4.json",
+    "research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b64-aa.json",
+    "research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b8.json",
+    "research/ecbench_batched_screen_20261101/sessions/n19a0/host.json",
+    "research/ecbench_batched_screen_20261101/sessions/n19a0/plan.json",
+    "research/ecbench_batched_screen_20261101/sessions/n19a0/records.jsonl",
+    "research/ecbench_batched_screen_20261101/sessions/n19a0/session.json",
+    "research/ecbench_batched_screen_20261101/sessions/n19a0/spec.json",
+    "research/ecbench_batched_screen_20261101/sessions/n23a0.run.stderr",
+    "research/ecbench_batched_screen_20261101/sessions/n23a0.run.stdout",
+    "research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b1.json",
+    "research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b128.json",
+    "research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b16.json",
+    "research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b2.json",
+    "research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b256.json",
+    "research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b32.json",
+    "research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b4.json",
+    "research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b64-aa.json",
+    "research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b8.json",
+    "research/ecbench_batched_screen_20261101/sessions/n23a0/host.json",
+    "research/ecbench_batched_screen_20261101/sessions/n23a0/plan.json",
+    "research/ecbench_batched_screen_20261101/sessions/n23a0/records.jsonl",
+    "research/ecbench_batched_screen_20261101/sessions/n23a0/session.json",
+    "research/ecbench_batched_screen_20261101/sessions/n23a0/spec.json",
+    "research/ecbench_batched_screen_20261101/tables/n13a0.table.txt",
+    "research/ecbench_batched_screen_20261101/tables/n17a1.table.txt",
+    "research/ecbench_batched_screen_20261101/tables/n19a0.table.txt",
+    "research/ecbench_batched_screen_20261101/tables/n23a0.table.txt"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

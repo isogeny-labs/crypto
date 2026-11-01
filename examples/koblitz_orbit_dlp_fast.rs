@@ -1870,11 +1870,15 @@ mod wide {
             assert!(
                 !fp2 || id31,
                 "side fingerprint requires four-byte ID31 slots"
-            Self::with_capacity_indexed83_four_mode(entries, false)
-        }
-
-        fn with_capacity_indexed83_four_mode(entries: usize, id31: bool) -> Self {
-            Self::with_capacity_indexed83_four_layout(entries, id31, None)
+            );
+            Self::with_capacity_indexed83_four_layout_options(
+                entries,
+                id31,
+                None,
+                false,
+                fp2,
+                bloom_enabled,
+            )
         }
 
         fn with_capacity_indexed83_four_relative(entries: usize, base: usize) -> Self {
@@ -1901,7 +1905,26 @@ mod wide {
             relative_base: Option<usize>,
             fingerprint8: bool,
         ) -> Self {
+            Self::with_capacity_indexed83_four_layout_options(
+                entries,
+                id31,
+                relative_base,
+                fingerprint8,
+                false,
+                root_bloom_enabled(),
+            )
+        }
+
+        fn with_capacity_indexed83_four_layout_options(
+            entries: usize,
+            id31: bool,
+            relative_base: Option<usize>,
+            fingerprint8: bool,
+            fp2: bool,
+            bloom_enabled: bool,
+        ) -> Self {
             assert!(!id31 || relative_base.is_none());
+            assert!(!fp2 || id31);
             assert!(
                 !fingerprint8 || relative_base.is_some(),
                 "byte fingerprint sidecar requires relative four-byte slots"
@@ -2065,17 +2088,6 @@ mod wide {
         }
 
         #[inline(always)]
-        fn indexed83_four_id31_decode(word: u32) -> (usize, usize) {
-            (((word >> 1) - 1) as usize, (word & 1) as usize)
-            assert!(
-                state_index + 1 < 1 << 31,
-                "four-byte root state id exceeds 31 bits"
-            );
-            assert!(root_selector < 2);
-            (((state_index + 1) as u32) << 1) | root_selector as u32
-        }
-
-        #[inline(always)]
         fn indexed83_four_id31_decode(word: u32) -> (usize, usize, u64) {
             assert_ne!(word, 0, "empty four-byte root slot has no witness");
             (((word >> 1) - 1) as usize, (word & 1) as usize, 0)
@@ -2169,7 +2181,7 @@ mod wide {
                 RootSlots128::Indexed83Four(slots) => (
                     if self.indexed83_four_fp2.is_some() {
                         "indexed83_4byte_exact_id31_fp2"
-                    if self.indexed83_four_relative_base.is_some() {
+                    } else if self.indexed83_four_relative_base.is_some() {
                         "indexed83_4byte_split_id30"
                     } else if self.indexed83_four_id31 {
                         "indexed83_4byte_exact_id31"
@@ -2178,7 +2190,11 @@ mod wide {
                     },
                     std::mem::size_of::<u32>(),
                     slots.len() * std::mem::size_of::<u32>()
-                        + self.indexed83_four_fp2.as_ref().map_or(0, Vec::len),
+                        + self.indexed83_four_fp2.as_ref().map_or(0, Vec::len)
+                        + self
+                            .indexed83_four_fingerprint8
+                            .as_ref()
+                            .map_or(0, Vec::len),
                 ),
             }
         }
@@ -2215,7 +2231,6 @@ mod wide {
                 loop {
                     let existing = slots[slot];
                     if existing == 0 {
-                        slots[slot] = if self.indexed83_four_id31 {
                         slots[slot] = if let Some(base) = relative_base {
                             Self::indexed83_four_relative_encode(
                                 state_index,
@@ -2230,6 +2245,7 @@ mod wide {
                         };
                         if let Some(bits) = side.as_mut() {
                             Self::fp2_set(bits, slot, fingerprint as u8);
+                        }
                         if let Some(bytes) = fingerprints.as_mut() {
                             bytes[slot] = fingerprint as u8;
                         }
@@ -2243,20 +2259,6 @@ mod wide {
                         }
                         return;
                     }
-                    let (old_state, old_root, fingerprint_matches) = if self.indexed83_four_id31 {
-                        let (state, root) = Self::indexed83_four_id31_decode(existing);
-                        (
-                            state,
-                            root,
-                            side.as_ref().is_none_or(|bits| {
-                                Self::fp2_at(bits, slot) == (fingerprint as u8 & 3)
-                            }),
-                        )
-                    } else {
-                        let (state, root, old_fingerprint) = Self::indexed83_four_decode(existing);
-                        (state, root, old_fingerprint == (fingerprint & 3))
-                    };
-                    if fingerprint_matches && key_of(old_state, old_root) == key {
                     let (old_state, old_root, old_fingerprint) = if let Some(base) = relative_base {
                         Self::indexed83_four_relative_decode(existing, base)
                     } else if id31 {
@@ -2267,6 +2269,9 @@ mod wide {
                     if fingerprints
                         .as_ref()
                         .is_none_or(|bytes| bytes[slot] == fingerprint as u8)
+                        && side
+                            .as_ref()
+                            .is_none_or(|bits| Self::fp2_at(bits, slot) == (fingerprint as u8 & 3))
                         && (id31
                             || old_fingerprint
                                 == (fingerprint & if relative_base.is_some() { 1 } else { 3 }))
@@ -2352,22 +2357,6 @@ mod wide {
                     if existing == 0 {
                         return None;
                     }
-                    let (state_index, root_selector, fingerprint_matches) = if self
-                        .indexed83_four_id31
-                    {
-                        let (state, root) = Self::indexed83_four_id31_decode(existing);
-                        (
-                            state,
-                            root,
-                            self.indexed83_four_fp2
-                                .as_ref()
-                                .is_none_or(|bits| Self::fp2_at(bits, slot) == fingerprint as u8),
-                        )
-                    } else {
-                        let (state, root, old_fingerprint) = Self::indexed83_four_decode(existing);
-                        (state, root, old_fingerprint == fingerprint)
-                    };
-                    if fingerprint_matches && key_of(state_index, root_selector) == key {
                     let (state_index, root_selector, old_fingerprint) =
                         if let Some(base) = relative_base {
                             Self::indexed83_four_relative_decode(existing, base)
@@ -2380,6 +2369,10 @@ mod wide {
                         .indexed83_four_fingerprint8
                         .as_ref()
                         .is_none_or(|bytes| bytes[slot] == fingerprint as u8)
+                        && self
+                            .indexed83_four_fp2
+                            .as_ref()
+                            .is_none_or(|bits| Self::fp2_at(bits, slot) == (fingerprint as u8 & 3))
                         && (id31
                             || old_fingerprint
                                 == (fingerprint & if relative_base.is_some() { 1 } else { 3 }))
@@ -2608,7 +2601,7 @@ mod wide {
             let mut packed = RootTable128::with_capacity(states.len() * 2, 83, reps.len(), true);
             let mut indexed = RootTable128::with_capacity_indexed83(states.len() * 2);
             let mut indexed4_id31 =
-                RootTable128::with_capacity_indexed83_four_mode(states.len() * 2, true);
+                RootTable128::with_capacity_indexed83_four_mode(states.len() * 2, true, false);
             let split_at = states.len() / 2;
             let mut split_primary =
                 RootTable128::with_capacity_indexed83_four_relative(states.len(), 0);
@@ -3236,13 +3229,12 @@ mod wide {
         }
 
         #[test]
-        fn indexed_four_byte_id31_preserves_exact_keys_without_a_fingerprint() {
         fn indexed_four_byte_id31_slots_preserve_exact_first_witness() {
             let boundary = RootTable128::indexed83_four_id31_encode((1 << 31) - 2, 1);
             assert_eq!(boundary, u32::MAX);
             assert_eq!(
                 RootTable128::indexed83_four_id31_decode(boundary),
-                ((1 << 31) - 2, 1)
+                ((1 << 31) - 2, 1, 0)
             );
             let mut table = RootTable128::with_capacity_indexed83_four_mode(64, true, false);
             let mut filtered =
@@ -3255,10 +3247,8 @@ mod wide {
                 filtered.layout_receipt(),
                 ("indexed83_4byte_exact_id31_fp2", 4, 544)
             );
-                ((1 << 31) - 2, 1, 0)
-            );
             let high_state = (1 << 31) - 2;
-            let mut high_table = RootTable128::with_capacity_indexed83_four_mode(8, true);
+            let mut high_table = RootTable128::with_capacity_indexed83_four_mode(8, true, false);
             high_table.bloom = None;
             high_table.insert_indexed83(0x12345, high_state, 1, |_, _| 0x12345);
             assert_eq!(
@@ -3268,15 +3258,12 @@ mod wide {
                 }),
                 Some((high_state, 1))
             );
-            let mut table = RootTable128::with_capacity_indexed83_four_mode(64, true);
-            table.bloom = None;
             let keys: Vec<u128> = (0..96u64)
                 .map(|i| (mix_root_bloom(i) as u128) << 19 | i as u128)
                 .collect();
             for (i, &key) in keys.iter().enumerate() {
                 table.insert_indexed83(key, i / 2, i % 2, |state, root| keys[2 * state + root]);
                 filtered.insert_indexed83(key, i / 2, i % 2, |state, root| keys[2 * state + root]);
-            }
             }
             assert_eq!(
                 table.layout_receipt(),
@@ -4679,14 +4666,16 @@ mod wide {
             "relative four-byte slots require KIC_INDEXED4_SPLIT_AT"
         );
         assert!(
-            (indexed4_fixed30 as u8 + indexed4_fixed31 as u8 + indexed4_id31 as u8) <= 1,
-            "select one four-byte root slot mode"
             (indexed4_fixed30 as u8
                 + indexed4_fixed31 as u8
                 + indexed4_fixed32 as u8
                 + indexed4_split30 as u8)
                 <= 1,
             "select one four-byte root table capacity"
+        );
+        assert!(
+            !indexed4_id31 || (indexed4_table && !indexed4_split30),
+            "ID31 four-byte slots require an unsplit four-byte table"
         );
         assert!(
             (packed_state83 as u8
@@ -4719,8 +4708,6 @@ mod wide {
                     && core < k
                     && root_only11
                     && symmetric_states
-                    && ((indexed5_id30 || indexed5_id31) && indexed5_load80 || indexed4_id31),
-                "split root index needs 0 < core < K and symmetric one-root load80 slots"
                     && (indexed4_split30 || ((indexed5_id30 || indexed5_id31) && indexed5_load80)),
                 "split root index needs 0 < core < K and symmetric one-root indexed slots"
             );
@@ -4788,8 +4775,7 @@ mod wide {
                         || indexed5_fixed31)
                     && !indexed4_table)
                     || (indexed4_table
-                        && (indexed4_fixed31 || indexed4_id31)
-                        && (indexed4_fixed30 || indexed4_fixed31 || indexed4_fixed32 || indexed4_split30)
+                        && (indexed4_id31 || indexed4_fixed30 || indexed4_fixed31 || indexed4_fixed32 || indexed4_split30)
                         && std::env::var("KIC_INDEXED_ROOT5").as_deref() != Ok("1")
                         && !indexed5_load75
                         && !indexed5_load80))
@@ -4799,8 +4785,8 @@ mod wide {
             assert!(
                 max_states.checked_mul(2).unwrap()
                     < (1usize
-                        << if indexed5_id31 || indexed4_id31 {
-                        << if indexed4_fixed32 || indexed4_split30 || indexed5_id31 {
+                        << if indexed4_id31 || indexed4_fixed32 || indexed4_split30 || indexed5_id31
+                        {
                             32
                         } else if indexed4_fixed31 || indexed5_id30 {
                             31
@@ -4854,9 +4840,6 @@ mod wide {
         // still available.  The retained state count is known from the
         // symmetric traversal, so load75 can size this early table exactly.
         let root11_request_entries = root_only11.then(|| {
-            if indexed4_id31 {
-                indexed5_load80_request(core_states.unwrap_or(max_states))
-            } else if indexed4_table || indexed5_fixed31 {
             if indexed4_table {
                 if indexed4_split30 {
                     indexed5_load80_request(core_states.expect("four-byte split needs core states"))
@@ -4864,6 +4847,8 @@ mod wide {
                     1usize << 31
                 } else if indexed4_fixed30 {
                     1usize << 29
+                } else if indexed4_id31 && !indexed4_fixed31 {
+                    indexed5_load80_request(core_states.unwrap_or(max_states))
                 } else {
                     1usize << 30
                 }
@@ -4883,16 +4868,15 @@ mod wide {
         });
         let mut early_root11_table = root11_request_entries.map(|entries| {
             if indexed4_table {
-                RootTable128::with_capacity_indexed83_four_mode_fp2(
-                    entries,
-                    indexed4_id31,
-                    !shared_bloom_requested && root_bloom_enabled(),
-                    indexed4_fp2,
-                )
                 if indexed4_split30 {
                     RootTable128::with_capacity_indexed83_four_relative(entries, 0)
                 } else {
-                    RootTable128::with_capacity_indexed83_four_mode(entries, indexed4_fixed32)
+                    RootTable128::with_capacity_indexed83_four_mode_fp2(
+                        entries,
+                        indexed4_id31 || indexed4_fixed32,
+                        !shared_bloom_requested && root_bloom_enabled(),
+                        indexed4_fp2,
+                    )
                 }
             } else {
                 RootTable128::with_capacity_indexed83_mode_bloom_id31(
@@ -4904,12 +4888,6 @@ mod wide {
             }
         });
         let mut early_overflow_table = overflow_request_entries.map(|entries| {
-            if indexed4_id31 {
-                RootTable128::with_capacity_indexed83_four_mode_fp2(
-                    entries,
-                    true,
-                    !shared_bloom_requested && root_bloom_enabled(),
-                    indexed4_fp2,
             if indexed4_split30 {
                 RootTable128::with_capacity_indexed83_four_relative(
                     entries,
@@ -5160,13 +5138,14 @@ mod wide {
         assert!(
             !indexed4_table
                 || (!indexed5_table
-                    && ((root_only11 && (indexed4_fixed31 || indexed4_id31))
+                    && ((root_only11
+                        && (indexed4_id31
+                            || indexed4_fixed30
+                            || indexed4_fixed31
+                            || indexed4_fixed32
+                            || indexed4_split30))
                         || (root_only21 && indexed4_fixed30))),
             "four-byte root slots require an eligible root-only state layout"
-                    && ((root_only11
-                        && (indexed4_fixed30 || indexed4_fixed31 || indexed4_fixed32 || indexed4_split30))
-                        || (root_only21 && indexed4_fixed30))),
-            "four-byte root slots require one-root/fixed30/fixed31/fixed32/split30 or 21-byte/fixed30 states"
         );
         assert!(
             !(dense_table || load75_table) || packed,
@@ -5280,7 +5259,7 @@ mod wide {
         } else if indexed4_table {
             RootTable128::with_capacity_indexed83_four_mode_fp2(
                 root_table_request_entries,
-                indexed4_id31,
+                indexed4_id31 || indexed4_fixed32,
                 root_bloom_enabled(),
                 indexed4_fp2,
             )
@@ -5942,7 +5921,7 @@ mod wide {
                     "indexed5_state_id_bits": if index.indexed5_id31 || index.indexed4_id31 { 31 } else if index.indexed5_id30 { 30 } else { 29 },
                     "root_fingerprint_sidecar_bytes": index.table.fingerprint_sidecar_bytes() + index.overflow_table.as_ref().map_or(0, RootTable128::fingerprint_sidecar_bytes),
                     "root_table_layout": index.table.layout_receipt().0,
-                    "root_slot_state_id_bits": if index.indexed4_fixed32 || index.indexed5_id31 { 31 } else if index.indexed4_split30 || index.indexed5_id30 { 30 } else { 29 },
+                    "root_slot_state_id_bits": if index.indexed4_id31 || index.indexed4_fixed32 || index.indexed5_id31 { 31 } else if index.indexed4_split30 || index.indexed5_id30 { 30 } else { 29 },
                     "indexed5_split_at": if index.indexed4_split30 { None } else { index.split_at },
                     "indexed4_split_at": if index.indexed4_split30 { index.split_at } else { None },
                     "indexed5_state_id_bits": if index.indexed5_id31 { 31 } else if index.indexed5_id30 { 30 } else { 29 },
