@@ -601,6 +601,7 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "base"
         | "base_multiplier"
         | "base_scale"
+        | "batch_trials"
         | "beta"
         | "branches"
         | "collection_aim"
