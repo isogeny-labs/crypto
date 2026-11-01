@@ -17,7 +17,9 @@ use tokio_postgres::types::ToSql;
 
 mod catalog;
 mod curves;
+pub mod export;
 mod mcp;
+mod results;
 mod sql;
 mod write;
 
@@ -195,6 +197,13 @@ pub fn router(state: Shared) -> Router {
         .route("/v1/curves/{reference}/relations", get(curves::relations))
         .route("/v1/curves/{reference}/endomorphisms", get(curves::endomorphisms))
         .route("/v1/curves/{reference}/division-polynomials", get(curves::division_polynomials))
+        .route("/v1/curves/{reference}/measurements", get(results::curve_measurements))
+        .route("/v1/ic/leaderboard", get(results::leaderboard))
+        .route("/v1/ic/progress", get(results::progress))
+        .route("/v1/ic/boundary", get(results::boundary))
+        .route("/v1/benchmarks", get(results::benchmarks))
+        .route("/v1/ecbench/sessions", get(results::sessions))
+        .route("/v1/ecbench/sessions/{id}", get(results::session))
         .route("/v1/isogenies/{id}", get(catalog::isogeny))
         .route("/v1/isogeny-classes", get(catalog::classes))
         .route("/v1/isogeny-classes/{label}", get(catalog::class))
@@ -206,6 +215,8 @@ pub fn router(state: Shared) -> Router {
         .route("/v1/class-polynomials", get(catalog::class_polynomials))
         .route("/v1/summation-polynomials", get(catalog::summation_polynomials))
         .route("/v1/sql", post(sql::run))
+        .route("/v1/export", get(export::manifest))
+        .route("/v1/export/{table}", get(export::page))
         .route_layer(middleware::from_fn_with_state(state.clone(), read_auth));
     let writes = Router::new()
         .route("/v1/evidence", post(write::evidence))
