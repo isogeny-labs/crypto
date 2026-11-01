@@ -7,7 +7,11 @@ matplotlib.use('Agg');matplotlib.rcParams['svg.hashsalt']='koblitz-r60-fixed'
 import matplotlib.pyplot as plt
 import typst
 h=Path(__file__).resolve().parent;r=json.loads((h/'results.json').read_text())
-rows=list(csv.DictReader((h/'runs/cohort60-01/cohort60.tsv').open(),delimiter='\t'))
+rawlines=(h/'runs/cohort60-01/cohort60.tsv').read_text().splitlines()
+assert rawlines[0]=='idte0te1te2te3tdegreetranktkernel_dimensiontstatus'
+keys=['id','e0','e1','e2','e3','degree','rank','kernel_dimension','status']
+assert all(len(line.split('t'))==9 for line in rawlines[1:])
+rows=[dict(zip(keys,line.split('t'))) for line in rawlines[1:]]
 assert len(rows)==404 and all(x['rank']=='18' and x['kernel_dimension']=='0' for x in rows)
 counts=Counter(int(x['degree']) for x in rows)
 fig,ax=plt.subplots(1,2,figsize=(10,3),layout='constrained')
@@ -83,7 +87,9 @@ The first native attempt used an unsupported indexed intvec increment.
 All four chart bodies failed; its late PASS was rejected and all reported
 numbers excluded. The repair was frozen before mixed60-02. Two Lean attempts also failed:
 first an absent Mathlib Omega module, then missing absolute-value notation
-and recursive enumeration depth. Fresh repairs use core Omega, explicit
+and recursive enumeration depth. The native table also retains literal t separators because Singular does
+not interpret the requested tab escape; the renderer parses that recorded
+format without changing raw bytes. Fresh repairs use core Omega, explicit
 integer intervals and symbolic finite cardinality identities. No accepted
 producer was repeated to publish or validate custody.
 

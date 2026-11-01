@@ -109,3 +109,17 @@ Terminalrecordpublication/reportinspection/custody;R61source-specific canonicalb
 
 ### Errors
 Metadatarecord attemptobservedaudittextbeforeaudit.exit waswritten and failedtheterminal-acceptanceassertion. Waited originaldriverterminal andreran metadataonly;no math rerun. Rawmatherrors remainnativeindexed++andtwoLeanrepairfailures.
+
+## 2026-11-01T18:11:15.775292+00:00 — terminalrecords pushed and report inspected
+
+### What was done
+Committed/pushed24b688f5cterminalresults/export:7workflows4accepted3rejected,39historicalGitpins,3auditedclaims. Rendered current3pagePDF and inspected everypage. Quantitative graph usesactual36/18/18counts and404recordeddegree rows; proposedCartierdiagram labelledunmeasured.
+
+### Decisions made
+Seal R60scientificbytes now,then conditionalPUT/freshGET/memberhash/repack. PR3200wasexternallymergedata90016f77;finalsealedeliveryneedsfreshcontinuationPRaftercustody,not anotherprematurePR. Originalbase/noagentmerge/retarget/automergepersist.
+
+### Open threads
+R60custody andexactheaddelivery;thenR61traceGram/dual andcompletecubic818,alloriginalleads.
+
+### Errors
+FirstreportassemblyexpectedtabTSV,butSingularemitsliteral t for the tabescape. Preservedrawbytes,parsedexactheader/9numericfieldswithoutproducerrepeat;freshreportpasses. Metadatafailure/repair recordedinpublication-checks.
