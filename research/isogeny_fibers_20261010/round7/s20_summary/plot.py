@@ -40,7 +40,7 @@ for s in ax.spines.values():
     s.set_visible(False)
 ax.text(HX, n - 0.1, "PR and headline (as in the lead's RESULTS.md)", fontsize=8, color=ink, ha="left", va="bottom", weight="bold")
 fig.text(0.01, 0.01,
-         "Hollow marker: pull request open and UNMERGED (status read 2026-11-01); no round-7 lead is merged. One verdict class per lead; see section 20.9.\n"
+         "Hollow marker: pull request open and UNMERGED (status read 2026-11-01); filled: merged on 2026-11-01 (R7.1, R7.3, R7.5, R7.7). One verdict class per lead; see section 20.9.\n"
          "R7.8 changes no result. R7.1: the ordering part of the falsifier fires in one accounting, the exponent part does not. Toy instances only. Source: verdicts.json.",
          fontsize=7.2, color=ink2, ha="left")
 fig.subplots_adjust(left=0.22, right=0.995, top=0.86, bottom=0.11)

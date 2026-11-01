@@ -10,7 +10,8 @@ propositions, with a toy-field computational probe
 verdict of every round-5 and round-6 lead; it was written on 2026-10-24 with
 five leads still in open pull requests and was updated on 2026-10-31 (§19.19),
 when all of them and the R6.2 correction (#2543) had merged. §20 records round 7
-(eight pull requests, all open and **UNMERGED** when it was written); §18 is the
+(eight pull requests; R7.1, R7.3, R7.5 and R7.7 merged on 2026-11-01, the other four
+open and **UNMERGED**); §18 is the
 reference list as revised by the R6.10 literature check.
 **Prior notes this builds on.** `RESEARCH_PDP_SPEEDUP_AND_ISOGENY.md` (2-/3-isogenous
 binary neighbours: identical Macaulay ranks, yield moves only with |F|),
@@ -132,7 +133,8 @@ binary neighbours: identical Macaulay ranks, yield moves only with |F|),
    claims to move an exponent or a row of §15.4; R6.5 states that it moves none.
 
 10. **Round 7 (§20) closes bookkeeping and tests open ends; no lead reports a
-    single-target speedup over the best generic method.** Eight pull requests, all open on 2026-11-01 (**UNMERGED**).
+    single-target speedup over the best generic method.** Eight pull requests; R7.1, R7.3,
+    R7.5 and R7.7 merged on 2026-11-01, the other four open (**UNMERGED**).
     Counting additions and the Φ_ℓ construction leaves the generic-kernel
     exponent at 1.919 and still insufficient to show a value below 2, with one
     near-tie reordering in one accounting (R7.1). End to end on the real GHS
@@ -2035,7 +2037,7 @@ defects: R6.2's two defects were corrected in #2543 (§19.6, verdict still
 open); one miscount remains in the merged R6.7 `RESULTS.md` (§19.11), and one
 internal count discrepancy remains in the merged R6.9 `RESULTS.md` (§19.13).
 Both are corrected in versioned errata that are in an open pull request
-(R7.5, #3109, **UNMERGED**, §20.5); the frozen files are not edited.
+(R7.5, #3109, merged, §20.5); the frozen files are not edited.
 
 ### Round 5
 
@@ -2442,7 +2444,7 @@ status against round 4's falsifier. Read against the PROGRAM falsifier, **not
 fired** (derived from the source's numbers: the F/⟨T⟩ oracle costs 0.980–1.075
 against plain, and pricing moves no m = 3 point value by more than 0.0151, the
 largest being B/A priced as run; the source's "0.011" is not reproduced by its
-records, R7.5 recount, #3109 **UNMERGED**, §20.5. That shift is below the B/A and
+records, R7.5 recount, #3109 merged, §20.5. That shift is below the B/A and
 C/A interval widths, 0.05 to 0.40, and the m = 3 containment counts are the same
 under all three pricings. It is above B/C's interval width, below 0.001 (largest
 B/C shift 0.0093; B/C stays at least 0.031 above 3 under every pricing), so
@@ -2472,7 +2474,7 @@ per-curve (c)/(b) size-matched intervals contain 1 at m = 2. The committed
 11 of 18 (priced essential); the review comment on the pull request reports the
 same counts and I recounted them from the records. Use the record counts; the
 merged `RESULTS.md` and `report.pdf` have not been regenerated. The point
-range 0.542–1.127 is unaffected. R7.5 (#3109, **UNMERGED**) writes this
+range 0.542–1.127 is unaffected. R7.5 (#3109, merged) writes this
 correction as `round6/r6_7_zeta_fold_phase2/ERRATUM_v2.md` (§20.5): the seven
 intervals that exclude 1 unpriced all lie below 1, 14 of the 18 point values are
 below 1, and only two curves change status between pricings.
@@ -2553,7 +2555,7 @@ all 34; against 1/g! off by more than 10× in "6 of 34 runs" per the source (q =
 with g ∈ {6, 7, 8}; q = 8 with g = 6; the source's own table has 7 rows above
 10×: the six q = 4 rows at g ∈ {6, 7, 8} and the q = 8, g = 6 row at 12.1×, so
 the count of 6 omits one: 7 of 34, confirmed by the R7.5 recount of `relrate.json`,
-#3109 **UNMERGED**, §20.5; the nearest uncounted run is q = 4, g = 4 at 9.1×), and by 585× and 858× on the two curves of the
+#3109 merged, §20.5; the nearest uncounted run is q = 4, g = 4 at 9.1×), and by 585× and 858× on the two curves of the
 smallest weak instance (N = 12, (l, n) = (2, 6), descended genus 8 over F₄,
 where all 53 searches ended at a curve with (g, l, n, m) = (8, 2, 6, 4)). The
 source explains it as 1/g! assuming q ≫ g.
@@ -2726,7 +2728,7 @@ status read on 2026-10-31.
   every crossover, which hold only under the restricted M + W + 91 I cost
   model (R5.3, R6.4, both merged). Round 7 counted additions and the Φ_ℓ
   construction (library builder) and left the exponent unchanged (R7.1, #3107,
-  **UNMERGED**, §20.1); the Sutherland CRT evaluation of Φ_ℓ is still not
+  merged, §20.1); the Sutherland CRT evaluation of Φ_ℓ is still not
   implemented, so the cold Φ route is not a state-of-the-art one.
 * Direct S5 systems are not buildable beyond ℓ = 5 (R6.1, merged). The
   `chained-x` plug-in is unregistered in `ic bench` on `main`; registration and
@@ -2743,12 +2745,12 @@ status read on 2026-10-31.
   discrepancy that R5.2 reported is stated by #2524 (merged) to come from a
   stale base and is not present on current `main` (§19.2).
 * Conjecture 10′: R6.11 tested only the plain x-frame, ℓ ≤ 13, h(D) = 1
-  craters. R7.3 (#3105, **UNMERGED**, §20.3) tested automorphism-class rho, an
+  craters. R7.3 (#3105, merged, §20.3) tested automorphism-class rho, an
   endomorphism-mixed rho and h(D) = 2, 3 craters at toy size: null after the
   |Aut| baseline, apart from a 1.46× multiplication-count gap on one inferior
   algorithm. The library `LineOracle` ζ-fold and a level-dependent
   index-calculus oracle were not run.
-* The E/4E label for a = 1 and for E/8E: R7.7 (#3113, **UNMERGED**, §20.7)
+* The E/4E label for a = 1 and for E/8E: R7.7 (#3113, merged, §20.7)
   found the a = 1 premise false (E/4E = Z/2), extended R6.3 to every (a, b)
   with Tr(a) = 0 (one lemma measured, not proved) and labelled E/8E, not
   cheaper than halving. King §5 and the Eagle–Galbraith–Ong cofactor-4 test
@@ -2758,7 +2760,7 @@ status read on 2026-10-31.
   rational 2-power torsion in R7.4 (Proposition 9.3), with the pair-table yield
   not confirmed at toy size; no Gröbner/F4 oracle was run on Edwards summation
   polynomials. The R6.7 `RESULTS.md` count (12 of 18) and the R6.9 count (6 of
-  34) are corrected in versioned errata in R7.5 (#3109, **UNMERGED**, §20.5)
+  34) are corrected in versioned errata in R7.5 (#3109, merged, §20.5)
   and the frozen files are still uncorrected on `main`. The §17.3 generic row
   has been superseded in place by the paragraph from #2240.
 
@@ -2868,27 +2870,28 @@ section R7.1 is #3107 (complete-cost ordering); #2542 is called the smooth-cover
 lead.
 
 **Status of the sources (pull-request records and branches read on
-2026-11-01).** All eight round-7 pull requests are **open and UNMERGED**. Every
-entry below quotes the `RESULTS.md` on the pull request's branch (R7.5: the two
-`ERRATUM_v2.md` files; R7.8: the pull request description, there is no
-`RESULTS.md`), can still change, and links the branch because the file is not on
-`main`: R7.1 #3107 (`c3d38a7c0a`), R7.2 #3124 (`82b02896bf`), R7.3 #3105
-(`a668d003c8`), R7.4 #3092 (`98ee823ca0`), R7.5 #3109 (`34896a4992`), R7.6 #3128
-(`ede77e08f2`), R7.7 #3113 (`f92bfaea3b`), R7.8 #3125 (`f5ff41a23a`). Merged
-earlier in round 7 and recorded in §19: the smooth-cover lead #2542 (§19.19),
-the R6.2 correction #2543 (§19.6), `audit_curve` #2524 (no bug on `main`,
-§19.2) and clippy #2538 (no research content). Two further pull requests were
-**not merged** on 2026-11-01: #3072 (the §19 update; this revision carries its
-two commits, so §19 above is the text of that pull request) and #3074 (two
-`tests/ecbench.rs` fixes, context for R7.8). CI state and validation holds of the
-round-7 pull requests were not read. Reduced builds are recorded in the
+2026-11-01).** Four round-7 pull requests merged on 2026-11-01: R7.1 #3107,
+R7.3 #3105, R7.5 #3109 and R7.7 #3113. R7.2 #3124, R7.4 #3092, R7.6 #3128 and
+R7.8 #3125 remain **open and UNMERGED**. Every entry below quotes the
+`RESULTS.md` on the pull request's branch (R7.5: the two `ERRATUM_v2.md` files;
+R7.8: the pull request description, there is no `RESULTS.md`), can still change
+for the open ones, and links the branch because the file was not on `main` when
+the entry was written: R7.1 #3107 (`c3d38a7c0a`), R7.2 #3124 (`82b02896bf`),
+R7.3 #3105 (`a668d003c8`), R7.4 #3092 (`98ee823ca0`), R7.5 #3109 (`34896a4992`),
+R7.6 #3128 (`ede77e08f2`), R7.7 #3113 (`f92bfaea3b`), R7.8 #3125
+(`f5ff41a23a`). Merged earlier in round 7 and recorded in §19: the smooth-cover
+lead #2542 (§19.19), the R6.2 correction #2543 (§19.6), `audit_curve` #2524 (no
+bug on `main`, §19.2) and clippy #2538 (no research content). The §19 update
+#3072 merged on 2026-11-01, so §19 above is now the text on `main`; #3074 (two
+`tests/ecbench.rs` fixes, context for R7.8) remains open. CI state and validation
+holds of the round-7 pull requests were not read. Reduced builds are recorded in the
 descriptions of #3107 (full-crate build OOM-killed; tests, clippy and rustfmt on
 a minimal crate), #3092 (clippy on a single file) and #3113 (full crate not
 built); details in the entries. The descriptions of every round-7 pull request
 except #3113 say that Conductor was not installed in the author's session (hooks
 warn and let edits through), so no task was reserved.
 
-### 20.1 R7.1 — complete-cost ordering of the kernel-finding routes (**UNMERGED**, open #3107)
+### 20.1 R7.1 — complete-cost ordering of the kernel-finding routes (**merged**, #3107)
 
 *Hypothesis.* The ordering of R6.4's three routes (ladder with NTT, ψ_ℓ plus
 factoring, Φ_ℓ(j, Y)) and the crossover with rho at r = 2^128 survive when
@@ -3016,7 +3019,7 @@ are not covered; wall times contended. Not a statement about any deployed curve.
 *Source.* PR #3124, branch `research/r7-2-ghs-end-to-end`,
 `research/isogeny_fibers_20261010/round7/r7_2_ghs_end_to_end/RESULTS.md`.
 
-### 20.3 R7.3 — conductor-sensitive algorithms across an ℓ-volcano gap (**UNMERGED**, open #3105)
+### 20.3 R7.3 — conductor-sensitive algorithms across an ℓ-volcano gap (**merged**, #3105)
 
 *Hypothesis.* Some implemented algorithm whose cost depends on End(E), and not
 only on the group structure of E(F_p), shows a measurable crater-versus-floor
@@ -3133,7 +3136,7 @@ constant or about formulations of the summation polynomials not examined.
 *Source.* PR #3092, branch `research/r7-4-literature-edwards`,
 `research/isogeny_fibers_20261010/round7/r7_4_literature_edwards/RESULTS.md`.
 
-### 20.5 R7.5 — versioned errata for R6.7 and R6.9 (**UNMERGED**, open #3109)
+### 20.5 R7.5 — versioned errata for R6.7 and R6.9 (**merged**, #3109)
 
 *Question.* No hypothesis or falsifier. Recount two statements of merged,
 frozen results from their committed records.
@@ -3243,7 +3246,7 @@ Library `src/` is unchanged.
 *Source.* PR #3128, branch `research/r7-6-r62-batch`,
 `research/isogeny_fibers_20261010/round7/r7_6_r62_batch/RESULTS.md`.
 
-### 20.7 R7.7 — the trace pair as a coset label for a = 1 and for E/8E (**UNMERGED**, open #3113)
+### 20.7 R7.7 — the trace pair as a coset label for a = 1 and for E/8E (**merged**, #3113)
 
 *Hypotheses.* H1: for a = 1 (Tr(a) = 1), E/4E has the structure R6.3 describes and
 the trace pair is a full label of it. H1′ (the live extension): for every curve
@@ -3357,25 +3360,26 @@ checkout; its files use no curve names beyond existing test ones.
 
 | lead | PR | falsifier | verdict | headline (measured unless marked) |
 |:--|:--|:--|:--|:--|
-| R7.1 complete-cost ordering | #3107 **open** | ordering: fired in cold ascending only (ℓ = 89, 109, 131: near ties); exponent: not fired | mixed; H not confirmed as stated | exponent 1.919 at every a, OLS at worst [1.717, 2.121], boot [1.781, 2.126]; ladder crossover shifts −0.24 to −0.39 bit (extrapolated) |
+| R7.1 complete-cost ordering | #3107 **merged** | ordering: fired in cold ascending only (ℓ = 89, 109, 131: near ties); exponent: not fired | mixed; H not confirmed as stated | exponent 1.919 at every a, OLS at worst [1.717, 2.121], boot [1.781, 2.126]; ladder crossover shifts −0.24 to −0.39 bit (extrapolated) |
 | R7.2 GHS end to end | #3124 **open** | fired (IC ≥ rho at every instance) | H refuted; no instance weak | IC / best generic 1.91 [1.72, 2.11] to 131 [123, 141] over 30 instances, N = 12..28; n = 4 ratio halves per q doubling, extrapolated crossing N ≈ 32 [31, 33], not built |
-| R7.3 conductor-sensitive | #3105 **open** | iterations and yield: null; multiplications: second branch fires for one algorithm | null after baseline; one inferior algorithm 1.46× | conductor effect 1.0018 [0.9986, 1.0050], 0.9997 [0.9966, 1.0030]; ε-walk floor 1.46× [1.44, 1.48] mults, best strategy 0.9999 [0.9945, 1.0055] |
+| R7.3 conductor-sensitive | #3105 **merged** | iterations and yield: null; multiplications: second branch fires for one algorithm | null after baseline; one inferior algorithm 1.46× | conductor effect 1.0018 [0.9986, 1.0050], 0.9997 [0.9966, 1.0030]; ε-walk floor 1.46× [1.44, 1.48] mults, best strategy 0.9999 [0.9945, 1.0055] |
 | R7.4 literature + binary Edwards | #3092 **open** | (b) fires at n ≤ 12 as worded; (a) not fired | (a) proved (Prop. 9.3) and tested; (b) not confirmed; King/EGO unread | 46 curves, 151 034 points, 0 exceptions; 39 of 40 cells exclude 1 (primary); sign set by c vs c + 1 |
-| R7.5 errata R6.7, R6.9 | #3109 **open** | none | counts corrected, no verdict changes | R6.7 (c)/(b): 11 / 9 / 11 of 18 (not 12); m = 3 shift 0.0151 (not 0.011); R6.9: 7 of 34 (not 6) |
+| R7.5 errata R6.7, R6.9 | #3109 **merged** | none | counts corrected, no verdict changes | R6.7 (c)/(b): 11 / 9 / 11 of 18 (not 12); m = 3 shift 0.0151 (not 0.011); R6.9: 7 of 34 (not 6) |
 | R7.6 R6.2 batch + paths | #3128 **open** | H1: no-gain not met, below-√C met from C ≥ 32; H2: fired | H1 supported as a scaling law, not as gain = √C; H2 refuted | gain exponent 0.43 to 0.52 (ideal 0.489); gain 11.0 to 13.9 at C = 256 (16 under √C); path exponent 1.13 [1.06, 1.21] |
-| R7.7 trace pair, a = 1 and E/8E | #3113 **open** | H1 fired (premise false); H1′, H2 not fired | H1 refuted as posed; H1′ confirmed (constancy measured); H2 confirmed, not cheap | label Tr(x) + Tr(a), 0 wrong in 148 598 015 points; triple label E/8E → F₂³, 74 118 081 points; CT bar still missed for Tr(a) = 0 |
+| R7.7 trace pair, a = 1 and E/8E | #3113 **merged** | H1 fired (premise false); H1′, H2 not fired | H1 refuted as posed; H1′ confirmed (constancy measured); H2 confirmed, not cheap | label Tr(x) + Tr(a), 0 wrong in 148 598 015 points; triple label E/8E → F₂³, 74 118 081 points; CT bar still missed for Tr(a) = 0 |
 | R7.8 chained-x in `ic bench`, procedure-2 test | #3125 **open** | none | no result; library follow-up | `chained-x` registered; m = 3 S 375.5 / 419.4 against R6.1's 428.6 on different bases (not bit-identical); procedure-2 test 5 of 5 runs |
 
 The summary figure is `round7/s20_summary/verdicts.svg` (data `verdicts.json`,
 report `report.pdf` beside it); it carries the same hollow-marker convention as
-`round6/s19_summary/` for unmerged leads, and all eight round-7 leads are hollow.
-The table's PR column gives the status read on 2026-11-01.
+`round6/s19_summary/` for unmerged leads; the four merged round-7 leads are
+filled and the four open ones hollow. The table's PR column gives the status
+read on 2026-11-01, updated when R7.1, R7.3, R7.5 and R7.7 merged.
 
 ### 20.10 What is settled, what is still open, and the leads the results motivate
 
-*Settled at the stated toy scope, subject to the cited pull request merging.*
-Nothing below is on `main`; the settled list of §19.17 (merged results) is
-unchanged until they merge.
+*Settled at the stated toy scope.* R7.1, R7.3, R7.5 and R7.7 are merged; R7.2,
+R7.4, R7.6 and R7.8 remain open, so the items resting on those are provisional.
+The settled list of §19.17 (merged results) is unchanged.
 * Corollary 9.2 is not limited to the Weierstrass model or to the point T: for an
   ordinary binary curve in any model every rational 2-power torsion subgroup
   gives an M-symmetrised summation-polynomial system equal to the plain x-frame
@@ -3431,9 +3435,9 @@ unchanged until they merge.
   Kuhn–Struik gain at finite r (R7.6).
 * The R6.8 exact-simulation theorem; direct S5 beyond ℓ = 5 (unchanged from
   §19.17).
-* Housekeeping that waits on merges: #3109 (errata files), #3125
-  (`chained-x` registration and the procedure-2 test), and the open #3072 and
-  #3074.
+* Housekeeping that waited on merges: #3109 (errata files) and #3072 merged on
+  2026-11-01; #3125 (`chained-x` registration and the procedure-2 test) and
+  #3074 remain open.
 
 *Leads the results motivate (each is the next step or a not-done item in its own
 source; none is a claim).*
@@ -3459,7 +3463,7 @@ No frozen result file was edited, and the measured numbers of earlier sections
 are unchanged. Edits are to this note only.
 * Header status line and §0: date and status line extended to §20; item 10 added.
 * §19 status paragraph ("Known defects"): the R6.7 and R6.9 count errata are now
-  pointed to (R7.5, #3109, **UNMERGED**).
+  pointed to (R7.5, #3109, merged).
 * §19.5 (R6.1, *Library change*): the unregistered `chained-x` sentence points to
   #3125 (R7.8, **UNMERGED**).
 * §19.11 (R6.7): the verdict sentence "pricing moves no ratio by more than 0.011"
@@ -3478,12 +3482,15 @@ are unchanged. Edits are to this note only.
   smooth-cover facts of §19.19 kept), Conjecture 10′ (R7.3), the a = 1 and E/8E
   label and the two unread sources (R7.7, R7.4), and the binary-Edwards check with
   the R6.7/R6.9 counts (R7.4, R7.5) now name the round-7 result and its
-  **UNMERGED** pull request. The "awaits its correction" lines were kept in
-  substance, not removed, because every correcting pull request is open.
+  pull-request status. The "awaits its correction" lines were kept in
+  substance, not removed, because the correcting pull requests for R7.2, R7.4,
+  R7.6 and R7.8 are open; the R7.5 errata (#3109) and #3072 have merged.
 * §19.18, §19.19: a revision line; the "numbering" note under §19.19 (its R7.1 is
   the smooth-cover lead); the (3, 4), g = 8 "did not finish" sentence now cites
   the R7.2 measurement of 1175 s.
-* Not edited: §17.3 (R7.1 does not supersede it, and is unmerged); the settled
+* Not edited: §17.3 (the smooth-cover R7.1 #2542 does not supersede it; the
+  complete-cost R7.1 #3107 is a different lead and merged on 2026-11-01); the settled
   list of §19.17 (merged results only; the round-7 settled items are in §20.10);
   §19.2, §19.6 and the smooth-cover text already carry #2524, #2543 and #2542
-  from the revision of 2026-10-31, which this branch includes (#3072, open).
+  from the revision of 2026-10-31, which this branch includes (#3072, merged
+  2026-11-01).

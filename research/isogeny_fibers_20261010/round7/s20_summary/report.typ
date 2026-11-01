@@ -4,11 +4,11 @@
 
 = §20 of the isogeny-fibers note: round 7, verdicts and corrections
 
-*Date* 2026-11-01 (branch `research/note-s20-round-7`, base `origin/main` `5cbcb51bc3`, plus the two commits of \#3072 that carry the revised §19). *Type* documentation of existing results; no experiment was run for this report and no number below is newly computed unless marked _derived_. Toy and synthetic instances only; no sub-rho claim and no claim about a deployed curve.
+*Date* 2026-11-01 (branch `research/note-s20-round-7`; the revised §19 from \#3072 is on `main`). *Type* documentation of existing results; no experiment was run for this report and no number below is newly computed unless marked _derived_. Toy and synthetic instances only; no sub-rho claim and no claim about a deployed curve.
 
 *Question.* What did the eight round-7 leads (R7.1–R7.8) find against their hypotheses and falsifiers, and which statements of §19 must change in light of them?
 
-*Method.* Read each lead's `RESULTS.md` from the branch of its open pull request (R7.5: the two `ERRATUM_v2.md` files; R7.8: the pull-request description, because it has no `RESULTS.md`), checked the branch heads against the pull-request records (all eight match), and transcribed hypothesis, falsifier, verdict and numbers with the sources' intervals. All eight pull requests are *open and unmerged* on 2026-11-01: R7.1 \#3107, R7.2 \#3124, R7.3 \#3105, R7.4 \#3092, R7.5 \#3109, R7.6 \#3128, R7.7 \#3113, R7.8 \#3125. Two pull requests expected to be merged are not: \#3072 (the §19 update, whose commits this branch carries) and \#3074. One check was re-run for this report: both `recount_v2.py` scripts of R7.5 on the committed records of `main`; their output equals the committed `recount_v2.txt`.
+*Method.* Read each lead's `RESULTS.md` from the branch of its open pull request (R7.5: the two `ERRATUM_v2.md` files; R7.8: the pull-request description, because it has no `RESULTS.md`), checked the branch heads against the pull-request records (all eight match), and transcribed hypothesis, falsifier, verdict and numbers with the sources' intervals. Four of the eight pull requests merged on 2026-11-01 (R7.1 \#3107, R7.3 \#3105, R7.5 \#3109, R7.7 \#3113); the other four are *open and unmerged* on 2026-11-01: R7.2 \#3124, R7.4 \#3092, R7.6 \#3128, R7.8 \#3125. The §19 update \#3072 merged on 2026-11-01; \#3074 remains open. One check was re-run for this report: both `recount_v2.py` scripts of R7.5 on the committed records of `main`; their output equals the committed `recount_v2.txt`.
 
 The verdict figure (Figure 1) is on the last page (landscape).
 
@@ -22,7 +22,7 @@ The verdict figure (Figure 1) is on the last page (landscape).
 
 == What changed in the note (research note, not a result)
 
-New §20 (one subsection per lead, synthesis table, settled and open lists, next leads, edit list). Edits to earlier sections: header and §0 item 10; §19 status paragraph; §19.5, §19.11 (the 0.011 sentence and the unscoped inversion share), §19.13, §19.16 rows, §19.17 open lines (each now names its round-7 result and its UNMERGED pull request), §19.18, §19.19. The "awaits correction" lines were kept in substance because every correcting pull request is open. §17.3 and all frozen results are untouched; measured values of earlier sections are unchanged.
+New §20 (one subsection per lead, synthesis table, settled and open lists, next leads, edit list). Edits to earlier sections: header and §0 item 10; §19 status paragraph; §19.5, §19.11 (the 0.011 sentence and the unscoped inversion share), §19.13, §19.16 rows, §19.17 open lines (each now names its round-7 result and its pull-request status), §19.18, §19.19. The "awaits correction" lines were kept in substance because the correcting pull requests for R7.2, R7.4, R7.6 and R7.8 are open; the R7.5 errata (\#3109) and \#3072 merged. §17.3 and all frozen results are untouched; measured values of earlier sections are unchanged.
 
 == Graphs checked and left unchanged
 
@@ -30,12 +30,12 @@ New §20 (one subsection per lead, synthesis table, settled and open lists, next
 
 == Limits and unresolved checks
 
-Verdict classes compress mixed outcomes into one column; the wording is in §20.9. Merge status is as read on 2026-11-01 and will change. CI state of the round-7 pull requests was not read. `conductor` is not installed in this environment, so no task was reserved; edits are confined to the note and this directory. The curve-name linter was not run (docs only; the note names no curve slug that §19 did not already carry).
+Verdict classes compress mixed outcomes into one column; the wording is in §20.9. Merge status is as read on 2026-11-01: R7.1, R7.3, R7.5 and R7.7 merged; the rest may change. CI state of the round-7 pull requests was not read. `conductor` is not installed in this environment, so no task was reserved; edits are confined to the note and this directory. The curve-name linter was not run (docs only; the note names no curve slug that §19 did not already carry).
 
 == Commands
 
 `venv/bin/python plot.py` (reads `verdicts.json`, writes `verdicts.svg`); `typst.compile('report.typ')` for this PDF.
 
 #page(flipped: true, margin: 1.5cm)[
-#figure(image("verdicts.svg", width: 100%), caption: [Verdict class of each round-7 lead (transcribed; data `verdicts.json`, script `plot.py`). Hollow markers: the pull request is open and unmerged on 2026-11-01. R7.1: ordering falsifier fires in one accounting, exponent falsifier does not. R7.8 changes no result.])
+#figure(image("verdicts.svg", width: 100%), caption: [Verdict class of each round-7 lead (transcribed; data `verdicts.json`, script `plot.py`). Hollow markers: pull request open and unmerged on 2026-11-01; filled: merged (R7.1, R7.3, R7.5, R7.7). R7.1: ordering falsifier fires in one accounting, exponent falsifier does not. R7.8 changes no result.])
 ]
