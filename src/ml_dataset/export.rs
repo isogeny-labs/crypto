@@ -166,7 +166,6 @@ fn feature_projection(public: &Value, base: &Value) -> Result<Value, String> {
 /// Causal projection prepared for the planted-control integration. Normalize
 /// policy provenance for both populations; coordinates and mathematical
 /// actions remain visible, while the constructed-positive flag stays private.
-#[allow(dead_code)]
 fn feature_projection_v7(public: &Value, base: &Value) -> Result<Value, String> {
     let mut normalized = base.clone();
     if base["rule"] != "planted-known-log-subgroup/v1"
@@ -784,6 +783,7 @@ fn export_with_graph_projector(
     let root = super::checked_directory(root, false)?;
     let _source_lease = super::Lease::acquire(&root)?;
     let (plan, binding, plan_sha) = super::bound_run(&root)?;
+    let planted = plan.planted();
     let out = output_directory(&root, out)?;
     let _out_lease = super::Lease::acquire(&out)?;
     let restricted = super::checked_directory(&out.join("restricted"), true)?;
@@ -888,7 +888,17 @@ fn export_with_graph_projector(
                 {
                     return Err("large-prime domain on a different solver source cell".into());
                 }
-                let inputs = if manifest.config.solver == "pkm" {
+                let inputs = if planted
+                    && (matches!(
+                        manifest.config.solver.as_str(),
+                        "pkm" | "double-large-prime"
+                    ) || (manifest.config.family == "prime"
+                        && manifest.config.solver == "f4"
+                        && (3..=15).contains(&manifest.config.m)))
+                {
+                    feature_status = "planted_specialized_domain_projection_not_admitted";
+                    None
+                } else if manifest.config.solver == "pkm" {
                     if let Some(artifact) = alternative {
                         if artifact.role != "explicit-alternative-kummer-factor-base"
                             || artifact.encoding != "json"
@@ -952,7 +962,11 @@ fn export_with_graph_projector(
                             None
                         }
                     } else {
-                        Some(feature_projection(&public, &base)?)
+                        Some(if planted {
+                            feature_projection_v7(&public, &base)?
+                        } else {
+                            feature_projection(&public, &base)?
+                        })
                     }
                 };
                 if let Some(inputs) = inputs {
@@ -1205,7 +1219,9 @@ fn export_with_graph_projector(
         "split_policy":{"domain":SPLIT_DOMAIN,"component":"field-size-nN","assignment":"first 64 hash bits modulo 100: train 0..79, validation 80..89, test 90..99",
             "occurrences_by_partition":split_counts,"all_same_size_families_twists_generators_keys_stay_together":true,
             "cross_size_algebraic_links_merged":false,"row_random_split_permitted":false},
-        "feature_policy":{"version":"strict-structural-allowlist-v6","only_features_jsonl_is_model_input":false,
+        "feature_policy":{"version":if planted {"strict-structural-allowlist-v7-planted"} else {"strict-structural-allowlist-v6"},
+            "cross_population_pooling_permitted":!planted,
+            "only_features_jsonl_is_model_input":false,
             "model_input_files":["features.jsonl","prefix-features.jsonl","algebraic-features.jsonl"],
             "algebraic_task":"prime-polynomial-consequence/v1; pre-native equations only; independently checked identities for retained native basis rows, with separately searched witnesses",
             "algebraic_claim_limits":["recursive prime m3..15 and p<2^32 only","admission requires a previously certified equality node","separate cumulative consequence-channel caps preserve existing branch budget","witness-dependent cancellation is not exact first/last fall degree","no native-operation or native-instruction witness"],
