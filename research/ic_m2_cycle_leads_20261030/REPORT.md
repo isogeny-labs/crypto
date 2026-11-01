@@ -21,6 +21,10 @@ overlapped a d-sweep, so its same-process rho time is noisy (about 10 ms).
    **Erratum (2026-11-01):** that range is not general. A paired run at n = 41 (cofactor 4, 8
    pairs) shows no detectable penalty (geometric mean 0.98, 95% [0.64, 1.43]), and 32 pairs at
    n = 31 give 13.3× (95% [10.3, 17.5]); see `../ic_m2_torsion_n41_20261101/REPORT.md`.
+   **Second erratum (2026-11-01):** torsion was not needed at n = 37 either. Paired on/off on the
+   cofactor-596 curve (8 pairs): the cycle stop without torsion solves it in 3.4 s on average, 7.5×
+   fewer trials than with torsion (95% [4.9, 12.1]); see `../ic_m2_torsion_n37_20261101/REPORT.md`.
+   The ladder's failure there came from its 90% coverage stop, not from the cofactor.
 4. **The wall-time optimum stays at d ≈ n/3.** Trials keep falling for larger d,
    but the per-trial solution enumeration grows as `2^{3d−1−n}`.
 5. **Beating rho is closed for this family** if the ceiling argument below
