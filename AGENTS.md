@@ -1351,7 +1351,15 @@ resources, deadline and acceptance criteria, submit the job, and retain its
 receipt. The experiment runs in a pod in cluster `isolab`, namespace `isolab`,
 region `us-east-2`, account `104186811093`. Karpenter starts Spot workers;
 `cpu-spot` serves ordinary work and `cpu-l2-spot` serves native L2 benchmarks.
-Keep the combined 64-vCPU worker cap and the shared 96-vCPU account quota.
+Follow the owner cost ceilings in [COST_CONTROLS.md](taskq/deploy/eks-karpenter/COST_CONTROLS.md):
+24 worker vCPUs / 160 GiB total, with no automatic quota or cap increases.
+Before any EKS/IsoLab build or run, commit and push the exact experiment code,
+protocol, configuration and launch command to GitHub; retain the publication
+check receipt. Publish outcomes, including failures, in the same experiment PR.
+Record a finite dollar ceiling, CPU/RAM, original deadline and total retry
+allowance before spending; charge build, idle, failed and interrupted attempts.
+Queue work that cannot fit. Never bypass a budget stop through another pool,
+account, region, provider or a renamed retry.
 
 - **Use existing authentication.** Verify the caller with
   `aws sts get-caller-identity` and check the required permissions using
