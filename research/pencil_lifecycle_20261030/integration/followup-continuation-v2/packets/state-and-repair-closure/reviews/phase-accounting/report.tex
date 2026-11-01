@@ -1,0 +1,14 @@
+\documentclass[10pt]{article}\usepackage[margin=0.8in]{geometry}\usepackage[T1]{fontenc}\usepackage{lmodern,hyperref}
+\title{Independent saved phase-counter review}\date{1 November 2026}\begin{document}\maketitle
+Fresh compilation and replay reproduced the published counter-audit result. Seven saved arms each contain 1,260 standardized rows, with 1,260 candidate and 1,260 rho phase-conservation checks: 8,820 rows and 17,640 side checks in total. No new scientific experiment was performed.
+\section*{What was checked}
+The native join uses $(p,\mathrm{target\_index})$, compares bit size and workload identity, and rejects duplicate native and standardized identities. Every declared phase has the same counter keys as its aggregate, unique nonempty phase name and unsigned values. Exact u128 phase sums equal the stored u64 aggregate counters. Fifty input files were hash-checked unchanged. An independent bit-stratum tally contains 49 entries of 180 rows.
+\section*{Acceptance is separate from process exit}
+The executable reports some failures through structured issues or unresolved counts while exiting zero; it also permits an empty cohort. The separate review predicate requires the exact seven arms, each with exactly 1,260 rows and 1,260 candidate/rho passes, no issues and unchanged inputs. The saved baseline passes that predicate.
+\section*{Eight independent negative controls}
+Copied-input controls cover duplicate standardized identity, duplicate native key, altered bits, wrong workload ID, negative counter, empty phases, omitted phase and an empty cohort. Both duplicate cases exit 101. The other six exit zero but are rejected by the review predicate. All eight are rejected, with complete receipts and original evidence preserved.
+\section*{Scope and reproducibility}
+This establishes conservation of declared counters. It does not establish physical instrumentation completeness, setup allocation, cold/warm boundaries, retry charging, historical scalar correctness or new timing/pricing. An omitted activity can be absent from both the aggregate and its phase sums.
+
+Reviewed source: PR3056 commit \texttt{60346e7f2b831aa88f89d7967b9e74e21220422c}. The reviewer inspected source before replay and used producer outputs for input discovery; this was not blind. \texttt{REVIEW.md}, \texttt{status.json}, \texttt{accept.jq}, raw hashes and control receipts preserve the result. No solver, curve generation, cloud operation or repository mutation occurred.
+\end{document}

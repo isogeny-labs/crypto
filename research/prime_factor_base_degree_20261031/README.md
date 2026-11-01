@@ -1,5 +1,46 @@
 # Prime-field factor bases: certificates and a secant degree reduction
 
+## Four complete selector presentations, 2026-11-01
+
+The [four-track continuation](four_tracks_20261101/README.md) keeps the same
+`icv1-fp5-tm1-a77cc6af` / `FB1h29cc024e755c` points and proves canonical
+degree **7→6** with seven-variable XOR recoding and **7→5** with nine-variable
+one-hot support. Both bounds include every selector and actual highest form.
+It also proves complete symmetric rational-pivot charts and a unit-pivot
+membership determinant; the expanded determinant has no finite homogeneous
+first vanishing, while Schur elimination returns XOR. The
+[matched presentation dashboard](four_tracks_20261101/README.md#matched-presentation-dashboard)
+counts all variables/equations and separates derived ambient dimensions from
+solver work. Ten new Lean modules and a fixed native21-system exporter are
+included. No new CAS/time/yield experiment was launched; the
+[prospective complete protocol](four_tracks_20261101/PROTOCOL.md) records the
+next EKS/CAS integration. Earlier sealed receipts and measured plots stay fixed.
+
+
+## Boolean ordinate offsets, 2026-11-01
+
+The [new offset-base search](pencil_search_20261101/README.md) removes the
+complete-splitting requirement and keeps both summands' Boolean labels
+variable. Lean proves exact group semantics and canonical degree2k+3,
+counting all2k selectors. The new F17 base has eight columns/sixteen signed
+points, with canonical degree7 versus same-base dense9. Exact single-bit
+projection is also proved. Actual affine degree, yield and solving work
+remain unmeasured; the report exposes the variable/column tax and prospective
+matched controls. Earlier sealed records and measured graphs are unchanged.
+
+## Concrete semantic/degree theorem, 2026-10-31
+
+The [concrete F17 continuation](fixture_bridge_20261031/README.md) now joins
+the actual polynomial generator set, exact signed factor-base group
+relations and canonical degree 3 versus the inherited dense degree 5 in one
+Lean theorem. All four signs and identity inverse pairs are covered. The
+unchanged transitive auditor checks 159 declarations in fourteen modules:
+zero failures and zero native trust. The published generic group project
+also rebuilt and passed its complete 22-declaration audit, closing the
+specific outage verification gaps recorded below. Existing sealed records
+remain historical. This is formal semantic integration of the earlier degree
+result, without a new degree measurement or runtime claim.
+
 ## Checked Lean continuation, 2026-10-31
 
 The [formalization](proof/FORMALIZATION.md) now proves the polynomial-ring

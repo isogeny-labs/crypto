@@ -14,6 +14,7 @@ pub mod covers;
 pub mod derive;
 pub mod ecbench;
 pub mod enrich;
+pub mod factor_bases;
 pub mod generated;
 pub mod lmfdb;
 pub mod pack;
@@ -22,6 +23,7 @@ pub mod results;
 pub mod siblings;
 pub mod traits;
 pub mod transfers;
+pub mod volcano;
 pub mod walks;
 
 pub const TOOL: &str = "ecdb import";
@@ -204,6 +206,10 @@ pub enum Selection {
     Ecbench,
     /// The sibling repositories' curve records, dataset curves and measurements.
     Siblings,
+    /// ℓ-volcano levels, directions and End(E) from the stored census isogeny graphs.
+    Volcanoes,
+    /// Factor bases of the IC work (FB1, FBM1, archive, spec ids), their points and results.
+    FactorBases,
 }
 
 /// Run the selected importers; `walk_files` overrides the default walk outputs.
@@ -246,6 +252,13 @@ pub async fn run(ctx: &Ctx<'_>, what: Selection, walk_files: Option<Vec<String>>
     }
     if all || what == Selection::Ecbench {
         reports.push(ecbench::import(ctx).await?);
+    }
+    if all || what == Selection::Volcanoes {
+        reports.push(volcano::import(ctx).await?);
+    }
+    // After ecbench, results and siblings: it links their rows.
+    if all || what == Selection::FactorBases {
+        reports.push(factor_bases::import(ctx).await?);
     }
     Ok(reports)
 }

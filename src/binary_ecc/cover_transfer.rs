@@ -21,12 +21,13 @@
 //! the latter maps to the rational two-torsion point `(0,d)` on `E`.
 //!
 //! The implementation constructs and validates the equations, maps rational
-//! points, constructs `phi^*([P]-[O])` in reduced Mumford form, and pushes a
-//! rational point divisor `[Q]-[infinity]` forward.  A complete arbitrary-class
-//! pushforward is also available for the exact exhaustive `GF(8)` fixture
-//! `a=1`, `b=3`, using a checked 486-class presentation; every other model
-//! remains explicitly unsupported.  This module contains no discrete-log
-//! solver or performance claim.
+//! points, constructs `phi^*([P]-[O])` in reduced Mumford form, and pushes
+//! arbitrary reduced Mumford classes forward.  The arbitrary-class path
+//! factors the degree-at-most-three support over the base field and evaluates
+//! each closed point by summing its residue-field Frobenius orbit.  The exact
+//! exhaustive `GF(8)` fixture `a=1`, `b=3` retains its independently built
+//! 486-class lookup table as a complete cross-check.  This module contains no
+//! discrete-log solver or performance claim.
 
 use super::{
     hyperelliptic::HyperellipticError, BinaryPoint, F2mElement, F2mPoly, HyperellipticCurve,
@@ -52,6 +53,10 @@ pub enum CoverTransferError {
     PointNotOnTarget,
     PointNotOnCover,
     InvalidSubgroupOrder,
+    ProjectorOrderNotCoprime {
+        common_factor: u32,
+    },
+    DivisorNotInDeclaredTorsion,
     DivisorPolynomialTooLong {
         polynomial: &'static str,
         maximum_coefficients: usize,
@@ -75,6 +80,13 @@ impl fmt::Display for CoverTransferError {
             Self::PointNotOnTarget => write!(f, "point is not on the target elliptic curve"),
             Self::PointNotOnCover => write!(f, "point is not on the source cover"),
             Self::InvalidSubgroupOrder => write!(f, "subgroup order must be positive"),
+            Self::ProjectorOrderNotCoprime { common_factor } => write!(
+                f,
+                "projector requires cover degree coprime to the declared torsion order (gcd={common_factor})"
+            ),
+            Self::DivisorNotInDeclaredTorsion => {
+                write!(f, "divisor is not annihilated by the declared torsion order")
+            }
             Self::DivisorPolynomialTooLong {
                 polynomial,
                 maximum_coefficients,
@@ -108,9 +120,8 @@ impl From<HyperellipticError> for CoverTransferError {
 /// Operations intentionally outside the certified implementation boundary.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum UnsupportedCoverOperation {
-    /// The exhaustive arbitrary-class implementation is certified only for
-    /// one fixed `GF(8)` fixture.  Other models still require a general
-    /// polynomial norm/resultant implementation, including non-split support.
+    /// Retained for wire/source compatibility with pre-general-norm callers.
+    /// Current checked covers implement this operation.
     ArbitraryJacobianPushforward,
 }
 
@@ -177,6 +188,51 @@ pub struct PullPushCompositionCertificate {
     pub identity_holds: bool,
 }
 
+/// One irreducible closed-point component of a reduced Mumford support and
+/// its residue-field pushforward.
+///
+/// `support` is monic and irreducible over the base field.  Its degree is the
+/// residue degree of the closed point.  `image` is the sum of the complete
+/// Frobenius orbit after applying `phi`, represented in `E(k)`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ClosedPointPushforwardCertificate {
+    pub support: F2mPoly,
+    pub degree: usize,
+    pub image: BinaryPoint,
+}
+
+/// Replayable decomposition of an arbitrary Jacobian pushforward into its
+/// irreducible closed-point norms.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct JacobianPushforwardCertificate {
+    pub input: MumfordDivisor,
+    pub components: Vec<ClosedPointPushforwardCertificate>,
+    pub reconstructed_support: F2mPoly,
+    pub component_image_sum: BinaryPoint,
+    pub general_pushforward: BinaryPoint,
+    pub support_reconstruction_holds: bool,
+    pub component_sum_holds: bool,
+}
+
+/// Closed-point certificate for one point-class pullback.
+///
+/// For a generic rational target point the component degrees sum to the
+/// geometric cover degree three.  At a ramified point the reduced Mumford
+/// support can have smaller degree; `fiber_kind` records the scheme-theoretic
+/// multiplicity separately.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PullbackClosedPointCertificate {
+    pub input: BinaryPoint,
+    pub pullback: MumfordDivisor,
+    pub fiber_kind: PullbackFiberKind,
+    pub components: Vec<ClosedPointPushforwardCertificate>,
+    pub reduced_support_degree: usize,
+    pub component_image_sum: BinaryPoint,
+    pub three_times_input: BinaryPoint,
+    pub every_component_is_degree_times_input: bool,
+    pub total_matches_three_times_input: bool,
+}
+
 /// Conditional subgroup-preservation consequence of `phi_* phi^* = [3]`.
 ///
 /// This type does not certify that the caller's integer is the order of a
@@ -196,6 +252,39 @@ pub enum SubgroupTransferStatus {
     },
 }
 
+/// Replayable arbitrary-class certificate for `e=phi^* phi_*` and
+/// `e^2=[3]e`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ImageEndomorphismCertificate {
+    pub input: MumfordDivisor,
+    pub pushforward: BinaryPoint,
+    pub endomorphism: MumfordDivisor,
+    pub endomorphism_squared: MumfordDivisor,
+    pub three_times_endomorphism: MumfordDivisor,
+    pub quadratic_identity_holds: bool,
+    pub pushforward_kernel_member: bool,
+}
+
+/// Checked normalized projector on a declared order-`r` torsion module.
+///
+/// The certificate verifies that the input is killed by `r` and that three is
+/// invertible modulo `r`.  It does not prove that `r` is prime or the exact
+/// order of the input; callers bind those facts independently.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TorsionProjectorCertificate {
+    pub order: BigUint,
+    pub degree_inverse_mod_order: BigUint,
+    pub input: MumfordDivisor,
+    pub normalized_projection: MumfordDivisor,
+    pub complementary_component: MumfordDivisor,
+    pub projection_is_idempotent: bool,
+    pub projected_component_is_in_image: bool,
+    pub complementary_component_is_in_pushforward_kernel: bool,
+    pub input_is_in_image: bool,
+    pub input_is_in_pushforward_kernel: bool,
+    pub decomposition_holds: bool,
+}
+
 /// The checked fixed-family cover and its exact field/model data.
 #[derive(Clone, Debug)]
 pub struct OrdinaryBinaryCover {
@@ -209,6 +298,12 @@ pub struct OrdinaryBinaryCover {
 }
 
 type FixedF8DivisorKey = (Vec<BigUint>, Vec<BigUint>);
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum ExtensionPoint {
+    Infinity,
+    Affine { x: F2mPoly, y: F2mPoly },
+}
 
 #[derive(Clone, Debug)]
 struct FixedF8NormTable {
@@ -594,6 +689,55 @@ impl OrdinaryBinaryCover {
         })
     }
 
+    /// Factor a point-class pullback into closed points and certify every
+    /// component norm separately.
+    ///
+    /// A component of residue degree `s` in a fiber above a rational point
+    /// `P` must push to `[s]P`.  This exposes that equality directly, including
+    /// nonsplit degree-two and degree-three support, before the component
+    /// images are summed.
+    pub fn pullback_closed_point_certificate(
+        &self,
+        point: &BinaryPoint,
+    ) -> Result<PullbackClosedPointCertificate, CoverTransferError> {
+        let pullback = self.pullback_point_class(point)?;
+        let fiber_kind = self.pullback_fiber_kind(point)?;
+        let certificate = self.jacobian_pushforward_certificate(&pullback)?;
+        let reduced_support_degree = certificate
+            .components
+            .iter()
+            .map(|component| component.degree)
+            .sum();
+        let every_component_is_degree_times_input =
+            certificate.components.iter().all(|component| {
+                self.target_scalar_mul_small(point, component.degree as u32)
+                    .is_ok_and(|expected| expected == component.image)
+            });
+        if !every_component_is_degree_times_input {
+            return Err(CoverTransferError::CertificateFailure(
+                "closed-point pullback component did not push to its residue degree times the input",
+            ));
+        }
+        let three_times_input = self.target_scalar_mul_small(point, 3)?;
+        let total_matches_three_times_input = certificate.component_image_sum == three_times_input;
+        if !total_matches_three_times_input {
+            return Err(CoverTransferError::CertificateFailure(
+                "closed-point pullback components did not sum to three times the input",
+            ));
+        }
+        Ok(PullbackClosedPointCertificate {
+            input: point.clone(),
+            pullback,
+            fiber_kind,
+            components: certificate.components,
+            reduced_support_degree,
+            component_image_sum: certificate.component_image_sum,
+            three_times_input,
+            every_component_is_degree_times_input,
+            total_matches_three_times_input,
+        })
+    }
+
     /// Push the typed pullback witness forward without invoking a general
     /// Jacobian norm.  This is deliberately private: it is valid only for
     /// the three point fibers constructed by `pullback_point_class`.
@@ -732,35 +876,22 @@ impl OrdinaryBinaryCover {
 
     /// Push an arbitrary reduced Jacobian class to the target elliptic curve.
     ///
-    /// This operation is deliberately bounded to the exact exhaustive fixture
+    /// A reduced genus-three class has degree-at-most-three support.  The
+    /// implementation factors its monic support polynomial over the base
+    /// field.  A linear factor is mapped directly.  For an irreducible factor
+    /// `g` of degree two or three it evaluates `phi` in `k[t]/(g)` and sums
+    /// the complete `q`-Frobenius orbit, which is the pushforward of that
+    /// closed point.  Repeated linear factors retain their multiplicity.  This
+    /// covers split and nonsplit support without enumerating the base field.
     ///
-    /// ```text
-    /// GF(8) = GF(2)[z]/(z^3+z+1),  a=1, b=3,
-    /// H: v^2+u^2*v=u^7+u^4+7u.
-    /// ```
-    ///
-    /// Its 486 rational Jacobian classes have the unique presentation
-    /// `i*A+j*B`, `0<=i<9`, `0<=j<54`, where
-    /// `A=[(2,3)-infinity]` and `B=[(3,1)-infinity]`.  The cached table is
-    /// constructed with the checked Jacobian law and assigns each class the
-    /// corresponding sum of the two directly mapped rational point classes.
-    /// This handles non-split support in this finite fixture without claiming
-    /// a general resultant implementation.  Every other cover returns a
-    /// structured unsupported result.
+    /// On the exact exhaustive `GF(8)`, `a=1`, `b=3` fixture, construction
+    /// of the retained 486-class lookup table compares every entry with this
+    /// residue-field implementation before the table is used as a fast exact
+    /// cross-check.
     pub fn pushforward_arbitrary_jacobian_class(
         &self,
         divisor: &MumfordDivisor,
     ) -> Result<BinaryPoint, CoverTransferError> {
-        if !self.is_fixed_f8_norm_fixture() {
-            return Err(CoverTransferError::Unsupported(
-                UnsupportedCoverOperation::ArbitraryJacobianPushforward,
-            ));
-        }
-        // A reduced genus-three Mumford representative has deg(u) <= 3 and
-        // deg(v) < deg(u), hence at most four and three coefficients.  Check
-        // the public vector lengths before the full curve/divisor validation,
-        // whose canonicality and field-width checks otherwise scan every
-        // supplied coefficient.
         if divisor.u.coeffs.len() > 4 {
             return Err(CoverTransferError::DivisorPolynomialTooLong {
                 polynomial: "u",
@@ -776,17 +907,546 @@ impl OrdinaryBinaryCover {
             });
         }
         divisor.validate(&self.source)?;
-        let table = FIXED_F8_NORM_TABLE
-            .get_or_init(|| self.build_fixed_f8_norm_table())
-            .as_ref()
-            .map_err(Clone::clone)?;
-        table
-            .images
-            .get(&fixed_f8_divisor_key(divisor))
-            .cloned()
+        if self.is_fixed_f8_norm_fixture() {
+            let table = FIXED_F8_NORM_TABLE
+                .get_or_init(|| self.build_fixed_f8_norm_table())
+                .as_ref()
+                .map_err(Clone::clone)?;
+            return table
+                .images
+                .get(&fixed_f8_divisor_key(divisor))
+                .cloned()
+                .ok_or(CoverTransferError::CertificateFailure(
+                    "validated fixed-fixture divisor is absent from the 486-class norm table",
+                ));
+        }
+        self.pushforward_via_residue_fields(divisor)
+    }
+
+    /// Certify an arbitrary pushforward component by component.
+    ///
+    /// This is the public evidence surface for the residue-field norm used by
+    /// [`Self::pushforward_arbitrary_jacobian_class`].  It reconstructs the
+    /// Mumford support from monic irreducible factors, reports each factor's
+    /// closed-point image, sums those images, and compares the result with the
+    /// general pushforward path.  On the fixed `GF(8)` fixture the latter is
+    /// the independently enumerated 486-class lookup table.
+    pub fn jacobian_pushforward_certificate(
+        &self,
+        divisor: &MumfordDivisor,
+    ) -> Result<JacobianPushforwardCertificate, CoverTransferError> {
+        if divisor.u.coeffs.len() > 4 {
+            return Err(CoverTransferError::DivisorPolynomialTooLong {
+                polynomial: "u",
+                maximum_coefficients: 4,
+                actual_coefficients: divisor.u.coeffs.len(),
+            });
+        }
+        if divisor.v.coeffs.len() > 3 {
+            return Err(CoverTransferError::DivisorPolynomialTooLong {
+                polynomial: "v",
+                maximum_coefficients: 3,
+                actual_coefficients: divisor.v.coeffs.len(),
+            });
+        }
+        divisor.validate(&self.source)?;
+        let factors = self.factor_small_support(&divisor.u)?;
+        let reconstructed_support = factors
+            .iter()
+            .fold(F2mPoly::one(self.m), |product, factor| {
+                product.mul(factor, &self.irreducible)
+            });
+        let support_reconstruction_holds = reconstructed_support == divisor.u;
+        if !support_reconstruction_holds {
+            return Err(CoverTransferError::CertificateFailure(
+                "closed-point certificate did not reconstruct the Mumford support",
+            ));
+        }
+
+        let mut components = Vec::with_capacity(factors.len());
+        let mut component_image_sum = BinaryPoint::Infinity;
+        for support in factors {
+            let degree = support
+                .degree()
+                .ok_or(CoverTransferError::CertificateFailure(
+                    "closed-point certificate contains the zero polynomial",
+                ))?;
+            let image = self.pushforward_irreducible_support(&support, &divisor.v)?;
+            component_image_sum = self.target_add(&component_image_sum, &image)?;
+            components.push(ClosedPointPushforwardCertificate {
+                support,
+                degree,
+                image,
+            });
+        }
+        let general_pushforward = self.pushforward_arbitrary_jacobian_class(divisor)?;
+        let component_sum_holds = component_image_sum == general_pushforward;
+        if !component_sum_holds {
+            return Err(CoverTransferError::CertificateFailure(
+                "closed-point component sum differs from the general pushforward",
+            ));
+        }
+        Ok(JacobianPushforwardCertificate {
+            input: divisor.clone(),
+            components,
+            reconstructed_support,
+            component_image_sum,
+            general_pushforward,
+            support_reconstruction_holds,
+            component_sum_holds,
+        })
+    }
+
+    /// Evaluate `e=phi^* phi_*` on an arbitrary reduced class.
+    pub fn elliptic_image_endomorphism(
+        &self,
+        divisor: &MumfordDivisor,
+    ) -> Result<MumfordDivisor, CoverTransferError> {
+        let image = self.pushforward_arbitrary_jacobian_class(divisor)?;
+        self.pullback_point_class(&image)
+    }
+
+    /// Certify `e^2=[3]e` for one arbitrary reduced class.
+    pub fn image_endomorphism_certificate(
+        &self,
+        divisor: &MumfordDivisor,
+    ) -> Result<ImageEndomorphismCertificate, CoverTransferError> {
+        divisor.validate(&self.source)?;
+        let pushforward = self.pushforward_arbitrary_jacobian_class(divisor)?;
+        let endomorphism = self.pullback_point_class(&pushforward)?;
+        let endomorphism_squared = self.elliptic_image_endomorphism(&endomorphism)?;
+        let three_times_endomorphism =
+            endomorphism.try_scalar_mul(&BigUint::from(3u32), &self.source)?;
+        let quadratic_identity_holds = endomorphism_squared == three_times_endomorphism;
+        if !quadratic_identity_holds {
+            return Err(CoverTransferError::CertificateFailure(
+                "elliptic-image endomorphism did not satisfy e^2=[3]e",
+            ));
+        }
+        let pushforward_kernel_member = pushforward == BinaryPoint::Infinity;
+        Ok(ImageEndomorphismCertificate {
+            input: divisor.clone(),
+            pushforward,
+            endomorphism,
+            endomorphism_squared,
+            three_times_endomorphism,
+            quadratic_identity_holds,
+            pushforward_kernel_member,
+        })
+    }
+
+    /// Normalize `e` to the idempotent `[3^-1]e` on declared order-`r`
+    /// torsion and separate image and complementary components.
+    pub fn torsion_projector_certificate(
+        &self,
+        divisor: &MumfordDivisor,
+        order: &BigUint,
+    ) -> Result<TorsionProjectorCertificate, CoverTransferError> {
+        divisor.validate(&self.source)?;
+        if !divisor.try_scalar_mul(order, &self.source)?.is_identity() {
+            return Err(CoverTransferError::DivisorNotInDeclaredTorsion);
+        }
+        let degree_inverse_mod_order = match self.subgroup_transfer_status(order)? {
+            SubgroupTransferStatus::InjectiveIfExactSubgroupOrder {
+                degree_inverse_mod_order,
+                ..
+            } => degree_inverse_mod_order,
+            SubgroupTransferStatus::KernelIntersectionUnresolved { common_factor, .. } => {
+                return Err(CoverTransferError::ProjectorOrderNotCoprime { common_factor });
+            }
+        };
+
+        let endomorphism = self.elliptic_image_endomorphism(divisor)?;
+        let normalized_projection =
+            endomorphism.try_scalar_mul(&degree_inverse_mod_order, &self.source)?;
+        let projection_twice = self
+            .elliptic_image_endomorphism(&normalized_projection)?
+            .try_scalar_mul(&degree_inverse_mod_order, &self.source)?;
+        let projection_is_idempotent = projection_twice == normalized_projection;
+        if !projection_is_idempotent {
+            return Err(CoverTransferError::CertificateFailure(
+                "normalized elliptic-image projector is not idempotent",
+            ));
+        }
+
+        let complementary_component =
+            divisor.try_add(&normalized_projection.try_neg(&self.source)?, &self.source)?;
+        let projected_pushforward =
+            self.pushforward_arbitrary_jacobian_class(&normalized_projection)?;
+        let projected_roundtrip = self.pullback_point_class(&projected_pushforward)?;
+        let three_times_projection =
+            normalized_projection.try_scalar_mul(&BigUint::from(3u32), &self.source)?;
+        let projected_component_is_in_image = projected_roundtrip == three_times_projection;
+        let complementary_component_is_in_pushforward_kernel = self
+            .pushforward_arbitrary_jacobian_class(&complementary_component)?
+            == BinaryPoint::Infinity;
+        let input_is_in_image = &normalized_projection == divisor;
+        let input_is_in_pushforward_kernel =
+            self.pushforward_arbitrary_jacobian_class(divisor)? == BinaryPoint::Infinity;
+        let decomposition_holds = normalized_projection
+            .try_add(&complementary_component, &self.source)?
+            == divisor.clone();
+        if !projected_component_is_in_image
+            || !complementary_component_is_in_pushforward_kernel
+            || !decomposition_holds
+        {
+            return Err(CoverTransferError::CertificateFailure(
+                "normalized projector decomposition certificate failed",
+            ));
+        }
+        Ok(TorsionProjectorCertificate {
+            order: order.clone(),
+            degree_inverse_mod_order,
+            input: divisor.clone(),
+            normalized_projection,
+            complementary_component,
+            projection_is_idempotent,
+            projected_component_is_in_image,
+            complementary_component_is_in_pushforward_kernel,
+            input_is_in_image,
+            input_is_in_pushforward_kernel,
+            decomposition_holds,
+        })
+    }
+
+    fn pushforward_via_residue_fields(
+        &self,
+        divisor: &MumfordDivisor,
+    ) -> Result<BinaryPoint, CoverTransferError> {
+        divisor.validate(&self.source)?;
+        let factors = self.factor_small_support(&divisor.u)?;
+        let mut image = BinaryPoint::Infinity;
+        for factor in factors {
+            let closed_point_image = self.pushforward_irreducible_support(&factor, &divisor.v)?;
+            image = self.target_add(&image, &closed_point_image)?;
+        }
+        Ok(image)
+    }
+
+    fn factor_small_support(
+        &self,
+        polynomial: &F2mPoly,
+    ) -> Result<Vec<F2mPoly>, CoverTransferError> {
+        let mut factors = Vec::new();
+        self.factor_small_support_recursive(polynomial, &mut factors)?;
+        let product = factors
+            .iter()
+            .fold(F2mPoly::one(self.m), |product, factor| {
+                product.mul(factor, &self.irreducible)
+            });
+        if product != *polynomial {
+            return Err(CoverTransferError::CertificateFailure(
+                "small-support factorization did not reconstruct the input",
+            ));
+        }
+        Ok(factors)
+    }
+
+    fn factor_small_support_recursive(
+        &self,
+        polynomial: &F2mPoly,
+        factors: &mut Vec<F2mPoly>,
+    ) -> Result<(), CoverTransferError> {
+        let degree = polynomial
+            .degree()
             .ok_or(CoverTransferError::CertificateFailure(
-                "validated fixed-fixture divisor is absent from the 486-class norm table",
-            ))
+                "cannot factor the zero support polynomial",
+            ))?;
+        if degree == 0 {
+            return Ok(());
+        }
+        if degree == 1 {
+            factors.push(polynomial.clone());
+            return Ok(());
+        }
+        if degree > 3 || polynomial.lead() != F2mElement::one(self.m) {
+            return Err(CoverTransferError::CertificateFailure(
+                "small-support factorization requires a monic polynomial of degree at most three",
+            ));
+        }
+
+        let derivative = formal_derivative_over_base(polynomial);
+        if derivative.is_zero() {
+            let mut square_root_coefficients = Vec::with_capacity(degree / 2 + 1);
+            for exponent in (0..=degree).step_by(2) {
+                square_root_coefficients.push(
+                    polynomial
+                        .coeff(exponent)
+                        .square_k_times(self.m - 1, &self.irreducible),
+                );
+            }
+            let square_root = F2mPoly::from_coeffs(square_root_coefficients, self.m);
+            if square_root.mul(&square_root, &self.irreducible) != *polynomial {
+                return Err(CoverTransferError::CertificateFailure(
+                    "inseparable support square root did not reconstruct the polynomial",
+                ));
+            }
+            let start = factors.len();
+            self.factor_small_support_recursive(&square_root, factors)?;
+            let repeated = factors[start..].to_vec();
+            factors.extend(repeated);
+            return Ok(());
+        }
+
+        let repeated_part = polynomial.gcd(&derivative, &self.irreducible);
+        let repeated_degree = repeated_part.degree().unwrap_or(0);
+        if repeated_degree > 0 && repeated_degree < degree {
+            return self.factor_split_parts(polynomial, &repeated_part, factors);
+        }
+
+        let x = F2mPoly::x(self.m);
+        let mut x_to_q = x.rem(polynomial, &self.irreducible);
+        for _ in 0..self.m {
+            x_to_q = x_to_q.square_mod(polynomial, &self.irreducible);
+        }
+        let rational_part = polynomial.gcd(&x_to_q.add(&x), &self.irreducible);
+        let rational_degree = rational_part.degree().unwrap_or(0);
+        if rational_degree == 0 {
+            factors.push(polynomial.clone());
+            return Ok(());
+        }
+        if rational_degree < degree {
+            return self.factor_split_parts(polynomial, &rational_part, factors);
+        }
+
+        // Absolute traces Tr(c*x) separate distinct rational roots because
+        // the finite-field trace pairing is nondegenerate.
+        for bit in 0..self.m {
+            let coefficient = F2mElement::from_bit_positions(&[bit], self.m);
+            let mut conjugate = x
+                .scalar_mul(&coefficient, &self.irreducible)
+                .rem(polynomial, &self.irreducible);
+            let mut trace = F2mPoly::zero(self.m);
+            for _ in 0..self.m {
+                trace = trace.add(&conjugate);
+                conjugate = conjugate.square_mod(polynomial, &self.irreducible);
+            }
+            let split = polynomial.gcd(&trace, &self.irreducible);
+            let split_degree = split.degree().unwrap_or(0);
+            if split_degree > 0 && split_degree < degree {
+                return self.factor_split_parts(polynomial, &split, factors);
+            }
+        }
+        Err(CoverTransferError::CertificateFailure(
+            "absolute-trace factorization did not split rational support",
+        ))
+    }
+
+    fn factor_split_parts(
+        &self,
+        polynomial: &F2mPoly,
+        factor: &F2mPoly,
+        factors: &mut Vec<F2mPoly>,
+    ) -> Result<(), CoverTransferError> {
+        let (quotient, remainder) = polynomial.divrem(factor, &self.irreducible);
+        if !remainder.is_zero() || quotient.is_zero() {
+            return Err(CoverTransferError::CertificateFailure(
+                "small-support factor division was not exact",
+            ));
+        }
+        self.factor_small_support_recursive(factor, factors)?;
+        self.factor_small_support_recursive(&quotient, factors)
+    }
+
+    fn pushforward_irreducible_support(
+        &self,
+        factor: &F2mPoly,
+        source_v: &F2mPoly,
+    ) -> Result<BinaryPoint, CoverTransferError> {
+        let degree = factor
+            .degree()
+            .ok_or(CoverTransferError::CertificateFailure(
+                "zero residue-field modulus",
+            ))?;
+        if degree == 1 {
+            let u = factor.coeff(0);
+            let v = source_v.eval(&u, &self.irreducible);
+            return self.map_point(&BinaryCoverPoint::Affine { u, v });
+        }
+        if !(2..=3).contains(&degree) {
+            return Err(CoverTransferError::CertificateFailure(
+                "residue-field support degree exceeds three",
+            ));
+        }
+
+        let t = F2mPoly::x(self.m).rem(factor, &self.irreducible);
+        let t_squared = self.extension_mul(&t, &t, factor);
+        let x = self.extension_mul(&t_squared, &t, factor);
+        let v = source_v.rem(factor, &self.irreducible);
+        let y = self
+            .extension_mul(&t, &v, factor)
+            .add(&F2mPoly::constant(self.d.clone()))
+            .rem(factor, &self.irreducible);
+        let point = ExtensionPoint::Affine { x, y };
+        if !self.extension_target_is_on_curve(&point, factor) {
+            return Err(CoverTransferError::CertificateFailure(
+                "residue-field image is not on the elliptic target",
+            ));
+        }
+
+        let mut trace = ExtensionPoint::Infinity;
+        let mut conjugate = point.clone();
+        for _ in 0..degree {
+            trace = self.extension_target_add(&trace, &conjugate, factor)?;
+            conjugate = self.extension_point_frobenius_q(&conjugate, factor);
+        }
+        if conjugate != point {
+            return Err(CoverTransferError::CertificateFailure(
+                "residue-field Frobenius orbit did not close",
+            ));
+        }
+        if self.extension_point_frobenius_q(&trace, factor) != trace {
+            return Err(CoverTransferError::CertificateFailure(
+                "closed-point trace did not descend to the base field",
+            ));
+        }
+        self.extension_point_to_base(&trace)
+    }
+
+    fn extension_mul(&self, left: &F2mPoly, right: &F2mPoly, modulus: &F2mPoly) -> F2mPoly {
+        left.mul(right, &self.irreducible)
+            .rem(modulus, &self.irreducible)
+    }
+
+    fn extension_inverse(
+        &self,
+        value: &F2mPoly,
+        modulus: &F2mPoly,
+    ) -> Result<F2mPoly, CoverTransferError> {
+        let (gcd, coefficient, _) = value.ext_gcd(modulus, &self.irreducible);
+        if gcd != F2mPoly::one(self.m) {
+            return Err(CoverTransferError::CertificateFailure(
+                "nonzero residue-field denominator is not invertible",
+            ));
+        }
+        Ok(coefficient.rem(modulus, &self.irreducible))
+    }
+
+    fn extension_target_is_on_curve(&self, point: &ExtensionPoint, modulus: &F2mPoly) -> bool {
+        let ExtensionPoint::Affine { x, y } = point else {
+            return true;
+        };
+        let y_squared = self.extension_mul(y, y, modulus);
+        let xy = self.extension_mul(x, y, modulus);
+        let x_squared = self.extension_mul(x, x, modulus);
+        let x_cubed = self.extension_mul(&x_squared, x, modulus);
+        let a_x_squared =
+            self.extension_mul(&F2mPoly::constant(self.a.clone()), &x_squared, modulus);
+        let lhs = y_squared.add(&xy).rem(modulus, &self.irreducible);
+        let rhs = x_cubed
+            .add(&a_x_squared)
+            .add(&F2mPoly::constant(self.b.clone()))
+            .rem(modulus, &self.irreducible);
+        lhs == rhs
+    }
+
+    fn extension_target_add(
+        &self,
+        left: &ExtensionPoint,
+        right: &ExtensionPoint,
+        modulus: &F2mPoly,
+    ) -> Result<ExtensionPoint, CoverTransferError> {
+        if !self.extension_target_is_on_curve(left, modulus)
+            || !self.extension_target_is_on_curve(right, modulus)
+        {
+            return Err(CoverTransferError::CertificateFailure(
+                "residue-field target addition received an off-curve point",
+            ));
+        }
+        let result = match (left, right) {
+            (ExtensionPoint::Infinity, point) | (point, ExtensionPoint::Infinity) => point.clone(),
+            (ExtensionPoint::Affine { x: x1, y: y1 }, ExtensionPoint::Affine { x: x2, y: y2 }) => {
+                if x1 == x2 {
+                    if y1.add(y2) == *x1 || x1.is_zero() {
+                        ExtensionPoint::Infinity
+                    } else {
+                        let inverse = self.extension_inverse(x1, modulus)?;
+                        let lambda = x1.add(&self.extension_mul(y1, &inverse, modulus));
+                        let x3 = self
+                            .extension_mul(&lambda, &lambda, modulus)
+                            .add(&lambda)
+                            .add(&F2mPoly::constant(self.a.clone()))
+                            .rem(modulus, &self.irreducible);
+                        let lambda_plus_one = lambda.add(&F2mPoly::one(self.m));
+                        let y3 = self
+                            .extension_mul(x1, x1, modulus)
+                            .add(&self.extension_mul(&lambda_plus_one, &x3, modulus))
+                            .rem(modulus, &self.irreducible);
+                        ExtensionPoint::Affine { x: x3, y: y3 }
+                    }
+                } else {
+                    let denominator = x1.add(x2).rem(modulus, &self.irreducible);
+                    let inverse = self.extension_inverse(&denominator, modulus)?;
+                    let lambda = self.extension_mul(&y1.add(y2), &inverse, modulus);
+                    let x3 = self
+                        .extension_mul(&lambda, &lambda, modulus)
+                        .add(&lambda)
+                        .add(x1)
+                        .add(x2)
+                        .add(&F2mPoly::constant(self.a.clone()))
+                        .rem(modulus, &self.irreducible);
+                    let y3 = self
+                        .extension_mul(&lambda, &x1.add(&x3), modulus)
+                        .add(&x3)
+                        .add(y1)
+                        .rem(modulus, &self.irreducible);
+                    ExtensionPoint::Affine { x: x3, y: y3 }
+                }
+            }
+        };
+        if !self.extension_target_is_on_curve(&result, modulus) {
+            return Err(CoverTransferError::CertificateFailure(
+                "residue-field target addition left the curve",
+            ));
+        }
+        Ok(result)
+    }
+
+    fn extension_point_frobenius_q(
+        &self,
+        point: &ExtensionPoint,
+        modulus: &F2mPoly,
+    ) -> ExtensionPoint {
+        let frobenius = |value: &F2mPoly| {
+            let mut result = value.clone();
+            for _ in 0..self.m {
+                result = result.square_mod(modulus, &self.irreducible);
+            }
+            result
+        };
+        match point {
+            ExtensionPoint::Infinity => ExtensionPoint::Infinity,
+            ExtensionPoint::Affine { x, y } => ExtensionPoint::Affine {
+                x: frobenius(x),
+                y: frobenius(y),
+            },
+        }
+    }
+
+    fn extension_point_to_base(
+        &self,
+        point: &ExtensionPoint,
+    ) -> Result<BinaryPoint, CoverTransferError> {
+        let base_coordinate = |value: &F2mPoly| match value.degree() {
+            None => Ok(F2mElement::zero(self.m)),
+            Some(0) => Ok(value.coeff(0)),
+            Some(_) => Err(CoverTransferError::CertificateFailure(
+                "Frobenius-fixed residue-field coordinate is not constant",
+            )),
+        };
+        let result = match point {
+            ExtensionPoint::Infinity => BinaryPoint::Infinity,
+            ExtensionPoint::Affine { x, y } => BinaryPoint::Affine {
+                x: base_coordinate(x)?,
+                y: base_coordinate(y)?,
+            },
+        };
+        if !self.target_is_on_curve(&result) {
+            return Err(CoverTransferError::CertificateFailure(
+                "descended closed-point trace is not on the target",
+            ));
+        }
+        Ok(result)
     }
 
     fn is_fixed_f8_norm_fixture(&self) -> bool {
@@ -875,6 +1535,12 @@ impl OrdinaryBinaryCover {
             for (b_multiple, image_b_multiple) in b_multiples.iter().zip(image_b_multiples.iter()) {
                 let divisor = a_multiple.try_add(b_multiple, &self.source)?;
                 let image = self.target_add(image_a_multiple, image_b_multiple)?;
+                let residue_field_image = self.pushforward_via_residue_fields(&divisor)?;
+                if residue_field_image != image {
+                    return Err(CoverTransferError::CertificateFailure(
+                        "residue-field norm disagrees with the independent fixed F8 presentation",
+                    ));
+                }
                 let key = fixed_f8_divisor_key(&divisor);
                 if let Some(previous) = images.insert(key, image.clone()) {
                     if previous != image {
@@ -999,6 +1665,15 @@ impl OrdinaryBinaryCover {
         }
         Ok(result)
     }
+}
+
+fn formal_derivative_over_base(polynomial: &F2mPoly) -> F2mPoly {
+    let mut coefficients =
+        vec![F2mElement::zero(polynomial.m); polynomial.coeffs.len().saturating_sub(1)];
+    for degree in (1..polynomial.coeffs.len()).step_by(2) {
+        coefficients[degree - 1] = polynomial.coeffs[degree].clone();
+    }
+    F2mPoly::from_coeffs(coefficients, polynomial.m)
 }
 
 fn fixed_f8_divisor_key(divisor: &MumfordDivisor) -> FixedF8DivisorKey {
@@ -1173,6 +1848,13 @@ mod tests {
         OrdinaryBinaryCover::new(3, f8_modulus(), elt(a), elt(b)).unwrap()
     }
 
+    fn point_one_zero(m: u32) -> BinaryPoint {
+        BinaryPoint::Affine {
+            x: F2mElement::one(m),
+            y: F2mElement::zero(m),
+        }
+    }
+
     fn coefficients_from_code(mut code: usize, length: usize) -> Vec<F2mElement> {
         (0..length)
             .map(|_| {
@@ -1209,6 +1891,68 @@ mod tests {
             }
         }
         divisors
+    }
+
+    #[test]
+    fn closed_point_pullback_certificate_detects_odd_and_even_fiber_splitting() {
+        let odd = cover(0, 1);
+        let odd_certificate = odd
+            .pullback_closed_point_certificate(&point_one_zero(3))
+            .unwrap();
+        let mut odd_degrees: Vec<_> = odd_certificate
+            .components
+            .iter()
+            .map(|component| component.degree)
+            .collect();
+        odd_degrees.sort_unstable();
+        assert_eq!(odd_degrees, vec![1, 2]);
+        assert_eq!(odd_certificate.reduced_support_degree, 3);
+        assert!(odd_certificate.every_component_is_degree_times_input);
+        assert!(odd_certificate.total_matches_three_times_input);
+
+        let even = OrdinaryBinaryCover::new(
+            2,
+            IrreduciblePoly {
+                degree: 2,
+                low_terms: vec![0, 1],
+            },
+            F2mElement::zero(2),
+            F2mElement::one(2),
+        )
+        .unwrap();
+        let even_certificate = even
+            .pullback_closed_point_certificate(&point_one_zero(2))
+            .unwrap();
+        let mut even_degrees: Vec<_> = even_certificate
+            .components
+            .iter()
+            .map(|component| component.degree)
+            .collect();
+        even_degrees.sort_unstable();
+        assert_eq!(even_degrees, vec![1, 1, 1]);
+        assert_eq!(even_certificate.reduced_support_degree, 3);
+        assert!(even_certificate.every_component_is_degree_times_input);
+        assert!(even_certificate.total_matches_three_times_input);
+    }
+
+    #[test]
+    fn closed_point_pullback_certificate_keeps_ramification_separate() {
+        let c = cover(0, 1);
+        let ramified = BinaryPoint::Affine {
+            x: F2mElement::zero(3),
+            y: F2mElement::one(3),
+        };
+        let certificate = c.pullback_closed_point_certificate(&ramified).unwrap();
+        assert_eq!(certificate.reduced_support_degree, 1);
+        assert_eq!(certificate.components.len(), 1);
+        assert!(matches!(
+            certificate.fiber_kind,
+            PullbackFiberKind::ExceptionalTwoTorsionRamified {
+                ramification_index: 3
+            }
+        ));
+        assert!(certificate.every_component_is_degree_times_input);
+        assert!(certificate.total_matches_three_times_input);
     }
 
     fn target_point(x: u32, y: u32) -> BinaryPoint {
@@ -1397,7 +2141,7 @@ mod tests {
     }
 
     #[test]
-    fn subgroup_status_and_arbitrary_pushforward_boundary() {
+    fn subgroup_status_general_pushforward_and_projector() {
         let c = cover(0, 1);
         assert_eq!(
             c.subgroup_transfer_status(&BigUint::from(7u32)).unwrap(),
@@ -1419,10 +2163,8 @@ mod tests {
         );
         let id = MumfordDivisor::identity(3);
         assert_eq!(
-            c.pushforward_arbitrary_jacobian_class(&id).unwrap_err(),
-            CoverTransferError::Unsupported(
-                UnsupportedCoverOperation::ArbitraryJacobianPushforward
-            )
+            c.pushforward_arbitrary_jacobian_class(&id).unwrap(),
+            BinaryPoint::Infinity
         );
 
         // Exact EC1/ICV1 catalog fixture:
@@ -1474,6 +2216,31 @@ mod tests {
                 .unwrap(),
             generator
         );
+        let endomorphism = catalog.image_endomorphism_certificate(&image).unwrap();
+        assert!(endomorphism.quadratic_identity_holds);
+        assert_eq!(endomorphism.pushforward, composition.formal_pushforward);
+        assert!(!endomorphism.pushforward_kernel_member);
+        let projector = catalog
+            .torsion_projector_certificate(&image, &BigUint::from(29u32))
+            .unwrap();
+        assert_eq!(projector.degree_inverse_mod_order, BigUint::from(10u32));
+        assert_eq!(projector.normalized_projection, image);
+        assert!(projector.complementary_component.is_identity());
+        assert!(projector.projection_is_idempotent);
+        assert!(projector.projected_component_is_in_image);
+        assert!(projector.complementary_component_is_in_pushforward_kernel);
+        assert!(projector.input_is_in_image);
+        assert!(!projector.input_is_in_pushforward_kernel);
+        assert!(projector.decomposition_holds);
+        assert_eq!(
+            catalog.torsion_projector_certificate(&image, &BigUint::from(2u32)),
+            Err(CoverTransferError::DivisorNotInDeclaredTorsion)
+        );
+        assert_eq!(
+            catalog
+                .torsion_projector_certificate(&MumfordDivisor::identity(7), &BigUint::from(3u32),),
+            Err(CoverTransferError::ProjectorOrderNotCoprime { common_factor: 3 })
+        );
 
         // Both named destination solvers operate on the pulled-back
         // Jacobian image, receive no planted logarithm, and verify their
@@ -1514,6 +2281,102 @@ mod tests {
     }
 
     #[test]
+    fn n83_prym_point_counts_and_order_factors_are_coprime_to_r() {
+        fn counts(degree: u32, low_terms: Vec<u32>) -> (u64, u64) {
+            let cover = OrdinaryBinaryCover::new(
+                degree,
+                IrreduciblePoly { degree, low_terms },
+                F2mElement::zero(degree),
+                F2mElement::one(degree),
+            )
+            .unwrap();
+            let mut elliptic = 1u64;
+            let mut genus_three = 1u64;
+            for x in 0..(1u32 << degree) {
+                for y in 0..(1u32 << degree) {
+                    let x = F2mElement::from_biguint(&BigUint::from(x), degree);
+                    let y = F2mElement::from_biguint(&BigUint::from(y), degree);
+                    if cover.target_is_on_curve(&BinaryPoint::Affine {
+                        x: x.clone(),
+                        y: y.clone(),
+                    }) {
+                        elliptic += 1;
+                    }
+                    if cover.source_is_on_curve(&BinaryCoverPoint::Affine { u: x, v: y }) {
+                        genus_three += 1;
+                    }
+                }
+            }
+            (elliptic, genus_three)
+        }
+
+        fn gcd(mut left: BigUint, mut right: BigUint) -> BigUint {
+            while !right.is_zero() {
+                let remainder = &left % &right;
+                left = right;
+                right = remainder;
+            }
+            left
+        }
+
+        assert_eq!(counts(1, vec![0]), (4, 4));
+        assert_eq!(counts(2, vec![0, 1]), (8, 8));
+        assert_eq!(counts(3, vec![0, 1]), (4, 4));
+
+        let q = BigUint::one() << 83usize;
+        let trace = BigUint::one() << 42usize;
+        let r = BigUint::parse_bytes(b"2417851639230796216685689", 10).unwrap();
+        let factor_plus_order = &q + 1u32 - &trace;
+        let factor_minus_order = &q + 1u32 + &trace;
+        let prym_order = &q * &q + 1u32;
+        assert_eq!(&factor_plus_order * &factor_minus_order, prym_order);
+        assert_eq!(gcd(r.clone(), factor_plus_order), BigUint::one());
+        assert_eq!(gcd(r.clone(), factor_minus_order), BigUint::one());
+        assert_eq!(gcd(r.clone(), prym_order), BigUint::one());
+        assert_eq!(&q + 1u32 + BigUint::from(6_151_469_093_347u64), r * 4u32);
+    }
+
+    #[test]
+    fn n83_general_norm_and_r_torsion_projector_replay() {
+        let cover = OrdinaryBinaryCover::new(
+            83,
+            IrreduciblePoly {
+                degree: 83,
+                low_terms: vec![0, 1, 2, 45],
+            },
+            F2mElement::zero(83),
+            F2mElement::one(83),
+        )
+        .unwrap();
+        let generator = BinaryPoint::Affine {
+            x: F2mElement::from_hex("477f77103dfad59850800", 83),
+            y: F2mElement::from_hex("2fa5e737d542c4e4fd5c3", 83),
+        };
+        let order = BigUint::parse_bytes(b"2417851639230796216685689", 10).unwrap();
+        let image = cover.pullback_point_class(&generator).unwrap();
+        assert!(image
+            .try_scalar_mul(&order, cover.source_curve())
+            .unwrap()
+            .is_identity());
+
+        let general_pushforward = cover.pushforward_arbitrary_jacobian_class(&image).unwrap();
+        let typed = cover.pull_push_composition_certificate(&generator).unwrap();
+        assert_eq!(general_pushforward, typed.formal_pushforward);
+        assert!(typed.identity_holds);
+
+        let endomorphism = cover.image_endomorphism_certificate(&image).unwrap();
+        assert!(endomorphism.quadratic_identity_holds);
+        let projector = cover.torsion_projector_certificate(&image, &order).unwrap();
+        assert!(projector.projection_is_idempotent);
+        assert!(projector.projected_component_is_in_image);
+        assert!(projector.complementary_component_is_in_pushforward_kernel);
+        assert!(projector.input_is_in_image);
+        assert!(!projector.input_is_in_pushforward_kernel);
+        assert!(projector.complementary_component.is_identity());
+        assert!(projector.decomposition_holds);
+    }
+
+    #[test]
     fn fixed_f8_arbitrary_pushforward_is_complete_and_homomorphic() {
         let c = cover(1, 3);
         let divisors = all_fixed_f8_reduced_divisors(c.source_curve());
@@ -1548,6 +2411,7 @@ mod tests {
         );
         let mut fiber_sizes = [0usize; 6];
         let mut images = Vec::with_capacity(divisors.len());
+        let mut kernel_size = 0usize;
         for divisor in &divisors {
             let image = c.pushforward_arbitrary_jacobian_class(divisor).unwrap();
             assert!(c.target_is_on_curve(&image));
@@ -1563,9 +2427,15 @@ mod tests {
                 c.target_add(&image, &inverse_image).unwrap(),
                 BinaryPoint::Infinity
             );
+            let endomorphism = c.image_endomorphism_certificate(divisor).unwrap();
+            assert!(endomorphism.quadratic_identity_holds);
+            if endomorphism.pushforward_kernel_member {
+                kernel_size += 1;
+            }
             images.push(image);
         }
         assert_eq!(fiber_sizes, [81; 6]);
+        assert_eq!(kernel_size, 81);
 
         for (left_index, left) in divisors.iter().enumerate() {
             for (right_index, right) in divisors.iter().enumerate() {
@@ -1664,7 +2534,7 @@ mod tests {
     }
 
     #[test]
-    fn arbitrary_pushforward_rejects_malformed_and_unsupported_inputs() {
+    fn arbitrary_pushforward_rejects_malformed_inputs_and_accepts_all_models() {
         let c = cover(1, 3);
         let identity = MumfordDivisor::identity(3);
         let zero_u = MumfordDivisor {
@@ -1707,15 +2577,12 @@ mod tests {
 
         for a in 0..8 {
             for b in 1..8 {
-                if (a, b) == (1, 3) {
-                    continue;
-                }
                 assert_eq!(
-                    cover(a, b).pushforward_arbitrary_jacobian_class(&identity),
-                    Err(CoverTransferError::Unsupported(
-                        UnsupportedCoverOperation::ArbitraryJacobianPushforward
-                    )),
-                    "model a={a}, b={b} must remain outside the bounded fixture"
+                    cover(a, b)
+                        .pushforward_arbitrary_jacobian_class(&identity)
+                        .unwrap(),
+                    BinaryPoint::Infinity,
+                    "model a={a}, b={b} must accept the identity"
                 );
             }
         }
@@ -1730,10 +2597,10 @@ mod tests {
         )
         .unwrap();
         assert_eq!(
-            other_basis.pushforward_arbitrary_jacobian_class(&identity),
-            Err(CoverTransferError::Unsupported(
-                UnsupportedCoverOperation::ArbitraryJacobianPushforward
-            ))
+            other_basis
+                .pushforward_arbitrary_jacobian_class(&identity)
+                .unwrap(),
+            BinaryPoint::Infinity
         );
     }
 

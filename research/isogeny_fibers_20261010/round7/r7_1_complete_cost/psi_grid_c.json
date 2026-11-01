@@ -1,0 +1,130 @@
+{
+  "argv": [
+    "/tmp/claude-0/-home-user/717e4727-b5a7-5b25-924a-7b31edb43331/scratchpad/r71_bin",
+    "psi",
+    "109,131",
+    "100000",
+    "research/isogeny_fibers_20261010/round7/r7_1_complete_cost/psi_grid_c.json"
+  ],
+  "arithmetic": "PolyMul::Auto; remainders by MonicDivisor (Newton); gcd and exact division schoolbook; CZ exponentiation 4-bit fixed window; x^(p^k) by square-and-multiply with x-multiplications as shifts",
+  "field_bits": 61,
+  "mode": "psi",
+  "rows": [
+    {
+      "asc": {
+        "cz_splits": 0,
+        "find": {
+          "A": 319679303,
+          "I": 5896,
+          "M": 280185865,
+          "Meq": 10481035673,
+          "W": 10200313272,
+          "WA": 18458948542
+        },
+        "frobenius_gcd_degree": 54,
+        "psi": {
+          "A": 1908759,
+          "I": 3,
+          "M": 1427258,
+          "Meq": 4674413,
+          "W": 3246882,
+          "WA": 5835485
+        },
+        "wall_s_contended": 155.613238522
+      },
+      "asc_reaches_crater": true,
+      "checks": [
+        "desc_images_order_N",
+        "lib_verify_kernel_desc",
+        "asc_reaches_crater_images_order_N",
+        "lib_verify_kernel_asc"
+      ],
+      "chi_m7": 1,
+      "crater_j": 2037277396452347042,
+      "desc": {
+        "cz_splits": 7,
+        "find": {
+          "A": 2435798986,
+          "I": 4941,
+          "M": 1798890444,
+          "Meq": 23535481839,
+          "W": 21736141764,
+          "WA": 39320661178
+        },
+        "horizontal_retries": 0,
+        "psi": {
+          "A": 1908759,
+          "I": 3,
+          "M": 1427258,
+          "Meq": 4674413,
+          "W": 3246882,
+          "WA": 5835474
+        },
+        "wall_s_contended": 344.912910634
+      },
+      "ell": 109,
+      "floor_j": 103543245931214726,
+      "k": 54,
+      "p": 2037277396452350417
+    },
+    {
+      "asc": {
+        "cz_splits": 0,
+        "find": {
+          "A": 564412265,
+          "I": 8525,
+          "M": 496254606,
+          "Meq": 25971759893,
+          "W": 25474729512,
+          "WA": 46952545569
+        },
+        "frobenius_gcd_degree": 65,
+        "psi": {
+          "A": 2868633,
+          "I": 3,
+          "M": 2048841,
+          "Meq": 7562640,
+          "W": 5513526,
+          "WA": 9989253
+        },
+        "wall_s_contended": 491.011173258
+      },
+      "asc_reaches_crater": true,
+      "checks": [
+        "desc_images_order_N",
+        "lib_verify_kernel_desc",
+        "asc_reaches_crater_images_order_N",
+        "lib_verify_kernel_asc"
+      ],
+      "chi_m7": -1,
+      "crater_j": 1561706451657183952,
+      "desc": {
+        "cz_splits": 6,
+        "find": {
+          "A": 2319801941,
+          "I": 8085,
+          "M": 1759877053,
+          "Meq": 58154759722,
+          "W": 56394146934,
+          "WA": 103643673072
+        },
+        "horizontal_retries": 0,
+        "psi": {
+          "A": 2868633,
+          "I": 3,
+          "M": 2048841,
+          "Meq": 7562640,
+          "W": 5513526,
+          "WA": 9989285
+        },
+        "wall_s_contended": 1455.204873408
+      },
+      "ell": 131,
+      "floor_j": 1098603012958861991,
+      "k": 65,
+      "p": 1561706451657187327
+    }
+  ],
+  "total_wall_s_contended": 2448.127460857,
+  "unit": "M = F_p mults+squarings (incl. schoolbook/Karatsuba coefficient products); W = word mults mod 62-bit NTT primes, counted as 1 M; I = F_p inversions; Meq = M + W + 91 I (R6.4's unit); A = F_p additions/subtractions/negations incl. fused schoolbook accumulations and the two u128 accumulations per NTT output coefficient; WA = additions/subtractions mod the NTT primes; cost(a) = Meq + a (A + WA)"
+}

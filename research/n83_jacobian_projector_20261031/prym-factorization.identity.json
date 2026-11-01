@@ -1,0 +1,199 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h0ec3d37bcb6795db",
+  "statement": {
+    "name": "Prym quartic factor expansion",
+    "source": "research/n83_jacobian_projector_20261031; direct integer polynomial expansion",
+    "variables": [
+      "x",
+      "a",
+      "q"
+    ],
+    "degree_bound": 4,
+    "lhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x"
+                },
+                {
+                  "op": "var",
+                  "args": "x"
+                }
+              ]
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "a"
+                  },
+                  {
+                    "op": "var",
+                    "args": "x"
+                  }
+                ]
+              }
+            },
+            {
+              "op": "var",
+              "args": "q"
+            }
+          ]
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x"
+                },
+                {
+                  "op": "var",
+                  "args": "x"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "a"
+                },
+                {
+                  "op": "var",
+                  "args": "x"
+                }
+              ]
+            },
+            {
+              "op": "var",
+              "args": "q"
+            }
+          ]
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x"
+                },
+                {
+                  "op": "var",
+                  "args": "x"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x"
+                },
+                {
+                  "op": "var",
+                  "args": "x"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "const",
+                      "args": 2
+                    },
+                    {
+                      "op": "var",
+                      "args": "q"
+                    }
+                  ]
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "a"
+                      },
+                      {
+                        "op": "var",
+                        "args": "a"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x"
+                },
+                {
+                  "op": "var",
+                  "args": "x"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "q"
+            },
+            {
+              "op": "var",
+              "args": "q"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 33539,
+  "value_digest": "1a5b80851f6e23e4b97dd42f48085741a2f11f945bf9b4f45e4df90f06647aa7",
+  "independence": "issued by deterministic schema replay; checked by the repository native checker; Lean ring proof is a separate artifact",
+  "proof": null
+}

@@ -1,0 +1,502 @@
+{
+ "schema": "replay-certificate/v1",
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "date": "2026-11-01T02:38Z",
+ "verifier": "Validator subagent (Sonnet 5.5); did not produce the data or the analysis scripts; replay seed chosen by the validator",
+ "subject": "research/ic_residual_dp_eq_20261101 sessions E-p36 and E-p37 (priced DP residual collectors)",
+ "freeze_commit": "0fb916d99fae2110c5ebb74ad1dcb993ca11ba43",
+ "repository_head_at_validation": "f6251c72b331327323a89a0e13358d4b7d1c3b3d",
+ "binary": {
+  "path": "target/release/ecbench",
+  "sha256": "f3b452d683f8abb098bc1ddd2b4bea315ffede5f25338c2521478f38fcb52e77",
+  "mtime_utc": "2026-11-01T01:12:13Z",
+  "equals_binary_recorded_in_both_sessions": true,
+  "note": "This is the binary that produced the sessions (session.json binary_sha256), not a rebuild from the current branch head: src/cryptanalysis/{ecbench/{compare,methods}.rs, ic_framework/{mod,plugins,stages}.rs} changed after the freeze commit via merges. Replay therefore shows the recorded binary reproduces its own records; it does not show the current head does."
+ },
+ "runs": [
+  {
+   "session_id": "ECBS1h0810c0a2e607",
+   "label": "E-p36 nonce-drawn sample",
+   "session_dir": "research/ic_residual_dp_eq_20261101/sessions/E-p36",
+   "records": 704,
+   "verified_records": 704,
+   "records_sha256": "12a1fc4ba79db69092c6a2c7deae733ca7e074ae107399947760ebd668f4dd33",
+   "replay_selection": "sample",
+   "replay_candidates": 528,
+   "replay_count": 24,
+   "replays_reproduced_identical": 24,
+   "replay_seed": 102056928696331,
+   "nonce_note": "auditor-chosen seed drawn from /dev/urandom by the validator before any replay; same seed on the same session draws the same runs",
+   "arms_covered": {
+    "res1": 2,
+    "res1dp": 2,
+    "res1eq": 1,
+    "res2": 4,
+    "res2aa": 2,
+    "res2dp": 1,
+    "res2eq": 3,
+    "res4": 2,
+    "res4eq": 1,
+    "rho": 6
+   },
+   "audit_checks_all_true": true,
+   "audit_problems": [],
+   "audit_ok": true,
+   "binary_sha256": "f3b452d683f8abb098bc1ddd2b4bea315ffede5f25338c2521478f38fcb52e77",
+   "binary_matches_session_binary": true,
+   "env_class_id": "ECBENV3h7e8286bea20e",
+   "hardware_class_id": "ECBHW1h81c2f17c5afa",
+   "command": "./target/release/ecbench verify --dir research/ic_residual_dp_eq_20261101/sessions/E-p36 --replay 24 --replay-seed 102056928696331 --out receipt-E-p36.json",
+   "receipt_file_sha256": "361b09e15e3e742286bd0c551c125f7c88710c54d1c6e86b6d21661716ae1bcf",
+   "receipt_sha256_printed": "361b09e15e3e742286bd0c551c125f7c88710c54d1c6e86b6d21661716ae1bcf",
+   "audit_line": "audit OK: 704 records, 704 verified, 24 replays reproduced, 0 problems",
+   "audited_unix_ms": 1793500138699,
+   "replayed_records": [
+    {
+     "seq": 180,
+     "record_id": "ECR1h59fd7048efca",
+     "arm": "res2",
+     "detail": "identical"
+    },
+    {
+     "seq": 198,
+     "record_id": "ECR1h64f9f35e60e7",
+     "arm": "rho",
+     "detail": "identical"
+    },
+    {
+     "seq": 236,
+     "record_id": "ECR1h58822a99e22c",
+     "arm": "res2dp",
+     "detail": "identical"
+    },
+    {
+     "seq": 237,
+     "record_id": "ECR1h92f080d48f7d",
+     "arm": "res2eq",
+     "detail": "identical"
+    },
+    {
+     "seq": 257,
+     "record_id": "ECR1hd987e5971925",
+     "arm": "res2",
+     "detail": "identical"
+    },
+    {
+     "seq": 318,
+     "record_id": "ECR1hb5edd2219c29",
+     "arm": "res2aa",
+     "detail": "identical"
+    },
+    {
+     "seq": 319,
+     "record_id": "ECR1hc572646c4b50",
+     "arm": "rho",
+     "detail": "identical"
+    },
+    {
+     "seq": 321,
+     "record_id": "ECR1h5ed4dcb20b70",
+     "arm": "res1dp",
+     "detail": "identical"
+    },
+    {
+     "seq": 347,
+     "record_id": "ECR1h2900ff2df913",
+     "arm": "res2eq",
+     "detail": "identical"
+    },
+    {
+     "seq": 358,
+     "record_id": "ECR1ha9ab69a0901c",
+     "arm": "res2",
+     "detail": "identical"
+    },
+    {
+     "seq": 377,
+     "record_id": "ECR1h43532a3cc4c4",
+     "arm": "res4",
+     "detail": "identical"
+    },
+    {
+     "seq": 426,
+     "record_id": "ECR1h94f3e8f1a1a9",
+     "arm": "res1dp",
+     "detail": "identical"
+    },
+    {
+     "seq": 494,
+     "record_id": "ECR1hae1d7cb59716",
+     "arm": "rho",
+     "detail": "identical"
+    },
+    {
+     "seq": 502,
+     "record_id": "ECR1h0a42a40313de",
+     "arm": "res1eq",
+     "detail": "identical"
+    },
+    {
+     "seq": 510,
+     "record_id": "ECR1hb56a3501b843",
+     "arm": "res2eq",
+     "detail": "identical"
+    },
+    {
+     "seq": 515,
+     "record_id": "ECR1he7013bdeb55f",
+     "arm": "res1",
+     "detail": "identical"
+    },
+    {
+     "seq": 517,
+     "record_id": "ECR1h4e4524d607a5",
+     "arm": "res2aa",
+     "detail": "identical"
+    },
+    {
+     "seq": 520,
+     "record_id": "ECR1h0628baa508c5",
+     "arm": "res4",
+     "detail": "identical"
+    },
+    {
+     "seq": 559,
+     "record_id": "ECR1h209845594fe1",
+     "arm": "res4eq",
+     "detail": "identical"
+    },
+    {
+     "seq": 576,
+     "record_id": "ECR1hfe19961bc1ad",
+     "arm": "res2",
+     "detail": "identical"
+    },
+    {
+     "seq": 583,
+     "record_id": "ECR1h1c5179d7599a",
+     "arm": "rho",
+     "detail": "identical"
+    },
+    {
+     "seq": 594,
+     "record_id": "ECR1h15645f1f5719",
+     "arm": "rho",
+     "detail": "identical"
+    },
+    {
+     "seq": 595,
+     "record_id": "ECR1h6c9c34598727",
+     "arm": "res1",
+     "detail": "identical"
+    },
+    {
+     "seq": 605,
+     "record_id": "ECR1h0dd0ecf3124d",
+     "arm": "rho",
+     "detail": "identical"
+    }
+   ]
+  },
+  {
+   "session_id": "ECBS1h0810c0a2e607",
+   "label": "E-p36 replay-all",
+   "session_dir": "research/ic_residual_dp_eq_20261101/sessions/E-p36",
+   "records": 704,
+   "verified_records": 704,
+   "records_sha256": "12a1fc4ba79db69092c6a2c7deae733ca7e074ae107399947760ebd668f4dd33",
+   "replay_selection": "all",
+   "replay_candidates": 528,
+   "replay_count": 528,
+   "replays_reproduced_identical": 528,
+   "replay_seed": null,
+   "nonce_note": "every measured deterministic run re-executed; no sampling",
+   "arms_covered": {
+    "res1": 48,
+    "res1dp": 48,
+    "res1eq": 48,
+    "res2": 48,
+    "res2aa": 48,
+    "res2dp": 48,
+    "res2eq": 48,
+    "res4": 48,
+    "res4dp": 48,
+    "res4eq": 48,
+    "rho": 48
+   },
+   "audit_checks_all_true": true,
+   "audit_problems": [],
+   "audit_ok": true,
+   "binary_sha256": "f3b452d683f8abb098bc1ddd2b4bea315ffede5f25338c2521478f38fcb52e77",
+   "binary_matches_session_binary": true,
+   "env_class_id": "ECBENV3h7e8286bea20e",
+   "hardware_class_id": "ECBHW1h81c2f17c5afa",
+   "command": "./target/release/ecbench verify --dir research/ic_residual_dp_eq_20261101/sessions/E-p36 --replay-all --out receipt-all-E-p36.json",
+   "receipt_file_sha256": "a8d3926073523ce37f47639a8c5e29d0dd1952aff8ea4ba5f3bfb2c82e5ca85c",
+   "receipt_sha256_printed": "a8d3926073523ce37f47639a8c5e29d0dd1952aff8ea4ba5f3bfb2c82e5ca85c",
+   "audit_line": "audit OK: 704 records, 704 verified, 528 replays reproduced, 0 problems",
+   "audited_unix_ms": 1793500447217,
+   "replayed_records": {
+    "count": 528,
+    "seq_min": 176,
+    "seq_max": 703,
+    "sha256_of_ordered_seq_record_id_detail": "0e00c8336bd245cad85ff83cf8c47a7d59c398094a71e9244e40ecf44adfe4ad"
+   }
+  },
+  {
+   "session_id": "ECBS1h7fc7b5748e55",
+   "label": "E-p37 nonce-drawn sample",
+   "session_dir": "research/ic_residual_dp_eq_20261101/sessions/E-p37",
+   "records": 704,
+   "verified_records": 704,
+   "records_sha256": "87810fe7057b33917897ee9e1682ca3e35af955423c556b7c2e6ca0195aa6a1b",
+   "replay_selection": "sample",
+   "replay_candidates": 528,
+   "replay_count": 24,
+   "replays_reproduced_identical": 24,
+   "replay_seed": 102056928696331,
+   "nonce_note": "auditor-chosen seed drawn from /dev/urandom by the validator before any replay; same seed on the same session draws the same runs",
+   "arms_covered": {
+    "res1": 2,
+    "res1dp": 2,
+    "res1eq": 1,
+    "res2": 4,
+    "res2aa": 2,
+    "res2dp": 1,
+    "res2eq": 3,
+    "res4": 2,
+    "res4eq": 1,
+    "rho": 6
+   },
+   "audit_checks_all_true": true,
+   "audit_problems": [],
+   "audit_ok": true,
+   "binary_sha256": "f3b452d683f8abb098bc1ddd2b4bea315ffede5f25338c2521478f38fcb52e77",
+   "binary_matches_session_binary": true,
+   "env_class_id": "ECBENV3h7e8286bea20e",
+   "hardware_class_id": "ECBHW1h81c2f17c5afa",
+   "command": "./target/release/ecbench verify --dir research/ic_residual_dp_eq_20261101/sessions/E-p37 --replay 24 --replay-seed 102056928696331 --out receipt-E-p37.json",
+   "receipt_file_sha256": "e8ce3c976f4b305c313ad91f4d59fbcfeb10e6f32a3a162ba6d895fbcd1bf82b",
+   "receipt_sha256_printed": "e8ce3c976f4b305c313ad91f4d59fbcfeb10e6f32a3a162ba6d895fbcd1bf82b",
+   "audit_line": "audit OK: 704 records, 704 verified, 24 replays reproduced, 0 problems",
+   "audited_unix_ms": 1793500150107,
+   "replayed_records": [
+    {
+     "seq": 180,
+     "record_id": "ECR1h5ee79179e1d5",
+     "arm": "res2",
+     "detail": "identical"
+    },
+    {
+     "seq": 198,
+     "record_id": "ECR1h8928f05eda14",
+     "arm": "rho",
+     "detail": "identical"
+    },
+    {
+     "seq": 236,
+     "record_id": "ECR1hbeeaf8cd02a3",
+     "arm": "res2dp",
+     "detail": "identical"
+    },
+    {
+     "seq": 237,
+     "record_id": "ECR1h73fc997189ce",
+     "arm": "res2eq",
+     "detail": "identical"
+    },
+    {
+     "seq": 257,
+     "record_id": "ECR1he18527862a44",
+     "arm": "res2",
+     "detail": "identical"
+    },
+    {
+     "seq": 318,
+     "record_id": "ECR1hba74da3b6a8a",
+     "arm": "res2aa",
+     "detail": "identical"
+    },
+    {
+     "seq": 319,
+     "record_id": "ECR1h6204fe4cf795",
+     "arm": "rho",
+     "detail": "identical"
+    },
+    {
+     "seq": 321,
+     "record_id": "ECR1he105a746ef09",
+     "arm": "res1dp",
+     "detail": "identical"
+    },
+    {
+     "seq": 347,
+     "record_id": "ECR1h84480e56dc89",
+     "arm": "res2eq",
+     "detail": "identical"
+    },
+    {
+     "seq": 358,
+     "record_id": "ECR1h329b06104b01",
+     "arm": "res2",
+     "detail": "identical"
+    },
+    {
+     "seq": 377,
+     "record_id": "ECR1ha30d4454dae7",
+     "arm": "res4",
+     "detail": "identical"
+    },
+    {
+     "seq": 426,
+     "record_id": "ECR1hf8382b578e20",
+     "arm": "res1dp",
+     "detail": "identical"
+    },
+    {
+     "seq": 494,
+     "record_id": "ECR1h86005ba1be5a",
+     "arm": "rho",
+     "detail": "identical"
+    },
+    {
+     "seq": 502,
+     "record_id": "ECR1h780f5cf70f6d",
+     "arm": "res1eq",
+     "detail": "identical"
+    },
+    {
+     "seq": 510,
+     "record_id": "ECR1hc06db821a0a8",
+     "arm": "res2eq",
+     "detail": "identical"
+    },
+    {
+     "seq": 515,
+     "record_id": "ECR1h84d923133bdd",
+     "arm": "res1",
+     "detail": "identical"
+    },
+    {
+     "seq": 517,
+     "record_id": "ECR1h85b57bf0e816",
+     "arm": "res2aa",
+     "detail": "identical"
+    },
+    {
+     "seq": 520,
+     "record_id": "ECR1h89334c6e6cde",
+     "arm": "res4",
+     "detail": "identical"
+    },
+    {
+     "seq": 559,
+     "record_id": "ECR1h37b18946dc2f",
+     "arm": "res4eq",
+     "detail": "identical"
+    },
+    {
+     "seq": 576,
+     "record_id": "ECR1h2aa070b338fd",
+     "arm": "res2",
+     "detail": "identical"
+    },
+    {
+     "seq": 583,
+     "record_id": "ECR1h078bae39139c",
+     "arm": "rho",
+     "detail": "identical"
+    },
+    {
+     "seq": 594,
+     "record_id": "ECR1h8274351e895c",
+     "arm": "rho",
+     "detail": "identical"
+    },
+    {
+     "seq": 595,
+     "record_id": "ECR1ha561d21bdfb2",
+     "arm": "res1",
+     "detail": "identical"
+    },
+    {
+     "seq": 605,
+     "record_id": "ECR1hefac99ff60b7",
+     "arm": "rho",
+     "detail": "identical"
+    }
+   ]
+  },
+  {
+   "session_id": "ECBS1h7fc7b5748e55",
+   "label": "E-p37 replay-all",
+   "session_dir": "research/ic_residual_dp_eq_20261101/sessions/E-p37",
+   "records": 704,
+   "verified_records": 704,
+   "records_sha256": "87810fe7057b33917897ee9e1682ca3e35af955423c556b7c2e6ca0195aa6a1b",
+   "replay_selection": "all",
+   "replay_candidates": 528,
+   "replay_count": 528,
+   "replays_reproduced_identical": 528,
+   "replay_seed": null,
+   "nonce_note": "every measured deterministic run re-executed; no sampling",
+   "arms_covered": {
+    "res1": 48,
+    "res1dp": 48,
+    "res1eq": 48,
+    "res2": 48,
+    "res2aa": 48,
+    "res2dp": 48,
+    "res2eq": 48,
+    "res4": 48,
+    "res4dp": 48,
+    "res4eq": 48,
+    "rho": 48
+   },
+   "audit_checks_all_true": true,
+   "audit_problems": [],
+   "audit_ok": true,
+   "binary_sha256": "f3b452d683f8abb098bc1ddd2b4bea315ffede5f25338c2521478f38fcb52e77",
+   "binary_matches_session_binary": true,
+   "env_class_id": "ECBENV3h7e8286bea20e",
+   "hardware_class_id": "ECBHW1h81c2f17c5afa",
+   "command": "./target/release/ecbench verify --dir research/ic_residual_dp_eq_20261101/sessions/E-p37 --replay-all --out receipt-all-E-p37.json",
+   "receipt_file_sha256": "c34daeb1f33579540934e454e9b40a902774fef04008ca132df60c04030e2d0e",
+   "receipt_sha256_printed": "c34daeb1f33579540934e454e9b40a902774fef04008ca132df60c04030e2d0e",
+   "audit_line": "audit OK: 704 records, 704 verified, 528 replays reproduced, 0 problems",
+   "audited_unix_ms": 1793500662565,
+   "replayed_records": {
+    "count": 528,
+    "seq_min": 176,
+    "seq_max": 703,
+    "sha256_of_ordered_seq_record_id_detail": "7d7d33034e87b28f25a22a809b20751be98be3c6e7082b60b1c18381bc608765"
+   }
+  }
+ ],
+ "scalar_checks": {
+  "E-p36": {
+   "targets_checked": 16,
+   "targets_with_Q_ne_planted_times_G": 0,
+   "verified_records": 704,
+   "verified_records_with_recovered_ne_planted_or_flag_false": 0,
+   "generator_order_check": "[r]G = O on the recorded curve (validator's own affine arithmetic)"
+  },
+  "E-p37": {
+   "targets_checked": 16,
+   "targets_with_Q_ne_planted_times_G": 0,
+   "verified_records": 704,
+   "verified_records_with_recovered_ne_planted_or_flag_false": 0,
+   "generator_order_check": "[r]G = O on the recorded curve (validator's own affine arithmetic)"
+  }
+ },
+ "replay_scope": "ecbench verify re-executes the selected deterministic measured runs and requires identical counts (cost, counters, phases); it also regrades every record (regraded: true), checks session/plan/host/spec/records hashes, record seals and that every planned execution is recorded.",
+ "did_not_hold": [],
+ "limitations": [
+  "Replay uses the same implementation (ecbench binary) that produced the runs; independence is of the party, the replay seed and the scalar check (own Python affine arithmetic), not of the implementation.",
+  "The 24-run nonce sample did not draw res4dp in either session (seed 102056928696331 draws the same plan positions in both sessions); the replay-all run closes that gap: all 528 measured deterministic runs per session reproduced identically.",
+  "Binary provenance: its mtime (01:12:13Z) precedes the freeze commit (01:13:52Z) and session.json records git_commit = freeze commit, git_dirty = false; the validator did not rebuild it from the freeze commit, so source-to-binary correspondence rests on the session record.",
+  "Runs were local L0 (allow_busy true), counts only; no wall-clock claim is certified."
+ ]
+}

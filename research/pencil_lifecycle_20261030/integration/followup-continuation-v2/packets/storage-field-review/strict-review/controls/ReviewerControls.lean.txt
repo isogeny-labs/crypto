@@ -1,0 +1,13 @@
+import StrictFallback
+set_option autoImplicit false
+namespace StrictReviewer
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest
+ theorem empty_support_rejected (v : List UInt64) : ¬ v.length < ([] : List UInt64).length := by simp
+ theorem stored_zero_nonnormal : ¬ Normal ([0] : List UInt64) := by simp [Normal]
+ theorem decoded_zero_not_empty (p : UInt64) : wordsPoly p ([0] : List UInt64) = 0 ∧ ([0] : List UInt64) ≠ [] := by simp [wordsPoly,listPoly]
+ theorem zero_residual_excluded {K : Type*} [Field K] (f v : K[X]) (hf : f.natDegree=5) : f-v*v ≠ 0 := ReductionWord.quintic_residual_nonzero f v hf
+#print axioms StrictReviewer.empty_support_rejected
+#print axioms StrictReviewer.stored_zero_nonnormal
+#print axioms StrictReviewer.decoded_zero_not_empty
+#print axioms StrictReviewer.zero_residual_excluded
+end StrictReviewer

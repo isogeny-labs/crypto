@@ -82,8 +82,10 @@ and GAE do not become comparable merely because they are numbers.
 | `IMPLEMENTATIONS.md` | closed roster of factor bases, oracles, solver engines, matrix engines, target sources, and symmetry references |
 | `LITERATURE.md` | primary-source and repository evidence reviewed before the refresh |
 | `PROTOCOL.md` / `protocol.json` | draft comparison rules and machine-readable protocol; not yet frozen |
-| `specs/` | nine exact-build planning specs; incomplete and not yet queue-safe |
-| `execution/` | exact publication identity, plan-only receipt, checkpoint, and current blocker receipts |
+| `specs/` | nine original broad drafts plus 92 exact-build queue-safe planning shards |
+| `SHARDS.md` | shard arithmetic, panel coverage, target-law limits and fixed reference rules |
+| `analyze_shards.py` | hash-bound replay, pricing-band and paired-comparison driver; validated before data |
+| `execution/` | exact publication identity, both plan-only receipts, shard manifest, and current blocker receipts |
 | `establishment/` | executable claim certificate and fresh all-replay receipts |
 | `REPORT.md` / `REPORT.pdf` | comprehensive frontier and bottleneck report |
 
@@ -97,12 +99,16 @@ and ECR image digest
 That workflow was publication-only and launched no experiment.
 
 Local execution is limited to registry capture, spec validation, correctness,
-and counted-operation preflight. GitHub publication now works, but the
-mandatory `scripts/checkpoint.sh gate` cannot pass: this workspace has no
-`CHECKPOINT_UPLOAD_TOKEN`, checkpoint token file, AWS CLI, or AWS identity.
-The existing nine specs also require expansion and one-hour sharding before
-freeze. Both blockers are retained in `execution/BLOCKER.md`; no local wall
-result is substituted.
+and counted-operation preflight. The exact binary accepted all 92 new shards
+and expanded them to 13,888 processes; each shard reserves at least 1,220
+seconds of the one-hour queue envelope outside child timeout ceilings. No
+benchmark process ran. The mandatory `scripts/checkpoint.sh gate` still cannot
+pass: this workspace has no `CHECKPOINT_UPLOAD_TOKEN`, checkpoint token file,
+AWS CLI, or AWS identity, and its GitHub Actions token now fails authentication.
+The deterministic analysis driver is now hash-bound and passes its 92-spec
+check-only gate. Exact-image runtime preflight still remains before freeze.
+These blockers are retained in `execution/BLOCKER.md`; no local wall result is
+substituted.
 
 The follow-up establishment audit passed 19/19 cross-artifact checks. The
 optimized-rho session reproduced 720/720 deterministic rows with the current
@@ -121,8 +127,8 @@ target/release/ecbench plan --spec research/ecbench_e2e_frontier_20261031/specs/
 ```
 
 The final campaign will use six measured rounds so alternating arm order is
-balanced. Before submission, the executor must close the roster in
-`IMPLEMENTATIONS.md`, split candidate/reference/A-A shards to fit the one-hour
-queue envelope, prospectively freeze them on `main`, pass the checkpoint gate,
-preserve failed and censored rows, replay all records, and only then rebuild
-the frontier and report.
+balanced. The roster and queue-envelope split are now explicit in `SHARDS.md`.
+Before submission, the executor must complete exact-image runtime preflight,
+preserve the hash-bound analysis driver, freeze the exact 92-spec roster on
+`main`, pass the checkpoint gate, preserve failed and censored rows, replay all
+records, and only then rebuild the frontier and report.

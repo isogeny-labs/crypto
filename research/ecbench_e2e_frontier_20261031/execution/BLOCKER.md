@@ -4,9 +4,8 @@ The current-source frontier refresh is being prepared, but no measurement has
 been submitted. Missing evidence remains `blocked`, never zero cost or a
 performance loss.
 
-## Route now verified
+## Route history and current access
 
-- GitHub CLI authentication works for `isogeny-labs/crypto`.
 - The trusted main-branch `isolab-experiment.yml` route accepted a
   publication-only request for source
   `ff7ad61cfed11908fb79de9dd485b696d0ada779`.
@@ -17,6 +16,10 @@ performance loss.
   preregistration: it permanently claims each frozen shard, runs native L2
   ECBench on Spot, retains failures, and returns result PRs without treating
   the queue as a scientific decision maker.
+- In the current runtime, `gh auth status` now succeeds for the authorized
+  repository account. There is still no direct Iso Lab/EKS MCP tool, AWS CLI,
+  kubectl or Conductor client. Repository access is restored, but it does not
+  by itself provide checkpoint transport or paid-execution authority.
 
 ## Blocking admission gate
 
@@ -33,37 +36,42 @@ and the gate cannot pass. No benchmark workflow or paid queue entry will be
 launched until a checkpoint upload token (or equivalent approved transport) is
 provisioned.
 
-## Design issues found before freeze
+## Sharding completed; design gates still open
 
-The nine-spec draft is not ready to execute unchanged:
+The original nine-spec draft remains planning history and will not be submitted.
+It has now been expanded into 92 candidate/reference/A-A shards:
 
-1. Its source, static binary, and image are now current and exact, but the
-   workload roster is not prospectively frozen.
-2. The 74-method statement inventories top-level registry IDs, not every
-   parameterized implementation. Current main adds the orbit-layout table,
-   generator-orbit/stride configurations, and the two-word F_(2^m)^4 IC/rho
-   path without necessarily adding a new method ID.
-3. It has no fresh random-binary cell and no dedicated cubic/quartic symmetry
-   cells, so it cannot establish the claimed boundary in those domains.
-4. `rho.signed_frobenius_strong_escape` is now present in each draft Koblitz
-   spec, but its common-accounting selection rule against strong-v2 still has
-   to be frozen before measurement.
-5. The nine specs plan 4,704 process executions. A trusted benchmark job has a
-   3,600-second whole-job deadline, while draft per-process timeouts reach
-   3,600 seconds. The campaign must be split into candidate/reference/A-A
-   shards with bounded censoring before freeze.
-6. The one-column generator-orbit result is a separate toy fixed-setup
-   engineering crossover. It does not support the unqualified sentence that
-   every Koblitz cell is rho-led, nor does it overturn the medium/scaling
-   Koblitz frontier.
+1. The exact pinned binary accepted all 92 specs, expanding them to 13,888
+   processes with zero planner failures.
+2. They cover all 13 top-level `current_primary` methods and all 11 nested
+   solver backends, plus the factor-base, root-finding, symmetry,
+   generator-orbit and F_((2^m)^4) parameterized panels named in the closed
+   roster.
+3. Every shard fixes at most 2,380 seconds of aggregate child timeout ceilings,
+   leaving at least 1,220 seconds of the one-hour EKS envelope for workload
+   construction, provisioning, audit and upload.
+4. Koblitz shards carry strong-v2 and strong-escape plus an A/A copy of each;
+   the paired minimum common-accounting `S` and union A/A envelope are fixed as
+   the reference rule before data.
+5. The extension-field public target constructor exhausted its fixed bound.
+   Those eight implementation specs therefore use planted known-answer targets
+   with scalars hidden from solvers and are excluded from public-target claims.
+
+The deterministic analysis driver is now SHA-256-bound in `protocol.json` and
+passes its 92-spec check-only gate. The remaining design blockers are
+exact-image runtime preflight for each arm class, protocol freeze, and merge of
+the exact spec IDs to `main` before the first warmup. The 92-spec set remains
+draft until those are complete.
 
 ## Unblock and resume
 
 Provision a checkpoint upload token for this workspace. Then:
 
-1. run `scripts/checkpoint.sh push` and `scripts/checkpoint.sh gate`;
-2. replace the draft with a shardable, prospectively frozen protocol and
-   closed implementation roster;
-3. merge the preregistration to `main` before any warmup;
-4. submit each queue shard at most once, replay all records, and update the
+1. provision an authorized AWS/Iso Lab submission identity while retaining the
+   working repository identity;
+2. run exact-image runtime preflight and preserve the bound analysis-script bytes;
+3. run `scripts/checkpoint.sh push` and `scripts/checkpoint.sh gate`;
+4. freeze and merge the exact preregistration to `main` before any warmup;
+5. reconcile existing receipts, submit each queue shard at most once, replay
+   all records, and update the
    ranked leaderboards/PDF only from admitted evidence.

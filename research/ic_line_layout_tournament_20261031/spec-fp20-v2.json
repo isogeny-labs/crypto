@@ -1,0 +1,77 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Prime IC full-solve relation tournament v2, fp20",
+  "description": "research/ic_line_layout_tournament_20261031/PROTOCOL-V2.md",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 20,
+        "seed": 20261101041
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261101042,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "incumbent",
+      "role": "reference",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=45",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "incumbent-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=45",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "candidate",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=45",
+          "oracle": "mitm:negation_folded=1,layout=lines",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-plain",
+      "role": "candidate",
+      "method": {
+        "id": "rho.plain"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 8,
+    "warmup": 1,
+    "order": "alternate_measured",
+    "seed": 20261101043,
+    "isolation_required": "L2",
+    "timeout_seconds": 1800
+  }
+}

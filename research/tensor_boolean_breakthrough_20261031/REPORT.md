@@ -42,6 +42,29 @@ The graph originally recorded predicate behavior only behind `Arc<dyn Predicate>
 
 Tiny controls pass round-trip count, every interface-prefix count, least-witness, parser, and five mutation checks. This establishes the core comparison instrument, not the E1 result: optional high-arity selector/custom predicates, final-ladder preflight, and the fresh-process A/A runner remain open. No affected rank or solver data has been taken.
 
+## E1 census implementation status — 2026-11-01
+
+The exact arithmetic core named by the protocol now exists. It contracts an
+explicit side of a canonical BTNIR cut under a free-edge cap, emits exact
+arbitrary-precision completion counts and a stable tensor digest, and computes
+canonical and exhaustive balanced flattening ranks using fraction-free integer
+elimination. Known ranks 1, 2 and 4 pass; 1,152 deterministic small matrices
+match an independent rational eliminator. See
+[`E1_IMPLEMENTATION.md`](E1_IMPLEMENTATION.md) and the dated
+[lead reconciliation](SEARCH_20261101.md).
+
+The census now emits independently recomputable nonzero-minor certificates.
+A Lean-checked theorem proves that an order-`k` certificate forces every exact
+linear separator factorization to use at least `k` coordinates. A second
+theorem makes the asymptotic gap precise: exponential rank on a linear-width
+family, plus an explicit message-to-work condition, forces exponential work
+for that architecture. The required production family rank lemma is still
+open. See [`RIGOROUS_BOUNDS.md`](RIGOROUS_BOUNDS.md).
+
+This is instrument verification, not an E1 row. Stable production semantic
+cuts, matched rewired nulls, a fresh-process A/A runner, disjoint preflight and
+the final frozen identities remain open. No affected rank data has been taken.
+
 ## Claim boundary
 
 No result in the proposed rank census proves a subexponential ECDLP algorithm. E1 can identify or reject a finite-size compression mechanism. E4 can establish an exact-engine improvement on a frozen ladder. E5 can establish complete relation-oracle progress. A complexity claim still needs a proved family invariant and complete end-to-end cost theorem.
