@@ -1,0 +1,733 @@
+T-873: exact functional rejection pruning, 2026-10-30 UTC
+Software validation; elapsed values printed by cargo are not benchmark evidence.
+Crypto base bd4c2fe5e6f; cryptanalysis base b14932651dcf9df2ba346fdc7efdb63b68904475.
+Source digests and soundness invariant: hashed-ecdl-functional-plan.md.
+
+Crypto standalone commands (completed, exit 0):
+cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml
+cargo clippy --locked --all-targets --manifest-path crates/hashed-ecdl-tensor/Cargo.toml -- -D warnings
+cargo +1.78.0 check --locked --all-targets --manifest-path crates/hashed-ecdl-tensor/Cargo.toml
+cargo fmt --manifest-path crates/hashed-ecdl-tensor/Cargo.toml -- --check
+
+Retained final test-output excerpt from the crypto tool response:
+test reduction::tests::tensor_relation_pipeline_recovers_and_replays_without_scalar_leakage ... ok
+test result: ok. 37 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 212.96s
+Runner and doc-tests both contained 0 tests and exited 0.
+The original complete crypto terminal transcript was not saved to a file;
+the complete mirrored native output follows, with identical modified source hashes.
+
+Cryptanalysis native command (exit 0), cwd bindings/rust:
+CARGO_BUILD_JOBS=2 cargo test --locked --release -p hashed-ecdl-tensor
+   Compiling autocfg v1.5.1
+   Compiling serde_core v1.0.229
+   Compiling num-traits v0.2.19
+   Compiling serde v1.0.229
+   Compiling libc v0.2.190
+   Compiling zmij v1.0.23
+   Compiling num-integer v0.1.47
+   Compiling serde_json v1.0.154
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling cfg-if v1.0.5
+   Compiling getrandom v0.2.17
+   Compiling num-bigint v0.5.1
+   Compiling num-rational v0.4.2
+   Compiling hashed-ecdl-tensor v0.1.0 (/home/ec2-user/cryptanalysis-hashed-tensor-functional-20261030/bindings/rust/hashed-ecdl-tensor)
+    Finished `release` profile [optimized] target(s) in 54.46s
+     Running unittests src/lib.rs (target/release/deps/hashed_ecdl_tensor-11962db036771e70)
+
+running 37 tests
+test arithmetic::tests::limits_do_not_turn_unknown_primes_into_true_or_false ... ok
+test contraction::deformation::tests::packet_entries_keep_creation_time_representatives ... ok
+test contraction::packing::tests::conditional_expectations_do_not_assume_disjoint_ports ... ok
+test contraction::recursive::tests::weighted_enumeration_has_no_missing_or_repeated_monomials ... ok
+test contraction::tests::dependency_pruning_handles_constant_failures_and_no_free_digits ... ok
+test contraction::tests::counts_and_prefix_witnesses_match_truth_tables ... ok
+test contraction::tests::dependency_pruning_skips_only_rejected_input_blocks ... ok
+test contraction::tests::functional_input_witness_preserves_prefix_order_without_recounts ... ok
+test contraction::tests::functional_witness_aliases_empty_unsat_and_limits_are_exact ... ok
+test contraction::tests::functional_leaf_count_equals_complete_edge_enumeration ... ok
+test curve::tests::prime_order_certificate_and_point_encoding ... ok
+test contraction::tests::functional_derived_interfaces_match_prefixes_for_all_output_pins ... ok
+test network::tests::parallel_edges_pins_and_isolated_scalars ... ok
+test primality::tests::forged_and_incomplete_pocklington_proofs_are_rejected ... ok
+test reduction::tests::exhausted_tensor_work_is_unknown_and_identity_has_an_exact_certificate ... ok
+test ring::tests::units_and_interpolation_over_nonfields ... ok
+test arithmetic::tests::exact_small_primality_and_square_roots ... ok
+test encoding::tests::ripple_arithmetic_and_shared_word_copies ... ok
+test contraction::tests::dependency_pruning_preserves_derived_pins_aliases_and_multiplicity ... ok
+test ring::tests::creation_precision_lifts_are_not_silently_ring_homomorphisms ... ok
+test primality::tests::challenge_proofs_verify_in_any_order_with_exact_u64_leaves ... ok
+test contraction::recursive::tests::tapered_hermite_recovers_the_constant_without_rounding ... ok
+test contraction::deformation::tests::integral_kernel_and_geometric_mode_series_match ... ok
+test reduction::tests::inverse_hash_enumeration_matches_independent_subgroup_scan ... ok
+test network::tests::incomplete_graphs_and_duplicate_interfaces_are_rejected ... ok
+test encoding::tests::modular_words_are_canonical_and_invalid_inputs_have_no_witness ... ok
+test primality::tests::bounded_primality_matches_independent_sieve_and_handles_u64_edges ... ok
+test arithmetic::tests::aks_cyclic_identity_and_large_prime_path ... ok
+test primality::tests::official_curve_and_target_validate_within_original_budget ... ok
+test encoding::tests::hash_membership_and_cofactor_clear_are_coordinate_predicates ... ok
+test contraction::recursive::tests::forced_small_packet_recursion_matches_independent_direct_contraction ... ok
+test encoding::tests::point_network_handles_every_pair_and_rejects_counterfeit_outputs ... ok
+test contraction::recursive::coupled_controls::coupled_nested_contraction_preserves_old_packet_creation_precision ... ok
+test encoding::tests::fourier_products_match_independent_integer_products_and_size_bounds ... ok
+test reduction::tests::cofactor_tensor_projection_finds_only_subgroup_points ... ok
+test contraction::recursive::coupled_controls::coupled_packets_match_direct_counts_with_parallel_ports_and_quadratic_modes ... ok
+test reduction::tests::tensor_relation_pipeline_recovers_and_replays_without_scalar_leakage has been running for over 60 seconds
+test reduction::tests::tensor_relation_pipeline_recovers_and_replays_without_scalar_leakage ... ok
+
+test result: ok. 37 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 230.65s
+
+     Running unittests src/bin/hashed-ecdl.rs (target/release/deps/hashed_ecdl-1adba597a2b08e12)
+
+running 5 tests
+test tests::input_reader_preserves_io_errors ... ok
+test tests::strict_json_problem_rejects_duplicates_even_after_null ... ok
+test tests::strict_json_problem_keeps_optional_defaults_and_required_target ... ok
+test tests::strict_json_receipt_rejects_duplicate_fields_and_nested_problems ... ok
+test tests::input_limit_applies_to_bytes_read_from_a_stream ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/strict_json.rs (target/release/deps/strict_json-4061c2a98f2eb846)
+
+running 3 tests
+test strict_json_point_forms_reject_duplicate_variants_and_coordinates ... ok
+test strict_json_records_keep_required_fields_and_reject_unknown_fields ... ok
+test strict_json_rejects_duplicate_certificate_fields_and_nested_records ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hashed_ecdl_tensor
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+Cryptanalysis binding command (exit 0), cwd bindings/rust:
+CARGO_BUILD_JOBS=2 cargo test --locked --release -p cryptanalysis
+   Compiling cryptanalysis-sys v0.1.0 (/home/ec2-user/cryptanalysis-hashed-tensor-functional-20261030/bindings/rust/cryptanalysis-sys)
+   Compiling cryptanalysis v0.1.0 (/home/ec2-user/cryptanalysis-hashed-tensor-functional-20261030/bindings/rust/cryptanalysis)
+    Finished `release` profile [optimized] target(s) in 32.98s
+     Running unittests src/lib.rs (target/release/deps/cryptanalysis-aeb2519aac7fab62)
+
+running 20 tests
+test gpu::tests::cuda_backend_reports_cleanly ... ok
+test gpu::tests::options_round_trip_and_defaults ... ok
+test hashed_ecdl::tests::identity_and_bounds_are_explicit ... ok
+test gpu::tests::max_ops_is_enforced ... ok
+test hashed_ecdl::tests::overlapping_slots_keep_separate_columns ... ok
+test hashed_ecdl::tests::rejects_corrupt_oracle_instead_of_accepting_a_relation ... ok
+test hashed_ecdl::tests::validates_curve_and_canonical_points ... ok
+test tests::error_display_includes_status ... ok
+test hashed_ecdl::tests::oracle_matches_cartesian_sum_for_every_target ... ok
+test tests::group_is_send_and_sync ... ok
+test tests::version_is_semver_like ... ok
+test gpu::tests::emulator_solves_curve ... ok
+test tests::options_default_matches_c_defaults ... ok
+test hashed_ecdl::tests::inverse_hash_enumeration_matches_complete_group_scan ... ok
+test tests::hashed_ecdl_agrees_with_independent_c_arithmetic ... ok
+test hashed_ecdl::tests::small_curve_all_logarithms_and_uninformative_dependency ... ok
+test gpu::tests::emulator_solves_zp ... ok
+test hashed_ecdl::tests::exhausted_trials_and_empty_bases_are_not_successes ... ok
+test hashed_ecdl::tests::solves_and_replays_seeded_known_answers ... ok
+test tests::tensor_curve_agrees_with_independent_c_arithmetic ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/ffi_parity.rs (target/release/deps/ffi_parity-a0785a41fdcfb188)
+
+running 19 tests
+test number_theory_helpers ... ok
+test curve_dispatch_and_glv ... ok
+test version_matches_header ... ok
+test zp_bsgs_interval_miss_is_not_found ... ok
+test index_calculus_one_shot ... ok
+test zp_cheon ... ok
+test ec_curve_end_to_end ... ok
+test index_calculus_random_exponent_method ... ok
+test index_calculus_context_reuse ... ok
+test zp_construction_and_accessors ... ok
+test zp_element_ops ... ok
+test zp_grumpy_interval ... ok
+test zp_max_ops_limit ... ok
+test zp_kangaroo_interval ... ok
+test zp_rho_single_and_multi_thread ... ok
+test zp_bsgs ... ok
+test group_usable_from_multiple_threads ... ok
+test zp_dlog_every_solver ... ok
+test zp_precomp ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+   Doc-tests cryptanalysis
+
+running 14 tests
+test cryptanalysis/src/nt.rs - nt::next_prime (line 18) ... ok
+test cryptanalysis/src/nt.rs - nt::invmod (line 48) ... ok
+test cryptanalysis/src/options.rs - options::Options (line 46) ... ok
+test cryptanalysis/src/nt.rs - nt::is_prime (line 7) ... ok
+test cryptanalysis/src/nt.rs - nt::powmod (line 38) ... ok
+test cryptanalysis/src/group.rs - group::Group::ec_count_points (line 197) ... ok
+test cryptanalysis/src/group.rs - group::Group::dlog (line 476) ... ok
+test cryptanalysis/src/index_calculus.rs - index_calculus (line 7) ... ok
+test cryptanalysis/src/gpu.rs - gpu::Group::gpu_rho (line 127) ... ok
+test cryptanalysis/src/nt.rs - nt::factorize (line 61) ... ok
+test cryptanalysis/src/group.rs - group::Group::zp (line 168) ... ok
+test cryptanalysis/src/lib.rs - (line 11) ... ok
+test cryptanalysis/src/nt.rs - nt::primitive_root (line 28) ... ok
+test cryptanalysis/src/group.rs - group::cheon_best_divisor (line 636) ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.54s
+
+
+Strict native lint (exit 0):
+CARGO_BUILD_JOBS=2 cargo clippy --locked -p hashed-ecdl-tensor --all-targets -- -D warnings
+   Compiling autocfg v1.5.1
+   Compiling serde_core v1.0.229
+   Compiling num-traits v0.2.19
+   Compiling serde v1.0.229
+   Compiling zmij v1.0.23
+   Compiling libc v0.2.190
+    Checking num-integer v0.1.47
+   Compiling serde_json v1.0.154
+    Checking memchr v2.8.3
+    Checking itoa v1.0.18
+    Checking cfg-if v1.0.5
+    Checking getrandom v0.2.17
+    Checking num-bigint v0.5.1
+    Checking num-rational v0.4.2
+    Checking hashed-ecdl-tensor v0.1.0 (/home/ec2-user/cryptanalysis-hashed-tensor-functional-20261030/bindings/rust/hashed-ecdl-tensor)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 9.44s
+
+Strict binding lint (exit 0):
+CARGO_BUILD_JOBS=2 cargo clippy --locked -p cryptanalysis --all-targets -- -D warnings
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.15
+   Compiling cc v1.9.0
+   Compiling cryptanalysis-sys v0.1.0 (/home/ec2-user/cryptanalysis-hashed-tensor-functional-20261030/bindings/rust/cryptanalysis-sys)
+    Checking cryptanalysis v0.1.0 (/home/ec2-user/cryptanalysis-hashed-tensor-functional-20261030/bindings/rust/cryptanalysis)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 45.76s
+
+Native Rust 1.78 all-targets (exit 0):
+CARGO_BUILD_JOBS=2 cargo +1.78.0 check --locked -p hashed-ecdl-tensor --all-targets
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded libc v0.2.190
+   Compiling autocfg v1.5.1
+   Compiling serde_core v1.0.229
+   Compiling num-traits v0.2.19
+   Compiling serde v1.0.229
+   Compiling libc v0.2.190
+   Compiling zmij v1.0.23
+    Checking num-integer v0.1.47
+   Compiling serde_json v1.0.154
+    Checking itoa v1.0.18
+    Checking memchr v2.8.3
+    Checking cfg-if v1.0.5
+    Checking getrandom v0.2.17
+    Checking num-bigint v0.5.1
+    Checking num-rational v0.4.2
+    Checking hashed-ecdl-tensor v0.1.0 (/home/ec2-user/cryptanalysis-hashed-tensor-functional-20261030/bindings/rust/hashed-ecdl-tensor)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 28.61s
+
+Binding Rust 1.78 all-targets (exit 0):
+CARGO_BUILD_JOBS=2 cargo +1.78.0 check --locked -p cryptanalysis --all-targets
+ Downloading crates ...
+  Downloaded find-msvc-tools v0.1.15
+  Downloaded shlex v2.0.1
+  Downloaded cc v1.9.0
+   Compiling find-msvc-tools v0.1.15
+   Compiling shlex v2.0.1
+   Compiling cc v1.9.0
+   Compiling cryptanalysis-sys v0.1.0 (/home/ec2-user/cryptanalysis-hashed-tensor-functional-20261030/bindings/rust/cryptanalysis-sys)
+    Checking cryptanalysis v0.1.0 (/home/ec2-user/cryptanalysis-hashed-tensor-functional-20261030/bindings/rust/cryptanalysis)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 51.42s
+
+Formatting and git diff --check passed in both working trees.
+
+Sparse-checkout failures before materialization (not solver failures):
+- Root cargo test --release --lib initially reported no package isogeny_algos
+  at tools/volcano-cli's local dependency path. Materialized the package and
+  research/five_leads_e2e_20261019/native before retrying.
+- Binding compilation initially reported:
+  src/gpu_internal.h:9:10: fatal error: ../cuda/ca_device.cuh: No such file or directory
+  Materialized cuda; the same binding command then passed as shown above.
+
+Broad crypto root command:
+CARGO_BUILD_JOBS=2 cargo test --release --lib
+Final outcome: exit 101; 5401 passed, 29 failed, 123 ignored.
+All 29 failures passed targeted retries with the same release binary after
+restoring tracked runtime fixtures and using sequential execution (28 + 1).
+The full parallel run remains failed; it was not rerun or relabelled green.
+Complete raw output: hashed-ecdl-functional-root-tests.log.xz (xz compressed).
+
+The preceding logs describe the first validation pass. A later diagnostic-only
+correction avoids counting a block jump that skips zero remaining inputs.
+Final native and binding rerun transcripts follow below.
+
+Final source validation after the diagnostic-only correction:
+network.rs SHA-256: 55accd8c18a9c94cdeee19568da1517b9fca7b0661044eef3b4dde8feaf388a0
+contraction.rs SHA-256: 8ad7339b241205d52ff62fb04042c3bc4098b79928589cbe28735dfdee1fed4c
+reduction.rs SHA-256: 43f1b2f5c7768d8bd5921698f8375cc3a4b85962395e21209fcc2b8347f47dba
+These three files were compared byte for byte between the repositories.
+
+Crypto final native command (exit 0):
+CARGO_BUILD_JOBS=2 cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml
+   Compiling hashed-ecdl-tensor v0.1.0 (/home/ec2-user/crypto-hashed-tensor-functional-20261030/crates/hashed-ecdl-tensor)
+    Finished `release` profile [optimized] target(s) in 12.42s
+     Running unittests src/lib.rs (crates/hashed-ecdl-tensor/target/release/deps/hashed_ecdl_tensor-3825d88d6fdc6fb0)
+
+running 37 tests
+test contraction::packing::tests::conditional_expectations_do_not_assume_disjoint_ports ... ok
+test contraction::deformation::tests::packet_entries_keep_creation_time_representatives ... ok
+test arithmetic::tests::limits_do_not_turn_unknown_primes_into_true_or_false ... ok
+test contraction::recursive::tests::weighted_enumeration_has_no_missing_or_repeated_monomials ... ok
+test contraction::tests::dependency_pruning_handles_constant_failures_and_no_free_digits ... ok
+test contraction::tests::counts_and_prefix_witnesses_match_truth_tables ... ok
+test contraction::tests::dependency_pruning_skips_only_rejected_input_blocks ... ok
+test contraction::tests::functional_input_witness_preserves_prefix_order_without_recounts ... ok
+test contraction::tests::functional_witness_aliases_empty_unsat_and_limits_are_exact ... ok
+test curve::tests::prime_order_certificate_and_point_encoding ... ok
+test contraction::tests::functional_leaf_count_equals_complete_edge_enumeration ... ok
+test network::tests::parallel_edges_pins_and_isolated_scalars ... ok
+test network::tests::incomplete_graphs_and_duplicate_interfaces_are_rejected ... ok
+test contraction::tests::functional_derived_interfaces_match_prefixes_for_all_output_pins ... ok
+test primality::tests::forged_and_incomplete_pocklington_proofs_are_rejected ... ok
+test reduction::tests::exhausted_tensor_work_is_unknown_and_identity_has_an_exact_certificate ... ok
+test ring::tests::creation_precision_lifts_are_not_silently_ring_homomorphisms ... ok
+test primality::tests::challenge_proofs_verify_in_any_order_with_exact_u64_leaves ... ok
+test arithmetic::tests::exact_small_primality_and_square_roots ... ok
+test ring::tests::units_and_interpolation_over_nonfields ... ok
+test contraction::tests::dependency_pruning_preserves_derived_pins_aliases_and_multiplicity ... ok
+test encoding::tests::ripple_arithmetic_and_shared_word_copies ... ok
+test contraction::recursive::tests::tapered_hermite_recovers_the_constant_without_rounding ... ok
+test contraction::deformation::tests::integral_kernel_and_geometric_mode_series_match ... ok
+test reduction::tests::inverse_hash_enumeration_matches_independent_subgroup_scan ... ok
+test encoding::tests::modular_words_are_canonical_and_invalid_inputs_have_no_witness ... ok
+test primality::tests::bounded_primality_matches_independent_sieve_and_handles_u64_edges ... ok
+test arithmetic::tests::aks_cyclic_identity_and_large_prime_path ... ok
+test primality::tests::official_curve_and_target_validate_within_original_budget ... ok
+test encoding::tests::hash_membership_and_cofactor_clear_are_coordinate_predicates ... ok
+test contraction::recursive::tests::forced_small_packet_recursion_matches_independent_direct_contraction ... ok
+test encoding::tests::point_network_handles_every_pair_and_rejects_counterfeit_outputs ... ok
+test contraction::recursive::coupled_controls::coupled_nested_contraction_preserves_old_packet_creation_precision ... ok
+test encoding::tests::fourier_products_match_independent_integer_products_and_size_bounds ... ok
+test reduction::tests::cofactor_tensor_projection_finds_only_subgroup_points ... ok
+test contraction::recursive::coupled_controls::coupled_packets_match_direct_counts_with_parallel_ports_and_quadratic_modes ... ok
+test reduction::tests::tensor_relation_pipeline_recovers_and_replays_without_scalar_leakage has been running for over 60 seconds
+test reduction::tests::tensor_relation_pipeline_recovers_and_replays_without_scalar_leakage ... ok
+
+test result: ok. 37 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 199.76s
+
+     Running unittests src/bin/hashed-ecdl.rs (crates/hashed-ecdl-tensor/target/release/deps/hashed_ecdl-2c8de4135ca4b745)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hashed_ecdl_tensor
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+Cryptanalysis final native and binding command (exit 0), cwd bindings/rust:
+CARGO_BUILD_JOBS=2 cargo test --locked --release -p hashed-ecdl-tensor -p cryptanalysis
+warning: failed to save last-use data
+This may prevent cargo from accurately tracking what is being used in its global cache. This information is used for automatically removing unused data in the cache.
+
+database is locked
+
+Caused by:
+  Error code 5: database is locked
+   Compiling hashed-ecdl-tensor v0.1.0 (/home/ec2-user/cryptanalysis-hashed-tensor-functional-20261030/bindings/rust/hashed-ecdl-tensor)
+   Compiling cryptanalysis v0.1.0 (/home/ec2-user/cryptanalysis-hashed-tensor-functional-20261030/bindings/rust/cryptanalysis)
+    Finished `release` profile [optimized] target(s) in 19.02s
+     Running unittests src/lib.rs (target/release/deps/cryptanalysis-aeb2519aac7fab62)
+
+running 20 tests
+test gpu::tests::options_round_trip_and_defaults ... ok
+test gpu::tests::cuda_backend_reports_cleanly ... ok
+test hashed_ecdl::tests::identity_and_bounds_are_explicit ... ok
+test hashed_ecdl::tests::oracle_matches_cartesian_sum_for_every_target ... ok
+test hashed_ecdl::tests::overlapping_slots_keep_separate_columns ... ok
+test hashed_ecdl::tests::rejects_corrupt_oracle_instead_of_accepting_a_relation ... ok
+test gpu::tests::max_ops_is_enforced ... ok
+test hashed_ecdl::tests::inverse_hash_enumeration_matches_complete_group_scan ... ok
+test hashed_ecdl::tests::validates_curve_and_canonical_points ... ok
+test tests::error_display_includes_status ... ok
+test tests::group_is_send_and_sync ... ok
+test tests::options_default_matches_c_defaults ... ok
+test tests::version_is_semver_like ... ok
+test gpu::tests::emulator_solves_curve ... ok
+test gpu::tests::emulator_solves_zp ... ok
+test hashed_ecdl::tests::small_curve_all_logarithms_and_uninformative_dependency ... ok
+test tests::hashed_ecdl_agrees_with_independent_c_arithmetic ... ok
+test hashed_ecdl::tests::exhausted_trials_and_empty_bases_are_not_successes ... ok
+test tests::tensor_curve_agrees_with_independent_c_arithmetic ... ok
+test hashed_ecdl::tests::solves_and_replays_seeded_known_answers ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/ffi_parity.rs (target/release/deps/ffi_parity-a0785a41fdcfb188)
+
+running 19 tests
+test number_theory_helpers ... ok
+test version_matches_header ... ok
+test curve_dispatch_and_glv ... ok
+test index_calculus_context_reuse ... ok
+test zp_construction_and_accessors ... ok
+test zp_element_ops ... ok
+test zp_bsgs_interval_miss_is_not_found ... ok
+test index_calculus_random_exponent_method ... ok
+test ec_curve_end_to_end ... ok
+test zp_cheon ... ok
+test zp_grumpy_interval ... ok
+test index_calculus_one_shot ... ok
+test zp_max_ops_limit ... ok
+test zp_kangaroo_interval ... ok
+test zp_rho_single_and_multi_thread ... ok
+test zp_bsgs ... ok
+test group_usable_from_multiple_threads ... ok
+test zp_dlog_every_solver ... ok
+test zp_precomp ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running unittests src/lib.rs (target/release/deps/hashed_ecdl_tensor-11962db036771e70)
+
+running 37 tests
+test arithmetic::tests::limits_do_not_turn_unknown_primes_into_true_or_false ... ok
+test contraction::deformation::tests::packet_entries_keep_creation_time_representatives ... ok
+test contraction::packing::tests::conditional_expectations_do_not_assume_disjoint_ports ... ok
+test contraction::recursive::tests::weighted_enumeration_has_no_missing_or_repeated_monomials ... ok
+test contraction::tests::counts_and_prefix_witnesses_match_truth_tables ... ok
+test contraction::tests::dependency_pruning_handles_constant_failures_and_no_free_digits ... ok
+test contraction::tests::functional_input_witness_preserves_prefix_order_without_recounts ... ok
+test contraction::tests::dependency_pruning_skips_only_rejected_input_blocks ... ok
+test contraction::tests::functional_witness_aliases_empty_unsat_and_limits_are_exact ... ok
+test contraction::tests::functional_leaf_count_equals_complete_edge_enumeration ... ok
+test network::tests::incomplete_graphs_and_duplicate_interfaces_are_rejected ... ok
+test curve::tests::prime_order_certificate_and_point_encoding ... ok
+test network::tests::parallel_edges_pins_and_isolated_scalars ... ok
+test reduction::tests::exhausted_tensor_work_is_unknown_and_identity_has_an_exact_certificate ... ok
+test primality::tests::forged_and_incomplete_pocklington_proofs_are_rejected ... ok
+test contraction::tests::functional_derived_interfaces_match_prefixes_for_all_output_pins ... ok
+test primality::tests::challenge_proofs_verify_in_any_order_with_exact_u64_leaves ... ok
+test ring::tests::creation_precision_lifts_are_not_silently_ring_homomorphisms ... ok
+test arithmetic::tests::exact_small_primality_and_square_roots ... ok
+test contraction::tests::dependency_pruning_preserves_derived_pins_aliases_and_multiplicity ... ok
+test ring::tests::units_and_interpolation_over_nonfields ... ok
+test encoding::tests::ripple_arithmetic_and_shared_word_copies ... ok
+test contraction::deformation::tests::integral_kernel_and_geometric_mode_series_match ... ok
+test contraction::recursive::tests::tapered_hermite_recovers_the_constant_without_rounding ... ok
+test reduction::tests::inverse_hash_enumeration_matches_independent_subgroup_scan ... ok
+test encoding::tests::modular_words_are_canonical_and_invalid_inputs_have_no_witness ... ok
+test primality::tests::bounded_primality_matches_independent_sieve_and_handles_u64_edges ... ok
+test arithmetic::tests::aks_cyclic_identity_and_large_prime_path ... ok
+test primality::tests::official_curve_and_target_validate_within_original_budget ... ok
+test encoding::tests::hash_membership_and_cofactor_clear_are_coordinate_predicates ... ok
+test contraction::recursive::tests::forced_small_packet_recursion_matches_independent_direct_contraction ... ok
+test encoding::tests::point_network_handles_every_pair_and_rejects_counterfeit_outputs ... ok
+test contraction::recursive::coupled_controls::coupled_nested_contraction_preserves_old_packet_creation_precision ... ok
+test encoding::tests::fourier_products_match_independent_integer_products_and_size_bounds ... ok
+test reduction::tests::cofactor_tensor_projection_finds_only_subgroup_points ... ok
+test contraction::recursive::coupled_controls::coupled_packets_match_direct_counts_with_parallel_ports_and_quadratic_modes ... ok
+test reduction::tests::tensor_relation_pipeline_recovers_and_replays_without_scalar_leakage has been running for over 60 seconds
+test reduction::tests::tensor_relation_pipeline_recovers_and_replays_without_scalar_leakage ... ok
+
+test result: ok. 37 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 201.46s
+
+     Running unittests src/bin/hashed-ecdl.rs (target/release/deps/hashed_ecdl-1adba597a2b08e12)
+
+running 5 tests
+test tests::input_reader_preserves_io_errors ... ok
+test tests::strict_json_problem_rejects_duplicates_even_after_null ... ok
+test tests::strict_json_problem_keeps_optional_defaults_and_required_target ... ok
+test tests::strict_json_receipt_rejects_duplicate_fields_and_nested_problems ... ok
+test tests::input_limit_applies_to_bytes_read_from_a_stream ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/strict_json.rs (target/release/deps/strict_json-4061c2a98f2eb846)
+
+running 3 tests
+test strict_json_point_forms_reject_duplicate_variants_and_coordinates ... ok
+test strict_json_records_keep_required_fields_and_reject_unknown_fields ... ok
+test strict_json_rejects_duplicate_certificate_fields_and_nested_records ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests cryptanalysis
+
+running 14 tests
+test cryptanalysis/src/nt.rs - nt::powmod (line 38) ... ok
+test cryptanalysis/src/nt.rs - nt::is_prime (line 7) ... ok
+test cryptanalysis/src/nt.rs - nt::invmod (line 48) ... ok
+test cryptanalysis/src/options.rs - options::Options (line 46) ... ok
+test cryptanalysis/src/group.rs - group::Group::dlog (line 476) ... ok
+test cryptanalysis/src/group.rs - group::Group::ec_count_points (line 197) ... ok
+test cryptanalysis/src/group.rs - group::Group::zp (line 168) ... ok
+test cryptanalysis/src/nt.rs - nt::factorize (line 61) ... ok
+test cryptanalysis/src/nt.rs - nt::primitive_root (line 28) ... ok
+test cryptanalysis/src/nt.rs - nt::next_prime (line 18) ... ok
+test cryptanalysis/src/index_calculus.rs - index_calculus (line 7) ... ok
+test cryptanalysis/src/group.rs - group::cheon_best_divisor (line 636) ... ok
+test cryptanalysis/src/lib.rs - (line 11) ... ok
+test cryptanalysis/src/gpu.rs - gpu::Group::gpu_rho (line 127) ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.59s
+
+   Doc-tests hashed_ecdl_tensor
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+Final strict lint and Rust 1.78 output, crypto then cryptanalysis (all exit 0):
+    Checking hashed-ecdl-tensor v0.1.0 (/home/ec2-user/crypto-hashed-tensor-functional-20261030/crates/hashed-ecdl-tensor)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 19.68s
+warning: unused manifest key: lints.rust.unexpected_cfgs.check-cfg
+    Checking hashed-ecdl-tensor v0.1.0 (/home/ec2-user/crypto-hashed-tensor-functional-20261030/crates/hashed-ecdl-tensor)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.05s
+    Checking hashed-ecdl-tensor v0.1.0 (/home/ec2-user/cryptanalysis-hashed-tensor-functional-20261030/bindings/rust/hashed-ecdl-tensor)
+    Checking cryptanalysis v0.1.0 (/home/ec2-user/cryptanalysis-hashed-tensor-functional-20261030/bindings/rust/cryptanalysis)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 21.23s
+    Checking hashed-ecdl-tensor v0.1.0 (/home/ec2-user/cryptanalysis-hashed-tensor-functional-20261030/bindings/rust/hashed-ecdl-tensor)
+    Checking cryptanalysis v0.1.0 (/home/ec2-user/cryptanalysis-hashed-tensor-functional-20261030/bindings/rust/cryptanalysis)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.37s
+
+Crypto broad-root preparation and retries:
+- The first compile reached the root library but reported 44 missing
+  include_str/include_bytes fixtures in the sparse checkout (exit 101).
+- Fast-forwarded to 9ff0812160499f3974d3507b936f0b7cb28123f9. Verified no
+  upstream diff in src, Cargo.toml, Cargo.lock, crates, isogeny_algos,
+  tools/factor-base or tools/volcano-cli relative to initial bd4c2fe5e6f.
+- The fast-forward reapplied sparse checkout. Restored referenced tracked
+  fixtures; a second attempt reported six references to four remaining
+  missing files. Stopped that already-failing compiler with SIGTERM, restored
+  the remaining files, verified every extracted include path exists and
+  restarted. No test was disabled, patched or skipped to hide a failure.
+- All fixture restoration was from Git; no scientific generation or S3 write.
+
+Raw missing-input error headings from the first compile:
+error: couldn't read `src/cryptanalysis/../../docs/units/bitop-v1.vectors.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/../../docs/units/bitop-v2.vectors.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/../../docs/ic/calibration.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/curve_traits/../../../docs/curves/traits.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/curve_traits/../../../docs/curves/registry.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/session.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/spec.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/plan.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/host.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/records.jsonl`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_factor_bases_20261013/sessions/prime20/session.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_factor_bases_20261013/sessions/prime20/spec.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_factor_bases_20261013/sessions/prime20/plan.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_factor_bases_20261013/sessions/prime20/host.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_factor_bases_20261013/sessions/prime20/records.jsonl`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ecbench/../../../docs/ic/boundary_targets.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/session.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_rootfind_parity_20261013/sessions/claim-n13-v2/comparisons/rho-strong__ic-c2-frob-counted-m2.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ecbench/../../../docs/ecbench/schema.sql`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ecbench/../../../docs/curves/registry.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ecbench/../../../docs/curves/registry.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ecbench_large_prime/../../../tests/fixtures/ecbench_manifest_small.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/../../tests/fixtures/ecbench_manifest_small.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/../../docs/ic/calibration.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ic_framework/../../../docs/ic/archive-comparison-v1.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ic_framework/../../../docs/ic/archive-comparison-v1.json.sha256`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ic_framework/../../../docs/ic/archive-technique-comparison-v2.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/ic_framework/../../../docs/ic/archive-technique-comparison-v2.json.sha256`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/../../docs/identity-certificates/schoenhage-10mult.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/jacobian_transfer/../../../docs/curves/registry.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/../../research/f4_linear_algebra_20260914/contract.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/../../research/ghs_cubic_genus3_build_20261012/results/run-20261013T0320Z.jsonl`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/../../research/quartic_pic_canonical_20261018/results/v4_dump_q5.jsonl`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/../../research/quartic_pic_canonical_20261018/results/v4_dump_q7.jsonl`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/../../research/quartic_pic_canonical_20261018/results/v4_dump_q11.jsonl`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-ic-state-v1/sat-preparation.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/manifest.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/instance.anf`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/instance.xor.cnf`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/result.json`: No such file or directory (os error 2)
+error: couldn't read `src/cryptanalysis/../../docs/curves/standards/parameters.json`: No such file or directory (os error 2)
+error: could not compile `crypto` (lib test) due to 44 previous errors
+
+Raw missing-input error headings from the second compile:
+error: couldn't read `/home/ec2-user/crypto-hashed-tensor-functional-20261030/research/notes/ecc2k130/disjoint_cold_v2_20261001/FROZEN.json`: No such file or directory (os error 2)
+error: couldn't read `/home/ec2-user/crypto-hashed-tensor-functional-20261030/research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b00.points.jsonl`: No such file or directory (os error 2)
+error: couldn't read `/home/ec2-user/crypto-hashed-tensor-functional-20261030/research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz`: No such file or directory (os error 2)
+error: couldn't read `/home/ec2-user/crypto-hashed-tensor-functional-20261030/research/notes/ecc2k130/disjoint_cold_v2_20261001/FROZEN.json`: No such file or directory (os error 2)
+error: couldn't read `/home/ec2-user/crypto-hashed-tensor-functional-20261030/research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b00.points.jsonl`: No such file or directory (os error 2)
+error: couldn't read `/home/ec2-user/crypto-hashed-tensor-functional-20261030/research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json`: No such file or directory (os error 2)
+
+Broad-root runtime failure diagnosis and recovery:
+The first three isolated reproductions below identify omitted tracked device
+source and historical records. Three other failures (F4 Hilbert-stop counters,
+allocator metadata and host capsule) passed in isolation with unchanged code;
+the original parallel-run failures are retained, not reclassified as passes.
+
+running 1 test
+
+thread 'cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic' (3007673) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:
+tracked gpu/certicom source must be materialized
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic ... FAILED
+
+failures:
+
+failures:
+    cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 5552 filtered out; finished in 0.02s
+
+
+running 1 test
+
+thread 'cryptanalysis::ecbench::band::tests::exact_sums_reproduce_the_band_means' (3007681) panicked at src/cryptanalysis/ecbench/band.rs:338:81:
+called `Result::unwrap()` on an `Err` value: "/home/ec2-user/crypto-hashed-tensor-functional-20261030/research/ic_planner_validation_20261020/sessions/r24/records.jsonl: No such file or directory (os error 2)"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test cryptanalysis::ecbench::band::tests::exact_sums_reproduce_the_band_means ... FAILED
+
+failures:
+
+failures:
+    cryptanalysis::ecbench::band::tests::exact_sums_reproduce_the_band_means
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 5552 filtered out; finished in 0.01s
+
+
+running 1 test
+
+thread 'cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload' (3007679) panicked at src/cryptanalysis/ecbench/bounds.rs:2379:43:
+called `Result::unwrap()` on an `Err` value: "/home/ec2-user/crypto-hashed-tensor-functional-20261030/research/ecbench_all_candidates_20261003/sessions/prime/records.jsonl: No such file or directory (os error 2)"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload ... FAILED
+
+failures:
+
+failures:
+    cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 5552 filtered out; finished in 0.02s
+
+
+running 1 test
+test cryptanalysis::f4_fp::tests::hilbert_stop_gives_the_same_reduced_basis_as_the_plain_run ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5552 filtered out; finished in 1.20s
+
+
+running 2 tests
+test cryptanalysis::ecbench::gpu::lock_and_capsule_tests::a_gpu_stage_writes_a_host_capsule_the_receipt_binds ... ok
+test cryptanalysis::ecbench::record::allocator_tests::the_child_prepares_the_allocator_before_the_solve_and_says_so ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 5551 filtered out; finished in 9.58s
+
+
+Restored the required tracked runtime inputs (device emulator, historical
+ecbench session records/verdicts, frozen chain constants, parameter files,
+work fixtures and planner references). No source changes or test exclusions.
+Reran the 29 failed tests exactly, sequentially, with the same release binary:
+awk '/^test .* \.\.\. FAILED$/ {print $2}' /tmp/hashed-tensor-root-final-tests.log | sort -u > /tmp/hashed-tensor-root-failed-tests.txt
+xargs -r target/release/deps/crypto_lib-cd696b7f650051ce --exact --test-threads=1 --nocapture < /tmp/hashed-tensor-root-failed-tests.txt
+The first recovery run found one further missing historical session. After
+restoring that study's tracked inputs, reran only that remaining failed test.
+
+running 29 tests
+test cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar ... ok
+test cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures ... ok
+test cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic ... ok
+test cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver ... ok
+test cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed ... ok
+test cryptanalysis::ecbench::band::tests::exact_sums_reproduce_the_band_means ... ok
+test cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload ... ok
+test cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible ... ok
+test cryptanalysis::ecbench::bounds::tests::a_session_counted_twice_is_refused_and_a_copy_of_its_draws_too ... ok
+test cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples ... ok
+test cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version ...
+thread 'cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version' (3043380) panicked at src/cryptanalysis/ecbench/bounds.rs:2435:38:
+called `Result::unwrap()` on an `Err` value: "/home/ec2-user/crypto-hashed-tensor-functional-20261030/research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1/session.json: No such file or directory (os error 2)"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band ... ok
+test cryptanalysis::ecbench::challenge::tests::the_committed_verdicts_read_as_version_1_and_a_new_one_is_version_2 ... ok
+test cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload ... ok
+test cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup ... ok
+test cryptanalysis::ecbench::gpu::lock_and_capsule_tests::a_gpu_stage_writes_a_host_capsule_the_receipt_binds ... ok
+test cryptanalysis::ecbench::koblitz_descent::tests::the_rule_v8_defaults_are_the_parameter_files ... ok
+test cryptanalysis::ecbench::record::allocator_tests::the_child_prepares_the_allocator_before_the_solve_and_says_so ... ok
+test cryptanalysis::ecbench::work::tests::fixture_records_reprice_to_their_committed_blocks ... ok
+test cryptanalysis::f4_fp::tests::hilbert_stop_gives_the_same_reduced_basis_as_the_plain_run ... ok
+test cryptanalysis::ic_framework::planner::tests::every_cited_file_exists ... ok
+test cryptanalysis::ic_framework::plugins::tests::compact_orbit_scan_matches_archived_n37_source42 ... ok
+test ecc::cryptopro_b_chain_set::tests::a_step_that_does_not_compose_is_refused - should panic ...
+thread 'ecc::cryptopro_b_chain_set::tests::a_step_that_does_not_compose_is_refused' (3044767) panicked at src/ecc/cryptopro_b_point.rs:601:13:
+assertion `left == right` failed: step 1: domain a does not compose
+  left: [3222, 0, 0, 9223372036854775808]
+ right: [4489424403059221815, 13107566178433889240, 9589934799479419441, 4053450176749327814]
+ok
+test ecc::cryptopro_b_chain_set::tests::frozen_chains_are_multiplication_by_lambda_and_orderings_agree ... ok
+test ecc::cryptopro_b_chain_set::tests::frozen_set_loads_and_every_chain_prepares ... ok
+test ecc::cryptopro_b_chain_set::tests::frozen_set_reproduces_its_test_vectors ... ok
+test ecc::cryptopro_b_chain_set::tests::tampered_sets_are_refused ... ok
+test ecc::endo_generic_chain_set::tests::cryptopro_b_set_loads_and_reproduces_its_vectors_on_the_generic_path ... ok
+test ecc::endo_generic_chain_set::tests::tampered_sets_are_refused ... ok
+
+failures:
+
+failures:
+    cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version
+
+test result: FAILED. 28 passed; 1 failed; 0 ignored; 0 measured; 5524 filtered out; finished in 53.29s
+
+
+running 1 test
+test cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5552 filtered out; finished in 0.11s
+
+
+Final broad-root result (original parallel run, exit 101):
+test result: FAILED. 5401 passed; 29 failed; 123 ignored; 0 measured; 0 filtered out; finished in 508.64s
+All 29 failed cases subsequently passed targeted retries as recorded above.
+No complete parallel rerun was performed. The F4 cost assertion, allocator
+metadata and host-capsule assertion passed in isolation; cause unresolved.
+Raw log: docs/hashed-ecdl-functional-root-tests.log.xz, artifact-store pointer
+in docs/.artifacts.json. Compressed bytes 80320; uncompressed bytes 503849.
+Compressed SHA-256: 73d7c10554f63add39cbb7bb651675a27392ad339553b145f1c50d56c165cc98
+Uncompressed SHA-256: 978ab375720353a81580dec0b99f262c0e13f324fdd727698b510c55a5d6aace
+Artifact verification: repository verify --remote returned 1 hydrated entry,
+0 problems. A fresh aws s3 cp download matched the compressed artifact with
+cmp, and its decompressed output matched the complete original log with cmp.
+
+Main integration at 4b1834891e78ca3f83b64540717042e0569d2a60:
+Only session-log append conflict; both histories retained. Native pruning
+source hashes unchanged. New upstream panel preparer validation follows.
+Command: CARGO_BUILD_JOBS=2 cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --bin hashed-ecdl-panel
+   Compiling hashed-ecdl-tensor v0.1.0 (/home/ec2-user/crypto-hashed-tensor-functional-20261030/crates/hashed-ecdl-tensor)
+    Finished `release` profile [optimized] target(s) in 2.96s
+     Running unittests src/bin/hashed-ecdl-panel.rs (crates/hashed-ecdl-tensor/target/release/deps/hashed_ecdl_panel-b9850214598f0c14)
+
+running 3 tests
+test tests::oracle_checks_full_cardinality_and_all_native_multiples ... ok
+test tests::panel_preserves_every_frozen_case_and_separates_answers ... ok
+test tests::preparation_is_complete_and_existing_evidence_is_never_replaced ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+    Checking hashed-ecdl-tensor v0.1.0 (/home/ec2-user/crypto-hashed-tensor-functional-20261030/crates/hashed-ecdl-tensor)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.57s
+warning: unused manifest key: lints.rust.unexpected_cfgs.check-cfg
+    Checking hashed-ecdl-tensor v0.1.0 (/home/ec2-user/crypto-hashed-tensor-functional-20261030/crates/hashed-ecdl-tensor)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.92s
+Formatting check exited 0. All three modified native source hashes still
+match the validated cryptanalysis implementation.
