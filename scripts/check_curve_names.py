@@ -364,7 +364,7 @@ def main() -> int:
                         "run scripts/build_curve_registry.py")
     if (not cid.REGISTRY_INDEX.exists()
             or cid.REGISTRY_INDEX.read_text() != cid.registry_index_text(cid.REGISTRY.read_text())):
-        problems.append("src/cryptanalysis/ecbench/registry_index.tsv does not match docs/curves/registry.json; "
+        problems.append("src/cryptanalysis/ecbench/registry_index.txt does not match docs/curves/registry.json; "
                         "run scripts/build_curve_registry.py")
     if args.diff:
         problems += lint_diff(args.diff, res)

@@ -15,7 +15,7 @@ the run report is its `reports/run-20261101T0130Z/`.
 Headline (Callgrind Ir, deterministic, each arm against the `main` it was
 built on): a 32-bit `rho.negation` child 275.2M → 32.6M instructions
 (−88%), a 32-bit `ic.pipeline` child 1,157.0M → 916.3M (−21%), a 20-bit
-rho child 208.5M → 3.4M; the `rho.negation` solve itself 928.9 → 881.1
+rho child 208.5M → 3.4M; the `rho.negation` solve itself 928.9 → 881.0
 Ir/GAE at 32 bits (−5.1%). Every record of both
 scratch sessions replays identically under every binary, so no counted
 cost, `S` or leaderboard row changes. Engineering.

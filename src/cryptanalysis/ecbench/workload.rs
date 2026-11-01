@@ -859,16 +859,24 @@ pub fn prime_automorphisms(curve: &PrimeCurve, generator: PrimePoint, r: u64) ->
 }
 
 const REGISTRY: &str = include_str!("../../../docs/curves/registry.json");
-/// The registry's index: one `<slug>\t<byte offset>` line per slug, sorted
-/// by slug, the offset being that of the opening quote of the slug's value
-/// in `REGISTRY` (its first `"slug": "…"` pair in document order).
-/// Written with the registry by `scripts/build_curve_registry.py`
-/// (`registry_index_text` in `scripts/curve_id.py`); `check_curve_names.py`
-/// and the test below fail when it is stale, so an index miss means the
-/// document has no such entry.  (A `build.rs` could generate it, but a
-/// build script makes Cargo list every file of the package to fingerprint
-/// it, which this repository's size and CI's partial clones do not bear.)
-const REGISTRY_INDEX: &str = include_str!("registry_index.tsv");
+/// The registry's index: one decimal byte offset per line, the offset of
+/// the opening quote of a slug's value in `REGISTRY` (its first
+/// `"slug": "…"` pair in document order), the lines ordered by that slug.
+/// The slugs themselves are read from `REGISTRY` at the offsets, so the
+/// index stays small (offsets only).  Written with the registry by
+/// `scripts/build_curve_registry.py` (`registry_index_text` in
+/// `scripts/curve_id.py`); `check_curve_names.py` and the test below fail
+/// when it is stale, so an index miss means the document has no such
+/// entry.  (A `build.rs` could generate it, but a build script makes Cargo
+/// list every file of the package to fingerprint it, which this
+/// repository's size and CI's partial clones do not bear.)
+const REGISTRY_INDEX: &str = include_str!("registry_index.txt");
+
+/// The slug whose value's opening quote is at byte `at` of `REGISTRY`.
+fn registry_slug_at(at: usize) -> Option<&'static str> {
+    let rest = REGISTRY.get(at..)?.strip_prefix('"')?;
+    Some(&rest[..rest.find('"')?])
+}
 
 /// The byte offset in `REGISTRY` of `slug`'s value, by binary search over
 /// the lines of `REGISTRY_INDEX`; `None` when the index has no such slug.
@@ -887,10 +895,9 @@ fn registry_index_offset(slug: &str) -> Option<usize> {
             .iter()
             .position(|&b| b == b'\n')
             .map_or(hi, |i| start + i);
-        let line = std::str::from_utf8(&text[start..end]).ok()?;
-        let (s, at) = line.split_once('\t')?;
-        match s.cmp(slug) {
-            std::cmp::Ordering::Equal => return at.parse().ok(),
+        let at: usize = std::str::from_utf8(&text[start..end]).ok()?.parse().ok()?;
+        match registry_slug_at(at)?.cmp(slug) {
+            std::cmp::Ordering::Equal => return Some(at),
             std::cmp::Ordering::Less => lo = (end + 1).min(hi),
             std::cmp::Ordering::Greater => hi = start,
         }
@@ -1928,9 +1935,9 @@ mod tests {
         .is_err());
     }
 
-    /// `registry_index_text` of `scripts/curve_id.py`, restated: every
-    /// `"slug": "…"` pair's first occurrence, sorted, with the offset of
-    /// the value's opening quote.
+    /// `registry_index_text` of `scripts/curve_id.py`, restated: the offset
+    /// of the value's opening quote of every `"slug": "…"` pair's first
+    /// occurrence, ordered by slug.
     fn expected_registry_index(text: &str) -> String {
         let key = "\"slug\"";
         let mut pairs: Vec<(&str, usize)> = Vec::new();
@@ -1955,7 +1962,7 @@ mod tests {
         }
         pairs.sort_by(|a, b| a.0.cmp(b.0).then(a.1.cmp(&b.1)));
         pairs.dedup_by(|later, first| later.0 == first.0);
-        pairs.iter().map(|(s, at)| format!("{s}\t{at}\n")).collect()
+        pairs.iter().map(|(_, at)| format!("{at}\n")).collect()
     }
 
     /// The slug-targeted extraction answers exactly as the full parse:
@@ -1983,16 +1990,15 @@ mod tests {
         assert_eq!(
             REGISTRY_INDEX,
             expected_registry_index(REGISTRY),
-            "registry_index.tsv is stale"
+            "registry_index.txt is stale"
         );
         assert_eq!(REGISTRY_INDEX.lines().count(), all.len());
+        let mut previous = "";
         for (i, line) in REGISTRY_INDEX.lines().enumerate() {
-            let (slug, at) = line.split_once('\t').unwrap();
-            let at: usize = at.parse().unwrap();
-            assert!(
-                REGISTRY[at..].starts_with(&format!("\"{slug}\"")),
-                "{slug} at {at}"
-            );
+            let at: usize = line.parse().unwrap();
+            let slug = registry_slug_at(at).unwrap();
+            assert!(previous < slug, "{slug} out of order at line {i}");
+            previous = slug;
             if i % 97 == 0 {
                 assert_eq!(registry_index_offset(slug), Some(at), "{slug}");
             }

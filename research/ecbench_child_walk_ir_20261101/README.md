@@ -34,17 +34,22 @@ Three changes, measured as steps from the same baseline:
   one the old code computed.
 - **C.** `registry_entry` (`ecbench::workload`) finds a curve's entry in
   `docs/curves/registry.json` (20.8 MB, 20,848 entries, not sorted by slug)
-  through `registry_index.tsv`, an index written beside the registry by
-  `scripts/build_curve_registry.py` (every `"slug": "…"` pair's first
-  occurrence, sorted, with the byte offset of its value; `registry_index_text`
-  in `scripts/curve_id.py`), binary-searched as text and the entry cut out
-  at that offset; the slug scan and the full parse stay as the fallback and
+  through `src/cryptanalysis/ecbench/registry_index.txt`, an index written
+  beside the registry by `scripts/build_curve_registry.py` (for every
+  `"slug": "…"` pair's first occurrence, the byte offset of its value, one
+  per line, ordered by slug: 177 KB; the reader takes each probe's slug from
+  the registry at the offset; `registry_index_text` in
+  `scripts/curve_id.py`), binary-searched as text and the entry cut out at
+  that offset; the slug scan and the full parse stay as the fallback and
   the entry is still checked to carry the slug, so every answer is the one
   the full parse gives. `check_curve_names.py` and the unit test fail when
   the index is stale, as for the alias table. (A `build.rs` generating the
   index was tried first: it makes Cargo list every file of the package to
-  fingerprint the build script, which CI's partial clones fail; the arm C
-  rows were re-measured with the committed index.) Under B the 32-bit child still spent 37.0M of its
+  fingerprint the build script, which CI's partial clones fail. A 754 KB
+  `<slug>\t<offset>` form came next and needed an artifact-policy `keep`
+  entry, which the repository's `migrate` gate refuses from a pull request;
+  the offsets-only form is under the policy's limit for text. The arm C rows
+  were re-measured with the final index.) Under B the 32-bit child still spent 37.0M of its
   39.2M pre-solve instructions in that scan (`str::find` from
   `Instance::facts`), because its curve's entry sits deep in the document;
   the 20-bit curve's entry is near the start, which is why the 20-bit
@@ -58,7 +63,7 @@ Three changes, measured as steps from the same baseline:
 | A | baseline + `curve_id.rs` | e6a5053058cd1b0b |
 | B | A + `ic_boundary.rs` | 0eff84e84d22b1a6 |
 | baseline′ | `main` 5ac38ef4e9 (2026-11-01, the PR's base after merging `main`) | 9dd9e01b6b6b18a2 |
-| C | baseline′ + the three source files of A and B + `registry_index.tsv` | 6f9518ed5046cada |
+| C | baseline′ + the three source files of A and B + `registry_index.txt` | 0038806674a3af21 |
 
 Inputs: the planned executions of two reduced copies of the frozen 20-bit
 holdout spec of `research/prime_base_oracle_tuning_20261029`
@@ -82,15 +87,15 @@ solve counts sit above B's.
 | | A | 3,341,048 | 1,296,509 | 1,706 | 760.0 |
 | | B | 3,331,282 | **1,222,380** | 1,706 | **716.5** |
 | | baseline′ | 207,188,998 | 1,296,397 | 1,706 | 759.9 |
-| | C | **2,178,485** | 1,223,171 | 1,706 | 717.0 |
+| | C | **2,170,921** | 1,222,979 | 1,706 | 716.9 |
 | `ic.pipeline` N=32 (seq 1) | baseline | 206,928,755 | 14,889,758 | 14,101 | 1,055.9 |
 | | A | 3,371,805 | 14,885,744 | 14,101 | 1,055.6 |
 | | B | 3,362,189 | 14,887,062 | 14,101 | 1,055.7 |
 | | baseline′ | 207,239,335 | 15,142,243 | 14,101 | 1,073.8 |
-| | C | **2,210,879** | 15,144,442 | 14,101 | 1,074.0 |
+| | C | **2,203,287** | 15,144,353 | 14,101 | 1,074.0 |
 | `ic.pipeline` N=45 (seq 2) | baseline | 206,920,193 | 10,123,197 | 10,632 | 952.1 |
 | | baseline′ | 207,250,032 | 10,275,946 | 10,632 | 966.5 |
-| | C | **2,203,539** | 10,267,606 | 10,632 | 965.7 |
+| | C | **2,203,287** | 10,267,488 | 10,632 | 965.7 |
 
 - A takes 98.4% of the pre-solve instructions out of every child
   (206.9M → 3.3M). The 3.3M that remain are the registry entry search, the
@@ -130,11 +135,11 @@ across the binaries; only wall-clock, scheduler and placement fields differ.
 | `rho.negation` (seq 0) | baseline | 274,792,709 | 242,782,512 | 31,726,911 | 34,156 | 928.9 |
 | | B | 69,591,262 | 39,232,509 | **30,093,469** | 34,156 | **881.1** |
 | | baseline′ | 275,220,629 | 243,219,672 | 31,727,893 | 34,156 | 928.9 |
-| | C | **32,594,966** | **2,218,763** | 30,093,073 | 34,156 | 881.1 |
+| | C | **32,598,131** | **2,207,376** | 30,092,881 | 34,156 | 881.0 |
 | `ic.pipeline` N=1024 (seq 1) | baseline | 1,147,910,545 | — | — | 1,446,809 | — |
 | | B | 944,194,507 | — | — | 1,446,809 | — |
 | | baseline′ | 1,157,017,508 | — | — | 1,446,809 | — |
-| | C | **916,254,791** | — | — | 1,446,809 | — |
+| | C | **916,254,438** | — | — | 1,446,809 | — |
 
 - The parse is the same constant per child at 32 bits: 203.5M Ir before
   the rho child's solve marker (242.8M → 39.2M; the 20-bit difference is
