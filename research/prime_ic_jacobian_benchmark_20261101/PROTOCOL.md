@@ -121,9 +121,9 @@ are merged. Dispatch `.github/workflows/isolab-experiment.yml` against the exact
 40-character merge revision on `main`, with `SPEC.json`, L2, four CPUs, and no
 retries. Before dispatch:
 
-1. initialize and complete `RESUME_CHECKPOINT.md` with
+1. initialize and complete `.resume/RESUME.md` with
    `scripts/checkpoint.sh init`;
-2. push the checkpoint and run `scripts/checkpoint_gate.sh`;
+2. push and verify the checkpoint with `scripts/checkpoint.sh gate`;
 3. refuse launch if that gate fails.
 
 The current development environment has no checkpoint upload token or AWS
