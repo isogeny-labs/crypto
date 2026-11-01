@@ -140,20 +140,20 @@
       "examples/dreg_high_arity_report.rs"
     ],
     "publication_receipt": null,
-    "source_commit": null,
-    "protocol_sha256": null
+    "source_commit": "a52f8e5a6e977dda20f1fc7add5ba48c543ecca6",
+    "protocol_sha256": "0a4c78928ead71060d3d65cf7b32bb34a78e89c4cbf463627fad3ceed311c192"
   },
   "blockers": [
     "The current AWS identity is account 590183823895, not required account 104186811093, and /ephemeral/config is unavailable.",
     "The 2026-11-01 AWS budget inspection reports both USD 25 daily thresholds already exceeded; current account and lane headroom has not been re-established.",
     "The exact draw-specific closure logical names cannot be filed until the three preregistered generator streams are replay-audited, committed, and pushed.",
-    "The exact backend submission command, source commit, frozen protocol hash, and GitHub publication-check receipt are not yet filed."
+    "The exact backend submission command and GitHub publication-check receipt are not yet filed."
   ],
   "unblock_requirements": [
     "Use the required account through existing authorized credentials and recover the deployed ephemeral configuration; do not substitute another account, region, pool, or provider.",
     "Record account-budget and lane-ledger telemetry proving enough unreserved headroom inside the USD 20.00 campaign ceiling.",
     "After draw generation, replace closure_draw_commands with the exact 19 ordered commands and commit and push the replay-audited draw inputs and custody sidecars.",
     "Record the exact backend submission command and immutable request identity.",
-    "Fill source_commit and protocol_sha256, run the listed GitHub custody check against the pushed HEAD, retain its receipt, and bind that receipt to the image and request before any build or job."
+    "Run the listed GitHub custody check against the pushed frozen-protocol HEAD, retain its receipt, and bind that receipt to the image and request before any cloud build or job."
   ]
 }

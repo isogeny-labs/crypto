@@ -1,6 +1,13 @@
 # High-arity Boolean closure-degree discriminator
 
-Status: **preregistered draft; no scientific run has started**.
+Status: **protocol frozen; no scientific run has started**.
+
+The protocol was frozen before affected data on 2026-11-01 at source commit
+`a52f8e5a6e977dda20f1fc7add5ba48c543ecca6`, with canonical protocol SHA-256
+`0a4c78928ead71060d3d65cf7b32bb34a78e89c4cbf463627fad3ceed311c192`.
+The four release identities are recorded in `binary.sha256`. Execution remains
+blocked by the independent custody, draw-command, account, and budget gates
+below.
 
 This study executes the still-unmeasured native closure cells identified by
 `research/factor_base_arity_review_20261024/README.md`:
@@ -136,7 +143,7 @@ stack is in account `104186811093`; `/ephemeral/config` is absent under the
 current identity; and the 2026-11-01 account inspection found both USD 25
 daily budget thresholds already exceeded. The exact draw-specific closure
 commands do not exist until the frozen generators produce replay-audited draw
-inputs. Before any build or job, those 19 ordered commands and the exact
+inputs. Before any cloud build or job, those 19 ordered commands and the exact
 backend submission command must be added to the request, all code, protocol,
 inputs/manifests and configuration must be committed and pushed, and the
 listed GitHub custody check must produce a retained receipt bound to the
@@ -149,8 +156,8 @@ Commands and exact decision rules are recorded in
 [PREREGISTRATION.md](PREREGISTRATION.md). The canonical machine-readable
 contract is [protocol.json](protocol.json). The exact publication mapping is
 specified in [REPORT_EXPORT_CONTRACT.md](REPORT_EXPORT_CONTRACT.md). Its code
-and consistency tests pass; binary hash binding remains required before
-freeze. The runner also requires a byte-identical fresh frozen-analyzer replay
+and consistency tests pass; all source, binary, compiler, image, and analysis
+hashes are frozen. The runner also requires a byte-identical fresh frozen-analyzer replay
 immediately before publication. The analyzer itself emits only
 `dreg_high_arity.summary/v1`,
 and no export or report from a registered run is claimed to exist.
