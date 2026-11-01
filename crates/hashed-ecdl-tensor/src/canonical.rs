@@ -584,6 +584,20 @@ fn validate_tag(tag: &PredicateTag) -> Result<()> {
 }
 
 impl CanonicalPredicate {
+    /// Evaluate this exact canonical predicate on one ordered port assignment.
+    ///
+    /// Bounded predicates use their packed truth table. Larger production
+    /// predicates use the typed program that is part of the canonical digest.
+    pub fn evaluate(&self, ports: &[bool], meter: &mut Meter) -> Result<bool> {
+        self.validate()?;
+        meter.charge(1, "canonical predicate evaluation")?;
+        if let Some(program) = &self.program {
+            program.evaluate(ports, meter)
+        } else {
+            self.accepts(ports)
+        }
+    }
+
     fn accepts(&self, ports: &[bool]) -> Result<bool> {
         if ports.len() != self.arity {
             return Err(invalid("canonical predicate port arity"));
@@ -641,12 +655,7 @@ impl Predicate for TruthTablePredicate {
     }
 
     fn evaluate(&self, ports: &[bool], meter: &mut Meter) -> Result<bool> {
-        meter.charge(1, "canonical truth-table predicate lookup")?;
-        if let Some(program) = &self.canonical.program {
-            program.evaluate(ports, meter)
-        } else {
-            self.canonical.accepts(ports)
-        }
+        self.canonical.evaluate(ports, meter)
     }
 
     fn canonical_tag(&self) -> Option<&PredicateTag> {
