@@ -5,7 +5,9 @@ result set. See [AMENDMENT_1.md](AMENDMENT_1.md) for the retained failure
 classification and prospective infrastructure remediation. A fixed receipt-only
 diagnostic is prepared in [`diagnostic/`](diagnostic/): it submits no EKS work
 and publishes only hash-verified gate booleans, counts, and failed predicate
-names for the retained target-1 audit failure. It does not authorize a retry.
+names for the retained target-1 audit failure. [AMENDMENT_2.md](AMENDMENT_2.md)
+records the resulting censored-outcome gate defect and freezes its candidate
+correction. It authorizes publication-only verification, not a retry.
 
 This study fills a specific accounting gap in the binary-curve index-calculus
 work: it measures a complete, current-source, cold solve from setup through an

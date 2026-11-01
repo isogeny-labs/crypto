@@ -120,7 +120,9 @@ taskq/deploy/eks-karpenter/remote/launch-remote request.json
 ```
 
 The script validates and normalizes the request, uploads it under its SHA-256,
-starts the configured CodeBuild project, and returns a
+uploads and hash-pins the current reviewed `remote/run-request`, starts the
+configured CodeBuild project with the repository's fixed buildspec and a
+100-minute terminal override, and returns a
 [result receipt](contracts/result.schema.json). An SDK can perform the same
 `S3 PutObject → CodeBuild StartBuild → BatchGetBuilds → S3 GetObject` sequence.
 Use the normalized request hash as the StartBuild token; AWS's short-lived token
@@ -133,6 +135,13 @@ The supplied GitHub OIDC role is restricted to the configured repository's main
 branch. Other AWS roles/CI identity providers need their own explicit grants.
 StartBuild can override project settings, so this permission is for trusted lab
 operators, not a public unauthenticated service.
+
+The per-build override changes only `remote/run-request`: the deployed launcher
+bundle still supplies its validated request parser, readiness checks, build
+verifier and pinned tools. Both override files are content-addressed under the
+existing request-write boundary and re-hashed inside CodeBuild. This lets a
+reviewed launcher correction take effect without silently depending on whether
+the CloudFormation source bundle has already been redeployed.
 
 ## GitHub Actions
 
