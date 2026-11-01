@@ -1,0 +1,55 @@
+import FallbackWordRemainder
+set_option autoImplicit false
+namespace ReductionWord
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest PencilWordRefinement WideModPow
+
+theorem trim_fixed (fuel : Nat) (xs : List UInt64) (hn : Normal xs) : trimFuel fuel xs=xs := by
+ cases fuel with
+ | zero => rfl
+ | succ fuel => simp [trimFuel,hn]
+
+def monic (p : UInt64) (xs : List UInt64) : List UInt64 :=
+ if xs=[] then [] else if xs.getLast?=some 1 then xs else
+ PegcdWord.scale p (inverseGenerator p (xs.getLast?.getD 0)) xs
+
+theorem inverse_scale_shape (p last : UInt64) [Fact p.toNat.Prime] (xs : List UInt64)
+ (hp : 1 < p.toNat) (hb : p.toNat < 2^31) (hc : Canon p xs)
+ (hl : xs.getLast?=some last) (ha : last.toNat < p.toNat) (hn : last ≠ 0) :
+ Canon p (PegcdWord.scale p (inverseGenerator p last) xs) ∧
+ Normal (PegcdWord.scale p (inverseGenerator p last) xs) ∧
+ (PegcdWord.scale p (inverseGenerator p last) xs).length=xs.length ∧
+ (PegcdWord.scale p (inverseGenerator p last) xs).getLast?=some 1 ∧
+ ∃ c : ZMod p.toNat, c ≠ 0 ∧
+ wordsPoly p (PegcdWord.scale p (inverseGenerator p last) xs)=C c*wordsPoly p xs := by
+ have hw := generator_witness p last hp hb ha hn
+ have hscale := PegcdWord.scale_correct p (inverseGenerator p last) xs (by omega) hb hw.2.2.1 hc
+ have hraw : (PegcdWord.scaleRaw p (inverseGenerator p last) xs).getLast?=some 1 := by
+   simp [PegcdWord.scaleRaw,List.getLast?_map,hl,hw.2.2.2]
+ have hnormal : Normal (PegcdWord.scaleRaw p (inverseGenerator p last) xs) := by
+   simp [Normal,hraw]
+ have he : PegcdWord.scale p (inverseGenerator p last) xs=PegcdWord.scaleRaw p (inverseGenerator p last) xs :=
+   trim_fixed _ _ hnormal
+ have hlen : (PegcdWord.scale p (inverseGenerator p last) xs).length=xs.length := by
+   rw [he]; simp [PegcdWord.scaleRaw]
+ have hlast : (PegcdWord.scale p (inverseGenerator p last) xs).getLast?=some 1 := by rw [he]; exact hraw
+ have hi : ((inverseGenerator p last).toNat : ZMod p.toNat) ≠ 0 := by
+   rw [generator_decode p last hp ha hn]
+   exact inv_ne_zero (canonical_word_nonzero p last (by omega) ha hn)
+ exact ⟨hscale.1,hscale.2.1,hlen,hlast,_,hi,hscale.2.2⟩
+
+theorem monic_shape (p : UInt64) [Fact p.toNat.Prime] (xs : List UInt64)
+ (hp : 1 < p.toNat) (hb : p.toNat < 2^31) (hc : Canon p xs) (hn : Normal xs) (he : xs ≠ []) :
+ Canon p (monic p xs) ∧ Normal (monic p xs) ∧ (monic p xs).length=xs.length ∧
+ (monic p xs).getLast?=some 1 ∧
+ ∃ c : ZMod p.toNat, c ≠ 0 ∧ wordsPoly p (monic p xs)=C c*wordsPoly p xs := by
+ by_cases h1 : xs.getLast?=some 1
+ · simp only [monic,if_neg he,if_pos h1]
+   exact ⟨hc,hn,rfl,h1,1,one_ne_zero,by simp⟩
+ · have hl : xs.getLast?=some (xs.getLast he) := List.getLast?_eq_some_getLast he
+   have ha : (xs.getLast he).toNat < p.toNat := hc _ (List.getLast_mem he)
+   have hanz : xs.getLast he ≠ 0 := by
+     intro hz
+     exact hn (by simp [hl,hz])
+   simpa only [monic,if_neg he,if_neg h1,hl,Option.getD_some] using
+     inverse_scale_shape p (xs.getLast he) xs hp hb hc hl ha hanz
+end ReductionWord
