@@ -91,6 +91,9 @@ MCP clients point at `${URL}mcp` with the header
 as server `ecdb` and reads the token from `ECDB_TOKEN`; see
 [`../docs/AGENTS.md`](../docs/AGENTS.md).
 
+A private copy on a LAN host (a NAS) is in [`nas/`](nas/README.md): docker
+compose with Postgres and the API, filled by `ecdb sync` from `/v1/export`.
+
 Rotate a token or password by editing `ecdb/api`, then re-run
 `deploy-aws.sh` with `ECDB_SKIP_IMPORT=1`. The script refreshes the function
 environment and `bootstrap_roles` re-passwords the logins.
