@@ -1905,6 +1905,7 @@ fn bounds_a_frontier_and_challenge_verdicts_round_trip() {
         "verify",
         "--dir",
         &s(&session),
+        "--replay-all",
         "--exit-code",
         "--out",
         &s(&receipt),
