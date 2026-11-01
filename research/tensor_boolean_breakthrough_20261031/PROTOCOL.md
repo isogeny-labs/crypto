@@ -158,6 +158,12 @@ E3 has a separate search split: the smallest two frozen E1 sizes form training o
 
 ## Freeze blockers
 
+The exact boundary contraction and fraction-free rank core named below was
+implemented on 2026-11-01 and is verified only on development controls; see
+[`E1_IMPLEMENTATION.md`](E1_IMPLEMENTATION.md). This does not freeze the
+protocol or satisfy the production generator, null, A/A, preflight or identity
+fields.
+
 The JSON record remains draft until all of these are present:
 
 - canonical IR version and E0 passing commit;
