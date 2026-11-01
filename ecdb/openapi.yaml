@@ -239,6 +239,59 @@ paths:
       description: "Convention: n = 2 is psi_2^2 = 4x^3 + b2 x^2 + 2 b4 x + b6; odd n is psi_n; n = 4 is psi_4 / psi_2. Each was checked to vanish on torsion points when the curve is small enough to enumerate."
       parameters: [{ $ref: "#/components/parameters/reference" }]
       responses: { "200": { description: "{curve_id, convention, items[{n, variant, degree, sha256, coefficients_ascending, factor_degrees, status}]}" } }
+  /v1/curves/{reference}/measurements:
+    get:
+      summary: The curve's measured results, each block in its producer's unit
+      description: IC leaderboard rows with recipes, ecbench arm summaries (v_ecbench_arm), sibling-dataset measurements and sibling-repository records with their match kind. Compare within one block only.
+      parameters: [{ $ref: "#/components/parameters/reference" }]
+      responses: { "200": { description: "{curve_id, ic_leaderboard, ecbench_arms, dataset_measurements, external_records, caution}" } }
+  /v1/ic/leaderboard:
+    get:
+      summary: The IC leaderboard (docs/ic/leaderboard.json), as frozen there.
+      description: best_ratio_rho is IC / rho for the best recipe, cold, against the matched rho of the row's family, in that family's unit; ratios compare only within a family.
+      parameters:
+        - { name: family, in: query, schema: { type: string, enum: [A, B, C] } }
+        - { name: regime, in: query, schema: { type: string } }
+        - { name: validation, in: query, schema: { type: string }, description: "validated or unvalidated (pre-gate)" }
+        - { name: recipes, in: query, schema: { type: boolean, default: false } }
+      responses: { "200": { description: "{families[], rows[], caution}" } }
+  /v1/ic/progress:
+    get:
+      summary: The progress timeline (docs/ic/progress-timeline.json).
+      parameters: [{ name: series, in: query, schema: { type: string } }]
+      responses: { "200": { description: "{series[{id, label, points[]}], caution}" } }
+  /v1/ic/boundary:
+    get:
+      summary: The boundary ledger (docs/ic/boundary_targets.json), per regime and stage.
+      parameters:
+        - { name: regime, in: query, schema: { type: string } }
+        - { name: stage, in: query, schema: { type: string } }
+      responses: { "200": { description: "{items[]}" } }
+  /v1/benchmarks:
+    get:
+      summary: The benchmarks/ index, with each entry's README or archive row and VALIDATION.json.
+      parameters:
+        - { name: listed, in: query, schema: { type: string, enum: [admitted, archive, unlisted] } }
+        - { name: q, in: query, schema: { type: string } }
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses: { "200": { description: OK } }
+  /v1/ecbench/sessions:
+    get:
+      summary: ecbench sessions, newest first.
+      parameters:
+        - { name: method, in: query, schema: { type: string } }
+        - { name: curve, in: query, schema: { type: string }, description: ICV1 slug of a workload curve }
+        - { name: label, in: query, schema: { type: string } }
+        - { name: path, in: query, schema: { type: string } }
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses: { "200": { description: OK } }
+  /v1/ecbench/sessions/{id}:
+    get:
+      summary: One ecbench session with per-arm summaries (runs, verified, mean S and its standard error, mean ratio to the floor) and paired comparisons.
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK }, "404": { description: Not found } }
   /v1/isogenies/{id}:
     get:
       summary: One isogeny with its routes and provenance.
@@ -314,6 +367,55 @@ paths:
     get:
       summary: Semaev summation polynomials S_2 and S_3 for y^2 = x^3 + a x + b, generic in a and b.
       responses: { "200": { description: OK } }
+  /v1/export:
+    get:
+      summary: Bulk-export manifest, for mirrors (`ecdb sync`).
+      description: Every table of schema ec except the migration ledger, with its copyable (non-generated) columns, primary key and exact row count.
+      responses: { "200": { description: OK } }
+  /v1/export/{table}:
+    get:
+      summary: One page of a table in Postgres COPY text format, gzipped, in primary-key order.
+      description: The x-ecdb-rows header gives the page's row count. A page over 4 MiB gzipped is refused with 413; ask again with a smaller limit.
+      parameters:
+        - { name: table, in: path, required: true, schema: { type: string } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200000, default: 20000 } }
+      responses:
+        "200": { description: gzipped COPY text, content: { application/gzip: {} } }
+        "404": { description: no such table }
+        "413": { description: page too large }
+  /v1/factor-bases:
+    get:
+      summary: Factor bases of the IC work over ec.v_factor_base_summary (size, results, solved, best solved S).
+      parameters:
+        - { name: curve, in: query, schema: { type: string }, description: any curve reference, or the producer's curve name }
+        - { name: family, in: query, schema: { type: string } }
+        - { name: scheme, in: query, schema: { type: string, enum: [fb1, fbarchive, spec] } }
+        - { name: min_columns, in: query, schema: { type: integer } }
+        - { name: max_columns, in: query, schema: { type: integer } }
+        - { name: solved, in: query, schema: { type: boolean } }
+        - { name: sort, in: query, schema: { type: string, enum: [results, best_s, columns, key] } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
+      responses: { "200": { description: OK } }
+  /v1/factor-bases/{key}:
+    get:
+      summary: One factor base by FB1/FBS1 id, archive digest, alias (PS1 label, cited digest) or id, with aliases, FBM1 configurations and results by source.
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+      responses: { "200": { description: OK }, "404": { description: unknown }, "409": { description: ambiguous alias } }
+  /v1/factor-bases/{key}/results:
+    get:
+      summary: The base's results (ecbench runs, large-prime cells, SECG small-x yields), or its points with points=true.
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+        - { name: source, in: query, schema: { type: string } }
+        - { name: fbm_id, in: query, schema: { type: string } }
+        - { name: solved, in: query, schema: { type: boolean } }
+        - { name: points, in: query, schema: { type: boolean } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
+      responses: { "200": { description: OK } }
   /v1/sql:
     post:
       summary: Run one read-only SQL query (search_path ec, public).
@@ -368,7 +470,7 @@ paths:
         prompts/list return empty lists). Notifications answer 202. initialize, ping and tools/list need no token;
         tools/call forwards the caller's Authorization header to the REST route the tool maps to. Tools:
         ecdb_schema, ecdb_search_curves, ecdb_get_curve, ecdb_curve_detail, ecdb_isogeny_class, ecdb_transfers,
-        ecdb_polynomials, ecdb_sql, ecdb_record_evidence.
+        ecdb_polynomials, ecdb_results, ecdb_ecbench, ecdb_sql, ecdb_record_evidence.
       security: [{}]
       requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
       responses: { "200": { description: JSON-RPC response }, "202": { description: notification accepted } }

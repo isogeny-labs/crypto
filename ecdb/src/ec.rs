@@ -242,6 +242,54 @@ pub fn glv_basis(r: &BigInt, lambda: &BigInt) -> [(BigInt, BigInt); 2] {
     [v1, v2]
 }
 
+/// Miller–Rabin with the first 13 prime bases (deterministic below
+/// 3.3 * 10^24) and 8 more fixed bases. Returns (probable prime, proved).
+pub fn is_probable_prime(n: &BigInt) -> (bool, bool) {
+    let two = BigInt::from(2);
+    if *n < two {
+        return (false, true);
+    }
+    const SMALL: [u32; 13] = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41];
+    for p in SMALL {
+        let p = BigInt::from(p);
+        if *n == p {
+            return (true, true);
+        }
+        if (n % &p).is_zero() {
+            return (false, true);
+        }
+    }
+    let one = BigInt::one();
+    let nm1 = n - &one;
+    let mut d = nm1.clone();
+    let mut s = 0u32;
+    while d.is_even() {
+        d >>= 1;
+        s += 1;
+    }
+    let extra = [53u64, 59, 61, 67, 71, 73, 79, 83];
+    let bases = SMALL.iter().map(|&b| b as u64).chain(extra);
+    'witness: for a in bases {
+        let a = BigInt::from(a);
+        if (&a % n).is_zero() {
+            continue; // a base that n divides says nothing (n = 53, ..., 83)
+        }
+        let mut x = modpow(&a, &d, n);
+        if x == one || x == nm1 {
+            continue;
+        }
+        for _ in 1..s {
+            x = (&x * &x) % n;
+            if x == nm1 {
+                continue 'witness;
+            }
+        }
+        return (false, true);
+    }
+    let bound: BigInt = "3317044064679887385961981".parse().unwrap();
+    (true, *n < bound)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

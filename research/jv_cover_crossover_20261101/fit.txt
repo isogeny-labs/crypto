@@ -1,0 +1,19 @@
+predecessor pooled rho_e S = 1.3437 (n=176)
+CALIBRATION p=251 rhodp mean 1.5393 sd 0.666 n=16 vs rho_e mean 1.2638 sd 0.558 n=32: diff +0.2755, Welch df 25.9, 95% interval [-0.123, +0.673], contains 0: true; |diff|<0.3: true
+REPRODUCTION p=1009 seed=1: total_muls new 429320392173 predecessor 452313823812 identical: false
+p=1301: S per seed [1.4939968550895473, 1.336605146812347, 1.1249352074611745] gm 1.3097; rhodp 1.651 ± 0.795 (9) | **0.793** [0.587, 1.119] | not resolved; rhostrong 0.971 ± 0.347 (6) | **1.349** [1.085, 1.699] | above measured rho at p; model 1.045
+p=1451: S per seed [0.9820992927726321, 1.0363848662491004, 1.2412342002040773] gm 1.0810; rhodp 1.395 ± 0.671 (9) | **0.775** [0.645, 0.970] | below measured rho at p; rhostrong 1.017 ± 0.477 (6) | **1.063** [0.819, 1.477] | not resolved; model 0.835
+p=1601: S per seed [1.1184125445836213, 0.7163633241873747, 0.6654031414451005] gm 0.8108; rhodp 1.381 ± 0.385 (9) | **0.587** [0.448, 0.811] | below measured rho at p; rhostrong 0.892 ± 0.382 (6) | **0.910** [0.658, 1.339] | not resolved; model 0.683
+FIT A primary: measured rho wherever it exists (503, 1009 keep the pooled 1.344 assumption): n=26 slope -2.098 (se 0.053, t-CI95 [-2.208, -1.989], boot [-2.234, -1.977], 20000 valid resamples) p* 1264 (boot [1197, 1348]) MODEL extrapolation; line at new primes {"1301": 0.9406199156045157, "1451": 0.7481127557794854, "1601": 0.6085718498857637}
+FIT B: as A, with 503 and 1009 priced at the new-prime rhodp pooled mean: n=26 slope -2.106 (se 0.053, t-CI95 [-2.216, -1.997], boot [-2.241, -1.984], 20000 valid resamples) p* 1246 (boot [1181, 1328]) MODEL extrapolation; line at new primes {"1301": 0.9123905667861832, "1451": 0.7250440491355421, "1601": 0.5893540458278216}
+FIT C: only points with measured rho (503 and 1009 dropped): n=20 slope -2.106 (se 0.061, t-CI95 [-2.234, -1.978], boot [-2.242, -1.977], 20000 valid resamples) p* 1249 (boot [1171, 1351]) MODEL extrapolation; line at new primes {"1301": 0.9175460105503231, "1451": 0.7291643148671686, "1601": 0.5927203778844985}
+FIT D: new primes only, vs rhodp: n=9 slope -1.426 (se 0.765, t-CI95 [-3.237, 0.384], boot [-3.639, -0.168], 18026 valid resamples) p* 1140 (boot [211, 1352]) MODEL extrapolation; line at new primes {"1301": 0.8278086114796682, "1451": 0.7085057887445374, "1601": 0.6157602821086312}
+FIT E: new primes only, vs rhostrong: n=9 slope -1.904 (se 0.714, t-CI95 [-3.593, -0.216], boot [-3.877, -0.283], 19033 valid resamples) p* 1515 (boot [1397, 2553]) MODEL extrapolation; line at new primes {"1301": 1.3356641900418664, "1451": 1.0850442298371537, "1601": 0.8996714020761564}
+FIT F: as A, with every predecessor cover S multiplied by the reproduction ratio (new binary / predecessor binary at p = 1009 seed 1; a uniform-factor assumption): n=26 slope -2.083 (se 0.053, t-CI95 [-2.192, -1.974], boot [-2.217, -1.961], 20000 valid resamples) p* 1253 (boot [1187, 1337]) MODEL extrapolation; line at new primes {"1301": 0.9248618287389216, "1451": 0.7367912166399367, "1601": 0.6002519271608036}
+SECTION 5A (one-sided: only the rho arms emit native counts; the cover arm does not, so no band ranking is made)
+  p=1301 rhodp: native/sqrt(l) per run 1.6509; S/rho(rho priced, cover unpriced) at w=0,0.1,1: 0.793, 0.721, 0.397
+  p=1301 rhostrong: native/sqrt(l) per run 16.4655; S/rho(rho priced, cover unpriced) at w=0,0.1,1: 1.349, 0.500, 0.075
+  p=1451 rhodp: native/sqrt(l) per run 1.3947; S/rho(rho priced, cover unpriced) at w=0,0.1,1: 0.775, 0.705, 0.388
+  p=1451 rhostrong: native/sqrt(l) per run 17.2497; S/rho(rho priced, cover unpriced) at w=0,0.1,1: 1.063, 0.394, 0.059
+  p=1601 rhodp: native/sqrt(l) per run 1.3805; S/rho(rho priced, cover unpriced) at w=0,0.1,1: 0.587, 0.534, 0.294
+  p=1601 rhostrong: native/sqrt(l) per run 15.1186; S/rho(rho priced, cover unpriced) at w=0,0.1,1: 0.910, 0.337, 0.051

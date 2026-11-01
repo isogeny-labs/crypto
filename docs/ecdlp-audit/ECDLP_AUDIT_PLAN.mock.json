@@ -1,7 +1,7 @@
 {
   "schema_version": "ecdlp-audit-plan/v1",
   "record_state": "mock_non_authoritative",
-  "plan_uid": "urn:ecdlp-audit-plan:1:sha256:83ec2598bed5eb66ad4480e0e977b358f84ff6444e3efa1f39364c30a4ee012c",
+  "plan_uid": "urn:ecdlp-audit-plan:1:sha256:68eabfbc0ee3122aa2f6a74ac21d2de557fc6f2383f3bc0ca73de8934199246c",
   "title": "Comprehensive elliptic-curve private-key recovery audit",
   "as_of": "2026-10-14",
   "authoritative": false,
@@ -222,9 +222,9 @@
         {
           "id": "WS2-D2",
           "kind": "implementation",
-          "description": "Arbitrary valid-class binary Jacobian norm for the exact GF(8) fixture; catalog-general support remains open.",
+          "description": "Catalog-general arbitrary-class binary Jacobian pushforward/norm and elliptic-image projector for checked cubic covers, including nonsplit support.",
           "path": "src/binary_ecc/cover_transfer.rs",
-          "artifact_sha256": "6e801f14abf087b2a6610aa320faf602d176ac764f5eee8e9d88611cdacfa896",
+          "artifact_sha256": "61bd3ce55913a98ec07914e287393890f23b672d9867138756bb12eb29ab57f0",
           "status": "partial",
           "acceptance_gate_ids": [
             "WS2-G2"
@@ -268,7 +268,7 @@
           "required": true,
           "claim_status": "unknown",
           "scope": "A catalog-general binary norm handles every valid reduced class for all 160 exact map.binary-cubic.same-field rows (membership SHA-256 fe39b6b1a6f833b5e45585b8deef032ce5b6ee1a65c4cad659defabd1a8f7379), including shared, nonsplit, repeated, and exceptional support, verifies degree-three composition, exports exact EC1/ICV1/HC1/CV1 bindings and certificates for the fixed fixture and catalog rows, and has a current cryptanalysis mirror/integration receipt.",
-          "rationale": "The exact GF(8), a=1, b=3 fixture now handles all 486 valid reduced classes with exhaustive native checks; other fields/models and an independent oracle remain open.",
+          "rationale": "The native implementation now handles arbitrary valid reduced classes for checked binary cubic covers and certifies degree-three composition and projectors, including exhaustive GF(8) and exact n=83 checks; an independent divisor-class oracle, catalog-wide bound certificates, and solver advantage remain open.",
           "evidence_refs": [],
           "obligation_id": "arbitrary-binary-jacobian-norm"
         },

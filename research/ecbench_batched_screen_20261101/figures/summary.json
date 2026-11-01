@@ -1,0 +1,1646 @@
+{
+ "schema": "crypto.ecbench_batched_screen/v1",
+ "protocol": "PROTOCOL.md",
+ "unit": "counted GAE (group additions and doublings), mean per run over the measured rounds",
+ "cells": {
+  "n13a0": {
+   "arms": {
+    "ic-b1": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 38223.4140625,
+     "phase_gae": {
+      "factor_base": 44.0,
+      "oracle_setup": 33306.0,
+      "relations": 3958.65625,
+      "linear_algebra": 349.578125,
+      "descent_setup": 83.0,
+      "descent": 469.3046875,
+      "verify": 12.875
+     },
+     "counters": {
+      "collection_trials": 10.125,
+      "collection_batches": 10.125,
+      "relations_collected": 10.125,
+      "solve_attempts": 4.109375,
+      "descent_trials": 1,
+      "columns": 7
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 108.9296875,
+      "pair_filter_probes_uncharged": 22.25,
+      "pair_bucket_reads_uncharged": 2035.875,
+      "frobenius_maps_uncharged": 1790,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.6426223621318328,
+      "ci95": [
+       0.6381719648638612,
+       0.647103794977882
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b2": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 38470.4453125,
+     "phase_gae": {
+      "factor_base": 44.0,
+      "oracle_setup": 33306.0,
+      "relations": 4195.921875,
+      "linear_algebra": 359.34375,
+      "descent_setup": 83.0,
+      "descent": 469.3046875,
+      "verify": 12.875
+     },
+     "counters": {
+      "collection_trials": 10.75,
+      "collection_batches": 5.375,
+      "relations_collected": 10.75,
+      "solve_attempts": 2.375,
+      "descent_trials": 1,
+      "columns": 7
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 118.0546875,
+      "pair_filter_probes_uncharged": 23.5,
+      "pair_bucket_reads_uncharged": 2150.25,
+      "frobenius_maps_uncharged": 1790,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.6467755182349431,
+      "ci95": [
+       0.6424015460195884,
+       0.6511792718744848
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b4": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 38704.9921875,
+     "phase_gae": {
+      "factor_base": 44.0,
+      "oracle_setup": 33306.0,
+      "relations": 4421.2578125,
+      "linear_algebra": 368.5546875,
+      "descent_setup": 83.0,
+      "descent": 469.3046875,
+      "verify": 12.875
+     },
+     "counters": {
+      "collection_trials": 11.34375,
+      "collection_batches": 2.8359375,
+      "relations_collected": 11.34375,
+      "solve_attempts": 1.8359375,
+      "descent_trials": 1,
+      "columns": 7
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 143.09375,
+      "pair_filter_probes_uncharged": 24.6875,
+      "pair_bucket_reads_uncharged": 2258.90625,
+      "frobenius_maps_uncharged": 1790,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.6507187836532721,
+      "ci95": [
+       0.6461251843808405,
+       0.6553450409226151
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b8": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 39259.3203125,
+     "phase_gae": {
+      "factor_base": 44.0,
+      "oracle_setup": 33306.0,
+      "relations": 4954.359375,
+      "linear_algebra": 389.78125,
+      "descent_setup": 83.0,
+      "descent": 469.3046875,
+      "verify": 12.875
+     },
+     "counters": {
+      "collection_trials": 12.75,
+      "collection_batches": 1.59375,
+      "relations_collected": 12.75,
+      "solve_attempts": 1.59375,
+      "descent_trials": 1,
+      "columns": 7
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 216.765625,
+      "pair_filter_probes_uncharged": 27.5,
+      "pair_bucket_reads_uncharged": 2516.25,
+      "frobenius_maps_uncharged": 1790,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.6600382978259502,
+      "ci95": [
+       0.6549432952311883,
+       0.6651729359916531
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b16": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 41032.7890625,
+     "phase_gae": {
+      "factor_base": 44.0,
+      "oracle_setup": 33306.0,
+      "relations": 6658.671875,
+      "linear_algebra": 458.9375,
+      "descent_setup": 83.0,
+      "descent": 469.3046875,
+      "verify": 12.875
+     },
+     "counters": {
+      "collection_trials": 17.25,
+      "collection_batches": 1.078125,
+      "relations_collected": 17.25,
+      "solve_attempts": 1.078125,
+      "descent_trials": 1,
+      "columns": 7
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 397.859375,
+      "pair_filter_probes_uncharged": 36.5,
+      "pair_bucket_reads_uncharged": 3339.75,
+      "frobenius_maps_uncharged": 1790,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.6898543335005365,
+      "ci95": [
+       0.6853418837648797,
+       0.6943964942506506
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b32": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 46851.3359375,
+     "phase_gae": {
+      "factor_base": 44.0,
+      "oracle_setup": 33306.0,
+      "relations": 12251.734375,
+      "linear_algebra": 684.421875,
+      "descent_setup": 83.0,
+      "descent": 469.3046875,
+      "verify": 12.875
+     },
+     "counters": {
+      "collection_trials": 32,
+      "collection_batches": 1,
+      "relations_collected": 32,
+      "solve_attempts": 1,
+      "descent_trials": 1,
+      "columns": 7
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 1414.6875,
+      "pair_filter_probes_uncharged": 66,
+      "pair_bucket_reads_uncharged": 6039,
+      "frobenius_maps_uncharged": 1790,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.7876773152695995,
+      "ci95": [
+       0.7875895035556746,
+       0.7877651367740279
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b64": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 59480.3671875,
+     "phase_gae": {
+      "factor_base": 44.0,
+      "oracle_setup": 33306.0,
+      "relations": 24389.5390625,
+      "linear_algebra": 1175.6484375,
+      "descent_setup": 83.0,
+      "descent": 469.3046875,
+      "verify": 12.875
+     },
+     "counters": {
+      "collection_trials": 64,
+      "collection_batches": 1,
+      "relations_collected": 64,
+      "solve_attempts": 1,
+      "descent_trials": 1,
+      "columns": 7
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 1530.453125,
+      "pair_filter_probes_uncharged": 130,
+      "pair_bucket_reads_uncharged": 11895,
+      "frobenius_maps_uncharged": 1790,
+      "canonicalisations_uncharged": 0
+     }
+    },
+    "ic-b128": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 84736.9453125,
+     "phase_gae": {
+      "factor_base": 44.0,
+      "oracle_setup": 33306.0,
+      "relations": 48661.5625,
+      "linear_algebra": 2160.203125,
+      "descent_setup": 83.0,
+      "descent": 469.3046875,
+      "verify": 12.875
+     },
+     "counters": {
+      "collection_trials": 128,
+      "collection_batches": 1,
+      "relations_collected": 128,
+      "solve_attempts": 1,
+      "descent_trials": 1,
+      "columns": 7
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 1025.6875,
+      "pair_filter_probes_uncharged": 258,
+      "pair_bucket_reads_uncharged": 23607,
+      "frobenius_maps_uncharged": 1790,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 1.4246204137473415,
+      "ci95": [
+       1.4244366814410967,
+       1.424804169752469
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b256": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 135241.6328125,
+     "phase_gae": {
+      "factor_base": 44.0,
+      "oracle_setup": 33306.0,
+      "relations": 97199.953125,
+      "linear_algebra": 4126.5,
+      "descent_setup": 83.0,
+      "descent": 469.3046875,
+      "verify": 12.875
+     },
+     "counters": {
+      "collection_trials": 256,
+      "collection_batches": 1,
+      "relations_collected": 256,
+      "solve_attempts": 1,
+      "descent_trials": 1,
+      "columns": 7
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 1058.28125,
+      "pair_filter_probes_uncharged": 514,
+      "pair_bucket_reads_uncharged": 47031,
+      "frobenius_maps_uncharged": 1790,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 2.273718862329444,
+      "ci95": [
+       2.273413418317021,
+       2.2740243473797324
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b64-aa": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 59480.3671875,
+     "phase_gae": {
+      "factor_base": 44.0,
+      "oracle_setup": 33306.0,
+      "relations": 24389.5390625,
+      "linear_algebra": 1175.6484375,
+      "descent_setup": 83.0,
+      "descent": 469.3046875,
+      "verify": 12.875
+     },
+     "counters": {
+      "collection_trials": 64,
+      "collection_batches": 1,
+      "relations_collected": 64,
+      "solve_attempts": 1,
+      "descent_trials": 1,
+      "columns": 7
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 1530.453125,
+      "pair_filter_probes_uncharged": 130,
+      "pair_bucket_reads_uncharged": 11895,
+      "frobenius_maps_uncharged": 1790,
+      "canonicalisations_uncharged": 0
+     }
+    }
+   },
+   "aa": {
+    "ratio": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ]
+   }
+  },
+  "n17a1": {
+   "arms": {
+    "ic-b1": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 81789.4921875,
+     "phase_gae": {
+      "factor_base": 24.0,
+      "oracle_setup": 74256.0,
+      "relations": 6166.9453125,
+      "linear_algebra": 567.9453125,
+      "descent_setup": 83.0,
+      "descent": 671.9140625,
+      "verify": 19.6875
+     },
+     "counters": {
+      "collection_trials": 10.59375,
+      "collection_batches": 10.59375,
+      "relations_collected": 10.59375,
+      "solve_attempts": 3.59375,
+      "descent_trials": 1,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 147.84375,
+      "pair_filter_probes_uncharged": 40.15625,
+      "pair_bucket_reads_uncharged": 3165.1875,
+      "frobenius_maps_uncharged": 2656,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.7218887389740856,
+      "ci95": [
+       0.7175390574234739,
+       0.7262647880504715
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b2": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 81955.3671875,
+     "phase_gae": {
+      "factor_base": 24.0,
+      "oracle_setup": 74256.0,
+      "relations": 6326.3828125,
+      "linear_algebra": 574.3828125,
+      "descent_setup": 83.0,
+      "descent": 671.9140625,
+      "verify": 19.6875
+     },
+     "counters": {
+      "collection_trials": 10.875,
+      "collection_batches": 5.4375,
+      "relations_collected": 10.875,
+      "solve_attempts": 2.4375,
+      "descent_trials": 1,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 157.6484375,
+      "pair_filter_probes_uncharged": 41.171875,
+      "pair_bucket_reads_uncharged": 3241.96875,
+      "frobenius_maps_uncharged": 2656,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.7233527814980665,
+      "ci95": [
+       0.7188860975899809,
+       0.7278472184329542
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b4": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 82380.1640625,
+     "phase_gae": {
+      "factor_base": 24.0,
+      "oracle_setup": 74256.0,
+      "relations": 6734.28125,
+      "linear_algebra": 591.28125,
+      "descent_setup": 83.0,
+      "descent": 671.9140625,
+      "verify": 19.6875
+     },
+     "counters": {
+      "collection_trials": 11.59375,
+      "collection_batches": 2.8984375,
+      "relations_collected": 11.59375,
+      "solve_attempts": 1.8984375,
+      "descent_trials": 1,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 191.921875,
+      "pair_filter_probes_uncharged": 43.7421875,
+      "pair_bucket_reads_uncharged": 3438.1953125,
+      "frobenius_maps_uncharged": 2656,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.7271021149663672,
+      "ci95": [
+       0.7223472218008469,
+       0.7318883074964199
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b8": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 83394.5390625,
+     "phase_gae": {
+      "factor_base": 24.0,
+      "oracle_setup": 74256.0,
+      "relations": 7708.96875,
+      "linear_algebra": 630.96875,
+      "descent_setup": 83.0,
+      "descent": 671.9140625,
+      "verify": 19.6875
+     },
+     "counters": {
+      "collection_trials": 13.3125,
+      "collection_batches": 1.6640625,
+      "relations_collected": 13.3125,
+      "solve_attempts": 1.6640625,
+      "descent_trials": 1,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 294.3671875,
+      "pair_filter_probes_uncharged": 50.0390625,
+      "pair_bucket_reads_uncharged": 3907.4375,
+      "frobenius_maps_uncharged": 2656,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.7360551707931247,
+      "ci95": [
+       0.7303216131228725,
+       0.7418337410755819
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b16": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 85863.7265625,
+     "phase_gae": {
+      "factor_base": 24.0,
+      "oracle_setup": 74256.0,
+      "relations": 10082.5625,
+      "linear_algebra": 726.5625,
+      "descent_setup": 83.0,
+      "descent": 671.9140625,
+      "verify": 19.6875
+     },
+     "counters": {
+      "collection_trials": 17.5,
+      "collection_batches": 1.09375,
+      "relations_collected": 17.5,
+      "solve_attempts": 1.09375,
+      "descent_trials": 1,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 526.53125,
+      "pair_filter_probes_uncharged": 64.5625,
+      "pair_bucket_reads_uncharged": 5050.65625,
+      "frobenius_maps_uncharged": 2656,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.7578486628786272,
+      "ci95": [
+       0.7525737339109035,
+       0.7631605648024344
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b32": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 94417.0859375,
+     "phase_gae": {
+      "factor_base": 24.0,
+      "oracle_setup": 74256.0,
+      "relations": 18302.1796875,
+      "linear_algebra": 1060.3046875,
+      "descent_setup": 83.0,
+      "descent": 671.9140625,
+      "verify": 19.6875
+     },
+     "counters": {
+      "collection_trials": 32,
+      "collection_batches": 1,
+      "relations_collected": 32,
+      "solve_attempts": 1,
+      "descent_trials": 1,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 1990.2890625,
+      "pair_filter_probes_uncharged": 114.484375,
+      "pair_bucket_reads_uncharged": 9009.2734375,
+      "frobenius_maps_uncharged": 2656,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.8333421480204084,
+      "ci95": [
+       0.8332981517207819,
+       0.8333861466429425
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b64": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 113299.3046875,
+     "phase_gae": {
+      "factor_base": 24.0,
+      "oracle_setup": 74256.0,
+      "relations": 36447.2890625,
+      "linear_algebra": 1797.4140625,
+      "descent_setup": 83.0,
+      "descent": 671.9140625,
+      "verify": 19.6875
+     },
+     "counters": {
+      "collection_trials": 64,
+      "collection_batches": 1,
+      "relations_collected": 64,
+      "solve_attempts": 1,
+      "descent_trials": 1,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 2558.5390625,
+      "pair_filter_probes_uncharged": 225.2109375,
+      "pair_bucket_reads_uncharged": 17745.5234375,
+      "frobenius_maps_uncharged": 2656,
+      "canonicalisations_uncharged": 0
+     }
+    },
+    "ic-b128": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 151061.3984375,
+     "phase_gae": {
+      "factor_base": 24.0,
+      "oracle_setup": 74256.0,
+      "relations": 72736.3359375,
+      "linear_algebra": 3270.4609375,
+      "descent_setup": 83.0,
+      "descent": 671.9140625,
+      "verify": 19.6875
+     },
+     "counters": {
+      "collection_trials": 128,
+      "collection_batches": 1,
+      "relations_collected": 128,
+      "solve_attempts": 1,
+      "descent_trials": 1,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 1410.9140625,
+      "pair_filter_probes_uncharged": 449.7109375,
+      "pair_bucket_reads_uncharged": 35218.09375,
+      "frobenius_maps_uncharged": 2656,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 1.3332950176009883,
+      "ci95": [
+       1.3332228546645117,
+       1.3333671844434036
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b256": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 226586.4765625,
+     "phase_gae": {
+      "factor_base": 24.0,
+      "oracle_setup": 74256.0,
+      "relations": 145314.875,
+      "linear_algebra": 6217.0,
+      "descent_setup": 83.0,
+      "descent": 671.9140625,
+      "verify": 19.6875
+     },
+     "counters": {
+      "collection_trials": 256,
+      "collection_batches": 1,
+      "relations_collected": 256,
+      "solve_attempts": 1,
+      "descent_trials": 1,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 1589.640625,
+      "pair_filter_probes_uncharged": 890.5625,
+      "pair_bucket_reads_uncharged": 70163.25,
+      "frobenius_maps_uncharged": 2656,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 1.9998929136190777,
+      "ci95": [
+       1.9997533984150977,
+       2.0000324385565036
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b64-aa": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 113299.3046875,
+     "phase_gae": {
+      "factor_base": 24.0,
+      "oracle_setup": 74256.0,
+      "relations": 36447.2890625,
+      "linear_algebra": 1797.4140625,
+      "descent_setup": 83.0,
+      "descent": 671.9140625,
+      "verify": 19.6875
+     },
+     "counters": {
+      "collection_trials": 64,
+      "collection_batches": 1,
+      "relations_collected": 64,
+      "solve_attempts": 1,
+      "descent_trials": 1,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 2558.5390625,
+      "pair_filter_probes_uncharged": 225.2109375,
+      "pair_bucket_reads_uncharged": 17745.5234375,
+      "frobenius_maps_uncharged": 2656,
+      "canonicalisations_uncharged": 0
+     }
+    }
+   },
+   "aa": {
+    "ratio": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ]
+   }
+  },
+  "n19a0": {
+   "arms": {
+    "ic-b1": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 100885.5078125,
+     "phase_gae": {
+      "factor_base": 48.0,
+      "oracle_setup": 92720.0,
+      "relations": 6670.59375,
+      "linear_algebra": 599.84375,
+      "descent_setup": 83.0,
+      "descent": 741.7578125,
+      "verify": 22.3125
+     },
+     "counters": {
+      "collection_trials": 10.1953125,
+      "collection_batches": 10.1953125,
+      "relations_collected": 10.1953125,
+      "solve_attempts": 3.1953125,
+      "descent_trials": 1,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 109.890625,
+      "pair_filter_probes_uncharged": 49.703125,
+      "pair_bucket_reads_uncharged": 3414.875,
+      "frobenius_maps_uncharged": 2976,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.7405321171490165,
+      "ci95": [
+       0.7374089991483292,
+       0.7436684623629026
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b2": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 101096.0234375,
+     "phase_gae": {
+      "factor_base": 48.0,
+      "oracle_setup": 92720.0,
+      "relations": 6873.2265625,
+      "linear_algebra": 607.7265625,
+      "descent_setup": 83.0,
+      "descent": 741.7578125,
+      "verify": 22.3125
+     },
+     "counters": {
+      "collection_trials": 10.515625,
+      "collection_batches": 5.2578125,
+      "relations_collected": 10.515625,
+      "solve_attempts": 2.2578125,
+      "descent_trials": 1,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 117.875,
+      "pair_filter_probes_uncharged": 51.0078125,
+      "pair_bucket_reads_uncharged": 3512.5703125,
+      "frobenius_maps_uncharged": 2976,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.7420773696322963,
+      "ci95": [
+       0.7388076918948525,
+       0.7453615177016333
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b4": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 101496.6484375,
+     "phase_gae": {
+      "factor_base": 48.0,
+      "oracle_setup": 92720.0,
+      "relations": 7258.7890625,
+      "linear_algebra": 622.7890625,
+      "descent_setup": 83.0,
+      "descent": 741.7578125,
+      "verify": 22.3125
+     },
+     "counters": {
+      "collection_trials": 11.125,
+      "collection_batches": 2.78125,
+      "relations_collected": 11.125,
+      "solve_attempts": 1.78125,
+      "descent_trials": 1,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 140.4375,
+      "pair_filter_probes_uncharged": 54.1171875,
+      "pair_bucket_reads_uncharged": 3698.4609375,
+      "frobenius_maps_uncharged": 2976,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.7450180861520983,
+      "ci95": [
+       0.7413116989018009,
+       0.7487430044824654
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b8": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 102606.4296875,
+     "phase_gae": {
+      "factor_base": 48.0,
+      "oracle_setup": 92720.0,
+      "relations": 8326.6796875,
+      "linear_algebra": 664.6796875,
+      "descent_setup": 83.0,
+      "descent": 741.7578125,
+      "verify": 22.3125
+     },
+     "counters": {
+      "collection_trials": 12.8125,
+      "collection_batches": 1.6015625,
+      "relations_collected": 12.8125,
+      "solve_attempts": 1.6015625,
+      "descent_trials": 1,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 246.953125,
+      "pair_filter_probes_uncharged": 61.859375,
+      "pair_bucket_reads_uncharged": 4213.1953125,
+      "frobenius_maps_uncharged": 2976,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.7531642379280519,
+      "ci95": [
+       0.7481940303454465,
+       0.7581674622982985
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b16": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 105357.1328125,
+     "phase_gae": {
+      "factor_base": 48.0,
+      "oracle_setup": 92720.0,
+      "relations": 10975.03125,
+      "linear_algebra": 767.03125,
+      "descent_setup": 83.0,
+      "descent": 741.7578125,
+      "verify": 22.3125
+     },
+     "counters": {
+      "collection_trials": 17,
+      "collection_batches": 1.0625,
+      "relations_collected": 17,
+      "solve_attempts": 1.0625,
+      "descent_trials": 1,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 454.5703125,
+      "pair_filter_probes_uncharged": 80.8046875,
+      "pair_bucket_reads_uncharged": 5490.5234375,
+      "frobenius_maps_uncharged": 2976,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.7733552847193358,
+      "ci95": [
+       0.7698241481060556,
+       0.7769026184418036
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b32": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 115212.5234375,
+     "phase_gae": {
+      "factor_base": 48.0,
+      "oracle_setup": 92720.0,
+      "relations": 20462.7265625,
+      "linear_algebra": 1134.7265625,
+      "descent_setup": 83.0,
+      "descent": 741.7578125,
+      "verify": 22.3125
+     },
+     "counters": {
+      "collection_trials": 32,
+      "collection_batches": 1,
+      "relations_collected": 32,
+      "solve_attempts": 1,
+      "descent_trials": 1,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 1956.2265625,
+      "pair_filter_probes_uncharged": 148.796875,
+      "pair_bucket_reads_uncharged": 10065.8046875,
+      "frobenius_maps_uncharged": 2976,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.8456970257989954,
+      "ci95": [
+       0.8456603898868309,
+       0.8457336632983107
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b64": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 136233.8046875,
+     "phase_gae": {
+      "factor_base": 48.0,
+      "oracle_setup": 92720.0,
+      "relations": 40701.3671875,
+      "linear_algebra": 1917.3671875,
+      "descent_setup": 83.0,
+      "descent": 741.7578125,
+      "verify": 22.3125
+     },
+     "counters": {
+      "collection_trials": 64,
+      "collection_batches": 1,
+      "relations_collected": 64,
+      "solve_attempts": 1,
+      "descent_trials": 1,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 2461.4765625,
+      "pair_filter_probes_uncharged": 294.4921875,
+      "pair_bucket_reads_uncharged": 19826.71875,
+      "frobenius_maps_uncharged": 2976,
+      "canonicalisations_uncharged": 0
+     }
+    },
+    "ic-b128": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 178279.6796875,
+     "phase_gae": {
+      "factor_base": 48.0,
+      "oracle_setup": 92720.0,
+      "relations": 81180.3046875,
+      "linear_algebra": 3484.3046875,
+      "descent_setup": 83.0,
+      "descent": 741.7578125,
+      "verify": 22.3125
+     },
+     "counters": {
+      "collection_trials": 128,
+      "collection_batches": 1,
+      "relations_collected": 128,
+      "solve_attempts": 1,
+      "descent_trials": 1,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 1409.59375,
+      "pair_filter_probes_uncharged": 582.28125,
+      "pair_bucket_reads_uncharged": 39348.5078125,
+      "frobenius_maps_uncharged": 2976,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 1.3086302632187876,
+      "ci95": [
+       1.308572860115209,
+       1.308687668840465
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b256": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 262376.1953125,
+     "phase_gae": {
+      "factor_base": 48.0,
+      "oracle_setup": 92720.0,
+      "relations": 162139.375,
+      "linear_algebra": 6621.75,
+      "descent_setup": 83.0,
+      "descent": 741.7578125,
+      "verify": 22.3125
+     },
+     "counters": {
+      "collection_trials": 256,
+      "collection_batches": 1,
+      "relations_collected": 256,
+      "solve_attempts": 1,
+      "descent_trials": 1,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 1589.5078125,
+      "pair_filter_probes_uncharged": 1168.1875,
+      "pair_bucket_reads_uncharged": 78391.7109375,
+      "frobenius_maps_uncharged": 2976,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 1.9259257708786146,
+      "ci95": [
+       1.9258244255059531,
+       1.9260271215845157
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b64-aa": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 136233.8046875,
+     "phase_gae": {
+      "factor_base": 48.0,
+      "oracle_setup": 92720.0,
+      "relations": 40701.3671875,
+      "linear_algebra": 1917.3671875,
+      "descent_setup": 83.0,
+      "descent": 741.7578125,
+      "verify": 22.3125
+     },
+     "counters": {
+      "collection_trials": 64,
+      "collection_batches": 1,
+      "relations_collected": 64,
+      "solve_attempts": 1,
+      "descent_trials": 1,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 2461.4765625,
+      "pair_filter_probes_uncharged": 294.4921875,
+      "pair_bucket_reads_uncharged": 19826.71875,
+      "frobenius_maps_uncharged": 2976,
+      "canonicalisations_uncharged": 0
+     }
+    }
+   },
+   "aa": {
+    "ratio": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ]
+   }
+  },
+  "n23a0": {
+   "arms": {
+    "ic-b1": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 144954.6953125,
+     "phase_gae": {
+      "factor_base": 48.0,
+      "oracle_setup": 135792.0,
+      "relations": 7359.9140625,
+      "linear_algebra": 741.3203125,
+      "descent_setup": 83.0,
+      "descent": 901.7109375,
+      "verify": 28.75
+     },
+     "counters": {
+      "collection_trials": 9.34375,
+      "collection_batches": 9.34375,
+      "relations_collected": 9.1015625,
+      "solve_attempts": 2.140625,
+      "descent_trials": 1.0390625,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 79.3828125,
+      "pair_filter_probes_uncharged": 478.3984375,
+      "pair_bucket_reads_uncharged": 3731.0703125,
+      "frobenius_maps_uncharged": 3616,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.770928739267196,
+      "ci95": [
+       0.769495724388194,
+       0.7723644228181322
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b2": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 145229.0703125,
+     "phase_gae": {
+      "factor_base": 48.0,
+      "oracle_setup": 135792.0,
+      "relations": 7623.6015625,
+      "linear_algebra": 752.0078125,
+      "descent_setup": 83.0,
+      "descent": 901.7109375,
+      "verify": 28.75
+     },
+     "counters": {
+      "collection_trials": 9.6875,
+      "collection_batches": 4.84375,
+      "relations_collected": 9.4453125,
+      "solve_attempts": 1.65625,
+      "descent_trials": 1.0390625,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 91.6484375,
+      "pair_filter_probes_uncharged": 492.859375,
+      "pair_bucket_reads_uncharged": 3858.0703125,
+      "frobenius_maps_uncharged": 3616,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.7723879784617625,
+      "ci95": [
+       0.7708632815457954,
+       0.7739156910884804
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b4": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 145771.375,
+     "phase_gae": {
+      "factor_base": 48.0,
+      "oracle_setup": 135792.0,
+      "relations": 8145.09375,
+      "linear_algebra": 772.8203125,
+      "descent_setup": 83.0,
+      "descent": 901.7109375,
+      "verify": 28.75
+     },
+     "counters": {
+      "collection_trials": 10.375,
+      "collection_batches": 2.59375,
+      "relations_collected": 10.1171875,
+      "solve_attempts": 1.40625,
+      "descent_trials": 1.0390625,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 114.0234375,
+      "pair_filter_probes_uncharged": 523.3125,
+      "pair_bucket_reads_uncharged": 4106.2421875,
+      "frobenius_maps_uncharged": 3616,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.7752721780258522,
+      "ci95": [
+       0.7735035416410765,
+       0.7770448584446792
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b8": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 147066.671875,
+     "phase_gae": {
+      "factor_base": 48.0,
+      "oracle_setup": 135792.0,
+      "relations": 9390.7421875,
+      "linear_algebra": 822.46875,
+      "descent_setup": 83.0,
+      "descent": 901.7109375,
+      "verify": 28.75
+     },
+     "counters": {
+      "collection_trials": 12,
+      "collection_batches": 1.5,
+      "relations_collected": 11.7421875,
+      "solve_attempts": 1.3125,
+      "descent_trials": 1.0390625,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 185.9453125,
+      "pair_filter_probes_uncharged": 589.4140625,
+      "pair_bucket_reads_uncharged": 4706.3125,
+      "frobenius_maps_uncharged": 3616,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.7821611000070798,
+      "ci95": [
+       0.7796788055598223,
+       0.784651297433974
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b16": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 150307.28125,
+     "phase_gae": {
+      "factor_base": 48.0,
+      "oracle_setup": 135792.0,
+      "relations": 12509.171875,
+      "linear_algebra": 944.6484375,
+      "descent_setup": 83.0,
+      "descent": 901.7109375,
+      "verify": 28.75
+     },
+     "counters": {
+      "collection_trials": 16.125,
+      "collection_batches": 1.0078125,
+      "relations_collected": 15.75,
+      "solve_attempts": 1.0078125,
+      "descent_trials": 1.0390625,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 381.0078125,
+      "pair_filter_probes_uncharged": 786.234375,
+      "pair_bucket_reads_uncharged": 6186.6171875,
+      "frobenius_maps_uncharged": 3616,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.7993959946377113,
+      "ci95": [
+       0.7982262179992533,
+       0.8005674855488318
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b32": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 162808.421875,
+     "phase_gae": {
+      "factor_base": 48.0,
+      "oracle_setup": 135792.0,
+      "relations": 24536.859375,
+      "linear_algebra": 1418.1015625,
+      "descent_setup": 83.0,
+      "descent": 901.7109375,
+      "verify": 28.75
+     },
+     "counters": {
+      "collection_trials": 32,
+      "collection_batches": 1,
+      "relations_collected": 31.2421875,
+      "solve_attempts": 1,
+      "descent_trials": 1.0390625,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 2801.21875,
+      "pair_filter_probes_uncharged": 1530.078125,
+      "pair_bucket_reads_uncharged": 11908.9296875,
+      "frobenius_maps_uncharged": 3616,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 0.8658822064893265,
+      "ci95": [
+       0.8655297405592343,
+       0.8662348159525936
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b64": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 188026.0625,
+     "phase_gae": {
+      "factor_base": 48.0,
+      "oracle_setup": 135792.0,
+      "relations": 48799.8671875,
+      "linear_algebra": 2372.734375,
+      "descent_setup": 83.0,
+      "descent": 901.7109375,
+      "verify": 28.75
+     },
+     "counters": {
+      "collection_trials": 64,
+      "collection_batches": 1,
+      "relations_collected": 62.5234375,
+      "solve_attempts": 1,
+      "descent_trials": 1.0390625,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 3925.140625,
+      "pair_filter_probes_uncharged": 2998.015625,
+      "pair_bucket_reads_uncharged": 23462.9296875,
+      "frobenius_maps_uncharged": 3616,
+      "canonicalisations_uncharged": 0
+     }
+    },
+    "ic-b128": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 238380.265625,
+     "phase_gae": {
+      "factor_base": 48.0,
+      "oracle_setup": 135792.0,
+      "relations": 97252.015625,
+      "linear_algebra": 4274.7890625,
+      "descent_setup": 83.0,
+      "descent": 901.7109375,
+      "verify": 28.75
+     },
+     "counters": {
+      "collection_trials": 128,
+      "collection_batches": 1,
+      "relations_collected": 124.890625,
+      "solve_attempts": 1,
+      "descent_trials": 1.0390625,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 2696.484375,
+      "pair_filter_probes_uncharged": 6054.765625,
+      "pair_bucket_reads_uncharged": 46499.8359375,
+      "frobenius_maps_uncharged": 3616,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 1.2678043801773493,
+      "ci95": [
+       1.2672769455330444,
+       1.2683320343374467
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b256": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 339293.0078125,
+     "phase_gae": {
+      "factor_base": 48.0,
+      "oracle_setup": 135792.0,
+      "relations": 194348.515625,
+      "linear_algebra": 8091.03125,
+      "descent_setup": 83.0,
+      "descent": 901.7109375,
+      "verify": 28.75
+     },
+     "counters": {
+      "collection_trials": 256,
+      "collection_batches": 1,
+      "relations_collected": 250.15625,
+      "solve_attempts": 1,
+      "descent_trials": 1.0390625,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 2823.8125,
+      "pair_filter_probes_uncharged": 11962.6171875,
+      "pair_bucket_reads_uncharged": 92767.4296875,
+      "frobenius_maps_uncharged": 3616,
+      "canonicalisations_uncharged": 0
+     },
+     "ratio_to_b64": {
+      "ratio": 1.804499883161144,
+      "ci95": [
+       1.8036608259658358,
+       1.805339330683152
+      ],
+      "pairs": 128
+     }
+    },
+    "ic-b64-aa": {
+     "runs": 128,
+     "all_verified": true,
+     "mean_gae_total": 188026.0625,
+     "phase_gae": {
+      "factor_base": 48.0,
+      "oracle_setup": 135792.0,
+      "relations": 48799.8671875,
+      "linear_algebra": 2372.734375,
+      "descent_setup": 83.0,
+      "descent": 901.7109375,
+      "verify": 28.75
+     },
+     "counters": {
+      "collection_trials": 64,
+      "collection_batches": 1,
+      "relations_collected": 62.5234375,
+      "solve_attempts": 1,
+      "descent_trials": 1.0390625,
+      "columns": 8
+     },
+     "uncharged": {
+      "la_row_ops_uncharged": 3925.140625,
+      "pair_filter_probes_uncharged": 2998.015625,
+      "pair_bucket_reads_uncharged": 23462.9296875,
+      "frobenius_maps_uncharged": 3616,
+      "canonicalisations_uncharged": 0
+     }
+    }
+   },
+   "aa": {
+    "ratio": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ]
+   }
+  }
+ },
+ "predictions": {
+  "P1": {
+   "held": false,
+   "text": "queries drawn are 8 for batch <= 8 and equal to the batch for batch >= 16",
+   "evidence": {
+    "mean_queries_drawn": {
+     "n13a0": {
+      "1": 10.12,
+      "2": 10.75,
+      "4": 11.34,
+      "8": 12.75,
+      "16": 17.25,
+      "32": 32,
+      "64": 64,
+      "128": 128,
+      "256": 256
+     },
+     "n17a1": {
+      "1": 10.59,
+      "2": 10.88,
+      "4": 11.59,
+      "8": 13.31,
+      "16": 17.5,
+      "32": 32,
+      "64": 64,
+      "128": 128,
+      "256": 256
+     },
+     "n19a0": {
+      "1": 10.2,
+      "2": 10.52,
+      "4": 11.12,
+      "8": 12.81,
+      "16": 17,
+      "32": 32,
+      "64": 64,
+      "128": 128,
+      "256": 256
+     },
+     "n23a0": {
+      "1": 9.34,
+      "2": 9.69,
+      "4": 10.38,
+      "8": 12,
+      "16": 16.12,
+      "32": 32,
+      "64": 64,
+      "128": 128,
+      "256": 256
+     }
+    },
+    "off_prediction": 20
+   }
+  },
+  "P2": {
+   "held": true,
+   "text": "GAE rises monotonically from batch 16 to 256; batch 128 and 256 are the two most expensive arms",
+   "evidence": {
+    "monotone_16_to_256": true,
+    "128_and_256_most_expensive": true
+   }
+  },
+  "P3": {
+   "held": false,
+   "text": "GAE is non-increasing in batch_trials from 1 to 8",
+   "evidence": {
+    "non_increasing_per_cell": {
+     "n13a0": false,
+     "n17a1": false,
+     "n19a0": false,
+     "n23a0": false
+    },
+    "gae_b1_b2_b4_b8": {
+     "n13a0": [
+      38223.4,
+      38470.4,
+      38705.0,
+      39259.3
+     ],
+     "n17a1": [
+      81789.5,
+      81955.4,
+      82380.2,
+      83394.5
+     ],
+     "n19a0": [
+      100885.5,
+      101096.0,
+      101496.6,
+      102606.4
+     ],
+     "n23a0": [
+      144954.7,
+      145229.1,
+      145771.4,
+      147066.7
+     ]
+    }
+   }
+  },
+  "P4": {
+   "held": false,
+   "text": "the minimum over the nine arms lies in {4, 8, 16} on every cell",
+   "evidence": {
+    "argmin_batch": {
+     "n13a0": 1,
+     "n17a1": 1,
+     "n19a0": 1,
+     "n23a0": 1
+    }
+   }
+  },
+  "P5": {
+   "held": true,
+   "text": "ic-b16 / ic-b64 < 1 (upper 95% bound below 1) on every cell",
+   "evidence": {
+    "n13a0": {
+     "ratio": 0.6898543335005365,
+     "ci95": [
+      0.6853418837648797,
+      0.6943964942506506
+     ]
+    },
+    "n17a1": {
+     "ratio": 0.7578486628786272,
+     "ci95": [
+      0.7525737339109035,
+      0.7631605648024344
+     ]
+    },
+    "n19a0": {
+     "ratio": 0.7733552847193358,
+     "ci95": [
+      0.7698241481060556,
+      0.7769026184418036
+     ]
+    },
+    "n23a0": {
+     "ratio": 0.7993959946377113,
+     "ci95": [
+      0.7982262179992533,
+      0.8005674855488318
+     ]
+    }
+   }
+  }
+ },
+ "a_a_all_within_0.001": true,
+ "all_records_verified": true,
+ "b16_native_not_above_b64": {
+  "n13a0": {
+   "la_row_ops_uncharged": true,
+   "pair_filter_probes_uncharged": true,
+   "pair_bucket_reads_uncharged": true,
+   "frobenius_maps_uncharged": true,
+   "canonicalisations_uncharged": true
+  },
+  "n17a1": {
+   "la_row_ops_uncharged": true,
+   "pair_filter_probes_uncharged": true,
+   "pair_bucket_reads_uncharged": true,
+   "frobenius_maps_uncharged": true,
+   "canonicalisations_uncharged": true
+  },
+  "n19a0": {
+   "la_row_ops_uncharged": true,
+   "pair_filter_probes_uncharged": true,
+   "pair_bucket_reads_uncharged": true,
+   "frobenius_maps_uncharged": true,
+   "canonicalisations_uncharged": true
+  },
+  "n23a0": {
+   "la_row_ops_uncharged": true,
+   "pair_filter_probes_uncharged": true,
+   "pair_bucket_reads_uncharged": true,
+   "frobenius_maps_uncharged": true,
+   "canonicalisations_uncharged": true
+  }
+ }
+}

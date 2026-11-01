@@ -8,6 +8,20 @@ open profiling/A-B access requirements. The original implementation receipt and
 source manifest below remain historical; the new study has its own manifest.
 No runtime, end-to-end or challenge-solve claim follows from these changes.
 
+2026-10-31 experiment follow-up: the standalone crate now exposes a versioned
+canonical semantic IR for controlled tensor/Boolean comparisons. `BTNIR001`
+binds construction-order graph incidence, ordered ports and interface, pins,
+provenance, predicate tags, and exact predicate semantics. Relations through
+16 ports use complete truth tables; larger built-in Fourier/product relations
+use strict typed programs that are also their live evaluators. Tiny controls
+verify stable bytes/hash, total and all interface-prefix counts, least witness,
+direct/functional agreement, malformed input rejection, and five registered
+mutations. The [E0 receipt](../research/tensor_boolean_breakthrough_20261031/E0_IMPLEMENTATION.md)
+records limitations: this is not graph-isomorphism canonicalization, imported
+graphs omit optimization hints, two optional high-arity predicate families are
+not typed, and the production E1 ladder remains unrun. No rank, solver,
+relation-yield, or speedup result follows from the representation work.
+
 2026-10-29. The compact encoder, exact contraction algorithm and relation
 pipeline are implemented in Rust in both repositories. Small-case correctness
 checks do not establish the manuscript's asymptotic bound or a practical speedup.
