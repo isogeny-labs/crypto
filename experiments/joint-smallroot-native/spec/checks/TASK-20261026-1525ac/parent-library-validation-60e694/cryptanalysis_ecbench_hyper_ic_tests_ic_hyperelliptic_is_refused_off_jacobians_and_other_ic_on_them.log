@@ -1,0 +1,18 @@
+
+running 1 test
+test cryptanalysis::ecbench::hyper_ic::tests::ic_hyperelliptic_is_refused_off_jacobians_and_other_ic_on_them ... FAILED
+
+failures:
+
+---- cryptanalysis::ecbench::hyper_ic::tests::ic_hyperelliptic_is_refused_off_jacobians_and_other_ic_on_them stdout ----
+
+thread 'cryptanalysis::ecbench::hyper_ic::tests::ic_hyperelliptic_is_refused_off_jacobians_and_other_ic_on_them' (78741) panicked at src/cryptanalysis/ecbench/hyper_ic.rs:1203:55:
+called `Result::unwrap()` on an `Err` value: "method `ic.hyperelliptic` has no parameter `branches`"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    cryptanalysis::ecbench::hyper_ic::tests::ic_hyperelliptic_is_refused_off_jacobians_and_other_ic_on_them
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 5014 filtered out; finished in 0.02s
+

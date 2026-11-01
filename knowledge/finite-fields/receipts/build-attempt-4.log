@@ -1,0 +1,59 @@
+✖ [3045/3046] Building FiniteFieldHandbook (4.5s)
+trace: .> LEAN_PATH=/Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/packages/Cli/.lake/build/lib/lean:/Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/packages/batteries/.lake/build/lib/lean:/Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/packages/Qq/.lake/build/lib/lean:/Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/packages/aesop/.lake/build/lib/lean:/Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/packages/importGraph/.lake/build/lib/lean:/Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/packages/plausible/.lake/build/lib/lean:/Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/packages/mathlib/.lake/build/lib/lean:/Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/build/lib/lean /Users/adamburan/.elan/toolchains/leanprover--lean4---v4.35.0/bin/lean /Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/FiniteFieldHandbook.lean -o /Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/build/lib/lean/FiniteFieldHandbook.olean -i /Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/build/lib/lean/FiniteFieldHandbook.ilean -c /Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/build/ir/FiniteFieldHandbook.c --setup /Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/build/ir/FiniteFieldHandbook.setup.json --json
+error: FiniteFieldHandbook.lean:114:57: Type mismatch
+  Fintype.card_units K
+has type
+  @Fintype.card Kˣ instFintypeUnitsOfDecidableEq = Fintype.card K - 1
+but is expected to have type
+  @Fintype.card Kˣ inst✝ = Fintype.card K - 1
+warning: FiniteFieldHandbook.lean:145:0: automatically included section variable(s) unused in theorem `FiniteFieldHandbook.permutation_iff_injective`:
+  [Field K]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Field K] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: FiniteFieldHandbook.lean:183:2: `simp` already closes the goal
+
+Hint: Use `simp` instead of `simpa`:
+  [apply] simp
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: FiniteFieldHandbook.lean:193:2: `simp` already closes the goal
+
+Hint: Use `simp` instead of `simpa`:
+  [apply] simp [Algebra.smul_def]
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: FiniteFieldHandbook.lean:262:0: automatically included section variable(s) unused in theorem `FiniteFieldHandbook.galois_group_cyclic`:
+  [Fintype K]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Fintype K] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: FiniteFieldHandbook.lean:271:0: automatically included section variable(s) unused in theorem `FiniteFieldHandbook.linearized_add`:
+  [Finite L]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Finite L] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: FiniteFieldHandbook.lean:278:0: automatically included section variable(s) unused in theorem `FiniteFieldHandbook.linearized_smul`:
+  [Finite L]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Finite L] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+error: FiniteFieldHandbook.lean:301:59: failed to synthesize instance of type class
+  Finite G
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+error: FiniteFieldHandbook.lean:310:49: Application type mismatch: The argument
+  FiniteField.Extension K p n
+has type
+  Type
+but is expected to have type
+  ?m.59[X]
+in the application
+  @IsSplittingField.splits ?m.59 K ?m.60 ?m.61 ?m.62 (FiniteField.Extension K p n)
+Some required targets logged failures:
+- FiniteFieldHandbook
+error: build failed

@@ -1,0 +1,7 @@
+The card run did not complete, and I have no exit code or receipt for it.
+
+I ran `python3 tools/task_card.py run research/n83_msweep_20261024/cards/CARD-n83-msweep-20261024-shard2.yaml` in the background. It printed nothing before the background task was stopped by the harness time limit (task notification `b9c0x29dq`, status `killed`). The output file contains only `[killed]`. The `tools/task_card.py run` process (pid 9305) had exited by the time I checked, but its exit status was not captured. There is no `receipts/` directory under `research/n83_msweep_20261024/`, so no receipt was written.
+
+I did not rerun the command, because the card procedure forbids rerunning `run`. The shard1 card (pid 9255) was also running in parallel and was not touched.
+
+Status: **refused** (the run was stopped before the tool reported a result). Condition: the background time limit was reached before `tools/task_card.py run` printed its summary. Impediment line: none printed. To retry, the Coordinator must re-dispatch the card with a longer background `timeout`.

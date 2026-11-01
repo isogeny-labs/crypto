@@ -50,6 +50,15 @@ single local process and are diagnostics for this control.
 
 `evidence-01/` retains config, samples, process output, target certificate,
 the checked macOS executable, receipt, independent replay and their hashes.
+The [executed producer source](koblitz_orbit_dlp_fast.executed-20261026.rs)
+is retained with SHA-256
+`58e3ee492093de5f6b760b96e3aba819fa479cdecd22b1adee94f0ecb26026d8`
+from commit `c1ed89ba343`. Independent replay checks this versioned source:
+later changes to `examples/koblitz_orbit_dlp_fast.rs` do not alter the
+recorded run. The runner still requires its frozen source hash when starting
+a new process. The replay also compares the recorded algorithm flags with
+the executed flag map in `verify.py`, so later changes to the cross-family
+runner's flag defaults do not reinterpret this receipt.
 The raw ordered base is
 31,156,577 bytes; its deterministic gzip is 9,135,776 bytes with SHA-256
 `3e0b7c9bad6a2abe2588a9f2b84d36f5fbe5991f3a6e0ef84f59135e3e40ec46`.

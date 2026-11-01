@@ -2,9 +2,9 @@
 
 - **Status:** open
 - **Kind:** implementation and measurement gap; formal-proof gap for a regularity claim
-- **Affected work:** [chart-complement screen](../research/factor_base_chart_complements_20261019/README.md), [completed shape study](../research/factor_base_shape_leads_20261018/README.md)
+- **Affected work:** [chart-complement screen](../research/factor_base_chart_complements_20261019/README.md), [completed shape study](../research/factor_base_shape_leads_20261018/README.md), [Boolean ordinate offsets](../research/prime_factor_base_degree_20261031/pencil_search_20261101/README.md)
 - **Next action owner:** native factor-base CLI lane; new follow-up remains draft/unfunded
-- **Last updated:** 2026-10-29
+- **Last updated:** 2026-11-01
 
 ## Problem
 
@@ -72,6 +72,49 @@ all phases, matched rho and independent replay under repository rules.
   and verification, or a concrete relevant algebraic certificate.
 
 ## Resolution and history
+
+2026-11-01: [Boolean offsets of a quadratic ordinate coordinate](../research/prime_factor_base_degree_20261031/pencil_search_20261101/README.md)
+now have kernel-checked complete two-summand group semantics and exact
+canonical highest-form first-vanishing degree2k+3, including all2k Boolean
+selector variables. The F17 base FB1h29cc024e755c has eight columns/sixteen
+signed points, canonical degree7 versus same-base dense9. This closes the
+specific canonical-degree proof obligation for this presentation; it does
+not close the successful-work condition. Derived full affine column
+envelopes are3432 versus55, not observed F4 widths. Exact one-bit-per-slot
+projection removes two variables, but its canonical degree and solver costs
+remain unproved/unmeasured. The five-module continuation passes the unchanged
+240-declaration dependency audit with zero failures/native trust and13
+native tests; the fixture export replays byte-for-byte.
+
+The [prospective panel](../research/prime_factor_base_degree_20261031/pencil_search_20261101/PROTOCOL.json)
+is not implemented or launched: matched controls/F4 instrumentation and an
+admitted arbitrary-native-command EKS route remain separate implementation
+and tool/access gaps. No EKS MCP or ready AWS identity is configured in that
+session; the inspected GitHub workflow consumes ecbench specs. The earlier
+local exception is specific to a different completed panel and is not reused.
+Next: prove the projected top ideal, implement the frozen complete-reference
+panel, submit it through the proper route and compare actual work including
+construction, all signs, duplicate labels and root recovery. Keep empty
+fibres and failures. Passing those checks could establish a measured
+two-summand stage improvement; the original P-256/17-term gates remain open.
+No mathematical impossibility or novelty conclusion is inferred.
+
+2026-10-30: the [structured predicate reference](../research/prime_ic_zero_filter_20261030/implementation/README.md)
+implements a rational two-isogeny fibre membership circuit with actual subgroup
+constraints, complete signed point-summation charts, exact counts and prefix
+witness extraction. A reusable local membership decision diagram can be built
+from quadratic fibre roots and both rational lifts, without scanning all field
+encodings; a separate exhaustive compiler is the finite control. The native
+checks cover two small fields, including the intermediate identity chart,
+noncanonical/nonrational inputs, poles, subgroup rejection and zero/limit
+distinctions. This special rational-two-torsion family does not cover arbitrary
+PKM auxiliary isogenies or prime-order curves without rational two-torsion.
+The execution backend remains finite functional enumeration. No compact message
+for the complete summation zero predicate, growing-parameter advantage, useful
+relation-rank improvement or end-to-end IC cost is established. The next code
+obligation is a bounded representation for the constrained summation boundary,
+checked against this reference with setup and intermediate storage retained.
+The successful-work and regularity exit conditions above remain open.
 
 2026-10-26: the literature/atlas review selects the still-unexamined native
 transfer of the product-profile/linearization-excess prior. The

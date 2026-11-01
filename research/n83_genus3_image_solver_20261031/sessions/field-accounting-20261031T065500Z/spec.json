@@ -1,0 +1,36 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "same-field genus-3 Jacobian image: deterministic field-operation accounting",
+  "description": "Accounting-only companion to the paired-host timing panel. The named tallied adapters count complete-route instrumented F2mElement additions, multiplications, squarings, and informational inversions. Their timing includes ledger overhead and is inadmissible for source/destination wall, instruction, or cycle comparisons.",
+  "workloads": {
+    "curves": [
+      {"kind": "koblitz", "a": 0, "n": 9},
+      {"kind": "koblitz", "a": 0, "n": 13},
+      {"kind": "koblitz", "a": 0, "n": 19},
+      {"kind": "koblitz", "a": 0, "n": 23}
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 202610310830,
+    "target_kind": "planted"
+  },
+  "arms": [
+    {
+      "name": "destination-rho3-field-tally",
+      "role": "baseline",
+      "method": {"id": "jacobian_image.rho3_field_tally"}
+    },
+    {
+      "name": "destination-bsgs-field-tally",
+      "role": "candidate",
+      "method": {"id": "jacobian_image.bsgs_field_tally"}
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 202610310832,
+    "isolation_required": "L0",
+    "timeout_seconds": 300
+  }
+}

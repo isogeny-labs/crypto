@@ -17,6 +17,7 @@
 //! | [`hyper`] | the hyperelliptic thread's Jacobians (genus 2–4, `p < 256`) for the generic arms |
 //! | [`hyper_ic`] | `ic.hyperelliptic`: the thread's index calculus on those Jacobians, counted |
 //! | [`koblitz_descent`] | `ic.koblitz_descent`: the ledger §23 one-target Koblitz index calculus, charged by counted group operations |
+//! | [`negation_strong`] | `rho.negation_strong`: batched negation-map rho on `E/F_{(2^m)^4}`, charged in counted `F_q` multiplications |
 //! | [`claw`] | the four-point signed-Frobenius pair claw (aburan28/cryptanalysis#175) on a Koblitz curve |
 //! | [`conductor_gap`] | CM crater/floor curve pairs with a certified prime endomorphism-conductor gap |
 //! | [`spec`] | the experiment spec and its deterministic expansion |
@@ -57,6 +58,14 @@ pub mod compare;
 pub mod conductor_gap;
 pub mod cover_quartic;
 pub mod db;
+pub mod diagnostic_binding_core;
+pub mod diagnostic_file_adapter;
+pub mod diagnostic_inventory;
+pub mod diagnostic_launch;
+pub mod diagnostic_preflight;
+pub mod diagnostic_resources;
+pub mod diagnostic_runtime;
+pub mod diagnostics;
 pub mod ext;
 pub mod fbm;
 pub mod fp4;
@@ -76,7 +85,10 @@ pub mod known_log;
 pub mod koblitz_descent;
 pub mod legacy;
 pub mod methods;
+pub mod negation_strong;
+pub mod optimization;
 pub mod plane_quartic;
+pub mod prime_orbit;
 pub mod record;
 pub mod resources;
 pub mod runner;

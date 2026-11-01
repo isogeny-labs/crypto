@@ -1,0 +1,3132 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "ER-E2E-v3-ao7xe0bzb6wgz9",
+  "created": "2026-10-30T04:18:29.212036+00:00",
+  "protocol": {
+    "path": "../protocol-v3.json",
+    "sha256": "36c8f17ea57cc552d84b076521f0b344fe2d2aa65cf41aa649228b0f110142b2",
+    "protocol_id": "EXPLICIT-RELATIONS-E2E-20261030",
+    "version": 3
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": "ecbench-e2e-v3",
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "614791252805f64a618a8ce0080e8f4f040c3a8f",
+    "dirty": false
+  },
+  "backend": "runpod",
+  "host": {
+    "path": "gpu-before.txt",
+    "sha256": "18c7a885d1626013b7ce59544fb7e313691293315c4cadfd87d64085c4cfe531",
+    "class_id": "runpod-ao7xe0bzb6wgz9",
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": "L0",
+      "gpu": "RTX PRO 6000 Blackwell Server Edition"
+    }
+  },
+  "arms": [
+    {
+      "id": "u",
+      "role": "candidate",
+      "binary_sha256": "ebc324145d3aafacee884edcd1bbf26f7c382c9c669e49fb9bfafec40f257934",
+      "commit": "614791252805f64a618a8ce0080e8f4f040c3a8f"
+    },
+    {
+      "id": "x",
+      "role": "control_aa",
+      "binary_sha256": "ebc324145d3aafacee884edcd1bbf26f7c382c9c669e49fb9bfafec40f257934",
+      "commit": "614791252805f64a618a8ce0080e8f4f040c3a8f"
+    },
+    {
+      "id": "h",
+      "role": "reference",
+      "binary_sha256": "0510bc8f1bccd81edd730e9deb46b4ebd1eff67423053c7449476f66997f5dd8",
+      "commit": "614791252805f64a618a8ce0080e8f4f040c3a8f"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "ao7xe0bzb6wgz9-20-101-u",
+      "arm": "u",
+      "instance_id": "20",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.453908695,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.434163359,
+          "verify_seconds": 0.009985956,
+          "bases_ms": 5.428844,
+          "targets_ms": 3.446572,
+          "oracle_ms": 10.898033,
+          "linear_ms": 0.1618,
+          "replay_ms": 1.107718,
+          "relations": 57,
+          "attempts": 57
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-20-101-x",
+      "arm": "x",
+      "instance_id": "20",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.375871001,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.354244372,
+          "verify_seconds": 0.010476598,
+          "bases_ms": 6.736743,
+          "targets_ms": 3.73919,
+          "oracle_ms": 7.509159,
+          "linear_ms": 0.227842,
+          "replay_ms": 1.617643,
+          "relations": 57,
+          "attempts": 57
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-20-101-h",
+      "arm": "h",
+      "instance_id": "20",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.053214519,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.04260843,
+          "verify_seconds": 0.004664596,
+          "bases_ms": 0.477158,
+          "targets_ms": 3.385291,
+          "oracle_ms": 21.860783,
+          "linear_ms": 0.182164,
+          "replay_ms": 1.265585,
+          "relations": 57,
+          "attempts": 57
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-20-202-x",
+      "arm": "x",
+      "instance_id": "20",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.364827044,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.348544505,
+          "verify_seconds": 0.005530711,
+          "bases_ms": 6.406175,
+          "targets_ms": 4.213704,
+          "oracle_ms": 7.945024,
+          "linear_ms": 0.261031,
+          "replay_ms": 1.059993,
+          "relations": 49,
+          "attempts": 60
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-20-202-u",
+      "arm": "u",
+      "instance_id": "20",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.35654109,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.338331154,
+          "verify_seconds": 0.009054843,
+          "bases_ms": 6.184316,
+          "targets_ms": 5.078568,
+          "oracle_ms": 5.696614,
+          "linear_ms": 0.257409,
+          "replay_ms": 2.000566,
+          "relations": 49,
+          "attempts": 60
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-20-202-h",
+      "arm": "h",
+      "instance_id": "20",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.056867676,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.046589336,
+          "verify_seconds": 0.005229789,
+          "bases_ms": 0.913522,
+          "targets_ms": 2.477159,
+          "oracle_ms": 25.267667,
+          "linear_ms": 0.122815,
+          "replay_ms": 0.747647,
+          "relations": 49,
+          "attempts": 60
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-24-101-u",
+      "arm": "u",
+      "instance_id": "24",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.399138804,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.374701937,
+          "verify_seconds": 0.012994485,
+          "bases_ms": 6.638284,
+          "targets_ms": 9.885729,
+          "oracle_ms": 13.362242,
+          "linear_ms": 0.21142,
+          "replay_ms": 1.250518,
+          "relations": 71,
+          "attempts": 86
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-24-101-x",
+      "arm": "x",
+      "instance_id": "24",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.393012421,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.373618765,
+          "verify_seconds": 0.012709357,
+          "bases_ms": 5.937608,
+          "targets_ms": 6.245767,
+          "oracle_ms": 8.855062,
+          "linear_ms": 0.355434,
+          "replay_ms": 1.826003,
+          "relations": 71,
+          "attempts": 86
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-24-101-h",
+      "arm": "h",
+      "instance_id": "24",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.157696732,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.144072779,
+          "verify_seconds": 0.006057167,
+          "bases_ms": 0.805594,
+          "targets_ms": 5.781929,
+          "oracle_ms": 120.15806,
+          "linear_ms": 0.401423,
+          "replay_ms": 2.201726,
+          "relations": 71,
+          "attempts": 86
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-24-202-x",
+      "arm": "x",
+      "instance_id": "24",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.40233821,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.377721669,
+          "verify_seconds": 0.012568821,
+          "bases_ms": 6.136833,
+          "targets_ms": 7.263208,
+          "oracle_ms": 46.760676,
+          "linear_ms": 0.426165,
+          "replay_ms": 2.170445,
+          "relations": 79,
+          "attempts": 80
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-24-202-u",
+      "arm": "u",
+      "instance_id": "24",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.439343395,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.413057435,
+          "verify_seconds": 0.012670102,
+          "bases_ms": 7.18345,
+          "targets_ms": 5.691863,
+          "oracle_ms": 9.724338,
+          "linear_ms": 0.415356,
+          "replay_ms": 1.647925,
+          "relations": 79,
+          "attempts": 80
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-24-202-h",
+      "arm": "h",
+      "instance_id": "24",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.149314825,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.136165513,
+          "verify_seconds": 0.005693521,
+          "bases_ms": 0.44045,
+          "targets_ms": 5.699453,
+          "oracle_ms": 112.277965,
+          "linear_ms": 0.493253,
+          "replay_ms": 2.823532,
+          "relations": 79,
+          "attempts": 80
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-28-101-u",
+      "arm": "u",
+      "instance_id": "28",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.378390557,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.348764375,
+          "verify_seconds": 0.016042991,
+          "bases_ms": 6.732607,
+          "targets_ms": 8.393905,
+          "oracle_ms": 11.190495,
+          "linear_ms": 0.456889,
+          "replay_ms": 2.230787,
+          "relations": 105,
+          "attempts": 106
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-28-101-x",
+      "arm": "x",
+      "instance_id": "28",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.445863584,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.422046679,
+          "verify_seconds": 0.015715303,
+          "bases_ms": 6.148746,
+          "targets_ms": 8.164979,
+          "oracle_ms": 27.738009,
+          "linear_ms": 0.488635,
+          "replay_ms": 2.22702,
+          "relations": 105,
+          "attempts": 106
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-28-202-x",
+      "arm": "x",
+      "instance_id": "28",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.509260892,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.485204279,
+          "verify_seconds": 0.016060565,
+          "bases_ms": 6.343074,
+          "targets_ms": 9.026935,
+          "oracle_ms": 12.204611,
+          "linear_ms": 0.502357,
+          "replay_ms": 2.320482,
+          "relations": 109,
+          "attempts": 111
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-28-202-u",
+      "arm": "u",
+      "instance_id": "28",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.43858847,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.407917819,
+          "verify_seconds": 0.015383135,
+          "bases_ms": 6.100168,
+          "targets_ms": 7.059116,
+          "oracle_ms": 33.991281,
+          "linear_ms": 0.509821,
+          "replay_ms": 2.32821,
+          "relations": 109,
+          "attempts": 111
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-32-101-u",
+      "arm": "u",
+      "instance_id": "32",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.397475342,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.36991441,
+          "verify_seconds": 0.018135361,
+          "bases_ms": 6.77086,
+          "targets_ms": 13.430577,
+          "oracle_ms": 22.080737,
+          "linear_ms": 0.781069,
+          "replay_ms": 3.651212,
+          "relations": 128,
+          "attempts": 215
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-32-101-x",
+      "arm": "x",
+      "instance_id": "32",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.434479518,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.398056252,
+          "verify_seconds": 0.018551223,
+          "bases_ms": 6.960381,
+          "targets_ms": 15.099544,
+          "oracle_ms": 60.749616,
+          "linear_ms": 0.783736,
+          "replay_ms": 3.652546,
+          "relations": 128,
+          "attempts": 215
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-32-202-x",
+      "arm": "x",
+      "instance_id": "32",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.44227859,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.414168928,
+          "verify_seconds": 0.018708296,
+          "bases_ms": 6.423589,
+          "targets_ms": 12.149226,
+          "oracle_ms": 52.005226,
+          "linear_ms": 0.886691,
+          "replay_ms": 3.858942,
+          "relations": 136,
+          "attempts": 185
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-32-202-u",
+      "arm": "u",
+      "instance_id": "32",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.596996574,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.575809299,
+          "verify_seconds": 0.008848859,
+          "bases_ms": 12.431281,
+          "targets_ms": 8.721895,
+          "oracle_ms": 105.424671,
+          "linear_ms": 0.944637,
+          "replay_ms": 3.861067,
+          "relations": 136,
+          "attempts": 185
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-36-101-u",
+      "arm": "u",
+      "instance_id": "36",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.570366473,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.541953973,
+          "verify_seconds": 0.015666043,
+          "bases_ms": 6.510209,
+          "targets_ms": 23.298909,
+          "oracle_ms": 118.107422,
+          "linear_ms": 2.499851,
+          "replay_ms": 6.703581,
+          "relations": 183,
+          "attempts": 300
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-36-101-x",
+      "arm": "x",
+      "instance_id": "36",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.61884672,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.570406521,
+          "verify_seconds": 0.024343469,
+          "bases_ms": 7.145303,
+          "targets_ms": 41.830747,
+          "oracle_ms": 163.042314,
+          "linear_ms": 2.687839,
+          "replay_ms": 6.993745,
+          "relations": 183,
+          "attempts": 300
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-36-202-x",
+      "arm": "x",
+      "instance_id": "36",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.582267514,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.547100396,
+          "verify_seconds": 0.022571458,
+          "bases_ms": 6.280669,
+          "targets_ms": 22.104371,
+          "oracle_ms": 135.19253,
+          "linear_ms": 2.094041,
+          "replay_ms": 6.4738,
+          "relations": 178,
+          "attempts": 380
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-36-202-u",
+      "arm": "u",
+      "instance_id": "36",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.559108258,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.515729753,
+          "verify_seconds": 0.022240948,
+          "bases_ms": 6.109629,
+          "targets_ms": 31.341985,
+          "oracle_ms": 140.501196,
+          "linear_ms": 2.152067,
+          "replay_ms": 6.484717,
+          "relations": 178,
+          "attempts": 380
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-40-101-u",
+      "arm": "u",
+      "instance_id": "40",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.77364781,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.729476281,
+          "verify_seconds": 0.026779401,
+          "bases_ms": 6.81051,
+          "targets_ms": 44.143308,
+          "oracle_ms": 290.260227,
+          "linear_ms": 6.634126,
+          "replay_ms": 11.92804,
+          "relations": 267,
+          "attempts": 380
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-40-101-x",
+      "arm": "x",
+      "instance_id": "40",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.68614536,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.633417562,
+          "verify_seconds": 0.027642602,
+          "bases_ms": 6.975603,
+          "targets_ms": 29.773926,
+          "oracle_ms": 228.610249,
+          "linear_ms": 6.600545,
+          "replay_ms": 11.608301,
+          "relations": 267,
+          "attempts": 380
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-40-202-x",
+      "arm": "x",
+      "instance_id": "40",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.704364586,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.649104938,
+          "verify_seconds": 0.025704052,
+          "bases_ms": 6.96754,
+          "targets_ms": 29.431692,
+          "oracle_ms": 222.422087,
+          "linear_ms": 7.300629,
+          "replay_ms": 12.125614,
+          "relations": 280,
+          "attempts": 332
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-40-202-u",
+      "arm": "u",
+      "instance_id": "40",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 0.712696489,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 0.659139331,
+          "verify_seconds": 0.029202862,
+          "bases_ms": 7.872556,
+          "targets_ms": 26.09869,
+          "oracle_ms": 235.532552,
+          "linear_ms": 7.359324,
+          "replay_ms": 12.220423,
+          "relations": 280,
+          "attempts": 332
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-44-101-u",
+      "arm": "u",
+      "instance_id": "44",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 1.242123741,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 1.172951007,
+          "verify_seconds": 0.02726962,
+          "bases_ms": 7.06902,
+          "targets_ms": 74.640991,
+          "oracle_ms": 661.161593,
+          "linear_ms": 16.964061,
+          "replay_ms": 20.58821,
+          "relations": 384,
+          "attempts": 505
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-44-101-x",
+      "arm": "x",
+      "instance_id": "44",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 1.090170655,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 1.026425462,
+          "verify_seconds": 0.037137305,
+          "bases_ms": 6.941275,
+          "targets_ms": 48.897543,
+          "oracle_ms": 586.995123,
+          "linear_ms": 16.426851,
+          "replay_ms": 20.333543,
+          "relations": 384,
+          "attempts": 505
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-44-202-x",
+      "arm": "x",
+      "instance_id": "44",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 1.269274917,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 1.205889076,
+          "verify_seconds": 0.036750121,
+          "bases_ms": 7.210408,
+          "targets_ms": 51.78403,
+          "oracle_ms": 741.84883,
+          "linear_ms": 18.10039,
+          "replay_ms": 36.183777,
+          "relations": 371,
+          "attempts": 538
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-44-202-u",
+      "arm": "u",
+      "instance_id": "44",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 1.441381728,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 1.378636754,
+          "verify_seconds": 0.036390094,
+          "bases_ms": 13.172141,
+          "targets_ms": 66.525289,
+          "oracle_ms": 858.379103,
+          "linear_ms": 18.308283,
+          "replay_ms": 19.898834,
+          "relations": 371,
+          "attempts": 538
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-48-101-u",
+      "arm": "u",
+      "instance_id": "48",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 9.13048743,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 9.03403625,
+          "verify_seconds": 0.047652338,
+          "bases_ms": 6.915848,
+          "targets_ms": 413.853695,
+          "oracle_ms": 8175.22004,
+          "linear_ms": 47.612396,
+          "replay_ms": 31.179856,
+          "relations": 495,
+          "attempts": 954
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-48-101-x",
+      "arm": "x",
+      "instance_id": "48",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 9.170737784,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 9.075842502,
+          "verify_seconds": 0.047912193,
+          "bases_ms": 7.429327,
+          "targets_ms": 417.698873,
+          "oracle_ms": 8172.838807,
+          "linear_ms": 47.378507,
+          "replay_ms": 31.262348,
+          "relations": 495,
+          "attempts": 954
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-48-202-x",
+      "arm": "x",
+      "instance_id": "48",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 9.247495713,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 9.156944164,
+          "verify_seconds": 0.044788052,
+          "bases_ms": 6.659721,
+          "targets_ms": 402.749181,
+          "oracle_ms": 8255.403976,
+          "linear_ms": 119.287485,
+          "replay_ms": 31.547623,
+          "relations": 501,
+          "attempts": 878
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-48-202-u",
+      "arm": "u",
+      "instance_id": "48",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 9.299711377,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 9.207682549,
+          "verify_seconds": 0.047355171,
+          "bases_ms": 5.138855,
+          "targets_ms": 401.462558,
+          "oracle_ms": 8314.29963,
+          "linear_ms": 52.019946,
+          "replay_ms": 31.478425,
+          "relations": 501,
+          "attempts": 878
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-52-101-u",
+      "arm": "u",
+      "instance_id": "52",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 64.421668448,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 64.277743328,
+          "verify_seconds": 0.07101555,
+          "bases_ms": 7.161985,
+          "targets_ms": 611.613986,
+          "oracle_ms": 63106.493802,
+          "linear_ms": 143.088151,
+          "replay_ms": 55.735051,
+          "relations": 743,
+          "attempts": 1050
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-52-101-x",
+      "arm": "x",
+      "instance_id": "52",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 64.201751399,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 64.059440531,
+          "verify_seconds": 0.070327921,
+          "bases_ms": 7.862455,
+          "targets_ms": 615.350692,
+          "oracle_ms": 62884.961804,
+          "linear_ms": 142.784617,
+          "replay_ms": 55.358027,
+          "relations": 743,
+          "attempts": 1050
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-52-202-x",
+      "arm": "x",
+      "instance_id": "52",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 71.392847678,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 71.240142432,
+          "verify_seconds": 0.069001305,
+          "bases_ms": 7.115323,
+          "targets_ms": 695.974178,
+          "oracle_ms": 70030.751027,
+          "linear_ms": 117.555223,
+          "replay_ms": 52.421371,
+          "relations": 709,
+          "attempts": 1289
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-52-202-u",
+      "arm": "u",
+      "instance_id": "52",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 71.337285561,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 71.206916081,
+          "verify_seconds": 0.058745203,
+          "bases_ms": 7.82878,
+          "targets_ms": 700.855583,
+          "oracle_ms": 69980.304214,
+          "linear_ms": 117.860838,
+          "replay_ms": 52.666803,
+          "relations": 709,
+          "attempts": 1289
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-arm certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-56-101-u",
+      "arm": "u",
+      "instance_id": "56",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "timeout",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 0
+        },
+        "wall_seconds": 300.009728461,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "timeout",
+          "solver_seconds": 300.00957123,
+          "verify_seconds": 0.0
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-56-101-x",
+      "arm": "x",
+      "instance_id": "56",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "timeout",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 0
+        },
+        "wall_seconds": 300.011052997,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "timeout",
+          "solver_seconds": 300.010869282,
+          "verify_seconds": 0.0
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-56-202-x",
+      "arm": "x",
+      "instance_id": "56",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "timeout",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 0
+        },
+        "wall_seconds": 300.01217518,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "timeout",
+          "solver_seconds": 300.012048216,
+          "verify_seconds": 0.0
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    },
+    {
+      "run_id": "ao7xe0bzb6wgz9-56-202-u",
+      "arm": "u",
+      "instance_id": "56",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "timeout",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 0
+        },
+        "wall_seconds": 300.008603861,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "timeout",
+          "solver_seconds": 300.008439512,
+          "verify_seconds": 0.0
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+          "bytes": 46907,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+          "bytes": 38100,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX PRO 6000 Blackwell Server Edition",
+      "backend_ref": "ao7xe0bzb6wgz9"
+    }
+  ],
+  "files": [
+    {
+      "path": "rows.csv",
+      "sha256": "0fc92e3adc826d939eb5de905e70b1953ff25a47c7b9f95cb704f3f6a0d57f70",
+      "bytes": 5795,
+      "kind": "raw"
+    },
+    {
+      "path": "certificate-audit.json",
+      "sha256": "690074d87bec4003b86a9a08ce348a30c40c907acd5073ca9bd91f45a65d052b",
+      "bytes": 46907,
+      "kind": "raw"
+    },
+    {
+      "path": "archive-manifest.json",
+      "sha256": "5f08760c12957a5c61bb7120d1992d61be67607bb5be2e5b3bb9ea4f1ef762cc",
+      "bytes": 38100,
+      "kind": "raw"
+    },
+    {
+      "path": "curves.txt",
+      "sha256": "5df3ab1a986a39a457cddcfd79bb843e8eb4d82edd856eb4292483481522e4e5",
+      "bytes": 582,
+      "kind": "raw"
+    },
+    {
+      "path": "instruments.sha256",
+      "sha256": "9ab879e4d9474cd188df85a72eb66937b1605e32e4d10bb6b9058c6160e5a916",
+      "bytes": 524,
+      "kind": "raw"
+    },
+    {
+      "path": "receipt.json",
+      "sha256": "98fa37b9b598804a7368f358f727a12b5e2db9f4cea39bd753a4141a8d1ed887",
+      "bytes": 432,
+      "kind": "raw"
+    },
+    {
+      "path": "deletion.txt",
+      "sha256": "bb63f320ec65d793b07671d8d10fa9670e00f080640b9fd0297553e232c45b7a",
+      "bytes": 33,
+      "kind": "raw"
+    },
+    {
+      "path": "source-commit.txt",
+      "sha256": "55778240fd7da61bee098edd69da4b119d8f8a1e126defabf45995bb0f20002a",
+      "bytes": 41,
+      "kind": "raw"
+    },
+    {
+      "path": "coverage.json",
+      "sha256": "e07c0faa647cf4e98fcb8dd86b651a281d5acd1cc25c01542caf4737635a22e5",
+      "bytes": 147,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../analyze.rs",
+      "sha256": "a00fbe4d73aa6a64e419087d8ef312735c204da031529fe584bf20675fadb1ff",
+      "bytes": 4084,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "summary.txt",
+        "sha256": "e250ce19021ec5017fc40048aa1965291fdd595a8104e8c134fca7ce7f5db171",
+        "bytes": 73,
+        "kind": "analysis"
+      },
+      {
+        "path": "scaling.svg",
+        "sha256": "8d864a712c71332f098539a827548bade226c41f15cf813de7b006537c271c5c",
+        "bytes": 7029,
+        "kind": "analysis"
+      },
+      {
+        "path": "analysis.log",
+        "sha256": "fda5c9d0fbb971bdd6c38df2e4b997befb691e6ccddfac19a9ffda15b147dffc",
+        "bytes": 104,
+        "kind": "analysis"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "Codex",
+      "text": "Protocol maximum44 executions; recorded44; unattempted0 under frozen stopping rule. Canonical flow counts recorded process outcomes, including explicit limit failures as completed failed processes; coverage.json separately counts verified recoveries. Limited native statuses map to failed; counters retain original labels. No timeouts or limits excluded. All clocks are L0/wall_valid=false. No human blinding."
+    },
+    {
+      "kind": "observation",
+      "by": "Codex",
+      "text": "Service binary hash is the arm identity; shared driver hash is recorded separately in instruments.sha256. Complete raw certificates and relation logs are in the content-hashed S3 archive; archive-manifest.json hashes every member and certificate-audit.json retains replay and negative-control outputs. These manifests do not replace the native certificate replay, which ran on the GPU host. Pod deletion verified. No root crypto plug-in build was performed locally."
+    }
+  ],
+  "reviews_dir": "reviews",
+  "flow": {
+    "planned": 44,
+    "attempted": 44,
+    "completed": 40,
+    "not_completed": 4,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  }
+}
