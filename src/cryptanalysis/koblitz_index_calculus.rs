@@ -9424,6 +9424,11 @@ pub struct ChainS3Tables {
     /// signed `d`-sums. Same verdicts and witness checks; only speed.
     #[serde(default)]
     pub indexed: bool,
+    /// With `meet`: split the per-query back enumeration across the rayon
+    /// pool (`RAYON_NUM_THREADS`) on the multiset's first index. Same hits
+    /// in the same order; only wall time changes.
+    #[serde(default)]
+    pub parallel: bool,
 }
 
 /// Everything a chained-S3 search can vary besides its limits.
@@ -9904,6 +9909,81 @@ fn chain_s3_rebuild_by_peeling(
     chain_s3_rebuild(kc, fb, signed, target, depth, hits, deadline)
 }
 
+/// The per-query side of [`ChainS3Tables::meet`]: every point `R + s` over
+/// signed `back`-multisets `s` whose x-fingerprint is in `front`, with the
+/// multiset's indices into `signed`, and whether some `R + s` is the identity
+/// (`R` is itself a signed `back`-sum). `parallel` splits the enumeration on
+/// the multiset's first (smallest) index across the rayon pool; the hits come
+/// back in the same order as the sequential enumeration. `None` when the
+/// deadline passed.
+#[allow(clippy::too_many_arguments)]
+fn chain_s3_back_hits(
+    curve: &BinaryCurve,
+    target: &BinaryPoint,
+    signed: &[BinaryPoint],
+    back: usize,
+    front: &ChainS3FrontSet,
+    indexed: bool,
+    parallel: bool,
+    deadline: Option<std::time::Instant>,
+) -> Option<(Vec<(BigUint, Vec<usize>)>, bool)> {
+    let scan = |start: &BinaryPoint, depth: usize, first: usize, path: Vec<usize>| {
+        let mut hits: Vec<(BigUint, Vec<usize>)> = Vec::new();
+        let mut short = false;
+        let mut scratch = ChainS3Scratch::default();
+        let mut path = path;
+        let complete = chain_s3_enumerate(
+            curve,
+            start,
+            signed,
+            depth,
+            first,
+            deadline,
+            &mut scratch,
+            &mut path,
+            &mut |x, path| {
+                match x {
+                    None => short = true,
+                    Some(x) => {
+                        let fingerprint = chain_s3_fingerprint(x);
+                        let member = if indexed {
+                            front.contains_indexed(fingerprint)
+                        } else {
+                            front.contains_binary(fingerprint)
+                        };
+                        if member {
+                            hits.push((x.to_biguint(), path.to_vec()));
+                        }
+                    }
+                }
+                true
+            },
+        );
+        complete.then_some((hits, short))
+    };
+    if !parallel || back == 0 {
+        return scan(target, back, 0, Vec::new());
+    }
+    let parts: Vec<Option<(Vec<(BigUint, Vec<usize>)>, bool)>> = (0..signed.len())
+        .into_par_iter()
+        .map(|i| {
+            if deadline.is_some_and(|d| std::time::Instant::now() >= d) {
+                return None;
+            }
+            let start = point_add(curve, target, &signed[i]);
+            scan(&start, back - 1, i, vec![i])
+        })
+        .collect();
+    let mut hits = Vec::new();
+    let mut short = false;
+    for part in parts {
+        let (part_hits, part_short) = part?;
+        hits.extend(part_hits);
+        short |= part_short;
+    }
+    Some((hits, short))
+}
+
 /// The sorted, distinct x-fingerprints of every affine sum of `depth`
 /// signed base points: the query-independent side of
 /// [`ChainS3Tables::meet`]. Built once per (base, depth) and process, so a
@@ -10143,40 +10223,19 @@ fn sat_decompose_chained_s3_checked(
         let step = depth - 1;
         let front = chain_s3_meet_front(kc, fb, depth);
         let signed = chain_s3_signed_base(fb);
-        let mut hit_paths: Vec<(BigUint, Vec<usize>)> = Vec::new();
-        let mut short = false;
-        let mut scratch = ChainS3Scratch::default();
-        let complete = chain_s3_enumerate(
+        let Some((hit_paths, short)) = chain_s3_back_hits(
             &kc.curve,
             target,
             &signed,
             m - depth,
-            0,
+            &front,
+            tables.indexed,
+            tables.parallel,
             deadline,
-            &mut scratch,
-            &mut Vec::new(),
-            &mut |x, path| {
-                match x {
-                    None => short = true,
-                    Some(x) => {
-                        let fingerprint = chain_s3_fingerprint(x);
-                        let member = if tables.indexed {
-                            front.contains_indexed(fingerprint)
-                        } else {
-                            front.contains_binary(fingerprint)
-                        };
-                        if member {
-                            hit_paths.push((x.to_biguint(), path.to_vec()));
-                        }
-                    }
-                }
-                true
-            },
-        );
-        if !complete {
+        ) else {
             stats.exhausted = true;
             return (None, stats);
-        }
+        };
         let mut hits: Vec<BigUint> = hit_paths.iter().map(|(x, _)| x.clone()).collect();
         hits.sort_unstable();
         hits.dedup();
@@ -23845,6 +23904,7 @@ mod chain_s3_tables_tests {
             meet: 0,
             rebuild: false,
             indexed: false,
+            parallel: false,
         };
         let (found, stats) =
             sat_decompose_chained_s3_with(&kc, &fb, &target, 3, LIMITS, options(tables));
@@ -23869,6 +23929,7 @@ mod chain_s3_tables_tests {
             meet: 0,
             rebuild: false,
             indexed: false,
+            parallel: false,
         };
         let (found, stats) =
             sat_decompose_chained_s3_with(&kc, &fb, &target, 3, LIMITS, options(tables));
@@ -23967,6 +24028,7 @@ mod chain_s3_tables_tests {
             meet: 2,
             rebuild: false,
             indexed: false,
+            parallel: false,
         });
         let planted = sum_of(&kc, &fb, &[3, 40, 97]);
         let (found, stats) =
@@ -24037,6 +24099,27 @@ mod chain_s3_tables_tests {
         assert_eq!(stats.conflicts, 0);
     }
 
+    /// The parallel back enumeration returns exactly the sequential hits, in
+    /// the same order, for a public and a planted m = 5 (d = 3) target.
+    #[test]
+    fn n83_parallel_back_hits_match_sequential() {
+        let kc = KoblitzCurve::known_n83_k1().expect("fixture");
+        let fb = union_base(&kc);
+        let signed = chain_s3_signed_base(&fb);
+        let front = chain_s3_meet_front(&kc, &fb, 3);
+        for target in [
+            sum_of(&kc, &fb, &[1, 33, 64, 99, 150]),
+            kc.mul(kc.generator(), &BigUint::from(0x5eed_83u64)),
+            fb.points[7].clone(),
+        ] {
+            let sequential =
+                chain_s3_back_hits(&kc.curve, &target, &signed, 2, &front, true, false, None);
+            let parallel =
+                chain_s3_back_hits(&kc.curve, &target, &signed, 2, &front, true, true, None);
+            assert_eq!(sequential, parallel);
+        }
+    }
+
     /// `indexed` keeps the verdicts and rebuilds by peeling: planted m = 4
     /// (d = 2) and m = 5 (d = 3) witnesses with no solve, public refuted.
     #[test]
@@ -24051,6 +24134,7 @@ mod chain_s3_tables_tests {
                 meet: depth,
                 rebuild: true,
                 indexed: true,
+                parallel: false,
                 ..ChainS3Tables::default()
             });
             let target = sum_of(&kc, &fb, picks);

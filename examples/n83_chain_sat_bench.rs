@@ -66,6 +66,8 @@ fn main() {
             for part in parts {
                 if part == "affine" {
                     options.patterns = ChainS3Patterns::AffineOnly;
+                } else if part == "parallel" {
+                    options.tables.parallel = true;
                 } else if part == "indexed" {
                     options.tables.indexed = true;
                 } else if part == "rebuild" {
@@ -81,6 +83,7 @@ fn main() {
                         meet: options.tables.meet,
                         rebuild: options.tables.rebuild,
                         indexed: options.tables.indexed,
+                        parallel: options.tables.parallel,
                     };
                 } else {
                     panic!("unknown arm modifier {part}");
@@ -185,6 +188,7 @@ fn main() {
                     "patterns_refuted_by_lookup": stats.patterns_refuted_by_lookup,
                     "meet_domain": stats.meet_domain,
                     "witness_by_lookup": stats.witness_by_lookup,
+                    "threads": if options.tables.parallel { rayon::current_num_threads() } else { 1 },
                     "seed": seed,
                 })
             );
