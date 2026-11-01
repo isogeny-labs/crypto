@@ -53,3 +53,17 @@ Checker,Lean,report/custody;thenfullinfinity404andsharedAS249test,broaderF32supp
 
 ### Errors
 InitialCASmissinglibraryretained/rejected;noRustfailureorcohortdownscale.
+
+## 2026-11-01T07:05:21.686892+00:00 — terminal evidence reconciled
+
+### What was done
+All5 workflows terminal:4accepted/1rejected;31historicalGitpins match. Leancompile/audit exit0,5authoredclaims,0failing/trusted. No live R59 mathematics or producer repeated. Conductor R59 check clear.
+
+### Decisions made
+Finish R59 records/report/custody before new R60 mathematics. All18 exclusions persist overF32 via left-inverse basechange. Next construction is complete mixed infinity-pole space and both trace parities.
+
+### Open threads
+Report/custody/PR delivery,then mixed infinity restriction and404patterns; all original leads remain authorized.
+
+### Errors
+First shell lookup omitted local-bin PATH; used absolute Conductor path successfully. InitialCAS missinglibrary remains sole mathematical-workflow rejection.
