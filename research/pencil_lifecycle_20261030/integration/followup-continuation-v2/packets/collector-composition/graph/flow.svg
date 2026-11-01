@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="610">
+<rect width="760" height="610" fill="white"/>
+<style>text{font-family:Arial,sans-serif;fill:#18334b} .h{font-size:17px;font-weight:bold}.b{font-size:12px}</style>
+<text x="30" y="30" class="h">Signed graph affine potential identities</text>
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3z" fill="#476884"/></marker></defs>
+<path d="M190,150 L300,190" stroke="#476884" fill="none" marker-end="url(#a)"/>
+<path d="M540,150 L430,190" stroke="#476884" fill="none" marker-end="url(#a)"/>
+<path d="M365,270 L190,330" stroke="#476884" fill="none" marker-end="url(#a)"/>
+<path d="M340,370 L390,370" stroke="#476884" fill="none" marker-end="url(#a)"/>
+<path d="M540,410 L190,470" stroke="#476884" fill="none" marker-end="url(#a)"/>
+<path d="M540,410 L540,470" stroke="#476884" fill="none" marker-end="url(#a)"/>
+<rect x="40" y="70" width="300" height="80" rx="7" fill="#eef4f8" stroke="#7890a3"/>
+<text x="50" y="98" class="h">Node to parent potential</text>
+<text x="50" y="123" class="b">node = s*parent + a + b*k</text>
+<rect x="390" y="70" width="300" height="80" rx="7" fill="#eef4f8" stroke="#7890a3"/>
+<text x="400" y="98" class="h">Parent to root potential</text>
+<text x="400" y="123" class="b">parent = t*root + c + d*k</text>
+<rect x="215" y="190" width="300" height="80" rx="7" fill="#eef4f8" stroke="#7890a3"/>
+<text x="225" y="218" class="h">Path compression</text>
+<text x="225" y="243" class="b">(s*t, a+s*c, b+s*d)</text>
+<rect x="40" y="330" width="300" height="80" rx="7" fill="#eef4f8" stroke="#7890a3"/>
+<text x="50" y="358" class="h">Reduced edge</text>
+<text x="50" y="383" class="b">cu*ru + cv*rv = A+B*k</text>
+<rect x="390" y="330" width="300" height="80" rx="7" fill="#eef4f8" stroke="#7890a3"/>
+<text x="400" y="358" class="h">Forward union</text>
+<text x="400" y="383" class="b">ru = (-cu*cv)*rv + cu*A + cu*B*k</text>
+<rect x="40" y="470" width="300" height="80" rx="7" fill="#eef4f8" stroke="#7890a3"/>
+<text x="50" y="498" class="h">Opposite-size union</text>
+<text x="50" y="523" class="b">Reverse offsets: (-s*a, -s*b)</text>
+<rect x="390" y="470" width="300" height="80" rx="7" fill="#eef4f8" stroke="#7890a3"/>
+<text x="400" y="498" class="h">Fixed-child transport</text>
+<text x="400" y="523" class="b">parent = s*(x-a) + s*(y-b)*k</text>
+<text x="30" y="586" class="b">CommRing identities; union/reversal require involutive signs. Native graph interpretation remains separate.</text>
+</svg>
