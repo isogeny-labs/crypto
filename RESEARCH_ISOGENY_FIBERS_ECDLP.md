@@ -10,8 +10,9 @@ propositions, with a toy-field computational probe
 verdict of every round-5 and round-6 lead; it was written on 2026-10-24 with
 five leads still in open pull requests and was updated on 2026-10-31 (§19.19),
 when all of them and the R6.2 correction (#2543) had merged. §20 records round 7
-(eight pull requests; R7.1, R7.3, R7.5 and R7.7 merged on 2026-11-01, the other four
-open and **UNMERGED**); §18 is the
+(eight pull requests; R7.1, R7.3, R7.5 and R7.7 merged on 2026-11-01;
+R7.8 #3125 merged at 03:58 UTC, leaving R7.2, R7.4 and R7.6 open and
+**UNMERGED**); §18 is the
 reference list as revised by the R6.10 literature check.
 **Prior notes this builds on.** `RESEARCH_PDP_SPEEDUP_AND_ISOGENY.md` (2-/3-isogenous
 binary neighbours: identical Macaulay ranks, yield moves only with |F|),
@@ -134,7 +135,8 @@ binary neighbours: identical Macaulay ranks, yield moves only with |F|),
 
 10. **Round 7 (§20) closes bookkeeping and tests open ends; no lead reports a
     single-target speedup over the best generic method.** Eight pull requests; R7.1, R7.3,
-    R7.5 and R7.7 merged on 2026-11-01, the other four open (**UNMERGED**).
+    R7.5 and R7.7 merged on 2026-11-01; R7.8 #3125 merged at 03:58 UTC,
+    leaving R7.2, R7.4 and R7.6 open (**UNMERGED**).
     Counting additions and the Φ_ℓ construction leaves the generic-kernel
     exponent at 1.919 and still insufficient to show a value below 2, with one
     near-tie reordering in one accounting (R7.1). End to end on the real GHS
@@ -2214,7 +2216,8 @@ pipeline drivers agree on 396/396 target outcomes and XOR counts; 1/24 against
 *Library change.* `ChainedXOracle` (`chained-x`) in
 `src/cryptanalysis/ic_framework/plugins.rs`, two unit tests; not
 registered in `src/bin/ic/bench.rs` (still the case on `main` on 2026-10-31;
-registration is in the open pull request #3125, **UNMERGED**, §20.8).
+registration and the procedure-2 integration test are in #3125 (merged,
+§20.8).
 *Limits.* No instance at n = 15 and a = 1 only at n = 17; six cells marked NOT
 RUN; "not buildable" is a contended wall-time observation, not a counted bound;
 the symbolic build is not counted in the XOR figures; no matched rho was run
@@ -2731,9 +2734,8 @@ status read on 2026-10-31.
   merged, §20.1); the Sutherland CRT evaluation of Φ_ℓ is still not
   implemented, so the cold Φ route is not a state-of-the-art one.
 * Direct S5 systems are not buildable beyond ℓ = 5 (R6.1, merged). The
-  `chained-x` plug-in is unregistered in `ic bench` on `main`; registration and
-  an end-to-end test of ecbench verdict procedure 2 are in #3125 (R7.8,
-  **UNMERGED**, §20.8).
+  `chained-x` plug-in is now registered in `ic bench`, and #3125 added an
+  end-to-end test of ecbench verdict procedure 2 (R7.8, merged, §20.8).
 * GHS: the smooth model of the GHS cover is in the library (the smooth-cover
   lead of §19.19, #2542, merged), and the relation rate on the real descended
   Jacobian is measured for N = 12 and N = 14 at q = 4 (g = 8) and N = 12 at
@@ -2869,17 +2871,17 @@ the entry says so. Verdict words are those of §19 (*not fired*, *fired*,
 section R7.1 is #3107 (complete-cost ordering); #2542 is called the smooth-cover
 lead.
 
-**Status of the sources (pull-request records and branches read on
-2026-11-01).** Four round-7 pull requests merged on 2026-11-01: R7.1 #3107,
-R7.3 #3105, R7.5 #3109 and R7.7 #3113. R7.2 #3124, R7.4 #3092, R7.6 #3128 and
-R7.8 #3125 remain **open and UNMERGED**. Every entry below quotes the
+**Status of the sources (pull-request records checked on 2026-11-01 at 04:11
+UTC).** Five round-7 pull requests are merged: R7.1 #3107, R7.3 #3105, R7.5
+#3109, R7.7 #3113 and R7.8 #3125 (merged at 03:58 UTC). R7.2 #3124, R7.4
+#3092 and R7.6 #3128 remain **open and UNMERGED**. Every entry below quotes the
 `RESULTS.md` on the pull request's branch (R7.5: the two `ERRATUM_v2.md` files;
-R7.8: the pull request description, there is no `RESULTS.md`), can still change
-for the open ones, and links the branch because the file was not on `main` when
-the entry was written: R7.1 #3107 (`c3d38a7c0a`), R7.2 #3124 (`82b02896bf`),
+R7.8: the merged pull request description, which has no `RESULTS.md`); the
+open source records can still change. The references used when this entry was
+written were: R7.1 #3107 (`c3d38a7c0a`), R7.2 #3124 (`82b02896bf`),
 R7.3 #3105 (`a668d003c8`), R7.4 #3092 (`98ee823ca0`), R7.5 #3109 (`34896a4992`),
 R7.6 #3128 (`ede77e08f2`), R7.7 #3113 (`f92bfaea3b`), R7.8 #3125
-(`f5ff41a23a`). Merged earlier in round 7 and recorded in §19: the smooth-cover
+(`f5ff41a23a`; merged). Merged earlier in round 7 and recorded in §19: the smooth-cover
 lead #2542 (§19.19), the R6.2 correction #2543 (§19.6), `audit_curve` #2524 (no
 bug on `main`, §19.2) and clippy #2538 (no research content). The §19 update
 #3072 merged on 2026-11-01, so §19 above is now the text on `main`; #3074 (two
@@ -3305,11 +3307,12 @@ minimal package).
 *Source.* PR #3113, branch `research/r7-7-coset-label-a1-e8e`,
 `research/isogeny_fibers_20261010/round7/r7_7_coset_label/RESULTS.md`.
 
-### 20.8 R7.8 — `chained-x` in `ic bench` and an end-to-end test of ecbench verdict procedure 2 (**UNMERGED**, open #3125; no result)
+### 20.8 R7.8 — `chained-x` in `ic bench` and an end-to-end test of ecbench verdict procedure 2 (merged, #3125)
 
 *Nature.* Two small library follow-ups left open by merged work. The pull request
-states that it changes no result, so there is no research report and no
-hypothesis, falsifier or verdict; this entry records what it does.
+states that it changes no frozen result; it has no separate `RESULTS.md`,
+hypothesis, falsifier or verdict. Its description reports the implementation
+checks, an `ic bench` comparison on a different base, and the procedure-2 test.
 *(1) `chained-x`.* R6.1 (#2511) added `ChainedXOracle` and did not register it in
 `src/bin/ic/bench.rs`. The pull request registers it (`run_binary` builds and
 dispatches it, as it does `symmetrised`; `ic bench --list` carries a catalogue
@@ -3367,18 +3370,19 @@ checkout; its files use no curve names beyond existing test ones.
 | R7.5 errata R6.7, R6.9 | #3109 **merged** | none | counts corrected, no verdict changes | R6.7 (c)/(b): 11 / 9 / 11 of 18 (not 12); m = 3 shift 0.0151 (not 0.011); R6.9: 7 of 34 (not 6) |
 | R7.6 R6.2 batch + paths | #3128 **open** | H1: no-gain not met, below-√C met from C ≥ 32; H2: fired | H1 supported as a scaling law, not as gain = √C; H2 refuted | gain exponent 0.43 to 0.52 (ideal 0.489); gain 11.0 to 13.9 at C = 256 (16 under √C); path exponent 1.13 [1.06, 1.21] |
 | R7.7 trace pair, a = 1 and E/8E | #3113 **merged** | H1 fired (premise false); H1′, H2 not fired | H1 refuted as posed; H1′ confirmed (constancy measured); H2 confirmed, not cheap | label Tr(x) + Tr(a), 0 wrong in 148 598 015 points; triple label E/8E → F₂³, 74 118 081 points; CT bar still missed for Tr(a) = 0 |
-| R7.8 chained-x in `ic bench`, procedure-2 test | #3125 **open** | none | no result; library follow-up | `chained-x` registered; m = 3 S 375.5 / 419.4 against R6.1's 428.6 on different bases (not bit-identical); procedure-2 test 5 of 5 runs |
+| R7.8 chained-x in `ic bench`, procedure-2 test | #3125 **merged** | none | no separate research verdict; library follow-up | `chained-x` registered; m = 3 S 375.5 / 419.4 against R6.1's 428.6 on different bases (not bit-identical); procedure-2 test 5 of 5 runs |
 
 The summary figure is `round7/s20_summary/verdicts.svg` (data `verdicts.json`,
 report `report.pdf` beside it); it carries the same hollow-marker convention as
-`round6/s19_summary/` for unmerged leads; the four merged round-7 leads are
-filled and the four open ones hollow. The table's PR column gives the status
-read on 2026-11-01, updated when R7.1, R7.3, R7.5 and R7.7 merged.
+`round6/s19_summary/` for unmerged leads. Five merged round-7 leads are filled
+and the three open ones hollow. The table and figure show status checked on
+2026-11-01 at 04:11 UTC.
 
 ### 20.10 What is settled, what is still open, and the leads the results motivate
 
-*Settled at the stated toy scope.* R7.1, R7.3, R7.5 and R7.7 are merged; R7.2,
-R7.4, R7.6 and R7.8 remain open, so the items resting on those are provisional.
+*Settled at the stated toy scope.* R7.1, R7.3, R7.5 and R7.7 are merged; the
+R7.8 library follow-up is also merged. R7.2, R7.4 and R7.6 remain open, so the
+research findings resting on those are provisional.
 The settled list of §19.17 (merged results) is unchanged.
 * Corollary 9.2 is not limited to the Weierstrass model or to the point T: for an
   ordinary binary curve in any model every rational 2-power torsion subgroup
@@ -3435,9 +3439,9 @@ The settled list of §19.17 (merged results) is unchanged.
   Kuhn–Struik gain at finite r (R7.6).
 * The R6.8 exact-simulation theorem; direct S5 beyond ℓ = 5 (unchanged from
   §19.17).
-* Housekeeping that waited on merges: #3109 (errata files) and #3072 merged on
-  2026-11-01; #3125 (`chained-x` registration and the procedure-2 test) and
-  #3074 remain open.
+* Housekeeping that waited on merges: #3109 (errata files), #3072 and #3125
+  (`chained-x` registration and the procedure-2 test) merged on 2026-11-01;
+  #3074 remains open.
 
 *Leads the results motivate (each is the next step or a not-done item in its own
 source; none is a claim).*
@@ -3465,7 +3469,7 @@ are unchanged. Edits are to this note only.
 * §19 status paragraph ("Known defects"): the R6.7 and R6.9 count errata are now
   pointed to (R7.5, #3109, merged).
 * §19.5 (R6.1, *Library change*): the unregistered `chained-x` sentence points to
-  #3125 (R7.8, **UNMERGED**).
+  #3125 (R7.8, merged).
 * §19.11 (R6.7): the verdict sentence "pricing moves no ratio by more than 0.011"
   is replaced by 0.0151 (B/A priced as run) with the B/A, C/A and B/C interval
   widths stated and the tension for B/C (shift 0.0093 above its interval width,
@@ -3483,8 +3487,8 @@ are unchanged. Edits are to this note only.
   label and the two unread sources (R7.7, R7.4), and the binary-Edwards check with
   the R6.7/R6.9 counts (R7.4, R7.5) now name the round-7 result and its
   pull-request status. The "awaits its correction" lines were kept in
-  substance, not removed, because the correcting pull requests for R7.2, R7.4,
-  R7.6 and R7.8 are open; the R7.5 errata (#3109) and #3072 have merged.
+  substance, not removed, because R7.2, R7.4 and R7.6 remain open; the R7.5
+  errata (#3109), R7.8 library follow-up (#3125) and #3072 have merged.
 * §19.18, §19.19: a revision line; the "numbering" note under §19.19 (its R7.1 is
   the smooth-cover lead); the (3, 4), g = 8 "did not finish" sentence now cites
   the R7.2 measurement of 1175 s.

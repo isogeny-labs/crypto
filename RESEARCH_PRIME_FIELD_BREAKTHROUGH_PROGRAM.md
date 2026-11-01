@@ -341,6 +341,14 @@ baseline it is measured against.
    `LEAD-ICP-pkm-tower-algebraic-oracle`) and the digit presentation
    (`LEAD-ICP-digit-presentation-solving-degree`) hold it. Derivation, evidence map and the
    recorded degrees: [`research/lever2_closure_20261031/REPORT.md`](research/lever2_closure_20261031/REPORT.md).
+   *Measured (2026-11-01).* The literal count was then run exactly at toy primes
+   (`research/lever2_exact_count_20261101/REPORT.md`; protocol frozen before the rows): 5,760
+   instances, `m = 2, 3`, `p` up to 4.2·10⁶. None of the 1,800 instances of the five §4.2
+   families (subgroup coset, progression, interval, cubic image, Dickson image) reaches `B^{m−1}`,
+   none differs from 400 size-matched random bases on the largest count or on coverage (90 tests
+   at a Bonferroni level, none rejected), and the `x(kP)` control fires in every instance with a
+   coverage collapse. The count is not fired by any candidate and does not separate them from
+   random; the solving degree remains the open question.
 3. **Transfer to a structured setting.** Isogenies to curves with
    exploitable endomorphisms, covers by higher-genus curves over `F_p`,
    lifts to characteristic 0 (anomalous only). This repository's isogeny

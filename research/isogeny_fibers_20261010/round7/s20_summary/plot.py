@@ -38,10 +38,14 @@ ax.tick_params(axis="x", length=0, pad=6)
 ax.set_yticks([])
 for s in ax.spines.values():
     s.set_visible(False)
-ax.text(HX, n - 0.1, "PR and headline (as in the lead's RESULTS.md)", fontsize=8, color=ink, ha="left", va="bottom", weight="bold")
+ax.text(HX, n - 0.1, "PR status and source headline", fontsize=8, color=ink, ha="left", va="bottom", weight="bold")
 fig.text(0.01, 0.01,
-         "Hollow marker: pull request open and UNMERGED (status read 2026-11-01); filled: merged on 2026-11-01 (R7.1, R7.3, R7.5, R7.7). One verdict class per lead; see section 20.9.\n"
-         "R7.8 changes no result. R7.1: the ordering part of the falsifier fires in one accounting, the exponent part does not. Toy instances only. Source: verdicts.json.",
+         "Hollow marker: pull request open and UNMERGED; filled: merged. Status checked 2026-11-01 04:11 UTC; five merged (including R7.8 #3125 at 03:58 UTC), three open. One verdict class per lead; see section 20.9.\n"
+         "R7.8 has no separate research verdict. R7.1: the ordering part of the falsifier fires in one accounting, the exponent part does not. Toy instances only. Source: verdicts.json.",
          fontsize=7.2, color=ink2, ha="left")
 fig.subplots_adjust(left=0.22, right=0.995, top=0.86, bottom=0.11)
-fig.savefig(here / "verdicts.svg")
+svg_path = here / "verdicts.svg"
+fig.savefig(svg_path)
+# Matplotlib leaves trailing spaces on some generated path lines; keep the
+# committed derived SVG clean under git diff --check.
+svg_path.write_text("\n".join(line.rstrip() for line in svg_path.read_text().splitlines()) + "\n")
