@@ -132,7 +132,7 @@ Against the lazy orbit IC (the section above): `mitm-frobenius-layout-counted` n
 
 [Report](../../research/ecbench_generator_orbit_20261022/REPORT.pdf) · [study](../../research/ecbench_generator_orbit_20261022/) · [data](../../research/ecbench_generator_orbit_20261022/figures/summary.json). At n = 29 (c = 1) the IC arm is below rho-frob at every band weight; at one column the pipeline is a Frobenius-folded baby-step giant-step and the crossing rests on rho-frob's fixed set-up at log₂ r = 15.4, so it is not "faster than rho": the gap grows with r. At n = 19 no pinned calibration row exists and the band does not re-price the IC natives.
 
-Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates. Gate: validator report raw_data sessions/a1-n29/records.jsonl: sessions/a1-n29/records.jsonl is not a file; validator report raw_data sessions/a0-n13/records.jsonl: sessions/a0-n13/records.jsonl is not a file; validator report raw_data sessions/a1-n17/records.jsonl: sessions/a1-n17/records.jsonl is not a file; validator report raw_data sessions/a0-n19/records.jsonl: sessions/a0-n19/records.jsonl is not a file; validator report raw_data sessions/a0-n23/records.jsonl: sessions/a0-n23/records.jsonl is not a file; validator report raw_data sessions/a0-n31/records.jsonl: sessions/a0-n31/records.jsonl is not a file; validator report raw_data sessions/a0-n37/records.jsonl: sessions/a0-n37/records.jsonl is not a file.
+Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates. Gate: VALIDATION.json is missing.
 
 ## Component tuning: two orbit columns under the lazy oracle (2026-10-18, engineering)
 
@@ -380,7 +380,7 @@ Second-host replay (PROTOCOL.md §13): the 20-bit holdout re-executed on isolab-
 
 [Report](../../research/prime_base_oracle_tuning_20261029/README.pdf) · [study](../../research/prime_base_oracle_tuning_20261029/).
 
-Validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band are filed in `research/prime_base_oracle_tuning_20261029/VALIDATION.json`. The promoted result is the 20-bit `N=45` engineering baseline only; it is one curve, counted pricing-band evidence, and not a scaling or wall-time claim.
+Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
 
 ## Linear-algebra engine, outside tables A–C
 
@@ -495,6 +495,17 @@ Copied from native analysis: eight independent one-target workloads per fixed cu
 | 8209 | 0.975242 | 0.603463 to 1.450934 |
 | 131101 | 1.127134 | 0.922471 to 1.341694 |
 
+## F_p Gröbner engine (`f4_fp`) in the Jacobian-cover IC
+
+Component speed-up, class engineering: `f4_fp` before and after #1717 in examples/jv_cover.rs (Nagao decompositions on a genus-2 cover of E(F_{p^6}); every decomposition one f4_fp solve), same seeds and the same relations. Both builds recorded `solved=true` and `correct=true` for every DLP row (`research/f4_fp_ic_effect_20261018`, run-20261018T1548Z); the archived rows have no recovered-scalar certificate for an independent replay. It moves no row of tables A–C. S/rho is a lower-bound comparison (unpriced native work is not emitted).
+
+| p | seed | relations | S before | S after | before ÷ after | S/rho before | S/rho after (distance to rho) |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 53 | 1 | 31 | 4734 | 936.9 | 5.05 | 4297 | 850 |
+| 53 | 2 | 33 | 2121 | 425.2 | 4.99 | 1843 | 370 |
+| 101 | 1 | 53 | 1455 | 287.5 | 5.06 | 981 | 194 |
+| 101 | 2 | 50 | 2370 | 466.4 | 5.08 | 1897 | 373 |
+
 ## GHS-weak E0/F_{q^3} with 4 | #E0(K): plane-quartic index calculus against matched rho
 
 Whole method, cold, one target, no subgroup enumeration, in F_q-multiplication equivalents; copied from the frozen summaries of `research/quartic_n4_20261019/`. **Restricted to one special GHS-weak family** (E0 over F_{q^3}, #E0(K) = 4*ell): not generic curves, not prime-order E/F_{q^3}, not any standard curve. Matched reference: plain Pollard rho (no negation map) on the same E0(K) subgroup. Class: advance (restricted to the GHS-weak family). Baseline for the improvement: arm A0r (all rational points as factor base). It moves no row of tables A–C. Columns give IC/rho with 95% bootstrap interval at 0, 0.1 and 1 GAE per unpriced operation.
@@ -544,7 +555,7 @@ Component speed-up, class engineering: the dense linear stage against sparse FGL
 
 ## Linear stage after F4 across Gröbner-basis corpora
 
-Component speed-up, class engineering, in median wall time, single thread (host B): from a monic grevlex F4 basis to every checked F_p point, on 253 systems in five families (`research/postgb_linear_stage_20261026/`, [report](research/postgb_linear_stage_20261026/REPORT.pdf)). Leader: `zero_dim_la::fast_stage` (transposed Krylov, Berlekamp–Massey, gcd(f, x^p − x) roots, rational univariate read-out, AVX-512/AVX2 kernels), now the default `JV_LIN`. Incumbent: sparse FGLM (the section above). Every arm returned the same solution set on every system; fast gave up (and fell back to dense) on 1. Counted multiplications (sparse ÷ fast 0.77–2.14×) are reported, not ranked. It moves no row of tables A–C. validated: replay certificate, validator report and the matched rho reference with the §5a band (research/postgb_linear_stage_20261026/validation/VALIDATION.json)
+Component speed-up, class engineering, in median wall time, single thread (host B): from a monic grevlex F4 basis to every checked F_p point, on 253 systems in five families (`research/postgb_linear_stage_20261026/`, [report](research/postgb_linear_stage_20261026/REPORT.pdf)). Leader: `zero_dim_la::fast_stage` (transposed Krylov, Berlekamp–Massey, gcd(f, x^p − x) roots, rational univariate read-out, AVX-512/AVX2 kernels), now the default `JV_LIN`. Incumbent: sparse FGLM (the section above). Every arm returned the same solution set on every system; fast gave up (and fell back to dense) on 1. Counted multiplications (sparse ÷ fast 0.77–2.14×) are reported, not ranked. It moves no row of tables A–C. Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
 
 | family | systems | δ | sparse ms | fast ms | **sparse ÷ fast** [95%] | dense ÷ fast | portable fast | host A | counted sparse ÷ fast |
 |:--|--:|--:|--:|--:|:--|--:|--:|--:|:--|
@@ -810,6 +821,9 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ecbench_e2e_frontier_20261031/establishment/certificate.json` — sha256 `fb5759832dd0f80a…`
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
+- `research/f4_fp_ic_effect_20261018/summary.json` — sha256 `7eff13424e0e9b1a…`
+- `research/f4_fp_ic_effect_20261018/reports/run-20261018T1548Z/raw/dlp_main.json` — sha256 `bca0162f22f19c74…`
+- `research/f4_fp_ic_effect_20261018/reports/run-20261018T1548Z/raw/dlp_new.json` — sha256 `114f27cd5a3eb091…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/ecbench_lazy_orbit_members_20261018/figures/ratios.json` — sha256 `c86743775097e0e1…`
 - `research/ecbench_generator_orbit_20261022/figures/summary.json` — sha256 `c4f567d49a2875e7…`

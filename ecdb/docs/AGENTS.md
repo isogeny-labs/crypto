@@ -89,6 +89,10 @@ export ECDB_TOKEN=$(aws secretsmanager get-secret-value --region us-west-2 \
   `ECDB_TOKEN` before the runtime starts. Without it, the handshake and tool
   list still work, but every tool call returns an error that names the
   secret.
+- **A LAN mirror.** When `ECDB_URL` points at a mirror built from
+  `ecdb/deploy/nas/` (for example `http://<nas>:8080`), everything here works
+  the same. Its token is `ECDB_LAN_TOKEN`, or none at all. A mirror has the
+  data of its last `sync`, so check `/v1/meta` before relying on recent rows.
 - **HTTP.** For example:
 
   ```sh
