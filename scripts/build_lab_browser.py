@@ -362,7 +362,8 @@ def curve_rows(registry: dict, leaderboard: dict) -> list[dict]:
             field = {"characteristic": "p", "p": str(p), "bits": (int_or_none(p) or 0).bit_length(), "degree": 1, "modulus": None}
         elif family == "extension":
             # GF(p^k) = GF(p)[t]/(t^k + low(t)): bits are the field's, p^k's.
-            p, k = params.get("p"), int_or_none(params.get("k"))
+            # 47 fixture rows spell the degree "degree", not "k".
+            p, k = params.get("p"), int_or_none(params.get("k", params.get("degree")))
             field = {"characteristic": "p", "p": str(p), "bits": ((int_or_none(p) or 0) ** (k or 0)).bit_length(), "degree": k, "modulus": params.get("modulus")}
         else:
             degree = params.get("n") or params.get("m")
