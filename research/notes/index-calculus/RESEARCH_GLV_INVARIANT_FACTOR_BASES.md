@@ -3656,7 +3656,7 @@ echelon's arithmetic itself, not its pivot order.
 
 ### 9.36 E32 measured: the distance to rho over `2^{22.6}`–`2^{42.4}`, falling as `n^{−0.24}`; no crossover reached; fitted crossover order `2^{85.5}` `[2^{79.2}, 2^{94.3}]` at `0` GAE
 
-*2026-10-31 to 2026-11-01.*  Binaries pinned from `e75771052` (`experiments/36_handover_ladder/binary_commit.txt`),
+*2026-10-31 to 2026-11-01.*  Binaries pinned from `e757710521` (`experiments/36_handover_ladder/binary_commit.txt`),
 run only from the scratchpad copies (sha256 re-verified after a container restart).  Runner
 `experiments/36_handover_ladder/run_ladder.sh` (it replaced the pre-registration's `run_ladder.py` after the three
 `p = 101` curves, with the same logic, because AGENTS.md forbids Python orchestration); records `ic_p*s*.json`,
@@ -3695,7 +3695,7 @@ registered `8` GB gate, but the cgroup limit is lower. Shrinking the pool would 
 
 `D(g) = (S + 97g·E) / (rho + 97g·steps)`, `rho` = walk (iii) without the `[d]G` check.  Per-curve rows (with `S`, `rho`,
 `C`, shares, steps) are in `tables.md`.  `C` median rises slowly, `5.99·10⁵` (`p = 101`) to `6.65·10⁵` (`p = 3089`);
-Macaulay entries per residual `1.76`–`1.82·10⁵`; the solve is `98.3`–`99.1 %` of `S`, the linear algebra `≤ 0.006 %`.
+Macaulay entries per residual `1.76`–`1.82·10⁵`; Weil restriction plus solve is `98.3`–`99.1 %` of `S` (the solve alone `97.69`–`98.45 %`), the linear algebra `≤ 0.006 %`.
 The walk's cost per step falls from `175`–`229` (`p = 101`, set-up dominated) to `95.9` (`p = 3089`).
 
 **Fits** (`log₂ D = α + β(log₂ n − 32)`; stratified cluster bootstrap over curves, `10,000` replicates, seed `32`;
@@ -3708,7 +3708,7 @@ no replicate had `β ≥ 0`):
 | 0 | M2 (`β = −1/4`) | 24 | — | `84.0` [`83.4`, `84.6`] |
 | 0.1 | **M1** | 24 | `−0.248` [`−0.284`, `−0.211`] | **`91.2` [`84.4`, `100.7`]** |
 | 0.1 | M1-all | 33 | `−0.239` [`−0.278`, `−0.197`] | `93.5` [`85.4`, `105.4`] |
-| 0.1 | M2 | 24 | — | `90.9` [`90.3`, `91.4`] |
+| 0.1 | M2 | 24 | — | `90.8` [`90.3`, `91.4`] |
 | 1 | **M1** | 24 | `−0.256` [`−0.292`, `−0.219`] | **`97.6` [`90.1`, `107.9`]** |
 | 1 | M1-all | 33 | `−0.256` [`−0.295`, `−0.216`] | `97.7` [`89.6`, `108.9`] |
 | 1 | M2 | 24 | — | `99.1` [`98.5`, `99.6`] |
@@ -3720,9 +3720,9 @@ Yield exponent in `p`: `−0.066` (OLS 95 % `[−0.285, 0.154]`).  Linear-algebr
 | id | result | verdict |
 |:--|:--|:--|
 | G2.114 | `6,040` of `6,040` fields; ten walk references exact; every log, row and walk correct at every size | **holds** |
-| G2.115 | `33` of `33` seeds gave `h = 16` curves; columns / `p` `0.057`–`0.068` at `p ≥ 557` | **holds** (for the sizes reached) |
+| G2.115 | `33` of `33` seeds gave `h = 16` curves; columns / `p` `0.0517`–`0.0687` at `p ≥ 557` | **holds** (for the sizes reached) |
 | G2.116 | `C` median `6.39`–`6.67·10⁵`; entries per residual `1.762`–`1.770·10⁵` at `p ≥ 557` | **holds** |
-| G2.117 | solve `≥ 98.28 %`; linear algebra `≤ 0.0057 %` | **holds** |
+| G2.117 | Weil + solve `≥ 98.28 %`; linear algebra `≤ 0.0057 %` | **holds** |
 | G2.118 | exponent `−0.066`; per-size median `y` `969`–`4,272` | **holds** |
 | G2.119 | steps / `√n` `0.468`–`0.787`; per step at `p ≥ 1549` `95.9`–`96.5` | steps **hold**; per step **falsified high**: the band `[66, 80]` priced the batched addition alone and missed the `ψ` map (`26`) the class representative costs at every step |
 | G2.120 | largest size `D(0)` median `1.54·10³` (in band); no row at or below rho at any weight; medians fall from `2^{14}`–`2^{15}` to `2^{10.6}`, but not monotonically (up at `149`, `269`, `773`, within the per-curve scatter) | level and "rho ahead" **hold**; "falls with `n`" **holds as a trend** (`β < 0` in every replicate) and is **falsified read as monotone**, at 3 of 10 steps |
@@ -3738,7 +3738,7 @@ The free-slope fit gives `β = −0.243` with a `±0.04` interval that contains 
 sizes and three curves each the slope is identified, unlike the four-size ratio exponent of
 `LEAD-ICE-charged-toy-ic-exponent-vs-rho`. The crossover order it implies is
 **`2^{85.5}` [`2^{79.2}`, `2^{94.3}`] at `0` GAE, `2^{91.2}` [`2^{84.4}`, `2^{100.7}`] at `0.1`, and `2^{97.6}`
-[`2^{90.1}`, `2^{107.9}`] at `1` GAE**. The theory-slope fit puts it at `2^{84.0}`, `2^{90.9}` and `2^{99.1}`. The
+[`2^{90.1}`, `2^{107.9}`] at `1` GAE**. The theory-slope fit puts it at `2^{84.0}`, `2^{90.8}` and `2^{99.1}`. The
 `15`-bit width of the free-slope interval is what the ladder can say about an extrapolation over `43` bits beyond
 its top size. **Class:** a measurement of distance, and a fitted extrapolation of where it would reach `1`. It is not
 an improvement, and the fitted `n*` is not a measured crossing. It replaces §9.33's single-point model handover
@@ -3746,6 +3746,13 @@ an improvement, and the fitted `n*` is not a measured crossing. It replaces §9.
 at `2^{42.4}` and `0` GAE, and `≈ 43` bits of `n` to the fitted crossover. **Scope:** E25's GLS twists
 (`h = 16`, `p ≡ 1 (mod 4)`), the degree-11 `V₄` solve, `p ≤ 3089`, operation counts. The validation gate is not run;
 the owner arranges it.
+
+**Erratum (2026-11-01, from the independent validator's replay of all 66 runs from a fresh build and its recompute, `research/e32_handover_ladder_20261031/`).** Four statements in this section disagreed with the records and are corrected in place above; no verdict changes (G2.114–G2.118 and G2.121–G2.123 hold; G2.119's per-step cost is falsified high; G2.120 holds with the median rising at `p = 149, 269, 773`).
+
+1. The build-input commit is `e757710521b…`; `binary_commit.txt` dropped a digit (`e75771052b…`). The record keeps its text and carries a correction line.
+2. The share printed as "the solve" (`98.3`–`99.1 %`, and `≥ 98.28 %` in G2.117) is Weil restriction plus solve; the solve alone is `97.69`–`98.45 %`. G2.117's registered quantity is Weil plus solve, so its verdict stands.
+3. G2.115: columns / `p` is `0.0517`–`0.0687`, not `0.057`–`0.068`; the registered band still holds.
+4. M2's `log₂ n*` at `0.1` GAE is `90.847`, printed `90.9`; now `90.8`.
 
 ### 9.37 E33 measured: solver B's pivot selection costs `1.05·10⁶` native operations per call — B is ahead of A and E25 at `0` GAE only; a counted estimate (B″) stays ahead of A through `0.1` GAE but not at `1`
 

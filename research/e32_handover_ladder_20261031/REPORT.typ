@@ -3,7 +3,7 @@
 #set par(justify: true)
 = E32: the handover ladder — distance to the matched rho over $2^(22.6)$–$2^(42.4)$, and the crossover order fitted with intervals
 
-*Run report and results, 2026-10-31 to 2026-11-01.* Research note `research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md` §9.34 (pre-registration, commit `246460f094`, pushed before any run) and §9.36 (results). Binaries built from `e75771052`, run only from pinned scratchpad copies (sha256 in `experiments/36_handover_ladder/binary_commit.txt`, re-verified after a container restart). Records: `experiments/36_handover_ladder/` (`ic_p*s*.json`, `walk_p*s*.json`, `run.log`, `tables.md`, `summary.json`, `fit.json`); tables and fits by `examples/e32_tables.rs`. Lead: `LEAD-ICE-charged-toy-ic-exponent-vs-rho` (crypto-autoresearcher).
+*Run report and results, 2026-10-31 to 2026-11-01.* Research note `research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md` §9.34 (pre-registration, commit `246460f094`, pushed before any run) and §9.36 (results). Binaries built from `e757710521`, run only from pinned scratchpad copies (sha256 in `experiments/36_handover_ladder/binary_commit.txt`, re-verified after a container restart). Records: `experiments/36_handover_ladder/` (`ic_p*s*.json`, `walk_p*s*.json`, `run.log`, `tables.md`, `summary.json`, `fit.json`); tables and fits by `examples/e32_tables.rs`. Lead: `LEAD-ICE-charged-toy-ic-exponent-vs-rho` (crypto-autoresearcher).
 
 *Host and route:* the 4-vCPU Claude Code container, 3 cores (`taskset -c 1-3`). isolab-eks was checked and is unreachable from it (no `aws` or `kubectl`; the GitHub dispatch route is refused by the session proxy), so no isolation tier is earned: *operation counts only, wall times not admitted*.
 
@@ -43,7 +43,7 @@ Distance $D(g) = (S + 97 g E) \/ ("rho" + 97 g dot "steps")$, where $E$ is the M
   [0], [M1, all], [$-0.232$ [−0.272, −0.191]], [87.7 [80.2, 98.6]],
   [0], [M2, $beta = -1\/4$], [—], [84.0 [83.4, 84.6]],
   [0.1], [M1], [$-0.248$ [−0.284, −0.211]], [*91.2* [84.4, 100.7]],
-  [0.1], [M2], [—], [90.9 [90.3, 91.4]],
+  [0.1], [M2], [—], [90.8 [90.3, 91.4]],
   [1], [M1], [$-0.256$ [−0.292, −0.219]], [*97.6* [90.1, 107.9]],
   [1], [M2], [—], [99.1 [98.5, 99.6]],
 )
