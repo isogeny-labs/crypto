@@ -255,7 +255,7 @@ impl Collector {
         use std::os::fd::AsRawFd;
         let mut event_id: u64 = 0;
         // SAFETY: the ioctl writes one u64 to the provided valid pointer.
-        if unsafe { libc::ioctl(fd.as_raw_fd(), PERF_EVENT_IOC_ID, &mut event_id) } < 0 {
+        if unsafe { libc::ioctl(fd.as_raw_fd(), PERF_EVENT_IOC_ID as _, &mut event_id) } < 0 {
             return Err(io::Error::last_os_error());
         }
         if event_id == 0 {
