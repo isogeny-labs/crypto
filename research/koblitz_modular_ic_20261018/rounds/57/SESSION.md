@@ -39,3 +39,17 @@ Complete kernel, full descended field functions, Lean implications, report/custo
 
 ### Errors
 Attempt01 retained/rejected; no accepted producer repeated.
+
+## 2026-11-01T04:50:48.031554+00:00 — stage2 syntax repair
+
+### What was done
+space57-01 terminal rejected: Singular reserved name denominator aborted cache procedure. All raw partials retained.
+
+### Decisions made
+Rename cacheDen57 and freeze fresh attempt02. Rank0/kernel68 output after errors is invalid and excluded.
+
+### Open threads
+Execute repaired full local constraints.
+
+### Errors
+Reserved identifier; late output is not mathematical evidence.
