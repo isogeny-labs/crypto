@@ -25,3 +25,4 @@ done
 "$CC" -O2 -Wall -Wextra -std=c11 -I"$NATIVE_PREFIX/include" "$SOURCE_DIR/poly_blocks.c" -L"$NATIVE_PREFIX/lib" -Wl,-rpath,"$NATIVE_PREFIX/lib" -lflint -lgmp -o "$BUILD_DIR/poly_blocks"
 "$CC" -O2 -Wall -Wextra -std=c11 -I"$NATIVE_PREFIX/include" "$SOURCE_DIR/point_contexts.c" -L"$NATIVE_PREFIX/lib" -Wl,-rpath,"$NATIVE_PREFIX/lib" -lflint -lgmp -o "$BUILD_DIR/point_contexts"
 "$CC" -O2 -Wall -Wextra -std=c11 -I"$NATIVE_PREFIX/include" "$SOURCE_DIR/check_contexts.c" -L"$NATIVE_PREFIX/lib" -Wl,-rpath,"$NATIVE_PREFIX/lib" -lpari -o "$BUILD_DIR/check_contexts"
+"$CXX" -O2 -Wall -Wextra -std=c++17 -I"$NATIVE_PREFIX/include" "$SOURCE_DIR/complete_pipeline.cpp" "$BUILD_DIR/optimized.o" -L"$NATIVE_PREFIX/lib" -Wl,-rpath,"$NATIVE_PREFIX/lib" -lpari -lflint -lgmpxx -lgmp -o "$BUILD_DIR/complete_pipeline"
