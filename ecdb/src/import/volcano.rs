@@ -5,7 +5,9 @@
 //! d minus its distance to the floor in the ℓ-graph. The level is v_ℓ of the
 //! conductor of End(E): 0 on the crater, d on the floor.
 //!
-//! Only `census-fp` graphs are used: they hold every curve over F_p (p < 2^10)
+//! Only the census graphs are used (p < 2^10; a census record that matched an
+//! existing ecdb curve keeps that curve's family, so vertices are the census
+//! curves plus every source of a stored Velu edge there): they hold every curve over F_p
 //! and every rational ℓ-isogeny between them (ℓ = 2, 3, 5), so each component
 //! is complete. Before anything is written, a class and ℓ must pass every
 //! check below; otherwise it is reported and skipped:
@@ -40,12 +42,16 @@ FROM ec.curve c
 JOIN ec.abelian_variety av ON av.curve_id = c.id
 JOIN ec.isogeny_class_fq ic ON ic.id = av.isogeny_class_id
 JOIN ec.frobenius_genus1 fg ON fg.isogeny_class_id = ic.id
-WHERE c.family = 'census-fp' AND fg.conductor_v IS NOT NULL AND fg.cm_discriminant IS NOT NULL";
+WHERE ic.p < 1024 AND fg.conductor_v IS NOT NULL AND fg.cm_discriminant IS NOT NULL
+  AND (c.family = 'census-fp'
+       OR EXISTS (SELECT 1 FROM ec.isogeny i WHERE i.source_curve_id = c.id AND i.formula = 'velu'))";
 
 const EDGES_SQL: &str = "
 SELECT i.id, i.source_curve_id, i.target_curve_id, i.ell::int8
-FROM ec.isogeny i JOIN ec.curve c ON c.id = i.source_curve_id
-WHERE c.family = 'census-fp' AND i.formula = 'velu' AND i.ell IN (2, 3, 5)";
+FROM ec.isogeny i
+JOIN ec.abelian_variety av ON av.curve_id = i.source_curve_id
+JOIN ec.isogeny_class_fq ic ON ic.id = av.isogeny_class_id
+WHERE ic.p < 1024 AND i.formula = 'velu' AND i.ell IN (2, 3, 5)";
 
 const VOLCANO_SQL: &str = "
 INSERT INTO ec.isogeny_volcano (isogeny_class_id, ell, depth, crater_size, crater_shape, vertex_count, is_complete,
