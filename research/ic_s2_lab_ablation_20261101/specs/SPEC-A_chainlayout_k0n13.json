@@ -1,0 +1,39 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "S2 k0n13 abl chainlayout",
+ "description": "S2: lab-arm ablation vs WDSat (research/ic_s2_lab_ablation_20261101/PROTOCOL.md)",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 0,
+    "n": 13
+   }
+  ],
+  "targets_per_curve": 8,
+  "target_seed": 202610111901,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "lab-l6-chainlayout",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-standard-subspace:dimension=6",
+     "oracle": "pdp3-binary:m=3,engine=inherited-f4,degree=3,node_budget=8192,abl=chainlayout",
+     "max_trials": "200000"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 202610111902,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

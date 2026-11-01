@@ -1,0 +1,40 @@
+--- orig.rs	2026-11-01 12:37:53
++++ new.rs	2026-11-01 12:37:53
+@@ -763,6 +763,11 @@
+         params: &Params,
+         ops: &mut GroupOps,
+     ) -> Result<(), String> {
++        // S2 ablation (research/ic_s2_lab_ablation_20261101/abl.patch): `abl=<id>` sets the solver
++        // switches of one ablation in-process (the child environment is scrubbed, and the
++        // solver reads its switches once per process).  Absent `abl` = the unchanged lab arm.
++        static ABL_DONE: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
++        if !ABL_DONE.load(std::sync::atomic::Ordering::SeqCst) {
+         if let Some((k, _)) =
+             std::env::vars().find(|(k, _)| TUNING_PREFIXES.iter().any(|p| k.starts_with(p)))
+         {
+@@ -770,6 +775,25 @@
+                 "pdp3-koblitz refuses to run with the solver override `{k}` set: it would \
+                  change the search without changing the method's identity"
+             ));
++        }
++        }
++        if let Some(a) = params.get("abl") {
++            if ABL_DONE.swap(true, std::sync::atomic::Ordering::SeqCst) {
++                return Err("abl: prepare called twice in one process".into());
++            }
++            let set: &[(&str, &str)] = match a {
++                "memo0" => &[("IC_TEMPLATE_MEMO", "0")],
++                "nolin" => &[("KIC_LINEAR_ELIM", "0")],
++                "noinh" => &[("KIC_F4_INHERIT", "0"), ("KIC_LINEAR_ELIM", "1"), ("SOLVER_SPLIT_RULE", "highest")],
++                "splitlow" => &[("SOLVER_SPLIT_RULE", "lowest")],
++                "chainlayout" => &[("KIC_CHAIN_ORDER", "layout")],
++                "occmult" => &[("KIC_F4_MULTIPLIERS", "occurring")],
++                "alloff" => &[("IC_TEMPLATE_MEMO", "0"), ("KIC_F4_INHERIT", "0"), ("KIC_CHAIN_ORDER", "layout"), ("KIC_F4_MULTIPLIERS", "occurring")],
++                other => return Err(format!("abl `{other}` unknown")),
++            };
++            for (k, v) in set {
++                std::env::set_var(k, v);
++            }
+         }
+         if !(2..=3).contains(&self.summands) {
+             return Err(format!(
