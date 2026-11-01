@@ -574,9 +574,106 @@ impl<'i> LargePrimeCollector<'i> {
         a: u64,
         b: u64,
     ) -> Vec<Relation> {
+        let small_points = self.small_points;
+        self.decompose_over(
+            ctx,
+            fb,
+            ops,
+            counters,
+            point,
+            a,
+            b,
+            0..small_points,
+            true,
+        )
+    }
+
+    /// The large-prime probe over an explicit aimed/windowed subset of
+    /// third summands.  Indices outside the small base are ignored; the
+    /// supplied order is the probe order.  This is the seam used by the
+    /// §23 aimed collector, whose window is chosen from the columns still
+    /// least represented rather than by a whole-base sweep.
+    #[allow(clippy::too_many_arguments)]
+    pub fn decompose_indices(
+        &mut self,
+        ctx: &InstanceCtx<BinaryGroup<'_>>,
+        fb: &FactorBase<FastPoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: FastPoint,
+        a: u64,
+        b: u64,
+        indices: &[u32],
+    ) -> Vec<Relation> {
+        let small_points = self.small_points;
+        self.decompose_over(
+            ctx,
+            fb,
+            ops,
+            counters,
+            point,
+            a,
+            b,
+            indices
+                .iter()
+                .copied()
+                .map(|index| index as usize)
+                .filter(move |&index| index < small_points),
+            true,
+        )
+    }
+
+    /// The aimed m=3 seam with no direct two-summand treatment.  Base
+    /// membership remains in the map so the large-prime domain stays
+    /// disjoint and the domain-membership probe keeps its exact cost, but a
+    /// residual in the base is not emitted: the frozen aimed collector does
+    /// not search that m=2 relation family.
+    #[allow(clippy::too_many_arguments)]
+    pub fn decompose_indices_lp_only(
+        &mut self,
+        ctx: &InstanceCtx<BinaryGroup<'_>>,
+        fb: &FactorBase<FastPoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: FastPoint,
+        a: u64,
+        b: u64,
+        indices: &[u32],
+    ) -> Vec<Relation> {
+        let small_points = self.small_points;
+        self.decompose_over(
+            ctx,
+            fb,
+            ops,
+            counters,
+            point,
+            a,
+            b,
+            indices
+                .iter()
+                .copied()
+                .map(|index| index as usize)
+                .filter(move |&index| index < small_points),
+            false,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn decompose_over<I: IntoIterator<Item = usize>>(
+        &mut self,
+        ctx: &InstanceCtx<BinaryGroup<'_>>,
+        fb: &FactorBase<FastPoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: FastPoint,
+        a: u64,
+        b: u64,
+        indices: I,
+        allow_direct_two_sum: bool,
+    ) -> Vec<Relation> {
         let g = ctx.group;
         let mut out = Vec::new();
-        for i in 0..self.small_points {
+        for i in indices {
             let t = g.add(ops, point, g.neg(fb.points[i]));
             if g.is_identity(&t) {
                 continue;
@@ -629,7 +726,7 @@ impl<'i> LargePrimeCollector<'i> {
                         return out;
                     }
                 }
-                Some(Membership::Base) => {
+                Some(Membership::Base) if allow_direct_two_sum => {
                     counters.lookups += 1;
                     if let Some(&j) = fb.point_index.get(&t.pack()) {
                         self.counters.direct_two_sum += 1;
@@ -637,7 +734,7 @@ impl<'i> LargePrimeCollector<'i> {
                         return out;
                     }
                 }
-                None => {}
+                Some(Membership::Base) | None => {}
             }
         }
         out
@@ -936,6 +1033,125 @@ mod tests {
             classic.counters.canonicalisations,
             seam.counters.canonicalisations
         );
+    }
+
+    #[test]
+    fn aimed_decomposition_scans_only_the_named_third_summands() {
+        let inst = koblitz_instance(0, 13).expect("K_0 at n = 13");
+        let g = BinaryGroup(&inst.fast);
+        let q = multiple(&inst, 777);
+        let ctx = ctx(&inst, &g, q);
+        let fb = known_log_base(&inst, &[1, 3, 5]);
+        let config = LargePrimeConfig {
+            large_primes: 2,
+            domain_factor: 1.0,
+            raw_x_cap: 1 << 13,
+            limits: LargePrimeLimits::default(),
+        };
+        let mut setup = GroupOps::default();
+        let mut lp = LargePrimeCollector::new(&inst, &ctx, &fb, config, &mut setup).unwrap();
+        let point = multiple(&inst, 123);
+
+        let mut ops = GroupOps::default();
+        let mut counters = OracleCounters::default();
+        assert!(lp
+            .decompose_indices_lp_only(
+                &ctx,
+                &fb,
+                &mut ops,
+                &mut counters,
+                point,
+                123,
+                0,
+                &[],
+            )
+            .is_empty());
+        assert_eq!(ops.gae(), 0.0);
+        assert_eq!(counters.lookups, 0);
+        assert_eq!(counters.canonicalisations, 0);
+
+        let mut ops = GroupOps::default();
+        let mut counters = OracleCounters::default();
+        let rows = lp.decompose_indices_lp_only(
+            &ctx,
+            &fb,
+            &mut ops,
+            &mut counters,
+            point,
+            123,
+            0,
+            &[0],
+        );
+        assert!(ops.gae() >= 1.0, "one named summand performs R - P_0");
+        assert!(rows.iter().all(|row| match row {
+            Relation::Summands(points) => points.len() == 3,
+            Relation::Row { .. } => true,
+        }));
+        assert_eq!(lp.relation_counters()["lp_direct_two_sum"], 0);
+
+        // Prove that this is a treatment restriction, not an unreachable
+        // branch: the generic seam can find a direct base two-sum on this
+        // toy base, while the aimed LP-only seam suppresses the same family.
+        let seeds = [1u64, 3, 5];
+        let mut generic_setup = GroupOps::default();
+        let mut generic =
+            LargePrimeCollector::new(&inst, &ctx, &fb, config, &mut generic_setup).unwrap();
+        let mut direct_case = None;
+        'find: for i in 0..fb.points.len() {
+            for j in 0..fb.points.len() {
+                let mut add_ops = GroupOps::default();
+                let candidate = g.add(&mut add_ops, fb.points[i], fb.points[j]);
+                if g.is_identity(&candidate) {
+                    continue;
+                }
+                let log_i = ((seeds[fb.col_of[i]] as u128 * fb.coef_of[i] as u128)
+                    % inst.r as u128) as u64;
+                let log_j = ((seeds[fb.col_of[j]] as u128 * fb.coef_of[j] as u128)
+                    % inst.r as u128) as u64;
+                let a = ((log_i as u128 + log_j as u128) % inst.r as u128) as u64;
+                let mut probe_ops = GroupOps::default();
+                let mut probe_counters = OracleCounters::default();
+                let rows = generic.decompose_indices(
+                    &ctx,
+                    &fb,
+                    &mut probe_ops,
+                    &mut probe_counters,
+                    candidate,
+                    a,
+                    0,
+                    &[i as u32],
+                );
+                if rows
+                    .iter()
+                    .any(|row| matches!(row, Relation::Summands(points) if points.len() == 2))
+                {
+                    direct_case = Some((candidate, a, i as u32));
+                    break 'find;
+                }
+            }
+        }
+        let (candidate, a, index) = direct_case.expect("toy base exercises direct two-sum");
+        assert!(generic.relation_counters()["lp_direct_two_sum"] > 0);
+        let mut aimed_setup = GroupOps::default();
+        let mut aimed =
+            LargePrimeCollector::new(&inst, &ctx, &fb, config, &mut aimed_setup).unwrap();
+        let mut aimed_ops = GroupOps::default();
+        let mut aimed_counters = OracleCounters::default();
+        let rows = aimed.decompose_indices_lp_only(
+            &ctx,
+            &fb,
+            &mut aimed_ops,
+            &mut aimed_counters,
+            candidate,
+            a,
+            0,
+            &[index],
+        );
+        assert!(rows.iter().all(|row| match row {
+            Relation::Summands(points) => points.len() == 3,
+            Relation::Row { .. } => true,
+        }));
+        assert_eq!(aimed.relation_counters()["lp_direct_two_sum"], 0);
     }
 
     /// End to end through `run_pipeline`: one and two large primes recover

@@ -1,0 +1,92 @@
+{
+  "schema": "icb.aimed2lp.focused_gates/v1",
+  "created": "2026-11-01",
+  "status": "invalidated",
+  "base_commit": "ff7ad61cfed11908fb79de9dd485b696d0ada779",
+  "source_commit": null,
+  "source_patch_sha256": "a53812e50cf86b6d488b54b634f139af910314296b0044522484cbc6ff516cbb",
+  "audit_invalidation": {
+    "at": "2026-11-01",
+    "reason": "The tested source admitted a direct two-summand Base relation absent from frozen aimed m=3 and predated accounting-ownership, final LP0 SolveReport, sparse-row, native-analysis/export and provider-topology repairs.",
+    "effect": "Every prior PASS is historical only. No source, freeze, image, control or target gate may consume this receipt; all focused gates must be rerun against one eventual source commit."
+  },
+  "source_paths": [
+    "src/cryptanalysis/ecbench/koblitz_descent.rs",
+    "src/cryptanalysis/ecbench/methods.rs",
+    "src/cryptanalysis/ic_framework/large_prime.rs",
+    "src/cryptanalysis/koblitz_index_calculus.rs"
+  ],
+  "frozen_method": {
+    "id": "ic.koblitz_descent",
+    "implementation_entry_unchanged": true,
+    "control": "ic.koblitz_descent_lp_v1 with large_primes=0 delegates to the frozen entry before constructing an adapter"
+  },
+  "toolchain": {
+    "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+    "rustc_commit": "b940084d7eb6a299eb4bfeb8e34901bc051e7ac4",
+    "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+    "host": "x86_64-unknown-linux-gnu"
+  },
+  "checks": [
+    {
+      "id": "cargo-check-lib",
+      "command": "python3 tools/isolated_bench.py busy -- env PATH=/workspace/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin cargo check --lib",
+      "outcome": "pass",
+      "observed": "Finished dev profile in 2m 22s"
+    },
+    {
+      "id": "projected-row-map-and-fail-closed",
+      "command": "cargo test --lib projected_large_prime_rows_map_to_the_frozen_log_columns_and_fail_closed -- --nocapture",
+      "test": "cryptanalysis::ecbench::koblitz_descent::tests::projected_large_prime_rows_map_to_the_frozen_log_columns_and_fail_closed",
+      "outcome": "pass",
+      "observed": "Known raw signed-orbit logs mapped into every projected column, the sparse system solved and verified, and a mutated coefficient was rejected; 1 passed, 0 failed."
+    },
+    {
+      "id": "lp0-equivalence-and-toy-2lp",
+      "command": "target/debug/deps/crypto_lib-df02ebd3afdf5856 --exact cryptanalysis::ecbench::koblitz_descent::tests::lp_zero_is_the_frozen_pipeline_and_two_lp_recovers_a_toy_target --nocapture",
+      "test": "cryptanalysis::ecbench::koblitz_descent::tests::lp_zero_is_the_frozen_pipeline_and_two_lp_recovers_a_toy_target",
+      "outcome": "pass",
+      "observed": "LP=0 matched the frozen recovered answer, counts, relation scalars, column logs and every phase OpCounts; 2LP recovered and verified the n=13 target with partial activity and zero LP verification failures; 1 passed, 0 failed."
+    },
+    {
+      "id": "aimed-window-parity",
+      "command": "target/debug/deps/crypto_lib-df02ebd3afdf5856 --exact cryptanalysis::koblitz_index_calculus::tests::exported_aimed_window_indices_are_the_collectors_exact_scan --nocapture",
+      "test": "cryptanalysis::koblitz_index_calculus::tests::exported_aimed_window_indices_are_the_collectors_exact_scan",
+      "outcome": "pass",
+      "observed": "The exported selector exactly matched the frozen collector scan order for duplicate/unsorted named points and six trials; 1 passed, 0 failed."
+    },
+    {
+      "id": "explicit-third-summand-restriction",
+      "command": "target/debug/deps/crypto_lib-df02ebd3afdf5856 --exact cryptanalysis::ic_framework::large_prime::tests::aimed_decomposition_scans_only_the_named_third_summands --nocapture",
+      "test": "cryptanalysis::ic_framework::large_prime::tests::aimed_decomposition_scans_only_the_named_third_summands",
+      "outcome": "pass",
+      "observed": "An empty named set performed no group work or lookup; one named index performed only that third-summand probe; 1 passed, 0 failed."
+    }
+  ],
+  "infrastructure_events": [
+    {
+      "id": "sparse-fixtures-missing",
+      "classification": "infrastructure_only",
+      "outcome": "no_test_result",
+      "observed": "The first lib-test compile stopped on 33 missing include_str!/include_bytes! fixtures from the sparse checkout. Only the twelve exact fixture directories were temporarily materialized; they were removed after the focused binary linked."
+    },
+    {
+      "id": "orchestrator-memory-termination",
+      "classification": "infrastructure_only",
+      "outcome": "no_test_result",
+      "observed": "The first retry was stopped by the root orchestrator before link after concurrent rustc memory headroom fell too low (exit 241/SIGTERM). The preserved incremental target was resumed only after the competing build drained."
+    }
+  ],
+  "resource_cleanup": {
+    "command": "cargo clean",
+    "removed": "4646 files, 8.4 GiB",
+    "scope": "only /workspace/run-worktrees/large-prime/target",
+    "temporary_sparse_fixture_patterns_removed": true,
+    "workspace_free_after_cleanup": "14 GiB"
+  },
+  "target_data": {
+    "n53_runs": 0,
+    "n61_runs": 0,
+    "statement": "No target-size candidate, control, rho, preflight or timing row existed when this receipt was written."
+  }
+}

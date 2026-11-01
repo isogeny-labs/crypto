@@ -1,0 +1,131 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "pre-target positive control for the aimed double-large-prime adapter, n=13",
+  "description": "Must complete and replay before either n=53 or n=61 target cell may launch",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 13
+      }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 2026110113,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "aimed",
+      "role": "reference",
+      "method": {
+        "id": "ic.koblitz_descent",
+        "params": {
+          "summands": "3",
+          "descent_summands": "2",
+          "collection_aim": "true",
+          "collection_window": "16",
+          "factor_base_points": "80",
+          "unit_trials": "32",
+          "units": "1",
+          "max_units": "10000",
+          "max_trials": "10000000",
+          "seed": "11"
+        }
+      }
+    },
+    {
+      "name": "aimed-lp0",
+      "role": "control",
+      "method": {
+        "id": "ic.koblitz_descent_lp_v1",
+        "params": {
+          "summands": "3",
+          "descent_summands": "2",
+          "collection_aim": "true",
+          "collection_window": "16",
+          "factor_base_points": "80",
+          "unit_trials": "32",
+          "units": "1",
+          "max_units": "10000",
+          "max_trials": "10000000",
+          "seed": "11",
+          "large_primes": "0",
+          "lp_domain_factor": "1",
+          "lp_raw_x_cap": "8192"
+        }
+      }
+    },
+    {
+      "name": "aimed-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.koblitz_descent",
+        "params": {
+          "summands": "3",
+          "descent_summands": "2",
+          "collection_aim": "true",
+          "collection_window": "16",
+          "factor_base_points": "80",
+          "unit_trials": "32",
+          "units": "1",
+          "max_units": "10000",
+          "max_trials": "10000000",
+          "seed": "11"
+        }
+      }
+    },
+    {
+      "name": "aimed-lp2-c05",
+      "role": "candidate",
+      "method": {
+        "id": "ic.koblitz_descent_lp_v1",
+        "params": {
+          "summands": "3",
+          "descent_summands": "2",
+          "collection_aim": "true",
+          "collection_window": "16",
+          "factor_base_points": "80",
+          "unit_trials": "32",
+          "units": "1",
+          "max_units": "10000",
+          "max_trials": "10000000",
+          "seed": "11",
+          "large_primes": "2",
+          "lp_domain_factor": "0.5",
+          "lp_raw_x_cap": "8192"
+        }
+      }
+    },
+    {
+      "name": "aimed-lp2-c1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.koblitz_descent_lp_v1",
+        "params": {
+          "summands": "3",
+          "descent_summands": "2",
+          "collection_aim": "true",
+          "collection_window": "16",
+          "factor_base_points": "80",
+          "unit_trials": "32",
+          "units": "1",
+          "max_units": "10000",
+          "max_trials": "10000000",
+          "seed": "11",
+          "large_primes": "2",
+          "lp_domain_factor": "1",
+          "lp_raw_x_cap": "8192"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 5,
+    "warmup": 1,
+    "order": "shuffle",
+    "seed": 20261101,
+    "isolation_required": "L2",
+    "timeout_seconds": 600
+  }
+}

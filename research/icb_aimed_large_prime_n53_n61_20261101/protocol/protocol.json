@@ -1,0 +1,962 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "ICB-AIMED-2LP-N53-N61-20261101",
+  "version": 1,
+  "created": "2026-11-01",
+  "repository": "crypto",
+  "study_dir": "research/icb_aimed_large_prime_n53_n61_20261101",
+  "authors": [
+    "aimed-large-prime experiment lane"
+  ],
+  "links": {
+    "specs": [
+      "../specs/control-n13.json",
+      "../specs/n53.json",
+      "../specs/n61.json"
+    ],
+    "implementation_receipt": "../receipts/focused-gates.json",
+    "result_schema": "../RESULT_SCHEMA.json",
+    "receipt_schema": "../RECEIPT_SCHEMA.json",
+    "request_schema": "../REQUEST_SCHEMA.json",
+    "request_templates": [
+      "../requests/control-n13.json",
+      "../requests/n53.json",
+      "../requests/n61.json"
+    ],
+    "analysis_manifest": "../analysis-manifest.json",
+    "native_analyzer_source": "../../../examples/ecbench_aimed2lp_analyze.rs",
+    "native_provider_preflight_source": "../../../examples/ecbench_aimed2lp_preflight.rs",
+    "provider_wrapper_source": "../../../taskq/deploy/eks-karpenter/run-ecbench",
+    "provider_compare_source": "../../../src/cryptanalysis/ecbench/compare.rs",
+    "resume_checkpoint": "../../../.resume/RESUME.md",
+    "predecessor": "origin/lead/icb-large-prime-20261029 (open PR #2850; stage evidence only)",
+    "table_a_recipe": "research/ic_tool_program/rule/v8"
+  },
+  "question": "On the frozen rule-v8 one-target Koblitz pipelines at n=53 and n=61, does the complete versioned aimed-LP adapter composition, after a focused gate proves parity of ordinary aimed three-sum opportunities, use exact double-large-prime elimination to reduce complete cold cost without changing targets, descent, verification, or accounting boundaries?",
+  "claims": [
+    {
+      "id": "C-exact",
+      "text": "Every admitted candidate row recovers and independently verifies the planted public logarithm, every projected relation passes both exact row replays, and replay-all reproduces every result and counter.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C-aimed-2lp",
+      "text": "On the frozen c8a.2xlarge L2 host class, at least one preregistered versioned aimed-LP adapter composition lowers complete cold one-target wall time by at least 5% against the frozen aimed pipeline at both n=53 and n=61. Ordinary aimed three-sum opportunity parity is a mandatory focused gate, but the measured treatment remains the complete adapter composition. The 0/0.1/1 counted-cost band is descriptive and may be UNRANKABLE PRICING without changing the finite-host wall verdict.",
+      "class": "comparative",
+      "decided_by": [
+        "C-c05",
+        "C-c1"
+      ],
+      "if_supported": "Classify the winning configuration as a finite-host engineering improvement of the one-target aimed pipeline, separately at each size; do not extrapolate past this host class or n=61.",
+      "if_not_supported": "Report NULL, WORSE, or CENSORED NON-IMPROVEMENT for the wall claim and separately report the pricing-band status; preserve every failed, exhausted, capped, or timed-out row."
+    },
+    {
+      "id": "C-rho-distance",
+      "text": "The candidate's complete cold distance to the current matched signed-Frobenius rho is reported descriptively at both sizes. No rho win is claimed unless a future complete-pricing protocol supports it; this protocol's finite-host wall verdict concerns candidate versus aimed only.",
+      "class": "comparative",
+      "decided_by": [
+        "C-rho-c05",
+        "C-rho-c1"
+      ],
+      "if_supported": "Report the per-size candidate/rho ratios and the exact qualifying arm.",
+      "if_not_supported": "Report the measured distance as a lower-bound or unrankable comparison, never as a rho win."
+    },
+    {
+      "id": "C-scope",
+      "text": "Deployed-key recovery, asymptotic improvement, curves above n=61, Table C/32-target batching, amortized precomputation, and a claim that predecessor PR #2850 measured the aimed pipeline are outside scope. Table C would require its own versioned shared-state method and protocol; repeated one-target calls are not a batch measurement.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H-aimed-2lp",
+      "statement": "Closing exact 2LP partials inside the aimed rule-v8 relation stream reduces enough collection work to repay its additional cold domain, table, verification, and elimination cost.",
+      "mechanism": "After a deterministic focused gate proves that the adapter preserves the frozen collector's ordinary aimed three-sum trial census and probe scalars, the disjoint domain turns failed aimed three-sum probes into exact partial rows; graph closure supplies sparse projected rows while keeping the same factor-base columns and descent. The causal treatment is the full versioned adapter composition, not graph closure in isolation.",
+      "predictions": [
+        {
+          "id": "P-cold",
+          "metric": "cold_wall_ratio",
+          "direction": "lower",
+          "minimum_effect": "candidate/baseline <= 0.95 at both n=53 and n=61 after the A/A gate",
+          "provenance": {
+            "written_at": "2026-11-01",
+            "first_recorded_in": "research/icb_aimed_large_prime_n53_n61_20261101/protocol/protocol.json",
+            "data_seen": [
+              {
+                "path": "origin/lead/icb-large-prime-20261029:research/icb_large_prime_n53_n61_20261029/results.json",
+                "measured": "compact-orbit ic.pipeline stage only: best 2LP component-S/plain ratios 0.604 at n=53 and 0.559 at n=61; two rounds, warmup zero"
+              },
+              {
+                "path": "research/ic_tool_program/rule/v8",
+                "measured": "frozen aimed baseline recipes and predecessor target-size costs; no aimed-2LP composition"
+              }
+            ],
+            "sample_status": "partially_in_sample",
+            "decisive_scope": "the new ic.koblitz_descent_lp_v1 composition on the new public target seeds 2026110153 and 2026110161; no target-size candidate data existed at freeze"
+          },
+          "role": "decisive"
+        },
+        {
+          "id": "P-band",
+          "metric": "cold_band_ratio",
+          "direction": "lower",
+          "minimum_effect": "descriptive only: report candidate/baseline at weights 0, 0.1 and 1 GAE per emitted unpriced native operation; any named unit without a numeric count makes the affected weight UNRANKABLE PRICING",
+          "provenance": {
+            "written_at": "2026-11-01",
+            "first_recorded_in": "research/icb_aimed_large_prime_n53_n61_20261101/protocol/protocol.json",
+            "data_seen": [
+              {
+                "path": "origin/lead/icb-large-prime-20261029:research/icb_large_prime_n53_n61_20261029/band",
+                "measured": "predecessor compact-pipeline 0/0.1/1 bands; different method and accounting path"
+              }
+            ],
+            "sample_status": "partially_in_sample",
+            "decisive_scope": "the emitted cold counters of the new aimed composition; predecessor bands do not contain these rows"
+          },
+          "role": "calibration"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "rho-v2",
+      "role": "reference",
+      "description": "Current matched strong signed-Frobenius rho under v2 accounting; identical public targets and binary.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "RUSTFLAGS": "-C target-cpu=x86-64",
+          "CARGO_BUILD_JOBS": "2"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "rho.signed_frobenius_strong_v2"
+      },
+      "same_instrument_as": "aimed"
+    },
+    {
+      "id": "aimed",
+      "role": "baseline",
+      "description": "Frozen ic.koblitz_descent rule-v8 recipe: subgroup-orbit base, aimed m=3 collection, sparse logs, walked m=2 descent.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "RUSTFLAGS": "-C target-cpu=x86-64",
+          "CARGO_BUILD_JOBS": "2"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.koblitz_descent",
+        "recipe": "rule_v8"
+      }
+    },
+    {
+      "id": "aimed-aa",
+      "role": "control_aa",
+      "description": "A separately scheduled execution of the exact aimed baseline, for operation identity and whole-call wall bias/noise.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "RUSTFLAGS": "-C target-cpu=x86-64",
+          "CARGO_BUILD_JOBS": "2"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.koblitz_descent",
+        "recipe": "rule_v8"
+      },
+      "same_instrument_as": "aimed"
+    },
+    {
+      "id": "aimed-lp0",
+      "role": "control_positive",
+      "description": "New method identity with large_primes=0; delegates before constructing LP state and must equal the frozen baseline counter for counter.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "RUSTFLAGS": "-C target-cpu=x86-64",
+          "CARGO_BUILD_JOBS": "2"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.koblitz_descent_lp_v1",
+        "large_primes": 0,
+        "lp_domain_factor": 1,
+        "lp_raw_x_cap": 400000000
+      },
+      "same_instrument_as": "aimed"
+    },
+    {
+      "id": "aimed-lp2-c05",
+      "role": "candidate",
+      "description": "Exact double-large-prime collector over a disjoint domain with half as many signed points as the frozen base.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "RUSTFLAGS": "-C target-cpu=x86-64",
+          "CARGO_BUILD_JOBS": "2"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.koblitz_descent_lp_v1",
+        "recipe": "rule_v8",
+        "large_primes": 2,
+        "lp_domain_factor": 0.5,
+        "lp_raw_x_cap": 400000000
+      },
+      "same_instrument_as": "aimed"
+    },
+    {
+      "id": "aimed-lp2-c1",
+      "role": "candidate",
+      "description": "Exact double-large-prime collector over a disjoint domain with as many signed points as the frozen base.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "RUSTFLAGS": "-C target-cpu=x86-64",
+          "CARGO_BUILD_JOBS": "2"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.koblitz_descent_lp_v1",
+        "recipe": "rule_v8",
+        "large_primes": 2,
+        "lp_domain_factor": 1,
+        "lp_raw_x_cap": 400000000
+      },
+      "same_instrument_as": "aimed"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "aimed-lp0",
+      "expected_detection": "On the frozen n=13 L2 gate, ten measured A/A pairs have identical operations and counters; ten measured LP=0 pairs have the same recovered values, relation scalars, column logs, phase operations and replayed counters as aimed; each of the twenty measured 2LP rows recovers its target, emits lp_partials_fed > 0, lp_projected_relations > 0 and lp_merged_relations > 0, and emits lp_verification_failures = 0 and lp_direct_two_sum = 0.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "This is an exact paired computation, not a detector/enrichment claim. A mutated projected coefficient is the fail-closed unit control in receipts/focused-gates.json; it is not a timed null population."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "collector_configuration",
+        "levels": [
+          "frozen aimed",
+          "aimed LP=0",
+          "aimed 2LP c=0.5",
+          "aimed 2LP c=1"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "curve_size",
+        "treatment": "crossed",
+        "how": "Run the same six-arm design separately on K_0/GF(2^53) and K_0/GF(2^61); report each size, never pool a headline ratio.",
+        "value": [
+          53,
+          61
+        ]
+      },
+      {
+        "name": "workload",
+        "treatment": "crossed",
+        "how": "Eight new public planted targets per size; every arm receives exactly the same target points and target identifiers.",
+        "value": {
+          "n53_target_seed": 2026110153,
+          "n61_target_seed": 2026110161
+        }
+      },
+      {
+        "name": "scheduled_arm_position",
+        "treatment": "randomized",
+        "how": "ecbench deterministically shuffles arm order inside every target/round block from measurement seed 20261101 and the workload id; the separate aimed-aa arm estimates residual positional wall bias."
+      },
+      {
+        "name": "method_seed",
+        "treatment": "fixed",
+        "how": "Rule v8 fixes the base, probe sequence, and descent walks at seed 201 for both sizes; only the public target changes.",
+        "value": 201
+      },
+      {
+        "name": "pricing_weight",
+        "treatment": "crossed",
+        "how": "Apply exactly 0, 0.1, and 1 GAE to every emitted unpriced native count on every arm; a named counter with no emission makes that comparison unrankable.",
+        "value": [
+          0,
+          0.1,
+          1
+        ]
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "how": "One source commit, Cargo.lock, release binary, flags, binary SHA-256 and image digest for all arms; unresolved identities block target launch."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Record node and instance identity, CPU model/microcode, SMT/affinity/NUMA, kernel, governor/frequency, steal, PSI, co-tenants, peak RSS and isolation blockers."
+      },
+      {
+        "name": "isolation",
+        "treatment": "fixed",
+        "how": "Require ecbench L2 for all timed pairs on dedicated c8a.2xlarge Spot placement; lower levels remain visible but decide nothing.",
+        "value": "L2"
+      },
+      {
+        "name": "round",
+        "treatment": "crossed",
+        "how": "Five measured repeats per target and arm, after one warmup; every repeat is retained.",
+        "value": 5
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-aa",
+        "arms": [
+          "aimed",
+          "aimed-aa"
+        ],
+        "differs_in": [
+          "scheduled_arm_position"
+        ],
+        "design": "aa",
+        "reason": "The methods, parameters, targets and seeds are identical; only scheduled position differs."
+      },
+      {
+        "id": "C-lp0",
+        "arms": [
+          "aimed",
+          "aimed-lp0"
+        ],
+        "differs_in": [
+          "collector_configuration"
+        ],
+        "design": "one_factor",
+        "reason": "Positive plumbing control; exact operation/count equality is required, not an effect claim."
+      },
+      {
+        "id": "C-c05",
+        "arms": [
+          "aimed",
+          "aimed-lp2-c05"
+        ],
+        "differs_in": [
+          "collector_configuration"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-c1",
+        "arms": [
+          "aimed",
+          "aimed-lp2-c1"
+        ],
+        "differs_in": [
+          "collector_configuration"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-rho-c05",
+        "arms": [
+          "rho-v2",
+          "aimed-lp2-c05"
+        ],
+        "differs_in": [
+          "collector_configuration"
+        ],
+        "design": "absolute",
+        "threshold": "candidate/rho < 1 at both sizes in admitted whole-call wall and at all 0/0.1/1 pricing weights"
+      },
+      {
+        "id": "C-rho-c1",
+        "arms": [
+          "rho-v2",
+          "aimed-lp2-c1"
+        ],
+        "differs_in": [
+          "collector_configuration"
+        ],
+        "design": "absolute",
+        "threshold": "candidate/rho < 1 at both sizes in admitted whole-call wall and at all 0/0.1/1 pricing weights"
+      }
+    ],
+    "crosses_map": false,
+    "transfer_obligations": []
+  },
+  "randomization": {
+    "arm_order": "randomized",
+    "arm_order_reason": "Deterministically shuffle every target/round block from the frozen measurement seed and workload id so five measured rounds do not leave one global order overrepresented; the A/A arm measures residual position bias.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "ecbench derives public target scalars from each frozen workload target_seed and run identities from measurement seed 20261101; rule-v8 method seed 201 is fixed. Every resolved seed and target hash is sealed in records.jsonl."
+    },
+    "instance_sampling": {
+      "rule": "All eight public targets generated by each frozen spec seed, in emitted order; no target selection or replacement after seeing a result.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "The methods expose configuration-specific counters, so masking would be nominal. A frozen native Rust analyzer reads every arm; no analyst exclusion or threshold choice remains.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 16,
+    "replicates": 5,
+    "warmups": 1,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 4,
+      "correction": "holm",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": 0.0078125,
+      "passes": true,
+      "note": "The independent units are eight public targets per size; five rounds are repeated timings within each target, not n=40. The exact one-sided sign-flip test has 2^8=256 assignments (minimum one-sided p=1/256; minimum two-sided p=2/256), so the first Holm boundary 0.0125 is attainable. Normal-approximation sensitivity at 80% power and the first Holm boundary requires target-level paired ratio SD about <=0.046 for a true ratio 0.90 and <=0.092 for 0.85; a true ratio exactly 0.95 cannot put an upper confidence bound below 0.95 except at degenerate variance. These are sensitivity limits, not a guarantee; cluster intervals and the exact test decide."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 600,
+      "per_sample_seconds": 75,
+      "threads": 1,
+      "estimated_total_seconds": 6600,
+      "measured_on": "Conservative bound from rule-v8 target sessions and PR #2850 n53/n61 large-prime sessions plus the explicit extra-table operation envelope; the frozen n=13 gate records actual candidate runtime before target launch."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "cold_wall_ratio",
+        "name": "complete cold one-target wall ratio",
+        "unit": "candidate/baseline",
+        "kind": "timed",
+        "definition": "Ratio of total solve wall over paired rows, including factor-base construction, both pair tables, domain construction, relation collection, elimination, sparse log solve, descent and verification; warmups excluded and only L2 pairs decide.",
+        "source": "records.jsonl solve_wall_ns, rederived by the frozen analysis and point-checked against ecbench.comparison/v2 wall.total_wall_ratio",
+        "formula": "sum(candidate solve_wall_ns) / sum(baseline solve_wall_ns), clustered by target",
+        "aggregation": "paired_ratio",
+        "resolution": "1 ns per child clock, inference over target clusters",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "cold_band_ratio",
+        "name": "complete cold counted-cost band ratio",
+        "unit": "candidate/baseline",
+        "kind": "derived",
+        "definition": "Descriptive whole-cold total GAE plus the sum of every emitted unpriced native operation times w, evaluated identically on both arms at w in {0,0.1,1}; any named uncounted unit is null and prevents pricing at that weight but does not erase the finite-host wall verdict.",
+        "source": "records.jsonl total_gae/counters/unpriced, rederived by the frozen analysis and point-checked against ecbench.comparison/v2 ops.band",
+        "formula": "sum(GAE_candidate + w*native_candidate) / sum(GAE_baseline + w*native_baseline)",
+        "aggregation": "paired_ratio",
+        "resolution": "exact emitted integer counts before normalization",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "recovery_rate",
+        "name": "verified target recovery rate",
+        "unit": "verified/measured",
+        "kind": "rate",
+        "definition": "Rows whose recovered logarithm passes the independent runner verification; failures, exhaustion and timeout remain in the denominator.",
+        "source": "records.jsonl status and verification fields",
+        "formula": "verified rows / all scheduled measured rows",
+        "aggregation": "per_row",
+        "uncertainty": "clopper_pearson_ci95"
+      },
+      {
+        "id": "replay_rate",
+        "name": "exact replay pass rate",
+        "unit": "matching replays/scheduled replays",
+        "kind": "rate",
+        "definition": "Replay-all equality of status, answer, total and phase counts, counters, unpriced list and factor-base identity.",
+        "source": "ecbench verify --replay-all receipt",
+        "formula": "matching replay rows / scheduled measured rows",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "lp_activity",
+        "name": "large-prime graph activity",
+        "unit": "events",
+        "kind": "counted",
+        "definition": "Partials fed/stored, pivot reductions, merged sources, projected rows, direct-two-sum rows, verification failures and caps, retained per arm and size. The aimed 2LP method requires direct-two-sum rows to remain exactly zero.",
+        "source": "records.jsonl counters aimed_lp_* and detail.large_prime",
+        "aggregation": "sum",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "peak_rss",
+        "name": "peak resident memory",
+        "unit": "bytes",
+        "kind": "counted",
+        "definition": "Maximum child peak RSS by arm and size, including cold setup.",
+        "source": "records.jsonl resources.peak_rss_bytes",
+        "aggregation": "max",
+        "uncertainty": "range"
+      },
+      {
+        "id": "rho_distance",
+        "name": "complete cold distance to matched rho",
+        "unit": "candidate/rho",
+        "kind": "derived",
+        "definition": "Per-size whole-call wall and counted 0/0.1/1 ratios on exactly paired public targets; unrankable if either arm has a null native count.",
+        "source": "C-rho-c05 and C-rho-c1 ecbench comparisons",
+        "formula": "candidate complete cold cost / rho-v2 complete cold cost",
+        "aggregation": "paired_ratio",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "lp0_identity",
+        "name": "LP=0 frozen-path identity",
+        "unit": "boolean",
+        "kind": "exact",
+        "definition": "For every paired row, recovered value, phase operations, counters, factor-base identity and replay output are equal after excluding method identity and clocks.",
+        "source": "C-lp0 comparison plus replay receipt",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "randomized",
+    "clock": "monotonic",
+    "counters": [
+      "phase adds/doubles/scalar_mults/GAE",
+      "all *_uncharged counters",
+      "LP domain/table/oracle/graph counters",
+      "aimed_lp_direct_two_sum and aimed_lp_verification_failures",
+      "relation, sparse solve and descent counters",
+      "whole and online wall clocks",
+      "peak RSS"
+    ],
+    "record": [
+      "source commit, Cargo.lock SHA, binary SHA-256 and image digest",
+      "spec, plan, protocol and target hashes",
+      "instance id/type, CPU model/microcode, SMT, affinity and NUMA",
+      "kernel, governor/frequency, allocator, ASLR, steal, PSI and run queue",
+      "threads and environment",
+      "isolation level and every blocker",
+      "status, answer verification, phases, counters, unpriced units, factor base and resources"
+    ],
+    "timed_primary_justification": "The frozen aimed method and rho retain named native work with no universal GAE conversion, so counted GAE alone is a lower bound and can be unrankable. Paired complete-call wall on one immutable binary and homogeneous c8a.2xlarge L2 placements captures that work for this finite host/workload claim. Exact counters and the 0/0.1/1 band remain mandatory descriptive diagnostics; they are not a complete-pricing or cross-hardware verdict."
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab-eks",
+    "placement": {
+      "instance_type": "c8a.2xlarge",
+      "capacity": "spot",
+      "node_selector": {
+        "node.kubernetes.io/instance-type": "c8a.2xlarge",
+        "eks.amazonaws.com/capacityType": "SPOT"
+      },
+      "requested_vcpu": 4,
+      "cpu_request": "4",
+      "cpu_limit": "4",
+      "requested_memory": "8Gi",
+      "requested_memory_bytes": 8589934592,
+      "memory_request": "8Gi",
+      "memory_limit": "8Gi",
+      "restart_policy": "Never",
+      "provider_retries": 0,
+      "scientific_retries": 0,
+      "durable_prefix_root": "s3://setec-astronomy-artifacts/ecbench/icb-aimed-large-prime-n53-n61-20261101/",
+      "child_timeout_seconds": 3600,
+      "job_active_deadline_seconds": 7800,
+      "artifact_upload_grace_seconds": 1200,
+      "deadline_rule": "The outer Job deadline covers the full ecbench session, replay-all, canonical export and immutable upload; 7800 seconds is the frozen 6600-second estimate plus 1200 seconds upload grace and must never be inferred from the 3600-second per-child cap.",
+      "attempt_receipt": "Every request id, Job UID, Pod name/UID, node name, instance id/type, capacity, attempt, zero restart count, exact requests/limits/node selector, digest-suffixed image, exact argv, payload bytes/SHA-256, terminal reason, durable object key/version, and verified readback bytes/SHA-256 is retained, including failed and refused attempts. Frozen requests are exact protocol-canonical bytes. The provider identity is a canonical fixed-shape semantic object; the Pod/Job projection is deterministically reconstructed from frozen image, argv, payload, placement, resources, restart policy and deadlines, and its canonical SHA-256 must equal the pre-data request anchor. Every produced core session file and every decisive replay/export/control/comparison file consumed by analysis has exactly one authenticated attempt owner.",
+      "max_concurrent_vcpu": 64,
+      "target_cells": [
+        "n53",
+        "n61"
+      ],
+      "launch_rule": "After one passing control-n13 session and immutable-image gate, launch both target cells concurrently; neither target may remain not_attempted, and exact-placement refusal must be an authenticated infrastructure_blocked attempt. After a non-passing control both target attempt arrays stay empty with the exact prerequisite-failure reason. Never substitute a heterogeneous node."
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 3600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 2
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Run exactly two target sizes, eight public targets per size, five measured rounds and one warmup for every frozen arm; never stop on an effect estimate.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Do not launch either target cell unless the focused-gate receipt, frozen protocol/checkpoint, immutable image identity, n=13 LP=0/2LP positive control and its replay-all receipt all pass.",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "If the exact c8a.2xlarge request for four exclusive vCPUs, 8Gi memory, a 7800-second outer Job deadline and a 3600-second per-child cap cannot be admitted during preflight, classify that cell BLOCKED; do not shrink the domain, target set or accounting boundary after data.",
+      "kind": "budget",
+      "preregistered": true
+    },
+    {
+      "rule": "A scientific exhaustion, cap or child timeout is retained and yields CENSORED NON-IMPROVEMENT for the affected wall claim, never INVALID and never a scientific retry. A preregistered resource refusal or authenticated infrastructure failure is BLOCKED and alone may use the frozen infrastructure retry allowance. INVALID is reserved for identity, protocol, replay, exact-equation or answer-verification violations.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any n=53/n=61 candidate execution before this protocol is frozen and checkpoint-gated.",
+    "Source commit, binary SHA-256, image digest, Cargo.lock, flags or thread count differs between arms or from the frozen identities.",
+    "LP=0 differs from the frozen baseline in recovered value or replayed operation/counter identity.",
+    "Any projected-row or final-log verification failure, wrong answer, target mismatch, or replay-all mismatch.",
+    "Any aimed candidate emits or admits a direct two-summand base relation, or reports aimed_lp_direct_two_sum other than exactly zero.",
+    "The nonzero-LP adapter's focused ordinary aimed three-sum hit-trial census or probe scalars differ from the frozen collector on the deterministic control fixture, or any adapted witness fails replay.",
+    "Fewer than eight complete target clusters or fewer than five admitted L2 repeated pairs for a timed comparison prevents a finite-host improvement verdict; authenticated infrastructure loss is BLOCKED, scientific exhaustion/timeout is CENSORED NON-IMPROVEMENT, and lower-isolation rows remain descriptive.",
+    "A/A operation ratio differs from exactly one, or its admitted whole-call 95% interval does not contain one within [0.9,1.1].",
+    "A target or failed row is dropped, replaced or rerun for a scientific reason.",
+    "An unpriced unit named by either arm lacks a numeric count: the counted band and any ranking that needs it are UNRANKABLE, not zero."
+  ],
+  "decision_rule": {
+    "text": "Evaluate C-c05 and C-c1 separately at each size on complete cold solve_wall_ns. Collapse the five repeated rounds within each of the eight public targets, then compute the candidate/baseline ratio of sums, a 95% target-cluster bootstrap interval, and an exact one-sided 2^8 sign-flip test of target contrasts sum(candidate)-0.95*sum(baseline). Holm adjusts the four wall tests. A configuration is IMPROVEMENT only if all scheduled artifacts are retained, every affected answer and replay verifies, LP=0 and A/A operation gates pass, the A/A target-cluster wall interval contains one within [0.9,1.1], LP verification failures and direct-two-sum rows are zero, the adjusted p is <=0.05, and the candidate wall-ratio upper bound is <=0.95 at both sizes. The 0/0.1/1 pricing band is reported separately and becomes UNRANKABLE PRICING at a weight with an unnamed numeric unit; it never erases or upgrades the finite-host wall verdict. Scientific exhaustion/cap/timeout is CENSORED NON-IMPROVEMENT, authenticated resource/infrastructure refusal is BLOCKED, and INVALID is reserved for protocol, identity, correctness or replay violations.",
+    "comparison_ids": [
+      "C-c05",
+      "C-c1"
+    ],
+    "threshold": "finite-host complete-cold candidate/baseline wall upper 95% bound <= 0.95 at both sizes; counted 0/0.1/1 prices are descriptive",
+    "statistic": "ratio of total complete cold wall over paired rows after aggregating five repeats inside each of eight public-target clusters; exact one-sided sign-flip statistic is sum over the eight target contrasts candidate-0.95*baseline",
+    "interval": "95% paired target-cluster percentile interval; exact enumeration of all 256 target-level sign assignments gives the one-sided p-value; Holm adjusts the four candidate wall tests",
+    "multiple_comparison_correction": "holm",
+    "effect_size_measure": "candidate/baseline complete cold ratio and reciprocal speedup",
+    "verdict_vocabulary": [
+      "IMPROVEMENT",
+      "NULL",
+      "WORSE",
+      "UNRANKABLE PRICING",
+      "CENSORED NON-IMPROVEMENT",
+      "BLOCKED",
+      "INVALID"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "../../examples/ecbench_aimed2lp_analyze.rs",
+      "sha256": null
+    },
+    "inputs": [
+      "../analysis-manifest.json",
+      "../receipts/focused-gates.json",
+      "../receipts/checkpoint.json",
+      "../receipts/image.json",
+      "../receipts/provider-preflight.json",
+      "../receipts/native-analyzer-tests.json",
+      "../RESULT_SCHEMA.json",
+      "../RECEIPT_SCHEMA.json",
+      "../REQUEST_SCHEMA.json",
+      "../requests/control-n13.json",
+      "../requests/n53.json",
+      "../requests/n61.json",
+      "../sessions/control-n13",
+      "../sessions/n53",
+      "../sessions/n61",
+      "../attempts/control-n13.json",
+      "../attempts/n53.json",
+      "../attempts/n61.json"
+    ],
+    "outputs": [
+      "../results.json",
+      "../VALIDATION.json",
+      "../export.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": false
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "per-size complete cold candidate/baseline ratios with intervals and A/A band",
+      "0/0.1/1 counted-cost ratios with unrankable weights explicit",
+      "whole-cold phase GAE and peak RSS by arm",
+      "LP partial, merge and projected-row flow by size"
+    ],
+    "report_dir": "../../benchmarks/20261101-icb-aimed-large-prime"
+  },
+  "inadmissible": [
+    "The predecessor PR #2850 component-S ratios as evidence for the aimed composition.",
+    "A best-of-target, best-of-round or best-domain-factor readout.",
+    "Online-only descent time as the primary result; the candidate changes target-independent cold setup and collection.",
+    "GAE at w=0 as a complete cost when either arm names unpriced work.",
+    "A wall result below L2 or without the A/A gate.",
+    "Pooling n=53 and n=61 into one headline ratio or fitting an exponent from two sizes.",
+    "Calling repeated one-target runs a Table C/32-target batch or an amortized-preprocessing result; no shared-state Koblitz batch method is in this freeze.",
+    "A resource-driven post-data domain downscale, larger timeout, target replacement or arm deletion.",
+    "Any claim about ECC2K-130, deployed security, asymptotics, or amortized preprocessing."
+  ],
+  "literature": [
+    {
+      "ref": "Victor Shoup, Lower Bounds for Discrete Logarithms and Related Problems, EUROCRYPT 1997, DOI 10.1007/3-540-69053-0_18",
+      "provenance": "retrieved",
+      "claim": "A generic-group algorithm has square-root-order query complexity up to the theorem's success-probability and group-order conditions. This pair-table/large-prime composition uses generic group representations and therefore makes no sub-square-root asymptotic ECDLP claim.",
+      "verified_by": "Primary-source metadata and theorem scope were reviewed; repository citation inventory is recorded in RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM.md and docs/session-logs/2026-10-31.md."
+    },
+    {
+      "ref": "Pierrick Gaudry, Emmanuel Thomé and Nicolas Thériault, A double large prime variation for small genus hyperelliptic index calculus, February 2005, sections 2.3 and 3.1, https://cacr.uwaterloo.ca/techreports/2004/corr2004-29.pdf",
+      "provenance": "retrieved",
+      "claim": "The paper motivates coefficient-aware large-prime graph elimination and distinguishes cycles yielding full relations from cycles that retain a large prime. Its complexity result assumes genus at least three and its stated relation model; neither the genus nor the complexity theorem transfers here.",
+      "verified_by": "research/pencil_large_prime_20261029/README.md, Sources and reuse assessment."
+    },
+    {
+      "ref": "Claus Diem, On the discrete logarithm problem in class groups of curves, Mathematics of Computation 80 (2011), https://www.ams.org/journals/mcom/2011-80-273/S0025-5718-2010-02281-1/home.html",
+      "provenance": "retrieved",
+      "claim": "Large-prime graph arguments in curve class groups depend on that curve/class-group relation model. They establish precedent for elimination, not a complexity transfer to this Koblitz elliptic-curve decomposition.",
+      "verified_by": "docs/ic/ARCHIVE_FACTOR_BASE_COMPARISON.md, Relation-finding options and compatibility."
+    },
+    {
+      "ref": "docs/ic/LEAD_LADDER_METHODOLOGY_20261010.md, lead 4",
+      "provenance": "internal",
+      "claim": "For the repository single-large-prime residual collector, bounding the residual domain lowers entry and collision rates together. At n=23 and 2, 3 and 5 columns, the residual collector cost 1.9--4x the direct-table relation phase even at the full-group residual limit.",
+      "verified_by": "The named methodology section records the break-even analysis, observed range and falsifier. This residual-yield floor is an explicit assumption/adverse prior, not silently discarded."
+    },
+    {
+      "ref": "origin/lead/icb-large-prime-20261029 (PR #2850)",
+      "provenance": "retrieved",
+      "claim": "At n=53 and n=61, exact 2LP improved the compact-orbit ic.pipeline component S in two-round stage measurements; that study explicitly did not compose with the Table A aimed pipeline.",
+      "verified_by": "Remote protocol, results, band files, replay certificate and VALIDATION.json inspected before this protocol."
+    },
+    {
+      "ref": "research/ic_tool_program/rule/v8",
+      "provenance": "internal",
+      "claim": "The registered rule-v8 n=53/n=61 recipes fix the aimed m=3 base, window, probe units and walked m=2 descent used here.",
+      "verified_by": "KOBLITZ_DESCENT rule-v8 registration and archived protocol/parameter files."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  },
+  "extensions": {
+    "method_governance": {
+      "classification": "generic pair-table decomposition plus exact double-large-prime graph elimination",
+      "counting_model": "For a fixed target and aimed third-summand window, candidate sums are treated as approximately uniform and independent in the prime-order subgroup. Base and large-prime signed orbits are exact and disjoint; only residual-free, independently verified projected equations contribute rank. Duplicate/orbit correlation, sparse-rank loss, domain-scan cost and graph closure are measured rather than idealised away.",
+      "assumptions": [
+        "correct signed-Frobenius canonicalisation and cofactor-projected column mapping",
+        "bounded disjoint residual domain with no direct two-summand Base emission",
+        "focused ordinary aimed three-sum opportunity and probe-scalar parity with the frozen collector",
+        "independent exact row verification before sparse-rank ingestion",
+        "eight public target contrasts are independent and sign-exchangeable for the exact sign-flip test",
+        "the repository residual-yield floor remains an applicable adverse prior"
+      ],
+      "non_transfer": "Hyperelliptic-genus and curve-class-group large-prime theorems motivate the graph mechanism but do not transfer an exponent or complexity claim to this elliptic-curve workload."
+    },
+    "native_analysis": {
+      "source_path": "examples/ecbench_aimed2lp_analyze.rs",
+      "source_sha256": null,
+      "binary_path": "target/release/examples/ecbench_aimed2lp_analyze",
+      "binary_sha256": null,
+      "build": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--no-default-features",
+        "--bin",
+        "ecbench",
+        "--example",
+        "ecbench_aimed2lp_analyze",
+        "--example",
+        "ecbench_aimed2lp_preflight"
+      ],
+      "cargo_build_jobs": 1,
+      "self_test_receipt": "research/icb_aimed_large_prime_n53_n61_20261101/receipts/native-analyzer-tests.json",
+      "canonical_export": "research/icb_aimed_large_prime_n53_n61_20261101/export.json",
+      "export_schema": "experiment.export/v1"
+    },
+    "provider_preflight": {
+      "source_path": "examples/ecbench_aimed2lp_preflight.rs",
+      "source_sha256": null,
+      "binary_path": "target/release/examples/ecbench_aimed2lp_preflight",
+      "binary_sha256": null,
+      "receipt": "research/icb_aimed_large_prime_n53_n61_20261101/receipts/provider-preflight.json"
+    },
+    "attempt_receipts": [
+      "research/icb_aimed_large_prime_n53_n61_20261101/attempts/control-n13.json",
+      "research/icb_aimed_large_prime_n53_n61_20261101/attempts/n53.json",
+      "research/icb_aimed_large_prime_n53_n61_20261101/attempts/n61.json"
+    ],
+    "spec_paths": [
+      "research/icb_aimed_large_prime_n53_n61_20261101/specs/control-n13.json",
+      "research/icb_aimed_large_prime_n53_n61_20261101/specs/n53.json",
+      "research/icb_aimed_large_prime_n53_n61_20261101/specs/n61.json"
+    ],
+    "spec_file_sha256": {
+      "research/icb_aimed_large_prime_n53_n61_20261101/specs/control-n13.json": "c3c83e00d6ea0da4ef1fd0a1380da9a6cd8cb5865a6b33fb25e647fc3dccfec6",
+      "research/icb_aimed_large_prime_n53_n61_20261101/specs/n53.json": "0beac2080c9eb8bf5b0fc4db1a500a29841d0619dc0c3a96e04931c308a71a5c",
+      "research/icb_aimed_large_prime_n53_n61_20261101/specs/n61.json": "7d992f8a20bf00e8e0d3508c2705108d88709166e2b43b5a4d255f38ec02464b"
+    },
+    "spec_identity_sha256": {
+      "research/icb_aimed_large_prime_n53_n61_20261101/specs/control-n13.json": null,
+      "research/icb_aimed_large_prime_n53_n61_20261101/specs/n53.json": null,
+      "research/icb_aimed_large_prime_n53_n61_20261101/specs/n61.json": null
+    },
+    "focused_gate_receipt": "research/icb_aimed_large_prime_n53_n61_20261101/receipts/focused-gates.json",
+    "focused_gate_receipt_sha256": null,
+    "result_schema": "research/icb_aimed_large_prime_n53_n61_20261101/RESULT_SCHEMA.json",
+    "result_schema_sha256": null,
+    "receipt_schema_sha256": null,
+    "request_schema_sha256": null,
+    "analysis_manifest_sha256": null,
+    "native_analyzer_source_sha256": null,
+    "native_analyzer_binary_sha256": null,
+    "provider_preflight_source_sha256": null,
+    "provider_preflight_binary_sha256": null,
+    "request_template_sha256": {
+      "requests/control-n13.json": null,
+      "requests/n53.json": null,
+      "requests/n61.json": null
+    },
+    "target_launch_gate": "DISABLED: refreshed focused gates, independent audit, native analyzer/export and provider preflight, source commit, frozen protocol/checkpoint, release binary/image identities, authenticated attempt route, control-n13 and replay-all must all pass before n53/n61",
+    "coordination": "conductor executable unavailable in the assigned worktree; recorded in the session log and protocol, not treated as approval"
+  }
+}

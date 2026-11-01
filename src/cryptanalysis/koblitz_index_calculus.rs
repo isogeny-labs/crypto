@@ -125,7 +125,7 @@
 //!   (2000) — the `√n` rho speed-up we compare against.
 
 use std::cell::RefCell;
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::rc::Rc;
 use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 use std::sync::{Arc, OnceLock};
@@ -4348,6 +4348,23 @@ impl ColumnCoverage {
         }
     }
 
+    /// Record rows that have already been reduced to projected columns.
+    /// Large-prime elimination produces this form: a nonzero coefficient
+    /// mentions the column just as one original summand would for aiming.
+    pub fn add_projected(&mut self, relations: &[ProjectedRelation]) {
+        for rel in relations {
+            for &(column, coefficient) in &rel.columns {
+                if coefficient == 0 || column >= self.mentions.len() {
+                    continue;
+                }
+                if self.mentions[column] == 0 {
+                    self.covered += 1;
+                }
+                self.mentions[column] += 1;
+            }
+        }
+    }
+
     /// Factor-base points of the columns mentioned fewest times, in
     /// index order.
     ///
@@ -4367,6 +4384,48 @@ impl ColumnCoverage {
         out.sort_unstable();
         out
     }
+}
+
+/// The exact third-summand indices an aimed walked probe scans.
+///
+/// This is the public seam for collectors that share the §23 aimed-window
+/// recipe but add another relation backend (the large-prime experiment).
+/// It deliberately mirrors [`Targets::Subset`]: sorted/deduplicated valid
+/// indices, the requested window clipped to the remaining set, and the
+/// same public `(seed, trial)` rotation.  `None` means the caller should
+/// use the ordinary whole-base window.
+pub fn aimed_window_indices(
+    points: &[u32],
+    base_len: usize,
+    window: usize,
+    seed: u64,
+    trial: u64,
+) -> Option<Vec<u32>> {
+    if points.is_empty() || base_len == 0 || window == 0 {
+        return None;
+    }
+    let mut indices: Vec<u32> = points
+        .iter()
+        .copied()
+        .filter(|&index| (index as usize) < base_len)
+        .collect();
+    indices.sort_unstable();
+    indices.dedup();
+    if indices.is_empty() {
+        return None;
+    }
+    let take = window.min(indices.len());
+    let offset = aimed_window_offset(seed, trial, indices.len());
+    Some(
+        (0..take)
+            .map(|step| indices[(offset + step) % indices.len()])
+            .collect(),
+    )
+}
+
+/// Rotation shared by the ordinary aimed scan and compatible collectors.
+pub fn aimed_window_offset(seed: u64, trial: u64, pool: usize) -> usize {
+    pair_filter_hash(seed ^ trial.wrapping_mul(0x9e37_79b9_7f4a_7c15)) as usize % pool.max(1)
 }
 
 /// What one walked collection unit scans, owned so a work unit can
@@ -4425,8 +4484,7 @@ impl Targets {
         let pool = self.pool(base);
         // A rotating offset, so no column is favoured by sitting where
         // the window always starts.
-        let offset =
-            pair_filter_hash(seed ^ t.wrapping_mul(0x9e37_79b9_7f4a_7c15)) as usize % pool.max(1);
+        let offset = aimed_window_offset(seed, t, pool);
         match self {
             Targets::Window(len) => Scan::Cyclic {
                 start: offset,
@@ -12716,6 +12774,30 @@ pub struct CollectedRelation {
     pub points: Vec<usize>,
 }
 
+/// One exact row already written over the cofactor-projected signed-
+/// Frobenius columns.
+///
+/// This is the boundary used by relation collectors that eliminate
+/// auxiliary large primes before the ordinary factor-base logarithm
+/// solver sees a row.  The coefficients still describe the public probe
+/// `[a]G`: the solver independently checks
+///
+/// ` [h*a]G = sum columns[i].1 * R_columns[i].0 `
+///
+/// before accepting it, where `R_j` is the projected representative of
+/// column `j`.  A collector therefore cannot bypass the same group replay
+/// that [`CollectedRelation`] receives merely because its row no longer
+/// has a list of original summands.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ProjectedRelation {
+    /// Stable source/trial identifier, diagnostic only.
+    pub trial: u64,
+    /// The (possibly merged) probe scalar before cofactor projection.
+    pub a: u64,
+    /// Sparse `(projected column, coefficient mod r)` entries.
+    pub columns: Vec<(usize, u64)>,
+}
+
 /// A slice `[start, start + count)` of a seed's probe sequence.  Probe
 /// `t` depends only on `(seed, t)` ([`probe_scalar`]), so any partition
 /// of the trial range into units yields the same relations, in any
@@ -13874,6 +13956,7 @@ pub struct FactorBaseLogSolver<'a> {
     opts: &'a KoblitzIcOptions,
     system: LogSystem<'a>,
     seen: HashSet<(u64, Vec<usize>)>,
+    seen_projected: HashSet<(u64, Vec<(usize, u64)>)>,
     report: LogTableReport,
 }
 
@@ -13892,6 +13975,56 @@ pub struct RelationMatrixSnapshot {
     pub rows: Vec<RelationMatrixRow>,
     pub solver: &'static str,
     pub sparse_options: Option<SparseSolveOptions>,
+}
+
+/// Canonicalise and independently replay one projected sparse row.
+fn verified_projected_row(
+    kc: &KoblitzCurve,
+    projected: &ProjectedSignedOrbitMap,
+    relation: &ProjectedRelation,
+) -> Option<(Vec<(usize, u64)>, Vec<BigUint>, BigUint)> {
+    let r = kc.subgroup_order.to_u64()?;
+    if r < 2 || relation.a >= r || relation.columns.is_empty() {
+        return None;
+    }
+    let mut sparse: BTreeMap<usize, u64> = BTreeMap::new();
+    for &(column, coefficient) in &relation.columns {
+        if column >= projected.representatives.len() {
+            return None;
+        }
+        let coefficient = coefficient % r;
+        if coefficient == 0 {
+            continue;
+        }
+        let slot = sparse.entry(column).or_insert(0);
+        *slot = ((*slot as u128 + coefficient as u128) % r as u128) as u64;
+    }
+    sparse.retain(|_, coefficient| *coefficient != 0);
+    if sparse.is_empty() {
+        return None;
+    }
+    let h = kc.cofactor.to_u64()? % r;
+    let rhs_scalar = ((h as u128 * relation.a as u128) % r as u128) as u64;
+    let lhs = kc.mul(kc.generator(), &BigUint::from(rhs_scalar));
+    let mut replay = BinaryPoint::Infinity;
+    for (&column, &coefficient) in &sparse {
+        replay = kc.add(
+            &replay,
+            &kc.mul(
+                projected.representatives.get(column)?,
+                &BigUint::from(coefficient),
+            ),
+        );
+    }
+    if replay != lhs {
+        return None;
+    }
+    let normal: Vec<(usize, u64)> = sparse.into_iter().collect();
+    let mut dense = vec![BigUint::zero(); projected.representatives.len()];
+    for &(column, coefficient) in &normal {
+        dense[column] = BigUint::from(coefficient);
+    }
+    Some((normal, dense, BigUint::from(rhs_scalar)))
 }
 
 impl<'a> FactorBaseLogSolver<'a> {
@@ -13938,6 +14071,7 @@ impl<'a> FactorBaseLogSolver<'a> {
             opts,
             system,
             seen: HashSet::new(),
+            seen_projected: HashSet::new(),
             report,
         })
     }
@@ -13964,6 +14098,44 @@ impl<'a> FactorBaseLogSolver<'a> {
                 continue;
             }
             self.system.push(rel);
+        }
+        self.report.collection_seconds += begin.elapsed().as_secs_f64();
+        self.report.relations = self.system.rows();
+    }
+
+    /// Verify and accept sparse rows that a large-prime eliminator has
+    /// already written over the projected columns.
+    ///
+    /// The row is normalised modulo `r`, replayed as a point equation,
+    /// deduplicated, and only then stored.  Thus this seam has the same
+    /// fail-closed property as [`Self::push`]; it is not a trusted matrix
+    /// import.  Rows use the original probe scalar `a`, so the right hand
+    /// side remains `h*a`, exactly as for an ordinary decomposition.
+    pub fn push_projected(&mut self, relations: &[ProjectedRelation]) {
+        let _check = measurement::scope(Phase::RelationCheck);
+        let begin = std::time::Instant::now();
+        let r_u64 = self
+            .kc
+            .subgroup_order
+            .to_u64()
+            .expect("FactorBaseLogSolver admitted a word-sized subgroup");
+        for relation in relations {
+            let Some((normal, dense, rhs)) = verified_projected_row(
+                self.kc,
+                self.system.projected.as_ref(),
+                relation,
+            ) else {
+                self.report.rejected_relations += 1;
+                continue;
+            };
+            if !self
+                .seen_projected
+                .insert((relation.a % r_u64, normal))
+            {
+                self.report.duplicate_relations += 1;
+                continue;
+            }
+            self.system.push_row(dense, rhs);
         }
         self.report.collection_seconds += begin.elapsed().as_secs_f64();
         self.report.relations = self.system.rows();
@@ -14971,6 +15143,31 @@ mod tests {
     use crate::cryptanalysis::pq_groebner_f2::{
         bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
     };
+
+    #[test]
+    fn exported_aimed_window_indices_are_the_collectors_exact_scan() {
+        let kc = KoblitzCurve::new(0, 9).unwrap();
+        let fb = build_frobenius_factor_base(&kc, 0).unwrap();
+        let opts = KoblitzIcOptions {
+            strategy: DecompositionStrategy::PairTable,
+            collection_window: Some(3),
+            m: 3,
+            ..Default::default()
+        };
+        let collector = RelationCollector::new(&kc, &fb, &opts).unwrap();
+        assert!(fb.points.len() > 7);
+        let named = vec![7, 2, 7, 1, 5];
+        let targets = collector.aimed(&named).expect("valid aimed subset");
+        for trial in [0, 1, 2, 63, 64, 999] {
+            let expected =
+                aimed_window_indices(&named, fb.points.len(), 3, 42, trial).unwrap();
+            let actual = match targets.scan(42, trial, fb.points.len()) {
+                Scan::Indices(indices) | Scan::Gathered { idxs: indices, .. } => indices,
+                Scan::Cyclic { .. } => panic!("aimed subset became a cyclic scan"),
+            };
+            assert_eq!(actual, expected.as_slice(), "trial {trial}");
+        }
+    }
 
     #[test]
     fn live_collection_progress_preserves_swept_walked_and_aimed_queries() {

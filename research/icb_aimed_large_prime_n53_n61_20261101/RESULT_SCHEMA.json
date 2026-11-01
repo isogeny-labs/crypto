@@ -1,0 +1,514 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "icb.aimed2lp.results/v2",
+  "title": "Aimed m=3 plus exact 2LP n53/n61 results",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "protocol_id",
+    "protocol_sha256",
+    "native_analyzer_source_sha256",
+    "native_analyzer_binary_sha256",
+    "native_provider_preflight_source_sha256",
+    "native_provider_preflight_binary_sha256",
+    "source_commit",
+    "binary_sha256",
+    "image_digest",
+    "created",
+    "status",
+    "controls",
+    "attempt_receipts",
+    "inference",
+    "sizes",
+    "overall_verdict",
+    "canonical_export",
+    "limitations"
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "nullable_number": {
+      "type": ["number", "null"]
+    },
+    "interval": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "array",
+          "prefixItems": [
+            {"type": "number"},
+            {"type": "number"}
+          ],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        }
+      ]
+    },
+    "numeric_interval": {
+      "type": "array",
+      "prefixItems": [
+        {"type": "number"},
+        {"type": "number"}
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "pass_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "receipt"],
+      "properties": {
+        "status": {"const": "pass"},
+        "receipt": {"type": "string", "minLength": 1}
+      }
+    },
+    "attempt_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "final_class", "attempts"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "final_class": {
+          "enum": [
+            "complete",
+            "scientific_censored",
+            "infrastructure_blocked",
+            "not_attempted"
+          ]
+        },
+        "attempts": {"type": "integer", "minimum": 0, "maximum": 2}
+      }
+    },
+    "aa": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "ratio_b_over_a",
+            "ci95",
+            "target_clusters",
+            "rounds_per_target",
+            "required_interval",
+            "must_contain"
+          ],
+          "properties": {
+            "status": {"enum": ["pass", "fail"]},
+            "ratio_b_over_a": {"type": "number"},
+            "ci95": {"$ref": "#/$defs/numeric_interval"},
+            "target_clusters": {"const": 8},
+            "rounds_per_target": {"const": 5},
+            "required_interval": {"const": [0.9, 1.1]},
+            "must_contain": {"const": 1.0}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "ratio_b_over_a",
+            "ci95",
+            "target_clusters",
+            "rounds_per_target"
+          ],
+          "properties": {
+            "status": {"const": "not_evaluated"},
+            "ratio_b_over_a": {"type": "null"},
+            "ci95": {"type": "null"},
+            "target_clusters": {"const": 8},
+            "rounds_per_target": {"const": 5}
+          }
+        }
+      ]
+    },
+    "exact_sign_flip": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statistic",
+        "alternative",
+        "null_ratio",
+        "sign_assignments",
+        "raw_one_sided_p",
+        "holm_family_size",
+        "holm_adjusted_p"
+      ],
+      "properties": {
+        "statistic": {
+          "const": "sum_over_targets(sum_candidate_rounds - 0.95 * sum_baseline_rounds)"
+        },
+        "alternative": {"const": "candidate_below_null_ratio"},
+        "null_ratio": {"const": 0.95},
+        "sign_assignments": {"const": 256},
+        "raw_one_sided_p": {"type": "number", "minimum": 0, "maximum": 1},
+        "holm_family_size": {"const": 4},
+        "holm_adjusted_p": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "wall": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "metric",
+            "ratio_b_over_a",
+            "ci95",
+            "target_clusters",
+            "rounds_per_target",
+            "ci_method",
+            "exact_sign_flip"
+          ],
+          "properties": {
+            "status": {"const": "complete"},
+            "metric": {"const": "solve_wall_ns"},
+            "ratio_b_over_a": {"type": "number"},
+            "ci95": {"$ref": "#/$defs/numeric_interval"},
+            "target_clusters": {"const": 8},
+            "rounds_per_target": {"const": 5},
+            "ci_method": {"const": "target_cluster_percentile_bootstrap"},
+            "exact_sign_flip": {"$ref": "#/$defs/exact_sign_flip"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "metric",
+            "ratio_b_over_a",
+            "ci95",
+            "target_clusters",
+            "rounds_per_target",
+            "exact_sign_flip"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "scientific_censored",
+                "infrastructure_blocked",
+                "not_attempted"
+              ]
+            },
+            "metric": {"const": "solve_wall_ns"},
+            "ratio_b_over_a": {"type": "null"},
+            "ci95": {"type": "null"},
+            "target_clusters": {"const": 8},
+            "rounds_per_target": {"const": 5},
+            "exact_sign_flip": {"type": "null"}
+          }
+        }
+      ]
+    },
+    "pricing_complete": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "role",
+        "weights",
+        "ratios",
+        "ci95",
+        "missing_native_count",
+        "missing_unpriced_units",
+        "note"
+      ],
+      "properties": {
+        "status": {"enum": ["DESCRIPTIVE COMPLETE", "UNRANKABLE PRICING"]},
+        "role": {"const": "descriptive_not_decisive"},
+        "weights": {"const": [0.0, 0.1, 1.0]},
+        "ratios": {
+          "type": "array",
+          "prefixItems": [
+            {"$ref": "#/$defs/nullable_number"},
+            {"$ref": "#/$defs/nullable_number"},
+            {"$ref": "#/$defs/nullable_number"}
+          ],
+          "items": false,
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "ci95": {
+          "type": "array",
+          "prefixItems": [
+            {"$ref": "#/$defs/interval"},
+            {"$ref": "#/$defs/interval"},
+            {"$ref": "#/$defs/interval"}
+          ],
+          "items": false,
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "missing_native_count": {
+          "type": "array",
+          "prefixItems": [
+            {"type": "boolean"},
+            {"type": "boolean"},
+            {"type": "boolean"}
+          ],
+          "items": false,
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "missing_unpriced_units": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true
+        },
+        "note": {"type": "string", "minLength": 1}
+      }
+    },
+    "pricing_not_evaluated": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "role"],
+      "properties": {
+        "status": {"const": "NOT_EVALUATED"},
+        "role": {"const": "descriptive_not_decisive"}
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "a",
+        "b",
+        "wall",
+        "wall_verdict",
+        "pricing_band",
+        "pricing_status"
+      ],
+      "properties": {
+        "id": {"enum": ["C-c05", "C-c1"]},
+        "a": {"const": "aimed"},
+        "b": {"enum": ["aimed-lp2-c05", "aimed-lp2-c1"]},
+        "wall": {"$ref": "#/$defs/wall"},
+        "wall_verdict": {
+          "enum": [
+            "IMPROVEMENT",
+            "NULL",
+            "WORSE",
+            "INVALID",
+            "CENSORED NON-IMPROVEMENT",
+            "BLOCKED",
+            "NOT ATTEMPTED"
+          ]
+        },
+        "pricing_band": {
+          "oneOf": [
+            {"$ref": "#/$defs/pricing_complete"},
+            {"$ref": "#/$defs/pricing_not_evaluated"}
+          ]
+        },
+        "pricing_status": {
+          "enum": [
+            "DESCRIPTIVE COMPLETE",
+            "UNRANKABLE PRICING",
+            "NOT_EVALUATED"
+          ]
+        }
+      }
+    }
+  },
+  "properties": {
+    "schema": {"const": "icb.aimed2lp.results/v2"},
+    "protocol_id": {"const": "ICB-AIMED-2LP-N53-N61-20261101"},
+    "protocol_sha256": {"$ref": "#/$defs/sha256"},
+    "native_analyzer_source_sha256": {"$ref": "#/$defs/sha256"},
+    "native_analyzer_binary_sha256": {"$ref": "#/$defs/sha256"},
+    "native_provider_preflight_source_sha256": {"$ref": "#/$defs/sha256"},
+    "native_provider_preflight_binary_sha256": {"$ref": "#/$defs/sha256"},
+    "source_commit": {"$ref": "#/$defs/commit"},
+    "binary_sha256": {"$ref": "#/$defs/sha256"},
+    "image_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "created": {"type": "string", "minLength": 1},
+    "status": {
+      "enum": ["complete", "scientific_censored", "blocked", "not_attempted", "invalid"]
+    },
+    "controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "focused_gates",
+        "checkpoint",
+        "provider_preflight",
+        "native_analyzer_self_test",
+        "positive_n13",
+        "lp0_identity",
+        "aa_operation_identity",
+        "direct_two_sum_zero",
+        "replay_all",
+        "provider_attempt_receipts"
+      ],
+      "properties": {
+        "focused_gates": {"$ref": "#/$defs/pass_receipt"},
+        "checkpoint": {"$ref": "#/$defs/pass_receipt"},
+        "provider_preflight": {"$ref": "#/$defs/pass_receipt"},
+        "native_analyzer_self_test": {"$ref": "#/$defs/pass_receipt"},
+        "positive_n13": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "receipt", "attempt_receipt"],
+          "properties": {
+            "status": {"enum": ["pass", "scientific_censored", "blocked", "not_attempted"]},
+            "receipt": {"type": "string", "minLength": 1},
+            "attempt_receipt": {"type": "string", "minLength": 1}
+          }
+        },
+        "lp0_identity": {"enum": ["pass", "not_evaluated"]},
+        "aa_operation_identity": {"enum": ["pass", "not_evaluated"]},
+        "direct_two_sum_zero": {"enum": ["pass", "not_evaluated"]},
+        "replay_all": {"enum": ["pass", "not_evaluated"]},
+        "provider_attempt_receipts": {"const": "pass"}
+      }
+    },
+    "attempt_receipts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["control-n13", "n53", "n61"],
+      "properties": {
+        "control-n13": {"$ref": "#/$defs/attempt_summary"},
+        "n53": {"$ref": "#/$defs/attempt_summary"},
+        "n61": {"$ref": "#/$defs/attempt_summary"}
+      }
+    },
+    "inference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "primary",
+        "independent_unit",
+        "target_clusters_per_size",
+        "repeated_rounds_per_target",
+        "multiple_testing",
+        "sensitivity"
+      ],
+      "properties": {
+        "primary": {"const": "whole-cold paired L2 wall on frozen c8a.2xlarge"},
+        "independent_unit": {"const": "public target"},
+        "target_clusters_per_size": {"const": 8},
+        "repeated_rounds_per_target": {"const": 5},
+        "multiple_testing": {"const": "Holm over four candidate cells (2 configurations x 2 sizes)"},
+        "sensitivity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "independent_target_clusters",
+            "repeated_rounds_per_cluster",
+            "exact_sign_patterns",
+            "minimum_raw_p",
+            "minimum_four_test_holm_p",
+            "equal_magnitude_power_if_each_target_favors_candidate",
+            "limitation"
+          ],
+          "properties": {
+            "independent_target_clusters": {"const": 8},
+            "repeated_rounds_per_cluster": {"const": 5},
+            "exact_sign_patterns": {"const": 256},
+            "minimum_raw_p": {"const": 0.00390625},
+            "minimum_four_test_holm_p": {"const": 0.015625},
+            "equal_magnitude_power_if_each_target_favors_candidate": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["p_0.80", "p_0.90", "p_0.95"],
+              "properties": {
+                "p_0.80": {"type": "number"},
+                "p_0.90": {"type": "number"},
+                "p_0.95": {"type": "number"}
+              }
+            },
+            "limitation": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    },
+    "sizes": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "n",
+          "status",
+          "attempt_receipt",
+          "session_export",
+          "session_id",
+          "records",
+          "measured_rows",
+          "target_clusters",
+          "rounds_per_target",
+          "aa",
+          "comparisons"
+        ],
+        "properties": {
+          "n": {"enum": [53, 61]},
+          "status": {
+            "enum": ["complete", "scientific_censored", "infrastructure_blocked", "not_attempted"]
+          },
+          "attempt_receipt": {"type": "string", "minLength": 1},
+          "session_export": {"type": "string", "minLength": 1},
+          "session_id": {
+            "type": ["string", "null"],
+            "pattern": "^ECBS1h[0-9a-f]{12}$"
+          },
+          "records": {"type": "integer", "minimum": 0, "maximum": 288},
+          "measured_rows": {"type": "integer", "minimum": 0, "maximum": 240},
+          "target_clusters": {"const": 8},
+          "rounds_per_target": {"const": 5},
+          "aa": {"$ref": "#/$defs/aa"},
+          "comparisons": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {"$ref": "#/$defs/comparison"}
+          }
+        }
+      }
+    },
+    "overall_verdict": {
+      "enum": [
+        "IMPROVEMENT",
+        "NULL",
+        "WORSE",
+        "CENSORED NON-IMPROVEMENT",
+        "BLOCKED",
+        "NOT ATTEMPTED",
+        "INVALID"
+      ]
+    },
+    "canonical_export": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "path", "expected_rows"],
+      "properties": {
+        "schema": {"const": "experiment.export/v1"},
+        "path": {"type": "string", "minLength": 1},
+        "expected_rows": {"const": 636}
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    }
+  }
+}

@@ -122,10 +122,13 @@ for example `|spotlab.yml|rust-lint.yml|`. Use
 pool; it takes precedence. Remove a filename to roll that workflow back to
 `ubuntu-latest`. `route_workflows.py --apply` writes the routing expression
 into any new direct `runs-on: ubuntu-latest` line and is idempotent; it skips
-workflows whose bytes are pinned elsewhere (`SEALED`). Four workflows name a
+workflows whose bytes are pinned elsewhere (`SEALED`). Five workflows name a
 scale set directly because they cannot run on a hosted runner:
 `eks-arc-smoke.yml`, `dreg-a3-eks-highmem.yml`, `fb-designs-m4-highmem.yml`
-and the `segment` job of `dreg-ckpt-job.yml` (xmem/xmem1t).
+and the `segment` job of `dreg-ckpt-job.yml` (xmem/xmem1t), plus the
+dispatch-only `icb-aimed-2lp-compile.yml` pre-data compile gate. The latter
+requires an exact expected commit and has no target-data, provider, or write
+path.
 
 ### Turning the Spot runners back on (isogeny-labs/crypto)
 

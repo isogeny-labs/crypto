@@ -1,0 +1,757 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "icb.aimed2lp.receipts/v1",
+  "title": "Immutable-image, provider-custody, and pre-target receipts",
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "node_selector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node.kubernetes.io/instance-type",
+        "eks.amazonaws.com/capacityType"
+      ],
+      "properties": {
+        "node.kubernetes.io/instance-type": {"const": "c8a.2xlarge"},
+        "eks.amazonaws.com/capacityType": {"const": "SPOT"}
+      }
+    },
+    "source_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file_sha256", "identity_sha256", "spec_id"],
+      "properties": {
+        "file_sha256": {"$ref": "#/$defs/sha256"},
+        "identity_sha256": {"$ref": "#/$defs/sha256"},
+        "spec_id": {"type": "string", "pattern": "^ECS1h[0-9a-f]{12}$"}
+      }
+    },
+    "frozen_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "status",
+        "cell",
+        "provider_tool",
+        "job_name",
+        "spec_path",
+        "spec_file_sha256",
+        "source_revision",
+        "image_uri",
+        "image_digest",
+        "ecbench_sha256",
+        "argv",
+        "payload_sha256",
+        "payload_bytes",
+        "provider_identity_sha256",
+        "pod_spec_sha256",
+        "instance_type",
+        "capacity",
+        "node_selector",
+        "exclusive_vcpus",
+        "cpu_request",
+        "cpu_limit",
+        "memory",
+        "memory_bytes",
+        "memory_request",
+        "memory_limit",
+        "restart_policy",
+        "child_timeout_seconds",
+        "outer_deadline_seconds",
+        "durable_prefix",
+        "provider_retries",
+        "scientific_retries",
+        "infrastructure_attempts_max",
+        "retain_failed_artifacts"
+      ],
+      "properties": {
+        "schema": {"const": "icb.aimed2lp.request/v1"},
+        "status": {"const": "frozen"},
+        "cell": {"enum": ["control-n13", "n53", "n61"]},
+        "provider_tool": {"const": "isolab_k8s_benchmark"},
+        "job_name": {"type": "string", "minLength": 1},
+        "spec_path": {
+          "type": "string",
+          "pattern": "^research/icb_aimed_large_prime_n53_n61_20261101/specs/(control-n13|n53|n61)\\.json$"
+        },
+        "spec_file_sha256": {"$ref": "#/$defs/sha256"},
+        "source_revision": {"$ref": "#/$defs/commit"},
+        "image_uri": {
+          "type": "string",
+          "pattern": "@sha256:[0-9a-f]{64}$"
+        },
+        "image_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "ecbench_sha256": {"$ref": "#/$defs/sha256"},
+        "argv": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "payload_sha256": {"$ref": "#/$defs/sha256"},
+        "payload_bytes": {"type": "integer", "minimum": 1},
+        "provider_identity_sha256": {"$ref": "#/$defs/sha256"},
+        "pod_spec_sha256": {"$ref": "#/$defs/sha256"},
+        "instance_type": {"const": "c8a.2xlarge"},
+        "capacity": {"const": "spot"},
+        "node_selector": {"$ref": "#/$defs/node_selector"},
+        "exclusive_vcpus": {"const": 4},
+        "cpu_request": {"const": "4"},
+        "cpu_limit": {"const": "4"},
+        "memory": {"const": "8Gi"},
+        "memory_bytes": {"const": 8589934592},
+        "memory_request": {"const": "8Gi"},
+        "memory_limit": {"const": "8Gi"},
+        "restart_policy": {"const": "Never"},
+        "child_timeout_seconds": {"enum": [600, 3600]},
+        "outer_deadline_seconds": {"const": 7800},
+        "durable_prefix": {
+          "type": "string",
+          "pattern": "^s3://setec-astronomy-artifacts/ecbench/icb-aimed-large-prime-n53-n61-20261101/(control-n13|n53|n61)/$"
+        },
+        "provider_retries": {"const": 0},
+        "scientific_retries": {"const": 0},
+        "infrastructure_attempts_max": {"const": 2},
+        "retain_failed_artifacts": {"const": true}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"cell": {"const": "control-n13"}}},
+          "then": {
+            "properties": {
+              "child_timeout_seconds": {"const": 600},
+              "durable_prefix": {
+                "const": "s3://setec-astronomy-artifacts/ecbench/icb-aimed-large-prime-n53-n61-20261101/control-n13/"
+              }
+            }
+          },
+          "else": {"properties": {"child_timeout_seconds": {"const": 3600}}}
+        },
+        {
+          "if": {"properties": {"cell": {"const": "n53"}}},
+          "then": {
+            "properties": {
+              "durable_prefix": {
+                "const": "s3://setec-astronomy-artifacts/ecbench/icb-aimed-large-prime-n53-n61-20261101/n53/"
+              }
+            }
+          }
+        },
+        {
+          "if": {"properties": {"cell": {"const": "n61"}}},
+          "then": {
+            "properties": {
+              "durable_prefix": {
+                "const": "s3://setec-astronomy-artifacts/ecbench/icb-aimed-large-prime-n53-n61-20261101/n61/"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "created",
+        "source_commit",
+        "cargo_lock_sha256",
+        "binary_sha256",
+        "image_digest",
+        "image_ref",
+        "build_command",
+        "rustflags",
+        "cargo_build_jobs",
+        "focused_gate_receipt_sha256",
+        "protocol_sha256",
+        "checkpoint_receipt_sha256",
+        "analysis_manifest_sha256",
+        "result_schema_sha256",
+        "receipt_schema_sha256",
+        "request_schema_sha256",
+        "native_analyzer_source_sha256",
+        "native_analyzer_binary_sha256",
+        "native_provider_preflight_source_sha256",
+        "native_provider_preflight_binary_sha256",
+        "specs"
+      ],
+      "properties": {
+        "schema": {"const": "icb.aimed2lp.image/v1"},
+        "created": {"type": "string", "minLength": 1},
+        "source_commit": {"$ref": "#/$defs/commit"},
+        "cargo_lock_sha256": {"$ref": "#/$defs/sha256"},
+        "binary_sha256": {"$ref": "#/$defs/sha256"},
+        "image_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "image_ref": {
+          "type": "string",
+          "pattern": "^.+@sha256:[0-9a-f]{64}$"
+        },
+        "build_command": {
+          "const": [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--bin",
+            "ecbench",
+            "--example",
+            "ecbench_aimed2lp_analyze",
+            "--example",
+            "ecbench_aimed2lp_preflight"
+          ]
+        },
+        "rustflags": {"const": "-C target-cpu=x86-64"},
+        "cargo_build_jobs": {"const": 1},
+        "focused_gate_receipt_sha256": {"$ref": "#/$defs/sha256"},
+        "protocol_sha256": {"$ref": "#/$defs/sha256"},
+        "checkpoint_receipt_sha256": {"$ref": "#/$defs/sha256"},
+        "analysis_manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "result_schema_sha256": {"$ref": "#/$defs/sha256"},
+        "receipt_schema_sha256": {"$ref": "#/$defs/sha256"},
+        "request_schema_sha256": {"$ref": "#/$defs/sha256"},
+        "native_analyzer_source_sha256": {"$ref": "#/$defs/sha256"},
+        "native_analyzer_binary_sha256": {"$ref": "#/$defs/sha256"},
+        "native_provider_preflight_source_sha256": {"$ref": "#/$defs/sha256"},
+        "native_provider_preflight_binary_sha256": {"$ref": "#/$defs/sha256"},
+        "specs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "research/icb_aimed_large_prime_n53_n61_20261101/specs/control-n13.json",
+            "research/icb_aimed_large_prime_n53_n61_20261101/specs/n53.json",
+            "research/icb_aimed_large_prime_n53_n61_20261101/specs/n61.json"
+          ],
+          "properties": {
+            "research/icb_aimed_large_prime_n53_n61_20261101/specs/control-n13.json": {"$ref": "#/$defs/spec"},
+            "research/icb_aimed_large_prime_n53_n61_20261101/specs/n53.json": {"$ref": "#/$defs/spec"},
+            "research/icb_aimed_large_prime_n53_n61_20261101/specs/n61.json": {"$ref": "#/$defs/spec"}
+          }
+        }
+      }
+    },
+    "control": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "created",
+        "status",
+        "session_id",
+        "source_commit",
+        "binary_sha256",
+        "spec_identity_sha256",
+        "measured_rows",
+        "verified_rows",
+        "aa_pairs_identical",
+        "lp0_pairs_identical",
+        "lp2_rows_active",
+        "lp2_rows_with_merged_relation",
+        "lp_direct_two_sum",
+        "lp_verification_failures",
+        "replay_required",
+        "note"
+      ],
+      "properties": {
+        "schema": {"const": "icb.aimed2lp.control/v1"},
+        "created": {"type": "string", "minLength": 1},
+        "status": {"enum": ["pass", "fail"]},
+        "session_id": {"type": "string", "pattern": "^ECBS1h[0-9a-f]{12}$"},
+        "source_commit": {"$ref": "#/$defs/commit"},
+        "binary_sha256": {"$ref": "#/$defs/sha256"},
+        "spec_identity_sha256": {"$ref": "#/$defs/sha256"},
+        "measured_rows": {"const": 50},
+        "verified_rows": {"const": 50},
+        "aa_pairs_identical": {"const": 10},
+        "lp0_pairs_identical": {"const": 10},
+        "lp2_rows_active": {"const": 20},
+        "lp2_rows_with_merged_relation": {"const": 20},
+        "lp_direct_two_sum": {"const": 0},
+        "lp_verification_failures": {"const": 0},
+        "replay_required": {"const": true},
+        "note": {"type": "string", "minLength": 1}
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "bytes",
+        "object_uri",
+        "object_version",
+        "readback_sha256",
+        "readback_bytes",
+        "readback_verified"
+      ],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 0},
+        "object_uri": {
+          "type": "string",
+          "pattern": "^s3://setec-astronomy-artifacts/ecbench/icb-aimed-large-prime-n53-n61-20261101/(control-n13|n53|n61)/.+"
+        },
+        "object_version": {"type": "string", "minLength": 1},
+        "readback_sha256": {"$ref": "#/$defs/sha256"},
+        "readback_bytes": {"type": "integer", "minimum": 0},
+        "readback_verified": {"const": true}
+      }
+    },
+    "attempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "created",
+        "status",
+        "protocol_sha256",
+        "source_commit",
+        "binary_sha256",
+        "image_digest",
+        "provider_identity_artifact",
+        "pod_spec_artifact",
+        "lineage",
+        "request",
+        "terminal",
+        "authentication",
+        "artifacts"
+      ],
+      "properties": {
+        "schema": {"const": "icb.aimed2lp.attempt/v1"},
+        "created": {"type": "string", "minLength": 1},
+        "status": {
+          "enum": [
+            "succeeded",
+            "scientific_censored",
+            "infrastructure_failed",
+            "resource_refused",
+            "invalid"
+          ]
+        },
+        "protocol_sha256": {"$ref": "#/$defs/sha256"},
+        "source_commit": {"$ref": "#/$defs/commit"},
+        "binary_sha256": {"$ref": "#/$defs/sha256"},
+        "image_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "provider_identity_artifact": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[^/].*",
+          "not": {"pattern": "(^|/)\\.\\.(/|$)"}
+        },
+        "pod_spec_artifact": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[^/].*",
+          "not": {"pattern": "(^|/)\\.\\.(/|$)"}
+        },
+        "lineage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "request_id",
+            "job_name",
+            "job_uid",
+            "pod_name",
+            "pod_uid",
+            "node_name",
+            "instance_id",
+            "instance_type",
+            "capacity",
+            "attempt",
+            "restart_count"
+          ],
+          "properties": {
+            "request_id": {"type": "string", "minLength": 1},
+            "job_name": {"type": "string", "minLength": 1},
+            "job_uid": {"type": ["string", "null"]},
+            "pod_name": {"type": ["string", "null"]},
+            "pod_uid": {"type": ["string", "null"]},
+            "node_name": {"type": ["string", "null"]},
+            "instance_id": {"type": ["string", "null"]},
+            "instance_type": {"enum": ["c8a.2xlarge", null]},
+            "capacity": {"enum": ["spot", null]},
+            "attempt": {"type": "integer", "minimum": 0, "maximum": 1},
+            "restart_count": {"const": 0}
+          }
+        },
+        "request": {"$ref": "#/$defs/frozen_request"},
+        "terminal": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["classification", "reason", "exit_code", "started", "finished"],
+          "properties": {
+            "classification": {
+              "enum": [
+                "scientific_complete",
+                "scientific_censored",
+                "infrastructure_blocked",
+                "identity_or_correctness_invalid"
+              ]
+            },
+            "reason": {"type": "string", "minLength": 1},
+            "exit_code": {"type": ["integer", "null"]},
+            "started": {"type": ["string", "null"]},
+            "finished": {"type": "string", "minLength": 1}
+          }
+        },
+        "authentication": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "provider_identity_sha256",
+            "pod_spec_sha256",
+            "lineage_object_sha256",
+            "request_object_sha256",
+            "terminal_object_sha256",
+            "artifact_listing_sha256"
+          ],
+          "properties": {
+            "provider_identity_sha256": {"$ref": "#/$defs/sha256"},
+            "pod_spec_sha256": {"$ref": "#/$defs/sha256"},
+            "lineage_object_sha256": {"$ref": "#/$defs/sha256"},
+            "request_object_sha256": {"$ref": "#/$defs/sha256"},
+            "terminal_object_sha256": {"$ref": "#/$defs/sha256"},
+            "artifact_listing_sha256": {"$ref": "#/$defs/sha256"}
+          }
+        },
+        "artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/artifact"}
+        }
+      }
+    },
+    "attempts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "created",
+        "cell",
+        "final_class",
+        "not_attempted_reason",
+        "frozen_request_sha256",
+        "protocol_sha256",
+        "source_commit",
+        "binary_sha256",
+        "image_digest",
+        "provider_identity_sha256",
+        "attempts"
+      ],
+      "properties": {
+        "schema": {"const": "icb.aimed2lp.attempts/v1"},
+        "created": {"type": "string", "minLength": 1},
+        "cell": {"enum": ["control-n13", "n53", "n61"]},
+        "final_class": {
+          "enum": [
+            "complete",
+            "scientific_censored",
+            "infrastructure_blocked",
+            "not_attempted",
+            "invalid"
+          ]
+        },
+        "not_attempted_reason": {"type": ["string", "null"]},
+        "frozen_request_sha256": {"$ref": "#/$defs/sha256"},
+        "protocol_sha256": {"$ref": "#/$defs/sha256"},
+        "source_commit": {"$ref": "#/$defs/commit"},
+        "binary_sha256": {"$ref": "#/$defs/sha256"},
+        "image_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "provider_identity_sha256": {"$ref": "#/$defs/sha256"},
+        "attempts": {
+          "type": "array",
+          "maxItems": 2,
+          "items": {"$ref": "#/$defs/attempt"}
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"final_class": {"const": "not_attempted"}}},
+          "then": {
+            "properties": {
+              "not_attempted_reason": {"type": "string", "minLength": 1},
+              "attempts": {"maxItems": 0}
+            }
+          },
+          "else": {
+            "properties": {
+              "not_attempted_reason": {"type": "null"},
+              "attempts": {"minItems": 1}
+            }
+          }
+        }
+      ]
+    },
+    "provider_spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "file_sha256",
+        "spec_id",
+        "spec_sha256",
+        "request_template_path",
+        "request_template_sha256",
+        "payload_sha256",
+        "payload_bytes",
+        "argv",
+        "provider_identity_sha256",
+        "pod_spec_sha256",
+        "durable_prefix",
+        "first_reference",
+        "first_control",
+        "aa_denominator",
+        "aa_numerator",
+        "aa_selection",
+        "scheduled_aa_pairs",
+        "measured_rows",
+        "rounds",
+        "warmup",
+        "targets",
+        "child_timeout_seconds",
+        "isolation_required"
+      ],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "file_sha256": {"$ref": "#/$defs/sha256"},
+        "spec_id": {"type": "string", "pattern": "^ECS1h[0-9a-f]{12}$"},
+        "spec_sha256": {"$ref": "#/$defs/sha256"},
+        "request_template_path": {"type": "string", "minLength": 1},
+        "request_template_sha256": {"$ref": "#/$defs/sha256"},
+        "payload_sha256": {"$ref": "#/$defs/sha256"},
+        "payload_bytes": {"type": "integer", "minimum": 1},
+        "argv": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "provider_identity_sha256": {"$ref": "#/$defs/sha256"},
+        "pod_spec_sha256": {"$ref": "#/$defs/sha256"},
+        "durable_prefix": {
+          "type": "string",
+          "pattern": "^s3://setec-astronomy-artifacts/ecbench/icb-aimed-large-prime-n53-n61-20261101/(control-n13|n53|n61)/$"
+        },
+        "first_reference": {"type": "string", "minLength": 1},
+        "first_control": {"type": "string", "minLength": 1},
+        "aa_denominator": {"const": "aimed"},
+        "aa_numerator": {"const": "aimed-aa"},
+        "aa_selection": {"type": "string", "minLength": 1},
+        "scheduled_aa_pairs": {"type": "integer", "minimum": 5},
+        "measured_rows": {"type": "integer", "minimum": 1},
+        "rounds": {"type": "integer", "minimum": 5},
+        "warmup": {"type": "integer", "minimum": 1},
+        "targets": {"type": "integer", "minimum": 1},
+        "child_timeout_seconds": {"type": "integer", "minimum": 1, "maximum": 3600},
+        "isolation_required": {"const": "L2"}
+      }
+    },
+    "provider_preflight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "created",
+        "status",
+        "source_sha256",
+        "binary_sha256",
+        "wrapper",
+        "compare_implementation",
+        "request",
+        "specs",
+        "gate"
+      ],
+      "properties": {
+        "schema": {"const": "icb.aimed2lp.provider_preflight/v1"},
+        "created": {"type": "string", "minLength": 1},
+        "status": {"const": "pass"},
+        "source_sha256": {"$ref": "#/$defs/sha256"},
+        "binary_sha256": {"$ref": "#/$defs/sha256"},
+        "wrapper": {"$ref": "#/$defs/source_binding"},
+        "compare_implementation": {"$ref": "#/$defs/source_binding"},
+        "request": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "instance_type",
+            "capacity",
+            "node_selector",
+            "exclusive_vcpus",
+            "cpu_request",
+            "cpu_limit",
+            "memory",
+            "memory_bytes",
+            "memory_request",
+            "memory_limit",
+            "restart_policy",
+            "child_timeout_max_seconds",
+            "outer_job_deadline_seconds",
+            "estimated_session_seconds",
+            "artifact_upload_grace_seconds",
+            "provider_retries",
+            "scientific_retries",
+            "infrastructure_attempts_max"
+          ],
+          "properties": {
+            "instance_type": {"const": "c8a.2xlarge"},
+            "capacity": {"const": "spot"},
+            "node_selector": {"$ref": "#/$defs/node_selector"},
+            "exclusive_vcpus": {"const": 4},
+            "cpu_request": {"const": "4"},
+            "cpu_limit": {"const": "4"},
+            "memory": {"const": "8Gi"},
+            "memory_bytes": {"const": 8589934592},
+            "memory_request": {"const": "8Gi"},
+            "memory_limit": {"const": "8Gi"},
+            "restart_policy": {"const": "Never"},
+            "child_timeout_max_seconds": {"const": 3600},
+            "outer_job_deadline_seconds": {"const": 7800},
+            "estimated_session_seconds": {"const": 6600},
+            "artifact_upload_grace_seconds": {"const": 1200},
+            "provider_retries": {"const": 0},
+            "scientific_retries": {"const": 0},
+            "infrastructure_attempts_max": {"const": 2}
+          }
+        },
+        "specs": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {"$ref": "#/$defs/provider_spec"}
+        },
+        "gate": {"type": "string", "minLength": 1}
+      }
+    },
+    "native_analyzer_tests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "created",
+        "status",
+        "source_sha256",
+        "binary_sha256",
+        "analysis_manifest_sha256",
+        "result_schema_sha256",
+        "receipt_schema_sha256",
+        "request_schema_sha256",
+        "command",
+        "checks"
+      ],
+      "properties": {
+        "schema": {"const": "icb.aimed2lp.native_analyzer_tests/v1"},
+        "created": {"type": "string", "minLength": 1},
+        "status": {"const": "pass"},
+        "source_sha256": {"$ref": "#/$defs/sha256"},
+        "binary_sha256": {"$ref": "#/$defs/sha256"},
+        "analysis_manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "result_schema_sha256": {"$ref": "#/$defs/sha256"},
+        "receipt_schema_sha256": {"$ref": "#/$defs/sha256"},
+        "request_schema_sha256": {"$ref": "#/$defs/sha256"},
+        "command": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "checks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "outcome"],
+            "properties": {
+              "id": {"type": "string", "minLength": 1},
+              "outcome": {"const": "pass"}
+            }
+          }
+        }
+      }
+    },
+    "checkpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "created",
+        "status",
+        "source_commit",
+        "protocol_sha256",
+        "filed_before_affected_data",
+        "resume_sha256",
+        "focused_gate_receipt_sha256",
+        "analysis_manifest_sha256",
+        "result_schema_sha256",
+        "receipt_schema_sha256",
+        "request_schema_sha256",
+        "request_templates",
+        "native_analyzer_source_sha256",
+        "native_analyzer_binary_sha256",
+        "native_provider_preflight_source_sha256",
+        "native_provider_preflight_binary_sha256",
+        "provider_preflight_receipt_sha256",
+        "target_rows"
+      ],
+      "properties": {
+        "schema": {"const": "icb.aimed2lp.checkpoint/v1"},
+        "created": {"type": "string", "minLength": 1},
+        "status": {"const": "pass"},
+        "source_commit": {"$ref": "#/$defs/commit"},
+        "protocol_sha256": {"$ref": "#/$defs/sha256"},
+        "filed_before_affected_data": {"const": true},
+        "resume_sha256": {"$ref": "#/$defs/sha256"},
+        "focused_gate_receipt_sha256": {"$ref": "#/$defs/sha256"},
+        "analysis_manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "result_schema_sha256": {"$ref": "#/$defs/sha256"},
+        "receipt_schema_sha256": {"$ref": "#/$defs/sha256"},
+        "request_schema_sha256": {"$ref": "#/$defs/sha256"},
+        "request_templates": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["control-n13", "n53", "n61"],
+          "properties": {
+            "control-n13": {"$ref": "#/$defs/sha256"},
+            "n53": {"$ref": "#/$defs/sha256"},
+            "n61": {"$ref": "#/$defs/sha256"}
+          }
+        },
+        "native_analyzer_source_sha256": {"$ref": "#/$defs/sha256"},
+        "native_analyzer_binary_sha256": {"$ref": "#/$defs/sha256"},
+        "native_provider_preflight_source_sha256": {"$ref": "#/$defs/sha256"},
+        "native_provider_preflight_binary_sha256": {"$ref": "#/$defs/sha256"},
+        "provider_preflight_receipt_sha256": {"$ref": "#/$defs/sha256"},
+        "target_rows": {"const": 0}
+      }
+    }
+  },
+  "oneOf": [
+    {"$ref": "#/$defs/image"},
+    {"$ref": "#/$defs/control"},
+    {"$ref": "#/$defs/attempts"},
+    {"$ref": "#/$defs/provider_preflight"},
+    {"$ref": "#/$defs/native_analyzer_tests"},
+    {"$ref": "#/$defs/checkpoint"}
+  ]
+}

@@ -1856,7 +1856,7 @@ fn verify_protocol(plan: &DatasetPlan, bytes: &[u8]) -> Result<(), String> {
 
 /// Match the pinned official checker's duplicate-key rejection while preserving
 /// arbitrary-sized JSON integers. RawValue avoids converting integers to f64.
-fn protocol_unique_json(text: &str, depth: usize) -> Result<Value, String> {
+pub fn protocol_unique_json(text: &str, depth: usize) -> Result<Value, String> {
     if depth > 128 {
         return Err("protocol JSON nesting exceeds 128 levels".into());
     }
@@ -1988,7 +1988,7 @@ fn protocol_float(value: f64) -> Result<String, String> {
 /// crypto-autoresearcher commit 37e193bf: sorted keys, UTF-8, no whitespace,
 /// finite JSON numbers, and the entire top-level freeze block excluded by the
 /// caller. Full schema/semantic validation remains the official checker's job.
-fn protocol_canonical_bytes(value: &Value) -> Result<Vec<u8>, String> {
+pub fn protocol_canonical_bytes(value: &Value) -> Result<Vec<u8>, String> {
     fn append(value: &Value, out: &mut Vec<u8>) -> Result<(), String> {
         match value {
             Value::Null => out.extend_from_slice(b"null"),

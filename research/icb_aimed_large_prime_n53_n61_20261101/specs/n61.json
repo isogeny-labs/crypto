@@ -1,0 +1,84 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "prospective aimed m=3 double-large-prime Koblitz experiment, n=61",
+  "description": "research/icb_aimed_large_prime_n53_n61_20261101/PROTOCOL.md; whole-cold rule-v8 pipeline, paired public targets",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 61
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 2026110161,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-v2",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong_v2"
+      }
+    },
+    {
+      "name": "aimed",
+      "role": "baseline",
+      "method": {
+        "id": "ic.koblitz_descent"
+      }
+    },
+    {
+      "name": "aimed-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.koblitz_descent"
+      }
+    },
+    {
+      "name": "aimed-lp0",
+      "role": "control",
+      "method": {
+        "id": "ic.koblitz_descent_lp_v1",
+        "params": {
+          "large_primes": "0",
+          "lp_domain_factor": "1",
+          "lp_raw_x_cap": "400000000"
+        }
+      }
+    },
+    {
+      "name": "aimed-lp2-c05",
+      "role": "candidate",
+      "method": {
+        "id": "ic.koblitz_descent_lp_v1",
+        "params": {
+          "large_primes": "2",
+          "lp_domain_factor": "0.5",
+          "lp_raw_x_cap": "400000000"
+        }
+      }
+    },
+    {
+      "name": "aimed-lp2-c1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.koblitz_descent_lp_v1",
+        "params": {
+          "large_primes": "2",
+          "lp_domain_factor": "1",
+          "lp_raw_x_cap": "400000000"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 5,
+    "warmup": 1,
+    "order": "shuffle",
+    "seed": 20261101,
+    "isolation_required": "L2",
+    "timeout_seconds": 3600
+  }
+}

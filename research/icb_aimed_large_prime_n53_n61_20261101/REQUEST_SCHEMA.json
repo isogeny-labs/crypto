@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "icb.aimed2lp.request/v1",
+  "title": "Prospective isolab request for the aimed 2LP study",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "cell",
+    "provider_tool",
+    "job_name",
+    "spec_path",
+    "spec_file_sha256",
+    "source_revision",
+    "image_uri",
+    "image_digest",
+    "ecbench_sha256",
+    "argv",
+    "payload_sha256",
+    "payload_bytes",
+    "provider_identity_sha256",
+    "pod_spec_sha256",
+    "instance_type",
+    "capacity",
+    "node_selector",
+    "exclusive_vcpus",
+    "cpu_request",
+    "cpu_limit",
+    "memory",
+    "memory_bytes",
+    "memory_request",
+    "memory_limit",
+    "restart_policy",
+    "child_timeout_seconds",
+    "outer_deadline_seconds",
+    "durable_prefix",
+    "provider_retries",
+    "scientific_retries",
+    "infrastructure_attempts_max",
+    "retain_failed_artifacts"
+  ],
+  "$defs": {
+    "sha256_or_null": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "node_selector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node.kubernetes.io/instance-type",
+        "eks.amazonaws.com/capacityType"
+      ],
+      "properties": {
+        "node.kubernetes.io/instance-type": {"const": "c8a.2xlarge"},
+        "eks.amazonaws.com/capacityType": {"const": "SPOT"}
+      }
+    }
+  },
+  "properties": {
+    "schema": {"const": "icb.aimed2lp.request/v1"},
+    "status": {"enum": ["draft_identity_blocked", "frozen"]},
+    "cell": {"enum": ["control-n13", "n53", "n61"]},
+    "provider_tool": {"const": "isolab_k8s_benchmark"},
+    "job_name": {
+      "type": "string",
+      "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$",
+      "maxLength": 55
+    },
+    "spec_path": {
+      "type": "string",
+      "pattern": "^research/icb_aimed_large_prime_n53_n61_20261101/specs/(control-n13|n53|n61)\\.json$"
+    },
+    "spec_file_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "source_revision": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "image_uri": {"type": ["string", "null"]},
+    "image_digest": {
+      "type": ["string", "null"],
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "ecbench_sha256": {"$ref": "#/$defs/sha256_or_null"},
+    "argv": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        }
+      ]
+    },
+    "payload_sha256": {"$ref": "#/$defs/sha256_or_null"},
+    "payload_bytes": {"type": ["integer", "null"], "minimum": 1},
+    "provider_identity_sha256": {"$ref": "#/$defs/sha256_or_null"},
+    "pod_spec_sha256": {"$ref": "#/$defs/sha256_or_null"},
+    "instance_type": {"const": "c8a.2xlarge"},
+    "capacity": {"const": "spot"},
+    "node_selector": {"$ref": "#/$defs/node_selector"},
+    "exclusive_vcpus": {"const": 4},
+    "cpu_request": {"const": "4"},
+    "cpu_limit": {"const": "4"},
+    "memory": {"const": "8Gi"},
+    "memory_bytes": {"const": 8589934592},
+    "memory_request": {"const": "8Gi"},
+    "memory_limit": {"const": "8Gi"},
+    "restart_policy": {"const": "Never"},
+    "child_timeout_seconds": {"enum": [600, 3600]},
+    "outer_deadline_seconds": {"const": 7800},
+    "durable_prefix": {
+      "type": "string",
+      "pattern": "^s3://setec-astronomy-artifacts/ecbench/icb-aimed-large-prime-n53-n61-20261101/(control-n13|n53|n61)/$"
+    },
+    "provider_retries": {"const": 0},
+    "scientific_retries": {"const": 0},
+    "infrastructure_attempts_max": {"const": 2},
+    "retain_failed_artifacts": {"const": true}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "frozen"}}},
+      "then": {
+        "properties": {
+          "source_revision": {"type": "string"},
+          "image_uri": {
+            "type": "string",
+            "pattern": "@sha256:[0-9a-f]{64}$"
+          },
+          "image_digest": {"type": "string"},
+          "ecbench_sha256": {"type": "string"},
+          "argv": {"type": "array"},
+          "payload_sha256": {"type": "string"},
+          "payload_bytes": {"type": "integer"},
+          "provider_identity_sha256": {"type": "string"},
+          "pod_spec_sha256": {"type": "string"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"cell": {"const": "control-n13"}}},
+      "then": {
+        "properties": {
+          "child_timeout_seconds": {"const": 600},
+          "durable_prefix": {
+            "const": "s3://setec-astronomy-artifacts/ecbench/icb-aimed-large-prime-n53-n61-20261101/control-n13/"
+          }
+        }
+      },
+      "else": {"properties": {"child_timeout_seconds": {"const": 3600}}}
+    },
+    {
+      "if": {"properties": {"cell": {"const": "n53"}}},
+      "then": {
+        "properties": {
+          "durable_prefix": {
+            "const": "s3://setec-astronomy-artifacts/ecbench/icb-aimed-large-prime-n53-n61-20261101/n53/"
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"cell": {"const": "n61"}}},
+      "then": {
+        "properties": {
+          "durable_prefix": {
+            "const": "s3://setec-astronomy-artifacts/ecbench/icb-aimed-large-prime-n53-n61-20261101/n61/"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1135,6 +1135,14 @@ pub fn registry() -> &'static [MethodDecl] {
             applies: Applies::KoblitzOnly,
             params: KOBLITZ_DESCENT_PARAMS,
         },
+        MethodDecl {
+            id: "ic.koblitz_descent_lp_v1",
+            family: "ic",
+            summary: "versioned prospective extension of ic.koblitz_descent: the same subgroup-orbit base, aimed m=3 walked probe/window and m=2 descent, through a versioned Frobenius-table adapter whose ordinary-hit opportunities are parity-gated, with exact one-/two-large-prime partial elimination feeding independently replayed projected sparse rows; the measured treatment is this complete adapter composition and large_primes=0 is the frozen implementation control",
+            entry: "ecbench::koblitz_descent::run_aimed_large_prime",
+            applies: Applies::KoblitzOnly,
+            params: KOBLITZ_DESCENT_LP_PARAMS,
+        },
         // ── `_v2`: the same algorithms under the accounting rules of README
         // §7 "Accounting v2".  The ids above keep the counts they were
         // recorded with; these are the ones to read new work against.
@@ -1283,6 +1291,76 @@ const KOBLITZ_DESCENT_PARAMS: &[ParamDecl] = &[
         name: "seed",
         default: Some("rule_v8"),
         help: "seed of the factor base, the probes and the descent walks (`run`: the run's algorithm seed)",
+    },
+];
+
+/// A new identity because the large-prime graph, row shape and native-work
+/// counters are not part of the frozen `ic.koblitz_descent` contract.
+const KOBLITZ_DESCENT_LP_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "summands",
+        default: Some("3"),
+        help: "collection summands; the aimed window needs 3",
+    },
+    ParamDecl {
+        name: "descent_summands",
+        default: Some("rule_v8"),
+        help: "summands the walked descent asks for",
+    },
+    ParamDecl {
+        name: "collection_aim",
+        default: Some("true"),
+        help: "aim each unit at the least-represented projected columns",
+    },
+    ParamDecl {
+        name: "collection_window",
+        default: Some("rule_v8"),
+        help: "factor-base third summands each m=3 probe scans",
+    },
+    ParamDecl {
+        name: "factor_base_points",
+        default: Some("rule_v8"),
+        help: "points of the subgroup-orbit factor base",
+    },
+    ParamDecl {
+        name: "unit_trials",
+        default: Some("rule_v8"),
+        help: "walked probes per collection work unit",
+    },
+    ParamDecl {
+        name: "units",
+        default: Some("rule_v8"),
+        help: "units collected before the first solve",
+    },
+    ParamDecl {
+        name: "max_units",
+        default: Some("100000"),
+        help: "units the extension may reach before failure",
+    },
+    ParamDecl {
+        name: "max_trials",
+        default: Some("rule_v8"),
+        help: "descent probe cap",
+    },
+    ParamDecl {
+        name: "seed",
+        default: Some("rule_v8"),
+        help: "seed of the base, probe sequence and descent",
+    },
+    ParamDecl {
+        name: "large_primes",
+        default: Some("2"),
+        help: "0 exact frozen control, 1 single-large-prime, 2 double-large-prime",
+    },
+    ParamDecl {
+        name: "lp_domain_factor",
+        default: Some("1"),
+        help: "large-prime signed-point domain divided by the Table A factor-base size",
+    },
+    ParamDecl {
+        name: "lp_raw_x_cap",
+        default: Some("400000000"),
+        help: "inclusive public raw-x cap for the disjoint large-prime domain scan",
     },
 ];
 
@@ -2469,9 +2547,13 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
             "`{id}` runs on prime-field curves only; {} is {}",
             curve.slug, curve.family
         )),
-        Instance::Binary(i) if id == "ic.koblitz_descent" => koblitz_descent_applicable(m, i),
-        _ if id == "ic.koblitz_descent" => Err(format!(
-            "`ic.koblitz_descent` runs on one-word Koblitz curves only; {} is {}",
+        Instance::Binary(i)
+            if id == "ic.koblitz_descent" || id == "ic.koblitz_descent_lp_v1" =>
+        {
+            koblitz_descent_applicable(m, i)
+        }
+        _ if id == "ic.koblitz_descent" || id == "ic.koblitz_descent_lp_v1" => Err(format!(
+            "`{id}` runs on one-word Koblitz curves only; {} is {}",
             curve.slug, curve.family
         )),
         _ => Ok(()),
@@ -2514,14 +2596,19 @@ fn koblitz_descent_applicable(m: &ResolvedMethod, i: &BinaryInstance) -> Result<
     let kc = i
         .koblitz
         .as_ref()
-        .ok_or("`ic.koblitz_descent` needs a Koblitz instance")?;
+        .ok_or_else(|| format!("`{}` needs a Koblitz instance", m.id))?;
     if kc.n.is_multiple_of(2) || kc.n >= 64 || kc.subgroup_order.bits() > 64 {
         return Err(format!(
-            "`ic.koblitz_descent` needs odd n < 64 and a subgroup order of at most 64 bits; n = {}",
+            "`{}` needs odd n < 64 and a subgroup order of at most 64 bits; n = {}",
+            m.id,
             kc.n
         ));
     }
-    KoblitzDescentParams::from_method(&m.params, kc.n, kc.a, 0).map(|_| ())
+    KoblitzDescentParams::from_method(&m.params, kc.n, kc.a, 0)?;
+    if m.id == "ic.koblitz_descent_lp_v1" {
+        koblitz_descent::AimedLargePrimeParams::from_method(&m.params)?;
+    }
+    Ok(())
 }
 
 /// The refusal of a [`Applies::PrimeOnly`] method on any other instance.
@@ -2765,6 +2852,9 @@ fn solve_inner(
         }
         (Instance::Binary(i), _) if m.id == "ic.koblitz_descent" => {
             solve_koblitz_descent(m, i, curve, FastPoint::affine(tx, ty), seed)
+        }
+        (Instance::Binary(i), _) if m.id == "ic.koblitz_descent_lp_v1" => {
+            solve_koblitz_descent_lp(m, i, curve, FastPoint::affine(tx, ty), seed)
         }
         (Instance::Prime(i), _)
             if matches!(
@@ -6465,6 +6555,250 @@ fn solve_koblitz_descent(
     })
 }
 
+/// Prospective aimed one-/two-large-prime extension.  This is deliberately a
+/// separate method id: its Frobenius-table adapter, merged sparse rows and
+/// graph counters were never part of the frozen `ic.koblitz_descent` replay
+/// contract.  The prospective treatment is the complete adapter composition;
+/// a focused gate separately requires parity of its ordinary m=3 hit
+/// opportunities with the frozen collector.
+fn solve_koblitz_descent_lp(
+    m: &ResolvedMethod,
+    inst: &BinaryInstance,
+    curve: &CurveFacts,
+    target: FastPoint,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    koblitz_descent_applicable(m, inst)?;
+    let kc = inst.koblitz.as_ref().ok_or("not a Koblitz instance")?;
+    let lp = koblitz_descent::AimedLargePrimeParams::from_method(&m.params)?;
+    // The zero arm is the frozen SolveReport path itself, not merely the
+    // same mathematical pipeline wrapped in a new report shape.  This keeps
+    // counters, unpriced names, detail and serialization identical (clocks
+    // aside) and makes the control useful at the runner/replay boundary.
+    if lp.large_primes == 0 {
+        return solve_koblitz_descent(m, inst, curve, target, seed);
+    }
+    let p = KoblitzDescentParams::from_method(&m.params, kc.n, kc.a, seed)?;
+    let q = inst.fast.lower(target);
+    let started = Instant::now();
+    let out = koblitz_descent::run_aimed_large_prime(inst, &q, &p, &lp)?;
+    let wall = started.elapsed().as_nanos() as u64;
+    let base = &out.base;
+    if !base.single_thread {
+        return Err("ic.koblitz_descent_lp_v1 did not run on its one counting thread".into());
+    }
+    let phases: Vec<PhaseRecord> = base
+        .phases
+        .iter()
+        .map(|phase| {
+            let mut native = koblitz_descent::native_of(&phase.ops);
+            let extra = match phase.name.as_str() {
+                "oracle_setup" => Some(&out.large_prime.setup),
+                "relations" => Some(&out.large_prime.relations),
+                _ => None,
+            };
+            if let Some(extra) = extra {
+                for (name, value) in extra {
+                    // These are observations of work already owned by the
+                    // thread-local phase ledger.  Keep them in `detail`, but
+                    // do not expose a second phase-native unit under an LP
+                    // name (which would double canonicalisations, coordinate
+                    // Frobenius maps, additions, or scalar multiplications).
+                    if name.contains("canonicalisations")
+                        || name.contains("frobenius_maps")
+                        || name == "lp_table_adds"
+                        || name == "lp_verification_scalar_mults"
+                    {
+                        continue;
+                    }
+                    *native.entry(name.clone()).or_insert(0) += value;
+                }
+            }
+            if phase.name == "relations" {
+                // Hash lookups have no thread-local owner; canonicalisations
+                // and Frobenius coordinate maps do and therefore stay out of
+                // this explicit phase-native overlay.
+                for (name, value) in
+                    [("lp_oracle_lookups", out.large_prime.oracle_lookups)]
+                {
+                    if value > 0 {
+                        *native.entry(name.into()).or_insert(0) += value;
+                    }
+                }
+            }
+            PhaseRecord {
+                name: phase.name.clone(),
+                adds: phase.ops.adds,
+                doubles: phase.ops.doubles,
+                scalar_mults: phase.ops.scalar_mults,
+                gae: phase.ops.gae(),
+                wall_ns: Some(phase.wall_ns),
+                native,
+                work_native: BTreeMap::new(),
+            }
+        })
+        .collect();
+    let total_gae: f64 = phases.iter().map(|phase| phase.gae).sum();
+    let c = &base.counts;
+    let mut counters: BTreeMap<String, u64> = [
+        ("fb_points", c.fb_points as u64),
+        ("fb_signed_orbits", c.fb_signed_orbits as u64),
+        ("columns", c.columns as u64),
+        ("pair_table_entries", c.pair_table_entries as u64),
+        ("collection_units", c.units as u64),
+        ("collection_units_extended", c.units_extended as u64),
+        ("collection_trials", c.trials),
+        ("summands_scanned", c.summands_scanned),
+        ("relations_collected", c.relations_collected as u64),
+        ("relations_accepted", c.relations_accepted as u64),
+        ("relations_rejected", c.relations_rejected as u64),
+        ("relations_duplicate", c.relations_duplicate as u64),
+        ("solve_attempts", c.solve_attempts as u64),
+        ("descent_trials", c.descent_trials as u64),
+        ("large_primes", u64::from(lp.large_primes)),
+        (
+            "lp_ordinary_relations",
+            out.large_prime.ordinary_relations as u64,
+        ),
+        (
+            "lp_projected_relations",
+            out.large_prime.projected_relations as u64,
+        ),
+    ]
+    .into_iter()
+    .map(|(name, value)| (name.to_string(), value))
+    .collect();
+    for (name, value) in &out.large_prime.setup {
+        counters.insert(format!("aimed_{name}"), *value);
+    }
+    for (name, value) in &out.large_prime.relations {
+        counters.insert(format!("aimed_{name}"), *value);
+    }
+    let mut native = OpCounts::default();
+    for phase in &base.phases {
+        native.merge(&phase.ops);
+    }
+    let la_row_ops = c.sparse.as_ref().map_or(0, |report| report.row_ops);
+    for (name, value) in [
+        ("canonicalisations_uncharged", native.canonicalisations),
+        ("pair_filter_probes_uncharged", native.filter_probes),
+        ("pair_bucket_reads_uncharged", native.bucket_reads),
+        ("frobenius_maps_uncharged", native.frobenius_maps),
+        ("la_row_ops_uncharged", la_row_ops),
+        (
+            "fb_abscissae_lifted_uncharged",
+            c.selection.abscissae_drawn,
+        ),
+        (
+            "fb_rebuilds_uncharged",
+            u64::from(c.selection.rebuilds),
+        ),
+        (
+            "lp_domain_scan_abscissae_uncharged",
+            out.large_prime
+                .setup
+                .get("lp_domain_scan_abscissae_uncharged")
+                .copied()
+                .unwrap_or(0),
+        ),
+        (
+            "lp_domain_scan_lifts_uncharged",
+            out.large_prime
+                .setup
+                .get("lp_domain_scan_lifts_uncharged")
+                .copied()
+                .unwrap_or(0),
+        ),
+        (
+            "lp_table_lookups_uncharged",
+            out.large_prime
+                .setup
+                .get("lp_table_lookups")
+                .copied()
+                .unwrap_or(0),
+        ),
+        (
+            "lp_small_table_lookups_uncharged",
+            out.large_prime.setup.get("lookups").copied().unwrap_or(0),
+        ),
+        ("lp_oracle_lookups_uncharged", out.large_prime.oracle_lookups),
+        (
+            "lp_pivot_reductions_uncharged",
+            out.large_prime
+                .relations
+                .get("lp_pivot_reductions")
+                .copied()
+                .unwrap_or(0),
+        ),
+        (
+            "lp_partials_fed_uncharged",
+            out.large_prime
+                .relations
+                .get("lp_partials_fed")
+                .copied()
+                .unwrap_or(0),
+        ),
+        (
+            "lp_merge_sources_uncharged",
+            out.large_prime
+                .relations
+                .get("lp_merge_sources_total")
+                .copied()
+                .unwrap_or(0),
+        ),
+    ] {
+        counters.insert(name.into(), value);
+    }
+    let mut unpriced = unpriced_of(&counters);
+    unpriced.extend([
+        "field_arithmetic_uncharged".into(),
+        "hash_and_allocation_uncharged".into(),
+        "modular_combination_uncharged".into(),
+        "vector_declined_lanes_uncharged".into(),
+    ]);
+    unpriced.sort();
+    unpriced.dedup();
+    let facts = koblitz_descent::factor_base_facts(
+        &curve.slug,
+        kc,
+        &base.factor_base,
+        c.fb_signed_orbits,
+        p.factor_base_points,
+        p.seed,
+    )?;
+    let online = match &base.snapshot {
+        Ok(snapshot) => koblitz_descent_lp_online(snapshot),
+        Err(_) => None,
+    };
+    let online_error = match (&base.snapshot, &online) {
+        (Err(error), _) => Some(error.clone()),
+        (Ok(_), None) => Some("the descent's online interval did not close".into()),
+        _ => None,
+    };
+    Ok(SolveReport {
+        recovered: base
+            .recovered
+            .as_ref()
+            .and_then(ToPrimitive::to_u64)
+            .map(u128::from),
+        exhausted: base.recovered.is_none(),
+        phases,
+        total_gae,
+        automorphisms_used: 2 * inst.n,
+        counters,
+        unpriced,
+        deterministic: true,
+        nondeterminism: Vec::new(),
+        solve_wall_ns: wall,
+        factor_base: Some(facts),
+        detail: koblitz_descent::detail_of_aimed(&out, &p, &lp),
+        online,
+        online_error,
+        solver: None,
+        field_ops: None,
+    })
+}
+
 /// The descent's online window from the session the pipeline ran under:
 /// the five claim phases, which sum to the interval.
 fn koblitz_descent_online(snap: &Snapshot) -> Option<OnlineWindow> {
@@ -6473,6 +6807,14 @@ fn koblitz_descent_online(snap: &Snapshot) -> Option<OnlineWindow> {
     w.stop_event = "[d]G = Q checked inside the descent (one-word arithmetic)".into();
     w.mapping = "one-target descent over a solved log table: building the walks and stepping them by G is target_query, keying each state and probing the pair table is target_PDP, the witness re-check is target_relation_check, combining the column logs into d is target_descent, and the descent's [d]G = Q is target_recovery_check; the relations and logs are target-independent set-up outside the window".into();
     (w.phases_ns.values().sum::<u64>() == w.wall_ns).then_some(w)
+}
+
+fn koblitz_descent_lp_online(snap: &Snapshot) -> Option<OnlineWindow> {
+    let mut window = online_window("ic", "ic.koblitz_descent_lp_v1", snap)?;
+    window.start_event = "the descent's first target-dependent operation ([a0]G + [b]Q), after the factor base, ordinary and large-prime pair tables, graph elimination and every column log are ready".into();
+    window.stop_event = "[d]G = Q checked inside the descent (one-word arithmetic)".into();
+    window.mapping = "the candidate changes target-independent relation collection only; its one-target descent and five exclusive online phases are the frozen ic.koblitz_descent path over the solved log table".into();
+    (window.phases_ns.values().sum::<u64>() == window.wall_ns).then_some(window)
 }
 
 #[cfg(test)]
@@ -7664,6 +8006,134 @@ mod accounting_rules_tests {
         assert_eq!(sum, rep.total_gae, "{id}: phases {:?}", rep.phases);
     }
 
+    fn without_clocks(value: &mut Value) {
+        match value {
+            Value::Object(fields) => {
+                for key in ["solve_wall_ns", "wall_ns", "phases_ns"] {
+                    fields.remove(key);
+                }
+                for child in fields.values_mut() {
+                    without_clocks(child);
+                }
+            }
+            Value::Array(items) => {
+                for child in items {
+                    without_clocks(child);
+                }
+            }
+            _ => {}
+        }
+    }
+
+    #[test]
+    fn aimed_lp_report_control_and_native_ownership_are_exact() {
+        let (inst, facts) = built(&CurveSpec::Koblitz { a: 0, n: 13 });
+        let common = [
+            ("summands", "3"),
+            ("descent_summands", "2"),
+            ("collection_aim", "true"),
+            ("collection_window", "16"),
+            ("factor_base_points", "80"),
+            ("unit_trials", "32"),
+            ("units", "1"),
+            ("max_units", "10000"),
+            ("max_trials", "10000000"),
+            ("seed", "11"),
+        ];
+        let baseline = run(
+            &method("ic.koblitz_descent", &common),
+            &inst,
+            &facts,
+            777,
+            11,
+        );
+        let mut zero_params = common.to_vec();
+        zero_params.extend([
+            ("large_primes", "0"),
+            ("lp_domain_factor", "1"),
+            ("lp_raw_x_cap", "8192"),
+        ]);
+        let zero = run(
+            &method("ic.koblitz_descent_lp_v1", &zero_params),
+            &inst,
+            &facts,
+            777,
+            11,
+        );
+        assert_eq!(zero.counters, baseline.counters);
+        assert_eq!(zero.unpriced, baseline.unpriced);
+        let mut baseline_json = serde_json::to_value(&baseline).unwrap();
+        let mut zero_json = serde_json::to_value(&zero).unwrap();
+        without_clocks(&mut baseline_json);
+        without_clocks(&mut zero_json);
+        assert_eq!(zero_json, baseline_json, "LP=0 is the frozen report path");
+
+        let mut two_params = common.to_vec();
+        two_params.extend([
+            ("large_primes", "2"),
+            ("lp_domain_factor", "3"),
+            ("lp_raw_x_cap", "8192"),
+        ]);
+        let two = run(
+            &method("ic.koblitz_descent_lp_v1", &two_params),
+            &inst,
+            &facts,
+            777,
+            11,
+        );
+        assert_eq!(two.recovered, Some(777));
+        for unit in &two.unpriced {
+            assert!(
+                !(unit.starts_with("lp_")
+                    && (unit.contains("canonicalisations")
+                        || unit.contains("frobenius_maps"))),
+                "{unit} duplicates a thread-local native unit"
+            );
+        }
+        for phase in &two.phases {
+            assert!(phase.native.keys().all(|name| {
+                !(name.starts_with("lp_")
+                    && (name.contains("canonicalisations")
+                        || name.contains("frobenius_maps")))
+            }));
+        }
+        for (counter, native) in [
+            ("canonicalisations_uncharged", "canonicalisations"),
+            ("frobenius_maps_uncharged", "frobenius_maps"),
+        ] {
+            let phase_total: u64 = two
+                .phases
+                .iter()
+                .map(|phase| phase.native.get(native).copied().unwrap_or(0))
+                .sum();
+            assert_eq!(two.counters.get(counter).copied(), Some(phase_total));
+        }
+        let setup = two
+            .phases
+            .iter()
+            .find(|phase| phase.name == "oracle_setup")
+            .unwrap();
+        let relations = two
+            .phases
+            .iter()
+            .find(|phase| phase.name == "relations")
+            .unwrap();
+        let detail = &two.detail["large_prime"];
+        let wrapper_setup = detail["wrapper_scalar_mults_setup"].as_u64().unwrap();
+        let wrapper_relations = detail["wrapper_scalar_mults_relations"].as_u64().unwrap();
+        assert_eq!(setup.scalar_mults, wrapper_setup);
+        assert_eq!(
+            two.counters
+                .get("aimed_lp_verification_scalar_mults")
+                .copied(),
+            Some(wrapper_relations)
+        );
+        assert!(relations.scalar_mults >= wrapper_relations);
+        assert!(two.counters["lp_small_table_lookups_uncharged"] > 0);
+        assert!(two.counters["lp_table_lookups_uncharged"] > 0);
+        assert!(two.counters["lp_oracle_lookups_uncharged"] > 0);
+    }
+
     #[test]
     fn the_floor_counts_the_automorphisms_a_curve_has() {
         let (_, f0) = built(&j0());
@@ -8492,6 +8962,7 @@ mod accounting_rules_tests {
             "ic.hyperelliptic_thread", // hyper_ic tests
             "ic.known_log_mitm2_v1",
             "ic.koblitz_descent", // koblitz_descent tests
+            "ic.koblitz_descent_lp_v1", // versioned aimed-LP tests
             "ic.pipeline_wordram",
             "ic.trace_line_2lp",
             "rho.best2_model_v1", // best2_model tests

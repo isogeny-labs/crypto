@@ -1,0 +1,101 @@
+{
+  "schema": "icb.aimed2lp.analysis_manifest/v1",
+  "protocol": "protocol/protocol.json",
+  "result_schema": "RESULT_SCHEMA.json",
+  "receipt_schema": "RECEIPT_SCHEMA.json",
+  "request_schema": "REQUEST_SCHEMA.json",
+  "focused_gates": "receipts/focused-gates.json",
+  "checkpoint_receipt": "receipts/checkpoint.json",
+  "image_receipt": "receipts/image.json",
+  "provider_preflight": "receipts/provider-preflight.json",
+  "native_analyzer": {
+    "source": "../../examples/ecbench_aimed2lp_analyze.rs",
+    "source_sha256": null,
+    "binary_sha256": null,
+    "self_test_receipt": "receipts/native-analyzer-tests.json"
+  },
+  "native_provider_preflight": {
+    "source": "../../examples/ecbench_aimed2lp_preflight.rs",
+    "source_sha256": null,
+    "binary_sha256": null
+  },
+  "provider_request": {
+    "instance_type": "c8a.2xlarge",
+    "capacity": "spot",
+    "node_selector": {
+      "node.kubernetes.io/instance-type": "c8a.2xlarge",
+      "eks.amazonaws.com/capacityType": "SPOT"
+    },
+    "exclusive_vcpus": 4,
+    "cpu_request": "4",
+    "cpu_limit": "4",
+    "memory": "8Gi",
+    "memory_bytes": 8589934592,
+    "memory_request": "8Gi",
+    "memory_limit": "8Gi",
+    "restart_policy": "Never",
+    "child_timeout_max_seconds": 3600,
+    "outer_job_deadline_seconds": 7800,
+    "estimated_session_seconds": 6600,
+    "artifact_upload_grace_seconds": 1200,
+    "provider_retries": 0,
+    "scientific_retries": 0,
+    "infrastructure_attempts_max": 2
+  },
+  "request_templates": {
+    "control-n13": "requests/control-n13.json",
+    "n53": "requests/n53.json",
+    "n61": "requests/n61.json"
+  },
+  "attempt_receipts": [
+    "attempts/control-n13.json",
+    "attempts/n53.json",
+    "attempts/n61.json"
+  ],
+  "positive_control": {
+    "session": "sessions/control-n13",
+    "receipt": "sessions/control-n13/CONTROL.json",
+    "replay_receipt": "sessions/control-n13/replay-all.json",
+    "attempt_receipt": "attempts/control-n13.json",
+    "export": "sessions/control-n13/export.json"
+  },
+  "sizes": [
+    {
+      "n": 53,
+      "session": "sessions/n53",
+      "replay_receipt": "sessions/n53/replay-all.json",
+      "attempt_receipt": "attempts/n53.json",
+      "export": "sessions/n53/export.json",
+      "comparisons": {
+        "C-aa": "sessions/n53/comparisons/aimed__aimed-aa.json",
+        "C-lp0": "sessions/n53/comparisons/aimed__aimed-lp0.json",
+        "C-c05": "sessions/n53/comparisons/aimed__aimed-lp2-c05.json",
+        "C-c1": "sessions/n53/comparisons/aimed__aimed-lp2-c1.json",
+        "C-rho-c05": "sessions/n53/comparisons/rho-v2__aimed-lp2-c05.json",
+        "C-rho-c1": "sessions/n53/comparisons/rho-v2__aimed-lp2-c1.json"
+      }
+    },
+    {
+      "n": 61,
+      "session": "sessions/n61",
+      "replay_receipt": "sessions/n61/replay-all.json",
+      "attempt_receipt": "attempts/n61.json",
+      "export": "sessions/n61/export.json",
+      "comparisons": {
+        "C-aa": "sessions/n61/comparisons/aimed__aimed-aa.json",
+        "C-lp0": "sessions/n61/comparisons/aimed__aimed-lp0.json",
+        "C-c05": "sessions/n61/comparisons/aimed__aimed-lp2-c05.json",
+        "C-c1": "sessions/n61/comparisons/aimed__aimed-lp2-c1.json",
+        "C-rho-c05": "sessions/n61/comparisons/rho-v2__aimed-lp2-c05.json",
+        "C-rho-c1": "sessions/n61/comparisons/rho-v2__aimed-lp2-c1.json"
+      }
+    }
+  ],
+  "outputs": {
+    "results": "results.json",
+    "validation": "VALIDATION.json",
+    "canonical_export": "export.json",
+    "export_schema": "experiment.export/v1",
+    "expected_rows": 636
+  }
+}
