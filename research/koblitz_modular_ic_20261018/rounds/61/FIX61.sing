@@ -9,7 +9,7 @@ matrix H61=transpose(lift(module(transpose(N61)),module(transpose(unitmat(76)+F6
 require61(N61*F61==matrix(0,76,fixed61) && R61*F61==unitmat(fixed61) && F61*R61+H61*N61==unitmat(76),"FIX61_COMPLETE_FIXED_SPLITTING");
 require61(fixed61==38 && trace61==38,"FIX61_HIGH_DEGREE_TRACE_ACYCLICITY");
 matrix preimages61=lift(module(N61),module(F61));require61(N61*preimages61==F61,"FIX61_ALL_FIXED_TRACE_PREIMAGES");
-matrix J61=concat(F61,preimages61);matrix Jinv61=lift(module(J61),module(unitmat(76)));
+module Jmodule61=module(F61),module(preimages61);matrix J61=matrix(Jmodule61);matrix Jinv61=lift(module(J61),module(unitmat(76)));
 require61(J61*Jinv61==unitmat(76) && Jinv61*J61==unitmat(76),"FIX61_COMPLETE_JORDAN_BASIS");
 matrix first61[38][76];int i61;int j61;
 for(i61=1;i61<=38;i61++){for(j61=1;j61<=76;j61++){first61[i61,j61]=Jinv61[i61,j61];}}
