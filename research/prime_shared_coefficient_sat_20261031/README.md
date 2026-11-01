@@ -26,9 +26,10 @@ The implemented E0 gate passes:
 - the census is 6 SAT targets, 12 UNSAT targets, and 6 models in each
   implementation, with 18/18 exact set matches.
 
-This is development correctness, not solver evidence. No msolve, CaDiCaL,
-CryptoMiniSat or cvc5 run was made, no timing was collected, and no
-index-calculus speedup is claimed.
+This is development correctness, not solver evidence. E0 ran no external
+solver. Subsequent preparation built and validated pinned solver toolchains,
+but no external solver has seen a study instance, no timing was collected, and
+no index-calculus speedup is claimed.
 
 ## Claim ledger
 
@@ -73,13 +74,21 @@ The native tool in [`native`](native/) emits:
 - msolve prime-field polynomial input;
 - cvc5 `QF_FF` input;
 - ordinary CNF and CNF-XOR from one deterministic functional Boolean circuit;
+- strict msolve rational-parametrization parsing with Fp extraction and
+  canonical full-assignment replay;
+- fail-closed, hash-pinned SAT and msolve correctness-panel runners;
 - the exhaustive E0 F17 census.
 
 The Boolean lowering and a fail-closed external-solver runner are implemented
 and frozen in [E1_PROTOCOL.md](E1_PROTOCOL.md). The fixed study panel has not
 yet run. Its CaDiCaL/CNF and CryptoMiniSat/CNF-XOR projected model sets and
 checked UNSAT proofs must agree with the exact oracle before any performance
-row is admissible; msolve and cvc5 remain separate open E1 arms.
+row is admissible. The separate
+[comparator protocol](E1_COMPARATOR_PROTOCOL.md) freezes an msolve 0.11.0
+base-field cross-check; it is also unrun. cvc5 1.4.2 is proof-ineligible for
+finite-field UNSAT under the checked-proof policy and remains optional for SAT
+model cross-checking only. Its exact source/reference register is
+[`e1-comparator-inputs.sha256`](e1-comparator-inputs.sha256).
 
 ## Experiments
 
@@ -89,7 +98,7 @@ status is in [experiment-matrix.json](experiment-matrix.json).
 | Stage | Question | Current status | Decisive output |
 |---|---|---|---|
 | E0 | Is the canonical predicate internally and independently correct on tiny complete domains? | complete | exact set equality, legacy conformance, mutation rejection |
-| E1 | Do JSON, msolve, QF_FF, CNF and CNF-XOR preserve the same projected models? | SAT subgate frozen, not run; msolve/cvc5 open | exhaustive backend equivalence and checked UNSAT certificates |
+| E1 | Do JSON, msolve, QF_FF, CNF and CNF-XOR preserve the same projected models? | SAT and msolve subgates frozen, not run; cvc5 proof-ineligible | exhaustive model-set equivalence; independent checked certificates for every accepted UNSAT |
 | E2 | Are the detector, limits and planned sample powered on disjoint scratch instances? | blocked | frozen binaries, limits, seed list and power receipt |
 | E3 | Does a SAT bundle have lower complete-work growth than enumeration and F4? | draft | held-out four-rung tournament with A/A, planted and matched-null controls |
 | E4 | Does an advancing bundle improve a complete relation-collection pipeline? | conditional | verified relations, matrix rank/log replay and end-to-end cost |
@@ -131,10 +140,12 @@ selected chart with F4 on a larger repeated-root chart.
   its [formal draft protocol](../prime_ic_lead_review_20261031/protocol.draft.json).
 - The [prior SAT/SMT design](../sat_smt_prime_ic_design_20261030/DESIGN.md),
   which rules out merely repeating the direct Semaev representation.
-- Official msolve input documentation, cvc5 finite-field documentation,
-  CaDiCaL DIMACS/proof documentation and CryptoMiniSat CNF-XOR/XLRUP
-  documentation were checked for exporter and certificate obligations. They
-  were not installed or benchmarked in E0.
+- Official msolve input/output and genericity-handling source, cvc5
+  finite-field proof behavior, CaDiCaL DIMACS/LRAT documentation and
+  CryptoMiniSat CNF-XOR/XLRUP documentation were checked for exporter,
+  parametrization and certificate obligations. The pinned development
+  toolchains passed non-study smoke checks; none was benchmarked or run on E0
+  study inputs.
 
 No novelty claim is made for divisor coefficients, quotient/remainder
 membership, SAT, XOR reasoning, F4, or PKM factor bases. The open contribution
@@ -155,6 +166,13 @@ cargo run --release --locked -- emit 17 2 2 3 4 1 0 6 qf-ff
 cargo run --release --locked -- emit 17 2 2 3 4 1 0 6 cnf
 cargo run --release --locked -- emit 17 2 2 3 4 1 0 6 cnf-xor
 ```
+
+The study runners are deliberately not included in the ordinary reproduction
+block. They require the exact frozen binaries, a 40-hex source revision, a
+fresh output directory, and a successful repository checkpoint gate. See
+[E1_PROTOCOL.md](E1_PROTOCOL.md) and
+[E1_COMPARATOR_PROTOCOL.md](E1_COMPARATOR_PROTOCOL.md) for their only
+admissible invocations.
 
 See [VALIDATION.md](VALIDATION.md) for the exact checks and environment
 limitations of this handoff.

@@ -1,6 +1,7 @@
 {
   "schema": "prime-shared-coefficient.experiment-matrix/v1",
   "created": "2026-10-31",
+  "updated": "2026-11-01",
   "lead": {
     "id": "shared-coefficient-solver-tournament",
     "rank_in_parent_review": 2,
@@ -37,7 +38,7 @@
     {
       "id": "E1",
       "title": "backend representation equivalence",
-      "status": "sat_subgate_frozen_unrun_msolve_cvc5_open",
+      "status": "sat_and_msolve_subgates_frozen_unrun_cvc5_proof_ineligible",
       "affected_performance_data": false,
       "arms": [
         "canonical evaluator",
@@ -51,9 +52,20 @@
       "fail": "block benchmarking and report backend/target mismatch",
       "open_obligations": [
         "execute frozen CaDiCaL/CNF and CryptoMiniSat/CNF-XOR panel",
-        "msolve projected-model equivalence",
-        "cvc5 QF_FF projected-model equivalence"
-      ]
+        "execute frozen msolve F17 base-field projected-model cross-check",
+        "retain independently checked UNSAT coverage; msolve and cvc5 cannot supply it"
+      ],
+      "frozen_protocols": [
+        "E1_PROTOCOL.md",
+        "E1_COMPARATOR_PROTOCOL.md",
+        "e1-comparator-freeze.json",
+        "e1-comparator-inputs.sha256"
+      ],
+      "cvc5_disposition": {
+        "mandatory": false,
+        "scope": "optional SAT-model cross-check only",
+        "reason": "version 1.4.2 requires trusted finite-field proof rewrites and cannot emit supported Alethe finite-field terms"
+      }
     },
     {
       "id": "E2",
@@ -69,7 +81,8 @@
       ],
       "blockers": [
         "E1",
-        "solver binaries",
+        "durable checkpoint gate",
+        "proof-bearing UNSAT coverage",
         "perf access",
         "authorized isolated runner",
         "power analysis"
@@ -138,12 +151,13 @@
     }
   ],
   "current_environment": {
-    "msolve": "absent",
-    "cvc5": "absent",
-    "cadical": "absent",
-    "cryptominisat": "absent",
+    "msolve": "pinned local development build; no study input run",
+    "cvc5": "pinned local development build; proof-ineligible for finite-field UNSAT",
+    "cadical": "pinned local development build; no study input run",
+    "cryptominisat": "pinned local development build; no study input run",
     "perf": "absent",
-    "aws_identity": "absent",
+    "checkpoint_authorization": "absent",
+    "isolated_custom_toolchain_image": "absent",
     "scientific_run_authorized_or_started": false
   }
 }

@@ -1,10 +1,11 @@
 # Staged protocol: shared-coefficient SAT/F4 discriminator
 
-Status: **E0 complete; the E1 SAT subgate is frozen but unrun; E1 msolve/cvc5
-and E2--E5 remain draft**. This document was written before any affected SAT,
-XOR, QF_FF or F4 study output. The E0 toy correctness result was already
-visible and is not used as performance evidence. The exact SAT subgate freeze
-is [E1_PROTOCOL.md](E1_PROTOCOL.md).
+Status: **E0 complete; the E1 SAT and msolve subgates are frozen but unrun;
+cvc5 1.4.2 is proof-ineligible; E2--E5 remain draft**. This document was
+written before any affected SAT, XOR, QF_FF or F4 study output. The E0 toy
+correctness result was already visible and is not used as performance
+evidence. The exact freezes are [E1_PROTOCOL.md](E1_PROTOCOL.md) and
+[E1_COMPARATOR_PROTOCOL.md](E1_COMPARATOR_PROTOCOL.md).
 
 ## Question and scope
 
@@ -61,15 +62,22 @@ round trip, deterministic exporter tests.
 Fixed result: 18 targets, 6 SAT, 12 UNSAT, 6 models in each implementation,
 18 exact set matches. No timing was collected. See `results/e0-panel.json`.
 
-## Stage E1: representation-equivalence gate (SAT subgate frozen, unrun)
+## Stage E1: representation-equivalence gate (subgates frozen, unrun)
 
 Implement parsimonious finite-field arithmetic lowerings from the canonical IR
 to CNF and CNF-XOR. Do not benchmark until this gate passes.
 
 The shared functional circuit, strict exporters, projected-model runner and
-proof-mutation controls are now implemented. The CaDiCaL/CNF and
-CryptoMiniSat/CNF-XOR panel is frozen separately; msolve and cvc5 remain open,
-so a SAT-subgate pass will not by itself complete E1.
+proof-mutation controls are implemented. The CaDiCaL/CNF and
+CryptoMiniSat/CNF-XOR panel is frozen separately. A strict msolve
+parametrization parser, F17 extractor and fixed-control runner are also
+implemented and frozen. Neither panel has run because the checkpoint launch
+gate remains unavailable.
+
+Pinned cvc5 1.4.2 cannot emit a trust-free, independently checkable
+finite-field UNSAT proof: complete proof checking stops at trusted `THEORY_FF`
+rewrites and Alethe output rejects `CONST_FINITE_FIELD`. It can be only an
+optional SAT-model cross-check and cannot close an UNSAT cell.
 
 Fixed tiny panel:
 
@@ -78,11 +86,13 @@ Fixed tiny panel:
 - one deterministic mutation of every known witness;
 - malformed/truncated/trailing-input cases.
 
-Arms: canonical evaluator, exact enumeration, msolve, cvc5 QF_FF, CaDiCaL CNF
-and CryptoMiniSat CNF-XOR. Compare projected semantic variables, not auxiliary
-models. SAT models must pass canonical evaluation, root extraction and group
-replay. UNSAT is accepted only with a certificate checked by the pinned
-official checker; `unknown`, timeout or unchecked UNSAT remains unknown.
+Arms: canonical evaluator, exact enumeration, msolve, optional cvc5 QF_FF,
+CaDiCaL CNF and CryptoMiniSat CNF-XOR. Compare projected semantic variables,
+not auxiliary models. SAT models must pass canonical evaluation, root
+extraction and group replay. msolve algebraic-closure parametrizations must be
+filtered to Fp and replayed; their empty sets remain uncertified. UNSAT is
+accepted only with a certificate checked by the pinned official checker;
+`unknown`, timeout or unchecked UNSAT remains unknown.
 
 Pass rule: every completed backend has exactly the same projected model set on
 enumerable cases, every positive control is detected, every mutation is
@@ -109,11 +119,14 @@ allowed before freeze and must list every changed field. After freeze, no
 solver, flags, field sizes, target class, null generator, timeout, metric,
 threshold or exclusion changes are admissible.
 
-Current freeze blockers: CNF/CNF-XOR exporters and certificate checkers; pinned
-solver hashes; exact field/curve cells; protocol-derived seed list; detector
-receipt; power receipt; valid `perf` access; analysis script/hash; and an
-authorized isolated execution environment. The current host lacks msolve,
-cvc5, CaDiCaL, CryptoMiniSat and `perf`, and has no configured AWS identity.
+Current freeze blockers: completion of both frozen E1 launches; independently
+checked UNSAT coverage; a successful durable checkpoint; exact E2 field/curve
+cells; protocol-derived seed list; detector and power receipts; valid `perf`
+access; analysis script/hash; and an authorized isolated execution
+environment. Pinned development builds of msolve, cvc5, CaDiCaL,
+CryptoMiniSat and both proof checkers exist locally, but no study input has run.
+The current host lacks `perf` access, an authorized checkpoint credential and
+an EKS image carrying this custom toolchain.
 
 ## Stage E3: held-out solver tournament
 
