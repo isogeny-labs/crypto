@@ -17,7 +17,7 @@ errors rejected. Retain all capped/error/partial data and freeze repairs.
 
 Stage2,with its own source/cache hash frozen before data,will split rational
 coefficients using N*D=E²+u*O² and verify whole-source f=g²+u*h². Planned
-cohort is all32 basis functions,1/u/u² controls,all324 actual cubic and76
+cohort is all32 basis functions,three named inputs1,u,u²,all324 actual cubic and76
 mixed functions:435 named checks. Do not silently shrink it on cost/failure.
 The nonsquare-u check uses uniqueness of the full operator/coefficient split;
 no root coefficient boxes. Full global61 differential regularity,actual
@@ -38,3 +38,6 @@ coefenumerateseverytermofN*Dwithfullreconstruction;actualrationalcoefficient
 identityandwholefieldidentityrequired. Controlu=>g0/h1,u²=>gu/h0,1=>g1/h0;
 changedrootfails. Saveeveryf/g/h,andcomplete435rowtable. No shrinking or
 filtering on costs/zerooddoutput;retainfailuresandfreezerepairs. Samecaps.
+
+Zero root components are exported in explicit lists,not truncated ideal
+generator sequences. All435indices must survive roundtrip for replay.

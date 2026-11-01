@@ -37,7 +37,7 @@ proc coordinates62(poly f){
 int count62=0;int zeroOdd62=0;int coefficientChecks62=0;int i62;int j62;
 link output62="ASCII:w split-functions62.sing";open(output62);
 write(output62,"// Whole-source square decompositions in retained FIELD61; source ideal binding follows.");
-write(output62,"ideal splitIdeal62;ideal inputs62;ideal evenParts62;ideal oddParts62;");
+write(output62,"ideal splitIdeal62;list inputs62;list evenParts62;list oddParts62;");
 for(i62=1;i62<=size(sourceIdeal61);i62++){write(output62,"splitIdeal62["+string(i62)+"]="+string(sourceIdeal61[i62])+";");}
 link table62="ASCII:w split62.tsv";open(table62);write(table62,"id|family|index|zero_odd|source_identity");
 proc decompose62(poly f,string family,int index){

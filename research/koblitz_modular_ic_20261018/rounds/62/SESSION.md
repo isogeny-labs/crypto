@@ -37,3 +37,23 @@ holomorphicregularity andunitdivisors/T-character/11action/alloriginalscope.
 
 ### Errors
 NoMatrix62nativeerror. Stage2 API/ring conversions notyetexecuted.
+
+## 2026-11-01T22:58:52.713554+00:00 — raw custody/index correction before stage2
+
+### What was done
+Caught accidental staging of native stage1raw/checkpoint in broad round add.
+Copied existing raw-ignore policy,removed raw paths from current index only;
+local bytes and existing Git history retained for final raw custody.
+Exported decomposition roots use lists preserving explicit zeros/all435slots.
+
+### Decisions made
+No history rewrite or native rerun. Explicit source staging for futuredata.
+Protocol3/source freeze precedes all stage2data;435/13920scope unchanged.
+
+### Open threads
+FullSPLIT62native/whole-source replay,Lean implications,normal order/global
+regularity andalloriginalresearchlanes.
+
+### Errors
+I omitted the new-round raw-ignore file before a broad add. Corrected index
+and future archive flow; no raw file deleted or accepted calculation repeated.
