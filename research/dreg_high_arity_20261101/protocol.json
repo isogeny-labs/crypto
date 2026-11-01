@@ -1,0 +1,635 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "DREG-HIGH-ARITY-20261101",
+  "version": 1,
+  "created": "2026-11-01",
+  "repository": "crypto",
+  "study_dir": "research/dreg_high_arity_20261101",
+  "authors": [
+    "Codex ECDLP research lane"
+  ],
+  "links": {
+    "source_review": "research/factor_base_arity_review_20261024/README.md",
+    "predecessor": "research/dreg_closure_driver_20261016",
+    "atlas_leads": [
+      "LEAD-ICE-descent-closure-degree-at-scale",
+      "LEAD-ICE-boolean-f4-f5-f6-engines",
+      "LEAD-ICB-decomposition-encoding-and-sat"
+    ]
+  },
+  "question": "For the first feasible chained Boolean systems at arity five and six, do four exact unsatisfiable draws per cell refute under fixed-degree MutantXL closure by degree four while two exact satisfiable controls per cell remain unrefuted?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Each of the three registered cells receives one exact bounded-four, above-four, draw-dependent, unmeasured, or invalid classification under the preregistered four-unsatisfiable/two-satisfiable rule.",
+      "class": "exact_computation",
+      "decided_by": [
+        "C-m5-n11-l2",
+        "C-m5-n13-l3",
+        "C-m6-n11-l2",
+        "C-soundness",
+        "C-identity"
+      ],
+      "if_supported": "Advance bounded cells to growing ell and n, matched external F4, and complete charged cost; retain every other presentation and scale question as open.",
+      "if_not_supported": "Reject only universal closure degree four at the exact completed cell; degree five and other formulations remain live."
+    },
+    {
+      "id": "C2",
+      "text": "No elapsed-time, throughput, end-to-end ECDLP, asymptotic, or cryptographic-scale claim is in scope.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "m5-n11-l2",
+      "role": "candidate",
+      "description": "First arity-five cell with 43 Boolean variables and 136698 degree-at-most-four columns.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--example",
+            "dreg_ladder",
+            "--example",
+            "dreg_closure"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "ladder_source_sha256": "6aa243df66a4369b1014fe4f5d9f54f9eb80fe353d882b27364d5d2ca94320eb",
+          "closure_source_sha256": "4acc507cfb964cd3f621716fc5e823a895370dae0a1752fd9301af11c469c3e8",
+          "max_cols": "400000",
+          "address_space_bytes": "32000000000"
+        },
+        "env": {
+          "F4_F2_MAX_ROWS": "50000000",
+          "F4_F2_MAX_COLS": "50000000",
+          "RAYON_NUM_THREADS": "4",
+          "DREG_CKPT_SECONDS": "900"
+        },
+        "threads": 4
+      },
+      "parameters": {
+        "m": 5,
+        "n": 11,
+        "ell": 2,
+        "n_vars": 43,
+        "degree_to": 4,
+        "unsatisfiable_draws": 4,
+        "satisfiable_controls": 2
+      }
+    },
+    {
+      "id": "m5-n13-l3",
+      "role": "candidate",
+      "description": "Arity-five cell at the previous measured variable frontier, with 54 variables and 342541 degree-at-most-four columns.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--example",
+            "dreg_ladder",
+            "--example",
+            "dreg_closure"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "ladder_source_sha256": "6aa243df66a4369b1014fe4f5d9f54f9eb80fe353d882b27364d5d2ca94320eb",
+          "closure_source_sha256": "4acc507cfb964cd3f621716fc5e823a895370dae0a1752fd9301af11c469c3e8",
+          "max_cols": "400000",
+          "address_space_bytes": "32000000000"
+        },
+        "env": {
+          "F4_F2_MAX_ROWS": "50000000",
+          "F4_F2_MAX_COLS": "50000000",
+          "RAYON_NUM_THREADS": "4",
+          "DREG_CKPT_SECONDS": "900"
+        },
+        "threads": 4
+      },
+      "parameters": {
+        "m": 5,
+        "n": 13,
+        "ell": 3,
+        "n_vars": 54,
+        "degree_to": 4,
+        "unsatisfiable_draws": 4,
+        "satisfiable_controls": 2
+      },
+      "same_instrument_as": "m5-n11-l2"
+    },
+    {
+      "id": "m6-n11-l2",
+      "role": "candidate",
+      "description": "First arity-six cell with 56 variables and 396607 degree-at-most-four columns.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--example",
+            "dreg_ladder",
+            "--example",
+            "dreg_closure"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "ladder_source_sha256": "6aa243df66a4369b1014fe4f5d9f54f9eb80fe353d882b27364d5d2ca94320eb",
+          "closure_source_sha256": "4acc507cfb964cd3f621716fc5e823a895370dae0a1752fd9301af11c469c3e8",
+          "max_cols": "400000",
+          "address_space_bytes": "32000000000"
+        },
+        "env": {
+          "F4_F2_MAX_ROWS": "50000000",
+          "F4_F2_MAX_COLS": "50000000",
+          "RAYON_NUM_THREADS": "4",
+          "DREG_CKPT_SECONDS": "900"
+        },
+        "threads": 4
+      },
+      "parameters": {
+        "m": 6,
+        "n": 11,
+        "ell": 2,
+        "n_vars": 56,
+        "degree_to": 4,
+        "unsatisfiable_draws": 4,
+        "satisfiable_controls": 2
+      },
+      "same_instrument_as": "m5-n11-l2"
+    },
+    {
+      "id": "satisfiable-controls",
+      "role": "control_positive",
+      "description": "The first two committed natural satisfiable draws in each registered cell; neither XL nor closure may refute them through degree four.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--example",
+            "dreg_ladder",
+            "--example",
+            "dreg_closure"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "mode": "--satisfiable",
+          "max_cols": "400000",
+          "address_space_bytes": "32000000000"
+        },
+        "env": {
+          "F4_F2_MAX_ROWS": "50000000",
+          "F4_F2_MAX_COLS": "50000000",
+          "RAYON_NUM_THREADS": "4",
+          "DREG_CKPT_SECONDS": "900"
+        },
+        "threads": 4
+      },
+      "parameters": {
+        "cells": [
+          "m5-n11-l2",
+          "m5-n13-l3",
+          "m6-n11-l2"
+        ],
+        "draws_per_cell": 2,
+        "degree_to": 4
+      },
+      "same_instrument_as": "m5-n11-l2"
+    },
+    {
+      "id": "identity-replay",
+      "role": "reference",
+      "description": "Replay historical m4,n12,ell5,draw24 and require every algebraic counter and closure classification to match the retained row after excluding seconds and source-path spelling.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--example",
+            "dreg_ladder",
+            "--example",
+            "dreg_closure"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "input_sha256": "ec26d4668e3afec0a08f2f74f043b90909690fcd05865f5bb2e958e87002ed7e",
+          "expected_row_sha256": "15a0d1661227407ebf721de4f0ce63b129f78eff47594599b2913f6c5d240181",
+          "max_cols": "155000",
+          "address_space_bytes": "32000000000"
+        },
+        "env": {
+          "F4_F2_MAX_ROWS": "50000000",
+          "F4_F2_MAX_COLS": "50000000",
+          "RAYON_NUM_THREADS": "4",
+          "DREG_CKPT_SECONDS": "900"
+        },
+        "threads": 4
+      },
+      "parameters": {
+        "m": 4,
+        "n": 12,
+        "ell": 5,
+        "draw": 24,
+        "expected_closure_degree": 4
+      },
+      "same_instrument_as": "m5-n11-l2"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "No clock, throughput, or relative-performance quantity is a metric; all decisions use exact algebraic replay and completion states."
+    },
+    "positive": {
+      "present": true,
+      "arm": "satisfiable-controls",
+      "expected_detection": "All six controls retain a positive exact solution count and neither XL nor closure refutes at any completely built degree through four.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "The exactly-unsatisfiable systems are the registered scientific instances, not a sampled null population; their zero solution counts are checked before closure."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "registered_cell",
+        "levels": [
+          "m5-n11-l2",
+          "m5-n13-l3",
+          "m6-n11-l2"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source_build_and_caps",
+        "treatment": "fixed",
+        "value": "One frozen commit and release binaries; four threads; degree four; 400000 columns; 32 GB address space.",
+        "how": "Source, Cargo.lock, commit, binaries, environment, argv, and manifests are hash-bound before new closure data."
+      },
+      {
+        "name": "draw_stream",
+        "treatment": "fixed",
+        "value": "seed 20261101, max_draws 4096, ffd_max 3",
+        "how": "A separate deterministic native generator call per cell; first four exact UNSAT and first two exact SAT records by committed draw index."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Record CPU, memory, kernel, hypervisor, thread count, commit, binaries, and checkpoint segments; these facts cannot license a timing claim."
+      },
+      {
+        "name": "execution_order",
+        "treatment": "fixed",
+        "value": "identity, satisfiable controls, then cells in listed order and ascending draw index",
+        "how": "One process at a time. Resumes reuse only that draw's checkpoint directory and invalidate wall time."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-m5-n11-l2",
+        "arms": [
+          "m5-n11-l2"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "All four complete UNSAT draws refute by degree four for bounded-four; any complete saturation without refutation rejects universal four at this cell."
+      },
+      {
+        "id": "C-m5-n13-l3",
+        "arms": [
+          "m5-n13-l3"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "All four complete UNSAT draws refute by degree four for bounded-four; any complete saturation without refutation rejects universal four at this cell."
+      },
+      {
+        "id": "C-m6-n11-l2",
+        "arms": [
+          "m6-n11-l2"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "All four complete UNSAT draws refute by degree four for bounded-four; any complete saturation without refutation rejects universal four at this cell."
+      },
+      {
+        "id": "C-soundness",
+        "arms": [
+          "satisfiable-controls"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Zero refuted satisfiable systems across all six controls."
+      },
+      {
+        "id": "C-identity",
+        "arms": [
+          "identity-replay"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Exact equality of every algebraic output field after excluding seconds, checkpoint segment count, and source path."
+      }
+    ],
+    "aa_not_applicable": "No clock or relative-performance comparison is claimed; exact identity and satisfiable controls replace A/A for this algebraic instrument.",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Exact computations run one at a time in increasing registered cell and committed draw order; order cannot change algebraic results and no clock is analyzed.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261101
+      ],
+      "nonce": null,
+      "note": "dreg_ladder derives each cell stream from this seed, n, ell, and m; no replacement seed is allowed."
+    },
+    "instance_sampling": {
+      "rule": "For each registered cell use the first four exact zero-solution records and first two exact positive-solution records by draw index in the deterministic committed stream; fail the cell gate if unavailable by draw 4095.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "All outcomes are exact and the complete fixed sample is reported; no analyst choice or inferential comparison is present.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 4,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 3,
+      "correction": "other",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "This is a finite exact classification of four preregistered UNSAT draws per cell plus two SAT controls, not a population-frequency or significance claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 4,
+      "estimated_total_seconds": 86400,
+      "measured_on": "Per-process admission budget only. The complete campaign has 15 sequential processes, each separately capped at 24 hours; no elapsed-time result is analyzed."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "closure_class",
+        "name": "Exact closure outcome",
+        "unit": "categorical draw outcome",
+        "kind": "exact",
+        "definition": "For an exactly-unsatisfiable draw: closure refutes by degree four, complete degree-four saturation does not refute, or unmeasured because the scan is incomplete/capped/resource-limited.",
+        "source": "runs/unsat-*.jsonl scan and status records",
+        "aggregation": "distribution",
+        "resolution": "one complete draw",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "soundness_failures",
+        "name": "Refuted satisfiable controls",
+        "unit": "controls",
+        "kind": "exact",
+        "definition": "Number of exact positive-solution controls for which XL or closure reports a refutation through a completely built degree four.",
+        "source": "runs/control-*.jsonl refuted_satisfiable",
+        "aggregation": "sum",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "identity_match",
+        "name": "Historical algebraic identity replay",
+        "unit": "boolean",
+        "kind": "exact",
+        "definition": "One iff the m4,n12,ell5,draw24 replay matches every historical algebraic field after excluding seconds, checkpoint segments, and source path.",
+        "source": "runs/identity-m4-n12-l5.d24.jsonl and predecessor retained row",
+        "aggregation": "per_row",
+        "resolution": "boolean",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "closure_word_ops",
+        "name": "Closure bit-word operations",
+        "unit": "64-bit word operations",
+        "kind": "counted",
+        "definition": "Instrument-emitted closure_word_ops summed over each completely built degree; descriptive work counter only.",
+        "source": "runs/*.jsonl scan[].closure_word_ops",
+        "aggregation": "sum",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "columns",
+        "name": "Built Boolean monomial columns",
+        "unit": "columns",
+        "kind": "exact",
+        "definition": "Instrument-emitted exact column count at each completely built degree.",
+        "source": "runs/*.jsonl scan[].columns",
+        "aggregation": "max",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "closure_word_ops",
+      "closure_products",
+      "xl_rank",
+      "closure_rank",
+      "columns",
+      "checkpoint_segments"
+    ],
+    "record": [
+      "Protocol hash, repository commit, source and binary SHA256",
+      "Exact argv, environment, cell, draw index, solution count and committed draw SHA256",
+      "CPU model, memory bytes, kernel, hypervisor, thread count and placement identity",
+      "All JSONL, stderr, exit status, checkpoints and manifest hashes",
+      "Every timeout, OOM, cap, invalid control, interruption and resume",
+      "Seconds retained as diagnostic only and never interpreted as a metric"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "ephemeral",
+    "queue": "detached 32GB-or-larger CPU host",
+    "placement": {
+      "minimum_memory_bytes": 34359738368,
+      "suggested_instance": "c7i.4xlarge or larger",
+      "concurrency": 1
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 86400,
+    "checkpoint": {
+      "policy": "application",
+      "interval_seconds": 900,
+      "grace_seconds": 1800,
+      "restore_validation": "manifest_sha256",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 4
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Generate one deterministic stream per cell and select exactly the first four exact UNSAT plus first two exact SAT records by committed draw index; never replace the seed or select by closure outcome.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Run the identity replay and all six satisfiable controls before the twelve UNSAT scans; any algebraic identity mismatch or refuted satisfiable control invalidates scientific interpretation and stops primary execution.",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "Each process is limited to 400000 columns, 32 billion address-space bytes, four threads, and 86400 seconds. A cap, OOM, timeout, corrupt checkpoint, missing final row, or incomplete degree-four build is unmeasured, never above-four and never a disproof.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any mismatch in the historical identity replay's algebraic fields invalidates the new cells until explained and a new protocol version is filed before rerun.",
+    "Any satisfiable control refuted by XL or closure invalidates that cell and the shared instrument; no primary conclusion is allowed.",
+    "A draw file generated before the protocol freeze or altered after its commit is inadmissible.",
+    "A resumed run whose wall time is interpreted as evidence is inadmissible; exact counters remain usable after manifest-validated restore."
+  ],
+  "decision_rule": {
+    "text": "Classify each draw only from a complete exact degree-four scan and each cell only after all four UNSAT draws and two SAT controls are measured. Bounded-four requires four of four refutations by degree four; any complete degree-four saturation without refutation rejects universal four at that cell; a mixture is draw-dependent. Any incomplete/resource-limited row makes the cell unmeasured. Controls or identity failures make it invalid.",
+    "comparison_ids": [
+      "C-m5-n11-l2",
+      "C-m5-n13-l3",
+      "C-m6-n11-l2",
+      "C-soundness",
+      "C-identity"
+    ],
+    "threshold": "Four complete UNSAT draws and two sound SAT controls per cell, plus exact identity replay",
+    "statistic": "Exact count of closure-by-four versus complete-no-refutation outcomes among four fixed draws per cell",
+    "interval": "No sampling interval; finite exact registered draws only",
+    "multiple_comparison_correction": "other",
+    "effect_size_measure": "Exact closure degree category and instrument counters per completed draw; no standardized or timing effect size",
+    "verdict_vocabulary": [
+      "bounded_four_at_cell",
+      "not_universally_four_at_cell",
+      "draw_dependent",
+      "unmeasured",
+      "invalid_instrument"
+    ]
+  },
+  "analysis_plan": {
+    "script": null,
+    "inputs": [
+      "draws/*.jsonl",
+      "runs/*.jsonl",
+      "runs/*.status",
+      "runs/*.log",
+      "sources.sha256",
+      "binary.sha256",
+      "host.json"
+    ],
+    "outputs": [
+      "summary.json",
+      "experiment.export.json",
+      "reports/run-*/REPORT.md",
+      "reports/run-*/closure-outcomes.svg",
+      "reports/run-*/report.typ",
+      "reports/run-*/report.pdf"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Per-cell exact draw outcomes with unmeasured rows visible",
+      "Degree-four columns and closure word-operation counts for complete rows only"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Calling timeout, OOM, cap, missing output, incomplete degree, or checkpoint corruption a failure of the mathematical mechanism",
+    "Generalizing three toy cells to constant degree at cryptographic scale or to another presentation",
+    "Using emitted seconds for a speed, scaling, or comparative claim",
+    "Hiding an extra draw, control failure, interrupted row, retry, or resume",
+    "Changing the seed, draw selection, cap, degree, or cell after seeing closure output",
+    "Closing GG14, FGHR, symmetric, topology-dependent, degree-five, or end-to-end index-calculus leads from this experiment"
+  ],
+  "literature": [
+    {
+      "ref": "research/factor_base_arity_review_20261024/README.md",
+      "provenance": "internal",
+      "claim": "The three registered m=5,6 cells are the cheapest native high-arity closure discriminator and require four UNSAT draws each on a 32GB host.",
+      "verified_by": "Repository source review on 2026-11-01."
+    },
+    {
+      "ref": "research/dreg_closure_driver_20261016/PREREGISTRATION.md",
+      "provenance": "internal",
+      "claim": "The predecessor defines exact draw generation, complete degree-four versus unmeasured classification, and satisfiable soundness replay.",
+      "verified_by": "Repository protocol and retained raw-row review on 2026-11-01."
+    },
+    {
+      "ref": "examples/dreg_closure.rs",
+      "provenance": "internal",
+      "claim": "The native closure instrument supports committed-draw replay, satisfiable controls, exact column caps, and manifest-hashed application checkpoints.",
+      "verified_by": "Direct source inspection and SHA256 binding on 2026-11-01."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  }
+}
