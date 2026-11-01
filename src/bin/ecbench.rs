@@ -37,6 +37,8 @@
 mod pdp3_koblitz;
 #[path = "ecbench/pdp_split_oracle.rs"]
 mod pdp_split_oracle;
+#[path = "ecbench/pkm_tower.rs"]
+mod pkm_tower;
 #[path = "ecbench/structured_s4.rs"]
 mod structured_s4;
 
@@ -854,6 +856,7 @@ pub fn main() -> ExitCode {
     // Oracles this binary links that the library cannot name (see
     // `pdp3_koblitz`); registered before any run, child or replay.
     crypto_lib::cryptanalysis::ecbench::methods::register_binary_plugins(binary_plugins());
+    crypto_lib::cryptanalysis::ecbench::methods::register_prime_plugins(pkm_tower::plugins());
     match run(Cli::parse()) {
         Ok(code) => code,
         Err(e) => {
