@@ -55,3 +55,30 @@ behavior and the square decomposition. The paper studies Suzuki curves;
 its curve-specific basis and matrices are NOT transferred to this source.
 Only the standard operator rules motivate the proposed exact computation.
 https://www.math.colostate.edu/~pries/Preprints/13AMSSummerSuzukiFinal.pdf
+
+## Concrete route to the complete differential basis: trace dual
+The retained R52 normal-chart algebra B is free of rank32 over A=F2[z],
+with all528 product columns already checked. Compute the field-trace vector
+and Gram matrix T_ij=Tr(e_i e_j) from those actual multiplication matrices.
+Check det(T) nonzero and the full T*Tinv=Tinv*T=I32 products. Its dual
+basis gives the complementary module {h:Tr(hB) subset A}; for a finite
+map with separable generic field this identifies Hom_A(B,A), the relative
+dualizing module. Subject to the retained NORMAL-RR bridge, multiplying by
+dz handles regular differentials on the entire affine normal chart. Then
+impose actual infinity regularity, with complete kernel and61-dimensional
+holomorphic-basis checks. Do not infer global regularity from a nonmaximal
+order or omit any point over z=infinity. Track z=1/u and the differential
+factor exactly; the R59 function-field coordinate bridge is available.
+
+This replaces a blind many-denominator search by a32x32 trace-dual lattice
+calculation followed by exact infinity constraints. R27 also already gives
+total tame different120 over the genus-one base, including the exceptional
+Z5 branch. Certify that base invariant differential in current coordinates
+and use the complete different as an independent divisor check. These are
+proposed executable steps; no trace Gram matrix has yet been computed.
+
+Primary source: Stacks Project, section49.8, especially lemma49.8.2, gives
+the complementary-module/relative-dualizing-module identification under
+finite generically etale hypotheses. The normal-source/differential bridge
+and complete global sections still need the source-specific checks above.
+https://stacks.math.columbia.edu/tag/0BW0

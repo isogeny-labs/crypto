@@ -52,3 +52,13 @@ R60science must seal before new R61mathematics. Preserve original manual
 4GiB/1200s/one nativejob/thread,Lean4.34.1/mathlibd13f23b-j1M4096with
 separate1200secondcompile/audit/noVMcap. No EKS,Diem/freezer,newclaim,
 delegation,merge,retarget or automaticmerge changes. Goal remains active.
+
+## Pole-independent companion lane
+NEW-LEADS60.md specifies the joint Cartier/sigma differential filter.
+First compute the actual32x32 trace Gram matrix from the retained normal
+multiplication table and certify its inverse/trace-dual lattice. Under the
+normal-RR/separability bridge, impose all infinity regularity constraints
+to obtain the COMPLETE61-form basis; use R27's tame different120 as an
+independent divisor check. Then exact square decomposition/Cartier and
+sigma matrices,305binaryF32coordinates,jointkernel and rational-function
+reconstruction. No unproved differential-matrix-to-integral11action step.

@@ -1,0 +1,27 @@
+# R60 sealed scientific result and verified custody
+
+Scientific seal da60d349b540fd32f00b9b54dbafd737c320238e.
+Seven mathematical workflows terminal:4accepted/3rejected. All39executed
+Git bytepins match. Actual mixedspace36,fixed18,trace18,oddparticular;
+all404infinitypatternsrank18/kernel0 withsource-boundleftinverses.
+Freshcheckerreconstructsall404matrices andfullmixed/fixedsplittings.
+ThreeauthoredLeanclaimcompile/audit0,0failing/trusted. All3PDFpagesinspected.
+
+RawSHA2563c93bd755acdc1776b0c2b6c1c56af686cf8a297dff8975b469005ed7ef36978,
+853604bytes,112regularfiles,44sourcepins. ConditionalPUT/freshdirectGET,
+allmemberhashes/deterministicrepackpass at setec-astronomy-artifacts/store.
+No acceptedproducer repeatedforpublication. Rejectednative01/Lean01/02
+andmetadataformat/earlyterminal-recordfailuresarepreserved at theirscopes.
+
+PR3062externallymerged404f49801;PR3200externallymergeda90016f77.
+Laterformalrepairs/sealedreport/custodyneedfreshcontinuationdelivery.
+Originalstackedbase/automergeNull;noagentmergeorretarget.
+Localartifact/large-filegatespass through80c5572c5 againsta90016f77;
+observefinalheadCIbefore any allchecksclaim.
+
+R61trace61-01 is theonlynewnative mathematicalowner,source80c5572c5,
+seed61/4GiBvirtual/1200s/oneSingularFLINTthread. Reconcileitslivehandle/raw
+beforeanyretry. Itcomputesactualnormal32traceGram/inverse/dual sourcebinding.
+Nextcompletecubic324/76mixed/818 andcanonical61form/Cartier305binary
+jointkernel;alloriginalfactor/action/saturation/polarization/reverse/larger
+sourcespersist. NEXT.md andTRACE-DUAL-NEXT.md recordexactobligations.

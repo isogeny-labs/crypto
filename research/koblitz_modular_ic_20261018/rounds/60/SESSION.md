@@ -67,3 +67,59 @@ Leanterminalresults,exactrecords/report/custody and finalPR update;thenR61cubica
 
 ### Errors
 One metadata Python string-assembly syntaxerror fixed using a separate Typst include;no math/data affected. Initialnative indexedincrementfailure remains excluded. Noacceptedmathproducer repeated.
+
+## 2026-11-01T18:01:30.866571+00:00 — Lean import repair after terminal failure
+
+### What was done
+infinity-lean60-01 compileexit1;Mathlib.Tactic.Omega.olean is absent. The core Lean.Elab.Tactic.Omega.olean exists in the pinnedtoolchain. Rawfailure retained;no audit attempted.
+
+### Decisions made
+Use the existing coreOmega import,freezebeforefresh02 under identicalcaps. No new build/toolchain/dependency or accepted producer repeat.
+
+### Open threads
+Lean02,bothfailedattemptrecords,report/custody/finalPR;then cubic818andcompleteCartier-sourceconstruction.
+
+### Errors
+Missingmathlibmoduleimport,not disproved bound or mathematicalnull. Metadatarecorder followsfresh02 only after acceptance.
+
+## 2026-11-01T18:04:49.335260+00:00 — Lean explicit interval/cardinality repair
+
+### What was done
+Lean02terminalcompile1: absolute-value notation absent from minimal imports; exhaustive kerneldecide hit default recursiondepth. Noaudit. Allrawerrors retained.
+
+### Decisions made
+State equivalent explicit integerinterval hypotheses/conclusion; use symbolic Finseterase/univ/product/Fin cardinal identities instead of enumerating405tuples. Same three claims and originalcaps. Freezebeforefresh03,no new dependency or capincrease.
+
+### Open threads
+Lean03terminal,finalrecords/report/custody/PR;nextcubic818andtrace-dual32canonicalbasis/Cartierfilter.
+
+### Errors
+Lean02parse/recursive-normalization failures; no mathematicalcounterexample. Bothfailureattemptsexcludedfromprovedclaims.
+
+## 2026-11-01T18:09:15.878639+00:00 — three audited claims terminal
+
+### What was done
+Lean03compile0/audit0,all3authoredclaims audited,0failing/trusted. Originaldriverterminal. All7mathworkflows terminal:4accepted/3rejected,includingnative01andLean01/02. No acceptedproducerrepeated.
+
+### Decisions made
+Commit/push terminalrecords before renderedreport,then seal/custody and finalcontinuationPR. Next bounded lead actual32traceGram/dual afterR60seal;completecubic/818remains required.
+
+### Open threads
+Terminalrecordpublication/reportinspection/custody;R61source-specific canonicalbasis/Cartier andcubiccompleteness,all broaderoldleads.
+
+### Errors
+Metadatarecord attemptobservedaudittextbeforeaudit.exit waswritten and failedtheterminal-acceptanceassertion. Waited originaldriverterminal andreran metadataonly;no math rerun. Rawmatherrors remainnativeindexed++andtwoLeanrepairfailures.
+
+## 2026-11-01T18:11:15.775292+00:00 — terminalrecords pushed and report inspected
+
+### What was done
+Committed/pushed24b688f5cterminalresults/export:7workflows4accepted3rejected,39historicalGitpins,3auditedclaims. Rendered current3pagePDF and inspected everypage. Quantitative graph usesactual36/18/18counts and404recordeddegree rows; proposedCartierdiagram labelledunmeasured.
+
+### Decisions made
+Seal R60scientificbytes now,then conditionalPUT/freshGET/memberhash/repack. PR3200wasexternallymergedata90016f77;finalsealedeliveryneedsfreshcontinuationPRaftercustody,not anotherprematurePR. Originalbase/noagentmerge/retarget/automergepersist.
+
+### Open threads
+R60custody andexactheaddelivery;thenR61traceGram/dual andcompletecubic818,alloriginalleads.
+
+### Errors
+FirstreportassemblyexpectedtabTSV,butSingularemitsliteral t for the tabescape. Preservedrawbytes,parsedexactheader/9numericfieldswithoutproducerrepeat;freshreportpasses. Metadatafailure/repair recordedinpublication-checks.
