@@ -105,7 +105,9 @@ jobs:
       - run: cargo test --release --locked --example koblitz_rho_batch_ks_strong_online
 
   measure:
-    if: github.event_name == 'workflow_dispatch'
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event_name == 'workflow_dispatch')
     needs: validate
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|compact-orbit-n61-single-target-isolated.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|compact-orbit-n61-single-target-isolated.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: ${{ fromJSON(inputs.timeout_minutes) }}

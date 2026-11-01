@@ -1,6 +1,7 @@
 name: Iso Lab experiment
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches: [main]
     paths:
       - taskq/deploy/eks-karpenter/**
@@ -47,6 +48,7 @@ permissions:
   contents: read
 jobs:
   contracts:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && vars.ISOLAB_BUILD_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 10
     steps:
@@ -97,7 +99,9 @@ jobs:
             1048576 taskq/deploy/eks-karpenter/resume/validation/20261021/progress-before.log
   build:
     needs: contracts
-    if: github.event_name == 'workflow_dispatch'
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event_name == 'workflow_dispatch')
     runs-on: ${{ (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && vars.ISOLAB_BUILD_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 60
     permissions:
@@ -168,7 +172,9 @@ jobs:
           compression-level: 0
   experiment:
     needs: build
-    if: github.ref == 'refs/heads/main'
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.ref == 'refs/heads/main')
     runs-on: ${{ (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && vars.ISOLAB_ACTIONS_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 150
     permissions:

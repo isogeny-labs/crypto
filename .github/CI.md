@@ -210,3 +210,76 @@ The classifier tests exercise real git history, dependencies, unrelated prose,
 workflow changes, embedded data, renames/deletions, newline-containing paths,
 more than 300 changed files, and fail-closed comparisons. No cryptographic
 algorithm, scientific result, or frozen session is modified by this change.
+
+## Runner capacity and stalled PRs (2026-10-22)
+
+Measured from the public Actions API on 2026-10-22 at about 17:00 UTC:
+
+- 807 workflow runs were queued, 790 of them for PRs. Sampled queued jobs had
+  waited a median of about 8 hours (maximum 9.7 hours). The waits were on the
+  self-hosted ARC pools, not on GitHub-hosted runners: 46 sampled jobs waited
+  for `crypto-eks-linux` (6 of its 11 runners busy) and 41 for
+  `crypto-eks-highmem`, which has `maxRunners: 1`.
+- `CRYPTO_EKS_HIGHMEM_WORKFLOWS` sends the always-on PR gates to that single
+  runner: `codeql.yml`, `rust-all-targets.yml`, `rust-lint.yml`,
+  `curve-names.yml`, `ecbench.yml`, `workflows-parse.yml` and
+  `workflow-lint.yml`. Every PR push queues those gates behind every other
+  PR's gates, one job at a time, including YAML parsing and the
+  scope classifier.
+- Each PR push starts a median of 16 workflow runs (up to 39). Of the latest
+  1,000 runs (8.5 hours), 549 were cancelled by a newer push to the same PR,
+  148 succeeded and 11 failed.
+- Of 187 open PRs, none had a complete green head. 40 waited on queued
+  checks, 41 had failing checks, 2 had conflicts, about 80 carried
+  `needs-human` and about 24 were based on another PR's branch.
+
+Rolling back the high-memory routing of the PR gates removes the one-runner
+bottleneck without a workflow change. Each workflow then falls back to
+`crypto-eks-linux` if it is listed in `CRYPTO_EKS_WORKFLOWS`, or otherwise to
+its original GitHub-hosted label. Queued jobs keep the label they were created
+with, so they must be cancelled and re-run (see
+[the ARC README](../taskq/deploy/eks-karpenter/arc/README.md)).
+
+`merge-sweeper.yml` applies the AGENTS.md merge gate to every open PR every
+30 minutes, so a green PR lands after its authoring session has ended. It
+reports only until `MERGE_SWEEPER_APPLY` is `true`.
+
+## CI tiers (2026-10-23)
+
+The three repositories opened about 1,125 PRs from 2026-10-15 to 2026-10-23
+(up to about 240 a day), and on 2026-10-23 about 1,000 runs were queued
+behind 11 EKS runners. The fix is to run less, not to wait longer:
+
+| PR state | What runs on each push |
+| --- | --- |
+| Draft | Fast tier only: `workflows-parse.yml`, `workflow-lint.yml`, `validation-gate.yml`, `ci-tier.yml` (its `full-tier` job skips), and the four byte-pinned workflows below |
+| Ready for review | Full tier: every applicable workflow, as before |
+
+- Every other workflow with a `pull_request` trigger gates each job on
+  `!github.event.pull_request.draft` and lists `ready_for_review` in its PR
+  types (label-only triggers are left alone), so marking a PR ready starts the
+  full tier on its head. `.github/scripts/draft_tier_gate.py` checks this in
+  `workflows-parse` and `--apply` adds it to a new workflow; other events
+  (push, schedule, dispatch) carry no PR payload and are unaffected.
+- `weak-curve-lean.yml`, `weak-curve-conjectures.yml`, `release.yml` and
+  `curve-covers.yml` are excluded: their bytes are pinned by sealed evidence
+  or an exact implementation-version dependency.
+- A gated job on a draft reports `skipped`, so the merge sweeper also requires
+  a successful `full-tier` check on the head. Heads whose checks all started
+  before `ci-tier.yml` reached `main` predate the tiers and need no marker.
+- **Check budget:** the sweeper holds a PR whose head ran more than 30 checks
+  (`MERGE_SWEEPER_MAX_CHECKS`; skipped and neutral checks do not count) and
+  labels it `ci:over-budget`. On 2026-10-23, 9 of the 30 most recently
+  updated PRs were over.
+- **Capacity:** with `MERGE_SWEEPER_APPLY=true`, red, conflicted,
+  over-budget and `needs-human` PRs receive `ci:parked`; PRs beyond
+  `MERGE_SWEEPER_MAX_READY` (default 40) receive `ci:waiting` for merge
+  prioritization. These labels never change a PR's draft/ready state. Waiting
+  labels clear when PRs return within the prioritization cap. Drafts remain
+  drafts only when explicitly requested by the user.
+- **Lanes:** sessions working one study push to `lane/<lane>` with
+  `scripts/lane-push.sh <lane>` instead of opening a PR each; the lane has one
+  regular PR by default.
+
+Queued runs keep the workflow revision they were created with; only new events
+use the tiers.

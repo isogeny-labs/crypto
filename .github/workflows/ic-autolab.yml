@@ -289,6 +289,7 @@ jobs:
           retention-days: 30
 
   linux-integration:
+    if: ${{ !github.event.pull_request.draft }}
     if: ${{ github.event_name != 'workflow_dispatch' || !inputs.run_native_tournament_pilot }}
     needs: [linux-integration-controls, linux-integration-release]
     # Valgrind 3.22.0 is the calibrated Ir unit (autolab.py checks it too).
