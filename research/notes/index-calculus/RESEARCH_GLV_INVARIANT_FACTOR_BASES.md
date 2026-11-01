@@ -3947,7 +3947,7 @@ All runs together took under a minute of CPU.  E33's uncommitted solver edits we
 binary was built (no walk path); the E29 replay below is the check.
 
 **Identity.**  (a) The counted copies of E29's walks reproduce **all `512`** E29 Stage R records (8 curves × 2 orders ×
-16 seeds × 2 arithmetics; §9.38 said `256`, the count per arithmetic) in every field.  (b) Every one of the `24`
+16 seeds × 2 arithmetics; §9.38 said `256`, the count per arithmetic) in every field, except the visit digest of the order-24 records, which E29 stored as `0`.  (b) Every one of the `24`
 (resp. `6`) class members of `200` random points of `⟨G⟩` plus `8` forced `x₀ = 0` points per curve gets E29's
 representative and multiplier from both cheap order-24 representatives (`39,936` members) and the cheap order-6 one
 (`9,984`), `0` mismatches, `rep = [m]P` on every scalar check.  No curve has a point with `x = 0` (`b₀t³` is not a
@@ -3966,8 +3966,8 @@ correctness, is the detector).  **Positive control:** E29's order-6 representati
 | order 6, E29 | `8.00` | `109.1`–`111.2` | `16.77` | `3.10` | `4.13` | `5.55` | `2.00` | `2.00` |
 | order 6, cheap | `4.00` | `105.0`–`107.1` | `15.22` | `4.65` | `2.06` | `4.52` | `2.00` | `2.00` |
 | order 24, E29 | `86`–`92` | `191.0`–`199.4` | `65.25` | `16.52` | `4.13` | `40.61` | `2.00` | `2.00` |
-| order 24, cheap | `15.17` | `117.2`–`120.2` | `25.82` | `13.95` | `3.35` | `4.52` | `2.00` | `2.00` |
-| order 24, cheap mul-lean | `10.17` | `112.1`–`115.1` | `30.96` | `13.95` | `8.50` | `4.52` | `2.00` | `2.00` |
+| order 24, cheap | `15.17` | `117.2`–`120.2` | `25.81` | `13.95` | `3.35` | `4.52` | `2.00` | `2.00` |
+| order 24, cheap mul-lean | `10.17` | `112.1`–`115.0` | `30.96` | `13.95` | `8.50` | `4.52` | `2.00` | `2.00` |
 
 The cheap representative needs `13.5` comparisons a call (`11` for the minimum of twelve, one zero test, `≈ 1.5` for
 the sign).  E29's walk as built also spent `40.6` mod-`n` operations a step on its multipliers (`pow_mod` per
@@ -3979,7 +3979,7 @@ artefact of the one-op-per-step convention.
 
 | order 6 / order 24 | arithmetic | 0 GAE | 0.1 GAE | 1 GAE | pooled order holds | curves: order 24 / unresolved |
 |:--|:--|--:|--:|--:|:--|:--|
-| E29 / E29 | schoolbook | `0.962` | `0.562` | `0.453` | yes (order 6) | `0` / `0` (order 6 on all 8) |
+| E29 / E29 | schoolbook | `0.962` | `0.562` | `0.453` | yes (order 6) | `0` / `3` (order 6 on 5; `p = 601, 997, 1069` unresolved: order 24 cheaper at `0` GAE) |
 | E29 / cheap | schoolbook | `1.563` | `1.254` | `1.126` | **yes** | `7` / `1` (`p = 769`) |
 | E29 / cheap | Karatsuba | `1.544` | `1.232` | `1.122` | **yes** | `7` / `1` |
 | cheap / cheap | schoolbook | `1.505` | `1.167` | `1.026` | **yes** | `3` / `5` |
@@ -3991,7 +3991,7 @@ validator's one-op-per-step convention every cheap order-24 row is `1.48`–`1.6
 variant is cheapest at `0` GAE and loses its lead by `0.1` (its six negations); the strongest order-24 walk is the
 mul-lean one at `0` GAE and the op-lean one at `0.1` and `1`, the strongest order-6 walk the cheap one throughout.
 Per curve against the cheap order-6 walk, the cheap order-24 walk is cheaper at every weight on `p = 601, 997,
-1069`; on the other five it is cheaper at `0` (`1.16`–`1.86`) and the order changes at `0.1` (`p = 769`) or `1` GAE
+1069`; on the other five it is cheaper at `0` (`1.16`–`1.46`) and the order changes at `0.1` (`p = 769`) or `1` GAE
 (`0.78`–`0.99`): there the ranking is unresolved.  The per-curve spread is the step count of `16` walks (steps
 ratio `1.29`–`2.10` per curve, `1.701` pooled), not the representative.
 
@@ -4001,7 +4001,7 @@ ratio `1.29`–`2.10` per curve, `1.701` pooled), not the representative.
 | G2.135 | `512/512` E29 records identical; E29's functions untouched; unit test `e34_built_arms_reproduce_e29_walks` passes | **holds** (registered count `256` was per arithmetic) |
 | G2.136 | `768/768` | **holds** |
 | G2.137 | `16/16` | **holds** |
-| G2.138 | `8.00`; `4.00`; `86`–`92`; `15.16`–`15.18`; `10.17`–`10.18`; equal in both arithmetics | **holds** |
+| G2.138 | `8.00`; `4.00`; `86`–`92`; `15.16`–`15.17`; `10.17`–`10.18`; equal in both arithmetics | **holds** |
 | G2.139 | `1.072`–`1.086` (schoolbook), `1.086`–`1.100` (Karatsuba) | **holds** |
 | G2.140 | `16.77`; `15.22`; `65.25`–`65.29`; `25.81`–`25.87` (`cmp` `13.52`–`13.59` a call) | **holds** |
 | G2.141 | `1.563 / 1.254 / 1.126` (S), `1.544 / 1.232 / 1.122` (K); `7/8` curves | **holds** |
@@ -4023,3 +4023,15 @@ built as the coordinate-wise structure allows: `15` multiplications instead of `
 more than an order-6 step instead of `80 %`, against `1.70×` fewer steps.  That holds pooled at every weight of the
 band with every operation of both walks emitted.  The margin at `1` GAE is thin (`2 %` over the cheap order-6 walk)
 and rests on the `11` comparisons that a minimum of twelve needs.  No representative equal to E29's avoids them.
+
+
+**Erratum (2026-11-01, from the independent validator's recompute; replay byte-identical from a fresh build of `bd0118f39`).** Six statements in this section disagreed with the records and are corrected in place above; no verdict changes (G2.134–G2.143 hold).
+
+1. G2.138: the cheap representative costs `15.16`–`15.17` F_p multiplications a call, not `15.16`–`15.18`.
+2. Mul-lean multiplications per step: top `115.047` → `115.0` (was rounded twice to `115.1`).
+3. Cheap order-24 native operations per step, pooled: `25.81`, not `25.82`.
+4. E29 / E29 per curve (schoolbook): order 6 is cheaper across the band on 5 of 8 curves, not all 8; on `p = 601, 997, 1069` E29's order-24 walk is cheaper at `0` GAE, so those three are unresolved. The pooled correction to §9.33 is unaffected.
+5. The five curves unresolved against the cheap order-6 walk are cheaper at `0` GAE by `1.16`–`1.46`, not `1.16`–`1.86` (`1.86` is `p = 601`, a resolved curve).
+6. Wording: the E29 replay matches every field except the order-24 visit digest, which E29 stored as `0` (disclosed in `tables.md`).
+
+**Two cautions from the validator.** The cheap order-24 lead over the cheap order-6 walk at `1` GAE (`1.026`, schoolbook) is `0.4` standard errors from `1` with `16` walks per curve and arm (steps ratio `1.701 ± 0.111` against the expected `2.0`); the registered rule ranks on point estimates, so G2.142 stands, but the data do not resolve that margin statistically, and the per-curve ranks are within sampling noise. The `1.632` factor at `0` GAE for E18 uses the mul-lean walk, which is not ranked across the band; against the band-ranked cheap walk it is `1.563` (`2.58` bits) schoolbook and `1.544` (`2.51` bits) Karatsuba.

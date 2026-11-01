@@ -9,7 +9,7 @@
 On the canonical model $y^2 = x^3 + b_0 t^3$, candidate $(j, k)$ of a class is $iota^k compose Phi^j (P)$. On abscissae both maps are coordinate-wise: $x_i |-> c_(i j k) x_i$ with $c_(i j k) = h^(2j) z^(i j) omega^k in FF_p$ ($h^2 = z^(-1)$). The cheap representative therefore (1) computes coordinate 0 of the twelve abscissae ($10$ products, $1$ negation) and keeps the minimum with $11$ comparisons, going on to the next coordinate only on a tie ($x_0 = 0$); (2) completes only the winner's abscissa and computes only the winner's ordinate ($Phi^j$ on $y$ is a monomial map); (3) fixes the sign by a half-$p$ test on the first non-zero ordinate coordinate. The multiplier comes from a 24-entry table. Arms: order 6 (E29), order 6 cheap, order 24 (E29), order 24 cheap, order 24 cheap mul-lean (sign classes: $5$ products and $6$ negations on coordinate 0).
 
 == Checks
-- *E29 replay*: counted copies reproduce all 512 E29 Stage R records in every field.
+- *E29 replay*: counted copies reproduce all 512 E29 Stage R records in every field, except the order-24 visit digest, which E29 stored as 0.
 - *Representative identity*: 0 mismatches over 39,936 order-24 class members (both cheap variants) and 9,984 order-6 members (200 random points of $chevron.l G chevron.r$ plus 8 forced $x_0 = 0$ points per curve), $"rep" = [m]P$ on every scalar check. No curve has a point with $x = 0$.
 - *Walk identity*: 768 of 768 cheap walks equal their built walk (steps, group operations, escapes, log, correctness, visit digest).
 - *Negative controls*: omitted candidate 3,328 of 39,936 mismatches and digest differs on 16 of 16 walks; wrong ordinate 39,936 of 39,936 mismatches.
