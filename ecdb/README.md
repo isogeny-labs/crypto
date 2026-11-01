@@ -105,6 +105,7 @@ record it refused, with the reason.
 | `GET /v1/modular-polynomials?level=&coefficients=` | Phi_l over Z, l = 2..19 |
 | `GET /v1/class-polynomials`, `GET /v1/summation-polynomials` | H_D for class number one; Semaev S_2, S_3 |
 | `POST /v1/sql` | one read-only query |
+| `GET /v1/export`, `GET /v1/export/{table}?offset=&limit=` | bulk export for mirrors: the manifest (tables, copyable columns, primary keys, exact row counts), then gzipped COPY-text pages in primary-key order, at most 4 MiB each (413 asks for a smaller `limit`) |
 | `POST /v1/evidence`, `POST /v1/isogenies` | token-gated agent writes |
 | `POST /mcp` | MCP (streamable HTTP, JSON responses, stateless): eleven tools over the routes above |
 
@@ -126,6 +127,13 @@ candidates.
 | `ECDB_SQL_TIMEOUT_MS`, `ECDB_SQL_MAX_ROWS` | 15000, 5000 | limits of `POST /v1/sql` |
 | `ECDB_MIGRATE_ON_START` | false | run pending migrations before serving |
 | `ECDB_POOL_SIZE` | 16 | connections per pool |
+
+## Local mirror (NAS)
+
+[`deploy/nas/`](deploy/nas/README.md) runs Postgres and the API with docker
+compose on a LAN host. `ecdb sync` copies the deployed catalogue into it
+through `/v1/export`. `ecdb bootstrap` applies the migrations and creates the
+`ecdb_api` login (and `ecdb_api_writer` when `ECDB_WRITER_PASSWORD` is set).
 
 ## Deploying on RDS
 

@@ -17,3 +17,4 @@ pub mod json;
 pub mod lambda;
 pub mod math;
 pub mod migrate;
+pub mod sync;

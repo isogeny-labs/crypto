@@ -1,0 +1,30 @@
+# DRAFT (L10). Provisional id. Replaces the WITHDRAWN draft KR-2 in the sibling REVIEW.md A1: it must extend
+# LEAD-ICB-decomposition-encoding-and-sat / KN-LIT-caa51d (Tseitin-variable-count obstruction) rather than stand alone.
+id: KR-IC-a10006
+area: index-calculus
+kind: known_negative
+title: Fermat-indicator counting of prime-field point decomposition has polynomial degree ~p
+claim: >-
+  The k-CNF polynomial-method counter needs a clause polynomial of degree O(1) per clause. The Boolean
+  indicator of S(x_1..x_m) = 0 over F_p is 1 - S^{p-1}, of degree ~deg(S)(p-1) in the field, so the
+  interpolation degree and point count scale with p. The additive-character rewriting removes the
+  degree but, for injective windows, reduces the count to window enumeration / x-coordinate
+  meet-in-the-middle (LEAD-ICP-generic-table-decomposition). Tseitin width reduction of F_p arithmetic
+  instead inflates n by the multiplier-circuit size, and the existing binary obstruction (#SAT exponent
+  outgrows enumeration once the CNF has omega(l sqrt(log l)) variables) applies the same way.
+status: heuristic
+setting: {field: prime, model: polynomial_method_counting}
+sources:
+  - ref: KN-LIT-caa51d
+    locator: "main-text clause-product polynomial of degree <= 3n (sparsified 3-CNF)"
+    verification_state: secondary_source
+forecloses:
+  - Fermat indicator polynomial method counting of decompositions
+  - apply ETH counting algorithm directly to Semaev point decomposition over F_p
+  - character sum rewriting of S3 count
+internal:
+  - {ref: LEAD-ICB-decomposition-encoding-and-sat, relation: extends, note: "same variable-count obstruction"}
+  - {ref: LEAD-EXO-hashed-factor-base-tensor-ecdl, relation: extends, note: ""}
+dominated_by: null
+added: '2026-10-31'
+superseded_by: null

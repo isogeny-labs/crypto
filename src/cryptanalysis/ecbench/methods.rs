@@ -69,10 +69,10 @@ use crate::cryptanalysis::ic_framework::fiber::{
     FiberDescentOracle, FiberFrobeniusMitmOracle, FiberMitmOracle,
 };
 use crate::cryptanalysis::ic_framework::plugins::{
-    BinarySubspaceBase, CompactOrbitScanBase, CyclotomicBase, DescentAlgebraicOracle,
-    FrobeniusMitmOracle, GlvOrbitBase, KSumOracle, KoblitzOrbitBase, MitmOracle, OnbWeightBase,
-    PrimeAbscissaBase, PrimeBatchMitmOracle, PrimeProjectedAbscissaBase, RootfindSubtractOracle,
-    SubtractOracle,
+    BinaryMultiplierBase, BinarySubspaceBase, CmMultiplierBase, CompactOrbitScanBase,
+    CyclotomicBase, DescentAlgebraicOracle, FrobeniusMitmOracle, GlvOrbitBase, KSumOracle,
+    KoblitzOrbitBase, MitmOracle, OnbWeightBase, PrimeAbscissaBase, PrimeBatchMitmOracle,
+    PrimeProjectedAbscissaBase, RootfindSubtractOracle, SubtractOracle,
 };
 use crate::cryptanalysis::ic_framework::prime_tower::{PrimeIsogenyBase, PrimeKummerBase};
 use crate::cryptanalysis::ic_framework::rootfind::{RootfindMitmOracle, RootfindPairsOracle};
@@ -206,7 +206,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "factor_base",
             default: None,
-            help: "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), binary-subspace:dimension=D, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
+            help: "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, cm-multiplier:size=N,norm=B[,endo=I][,mult=M], prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), binary-subspace:dimension=D, binary-multiplier:size=N,mult=M, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
         },
         ParamDecl {
             name: "oracle",
@@ -2415,6 +2415,7 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
     let id = full_price::base_of(&m.id)
         .or(wordram_price::base_of(&m.id))
         .unwrap_or(m.id.as_str());
+    three_leads_applicable(m, inst, curve)?;
     hyper_ic_variant_guard(m, inst, curve)?;
     if id == "rho.multitarget_pooled" {
         let batch = param_u64(m, "batch")?;
@@ -2540,6 +2541,23 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
     }
 }
 
+fn three_leads_applicable(
+    m: &ResolvedMethod,
+    inst: &Instance,
+    curve: &CurveFacts,
+) -> Result<(), String> {
+    if !m.id.contains(".three_leads_") {
+        return Ok(());
+    }
+    let Instance::ThreeLeads(study) = inst else {
+        return Err(format!(
+            "three-leads methods require a frozen three_leads curve fixture; {} is {}",
+            curve.slug, curve.family
+        ));
+    };
+    super::three_leads::applicable(m, study)
+}
+
 /// What `solve_ext` runs on a GLS or subfield curve: the generic methods,
 /// and the endomorphism-orbit rho of the instance's own family.  Anything
 /// else is the refusal `solve_ext` raises on every execution.
@@ -2619,9 +2637,7 @@ pub fn solve_measured(
 ) -> Result<SolveReport, String> {
     hyper_ic_variant_guard(m, inst, curve)?;
     let d = decl(&m.id).ok_or("unregistered method")?;
-    if m.id.contains(".three_leads_") && !matches!(inst, Instance::ThreeLeads(_)) {
-        return Err("three-leads methods require a frozen three_leads curve fixture".into());
-    }
+    three_leads_applicable(m, inst, curve)?;
     if m.id.starts_with("ic.cm_folded_") && !matches!(inst, Instance::Prime(_)) {
         return Err("CM folded controls require a prime-field instance".into());
     }
@@ -5590,15 +5606,19 @@ fn prime_base_for<'a>(
         "prime-abscissa" => Box::new(PrimeAbscissaBase { instance: inst }),
         "prime-projected-abscissa" => Box::new(PrimeProjectedAbscissaBase { instance: inst }),
         "glv-orbit" => Box::new(GlvOrbitBase { instance: inst }),
+        "cm-multiplier" => Box::new(CmMultiplierBase { instance: inst }),
         "prime-kummer" => Box::new(PrimeKummerBase { instance: inst }),
         "prime-isogeny" => Box::new(PrimeIsogenyBase { instance: inst }),
         "cm-scalar-orbit" => Box::new(CmOrbitBase { instance: inst }),
         "known-log" => Box::new(crate::cryptanalysis::ic_framework::plugins::KnownLogBase),
-        other => {
-            return Err(format!(
-                "factor base `{other}` does not run on a prime curve"
-            ))
-        }
+        other => match prime_plugins().and_then(|p| (p.base)(other, inst)) {
+            Some(b) => b,
+            None => {
+                return Err(format!(
+                    "factor base `{other}` does not run on a prime curve"
+                ))
+            }
+        },
     })
 }
 
@@ -5639,6 +5659,7 @@ fn solve_ic_prime(
     let mut rootfind_mitm = RootfindMitmOracle::new(ms);
     let mut rootfind_pairs = RootfindPairsOracle::new(ms);
     let mut rootfind = RootfindSubtractOracle::new(ms, inst);
+    let mut plugin_oracle = prime_plugins().and_then(|p| (p.oracle)(or_name.as_str(), ms, inst));
     // `pkm-semaev` writes its system on the base's own tower, so it reads
     // the tower from the `prime-kummer` spec and runs on no other base.
     let mut pkm = match or_name.as_str() {
@@ -5670,7 +5691,10 @@ fn solve_ic_prime(
         "rootfind-mitm" => &mut rootfind_mitm,
         "rootfind-pairs" => &mut rootfind_pairs,
         "rootfind-subtract" => &mut rootfind,
-        other => return Err(format!("oracle `{other}` does not run on a prime curve")),
+        other => match plugin_oracle.as_deref_mut() {
+            Some(o) => o,
+            None => return Err(format!("oracle `{other}` does not run on a prime curve")),
+        },
     };
     let ctx = prime_ctx(inst, curve, target);
     let calib = pinned_only_calibration("prime", &curve.slug);
@@ -6243,6 +6267,44 @@ fn binary_plugins() -> Option<&'static BinaryPlugins> {
     BINARY_PLUGINS.get()
 }
 
+/// A prime-curve factor base that a linking binary adds to `ic.pipeline`
+/// by name, or `None` when the name is not its.
+pub type PrimeBasePlugin = for<'i> fn(
+    &str,
+    &'i PrimeInstance,
+) -> Option<
+    Box<dyn FactorBaseBuilder<crate::cryptanalysis::ic_boundary::PrimeCurve> + 'i>,
+>;
+
+/// A prime-curve decomposition oracle that a linking binary adds to
+/// `ic.pipeline` by name, given the summand count `m`, or `None`.
+pub type PrimeOraclePlugin = for<'i> fn(
+    &str,
+    u32,
+    &'i PrimeInstance,
+) -> Option<
+    Box<dyn DecompositionOracle<crate::cryptanalysis::ic_boundary::PrimeCurve> + 'i>,
+>;
+
+/// Prime-curve plug-ins a binary registers at start-up, for the same
+/// reason as [`BinaryPlugins`].
+#[derive(Clone, Copy)]
+pub struct PrimePlugins {
+    pub base: PrimeBasePlugin,
+    pub oracle: PrimeOraclePlugin,
+}
+
+static PRIME_PLUGINS: std::sync::OnceLock<PrimePlugins> = std::sync::OnceLock::new();
+
+/// Register a binary's prime-curve plug-ins; the first registration wins.
+pub fn register_prime_plugins(plugins: PrimePlugins) {
+    let _ = PRIME_PLUGINS.set(plugins);
+}
+
+fn prime_plugins() -> Option<&'static PrimePlugins> {
+    PRIME_PLUGINS.get()
+}
+
 /// The factor-base builder `fb_name` names on a binary curve: a built-in
 /// one, or one a binary registers ([`register_binary_plugins`]).
 fn binary_base_for<'a>(
@@ -6256,6 +6318,7 @@ fn binary_base_for<'a>(
             },
         ),
         "binary-subspace" => Box::new(BinarySubspaceBase { instance: inst }),
+        "binary-multiplier" => Box::new(BinaryMultiplierBase { instance: inst }),
         "koblitz-orbit" => Box::new(KoblitzOrbitBase { instance: inst }),
         "compact-orbit-scan" => Box::new(CompactOrbitScanBase { instance: inst }),
         "cyclotomic" => Box::new(CyclotomicBase { instance: inst }),
@@ -6965,20 +7028,26 @@ pub fn dump_factor_base(
             let explicit = crate::cryptanalysis::ic_framework::explicit_base::PrimeExplicitXBase;
             let projected = PrimeProjectedAbscissaBase { instance: i };
             let orbit = GlvOrbitBase { instance: i };
+            let multiplier = CmMultiplierBase { instance: i };
             let kummer = PrimeKummerBase { instance: i };
             let isogeny = PrimeIsogenyBase { instance: i };
+            let plugin_base = prime_plugins().and_then(|p| (p.base)(name.as_str(), i));
             let base: &dyn FactorBaseBuilder<_> = match name.as_str() {
                 "explicit-x" => &explicit,
                 "prime-abscissa" => &abscissa,
                 "prime-projected-abscissa" => &projected,
                 "glv-orbit" => &orbit,
+                "cm-multiplier" => &multiplier,
                 "prime-kummer" => &kummer,
                 "prime-isogeny" => &isogeny,
-                other => {
-                    return Err(format!(
-                        "factor base `{other}` does not run on a prime curve"
-                    ))
-                }
+                other => match plugin_base.as_deref() {
+                    Some(b) => b,
+                    None => {
+                        return Err(format!(
+                            "factor base `{other}` does not run on a prime curve"
+                        ))
+                    }
+                },
             };
             let ctx = InstanceCtx {
                 group: &i.curve,
@@ -7010,6 +7079,7 @@ pub fn dump_factor_base(
         Instance::Binary(i) => {
             let g = BinaryGroup(&i.fast);
             let subspace = BinarySubspaceBase { instance: i };
+            let multiplier = BinaryMultiplierBase { instance: i };
             let explicit = crate::cryptanalysis::ic_framework::explicit_base::BinaryExplicitXBase {
                 instance: i,
             };
@@ -7021,6 +7091,7 @@ pub fn dump_factor_base(
             let base: &dyn FactorBaseBuilder<BinaryGroup> = match name.as_str() {
                 "explicit-x" => &explicit,
                 "binary-subspace" => &subspace,
+                "binary-multiplier" => &multiplier,
                 "koblitz-orbit" => &orbit,
                 "compact-orbit-scan" => &compact,
                 "cyclotomic" => &cyclotomic,
@@ -8586,6 +8657,16 @@ mod accounting_rules_tests {
     fn the_inventory_describes_the_base_the_run_used() {
         let cases: Vec<(CurveSpec, ResolvedMethod)> = vec![
             (
+                j0(),
+                method(
+                    "ic.pipeline",
+                    &[
+                        ("factor_base", "cm-multiplier:size=4,norm=4"),
+                        ("oracle", "mitm:negation_folded=1"),
+                    ],
+                ),
+            ),
+            (
                 CurveSpec::PrimeSearch {
                     bits: 16,
                     seed: 59297,
@@ -8594,6 +8675,16 @@ mod accounting_rules_tests {
                     "ic.pipeline",
                     &[
                         ("factor_base", "prime-abscissa:size=32"),
+                        ("oracle", "mitm:negation_folded=1"),
+                    ],
+                ),
+            ),
+            (
+                CurveSpec::Koblitz { a: 1, n: 17 },
+                method(
+                    "ic.pipeline",
+                    &[
+                        ("factor_base", "binary-multiplier:size=4,mult=4"),
                         ("oracle", "mitm:negation_folded=1"),
                     ],
                 ),
@@ -9046,6 +9137,39 @@ mod accounting_tests {
         )
         .unwrap_err();
         assert!(err.contains("no gls_fp2 implementation"), "{err}");
+    }
+
+    #[test]
+    fn plan_checks_three_leads_variant_families_before_execution() {
+        let scholten = json!({
+            "kind": "three_leads", "p": 739, "n": 2, "modulus": 1,
+            "a": 493102, "b": 193650, "group_order": 546352, "r": 34147,
+            "gx": 433246, "gy": 59741, "family": "scholten", "parameter": 0
+        });
+        let subfield = json!({
+            "kind": "three_leads", "p": 2, "n": 6, "modulus": 67,
+            "a": 3, "b": 3, "group_order": 56, "r": 7,
+            "gx": 1, "gy": 58, "family": "subfield", "parameter": 3
+        });
+        let params = json!({
+            "trial_cap": "2000", "oracle": "subtract",
+            "random_base": "0", "base_seed": "17"
+        });
+        for id in [
+            "ic.three_leads_decomposition_v1",
+            "ic.three_leads_decomposition_v2",
+        ] {
+            let err = plan_arm(scholten.clone(), id, params.clone()).unwrap_err();
+            assert!(err.contains("subfield or tower fixture"), "{id}: {err}");
+            plan_arm(subfield.clone(), id, params.clone()).unwrap();
+        }
+        let err = plan_arm(
+            json!({"kind": "prime_search", "bits": 12, "seed": 5}),
+            "rho.three_leads_plain_v1",
+            json!({"trial_cap": "2000"}),
+        )
+        .unwrap_err();
+        assert!(err.contains("frozen three_leads curve fixture"), "{err}");
     }
 
     #[test]
