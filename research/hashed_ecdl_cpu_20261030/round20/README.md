@@ -1,9 +1,18 @@
 # Round20: matched CPU panel preparation
 
-Status: **native-validated and frozen; not admitted or executed**. This
-directory contains a frozen worker runner but no submission command. It does not authorize
-a replacement for the terminal round19 attempt. The current 10x goal keeps its
-original baseline and all three fixtures.
+Status: **terminal scheduling timeout; zero executions**. The owner authorized
+one 2-vCPU/4-GiB/300-second/zero-retry attempt and subsequently allowed normal
+Spot-pool autoscaling. Job hashed-ecdl-cpu-round20-20261030 was submitted on
+2026-11-01 at 03:50:31 UTC and reached DeadlineExceeded at 03:55:31 UTC;
+terminal Failed was recorded at 03:55:32 UTC. No node was assigned, no worker
+logs were returned, and the S3 listing contained no result objects. All 180
+planned executions are missing. No timing or certificate result is claimed.
+
+The exact request, admission, Job/Pod identities and terminal receipts are
+retained here. Historical preparation/qualification records remain unchanged;
+their earlier unsubmitted state is superseded by these execution receipts.
+No retry or replacement was submitted. The current 10x goal keeps its original
+baseline and all three fixtures.
 
 ## Planned contrasts
 
