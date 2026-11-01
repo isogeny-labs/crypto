@@ -7,12 +7,20 @@
    impose f vanishingtoorder4 onT andorder2 oncomponentsoutsideO/T.
    A nonzero solution is one-dimensional up toconstants,or the pattern is
    excluded. Construct the exact NORMAL source quotient B/A^4 (dimension320)
-   to evaluate all these jets,using the actualnormalA multiplication and
+   to evaluate all these jets. Start withR55/runs/quotient55-02/
+   source-annihilator55.sing (A55,conjugate55,f55):A55*conjugate55=f55I.
+   Workmodf55^4 on32normalbasisvectors (640binarycoordinates);A55^4
+   shouldhaverank320 andcomplete320-cokernelcertificates. Keepactual
+   source-liftmaps fromR52/rr-table50 and the z versus1/u coordinatebridge.
+   Usequotientmultiplication for allpointjets/CRT,not unnormalizedlambda
+   jets. This uses the actualnormalA multiplication and
    source-coordinate maps. Keep this distinct from projective/incidence
    saturation. Evaluate all18patterns;do not substitute a smallsubset.
    For each surviving x0,test all31 nonzero F32scalars andboth ordinarysigns.
-   The equation t²+t=c*x0+a+1/(c*x0)² is F2-linear in the500 t-coefficient
-   bits of L(2P). Combine it withNt=1,solve exactly,and verify whole-source
+   The equation t²+t=c*x0+a+1/(c*x0)² is F2-linear in250 trace-compatible bits using
+   t=t0+sum(c_j*fixed_j),t0=lambda/A. The shared ASoperator has expected
+   rank249,with kernel{0,1};verifythis withthe completepole/jetbound.
+   Solve exactly,and verify whole-source
    identities/all5conjugates/intended11action. Use161 F1024regular jets only
    with full degree320 L(4P) injectivity bound and finalfunctionfieldcheck.
    Positivecontrol:RHS=t0²+t0,Nt0=1 witht0=lambda/A. Negativecontrol:
@@ -20,7 +28,8 @@
    F32/F2degree exclude an Artin-Schreier root of1. This detects accidental
    admission of F4constants from the F1024evaluationresidue. Factor the
    shared AS/trace linearoperator once and apply all RHS,not one search
-   per scalar. This is a complete F2-stable-support cohort,not all F32
+   per scalar. The broader quadraticcompiler stillhas500bits forxandt.
+   This is a complete F2-stable-support cohort,not all F32
    fiberpatterns.
 2. Build the exact target-relation compiler overF32 for BOTH ordinary signs
    using the100-section L(2P),not the old simple-pole space. Use the actual

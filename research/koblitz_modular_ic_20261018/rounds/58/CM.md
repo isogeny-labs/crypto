@@ -123,8 +123,10 @@ Constructing normalB/A^4,dimension320, supplies all pointjets. A nonzero
 solution is unique up toscalar by propercurve constant-field facts.
 
 For each surviving x0, enumerate all31 nonzero F32scalars and bothordinary
-signs. The Artin-Schreier equation t²+t=x+a+1/x² is F2-linear on the500
-binarycoefficients of completeL(2P),withNt=1 imposed. This avoids starting
+signs. The Artin-Schreier equation t²+t=x+a+1/x² is F2-linear on250
+trace-compatible bits:write t=lambda/A plus acombinationofthe50fixed
+functions overF32. Its expectedrank249 has kernelthetwoconstants0,1;
+verifythis usingthe completepole/jetbound andwhole-source equations. This avoids starting
 with a500-variable quadratic solve for this specifically bounded cohort.
 The generalF32-support quadratic compiler remains a separate retained lane.
 Final whole-source identities,allfivecoefficientconjugates andintended11action

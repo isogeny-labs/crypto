@@ -24,4 +24,6 @@ attempts retained. Neverrepeat anacceptedproducer for metadata/report or
 custody. Donorarchives andstageoutputs are pinned indonors.json with
 relativepaths. ARTIFACTS.md resolves rawcustody after publication. Timings
 are custody diagnostics,not an ICspeed comparison. The nextconstruction
-is theactualF32targetrelationcompiler using50fixed/50traceparameters.
+is the320-dimensional normalA4quotient andall18stablefiberpatterns,
+then shared250-bit Artin-Schreier solves;the general500-bit target
+relationcompiler remains a separate retainedlane.
