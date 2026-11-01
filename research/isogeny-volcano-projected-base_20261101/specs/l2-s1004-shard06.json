@@ -1,0 +1,458 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "oracle": "mitm:negation_folded=1"
+        }
+      },
+      "name": "ic-raw",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=32",
+          "oracle": "mitm:negation_folded=1"
+        }
+      },
+      "name": "ic-projected",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg-aa",
+      "role": "control"
+    }
+  ],
+  "description": "volcano-rho --ecbench: every curve of an 2-isogeny volcano over F_10962617 (35 curves x 4 models), isogeny-transported generators, planted_shared targets; written by ./target/release/volcano-rho --bits 24 --depth 3 --max-cofactor 4096 --ell 2 --crater split --seed 1004 --controls 0 --level-caps 16,4,4,12 --ecbench research/isogeny-volcano-cost-v2_20261017/classes/l2-s1004 --models 4 --crater-models 16 --aa-model0 --targets 8 --out /tmp/claude-0/-home-user/bb846e50-c603-501b-84aa-3c771ffd768e/scratchpad/v2-l2-s1004; prospectively sliced without changing curves or targets for EX-VOLCANO-PROJECTED-20261101, class l2-s1004, cell l2-s1004-shard06",
+  "label": "projected volcano discriminator: l2-s1004-shard06",
+  "measurement": {
+    "isolation_required": "L2",
+    "order": "shuffle",
+    "rounds": 5,
+    "seed": 1004,
+    "timeout_seconds": 600,
+    "warmup": 1
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 4492961,
+        "b": 751058,
+        "group_order": 10967284,
+        "gx": 953190,
+        "gy": 1384718,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 5960307,
+        "b": 9133381,
+        "group_order": 10967284,
+        "gx": 115366,
+        "gy": 1681539,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 8839493,
+        "b": 2185332,
+        "group_order": 10967284,
+        "gx": 247679,
+        "gy": 6751066,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 5349174,
+        "b": 4573044,
+        "group_order": 10967284,
+        "gx": 791607,
+        "gy": 6086972,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 3376454,
+        "b": 1263159,
+        "group_order": 10967284,
+        "gx": 9223623,
+        "gy": 3440461,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 2471577,
+        "b": 7845178,
+        "group_order": 10967284,
+        "gx": 6650887,
+        "gy": 6951798,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 9409574,
+        "b": 9078774,
+        "group_order": 10967284,
+        "gx": 313214,
+        "gy": 6575990,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 8627247,
+        "b": 8291759,
+        "group_order": 10967284,
+        "gx": 4603084,
+        "gy": 6560416,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 9185878,
+        "b": 5702616,
+        "group_order": 10967284,
+        "gx": 1803745,
+        "gy": 6476447,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 7056314,
+        "b": 9005337,
+        "group_order": 10967284,
+        "gx": 1804239,
+        "gy": 10828573,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 8786929,
+        "b": 5775635,
+        "group_order": 10967284,
+        "gx": 6987185,
+        "gy": 7214176,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 5030799,
+        "b": 489283,
+        "group_order": 10967284,
+        "gx": 4951665,
+        "gy": 5590252,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 9620156,
+        "b": 2965561,
+        "group_order": 10967284,
+        "gx": 4960046,
+        "gy": 7527097,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 9504207,
+        "b": 23083,
+        "group_order": 10967284,
+        "gx": 7442665,
+        "gy": 4464478,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 1691672,
+        "b": 3638486,
+        "group_order": 10967284,
+        "gx": 9332099,
+        "gy": 7042281,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 1523926,
+        "b": 6894918,
+        "group_order": 10967284,
+        "gx": 8183756,
+        "gy": 754689,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 6350409,
+        "b": 10684849,
+        "group_order": 10967284,
+        "gx": 10843505,
+        "gy": 4997965,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 1748162,
+        "b": 8572520,
+        "group_order": 10967284,
+        "gx": 2509010,
+        "gy": 4039431,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 3226646,
+        "b": 10072091,
+        "group_order": 10967284,
+        "gx": 9470741,
+        "gy": 5234114,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 4986752,
+        "b": 6253196,
+        "group_order": 10967284,
+        "gx": 844132,
+        "gy": 3154609,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 9674933,
+        "b": 9318132,
+        "group_order": 10967284,
+        "gx": 6930477,
+        "gy": 5004141,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 1263389,
+        "b": 6978127,
+        "group_order": 10967284,
+        "gx": 3901423,
+        "gy": 3398686,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 5818555,
+        "b": 398996,
+        "group_order": 10967284,
+        "gx": 2152013,
+        "gy": 2228973,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 8583332,
+        "b": 5386050,
+        "group_order": 10967284,
+        "gx": 4297912,
+        "gy": 5033801,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 8996861,
+        "b": 9565534,
+        "group_order": 10967284,
+        "gx": 6280003,
+        "gy": 417025,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 8594490,
+        "b": 4439048,
+        "group_order": 10967284,
+        "gx": 9780935,
+        "gy": 659341,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 10475339,
+        "b": 7524930,
+        "group_order": 10967284,
+        "gx": 216452,
+        "gy": 3574242,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 7787056,
+        "b": 6424658,
+        "group_order": 10967284,
+        "gx": 4420860,
+        "gy": 6305482,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 5759776,
+        "b": 4251618,
+        "group_order": 10967284,
+        "gx": 1504824,
+        "gy": 2940250,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 10627317,
+        "b": 6940404,
+        "group_order": 10967284,
+        "gx": 1513657,
+        "gy": 10891072,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 3123146,
+        "b": 3440805,
+        "group_order": 10967284,
+        "gx": 3935875,
+        "gy": 3036641,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 643376,
+        "b": 6727429,
+        "group_order": 10967284,
+        "gx": 132800,
+        "gy": 8277120,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 1801568,
+        "b": 4228094,
+        "group_order": 10967284,
+        "gx": 10506402,
+        "gy": 5728639,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 9982476,
+        "b": 5198978,
+        "group_order": 10967284,
+        "gx": 5474680,
+        "gy": 307323,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 6659762,
+        "b": 1256959,
+        "group_order": 10967284,
+        "gx": 3897906,
+        "gy": 74763,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 10525999,
+        "b": 825601,
+        "group_order": 10967284,
+        "gx": 10349332,
+        "gy": 9989661,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 1115724,
+        "b": 9216813,
+        "group_order": 10967284,
+        "gx": 2350165,
+        "gy": 9842044,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 10261554,
+        "b": 9189960,
+        "group_order": 10967284,
+        "gx": 3789301,
+        "gy": 5391780,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 8819998,
+        "b": 10346397,
+        "group_order": 10967284,
+        "gx": 9064304,
+        "gy": 6169422,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      },
+      {
+        "a": 7297503,
+        "b": 3085778,
+        "group_order": 10967284,
+        "gx": 2767987,
+        "gy": 2013839,
+        "kind": "prime_explicit",
+        "p": 10962617,
+        "r": 2741821
+      }
+    ],
+    "target_kind": "planted_shared",
+    "target_seed": 1004,
+    "targets_per_curve": 8
+  }
+}

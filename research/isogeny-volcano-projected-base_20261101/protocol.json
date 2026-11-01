@@ -1,0 +1,712 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "EX-VOLCANO-PROJECTED-20261101",
+  "version": 1,
+  "created": "2026-11-01",
+  "repository": "crypto",
+  "study_dir": "research/isogeny-volcano-projected-base_20261101",
+  "authors": [
+    "projected-base experiment lane"
+  ],
+  "links": {
+    "predecessor": "research/isogeny-volcano-cost-v2_20261017",
+    "lead19": "research/lead19_projected_base",
+    "desk_discriminator": "research/pdp_strategy_evaluation_20261031/cards/e4.md",
+    "cell_manifest": "research/isogeny-volcano-projected-base_20261101/specs/manifest.json sha256:b7c25fe94983234da84f7f8fea3777b66c3eb20409d0c18f154d6a72afdb66d2",
+    "historical_l3_null": "research/isogeny-volcano-cost-v2_20261017/analysis/v2.1-H2-l3.json sha256:212235fa171ea718efc2d071f7736d54b30a3e88f7210264008f904f171bee76"
+  },
+  "question": "On the unchanged 14 l=2 volcano classes, does the floor/crater IC effect survive when prime-abscissa:size=32 is replaced by prime-projected-abscissa:size=32, or was the effect mediated by cofactor-class dead weight?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Every completed row recovers and verifies its planted scalar.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "The projected-base IC floor/crater effect either persists below the preregistered 0.97 margin or is equivalent within +/-3% with model heterogeneity no larger than the old null p95.",
+      "class": "comparative",
+      "decided_by": [
+        "C-projected-level"
+      ],
+      "if_supported": "Within this 24-bit split-crater panel only, proceed to charged representative-selection arms on the projected baseline.",
+      "if_not_supported": "Close the representative-selection lead as mediated by raw cofactor dead weight and absorbed by LEAD-19 within this scope."
+    },
+    {
+      "id": "C3",
+      "text": "Projection changes relation yield and counted S relative to the raw base on otherwise identical workloads.",
+      "class": "comparative",
+      "decided_by": [
+        "C-projection"
+      ],
+      "if_supported": "Report the paired effect as engineering and retain the matched-rho distance.",
+      "if_not_supported": "Report no transferable LEAD-19 effect on this prime-field panel."
+    },
+    {
+      "id": "C4",
+      "text": "No exponent, scaling, generic-ECC, standardized-curve, or security claim is licensed by this 24-bit panel.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "After subgroup projection, l=2 volcano floors still have lower IC relation yield and higher end-to-end counted cost than craters by more than a 3% equivalence margin.",
+      "mechanism": "If the effect is intrinsic to level-dependent coordinate factor-base realization, projection removes dead cofactor classes but leaves a floor/crater contrast; if it was cofactor-class mediation, projection removes it.",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "floor_over_crater",
+          "direction": "lower",
+          "minimum_effect": "90% CI upper endpoint below 0.97 and one-sided permutation p < 0.05",
+          "provenance": {
+            "written_at": "2026-11-01",
+            "first_recorded_in": "research/pdp_strategy_evaluation_20261031/cards/e4.md",
+            "data_seen": [
+              {
+                "path": "research/isogeny-volcano-cost-v2_20261017",
+                "measured": "raw-base H1 and its controls"
+              },
+              {
+                "path": "research/lead19_projected_base",
+                "measured": "binary-curve projected-base transfer, not this prime-field population"
+              }
+            ],
+            "sample_status": "partially_in_sample",
+            "decisive_scope": "The projected prime-base rows have never been run; the classes and raw outcomes are already seen."
+          },
+          "role": "decisive"
+        }
+      ]
+    },
+    {
+      "id": "H2",
+      "statement": "The cofactor projection increases useful relation yield and lowers end-to-end S versus the raw base on the same prime-field workloads.",
+      "mechanism": "Multiplication by h maps scanned rational points into the r-order subgroup, eliminating table entries that cannot match a subgroup target while charging the projection work.",
+      "predictions": [
+        {
+          "id": "P2",
+          "metric": "relation_yield",
+          "direction": "higher",
+          "minimum_effect": "paired relation-yield ratio 95% CI lower endpoint above 1; any S ordering must hold at native-operation prices 0, 0.1, and 1 GAE",
+          "provenance": {
+            "written_at": "2026-11-01",
+            "first_recorded_in": "research/pdp_strategy_evaluation_20261031/cards/e4.md",
+            "data_seen": [
+              {
+                "path": "research/lead19_projected_base",
+                "measured": "1.29x to 3.36x binary-ladder S lever at cofactors 2 to 6"
+              }
+            ],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "Prime-field cofactor-4/12 volcano classes and the registered projected prime-abscissa implementation."
+          },
+          "role": "decisive"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "rho-neg",
+      "role": "reference",
+      "description": "Matched rho.negation on every workload; also the across-level negative control.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "rho.negation"
+      }
+    },
+    {
+      "id": "ic-raw",
+      "role": "baseline",
+      "description": "Unmodified raw prime-abscissa:size=32 base with the frozen negation-folded MITM oracle; the prior H1 is the positive control.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=32",
+        "oracle": "mitm:negation_folded=1"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "ic-projected",
+      "role": "candidate",
+      "description": "The sole treatment: prime-projected-abscissa:size=32 with the same oracle and every other workload and budget fixed.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-projected-abscissa:size=32",
+        "oracle": "mitm:negation_folded=1"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "rho-neg-aa",
+      "role": "control_aa",
+      "description": "rho.negation repeated under a second arm name for the matched A/A admission control.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "rho.negation"
+      },
+      "same_instrument_as": "rho-neg"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "No extra positive-control arm is added because it would change the frozen cost population. Instead the unchanged ic-raw baseline is a mandatory in-session detector calibration: it must reproduce the already-confirmed floor deficit (90% CI upper endpoint below 0.97 and p < 0.05), and a miss invalidates every projected null conclusion. The separate synthetic 0.95 floor plant must also be detected by the frozen analysis."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No extra negative-control arm is needed because the matched rho-neg reference already supplies the exact null path on every retained workload; its +/-3% level-equivalence result is a mandatory invalidation gate. The previously measured 14-class l=3 null is retained as an already-seen calibration and cannot decide the projected result."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "factor_base",
+        "levels": [
+          "prime-abscissa:size=32",
+          "prime-projected-abscissa:size=32"
+        ]
+      },
+      {
+        "name": "volcano_level",
+        "levels": [
+          0,
+          1,
+          2,
+          3
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "population",
+        "treatment": "fixed",
+        "value": "14 l=2 v2.1 classes; 3,904 curve-models; 8 targets each",
+        "how": "Specs slice the committed ordered curves arrays; source spec hashes and slice bounds are in specs/manifest.json."
+      },
+      {
+        "name": "factor_base",
+        "treatment": "crossed",
+        "value": "raw and projected, size 32",
+        "how": "Both arms run in each cell against the same workload and algorithm seed."
+      },
+      {
+        "name": "volcano_level",
+        "treatment": "crossed",
+        "value": "crater through floor",
+        "how": "The original curves.jsonl sidecars fix vertex, model, and level before this protocol."
+      },
+      {
+        "name": "oracle",
+        "treatment": "fixed",
+        "value": "mitm:negation_folded=1",
+        "how": "Written explicitly in both IC arms."
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "one release ecbench binary and digest-pinned OCI image per submitted population",
+        "how": "same_instrument_as binds all arms; request and result must match the frozen source and image."
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "The ecbench child environment fixes Rayon and OpenMP to one thread."
+      },
+      {
+        "name": "algorithm_seed",
+        "treatment": "randomized",
+        "how": "ecbench derives a seed per workload and round from each frozen spec's measurement seed and shares it across arms."
+      },
+      {
+        "name": "arm_order",
+        "treatment": "randomized",
+        "how": "Shuffle order is fixed by each spec before data and interleaves arms within every round."
+      },
+      {
+        "name": "class_and_shard",
+        "treatment": "crossed",
+        "how": "All 104 disjoint cells run; cell membership is not a selection variable."
+      },
+      {
+        "name": "host_and_load",
+        "treatment": "measured",
+        "how": "EKS/ecbench records CPU, kernel, NUMA, SMT, PSI, steal, foreign slices, run queue, interrupts, and L2 blockers per row."
+      },
+      {
+        "name": "uncharged_native_work",
+        "treatment": "measured",
+        "how": "Every emitted counter is retained and priced at 0, 0.1, and 1 GAE for raw, projected, and rho."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-projected-level",
+        "arms": [
+          "ic-projected"
+        ],
+        "differs_in": [
+          "volcano_level"
+        ],
+        "design": "absolute",
+        "threshold": "floor/crater ratio 0.97 and equivalence interval [0.97,1.03]"
+      },
+      {
+        "id": "C-projection",
+        "arms": [
+          "ic-raw",
+          "ic-projected"
+        ],
+        "differs_in": [
+          "factor_base"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "rho-neg",
+          "rho-neg-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-raw-positive",
+        "arms": [
+          "ic-raw"
+        ],
+        "differs_in": [
+          "volcano_level"
+        ],
+        "design": "absolute",
+        "threshold": "floor/crater 90% CI upper endpoint below 0.97 and p < 0.05"
+      },
+      {
+        "id": "C-rho-negative",
+        "arms": [
+          "rho-neg"
+        ],
+        "differs_in": [
+          "volcano_level"
+        ],
+        "design": "absolute",
+        "threshold": "90% CI contained in [0.97,1.03]"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false,
+    "transfer_obligations": [
+      {
+        "scope": "population",
+        "obligation": "The result transfers only to the committed 24-bit prime-field split-crater depth-3 population."
+      },
+      {
+        "scope": "classification",
+        "obligation": "A projected-base gain is engineering and does not transfer an exponent improvement to generic ECC or ECC2K-130."
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "Each generated spec retains the source class measurement seed (1001 through 1014); ecbench freezes the per-workload, per-round algorithm seeds in plan.json and shares them across arms."
+    },
+    "instance_sampling": {
+      "rule": "Complete census of the committed l=2 v2.1 class exports, preserving all 3,904 curve-models and their eight target_seed-derived planted_shared targets.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Not masked: arm implementations are structurally visible in emitted factor-base counters. The analysis script, margins, direction, and verdicts are frozen before data.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 31232,
+    "replicates": 5,
+    "warmups": 1,
+    "power": {
+      "method": "other",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": 10000,
+      "min_attainable_two_sided_p": 0.00019998000199980003,
+      "passes": true,
+      "note": "Fourteen classes, 3,904 models, eight targets and five algorithm-seed rounds greatly exceed v2.1, whose predicted four-class precision was about +/-0.9% for a 6.5% effect. The primary equivalence margin is +/-3%; 10,000 permutations resolve alpha 0.05. Repeated rounds are sampled within curve by the frozen two-stage analysis."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 0.3592,
+      "threads": 1,
+      "estimated_total_seconds": 269300,
+      "measured_on": "The complete old l=2 main sessions took 44,873.130 s for 124,928 arm-round executions; the new four-arm, six-round design is 6x, about 74.8 CPU-hours. <=40-model cells predict <=46 minutes at the old mean, below the 3,600 s request cap."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "s",
+        "name": "end-to-end counted S",
+        "unit": "total GAE / sqrt(r)",
+        "kind": "counted",
+        "definition": "All charged factor-base, relation, linear-algebra, and verification group-addition equivalents for one solve, divided by sqrt(r).",
+        "source": "records.jsonl cost.s",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE / sqrt(r)",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "relation_yield",
+        "name": "relations per target tried",
+        "unit": "verified relations / target trial",
+        "kind": "rate",
+        "definition": "relations_found divided by targets_tried over the same end-to-end IC row; no failed row is dropped.",
+        "source": "records.jsonl counters.relations_found / counters.targets_tried",
+        "aggregation": "paired_ratio",
+        "resolution": "one relation and one target trial",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "floor_over_crater",
+        "name": "class-stratified floor/crater ratio",
+        "unit": "ratio",
+        "kind": "derived",
+        "definition": "Within each class, ratio of the floor to crater aggregate, combined as the equal-weight mean of log ratios.",
+        "source": "volcano-stats metrics[].vertical.floor_over_crater",
+        "formula": "exp(mean_class(log(floor_mean/crater_mean)))",
+        "aggregation": "paired_ratio",
+        "resolution": "recorded f64 from exact integer counters",
+        "uncertainty": "bootstrap_ci95"
+      },
+      {
+        "id": "model_tau",
+        "name": "isomorphic-model heterogeneity tau",
+        "unit": "relative spread",
+        "kind": "derived",
+        "definition": "DerSimonian-Laird relative spread between isomorphic models within class, vertex, and level.",
+        "source": "volcano-stats metrics[].model.tau_rel",
+        "formula": "volcano-stats preregistered model heterogeneity estimator",
+        "aggregation": "distribution",
+        "resolution": "recorded f64 from exact integer counters",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "priced_s_band",
+        "name": "S at native-operation prices 0, 0.1, and 1",
+        "unit": "GAE / sqrt(r)",
+        "kind": "derived",
+        "definition": "Recorded S plus each emitted uncharged native-operation count times the common price, divided by sqrt(r).",
+        "source": "ecbench compare --weight and ecbench band",
+        "formula": "(charged_gae + weight * sum(uncharged counters)) / sqrt(r)",
+        "aggregation": "paired_ratio",
+        "resolution": "0.1 GAE / sqrt(r) at the middle price",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "solve_wall_seconds",
+        "name": "solve wall time",
+        "unit": "seconds",
+        "kind": "timed",
+        "definition": "The ecbench solve interval in a fresh child, reported only for rows that earn L2 and read against the same-session rho A/A interval.",
+        "source": "records.jsonl time.solve_wall_ns",
+        "aggregation": "paired_ratio",
+        "resolution": "1 microsecond",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "randomized",
+    "clock": "counted",
+    "counters": [
+      "adds",
+      "doubles",
+      "scalar_mults",
+      "relations_found",
+      "targets_tried",
+      "projected_base_membership_checks_uncharged",
+      "canonicalisations_uncharged",
+      "field_ops.muls",
+      "field_ops.sqrs",
+      "field_ops.invs"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "source_revision",
+      "image_digest",
+      "env_class_id",
+      "isolation.level",
+      "isolation.blockers",
+      "steal_ticks",
+      "psi",
+      "run_cpu",
+      "numa_policy",
+      "threads"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab cpu-l2-spot",
+    "placement": {
+      "instance_type": "c8a.2xlarge",
+      "cpus": 4,
+      "memory": "4Gi",
+      "spot": true,
+      "cells": 104,
+      "submission": "all frozen cells submitted once without waiting for scientific outcomes; the existing 32-vCPU pool queues excess cells"
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 3600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 2
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Fixed design: all 104 manifest cells, each with 4 arms x its frozen workloads x (1 warmup + 5 measured rounds), then stop.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "A non-verified row, timeout, algorithm error, or exhausted cell is recorded and is not retried for its result; only a launcher-classified infrastructure failure may use the one allowed retry.",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "No early success stop and no cell cancellation based on interim counters, cost, yield, level, or arm.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any missing manifest cell or any measured outcome other than verified makes the scientific verdict invalid; all rows remain reported.",
+    "A request/spec/source/image/binary identity mismatch makes that cell invalid and forbids silent substitution.",
+    "Failure of raw H1 positive control, rho level negative control, rho A/A admission, L2 admission, payload hashes, or replay-all makes the projected null invalid.",
+    "Wall time on a row below L2 is descriptive only; counted units remain usable only when the row and its replay verify.",
+    "A missing uncharged counter makes the corresponding price-band ordering a lower bound and withholds a rank claim."
+  ],
+  "decision_rule": {
+    "text": "After every gate passes: verdict mediated_by_raw_cofactor_dead_weight when ic-projected floor/crater 90% CI is contained in [0.97,1.03] and model tau <= 0.047; verdict projected_level_effect_persists when the interval excludes 1 with upper endpoint < 0.97 and one-sided permutation p < 0.05; otherwise inconclusive. Any gate failure is invalid_measurement. The projection transfer is separately supported only when its paired relation-yield interval is above 1 and any S ordering holds at 0, 0.1, and 1 GAE/native-op.",
+    "comparison_ids": [
+      "C-projected-level",
+      "C-projection"
+    ],
+    "threshold": "Primary equivalence [0.97,1.03], persistence upper CI < 0.97 and p < 0.05, model tau gate 0.047",
+    "statistic": "Equal-class-weight mean log floor/crater ratio with two-stage bootstrap and class-stratified level-label permutation; paired candidate/raw ratios for transfer",
+    "interval": "90% bootstrap for the equivalence/level decision; 95% paired bootstrap for candidate/raw and price-band comparisons",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "floor/crater ratio, model tau, projected/raw relation-yield ratio, and projected/raw S ratio across the full price band",
+    "verdict_vocabulary": [
+      "mediated_by_raw_cofactor_dead_weight",
+      "projected_level_effect_persists",
+      "inconclusive",
+      "invalid_measurement"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/isogeny-volcano-projected-base_20261101/analyse.sh",
+      "sha256": "e2e1a7f0773e24896246cb98e3f8ce631a208a11800d49f68474cab6f8cd91a8"
+    },
+    "inputs": [
+      "research/isogeny-volcano-projected-base_20261101/specs/manifest.json",
+      "research/isogeny-volcano-projected-base_20261101/sessions/<cell>/records.jsonl",
+      "research/isogeny-volcano-cost-v2_20261017/classes/<class>/curves.jsonl"
+    ],
+    "outputs": [
+      "analysis/projected-volcano.json",
+      "analysis/positive-control-floor-095.json",
+      "analysis/comparisons/<cell>[-weight-W].json",
+      "analysis/bands/<cell>.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "projected and raw floor/crater ratios with 90% intervals",
+      "per-level S and relation yield for raw and projected arms",
+      "per-class projected effect and isomorphic-model heterogeneity",
+      "projected/raw price-band forest at 0, 0.1, and 1 GAE"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "changing a class, curve-model, target, shard, seed, arm, round count, oracle, factor-base size, direction, margin, or verdict after affected data",
+    "dropping or rerunning a cell because its scientific result is inconvenient",
+    "combining rows from different source, spec, image, binary, or unverified payload identities",
+    "selecting one price from the 0/0.1/1 band or omitting an emitted native counter",
+    "quoting wall time from below-L2 rows or using it when the A/A control fails",
+    "calling a constant engineering improvement an exponent or generic-ECC advance",
+    "publishing a leaderboard or benchmark row before independent replay, independent recompute, matched rho band, and VALIDATION.json pass"
+  ],
+  "literature": [
+    {
+      "ref": "research/lead19_projected_base/README.md and PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "Cofactor projection removes dead factor-base classes on the binary ladder and specifies the charged mechanism and validation debt.",
+      "verified_by": "projected-base experiment lane, 2026-11-01"
+    },
+    {
+      "ref": "research/isogeny-volcano-cost-v2_20261017/README.md and PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "The raw-base 14-class l=2 floor deficit, controls, population, original runtime, and exact class exports reused here.",
+      "verified_by": "projected-base experiment lane, 2026-11-01"
+    },
+    {
+      "ref": "research/pdp_strategy_evaluation_20261031/cards/e4.md",
+      "provenance": "internal",
+      "claim": "The projected-base rerun is the cheap discriminator; it fixes the 3% equivalence rule, 0.047 model null, and scope limits.",
+      "verified_by": "projected-base experiment lane, 2026-11-01"
+    },
+    {
+      "ref": "docs/ecbench/README.md and docs/VALIDATION_GATE.md",
+      "provenance": "internal",
+      "claim": "Counted S, paired comparisons, L2/A/A admission, pricing band, replay, and publication validation rules.",
+      "verified_by": "projected-base experiment lane, 2026-11-01"
+    },
+    {
+      "ref": "Tate isogeny theorem; Faugere-Gaudry-Huot-Renault, Journal of Cryptology 27 (2014), as provenance-recorded in the E4 desk card",
+      "provenance": "internal",
+      "claim": "Isogenous curves share group order; extension-field symmetry results do not supply this prime-field projected-base effect.",
+      "verified_by": "E4 evaluator; relayed with that card's stated source limits"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  }
+}
