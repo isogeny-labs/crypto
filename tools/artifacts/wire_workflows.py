@@ -168,7 +168,6 @@ def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
             j = k + 1
             while j < len(lines) and (not lines[j].strip() or len(lines[j]) - len(lines[j].lstrip()) > len(indent)):
                 j += 1
-            while not lines[j - 1].strip():
             while j > k + 1 and not lines[j - 1].strip():
                 j -= 1
         step = step_lines(indent, paths)
@@ -189,7 +188,6 @@ def add_sparse_pattern(block: list[str], indent: str) -> list[str]:
             (".artifacts", "/.artifacts/", ())]
     for k, b in enumerate(block):
         scalar = re.match(rf"^({indent}    sparse-checkout: )(?!\|)(\S.*)$", b)
-        if scalar:  # one pattern on the key line: rewrite as a block list
         if scalar and "${{" in scalar.group(2):
             # A conditional empty value means a full checkout. Appending literal
             # patterns would silently narrow it to the artifact bootstrap only.
