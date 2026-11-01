@@ -1,5 +1,20 @@
 # Prime-field factor bases: certificates and a secant degree reduction
 
+## Checked Lean continuation, 2026-10-31
+
+The [formalization](proof/FORMALIZATION.md) now proves the polynomial-ring
+degree reduction using actual canonical highest-degree forms: d+1 versus
+2d+1, including the nonmonomial quadratic case. The exact F17 fixture is
+checked at degree 5→3 for every target and all four sign branches. All eleven
+modules build; the transitive axiom audit has zero failures and no native
+evaluation. The [group-law continuation](group_law_20261031/README.md) now has a locally
+compiled equivalence with Mathlib's actual point addition, including tangents,
+all four split-base sign branches and the identity target. Its published-byte
+replay and full repository audit remain pending after worker loss.
+Earlier proof-scope statements and sealed records below describe their
+historical stages. The measured continuation is in
+[the completed three-track study](parallel_20261031/RESULTS.md).
+
 ## Positive secant/graph continuation, 2026-10-31
 
 A subsequent [split-graph theorem](SECANT_GRAPH.md) derives a strict
