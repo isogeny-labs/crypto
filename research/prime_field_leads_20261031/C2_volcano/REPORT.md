@@ -46,3 +46,55 @@ Decision rule (frozen).
 - Honest limitation stated in advance: for this routine the B-fixed term is about three quarters of the total, so the 2x
   gate on work_total is not reachable by the gcd/root part alone; a null on work_total alone would be weak. The msolve leg is
   the discriminating one.
+
+---
+
+## Results (appended 2026-10-31 by the resuming session; the section above is unchanged)
+
+STATUS: COMPLETE for the frozen decision rule. Nothing was rerun in this session: the counted-work leg finished on M and S before the
+host stopped the workflow, and the msolve data on both instances were already on disk. The msolve leg on M did NOT finish (timeouts, below);
+the frozen rule compares such cells on the common prefix of F4 rounds, which is what is done here. Files: `M/summary.csv`, `S/summary.csv`,
+`*/work_per_target.csv`, `*/msolve_summary.csv`, `*/msolve_trajectories.csv`.
+
+### Counted work (field multiplications), median over 32 targets, then median over 8 models
+
+| Instance | metric | crater [min,max] | floor [min,max] | ratio crater/floor |
+|---|---|---|---|---|
+| M (B=47) | work_total | 721402 [721402, 721402] | 721551.25 [721402, 721999] | 0.9998 |
+| M | work_variable_gcd_roots | 176565 [176565, 176565] | 176714.25 [176565, 177162] | 0.9992 |
+| S (B=12) | work_total | 23035 [23005, 23065] | 23035 [23020, 23035] | 1.0000 |
+| S | work_variable_gcd_roots | 10386 [10356, 10416] | 10386 [10371, 10386] | 1.0000 |
+
+rho is inside [0.5, 2] on both instances and the spreads overlap (on M the crater spread is a single value contained in the floor spread).
+False hits: 0 on both sides. Decomposable targets (yield, not part of the decision): M crater 196/256, floor 209/256; S crater 195/256,
+floor 174/256; median work to first relation on M 207248 vs 153572. Yield is the lead card's question, is not used here, and no
+significance was tested.
+
+### msolve (DRL, char p, 1 thread)
+
+- S, 32 cells (16 crater, 16 floor), all completed within 300 s: max step degree is 20 in every cell, crater and floor. Round
+  counts differ between cells (168 to 186) on both sides; on the common prefix of 168 rounds the sum of rows x cols is 7767106 to 7803178
+  for crater and 7767106 to 7769334 for floor, max matrix 268 x 1142 for every cell.
+- M, 16 cells (8 crater, 8 floor): 11 timed out at 420 s (7 crater, 4 floor; per-cell status in `M/msolve_summary.csv`);
+  5 completed (crater_3_t1, floor_0_t0, floor_2_t0, floor_3_t0, floor_3_t1) with 2037 to 2089 rounds and max step degree 55.
+  Every cell, completed or not, has max step degree 55. Common prefix = 95 rounds (the shortest timed-out cell). Over those 95 rounds
+  the sum of rows x cols is 3079461630 in 15 of 16 cells and 3079459926 in crater_3_t1; max rows 4177 in every cell. Over the whole
+  run the five completed cells have sum of rows x cols 2.062e10 to 2.775e10, with max matrices 28500 x 28506 (crater_3_t1) against
+  26559 x 26442 to 28503 x 28506 (floor); no side separation.
+- The timeouts depend on host load (load average 137 to 430 during the original run) and say nothing about the cost of the system.
+  The common-prefix comparison does not depend on them. The step degree 55 is reached in round 1, so on this routine max step degree
+  carries little information beyond B; the matrix profile is the informative quantity and it is identical to within 1 part in 10^6 on the prefix.
+
+### Decision (frozen rule)
+
+null_confirmed. rho in [0.5, 2] with overlapping spreads on M and S, and msolve step degrees are not separated (S at completion, M on the
+common prefix, with the M cells that did finish showing the same degree 55). The stated limitation applies: about three quarters of
+work_total is fixed by B, so the work_total gate alone is weak; the msolve leg carries the decision and its M part is a prefix
+comparison plus 5 completed cells, not 16 completed cells. No speedup, exponent change or reopening is claimed. The atlas proposals in
+`atlas_update.md` stay as proposals (disposition unchanged).
+
+Every attempted cell is listed in the CSV files named above, including the 11 M cells that timed out.
+
+Directories `S_ctrl_a0` and `S_ctrl_b0` hold two extra S-instance control runs (4 cells each, all completed, max step degree 20, identical
+trajectories on crater and floor within each directory). Their construction is not described in the frozen text or in the logs kept, so they
+are listed here but not interpreted and not used in the decision.

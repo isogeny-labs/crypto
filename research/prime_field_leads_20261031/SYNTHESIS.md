@@ -10,9 +10,9 @@ This file is the manual replacement. Nothing below is a speedup over rho.
 | C1 | done | closes | prime-to-p torsion section unique; lead's "only N = p non-split" claim is wrong |
 | C3 | partial | writeup | f must be < p^(-1/m); screening budget leaves empty window at m=3, one boundary point at m=4 |
 | C4 | done | null_confirmed | energy ratio 0.993-1.013, no growth with log p |
-| L2a | INCOMPLETE, no report | none | preliminary fit from attempts.csv (1472 rows, partial run): e = 1.97 (arm G), 2.21 (S), 3.21 (T). Beating rho needs e < m/2-1 = 0.5 at m=3, so the lead does not reopen on this data. Unreviewed. |
+| L2a | INCOMPLETE, no report | none | fit over s=6..11 (s=12 rows removed for a clean rerun): e = 1.98 [1.94, 2.01] (G), 2.21 [2.16, 2.24] (S), 3.21 [3.00, 3.40] (T, 3 points). Reopening needs e < 0.5 at m=3, so it does not reopen on this data. No REPORT.md. |
 | L2b | INCOMPLETE | none | PREREG.md frozen; ladder produced 1 cell. No conclusion. |
-| C2 | INCOMPLETE | none | REPORT.md says IN PROGRESS; msolve leg timed out at 420 s on all M cells under load. Counted-work leg only; no decision. |
+| C2 | done (REPORT.md has results) | null_confirmed | counted-work crater/floor ratio 0.9998 (M), 1.000 (S), spreads overlap. msolve: S all 32 cells finish, max degree 20 both sides; M 11/16 timed out, common 95-round prefix identical. Weak: ~3/4 of work_total is fixed by B. S_ctrl_a0/b0 not interpreted. |
 
 Rerun needs: a quiet machine (cap parallelism; load was 137-430), L2b ladder, C2 msolve leg on S only.
 Not committed: `.tmp/` scratch, `L2b_dreg_trajectory/work/` (raw logs).
