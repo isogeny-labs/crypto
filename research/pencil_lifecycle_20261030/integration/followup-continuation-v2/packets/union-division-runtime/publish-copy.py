@@ -7,7 +7,7 @@ for p in sorted(src.rglob('*')):
  if not p.is_file() or p.is_symlink():continue
  rel=p.relative_to(src)
  if any(x in ('target','.lake','deps','dependency-union','__pycache__') for x in rel.parts):continue
- data=p.read_bytes();omit=p.suffix in ('.olean','.ilean','.o','.png','.aux','.out','.pyc') or p.name=='render.log'
+ data=p.read_bytes();omit=p.suffix in ('.olean','.ilean','.o','.png','.aux','.out','.pyc') or p.name=='render.log' or ('pins' in rel.parts and p.name.startswith('target-gate-'))
  name=str(rel)+('.txt' if p.suffix=='.lean' else '')
  encoding='identity';stored=data
  if not omit and p.suffix!='.pdf':
@@ -19,7 +19,7 @@ for p in sorted(src.rglob('*')):
     if any(x.endswith((' ','\t')) for x in s.splitlines()) or s.endswith('\n\n'):
      encoding='base64';stored=base64.b64encode(data)+b'\n';name+='.b64'
    except UnicodeDecodeError:pass
- files.append({'original_path':str(rel),'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data),'encoding':encoding,'stored_sha256':hashlib.sha256(stored).hexdigest(),'included_path':None if omit else name,'omission_reason':'compiled/render intermediate' if omit else None})
+ files.append({'original_path':str(rel),'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data),'encoding':encoding,'stored_sha256':hashlib.sha256(stored).hexdigest(),'included_path':None if omit else name,'omission_reason':('retained historical target file: exact digest and retrieval source in matrix pin index/collect-pins.sh; no fresh enumeration' if 'pins' in rel.parts and p.name.startswith('target-gate-') else 'compiled/render intermediate') if omit else None})
  if not omit:
   q=dst/name;q.parent.mkdir(parents=True,exist_ok=True);q.write_bytes(stored)
 (dst/'custody-map.json').write_text(json.dumps({'source_directory':str(src),'files':files},indent=2)+'\n')
