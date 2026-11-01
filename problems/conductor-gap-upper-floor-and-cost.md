@@ -138,6 +138,16 @@ controls. This checks the first native processing primitive for stored
 blocks; full baby/giant coverage, codomain moments, complete point images
 and feasible total-work accounting remain open.
 
+The [complete native control runner](../research/prime_conductor_gap80_20261031/complete-pipeline/README.md)
+now wires canonical coverage, codomain moments, full point evaluation and
+paired known-answer recovery on complete ordinary-curve fixtures. PARI
+matches both codomains and 42 evaluated inputs; 34 paired targets recover
+on both endpoints (q=3 and q=37). Six negative coverage controls pass.
+These are software controls, not certified conductor-gap records or timing
+measurements. The 80-bit prefix gate refuses assembly. Durable S3-manifest
+coverage/resumption, complete target data and feasible total-work execution
+remain prerequisites to the requested endpoint measurements.
+
 ### Historical 60-bit-prime instance imported on 2026-10-31
 
 The [archived gap60 study](../research/prime_conductor_gap60_20261031/README.md)
