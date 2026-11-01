@@ -93,6 +93,14 @@ contexts under Sage, Python-FLINT and the optimized native backend. Those
 
 ## Acceptance status and next construction
 
+The [native polynomial-block stage](poly-blocks/README.md) now prepares
+bounded products and streams six reciprocal-power sums across supplied
+blocks. The 4,096-root fixture matches a direct oracle at 32 source and
+32 actual giant contexts (384 compared values),
+including split-block/order controls. It does not establish global coverage,
+full-work feasibility or an isogeny image; actual giant-batch/codomain
+integration and complete point evaluation are still required.
+
 The [S3 root-chunk storage fixture](s3-chunks/README.md) adds a bounded native
 producer and independent PARI validation of 4,096 roots. Its object-store
 upload uses the trusted artifact workflow's full-byte readback. This prepares
