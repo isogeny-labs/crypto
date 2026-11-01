@@ -40,6 +40,7 @@ import atexit
 import datetime as dt
 import json
 import os
+import posixpath
 import subprocess
 import sys
 from pathlib import Path
@@ -725,11 +726,20 @@ def explicit_gpu_fullcache(ref, since):
             samples = [("preflight_failures", 1, "retained preflight failure; zero recovery attempts")]
         else:
             runs = record.get("runs", [])
-            if len(runs) != record.get("flow", {}).get("attempted"):
+            attempted = sum(r.get("attempts", 0) >= 1 for r in runs)
+            if attempted != record.get("flow", {}).get("attempted"):
                 raise ValueError(f"inconsistent GPU full-cache coverage: {path}")
+            protocol_path = posixpath.normpath(f"{directory}/{record['protocol']['path']}")
+            protocol = json.loads(show(ref, protocol_path))
+            sample = protocol["sample_size"]
+            planned = len(protocol["arms"]) * sample["instances"] * (
+                sample["replicates"] + sample.get("warmups", 0))
+            if attempted > planned:
+                raise ValueError(f"GPU full-cache attempts exceed protocol: {path}")
             prefix += ".small" if name == "export-small.json" else ".large"
             samples = [
-                ("attempted", len(runs), "recorded complete-recovery executions"),
+                ("planned", planned, "protocol-planned executions"),
+                ("attempted", attempted, "recorded complete-recovery executions"),
                 ("verified_recoveries", sum(r.get("status") == "succeeded" and
                     r.get("verification", {}).get("status") == "verified" for r in runs),
                  "fresh CPU-replayed recoveries"),
@@ -737,6 +747,10 @@ def explicit_gpu_fullcache(ref, since):
                  "retained solve timeouts"),
                 ("failed", sum(r.get("status") == "failed" for r in runs),
                  "retained failed or resource-limited executions"),
+                ("interrupted", sum(r.get("status") == "interrupted" for r in runs),
+                 "retained interrupted executions; no complete clock"),
+                ("not_attempted", planned - attempted,
+                 "planned cells not started after infrastructure stop"),
             ]
         for suffix, value, label in samples:
             emit(f"{prefix}.{suffix}", value, date=date,

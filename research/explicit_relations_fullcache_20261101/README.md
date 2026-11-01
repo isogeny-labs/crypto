@@ -46,3 +46,18 @@ the lockfile, preserves the kernel, analyzer and all workloads, and subtracts
 180seconds (rounded up from150.841seconds) from the original worker allowance:
 17,820seconds worker /18,120seconds controller. Its separate frozen protocols
 are `protocol-v2.json` and `protocol-small-v2.json`; no version1 cell was timed.
+
+Version2 passed the full GPU preflight and completed33 verified recoveries:
+all30 small cells and the three-arm seed101 large comparison. RunPod recorded
+pod deletion at06:38:03UTC during63-202-0-x, before the controller's cleanup.
+The latest partial archive is retained; the interrupted attempt has no complete
+clock, and seed202 armsv/b were never started. `results-v2/interruption.json`
+and both canonical exports preserve that accounting. GPU deletion is verified.
+
+The original frozen whole-panel analyzer remains unchanged and correctly
+rejects incomplete coverage. `analyze-retained.rs` is a separately labelled,
+unblinded post-interruption descriptive adapter: it preserves the original
+formulas and exact completed-cell checks, reports every complete matched set,
+and keeps the interrupted/unstarted slots outside timing calculations.
+`retained-analysis-v2/analysis-custody.json` identifies its source and outputs.
+No new measurement or replacement GPU is authorized by that analysis artifact.
