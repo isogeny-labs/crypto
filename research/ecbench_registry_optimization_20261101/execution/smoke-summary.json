@@ -1,0 +1,62 @@
+{
+  "schema": "ecbench.registry-smoke-summary/v1",
+  "generated_utc": "2026-11-01T01:28:45Z",
+  "evidence_level": "L0 development diagnostic",
+  "sessions": 33,
+  "records": 955,
+  "outcomes": {
+    "verified": 902,
+    "exhausted": 20,
+    "timeout": 23,
+    "error": 10
+  },
+  "audit": {
+    "receipts_ok": 33,
+    "verified_records": 902,
+    "eligible_measured_replays": 742,
+    "reproduced_replays": 742,
+    "problems": 0
+  },
+  "top_level": {
+    "registry_methods": 78,
+    "runnable_native_methods": 72,
+    "executed_native_methods": 72,
+    "blocked_external_methods": [
+      "ic.cm_folded_native_d43_v1",
+      "ic.cm_folded_native_d43_v2",
+      "ic.cm_folded_native_v1",
+      "ic.cm_folded_native_v2",
+      "ic.cm_folded_recurrence_v1",
+      "ic.cm_folded_recurrence_v2"
+    ]
+  },
+  "nested": {
+    "system_solvers_required": 11,
+    "system_solvers_executed": 11,
+    "pdp3_engines_required": 8,
+    "pdp3_engines_executed": 8
+  },
+  "development_roster": {
+    "specs": 109,
+    "methods": 78,
+    "nested_algorithms": 19,
+    "admissible": true,
+    "missing_methods": 0,
+    "missing_nested_algorithms": 0,
+    "seed_leakage": 0
+  },
+  "selected_candidate": {
+    "workload": "Koblitz a=1 n=29 generator-orbit, one public target",
+    "candidate": "ic.pipeline_full generator-orbit layout",
+    "reference": "rho.signed_frobenius_full",
+    "work_ratio_candidate_over_reference": 0.4405299539505004,
+    "ci95_within_target": [0.36310399666888743, 0.5344657236163619],
+    "pricing_band_ratios": {
+      "w0": 0.4209243601640201,
+      "w0_1": 0.4632610853389705,
+      "w1": 0.8442916119135243
+    },
+    "status": "development selection only; requires disjoint multi-target L2 holdout"
+  },
+  "leaderboard_updated": false
+}
