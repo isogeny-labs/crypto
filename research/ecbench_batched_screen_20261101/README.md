@@ -20,15 +20,13 @@ tournament round, not promotable. Read [REPORT.pdf](REPORT.pdf) first.
 - `figures/`: `make_summary.py` (records → `summary.json`, predictions scored by code), `plot_figures.py` (SVGs), `make_report.py` (→ `REPORT.typ`).
 - `REPORT.typ`, `REPORT.pdf`: the report.
 
-## What is not here
+## Where the records are
 
-`sessions/<cell>/records.jsonl` (about 17.7 MB each) are not committed: this
-repository keeps data that large in the artifact store, and the session that
-ran the screen could not write to it. To land them, from a machine with AWS
-credentials:
+`sessions/<cell>/records.jsonl` (about 17.7 MB each, 70.8 MB in all) are in the
+artifact store, not in Git: each cell directory carries an `.artifacts.json`
+manifest (sha256 and size) and the managed `.gitignore`. Hydrate them with
 
-    python3 tools/artifacts/artifacts.py push research/ecbench_batched_screen_20261101/sessions
-    git add research/ecbench_batched_screen_20261101/sessions
+    python3 tools/artifacts/artifacts.py pull research/ecbench_batched_screen_20261101/sessions
 
-`figures/make_summary.py` needs them. Until then `summary.json`, the audits and
-the comparisons are the committed record.
+`figures/make_summary.py` reads them; run on the stored records it reproduces
+the committed `figures/summary.json` byte for byte.
