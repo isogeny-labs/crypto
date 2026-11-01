@@ -25,3 +25,17 @@ Cubicdata/checks/fullfield76binding/fixedtrace/all818;canonical61forms/infinityr
 
 ### Errors
 NoR61nativefailureyet. .resume isignoredandwasnotforcedintoGit;localdurableresumeupdatedwithowners;projectSESSION/DELIVERYinGit preservehandoff.
+
+## 2026-11-01T18:34:20.670606+00:00 — cubic pair-order failure retained and corrected
+
+### What was done
+cubic61-01 nativeerrors `_`undefined perchart;retainedR43producer explicitly p3=(section68,quad196),where newcode reversedlistindices. Stopped only ownedSingularpid1652497 afterverifyingitlive;driverterminalexit0butERROR/missingmarkerstrictgateFAIL. Allpartialrawretained,noneofitscountsused.
+
+### Decisions made
+Correctfactorindexorder,addexplicitall324indexbounds,freezebeforefresh02. Preserve385F4jets/all20charts/full324/248rowkernel,caps unchanged. Noacceptedproducer repeated.
+
+### Open threads
+cubic02completeambient/mixed76/fixedtrace/sourcebindings/all818;trace-dualglobal61differentialspace andCartier;allbroaderleads.
+
+### Errors
+Integration indexingfailure,not rank/precision/geometricnull. SIGTERMreported0bySingular but strictacceptancecorrectlyrejects.

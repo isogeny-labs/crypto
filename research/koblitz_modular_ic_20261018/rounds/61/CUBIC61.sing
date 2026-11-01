@@ -5,6 +5,7 @@ intvec ambientCaps61=147,21,21,3;intvec mixedCaps61=34,12,20,2;intvec constraint
 intvec selected61=0,0,0,0;int chartid61;int cusp61;int ram61;int point61;int bound61;int ii61;int jj61;int kk61;int order61;int row61;int evaluations61=0;int conjugates61=0;
 list chart61;list coords61;list cached61;list old61;list vals61;list sig61;list quad61;list sigQuad61;list supp61;list val61;list sigVal61;list check61;
 number coeff61;
+for(ii61=1;ii61<=324;ii61++){require58(pairs361[ii61,1]>=1 && pairs361[ii61,1]<=68 && pairs361[ii61,2]>=1 && pairs361[ii61,2]<=196,"CUBIC61_SECTION_THEN_QUADRATIC_PAIR_ORDER");}
 for(chartid61=1;chartid61<=20;chartid61++){
  chart61=charts[chartid61];coords61=chart61[1];ram61=chart61[4];cusp61=chart61[5];point61=0;bound61=0;
  if(cusp61==1){bound61=21*ram61;}if(cusp61==4){bound61=3*ram61;}
@@ -24,10 +25,10 @@ for(chartid61=1;chartid61<=20;chartid61++){
   sigQuad61[jj61]=lm(sig61[pairs58[jj61,1]],sig61[pairs58[jj61,2]]);
  }
  for(jj61=1;jj61<=324;jj61++){
-  val61=lm(quad61[pairs361[jj61,1]],vals61[pairs361[jj61,2]]);evaluations61++;
+  val61=lm(vals61[pairs361[jj61,1]],quad61[pairs361[jj61,2]]);evaluations61++;
   require58(val61[3]>0 && (val61[1]==0 || val61[2]>=-bound61),"CUBIC61_ALL_ACTUAL_AMBIENT_POLE_BOUNDS");
   if(chartid61==1){
-   sigVal61=lm(sigQuad61[pairs361[jj61,1]],sig61[pairs361[jj61,2]]);
+   sigVal61=lm(sig61[pairs361[jj61,1]],sigQuad61[pairs361[jj61,2]]);
    require58(val61[3]>=385 && sigVal61[3]>=385 && (val61[1]==0 || val61[2]>=0) && (sigVal61[1]==0 || sigVal61[2]>=0),"CUBIC61_385_F4_JET_PRECISION");
    for(order61=0;order61<385;order61++){
     coeff61=coefficient58(val61,order61);cubicJets61[2*order61+1,jj61]=real58(coeff61);cubicJets61[2*order61+2,jj61]=imag58(coeff61);

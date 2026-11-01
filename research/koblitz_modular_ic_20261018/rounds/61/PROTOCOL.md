@@ -50,3 +50,11 @@ bindings,completefixed/trace space andALL818patternsremainnext frozenstages.
 Do notclaim aJacobianfactor,properembedding,Cartiermatrixor11action here.
 Same1200sec/4GiB/onejob/thread/seed61. LiteratureR27/R58properRR/poles,
 R43retainedcubicpairs,R60NEXT;standardRRnotanewalgorithmclaim.
+
+### Cubic pair convention repair before fresh02
+The retained R43source explicitly defines p3=(sectionindex1..68,
+quadraticindex1..196). cubic61-01 reversedthose factors' listindices,
+causingout-of-range missinglistentries andnativeerrors. Itwasstoppedafter
+knownerrors;SingularhandledTERMwithexit0,butnomarker/errorsmeansrejected.
+Preserveallpartialbytes. Correctpairorderandnativeboundschecksarefrozen
+beforecubic61-02. Sameall324products/385jets/20charts/caps,nodownscale.
