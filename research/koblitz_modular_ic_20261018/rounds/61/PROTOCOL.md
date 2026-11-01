@@ -30,3 +30,107 @@ Exactfixedproducts,noisyA-A/randomization/blinding/powernotapplicable;
 UTC/binaryhashescustodyonly. Exit0/exactfinalmarker/noquestionmarkerrors.
 Preservefailed/capped/partialraw;freezeaffectedsourcebeforefreshattempts.
 Noacceptedproducerrepeatedforpublication;nevereditcopiedlivedriver.
+
+## Stage2 complete cubic ambient and76 mixed infinity sections
+trace61-01 accepted full32traceGram/inverse/dualbindings. No producerrepeat.
+Freeze actual324descendedcubicproducts using retainedR43pairs2/pairs3,
+R58actual68descent recipe andnormalR27charts. Requireall20charts6480cubic
+bounds,1360oldfunctioncoefficientconjugationchecks. Actualcubicambient
+caps147,21,21,3 atfourdegree2infinitypoints andregularity atothercusps.
+Require385F4regularjets (770binaryrows),rank324 andexplicitleftinverse,
+actualsigmajet reconstruction/sigma²=I and changedinvolution rejection.
+Ifprecisionorrankfails,preservefailure;freeze anyexpandedproduct/series
+constructionbeforefreshdata. No inherited R43rank substitutes for this gate.
+
+Imposeall248binaryremovedcoefficients for mixedbound34,12,20,2 degree136.
+RequireC K=0,R K=I,K R+H C=I324;derive dimension andverifyRRpredicted76.
+Actualrestrictedinvolution/constant1positivecontrol andall272mixedlocal
+profilecoefficients are exported. Binaryentriesonly. Whole-source field
+bindings,completefixed/trace space andALL818patternsremainnext frozenstages.
+Do notclaim aJacobianfactor,properembedding,Cartiermatrixor11action here.
+Same1200sec/4GiB/onejob/thread/seed61. LiteratureR27/R58properRR/poles,
+R43retainedcubicpairs,R60NEXT;standardRRnotanewalgorithmclaim.
+
+### Cubic pair convention repair before fresh02
+The retained R43source explicitly defines p3=(sectionindex1..68,
+quadraticindex1..196). cubic61-01 reversedthose factors' listindices,
+causingout-of-range missinglistentries andnativeerrors. Itwasstoppedafter
+knownerrors;SingularhandledTERMwithexit0,butnomarker/errorsmeansrejected.
+Preserveallpartialbytes. Correctpairorderandnativeboundschecksarefrozen
+beforecubic61-02. Sameall324products/385jets/20charts/caps,nodownscale.
+
+Beforefresh02 also compare all196retainedR43quadraticpairs withR58pairs58
+exactly, so cubicsecondindices refer to the same sourcequadraticselection.
+
+## Auxiliary metadata correction, version5 (after cubic02 started)
+HistoricalJSONcarriedquotient-eraarms andno-seriestruncationannotation.
+Theirclaim/metric/launcherblocksandthefrozenMarkdown/native sourcealready
+specifiedtheactual trace/cubiccalculationand385jetprecisiongates. Rawversions
+remainunchanged. Version5correctsonlyauxiliaryannotations;itdoesnotchange
+source,thresholds,cohort,caps,stoppingoracceptedidentitycriteria. No performance
+resultisassignedtolegacyarms. R60sealedJSONhasthesameinheritedannotation
+issue;R60nativefullsource/exactkernels/report remainat their stated scope.
+Canonicalprotocoltool/schema/docs are absent from thecurrentselected Git
+index anddisk;manual contract/byteverification is not schema validation.
+Allnewaffected stages use correctedblocks frozenbeforetheirdata.
+
+## Stage3 actual whole-source76section identities
+cubic61-02 accepted rank324/385F4jets/all6480bounds/all248constraints,
+complete76kernelandactualinvolution. Freeze FIELD61:actualdegree32source,
+all324descendedcubicproducts,all76mixedfunctions,constant1andall76actual
+l->l+A sourceinvolutions. A changedcubiccoefficientmustproduce a nonzero
+whole-source residual. Exactrationalfunctionnormalforms,nofinitefiberfit.
+Outputall324/76fieldfunctiondefinitions for futurefixed/trace/cohort/maps.
+Noacceptedproducerrepeated. Samecaps/onejob/seed61.
+
+## Stage4 complete76 source fixed/trace complex
+FIELD61accepted324actualcubic/76mixedfunctions and76actualinvolutions.
+FreezecompleteN=sigma+I kernel/recovery/homotopy,derivefixed/trace ranks,
+thencheck38/38fromhigh-degreeetalegeometry. FullJordanbasis/twoinverse
+products,QwithNQ+QN=I76,Q²=0,actualoneandoddparticular. Verifyall38
+sourcefixedfunctions andall38sourcepreimageidentities inwholedegree32field,
+actualtrace(odd)=1. Checkalllocal272/regular770profileimaginarycoefficients
+zero. Exportfullmatrices andactualfixed/preimagefunctions. Changedsource
+controls alreadyinCUBIC/FIELDdonors;no newnull claiminthisstage. Samecaps.
+ALL818supportpatterns are next,notassumedfromdimensions.
+
+## Stage5 all818 balanced infinity patterns
+FIX61fresh02acceptedcomplete38fixed/38trace/fullcontraction andactualsourceidentities;01interruptedbefore native start at checkpointgate. Freezeactualfixed-space61donorhash. Minorintervals[-6,6],[-10,10],[-1,1],forcede0=-sum,excludezero:all818,degree2sumpositive<=34. All136rows from272profiles include bothF4orientations,completefixed38space. EveryC hasrank38 or37; zerokernelrequiresH C=I38, onedimrequiresfullC K=0,R K=1,K R+H C=I38 andsavedgenerator. Globalregularcontrolrank37/kernel1containsactual1; changedleftinversefails. Preserveeverycase,includingnonunit11degrees. Bothtraceparities remainavailable. Survivingprincipalx requiresall31F32scalars,bothordinarysigns,fullASsourceidentities/5conjugates/intended11action,notinferredfromkernel. Samecaps,onejob,seed61.
+
+## Stage6 fresh ambient-profile certificate check
+All818producer cases rank38/kernel0 withleftinverse; regularcontrolrank37/kernel1. Freezeallcasecertificates. Reconstructevery136x38matrixbyselectingrowsfromactual272x324ambientprofiles BEFORE multiplying324x76mixed and76x38fixedinclusions. CompareeverymatrixandfullH C=I38. Checkcompleteambientinjection,mixed/fixedsplittings,actualsigma,NQ+QN=I76,Q2=0,allpreimages,oddparticular,allfixedprofile/regularbindings andglobalregularcontrol. Changedlastrowmustfailcomparison. Nativeexactproducts,no independent scientific verdict or projectivesaturationclaim. Samefull818/caps/thread/seed61.
+
+### Execution metadata annotation before CHECK61
+Version10removes inheritedRustcompilerfields/CPU0annotation. Actualnative
+driveroneSingular/FLINTthread isnotCPU-pinned;separateLeandriverpinsCPU0.
+Alloriginalmathematicalsource/caps/seed/cohort/checksunchanged. Historical
+rawcopiesimmutable;no timingcomparisonisclaimed.
+
+### Checker02 native row-vector copy repair
+CHECK01manuallystoppedforavoidableper-cellinterpretercost;no resultaccepted,
+notatimeoutclaim. Preserveallrawandstopreceipt. Fresh02formsall272
+ambientrowsasmodulevectorsandchecksthefullmatrixreconstruction. Select
+all136rowsbywhole-vectorcopy,thenmultiplytheactual136x324matrixbythe
+mixed/fixedinclusionasbefore. All818casecomparisons/certificates,controls,
+source dimensions and originalcapsunchanged. Progressmarkersareobservational.
+
+### Checker03 zero-initialization syntax repair
+CHECK02rejectednative module(int)error;itslatePASS/numericlinesnotaccepted.
+Whole272row-modulebindingandspaceproductsarecontrolsinsideeachfreshcheck,
+notseparatelypublishedresults. Removeunnecessarymodule(0)reset:everyoneof
+136selectedgeneratorsisoverwritteninALLcases,includingzeros. All818
+pre-projectionproducts/comparisons/certificates/capsunchanged,sourcefrozen
+beforefresh03. Fullmatrixcomparisonsdetectanystalerow.
+
+## Stage7 independent packed binary row-dot replay
+SingularCHECK03resource-manuallystopped,partialresultsnotaccepted;no timeout
+claim. FreezeCHECK61.rs/RUST_DRIVER/launcher/RUST-PROTOCOLanddonors before
+Rustdata. Readactualcubic/fixed/cohortbinaryarraysdirectly,rejectunknown
+syntax/nonbinary/duplicate/out-of-boundsentries. All818136x324ambientrows
+areselectedBEFOREprojection,allleftinverses/sourceproducts/controlschecked
+byrow-dot-columnparity;alsofullambientinvolution/jet/Jordanbindings.
+Globalregularcontrolrank37/kernel1,actualconstant1;changedinverse/source-row
+controls. Rustcompiler/run each1200s/4GiB,CPU0,oneworker,opt2/codegen1,
+standalonestd/noCargo/network. Allnativefailed/stoppedattemptsretained.
+No clockcomparisonorcohortdownscale;function-field/normalmodelpremises
+remainseparateacceptedsourcecalculations.

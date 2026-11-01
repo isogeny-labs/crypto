@@ -1,0 +1,77 @@
+execute(read("../../../60/source-data/evaluation-prefix60.sing"));
+execute(read("../../source-data/pairs361.sing"));
+execute(read("../../source-data/pairs261.sing"));
+require58(pairs261==pairs58,"CUBIC61_RETAINED_QUADRATIC_INDEX_BINDING");
+matrix cubicJets61[770][324];matrix cubicSigmaJets61[770][324];matrix cubicC61[248][324];matrix cubicProfiles61[272][324];
+intvec ambientCaps61=147,21,21,3;intvec mixedCaps61=34,12,20,2;intvec constraintOffsets61=0,226,244,246;intvec profileOffsets61=0,136,184,264;
+intvec selected61=0,0,0,0;int chartid61;int cusp61;int ram61;int point61;int bound61;int ii61;int jj61;int kk61;int order61;int row61;int evaluations61=0;int conjugates61=0;
+list chart61;list coords61;list cached61;list old61;list vals61;list sig61;list quad61;list sigQuad61;list supp61;list val61;list sigVal61;list check61;
+number coeff61;
+for(ii61=1;ii61<=324;ii61++){require58(pairs361[ii61,1]>=1 && pairs361[ii61,1]<=68 && pairs361[ii61,2]>=1 && pairs361[ii61,2]<=196,"CUBIC61_SECTION_THEN_QUADRATIC_PAIR_ORDER");}
+for(chartid61=1;chartid61<=20;chartid61++){
+ chart61=charts[chartid61];coords61=chart61[1];ram61=chart61[4];cusp61=chart61[5];point61=0;bound61=0;
+ if(cusp61==1){bound61=21*ram61;}if(cusp61==4){bound61=3*ram61;}
+ if(cusp61==1 && coords61[2][2]==-4*ram61){if(ram61==7){point61=1;}if(ram61==1){point61=2;}}
+ if(cusp61==4 && coords61[2][2]==-ram61){if(ram61==7){point61=3;}if(ram61==1){point61=4;}}
+ if(point61!=0){selected61[point61]=selected61[point61]+1;require58(bound61==ambientCaps61[point61],"CUBIC61_POINT_BOUND_LABEL");}
+ cached61=cache58(coords61,chart61[2],chart61[3]);old61=list();vals61=list();sig61=list();quad61=list();sigQuad61=list();
+ for(jj61=1;jj61<=68;jj61++){old61[jj61]=eval58(terms58[jj61],cached61);}
+ for(jj61=1;jj61<=68;jj61++){
+  val61=lc(0);supp61=sigmaSupports58[jj61];for(kk61=1;kk61<=size(supp61);kk61++){val61=la(val61,old61[supp61[kk61]]);}
+  vals61[jj61]=la(val61,scale58(la(old61[jj61],val61),a));
+  sig61[jj61]=la(old61[jj61],scale58(la(old61[jj61],val61),a));
+  check61=la(conjugate58(vals61[jj61]),sig61[jj61]);require58(check61[1]==0 && check61[3]>0,"CUBIC61_DESCENT_COEFFICIENT_ORIENTATIONS");conjugates61++;
+ }
+ for(jj61=1;jj61<=196;jj61++){
+  quad61[jj61]=lm(vals61[pairs58[jj61,1]],vals61[pairs58[jj61,2]]);
+  sigQuad61[jj61]=lm(sig61[pairs58[jj61,1]],sig61[pairs58[jj61,2]]);
+ }
+ for(jj61=1;jj61<=324;jj61++){
+  val61=lm(vals61[pairs361[jj61,1]],quad61[pairs361[jj61,2]]);evaluations61++;
+  require58(val61[3]>0 && (val61[1]==0 || val61[2]>=-bound61),"CUBIC61_ALL_ACTUAL_AMBIENT_POLE_BOUNDS");
+  if(chartid61==1){
+   sigVal61=lm(sig61[pairs361[jj61,1]],sigQuad61[pairs361[jj61,2]]);
+   require58(val61[3]>=385 && sigVal61[3]>=385 && (val61[1]==0 || val61[2]>=0) && (sigVal61[1]==0 || sigVal61[2]>=0),"CUBIC61_385_F4_JET_PRECISION");
+   for(order61=0;order61<385;order61++){
+    coeff61=coefficient58(val61,order61);cubicJets61[2*order61+1,jj61]=real58(coeff61);cubicJets61[2*order61+2,jj61]=imag58(coeff61);
+    coeff61=coefficient58(sigVal61,order61);cubicSigmaJets61[2*order61+1,jj61]=real58(coeff61);cubicSigmaJets61[2*order61+2,jj61]=imag58(coeff61);
+   }
+  }
+  if(point61!=0){
+   for(order61=-ambientCaps61[point61];order61< -mixedCaps61[point61];order61++){
+    row61=constraintOffsets61[point61]+2*(order61+ambientCaps61[point61])+1;coeff61=coefficient58(val61,order61);
+    cubicC61[row61,jj61]=real58(coeff61);cubicC61[row61+1,jj61]=imag58(coeff61);
+   }
+   for(order61=-mixedCaps61[point61];order61<mixedCaps61[point61];order61++){
+    row61=profileOffsets61[point61]+2*(order61+mixedCaps61[point61])+1;coeff61=coefficient58(val61,order61);
+    cubicProfiles61[row61,jj61]=real58(coeff61);cubicProfiles61[row61+1,jj61]=imag58(coeff61);
+   }
+  }
+ }
+ print("CUBIC61_CHART chart="+string(chartid61)+" cusp="+string(cusp61)+" ramification="+string(ram61)+" cubic_products=324 point_label="+string(point61));
+}
+for(ii61=1;ii61<=4;ii61++){require58(selected61[ii61]==1,"CUBIC61_FOUR_UNIQUE_POINTS");}
+require58(evaluations61==6480 && conjugates61==1360,"CUBIC61_FULL_CHART_COUNTS");
+int ambientRank61=mat_rk(cubicJets61);print("CUBIC61_AMBIENT_RANK "+string(ambientRank61));
+require58(ambientRank61==324,"CUBIC61_COMPLETE_AMBIENT_INDEPENDENCE");
+matrix ambientLeft61=transpose(lift(module(transpose(cubicJets61)),module(unitmat(324))));
+require58(ambientLeft61*cubicJets61==unitmat(324),"CUBIC61_AMBIENT_LEFT_INVERSE");
+matrix sigmaAmbient61=lift(module(cubicJets61),module(cubicSigmaJets61));
+require58(cubicJets61*sigmaAmbient61==cubicSigmaJets61 && sigmaAmbient61*sigmaAmbient61==unitmat(324),"CUBIC61_ACTUAL_AMBIENT_INVOLUTION");
+matrix wrongSigma61=sigmaAmbient61;wrongSigma61[1,1]=wrongSigma61[1,1]+1;
+require58(cubicJets61*wrongSigma61!=cubicSigmaJets61,"CUBIC61_CHANGED_INVOLUTION_REJECTED");
+matrix kernel61=matrix(syz(module(cubicC61)));int dimension61=ncols(kernel61);int rank61=mat_rk(cubicC61);
+require58(dimension61==324-rank61 && mat_rk(kernel61)==dimension61,"CUBIC61_COMPLETE_MIXED_KERNEL");
+matrix recovery61=transpose(lift(module(transpose(kernel61)),module(unitmat(dimension61))));
+matrix homotopy61=transpose(lift(module(transpose(cubicC61)),module(transpose(unitmat(324)+kernel61*recovery61))));
+require58(cubicC61*kernel61==matrix(0,248,dimension61) && recovery61*kernel61==unitmat(dimension61) && kernel61*recovery61+homotopy61*cubicC61==unitmat(324),"CUBIC61_FULL_KERNEL_SPLITTING");
+matrix sigmaMixed61=recovery61*sigmaAmbient61*kernel61;
+require58(sigmaAmbient61*kernel61==kernel61*sigmaMixed61 && sigmaMixed61*sigmaMixed61==unitmat(dimension61),"CUBIC61_RESTRICTED_INVOLUTION");
+matrix oneJets61[770][1];oneJets61[1,1]=1;matrix oneAmbient61=lift(module(cubicJets61),module(oneJets61));matrix oneMixed61=recovery61*oneAmbient61;
+require58(cubicJets61*oneAmbient61==oneJets61 && kernel61*oneMixed61==oneAmbient61,"CUBIC61_ONE_POSITIVE_CONTROL");
+matrix regular61=cubicJets61*kernel61;matrix profiles61=cubicProfiles61*kernel61;
+link out61="ASCII:w cubic-space61.sing";open(out61);write(out61,"ring cubicSpace61=2,(w),dp;short=0;");
+dump58(out61,"cubicJets61",cubicJets61);dump58(out61,"cubicSigmaJets61",cubicSigmaJets61);dump58(out61,"ambientLeft61",ambientLeft61);dump58(out61,"cubicC61",cubicC61);dump58(out61,"cubicProfiles61",cubicProfiles61);dump58(out61,"sigmaAmbient61",sigmaAmbient61);dump58(out61,"kernel61",kernel61);dump58(out61,"recovery61",recovery61);dump58(out61,"homotopy61",homotopy61);dump58(out61,"sigmaMixed61",sigmaMixed61);dump58(out61,"oneMixed61",oneMixed61);dump58(out61,"regular61",regular61);dump58(out61,"profiles61",profiles61);close(out61);
+print("CUBIC61_RESULT ambient=324 ambient_degree=384 jet_orders=385 binary_jet_rows=770 local_conditions=248 constraint_rank="+string(rank61)+" mixed_dimension="+string(dimension61)+" mixed_degree=136 source_charts=20 cubic_bound_checks=6480 conjugate_checks=1360 complete_splitting=1");
+require58(dimension61==76,"CUBIC61_RR_DIMENSION_CONSISTENCY");
+print("CUBIC61_ALL_CHECKS_PASS");quit;

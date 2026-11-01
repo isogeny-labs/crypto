@@ -1,41 +1,41 @@
 {
   "schema": "experiment.protocol/v1",
-  "id": "KOBLITZ-R61-NORMAL-TRACE-DUAL",
+  "id": "KOBLITZ-R61-RUST-CERTIFICATE-CHECK",
   "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
   "claims": [
     {
-      "id": "trace-dual",
+      "id": "complete818-rowdot-reconstruction",
       "class": "exact_computation",
-      "statement": "All1024actual normal trace-Gram entries,fullrank32 inverse and source-bound dual lattice"
+      "statement": "Independent packed binary row-dot replay of all818 full ambient-row reconstructions, left inverses, complete source spaces/involutions/Jordan/contraction and controls"
     }
   ],
   "arms": {
-    "reference": "R55normalA andsourceannihilator;R52normalbasis/table/nu;R58complete100functions",
-    "baseline": "reducedB/A80sourcequotient",
-    "candidate": "640/320normalA4quotientwithcomplete18-patternprincipaldivisortest",
+    "reference": "accepted Singular cubic61-02/fix61-02/cohort61-01 exact binary source matrices",
+    "baseline": {
+      "not_applicable_reason": "exactidentityreconstruction,no timingcomparison"
+    },
+    "candidate": "standalone Rust packed row-dot-column parity; strict sparse binary parser",
     "positive": [
-      "allE M4=0,E G=I320,M4H+GE=I640",
-      "fourpoint-labelled80-dimensionalnilpotentJordanblocks",
-      "full100-columnfiniteevaluationleftinverse",
-      "all160oldCRTcolumnsrecovered",
-      "globallyregularxspacepositivekernelA\u00b2dimension1",
-      "all18completeC K/R K/K R+H Cproducts"
+      "complete ambient/mixed/fixed/Jordan/contraction products",
+      "actual1 regular kernel rank37/dimension1",
+      "all272 source-profile bindings"
     ],
     "negative": [
-      "knownx=1/A\u00b2failsglobalregularconditions",
-      "changedcokernelprojectionfailsinverseproduct"
+      "changed inverse product fails",
+      "changed source row fails",
+      "invalid sparse binary syntax/duplicate entries rejected"
     ],
     "A_A": {
-      "not_applicable_reason": "fixedexactproducts,no noisycomparison"
+      "not_applicable_reason": "fixedexactidentities,no statisticalmetric"
     }
   },
   "variables": {
     "fixed": [
-      "all528sourceproducts",
-      "normal32basis",
-      "seed61",
-      "4GiB/1200s",
-      "onejob/thread"
+      "all818supportpatterns",
+      "all136ambient rows before projection",
+      "all324/76/38source matrices",
+      "original4GiB/1200s Rust compile and run",
+      "CPU0 singleworker"
     ],
     "measured": [
       "binaryhash",
@@ -62,26 +62,30 @@
     "power": "notapplicable"
   },
   "metrics": [
-    "1024orderedtraceproducts",
-    "normalrank32",
-    "528sourceproductcolumns",
-    "twoinverseproducts",
-    "32dualcoordinatesourcebindings"
+    "818 exact pre-projection source reconstructions/left inverse products",
+    "all complete ambient/mixed/fixed/Jordan/contraction/jet products",
+    "global regular rank37/kernel1 and actual1",
+    "changed inverse/source-row rejection"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh trace61-01 TRACE61.sing TRACE61_ALL_CHECKS_PASS",
-    "timeout_seconds": 1200,
-    "virtual_KiB": 4194304,
-    "threads": 1,
-    "seed": 61,
-    "queue": "one mathematical job atonce",
-    "checkpoint": "immutable raw sources,logs,exit,binaryhash,tar",
-    "source_gate": "sixexecutedfiles matchGit;all donor hashes",
-    "backend": "original manually authorized local exact Singular",
+    "launcher": "REPLAY_RUST.sh rustcheck61-01",
+    "backend": "original manually authorized local Rust exact certificate replay",
+    "compiler": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
     "compiler_timeout_seconds": 1200,
     "run_timeout_seconds": 1200,
-    "compiler": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
-    "CPU_affinity": "0"
+    "virtual_KiB": 4194304,
+    "CPU_affinity": "0",
+    "compiler_flags": [
+      "--edition=2021",
+      "-Copt-level=2",
+      "-Ccodegen-units=1",
+      "-Cdebuginfo=0"
+    ],
+    "queue": "one mathematical job atonce",
+    "checkpoint": "source gate then immutable raw sources/build/exit/log/binary and tar",
+    "source_gate": "seven executed files match Git; all donor hashes",
+    "dependencies": "standalone std, no Cargo/network",
+    "seed_semantics": "Rust uses no randomness; source cohort seed61 retained"
   },
   "stopping": {
     "accepted": "exit0,exactmarker,no nativeerrorlines,allprescribedchecks",
@@ -91,12 +95,12 @@
   "decision": {
     "accept": "exit0,exactmarker,no nativeerrorlines,allpredeclaredsourceproducts",
     "failure": "preserveeverycap/error/partial;freezearepairbeforefreshattempt",
-    "scope": "affinetracedualonly;global61holodifferentials/Cartier andcubic818next"
+    "scope": "finite source-bound binary matrices only; geometry/function-field/normalization remain accepted native premises; no timing comparison"
   },
   "analysis": {
-    "kind": "exactpolynomialmatrix/rationalcoefficienttransportandbinarypresentation",
+    "kind": "exact GF2 word-bit parity products and independent control rank elimination",
     "comparative": false,
-    "precision": "exact,no seriestruncationinthisstage"
+    "precision": "all recorded binary entries and all818 complete supports; no sampling"
   },
   "literature": [
     {
@@ -109,5 +113,9 @@
     }
   ],
   "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
-  "version": 1
+  "version": 13,
+  "amendment": {
+    "before_affected_data": true,
+    "reason": "Singular03 resource-manually-stopped before100cases, partial results excluded; independent Rust row-dot replay preserves complete818 source matrices/certificates under original Rust resource caps"
+  }
 }

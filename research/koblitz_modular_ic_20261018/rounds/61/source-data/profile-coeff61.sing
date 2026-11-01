@@ -1,0 +1,40 @@
+// Exact coefficient windows through one native monomial/coefficient matrix.
+// Every binary output window reconstructs the corresponding source polynomial jet.
+proc profile61(list x,int lower,int upper){
+ require58(upper>lower && x[3]>=upper,"PROFILE61_WINDOW_PRECISION");
+ matrix B[2*(upper-lower)][1];poly p=x[1];if(p==0){return(B);}
+ matrix cc=coef(p,w);poly reconstructed=0;int j;int exponent;int row;number q;
+ for(j=1;j<=ncols(cc);j++){
+  require58(deg(cc[2,j])<=0,"PROFILE61_COEFFICIENT_CONSTANT");
+  reconstructed=reconstructed+cc[1,j]*cc[2,j];exponent=deg(cc[1,j])+x[2];
+  if(exponent>=lower && exponent<upper){row=2*(exponent-lower)+1;q=leadcoef(cc[2,j]);B[row,1]=real58(q);B[row+1,1]=imag58(q);}
+ }
+ require58(reconstructed==p,"PROFILE61_NATIVE_COEFFICIENT_RECONSTRUCTION");
+ poly fromB=0;for(j=0;j<upper-lower;j++){fromB=fromB+(B[2*j+1,1]+a*B[2*j+2,1])*w^j;}
+ poly high=0;poly low=0;
+ if(upper-x[2]-1>=0){high=jet(p,upper-x[2]-1);}
+ if(lower-x[2]-1>=0){low=jet(p,lower-x[2]-1);}
+ if(lower>=x[2]){require58(fromB*w^(lower-x[2])==high-low,"PROFILE61_FULL_WINDOW_BINDING");}
+ else{require58(fromB==(high-low)*w^(x[2]-lower),"PROFILE61_FULL_WINDOW_BINDING");}
+ return(B);
+}
+proc conjugate61(list x){
+ poly p=x[1];if(p==0){return(x);}
+ matrix cc=coef(p,w);poly original=0;poly ans=0;int j;number q;
+ for(j=1;j<=ncols(cc);j++){
+  require58(deg(cc[2,j])<=0,"PROFILE61_CONJUGATE_COEFFICIENT_CONSTANT");q=leadcoef(cc[2,j]);
+  original=original+cc[1,j]*cc[2,j];ans=ans+q^2*cc[1,j];
+ }
+ require58(original==p,"PROFILE61_CONJUGATE_SOURCE_BINDING");return(lnrm(ans,x[2],x[3]));
+}
+proc profileControls61(){
+ list sparse=lnrm(a*w^7+(a+1)*w^3+1,-4,22);matrix W=profile61(sparse,-6,13);int j;number q;
+ for(j=-6;j<13;j++){q=W[2*(j+6)+1,1]+a*W[2*(j+6)+2,1];require58(q==coefficient58(sparse,j),"PROFILE61_RETAINED_SPARSE_CONTROL");}
+ poly dense=0;for(j=0;j<=31;j++){dense=dense+(a^j)*w^j;}
+ list ds=lnrm(dense,-9,50);matrix D=profile61(ds,-12,28);
+ for(j=-12;j<28;j++){q=D[2*(j+12)+1,1]+a*D[2*(j+12)+2,1];require58(q==coefficient58(ds,j),"PROFILE61_RETAINED_DENSE_CONTROL");}
+ matrix Z=profile61(lc(0),-3,9);require58(Z==matrix(0,24,1),"PROFILE61_ZERO_CONTROL");
+ list dif=la(conjugate61(sparse),conjugate58(sparse));require58(dif[1]==0 && dif[3]>=22,"PROFILE61_RETAINED_CONJUGATE_CONTROL");
+ matrix bad=W;bad[1,1]=bad[1,1]+1;require58(bad!=W,"PROFILE61_CHANGED_COEFFICIENT_REJECTED");
+ return(1);
+}
