@@ -95,3 +95,17 @@ Complete FIX61 then all818 cohort and six Lean claims. Waiting-freeze lane stays
 
 ### Errors
 Ordinary receipt access denied; scoped sudo read succeeded. Interrupted FIX61 is a launch interruption, not a mathematical null.
+
+## 2026-11-01T19:14:14.813648+00:00 — fixed38 exact source complex
+
+### What was done
+fix61-02terminalacceptedexit0/exactPASS/noerrors:38fixed/38trace,NQ+QN=I76,Q2=0,all38whole-sourcefixed and38preimageidentities,actualoddtrace1,alllocal/regularimaginaryzero.
+
+### Decisions made
+Freezeall818cohort withactualaccepted02donor andfull136rows; retain01interruptionasnon-nativeattempt.
+
+### Open threads
+All818,independentchecker,sixLeanclaims/report/custody andoriginalallleads.
+
+### Errors
+No fresh02nativeerrors. Old01checkpointinterruptionretained.

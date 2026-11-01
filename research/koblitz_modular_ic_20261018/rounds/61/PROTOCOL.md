@@ -93,3 +93,6 @@ actualtrace(odd)=1. Checkalllocal272/regular770profileimaginarycoefficients
 zero. Exportfullmatrices andactualfixed/preimagefunctions. Changedsource
 controls alreadyinCUBIC/FIELDdonors;no newnull claiminthisstage. Samecaps.
 ALL818supportpatterns are next,notassumedfromdimensions.
+
+## Stage5 all818 balanced infinity patterns
+FIX61fresh02acceptedcomplete38fixed/38trace/fullcontraction andactualsourceidentities;01interruptedbefore native start at checkpointgate. Freezeactualfixed-space61donorhash. Minorintervals[-6,6],[-10,10],[-1,1],forcede0=-sum,excludezero:all818,degree2sumpositive<=34. All136rows from272profiles include bothF4orientations,completefixed38space. EveryC hasrank38 or37; zerokernelrequiresH C=I38, onedimrequiresfullC K=0,R K=1,K R+H C=I38 andsavedgenerator. Globalregularcontrolrank37/kernel1containsactual1; changedleftinversefails. Preserveeverycase,includingnonunit11degrees. Bothtraceparities remainavailable. Survivingprincipalx requiresall31F32scalars,bothordinarysigns,fullASsourceidentities/5conjugates/intended11action,notinferredfromkernel. Samecaps,onejob,seed61.
