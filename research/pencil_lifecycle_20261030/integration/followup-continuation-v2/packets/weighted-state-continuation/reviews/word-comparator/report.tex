@@ -1,0 +1,19 @@
+\documentclass[10pt]{article}\usepackage[margin=0.8in]{geometry}\usepackage[T1]{fontenc}\begin{document}\section*{Independent native-word comparator review}
+Reviewer /root/monic\_review. 2026-11-01.
+
+\textbf{Result.} Eight new declarations, ten producer controls and six independent controls pass fresh exact-module checks. Twenty-four named axiom readbacks pass. No defect found in the scoped literal-word predicate bridge.
+
+\textbf{Narrow multiplication.} Native mul computes UInt64 $xy\bmod p$. Canonical inputs and $p\le2^{32}$ imply $xy\le(2^{32}-1)^2<2^{64}$, including the endpoint. The proof removes wrapping only under this bound. Modular output canonicality is distinct from correctness of the original product; both are used appropriately.
+
+\textbf{Sixteen comparisons.} The Boolean nested finRange all tests are translated to all Fin4 cross-product equalities. Canonical modular output equality is reflected through ZMod, and exact narrow multiplication decoding supplies the field minors. The nonzero Boolean scan reflects decoded nonzero only with canonical inputs. Final equivalence retains prime modulus, bound, canonicality and both nonzero vectors, concluding a nonzero field scalar multiple.
+
+\begin{center}\fbox{Bounded word products}\quad$\longrightarrow$\quad\fbox{Boolean minors}\quad$\longrightarrow$\quad\fbox{Projective field equality}\end{center}
+
+\textbf{Boundary evidence.} Producer controls retain an actual overflow false-positive comparison outside the bound and a separate natural-arithmetic cross-product. Reviewer controls exercise multiple nonzero coordinates, reversed scaling, changed final slot, characteristic-two words and exact wrapping boundary products. Endpoint $p=2^{32}$ is an arithmetic fixture, not a prime-field instance. No reviewer failures occurred.
+
+\textbf{Remaining scope.} Field-value predicate correspondence is faithful at its stated premises. Rust compilation, array/function representation, counters and surrounding geometric membership remain separate. Raw zero-vector degeneracy is preserved; noncanonical p-valued words still cannot establish decoded nonzero.
+
+\textbf{Workflow.} Prospective local source-first plan, separate reviewer, fresh builds and matching local pre/post bindings completed. Cached imported helpers retain their trust boundary; full clean dependency rebuild, independent kernel checker, precommitted publication and multi-reviewer gate remain separate. No scientific runs, repository writes or official transition.
+
+Artifacts: REVIEW.md, status/attestation JSON, receipts and complete logs, source bindings and editable flow.svg.
+\end{document}

@@ -137,8 +137,8 @@ use crypto_lib::cryptanalysis::koblitz_groebner::{
 };
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     build_standard_subspace_factor_base, groebner_decompose, groebner_decompose_f6_ic,
-    groebner_decompose_f6_ic_pair_index, point_key, FrobeniusFactorBase, KoblitzCurve,
-    PairSumTable,
+    groebner_decompose_f6_ic_pair_index, point_key, reset_f6_ic_pair_index_cache,
+    FrobeniusFactorBase, KoblitzCurve, PairSumTable,
 };
 
 /// The unit string of the solver's count.  It matches the symmetrised and
@@ -494,7 +494,7 @@ fn stats_extra(s: &SolveStats) -> BTreeMap<String, u64> {
     e
 }
 
-/// `pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N[,linear_harvest=H]`,
+/// `pdp3-koblitz:m=3,engine=inherited-f4|f6-ic|f6-ic-pair,degree=D,node_budget=N[,linear_harvest=H]`,
 /// `pdp3-koblitz:m=2|3,engine=rootfind`,
 /// `pdp3-koblitz:m=3,engine=rootfind-window`,
 /// `pdp3-koblitz:m=2|3,engine=rootfind-negfold`, or
@@ -794,6 +794,11 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
              rootfind, rootfind-window, rootfind-negfold or rootfind-window-negfold",
         )?;
         self.engine = Pdp3Engine::parse(engine)?;
+        if self.engine == Pdp3Engine::F6IcPair {
+            // Reuse within this pipeline solve, never across independent
+            // records or replayed records in the auditor process.
+            reset_f6_ic_pair_index_cache();
+        }
         let mut max_degree = 0u32;
         if self.engine.is_groebner() {
             let degree = params

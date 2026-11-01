@@ -1,0 +1,88 @@
+import WordConstraint
+set_option autoImplicit false
+namespace SignedWord
+structure Anchored (n:Nat) where
+ graph : State n
+ fixed : Fin n → Option (UInt64×UInt64)
+def decodeA {n:Nat} (r:UInt64) (s:Anchored n) : GraphUnion.State (F r) n :=
+ ⟨decode r s.graph,fun i=>(s.fixed i).map (fun xy=>(wd r xy.1,wd r xy.2))⟩
+def GoodA {n:Nat} (r:UInt64) (s:Anchored n) : Prop :=
+ Good r s.graph ∧ ∀ i x y,s.fixed i=some (x,y) → x.toNat<r.toNat ∧ y.toNat<r.toNat
+def pairDecode {n:Nat} (r:UInt64) (p:Anchored n×GraphSameRoot.Result UInt64) :=
+ (decodeA r p.1,outDecode r p.2)
+def anchor {n:Nat} (r:UInt64) (s:Anchored n) (root:Fin n) (a b:UInt64) : Anchored n×GraphSameRoot.Result UInt64 :=
+ match s.fixed root with
+ | some xy => (s,constraint r (GraphRingWord.sub r xy.1 a) (GraphRingWord.sub r xy.2 b))
+ | none => (⟨s.graph,fun i=>if i=root then some (a,b) else s.fixed i⟩,.none)
+theorem anchor_refines {n:Nat} (r:UInt64) [Fact r.toNat.Prime] (s:Anchored n) (root:Fin n) (a b:UInt64)
+ (hp:1<r.toNat) (hr:r.toNat≤2^63) (hg:GoodA r s) (ha:a.toNat<r.toNat) (hb:b.toNat<r.toNat) :
+ pairDecode r (anchor r s root a b)=GraphSameRoot.anchor (decodeA r s) root (wd r a) (wd r b) := by
+ cases hf:s.fixed root with
+ | none =>
+   simp only [anchor,hf,pairDecode,GraphSameRoot.anchor,decodeA,Option.map_none,outDecode]
+   congr 2
+   funext i
+   by_cases hi:i=root <;> simp [hi]
+ | some xy =>
+   have hxy:=hg.2 root xy.1 xy.2 hf
+   have hs1:=GraphRingWord.sub_correct r xy.1 a (by omega) hr hxy.1 ha
+   have hs2:=GraphRingWord.sub_correct r xy.2 b (by omega) hr hxy.2 hb
+   have hc:=constraint_refines r _ _ hp hs1.1 hs2.1
+   simp only [anchor,hf,pairDecode,GraphSameRoot.anchor,decodeA,Option.map_some]
+   apply Prod.ext
+   · rfl
+   · simpa only [wd,hs1.2,hs2.2] using hc
+
+theorem anchor_good {n:Nat} (r:UInt64) (s:Anchored n) (root:Fin n) (a b:UInt64)
+ (hg:GoodA r s) (ha:a.toNat<r.toNat) (hb:b.toNat<r.toNat) : GoodA r (anchor r s root a b).1 := by
+ cases hf:s.fixed root with
+ | some xy => simpa [anchor,hf] using hg
+ | none =>
+   simp only [anchor,hf]
+   refine ⟨hg.1,?_⟩
+   intro i x y h
+   by_cases hi:i=root
+   · have hh:(a,b)=(x,y) := by simpa [anchor,hf,hi] using h
+     cases hh; exact ⟨ha,hb⟩
+   · exact hg.2 i x y (by simpa [anchor,hf,hi] using h)
+
+theorem two_nonzero (r:UInt64) (hp:2<r.toNat) : (2:F r)≠0 := by
+ simpa [F] using PencilWordRefinement.canonical_word_nonzero r (2:UInt64) (by omega) (by simpa using hp) (by decide)
+theorem sign_sum_zero (r:UInt64) (c d:Int8) (hp:2<r.toNat) (hc:Sign c) (hd:Sign d) :
+ c+d=0 ↔ sd r c+sd r d=0 := by
+ have h2:=two_nonzero r hp
+ rcases hc with rfl|rfl <;> rcases hd with rfl|rfl <;> norm_num [sd,h2]
+
+def sameRoot {n:Nat} (r:UInt64) (s:Anchored n) (root:Fin n) (cu cv:Int8) (a b:UInt64) : Anchored n×GraphSameRoot.Result UInt64 :=
+ if cu+cv=0 then (s,constraint r (GraphRingWord.neg r a) (GraphRingWord.neg r b)) else
+ let ci:=WideModPow.inverseGenerator r (denominator r cu)
+ anchor r s root (GraphRingWord.mul r a ci) (GraphRingWord.mul r b ci)
+theorem same_refines {n:Nat} (r:UInt64) [Fact r.toNat.Prime] (s:Anchored n) (root:Fin n) (cu cv:Int8) (a b:UInt64)
+ (hp:2<r.toNat) (hr:r.toNat≤2^63) (hg:GoodA r s) (ha:a.toNat<r.toNat) (hb:b.toNat<r.toNat) (hc:Sign cu) (hd:Sign cv) :
+ pairDecode r (sameRoot r s root cu cv a b)=GraphSameRoot.sameRoot (decodeA r s) root (sd r cu) (sd r cv) (wd r a) (wd r b) := by
+ have hs:=sign_sum_zero r cu cv hp hc hd
+ by_cases hh:cu+cv=0
+ · have hna:=GraphRingWord.neg_correct r a (by omega) ha
+   have hnb:=GraphRingWord.neg_correct r b (by omega) hb
+   have hcon:=constraint_refines r _ _ (by omega) hna.1 hnb.1
+   simp only [sameRoot,if_pos hh,pairDecode,GraphSameRoot.sameRoot,if_pos (hs.mp hh)]
+   apply Prod.ext
+   · rfl
+   · simpa only [wd,hna.2,hnb.2] using hcon
+ · have hde:=denominator_correct r cu hp hc
+   have hden := hde.2.2
+   change ((denominator r cu).toNat:F r)=(if sd r cu=1 then (2:F r) else -2) at hden
+   have hi:=WideModPow.generator_decode r _ (by omega) hde.1 hde.2.1
+   have hma:=GraphRingWord.mul_correct r a (WideModPow.inverseGenerator r (denominator r cu)) (by omega)
+   have hmb:=GraphRingWord.mul_correct r b (WideModPow.inverseGenerator r (denominator r cu)) (by omega)
+   have he:=anchor_refines r s root _ _ (by omega) hr hg hma.1 hmb.1
+   simp only [sameRoot,if_neg hh,GraphSameRoot.sameRoot,if_neg (fun h=>hh (hs.mpr h))]
+   simpa only [wd,hma.2,hmb.2,hi,hden] using he
+
+theorem same_good {n:Nat} (r:UInt64) (s:Anchored n) (root:Fin n) (cu cv:Int8) (a b:UInt64)
+ (hp:0<r.toNat) (hg:GoodA r s) : GoodA r (sameRoot r s root cu cv a b).1 := by
+ unfold sameRoot
+ split_ifs
+ · exact hg
+ · exact anchor_good r s root _ _ hg (GraphRingWord.mul_correct r _ _ hp).1 (GraphRingWord.mul_correct r _ _ hp).1
+end SignedWord

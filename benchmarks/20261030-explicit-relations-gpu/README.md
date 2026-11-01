@@ -110,3 +110,17 @@ were estimated. [Seed101 graph](query-profile-v2-kernels-101.svg) and
 [seed202 graph](query-profile-v2-kernels-202.svg), plus corresponding PNGs,
 are byte/hash-bound presentation copies. Raw supplement was pushed as
 `5d4713f59fa3` before rendering; both PDF pages were visually inspected.
+
+The [uninstrumented full-cache comparison](../../research/explicit_relations_fullcache_20261101/RESULTS.md)
+retains33 verified recoveries on one RTX4090: all30 small executions and the
+complete first large matched set. Median paired cold time was16.75%/17.43%
+lower on the small inputs and10.10% lower on the completed large input; its
+baseline controls differed by0.012%. These are descriptive L0 results from
+completed sets. External pod deletion interrupted the second large input;
+one interrupted attempt and two unstarted cells remain explicit. The original
+whole-panel analysis refuses the incomplete coverage; the separate retained-set
+analysis is labelled post-interruption and unblinded. The [two-page PDF](fullcache-v2-report.pdf),
+[SVG](fullcache-v2-scaling.svg) and [PNG](fullcache-v2-scaling.png) preserve that
+scope. Raw evidence was pushed as2ef5d57e0e01 before rendering, and both PDF
+pages were inspected. The second large input's full matched comparison remains
+open; no replacement GPU is running while its external deletion is clarified.
