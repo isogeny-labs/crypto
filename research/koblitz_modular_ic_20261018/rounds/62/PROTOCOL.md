@@ -41,3 +41,9 @@ filtering on costs/zerooddoutput;retainfailuresandfreezerepairs. Samecaps.
 
 Zero root components are exported in explicit lists,not truncated ideal
 generator sequences. All435indices must survive roundtrip for replay.
+
+### SPLIT02 source-cache syntax repair
+SPLIT01unsupportedideal==idealcomparisonisnativeerror;latePASSandall
+numbersrejected. Comparefullgeneratorcountandeverycachedsourcepolynomial
+exactlybeforeSPLIT02. All435functions/13920coefficientchecks/controls/caps
+unchanged;cachedMATRIX62accepted,noreproducerun.

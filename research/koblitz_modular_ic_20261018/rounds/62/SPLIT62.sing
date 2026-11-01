@@ -2,7 +2,8 @@ LIB "linalg.lib";
 proc require62(int ok,string tag){if(!ok){ERROR(tag);quit;}}
 execute(read("../../../61/runs/field61-01/field-space61.sing"));
 execute(read("../matrix62-01/square-matrix62.sing"));
-require62(cachedIdeal62==sourceIdeal61,"SPLIT62_ACTUAL_SOURCE_CACHE_BINDING");
+require62(size(cachedIdeal62)==size(sourceIdeal61),"SPLIT62_SOURCE_GENERATOR_COUNT");
+int sourceIndex62;for(sourceIndex62=1;sourceIndex62<=size(sourceIdeal61);sourceIndex62++){require62(cachedIdeal62[sourceIndex62]==sourceIdeal61[sourceIndex62],"SPLIT62_ACTUAL_SOURCE_CACHE_BINDING");}
 ideal GB62=std(sourceIdeal61);require62(vdim(GB62)==32,"SPLIT62_SOURCE_DEGREE");
 require62(square62*inverse62==unitmat(32) && inverse62*square62==unitmat(32),"SPLIT62_CACHED_INVERSE_PRODUCTS");
 def sourceRing62=basering;

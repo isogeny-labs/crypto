@@ -76,3 +76,20 @@ normality/infinity binding andoriginal researchscope.
 
 ### Errors
 Proof source notyetcompiled. No additional mathematicaldata taken.
+
+## 2026-11-01T23:01:45.793732+00:00 — rejected ideal-equality syntax, full fresh repair
+
+### What was done
+split62-01terminalFAIL/native0:unsupportedideal==idealcachecomparison;
+latePASS/allnumericlinesunaccepted. Preservedentire435attemptandlogs.
+
+### Decisions made
+Freezeexactgeneratorcount/per-polynomialcachebindingbeforefresh02;
+same435sourcefunctions/13920coefficientchecksandcache,capsunchanged.
+
+### Open threads
+SPLIT02then8Leanclaims/fullsourcechecker/reports;alloriginallanesremain.
+
+### Errors
+I used unsupported Singular ideal equality. Repaired syntax before fresh
+fullcohortdata;noaccepted matrix producer repeated.

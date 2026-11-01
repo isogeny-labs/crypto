@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "id": "KOBLITZ-R62-FULL435-DECOMPOSITION",
-  "version": 3,
+  "version": 4,
   "goal": "generate and pursue Koblitz cover/modular transfer leads at larger sizes",
   "claims": [
     {
@@ -69,7 +69,7 @@
     "changed-root rejection"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh split62-01 SPLIT62.sing SPLIT62_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_CAS.sh split62-02 SPLIT62.sing SPLIT62_ALL_CHECKS_PASS",
     "backend": "original manually authorized local Singular",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
@@ -103,6 +103,6 @@
   "validation_note": "canonical protocol tools/schema absent in selected index; manual contract/source byte verification only",
   "amendment": {
     "before_affected_data": true,
-    "reason": "explicit lists preserve all435 zero-valued root components; raw stage1 removed from current Git index into archive flow with bytes/history retained. Same435functions/13920coefficients/caps"
+    "reason": "split62-01 rejected unsupported ideal equality and late PASS; compare complete source equation count and every polynomial exactly, same435/13920scope/cache/caps"
   }
 }
