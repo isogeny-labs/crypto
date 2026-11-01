@@ -390,7 +390,8 @@ paths:
       parameters:
         - { name: curve, in: query, schema: { type: string }, description: any curve reference, or the producer's curve name }
         - { name: family, in: query, schema: { type: string } }
-        - { name: scheme, in: query, schema: { type: string, enum: [fb1, fbarchive, spec] } }
+        - { name: scheme, in: query, schema: { type: string, enum: [fb1, fbarchive, spec, pointset] } }
+        - { name: design, in: query, schema: { type: string }, description: study name of a design grid }
         - { name: min_columns, in: query, schema: { type: integer } }
         - { name: max_columns, in: query, schema: { type: integer } }
         - { name: solved, in: query, schema: { type: boolean } }
@@ -413,6 +414,22 @@ paths:
         - { name: fbm_id, in: query, schema: { type: string } }
         - { name: solved, in: query, schema: { type: boolean } }
         - { name: points, in: query, schema: { type: boolean } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
+      responses: { "200": { description: OK } }
+  /v1/factor-base-designs:
+    get:
+      summary: Factor-base design grids (n83 sweep) with solver axes, tuple counts and per-tuple dispositions (design coverage, not results).
+      responses: { "200": { description: OK } }
+  /v1/ic/claims:
+    get:
+      summary: IC tool-program claims (single-target IC online vs matched rho), or per-candidate summaries with summary=true. online_speedup excludes the IC set-up; cold_ratio_ic_over_rho includes it.
+      parameters:
+        - { name: summary, in: query, schema: { type: boolean } }
+        - { name: rule_version, in: query, schema: { type: string } }
+        - { name: curve, in: query, schema: { type: string } }
+        - { name: candidate_id, in: query, schema: { type: string } }
+        - { name: validation_status, in: query, schema: { type: string } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
         - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
       responses: { "200": { description: OK } }
