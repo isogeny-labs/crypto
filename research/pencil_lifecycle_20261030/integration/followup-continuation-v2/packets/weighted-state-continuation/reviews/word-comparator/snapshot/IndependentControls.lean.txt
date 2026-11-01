@@ -1,0 +1,17 @@
+import WordComparator
+open WordComparator
+def x : V := fun i=>if i=0 then 2 else if i=1 then 3 else if i=2 then 4 else 5
+def y : V := fun i=>if i=0 then 8 else if i=1 then 12 else if i=2 then 16 else 3
+def bad : V := fun i=>if i=0 then 8 else if i=1 then 12 else if i=2 then 16 else 4
+theorem multi_coordinate_scale : sameB 17 x y=true := by decide
+theorem reversed_multi_scale : sameB 17 y x=true := by decide
+theorem last_slot_matters : sameB 17 x bad=false := by decide
+theorem characteristic_two_words : sameB 2 (fun i=>if i=3 then 1 else 0) (fun i=>if i=3 then 1 else 0)=true := by decide
+theorem exact_bound_no_wrap : ((4294967295:UInt64)*4294967295).toNat=18446744065119617025 := by decide
+theorem beyond_bound_wrap : ((4294967296:UInt64)*4294967296).toNat=0 := by decide
+#print axioms multi_coordinate_scale
+#print axioms reversed_multi_scale
+#print axioms last_slot_matters
+#print axioms characteristic_two_words
+#print axioms exact_bound_no_wrap
+#print axioms beyond_bound_wrap

@@ -1,0 +1,37 @@
+import FallbackWordChain
+set_option autoImplicit false
+namespace FallbackWord
+open Polynomial ScaleTrim MonicRemainder
+
+def numerator (p : UInt64) (ua ub va vb f c1 c2 e1 e2 : List UInt64) : List UInt64 :=
+ let s1 := ProductPolynomial.product p c1 e1
+ let s2 := ProductPolynomial.product p c1 e2
+ ResidualWord.padd p
+   (ResidualWord.padd p
+     (ProductPolynomial.product p (ProductPolynomial.product p s1 ua) vb)
+     (ProductPolynomial.product p (ProductPolynomial.product p s2 ub) va))
+   (ProductPolynomial.product p c2 (ResidualWord.padd p (ProductPolynomial.product p va vb) f))
+
+theorem numerator_correct (p : UInt64) [Fact p.toNat.Prime] (ua ub va vb f c1 c2 e1 e2 : List UInt64)
+ (hp : 0 < p.toNat) (hb : p.toNat < 2^31)
+ (hua : Canon p ua) (hub : Canon p ub) (hva : Canon p va) (hvb : Canon p vb) (hf : Canon p f)
+ (hc1 : Canon p c1) (hc2 : Canon p c2) (he1 : Canon p e1) (he2 : Canon p e2) :
+ Canon p (numerator p ua ub va vb f c1 c2 e1 e2) ∧
+ wordsPoly p (numerator p ua ub va vb f c1 c2 e1 e2)=
+ ((wordsPoly p c1*wordsPoly p e1)*wordsPoly p ua)*wordsPoly p vb+
+ ((wordsPoly p c1*wordsPoly p e2)*wordsPoly p ub)*wordsPoly p va+
+ wordsPoly p c2*(wordsPoly p va*wordsPoly p vb+wordsPoly p f) := by
+ have hs1 := ProductPolynomial.product_correct p c1 e1 hp hb hc1 he1
+ have hs2 := ProductPolynomial.product_correct p c1 e2 hp hb hc1 he2
+ have hsu := ProductPolynomial.product_correct p _ ua hp hb hs1.1 hua
+ have htu := ProductPolynomial.product_correct p _ ub hp hb hs2.1 hub
+ have hsv := ProductPolynomial.product_correct p _ vb hp hb hsu.1 hvb
+ have htv := ProductPolynomial.product_correct p _ va hp hb htu.1 hva
+ have hsum := ResidualWord.add_correct p _ _ hp hb hsv.1 htv.1
+ have hvv := ProductPolynomial.product_correct p va vb hp hb hva hvb
+ have hvf := ResidualWord.add_correct p _ f hp hb hvv.1 hf
+ have hlast := ProductPolynomial.product_correct p c2 _ hp hb hc2 hvf.1
+ have hout := ResidualWord.add_correct p _ _ hp hb hsum.1 hlast.1
+ refine ⟨hout.1,?_⟩
+ simpa only [numerator,hs1.2,hs2.2,hsu.2,htu.2,hsv.2,htv.2,hsum.2,hvv.2,hvf.2,hlast.2] using hout.2
+end FallbackWord
