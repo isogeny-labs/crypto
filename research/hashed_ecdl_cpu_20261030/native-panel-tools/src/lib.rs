@@ -106,7 +106,10 @@ pub fn export(study: &Path, analyzer: &Path, created: &str) -> Result<()> {
         .and_then(|s| s.to_str())
         .ok_or("invalid study name")?;
     check(
-        matches!(round, "round18" | "round19" | "round20" | "round21"),
+        matches!(
+            round,
+            "round18" | "round19" | "round20" | "round21" | "round22"
+        ),
         "unsupported study",
     )?;
     let job = format!("hashed-ecdl-cpu-{round}-20261030");
@@ -159,6 +162,39 @@ pub fn export(study: &Path, analyzer: &Path, created: &str) -> Result<()> {
         }
         let cert = format!("cert-{}-{}-{}.txt", row[0], row[1], row[3]);
         run["artifacts"] = json!([file_ref(&out.join(&cert), &cert)?]);
+        if round == "round22" && matches!(row[0], "y" | "z") {
+            let name = format!("stages-{}-{}-{}.csv", row[0], row[1], row[3]);
+            run["artifacts"]
+                .as_array_mut()
+                .ok_or("invalid artifacts")?
+                .push(file_ref(&out.join(&name), &name)?);
+            run["isolation"]["blockers"].as_array_mut().ok_or("invalid blockers")?
+                .push(json!("Additional stage clocks perturb this L0-profile execution; not an ordinary timing row."));
+            let raw = fs::read_to_string(out.join(name))?;
+            let fields: Vec<_> = raw
+                .lines()
+                .nth(1)
+                .ok_or("missing stage row")?
+                .split(',')
+                .collect();
+            check(fields.len() == 13, "malformed stage row")?;
+            for (column, name) in [
+                "solve",
+                "bases",
+                "targets",
+                "oracle",
+                "linear",
+                "internal_replay",
+                "external_replay",
+                "complete",
+            ]
+            .iter()
+            .enumerate()
+            {
+                run["measurements"]["counters"][format!("stage_{name}_ms")] =
+                    json!(fields[column + 4].parse::<f64>()?);
+            }
+        }
         runs.push(run);
     }
     export["runs"] = json!(runs);
@@ -186,6 +222,15 @@ pub fn export(study: &Path, analyzer: &Path, created: &str) -> Result<()> {
         file_ref(&out.join("latency.svg"), "latency.svg")?,
         file_ref(&out.join("analysis.log"), "analysis.log")?
     ]);
+    if round == "round22" {
+        export["analysis"]["outputs"]
+            .as_array_mut()
+            .ok_or("invalid outputs")?
+            .push(file_ref(
+                &out.join("stage-summary.csv"),
+                "stage-summary.csv",
+            )?);
+    }
     export["notes"] = json!([
         {"kind":"observation","by":"native-panel-tools","text":"180 complete executions; 162 measured and 18 warmups. Frozen native analysis accepts full certificate equality across all six arms. Effective source identities, including any patched control, are retained in the materialization files. All full phases and both certificate replays remain charged."},
         {"kind":"observation","by":"native-panel-tools","text":"L0 diagnostics; wall_valid=false. Neutral machine labels do not establish human blinding."}

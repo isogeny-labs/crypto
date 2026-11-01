@@ -59,6 +59,11 @@ impl Fixture {
                     row.extend(vec!["1.0".into(); 6]);
                     row.extend(vec!["0".into(); 7]);
                     row.extend(["0.001".into(), "L0".into()]);
+                    if source.file_name().unwrap() == "round22" && matches!(arm, 'y' | 'z') {
+                        row[23] = "L0-profile".into();
+                        fs::write(out.join(format!("stages-{arm}-{case}-{round}.csv")),
+                            format!("arm,instance_id,seed,replicate,solve_ms,bases_ms,targets_ms,oracle_ms,linear_ms,internal_replay_ms,external_replay_ms,complete_ms,tier\n{arm},{case},{},{round},1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,L0-profile\n", 111 * (case + 1))).unwrap();
+                    }
                     rows.push(row);
                     fs::write(
                         out.join(format!("cert-{arm}-{case}-{round}.txt")),
@@ -302,4 +307,48 @@ fn historical_round18_export_parity() {
         value.as_object_mut().unwrap().remove("notes");
     }
     assert_eq!(actual, expected);
+}
+
+#[test]
+fn stage_rows_are_bound_to_execution_and_exported() {
+    let f = Fixture::new();
+    if f.study.file_name().unwrap() != "round22" {
+        return;
+    }
+    f.export().unwrap();
+    let data: Value =
+        serde_json::from_slice(&fs::read(f.out.join("export.json")).unwrap()).unwrap();
+    let profiled: Vec<_> = data["runs"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|r| r["arm"] == "y" || r["arm"] == "z")
+        .collect();
+    assert_eq!(profiled.len(), 60);
+    for run in profiled {
+        assert_eq!(run["measurements"]["counters"]["stage_targets_ms"], 1.0);
+        assert_eq!(run["artifacts"].as_array().unwrap().len(), 2);
+        assert_eq!(run["measurements"]["wall_valid"], false);
+    }
+}
+
+#[test]
+fn missing_or_mismatched_stage_rows_rejected() {
+    let f = Fixture::new();
+    if f.study.file_name().unwrap() != "round22" {
+        return;
+    }
+    let path = f.out.join("stages-y-0-0.csv");
+    let original = fs::read_to_string(&path).unwrap();
+    fs::remove_file(&path).unwrap();
+    assert!(f.export().is_err());
+    for bad in [
+        original.replace("y,0,111,0,", "z,0,111,0,"),
+        original.replace(",1.0,L0-profile", ",2.0,L0-profile"),
+        original.replace(",1.0,1.0,", ",NaN,1.0,"),
+    ] {
+        fs::write(&path, bad).unwrap();
+        assert!(f.export().is_err());
+        assert!(!f.out.join("export.json").exists());
+    }
 }
