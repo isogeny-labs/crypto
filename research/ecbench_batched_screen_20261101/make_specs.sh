@@ -19,7 +19,7 @@ for c in "${cells[@]}"; do
     schema: "ecbench.spec/v1", label: $label, description: $desc,
     workloads: {curves: [{kind: "koblitz", a: $a, n: $n}], targets_per_curve: 32, target_seed: $tseed, target_kind: "public"},
     arms: $arms,
-    measurement: {rounds: 3, warmup: 1, order: "alternate", seed: 202611012001, isolation_required: "L0", timeout_seconds: 3600}
+    measurement: {rounds: 4, warmup: 1, order: "alternate_measured", seed: 202611012001, isolation_required: "L0", timeout_seconds: 3600}
   }' > "specs/$name.json"
 done
 ls specs

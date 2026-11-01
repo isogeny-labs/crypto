@@ -49,8 +49,8 @@ neighbours the tournament's own refinement rule (`batch/2`, `batch/4`, `2·batch
 `batch_trials` changes and are not ported, so they are not in this screen.
 
 Targets: 32 public points per curve, `target_seed` `202611011001` (n13),
-`…1002` (n17), `…1003` (n19), `…1004` (n23). Measurement: 3 rounds after 1
-warmup, order `alternate`, seed `202611012001`, isolation `L0`. All arms see the
+`…1002` (n17), `…1003` (n19), `…1004` (n23). Measurement: 4 rounds after 1
+warmup, order `alternate_measured` (see Amendment 1), seed `202611012001`, isolation `L0`. All arms see the
 same targets, so every comparison is paired by target.
 
 ## Predictions (stated before data)
@@ -100,3 +100,20 @@ A session that does not verify, a failed A/A control (ratio outside
 [0.999, 1.001] in counted GAE), or any record that is not `VERIFIED` stops
 the screen and is reported as such. The seeds are not reused after a measured
 failure.
+
+## Amendments
+
+**Amendment 1 (before any data).** Three corrections found by building the
+binary and running `ecbench plan`; none changes the panel, arms, targets,
+seeds, predictions or decision rule.
+
+- `measurement` is 4 rounds (not 3) with order `alternate_measured` (not
+  `alternate`): `plan` warns that an odd number of measured rounds cannot be
+  balanced under either order. Counted cost is a function of the target and
+  seed, so the order cannot move it.
+- `run.sh` passes `--cpus none`: this host has no whole core away from CPU 0
+  for `--cpus auto`, and the spec asks for isolation L0 (record only).
+- `run.sh` calls `compare --save` without a path: the flag takes none and
+  writes `<dir>/comparisons/<a>__<b>.json`. In `compare`, `--a` is the
+  denominator (the baseline `ic-b64`) and `--b` the numerator, so a ratio
+  below 1 means the arm is cheaper.
