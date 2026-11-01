@@ -2091,35 +2091,24 @@ mod tests {
         use crate::cryptanalysis::quartic_folds::generate_gls_klein_instance;
         use rand::Rng;
         let same_phases = |a: &QuarticSolve, b: &QuarticSolve| {
-            (
-                a.weil_muls,
-                a.triangularise_muls,
-                a.echelon_muls,
-                a.nf_muls,
-                a.charpoly_muls,
-                a.roots_muls,
-                a.eigenvector_muls,
-                a.verify_muls,
-                a.total_muls,
-                a.rows,
-                a.cols,
-                a.pivots,
-                &a.outcome,
-            ) == (
-                b.weil_muls,
-                b.triangularise_muls,
-                b.echelon_muls,
-                b.nf_muls,
-                b.charpoly_muls,
-                b.roots_muls,
-                b.eigenvector_muls,
-                b.verify_muls,
-                b.total_muls,
-                b.rows,
-                b.cols,
-                b.pivots,
-                &b.outcome,
-            )
+            let key = |s: &QuarticSolve| {
+                (
+                    [
+                        s.weil_muls,
+                        s.triangularise_muls,
+                        s.echelon_muls,
+                        s.nf_muls,
+                        s.charpoly_muls,
+                        s.roots_muls,
+                        s.eigenvector_muls,
+                        s.verify_muls,
+                        s.total_muls,
+                    ],
+                    (s.rows, s.cols, s.pivots),
+                    s.outcome.clone(),
+                )
+            };
+            key(a) == key(b)
         };
         let (mut calls, mut digest_flagged, mut count_flagged, mut contested) = (0, 0, 0, 0);
         for (p, seed) in [(101u64, 2u64), (149, 1)] {

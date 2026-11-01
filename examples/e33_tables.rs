@@ -176,9 +176,8 @@ fn main() {
         let sv = |n: &str, g: usize| by(n)["s_mean"][g].as_f64().unwrap();
         // Sensitivity G2.133: every arm's lead-scan reads priced too.
         let sens = |n: &str, g: usize| {
-            let lead = if n == "existing" {
-                f(&by("chain-counted"), "lead_scan_mean")
-            } else if n == "chain" {
+            // The existing solver's echelon is A's (same rows, same code).
+            let lead = if n == "existing" || n == "chain" {
                 f(&by("chain-counted"), "lead_scan_mean")
             } else {
                 f(&by(n), "lead_scan_mean")
