@@ -47,6 +47,9 @@ clear:
    A separate n=29 one-column generator-orbit panel does cross below rho-frob,
    but at one column it is a fixed-setup Frobenius-folded BSGS; the gap grows
    with r, so it is not a uniform-target or asymptotic IC crossing.
+   The late-main prime-orbit relation collector is also rho-led in its new
+   count-first cross-checks: its tuned affine arm costs 5.42× negation rho on
+   the generic shape, 4.20× cubic rho on j=0, and 5.79× quartic rho on j=1728.
 2. **One restricted curve family is IC-led.** The plane-quartic attack on the
    special GHS-weak family $E_0/\mathbb F_{q^3}$, with
    $\#E_0(\mathbb F_{q^3})=4\ell$, is below matched rho in its own cold,
@@ -97,7 +100,7 @@ retains a new F4/F5/F6 compatibility failure (72/144 rows reproduce). A pass
 means the versioned evidence statements agree; it does not turn the draft EKS
 campaign into data.
 
-# 1 November current-source addendum
+# 1 November 78-method snapshot addendum
 
 The live registry has grown since the pinned October snapshot. The current
 release binary at source `907d68631e79` has **78 top-level method IDs** plus
@@ -162,6 +165,55 @@ relations with 1/mu lookups in all 268,000 checks. Its toy finite-size yield
 can lie on either side of parity depending on whether c or c+1 columns are
 charged and trends toward the null at n=13,14. No Groebner/F4 oracle or matched
 end-to-end rho run was performed, so this is not a new performance row.
+
+## Late-main 79th-method reconciliation
+
+After the 78-method snapshot, main added `ic.prime_orbit_relations_v1`. The
+registry-wide optimizer now has an explicit finite-grid policy for its three
+true knobs (`coordinates`, `orbits`, and `relations_per_orbit`) and keeps both
+operation caps fixed as censoring/resource envelopes. The new fail-closed
+receipt covers **114 development specs, 79/79 top-level methods, and 24/24
+nested algorithms**: 11 system solvers, nine PDP3 engines, and four prime PKM
+tower engines. It reports no missing entries, no structural errors, and no
+development/holdout seed reuse. The two warnings only restate that clocks in
+two older development specs are descriptive below L2.
+
+The exact executable for the new sessions is source `68a78284` with release
+binary
+\nolinkurl{sha256:e6c1f5048acb071192f83ab996fd9577c152f136e8e62a301e50b62335ec7879}.
+Three prospectively specified L0 sessions add 90 records, all verified, and
+all 72 measured deterministic executions replay identically. Cumulatively,
+the registry workstream now has 38 admitted L0 sessions, 1,095 records, 1,042
+verified outcomes, and 854/854 eligible deterministic measured replays with
+zero audit problems. All 73 runnable native methods and all 24 nested engines
+have executed; the other six top-level methods remain external CM wrappers
+without a real hash-bound backend.
+
+On the one-target generic development grid, affine coordinates with eight
+factor-base orbits and 1.5 requested relations/orbit use 0.8721 [0.754, 1.008]
+of the charged operations of the 16-orbit affine baseline. At 16 orbits,
+Jacobian uses 1.3351 [1.229, 1.450] times affine. This selects the eight-orbit
+arm for further testing, but does not justify changing the shipped default
+from one toy target.
+
+The ECDLP comparison remains rho-led:
+
+| prime shape | tuned orbit IC / matched rho | pricing-band ratios at w=0,0.1,1 | reading |
+|:--|--:|:--|:--|
+| generic a=-3 | 5.4169 [3.389, 8.658] | 5.4169 / 5.0235 / 3.0548 | negation rho leads |
+| j=0, b=7 | 4.2011 [3.085, 5.721] | 4.2011 / 4.0005 / 2.8097 | cubic rho leads |
+| j=1728 | 5.7901 [3.824, 8.768] | 5.7901 / 5.4343 / 3.5160 | quartic rho leads |
+
+These intervals are indicative within-target operation intervals, not
+curve-family generalization. Factor-base draws remain unpriced, making the IC
+totals lower bounds. Every run is L0 and each comparison has only four measured
+pairs, so local wall clocks are descriptive and no leaderboard row changes.
+The machine-readable evidence is the
+[79-method audit](../ecbench_registry_optimization_20261101/execution/full-development-audit-79.json),
+[generic comparison](../ecbench_registry_optimization_20261101/execution/prime-orbit-grid-l0-20261101/comparisons/rho-reference__orbit-affine-o8-r1_5.json),
+[j=0 comparison](../ecbench_registry_optimization_20261101/execution/prime-orbit-j0-crosscheck-l0-20261101/comparisons/rho-cubic-reference__orbit-affine-o8-r1_5.json),
+and
+[j=1728 comparison](../ecbench_registry_optimization_20261101/execution/prime-orbit-j1728-crosscheck-l0-20261101/comparisons/rho-quartic-reference__orbit-affine-o8-r1_5.json).
 
 ## Boundary by domain
 
@@ -680,7 +732,9 @@ The performance frontier is now explicit:
 - **Restricted GHS-weak ECC:** plane-quartic IC is the leader and must remain
   labelled as a special-family result.
 - **Prime engineering:** P20 $N=45$ is the validated factor-base baseline,
-  still roughly 8–10× rho.
+  still roughly 8–10× rho. The newer orbit collector's best toy configuration
+  is affine/eight-orbit, but remains 4.20–5.79× matched rho across its three
+  L0 prime-shape checks.
 - **Algebraic solvers:** F5 and F6 win component metrics; inherited F4 wins the
   tested common E2E lower-bound comparison; rho wins the ECDLP comparison.
 - **SAT/WDSAT/FES:** implemented or historically explored, but not yet on one
