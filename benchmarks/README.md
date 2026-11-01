@@ -31,6 +31,8 @@ verdict that every historical measurement is verified. See the
 [benchmark gate problem record](../problems/benchmark-validation-gate-postfreeze-rows.md)
 for remaining independent validation work. `scripts/validation_gate.py check`
 is the machine admission test.
+The [tuned GAE record awaiting admission](TUNED_GAE_UNADMITTED_20261021.md)
+preserves its original benchmark row and links to the retained study artifacts.
 
 Rows that are removed from this admitted-results table before validation remain
 in the [unvalidated benchmark archive](ARCHIVE.md), with their exact former row
