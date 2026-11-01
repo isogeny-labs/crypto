@@ -2,7 +2,7 @@
 title: "The ECBench ECDLP Performance Frontier"
 subtitle: "End-to-end boundary, implementation census, bottlenecks, and the next isolated campaign"
 author: "ECBench frontier audit"
-date: "31 October 2026"
+date: "1 November 2026"
 lang: en-US
 geometry: margin=0.72in
 fontsize: 10pt
@@ -23,7 +23,7 @@ header-includes:
     \pagestyle{fancy}
     \fancyhf{}
     \lhead{ECBench ECDLP frontier}
-    \rhead{2026-10-31}
+    \rhead{2026-11-01}
     \cfoot{\thepage}
     ```
 ---
@@ -80,7 +80,7 @@ clear:
 ![Boundary markers. A ratio is meaningful only inside its row's exact domain and unit.](figures/boundary-map.png){width=100%}
 
 This report synthesizes versioned evidence; each performance row remains bound
-to the source and binary that produced it. The current executable audit is at
+to the source and binary that produced it. The October snapshot executable audit is at
 source `ff7ad61cfed11908fb79de9dd485b696d0ada779`. It does not present blocked
 jobs as measurements. The exact current-source image is published, but the
 mandatory checkpoint gate has no upload credential. The replacement workload
@@ -96,6 +96,51 @@ files, reproduces 720/720 optimized-rho rows with the current binary, and
 retains a new F4/F5/F6 compatibility failure (72/144 rows reproduce). A pass
 means the versioned evidence statements agree; it does not turn the draft EKS
 campaign into data.
+
+# 1 November current-source addendum
+
+The live registry has grown since the pinned October snapshot. The current
+release binary at source `907d68631e79` has **78 top-level method IDs** plus
+**24 explicitly audited nested engines**: 11 system solvers, nine PDP3
+engines, and four prime PKM tower engines. A fail-closed optimization audit
+admits 111 development specs with 78/78 methods and 24/24 nested algorithms;
+fresh local sessions exercised all 72 runnable native methods and every nested
+engine. The remaining six top-level entries are external CM wrappers without
+a real hash-bound backend.
+
+The exact release binary SHA-256 is
+`e91c0ec79774af70c3b6af6aaac7b209e8edcdc0e42b1d18e1a92a14af065f65`.
+Across 35 admitted L0 sessions it audited 1,005 records, 952 verified outcomes,
+and reproduced all 782 eligible deterministic measured runs with zero
+problems. These are diagnostic development sessions, not L2 holdouts, so no
+leaderboard row changes.
+
+The fresh, current-source performance boundary is:
+
+- Koblitz n=29 generator-orbit IC is the only new holdout candidate, at 0.4405
+  [0.363, 0.534] of signed-Frobenius rho in its one-target, full-price L0 cell.
+  This remains a fixed-setup candidate, not a family-level or leaderboard win.
+- Pair-index F6 reduces inherited-F6 work to 0.2792 [0.246, 0.317], yet remains
+  139.30 [85.48, 227.02] times strong rho end to end. The prime PKM F4, F5,
+  F6, and enumeration engines remain 4.62--5.03 times negation rho. The best
+  matched n=17 system solver is wide FES/Gray-code at 4.28 times strong rho;
+  SAT-CDCL, Crossbred, exhaustive, F4 variants, F5, F6, and all root-finding
+  variants remain rho-led in their measured cells.
+- The separate `ic bench` chained-x diagnostic is also rho-led: inherited F4
+  costs 24.71, 144.09, and 794.37 times rho at m=2, 3, and 4. Matrix F5 cuts
+  matrix F4 work at m=3 to 0.6276, but still costs 16,296.76 times rho; both
+  m=4 matrix arms censor because this oracle ignores the solver wall budget.
+
+Mainline also now contains a distinct end-to-end GHS study, outside ECBench.
+It measured 30 applicable toy instances at N=12..28 and verified IC, rho, and
+BSGS on all 600 planted logs. Every measured instance remains generic-led:
+the best IC/best-generic ratio is 1.91 [1.72, 2.11], and the best IC/rho ratio
+is 1.60 [1.25, 2.12]. The genus-4 n=4 fit crosses near N=32 [31, 33], but that
+is extrapolated one step beyond the measured range. This does not invalidate
+the older `E_0/F_(q^3)` result in its exact restricted family and accounting
+domain; it does show that the historical exception cannot be generalized to
+the new GHS roster. The new GHS study has no ECBench replay certificate and is
+not leaderboard evidence.
 
 ## Boundary by domain
 

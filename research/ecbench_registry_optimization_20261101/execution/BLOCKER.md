@@ -38,6 +38,14 @@ matrix cells censored. It is blocked from broad sweeps by missing effective
 wall-budget plumbing (`--solver-budget-seconds` is ignored for this oracle),
 and from the ECBench frontier by the missing spec/session/replay integration.
 
+The separately merged R7.2 GHS experiment is also outside ECBench. Its 30-case
+toy panel is complete and generic-led everywhere measured, but the projected
+n=4 crossover at N about 32 is extrapolated. Promotion would require an actual
+N=32-or-larger measurement plus ECBench integration, a matched strongest
+generic reference, replay receipts, and the same disjoint L2 holdout gate. The
+historical restricted `E_0/F_(q^3)` result cannot be substituted for those
+missing obligations because it is a different domain and protocol.
+
 New paid execution remains gated on a durable checkpoint identity and a fresh,
 disjoint confirmatory roster passing:
 

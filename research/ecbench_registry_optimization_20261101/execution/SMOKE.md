@@ -14,10 +14,10 @@ Status: replay-verified L0 development evidence; not a leaderboard result.
 - The campaign-structure audit separately admits 111 specs with 78/78 methods
   and 24/24 nested algorithms.
 - The latest merged-head audit reproduced 782/782 eligible runs across all 35
-  admitted sessions with zero problems, using source `d955159129` and release
-  binary SHA-256 `146c4892...d35eb`. Its binary-bound receipts and summary are
-  in [`current-merged-head-replay/`](current-merged-head-replay/). The earlier
-  33-session receipts remain under [`current-head-replay/`](current-head-replay/).
+  admitted sessions with zero problems, using source `907d68631e79` and release
+  binary SHA-256 `e91c0ec7...f065f65`. Its binary-bound receipts and summary are
+  in [`current-ghs-merged-head-replay/`](current-ghs-merged-head-replay/). The
+  earlier 35- and 33-session receipts remain as provenance snapshots.
 - The new PKM panel passed 24/24 measured replays. The first PDP3 pair-index
   session exposed cross-record cache charging (13/16 replays); it is retained
   as a failed negative control. After resetting the cache once per independent
@@ -86,6 +86,17 @@ refused the 18-unknown/17-equation system; Buchberger hit the common cap.
 
 ## Other retained bottlenecks
 
+- The separately merged R7.2 GHS experiment is not an ECBench lane, but it is
+  now the strongest current-source check on the proposed GHS exception. Across
+  30 applicable toy instances at N=12..28, IC, rho, and BSGS each recovered
+  and verified all 600 planted logs. IC/best-generic ranges from 1.91 [1.72,
+  2.11] to 131 [123, 141], and the best IC/rho result is 1.60 [1.25, 2.12].
+  A fit for the genus-4 n=4 family crosses at N about 32 [31, 33], one step
+  outside the measured range, so it is an extrapolated candidate rather than a
+  measured frontier. The older `E_0/F_(q^3)` result used a distinct restricted
+  family and protocol; it remains historical evidence for that exact domain,
+  not a contradiction and not a general GHS win. R7.2 has no ECBench replay
+  certificate or L2 holdout and cannot update the leaderboard.
 - The distinct `ic bench` chained-x oracle was measured after it appeared on
   current `main`. On Koblitz a=0, n=13 with a fixed dimension-6 subspace base,
   four repeats, and matched rho, inherited F4 is the best completed engine but

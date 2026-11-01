@@ -25,11 +25,11 @@ into a speed claim.
   solvers**, **9/9 PDP3 engines**, and **4/4 PKM tower engines**. The remaining
   six registry entries are external CM wrappers and require a real hash-bound
   backend.
-- Exact merged-head replay at source `d955159129` and release-binary SHA-256
-  `146c4892...d35eb` reproduces all **782/782** eligible measured runs across
+- Exact merged-head replay at source `907d68631e79` and release-binary SHA-256
+  `e91c0ec7...f065f65` reproduces all **782/782** eligible measured runs across
   all 35 admitted sessions. Its receipts and aggregate are under
-  [`execution/current-merged-head-replay/`](execution/current-merged-head-replay/);
-  the earlier 33-session replay is retained separately.
+  [`execution/current-ghs-merged-head-replay/`](execution/current-ghs-merged-head-replay/);
+  the earlier 35- and 33-session replays are retained separately.
 - The pair-index F6 and four PKM tower panels verify. The first pair-index
   replay also exposed and retained an accounting-cache regression; resetting
   the cache at the independent-run boundary makes the corrected session
@@ -46,6 +46,16 @@ into a speed claim.
   24.71x, 144.09x, and 794.37x matched rho, respectively. Both `m = 4`
   matrix-engine cells censored. This is end-to-end IC-framework evidence, but
   it still lacks an ECBench spec/receipt and is not part of 78+24.
+- Current `main` also adds a separate end-to-end GHS experiment outside
+  ECBench. It verified IC, rho, and BSGS on all 600 planted logs from 30 toy
+  instances at N=12..28. Every priced IC row remains generic-led: the best
+  IC/best-generic ratio is 1.91 [1.72, 2.11], and the best IC/rho ratio is
+  1.60 [1.25, 2.12]. The n=4 family fit crosses at N about 32 [31, 33], but
+  that point is extrapolated and unmeasured. This result does not erase the
+  older, differently specified `E_0/F_(q^3)` evidence; it does prevent that
+  restricted historical exception from being generalized to the new GHS
+  roster. The new experiment has no ECBench receipt and is leaderboard
+  ineligible.
 - No leaderboard row changes. These are one-target/four-round development
   diagnostics, not L2 confirmatory holdouts.
 - Confirmatory execution is blocked because this managed runtime has no ready
