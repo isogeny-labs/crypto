@@ -39,3 +39,18 @@ not applicable. UTC/binary hashes are custody diagnostics, not performance.
 Literature: retained R27 charts, R56 infinity divisors, R58 descended product
 space and R59 NEXT; official Singular documentation already checked for
 linalg kernel/lift behavior. R60 reuses these established operations.
+
+## Stage2 full404 infinity divisor cohort
+mixed60-02 accepted complete36-space/fixed18/trace18 and an actual odd
+particular; fixed local profiles have no imaginary coefficients. Freeze
+all404 balanced nonzero signed patterns e=(-e1-e2-e3,e1,e2,e3), minor
+ranges[-4,4],[-7,7],[-1,1]. On the computed fixed18-space impose local
+orders>=2e at each point using all96 binary rows of the complete mixed
+profile. Require exact full kernel splitting for every case, including
+explicit left inverse for zero kernels. Any dimension>1 stops the geometry
+audit. The allzero regular control must have dimension1 containing1.
+Export every case, degree2sumpositive(e), generator for each principal
+survivor and complete C/K/R/H certificates. Count404 exactly; no degree11
+filter or omission of either trace parity. Changed constraint recovery
+must fail. This stage only tests principal x; all31scalars/bothsigns and
+bothparities with AS and whole-source/action checks are next.

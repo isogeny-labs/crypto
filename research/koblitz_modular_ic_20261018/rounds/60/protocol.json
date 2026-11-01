@@ -1,12 +1,12 @@
 {
   "schema": "experiment.protocol/v1",
-  "id": "KOBLITZ-R60-MIXED-INFINITY",
+  "id": "KOBLITZ-R60-INFINITY-404",
   "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
   "claims": [
     {
-      "id": "mixed",
+      "id": "cohort",
       "class": "exact_computation",
-      "statement": "Complete source-bound mixed infinity pole space, restricted involution and exact trace-zero/trace-one gate"
+      "statement": "All404 source-bound balanced infinity principal-divisor spaces on the actual18-dimensional fixed mixed space"
     }
   ],
   "arms": {
@@ -67,10 +67,13 @@
     "fixed/trace ranks",
     "trace-one feasibility",
     "four unique source charts",
-    "complete splitting identities"
+    "complete splitting identities",
+    "all404ranks/kernels/degrees",
+    "principal/excluded counts",
+    "regular control dimension1"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh mixed60-01 MIXED60.sing MIXED60_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_CAS.sh cohort60-01 COHORT60.sing COHORT60_ALL_CHECKS_PASS",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
     "threads": 1,
@@ -106,5 +109,9 @@
     }
   ],
   "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
-  "version": 1
+  "version": 2,
+  "amendment": {
+    "before_affected_data": true,
+    "reason": "mixed60-02 accepted dimension36/fixed18/trace18; freeze exhaustive404case computation"
+  }
 }

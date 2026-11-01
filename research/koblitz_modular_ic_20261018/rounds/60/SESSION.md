@@ -25,3 +25,17 @@ mixed60-02 actualprofiles/fullmixedkernel then404cases.
 
 ### Errors
 Native indexedincrement syntax,not geometrynull. No live job repeated.
+
+## 2026-11-01T17:45:25.310755+00:00 — complete mixed space and404cohort freeze
+
+### What was done
+mixed60-02 accepted:four source charts,full64rank restriction,36space,18fixed,18trace,oddparticular exists. Both full kernel splittings and regular514row injection pass; fixedprofile imaginarycoefficientszero. R59 raw custodyfreshGET/member/repack passed91files.
+
+### Decisions made
+Freeze all404principalxpatterns and regularcontrol before data;retainbothtraceparities. PR3062observedexternallyMERGEDat404f49801;nextdeliveryneedsnewcontinuationPR. Noagentmerge/retarget/automerge action.
+
+### Open threads
+All404kernelcertificates;then sharedASover18F32fixedfunctions90bits/expectedrank89,mustverify;all31scalars/bothsigns/bothparities/sourceidentities/action.
+
+### Errors
+Earlierconcurrentgitcommit causedindexlock;no lock removed. Bothhandles terminal;stagedR59custody/R60syntaxrepairlandedtogetherinfe0ba4bb4. Scientificbytes unchanged. Serializemutations henceforth. Initialmixed60-01 indexed++failure retained/excluded.
