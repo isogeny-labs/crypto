@@ -1,0 +1,23 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
++ actual - expected
+
++ '8bd5ceabd6c18d65193e10a243219f088dc94513afbe47a967ab43bfa76b04fe'
+- '87724546ad2e971572c4f62ae0fbc4b2bfed8cd028ae30ded78bc4c4bb9287ca'
+
+    at file:///workspace/crypto-next/research/quadratic_twist_evidence_20261021/validation/metadata-ci-20261022T0500Z/verify-preservation.mjs:44:12
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: '8bd5ceabd6c18d65193e10a243219f088dc94513afbe47a967ab43bfa76b04fe',
+  expected: '87724546ad2e971572c4f62ae0fbc4b2bfed8cd028ae30ded78bc4c4bb9287ca',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

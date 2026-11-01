@@ -1,0 +1,13 @@
+digraph controls {
+  graph [rankdir=TB, bgcolor="white", fontname="Helvetica", nodesep=0.35, ranksep=0.45];
+  node [shape=box, style="rounded,filled", fillcolor="#eef4fa", color="#6688a3", fontname="Helvetica", fontsize=11];
+  edge [fontname="Helvetica", fontsize=10, color="#466176"];
+  main [label="E/F43: y²=x³+x\nP=(31,18), order 11\nPrefix base: (4,5),(13,19)\nFirst target: rank 0, closure 6"];
+  twist [label="Twist T/F43: Y²=X³+4X\nU=(24,26), order 11\nPrefix base: (15,9),(17,6)\nFirst target: rank 2, closure 4", fillcolor="#fff2e4", color="#bd7935"];
+  pullback [label="Same E/F43\nPulled-back base: (14,36),(13,24)\nFirst target: rank 2, closure 4\nSame exact coefficient sets", fillcolor="#eaf5ec", color="#65956e"];
+  limit [label="Both leading ideals: <x²y²,x²,y²>\nHomogeneous first-zero degree 3\nNo runtime / uniform advantage established", fillcolor="#f6f3eb", color="#aa9670"];
+  main -> twist [label="φ(x,y)=(41x,11y)\nLean: additive, injective; scalar equivalence"];
+  twist -> pullback [label="φ inverse on factor base\nLean relation sets + native degree replay"];
+  main -> limit [style=dashed, label="equal homogeneous regularity"];
+  twist -> limit [style=dashed];
+}

@@ -46,7 +46,13 @@ STORE_INDEX = "store/index.json"
 STORE_CONFIG = "store/config.json"
 STORE_SCHEMA = "crypto.store-index/v1"
 TOURNAMENT_RUNS = "research/ic_candidate_tournament_20260915/runs"
-ECBENCH_SESSIONS_GLOBS = ("research/ecbench_*/sessions/*", "research/isogeny_conductor_gap_*/sessions/*", "research/fiber_ic_scaling_*/sessions/*", "research/full_volcano_graphwide_ic_*/execution/campaigns/*/sessions/*")
+ECBENCH_SESSIONS_GLOBS = (
+    "research/ecbench_*/sessions/*",
+    "research/isogeny_conductor_gap_*/sessions/*",
+    "research/fiber_ic_scaling_*/sessions/*",
+    "research/n83_genus3_image_solver_*/sessions/*",
+    "research/full_volcano_graphwide_ic_*/execution/campaigns/*/sessions/*",
+)
 IC1_SCAN_GLOBS = (
     "docs/ic/**/*.json",
     "docs/ic/**/*.md",
@@ -368,7 +374,7 @@ def curve_rows(registry: dict, leaderboard: dict) -> list[dict]:
         a = params.get("a") if params.get("a") is not None else model.get("a")
         b = params.get("b") if params.get("b") is not None else model.get("b")
         # An extension coefficient is its list over 1, t, ..., t^(k-1).
-        a, b = ("[" + ", ".join(v) + "]" if isinstance(v, list) else v for v in (a, b))
+        a, b = ("[" + ", ".join(map(str, v)) + "]" if isinstance(v, list) else v for v in (a, b))
         rep = (c.get("representations") or [None])[0]
         subgroup = rep["curve"] if rep else {}
         r = subgroup.get("subgroup_order")

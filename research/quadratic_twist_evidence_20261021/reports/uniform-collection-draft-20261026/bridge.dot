@@ -1,0 +1,15 @@
+digraph G {
+ rankdir=LR; graph[bgcolor="white",pad=0.12];
+ node[shape=box,style="rounded,filled",fillcolor="#eef3f7",fontname="Helvetica",fontsize=10];
+ edge[fontname="Helvetica",fontsize=9];
+ a[label="Actual rank states
+Query entries with repeats
+Bridge still open"];
+ b[label="Draft scalar recurrence
+Calls and degree requests
+NOT kernel checked",fillcolor="#fff0d9"];
+ c[label="Actual iid expectation
+Useful-yield comparison
+STILL OPEN",fillcolor="#f2f2f2"];
+ a->b[style=dashed,label="needs binding"]; b->c[style=dashed,label="needs semantics"];
+}

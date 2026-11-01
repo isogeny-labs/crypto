@@ -10,8 +10,10 @@ on:
       - 'src/cryptanalysis/ec_trapdoor.rs'
       - 'src/cryptanalysis/curve_traits/arith.rs'
       - 'src/cryptanalysis/curve_id.rs'
+      - 'src/cryptanalysis/cover_catalog.rs'
       - 'src/binary_ecc/**'
       - 'docs/curves/registry.json'
+      - 'docs/curves/cover-catalog.json'
       - 'docs/curves/jacobian-transfers.json'
       - 'docs/curves/JACOBIAN_TRANSFERS.md'
       - '.github/workflows/jacobian-transfers.yml'
@@ -52,6 +54,7 @@ jobs:
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
             /docs/curves/registry.json
+            /docs/curves/cover-catalog.json
             /docs/curves/jacobian-transfers.json
             /docs/curves/JACOBIAN_TRANSFERS.md
       - name: Materialize compile-time fixture inputs
@@ -63,7 +66,7 @@ jobs:
       - name: Module tests
         run: cargo test --release --lib jacobian_transfer
       - run: cargo build --release --bin jacobian_transfers
-      - name: jacobian-transfers.json is current with registry.json
+      - name: jacobian-transfers.json is current with the catalog rows of registry.json
         run: ./target/release/jacobian_transfers check
       - name: The summary table in JACOBIAN_TRANSFERS.md is current
         run: |

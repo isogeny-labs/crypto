@@ -90,3 +90,47 @@ waves and shared-host activity confound timing. The new 96-bit floor and 137th
 torsion certificate complete this particular upper construction. Complete
 common pricing, other upper floors and the stated CM proof bridges remain open
 independently. All completed large-gap ECDLP timing comparisons remain 53-bit.
+
+### Separate 80-bit-prime source/kernel and native helper, 2026-10-31
+
+The [gap80 native study](../research/prime_conductor_gap80_20261031/README.md)
+preserves prime `729845429276318409687041`, a 202-bit field-prime certificate,
+native source/kernel checks and independent PARI verification. Its native
+log-norm helper shares the trace functional and reciprocal; historical
+microbenchmarks and partial-tile clocks remain unadmitted diagnostics with
+their pinning/overlap exclusions intact. Complete small fixtures and the
+80-bit kernel's 128-root tile checks at 32 scalar contexts are retained.
+
+This instance still needs its explicit quotient equation, complete
+non-kernel images and transported subgroup verification before matched
+endpoint measurements. At block 4,096 the current bounded method requires
+10,875,544,558,802,641 rectangular tiles and 722,432,689,208 leftover roots.
+Completing a native construction/evaluation path with recorded total costs
+would unblock that instance. Partial sums, source/kernel certificates and
+the helper improvement do not discharge this exit condition or establish
+largest-known crossing status. The older upper instances remain distinct.
+
+The follow-up [measurement protocol](../research/prime_conductor_gap80_20261031/MEASUREMENT_PROTOCOL.md)
+records an exact native eligibility audit of the existing constructor. Its
+degree parser is 64-bit; after widening it, the baby-root slots alone would
+require 3,417,239,656,272 bytes, before limbs and polynomial trees. This exceeds
+the current 128-GiB lab cap. That constructor is also codomain-only. These
+are specific implementation/resource blockers, not a failed timed run or a
+universal lower bound. The explicit 80-bit construction, point evaluation
+and paired ECDLP times remain missing, rather than inferred from a smaller
+fixture or assigned zero.
+
+### Historical 60-bit-prime instance imported on 2026-10-31
+
+The [archived gap60 study](../research/prime_conductor_gap60_20261031/README.md)
+preserves a separate prime-degree instance, its source and rational-kernel
+certificate, the failed standard constructor, and checked partial block sums.
+It does not supply a full quotient equation or complete non-kernel images.
+This import does not replace or resolve the older upper instances above.
+
+The next acceptance condition for this instance is a complete explicit quotient
+and verified images at the unchanged minimum 60-bit prime gap. A continuation
+must preserve the archived inputs and producer provenance, use a native
+execution path for new research, and retain fresh construction, transport and
+matched endpoint receipts. The historical archive alone does not satisfy that
+condition or any performance-promotion gate.

@@ -1,0 +1,67 @@
+import TwistEmbedding
+
+/-! Addition compatibility for the explicit short-model twist map.  This
+module leaves the previous point-map source and certificates unchanged. -/
+namespace TwistGroupMap
+
+open WeierstrassCurve.Affine TwistEmbedding
+
+section Scaling
+
+variable {F : Type*} [Field F] [DecidableEq F]
+
+theorem slope_scale (a b d u x₁ x₂ y₁ y₂ : F) (hd : d ≠ 0)
+    (hu : u ^ 2 = d) :
+    (short a b).slope (x₁ / d) (x₂ / d) (y₁ / (d * u)) (y₂ / (d * u)) =
+      (twist a b d).slope x₁ x₂ y₁ y₂ / u := by
+  have hu0 : u ≠ 0 := by
+    intro hz
+    exact hd (by simpa [hz] using hu.symm)
+  have hdu : d * u ≠ 0 := mul_ne_zero hd hu0
+  have hx : (x₁ / d = x₂ / d) ↔ x₁ = x₂ := div_left_inj' hd
+  have hy : (y₁ / (d * u) = -(y₂ / (d * u))) ↔ y₁ = -y₂ := by
+    rw [← neg_div]
+    exact div_left_inj' hdu
+  simp only [slope, negY, short, twist, zero_mul, mul_zero, add_zero, sub_zero, hx, hy]
+  split_ifs with hxx hyy
+  · simp
+  · have hn : 3 * (x₁ / d) ^ 2 + a = (3 * x₁ ^ 2 + d ^ 2 * a) / d ^ 2 := by
+      field_simp
+    have he : y₁ / (d * u) - -(y₁ / (d * u)) = (y₁ - -y₁) / (d * u) := by ring
+    rw [hn, he]
+    calc
+      _ = ((3 * x₁ ^ 2 + d ^ 2 * a) / (y₁ - -y₁)) * ((d * u) / d ^ 2) := by
+        simp only [div_eq_mul_inv, mul_inv_rev, inv_inv]
+        ring
+      _ = _ := by
+        have hc : (d * u) / d ^ 2 = 1 / u := by
+          field_simp
+          linear_combination d * hu
+        rw [hc, mul_one_div]
+  · simp only [div_eq_mul_inv, mul_inv_rev]
+    field_simp
+
+omit [DecidableEq F] in
+theorem addX_scale (a b d u x₁ x₂ ℓ : F)
+    (hu : u ^ 2 = d) :
+    (short a b).addX (x₁ / d) (x₂ / d) (ℓ / u) =
+      (twist a b d).addX x₁ x₂ ℓ / d := by
+  simp only [addX, short, twist, zero_mul, add_zero, sub_zero, div_pow, hu]
+  ring
+
+omit [DecidableEq F] in
+theorem addY_scale (a b d u x₁ x₂ y₁ ℓ : F)
+    (hu : u ^ 2 = d) :
+    (short a b).addY (x₁ / d) (x₂ / d) (y₁ / (d * u)) (ℓ / u) =
+      (twist a b d).addY x₁ x₂ y₁ ℓ / (d * u) := by
+  simp only [addY, negY, negAddY, short, twist, zero_mul, sub_zero,
+    addX, add_zero, div_pow, hu]
+  ring
+
+end Scaling
+
+#print axioms slope_scale
+#print axioms addX_scale
+#print axioms addY_scale
+
+end TwistGroupMap

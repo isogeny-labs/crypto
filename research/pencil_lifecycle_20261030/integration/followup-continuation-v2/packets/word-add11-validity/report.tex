@@ -1,0 +1,12 @@
+\documentclass[11pt]{article}\usepackage[margin=.85in]{geometry}\usepackage[T1]{fontenc}\begin{document}
+\section*{Conditional machine-level distinct branch invariant}
+The completed UInt64 expression and weighted field-validity results compose into one theorem. For prime $5\le p<2^{31}$, two canonical degree-one inputs, four nonzero word weights, common normalized Mumford validity and distinct normalized x, the modeled source guard selects distinct. Its literal degree-two payload is canonical, has nonzero word weights and preserves normalized Mumford validity.
+
+\textbf{Composition.} Canonical bounds convert nonzero input words into nonzero field weights. The six-coordinate decoding theorem identifies the literal payload with the field formula. The weighted field theorem supplies output validity and nonzero field weights; rewriting gives normalized word validity, and decoded nonzero implies word nonzero. No coefficient identities are assumed.
+
+\textbf{Control.} Over F7 use nonunit-weight $a=(0,0,2,3)$ and $b=(2,3,3,2)$, normalized points $(0,0),(1,1)$ on $f=X^2$. Both input divisibilities are constructed and the full theorem is applied. This is polynomial algebra, not a smooth genus-two fixture. Equal normalized x and zero input z boundary checks are retained.
+
+\textbf{Checks.} Main theorem and separate axiom readback pass; controls pass after explicit field-residue rewriting. Failed controls using decide on noncomputable division and insufficient norm\_num reduction and an intermediate modulus-instance mismatch are preserved. Only propext, Classical.choice and Quot.sound occur.
+
+\textbf{Scope.} Degree-one plus degree-one to degree-two support, arbitrary common polynomial f. Source conditions remain Field.n=1, tables=None and ordinary execution/counter headroom. No compiler/counter, other-branch, divisor-class or whole-walk claim. No scientific data or costs. Independent review pending; source hashes and receipts are retained.
+\end{document}
