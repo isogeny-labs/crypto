@@ -64,7 +64,7 @@ def collect(receipt_path, output):
         raise ValueError('complete two-instance controller receipt required')
     output.mkdir(parents=True, exist_ok=False)
     ec2 = boto3.client('ec2', region_name=controller['region'])
-    s3 = boto3.client('s3', region_name=controller['region'])
+    s3 = boto3.client('s3', region_name=allocate_aws.S3_REGION)
     launch_snapshot = receipt_path.parent / 'provider_snapshot_at_launch.json'
     if launch_snapshot.exists():
         snapshot = json.loads(launch_snapshot.read_text())
