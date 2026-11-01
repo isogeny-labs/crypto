@@ -6,6 +6,7 @@
 //! ECDLP scalar was replayed; those are independent label-admission gates.
 #![allow(dead_code)] // Staged collector: supervisor integration is a separate owned change.
 
+use std::ffi::{OsStr, OsString};
 use std::io::{self, Write};
 use std::os::fd::{FromRawFd, OwnedFd};
 use std::os::unix::process::CommandExt;
@@ -80,11 +81,24 @@ fn instructions_attr() -> PerfEventAttr {
 pub(crate) struct GatedWorker {
     child: Child,
     release_pipe: Option<OwnedFd>,
+    exit_status: Option<ExitStatus>,
 }
 
 impl GatedWorker {
     /// Spawn an exec'd shell gate. The worker cannot start until `release`.
     pub(crate) fn spawn(program: &str, args: &[&str]) -> io::Result<Self> {
+        let args: Vec<_> = args.iter().map(OsString::from).collect();
+        Self::spawn_configured(OsStr::new(program), &args, |_| {})
+    }
+
+    /// Configure the gate as a normal `Command` before it is spawned. Its
+    /// environment, stdio, and pre-exec limits survive the final worker exec.
+    /// The program and each argument remain separate argv entries.
+    pub(crate) fn spawn_configured(
+        program: &OsStr,
+        args: &[OsString],
+        configure: impl FnOnce(&mut Command),
+    ) -> io::Result<Self> {
         let mut pipe = [-1; 2];
         // SAFETY: pipe points to two valid integers; the returned fds are owned below.
         if unsafe { libc::pipe2(pipe.as_mut_ptr(), libc::O_CLOEXEC) } != 0 {
@@ -98,6 +112,10 @@ impl GatedWorker {
             .arg("-c")
             .arg("IFS= read -r gate <&3 || exit 125; exec \"$@\"");
         command.arg("dataset-worker-gate").arg(program).args(args);
+        configure(&mut command);
+        // This also makes signaling the negative child PID safe: it can never
+        // refer to the supervisor's own process group while the gate is live.
+        command.process_group(0);
         use std::os::fd::AsRawFd;
         let read_fd = read_pipe.as_raw_fd();
         // SAFETY: only async-signal-safe syscalls run in the post-fork child.
@@ -117,6 +135,7 @@ impl GatedWorker {
         Ok(Self {
             child,
             release_pipe: Some(write_pipe),
+            exit_status: None,
         })
     }
 
@@ -124,7 +143,8 @@ impl GatedWorker {
         self.child.id()
     }
 
-    /// Releasing the pipe starts the worker's exec. An unreleased gate exits 125 on drop.
+    /// Releasing the pipe starts the worker's exec. A failed write still
+    /// consumes the gate, so Drop will stop and reap it.
     pub(crate) fn release(&mut self) -> io::Result<()> {
         let pipe = self
             .release_pipe
@@ -135,15 +155,53 @@ impl GatedWorker {
     }
 
     pub(crate) fn wait(&mut self) -> io::Result<ExitStatus> {
-        self.child.wait()
+        if let Some(status) = self.exit_status {
+            return Ok(status);
+        }
+        let status = self.child.wait()?;
+        self.exit_status = Some(status);
+        Ok(status)
+    }
+
+    pub(crate) fn try_wait(&mut self) -> io::Result<Option<ExitStatus>> {
+        if let Some(status) = self.exit_status {
+            return Ok(Some(status));
+        }
+        let status = self.child.try_wait()?;
+        self.exit_status = status;
+        Ok(status)
+    }
+
+    /// Stop the isolated process group before reaping its direct child. A
+    /// cgroup check is still needed to account for descendants that escape it.
+    pub(crate) fn stop(&mut self) -> io::Result<ExitStatus> {
+        if let Some(status) = self.exit_status {
+            return Ok(status);
+        }
+        self.release_pipe.take();
+        self.kill_group();
+        self.wait()
+    }
+
+    fn kill_group(&mut self) {
+        // SAFETY: spawn_configured established a fresh group whose ID equals
+        // the still-unreaped child PID. The direct-child fallback also handles
+        // a group signal racing with worker exit.
+        unsafe {
+            libc::kill(-(self.child.id() as libc::pid_t), libc::SIGKILL);
+        }
+        let _ = self.child.kill();
     }
 }
 
 impl Drop for GatedWorker {
     fn drop(&mut self) {
-        // Closing the pipe makes a still-blocked gate exit without executing the worker.
-        if self.release_pipe.take().is_some() {
-            let _ = self.child.wait();
+        if self.exit_status.is_none() {
+            // Closing a blocked gate cannot release it. Killing first also
+            // bounds cleanup if an error interrupts supervision after release.
+            self.release_pipe.take();
+            self.kill_group();
+            let _ = self.wait();
         }
     }
 }
@@ -260,6 +318,9 @@ pub(crate) fn eligible_instructions(o: Observation, expected_id: u64, a: Admissi
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fs::OpenOptions;
+    use std::process::Stdio;
+    use std::time::{Duration, Instant};
 
     #[test]
     fn attr_and_admission_are_exact() {
@@ -327,6 +388,107 @@ mod tests {
         gate.release().unwrap();
         assert!(gate.wait().unwrap().success());
         assert!(path.exists());
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn configured_gate_preserves_env_stdio_and_limit() {
+        let path =
+            std::env::temp_dir().join(format!("dataset-gate-configured-{}", std::process::id()));
+        let _ = std::fs::remove_file(&path);
+        let output = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&path)
+            .unwrap();
+        let args = [
+            OsString::from("-c"),
+            OsString::from("printf '%s:%s' \"$DATASET_GATE_TEST\" \"$(ulimit -v)\""),
+        ];
+        let mut gate = GatedWorker::spawn_configured(OsStr::new("/bin/sh"), &args, |command| {
+            command
+                .env("DATASET_GATE_TEST", "configured")
+                .stdout(Stdio::from(output));
+            // SAFETY: setrlimit is async-signal-safe in the pre-exec child.
+            unsafe {
+                command.pre_exec(|| {
+                    let limit = libc::rlimit {
+                        rlim_cur: 64 * 1024 * 1024,
+                        rlim_max: 64 * 1024 * 1024,
+                    };
+                    if libc::setrlimit(libc::RLIMIT_AS, &limit) != 0 {
+                        return Err(io::Error::last_os_error());
+                    }
+                    Ok(())
+                });
+            }
+        })
+        .unwrap();
+        assert_eq!(gate.try_wait().unwrap(), None);
+        gate.release().unwrap();
+        assert!(gate.wait().unwrap().success());
+        assert_eq!(std::fs::read_to_string(&path).unwrap(), "configured:65536");
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn stop_kills_and_reaps_released_worker() {
+        let args = [OsString::from("-c"), OsString::from("exec sleep 30")];
+        let mut gate = GatedWorker::spawn_configured(OsStr::new("/bin/sh"), &args, |_| {}).unwrap();
+        let pid = gate.pid() as libc::pid_t;
+        assert_eq!(gate.try_wait().unwrap(), None);
+        gate.release().unwrap();
+        let started = Instant::now();
+        let exit = gate.stop().unwrap();
+        assert!(!exit.success());
+        assert!(started.elapsed() < Duration::from_secs(2));
+        assert_eq!(gate.try_wait().unwrap(), Some(exit));
+        // SAFETY: signal zero only queries the reaped direct child's existence.
+        assert_eq!(unsafe { libc::kill(pid, 0) }, -1);
+        assert_eq!(io::Error::last_os_error().raw_os_error(), Some(libc::ESRCH));
+    }
+
+    #[test]
+    fn try_wait_reports_and_caches_natural_exit() {
+        let mut gate = GatedWorker::spawn("/bin/true", &[]).unwrap();
+        assert_eq!(gate.try_wait().unwrap(), None);
+        gate.release().unwrap();
+        let started = Instant::now();
+        let status = loop {
+            if let Some(status) = gate.try_wait().unwrap() {
+                break status;
+            }
+            assert!(started.elapsed() < Duration::from_secs(2));
+            std::thread::sleep(Duration::from_millis(10));
+        };
+        assert!(status.success());
+        assert_eq!(gate.try_wait().unwrap(), Some(status));
+        assert_eq!(gate.wait().unwrap(), status);
+    }
+
+    #[test]
+    fn drop_stops_released_worker_after_error_path() {
+        let path = std::env::temp_dir().join(format!("dataset-gate-drop-{}", std::process::id()));
+        let _ = std::fs::remove_file(&path);
+        let args = [
+            OsString::from("-c"),
+            OsString::from("touch \"$DATASET_GATE_MARKER\"; exec sleep 30"),
+        ];
+        let mut gate = GatedWorker::spawn_configured(OsStr::new("/bin/sh"), &args, |command| {
+            command.env("DATASET_GATE_MARKER", &path);
+        })
+        .unwrap();
+        let pid = gate.pid() as libc::pid_t;
+        gate.release().unwrap();
+        let started = Instant::now();
+        while !path.exists() && started.elapsed() < Duration::from_secs(2) {
+            std::thread::sleep(Duration::from_millis(10));
+        }
+        assert!(path.exists(), "worker did not start before test deadline");
+        drop(gate);
+        // SAFETY: signal zero only queries the reaped direct child's existence.
+        assert_eq!(unsafe { libc::kill(pid, 0) }, -1);
+        assert_eq!(io::Error::last_os_error().raw_os_error(), Some(libc::ESRCH));
         std::fs::remove_file(path).unwrap();
     }
 }
