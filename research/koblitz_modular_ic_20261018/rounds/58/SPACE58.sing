@@ -1,6 +1,6 @@
 LIB "linalg.lib";
 proc require58(int ok,string tag){if(!ok){ERROR(tag);quit;}}
-proc dump58(link out,string name,matrix A){int i;int j;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");for(i=1;i<=nrows(A);i++){for(j=1;j<=ncols(A);j++){if(A[i,j]!=0){write(out,name+"["+string(i)+","+string(j)+"]="+string(A[i,j])+";");}}}}
+proc dump58(link out,string name,matrix A){int i;int j;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");for(i=1;i<=nrows(A);i++){for(j=1;j<=ncols(A);j++){if(A[i,j]!=0){require58(A[i,j]==1,"SPACE58_EXPORTED_BINARY_MATRIX_ENTRY");write(out,name+"["+string(i)+","+string(j)+"]="+string(A[i,j])+";");}}}}
 execute(read("../../../57/source-data/rr-literals57.sing"));
 list terms58;list oneTerms58;poly remaining58;int ti58;intvec exp58;
 for(ti58=1;ti58<=68;ti58++){
