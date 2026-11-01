@@ -18,6 +18,9 @@ overlapped a d-sweep, so its same-process rho time is noisy (about 10 ms).
    n = 37 (cofactor 596) was stopped unfinished by the ladder after 99 s; it is
    solved here in 26 and 31 s. They *cost* 1.5× (n = 23) to 16× (n = 31) on
    cofactor-4 curves, so they are for large cofactors only.
+   **Erratum (2026-11-01):** that range is not general. A paired run at n = 41 (cofactor 4, 8
+   pairs) shows no detectable penalty (geometric mean 0.98, 95% [0.64, 1.43]), and 32 pairs at
+   n = 31 give 13.3× (95% [10.3, 17.5]); see `../ic_m2_torsion_n41_20261101/REPORT.md`.
 4. **The wall-time optimum stays at d ≈ n/3.** Trials keep falling for larger d,
    but the per-trial solution enumeration grows as `2^{3d−1−n}`.
 5. **Beating rho is closed for this family** if the ceiling argument below
