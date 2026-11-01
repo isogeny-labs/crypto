@@ -55,6 +55,8 @@ env:
 
 jobs:
   compile-gates:
+    # The high-memory one-shot remains bound to its original parent. A later
+    # hosted-fallback push must create only a skipped high-memory job.
     if: ${{ github.repository == 'isogeny-labs/crypto' && github.ref == 'refs/heads/codex/large-prime' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.event.before == '73a35d4c4801193a306eddaf54ec5bbf1bee4c3f')) }}
     runs-on: crypto-eks-highmem
     timeout-minutes: 240
