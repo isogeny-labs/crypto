@@ -1,0 +1,94 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261101-rank-directed-jet-completion",
+  "title": "Bounded rank-directed jet completion with integral factor witnesses",
+  "created": "2026-11-01",
+  "authors": ["backlog lane", "coordinator"],
+  "status": "draft",
+  "status_note": "Draft only: no runner, frozen protocol, resource estimate, funding, Cairn lease, or execution is in place. Freeze coefficient and denominator budgets and implement an independently checkable witness format before considering readiness.",
+  "blocked_on": [],
+  "links": {
+    "lead": "research/prime_jet_completion_20261030/README.md",
+    "notes": [
+      "research/prime_jet_completion_20261030/native/PROTOCOL.txt",
+      "research/prime_jet_completion_20261030/reports/review-followup-20261101/REPORT.md"
+    ],
+    "prs": [2969]
+  },
+  "question": "For L=4 and 8, can a degree-bounded rational matrix H yield lower precision-adjusted crossing-mode cost than the original kernel and flattening control while admitting exact integral factorization witnesses at every retained node?",
+  "decision_value": "A valid witness at a frozen size and precision would show whether rank-directed completion merits a larger uniform-construction study; rejection or no candidate under the fixed coefficient and denominator budgets would quantify this search domain's obstruction. Neither outcome alone establishes an asymptotic improvement, a DLP solver, or a runtime gain.",
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "codex/jet-completion-20261030",
+    "build": []
+  },
+  "resources": {
+    "cpus": 2,
+    "ram_gb": 8,
+    "disk_gb": 4,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Provisional planning envelope only; actual estimates require an implemented prototype and preflight. No paid compute or additional capacity is authorized by this draft."
+  },
+  "run": {
+    "argv": [
+      "target/release/jet_completion_search",
+      "--card",
+      "XP-20261101-rank-directed-jet-completion",
+      "--out",
+      "{out}"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 3600
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {
+      "L": [4, 8],
+      "precisions": [8, 12, 16],
+      "degree_H_max": "2L-1",
+      "candidate": "W_new = W_base + C H",
+      "controls": ["H=0 original kernel", "recorded flattening control", "reject invalid even-denominator inverse"],
+      "required_witness": "entry-by-entry reconstruction with integral U,V factors at every retained node and each stipulated precision"
+    },
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "rank-directed-jet-completion/v1",
+    "verify": [],
+    "land": "research/prime_jet_completion_20261030"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "unassigned",
+    "tasks": ["XP-20261101-rank-directed-jet-completion"],
+    "env": {
+      "name": "crypto-native",
+      "recipe": "Draft only; implementation and protocol do not exist."
+    },
+    "exec": {
+      "cpus": 2,
+      "memory_mb": 8192,
+      "timeout_s": 3600,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261101-rank-directed-jet-completion"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "No funding, task reservation, lease, or execution requested; retain as an unscheduled draft."
+    },
+    "ttl_s": 86400,
+    "notes": "Draft only. Do not publish or execute until code, independent verifier, frozen protocol, resource estimates, and funding authorization are reviewed."
+  }
+}

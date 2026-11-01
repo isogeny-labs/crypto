@@ -24,7 +24,7 @@
   },
   "progress_timeline": {
    "path": "docs/ic/progress-timeline.json",
-   "sha256": "6c62c182babfb64b711af9e2e0b9da8d8303dcc4da44624f0e0ed2f119fbdb1a"
+   "sha256": "fd19ac4eea242e74769757d08a9514cedb618e9839b8bdb2aacae9d4c7b2a690"
   },
   "native_tournament26": {
    "path": "research/ic_candidate_tournament_20260915/runs/round-0026/measurements.json",
@@ -751,7 +751,7 @@
  },
  "progress": {
   "source": "docs/ic/progress-timeline.json",
-  "updated": "2026-10-31",
+  "updated": "2026-11-01",
   "series_id": "ec-cold",
   "label": "Elliptic curve, whole method, cold, one target",
   "points": [
@@ -998,6 +998,17 @@
     "class": "engineering",
     "anchor": "#rho-parity-ledger",
     "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
+   },
+   {
+    "anchor": "#late-main-79th-method-reconciliation",
+    "class": "diagnostic",
+    "date": "2026-11-01",
+    "detail": "The late-main prime-orbit relation collector was admitted to the fail-closed 79-method optimization inventory. On one planted generic a=-3 toy target, the affine eight-orbit candidate costs 5.4169 [3.389, 8.658] times same-target rho.negation_v2 in counted GAE; pricing every uncharged native operation at 0, 0.1 and 1 GAE leaves ratios 5.4169, 5.0235 and 3.0548. Prospective j=0 and j=1728 cross-checks remain 4.2011 and 5.7901 times their cubic/quartic rho references. All 90 records verified and all 72 measured deterministic executions replayed exactly. Factor-base draws remain unpriced, all clocks are L0, each comparison has one workload and four measured pairs, and no ranked leaderboard row or shipped default changes.",
+    "label": "Prime-orbit relation collector, affine eight-orbit candidate vs negation rho, generic 14-bit toy curve",
+    "reference": "matched",
+    "source": "https://github.com/isogeny-labs/crypto/blob/main/research/ecbench_e2e_frontier_20261031/REPORT.md#late-main-79th-method-reconciliation",
+    "unit": "counted GAE lower-bound diagnostic",
+    "value": 5.41693461951
    }
   ]
  },
@@ -312617,8 +312628,8 @@
   "report": "research/prime_base_oracle_tuning_20261029/README.pdf",
   "second_host": "Second-host replay (PROTOCOL.md §13): the 20-bit holdout re-executed on isolab-eks (L2, another host class and ecbench build); 1008 of 1008 original records identical in every counted and band-priced field. Over its 5 rounds, selected ÷ incumbent 0.836 / 0.817 / 0.746 at w = 0 / 0.1 / 1 (240 pairs); report research/prime_base_oracle_tuning_20261029/second-host/README.pdf.",
   "unit": "S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation",
-  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.",
-  "validated": false
+  "validation": "Validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band are filed in `research/prime_base_oracle_tuning_20261029/VALIDATION.json`. The promoted result is the 20-bit `N=45` engineering baseline only; it is one curve, counted pricing-band evidence, and not a scaling or wall-time claim.",
+  "validated": true
  },
  "lazy_members_component": {
   "rows": [
@@ -313350,7 +313361,7 @@
   "report": "research/ecbench_generator_orbit_20261022/REPORT.pdf",
   "source": "research/ecbench_generator_orbit_20261022/figures/summary.json",
   "validated": false,
-  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates. Gate: VALIDATION.json is missing."
+  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates. Gate: validator report raw_data sessions/a1-n29/records.jsonl: sessions/a1-n29/records.jsonl is not a file; validator report raw_data sessions/a0-n13/records.jsonl: sessions/a0-n13/records.jsonl is not a file; validator report raw_data sessions/a1-n17/records.jsonl: sessions/a1-n17/records.jsonl is not a file; validator report raw_data sessions/a0-n19/records.jsonl: sessions/a0-n19/records.jsonl is not a file; validator report raw_data sessions/a0-n23/records.jsonl: sessions/a0-n23/records.jsonl is not a file; validator report raw_data sessions/a0-n31/records.jsonl: sessions/a0-n31/records.jsonl is not a file; validator report raw_data sessions/a0-n37/records.jsonl: sessions/a0-n37/records.jsonl is not a file."
  },
  "lazy_columns2_component": {
   "rows": [
@@ -314339,8 +314350,8 @@
   "study": "research/postgb_linear_stage_20261026/",
   "report": "research/postgb_linear_stage_20261026/REPORT.pdf",
   "source": "research/postgb_linear_stage_20261026/analysis/summary.json",
-  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.",
-  "validated": false
+  "validation": "validated: replay certificate, validator report and the matched rho reference with the §5a band (research/postgb_linear_stage_20261026/validation/VALIDATION.json)",
+  "validated": true
  },
  "algebraic_ladder": {
   "source": "research/ic_m2_linear_ladder_20261024/fit.json",
