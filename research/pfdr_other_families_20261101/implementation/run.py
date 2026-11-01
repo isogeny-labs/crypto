@@ -276,7 +276,18 @@ def quad_base(E, b: int, rng: random.Random) -> tuple[list, dict]:
 
 def family_base(E, b: int, d: int, rng: random.Random) -> tuple[list, dict]:
     """d = 1 Dickson, d = 2 geometric progression, d = 3 quadratic progression (this study's three structured families)."""
-    return {1: dickson_base, 2: gp_base, 3: quad_base}[d](E, b, rng)
+    fn = {1: dickson_base, 2: gp_base, 3: quad_base}[d]
+    # Amendment 1: a Dickson / geometric stream whose parameter has small multiplicative order cycles and never reaches b
+    # abscissae; resample the parameters from the same rng (deterministic), at most 50 attempts.
+    for attempt in range(50):
+        try:
+            pts, meta = fn(E, b, rng)
+        except RuntimeError:
+            continue
+        meta = dict(meta)
+        meta["attempt"] = attempt
+        return pts, meta
+    raise RuntimeError(f"family {d}: no parameter reached b = {b} points in 50 attempts")
 
 
 def plant_internal(L: int) -> int:

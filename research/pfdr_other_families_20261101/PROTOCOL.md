@@ -37,3 +37,10 @@ distinct symmetric points on the curve.
 ## Execution and decision rule
 `scripts/run_all.sh` (local, 4 workers, about 17 minutes). Report analysis-main.json's reading verbatim; if a blocking control fails the reading is O-INVALID
 and is reported as such with no redesign in this study. Raw jobs go to the artifact store.
+
+## Amendment 1 (2026-11-01, before any analysis of study data)
+The first census attempt aborted after 10,359 of 19,887 jobs: a Dickson job raised "abscissa stream did not reach b points" (a random u, or rho for the
+geometric family, of small multiplicative order makes the stream cycle; my pre-freeze base check used too few parameter draws to see it). No analysis was run on the
+partial data; it is kept unmodified in `aborted-attempt1/` with its log. Fix (a construction-validity rule, not data-driven): `family_base` resamples the family
+parameters from the same rng when a stream cannot supply b liftable distinct abscissae (at most 50 attempts; the attempt index is recorded in the job's `struct_meta`).
+The seeds, cells, statistics, controls and readings are unchanged; the full study is rerun from the start.
