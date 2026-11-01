@@ -1,0 +1,7 @@
+13:35:21 k1n17 D curve {} need [13]
+Traceback (most recent call last):
+  File "/Volumes/SSD990-2/crypto-worktrees/ic-s1-scaling-n17-20261101/research/ic_s1_scaling_20261101/sweep.py", line 75, in <module>
+    full, trial = scan(cell, cfg)
+  File "/Volumes/SSD990-2/crypto-worktrees/ic-s1-scaling-n17-20261101/research/ic_s1_scaling_20261101/sweep.py", line 45, in scan
+    by.setdefault(arm, []).append((ok, ir(tms[i]) + extra - ECB))
+TypeError: unsupported operand type(s) for +: 'NoneType' and 'int'

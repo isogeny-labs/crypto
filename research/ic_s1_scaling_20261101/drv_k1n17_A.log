@@ -1,0 +1,7 @@
+13:35:19 k1n17 A curve {10: '5.6e+11', 11: '9.23e+10', 12: '1.39e+11', 13: '1.75e+11', 14: '2.56e+11'} need [3, 4, 9, 15]
+Traceback (most recent call last):
+  File "/Volumes/SSD990-2/crypto-worktrees/ic-s1-scaling-n17-20261101/research/ic_s1_scaling_20261101/sweep.py", line 75, in <module>
+    full, trial = scan(cell, cfg)
+  File "/Volumes/SSD990-2/crypto-worktrees/ic-s1-scaling-n17-20261101/research/ic_s1_scaling_20261101/sweep.py", line 45, in scan
+    by.setdefault(arm, []).append((ok, ir(tms[i]) + extra - ECB))
+TypeError: unsupported operand type(s) for +: 'NoneType' and 'int'

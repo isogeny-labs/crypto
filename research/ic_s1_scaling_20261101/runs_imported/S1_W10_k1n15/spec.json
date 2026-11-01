@@ -1,0 +1,39 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "S1 W10 k1n15",
+ "description": "S1: WDSat (wdsat-s4, first-solution, -x -b) and lab arm swept over l.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 1,
+    "n": 15
+   }
+  ],
+  "targets_per_curve": 8,
+  "target_seed": 202610111901,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "wdsat-l10",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-standard-subspace:dimension=10",
+     "oracle": "pdp3-binary:m=3,engine=wdsat-s4,sym=1,xg=1,find=first",
+     "max_trials": "200000"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 202610111902,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

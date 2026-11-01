@@ -21,7 +21,7 @@ NN = {'K0 n=9': 9, 'K1 n=9': 9, 'K1 n=11': 11, 'K0 n=13': 13, 'K0 n=15': 15, 'K1
 R2WCELLS = ['K0 n=9', 'K1 n=9', 'K1 n=11', 'K0 n=13', 'K0 n=15']
 def finished(d):
     lg = d + '.log'
-    return os.path.exists(lg) and any(l.startswith('exit ') for l in open(lg))
+    return os.path.exists(lg) and any(l.startswith('exit ') for l in open(lg)) and any('complete ->' in l for l in open(lg))
 def collect():
     data = {c: {} for c in NN}   # cell -> arm (cfg|'lab', l) -> {t: (ok, whole, lower)}
     rbyc = {}

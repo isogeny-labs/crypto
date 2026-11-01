@@ -1,0 +1,75 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "S1 trial k0n15 D",
+ "description": "S1 2026-11-01: WDSat published arm (config A=-x -b, B=none, C=-x, D=-b) and lab arm; protocol S1_SCALING_20261101.md",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 0,
+    "n": 15
+   }
+  ],
+  "targets_per_curve": 1,
+  "target_seed": 202610111901,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "wdsat-D-l3",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-standard-subspace:dimension=3",
+     "oracle": "pdp3-binary:m=3,engine=wdsat-s4,sym=1,xg=0,find=first",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "wdsat-D-l4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-standard-subspace:dimension=4",
+     "oracle": "pdp3-binary:m=3,engine=wdsat-s4,sym=1,xg=0,find=first",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "wdsat-D-l10",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-standard-subspace:dimension=10",
+     "oracle": "pdp3-binary:m=3,engine=wdsat-s4,sym=1,xg=0,find=first",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "wdsat-D-l12",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-standard-subspace:dimension=12",
+     "oracle": "pdp3-binary:m=3,engine=wdsat-s4,sym=1,xg=0,find=first",
+     "max_trials": "200000"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 202610111902,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

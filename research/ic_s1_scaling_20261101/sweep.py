@@ -84,7 +84,7 @@ if __name__ == '__main__':
         for lg in inflight:
             nm = os.path.basename(lg)[3:-4]
             try:
-                if key_of(f'{B}/runs/{os.path.basename(lg)[:2]}_{nm}') == (a, n, M.SEED.get(cell, 202610111901)): mine.append(nm)
+                if key_of(f'{B}/runs/{os.path.basename(lg)[:2]}_{nm}') == (a, n, M.SEED.get(cell, 202610111901)) and (not nm.startswith('DR') or nm.startswith(('DR_' + cfg + '_', 'DRT_' + cfg + '_'))): mine.append(nm)
             except Exception: pass
         if mine: time.sleep(30); continue
         need = needs(curve, l0, guard, 3, lmax)
