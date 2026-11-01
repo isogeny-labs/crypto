@@ -8,9 +8,10 @@ committed session measured, every tournament candidate identity (IC1) the
 repository mentions, every tournament round, every committed ecbench
 session, and the vocabulary of oracles, solvers and factor-base families.
 
-Like the leaderboard (AGENTS.md §7b) it is generated, never edited by hand,
-and reads only committed files, so a number that is not in one cannot reach
-the page.  `--check` fails when docs/browser/data.json is stale.
+Like the leaderboard (AGENTS.md §7b) it is generated, never edited by hand.
+Sparse-excluded tracked inputs are read from committed HEAD, while materialized
+inputs use their worktree bytes.  `--check` fails when docs/browser/data.json
+is stale.
 
 This is site tooling, not research or performance code: it joins JSON
 records on the identities the repository already computes and computes no
@@ -20,13 +21,17 @@ measurement of its own.
 from __future__ import annotations
 
 import argparse
+import contextlib
+import fnmatch
 import glob
 import hashlib
 import json
 import os
 import re
+import subprocess
 import sys
 from collections import Counter, defaultdict
+from functools import lru_cache
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, ".."))
@@ -37,8 +42,17 @@ COVERS = "docs/curves/covers.json"
 COVER_LINKS = "docs/curves/cover-links.yaml"
 STANDARDS_COVERAGE = "docs/curves/standards/coverage.json"
 LEADERBOARD = "docs/ic/leaderboard.json"
+STORE_INDEX = "store/index.json"
+STORE_CONFIG = "store/config.json"
+STORE_SCHEMA = "crypto.store-index/v1"
 TOURNAMENT_RUNS = "research/ic_candidate_tournament_20260915/runs"
-ECBENCH_SESSIONS_GLOBS = ("research/ecbench_*/sessions/*", "research/isogeny_conductor_gap_*/sessions/*")
+ECBENCH_SESSIONS_GLOBS = (
+    "research/ecbench_*/sessions/*",
+    "research/isogeny_conductor_gap_*/sessions/*",
+    "research/fiber_ic_scaling_*/sessions/*",
+    "research/n83_genus3_image_solver_*/sessions/*",
+    "research/full_volcano_graphwide_ic_*/execution/campaigns/*/sessions/*",
+)
 IC1_SCAN_GLOBS = (
     "docs/ic/**/*.json",
     "docs/ic/**/*.md",
@@ -80,6 +94,7 @@ VOCABULARY = {
     ],
     "factor_base_families": [
         {"name": "prime-abscissa", "params": "size", "what": "The points whose abscissa is below a bound on a prime-field curve."},
+        {"name": "prime-projected-abscissa", "params": "size,scan_cap", "what": "Cofactor-projected rational points, checked in the selected prime subgroup, with distinct negation pairs folded into columns."},
         {"name": "koblitz-orbit", "params": "divisor", "what": "A Frobenius-invariant subspace of abscissae named by factors of x^n - 1; Frobenius-closed, so the table folds."},
         {"name": "binary-subspace", "params": "dimension", "what": "Abscissae in a polynomial-basis F2-subspace; needs no invariant factor, so not Frobenius-closed."},
         {"name": "compact-orbit-scan", "params": "", "what": "Orbit base built by scanning a compact representative set."},
@@ -94,18 +109,207 @@ def rel(path: str) -> str:
     return os.path.relpath(path, ROOT)
 
 
-def load_file(path: str):
+def _glob_match(path: str, pattern: str) -> bool:
+    """Match one repository path with Python glob's path-component rules."""
+    path_parts = path.split("/")
+    pattern_parts = pattern.split("/")
+
+    @lru_cache(maxsize=None)
+    def match(path_i: int, pattern_i: int) -> bool:
+        if pattern_i == len(pattern_parts):
+            return path_i == len(path_parts)
+        part = pattern_parts[pattern_i]
+        if part == "**":
+            return match(path_i, pattern_i + 1) or (
+                path_i < len(path_parts)
+                and not path_parts[path_i].startswith(".")
+                and match(path_i + 1, pattern_i)
+            )
+        return (
+            path_i < len(path_parts)
+            and (
+                not path_parts[path_i].startswith(".")
+                or part.startswith(".")
+            )
+            and fnmatch.fnmatchcase(path_parts[path_i], part)
+            and match(path_i + 1, pattern_i + 1)
+        )
+
+    return match(0, 0)
+
+
+class RepositoryInputs:
+    """Read a sparse worktree as the worktree overlaid on committed HEAD.
+
+    Git marks sparse-excluded index entries with ``skip-worktree``.  Those
+    files are absent from the filesystem, but remain inputs to this generated
+    index.  Materialized files always use their worktree bytes, including
+    local modifications.  Only an absent skip-worktree entry falls back to
+    its blob in HEAD; an ordinary tracked deletion therefore stays deleted.
+    """
+
+    def __init__(self, root: str):
+        self.root = root
+        self.git_env = os.environ.copy()
+        # A generator must not silently turn a sparse validation into a broad
+        # promisor download.  Callers may provide the required objects through
+        # the repository object store or an alternate object directory.
+        self.git_env["GIT_NO_LAZY_FETCH"] = "1"
+        try:
+            raw = subprocess.check_output(
+                ["git", "ls-files", "-t", "-z"],
+                cwd=root,
+                env=self.git_env,
+                stderr=subprocess.PIPE,
+            )
+        except (FileNotFoundError, subprocess.CalledProcessError) as error:
+            raise RuntimeError(
+                f"cannot enumerate committed lab-browser inputs in Git checkout {root}"
+            ) from error
+        entries = [item for item in raw.split(b"\0") if item]
+        self.tracked_files = {
+            item[2:].decode("utf-8", "surrogateescape") for item in entries
+        }
+        self.sparse_files = {
+            item[2:].decode("utf-8", "surrogateescape")
+            for item in entries
+            if item.startswith(b"S ")
+        }
+
+    def _relative(self, path: str) -> str:
+        if os.path.isabs(path):
+            path = os.path.relpath(path, self.root)
+        return path.replace(os.sep, "/")
+
+    def _absolute(self, path: str) -> str:
+        return os.path.join(self.root, self._relative(path))
+
+    def exists(self, path: str) -> bool:
+        relative = self._relative(path)
+        return (
+            relative in self.tracked_files
+            and (
+                os.path.isfile(self._absolute(relative))
+                or relative in self.sparse_files
+            )
+        )
+
+    def is_directory(self, path: str) -> bool:
+        relative = self._relative(path).rstrip("/")
+        prefix = relative + "/"
+        return any(
+            item.startswith(prefix) and self.exists(item)
+            for item in self.tracked_files
+        )
+
+    def glob_files(self, pattern: str) -> list[str]:
+        pattern = self._relative(pattern)
+        materialized = {
+            self._relative(path)
+            for path in glob.glob(os.path.join(self.root, pattern), recursive=True)
+            if (
+                os.path.isfile(path)
+                and self._relative(path) in self.tracked_files
+            )
+        }
+        materialized.update(path for path in self.sparse_files if _glob_match(path, pattern))
+        return sorted(materialized)
+
+    def child_directories(self, base: str) -> list[str]:
+        base = self._relative(base).rstrip("/")
+        children = set()
+        prefix = base + "/"
+        for path in self.tracked_files:
+            if path.startswith(prefix) and self.exists(path):
+                remainder = path[len(prefix):]
+                if "/" in remainder:
+                    children.add(remainder.split("/", 1)[0])
+        return sorted(children)
+
+    def size(self, path: str) -> int:
+        relative = self._relative(path)
+        absolute = os.path.join(self.root, relative)
+        if os.path.isfile(absolute):
+            return os.path.getsize(absolute)
+        if relative not in self.sparse_files:
+            raise FileNotFoundError(absolute)
+        result = subprocess.run(
+            ["git", "cat-file", "-s", f"HEAD:{relative}"],
+            cwd=self.root,
+            env=self.git_env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        if result.returncode:
+            detail = result.stderr.strip() or "object is unavailable"
+            raise OSError(f"cannot read sparse input HEAD:{relative}: {detail}")
+        return int(result.stdout.strip())
+
+    @contextlib.contextmanager
+    def open_binary(self, path: str):
+        relative = self._relative(path)
+        absolute = os.path.join(self.root, relative)
+        if os.path.isfile(absolute):
+            with open(absolute, "rb") as fh:
+                yield fh
+            return
+        if relative not in self.sparse_files:
+            raise FileNotFoundError(absolute)
+        proc = subprocess.Popen(
+            ["git", "cat-file", "blob", f"HEAD:{relative}"],
+            cwd=self.root,
+            env=self.git_env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        assert proc.stdout is not None
+        completed = False
+        try:
+            yield proc.stdout
+            completed = True
+        finally:
+            proc.stdout.close()
+            if not completed and proc.poll() is None:
+                proc.kill()
+            returncode = proc.wait()
+            assert proc.stderr is not None
+            stderr = proc.stderr.read()
+            proc.stderr.close()
+        if returncode:
+            detail = (
+                stderr.decode("utf-8", "replace").strip()
+                or "object is unavailable"
+            )
+            raise OSError(f"cannot read sparse input HEAD:{relative}: {detail}")
+
+    def read_bytes(self, path: str) -> bytes:
+        with self.open_binary(path) as fh:
+            return fh.read()
+
+    def read_text(self, path: str, errors: str = "strict") -> str:
+        return self.read_bytes(path).decode("utf-8", errors)
+
+
+def load_file(path: str, source: RepositoryInputs | None = None):
+    if source is not None:
+        return json.loads(source.read_text(path))
     with open(path, encoding="utf-8") as fh:
         return json.load(fh)
 
 
-def load(path_rel: str):
-    return load_file(os.path.join(ROOT, path_rel))
+def load(path_rel: str, source: RepositoryInputs | None = None):
+    return load_file(os.path.join(ROOT, path_rel), source)
 
 
-def sha256_file(path_rel: str) -> str:
+def sha256_file(path_rel: str, source: RepositoryInputs | None = None) -> str:
     h = hashlib.sha256()
-    with open(os.path.join(ROOT, path_rel), "rb") as fh:
+    opener = (
+        source.open_binary(path_rel)
+        if source is not None
+        else open(os.path.join(ROOT, path_rel), "rb")
+    )
+    with opener as fh:
         for chunk in iter(lambda: fh.read(1 << 20), b""):
             h.update(chunk)
     return h.hexdigest()
@@ -136,7 +340,14 @@ def curve_rows(registry: dict, leaderboard: dict) -> list[dict]:
                 "log2_r": row.get("log2_r"),
                 "reference": row.get("reference"),
                 "best_recipe": best.get("variant"),
+                "best_base_points": best.get("base_points"),
+                "best_base_columns": best.get("columns"),
+                "best_base_source": row.get("source"),
                 "best_s": best.get("s"),
+                "log2_ic_gae": best.get("log2_total_gae"),
+                "log2_rho_gae": row.get("reference_log2_total_gae"),
+                "operation_unit": row.get("operation_unit"),
+                "validation_status": (row.get("validation") or {}).get("status"),
                 "ratio_rho": best.get("ratio_rho"),
                 "ratio_floor": best.get("ratio_floor"),
                 "verified": best.get("verified"),
@@ -151,7 +362,8 @@ def curve_rows(registry: dict, leaderboard: dict) -> list[dict]:
             field = {"characteristic": "p", "p": str(p), "bits": (int_or_none(p) or 0).bit_length(), "degree": 1, "modulus": None}
         elif family == "extension":
             # GF(p^k) = GF(p)[t]/(t^k + low(t)): bits are the field's, p^k's.
-            p, k = params.get("p"), int_or_none(params.get("k"))
+            # 47 fixture rows spell the degree "degree", not "k".
+            p, k = params.get("p"), int_or_none(params.get("k", params.get("degree")))
             field = {"characteristic": "p", "p": str(p), "bits": ((int_or_none(p) or 0) ** (k or 0)).bit_length(), "degree": k, "modulus": params.get("modulus")}
         else:
             degree = params.get("n") or params.get("m")
@@ -163,7 +375,7 @@ def curve_rows(registry: dict, leaderboard: dict) -> list[dict]:
         a = params.get("a") if params.get("a") is not None else model.get("a")
         b = params.get("b") if params.get("b") is not None else model.get("b")
         # An extension coefficient is its list over 1, t, ..., t^(k-1).
-        a, b = ("[" + ", ".join(v) + "]" if isinstance(v, list) else v for v in (a, b))
+        a, b = ("[" + ", ".join(map(str, v)) + "]" if isinstance(v, list) else v for v in (a, b))
         rep = (c.get("representations") or [None])[0]
         subgroup = rep["curve"] if rep else {}
         r = subgroup.get("subgroup_order")
@@ -203,19 +415,28 @@ def curve_rows(registry: dict, leaderboard: dict) -> list[dict]:
     return rows
 
 
-def ecbench_sessions(curves_by_slug: dict) -> tuple[list[dict], list[dict], list[dict]]:
+def ecbench_sessions(
+    curves_by_slug: dict, source: RepositoryInputs
+) -> tuple[list[dict], list[dict], list[dict], list[dict]]:
     sessions, methods, fbs, yields = [], {}, {}, []
-    per_curve_arm = defaultdict(lambda: {"n": 0, "verified": 0, "s_sum": 0.0, "floor_sum": 0.0})
-    for sdir in sorted(d for g in ECBENCH_SESSIONS_GLOBS for d in glob.glob(os.path.join(ROOT, g))):
-        session_path = os.path.join(sdir, "session.json")
+    per_curve_arm = defaultdict(lambda: {"n": 0, "verified": 0, "s_sum": 0.0, "floor_sum": 0.0, "unpriced_zero_runs": 0})
+    session_paths = {
+        path
+        for pattern in ECBENCH_SESSIONS_GLOBS
+        for path in source.glob_files(pattern.rstrip("/") + "/session.json")
+    }
+    for session_path in sorted(session_paths):
+        sdir = os.path.dirname(session_path)
         records_path = os.path.join(sdir, "records.jsonl")
-        if not (os.path.exists(session_path) and os.path.exists(records_path)):
+        if not source.exists(records_path):
             continue
-        s = load_file(session_path)
-        spec = load_file(os.path.join(sdir, "spec.json")) if os.path.exists(os.path.join(sdir, "spec.json")) else {}
+        s = load_file(session_path, source)
+        spec_path = os.path.join(sdir, "spec.json")
+        spec = load_file(spec_path, source) if source.exists(spec_path) else {}
         slugs, arms, statuses = set(), {}, Counter()
-        with open(records_path, encoding="utf-8") as fh:
-            for line in fh:
+        with source.open_binary(records_path) as raw:
+            lines = (line.decode("utf-8") for line in raw)
+            for line in lines:
                 r = json.loads(line)
                 statuses[r["outcome"]["status"]] += 1
                 curve = r["workload"].get("curve") or {}
@@ -238,8 +459,14 @@ def ecbench_sessions(curves_by_slug: dict) -> tuple[list[dict], list[dict], list
                 if fb:
                     f = fbs.setdefault(
                         fb["fb_id"],
-                        {**{k: fb.get(k) for k in ("fb_id", "fb_sha256", "family", "params", "description", "signed_points", "abscissae", "columns", "dimension", "points_sha256")}, "curve": slug, "sessions": set(), "methods": set()},
+                        {**{k: fb.get(k) for k in ("fb_id", "fb_sha256", "family", "params", "description", "signed_points", "abscissae", "columns", "dimension", "points_sha256")}, "curve": slug if slug in curves_by_slug else None, "sessions": set(), "methods": set()},
                     )
+                    if slug and slug not in curves_by_slug:
+                        # A frozen record can name a model whose exact subgroup
+                        # representation is still pending registration. Preserve
+                        # that identity without emitting a broken registry link.
+                        f["recorded_curve"] = slug
+                        f["registration_status"] = "pending"
                     f["sessions"].add(s["session_id"])
                     f["methods"].add(m["method_id"])
                 if r.get("warmup") or not slug:
@@ -255,10 +482,14 @@ def ecbench_sessions(curves_by_slug: dict) -> tuple[list[dict], list[dict], list
                     agg["verified"] += 1
                     agg["s_sum"] += float(r["cost"]["s"])
                     agg["floor_sum"] += float(r["boundaries"]["floor_s"])
+                    # A zero charged lower bound with unpriced native work is
+                    # not a complete zero-cost solve or a sortable S=0 result.
+                    if r["cost"].get("unpriced") and r["cost"].get("total_gae") == 0:
+                        agg["unpriced_zero_runs"] += 1
         sessions.append(
             {
                 "session_id": s["session_id"],
-                "dir": rel(sdir),
+                "dir": sdir,
                 "label": s.get("label") or spec.get("label"),
                 "status": s.get("status"),
                 "spec_id": s.get("spec_id"),
@@ -282,8 +513,9 @@ def ecbench_sessions(curves_by_slug: dict) -> tuple[list[dict], list[dict], list
                     "method_id": agg["method_id"],
                     "runs": agg["n"],
                     "verified": agg["verified"],
-                    "mean_s": round(agg["s_sum"] / agg["verified"], 4) if agg["verified"] else None,
-                    "mean_ratio_to_floor": round(agg["s_sum"] / agg["floor_sum"], 3) if agg["floor_sum"] else None,
+                    "mean_s": round(agg["s_sum"] / agg["verified"], 4) if agg["verified"] and not agg["unpriced_zero_runs"] else None,
+                    "mean_ratio_to_floor": round(agg["s_sum"] / agg["floor_sum"], 3) if agg["floor_sum"] and not agg["unpriced_zero_runs"] else None,
+                    **({"unpriced_zero_runs": agg["unpriced_zero_runs"], "score_status": "unknown complete price; zero charged lower bound"} if agg["unpriced_zero_runs"] else {}),
                 }
             )
     for f in fbs.values():
@@ -324,6 +556,8 @@ def yield_row(r: dict, session_id: str) -> dict:
     workload = r["workload"]
     curve = workload.get("curve") or {}
     phase_gae = {p["name"]: p.get("gae") for p in r.get("phases", [])}
+    cost = r.get("cost") or {}
+    uninformative_zero = bool(cost.get("unpriced")) and cost.get("total_gae") == 0
     return {
         "run_id": r["run_id"],
         "record_id": r["record_id"],
@@ -359,32 +593,33 @@ def yield_row(r: dict, session_id: str) -> dict:
         "matrix_rank": la.get("rank"),
         "row_ops": la.get("row_ops"),
         "gae": {k: phase_gae.get(k) for k in ("factor_base", "oracle_setup", "relations", "linear_algebra", "verify")},
-        "total_gae": (r.get("cost") or {}).get("total_gae"),
-        "s": (r.get("cost") or {}).get("s"),
+        "total_gae": None if uninformative_zero else cost.get("total_gae"),
+        "s": None if uninformative_zero else cost.get("s"),
+        **({"charged_gae_lower_bound": 0, "charged_s_lower_bound": 0, "score_status": "unknown complete price; zero charged lower bound", "unpriced": cost["unpriced"]} if uninformative_zero else {}),
         "deterministic": (r.get("cost") or {}).get("deterministic"),
         "solver": r.get("solver"),
     }
 
 
-def tournament_rounds(curves: list[dict]) -> list[dict]:
+def tournament_rounds(curves: list[dict], source: RepositoryInputs) -> list[dict]:
     koblitz = {(c["field"]["degree"], int(c["a"])): c["slug"] for c in curves if c["family"] == "koblitz" and c["a"] in ("0", "1")}
     by_slug = {c["slug"]: c for c in curves}
     rounds = []
-    base = os.path.join(ROOT, TOURNAMENT_RUNS)
-    for d in sorted(os.listdir(base)):
+    base = TOURNAMENT_RUNS
+    for d in source.child_directories(base):
         path = os.path.join(base, d)
-        if not os.path.isdir(path):
-            continue
-        row = {"round": d, "dir": rel(path), "report": rel(os.path.join(path, "REPORT.md")) if os.path.exists(os.path.join(path, "REPORT.md")) else None}
+        row = {"round": d, "dir": path}
         failure = os.path.join(path, "prepare_failure.json")
-        if os.path.exists(failure):
-            f = load_file(failure)
+        report_path = os.path.join(path, "REPORT.md")
+        row["report"] = report_path if source.exists(report_path) else None
+        if source.exists(failure):
+            f = load_file(failure, source)
             row.update({"status": "prepare failed", "reason": f.get("reason")})
             rounds.append(row)
             continue
         dec_path = os.path.join(path, "decision.json")
-        if os.path.exists(dec_path):
-            dec = load_file(dec_path)
+        if source.exists(dec_path):
+            dec = load_file(dec_path, source)
             row.update(
                 {
                     "status": dec.get("status"),
@@ -402,12 +637,21 @@ def tournament_rounds(curves: list[dict]) -> list[dict]:
         else:
             row["status"] = "no decision"
         cand_path = os.path.join(path, "candidates.json")
-        if os.path.exists(cand_path):
-            row["candidates"] = [{"id": c.get("id"), "config": c.get("config"), "parent": c.get("parent"), "hypothesis": c.get("hypothesis"), "configuration_sha256": c.get("configuration_sha256")} for c in load_file(cand_path)]
+        if source.exists(cand_path):
+            row["candidates"] = [
+                {
+                    "id": c.get("id"),
+                    "config": c.get("config"),
+                    "parent": c.get("parent"),
+                    "hypothesis": c.get("hypothesis"),
+                    "configuration_sha256": c.get("configuration_sha256"),
+                }
+                for c in load_file(cand_path, source)
+            ]
         fix_path = os.path.join(path, "fixtures.json")
         cells = {}
-        if os.path.exists(fix_path):
-            fixtures = load_file(fix_path)
+        if source.exists(fix_path):
+            fixtures = load_file(fix_path, source)
             for stage, items in fixtures.items():
                 if not isinstance(items, list):
                     continue
@@ -429,17 +673,22 @@ def tournament_rounds(curves: list[dict]) -> list[dict]:
     return rounds
 
 
-def candidate_identities() -> list[dict]:
+def candidate_identities(source: RepositoryInputs) -> list[dict]:
     found = defaultdict(lambda: {"count": 0, "files": Counter()})
     for pattern in IC1_SCAN_GLOBS:
-        for path in sorted(glob.glob(os.path.join(ROOT, pattern), recursive=True)):
-            if not os.path.isfile(path) or os.path.getsize(path) > MAX_SCAN_BYTES:
+        for path in source.glob_files(pattern):
+            # The canonical leaderboard is required input even after it grows
+            # beyond the cap for incidental text files. Otherwise published
+            # IC1 identities disappear from search without a source change.
+            # The core leaderboard is already a required, fully parsed input
+            # to build(). Its growth must not hide IDs named only there. Keep
+            # the bound for the general research-note/candidate scan.
+            if path != LEADERBOARD and source.size(path) > MAX_SCAN_BYTES:
                 continue
-            with open(path, encoding="utf-8", errors="replace") as fh:
-                text = fh.read()
+            text = source.read_text(path, errors="replace")
             for ident in IC1_FULL_RE.findall(text):
                 found[ident]["count"] += 1
-                found[ident]["files"][rel(path)] += 1
+                found[ident]["files"][path] += 1
     rows = []
     for ident, info in found.items():
         m = IC1_RE.match(ident)
@@ -463,43 +712,104 @@ def candidate_identities() -> list[dict]:
     return rows
 
 
-def attach_covers(curves: list[dict], report: dict) -> None:
-    """Join preverified metadata only; mathematical checks are native Rust."""
-    if report.get("schema_version") != "curve-covers/v1" or report.get("registry_sha256") != sha256_file(REGISTRY):
-        raise ValueError("cover report schema or registry digest is stale")
+def attach_covers(
+    curves: list[dict],
+    report: dict,
+    source: RepositoryInputs | None = None,
+) -> set[str]:
+    """Join source-bound cover findings; leave newer registry curves unassessed."""
+    if (report.get("schema_version") != "curve-covers/v1" or
+            not re.fullmatch(r"[a-f0-9]{64}", report.get("registry_sha256", ""))):
+        raise ValueError("cover report schema or source digest is invalid")
     findings = report.get("curves", [])
     by_slug = {r["slug"]: r for r in findings}
-    if len(by_slug) != len(findings) or set(by_slug) != {c["slug"] for c in curves}:
-        raise ValueError("cover report must have exactly one finding per catalog model")
+    current_slugs = {c["slug"] for c in curves}
+    if len(by_slug) != len(findings) or not set(by_slug).issubset(current_slugs):
+        raise ValueError("cover report has duplicate or unknown catalog models")
+    if report["registry_sha256"] == sha256_file(REGISTRY, source) and set(by_slug) != current_slugs:
+        raise ValueError("current cover report must have one finding per catalog model")
     for curve in curves:
-        finding = by_slug[curve["slug"]]
-        if finding.get("model_sha256") != hashlib.sha256(curve["model_json"].encode()).hexdigest():
+        finding = by_slug.get(curve["slug"])
+        if finding and finding.get("model_sha256") != hashlib.sha256(curve["model_json"].encode()).hexdigest():
             raise ValueError(f"cover model digest mismatch: {curve['slug']}")
         curve["hyperelliptic_cover"] = finding
+    return set(by_slug)
+
+
+def store_objects(curves_by_slug: dict, fb_ids: set, source: RepositoryInputs) -> dict:
+    """The large files the repository keeps in its content-addressed store.
+
+    Quoted from the committed index (`store/index.json`); the bytes live in
+    the remote under their SHA-256 and are fetched on demand (`ecbench store
+    pull`).  The curve and factor-base links come from the entry's name, the
+    same rule the ecbench database uses (`factor-bases/<curve>/<FB1h id>.json`),
+    and are kept only where the id resolves to a row of this index.
+    """
+    index = load(STORE_INDEX, source)
+    if index.get("schema") != STORE_SCHEMA:
+        raise ValueError(f"{STORE_INDEX}: schema {index.get('schema')!r}, expected {STORE_SCHEMA!r}")
+    objects = []
+    for name, e in sorted(index["entries"].items()):
+        parts = name.split("/")
+        curve = fb = None
+        if parts[0] == "factor-bases" and len(parts) >= 3:
+            curve = parts[1]
+            stem = parts[-1].rsplit(".", 1)[0]
+            if stem.startswith("FB1h"):
+                fb = stem
+        objects.append(
+            {
+                "name": name,
+                "kind": parts[0],
+                "sha256": e["sha256"],
+                "bytes": e["bytes"],
+                "description": e.get("description") or None,
+                "tags": e.get("tags", []),
+                "provenance": e.get("provenance") or None,
+                "superseded": e.get("superseded", []),
+                "recorded_curve": curve,
+                "curve": curve if curve in curves_by_slug else None,
+                "fb_id": fb if fb in fb_ids else None,
+                "recorded_fb_id": fb,
+            }
+        )
+    return {"remote": load(STORE_CONFIG, source).get("remote"), "objects": objects}
 
 
 def build() -> dict:
-    registry = load(REGISTRY)
-    leaderboard = load(LEADERBOARD)
+    source = RepositoryInputs(ROOT)
+    registry = load(REGISTRY, source)
+    leaderboard = load(LEADERBOARD, source)
     curves = curve_rows(registry, leaderboard)
-    attach_covers(curves, load(COVERS))
-    graph = load(COVER_LINKS)  # JSON syntax is a subset of YAML 1.2.
-    if graph.get("schema_version") != "curve-cover-graph/v1" or graph.get("registry_sha256") != sha256_file(REGISTRY):
-        raise ValueError("stale cover graph")
+    report = load(COVERS, source)
+    covered_slugs = attach_covers(curves, report, source)
+    graph = load(COVER_LINKS, source)  # JSON syntax is a subset of YAML 1.2.
+    if (
+        graph.get("schema_version") != "curve-cover-graph/v1"
+        or graph.get("registry_sha256") != report.get("registry_sha256")
+    ):
+        raise ValueError("cover graph and report have different source registries")
     nodes = {node["icv1_identity"]["slug"]: node for node in graph["curves"]}
-    if len(nodes) != len(graph["curves"]) or set(nodes) != {c["slug"] for c in curves}:
-        raise ValueError("cover graph must bind every catalog model exactly once")
+    if len(nodes) != len(graph["curves"]) or set(nodes) != covered_slugs:
+        raise ValueError("cover graph must bind every assessed model exactly once")
     for curve in curves:
-        node = nodes[curve["slug"]]
+        node = nodes.get(curve["slug"])
+        if node is None:
+            curve["cover_links"] = []
+            curve["standards_provenance"] = []
+            continue
         if node["model_json"] != curve["model_json"]:
             raise ValueError("cover graph model mismatch")
         curve["cover_links"] = [dict(link, cover_id=graph["covers"][link["cover_uid"]]["cover_id"],
                                      map_id=graph["maps"][link["map_uid"]]["map_id"]) for link in node["cover_links"]]
         curve["standards_provenance"] = node.get("standards_provenance") or []
     by_slug = {c["slug"]: c for c in curves}
-    sessions, methods, fbs, yields = ecbench_sessions(by_slug)
-    rounds = tournament_rounds(curves)
-    candidates = candidate_identities()
+    sessions, methods, fbs, yields = ecbench_sessions(by_slug, source)
+    store = store_objects(by_slug, {f["fb_id"] for f in fbs}, source)
+    for c in curves:
+        c["store_objects"] = [o["name"] for o in store["objects"] if o["curve"] == c["slug"]]
+    rounds = tournament_rounds(curves, source)
+    candidates = candidate_identities(source)
     tag_to_slug = {}
     for c in curves:
         if c["family"] == "koblitz" and c["a"] in ("0", "1"):
@@ -507,21 +817,32 @@ def build() -> dict:
     for cand in candidates:
         cand["slug"] = tag_to_slug.get((cand.get("n"), cand.get("curve_tag")))
     sources = {
-        REGISTRY: sha256_file(REGISTRY),
-        COVERS: sha256_file(COVERS),
-        COVER_LINKS: sha256_file(COVER_LINKS),
-        STANDARDS_COVERAGE: sha256_file(STANDARDS_COVERAGE),
-        LEADERBOARD: sha256_file(LEADERBOARD),
-        **{os.path.join(s["dir"], "records.jsonl"): sha256_file(os.path.join(s["dir"], "records.jsonl")) for s in sessions},
+        REGISTRY: sha256_file(REGISTRY, source),
+        COVERS: sha256_file(COVERS, source),
+        COVER_LINKS: sha256_file(COVER_LINKS, source),
+        STANDARDS_COVERAGE: sha256_file(STANDARDS_COVERAGE, source),
+        LEADERBOARD: sha256_file(LEADERBOARD, source),
+        STORE_INDEX: sha256_file(STORE_INDEX, source),
+        STORE_CONFIG: sha256_file(STORE_CONFIG, source),
+        **{
+            os.path.join(s["dir"], "records.jsonl"): sha256_file(
+                os.path.join(s["dir"], "records.jsonl"), source
+            )
+            for s in sessions
+        },
     }
     return {
         "schema_version": "lab-browser/1",
         "generated_by": "scripts/build_lab_browser.py",
         "what_this_is": "A searchable index of the curves, methods, factor bases, candidate identities, tournament rounds and ecbench sessions this repository names, joined on the identities it already computes (ICV1 slugs, EC1 aliases, ECM1 method ids, FB1 factor-base ids, IC1 candidate ids). Every figure is quoted from a committed file named in `sources` or in the row; nothing is computed here beyond means over a session's own verified runs.",
-        "counts": {"curves": len(curves), "methods": len(methods), "factor_bases": len(fbs), "candidates": len(candidates), "rounds": len(rounds), "sessions": len(sessions), "yields": len(yields)},
+        "counts": {"curves": len(curves), "cover_assessed": len(covered_slugs),
+                   "cover_unassessed": len(curves) - len(covered_slugs),
+                   "methods": len(methods), "factor_bases": len(fbs), "candidates": len(candidates),
+                   "rounds": len(rounds), "sessions": len(sessions), "yields": len(yields),
+                   "store_objects": len(store["objects"])},
         "sources": sources,
         "vocabulary": VOCABULARY,
-        "standards_coverage": load(STANDARDS_COVERAGE),
+        "standards_coverage": load(STANDARDS_COVERAGE, source),
         "curves": curves,
         "methods": methods,
         "factor_bases": fbs,
@@ -529,6 +850,7 @@ def build() -> dict:
         "rounds": rounds,
         "sessions": sessions,
         "yields": yields,
+        "store": store,
     }
 
 

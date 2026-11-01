@@ -1,0 +1,39 @@
+# Privileged CRIU is restricted to this dedicated trusted-process namespace.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: isolab-recovery-controller, namespace: isolab-recovery-system}
+rules:
+  - apiGroups: ['']
+    resources: [configmaps, persistentvolumeclaims, pods]
+    verbs: [get, list, create, update, delete]
+  - apiGroups: ['']
+    resources: [pods/exec]
+    verbs: [create]
+  - apiGroups: [snapshot.storage.k8s.io]
+    resources: [volumesnapshots]
+    verbs: [get, list, create]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: isolab-recovery-controller, namespace: isolab-recovery-system}
+subjects:
+  - {kind: Group, name: 'isolab:recovery', apiGroup: rbac.authorization.k8s.io}
+roleRef: {kind: Role, name: isolab-recovery-controller, apiGroup: rbac.authorization.k8s.io}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: {name: isolab-recovery-readiness}
+rules:
+  - apiGroups: ['']
+    resources: [nodes]
+    verbs: [get]
+  - apiGroups: [snapshot.storage.k8s.io]
+    resources: [volumesnapshotcontents]
+    verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata: {name: isolab-recovery-readiness}
+subjects:
+  - {kind: Group, name: 'isolab:recovery', apiGroup: rbac.authorization.k8s.io}
+roleRef: {kind: ClusterRole, name: isolab-recovery-readiness, apiGroup: rbac.authorization.k8s.io}

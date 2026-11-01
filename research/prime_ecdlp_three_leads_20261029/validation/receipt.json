@@ -1,0 +1,236 @@
+{
+  "schema": "prime-ecdlp.followup-validation/v1",
+  "updated_utc": "2026-10-29T16:51:39.976732+00:00",
+  "scope": "software correctness and formal structure only; not a scientific performance result",
+  "admitted_performance_result": false,
+  "base_revision": "117c9c4f3ee85d4dc32f275893f6e50b591e4a47",
+  "implementation_commit": "98eb00bea3a758fec62fbd0fc45d2760dab24e8f",
+  "final_changes_after_implementation_commit": "one lint style correction, documentation and receipts",
+  "source_sha256": {
+    "examples/pkm_symmetric_complete.rs": "f4b54888798695840813e211e4a17bfc6358ecb939f0817762e04bb26cf8e67b",
+    "examples/hecke_target_router.rs": "716ec5f01876d651a66e5564128361bb5f69429843e2a0b514f301198dbca692",
+    "research/prime_ecdlp_three_leads_20261029/lean/ThreeLeads.lean": "bef41a3f3a96f6a82345a6cff75ac03cd5938033c646f5fabb1bf75456237712",
+    "research/prime_ecdlp_three_leads_20261029/lean/lakefile.toml": "fbc0f110628a9f47ed38175cad63e960e5c3fc754b38160631a0077bbad0a909",
+    "research/prime_ecdlp_three_leads_20261029/lean/lake-manifest.json": "2dbce3fe784dea762058cf4cfe5dccf26f8884233df874e6697a5649ba9330a4",
+    "research/prime_ecdlp_three_leads_20261029/five-sum-inputs.json": "64dc0971b31934c2fe041d54a1c3b111c843d73f08aedc91bc4ec4ac3b5abeaa"
+  },
+  "toolchains": {
+    "rustc": "1.99.1 (58cf8f9c35b355199727627d07ae34a4e2846d67)",
+    "lean": "4.34.1 (5045d0056413266e57c625dcd7c365b10e377c52)",
+    "mathlib": "d13f23b723b8a846827a245b89c10fc7d3f11612"
+  },
+  "commands": [
+    {
+      "argv": [
+        "lake",
+        "build"
+      ],
+      "cwd": "research/prime_ecdlp_three_leads_20261029/lean",
+      "exit": 0,
+      "log": "lake-build.log"
+    },
+    {
+      "argv": [
+        "tools/lean/proof-gate.sh",
+        "--out",
+        "/workspace/three-leads-proof-receipts",
+        "research/prime_ecdlp_three_leads_20261029/lean"
+      ],
+      "exit": 0,
+      "log": "proof-gate.log",
+      "named_theorems": 8,
+      "audited_declarations": 9,
+      "trusted_exceptions": 0
+    },
+    {
+      "argv": [
+        "lake",
+        "env",
+        "leanchecker",
+        "ThreeLeads"
+      ],
+      "cwd": "research/prime_ecdlp_three_leads_20261029/lean",
+      "exit": 0,
+      "stdout": "empty",
+      "mode": "module declarations replayed against imported environment; not an external prover or --fresh replay"
+    },
+    {
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--example",
+        "pkm_symmetric_complete",
+        "--example",
+        "hecke_target_router",
+        "-j2"
+      ],
+      "exit": 0,
+      "log": "native-tests-final.log",
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "env": {
+        "CARGO_TARGET_DIR": "/workspace/three-leads-clippy-target"
+      }
+    },
+    {
+      "argv": [
+        "cargo",
+        "clippy",
+        "--release",
+        "--locked",
+        "--example",
+        "pkm_symmetric_complete",
+        "--example",
+        "hecke_target_router",
+        "--no-deps",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "log": "clippy-final.log",
+      "env": {
+        "CARGO_TARGET_DIR": "/workspace/three-leads-clippy-target"
+      }
+    },
+    {
+      "argv": [
+        "rustfmt",
+        "--edition",
+        "2021",
+        "--check",
+        "examples/pkm_symmetric_complete.rs",
+        "examples/hecke_target_router.rs"
+      ],
+      "exit": 0
+    },
+    {
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--lib",
+        "--locked",
+        "-j2"
+      ],
+      "status": "capped incomplete; no full-suite pass",
+      "cargo_exit": 101,
+      "log": "full-library-final-excerpt.log",
+      "budget_seconds": 2400,
+      "passed_unique": 5232,
+      "failed": 0,
+      "ignored": 123,
+      "unfinished": [
+        "cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies"
+      ],
+      "raw_output_status": "NOT_UPLOADED; see unuploaded-artifacts.json"
+    }
+  ],
+  "unit_test_binaries": {
+    "pkm_symmetric_complete-5926cbd650b7cea8": {
+      "sha256": "5e76c1f2b3df4cc0802fdce988a024e50cbae2d326ce761b143aa1315053a333",
+      "bytes": 6234952,
+      "role": "development unit-test executable; binary not committed"
+    },
+    "hecke_target_router-53def5cc6a246da6": {
+      "sha256": "4404aa9b285b5029aef34835b78f2c09ebef0c87ae3e6b59a18789fd6eec5951",
+      "bytes": 4893088,
+      "role": "development unit-test executable; binary not committed"
+    }
+  },
+  "blocked_actions": [
+    {
+      "argv": [
+        "bash",
+        "scripts/checkpoint.sh",
+        "push"
+      ],
+      "exit": 1,
+      "log": "checkpoint-push.log",
+      "reason": "no configured upload transport"
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/checkpoint.sh",
+        "gate"
+      ],
+      "exit": 1,
+      "log": "checkpoint-gate.log",
+      "reason": "checkpoint not uploaded"
+    },
+    {
+      "action": "unauthenticated P20 raw-object GET",
+      "http_status": 403,
+      "response": "artifact-access-denied.xml"
+    }
+  ],
+  "scientific_panels_run": 0,
+  "report": {
+    "renderer": "typst Python wheel 0.15.0",
+    "inspected_pages": 2,
+    "source_sha256": "d96042632710f8734d6ecd110fa97902c4a646d7cfcef7f73a599ad91042a7b8",
+    "pdf_sha256": "d16184dfbadb5c9da49cd950dfb6e8102d4afdb69436c8365ef12cb48328474c",
+    "diagram_sha256": "5d97bed4488449106d328b41f051f08d7cb56ff9f6dd6124b7cf9cb98a201414"
+  },
+  "gate_source": {
+    "repository_revision": "117c9c4f3ee85d4dc32f275893f6e50b591e4a47",
+    "sha256": {
+      "tools/lean/proof-gate.sh": "19d54c7c9095a2604f9daeaac51e9069d43b8864a225a4b8443df01a8b0b5a83",
+      "tools/lean/AuditAxioms.lean": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929",
+      "tools/lean/trusted-native.txt": "934d0322ac07faec9502186b206c289cdeed7fb9a54f700cc097124476b6bf15"
+    }
+  },
+  "full_library_attempts": [
+    {
+      "status": "interrupted after sparse runtime-input failures; not a completed suite",
+      "cargo_exit": 101,
+      "termination": "test process received SIGTERM to restart after restoration",
+      "log": "full-library-initial-excerpt.log",
+      "raw_sha256": "fecbec58ee7927991be96231e2c5343855c9c1b62b13e983117f74a8ada00439",
+      "observed_failed_tests": 6,
+      "restored_tracked_paths": [
+        "gpu/certicom",
+        "research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1"
+      ],
+      "raw_output_status": "NOT_UPLOADED; see unuploaded-artifacts.json"
+    },
+    {
+      "stopped_utc": "2026-10-29T16:48:02.722491+00:00",
+      "outcome": "capped incomplete; no full-suite pass claimed",
+      "local_budget_seconds": 2400,
+      "termination": "SIGTERM after local budget",
+      "passed_unique": 5232,
+      "failed": 0,
+      "ignored": 123,
+      "unfinished": [
+        "cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies"
+      ],
+      "declared_tests": 5356,
+      "cargo_exit": 101,
+      "log": "full-library-final-excerpt.log",
+      "raw_sha256": "86acd43c1324f3f008f19b527b24a03fe26eb9aa3750e3214e92389e1f32d240",
+      "raw_output_status": "NOT_UPLOADED; see unuploaded-artifacts.json"
+    }
+  ],
+  "runtime_input_rechecks": [
+    {
+      "scope": "Certicom device module; CPU emulation",
+      "exit": 0,
+      "passed": 6,
+      "failed": 0,
+      "log": "device-tests-after-restore.log"
+    },
+    {
+      "scope": "frozen version-one bounds fixture",
+      "exit": 0,
+      "passed": 1,
+      "failed": 0,
+      "log": "bounds-fixture-after-restore.log"
+    }
+  ]
+}

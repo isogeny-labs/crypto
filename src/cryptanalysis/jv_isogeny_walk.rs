@@ -1084,6 +1084,12 @@ pub struct Walk2Trial {
     pub order: u128,
     pub trace: i128,
     pub kronecker: [i8; 3],
+    /// `v₂(4q³ − t²)`; the class's 2-volcano has depth 1 iff this is 5
+    /// (`t = 2t′` with `t′` odd, `q³ ≡ 1 mod 8`, depth 1 iff `v₂(t′² − q³) = 3`).
+    pub v2_disc: u32,
+    /// Refused before any enumeration: depth-1 classes hold no weak curve
+    /// (PR #1556, exact at p = 5…19).  Only the point count was charged.
+    pub refused: bool,
     pub degrees_used: Vec<u64>,
     pub found: bool,
     /// Met `cap` distinct curves without a weak one.
@@ -1125,6 +1131,13 @@ pub struct Walk2Report {
     pub closure_mode: bool,
     pub from_weak_class: bool,
     pub weak_class_moves: usize,
+    pub refuse_depth1: bool,
+    /// Trials refused by the depth-1 test; counted as not found in
+    /// `success_fraction`, excluded from `success_fraction_admitted`.
+    pub refused: usize,
+    pub success_fraction_admitted: f64,
+    pub mean_muls_admitted: f64,
+    pub mean_muls_refused: f64,
     pub found: usize,
     pub capped: usize,
     pub exhausted: usize,
@@ -1264,6 +1277,7 @@ pub fn run_walk2(
     closure_mode: bool,
     from_weak_class: bool,
     weak_class_moves: usize,
+    refuse_depth1: bool,
 ) -> Walk2Report {
     let start = Instant::now();
     let ctx = WalkCtx::new(p);
@@ -1309,6 +1323,19 @@ pub fn run_walk2(
         row.trace = q3 + 1 - row.order as i128;
         let disc = row.trace * row.trace - 4 * q3;
         row.kronecker = [kronecker(disc, 3), kronecker(disc, 5), kronecker(disc, 7)];
+        row.v2_disc = if disc < 0 {
+            ((-disc) as u128).trailing_zeros()
+        } else {
+            64
+        };
+        if refuse_depth1 && row.v2_disc == 5 {
+            row.refused = true;
+            row.curves = seen.len() as u64;
+            row.muls = f.muls();
+            row.ms = t0.elapsed().as_secs_f64() * 1e3;
+            rows.push(row);
+            continue;
+        }
         let degrees: Vec<u64> = jumps
             .iter()
             .copied()
@@ -1443,6 +1470,22 @@ pub fn run_walk2(
     let exhausted = rows.iter().filter(|r| r.exhausted).count();
     let start_weak = rows.iter().filter(|r| r.start_weak).count();
     let proper: Vec<&Walk2Trial> = rows.iter().filter(|r| r.found && !r.start_weak).collect();
+    let refused = rows.iter().filter(|r| r.refused).count();
+    let admitted = rows.iter().filter(|r| !r.refused && !r.start_weak).count();
+    let mean_muls_admitted = mean(
+        &rows
+            .iter()
+            .filter(|r| !r.refused)
+            .map(|r| r.muls as f64)
+            .collect::<Vec<_>>(),
+    );
+    let mean_muls_refused = mean(
+        &rows
+            .iter()
+            .filter(|r| r.refused)
+            .map(|r| r.muls as f64)
+            .collect::<Vec<_>>(),
+    );
     let mut curves: Vec<f64> = proper.iter().map(|r| r.curves as f64).collect();
     curves.sort_by(|a, b| a.partial_cmp(b).unwrap());
     let total_curves: u64 = rows.iter().map(|r| r.curves).sum();
@@ -1468,6 +1511,11 @@ pub fn run_walk2(
         closure_mode,
         from_weak_class,
         weak_class_moves,
+        refuse_depth1,
+        refused,
+        success_fraction_admitted: proper.len() as f64 / admitted.max(1) as f64,
+        mean_muls_admitted,
+        mean_muls_refused,
         found,
         capped,
         exhausted,
@@ -1562,6 +1610,7 @@ pub fn walk_to_weak_record(
             let mut steps = Vec::new();
             let mut j = weak_j;
             while let Some((pj, step)) = parent.get(&j) {
+                super::jv_bitops::probe(6);
                 steps.push(step.clone());
                 j = *pj;
             }
@@ -1573,9 +1622,12 @@ pub fn walk_to_weak_record(
         // 2-isogeny edges
         for e in cur.two_edges(ctx, known) {
             let tj = e.curve.j(f);
+            // bitop/v1: the seen-set probe, then the parent and curve maps
+            super::jv_bitops::probe(6);
             if !seen.insert(tj) {
                 continue;
             }
+            super::jv_bitops::probes(2, 6);
             parent.insert(tj, (cj, Step::Two { from: cur, k: e.k }));
             curve_of.insert(tj, e.curve);
             if e.curve.weak_by_norms(f) {
@@ -1590,9 +1642,11 @@ pub fn walk_to_weak_record(
         for &ell in &degrees {
             for (tgt, ker) in cur.ell_targets_with_kernels(ctx, ell, rng) {
                 let tj = tgt.j(f);
+                super::jv_bitops::probe(6);
                 if !seen.insert(tj) {
                     continue;
                 }
+                super::jv_bitops::probes(2, 6);
                 parent.insert(
                     tj,
                     (
@@ -1684,42 +1738,36 @@ pub struct EndToEndReport {
     pub wall_ms: f64,
 }
 
-#[allow(clippy::too_many_arguments)]
-pub fn run_end_to_end(
+/// The instance of §18.1 for `(p, seed, moves)`: the weak instance of the
+/// seed (`spec0`, whose planted `d` is the logarithm), moved `moves` random
+/// isogeny steps off the weak locus to the challenge curve, with `G`, `Q`
+/// transported onto it.  The instance's construction, never charged.
+#[derive(Clone, Debug)]
+pub struct Challenge {
+    pub spec0: super::jv_cover::Spec,
+    pub curve: Curve2,
+    pub g: Pt2,
+    pub q: Pt2,
+}
+
+/// Build the challenge with the walk context and the run's generator (whose
+/// state the attack then continues from, as [`run_end_to_end`] always has).
+/// `Err` when the moves could not leave the weak locus.
+fn build_challenge(
+    ctx: &WalkCtx,
     p: u64,
     seed: u64,
     moves: usize,
     jumps: &[u64],
-    cap_mult: u64,
-    rho_s_ref: f64,
-    margin: f64,
-    stop: Option<usize>,
-) -> EndToEndReport {
+    rng: &mut StdRng,
+) -> Result<Challenge, &'static str> {
     use super::jv_cover::generate_spec;
-    use super::jv_sieve::{run_cover_sieve_dlp, run_cover_sieve_dlp_on};
-    let start = Instant::now();
-    let ctx = WalkCtx::new(p);
     let f = &ctx.f;
     let spec0 = generate_spec(p, seed);
-    let l = spec0.l;
     let w0 = Curve2 {
         e: [E6::ZERO, spec0.alpha, f.sigma(&spec0.alpha)],
     };
-    let trace = (p as i128).pow(6) + 1 - 4 * l as i128;
-    let mut rng = StdRng::seed_from_u64(seed ^ 0xE2E_18);
-    let mut rep = EndToEndReport {
-        p,
-        seed,
-        moves,
-        l,
-        bits: (l as f64).log2(),
-        c_add_e: 0.0,
-        rho_s_ref,
-        stage: String::from("ok"),
-        ..Default::default()
-    };
-
-    // ── build the challenge C: move away from weak, transporting G, Q
+    // ── move away from weak, transporting G, Q
     let mut cur = w0;
     let mut g = (spec0.g.x, spec0.g.y);
     let mut q = (spec0.q.x, spec0.q.y);
@@ -1727,12 +1775,12 @@ pub fn run_end_to_end(
     for i in 0..(moves + 200) {
         // candidate moves: 2-edges and ℓ-targets, each with its codomain
         let mut cands: Vec<(Step, Curve2)> = cur
-            .two_edges(&ctx, None)
+            .two_edges(ctx, None)
             .into_iter()
             .map(|e| (Step::Two { from: cur, k: e.k }, e.curve))
             .collect();
         for &ell in jumps {
-            for (tgt, ker) in cur.ell_targets_with_kernels(&ctx, ell, &mut rng) {
+            for (tgt, ker) in cur.ell_targets_with_kernels(ctx, ell, rng) {
                 cands.push((
                     Step::Odd {
                         from: cur,
@@ -1756,21 +1804,121 @@ pub fn run_end_to_end(
         }
     }
     if !done && cur.weak_by_norms(f) {
-        // could not leave the weak locus; report the failure honestly
-        rep.stage = String::from("challenge_weak");
-        rep.wall_ms = start.elapsed().as_secs_f64() * 1e3;
-        return rep;
+        return Err("challenge_weak");
     }
-    rep.challenge_non_weak = !cur.weak_by_norms(f);
-    let challenge = cur;
-    let gc = g;
-    let qc = q;
-    debug_assert!(challenge.on_curve(f, &gc) && challenge.on_curve(f, &qc));
+    debug_assert!(cur.on_curve(f, &g) && cur.on_curve(f, &q));
+    Ok(Challenge {
+        spec0,
+        curve: cur,
+        g,
+        q,
+    })
+}
+
+/// The challenge of [`run_end_to_end`] for `(p, seed, moves)`, the same
+/// curve and points the attack is handed (for a reference arm run on it).
+pub fn challenge_instance(
+    p: u64,
+    seed: u64,
+    moves: usize,
+    jumps: &[u64],
+) -> Result<Challenge, String> {
+    let ctx = WalkCtx::new(p);
+    let mut rng = StdRng::seed_from_u64(seed ^ 0xE2E_18);
+    build_challenge(&ctx, p, seed, moves, jumps, &mut rng).map_err(str::to_string)
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn run_end_to_end(
+    p: u64,
+    seed: u64,
+    moves: usize,
+    jumps: &[u64],
+    cap_mult: u64,
+    rho_s_ref: f64,
+    margin: f64,
+    stop: Option<usize>,
+) -> EndToEndReport {
+    run_end_to_end_with(
+        p, seed, moves, jumps, cap_mult, rho_s_ref, margin, stop, true,
+    )
+}
+
+/// [`run_end_to_end`], with the paired walk-free route on the weak curve of
+/// the same seed run only when `paired` is set (it is a comparison, not part
+/// of the attack).  Phases are attributed for `jv_bitops` (instance and
+/// harness work outside the attack's phases); the paired route attributes
+/// its own phases like the attack's, so a counted run sets `paired = false`.
+#[allow(clippy::too_many_arguments)]
+pub fn run_end_to_end_with(
+    p: u64,
+    seed: u64,
+    moves: usize,
+    jumps: &[u64],
+    cap_mult: u64,
+    rho_s_ref: f64,
+    margin: f64,
+    stop: Option<usize>,
+    paired: bool,
+) -> EndToEndReport {
+    use super::jv_bitops::{enter, Phase};
+    use super::jv_sieve::{run_cover_sieve_dlp, run_cover_sieve_dlp_on};
+    let start = Instant::now();
+    let ctx = {
+        let _g = enter(Phase::Walk);
+        WalkCtx::new(p)
+    };
+    let f = &ctx.f;
+    let mut rng = StdRng::seed_from_u64(seed ^ 0xE2E_18);
+
+    // ── build the challenge C: move away from weak, transporting G, Q
+    let built = {
+        let _g = enter(Phase::Instance);
+        build_challenge(&ctx, p, seed, moves, jumps, &mut rng)
+    };
+    let (spec0, challenge, gc, qc) = match built {
+        Ok(c) => (c.spec0, c.curve, c.g, c.q),
+        Err(stage) => {
+            // could not leave the weak locus; report the failure honestly
+            let spec0 = super::jv_cover::generate_spec(p, seed);
+            return EndToEndReport {
+                p,
+                seed,
+                moves,
+                l: spec0.l,
+                bits: (spec0.l as f64).log2(),
+                rho_s_ref,
+                stage: String::from(stage),
+                wall_ms: start.elapsed().as_secs_f64() * 1e3,
+                ..Default::default()
+            };
+        }
+    };
+    let l = spec0.l;
+    let trace = (p as i128).pow(6) + 1 - 4 * l as i128;
+    let mut rep = EndToEndReport {
+        p,
+        seed,
+        moves,
+        l,
+        bits: (l as f64).log2(),
+        c_add_e: 0.0,
+        rho_s_ref,
+        stage: String::from("ok"),
+        ..Default::default()
+    };
+    rep.challenge_non_weak = {
+        let _g = enter(Phase::Instance);
+        !challenge.weak_by_norms(f)
+    };
 
     // ── attack: walk back to a weak curve (charged)
     f.reset_muls();
     let cap = cap_mult * p * p;
-    let walk = walk_to_weak_record(&ctx, challenge, jumps, cap, trace, &mut rng);
+    let walk = {
+        let _g = enter(Phase::Walk);
+        walk_to_weak_record(&ctx, challenge, jumps, cap, trace, &mut rng)
+    };
     rep.walk_muls = f.muls();
     let Some((weak, path)) = walk else {
         rep.stage = String::from("walk_none");
@@ -1789,15 +1937,19 @@ pub fn run_end_to_end(
     f.reset_muls();
     let mut gw = gc;
     let mut qw = qc;
-    for step in &path {
-        gw = map_step(f, step, &gw);
-        qw = map_step(f, step, &qw);
+    {
+        let _g = enter(Phase::Transport);
+        for step in &path {
+            gw = map_step(f, step, &gw);
+            qw = map_step(f, step, &qw);
+        }
     }
     rep.transport_muls = f.muls();
     debug_assert!(weak.on_curve(f, &gw) && weak.on_curve(f, &qw));
 
     // ── model change onto the cover's form (charged)
     f.reset_muls();
+    let model_guard = enter(Phase::Model);
     let Some((alpha, mapped)) = model_change(&ctx, &weak, &[gw, qw]) else {
         rep.model_muls = f.muls();
         rep.stage = String::from("model_change_none");
@@ -1820,9 +1972,14 @@ pub fn run_end_to_end(
         rep.wall_ms = start.elapsed().as_secs_f64() * 1e3;
         return rep;
     };
+    drop(model_guard);
 
-    // ── the sieved route on the transported instance
-    let route = run_cover_sieve_dlp_on(&spec, seed, 0, rho_s_ref, stop, margin, None, true);
+    // ── the sieved route on the transported instance (it attributes its
+    // own phases; anything it leaves unattributed is the attack's)
+    let route = {
+        let _g = enter(Phase::Unattributed);
+        run_cover_sieve_dlp_on(&spec, seed, 0, rho_s_ref, stop, margin, None, true)
+    };
     rep.route_muls = route.total_muls;
     rep.route_solved = route.solved;
     rep.route_correct = route.correct;
@@ -1830,6 +1987,7 @@ pub fn run_end_to_end(
 
     // ── verify the recovered scalar on the challenge curve itself
     if route.correct {
+        let _g = enter(Phase::Verification);
         let got = challenge.scalar_mul(f, &gc, spec0.d as u128);
         rep.verified_on_challenge = got == Some(qc);
     }
@@ -1844,9 +2002,12 @@ pub fn run_end_to_end(
     rep.s_over_rho = rep.total_muls as f64 / rho_muls;
 
     // ── paired walk-free route on the weak curve of the same seed
-    let route_only = run_cover_sieve_dlp(p, seed, 0, rho_s_ref, stop, margin, None, true);
-    rep.route_only_s_over_rho = route_only.total_muls as f64 / rho_muls;
-    rep.e2e_over_route_only = rep.total_muls as f64 / (route_only.total_muls.max(1)) as f64;
+    if paired {
+        let _g = enter(Phase::Harness);
+        let route_only = run_cover_sieve_dlp(p, seed, 0, rho_s_ref, stop, margin, None, true);
+        rep.route_only_s_over_rho = route_only.total_muls as f64 / rho_muls;
+        rep.e2e_over_route_only = rep.total_muls as f64 / (route_only.total_muls.max(1)) as f64;
+    }
     rep.wall_ms = start.elapsed().as_secs_f64() * 1e3;
     rep
 }
@@ -2233,6 +2394,41 @@ pub fn characterize_weak(reports: &[ExactCensus]) -> String {
                 cells.join(" · ")
             );
         }
+        // §18.6's registered readout for rule R-v2 (weak iff v₂(D) ≥ 6)
+        let v2_of = |t: i128| val(t * t - 4 * q3, 2);
+        let weak_v5 = weak.iter().filter(|&&t| v2_of(t) == 5).count();
+        let bucket = |pred: &dyn Fn(u32) -> bool| -> (u64, u64) {
+            let mut w = 0u64;
+            let mut n = 0u64;
+            for &t in &classes {
+                if pred(v2_of(t)) {
+                    n += 1;
+                    w += weak.contains(&t) as u64;
+                }
+            }
+            (w, n)
+        };
+        let (w6, n6) = bucket(&|v| v == 6);
+        let (w7, n7) = bucket(&|v| (7..99).contains(&v));
+        let (w5, n5) = bucket(&|v| v == 5);
+        let sampled = r.random_traces.len().max(1) as f64;
+        let pred_reach =
+            r.random_traces.iter().filter(|&&t| v2_of(t) >= 6).count() as f64 / sampled;
+        let _ = writeln!(
+            out,
+            "- **R-v2 readout**: V1 weak traces with v₂(D) = 5: {}/{} ({:.2} %) · V2 weak share at v₂ = 6: {:.3} ({}), at v₂ ≥ 7: {:.3} ({}), at v₂ = 5: {:.3} ({}) · V3 predicted reach (sampled curves with v₂ ≥ 6) {:.4} against census reach {:.4}",
+            weak_v5,
+            weak.len(),
+            100.0 * weak_v5 as f64 / weak.len().max(1) as f64,
+            w6 as f64 / n6.max(1) as f64,
+            n6,
+            w7 as f64 / n7.max(1) as f64,
+            n7,
+            w5 as f64 / n5.max(1) as f64,
+            n5,
+            pred_reach,
+            r.random_in_weak_classes
+        );
     }
     out
 }
@@ -2629,7 +2825,18 @@ mod tests {
     #[test]
     fn the_rebuilt_walk_reaches_weak_curves_at_p7_and_p13() {
         for (p, trials) in [(7u64, 20usize), (13, 12)] {
-            let r = run_walk2(p, 1, trials, 3 * p * p, &[3, 5, 7], 1000, false, false, 8);
+            let r = run_walk2(
+                p,
+                1,
+                trials,
+                3 * p * p,
+                &[3, 5, 7],
+                1000,
+                false,
+                false,
+                8,
+                false,
+            );
             // every walk ends found, capped or exhausted; at these sizes many
             // closures hold no weak curve, so exhaustion is common
             assert_eq!(
@@ -2716,6 +2923,60 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    #[ignore = "long end-to-end sieve; run in jv-isogeny-walk CI"]
+    fn counted_end_to_end_keeps_the_legacy_counts_and_charges_every_phase() {
+        use crate::cryptanalysis::jv_bitops::{self, Kind, Phase};
+        use crate::cryptanalysis::jv_cover::set_trace_scope;
+        // one thread: every nested parallel iterator runs on the pool's
+        // thread, which owns the tally
+        let pool = rayon::ThreadPoolBuilder::new()
+            .num_threads(1)
+            .build()
+            .unwrap();
+        let run = |scope: u64| {
+            pool.install(|| {
+                set_trace_scope(scope);
+                jv_bitops::claim();
+                jv_bitops::set_moduli(101, super::super::jv_cover::generate_spec(101, 1).l);
+                let before = jv_bitops::snapshot();
+                let r = run_end_to_end_with(101, 1, 8, &[3, 5, 7], 3, 1.3, 1.25, Some(64), false);
+                (r, jv_bitops::snapshot().since(&before))
+            })
+        };
+        jv_bitops::enable(true);
+        let (a, ta) = run(0xA11CE);
+        let (b, tb) = run(0xB0B);
+        // a cold trace scope per run: the same counts both times
+        assert_eq!(ta, tb);
+        assert_eq!(
+            (a.walk_muls, a.transport_muls, a.model_muls, a.route_muls),
+            (b.walk_muls, b.transport_muls, b.model_muls, b.route_muls)
+        );
+        assert!(a.route_correct && a.verified_on_challenge, "{a:?}");
+        for ph in [
+            Phase::Instance,
+            Phase::Walk,
+            Phase::Model,
+            Phase::FactorBase,
+            Phase::Relations,
+            Phase::Descent,
+            Phase::LinearAlgebra,
+            Phase::Verification,
+        ] {
+            assert!(ta.phase(ph).field_ops() > 0, "{ph:?} has no field work");
+        }
+        // the sieve's probes and scans, the descent's F4 row operations, the
+        // linear algebra modulo ℓ
+        assert!(ta.phase(Phase::Relations).get(Kind::WordOp) > 0);
+        assert!(ta.phase(Phase::Relations).get(Kind::HashProbe) > 0);
+        assert!(ta.phase(Phase::LinearAlgebra).get(Kind::ModrMul) > 0);
+        assert!(ta.phase(Phase::Descent).get(Kind::FieldInv) > 0);
+        // the legacy product count is a lower bound of the counted products
+        let ic = ta.sum(&Phase::IC);
+        assert!(ic.get(Kind::FieldMul) + ic.get(Kind::ModrMul) > 0);
     }
 
     #[test]

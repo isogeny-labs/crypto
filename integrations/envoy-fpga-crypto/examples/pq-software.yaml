@@ -1,0 +1,47 @@
+# Requires the custom Envoy binary and separately built CPU plugin.
+# This loopback demo uses volatile software keys, not FPGA acceleration.
+static_resources:
+  listeners:
+    - name: pq_software_demo
+      address:
+        socket_address: {address: 127.0.0.1, port_value: 8088}
+      filter_chains:
+        - filters:
+            - name: envoy.filters.network.http_connection_manager
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                stat_prefix: pq_demo
+                stream_idle_timeout: 30s
+                route_config:
+                  name: local
+                  virtual_hosts:
+                    - name: local
+                      domains: ["*"]
+                      routes:
+                        - match: {prefix: /}
+                          direct_response: {status: 404}
+                http_filters:
+                  - name: envoy.filters.http.pq_crypto
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.fpga_crypto.v3.PqHttp
+                      value:
+                        backend: software-liboqs
+                        plugin_library: /opt/envoy/lib/libfpga_pq_oqs.so
+                        allow_experimental: false
+                        max_keys: 32
+                        queue_capacity: 32
+                        timeout_ms: 10000
+                        path_prefix: /_pq/
+                        routes:
+                          mldsa/keygen: {operation: keygen, algorithm: ML-DSA-65, key_slot: 101}
+                          mldsa/public-key: {operation: public-key, algorithm: ML-DSA-65, key_slot: 101}
+                          mldsa/sign: {operation: sign, algorithm: ML-DSA-65, key_slot: 101}
+                          mldsa/verify: {operation: verify, algorithm: ML-DSA-65}
+                          mldsa/erase: {operation: erase, algorithm: ML-DSA-65, key_slot: 101}
+                          mlkem/keygen: {operation: keygen, algorithm: ML-KEM-768, key_slot: 102}
+                          mlkem/encapsulate: {operation: encapsulate, algorithm: ML-KEM-768}
+                          mlkem/decapsulate: {operation: decapsulate, algorithm: ML-KEM-768, key_slot: 102}
+                          mlkem/erase: {operation: erase, algorithm: ML-KEM-768, key_slot: 102}
+                  - name: envoy.filters.http.router
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router

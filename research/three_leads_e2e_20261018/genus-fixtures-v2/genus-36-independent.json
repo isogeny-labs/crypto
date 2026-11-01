@@ -1,0 +1,75 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "ic.three_leads_genus2_v2",
+        "params": {
+          "independent": "1",
+          "trial_cap": "19682700",
+          "unique_relations": "1"
+        }
+      },
+      "name": "independent",
+      "role": "candidate"
+    }
+  ],
+  "description": "Fresh three-leads counts-only experiment; all cold phases; walls unqualified",
+  "label": "three-leads-genus-36-independent-walk-cycle-v2",
+  "measurement": {
+    "isolation_required": "L2",
+    "order": "shuffle",
+    "rounds": 1,
+    "seed": 2026101801,
+    "timeout_seconds": 1200,
+    "warmup": 0
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 12881175837,
+        "b": 38414194965,
+        "family": "scholten",
+        "group_order": 38668393472,
+        "gx": 308920721,
+        "gy": 31109378734,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 196643,
+        "parameter": 0,
+        "r": 803449
+      },
+      {
+        "a": 21822298847,
+        "b": 11856001764,
+        "family": "scholten",
+        "group_order": 38690815328,
+        "gx": 24944,
+        "gy": 32756219367,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 196699,
+        "parameter": 0,
+        "r": 109917089
+      },
+      {
+        "a": 24280851789,
+        "b": 30476125920,
+        "family": "scholten",
+        "group_order": 38701344608,
+        "gx": 38461342717,
+        "gy": 33975745432,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 196727,
+        "parameter": 0,
+        "r": 25732277
+      }
+    ],
+    "target_seed": 202610181260,
+    "targets_per_curve": 1
+  }
+}

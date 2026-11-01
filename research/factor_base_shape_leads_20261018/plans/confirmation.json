@@ -1,0 +1,86 @@
+{
+  "schema": "factor_base_sweep/v1",
+  "seed": 2026101802,
+  "train": 64,
+  "holdout": 128,
+  "max_degree": 8,
+  "candidate_seconds": 20,
+  "max_abscissae": 64,
+  "max_matrix_cells": 2000000,
+  "memory_mib": 2048,
+  "threads": 1,
+  "candidates": [
+    {
+      "label": "confirmation-coordinate-d5",
+      "curve": {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 13
+      },
+      "factor_base": null,
+      "shape": "coordinate",
+      "dimension": 5,
+      "seed": 17
+    },
+    {
+      "label": "confirmation-random-d5-seed17",
+      "curve": {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 13
+      },
+      "factor_base": null,
+      "shape": "random",
+      "dimension": 5,
+      "seed": 17
+    },
+    {
+      "label": "confirmation-random-d5-seed29",
+      "curve": {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 13
+      },
+      "factor_base": null,
+      "shape": "random",
+      "dimension": 5,
+      "seed": 29
+    },
+    {
+      "label": "confirmation-tracezero-gp-d5-seed17",
+      "curve": {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 13
+      },
+      "factor_base": null,
+      "shape": "tracezero-gp",
+      "dimension": 5,
+      "seed": 17
+    },
+    {
+      "label": "confirmation-tracezero-gp-d5-seed29",
+      "curve": {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 13
+      },
+      "factor_base": null,
+      "shape": "tracezero-gp",
+      "dimension": 5,
+      "seed": 29
+    },
+    {
+      "label": "confirmation-tracezero-gp-d5-seed43",
+      "curve": {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 13
+      },
+      "factor_base": null,
+      "shape": "tracezero-gp",
+      "dimension": 5,
+      "seed": 43
+    }
+  ]
+}

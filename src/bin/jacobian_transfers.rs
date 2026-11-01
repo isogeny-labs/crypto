@@ -2,7 +2,7 @@
 //! registered curve's discrete logarithm into a Jacobian.
 //!
 //! ```text
-//! jacobian_transfers build                   # docs/curves/registry.json → docs/curves/jacobian-transfers.json
+//! jacobian_transfers build                   # catalog rows of docs/curves/registry.json → docs/curves/jacobian-transfers.json
 //! jacobian_transfers check                   # the committed file is current (CI)
 //! jacobian_transfers show "Oakley Group 3"   # one curve, every route
 //! jacobian_transfers rank --top 20           # curves by best ratio
@@ -22,6 +22,7 @@ use crypto_lib::cryptanalysis::jacobian_transfer::{
 
 const REGISTRY: &str = "docs/curves/registry.json";
 const OUT: &str = "docs/curves/jacobian-transfers.json";
+const CATALOG: &str = crypto_lib::cryptanalysis::cover_catalog::MANIFEST_PATH;
 
 #[derive(Parser)]
 #[command(about = "Jacobian transfer routes of registered curves: build, check, show, rank, chart")]
@@ -32,10 +33,13 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Cmd {
-    /// Screen every registry curve and write the report.
+    /// Screen every curve of the catalog and write the report.
     Build {
         #[arg(long, default_value = REGISTRY)]
         registry: String,
+        /// The manifest naming the registry rows to screen.
+        #[arg(long, default_value = CATALOG)]
+        catalog: String,
         #[arg(long, default_value = OUT)]
         out: String,
         /// Pollard-rho iterations per order whose subgroup is not recorded.
@@ -46,6 +50,8 @@ enum Cmd {
     Check {
         #[arg(long, default_value = REGISTRY)]
         registry: String,
+        #[arg(long, default_value = CATALOG)]
+        catalog: String,
         #[arg(long, default_value = OUT)]
         report: String,
     },
@@ -61,7 +67,7 @@ enum Cmd {
     Rank {
         #[arg(long, default_value_t = 25)]
         top: usize,
-        /// Only curves with this verdict (`formula_advantage`, `formula_marginal`, `unresolved`, `boundary`, `not_carried`).
+        /// Only curves with this verdict (`formula_advantage`, `formula_marginal`, `boundary`, `not_carried`).
         #[arg(long)]
         class: Option<String>,
         #[arg(long, default_value = OUT)]
@@ -172,12 +178,15 @@ fn run(cli: Cli) -> Result<bool, String> {
     match cli.cmd {
         Cmd::Build {
             registry,
+            catalog,
             out,
             budget,
         } => {
             let text =
                 std::fs::read_to_string(&registry).map_err(|e| format!("{registry}: {e}"))?;
-            let file = TransferFile::build(&text, CostModel::default(), budget)?;
+            let manifest =
+                std::fs::read_to_string(&catalog).map_err(|e| format!("{catalog}: {e}"))?;
+            let file = TransferFile::build(&text, &manifest, CostModel::default(), budget)?;
             std::fs::write(&out, file.to_json()).map_err(|e| format!("{out}: {e}"))?;
             eprintln!(
                 "wrote {} curves, {} routes to {out}; verdicts {:?}",
@@ -185,15 +194,25 @@ fn run(cli: Cli) -> Result<bool, String> {
             );
             Ok(true)
         }
-        Cmd::Check { registry, report } => {
+        Cmd::Check {
+            registry,
+            catalog,
+            report,
+        } => {
             let committed =
                 std::fs::read_to_string(&report).map_err(|e| format!("{report}: {e}"))?;
             let parsed = load(&report)?;
             let text =
                 std::fs::read_to_string(&registry).map_err(|e| format!("{registry}: {e}"))?;
-            let fresh =
-                TransferFile::build(&text, parsed.cost_model.clone(), parsed.factor_budget)?
-                    .to_json();
+            let manifest =
+                std::fs::read_to_string(&catalog).map_err(|e| format!("{catalog}: {e}"))?;
+            let fresh = TransferFile::build(
+                &text,
+                &manifest,
+                parsed.cost_model.clone(),
+                parsed.factor_budget,
+            )?
+            .to_json();
             if fresh == committed {
                 eprintln!("{report} is current");
                 return Ok(true);
@@ -288,13 +307,8 @@ fn run(cli: Cli) -> Result<bool, String> {
                 .iter()
                 .filter(|c| c.verdict == RouteClass::FormulaMarginal)
                 .count();
-            let unresolved = file
-                .curves
-                .iter()
-                .filter(|c| c.verdict == RouteClass::Unresolved)
-                .count();
             eprintln!(
-                "{} curves, {adv} with a formula advantage, {marginal} marginal, {unresolved} unresolved",
+                "{} curves, {adv} with a formula advantage, {marginal} marginal",
                 file.curves.len()
             );
             Ok(true)

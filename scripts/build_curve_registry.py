@@ -279,7 +279,7 @@ def generator_of(o: dict) -> tuple[int, int] | None:
 
 
 def subgroup_of(o: dict, order: int) -> tuple[int, int] | None:
-    r = _int(o.get("subgroup_order"))
+    r = _int(o.get("subgroup_order", o.get("r")))
     h = _int(o.get("cofactor"))
     if r is None:
         return None
@@ -310,7 +310,18 @@ def add_koblitz(reg: Registry, a: int, n: int, source: str, standard: str | None
 
 
 def harvest_json(reg: Registry, problems: list[str], fatal: list[str]) -> None:
+    # Explicit coordinate forms are normalized by the native registry_models
+    # tool. This harvester consumes its field results and checks source bytes;
+    # it must never reinterpret quadratic coefficients as a short model.
+    native_path = REPO / "docs/curves/sources/prime-models.json"
+    try:
+        native_doc = json.loads(native_path.read_text())
+        native_rows = native_doc["records"] if native_doc.get("schema") == "prime-models-normalization/v1" else []
+    except (OSError, ValueError, KeyError):
+        native_rows = []
     for path in tracked("*.json"):
+        if path == native_path:
+            continue
         try:
             if path.stat().st_size > MAX_JSON_BYTES:
                 continue
@@ -318,15 +329,17 @@ def harvest_json(reg: Registry, problems: list[str], fatal: list[str]) -> None:
         except (OSError, ValueError, UnicodeDecodeError):
             continue
         rel = str(path.relative_to(REPO))
-        stack = [doc]
+        stack = [(doc, "")]
         while stack:
-            o = stack.pop()
+            o, pointer = stack.pop()
             if isinstance(o, list):
-                stack.extend(x for x in o if isinstance(x, (dict, list)))
+                stack.extend((x, f"{pointer}/{index}") for index, x in enumerate(o)
+                             if isinstance(x, (dict, list)))
                 continue
             if not isinstance(o, dict):
                 continue
-            stack.extend(v for v in o.values() if isinstance(v, (dict, list)))
+            stack.extend((v, pointer + "/" + str(k).replace("~", "~0").replace("/", "~1"))
+                         for k, v in o.items() if isinstance(v, (dict, list)))
             order = _int(o.get("group_order", o.get("order")))
             name = o.get("name") if isinstance(o.get("name"), str) else None
             field = o.get("field")
@@ -363,6 +376,29 @@ def harvest_json(reg: Registry, problems: list[str], fatal: list[str]) -> None:
                     if g and rh:
                         reg.represent(ident, *binary_record(m, f, a, b, order, *rh, g), rel)
                 elif "p" in o and "a" in o and "b" in o and order:
+                    form = o.get("model", o.get("form"))
+                    form = "".join(form.split()) if isinstance(form, str) else None
+                    if form == "y^2=x^3+ax^2+bx":
+                        rows = [row for row in native_rows
+                                if row.get("source") == rel and row.get("pointer") == pointer
+                                and row.get("original") == o]
+                        if len(rows) != 1 or rows[0].get("source_sha256") != hashlib.sha256(path.read_bytes()).hexdigest():
+                            fatal.append(f"{rel}: native prime-model normalization is missing or stale; "
+                                         "run registry_models from tools/isogeny-cli")
+                            continue
+                        row = rows[0]
+                        ident, params = row["identity"], row["params"]
+                        check_rust(o, ident, rel, fatal)
+                        reg.add(ident, "prime", params, rel, [name] if name else [])
+                        # A future record with a generator must carry its
+                        # native coordinate conversion before an EC1 is added.
+                        if generator_of(o):
+                            fatal.append(f"{rel}: native normalization does not yet export generator coordinates")
+                        continue
+                    if form is not None and form not in {
+                            "shortWeierstrass", "y^2=x^3+ax+b", "y^2=x^3+a*x+b"}:
+                        fatal.append(f"{rel}: unsupported explicit prime model {form!r}")
+                        continue
                     p, a, b = _int(o["p"]), _int(o["a"]), _int(o["b"])
                     if p is None or a is None or b is None or p < 5:
                         continue
@@ -437,6 +473,12 @@ def check_thread_ids(curves: list[dict], fatal: list[str]) -> None:
             if uid and uid not in held:
                 fatal.append(f"{path.relative_to(REPO)}: {c.get('curve_id')} ({uid[-12:]}) "
                              "is not a representation in the registry")
+        # List-format files record no UID; derive it from the record itself.
+        for p, a, b, order, r, h, g in prepared_prime_rows(doc):
+            uid = ec1.curve_identity(*prime_record(p, a, b, order, r, h, g), "x")["curve_uid"]
+            if uid not in held:
+                fatal.append(f"{path.relative_to(REPO)}: prime record p={p} a={a} b={b} "
+                             f"({uid[-12:]}) is not a representation in the registry")
 
 
 def check_calibration(reg: "Registry", fatal: list[str]) -> None:
@@ -475,6 +517,83 @@ def harvest_curve_records(reg: Registry) -> None:
             reg.add(ident, "koblitz" if koblitz else "binary", params, rel,
                     koblitz_aliases(a, m) if koblitz else [])
             reg.represent(ident, f, {k: v for k, v in c.items() if k != "curve_id"}, rel)
+
+
+def harvest_thread_binary_representations(reg: Registry) -> None:
+    """Keep full binary EC1 records in curve_ids.json in the registry too.
+
+    Some frozen thread inventories retain an exact generator representation
+    that predates (or was not copied into) their companion curve_records.json.
+    The UID is recomputed before importing the row, so this cannot silently
+    turn a stale identifier into a catalog entry.
+    """
+    held = {uid for reps in reg.reps.values() for uid in reps}
+    for path in tracked("*curve_ids.json"):
+        rel = str(path.relative_to(REPO))
+        try:
+            doc = json.loads(path.read_text())
+        except (OSError, ValueError):
+            continue
+        for row in doc.get("curves", []) if isinstance(doc, dict) else []:
+            if not isinstance(row, dict) or not row.get("curve_uid") or row["curve_uid"] in held:
+                continue
+            field, curve = row.get("field"), row.get("curve")
+            if not isinstance(field, dict) or not isinstance(curve, dict):
+                continue
+            coeff = curve.get("coefficients")
+            order = _int(row.get("group_order"))
+            if (field.get("characteristic") != 2 or not isinstance(coeff, list)
+                    or len(coeff) != 5 or coeff[0] != 1 or coeff[2] or coeff[3]
+                    or not order or not isinstance(field.get("degree"), int)
+                    or not isinstance(field.get("modulus_exponents"), list)):
+                continue
+            m = field["degree"]
+            modulus = sum(1 << e for e in field["modulus_exponents"])
+            a, b = coeff[1], coeff[4]
+            ident = cid.binary_id(m, modulus, a, b, order,
+                                  end="-7" if b == 1 and a in (0, 1) else "unk")
+            rep = ec1.curve_identity(field, curve, "x")
+            if rep["curve_uid"] != row["curve_uid"]:
+                raise ValueError(f"{rel}: stored EC1 UID does not match its binary record")
+            koblitz = b == 1 and a in (0, 1)
+            params = ({"a": a, "n": m, "modulus": cid._hex(modulus),
+                       "modulus_rule": "recorded in the run"}
+                      if koblitz else {"m": m, "modulus": cid._hex(modulus),
+                                      "a": cid._hex(a), "b": cid._hex(b)})
+            reg.add(ident, "koblitz" if koblitz else "binary", params, rel,
+                    koblitz_aliases(a, m) if koblitz else [])
+            reg.represent(ident, field, curve, rel)
+            held.add(rep["curve_uid"])
+
+
+def prepared_prime_rows(doc) -> list[tuple]:
+    """The rows of a list-format curve_ids.json (the conductor-gap threads):
+    each {p, a, b, order, r, generator} is one prime-field EC1 record."""
+    rows = []
+    for c in doc if isinstance(doc, list) else []:
+        if not isinstance(c, dict):
+            continue
+        p, a, b = _int(c.get("p")), _int(c.get("a")), _int(c.get("b"))
+        order, r, g = _int(c.get("order")), _int(c.get("r")), c.get("generator")
+        if None in (p, a, b, order, r) or not r or order % r or not isinstance(g, list) or len(g) != 2:
+            continue
+        rows.append((p, a, b, order, r, order // r, (int(g[0], 16), int(g[1], 16))))
+    return rows
+
+
+def harvest_prepared_curve_ids(reg: Registry) -> None:
+    """List-format curve_ids.json files carry no EC1 UID, only the record:
+    representations are rebuilt from it, so a registry rebuild keeps them."""
+    for path in tracked("*curve_ids.json"):
+        rel = str(path.relative_to(REPO))
+        try:
+            doc = json.loads(path.read_text())
+        except (OSError, ValueError):
+            continue
+        for p, a, b, order, r, h, g in prepared_prime_rows(doc):
+            ident = cid.prime_id(p, a, b, order)
+            reg.add(ident, "prime", {"p": str(p), "a": str(a % p), "b": str(b % p)}, rel)
+            reg.represent(ident, *prime_record(p, a, b, order, r, h, g), rel)
 
 
 def harvest_bench(reg: Registry) -> None:
@@ -559,6 +678,50 @@ def harvest_programme_extensions(reg: Registry) -> None:
     add_extension_doc(reg, B2_C050)
 
 
+THREE_LEADS_FIXTURES = (
+    "research/three_leads_e2e_20261018/coverage-fixtures-v3/fixtures.json",
+    "research/three_leads_e2e_20261018/genus-fixtures-v1/fixtures.json",
+    "research/three_leads_e2e_20261018/genus-order-fixtures-v1/fixtures.json",
+)
+
+
+def _base_p_coefficients(value: int, degree: int, p: int) -> list[int]:
+    coefficients = []
+    for _ in range(degree):
+        value, coefficient = divmod(value, p)
+        coefficients.append(coefficient)
+    if value:
+        raise ValueError("packed extension coefficient exceeds field degree")
+    return coefficients
+
+
+def harvest_three_leads_extensions(reg: Registry) -> None:
+    """Retain the exact extension models in the frozen three-leads fixtures."""
+    for rel in THREE_LEADS_FIXTURES:
+        rows = json.loads((REPO / rel).read_text())
+        for row in rows:
+            curve = row["curve"]
+            field = curve["f"]
+            p, degree = int(field["p"]), int(field["n"])
+            if curve["binary"] or degree < 2:
+                continue
+            coefficients = curve["c"]
+            order = int(row["order"])
+            if (len(coefficients) != 4 or coefficients[2:] != [0, 1]
+                    or int(row["r"]) * int(row["h"]) != order
+                    or int(row["evidence"]["order"]) != order):
+                raise ValueError(f"invalid frozen extension record in {rel}")
+            modulus = _base_p_coefficients(int(field["modulus"]), degree, p)
+            a = _base_p_coefficients(int(coefficients[1]), degree, p)
+            b = _base_p_coefficients(int(coefficients[0]), degree, p)
+            ident = cid.extension_id(p, degree, modulus, a, b, order)
+            ident["trace"] = str(ident["trace"])
+            reg.add(ident, "extension", {
+                "p": p, "degree": degree, "modulus": int(field["modulus"]),
+                "a": int(coefficients[1]), "b": int(coefficients[0]),
+            }, rel)
+
+
 def harvest_standards(reg: Registry) -> None:
     for a, n in DESIGNATED_KOBLITZ:
         add_koblitz(reg, a, n, STANDARD_MODULI[n][1])
@@ -638,7 +801,19 @@ def carry_forward(reg: Registry) -> None:
     curve is gone, and the slug that replaced it must still resolve."""
     if not OUT.exists():
         return
+    # Deprecated erroneous extraction labels (prime-model-corrections.json)
+    # are retained as provenance in that file only; carrying them forward
+    # would resurrect the wrong models, e.g. after a merge of a stale
+    # registry.json.
+    try:
+        corrections = json.loads(
+            (REPO / "docs/curves/sources/prime-model-corrections.json").read_text())["corrections"]
+        deprecated = {c["deprecated_extraction_slug"] for c in corrections}
+    except (OSError, ValueError, KeyError):
+        deprecated = set()
     for e in json.loads(OUT.read_text())["curves"]:
+        if e["slug"] in deprecated:
+            continue
         key = hashlib.sha256(e["model_json"].encode("ascii")).hexdigest()
         if key in reg.curves:
             for a in e["aliases"]:
@@ -653,15 +828,48 @@ def carry_forward(reg: Registry) -> None:
             reg.alias_text.setdefault(cid.normalise_alias(a), a)
 
 
+def harvest_native_factor_base_history(reg: Registry) -> None:
+    """Assemble already computed native identities; do no curve arithmetic."""
+    path = REPO / "docs/curves/sources/factor-base-evaluation-20261015.json"
+    if not path.exists():
+        return
+    doc = json.loads(path.read_text())
+    if doc.get("schema") != "ecbench.historical_curve_registry/v1":
+        raise ValueError("unsupported native historical curve registry")
+    for row in doc["curves"]:
+        ident = dict(row, model_sha256=hashlib.sha256(row["model_json"].encode()).hexdigest())
+        reg.add(ident, row["family"], row["params"], str(path.relative_to(REPO)), [])
+
+
+def harvest_native_quadratic_twists(reg: Registry) -> None:
+    """Assemble hash-bound native metadata; do not run curve arithmetic here."""
+    path = REPO / "docs/curves/sources/quadratic-twist-native-20261021.json"
+    if not path.exists():
+        return
+    doc = json.loads(path.read_text())
+    if doc.get("schema") != "quadratic-twist-native-models/v1":
+        raise ValueError("unsupported native quadratic-twist catalog")
+    for row in doc["models"]:
+        ident = dict(row, model_sha256=hashlib.sha256(row["model_json"].encode()).hexdigest())
+        reg.add(ident, row["family"], row["params"], str(path.relative_to(REPO)), [])
+        for rep in row["representations"]:
+            reg.represent(ident, rep["field"], rep["curve"], str(path.relative_to(REPO)))
+
+
 def build() -> tuple[dict, list[str], list[str]]:
     reg, problems, fatal = Registry(), [], []
     harvest_standards(reg)
     harvest_bench(reg)
     harvest_json(reg, problems, fatal)
     harvest_curve_records(reg)
+    harvest_thread_binary_representations(reg)
+    harvest_prepared_curve_ids(reg)
     harvest_text_koblitz(reg)
     harvest_native_standards(reg)
+    harvest_native_factor_base_history(reg)
+    harvest_native_quadratic_twists(reg)
     harvest_programme_extensions(reg)
+    harvest_three_leads_extensions(reg)
     carry_forward(reg)
     ambiguous = sorted(f"{reg.alias_text[k]!r} -> {len(v)} models"
                        for k, v in reg.alias_models.items() if len(v) > 1)

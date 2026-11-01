@@ -26,8 +26,13 @@ use crate::cryptanalysis::koblitz_fast::{FastCurve, FastPoint};
 use crate::cryptanalysis::koblitz_index_calculus::{
     frobenius_eigenvalue, is_irreducible_f2, koblitz_point_count, KoblitzCurve,
 };
+use crate::cryptanalysis::large_prime_filter as lpf;
 use crate::cryptanalysis::residual_walk::is_prime_u64;
 use crate::cryptanalysis::semaev_decomp::Gf2;
+
+pub mod orbit;
+pub mod trace_line;
+use orbit::{LambdaPowers, RelationFrame};
 
 pub const MANIFEST_SCHEMA: &str = "ecbench.curve-corpus/v1";
 pub const MAX_MANIFEST_BYTES: u64 = 16 * 1024 * 1024;
@@ -254,12 +259,12 @@ pub fn binary_explicit_instance(
             subgroup_order: order,
             cofactor: BigUint::from(group_order / r),
             lambda,
+            frobenius_is_endomorphism: true,
             k: 1,
             q: 2,
             a_index: a,
             b_index: 1,
             subfield_basis: vec![F2mElement::one(n)],
-            frobenius_is_endomorphism: true,
         })
     } else {
         None
@@ -397,7 +402,7 @@ pub fn independent_verify(
     Ok(())
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum RelationClass {
     Full,
@@ -405,7 +410,7 @@ pub enum RelationClass {
     DoubleLargePrime,
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PartialRelation {
     pub trial: u64,
     pub a: u64,
@@ -413,6 +418,121 @@ pub struct PartialRelation {
     pub class: RelationClass,
     pub raw_terms: Vec<usize>,
     pub columns: Vec<(usize, u64)>,
+}
+
+/// How partial relations with large primes are combined into complete ones.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum LargePrimeGraph {
+    /// The original streaming pivot elimination ([`LargePrimeEliminator`]).
+    /// This is the default, and every report produced before the orbit
+    /// quotient existed came from it.
+    #[default]
+    Online,
+    /// Collect every partial relation, then run the batch
+    /// [`lpf::filter_large_primes`] over *plain* large columns: one vertex
+    /// per canonical projected point, coefficients `+-1`.  Every emitted
+    /// complete relation is replayed against the curve.
+    Filter,
+    /// As [`Self::Filter`], but a large vertex is a signed Frobenius orbit
+    /// and the column coefficient carries the phase, `+-lambda^k`.
+    FilterOrbit,
+    /// As [`Self::FilterOrbit`], and a large prime whose orbit contains a
+    /// small (factor-base) column is rewritten into that small column.
+    FilterOrbitAbsorb,
+    /// The controlled version of [`Self::FilterOrbit`]: decompositions are
+    /// accepted with the **plain** column count (so the accepted relation
+    /// stream is exactly that of [`Self::Filter`]), and only the stored
+    /// relations are re-expressed in orbit columns before the batch filter.
+    ///
+    /// [`Self::FilterOrbit`] counts large *orbit* columns when it decides
+    /// whether a decomposition is acceptable, and the coarser column map
+    /// accepts a superset of what [`Self::Filter`] accepts (and can pick a
+    /// different first-hit decomposition of a trial).  The two therefore do
+    /// not see an identical relation stream; this arm does.
+    FilterOrbitPostCollect,
+}
+
+impl LargePrimeGraph {
+    /// `serde` skip predicate: the default arm adds no field to a report.
+    pub fn is_online(&self) -> bool {
+        matches!(self, Self::Online)
+    }
+
+    pub fn uses_filter(self) -> bool {
+        !self.is_online()
+    }
+
+    /// Whether large columns are quotiented by Frobenius orbits at all.
+    pub fn orbit(self) -> bool {
+        matches!(
+            self,
+            Self::FilterOrbit | Self::FilterOrbitAbsorb | Self::FilterOrbitPostCollect
+        )
+    }
+
+    pub fn absorb(self) -> bool {
+        matches!(self, Self::FilterOrbitAbsorb)
+    }
+
+    /// Whether the orbit map is applied only after collection, leaving the
+    /// acceptance of decompositions on the plain column count.
+    pub fn post_collect(self) -> bool {
+        matches!(self, Self::FilterOrbitPostCollect)
+    }
+}
+
+/// Optional instrumentation of a [`solve_with_options`] call.  The default
+/// adds nothing to a report, so `solve` output is unchanged (`charge_checks`
+/// is an accounting rule, not instrumentation, and is off by default).
+#[derive(Clone, Debug, Default)]
+pub struct SolveOptions {
+    /// Explicit nested binary basis for abscissae. `None` preserves the
+    /// historical polynomial-prefix base and its sealed replay records.
+    pub abscissa_basis: Option<Vec<u64>>,
+    /// The `_v2` accounting (`ic.large_prime_v2`): the target's `[r]Q`
+    /// subgroup-membership check and the final `[d]G = Q` check are counted
+    /// scalar multiplications in the verification phase.  Off, they are not
+    /// charged (the membership check runs on a ledger nobody reads, the final
+    /// check is the runner's), which is the first rule.
+    pub charge_checks: bool,
+    /// Hash every accepted decomposition `(trial, a, b, raw terms)` in order
+    /// into [`FilterPipelineReport::stream`], so two arms can be shown to have
+    /// seen the same relation stream.
+    pub stream_digest: bool,
+    /// Re-run the batch pipeline on prefixes of the stored relation stream to
+    /// find, without a trial cap, how many trials a given verified rank takes.
+    /// Filter arms only.
+    pub trajectory: Option<TrajectoryRequest>,
+    /// Test hook: damage one entry of the finished orbit table *after* its
+    /// self-checks, to show that the replays (not the table build) are what
+    /// catch a wrong coefficient.  Never set outside tests.
+    #[doc(hidden)]
+    pub table_fault: Option<TableFault>,
+}
+
+/// Which prefixes of the stored relation stream [`SolveOptions::trajectory`]
+/// reports in full (in addition to the first-hit search).
+#[derive(Clone, Debug, Default)]
+pub struct TrajectoryRequest {
+    /// Trial cutoffs: the prefix of stored relations with `trial <= cutoff`.
+    pub cutoffs: Vec<u64>,
+}
+
+/// A deliberate defect in the orbit table, for negative tests.
+#[doc(hidden)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum TableFault {
+    /// Multiply the factor of absorbed large point number `index` (in table
+    /// order; `None` = every one) by 2, which breaks `[factor]S = Q`.
+    AbsorbFactor { index: Option<usize> },
+    /// Multiply the factor of the *second* member of multi-member orbit number
+    /// `index` (`None` = of every multi-member orbit) by lambda: the
+    /// Frobenius phase of that member is off by one.  Only one member is
+    /// damaged on purpose: a damage shared by all members of an orbit is
+    /// the rescaling of one unknown, which the elimination absorbs, so only
+    /// a wrong *relative* factor makes a relation false.
+    OrbitFactor { index: Option<usize> },
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -424,6 +544,10 @@ pub struct SolveConfig {
     pub max_trials: u64,
     pub max_states: u64,
     pub seed: u64,
+    /// Off by default: [`LargePrimeGraph::Online`] is the original code path
+    /// and serialises without this field, so existing reports are unchanged.
+    #[serde(skip_serializing_if = "LargePrimeGraph::is_online")]
+    pub large_prime_graph: LargePrimeGraph,
 }
 
 #[derive(Clone, Debug, Default, Serialize)]
@@ -441,6 +565,20 @@ pub struct SolveCounters {
     pub lp_merge_ops_uncharged: u64,
     pub row_ops_uncharged: u64,
     pub lp_pivots: u64,
+    /// Scalar multiplications the `_v2` accounting charges to the
+    /// verification phase beyond the relation witness checks: the target's
+    /// `[r]Q` membership check and the final `[d]G = Q`.  Zero (and absent
+    /// from the report) for the first rule.
+    #[serde(skip_serializing_if = "is_zero")]
+    pub membership_checks: u64,
+    #[serde(skip_serializing_if = "is_zero")]
+    pub final_checks: u64,
+    #[serde(skip_serializing_if = "is_zero")]
+    pub final_checks_failed: u64,
+}
+
+fn is_zero(v: &u64) -> bool {
+    *v == 0
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -454,6 +592,50 @@ pub struct FactorBaseReport {
     /// adapter hashes these into its factor-base identity; reports omit them.
     #[serde(skip)]
     pub column_keys: Vec<u64>,
+    /// Present only when the large columns were quotiented by Frobenius.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub orbit: Option<OrbitFactorBaseReport>,
+}
+
+/// One large point as seen from its orbit representative.
+#[derive(Clone, Debug, Serialize)]
+pub struct OrbitMember {
+    pub x: u64,
+    pub y: u64,
+    /// `k` with `pi^k(point) = +-rep`.
+    pub phase: u32,
+    pub negated: bool,
+    /// `log point = factor * log rep (mod r)`.
+    pub factor: u64,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct OrbitExample {
+    pub rep_x: u64,
+    pub rep_y: u64,
+    pub members: Vec<OrbitMember>,
+}
+
+/// What the Frobenius quotient did to the large columns.
+#[derive(Clone, Debug, Serialize)]
+pub struct OrbitFactorBaseReport {
+    pub lambda: u64,
+    pub absorb_into_small: bool,
+    /// Distinct large projected points before the quotient.
+    pub large_points: usize,
+    /// Large columns after the quotient.
+    pub large_orbits: usize,
+    /// Large points that share an orbit vertex with another large point.
+    pub merged_points: usize,
+    /// Large points rewritten into a small column (absorb arm only).
+    pub absorbed_into_small: usize,
+    /// Large points whose orbit representative is the negative of the
+    /// Frobenius image, so the factor carries a sign.
+    pub negated_points: usize,
+    /// How many large points needed Frobenius power `k = index`.
+    pub phase_histogram: Vec<u64>,
+    /// Up to eight orbits with more than one member.
+    pub examples: Vec<OrbitExample>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -464,8 +646,120 @@ pub struct MitmReport {
     pub right_states: u64,
 }
 
+/// Process CPU time by phase, nanoseconds.  Setup is the factor base and the
+/// exact combination table, which every arm builds identically.
+#[derive(Clone, Copy, Debug, Default, Serialize)]
+pub struct PhaseCpuNs {
+    pub setup: u64,
+    /// The trial loop: target residuals and the meet-in-the-middle probe.
+    pub collect: u64,
+    pub filter: u64,
+    /// Linear replay and curve replay of every emitted complete relation,
+    /// plus the incremental rank update.
+    pub replay: u64,
+    /// Curve-level audit of every input partial row.  Reported separately
+    /// and excluded from the online cost.
+    pub audit: u64,
+}
+
+/// The batch pipeline's accounting; present only for the filter arms.
+#[derive(Clone, Debug, Serialize)]
+pub struct FilterPipelineReport {
+    pub graph: LargePrimeGraph,
+    /// Partial relations by class: full, single large prime, double.
+    pub partials_by_class: [u64; 3],
+    pub filter: lpf::LargePrimeFilterReport,
+    pub complete_relations: u64,
+    pub replays_verified: u64,
+    pub replays_failed: u64,
+    /// Failures of the linear replay against the certificate.
+    pub replay_failed_linear: u64,
+    /// Failures of the group identity checked with scalar multiplications.
+    pub replay_failed_curve: u64,
+    pub independent_verified: u64,
+    pub dependent_verified: u64,
+    /// Input partial rows whose own group identity does not hold.
+    pub partial_audit_failed: u64,
+    pub rank: u64,
+    pub cpu_ns: PhaseCpuNs,
+    /// Only with [`SolveOptions::stream_digest`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stream: Option<StreamReport>,
+    /// Only for [`LargePrimeGraph::FilterOrbitPostCollect`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub post_collect: Option<PostCollectReport>,
+    /// Only with [`SolveOptions::trajectory`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trajectory: Option<RankTrajectory>,
+}
+
+/// The accepted-decomposition stream of one run.
+#[derive(Clone, Debug, Serialize)]
+pub struct StreamReport {
+    /// BLAKE3 over `(trial, a, b, number of terms, term atom indices)` of
+    /// every accepted decomposition, in trial order.
+    pub digest: String,
+    pub accepted: u64,
+}
+
+/// What re-expressing the plain stream in orbit columns did.
+#[derive(Clone, Debug, Serialize)]
+pub struct PostCollectReport {
+    /// Stored partial relations by number of large *orbit* columns (0, 1, 2).
+    /// `FilterPipelineReport::partials_by_class` is the plain class and equals
+    /// the plain arm's.
+    pub partials_by_orbit_class: [u64; 3],
+    /// Relations whose number of large columns fell under the orbit map.
+    pub class_changed: u64,
+}
+
+/// First prefix of the stream that reaches a target.
+#[derive(Clone, Debug, Serialize)]
+pub struct TrajectoryHit {
+    /// `rank>=q` or `recovery` (the target column is pinned).
+    pub target: String,
+    pub rank: u64,
+    /// Stored partial relations in the first prefix that reaches the target;
+    /// `None` when no prefix of the run does (censored).
+    pub partials: Option<u64>,
+    /// The trial index of the last relation of that prefix.
+    pub trial: Option<u64>,
+}
+
+/// The state of one prefix (`trial <= cutoff_trial`) of the stream.
+#[derive(Clone, Debug, Serialize)]
+pub struct TrajectoryPoint {
+    pub cutoff_trial: u64,
+    pub partials: u64,
+    pub complete: u64,
+    pub independent: u64,
+    pub rank: u64,
+    pub pinned: bool,
+}
+
+/// Cap-free yield: how long the stream takes to reach a given verified rank.
+#[derive(Clone, Debug, Serialize)]
+pub struct RankTrajectory {
+    /// Columns of the rank (small columns plus the target column).
+    pub columns: u64,
+    pub stored_partials: u64,
+    /// Prefix evaluations performed (each one is a filter run, both replays
+    /// and a rank update).
+    pub evaluations: u64,
+    /// The rank never decreased along the scanned prefixes.
+    pub monotone: bool,
+    /// The full prefix reproduces the run's own complete/independent/rank.
+    pub consistent_with_pipeline: bool,
+    pub first_hits: Vec<TrajectoryHit>,
+    pub at_cutoffs: Vec<TrajectoryPoint>,
+}
+
 #[derive(Clone, Debug, Serialize)]
 pub struct LargePrimeReport {
+    /// Present only for explicit-base runs; relation_samples then retains
+    /// every accepted relation, rather than just the first twelve.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trace_evidence: Option<trace_line::Evidence>,
     pub recovered: Option<u64>,
     pub exhausted: bool,
     pub verified_fast: bool,
@@ -478,6 +772,8 @@ pub struct LargePrimeReport {
     pub phase_group_ops: BTreeMap<String, GroupOps>,
     pub solve_wall_ns: u64,
     pub relation_samples: Vec<PartialRelation>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub filter_pipeline: Option<FilterPipelineReport>,
 }
 
 #[derive(Clone)]
@@ -491,6 +787,9 @@ struct Atom {
 struct FactorBase {
     atoms: Vec<Atom>,
     small_columns: usize,
+    /// Group element of each column (index = column): the canonical
+    /// projected point of a plain column, the representative of an orbit.
+    column_points: Vec<FastPoint>,
     report: FactorBaseReport,
 }
 
@@ -503,10 +802,19 @@ fn canonical(curve: &FastCurve, p: FastPoint) -> (FastPoint, bool) {
     }
 }
 
+/// The Frobenius quotient requested for the large columns.
+struct OrbitPlan {
+    powers: LambdaPowers,
+    absorb: bool,
+}
+
 fn build_factor_base(
     instance: &BinaryInstance,
     small_dimension: u32,
     envelope_dimension: u32,
+    orbit: Option<&OrbitPlan>,
+    fault: Option<TableFault>,
+    basis: Option<&[u64]>,
     ops: &mut GroupOps,
 ) -> Result<FactorBase, String> {
     if small_dimension > envelope_dimension || envelope_dimension > instance.n {
@@ -515,36 +823,182 @@ fn build_factor_base(
     if envelope_dimension >= 63 {
         return Err("factor-base envelope does not fit a word".into());
     }
+    if let Some(basis) = basis {
+        trace_line::validate_basis(instance, basis, envelope_dimension)?;
+    }
     let small_x = 1u64 << small_dimension;
     let envelope_x = 1u64 << envelope_dimension;
     let group = BinaryGroup(&instance.fast);
     let mut raw = Vec::new();
     let mut keys: BTreeMap<u64, bool> = BTreeMap::new();
-    for x in 0..envelope_x {
+    let mut points_by_key: BTreeMap<u64, FastPoint> = BTreeMap::new();
+    for index in 0..envelope_x {
+        let x = basis.map_or(index, |basis| trace_line::expand(basis, index));
         for p in instance.points_with_x(x) {
             let projected = group.mul(ops, p, instance.cofactor);
             if !projected.infinity {
                 let (c, _) = canonical(&instance.fast, projected);
                 keys.entry(c.pack())
-                    .and_modify(|s| *s |= x < small_x)
-                    .or_insert(x < small_x);
+                    .and_modify(|s| *s |= index < small_x)
+                    .or_insert(index < small_x);
+                points_by_key.entry(c.pack()).or_insert(c);
             }
-            raw.push((p, projected, x < small_x));
+            raw.push((p, projected, index < small_x));
         }
     }
+    let r = instance.r;
     let mut col_of = HashMap::new();
+    let mut factor_of: HashMap<u64, u64> = HashMap::new();
+    let mut column_points: Vec<FastPoint> = Vec::new();
+    let mut column_keys: Vec<u64> = Vec::new();
     let mut next = 0usize;
     for (&key, &small) in &keys {
         if small {
             col_of.insert(key, next);
+            column_points.push(points_by_key[&key]);
+            column_keys.push(key);
             next += 1;
         }
     }
     let small_columns = next;
-    for (&key, &small) in &keys {
-        if !small {
-            col_of.insert(key, next);
+    let mut orbit_report = None;
+    if let Some(plan) = orbit {
+        let fast = &instance.fast;
+        let mut phase_histogram = vec![0u64; instance.n as usize];
+        let mut negated_points = 0usize;
+        let mut large_points = 0usize;
+        // Orbit representative key -> (representative, members).
+        let mut groups: BTreeMap<u64, (FastPoint, Vec<(u64, orbit::OrbitCanon)>)> = BTreeMap::new();
+        for (&key, &small) in &keys {
+            if small {
+                continue;
+            }
+            large_points += 1;
+            let point = points_by_key[&key];
+            let canon = orbit::canonicalise(instance, &plan.powers, point);
+            // The convention (direction of the phase, sign) is checked
+            // against the real curve arithmetic for every large point.
+            if fast.mul_u64(canon.rep, canon.factor) != point {
+                return Err(format!(
+                    "orbit table self-check failed for projected point {key}"
+                ));
+            }
+            phase_histogram[canon.phase as usize] += 1;
+            negated_points += usize::from(canon.negated);
+            groups
+                .entry(canon.rep.pack())
+                .or_insert_with(|| (canon.rep, Vec::new()))
+                .1
+                .push((key, canon));
+        }
+        let mut small_by_rep: BTreeMap<u64, (usize, u64)> = BTreeMap::new();
+        if plan.absorb {
+            for (&key, &small) in &keys {
+                if small {
+                    let point = points_by_key[&key];
+                    let canon = orbit::canonicalise(instance, &plan.powers, point);
+                    // The factors of the small columns are used by the
+                    // absorb arm, so they get the same curve check as the
+                    // large points' factors: `[factor]rep == S`.
+                    if fast.mul_u64(canon.rep, canon.factor) != point {
+                        return Err(format!(
+                            "orbit table self-check failed for small projected point {key}"
+                        ));
+                    }
+                    small_by_rep
+                        .entry(canon.rep.pack())
+                        .or_insert((col_of[&key], canon.factor));
+                }
+            }
+        }
+        let mut absorbed = 0usize;
+        let mut merged_orbits = 0usize;
+        let mut examples = Vec::new();
+        for (rep_key, (rep, members)) in &groups {
+            if let Some(&(column, small_factor)) = small_by_rep.get(rep_key) {
+                // log Q = f_Q log rep and log S = f_S log rep, so
+                // log Q = f_Q f_S^{-1} log S.
+                let inverse = orbit::inv_mod(small_factor, r).ok_or("zero orbit factor")?;
+                for (key, canon) in members {
+                    let factor = orbit::mul_mod(canon.factor, inverse, r);
+                    // The inversion is checked on the curve as well:
+                    // `[f_Q f_S^{-1}] S == Q`, S being the small column's point.
+                    if fast.mul_u64(column_points[column], factor) != points_by_key[key] {
+                        return Err(format!(
+                            "absorb table self-check failed for projected point {key}"
+                        ));
+                    }
+                    let factor = match fault {
+                        Some(TableFault::AbsorbFactor { index })
+                            if index.is_none_or(|i| i == absorbed) =>
+                        {
+                            orbit::mul_mod(factor, 2, r)
+                        }
+                        _ => factor,
+                    };
+                    col_of.insert(*key, column);
+                    factor_of.insert(*key, factor);
+                    absorbed += 1;
+                }
+                continue;
+            }
+            let column = next;
             next += 1;
+            column_points.push(*rep);
+            column_keys.push(*rep_key);
+            for (position, (key, canon)) in members.iter().enumerate() {
+                let factor = match fault {
+                    Some(TableFault::OrbitFactor { index })
+                        if position == 1 && index.is_none_or(|i| i == merged_orbits) =>
+                    {
+                        orbit::mul_mod(canon.factor, plan.powers.lambda, r)
+                    }
+                    _ => canon.factor,
+                };
+                col_of.insert(*key, column);
+                factor_of.insert(*key, factor);
+            }
+            merged_orbits += usize::from(members.len() > 1);
+            if members.len() > 1 && examples.len() < 8 {
+                examples.push(OrbitExample {
+                    rep_x: rep.x,
+                    rep_y: rep.y,
+                    members: members
+                        .iter()
+                        .map(|(key, canon)| {
+                            let point = points_by_key[key];
+                            OrbitMember {
+                                x: point.x,
+                                y: point.y,
+                                phase: canon.phase,
+                                negated: canon.negated,
+                                factor: canon.factor,
+                            }
+                        })
+                        .collect(),
+                });
+            }
+        }
+        let large_orbits = next - small_columns;
+        orbit_report = Some(OrbitFactorBaseReport {
+            lambda: plan.powers.lambda,
+            absorb_into_small: plan.absorb,
+            large_points,
+            large_orbits,
+            merged_points: large_points - absorbed - large_orbits,
+            absorbed_into_small: absorbed,
+            negated_points,
+            phase_histogram,
+            examples,
+        });
+    } else {
+        for (&key, &small) in &keys {
+            if !small {
+                col_of.insert(key, next);
+                column_points.push(points_by_key[&key]);
+                column_keys.push(key);
+                next += 1;
+            }
         }
     }
     let atoms = raw
@@ -559,19 +1013,21 @@ fn build_factor_base(
                 }
             } else {
                 let (c, negated) = canonical(&instance.fast, projected);
+                let key = c.pack();
+                let sign = if negated { r - 1 } else { 1 };
+                let coefficient = match factor_of.get(&key) {
+                    Some(&factor) => orbit::mul_mod(sign, factor, r),
+                    None => sign,
+                };
                 Atom {
                     raw,
-                    column: Some(col_of[&c.pack()]),
-                    coefficient: if negated { instance.r - 1 } else { 1 },
+                    column: Some(col_of[&key]),
+                    coefficient,
                     small,
                 }
             }
         })
         .collect::<Vec<_>>();
-    let mut column_keys = vec![0u64; next];
-    for (key, column) in &col_of {
-        column_keys[*column] = *key;
-    }
     let small_raw_points = atoms.iter().filter(|a| a.small).count();
     Ok(FactorBase {
         report: FactorBaseReport {
@@ -581,9 +1037,11 @@ fn build_factor_base(
             small_columns,
             large_columns: next - small_columns,
             column_keys,
+            orbit: orbit_report,
         },
         atoms,
         small_columns,
+        column_points,
     })
 }
 
@@ -655,6 +1113,20 @@ fn enumerate_states(
     out
 }
 
+/// The columns and coefficients (mod `r`) of the decomposition `terms` under
+/// the column map of `base`; zero coefficients are dropped.
+fn project_terms(base: &FactorBase, terms: &[usize], r: u64) -> Vec<(usize, u64)> {
+    let mut coeffs: BTreeMap<usize, u64> = BTreeMap::new();
+    for &i in terms {
+        let atom = &base.atoms[i];
+        if let Some(c) = atom.column {
+            let v = coeffs.entry(c).or_insert(0);
+            *v = ((*v as u128 + atom.coefficient as u128) % r as u128) as u64;
+        }
+    }
+    coeffs.into_iter().filter(|(_, v)| *v != 0).collect()
+}
+
 impl Decomposer {
     fn new(
         group: &BinaryGroup<'_>,
@@ -713,16 +1185,7 @@ impl Decomposer {
             for left in lefts {
                 let mut terms = left.clone();
                 terms.extend_from_slice(&right.terms);
-                let mut coeffs: BTreeMap<usize, u64> = BTreeMap::new();
-                for &i in &terms {
-                    let atom = &base.atoms[i];
-                    if let Some(c) = atom.column {
-                        let v = coeffs.entry(c).or_insert(0);
-                        *v = ((*v as u128 + atom.coefficient as u128) % r as u128) as u64;
-                    }
-                }
-                let projected: Vec<(usize, u64)> =
-                    coeffs.into_iter().filter(|(_, v)| *v != 0).collect();
+                let projected = project_terms(base, &terms, r);
                 let lp = projected
                     .iter()
                     .filter(|(c, _)| *c >= base.small_columns)
@@ -759,7 +1222,18 @@ pub fn solve(
     target: FastPoint,
     config: SolveConfig,
 ) -> Result<LargePrimeReport, String> {
-    solve_with_verification(instance, target, config, true)
+    solve_with_verification(instance, target, config, true, SolveOptions::default())
+}
+
+/// [`solve`] with instrumentation ([`SolveOptions`]).  The default options
+/// give exactly [`solve`]'s report.
+pub fn solve_with_options(
+    instance: &BinaryInstance,
+    target: FastPoint,
+    config: SolveConfig,
+    options: SolveOptions,
+) -> Result<LargePrimeReport, String> {
+    solve_with_verification(instance, target, config, true, options)
 }
 
 /// Return the algebraic candidate without checking it against the target.
@@ -769,7 +1243,435 @@ pub fn solve_candidate(
     target: FastPoint,
     config: SolveConfig,
 ) -> Result<LargePrimeReport, String> {
-    solve_with_verification(instance, target, config, false)
+    solve_with_verification(instance, target, config, false, SolveOptions::default())
+}
+
+/// [`solve_candidate`] under the `_v2` accounting (`ic.large_prime_v2`):
+/// the target's `[r]Q` subgroup-membership check, which the first rule runs
+/// on a ledger nobody reads, and the final `[d]G = Q` check, which it
+/// leaves to the runner, are counted scalar multiplications in the
+/// verification phase.  The search is the same.
+pub fn solve_candidate_v2(
+    instance: &BinaryInstance,
+    target: FastPoint,
+    config: SolveConfig,
+) -> Result<LargePrimeReport, String> {
+    solve_with_verification(
+        instance,
+        target,
+        config,
+        false,
+        SolveOptions {
+            charge_checks: true,
+            ..Default::default()
+        },
+    )
+}
+
+/// An explicit-base candidate; the ecbench runner performs scalar verification.
+pub fn solve_candidate_with_basis(
+    instance: &BinaryInstance,
+    target: FastPoint,
+    config: SolveConfig,
+    basis: Vec<u64>,
+) -> Result<LargePrimeReport, String> {
+    solve_with_verification(
+        instance,
+        target,
+        config,
+        false,
+        SolveOptions {
+            abscissa_basis: Some(basis),
+            ..Default::default()
+        },
+    )
+}
+
+/// CPU time consumed by this process so far, in nanoseconds; 0 where the
+/// clock is unavailable.  The collector is single-threaded, so this is the
+/// collector's own CPU time.
+pub fn process_cpu_ns() -> u64 {
+    #[cfg(unix)]
+    {
+        let mut ts = libc::timespec {
+            tv_sec: 0,
+            tv_nsec: 0,
+        };
+        // SAFETY: clock_gettime only writes through the pointer to `ts`.
+        let rc = unsafe { libc::clock_gettime(libc::CLOCK_PROCESS_CPUTIME_ID, &mut ts) };
+        if rc == 0 {
+            return ts.tv_sec as u64 * 1_000_000_000 + ts.tv_nsec as u64;
+        }
+    }
+    0
+}
+
+/// An accepted partial relation held back for the batch filter.
+struct StoredPartial {
+    trial: u64,
+    class: RelationClass,
+    /// Columns in the collector's shifted indexing: small columns, then the
+    /// target column `d`, then large columns.
+    cols: Vec<(usize, u64)>,
+    rhs: u64,
+}
+
+/// Combine every stored partial relation with the batch hypergraph filter,
+/// replay each emitted complete relation, and feed only verified rows to the
+/// rank tracker.
+///
+/// A complete relation is *verified* when both replays pass: the linear
+/// replay of its source certificate must reproduce it exactly, and the group
+/// identity it asserts must hold on the curve
+/// ([`RelationFrame::row_holds`]).  The second replay is the one that
+/// notices a wrong Frobenius phase coefficient.
+fn run_filter_pipeline(
+    instance: &BinaryInstance,
+    target: FastPoint,
+    base: &FactorBase,
+    graph: LargePrimeGraph,
+    stored: Vec<StoredPartial>,
+    matrix: &mut IncrementalGauss,
+    mut cpu: PhaseCpuNs,
+    extras: PipelineExtras<'_>,
+) -> Result<FilterPipelineReport, String> {
+    let r = instance.r;
+    let d_col = base.small_columns;
+    let mut partials_by_class = [0u64; 3];
+    let mut inputs = Vec::with_capacity(stored.len());
+    for s in &stored {
+        partials_by_class[match s.class {
+            RelationClass::Full => 0,
+            RelationClass::SingleLargePrime => 1,
+            RelationClass::DoubleLargePrime => 2,
+        }] += 1;
+        let mut small = Vec::new();
+        let mut large = Vec::new();
+        for &(c, v) in &s.cols {
+            if c <= d_col {
+                small.push((c as u32, v));
+            } else {
+                large.push((c as u64, v));
+            }
+        }
+        inputs.push(lpf::PartialRelation {
+            id: s.trial,
+            small,
+            large,
+            rhs: s.rhs,
+        });
+    }
+    drop(stored);
+
+    // Group element of every column id in the shifted indexing.
+    let mut points = Vec::with_capacity(base.column_points.len() + 1);
+    points.extend_from_slice(&base.column_points[..base.small_columns]);
+    points.push(FastPoint::INFINITY);
+    points.extend_from_slice(&base.column_points[base.small_columns..]);
+    let frame = RelationFrame {
+        instance,
+        target,
+        points: &points,
+        d_col,
+    };
+
+    let t = process_cpu_ns();
+    let options = lpf::LargePrimeFilterOptions {
+        modulus: r,
+        ..Default::default()
+    };
+    let (complete, filter_report) = lpf::filter_large_primes(inputs.clone(), &options)
+        .map_err(|e| format!("large-prime filter refused its input: {e:?}"))?;
+    cpu.filter = process_cpu_ns().saturating_sub(t);
+
+    let t = process_cpu_ns();
+    let index: HashMap<u64, usize> = inputs
+        .iter()
+        .enumerate()
+        .map(|(i, row)| (row.id, i))
+        .collect();
+    let Verified {
+        verified,
+        failed_linear,
+        failed_curve,
+        failed,
+        independent,
+        dependent,
+    } = verify_complete(&complete, &inputs, &index, &frame, r, d_col, matrix)?;
+    cpu.replay = process_cpu_ns().saturating_sub(t);
+
+    let t = process_cpu_ns();
+    let mut audit_failed = 0u64;
+    for row in &inputs {
+        let terms = row
+            .small
+            .iter()
+            .map(|&(c, v)| (c as u64, v))
+            .chain(row.large.iter().copied());
+        audit_failed += u64::from(!frame.row_holds(terms, row.rhs));
+    }
+    cpu.audit = process_cpu_ns().saturating_sub(t);
+
+    // Instrumentation, outside every timed phase above.
+    let trajectory = match extras.trajectory {
+        Some(request) => Some(rank_trajectory(
+            &inputs,
+            &frame,
+            r,
+            d_col,
+            request,
+            (complete.len() as u64, independent, matrix.rank() as u64),
+        )?),
+        None => None,
+    };
+
+    Ok(FilterPipelineReport {
+        graph,
+        partials_by_class,
+        filter: filter_report,
+        complete_relations: complete.len() as u64,
+        replays_verified: verified,
+        replays_failed: failed,
+        replay_failed_linear: failed_linear,
+        replay_failed_curve: failed_curve,
+        independent_verified: independent,
+        dependent_verified: dependent,
+        partial_audit_failed: audit_failed,
+        rank: matrix.rank() as u64,
+        cpu_ns: cpu,
+        stream: extras.stream,
+        post_collect: extras.post_collect,
+        trajectory,
+    })
+}
+
+/// Instrumentation handed to [`run_filter_pipeline`].
+struct PipelineExtras<'a> {
+    stream: Option<StreamReport>,
+    post_collect: Option<PostCollectReport>,
+    trajectory: Option<&'a TrajectoryRequest>,
+}
+
+#[derive(Default)]
+struct Verified {
+    verified: u64,
+    failed_linear: u64,
+    failed_curve: u64,
+    failed: u64,
+    independent: u64,
+    dependent: u64,
+}
+
+/// Replay every complete relation twice and feed the verified ones to the
+/// rank tracker.  `index` maps a partial relation's id to its position in
+/// `inputs`.
+fn verify_complete(
+    complete: &[lpf::CompleteRelation],
+    inputs: &[lpf::PartialRelation],
+    index: &HashMap<u64, usize>,
+    frame: &RelationFrame<'_>,
+    r: u64,
+    d_col: usize,
+    matrix: &mut IncrementalGauss,
+) -> Result<Verified, String> {
+    let mut out = Verified::default();
+    for c in complete {
+        // Replay against only the rows the certificate names.
+        let sources: Option<Vec<lpf::PartialRelation>> = c
+            .sources
+            .iter()
+            .map(|(id, _)| index.get(id).map(|&i| inputs[i].clone()))
+            .collect();
+        let linear_ok = sources
+            .and_then(|rows| lpf::replay_complete_relation(c, &rows, r))
+            .is_some_and(|replayed| replayed.small == c.small && replayed.rhs == c.rhs);
+        let curve_ok = frame.row_holds(c.small.iter().map(|&(col, v)| (col as u64, v)), c.rhs);
+        out.failed_linear += u64::from(!linear_ok);
+        out.failed_curve += u64::from(!curve_ok);
+        if !(linear_ok && curve_ok) {
+            out.failed += 1;
+            continue;
+        }
+        out.verified += 1;
+        let mut row = vec![0u64; d_col + 1];
+        for &(col, v) in &c.small {
+            row[col as usize] = v;
+        }
+        match matrix.add_row(row, c.rhs) {
+            RowStatus::Independent => out.independent += 1,
+            RowStatus::Dependent => out.dependent += 1,
+            RowStatus::Inconsistent => {
+                return Err("a verified relation made the system inconsistent".into());
+            }
+        }
+    }
+    Ok(out)
+}
+
+/// The state of the first `k` stored partial relations.
+#[derive(Clone, Copy, PartialEq, Eq)]
+struct PrefixState {
+    complete: u64,
+    independent: u64,
+    rank: u64,
+    pinned: bool,
+}
+
+/// Run the whole pipeline (filter, both replays, rank update) on a prefix of
+/// the stored stream.
+fn prefix_state(
+    inputs: &[lpf::PartialRelation],
+    k: usize,
+    frame: &RelationFrame<'_>,
+    r: u64,
+    d_col: usize,
+) -> Result<PrefixState, String> {
+    let prefix = &inputs[..k];
+    let options = lpf::LargePrimeFilterOptions {
+        modulus: r,
+        ..Default::default()
+    };
+    let (complete, _) = lpf::filter_large_primes(prefix.to_vec(), &options)
+        .map_err(|e| format!("large-prime filter refused a prefix: {e:?}"))?;
+    let index: HashMap<u64, usize> = prefix
+        .iter()
+        .enumerate()
+        .map(|(i, row)| (row.id, i))
+        .collect();
+    let mut matrix = IncrementalGauss::new(d_col + 1, r);
+    let v = verify_complete(&complete, prefix, &index, frame, r, d_col, &mut matrix)?;
+    Ok(PrefixState {
+        complete: complete.len() as u64,
+        independent: v.independent,
+        rank: matrix.rank() as u64,
+        pinned: matrix.pinned(d_col).is_some(),
+    })
+}
+
+/// How many trials each verified rank takes, found by re-running the pipeline
+/// on prefixes of the stored relation stream (`inputs` is in trial order).
+///
+/// A coarse scan (about 64 prefixes) locates the first interval that reaches
+/// each target, then every prefix inside that interval is evaluated, so the
+/// reported prefix is the first one that reaches the target *given that the
+/// rank does not decrease between scanned prefixes*; `monotone` reports
+/// whether it did not along the scan.
+fn rank_trajectory(
+    inputs: &[lpf::PartialRelation],
+    frame: &RelationFrame<'_>,
+    r: u64,
+    d_col: usize,
+    request: &TrajectoryRequest,
+    full: (u64, u64, u64),
+) -> Result<RankTrajectory, String> {
+    let columns = d_col as u64 + 1;
+    let n = inputs.len();
+    let mut cache: BTreeMap<usize, PrefixState> = BTreeMap::new();
+    let mut evaluations = 0u64;
+    let mut eval = |k: usize| -> Result<PrefixState, String> {
+        if let Some(state) = cache.get(&k) {
+            return Ok(*state);
+        }
+        evaluations += 1;
+        let state = prefix_state(inputs, k, frame, r, d_col)?;
+        cache.insert(k, state);
+        Ok(state)
+    };
+    let step = (n / 64).max(1);
+    let mut scan: Vec<usize> = (1..=n / step).map(|i| i * step).collect();
+    if scan.last() != Some(&n) && n > 0 {
+        scan.push(n);
+    }
+    let mut monotone = true;
+    let mut previous = 0u64;
+    let mut coarse = Vec::with_capacity(scan.len());
+    for &k in &scan {
+        let state = eval(k)?;
+        monotone &= state.rank >= previous;
+        previous = state.rank;
+        coarse.push((k, state));
+    }
+    let consistent_with_pipeline = if n == 0 {
+        full == (0, 0, 0)
+    } else {
+        let last = eval(n)?;
+        (last.complete, last.independent, last.rank) == full
+    };
+
+    enum Target {
+        Rank(u64),
+        Recovery,
+    }
+    let mut targets: Vec<(String, u64, Target)> = Vec::new();
+    for fraction in [0.5f64, 0.75, 0.9, 1.0] {
+        let q = ((fraction * columns as f64).ceil() as u64).clamp(1, columns);
+        if !targets.iter().any(|(_, existing, _)| *existing == q) {
+            targets.push((format!("rank>={q}"), q, Target::Rank(q)));
+        }
+    }
+    targets.push(("recovery".into(), columns, Target::Recovery));
+    let mut first_hits = Vec::with_capacity(targets.len());
+    for (label, rank, target) in &targets {
+        let reached = |s: &PrefixState| match target {
+            Target::Rank(q) => s.rank >= *q,
+            Target::Recovery => s.pinned,
+        };
+        let mut hit = None;
+        let mut lower = 0usize;
+        for &(k, state) in &coarse {
+            if reached(&state) {
+                // Every prefix strictly between the previous scan point and
+                // this one, in order.
+                hit = Some(k);
+                for j in lower + 1..k {
+                    if reached(&eval(j)?) {
+                        hit = Some(j);
+                        break;
+                    }
+                }
+                break;
+            }
+            lower = k;
+        }
+        first_hits.push(TrajectoryHit {
+            target: label.clone(),
+            rank: *rank,
+            partials: hit.map(|k| k as u64),
+            trial: hit.map(|k| inputs[k - 1].id),
+        });
+    }
+
+    let mut at_cutoffs = Vec::with_capacity(request.cutoffs.len());
+    for &cutoff in &request.cutoffs {
+        let k = inputs.iter().take_while(|row| row.id <= cutoff).count();
+        let state = if k == 0 {
+            PrefixState {
+                complete: 0,
+                independent: 0,
+                rank: 0,
+                pinned: false,
+            }
+        } else {
+            eval(k)?
+        };
+        at_cutoffs.push(TrajectoryPoint {
+            cutoff_trial: cutoff,
+            partials: k as u64,
+            complete: state.complete,
+            independent: state.independent,
+            rank: state.rank,
+            pinned: state.pinned,
+        });
+    }
+    Ok(RankTrajectory {
+        columns,
+        stored_partials: n as u64,
+        evaluations,
+        monotone,
+        consistent_with_pipeline,
+        first_hits,
+        at_cutoffs,
+    })
 }
 
 fn solve_with_verification(
@@ -777,15 +1679,43 @@ fn solve_with_verification(
     target: FastPoint,
     config: SolveConfig,
     verify_candidate: bool,
+    options: SolveOptions,
 ) -> Result<LargePrimeReport, String> {
     if config.max_large_primes > 2 {
         return Err("max_large_primes must be 0, 1, or 2".into());
     }
-    if !instance.fast.is_on_curve(target) || !instance.fast.mul_u64(target, instance.r).infinity {
+    let charge_checks = options.charge_checks;
+    let group = BinaryGroup(&instance.fast);
+    let mut verify_ops = GroupOps::default();
+    let mut membership_checks = 0u64;
+    let in_subgroup = if charge_checks {
+        membership_checks = 1;
+        instance.fast.is_on_curve(target) && group.mul(&mut verify_ops, target, instance.r).infinity
+    } else {
+        instance.fast.is_on_curve(target) && instance.fast.mul_u64(target, instance.r).infinity
+    };
+    if !in_subgroup {
         return Err("target is not a point in the configured prime-order subgroup".into());
     }
     let start = Instant::now();
-    let group = BinaryGroup(&instance.fast);
+    let cpu_start = process_cpu_ns();
+    let graph = config.large_prime_graph;
+    if options.trajectory.is_some() && !graph.uses_filter() {
+        return Err(
+            "a rank trajectory needs a filter arm (the online path stops at recovery)".into(),
+        );
+    }
+    if options.table_fault.is_some() && !graph.orbit() {
+        return Err("a table fault needs an orbit graph".into());
+    }
+    let orbit_plan = if graph.orbit() {
+        Some(OrbitPlan {
+            powers: LambdaPowers::new(instance)?,
+            absorb: graph.absorb(),
+        })
+    } else {
+        None
+    };
     let mut phase_group_ops = BTreeMap::new();
 
     let mut fb_ops = GroupOps::default();
@@ -793,6 +1723,9 @@ fn solve_with_verification(
         instance,
         config.small_dimension,
         config.envelope_dimension,
+        orbit_plan.as_ref(),
+        options.table_fault,
+        options.abscissa_basis.as_deref(),
         &mut fb_ops,
     )?;
     if base.small_columns == 0 {
@@ -800,29 +1733,69 @@ fn solve_with_verification(
     }
     phase_group_ops.insert("factor_base".into(), fb_ops);
 
+    // The post-collection arm decides acceptance on the plain column map and
+    // only stores the relations in orbit columns.  Both bases come from the
+    // same enumeration of raw points, so atom `i` is the same point in both
+    // (checked), and a decomposition (a list of atom indices) means the same
+    // thing in either.
+    let plain_base = if graph.post_collect() {
+        let mut plain_ops = GroupOps::default();
+        let plain = build_factor_base(
+            instance,
+            config.small_dimension,
+            config.envelope_dimension,
+            None,
+            None,
+            options.abscissa_basis.as_deref(),
+            &mut plain_ops,
+        )?;
+        let aligned = plain.atoms.len() == base.atoms.len()
+            && plain.small_columns == base.small_columns
+            && plain
+                .atoms
+                .iter()
+                .zip(&base.atoms)
+                .all(|(p, o)| p.raw == o.raw && p.small == o.small);
+        if !aligned {
+            return Err("plain and orbit atom tables disagree".into());
+        }
+        phase_group_ops.insert("factor_base_plain".into(), plain_ops);
+        Some(plain)
+    } else {
+        None
+    };
+    let accept_base = plain_base.as_ref().unwrap_or(&base);
+
     let mut setup_ops = GroupOps::default();
     let decomposer = Decomposer::new(
         &group,
-        &base,
+        accept_base,
         config.summands,
         config.max_states,
         &mut setup_ops,
     )?;
     phase_group_ops.insert("oracle_setup".into(), setup_ops);
+    let cpu_after_setup = process_cpu_ns();
 
     let d_col = base.small_columns;
     let mut matrix = IncrementalGauss::new(base.small_columns + 1, instance.r);
     let mut eliminator = LargePrimeEliminator::new(base.small_columns + 1, instance.r);
     let mut rng = SplitMix64(config.seed ^ 0x4a6f_7578_4c50_7631);
     let mut rel_ops = GroupOps::default();
-    let mut verify_ops = GroupOps::default();
     let mut counters = SolveCounters {
         combination_states_uncharged: decomposer.report.left_states
             + decomposer.report.right_states,
+        membership_checks,
         ..Default::default()
     };
     let mut samples = Vec::new();
+    let mut stored: Vec<StoredPartial> = Vec::new();
     let mut recovered = None;
+    let mut stream_hasher = options.stream_digest.then(blake3::Hasher::new);
+    let mut post_collect_report = graph.post_collect().then_some(PostCollectReport {
+        partials_by_orbit_class: [0; 3],
+        class_changed: 0,
+    });
     measurement::begin_online(measurement::Phase::TargetQuery);
     for trial in 1..=config.max_trials {
         counters.trials = trial;
@@ -835,7 +1808,7 @@ fn solve_with_verification(
             let _pdp = measurement::scope(measurement::Phase::TargetPdp);
             decomposer.find(
                 &group,
-                &base,
+                accept_base,
                 residual,
                 config.max_large_primes,
                 instance.r,
@@ -868,6 +1841,30 @@ fn solve_with_verification(
             1 => RelationClass::SingleLargePrime,
             _ => RelationClass::DoubleLargePrime,
         };
+        if let Some(hasher) = stream_hasher.as_mut() {
+            hasher.update(&trial.to_le_bytes());
+            hasher.update(&a.to_le_bytes());
+            hasher.update(&b.to_le_bytes());
+            hasher.update(&(terms.len() as u64).to_le_bytes());
+            for &term in &terms {
+                hasher.update(&(term as u64).to_le_bytes());
+            }
+        }
+        // Acceptance used the plain columns above; the post-collection arm
+        // now re-expresses the same decomposition in orbit columns.
+        let projected = match post_collect_report.as_mut() {
+            Some(report) => {
+                let orbit_columns = project_terms(&base, &terms, instance.r);
+                let orbit_lp = orbit_columns
+                    .iter()
+                    .filter(|(c, _)| *c >= base.small_columns)
+                    .count();
+                report.partials_by_orbit_class[orbit_lp.min(2)] += 1;
+                report.class_changed += u64::from(orbit_lp != lp_count);
+                orbit_columns
+            }
+            None => projected,
+        };
         let mut cols = Vec::with_capacity(projected.len() + 1);
         for &(c, v) in &projected {
             cols.push((if c < base.small_columns { c } else { c + 1 }, v));
@@ -878,7 +1875,7 @@ fn solve_with_verification(
         }
         cols.sort_unstable();
         let rhs = mod_mul(instance.cofactor % instance.r, a, instance.r);
-        if samples.len() < 12 {
+        if samples.len() < 12 || options.abscissa_basis.is_some() {
             samples.push(PartialRelation {
                 trial,
                 a,
@@ -887,6 +1884,15 @@ fn solve_with_verification(
                 raw_terms: terms,
                 columns: cols.clone(),
             });
+        }
+        if graph.uses_filter() {
+            stored.push(StoredPartial {
+                trial,
+                class,
+                cols,
+                rhs,
+            });
+            continue;
         }
         let _descent = measurement::scope(measurement::Phase::TargetDescent);
         let sparse = SparseRel { cols, rhs };
@@ -921,9 +1927,53 @@ fn solve_with_verification(
         }
     }
     measurement::end_online();
+    let filter_pipeline = if graph.uses_filter() {
+        let cpu = PhaseCpuNs {
+            setup: cpu_after_setup.saturating_sub(cpu_start),
+            collect: process_cpu_ns().saturating_sub(cpu_after_setup),
+            ..PhaseCpuNs::default()
+        };
+        let report = run_filter_pipeline(
+            instance,
+            target,
+            &base,
+            graph,
+            std::mem::take(&mut stored),
+            &mut matrix,
+            cpu,
+            PipelineExtras {
+                stream: stream_hasher.take().map(|hasher| StreamReport {
+                    digest: hex::encode(hasher.finalize().as_bytes()),
+                    accepted: counters.accepted_relations,
+                }),
+                post_collect: post_collect_report.take(),
+                trajectory: options.trajectory.as_ref(),
+            },
+        )?;
+        recovered = matrix.pinned(d_col);
+        counters.eliminated_full_relations = report.filter.cycles_closed as u64;
+        counters.independent_rows = report.independent_verified;
+        Some(report)
+    } else {
+        None
+    };
     counters.matrix_rank = matrix.rank() as u64;
     counters.row_ops_uncharged = matrix.row_ops;
-    counters.lp_pivots = eliminator.pivot_count() as u64;
+    counters.lp_pivots = match &filter_pipeline {
+        Some(report) => report.filter.pivots as u64,
+        None => eliminator.pivot_count() as u64,
+    };
+    if let Some(report) = &filter_pipeline {
+        counters.lp_merge_ops_uncharged = report.filter.merges as u64;
+    }
+    if charge_checks {
+        if let Some(d) = recovered {
+            counters.final_checks = 1;
+            if group.mul(&mut verify_ops, instance.generator, d) != target {
+                counters.final_checks_failed = 1;
+            }
+        }
+    }
     phase_group_ops.insert("relations".into(), rel_ops);
     phase_group_ops.insert("verification".into(), verify_ops);
     let verified_fast = verify_candidate
@@ -931,6 +1981,12 @@ fn solve_with_verification(
     let verified_independent = verify_candidate
         && recovered.is_some_and(|d| independent_verify(instance, target, d).is_ok());
     Ok(LargePrimeReport {
+        trace_evidence: options.abscissa_basis.map(|basis| trace_line::Evidence {
+            basis,
+            atoms: base.atoms.iter().map(|a| (a.raw.x, a.raw.y)).collect(),
+            columns: base.column_points.iter().map(|p| (p.x, p.y)).collect(),
+            small_columns: base.small_columns,
+        }),
         recovered,
         exhausted: recovered.is_none(),
         verified_fast,
@@ -943,6 +1999,7 @@ fn solve_with_verification(
         phase_group_ops,
         solve_wall_ns: start.elapsed().as_nanos() as u64,
         relation_samples: samples,
+        filter_pipeline,
     })
 }
 

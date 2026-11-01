@@ -23,9 +23,17 @@
 //! `n − M·ℓ`.  At `M = 3` everything is as before; otherwise the cell seed is
 //! offset by `M << 48`, the JSON line carries `"m"`, and controls are off
 //! (their density is defined for `M = 3`).
+//!
+//! `--shard I/J` (with `--first-draw F`, default 0) measures a fixed draw
+//! range in parallel processes: process `I` of `J` walks the cell's one
+//! sequential stream to `--max-draws`, sampling every draw (cheap) and
+//! measuring only the draws `k ≥ F` with `k mod J = I`.  `--unsat` does not
+//! stop it.  Each line is the sequential run's line for that draw (same
+//! `draw` index, same fields), so the `J` outputs sorted by `draw` are the
+//! sequential file from `F` on, up to `secs`.
 
 use crypto_lib::cryptanalysis::koblitz_bench::{
-    ladder_control, ladder_draw_m, LadderDraw, LadderOutcome,
+    ladder_control, ladder_draw_m, ladder_measure_m, ladder_sample, LadderDraw, LadderOutcome,
 };
 use rand::rngs::StdRng;
 use rand::SeedableRng;
@@ -107,6 +115,31 @@ fn main() {
         m == 3 || (controls == 0 && !control_only),
         "controls are defined for m = 3 only"
     );
+    let shard: Option<(usize, usize)> = flag("--shard").map(|v| {
+        let (i, j) = v.split_once('/').expect("--shard I/J");
+        let (i, j) = (i.parse().expect("I"), j.parse().expect("J"));
+        assert!(j >= 1 && i < j, "--shard I/J with 0 <= I < J");
+        (i, j)
+    });
+    if let Some((i, j)) = shard {
+        assert_eq!(cells.len(), 1, "one cell per process in this mode");
+        assert!(only_unsat.is_none() && !control_only && controls == 0);
+        let (n, ell, d_max) = cells[0];
+        let first = num("--first-draw", 0) as usize;
+        shard_run(
+            m,
+            n,
+            ell,
+            d_max,
+            ffd_max,
+            cell_seed(seed, n, ell, m),
+            first,
+            max_draws,
+            i,
+            j,
+        );
+        return;
+    }
     if only_unsat.is_some() || control_only {
         assert_eq!(cells.len(), 1, "one cell per process in this mode");
         let (n, ell, d_max) = cells[0];
@@ -234,6 +267,56 @@ fn main() {
                 cs.join(" ")
             }
         );
+    }
+}
+
+/// `--shard I/J`: the draws `first ≤ k < max_draws` with `k mod J = I`,
+/// each measured exactly as the sequential loop measures it.  The stream is
+/// sampled for every draw so the measured ones sit where the sequential run
+/// puts them; [`ladder_draw_m`] is [`ladder_sample`] then
+/// [`ladder_measure_m`] from degree 1, and the measurement takes no
+/// randomness.
+#[allow(clippy::too_many_arguments)]
+fn shard_run(
+    m: usize,
+    n: u32,
+    ell: usize,
+    d_max: u32,
+    ffd_max: u32,
+    cell_seed: u64,
+    first: usize,
+    max_draws: usize,
+    i: usize,
+    j: usize,
+) {
+    let mut rng = StdRng::seed_from_u64(cell_seed);
+    for drawn in 0..max_draws {
+        let (basis, x_r) = ladder_sample(n, ell, &mut rng);
+        if drawn < first || drawn % j != i {
+            continue;
+        }
+        let d = ladder_measure_m(m, n, &basis, &x_r, 1, d_max, ffd_max).expect("cell builds");
+        println!(
+            r#"{{"cell":"{}","n":{n},"ell":{ell},"surplus":{},"d_max":{d_max},"draw":{drawn},"n_vars":{},"n_eqs":{},"v_basis":{:?},"x_r":{},"solutions":{},"outcome":{},"ffd":{},"secs":{:.3}{}}}"#,
+            cell_name(n, ell, m),
+            n as i64 - (m * ell) as i64,
+            d.n_vars,
+            d.n_eqs,
+            d.v_basis,
+            d.x_r,
+            d.solutions,
+            outcome_json(&d.outcome),
+            d.ffd.map_or("null".to_string(), |f| f.to_string()),
+            d.secs,
+            m_json(m)
+        );
+        if d.outcome != LadderOutcome::Satisfiable {
+            eprintln!(
+                "n={n} ℓ={ell}: shard {i}/{j} draw {drawn} unsatisfiable -> {} ({:.1}s)",
+                outcome_short(&d.outcome),
+                d.secs
+            );
+        }
     }
 }
 

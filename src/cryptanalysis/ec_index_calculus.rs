@@ -91,6 +91,7 @@
 use crate::ecc::curve::CurveParams;
 use crate::ecc::field::FieldElement;
 use crate::ecc::point::Point;
+use crate::prime_hyperelliptic::ops as bitop_ops;
 use crate::utils::mod_inverse;
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
@@ -383,7 +384,6 @@ pub fn find_roots_fp_fast(coeffs: &[FieldElement], p: &BigUint) -> Vec<FieldElem
     // Monic copy for the polynomial arithmetic.
     let lead_inv = f[deg].inv().expect("nonzero lead is invertible mod p");
     let monic: Vec<FieldElement> = f.iter().map(|c| c.mul(&lead_inv)).collect();
-    let _deg = monic.len() - 1;
 
     // X^p mod f(X) by repeated squaring.
     let x_pow_p = poly_pow_x_mod(&monic, p);
@@ -661,6 +661,18 @@ pub fn sqrt_mod_p(n: &BigUint, p: &BigUint) -> Option<BigUint> {
     if n_mod.is_zero() {
         return Some(BigUint::zero());
     }
+    // Word-sized `p`: the same algorithm on `u64`s, with the residue
+    // tests as Jacobi symbols.  Same root: the shortcut and the
+    // Tonelli–Shanks loop below are deterministic in `n`, `p` and the
+    // first non-residue, and the word path finds the same `z`.
+    if let ([n], [m]) = (
+        n_mod.to_u64_digits().as_slice(),
+        p.to_u64_digits().as_slice(),
+    ) {
+        if *m > 2 && *m % 2 == 1 && *m < 1 << 63 {
+            return sqrt_mod_p_u64(*n, *m).map(BigUint::from);
+        }
+    }
     // Euler's criterion: n^((p-1)/2) must be 1 (QR) or p-1 (NQR).
     let p_minus_one = p - BigUint::one();
     let euler = n_mod.modpow(&(&p_minus_one >> 1), p);
@@ -711,6 +723,71 @@ pub fn sqrt_mod_p(n: &BigUint, p: &BigUint) -> Option<BigUint> {
         c = (&b * &b) % p;
         t = (t * &c) % p;
         r = (r * b) % p;
+    }
+}
+
+/// [`sqrt_mod_p`] on words: `0 < n < p`, `p` an odd prime below `2^63`.
+///
+/// The residue tests are Jacobi symbols, a gcd-style loop, and the
+/// exponentiations plain square-and-multiply: what `bitop/v1` prices a
+/// `legendre` and a `field_sqrt` as.  The big-integer path's Euler
+/// criterion goes through `num-bigint`'s windowed `modpow`, whose cost
+/// is a fixed ~90 products whatever the size of `p`.
+fn sqrt_mod_p_u64(n: u64, p: u64) -> Option<u64> {
+    let mul = |a: u64, b: u64| ((a as u128 * b as u128) % p as u128) as u64;
+    let pow = |mut b: u64, mut e: u64| {
+        let mut acc = 1u64;
+        while e > 0 {
+            if e & 1 == 1 {
+                acc = mul(acc, b);
+            }
+            b = mul(b, b);
+            e >>= 1;
+        }
+        acc
+    };
+    if crate::utils::jacobi_u64(n, p) != 1 {
+        return None;
+    }
+    // Shortcut for p ≡ 3 (mod 4):  x = n^((p+1)/4) mod p.
+    if p % 4 == 3 {
+        return Some(pow(n, p / 4 + 1));
+    }
+    // General Tonelli–Shanks.  Write p − 1 = Q · 2^S with Q odd.
+    let mut q = p - 1;
+    let mut s = 0u32;
+    while q.is_multiple_of(2) {
+        q /= 2;
+        s += 1;
+    }
+    // Find a quadratic non-residue z.
+    let mut z = 2u64;
+    while crate::utils::jacobi_u64(z, p) != -1 {
+        z += 1;
+    }
+    let mut m = s;
+    let mut c = pow(z, q);
+    let mut t = pow(n, q);
+    let mut r = pow(n, q.div_ceil(2));
+    loop {
+        if t == 1 {
+            return Some(r);
+        }
+        // Find least i, 0 < i < m, with t^(2^i) = 1.
+        let mut i = 0u32;
+        let mut tmp = t;
+        while tmp != 1 {
+            tmp = mul(tmp, tmp);
+            i += 1;
+            if i >= m {
+                return None;
+            }
+        }
+        let b = pow(c, 1u64 << (m - i - 1));
+        m = i;
+        c = mul(b, b);
+        t = mul(t, c);
+        r = mul(r, b);
     }
 }
 
@@ -807,7 +884,19 @@ pub fn find_one_relation_counted(
     factor_base: &[FactorBaseEntry],
     max_trials: usize,
 ) -> Option<(Relation, usize)> {
-    use crate::utils::random::random_scalar;
+    let mut rng = rand::rngs::OsRng;
+    find_one_relation_counted_with_rng(curve, g, q, factor_base, max_trials, &mut rng)
+}
+
+fn find_one_relation_counted_with_rng<R: rand::RngCore>(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    factor_base: &[FactorBaseEntry],
+    max_trials: usize,
+    rng: &mut R,
+) -> Option<(Relation, usize)> {
+    use num_bigint::RandBigInt;
 
     let a_fe = curve.a_fe();
     let b_fe = curve.fe(curve.b.clone());
@@ -820,8 +909,14 @@ pub fn find_one_relation_counted(
     }
 
     for trial in 1..=max_trials {
-        let a = random_scalar(&curve.n);
-        let b = random_scalar(&curve.n);
+        let mut sample_nonzero = || loop {
+            let value = rng.gen_biguint_below(&curve.n);
+            if !value.is_zero() {
+                break value;
+            }
+        };
+        let a = sample_nonzero();
+        let b = sample_nonzero();
         // R = aG + bQ.  Use the variable-time ladder (public k, fine).
         let ag = g.scalar_mul(&a, &a_fe);
         let bq = q.scalar_mul(&b, &a_fe);
@@ -1148,6 +1243,9 @@ pub fn gaussian_eliminate_mod_n_particular(
         None => gaussian_eliminate_mod_biguint(matrix, rhs, n)?,
     };
     let rank = pivot_rows.iter().filter(|&&r| r != usize::MAX).count();
+    // Counted for the `bitop/v1` head-to-head: one word op per zero test
+    // and per determined-flag compare below.
+    bitop_ops::word_op((rhs.len().saturating_sub(rank)) as u64);
     // Rows below the pivots are all-zero on the left; a nonzero
     // right-hand side there is `0 = c`.
     if rhs.iter().skip(rank).any(|v| !(v % n).is_zero()) {
@@ -1162,6 +1260,7 @@ pub fn gaussian_eliminate_mod_n_particular(
             continue;
         }
         values[c] = rhs[pr].clone();
+        bitop_ops::word_op(free.len() as u64);
         determined[c] = free.iter().all(|&f| matrix[pr][f].is_zero());
     }
     Some(ModNSolution {
@@ -1189,6 +1288,7 @@ fn gaussian_eliminate_mod_biguint(
         // Find a row at index ≥ `row` with a non-zero entry in column `col`.
         let mut piv = None;
         for r in row..rows {
+            bitop_ops::word_op(1);
             if !matrix[r][col].is_zero() {
                 piv = Some(r);
                 break;
@@ -1210,7 +1310,9 @@ fn gaussian_eliminate_mod_biguint(
         // columns were eliminated from it, free columns were zero in
         // every row still below the diagonal), so every sweep starts
         // at `col`.
+        bitop_ops::modr_inv(1);
         let inv = mod_inverse(&matrix[row][col], n)?;
+        bitop_ops::modr_mul((m - col) as u64 + 1);
         for c in col..m {
             matrix[row][c] = (&matrix[row][c] * &inv) % n;
         }
@@ -1221,9 +1323,13 @@ fn gaussian_eliminate_mod_biguint(
             if r == row {
                 continue;
             }
+            bitop_ops::word_op(1);
             if matrix[r][col].is_zero() {
                 continue;
             }
+            // `m − col + 1` multiply-subtracts.
+            bitop_ops::modr_mul((m - col) as u64 + 1);
+            bitop_ops::modr_add((m - col) as u64 + 1);
             let factor = matrix[r][col].clone();
             for c in col..m {
                 let term = (&factor * &matrix[row][c]) % n;
@@ -1274,7 +1380,10 @@ fn gaussian_eliminate_mod_u64(
     let mut failed = false;
     let (mut row, mut col) = (0usize, 0usize);
     while row < rows && col < m {
-        let Some(piv) = (row..rows).find(|&r| a[r * m + col] != 0) else {
+        let Some(piv) = (row..rows).find(|&r| {
+            bitop_ops::word_op(1);
+            a[r * m + col] != 0
+        }) else {
             col += 1;
             continue;
         };
@@ -1286,10 +1395,12 @@ fn gaussian_eliminate_mod_u64(
             matrix.swap(row, piv);
         }
         pivot_rows[col] = row;
+        bitop_ops::modr_inv(1);
         let Some(inv) = inv_mod_u64(a[row * m + col], n) else {
             failed = true;
             break;
         };
+        bitop_ops::modr_mul((m - col) as u64 + 1);
         for c in col..m {
             a[row * m + c] = mulmod(a[row * m + c], inv);
         }
@@ -1301,9 +1412,13 @@ fn gaussian_eliminate_mod_u64(
         let brow = b[row];
         let eliminate = |target: &mut [u64], br: &mut u64| {
             let factor = target[col];
+            bitop_ops::word_op(1);
             if factor == 0 {
                 return;
             }
+            // The negation, then `m − col + 1` multiply-adds.
+            bitop_ops::modr_add((m - col) as u64 + 2);
+            bitop_ops::modr_mul((m - col) as u64 + 1);
             let neg = n - factor;
             for (t, &p) in target[col..].iter_mut().zip(prow) {
                 *t = ((*t as u128 + neg as u128 * p as u128) % n as u128) as u64;
@@ -1464,6 +1579,55 @@ pub fn ec_index_calculus_dlp_staged(
     max_trials_per_relation: usize,
     max_relation_attempts: usize,
 ) -> Option<(BigUint, EcIcStageReport)> {
+    let mut rng = rand::rngs::OsRng;
+    ec_index_calculus_dlp_staged_with_rng(
+        curve,
+        g,
+        q,
+        fb_size,
+        extra_relations,
+        max_trials_per_relation,
+        max_relation_attempts,
+        &mut rng,
+    )
+}
+
+/// Run the staged prime-field IC pipeline with a reproducible relation sampler.
+/// The seed controls relation sampling only; wall times remain host-dependent.
+pub fn ec_index_calculus_dlp_staged_seeded(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    fb_size: usize,
+    extra_relations: usize,
+    max_trials_per_relation: usize,
+    max_relation_attempts: usize,
+    seed: u64,
+) -> Option<(BigUint, EcIcStageReport)> {
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(seed);
+    ec_index_calculus_dlp_staged_with_rng(
+        curve,
+        g,
+        q,
+        fb_size,
+        extra_relations,
+        max_trials_per_relation,
+        max_relation_attempts,
+        &mut rng,
+    )
+}
+
+fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    fb_size: usize,
+    extra_relations: usize,
+    max_trials_per_relation: usize,
+    max_relation_attempts: usize,
+    rng: &mut R,
+) -> Option<(BigUint, EcIcStageReport)> {
     use std::time::Instant;
     let total_started = Instant::now();
 
@@ -1481,20 +1645,27 @@ pub fn ec_index_calculus_dlp_staged(
     let mut trials_per_relation: Vec<usize> = Vec::with_capacity(target);
     let mut trials_total = 0usize;
     while relations.len() < target {
+        let mut failed_trials = 0usize;
         let found = 'attempt: {
             for _ in 0..max_relation_attempts {
-                if let Some(found) =
-                    find_one_relation_counted(curve, g, q, &fb, max_trials_per_relation)
-                {
+                if let Some(found) = find_one_relation_counted_with_rng(
+                    curve,
+                    g,
+                    q,
+                    &fb,
+                    max_trials_per_relation,
+                    rng,
+                ) {
                     break 'attempt Some(found);
                 }
                 attempts_exhausted += 1;
+                failed_trials += max_trials_per_relation;
             }
             None
         };
         let (rel, trials) = found?;
-        trials_total += trials;
-        trials_per_relation.push(trials);
+        trials_total += failed_trials + trials;
+        trials_per_relation.push(failed_trials + trials);
         relations.push(rel);
     }
     let relations_ms = relations_started.elapsed().as_secs_f64() * 1e3;
@@ -1523,8 +1694,8 @@ pub fn ec_index_calculus_dlp_staged(
     if !solution.determined[m] {
         return None;
     }
-    let x = solution.values[m].clone();
     let linear_algebra_ms = la_started.elapsed().as_secs_f64() * 1e3;
+    let x = solution.values[m].clone();
 
     let verify_started = Instant::now();
     let a_fe = curve.a_fe();
@@ -1591,6 +1762,7 @@ pub fn ec_index_calculus_dlp_s4_staged(
     let mut trials_per_relation: Vec<usize> = Vec::with_capacity(target);
     let mut trials_total = 0usize;
     while relations.len() < target {
+        let mut failed_trials = 0usize;
         let found = 'attempt: {
             for _ in 0..max_relation_attempts {
                 if let Some(found) =
@@ -1599,12 +1771,13 @@ pub fn ec_index_calculus_dlp_s4_staged(
                     break 'attempt Some(found);
                 }
                 attempts_exhausted += 1;
+                failed_trials += max_trials_per_relation;
             }
             None
         };
         let (rel, trials) = found?;
-        trials_total += trials;
-        trials_per_relation.push(trials);
+        trials_total += failed_trials + trials;
+        trials_per_relation.push(failed_trials + trials);
         relations.push(rel);
     }
     let relations_ms = relations_started.elapsed().as_secs_f64() * 1e3;
@@ -1629,8 +1802,8 @@ pub fn ec_index_calculus_dlp_s4_staged(
     if !solution.determined[m] {
         return None;
     }
-    let x = solution.values[m].clone();
     let linear_algebra_ms = la_started.elapsed().as_secs_f64() * 1e3;
+    let x = solution.values[m].clone();
 
     let verify_started = Instant::now();
     let a_fe = curve.a_fe();
@@ -1826,19 +1999,20 @@ mod tests {
         let q = g.scalar_mul(&BigUint::from(190u32), &a_fe);
         let fb = build_factor_base(&curve, 10);
         assert!(!fb.is_empty());
-        let (_relation, _trials) = (0..64)
+        let (x, _trials) = (0..64)
             .find_map(|_| find_one_relation_s4_counted(&curve, &g, &q, &fb, 5000))
             .expect("an S4 relation exists within 64 bounded attempts");
-        // Independent random relation sets can leave the target column free.
-        let (s4_x, report) = (0..64)
-            .find_map(|_| ec_index_calculus_dlp_s4_staged(&curve, &g, &q, 10, 6, 5000, 64))
-            .expect("S4 staged solve succeeds within 64 bounded attempts");
+        let _ = x; // one relation suffices; full solve below.
+
+        // Compare the relation formats with ample random-row redundancy;
+        // a small raw-row surplus is not a matrix-rank guarantee.
+        let extra_relations = 64;
+        let staged = ec_index_calculus_dlp_s4_staged(&curve, &g, &q, 10, extra_relations, 5000, 64);
+        let (s4_x, report) = staged.expect("S4 staged solve succeeds on the tiny curve");
         assert_eq!(g.scalar_mul(&s4_x, &a_fe), q);
-        let plain_x = (0..64)
-            .find_map(|_| ec_index_calculus_dlp(&curve, &g, &q, 10, 6, 5000))
-            .expect("2-decomp solve succeeds within 64 bounded attempts");
-        assert_eq!(s4_x, plain_x);
-        assert!(report.relations_collected >= 10);
+        let plain = ec_index_calculus_dlp(&curve, &g, &q, 10, extra_relations, 5000);
+        assert_eq!(s4_x, plain.expect("2-decomp solve also succeeds"));
+        assert_eq!(report.relations_collected, 10 + extra_relations);
         assert!(report.trials_per_relation_median >= 1.0);
     }
 
@@ -1851,18 +2025,18 @@ mod tests {
         let a_fe = curve.a_fe();
         let g = curve.generator();
         let q = g.scalar_mul(&BigUint::from(190u32), &a_fe);
-        // A bounded fresh relation set may leave the target column free.
-        // Retry the randomized collection while keeping both correctness checks.
-        let plain_x = (0..64)
-            .find_map(|_| ec_index_calculus_dlp(&curve, &g, &q, 8, 4, 5000))
-            .expect("plain solve succeeds on the small curve within 64 attempts");
-        let (staged_x, report) = (0..64)
-            .find_map(|_| ec_index_calculus_dlp_staged(&curve, &g, &q, 8, 4, 5000, 64))
-            .expect("staged solve succeeds on the small curve within 64 attempts");
+        // Stage accounting needs a successful solve. Four extra random
+        // relation rows can leave the matrix rank deficient; retain ample
+        // redundancy in this public known-answer fixture.
+        let extra_relations = 64;
+        let plain = ec_index_calculus_dlp(&curve, &g, &q, 8, extra_relations, 5000);
+        let staged = ec_index_calculus_dlp_staged(&curve, &g, &q, 8, extra_relations, 5000, 64);
+        let (staged_x, report) = staged.expect("staged solve succeeds on the tiny curve");
+        let plain_x = plain.expect("plain solve succeeds on the tiny curve");
         assert_eq!(staged_x, plain_x);
         assert_eq!(g.scalar_mul(&staged_x, &a_fe), q);
         assert_eq!(report.factor_base_size, 8);
-        assert_eq!(report.relations_collected, 8 + 4);
+        assert_eq!(report.relations_collected, 8 + extra_relations);
         assert!(report.factor_base_ms >= 0.0);
         assert!(report.relations_ms >= 0.0);
         assert!(report.linear_algebra_ms >= 0.0);
@@ -1870,7 +2044,10 @@ mod tests {
         assert!(report.total_ms >= report.relations_ms);
         assert!(report.trials_total >= report.relations_collected);
         assert!(report.trials_per_relation_median >= 1.0);
-        assert!(report.relation_attempts_exhausted == 0);
+        assert!(
+            report.trials_total
+                >= report.relations_collected + report.relation_attempts_exhausted * 64
+        );
     }
 
     /// **Small curve for tests**: y² = x³ + x + 19 (mod 271).  Curve

@@ -1,0 +1,21 @@
+{
+  "schema": "ghs-hess-c-parameter-magma/v1",
+  "endpoint": "https://calculator.magma-maths.org/execute",
+  "input_file": "check_556.magma",
+  "input_sha256": "253507ff015f194466a06de7b08a05d1f8db64f4bcb4436961daf500347f793c",
+  "http_status": 200,
+  "response": {
+    "success": false,
+    "stdout": "source_order 556\nsource_b w^5\ngamma w^53\nbeta w^205\ntrace_factors_zero true\nhess_genus 3\nhess_degree 4\ncurve Curve over GF(2^3) defined by\n$.1^6 + a^6*$.1^5*$.3 + a^4*$.1^3*$.2*$.3^2 + a^2*$.1^2*$.2^2*$.3^2 + \n    a^6*$.2^4*$.3^2 + $.1^3*$.3^3 + a*$.1^2*$.3^4\ncurve_genus 3\ncurve_smooth false\n\n>> print \"map_domain\", Domain(h);\n                             ^\nRuntime error in 'Domain': Bad argument types\nArgument types given: UserProgram\n\n\n>> print \"map_codomain\", Codomain(h);\n                                 ^\nRuntime error in 'Codomain': Bad argument types\nArgument types given: UserProgram\n",
+    "exit_code": 0,
+    "truncated": false,
+    "magma": {
+      "version": "2.30-1",
+      "seed": 1809767649,
+      "time_sec": 0.24,
+      "memory": "32.09MB"
+    },
+    "warnings": [],
+    "error": "An error occurred. See the output for details."
+  }
+}

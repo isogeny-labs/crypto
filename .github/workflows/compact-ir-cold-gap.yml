@@ -1,25 +1,40 @@
 name: Compact Ir matched cold native gap
 
 on:
-  pull_request:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
     paths:
+      - 'tools/isolated_bench.py'
       - '.github/workflows/compact-ir-cold-gap.yml'
       - 'research/notes/ecc2k130/compact_ir_cold_gap_20260930/**'
       - 'research/notes/ecc2k130/compact_ir_ledger_20260930/run_panel.py'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
+
 jobs:
   validate:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|compact-ir-cold-gap.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|compact-ir-cold-gap.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: ${{ github.event_name == 'push' && 25 || 30 }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            tools/factor-base
             Cargo.toml
+            tools/volcano-cli/
+            isogeny_algos/
             docs/ic/calibration.json
+            docs/ic/boundary_targets.json
+            docs/ecbench/schema.sql
+            docs/curves/registry.json
+            docs/curves/standards/parameters.json
             src
             examples/koblitz_orbit_dlp_s3_batch.rs
             examples/koblitz_rho_batch_ks_v2_n61.rs
@@ -34,12 +49,13 @@ jobs:
             research/sat_factor_base_review_20260908/autolab_orbit_extract_20260924/independent_replay.py
             tools/isolated_bench.py
             .github/workflows/compact-s3-prefilter.yml
+      - uses: Swatinem/rust-cache@v2
       - name: Check frozen cells and Python syntax
         run: |
           python3 -m py_compile research/notes/ecc2k130/compact_ir_ledger_20260930/run_panel.py \
             research/notes/ecc2k130/compact_ir_cold_gap_20260930/*.py
           python3 -m unittest discover -s research/notes/ecc2k130/compact_ir_ledger_20260930 -p 'test_panel.py' -v
-          python3 -m unittest discover -s research/notes/ecc2k130/compact_frozen_source_replay_20260929 -p 'test_materialize.py' -v
+          cargo test --release --locked --manifest-path research/notes/ecc2k130/compact_frozen_source_replay_20260929/frozen-materialize/Cargo.toml
           python3 -c 'import sys; sys.path.insert(0,"research/notes/ecc2k130/compact_ir_cold_gap_20260930"); from run_cold import load_cell; [load_cell(x) for x in ("n37_L1","n37_L1024","n41_L1","n53_L1")]'
           python3 research/notes/ecc2k130/compact_ir_cold_gap_20260930/analyze_cold.py \
             --archive research/notes/ecc2k130/compact_ir_cold_gap_20260930/evidence/run_36694337420 \
@@ -49,7 +65,7 @@ jobs:
       - name: Materialize and build the exact frozen source
         run: |
           mkdir -p "${{ runner.temp }}/compact-ir-cold"
-          python3 research/notes/ecc2k130/compact_frozen_source_replay_20260929/materialize.py \
+          cargo run --release --locked --quiet --manifest-path research/notes/ecc2k130/compact_frozen_source_replay_20260929/frozen-materialize/Cargo.toml -- materialize \
             --freeze research/notes/ecc2k130/compact_s3_prefilter_20260930/FROZEN.json \
             --dest "${{ runner.temp }}/compact-ir-cold-frozen-src" \
             --receipt "${{ runner.temp }}/compact-ir-cold/materialization.json"
@@ -81,7 +97,7 @@ jobs:
   measure:
     if: github.event_name == 'workflow_dispatch'
     needs: validate
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|compact-ir-cold-gap.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|compact-ir-cold-gap.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 90
     strategy:
       fail-fast: false
@@ -93,8 +109,15 @@ jobs:
           ref: ${{ github.sha }}
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            tools/factor-base
             Cargo.toml
+            tools/volcano-cli/
+            isogeny_algos/
             docs/ic/calibration.json
+            docs/ic/boundary_targets.json
+            docs/ecbench/schema.sql
+            docs/curves/registry.json
+            docs/curves/standards/parameters.json
             src
             examples/koblitz_orbit_dlp_s3_batch.rs
             examples/koblitz_rho_batch_ks_v2_n61.rs
@@ -109,10 +132,11 @@ jobs:
             research/sat_factor_base_review_20260908/autolab_orbit_extract_20260924/independent_replay.py
             tools/isolated_bench.py
             .github/workflows/compact-s3-prefilter.yml
+      - uses: Swatinem/rust-cache@v2
       - name: Materialize and build the exact frozen source
         run: |
           mkdir -p "${{ runner.temp }}/compact-ir-cold"
-          python3 research/notes/ecc2k130/compact_frozen_source_replay_20260929/materialize.py \
+          cargo run --release --locked --quiet --manifest-path research/notes/ecc2k130/compact_frozen_source_replay_20260929/frozen-materialize/Cargo.toml -- materialize \
             --freeze research/notes/ecc2k130/compact_s3_prefilter_20260930/FROZEN.json \
             --dest "${{ runner.temp }}/compact-ir-cold-frozen-src" \
             --receipt "${{ runner.temp }}/compact-ir-cold/materialization.json"

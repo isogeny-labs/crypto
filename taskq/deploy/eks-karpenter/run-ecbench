@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+# Runs inside the pinned task image. argv[1] is literal spec JSON, not code.
+set -euo pipefail
+mkdir -p "$ISOLAB_OUTPUT_DIR"
+finish() {
+  run_exit=$?
+  trap - EXIT TERM INT
+  set +e
+  printf '{"exit_code":%s,"job_name":"%s","pod_uid":"%s","node_name":"%s"}\n' "$run_exit" "$ISOLAB_JOB_ID" "$POD_UID" "$NODE_NAME" > "$ISOLAB_OUTPUT_DIR/job-exit.json"
+  (
+    set -e
+    cd "$ISOLAB_OUTPUT_DIR"
+    shopt -s globstar nullglob
+    for artifact in **/*; do
+      if [[ -f "$artifact" && "$artifact" != SHA256SUMS ]]; then sha256sum "$artifact"; fi
+    done
+  ) > "$ISOLAB_OUTPUT_DIR/SHA256SUMS"
+  hash_exit=$?
+  if [[ "$hash_exit" != 0 ]]; then
+    printf 'Artifact hash collection failed: %s; original exit: %s\n' "$hash_exit" "$run_exit" >&2
+    if [[ "$run_exit" != 0 ]]; then exit "$run_exit"; fi
+    exit 90
+  fi
+  if aws s3 cp "$ISOLAB_OUTPUT_DIR/" "$ISOLAB_RESULTS_URI" --recursive --only-show-errors; then
+    printf 'Artifacts saved: %s\n' "$ISOLAB_RESULTS_URI"
+  else
+    printf 'Artifact upload failed; original exit: %s\n' "$run_exit" >&2
+    if [[ "$run_exit" != 0 ]]; then exit "$run_exit"; fi
+    exit 91
+  fi
+  exit "$run_exit"
+}
+trap finish EXIT
+OWNER_PID=""
+OWNER_INTERRUPTED=0
+owner_signal() {
+  if [[ -n "$OWNER_PID" ]]; then
+    OWNER_INTERRUPTED=1
+    kill -"$1" "$OWNER_PID" 2>/dev/null || true
+  else
+    exit "$2"
+  fi
+}
+trap 'owner_signal TERM 143' TERM
+trap 'owner_signal INT 130' INT
+cp /opt/isolab/build-info.json "$ISOLAB_OUTPUT_DIR/build-info.json"
+sha256sum /usr/local/bin/ecbench > "$ISOLAB_OUTPUT_DIR/binary.sha256"
+# Validate build identity before any warmup or measured execution.
+jq -e --arg source "${2:?expected source revision}" --arg binary "${3:?expected binary hash}" \
+  '.source_revision==$source and .ecbench_sha256==$binary' \
+  "$ISOLAB_OUTPUT_DIR/build-info.json" >/dev/null || exit 44
+[[ $(cut -d' ' -f1 "$ISOLAB_OUTPUT_DIR/binary.sha256") == "$3" ]] || exit 44
+printf '%s\n' "$1" > "$ISOLAB_OUTPUT_DIR/input-spec.json"
+spec="$ISOLAB_OUTPUT_DIR/input-spec.json"
+# Explicit optional transport; absent arguments preserve the historical command.
+diagnostic_args=()
+if [[ $# != 3 ]]; then
+  [[ $# == 9 && "$4" == --diagnostic-launch && "$5" == /opt/isolab/diagnostic-input/fresh-launch.json \
+     && "$6" == --diagnostic-launch-sha256 && "$8" == --diagnostic-spec-sha256 ]] || exit 45
+  [[ "$7" =~ ^[a-f0-9]{64}$ && "$9" =~ ^[a-f0-9]{64}$ ]] || exit 45
+  [[ -f "$5" && "$(stat -Lc '%u %a' "$5")" == '0 444' ]] || exit 45
+  [[ $(wc -c < "$5") -le 65536 ]] || exit 45
+  [[ $(sha256sum "$5" | cut -d' ' -f1) == "$7" ]] || exit 45
+  [[ $(sha256sum "$spec" | cut -d' ' -f1) == "$9" ]] || exit 45
+  # Copy exact bytes only for custody; pass the immutable kubelet-prepared mount.
+  cp -- "$5" "$ISOLAB_OUTPUT_DIR/diagnostic-launch.json"
+  sha256sum "$ISOLAB_OUTPUT_DIR/diagnostic-launch.json" > "$ISOLAB_OUTPUT_DIR/diagnostic-launch.sha256"
+  diagnostic_args=(--diagnostic-launch "$5")
+fi
+jq -e '.schema == "ecbench.spec/v1" and .measurement.isolation_required == "L2"
+  and .measurement.rounds >= 5 and .measurement.warmup >= 1
+  and ([.arms[] | select(.role == "reference")] | length > 0)
+  and ([.arms[] | select(.role == "control")] | length > 0)' "$spec" >/dev/null
+aws sts get-caller-identity > "$ISOLAB_OUTPUT_DIR/runner-identity.json"
+cat /proc/self/status > "$ISOLAB_OUTPUT_DIR/process-status.txt"
+cat /sys/fs/cgroup/cpuset.cpus.effective > "$ISOLAB_OUTPUT_DIR/pod-cpuset.txt"
+# A separate whole core remains for the parent shell and harness. No busy
+# override, threshold override, automatic retry, or selective record removal.
+sleep 60
+owner_invoke() {
+  local phase=$1
+  shift
+  local config="$ISOLAB_OUTPUT_DIR/owner-$phase-config.json"
+  local receipt="$ISOLAB_OUTPUT_DIR/owner-$phase.json"
+  local config_sha child_exit check_exit
+  [[ ${#diagnostic_args[@]} == 2 ]] || return 46
+  [[ $(sha256sum /usr/local/bin/isolab-fresh-owner | cut -d' ' -f1) == "$ISOLAB_FRESH_OWNER_SHA256" ]] || return 46
+  [[ $(jq -r .fresh_owner_sha256 "$ISOLAB_OUTPUT_DIR/build-info.json") == "$ISOLAB_FRESH_OWNER_SHA256" ]] || return 46
+  jq -n --arg phase "$phase" --arg request "$ISOLAB_OWNER_REQUEST_SHA256" \
+    --arg pod "$POD_UID" --arg job "$ISOLAB_OWNER_JOB_UID" --arg image "$ISOLAB_OWNER_IMAGE_SHA256" \
+    --arg binary_sha "$(cut -d' ' -f1 "$ISOLAB_OUTPUT_DIR/binary.sha256")" \
+    --arg launch "${diagnostic_args[1]}" --arg launch_sha "$(sha256sum "${diagnostic_args[1]}" | cut -d' ' -f1)" \
+    --arg spec "$spec" --arg spec_sha "$(sha256sum "$spec" | cut -d' ' -f1)" \
+    --arg session "$ISOLAB_OUTPUT_DIR/session" --arg receipt "$receipt" \
+    --argjson stop "$ISOLAB_OWNER_STOP_UTC" --args \
+    '{schema:"isolab.fresh-owner-config/v1",phase:$phase,request_sha256:$request,pod_uid:$pod,job_uid:$job,
+      image_digest:$image,binary_sha256:$binary_sha,binary:"/usr/local/bin/ecbench",argv:$ARGS.positional,
+      launch:$launch,launch_sha256:$launch_sha,spec:$spec,spec_sha256:$spec_sha,session:$session,receipt:$receipt,stop_utc_seconds:$stop}' -- "$@" > "$config"
+  config_sha=$(sha256sum "$config" | cut -d' ' -f1)
+  set +e
+  /usr/local/bin/isolab-fresh-owner "$config" "$config_sha" &
+  OWNER_PID=$!
+  while true; do
+    OWNER_INTERRUPTED=0
+    wait "$OWNER_PID"
+    child_exit=$?
+    # A trapped wrapper signal interrupts wait before the native owner has
+    # reaped/published. Forward it, then wait again for that same owner.
+    if [[ $OWNER_INTERRUPTED == 0 ]]; then break; fi
+  done
+  OWNER_PID=""
+  /usr/local/bin/isolab-fresh-owner --check "$config" "$config_sha" > "$ISOLAB_OUTPUT_DIR/owner-$phase-check.json" 2> "$ISOLAB_OUTPUT_DIR/owner-$phase-check.stderr"
+  check_exit=$?
+  set -e
+  if [[ $child_exit != 0 ]]; then return "$child_exit"; fi
+  [[ $check_exit == 0 ]] || return 47
+}
+if [[ -n ${ISOLAB_FRESH_OWNER_SHA256:-} ]]; then
+  owner_invoke run run --spec "$spec" --out "$ISOLAB_OUTPUT_DIR/session" --cpus auto "${diagnostic_args[@]}" > "$ISOLAB_OUTPUT_DIR/run-summary.json" 2> "$ISOLAB_OUTPUT_DIR/run.stderr"
+  owner_invoke replay verify --dir "$ISOLAB_OUTPUT_DIR/session" --replay-all --exit-code --out "$ISOLAB_OUTPUT_DIR/audit.json" > "$ISOLAB_OUTPUT_DIR/audit.stdout" 2> "$ISOLAB_OUTPUT_DIR/audit.stderr"
+else
+  ecbench run --spec "$spec" --out "$ISOLAB_OUTPUT_DIR/session" --cpus auto "${diagnostic_args[@]}" > "$ISOLAB_OUTPUT_DIR/run-summary.json" 2> "$ISOLAB_OUTPUT_DIR/run.stderr"
+  ecbench verify --dir "$ISOLAB_OUTPUT_DIR/session" --replay-all --exit-code --out "$ISOLAB_OUTPUT_DIR/audit.json" > "$ISOLAB_OUTPUT_DIR/audit.stdout" 2> "$ISOLAB_OUTPUT_DIR/audit.stderr"
+fi
+cat "$ISOLAB_OUTPUT_DIR/audit.stderr"
+jq -e '.ok and .regraded and .records_bound and .records>0
+  and .verified_records==.records and (.replays|length)>0
+  and all(.replays[]; .reproduced==true)' "$ISOLAB_OUTPUT_DIR/audit.json" >/dev/null || exit 41
+# The audit authenticates and regrades the records; this additional gate
+# rejects a correct computation whose measurement did not achieve L2.
+jq -s '{required:"L2",executions:length,
+  invalid_outcomes:[.[] | select(.outcome.status != "verified" or .outcome.matches_target != true) | {seq,arm,outcome}],
+  below_l2:[.[] | select(.isolation.level != "L2" and .isolation.level != "L3") | {seq,arm,isolation}],
+  grades:(group_by(.isolation.level)|map({level:.[0].isolation.level,count:length}))}
+  | .accepted=(.executions > 0 and (.below_l2|length)==0 and (.invalid_outcomes|length)==0)' \
+  "$ISOLAB_OUTPUT_DIR/session/records.jsonl" > "$ISOLAB_OUTPUT_DIR/l2-gate.json"
+jq -e '.accepted' "$ISOLAB_OUTPUT_DIR/l2-gate.json" >/dev/null || exit 42
+reference=$(jq -r '.arms[] | select(.role=="reference") | .name' "$spec" | head -1)
+control=$(jq -r '.arms[] | select(.role=="control") | .name' "$spec" | head -1)
+ecbench compare --dir "$ISOLAB_OUTPUT_DIR/session" --a "$reference" --b "$control" --json \
+  > "$ISOLAB_OUTPUT_DIR/control-comparison.json"
+jq -e '.wall.status=="admitted" and .wall.pairs_below_level==0 and .wall.aa_pairs>=5
+  and .wall.aa_ci95!=null' "$ISOLAB_OUTPUT_DIR/control-comparison.json" >/dev/null || exit 43

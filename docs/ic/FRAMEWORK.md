@@ -24,6 +24,12 @@ is visible where it lands, not only in the total.
 
 ## 1. Quick start
 
+For one-command structured-base search with live CADO-style progress, exact
+inventories, verified decomposition probes and resumable attempts, see
+[the native factor-base sweeper](factor-base-sweep/README.md). Its live rates
+and ETAs are provisional diagnostics; it does not certify regularity or a
+complete discrete-log speedup.
+
 ```bash
 cargo build --release --bin ic
 
@@ -69,6 +75,13 @@ ic bench --bits 20 \
 # A sweep: every combination in the matrix, one table.
 ic bench --sweep docs/ic/sweeps/factor-base-size.json \
     --out docs/ic/runs/my-sweep-2026-09-22.json
+
+# Let the planner choose: every stage the measured evidence says to run
+# on this curve, each with its rule, its reason, its sources and how far
+# the curve is from what was measured, and the expected gap to rho.
+ic plan --prime-bits 28                     # or --koblitz 0:41, or --binary-degree 21
+ic plan --curve @curve.json --ecbench-arm auto   # an ecbench workload curve
+ic bench --bits 24 --auto --rho-runs 8      # run the plan; explicit stages still win
 ```
 
 The table that comes out:
@@ -84,6 +97,50 @@ Read across a row and the trade-off is explicit: a bigger base raises
 the hit rate (`0.001 → 0.110`), which cuts the targets needed
 (`2219 → 757`), which raises the matrix rows (`3 → 83`). `S` is the sum
 of all of it, and it is not monotone — that is the point.
+
+### The planner (`ic plan`, `ic bench --auto`)
+
+`ic_framework::planner` reads a curve's class (prime, `j = 0`, `j = 1728`,
+random binary, Koblitz), field and subgroup size, and picks the pipeline from
+the repository's measurements: the factor base at the family optimum, the
+two-summand pair table (the cache-blocked builder when `p < 2^62`, the
+Frobenius-folded table on Koblitz curves), the target-pinned matrix for one
+target or `sparse-cado` for a log database (`--goal log-database`), and the
+target source. Each choice names its rule (`prime.oracle.blocked-table`, …),
+the study files it rests on, and whether the curve is inside the measured
+sizes (`measured`), between them (`interpolated`) or outside them
+(`extrapolated`). It also reads the measured gap to the matched rho off the
+same studies and says which to run: on every class measured so far rho is
+cheaper, so the verdict says so. A class with no measured recipe (extension
+fields, even-degree or wide Koblitz curves) gets the rho reference and no
+index-calculus plan. A plan is a hypothesis until a paired session confirms it
+on the curve (`research/ic_planner_validation_20261020`).
+
+`--native-weight w` (on `ic plan` and `ic bench --auto`, default 0) plans for
+the AGENTS.md §5a weight `w`, in GAE per unpriced native operation. The
+operations are lookups, guard probes, Legendre symbols, square roots and row
+operations.
+- **No weight rule is in force.** Since `ic-planner/4` the factor base is the
+  counted optimum at every weight: N₀ on prime curves, c₀ orbit columns on
+  Koblitz curves, d₀ on random binary curves. A declared weight adds a warning
+  and the evidence for that weight.
+- **What was withdrawn.** `ic-planner/3` scaled the prime base by 1.41 at
+  `w = 1` (`research/ic_planner_weight_rule_20261021`). It shrank the Koblitz
+  base to 0.71·c₀ at `w ≥ 0.3` (`research/ic_planner_weight_rule_binkob_20261026`).
+  Both failed their preregistered hold-outs in
+  `research/ic_planner_exhaustive_20261026`, and its decision rule withdraws them:
+  - **Prime:** 1.41·N₀ was cheaper at `w = 1` on 4 of 4 curves, but also at
+    `w = 0` on 2 of 4.
+  - **Koblitz:** at log2 r 36.6–47.2, 0.71·c₀ cost 1.06–1.17× c₀ at `w = 1`.
+  - **Binary:** d₀ + 1 beat d₀ at `w = 1` on one of four held-out curves.
+- For log2 r ≥ 36 the Koblitz plan also cites
+  `research/ic_koblitz_descent_routing_20261026`. There the ledger §23 descent,
+  now the `ecbench` method `ic.koblitz_descent`, measured 1.41–1.49× costlier
+  in counted `S`.
+
+A weighted plan is cheaper only at its weight; it is never a ranking across
+the band. The rule set is versioned (`ic-planner/4` since the weight rules were withdrawn);
+change a rule and the version changes with it.
 
 ---
 
@@ -226,7 +283,7 @@ stopwatch, and the table should say which is which.
 
 | field | meaning |
 |:--|:--|
-| `name` | the matrix: `incremental-gauss` or `structured-gauss` |
+| `name` | the matrix: `incremental-gauss`, `structured-gauss` or `sparse-cado` |
 | `rows`, `rank`, `dependent` | relations added, rank reached, and the ones that added nothing |
 | `work`, `work_unit` | the method's own count (`row_ops` for an elimination) |
 | `recovered`, `verified` | the logarithm found, and whether it is the planted one |
@@ -463,12 +520,13 @@ incremental elimination, structured Gaussian elimination and an
 iterative method (Wiedemann, Lanczos) is a real lever and the one most
 often left unpriced.
 
-Two ship, chosen with `--linalg` (or the `linalg` key of a sweep):
+Three ship, chosen with `--linalg` (or the `linalg` key of a sweep):
 
 | name | what it is | pivot | storage |
 |:--|:--|:--|:--|
 | `incremental-gauss` | dense reduced row echelon, maintained as rows arrive | leftmost non-zero | `rank × columns` |
 | `structured-gauss` | sparse reduced row echelon, maintained as rows arrive | lightest column (Markowitz) | the non-zeros |
+| `sparse-cado` | batch: CADO-style filter (clique purge, spanning-tree merge), then block Wiedemann, re-solved as relations arrive; full-rank stop rule | — | the non-zeros |
 
 Both charge one `row_op` per non-zero multiply-subtract, so their
 `work` columns compare directly; on the two- or three-non-zero rows an
@@ -480,7 +538,12 @@ reduces the new row against the pivots held so far and answers
 `Independent`, `Dependent` or `Inconsistent`; `pinned` says whether one
 column is determined on its own. The loop calls them after every
 relation, so an implementation must answer incrementally; a batch
-method would re-solve on every call.
+method would re-solve on every call. `sparse-cado` is that batch method,
+made workable by re-solving only once every column is covered, then every
+`max(1, columns / 32)` relations; it answers only at full column rank,
+certified by two independently seeded solves agreeing, and charges the
+same `row_ops` (entry multiply-subtracts in merges, sparse products,
+checks and reconstruction) summed over every solve it tried.
 
 ---
 
@@ -769,11 +832,27 @@ worse than none:
 
 | stage | trait | plug-ins |
 |:--|:--|:--|
-| factor base | `FactorBaseBuilder` | `prime-abscissa`, `glv-orbit`, `binary-subspace`, `koblitz-orbit`, `koblitz-trace-zero`, `koblitz-symmetrised`, `gls-line` |
+| factor base | `FactorBaseBuilder` | `prime-abscissa`, `glv-orbit`, `hashed-affine`, `binary-subspace`, `koblitz-orbit`, `koblitz-trace-zero`, `koblitz-symmetrised`, `gls-line` |
 | targets | `Targets` | `random`, `walk` |
-| point decomposition | `DecompositionOracle` | `subtract`, `mitm`, `mitm-frobenius`, `descent-algebraic`, `symmetrised`; `line-resultant` (library and `examples/glv_invariant_experiments.rs`: the `O(log p)` Weil-descent oracle for a line base over `F_{p^k}`, `line_oracle.rs`) |
+| point decomposition | `DecompositionOracle` | `subtract`, `mitm`, `hashed-tensor`, `mitm-frobenius`, `descent-algebraic`, `symmetrised`, `chained-x`; `line-resultant` (library and `examples/glv_invariant_experiments.rs`: the `O(log p)` Weil-descent oracle for a line base over `F_{p^k}`, `line_oracle.rs`) |
 | polynomial solver | `SystemSolver` | `f4-f2`, `buchberger-f2`, `matrix-f4`, `matrix-f5`, `inherited-f4`, `crossbred-f2`, `xl-f2`, `sat-cdcl`, `fes-f2`, `fes-f2-wide`, `exhaustive` |
-| relation matrix | `RelationSolver` | `incremental-gauss`, `structured-gauss` |
+| relation matrix | `RelationSolver` | `incremental-gauss`, `structured-gauss`, `sparse-cado` |
+
+### Hashed-affine / hashed-tensor
+
+`hashed-affine` is the union of `slots` independent affine-hashed bases
+(`(α·encode(A) + β) mod s < τ`) and `hashed-tensor` is the exact Boolean
+tensor-contraction oracle over those slots, from the vendored
+`crates/hashed-ecdl-tensor`. Both read `slots`, `seed`, `tau` and `s`; the
+two specifications must agree, and `prepare` refuses the run when the base
+is not the same point list. This is the Bochum v0.2 §3 construction with the
+October 25 manuscript Appendix D.4 contraction; it is a separate arm from
+the summation-polynomial pipeline.
+
+The contraction's work is reported as `hashed_tensor_steps`, an
+**uncalibrated** charged-primitive count, so the `S` column does not yet
+price it. Treat a `hashed-affine + hashed-tensor` row as a stage diagnostic,
+not as a comparable end-to-end `S`, until that step has a calibration.
 
 `ic bench --list` prints this with every parameter each plug-in reads.
 A parameter that takes several values (`divisor` on `koblitz-orbit`,

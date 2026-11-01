@@ -1,0 +1,56 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h396db1437f4a",
+  "label": "vs_rho shape: root-finding vs inherited-F4 decomposition on public targets, E_0 m=13, d=5",
+  "spec_id": "ECS1h4b02cd069a11",
+  "spec_sha256": "4b02cd069a1181f27a63d1989c6bcf83f0f36982daea82ab5fe1063c6026114d",
+  "env_class_id": "ECBENV3h4b21368b3262",
+  "host_sha256": "e36c9930cb942f80915dd771a7279d7b17e6800016476c16318eaa5beb34fc93",
+  "plan_sha256": "0b109338077a2f52037731c4ffa5357b6814be7c3005b4dc46fb33c88c1c3cb3",
+  "binary_sha256": "5011c39c8d52f54039cf344df0027ce4bdd97d20ad41d0da4a16b7c50b2e2efc",
+  "git_commit": "2b9f3f72f681fd414f881d56e009c13d7f9bbf56",
+  "git_dirty": false,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": false,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1793160229329,
+  "finished_unix_ms": 1793160244679,
+  "status": "complete",
+  "executions_planned": 224,
+  "records_written": 224,
+  "records_sha256": "0b5e0124732f9739d84883dc27baaf662c31bf6bf49e47fec0eaf2fe7813e495",
+  "status_counts": {
+    "verified": 224
+  },
+  "last_seq": 223
+}

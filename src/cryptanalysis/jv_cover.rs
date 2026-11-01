@@ -110,6 +110,7 @@ impl Fq {
         self.mul(a, a)
     }
     pub fn conj(&self, a: &E2) -> E2 {
+        super::jv_bitops::hook_adds(self.p, 1);
         E2([a.0[0], (self.p - a.0[1]) % self.p])
     }
     pub fn pow(&self, a: &E2, mut e: u128) -> E2 {
@@ -131,6 +132,7 @@ impl Fq {
         *a == E2::ZERO || self.pow(a, self.order() / 2) == E2::ONE
     }
     pub fn random(&self, rng: &mut StdRng) -> E2 {
+        super::jv_bitops::rng_words(2);
         E2([rng.gen_range(0..self.p), rng.gen_range(0..self.p)])
     }
     /// Tonelli–Shanks in `F_{p²}^×`.
@@ -189,6 +191,7 @@ impl Fld for Fq {
         E2([sm(a.0[0], b.0[0], self.p), sm(a.0[1], b.0[1], self.p)])
     }
     fn neg(&self, a: &E2) -> E2 {
+        super::jv_bitops::hook_adds(self.p, 2);
         E2([(self.p - a.0[0]) % self.p, (self.p - a.0[1]) % self.p])
     }
     fn mul(&self, a: &E2, b: &E2) -> E2 {
@@ -211,6 +214,7 @@ impl Fld for Fq {
             p,
         );
         let ni = inv_mod(norm, p);
+        super::jv_bitops::hook_adds(p, 1);
         E2([mm(a.0[0], ni, p), mm((p - a.0[1]) % p, ni, p)])
     }
 }
@@ -1300,11 +1304,20 @@ pub struct ZeroDimStats {
     pub timed_out: bool,
     /// A root of the minimal polynomial whose eigenspace was not a line.
     pub nonseparating: usize,
+    /// The sparse linear stage gave up (minimal polynomial of `x_n` short of
+    /// `delta`, or an eigen-system not of corank one) and the dense path ran.
+    pub lin_fallback: usize,
     pub f4_ms: f64,
     /// Wall time of everything after F4 in the solver.
     pub lin_ms: f64,
     /// F4 stopped early at this staircase (`F4Options::stop_staircase`).
     pub stopped_at: Option<usize>,
+    /// The Hilbert rule ran (`F4Options::stopping_by_hilbert`), or its
+    /// certificate failed and the plain run was done (a fallback).
+    pub hilbert_applied: bool,
+    pub hilbert_fallback: bool,
+    /// Multiplications of the regularity check (inside `f4_muls`).
+    pub hilbert_check_muls: u64,
     /// F4 replayed a recorded trace (the useful rows of an earlier system
     /// of the same shape) instead of selecting pairs.
     pub replayed: bool,
@@ -1328,6 +1341,27 @@ pub struct TraceEntry {
 fn trace_cache() -> &'static Mutex<HashMap<u64, TraceEntry>> {
     static CACHE: OnceLock<Mutex<HashMap<u64, TraceEntry>>> = OnceLock::new();
     CACHE.get_or_init(|| Mutex::new(HashMap::new()))
+}
+
+thread_local! {
+    static TRACE_SCOPE: Cell<u64> = const { Cell::new(0) };
+}
+
+/// Key traces recorded and replayed on this thread by `scope` as well as
+/// `p` (`0`, the default, is the process-wide cache keyed by `p` alone).  A
+/// study that runs each instance on its own thread gives each run its own
+/// scope, so every run starts with no recorded trace (cold) and runs side by
+/// side do not share one.
+pub fn set_trace_scope(scope: u64) {
+    TRACE_SCOPE.with(|c| c.set(scope));
+}
+
+fn trace_key(p: u64) -> u64 {
+    p.wrapping_add(
+        TRACE_SCOPE
+            .with(Cell::get)
+            .wrapping_mul(0x9E37_79B9_7F4A_7C15),
+    )
 }
 
 /// Forget the recorded traces (tests).
@@ -1360,26 +1394,40 @@ pub fn solve_zero_dim_traced(
     rng: &mut StdRng,
     trace: bool,
 ) -> (Vec<Vec<u64>>, ZeroDimStats) {
+    solve_zero_dim_mode(input, n, p, opts, rng, trace, lin_mode())
+}
+
+/// [`solve_zero_dim_traced`] with the linear stage chosen explicitly.
+pub fn solve_zero_dim_mode(
+    input: &[f4_fp::Poly],
+    n: usize,
+    p: u64,
+    opts: &F4Options,
+    rng: &mut StdRng,
+    trace: bool,
+    mode: LinMode,
+) -> (Vec<Vec<u64>>, ZeroDimStats) {
     let mut st = ZeroDimStats::default();
+    let key = trace_key(p);
     let r = if !trace {
         f4_fp::f4(input, n, p, opts)
     } else {
         let have = trace_cache()
             .lock()
             .unwrap()
-            .get(&p)
+            .get(&key)
             .map(|e| e.trace.clone());
         match have {
             Some(t) => {
                 // a diverging replay finishes as a full run inside the engine
                 let r = f4_fp::f4_replay(input, n, p, opts, &t);
                 let mut cache = trace_cache().lock().unwrap();
-                if let Some(e) = cache.get_mut(&p) {
+                if let Some(e) = cache.get_mut(&key) {
                     if Arc::ptr_eq(&e.trace, &t) {
                         if r.trace_mismatch {
                             e.diverged += 1;
                             if e.diverged >= 3 && e.diverged > e.held {
-                                cache.remove(&p);
+                                cache.remove(&key);
                             }
                         } else {
                             e.held += 1;
@@ -1399,7 +1447,7 @@ pub fn solve_zero_dim_traced(
                     trace_cache()
                         .lock()
                         .unwrap()
-                        .entry(p)
+                        .entry(key)
                         .or_insert_with(|| TraceEntry {
                             trace: Arc::new(t),
                             held: 0,
@@ -1418,6 +1466,12 @@ pub fn solve_zero_dim_traced(
     st.max_cols = r.max_cols;
     st.f4_ms = r.ms;
     st.stopped_at = r.staircase_at_stop;
+    st.hilbert_applied = r.hilbert == f4_fp::HilbertStop::Applied;
+    st.hilbert_fallback = matches!(
+        r.hilbert,
+        f4_fp::HilbertStop::CheckFailed | f4_fp::HilbertStop::Violated
+    );
+    st.hilbert_check_muls = r.hilbert_check_ops;
     if r.timed_out {
         st.timed_out = true;
         return (Vec::new(), st);
@@ -1430,7 +1484,41 @@ pub fn solve_zero_dim_traced(
         st.incomplete = true;
         return (Vec::new(), st);
     }
-    let lms: Vec<&Vec<u32>> = r.basis.iter().map(|g| &g[0].0).collect();
+    let sols = linear_stage_from_basis(&r.basis, input, n, p, rng, mode, &mut st, t_lin);
+    (sols, st)
+}
+
+/// The linear stage of [`solve_zero_dim_mode`] alone: from a Gröbner basis
+/// (monic, grevlex, as `f4_fp` returns it) of a zero-dimensional ideal to its
+/// `F_p`-rational solutions, each checked against `input`. It draws one `u64`
+/// from `rng`, as the solver always did. `t_lin` is when the stage's clock
+/// starts; the stage writes `delta`, `lin_muls`, `lin_ms`, `lin_fallback`,
+/// `nonseparating`, `incomplete` and `inconsistent` into `st`.
+#[allow(clippy::too_many_arguments)]
+pub fn linear_stage_from_basis(
+    basis: &[f4_fp::Poly],
+    input: &[f4_fp::Poly],
+    n: usize,
+    p: u64,
+    rng: &mut StdRng,
+    mode: LinMode,
+    st: &mut ZeroDimStats,
+    t_lin: Instant,
+) -> Vec<Vec<u64>> {
+    if mode == LinMode::Fast {
+        let mut fs = super::zero_dim_la::FastStats::default();
+        if let Some(sols) = super::zero_dim_la::fast_stage(basis, input, n, p, rng, &mut fs) {
+            st.delta = fs.delta;
+            st.lin_muls = fs.muls();
+            st.lin_ms = t_lin.elapsed().as_secs_f64() * 1e3;
+            return sols;
+        }
+        st.lin_fallback += 1;
+        let sols = linear_stage_from_basis(basis, input, n, p, rng, LinMode::Dense, st, t_lin);
+        st.lin_muls += fs.muls();
+        return sols;
+    }
+    let lms: Vec<&Vec<u32>> = basis.iter().map(|g| &g[0].0).collect();
     // the smallest pure power of each variable
     let mut cap = vec![u32::MAX; n];
     for lm in &lms {
@@ -1440,7 +1528,7 @@ pub fn solve_zero_dim_traced(
     }
     if cap.contains(&u32::MAX) {
         st.incomplete = true;
-        return (Vec::new(), st);
+        return Vec::new();
     }
     // standard monomials by pruned depth-first search
     let mut std_mons: Vec<Vec<u32>> = Vec::new();
@@ -1474,13 +1562,13 @@ pub fn solve_zero_dim_traced(
     let mut mono = vec![0u32; n];
     if !walk(0, &mut mono, &cap, &lms, &mut std_mons) {
         st.incomplete = true;
-        return (Vec::new(), st);
+        return Vec::new();
     }
     let delta = std_mons.len();
     st.delta = delta;
     if delta == 0 {
         st.inconsistent = true;
-        return (Vec::new(), st);
+        return Vec::new();
     }
     // Monomials packed eight bits per variable; divisibility by the guard-bit
     // trick (exponents stay below 128).
@@ -1505,8 +1593,7 @@ pub fn solve_zero_dim_traced(
         .enumerate()
         .map(|(i, m)| (pack(m), i))
         .collect();
-    let bas: Vec<(u64, Vec<(u64, u64)>)> = r
-        .basis
+    let bas: Vec<(u64, Vec<(u64, u64)>)> = basis
         .iter()
         .map(|g| {
             (
@@ -1554,93 +1641,294 @@ pub fn solve_zero_dim_traced(
         memo.insert(m, acc.clone());
         Some(acc)
     }
-    // multiplication matrices: column j of M_i is NF(x_i · b_j)
-    let mut mats: Vec<Vec<Vec<u64>>> = Vec::with_capacity(n);
-    for i in 0..n {
-        let mut mi = vec![vec![0u64; delta]; delta];
-        for (j, b) in std_mons.iter().enumerate() {
-            let xb = pack(b) + (1u64 << (8 * i));
-            let Some(col) = nf_mono(xb, delta, p, &index, &bas, &divides_p, &mut memo, &mut cnt)
-            else {
-                st.incomplete = true;
-                return (Vec::new(), st);
-            };
-            for (k, &c) in col.iter().enumerate() {
-                mi[k][j] = c;
-            }
-        }
-        mats.push(mi);
-    }
-    // A random linear form `ℓ = Σ c_i x_i` and the characteristic polynomial of
-    // its matrix (exact, by Hessenberg reduction: a Krylov minimal polynomial
-    // of one random vector misses a root with probability `1/p` per root).  If
-    // some root's eigenspace is not a line, `ℓ` does not separate the points
-    // and a new form is drawn.
+    // ── The linear stage ──
+    // Dense (reference): all n multiplication matrices, the characteristic
+    // polynomial of a random linear form, a 64x64 null space per root.
+    // Sparse (default): only M_{x_n}, whose unit columns are shifts; its
+    // minimal polynomial by Wiedemann + Berlekamp–Massey (degree delta means
+    // it is the characteristic polynomial and x_n separates the points), and
+    // each eigenvector from the shift chains and the dense columns alone.
+    // `L1a`: the same chain recovery with the dense Hessenberg charpoly of M_{x_n}.
     let ring = PolyRing::new(p);
+    let mut lrng = StdRng::seed_from_u64(rng.gen());
     let mut sols: Vec<Vec<u64>> = Vec::new();
-    for _attempt in 0..16 {
-        let coef: Vec<u64> = (0..n).map(|_| rng.gen_range(1..p)).collect();
-        let mut m = vec![vec![0u64; delta]; delta];
-        for i in 0..n {
-            for a in 0..delta {
-                for b in 0..delta {
-                    m[a][b] = am(m[a][b], mm(coef[i], mats[i][a][b], p), p);
+    let mut fast: Option<Vec<Vec<u64>>> = None;
+    if mode != LinMode::Dense && n >= 2 {
+        'fast: {
+            let xn = n - 1;
+            let unit = 1u64 << (8 * xn);
+            // column j of M_xn: a shift target, or the dense normal form (sparse list)
+            let mut target: Vec<Option<usize>> = Vec::with_capacity(delta);
+            let mut nz: Vec<Vec<(usize, u64)>> = Vec::with_capacity(delta);
+            for b in &std_mons {
+                let xb = pack(b) + unit;
+                if let Some(&k) = index.get(&xb) {
+                    target.push(Some(k));
+                    nz.push(Vec::new());
+                    continue;
+                }
+                let Some(col) =
+                    nf_mono(xb, delta, p, &index, &bas, &divides_p, &mut memo, &mut cnt)
+                else {
+                    st.incomplete = true;
+                    return Vec::new();
+                };
+                target.push(None);
+                nz.push(
+                    col.iter()
+                        .enumerate()
+                        .filter(|(_, &c)| c != 0)
+                        .map(|(k, &c)| (k, c))
+                        .collect(),
+                );
+            }
+            // the chains x_n^e * root and the coordinates
+            let mut chain_of = vec![0usize; delta];
+            let mut e_of = vec![0usize; delta];
+            let mut roots_map: crate::cryptanalysis::fx_hash::FxMap<u64, usize> =
+                Default::default();
+            let mut chain_end: Vec<usize> = Vec::new();
+            for (j, b) in std_mons.iter().enumerate() {
+                let e = b[xn] as usize;
+                let root = pack(b) - (e as u64) * unit;
+                let nc = roots_map.len();
+                let c = *roots_map.entry(root).or_insert(nc);
+                if c == chain_end.len() {
+                    chain_end.push(j);
+                }
+                chain_of[j] = c;
+                e_of[j] = e;
+                if e > e_of[chain_end[c]] {
+                    chain_end[c] = j;
                 }
             }
+            let nchain = chain_end.len();
+            if chain_end.iter().any(|&j| target[j].is_some()) {
+                break 'fast;
+            }
+            let mut coord_idx: Vec<usize> = Vec::with_capacity(n - 1);
+            for i in 0..xn {
+                let Some(&k) = index.get(&(1u64 << (8 * i))) else {
+                    break 'fast;
+                };
+                coord_idx.push(k);
+            }
+            let Some(&one_idx) = index.get(&0u64) else {
+                break 'fast;
+            };
+            // minimal polynomial of M_xn
+            let minpoly: Vec<u64> = if mode == LinMode::L1a {
+                let mut d = vec![vec![0u64; delta]; delta];
+                for j in 0..delta {
+                    match target[j] {
+                        Some(k) => d[k][j] = 1,
+                        None => {
+                            for &(k, c) in &nz[j] {
+                                d[k][j] = c;
+                            }
+                        }
+                    }
+                }
+                charpoly_mod_p(&d, p, &mut cnt)
+            } else {
+                let matvec = |v: &[u64], cnt: &mut u64| -> Vec<u64> {
+                    let mut y = vec![0u64; delta];
+                    for j in 0..delta {
+                        let vj = v[j];
+                        if vj == 0 {
+                            continue;
+                        }
+                        match target[j] {
+                            Some(k) => y[k] = am(y[k], vj, p),
+                            None => {
+                                for &(k, c) in &nz[j] {
+                                    y[k] = am(y[k], mm(c, vj, p), p);
+                                }
+                                *cnt += nz[j].len() as u64;
+                            }
+                        }
+                    }
+                    y
+                };
+                let mut found: Option<Vec<u64>> = None;
+                for _try in 0..4 {
+                    let u: Vec<u64> = (0..delta).map(|_| lrng.gen_range(0..p)).collect();
+                    let mut v: Vec<u64> = (0..delta).map(|_| lrng.gen_range(0..p)).collect();
+                    let mut seq = Vec::with_capacity(2 * delta);
+                    for i in 0..2 * delta {
+                        let mut acc = 0u64;
+                        for k in 0..delta {
+                            acc = am(acc, mm(u[k], v[k], p), p);
+                        }
+                        cnt += delta as u64;
+                        seq.push(acc);
+                        if i + 1 < 2 * delta {
+                            v = matvec(&v, &mut cnt);
+                        }
+                    }
+                    let f = berlekamp_massey_minpoly(&seq, p, &mut cnt);
+                    if f.len() == delta + 1 {
+                        found = Some(f);
+                        break;
+                    }
+                }
+                match found {
+                    Some(f) => f,
+                    None => break 'fast,
+                }
+            };
+            if minpoly.len() != delta + 1 {
+                break 'fast;
+            }
+            let roots = ring.roots(&UPoly(minpoly), &mut lrng);
+            let maxe = *e_of.iter().max().unwrap();
+            let mut round: Vec<Vec<u64>> = Vec::new();
+            for rt in roots {
+                let mut rpow = vec![1u64; maxe + 2];
+                for e in 1..maxe + 2 {
+                    rpow[e] = mm(rpow[e - 1], rt, p);
+                }
+                cnt += (maxe + 1) as u64;
+                let mut a = vec![vec![0u64; nchain]; nchain];
+                for c in 0..nchain {
+                    let je = chain_end[c];
+                    for &(k, val) in &nz[je] {
+                        let ck = chain_of[k];
+                        let t = if e_of[k] == 0 {
+                            val
+                        } else {
+                            cnt += 1;
+                            mm(val, rpow[e_of[k]], p)
+                        };
+                        a[c][ck] = am(a[c][ck], t, p);
+                    }
+                    a[c][c] = sm(a[c][c], rpow[e_of[je] + 1], p);
+                }
+                let mut mc = 0u64;
+                let piv = rref_mod_p_local(&mut a, p, &mut mc);
+                cnt += mc;
+                if piv.len() + 1 != nchain {
+                    break 'fast;
+                }
+                let free = (0..nchain).find(|c| !piv.contains(c)).unwrap();
+                let mut z = vec![0u64; nchain];
+                z[free] = 1;
+                for (ri, &pc) in piv.iter().enumerate() {
+                    z[pc] = (p - a[ri][free]) % p;
+                    super::jv_bitops::hook_adds(p, 1);
+                }
+                let w1 = z[chain_of[one_idx]];
+                if w1 == 0 {
+                    break 'fast;
+                }
+                let wi = inv_mod(w1, p);
+                let mut sol = vec![0u64; n];
+                for i in 0..xn {
+                    sol[i] = mm(z[chain_of[coord_idx[i]]], wi, p);
+                }
+                sol[xn] = rt;
+                cnt += n as u64;
+                if input.iter().all(|f| f4_fp::eval(f, &sol, p) == 0) {
+                    round.push(sol);
+                }
+            }
+            fast = Some(round);
         }
-        cnt += (n * delta * delta) as u64;
-        let cp = charpoly_mod_p(&m, p, &mut cnt);
-        let roots = ring.roots(&UPoly(cp), rng);
-        let mut round: Vec<Vec<u64>> = Vec::new();
-        let mut clean = true;
-        for rt in roots {
-            // null space of Mᵀ − rt·I
-            let mut a: Vec<Vec<u64>> = (0..delta)
-                .map(|i| {
-                    (0..delta)
-                        .map(|j| if i == j { sm(m[j][i], rt, p) } else { m[j][i] })
-                        .collect()
-                })
-                .collect();
-            let mut mc = 0u64;
-            let piv = rref_mod_p_local(&mut a, p, &mut mc);
-            cnt += mc;
-            if piv.len() + 1 != delta {
-                clean = false;
+        if fast.is_none() {
+            st.lin_fallback += 1;
+        }
+    }
+    if let Some(s) = fast {
+        sols = s;
+    } else {
+        // multiplication matrices: column j of M_i is NF(x_i · b_j)
+        let mut mats: Vec<Vec<Vec<u64>>> = Vec::with_capacity(n);
+        for i in 0..n {
+            let mut mi = vec![vec![0u64; delta]; delta];
+            for (j, b) in std_mons.iter().enumerate() {
+                let xb = pack(b) + (1u64 << (8 * i));
+                let Some(col) =
+                    nf_mono(xb, delta, p, &index, &bas, &divides_p, &mut memo, &mut cnt)
+                else {
+                    st.incomplete = true;
+                    return Vec::new();
+                };
+                for (k, &c) in col.iter().enumerate() {
+                    mi[k][j] = c;
+                }
+            }
+            mats.push(mi);
+        }
+        // A random linear form `ℓ = Σ c_i x_i` and the characteristic polynomial of
+        // its matrix (exact, by Hessenberg reduction: a Krylov minimal polynomial
+        // of one random vector misses a root with probability `1/p` per root).  If
+        // some root's eigenspace is not a line, `ℓ` does not separate the points
+        // and a new form is drawn.
+        for _attempt in 0..16 {
+            let coef: Vec<u64> = (0..n).map(|_| lrng.gen_range(1..p)).collect();
+            let mut m = vec![vec![0u64; delta]; delta];
+            for i in 0..n {
+                for a in 0..delta {
+                    for b in 0..delta {
+                        m[a][b] = am(m[a][b], mm(coef[i], mats[i][a][b], p), p);
+                    }
+                }
+            }
+            cnt += (n * delta * delta) as u64;
+            let cp = charpoly_mod_p(&m, p, &mut cnt);
+            let roots = ring.roots(&UPoly(cp), &mut lrng);
+            let mut round: Vec<Vec<u64>> = Vec::new();
+            let mut clean = true;
+            for rt in roots {
+                // null space of Mᵀ − rt·I
+                let mut a: Vec<Vec<u64>> = (0..delta)
+                    .map(|i| {
+                        (0..delta)
+                            .map(|j| if i == j { sm(m[j][i], rt, p) } else { m[j][i] })
+                            .collect()
+                    })
+                    .collect();
+                let mut mc = 0u64;
+                let piv = rref_mod_p_local(&mut a, p, &mut mc);
+                cnt += mc;
+                if piv.len() + 1 != delta {
+                    clean = false;
+                    break;
+                }
+                let free = (0..delta).find(|c| !piv.contains(c)).unwrap();
+                let mut w = vec![0u64; delta];
+                w[free] = 1;
+                for (ri, &pc) in piv.iter().enumerate() {
+                    w[pc] = (p - a[ri][free]) % p;
+                    super::jv_bitops::hook_adds(p, 1);
+                }
+                let Some(kk) = w.iter().position(|&x| x != 0) else {
+                    continue;
+                };
+                let wi = inv_mod(w[kk], p);
+                let mut sol = vec![0u64; n];
+                for i in 0..n {
+                    // (M_iᵀ w)_kk = Σ_a M_i[a][kk] w_a
+                    let mut acc = 0u64;
+                    for aa in 0..delta {
+                        acc = am(acc, mm(mats[i][aa][kk], w[aa], p), p);
+                    }
+                    sol[i] = mm(acc, wi, p);
+                }
+                cnt += (n * (delta + 1)) as u64;
+                // a genuine solution of the input
+                if input.iter().all(|f| f4_fp::eval(f, &sol, p) == 0) {
+                    round.push(sol);
+                }
+            }
+            if clean {
+                sols = round;
                 break;
             }
-            let free = (0..delta).find(|c| !piv.contains(c)).unwrap();
-            let mut w = vec![0u64; delta];
-            w[free] = 1;
-            for (ri, &pc) in piv.iter().enumerate() {
-                w[pc] = (p - a[ri][free]) % p;
+            st.nonseparating += 1;
+            if _attempt == 15 {
+                st.incomplete = true;
             }
-            let Some(kk) = w.iter().position(|&x| x != 0) else {
-                continue;
-            };
-            let wi = inv_mod(w[kk], p);
-            let mut sol = vec![0u64; n];
-            for i in 0..n {
-                // (M_iᵀ w)_kk = Σ_a M_i[a][kk] w_a
-                let mut acc = 0u64;
-                for aa in 0..delta {
-                    acc = am(acc, mm(mats[i][aa][kk], w[aa], p), p);
-                }
-                sol[i] = mm(acc, wi, p);
-            }
-            cnt += (n * (delta + 1)) as u64;
-            // a genuine solution of the input
-            if input.iter().all(|f| f4_fp::eval(f, &sol, p) == 0) {
-                round.push(sol);
-            }
-        }
-        if clean {
-            sols = round;
-            break;
-        }
-        st.nonseparating += 1;
-        if _attempt == 15 {
-            st.incomplete = true;
         }
     }
     cnt += ring.muls.get();
@@ -1648,7 +1936,116 @@ pub fn solve_zero_dim_traced(
     sols.dedup();
     st.lin_muls = cnt;
     st.lin_ms = t_lin.elapsed().as_secs_f64() * 1e3;
-    (sols, st)
+    sols
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum LinMode {
+    Dense,
+    Sparse,
+    L1a,
+    /// `zero_dim_la::fast_stage` (transposed Krylov and the rational read-out),
+    /// with the dense stage when it gives up.
+    Fast,
+}
+
+/// `JV_DUMP_INSTANCE=<path>`: append one JSON line per solved DLP with the
+/// field tower (`F_p²` = `F_p[i]/(i² − w)`, `F_p⁶` = `F_p²[θ]/(θ³ − s)`), the
+/// curve `y² = x³ + a₂x² + a₄x`, `G`, `Q`, `l`, the planted `d` and the
+/// solved `dd`, so an independent program can check `dd·G = Q`. It reads
+/// values only; no counter moves.
+fn dump_instance(f: &Fq3, ec: &EllE, spec: &Spec, seed: u64, dd: u64) {
+    let Ok(path) = std::env::var("JV_DUMP_INSTANCE") else {
+        return;
+    };
+    let e2 = |x: &E2| format!("[{},{}]", x.0[0], x.0[1]);
+    let e6 = |x: &E6| format!("[{},{},{}]", e2(&x.0[0]), e2(&x.0[1]), e2(&x.0[2]));
+    let pt = |q: &PtE6| {
+        format!(
+            "{{\"x\":{},\"y\":{},\"inf\":{}}}",
+            e6(&q.x),
+            e6(&q.y),
+            q.inf
+        )
+    };
+    let line = format!(
+        "{{\"p\":{},\"seed\":{},\"w\":{},\"s\":{},\"a2\":{},\"a4\":{},\"l\":{},\"g\":{},\"q\":{},\"d\":{},\"dd\":{},\"lin\":\"{}\"}}\n",
+        spec.p, seed, f.f.w, e2(&f.s), e6(&ec.a2), e6(&ec.a4), spec.l, pt(&spec.g), pt(&spec.q), spec.d, dd, lin_mode_name()
+    );
+    use std::io::Write;
+    let mut out = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&path)
+        .expect("JV_DUMP_INSTANCE");
+    out.write_all(line.as_bytes())
+        .expect("JV_DUMP_INSTANCE write");
+}
+
+/// `JV_LIN=dense|l1a|sparse|fast` (default fast since
+/// research/postgb_linear_stage_20261026; `sparse` is the earlier default),
+/// read once.
+fn lin_mode() -> LinMode {
+    static MODE: OnceLock<LinMode> = OnceLock::new();
+    *MODE.get_or_init(|| match std::env::var("JV_LIN").as_deref() {
+        Ok("dense") => LinMode::Dense,
+        Ok("l1a") => LinMode::L1a,
+        Ok("sparse") => LinMode::Sparse,
+        _ => LinMode::Fast,
+    })
+}
+
+pub fn lin_mode_name() -> &'static str {
+    match lin_mode() {
+        LinMode::Dense => "dense",
+        LinMode::L1a => "l1a",
+        LinMode::Sparse => "sparse",
+        LinMode::Fast => "fast",
+    }
+}
+
+/// Minimal polynomial (monic, low to high, degree = linear complexity `L`) of
+/// a sequence by Berlekamp–Massey; multiplications counted into `cnt`.  The
+/// result is the generator of the whole sequence when `2L <= seq.len()`.
+pub fn berlekamp_massey_minpoly(seq: &[u64], p: u64, cnt: &mut u64) -> Vec<u64> {
+    let mut c: Vec<u64> = vec![1];
+    let mut b: Vec<u64> = vec![1];
+    let mut l = 0usize;
+    let mut m = 1usize;
+    let mut bd = 1u64;
+    for n in 0..seq.len() {
+        let mut d = seq[n];
+        for i in 1..=l.min(c.len() - 1) {
+            d = am(d, mm(c[i], seq[n - i], p), p);
+        }
+        *cnt += l as u64;
+        if d == 0 {
+            m += 1;
+            continue;
+        }
+        let coef = mm(d, inv_mod(bd, p), p);
+        *cnt += 1;
+        let t = c.clone();
+        if c.len() < b.len() + m {
+            c.resize(b.len() + m, 0);
+        }
+        for (i, &bi) in b.iter().enumerate() {
+            c[i + m] = sm(c[i + m], mm(coef, bi, p), p);
+        }
+        *cnt += b.len() as u64;
+        if 2 * l <= n {
+            l = n + 1 - l;
+            b = t;
+            bd = d;
+            m = 1;
+        } else {
+            m += 1;
+        }
+    }
+    c.resize(l + 1, 0);
+    // x^L C(1/x)
+    c.reverse();
+    c
 }
 
 /// Characteristic polynomial (monic, coefficients low to high) of a square
@@ -1919,6 +2316,9 @@ pub fn verify_dec(jac: &Hyp<Fq>, base: &[BaseEl], r: &Div<E2>, d: &Dec6) -> bool
 
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct NagaoCost {
+    pub hilbert_applied: bool,
+    pub hilbert_fallback: bool,
+    pub hilbert_check_muls: u64,
     pub weil_muls: u64,
     pub f4_muls: u64,
     pub lin_muls: u64,
@@ -1936,6 +2336,7 @@ pub struct NagaoCost {
     pub timed_out: bool,
     pub degenerate: bool,
     pub nonseparating: usize,
+    pub lin_fallback: usize,
     pub stopped_at: Option<usize>,
     pub replayed: bool,
     pub trace_mismatch: bool,
@@ -1967,6 +2368,25 @@ pub fn jv_options(max_degree: u32, budget_secs: f64) -> F4Options {
 /// solver's final check of every candidate against the input covers.
 pub fn jv_options_stopped(max_degree: u32, budget_secs: f64, staircase: usize) -> F4Options {
     jv_options(max_degree, budget_secs).stopping_below(staircase)
+}
+
+/// How a Nagao system's F4 may stop early.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum StopMode {
+    /// Run to the certified basis.
+    Full,
+    /// At this many standard monomials (`F4Options::stop_staircase`).
+    Staircase(usize),
+    /// The Hilbert rule with this many pairs per step (`F4Options::stopping_by_hilbert`).
+    Hilbert(usize),
+}
+
+pub fn opts_for_mode(max_degree: u32, budget_secs: f64, mode: StopMode) -> F4Options {
+    match mode {
+        StopMode::Full => jv_options(max_degree, budget_secs),
+        StopMode::Staircase(k) => jv_options_stopped(max_degree, budget_secs, k),
+        StopMode::Hilbert(c) => jv_options(max_degree, budget_secs).stopping_by_hilbert(c),
+    }
 }
 
 pub(crate) fn opts_for(max_degree: u32, budget_secs: f64, stop: Option<usize>) -> F4Options {
@@ -2014,7 +2434,11 @@ pub fn nagao_decompose(
     cost.incomplete = st.incomplete;
     cost.timed_out = st.timed_out;
     cost.nonseparating = st.nonseparating;
+    cost.lin_fallback = st.lin_fallback;
     cost.stopped_at = st.stopped_at;
+    cost.hilbert_applied = st.hilbert_applied;
+    cost.hilbert_fallback = st.hilbert_fallback;
+    cost.hilbert_check_muls = st.hilbert_check_muls;
     cost.replayed = st.replayed;
     cost.trace_mismatch = st.trace_mismatch;
     cost.fp_solutions = sols.len();
@@ -2067,6 +2491,7 @@ pub fn nagao_decompose(
         let mut options: Vec<(usize, Vec<i8>)> = Vec::with_capacity(6);
         for &x in &roots {
             let xe = f.from_fp(x);
+            super::jv_bitops::probe(1);
             let Some(&i) = by_x.get(&x) else {
                 continue 'sol;
             };
@@ -2244,6 +2669,102 @@ pub fn rho_e(spec: &Spec, seed: u64) -> RhoRunE {
             l = ec.add(&l, &mults[j].2);
             a = (a + mults[j].0) % n;
             b = (b + mults[j].1) % n;
+            if steps > 64 * (n as f64).sqrt() as u64 + 1_000_000 {
+                break 'outer;
+            }
+        }
+    }
+    let ops = ec.ops();
+    RhoRunE {
+        seed,
+        steps,
+        group_ops: ops,
+        s: ops as f64 / (n as f64).sqrt(),
+        correct: found == Some(spec.d),
+    }
+}
+
+/// [`rho_e`] on the classes `{±P}`: the negation map, the strongest rho on
+/// this curve (`y² = x³ + a₂x² + a₄x` with `α ∉ F_q` has only `±1` and no
+/// Frobenius acting on it). The same 32 multipliers, exhaustive storage of
+/// canonical representatives (the one of `P`, `−P` with the smaller `y`), the
+/// coefficients negated with the point. Fruitless 2-cycles are avoided by
+/// look-ahead (Wiener–Zuccherato): when the next point would pick the same
+/// multiplier, the next multiplier is tried, and after `r` tries the point is
+/// doubled. Longer fruitless cycles end in a stored collision with `db = 0`,
+/// and the walk restarts. Every group operation is charged.
+pub fn rho_e_neg(spec: &Spec, seed: u64) -> RhoRunE {
+    let f = Fq3::new(spec.p);
+    let ec = EllE::new(&f, &spec.alpha);
+    let n = spec.l;
+    let mut rng = StdRng::seed_from_u64(seed ^ 0x8D06);
+    let r = 32usize;
+    let mults: Vec<(u64, u64, PtE6)> = (0..r)
+        .map(|_| {
+            let al = rng.gen_range(0..n);
+            let be = rng.gen_range(1..n);
+            (al, be, ec.add(&ec.mul(&spec.g, al), &ec.mul(&spec.q, be)))
+        })
+        .collect();
+    // (point, a, b) with point = aG + bQ, made canonical in its class {±P}.
+    let canon = |pt: PtE6, a: u64, b: u64| -> (PtE6, u64, u64) {
+        let ny = f.neg(&pt.y);
+        if !pt.inf && ny < pt.y {
+            (
+                PtE6 {
+                    x: pt.x,
+                    y: ny,
+                    inf: false,
+                },
+                (n - a) % n,
+                (n - b) % n,
+            )
+        } else {
+            (pt, a, b)
+        }
+    };
+    let index = |pt: &PtE6| -> usize {
+        let h = pt.x.0[0].0[0]
+            ^ pt.x.0[0].0[1].wrapping_mul(0x9E37_79B9)
+            ^ pt.x.0[1].0[0].rotate_left(17)
+            ^ pt.x.0[2].0[1].rotate_left(33);
+        (mix64(h) % r as u64) as usize
+    };
+    let mut table: HashMap<PtE6, (u64, u64)> = HashMap::new();
+    let mut steps = 0u64;
+    let mut found = None;
+    'outer: loop {
+        let a0 = rng.gen_range(0..n);
+        let b0 = rng.gen_range(1..n);
+        let start = ec.add(&ec.mul(&spec.g, a0), &ec.mul(&spec.q, b0));
+        let (mut l, mut a, mut b) = canon(start, a0, b0);
+        loop {
+            steps += 1;
+            if let Some(&(a2, b2)) = table.get(&l) {
+                let db = (b + n - b2) % n;
+                if db != 0 {
+                    let da = (a2 + n - a) % n;
+                    found = Some(mm(da, inv_mod(db, n), n));
+                    break 'outer;
+                }
+                break;
+            }
+            table.insert(l, (a, b));
+            let mut j = index(&l);
+            let mut next = None;
+            for _ in 0..r {
+                let c = canon(
+                    ec.add(&l, &mults[j].2),
+                    (a + mults[j].0) % n,
+                    (b + mults[j].1) % n,
+                );
+                if index(&c.0) != j {
+                    next = Some(c);
+                    break;
+                }
+                j = (j + 1) % r;
+            }
+            (l, a, b) = next.unwrap_or_else(|| canon(ec.add(&l, &l), 2 * a % n, 2 * b % n));
             if steps > 64 * (n as f64).sqrt() as u64 + 1_000_000 {
                 break 'outer;
             }
@@ -2467,6 +2988,10 @@ pub struct CcovReport {
     pub c_add_j: f64,
     pub max_degree: u32,
     pub budget_secs: f64,
+    /// Hilbert rule (`StopMode::Hilbert`): systems it ran on, and systems whose
+    /// leading forms were not certified regular (plain run, counted in full).
+    pub hilbert_applied: usize,
+    pub hilbert_fallbacks: usize,
     /// F4 stopped at this staircase, or run to a certified basis.
     pub stop_staircase: Option<usize>,
     pub stopped: usize,
@@ -2485,6 +3010,7 @@ pub struct CcovReport {
     pub incomplete: usize,
     pub timed_out: usize,
     pub nonseparating: usize,
+    pub lin_fallback: usize,
     pub c_cov: CostStatsC,
     pub weil_muls: CostStatsC,
     pub f4_muls: CostStatsC,
@@ -2504,7 +3030,7 @@ pub struct CcovReport {
 }
 
 /// A random six-sum and the decomposition it plants.
-fn planted(jac: &Hyp<Fq>, base: &[BaseEl], rng: &mut StdRng) -> (Div<E2>, Dec6) {
+pub(crate) fn planted(jac: &Hyp<Fq>, base: &[BaseEl], rng: &mut StdRng) -> (Div<E2>, Dec6) {
     let mut idx: Vec<usize> = Vec::new();
     while idx.len() < 6 {
         let i = rng.gen_range(0..base.len());
@@ -2545,6 +3071,37 @@ pub fn run_cover_ccov(
     stop: Option<usize>,
     trace: bool,
 ) -> CcovReport {
+    let mode = stop.map_or(StopMode::Full, StopMode::Staircase);
+    run_cover_ccov_mode(
+        p,
+        seed,
+        random,
+        constructed,
+        max_degree,
+        budget_secs,
+        oracle_up_to_base,
+        mode,
+        trace,
+    )
+}
+
+/// [`run_cover_ccov`] with any [`StopMode`].
+#[allow(clippy::too_many_arguments)]
+pub fn run_cover_ccov_mode(
+    p: u64,
+    seed: u64,
+    random: usize,
+    constructed: usize,
+    max_degree: u32,
+    budget_secs: f64,
+    oracle_up_to_base: usize,
+    mode: StopMode,
+    trace: bool,
+) -> CcovReport {
+    let stop = match mode {
+        StopMode::Staircase(k) => Some(k),
+        _ => None,
+    };
     let start = Instant::now();
     let spec = generate_spec(p, seed);
     let ctx = Ctx::with_trace(&spec, trace);
@@ -2592,7 +3149,7 @@ pub fn run_cover_ccov(
         .map(|(k, (r, want))| {
             let mut lrng =
                 StdRng::seed_from_u64(seed ^ (k as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15));
-            let opts = opts_for(max_degree, budget_secs, stop);
+            let opts = opts_for_mode(max_degree, budget_secs, mode);
             let (found, cost) = nagao_decompose(&ctx, &base, &by_x, r, &opts, &mut lrng);
             let verified = found.iter().all(|d| verify_dec(&jac, &base, r, d));
             let planted_ok = want.as_ref().map(|w| found.contains(w));
@@ -2623,8 +3180,15 @@ pub fn run_cover_ccov(
             rep.timed_out += 1;
         }
         rep.nonseparating += cost.nonseparating;
+        rep.lin_fallback += cost.lin_fallback;
         if cost.stopped_at.is_some() {
             rep.stopped += 1;
+        }
+        if cost.hilbert_applied {
+            rep.hilbert_applied += 1;
+        }
+        if cost.hilbert_fallback {
+            rep.hilbert_fallbacks += 1;
         }
         if cost.replayed {
             rep.replayed += 1;
@@ -2679,6 +3243,26 @@ pub struct CoverDlpReport {
     pub c_add_e: f64,
     pub c_add_j: f64,
     pub stop_staircase: Option<usize>,
+    /// The stop mode as a label: `full`, `staircase:K`, `hilbert:C`.
+    pub stop_mode: String,
+    /// Tests where the Hilbert rule ran / fell back to the plain run, and the
+    /// regularity-check multiplications (inside `f4_muls`).
+    pub hilbert_applied: u64,
+    pub hilbert_fallbacks: u64,
+    pub hilbert_check_muls: u64,
+    /// Sum of the per-test F4 multiplications; equals `f4_muls` when one
+    /// thread runs the batch (a consistency check on the global counter).
+    pub f4_muls_per_test_sum: u64,
+    /// Native F4-driver operations no multiplication counter prices (leading-monomial
+    /// divisibility tests, monomial-table probes of symbolic preprocessing); a lower bound.
+    pub f4_native_ops: u64,
+    /// The share of `f4_native_ops` spent on staircase / Hilbert-function checks.
+    pub f4_stair_ops: u64,
+    /// FNV-1a of every relation found, in residual order: (a, b, terms).
+    /// Equal digests mean equal relations.
+    pub relation_digest: u64,
+    /// Total steps of the rho runs (the table inserts and lookups rho leaves unpriced).
+    pub rho_steps_mean: f64,
     pub stopped: u64,
     pub trace: bool,
     pub replayed: u64,
@@ -2704,6 +3288,10 @@ pub struct CoverDlpReport {
     pub post_muls: u64,
     pub verify_muls: u64,
     pub oracle_muls: u64,
+    /// Milliseconds in F4 and in the linear stage, summed over the Nagao
+    /// tests (time per test on its own thread, not elapsed wall time).
+    pub f4_ms: f64,
+    pub lin_ms: f64,
     /// `C_cov` as the run paid it, per residual.
     pub c_cov: f64,
     pub unknowns: usize,
@@ -2723,6 +3311,14 @@ pub struct CoverDlpReport {
     pub rho_s_mean: f64,
     pub rho_s_sd: f64,
     pub s_over_rho: f64,
+    /// `JV_RHO_NEG=1`: as many [`rho_e_neg`] runs as `rho`, after the clock,
+    /// and `S` over their mean; absent otherwise.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub rho_neg: Vec<RhoRunE>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rho_neg_s_mean: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub s_over_rho_neg: Option<f64>,
     pub relation_over_rho: f64,
     pub r: f64,
     pub r_last: f64,
@@ -2743,6 +3339,31 @@ pub fn run_cover_dlp(
     stop: Option<usize>,
     trace: bool,
 ) -> CoverDlpReport {
+    run_cover_dlp_mode(
+        p,
+        seed,
+        rho_runs,
+        check_every,
+        rho_s_ref,
+        stop.map_or(StopMode::Full, StopMode::Staircase),
+        trace,
+    )
+}
+
+/// [`run_cover_dlp`] with any [`StopMode`] for the F4 of every Nagao test.
+pub fn run_cover_dlp_mode(
+    p: u64,
+    seed: u64,
+    rho_runs: usize,
+    check_every: u64,
+    rho_s_ref: f64,
+    mode: StopMode,
+    trace: bool,
+) -> CoverDlpReport {
+    let stop = match mode {
+        StopMode::Staircase(k) => Some(k),
+        _ => None,
+    };
     let start = Instant::now();
     let spec = generate_spec(p, seed);
     let ctx = Ctx::with_trace(&spec, trace);
@@ -2778,6 +3399,12 @@ pub fn run_cover_dlp(
         base: small,
         c_add_e: c_e,
         c_add_j: c_j,
+        stop_mode: match mode {
+            StopMode::Full => "full".into(),
+            StopMode::Staircase(k) => format!("staircase:{k}"),
+            StopMode::Hilbert(c) => format!("hilbert:{c}"),
+        },
+        relation_digest: 0xcbf2_9ce4_8422_2325,
         stop_staircase: stop,
         trace,
         expected_rate: 1.0 / 720.0,
@@ -2790,6 +3417,10 @@ pub fn run_cover_dlp(
     let mut next_attempt = unknowns;
     let mut la_ops = 0u64;
     let cap = 400 * (unknowns as u64) * 720;
+    // Opt-in, read-only: JV_LP_LOG=1 prints one `LPLOG {json}` line per decomposition
+    // (its six factor-base indices and abscissae).  Used by the large-prime
+    // feasibility study; nothing below depends on it.
+    let lp_log = std::env::var("JV_LP_LOG").is_ok();
     'collect: while rep.residuals < cap {
         let mut batch: Vec<(u64, u64, Div<E2>, u64)> = Vec::with_capacity(64);
         for _ in 0..64 {
@@ -2802,13 +3433,15 @@ pub fn run_cover_dlp(
         rep.stream_muls += ctx.f.muls();
         ctx.f.reset_muls();
         let f4_before = f4_fp::field_ops_total();
+        let native_before = f4_fp::native_ops_total();
+        let stair_before = f4_fp::native_stair_ops_total();
         let found: Vec<(u64, u64, Div<E2>, Vec<Dec6>, NagaoCost, u64, bool, bool)> = batch
             .par_iter()
             .map_init(
                 || Ctx::with_trace(&spec, trace),
                 |c, (a, b, r, idx)| {
                     // the deadline is absolute: one budget per test, not per run
-                    let opts = opts_for(24, 600.0, stop);
+                    let opts = opts_for_mode(24, 600.0, mode);
                     let mut lrng =
                         StdRng::seed_from_u64(seed ^ idx.wrapping_mul(0x9E37_79B9_7F4A_7C15));
                     let (decs, cost) = nagao_decompose(c, &base, &by_x, r, &opts, &mut lrng);
@@ -2833,12 +3466,20 @@ pub fn run_cover_dlp(
             .collect();
         // the F4 work is counted once, globally, by the batch's difference
         rep.f4_muls += f4_fp::field_ops_total() - f4_before;
+        rep.f4_native_ops += f4_fp::native_ops_total() - native_before;
+        rep.f4_stair_ops += f4_fp::native_stair_ops_total() - stair_before;
         for (a, b, _r, decs, cost, vm, checked, was_checked) in found {
             rep.residuals += 1;
             rep.weil_muls += cost.weil_muls;
             rep.lin_muls += cost.lin_muls;
+            rep.f4_ms += cost.f4_ms;
+            rep.lin_ms += cost.lin_ms;
             rep.post_muls += cost.post_muls;
             rep.verify_muls += vm;
+            rep.f4_muls_per_test_sum += cost.f4_muls;
+            rep.hilbert_check_muls += cost.hilbert_check_muls;
+            rep.hilbert_applied += cost.hilbert_applied as u64;
+            rep.hilbert_fallbacks += cost.hilbert_fallback as u64;
             if cost.incomplete {
                 rep.incomplete += 1;
             }
@@ -2864,6 +3505,24 @@ pub fn run_cover_dlp(
             for d in decs {
                 any = true;
                 rep.decompositions += 1;
+                for w in std::iter::once(a)
+                    .chain(std::iter::once(b))
+                    .chain(d.terms.iter().flat_map(|&(i, e)| [i as u64, e as u64]))
+                {
+                    rep.relation_digest =
+                        (rep.relation_digest ^ w).wrapping_mul(0x0000_0100_0000_01b3);
+                }
+                if lp_log {
+                    eprintln!(
+                        "LPLOG {{\"p\":{},\"seed\":{},\"residual\":{},\"base\":{},\"idx\":{:?},\"x\":{:?}}}",
+                        p,
+                        seed,
+                        rep.residuals,
+                        small,
+                        d.terms.iter().map(|t| t.0).collect::<Vec<_>>(),
+                        d.terms.iter().map(|t| base[t.0].x).collect::<Vec<_>>()
+                    );
+                }
                 let mut cols: Vec<(usize, u64)> = d
                     .terms
                     .iter()
@@ -2906,6 +3565,7 @@ pub fn run_cover_dlp(
                     if dd.is_some_and(|dd| ec.mul(&spec.g, dd) == spec.q) {
                         rep.solved = true;
                         rep.correct = dd == Some(spec.d);
+                        dump_instance(&ctx.f, &ec, &spec, seed, dd.unwrap());
                         rep.unknowns = sel.len();
                         rep.filtered_out = full_rels.len() - sel.len();
                         rep.la_ops_last = la_ops - before;
@@ -2953,6 +3613,11 @@ pub fn run_cover_dlp(
         (ss.iter().map(|s| (s - rep.rho_s_mean).powi(2)).sum::<f64>() / (ss.len() - 1) as f64)
             .sqrt()
     };
+    rep.rho_steps_mean = if rep.rho.is_empty() {
+        0.0
+    } else {
+        rep.rho.iter().map(|r| r.steps as f64).sum::<f64>() / rep.rho.len() as f64
+    };
     let rho_muls = rep.rho_s_mean * sqrt_l * c_e;
     rep.s_over_rho = rep.total_muls as f64 / rho_muls;
     rep.relation_over_rho =
@@ -2964,7 +3629,204 @@ pub fn run_cover_dlp(
     rep.predicted_s_over_rho =
         360.0 * p as f64 * rep.c_cov / (rep.rho_s_mean * sqrt_l * c_e) + rep.r;
     rep.wall_ms = start.elapsed().as_secs_f64() * 1e3;
+    if std::env::var("JV_RHO_NEG").as_deref() == Ok("1") {
+        rep.rho_neg = (0..rho_runs as u64)
+            .into_par_iter()
+            .map(|k| rho_e_neg(&spec, seed * 1000 + k))
+            .collect();
+        if !rep.rho_neg.is_empty() {
+            let m = rep.rho_neg.iter().map(|r| r.s).sum::<f64>() / rep.rho_neg.len() as f64;
+            rep.rho_neg_s_mean = Some(m);
+            rep.s_over_rho_neg = Some(rep.s / m);
+        }
+    }
     rep
+}
+
+// ── EXPERIMENT: early-stop study (research/f4_early_stop_20261018) ─────────
+
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct StudyMode {
+    pub name: String,
+    pub f4_muls: u64,
+    pub same_found: bool,
+    pub same_fp_solutions: bool,
+    pub stopped: bool,
+    pub hilbert_applied: bool,
+    pub hilbert_fallback: bool,
+    pub check_muls: u64,
+    pub dropped_pairs: usize,
+    /// matrix rows built over all steps (pairs plus reducers)
+    pub all_rows: usize,
+    /// (degree, pairs, pair rows, ops, new polys, staircase after)
+    pub steps: Vec<(u32, usize, usize, u64, usize, usize)>,
+}
+
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct StudySystem {
+    pub k: usize,
+    pub planted: bool,
+    pub top_hash: u64,
+    pub top_muls: u64,
+    pub top_staircase: Option<usize>,
+    pub modes: Vec<StudyMode>,
+}
+
+/// The Weil-restricted Nagao systems of `run_stop_study`'s jobs: `random`
+/// residuals `aG + bQ` and `constructed` ones with a planted six-point
+/// decomposition, each as its six quadrics in six unknowns over `F_p`, with
+/// `true` on the constructed ones. Degenerate residuals are skipped. This is
+/// the corpus input of `research/postgb_linear_stage_20261027`.
+pub fn nagao_systems(
+    p: u64,
+    seed: u64,
+    random: usize,
+    constructed: usize,
+) -> Vec<(Vec<f4_fp::Poly>, bool)> {
+    let spec = generate_spec(p, seed);
+    let ctx = Ctx::new(&spec);
+    let mut rng = StdRng::seed_from_u64(seed ^ 0xC0C0);
+    let base = factor_base(&ctx, &mut rng);
+    let jac = ctx.jac();
+    let mut jobs: Vec<(Div<E2>, bool)> = Vec::new();
+    for _ in 0..random {
+        let a = rng.gen_range(0..spec.l);
+        let b = rng.gen_range(1..spec.l);
+        jobs.push((
+            jac.add(&jac.mul(&spec.gj, a as u128), &jac.mul(&spec.qj, b as u128)),
+            false,
+        ));
+    }
+    for _ in 0..constructed {
+        jobs.push((planted(&jac, &base, &mut rng).0, true));
+    }
+    jobs.into_iter()
+        .filter(|(r, _)| r.u.len() == 4)
+        .map(|(r, pl)| {
+            let mut v = r.v.clone();
+            v.resize(3, E2::ZERO);
+            let forms = weil_forms(&ctx.f.f, &ctx.cov.hx, &r.u, &v);
+            (forms.polys(&ctx.reim, p), pl)
+        })
+        .collect()
+}
+
+pub fn run_stop_study(
+    p: u64,
+    seed: u64,
+    random: usize,
+    constructed: usize,
+    chunks: &[usize],
+) -> Vec<StudySystem> {
+    use std::hash::{Hash, Hasher};
+    let spec = generate_spec(p, seed);
+    let ctx = Ctx::new(&spec);
+    let mut rng = StdRng::seed_from_u64(seed ^ 0xC0C0);
+    let base = factor_base(&ctx, &mut rng);
+    let by_x: HashMap<u64, usize> = base.iter().enumerate().map(|(i, b)| (b.x, i)).collect();
+    let jac = ctx.jac();
+    let mut jobs: Vec<(Div<E2>, bool)> = Vec::new();
+    for _ in 0..random {
+        let a = rng.gen_range(0..spec.l);
+        let b = rng.gen_range(1..spec.l);
+        jobs.push((
+            jac.add(&jac.mul(&spec.gj, a as u128), &jac.mul(&spec.qj, b as u128)),
+            false,
+        ));
+    }
+    for _ in 0..constructed {
+        jobs.push((planted(&jac, &base, &mut rng).0, true));
+    }
+    let mut modes: Vec<(String, F4Options)> = Vec::new();
+    modes.push(("full".into(), jv_options(24, 300.0)));
+    modes.push(("stop64".into(), jv_options_stopped(24, 300.0, 64)));
+    for &c in chunks {
+        let mut o = jv_options_stopped(24, 300.0, 64);
+        o.max_pairs_per_step = Some(c);
+        modes.push((format!("stop64_chunk{c}"), o));
+    }
+    modes.push((
+        "hilbert".into(),
+        jv_options(24, 300.0).stopping_by_hilbert(usize::MAX),
+    ));
+    for &c in chunks {
+        modes.push((
+            format!("hilbert_chunk{c}"),
+            jv_options(24, 300.0).stopping_by_hilbert(c),
+        ));
+    }
+    for (_, opts) in &mut modes {
+        *opts = opts.clone().capturing_run_log();
+    }
+    let mut out = Vec::new();
+    for (k, (r, pl)) in jobs.iter().enumerate() {
+        if r.u.len() != 4 {
+            continue;
+        }
+        let mut v = r.v.clone();
+        v.resize(3, E2::ZERO);
+        let forms = weil_forms(&ctx.f.f, &ctx.cov.hx, &r.u, &v);
+        let polys = forms.polys(&ctx.reim, p);
+        let top: Vec<f4_fp::Poly> = polys
+            .iter()
+            .map(|f| {
+                let t: Vec<(Vec<u32>, u64)> = f
+                    .iter()
+                    .filter(|(e, _)| e.iter().sum::<u32>() == 2)
+                    .cloned()
+                    .collect();
+                f4_fp::normalise(&t, p, F4Ordering::Grevlex)
+            })
+            .filter(|f| !f.is_empty())
+            .collect();
+        let mut h = std::collections::hash_map::DefaultHasher::new();
+        top.hash(&mut h);
+        let top_hash = h.finish();
+        let _ = f4_fp::take_run_log();
+        let rep = f4_fp::f4(&top, 6, p, &jv_options_stopped(24, 300.0, 64));
+        let _ = f4_fp::take_run_log();
+        let mut sys = StudySystem {
+            k,
+            planted: *pl,
+            top_hash,
+            top_muls: rep.field_ops,
+            top_staircase: rep.staircase_at_stop,
+            modes: Vec::new(),
+        };
+        let mut ref_found = None;
+        let mut ref_fp = 0usize;
+        for (name, opts) in &modes {
+            let _ = f4_fp::take_run_log();
+            let mut lrng =
+                StdRng::seed_from_u64(seed ^ (k as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15));
+            let (found, cost) = nagao_decompose(&ctx, &base, &by_x, r, opts, &mut lrng);
+            let log = f4_fp::take_run_log();
+            if ref_found.is_none() {
+                ref_found = Some(found.clone());
+                ref_fp = cost.fp_solutions;
+            }
+            sys.modes.push(StudyMode {
+                name: name.clone(),
+                f4_muls: cost.f4_muls,
+                same_found: Some(&found) == ref_found.as_ref(),
+                same_fp_solutions: cost.fp_solutions == ref_fp,
+                stopped: cost.stopped_at.is_some(),
+                hilbert_applied: cost.hilbert_applied,
+                hilbert_fallback: cost.hilbert_fallback,
+                check_muls: cost.hilbert_check_muls,
+                all_rows: log.steps.iter().map(|s| s.all_rows).sum(),
+                dropped_pairs: log.dropped_pairs,
+                steps: log
+                    .steps
+                    .iter()
+                    .map(|s| (s.degree, s.pairs, s.rows, s.ops, s.new_polys, s.staircase))
+                    .collect(),
+            });
+        }
+        out.push(sys);
+    }
+    let _ = &by_x;
+    out
 }
 
 #[cfg(test)]
@@ -3221,6 +4083,10 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(
+        debug_assertions,
+        ignore = "F4 solves exceed their 120 s budget in a debug build; run with --release"
+    )]
     fn nagao_finds_planted_six_sums_and_agrees_with_the_oracle() {
         let (_, ctx, base, by_x, mut rng) = small_ctx(53, 2);
         let jac = ctx.jac();
@@ -3262,6 +4128,90 @@ mod tests {
             eprintln!("trial {trial}: {cost:?}");
         }
         assert_eq!(found_planted, 6);
+    }
+
+    /// The sparse and L1a linear stages return exactly the dense stage's
+    /// solution set, on random 4- and 5-variable quadric systems (some with a
+    /// planted point, some with several), and never lose the planted point.
+    #[test]
+    fn sparse_linear_stage_agrees_with_dense() {
+        let mut rng = StdRng::seed_from_u64(77);
+        let opts = jv_options(24, 120.0);
+        let (mut used_fast, mut total) = (0usize, 0usize);
+        for &p in &[53u64, 101] {
+            for &n in &[4usize, 5, 6] {
+                for trial in 0..8 {
+                    let planted: Vec<Vec<u64>> = (0..1 + trial % 3)
+                        .map(|_| (0..n).map(|_| rng.gen_range(0..p)).collect())
+                        .collect();
+                    let mut sys: Vec<f4_fp::Poly> = Vec::new();
+                    for _ in 0..n {
+                        // random quadric, then forced through the planted points
+                        // by a random combination (one point: shift the constant)
+                        let mut terms: Vec<(Vec<u32>, u64)> = Vec::new();
+                        for a in 0..n {
+                            for b in a..n {
+                                let mut e = vec![0u32; n];
+                                e[a] += 1;
+                                e[b] += 1;
+                                terms.push((e, rng.gen_range(0..p)));
+                            }
+                        }
+                        for a in 0..n {
+                            let mut e = vec![0u32; n];
+                            e[a] = 1;
+                            terms.push((e, rng.gen_range(0..p)));
+                        }
+                        let f0 = f4_fp::normalise(&terms, p, F4Ordering::Grevlex);
+                        if planted.len() == 1 {
+                            let v = f4_fp::eval(&f0, &planted[0], p);
+                            terms = f0.clone();
+                            terms.push((vec![0u32; n], (p - v) % p));
+                            sys.push(f4_fp::normalise(&terms, p, F4Ordering::Grevlex));
+                        } else {
+                            sys.push(f0);
+                        }
+                    }
+                    let mut outs = Vec::new();
+                    for mode in [LinMode::Dense, LinMode::Sparse, LinMode::L1a, LinMode::Fast] {
+                        let mut r = StdRng::seed_from_u64(5 + trial as u64);
+                        let (sols, st) =
+                            solve_zero_dim_mode(&sys, n, p, &opts, &mut r, false, mode);
+                        assert!(!st.incomplete, "p={p} n={n} trial={trial} {mode:?}");
+                        if mode == LinMode::Sparse {
+                            total += 1;
+                            used_fast += (st.lin_fallback == 0) as usize;
+                        }
+                        outs.push((sols, st.lin_muls));
+                    }
+                    assert_eq!(outs[0].0, outs[1].0, "sparse p={p} n={n} trial={trial}");
+                    assert_eq!(outs[0].0, outs[2].0, "l1a p={p} n={n} trial={trial}");
+                    assert_eq!(outs[0].0, outs[3].0, "fast p={p} n={n} trial={trial}");
+                    if planted.len() == 1 {
+                        assert!(outs[1].0.contains(&planted[0]), "planted lost p={p} n={n}");
+                    }
+                }
+            }
+        }
+        // the sparse path must actually be the one exercised
+        assert!(
+            used_fast * 10 >= total * 8,
+            "fast path used {used_fast}/{total}"
+        );
+    }
+
+    #[test]
+    fn berlekamp_massey_recovers_a_linear_recurrence() {
+        let p = 101u64;
+        // s_{i+3} = 2 s_{i+2} + 5 s_{i+1} + 7 s_i
+        let mut s = vec![3u64, 9, 4];
+        for i in 0..20 {
+            let v = (2 * s[i + 2] + 5 * s[i + 1] + 7 * s[i]) % p;
+            s.push(v);
+        }
+        let mut cnt = 0;
+        let f = berlekamp_massey_minpoly(&s, p, &mut cnt);
+        assert_eq!(f, vec![p - 7, p - 5, p - 2, 1]);
     }
 
     #[test]
@@ -3310,6 +4260,10 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(
+        debug_assertions,
+        ignore = "F4 solves exceed their 120 s budget in a debug build; run with --release"
+    )]
     fn the_solver_loses_no_rational_solution_at_small_p() {
         // p = 53: a Krylov minimal polynomial of one vector loses a root with
         // probability 1/p, a non-separating form likewise.  Plant many sums.
@@ -3319,7 +4273,10 @@ mod tests {
         for trial in 0..120 {
             let (r, want) = planted(&jac, &base, &mut rng);
             let (found, cost) = nagao_decompose(&ctx, &base, &by_x, &r, &opts, &mut rng);
-            assert!(!cost.incomplete, "trial {trial}");
+            assert!(
+                !cost.incomplete && !cost.timed_out,
+                "trial {trial}: {cost:?}"
+            );
             assert!(
                 found.contains(&want),
                 "trial {trial}: missed {want:?}, {cost:?}"
@@ -3357,6 +4314,10 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(
+        debug_assertions,
+        ignore = "F4 solves exceed their 120 s budget in a debug build; run with --release"
+    )]
     fn stopped_f4_agrees_with_the_full_solver_and_the_oracle() {
         let (spec, ctx, base, by_x, mut rng) = small_ctx(53, 7);
         let jac = ctx.jac();
@@ -3373,7 +4334,7 @@ mod tests {
             };
             let (fa, ca) = nagao_decompose(&ctx, &base, &by_x, &r, &full, &mut rng);
             let (fb, cb) = nagao_decompose(&ctx, &base, &by_x, &r, &stop, &mut rng);
-            if ca.degenerate || ca.incomplete || cb.incomplete {
+            if ca.degenerate || ca.incomplete || cb.incomplete || ca.timed_out || cb.timed_out {
                 continue;
             }
             n += 1;
@@ -3381,23 +4342,95 @@ mod tests {
             assert_eq!(fa, oracle, "full solver vs oracle, residual {k}");
             assert_eq!(fb, oracle, "stopped solver vs oracle, residual {k}");
             assert!(fb.iter().all(|d| verify_dec(&jac, &base, &r, d)));
-            if cb.stopped_at == Some(64) {
+            // at most the Bézout bound: a system with a solution at infinity
+            // has ideal degree below 64 and stops at its own staircase
+            if matches!(cb.stopped_at, Some(s) if s <= 64) {
                 stopped += 1;
             }
-            // "cheaper" by the F4 degree and matrix the stop saves, which are
-            // per-run facts; `f4_muls` is a difference of the process-wide
-            // counter and interleaves with other tests' F4 runs under
-            // `cargo test`'s parallelism.
-            if cb.degree_reached < ca.degree_reached && cb.max_rows < ca.max_rows {
+            // "no dearer" by the F4 degree and matrix, which are per-run
+            // facts; `f4_muls` is a difference of the process-wide counter and
+            // interleaves with other tests' F4 runs under `cargo test`'s
+            // parallelism.  The stop skips the degree-8 step, which holds the
+            // few remaining pairs (research/f4_early_stop_20261018 measured
+            // about 5% of the F4 multiplications at p = 101); it must never
+            // cost more.
+            if cb.degree_reached <= ca.degree_reached && cb.max_rows <= ca.max_rows {
                 cheaper += 1;
             }
         }
         assert!(n >= 25, "{n}");
-        assert_eq!(stopped, n, "every system stops at the Bézout staircase");
+        assert_eq!(
+            stopped, n,
+            "every system stops at or below the Bézout staircase"
+        );
         assert_eq!(
             cheaper, n,
-            "every stopped run ends at a lower degree with a smaller matrix"
+            "no stopped run ends at a higher degree or with a larger matrix"
         );
+    }
+
+    #[test]
+    fn hilbert_stop_agrees_with_the_full_solver_and_the_oracle() {
+        let (spec, ctx, base, by_x, mut rng) = small_ctx(53, 7);
+        let jac = ctx.jac();
+        let t = table3(&jac, &base);
+        let full = jv_options(24, 120.0);
+        let hil = jv_options(24, 120.0).stopping_by_hilbert(1);
+        let (mut applied, mut fallbacks, mut n) = (0, 0, 0);
+        // Some residuals are degenerate or exhaust a solver budget. Keep
+        // sampling until the comparison includes 30 completed residuals.
+        for k in 0..80 {
+            if n >= 30 {
+                break;
+            }
+            let r = if k % 2 == 0 {
+                planted(&jac, &base, &mut rng).0
+            } else {
+                let a = rng.gen_range(0..spec.l);
+                jac.add(&jac.mul(&spec.gj, a as u128), &spec.qj)
+            };
+            let (fa, ca) = nagao_decompose(&ctx, &base, &by_x, &r, &full, &mut rng);
+            let (fb, cb) = nagao_decompose(&ctx, &base, &by_x, &r, &hil, &mut rng);
+            if ca.degenerate || ca.incomplete || cb.incomplete || ca.timed_out || cb.timed_out {
+                continue;
+            }
+            n += 1;
+            let oracle = mitm6(&jac, &t, &r);
+            assert_eq!(fa, oracle, "full solver vs oracle, residual {k}");
+            assert_eq!(fb, oracle, "Hilbert-stopped solver vs oracle, residual {k}");
+            assert_eq!(
+                ca.fp_solutions, cb.fp_solutions,
+                "F_p solutions, residual {k}"
+            );
+            assert_eq!(ca.delta, cb.delta, "staircase, residual {k}");
+            assert!(
+                cb.hilbert_applied != cb.hilbert_fallback,
+                "exactly one path"
+            );
+            applied += cb.hilbert_applied as usize;
+            fallbacks += cb.hilbert_fallback as usize;
+        }
+        assert!(n >= 30, "{n}");
+        assert!(
+            applied >= n - 3,
+            "applied {applied} fallbacks {fallbacks} of {n}"
+        );
+    }
+
+    #[test]
+    fn negation_rho_finds_the_planted_logarithm_in_fewer_operations() {
+        // p = 53: the stored walk on {±P} against the plain one, same seeds;
+        // the negation map should need about 1/sqrt(2) of the operations.
+        let spec = generate_spec(53, 1);
+        let (mut plain, mut neg) = (0.0, 0.0);
+        for run in 0..8u64 {
+            let a = rho_e(&spec, 200 + run);
+            let b = rho_e_neg(&spec, 200 + run);
+            assert!(a.correct && b.correct, "run {run}: {a:?} {b:?}");
+            plain += a.s;
+            neg += b.s;
+        }
+        assert!(neg < plain, "negation map S {neg} not below plain {plain}");
     }
 
     #[test]
@@ -3412,6 +4445,10 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(
+        debug_assertions,
+        ignore = "F4 solves exceed their 120 s budget in a debug build; run with --release"
+    )]
     fn replayed_f4_agrees_with_the_full_solver_and_the_oracle() {
         let (spec, ctx, base, by_x, mut rng) = small_ctx(53, 7);
         let traced = Ctx::with_trace(&spec, true);
@@ -3429,7 +4466,7 @@ mod tests {
             };
             let (fa, ca) = nagao_decompose(&ctx, &base, &by_x, &r, &stop, &mut rng);
             let (fb, cb) = nagao_decompose(&traced, &base, &by_x, &r, &stop, &mut rng);
-            if ca.degenerate || ca.incomplete || cb.incomplete {
+            if ca.degenerate || ca.incomplete || cb.incomplete || ca.timed_out || cb.timed_out {
                 continue;
             }
             n += 1;
@@ -3437,7 +4474,11 @@ mod tests {
             assert_eq!(fa, oracle, "stopped solver vs oracle, residual {k}");
             assert_eq!(fb, oracle, "replayed solver vs oracle, residual {k}");
             assert!(fb.iter().all(|d| verify_dec(&jac, &base, &r, d)));
-            assert_eq!(cb.stopped_at, Some(64));
+            assert!(
+                matches!(cb.stopped_at, Some(s) if s <= 64),
+                "{:?}",
+                cb.stopped_at
+            );
             if cb.replayed {
                 replayed += 1;
                 // the replay keeps only the rows that produced a pivot, so its

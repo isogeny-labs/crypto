@@ -23,7 +23,7 @@
 //! real-curve cost is what `icx estimate` reports.  Nothing here claims to
 //! solve the named curve.
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::cryptanalysis::curve_catalog::{CatalogCurve, CurveObject, Family};
 use crate::cryptanalysis::ic_boundary::{
@@ -34,8 +34,8 @@ use crate::cryptanalysis::ic_boundary::{
 };
 use crate::cryptanalysis::ic_engine::{classify, Regime};
 use crate::cryptanalysis::ic_framework::plugins::{
-    BinarySubspaceBase, DescentAlgebraicOracle, KoblitzOrbitBase, KoblitzTraceZeroBase, MitmOracle,
-    PrimeAbscissaBase, SubtractOracle,
+    BinarySubspaceBase, DescentAlgebraicOracle, KnownLogBase, KoblitzOrbitBase,
+    KoblitzTraceZeroBase, MitmOracle, PrimeAbscissaBase, SubtractOracle,
 };
 use crate::cryptanalysis::ic_framework::solvers::solver_by_name;
 use crate::cryptanalysis::ic_framework::stages::{
@@ -107,7 +107,7 @@ pub struct AnalogueInfo {
 }
 
 /// One counted rho reference run's summary.
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct RhoRef {
     pub method: String,
     pub runs: usize,
@@ -209,7 +209,7 @@ fn build_spec(family: Family, cfg: &RunConfig, r: u64, field_degree: Option<u32>
                 .factor_base
                 .clone()
                 .unwrap_or_else(|| "prime-abscissa".to_string());
-            if spec.factor_base == "prime-abscissa"
+            if matches!(spec.factor_base.as_str(), "prime-abscissa" | "known-log")
                 && !spec.factor_base_params.0.contains_key("size")
             {
                 spec.factor_base_params
@@ -283,6 +283,11 @@ fn run_prime_analogue(
     inst: &PrimeInstance,
     cfg: &RunConfig,
     progress: &mut ProgressReporter,
+    completed: usize,
+    prior_rho: Option<RhoRef>,
+    mut checkpoint: Option<
+        &mut dyn FnMut(usize, &RunReport, Option<&RhoRef>, &str) -> Result<(), String>,
+    >,
 ) -> Result<(Vec<RunReport>, Option<RhoRef>, String), String> {
     let mut points = Vec::new();
     let g0 = inst.generator_point();
@@ -296,16 +301,27 @@ fn run_prime_analogue(
     calib.ns_per_word_xor = Some(calibrate_word_xor());
     let _ = calib.pin("prime", &inst.name);
 
-    let rho = rho_ref_for(&inst.curve, g0, inst.r, cfg.seed, cfg.repeats, cfg.rho_runs);
+    let rho = prior_rho
+        .or_else(|| rho_ref_for(&inst.curve, g0, inst.r, cfg.seed, cfg.repeats, cfg.rho_runs));
     let rho_s = rho.as_ref().map(|r| r.mean_s);
 
-    let base = PrimeAbscissaBase { instance: inst };
+    let abscissa = PrimeAbscissaBase { instance: inst };
+    let known_log = KnownLogBase;
     let mut reports = Vec::new();
     let mut label = String::new();
-    for rep in 0..cfg.repeats.max(1) {
+    for rep in completed..cfg.repeats {
         let mut spec = build_spec(Family::Prime, cfg, inst.r, None);
         spec.seed = cfg.seed.wrapping_add(rep as u64 * 0x9E37);
         label = spec.label();
+        let base: &dyn FactorBaseBuilder<_> = match spec.factor_base.as_str() {
+            "prime-abscissa" => &abscissa,
+            "known-log" => &known_log,
+            other => {
+                return Err(format!(
+                    "factor base `{other}` is not available here on a prime-field curve; try prime-abscissa or known-log"
+                ))
+            }
+        };
         let g = inst.generator_point();
         let planted = planted_log(spec.seed, 0, inst.r);
         let mut ops = GroupOps::default();
@@ -333,8 +349,11 @@ fn run_prime_analogue(
             }
         };
         progress.stage_begin("Index calculus", None, &spec.label());
-        let report = run_pipeline(&ctx, &spec, &base, oracle, planted, &calib, rho_s)?;
+        let report = run_pipeline(&ctx, &spec, base, oracle, planted, &calib, rho_s)?;
         report_progress(progress, &report);
+        if let Some(save) = checkpoint.as_mut() {
+            save(rep, &report, rho.as_ref(), &label)?;
+        }
         reports.push(report);
     }
     Ok((reports, rho, label))
@@ -346,20 +365,27 @@ fn run_binary_analogue(
     family: Family,
     cfg: &RunConfig,
     progress: &mut ProgressReporter,
+    completed: usize,
+    prior_rho: Option<RhoRef>,
+    mut checkpoint: Option<
+        &mut dyn FnMut(usize, &RunReport, Option<&RhoRef>, &str) -> Result<(), String>,
+    >,
 ) -> Result<(Vec<RunReport>, Option<RhoRef>, String), String> {
     let mut calib = calibrate_binary_instance(inst);
     calibrate_row_ops(inst.r, &mut calib);
     let _ = calib.pin(family_regime(family), &inst.name);
 
     let g = BinaryGroup(&inst.fast);
-    let rho = rho_ref_for(
-        &g,
-        inst.generator,
-        inst.r,
-        cfg.seed,
-        cfg.repeats,
-        cfg.rho_runs,
-    );
+    let rho = prior_rho.or_else(|| {
+        rho_ref_for(
+            &g,
+            inst.generator,
+            inst.r,
+            cfg.seed,
+            cfg.repeats,
+            cfg.rho_runs,
+        )
+    });
     let rho_s = rho.as_ref().map(|r| r.mean_s);
 
     let subspace = BinarySubspaceBase { instance: inst };
@@ -368,7 +394,7 @@ fn run_binary_analogue(
 
     let mut reports = Vec::new();
     let mut label = String::new();
-    for rep in 0..cfg.repeats.max(1) {
+    for rep in completed..cfg.repeats {
         let mut spec = build_spec(family, cfg, inst.r, Some(inst.n));
         spec.seed = cfg.seed.wrapping_add(rep as u64 * 0x9E37);
         label = spec.label();
@@ -400,6 +426,12 @@ fn run_binary_analogue(
         let mut mitm = MitmOracle::new(m);
         let mut frob =
             crate::cryptanalysis::ic_framework::plugins::FrobeniusMitmOracle::new(m, inst);
+        // The higher-arity extraction kernels; `kernel=4sum|a|b|c` is read
+        // from the oracle parameters in `prepare`.
+        let mut sixsum = crate::cryptanalysis::koblitz_sixsum_extract::SixSumOracle::new(
+            crate::cryptanalysis::koblitz_sixsum_extract::Kernel::FourSum,
+            inst,
+        );
         let mut algebraic = match spec.oracle.as_str() {
             "descent-algebraic" => {
                 let raw = spec.solver.as_deref().ok_or(
@@ -422,12 +454,16 @@ fn run_binary_analogue(
             "subtract" => &mut subtract,
             "mitm" => &mut mitm,
             "mitm-frobenius" => &mut frob,
+            "sixsum-extract" => &mut sixsum,
             "descent-algebraic" => algebraic.as_mut().expect("built above"),
             other => return Err(format!("oracle `{other}` is not available here")),
         };
         progress.stage_begin("Index calculus", None, &spec.label());
         let report = run_pipeline(&ctx, &spec, base, oracle, planted, &calib, rho_s)?;
         report_progress(progress, &report);
+        if let Some(save) = checkpoint.as_mut() {
+            save(rep, &report, rho.as_ref(), &label)?;
+        }
         reports.push(report);
     }
     Ok((reports, rho, label))
@@ -468,10 +504,28 @@ pub fn run_curve(
     cfg: &RunConfig,
     progress: &mut ProgressReporter,
 ) -> Result<RunResult, String> {
+    run_curve_from_repeat(curve, cfg, progress, 0, None, None)
+}
+
+/// Run only unfinished repeats, preserving the reference used by earlier
+/// reports. The callback is called after each complete pipeline report.
+pub fn run_curve_from_repeat(
+    curve: &CatalogCurve,
+    cfg: &RunConfig,
+    progress: &mut ProgressReporter,
+    completed: usize,
+    prior_rho: Option<RhoRef>,
+    checkpoint: Option<
+        &mut dyn FnMut(usize, &RunReport, Option<&RhoRef>, &str) -> Result<(), String>,
+    >,
+) -> Result<RunResult, String> {
     let cls = classify(curve, cfg.envelope_bits);
     let family = curve.family;
     if cfg.repeats == 0 {
         return Err("repeats must be greater than zero".into());
+    }
+    if completed > cfg.repeats {
+        return Err("completed repeats exceed the requested repeat count".into());
     }
     if family == Family::Prime && cfg.degree.is_some() {
         return Err("--degree applies to binary analogues; use --bits for a prime analogue".into());
@@ -535,7 +589,8 @@ pub fn run_curve(
                 field_degree: None,
                 run_order_bits: bits_of(inst.r),
             };
-            let (reports, rho, label) = run_prime_analogue(&inst, cfg, progress)?;
+            let (reports, rho, label) =
+                run_prime_analogue(&inst, cfg, progress, completed, prior_rho, checkpoint)?;
             Ok(finish(
                 curve,
                 &cls.regime,
@@ -596,7 +651,9 @@ pub fn run_curve(
                 field_degree: Some(inst.n),
                 run_order_bits: bits_of(inst.r),
             };
-            let (reports, rho, label) = run_binary_analogue(&inst, family, cfg, progress)?;
+            let (reports, rho, label) = run_binary_analogue(
+                &inst, family, cfg, progress, completed, prior_rho, checkpoint,
+            )?;
             Ok(finish(
                 curve,
                 &cls.regime,
@@ -656,6 +713,52 @@ fn finish(
 mod tests {
     use super::*;
     use crate::cryptanalysis::curve_catalog::by_name;
+
+    #[test]
+    fn completed_repeat_resumes_at_next_seed() {
+        let curve = by_name("p192").unwrap();
+        let cfg = RunConfig {
+            bits: Some(7),
+            repeats: 2,
+            rho_runs: 0,
+            max_trials: 2_000,
+            ..Default::default()
+        };
+        let mut saved = Vec::new();
+        let mut progress = ProgressReporter::silent();
+        let interrupted = run_curve_from_repeat(
+            &curve,
+            &cfg,
+            &mut progress,
+            0,
+            None,
+            Some(&mut |index, report, _, _| {
+                saved.push((index, report.clone()));
+                Err("interrupted after checkpoint".into())
+            }),
+        );
+        assert_eq!(interrupted.unwrap_err(), "interrupted after checkpoint");
+        assert_eq!(saved.len(), 1);
+        assert_eq!(saved[0].0, 0);
+
+        let mut resumed_indices = Vec::new();
+        let resumed = run_curve_from_repeat(
+            &curve,
+            &cfg,
+            &mut progress,
+            saved.len(),
+            None,
+            Some(&mut |index, _, _, _| {
+                resumed_indices.push(index);
+                Ok(())
+            }),
+        )
+        .expect("resume");
+        assert_eq!(resumed_indices, vec![1]);
+        assert_eq!(resumed.reports.len(), 1);
+        assert_ne!(saved[0].1.spec.seed, resumed.reports[0].spec.seed);
+        assert_eq!(resumed.reports[0].spec.seed, cfg.seed.wrapping_add(0x9E37));
+    }
 
     #[test]
     fn analogue_preserves_koblitz_coefficient_and_scaled_regime() {

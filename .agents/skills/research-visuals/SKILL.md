@@ -5,6 +5,21 @@ description: Produce and refresh evidence-linked diagrams, graphs, reports, and 
 
 # Research visuals and reports
 
+## Report progress at the working scope
+
+Owner instruction, 2026-10-30: lead with the construction, implementation,
+verified identity, or measured improvement and its supporting checks.
+State the relevant assumptions and costs. Name a material remaining dependency
+once and give the next technical step.
+
+Routine reports and updates do not need an overall ECDLP verdict or a rho
+comparison. Include those in an explicitly scoped evaluation, a required
+comparison table, or a specific factual correction. Describe limitations as
+the particular construction's domain, costs, and open dependencies. Recognize
+completed components as progress at their stated scope.
+
+## When to use this skill
+
 Use this skill at three points (AGENTS.md "Research searches must leave
 visual reports"):
 
@@ -41,9 +56,10 @@ PR as the run's records; failed and timed-out runs included.
   references and controls, and the paths of the raw records. Label every
   number measured or derived, and show how a derived one was computed. State
   missing data as missing.
-- **Observations only.** No speedup, win, or significance language beyond
-  what the harness's own comparison admitted, with its scope; wall time only
-  where the harness admitted it. Interpretation belongs to the result PR.
+- **Describe the run.** Lead with the outcomes and checks. Report component
+  and pipeline comparisons at the scope admitted by the harness, including
+  wall time where its measurement conditions permit it. Interpretation
+  belongs to the result PR.
 - **Graph.** At least one quantitative graph of the recorded values (arms
   side by side, per-round values, a quantity against a parameter), with
   units, sample size, uncertainty where recorded, and the session or run id
@@ -65,6 +81,17 @@ Refresh every affected canonical graph and its rendered copies in the same PR
 ("Refresh existing graphs in the same change" below; AGENTS.md section 7), and
 list the graphs checked and left unchanged.
 
+## Performance results: copy into `benchmarks/`
+
+When the run or PR measures how fast an algorithm runs or reports a speedup,
+also copy the report PDFs, every graph as SVG and a 150 dpi PNG render of
+every graph into `benchmarks/<YYYYMMDD>-<slug>/`, and add a row to
+`benchmarks/README.md` (date, what was measured, headline values with units,
+host and isolation, links to the study and run report), in the same PR
+(AGENTS.md "Performance results also land in `benchmarks/`"). Render the PNG
+from the same plotting source as the SVG (for matplotlib, a second `savefig`
+with `dpi=150`). The study directory stays the source of truth.
+
 ## Rendering
 
 Use an installed renderer: Typst, Pandoc with a PDF engine, or LaTeX. Where
@@ -85,6 +112,32 @@ every page: it opens, the graph is legible and labeled, and ids and citations
 are present. Never commit a PDF you have not inspected or present an older
 PDF as current. If no renderer can be installed, commit the complete source
 and graphs and state the exact blocker in the report and the PR.
+
+## Isogeny volcanoes: the standard diagram
+
+Draw every ℓ-isogeny volcano — a walk's result, or measurements placed on
+its curves — with `tools/volcano-diagram/volcano_diagram.py`
+(`volcano-diagram/v2` input, documented in its README). Don't hand-roll a
+new layout. That gives every volcano figure the same reading, a heat map of
+the volcano:
+- **Strata:** each level is a shaded band labelled `Level i · crater/floor`,
+  with its curve count (and how many were measured) and its conductor
+  relative to the crater, ℓ^i.
+- **Rings:** each level is an elliptical ring in perspective, wider going
+  down. Every vertex sits at the angle of the curves below it, under its
+  parent.
+- **Panels:** one per metric, normally mean operations beside mean time.
+  Each panel has one observed-range YlOrRd colour bar, shared by every
+  level, with its min, mid and max printed.
+- **Marks:** unmeasured vertices are small and grey, unverified edges
+  dashed, and the root ringed blue. The title says what was measured and
+  how many seeds or instances per curve; the subtitle carries the run id,
+  and a footnote states anything the colours leave out.
+
+Save the input as `<name>.diagram.json` beside the SVG and PNG. Map each
+short vertex label to its full curve id in the report. If a figure needs
+something the renderer lacks, extend the renderer and its schema version
+rather than forking it.
 
 ## Deliverables for each search round
 
@@ -136,7 +189,17 @@ and graphs and state the exact blocker in the report and the PR.
 ## Reports in S3
 
 Once a report is on `main`, `.github/workflows/reports-s3.yml` copies it to
-`s3://crypto-autoresearcher/reports/crypto/<repository path>` with a per-push
-manifest (`docs/reports-s3.md`). It takes everything under
-`docs/ic/measurement/reports/` and `research/**/reports/` and every PDF under
-`research/`, so keep reports at those paths. Sessions never upload to S3.
+`s3://setec-astronomy-artifacts/reports/crypto/<repository path>` (region
+`us-east-2`) with a per-push manifest (`docs/reports-s3.md`). It takes
+everything under `docs/ic/measurement/reports/` and `research/**/reports/` and
+every PDF under `research/`, so keep reports at those paths.
+
+Sessions never upload, overwrite or delete in that prefix; the workflow is the
+only writer. To read a published report, list or copy it down and check it
+against the manifest's SHA-256:
+
+```sh
+aws s3 ls s3://setec-astronomy-artifacts/reports/crypto/<repository path> --region us-east-2
+aws s3 cp s3://setec-astronomy-artifacts/reports/crypto/<repository path> . --region us-east-2
+aws s3 presign s3://setec-astronomy-artifacts/reports/crypto/<repository path> --expires-in 604800 --region us-east-2
+```

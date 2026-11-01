@@ -1,0 +1,762 @@
+{
+  "card_id": "CARD-ext-endo-rho-20261023-2",
+  "card_path": "research/ext_endo_rho_20261023/cards/CARD-ext-endo-rho-20261023-2.yaml",
+  "card_sha256": "1bad058d4744939fed629152f49490416318c25547dcbf8acbf1baef38c90abb",
+  "commands": [
+    {
+      "argv": [
+        "cargo",
+        "build",
+        "--release",
+        "--bin",
+        "ecbench"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.213,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build-ecbench",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.213,
+      "stderr_sha256": "1ff8bbcb4151dc887e69b78a29bc241d5062cba4757aa5f4639926ae712a8181",
+      "stderr_tail": [
+        "    Finished `release` profile [optimized] target(s) in 0.13s"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--wait",
+        "--allow-busy",
+        "--cpus",
+        "auto",
+        "--spec",
+        "research/ext_endo_rho_20261023/specs/SPEC-subfield-fp3.json",
+        "--out",
+        "research/ext_endo_rho_20261023/sessions/subfield-fp3"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 42.499,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-subfield-fp3",
+      "index": 2,
+      "outputs": {},
+      "seconds": 42.499,
+      "stderr_sha256": "fdeae171459e77f3ffc35e632844fdfffbd1d6cdbae84d5b593ed443a862ab4f",
+      "stderr_tail": [
+        " 270/288 rho-frob       icv1-fp18k3-tm175168838-40adb55f W96cf52979de4  verified S=0.296 L1",
+        " 271/288 rho-neg-aa     icv1-fp18k3-tm175168838-40adb55f W96cf52979de4  verified S=0.550 L2",
+        " 272/288 rho-neg        icv1-fp18k3-tm175168838-40adb55f W96cf52979de4  verified S=0.550 L2",
+        " 273/288 rho-neg-aa     icv1-fp18k3-tm175168838-40adb55f Wd2cc77a90266  verified S=1.837 L2",
+        " 274/288 rho-plain      icv1-fp18k3-tm175168838-40adb55f Wd2cc77a90266  verified S=2.359 L1",
+        " 275/288 rho-frob       icv1-fp18k3-tm175168838-40adb55f Wd2cc77a90266  verified S=0.822 L2",
+        " 276/288 rho-neg        icv1-fp18k3-tm175168838-40adb55f Wd2cc77a90266  verified S=1.837 L1",
+        " 277/288 rho-neg-aa     icv1-fp18k3-tm175168838-40adb55f We682482e6685  verified S=1.487 L2",
+        " 278/288 rho-frob       icv1-fp18k3-tm175168838-40adb55f We682482e6685  verified S=0.217 L2",
+        " 279/288 rho-neg        icv1-fp18k3-tm175168838-40adb55f We682482e6685  verified S=1.487 L2",
+        " 280/288 rho-plain      icv1-fp18k3-tm175168838-40adb55f We682482e6685  verified S=0.585 L2",
+        " 281/288 rho-plain      icv1-fp18k3-tm175168838-40adb55f W24001c709f81  verified S=2.244 L2",
+        " 282/288 rho-neg        icv1-fp18k3-tm175168838-40adb55f W24001c709f81  verified S=0.891 L2",
+        " 283/288 rho-frob       icv1-fp18k3-tm175168838-40adb55f W24001c709f81  verified S=0.397 L1",
+        " 284/288 rho-neg-aa     icv1-fp18k3-tm175168838-40adb55f W24001c709f81  verified S=0.891 L2",
+        " 285/288 rho-frob       icv1-fp18k3-tm175168838-40adb55f Wfe5a2ac9e82a  verified S=0.631 L1",
+        " 286/288 rho-plain      icv1-fp18k3-tm175168838-40adb55f Wfe5a2ac9e82a  verified S=1.502 L1",
+        " 287/288 rho-neg-aa     icv1-fp18k3-tm175168838-40adb55f Wfe5a2ac9e82a  verified S=1.208 L1",
+        " 288/288 rho-neg        icv1-fp18k3-tm175168838-40adb55f Wfe5a2ac9e82a  verified S=1.208 L2",
+        "session ECBS1h31743ea9fa05 complete -> research/ext_endo_rho_20261023/sessions/subfield-fp3 (288 records: {\"verified\": 288})"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ext_endo_rho_20261023/sessions/subfield-fp3",
+        "--replay",
+        "16",
+        "--out",
+        "research/ext_endo_rho_20261023/sessions/subfield-fp3.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 3.369,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-subfield-fp3",
+      "index": 3,
+      "outputs": {
+        "research/ext_endo_rho_20261023/sessions/subfield-fp3.audit.json": "e5d737294f218a4213605c3a1682eff486ac8574c3a99a10d4ced70e7ee53a5b"
+      },
+      "seconds": 3.369,
+      "stderr_sha256": "2e694fec43dd7609df24330e72dddb78a163de91e53d9914d7b1ea0e3edd18f4",
+      "stderr_tail": [
+        "receipt sha256 e5d737294f218a4213605c3a1682eff486ac8574c3a99a10d4ced70e7ee53a5b",
+        "audit OK: 288 records, 288 verified, 16 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "e5d737294f218a4213605c3a1682eff486ac8574c3a99a10d4ced70e7ee53a5b",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 270,",
+        "      \"record_id\": \"ECR1hf5559a9067cb\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"72f960c3aaa21c3469482436e39acd65725ce7ee5231a79b783aefbfe0abc8c0\",",
+        "    \"plan.json\": \"ffd785453ba72e510c7904d0f0432cd39978c184ccd7c100d72a326ef5d79dc2\",",
+        "    \"records.jsonl\": \"79b190d4550787e962e66b17475b76de93acaa31d88ec4515c8b10812be48d0a\",",
+        "    \"session.json\": \"76b5ce7bf68ae76c9eda2b4abb4b8fd9f7ec1998e47a786f5010f91f5e982169\",",
+        "    \"spec.json\": \"efc57e8d49e18a24086e9d13a97dbe780a52ff2499aabb5f7f613b1e384ea2bb\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"87bac3448d63e3c1dcd841a2d23b565c09477c855eda0febf11a03d9931d148f\",",
+        "  \"auditor_env_class_id\": \"ECBENV2h61599de43162\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1he9e33daae9e7\",",
+        "  \"audited_unix_ms\": 1792736781978",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ext_endo_rho_20261023/sessions/subfield-fp3",
+        "--a",
+        "rho-neg-aa",
+        "--b",
+        "rho-neg"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.102,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-subfield-fp3-aa",
+      "index": 4,
+      "outputs": {
+        "research/ext_endo_rho_20261023/sessions/subfield-fp3.compare-rho-neg-aa__rho-neg.txt": "f06c8e492c369e4e90926c7b0d536a521169317c007b9f4de1d2dbae8b754f4b"
+      },
+      "seconds": 0.102,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "f06c8e492c369e4e90926c7b0d536a521169317c007b9f4de1d2dbae8b754f4b",
+      "stdout_tail": [
+        "| Wc957f35c80f1 | icv1-fp18k3-tm49382174-9449e876 | 29.07 | 0.1762 | 0.1762 | 1.0000 |",
+        "| Wca2386433a84 | icv1-fp14k3-t1067974-6e370b4a | 27.09 | 1.0734 | 1.0734 | 1.0000 |",
+        "| Wd2cc77a90266 | icv1-fp18k3-tm175168838-40adb55f | 30.38 | 1.8371 | 1.8371 | 1.0000 |",
+        "| Wd5136cdceaad | icv1-fp18k3-t105242256-eb839464 | 34.23 | 1.2297 | 1.2297 | 1.0000 |",
+        "| Wdc9de5e66ca6 | icv1-fp18k3-t105242256-eb839464 | 34.23 | 0.7276 | 0.7276 | 1.0000 |",
+        "| Wdddfde465c95 | icv1-fp18k3-tm175168838-40adb55f | 30.38 | 1.2028 | 1.2028 | 1.0000 |",
+        "| We017ae6df94c | icv1-fp18k3-t105242256-eb839464 | 34.23 | 3.0954 | 3.0954 | 1.0000 |",
+        "| We285540dab06 | icv1-fp14k3-t1721160-0f9664f3 | 21.85 | 0.6836 | 0.6836 | 1.0000 |",
+        "| We2dfae9fad79 | icv1-fp14k3-tm270470-11d94aae | 21.33 | 1.5264 | 1.5264 | 1.0000 |",
+        "| We682482e6685 | icv1-fp18k3-tm175168838-40adb55f | 30.38 | 1.4866 | 1.4866 | 1.0000 |",
+        "| We6fabb1b7c82 | icv1-fp18k3-tm175168838-40adb55f | 30.38 | 0.5071 | 0.5071 | 1.0000 |",
+        "| We74ee6875c94 | icv1-fp14k3-t1721160-0f9664f3 | 21.85 | 1.8206 | 1.8206 | 1.0000 |",
+        "| We7debe526059 | icv1-fp16k3-t15945104-a601ebf6 | 25.33 | 0.4596 | 0.4596 | 1.0000 |",
+        "| Weca0e5343c7e | icv1-fp16k3-tm23011846-a82bc81a | 26.11 | 0.8166 | 0.8166 | 1.0000 |",
+        "| Wed9ecb91fb56 | icv1-fp14k3-t1067974-6e370b4a | 27.09 | 1.3142 | 1.3142 | 1.0000 |",
+        "| Wee24a43199b2 | icv1-fp18k3-t105242256-eb839464 | 34.23 | 0.5137 | 0.5137 | 1.0000 |",
+        "| Weff61992d3f8 | icv1-fp14k3-t1067974-6e370b4a | 27.09 | 1.0900 | 1.0900 | 1.0000 |",
+        "| Wf82f7df54504 | icv1-fp16k3-tm12407110-185a0067 | 26.94 | 0.7481 | 0.7481 | 1.0000 |",
+        "| Wfd80c9e87e7b | icv1-fp16k3-tm12407110-185a0067 | 26.94 | 1.6681 | 1.6681 | 1.0000 |",
+        "| Wfe5a2ac9e82a | icv1-fp18k3-tm175168838-40adb55f | 30.38 | 1.2077 | 1.2077 | 1.0000 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ext_endo_rho_20261023/sessions/subfield-fp3",
+        "--a",
+        "rho-plain",
+        "--b",
+        "rho-neg"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.086,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-subfield-fp3-plain",
+      "index": 5,
+      "outputs": {
+        "research/ext_endo_rho_20261023/sessions/subfield-fp3.compare-rho-plain__rho-neg.txt": "d1c24d74329a5ea991388126e69564cee0e72331ac95c41f4b6ad1a40bc7f7d6"
+      },
+      "seconds": 0.086,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "d1c24d74329a5ea991388126e69564cee0e72331ac95c41f4b6ad1a40bc7f7d6",
+      "stdout_tail": [
+        "| Wc957f35c80f1 | icv1-fp18k3-tm49382174-9449e876 | 29.07 | 0.8801 | 0.1762 | 0.2003 |",
+        "| Wca2386433a84 | icv1-fp14k3-t1067974-6e370b4a | 27.09 | 1.2145 | 1.0734 | 0.8838 |",
+        "| Wd2cc77a90266 | icv1-fp18k3-tm175168838-40adb55f | 30.38 | 2.3590 | 1.8371 | 0.7788 |",
+        "| Wd5136cdceaad | icv1-fp18k3-t105242256-eb839464 | 34.23 | 2.0023 | 1.2297 | 0.6142 |",
+        "| Wdc9de5e66ca6 | icv1-fp18k3-t105242256-eb839464 | 34.23 | 1.0869 | 0.7276 | 0.6694 |",
+        "| Wdddfde465c95 | icv1-fp18k3-tm175168838-40adb55f | 30.38 | 1.5879 | 1.2028 | 0.7575 |",
+        "| We017ae6df94c | icv1-fp18k3-t105242256-eb839464 | 34.23 | 2.1763 | 3.0954 | 1.4223 |",
+        "| We285540dab06 | icv1-fp14k3-t1721160-0f9664f3 | 21.85 | 1.8345 | 0.6836 | 0.3726 |",
+        "| We2dfae9fad79 | icv1-fp14k3-tm270470-11d94aae | 21.33 | 1.2214 | 1.5264 | 1.2497 |",
+        "| We682482e6685 | icv1-fp18k3-tm175168838-40adb55f | 30.38 | 0.5847 | 1.4866 | 2.5427 |",
+        "| We6fabb1b7c82 | icv1-fp18k3-tm175168838-40adb55f | 30.38 | 0.4860 | 0.5071 | 1.0434 |",
+        "| We74ee6875c94 | icv1-fp14k3-t1721160-0f9664f3 | 21.85 | 1.7058 | 1.8206 | 1.0673 |",
+        "| We7debe526059 | icv1-fp16k3-t15945104-a601ebf6 | 25.33 | 1.3195 | 0.4596 | 0.3483 |",
+        "| Weca0e5343c7e | icv1-fp16k3-tm23011846-a82bc81a | 26.11 | 0.9149 | 0.8166 | 0.8926 |",
+        "| Wed9ecb91fb56 | icv1-fp14k3-t1067974-6e370b4a | 27.09 | 1.1754 | 1.3142 | 1.1181 |",
+        "| Wee24a43199b2 | icv1-fp18k3-t105242256-eb839464 | 34.23 | 0.2585 | 0.5137 | 1.9871 |",
+        "| Weff61992d3f8 | icv1-fp14k3-t1067974-6e370b4a | 27.09 | 0.8266 | 1.0900 | 1.3187 |",
+        "| Wf82f7df54504 | icv1-fp16k3-tm12407110-185a0067 | 26.94 | 1.2573 | 0.7481 | 0.5950 |",
+        "| Wfd80c9e87e7b | icv1-fp16k3-tm12407110-185a0067 | 26.94 | 1.5242 | 1.6681 | 1.0945 |",
+        "| Wfe5a2ac9e82a | icv1-fp18k3-tm175168838-40adb55f | 30.38 | 1.5019 | 1.2077 | 0.8041 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ext_endo_rho_20261023/sessions/subfield-fp3",
+        "--a",
+        "rho-neg",
+        "--b",
+        "rho-frob"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.086,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-subfield-fp3-cand",
+      "index": 6,
+      "outputs": {
+        "research/ext_endo_rho_20261023/sessions/subfield-fp3.compare-rho-neg__rho-frob.txt": "f833b7a420768249ec47b00fc646dc32b7e5b5435279bc021d30b1a25a7d7bb7"
+      },
+      "seconds": 0.086,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "f833b7a420768249ec47b00fc646dc32b7e5b5435279bc021d30b1a25a7d7bb7",
+      "stdout_tail": [
+        "| Wc957f35c80f1 | icv1-fp18k3-tm49382174-9449e876 | 29.07 | 0.1762 | 1.2188 | 6.9153 |",
+        "| Wca2386433a84 | icv1-fp14k3-t1067974-6e370b4a | 27.09 | 1.0734 | 0.4617 | 0.4301 |",
+        "| Wd2cc77a90266 | icv1-fp18k3-tm175168838-40adb55f | 30.38 | 1.8371 | 0.8224 | 0.4477 |",
+        "| Wd5136cdceaad | icv1-fp18k3-t105242256-eb839464 | 34.23 | 1.2297 | 0.2025 | 0.1647 |",
+        "| Wdc9de5e66ca6 | icv1-fp18k3-t105242256-eb839464 | 34.23 | 0.7276 | 1.0983 | 1.5095 |",
+        "| Wdddfde465c95 | icv1-fp18k3-tm175168838-40adb55f | 30.38 | 1.2028 | 0.2423 | 0.2015 |",
+        "| We017ae6df94c | icv1-fp18k3-t105242256-eb839464 | 34.23 | 3.0954 | 0.3111 | 0.1005 |",
+        "| We285540dab06 | icv1-fp14k3-t1721160-0f9664f3 | 21.85 | 0.6836 | 0.1328 | 0.1943 |",
+        "| We2dfae9fad79 | icv1-fp14k3-tm270470-11d94aae | 21.33 | 1.5264 | 1.4280 | 0.9355 |",
+        "| We682482e6685 | icv1-fp18k3-tm175168838-40adb55f | 30.38 | 1.4866 | 0.2175 | 0.1463 |",
+        "| We6fabb1b7c82 | icv1-fp18k3-tm175168838-40adb55f | 30.38 | 0.5071 | 1.0734 | 2.1167 |",
+        "| We74ee6875c94 | icv1-fp14k3-t1721160-0f9664f3 | 21.85 | 1.8206 | 0.8823 | 0.4846 |",
+        "| We7debe526059 | icv1-fp16k3-t15945104-a601ebf6 | 25.33 | 0.4596 | 0.5197 | 1.1306 |",
+        "| Weca0e5343c7e | icv1-fp16k3-tm23011846-a82bc81a | 26.11 | 0.8166 | 0.9291 | 1.1377 |",
+        "| Wed9ecb91fb56 | icv1-fp14k3-t1067974-6e370b4a | 27.09 | 1.3142 | 0.4521 | 0.3441 |",
+        "| Wee24a43199b2 | icv1-fp18k3-t105242256-eb839464 | 34.23 | 0.5137 | 0.7998 | 1.5571 |",
+        "| Weff61992d3f8 | icv1-fp14k3-t1067974-6e370b4a | 27.09 | 1.0900 | 1.0091 | 0.9258 |",
+        "| Wf82f7df54504 | icv1-fp16k3-tm12407110-185a0067 | 26.94 | 0.7481 | 0.2883 | 0.3854 |",
+        "| Wfd80c9e87e7b | icv1-fp16k3-tm12407110-185a0067 | 26.94 | 1.6681 | 0.3071 | 0.1841 |",
+        "| Wfe5a2ac9e82a | icv1-fp18k3-tm175168838-40adb55f | 30.38 | 1.2077 | 0.6309 | 0.5224 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "table",
+        "--dir",
+        "research/ext_endo_rho_20261023/sessions/subfield-fp3"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.072,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "table-subfield-fp3",
+      "index": 7,
+      "outputs": {
+        "research/ext_endo_rho_20261023/sessions/subfield-fp3.table.md": "c7275bc7b32a9ea2facb598b0235c7cc7e0ff158a7836378511dffd3a08474d7"
+      },
+      "seconds": 0.072,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "c7275bc7b32a9ea2facb598b0235c7cc7e0ff158a7836378511dffd3a08474d7",
+      "stdout_tail": [
+        "| ECBS1h31743ea9fa05 | rho-neg | rho.negation | icv1-fp18k3-tm49382174-9449e876 | 29.07 | 8/8 | 0.785 | [0.496, 1.111] | 0.886 | 0.886 | 1.534 | 1.000 | yes | 16.508 | L2\u00d78 |",
+        "| ECBS1h31743ea9fa05 | rho-neg | rho.negation | icv1-fp18k3-tm175168838-40adb55f | 30.38 | 8/8 | 1.015 | [0.700, 1.355] | 0.886 | 1.145 | 1.983 | 1.000 | yes | 40.006 | L1\u00d72 L2\u00d76 |",
+        "| ECBS1h31743ea9fa05 | rho-neg-aa | rho.negation | icv1-fp14k3-t1721160-0f9664f3 | 21.85 | 8/8 | 1.134 | [0.742, 1.612] | 0.886 | 1.279 | 2.216 | 1.000 | yes | 1.689 | L1\u00d75 L2\u00d73 |",
+        "| ECBS1h31743ea9fa05 | rho-neg-aa | rho.negation | icv1-fp14k3-tm270470-11d94aae | 21.33 | 8/8 | 1.131 | [0.775, 1.458] | 0.886 | 1.276 | 2.211 | 1.000 | yes | 2.229 | L1\u00d72 L2\u00d76 |",
+        "| ECBS1h31743ea9fa05 | rho-neg-aa | rho.negation | icv1-fp14k3-t1067974-6e370b4a | 27.09 | 8/8 | 1.194 | [1.026, 1.373] | 0.886 | 1.347 | 2.333 | 1.000 | yes | 14.764 | L2\u00d78 |",
+        "| ECBS1h31743ea9fa05 | rho-neg-aa | rho.negation | icv1-fp16k3-tm23011846-a82bc81a | 26.11 | 8/8 | 0.944 | [0.803, 1.100] | 0.886 | 1.065 | 1.844 | 1.000 | yes | 10.066 | L2\u00d78 |",
+        "| ECBS1h31743ea9fa05 | rho-neg-aa | rho.negation | icv1-fp16k3-t15945104-a601ebf6 | 25.33 | 8/8 | 0.783 | [0.465, 1.110] | 0.886 | 0.884 | 1.531 | 1.000 | yes | 6.801 | L1\u00d71 L2\u00d77 |",
+        "| ECBS1h31743ea9fa05 | rho-neg-aa | rho.negation | icv1-fp16k3-tm12407110-185a0067 | 26.94 | 8/8 | 1.404 | [1.061, 1.757] | 0.886 | 1.584 | 2.744 | 1.000 | yes | 16.531 | L1\u00d71 L2\u00d77 |",
+        "| ECBS1h31743ea9fa05 | rho-neg-aa | rho.negation | icv1-fp18k3-t105242256-eb839464 | 34.23 | 8/8 | 1.305 | [0.893, 1.878] | 0.886 | 1.473 | 2.551 | 1.000 | yes | 175.849 | L1\u00d74 L2\u00d74 |",
+        "| ECBS1h31743ea9fa05 | rho-neg-aa | rho.negation | icv1-fp18k3-tm49382174-9449e876 | 29.07 | 8/8 | 0.785 | [0.496, 1.111] | 0.886 | 0.886 | 1.534 | 1.000 | yes | 15.316 | L1\u00d72 L2\u00d76 |",
+        "| ECBS1h31743ea9fa05 | rho-neg-aa | rho.negation | icv1-fp18k3-tm175168838-40adb55f | 30.38 | 8/8 | 1.015 | [0.700, 1.355] | 0.886 | 1.145 | 1.983 | 1.000 | yes | 40.498 | L1\u00d73 L2\u00d75 |",
+        "| ECBS1h31743ea9fa05 | rho-frob | rho.frobenius_orbit | icv1-fp14k3-t1721160-0f9664f3 | 21.85 | 8/8 | 0.595 | [0.397, 0.797] | 0.512 | 1.164 | 1.164 | 0.525 | yes | 1.247 | L1\u00d75 L2\u00d73 |",
+        "| ECBS1h31743ea9fa05 | rho-frob | rho.frobenius_orbit | icv1-fp14k3-tm270470-11d94aae | 21.33 | 8/8 | 0.692 | [0.471, 0.964] | 0.512 | 1.353 | 1.353 | 0.612 | yes | 1.093 | L2\u00d78 |",
+        "| ECBS1h31743ea9fa05 | rho-frob | rho.frobenius_orbit | icv1-fp14k3-t1067974-6e370b4a | 27.09 | 8/8 | 0.587 | [0.374, 0.791] | 0.512 | 1.147 | 1.147 | 0.491 | yes | 9.842 | L1\u00d71 L2\u00d77 |",
+        "| ECBS1h31743ea9fa05 | rho-frob | rho.frobenius_orbit | icv1-fp16k3-tm23011846-a82bc81a | 26.11 | 8/8 | 0.664 | [0.428, 0.897] | 0.512 | 1.299 | 1.299 | 0.704 | yes | 8.024 | L2\u00d78 |",
+        "| ECBS1h31743ea9fa05 | rho-frob | rho.frobenius_orbit | icv1-fp16k3-t15945104-a601ebf6 | 25.33 | 8/8 | 0.616 | [0.509, 0.727] | 0.512 | 1.204 | 1.204 | 0.786 | yes | 6.044 | L1\u00d73 L2\u00d75 |",
+        "| ECBS1h31743ea9fa05 | rho-frob | rho.frobenius_orbit | icv1-fp16k3-tm12407110-185a0067 | 26.94 | 8/8 | 0.631 | [0.386, 0.886] | 0.512 | 1.232 | 1.232 | 0.449 | yes | 9.025 | L1\u00d71 L2\u00d77 |",
+        "| ECBS1h31743ea9fa05 | rho-frob | rho.frobenius_orbit | icv1-fp18k3-t105242256-eb839464 | 34.23 | 8/8 | 0.601 | [0.412, 0.790] | 0.512 | 1.175 | 1.175 | 0.460 | yes | 123.244 | L1\u00d72 L2\u00d76 |",
+        "| ECBS1h31743ea9fa05 | rho-frob | rho.frobenius_orbit | icv1-fp18k3-tm49382174-9449e876 | 29.07 | 8/8 | 0.482 | [0.272, 0.728] | 0.512 | 0.941 | 0.941 | 0.613 | yes | 14.868 | L1\u00d73 L2\u00d75 |",
+        "| ECBS1h31743ea9fa05 | rho-frob | rho.frobenius_orbit | icv1-fp18k3-tm175168838-40adb55f | 30.38 | 8/8 | 0.532 | [0.346, 0.740] | 0.512 | 1.039 | 1.039 | 0.524 | yes | 30.072 | L1\u00d73 L2\u00d75 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--wait",
+        "--allow-busy",
+        "--cpus",
+        "auto",
+        "--spec",
+        "research/ext_endo_rho_20261023/specs/SPEC-gls-fp2.json",
+        "--out",
+        "research/ext_endo_rho_20261023/sessions/gls-fp2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 38.783,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-gls-fp2",
+      "index": 8,
+      "outputs": {},
+      "seconds": 38.783,
+      "stderr_sha256": "fea782ada9b62bdfb2cb6ce94bb8a3059f67d4c4544b9ee0208a59f10448bde0",
+      "stderr_tail": [
+        " 270/288 rho-plain      icv1-fp18k2-t18094-9309ee0a W77b414a7dd89  verified S=1.936 L2",
+        " 271/288 rho-gls        icv1-fp18k2-t18094-9309ee0a W77b414a7dd89  verified S=0.156 L2",
+        " 272/288 rho-neg        icv1-fp18k2-t18094-9309ee0a W77b414a7dd89  verified S=1.372 L2",
+        " 273/288 rho-neg        icv1-fp18k2-t18094-9309ee0a W2224602adea3  verified S=1.090 L1",
+        " 274/288 rho-neg-aa     icv1-fp18k2-t18094-9309ee0a W2224602adea3  verified S=1.090 L1",
+        " 275/288 rho-plain      icv1-fp18k2-t18094-9309ee0a W2224602adea3  verified S=1.867 L2",
+        " 276/288 rho-gls        icv1-fp18k2-t18094-9309ee0a W2224602adea3  verified S=0.281 L2",
+        " 277/288 rho-neg-aa     icv1-fp18k2-t18094-9309ee0a W8af981feea07  verified S=0.787 L2",
+        " 278/288 rho-gls        icv1-fp18k2-t18094-9309ee0a W8af981feea07  verified S=0.701 L1",
+        " 279/288 rho-neg        icv1-fp18k2-t18094-9309ee0a W8af981feea07  verified S=0.787 L2",
+        " 280/288 rho-plain      icv1-fp18k2-t18094-9309ee0a W8af981feea07  verified S=0.403 L2",
+        " 281/288 rho-plain      icv1-fp18k2-t18094-9309ee0a Wbaf4a846e39f  verified S=1.306 L2",
+        " 282/288 rho-neg-aa     icv1-fp18k2-t18094-9309ee0a Wbaf4a846e39f  verified S=0.591 L2",
+        " 283/288 rho-neg        icv1-fp18k2-t18094-9309ee0a Wbaf4a846e39f  verified S=0.591 L2",
+        " 284/288 rho-gls        icv1-fp18k2-t18094-9309ee0a Wbaf4a846e39f  verified S=0.754 L2",
+        " 285/288 rho-gls        icv1-fp18k2-t18094-9309ee0a Wc38c04485645  verified S=0.239 L2",
+        " 286/288 rho-neg-aa     icv1-fp18k2-t18094-9309ee0a Wc38c04485645  verified S=2.258 L2",
+        " 287/288 rho-neg        icv1-fp18k2-t18094-9309ee0a Wc38c04485645  verified S=2.258 L1",
+        " 288/288 rho-plain      icv1-fp18k2-t18094-9309ee0a Wc38c04485645  verified S=0.451 L2",
+        "session ECBS1he01d3dfefa3e complete -> research/ext_endo_rho_20261023/sessions/gls-fp2 (288 records: {\"verified\": 288})"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ext_endo_rho_20261023/sessions/gls-fp2",
+        "--replay",
+        "16",
+        "--out",
+        "research/ext_endo_rho_20261023/sessions/gls-fp2.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 3.163,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-gls-fp2",
+      "index": 9,
+      "outputs": {
+        "research/ext_endo_rho_20261023/sessions/gls-fp2.audit.json": "e8b4e6453baee6488ef8a0aad8c04ad1428c35a35a7b941910e7e08a8908ff2a"
+      },
+      "seconds": 3.163,
+      "stderr_sha256": "7f0842c5de7654b3c2bbb4f4fe725073aa329f13b9ea8baaac34e23ad9aafa55",
+      "stderr_tail": [
+        "receipt sha256 e8b4e6453baee6488ef8a0aad8c04ad1428c35a35a7b941910e7e08a8908ff2a",
+        "audit OK: 288 records, 288 verified, 16 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "e8b4e6453baee6488ef8a0aad8c04ad1428c35a35a7b941910e7e08a8908ff2a",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 270,",
+        "      \"record_id\": \"ECR1hb85808d77987\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"bf4310e591fcd54dd367f9b89627d50c1b063a088999f51d3839079699291bc9\",",
+        "    \"plan.json\": \"e087896cd9eda0df14aa7cc25312418f06e7ba2178a82567eab21f7b5b420831\",",
+        "    \"records.jsonl\": \"81bc759c2e236ae49e6906649c50d2d60b2e831014109fea416147cabeff2447\",",
+        "    \"session.json\": \"b203bc9103eaa0ad473612be96a364579f19ceb82fdd3a31514fbac0a990eab2\",",
+        "    \"spec.json\": \"aacf7e8c9020caf65d8b250286cce75cc56f2992bd314d50a80028c4078f7ba2\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"87bac3448d63e3c1dcd841a2d23b565c09477c855eda0febf11a03d9931d148f\",",
+        "  \"auditor_env_class_id\": \"ECBENV2h61599de43162\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1he9e33daae9e7\",",
+        "  \"audited_unix_ms\": 1792736824269",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ext_endo_rho_20261023/sessions/gls-fp2",
+        "--a",
+        "rho-neg-aa",
+        "--b",
+        "rho-neg"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.113,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-gls-fp2-aa",
+      "index": 10,
+      "outputs": {
+        "research/ext_endo_rho_20261023/sessions/gls-fp2.compare-rho-neg-aa__rho-neg.txt": "7238a22379c0a16e633e4972d6aeb51cfc206c24577271297034df7d8b9b1f54"
+      },
+      "seconds": 0.113,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "7238a22379c0a16e633e4972d6aeb51cfc206c24577271297034df7d8b9b1f54",
+      "stdout_tail": [
+        "| Wc20da02e5f7a | icv1-fp16k2-tm31031-d66fa2a8 | 25.46 | 1.5475 | 1.5475 | 1.0000 |",
+        "| Wc279b1cd14c3 | icv1-fp14k2-t16033-d931ad8e | 23.49 | 0.6806 | 0.6806 | 1.0000 |",
+        "| Wc38c04485645 | icv1-fp18k2-t18094-9309ee0a | 28.96 | 2.2577 | 2.2577 | 1.0000 |",
+        "| Wc450e51414ee | icv1-fp16k2-t128773-23d033a0 | 31.95 | 2.0860 | 2.0860 | 1.0000 |",
+        "| Wc86f8e150c46 | icv1-fp16k2-t104482-e8762922 | 27.57 | 0.5454 | 0.5454 | 1.0000 |",
+        "| Wcb3f817be534 | icv1-fp18k2-t246790-1e8c9e35 | 30.37 | 1.1305 | 1.1305 | 1.0000 |",
+        "| Wcfc4291659e5 | icv1-fp14k2-t16033-d931ad8e | 23.49 | 1.1125 | 1.1125 | 1.0000 |",
+        "| Wd03215c161d6 | icv1-fp16k2-t104482-e8762922 | 27.57 | 1.1742 | 1.1742 | 1.0000 |",
+        "| Wd59f3bc76cd6 | icv1-fp14k2-tm4302-8e295ae8 | 23.67 | 1.1679 | 1.1679 | 1.0000 |",
+        "| Wd6b1a2b17936 | icv1-fp16k2-t128773-23d033a0 | 31.95 | 0.0335 | 0.0335 | 1.0000 |",
+        "| Wd6e23117799e | icv1-fp14k2-t16033-d931ad8e | 23.49 | 0.9016 | 0.9016 | 1.0000 |",
+        "| We2e73452d169 | icv1-fp16k2-tm31031-d66fa2a8 | 25.46 | 0.7846 | 0.7846 | 1.0000 |",
+        "| We62adcd41bfb | icv1-fp16k2-t104482-e8762922 | 27.57 | 0.9128 | 0.9128 | 1.0000 |",
+        "| Web27e44c1d18 | icv1-fp14k2-t17985-b3a43584 | 24.81 | 1.3584 | 1.3584 | 1.0000 |",
+        "| Wed5ae51ec383 | icv1-fp14k2-t17985-b3a43584 | 24.81 | 0.2164 | 0.2164 | 1.0000 |",
+        "| Wf16e225372ba | icv1-fp18k2-t18094-9309ee0a | 28.96 | 0.8060 | 0.8060 | 1.0000 |",
+        "| Wf57c16a96e97 | icv1-fp16k2-tm31031-d66fa2a8 | 25.46 | 0.7532 | 0.7532 | 1.0000 |",
+        "| Wf8faa6144f1c | icv1-fp18k2-t493789-17ed92fc | 35.95 | 1.2752 | 1.2752 | 1.0000 |",
+        "| Wfa80146dfd88 | icv1-fp14k2-tm4302-8e295ae8 | 23.67 | 1.0321 | 1.0321 | 1.0000 |",
+        "| Wfe3d616fc58d | icv1-fp16k2-t128773-23d033a0 | 31.95 | 0.6672 | 0.6672 | 1.0000 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ext_endo_rho_20261023/sessions/gls-fp2",
+        "--a",
+        "rho-plain",
+        "--b",
+        "rho-neg"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.097,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-gls-fp2-plain",
+      "index": 11,
+      "outputs": {
+        "research/ext_endo_rho_20261023/sessions/gls-fp2.compare-rho-plain__rho-neg.txt": "d0947afe6e1b7ad97a17d24df3df6b94d65048c92987d9ad73bedc6b4a3ed6b6"
+      },
+      "seconds": 0.097,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "d0947afe6e1b7ad97a17d24df3df6b94d65048c92987d9ad73bedc6b4a3ed6b6",
+      "stdout_tail": [
+        "| Wc20da02e5f7a | icv1-fp16k2-tm31031-d66fa2a8 | 25.46 | 0.7872 | 1.5475 | 1.9657 |",
+        "| Wc279b1cd14c3 | icv1-fp14k2-t16033-d931ad8e | 23.49 | 1.4228 | 0.6806 | 0.4783 |",
+        "| Wc38c04485645 | icv1-fp18k2-t18094-9309ee0a | 28.96 | 0.4507 | 2.2577 | 5.0096 |",
+        "| Wc450e51414ee | icv1-fp16k2-t128773-23d033a0 | 31.95 | 1.0897 | 2.0860 | 1.9142 |",
+        "| Wc86f8e150c46 | icv1-fp16k2-t104482-e8762922 | 27.57 | 0.9021 | 0.5454 | 0.6046 |",
+        "| Wcb3f817be534 | icv1-fp18k2-t246790-1e8c9e35 | 30.37 | 0.7857 | 1.1305 | 1.4389 |",
+        "| Wcfc4291659e5 | icv1-fp14k2-t16033-d931ad8e | 23.49 | 1.8780 | 1.1125 | 0.5924 |",
+        "| Wd03215c161d6 | icv1-fp16k2-t104482-e8762922 | 27.57 | 2.9910 | 1.1742 | 0.3926 |",
+        "| Wd59f3bc76cd6 | icv1-fp14k2-tm4302-8e295ae8 | 23.67 | 1.9057 | 1.1679 | 0.6128 |",
+        "| Wd6b1a2b17936 | icv1-fp16k2-t128773-23d033a0 | 31.95 | 0.5060 | 0.0335 | 0.0662 |",
+        "| Wd6e23117799e | icv1-fp14k2-t16033-d931ad8e | 23.49 | 2.8273 | 0.9016 | 0.3189 |",
+        "| We2e73452d169 | icv1-fp16k2-tm31031-d66fa2a8 | 25.46 | 0.3714 | 0.7846 | 2.1123 |",
+        "| We62adcd41bfb | icv1-fp16k2-t104482-e8762922 | 27.57 | 2.4872 | 0.9128 | 0.3670 |",
+        "| Web27e44c1d18 | icv1-fp14k2-t17985-b3a43584 | 24.81 | 1.5738 | 1.3584 | 0.8631 |",
+        "| Wed5ae51ec383 | icv1-fp14k2-t17985-b3a43584 | 24.81 | 1.3929 | 0.2164 | 0.1553 |",
+        "| Wf16e225372ba | icv1-fp18k2-t18094-9309ee0a | 28.96 | 0.7237 | 0.8060 | 1.1137 |",
+        "| Wf57c16a96e97 | icv1-fp16k2-tm31031-d66fa2a8 | 25.46 | 1.1688 | 0.7532 | 0.6444 |",
+        "| Wf8faa6144f1c | icv1-fp18k2-t493789-17ed92fc | 35.95 | 0.2430 | 1.2752 | 5.2468 |",
+        "| Wfa80146dfd88 | icv1-fp14k2-tm4302-8e295ae8 | 23.67 | 1.3125 | 1.0321 | 0.7864 |",
+        "| Wfe3d616fc58d | icv1-fp16k2-t128773-23d033a0 | 31.95 | 0.6167 | 0.6672 | 1.0818 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ext_endo_rho_20261023/sessions/gls-fp2",
+        "--a",
+        "rho-neg",
+        "--b",
+        "rho-gls"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.093,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-gls-fp2-cand",
+      "index": 12,
+      "outputs": {
+        "research/ext_endo_rho_20261023/sessions/gls-fp2.compare-rho-neg__rho-gls.txt": "4dce71ceac94ddd547e56d61a5c910fe80e50db857c09f88ccaa210730530a5c"
+      },
+      "seconds": 0.093,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "4dce71ceac94ddd547e56d61a5c910fe80e50db857c09f88ccaa210730530a5c",
+      "stdout_tail": [
+        "| Wc20da02e5f7a | icv1-fp16k2-tm31031-d66fa2a8 | 25.46 | 1.5475 | 0.8391 | 0.5422 |",
+        "| Wc279b1cd14c3 | icv1-fp14k2-t16033-d931ad8e | 23.49 | 0.6806 | 0.8559 | 1.2577 |",
+        "| Wc38c04485645 | icv1-fp18k2-t18094-9309ee0a | 28.96 | 2.2577 | 0.2394 | 0.1060 |",
+        "| Wc450e51414ee | icv1-fp16k2-t128773-23d033a0 | 31.95 | 2.0860 | 0.3117 | 0.1494 |",
+        "| Wc86f8e150c46 | icv1-fp16k2-t104482-e8762922 | 27.57 | 0.5454 | 1.2367 | 2.2675 |",
+        "| Wcb3f817be534 | icv1-fp18k2-t246790-1e8c9e35 | 30.37 | 1.1305 | 0.7392 | 0.6539 |",
+        "| Wcfc4291659e5 | icv1-fp14k2-t16033-d931ad8e | 23.49 | 1.1125 | 0.8888 | 0.7990 |",
+        "| Wd03215c161d6 | icv1-fp16k2-t104482-e8762922 | 27.57 | 1.1742 | 0.2655 | 0.2262 |",
+        "| Wd59f3bc76cd6 | icv1-fp14k2-tm4302-8e295ae8 | 23.67 | 1.1679 | 1.4474 | 1.2393 |",
+        "| Wd6b1a2b17936 | icv1-fp16k2-t128773-23d033a0 | 31.95 | 0.0335 | 0.4972 | 14.8463 |",
+        "| Wd6e23117799e | icv1-fp14k2-t16033-d931ad8e | 23.49 | 0.9016 | 1.3463 | 1.4932 |",
+        "| We2e73452d169 | icv1-fp16k2-tm31031-d66fa2a8 | 25.46 | 0.7846 | 0.5856 | 0.7464 |",
+        "| We62adcd41bfb | icv1-fp16k2-t104482-e8762922 | 27.57 | 0.9128 | 0.1024 | 0.1121 |",
+        "| Web27e44c1d18 | icv1-fp14k2-t17985-b3a43584 | 24.81 | 1.3584 | 0.7043 | 0.5185 |",
+        "| Wed5ae51ec383 | icv1-fp14k2-t17985-b3a43584 | 24.81 | 0.2164 | 0.8060 | 3.7253 |",
+        "| Wf16e225372ba | icv1-fp18k2-t18094-9309ee0a | 28.96 | 0.8060 | 0.5775 | 0.7165 |",
+        "| Wf57c16a96e97 | icv1-fp16k2-tm31031-d66fa2a8 | 25.46 | 0.7532 | 0.2672 | 0.3548 |",
+        "| Wf8faa6144f1c | icv1-fp18k2-t493789-17ed92fc | 35.95 | 1.2752 | 0.2393 | 0.1877 |",
+        "| Wfa80146dfd88 | icv1-fp14k2-tm4302-8e295ae8 | 23.67 | 1.0321 | 1.3333 | 1.2918 |",
+        "| Wfe3d616fc58d | icv1-fp16k2-t128773-23d033a0 | 31.95 | 0.6672 | 0.7372 | 1.1050 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "table",
+        "--dir",
+        "research/ext_endo_rho_20261023/sessions/gls-fp2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.085,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "table-gls-fp2",
+      "index": 13,
+      "outputs": {
+        "research/ext_endo_rho_20261023/sessions/gls-fp2.table.md": "ed5cd55f79930f71095f1f0661d0236ec00bc6e85e1c6093a447db75619362b7"
+      },
+      "seconds": 0.085,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ed5cd55f79930f71095f1f0661d0236ec00bc6e85e1c6093a447db75619362b7",
+      "stdout_tail": [
+        "| ECBS1he01d3dfefa3e | rho-neg | rho.negation | icv1-fp18k2-t493789-17ed92fc | 35.95 | 8/8 | 1.052 | [0.630, 1.631] | 0.886 | 1.187 | 1.679 | 1.000 | yes | 129.111 | L1\u00d74 L2\u00d74 |",
+        "| ECBS1he01d3dfefa3e | rho-neg | rho.negation | icv1-fp18k2-t18094-9309ee0a | 28.96 | 8/8 | 1.165 | [0.854, 1.529] | 0.886 | 1.314 | 1.859 | 1.000 | yes | 17.171 | L1\u00d73 L2\u00d75 |",
+        "| ECBS1he01d3dfefa3e | rho-neg-aa | rho.negation | icv1-fp14k2-t16033-d931ad8e | 23.49 | 8/8 | 0.969 | [0.722, 1.253] | 0.886 | 1.093 | 1.546 | 1.000 | yes | 2.396 | L2\u00d78 |",
+        "| ECBS1he01d3dfefa3e | rho-neg-aa | rho.negation | icv1-fp14k2-t17985-b3a43584 | 24.81 | 8/8 | 0.904 | [0.591, 1.205] | 0.886 | 1.020 | 1.443 | 1.000 | yes | 2.886 | L1\u00d71 L2\u00d77 |",
+        "| ECBS1he01d3dfefa3e | rho-neg-aa | rho.negation | icv1-fp14k2-tm4302-8e295ae8 | 23.67 | 8/8 | 1.067 | [0.758, 1.417] | 0.886 | 1.204 | 1.703 | 1.000 | yes | 2.126 | L1\u00d76 L2\u00d72 |",
+        "| ECBS1he01d3dfefa3e | rho-neg-aa | rho.negation | icv1-fp16k2-t128773-23d033a0 | 31.95 | 8/8 | 0.880 | [0.433, 1.361] | 0.886 | 0.994 | 1.405 | 1.000 | yes | 37.522 | L2\u00d78 |",
+        "| ECBS1he01d3dfefa3e | rho-neg-aa | rho.negation | icv1-fp16k2-tm31031-d66fa2a8 | 25.46 | 8/8 | 1.031 | [0.759, 1.314] | 0.886 | 1.163 | 1.645 | 1.000 | yes | 5.059 | L1\u00d71 L2\u00d77 |",
+        "| ECBS1he01d3dfefa3e | rho-neg-aa | rho.negation | icv1-fp16k2-t104482-e8762922 | 27.57 | 8/8 | 1.032 | [0.806, 1.257] | 0.886 | 1.165 | 1.647 | 1.000 | yes | 8.448 | L1\u00d72 L2\u00d76 |",
+        "| ECBS1he01d3dfefa3e | rho-neg-aa | rho.negation | icv1-fp18k2-t246790-1e8c9e35 | 30.37 | 8/8 | 0.812 | [0.570, 1.038] | 0.886 | 0.916 | 1.295 | 1.000 | yes | 16.874 | L2\u00d78 |",
+        "| ECBS1he01d3dfefa3e | rho-neg-aa | rho.negation | icv1-fp18k2-t493789-17ed92fc | 35.95 | 8/8 | 1.052 | [0.630, 1.631] | 0.886 | 1.187 | 1.679 | 1.000 | yes | 127.275 | L1\u00d74 L2\u00d74 |",
+        "| ECBS1he01d3dfefa3e | rho-neg-aa | rho.negation | icv1-fp18k2-t18094-9309ee0a | 28.96 | 8/8 | 1.165 | [0.854, 1.529] | 0.886 | 1.314 | 1.859 | 1.000 | yes | 19.179 | L1\u00d71 L2\u00d77 |",
+        "| ECBS1he01d3dfefa3e | rho-gls | rho.gls | icv1-fp14k2-t16033-d931ad8e | 23.49 | 8/8 | 0.762 | [0.590, 0.961] | 0.627 | 1.216 | 1.216 | 0.787 | yes | 2.284 | L1\u00d71 L2\u00d77 |",
+        "| ECBS1he01d3dfefa3e | rho-gls | rho.gls | icv1-fp14k2-t17985-b3a43584 | 24.81 | 8/8 | 0.857 | [0.595, 1.101] | 0.627 | 1.367 | 1.367 | 0.948 | yes | 3.709 | L1\u00d71 L2\u00d77 |",
+        "| ECBS1he01d3dfefa3e | rho-gls | rho.gls | icv1-fp14k2-tm4302-8e295ae8 | 23.67 | 8/8 | 0.921 | [0.602, 1.226] | 0.627 | 1.469 | 1.469 | 0.863 | yes | 3.206 | L1\u00d75 L2\u00d73 |",
+        "| ECBS1he01d3dfefa3e | rho-gls | rho.gls | icv1-fp16k2-t128773-23d033a0 | 31.95 | 8/8 | 0.474 | [0.305, 0.652] | 0.627 | 0.756 | 0.756 | 0.538 | yes | 24.995 | L1\u00d71 L2\u00d77 |",
+        "| ECBS1he01d3dfefa3e | rho-gls | rho.gls | icv1-fp16k2-tm31031-d66fa2a8 | 25.46 | 8/8 | 0.595 | [0.420, 0.763] | 0.627 | 0.950 | 0.950 | 0.578 | yes | 4.395 | L1\u00d73 L2\u00d75 |",
+        "| ECBS1he01d3dfefa3e | rho-gls | rho.gls | icv1-fp16k2-t104482-e8762922 | 27.57 | 8/8 | 0.648 | [0.407, 0.901] | 0.627 | 1.034 | 1.034 | 0.628 | yes | 8.896 | L2\u00d78 |",
+        "| ECBS1he01d3dfefa3e | rho-gls | rho.gls | icv1-fp18k2-t246790-1e8c9e35 | 30.37 | 8/8 | 0.472 | [0.274, 0.661] | 0.627 | 0.753 | 0.753 | 0.581 | yes | 21.614 | L1\u00d72 L2\u00d76 |",
+        "| ECBS1he01d3dfefa3e | rho-gls | rho.gls | icv1-fp18k2-t493789-17ed92fc | 35.95 | 8/8 | 0.501 | [0.329, 0.686] | 0.627 | 0.800 | 0.800 | 0.476 | yes | 93.788 | L1\u00d72 L2\u00d76 |",
+        "| ECBS1he01d3dfefa3e | rho-gls | rho.gls | icv1-fp18k2-t18094-9309ee0a | 28.96 | 8/8 | 0.554 | [0.345, 0.795] | 0.627 | 0.884 | 0.884 | 0.476 | yes | 12.216 | L1\u00d72 L2\u00d76 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 13,
+  "commit": "16b4fcca2b308e5ef7308d43dbd4e751479f7b1f",
+  "dirty_after": [
+    "research/conductor_gap_cm_orbits_20261015/native/ecbench_next.rs",
+    "research/ext_endo_rho_20261023/cards/CARD-ext-endo-rho-20261023-1.receipt.json",
+    "research/ext_endo_rho_20261023/cards/CARD-ext-endo-rho-20261023-1.yaml",
+    "research/ext_endo_rho_20261023/cards/CARD-ext-endo-rho-20261023-2.yaml",
+    "research/ext_endo_rho_20261023/receipts/build-ecbench.stderr",
+    "research/ext_endo_rho_20261023/receipts/build-ecbench.stdout",
+    "research/ext_endo_rho_20261023/receipts/card2-build-ecbench.stderr",
+    "research/ext_endo_rho_20261023/receipts/card2-build-ecbench.stdout",
+    "research/ext_endo_rho_20261023/receipts/card2-compare-gls-fp2-aa.stderr",
+    "research/ext_endo_rho_20261023/receipts/card2-compare-gls-fp2-cand.stderr",
+    "research/ext_endo_rho_20261023/receipts/card2-compare-gls-fp2-plain.stderr",
+    "research/ext_endo_rho_20261023/receipts/card2-compare-subfield-fp3-aa.stderr",
+    "research/ext_endo_rho_20261023/receipts/card2-compare-subfield-fp3-cand.stderr",
+    "research/ext_endo_rho_20261023/receipts/card2-compare-subfield-fp3-plain.stderr",
+    "research/ext_endo_rho_20261023/receipts/card2-run-gls-fp2.stderr",
+    "research/ext_endo_rho_20261023/receipts/card2-run-gls-fp2.stdout",
+    "research/ext_endo_rho_20261023/receipts/card2-run-subfield-fp3.stderr",
+    "research/ext_endo_rho_20261023/receipts/card2-run-subfield-fp3.stdout",
+    "research/ext_endo_rho_20261023/receipts/card2-table-gls-fp2.stderr",
+    "research/ext_endo_rho_20261023/receipts/card2-table-subfield-fp3.stderr",
+    "research/ext_endo_rho_20261023/receipts/card2-verify-gls-fp2.stderr",
+    "research/ext_endo_rho_20261023/receipts/card2-verify-gls-fp2.stdout",
+    "research/ext_endo_rho_20261023/receipts/card2-verify-subfield-fp3.stderr",
+    "research/ext_endo_rho_20261023/receipts/card2-verify-subfield-fp3.stdout",
+    "research/ext_endo_rho_20261023/receipts/run-subfield-fp3.stderr",
+    "research/ext_endo_rho_20261023/receipts/run-subfield-fp3.stdout",
+    "research/ext_endo_rho_20261023/sessions/gls-fp2.audit.json",
+    "research/ext_endo_rho_20261023/sessions/gls-fp2.compare-rho-neg-aa__rho-neg.txt",
+    "research/ext_endo_rho_20261023/sessions/gls-fp2.compare-rho-neg__rho-gls.txt",
+    "research/ext_endo_rho_20261023/sessions/gls-fp2.compare-rho-plain__rho-neg.txt",
+    "research/ext_endo_rho_20261023/sessions/gls-fp2.table.md",
+    "research/ext_endo_rho_20261023/sessions/gls-fp2/host.json",
+    "research/ext_endo_rho_20261023/sessions/gls-fp2/plan.json",
+    "research/ext_endo_rho_20261023/sessions/gls-fp2/records.jsonl",
+    "research/ext_endo_rho_20261023/sessions/gls-fp2/session.json",
+    "research/ext_endo_rho_20261023/sessions/gls-fp2/spec.json",
+    "research/ext_endo_rho_20261023/sessions/subfield-fp3.audit.json",
+    "research/ext_endo_rho_20261023/sessions/subfield-fp3.compare-rho-neg-aa__rho-neg.txt",
+    "research/ext_endo_rho_20261023/sessions/subfield-fp3.compare-rho-neg__rho-frob.txt",
+    "research/ext_endo_rho_20261023/sessions/subfield-fp3.compare-rho-plain__rho-neg.txt",
+    "research/ext_endo_rho_20261023/sessions/subfield-fp3.table.md",
+    "research/ext_endo_rho_20261023/sessions/subfield-fp3/host.json",
+    "research/ext_endo_rho_20261023/sessions/subfield-fp3/plan.json",
+    "research/ext_endo_rho_20261023/sessions/subfield-fp3/records.jsonl",
+    "research/ext_endo_rho_20261023/sessions/subfield-fp3/session.json",
+    "research/ext_endo_rho_20261023/sessions/subfield-fp3/spec.json",
+    "xamples/n83_precomputed_rho_analyze.rs"
+  ],
+  "dirty_before": [
+    "examples/ghs3_vs_rho_20261023.rs",
+    "research/conductor_gap_cm_orbits_20261015/native/ecbench_next.rs",
+    "research/ext_endo_rho_20261023/cards/CARD-ext-endo-rho-20261023-1.receipt.json",
+    "research/ext_endo_rho_20261023/cards/CARD-ext-endo-rho-20261023-1.yaml",
+    "research/ext_endo_rho_20261023/cards/CARD-ext-endo-rho-20261023-2.yaml",
+    "research/ext_endo_rho_20261023/receipts/build-ecbench.stderr",
+    "research/ext_endo_rho_20261023/receipts/build-ecbench.stdout",
+    "research/ext_endo_rho_20261023/receipts/run-subfield-fp3.stderr",
+    "research/ext_endo_rho_20261023/receipts/run-subfield-fp3.stdout",
+    "research/ghs3_vs_rho_20261023/run.sh",
+    "xamples/n83_precomputed_rho_analyze.rs"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

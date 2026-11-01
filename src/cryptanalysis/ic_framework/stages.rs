@@ -42,7 +42,7 @@ use std::time::Duration;
 use serde::Serialize;
 
 use crate::cryptanalysis::ic_boundary::{
-    CountedGroup, FactorBase, GroupOps, OracleCounters, RowStatus,
+    CountedGroup, FactorBase, GroupOps, OracleCounters, Relation, RowStatus,
 };
 use crate::cryptanalysis::pq_groebner_f2::F2BoolPoly;
 
@@ -174,6 +174,18 @@ pub trait FactorBaseBuilder<G: CountedGroup> {
         params: &Params,
         ops: &mut GroupOps,
     ) -> Result<FactorBase<G::Elt>, String>;
+
+    /// Columns whose logarithm the base knows before any relation, in the
+    /// relation matrix's convention `x = h·log_G(seed)`. The pipeline enters
+    /// each as a unit row ahead of the relation search. Empty for every base
+    /// whose seeds are found points rather than the generator.
+    fn known_column_logs(
+        &self,
+        _ctx: &InstanceCtx<G>,
+        _params: &Params,
+    ) -> Result<Vec<(usize, u64)>, String> {
+        Ok(Vec::new())
+    }
 }
 
 /// The shape of an algebraic system, for the report's degree columns.
@@ -230,6 +242,15 @@ pub trait DecompositionOracle<G: CountedGroup> {
         BTreeMap::new()
     }
 
+    /// Work performed by `prepare` that only `bitop/v1` prices (table
+    /// insert attempts, canonicalisation tables), by `ecbench::work`
+    /// counter name; kept out of `setup_native` so committed records
+    /// replay.  An oracle whose set-up work is all counted also returns
+    /// the marker `counted:table_insert_attempts`.
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        BTreeMap::new()
+    }
+
     /// Decompose `point`, or decide it does not decompose.
     fn decompose(
         &mut self,
@@ -239,6 +260,58 @@ pub trait DecompositionOracle<G: CountedGroup> {
         counters: &mut OracleCounters,
         point: G::Elt,
     ) -> Option<Vec<usize>>;
+
+    /// Request data that a future decomposition of `point` will read.
+    /// The default is a no-op and the hook may not decide or count.
+    fn touch(&self, _ctx: &InstanceCtx<G>, _point: &G::Elt) {}
+
+    /// Select the cache-line relation guard.  Both representations return
+    /// identical membership answers; the default preserves every recorded
+    /// run's hash-map path.
+    fn line_guard(&self) -> bool {
+        false
+    }
+
+    /// **The large-prime seam.**  Decompose `point = [a]G + [b]Q`, or
+    /// store what partially decomposed and hand back whatever complete
+    /// relations the stored partials now merge into.  The default is
+    /// [`decompose`] wrapped as one [`Relation::Summands`], so an
+    /// oracle without large primes behaves exactly as before; the
+    /// Frobenius pair-table oracle overrides it when `large_primes` is
+    /// set (`ic_framework::large_prime`).  Every merged row returned
+    /// here must already hold as a group equation.
+    ///
+    /// [`decompose`]: DecompositionOracle::decompose
+    #[allow(clippy::too_many_arguments)]
+    fn decompose_relations(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: G::Elt,
+        _a: u64,
+        _b: u64,
+    ) -> Vec<Relation> {
+        match self.decompose(ctx, fb, ops, counters, point) {
+            Some(summands) => vec![Relation::Summands(summands)],
+            None => Vec::new(),
+        }
+    }
+
+    /// Native counters the oracle accumulated over the relation phase
+    /// beyond [`OracleCounters`], folded into the relation phase's
+    /// counters by name.  The large-prime collector reports its partials,
+    /// merges and verification work here.
+    fn relation_counters(&self) -> BTreeMap<String, u64> {
+        BTreeMap::new()
+    }
+
+    /// Relation-phase work that only `bitop/v1` prices, as
+    /// [`setup_work_native`](Self::setup_work_native) is for set-up.
+    fn relation_work_native(&self) -> BTreeMap<String, u64> {
+        BTreeMap::new()
+    }
 
     /// The algebraic system the last [`decompose`] built, when it built
     /// one.  Table oracles return `None` and their degree columns stay
@@ -279,6 +352,10 @@ pub struct SolverTotals {
     pub extra: BTreeMap<String, u64>,
 }
 
+/// The `SolverCost::extra` flag by which an engine says its `bitop_*`
+/// keys count its whole call (`ecbench::work::SOLVER_BITOP_KEYS`).
+const BITOP_COMPLETE: &str = "bitop_complete";
+
 impl SolverTotals {
     pub fn absorb(
         &mut self,
@@ -289,6 +366,20 @@ impl SolverTotals {
         self.calls += 1;
         self.shape = Some(shape.clone());
         self.budget_exceeded += u64::from(budget_exceeded);
+        // `bitop_complete` is a flag, not a total: the run's `bitop_*`
+        // counts cover all of its work only if every call's did, so it
+        // stays 1 while every call reports 1 and drops to 0 at the first
+        // that does not (an unmeasured call included).
+        let complete = cost.and_then(|c| c.extra.get(BITOP_COMPLETE)).copied() == Some(1);
+        if self.calls == 1 {
+            if complete {
+                self.extra.insert(BITOP_COMPLETE.into(), 1);
+            }
+        } else if !complete {
+            if let Some(flag) = self.extra.get_mut(BITOP_COMPLETE) {
+                *flag = 0;
+            }
+        }
         let Some(c) = cost else { return };
         self.ops += c.ops;
         if self.op_unit.is_empty() {
@@ -304,6 +395,9 @@ impl SolverTotals {
         // A key that names a maximum (`*_max`) is the maximum over
         // calls; every other key is a total over the run.
         for (k, v) in &c.extra {
+            if k == BITOP_COMPLETE {
+                continue;
+            }
             let entry = self.extra.entry(k.clone()).or_insert(0);
             if k.ends_with("_max") {
                 *entry = (*entry).max(*v);
@@ -363,13 +457,35 @@ impl BooleanSystem {
             degrees,
         }
     }
+
+    /// 64-bit word operations (`bitop/v1`'s `word_op`) of one
+    /// [`shape`](Self::shape) call that returned `shape`: a popcount a
+    /// term and a store an equation for the degrees; then the
+    /// semi-regular series on `i128` coefficients (two words each), with
+    /// `top = n_vars + 1` — the numerator's `n_vars · top` additions, the
+    /// denominator's `top − d + 1` additions per positive degree `d`, and
+    /// the long division's multiply-subtracts (six words each) up to the
+    /// degree it stops at.
+    pub fn shape_word_ops(&self, shape: &SystemShape) -> u64 {
+        let terms: u64 = self.equations.iter().map(|p| p.terms.len() as u64).sum();
+        let v = self.n_vars as u64;
+        let top = v + 1;
+        let den: u64 = shape
+            .degrees
+            .iter()
+            .filter(|&&d| d > 0 && u64::from(d) <= top)
+            .map(|&d| top - u64::from(d) + 1)
+            .sum();
+        let stop = shape.semi_regular_degree.map_or(top, u64::from);
+        terms + self.equations.len() as u64 + 2 * (v * top + den) + 6 * (stop * (stop + 1) / 2)
+    }
 }
 
 /// What a solver concluded.
 #[derive(Clone, Debug, Serialize)]
 pub enum SolverVerdict {
     /// Solutions found, as bitmasks over the system's variables.
-    Solved(Vec<u64>),
+    Solved(Vec<crate::cryptanalysis::pq_groebner_f2::Mask>),
     /// The system is inconsistent: this target does not decompose.
     Unsatisfiable,
     /// The budget ran out.  **Not** the same as unsatisfiable, and a
@@ -491,10 +607,34 @@ pub enum Targets {
     /// An r-adding walk: one group addition per trial, with the guard
     /// that no target is presented twice.
     Walk,
+    /// The same guarded walk with native Montgomery additions on supported
+    /// single-word prime curves.
+    WalkPrimeFast,
+    /// Synchronized independent prime walks, with ordinary additions done
+    /// separately.  The paired reference for the batch variants.
+    WalkPrimeSerial4,
+    WalkPrimeSerial8,
+    WalkPrimeSerial16,
+    /// The same lane schedule with Montgomery batch inversion.
+    WalkPrimeBatch4,
+    WalkPrimeBatch8,
+    WalkPrimeBatch16,
     /// Residual matching (lead L3): the walk subtracts a base point at
     /// every step and relations come from collisions of the residuals;
     /// the oracle is not consulted.  See `ic_framework::residual`.
     Residual,
+    /// `R ← R + S` for one drawn `S = [s]G + [t]Q`: one addition per
+    /// target, with no jump table to set up.  See `TargetSource::Stride`.
+    Stride,
+    /// `Stride` with a new stride after every relation.  See
+    /// `TargetSource::StrideRenew`.
+    StrideRenew,
+    /// `R = Q + [k]G`: no scalar multiplication, for a base with a known
+    /// column logarithm (`generator_orbit=1`). `TargetSource::StrideGenerator`.
+    StrideGenerator,
+    /// `StrideRenew` probing the repeat guard only on targets that
+    /// decompose.  See `TargetSource::StrideRenewDeferredGuard`.
+    StrideRenewDeferredGuard,
 }
 
 impl Targets {
@@ -502,7 +642,18 @@ impl Targets {
         match self {
             Targets::Random => "random",
             Targets::Walk => "walk",
+            Targets::WalkPrimeFast => "walk-prime-fast",
+            Targets::WalkPrimeSerial4 => "walk-prime-serial-4",
+            Targets::WalkPrimeSerial8 => "walk-prime-serial-8",
+            Targets::WalkPrimeSerial16 => "walk-prime-serial-16",
+            Targets::WalkPrimeBatch4 => "walk-prime-batch-4",
+            Targets::WalkPrimeBatch8 => "walk-prime-batch-8",
+            Targets::WalkPrimeBatch16 => "walk-prime-batch-16",
             Targets::Residual => "residual",
+            Targets::Stride => "stride",
+            Targets::StrideRenew => "stride-renew",
+            Targets::StrideGenerator => "stride-generator",
+            Targets::StrideRenewDeferredGuard => "stride-renew-deferred-guard",
         }
     }
 
@@ -510,9 +661,20 @@ impl Targets {
         match s {
             "random" => Ok(Targets::Random),
             "walk" => Ok(Targets::Walk),
+            "walk-prime-fast" => Ok(Targets::WalkPrimeFast),
+            "walk-prime-serial-4" => Ok(Targets::WalkPrimeSerial4),
+            "walk-prime-serial-8" => Ok(Targets::WalkPrimeSerial8),
+            "walk-prime-serial-16" => Ok(Targets::WalkPrimeSerial16),
+            "walk-prime-batch-4" => Ok(Targets::WalkPrimeBatch4),
+            "walk-prime-batch-8" => Ok(Targets::WalkPrimeBatch8),
+            "walk-prime-batch-16" => Ok(Targets::WalkPrimeBatch16),
             "residual" => Ok(Targets::Residual),
+            "stride" => Ok(Targets::Stride),
+            "stride-renew" => Ok(Targets::StrideRenew),
+            "stride-generator" => Ok(Targets::StrideGenerator),
+            "stride-renew-deferred-guard" => Ok(Targets::StrideRenewDeferredGuard),
             other => Err(format!(
-                "unknown target source `{other}`; try random, walk or residual"
+                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16, residual, stride, stride-renew or stride-renew-deferred-guard"
             )),
         }
     }
@@ -520,7 +682,49 @@ impl Targets {
 
 #[cfg(test)]
 mod tests {
-    use super::Params;
+    use super::{Params, SolverCost, SolverTotals, SystemShape};
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
+
+    /// `bitop_complete` survives the totals only while every call set it;
+    /// the other `bitop_*` keys add up.
+    #[test]
+    fn bitop_complete_is_a_flag_over_calls() {
+        let shape = SystemShape {
+            n_vars: 2,
+            n_equations: 1,
+            degrees: Vec::new(),
+            semi_regular_degree: None,
+        };
+        let cost = |complete: bool| {
+            let mut c = SolverCost {
+                ops: 1,
+                op_unit: "word XORs (elimination only)".into(),
+                ..Default::default()
+            };
+            c.extra.insert("bitop_word_ops".into(), 5);
+            if complete {
+                c.extra.insert("bitop_complete".into(), 1);
+            }
+            c
+        };
+        let mut all = SolverTotals::default();
+        for _ in 0..3 {
+            all.absorb(&shape, Some(&cost(true)), false);
+        }
+        assert_eq!(all.extra["bitop_complete"], 1);
+        assert_eq!(all.extra["bitop_word_ops"], 15);
+        all.absorb(&shape, Some(&cost(false)), false);
+        assert_eq!(all.extra["bitop_complete"], 0);
+        all.absorb(&shape, Some(&cost(true)), false);
+        assert_eq!(all.extra["bitop_complete"], 0);
+        let mut late = SolverTotals::default();
+        late.absorb(&shape, Some(&cost(false)), false);
+        late.absorb(&shape, Some(&cost(true)), false);
+        assert!(!late.extra.contains_key("bitop_complete"));
+    }
 
     #[test]
     fn a_plugin_spec_splits_into_name_and_parameters() {

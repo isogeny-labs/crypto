@@ -1,0 +1,38 @@
+diff --git a/src/cryptanalysis/jv_cover.rs b/src/cryptanalysis/jv_cover.rs
+index 498e92557..29b7d62ad 100644
+--- a/src/cryptanalysis/jv_cover.rs
++++ b/src/cryptanalysis/jv_cover.rs
+@@ -1554,6 +1554,7 @@ pub fn solve_zero_dim_traced(
+         memo.insert(m, acc.clone());
+         Some(acc)
+     }
++    let __c0=cnt;
+     // multiplication matrices: column j of M_i is NF(x_i · b_j)
+     let mut mats: Vec<Vec<Vec<u64>>> = Vec::with_capacity(n);
+     for i in 0..n {
+@@ -1576,6 +1577,8 @@ pub fn solve_zero_dim_traced(
+     // of one random vector misses a root with probability `1/p` per root).  If
+     // some root's eigenspace is not a line, `ℓ` does not separate the points
+     // and a new form is drawn.
++    if std::env::var("LEADS_DBG").is_ok(){let dense:Vec<usize>=mats.iter().map(|mi|(0..delta).filter(|&j|(0..delta).filter(|&k|mi[k][j]!=0).count()>1).count()).collect();eprintln!("LEADS nf={} dense_cols={:?}",cnt-__c0,dense);}
++    let __c1=cnt;
+     let ring = PolyRing::new(p);
+     let mut sols: Vec<Vec<u64>> = Vec::new();
+     for _attempt in 0..16 {
+@@ -1589,7 +1592,7 @@ pub fn solve_zero_dim_traced(
+             }
+         }
+         cnt += (n * delta * delta) as u64;
+-        let cp = charpoly_mod_p(&m, p, &mut cnt);
++        let __a=cnt; let cp = charpoly_mod_p(&m, p, &mut cnt); if std::env::var("LEADS_DBG").is_ok(){eprintln!("LEADS charpoly={}",cnt-__a);}
+         let roots = ring.roots(&UPoly(cp), rng);
+         let mut round: Vec<Vec<u64>> = Vec::new();
+         let mut clean = true;
+@@ -1643,6 +1646,7 @@ pub fn solve_zero_dim_traced(
+             st.incomplete = true;
+         }
+     }
++    if std::env::var("LEADS_DBG").is_ok(){eprintln!("LEADS after_nf={} roots={}",cnt-__c1,ring.muls.get());}
+     cnt += ring.muls.get();
+     sols.sort();
+     sols.dedup();

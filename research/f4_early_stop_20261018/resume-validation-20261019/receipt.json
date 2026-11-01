@@ -1,0 +1,105 @@
+{
+  "status": "passed",
+  "started_at": "2026-10-19T21:56:03.876871+00:00",
+  "pid": 1858700,
+  "out": "/home/ec2-user/crypto-icl-L4/research/f4_early_stop_20261018/resume-validation-20261019T215603Z",
+  "source_sha256": {
+    "src/cryptanalysis/f4_fp.rs": "70cca68e577243a92ce429fd97fc92278cfb5a8a9cee3ef5cc9dd61271ace3b6",
+    "src/cryptanalysis/jv_cover.rs": "61ac3bae055733e77b60e538024f562f0170a69b55c5875ed1588fc6a595c8c4",
+    "examples/f4_stop_study.rs": "ced659d768b5f7333495810bf2314724d7760b48c556d5b36ceb593f88056db1",
+    "examples/jv_cover.rs": "ce030fb04c8146c47f91c3f15a51ffaaa7160f99d91e4f4dd288a37b4958783a",
+    "Cargo.toml": "bce1095d381cc258288d3ad51de9597b5c18b2babf428ec210bf8f28af79fc3f",
+    "Cargo.lock": "45223ac12cb2f0d1c2f478342515a4d06fa5d80badfa41f22eeca61dcbb7803b"
+  },
+  "head": "abee07ee7337d04a7e734333669ca1bacd6c763a",
+  "steps": [
+    {
+      "name": "f4-focused",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--offline",
+        "--lib",
+        "f4_fp",
+        "-j",
+        "2",
+        "--",
+        "--test-threads=1"
+      ],
+      "started_at": "2026-10-19T21:56:03.889833+00:00",
+      "timeout_seconds": 900,
+      "pid": 1858702,
+      "exit_code": 0,
+      "finished_at": "2026-10-19T22:01:52.583783+00:00"
+    },
+    {
+      "name": "cover-focused",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--offline",
+        "--lib",
+        "jv_cover",
+        "-j",
+        "2",
+        "--",
+        "--test-threads=1"
+      ],
+      "started_at": "2026-10-19T22:01:52.594647+00:00",
+      "timeout_seconds": 900,
+      "pid": 1867307,
+      "exit_code": 0,
+      "finished_at": "2026-10-19T22:02:19.663110+00:00"
+    },
+    {
+      "name": "examples",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--offline",
+        "--example",
+        "jv_cover",
+        "--example",
+        "f4_stop_study",
+        "-j",
+        "2",
+        "--",
+        "--test-threads=1"
+      ],
+      "started_at": "2026-10-19T22:02:19.670939+00:00",
+      "timeout_seconds": 900,
+      "pid": 1868264,
+      "exit_code": 0,
+      "finished_at": "2026-10-19T22:02:21.996316+00:00"
+    },
+    {
+      "name": "full-library",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--offline",
+        "--lib",
+        "-j",
+        "2",
+        "--",
+        "--test-threads=2"
+      ],
+      "started_at": "2026-10-19T22:02:22.017319+00:00",
+      "timeout_seconds": 1800,
+      "pid": 1868599,
+      "exit_code": 0,
+      "finished_at": "2026-10-19T22:12:15.543518+00:00"
+    }
+  ],
+  "conductor_task": "T-15",
+  "new_measurement_runs": 0,
+  "finished_at": "2026-10-19T22:12:15.547100+00:00"
+}

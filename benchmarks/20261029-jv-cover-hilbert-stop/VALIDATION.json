@@ -1,0 +1,46 @@
+{
+ "schema": "validation-gate/v1",
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "PROTOCOL.md 'Validation reference (added 2026-10-29)': the matched reference is the negation-map rho measured with jv_cover --exp rhostrong (repository defaults: neg=true, batch=16, dp_bits=16, r=64), 64 instances at each p with the study's seeds",
+  "unit": "S harness = counted F_p multiplications / (c_add_E * sqrt(l)); rho priced in the same S unit, steps_per_op from the same strong-rho runs",
+  "binary_or_process": "same source commit 1f006b002f02e28ad1626338dc504960d6a1dd92 as the recorded runs, rebuilt locally (sha256 adcdc17f...); validation/exact-reproduction.json shows the p=53 seed=1 A/B pair reproduces total_muls, relation_digest, f4_native_ops, residuals, relations and stop_mode exactly",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "strongest_available_basis": "E over a prime field with j neither 0 nor 1728, so Aut(E) = {+-1}; the negation map is the only available automorphism fold, and jv_rho_strong folds it",
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "band_p": 503,
+  "gae_band": {
+   "0": {
+    "ic": 9.785789787347165,
+    "rho": 0.968621
+   },
+   "0.1": {
+    "ic": 9.785789787347165,
+    "rho": 1.1608207842702
+   },
+   "1": {
+    "ic": 9.785789787347165,
+    "rho": 2.890618842702
+   }
+  },
+  "order_holds_across_band": true,
+  "rho_neg": {
+   "path": "../../research/ic_cover_weakclass_20261023/validation/rho-neg.json",
+   "sha256": "41b2bcd995ec15956deaa3630278dbf5aac68c02be9b1f38f81c1045320765c1"
+  },
+  "exact_reproduction": {
+   "path": "../../research/ic_cover_weakclass_20261023/validation/exact-reproduction.json",
+   "sha256": "3eb00575533d86fd211b0c032d100795e6250771e547d9c950a5db9353b12c4e"
+  }
+ },
+ "replay_certificate": {
+  "path": "../../research/ic_cover_weakclass_20261023/validation/REPLAY_CERTIFICATE.json",
+  "sha256": "d7ce3e898ef5292574ea94cbc97e79b9042b1d67dee8aec41841b2a5b1f8b8ab"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "be6f9e2e029ef26e68e09019c9649b565cb7c5565d07eb3f04fee5be0a2a146c"
+ }
+}

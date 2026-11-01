@@ -5,6 +5,10 @@ mod bench;
 mod boundary;
 #[path = "ic/corpus.rs"]
 mod corpus;
+#[path = "icx/cubic_external.rs"]
+mod cubic_external;
+#[path = "icx/cubic_route.rs"]
+mod cubic_route;
 #[path = "ic/descent.rs"]
 mod descent;
 #[path = "ic/experiment.rs"]
@@ -15,10 +19,24 @@ mod fixed;
 mod large_prime;
 #[path = "ic/params.rs"]
 mod params;
+#[path = "ic/plan.rs"]
+mod plan;
 #[path = "ic/price.rs"]
 mod price;
+#[path = "ic/prime.rs"]
+mod prime;
+#[path = "icx/prime_external.rs"]
+mod prime_external;
+#[path = "ic/prime_orbit.rs"]
+mod prime_orbit;
+#[path = "ic/progress.rs"]
+mod progress;
 #[path = "ic/rho.rs"]
 mod rho;
+#[path = "ic/sweep/mod.rs"]
+mod sweep;
+#[path = "ic/tensor.rs"]
+mod tensor;
 #[path = "ic/workflow.rs"]
 mod workflow;
 
@@ -36,10 +54,10 @@ use std::{
 #[command(
     name = "ic",
     version,
-    about = "Curve inspection and synthetic index-calculus research"
+    about = "Curve inspection and index-calculus research, including explicit public EC targets"
 )]
 #[command(
-    long_about = "Inspect named/custom curves, generate reproducible known-answer fixtures, run the toy index-calculus pipeline, compare factor-base candidates, or search for high-yield factor bases. Bare ic runs the default synthetic example. A bare curve name (for example ic ecc2k-130) performs inspection only. The fixed subcommand accepts explicit K_0 parameters and points with full-width coordinates."
+    long_about = "Inspect named/custom curves, generate reproducible known-answer fixtures, run index-calculus pipelines, compare factor-base candidates, or search for high-yield factor bases. Solve-prime and solve-cubic accept caller-supplied public EC targets. Bare ic runs the default synthetic example. A bare curve name (for example ic ecc2k-130) performs inspection only. The fixed subcommand accepts explicit K_0 parameters and points with full-width coordinates."
 )]
 struct Cli {
     #[command(subcommand)]
@@ -52,9 +70,15 @@ struct Cli {
     /// Print a machine-readable JSON report, without progress text.
     #[arg(long, global = true)]
     json: bool,
+    /// Trace index-calculus stages and individual trials as they finish (suppressed by --json).
+    #[arg(short, long, global = true)]
+    verbose: bool,
     /// Write the JSON report to a new file; existing files are never overwritten.
     #[arg(long, global = true)]
     out: Option<PathBuf>,
+    /// Publish --out through the configured artifact store under a new logical name.
+    #[arg(long, global = true, requires = "out")]
+    store_name: Option<String>,
 }
 #[derive(Subcommand)]
 enum Action {
@@ -84,6 +108,8 @@ enum Action {
     Corpus(corpus::CorpusArgs),
     /// Measure the degree a Weil-descent system actually reaches, against the degree a semi-regular system of the same shape would, with the operation count, wall time and peak footprint beside it.
     Descent(descent::DescentArgs),
+    /// The configuration the measured evidence says to run on a curve: every pipeline stage with its rule, reason and sources, and the expected gap to the matched rho.
+    Plan(plan::PlanArgs),
     /// Run index-calculus configurations end to end and compare them: plug a factor base, a target source, a decomposition oracle, a polynomial solver and a relation matrix together, and see every stage's cost in one unit.
     Bench(bench::BenchArgs),
     /// Price every decomposition oracle on R and on R − P + Q pairwise: does a solver charge the same for a swapped target?
@@ -95,6 +121,37 @@ enum Action {
     /// Import the ECBench binary-curve battery and run bounded exact
     /// n−1 index calculus with the zero/single/double-large-prime variation.
     LargePrime(large_prime::LargePrimeArgs),
+    /// Measure the exact pair-sum yield of a small-x factor base on a
+    /// prime-field curve (NIST P-192 or small prime fixtures with common hits).
+    Prime(prime::PrimeArgs),
+    /// Run the scaled automorphism-orbit prime-field IC pipeline; relation
+    /// walks support affine or batched Jacobian coordinates.
+    PrimeOrbit(prime_orbit::PrimeArgs),
+    /// Run bounded EC index calculus on an explicit prime-field public target.
+    SolvePrime(prime_external::PrimeArgs),
+    /// Run bounded prime-field EC index calculus from a checked JSON target artifact.
+    SolvePrimeFile(prime_external::PrimeFileArgs),
+    /// Generate bounded certified prime-field IW1 isogeny routes for a public target.
+    PrimeRouteGenerate(prime_external::PrimeRouteGenerateArgs),
+    /// Run bounded EC index calculus on an explicit cubic-field public target.
+    SolveCubic(cubic_external::CubicArgs),
+    /// Enumerate bounded rational j-neighbours over an exact cubic field.
+    CubicGraph(cubic_route::GraphArgs),
+    /// Generate a checked one-hop cubic Vélu route for a rational prime-order kernel.
+    CubicRouteGenerate(cubic_route::GenerateArgs),
+    /// Search index-calculus configurations with an Optuna-style sweeper: a
+    /// typed conditional space, a TPE sampler, median pruning over a ladder
+    /// of sizes, and an append-only resumable store.  The objective is the
+    /// §5a-banded S against a frozen baseline, projected to the target size.
+    Sweep(sweep::SweepArgs),
+    /// Run one pipeline configuration and print one scored, classified
+    /// record: the unit `ic sweep` optimises over.  The score is a function
+    /// of operation counts alone.
+    SweepTrial(sweep::trial::TrialArgs),
+    /// Toy index calculus with relations found by Boolean tensor contraction
+    /// (crates/ecdl-tensor-ic): gadget-network shape table, or a solved toy
+    /// instance. Exponential counters; no speedup is claimed.
+    Tensor(tensor::TensorArgs),
 }
 #[derive(Args)]
 #[group(required = true, multiple = false)]
@@ -127,7 +184,7 @@ fn execute(cli: &Cli) -> Result<Value, String> {
     }
     match &cli.command {
         Some(Action::List) => Ok(
-            json!({"schema_version":1,"operation":"list","status":"complete","curves":params::NAMES}),
+            json!({"schema_version":1,"operation":"list","status":"complete","curves":params::names()}),
         ),
         Some(Action::Inspect(args)) => inspect(InspectArgs {
             curve: args.curve.clone(),
@@ -143,11 +200,23 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::Boundary(args)) => boundary::run(args.clone(), cli.json),
         Some(Action::Corpus(args)) => corpus::run(args.clone()),
         Some(Action::Descent(args)) => descent::run(args.clone(), cli.json),
+        Some(Action::Plan(args)) => plan::run(args.clone(), cli.json),
         Some(Action::Bench(args)) => bench::run(args.clone(), cli.json),
         Some(Action::Swap(args)) => boundary::swap(args.clone(), cli.json),
         Some(Action::Rho(args)) => rho::run(args.clone(), cli.json),
         Some(Action::Price(args)) => price::run(args.clone(), cli.json),
         Some(Action::LargePrime(args)) => large_prime::run(args.clone()),
+        Some(Action::Prime(args)) => prime::run(args.clone()),
+        Some(Action::PrimeOrbit(args)) => prime_orbit::run(args.clone(), cli.json),
+        Some(Action::SolvePrime(args)) => prime_external::solve(args),
+        Some(Action::SolvePrimeFile(args)) => prime_external::solve_file(args),
+        Some(Action::PrimeRouteGenerate(args)) => prime_external::generate_route(args),
+        Some(Action::SolveCubic(args)) => cubic_external::solve(args),
+        Some(Action::CubicGraph(args)) => cubic_route::enumerate_j(args),
+        Some(Action::CubicRouteGenerate(args)) => cubic_route::generate(args),
+        Some(Action::Sweep(args)) => sweep::run_sweep(args.clone(), cli.json),
+        Some(Action::SweepTrial(args)) => sweep::trial::run(args.clone()),
+        Some(Action::Tensor(args)) => tensor::run(args.clone(), cli.json),
         Some(Action::Run(args)) => experiment::run(args.clone(), cli.json),
         None => {
             if let Some(name) = &cli.profile {
@@ -227,6 +296,8 @@ fn linear_algebra_summary(la: &Value) -> String {
 
 fn display(report: &Value) {
     match report["operation"].as_str() {
+        Some("plan") => plan::display(report),
+        Some("tensor-scale" | "tensor-demo") => tensor::display(report),
         Some("inspect") => {
             println!(
                 "Curve: {}\nInspection: {}",
@@ -480,9 +551,73 @@ fn display(report: &Value) {
             );
         }
         Some("list") => {
-            for name in params::NAMES {
+            for name in params::names() {
                 println!("{name}");
             }
+        }
+        Some("prime-orbit") => {
+            println!(
+                "Prime-orbit IC: {} ({}, {}-bit scaled field)",
+                report["status"].as_str().unwrap_or("?"),
+                report["curve_type"].as_str().unwrap_or("?"),
+                report["instance"]["field_bits"]
+            );
+            println!(
+                "  relation walk: {} coordinates, {} lane(s); {} relations in {} rounds",
+                report["configuration"]["relation_coordinates"],
+                report["configuration"]["relation_lanes"],
+                report["logs"]["relations"],
+                report["logs"]["collection_rounds"]
+            );
+            println!(
+                "  target: expected {}; recovered {}; verified {}",
+                report["result"]["expected"],
+                report["result"]["recovered"],
+                report["result"]["verified"]
+            );
+        }
+        Some("prime") => {
+            let r = &report["report"];
+            let f = |k: &str| r[k].as_f64().unwrap_or(f64::NAN);
+            println!(
+                "Small-x factor base on {}\n  base: {} abscissae ({} points), x up to {}\n  pair sums: {} ({} distinct, {} collisions); group order 2^{:.2}",
+                r["curve"].as_str().unwrap_or("?"),
+                r["base_abscissae"],
+                r["base_points"],
+                r["largest_small_x"],
+                r["sums"],
+                r["distinct_sums"],
+                r["collisions"],
+                f("order_bits")
+            );
+            println!(
+                "  yield per trial, exact: 2^{:.2} ({:.3e}); collision-free model: 2^{:.2}",
+                f("exact_yield_log2"),
+                f("exact_yield"),
+                f("model_yield_log2")
+            );
+            println!(
+                "  expected trials per relation 2^{:.2}; for {} relations 2^{:.2}; rho 2^{:.2} group operations",
+                f("expected_trials_log2"),
+                r["base_abscissae"].as_u64().unwrap_or(0) + 1,
+                f("trials_for_full_system_log2"),
+                f("rho_log2")
+            );
+            let ci = &r["mc_ci95"];
+            println!(
+                "  Monte Carlo: {} hits in {} trials (rate {:.3e}, 95% [{:.2e}, {:.2e}]), {} recovered; {:.2} us per trial",
+                r["mc_hits"],
+                r["mc_trials"],
+                f("mc_rate"),
+                ci[0].as_f64().unwrap_or(f64::NAN),
+                ci[1].as_f64().unwrap_or(f64::NAN),
+                r["mc_hits_verified"],
+                r["timing_ms"]["us_per_trial_wall"].as_f64().unwrap_or(f64::NAN)
+            );
+            println!(
+                "  planted controls: {}/{} detected, {}/{} recovered",
+                r["controls_detected"], r["controls"], r["controls_recovered"], r["controls"]
+            );
         }
         Some("large-prime") => {
             println!(
@@ -512,6 +647,11 @@ fn display(report: &Value) {
 }
 fn main() -> ExitCode {
     let cli = Cli::parse();
+    // Generated parameters stay directly importable even with a global -v.
+    progress::init(cli.verbose && !cli.json && !matches!(cli.command, Some(Action::Generate(_))));
+    progress::line(format_args!(
+        "startup: capturing executable and source provenance"
+    ));
     // Before any work: the binary that is about to run, and the commit it
     // was built from.  See `BINARY_HASH`.
     let _ = binary_hash();
@@ -522,6 +662,31 @@ fn main() -> ExitCode {
             return ExitCode::FAILURE;
         }
     }
+    let mut publication_store = if let Some(name) = &cli.store_name {
+        if let Err(error) = crypto_lib::store::index::validate_name(name) {
+            eprintln!("ic: invalid store name: {error}");
+            return ExitCode::FAILURE;
+        }
+        match crypto_lib::store::Store::open_default() {
+            Ok(store) => {
+                if let Err(error) = store.remote() {
+                    eprintln!("ic: {error}");
+                    return ExitCode::FAILURE;
+                }
+                if store.index.get(name).is_some() {
+                    eprintln!("ic: store name already exists: {name}");
+                    return ExitCode::FAILURE;
+                }
+                Some(store)
+            }
+            Err(error) => {
+                eprintln!("ic: cannot open artifact store: {error}");
+                return ExitCode::FAILURE;
+            }
+        }
+    } else {
+        None
+    };
     let mut report = match execute(&cli) {
         Ok(v) => v,
         Err(message) => {
@@ -541,6 +706,7 @@ fn main() -> ExitCode {
     ) || report.get("operation").is_none();
     let text = serde_json::to_string_pretty(&report).expect("JSON serializable");
     if let Some(path) = &cli.out {
+        progress::line(format_args!("report: writing {}", path.display()));
         let result = OpenOptions::new()
             .write(true)
             .create_new(true)
@@ -553,6 +719,31 @@ fn main() -> ExitCode {
         if let Err(error) = result {
             eprintln!("ic: could not create report {}: {error}", path.display());
             return ExitCode::FAILURE;
+        }
+    }
+    if let (Some(name), Some(path), Some(store)) =
+        (&cli.store_name, &cli.out, &mut publication_store)
+    {
+        let meta = crypto_lib::store::PushMeta {
+            description: format!(
+                "ic {} report",
+                report["operation"].as_str().unwrap_or("run")
+            ),
+            provenance: format!(
+                "ic CLI, git commit {}",
+                git_commit().as_deref().unwrap_or("unknown")
+            ),
+            ..Default::default()
+        };
+        match store.push(name, path, meta) {
+            Ok(published) => eprintln!(
+                "ic: published store:{name} sha256:{} bytes={} uploaded={}",
+                published.sha256, published.bytes, published.uploaded
+            ),
+            Err(error) => {
+                eprintln!("ic: could not publish report {}: {error}", path.display());
+                return ExitCode::FAILURE;
+            }
         }
     }
     if cli.json || report.get("operation").is_none() {
@@ -569,3 +760,54 @@ fn main() -> ExitCode {
         ExitCode::FAILURE
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn prime_orbit_parses_the_jacobian_relation_mode() {
+        let cli = Cli::try_parse_from([
+            "ic",
+            "prime-orbit",
+            "--type",
+            "j0",
+            "--bits",
+            "20",
+            "--relation-coordinates",
+            "jacobian",
+            "--no-rho",
+        ])
+        .unwrap();
+        let Some(Action::PrimeOrbit(args)) = cli.command else {
+            panic!("prime-orbit did not select its action");
+        };
+        assert_eq!(args.curve_type, Some(prime_orbit::TypeArg::J0));
+        assert_eq!(
+            args.relation_coordinates,
+            prime_orbit::RelationCoordinatesArg::Jacobian
+        );
+        assert!(args.no_rho);
+    }
+
+    #[test]
+    fn every_listed_curve_is_inspectable() {
+        for name in params::names() {
+            params::named(name).unwrap_or_else(|error| panic!("{name}: {error}"));
+        }
+    }
+}
+
+// Keep the CLI's complete external contract suites available to a selected
+// binary test target. Cargo integration-test mode also builds unrelated bins.
+#[cfg(all(test, feature = "ic-cli-contracts"))]
+#[path = "../../tests/ic_framework.rs"]
+mod cli_framework_contract_tests;
+
+#[cfg(all(test, feature = "ic-cli-contracts"))]
+#[path = "../../tests/ic_progress.rs"]
+mod cli_progress_contract_tests;
+
+#[cfg(all(test, feature = "ic-cli-contracts"))]
+#[path = "../../tests/ic_tensor.rs"]
+mod cli_tensor_contract_tests;

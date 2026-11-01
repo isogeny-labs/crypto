@@ -1,0 +1,19 @@
+digraph exact_pair {
+  graph [rankdir=TB,bgcolor="white",pad="0.2"];
+  node [shape=box,style="rounded,filled",fontname="Helvetica",fontsize=11,fillcolor="#e2f1e6",color="#237441"];
+  edge [color="#496274"];
+  inputs [label="Prime p > 3; distinct base abscissas\ncurve/point hypotheses; polynomial UNSAT",fillcolor="#edf2f7",color="#496274"];
+  reduction [label="CHECKED: actual six inputs\ndegree-four pair/cubic reduction"];
+  monic [label="CHECKED: explicit interpolation inverse\nstaged monic normalization at degree 5"];
+  roots [label="CHECKED: rational quadratic roots\nUNSAT implies nonzero scalar resultant"];
+  resultant [label="CHECKED: affine-grid shifts\nstaged scalar resultant at degree 5"];
+  inverse [label="CHECKED: nine-point inverse\nactual degree-five refutation"];
+  lower [label="CHECKED: uniform separating space\n1 not in V(F,4)"];
+  last [label="CHECKED: exact last fall 5\nunit ideal follows from refutation"];
+  first [label="CHECKED: actual degrees and top map\nfirst non-Koszul relation at degree 4"];
+  final [label="KERNEL-CHECKED: exact pair (4,5)\nGuardedExactPair.exact_pair_prime",fillcolor="#b9e3c7",penwidth=2];
+  inputs -> reduction; reduction -> monic; inputs -> roots;
+  monic -> resultant; roots -> inverse; resultant -> inverse;
+  inverse -> last; lower -> last; inputs -> lower; inputs -> first;
+  last -> final; first -> final;
+}

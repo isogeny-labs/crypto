@@ -1,0 +1,59 @@
+Current native-main integration, 2026-10-30 05:51 UTC
+
+Crypto base: 3b34d504b (full merge parent recorded in the commit)
+Peer native source: 55f659309e510fc861a1e54ff199b9f2bf63e17a
+Tracked native files: 36; all bytes match current peer main.
+Older26-file and earlier manifests remain frozen historical snapshots.
+The peer PR1302 is already merged; its private local branch/receipts remain
+intact. The peer checkout is detached at official main for validation only;
+no merged peer branch is replaced or pushed.
+
+Main advanced with native finite-size, width, binary-field, partial-relation,
+square-root reuse and ecdl-tensor-ic changes while the completed root ran.
+Those landed changes are retained, together with the exact sampler and both
+taper controls. The runner conflict retained both strict input reading and
+new solve dispatch. Current peer main additionally has checked hash-prime
+reuse/input helpers; carried those existing changes across to preserve native
+byte identity. They are upstream integration, not new algorithms attributed
+to this sampling audit. No benchmark/challenge solver is executed here.
+
+The root at9f0835c26 completed5430tests with actual exit0; its receipt is
+advanced-root-complete.txt. That success is NOT a pass for this newer source.
+New native/binding/lint/MSRV/docs and full root checks are required and pending.
+No assertion, source admission guard, check or ignored-test policy was weakened.
+General theorem/complexity obligations remain open. Only task PR2909 is active.
+
+Actual check outcomes, 2026-10-30 05:59 UTC:
+Both native cargo test commands passed51core,5runner,3panel-unit,6certified-hash,
+9finite-extension,3strict-JSON and4width-extension tests. No failures or ignored
+cases. Peer bindings also pass20unit/19FFI/14docs. Changed ecdl-tensor-ic suite
+passes40tests. Both native strict Clippy and Rust1.78 all-target checks pass.
+Independent format checks pass after the batch wrappers stopped at docs.
+Compact transcripts omit only final blank separator lines.
+
+Strict API docs FAIL, actual exit101 on both check wrappers at phase docs.
+Untouched official peer55f65930 reproduces unresolved rustdoc links:
+- src/binary.rs:504, [coefficient]
+- src/reduction.rs:242, [2p,4p]
+These are existing upstream source comments, not sampler/taper changes.
+Do not call the aggregate wrappers successful or suppress the warnings. Full
+errors are retained in current-crypto-docs-error.txt/current-peer-docs-error.txt.
+Report the pre-existing base failure on task PR2909; do not patch unrelated
+source or alter warning/check policies under this tracker.
+
+Initial current-root compile exited101 before test execution: two tracked
+APS JSON fixtures were not materialized in sparse checkout. Original raw trace
+1269bytes SHA2565ef4cd4ca53d4d7d95d601780612f20eec36cd79a1e8ab9f1d8352afd0c8a49a.
+Retained current-root-fixture-error.txt; restored the tracked directory using
+scripts/sparse-checkout.sh add --path research/aps_measurement_20261029.
+No source/check/assertion changed. Once the failed parent exited, restarted the
+unchanged full command under a new detached receipt wrapper, PID/SID84147.
+Started05:56:42Z, tested source bdfbad66714020f732fb4dd50cd749dda1100277.
+Output/status/metadata prefix:/tmp/crypto-root-native-main-restored-20261030.
+It remains PENDING, not a pass. Require actual exit0 plus full parent summary;
+do not restart while alive. Current native batch jobs are finished.
+
+2026-10-30 07:00 UTC: COMPLETE current-root PASS at sourcebdfbad667, actual
+exit0,5444passed/0failed/123existingignored/0filtered, completed06:49:02Z.
+See native-main-root-complete.txt. This supersedes PENDING for that run only.
+Strict API docs remain an upstream failure; no aggregate all-checks pass claimed.

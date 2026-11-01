@@ -65,6 +65,12 @@ class BuildTests(unittest.TestCase):
             "browser/browser.js",
             "browser/browser.css",
             "browser/data.json",
+            "backend-leaderboard/index.html",
+            "backend-leaderboard/leaderboard.json",
+            "backend-leaderboard/LEADERBOARD.md",
+            "backend-leaderboard/REPLAY_PLAN.json",
+            "backend-leaderboard/REPRODUCING.md",
+            "backend-leaderboard/reproduction.lock.json",
             "status/index.html",
             "status/style.css",
             "status/walk-forest.svg",
@@ -72,12 +78,19 @@ class BuildTests(unittest.TestCase):
             "status/walk-forest-gf2-23.json",
             "status/walk-forest.js",
             "status/how.html",
+            "status/challenges.html",
+            "status/challenges.js",
+            "status/challenges.json",
             "status/rho-toy.js",
             "status/status.json",
             "status/history.json",
+            "status/status34.json",
+            "status/history34.json",
             "status/mac-control.json",
             "status.json",
             "history.json",
+            "status34.json",
+            "history34.json",
             "robots.txt",
             "sitemap.xml",
             ".nojekyll",
@@ -92,10 +105,12 @@ class BuildTests(unittest.TestCase):
         # and in the workflow together.
         workflow = read(os.path.join(ROOT, ".github", "workflows", "ecc2k130-status.yml"))
         self.assertIn("PAGES_HISTORY_URL: %s/history.json" % BASE_URL, workflow)
+        self.assertIn("PAGES_HISTORY34_URL: %s/history34.json" % BASE_URL, workflow)
         self.assertTrue(os.path.exists(os.path.join(self.out, "history.json")))
+        self.assertTrue(os.path.exists(os.path.join(self.out, "history34.json")))
 
     def test_snapshot_data_is_byte_identical_in_both_locations(self):
-        for name in ("status.json", "history.json"):
+        for name in ("status.json", "history.json", "status34.json", "history34.json"):
             source = read(os.path.join(ROOT, "docs", "ecc2k130-status", name), "rb")
             self.assertEqual(read(os.path.join(self.out, name), "rb"), source, name)
             self.assertEqual(read(os.path.join(self.out, "status", name), "rb"), source, name)
@@ -123,6 +138,7 @@ class BuildTests(unittest.TestCase):
         # same data, every point must have a row in the "every plotted point"
         # table, and the file's `updated` date is never older than its
         # newest point.
+        import html
         import json
 
         page = read(os.path.join(ROOT, "docs", "index-calculus-scoreboard.html"))
@@ -133,14 +149,61 @@ class BuildTests(unittest.TestCase):
 
         table = re.search(r"<summary>Every plotted point as a table</summary>(.*?)</details>", page, re.S)
         self.assertIsNotNone(table, "the progress panel has no plotted-point table")
-        rows = table.group(1)
+        rows = re.findall(r"<tr><td>.*?</tr>", table.group(1), re.S)
+        self.assertEqual(len(rows), sum(len(series["points"]) for series in timeline["series"]))
         newest = None
         for series in timeline["series"]:
             for point in series["points"]:
                 newest = max(newest or point["date"], point["date"])
-                anchor = re.escape(point["anchor"])
-                self.assertRegex(rows, rf'<tr><td>{point["date"]}</td>.*?href="{anchor}".*?</tr>', f"no table row for the {point['date']} point anchored at {point['anchor']} in series {series['id']}")
+                matching = [row for row in rows
+                            if row.startswith(f'<tr><td>{point["date"]}</td>')
+                            and f'<td>{series["label"]}<br>' in html.unescape(row)
+                            and f'<td>{point["label"]}<br>' in html.unescape(row)
+                            and f'href="{point["anchor"]}"' in html.unescape(row)]
+                self.assertEqual(len(matching), 1, f"missing or duplicate table row for {series['id']}: {point['label']}")
+                row = matching[0]
+                shown_value = re.search(r'<td class="n">([^<]+)&times;', row)
+                self.assertIsNotNone(shown_value)
+                self.assertEqual(float(shown_value.group(1)), point["value"])
+                for text in (point["detail"], point["reference"], point["class"], series["note"]):
+                    self.assertIn(text, html.unescape(row))
+                if "unit" in point:
+                    self.assertIn(point["unit"], html.unescape(row))
+                self.assertIn(f'href="{point["source"]}"', html.unescape(row))
         self.assertGreaterEqual(timeline["updated"], newest, "progress-timeline.json `updated` is older than its newest point")
+
+    def test_leaderboard_absolute_operations_and_history_match_frozen_sources(self):
+        import json
+        import math
+        import statistics
+
+        def source(path):
+            return json.loads(read(os.path.join(ROOT, path)))
+
+        board = source("docs/ic/leaderboard.json")
+        round5 = source("docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json")
+        matched = source("research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json")
+        timeline = source("docs/ic/progress-timeline.json")
+        canonical_points = next(s["points"] for s in timeline["series"] if s["id"] == "ec-cold")
+        self.assertEqual(len(board["progress"]["points"]), len(canonical_points))
+        for shown, original in zip(board["progress"]["points"], canonical_points):
+            self.assertEqual({k: v for k, v in shown.items() if k != "value"},
+                             {k: v for k, v in original.items() if k != "value"})
+            self.assertTrue(math.isclose(shown["value"], original["value"], rel_tol=1e-6))
+        instances = {i["curve"]["name"]: i for i in round5["ledger"]["instances"]}
+        references = {i["instance"]: i for i in matched["instances"]}
+        for row in board["board"]:
+            if row["family"] != "B":
+                self.assertNotIn("reference_log2_total_gae", row)
+                self.assertNotIn("log2_total_gae", row["best"])
+                continue
+            inst = instances[row["legacy"]]
+            rho = statistics.fmean(run["gae"] for run in references[row["legacy"]]["matched_reference"]["per_run"])
+            self.assertTrue(math.isclose(row["reference_log2_total_gae"], math.log2(rho), rel_tol=1e-10))
+            for recipe in row["recipes"]:
+                ic = statistics.fmean(v["total_gae"] for v in inst["variants"] if v["name"] == recipe["variant"])
+                self.assertTrue(math.isclose(recipe["log2_total_gae"], math.log2(ic), rel_tol=1e-10))
+                self.assertTrue(math.isclose(ic / rho, recipe["ratio_rho"], rel_tol=1e-9))
 
     def test_scoreboard_panels_close_and_sit_at_the_top_level(self):
         # An unclosed <section> once swallowed every later panel into one
@@ -466,15 +529,32 @@ class BuildTests(unittest.TestCase):
         # tree. The workflow that runs them is path-filtered, so a document
         # it does not list can change without the pins running, and the page
         # drifts from what it cites until the next site edit. Keep every
-        # document a pin reads in both the pull_request and push filters.
+        # document a pin reads in both filters. PRs validate the site with
+        # read-only permissions; the publish job excludes PR events.
         workflow = read(os.path.join(ROOT, ".github", "workflows", "ecc2k130-status.yml"))
         cited = ("ecc2k130/LAMBDA-PROJECTIVE.md", "ecc2k130/aws/README.md")
-        for trigger in ("pull_request", "push"):
+        self.assertNotRegex(workflow, r"(?m)^  pull_request_target:")
+        self.assertRegex(workflow, r"(?m)^  pull_request:")
+        permissions = re.search(r"^permissions:\n((?:  .*\n|\n)*)", workflow, re.M)
+        self.assertIsNotNone(permissions)
+        self.assertIn("contents: read", permissions.group(1))
+        self.assertNotIn("write", permissions.group(1))
+        test_job = re.search(r"^  test:\n((?:    .*\n|\n)*)", workflow, re.M)
+        self.assertIsNotNone(test_job)
+        self.assertIn("if: github.event_name == 'pull_request'", test_job.group(1))
+        self.assertNotRegex(test_job.group(1), r"actions/(?:deploy-pages|upload-pages-artifact)@")
+        publish = re.search(r"^  publish:\n    if: ([^\n]+)", workflow, re.M)
+        self.assertIsNotNone(publish)
+        self.assertEqual(publish.group(1), "(github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')) && !inputs.source_connection_check")
+        self.assertRegex(workflow, r"(?m)^  workflow_dispatch:")
+        for trigger in ("push", "pull_request"):
             # The trigger's block is everything indented deeper than its key,
             # up to the next key at the same depth (the triggers are adjacent,
             # with no blank line between them) or the next top-level key.
             match = re.search(r"^  %s:\n((?:    .*\n|\n)*)" % trigger, workflow, re.M)
             self.assertIsNotNone(match, "no %s trigger in the status workflow" % trigger)
+            if trigger == "push":
+                self.assertIn("branches: [main]", match.group(1))
             paths = re.findall(r'-\s+"([^"]+)"', match.group(1))
             self.assertIn("docs/ecc2k130-status/**", paths, trigger)
             for doc in cited:
@@ -761,7 +841,7 @@ class BuildTests(unittest.TestCase):
 
     def test_internal_links_resolve(self):
         missing = []
-        for rel in ("index.html", "404.html", "status/index.html", "scoreboard/index.html", "scoreboard/ic-leaderboard.html", "scoreboard/ic-measurement.html", "scoreboard/performance-gains.html", "scoreboard/algorithm-lab.html", "browser/index.html"):
+        for rel in ("index.html", "404.html", "status/index.html", "scoreboard/index.html", "scoreboard/ic-leaderboard.html", "scoreboard/ic-measurement.html", "scoreboard/performance-gains.html", "scoreboard/algorithm-lab.html", "browser/index.html", "backend-leaderboard/index.html"):
             page = read(os.path.join(self.out, rel))
             base = os.path.dirname(rel)
             for href in re.findall(r'(?:href|src)="([^"]+)"', page):
@@ -784,6 +864,16 @@ class BuildTests(unittest.TestCase):
                     missing.append("%s -> %s" % (rel, href))
         self.assertEqual(missing, [], "unresolvable internal links: %s" % missing)
 
+    def test_published_assets_do_not_link_to_the_retired_pages_origin(self):
+        # Absolute URLs bypass the internal-link check above. The repository
+        # moved to isogeny-labs, while the old /crypto/ Pages origin returns 404.
+        retired = "aburan28.github.io/crypto"
+        text_assets = (".html", ".js", ".css", ".xml", ".txt")
+        broken = [rel for rel in self.published
+                  if rel.endswith(text_assets)
+                  and retired in read(os.path.join(self.out, rel))]
+        self.assertEqual(broken, [], "retired GitHub Pages links: %s" % broken)
+
     def test_research_evidence_is_linked_absolutely(self):
         # research/ is not part of the site artifact, so a relative
         # ../research/<path> link resolves in the working tree and 404s once
@@ -804,7 +894,7 @@ class BuildTests(unittest.TestCase):
         )
 
     def test_every_page_declares_title_viewport_and_description(self):
-        for rel in ("index.html", "404.html", "status/index.html", "scoreboard/index.html", "scoreboard/ic-leaderboard.html", "scoreboard/ic-measurement.html", "scoreboard/performance-gains.html", "scoreboard/algorithm-lab.html", "browser/index.html"):
+        for rel in ("index.html", "404.html", "status/index.html", "scoreboard/index.html", "scoreboard/ic-leaderboard.html", "scoreboard/ic-measurement.html", "scoreboard/performance-gains.html", "scoreboard/algorithm-lab.html", "browser/index.html", "backend-leaderboard/index.html"):
             page = read(os.path.join(self.out, rel))
             self.assertRegex(page, r"<title>[^<]+</title>", rel)
             self.assertIn('name="viewport"', page, rel)
@@ -812,10 +902,37 @@ class BuildTests(unittest.TestCase):
 
     def test_sitemap_and_robots_point_at_the_published_urls(self):
         sitemap = read(os.path.join(self.out, "sitemap.xml"))
-        for path in ("/", "/browser/", "/scoreboard/", "/status/", "/status/how.html"):
+        for path in ("/", "/browser/", "/scoreboard/", "/status/", "/status/how.html", "/status/challenges.html"):
             self.assertIn("<loc>%s%s</loc>" % (BASE_URL, path), sitemap)
         self.assertIn("<lastmod>2026-01-01</lastmod>", sitemap)
         self.assertIn("Sitemap: %s/sitemap.xml" % BASE_URL, read(os.path.join(self.out, "robots.txt")))
+
+    def test_challenge_roster_keeps_one_live_store(self):
+        import json
+
+        page = read(os.path.join(self.out, "status", "challenges.html"))
+        script = read(os.path.join(self.out, "status", "challenges.js"))
+        roster = json.loads(read(os.path.join(self.out, "status", "challenges.json")))
+        self.assertNotIn("innerHTML", page)
+        self.assertNotIn("innerHTML", script)
+        self.assertEqual(roster["schema_version"], 1)
+        ids = []
+        live = []
+        for group in roster["groups"]:
+            self.assertIn("id", group)
+            for challenge in group["challenges"]:
+                self.assertIn(challenge["collection"], ("live", "local", "catalog", "none"))
+                self.assertTrue(challenge["id"] and challenge["name"] and challenge["field"] and challenge["join"])
+                ids.append(challenge["id"])
+                if challenge["collection"] == "live":
+                    live.append(challenge["id"])
+                    self.assertEqual(challenge["status_href"], "./")
+        self.assertEqual(live, ["ecc2k-130"])
+        self.assertEqual(len(ids), len(set(ids)))
+        self.assertIn("ECC2K-130", page)
+        self.assertIn("./challenges.json", page)
+        dashboard = read(os.path.join(self.out, "status", "index.html"))
+        self.assertIn("./challenges.html", dashboard)
 
     def test_lab_browser_index_is_current_and_self_consistent(self):
         # AGENTS.md §7c: docs/browser/data.json is generated from the curve
@@ -830,6 +947,7 @@ class BuildTests(unittest.TestCase):
         spec.loader.exec_module(builder)
         fresh = builder.build()
         committed = read(os.path.join(ROOT, "docs", "browser", "data.json"))
+        source = builder.RepositoryInputs(ROOT)
         # Mention statistics are volatile (see builder.comparable); the rest
         # must match a fresh build exactly.
         self.assertEqual(builder.comparable(json.loads(committed)), builder.comparable(fresh), "docs/browser/data.json is stale; run python3 scripts/build_lab_browser.py")
@@ -852,17 +970,35 @@ class BuildTests(unittest.TestCase):
                 self.assertIn(t["round"], rounds, c["slug"])
         for f in data["factor_bases"]:
             self.assertTrue(f["curve"] is None or f["curve"] in slugs, f["fb_id"])
+            if f.get("recorded_curve"):
+                self.assertIsNone(f["curve"], f["fb_id"])
+                self.assertNotIn(f["recorded_curve"], slugs, f["fb_id"])
+                self.assertEqual(f["registration_status"], "pending")
             self.assertRegex(f["points_sha256"] or "", r"^[a-f0-9]{64}$", f["fb_id"])
+        store_index = json.loads(read(os.path.join(ROOT, "store", "index.json")))
+        self.assertEqual({o["name"] for o in data["store"]["objects"]}, set(store_index["entries"]), "every stored file and no other")
+        for o in data["store"]["objects"]:
+            self.assertRegex(o["sha256"], r"^[a-f0-9]{64}$", o["name"])
+            self.assertEqual(o["sha256"], store_index["entries"][o["name"]]["sha256"], o["name"])
+            self.assertTrue(o["curve"] is None or o["curve"] in slugs, o["name"])
+            self.assertTrue(o["fb_id"] is None or o["fb_id"] in fbs, o["name"])
+        for c in data["curves"]:
+            for n in c["store_objects"]:
+                self.assertEqual(next(o for o in data["store"]["objects"] if o["name"] == n)["curve"], c["slug"], n)
+        self.assertEqual(data["counts"]["store_objects"], len(data["store"]["objects"]))
         for k in data["candidates"]:
             self.assertTrue(k["slug"] is None or k["slug"] in slugs, k["candidate_id"])
             for path in k["where"]:
-                self.assertTrue(os.path.exists(os.path.join(ROOT, path)), path)
+                self.assertTrue(source.exists(path), path)
         for r in data["rounds"]:
-            self.assertTrue(os.path.isdir(os.path.join(ROOT, r["dir"])), r["round"])
+            self.assertTrue(source.is_directory(r["dir"]), r["round"])
         for s in data["sessions"]:
-            self.assertTrue(os.path.exists(os.path.join(ROOT, s["dir"], "records.jsonl")), s["session_id"])
+            self.assertTrue(
+                source.exists(os.path.join(s["dir"], "records.jsonl")),
+                s["session_id"],
+            )
         for path, digest in data["sources"].items():
-            self.assertTrue(os.path.exists(os.path.join(ROOT, path)), path)
+            self.assertTrue(source.exists(path), path)
             self.assertRegex(digest, r"^[a-f0-9]{64}$", path)
 
     def test_lab_browser_renders_with_dom_nodes_only(self):
@@ -893,9 +1029,11 @@ class WorkflowTests(unittest.TestCase):
 
     def test_site_sources_trigger_the_workflow(self):
         workflow = read(os.path.join(ROOT, ".github", "workflows", "ecc2k130-status.yml"))
-        for path in ('"docs/site/**"', '"scripts/site/**"', '"docs/index-calculus-scoreboard.html"', '"docs/browser/**"', '"scripts/build_lab_browser.py"'):
-            # Once for pull_request, once for push.
-            self.assertEqual(workflow.count(path), 2, path)
+        push = re.search(r"^  push:\n((?:    .*\n|\n)*)", workflow, re.M)
+        self.assertIsNotNone(push, "site changes need a main-push publication trigger")
+        paths = re.findall(r'^\s+-\s+"([^"]+)"', push.group(1), re.M)
+        for path in ('docs/site/**', 'scripts/site/**', 'docs/index-calculus-scoreboard.html', 'docs/browser/**', 'docs/backend-leaderboard/**', 'scripts/build_lab_browser.py'):
+            self.assertIn(path, paths)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,10 @@
 name: ECC2K-130 degree-7 m3 four-policy
 
 on:
-  pull_request:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
     paths:
       - '.github/workflows/ecc2k130-m3-four-policy.yml'
       - 'research/notes/ecc2k130/m3_four_policy_20260930/**'
@@ -9,9 +12,10 @@ on:
       - 'research/ecc2k130_factor_base_replication_20260925/**'
       - 'research/ecc2k130_dual_transport_20260925/**'
 
+  workflow_dispatch:
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-m3-four-policy.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-m3-four-policy.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4

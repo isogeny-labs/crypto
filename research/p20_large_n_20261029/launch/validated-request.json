@@ -1,0 +1,124 @@
+{
+  "schema": "isolab.eks.request/v1",
+  "job": {
+    "job_name": "p20-large-n-20261029",
+    "instance_type": "c8a.2xlarge",
+    "seconds": 3600,
+    "spec": {
+      "schema": "ecbench.spec/v1",
+      "label": "XP-20261029-p20-large-n holdout: N 64 against the N 45 prime-field baseline, three fresh 20-bit curves",
+      "description": "Frozen follow-up to XP-20261016 (PROTOCOL.md): the single pre-registered candidate N = 64 against the 20-bit baseline N = 45, same exact oracle, on three fresh prime-order curves and fresh public targets, with N 90 and N 32 descriptive arms, matched rho and A/A arms. Public synthetic curves and targets; no security claim.",
+      "workloads": {
+        "curves": [
+          {
+            "kind": "prime_search",
+            "bits": 20,
+            "seed": 20261029201
+          },
+          {
+            "kind": "prime_search",
+            "bits": 20,
+            "seed": 20261029202
+          },
+          {
+            "kind": "prime_search",
+            "bits": 20,
+            "seed": 20261029203
+          }
+        ],
+        "targets_per_curve": 32,
+        "target_seed": 20261029211,
+        "target_kind": "public"
+      },
+      "arms": [
+        {
+          "name": "rho-neg",
+          "role": "reference",
+          "method": {
+            "id": "rho.negation"
+          }
+        },
+        {
+          "name": "inc",
+          "role": "baseline",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=45",
+              "oracle": "mitm:negation_folded=1",
+              "max_trials": "1410236"
+            }
+          }
+        },
+        {
+          "name": "n64",
+          "role": "candidate",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=64",
+              "oracle": "mitm:negation_folded=1",
+              "max_trials": "1410236"
+            }
+          }
+        },
+        {
+          "name": "n90",
+          "role": "control",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=90",
+              "oracle": "mitm:negation_folded=1",
+              "max_trials": "1410236"
+            }
+          }
+        },
+        {
+          "name": "n32",
+          "role": "control",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=32",
+              "oracle": "mitm:negation_folded=1",
+              "max_trials": "1410236"
+            }
+          }
+        },
+        {
+          "name": "inc-aa",
+          "role": "control",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=45",
+              "oracle": "mitm:negation_folded=1",
+              "max_trials": "1410236"
+            }
+          }
+        },
+        {
+          "name": "rho-neg-aa",
+          "role": "control",
+          "method": {
+            "id": "rho.negation"
+          }
+        }
+      ],
+      "measurement": {
+        "rounds": 6,
+        "warmup": 1,
+        "order": "alternate",
+        "seed": 20261029221,
+        "isolation_required": "L2",
+        "timeout_seconds": 1800
+      }
+    },
+    "memory": "4Gi"
+  },
+  "provenance": {
+    "harness": "crypto XP-20261029 p20 large-N holdout (backlog/XP-20261029-p20-large-n/PROTOCOL.md, frozen at 97321bfc4)",
+    "source_revision": "97321bfc4fb7872d3fd2b89c068b5749d270452e"
+  }
+}

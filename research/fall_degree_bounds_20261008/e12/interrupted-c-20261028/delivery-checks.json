@@ -1,0 +1,143 @@
+{
+  "schema": "e12c.delivery-checks/v1",
+  "scope": "repository delivery checks; not independent experiment validation",
+  "report_commit": "ade8e7339f8c190953262a4956d681da33f53db5",
+  "src_tree": "7a360f787d88b509f4d8d53c56032dc2288f180b",
+  "implementation_or_test_code_changed": false,
+  "test_command": "cargo +1.98 test --release --lib -- --test-threads=1",
+  "test_binary_sha256": "038ac60841136d626ee61348a6fc1d36e60e4dd5b58ef97a954cbb4a2a154b2c",
+  "initial_compile": {
+    "exit_code": 101,
+    "missing_include_diagnostics": 45,
+    "unique_missing_tracked_paths": 36
+  },
+  "full_serial_run": {
+    "exit_code": 101,
+    "passed": 4967,
+    "failed": 20,
+    "ignored": 122,
+    "measured": 0,
+    "filtered_out": 0,
+    "seconds": 1412.74,
+    "clean": false
+  },
+  "fixture_restoration_reruns": {
+    "same_binary": true,
+    "tests": 20,
+    "passed": 20,
+    "failed": 0,
+    "exit_code": 0,
+    "exact_failed_test_list_verified": true,
+    "names": [
+      "cryptanalysis::ecbench::band::tests::exact_sums_reproduce_the_band_means",
+      "cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload",
+      "cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible",
+      "cryptanalysis::ecbench::bounds::tests::a_session_counted_twice_is_refused_and_a_copy_of_its_draws_too",
+      "cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples",
+      "cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version",
+      "cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band",
+      "cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload",
+      "cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup",
+      "cryptanalysis::ecbench::koblitz_descent::tests::the_rule_v8_defaults_are_the_parameter_files",
+      "cryptanalysis::ecbench::work::tests::fixture_records_reprice_to_their_committed_blocks",
+      "cryptanalysis::ic_framework::planner::tests::every_cited_file_exists",
+      "cryptanalysis::ic_framework::plugins::tests::compact_orbit_scan_matches_archived_n37_source42",
+      "ecc::cryptopro_b_chain_set::tests::a_step_that_does_not_compose_is_refused",
+      "ecc::cryptopro_b_chain_set::tests::frozen_chains_are_multiplication_by_lambda_and_orderings_agree",
+      "ecc::cryptopro_b_chain_set::tests::frozen_set_loads_and_every_chain_prepares",
+      "ecc::cryptopro_b_chain_set::tests::frozen_set_reproduces_its_test_vectors",
+      "ecc::cryptopro_b_chain_set::tests::tampered_sets_are_refused",
+      "ecc::endo_generic_chain_set::tests::cryptopro_b_set_loads_and_reproduces_its_vectors_on_the_generic_path",
+      "ecc::endo_generic_chain_set::tests::tampered_sets_are_refused"
+    ]
+  },
+  "logs": [
+    {
+      "kind": "initial_compile_missing_tracked_sparse_fixtures",
+      "uri": "s3://setec-astronomy-artifacts/research/fall-degree/e12/interrupted-c-20261028/software-validation/7cb486d82e92b77810bccb0339490fd05839b58901ae695c1b3da6af1416d16a/compile-missing-fixtures.log",
+      "sha256": "7cb486d82e92b77810bccb0339490fd05839b58901ae695c1b3da6af1416d16a",
+      "bytes": 20638,
+      "download_sha256_verified": true,
+      "download_byte_identical": true,
+      "put": {
+        "ETag": "\"4f9ff3ce1f42acf59c5e6adacdfd9e20\"",
+        "ChecksumSHA256": "fLSG2C6St3gQvMsDOUkP0Fg5tYkBrmlcGz2mrxQW0Wo=",
+        "ChecksumType": "FULL_OBJECT",
+        "ServerSideEncryption": "AES256"
+      },
+      "get": {
+        "AcceptRanges": "bytes",
+        "LastModified": "2026-10-28T08:18:09+00:00",
+        "ContentLength": 20638,
+        "ETag": "\"4f9ff3ce1f42acf59c5e6adacdfd9e20\"",
+        "ChecksumSHA256": "fLSG2C6St3gQvMsDOUkP0Fg5tYkBrmlcGz2mrxQW0Wo=",
+        "ChecksumType": "FULL_OBJECT",
+        "ContentType": "binary/octet-stream",
+        "ServerSideEncryption": "AES256",
+        "Metadata": {}
+      }
+    },
+    {
+      "kind": "complete_serial_suite_with_missing_runtime_fixtures",
+      "uri": "s3://setec-astronomy-artifacts/research/fall-degree/e12/interrupted-c-20261028/software-validation/4aa1a55d5859e47e0d95c04ed855d3f2e7e81f849a515ee4d0e8ecbe74496eff/full-serial-suite.log",
+      "sha256": "4aa1a55d5859e47e0d95c04ed855d3f2e7e81f849a515ee4d0e8ecbe74496eff",
+      "bytes": 448465,
+      "download_sha256_verified": true,
+      "download_byte_identical": true,
+      "put": {
+        "ETag": "\"9713bf3fb066a90407ba43f630278c20\"",
+        "ChecksumSHA256": "SqGlXVhZ5H4NlcBO2FXT8ufoH4SaUV7k0OjsvnRJbv8=",
+        "ChecksumType": "FULL_OBJECT",
+        "ServerSideEncryption": "AES256"
+      },
+      "get": {
+        "AcceptRanges": "bytes",
+        "LastModified": "2026-10-28T08:35:15+00:00",
+        "ContentLength": 448465,
+        "ETag": "\"9713bf3fb066a90407ba43f630278c20\"",
+        "ChecksumSHA256": "SqGlXVhZ5H4NlcBO2FXT8ufoH4SaUV7k0OjsvnRJbv8=",
+        "ChecksumType": "FULL_OBJECT",
+        "ContentType": "binary/octet-stream",
+        "ServerSideEncryption": "AES256",
+        "Metadata": {}
+      }
+    },
+    {
+      "kind": "all_twenty_exact_failed_tests_after_tracked_fixture_restore",
+      "uri": "s3://setec-astronomy-artifacts/research/fall-degree/e12/interrupted-c-20261028/software-validation/79ef046a4bb314872b146c090e4b2df50337980d721719180231ab2ef07f7e6c/exact-failed-test-reruns.log",
+      "sha256": "79ef046a4bb314872b146c090e4b2df50337980d721719180231ab2ef07f7e6c",
+      "bytes": 4305,
+      "download_sha256_verified": true,
+      "download_byte_identical": true,
+      "put": {
+        "ETag": "\"d8f6bf4cd5625c755b28240362bcfa5a\"",
+        "ChecksumSHA256": "ee8EakuzFIcrFGwJDkst9QM3mA1yFxkYAjGrLvB/fmw=",
+        "ChecksumType": "FULL_OBJECT",
+        "ServerSideEncryption": "AES256"
+      },
+      "get": {
+        "AcceptRanges": "bytes",
+        "LastModified": "2026-10-28T08:35:38+00:00",
+        "ContentLength": 4305,
+        "ETag": "\"d8f6bf4cd5625c755b28240362bcfa5a\"",
+        "ChecksumSHA256": "ee8EakuzFIcrFGwJDkst9QM3mA1yFxkYAjGrLvB/fmw=",
+        "ChecksumType": "FULL_OBJECT",
+        "ContentType": "binary/octet-stream",
+        "ServerSideEncryption": "AES256",
+        "Metadata": {}
+      }
+    }
+  ],
+  "pdf": {
+    "renderer": "Typst 0.15.1",
+    "decoder": "Poppler 24.08",
+    "pages": 1,
+    "visual_clipping_observed": false,
+    "pdfinfo_exit_code": 0,
+    "pdfinfo_warning": "Suspects object is wrong type (boolean)",
+    "sha256": "e6aa3a6d6e89af5bb1de5815b651107910c8ed04f3800acbd8e90375fe2d0112"
+  },
+  "formal_experiment_review": false,
+  "solver_replay": false,
+  "new_experiment": false
+}

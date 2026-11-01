@@ -1,0 +1,25 @@
+# run-20261023T0124Z-quartic_twist_k1_thin_p97_seed2_j1_aa_v1
+
+[Raw record](../../quartic_twist_k1_thin_p97_seed2_j1_aa_v1.json) SHA-256 `258dc92c9f18a67be186a93e43b7635079e146fe7d87ad256117aeb11cbb53de`; [independent audit](../../quartic_twist_k1_thin_p97_seed2_j1_audit_aa_v1.json) SHA-256 `9a20002ef596d59825d232cd97d41168922e99c535644e34a9459b7e8e56f6fa`.
+
+Frozen native-thinning protocol commit `cadd7b9001`; [producer](../../../../examples/quartic_twist_k1_thin.rs) SHA-256 `b58e34d64a6f83ebc5dac7a1aa2670a60369515a1665aedbd37a2b46ceadd188`; [auditor](../../../../examples/quartic_twist_k1_thin_audit.rs) SHA-256 `46d6432070820bc431721a4d24bdff6e55bc8b49eda534272e274b9a6c9cc0a8`.
+
+## Execution
+
+Shared Intel Xeon Platinum 6975P-C host; L0 exploratory run. One public target `[271]G`.
+
+Command: `target/release/examples/quartic_twist_k1_thin research/twist_index_calculus_20261020/quartic_twist_mixed_v1.ndjson 97 2 1` with 8 GiB address-space cap and 1,200 s watchdog.
+
+## Recorded observations
+
+- Native `pass`; independent point-keyed/BSGS audit `pass`; 182 residuals, anchored rank 4/4, recovered 271.
+- Physical base 48 retained points from 72 constructed points; 1 complete L2 orbits. Full-base construction and map, plus a proper-subset map, are charged.
+- Exact signed k=1 sets on processed prefix: 4 reference, 4 polynomial, 0 missing; 4,368 attempted S4 systems, 0 failures.
+- Counted candidate: 2,710,417,878 Fp multiplications and 25,189 group operations; same-seed full-base control 6,696,848,851 Fp multiplications (full/candidate 2.471).
+- Same-target twist24 rho: 791,504 Fp multiplications and 5,395 group operations. Independent BSGS verified 48 retained physical factor logs.
+
+![Recorded rank and polynomial field-work trace](graph.svg)
+
+The graph plots native recorded values only. Hash/tree and allocator CPU, calibrated GAE and isolated timing are absent. Field-operation ratios do not constitute a priced IC/rho or external-solver speed claim.
+
+[PDF](report.pdf).

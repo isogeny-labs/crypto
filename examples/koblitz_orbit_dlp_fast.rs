@@ -2,6 +2,7 @@
 //!
 //! Public synthetic Koblitz fixtures only. Reads a retained
 //! `point_defined_factor_base` header, builds the Frobenius-quotiented S3
+//! regular-root index once (no pair table, no edge selectors), then:
 //! regular-root index once (no pair table, no edge selectors), then
 //!   1. rank stage: decomposes random `[a]G` until the K orbit logs are fixed,
 //!   2. target stage: decomposes each published target and recovers its log.
@@ -321,22 +322,118 @@ impl S3Solver {
     /// Same roots, in the same order, as `s3_x_roots` on the generic branch.
     #[inline(always)]
     fn roots(&self, gf: &Gf2, basis: &NormalBasis, left: u64, right: u64) -> Option<[u64; 2]> {
-        let s = left ^ right;
-        let a = self.square.apply(s);
+        let prepared = self.prepare(gf, left, right);
+        let inverse = if prepared.denominator == 0 {
+            0
+        } else {
+            invert(gf, basis, prepared.denominator)
+        };
+        self.finish(gf, prepared, inverse)
+    }
+
+    /// Everything up to the shared inversion: `a = (left+right)^2`,
+    /// `p = left·right`, `ps = p^2`, and the denominator `a·ps` (zero marks
+    /// the exceptional path, which `finish` routes to the direct solver
+    /// exactly as the scalar `roots` did).
+    #[inline(always)]
+    fn prepare(&self, gf: &Gf2, left: u64, right: u64) -> PreparedRoot {
+        let a = self.square.apply(left ^ right);
         let p = gf.mul(left, right);
         let ps = self.square.apply(p);
-        if a == 0 || ps == 0 {
-            return s3_x_roots(gf, self.b, left, right);
+        let denominator = if a == 0 || ps == 0 { 0 } else { gf.mul(a, ps) };
+        PreparedRoot {
+            left,
+            right,
+            a,
+            p,
+            ps,
+            denominator,
         }
-        let inv_combined = invert(gf, basis, gf.mul(a, ps));
-        let q = gf.mul(p, gf.mul(ps, inv_combined));
-        let c = ps ^ self.b;
-        let d = gf.mul(gf.mul(c, a), gf.mul(a, inv_combined));
+    }
+
+    /// Everything after the inversion, given `inverse = denominator^{-1}`
+    /// (ignored on the exceptional path).
+    #[inline(always)]
+    fn finish(&self, gf: &Gf2, prepared: PreparedRoot, inverse: u64) -> Option<[u64; 2]> {
+        if prepared.denominator == 0 {
+            return s3_x_roots(gf, self.b, prepared.left, prepared.right);
+        }
+        let q = gf.mul(prepared.p, gf.mul(prepared.ps, inverse));
+        let c = prepared.ps ^ self.b;
+        let d = gf.mul(gf.mul(c, prepared.a), gf.mul(prepared.a, inverse));
         if (d & self.trace_mask).count_ones() & 1 == 1 {
             return None;
         }
         let first = gf.mul(q, self.half_trace.apply(d));
         Some([first, first ^ q])
+    }
+}
+
+#[derive(Clone, Copy)]
+struct PreparedRoot {
+    left: u64,
+    right: u64,
+    a: u64,
+    p: u64,
+    ps: u64,
+    denominator: u64,
+}
+
+/// Reusable scratch for solving many u64 S3 root pairs with one shared
+/// field inversion (Montgomery's trick over the non-exceptional
+/// denominators), the u64 twin of the wide path's `RootBatch128`.
+/// `results[i]` equals `solver.roots(inputs[i])` for every `i`; only the
+/// inversion count changes.
+struct RootBatch {
+    prepared: Vec<PreparedRoot>,
+    inverses: Vec<u64>,
+    prefixes: Vec<u64>,
+    regular: Vec<usize>,
+    results: Vec<Option<[u64; 2]>>,
+}
+
+impl RootBatch {
+    fn with_capacity(entries: usize) -> Self {
+        Self {
+            prepared: Vec::with_capacity(entries),
+            inverses: Vec::with_capacity(entries),
+            prefixes: Vec::with_capacity(entries),
+            regular: Vec::with_capacity(entries),
+            results: Vec::with_capacity(entries),
+        }
+    }
+
+    fn solve(&mut self, gf: &Gf2, basis: &NormalBasis, solver: &S3Solver, inputs: &[(u64, u64)]) {
+        self.prepared.clear();
+        self.inverses.clear();
+        self.prefixes.clear();
+        self.regular.clear();
+        self.results.clear();
+        self.inverses.resize(inputs.len(), 0);
+        self.prefixes.resize(inputs.len(), 0);
+        for (index, &(left, right)) in inputs.iter().enumerate() {
+            let prepared = solver.prepare(gf, left, right);
+            if prepared.denominator != 0 {
+                self.regular.push(index);
+            }
+            self.prepared.push(prepared);
+        }
+        if !self.regular.is_empty() {
+            let mut product = 1u64;
+            for &index in &self.regular {
+                self.prefixes[index] = product;
+                product = gf.mul(product, self.prepared[index].denominator);
+            }
+            // A product of non-zero field elements is non-zero.
+            let mut inverse_product = invert(gf, basis, product);
+            for &index in self.regular.iter().rev() {
+                self.inverses[index] = gf.mul(inverse_product, self.prefixes[index]);
+                inverse_product = gf.mul(inverse_product, self.prepared[index].denominator);
+            }
+        }
+        for (prepared, &inverse) in self.prepared.iter().zip(&self.inverses) {
+            self.results.push(solver.finish(gf, *prepared, inverse));
+        }
     }
 }
 
@@ -367,20 +464,70 @@ fn invert(gf: &Gf2, basis: &NormalBasis, a: u64) -> u64 {
 struct RootBloom {
     words: Vec<u64>,
     bit_mask: usize,
+    hashes: usize,
+    profile: RootBloomProfile,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum RootBloomProfile {
+    Compact4,
+    Standard,
+    Wide3,
+    Wide5,
+}
+
+impl RootBloomProfile {
+    fn from_env() -> Self {
+        match std::env::var("KIC_ROOT_BLOOM_PROFILE").as_deref() {
+            Err(_) | Ok("standard") => Self::Standard,
+            Ok("compact4") => Self::Compact4,
+            Ok("wide3") => Self::Wide3,
+            Ok("wide5") => Self::Wide5,
+            _ => panic!("KIC_ROOT_BLOOM_PROFILE must be compact4, standard, wide3 or wide5"),
+        }
+    }
+
+    fn bits_per_request(self) -> usize {
+        match self {
+            Self::Compact4 => 4,
+            Self::Standard => 8,
+            Self::Wide3 | Self::Wide5 => 16,
+        }
+    }
+
+    fn hashes(self) -> usize {
+        match self {
+            Self::Compact4 | Self::Standard | Self::Wide3 => 3,
+            Self::Wide5 => 5,
+        }
+    }
+
+    fn name(self) -> &'static str {
+        match self {
+            Self::Compact4 => "compact4",
+            Self::Standard => "standard",
+            Self::Wide3 => "wide3",
+            Self::Wide5 => "wide5",
+        }
+    }
 }
 
 impl RootBloom {
-    const HASHES: usize = 3;
-
     fn with_capacity(keys: usize) -> Self {
+        Self::with_profile(keys, RootBloomProfile::from_env())
+    }
+
+    fn with_profile(keys: usize, profile: RootBloomProfile) -> Self {
         let bits = keys
-            .checked_mul(8)
+            .checked_mul(profile.bits_per_request())
             .and_then(usize::checked_next_power_of_two)
             .expect("root Bloom size overflow")
             .max(64);
         Self {
             words: vec![0; bits / 64],
             bit_mask: bits - 1,
+            hashes: profile.hashes(),
+            profile,
         }
     }
 
@@ -397,7 +544,7 @@ impl RootBloom {
     #[inline(always)]
     fn insert(&mut self, key: u128) {
         let (first, step) = Self::hash_pair(key);
-        for index in 0..Self::HASHES {
+        for index in 0..self.hashes {
             let bit =
                 first.wrapping_add((index as u64).wrapping_mul(step)) as usize & self.bit_mask;
             self.words[bit >> 6] |= 1u64 << (bit & 63);
@@ -407,7 +554,7 @@ impl RootBloom {
     #[inline(always)]
     fn contains(&self, key: u128) -> bool {
         let (first, step) = Self::hash_pair(key);
-        for index in 0..Self::HASHES {
+        for index in 0..self.hashes {
             let bit =
                 first.wrapping_add((index as u64).wrapping_mul(step)) as usize & self.bit_mask;
             if self.words[bit >> 6] & (1u64 << (bit & 63)) == 0 {
@@ -430,7 +577,68 @@ fn mix_root_bloom(mut value: u64) -> u64 {
 }
 
 fn root_bloom_enabled() -> bool {
-    std::env::var("KIC_ROOT_BLOOM").as_deref() == Ok("1")
+    // Enabled by default (opt out with KIC_ROOT_BLOOM=0): most root-table
+    // probe keys miss, and the Bloom prefilter avoids a random DRAM walk per
+    // miss. Exactness is unchanged; a Bloom pass still probes the table.
+    std::env::var("KIC_ROOT_BLOOM").as_deref() != Ok("0")
+}
+
+fn root_table_hugepage_requested() -> bool {
+    // Opt in with KIC_ROOT_TABLE_HUGEPAGE=1: the root slots are advised as
+    // transparent huge pages before they are first written. Off by default;
+    // contents and probe order are unchanged either way.
+    std::env::var("KIC_ROOT_TABLE_HUGEPAGE").as_deref() == Ok("1")
+}
+
+/// A root-slot vector of `len` copies of `fill`. With the huge-page request
+/// on Linux, the allocation is advised `MADV_HUGEPAGE` before it is filled,
+/// so the first-touch faults can map 2 MiB pages; otherwise it is `vec!`.
+fn root_slot_vec<T: Clone>(len: usize, fill: T) -> Vec<T> {
+    if !root_table_hugepage_requested() {
+        return vec![fill; len];
+    }
+    let mut slots: Vec<T> = Vec::with_capacity(len);
+    advise_hugepage(
+        slots.as_mut_ptr() as *mut u8,
+        len * std::mem::size_of::<T>(),
+    );
+    slots.resize(len, fill);
+    slots
+}
+
+#[cfg(target_os = "linux")]
+fn advise_hugepage(ptr: *mut u8, bytes: usize) {
+    const PAGE: usize = 4096;
+    let start = (ptr as usize).div_ceil(PAGE) * PAGE;
+    let end = (ptr as usize + bytes) / PAGE * PAGE;
+    if end > start {
+        // SAFETY: [start, end) lies inside the vector's live allocation;
+        // madvise only changes the kernel's paging policy for that range.
+        let rc =
+            unsafe { libc::madvise(start as *mut libc::c_void, end - start, libc::MADV_HUGEPAGE) };
+        assert_eq!(rc, 0, "madvise(MADV_HUGEPAGE) failed on the root table");
+    }
+}
+
+#[cfg(not(target_os = "linux"))]
+fn advise_hugepage(_ptr: *mut u8, _bytes: usize) {
+    panic!("KIC_ROOT_TABLE_HUGEPAGE=1 is supported on Linux only");
+}
+
+/// Peak resident set (`VmHWM`) of this process in bytes, from `/proc/self/status`.
+fn vm_hwm_bytes() -> Option<u64> {
+    let text = std::fs::read_to_string("/proc/self/status").ok()?;
+    let line = text.lines().find(|l| l.starts_with("VmHWM:"))?;
+    let kib: u64 = line.split_whitespace().nth(1)?.parse().ok()?;
+    Some(kib * 1024)
+}
+
+/// `AnonHugePages` of this process in bytes, from `/proc/self/smaps_rollup`.
+fn anon_huge_pages_bytes() -> Option<u64> {
+    let text = std::fs::read_to_string("/proc/self/smaps_rollup").ok()?;
+    let line = text.lines().find(|l| l.starts_with("AnonHugePages:"))?;
+    let kib: u64 = line.split_whitespace().nth(1)?.parse().ok()?;
+    Some(kib * 1024)
 }
 
 /// Open-addressing u64 -> u64 table; keys are < 2^63 so u64::MAX marks empty.
@@ -502,8 +710,55 @@ impl RootTable {
 }
 
 #[cfg(test)]
+mod root_batch_tests {
+    use super::{Gf2, NormalBasis, RootBatch, S3Solver};
+    use crypto_lib::cryptanalysis::koblitz_index_calculus::KoblitzCurve;
+
+    /// The batched u64 root solve (one shared inversion per batch) must
+    /// return exactly the scalar `S3Solver::roots` result, in input order,
+    /// including the exceptional zero-denominator paths.
+    #[test]
+    fn batched_roots_match_scalar_roots_in_order() {
+        let curve = KoblitzCurve::new(0, 41).expect("admitted Koblitz rung");
+        let gf = Gf2::new(&curve.curve.irreducible);
+        let basis = NormalBasis::new(&gf);
+        let b = gf.from_element(&curve.curve.b);
+        let solver = S3Solver::new(&gf, b);
+        let mut seed = 0x9E37_79B9_7F4A_7C15u64;
+        let mut next = move || {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            seed
+        };
+        let mut inputs = Vec::new();
+        for i in 0..4096usize {
+            let x = next() & basis.mask;
+            let y = next() & basis.mask;
+            inputs.push(match i % 7 {
+                0 => (x, x),
+                1 => (0, y),
+                2 => (x, 0),
+                _ => (x, y),
+            });
+        }
+        let mut batch = RootBatch::with_capacity(83);
+        let mut regular = 0usize;
+        for chunk in inputs.chunks(83) {
+            batch.solve(&gf, &basis, &solver, chunk);
+            assert_eq!(batch.results.len(), chunk.len());
+            regular += batch.regular.len();
+            for (k, &(left, right)) in chunk.iter().enumerate() {
+                assert_eq!(batch.results[k], solver.roots(&gf, &basis, left, right));
+            }
+        }
+        assert!(regular > 0 && regular < inputs.len());
+    }
+}
+
+#[cfg(test)]
 mod root_bloom_table_tests {
-    use super::{mix_root_bloom, RootBloom, RootTable};
+    use super::{mix_root_bloom, RootBloom, RootBloomProfile, RootTable};
 
     #[test]
     fn canonical_u64_lookup_matches_unscreened_table() {
@@ -529,6 +784,25 @@ mod root_bloom_table_tests {
             }
         }
     }
+
+    #[test]
+    fn every_bloom_profile_preserves_all_inserted_keys() {
+        for profile in [
+            RootBloomProfile::Compact4,
+            RootBloomProfile::Standard,
+            RootBloomProfile::Wide3,
+            RootBloomProfile::Wide5,
+        ] {
+            let mut bloom = RootBloom::with_profile(4096, profile);
+            let keys: Vec<_> = (0..4096u64).map(|i| mix_root_bloom(i) as u128).collect();
+            for &key in &keys {
+                bloom.insert(key);
+            }
+            for key in keys {
+                assert!(bloom.contains(key), "missing key under {profile:?}");
+            }
+        }
+    }
 }
 
 struct State {
@@ -536,6 +810,71 @@ struct State {
     right: u16,
     relative: u16,
     normal_roots: [u64; 2],
+}
+
+/// Reusable scratch for [`batch_adds`]: result slots, Montgomery-batch
+/// denominators/prefixes and the materialized choice points, all reused
+/// across calls so the hot lift loop performs no allocations.
+#[derive(Default)]
+struct LiftScratch {
+    results: Vec<FastPoint>,
+    denominators: Vec<u64>,
+    prefixes: Vec<u64>,
+    regular: Vec<usize>,
+}
+
+impl LiftScratch {
+    /// Affine batch addition of one fixed point against a list of points
+    /// with a single shared field inversion (Montgomery's trick).
+    /// `results[i]` equals `fast.add(base, points[i])`, in order; the
+    /// exceptional same-x paths (doubling, the point at infinity) fall back
+    /// to the scalar `add`.
+    fn batch_adds(&mut self, fast: &FastBinaryCurve, base: FastPoint, points: &[FastPoint]) {
+        let gf = &fast.gf;
+        self.results.clear();
+        self.results.extend(std::iter::repeat_n(None, points.len()));
+        self.denominators.clear();
+        self.prefixes.clear();
+        self.prefixes.resize(points.len(), 0);
+        self.regular.clear();
+        self.regular.reserve(points.len());
+        for (i, &q) in points.iter().enumerate() {
+            match (base, q) {
+                (None, r) | (r, None) => self.results[i] = r,
+                (Some((x1, _)), Some((x2, _))) => {
+                    if x1 == x2 {
+                        self.results[i] = fast.add(base, q);
+                    } else {
+                        self.denominators.push(x1 ^ x2);
+                        self.regular.push(i);
+                    }
+                }
+            }
+        }
+        if self.regular.is_empty() {
+            return;
+        }
+        let mut product = 1u64;
+        for (k, &d) in self.denominators.iter().enumerate() {
+            self.prefixes[k] = product;
+            product = gf.mul(product, d);
+        }
+        let mut inverse_product = gf.inv(product);
+        for k in (0..self.denominators.len()).rev() {
+            let inverse = gf.mul(inverse_product, self.prefixes[k]);
+            inverse_product = gf.mul(inverse_product, self.denominators[k]);
+            let i = self.regular[k];
+            let (Some((x1, y1)), Some((x2, y2))) = (base, points[i]) else {
+                unreachable!("regular slots hold affine pairs");
+            };
+            let dy = y1 ^ y2;
+            let lambda = gf.mul(dy, inverse);
+            let lambda_sq = gf.sqr(lambda);
+            let x3 = lambda_sq ^ lambda ^ x1 ^ x2 ^ fast.a;
+            let y3 = gf.mul(lambda, x1 ^ x3) ^ x3 ^ y1;
+            self.results[i] = Some((x3, y3));
+        }
+    }
 }
 
 struct Index {
@@ -594,6 +933,11 @@ fn build_index(gf: &Gf2, basis: &NormalBasis, solver: &S3Solver, reps: &[u64]) -
     let mut table = RootTable::with_capacity(states.len() * 2);
     for state in &states {
         for &root in &state.normal_roots {
+            let (canonical, shift) = basis.canonical(root);
+            table.insert_if_absent(
+                canonical,
+                pack(state.left, state.right, state.relative, shift),
+            );
             let (canonical, shift) = basis.canonical_selected(root);
             table.insert_if_absent(
                 canonical,
@@ -633,19 +977,31 @@ fn lift(
     base: &Base,
     codes: &[u64; 4],
     target: FastPoint,
+    scratch: &mut LiftScratch,
 ) -> Option<[usize; 4]> {
     let choices: Vec<&Vec<usize>> = codes
         .iter()
         .map(|code| base.by_x.get(code))
         .collect::<Option<_>>()?;
+    let b_points: Vec<FastPoint> = choices[1].iter().map(|&i| base.points[i]).collect();
+    let c_points: Vec<FastPoint> = choices[2].iter().map(|&i| base.points[i]).collect();
+    let d_points: Vec<FastPoint> = choices[3].iter().map(|&i| base.points[i]).collect();
+    // Batched affine adds level by level: for each fixed left point, the
+    // next level's adds against the choice points share one field
+    // inversion (Montgomery's trick). The iteration order and the first
+    // lifted match are exactly those of the per-candidate add loop this
+    // replaces.
     for &a in choices[0] {
-        for &b in choices[1] {
-            let ab = fast.add(base.points[a], base.points[b]);
-            for &c in choices[2] {
-                let abc = fast.add(ab, base.points[c]);
-                for &d in choices[3] {
-                    if fast.add(abc, base.points[d]) == target {
-                        return Some([a, b, c, d]);
+        scratch.batch_adds(fast, base.points[a], &b_points);
+        let abs = scratch.results.clone();
+        for (bi, &ab) in abs.iter().enumerate() {
+            scratch.batch_adds(fast, ab, &c_points);
+            let abcs = scratch.results.clone();
+            for (ci, &abc) in abcs.iter().enumerate() {
+                scratch.batch_adds(fast, abc, &d_points);
+                for (di, &result) in scratch.results.iter().enumerate() {
+                    if result == target {
+                        return Some([a, choices[1][bi], choices[2][ci], choices[3][di]]);
                     }
                 }
             }
@@ -670,16 +1026,34 @@ fn extract(
     // Callers provide a rotating, target-dependent origin so rank-stage rows
     // do not concentrate on the same early columns.
     let start = start % index.states.len().max(1);
+    let mut scan_inputs: Vec<(u64, u64)> = Vec::with_capacity(n as usize);
+    let mut scan = RootBatch::with_capacity(n as usize);
+    let mut lift_scratch = LiftScratch::default();
     for state in index.states[start..].iter().chain(&index.states[..start]) {
+        // Collect this state's (shift, root) candidate inputs and share one
+        // field inversion across them (Montgomery's trick); the candidate
+        // order and the published relation are exactly those of the
+        // per-candidate solver.roots loop this replaces.
+        scan_inputs.clear();
+        for shift in 0..n {
+            for &normal_root in &state.normal_roots {
+                let absolute = basis.to_poly.apply(basis.rotate(normal_root, shift));
+                scan_inputs.push((absolute, target_x));
+            }
+        }
+        scan.solve(gf, basis, solver, &scan_inputs);
+        let mut candidate = 0usize;
         for shift in 0..n {
             let left_x = index.shifted[state.left as usize][shift as usize];
             let right_x = index.shifted[state.right as usize]
                 [(shift as usize + state.relative as usize) % n as usize];
-            for &normal_root in &state.normal_roots {
-                let absolute = basis.to_poly.apply(basis.rotate(normal_root, shift));
-                let Some(partners) = solver.roots(gf, basis, absolute, target_x) else {
+            for _ in 0..state.normal_roots.len() {
+                let absolute = scan_inputs[candidate].0;
+                let Some(partners) = scan.results[candidate] else {
+                    candidate += 1;
                     continue;
                 };
+                candidate += 1;
                 for partner in partners {
                     probes += 1;
                     let (canonical, partner_shift) =
@@ -696,7 +1070,8 @@ fn extract(
                         index.shifted[left2][left_shift2],
                         index.shifted[right2][right_shift2],
                     ];
-                    if let Some(point_indices) = lift(fast, base, &codes, target) {
+                    if let Some(point_indices) = lift(fast, base, &codes, target, &mut lift_scratch)
+                    {
                         return Some(Relation {
                             point_indices,
                             x_codes: codes,
@@ -889,6 +1264,7 @@ mod wide {
     use std::time::Instant;
 
     /// F2-linear map on n ≤ 128 bits applied by byte tables.
+    #[derive(Clone)]
     struct Linear128 {
         tables: Vec<[u128; 256]>,
     }
@@ -918,6 +1294,7 @@ mod wide {
         }
     }
 
+    #[derive(Clone)]
     struct NormalBasis128 {
         n: u32,
         mask: u128,
@@ -1337,23 +1714,379 @@ mod wide {
         gf.sqr(c)
     }
 
-    /// Open-addressing `u128 -> u64` table; `u128::MAX` marks empty
-    /// (keys are `< 2^71`, so the marker is unreachable).
+    /// Store the canonical key and its witness in one `u128` slot when their
+    /// combined bit widths leave the top bit free for the empty marker.
+    /// The witness uses exact widths for the number of representatives and
+    /// Frobenius rotations; insertion order and the first witness are kept.
+    #[derive(Clone, Copy)]
+    struct PackedRootLayout {
+        rep_bits: u32,
+        rot_bits: u32,
+        value_bits: u32,
+        rep_mask: u128,
+        rot_mask: u128,
+        value_mask: u128,
+        key_mask: u128,
+    }
+
+    impl PackedRootLayout {
+        fn new(degree: u32, representatives: usize) -> Self {
+            assert!(degree > 0 && degree < 128);
+            assert!(representatives > 0 && representatives <= u16::MAX as usize + 1);
+            let rep_bits = usize::BITS - (representatives - 1).leading_zeros();
+            let rot_bits = u32::BITS - (degree - 1).leading_zeros();
+            let value_bits = 2 * (rep_bits + rot_bits);
+            assert!(
+                degree + value_bits <= 127,
+                "packed root slot needs a free marker bit"
+            );
+            Self {
+                rep_bits,
+                rot_bits,
+                value_bits,
+                rep_mask: (1u128 << rep_bits) - 1,
+                rot_mask: (1u128 << rot_bits) - 1,
+                value_mask: (1u128 << value_bits) - 1,
+                key_mask: (1u128 << degree) - 1,
+            }
+        }
+
+        #[inline(always)]
+        fn encode(self, key: u128, value: u64) -> u128 {
+            assert_eq!(key & !self.key_mask, 0, "root key exceeds field degree");
+            let (left, right, relative, shift) = unpack(value);
+            assert!((left as u128) <= self.rep_mask && (right as u128) <= self.rep_mask);
+            assert!((relative as u128) <= self.rot_mask && (shift as u128) <= self.rot_mask);
+            let witness = (left as u128)
+                | ((right as u128) << self.rep_bits)
+                | ((relative as u128) << (2 * self.rep_bits))
+                | ((shift as u128) << (2 * self.rep_bits + self.rot_bits));
+            (key << self.value_bits) | witness
+        }
+
+        #[inline(always)]
+        fn decode(self, slot: u128) -> (u128, u64) {
+            let witness = slot & self.value_mask;
+            let left = (witness & self.rep_mask) as u16;
+            let right = ((witness >> self.rep_bits) & self.rep_mask) as u16;
+            let relative = ((witness >> (2 * self.rep_bits)) & self.rot_mask) as u16;
+            let shift = ((witness >> (2 * self.rep_bits + self.rot_bits)) & self.rot_mask) as u32;
+            (slot >> self.value_bits, pack(left, right, relative, shift))
+        }
+    }
+
+    enum RootSlots128 {
+        Wide(Vec<(u128, u64)>),
+        Packed(Vec<u128>),
+        Indexed83(Vec<[u8; 5]>),
+        Indexed83Four(Vec<u32>),
+    }
+
+    /// Open-addressing root table. The five-byte mode stores a reference to
+    /// an exact root in the state array; its zero slot marks empty.
     struct RootTable128 {
-        slots: Vec<(u128, u64)>,
+        slots: RootSlots128,
         shift: u32,
         len: usize,
         bloom: Option<RootBloom>,
+        packed_layout: Option<PackedRootLayout>,
+        indexed83_id30: bool,
+        indexed83_id31: bool,
+        indexed83_four_id31: bool,
+        indexed83_four_relative_base: Option<usize>,
+        indexed83_four_fingerprint8: Option<Vec<u8>>,
     }
 
     impl RootTable128 {
-        fn with_capacity(entries: usize) -> Self {
-            let slots = (entries * 2).next_power_of_two().max(16);
+        #[allow(dead_code)]
+        fn with_capacity_indexed83(entries: usize) -> Self {
+            Self::with_capacity_indexed83_mode(entries, false)
+        }
+
+        fn with_capacity_indexed83_mode(entries: usize, indexed83_id30: bool) -> Self {
+            Self::with_capacity_indexed83_mode_bloom(entries, indexed83_id30, root_bloom_enabled())
+        }
+
+        fn with_capacity_indexed83_mode_bloom(
+            entries: usize,
+            indexed83_id30: bool,
+            bloom_enabled: bool,
+        ) -> Self {
+            Self::with_capacity_indexed83_mode_bloom_id31(
+                entries,
+                indexed83_id30,
+                false,
+                bloom_enabled,
+            )
+        }
+
+        fn with_capacity_indexed83_mode_bloom_id31(
+            entries: usize,
+            indexed83_id30: bool,
+            indexed83_id31: bool,
+            bloom_enabled: bool,
+        ) -> Self {
+            assert!(!(indexed83_id30 && indexed83_id31));
+            let slots = entries
+                .checked_mul(2)
+                .expect("indexed root table request exceeds usize")
+                .next_power_of_two()
+                .max(16);
             Self {
-                slots: vec![(u128::MAX, 0); slots],
+                slots: RootSlots128::Indexed83(crate::root_slot_vec(slots, [0u8; 5])),
+                shift: 128 - slots.trailing_zeros(),
+                len: 0,
+                bloom: bloom_enabled.then(|| RootBloom::with_capacity(entries)),
+                packed_layout: None,
+                indexed83_id30,
+                indexed83_id31,
+                indexed83_four_id31: false,
+                indexed83_four_relative_base: None,
+                indexed83_four_fingerprint8: None,
+            }
+        }
+
+        fn with_capacity_indexed83_four(entries: usize) -> Self {
+            Self::with_capacity_indexed83_four_mode(entries, false)
+        }
+
+        fn with_capacity_indexed83_four_mode(entries: usize, id31: bool) -> Self {
+            Self::with_capacity_indexed83_four_layout(entries, id31, None)
+        }
+
+        fn with_capacity_indexed83_four_relative(entries: usize, base: usize) -> Self {
+            Self::with_capacity_indexed83_four_layout(entries, false, Some(base))
+        }
+
+        fn with_capacity_indexed83_four_layout(
+            entries: usize,
+            id31: bool,
+            relative_base: Option<usize>,
+        ) -> Self {
+            let fingerprint8 = std::env::var("KIC_INDEXED4_FINGERPRINT8").as_deref() == Ok("1");
+            Self::with_capacity_indexed83_four_layout_fp8(
+                entries,
+                id31,
+                relative_base,
+                fingerprint8,
+            )
+        }
+
+        fn with_capacity_indexed83_four_layout_fp8(
+            entries: usize,
+            id31: bool,
+            relative_base: Option<usize>,
+            fingerprint8: bool,
+        ) -> Self {
+            assert!(!id31 || relative_base.is_none());
+            assert!(
+                !fingerprint8 || relative_base.is_some(),
+                "byte fingerprint sidecar requires relative four-byte slots"
+            );
+            let slots = entries
+                .checked_mul(2)
+                .expect("four-byte indexed root table request exceeds usize")
+                .next_power_of_two()
+                .max(16);
+            Self {
+                slots: RootSlots128::Indexed83Four(crate::root_slot_vec(slots, 0u32)),
                 shift: 128 - slots.trailing_zeros(),
                 len: 0,
                 bloom: root_bloom_enabled().then(|| RootBloom::with_capacity(entries)),
+                packed_layout: None,
+                indexed83_id30: false,
+                indexed83_id31: false,
+                indexed83_four_id31: id31,
+                indexed83_four_relative_base: relative_base,
+                indexed83_four_fingerprint8: fingerprint8.then(|| vec![0u8; slots]),
+            }
+        }
+
+        #[inline(always)]
+        fn indexed83_fingerprint(key: u128) -> u64 {
+            super::mix_root_bloom(key as u64 ^ (key >> 64) as u64) & 0x3ff
+        }
+
+        #[inline(always)]
+        fn indexed83_encode(state_index: usize, root_selector: usize, fingerprint: u64) -> [u8; 5] {
+            assert!(
+                state_index + 1 < 1 << 29,
+                "indexed root state id exceeds 29 bits"
+            );
+            assert!(root_selector < 2);
+            let word =
+                (fingerprint << 30) | (((state_index + 1) as u64) << 1) | root_selector as u64;
+            let bytes = word.to_le_bytes();
+            [bytes[0], bytes[1], bytes[2], bytes[3], bytes[4]]
+        }
+
+        #[inline(always)]
+        fn indexed83_decode(bytes: [u8; 5]) -> (usize, usize, u64) {
+            let word =
+                u64::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], 0, 0, 0]);
+            let token = word & ((1 << 30) - 1);
+            (
+                ((token >> 1) - 1) as usize,
+                (token & 1) as usize,
+                word >> 30,
+            )
+        }
+
+        #[inline(always)]
+        fn indexed83_id30_encode(
+            state_index: usize,
+            root_selector: usize,
+            fingerprint: u64,
+        ) -> [u8; 5] {
+            assert!(
+                state_index + 1 < 1 << 30,
+                "indexed root state id exceeds 30 bits"
+            );
+            assert!(root_selector < 2);
+            let word = ((fingerprint & 0x1ff) << 31)
+                | (((state_index + 1) as u64) << 1)
+                | root_selector as u64;
+            let bytes = word.to_le_bytes();
+            [bytes[0], bytes[1], bytes[2], bytes[3], bytes[4]]
+        }
+
+        #[inline(always)]
+        fn indexed83_id30_decode(bytes: [u8; 5]) -> (usize, usize, u64) {
+            let word =
+                u64::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], 0, 0, 0]);
+            let token = word & ((1 << 31) - 1);
+            (
+                ((token >> 1) - 1) as usize,
+                (token & 1) as usize,
+                word >> 31,
+            )
+        }
+
+        #[inline(always)]
+        fn indexed83_id31_encode(
+            state_index: usize,
+            root_selector: usize,
+            fingerprint: u64,
+        ) -> [u8; 5] {
+            assert!(
+                state_index + 1 < 1 << 31,
+                "indexed root state id exceeds 31 bits"
+            );
+            assert!(root_selector < 2);
+            let word = ((fingerprint & 0xff) << 32)
+                | (((state_index + 1) as u64) << 1)
+                | root_selector as u64;
+            let bytes = word.to_le_bytes();
+            [bytes[0], bytes[1], bytes[2], bytes[3], bytes[4]]
+        }
+
+        #[inline(always)]
+        fn indexed83_id31_decode(bytes: [u8; 5]) -> (usize, usize, u64) {
+            let word =
+                u64::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], 0, 0, 0]);
+            let token = word & ((1 << 32) - 1);
+            (
+                ((token >> 1) - 1) as usize,
+                (token & 1) as usize,
+                word >> 32,
+            )
+        }
+
+        #[inline(always)]
+        fn indexed83_four_encode(
+            state_index: usize,
+            root_selector: usize,
+            fingerprint: u64,
+        ) -> u32 {
+            assert!(
+                state_index + 1 < 1 << 29,
+                "four-byte root state id exceeds 29 bits"
+            );
+            assert!(root_selector < 2);
+            (((fingerprint & 3) as u32) << 30)
+                | (((state_index + 1) as u32) << 1)
+                | root_selector as u32
+        }
+
+        #[inline(always)]
+        fn indexed83_four_decode(word: u32) -> (usize, usize, u64) {
+            let token = word & ((1 << 30) - 1);
+            (
+                ((token >> 1) - 1) as usize,
+                (token & 1) as usize,
+                (word >> 30) as u64,
+            )
+        }
+
+        #[inline(always)]
+        fn indexed83_four_id31_encode(state_index: usize, root_selector: usize) -> u32 {
+            assert!(
+                state_index + 1 < 1 << 31,
+                "four-byte root state id exceeds 31 bits"
+            );
+            assert!(root_selector < 2);
+            (((state_index + 1) as u32) << 1) | root_selector as u32
+        }
+
+        #[inline(always)]
+        fn indexed83_four_id31_decode(word: u32) -> (usize, usize, u64) {
+            assert_ne!(word, 0, "empty four-byte root slot has no witness");
+            (((word >> 1) - 1) as usize, (word & 1) as usize, 0)
+        }
+
+        #[inline(always)]
+        fn indexed83_four_relative_encode(
+            state_index: usize,
+            root_selector: usize,
+            fingerprint: u64,
+            base: usize,
+        ) -> u32 {
+            let relative = state_index
+                .checked_sub(base)
+                .expect("four-byte relative state precedes split");
+            assert!(
+                relative + 1 < 1 << 30,
+                "four-byte relative state exceeds 30 bits"
+            );
+            assert!(root_selector < 2);
+            (((relative + 1) as u32) << 2)
+                | ((root_selector as u32) << 1)
+                | (fingerprint as u32 & 1)
+        }
+
+        #[inline(always)]
+        fn indexed83_four_relative_decode(word: u32, base: usize) -> (usize, usize, u64) {
+            assert_ne!(word, 0, "empty four-byte root slot has no witness");
+            (
+                base + ((word >> 2) - 1) as usize,
+                ((word >> 1) & 1) as usize,
+                (word & 1) as u64,
+            )
+        }
+
+        fn with_capacity(
+            entries: usize,
+            degree: u32,
+            representatives: usize,
+            packed: bool,
+        ) -> Self {
+            let slots = (entries * 2).next_power_of_two().max(16);
+            let packed_layout = packed.then(|| PackedRootLayout::new(degree, representatives));
+            Self {
+                slots: if packed {
+                    RootSlots128::Packed(crate::root_slot_vec(slots, u128::MAX))
+                } else {
+                    RootSlots128::Wide(crate::root_slot_vec(slots, (u128::MAX, 0)))
+                },
+                shift: 128 - slots.trailing_zeros(),
+                len: 0,
+                bloom: root_bloom_enabled().then(|| RootBloom::with_capacity(entries)),
+                packed_layout,
+                indexed83_id30: false,
+                indexed83_id31: false,
+                indexed83_four_id31: false,
+                indexed83_four_relative_base: None,
+                indexed83_four_fingerprint8: None,
             }
         }
 
@@ -1362,22 +2095,292 @@ mod wide {
             (key.wrapping_mul(0x9E37_79B9_7F4A_7C15_9E37_79B9_7F4A_7C15) >> self.shift) as usize
         }
 
-        fn insert_if_absent(&mut self, key: u128, value: u64) {
-            let mask = self.slots.len() - 1;
+        fn layout_receipt(&self) -> (&'static str, usize, usize) {
+            match &self.slots {
+                RootSlots128::Wide(slots) => (
+                    "wide_u128_u64",
+                    std::mem::size_of::<(u128, u64)>(),
+                    slots.len() * std::mem::size_of::<(u128, u64)>(),
+                ),
+                RootSlots128::Packed(slots) => (
+                    "packed_u128",
+                    std::mem::size_of::<u128>(),
+                    slots.len() * std::mem::size_of::<u128>(),
+                ),
+                RootSlots128::Indexed83(slots) => (
+                    if self.indexed83_id31 {
+                        "indexed83_5byte_exact_id31"
+                    } else if self.indexed83_id30 {
+                        "indexed83_5byte_exact_id30"
+                    } else {
+                        "indexed83_5byte_exact"
+                    },
+                    std::mem::size_of::<[u8; 5]>(),
+                    slots.len() * std::mem::size_of::<[u8; 5]>(),
+                ),
+                RootSlots128::Indexed83Four(slots) => (
+                    if self.indexed83_four_relative_base.is_some() {
+                        "indexed83_4byte_split_id30"
+                    } else if self.indexed83_four_id31 {
+                        "indexed83_4byte_exact_id31"
+                    } else {
+                        "indexed83_4byte_exact"
+                    },
+                    std::mem::size_of::<u32>(),
+                    slots.len() * std::mem::size_of::<u32>(),
+                ),
+            }
+        }
+
+        fn fingerprint_sidecar_bytes(&self) -> usize {
+            self.indexed83_four_fingerprint8
+                .as_ref()
+                .map_or(0, Vec::len)
+        }
+
+        fn insert_indexed83<F>(
+            &mut self,
+            key: u128,
+            state_index: usize,
+            root_selector: usize,
+            key_of: F,
+        ) where
+            F: Fn(usize, usize) -> u128,
+        {
+            let fingerprint = Self::indexed83_fingerprint(key);
+            if matches!(&self.slots, RootSlots128::Indexed83Four(_)) {
+                let id31 = self.indexed83_four_id31;
+                let relative_base = self.indexed83_four_relative_base;
+                let mask = match &self.slots {
+                    RootSlots128::Indexed83Four(slots) => slots.len() - 1,
+                    _ => unreachable!(),
+                };
+                let mut slot = self.slot(key);
+                let RootSlots128::Indexed83Four(slots) = &mut self.slots else {
+                    unreachable!();
+                };
+                let fingerprints = &mut self.indexed83_four_fingerprint8;
+                loop {
+                    let existing = slots[slot];
+                    if existing == 0 {
+                        slots[slot] = if let Some(base) = relative_base {
+                            Self::indexed83_four_relative_encode(
+                                state_index,
+                                root_selector,
+                                fingerprint,
+                                base,
+                            )
+                        } else if id31 {
+                            Self::indexed83_four_id31_encode(state_index, root_selector)
+                        } else {
+                            Self::indexed83_four_encode(state_index, root_selector, fingerprint)
+                        };
+                        if let Some(bytes) = fingerprints.as_mut() {
+                            bytes[slot] = fingerprint as u8;
+                        }
+                        self.len += 1;
+                        assert!(
+                            self.len < slots.len(),
+                            "four-byte root table capacity exhausted"
+                        );
+                        if let Some(bloom) = &mut self.bloom {
+                            bloom.insert(key);
+                        }
+                        return;
+                    }
+                    let (old_state, old_root, old_fingerprint) = if let Some(base) = relative_base {
+                        Self::indexed83_four_relative_decode(existing, base)
+                    } else if id31 {
+                        Self::indexed83_four_id31_decode(existing)
+                    } else {
+                        Self::indexed83_four_decode(existing)
+                    };
+                    if fingerprints
+                        .as_ref()
+                        .is_none_or(|bytes| bytes[slot] == fingerprint as u8)
+                        && (id31
+                            || old_fingerprint
+                                == (fingerprint & if relative_base.is_some() { 1 } else { 3 }))
+                        && key_of(old_state, old_root) == key
+                    {
+                        return;
+                    }
+                    slot = (slot + 1) & mask;
+                }
+            }
+            let id30 = self.indexed83_id30;
+            let id31 = self.indexed83_id31;
+            let fingerprint = fingerprint
+                & if id31 {
+                    0xff
+                } else if id30 {
+                    0x1ff
+                } else {
+                    0x3ff
+                };
+            let mask = match &self.slots {
+                RootSlots128::Indexed83(slots) => slots.len() - 1,
+                _ => unreachable!("indexed insertion needs five-byte slots"),
+            };
             let mut slot = self.slot(key);
+            let RootSlots128::Indexed83(slots) = &mut self.slots else {
+                unreachable!();
+            };
             loop {
-                if self.slots[slot].0 == u128::MAX {
-                    self.slots[slot] = (key, value);
+                let existing = slots[slot];
+                if existing == [0; 5] {
+                    slots[slot] = if id31 {
+                        Self::indexed83_id31_encode(state_index, root_selector, fingerprint)
+                    } else if id30 {
+                        Self::indexed83_id30_encode(state_index, root_selector, fingerprint)
+                    } else {
+                        Self::indexed83_encode(state_index, root_selector, fingerprint)
+                    };
                     self.len += 1;
+                    assert!(
+                        self.len < slots.len(),
+                        "indexed root table capacity exhausted"
+                    );
                     if let Some(bloom) = &mut self.bloom {
                         bloom.insert(key);
                     }
                     return;
                 }
-                if self.slots[slot].0 == key {
+                let (old_state, old_root, old_fingerprint) = if id31 {
+                    Self::indexed83_id31_decode(existing)
+                } else if id30 {
+                    Self::indexed83_id30_decode(existing)
+                } else {
+                    Self::indexed83_decode(existing)
+                };
+                if old_fingerprint == fingerprint && key_of(old_state, old_root) == key {
                     return;
                 }
                 slot = (slot + 1) & mask;
+            }
+        }
+
+        #[inline(always)]
+        fn get_indexed83<F>(&self, key: u128, key_of: F) -> Option<(usize, usize)>
+        where
+            F: Fn(usize, usize) -> u128,
+        {
+            if self
+                .bloom
+                .as_ref()
+                .is_some_and(|bloom| !bloom.contains(key))
+            {
+                return None;
+            }
+            if let RootSlots128::Indexed83Four(slots) = &self.slots {
+                let id31 = self.indexed83_four_id31;
+                let relative_base = self.indexed83_four_relative_base;
+                let mask = slots.len() - 1;
+                let fingerprint = Self::indexed83_fingerprint(key);
+                let mut slot = self.slot(key);
+                loop {
+                    let existing = slots[slot];
+                    if existing == 0 {
+                        return None;
+                    }
+                    let (state_index, root_selector, old_fingerprint) =
+                        if let Some(base) = relative_base {
+                            Self::indexed83_four_relative_decode(existing, base)
+                        } else if id31 {
+                            Self::indexed83_four_id31_decode(existing)
+                        } else {
+                            Self::indexed83_four_decode(existing)
+                        };
+                    if self
+                        .indexed83_four_fingerprint8
+                        .as_ref()
+                        .is_none_or(|bytes| bytes[slot] == fingerprint as u8)
+                        && (id31
+                            || old_fingerprint
+                                == (fingerprint & if relative_base.is_some() { 1 } else { 3 }))
+                        && key_of(state_index, root_selector) == key
+                    {
+                        return Some((state_index, root_selector));
+                    }
+                    slot = (slot + 1) & mask;
+                }
+            }
+            let RootSlots128::Indexed83(slots) = &self.slots else {
+                unreachable!("indexed lookup needs five-byte slots");
+            };
+            let mask = slots.len() - 1;
+            let id30 = self.indexed83_id30;
+            let id31 = self.indexed83_id31;
+            let fingerprint = Self::indexed83_fingerprint(key)
+                & if id31 {
+                    0xff
+                } else if id30 {
+                    0x1ff
+                } else {
+                    0x3ff
+                };
+            let mut slot = self.slot(key);
+            loop {
+                let existing = slots[slot];
+                if existing == [0; 5] {
+                    return None;
+                }
+                let (state_index, root_selector, old_fingerprint) = if id31 {
+                    Self::indexed83_id31_decode(existing)
+                } else if id30 {
+                    Self::indexed83_id30_decode(existing)
+                } else {
+                    Self::indexed83_decode(existing)
+                };
+                if old_fingerprint == fingerprint && key_of(state_index, root_selector) == key {
+                    return Some((state_index, root_selector));
+                }
+                slot = (slot + 1) & mask;
+            }
+        }
+
+        fn insert_if_absent(&mut self, key: u128, value: u64) {
+            let mask = match &self.slots {
+                RootSlots128::Wide(slots) => slots.len() - 1,
+                RootSlots128::Packed(slots) => slots.len() - 1,
+                RootSlots128::Indexed83(_) | RootSlots128::Indexed83Four(_) => {
+                    unreachable!("use indexed insertion")
+                }
+            };
+            let mut slot = self.slot(key);
+            let inserted = match &mut self.slots {
+                RootSlots128::Wide(slots) => loop {
+                    if slots[slot].0 == u128::MAX {
+                        slots[slot] = (key, value);
+                        break true;
+                    }
+                    if slots[slot].0 == key {
+                        break false;
+                    }
+                    slot = (slot + 1) & mask;
+                },
+                RootSlots128::Packed(slots) => {
+                    let layout = self.packed_layout.expect("packed slots need layout");
+                    loop {
+                        if slots[slot] == u128::MAX {
+                            slots[slot] = layout.encode(key, value);
+                            break true;
+                        }
+                        if (slots[slot] >> layout.value_bits) == key {
+                            break false;
+                        }
+                        slot = (slot + 1) & mask;
+                    }
+                }
+                RootSlots128::Indexed83(_) | RootSlots128::Indexed83Four(_) => {
+                    unreachable!("use indexed insertion")
+                }
+            };
+            if inserted {
+                self.len += 1;
+                if let Some(bloom) = &mut self.bloom {
+                    bloom.insert(key);
+                }
             }
         }
 
@@ -1390,31 +2393,1132 @@ mod wide {
             {
                 return None;
             }
-            let mask = self.slots.len() - 1;
+            let mask = match &self.slots {
+                RootSlots128::Wide(slots) => slots.len() - 1,
+                RootSlots128::Packed(slots) => slots.len() - 1,
+                RootSlots128::Indexed83(_) | RootSlots128::Indexed83Four(_) => {
+                    unreachable!("use contextual indexed lookup")
+                }
+            };
             let mut slot = self.slot(key);
-            loop {
-                let (stored, value) = self.slots[slot];
-                if stored == key {
-                    return Some(value);
+            match &self.slots {
+                RootSlots128::Wide(slots) => loop {
+                    let (stored, value) = slots[slot];
+                    if stored == key {
+                        return Some(value);
+                    }
+                    if stored == u128::MAX {
+                        return None;
+                    }
+                    slot = (slot + 1) & mask;
+                },
+                RootSlots128::Packed(slots) => {
+                    let layout = self.packed_layout.expect("packed slots need layout");
+                    loop {
+                        let stored = slots[slot];
+                        if stored == u128::MAX {
+                            return None;
+                        }
+                        if (stored >> layout.value_bits) == key {
+                            return Some(layout.decode(stored).1);
+                        }
+                        slot = (slot + 1) & mask;
+                    }
                 }
-                if stored == u128::MAX {
-                    return None;
+                RootSlots128::Indexed83(_) | RootSlots128::Indexed83Four(_) => {
+                    unreachable!("use contextual indexed lookup")
                 }
-                slot = (slot + 1) & mask;
             }
+        }
+
+        #[inline(always)]
+        fn get_with_context(
+            &self,
+            key: u128,
+            states: &StateStore128,
+            basis: &NormalBasis128,
+        ) -> Option<u64> {
+            if !matches!(
+                &self.slots,
+                RootSlots128::Indexed83(_) | RootSlots128::Indexed83Four(_)
+            ) {
+                return self.get(key);
+            }
+            let (state_index, root_selector) = self.get_indexed83(key, |index, selector| {
+                basis.canonical_selected(states.root_at(index, selector)).0
+            })?;
+            let state = states.get(state_index);
+            let (verified_key, shift) = basis.canonical_selected(state.normal_roots[root_selector]);
+            debug_assert_eq!(verified_key, key);
+            Some(pack(state.left, state.right, state.relative, shift))
         }
     }
 
     #[cfg(test)]
     mod root_bloom_table_tests {
-        use super::{RootBloom, RootTable128};
-        use crate::mix_root_bloom;
+        use super::{
+            build_index128_with_symmetry, indexed5_load80_request, pack, root_from_tables,
+            symmetric_labels_for_ordinal, symmetric_state_prefix, Gf2_128, NormalBasis128,
+            PackedRootLayout, RootBloom, RootOnly11, RootOnly21, RootOnly83, RootSlots128,
+            RootTable128, S3Solver128, State128, State26, State83, StateStore128,
+        };
+        use crate::{mix_root_bloom, RootBloomProfile};
+        use crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse_wide;
+
+        #[test]
+        fn indexed_five_byte_slots_match_real_n83_s3_roots() {
+            let polynomial = find_irreducible_sparse_wide(83).unwrap();
+            assert_eq!(polynomial.low_terms, [0, 2, 4, 7]);
+            let gf = Gf2_128::new(&polynomial);
+            let basis = NormalBasis128::new(&gf);
+            let solver = S3Solver128::new(&gf, 1);
+            // Exact x coordinates of the first six archived K512 base representatives.
+            let reps = [
+                8342699431223747237330307u128,
+                1922428771273471083037496,
+                8050843414474538827389079,
+                3206891573540907568398899,
+                2445342385696756367155238,
+                5959927424489161220022208,
+            ];
+            let shifted: Vec<Vec<u128>> = reps
+                .iter()
+                .map(|&x| {
+                    let mut orbit = Vec::with_capacity(83);
+                    let mut current = x;
+                    for _ in 0..83 {
+                        orbit.push(current);
+                        current = gf.sqr(current);
+                    }
+                    orbit
+                })
+                .collect();
+            let mut packed_states = Vec::new();
+            for left in 0..reps.len() {
+                for right in 0..reps.len() {
+                    for relative in 0..83usize {
+                        if let Some(roots) =
+                            solver.roots(&gf, &basis, shifted[left][0], shifted[right][relative])
+                        {
+                            packed_states.push(State83::from_wide(State128 {
+                                left: left as u16,
+                                right: right as u16,
+                                relative: relative as u16,
+                                normal_roots: [
+                                    basis.to_normal.apply(roots[0]),
+                                    basis.to_normal.apply(roots[1]),
+                                ],
+                            }));
+                        }
+                    }
+                }
+            }
+            let states = StateStore128::Packed83(packed_states);
+            let states26 = StateStore128::Packed26(
+                (0..states.len())
+                    .map(|index| State26::from_wide(states.get(index)))
+                    .collect(),
+            );
+            assert!(states.len() > 100);
+            let mut packed = RootTable128::with_capacity(states.len() * 2, 83, reps.len(), true);
+            let mut indexed = RootTable128::with_capacity_indexed83(states.len() * 2);
+            let mut indexed4_id31 =
+                RootTable128::with_capacity_indexed83_four_mode(states.len() * 2, true);
+            let split_at = states.len() / 2;
+            let mut split_primary =
+                RootTable128::with_capacity_indexed83_four_relative(states.len(), 0);
+            let mut split_overflow =
+                RootTable128::with_capacity_indexed83_four_relative(states.len(), split_at);
+            let mut indexed_bloom = RootTable128::with_capacity_indexed83(states.len() * 2);
+            let mut indexed26 = RootTable128::with_capacity_indexed83(states.len() * 2);
+            packed.bloom = None;
+            indexed.bloom = None;
+            indexed4_id31.bloom = None;
+            split_primary.bloom = None;
+            split_overflow.bloom = None;
+            indexed_bloom.bloom = Some(RootBloom::with_capacity(states.len() * 2));
+            indexed26.bloom = None;
+            let mut inserted_keys = Vec::new();
+            for index in 0..states.len() {
+                let state = states.get(index);
+                for (selector, &root) in state.normal_roots.iter().enumerate() {
+                    let (key, shift) = basis.canonical_selected(root);
+                    inserted_keys.push(key);
+                    packed.insert_if_absent(
+                        key,
+                        super::pack(state.left, state.right, state.relative, shift),
+                    );
+                    indexed.insert_indexed83(key, index, selector, |state_index, root_selector| {
+                        basis
+                            .canonical_selected(states.root_at(state_index, root_selector))
+                            .0
+                    });
+                    indexed4_id31.insert_indexed83(
+                        key,
+                        index,
+                        selector,
+                        |state_index, root_selector| {
+                            basis
+                                .canonical_selected(states.root_at(state_index, root_selector))
+                                .0
+                        },
+                    );
+                    let split_table = if index < split_at {
+                        &mut split_primary
+                    } else {
+                        &mut split_overflow
+                    };
+                    split_table.insert_indexed83(
+                        key,
+                        index,
+                        selector,
+                        |state_index, root_selector| {
+                            basis
+                                .canonical_selected(states.root_at(state_index, root_selector))
+                                .0
+                        },
+                    );
+                    indexed_bloom.insert_indexed83(
+                        key,
+                        index,
+                        selector,
+                        |state_index, root_selector| {
+                            basis
+                                .canonical_selected(states.root_at(state_index, root_selector))
+                                .0
+                        },
+                    );
+                    indexed26.insert_indexed83(
+                        key,
+                        index,
+                        selector,
+                        |state_index, root_selector| {
+                            basis
+                                .canonical_selected(states26.root_at(state_index, root_selector))
+                                .0
+                        },
+                    );
+                }
+            }
+            assert_eq!(indexed.len, packed.len);
+            assert_eq!(indexed4_id31.len, packed.len);
+            assert_eq!(indexed_bloom.len, packed.len);
+            assert_eq!(indexed26.len, packed.len);
+            for key in inserted_keys {
+                assert_eq!(
+                    indexed.get_with_context(key, &states, &basis),
+                    packed.get(key)
+                );
+                assert_eq!(
+                    indexed4_id31.get_with_context(key, &states, &basis),
+                    packed.get(key)
+                );
+                assert_eq!(
+                    root_from_tables(
+                        &split_primary,
+                        Some(&split_overflow),
+                        None,
+                        &states,
+                        &basis,
+                        key,
+                    ),
+                    packed.get(key)
+                );
+                assert_eq!(
+                    indexed_bloom.get_with_context(key, &states, &basis),
+                    packed.get(key)
+                );
+                assert_eq!(
+                    indexed26.get_with_context(key, &states26, &basis),
+                    packed.get(key)
+                );
+            }
+            for probe in 1..2048u128 {
+                let key = basis
+                    .canonical_selected(probe.wrapping_mul(0x2545_F491_4F6C_DD1D) & basis.mask)
+                    .0;
+                assert_eq!(
+                    indexed.get_with_context(key, &states, &basis),
+                    packed.get(key)
+                );
+                assert_eq!(
+                    indexed4_id31.get_with_context(key, &states, &basis),
+                    packed.get(key)
+                );
+                assert_eq!(
+                    root_from_tables(
+                        &split_primary,
+                        Some(&split_overflow),
+                        None,
+                        &states,
+                        &basis,
+                        key,
+                    ),
+                    packed.get(key)
+                );
+                assert_eq!(
+                    indexed_bloom.get_with_context(key, &states, &basis),
+                    packed.get(key)
+                );
+                assert_eq!(
+                    indexed26.get_with_context(key, &states26, &basis),
+                    packed.get(key)
+                );
+            }
+        }
+
+        #[test]
+        fn symmetric_s3_states_preserve_exact_root_keys_and_first_witness() {
+            let gf = Gf2_128::new(&find_irreducible_sparse_wide(83).unwrap());
+            let basis = NormalBasis128::new(&gf);
+            let solver = S3Solver128::new(&gf, 1);
+            let reps = [
+                8342699431223747237330307u128,
+                1922428771273471083037496,
+                8050843414474538827389079,
+                3206891573540907568398899,
+                2445342385696756367155238,
+                5959927424489161220022208,
+            ];
+            let full = build_index128_with_symmetry(
+                &gf, &basis, &solver, &reps, false, false, false, false,
+            );
+            let quotient = build_index128_with_symmetry(
+                &gf, &basis, &solver, &reps, true, false, false, false,
+            );
+            let batched =
+                build_index128_with_symmetry(&gf, &basis, &solver, &reps, true, false, false, true);
+            assert_eq!(batched.states.len(), quotient.states.len());
+            assert_eq!(batched.table.len, quotient.table.len);
+            for index in 0..quotient.states.len() {
+                let scalar = quotient.states.get(index);
+                let batch = batched.states.get(index);
+                assert_eq!(
+                    (batch.left, batch.right, batch.relative),
+                    (scalar.left, scalar.right, scalar.relative)
+                );
+                assert_eq!(batch.normal_roots, scalar.normal_roots);
+                for root in scalar.normal_roots {
+                    let key = basis.canonical_selected(root).0;
+                    assert_eq!(
+                        batched.table.get_with_context(key, &batched.states, &basis),
+                        quotient
+                            .table
+                            .get_with_context(key, &quotient.states, &basis),
+                        "batched index changed the first witness for key {key}",
+                    );
+                }
+            }
+            assert!(quotient.states.len() < full.states.len());
+            assert_eq!(quotient.table.len, full.table.len);
+            assert_eq!(
+                quotient.states.len(),
+                symmetric_state_prefix(reps.len(), reps.len())
+            );
+            assert_eq!(std::mem::size_of::<RootOnly83>(), 22);
+            assert_eq!(std::mem::size_of::<RootOnly21>(), 21);
+            let root_only = StateStore128::RootOnly83 {
+                states: (0..quotient.states.len())
+                    .map(|index| RootOnly83::from_wide(quotient.states.get(index)))
+                    .collect(),
+                k: reps.len(),
+            };
+            let root_only21 = StateStore128::RootOnly21 {
+                states: (0..quotient.states.len())
+                    .map(|index| RootOnly21::from_wide(quotient.states.get(index)))
+                    .collect(),
+                k: reps.len(),
+            };
+            assert_eq!(std::mem::size_of::<RootOnly11>(), 11);
+            let shifted: Vec<Vec<u128>> = reps
+                .iter()
+                .map(|&code| (0..gf.n).map(|relative| gf.sqr_k(code, relative)).collect())
+                .collect();
+            let root_only11 = StateStore128::RootOnly11 {
+                states: (0..quotient.states.len())
+                    .map(|index| RootOnly11::from_wide(quotient.states.get(index)))
+                    .collect(),
+                k: reps.len(),
+                shifted,
+                gf: Box::new(gf.clone()),
+                basis: Box::new(basis.clone()),
+            };
+            // Partition the same real S3 roots at K=3, then compare the
+            // exact union and its core-first witness rule against a map.
+            let mut core_table =
+                RootTable128::with_capacity_indexed83_mode(quotient.states.len() * 2, true);
+            let mut extension_table =
+                RootTable128::with_capacity_indexed83_mode(quotient.states.len() * 2, true);
+            let mut expected_roots = std::collections::HashMap::new();
+            for extension in [false, true] {
+                let table = if extension {
+                    &mut extension_table
+                } else {
+                    &mut core_table
+                };
+                for state_index in 0..quotient.states.len() {
+                    let state = quotient.states.get(state_index);
+                    if (state.left >= 3 || state.right >= 3) != extension {
+                        continue;
+                    }
+                    for (selector, root) in state.normal_roots.into_iter().enumerate() {
+                        let (key, shift) = basis.canonical_selected(root);
+                        table.insert_indexed83(key, state_index, selector, |index, which| {
+                            basis
+                                .canonical_selected(root_only11.root_at(index, which))
+                                .0
+                        });
+                        expected_roots.entry(key).or_insert_with(|| {
+                            pack(state.left, state.right, state.relative, shift)
+                        });
+                    }
+                }
+            }
+            assert!(core_table.len > 0 && extension_table.len > 0);
+            for (&key, &value) in &expected_roots {
+                assert_eq!(
+                    root_from_tables(
+                        &core_table,
+                        Some(&extension_table),
+                        None,
+                        &root_only11,
+                        &basis,
+                        key,
+                    ),
+                    Some(value),
+                    "split index changed the core-first witness for {key}"
+                );
+            }
+            for probe in 1..2048u128 {
+                assert_eq!(
+                    root_from_tables(
+                        &core_table,
+                        Some(&extension_table),
+                        None,
+                        &root_only11,
+                        &basis,
+                        probe,
+                    ),
+                    expected_roots.get(&probe).copied(),
+                );
+            }
+            let mut shared_bloom =
+                RootBloom::with_profile(expected_roots.len(), RootBloomProfile::Wide3);
+            for &key in expected_roots.keys() {
+                shared_bloom.insert(key);
+            }
+            core_table.bloom = None;
+            extension_table.bloom = None;
+            for (&key, &value) in &expected_roots {
+                assert_eq!(
+                    root_from_tables(
+                        &core_table,
+                        Some(&extension_table),
+                        Some(&shared_bloom),
+                        &root_only11,
+                        &basis,
+                        key,
+                    ),
+                    Some(value),
+                );
+            }
+            for probe in 1..2048u128 {
+                assert_eq!(
+                    root_from_tables(
+                        &core_table,
+                        Some(&extension_table),
+                        Some(&shared_bloom),
+                        &root_only11,
+                        &basis,
+                        probe,
+                    ),
+                    expected_roots.get(&probe).copied(),
+                );
+            }
+            for index in 0..quotient.states.len() {
+                let expected = quotient.states.get(index);
+                let (left, right, relative) = symmetric_labels_for_ordinal(reps.len(), index);
+                assert_eq!(
+                    (left, right, relative),
+                    (expected.left, expected.right, expected.relative)
+                );
+                let x = reps[left as usize];
+                let y = gf.sqr_k(reps[right as usize], relative as u32);
+                let denominator = gf.sqr(x ^ y);
+                let root_sum = if denominator == 0 {
+                    0
+                } else {
+                    gf.mul(gf.mul(x, y), gf.inv(denominator))
+                };
+                assert_eq!(
+                    expected.normal_roots[0] ^ basis.to_normal.apply(root_sum),
+                    expected.normal_roots[1],
+                    "one-root S3 reconstruction differs at state {index}"
+                );
+                let actual = root_only.get(index);
+                assert_eq!(
+                    (actual.left, actual.right, actual.relative),
+                    (expected.left, expected.right, expected.relative)
+                );
+                assert_eq!(actual.normal_roots, expected.normal_roots);
+                assert_eq!(root_only21.get(index).normal_roots, expected.normal_roots);
+                assert_eq!(root_only21.get(index).left, expected.left);
+                assert_eq!(root_only21.get(index).right, expected.right);
+                assert_eq!(root_only21.get(index).relative, expected.relative);
+                assert_eq!(root_only11.get(index).normal_roots, expected.normal_roots);
+                assert_eq!(root_only11.get(index).left, expected.left);
+                assert_eq!(root_only11.get(index).right, expected.right);
+                assert_eq!(root_only11.get(index).relative, expected.relative);
+            }
+            let mut full_indexed = RootTable128::with_capacity_indexed83(full.states.len() * 2);
+            let mut quotient_indexed =
+                RootTable128::with_capacity_indexed83(quotient.states.len() * 2);
+            let mut dense_quotient_indexed =
+                RootTable128::with_capacity_indexed83((quotient.states.len() * 4 + 2) / 3);
+            let mut single_root_indexed =
+                RootTable128::with_capacity_indexed83(quotient.states.len() * 2);
+            let mut single_root_four =
+                RootTable128::with_capacity_indexed83_four(quotient.states.len() * 2);
+            let mut two_root_four =
+                RootTable128::with_capacity_indexed83_four(quotient.states.len() * 2);
+            for (states, table) in [
+                (&full.states, &mut full_indexed),
+                (&quotient.states, &mut quotient_indexed),
+            ] {
+                for index in 0..states.len() {
+                    let state = states.get(index);
+                    for (selector, root) in state.normal_roots.into_iter().enumerate() {
+                        let key = basis.canonical_selected(root).0;
+                        table.insert_indexed83(
+                            key,
+                            index,
+                            selector,
+                            |state_index, root_selector| {
+                                basis
+                                    .canonical_selected(states.root_at(state_index, root_selector))
+                                    .0
+                            },
+                        );
+                    }
+                }
+            }
+            assert_eq!(quotient_indexed.len, full_indexed.len);
+            for index in 0..quotient.states.len() {
+                let state = quotient.states.get(index);
+                for (selector, root) in state.normal_roots.into_iter().enumerate() {
+                    let key = basis.canonical_selected(root).0;
+                    dense_quotient_indexed.insert_indexed83(
+                        key,
+                        index,
+                        selector,
+                        |state_index, root_selector| {
+                            basis
+                                .canonical_selected(
+                                    quotient.states.root_at(state_index, root_selector),
+                                )
+                                .0
+                        },
+                    );
+                }
+            }
+            assert_eq!(dense_quotient_indexed.len, quotient_indexed.len);
+            for index in 0..quotient.states.len() {
+                let state = quotient.states.get(index);
+                for (selector, root) in state.normal_roots.into_iter().enumerate() {
+                    let key = basis.canonical_selected(root).0;
+                    single_root_indexed.insert_indexed83(
+                        key,
+                        index,
+                        selector,
+                        |prior_index, prior_selector| {
+                            basis
+                                .canonical_selected(
+                                    root_only11.root_at(prior_index, prior_selector),
+                                )
+                                .0
+                        },
+                    );
+                    single_root_four.insert_indexed83(
+                        key,
+                        index,
+                        selector,
+                        |prior_index, prior_selector| {
+                            basis
+                                .canonical_selected(
+                                    root_only11.root_at(prior_index, prior_selector),
+                                )
+                                .0
+                        },
+                    );
+                    two_root_four.insert_indexed83(
+                        key,
+                        index,
+                        selector,
+                        |prior_index, prior_selector| {
+                            basis
+                                .canonical_selected(
+                                    root_only21.root_at(prior_index, prior_selector),
+                                )
+                                .0
+                        },
+                    );
+                }
+            }
+            assert_eq!(single_root_indexed.len, quotient_indexed.len);
+            assert_eq!(single_root_four.len, quotient_indexed.len);
+            assert_eq!(two_root_four.len, quotient_indexed.len);
+            assert!(
+                dense_quotient_indexed.layout_receipt().2 < quotient_indexed.layout_receipt().2
+            );
+            for index in 0..full.states.len() {
+                let state = full.states.get(index);
+                for root in state.normal_roots {
+                    let key = basis.canonical_selected(root).0;
+                    assert_eq!(
+                        quotient
+                            .table
+                            .get_with_context(key, &quotient.states, &basis),
+                        full.table.get_with_context(key, &full.states, &basis),
+                        "first witness differs for key {key}",
+                    );
+                    assert_eq!(
+                        dense_quotient_indexed.get_with_context(key, &quotient.states, &basis),
+                        quotient_indexed.get_with_context(key, &quotient.states, &basis),
+                        "dense five-byte first witness differs for key {key}",
+                    );
+                    assert_eq!(
+                        quotient_indexed.get_with_context(key, &quotient.states, &basis),
+                        full_indexed.get_with_context(key, &full.states, &basis),
+                        "five-byte first witness differs for key {key}",
+                    );
+                    assert_eq!(
+                        quotient_indexed.get_with_context(key, &root_only, &basis),
+                        quotient_indexed.get_with_context(key, &quotient.states, &basis),
+                        "root-only first witness differs for key {key}",
+                    );
+                    assert_eq!(
+                        quotient_indexed.get_with_context(key, &root_only21, &basis),
+                        quotient_indexed.get_with_context(key, &quotient.states, &basis),
+                        "21-byte first witness differs for key {key}",
+                    );
+                    assert_eq!(
+                        single_root_indexed.get_with_context(key, &root_only11, &basis),
+                        quotient_indexed.get_with_context(key, &quotient.states, &basis),
+                        "11-byte first witness differs for key {key}",
+                    );
+                    assert_eq!(
+                        single_root_four.get_with_context(key, &root_only11, &basis),
+                        quotient_indexed.get_with_context(key, &quotient.states, &basis),
+                        "four-byte first witness differs for key {key}",
+                    );
+                    assert_eq!(
+                        two_root_four.get_with_context(key, &root_only21, &basis),
+                        quotient_indexed.get_with_context(key, &quotient.states, &basis),
+                        "four-byte 21-byte-state first witness differs for key {key}",
+                    );
+                }
+            }
+            for probe in 1..2048u128 {
+                let key = basis
+                    .canonical_selected(probe.wrapping_mul(0x2545_F491_4F6C_DD1D) & basis.mask)
+                    .0;
+                assert_eq!(
+                    dense_quotient_indexed.get_with_context(key, &quotient.states, &basis),
+                    quotient_indexed.get_with_context(key, &quotient.states, &basis),
+                    "dense five-byte probe differs for key {key}",
+                );
+                assert_eq!(
+                    quotient_indexed.get_with_context(key, &root_only, &basis),
+                    quotient_indexed.get_with_context(key, &quotient.states, &basis),
+                    "root-only probe differs for key {key}",
+                );
+                assert_eq!(
+                    quotient_indexed.get_with_context(key, &root_only21, &basis),
+                    quotient_indexed.get_with_context(key, &quotient.states, &basis),
+                    "21-byte probe differs for key {key}",
+                );
+                assert_eq!(
+                    single_root_indexed.get_with_context(key, &root_only11, &basis),
+                    quotient_indexed.get_with_context(key, &quotient.states, &basis),
+                    "11-byte probe differs for key {key}",
+                );
+                assert_eq!(
+                    single_root_four.get_with_context(key, &root_only11, &basis),
+                    quotient_indexed.get_with_context(key, &quotient.states, &basis),
+                    "four-byte probe differs for key {key}",
+                );
+                assert_eq!(
+                    two_root_four.get_with_context(key, &root_only21, &basis),
+                    quotient_indexed.get_with_context(key, &quotient.states, &basis),
+                    "four-byte 21-byte-state probe differs for key {key}",
+                );
+            }
+        }
+
+        #[test]
+        fn indexed_four_byte_slots_preserve_exact_first_witness() {
+            assert_eq!(std::mem::size_of::<u32>(), 4);
+            let boundary = RootTable128::indexed83_four_encode((1 << 29) - 2, 1, 3);
+            assert_eq!(
+                RootTable128::indexed83_four_decode(boundary),
+                ((1 << 29) - 2, 1, 3)
+            );
+            let mut table = RootTable128::with_capacity_indexed83_four(64);
+            table.bloom = None;
+            let keys: Vec<u128> = (0..96u64)
+                .map(|i| (mix_root_bloom(i) as u128) << 19 | i as u128)
+                .collect();
+            for (i, &key) in keys.iter().enumerate() {
+                table.insert_indexed83(key, i / 2, i % 2, |state, root| keys[2 * state + root]);
+            }
+            assert_eq!(table.layout_receipt(), ("indexed83_4byte_exact", 4, 512));
+            assert_eq!(table.len, keys.len());
+            table.insert_indexed83(keys[0], 48, 0, |state, root| {
+                if state == 48 {
+                    keys[0]
+                } else {
+                    keys[2 * state + root]
+                }
+            });
+            assert_eq!(table.len, keys.len());
+            for (i, &key) in keys.iter().enumerate() {
+                assert_eq!(
+                    table.get_indexed83(key, |state, root| keys[2 * state + root]),
+                    Some((i / 2, i % 2))
+                );
+            }
+            assert_eq!(
+                table.get_indexed83(u128::MAX, |state, root| keys[2 * state + root]),
+                None
+            );
+        }
+
+        #[test]
+        fn indexed_four_byte_id31_slots_preserve_exact_first_witness() {
+            let boundary = RootTable128::indexed83_four_id31_encode((1 << 31) - 2, 1);
+            assert_eq!(boundary, u32::MAX);
+            assert_eq!(
+                RootTable128::indexed83_four_id31_decode(boundary),
+                ((1 << 31) - 2, 1, 0)
+            );
+            let high_state = (1 << 31) - 2;
+            let mut high_table = RootTable128::with_capacity_indexed83_four_mode(8, true);
+            high_table.bloom = None;
+            high_table.insert_indexed83(0x12345, high_state, 1, |_, _| 0x12345);
+            assert_eq!(
+                high_table.get_indexed83(0x12345, |state, selector| {
+                    assert_eq!((state, selector), (high_state, 1));
+                    0x12345
+                }),
+                Some((high_state, 1))
+            );
+            let mut table = RootTable128::with_capacity_indexed83_four_mode(64, true);
+            table.bloom = None;
+            let keys: Vec<u128> = (0..96u64)
+                .map(|i| (mix_root_bloom(i) as u128) << 19 | i as u128)
+                .collect();
+            for (i, &key) in keys.iter().enumerate() {
+                table.insert_indexed83(key, i / 2, i % 2, |state, root| keys[2 * state + root]);
+            }
+            assert_eq!(
+                table.layout_receipt(),
+                ("indexed83_4byte_exact_id31", 4, 512)
+            );
+            table.insert_indexed83(keys[0], 48, 0, |state, root| {
+                if state == 48 {
+                    keys[0]
+                } else {
+                    keys[2 * state + root]
+                }
+            });
+            assert_eq!(table.len, keys.len());
+            for (i, &key) in keys.iter().enumerate() {
+                assert_eq!(
+                    table.get_indexed83(key, |state, root| keys[2 * state + root]),
+                    Some((i / 2, i % 2))
+                );
+            }
+            assert_eq!(
+                table.get_indexed83(u128::MAX, |state, root| keys[2 * state + root]),
+                None
+            );
+        }
+
+        #[test]
+        fn indexed_four_byte_relative_slots_preserve_high_global_ids() {
+            let base = 1usize << 31;
+            let high_state = base + (1usize << 30) - 2;
+            let boundary = RootTable128::indexed83_four_relative_encode(high_state, 1, 1, base);
+            assert_eq!(boundary, u32::MAX);
+            assert_eq!(
+                RootTable128::indexed83_four_relative_decode(boundary, base),
+                (high_state, 1, 1)
+            );
+            let mut table = RootTable128::with_capacity_indexed83_four_relative(64, base);
+            table.bloom = None;
+            let keys: Vec<u128> = (0..96u64)
+                .map(|i| (mix_root_bloom(i) as u128) << 19 | i as u128)
+                .collect();
+            for (i, &key) in keys.iter().enumerate() {
+                table.insert_indexed83(key, base + i / 2, i % 2, |state, root| {
+                    keys[2 * (state - base) + root]
+                });
+            }
+            assert_eq!(
+                table.layout_receipt(),
+                ("indexed83_4byte_split_id30", 4, 512)
+            );
+            table.insert_indexed83(keys[0], base + 48, 0, |state, root| {
+                if state == base + 48 {
+                    keys[0]
+                } else {
+                    keys[2 * (state - base) + root]
+                }
+            });
+            assert_eq!(table.len, keys.len());
+            for (i, &key) in keys.iter().enumerate() {
+                assert_eq!(
+                    table.get_indexed83(key, |state, root| keys[2 * (state - base) + root]),
+                    Some((base + i / 2, i % 2))
+                );
+            }
+            assert_eq!(
+                table.get_indexed83(u128::MAX, |state, root| keys[2 * (state - base) + root]),
+                None
+            );
+        }
+
+        #[test]
+        fn indexed_four_byte_byte_fingerprint_filters_without_changing_exact_keys() {
+            use std::cell::Cell;
+            use std::collections::HashMap;
+
+            let base = 1usize << 31;
+            let mut reference =
+                RootTable128::with_capacity_indexed83_four_layout_fp8(64, false, Some(base), false);
+            let mut filtered =
+                RootTable128::with_capacity_indexed83_four_layout_fp8(64, false, Some(base), true);
+            reference.bloom = None;
+            filtered.bloom = None;
+            assert_eq!(filtered.fingerprint_sidecar_bytes(), 128);
+            let keys: Vec<u128> = (0..96u64)
+                .map(|i| (mix_root_bloom(i) as u128) << 19 | i as u128)
+                .collect();
+            for (i, &key) in keys.iter().enumerate() {
+                let witness = |state: usize, selector: usize| keys[2 * (state - base) + selector];
+                reference.insert_indexed83(key, base + i / 2, i % 2, witness);
+                filtered.insert_indexed83(key, base + i / 2, i % 2, witness);
+            }
+            for (i, &key) in keys.iter().enumerate() {
+                let witness = |state: usize, selector: usize| keys[2 * (state - base) + selector];
+                assert_eq!(
+                    filtered.get_indexed83(key, witness),
+                    reference.get_indexed83(key, witness)
+                );
+                assert_eq!(
+                    filtered.get_indexed83(key, witness),
+                    Some((base + i / 2, i % 2))
+                );
+            }
+            assert_eq!(filtered.len, reference.len);
+
+            let mut seen = HashMap::new();
+            let mut pair = None;
+            for i in 1..10_000u64 {
+                let key = (mix_root_bloom(i) as u128) << 19 | i as u128;
+                let fingerprint = RootTable128::indexed83_fingerprint(key);
+                let signature = (filtered.slot(key), fingerprint & 1);
+                if let Some(&(prior, prior_fingerprint)) = seen.get(&signature) {
+                    if prior_fingerprint as u8 != fingerprint as u8 {
+                        pair = Some((prior, key));
+                        break;
+                    }
+                } else {
+                    seen.insert(signature, (key, fingerprint));
+                }
+            }
+            let (first, second) = pair.expect("same slot and bit, different byte");
+            let mut collided =
+                RootTable128::with_capacity_indexed83_four_layout_fp8(64, false, Some(base), true);
+            collided.bloom = None;
+            collided.insert_indexed83(first, base, 0, |_, _| first);
+            let exact_checks = Cell::new(0);
+            collided.insert_indexed83(second, base + 1, 0, |_, _| {
+                exact_checks.set(exact_checks.get() + 1);
+                first
+            });
+            assert_eq!(exact_checks.get(), 0);
+            assert_eq!(collided.len, 2);
+            assert_eq!(collided.get_indexed83(first, |_, _| first), Some((base, 0)));
+            assert_eq!(
+                collided.get_indexed83(second, |state, _| {
+                    if state == base {
+                        first
+                    } else {
+                        second
+                    }
+                }),
+                Some((base + 1, 0))
+            );
+        }
+
+        #[test]
+        fn indexed_five_byte_slots_preserve_exact_first_witness() {
+            assert_eq!(std::mem::size_of::<[u8; 5]>(), 5);
+            let boundary = RootTable128::indexed83_encode((1 << 29) - 2, 1, 0x3ff);
+            assert_eq!(
+                RootTable128::indexed83_decode(boundary),
+                ((1 << 29) - 2, 1, 0x3ff)
+            );
+            let mut reference = RootTable128::with_capacity(512, 83, 512, false);
+            let mut indexed = RootTable128::with_capacity_indexed83(512);
+            reference.bloom = None;
+            indexed.bloom = None;
+            assert_eq!(indexed.layout_receipt(), ("indexed83_5byte_exact", 5, 5120));
+            let mut keys = Vec::new();
+            for i in 0..768u64 {
+                let key = (((mix_root_bloom(i) as u128) << 19)
+                    ^ ((mix_root_bloom(i ^ 0xD1B5_4A32_D192_ED03) as u128) & ((1u128 << 19) - 1)))
+                    & ((1u128 << 83) - 1);
+                keys.push(key);
+                reference.insert_if_absent(key, i + 1);
+                indexed.insert_indexed83(key, i as usize / 2, i as usize % 2, |state, root| {
+                    keys[2 * state + root]
+                });
+            }
+            assert_eq!(indexed.len, reference.len);
+            keys.push(keys[0]);
+            indexed.insert_indexed83(keys[0], 384, 0, |state, root| keys[2 * state + root]);
+            reference.insert_if_absent(keys[0], 900);
+            assert_eq!(
+                indexed.get_indexed83(keys[0], |state, root| keys[2 * state + root]),
+                Some((0, 0))
+            );
+            for i in 0..2048u64 {
+                let key = (((mix_root_bloom(i) as u128) << 19)
+                    ^ ((mix_root_bloom(i ^ 0xD1B5_4A32_D192_ED03) as u128) & ((1u128 << 19) - 1)))
+                    & ((1u128 << 83) - 1);
+                let expected = reference
+                    .get(key)
+                    .map(|value| (((value - 1) / 2) as usize, ((value - 1) % 2) as usize));
+                assert_eq!(
+                    indexed.get_indexed83(key, |state, root| keys[2 * state + root]),
+                    expected
+                );
+            }
+
+            // Find two distinct full keys sharing both slot and ten-bit fingerprint.
+            let mut collided = RootTable128::with_capacity_indexed83(64);
+            collided.bloom = None;
+            let mut seen = std::collections::HashMap::new();
+            let mut pair = None;
+            for i in 1..20_000u64 {
+                let key = (mix_root_bloom(i) as u128) << 19 | i as u128;
+                let signature = (collided.slot(key), RootTable128::indexed83_fingerprint(key));
+                if let Some(&prior) = seen.get(&signature) {
+                    if prior != key {
+                        pair = Some((prior, key));
+                        break;
+                    }
+                } else {
+                    seen.insert(signature, key);
+                }
+            }
+            let (first, second) = pair.expect("deterministic slot/fingerprint collision");
+            let pair_keys = [first, second];
+            collided.insert_indexed83(first, 0, 0, |_, root| pair_keys[root]);
+            collided.insert_indexed83(second, 0, 1, |_, root| pair_keys[root]);
+            assert_eq!(
+                collided.get_indexed83(first, |_, root| pair_keys[root]),
+                Some((0, 0))
+            );
+            assert_eq!(
+                collided.get_indexed83(second, |_, root| pair_keys[root]),
+                Some((0, 1))
+            );
+            assert_eq!(collided.len, 2);
+        }
+
+        #[test]
+        fn indexed_five_byte_id30_preserves_large_ids_and_exact_keys() {
+            let boundary = RootTable128::indexed83_id30_encode((1 << 30) - 2, 1, 0x1ff);
+            assert_eq!(
+                RootTable128::indexed83_id30_decode(boundary),
+                ((1 << 30) - 2, 1, 0x1ff)
+            );
+            let mut table = RootTable128::with_capacity_indexed83_mode(64, true);
+            table.bloom = None;
+            assert_eq!(
+                table.layout_receipt(),
+                ("indexed83_5byte_exact_id30", 5, 640)
+            );
+            let keys: Vec<u128> = (0..96u64)
+                .map(|i| (mix_root_bloom(i) as u128) << 19 | i as u128)
+                .collect();
+            for (i, &key) in keys.iter().enumerate() {
+                table.insert_indexed83(key, i / 2, i % 2, |state, root| keys[2 * state + root]);
+            }
+            table.insert_indexed83(keys[0], 48, 0, |state, root| {
+                if state == 48 {
+                    keys[0]
+                } else {
+                    keys[2 * state + root]
+                }
+            });
+            assert_eq!(table.len, keys.len());
+            for (i, &key) in keys.iter().enumerate() {
+                assert_eq!(
+                    table.get_indexed83(key, |state, root| keys[2 * state + root]),
+                    Some((i / 2, i % 2))
+                );
+            }
+            assert_eq!(
+                table.get_indexed83(u128::MAX, |state, root| keys[2 * state + root]),
+                None
+            );
+
+            // Equal slot and nine-bit fingerprint still require full root equality.
+            let mut seen = std::collections::HashMap::new();
+            let mut pair = None;
+            for i in 1..20_000u64 {
+                let key = (mix_root_bloom(i) as u128) << 19 | i as u128;
+                let signature = (
+                    table.slot(key),
+                    RootTable128::indexed83_fingerprint(key) & 0x1ff,
+                );
+                if let Some(&prior) = seen.get(&signature) {
+                    if prior != key {
+                        pair = Some((prior, key));
+                        break;
+                    }
+                } else {
+                    seen.insert(signature, key);
+                }
+            }
+            let (first, second) = pair.expect("deterministic ID30 slot/fingerprint collision");
+            let pair_keys = [first, second];
+            let mut collided = RootTable128::with_capacity_indexed83_mode(64, true);
+            collided.bloom = None;
+            collided.insert_indexed83(first, 0, 0, |_, root| pair_keys[root]);
+            collided.insert_indexed83(second, 0, 1, |_, root| pair_keys[root]);
+            assert_eq!(
+                collided.get_indexed83(first, |_, root| pair_keys[root]),
+                Some((0, 0))
+            );
+            assert_eq!(
+                collided.get_indexed83(second, |_, root| pair_keys[root]),
+                Some((0, 1))
+            );
+        }
+
+        #[test]
+        fn indexed_five_byte_id31_preserves_large_ids_and_exact_keys() {
+            let boundary = RootTable128::indexed83_id31_encode((1 << 31) - 2, 1, 0xff);
+            assert_eq!(
+                RootTable128::indexed83_id31_decode(boundary),
+                ((1 << 31) - 2, 1, 0xff)
+            );
+            assert_eq!(boundary, [0xff; 5]);
+            let mut table =
+                RootTable128::with_capacity_indexed83_mode_bloom_id31(64, false, true, false);
+            assert_eq!(
+                table.layout_receipt(),
+                ("indexed83_5byte_exact_id31", 5, 640)
+            );
+            let keys: Vec<u128> = (0..96u64)
+                .map(|i| (mix_root_bloom(i) as u128) << 19 | i as u128)
+                .collect();
+            for (i, &key) in keys.iter().enumerate() {
+                table.insert_indexed83(key, i / 2, i % 2, |state, root| keys[2 * state + root]);
+            }
+            table.insert_indexed83(keys[0], 48, 0, |state, root| {
+                if state == 48 {
+                    keys[0]
+                } else {
+                    keys[2 * state + root]
+                }
+            });
+            assert_eq!(table.len, keys.len());
+            for (i, &key) in keys.iter().enumerate() {
+                assert_eq!(
+                    table.get_indexed83(key, |state, root| keys[2 * state + root]),
+                    Some((i / 2, i % 2))
+                );
+            }
+            assert_eq!(
+                table.get_indexed83(u128::MAX, |state, root| keys[2 * state + root]),
+                None
+            );
+
+            // The shorter fingerprint must still compare the reconstructed full key.
+            let mut seen = std::collections::HashMap::new();
+            let mut pair = None;
+            for i in 1..20_000u64 {
+                let key = (mix_root_bloom(i) as u128) << 19 | i as u128;
+                let signature = (
+                    table.slot(key),
+                    RootTable128::indexed83_fingerprint(key) & 0xff,
+                );
+                if let Some(&prior) = seen.get(&signature) {
+                    if prior != key {
+                        pair = Some((prior, key));
+                        break;
+                    }
+                } else {
+                    seen.insert(signature, key);
+                }
+            }
+            let (first, second) = pair.expect("deterministic ID31 slot/fingerprint collision");
+            let pair_keys = [first, second];
+            let mut collided =
+                RootTable128::with_capacity_indexed83_mode_bloom_id31(64, false, true, false);
+            collided.insert_indexed83(first, 0, 0, |_, root| pair_keys[root]);
+            collided.insert_indexed83(second, 0, 1, |_, root| pair_keys[root]);
+            assert_eq!(
+                collided.get_indexed83(first, |_, root| pair_keys[root]),
+                Some((0, 0))
+            );
+            assert_eq!(
+                collided.get_indexed83(second, |_, root| pair_keys[root]),
+                Some((0, 1))
+            );
+        }
+
+        #[test]
+        fn indexed_five_byte_load80_extends_the_same_slot_boundary_exactly() {
+            let states = |k: usize| 83 * k * (k - 1) / 2 + 42 * k;
+            assert!(indexed5_load80_request(states(4549)) <= (1 << 30));
+            assert!(indexed5_load80_request(states(4550)) > (1 << 30));
+            let slots = |count: usize| (indexed5_load80_request(count) * 2).next_power_of_two();
+            assert_eq!(slots(states(4300)), 1 << 31);
+            assert_eq!(slots(states(4405)), 1 << 31);
+            assert_eq!(slots(states(4405) - states(4300)), 1 << 27);
+            let mut table = RootTable128::with_capacity_indexed83_mode(64, true);
+            table.bloom = None;
+            let keys: Vec<u128> = (0..102u64)
+                .map(|i| ((mix_root_bloom(i) as u128) << 19) | i as u128)
+                .collect();
+            for (i, &key) in keys.iter().enumerate() {
+                table.insert_indexed83(key, i / 2, i % 2, |state, root| keys[2 * state + root]);
+            }
+            assert_eq!(table.len, 102);
+            for (i, &key) in keys.iter().enumerate() {
+                assert_eq!(
+                    table.get_indexed83(key, |state, root| keys[2 * state + root]),
+                    Some((i / 2, i % 2))
+                );
+            }
+            assert_eq!(
+                table.get_indexed83(u128::MAX, |state, root| keys[2 * state + root]),
+                None
+            );
+        }
 
         #[test]
         fn canonical_u128_lookup_matches_unscreened_table() {
-            let mut reference = RootTable128::with_capacity(4096);
+            let mut reference = RootTable128::with_capacity(4096, 83, 900, false);
             reference.bloom = None;
-            let mut screened = RootTable128::with_capacity(4096);
+            let mut screened = RootTable128::with_capacity(4096, 83, 900, false);
             screened.bloom = Some(RootBloom::with_capacity(4096));
             for i in 0..4096u64 {
                 let key = ((mix_root_bloom(i) as u128 & (u64::MAX as u128 >> 1)) << 64)
@@ -1431,15 +3535,91 @@ mod wide {
                     | mix_root_bloom(i ^ 0x3F19_7C2B_74A8_65ED) as u128;
                 assert_eq!(screened.get(key), reference.get(key));
             }
-            for &(key, value) in &reference.slots {
+            let RootSlots128::Wide(slots) = &reference.slots else {
+                unreachable!()
+            };
+            for &(key, value) in slots {
                 if key != u128::MAX {
                     assert!(screened.bloom.as_ref().unwrap().contains(key));
                     assert_eq!(screened.get(key), Some(value));
                 }
             }
         }
+
+        #[test]
+        fn packed_slots_preserve_first_witness_and_exact_lookup() {
+            let layout = PackedRootLayout::new(83, 900);
+            assert_eq!(layout.value_bits, 34);
+            assert_eq!(std::mem::size_of::<u128>(), 16);
+            let mut wide = RootTable128::with_capacity(8192, 83, 900, false);
+            let mut packed = RootTable128::with_capacity(8192, 83, 900, true);
+            assert_eq!(
+                wide.layout_receipt(),
+                (
+                    "wide_u128_u64",
+                    std::mem::size_of::<(u128, u64)>(),
+                    16384 * std::mem::size_of::<(u128, u64)>()
+                )
+            );
+            assert_eq!(packed.layout_receipt(), ("packed_u128", 16, 1 << 18));
+            wide.bloom = None;
+            packed.bloom = None;
+            for i in 0..8192u64 {
+                let key = ((mix_root_bloom(i) as u128) << 19)
+                    ^ ((mix_root_bloom(i ^ 0xD1B5_4A32_D192_ED03) as u128) & ((1u128 << 19) - 1));
+                let key = key & ((1u128 << 83) - 1);
+                let value = super::pack(
+                    (i % 900) as u16,
+                    ((i * 17) % 900) as u16,
+                    (i % 83) as u16,
+                    ((i * 7) % 83) as u32,
+                );
+                wide.insert_if_absent(key, value);
+                packed.insert_if_absent(key, value);
+                wide.insert_if_absent(key, 0);
+                packed.insert_if_absent(key, 0);
+            }
+            for i in 0..20_000u64 {
+                let key = (mix_root_bloom(i ^ 0x3F19_7C2B_74A8_65ED) as u128) & ((1u128 << 83) - 1);
+                assert_eq!(packed.get(key), wide.get(key));
+            }
+            let RootSlots128::Wide(slots) = &wide.slots else {
+                unreachable!()
+            };
+            for &(key, value) in slots {
+                if key != u128::MAX {
+                    assert_eq!(packed.get(key), Some(value));
+                }
+            }
+            assert_eq!(packed.len, wide.len);
+        }
+
+        #[test]
+        fn denser_packed_slots_preserve_first_witness_and_exact_lookup() {
+            let mut dense = RootTable128::with_capacity(512, 83, 900, true);
+            let mut regular = RootTable128::with_capacity(1024, 83, 900, true);
+            assert_eq!(dense.layout_receipt(), ("packed_u128", 16, 1 << 14));
+            assert_eq!(regular.layout_receipt(), ("packed_u128", 16, 1 << 15));
+            dense.bloom = None;
+            regular.bloom = None;
+            for i in 0..768u64 {
+                let key = ((i as u128) << 16) | (mix_root_bloom(i) as u128 & 0xffff);
+                dense.insert_if_absent(key, i + 1);
+                regular.insert_if_absent(key, i + 1);
+                dense.insert_if_absent(key, 0);
+                regular.insert_if_absent(key, 0);
+            }
+            for i in 0..2048u64 {
+                let key = ((i as u128) << 16) | (mix_root_bloom(i) as u128 & 0xffff);
+                assert_eq!(dense.get(key), regular.get(key));
+                assert_eq!(dense.get(key), (i < 768).then_some(i + 1));
+            }
+            assert_eq!(dense.len, 768);
+            assert_eq!(regular.len, 768);
+        }
     }
 
+    #[derive(Clone, Copy)]
     struct State128 {
         left: u16,
         right: u16,
@@ -1447,10 +3627,519 @@ mod wide {
         normal_roots: [u128; 2],
     }
 
+    #[derive(Clone, Copy)]
+    struct State83 {
+        left: u16,
+        right: u16,
+        relative: u16,
+        root0: [u8; 11],
+        root1: [u8; 11],
+    }
+
+    impl State83 {
+        fn encode_root(root: u128) -> [u8; 11] {
+            assert!(root < (1u128 << 83), "packed state root exceeds F_2^83");
+            let bytes = root.to_le_bytes();
+            let mut packed = [0u8; 11];
+            packed.copy_from_slice(&bytes[..11]);
+            packed
+        }
+
+        fn decode_root(packed: [u8; 11]) -> u128 {
+            let mut bytes = [0u8; 16];
+            bytes[..11].copy_from_slice(&packed);
+            u128::from_le_bytes(bytes)
+        }
+
+        fn from_wide(state: State128) -> Self {
+            Self {
+                left: state.left,
+                right: state.right,
+                relative: state.relative,
+                root0: Self::encode_root(state.normal_roots[0]),
+                root1: Self::encode_root(state.normal_roots[1]),
+            }
+        }
+
+        fn to_wide(self) -> State128 {
+            State128 {
+                left: self.left,
+                right: self.right,
+                relative: self.relative,
+                normal_roots: [Self::decode_root(self.root0), Self::decode_root(self.root1)],
+            }
+        }
+    }
+
+    // N83 needs 12 bits for each base label and 7 bits for a Frobenius shift.
+    // The remaining high bit stays zero, so the labels and two roots use 26 bytes.
+    #[derive(Clone, Copy)]
+    struct State26 {
+        labels: [u8; 4],
+        root0: [u8; 11],
+        root1: [u8; 11],
+    }
+
+    impl State26 {
+        fn from_wide(state: State128) -> Self {
+            assert!(state.left < 4096 && state.right < 4096);
+            assert!(state.relative < 128);
+            let labels = (state.left as u32)
+                | ((state.right as u32) << 12)
+                | ((state.relative as u32) << 24);
+            Self {
+                labels: labels.to_le_bytes(),
+                root0: State83::encode_root(state.normal_roots[0]),
+                root1: State83::encode_root(state.normal_roots[1]),
+            }
+        }
+
+        fn to_wide(self) -> State128 {
+            let labels = u32::from_le_bytes(self.labels);
+            assert_eq!(labels >> 31, 0);
+            State128 {
+                left: (labels & 0xfff) as u16,
+                right: ((labels >> 12) & 0xfff) as u16,
+                relative: ((labels >> 24) & 0x7f) as u16,
+                normal_roots: [
+                    State83::decode_root(self.root0),
+                    State83::decode_root(self.root1),
+                ],
+            }
+        }
+    }
+
+    // Every retained symmetric N83 pair has two S3 roots on this base.
+    // Guard that property during construction, then recover labels from the
+    // deterministic loop ordinal only when an exact table hit needs them.
+    #[derive(Clone, Copy)]
+    struct RootOnly83 {
+        root0: [u8; 11],
+        root1: [u8; 11],
+    }
+
+    impl RootOnly83 {
+        fn from_wide(state: State128) -> Self {
+            Self {
+                root0: State83::encode_root(state.normal_roots[0]),
+                root1: State83::encode_root(state.normal_roots[1]),
+            }
+        }
+
+        fn roots(self) -> [u128; 2] {
+            [
+                State83::decode_root(self.root0),
+                State83::decode_root(self.root1),
+            ]
+        }
+    }
+
+    // Two 83-bit roots occupy 166 bits, so the exact pair fits in 21 bytes.
+    // The three unused bits of byte 10 carry the low five bits of root 1.
+    #[derive(Clone, Copy)]
+    struct RootOnly21 {
+        bits: [u8; 21],
+    }
+
+    impl RootOnly21 {
+        fn from_wide(state: State128) -> Self {
+            let [root0, root1] = state.normal_roots;
+            assert_eq!(root0 >> 83, 0);
+            assert_eq!(root1 >> 83, 0);
+            let mut bits = [0u8; 21];
+            bits[..11].copy_from_slice(&root0.to_le_bytes()[..11]);
+            bits[10] |= ((root1 as u8) & 0x1f) << 3;
+            bits[11..].copy_from_slice(&(root1 >> 5).to_le_bytes()[..10]);
+            Self { bits }
+        }
+
+        fn roots(self) -> [u128; 2] {
+            let mut low = [0u8; 16];
+            low[..11].copy_from_slice(&self.bits[..11]);
+            low[10] &= 0x07;
+            let mut high = [0u8; 16];
+            high[..10].copy_from_slice(&self.bits[11..]);
+            [
+                u128::from_le_bytes(low),
+                (u128::from_le_bytes(high) << 5) | ((self.bits[10] >> 3) as u128),
+            ]
+        }
+    }
+
+    // Retain one exact root. The other differs by x*y/(x+y)^2 in the
+    // regular S3 quadratic, and equals the first on its exceptional path.
+    #[derive(Clone, Copy)]
+    struct RootOnly11 {
+        root0: [u8; 11],
+    }
+
+    impl RootOnly11 {
+        fn from_wide(state: State128) -> Self {
+            Self {
+                root0: State83::encode_root(state.normal_roots[0]),
+            }
+        }
+    }
+
+    fn root11_at(
+        states: &[RootOnly11],
+        k: usize,
+        shifted: &[Vec<u128>],
+        gf: &Gf2_128,
+        basis: &NormalBasis128,
+        index: usize,
+        selector: usize,
+    ) -> u128 {
+        assert!(selector < 2);
+        let root0 = State83::decode_root(states[index].root0);
+        if selector == 0 {
+            return root0;
+        }
+        let (left, right, relative) = symmetric_labels_for_ordinal(k, index);
+        let x = shifted[left as usize][0];
+        let y = shifted[right as usize][relative as usize];
+        let denominator = gf.sqr(x ^ y);
+        if denominator == 0 {
+            return root0;
+        }
+        let root_sum = gf.mul(gf.mul(x, y), invert128(gf, basis, denominator));
+        root0 ^ basis.to_normal.apply(root_sum)
+    }
+
+    fn symmetric_state_prefix(k: usize, left: usize) -> usize {
+        assert!(k > 0 && left <= k);
+        42 * left + 83 * (left * (k - 1) - left * left.saturating_sub(1) / 2)
+    }
+
+    fn symmetric_labels_for_ordinal(k: usize, ordinal: usize) -> (u16, u16, u16) {
+        assert!(k > 0 && k <= u16::MAX as usize);
+        assert!(ordinal < symmetric_state_prefix(k, k));
+        let (mut lo, mut hi) = (0, k);
+        while lo + 1 < hi {
+            let mid = (lo + hi) / 2;
+            if symmetric_state_prefix(k, mid) <= ordinal {
+                lo = mid;
+            } else {
+                hi = mid;
+            }
+        }
+        let offset = ordinal - symmetric_state_prefix(k, lo);
+        if offset < 42 {
+            (lo as u16, lo as u16, offset as u16)
+        } else {
+            let off_diagonal = offset - 42;
+            let right = lo + 1 + off_diagonal / 83;
+            assert!(right < k);
+            (lo as u16, right as u16, (off_diagonal % 83) as u16)
+        }
+    }
+
+    enum StateStore128 {
+        Wide(Vec<State128>),
+        Packed83(Vec<State83>),
+        Packed26(Vec<State26>),
+        RootOnly83 {
+            states: Vec<RootOnly83>,
+            k: usize,
+        },
+        RootOnly21 {
+            states: Vec<RootOnly21>,
+            k: usize,
+        },
+        RootOnly11 {
+            states: Vec<RootOnly11>,
+            k: usize,
+            shifted: Vec<Vec<u128>>,
+            gf: Box<Gf2_128>,
+            basis: Box<NormalBasis128>,
+        },
+    }
+
+    impl StateStore128 {
+        fn len(&self) -> usize {
+            match self {
+                Self::Wide(states) => states.len(),
+                Self::Packed83(states) => states.len(),
+                Self::Packed26(states) => states.len(),
+                Self::RootOnly83 { states, .. } => states.len(),
+                Self::RootOnly21 { states, .. } => states.len(),
+                Self::RootOnly11 { states, .. } => states.len(),
+            }
+        }
+
+        fn get(&self, index: usize) -> State128 {
+            match self {
+                Self::Wide(states) => states[index],
+                Self::Packed83(states) => states[index].to_wide(),
+                Self::Packed26(states) => states[index].to_wide(),
+                Self::RootOnly83 { states, k } => {
+                    let (left, right, relative) = symmetric_labels_for_ordinal(*k, index);
+                    State128 {
+                        left,
+                        right,
+                        relative,
+                        normal_roots: states[index].roots(),
+                    }
+                }
+                Self::RootOnly21 { states, k } => {
+                    let (left, right, relative) = symmetric_labels_for_ordinal(*k, index);
+                    State128 {
+                        left,
+                        right,
+                        relative,
+                        normal_roots: states[index].roots(),
+                    }
+                }
+                Self::RootOnly11 {
+                    states,
+                    k,
+                    shifted,
+                    gf,
+                    basis,
+                } => {
+                    let (left, right, relative) = symmetric_labels_for_ordinal(*k, index);
+                    State128 {
+                        left,
+                        right,
+                        relative,
+                        normal_roots: [
+                            root11_at(states, *k, shifted, gf, basis, index, 0),
+                            root11_at(states, *k, shifted, gf, basis, index, 1),
+                        ],
+                    }
+                }
+            }
+        }
+
+        #[inline(always)]
+        fn root_at(&self, index: usize, selector: usize) -> u128 {
+            assert!(selector < 2);
+            match self {
+                Self::Wide(states) => states[index].normal_roots[selector],
+                Self::Packed83(states) => {
+                    let state = states[index];
+                    State83::decode_root(if selector == 0 {
+                        state.root0
+                    } else {
+                        state.root1
+                    })
+                }
+                Self::Packed26(states) => {
+                    let state = states[index];
+                    State83::decode_root(if selector == 0 {
+                        state.root0
+                    } else {
+                        state.root1
+                    })
+                }
+                Self::RootOnly83 { states, .. } => {
+                    let state = states[index];
+                    State83::decode_root(if selector == 0 {
+                        state.root0
+                    } else {
+                        state.root1
+                    })
+                }
+                Self::RootOnly21 { states, .. } => states[index].roots()[selector],
+                Self::RootOnly11 {
+                    states,
+                    k,
+                    shifted,
+                    gf,
+                    basis,
+                } => root11_at(states, *k, shifted, gf, basis, index, selector),
+            }
+        }
+
+        fn layout_receipt(&self) -> (&'static str, usize, usize) {
+            match self {
+                Self::Wide(states) => (
+                    "wide_u128_roots",
+                    std::mem::size_of::<State128>(),
+                    states.capacity() * std::mem::size_of::<State128>(),
+                ),
+                Self::Packed83(states) => (
+                    "packed83_11byte_roots",
+                    std::mem::size_of::<State83>(),
+                    states.capacity() * std::mem::size_of::<State83>(),
+                ),
+                Self::Packed26(states) => (
+                    "packed83_26byte_states",
+                    std::mem::size_of::<State26>(),
+                    states.capacity() * std::mem::size_of::<State26>(),
+                ),
+                Self::RootOnly83 { states, .. } => (
+                    "root_only83_22byte_states",
+                    std::mem::size_of::<RootOnly83>(),
+                    states.capacity() * std::mem::size_of::<RootOnly83>(),
+                ),
+                Self::RootOnly21 { states, .. } => (
+                    "root_only83_21byte_states",
+                    std::mem::size_of::<RootOnly21>(),
+                    states.capacity() * std::mem::size_of::<RootOnly21>(),
+                ),
+                Self::RootOnly11 { states, .. } => (
+                    "root_only83_11byte_states_reconstructed_second_root",
+                    std::mem::size_of::<RootOnly11>(),
+                    states.capacity() * std::mem::size_of::<RootOnly11>(),
+                ),
+            }
+        }
+    }
+
+    #[cfg(test)]
+    mod state83_tests {
+        use super::{RootOnly21, State128, State26, State83, StateStore128};
+
+        #[test]
+        fn root21_roundtrips_boundary_pairs() {
+            assert_eq!(std::mem::size_of::<RootOnly21>(), 21);
+            let roots = [0, 1, 0x1f, 0x20, 1u128 << 82, (1u128 << 83) - 1];
+            for &left in &roots {
+                for &right in &roots {
+                    let state = State128 {
+                        left: 7,
+                        right: 13,
+                        relative: 29,
+                        normal_roots: [left, right],
+                    };
+                    assert_eq!(RootOnly21::from_wide(state).roots(), [left, right]);
+                }
+            }
+        }
+
+        #[test]
+        fn packed_state_preserves_both_83_bit_roots_and_order() {
+            assert_eq!(std::mem::size_of::<State128>(), 48);
+            assert_eq!(std::mem::size_of::<State83>(), 28);
+            let roots = [
+                0,
+                1,
+                (1u128 << 64) - 1,
+                1u128 << 64,
+                (1u128 << 82) + 0x1234_5678_9ABC_DEF0,
+                (1u128 << 83) - 1,
+            ];
+            let mut stored = Vec::new();
+            for pair in roots.chunks_exact(2) {
+                let wide = State128 {
+                    left: 7,
+                    right: 13,
+                    relative: 29,
+                    normal_roots: [pair[0], pair[1]],
+                };
+                let packed = State83::from_wide(wide);
+                let restored = packed.to_wide();
+                assert_eq!(restored.left, wide.left);
+                assert_eq!(restored.right, wide.right);
+                assert_eq!(restored.relative, wide.relative);
+                assert_eq!(restored.normal_roots, wide.normal_roots);
+                stored.push(packed);
+            }
+            let store = StateStore128::Packed83(stored);
+            assert_eq!(store.len(), roots.len() / 2);
+            assert_eq!(store.layout_receipt().0, "packed83_11byte_roots");
+            for (i, pair) in roots.chunks_exact(2).enumerate() {
+                assert_eq!(store.get(i).normal_roots, [pair[0], pair[1]]);
+            }
+        }
+
+        #[test]
+        fn state26_preserves_boundary_labels_roots_and_order() {
+            assert_eq!(std::mem::size_of::<State26>(), 26);
+            let roots = [0, 1, (1u128 << 82) + 99, (1u128 << 83) - 1];
+            let wide = [
+                State128 {
+                    left: 0,
+                    right: 4095,
+                    relative: 0,
+                    normal_roots: [roots[0], roots[1]],
+                },
+                State128 {
+                    left: 4095,
+                    right: 0,
+                    relative: 82,
+                    normal_roots: [roots[2], roots[3]],
+                },
+            ];
+            let store = StateStore128::Packed26(wide.map(State26::from_wide).to_vec());
+            assert_eq!(store.layout_receipt().0, "packed83_26byte_states");
+            for (index, expected) in wide.iter().enumerate() {
+                let actual = store.get(index);
+                assert_eq!(
+                    (actual.left, actual.right, actual.relative),
+                    (expected.left, expected.right, expected.relative)
+                );
+                assert_eq!(actual.normal_roots, expected.normal_roots);
+                for selector in 0..2 {
+                    assert_eq!(
+                        store.root_at(index, selector),
+                        expected.normal_roots[selector]
+                    );
+                }
+            }
+        }
+    }
+
     struct Index128 {
-        states: Vec<State128>,
+        states: StateStore128,
         table: RootTable128,
+        overflow_table: Option<RootTable128>,
+        shared_bloom: Option<RootBloom>,
+        split_at: Option<usize>,
+        overflow_request_entries: Option<usize>,
         shifted: Vec<Vec<u128>>,
+        symmetric_states: bool,
+        dense_table: bool,
+        load75_table: bool,
+        indexed5_table: bool,
+        indexed5_id30: bool,
+        indexed5_id31: bool,
+        indexed4_table: bool,
+        indexed5_load75: bool,
+        indexed5_load80: bool,
+        indexed5_fixed30: bool,
+        indexed5_fixed31: bool,
+        indexed4_fixed30: bool,
+        indexed4_fixed31: bool,
+        indexed4_fixed32: bool,
+        indexed4_split30: bool,
+        root_table_request_entries: usize,
+    }
+
+    #[inline(always)]
+    fn root_from_tables(
+        primary: &RootTable128,
+        overflow: Option<&RootTable128>,
+        shared_bloom: Option<&RootBloom>,
+        states: &StateStore128,
+        basis: &NormalBasis128,
+        key: u128,
+    ) -> Option<u64> {
+        if shared_bloom.is_some_and(|bloom| !bloom.contains(key)) {
+            return None;
+        }
+        primary
+            .get_with_context(key, states, basis)
+            .or_else(|| overflow.and_then(|table| table.get_with_context(key, states, basis)))
+    }
+
+    impl Index128 {
+        #[inline(always)]
+        fn get_root(&self, key: u128, basis: &NormalBasis128) -> Option<u64> {
+            root_from_tables(
+                &self.table,
+                self.overflow_table.as_ref(),
+                self.shared_bloom.as_ref(),
+                &self.states,
+                basis,
+                key,
+            )
+        }
+
+        fn bloom(&self) -> Option<&RootBloom> {
+            self.shared_bloom.as_ref().or(self.table.bloom.as_ref())
+        }
     }
 
     struct Relation128 {
@@ -1497,6 +4186,7 @@ mod wide {
         target: FastPoint128,
         start: usize,
         threads: usize,
+        cancel_early: bool,
     ) -> (Option<Relation128>, u128) {
         let n_states = index.states.len();
         if threads <= 1 || n_states == 0 {
@@ -1521,10 +4211,12 @@ mod wide {
         let n_u32 = gf.n;
         let chunk = n_states.div_ceil(threads);
         let (sender, receiver) = std::sync::mpsc::channel::<(usize, Relation128, u128)>();
+        let cancelled = std::sync::atomic::AtomicBool::new(false);
         std::thread::scope(|scope| {
             let mut handles = Vec::with_capacity(threads);
             for thread in 0..threads {
                 let sender = sender.clone();
+                let cancelled = &cancelled;
                 handles.push(scope.spawn(move || {
                     let pos_lo = thread * chunk;
                     let pos_hi = ((thread + 1) * chunk).min(n_states);
@@ -1538,8 +4230,12 @@ mod wide {
                     let mut relation_check_ns = 0u128;
                     let mut probes = 0u64;
                     let mut scan = StateScan128::new(n_u32);
+                    let mut lift_scratch = LiftScratch128::default();
                     for offset in 0..length {
-                        let state = &index.states[(state_lo + offset) % n_states];
+                        if cancel_early && cancelled.load(std::sync::atomic::Ordering::Acquire) {
+                            break;
+                        }
+                        let state = index.states.get((state_lo + offset) % n_states);
                         if let Some(relation) = scan_state128(
                             gf,
                             fast,
@@ -1549,15 +4245,20 @@ mod wide {
                             base,
                             target,
                             target_x,
-                            state,
+                            &state,
                             &mut scan,
+                            &mut lift_scratch,
                             &mut probes,
                             &mut relation_check_ns,
                         ) {
                             let position = pos_lo + offset;
-                            sender
-                                .send((position, relation, relation_check_ns))
-                                .expect("target receiver is alive");
+                            if !cancel_early
+                                || !cancelled.swap(true, std::sync::atomic::Ordering::AcqRel)
+                            {
+                                sender
+                                    .send((position, relation, relation_check_ns))
+                                    .expect("target receiver is alive");
+                            }
                             break;
                         }
                     }
@@ -1603,6 +4304,27 @@ mod wide {
         }
     }
 
+    /// Parse a `[x, y]` target line directly from decimal text: JSON
+    /// numbers beyond `u64` lose precision in `serde_json::Value`, so wide
+    /// coordinates are read from the raw line (integers or quoted strings).
+    fn parse_wide_pair_line(line: &str) -> [u128; 2] {
+        let inner = line.trim().trim_start_matches('[').trim_end_matches(']');
+        let mut words = inner.split(',');
+        let parse = |raw: &str| -> u128 {
+            raw.trim()
+                .trim_matches('"')
+                .parse()
+                .expect("wide field coordinate must be a decimal integer or string")
+        };
+        let x = parse(words.next().expect("wide point needs two coordinates"));
+        let y = parse(words.next().expect("wide point needs two coordinates"));
+        assert!(
+            words.next().is_none(),
+            "wide point must have two coordinates"
+        );
+        [x, y]
+    }
+
     fn decode_pair128(value: &Value) -> Option<[u128; 2]> {
         if value.is_null() {
             return None;
@@ -1628,13 +4350,69 @@ mod wide {
         columns: usize,
     }
 
+    fn indexed5_fixed31_capacity_ok(max_states: usize) -> bool {
+        max_states < (1usize << 30)
+            && max_states
+                .checked_mul(5)
+                .is_some_and(|bound| bound <= (1usize << 31) * 2)
+    }
+
+    #[test]
+    fn indexed5_fixed31_accepts_exact_eighty_percent_boundary() {
+        let states = |k: usize| k * (k - 1) / 2 * 83 + k * 42;
+        assert!(indexed5_fixed31_capacity_ok(states(4549)));
+        assert!(!indexed5_fixed31_capacity_ok(states(4550)));
+    }
+
     fn build_index128(
         gf: &Gf2_128,
         basis: &NormalBasis128,
         solver: &S3Solver128,
         reps: &[u128],
     ) -> Index128 {
+        let symmetric_states = std::env::var("KIC_SYMMETRIC_S3").as_deref() == Ok("1");
+        let indexed5_load75 = std::env::var("KIC_INDEXED5_LOAD75").as_deref() == Ok("1");
+        let indexed5_load80 = std::env::var("KIC_INDEXED5_LOAD80").as_deref() == Ok("1");
+        let batch_roots = std::env::var("KIC_INDEX_ROOT_BATCH").as_deref() == Ok("1");
+        build_index128_with_symmetry(
+            gf,
+            basis,
+            solver,
+            reps,
+            symmetric_states,
+            indexed5_load75,
+            indexed5_load80,
+            batch_roots,
+        )
+    }
+
+    fn indexed5_load80_request(states: usize) -> usize {
+        states
+            .checked_mul(5)
+            .and_then(|count| count.checked_add(3))
+            .expect("indexed load80 root table request exceeds usize")
+            / 4
+    }
+
+    fn build_index128_with_symmetry(
+        gf: &Gf2_128,
+        basis: &NormalBasis128,
+        solver: &S3Solver128,
+        reps: &[u128],
+        symmetric_states: bool,
+        indexed5_load75: bool,
+        indexed5_load80: bool,
+        batch_roots: bool,
+    ) -> Index128 {
+        assert!(
+            !(indexed5_load75 && indexed5_load80),
+            "indexed five-byte load75 and load80 requests are mutually exclusive"
+        );
         let n = gf.n as usize;
+        assert!(
+            !symmetric_states || gf.n == 83,
+            "symmetric S3 index requires N83"
+        );
         let shifted: Vec<Vec<u128>> = reps
             .iter()
             .map(|&code| {
@@ -1647,14 +4425,386 @@ mod wide {
                 row
             })
             .collect();
-        let mut states = Vec::new();
+        let packed_state83 = std::env::var("KIC_STATE28").as_deref() == Ok("1");
+        let packed_state26 = std::env::var("KIC_STATE26").as_deref() == Ok("1");
+        let root_only83 = std::env::var("KIC_ROOT_ONLY22").as_deref() == Ok("1");
+        let root_only21 = std::env::var("KIC_ROOT_ONLY21").as_deref() == Ok("1");
+        let root_only11 = std::env::var("KIC_ROOT_ONLY11").as_deref() == Ok("1");
+        let indexed5_id30 = std::env::var("KIC_INDEXED5_ID30").as_deref() == Ok("1");
+        let indexed5_id31 = std::env::var("KIC_INDEXED5_ID31").as_deref() == Ok("1");
+        assert!(
+            !(indexed5_id30 && indexed5_id31),
+            "select one five-byte state-ID width"
+        );
+        let indexed5_split_at = std::env::var("KIC_INDEXED5_SPLIT_AT")
+            .ok()
+            .map(|value| value.parse::<usize>().expect("split K must be an integer"));
+        let indexed4_split_at = std::env::var("KIC_INDEXED4_SPLIT_AT").ok().map(|value| {
+            value
+                .parse::<usize>()
+                .expect("four-byte split K must be an integer")
+        });
+        assert!(
+            indexed5_split_at.is_none() || indexed4_split_at.is_none(),
+            "select one root index split"
+        );
+        let split_at = indexed4_split_at.or(indexed5_split_at);
+        let shared_bloom_requested =
+            std::env::var("KIC_INDEXED5_SPLIT_SHARED_BLOOM").as_deref() == Ok("1");
+        assert!(
+            !shared_bloom_requested || (indexed5_split_at.is_some() && root_bloom_enabled()),
+            "shared split Bloom requires a split index and an enabled root Bloom filter"
+        );
+        let indexed5_fixed31 = std::env::var("KIC_INDEXED5_FIXED31").as_deref() == Ok("1");
+        let indexed4_table = std::env::var("KIC_INDEXED_ROOT4").as_deref() == Ok("1");
+        let indexed4_fixed30 = std::env::var("KIC_INDEXED4_FIXED30").as_deref() == Ok("1");
+        let indexed4_fixed31 = std::env::var("KIC_INDEXED4_FIXED31").as_deref() == Ok("1");
+        let indexed4_fixed32 = std::env::var("KIC_INDEXED4_FIXED32").as_deref() == Ok("1");
+        let indexed4_split30 = std::env::var("KIC_INDEXED4_SPLIT30").as_deref() == Ok("1");
+        assert_eq!(
+            indexed4_split30,
+            indexed4_split_at.is_some(),
+            "relative four-byte slots require KIC_INDEXED4_SPLIT_AT"
+        );
+        assert!(
+            (indexed4_fixed30 as u8
+                + indexed4_fixed31 as u8
+                + indexed4_fixed32 as u8
+                + indexed4_split30 as u8)
+                <= 1,
+            "select one four-byte root table capacity"
+        );
+        assert!(
+            (packed_state83 as u8
+                + packed_state26 as u8
+                + root_only83 as u8
+                + root_only21 as u8
+                + root_only11 as u8)
+                <= 1,
+            "select one packed state layout"
+        );
+        assert!(!packed_state83 || gf.n == 83, "28-byte states require N83");
+        assert!(!packed_state26 || gf.n == 83, "26-byte states require N83");
+        assert!(
+            !(root_only83 || root_only21 || root_only11) || (gf.n == 83 && symmetric_states),
+            "root-only states require symmetric N83 traversal"
+        );
+        assert!(
+            !packed_state26 || reps.len() <= 4096,
+            "26-byte state labels require K <= 4096"
+        );
+        // S3(x,y,z) is symmetric in x,y.  Frobenius^relative maps the
+        // reversed pair (right,left,n-relative) to (left,right,relative)
+        // up to exchange.  Canonical root keys are therefore identical.
+        // Keep the lexicographically first state for every such pair so
+        // first-inserted exact-root witnesses remain available.
+        let k = reps.len();
+        if let Some(core) = split_at {
+            assert!(
+                0 < core
+                    && core < k
+                    && root_only11
+                    && symmetric_states
+                    && (indexed4_split30 || ((indexed5_id30 || indexed5_id31) && indexed5_load80)),
+                "split root index needs 0 < core < K and symmetric one-root indexed slots"
+            );
+        }
+        let max_states = if symmetric_states {
+            k.checked_mul(k.saturating_sub(1))
+                .and_then(|pairs| pairs.checked_div(2))
+                .and_then(|pairs| pairs.checked_mul(n))
+                .and_then(|off_diagonal| {
+                    k.checked_mul(n / 2 + 1)
+                        .and_then(|diagonal| off_diagonal.checked_add(diagonal))
+                })
+                .expect("symmetric state capacity exceeds usize")
+        } else {
+            k.checked_mul(k)
+                .and_then(|pairs| pairs.checked_mul(n))
+                .expect("state capacity exceeds usize")
+        };
+        if indexed4_fixed32 {
+            assert!(
+                usize::BITS >= 64
+                    && indexed4_table
+                    && root_only11
+                    && symmetric_states
+                    && max_states < (1usize << 31)
+                    && max_states.checked_mul(2).is_some_and(|roots| roots <= (3usize << 30)),
+                "fixed 2^32 four-byte table needs symmetric one-root N83 states, 31-bit IDs, and at most 75% worst-case load"
+            );
+        }
+        let core_states = split_at.map(|core| {
+            core.checked_mul(core - 1)
+                .and_then(|pairs| pairs.checked_div(2))
+                .and_then(|pairs| pairs.checked_mul(n))
+                .and_then(|off_diagonal| {
+                    core.checked_mul(n / 2 + 1)
+                        .and_then(|diagonal| off_diagonal.checked_add(diagonal))
+                })
+                .expect("split core state capacity exceeds usize")
+        });
+        if indexed4_split30 {
+            let core_count = core_states.expect("four-byte split needs core states");
+            let extension_count = max_states - core_count;
+            assert!(
+                usize::BITS >= 64
+                    && indexed4_table
+                    && root_only11
+                    && symmetric_states
+                    && core_count < (1usize << 30)
+                    && extension_count < (1usize << 30)
+                    && indexed5_load80_request(core_count) <= (1usize << 30)
+                    && indexed5_load80_request(extension_count) <= (1usize << 29),
+                "relative four-byte split exceeds 30-bit IDs or table buckets"
+            );
+        }
+        let overflow_request_entries =
+            core_states.map(|core_count| indexed5_load80_request(max_states - core_count));
+        let mut shared_bloom = shared_bloom_requested
+            .then(|| RootBloom::with_capacity(indexed5_load80_request(max_states)));
+        if root_only11 {
+            assert!(
+                ((std::env::var("KIC_INDEXED_ROOT5").as_deref() == Ok("1")
+                    && (std::env::var("KIC_INDEXED5_FIXED30").as_deref() == Ok("1")
+                        || indexed5_load75
+                        || indexed5_load80
+                        || indexed5_fixed31)
+                    && !indexed4_table)
+                    || (indexed4_table
+                        && (indexed4_fixed30 || indexed4_fixed31 || indexed4_fixed32 || indexed4_split30)
+                        && std::env::var("KIC_INDEXED_ROOT5").as_deref() != Ok("1")
+                        && !indexed5_load75
+                        && !indexed5_load80))
+                    && std::env::var("KIC_PACKED_ROOT_TABLE").as_deref() == Ok("1"),
+                "one-root states require exact indexed fixed30, fixed31, fixed32, split30, load75, or load80 slots"
+            );
+            assert!(
+                max_states.checked_mul(2).unwrap()
+                    < (1usize
+                        << if indexed4_fixed32 || indexed4_split30 || indexed5_id31 {
+                            32
+                        } else if indexed4_fixed31 || indexed5_id30 {
+                            31
+                        } else {
+                            30
+                        }),
+                "one-root complete key bound exceeds fixed indexed slots"
+            );
+        }
+        assert!(
+            !indexed5_id30
+                || (root_only11
+                    && !indexed4_table
+                    && (indexed5_load75 || indexed5_load80 || indexed5_fixed31)
+                    && std::env::var("KIC_INDEXED_ROOT5").as_deref() == Ok("1")),
+            "30-bit indexed state IDs require one-root five-byte load75, load80, or fixed31 slots"
+        );
+        assert!(
+            !indexed5_id31
+                || (root_only11
+                    && !indexed4_table
+                    && (indexed5_load75 || indexed5_load80)
+                    && std::env::var("KIC_INDEXED_ROOT5").as_deref() == Ok("1")),
+            "31-bit indexed state IDs require one-root five-byte load75 or load80 slots"
+        );
+        assert!(
+            !indexed5_fixed31
+                || (root_only11
+                    && indexed5_id30
+                    && !indexed4_table
+                    && !indexed5_load75
+                    && std::env::var("KIC_INDEXED5_FIXED30").as_deref() != Ok("1")
+                    && std::env::var("KIC_INDEXED_ROOT5").as_deref() == Ok("1")
+                    && indexed5_fixed31_capacity_ok(max_states)),
+            "fixed31 five-byte slots require one-root ID30 states and at most 80% upper load"
+        );
+        // One-root states insert their exact keys while each second root is
+        // still available.  The retained state count is known from the
+        // symmetric traversal, so load75 can size this early table exactly.
+        let root11_request_entries = root_only11.then(|| {
+            if indexed4_table {
+                if indexed4_split30 {
+                    indexed5_load80_request(core_states.expect("four-byte split needs core states"))
+                } else if indexed4_fixed32 {
+                    1usize << 31
+                } else if indexed4_fixed30 {
+                    1usize << 29
+                } else {
+                    1usize << 30
+                }
+            } else if indexed5_fixed31 {
+                1usize << 30
+            } else if indexed5_load75 {
+                max_states
+                    .checked_mul(4)
+                    .and_then(|count| count.checked_add(2))
+                    .expect("one-root indexed request exceeds usize")
+                    / 3
+            } else if indexed5_load80 {
+                indexed5_load80_request(core_states.unwrap_or(max_states))
+            } else {
+                1usize << 29
+            }
+        });
+        let mut early_root11_table = root11_request_entries.map(|entries| {
+            if indexed4_table {
+                if indexed4_split30 {
+                    RootTable128::with_capacity_indexed83_four_relative(entries, 0)
+                } else {
+                    RootTable128::with_capacity_indexed83_four_mode(entries, indexed4_fixed32)
+                }
+            } else {
+                RootTable128::with_capacity_indexed83_mode_bloom_id31(
+                    entries,
+                    indexed5_id30,
+                    indexed5_id31,
+                    !shared_bloom_requested && root_bloom_enabled(),
+                )
+            }
+        });
+        let mut early_overflow_table = overflow_request_entries.map(|entries| {
+            if indexed4_split30 {
+                RootTable128::with_capacity_indexed83_four_relative(
+                    entries,
+                    core_states.expect("four-byte split needs core states"),
+                )
+            } else {
+                RootTable128::with_capacity_indexed83_mode_bloom_id31(
+                    entries,
+                    indexed5_id30,
+                    indexed5_id31,
+                    !shared_bloom_requested && root_bloom_enabled(),
+                )
+            }
+        });
+        let mut states83 = if packed_state83 {
+            Vec::with_capacity(max_states)
+        } else {
+            Vec::new()
+        };
+        let mut states26 = if packed_state26 {
+            Vec::with_capacity(max_states)
+        } else {
+            Vec::new()
+        };
+        let mut root_only_states = if root_only83 {
+            Vec::with_capacity(max_states)
+        } else {
+            Vec::new()
+        };
+        let mut root_only21_states = if root_only21 {
+            Vec::with_capacity(max_states)
+        } else {
+            Vec::new()
+        };
+        let mut root_only11_states = if root_only11 {
+            Vec::with_capacity(max_states)
+        } else {
+            Vec::new()
+        };
+        let mut core_state_insertions = 0usize;
+        let mut overflow_state_insertions = 0usize;
+        let mut states_wide = Vec::new();
+        let mut root_batch = RootBatch128::with_capacity(n);
+        let mut root_inputs = Vec::with_capacity(n);
+        let root_threads: usize = match std::env::var("KIC_INDEX_ROOT_THREADS") {
+            Ok(value) => {
+                let threads: usize = value
+                    .parse()
+                    .expect("KIC_INDEX_ROOT_THREADS must be an integer from 1 to 8");
+                assert!(
+                    (1..=8).contains(&threads),
+                    "KIC_INDEX_ROOT_THREADS must be from 1 to 8"
+                );
+                threads
+            }
+            Err(std::env::VarError::NotPresent) => 1,
+            Err(error) => panic!("invalid KIC_INDEX_ROOT_THREADS: {error}"),
+        };
         for left in 0..reps.len() {
-            for right in 0..reps.len() {
-                for relative in 0..n {
-                    if let Some(roots) =
+            let right_start = if symmetric_states { left } else { 0 };
+            // Compute each left row concurrently, then insert states and exact
+            // root keys in the original right/relative order.  The latter
+            // preserves stable state IDs and the first-witness table rule.
+            let parallel_roots: Vec<Option<[u128; 2]>> = if root_threads > 1 {
+                std::thread::scope(|scope| {
+                    let count = reps.len() - right_start;
+                    let workers = root_threads.min(count);
+                    let chunk_width = count.div_ceil(workers);
+                    let mut handles = Vec::with_capacity(workers);
+                    let shifted = &shifted;
+                    for first in (right_start..reps.len()).step_by(chunk_width) {
+                        let last = (first + chunk_width).min(reps.len());
+                        handles.push(scope.spawn(move || {
+                            let mut batch = RootBatch128::with_capacity(n);
+                            let mut inputs = Vec::with_capacity(n);
+                            let mut roots = Vec::with_capacity((last - first) * n);
+                            for right in first..last {
+                                let relative_count = if symmetric_states && left == right {
+                                    n / 2 + 1
+                                } else {
+                                    n
+                                };
+                                if batch_roots {
+                                    inputs.clear();
+                                    for relative in 0..relative_count {
+                                        inputs.push((shifted[left][0], shifted[right][relative]));
+                                    }
+                                    batch.solve(gf, basis, solver, &inputs);
+                                    roots.extend_from_slice(&batch.results);
+                                } else {
+                                    roots.extend((0..relative_count).map(|relative| {
+                                        solver.roots(
+                                            gf,
+                                            basis,
+                                            shifted[left][0],
+                                            shifted[right][relative],
+                                        )
+                                    }));
+                                }
+                            }
+                            roots
+                        }));
+                    }
+                    handles
+                        .into_iter()
+                        .flat_map(|handle| handle.join().expect("root worker panicked"))
+                        .collect()
+                })
+            } else {
+                Vec::new()
+            };
+            let mut root_cursor = 0;
+            for right in right_start..reps.len() {
+                let relative_count = if symmetric_states && left == right {
+                    n / 2 + 1
+                } else {
+                    n
+                };
+                if batch_roots && root_threads == 1 {
+                    root_inputs.clear();
+                    for relative in 0..relative_count {
+                        root_inputs.push((shifted[left][0], shifted[right][relative]));
+                    }
+                    root_batch.solve(gf, basis, solver, &root_inputs);
+                }
+                for relative in 0..relative_count {
+                    let roots = if root_threads > 1 {
+                        parallel_roots[root_cursor + relative]
+                    } else if batch_roots {
+                        root_batch.results[relative]
+                    } else {
                         solver.roots(gf, basis, shifted[left][0], shifted[right][relative])
-                    {
-                        states.push(State128 {
+                    };
+                    if root_only83 || root_only21 || root_only11 {
+                        assert!(
+                            roots.is_some(),
+                            "root-only state domain has a missing S3 root"
+                        );
+                    }
+                    if let Some(roots) = roots {
+                        let state = State128 {
                             left: left as u16,
                             right: right as u16,
                             relative: relative as u16,
@@ -1662,25 +4812,360 @@ mod wide {
                                 basis.to_normal.apply(roots[0]),
                                 basis.to_normal.apply(roots[1]),
                             ],
-                        });
+                        };
+                        if packed_state83 {
+                            states83.push(State83::from_wide(state));
+                        } else if packed_state26 {
+                            states26.push(State26::from_wide(state));
+                        } else if root_only83 {
+                            root_only_states.push(RootOnly83::from_wide(state));
+                        } else if root_only21 {
+                            root_only21_states.push(RootOnly21::from_wide(state));
+                        } else if root_only11 {
+                            let state_index = root_only11_states.len();
+                            root_only11_states.push(RootOnly11::from_wide(state));
+                            // Relative IDs use a contiguous ordinal cut;
+                            // the five-byte split keeps its pair-label cut.
+                            let overflows = if indexed4_split30 {
+                                state_index
+                                    >= core_states.expect("four-byte split needs core states")
+                            } else {
+                                split_at.is_some_and(|core| left >= core || right >= core)
+                            };
+                            let table = if overflows {
+                                overflow_state_insertions += 1;
+                                early_overflow_table.as_mut().unwrap()
+                            } else {
+                                core_state_insertions += 1;
+                                early_root11_table.as_mut().unwrap()
+                            };
+                            for (selector, root) in state.normal_roots.into_iter().enumerate() {
+                                let canonical = basis.canonical_selected(root).0;
+                                table.insert_indexed83(
+                                    canonical,
+                                    state_index,
+                                    selector,
+                                    |prior_index, prior_selector| {
+                                        basis
+                                            .canonical_selected(root11_at(
+                                                &root_only11_states,
+                                                k,
+                                                &shifted,
+                                                gf,
+                                                basis,
+                                                prior_index,
+                                                prior_selector,
+                                            ))
+                                            .0
+                                    },
+                                );
+                                if let Some(bloom) = &mut shared_bloom {
+                                    bloom.insert(canonical);
+                                }
+                            }
+                        } else {
+                            states_wide.push(state);
+                        }
                     }
                 }
+                root_cursor += relative_count;
+            }
+            if root_threads > 1 {
+                assert_eq!(root_cursor, parallel_roots.len());
             }
         }
-        let mut table = RootTable128::with_capacity(states.len() * 2);
-        for state in &states {
-            for &root in &state.normal_roots {
-                let (canonical, shift) = basis.canonical_selected(root);
-                table.insert_if_absent(
-                    canonical,
-                    pack(state.left, state.right, state.relative, shift),
-                );
+        let states = if packed_state83 {
+            StateStore128::Packed83(states83)
+        } else if packed_state26 {
+            StateStore128::Packed26(states26)
+        } else if root_only83 {
+            assert_eq!(root_only_states.len(), max_states);
+            StateStore128::RootOnly83 {
+                states: root_only_states,
+                k,
+            }
+        } else if root_only21 {
+            assert_eq!(root_only21_states.len(), max_states);
+            StateStore128::RootOnly21 {
+                states: root_only21_states,
+                k,
+            }
+        } else if root_only11 {
+            assert_eq!(root_only11_states.len(), max_states);
+            if let Some(expected_core) = core_states {
+                assert_eq!(core_state_insertions, expected_core);
+                assert_eq!(overflow_state_insertions, max_states - expected_core);
+            }
+            StateStore128::RootOnly11 {
+                states: root_only11_states,
+                k,
+                shifted: shifted.clone(),
+                gf: Box::new(gf.clone()),
+                basis: Box::new(basis.clone()),
+            }
+        } else {
+            StateStore128::Wide(states_wide)
+        };
+        let packed = std::env::var("KIC_PACKED_ROOT_TABLE").as_deref() == Ok("1");
+        let dense_table = std::env::var("KIC_PACKED_ROOT_TABLE_DENSE").as_deref() == Ok("1");
+        let load75_table = std::env::var("KIC_PACKED_ROOT_TABLE_LOAD75").as_deref() == Ok("1");
+        let indexed5_table = std::env::var("KIC_INDEXED_ROOT5").as_deref() == Ok("1");
+        let indexed5_fixed30 = std::env::var("KIC_INDEXED5_FIXED30").as_deref() == Ok("1");
+        assert!(
+            !indexed4_table
+                || (!indexed5_table
+                    && ((root_only11
+                        && (indexed4_fixed30 || indexed4_fixed31 || indexed4_fixed32 || indexed4_split30))
+                        || (root_only21 && indexed4_fixed30))),
+            "four-byte root slots require one-root/fixed30/fixed31/fixed32/split30 or 21-byte/fixed30 states"
+        );
+        assert!(
+            !(dense_table || load75_table) || packed,
+            "dense root table requires packed slots"
+        );
+        assert!(
+            !(dense_table && load75_table),
+            "select one dense root table request rule"
+        );
+        assert!(
+            !indexed5_table
+                || (gf.n == 83
+                    && (packed_state83
+                        || packed_state26
+                        || root_only83
+                        || root_only21
+                        || root_only11)
+                    && packed
+                    && !dense_table
+                    && !load75_table),
+            "five-byte indexed roots require N83 compact states and the regular packed request"
+        );
+        assert!(
+            !indexed5_load75 || indexed5_table,
+            "indexed five-byte load75 request requires the indexed table"
+        );
+        assert!(
+            !indexed5_load80 || indexed5_table,
+            "indexed five-byte load80 request requires the indexed table"
+        );
+        assert!(
+            !indexed5_fixed31 || (indexed5_table && root_only11 && indexed5_id30),
+            "indexed five-byte fixed31 request requires one-root ID30 states"
+        );
+        assert!(
+            !indexed5_fixed30
+                || (indexed5_table
+                    && (root_only21 || root_only11)
+                    && !indexed5_load75
+                    && !indexed5_load80),
+            "fixed 2^30 root slots require an indexed root-only state layout"
+        );
+        if indexed5_fixed30 {
+            assert!(
+                max_states.checked_mul(2).unwrap() < (1usize << 30),
+                "fixed 2^30 root table cannot hold all possible state roots"
+            );
+        }
+        if indexed4_fixed31 {
+            assert!(
+                indexed4_table
+                    && max_states < (1usize << 29)
+                    && max_states.checked_mul(2).unwrap() < (1usize << 31),
+                "fixed 2^31 four-byte table cannot encode all state roots"
+            );
+        }
+        if indexed4_fixed32 {
+            assert!(
+                indexed4_table
+                    && root_only11
+                    && max_states < (1usize << 31)
+                    && max_states
+                        .checked_mul(2)
+                        .is_some_and(|roots| roots <= (3usize << 30)),
+                "fixed 2^32 four-byte table cannot encode all state roots at 75% load"
+            );
+        }
+        if indexed4_fixed30 {
+            assert!(
+                indexed4_table
+                    && (root_only21 || root_only11)
+                    && max_states < (1usize << 29)
+                    && max_states.checked_mul(2).unwrap() < (1usize << 30),
+                "fixed 2^30 four-byte table cannot encode all state roots"
+            );
+        }
+        // The symmetric quotient retains almost two distinct canonical root
+        // keys per state.  Requesting 4*S/3 therefore targets at most 75%
+        // occupancy after the constructor doubles the request.
+        let root_table_request_entries = if let Some(entries) = root11_request_entries {
+            entries
+        } else if indexed4_fixed32 {
+            1usize << 31
+        } else if indexed4_fixed31 {
+            1usize << 30
+        } else if indexed4_fixed30 || indexed5_fixed30 {
+            1usize << 29
+        } else if indexed5_load75 {
+            states
+                .len()
+                .checked_mul(4)
+                .and_then(|n| n.checked_add(2))
+                .expect("indexed root table request exceeds usize")
+                / 3
+        } else if indexed5_load80 {
+            indexed5_load80_request(states.len())
+        } else if load75_table {
+            states
+                .len()
+                .checked_mul(2)
+                .and_then(|n| n.checked_add(2))
+                .expect("root table request exceeds usize")
+                / 3
+        } else if dense_table {
+            states.len()
+        } else {
+            states.len() * 2
+        };
+        let mut table = if let Some(table) = early_root11_table {
+            table
+        } else if indexed4_table {
+            RootTable128::with_capacity_indexed83_four(root_table_request_entries)
+        } else if indexed5_table {
+            RootTable128::with_capacity_indexed83_mode_bloom_id31(
+                root_table_request_entries,
+                indexed5_id30,
+                indexed5_id31,
+                root_bloom_enabled(),
+            )
+        } else {
+            RootTable128::with_capacity(root_table_request_entries, gf.n, reps.len(), packed)
+        };
+        if !root_only11 {
+            for state_index in 0..states.len() {
+                if matches!(
+                    &table.slots,
+                    RootSlots128::Indexed83(_) | RootSlots128::Indexed83Four(_)
+                ) {
+                    for root_selector in 0..2 {
+                        let canonical = basis
+                            .canonical_selected(states.root_at(state_index, root_selector))
+                            .0;
+                        table.insert_indexed83(
+                            canonical,
+                            state_index,
+                            root_selector,
+                            |index, selector| {
+                                basis.canonical_selected(states.root_at(index, selector)).0
+                            },
+                        );
+                    }
+                } else {
+                    let state = states.get(state_index);
+                    for &root in &state.normal_roots {
+                        let (canonical, shift) = basis.canonical_selected(root);
+                        table.insert_if_absent(
+                            canonical,
+                            pack(state.left, state.right, state.relative, shift),
+                        );
+                    }
+                }
             }
         }
         Index128 {
             states,
             table,
+            overflow_table: early_overflow_table,
+            shared_bloom,
+            split_at,
+            overflow_request_entries,
             shifted,
+            symmetric_states,
+            dense_table,
+            load75_table,
+            indexed5_table,
+            indexed5_id30,
+            indexed5_id31,
+            indexed4_table,
+            indexed5_load75,
+            indexed5_load80,
+            indexed5_fixed30,
+            indexed5_fixed31,
+            indexed4_fixed30,
+            indexed4_fixed31,
+            indexed4_fixed32,
+            indexed4_split30,
+            root_table_request_entries,
+        }
+    }
+
+    /// Reusable scratch for batched affine adds in [`lift128`]: result
+    /// slots, Montgomery-batch denominators/prefixes, all reused across
+    /// calls so the hot lift loop performs no allocations.  The u128 twin
+    /// of the u64 pipeline's `LiftScratch`.
+    #[derive(Default)]
+    struct LiftScratch128 {
+        results: Vec<FastPoint128>,
+        denominators: Vec<u128>,
+        prefixes: Vec<u128>,
+        regular: Vec<usize>,
+    }
+
+    impl LiftScratch128 {
+        /// Affine batch addition of one fixed point against a list of points
+        /// with a single shared field inversion (Montgomery's trick).
+        /// `results[i]` equals `fast.add(base, points[i])`, in order; the
+        /// exceptional same-x paths (doubling, the point at infinity) fall
+        /// back to the scalar `add`.
+        fn batch_adds(
+            &mut self,
+            fast: &FastBinaryCurve128,
+            base: FastPoint128,
+            points: &[FastPoint128],
+        ) {
+            let gf = &fast.gf;
+            self.results.clear();
+            self.results.extend(std::iter::repeat_n(None, points.len()));
+            self.denominators.clear();
+            self.prefixes.clear();
+            self.prefixes.resize(points.len(), 0);
+            self.regular.clear();
+            self.regular.reserve(points.len());
+            for (i, &q) in points.iter().enumerate() {
+                match (base, q) {
+                    (None, r) | (r, None) => self.results[i] = r,
+                    (Some((x1, _)), Some((x2, _))) => {
+                        if x1 == x2 {
+                            self.results[i] = fast.add(base, q);
+                        } else {
+                            self.denominators.push(x1 ^ x2);
+                            self.regular.push(i);
+                        }
+                    }
+                }
+            }
+            if self.regular.is_empty() {
+                return;
+            }
+            let mut product = 1u128;
+            for (k, &d) in self.denominators.iter().enumerate() {
+                self.prefixes[k] = product;
+                product = gf.mul(product, d);
+            }
+            let mut inverse_product = gf.inv(product);
+            for k in (0..self.denominators.len()).rev() {
+                let inverse = gf.mul(inverse_product, self.prefixes[k]);
+                inverse_product = gf.mul(inverse_product, self.denominators[k]);
+                let i = self.regular[k];
+                let (Some((x1, y1)), Some((x2, y2))) = (base, points[i]) else {
+                    unreachable!("regular slots hold affine pairs");
+                };
+                let dy = y1 ^ y2;
+                let lambda = gf.mul(dy, inverse);
+                let lambda_sq = gf.sqr(lambda);
+                let x3 = lambda_sq ^ lambda ^ x1 ^ x2 ^ fast.a;
+                let y3 = gf.mul(lambda, x1 ^ x3) ^ x3 ^ y1;
+                self.results[i] = Some((x3, y3));
+            }
         }
     }
 
@@ -1689,23 +5174,31 @@ mod wide {
         base: &Base128,
         codes: &[u128; 4],
         target: FastPoint128,
-        relation_check_ns: &mut u128,
+        scratch: &mut LiftScratch128,
     ) -> Option<[usize; 4]> {
         let choices: Vec<&Vec<usize>> = codes
             .iter()
             .map(|code| base.by_x.get(code))
             .collect::<Option<_>>()?;
+        let b_points: Vec<FastPoint128> = choices[1].iter().map(|&i| base.points[i]).collect();
+        let c_points: Vec<FastPoint128> = choices[2].iter().map(|&i| base.points[i]).collect();
+        let d_points: Vec<FastPoint128> = choices[3].iter().map(|&i| base.points[i]).collect();
+        // Batched affine adds level by level: for each fixed left point, the
+        // next level's adds against the choice points share one field
+        // inversion (Montgomery's trick). The iteration order and the first
+        // lifted match are exactly those of the per-candidate add loop this
+        // replaces.
         for &a in choices[0] {
-            for &b in choices[1] {
-                let ab = fast.add(base.points[a], base.points[b]);
-                for &c in choices[2] {
-                    let abc = fast.add(ab, base.points[c]);
-                    for &d in choices[3] {
-                        let check_started = Instant::now();
-                        let matches = fast.add(abc, base.points[d]) == target;
-                        *relation_check_ns += check_started.elapsed().as_nanos();
-                        if matches {
-                            return Some([a, b, c, d]);
+            scratch.batch_adds(fast, base.points[a], &b_points);
+            let abs = scratch.results.clone();
+            for (bi, &ab) in abs.iter().enumerate() {
+                scratch.batch_adds(fast, ab, &c_points);
+                let abcs = scratch.results.clone();
+                for (ci, &abc) in abcs.iter().enumerate() {
+                    scratch.batch_adds(fast, abc, &d_points);
+                    for (di, &result) in scratch.results.iter().enumerate() {
+                        if result == target {
+                            return Some([a, choices[1][bi], choices[2][ci], choices[3][di]]);
                         }
                     }
                 }
@@ -1748,6 +5241,7 @@ mod wide {
         target_x: u128,
         state: &State128,
         scan: &mut StateScan128,
+        lift_scratch: &mut LiftScratch128,
         probes: &mut u64,
         relation_check_ns: &mut u128,
     ) -> Option<Relation128> {
@@ -1775,8 +5269,8 @@ mod wide {
                 for partner in partners {
                     *probes += 1;
                     let (canonical, partner_shift) =
-                        basis.canonical(basis.to_normal.apply(partner));
-                    let Some(value) = index.table.get(canonical) else {
+                        basis.canonical_selected(basis.to_normal.apply(partner));
+                    let Some(value) = index.get_root(canonical, basis) else {
                         continue;
                     };
                     let (left2, right2, relative2, stored_shift) = unpack(value);
@@ -1788,9 +5282,12 @@ mod wide {
                         index.shifted[left2][left_shift2],
                         index.shifted[right2][right_shift2],
                     ];
-                    if let Some(point_indices) =
-                        lift128(fast, base, &codes, target, relation_check_ns)
-                    {
+                    // Time the whole lift once per candidate instead of one
+                    // Instant::now() per innermost add.
+                    let lift_started = Instant::now();
+                    let lifted = lift128(fast, base, &codes, target, lift_scratch);
+                    *relation_check_ns += lift_started.elapsed().as_nanos();
+                    if let Some(point_indices) = lifted {
                         return Some(Relation128 {
                             point_indices,
                             x_codes: codes,
@@ -1818,8 +5315,10 @@ mod wide {
         let (target_x, _) = target?;
         let mut probes = 0u64;
         let mut scan = StateScan128::new(gf.n);
+        let mut lift_scratch = LiftScratch128::default();
         let start = start % index.states.len().max(1);
-        for state in index.states[start..].iter().chain(&index.states[..start]) {
+        for offset in 0..index.states.len() {
+            let state = index.states.get((start + offset) % index.states.len());
             if let Some(relation) = scan_state128(
                 gf,
                 fast,
@@ -1829,8 +5328,9 @@ mod wide {
                 base,
                 target,
                 target_x,
-                state,
+                &state,
                 &mut scan,
+                &mut lift_scratch,
                 &mut probes,
                 relation_check_ns,
             ) {
@@ -1955,9 +5455,7 @@ mod wide {
             .map(|line| {
                 let line = line.trim();
                 if line.starts_with('[') {
-                    let encoded: Value = serde_json::from_str(line)
-                        .expect("target point must be a JSON [x,y] array");
-                    let [x, y] = decode_pair128(&encoded).expect("target point must be affine");
+                    let [x, y] = parse_wide_pair_line(line);
                     TargetInput128::PublicPoint(Some((x, y)))
                 } else {
                     TargetInput128::KnownAnswerScalar(line.parse().unwrap())
@@ -2033,6 +5531,47 @@ mod wide {
             }
             None => header["base_hash"].as_str().unwrap().to_owned(),
         };
+        if std::env::var("KIC_BASE_BUILD_ONLY").as_deref() == Ok("1") {
+            assert!(
+                constructed.is_some(),
+                "base-only stage needs a constructed base"
+            );
+            let dump_path =
+                std::env::var("KIC_DUMP_BASE").expect("base-only stage needs KIC_DUMP_BASE");
+            let dump = json!({
+                "kind":"point_defined_factor_base",
+                "n":n, "a":a,
+                "subgroup_order":r,
+                "field_modulus_low_terms":curve.curve.irreducible.low_terms,
+                "orbit_columns":representatives.len(),
+                "base_hash":base_hash,
+                "factor_base_points":points.len(),
+                "field_value_encoding":"base-10 strings for u128 field values",
+                "factor_base_point_coordinates":points.iter().map(|p| encode_point128(*p)).collect::<Vec<_>>(),
+                "factor_base_point_labels":labels,
+                "factor_base_representatives":representatives.iter().copied().map(encode_pair128).collect::<Vec<_>>(),
+            });
+            std::fs::write(&dump_path, format!("{dump}\n")).expect("write base-only dump");
+            println!(
+                "{}",
+                json!({
+                    "kind":"compact_orbit_base_stage",
+                    "status":"STAGE_DIAGNOSTIC_ONLY",
+                    "n":n, "a":a,
+                    "subgroup_order":r,
+                    "cofactor":curve.cofactor.to_string(),
+                    "field_modulus_low_terms":curve.curve.irreducible.low_terms,
+                    "generator":encode_point128(generator),
+                    "orbit_columns":representatives.len(),
+                    "factor_base_points":points.len(),
+                    "base_hash":base_hash,
+                    "base_scanned_x":scanned_x,
+                    "base_construction_ms":setup_started.elapsed().as_secs_f64() * 1000.0,
+                    "base_dump_path":dump_path,
+                })
+            );
+            std::process::exit(0);
+        }
         let mut by_x: HashMap<u128, Vec<usize>> = HashMap::new();
         for (index, point) in points.iter().enumerate() {
             if let Some((x, _)) = point {
@@ -2074,6 +5613,88 @@ mod wide {
         let index = build_index128(&gf, &basis, &solver, &reps);
         let index_ms = index_started.elapsed().as_secs_f64() * 1000.0;
         let setup_ms = setup_started.elapsed().as_secs_f64() * 1000.0;
+        if std::env::var("KIC_INDEX_BUILD_ONLY").as_deref() == Ok("1") {
+            let state_digest = match &index.states {
+                StateStore128::RootOnly11 { states, .. } => {
+                    let mut hasher = blake3::Hasher::new();
+                    for state in states {
+                        hasher.update(&state.root0);
+                    }
+                    Some(hasher.finalize().to_hex().to_string())
+                }
+                _ => None,
+            };
+            let table_digest = match &index.table.slots {
+                RootSlots128::Indexed83(slots) => {
+                    let mut hasher = blake3::Hasher::new();
+                    for slot in slots {
+                        hasher.update(slot);
+                    }
+                    Some(hasher.finalize().to_hex().to_string())
+                }
+                RootSlots128::Indexed83Four(slots) => {
+                    let mut hasher = blake3::Hasher::new();
+                    for slot in slots {
+                        hasher.update(&slot.to_le_bytes());
+                    }
+                    Some(hasher.finalize().to_hex().to_string())
+                }
+                _ => None,
+            };
+            let overflow_digest = index.overflow_table.as_ref().and_then(|table| {
+                let mut hasher = blake3::Hasher::new();
+                match &table.slots {
+                    RootSlots128::Indexed83(slots) => {
+                        for slot in slots {
+                            hasher.update(slot);
+                        }
+                    }
+                    RootSlots128::Indexed83Four(slots) => {
+                        for slot in slots {
+                            hasher.update(&slot.to_le_bytes());
+                        }
+                    }
+                    _ => return None,
+                }
+                Some(hasher.finalize().to_hex().to_string())
+            });
+            println!(
+                "{}",
+                json!({
+                    "kind": "compact_orbit_index_stage",
+                    "status": "STAGE_DIAGNOSTIC_ONLY",
+                    "n": gf.n,
+                    "base_hash": base_hash,
+                    "orbit_columns": base.columns,
+                    "factor_base_points": base.points.len(),
+                    "regular_states": index.states.len(),
+                    "root_table_entries": index.table.len + index.overflow_table.as_ref().map_or(0, |t| t.len),
+                    "primary_table_entries": index.table.len,
+                    "overflow_table_entries": index.overflow_table.as_ref().map_or(0, |t| t.len),
+                    "primary_table_allocated_bytes": index.table.layout_receipt().2,
+                    "overflow_table_allocated_bytes": index.overflow_table.as_ref().map_or(0, |t| t.layout_receipt().2),
+                    "root_table_allocated_bytes": index.table.layout_receipt().2 + index.overflow_table.as_ref().map_or(0, |t| t.layout_receipt().2),
+                    "root_fingerprint_sidecar_bytes": index.table.fingerprint_sidecar_bytes() + index.overflow_table.as_ref().map_or(0, RootTable128::fingerprint_sidecar_bytes),
+                    "root_table_layout": index.table.layout_receipt().0,
+                    "root_slot_state_id_bits": if index.indexed4_fixed32 || index.indexed5_id31 { 31 } else if index.indexed4_split30 || index.indexed5_id30 { 30 } else { 29 },
+                    "indexed5_split_at": if index.indexed4_split30 { None } else { index.split_at },
+                    "indexed4_split_at": if index.indexed4_split30 { index.split_at } else { None },
+                    "indexed5_state_id_bits": if index.indexed5_id31 { 31 } else if index.indexed5_id30 { 30 } else { 29 },
+                    "shared_bloom_enabled": index.shared_bloom.is_some(),
+                    "shared_bloom_bytes": index.shared_bloom.as_ref().map_or(0, RootBloom::bytes),
+                    "root_bloom_bytes": index.table.bloom.as_ref().map_or(0, RootBloom::bytes) + index.overflow_table.as_ref().and_then(|t| t.bloom.as_ref()).map_or(0, RootBloom::bytes) + index.shared_bloom.as_ref().map_or(0, RootBloom::bytes),
+                    "state_digest_blake3": state_digest,
+                    "table_digest_blake3": table_digest,
+                    "overflow_digest_blake3": overflow_digest,
+                    "batch_roots": std::env::var("KIC_INDEX_ROOT_BATCH").as_deref() == Ok("1"),
+                    "base_load_ms": base_load_ms,
+                    "normal_basis_and_selftest_ms": basis_ms,
+                    "index_build_ms": index_ms,
+                    "setup_total_ms": setup_ms,
+                })
+            );
+            std::process::exit(0);
+        }
 
         let rank_started = Instant::now();
         let mut echelon = super::Echelon {
@@ -2230,6 +5851,7 @@ mod wide {
             .and_then(|value| value.trim().parse::<usize>().ok())
             .filter(|&threads| threads > 0)
             .unwrap_or(1);
+        let target_cancel = std::env::var("KIC_TARGET_CANCEL").as_deref() == Ok("1");
         let mut solved = 0usize;
         let mut failed = 0usize;
         let mut target_query_ms = Vec::with_capacity(target_inputs.len());
@@ -2266,6 +5888,7 @@ mod wide {
                 target,
                 start,
                 target_threads,
+                target_cancel,
             );
             let target_decomposition_total_ms = target_pdp_started.elapsed().as_secs_f64() * 1000.0;
             let target_relation_check_ms = target_relation_check_ns as f64 / 1_000_000.0;
@@ -2322,7 +5945,11 @@ mod wide {
         let mut sorted = target_query_ms.clone();
         sorted.sort_by(|x, y| x.partial_cmp(y).unwrap());
         let median = sorted.get(sorted.len() / 2).copied();
-        let summary = json!({
+        let (root_table_layout, root_table_slot_bytes, root_table_allocated_bytes) =
+            index.table.layout_receipt();
+        let (root_state_layout, root_state_slot_bytes, root_state_allocated_bytes) =
+            index.states.layout_receipt();
+        let mut summary = json!({
             "kind":"compact_orbit_dlp_summary",
             "schema_version":"1.0",
             "n":n, "a":a,
@@ -2332,9 +5959,19 @@ mod wide {
             "orbit_columns":base.columns,
             "factor_base_points":base.points.len(),
             "regular_states":index.states.len(),
-            "root_table_entries":index.table.len,
-            "root_bloom_enabled":index.table.bloom.is_some(),
-            "root_bloom_bytes":index.table.bloom.as_ref().map_or(0, RootBloom::bytes),
+            "root_state_layout":root_state_layout,
+            "root_state_slot_bytes":root_state_slot_bytes,
+            "root_state_allocated_bytes":root_state_allocated_bytes,
+            "root_table_entries":index.table.len + index.overflow_table.as_ref().map_or(0, |t| t.len),
+            "root_table_dense_enabled":index.dense_table,
+            "root_table_load75_enabled":index.load75_table,
+            "root_table_indexed5_enabled":index.indexed5_table,
+            "root_table_request_entries":index.root_table_request_entries,
+            "root_table_layout":root_table_layout,
+            "root_table_slot_bytes":root_table_slot_bytes,
+            "root_table_allocated_bytes":root_table_allocated_bytes + index.overflow_table.as_ref().map_or(0, |t| t.layout_receipt().2),
+            "root_bloom_enabled":index.bloom().is_some(),
+            "root_bloom_bytes":index.table.bloom.as_ref().map_or(0, RootBloom::bytes) + index.overflow_table.as_ref().and_then(|t| t.bloom.as_ref()).map_or(0, RootBloom::bytes) + index.shared_bloom.as_ref().map_or(0, RootBloom::bytes),
             "sparse_canonical_enabled":basis.sparse_canonical,
             "pair_table_entries":0,
             "edge_selectors":0,
@@ -2368,6 +6005,64 @@ mod wide {
             "target_threads":target_threads,
             "scope":"public synthetic Koblitz fixtures; shared-factor-log DLP with every stage timed in one process; no external points or key recovery",
         });
+        summary["root_fingerprint_sidecar_bytes"] = json!(
+            index.table.fingerprint_sidecar_bytes()
+                + index
+                    .overflow_table
+                    .as_ref()
+                    .map_or(0, RootTable128::fingerprint_sidecar_bytes)
+        );
+        summary["primary_table_entries"] = json!(index.table.len);
+        summary["overflow_table_entries"] =
+            json!(index.overflow_table.as_ref().map_or(0, |table| table.len));
+        summary["indexed5_split_at"] = json!(if index.indexed4_split30 {
+            None
+        } else {
+            index.split_at
+        });
+        summary["indexed4_split_at"] = json!(if index.indexed4_split30 {
+            index.split_at
+        } else {
+            None
+        });
+        summary["overflow_request_entries"] = json!(index.overflow_request_entries);
+        summary["overflow_table_allocated_bytes"] = json!(index
+            .overflow_table
+            .as_ref()
+            .map_or(0, |table| table.layout_receipt().2));
+        summary["overflow_bloom_bytes"] = json!(index
+            .overflow_table
+            .as_ref()
+            .and_then(|table| table.bloom.as_ref())
+            .map_or(0, RootBloom::bytes));
+        summary["primary_table_allocated_bytes"] = json!(root_table_allocated_bytes);
+        summary["shared_bloom_enabled"] = json!(index.shared_bloom.is_some());
+        summary["shared_bloom_bytes"] =
+            json!(index.shared_bloom.as_ref().map_or(0, RootBloom::bytes));
+        summary["target_cancel"] = json!(target_cancel);
+        summary["root_bloom_profile"] =
+            json!(index.bloom().map_or("none", |bloom| bloom.profile.name()));
+        summary["root_bloom_hashes"] = json!(index.bloom().map_or(0, |bloom| bloom.hashes));
+        summary["root_bloom_bits_per_request"] = json!(index
+            .bloom()
+            .map_or(0, |bloom| bloom.profile.bits_per_request()));
+        summary["root_table_hugepage_requested"] = json!(crate::root_table_hugepage_requested());
+        summary["anon_huge_pages_bytes"] = json!(crate::anon_huge_pages_bytes());
+        summary["vm_hwm_bytes"] = json!(crate::vm_hwm_bytes());
+        summary["symmetric_s3_states_enabled"] = json!(index.symmetric_states);
+        summary["root_table_indexed4_enabled"] = json!(index.indexed4_table);
+        summary["root_table_indexed5_id30_enabled"] = json!(index.indexed5_id30);
+        summary["root_table_indexed5_id31_enabled"] = json!(index.indexed5_id31);
+        summary["indexed5_load75_enabled"] = json!(index.indexed5_load75);
+        summary["indexed5_load80_enabled"] = json!(index.indexed5_load80);
+        summary["indexed5_fixed30_enabled"] = json!(index.indexed5_fixed30);
+        summary["indexed5_fixed31_enabled"] = json!(index.indexed5_fixed31);
+        summary["indexed4_fixed31_enabled"] = json!(index.indexed4_fixed31);
+        summary["indexed4_fixed32_enabled"] = json!(index.indexed4_fixed32);
+        summary["indexed4_split30_enabled"] = json!(index.indexed4_split30);
+        summary["indexed4_fixed30_enabled"] = json!(index.indexed4_fixed30);
+        summary["root_only11_enabled"] =
+            json!(matches!(&index.states, StateStore128::RootOnly11 { .. }));
         println!("{summary}");
         if let Ok(path) = std::env::var("KIC_DUMP_BASE") {
             let dump = json!({
@@ -2832,7 +6527,7 @@ fn main() {
     let mut sorted = target_query_ms.clone();
     sorted.sort_by(|x, y| x.partial_cmp(y).unwrap());
     let median = sorted.get(sorted.len() / 2).copied();
-    let summary = json!({
+    let mut summary = json!({
         "kind":"compact_orbit_dlp_summary",
         "schema_version":"1.0",
         "n":n, "a":a,
@@ -2873,6 +6568,18 @@ fn main() {
         "threads":1,
         "scope":"public synthetic Koblitz fixtures; shared-factor-log DLP with every stage timed in one process; no external points or key recovery",
     });
+    summary["root_bloom_profile"] = json!(index
+        .table
+        .bloom
+        .as_ref()
+        .map_or("none", |bloom| bloom.profile.name()));
+    summary["root_bloom_hashes"] =
+        json!(index.table.bloom.as_ref().map_or(0, |bloom| bloom.hashes));
+    summary["root_bloom_bits_per_request"] = json!(index
+        .table
+        .bloom
+        .as_ref()
+        .map_or(0, |bloom| bloom.profile.bits_per_request()));
     println!("{summary}");
     if let Ok(path) = std::env::var("KIC_DUMP_BASE") {
         let dump = json!({

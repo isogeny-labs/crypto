@@ -1,0 +1,977 @@
+//! Cross-checks for the isogeny evaluation module.
+//!
+//! - Field, polynomial and ladder arithmetic against naive references.
+//! - √élu against Vélu (codomain and images) on CM instances with a fully
+//!   rational `ℓ`-torsion (`j = −3375`, `p = (t² + 7v²)/4`, `ℓ | v`,
+//!   `t ≡ 2 mod ℓ`, as in round-4 lead 16.3), for `ℓ ∈ {3, 5, 7, 11, 101,
+//!   1009}`; codomain `j` against the library's independent
+//!   `isogeny_walk::kernel::velu_codomain` (and `verify_kernel`, and
+//!   `Φ_ℓ(j, j') = 0` for small `ℓ`); images have the right order on the
+//!   codomain and the x-only map respects differential addition.
+//! - `ℓ ∈ {2, 3}`: images on the codomain, homomorphism, certified dual with
+//!   `φ̂∘φ = [ℓ]` and `φ∘φ̂ = [ℓ]`, the library codomain for `ℓ = 3`,
+//!   `Φ_ℓ(j, j') = 0`, and `j ∈ {0, 1728}` domains.
+//! - Counters: positive, deterministic, exact per-image Vélu cost, and the
+//!   uncounted field gives the same results.
+//! - NTT: equal to schoolbook and Karatsuba at 20/50/62/63-bit `p` for many
+//!   lengths (edge lengths around powers of two, unbalanced, squares, the
+//!   all-`(p−1)` worst case), exact word counts, NTT-prime constants, and
+//!   √élu results identical under every [`PolyMul`].
+
+use num_bigint::BigUint;
+use num_traits::ToPrimitive;
+use rand::rngs::StdRng;
+use rand::{Rng, SeedableRng};
+
+use super::counted_fp::{
+    is_prime_u64, CompleteTally, NoCount, OpCounter, OpTally, PolyMul, PrimeField,
+};
+use super::montgomery::{batch_to_affine, is_kernel_generator, ladder, xadd, MontgomeryCurve, XZ};
+use super::ntt::{mul_ntt, ntt_mul_add_cost, ntt_mul_cost, MAX_LOG2_LEN, NTT_PRIMES};
+use super::poly::{self, MonicDivisor, ProductTree};
+use super::small_degree::{
+    isomorphisms, kernel_orbit, kernel_representatives, kernel_x_coordinates, ShortWeierstrass,
+    SmallIsogeny,
+};
+use super::sqrt_velu::sqrt_velu;
+use super::velu::{kernel_polynomial, velu};
+use super::IsogenyEvalError;
+use crate::cryptanalysis::isogeny_walk::curve::Model;
+use crate::cryptanalysis::isogeny_walk::field::Field as LibField;
+use crate::cryptanalysis::isogeny_walk::{kernel as lib_kernel, modpoly, poly as lib_poly};
+
+fn random_prime(rng: &mut StdRng, bits: u32) -> u64 {
+    loop {
+        let p = rng.gen_range(1u64 << (bits - 1)..1u64 << bits) | 1;
+        if is_prime_u64(p) {
+            return p;
+        }
+    }
+}
+
+fn lib_field(p: u64) -> LibField {
+    LibField::new(&BigUint::from(p)).expect("prime")
+}
+
+fn lib_u64(f: &LibField, v: &crate::cryptanalysis::isogeny_walk::field::Fe) -> u64 {
+    f.to_big(v).to_u64().expect("fits")
+}
+
+/// `Φ_ℓ(j1, j2) mod p` from the library's modular polynomial.
+fn phi_at(p: u64, ell: u64, j1: u64, j2: u64) -> u64 {
+    let lf = lib_field(p);
+    let phi = modpoly::modular_polynomial(&lf, ell).expect("Φ_ℓ");
+    let py = phi.at_x(&lf, &lf.from_u64(j1));
+    lib_u64(&lf, &lib_poly::eval(&lf, &py, &lf.from_u64(j2)))
+}
+
+// --------------------------------------------------------------- field ----
+
+#[test]
+fn field_rejects_bad_moduli_and_inverts() {
+    assert!(PrimeField::new(3).is_none());
+    assert!(PrimeField::new(91).is_none());
+    assert!(PrimeField::new((1u64 << 63) + 29).is_none());
+    assert!(PrimeField::new(2_305_843_009_213_693_951).is_some()); // 2^61 − 1
+    assert_eq!(std::mem::size_of::<NoCount>(), 0);
+    let mut rng = StdRng::seed_from_u64(1);
+    for bits in [10, 40, 61, 63] {
+        let f = PrimeField::new(random_prime(&mut rng, bits)).unwrap();
+        assert_eq!(f.inv(0), None);
+        for _ in 0..50 {
+            let a = rng.gen_range(1..f.p());
+            assert_eq!(f.mul(a, f.inv(a).unwrap()), 1);
+            let s = f.sqr(a);
+            let r = f.sqrt(s).unwrap();
+            assert_eq!(f.sqr(r), s);
+            assert_eq!(f.pow(a, (f.p() - 1) as u128), 1);
+        }
+    }
+}
+
+// ---------------------------------------------------------- polynomials ----
+
+fn naive_mul<C: OpCounter>(f: &PrimeField<C>, a: &[u64], b: &[u64]) -> Vec<u64> {
+    let mut out = vec![0u64; a.len() + b.len() - 1];
+    for (i, &x) in a.iter().enumerate() {
+        for (j, &y) in b.iter().enumerate() {
+            out[i + j] = f.add(out[i + j], f.mul(x, y));
+        }
+    }
+    out
+}
+
+#[test]
+fn karatsuba_matches_schoolbook() {
+    let mut rng = StdRng::seed_from_u64(2);
+    for bits in [20, 62, 63] {
+        let f = PrimeField::new(random_prime(&mut rng, bits)).unwrap();
+        for (la, lb) in [
+            (1, 1),
+            (5, 30),
+            (25, 25),
+            (60, 61),
+            (300, 40),
+            (97, 200),
+            (128, 128),
+        ] {
+            let a: Vec<u64> = (0..la).map(|_| rng.gen_range(0..f.p())).collect();
+            let b: Vec<u64> = (0..lb).map(|_| rng.gen_range(0..f.p())).collect();
+            assert_eq!(poly::mul(&f, &a, &b), naive_mul(&f, &a, &b), "{la}x{lb}");
+        }
+    }
+}
+
+fn pow_mod(a: u64, mut e: u64, q: u64) -> u64 {
+    let (mut r, mut b) = (1u128, a as u128 % q as u128);
+    while e > 0 {
+        if e & 1 == 1 {
+            r = r * b % q as u128;
+        }
+        b = b * b % q as u128;
+        e >>= 1;
+    }
+    r as u64
+}
+
+#[test]
+fn ntt_primes_are_ntt_friendly_and_large_enough() {
+    let mut log2_q = 0.0;
+    for (&q, g) in NTT_PRIMES.iter().zip([3u64, 5, 7]) {
+        assert!(is_prime_u64(q));
+        assert!(q > 1 << 61 && q < 1 << 62);
+        assert!((q - 1).trailing_zeros() >= MAX_LOG2_LEN);
+        // g is a non-residue, so g^((q−1)/2^k) has order exactly 2^k.
+        assert_eq!(pow_mod(g, (q - 1) / 2, q), q - 1);
+        log2_q += (q as f64).log2();
+    }
+    // Q > 2^57 · 2^126: no coefficient of a product of lengths ≤ 2^54 wraps.
+    assert!(log2_q > 183.0);
+    // Every q_i < 2 q_j (Garner's cross-reductions use one subtraction).
+    for &a in &NTT_PRIMES {
+        for &b in &NTT_PRIMES {
+            assert!(a < 2 * b);
+        }
+    }
+}
+
+#[test]
+fn ntt_matches_schoolbook_and_karatsuba() {
+    let mut rng = StdRng::seed_from_u64(0x5e3);
+    let mut primes: Vec<u64> = [20u32, 50, 62, 63]
+        .iter()
+        .map(|&b| random_prime(&mut rng, b))
+        .collect();
+    // The largest prime below 2^63 and the smallest allowed prime.
+    primes.push((1u64 << 63) - 25);
+    primes.push(5);
+    let lens: &[(usize, usize)] = &[
+        (1, 1),
+        (1, 9),
+        (2, 2),
+        (3, 5),
+        (7, 1),
+        (31, 33),
+        (32, 32),
+        (33, 32),
+        (63, 64),
+        (64, 65),
+        (100, 1),
+        (127, 129),
+        (255, 257),
+        (256, 256),
+        (512, 513),
+        (1000, 37),
+        (1024, 1),
+        (1500, 700),
+    ];
+    for &p in &primes {
+        assert!(is_prime_u64(p), "{p}");
+        let f = PrimeField::counted(p).unwrap();
+        for (k, &(la, lb)) in lens.iter().enumerate() {
+            let worst = k % 3 == 0;
+            let draw = |rng: &mut StdRng, n: usize| -> Vec<u64> {
+                (0..n)
+                    .map(|_| if worst { p - 1 } else { rng.gen_range(0..p) })
+                    .collect()
+            };
+            let a = draw(&mut rng, la);
+            let b = draw(&mut rng, lb);
+            let want = poly::mul_schoolbook(&f, &a, &b);
+            assert_eq!(
+                poly::mul_karatsuba(&f, &a, &b),
+                want,
+                "kara {la}x{lb} p={p}"
+            );
+            let before = f.tally();
+            let got = mul_ntt(&f, &a, &b);
+            let used = f.tally().since(before);
+            assert_eq!(got, want, "ntt {la}x{lb} p={p}");
+            let (w, m) = ntt_mul_cost(la, lb, false);
+            assert_eq!((used.word, used.mul, used.inv), (w, m, 0));
+            // Squaring path (same slice) and its count.
+            let before = f.tally();
+            let sq = mul_ntt(&f, &a, &a);
+            let used = f.tally().since(before);
+            assert_eq!(sq, poly::mul_schoolbook(&f, &a, &a), "sqr {la} p={p}");
+            assert_eq!((used.word, used.mul), ntt_mul_cost(la, la, true));
+        }
+        assert!(mul_ntt(&f, &[], &[1, 2]).is_empty());
+    }
+}
+
+#[test]
+fn poly_mul_follows_the_field_choice() {
+    let mut rng = StdRng::seed_from_u64(0x5e4);
+    let p = random_prime(&mut rng, 61);
+    let a: Vec<u64> = (0..1200).map(|_| rng.gen_range(0..p)).collect();
+    // 1200 × 800: the NTT's count is the smaller (ratio 0.58).
+    let b: Vec<u64> = (0..800).map(|_| rng.gen_range(0..p)).collect();
+    let small: Vec<u64> = (0..poly::NTT_THRESHOLD - 1)
+        .map(|_| rng.gen_range(0..p))
+        .collect();
+    let mut outs = Vec::new();
+    for (m, ntt_big, ntt_small) in [
+        (PolyMul::Karatsuba, false, false),
+        (PolyMul::Auto, true, false),
+        (PolyMul::Ntt, true, true),
+    ] {
+        let f = PrimeField::counted(p).unwrap().with_poly_mul(m);
+        assert_eq!(f.poly_mul(), m);
+        let c = poly::mul(&f, &a, &b);
+        assert_eq!(f.tally().word > 0, ntt_big, "{m:?}");
+        f.reset_counts();
+        let _ = poly::mul(&f, &a, &small);
+        assert_eq!(f.tally().word > 0, ntt_small, "{m:?}");
+        outs.push(c);
+    }
+    assert_eq!(PrimeField::new(p).unwrap().poly_mul(), PolyMul::Auto);
+    assert!(outs.windows(2).all(|w| w[0] == w[1]));
+    // Above the length threshold, Auto still takes Karatsuba when its count
+    // is the smaller for the shape (1200 × 259: ratio 1.13 from padding).
+    let mid: Vec<u64> = (0..poly::NTT_THRESHOLD + 3)
+        .map(|_| rng.gen_range(0..p))
+        .collect();
+    let f = PrimeField::counted(p).unwrap();
+    let c = poly::mul(&f, &a, &mid);
+    assert_eq!(f.tally().word, 0);
+    assert_eq!(
+        f.tally().mul,
+        poly::karatsuba_cost(a.len(), mid.len()),
+        "Auto chose Karatsuba"
+    );
+    assert_eq!(c, poly::mul_karatsuba(&f, &a, &mid));
+    // Karatsuba under `PolyMul::Karatsuba` counts exactly what
+    // `mul_karatsuba` counts.
+    let f = PrimeField::counted(p)
+        .unwrap()
+        .with_poly_mul(PolyMul::Karatsuba);
+    let _ = poly::mul_karatsuba(&f, &a, &b);
+    let t1 = f.tally();
+    f.reset_counts();
+    let _ = poly::mul(&f, &a, &b);
+    assert_eq!(f.tally(), t1);
+}
+
+#[test]
+fn remainder_and_multipoint_evaluation() {
+    let mut rng = StdRng::seed_from_u64(3);
+    let f = PrimeField::new(random_prime(&mut rng, 62)).unwrap();
+    for (dg, db) in [(10, 3), (100, 40), (300, 64), (80, 79)] {
+        let mut b: Vec<u64> = (0..db).map(|_| rng.gen_range(0..f.p())).collect();
+        b.push(1);
+        let q: Vec<u64> = (0..=dg - db).map(|_| rng.gen_range(0..f.p())).collect();
+        let r: Vec<u64> = (0..db).map(|_| rng.gen_range(0..f.p())).collect();
+        let a = poly::add(&f, &poly::mul(&f, &q, &b), &r);
+        let mut div = MonicDivisor::new(b).unwrap();
+        let mut want = r.clone();
+        poly::trim(&mut want);
+        assert_eq!(div.rem(&f, &a), want);
+        assert_eq!(div.rem(&f, &a), want, "cached reciprocal");
+    }
+    for n in [1usize, 2, 7, 37, 100] {
+        let xs: Vec<u64> = (0..n).map(|_| rng.gen_range(0..f.p())).collect();
+        let g: Vec<u64> = (0..150).map(|_| rng.gen_range(0..f.p())).collect();
+        let mut tree = ProductTree::new(&f, &xs);
+        let got = tree.evaluate(&f, &g);
+        let want: Vec<u64> = xs.iter().map(|&x| poly::eval(&f, &g, x)).collect();
+        assert_eq!(got, want, "n = {n}");
+        let root = tree.root();
+        assert!(xs.iter().all(|&x| poly::eval(&f, &root, x) == 0));
+    }
+    assert!(ProductTree::new(&f, &[]).evaluate(&f, &[1, 2]).is_empty());
+}
+
+// ------------------------------------------------- CM instances (λ = 1) ----
+
+/// A Montgomery curve with `E[ℓ] ⊂ E(F_p)`, its order `n`, its twist's
+/// order, and the x-coordinate of a point of order `ℓ`.
+struct Inst {
+    p: u64,
+    curve: MontgomeryCurve,
+    n: u128,
+    n_twist: u128,
+    kernel_x: u64,
+}
+
+fn valuation(mut n: u128, l: u128) -> (u32, u128) {
+    let mut e = 0;
+    while n.is_multiple_of(l) {
+        n /= l;
+        e += 1;
+    }
+    (e, n)
+}
+
+/// `j = −3375` (CM by `Z[(1+√−7)/2]`) over `p = (t² + 7v²)/4` with `ℓ | v`
+/// and `t ≡ 2 (mod ℓ)`, `p ∈ [2^(bits−1), 2^bits)`.
+fn cm_instance(ell: u64, bits: u32, rng: &mut StdRng) -> Inst {
+    let lo: u128 = 1 << (bits + 1);
+    let hi: u128 = 1 << (bits + 2);
+    let l = ell as i128;
+    'outer: loop {
+        let wmax = (((hi - 1) / 7) as f64).sqrt() as u128 / ell as u128;
+        let w = rng.gen_range(1..=wmax.max(1)) as u64;
+        let v = ell * w;
+        let sv = 7u128 * (v as u128) * (v as u128);
+        if sv >= hi {
+            continue;
+        }
+        let tmax = ((hi - 1 - sv) as f64).sqrt() as i128;
+        let tmin = if sv >= lo {
+            0
+        } else {
+            ((lo - sv) as f64).sqrt().ceil() as i128
+        };
+        let r = if (2 % l) % 2 == (v % 2) as i128 {
+            2 % l
+        } else {
+            2 % l + l
+        };
+        let span = (tmax - tmin) / (2 * l);
+        if span < 1 {
+            continue;
+        }
+        let k = rng.gen_range(0..=span);
+        let mut t = tmin - tmin.rem_euclid(2 * l) + r + 2 * l * k;
+        if t < tmin {
+            t += 2 * l;
+        }
+        let four_p = (t * t) as u128 + sv;
+        if t > tmax || !four_p.is_multiple_of(4) || four_p < lo || four_p >= hi {
+            continue;
+        }
+        let p = (four_p / 4) as u64;
+        if !is_prime_u64(p) || p < 1 << (bits - 1) {
+            continue;
+        }
+        let f = PrimeField::new(p).unwrap();
+        let n = (p as i128 + 1 - t) as u128;
+        let n_twist = (p as i128 + 1 + t) as u128;
+        // Roots of x³ − 35x − 98 = (x − 7)(x² + 7x + 14).
+        let mut roots = vec![7u64];
+        if let Some(sq) = f.sqrt(f.from_i64(-7)) {
+            let inv2 = f.inv(2).unwrap();
+            roots.push(f.mul(f.sub(sq, 7), inv2));
+            roots.push(f.mul(f.sub(f.neg(sq), 7), inv2));
+        }
+        for alpha in roots {
+            let w = f.add(f.mul_small(3, f.sqr(alpha)), f.from_i64(-35));
+            let Some(s) = f.sqrt(w).filter(|&s| s != 0) else {
+                continue;
+            };
+            let a = f.div(f.mul_small(3, alpha), s).unwrap();
+            let Ok(curve) = MontgomeryCurve::new(&f, a) else {
+                continue;
+            };
+            assert_eq!(curve.j_invariant(&f), f.from_i64(-3375));
+            let (e, m) = valuation(n, ell as u128);
+            assert!(e >= 2, "ℓ² | N for λ = 1");
+            for _ in 0..64 {
+                let x = rng.gen_range(2..p);
+                let mut q = ladder(&f, &XZ::affine(x), m, &curve.a24);
+                if q.is_infinity() {
+                    continue;
+                }
+                for _ in 0..e {
+                    let r = ladder(&f, &q, ell as u128, &curve.a24);
+                    if r.is_infinity() {
+                        let kernel_x = q.to_affine(&f).unwrap();
+                        return Inst {
+                            p,
+                            curve,
+                            n,
+                            n_twist,
+                            kernel_x,
+                        };
+                    }
+                    q = r;
+                }
+            }
+            continue 'outer;
+        }
+    }
+}
+
+/// The order (`n` or the twist's) that kills `x` on `curve`.
+fn side(f: &PrimeField, curve: &MontgomeryCurve, x: u64, inst: &Inst) -> u128 {
+    if ladder(f, &XZ::affine(x), inst.n, &curve.a24).is_infinity() {
+        inst.n
+    } else {
+        assert!(ladder(f, &XZ::affine(x), inst.n_twist, &curve.a24).is_infinity());
+        inst.n_twist
+    }
+}
+
+/// The library's codomain `j` for the kernel `⟨P⟩` (via the `B = 1` short
+/// Weierstrass model), and the library kernel certificate for small `ℓ`.
+fn library_codomain_j(f: &PrimeField, inst: &Inst, ell: u64) -> u64 {
+    let (aw, bw, shift) = inst.curve.short_weierstrass(f);
+    let d = ((ell - 1) / 2) as usize;
+    let mults: Vec<XZ<u64>> = (1..=d as u128)
+        .map(|i| ladder(f, &XZ::affine(inst.kernel_x), i, &inst.curve.a24))
+        .collect();
+    let xs = batch_to_affine(f, &mults).unwrap();
+    let lf = lib_field(inst.p);
+    let mut h = vec![lf.one()];
+    for x in xs {
+        let root = lf.from_u64(f.add(x, shift));
+        h = lib_poly::mul(&lf, &h, &vec![lf.neg(&root), lf.one()]);
+    }
+    let e = Model {
+        a: lf.from_u64(aw),
+        b: lf.from_u64(bw),
+    };
+    let cod = lib_kernel::velu_codomain(&lf, &e, &h);
+    if ell <= 11 {
+        let certified = lib_kernel::verify_kernel(&lf, &e, ell, &h).expect("library certifies");
+        assert_eq!(certified, cod);
+    }
+    lib_u64(&lf, &cod.j(&lf).expect("nonsingular"))
+}
+
+#[test]
+fn sqrt_velu_agrees_with_velu_and_library() {
+    let mut rng = StdRng::seed_from_u64(163);
+    for (k, &ell) in [3u64, 5, 7, 11, 101, 1009].iter().enumerate() {
+        for bits in [50u32, if k % 2 == 0 { 61 } else { 63 }] {
+            let inst = cm_instance(ell, bits, &mut rng);
+            let f = PrimeField::new(inst.p).unwrap();
+            assert!(is_kernel_generator(&f, &inst.curve, ell, inst.kernel_x));
+            // Random points on either side, a kernel point, and x = 0.
+            let mut xs: Vec<u64> = (0..4).map(|_| rng.gen_range(2..inst.p)).collect();
+            xs.push(inst.kernel_x);
+            xs.push(0);
+            let slow = velu(&f, &inst.curve, ell, inst.kernel_x, &xs).unwrap();
+            let (fast, shape) = sqrt_velu(&f, &inst.curve, ell, inst.kernel_x, &xs).unwrap();
+            assert_eq!(slow, fast, "ℓ = {ell}, p = {}", inst.p);
+            if ell >= 5 {
+                assert_eq!(
+                    shape.i_len * shape.j_len * 2 + shape.k_len,
+                    ((ell - 1) / 2) as usize
+                );
+            }
+            assert_eq!(slow.images[4], None, "kernel point maps to O");
+            assert_eq!(slow.images[5], Some(0), "(0, 0) maps to x = 0");
+            let cod = slow.codomain;
+            let j_new = cod.j_invariant(&f);
+            assert_eq!(j_new, library_codomain_j(&f, &inst, ell), "ℓ = {ell}");
+            if ell <= 7 {
+                assert_eq!(phi_at(inst.p, ell, inst.curve.j_invariant(&f), j_new), 0);
+            }
+            // Images lie on the codomain's Kummer line with the same order.
+            for (&x, img) in xs[..4].iter().zip(&slow.images) {
+                let n = side(&f, &inst.curve, x, &inst);
+                let xi = img.expect("non-kernel point");
+                assert!(ladder(&f, &XZ::affine(xi), n, &cod.a24).is_infinity());
+            }
+        }
+    }
+}
+
+#[test]
+fn sqrt_velu_is_unchanged_by_the_multiplication_algorithm() {
+    let mut rng = StdRng::seed_from_u64(0x5e5);
+    for &ell in &[11u64, 101, 1009, 10007] {
+        for bits in [50u32, 61] {
+            let inst = cm_instance(ell, bits, &mut rng);
+            let xs: Vec<u64> = (0..3).map(|_| rng.gen_range(2..inst.p)).collect();
+            let mut outs = Vec::new();
+            let mut tallies = Vec::new();
+            for m in [PolyMul::Karatsuba, PolyMul::Auto, PolyMul::Ntt] {
+                let f = PrimeField::counted(inst.p).unwrap().with_poly_mul(m);
+                let out = sqrt_velu(&f, &inst.curve, ell, inst.kernel_x, &xs).unwrap();
+                outs.push(out);
+                tallies.push(f.tally());
+            }
+            assert!(outs.windows(2).all(|w| w[0] == w[1]), "ℓ = {ell}");
+            assert_eq!(tallies[0].word, 0);
+            assert!(tallies[2].word > 0);
+            let plain = PrimeField::new(inst.p).unwrap();
+            let slow = velu(&plain, &inst.curve, ell, inst.kernel_x, &xs).unwrap();
+            assert_eq!(outs[0].0, slow, "ℓ = {ell}");
+        }
+    }
+}
+
+#[test]
+fn x_only_images_respect_differential_addition() {
+    let mut rng = StdRng::seed_from_u64(5);
+    for ell in [5u64, 11, 101] {
+        let inst = cm_instance(ell, 55, &mut rng);
+        let f = PrimeField::new(inst.p).unwrap();
+        let c = &inst.curve;
+        let g = XZ::affine(rng.gen_range(2..inst.p));
+        let (a, b) = (rng.gen_range(1000..1u128 << 40), rng.gen_range(1..1000u128));
+        let pts = [a, b, a + b, a - b].map(|k| ladder(&f, &g, k, &c.a24).to_affine(&f).unwrap());
+        for use_sqrt in [false, true] {
+            let out = if use_sqrt {
+                sqrt_velu(&f, c, ell, inst.kernel_x, &pts).unwrap().0
+            } else {
+                velu(&f, c, ell, inst.kernel_x, &pts).unwrap()
+            };
+            let im: Vec<XZ<u64>> = out.images.iter().map(|x| XZ::affine(x.unwrap())).collect();
+            let sum = xadd(&f, &im[0], &im[1], &im[3]);
+            assert!(sum.same_as(&f, &im[2]), "ℓ = {ell}");
+        }
+    }
+}
+
+#[test]
+fn invalid_inputs_are_errors_not_panics() {
+    let mut rng = StdRng::seed_from_u64(6);
+    let inst = cm_instance(7, 40, &mut rng);
+    let f = PrimeField::new(inst.p).unwrap();
+    assert_eq!(
+        velu(&f, &inst.curve, 9, inst.kernel_x, &[]),
+        Err(IsogenyEvalError::InvalidDegree(9))
+    );
+    assert_eq!(
+        sqrt_velu(&f, &inst.curve, 2, inst.kernel_x, &[]).map(|r| r.1),
+        Err(IsogenyEvalError::InvalidDegree(2))
+    );
+    assert!(MontgomeryCurve::new(&f, 2).is_err());
+    assert!(MontgomeryCurve::new(&f, f.p() - 2).is_err());
+    // A 7-torsion point is not a 101-kernel: no panic either way.
+    assert!(!is_kernel_generator(&f, &inst.curve, 101, inst.kernel_x));
+    let _ = sqrt_velu(&f, &inst.curve, 101, inst.kernel_x, &[5]);
+    let _ = velu(&f, &inst.curve, 101, inst.kernel_x, &[5]);
+    let h = kernel_polynomial(&f, &inst.curve, 7, inst.kernel_x).unwrap();
+    assert_eq!(poly::degree(&h), Some(3));
+    assert_eq!(poly::eval(&f, &h, inst.kernel_x), 0);
+}
+
+// ------------------------------------------------------- counters ----
+
+#[test]
+fn counters_are_positive_deterministic_and_free_when_off() {
+    let mut rng = StdRng::seed_from_u64(7);
+    let inst = cm_instance(101, 61, &mut rng);
+    let xs = [12345u64, 678910];
+    let plain = PrimeField::new(inst.p).unwrap();
+    let counted = PrimeField::counted(inst.p).unwrap();
+    let want = sqrt_velu(&plain, &inst.curve, 101, inst.kernel_x, &xs).unwrap();
+    let mut tallies = Vec::new();
+    for _ in 0..2 {
+        counted.reset_counts();
+        let got = sqrt_velu(&counted, &inst.curve, 101, inst.kernel_x, &xs).unwrap();
+        assert_eq!(got, want);
+        tallies.push(counted.tally());
+    }
+    assert_eq!(tallies[0], tallies[1]);
+    assert!(tallies[0].mul > 0 && tallies[0].inv > 0);
+    // Vélu: each extra image costs exactly 4d + 4 M and one I.
+    let d = 50u64;
+    let start = counted.tally();
+    velu(&counted, &inst.curve, 101, inst.kernel_x, &xs[..1]).unwrap();
+    let one = counted.tally().since(start);
+    let start = counted.tally();
+    velu(&counted, &inst.curve, 101, inst.kernel_x, &xs).unwrap();
+    let two = counted.tally().since(start);
+    assert_eq!(
+        two.since(one),
+        OpTally {
+            mul: 4 * d + 4,
+            inv: 1,
+            word: 0
+        }
+    );
+    assert_eq!(two.mul_equivalents(91), two.mul + 91 * two.inv);
+}
+
+// ------------------------------------------------- ℓ ∈ {2, 3} ----
+
+fn random_point<C: OpCounter>(
+    f: &PrimeField<C>,
+    e: &ShortWeierstrass,
+    rng: &mut StdRng,
+) -> (u64, u64) {
+    e.point_from_x(f, rng.gen_range(0..f.p()), 1 << 20).unwrap()
+}
+
+fn check_small(f: &PrimeField, e: &ShortWeierstrass, ell: u64, x0: u64, rng: &mut StdRng) {
+    let phi = SmallIsogeny::new(f, e, ell, x0).unwrap();
+    let cod = *phi.codomain();
+    let dual = phi.dual(f).unwrap();
+    assert_eq!(dual.domain(), &cod);
+    assert_eq!(dual.codomain(), e, "dual lands on the same model");
+    assert_eq!(dual.degree(), ell);
+    assert_eq!(phi_at(f.p(), ell, e.j_invariant(f), cod.j_invariant(f)), 0);
+    if ell >= 3 {
+        let lf = lib_field(f.p());
+        let model = Model {
+            a: lf.from_u64(e.a),
+            b: lf.from_u64(e.b),
+        };
+        let mut h = vec![lf.one()];
+        for xi in kernel_orbit(f, e, ell, x0).unwrap() {
+            h = lib_poly::mul(&lf, &h, &vec![lf.from_u64(f.neg(xi)), lf.one()]);
+        }
+        let lib = lib_kernel::velu_codomain(&lf, &model, &h);
+        assert!(lib_kernel::verify_kernel(&lf, &model, ell, &h).is_ok());
+        assert_eq!((lib_u64(&lf, &lib.a), lib_u64(&lf, &lib.b)), (cod.a, cod.b));
+    }
+    for _ in 0..6 {
+        let p = Some(random_point(f, e, rng));
+        let r = Some(random_point(f, e, rng));
+        let (ip, ir) = (phi.eval(f, p), phi.eval(f, r));
+        assert!(cod.contains(f, ip) && cod.contains(f, ir));
+        assert_eq!(
+            phi.eval(f, e.add(f, p, r)),
+            cod.add(f, ip, ir),
+            "homomorphism"
+        );
+        assert_eq!(dual.eval(f, ip), e.mul(f, p, ell as u128), "dual∘φ = [ℓ]");
+        let s = Some(random_point(f, &cod, rng));
+        assert_eq!(
+            phi.eval(f, dual.eval(f, s)),
+            cod.mul(f, s, ell as u128),
+            "φ∘dual = [ℓ]"
+        );
+    }
+    // Kernel points map to O.
+    if let Some(y) = f.sqrt(e.rhs(f, x0)) {
+        assert_eq!(phi.eval(f, Some((x0, y))), None);
+    }
+}
+
+#[test]
+fn small_degree_isogenies_and_certified_duals() {
+    let mut rng = StdRng::seed_from_u64(165);
+    for bits in [30u32, 62] {
+        let p = random_prime(&mut rng, bits);
+        let f = PrimeField::new(p).unwrap();
+        for ell in [2u64, 3] {
+            let mut done = 0;
+            while done < 3 {
+                let (a, b) = (rng.gen_range(1..p), rng.gen_range(1..p));
+                let Ok(e) = ShortWeierstrass::new(&f, a, b) else {
+                    continue;
+                };
+                for x0 in kernel_x_coordinates(&f, &e, ell).unwrap() {
+                    check_small(&f, &e, ell, x0, &mut rng);
+                    done += 1;
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn small_degree_special_j_and_errors() {
+    let mut rng = StdRng::seed_from_u64(9);
+    // p ≡ 1 (mod 12): j = 0 and j = 1728 have extra automorphisms.
+    let p = loop {
+        let p = random_prime(&mut rng, 40);
+        if p % 12 == 1 {
+            break p;
+        }
+    };
+    let f = PrimeField::new(p).unwrap();
+    // j = 1728: y² = x³ + ax, kernel (0, 0).
+    let e1728 = ShortWeierstrass::new(&f, 5, 0).unwrap();
+    assert_eq!(e1728.j_invariant(&f), 1728);
+    check_small(&f, &e1728, 2, 0, &mut rng);
+    // j = 0: y² = x³ + b with b = −c³ has the rational 2-torsion x = c.
+    let c = 11u64;
+    let e0 = ShortWeierstrass::new(&f, 0, f.neg(f.mul(f.sqr(c), c))).unwrap();
+    assert_eq!(e0.j_invariant(&f), 0);
+    for x0 in kernel_x_coordinates(&f, &e0, 2).unwrap() {
+        check_small(&f, &e0, 2, x0, &mut rng);
+    }
+    for x0 in kernel_x_coordinates(&f, &e0, 3).unwrap() {
+        check_small(&f, &e0, 3, x0, &mut rng);
+    }
+    assert!(isomorphisms(&f, &e0, &e0).len() >= 2);
+    assert_eq!(isomorphisms(&f, &e0, &e1728), Vec::<u64>::new());
+    // Errors.
+    assert_eq!(
+        SmallIsogeny::new(&f, &e1728, 11, 0),
+        Err(IsogenyEvalError::InvalidDegree(11))
+    );
+    assert_eq!(
+        SmallIsogeny::new(&f, &e1728, 5, 0),
+        Err(IsogenyEvalError::NotAKernelPoint)
+    );
+    assert_eq!(
+        SmallIsogeny::new(&f, &e1728, 2, 1),
+        Err(IsogenyEvalError::NotAKernelPoint)
+    );
+    assert!(ShortWeierstrass::new(&f, 0, 0).is_err());
+}
+
+#[test]
+fn small_degree_counts_are_deterministic() {
+    let p = 1_000_000_007u64;
+    let f = PrimeField::counted(p).unwrap();
+    let e = ShortWeierstrass::new(&f, 0, f.neg(8)).unwrap(); // x = 2 is 2-torsion
+    let phi = SmallIsogeny::new(&f, &e, 2, 2).unwrap();
+    let pt = e.point_from_x(&f, 3, 1000);
+    let start = f.tally();
+    let img = phi.eval(&f, pt);
+    assert_eq!(
+        f.tally().since(start),
+        OpTally {
+            mul: 7,
+            inv: 1,
+            word: 0
+        }
+    );
+    assert!(phi.codomain().contains(&f, img));
+}
+
+#[test]
+fn karatsuba_cost_is_the_counted_cost() {
+    let mut rng = StdRng::seed_from_u64(0x5e5);
+    let p = random_prime(&mut rng, 61);
+    let f = PrimeField::counted(p).unwrap();
+    let mut shapes = vec![
+        (0usize, 5usize),
+        (1, 1),
+        (24, 24),
+        (25, 24),
+        (25, 25),
+        (49, 24),
+    ];
+    for _ in 0..60 {
+        shapes.push((rng.gen_range(1..1500), rng.gen_range(1..1500)));
+    }
+    shapes.extend([
+        (512, 512),
+        (513, 257),
+        (1024, 1023),
+        (4096, 300),
+        (2047, 2048),
+    ]);
+    for (la, lb) in shapes {
+        let a: Vec<u64> = (0..la).map(|_| rng.gen_range(0..p)).collect();
+        let b: Vec<u64> = (0..lb).map(|_| rng.gen_range(0..p)).collect();
+        f.reset_counts();
+        let _ = poly::mul_karatsuba(&f, &a, &b);
+        assert_eq!(f.tally().mul, poly::karatsuba_cost(la, lb), "{la}x{lb}");
+        assert_eq!(poly::karatsuba_cost(la, lb), poly::karatsuba_cost(lb, la));
+    }
+}
+
+// ------------------------------------------------- ℓ ∈ {5, 7} ----
+
+#[test]
+fn degree_five_and_seven_isogenies_and_certified_duals() {
+    let mut rng = StdRng::seed_from_u64(62);
+    for bits in [30u32, 50] {
+        let p = random_prime(&mut rng, bits);
+        let f = PrimeField::new(p).unwrap();
+        for ell in [5u64, 7] {
+            let mut done = 0;
+            let mut tries = 0;
+            while done < 2 {
+                tries += 1;
+                assert!(tries < 20_000, "no rational {ell}-kernel found");
+                let (a, b) = (rng.gen_range(1..p), rng.gen_range(1..p));
+                let Ok(e) = ShortWeierstrass::new(&f, a, b) else {
+                    continue;
+                };
+                let roots = kernel_x_coordinates(&f, &e, ell).unwrap();
+                let reps = kernel_representatives(&f, &e, ell).unwrap();
+                assert_eq!(roots.len(), reps.len() * (ell as usize - 1) / 2);
+                for x0 in reps {
+                    let orbit = kernel_orbit(&f, &e, ell, x0).unwrap();
+                    assert_eq!(orbit.len(), (ell as usize - 1) / 2);
+                    for &xi in &orbit {
+                        assert!(roots.contains(&xi), "orbit abscissas are roots of f_ℓ");
+                    }
+                    let dual_rational = p % ell == 1 || p % ell == ell - 1;
+                    // Frobenius acts on ker φ by λ = ±1 (rational abscissas)
+                    // and on ker φ̂ by p/λ, so φ̂ has rational kernel
+                    // abscissas exactly when p ≡ ±1 (mod ℓ).
+                    let phi = SmallIsogeny::new(&f, &e, ell, x0).unwrap();
+                    assert_eq!(
+                        phi.dual(&f).is_ok(),
+                        dual_rational,
+                        "p mod {ell} = {}",
+                        p % ell
+                    );
+                    if dual_rational {
+                        check_small(&f, &e, ell, x0, &mut rng);
+                    }
+                    // Any orbit member generates the same kernel and isogeny.
+                    let other = SmallIsogeny::new(&f, &e, ell, orbit[orbit.len() - 1]).unwrap();
+                    assert_eq!(
+                        other.codomain(),
+                        SmallIsogeny::new(&f, &e, ell, x0).unwrap().codomain()
+                    );
+                    done += 1;
+                }
+            }
+        }
+    }
+}
+
+// ------------------------------------------------- addition tally ----
+
+/// A mixed workload over `f` touching every counted code path: schoolbook,
+/// Karatsuba, the NTT (squares and products), Newton reciprocals and
+/// remainders, product and remainder trees, inversions, and √élu.
+fn addition_workload<C: OpCounter>(f: &PrimeField<C>, inst: &Inst) -> Vec<u64> {
+    let mut rng = StdRng::seed_from_u64(0xadd5);
+    let p = f.p();
+    let mut out = Vec::new();
+    for &(la, lb) in &[
+        (5usize, 7usize),
+        (40, 40),
+        (300, 280),
+        (600, 600),
+        (900, 40),
+    ] {
+        let a: Vec<u64> = (0..la).map(|_| rng.gen_range(0..p)).collect();
+        let b: Vec<u64> = (0..lb).map(|_| rng.gen_range(0..p)).collect();
+        out.extend(poly::mul(f, &a, &b));
+        out.extend(poly::mul(f, &a, &a));
+        out.extend(poly::mul_karatsuba(f, &a, &b));
+        out.extend(mul_ntt(f, &a, &b));
+    }
+    let mut b: Vec<u64> = (0..150).map(|_| rng.gen_range(0..p)).collect();
+    b.push(1);
+    let a: Vec<u64> = (0..700).map(|_| rng.gen_range(0..p)).collect();
+    out.extend(MonicDivisor::new(b).unwrap().rem(f, &a));
+    let xs: Vec<u64> = (0..37).map(|_| rng.gen_range(0..p)).collect();
+    out.extend(ProductTree::new(f, &xs).evaluate(f, &a));
+    out.extend(poly::inv_series(f, &[3, 5, 7, 11], 200).unwrap());
+    let ximg = [12345u64, 678910];
+    let (ev, _) = sqrt_velu(f, &inst.curve, 101, inst.kernel_x, &ximg).unwrap();
+    out.extend(ev.images.iter().flatten().copied());
+    out
+}
+
+#[test]
+fn additions_are_opt_in_and_leave_frozen_counts_unchanged() {
+    let mut rng = StdRng::seed_from_u64(0xadd);
+    let inst = cm_instance(101, 61, &mut rng);
+    let plain = PrimeField::counted(inst.p).unwrap();
+    let with = PrimeField::counted_with_adds(inst.p).unwrap();
+    let none = PrimeField::new(inst.p).unwrap();
+    let r_plain = addition_workload(&plain, &inst);
+    let r_with = addition_workload(&with, &inst);
+    let r_none = addition_workload(&none, &inst);
+    // Same results, same M, W, I with and without additions requested.
+    assert_eq!(r_plain, r_with);
+    assert_eq!(r_plain, r_none);
+    let (t0, t1) = (plain.complete_tally(), with.complete_tally());
+    assert_eq!(t0.ops, t1.ops);
+    assert_eq!(t0.ops.mul_equivalents(91), t1.ops.mul_equivalents(91));
+    // Not requested: zero.  Requested: positive, in both domains.
+    assert_eq!((t0.adds.add, t0.adds.word_add), (0, 0));
+    assert!(t1.adds.add > 0 && t1.adds.word_add > 0);
+    assert!(t0.ops.word > 0, "the workload must reach the NTT");
+    // Deterministic.
+    let again = PrimeField::counted_with_adds(inst.p).unwrap();
+    let _ = addition_workload(&again, &inst);
+    assert_eq!(again.complete_tally(), t1);
+    // `a = 0` is Meq; the weight is linear in the additions.
+    assert_eq!(t1.weighted(91, 0.0), t1.ops.mul_equivalents(91) as f64);
+    assert_eq!(
+        t1.weighted(91, 0.5),
+        t1.ops.mul_equivalents(91) as f64 + 0.5 * (t1.adds.add + t1.adds.word_add) as f64
+    );
+    // reset clears the additions too.
+    with.reset_counts();
+    assert_eq!(with.complete_tally(), CompleteTally::default());
+}
+
+#[test]
+fn addition_counts_of_products_are_exact() {
+    let mut rng = StdRng::seed_from_u64(0xadd2);
+    // p < 2^61 < every NTT prime: no input reductions happen.
+    let p = random_prime(&mut rng, 60);
+    let f = PrimeField::counted_with_adds(p).unwrap();
+    // Schoolbook: la·lb − (la + lb − 1) additions, no word additions.
+    for (la, lb) in [(1usize, 1usize), (1, 9), (5, 7), (24, 24), (3, 100)] {
+        let a: Vec<u64> = (0..la).map(|_| rng.gen_range(0..p)).collect();
+        let b: Vec<u64> = (0..lb).map(|_| rng.gen_range(0..p)).collect();
+        f.reset_counts();
+        let _ = poly::mul_schoolbook(&f, &a, &b);
+        let t = f.add_tally();
+        assert_eq!((t.add, t.word_add), ((la * lb - (la + lb - 1)) as u64, 0));
+    }
+    // A hand count: (a0 + a1 Z)(b0 + b1 Z) = 4 products, 1 addition.
+    f.reset_counts();
+    let _ = poly::mul_schoolbook(&f, &[1, 2], &[3, 4]);
+    assert_eq!((f.tally().mul, f.add_tally().add), (4, 1));
+    // Karatsuba: its additions are the F_p add/sub calls plus the schoolbook
+    // leaves; a (25 × 25) product splits once and is recounted by hand:
+    // two sums of 12/13-term halves (12 + 13 adds), z0, z2, z1 schoolbooks,
+    // two subtractions of the length-(2·13−1) middle product from z1, and
+    // three add_into accumulations.
+    // Rather than restate the recursion, check the total is positive and
+    // equals the sum over an independent run.
+    let a: Vec<u64> = (0..64).map(|_| rng.gen_range(0..p)).collect();
+    f.reset_counts();
+    let r1 = poly::mul_karatsuba(&f, &a, &a);
+    let t1 = f.complete_tally();
+    let g = PrimeField::counted_with_adds(p).unwrap();
+    let r2 = poly::mul_karatsuba(&g, &a, &a);
+    assert_eq!(r1, r2);
+    assert_eq!(t1, g.complete_tally());
+    assert!(t1.adds.add > 0 && t1.adds.word_add == 0);
+    // NTT: exactly the data-independent formula, plus at most the 2n
+    // conditional Garner subtractions (p < 2^61, so inputs need none).
+    for (la, lb, sq) in [
+        (1usize, 1usize, false),
+        (3, 5, false),
+        (64, 64, true),
+        (100, 37, false),
+        (300, 300, false),
+        (513, 513, true),
+    ] {
+        let a: Vec<u64> = (0..la).map(|_| rng.gen_range(0..p)).collect();
+        let b: Vec<u64> = (0..lb).map(|_| rng.gen_range(0..p)).collect();
+        f.reset_counts();
+        let _ = if sq {
+            mul_ntt(&f, &a, &a)
+        } else {
+            mul_ntt(&f, &a, &b)
+        };
+        let t = f.add_tally();
+        let (wa, fa) = ntt_mul_add_cost(la, if sq { la } else { lb }, sq);
+        let n = (la + if sq { la } else { lb } - 1) as u64;
+        assert_eq!(t.add, fa, "{la}x{lb}");
+        assert!(
+            t.word_add >= wa && t.word_add <= wa + 2 * n,
+            "{la}x{lb}: {} not in [{wa}, {}]",
+            t.word_add,
+            wa + 2 * n
+        );
+    }
+    // Under PolyMul::Auto the choice of algorithm, hence M and W, does not
+    // depend on whether additions are counted.
+    for (la, lb) in [(255usize, 255usize), (256, 256), (600, 600), (2048, 300)] {
+        let a: Vec<u64> = (0..la).map(|_| rng.gen_range(0..p)).collect();
+        let b: Vec<u64> = (0..lb).map(|_| rng.gen_range(0..p)).collect();
+        let c = PrimeField::counted(p).unwrap();
+        let d = PrimeField::counted_with_adds(p).unwrap();
+        assert_eq!(poly::mul(&c, &a, &b), poly::mul(&d, &a, &b));
+        let (tc, td) = (c.tally(), d.tally());
+        assert_eq!((tc.mul, tc.word, tc.inv), (td.mul, td.word, td.inv));
+        assert_eq!(c.add_tally(), Default::default());
+    }
+}

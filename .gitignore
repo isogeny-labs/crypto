@@ -1,5 +1,6 @@
 /target
 **/Cargo.lock
+/store/index.json.lock
 !/Cargo.lock
 !ecc2k130/dp-ingest/Cargo.lock
 !research/ic_candidate_tournament_20260915/goal_20260924/native-f5-control-v1/build-validation-v1/data/Cargo.lock
@@ -113,3 +114,15 @@ hdl/ecc2k130/aws/cl_ecc2k130/build/constraints/generated_cl_clocks_aws.xdc
 # plus a 5 MB zip; rebuilt on demand and never a source of truth).
 ecc2k130/aws/build/
 ecc2k130/aws/ingest_lambda.zip
+
+# The compact-orbit frozen-source materializer is a standalone crate with its
+# own locked dependencies; its build output is not repository content.
+!research/notes/ecc2k130/compact_frozen_source_replay_20260929/frozen-materialize/Cargo.lock
+research/notes/ecc2k130/compact_frozen_source_replay_20260929/frozen-materialize/target/
+.lake/
+
+# Resume note and push state for scripts/checkpoint.sh (the copy lives in S3)
+.resume/
+
+# Stored plot; preserve the study's frozen ignore file.
+/research/nist_skip_criterion_20261025/strict_elkies_20261029/strict-counts.png

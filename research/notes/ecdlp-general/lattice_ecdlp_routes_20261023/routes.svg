@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="660" viewBox="0 0 1200 660" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="10">
+  <style>
+    .box { fill: #ffffff; stroke: #333; stroke-width: 1.2; rx: 6; }
+    .pub { fill: #e8f0fb; }
+    .ok  { fill: #e6f4ea; }
+    .no  { fill: #fdecea; }
+    .mid { fill: #fff4e0; }
+    .t   { font-size: 10px; }
+    .h   { font-size: 12.5px; font-weight: bold; }
+    .s   { font-size: 8.8px; fill: #333; }
+    .v   { font-size: 10px; font-weight: bold; }
+    .arrow { stroke: #555; stroke-width: 1.3; fill: none; marker-end: url(#a); }
+    .dash  { stroke-dasharray: 5,4; }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>
+    </marker>
+  </defs>
+  <text x="600" y="22" text-anchor="middle" class="h">Lattices attached to a prime-field ECDLP instance (E/F_p, P, Q = [k]P, prime order N)</text>
+  <text x="600" y="38" text-anchor="middle" class="s">Green: a lattice one can write down from public data. Amber: writable only with extra input (a lift or an oracle). Red: its basis or coordinates are the discrete log.</text>
+  <text x="600" y="51" text-anchor="middle" class="s">Exponents are of p. Every statement is derived or cited (RESEARCH_LATTICE_ECDLP_ROUTES.md §4–§6); none is measured here.</text>
+
+  <!-- public data -->
+  <rect x="10" y="270" width="228" height="118" class="box pub"/>
+  <text x="124" y="290" text-anchor="middle" class="h">Public data</text>
+  <text x="18" y="309" class="t">E: y² = x³ + ax + b over F_p</text>
+  <text x="18" y="325" class="t">P, Q = [k]P, N = ord(P) prime</text>
+  <text x="18" y="341" class="t">π (Frobenius); End(E) = R, Z-rank 2</text>
+  <text x="18" y="357" class="t">λ: eigenvalue of an automorphism</text>
+  <text x="18" y="376" class="s">Shoup: no generic method below √N</text>
+
+  <!-- writable column -->
+  <text x="455" y="78" text-anchor="middle" class="h">Writable without k</text>
+  <rect x="256" y="86" width="398" height="80" class="box ok"/>
+  <text x="264" y="103" class="v">GLV / automorphism lattice {(a,b) : a + bλ ≡ 0 mod N}</text>
+  <text x="264" y="119" class="t">dim 2, det N, λ₁ ≈ √N. Reduction gives the scalar split</text>
+  <text x="264" y="135" class="t">k = k₁ + k₂λ and folds rho by √#Aut(E) ≤ √6 (ordinary E).</text>
+  <text x="264" y="155" class="s">Constant factor only. Nothing in it depends on k.</text>
+
+  <rect x="256" y="176" width="398" height="80" class="box ok"/>
+  <text x="264" y="193" class="v">Z[τ]-net zero lattice {(α,β) in Z[τ]² : α + kβ ≡ 0 mod π}</text>
+  <text x="264" y="209" class="t">Z-rank 4, index N; a vector with N(α), N(β) well below √N exists, but</text>
+  <text x="264" y="225" class="t">finding it is a two-dimensional baby-step giant-step: Θ(√N).</text>
+  <text x="264" y="245" class="s">Closure §4.2, RESEARCH_NZMS_AMS_AUSTMS_2024_IDEAS.md (derived).</text>
+
+  <rect x="256" y="266" width="398" height="104" class="box mid"/>
+  <text x="264" y="283" class="v">Coppersmith lattice for S_(m+1)(x₁,…,x_m, x(R)) ≡ 0 mod p</text>
+  <text x="264" y="299" class="t">Factor base {x(P) &lt; B}, B = p^β. Lattice root region ∏Xᵢ ≤ p^θ</text>
+  <text x="264" y="315" class="t">with θ_m = 2 / ((m+1)·2^(m−1)) (box polytope, basic strategy).</text>
+  <text x="264" y="331" class="t">Relation collection ≥ p^(1 − (m−1)θ_m/m): p^(5/6) at m = 2,</text>
+  <text x="264" y="347" class="t">rising towards p^1. Rho parity needs θ ≥ m/(2(m−1)) ≥ 1/2.</text>
+  <text x="264" y="363" class="s">Derived in §6; never met. The toy falsifier of §7 would measure θ₂.</text>
+
+  <rect x="256" y="380" width="398" height="92" class="box mid"/>
+  <text x="264" y="397" class="v">Mordell–Weil lattice of a lift Ẽ/Q (or over F_p(t))</text>
+  <text x="264" y="413" class="t">E(Q)/torsion with the Néron–Tate height is Euclidean; a relation</text>
+  <text x="264" y="429" class="t">among lifted points solves the instance. JKSST 2000: an absolute</text>
+  <text x="264" y="445" class="t">bound on relation coefficients kills dependence as p grows.</text>
+  <text x="264" y="464" class="s">Refuted (xedni). Repo function-field line: toy only, p ≤ 31 (KN-FIND-003…011).</text>
+
+  <rect x="256" y="482" width="398" height="92" class="box mid"/>
+  <text x="264" y="499" class="v">HNP / EC-HNP lattice (Boneh–Venkatesan; BHH 2001; Shani 2017)</text>
+  <text x="264" y="515" class="t">Linear equations over Z/N from an oracle on bits of nonces or of</text>
+  <text x="264" y="531" class="t">x([ab]P). LLL/BKZ recovers k from a few leaked bits per sample.</text>
+  <text x="264" y="547" class="t">Needs representation-level leakage; a generic group has none.</text>
+  <text x="264" y="566" class="s">Measured here: hnp_ecdsa.rs, multi_key_hnp.rs, GLV-HNP at 12/17/20 bits.</text>
+
+  <!-- unwritable column -->
+  <text x="930" y="78" text-anchor="middle" class="h">Basis or coordinates ⇔ the discrete log</text>
+  <rect x="676" y="86" width="512" height="88" class="box no"/>
+  <text x="684" y="103" class="v">Relation lattice L_k = {(a,b) in Z² : aP + bQ = O} = Z(N,0) + Z(−k,1)</text>
+  <text x="684" y="119" class="t">det N, λ₁ ≈ √N. Any vector with b ≠ 0 gives k = −a/b mod N. Rho is a sampler</text>
+  <text x="684" y="135" class="t">of L_k: a collision aP + bQ = a'P + b'Q is one vector, found in Θ(√N).</text>
+  <text x="684" y="151" class="t">Without a vector there is no basis, so there is nothing to reduce.</text>
+  <text x="684" y="167" class="s">Elementary; the r-dimensional form is KN-FIND-009's derivation 2.</text>
+
+  <rect x="676" y="184" width="512" height="96" class="box no"/>
+  <text x="684" y="201" class="v">Witness lattice W_r(k) in Z^(2r): {(c,d) : Σcᵢλᵢ + k·Σdᵢλᵢ ≡ 0 mod N}</text>
+  <text x="684" y="217" class="t">Writing any basis is polynomial-time equivalent to solving the instance, and</text>
+  <text x="684" y="233" class="t">needs no LLL: the one-dimensional nullspace mod N reads k off. Vieta supplies</text>
+  <text x="684" y="249" class="t">∞-norm-1 vectors with d = 0: true relations that carry no logarithm.</text>
+  <text x="684" y="271" class="s">crypto-autoresearcher knowledge/findings/KN-FIND-009.md (certificate + derivation).</text>
+
+  <rect x="676" y="290" width="512" height="96" class="box no"/>
+  <text x="684" y="307" class="v">Lenstra coordinates: E(F_p) is isomorphic to R/(π−1)R as an R-module, R of rank 2</text>
+  <text x="684" y="323" class="t">The group is a quotient of a rank-2 lattice by an index-N sublattice. The map</text>
+  <text x="684" y="339" class="t">is α -> α(P₀); inverting it on P means finding a + bπ with (a + bπ)P₀ = P, a</text>
+  <text x="684" y="355" class="t">two-dimensional DLP (Gaudry–Schost): Θ(√N). Ordinary E has no larger End-module.</text>
+  <text x="684" y="377" class="s">Lenstra, J. Number Theory 56 (1996), Theorem 1(a); read from the PDF.</text>
+
+  <rect x="676" y="396" width="512" height="88" class="box no"/>
+  <text x="684" y="413" class="v">Weil-restriction subspace: the linear object that works over F_(p^n)</text>
+  <text x="684" y="429" class="t">Factor base = an F_p-subspace V of F_(p^n); Gaudry–Diem decomposition by Gröbner</text>
+  <text x="684" y="445" class="t">bases, exponent 2(n−1)/n² in the group size. Over F_p itself the only F_p-subspaces</text>
+  <text x="684" y="461" class="t">are 0 and F_p: there is no room, which is why no prime-field analogue exists.</text>
+  <text x="684" y="477" class="s">Gaudry 2009; Diem 2011; Galbraith–Gaudry 2016 survey (read from HAL).</text>
+
+  <!-- arrows: public data to the writable column -->
+  <path d="M 238 310 L 254 126" class="arrow"/>
+  <path d="M 238 320 L 254 216" class="arrow"/>
+  <path d="M 238 330 L 254 318" class="arrow"/>
+  <path d="M 238 340 L 254 426" class="arrow dash"/>
+  <path d="M 238 350 L 254 528" class="arrow dash"/>
+  <!-- public data to the unwritable column, routed below the middle column -->
+  <path d="M 124 388 L 124 610 L 662 610 L 662 440 L 674 440" class="arrow dash"/>
+  <text x="300" y="604" class="s">writing these down needs k, or a √N computation</text>
+
+  <!-- legend -->
+  <rect x="676" y="496" width="330" height="122" class="box"/>
+  <text x="686" y="514" class="h">Reading</text>
+  <rect x="686" y="524" width="14" height="12" class="ok" stroke="#333"/><text x="706" y="534" class="s">writable; constant factor or √N</text>
+  <rect x="686" y="544" width="14" height="12" class="mid" stroke="#333"/><text x="706" y="554" class="s">writable with a lift or an oracle</text>
+  <rect x="686" y="564" width="14" height="12" class="no" stroke="#333"/><text x="706" y="574" class="s">basis ⇔ solving the DLP</text>
+  <line x1="686" y1="590" x2="716" y2="590" class="arrow dash"/><text x="722" y="594" class="s">needs the log, a lift or an oracle</text>
+  <text x="686" y="609" class="s">Derived or cited; none measured.</text>
+
+  <text x="600" y="648" text-anchor="middle" class="s">Source: routes.svg (hand-written). Companion graph: exponents.svg, drawn from exponents.json. 2026-10-23.</text>
+</svg>

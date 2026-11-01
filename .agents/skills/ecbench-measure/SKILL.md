@@ -44,7 +44,34 @@ Copy `docs/ecbench/specs/smoke-prime.json` and edit it. Rules:
 - `isolation_required: L2` (default) is what a wall-clock figure needs. Operation
   counts need no level.
 
+## 2a. Under Claude Code: card, relay, assess
+
+Once the spec is frozen, steps 3 and 4 go through the model tiers (AGENTS.md
+"Model tiers"). The main session dispatches `experiment-director` in compile
+mode to write the task card (EKS request validation and submission by default:
+exact argv, request/spec/image identity, fresh receipt directory, timeouts and
+stop conditions from the `isolab-eks` submission reference;
+`python3 tools/task_card.py lint` must print `CARD OK`), relays the text
+`python3 tools/task_card.py prompt <card>` prints verbatim to
+`executor-mechanical`, which runs it with `tools/task_card.py run`, then dispatches `experiment-director` in
+assess mode with the executor's returned text. Only an assessment of
+`executed_as_specified` with a verbatim relay goes on to step 5. The
+measurement, audit, compare, tabulate and land steps stay as written; compare,
+the §5a band and the decision stay with the reasoning tier.
+
 ## 3. Run
+
+Use [isolab-eks](../isolab-eks/SKILL.md) for supported x86 experiments by default
+(AGENTS.md §9a). Freeze this spec into the EKS request and use an image built
+from the tested source commit. The launcher runs ecbench and verifies L2,
+native replay, A/A controls and S3 hashes; fetch its session for steps 4–7.
+Use the caller's existing AWS credentials through MCP or the portable bridge.
+Do not silently fall back to a local run when capacity, credentials or the
+required image are unavailable. Keep the requested experiment pending with the
+specific blocker. Requested resume uses the separate CRIU/EBS contract.
+
+The commands below are for an explicitly requested local run or for reproduction
+on an approved host. They are not an alternative to EKS admission:
 
 ```bash
 cargo build --release --bin ecbench
@@ -62,7 +89,8 @@ cargo build --release --bin ecbench
 - Never run builds, tests or other agents' jobs during a timed session. Wrap your
   own heavy work in `python3 tools/isolated_bench.py busy -- CMD`, which takes the
   same lock.
-- A busy host is refused. Wait, or pass `--allow-busy` and accept runs below L2.
+- A busy host is refused. Wait. `--allow-busy` is only for an explicitly requested
+  diagnostic that accepts below-L2 records; it cannot satisfy an L2 experiment.
 - `OUT_DIR` must not exist; it is claimed atomically under the lock. Never delete
   or edit a session. Ctrl-C or a SIGTERM stops a session cleanly: the child is
   killed, evicted threads are restored and the session is marked `interrupted`. An
@@ -97,6 +125,13 @@ Read it honestly:
   `S` on these curves. `incomplete` (a measured run did not verify) is not
   admissible. `partial` (runs without a partner) needs explaining. `bounded` means
   unpriced work: say so.
+- **Pricing band (AGENTS.md §5a).** Every arm, the rho reference included,
+  usually leaves native work unpriced. List each arm's `*_uncharged` counters
+  with their counts, price them at 0, 0.1 and 1 GAE per operation on every
+  arm alike, and rank two arms only if the order holds across the band. An
+  arm that names a counter without emitting its count is a lower bound and
+  cannot be ranked. Never set a calibrated IC cost against an uncalibrated
+  rho cost.
 - For a baseline binary against a candidate binary, run the same spec into two
   sessions and pass `--b-dir`. Pairs then share seeds (`same_seeds: true`), and
   wall time is refused across sessions by design.
@@ -152,6 +187,11 @@ Per AGENTS.md, open or update a PR in this task:
 - the spec, the session directory under `research/<topic>_<date>/sessions/`, the
   audit receipt, the saved comparisons, and a README with the hypothesis, the
   host (`ecbench host`), the levels earned, the table and the decision;
+- `protocol.json` frozen before the run (`experiment-protocol`: the spec is
+  the instrument, the protocol names its claims, controls, seeds and what
+  counts) and `export.json` built from the session with
+  `experiment_protocol.py from-ecbench` and checked with `check-export
+  --verify-files`, beside the session, never inside it;
 - the scoreboard and the thread's note in the same PR when the round measures an
   IC variant (§7). Mark extrapolations as such;
 - failures, timeouts and regressions included;

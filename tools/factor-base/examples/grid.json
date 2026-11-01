@@ -1,0 +1,143 @@
+[
+  {
+    "curve": {
+      "field": {
+        "kind": "binary",
+        "degree": 5,
+        "modulus": "37"
+      },
+      "a": "0x0",
+      "b": "0x1",
+      "group_order": "0x2c",
+      "subgroup_order": "0xb",
+      "cofactor": "0x4",
+      "generator": {
+        "x": "0x4",
+        "y": "0x16"
+      }
+    },
+    "recipe": {
+      "kind": "binary_subspace",
+      "shape": "coordinate",
+      "dimension": 3,
+      "seed": 12,
+      "offsets": [
+        "0"
+      ]
+    },
+    "max_candidates": 256,
+    "shard_points": 3
+  },
+  {
+    "curve": {
+      "field": {
+        "kind": "binary",
+        "degree": 5,
+        "modulus": "37"
+      },
+      "a": "0x0",
+      "b": "0x1",
+      "group_order": "0x2c",
+      "subgroup_order": "0xb",
+      "cofactor": "0x4",
+      "generator": {
+        "x": "0x4",
+        "y": "0x16"
+      }
+    },
+    "recipe": {
+      "kind": "binary_subspace",
+      "shape": "random_linear",
+      "dimension": 3,
+      "seed": 7,
+      "offsets": [
+        "0"
+      ]
+    },
+    "max_candidates": 256,
+    "shard_points": 3
+  },
+  {
+    "curve": {
+      "field": {
+        "kind": "binary",
+        "degree": 5,
+        "modulus": "37"
+      },
+      "a": "0x0",
+      "b": "0x1",
+      "group_order": "0x2c",
+      "subgroup_order": "0xb",
+      "cofactor": "0x4",
+      "generator": {
+        "x": "0x4",
+        "y": "0x16"
+      }
+    },
+    "recipe": {
+      "kind": "binary_subspace",
+      "shape": "geometric",
+      "dimension": 3,
+      "seed": 7,
+      "offsets": [
+        "0"
+      ]
+    },
+    "max_candidates": 256,
+    "shard_points": 3
+  },
+  {
+    "curve": {
+      "field": {
+        "kind": "binary",
+        "degree": 5,
+        "modulus": "37"
+      },
+      "a": "0x0",
+      "b": "0x1",
+      "group_order": "0x2c",
+      "subgroup_order": "0xb",
+      "cofactor": "0x4",
+      "generator": {
+        "x": "0x4",
+        "y": "0x16"
+      }
+    },
+    "recipe": {
+      "kind": "binary_subspace",
+      "shape": "trace_zero",
+      "dimension": 3,
+      "seed": 7,
+      "offsets": [
+        "0"
+      ]
+    },
+    "max_candidates": 256,
+    "shard_points": 3
+  },
+  {
+    "curve": {
+      "field": {
+        "kind": "prime",
+        "modulus": "101"
+      },
+      "a": "0x2",
+      "b": "0x3",
+      "group_order": "0x60",
+      "subgroup_order": "0x3",
+      "cofactor": "0x20",
+      "generator": {
+        "x": "0x23",
+        "y": "0x56"
+      }
+    },
+    "recipe": {
+      "kind": "prime_progression",
+      "start": "0",
+      "step": "1",
+      "count": 101
+    },
+    "max_candidates": 256,
+    "shard_points": 3
+  }
+]

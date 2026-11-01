@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+"""Deterministic, digest-pinned worker bundle; publish to the stack artifact bucket."""
+import gzip
+import hashlib
+from pathlib import Path
+import tarfile
+
+
+def package(destination=None, binary_dir=None):
+    here = Path(__file__).resolve().parent
+    destination = destination or here / 'runtime.tar.gz'
+    binary_dir = binary_dir or Path.home() / '.local/bin'
+    sources = [(here/name, name) for name in ['runner.py', 'activity.py', 'worker_state.py', 'node_service.py', 'install_services.py']]
+    sources.append((here/'experiment-run.schema.json', 'experiment-run.schema.json'))
+    sources.append((here/'experiment-runner', 'experiment-runner'))
+    sources.append((here/'wake.py', 'wake.py'))
+    sources += [(here/name, name) for name in ['codex_rpc.py','codex_snapshot.py','codex_recovery.py','diem_native_recovery.py']]
+    sources += [(here/name, name) for name in ['criu_local.py','criu_export.py','legacy_recovery.py',
+        'spot-legacy-backup.service','spot-legacy-backup.timer','spot-diem-backup.service','spot-diem-backup.timer']]
+    sources += [(binary_dir/name, 'bin/'+name) for name in
+                ['cairn', 'conductor', 'conductord', 'conductor-mcp', 'checkpoint-discovery',
+                 'checkpoint-selftest', 'solver-checkpoint-selftest', 'factor-base-shape-ladder', 'criu-4.2.1']]
+    for source, _ in sources:
+        if not source.is_file():
+            raise FileNotFoundError(source)
+    with destination.open('wb') as raw, gzip.GzipFile(fileobj=raw, mode='wb', filename='', mtime=0, compresslevel=1) as zipped:
+        with tarfile.open(fileobj=zipped, mode='w') as archive:
+            for source, name in sources:
+                info = archive.gettarinfo(str(source), arcname=name)
+                info.mtime = info.uid = info.gid = 0
+                info.uname = info.gname = ''
+                info.mode = 0o755 if name.startswith('bin/') or name == 'experiment-runner' else 0o644
+                with source.open('rb') as data:
+                    archive.addfile(info, data)
+    digest = hashlib.sha256(destination.read_bytes()).hexdigest()
+    destination.with_suffix('.sha256').write_text(digest+'\n')
+    return digest
+
+
+if __name__ == '__main__':
+    print(package())

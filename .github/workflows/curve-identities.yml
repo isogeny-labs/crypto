@@ -1,29 +1,61 @@
 name: curve-identities
 on:
-  pull_request:
-    paths:
-      - 'tools/curve_identity.py'
-      - 'tools/export_benchmark_snapshot.py'
-      - 'tests/test_curve_identity.py'
-      - 'tests/test_benchmark_export.py'
-      - '.github/workflows/curve-identities.yml'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
+    branches: [main]
     paths:
       - 'tools/curve_identity.py'
       - 'tools/export_benchmark_snapshot.py'
       - 'tests/test_curve_identity.py'
       - 'tests/test_benchmark_export.py'
+      - 'scripts/build_curve_registry.py'
+      - 'scripts/test_prime_model_normalization.py'
+      - 'scripts/check_curve_names.py'
+      - 'scripts/test_curve_names_archived_labels.py'
+      - 'research/f4_f5_history_20261012/reports/run-20261012T0009Z/REPORT.md'
+      - 'tools/isogeny-cli/src/bin/registry_models.rs'
+      - 'isogeny_algos/src/field.rs'
+      - 'docs/curves/sources/prime-models.json'
+      - 'research/isogeny_fibers_20261010/round4/16_7_agm_isogeny_oracles/out_seed7.json'
       - '.github/workflows/curve-identities.yml'
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   metadata:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|curve-identities.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|curve-identities.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 360 }}
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves/sources
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - name: Check metadata identities without running experiments
         run: |
           python tests/test_curve_identity.py
+          python scripts/test_prime_model_normalization.py
+          python scripts/test_curve_names_archived_labels.py

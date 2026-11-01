@@ -1,0 +1,34 @@
+== prod ratio of means off/default (>1: default cheaper); AA = off/off2
+pipe-n13-l4-m3-a0     n=12 cpu: 1.082 [0.971,1.213]         word_ops: 1.000 [1.000,1.000]         AA 1.089
+pipe-n17-l6-m3-a1     n=12 cpu: 1.069 [0.985,1.154]         word_ops: 0.990 [0.935,1.026]         AA 1.051
+pipe-n17-l9-m2-a1     n=12 cpu: 1.030 [0.913,1.157]         word_ops: 0.843 [0.778,0.894]  LOSES  AA 1.062
+pipe-n19-l10-m2-a0    n=12 cpu: 1.014 [0.726,1.353]         word_ops: 0.852 [0.759,0.942]  LOSES  AA 0.988
+pipe-n19-l7-m3-a0     n=12 cpu: 1.036 [0.953,1.094]         word_ops: 1.015 [0.928,1.063]         AA 1.032
+pipe-n23-l12-m2-a0    n=12 cpu: 1.035 [0.913,1.151]         word_ops: 1.024 [0.889,1.128]         AA 1.018
+pipe-n23-l8-m3-a0     n=12 cpu: 1.002 [0.962,1.036]         word_ops: 1.045 [1.022,1.058]         AA 0.973
+pipe-n29-l10-m3-a1    n= 8 cpu: 1.061 [1.048,1.074]         word_ops: 1.075 [1.055,1.086]         AA 1.022
+pipe-n29-l15-m2-a1    n= 8 cpu: 1.336 [1.148,1.496]         word_ops: 1.227 [1.123,1.300]         AA 0.979
+pipe-n31-l10-m3-a0    n= 8 cpu: 1.066 [1.036,1.100]         word_ops: 1.092 [1.087,1.098]         AA 0.987
+pipe-n31-l16-m2-a0    n= 8 cpu: 1.232 [1.144,1.332]         word_ops: 1.313 [1.239,1.351]         AA 0.980
+pipe-n37-l19-m2-a0    n= 7 cpu: 1.423 [1.365,1.513]         word_ops: 1.148 [1.069,1.280]         AA 0.965
+POOLED prod cpu: geo-mean of 12 cell ratios, 95% CI [1.066, 1.145]
+POOLED prod word_ops: geo-mean of 12 cell ratios, 95% CI [1.021, 1.062]
+  cpu: cells 12, losing (CI hi<1) 0, point<1 0, geo-mean of cell ratios 1.109
+  word_ops: cells 12, losing (CI hi<1) 2, point<1 3, geo-mean of cell ratios 1.044
+== bench ratio of means off/default (>1: default cheaper); AA = off/off2
+pipe-n13-l4-m3-a0     n=12 cpu: 0.961 [0.893,1.043]         word_ops: 1.000 [1.000,1.000]         AA 0.959
+pipe-n17-l6-m3-a1     n=12 cpu: 0.964 [0.855,1.062]         word_ops: 1.030 [1.017,1.046]         AA 1.005
+pipe-n17-l9-m2-a1     n=12 cpu: 0.918 [0.759,1.088]         word_ops: 0.947 [0.936,0.962]  LOSES  AA 1.000
+pipe-n19-l10-m2-a0    n=12 cpu: 1.195 [0.991,1.442]         word_ops: 0.995 [0.900,1.075]         AA 1.048
+pipe-n19-l7-m3-a0     n=12 cpu: 1.102 [1.068,1.138]         word_ops: 1.078 [1.068,1.089]         AA 1.014
+pipe-n23-l12-m2-a0    n=12 cpu: 1.099 [0.968,1.237]         word_ops: 1.210 [1.193,1.229]         AA 0.989
+pipe-n23-l8-m3-a0     n=12 cpu: 1.051 [1.035,1.066]         word_ops: 1.061 [1.051,1.071]         AA 0.986
+pipe-n29-l10-m3-a1    n= 8 cpu: 1.075 [1.038,1.114]         word_ops: 1.080 [1.073,1.087]         AA 1.012
+pipe-n29-l15-m2-a1    n= 8 cpu: 1.418 [1.392,1.442]         word_ops: 1.354 [1.308,1.388]         AA 0.996
+pipe-n31-l10-m3-a0    n= 8 cpu: 1.080 [1.049,1.113]         word_ops: 1.092 [1.087,1.098]         AA 1.003
+pipe-n31-l16-m2-a0    n= 8 cpu: 1.234 [1.195,1.291]         word_ops: 1.358 [1.346,1.370]         AA 1.025
+pipe-n37-l19-m2-a0    n= 8 cpu: 1.927 [1.846,2.016]         word_ops: 1.548 [1.502,1.595]         AA 0.985
+POOLED bench cpu: geo-mean of 12 cell ratios, 95% CI [1.111, 1.176]
+POOLED bench word_ops: geo-mean of 12 cell ratios, 95% CI [1.124, 1.143]
+  cpu: cells 12, losing (CI hi<1) 0, point<1 3, geo-mean of cell ratios 1.145
+  word_ops: cells 12, losing (CI hi<1) 1, point<1 2, geo-mean of cell ratios 1.134

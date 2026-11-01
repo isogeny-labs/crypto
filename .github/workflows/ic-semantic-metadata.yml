@@ -1,12 +1,8 @@
 name: ic-semantic-metadata
 
 on:
-  pull_request:
-    paths:
-      - AGENTS.md
-      - docs/curves/ic/**
-      - docs/curves/registry.json
-      - .github/workflows/ic-semantic-metadata.yml
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change reaches main, or on demand.
   push:
     branches: [main]
     paths:
@@ -15,16 +11,18 @@ on:
       - docs/curves/registry.json
       - .github/workflows/ic-semantic-metadata.yml
   workflow_dispatch:
-  schedule:
-    - cron: '17 5 * * *'
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   metadata:
     name: canonical identities and upstream mirror
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-semantic-metadata.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-semantic-metadata.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -35,17 +33,60 @@ jobs:
         run: python -m pip install pyyaml==6.0.2 jsonschema==4.23.0
       - name: Negative controls
         run: python -m unittest discover -s docs/curves/ic -p 'test_validate_semantics.py' -v
+      # aburan28/cryptanalysis is private: an unauthenticated fetch returns 404.
+      # CRYPTANALYSIS_READ_TOKEN (a fine-grained token with contents: read on
+      # that repository) enables the byte comparison. The gate is fail-closed:
+      # without the token the job errors instead of skipping the mirror check.
       - name: Fetch authoritative cryptanalysis registry for byte comparison
         shell: bash
+        env:
+          PEER_TOKEN: ${{ secrets.CRYPTANALYSIS_READ_TOKEN }}
         run: |
           set -euo pipefail
+          if [ -z "$PEER_TOKEN" ]; then
+            echo "::error::Configure CRYPTANALYSIS_READ_TOKEN with contents:read access to the private cryptanalysis repository. The upstream mirror gate cannot run anonymously."
+            exit 1
+          fi
+          # curl, not gh: the crypto-eks-linux runners do not ship the gh CLI.
           base=cryptanalysis-peer/experiments/ic-candidate-catalog
           mkdir -p "$base/curve-links"
           for file in curves.yaml curves.schema.json curve-links/link.schema.json \
                       validate_semantics.py test_validate_semantics.py; do
-            curl --fail --location --show-error --silent --retry 3 \
-              "https://raw.githubusercontent.com/aburan28/cryptanalysis/main/experiments/ic-candidate-catalog/$file" \
-              --output "$base/$file"
+            # Without --fail curl exits 0 on an HTTP error, so read the status and say
+            # which file and which status failed (a bare "curl: (22) ... 404" names neither).
+            status=$(curl --location --show-error --silent --retry 3 \
+              -H "Authorization: Bearer $PEER_TOKEN" \
+              -H "Accept: application/vnd.github.raw" \
+              --output "$base/$file" --write-out '%{http_code}' \
+              "https://api.github.com/repos/aburan28/cryptanalysis/contents/experiments/ic-candidate-catalog/$file?ref=main")
+            if [ "$status" != "200" ]; then
+              echo "::error::fetching $file from aburan28/cryptanalysis returned HTTP $status (a private repository answers 404 to a token without access to it; check CRYPTANALYSIS_READ_TOKEN's repository scope and the repository's current owner)"
+              exit 1
+            fi
           done
       - name: Validate committed metadata and upstream mirror
         run: python docs/curves/ic/validate_semantics.py --peer cryptanalysis-peer
+      # Source (cryptanalysis curves.yaml) -> mirror (docs/curves/ic) -> the
+      # registry the site reads. A stale registry is drift even when the mirror
+      # matches, so it is checked on the same run.
+      - name: Registry is current
+        id: registry
+        run: python3 scripts/build_curve_registry.py --check
+      - name: Rebuild stale registry for diagnosis
+        id: registry-diagnostic
+        if: failure() && steps.registry.outcome == 'failure'
+        run: |
+          python3 scripts/build_curve_registry.py
+          git rev-parse HEAD > canonical-registry-source-commit.txt
+          git diff --stat -- docs/curves/registry.json src/cryptanalysis/curve_aliases.json
+      - name: Retain exact complete-checkout registry candidate
+        if: always() && steps.registry-diagnostic.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: canonical-registry-${{ github.sha }}
+          path: |
+            docs/curves/registry.json
+            src/cryptanalysis/curve_aliases.json
+            canonical-registry-source-commit.txt
+          if-no-files-found: error
+          retention-days: 7

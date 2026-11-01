@@ -1,6 +1,9 @@
 name: ECC2K-130 n13 O-aware sparse-dense SAT freeze
 on:
-  pull_request:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
     paths:
       - 'research/notes/ecc2k130/n13_oaware_sparse_dense_sat_20260925/**'
       - 'research/notes/ecc2k130/n13_oaware_sat_benchmark_20260925/**'
@@ -14,12 +17,13 @@ permissions:
   contents: read
 jobs:
   frozen-hash-only:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-oaware-sparse-dense-sat.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-oaware-sparse-dense-sat.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # merge-ancestry checks include #785, #786 and #787
+          filter: blob:none
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'

@@ -1,0 +1,102 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}{Assumption}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\End}{\operatorname{End}}
+\newcommand{\Tr}{\operatorname{Tr}}
+\newcommand{\Nrd}{\operatorname{nrd}}
+\newcommand{\Ker}{\operatorname{ker}}
+\newcommand{\EA}{E_A}
+\newcommand{\EC}{E_C}
+\newcommand{\ED}{E_D}
+\DeclareUrlCommand\art{\urlstyle{tt}}
+\makeatletter\g@addto@macro\UrlBreaks{\do\_\do\-}\makeatother
+
+\setlength{\emergencystretch}{3em}
+\input{numbers.tex}
+
+\title{Eigen-S\'eta: an isogeny KEM whose trapdoor is a hidden-degree endomorphism\\[0.3em]
+\large Specification, correctness, heuristic security analysis and a constant-time implementation}
+\author{Anonymous}
+\date{Revision 2 of 2026-10-17 (first draft 2026-10-11) --- research draft, not peer reviewed}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We specify Eigen-S\'eta~v2, a key encapsulation mechanism built on supersingular
+isogenies in which the decryption trapdoor is a secret endomorphism of the
+public curve. The public key is a curve $\EA$ together with an eigenbasis, on
+its $2^E$-torsion, of the endomorphism $\tau=\varepsilon\omega\hat\varepsilon$,
+where $\omega$ is the degree-2 endomorphism of the curve with complex
+multiplication by $\Z[(1+\sqrt{-7})/2]$ and $\varepsilon$ is an isogeny of
+\emph{secret} degree $f$. A ciphertext is the codomain of a $3^{F}$-isogeny
+together with the images of that eigenbasis under FESTA-style diagonal masks.
+The masks commute with the eigen-structure, so the holder of $f$ decodes the
+ciphertext with a single $(2^E,2^E)$-isogeny in dimension two (Kani's lemma),
+while to anyone else the ciphertext is a masked-torsion isogeny instance.
+We give the algorithms, prove correctness (including that the kernel used in
+decryption is always cyclic), derive parameters, and analyse key- and
+message-recovery attacks. This second revision adds an assessment. We show
+that a candidate secret degree can be tested on the public key alone with a
+Kani chain of about $2\log_2 f$ steps, half the length of a decapsulation.
+We implemented this test: it accepted the true degree and rejected all
+\PkWrongTested\ wrong candidates at L1, L3 and L5. It lowers the cost of the
+degree search but leaves it far from binding. The binding attack is still
+guessing the mask ratio modulo about $\sqrt{3^F}$, at about $2^\lambda$
+classical and $2^{\lambda/2}$ Grover queries. We therefore withdraw
+revision~1's conjecture of NIST categories 1, 3 and 5 for the sets L1, L3 and
+L5 in its unqualified form. Those sets meet the AES references only in NIST's
+gate count under MAXDEPTH. At least $2^\lambda$ quantum queries is met only by
+L5 (as the level-1 set) and by quantum-hardened sets Q3 and Q5 with
+3904- and 5192-bit primes. Both claims assume that the hidden orientation of
+$\EA$ cannot be made effective. We identify this as the scheme's largest
+risk, because an effective orientation would give subexponential quantum key
+recovery at every set. At level~1, public keys and ciphertexts are
+1344~bytes. The maintained Rust implementation decapsulates with a theta
+chain in about \DecTimeOne\,s on a 4-core cloud VM. The security of the scheme
+is a conjecture supported by the analysis in this paper only; it has not
+been reviewed by others.
+\end{abstract}
+
+\tableofcontents
+
+\input{sections/intro.tex}
+\input{sections/prelim.tex}
+\input{sections/scheme.tex}
+\input{sections/correctness.tex}
+\input{sections/params.tex}
+\input{sections/security.tex}
+\input{sections/implementation.tex}
+\input{sections/results.tex}
+\input{sections/assessment.tex}
+\input{sections/conclusion.tex}
+
+\bibliographystyle{alpha}
+\bibliography{refs}
+\end{document}

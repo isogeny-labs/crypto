@@ -1,0 +1,87 @@
+{
+  "at_utc": "2026-10-22T05:28:43.646538+00:00",
+  "platform": "macOS-26.6-arm64-arm-64bit-Mach-O",
+  "commands": [
+    {
+      "command": [
+        "sysctl",
+        "-n",
+        "machdep.cpu.brand_string"
+      ],
+      "exit_code": 0,
+      "stdout": "Apple M4 Pro\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "sysctl",
+        "-n",
+        "hw.model"
+      ],
+      "exit_code": 0,
+      "stdout": "Mac16,7\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "sysctl",
+        "-n",
+        "hw.memsize"
+      ],
+      "exit_code": 0,
+      "stdout": "51539607552\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "sw_vers"
+      ],
+      "exit_code": 0,
+      "stdout": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6\nBuildVersion:\t\t25G70\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "uptime"
+      ],
+      "exit_code": 0,
+      "stdout": "22:28  up  3:19, 35 users, load averages: 74.17 52.55 43.33\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "vm_stat"
+      ],
+      "exit_code": 0,
+      "stdout": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                   120720.\nPages active:                                 990771.\nPages inactive:                               978924.\nPages speculative:                             76538.\nPages throttled:                                   0.\nPages wired down:                             270527.\nPages purgeable:                               17323.\n\"Translation faults\":                      379277584.\nPages copy-on-write:                        39449859.\nPages zero filled:                         219546804.\nPages reactivated:                           8299537.\nPages purged:                                 601832.\nFile-backed pages:                            936683.\nAnonymous pages:                             1109550.\nPages stored in compressor:                  1406530.\nPages occupied by compressor:                 663069.\nDecompressions:                              2680870.\nCompressions:                                5069363.\nPageins:                                    11101976.\nPageouts:                                      48452.\nSwapins:                                           0.\nSwapouts:                                          0.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "rustc",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "rustc 1.93.1 (01f6ddf75 2026-02-11) (Homebrew)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "cargo",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "cargo 1.93.1 (Homebrew)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "gp",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "                  GP/PARI CALCULATOR Version 2.17.3 (released)\n         arm64 running darwin (aarch64/GMP-6.3.0 kernel) 64-bit version\n      compiled: Nov 11 2025, Apple clang version 17.0.0 (clang-1700.4.4.1)\n                           threading engine: pthread\n                (readline v8.3 disabled, extended help enabled)\n"
+    }
+  ]
+}

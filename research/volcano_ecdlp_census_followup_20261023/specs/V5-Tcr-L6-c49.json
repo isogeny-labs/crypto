@@ -1,0 +1,46 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "volcano census follow-up V5 Tcr source vertex 49 (level 6)",
+ "description": "Volcano ECDLP census follow-up Phase B (research/volcano_ecdlp_census_followup_20261023/PLAN.md). Known-answer synthetic curves, planted_shared targets; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 66678169,
+    "a": 0,
+    "b": 20329640,
+    "group_order": 66662692,
+    "r": 16665673,
+    "gx": 47983629,
+    "gy": 17828532
+   }
+  ],
+  "targets_per_curve": 8,
+  "target_seed": 20261125,
+  "target_kind": "planted_shared"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rho-cubic",
+   "role": "control",
+   "method": {
+    "id": "rho.cubic"
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261023,
+  "isolation_required": "L2",
+  "timeout_seconds": 600
+ }
+}

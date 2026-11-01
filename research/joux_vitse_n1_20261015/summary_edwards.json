@@ -1,0 +1,466 @@
+{
+  "checks_failed": 0,
+  "committed_reference": {
+    "c_second": 73000000.0,
+    "log2_n_star": 233,
+    "source": "research/notes/index-calculus/RESEARCH_K5_TORSION_JOUX_VITSE.md §3"
+  },
+  "cost": [
+    {
+      "base_points": 57,
+      "checks_failed": 0,
+      "factor_max": 1.7695720810183622,
+      "factor_mean": 1.743912378917119,
+      "factor_min": 1.0,
+      "file": "cost_p271_s1.jsonl",
+      "full_max": 58701820.0,
+      "full_mean": 58527592.5,
+      "full_min": 58484513.0,
+      "p": 271,
+      "replay_max": 58701820.0,
+      "replay_mean": 33902344.5,
+      "replay_min": 33050088.0,
+      "replay_mismatches": 0,
+      "residuals": 32,
+      "seed": 1
+    },
+    {
+      "base_points": 66,
+      "checks_failed": 0,
+      "factor_max": 1.7688500103609421,
+      "factor_mean": 1.7679083667353956,
+      "factor_min": 1.766962793259731,
+      "file": "cost_p271_s2.jsonl",
+      "full_max": 58574016.0,
+      "full_mean": 58523712.71875,
+      "full_min": 58493141.0,
+      "p": 271,
+      "replay_max": 33131380.0,
+      "replay_mean": 33103366.21875,
+      "replay_min": 33074155.0,
+      "replay_mismatches": 0,
+      "residuals": 32,
+      "seed": 2
+    },
+    {
+      "base_points": 114,
+      "checks_failed": 0,
+      "factor_max": 1.769379428019207,
+      "factor_mean": 1.7439297371030051,
+      "factor_min": 1.0,
+      "file": "cost_p521_s1.jsonl",
+      "full_max": 58792217.0,
+      "full_mean": 58632064.375,
+      "full_min": 58589461.0,
+      "p": 521,
+      "replay_max": 58792217.0,
+      "replay_mean": 33962337.75,
+      "replay_min": 33113000.0,
+      "replay_mismatches": 0,
+      "residuals": 32,
+      "seed": 1
+    },
+    {
+      "base_points": 123,
+      "checks_failed": 0,
+      "factor_max": 1.7687509566849273,
+      "factor_mean": 1.7678219811120905,
+      "factor_min": 1.7638964360650016,
+      "file": "cost_p521_s2.jsonl",
+      "full_max": 58651978.0,
+      "full_mean": 58620031.40625,
+      "full_min": 58448497.0,
+      "p": 521,
+      "replay_max": 33178237.0,
+      "replay_mean": 33159465.09375,
+      "replay_min": 33136014.0,
+      "replay_mismatches": 0,
+      "residuals": 32,
+      "seed": 2
+    }
+  ],
+  "dlp": [
+    {
+      "agg": {
+        "consistent": 3195,
+        "e_solutions": 3351,
+        "f4_muls": 5926174181373,
+        "not_split": 3254,
+        "replay_mismatch": 3197,
+        "resolve_group_ops": 236,
+        "roots_muls": 1032776,
+        "target_gen_muls": 3195427108,
+        "undetermined": 0,
+        "weil_muls": 1521378048
+      },
+      "base_points": 7.0,
+      "c_trial": 56300236.615061134,
+      "census_trials_per_relation": 25567.667857142857,
+      "complete": true,
+      "file": "dlp_p31_s1.jsonl",
+      "log2_n": 22.77131596832236,
+      "n": "7158947",
+      "online_muls": 5930892126382,
+      "oracle_disagree": 0,
+      "p": 31,
+      "ratio_online_ic_over_expected_rho_walk": 3912884.9450509716,
+      "ratio_online_ic_over_rho": 3392306.814240512,
+      "relations": 8,
+      "rho_expected_walk_ops": 3353.3934531037876,
+      "rho_fp_muls": 1748336,
+      "rho_group_ops": 3868,
+      "rho_verified": true,
+      "seed": 1,
+      "trials": 105344.0,
+      "trials_per_relation": 13168.0,
+      "trials_per_relation_over_census": 0.515025463940437,
+      "trials_per_relation_over_census_95": [
+        0.2613813520835835,
+        1.1929368598917656
+      ],
+      "unknowns": 8,
+      "unpriced": {
+        "ic": "F4 symbolic preprocessing (monomial hashing, pair selection) not emitted: IC is a lower bound",
+        "rho": "partition hash and cycle comparison per walk step (2 per step; bounded above by group_ops)"
+      },
+      "unpriced_band": [
+        {
+          "gae_weight": 0.0,
+          "ic_over_rho": 3392306.814240512,
+          "rho_fp_muls_priced": 1748336.0
+        },
+        {
+          "gae_weight": 0.1,
+          "ic_over_rho": 2826922.3452004264,
+          "rho_fp_muls_priced": 2098003.2
+        },
+        {
+          "gae_weight": 1.0,
+          "ic_over_rho": 1130768.9380801707,
+          "rho_fp_muls_priced": 5245008.0
+        }
+      ],
+      "verified": true
+    },
+    {
+      "agg": {
+        "consistent": 8454,
+        "e_solutions": 8969,
+        "f4_muls": 12409096469830,
+        "not_split": 8834,
+        "replay_mismatch": 3936,
+        "resolve_group_ops": 192,
+        "roots_muls": 2631730,
+        "target_gen_muls": 9404798804,
+        "undetermined": 0,
+        "weil_muls": 4477713216
+      },
+      "base_points": 6.0,
+      "c_trial": 40067930.4506528,
+      "census_trials_per_relation": 59641.99166666667,
+      "complete": true,
+      "file": "dlp_p31_s2.jsonl",
+      "log2_n": 22.77093141050646,
+      "n": "7157039",
+      "online_muls": 12422981700652,
+      "oracle_disagree": 0,
+      "p": 31,
+      "ratio_online_ic_over_expected_rho_walk": 8197110.324714616,
+      "ratio_online_ic_over_rho": 5767990.0921412585,
+      "relations": 7,
+      "rho_expected_walk_ops": 3352.9465507114514,
+      "rho_fp_muls": 2153780,
+      "rho_group_ops": 4765,
+      "rho_verified": true,
+      "seed": 2,
+      "trials": 310048.0,
+      "trials_per_relation": 44292.57142857143,
+      "trials_per_relation_over_census": 0.742640716562893,
+      "trials_per_relation_over_census_95": [
+        0.36043832961422556,
+        1.8471266573560448
+      ],
+      "unknowns": 7,
+      "unpriced": {
+        "ic": "F4 symbolic preprocessing (monomial hashing, pair selection) not emitted: IC is a lower bound",
+        "rho": "partition hash and cycle comparison per walk step (2 per step; bounded above by group_ops)"
+      },
+      "unpriced_band": [
+        {
+          "gae_weight": 0.0,
+          "ic_over_rho": 5767990.0921412585,
+          "rho_fp_muls_priced": 2153780.0
+        },
+        {
+          "gae_weight": 0.1,
+          "ic_over_rho": 4806658.410117716,
+          "rho_fp_muls_priced": 2584536.0
+        },
+        {
+          "gae_weight": 1.0,
+          "ic_over_rho": 1922663.364047086,
+          "rho_fp_muls_priced": 6461340.0
+        }
+      ],
+      "verified": true
+    },
+    {
+      "base_points": 6.0,
+      "census_trials_per_relation": 241332.69166666668,
+      "complete": false,
+      "cost_to_cap_online_muls": 87564676461650,
+      "file": "dlp_p41_s1.jsonl",
+      "log2_n": 24.78755443073259,
+      "lower_bound_ic_over_rho": 15097191.420930872,
+      "n": "28959923",
+      "p": 41,
+      "relations_recorded": 3.0,
+      "rho_fp_muls": 5800064,
+      "rho_group_ops": 12832,
+      "rho_verified": true,
+      "seed": 1,
+      "trials": 1377312,
+      "unknowns": 7,
+      "wall_capped": true
+    },
+    {
+      "agg": {
+        "consistent": 11933,
+        "e_solutions": 14145,
+        "f4_muls": 20697872759313,
+        "not_split": 13879,
+        "replay_mismatch": 4483,
+        "resolve_group_ops": 348,
+        "roots_muls": 3841233,
+        "target_gen_muls": 17662734392,
+        "undetermined": 0,
+        "weil_muls": 7712259072
+      },
+      "base_points": 8.0,
+      "c_trial": 38806424.80994202,
+      "census_trials_per_relation": 51727.298214285714,
+      "complete": true,
+      "file": "dlp_p41_s2.jsonl",
+      "log2_n": 24.7879212361195,
+      "n": "28967287",
+      "online_muls": 20723251751876,
+      "oracle_disagree": 0,
+      "p": 41,
+      "ratio_online_ic_over_expected_rho_walk": 6796817.650174129,
+      "ratio_online_ic_over_rho": 1937944.9702392574,
+      "relations": 9,
+      "rho_expected_walk_ops": 6745.495387057466,
+      "rho_fp_muls": 10693416,
+      "rho_group_ops": 23658,
+      "rho_verified": true,
+      "seed": 2,
+      "trials": 534016.0,
+      "trials_per_relation": 59335.11111111111,
+      "trials_per_relation_over_census": 1.1470753965403189,
+      "trials_per_relation_over_census_95": [
+        0.6042608917461862,
+        2.508564430145952
+      ],
+      "unknowns": 9,
+      "unpriced": {
+        "ic": "F4 symbolic preprocessing (monomial hashing, pair selection) not emitted: IC is a lower bound",
+        "rho": "partition hash and cycle comparison per walk step (2 per step; bounded above by group_ops)"
+      },
+      "unpriced_band": [
+        {
+          "gae_weight": 0.0,
+          "ic_over_rho": 1937944.9702392574,
+          "rho_fp_muls_priced": 10693416.0
+        },
+        {
+          "gae_weight": 0.1,
+          "ic_over_rho": 1614954.141866048,
+          "rho_fp_muls_priced": 12832099.2
+        },
+        {
+          "gae_weight": 1.0,
+          "ic_over_rho": 645981.6567464191,
+          "rho_fp_muls_priced": 32080248.0
+        }
+      ],
+      "verified": true
+    },
+    {
+      "agg": {
+        "consistent": 6859,
+        "e_solutions": 7083,
+        "f4_muls": 16780248637565,
+        "not_split": 6902,
+        "replay_mismatch": 1842,
+        "resolve_group_ops": 552,
+        "roots_muls": 2495326,
+        "target_gen_muls": 16684215864,
+        "undetermined": 0,
+        "weil_muls": 6519234336
+      },
+      "base_points": 14.0,
+      "c_trial": 37224539.29171614,
+      "census_trials_per_relation": 26368.54408091908,
+      "complete": true,
+      "file": "dlp_p61_s1.jsonl",
+      "log2_n": 27.65375655447892,
+      "n": "211159301",
+      "online_muls": 16803454834723,
+      "oracle_disagree": 0,
+      "p": 61,
+      "ratio_online_ic_over_expected_rho_walk": 2041244.8490384251,
+      "ratio_online_ic_over_rho": 1236267.0025131525,
+      "relations": 15,
+      "rho_expected_walk_ops": 18212.31051732256,
+      "rho_fp_muls": 13592092,
+      "rho_group_ops": 30071,
+      "rho_verified": true,
+      "seed": 1,
+      "trials": 451408.0,
+      "trials_per_relation": 30093.866666666665,
+      "trials_per_relation_over_census": 1.1412790396889345,
+      "trials_per_relation_over_census_95": [
+        0.6919577261729325,
+        2.039118311483609
+      ],
+      "unknowns": 15,
+      "unpriced": {
+        "ic": "F4 symbolic preprocessing (monomial hashing, pair selection) not emitted: IC is a lower bound",
+        "rho": "partition hash and cycle comparison per walk step (2 per step; bounded above by group_ops)"
+      },
+      "unpriced_band": [
+        {
+          "gae_weight": 0.0,
+          "ic_over_rho": 1236267.0025131525,
+          "rho_fp_muls_priced": 13592092.0
+        },
+        {
+          "gae_weight": 0.1,
+          "ic_over_rho": 1030222.5020942937,
+          "rho_fp_muls_priced": 16310510.4
+        },
+        {
+          "gae_weight": 1.0,
+          "ic_over_rho": 412089.0008377175,
+          "rho_fp_muls_priced": 40776276.0
+        }
+      ],
+      "verified": true
+    },
+    {
+      "agg": {
+        "consistent": 20989,
+        "e_solutions": 21196,
+        "f4_muls": 67043077319574,
+        "not_split": 20797,
+        "replay_mismatch": 4939,
+        "resolve_group_ops": 424,
+        "roots_muls": 7067659,
+        "target_gen_muls": 70472706736,
+        "undetermined": 0,
+        "weil_muls": 26476229760
+      },
+      "base_points": 12.0,
+      "c_trial": 36622901.85644146,
+      "census_trials_per_relation": 113908.17904040404,
+      "complete": true,
+      "file": "dlp_p71_s1.jsonl",
+      "log2_n": 28.748796531159048,
+      "n": "451076389",
+      "online_muls": 67140033517127,
+      "oracle_disagree": 0,
+      "p": 71,
+      "ratio_online_ic_over_expected_rho_walk": 5580307.521303511,
+      "ratio_online_ic_over_rho": 5197337.199502639,
+      "relations": 13,
+      "rho_expected_walk_ops": 26618.58626871656,
+      "rho_fp_muls": 12918160,
+      "rho_group_ops": 28580,
+      "rho_verified": true,
+      "seed": 1,
+      "trials": 1833280.0,
+      "trials_per_relation": 141021.53846153847,
+      "trials_per_relation_over_census": 1.2380282052574743,
+      "trials_per_relation_over_census_95": [
+        0.7239802083417012,
+        2.325119493273669
+      ],
+      "unknowns": 13,
+      "unpriced": {
+        "ic": "F4 symbolic preprocessing (monomial hashing, pair selection) not emitted: IC is a lower bound",
+        "rho": "partition hash and cycle comparison per walk step (2 per step; bounded above by group_ops)"
+      },
+      "unpriced_band": [
+        {
+          "gae_weight": 0.0,
+          "ic_over_rho": 5197337.199502639,
+          "rho_fp_muls_priced": 12918160.0
+        },
+        {
+          "gae_weight": 0.1,
+          "ic_over_rho": 4331114.332918865,
+          "rho_fp_muls_priced": 15501792.0
+        },
+        {
+          "gae_weight": 1.0,
+          "ic_over_rho": 1732445.733167546,
+          "rho_fp_muls_priced": 38754480.0
+        }
+      ],
+      "verified": true
+    }
+  ],
+  "model_extrapolation": {
+    "c_add": 452.0,
+    "c_trial_replay": 33531878.390625,
+    "label": "extrapolation: IC = (p/4)·192p·C_trial (relations |F|+1 ≈ p/4 at the census rate 1/(192p), verified to three digits in RESEARCH_K5 §3), rho = √(πn/4)·c_add with the negation map, n = p⁵/4; C_trial the mean replayed trial over the cost runs. Sensitivity: the same at the measured trials-per-relation ratio",
+    "log2_n_star": 227.38065440147614,
+    "log2_n_star_at_measured_ratio": 226.0008703305056,
+    "log2_p_star": 45.87613088029523,
+    "measured_ratio_to_census": 0.9087917182867206,
+    "p_star": 64579024424238.89,
+    "rows": [
+      {
+        "ic_over_rho": 502256.72136586,
+        "log2_n": 38.0,
+        "log2_p": 8.0
+      },
+      {
+        "ic_over_rho": 251128.36068293,
+        "log2_n": 48.0,
+        "log2_p": 10.0
+      },
+      {
+        "ic_over_rho": 31391.04508536625,
+        "log2_n": 78.0,
+        "log2_p": 16.0
+      },
+      {
+        "ic_over_rho": 7847.761271341563,
+        "log2_n": 98.0,
+        "log2_p": 20.0
+      },
+      {
+        "ic_over_rho": 245.24253972942384,
+        "log2_n": 148.0,
+        "log2_p": 30.0
+      },
+      {
+        "ic_over_rho": 7.663829366544495,
+        "log2_n": 198.0,
+        "log2_p": 40.0
+      },
+      {
+        "ic_over_rho": 1.3547864287350537,
+        "log2_n": 223.0,
+        "log2_p": 45.0
+      },
+      {
+        "ic_over_rho": 0.23949466770451547,
+        "log2_n": 248.0,
+        "log2_p": 50.0
+      }
+    ]
+  },
+  "protocol": "research/joux_vitse_n1_20261015/PROTOCOL_EDWARDS.md"
+}

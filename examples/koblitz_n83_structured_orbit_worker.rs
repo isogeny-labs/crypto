@@ -34,6 +34,9 @@ const MANIFEST: &[u8] = include_bytes!("../research/koblitz_n83_factor_base_swee
 const EXPORTER: &[u8] = include_bytes!("koblitz_n83_structured_orbit_export.rs");
 const DESIGN: &[u8] =
     include_bytes!("../research/koblitz_n83_factor_base_sweep_20261008/structured-orbit-v3.json");
+const MAX_VARIABLES: u32 = 150_000;
+const MAX_DOMAIN_CLAUSES: usize = 12_000_000;
+const TRIAL_SEED: u64 = 2026100901;
 
 fn decimal(v: &Value) -> Result<BigUint> {
     let s = v
@@ -331,15 +334,16 @@ fn cgroup_peak_bytes() -> Result<u64> {
     }
 }
 
-fn run(args: &[String]) -> Result<()> {
+fn run(args: &[String], m: usize) -> Result<()> {
     if args.len() != 10 {
-        return Err("usage: run MANIFEST OBJECT CORPUS VALIDATION BUDGET_SECONDS MAX_TRIALS CONFLICT_BUDGET MAX_MODELS OUTPUT_DIR".into());
+        return Err("usage: run|run4 MANIFEST OBJECT CORPUS VALIDATION BUDGET_SECONDS MAX_TRIALS CONFLICT_BUDGET MAX_MODELS OUTPUT_DIR".into());
     }
     let budget: u64 = args[5].parse()?;
     let max_trials: usize = args[6].parse()?;
     let conflicts: u64 = args[7].parse()?;
     let models: usize = args[8].parse()?;
-    if !(1..=7200).contains(&budget)
+    if !(4..=5).contains(&m)
+        || !(1..=7200).contains(&budget)
         || max_trials == 0
         || !(1..=10_000_000).contains(&conflicts)
         || !(1..=1024).contains(&models)
@@ -358,7 +362,9 @@ fn run(args: &[String]) -> Result<()> {
             "public_corpus_path":args[3], "validation_path":args[4],
             "budget_seconds":budget, "max_trials":max_trials,
             "conflict_budget":conflicts, "max_models":models,
-            "summands":5, "strategy":"ChainedS3FrobeniusOrbit",
+            "max_variables":MAX_VARIABLES, "max_domain_clauses":MAX_DOMAIN_CLAUSES,
+            "summands":m, "strategy":"ChainedS3FrobeniusOrbit",
+            "seed":TRIAL_SEED, "allow_direct_relation":false,
             "memory_cgroup_limit_bytes":4294967296u64,
             "memory_cgroup_swap_limit_bytes":0,
             "source_blake3":blake3::hash(include_bytes!("koblitz_n83_structured_orbit_worker.rs")).to_hex().to_string()
@@ -380,17 +386,19 @@ fn run(args: &[String]) -> Result<()> {
     let (kc, fb) = import(Path::new(&args[1]), Path::new(&args[2]))?;
     let import_ms = start.elapsed().as_secs_f64() * 1000.0;
     let (target, corpus_hash) = public_target(Path::new(&args[3]), &kc)?;
-    let mut opts = KoblitzIcOptions::default();
-    opts.m = 5;
-    opts.strategy = DecompositionStrategy::ChainedS3FrobeniusOrbit;
-    opts.max_trials = max_trials;
-    opts.seed = 2026100901;
-    opts.allow_direct_relation = false;
-    opts.chain_s3_limits = ChainS3Limits {
-        max_variables: 150_000,
-        max_domain_clauses: 12_000_000,
-        max_models: models,
-        conflict_budget: conflicts,
+    let opts = KoblitzIcOptions {
+        m,
+        strategy: DecompositionStrategy::ChainedS3FrobeniusOrbit,
+        max_trials,
+        seed: TRIAL_SEED,
+        allow_direct_relation: false,
+        chain_s3_limits: ChainS3Limits {
+            max_variables: MAX_VARIABLES,
+            max_domain_clauses: MAX_DOMAIN_CLAUSES,
+            max_models: models,
+            conflict_budget: conflicts,
+        },
+        ..KoblitzIcOptions::default()
     };
     let mut events = OpenOptions::new()
         .write(true)
@@ -475,6 +483,7 @@ fn run(args: &[String]) -> Result<()> {
             "schema":"n83.structured-orbit-cold-result/v1", "study":STUDY,
             "status":status, "object_blake3":OBJECT_HASH,
             "manifest_blake3":MANIFEST_HASH,
+            "summands":m,
             "public_corpus_canonical_json_blake3":corpus_hash,
             "factor_base_size":report.factor_base_size, "orbit_count":report.orbit_count,
             "trials":report.trials, "relations":report.relations,
@@ -522,8 +531,9 @@ fn main() -> Result<()> {
             }));
             Ok(())
         }
-        Some("run") => run(&args),
-        _ => Err("usage: verify MANIFEST OBJECT | run MANIFEST OBJECT CORPUS VALIDATION BUDGET_SECONDS MAX_TRIALS CONFLICT_BUDGET MAX_MODELS OUTPUT_DIR".into()),
+        Some("run") => run(&args, 5),
+        Some("run4") => run(&args, 4),
+        _ => Err("usage: verify MANIFEST OBJECT | run|run4 MANIFEST OBJECT CORPUS VALIDATION BUDGET_SECONDS MAX_TRIALS CONFLICT_BUDGET MAX_MODELS OUTPUT_DIR".into()),
     }
 }
 

@@ -1,0 +1,151 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "sparse LA timing 2026-10-18, F(p^4) k=4 ladder: structured-gauss vs the four deferred sparse relation matrices on the baseline D4 recipe",
+  "description": "PROTOCOL: research/sparse_la_timing_20261018/PROTOCOL.md. Workload, target seed and measurement seed copied from research/gaudry_quartic_d4_cost_20261014/sessions/k4-p29-d4cost (baseline arm ic-d4-chains, linalg incremental-gauss). Only linalg varies across IC arms; every arm shares the algorithm seed per workload, so the relation stream is common. Arms: rho-neg reference; sg (structured-gauss, incumbent named by the task); sg-aa A/A; ig (incremental-gauss, the baseline session's configuration, gate 0); igfr positive control (full-rank completion rule); sparse-cado, filter-wiedemann, filter-lanczos, wiedemann, lanczos candidates. row_ops are unpriced native work, priced by the AGENTS.md 5a band at 0, 0.1, 1 GAE.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "fp4_torsion",
+        "p": 29,
+        "seed": 1,
+        "max_cofactor": 16
+      }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 202610134029
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "sg",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "max_trials": "20000",
+          "linalg": "structured-gauss"
+        }
+      }
+    },
+    {
+      "name": "sg-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "max_trials": "20000",
+          "linalg": "structured-gauss"
+        }
+      }
+    },
+    {
+      "name": "ig",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "max_trials": "20000",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "igfr",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "max_trials": "20000",
+          "linalg": "incremental-gauss-full-rank"
+        }
+      }
+    },
+    {
+      "name": "sparse-cado",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "max_trials": "20000",
+          "linalg": "sparse-cado"
+        }
+      }
+    },
+    {
+      "name": "filter-wiedemann",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "max_trials": "20000",
+          "linalg": "filter+wiedemann"
+        }
+      }
+    },
+    {
+      "name": "filter-lanczos",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "max_trials": "20000",
+          "linalg": "filter+lanczos"
+        }
+      }
+    },
+    {
+      "name": "wiedemann",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "max_trials": "20000",
+          "linalg": "wiedemann"
+        }
+      }
+    },
+    {
+      "name": "lanczos",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "max_trials": "20000",
+          "linalg": "lanczos"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "shuffle",
+    "seed": 202610134030,
+    "isolation_required": "L0",
+    "timeout_seconds": 3600
+  }
+}

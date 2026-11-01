@@ -5,11 +5,10 @@
 //! solver's answer.  Set `IC_GROEBNER_CACHE_URL` to enable it.  For an
 //! ElastiCache replication group with in-transit encryption, use a `rediss://`
 //! URL and provide the auth token in the URL through the deployment secret.
-
 // Fail-open cache infra, currently unwired: kept for upcoming use.
 // `dead_code` is allowed so `-D warnings` stays green until it is wired in.
 #![allow(dead_code)]
-use crate::cryptanalysis::pq_groebner_f2::F2BoolPoly;
+use crate::cryptanalysis::pq_groebner_f2::{F2BoolPoly, Mask};
 use redis::Commands;
 use serde::{Deserialize, Serialize};
 use std::sync::OnceLock;
@@ -22,7 +21,7 @@ const DEFAULT_MAX_BYTES: usize = 16 * 1024 * 1024;
 struct CachedRows {
     version: u8,
     n_vars: usize,
-    rows: Vec<Vec<u64>>,
+    rows: Vec<Vec<Mask>>,
 }
 
 /// A lightweight Redis client.  Connections are short-lived so a dead node or
@@ -201,6 +200,10 @@ fn warn_once(message: String) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
     use crate::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
 
     #[test]

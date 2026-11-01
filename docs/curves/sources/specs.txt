@@ -1,4 +1,6 @@
 # Specifications for examples/curve_id_generated.rs, one per line.
+# Native cofactor/generator fixture source: research/ecbench_known_log_targets_20261021/fixtures.json
+# Reproduce these additions with examples/known_log_targets.rs (fixtures, register).
 # Regenerate docs/curves/sources/generated.json with the command in docs/curves/README.md.
 # The Round-5 matched-rho evaluation ladder (seed 0xE7A1 = 59297) and its calibration (0xCA11B = 827675):
 prime:12:59297 prime:14:59297 prime:16:59297 prime:18:59297 prime:20:59297 prime:22:59297 prime:24:59297 prime:26:59297
@@ -17,3 +19,12 @@ koblitz:0:7 koblitz:0:9 koblitz:0:11 koblitz:0:13 koblitz:0:15 koblitz:0:17 kobl
 # Native seed/source manifest: docs/curves/sources/iso1_population_20261009.json
 
 # Native seed/source manifest: docs/curves/sources/iso1_two_branch_20261009.json
+# Native CM source search (seed 1, certified orders and floor models):
+# research/full_volcano_classes_20261017/evidence/construction.jsonl
+# research/full_volcano_classes_20261017/evidence/*-floor-plan.json
+# The frontier campaign pilot (research/ic_frontier_campaign_20261015/pilot, session pP20):
+prime:20:20261015
+# The ic-size-sweep ladder (taskq/deploy/eks-karpenter/validation/ic-size-sweep-20261026, seed 0xE7A1 = 59297) at the sizes the matched-rho ladder above does not hold:
+prime:28:59297 prime:32:59297
+# PKM tower ecbench round (research/pkm_tower_ecbench_20261011): prime-order curves with 2^t | p - 1 for t = 5..8:
+prime:9:17 prime:11:20 prime:13:35 prime:15:115

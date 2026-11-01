@@ -1,0 +1,62 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "ic.pipeline relation matrix: sparse-cado vs dense full-rank, |F| = 16k, icv1-fp32-t7319-90da43e9",
+  "description": "research/ic_linalg_pipeline_20261019/PROTOCOL.md, session B (counts; wall descriptive).",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 4294967291,
+        "a": 4294967288,
+        "b": 31,
+        "group_order": 4294959973,
+        "r": 4294959973,
+        "gx": 2,
+        "gy": 2120051858
+      }
+    ],
+    "targets_per_curve": 4,
+    "target_seed": 20261019
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "dense-16384",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=16384",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "incremental-gauss-full-rank"
+        }
+      }
+    },
+    {
+      "name": "cado-16384",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=16384",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "sparse-cado"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 2,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261019,
+    "isolation_required": "L2",
+    "timeout_seconds": 6000
+  }
+}

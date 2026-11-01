@@ -1,10 +1,9 @@
 # Automatic hyperelliptic cover checks
 
 `curve_cover_check` constructs and replays explicit covers **H -> E** for
-the supported elliptic model forms in the ICV1 catalog. Findings are in
-the elliptic models in the ICV1 catalog: short Weierstrass models over
-`GF(p)` and over extensions `GF(p^k)` with `p > 3`, and ordinary binary
-models. Findings are in
+the supported elliptic model forms in the ICV1 catalog: short Weierstrass
+models over `GF(p)` and over extensions `GF(p^k)` with `p > 3`, and ordinary
+binary models. Findings are in
 [`covers.json`](covers.json), joined to [`registry.json`](registry.json)
 by slug **and the full SHA-256 of the exact model JSON**. The registry's
 model and EC1 identities stay unchanged. The lab browser shows the finding
@@ -127,12 +126,26 @@ subfield would prevent an ordinary same-field hyperelliptic cover.
 
 ## Interpretation and scope
 
-These elementary same-field constructions establish existence. They
-perform **no Weil descent to a smaller field**, no subgroup-map computation,
-and no relation-solving or discrete-log benchmark. Those fields remain
-`not_tested`/null. Existence carries no speedup or vulnerability label.
-The elliptic factor already accounts for part of the cover's Jacobian;
-its existence alone does not establish cheaper computation there.
+These elementary same-field constructions establish existence. This geometry
+checker performs **no Weil descent to a smaller field**, no subgroup-map
+computation, and no relation-solving or discrete-log benchmark. Those fields
+remain `not_tested`/null. Existence carries no speedup or vulnerability label.
+The elliptic factor already accounts for part of the cover's Jacobian; its
+existence alone does not establish cheaper computation there.
+
+The separate generated
+[`cover-transfer-assessments.json`](cover-transfer-assessments.json) v2 ledger
+classifies transfer obligations for all 4,493 map rows (4,491 distinct cover
+models) and 1,004 linked EC1 representations. The population comprises 165
+binary maps and 4,328 odd-characteristic maps: 2,011 direct prime-field, 30
+normalized-target prime-field, and 2,287 extension-field maps. The EC1 links
+comprise 140 binary and 864 odd-characteristic representations. The
+[2026-10-22 catalog refresh](../../research/quadratic_twist_evidence_20261021/reports/catalog-20261022/README.md)
+records the native replay and retains the earlier dated assessment report. That
+classification does not alter this geometry catalog: it records bounded binary
+typed-transfer support,
+refutes capabilities absent from the current implementation, and leaves the
+odd-characteristic balanced-Jacobian maps and every solver-cost claim open.
 
 The Rust tests enumerate all affine cover points on every nonsingular
 short Weierstrass model over F5, F7, F11 and F25 (`t^2 + 2`), on four

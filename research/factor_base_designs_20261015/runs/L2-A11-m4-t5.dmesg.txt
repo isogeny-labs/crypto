@@ -1,0 +1,14 @@
+# Kernel log lines (dmesg) for the two L2 systems, copied verbatim at 2026-10-19T16:56:44Z.
+# The harness recorded 'child exited: signal: 9 (SIGKILL)'; the kernel's memory-cgroup OOM killer sent it.
+# Cgroup: memory:/process_api/01a154ed-7e62-70c2-8601-9fed198c3a26/claude-code-bash. Boot at 2026-10-19 16:10:09 local; dmesg times are seconds since boot.
+# Boot 2026-10-19T16:10:09Z: 2639.98 s = 16:54:10Z (target 0, pid 10420, 97.3 s after its 16:52:33Z start); 2748.17 s = 16:55:57Z (target 1, pid 10700).
+[ 2639.810023] fb_designs_slop invoked oom-killer: gfp_mask=0x100cca(GFP_HIGHUSER_MOVABLE), order=0, oom_score_adj=0
+[ 2639.894923] memory: usage 14007508kB, limit 14007508kB, failcnt 72202
+[ 2639.897781] memory+swap: usage 14007508kB, limit 9007199254740988kB, failcnt 0
+[ 2639.975784] oom-kill:constraint=CONSTRAINT_MEMCG,nodemask=(null),cpuset=/,mems_allowed=0,oom_memcg=/process_api/01a154ed-7e62-70c2-8601-9fed198c3a26/claude-code-bash,task_memcg=/process_api/01a154ed-7e62-70c2-8601-9fed198c3a26/claude-code-bash,task=fb_designs_slop,pid=10420,uid=0
+[ 2639.983701] Memory cgroup out of memory: Killed process 10420 (fb_designs_slop) total-vm:14261796kB, anon-rss:13972152kB, file-rss:2172kB, shmem-rss:0kB, UID:0 pgtables:27640kB oom_score_adj:0
+[ 2748.014663] fb_designs_slop invoked oom-killer: gfp_mask=0x100cca(GFP_HIGHUSER_MOVABLE), order=0, oom_score_adj=0
+[ 2748.018813] memory: usage 14007508kB, limit 14007508kB, failcnt 72901
+[ 2748.081564] memory+swap: usage 14007508kB, limit 9007199254740988kB, failcnt 0
+[ 2748.163121] oom-kill:constraint=CONSTRAINT_MEMCG,nodemask=(null),cpuset=/,mems_allowed=0,oom_memcg=/process_api/01a154ed-7e62-70c2-8601-9fed198c3a26/claude-code-bash,task_memcg=/process_api/01a154ed-7e62-70c2-8601-9fed198c3a26/claude-code-bash,task=fb_designs_slop,pid=10700,uid=0
+[ 2748.171202] Memory cgroup out of memory: Killed process 10700 (fb_designs_slop) total-vm:14196260kB, anon-rss:13972088kB, file-rss:2248kB, shmem-rss:0kB, UID:0 pgtables:27640kB oom_score_adj:0

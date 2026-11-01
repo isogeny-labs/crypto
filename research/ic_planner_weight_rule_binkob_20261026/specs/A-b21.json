@@ -1,0 +1,99 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "ic planner weight rule (binary, Koblitz), Phase A, binary curve b21: factor-base dimension",
+  "description": "research/ic_planner_weight_rule_binkob_20261026. The candidate arm is the ic plan (ic-planner/2, w = 0) output; every other IC arm changes the factor base only.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "binary_random",
+        "n": 21,
+        "seed": 827675,
+        "max_cofactor": 8
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261027
+  },
+  "arms": [
+    {
+      "name": "rho",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "dm2",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "linalg": "incremental-gauss",
+          "oracle": "mitm:m=2,negation_folded=1",
+          "targets": "walk",
+          "factor_base": "binary-subspace:dimension=5"
+        }
+      }
+    },
+    {
+      "name": "dm1",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "linalg": "incremental-gauss",
+          "oracle": "mitm:m=2,negation_folded=1",
+          "targets": "walk",
+          "factor_base": "binary-subspace:dimension=6"
+        }
+      }
+    },
+    {
+      "name": "plan",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "linalg": "incremental-gauss",
+          "oracle": "mitm:m=2,negation_folded=1",
+          "targets": "walk",
+          "factor_base": "binary-subspace:dimension=7"
+        }
+      }
+    },
+    {
+      "name": "dp1",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "linalg": "incremental-gauss",
+          "oracle": "mitm:m=2,negation_folded=1",
+          "targets": "walk",
+          "factor_base": "binary-subspace:dimension=8"
+        }
+      }
+    },
+    {
+      "name": "dp2",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "linalg": "incremental-gauss",
+          "oracle": "mitm:m=2,negation_folded=1",
+          "targets": "walk",
+          "factor_base": "binary-subspace:dimension=9"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 1,
+    "order": "alternate_measured",
+    "seed": 20261028,
+    "isolation_required": "L2",
+    "timeout_seconds": 1800
+  }
+}

@@ -1,0 +1,44 @@
+[
+  {
+    "name": "compact-fixture",
+    "command": [
+      "/Volumes/SSD990-2/research-resume-2026-10-19/full-smith-target/release/deps/crypto_lib-35e4729bc6accfed",
+      "--exact",
+      "cryptanalysis::ic_framework::plugins::tests::compact_orbit_scan_matches_archived_n37_source42",
+      "--test-threads=1"
+    ],
+    "started": "2026-10-19T18:30:17.590172+00:00",
+    "exit_code": 0,
+    "finished": "2026-10-19T18:30:17.659046+00:00"
+  },
+  {
+    "name": "chain-fixtures",
+    "command": [
+      "/Volumes/SSD990-2/research-resume-2026-10-19/full-smith-target/release/deps/crypto_lib-35e4729bc6accfed",
+      "chain_set::tests",
+      "--test-threads=1"
+    ],
+    "started": "2026-10-19T18:30:17.659371+00:00",
+    "exit_code": 0,
+    "finished": "2026-10-19T18:30:18.402567+00:00"
+  },
+  {
+    "name": "example",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "--locked",
+      "--offline",
+      "--example",
+      "smith_elliptic_walk",
+      "-j",
+      "2",
+      "--",
+      "--test-threads=1"
+    ],
+    "started": "2026-10-19T18:30:18.402828+00:00",
+    "exit_code": 0,
+    "finished": "2026-10-19T18:35:43.459315+00:00"
+  }
+]

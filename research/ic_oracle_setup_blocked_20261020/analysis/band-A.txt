@@ -1,0 +1,110 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp32-t7319-90da43e9 | 32.00 | batch-1024 | 40/40 | 31.851 | 35.021 | 63.548 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | batch-2048 | 40/40 | 71.816 | 73.388 | 87.534 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | batch-4096 | 40/40 | 260.011 | 260.843 | 268.323 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | batch-8192 | 40/40 | 1026.139 | 1026.632 | 1031.065 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | blocked-1024 | 40/40 | 31.851 | 35.021 | 63.548 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | blocked-2048 | 40/40 | 71.816 | 73.388 | 87.534 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | blocked-4096 | 40/40 | 260.011 | 260.843 | 268.323 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | blocked-4096-aa | 40/40 | 260.011 | 260.843 | 268.323 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | blocked-8192 | 40/40 | 1026.139 | 1026.632 | 1031.065 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | rho-neg | 40/40 | 0.966 | 1.063 | 1.927 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | scalar-1024 | 40/40 | 31.851 | 35.021 | 63.548 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | scalar-2048 | 40/40 | 71.816 | 73.388 | 87.534 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | scalar-4096 | 40/40 | 260.011 | 260.843 | 268.323 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | scalar-8192 | 40/40 | 1026.139 | 1026.632 | 1031.065 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp32-t7319-90da43e9 | batch-1024 vs batch-2048 | batch-1024 < batch-2048 |
+| icv1-fp32-t7319-90da43e9 | batch-1024 vs batch-4096 | batch-1024 < batch-4096 |
+| icv1-fp32-t7319-90da43e9 | batch-1024 vs batch-8192 | batch-1024 < batch-8192 |
+| icv1-fp32-t7319-90da43e9 | batch-1024 vs blocked-1024 | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | batch-1024 vs blocked-2048 | batch-1024 < blocked-2048 |
+| icv1-fp32-t7319-90da43e9 | batch-1024 vs blocked-4096 | batch-1024 < blocked-4096 |
+| icv1-fp32-t7319-90da43e9 | batch-1024 vs blocked-4096-aa | batch-1024 < blocked-4096-aa |
+| icv1-fp32-t7319-90da43e9 | batch-1024 vs blocked-8192 | batch-1024 < blocked-8192 |
+| icv1-fp32-t7319-90da43e9 | batch-1024 vs rho-neg | rho-neg < batch-1024 |
+| icv1-fp32-t7319-90da43e9 | batch-1024 vs scalar-1024 | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | batch-1024 vs scalar-2048 | batch-1024 < scalar-2048 |
+| icv1-fp32-t7319-90da43e9 | batch-1024 vs scalar-4096 | batch-1024 < scalar-4096 |
+| icv1-fp32-t7319-90da43e9 | batch-1024 vs scalar-8192 | batch-1024 < scalar-8192 |
+| icv1-fp32-t7319-90da43e9 | batch-2048 vs batch-4096 | batch-2048 < batch-4096 |
+| icv1-fp32-t7319-90da43e9 | batch-2048 vs batch-8192 | batch-2048 < batch-8192 |
+| icv1-fp32-t7319-90da43e9 | batch-2048 vs blocked-1024 | blocked-1024 < batch-2048 |
+| icv1-fp32-t7319-90da43e9 | batch-2048 vs blocked-2048 | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | batch-2048 vs blocked-4096 | batch-2048 < blocked-4096 |
+| icv1-fp32-t7319-90da43e9 | batch-2048 vs blocked-4096-aa | batch-2048 < blocked-4096-aa |
+| icv1-fp32-t7319-90da43e9 | batch-2048 vs blocked-8192 | batch-2048 < blocked-8192 |
+| icv1-fp32-t7319-90da43e9 | batch-2048 vs rho-neg | rho-neg < batch-2048 |
+| icv1-fp32-t7319-90da43e9 | batch-2048 vs scalar-1024 | scalar-1024 < batch-2048 |
+| icv1-fp32-t7319-90da43e9 | batch-2048 vs scalar-2048 | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | batch-2048 vs scalar-4096 | batch-2048 < scalar-4096 |
+| icv1-fp32-t7319-90da43e9 | batch-2048 vs scalar-8192 | batch-2048 < scalar-8192 |
+| icv1-fp32-t7319-90da43e9 | batch-4096 vs batch-8192 | batch-4096 < batch-8192 |
+| icv1-fp32-t7319-90da43e9 | batch-4096 vs blocked-1024 | blocked-1024 < batch-4096 |
+| icv1-fp32-t7319-90da43e9 | batch-4096 vs blocked-2048 | blocked-2048 < batch-4096 |
+| icv1-fp32-t7319-90da43e9 | batch-4096 vs blocked-4096 | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | batch-4096 vs blocked-4096-aa | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | batch-4096 vs blocked-8192 | batch-4096 < blocked-8192 |
+| icv1-fp32-t7319-90da43e9 | batch-4096 vs rho-neg | rho-neg < batch-4096 |
+| icv1-fp32-t7319-90da43e9 | batch-4096 vs scalar-1024 | scalar-1024 < batch-4096 |
+| icv1-fp32-t7319-90da43e9 | batch-4096 vs scalar-2048 | scalar-2048 < batch-4096 |
+| icv1-fp32-t7319-90da43e9 | batch-4096 vs scalar-4096 | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | batch-4096 vs scalar-8192 | batch-4096 < scalar-8192 |
+| icv1-fp32-t7319-90da43e9 | batch-8192 vs blocked-1024 | blocked-1024 < batch-8192 |
+| icv1-fp32-t7319-90da43e9 | batch-8192 vs blocked-2048 | blocked-2048 < batch-8192 |
+| icv1-fp32-t7319-90da43e9 | batch-8192 vs blocked-4096 | blocked-4096 < batch-8192 |
+| icv1-fp32-t7319-90da43e9 | batch-8192 vs blocked-4096-aa | blocked-4096-aa < batch-8192 |
+| icv1-fp32-t7319-90da43e9 | batch-8192 vs blocked-8192 | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | batch-8192 vs rho-neg | rho-neg < batch-8192 |
+| icv1-fp32-t7319-90da43e9 | batch-8192 vs scalar-1024 | scalar-1024 < batch-8192 |
+| icv1-fp32-t7319-90da43e9 | batch-8192 vs scalar-2048 | scalar-2048 < batch-8192 |
+| icv1-fp32-t7319-90da43e9 | batch-8192 vs scalar-4096 | scalar-4096 < batch-8192 |
+| icv1-fp32-t7319-90da43e9 | batch-8192 vs scalar-8192 | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | blocked-1024 vs blocked-2048 | blocked-1024 < blocked-2048 |
+| icv1-fp32-t7319-90da43e9 | blocked-1024 vs blocked-4096 | blocked-1024 < blocked-4096 |
+| icv1-fp32-t7319-90da43e9 | blocked-1024 vs blocked-4096-aa | blocked-1024 < blocked-4096-aa |
+| icv1-fp32-t7319-90da43e9 | blocked-1024 vs blocked-8192 | blocked-1024 < blocked-8192 |
+| icv1-fp32-t7319-90da43e9 | blocked-1024 vs rho-neg | rho-neg < blocked-1024 |
+| icv1-fp32-t7319-90da43e9 | blocked-1024 vs scalar-1024 | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | blocked-1024 vs scalar-2048 | blocked-1024 < scalar-2048 |
+| icv1-fp32-t7319-90da43e9 | blocked-1024 vs scalar-4096 | blocked-1024 < scalar-4096 |
+| icv1-fp32-t7319-90da43e9 | blocked-1024 vs scalar-8192 | blocked-1024 < scalar-8192 |
+| icv1-fp32-t7319-90da43e9 | blocked-2048 vs blocked-4096 | blocked-2048 < blocked-4096 |
+| icv1-fp32-t7319-90da43e9 | blocked-2048 vs blocked-4096-aa | blocked-2048 < blocked-4096-aa |
+| icv1-fp32-t7319-90da43e9 | blocked-2048 vs blocked-8192 | blocked-2048 < blocked-8192 |
+| icv1-fp32-t7319-90da43e9 | blocked-2048 vs rho-neg | rho-neg < blocked-2048 |
+| icv1-fp32-t7319-90da43e9 | blocked-2048 vs scalar-1024 | scalar-1024 < blocked-2048 |
+| icv1-fp32-t7319-90da43e9 | blocked-2048 vs scalar-2048 | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | blocked-2048 vs scalar-4096 | blocked-2048 < scalar-4096 |
+| icv1-fp32-t7319-90da43e9 | blocked-2048 vs scalar-8192 | blocked-2048 < scalar-8192 |
+| icv1-fp32-t7319-90da43e9 | blocked-4096 vs blocked-4096-aa | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | blocked-4096 vs blocked-8192 | blocked-4096 < blocked-8192 |
+| icv1-fp32-t7319-90da43e9 | blocked-4096 vs rho-neg | rho-neg < blocked-4096 |
+| icv1-fp32-t7319-90da43e9 | blocked-4096 vs scalar-1024 | scalar-1024 < blocked-4096 |
+| icv1-fp32-t7319-90da43e9 | blocked-4096 vs scalar-2048 | scalar-2048 < blocked-4096 |
+| icv1-fp32-t7319-90da43e9 | blocked-4096 vs scalar-4096 | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | blocked-4096 vs scalar-8192 | blocked-4096 < scalar-8192 |
+| icv1-fp32-t7319-90da43e9 | blocked-4096-aa vs blocked-8192 | blocked-4096-aa < blocked-8192 |
+| icv1-fp32-t7319-90da43e9 | blocked-4096-aa vs rho-neg | rho-neg < blocked-4096-aa |
+| icv1-fp32-t7319-90da43e9 | blocked-4096-aa vs scalar-1024 | scalar-1024 < blocked-4096-aa |
+| icv1-fp32-t7319-90da43e9 | blocked-4096-aa vs scalar-2048 | scalar-2048 < blocked-4096-aa |
+| icv1-fp32-t7319-90da43e9 | blocked-4096-aa vs scalar-4096 | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | blocked-4096-aa vs scalar-8192 | blocked-4096-aa < scalar-8192 |
+| icv1-fp32-t7319-90da43e9 | blocked-8192 vs rho-neg | rho-neg < blocked-8192 |
+| icv1-fp32-t7319-90da43e9 | blocked-8192 vs scalar-1024 | scalar-1024 < blocked-8192 |
+| icv1-fp32-t7319-90da43e9 | blocked-8192 vs scalar-2048 | scalar-2048 < blocked-8192 |
+| icv1-fp32-t7319-90da43e9 | blocked-8192 vs scalar-4096 | scalar-4096 < blocked-8192 |
+| icv1-fp32-t7319-90da43e9 | blocked-8192 vs scalar-8192 | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | rho-neg vs scalar-1024 | rho-neg < scalar-1024 |
+| icv1-fp32-t7319-90da43e9 | rho-neg vs scalar-2048 | rho-neg < scalar-2048 |
+| icv1-fp32-t7319-90da43e9 | rho-neg vs scalar-4096 | rho-neg < scalar-4096 |
+| icv1-fp32-t7319-90da43e9 | rho-neg vs scalar-8192 | rho-neg < scalar-8192 |
+| icv1-fp32-t7319-90da43e9 | scalar-1024 vs scalar-2048 | scalar-1024 < scalar-2048 |
+| icv1-fp32-t7319-90da43e9 | scalar-1024 vs scalar-4096 | scalar-1024 < scalar-4096 |
+| icv1-fp32-t7319-90da43e9 | scalar-1024 vs scalar-8192 | scalar-1024 < scalar-8192 |
+| icv1-fp32-t7319-90da43e9 | scalar-2048 vs scalar-4096 | scalar-2048 < scalar-4096 |
+| icv1-fp32-t7319-90da43e9 | scalar-2048 vs scalar-8192 | scalar-2048 < scalar-8192 |
+| icv1-fp32-t7319-90da43e9 | scalar-4096 vs scalar-8192 | scalar-4096 < scalar-8192 |

@@ -1,0 +1,1236 @@
+{
+  "schema": "pencil-protocol-field-changes/v1",
+  "predecessor_sha256": "584545688b60b6134fdf28af0906da0d6ae0f0f37d6136dbb787884dd7328349",
+  "amended_sha256": "f495db57948eda846afe96e93796df2b2078c16aa7621cad5e2199e8df8c331b",
+  "changes": [
+    {
+      "path": "/amendments",
+      "operation": "replace",
+      "before": [],
+      "after": [
+        {
+          "id": "A-accounting-20261029",
+          "filed": "2026-10-29",
+          "filed_before_affected_data": true,
+          "reason": "Pre-data finite algorithm accounting and deterministic reference instrument amendment; original draft preserved. No affected cohort solver executions recorded; build/plan preparation is not experimental data or authorization.",
+          "changes": [
+            "Bind source543a54b4b; static build40938439022 pending binary/image.",
+            "Add finite atomic-scalar disjoint36cell mapper and exact complete-plan aggregator.",
+            "Pin DefaultHasher collision table, preserving RNG streams while acknowledging changed table layout/runtime.",
+            "Preserve original cohort, stream/control/AA design, prepared spec bytes and stated resource limits; expose cap provenance and cumulative budget/deadline as unresolved.",
+            "Bind independently named analyze_pair and analyze_cohort release binaries and their completed build receipt; ecbench instrument binary/image remain pending.",
+            "Bind completed static ecbench binary a1c8ca89 and build40938439022 receipt to all three arms; 1260 archive targets and nine prepared plans match without solver execution. Image/runtime and authorization remain pending.",
+            "Bind software-validated canonical observation packaging adapter; retain incomplete-flow findings and independent-qualification boundary."
+          ],
+          "supersedes_fields": [
+            "question",
+            "claims",
+            "metrics",
+            "measurement.counters",
+            "measurement.timed_primary_justification",
+            "arms.instrument",
+            "arms.rho.description",
+            "analysis_plan",
+            "extensions.full_counted_cost_status",
+            "extensions.instrument_build",
+            "extensions.baseline_scope"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/analysis_plan/inputs",
+      "operation": "replace",
+      "before": [
+        "immutable ecbench.plan/v1 for each spec",
+        "sealed records.jsonl",
+        "protocol.json",
+        "source/binary/image manifests",
+        "independent verification/replay and isolation records"
+      ],
+      "after": [
+        "immutable ecbench.plan/v1 for each spec",
+        "sealed records.jsonl",
+        "protocol.json",
+        "source/binary/image manifests",
+        "independent verification/replay and isolation records",
+        "all9 unchanged prepared specs and newly verified emitted plans, preparation receipt and digest manifest",
+        "source-bound nine-category independent coverage review and report, mapping digest and analyzer binary identity",
+        "separate resource observations covering warmup/computation/replay/checkpoint/retry/harness costs",
+        "Hash-bound canonical packaging request, canonical schema/helper, raw native analysis and optional resource/session/host/replay sidecars; packaging grants no clock qualification."
+      ]
+    },
+    {
+      "path": "/analysis_plan/outputs",
+      "operation": "replace",
+      "before": [
+        "pairs.json",
+        "pairs.csv",
+        "experiment.export/v1 export.json",
+        "experiment.review/v1 review.json",
+        "full planned/attempted/completed/capped/interrupted/resumed/excluded/missing flow",
+        "neutral PDF and raw-clock/ratio/coverage graphs"
+      ],
+      "after": [
+        "pairs.json",
+        "pairs.csv",
+        "experiment.export/v1 export.json",
+        "experiment.review/v1 review.json",
+        "full planned/attempted/completed/capped/interrupted/resumed/excluded/missing flow",
+        "neutral PDF and raw-clock/ratio/coverage graphs",
+        "pencil-price-pair-output/v1 rows for all6300measured pairs",
+        "pencil-price-cohort-output/v1: all36exact ratio-of-sums cells and all5stream scopes, missing/null flow",
+        "calibration-only and calibration-inclusive costs, neutral cost and resource graphs"
+      ]
+    },
+    {
+      "path": "/analysis_plan/script/path",
+      "operation": "replace",
+      "before": "research/pencil_large_prime_20261029/paired_export/src/main.rs",
+      "after": "research/pencil_large_prime_20261029/native_price/src/bin/analyze_cohort.rs"
+    },
+    {
+      "path": "/analysis_plan/script/sha256",
+      "operation": "replace",
+      "before": "638a3fc180f24ae7e2494d28cb4544f2e70564b16a3e65d38b33ca51f05560e6",
+      "after": "34206c8aaa2eb0c89ebbf7d55f48f15f76bb98be177e099ac27aad1f3480e507"
+    },
+    {
+      "path": "/arms",
+      "operation": "replace",
+      "before": [
+        {
+          "id": "pencil",
+          "role": "candidate",
+          "description": "Signed symbolic point-driven pencil collector, cold per-call construction/transfer charged. Actual prepared arm label is pencil.",
+          "instrument": {
+            "repo": "crypto",
+            "commit": "3d99a998514c81a4095105ac71eb6df335bc55a2",
+            "build": [
+              [
+                "cargo",
+                "+1.99.1",
+                "build",
+                "--locked",
+                "--release",
+                "--no-default-features",
+                "--target",
+                "x86_64-unknown-linux-musl",
+                "--bin",
+                "ecbench"
+              ]
+            ],
+            "binary_sha256": "adb19f3eed3f0365cf84a3dd2c605c5cc91f9b7903f8792a4c6ce510b1797dc3",
+            "image_digest": null,
+            "flags": {
+              "RUSTFLAGS": "-C target-cpu=x86-64",
+              "CARGO_BUILD_JOBS": "2"
+            },
+            "env": {
+              "RAYON_NUM_THREADS": "1",
+              "OMP_NUM_THREADS": "1"
+            },
+            "threads": 1
+          },
+          "parameters": {
+            "method": "ic.three_leads_genus2_pencil_symbolic_v2",
+            "small_denominator": 8,
+            "matrix_coefficient_cap": 25000000
+          },
+          "same_instrument_as": "rho"
+        },
+        {
+          "id": "rho",
+          "role": "reference",
+          "description": "Matched source negation rho; also the unmodified reference baseline. Per-workload archived cap resolved by the prepared spec.",
+          "instrument": {
+            "repo": "crypto",
+            "commit": "3d99a998514c81a4095105ac71eb6df335bc55a2",
+            "build": [
+              [
+                "cargo",
+                "+1.99.1",
+                "build",
+                "--locked",
+                "--release",
+                "--no-default-features",
+                "--target",
+                "x86_64-unknown-linux-musl",
+                "--bin",
+                "ecbench"
+              ]
+            ],
+            "binary_sha256": "adb19f3eed3f0365cf84a3dd2c605c5cc91f9b7903f8792a4c6ce510b1797dc3",
+            "image_digest": null,
+            "flags": {
+              "RUSTFLAGS": "-C target-cpu=x86-64",
+              "CARGO_BUILD_JOBS": "2"
+            },
+            "env": {
+              "RAYON_NUM_THREADS": "1",
+              "OMP_NUM_THREADS": "1"
+            },
+            "threads": 1
+          },
+          "parameters": {
+            "method": "rho.three_leads_negation_v1",
+            "trial_cap": "resolved exact archived per-workload value"
+          }
+        },
+        {
+          "id": "rho_AA",
+          "role": "control_aa",
+          "description": "Identical resolved rho method and algorithm seed, separate scheduled execution.",
+          "instrument": {
+            "repo": "crypto",
+            "commit": "3d99a998514c81a4095105ac71eb6df335bc55a2",
+            "build": [
+              [
+                "cargo",
+                "+1.99.1",
+                "build",
+                "--locked",
+                "--release",
+                "--no-default-features",
+                "--target",
+                "x86_64-unknown-linux-musl",
+                "--bin",
+                "ecbench"
+              ]
+            ],
+            "binary_sha256": "adb19f3eed3f0365cf84a3dd2c605c5cc91f9b7903f8792a4c6ce510b1797dc3",
+            "image_digest": null,
+            "flags": {
+              "RUSTFLAGS": "-C target-cpu=x86-64",
+              "CARGO_BUILD_JOBS": "2"
+            },
+            "env": {
+              "RAYON_NUM_THREADS": "1",
+              "OMP_NUM_THREADS": "1"
+            },
+            "threads": 1
+          },
+          "parameters": {
+            "method": "rho.three_leads_negation_v1",
+            "trial_cap": "same as rho"
+          },
+          "same_instrument_as": "rho"
+        }
+      ],
+      "after": [
+        {
+          "id": "pencil",
+          "role": "candidate",
+          "description": "Signed symbolic point-driven pencil collector, cold per-call construction/transfer charged. Actual prepared arm label is pencil.",
+          "instrument": {
+            "repo": "crypto",
+            "commit": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+            "build": [
+              [
+                "cargo",
+                "+1.99.1",
+                "build",
+                "--locked",
+                "--release",
+                "--no-default-features",
+                "--target",
+                "x86_64-unknown-linux-musl",
+                "--bin",
+                "ecbench"
+              ]
+            ],
+            "binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+            "image_digest": null,
+            "flags": {
+              "RUSTFLAGS": "-C target-cpu=x86-64",
+              "CARGO_BUILD_JOBS": "2"
+            },
+            "env": {
+              "RAYON_NUM_THREADS": "1",
+              "OMP_NUM_THREADS": "1"
+            },
+            "threads": 1
+          },
+          "parameters": {
+            "method": "ic.three_leads_genus2_pencil_symbolic_v2",
+            "small_denominator": 8,
+            "matrix_coefficient_cap": 25000000
+          },
+          "same_instrument_as": "rho"
+        },
+        {
+          "id": "rho",
+          "role": "reference",
+          "description": "Matched source-negation rho with pinned DefaultHasher collision-table policy v1, same Rust1.99.1 instrument as candidate/control. Preserves walk RNG; table layout/runtime can differ from historical RandomState baseline.",
+          "instrument": {
+            "repo": "crypto",
+            "commit": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+            "build": [
+              [
+                "cargo",
+                "+1.99.1",
+                "build",
+                "--locked",
+                "--release",
+                "--no-default-features",
+                "--target",
+                "x86_64-unknown-linux-musl",
+                "--bin",
+                "ecbench"
+              ]
+            ],
+            "binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+            "image_digest": null,
+            "flags": {
+              "RUSTFLAGS": "-C target-cpu=x86-64",
+              "CARGO_BUILD_JOBS": "2"
+            },
+            "env": {
+              "RAYON_NUM_THREADS": "1",
+              "OMP_NUM_THREADS": "1"
+            },
+            "threads": 1
+          },
+          "parameters": {
+            "method": "rho.three_leads_negation_v1",
+            "trial_cap": "resolved exact archived per-workload value"
+          }
+        },
+        {
+          "id": "rho_AA",
+          "role": "control_aa",
+          "description": "Identical resolved rho method and algorithm seed, separate scheduled execution.",
+          "instrument": {
+            "repo": "crypto",
+            "commit": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+            "build": [
+              [
+                "cargo",
+                "+1.99.1",
+                "build",
+                "--locked",
+                "--release",
+                "--no-default-features",
+                "--target",
+                "x86_64-unknown-linux-musl",
+                "--bin",
+                "ecbench"
+              ]
+            ],
+            "binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+            "image_digest": null,
+            "flags": {
+              "RUSTFLAGS": "-C target-cpu=x86-64",
+              "CARGO_BUILD_JOBS": "2"
+            },
+            "env": {
+              "RAYON_NUM_THREADS": "1",
+              "OMP_NUM_THREADS": "1"
+            },
+            "threads": 1
+          },
+          "parameters": {
+            "method": "rho.three_leads_negation_v1",
+            "trial_cap": "same as rho"
+          },
+          "same_instrument_as": "rho"
+        }
+      ]
+    },
+    {
+      "path": "/claims",
+      "operation": "replace",
+      "before": [
+        {
+          "id": "C1",
+          "text": "Every accepted synthetic result satisfies the original source-curve equation and archived known answer; failures, caps and missing outcomes remain visible.",
+          "class": "exact_computation",
+          "decided_by": []
+        },
+        {
+          "id": "C2",
+          "text": "Report per-workload candidate/rho common full-method-call clock ratios only after paired identity, L2, independent verification and the independently applied cold A/A admission pass.",
+          "class": "comparative",
+          "decided_by": [
+            "C-method"
+          ],
+          "if_supported": "Descriptive ratios on admitted public fixtures, with denominators and missing outcomes.",
+          "if_not_supported": "Invalid or incomplete clock observations retained with null qualified ratios."
+        },
+        {
+          "id": "C3",
+          "text": "Report online ratios only after the separate online admission passes; neither online nor cold result is a complete counted-cost price or general speed claim.",
+          "class": "comparative",
+          "decided_by": [
+            "C-method"
+          ]
+        },
+        {
+          "id": "C4",
+          "text": "Deployed-key recovery, cryptographic security impact, asymptotic advantage, universal mathematical correctness and full GAE cost ratios are outside this clock experiment.",
+          "class": "out_of_scope",
+          "decided_by": []
+        }
+      ],
+      "after": [
+        {
+          "id": "C1",
+          "text": "Every accepted synthetic result satisfies the original source-curve equation and archived known answer; failures, caps and missing outcomes remain visible.",
+          "class": "exact_computation",
+          "decided_by": []
+        },
+        {
+          "id": "C2",
+          "text": "Report per-workload candidate/rho common full-method-call clock ratios only after paired identity, L2, independent verification and the independently applied cold A/A admission pass.",
+          "class": "comparative",
+          "decided_by": [
+            "C-method"
+          ],
+          "if_supported": "Descriptive ratios on admitted public fixtures, with denominators and missing outcomes.",
+          "if_not_supported": "Invalid or incomplete clock observations retained with null qualified ratios."
+        },
+        {
+          "id": "C3",
+          "text": "Report online clock ratios only after separate online admission; clocks are distinct from the finite counted algorithm model and imply no general speed claim.",
+          "class": "comparative",
+          "decided_by": [
+            "C-method"
+          ]
+        },
+        {
+          "id": "C4",
+          "text": "Deployed-key recovery, cryptographic security impact, asymptotic advantage, universal mathematical correctness and complete CPU/infrastructure pricing are outside this public synthetic study.",
+          "class": "out_of_scope",
+          "decided_by": []
+        },
+        {
+          "id": "C5",
+          "text": "After independent source-bound coverage review, report exact finite algorithm GAE prices on all36 declared cells, separately algorithm-only and calibration-inclusive; incomplete pairs retain null prices and incomplete cohorts retain null ratio-of-sums.",
+          "class": "comparative",
+          "decided_by": [
+            "C-method"
+          ],
+          "if_supported": "Descriptive complete-denominator ratios under the named finite model, with both losses and gains retained.",
+          "if_not_supported": "Raw counts and missing/capped/invalid outcomes remain visible; unadmitted prices are null."
+        }
+      ]
+    },
+    {
+      "path": "/decision_rule/statistic",
+      "operation": "replace",
+      "before": "Candidate/rho per exact workload/stream; observed median,min,max of five eligible ratios. No cohort ranking or survivor-only total.",
+      "after": "Candidate/rho per exact workload/stream; observed median,min,max of five eligible ratios. No cohort ranking or survivor-only total. Finite costs: exact ratio of price sums over all6300 measured pairs, and separately each of five1260-pair streams, in all36cells."
+    },
+    {
+      "path": "/decision_rule/text",
+      "operation": "replace",
+      "before": "No significance or superiority verdict. After independent protocol/source/binary/record review, classify each metric/workload as qualified_observation only if all5 matched candidate/reference rows verify and its separate A/A admission passes. Otherwise retain raw observations and null qualified ratio. Report per-stream ratios and median/min/max descriptively. Do not infer one metric admission from the other.",
+      "after": "No significance or superiority verdict. After independent protocol/source/binary/record review, classify each metric/workload as qualified_observation only if all5 matched candidate/reference rows verify and its separate A/A admission passes. Otherwise retain raw observations and null qualified ratio. Report per-stream ratios and median/min/max descriptively. Do not infer one metric admission from the other. Finite-count admission is separate from timing admission: require independent nine-category source/mapping/instrument review and exact paired identities; every missing/ineligible pair nulls its complete aggregation scope. Report algorithm-only and explicit calibration-inclusive exact ratios of sums for each cell and predetermined stream; no ranking or significance verdict."
+    },
+    {
+      "path": "/extensions/analysis_build",
+      "operation": "add",
+      "after": {
+        "status": "built_and_hash_verified_analysis_only",
+        "source_commit": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+        "receipt": "../../validation/native_analysis_build_20261029/receipt.json",
+        "receipt_sha256": "dd1f6084d437491400e4618aa5a0466d28a4b3be506ac7f203d5f615b0df34c3",
+        "build_command": "cargo +1.99.1 build --locked --offline --release --manifest-path research/pencil_large_prime_20261029/native_price/Cargo.toml",
+        "build_exit_code": 0,
+        "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+        "binaries": {
+          "analyze_pair": {
+            "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_price/target/release/analyze_pair",
+            "bytes": 843944,
+            "sha256": "eb2b2ce773c7300edcfd4e0bb0804251d4cca604379d94be40964cd4b278871e"
+          },
+          "analyze_cohort": {
+            "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_price/target/release/analyze_cohort",
+            "bytes": 1388376,
+            "sha256": "337e089f74426caa1d67c08d411b5034c67b50706738d399a41d79ac93a5c160"
+          }
+        },
+        "mapping_sha256": "eb5348c894516e9ba163740861dd1f0e58865c08a930500662e6b060f7a571d8",
+        "plan_only_check": {
+          "exit_code": 0,
+          "expected_workloads": 1260,
+          "expected_pairs": 6300,
+          "expected_slots": 22680,
+          "observed_slots": 0,
+          "all_36_ratios_null": true,
+          "output_sha256": "9c0d055e2af7f6f79ce201b9b0c2a22691da0af55e8f6f127acec7070bb7e665"
+        },
+        "experiment_executions": 0,
+        "scope": "Analysis executables only; not ecbench, not an empirical instrument binding, independent review, protocol freeze or launch authorization."
+      }
+    },
+    {
+      "path": "/extensions/analysis_support_sha256/TIMING_CONTRACT.json",
+      "operation": "add",
+      "after": "3719de558181e663192bfca9ea1fce05df535603f2acd187058de55e4a8b4585"
+    },
+    {
+      "path": "/extensions/analysis_support_sha256/native_price~1Cargo.lock",
+      "operation": "add",
+      "after": "d7d2479f3a9c691991bb13c7d8398602df198a94b3b73ef136c901d1285e1957"
+    },
+    {
+      "path": "/extensions/analysis_support_sha256/native_price~1Cargo.toml",
+      "operation": "add",
+      "after": "85dbb703cd29656e9916ae7aaa299790f1967ba8d4b931e1c6b19f031374b077"
+    },
+    {
+      "path": "/extensions/analysis_support_sha256/native_price~1src~1aggregate.rs",
+      "operation": "add",
+      "after": "1aa3622a7a32e903a7eae42c3596e20b3c7aaeac07621e9c9ebd2a79182cfc84"
+    },
+    {
+      "path": "/extensions/analysis_support_sha256/native_price~1src~1analyzer.rs",
+      "operation": "add",
+      "after": "eb5348c894516e9ba163740861dd1f0e58865c08a930500662e6b060f7a571d8"
+    },
+    {
+      "path": "/extensions/analysis_support_sha256/native_price~1src~1bin~1analyze_cohort.rs",
+      "operation": "add",
+      "after": "34206c8aaa2eb0c89ebbf7d55f48f15f76bb98be177e099ac27aad1f3480e507"
+    },
+    {
+      "path": "/extensions/analysis_support_sha256/native_price~1src~1bin~1analyze_pair.rs",
+      "operation": "add",
+      "after": "1ff553390e3584017edde1d27e15f1b6d3a6f1a2ec9d196899582530d964bac1"
+    },
+    {
+      "path": "/extensions/analysis_support_sha256/native_price~1src~1importer.rs",
+      "operation": "add",
+      "after": "53a622d46dc2950144999f5aeaa9dac00d5b458952f835f6162a6c484c85d229"
+    },
+    {
+      "path": "/extensions/analysis_support_sha256/native_price~1src~1lib.rs",
+      "operation": "add",
+      "after": "71222c3e8c9c826d43eff82bb776a36cd53a5bf932488c343618b4138e7dd1a7"
+    },
+    {
+      "path": "/extensions/analysis_support_sha256/paired_export~1Cargo.toml",
+      "operation": "add",
+      "after": "0a198bb240dee5fe2900d3e6323951e75a246459161c16046a6ed857c464e67f"
+    },
+    {
+      "path": "/extensions/analysis_support_sha256/paired_export~1src~1main.rs",
+      "operation": "add",
+      "after": "638a3fc180f24ae7e2494d28cb4544f2e70564b16a3e65d38b33ca51f05560e6"
+    },
+    {
+      "path": "/extensions/analysis_support_sha256/prepared_native_plans~1result.json",
+      "operation": "add",
+      "after": "1892db0ad5937bba74894c5be9f3b6f1e48dcf20ddb0284f043686a2f822ef1e"
+    },
+    {
+      "path": "/extensions/analysis_support_sha256/prepared_specs~1manifest.json",
+      "operation": "add",
+      "after": "31ac091fac15821fd86fbb3019e7a625376e3f86ae7da62a84bf60e654169179"
+    },
+    {
+      "path": "/extensions/analysis_support_sha256/validation~1accounting~1COST_BOUNDARY.md",
+      "operation": "add",
+      "after": "186ebceb5281612f62442a3e005fa92b019f80f8309afe2fe5245ef9c0f4d402"
+    },
+    {
+      "path": "/extensions/analysis_support_sha256/validation~1accounting~1kernel-primitive-registry.json",
+      "operation": "add",
+      "after": "a973bf6222125f37a5d37fa25dbaac434ea3c418fae7bbf8abbda67036c15e2f"
+    },
+    {
+      "path": "/extensions/baseline_scope",
+      "operation": "replace",
+      "before": "rho serves reference and unmodified baseline; historical online/peel/Markowitz data are context only, not fresh matched baseline arms.",
+      "after": "rho/rho_AA use identical pinned DefaultHasher instrumentation. Historical RandomState and earlier peeling/Markowitz results are context only. No new fourth baseline arm or experimental work is authorized here."
+    },
+    {
+      "path": "/extensions/canonical_packaging",
+      "operation": "add",
+      "after": {
+        "status": "software_validated_packaging_only_not_qualification",
+        "adapter": "research/pencil_large_prime_20261029/canonical_export/package.py",
+        "adapter_sha256": "97f2d5ccd080d5fe96d3a15f2eceeafa903574583d2c5d7af5324dd9dc035298",
+        "canonical_tool": "/home/ec2-user/crypto-autoresearcher-fall-degree-submission-20261029/tools/experiment_protocol.py",
+        "canonical_tool_sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+        "export_schema_sha256": "108f0ae9c1be3ed141bca3c22216eba049f2c76677f11013109a4740f19bd757",
+        "protocol_schema_sha256": "a9b948f2be323f862b98301eb7a5aa147ecc29db35041737f0aa3dfd03ad2443",
+        "software_tests": 14,
+        "test_log_sha256": "a36b5dcf0a2264c23762368588569d9702f0379de604ddc27b5f8fa6a25c3db0",
+        "limitations": [
+          "wall_valid false until independent clock admission; no qualification from producer flags",
+          "canonical rows cannot represent unattempted slots; missing slots remain in backend ledger/native output and shortfall findings",
+          "attempts/resumed projection defaults are not infrastructure history; authoritative retry/restore/resource sidecars remain separate"
+        ],
+        "experiment_executions": 0
+      }
+    },
+    {
+      "path": "/extensions/finite_cost_model",
+      "operation": "add",
+      "after": {
+        "policy": "pencil-algorithm-cost/atomic-scalar-disjoint-v1",
+        "mapping_sha256": "eb5348c894516e9ba163740861dd1f0e58865c08a930500662e6b060f7a571d8",
+        "square_per_multiply": [
+          0,
+          0.5,
+          1
+        ],
+        "inversion_per_multiply": [
+          1,
+          10,
+          100,
+          1000
+        ],
+        "native_GAE_per_event": [
+          0,
+          0.1,
+          1
+        ],
+        "cells": 36,
+        "independent_coverage_review": null,
+        "qualified_ratios_available": false,
+        "analyzer_binaries_sha256": {
+          "analyze_pair": "eb2b2ce773c7300edcfd4e0bb0804251d4cca604379d94be40964cd4b278871e",
+          "analyze_cohort": "337e089f74426caa1d67c08d411b5034c67b50706738d399a41d79ac93a5c160"
+        }
+      }
+    },
+    {
+      "path": "/extensions/full_counted_cost_status",
+      "operation": "replace",
+      "before": "unresolved; clock experiment does not discharge original full cost accounting requirement",
+      "after": "Finite mapper implemented and software-validated; independent final source coverage review, pinned new instrument and protocol freeze still pending. This draft certifies no full coverage or experiment result."
+    },
+    {
+      "path": "/extensions/instrument_build/archive_targets_matched",
+      "operation": "add",
+      "after": 1260
+    },
+    {
+      "path": "/extensions/instrument_build/artifact_id",
+      "operation": "replace",
+      "before": 12918062407,
+      "after": 12926168934
+    },
+    {
+      "path": "/extensions/instrument_build/binary_bytes",
+      "operation": "add",
+      "after": 76970952
+    },
+    {
+      "path": "/extensions/instrument_build/binary_path",
+      "operation": "add",
+      "after": "/home/ec2-user/pencil-build-40938439022/ecbench"
+    },
+    {
+      "path": "/extensions/instrument_build/binary_sha256",
+      "operation": "replace",
+      "before": "adb19f3eed3f0365cf84a3dd2c605c5cc91f9b7903f8792a4c6ce510b1797dc3",
+      "after": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab"
+    },
+    {
+      "path": "/extensions/instrument_build/build_info",
+      "operation": "add",
+      "after": {
+        "source_repository": "https://github.com/aburan28/crypto",
+        "source_revision": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+        "ecbench_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+        "built_at": "2026-10-29T19:31:18Z",
+        "architecture": "linux/amd64",
+        "target": "x86_64-unknown-linux-musl",
+        "default_features": false,
+        "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1",
+        "rustflags": "-C target-cpu=x86-64"
+      }
+    },
+    {
+      "path": "/extensions/instrument_build/evidence_sha256",
+      "operation": "add",
+      "after": {
+        "build-info.json": "17b5602dd978e0484677b4b9e27b8323ceb60b01ae5bbdcf9728e578d0d352c5",
+        "archive-parity.json": "a78b31214c136f82d5dc4ed6454b59df7abea471a7d1d5d8d970f763a70016d3",
+        "prepared-plan-parity.json": "06bce13aa3c5ed866238173ed5edd64365a92f589371df2b17b7653af6f877d6",
+        "elf-headers.txt": "611d9351cc4b69fd0bb2758b5b16a23cbeb0432ab9ba66c0eeadf30ef2199c2a"
+      }
+    },
+    {
+      "path": "/extensions/instrument_build/image_digest",
+      "operation": "add",
+      "after": null
+    },
+    {
+      "path": "/extensions/instrument_build/note",
+      "operation": "add",
+      "after": "Completed static ecbench build and plan-only parity bound; container image/runtime, independent review and resource/launch authorization remain pending."
+    },
+    {
+      "path": "/extensions/instrument_build/plans",
+      "operation": "remove",
+      "before": "Static binary reproduces all1260 archived inputs and all9 prepared plans exactly; zero solver executions."
+    },
+    {
+      "path": "/extensions/instrument_build/prepared_plans_exactly_equal",
+      "operation": "add",
+      "after": 9
+    },
+    {
+      "path": "/extensions/instrument_build/receipt",
+      "operation": "replace",
+      "before": "static_build_validation/receipt.json",
+      "after": "../../validation/instrument_build_40938439022/receipt.json"
+    },
+    {
+      "path": "/extensions/instrument_build/receipt_sha256",
+      "operation": "replace",
+      "before": "f966ce22aec150c6e292285d6440830887a6a50c247984e5bd7f147702826b3e",
+      "after": "59fd9e0e1f4573d9492bcca710b5351cd0175f788b197a7c82939e177ab1a1a1"
+    },
+    {
+      "path": "/extensions/instrument_build/solver_executions_performed",
+      "operation": "add",
+      "after": 0
+    },
+    {
+      "path": "/extensions/instrument_build/source_commit",
+      "operation": "replace",
+      "before": "3d99a998514c81a4095105ac71eb6df335bc55a2",
+      "after": "543a54b4b1c3be7052872af3ffe393a44c69a3c3"
+    },
+    {
+      "path": "/extensions/instrument_build/status",
+      "operation": "replace",
+      "before": "static_build_verified_native_plan_parity_passed",
+      "after": "completed_verified_binary_and_plan_parity_image_pending"
+    },
+    {
+      "path": "/extensions/instrument_build/workflow_commit",
+      "operation": "replace",
+      "before": "006f88e69fe7eb9a0afa4f90150daea2b372714d",
+      "after": "7d7f5495c5b85ae426efdbcb721b6faf72c1be14"
+    },
+    {
+      "path": "/extensions/instrument_build/workflow_run",
+      "operation": "replace",
+      "before": 40919051188,
+      "after": 40938439022
+    },
+    {
+      "path": "/extensions/pending_bindings",
+      "operation": "add",
+      "after": {
+        "image_digest": null,
+        "independent_coverage_review": null,
+        "cumulative_authorized_budget": null,
+        "original_absolute_deadline": null,
+        "cap_provenance": "Current unfrozen prepared specs25m retained unchanged; older Markowitz p739 gate10m differs. Root archaeology found T789 preserves historical caps and no explicit signed-symbolic25m smallgate authorization. This conflicts with old10m smallgate and requires explicit resolution before freeze; prepared specs are not authorization.",
+        "launch_authorization": null,
+        "execution_time_envelope": "Original smallgate3600s was one external gate-command boundary; existing draft3600s per expanded arm/execution is materially different. Existing draft value retained for review only, not inferred authorization. Root must bind the approved whole-gate/cohort envelope before freeze.",
+        "runtime_image_and_request_binding": null
+      }
+    },
+    {
+      "path": "/extensions/predecessor",
+      "operation": "add",
+      "after": {
+        "path": "/home/ec2-user/pencil-build-40919051188/protocol-with-binary.json",
+        "sha256": "584545688b60b6134fdf28af0906da0d6ae0f0f37d6136dbb787884dd7328349",
+        "version": 1,
+        "freeze_status": "draft"
+      }
+    },
+    {
+      "path": "/extensions/prepared_design_counts",
+      "operation": "add",
+      "after": {
+        "targets": 1260,
+        "measured_rounds": 5,
+        "warmup_rounds": 1,
+        "arms": 3,
+        "planned_executions": 22680,
+        "measured_pairs": 6300,
+        "warmup_executions": 3780,
+        "new_instrument_solver_executions": 0,
+        "status": "design_arithmetic_not_run_result"
+      }
+    },
+    {
+      "path": "/extensions/prerequisites",
+      "operation": "replace",
+      "before": [
+        "Immutable source commit, final native binary SHA256, build toolchain/flags and container image digest for all arms.",
+        "Native immutable plans bound to all9 prepared specs; exact workload membership and algorithm streams checked.",
+        "Bind cumulative authorized admission/budget and original absolute deadline. The capped p739 gate is the runtime preflight; no unbudgeted calibration run or prior wall-time estimate required.",
+        "Concrete EKS job/namespace identity with existing approved credentials; reconcile retained jobs before submission.",
+        "Validated L2 common cold-clock coverage, SMT/NUMA placement, warmup/order policy and parent clock separation.",
+        "Compose/pin tested runtime image with existing publish-runtime and validate CRIU+EBS request at300s checkpoint interval,max_restores1. Confirm120s interruption grace budget against controller; preserve immutable deadline, fence previous writer and verify coherent generation. Runtime build pending.",
+        "Native full export/review adapter and independent review implementation; paired_export is diagnostic-only and never promotes qualified ratios itself.",
+        "Pin all analysis sources/binary and schema/checker; freeze and commit before affected data."
+      ],
+      "after": [
+        "Immutable source commit, final native binary SHA256, build toolchain/flags and container image digest for all arms.",
+        "Native immutable plans bound to all9 prepared specs; exact workload membership and algorithm streams checked.",
+        "Bind cumulative authorized admission/budget and original absolute deadline. The capped p739 gate is the runtime preflight; no unbudgeted calibration run or prior wall-time estimate required.",
+        "Concrete EKS job/namespace identity with existing approved credentials; reconcile retained jobs before submission.",
+        "Validated L2 common cold-clock coverage, SMT/NUMA placement, warmup/order policy and parent clock separation.",
+        "Compose/pin tested runtime image with existing publish-runtime and validate CRIU+EBS request at300s checkpoint interval,max_restores1. Confirm120s interruption grace budget against controller; preserve immutable deadline, fence previous writer and verify coherent generation. Runtime build pending.",
+        "Native full export/review adapter and independent review implementation; paired_export is diagnostic-only and never promotes qualified ratios itself.",
+        "Pin all analysis sources/binary and schema/checker; freeze and commit before affected data.",
+        "Resolve signed-symbolic p739 coefficient-cap authorization separately from older Markowitz10m citation; preserve existing specs until resolved. No cumulative budget or original deadline is inferred from per-execution timeout."
+      ]
+    },
+    {
+      "path": "/links/analysis",
+      "operation": "replace",
+      "before": "../paired_export/README.md",
+      "after": "../../native_price/README.md"
+    },
+    {
+      "path": "/links/spec_manifest",
+      "operation": "replace",
+      "before": "../prepared_specs/manifest.json",
+      "after": "../../prepared_specs/manifest.json"
+    },
+    {
+      "path": "/links/status",
+      "operation": "replace",
+      "before": "DRAFT: not frozen, not launch authorization; unresolved identity and execution prerequisites listed in extensions.",
+      "after": "UNFROZEN PRE-DATA AMENDMENT; no launch authorization. Instrument binary/image, independent coverage, original cumulative budget/deadline, and cap provenance remain pending."
+    },
+    {
+      "path": "/links/timing_contract",
+      "operation": "replace",
+      "before": "../TIMING_CONTRACT.json",
+      "after": "../../TIMING_CONTRACT.json"
+    },
+    {
+      "path": "/literature",
+      "operation": "replace",
+      "before": [
+        {
+          "ref": "research/pencil_large_prime_20261029/README.md",
+          "provenance": "internal",
+          "claim": "Signed symbolic graph and residual constraint retention; tests do not constitute full formal implementation proof.",
+          "verified_by": "Protocol drafting lane read source study artifacts2026-10-29"
+        },
+        {
+          "ref": "research/pencil_markowitz_20261022/PROTOCOL.md",
+          "provenance": "internal",
+          "claim": "Preserve prior small then upper gate,25m coefficient/8GiB/3600s boundary and no extension on capped upper outcome.",
+          "verified_by": "Parent-supplied frozen gate contract; original artifact inventoried earlier"
+        },
+        {
+          "ref": "https://cacr.uwaterloo.ca/techreports/2004/corr2004-29.pdf",
+          "provenance": "internal",
+          "claim": "Prior study cites double-large-prime forest method; no genus2 pencil complexity theorem imported.",
+          "verified_by": "Previously retrieved by source study; no new literature retrieval in draft lane"
+        }
+      ],
+      "after": [
+        {
+          "ref": "research/pencil_large_prime_20261029/README.md",
+          "provenance": "internal",
+          "claim": "Signed symbolic graph and residual constraint retention; tests do not constitute full formal implementation proof.",
+          "verified_by": "Protocol drafting lane read source study artifacts2026-10-29"
+        },
+        {
+          "ref": "research/pencil_markowitz_20261022/PROTOCOL.md",
+          "provenance": "internal",
+          "claim": "Preserve prior small then upper gate,25m coefficient/8GiB/3600s boundary and no extension on capped upper outcome.",
+          "verified_by": "Parent-supplied frozen gate contract; original artifact inventoried earlier"
+        },
+        {
+          "ref": "https://cacr.uwaterloo.ca/techreports/2004/corr2004-29.pdf",
+          "provenance": "internal",
+          "claim": "Prior study cites double-large-prime forest method; no genus2 pencil complexity theorem imported.",
+          "verified_by": "Previously retrieved by source study; no new literature retrieval in draft lane"
+        },
+        {
+          "ref": "research/pencil_large_prime_20261029/validation/accounting/COST_BOUNDARY.md",
+          "provenance": "internal",
+          "claim": "Finite semantic algorithm price with separate measured resources; original36cell grid, disjoint observations and calibration scope.",
+          "verified_by": "Read source boundary, primitive registry, analyzer and aggregate mappings at543a54b4b; this is not a completed independent coverage review."
+        }
+      ]
+    },
+    {
+      "path": "/measurement/counters",
+      "operation": "replace",
+      "before": [
+        "raw field/scalar/symbolic counters with coverage flags"
+      ],
+      "after": [
+        "field M/S/I, field adds/bits, atomic scalar events",
+        "disjoint collection/map primitives, hash/RNG atomics",
+        "base and scalar-domain outer/constructor primality",
+        "setup and candidate semantic counts, nonoverlapping engine geometry segments",
+        "calibration preparation/addition and metadata copy observations"
+      ]
+    },
+    {
+      "path": "/measurement/timed_primary_justification",
+      "operation": "replace",
+      "before": "Current native counts omit parts of setup/primality/logical work and allocator valuation; pricing them as total cost would be misleading. One common enclosing method-call clock captures implementation work symmetrically. L2 qualification plus independent cold/online five-stream A/A admission is mandatory; no claim about complete counted cost.",
+      "after": "Method-call and online clocks observe implementation boundaries separately from the finite counted algorithm model. L2 and independent cold/online five-stream A/A admission remain mandatory for clock qualification. Finite algorithm pricing does not convert allocator/serialization/RSS/infrastructure into GAE; preserve their actual separate observations."
+    },
+    {
+      "path": "/metrics/primary",
+      "operation": "replace",
+      "before": [
+        {
+          "id": "cold_call",
+          "name": "Full method call",
+          "unit": "ns",
+          "kind": "timed",
+          "definition": "Immediately before methods::solve invocation to immediate return before profiling dump. Includes dispatch, parameter checks, per-call algorithm/model/transfer setup, target work, in-child verification and report construction. Excludes harness workload reconstruction, harness allocator preparation, child JSON serialization and parent audit. This is full method-call cost, not full process cost.",
+          "source": "records.jsonl time.method_call_wall_ns",
+          "aggregation": "paired_ratio",
+          "resolution": "integer nanoseconds; effective accuracy assessed by L2 and A/A",
+          "uncertainty": "range"
+        }
+      ],
+      "after": [
+        {
+          "id": "finite_algorithm_gae",
+          "name": "Finite algorithm cost including calibration, with separate components",
+          "unit": "GAE",
+          "kind": "derived",
+          "definition": "Declared M/S/I and disjoint native-event model on36cells. Algorithm setup/transfer/target/elimination/verification and metadata-copy primitives included; calibration preparation+addition shown separately and once in explicit combined cost. Map and geometry diagnostic totals are not double counted. Reporting/allocator/RSS/clocks/infrastructure remain separate units. Independent source-bound coverage is required; no complete CPU-cost claim.",
+          "source": "native_price analyzer/aggregate outputs bound to complete records, plans and independent coverage review",
+          "aggregation": "sum",
+          "resolution": "Exact checked rational numerator/denominator per cell; ratio of complete matched price sums, never mean of ratios or survivor-only cohort",
+          "uncertainty": "none_exact",
+          "formula": "For each fixed cell: price=(M+wS*S+wI*I)/U+wL*L, U=M_source_add+wS*S_source_add+wI*I_source_add. M/S/I/L are disjoint normalized primitive totals. Combined price=algorithm price+calibration price. Cohort ratio=sum(candidate prices)/sum(reference prices), only over the complete prescribed matched denominator."
+        },
+        {
+          "id": "cold_call",
+          "name": "Full method call",
+          "unit": "ns",
+          "kind": "timed",
+          "definition": "Immediately before methods::solve invocation to immediate return before profiling dump. Includes dispatch, parameter checks, per-call algorithm/model/transfer setup, target work, in-child verification and report construction. Excludes harness workload reconstruction, harness allocator preparation, child JSON serialization and parent audit. This is full method-call cost, not full process cost.",
+          "source": "records.jsonl time.method_call_wall_ns",
+          "aggregation": "paired_ratio",
+          "resolution": "integer nanoseconds; effective accuracy assessed by L2 and A/A",
+          "uncertainty": "range"
+        }
+      ]
+    },
+    {
+      "path": "/metrics/secondary",
+      "operation": "replace",
+      "before": [
+        {
+          "id": "online",
+          "name": "Online window",
+          "unit": "ns",
+          "kind": "timed",
+          "definition": "Target-dependent window only; require checked integer sum of exactly the five declared phase clocks equal to online.wall_ns and explicit online_clock_diagnostics.error=null. Setup excluded; never substitute for cold.",
+          "source": "records.jsonl online.wall_ns",
+          "aggregation": "paired_ratio",
+          "resolution": "integer nanoseconds; effective accuracy assessed by L2 and A/A",
+          "uncertainty": "range"
+        },
+        {
+          "id": "online_phases",
+          "name": "Five online phases",
+          "unit": "ns",
+          "kind": "timed",
+          "definition": "Retain target_query,target_PDP,target_relation_check,target_descent,target_recovery_check separately; zero stages require explicit reasons. Phases partition online clock and are not added to total again.",
+          "source": "records.jsonl online.phases_ns",
+          "aggregation": "per_row",
+          "resolution": "integer nanoseconds; effective accuracy assessed by L2 and A/A",
+          "uncertainty": "range"
+        },
+        {
+          "id": "parent_audit",
+          "name": "Parent mathematical audit",
+          "unit": "ns",
+          "kind": "timed",
+          "definition": "Parent source multiplication and equality comparison only; no inherited child isolation, diagnostic only and never added to child clocks.",
+          "source": "records.jsonl time.parent_audit_verification_ns",
+          "aggregation": "per_row",
+          "resolution": "integer nanoseconds; effective accuracy assessed by L2 and A/A",
+          "uncertainty": "range"
+        },
+        {
+          "id": "process",
+          "name": "Child process envelope",
+          "unit": "ns",
+          "kind": "timed",
+          "definition": "Spawn to reap; overlaps method call and includes preparation; diagnostic, never summed with method-call time.",
+          "source": "records.jsonl time.process_wall_ns",
+          "aggregation": "per_row",
+          "resolution": "integer nanoseconds; effective accuracy assessed by L2 and A/A",
+          "uncertainty": "range"
+        },
+        {
+          "id": "rss",
+          "name": "Child maximum resident set",
+          "unit": "KiB",
+          "kind": "counted",
+          "definition": "Per-child process high-water RSS including preparation; not allocated bytes or additive across phases.",
+          "source": "records.jsonl time.max_rss_kib",
+          "aggregation": "per_row",
+          "resolution": "exact recorded integer or explicit null",
+          "uncertainty": "none_exact"
+        },
+        {
+          "id": "native_counts",
+          "name": "Raw incomplete native counters",
+          "unit": "events",
+          "kind": "counted",
+          "definition": "Retain field, scalar, symbolic and phase observations with their coverage flags. No complete GAE comparison until symmetric setup/primality/logical/allocation accounting and fixed weights exist.",
+          "source": "records.jsonl cost and native/detail blocks",
+          "aggregation": "per_row",
+          "resolution": "exact recorded integer or explicit null",
+          "uncertainty": "none_exact"
+        }
+      ],
+      "after": [
+        {
+          "id": "online",
+          "name": "Online window",
+          "unit": "ns",
+          "kind": "timed",
+          "definition": "Target-dependent window only; require checked integer sum of exactly the five declared phase clocks equal to online.wall_ns and explicit online_clock_diagnostics.error=null. Setup excluded; never substitute for cold.",
+          "source": "records.jsonl online.wall_ns",
+          "aggregation": "paired_ratio",
+          "resolution": "integer nanoseconds; effective accuracy assessed by L2 and A/A",
+          "uncertainty": "range"
+        },
+        {
+          "id": "online_phases",
+          "name": "Five online phases",
+          "unit": "ns",
+          "kind": "timed",
+          "definition": "Retain target_query,target_PDP,target_relation_check,target_descent,target_recovery_check separately; zero stages require explicit reasons. Phases partition online clock and are not added to total again.",
+          "source": "records.jsonl online.phases_ns",
+          "aggregation": "per_row",
+          "resolution": "integer nanoseconds; effective accuracy assessed by L2 and A/A",
+          "uncertainty": "range"
+        },
+        {
+          "id": "parent_audit",
+          "name": "Parent mathematical audit",
+          "unit": "ns",
+          "kind": "timed",
+          "definition": "Parent source multiplication and equality comparison only; no inherited child isolation, diagnostic only and never added to child clocks.",
+          "source": "records.jsonl time.parent_audit_verification_ns",
+          "aggregation": "per_row",
+          "resolution": "integer nanoseconds; effective accuracy assessed by L2 and A/A",
+          "uncertainty": "range"
+        },
+        {
+          "id": "process",
+          "name": "Child process envelope",
+          "unit": "ns",
+          "kind": "timed",
+          "definition": "Spawn to reap; overlaps method call and includes preparation; diagnostic, never summed with method-call time.",
+          "source": "records.jsonl time.process_wall_ns",
+          "aggregation": "per_row",
+          "resolution": "integer nanoseconds; effective accuracy assessed by L2 and A/A",
+          "uncertainty": "range"
+        },
+        {
+          "id": "rss",
+          "name": "Child maximum resident set",
+          "unit": "KiB",
+          "kind": "counted",
+          "definition": "Per-child process high-water RSS including preparation; not allocated bytes or additive across phases.",
+          "source": "records.jsonl time.max_rss_kib",
+          "aggregation": "per_row",
+          "resolution": "exact recorded integer or explicit null",
+          "uncertainty": "none_exact"
+        },
+        {
+          "id": "native_counts",
+          "name": "Raw finite primitive observations and admission status",
+          "unit": "events",
+          "kind": "counted",
+          "definition": "Retain complete raw field/scalar/collection/primality/phase observations including rejected work and explicit missing fields. Independently reviewed finite mapping gates derived prices; allocation/RSS/reporting/infrastructure are separate resources without invented GAE weights.",
+          "source": "records.jsonl cost and native/detail blocks",
+          "aggregation": "per_row",
+          "resolution": "exact recorded integer or explicit null",
+          "uncertainty": "none_exact"
+        }
+      ]
+    },
+    {
+      "path": "/question",
+      "operation": "replace",
+      "before": "On the fixed 1,260 public synthetic mathematical workloads, what are the independently verified completion outcomes and qualified full-method-call and online clock ratios of the signed symbolic pencil collector against matched rho?",
+      "after": "On all 1,260 archived public synthetic mathematical workloads, report verified outcomes, finite algorithm-cost ratios under the declared 36-cell model, and separately admitted cold/online clock ratios against paired rho, retaining failures and all resource observations."
+    },
+    {
+      "path": "/reporting/graphs",
+      "operation": "replace",
+      "before": [
+        "All1260 workload completion/censoring matrix",
+        "Per-workload cold ratios five streams with separate AA admission",
+        "Online ratios and five-phase raw clocks",
+        "Cold clock and separate parent audit/RSS observations"
+      ],
+      "after": [
+        "All1260 workload completion/censoring matrix",
+        "Per-workload cold ratios five streams with separate AA admission",
+        "Online ratios and five-phase raw clocks",
+        "Cold clock and separate parent audit/RSS observations",
+        "36cell algorithm-only and calibration-inclusive ratios with exact complete denominators",
+        "Per-target failed/capped/missing price admission and separate resource observations"
+      ]
+    },
+    {
+      "path": "/study_dir",
+      "operation": "replace",
+      "before": "research/pencil_large_prime_20261029/protocol_draft",
+      "after": "research/pencil_large_prime_20261029/protocol_draft/accounting_amendment_20261029"
+    },
+    {
+      "path": "/variable_ledger/factors",
+      "operation": "replace",
+      "before": [
+        {
+          "name": "workload",
+          "treatment": "fixed",
+          "how": "21 models x60 exact archived targets; all arms share workload SHA and original source equation.",
+          "value": "550f7178e30b60db62931a752b0c179beeef7ea99a96cf94486ff8aee631d339"
+        },
+        {
+          "name": "instrument",
+          "treatment": "fixed",
+          "how": "One immutable source commit, lockfile, flags, binary and image for all arms; unresolved hashes block freezing."
+        },
+        {
+          "name": "threads",
+          "treatment": "fixed",
+          "how": "Single method thread; pin physical-core placement and SMT sibling exclusion before execution.",
+          "value": 1
+        },
+        {
+          "name": "host",
+          "treatment": "measured",
+          "how": "Record instance ID/type, CPU model/microcode, SMT, affinity, NUMA, kernel, hypervisor, governor/frequency, steal, PSI, co-tenants and isolation blockers. Reject timed rows below L2; no cross-host timing pooling after recovery."
+        },
+        {
+          "name": "placement",
+          "treatment": "fixed",
+          "how": "Dedicated qualified L2 c8a.2xlarge Spot placement; no heterogeneous fallback.",
+          "value": "c8a.2xlarge"
+        },
+        {
+          "name": "memory_environment",
+          "treatment": "fixed",
+          "how": "8GiB execution cap, same allocator preparation/environment for every arm; record actual RSS, allocator, ASLR and resolved environment. No memory-cap increase.",
+          "value": 8
+        },
+        {
+          "name": "arm_order",
+          "treatment": "randomized",
+          "how": "Use existing prepared spec shuffle rule and seed2026101801; freeze emitted plan bytes before data. Interleave all three arms in each workload/round."
+        },
+        {
+          "name": "algorithm_stream",
+          "treatment": "crossed",
+          "how": "Five predetermined measured streams per workload shared exactly across all three arms; index0 preserves archived seed; indices1..4 are new streams, not repeat measurements of index0."
+        },
+        {
+          "name": "warmup",
+          "treatment": "fixed",
+          "how": "One warmup execution per arm/workload; retain records but exclude from ratios.",
+          "value": 1
+        },
+        {
+          "name": "preemption",
+          "treatment": "measured",
+          "how": "Retain checkpoint, interruption and restore records; resumed execution clocks invalid. Restart only under frozen infrastructure retry limit, never restart a scientific cap."
+        },
+        {
+          "name": "analyst",
+          "treatment": "fixed",
+          "how": "Unblinded deterministic native exporter; no hand-selected workloads, thresholds or best stream. External reviewer receives all rows and reasons."
+        }
+      ],
+      "after": [
+        {
+          "name": "workload",
+          "treatment": "fixed",
+          "how": "21 models x60 exact archived targets; all arms share workload SHA and original source equation.",
+          "value": "550f7178e30b60db62931a752b0c179beeef7ea99a96cf94486ff8aee631d339"
+        },
+        {
+          "name": "instrument",
+          "treatment": "fixed",
+          "how": "One immutable source commit, lockfile, flags, binary and image for all arms; unresolved hashes block freezing."
+        },
+        {
+          "name": "threads",
+          "treatment": "fixed",
+          "how": "Single method thread; pin physical-core placement and SMT sibling exclusion before execution.",
+          "value": 1
+        },
+        {
+          "name": "host",
+          "treatment": "measured",
+          "how": "Record instance ID/type, CPU model/microcode, SMT, affinity, NUMA, kernel, hypervisor, governor/frequency, steal, PSI, co-tenants and isolation blockers. Reject timed rows below L2; no cross-host timing pooling after recovery."
+        },
+        {
+          "name": "placement",
+          "treatment": "fixed",
+          "how": "Dedicated qualified L2 c8a.2xlarge Spot placement; no heterogeneous fallback.",
+          "value": "c8a.2xlarge"
+        },
+        {
+          "name": "memory_environment",
+          "treatment": "fixed",
+          "how": "8GiB execution cap, same allocator preparation/environment for every arm; record actual RSS, allocator, ASLR and resolved environment. No memory-cap increase.",
+          "value": 8
+        },
+        {
+          "name": "arm_order",
+          "treatment": "randomized",
+          "how": "Use existing prepared spec shuffle rule and seed2026101801; freeze emitted plan bytes before data. Interleave all three arms in each workload/round."
+        },
+        {
+          "name": "algorithm_stream",
+          "treatment": "crossed",
+          "how": "Five predetermined measured streams per workload shared exactly across all three arms; index0 preserves archived seed; indices1..4 are new streams, not repeat measurements of index0."
+        },
+        {
+          "name": "warmup",
+          "treatment": "fixed",
+          "how": "One warmup execution per arm/workload; retain records but exclude from ratios.",
+          "value": 1
+        },
+        {
+          "name": "preemption",
+          "treatment": "measured",
+          "how": "Retain checkpoint, interruption and restore records; resumed execution clocks invalid. Restart only under frozen infrastructure retry limit, never restart a scientific cap."
+        },
+        {
+          "name": "analyst",
+          "treatment": "fixed",
+          "how": "Unblinded deterministic native exporter; no hand-selected workloads, thresholds or best stream. External reviewer receives all rows and reasons."
+        },
+        {
+          "name": "rho_hash_policy",
+          "treatment": "fixed",
+          "how": "DefaultHasher with BuildHasherDefault, policy version1, Rust1.99.1. Replaces randomized table hashing before data; records hash policy and all observed hash/equality events. This is an instrument amendment, not an unmodified historical baseline.",
+          "value": 1
+        },
+        {
+          "name": "finite_operation_model",
+          "treatment": "fixed",
+          "how": "pencil-algorithm-cost/atomic-scalar-disjoint-v1; source-bound nine-category independent coverage required.36cells, symmetric scalar inverse normalization, disjoint primitive registry, separate algorithm/calibration/resource boundaries.",
+          "value": "eb5348c894516e9ba163740861dd1f0e58865c08a930500662e6b060f7a571d8"
+        }
+      ]
+    },
+    {
+      "path": "/version",
+      "operation": "replace",
+      "before": 1,
+      "after": 2
+    }
+  ]
+}

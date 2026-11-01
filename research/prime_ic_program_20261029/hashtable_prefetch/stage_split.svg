@@ -1,0 +1,237 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="976" height="430" font-family="sans-serif" font-size="11">
+<rect width="976" height="430" fill="white"/>
+<text x="70" y="18" font-size="13" font-weight="bold">Prime relation trial, ns per trial by lane-round stage (measured, PR #2806 diagnosis)</text>
+<line x1="66" x2="746" y1="340.0" y2="340.0" stroke="#eee"/>
+<text x="62" y="344.0" text-anchor="end">0</text>
+<line x1="66" x2="746" y1="280.0" y2="280.0" stroke="#eee"/>
+<text x="62" y="284.0" text-anchor="end">100</text>
+<line x1="66" x2="746" y1="220.0" y2="220.0" stroke="#eee"/>
+<text x="62" y="224.0" text-anchor="end">200</text>
+<line x1="66" x2="746" y1="160.0" y2="160.0" stroke="#eee"/>
+<text x="62" y="164.0" text-anchor="end">300</text>
+<line x1="66" x2="746" y1="100.0" y2="100.0" stroke="#eee"/>
+<text x="62" y="104.0" text-anchor="end">400</text>
+<line x1="66" x2="746" y1="40.0" y2="40.0" stroke="#eee"/>
+<text x="62" y="44.0" text-anchor="end">500</text>
+<text transform="translate(18,190.0) rotate(-90)" text-anchor="middle">ns per relation trial</text>
+<text x="80" y="382" font-weight="bold">28-bit curve, base 512</text>
+<rect x="80" y="293.4" width="22" height="46.6" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b4 additions + shared inversion: 77.7 ns</title></rect>
+<rect x="80" y="276.5" width="22" height="16.8" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b4 lane preparation: 28.0 ns</title></rect>
+<rect x="80" y="269.6" width="22" height="7.0" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b4 queue fill: 11.6 ns</title></rect>
+<rect x="80" y="256.9" width="22" height="12.6" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b4 target draw: 21.1 ns</title></rect>
+<rect x="80" y="224.8" width="22" height="32.1" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b4 touch (demand reads): 53.5 ns</title></rect>
+<rect x="80" y="191.2" width="22" height="33.7" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b4 guard insert: 56.1 ns</title></rect>
+<rect x="80" y="137.3" width="22" height="53.9" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b4 oracle probe: 89.8 ns</title></rect>
+<rect x="80" y="80.8" width="22" height="56.5" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b4 rest (row build, loop, timers): 94.2 ns</title></rect>
+<text x="91.0" y="354" text-anchor="middle">4</text>
+<rect x="108" y="304.9" width="22" height="35.1" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b8 additions + shared inversion: 58.5 ns</title></rect>
+<rect x="108" y="292.1" width="22" height="12.8" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b8 lane preparation: 21.3 ns</title></rect>
+<rect x="108" y="287.4" width="22" height="4.7" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b8 queue fill: 7.8 ns</title></rect>
+<rect x="108" y="274.2" width="22" height="13.2" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b8 target draw: 21.9 ns</title></rect>
+<rect x="108" y="251.2" width="22" height="23.0" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b8 touch (demand reads): 38.3 ns</title></rect>
+<rect x="108" y="217.8" width="22" height="33.4" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b8 guard insert: 55.7 ns</title></rect>
+<rect x="108" y="165.2" width="22" height="52.6" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b8 oracle probe: 87.7 ns</title></rect>
+<rect x="108" y="116.8" width="22" height="48.4" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b8 rest (row build, loop, timers): 80.7 ns</title></rect>
+<text x="119.0" y="354" text-anchor="middle">8</text>
+<rect x="136" y="312.5" width="22" height="27.5" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b16 additions + shared inversion: 45.9 ns</title></rect>
+<rect x="136" y="301.7" width="22" height="10.8" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b16 lane preparation: 18.0 ns</title></rect>
+<rect x="136" y="298.7" width="22" height="2.9" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b16 queue fill: 4.9 ns</title></rect>
+<rect x="136" y="286.8" width="22" height="12.0" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b16 target draw: 19.9 ns</title></rect>
+<rect x="136" y="267.0" width="22" height="19.7" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b16 touch (demand reads): 32.9 ns</title></rect>
+<rect x="136" y="233.9" width="22" height="33.1" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b16 guard insert: 55.1 ns</title></rect>
+<rect x="136" y="184.7" width="22" height="49.2" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b16 oracle probe: 82.0 ns</title></rect>
+<rect x="136" y="142.0" width="22" height="42.7" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b16 rest (row build, loop, timers): 71.2 ns</title></rect>
+<text x="147.0" y="354" text-anchor="middle">16</text>
+<rect x="164" y="313.9" width="22" height="26.1" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b24 additions + shared inversion: 43.5 ns</title></rect>
+<rect x="164" y="302.9" width="22" height="11.0" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b24 lane preparation: 18.4 ns</title></rect>
+<rect x="164" y="300.4" width="22" height="2.5" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b24 queue fill: 4.1 ns</title></rect>
+<rect x="164" y="288.3" width="22" height="12.1" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b24 target draw: 20.1 ns</title></rect>
+<rect x="164" y="269.9" width="22" height="18.5" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b24 touch (demand reads): 30.8 ns</title></rect>
+<rect x="164" y="238.3" width="22" height="31.6" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b24 guard insert: 52.6 ns</title></rect>
+<rect x="164" y="189.8" width="22" height="48.5" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b24 oracle probe: 80.9 ns</title></rect>
+<rect x="164" y="148.4" width="22" height="41.3" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b24 rest (row build, loop, timers): 68.9 ns</title></rect>
+<text x="175.0" y="354" text-anchor="middle">24</text>
+<rect x="192" y="316.2" width="22" height="23.8" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b32 additions + shared inversion: 39.6 ns</title></rect>
+<rect x="192" y="305.5" width="22" height="10.8" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b32 lane preparation: 18.0 ns</title></rect>
+<rect x="192" y="303.2" width="22" height="2.2" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b32 queue fill: 3.7 ns</title></rect>
+<rect x="192" y="291.3" width="22" height="11.9" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b32 target draw: 19.8 ns</title></rect>
+<rect x="192" y="272.9" width="22" height="18.4" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b32 touch (demand reads): 30.6 ns</title></rect>
+<rect x="192" y="239.2" width="22" height="33.8" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b32 guard insert: 56.3 ns</title></rect>
+<rect x="192" y="190.6" width="22" height="48.6" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b32 oracle probe: 80.9 ns</title></rect>
+<rect x="192" y="149.1" width="22" height="41.5" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b32 rest (row build, loop, timers): 69.1 ns</title></rect>
+<text x="203.0" y="354" text-anchor="middle">32</text>
+<rect x="220" y="316.3" width="22" height="23.7" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b48 additions + shared inversion: 39.6 ns</title></rect>
+<rect x="220" y="304.7" width="22" height="11.5" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b48 lane preparation: 19.2 ns</title></rect>
+<rect x="220" y="302.5" width="22" height="2.3" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b48 queue fill: 3.8 ns</title></rect>
+<rect x="220" y="290.5" width="22" height="11.9" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b48 target draw: 19.9 ns</title></rect>
+<rect x="220" y="272.9" width="22" height="17.6" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b48 touch (demand reads): 29.3 ns</title></rect>
+<rect x="220" y="240.2" width="22" height="32.8" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b48 guard insert: 54.6 ns</title></rect>
+<rect x="220" y="191.3" width="22" height="48.9" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b48 oracle probe: 81.5 ns</title></rect>
+<rect x="220" y="143.8" width="22" height="47.5" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b48 rest (row build, loop, timers): 79.1 ns</title></rect>
+<text x="231.0" y="354" text-anchor="middle">48</text>
+<rect x="248" y="312.2" width="22" height="27.8" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b64 additions + shared inversion: 46.4 ns</title></rect>
+<rect x="248" y="299.3" width="22" height="12.9" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b64 lane preparation: 21.5 ns</title></rect>
+<rect x="248" y="296.9" width="22" height="2.4" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b64 queue fill: 3.9 ns</title></rect>
+<rect x="248" y="283.3" width="22" height="13.6" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b64 target draw: 22.6 ns</title></rect>
+<rect x="248" y="261.8" width="22" height="21.5" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b64 touch (demand reads): 35.9 ns</title></rect>
+<rect x="248" y="227.2" width="22" height="34.6" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b64 guard insert: 57.7 ns</title></rect>
+<rect x="248" y="170.6" width="22" height="56.5" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b64 oracle probe: 94.2 ns</title></rect>
+<rect x="248" y="121.5" width="22" height="49.1" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b64 rest (row build, loop, timers): 81.9 ns</title></rect>
+<text x="259.0" y="354" text-anchor="middle">64</text>
+<rect x="276" y="315.3" width="22" height="24.7" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b128 additions + shared inversion: 41.2 ns</title></rect>
+<rect x="276" y="300.5" width="22" height="14.8" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b128 lane preparation: 24.7 ns</title></rect>
+<rect x="276" y="297.2" width="22" height="3.2" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b128 queue fill: 5.4 ns</title></rect>
+<rect x="276" y="285.2" width="22" height="12.0" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b128 target draw: 20.0 ns</title></rect>
+<rect x="276" y="267.0" width="22" height="18.3" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b128 touch (demand reads): 30.4 ns</title></rect>
+<rect x="276" y="234.1" width="22" height="32.9" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b128 guard insert: 54.8 ns</title></rect>
+<rect x="276" y="184.1" width="22" height="49.9" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b128 oracle probe: 83.2 ns</title></rect>
+<rect x="276" y="136.5" width="22" height="47.7" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b128 rest (row build, loop, timers): 79.5 ns</title></rect>
+<text x="287.0" y="354" text-anchor="middle">128</text>
+<rect x="304" y="313.8" width="22" height="26.2" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b256 additions + shared inversion: 43.6 ns</title></rect>
+<rect x="304" y="289.9" width="22" height="23.9" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b256 lane preparation: 39.9 ns</title></rect>
+<rect x="304" y="286.5" width="22" height="3.4" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b256 queue fill: 5.7 ns</title></rect>
+<rect x="304" y="274.3" width="22" height="12.2" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b256 target draw: 20.3 ns</title></rect>
+<rect x="304" y="256.7" width="22" height="17.7" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b256 touch (demand reads): 29.4 ns</title></rect>
+<rect x="304" y="223.6" width="22" height="33.0" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b256 guard insert: 55.1 ns</title></rect>
+<rect x="304" y="169.7" width="22" height="53.9" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b256 oracle probe: 89.9 ns</title></rect>
+<rect x="304" y="126.1" width="22" height="43.5" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b256 rest (row build, loop, timers): 72.6 ns</title></rect>
+<text x="315.0" y="354" text-anchor="middle">256</text>
+<rect x="332" y="310.1" width="22" height="29.9" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b512 additions + shared inversion: 49.9 ns</title></rect>
+<rect x="332" y="271.6" width="22" height="38.5" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b512 lane preparation: 64.1 ns</title></rect>
+<rect x="332" y="267.9" width="22" height="3.7" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b512 queue fill: 6.2 ns</title></rect>
+<rect x="332" y="254.0" width="22" height="13.9" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b512 target draw: 23.1 ns</title></rect>
+<rect x="332" y="231.5" width="22" height="22.6" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b512 touch (demand reads): 37.6 ns</title></rect>
+<rect x="332" y="196.7" width="22" height="34.8" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b512 guard insert: 58.0 ns</title></rect>
+<rect x="332" y="135.0" width="22" height="61.7" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b512 oracle probe: 102.8 ns</title></rect>
+<rect x="332" y="81.8" width="22" height="53.2" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b512 rest (row build, loop, timers): 88.7 ns</title></rect>
+<text x="343.0" y="354" text-anchor="middle">512</text>
+<rect x="360" y="312.0" width="22" height="28.0" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b1024 additions + shared inversion: 46.6 ns</title></rect>
+<rect x="360" y="246.2" width="22" height="65.8" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b1024 lane preparation: 109.7 ns</title></rect>
+<rect x="360" y="242.7" width="22" height="3.5" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b1024 queue fill: 5.8 ns</title></rect>
+<rect x="360" y="229.7" width="22" height="13.0" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b1024 target draw: 21.7 ns</title></rect>
+<rect x="360" y="207.4" width="22" height="22.3" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b1024 touch (demand reads): 37.1 ns</title></rect>
+<rect x="360" y="171.1" width="22" height="36.3" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b1024 guard insert: 60.6 ns</title></rect>
+<rect x="360" y="116.4" width="22" height="54.7" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b1024 oracle probe: 91.2 ns</title></rect>
+<rect x="360" y="67.4" width="22" height="49.0" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b1024 rest (row build, loop, timers): 81.6 ns</title></rect>
+<text x="371.0" y="354" text-anchor="middle">1024</text>
+<text x="80" y="368" fill="#555">lanes</text>
+<text x="418" y="382" font-weight="bold">32-bit curve, base 1024</text>
+<rect x="418" y="291.2" width="22" height="48.8" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b4 additions + shared inversion: 81.3 ns</title></rect>
+<rect x="418" y="274.3" width="22" height="16.9" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b4 lane preparation: 28.1 ns</title></rect>
+<rect x="418" y="267.3" width="22" height="7.0" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b4 queue fill: 11.7 ns</title></rect>
+<rect x="418" y="254.9" width="22" height="12.4" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b4 target draw: 20.7 ns</title></rect>
+<rect x="418" y="208.1" width="22" height="46.8" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b4 touch (demand reads): 78.0 ns</title></rect>
+<rect x="418" y="176.3" width="22" height="31.8" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b4 guard insert: 53.1 ns</title></rect>
+<rect x="418" y="115.1" width="22" height="61.2" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b4 oracle probe: 102.0 ns</title></rect>
+<rect x="418" y="58.6" width="22" height="56.5" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b4 rest (row build, loop, timers): 94.2 ns</title></rect>
+<text x="429.0" y="354" text-anchor="middle">4</text>
+<rect x="446" y="301.1" width="22" height="38.9" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b8 additions + shared inversion: 64.8 ns</title></rect>
+<rect x="446" y="287.8" width="22" height="13.3" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b8 lane preparation: 22.2 ns</title></rect>
+<rect x="446" y="283.3" width="22" height="4.5" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b8 queue fill: 7.6 ns</title></rect>
+<rect x="446" y="270.3" width="22" height="13.0" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b8 target draw: 21.6 ns</title></rect>
+<rect x="446" y="228.3" width="22" height="42.0" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b8 touch (demand reads): 70.1 ns</title></rect>
+<rect x="446" y="196.5" width="22" height="31.8" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b8 guard insert: 53.0 ns</title></rect>
+<rect x="446" y="126.5" width="22" height="70.0" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b8 oracle probe: 116.6 ns</title></rect>
+<rect x="446" y="74.9" width="22" height="51.6" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b8 rest (row build, loop, timers): 86.1 ns</title></rect>
+<text x="457.0" y="354" text-anchor="middle">8</text>
+<rect x="474" y="308.8" width="22" height="31.2" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b16 additions + shared inversion: 51.9 ns</title></rect>
+<rect x="474" y="298.2" width="22" height="10.7" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b16 lane preparation: 17.8 ns</title></rect>
+<rect x="474" y="294.9" width="22" height="3.3" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b16 queue fill: 5.4 ns</title></rect>
+<rect x="474" y="281.9" width="22" height="13.0" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b16 target draw: 21.7 ns</title></rect>
+<rect x="474" y="245.0" width="22" height="36.9" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b16 touch (demand reads): 61.5 ns</title></rect>
+<rect x="474" y="210.2" width="22" height="34.7" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b16 guard insert: 57.9 ns</title></rect>
+<rect x="474" y="142.7" width="22" height="67.6" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b16 oracle probe: 112.6 ns</title></rect>
+<rect x="474" y="87.4" width="22" height="55.3" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b16 rest (row build, loop, timers): 92.2 ns</title></rect>
+<text x="485.0" y="354" text-anchor="middle">16</text>
+<rect x="502" y="313.1" width="22" height="26.9" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b24 additions + shared inversion: 44.8 ns</title></rect>
+<rect x="502" y="303.2" width="22" height="9.9" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b24 lane preparation: 16.4 ns</title></rect>
+<rect x="502" y="300.6" width="22" height="2.6" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b24 queue fill: 4.4 ns</title></rect>
+<rect x="502" y="288.1" width="22" height="12.5" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b24 target draw: 20.8 ns</title></rect>
+<rect x="502" y="254.5" width="22" height="33.6" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b24 touch (demand reads): 56.0 ns</title></rect>
+<rect x="502" y="221.4" width="22" height="33.2" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b24 guard insert: 55.3 ns</title></rect>
+<rect x="502" y="161.5" width="22" height="59.8" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b24 oracle probe: 99.7 ns</title></rect>
+<rect x="502" y="109.0" width="22" height="52.5" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b24 rest (row build, loop, timers): 87.5 ns</title></rect>
+<text x="513.0" y="354" text-anchor="middle">24</text>
+<rect x="530" y="315.7" width="22" height="24.3" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b32 additions + shared inversion: 40.5 ns</title></rect>
+<rect x="530" y="306.8" width="22" height="8.9" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b32 lane preparation: 14.8 ns</title></rect>
+<rect x="530" y="304.6" width="22" height="2.2" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b32 queue fill: 3.7 ns</title></rect>
+<rect x="530" y="292.6" width="22" height="12.0" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b32 target draw: 19.9 ns</title></rect>
+<rect x="530" y="263.9" width="22" height="28.7" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b32 touch (demand reads): 47.9 ns</title></rect>
+<rect x="530" y="234.3" width="22" height="29.5" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b32 guard insert: 49.2 ns</title></rect>
+<rect x="530" y="180.0" width="22" height="54.3" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b32 oracle probe: 90.6 ns</title></rect>
+<rect x="530" y="130.8" width="22" height="49.2" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b32 rest (row build, loop, timers): 82.0 ns</title></rect>
+<text x="541.0" y="354" text-anchor="middle">32</text>
+<rect x="558" y="315.9" width="22" height="24.1" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b48 additions + shared inversion: 40.2 ns</title></rect>
+<rect x="558" y="306.8" width="22" height="9.1" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b48 lane preparation: 15.1 ns</title></rect>
+<rect x="558" y="304.4" width="22" height="2.5" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b48 queue fill: 4.1 ns</title></rect>
+<rect x="558" y="292.3" width="22" height="12.1" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b48 target draw: 20.1 ns</title></rect>
+<rect x="558" y="262.5" width="22" height="29.8" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b48 touch (demand reads): 49.7 ns</title></rect>
+<rect x="558" y="226.9" width="22" height="35.5" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b48 guard insert: 59.2 ns</title></rect>
+<rect x="558" y="171.4" width="22" height="55.6" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b48 oracle probe: 92.6 ns</title></rect>
+<rect x="558" y="120.8" width="22" height="50.6" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b48 rest (row build, loop, timers): 84.3 ns</title></rect>
+<text x="569.0" y="354" text-anchor="middle">48</text>
+<rect x="586" y="316.1" width="22" height="23.9" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b64 additions + shared inversion: 39.9 ns</title></rect>
+<rect x="586" y="306.8" width="22" height="9.3" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b64 lane preparation: 15.4 ns</title></rect>
+<rect x="586" y="304.4" width="22" height="2.4" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b64 queue fill: 4.0 ns</title></rect>
+<rect x="586" y="292.3" width="22" height="12.1" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b64 target draw: 20.2 ns</title></rect>
+<rect x="586" y="261.5" width="22" height="30.8" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b64 touch (demand reads): 51.4 ns</title></rect>
+<rect x="586" y="226.5" width="22" height="35.0" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b64 guard insert: 58.3 ns</title></rect>
+<rect x="586" y="167.1" width="22" height="59.4" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b64 oracle probe: 98.9 ns</title></rect>
+<rect x="586" y="113.6" width="22" height="53.6" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b64 rest (row build, loop, timers): 89.3 ns</title></rect>
+<text x="597.0" y="354" text-anchor="middle">64</text>
+<rect x="614" y="314.0" width="22" height="26.0" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b128 additions + shared inversion: 43.4 ns</title></rect>
+<rect x="614" y="304.5" width="22" height="9.5" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b128 lane preparation: 15.8 ns</title></rect>
+<rect x="614" y="301.5" width="22" height="3.0" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b128 queue fill: 5.0 ns</title></rect>
+<rect x="614" y="289.2" width="22" height="12.3" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b128 target draw: 20.5 ns</title></rect>
+<rect x="614" y="258.1" width="22" height="31.0" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b128 touch (demand reads): 51.7 ns</title></rect>
+<rect x="614" y="222.5" width="22" height="35.6" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b128 guard insert: 59.3 ns</title></rect>
+<rect x="614" y="159.7" width="22" height="62.8" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b128 oracle probe: 104.7 ns</title></rect>
+<rect x="614" y="108.5" width="22" height="51.2" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b128 rest (row build, loop, timers): 85.3 ns</title></rect>
+<text x="625.0" y="354" text-anchor="middle">128</text>
+<rect x="642" y="313.7" width="22" height="26.3" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b256 additions + shared inversion: 43.8 ns</title></rect>
+<rect x="642" y="302.5" width="22" height="11.2" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b256 lane preparation: 18.6 ns</title></rect>
+<rect x="642" y="299.4" width="22" height="3.2" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b256 queue fill: 5.3 ns</title></rect>
+<rect x="642" y="287.0" width="22" height="12.3" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b256 target draw: 20.5 ns</title></rect>
+<rect x="642" y="254.4" width="22" height="32.7" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b256 touch (demand reads): 54.5 ns</title></rect>
+<rect x="642" y="217.4" width="22" height="36.9" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b256 guard insert: 61.6 ns</title></rect>
+<rect x="642" y="149.4" width="22" height="68.0" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b256 oracle probe: 113.4 ns</title></rect>
+<rect x="642" y="96.0" width="22" height="53.4" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b256 rest (row build, loop, timers): 89.0 ns</title></rect>
+<text x="653.0" y="354" text-anchor="middle">256</text>
+<rect x="670" y="313.0" width="22" height="27.0" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b512 additions + shared inversion: 44.9 ns</title></rect>
+<rect x="670" y="299.0" width="22" height="14.0" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b512 lane preparation: 23.4 ns</title></rect>
+<rect x="670" y="295.6" width="22" height="3.4" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b512 queue fill: 5.6 ns</title></rect>
+<rect x="670" y="283.0" width="22" height="12.6" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b512 target draw: 21.1 ns</title></rect>
+<rect x="670" y="250.4" width="22" height="32.6" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b512 touch (demand reads): 54.4 ns</title></rect>
+<rect x="670" y="218.9" width="22" height="31.5" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b512 guard insert: 52.5 ns</title></rect>
+<rect x="670" y="151.7" width="22" height="67.2" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b512 oracle probe: 112.0 ns</title></rect>
+<rect x="670" y="92.6" width="22" height="59.1" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b512 rest (row build, loop, timers): 98.5 ns</title></rect>
+<text x="681.0" y="354" text-anchor="middle">512</text>
+<rect x="698" y="311.3" width="22" height="28.7" fill="#8da0cb" stroke="#666" stroke-width="0.3"><title>b1024 additions + shared inversion: 47.9 ns</title></rect>
+<rect x="698" y="290.2" width="22" height="21.0" fill="#b3b3b3" stroke="#666" stroke-width="0.3"><title>b1024 lane preparation: 35.1 ns</title></rect>
+<rect x="698" y="286.8" width="22" height="3.5" fill="#d9d9d9" stroke="#666" stroke-width="0.3"><title>b1024 queue fill: 5.8 ns</title></rect>
+<rect x="698" y="273.9" width="22" height="12.8" fill="#e5c494" stroke="#666" stroke-width="0.3"><title>b1024 target draw: 21.4 ns</title></rect>
+<rect x="698" y="235.8" width="22" height="38.2" fill="#fc8d62" stroke="#666" stroke-width="0.3"><title>b1024 touch (demand reads): 63.6 ns</title></rect>
+<rect x="698" y="198.1" width="22" height="37.6" fill="#e78ac3" stroke="#666" stroke-width="0.3"><title>b1024 guard insert: 62.7 ns</title></rect>
+<rect x="698" y="122.4" width="22" height="75.8" fill="#d53e4f" stroke="#666" stroke-width="0.3"><title>b1024 oracle probe: 126.3 ns</title></rect>
+<rect x="698" y="64.0" width="22" height="58.4" fill="#f0f0f0" stroke="#666" stroke-width="0.3"><title>b1024 rest (row build, loop, timers): 97.3 ns</title></rect>
+<text x="709.0" y="354" text-anchor="middle">1024</text>
+<text x="418" y="368" fill="#555">lanes</text>
+<rect x="756" y="40" width="12" height="12" fill="#f0f0f0" stroke="#666" stroke-width="0.3"/>
+<text x="774" y="50">rest (row build, loop, timers)</text>
+<rect x="756" y="58" width="12" height="12" fill="#d53e4f" stroke="#666" stroke-width="0.3"/>
+<text x="774" y="68" font-weight="bold">oracle probe</text>
+<rect x="756" y="76" width="12" height="12" fill="#e78ac3" stroke="#666" stroke-width="0.3"/>
+<text x="774" y="86" font-weight="bold">guard insert</text>
+<rect x="756" y="94" width="12" height="12" fill="#fc8d62" stroke="#666" stroke-width="0.3"/>
+<text x="774" y="104" font-weight="bold">touch (demand reads)</text>
+<rect x="756" y="112" width="12" height="12" fill="#e5c494" stroke="#666" stroke-width="0.3"/>
+<text x="774" y="122">target draw</text>
+<rect x="756" y="130" width="12" height="12" fill="#d9d9d9" stroke="#666" stroke-width="0.3"/>
+<text x="774" y="140">queue fill</text>
+<rect x="756" y="148" width="12" height="12" fill="#b3b3b3" stroke="#666" stroke-width="0.3"/>
+<text x="774" y="158">lane preparation</text>
+<rect x="756" y="166" width="12" height="12" fill="#8da0cb" stroke="#666" stroke-width="0.3"/>
+<text x="774" y="176">additions + shared inversion</text>
+<text x="756" y="200" fill="#555">bold: hash-table work</text>
+<text x="70" y="420" fill="#555" font-size="9">source: research/ic_wide_ext_20261028/results.json @ lead/ic-wide-ext-20261028 (sha256 e9d39b5b712c2c79...); one timer-instrumented session per size, descriptive; cycles at 2.1 GHz</text>
+</svg>

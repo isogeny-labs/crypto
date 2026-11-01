@@ -1,0 +1,25 @@
+{
+  "schema": "formal-claim-ledger/v1",
+  "packet": "explicit-affine-chart-domain-dvr",
+  "toolchain": "leanprover/lean4:v4.34.1",
+  "field_quantifier": "every field K",
+  "coefficient_quantifier": "all a3,a2,a1,a0 in K",
+  "chart_equation": "w^2-z*(1+a3*z^2+a2*z^3+a1*z^4+a0*z^5)",
+  "checked": [
+    "Common22Eisenstein.outer_quadratic_irreducible",
+    "Common22Eisenstein.nested_chart_irreducible",
+    "Common22Domain.chart_equation_irreducible",
+    "Common22Domain.chart_ring_domain",
+    "Common22Domain.chart_wbar_ne_zero",
+    "Common22Domain.origin_stalk_domain",
+    "Common22Domain.stalkW_ne_zero",
+    "Common22Domain.origin_stalk_dvr",
+    "Common22Domain.stalkW_irreducible"
+  ],
+  "open": [
+    "projective_completion_and_infinity_stalk_isomorphism",
+    "principal_divisor_and_pic0_transport",
+    "independent_rust_law_semantic_equivalence"
+  ],
+  "rho_ratio": null
+}

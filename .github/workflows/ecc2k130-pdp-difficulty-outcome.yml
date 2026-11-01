@@ -1,10 +1,8 @@
 name: ECC2K-130 PDP difficulty outcome replay
 
 on:
-  pull_request:
-    paths:
-      - "research/notes/ecc2k130/pdp_difficulty_features_20261001/**"
-      - ".github/workflows/ecc2k130-pdp-difficulty-outcome.yml"
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:
@@ -14,9 +12,13 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   replay:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-pdp-difficulty-outcome.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-pdp-difficulty-outcome.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
@@ -39,3 +41,14 @@ jobs:
                       'checker_sha256'):
               assert replay[key] == expected[key], key
           PY
+      # Moved here from ecc2k130-pdp-difficulty-protocol.yml. SOURCE_LOCK.json and
+      # SOURCE_CHECK.json pin that workflow's exact bytes, so it must stay as it was
+      # sealed; editing it makes verify.py and source_preflight.py fail.
+      - name: Recompute the scored diagnostic without importing the producer
+        # Independent of the replay above: a failing verify.py must not hide the
+        # score check in the same run (they were separate jobs before the move).
+        if: ${{ !cancelled() }}
+        run: |
+          python3 research/notes/ecc2k130/pdp_difficulty_features_20261001/check_score.py \
+            --choice research/notes/ecc2k130/pdp_difficulty_features_20261001/TRAIN_CHOICE.json \
+            --outcome research/notes/ecc2k130/pdp_difficulty_features_20261001/OUTCOME.json

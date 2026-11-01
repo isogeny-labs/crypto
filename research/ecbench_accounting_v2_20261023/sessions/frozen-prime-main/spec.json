@@ -1,0 +1,19 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "accounting v2 study: frozen ids only, run on the branch binary and on the main binary (prime 20 bits)",
+  "description": "Only frozen ids (no _v2), with the arm names and workloads of pairs-prime.json, so the same file runs on the main binary that does not know the v2 ids. Used to compare recorded counts of frozen ids across binaries.",
+  "workloads": {
+    "curves": [{"kind": "prime_search", "bits": 20, "seed": 59297}],
+    "targets_per_curve": 8,
+    "target_seed": 20261023
+  },
+  "arms": [
+    {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+    {"name": "rho-plain", "role": "baseline", "method": {"id": "rho.plain"}},
+    {"name": "bsgs", "role": "baseline", "method": {"id": "bsgs.textbook"}},
+    {"name": "bsgs-il", "role": "baseline", "method": {"id": "bsgs.interleaved"}},
+    {"name": "bsgs-neg", "role": "baseline", "method": {"id": "bsgs.negation"}},
+    {"name": "kangaroo", "role": "baseline", "method": {"id": "kangaroo.vow"}}
+  ],
+  "measurement": {"rounds": 4, "warmup": 1, "order": "alternate", "seed": 20261023, "isolation_required": "L2", "timeout_seconds": 300}
+}

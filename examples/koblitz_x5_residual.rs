@@ -22,6 +22,7 @@
 //! cargo run --release --example koblitz_x5_residual -- --json experiments/30_koblitz_x5_residual.json > experiments/30_koblitz_x5_residual.log
 //! ```
 
+use crypto_lib::cryptanalysis::pq_groebner_f2::mask_low64;
 use std::collections::HashMap;
 use std::env;
 use std::fs;
@@ -799,7 +800,12 @@ fn main() {
             map.insert(eps, nn + ell_w);
             let eqs: Vec<Poly> = sy.equations[2 * nn..3 * nn]
                 .iter()
-                .map(|p| remap(&canon(p.terms.iter().map(|t| t.mask).collect()), &map))
+                .map(|p| {
+                    remap(
+                        &canon(p.terms.iter().map(|t| mask_low64(t.mask)).collect()),
+                        &map,
+                    )
+                })
                 .collect();
             let w_r = as_(&sy.u_r);
             let small = ell_w + 1;
@@ -851,12 +857,17 @@ fn main() {
             let len = xs.equations.len();
             let eqs: Vec<Poly> = xs.equations[len - nn..]
                 .iter()
-                .map(|p| remap(&canon(p.terms.iter().map(|t| t.mask).collect()), &map))
+                .map(|p| {
+                    remap(
+                        &canon(p.terms.iter().map(|t| mask_low64(t.mask)).collect()),
+                        &map,
+                    )
+                })
                 .collect();
             if pad_check {
                 let raw: Vec<Poly> = xs.equations[len - nn..]
                     .iter()
-                    .map(|p| canon(p.terms.iter().map(|t| t.mask).collect()))
+                    .map(|p| canon(p.terms.iter().map(|t| mask_low64(t.mask)).collect()))
                     .collect();
                 let k4 = eliminate(&Mac::full(&raw, xs.n_vars, 4, |_| true))
                     .kernel
