@@ -81,3 +81,17 @@ Lean02,bothfailedattemptrecords,report/custody/finalPR;then cubic818andcompleteC
 
 ### Errors
 Missingmathlibmoduleimport,not disproved bound or mathematicalnull. Metadatarecorder followsfresh02 only after acceptance.
+
+## 2026-11-01T18:04:49.335260+00:00 — Lean explicit interval/cardinality repair
+
+### What was done
+Lean02terminalcompile1: absolute-value notation absent from minimal imports; exhaustive kerneldecide hit default recursiondepth. Noaudit. Allrawerrors retained.
+
+### Decisions made
+State equivalent explicit integerinterval hypotheses/conclusion; use symbolic Finseterase/univ/product/Fin cardinal identities instead of enumerating405tuples. Same three claims and originalcaps. Freezebeforefresh03,no new dependency or capincrease.
+
+### Open threads
+Lean03terminal,finalrecords/report/custody/PR;nextcubic818andtrace-dual32canonicalbasis/Cartierfilter.
+
+### Errors
+Lean02parse/recursive-normalization failures; no mathematicalcounterexample. Bothfailureattemptsexcludedfromprovedclaims.

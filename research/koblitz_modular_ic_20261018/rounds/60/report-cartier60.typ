@@ -28,3 +28,15 @@ and matrices are not transferred here. Source:
 NEW-LEADS60.md records the full inference, source obligations and checks.
 R51 already notes that F2 differential matrices cannot certify an integral
 projector or11-torsion scalar; that action requirement remains separate.
+
+== A32-by32 route to the complete differential basis
+The existing normal-chart multiplication table supplies
+T_ij=Trace(e_i e_j). Check its inverse exactly, then use its dual basis
+for the complementary module Hom over F2[z] of B into F2[z]. Under the
+normal-source and separability hypotheses, this gives regular differentials
+on the affine chart after multiplying by dz. Impose all infinity conditions
+to recover all61 holomorphic forms. Track z=1/u and the differential factor.
+R27's complete tame different120 offers an independent divisor check.
+This is a proposed32-by32 lattice calculation, not a measured trace matrix.
+The standard module identification is
+#link("https://stacks.math.columbia.edu/tag/0BW0")[Stacks49.8, lemma49.8.2].
