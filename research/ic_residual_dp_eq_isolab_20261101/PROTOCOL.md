@@ -16,3 +16,10 @@ Class: infrastructure/replay evidence; not an algorithm speedup claim.
 
 ## Decision rule
 Report the lab's result.json state verbatim. A failed admission (L2, replay or A/A) is reported as failed with its receipt; nothing is retried or edited to pass. One dispatch only (a duplicate or rerun is a new experiment).
+
+## Amendment 1 (2026-11-01, no experiment had run)
+The first valid dispatch (workflow run 41337767031, source commit 428c146add196cdc925c22033f4714353c77feab) failed in the `build` job; the `experiment` job was skipped, so nothing reached the lab.
+Cause (log of job 124941431851): `src/ml_dataset/telemetry/whole_worker.rs:258` calls `libc::ioctl(fd, PERF_EVENT_IOC_ID, ...)` with `const PERF_EVENT_IOC_ID: libc::c_ulong`, but the lab image builds for musl where
+`libc::Ioctl` is `i32`: E0308 "expected i32, found u64". That file belongs to the ml_dataset telemetry work already on main; main fails the same way, which is also why other recent dispatches failed to build.
+Fix applied on this branch only (type of the constant, same bit pattern; checked with rustc on x86_64-unknown-linux-musl and -gnu, and the old form fails on musl): `const PERF_EVENT_IOC_ID: libc::Ioctl = 0x8008_2407_u32 as libc::Ioctl;`.
+It touches no code path of the study. The tested commit becomes main@aff5fa4975 + this protocol/spec + that one line. One redispatch with the new commit (no measurement had taken place, so this is not a rerun of a failed measurement). A separate PR carries the same one-line fix to main.
