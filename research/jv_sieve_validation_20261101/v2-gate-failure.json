@@ -1,0 +1,80 @@
+{
+  "schema": "jv.gate-attempt/v1",
+  "classification": "pre_panel_gate_predicate_failure",
+  "protocol_id": "JV-FULLROUTE-CORRECTED-20261101",
+  "protocol_version": 2,
+  "protocol_canonical_sha256": "7d95957e04cc24980e9d948c222b8bbe9fe1835e193236906e245ef1f9b556dc",
+  "protocol_file": "research/jv_sieve_validation_20261101/protocol-v2.json",
+  "protocol_file_sha256": "14ffb6a750c344e5d155842c84ad12c9c88a7609ff61ace213b1c88211f4b0b2",
+  "source_commit_bound_by_freeze": "966dd342d824df06b6a9ac7336d03b0bfe92954a",
+  "frozen_record_commit": "bb8a0b2e1c2e6d613a5057441f92e193081e8b51",
+  "workflow_run": {
+    "id": 41353962971,
+    "url": "https://github.com/isogeny-labs/crypto/actions/runs/41353962971",
+    "event": "workflow_dispatch",
+    "head_branch": "codex/jv-validation",
+    "head_sha": "bb8a0b2e1c2e6d613a5057441f92e193081e8b51",
+    "created_at": "2026-11-01T21:49:21Z",
+    "updated_at": "2026-11-01T23:11:20Z",
+    "status": "completed",
+    "conclusion": "failure",
+    "artifacts_total": 0
+  },
+  "prerequisite_jobs": [
+    {
+      "id": 124989928045,
+      "name": "corrected-rho-tools-gate",
+      "started_at": "2026-11-01T21:49:25Z",
+      "completed_at": "2026-11-01T22:09:45Z",
+      "conclusion": "success"
+    },
+    {
+      "id": 124989928058,
+      "name": "p101-recovery-gate",
+      "started_at": "2026-11-01T21:49:25Z",
+      "completed_at": "2026-11-01T22:32:15Z",
+      "conclusion": "success"
+    },
+    {
+      "id": 124989927910,
+      "name": "p101-counted-gate",
+      "started_at": "2026-11-01T21:49:25Z",
+      "completed_at": "2026-11-01T23:11:19Z",
+      "conclusion": "failure",
+      "release_build_seconds": 946,
+      "test_elapsed_seconds": 3806.18,
+      "exit_code": 101,
+      "failure_source": "src/cryptanalysis/jv_isogeny_walk.rs:2969:13",
+      "failure_message": "LinearAlgebra has no field work"
+    }
+  ],
+  "downstream_jobs": [
+    {
+      "id": 125010732245,
+      "name": "prospective-panels",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 125010732653,
+      "name": "prospective-validation",
+      "conclusion": "skipped"
+    }
+  ],
+  "target_flow": {
+    "planned_attempts": 99,
+    "attempted": 0,
+    "completed": 0,
+    "not_started": 99,
+    "requested_prime_data_observed": false
+  },
+  "log": {
+    "retrieval_command": "gh run view 41353962971 --log",
+    "retrieved_at": "2026-11-01T23:13:35Z",
+    "path": "research/jv_sieve_validation_20261101/v2-run-41353962971.log",
+    "bytes": 257716,
+    "lines": 2027,
+    "sha256": "2b1465614126bc18b91fcf42a2143ad715e4ab676097b470cfdb3782850e860d",
+    "canonical_copy_retained": true
+  },
+  "interpretation": "Version 2 stopped at a prerequisite assertion before any requested-prime panel. The failure is evidence about the gate predicate only. It is not an IC/rho result and provides no requested-prime scientific datum."
+}
