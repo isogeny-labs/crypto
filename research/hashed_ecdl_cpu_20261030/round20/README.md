@@ -14,6 +14,11 @@ their earlier unsubmitted state is superseded by these execution receipts.
 No retry or replacement was submitted. The current 10x goal keeps its original
 baseline and all three fixtures.
 
+The later [capacity diagnosis](capacity-diagnosis.md) identifies a one-node
+cpu-spot cap in the control-plane audit records. The occupied node plus required
+anti-affinity prevented another placement; nominal spare CPU did not override
+the node-count limit. No cap was raised and no other job was changed.
+
 ## Planned contrasts
 
 | Arm | Integrated source | Binary name | Batch | Purpose |
