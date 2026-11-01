@@ -41,6 +41,26 @@ mod cryptanalysis {
         pub mod canonical {
             pub use crate::canonical::splitmix64;
         }
+        /// For band.rs's unit test, which names its session under the library's
+        /// CARGO_MANIFEST_DIR (the repository root). Here that is
+        /// tools/backend-leaderboard, so the path is re-rooted. A checkout
+        /// without the session (CI's sparse one) gives no records; the library
+        /// crate runs the same test on the real data.
+        #[cfg(test)]
+        pub mod runner {
+            use std::path::{Path, PathBuf};
+            pub fn read_records(dir: &Path) -> Result<Vec<crate::record::Record>, String> {
+                let here = Path::new(env!("CARGO_MANIFEST_DIR"));
+                let dir: PathBuf = match dir.strip_prefix(here) {
+                    Ok(rel) => here.join("../..").join(rel),
+                    Err(_) => dir.to_path_buf(),
+                };
+                if !dir.join("records.jsonl").is_file() {
+                    return Ok(Vec::new());
+                }
+                crate::evidence::read_records(&dir)
+            }
+        }
     }
     pub mod ic_boundary {
         pub use crate::evidence::pinned_calibration_ratios;
