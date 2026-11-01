@@ -110,6 +110,12 @@ macro_rules! policy {
 const POLICIES: &[PolicyDecl] = &[
     policy!("ic.aps_v1", NativeAdaptive, SpecializedDomain, StandardBand),
     policy!(
+        "ic.prime_orbit_relations_v1",
+        NativeGrid,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
         "ic.three_leads_genus2_pencil_symbolic_v2",
         NativeGrid,
         SpecializedDomain,
@@ -564,6 +570,8 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "budget_ms"
         | "cap_multiple"
         | "matrix_coefficient_cap"
+        | "max_descent_ops"
+        | "max_ops"
         | "max_pair_work"
         | "max_restarts"
         | "max_states"
@@ -582,6 +590,7 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "trial_cap"
         | "unit_trials"
         | "units" => ResourceEnvelope,
+        "coordinates" | "orbits" | "relations_per_orbit" => Knob,
         "baby" | "base" | "base_multiplier" | "base_scale" | "beta" | "branches"
         | "collection_aim" | "collection_window" | "d" | "d_step_in" | "degree"
         | "descent_summands" | "dp_bits" | "ell" | "encoding" | "entries"
