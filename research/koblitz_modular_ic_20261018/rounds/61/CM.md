@@ -22,7 +22,7 @@ cohort has no principal x to feed the scalar/AS stage. This includes every
 minor triple in[-6,6]×[-10,10]×[-1,1] exceptzero; balancing fixes the first
 multiplicity, and the conditional map degree is at most34.
 
-Fresh checker status: CHECK61-03 is the next frozen attempt. It reconstructs every constraint
+Fresh checker status: packed Rust replay is the next frozen attempt. It reconstructs every constraint
 matrix from selected rows of the324 ambient profiles BEFORE multiplying by
 the mixed/fixed inclusions, and checks every certificate and the complete
 space/involution/trace/control products. Read terminal results.json before
@@ -44,7 +44,8 @@ extensions of the actual binary certificate products.
 
 All failed/interrupted attempts remain in the raw record: reversed cubic
 pair indices, a pre-native checkpoint interruption and a resource-stopped
-first checker, and unsupported checker module(int) zero initialization.
+first checker, unsupported checker module(int) zero initialization and a second generic
+polynomial-matrix resource stop.
 The resource stop is not called a timeout or mathematical null; checker02
 late PASS/numeric lines are rejected.
 Historical copied protocol annotations and prospective repairs are disclosed

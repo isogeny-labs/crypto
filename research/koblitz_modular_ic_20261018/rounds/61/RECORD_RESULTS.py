@@ -7,7 +7,14 @@ authored={'Scaling61.'+s for s in ['balanced_first_bound','balanced_degree_bound
 for d in sorted((h/'runs').iterdir()):
  if not d.is_dir():continue
  rev=(d/'source-revision.txt').read_text().strip();row={'attempt':d.name,'source_revision':rev}
- if (d/'input.sing').exists():
+ if (d/'input.rs').exists():
+  bc=int((d/'build.exit').read_text());code=int((d/'exit.txt').read_text()) if (d/'exit.txt').exists() else None;log=(d/'native.log').read_text() if (d/'native.log').exists() else ''
+  row.update(kind='Rust',build_exit=bc,native_exit=code,marker='RUSTCHECK61_ALL_CHECKS_PASS',marker_present='RUSTCHECK61_ALL_CHECKS_PASS' in log.splitlines(),native_results=[s for s in log.splitlines() if re.match(r'^[A-Z0-9_]+_RESULT ',s)])
+  row['status']='accepted' if bc==0 and code==0 and row['marker_present'] else 'rejected';row['result_lines_accepted']=row['status']=='accepted';row['outcome']='completed' if row['status']=='accepted' else 'build_or_run_failure'
+  if (d/'finished-utc.txt').exists():
+   start=(d/'started-utc.txt').read_text().strip();finish=(d/'finished-utc.txt').read_text().strip();row.update(started_utc=start,finished_utc=finish,native_wall_seconds=(datetime.fromisoformat(finish.replace('Z','+00:00'))-datetime.fromisoformat(start.replace('Z','+00:00'))).total_seconds())
+  mapping={'input.rs':'CHECK61.rs','driver.sh':'RUST_DRIVER.sh','launcher.sh':'REPLAY_RUST.sh','PROTOCOL.md':'PROTOCOL.md','protocol.json':'protocol.json','RUST-PROTOCOL.md':'RUST-PROTOCOL.md','donors.json':'donors.json'}
+ elif (d/'input.sing').exists():
   source=(d/'input.sing').read_text();markers=re.findall(r'print\("([A-Z0-9_]+_ALL_CHECKS_PASS)"\)',source);assert len(markers)==1
   if (d/'interrupted.json').exists():
    assert not (d/'native.log').exists() and not (d/'exit.txt').exists()
@@ -17,7 +24,7 @@ for d in sorted((h/'runs').iterdir()):
    row.update(kind='Singular',native_exit=code,marker=markers[0],marker_present=markers[0] in log.splitlines(),error_count=len(errors),first_errors=errors[:8],native_results=[s for s in log.splitlines() if re.match(r'^[A-Z0-9_]+_RESULT ',s)])
    row['status']='accepted' if code==0 and not errors and row['marker_present'] else 'rejected'
    row['result_lines_accepted']=row['status']=='accepted'
-   row['outcome']='manual_resource_stop' if d.name=='check61-01' else 'time_cap' if code==124 else 'native_error' if errors else 'completed' if row['status']=='accepted' else 'missing_marker'
+   row['outcome']='manual_resource_stop' if d.name in ('check61-01','check61-03') else 'time_cap' if code==124 else 'native_error' if errors else 'completed' if row['status']=='accepted' else 'missing_marker'
    start=(d/'started-utc.txt').read_text().strip();finish=(d/'finished-utc.txt').read_text().strip();row.update(started_utc=start,finished_utc=finish,native_wall_seconds=(datetime.fromisoformat(finish.replace('Z','+00:00'))-datetime.fromisoformat(start.replace('Z','+00:00'))).total_seconds())
   candidates=[]
   for p in h.glob('*.sing'):
@@ -37,7 +44,7 @@ for d in sorted((h/'runs').iterdir()):
  row['artifacts']=[{'path':str(p.relative_to(h)),'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'bytes':p.stat().st_size} for p in sorted(d.iterdir()) if p.is_file()]
  rows.append(row)
 accepted={r['attempt']:r for r in rows if r['status']=='accepted'}
-required=['trace61-01','cubic61-02','field61-01','fix61-02','cohort61-01','check61-03','scaling-lean61-01']
+required=['trace61-01','cubic61-02','field61-01','fix61-02','cohort61-01','rustcheck61-01','scaling-lean61-01']
 assert all(n in accepted for n in required),(required,list(accepted))
 result={'schema':'koblitz.results/v1','round':61,'runs':rows,'input_pins':pins,'authored_proved_claims':sorted(authored),'audited_declarations':accepted['scaling-lean61-01']['audited_declarations'],'protocol_metadata_disclosure':'PROTOCOL-METADATA61.md; historical versions immutable'}
 (h/'results.json').write_text(json.dumps(result,indent=2)+'\n')

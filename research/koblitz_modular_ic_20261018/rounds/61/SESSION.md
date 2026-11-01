@@ -193,3 +193,17 @@ CHECK03thenrecords/report/custody;all6formalclaimsaccepted.
 
 ### Errors
 IusedunsupportedSingularmodule(int)constructor. Sourcecorrectionbeforefreshdata;noacceptedproducerrepeated.
+
+## 2026-11-01T20:01:06.248732+00:00 — full Rust row-dot replay freeze
+
+### What was done
+CHECK03verifiedownedSingularPID1944351/cwdandmanuallystoppedforgenericmatrixcost,driverterminalFAIL/native0/missingmarker;noresultaccepted. Savedstopreceipt. Implementedstrictbinaryparser/packedrow-dotcheckerfromretainedR59helpers,all818pre-projectionrows/fullsourceproducts/controls.
+
+### Decisions made
+FreezeRustsource/driver/protocol13andallinputs;compiler/run each1200s4GiBCPU0/oneworker,stdonly. No fullcohortdownscale ortimingclaim.
+
+### Open threads
+Rustcompile/replayafterfreeze;records/report/custody/delivery;alloriginalleads.
+
+### Errors
+GenericSingularmatrixproductsresource-stopped,notatimeoutoramathematicalnull. All3Singularcheckerattemptsretained.

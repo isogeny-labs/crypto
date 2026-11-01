@@ -85,8 +85,11 @@ mathematical source. The first checker was manually stopped after an
 avoidable per-cell interpreter loop was identified; it has no accepted
 result and is not labelled a timeout. Checker02 then failed on unsupported
 module(int) zero initialization; its late PASS and numbers are rejected.
-Fresh03 removes that unnecessary reset, uses native row-vector copies,
-checks all272 row bindings and retains all818 pre-projection products.
+Fresh03 removes that reset but was resource-stopped during the generic
+polynomial-matrix products. The accepted complete Rust replay instead uses
+packed binary row-dot-column parity for all818 pre-projection products,
+all source/involution/Jordan/trace/control products and changed-inverse
+plus changed-row controls. All resource stops are distinct from timeouts.
 No accepted producer was repeated for publication.
 Historical auxiliary protocol metadata defects and prospective repairs are
 disclosed in PROTOCOL-METADATA61.md; raw versions remain immutable.

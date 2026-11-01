@@ -121,3 +121,16 @@ notseparatelypublishedresults. Removeunnecessarymodule(0)reset:everyoneof
 136selectedgeneratorsisoverwritteninALLcases,includingzeros. All818
 pre-projectionproducts/comparisons/certificates/capsunchanged,sourcefrozen
 beforefresh03. Fullmatrixcomparisonsdetectanystalerow.
+
+## Stage7 independent packed binary row-dot replay
+SingularCHECK03resource-manuallystopped,partialresultsnotaccepted;no timeout
+claim. FreezeCHECK61.rs/RUST_DRIVER/launcher/RUST-PROTOCOLanddonors before
+Rustdata. Readactualcubic/fixed/cohortbinaryarraysdirectly,rejectunknown
+syntax/nonbinary/duplicate/out-of-boundsentries. All818136x324ambientrows
+areselectedBEFOREprojection,allleftinverses/sourceproducts/controlschecked
+byrow-dot-columnparity;alsofullambientinvolution/jet/Jordanbindings.
+Globalregularcontrolrank37/kernel1,actualconstant1;changedinverse/source-row
+controls. Rustcompiler/run each1200s/4GiB,CPU0,oneworker,opt2/codegen1,
+standalonestd/noCargo/network. Allnativefailed/stoppedattemptsretained.
+No clockcomparisonorcohortdownscale;function-field/normalmodelpremises
+remainseparateacceptedsourcecalculations.

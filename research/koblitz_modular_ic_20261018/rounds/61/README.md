@@ -18,3 +18,7 @@ remain. The separate Lean driver uses CPU0; Singular is not CPU-pinned.
 PROTOCOL-METADATA61.md discloses historical copied annotations and amendments.
 NEXT.md preserves the next constructions and all original research lanes.
 The square-plan61.svg figure is explicitly proposed, not executed evidence.
+
+The complete binary replay uses REPLAY_RUST.sh with a fresh attempt and
+RUST-PROTOCOL.md. Its packed row-dot backend reuses R59 helpers; every source
+array is parsed strictly and all818 ambient reconstructions are retained.
