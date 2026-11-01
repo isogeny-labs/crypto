@@ -22,6 +22,7 @@ pub mod results;
 pub mod siblings;
 pub mod traits;
 pub mod transfers;
+pub mod volcano;
 pub mod walks;
 
 pub const TOOL: &str = "ecdb import";
@@ -204,6 +205,8 @@ pub enum Selection {
     Ecbench,
     /// The sibling repositories' curve records, dataset curves and measurements.
     Siblings,
+    /// ℓ-volcano levels, directions and End(E) from the stored census isogeny graphs.
+    Volcanoes,
 }
 
 /// Run the selected importers; `walk_files` overrides the default walk outputs.
@@ -246,6 +249,9 @@ pub async fn run(ctx: &Ctx<'_>, what: Selection, walk_files: Option<Vec<String>>
     }
     if all || what == Selection::Ecbench {
         reports.push(ecbench::import(ctx).await?);
+    }
+    if all || what == Selection::Volcanoes {
+        reports.push(volcano::import(ctx).await?);
     }
     Ok(reports)
 }

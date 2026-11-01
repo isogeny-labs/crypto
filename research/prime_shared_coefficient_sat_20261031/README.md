@@ -2,17 +2,19 @@
 
 ## Outcome
 
-The next prime-field index-calculus lead to pursue is the **odd-arity
-shared-divisor-coefficient system with quotient/remainder membership**, tested
-as one canonical predicate across exact enumeration, F4, CDCL/CNF, CNF-XOR and
-finite-field SMT.
+This subtree tests the **odd-arity shared-divisor-coefficient system with
+quotient/remainder membership** as one canonical predicate across exact
+enumeration, F4, CDCL/CNF, CNF-XOR and finite-field SMT.
 
-This is the second-ranked lead in the
-[31 October lead review](../prime_ic_lead_review_20261031/REPORT.md), after the
-hashed-factor-base Boolean-tensor lead. It is the best next experiment because
-it has an exact quadratic input, known witnesses at growing arity, and a clean
-way to test the user's SAT hypothesis without confusing a solver with a
-different mathematical predicate.
+The hardened
+[31 October lead review](../prime_ic_lead_review_20261031/REPORT.md) ranks the
+hashed-factor-base Boolean-tensor route first and instantiates the rank-two
+practical solver experiment as a fixed-arity-three chained-`S3` CDCL(T)/`F_p`
+screen. This quotient/remainder presentation is a representation candidate in
+that shared-coefficient mechanism family, not yet a production exponent
+screen. Its exact quadratic input, growing-arity witnesses and complete tiny
+panel make it a useful E0/E1 discriminator without confusing solvers that see
+different mathematical predicates.
 
 The implemented E0 gate passes:
 
@@ -26,9 +28,10 @@ The implemented E0 gate passes:
 - the census is 6 SAT targets, 12 UNSAT targets, and 6 models in each
   implementation, with 18/18 exact set matches.
 
-This is development correctness, not solver evidence. No msolve, CaDiCaL,
-CryptoMiniSat or cvc5 run was made, no timing was collected, and no
-index-calculus speedup is claimed.
+This is development correctness, not solver evidence. E0 ran no external
+solver. Subsequent preparation built and validated pinned solver toolchains,
+but no external solver has seen a study instance, no timing was collected, and
+no index-calculus speedup is claimed.
 
 ## Claim ledger
 
@@ -36,8 +39,8 @@ index-calculus speedup is claimed.
 |---|---|---|
 | The selected-chart remainder construction has a deterministic quadratic IR | supported for the implemented construction | strict generator/parser plus legacy fixture conformance |
 | The arity-three F17 predicate represents the intended rational, distinct-root decompositions | supported on the complete fixed toy panel | 18/18 exact projected coefficient-model-set matches against an algorithmically separate same-author group/interpolation oracle |
-| SAT/XOR beats F4 or enumeration | unknown | E1 exporter equivalence and the held-out E3 tournament have not run |
-| The mechanism scales better with arity | unknown | requires complete-work slopes on all four frozen rungs |
+| SAT/XOR beats F4 or enumeration | unknown | E1 exporter equivalence has not run; no performance screen is admitted |
+| The mechanism has exponent-changing scaling | unknown | requires a prospectively frozen fixed-`m=3` complete-cost panel with `e<0.5` and `a<1.5` |
 | The mechanism improves relation collection or ECDLP | unknown | requires E4 relation extraction, matrix construction, log replay and complete cost accounting |
 | A finite solver panel proves a subexponential algorithm | out of scope | requires a family theorem and a complete asymptotic cost proof |
 
@@ -73,13 +76,21 @@ The native tool in [`native`](native/) emits:
 - msolve prime-field polynomial input;
 - cvc5 `QF_FF` input;
 - ordinary CNF and CNF-XOR from one deterministic functional Boolean circuit;
+- strict msolve rational-parametrization parsing with Fp extraction and
+  canonical full-assignment replay;
+- fail-closed, hash-pinned SAT and msolve correctness-panel runners;
 - the exhaustive E0 F17 census.
 
 The Boolean lowering and a fail-closed external-solver runner are implemented
 and frozen in [E1_PROTOCOL.md](E1_PROTOCOL.md). The fixed study panel has not
 yet run. Its CaDiCaL/CNF and CryptoMiniSat/CNF-XOR projected model sets and
 checked UNSAT proofs must agree with the exact oracle before any performance
-row is admissible; msolve and cvc5 remain separate open E1 arms.
+row is admissible. The separate
+[comparator protocol](E1_COMPARATOR_PROTOCOL.md) freezes an msolve 0.11.0
+base-field cross-check; it is also unrun. cvc5 1.4.2 is proof-ineligible for
+finite-field UNSAT under the checked-proof policy and remains optional for SAT
+model cross-checking only. Its exact source/reference register is
+[`e1-comparator-inputs.sha256`](e1-comparator-inputs.sha256).
 
 ## Experiments
 
@@ -89,29 +100,29 @@ status is in [experiment-matrix.json](experiment-matrix.json).
 | Stage | Question | Current status | Decisive output |
 |---|---|---|---|
 | E0 | Is the canonical predicate internally and independently correct on tiny complete domains? | complete | exact set equality, legacy conformance, mutation rejection |
-| E1 | Do JSON, msolve, QF_FF, CNF and CNF-XOR preserve the same projected models? | SAT subgate frozen, not run; msolve/cvc5 open | exhaustive backend equivalence and checked UNSAT certificates |
-| E2 | Are the detector, limits and planned sample powered on disjoint scratch instances? | blocked | frozen binaries, limits, seed list and power receipt |
-| E3 | Does a SAT bundle have lower complete-work growth than enumeration and F4? | draft | held-out four-rung tournament with A/A, planted and matched-null controls |
+| E1 | Do JSON, msolve, QF_FF, CNF and CNF-XOR preserve the same projected models? | SAT and msolve subgates frozen, not run; cvc5 proof-ineligible | exhaustive model-set equivalence; independent checked certificates for every accepted UNSAT |
+| E2 | Can this representation be integrated into an admissible fixed-`m=3` complete-cost protocol? | blocked | semantic-object decision, source-bound `F_p` theory, setup/query ledger, power and resource receipts |
+| E3 | At fixed `m=3`, can one proof-eligible CDCL(T)/`F_p` bundle achieve natural-query `e<0.5` and reusable-setup `a<1.5`? | parent protocol is a hardened draft; this subtree is not admitted | complete `s=6..14` natural panel plus separately reported planted/UNSAT controls |
 | E4 | Does an advancing bundle improve a complete relation-collection pipeline? | conditional | verified relations, matrix rank/log replay and end-to-end cost |
 | E5 | Can an observed mechanism be proved for the family? | conditional | a theorem bounding solver work or a certified structural invariant |
 
-E3 advances a SAT bundle only if it is exactly correct, completes all four
-natural rungs, has a corrected upper 95% growth-slope interval at most `0.85`
-on the three largest rungs, and beats F4 in retired instructions on both
-largest jointly completed rungs outside the A/A interval. A lower slope bound
-at least `0.95` over three consecutive rungs, or all SAT bundles censoring
-before F4 on both largest common rungs, is evidence not to advance under this
-protocol. Other censoring is inconclusive.
+The earlier variable-arity `(m,t)=(3,3),(5,4),(7,5),(9,6)` E3 draft and its
+`0.85/0.95` screening thresholds were withdrawn before any performance data.
+They do not implement the complete index-calculus cost bridge. Any later
+performance amendment must hold `m=3` fixed, use actual `log2(p)/3`, account
+separately for reusable setup and online-plus-verification work, and apply the
+parent protocol's strict `a<1.5` and `e<0.5` gates on a complete natural panel.
 
-## Why this is the SAT test worth running
+## Why this is the SAT representation worth checking
 
 Prior direct Semaev bit-blasts and prime-field QF_FF coordinate encodings were
 poor, but they did not test this shared-coefficient predicate. Here the same
 `U` coefficients occur in every remainder layer. That repeated incidence is a
-specific propagation hypothesis. The matched-null arm preserves the field,
-equation/variable/degree multiset and support graph while randomizing the
-elliptic coefficients, so a SAT win can be separated from generic sparse-shape
-effects.
+specific propagation hypothesis worth checking at E1. It becomes a
+performance hypothesis only after a prospective amendment either proves
+projected-model equivalence to the parent's fixed-`m=3` semantic object or
+registers this as a separate representation with the same complete-cost
+accounting.
 
 The comparison object is the complete **representation plus solver bundle**.
 It would be invalid to attribute a win to CDCL alone, or to compare SAT on the
@@ -131,10 +142,12 @@ selected chart with F4 on a larger repeated-root chart.
   its [formal draft protocol](../prime_ic_lead_review_20261031/protocol.draft.json).
 - The [prior SAT/SMT design](../sat_smt_prime_ic_design_20261030/DESIGN.md),
   which rules out merely repeating the direct Semaev representation.
-- Official msolve input documentation, cvc5 finite-field documentation,
-  CaDiCaL DIMACS/proof documentation and CryptoMiniSat CNF-XOR/XLRUP
-  documentation were checked for exporter and certificate obligations. They
-  were not installed or benchmarked in E0.
+- Official msolve input/output and genericity-handling source, cvc5
+  finite-field proof behavior, CaDiCaL DIMACS/LRAT documentation and
+  CryptoMiniSat CNF-XOR/XLRUP documentation were checked for exporter,
+  parametrization and certificate obligations. The pinned development
+  toolchains passed non-study smoke checks; none was benchmarked or run on E0
+  study inputs.
 
 No novelty claim is made for divisor coefficients, quotient/remainder
 membership, SAT, XOR reasoning, F4, or PKM factor bases. The open contribution
@@ -155,6 +168,13 @@ cargo run --release --locked -- emit 17 2 2 3 4 1 0 6 qf-ff
 cargo run --release --locked -- emit 17 2 2 3 4 1 0 6 cnf
 cargo run --release --locked -- emit 17 2 2 3 4 1 0 6 cnf-xor
 ```
+
+The study runners are deliberately not included in the ordinary reproduction
+block. They require the exact frozen binaries, a 40-hex source revision, a
+fresh output directory, and a successful repository checkpoint gate. See
+[E1_PROTOCOL.md](E1_PROTOCOL.md) and
+[E1_COMPARATOR_PROTOCOL.md](E1_COMPARATOR_PROTOCOL.md) for their only
+admissible invocations.
 
 See [VALIDATION.md](VALIDATION.md) for the exact checks and environment
 limitations of this handoff.
