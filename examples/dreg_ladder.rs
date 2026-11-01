@@ -24,6 +24,13 @@
 //! offset by `M << 48`, the JSON line carries `"m"`, and controls are off
 //! (their density is defined for `M = 3`).
 //!
+//! `--min-sat K` keeps walking the same deterministic stream after the
+//! requested UNSAT quota until at least `K` natural satisfiable draws have
+//! also been emitted (or `--max-draws` is reached).  Extra UNSAT draws seen
+//! while waiting are emitted and retained but are not added to the requested
+//! UNSAT panel.  This lets a preregistered stream supply natural soundness
+//! controls without changing seeds or selecting on a later closure outcome.
+//!
 //! `--shard I/J` (with `--first-draw F`, default 0) measures a fixed draw
 //! range in parallel processes: process `I` of `J` walks the cell's one
 //! sequential stream to `--max-draws`, sampling every draw (cheap) and
@@ -92,6 +99,7 @@ fn main() {
         })
         .collect();
     let want_unsat = num("--unsat", 4) as usize;
+    let min_sat = num("--min-sat", 0) as usize;
     let max_draws = num("--max-draws", 4096) as usize;
     let ffd_max = num("--ffd-max", 5) as u32;
     let controls = num("--controls", 0) as usize;
@@ -112,6 +120,10 @@ fn main() {
     let only_unsat = flag("--unsat-index").map(|v| v.parse::<usize>().expect("--unsat-index K"));
     let control_only = args.iter().any(|a| a == "--control-only");
     assert!(
+        (only_unsat.is_none() && !control_only) || min_sat == 0,
+        "--min-sat applies only to a complete sequential cell stream"
+    );
+    assert!(
         m == 3 || (controls == 0 && !control_only),
         "controls are defined for m = 3 only"
     );
@@ -123,7 +135,7 @@ fn main() {
     });
     if let Some((i, j)) = shard {
         assert_eq!(cells.len(), 1, "one cell per process in this mode");
-        assert!(only_unsat.is_none() && !control_only && controls == 0);
+        assert!(only_unsat.is_none() && !control_only && controls == 0 && min_sat == 0);
         let (n, ell, d_max) = cells[0];
         let first = num("--first-draw", 0) as usize;
         shard_run(
@@ -184,7 +196,7 @@ fn main() {
         let mut unsat: Vec<LadderDraw> = Vec::new();
         let (mut drawn, mut sat) = (0usize, 0usize);
         let mut shape = None;
-        while unsat.len() < want_unsat && drawn < max_draws {
+        while (unsat.len() < want_unsat || sat < min_sat) && drawn < max_draws {
             let d = ladder_draw_m(m, n, ell, d_max, ffd_max, &mut rng).expect("cell builds");
             drawn += 1;
             shape = Some((d.n_vars, d.n_eqs));
@@ -205,7 +217,7 @@ fn main() {
             );
             if d.outcome == LadderOutcome::Satisfiable {
                 sat += 1;
-            } else {
+            } else if unsat.len() < want_unsat {
                 eprintln!(
                     "n={n} ℓ={ell}: unsat draw {} -> {} ({:.1}s)",
                     unsat.len(),
@@ -213,6 +225,11 @@ fn main() {
                     d.secs
                 );
                 unsat.push(d);
+            } else {
+                eprintln!(
+                    "n={n} ℓ={ell}: retained extra unsat draw {} while awaiting natural SAT control",
+                    drawn - 1
+                );
             }
         }
         let (n_vars, n_eqs) = shape.unwrap_or((0, 0));

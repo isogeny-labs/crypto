@@ -57,6 +57,63 @@ fn monomials_up_to(n_vars: u64, d: u32) -> f64 {
     total
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct CommittedXlPlan {
+    /// A resolved degree or the first degree not covered by an `at_least`
+    /// lower bound.  `None` means the ladder stopped on a resource cap and
+    /// established no XL-degree identity.
+    degree: Option<u32>,
+    resolved: bool,
+    ceiling: u32,
+}
+
+/// Interpret the ladder outcome without turning its resource cap into a
+/// mathematical statement.  A capped draw is still exactly UNSAT (the exact
+/// solution count is separate), so an explicitly bounded fresh scan is
+/// admissible.  Without `--to`, however, there is no principled ceiling to
+/// infer from a cap.
+fn committed_xl_plan(outcome: &Value, to: Option<u32>) -> Result<CommittedXlPlan, String> {
+    let kind = outcome["kind"]
+        .as_str()
+        .ok_or_else(|| "committed outcome has no kind".to_string())?;
+    let (degree, resolved) = match kind {
+        "resolved" => (
+            Some(
+                outcome["degree"]
+                    .as_u64()
+                    .ok_or_else(|| "resolved outcome has no degree".to_string())?
+                    as u32,
+            ),
+            true,
+        ),
+        "at_least" => (
+            Some(
+                outcome["degree"]
+                    .as_u64()
+                    .ok_or_else(|| "at_least outcome has no degree".to_string())?
+                    as u32,
+            ),
+            false,
+        ),
+        "caps_hit" => (None, false),
+        _ => return Err(format!("unsupported unsatisfiable outcome kind {kind:?}")),
+    };
+    let ceiling = match (to, kind, degree) {
+        (Some(d), _, _) => d,
+        (None, "resolved", Some(d)) => d,
+        (None, "at_least", Some(d)) if d > 0 => d - 1,
+        (None, "caps_hit", None) => {
+            return Err("caps_hit outcome requires an explicit --to degree".to_string())
+        }
+        _ => return Err("committed outcome has an invalid degree".to_string()),
+    };
+    Ok(CommittedXlPlan {
+        degree,
+        resolved,
+        ceiling,
+    })
+}
+
 fn degree_json(d: &ClosureDegree) -> String {
     format!(
         r#"{{"degree":{},"xl_refuted":{},"closure_refuted":{},"saturated":{},"xl_rank":{},"closure_rank":{},"columns":{},"closure_products":{},"closure_word_ops":{},"secs":{:.3}}}"#,
@@ -249,14 +306,22 @@ fn main() {
                 .flat_map(|p| p.terms.iter())
                 .fold(0u64, |acc, t| acc | t.mask)
                 .count_ones() as u64;
-            let fixed_json = format!(
-                "[{}]",
-                fixes
-                    .iter()
-                    .map(|(v, b)| format!("[{v},{}]", *b as u8))
-                    .collect::<Vec<_>>()
-                    .join(",")
-            );
+            // Keep an unspecialised replay byte-compatible in its algebraic
+            // fields with the historical identity row.  The optional field
+            // is present only when this is genuinely a different,
+            // specialised system.
+            let fixed_json = if fixes.is_empty() {
+                String::new()
+            } else {
+                format!(
+                    r#","fixed":[{}]"#,
+                    fixes
+                        .iter()
+                        .map(|(v, b)| format!("[{v},{}]", *b as u8))
+                        .collect::<Vec<_>>()
+                        .join(",")
+                )
+            };
             if let Some(d) = sparse {
                 let started = std::time::Instant::now();
                 let got = sparse_closure_refutes(&sys.equations, sys.n_vars, d, max_entries);
@@ -269,7 +334,7 @@ fn main() {
                     None => r#""capped":true"#.to_string(),
                 };
                 println!(
-                    r#"{{"source":"{file}","cell":"{}","m":{m},"n":{n},"ell":{ell},"draw":{},"n_vars":{},"committed_outcome":{},"engine":"sparse","degree":{d},"max_entries":{max_entries},{body},"secs":{secs:.3}}}"#,
+                    r#"{{"source":"{file}","cell":"{}","m":{m},"n":{n},"ell":{ell},"draw":{},"n_vars":{},"committed_outcome":{}{fixed_json},"engine":"sparse","degree":{d},"max_entries":{max_entries},{body},"secs":{secs:.3}}}"#,
                     v["cell"].as_str().unwrap_or(""),
                     v["draw"],
                     sys.n_vars,
@@ -304,11 +369,13 @@ fn main() {
                 );
                 continue;
             }
-            // The committed XL degree: resolved at `D`, or `≥D` (built to D−1).
-            let committed = v["outcome"]["degree"].as_u64().expect("committed degree") as u32;
-            let xl_known = v["outcome"]["kind"] == "resolved";
-            let ceiling = to.unwrap_or(if xl_known { committed } else { committed - 1 });
-            let top = (3..=ceiling)
+            // A resolved outcome fixes the XL degree; `at_least D` covers
+            // degrees below D.  `caps_hit` fixes no degree at all, but its
+            // exact-zero solution count still permits a fresh explicit
+            // `--to D` scan without an XL identity assertion.
+            let committed = committed_xl_plan(&v["outcome"], to)
+                .unwrap_or_else(|e| panic!("{file} draw {}: {e}", v["draw"]));
+            let top = (3..=committed.ceiling)
                 .take_while(|&d| monomials_up_to(occurring, d) <= max_cols)
                 .last()
                 .unwrap_or(2);
@@ -321,13 +388,15 @@ fn main() {
                 // XL identity: the plain basis refutes exactly at the
                 // committed degree, never below it.  Past a `≥D` bound the
                 // committed record says nothing, and XL is a new reading.
-                if fixes.is_empty() && (d < committed || xl_known) {
-                    assert_eq!(
-                        step.xl_refuted,
-                        xl_known && d >= committed,
-                        "{file} draw {}: XL at degree {d} disagrees with the committed outcome",
-                        v["draw"]
-                    );
+                if let Some(committed_degree) = committed.degree {
+                    if fixes.is_empty() && (d < committed_degree || committed.resolved) {
+                        assert_eq!(
+                            step.xl_refuted,
+                            committed.resolved && d >= committed_degree,
+                            "{file} draw {}: XL at degree {d} disagrees with the committed outcome",
+                            v["draw"]
+                        );
+                    }
                 }
                 let done = step.closure_refuted;
                 scan.push(step);
@@ -340,7 +409,7 @@ fn main() {
             let show = |x: Option<u32>| x.map_or("null".to_string(), |d| d.to_string());
             let measured_to = scan.last().map(|d| d.degree).unwrap_or(2);
             println!(
-                r#"{{"source":"{file}","cell":"{}","m":{m},"n":{n},"ell":{ell},"draw":{},"n_vars":{},"committed_outcome":{},"fixed":{fixed_json},"xl_degree":{},"closure_degree":{},"measured_to":{measured_to}{ck},"max_cols":{max_cols},"scan":[{}]}}"#,
+                r#"{{"source":"{file}","cell":"{}","m":{m},"n":{n},"ell":{ell},"draw":{},"n_vars":{},"committed_outcome":{}{fixed_json},"xl_degree":{},"closure_degree":{},"measured_to":{measured_to}{ck},"max_cols":{max_cols},"scan":[{}]}}"#,
                 v["cell"].as_str().unwrap_or(""),
                 v["draw"],
                 sys.n_vars,
@@ -362,5 +431,45 @@ fn main() {
         if let Some(l) = status.lines().find(|l| l.starts_with("VmHWM:")) {
             eprintln!("peak {l}");
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn capped_unsat_needs_an_explicit_scan_ceiling() {
+        let capped = json!({"kind": "caps_hit", "built": 2});
+        assert!(committed_xl_plan(&capped, None).is_err());
+        assert_eq!(
+            committed_xl_plan(&capped, Some(4)).unwrap(),
+            CommittedXlPlan {
+                degree: None,
+                resolved: false,
+                ceiling: 4,
+            }
+        );
+    }
+
+    #[test]
+    fn resolved_and_lower_bound_identities_are_preserved() {
+        assert_eq!(
+            committed_xl_plan(&json!({"kind": "resolved", "degree": 4}), None).unwrap(),
+            CommittedXlPlan {
+                degree: Some(4),
+                resolved: true,
+                ceiling: 4,
+            }
+        );
+        assert_eq!(
+            committed_xl_plan(&json!({"kind": "at_least", "degree": 4}), None).unwrap(),
+            CommittedXlPlan {
+                degree: Some(4),
+                resolved: false,
+                ceiling: 3,
+            }
+        );
     }
 }
