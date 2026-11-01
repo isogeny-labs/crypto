@@ -1,0 +1,158 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "EXP-generator-multiplier-binary-e2e-20261101",
+  "version": 1,
+  "created": "2026-11-01",
+  "repository": "crypto",
+  "study_dir": "research/generator_multiplier_e2e_20261101/binary",
+  "authors": ["Codex"],
+  "links": {
+    "spec": "research/generator_multiplier_e2e_20261101/binary/spec.json",
+    "note": "research/generator_multiplier_e2e_20261101/binary/PROTOCOL.md",
+    "training": "research/ic_improve_20261023/BINARY_README.md"
+  },
+  "question": "Does integer-multiple signed-graph batching produce a significant complete-cold end-to-end improvement over coordinate-subspace and best plain-seed bases on a registered held-out random-binary curve?",
+  "claims": [
+    {"id": "C-correct", "text": "Every completed arm recovers and independently verifies the planted scalar.", "class": "exact_computation", "decided_by": []},
+    {"id": "C-cost", "text": "The multiplier base lowers complete counted cost against the coordinate-subspace and best plain-seed controls on this random-binary curve.", "class": "comparative", "decided_by": ["C-coordinate", "C-plain"], "if_supported": "a scoped constant-factor counted-cost improvement for this native signed MITM pipeline", "if_not_supported": "the relation advantage did not lower complete counted cost under this protocol"},
+    {"id": "C-e2e", "text": "The multiplier base lowers the L2 complete-cold method-call wall interval against the coordinate control beyond A/A noise.", "class": "comparative", "decided_by": ["C-coordinate"], "if_supported": "a scoped end-to-end wall-time improvement on the pinned host class and toy curve", "if_not_supported": "no end-to-end wall-time improvement is established"},
+    {"id": "C-scope", "text": "No result here establishes an exponent change, improves the algebraic Weil-descent route, or rules out higher-degree extension-field algorithms.", "class": "out_of_scope", "decided_by": []}
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "Known signed integer multiples let the pair table expose 32 vertices per seed while elimination solves only eight seed-log columns, reducing relation and matrix work enough to offset construction and table costs.",
+      "mechanism": "Every table point has a known coefficient on one seed column; the table vertex count grows without a matching increase in unknown factor-base logarithms.",
+      "predictions": [
+        {
+          "id": "P-count", "metric": "s", "direction": "lower", "minimum_effect": "candidate/control point ratio at most 0.50 with the 95% upper bound below 1 against coordinate-subspace and plain-best",
+          "provenance": {"written_at": "2026-11-01", "data_seen": [{"path": "research/ic_improve_20261023/BINARY_README.md", "measured": "merged degree-26 and degree-28 training curves"}], "sample_status": "partially_in_sample", "decisive_scope": "the registered degree-27 seed-59297 curve, 12 targets from target_seed 2026110202, and all six measured rounds were unseen in multiplier training"},
+          "role": "decisive"
+        },
+        {
+          "id": "P-wall", "metric": "method_call_wall_ns", "direction": "lower", "minimum_effect": "candidate/coordinate point ratio at most 0.70 with the 95% upper bound below 1 and candidate A/A containing 1",
+          "provenance": {"written_at": "2026-11-01", "data_seen": [{"path": "research/ic_improve_20261023/BINARY_README.md", "measured": "operation-count training only; complete-cold ecbench wall is the missing gate"}], "sample_status": "partially_in_sample", "decisive_scope": "the held-out degree-27 curve and every L2 method-call cell; earlier work observed no such complete-cold clock"},
+          "role": "decisive"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "rho-neg", "role": "reference", "description": "generic negation rho reference",
+      "instrument": {"repo": "crypto", "commit": null, "build": [["cargo", "+1.99.1", "build", "--locked", "--release", "--bin", "ecbench"]], "binary_sha256": null, "flags": {}, "env": {"RAYON_NUM_THREADS": "1", "OMP_NUM_THREADS": "1"}, "threads": 1},
+      "parameters": {"method": "rho.negation"}
+    },
+    {
+      "id": "coordinate-subspace", "role": "baseline", "description": "dimension-nine coordinate-defined subspace base",
+      "instrument": {"repo": "crypto", "commit": null, "build": [["cargo", "+1.99.1", "build", "--locked", "--release", "--bin", "ecbench"]], "binary_sha256": null, "flags": {}, "env": {"RAYON_NUM_THREADS": "1", "OMP_NUM_THREADS": "1"}, "threads": 1},
+      "parameters": {"method": "ic.pipeline", "factor_base": "binary-subspace:dimension=9", "oracle": "mitm:negation_folded=1,m=3"}, "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "plain-best", "role": "baseline", "description": "interpolated best plain-seed base for degree 27",
+      "instrument": {"repo": "crypto", "commit": null, "build": [["cargo", "+1.99.1", "build", "--locked", "--release", "--bin", "ecbench"]], "binary_sha256": null, "flags": {}, "env": {"RAYON_NUM_THREADS": "1", "OMP_NUM_THREADS": "1"}, "threads": 1},
+      "parameters": {"method": "ic.pipeline", "factor_base": "binary-multiplier:size=320,mult=1", "oracle": "mitm:negation_folded=1,m=3"}, "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "plain-same-seeds", "role": "control_positive", "description": "the candidate's eight seeds without multiplier closure",
+      "instrument": {"repo": "crypto", "commit": null, "build": [["cargo", "+1.99.1", "build", "--locked", "--release", "--bin", "ecbench"]], "binary_sha256": null, "flags": {}, "env": {"RAYON_NUM_THREADS": "1", "OMP_NUM_THREADS": "1"}, "threads": 1},
+      "parameters": {"method": "ic.pipeline", "factor_base": "binary-multiplier:size=8,mult=1", "oracle": "mitm:negation_folded=1,m=3"}, "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "multiplier", "role": "candidate", "description": "eight seed columns with 32 signed integer multiples per seed",
+      "instrument": {"repo": "crypto", "commit": null, "build": [["cargo", "+1.99.1", "build", "--locked", "--release", "--bin", "ecbench"]], "binary_sha256": null, "flags": {}, "env": {"RAYON_NUM_THREADS": "1", "OMP_NUM_THREADS": "1"}, "threads": 1},
+      "parameters": {"method": "ic.pipeline", "factor_base": "binary-multiplier:size=8,mult=32", "oracle": "mitm:negation_folded=1,m=3"}, "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "multiplier-aa", "role": "control_aa", "description": "an independently scheduled duplicate of the candidate",
+      "instrument": {"repo": "crypto", "commit": null, "build": [["cargo", "+1.99.1", "build", "--locked", "--release", "--bin", "ecbench"]], "binary_sha256": null, "flags": {}, "env": {"RAYON_NUM_THREADS": "1", "OMP_NUM_THREADS": "1"}, "threads": 1},
+      "parameters": {"method": "ic.pipeline", "factor_base": "binary-multiplier:size=8,mult=32", "oracle": "mitm:negation_folded=1,m=3"}, "same_instrument_as": "rho-neg"
+    }
+  ],
+  "controls": {
+    "aa": {"present": true, "comparison": "C-aa", "not_applicable_reason": null},
+    "positive": {"present": true, "arm": "plain-same-seeds", "expected_detection": "the frozen detector reports the training-known large reduction from restoring the multiplier closure", "not_applicable_reason": null},
+    "negative": {"present": false, "arm": null, "null_population": null, "not_applicable_reason": "this is a paired method-cost comparison on fixed instances, not a population-structure claim"}
+  },
+  "variable_ledger": {
+    "independent": [
+      {"name": "factor_base", "levels": ["coordinate subspace", "plain best", "plain same seeds", "integer multiplier"]},
+      {"name": "algorithm", "levels": ["index calculus", "rho"]}
+    ],
+    "factors": [
+      {"name": "curve", "treatment": "fixed", "value": "icv1-f2m27-tm20293-ca4ad8af", "how": "one registered random-binary degree-27 curve not used in multiplier training"},
+      {"name": "targets", "treatment": "randomized", "value": "12 targets, target_seed 2026110202", "how": "uniform_scalar_sha256_v1, independent of arm and unseen in training"},
+      {"name": "binary", "treatment": "fixed", "value": "one post-merge ecbench binary", "how": "binary hash recorded in every row"},
+      {"name": "threads", "treatment": "fixed", "value": 1, "how": "one native thread and a whole reserved core"},
+      {"name": "algorithm_seed", "treatment": "randomized", "how": "ecbench derives and records a seed per execution from the frozen measurement seed"},
+      {"name": "arm_order", "treatment": "crossed", "how": "alternate_measured balances each arm position across six measured rounds"},
+      {"name": "host_load", "treatment": "measured", "how": "L2 isolation, steal, PSI, run queue and foreign busy ticks recorded per row"},
+      {"name": "table_vertices", "treatment": "crossed", "how": "the dimension-nine coordinate control has the candidate's approximate signed vertex scale"}
+    ],
+    "comparisons": [
+      {"id": "C-coordinate", "arms": ["coordinate-subspace", "multiplier"], "differs_in": ["factor_base"], "design": "factorial"},
+      {"id": "C-plain", "arms": ["plain-best", "multiplier"], "differs_in": ["factor_base"], "design": "one_factor"},
+      {"id": "C-same-seeds", "arms": ["plain-same-seeds", "multiplier"], "differs_in": ["factor_base"], "design": "one_factor"},
+      {"id": "C-rho", "arms": ["rho-neg", "multiplier"], "differs_in": ["algorithm"], "design": "one_factor"},
+      {"id": "C-aa", "arms": ["multiplier", "multiplier-aa"], "differs_in": [], "design": "aa"}
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": true
+  },
+  "randomization": {
+    "arm_order": "interleaved", "arm_order_reason": null,
+    "seed_derivation": {"method": "harness_drawn", "seeds": [], "nonce": null, "note": "ecbench derives every target and algorithm seed from the frozen spec and records it"},
+    "instance_sampling": {"rule": "12 target scalars from target_seed 2026110202 on the fixed registered curve", "independent_of_arm": true},
+    "blinding": {"analysis_labels_masked": false, "how": "the exact ecbench analysis script and thresholds are frozen before data; factor-base inventories reveal the methods, so label masking would not blind this analyst", "unmasked_at": null}
+  },
+  "sample_size": {
+    "instances": 12, "replicates": 6, "warmups": 1,
+    "power": {"method": "paired_bootstrap", "alpha": 0.05, "tests_in_family": 2, "correction": "other", "rank_test_n": null, "min_attainable_two_sided_p": null, "passes": true, "note": "72 paired cells per arm; a conjunctive gate requires both comparisons, the target effects are at least 50% by rule, and training effects were 3-7x"},
+    "preflight_runtime": {"fixed_seconds": 180.0, "per_sample_seconds": 1.0, "threads": 1, "estimated_total_seconds": 684.0, "measured_on": "merged 2026-10-23 four-target operation-count training plus current exact planning; conservative wall estimate, no held-out timing observed"}
+  },
+  "metrics": {
+    "primary": [
+      {"id": "s", "name": "S", "unit": "total GAE / sqrt(r)", "kind": "counted", "definition": "all charged factor-base, oracle, relation, elimination and verification work divided by sqrt(r)", "source": "records.jsonl cost.s", "aggregation": "paired_ratio", "resolution": "1 GAE / sqrt(r)", "uncertainty": "paired_bootstrap_ci95"},
+      {"id": "total_gae", "name": "complete counted work", "unit": "ecbench.gae", "kind": "counted", "definition": "all charged phases of one verified method call", "source": "records.jsonl cost.total_gae", "aggregation": "paired_ratio", "resolution": "1 GAE", "uncertainty": "paired_bootstrap_ci95"},
+      {"id": "method_call_wall_ns", "name": "complete cold method-call wall", "unit": "ns", "kind": "timed", "definition": "per-call setup through solve, in-child verification and report completion; excludes workload construction and process launch", "source": "records.jsonl time.method_call_wall_ns", "aggregation": "paired_ratio", "resolution": "1 ns", "uncertainty": "paired_bootstrap_ci95"}
+    ],
+    "secondary": [
+      {"id": "process_wall_ns", "name": "fork-to-reap wall", "unit": "ns", "kind": "timed", "definition": "whole child process including workload reconstruction", "source": "records.jsonl time.process_wall_ns", "aggregation": "paired_ratio", "resolution": "1 ns", "uncertainty": "paired_bootstrap_ci95"},
+      {"id": "relations", "name": "relation trials and rank work", "unit": "counts", "kind": "counted", "definition": "relations-phase GAE, targets tried, relations found, matrix rows and rank", "source": "records.jsonl phases and counters", "aggregation": "median", "resolution": "1", "uncertainty": "range"}
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2", "warmups": 1, "order": "alternate", "clock": "monotonic",
+    "counters": ["targets_tried", "relations_found", "matrix_rows", "matrix_rank", "phase.factor_base.gae", "phase.oracle_setup.gae", "phase.relations.gae", "phase.linear_algebra.gae"],
+    "record": ["cpu_model", "kernel_release", "binary_sha256", "env_class_id", "isolation.level", "isolation.blockers", "steal_ticks", "psi", "run_cpu", "threads", "max_rss_kib"],
+    "timed_primary_justification": "The request is specifically for end-to-end speed; counted GAE remains co-primary, and the complete cold clock is admitted only at L2 against the session's A/A interval."
+  },
+  "execution": {
+    "backend": "isolab-k8s", "queue": "isolab", "placement": {"instance_type": "c8a.2xlarge", "cpus": 8, "spot": true}, "measurement_class": "measurement", "timeout_seconds": 3600,
+    "checkpoint": {"policy": "none", "interval_seconds": null, "grace_seconds": null, "restore_validation": "none", "after_restore": {"wall_time": "invalid", "counted_units": "valid"}},
+    "retries": {"infrastructure_only": true, "max_attempts": 1}
+  },
+  "stopping_rules": [
+    {"rule": "fixed design: 6 arms x 12 targets x (1 warmup + 6 measured rounds) = 504 executions, then stop", "kind": "fixed_n", "preregistered": true},
+    {"rule": "wrong answers, exhaustion and timeouts remain rows; no parameter, target or threshold changes after inspection", "kind": "invalidation", "preregistered": true}
+  ],
+  "invalidation_rules": ["a wrong_answer row is excluded from the speed ratio and reported", "wall rows below L2 or after a restore are descriptive only; counted work remains", "a failed candidate A/A timing gate makes the wall claim inconclusive"],
+  "decision_rule": {
+    "text": "C-cost requires multiplier/coordinate-subspace and multiplier/plain-best S ratios each <=0.50 with paired-bootstrap 95% upper bounds <1. C-e2e additionally requires multiplier/coordinate-subspace method_call_wall ratio <=0.70 with upper bound <1 and the multiplier/multiplier-aa method-call interval containing 1.",
+    "comparison_ids": ["C-coordinate", "C-plain"], "threshold": "joint conjunctive thresholds stated in text", "statistic": "ratio of paired sums over workload-round cells", "interval": "target-clustered paired bootstrap interval of the ratio of sums, resampling targets and rounds within target, 95%; the linearised t interval is reported as a sensitivity check", "multiple_comparison_correction": "other", "effect_size_measure": "candidate/control ratio and reciprocal speed factor", "verdict_vocabulary": ["supported_within_scope", "within_control_distribution", "invalid_measurement", "inconclusive"]
+  },
+  "analysis_plan": {
+    "script": {"path": "research/generator_multiplier_e2e_20261101/binary/analyze.sh", "sha256": "a6a84275c32648e24f507436c96028e1c78c168221231d2dfa4180e579ed710d"},
+    "inputs": ["sessions/binary/records.jsonl"], "outputs": ["ecbench verification receipt", "one-unit table", "five frozen comparison JSON records"], "blinded": false, "frozen_before_data": true
+  },
+  "reporting": {"export_schema": "experiment.export/v1", "review_schema": "experiment.review/v1", "graphs": ["paired S and complete-cold wall ratios with 95% intervals", "phase and relation-work decomposition"], "report_dir": "reports"},
+  "inadmissible": ["retuning size or multiplier from held-out rows", "dropping failures or slow targets", "calling a relation-stage ratio an end-to-end speedup", "claiming a new asymptotic exponent", "claiming coordinate-defined or higher-degree extension-field bases are disproved"],
+  "literature": [
+    {"ref": "Semaev, ePrint 2004/031", "provenance": "retrieved", "claim": "summation-polynomial index calculus framework", "verified_by": "source review 2026-11-01"},
+    {"ref": "Galbraith, Petit, Shani and Ti, ePrint 2014/806", "provenance": "retrieved", "claim": "factor-base coset choice can move relation probability; their characteristic-two experiments did not beat rho", "verified_by": "source review 2026-11-01"},
+    {"ref": "Corrigan-Gibbs and Kogan, ePrint 2017/1113", "provenance": "retrieved", "claim": "generic preprocessing lower bounds constrain this table mechanism; they do not prove an implementation ratio", "verified_by": "source review 2026-11-01"},
+    {"ref": "research/ic_improve_20261023/BINARY_README.md", "provenance": "internal", "claim": "merged parameter training, not confirmatory evidence", "verified_by": "repository review 2026-11-01"}
+  ],
+  "amendments": [],
+  "freeze": {"status": "draft", "protocol_sha256": null, "commit": null, "frozen_at": null, "filed_before_affected_data": true}
+}
