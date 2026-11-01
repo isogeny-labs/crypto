@@ -20,22 +20,22 @@ the odds of censoring. Both use the binary of `examples/pkm_tower_pilot.rs` at o
 `command` (argv, no shell), per job, with `K` = 0 or 1:
 
 ```
-pkm_tower_pilot --p 2013265921 --ladder-t none --planted 0 --random 2 --engine tower --kinds kummer --m 2 \
-  --controls tower --budget 86400 --max-dense 27900000000 --trace --t-min 14 --max-t 14 --targets K --cap 6 \
-  --out /work/T-t14-kK-c6.jsonl
+["/usr/local/bin/run_cell", "K"]
 ```
 
-with `RAYON_NUM_THREADS=16` if the tool takes an environment, else wrap in an image entry script that sets it. The
-options are those of `run_cells.sh T 6 K` with the 112 GiB request of Amendment 7 A (`--max-dense` = the largest
-multiple of 10⁸ with `4·C <= 112 GiB − 8 GiB` = 27,900,000,000) and `--budget 86400`. The `--out` file and the
-stderr trace must be uploaded to `ISOLAB_RESULTS_URI` before the job ends (a `/work` path is temporary).
+`image/run_cell.sh` runs exactly the options of `run_cells.sh T 6 K` with the 112 GiB request of Amendment 7 A
+(`--budget 86400`, `--max-dense 27900000000`, the largest multiple of 10⁸ with `4·C <= 112 GiB − 8 GiB`,
+`RAYON_NUM_THREADS=16`), writes `/work/T-t14-kK-c6.{jsonl,log,sha256}` and uploads them to `ISOLAB_RESULTS_URI`
+(`/work` is temporary).
 
-## Image (not built)
+## Image (recipe in `image/`, not built or pushed)
 
-No existing workflow builds one. It needs `pkm_tower_pilot` from a pinned 40-character commit of `aburan28/crypto`
-`main` (a static `x86_64-unknown-linux-musl` build, as `build-info.json` records for ecbench), `aws` for the upload,
-`USER 1000:1000`, `HOME=/work`, in the lab's private ECR repository, referenced by digest. Record the source SHA,
-binary SHA-256 and OCI digest as three distinct values (SKILL.md). Taking `Dockerfile.ecbench` as the template.
+`image/build_image.sh COMMIT` clones `aburan28/crypto` at one pinned `main` commit, builds the static musl
+`pkm_tower_pilot` (`cargo +1.99.1 build --locked --release --no-default-features --example pkm_tower_pilot --target
+x86_64-unknown-linux-musl`, with `musl-tools`), builds `image/Dockerfile` (the `Dockerfile.ecbench` base, UID 1000),
+pushes it to the lab's ECR repository and prints the source SHA, binary SHA-256 and OCI digest. Keep the three
+distinct. The Dockerfile and push were not run here (no Docker daemon, no ECR access). The cargo build was run here:
+see `HANDOFF.md`. **Use a commit that contains the `whole_worker.rs` cast fix** or the build fails.
 
 ## Reading and what to record
 

@@ -2,6 +2,7 @@
 pub mod budget;
 pub mod capture;
 pub mod curves;
+pub mod custody;
 mod execution;
 pub mod export;
 pub mod relations;
@@ -48,6 +49,8 @@ pub struct DatasetArgs {
 
 #[derive(Subcommand)]
 pub enum DatasetCommand {
+    /// Create, verify, or locally restore a restricted full-run custody bundle.
+    Custody(custody::CustodyArgs),
     /// Validate a delivered launch grant and start the frozen bounded worker.
     Start {
         #[arg(long)]
@@ -970,6 +973,7 @@ fn fetch_budget_object(
 
 pub fn run(args: &DatasetArgs) -> Result<(), String> {
     match &args.command {
+        DatasetCommand::Custody(a) => println!("{}", custody::run(a)?),
         DatasetCommand::Start { resume } => {
             let outcome = startup_gate::start(*resume).map_err(|e| e.to_string())?;
             println!(

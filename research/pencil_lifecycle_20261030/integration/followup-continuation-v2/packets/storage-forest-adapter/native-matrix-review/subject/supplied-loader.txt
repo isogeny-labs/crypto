@@ -1,0 +1,36 @@
+    let mut theta = BTreeMap::new();
+    let mut normalization = BTreeMap::new();
+    for line in theta_rows.lines() {
+        let v: Value = serde_json::from_str(line).unwrap();
+        let p = v["p"].as_u64().unwrap();
+        normalization.insert(
+            p,
+            (
+                v["selected"]["r0"].as_u64().unwrap(),
+                v["selected"]["delta"].as_u64().unwrap(),
+            ),
+        );
+        theta.insert(p, v["selected"]["constants"].clone());
+    }
+    let model_rows =
+        fs::read_to_string("research/kummer_coordinates_20261022/results/generic-models.jsonl")
+            .unwrap();
+    let mut acts = BTreeMap::new();
+    for line in model_rows.lines() {
+        let v: Value = serde_json::from_str(line).unwrap();
+        let p = v["p"].as_u64().unwrap();
+        let (r0, delta) = normalization[&p];
+        let a: Vec<_> = v["torsion_actions"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|z| {
+                (
+                    mul(sub(z["root"].as_u64().unwrap(), r0, p), inv(delta, p), p),
+                    matrix(&z["action"]["matrix"]),
+                )
+            })
+            .collect();
+        acts.insert(p, a);
+    }
+    let (mut passed, mut failed, mut inapp, mut repaired) = (0, 0, 0, 0);

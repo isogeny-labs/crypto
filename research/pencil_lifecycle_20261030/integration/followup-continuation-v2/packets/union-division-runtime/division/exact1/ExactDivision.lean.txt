@@ -1,0 +1,66 @@
+import DivisionLoop
+set_option autoImplicit false
+namespace NativeDivision
+open Polynomial ScaleTrim MonicRemainder MonicTermination MonicZeroTest
+noncomputable def checkedDiv (p:UInt64) (b a:List UInt64) (fuel:Nat) :=
+ if b.getLast?=some 1 then qloop p b fuel 0 (trimFuel a.length a) else none
+
+theorem checked_projection (p:UInt64) (b a:List UInt64) (fuel:Nat) :
+ (checkedDiv p b a fuel).map Prod.snd=checkedPrem p b a fuel := by
+ unfold checkedDiv checkedPrem premModel
+ split_ifs
+ · exact remainder_projection p b fuel 0 _
+ · rfl
+
+theorem checked_correct (p:UInt64) [Fact p.toNat.Prime] (b a:List UInt64)
+ (hp:0<p.toNat) (hb:p.toNat<2^31) (hbs:Canon p b) (ha:Canon p a)
+ (fuel:Nat) (q:(ZMod p.toNat)[X]) (out:List UInt64)
+ (ho:checkedDiv p b a fuel=some (q,out)) :
+ Canon p out ∧ wordsPoly p a=q*wordsPoly p b+wordsPoly p out ∧
+ (out=[] ∨ out.length<b.length) := by
+ unfold checkedDiv at ho
+ split_ifs at ho with hm
+ have h:=success_correct p b hp hb hbs hm fuel 0 q _ out (trim_good p _ a ha) (zero_fresh b _) ho
+ refine ⟨h.1,?_,h.2.2.2⟩
+ simpa only [zero_mul,zero_add,trim_preserves] using h.2.2.1.symm
+
+theorem checked_exists (p:UInt64) [Fact p.toNat.Prime] (b a:List UInt64)
+ (hp:0<p.toNat) (hb:p.toNat<2^31) (hbs:Canon p b) (ha:Canon p a)
+ (hm:b.getLast?=some 1) (fuel:Nat) (hf:a.length≤fuel) :
+ ∃q out,checkedDiv p b a fuel=some (q,out) := by
+ unfold checkedDiv
+ rw [if_pos hm]
+ exact success_exists p b hp hb hbs hm fuel 0 _ (trim_good p _ a ha) (le_trans (trim_length _ _) hf)
+
+theorem empty_sound (p:UInt64) [Fact p.toNat.Prime] (b a:List UInt64)
+ (hp:0<p.toNat) (hb:p.toNat<2^31) (hbs:Canon p b) (ha:Canon p a)
+ (fuel:Nat) (q:(ZMod p.toNat)[X]) (ho:checkedDiv p b a fuel=some (q,[])) :
+ wordsPoly p a=q*wordsPoly p b := by
+ have h:=(checked_correct p b a hp hb hbs ha fuel q [] ho).2.1
+ simpa [wordsPoly] using h
+
+theorem exact_iff_divisible (p:UInt64) [Fact p.toNat.Prime] (b a:List UInt64)
+ (hp:0<p.toNat) (hb:p.toNat<2^31) (hbs:Canon p b) (ha:Canon p a)
+ (hm:b.getLast?=some 1) (fuel:Nat) (hf:a.length≤fuel) :
+ (∃q,checkedDiv p b a fuel=some (q,[])) ↔ wordsPoly p b∣wordsPoly p a := by
+ constructor
+ · rintro ⟨q,hq⟩
+   exact ⟨q,by rw [empty_sound p b a hp hb hbs ha fuel q hq,mul_comm]⟩
+ · intro hd
+   obtain ⟨q,out,hq⟩:=checked_exists p b a hp hb hbs ha hm fuel hf
+   have he:checkedPrem p b a fuel=some out := by rw [←checked_projection,hq]; rfl
+   have hz:checkedPrem p b a fuel=some [] := (checked_empty_iff p b a hp hb hbs ha hm fuel hf).mpr hd
+   have ho:out=[]:=Option.some.inj (he.symm.trans hz)
+   exact ⟨q,by simpa [ho] using hq⟩
+
+theorem quotient_unique (p:UInt64) [Fact p.toNat.Prime] (b a:List UInt64)
+ (hp:0<p.toNat) (hb:p.toNat<2^31) (hbs:Canon p b) (ha:Canon p a)
+ (hm:b.getLast?=some 1) (fuel:Nat) (q wanted:(ZMod p.toNat)[X])
+ (ho:checkedDiv p b a fuel=some (q,[])) (hw:wordsPoly p a=wanted*wordsPoly p b) : q=wanted := by
+ have hn:wordsPoly p b≠0 := by
+  intro hz
+  have h:=top_coefficient p b
+  rw [hz,hm] at h
+  simpa using h
+ exact mul_right_cancel₀ hn ((empty_sound p b a hp hb hbs ha fuel q ho).symm.trans hw)
+end NativeDivision

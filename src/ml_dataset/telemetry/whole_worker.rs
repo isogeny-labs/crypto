@@ -22,7 +22,7 @@ const PERF_ATTR_INHERIT: u64 = 1 << 1;
 const PERF_ATTR_EXCLUDE_KERNEL: u64 = 1 << 5;
 const PERF_ATTR_EXCLUDE_HV: u64 = 1 << 6;
 const PERF_ATTR_ENABLE_ON_EXEC: u64 = 1 << 12;
-const PERF_EVENT_IOC_ID: libc::c_ulong = 0x8008_2407;
+const PERF_EVENT_IOC_ID: libc::Ioctl = 0x8008_2407_u32 as libc::Ioctl;
 
 #[repr(C)]
 #[derive(Clone, Copy)]
@@ -255,7 +255,7 @@ impl Collector {
         use std::os::fd::AsRawFd;
         let mut event_id: u64 = 0;
         // SAFETY: the ioctl writes one u64 to the provided valid pointer.
-        if unsafe { libc::ioctl(fd.as_raw_fd(), PERF_EVENT_IOC_ID, &mut event_id) } < 0 {
+        if unsafe { libc::ioctl(fd.as_raw_fd(), PERF_EVENT_IOC_ID as _, &mut event_id) } < 0 {
             return Err(io::Error::last_os_error());
         }
         if event_id == 0 {
