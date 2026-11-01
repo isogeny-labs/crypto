@@ -32,3 +32,13 @@ and reviews on its exact published head. Repository default asks for auto-merge;
 if automatic approval review requires exact new-PR approval, stop and report it.
 The old #3108 approval is not exact approval for a different numbered PR.
 Use the repository check-in cadence, no busy polling; stop if merged/closed.
+
+
+Publication: https://github.com/isogeny-labs/crypto/pull/3210 (regular PR).
+Automatic approval review explicitly rejected enabling auto-merge for3210
+because earlier approval does not cover this new PR. Do not enable auto-merge,
+merge, or take another PR-merge route unless the user later explicitly approves
+3210. Keep auto-merge disabled while checking/fixing CI and reviews.
+Main d630dbd6d5eaa3472b34b3e03b5de12065b5fdab was merged into the feature
+branch to resolve the sole shared-session-log conflict; both append sections
+were retained. Earlier proof/reference sources and auditor are unchanged.
