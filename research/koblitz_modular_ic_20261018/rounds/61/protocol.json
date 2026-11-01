@@ -1,12 +1,12 @@
 {
   "schema": "experiment.protocol/v1",
-  "id": "KOBLITZ-R61-NORMAL-TRACE-DUAL",
+  "id": "KOBLITZ-R61-COMPLETE-CUBIC",
   "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
   "claims": [
     {
-      "id": "trace-dual",
+      "id": "cubic",
       "class": "exact_computation",
-      "statement": "All1024actual normal trace-Gram entries,fullrank32 inverse and source-bound dual lattice"
+      "statement": "Actual324cubicambient complete by385F4jets andall20sourcechartbounds,thenfull248row mixedrestriction with RRpredicted76"
     }
   ],
   "arms": {
@@ -62,14 +62,15 @@
     "power": "notapplicable"
   },
   "metrics": [
-    "1024orderedtraceproducts",
-    "normalrank32",
-    "528sourceproductcolumns",
-    "twoinverseproducts",
-    "32dualcoordinatesourcebindings"
+    "6480actualcubicbounds",
+    "1360coefficientconjugations",
+    "770binaryjets/rank324/leftinverse",
+    "248constraintrows/mixeddimension76",
+    "restrictedsourceinvolution",
+    "constant1/changedinvolutioncontrols"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh trace61-01 TRACE61.sing TRACE61_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_CAS.sh cubic61-01 CUBIC61.sing CUBIC61_ALL_CHECKS_PASS",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
     "threads": 1,
@@ -91,7 +92,7 @@
   "decision": {
     "accept": "exit0,exactmarker,no nativeerrorlines,allpredeclaredsourceproducts",
     "failure": "preserveeverycap/error/partial;freezearepairbeforefreshattempt",
-    "scope": "affinetracedualonly;global61holodifferentials/Cartier andcubic818next"
+    "scope": "cubic/mixedsource spaceonly;818patterns/fixedtrace/sourcefield/Cartier and11action next"
   },
   "analysis": {
     "kind": "exactpolynomialmatrix/rationalcoefficienttransportandbinarypresentation",
@@ -109,5 +110,9 @@
     }
   ],
   "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
-  "version": 1
+  "version": 2,
+  "amendment": {
+    "before_affected_data": true,
+    "reason": "trace61-01accepted fulltracepair32dual;freeze completecubic385jet/20chartgate"
+  }
 }

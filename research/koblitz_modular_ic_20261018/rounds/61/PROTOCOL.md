@@ -30,3 +30,23 @@ Exactfixedproducts,noisyA-A/randomization/blinding/powernotapplicable;
 UTC/binaryhashescustodyonly. Exit0/exactfinalmarker/noquestionmarkerrors.
 Preservefailed/capped/partialraw;freezeaffectedsourcebeforefreshattempts.
 Noacceptedproducerrepeatedforpublication;nevereditcopiedlivedriver.
+
+## Stage2 complete cubic ambient and76 mixed infinity sections
+trace61-01 accepted full32traceGram/inverse/dualbindings. No producerrepeat.
+Freeze actual324descendedcubicproducts using retainedR43pairs2/pairs3,
+R58actual68descent recipe andnormalR27charts. Requireall20charts6480cubic
+bounds,1360oldfunctioncoefficientconjugationchecks. Actualcubicambient
+caps147,21,21,3 atfourdegree2infinitypoints andregularity atothercusps.
+Require385F4regularjets (770binaryrows),rank324 andexplicitleftinverse,
+actualsigmajet reconstruction/sigma²=I and changedinvolution rejection.
+Ifprecisionorrankfails,preservefailure;freeze anyexpandedproduct/series
+constructionbeforefreshdata. No inherited R43rank substitutes for this gate.
+
+Imposeall248binaryremovedcoefficients for mixedbound34,12,20,2 degree136.
+RequireC K=0,R K=I,K R+H C=I324;derive dimension andverifyRRpredicted76.
+Actualrestrictedinvolution/constant1positivecontrol andall272mixedlocal
+profilecoefficients are exported. Binaryentriesonly. Whole-source field
+bindings,completefixed/trace space andALL818patternsremainnext frozenstages.
+Do notclaim aJacobianfactor,properembedding,Cartiermatrixor11action here.
+Same1200sec/4GiB/onejob/thread/seed61. LiteratureR27/R58properRR/poles,
+R43retainedcubicpairs,R60NEXT;standardRRnotanewalgorithmclaim.
