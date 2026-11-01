@@ -493,7 +493,7 @@ const POLICIES: &[PolicyDecl] = &[
     ),
     policy!(
         "ic.koblitz_batched",
-        NativeAdaptive,
+        NativeGrid,
         SpecializedDomain,
         StandardBand
     ),
@@ -597,10 +597,10 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "unit_trials"
         | "units" => ResourceEnvelope,
         "baby"
+        | "batch_trials"
         | "base"
         | "base_multiplier"
         | "base_scale"
-        | "batch_trials"
         | "beta"
         | "branches"
         | "collection_aim"
@@ -1140,6 +1140,26 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn koblitz_batch_tuning_keeps_seed_and_resource_cap_out_of_the_grid() {
+        let profiles = profiles().unwrap();
+        let profile = profiles
+            .iter()
+            .find(|profile| profile.id == "ic.koblitz_batched")
+            .unwrap();
+        assert_eq!(profile.strategy, SearchStrategy::NativeGrid);
+        assert_eq!(profile.claim_scope, ClaimScope::SpecializedDomain);
+        assert_eq!(profile.accounting_scope, AccountingScope::StandardBand);
+        let roles: BTreeMap<_, _> = profile
+            .parameters
+            .iter()
+            .map(|parameter| (parameter.name, parameter.role))
+            .collect();
+        assert_eq!(roles["batch_trials"], ParameterRole::Knob);
+        assert_eq!(roles["fb_seed"], ParameterRole::Seed);
+        assert_eq!(roles["max_trials"], ParameterRole::ResourceEnvelope);
     }
 
     #[test]
