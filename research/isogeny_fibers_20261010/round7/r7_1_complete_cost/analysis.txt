@@ -1,0 +1,386 @@
+rows: ladder grid 20 (+extra 16), projection 45, psi grid 9 (+extra 16), modpoly grid 23 (+extra 5)
+
+Reproduction of the frozen R6.4 counts (M, W, I and the Meq-based quantities; additions requested only here): {"ladder":{"frozen_rows_matched_by_ell":20,"identical_M_W_I_and_expected_find":20},"modpoly_eval_plus_roots":{"frozen_rows_matched_by_ell":23,"identical_M_W_I":23},"project":{"frozen_arm_rows_matched":119,"identical":119},"psi":{"frozen_rows_matched_by_ell":9,"identical_M_W_I":9}}
+
+================ addition weight a = 0 M ================
+  ladder find desc (measured)                                l>=30     n=20  2.582 OLS [2.544, 2.620] boot [2.548, 2.619]  log2c 9.55
+  ladder find desc (measured)                                l>=256    n=8   2.554 OLS [2.352, 2.756] boot [2.376, 2.713]  log2c 9.81
+  ladder find asc (measured)                                 l>=30     n=19  2.587 OLS [2.547, 2.628] boot [2.551, 2.623]  log2c 9.51
+  ladder find asc (measured)                                 l>=256    n=8   2.554 OLS [2.352, 2.756] boot [2.375, 2.707]  log2c 9.81
+  projected ladder, karatsuba                                l>=2^10   n=25  2.579 OLS [2.553, 2.605] boot [2.556, 2.604]  log2c 9.62
+  projected ladder, auto                                     l>=2^10   n=25  2.088 OLS [2.020, 2.155] boot [2.023, 2.158]  log2c 14.75
+  projected ladder, auto                                     l>=2^13   n=13  1.919 OLS [1.724, 2.115] boot [1.795, 2.113]  log2c 17.23
+  projected ladder, best of karatsuba/auto                   l>=2^10   n=25  2.088 OLS [2.020, 2.155] boot [2.029, 2.153]  log2c 14.75
+  projected ladder, best of karatsuba/auto                   l>=2^13   n=13  1.919 OLS [1.724, 2.115] boot [1.779, 2.123]  log2c 17.23
+  psi + CZ desc (measured)                                   grid      n=9   3.565 OLS [3.302, 3.828] boot [3.316, 3.792]  log2c 10.50
+  psi + gcd asc (measured)                                   grid      n=8   3.439 OLS [3.087, 3.791] boot [3.187, 3.724]  log2c 10.24
+  Phi amortised (eval+roots+Elkies) desc                     11..103   n=23  1.860 OLS [1.785, 1.936] boot [1.779, 1.932]  log2c 9.05
+  Phi amortised (eval+roots+Elkies) asc                      11..103   n=20  1.710 OLS [1.631, 1.790] boot [1.608, 1.770]  log2c 8.49
+  Phi cold (build+eval+roots+Elkies) desc                    11..103   n=23  4.638 OLS [4.581, 4.696] boot [4.574, 4.751]  log2c 1.84
+  Phi cold (build+eval+roots+Elkies) asc                     11..103   n=20  4.703 OLS [4.655, 4.751] boot [4.644, 4.805]  log2c 1.45
+  Phi construction alone (counted port)                      11..103   n=23  4.685 OLS [4.641, 4.729] boot [4.632, 4.768]  log2c 1.56
+  Phi eval+roots only (R6.4's row (c))                       11..103   n=23  1.884 OLS [1.804, 1.964] boot [1.796, 1.962]  log2c 8.88
+  projection / measured (desc, auto): 37:1.0015 41:1.0027 47:1.0044 59:1.0044 67:1.0039 79:1.0015 97:1.0028 109:1.0021 131:1.0026 157:1.0010 181:1.0019 223:1.0020 257:1.0012 307:1.0010 367:1.0009 431:1.0009 521:1.0011 613:1.0010 727:1.0006 863:1.0007
+
+================ addition weight a = 0.1 M ================
+  ladder find desc (measured)                                l>=30     n=20  2.597 OLS [2.562, 2.632] boot [2.562, 2.630]  log2c 9.62
+  ladder find desc (measured)                                l>=256    n=8   2.566 OLS [2.380, 2.753] boot [2.399, 2.710]  log2c 9.89
+  ladder find asc (measured)                                 l>=30     n=19  2.601 OLS [2.564, 2.638] boot [2.567, 2.633]  log2c 9.59
+  ladder find asc (measured)                                 l>=256    n=8   2.566 OLS [2.380, 2.752] boot [2.406, 2.710]  log2c 9.89
+  projected ladder, karatsuba                                l>=2^10   n=25  2.581 OLS [2.558, 2.604] boot [2.562, 2.603]  log2c 9.80
+  projected ladder, auto                                     l>=2^10   n=25  2.092 OLS [2.024, 2.160] boot [2.029, 2.163]  log2c 14.93
+  projected ladder, auto                                     l>=2^13   n=13  1.919 OLS [1.722, 2.116] boot [1.781, 2.113]  log2c 17.47
+  projected ladder, best of karatsuba/auto                   l>=2^10   n=25  2.092 OLS [2.024, 2.160] boot [2.026, 2.156]  log2c 14.93
+  projected ladder, best of karatsuba/auto                   l>=2^13   n=13  1.919 OLS [1.722, 2.116] boot [1.780, 2.122]  log2c 17.47
+  psi + CZ desc (measured)                                   grid      n=9   3.588 OLS [3.331, 3.845] boot [3.346, 3.819]  log2c 10.58
+  psi + gcd asc (measured)                                   grid      n=8   3.456 OLS [3.106, 3.806] boot [3.222, 3.738]  log2c 10.37
+  Phi amortised (eval+roots+Elkies) desc                     11..103   n=23  1.882 OLS [1.808, 1.956] boot [1.804, 1.959]  log2c 9.09
+  Phi amortised (eval+roots+Elkies) asc                      11..103   n=20  1.735 OLS [1.657, 1.813] boot [1.639, 1.791]  log2c 8.50
+  Phi cold (build+eval+roots+Elkies) desc                    11..103   n=23  4.639 OLS [4.582, 4.696] boot [4.577, 4.750]  log2c 1.97
+  Phi cold (build+eval+roots+Elkies) asc                     11..103   n=20  4.703 OLS [4.656, 4.751] boot [4.647, 4.804]  log2c 1.59
+  Phi construction alone (counted port)                      11..103   n=23  4.685 OLS [4.641, 4.729] boot [4.635, 4.769]  log2c 1.69
+  Phi eval+roots only (R6.4's row (c))                       11..103   n=23  1.904 OLS [1.825, 1.982] boot [1.813, 1.981]  log2c 8.92
+  projection / measured (desc, auto): 37:1.0019 41:1.0031 47:1.0047 59:1.0048 67:1.0043 79:1.0018 97:1.0031 109:1.0026 131:1.0030 157:1.0014 181:1.0023 223:1.0026 257:1.0018 307:1.0015 367:1.0013 431:1.0016 521:1.0017 613:1.0015 727:1.0011 863:1.0016
+
+================ addition weight a = 0.3 M ================
+  ladder find desc (measured)                                l>=30     n=20  2.618 OLS [2.587, 2.649] boot [2.586, 2.648]  log2c 9.76
+  ladder find desc (measured)                                l>=256    n=8   2.584 OLS [2.420, 2.748] boot [2.434, 2.715]  log2c 10.06
+  ladder find asc (measured)                                 l>=30     n=19  2.621 OLS [2.589, 2.654] boot [2.590, 2.652]  log2c 9.73
+  ladder find asc (measured)                                 l>=256    n=8   2.584 OLS [2.419, 2.748] boot [2.442, 2.714]  log2c 10.06
+  projected ladder, karatsuba                                l>=2^10   n=25  2.584 OLS [2.564, 2.603] boot [2.567, 2.603]  log2c 10.10
+  projected ladder, auto                                     l>=2^10   n=25  2.097 OLS [2.028, 2.167] boot [2.029, 2.169]  log2c 15.24
+  projected ladder, auto                                     l>=2^13   n=13  1.919 OLS [1.720, 2.118] boot [1.790, 2.126]  log2c 17.86
+  projected ladder, best of karatsuba/auto                   l>=2^10   n=25  2.097 OLS [2.028, 2.167] boot [2.026, 2.167]  log2c 15.24
+  projected ladder, best of karatsuba/auto                   l>=2^13   n=13  1.919 OLS [1.720, 2.118] boot [1.791, 2.146]  log2c 17.86
+  psi + CZ desc (measured)                                   grid      n=9   3.618 OLS [3.370, 3.867] boot [3.384, 3.833]  log2c 10.76
+  psi + gcd asc (measured)                                   grid      n=8   3.478 OLS [3.130, 3.826] boot [3.228, 3.743]  log2c 10.61
+  Phi amortised (eval+roots+Elkies) desc                     11..103   n=23  1.914 OLS [1.842, 1.987] boot [1.838, 1.988]  log2c 9.17
+  Phi amortised (eval+roots+Elkies) asc                      11..103   n=20  1.773 OLS [1.697, 1.849] boot [1.676, 1.830]  log2c 8.55
+  Phi cold (build+eval+roots+Elkies) desc                    11..103   n=23  4.640 OLS [4.583, 4.697] boot [4.572, 4.753]  log2c 2.21
+  Phi cold (build+eval+roots+Elkies) asc                     11..103   n=20  4.704 OLS [4.657, 4.752] boot [4.648, 4.807]  log2c 1.83
+  Phi construction alone (counted port)                      11..103   n=23  4.685 OLS [4.641, 4.729] boot [4.636, 4.771]  log2c 1.93
+  Phi eval+roots only (R6.4's row (c))                       11..103   n=23  1.934 OLS [1.858, 2.010] boot [1.853, 2.011]  log2c 9.03
+  projection / measured (desc, auto): 37:1.0025 41:1.0037 47:1.0052 59:1.0055 67:1.0049 79:1.0023 97:1.0035 109:1.0033 131:1.0037 157:1.0019 181:1.0028 223:1.0035 257:1.0025 307:1.0021 367:1.0018 431:1.0026 521:1.0026 613:1.0022 727:1.0017 863:1.0027
+
+================ addition weight a = 1 M ================
+  ladder find desc (measured)                                l>=30     n=20  2.655 OLS [2.629, 2.680] boot [2.627, 2.680]  log2c 10.21
+  ladder find desc (measured)                                l>=256    n=8   2.612 OLS [2.482, 2.742] boot [2.498, 2.720]  log2c 10.58
+  ladder find asc (measured)                                 l>=30     n=19  2.656 OLS [2.629, 2.683] boot [2.624, 2.683]  log2c 10.20
+  ladder find asc (measured)                                 l>=256    n=8   2.612 OLS [2.482, 2.742] boot [2.496, 2.725]  log2c 10.58
+  projected ladder, karatsuba                                l>=2^10   n=25  2.588 OLS [2.575, 2.601] boot [2.576, 2.601]  log2c 10.84
+  projected ladder, auto                                     l>=2^10   n=25  2.105 OLS [2.034, 2.177] boot [2.035, 2.179]  log2c 15.99
+  projected ladder, auto                                     l>=2^13   n=13  1.919 OLS [1.717, 2.121] boot [1.783, 2.125]  log2c 18.72
+  projected ladder, best of karatsuba/auto                   l>=2^10   n=25  2.106 OLS [2.034, 2.177] boot [2.034, 2.180]  log2c 15.98
+  projected ladder, best of karatsuba/auto                   l>=2^13   n=13  1.919 OLS [1.717, 2.121] boot [1.776, 2.122]  log2c 18.72
+  psi + CZ desc (measured)                                   grid      n=9   3.665 OLS [3.428, 3.903] boot [3.454, 3.856]  log2c 11.31
+  psi + gcd asc (measured)                                   grid      n=8   3.512 OLS [3.166, 3.859] boot [3.270, 3.764]  log2c 11.25
+  Phi amortised (eval+roots+Elkies) desc                     11..103   n=23  1.976 OLS [1.906, 2.045] boot [1.900, 2.043]  log2c 9.50
+  Phi amortised (eval+roots+Elkies) asc                      11..103   n=20  1.845 OLS [1.771, 1.920] boot [1.745, 1.899]  log2c 8.81
+  Phi cold (build+eval+roots+Elkies) desc                    11..103   n=23  4.642 OLS [4.586, 4.698] boot [4.576, 4.745]  log2c 2.82
+  Phi cold (build+eval+roots+Elkies) asc                     11..103   n=20  4.705 OLS [4.658, 4.752] boot [4.650, 4.802]  log2c 2.44
+  Phi construction alone (counted port)                      11..103   n=23  4.685 OLS [4.641, 4.729] boot [4.634, 4.768]  log2c 2.55
+  Phi eval+roots only (R6.4's row (c))                       11..103   n=23  1.990 OLS [1.917, 2.062] boot [1.912, 2.064]  log2c 9.39
+  projection / measured (desc, auto): 37:1.0038 41:1.0048 47:1.0062 59:1.0066 67:1.0059 79:1.0033 97:1.0043 109:1.0045 131:1.0048 157:1.0029 181:1.0036 223:1.0048 257:1.0038 307:1.0032 367:1.0028 431:1.0041 521:1.0040 613:1.0035 727:1.0027 863:1.0044
+
+================ additions per M-equivalent, (A + WA) / Meq ================
+  ladder desc l=37: ladder 0.986, minpoly 0.706, eval of one point 0.286
+  ladder desc l=97: ladder 1.124, minpoly 1.024, eval of one point 0.508
+  ladder desc l=223: ladder 1.470, minpoly 1.404, eval of one point 0.702
+  ladder desc l=431: ladder 1.550, minpoly 1.518, eval of one point 0.820
+  ladder desc l=863: ladder 1.606, minpoly 1.586, eval of one point 0.901
+  psi desc l=37: psi_l recurrences 1.317, whole find 1.419; asc find 1.470
+  psi desc l=97: psi_l recurrences 1.637, whole find 1.805; asc find 1.812
+  psi desc l=131: psi_l recurrences 1.700, whole find 1.822; asc find 1.830
+  Phi l=37: construction 1.000, evaluation 0.976, roots 1.103, Elkies 0.358
+  Phi l=67: construction 1.000, evaluation 0.986, roots 1.244, Elkies 0.494
+  Phi l=103: construction 1.000, evaluation 0.991, roots 1.407, Elkies 0.588
+  Phi l=131: construction 1.000, evaluation 0.993, roots 1.368, Elkies 0.636
+  projected ladder l=1031 karatsuba: xDBL 1.503, xADD 1.522
+  projected ladder l=1031 auto: xDBL 1.503, xADD 1.522
+  projected ladder l=8209 karatsuba: xDBL 1.565, xADD 1.587
+  projected ladder l=8209 auto: xDBL 1.822, xADD 1.827
+  projected ladder l=65537 karatsuba: xDBL 1.588, xADD 1.611
+  projected ladder l=65537 auto: xDBL 1.783, xADD 1.790
+
+================ ordering of routes at measured l ================
+  desc amortised l=11   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 5.01
+  desc amortised l=13   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 4.67
+  desc amortised l=17   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 6.98
+  desc amortised l=19   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 7.88
+  desc amortised l=23   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 11.13
+  desc amortised l=29   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 16.04
+  desc amortised l=31   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 16.05
+  desc amortised l=37   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 15.90
+  desc amortised l=41   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 16.14
+  desc amortised l=43   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 18.93
+  desc amortised l=47   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 18.95
+  desc amortised l=53   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 22.26
+  desc amortised l=59   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 24.32
+  desc amortised l=61   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 25.28
+  desc amortised l=67   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 28.71
+  desc amortised l=71   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 28.64
+  desc amortised l=73   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 30.39
+  desc amortised l=79   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 32.11
+  desc amortised l=83   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 33.41
+  desc amortised l=89   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 36.20
+  desc amortised l=97   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 40.96
+  desc amortised l=101  order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 40.44
+  desc amortised l=103  order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 42.10
+  desc amortised l=109  order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 44.40
+  desc amortised l=131  order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 55.11
+  desc cold      l=11   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 1.61
+  desc cold      l=13   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 1.87
+  desc cold      l=17   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 2.45
+  desc cold      l=19   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 2.79
+  desc cold      l=23   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 3.59
+  desc cold      l=29   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 5.11
+  desc cold      l=31   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 5.68
+  desc cold      l=37   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 7.54
+  desc cold      l=41   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 6.90
+  desc cold      l=43   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 6.89
+  desc cold      l=47   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 8.18
+  desc cold      l=53   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 6.60
+  desc cold      l=59   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 4.56
+  desc cold      l=61   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 4.18
+  desc cold      l=67   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 4.72
+  desc cold      l=71   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 4.78
+  desc cold      l=73   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 4.06
+  desc cold      l=79   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 3.26
+  desc cold      l=83   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 2.82
+  desc cold      l=89   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 2.25
+  desc cold      l=97   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 2.90
+  desc cold      l=101  order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 2.63
+  desc cold      l=103  order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 2.47
+  desc cold      l=109  order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 2.09
+  desc cold      l=131  order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 2.09
+  asc amortised l=13   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 11.64
+  asc amortised l=17   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 17.01
+  asc amortised l=23   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 23.58
+  asc amortised l=29   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 27.66
+  asc amortised l=31   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 28.93
+  asc amortised l=37   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 38.80
+  asc amortised l=41   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 35.80
+  asc amortised l=43   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 32.95
+  asc amortised l=53   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 57.64
+  asc amortised l=59   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 48.13
+  asc amortised l=61   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 46.50
+  asc amortised l=67   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 76.48
+  asc amortised l=71   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 69.20
+  asc amortised l=73   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 67.00
+  asc amortised l=79   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 57.14
+  asc amortised l=83   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 52.41
+  asc amortised l=89   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 47.15
+  asc amortised l=97   order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 80.35
+  asc amortised l=101  order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 96.06
+  asc amortised l=103  order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 93.26
+  asc amortised l=109  order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 83.90
+  asc amortised l=131  order at a=0: Phi(j,Y) amortised (c) < ladder (a) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 120.53
+  asc cold      l=13   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 1.73
+  asc cold      l=17   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 2.36
+  asc cold      l=23   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 3.51
+  asc cold      l=29   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 5.05
+  asc cold      l=31   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 5.15
+  asc cold      l=37   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 5.55
+  asc cold      l=41   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 3.98
+  asc cold      l=43   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 3.40
+  asc cold      l=53   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 3.21
+  asc cold      l=59   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 2.19
+  asc cold      l=61   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 1.94
+  asc cold      l=67   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 2.79
+  asc cold      l=71   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 2.23
+  asc cold      l=73   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 2.03
+  asc cold      l=79   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 1.51
+  asc cold      l=83   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 1.28
+  asc cold      l=89   order at a=0: ladder (a) < psi + factoring (b) < Phi(j,Y) cold (c) | cheapest-two changes over a: true | full order changes: true | smallest adjacent ratio 1.02
+  asc cold      l=97   order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 1.43
+  asc cold      l=101  order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 1.22
+  asc cold      l=103  order at a=0: ladder (a) < Phi(j,Y) cold (c) < psi + factoring (b) | cheapest-two changes over a: false | full order changes: false | smallest adjacent ratio 1.15
+  asc cold      l=109  order at a=0: ladder (a) < psi + factoring (b) < Phi(j,Y) cold (c) | cheapest-two changes over a: true | full order changes: true | smallest adjacent ratio 1.00
+  asc cold      l=131  order at a=0: ladder (a) < psi + factoring (b) < Phi(j,Y) cold (c) | cheapest-two changes over a: true | full order changes: true | smallest adjacent ratio 1.00
+
+================ fitted pairwise crossings (log2 l where the fits cross) ================
+  a=0: ladder vs psi: exponents 2.582 vs 3.565, fits cross at log2 l = -0.96
+  a=0: ladder vs Phi cold: exponents 2.582 vs 4.638, fits cross at log2 l = 3.75
+  a=0: ladder vs Phi amortised: exponents 2.582 vs 1.860, fits cross at log2 l = -0.69
+  a=0: psi vs Phi cold: exponents 3.565 vs 4.638, fits cross at log2 l = 8.07
+  a=0.1: ladder vs psi: exponents 2.597 vs 3.588, fits cross at log2 l = -0.97
+  a=0.1: ladder vs Phi cold: exponents 2.597 vs 4.639, fits cross at log2 l = 3.75
+  a=0.1: ladder vs Phi amortised: exponents 2.597 vs 1.882, fits cross at log2 l = -0.75
+  a=0.1: psi vs Phi cold: exponents 3.588 vs 4.639, fits cross at log2 l = 8.19
+  a=0.3: ladder vs psi: exponents 2.618 vs 3.618, fits cross at log2 l = -1.00
+  a=0.3: ladder vs Phi cold: exponents 2.618 vs 4.640, fits cross at log2 l = 3.74
+  a=0.3: ladder vs Phi amortised: exponents 2.618 vs 1.914, fits cross at log2 l = -0.84
+  a=0.3: psi vs Phi cold: exponents 3.618 vs 4.640, fits cross at log2 l = 8.37
+  a=1: ladder vs psi: exponents 2.655 vs 3.665, fits cross at log2 l = -1.09
+  a=1: ladder vs Phi cold: exponents 2.655 vs 4.642, fits cross at log2 l = 3.72
+  a=1: ladder vs Phi amortised: exponents 2.655 vs 1.976, fits cross at log2 l = -1.05
+  a=1: psi vs Phi cold: exponents 3.665 vs 4.642, fits cross at log2 l = 8.70
+
+================ exponent falsifier (projected auto, l >= 2^13) ================
+  projected ladder, auto, a=0: 1.919 OLS [1.724, 2.115] boot [1.795, 2.113]  lower<1.5 or upper>2.3: OLS false, bootstrap false
+  projected ladder, auto, a=0.1: 1.919 OLS [1.722, 2.116] boot [1.781, 2.113]  lower<1.5 or upper>2.3: OLS false, bootstrap false
+  projected ladder, auto, a=0.3: 1.919 OLS [1.720, 2.118] boot [1.790, 2.126]  lower<1.5 or upper>2.3: OLS false, bootstrap false
+  projected ladder, auto, a=1: 1.919 OLS [1.717, 2.121] boot [1.783, 2.125]  lower<1.5 or upper>2.3: OLS false, bootstrap false
+  projected ladder, best of karatsuba/auto, a=0: 1.919 OLS [1.724, 2.115] boot [1.779, 2.123]  lower<1.5 or upper>2.3: OLS false, bootstrap false
+  projected ladder, best of karatsuba/auto, a=0.1: 1.919 OLS [1.722, 2.116] boot [1.780, 2.122]  lower<1.5 or upper>2.3: OLS false, bootstrap false
+  projected ladder, best of karatsuba/auto, a=0.3: 1.919 OLS [1.720, 2.118] boot [1.791, 2.146]  lower<1.5 or upper>2.3: OLS false, bootstrap false
+  projected ladder, best of karatsuba/auto, a=1: 1.919 OLS [1.717, 2.121] boot [1.776, 2.122]  lower<1.5 or upper>2.3: OLS false, bootstrap false
+
+Ordering falsifier (cheapest two routes change with a at some measured l): TRIGGERED at [{"accounting":"cold","dir":"asc","ell":89},{"accounting":"cold","dir":"asc","ell":109},{"accounting":"cold","dir":"asc","ell":131}]
+Exponent falsifier (CI lower < 1.5 or upper > 2.3 for some a, either interval): not triggered
+
+crossover a=0.0 g=6 r=2^64.0 (rho = 2^34.41, l_max = 2^33.0):
+    ladder (a), measured desc fit l>=256                                   log2 l* =    9.61  (inside the possible range)
+    ladder (a), measured asc fit l>=256                                    log2 l* =    9.61  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^10                                log2 l* =    9.38  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^13                                log2 l* =    8.92  (inside the possible range)
+    ladder (a'), projected auto l>=2^13, exponent at OLS CI low end        log2 l* =    8.11  (inside the possible range)
+    ladder (a'), projected best of karatsuba/auto fit l>=2^13              log2 l* =    8.92  (inside the possible range)
+    ladder (a'), model l^2 log l calibrated at top                         log2 l* =    9.72  (inside the possible range)
+    psi + CZ desc (b), measured fit                                        log2 l* =    6.69  (inside the possible range)
+    psi + gcd asc (b), measured fit                                        log2 l* =    7.01  (inside the possible range)
+    Phi amortised desc (c), measured fit 11..103                           log2 l* =   13.59  (inside the possible range)
+    Phi cold desc (c), measured fit 11..103                                log2 l* =    7.01  (inside the possible range)
+
+crossover a=0.0 g=6 r=2^128.0 (rho = 2^66.41, l_max = 2^65.0):
+    ladder (a), measured desc fit l>=256                                   log2 l* =   21.74  (inside the possible range)
+    ladder (a), measured asc fit l>=256                                    log2 l* =   21.74  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^10                                log2 l* =   24.23  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^13                                log2 l* =   25.07  (inside the possible range)
+    ladder (a'), projected auto l>=2^13, exponent at OLS CI low end        log2 l* =   26.10  (inside the possible range)
+    ladder (a'), projected best of karatsuba/auto fit l>=2^13              log2 l* =   25.07  (inside the possible range)
+    ladder (a'), model l^2 log l calibrated at top                         log2 l* =   24.55  (inside the possible range)
+    psi + CZ desc (b), measured fit                                        log2 l* =   15.38  (inside the possible range)
+    psi + gcd asc (b), measured fit                                        log2 l* =   16.02  (inside the possible range)
+    Phi amortised desc (c), measured fit 11..103                           log2 l* =   30.26  (inside the possible range)
+    Phi cold desc (c), measured fit 11..103                                log2 l* =   13.69  (inside the possible range)
+
+crossover a=0.0 g=6 r=2^256.0 (rho = 2^130.41, l_max = 2^129.0):
+    ladder (a), measured desc fit l>=256                                   log2 l* =   46.41  (inside the possible range)
+    ladder (a), measured asc fit l>=256                                    log2 l* =   46.41  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^10                                log2 l* =   54.41  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^13                                log2 l* =   57.89  (inside the possible range)
+    ladder (a'), projected auto l>=2^13, exponent at OLS CI low end        log2 l* =   62.64  (inside the possible range)
+    ladder (a'), projected best of karatsuba/auto fit l>=2^13              log2 l* =   57.89  (inside the possible range)
+    ladder (a'), model l^2 log l calibrated at top                         log2 l* =   55.47  (inside the possible range)
+    psi + CZ desc (b), measured fit                                        log2 l* =   33.05  (inside the possible range)
+    psi + gcd asc (b), measured fit                                        log2 l* =   34.34  (inside the possible range)
+    Phi amortised desc (c), measured fit 11..103                           log2 l* =   64.12  (inside the possible range)
+    Phi cold desc (c), measured fit 11..103                                log2 l* =   27.27  (inside the possible range)
+
+crossover a=0.1 g=6 r=2^64.0 (rho = 2^34.55, l_max = 2^33.0):
+    ladder (a), measured desc fit l>=256                                   log2 l* =    9.58  (inside the possible range)
+    ladder (a), measured asc fit l>=256                                    log2 l* =    9.58  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^10                                log2 l* =    9.34  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^13                                log2 l* =    8.86  (inside the possible range)
+    ladder (a'), projected auto l>=2^13, exponent at OLS CI low end        log2 l* =    8.05  (inside the possible range)
+    ladder (a'), projected best of karatsuba/auto fit l>=2^13              log2 l* =    8.86  (inside the possible range)
+    ladder (a'), model l^2 log l calibrated at top                         log2 l* =    9.68  (inside the possible range)
+    psi + CZ desc (b), measured fit                                        log2 l* =    6.66  (inside the possible range)
+    psi + gcd asc (b), measured fit                                        log2 l* =    6.98  (inside the possible range)
+    Phi amortised desc (c), measured fit 11..103                           log2 l* =   13.49  (inside the possible range)
+    Phi cold desc (c), measured fit 11..103                                log2 l* =    7.01  (inside the possible range)
+
+crossover a=0.1 g=6 r=2^128.0 (rho = 2^66.55, l_max = 2^65.0):
+    ladder (a), measured desc fit l>=256                                   log2 l* =   21.66  (inside the possible range)
+    ladder (a), measured asc fit l>=256                                    log2 l* =   21.66  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^10                                log2 l* =   24.16  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^13                                log2 l* =   25.02  (inside the possible range)
+    ladder (a'), projected auto l>=2^13, exponent at OLS CI low end        log2 l* =   26.05  (inside the possible range)
+    ladder (a'), projected best of karatsuba/auto fit l>=2^13              log2 l* =   25.02  (inside the possible range)
+    ladder (a'), model l^2 log l calibrated at top                         log2 l* =   24.51  (inside the possible range)
+    psi + CZ desc (b), measured fit                                        log2 l* =   15.30  (inside the possible range)
+    psi + gcd asc (b), measured fit                                        log2 l* =   15.95  (inside the possible range)
+    Phi amortised desc (c), measured fit 11..103                           log2 l* =   29.97  (inside the possible range)
+    Phi cold desc (c), measured fit 11..103                                log2 l* =   13.69  (inside the possible range)
+
+crossover a=0.1 g=6 r=2^256.0 (rho = 2^130.55, l_max = 2^129.0):
+    ladder (a), measured desc fit l>=256                                   log2 l* =   46.21  (inside the possible range)
+    ladder (a), measured asc fit l>=256                                    log2 l* =   46.21  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^10                                log2 l* =   54.28  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^13                                log2 l* =   57.84  (inside the possible range)
+    ladder (a'), projected auto l>=2^13, exponent at OLS CI low end        log2 l* =   62.63  (inside the possible range)
+    ladder (a'), projected best of karatsuba/auto fit l>=2^13              log2 l* =   57.84  (inside the possible range)
+    ladder (a'), model l^2 log l calibrated at top                         log2 l* =   55.42  (inside the possible range)
+    psi + CZ desc (b), measured fit                                        log2 l* =   32.86  (inside the possible range)
+    psi + gcd asc (b), measured fit                                        log2 l* =   34.18  (inside the possible range)
+    Phi amortised desc (c), measured fit 11..103                           log2 l* =   63.44  (inside the possible range)
+    Phi cold desc (c), measured fit 11..103                                log2 l* =   27.27  (inside the possible range)
+
+crossover a=0.3 g=6 r=2^64.0 (rho = 2^34.79, l_max = 2^33.0):
+    ladder (a), measured desc fit l>=256                                   log2 l* =    9.54  (inside the possible range)
+    ladder (a), measured asc fit l>=256                                    log2 l* =    9.54  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^10                                log2 l* =    9.29  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^13                                log2 l* =    8.79  (inside the possible range)
+    ladder (a'), projected auto l>=2^13, exponent at OLS CI low end        log2 l* =    7.95  (inside the possible range)
+    ladder (a'), projected best of karatsuba/auto fit l>=2^13              log2 l* =    8.79  (inside the possible range)
+    ladder (a'), model l^2 log l calibrated at top                         log2 l* =    9.61  (inside the possible range)
+    psi + CZ desc (b), measured fit                                        log2 l* =    6.62  (inside the possible range)
+    psi + gcd asc (b), measured fit                                        log2 l* =    6.93  (inside the possible range)
+    Phi amortised desc (c), measured fit 11..103                           log2 l* =   13.35  (inside the possible range)
+    Phi cold desc (c), measured fit 11..103                                log2 l* =    7.01  (inside the possible range)
+
+crossover a=0.3 g=6 r=2^128.0 (rho = 2^66.79, l_max = 2^65.0):
+    ladder (a), measured desc fit l>=256                                   log2 l* =   21.54  (inside the possible range)
+    ladder (a), measured asc fit l>=256                                    log2 l* =   21.54  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^10                                log2 l* =   24.07  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^13                                log2 l* =   24.94  (inside the possible range)
+    ladder (a'), projected auto l>=2^13, exponent at OLS CI low end        log2 l* =   25.98  (inside the possible range)
+    ladder (a'), projected best of karatsuba/auto fit l>=2^13              log2 l* =   24.94  (inside the possible range)
+    ladder (a'), model l^2 log l calibrated at top                         log2 l* =   24.44  (inside the possible range)
+    psi + CZ desc (b), measured fit                                        log2 l* =   15.19  (inside the possible range)
+    psi + gcd asc (b), measured fit                                        log2 l* =   15.84  (inside the possible range)
+    Phi amortised desc (c), measured fit 11..103                           log2 l* =   29.54  (inside the possible range)
+    Phi cold desc (c), measured fit 11..103                                log2 l* =   13.69  (inside the possible range)
+
+crossover a=0.3 g=6 r=2^256.0 (rho = 2^130.79, l_max = 2^129.0):
+    ladder (a), measured desc fit l>=256                                   log2 l* =   45.92  (inside the possible range)
+    ladder (a), measured asc fit l>=256                                    log2 l* =   45.93  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^10                                log2 l* =   54.11  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^13                                log2 l* =   57.77  (inside the possible range)
+    ladder (a'), projected auto l>=2^13, exponent at OLS CI low end        log2 l* =   62.60  (inside the possible range)
+    ladder (a'), projected best of karatsuba/auto fit l>=2^13              log2 l* =   57.77  (inside the possible range)
+    ladder (a'), model l^2 log l calibrated at top                         log2 l* =   55.35  (inside the possible range)
+    psi + CZ desc (b), measured fit                                        log2 l* =   32.60  (inside the possible range)
+    psi + gcd asc (b), measured fit                                        log2 l* =   33.96  (inside the possible range)
+    Phi amortised desc (c), measured fit 11..103                           log2 l* =   62.45  (inside the possible range)
+    Phi cold desc (c), measured fit 11..103                                log2 l* =   27.27  (inside the possible range)
+
+crossover a=1.0 g=6 r=2^64.0 (rho = 2^35.41, l_max = 2^33.0):
+    ladder (a), measured desc fit l>=256                                   log2 l* =    9.48  (inside the possible range)
+    ladder (a), measured asc fit l>=256                                    log2 l* =    9.48  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^10                                log2 l* =    9.19  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^13                                log2 l* =    8.66  (inside the possible range)
+    ladder (a'), projected auto l>=2^13, exponent at OLS CI low end        log2 l* =    7.80  (inside the possible range)
+    ladder (a'), projected best of karatsuba/auto fit l>=2^13              log2 l* =    8.66  (inside the possible range)
+    ladder (a'), model l^2 log l calibrated at top                         log2 l* =    9.50  (inside the possible range)
+    psi + CZ desc (b), measured fit                                        log2 l* =    6.56  (inside the possible range)
+    psi + gcd asc (b), measured fit                                        log2 l* =    6.86  (inside the possible range)
+    Phi amortised desc (c), measured fit 11..103                           log2 l* =   13.08  (inside the possible range)
+    Phi cold desc (c), measured fit 11..103                                log2 l* =    7.01  (inside the possible range)
+
+crossover a=1.0 g=6 r=2^128.0 (rho = 2^67.41, l_max = 2^65.0):
+    ladder (a), measured desc fit l>=256                                   log2 l* =   21.35  (inside the possible range)
+    ladder (a), measured asc fit l>=256                                    log2 l* =   21.35  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^10                                log2 l* =   23.92  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^13                                log2 l* =   24.81  (inside the possible range)
+    ladder (a'), projected auto l>=2^13, exponent at OLS CI low end        log2 l* =   25.85  (inside the possible range)
+    ladder (a'), projected best of karatsuba/auto fit l>=2^13              log2 l* =   24.81  (inside the possible range)
+    ladder (a'), model l^2 log l calibrated at top                         log2 l* =   24.32  (inside the possible range)
+    psi + CZ desc (b), measured fit                                        log2 l* =   15.01  (inside the possible range)
+    psi + gcd asc (b), measured fit                                        log2 l* =   15.69  (inside the possible range)
+    Phi amortised desc (c), measured fit 11..103                           log2 l* =   28.77  (inside the possible range)
+    Phi cold desc (c), measured fit 11..103                                log2 l* =   13.68  (inside the possible range)
+
+crossover a=1.0 g=6 r=2^256.0 (rho = 2^131.41, l_max = 2^129.0):
+    ladder (a), measured desc fit l>=256                                   log2 l* =   45.47  (inside the possible range)
+    ladder (a), measured asc fit l>=256                                    log2 l* =   45.47  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^10                                log2 l* =   53.84  (inside the possible range)
+    ladder (a'), projected auto fit l>=2^13                                log2 l* =   57.64  (inside the possible range)
+    ladder (a'), projected auto l>=2^13, exponent at OLS CI low end        log2 l* =   62.55  (inside the possible range)
+    ladder (a'), projected best of karatsuba/auto fit l>=2^13              log2 l* =   57.64  (inside the possible range)
+    ladder (a'), model l^2 log l calibrated at top                         log2 l* =   55.23  (inside the possible range)
+    psi + CZ desc (b), measured fit                                        log2 l* =   32.20  (inside the possible range)
+    psi + gcd asc (b), measured fit                                        log2 l* =   33.62  (inside the possible range)
+    Phi amortised desc (c), measured fit 11..103                           log2 l* =   60.66  (inside the possible range)
+    Phi cold desc (c), measured fit 11..103                                log2 l* =   27.25  (inside the possible range)

@@ -8,7 +8,10 @@
 
 **Status:** corrected after review; no scientific run was started. The arity
 and solver-model correction is recorded in
-[`DEC-20261031-cd6460.md`](DEC-20261031-cd6460.md). One controlled
+[`PDP_ARITY_CORRECTION.md`](PDP_ARITY_CORRECTION.md). Immutable decision
+provenance is `DEC-20261031-b51282` plus additive hardening decision
+`DEC-20261101-26f1fa`; `DEC-20261031-cd6460` remains the unrelated checker
+defect. One controlled
 arity-three CDCL(T)/finite-field screen is drafted but deliberately not frozen
 until its native generator, theory-propagator source, solver identities, power
 check and preflight cost are available.
@@ -34,20 +37,23 @@ loses the required size bound.
 The best experiment for the narrower practical-solver hypothesis is therefore
 not another direct Semaev bit-blast and not ordinary CNF. It is a matched
 arity-three tournament on a **one-hot, disjoint-window, chained-`S3`
-predicate**, using hybrid CDCL(T) with an `F_p` theory or cvc5 `QF_FF`, with
-exact enumeration and F4 as controls. Pure CNF is only an encoding-cost
-control: although the quotient ring `F_p[z]/(z^2-z)` avoids carries, a general
-field multiplication still costs `Theta(log^2 p)` Boolean gates when
-bit-blasted.
+predicate**, using hybrid CDCL(T) with an `F_p` theory, with exact enumeration
+and F4 as controls. QF_FF is diagnostic at the inspected source. Pure CNF is
+only an encoding-cost
+control. The frozen schoolbook multiplier has `Theta((log p)^2)` gates by
+construction; this is not a lower bound for all Boolean multiplication. At the
+inspected cvc5 source, QF_FF is a SAT/model diagnostic because finite fields
+have no proof checker.
 
 The arity gate is structural. If a point-decomposition query at factor-base
-scale `s=log2(p)/m` costs `2^(e s)`, relation collection costs
-`p^((e+1)/m)` up to polynomial factors and can beat rho only if
-`e < m/2 - 1`. At `m=2` this is impossible; exact pair enumeration is already
+scale `s=log2(p)/m` costs `2^(e s)` and reusable setup costs `2^(a s)`,
+relation collection costs `2^(a s)+2^((e+1)s)` up to polynomial factors and
+can beat rho only if `a<m/2` and `e < m/2 - 1`. At `m=2` the second gate is
+impossible; exact pair enumeration is already
 optimal up to polynomial factors. Every theorem and completed measurement in
 the newer split-graph factor-base study is at `m=2`, so none is an
 exponent-changing result. The first relevant fixed arity is `m=3`, with the
-strict gate `e<0.5`.
+strict gates `e<0.5` and `a<1.5`.
 
 ### Ranked portfolio
 
@@ -57,7 +63,7 @@ prime-field relation oracle, not by implementation convenience.
 | rank | lead | present evidence | next discriminating action |
 |---:|---|---|---|
 | 1 | Hashed factor bases + compact Boolean tensor contraction | Conditional end-to-end theorem chain; native implementation and bounded controls exist; no independent general proof/code audit or practical recursive run | Audit the theorem-to-code bridge lemma by lemma; separately execute the already frozen 84-case finite panel |
-| 2 | Arity-three one-hot chained `S3`, solved by CDCL(T)/`F_p` or `QF_FF` | Rationality is free under the guarded disjoint-window argument; no measured PDP exponent; pure CNF has a `Theta(log^2 p)` multiplication expansion | Freeze the `m=3`, `s=6..14` exponent screen in [PROTOCOL.md](PROTOCOL.md), retaining enumeration and curve-free-null controls |
+| 2 | Arity-three one-hot chained `S3`, solved by CDCL(T)/`F_p`; QF_FF diagnostic | Rationality is free under the guarded disjoint-window argument; the development oracle passes, but no production PDP exponent exists; pure CNF has a counted schoolbook expansion | Implement the source-bound `F_p` trail theory and freeze the complete-natural-panel `m=3`, `s=6..14` screen in [PROTOCOL.md](PROTOCOL.md) |
 | 3 | PKM tower generalized root finding, `m >= 4` | Published prime-field construction and extensive F4/last-fall evidence; the correct generic gate is `e < m/2-1`, not “`m<=3` is impossible” | Keep as a distinct algebraic control; complete the registered `m=4, N=20` closure without using it to validate the arity-three solver claim |
 | 4 | Target-parametric learned-clause / tensor-message reuse | A plausible relation-collection amortization mechanism; no controlled prime-field evidence | Compare cold one-target, reset, and target-assumption reuse while preserving target-independent state provenance |
 | 5 | Special-`j`, Solinas-prime and chart-aware Boolean encodings | Sparse formulas and cheaper modular reduction are plausible constant improvements; no exponent-changing evidence | Factorial control: special versus generic curve and prime, with the same order, chart, predicate and solver |
@@ -87,11 +93,11 @@ This review keeps three questions separate.
    realize those hypotheses with the claimed bit cost?
 2. **Representation question:** can the decomposition predicate remain compact
    enough that a solver receives field constraints through an `F_p` theory,
-   rather than a pure-CNF expansion with `Theta(log^2 p)` gates per general
-   multiplication?
-3. **Practical solver question:** on that same predicate, do CDCL(T), `QF_FF`
-   or F4 reduce the fitted PDP exponent below the strict arity-three threshold
-   `e=0.5`, with complete correctness and cost accounting?
+   rather than the selected pure-CNF schoolbook expansion, whose gate count is
+   quadratic by construction?
+3. **Practical solver question:** on that same predicate, does proof-eligible
+   CDCL(T)/`F_p` reduce the natural-query exponent below `e=0.5` while reusable
+   setup remains below `a=1.5`, with complete correctness and cost accounting?
 
 A positive answer to question 3 would not prove question 1. A failure of one
 CNF encoding would not refute question 1. This distinction is the main reason
@@ -203,8 +209,8 @@ chains `S3` through the quadratic lambda lift; it does not expand `S4`. The
 disjoint-window three-summand argument makes every guarded model rational.
 Arity at least four instead retains and charges explicit rationality circuits.
 The rational-lift identity, its discriminant `16t^2 f(x)`, and forbidden-word
-clauses are stated with their exceptional cases in the
-[correction record](DEC-20261031-cd6460.md).
+semantics are stated with their exceptional cases and compact range encoding
+in the [correction analysis](PDP_ARITY_CORRECTION.md).
 
 ## Quantitative evidence currently constraining the algebraic fallback
 
@@ -263,43 +269,49 @@ record in [protocol.draft.json](protocol.draft.json).
 **Fixed semantic object.** Use `m=3` throughout. Each summand has a disjoint
 one-hot window of rational factor-base points. Chain two `S3` constraints
 through the quadratic lambda lift and do not expand `S4`. The nonzero-
-displacement chart, exactly-one constraints, forbidden-word clauses and
-independent group replay are identical across arms. The guarded
+displacement chart, Sinz exactly-one constraints, compact unsigned range
+predicate, bound lift signs and independent signed group replay are identical
+across arms. The guarded
 three-summand/disjoint-window argument supplies rationality without an extra
 rationality circuit; any exceptional chart is explicit rather than divided
 away.
 
 **Arms.** Canonical exact two-window enumeration; msolve/F4; CaDiCaL with an
-external `F_p` theory propagator and checked explanation clauses; cvc5
-`QF_FF`; and a pure-CNF bit-blast as an encoding-cost control only. Retain a
+external `F_p` theory propagator and checked explanation/proof clauses; cvc5
+`QF_FF` as a SAT/model diagnostic; and a frozen schoolbook pure-CNF bit-blast
+as an encoding-cost control only. Retain a
 byte-identical A/A rerun, planted positive controls and support/model-count
 matched curve-free nulls.
 
 **Cells.** Every integer `s=6,...,14` at fixed `m=3`, with natural, planted and
 exact-UNSAT targets and held-out protocol-derived seeds. Here
-`s=log2(p)/3` up to the recorded prime-rounding error. A later continuation may
-extend through `s=27` (approximately 40--80-bit fields), but it cannot be used
-to rewrite the first ladder after data. Exact model-set equality is required
-where enumeration completes; all larger attempted/censored cells remain in the
-export.
+the regression coordinate is actual `log2(p)/3` after prime rounding. The
+selected one-hot continuation through `s=27` is not admitted: at `s=27` it has
+805,306,365 Boolean variables and 1,207,959,543 exactly-one clauses before
+theory auxiliaries. A later continuation needs a prospective compact-selector
+equivalence/resource amendment. Exact model-set equality is required where
+enumeration completes.
 
-**Primary measurements.** Verified model set/status, complete counted work from
-instance compilation through solve and replay, peak RSS, and solver-native
-counters. The CDCL(T) ledger separately records Boolean decisions/conflicts,
+**Primary measurements.** Verified model set/status; complete cold, reusable
+setup and online-plus-verification retired instructions; cold peak RSS; and
+solver-native counters. The CDCL(T) ledger separately records Boolean decisions/conflicts,
 theory calls, field operations, propagated literals and explanation clauses;
 none may be omitted from the total. F4 reports solving degree, rows, columns
 and multiply-adds. Wall time is secondary and requires L2 isolation.
 
-**Advance gate.** Fit `log2(complete counted work)` directly against `s`. A
-predeclared hybrid bundle advances only if it is correct on every attempted
-cell, its Holm-corrected upper 95% slope interval is **strictly below `0.5`**,
-and the finding lies outside A/A spread. Enumeration remains the `e=2`
-reference and correctness control, not the normalization axis.
+**Advance gate.** Fit natural-only `log2(online plus verification work)` and
+`log2(setup work)` against actual `log2(p)/3`. The CDCL(T)/`F_p` bundle
+advances only if every preregistered natural row and every control completes
+and verifies, the upper intervals are strictly below `e=0.5` and `a=1.5`, the
+findings lie outside A/A spread and the stage ledger reconciles. There is one
+eligible slope candidate and no artificial Holm family. Enumeration remains
+the `e=2` reference and correctness control, not the normalization axis.
 
-**Do-not-advance gate.** The bundle is not advanced if its corrected lower 95%
-slope interval is at least `0.5` over the preregistered ladder. Failure to
-identify the slope because of censoring, failed theory explanations, missing
-counters or insufficient power is **inconclusive**, not a negative result.
+**Do-not-advance gate.** On the same complete valid panel, the bundle is not
+advanced if either lower interval has `e>=0.5` or `a>=1.5`. Any natural
+timeout, OOM, unknown, unproved UNSAT or missing rung is **inconclusive**;
+completed rows are never substituted, imputed or pooled with planted/UNSAT
+controls.
 
 This gate decides whether to invest in that solver/representation family. It
 does not prove or disprove a universal SAT or ECDLP complexity statement.
