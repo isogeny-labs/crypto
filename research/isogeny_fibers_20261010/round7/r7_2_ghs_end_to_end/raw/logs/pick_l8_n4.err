@@ -1,0 +1,10 @@
+
+thread 'main' (11320) panicked at examples/r7_2_ghs_end_to_end.rs:448:61:
+removal index (is 0) should be < len (is 0)
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+   1: core::panicking::panic_fmt
+   2: <alloc::vec::Vec<_, _>>::remove::assert_failed
+   3: r7_2_ghs_end_to_end::setup
+   4: r7_2_ghs_end_to_end::main
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
