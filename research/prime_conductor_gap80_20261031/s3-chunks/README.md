@@ -14,6 +14,11 @@ working polynomials merely by moving their input files.
 
 ## Upload and retrieval
 
+The root chunk's S3 upload/full-byte readback completed in artifact migration
+commit `5f89c75b013edad3bfb8e3c1215ba4a2930757a7`.
+Its manifest matches the independently checked local SHA-256
+`56bb2d85e4fb8584eb80b00cb8ead37d192c1055e84c80c6a6fb6c6057892ed2`.
+
 The authorized same-repository `artifact-autofix` workflow uploads selected
 data to `s3://setec-astronomy-artifacts/store/sha256/`, downloads the complete
 object again, checks the bytes and commits `.artifacts.json` plus an ignore
@@ -32,6 +37,28 @@ sha256sum -c roots-000000.bin.sha256
 Artifact tooling verifies the downloaded digest before placing the file.
 The object is immutable and content-addressed; the metadata preserves the
 exact ordinal interval so regeneration does not need preceding chunks.
+
+## Portable source/input snapshot
+
+`producer-state.tar.xz` holds the native source, build entry point, exact
+parameters, certificate, fixture bytes/metadata and this fixture's report.
+It is a portable source/input snapshot, not a process-memory checkpoint or
+a claim that a computation resumed. Its adjacent checksum pins the bytes;
+it is also subject to verified S3 migration. Hydrate this directory first,
+then verify and extract into an empty scratch directory:
+
+```sh
+sha256sum -c producer-state.tar.xz.sha256
+mkdir restored-producer
+tar -xJf producer-state.tar.xz -C restored-producer
+```
+
+The included source and parameters correspond to producer commit `109710510`.
+The archive is deterministic (sorted paths, fixed 1-November timestamp,
+numeric owner/group zero), excludes build outputs, and its embedded root
+bytes were checked against the original root digest before publication.
+The archive's creation-time documentation remains historical; current upload
+status is established by the live artifact manifest and migration commit.
 
 ## Native producer and independent fixture check
 
