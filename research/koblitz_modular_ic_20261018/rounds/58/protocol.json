@@ -1,27 +1,37 @@
 {
   "schema": "experiment.protocol/v1",
-  "id": "KOBLITZ-R58-COMPLETE-CHECK",
+  "id": "KOBLITZ-R58-F32-FINITE-SUPPORT",
   "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
   "claims": [
     {
-      "id": "complete-replay",
+      "id": "twenty-points",
       "class": "exact_computation",
-      "statement": "Independent replay of all ranks/kernel/recovery/actualsource/division/inclusion/contraction/traceidentity products."
+      "statement": "Wholedegree80sourcequotient factors into4degree20F2fields and20simpledegree4F32points;all5coefficientconjugates andactualFrob32\u00b2=sigma sourcecoordinates checked."
+    },
+    {
+      "id": "degree-units",
+      "class": "theorem",
+      "statement": "A nonconstant curve map overF32 withx andy/x both inL2P hasunramifiedO/Tfibers,degree4k,k1..10,coprime11;local/pullback/fiber-degree premises are supplied geometry."
+    },
+    {
+      "id": "closed-support-trace",
+      "class": "theorem",
+      "statement": "For an F32-defined sigma-anti-equivariant map,everyoneofthese20closedpointorbittraces iszero;conditionalonmap/equivariance,not a constructed targetmap."
     }
   ],
   "arms": {
     "reference": "R57 full descent/cusp bridge and R50 actual196-product packet",
     "baseline": "complete68-section degree128 space and24-section degree80 restriction",
-    "candidate": "Full saved-certificate replay",
+    "candidate": "Complete finite support andall5F32coefficientorbits",
     "positive": [
-      "all196/96/100 ranks andcompletekernelproducts",
-      "all100 actualfieldreconstructions",
-      "all100 divisionproducts",
-      "fullQcontraction andJordaninverse",
-      "24 inclusionproducts and4actualtracepreimagebindings"
+      "fullsquarefree80-polynomialfactorization",
+      "20irreduciblequarticsandallcomponentproducts",
+      "all5coefficientconjugatesfor4components",
+      "actualFrob32\u00b2translationonw,lambda,nu andbasecoordinates",
+      "tenconditionaldegreeswithintegerBezoutcertificates"
     ],
     "negative": [
-      "corruptedkernelentryinactualnonzeroconstraintrow"
+      "wrongidentityFrob32\u00b2w=w rejectedineveryquartic"
     ],
     "A_A": {
       "not_applicable_reason": "fixed exhaustive exact calculation, no noisy comparison"
@@ -63,14 +73,14 @@
     "power": "notapplicable"
   },
   "metrics": [
-    "fullmatrixproducts/ranks",
-    "100 source and100divisionproducts",
-    "24 inclusionrank",
-    "4actualtraceproducts",
-    "corruptedkernelrejected"
+    "4F2degree20fields",
+    "20F32degree4points",
+    "5coefficientconjugatespercomponent",
+    "20actualsourceactionchecks",
+    "10integerdegreeunitcertificates"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh check58-01 CHECK58.sing CHECK58_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_CAS.sh fiber58-01 FIBER58.sing FIBER58_ALL_CHECKS_PASS",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
     "threads": 1,
@@ -106,9 +116,9 @@
     }
   ],
   "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
-  "version": 5,
+  "version": 6,
   "amendment": {
     "before_affected_data": true,
-    "reason": "include58-01 accepted completeQ contraction,24 actualinclusionidentities and4actualtracepreimages;freeze independentchecker"
+    "reason": "independentcheck58 accepted; freeze all20 F32 pointorbits andconditionalmapdegree/trace-support implications;Lean01 rejected missingCharP import,preserved"
   }
 }

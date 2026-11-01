@@ -1,4 +1,8 @@
 import Mathlib.RingTheory.Valuation.Basic
+import Mathlib.Algebra.CharP.Defs
+import Mathlib.Tactic.Abel
+import Mathlib.Tactic.IntervalCases
+import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.LinearCombination
 
@@ -38,5 +42,27 @@ theorem real_coefficient {K : Type*} [Field K] [CharP K 2]
   rw [imaginary_coefficient a x y ha hx hy]
   have htwo : (2 : K) = 0 := CharP.cast_eq_zero K 2
   linear_combination (a*y) * htwo
+
+/-- Target orbit sums cancel when the second Frobenius sends a point
+ to its inverse. Equivariance supplies this premise for the finite support. -/
+theorem four_cycle_trace_zero {A : Type*} [AddCommGroup A]
+    (F : A →+ A) (q : A) (h : F (F q) = -q) :
+    q + F q + F (F q) + F (F (F q)) = 0 := by
+  rw [h]
+  simp only [map_neg]
+  abel
+
+/-- A double-pole coordinate under a multiplicity-two bound is unramified. -/
+theorem double_bound_unramified (e : ℤ) (he : 0 < e) (hbound : 2 * e ≤ 2) :
+    e = 1 := by
+  have he1 : 1 ≤ e := Int.add_one_le_iff.mpr he
+  linarith
+
+/-- Two disjoint degree-four fibers inside twenty degree-four points
+ give a degree coprime to eleven. Fiber geometry supplies the count bound. -/
+theorem support_degree_coprime_eleven (k : ℕ) (hk : 0 < k)
+    (hbound : k + k ≤ 20) : Nat.Coprime (4 * k) 11 := by
+  have hle : k ≤ 10 := by nlinarith
+  interval_cases k <;> norm_num at *
 
 end Pole58
