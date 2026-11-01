@@ -1,14 +1,15 @@
 # Research Report: Isogeny Fibers, Hidden Geometric Structure, and ECDLP Hardness Discrepancies
 
 **Date.** 2026-10-10 (rounds 1–3); extended through 2026-10-24 (§17 round 4,
-§19 rounds 5–6). **Status.** Theorem audit + proofs at the level of
+§19 rounds 5–6; status update 2026-10-31, §19.19). **Status.** Theorem audit + proofs at the level of
 propositions, with a toy-field computational probe
 (`research/isogeny_fibers_20261010/`, pure Python + sympy, reproducible with
 `python3 -I fiber_probe.py` and `python3 -I pullback_factor.py`). Rounds 4–6
 (§17, §19) are native Rust, toy and synthetic instances only. §19 records the
-verdict of every round-5 and round-6 lead and marks which results are in
-unmerged pull requests; §18 is the reference list as revised by the R6.10
-literature check.
+verdict of every round-5 and round-6 lead; it was written on 2026-10-24 with
+five leads still in open pull requests and was updated on 2026-10-31 (§19.19),
+when all of them and the R6.2 correction (#2543) had merged; §18 is the
+reference list as revised by the R6.10 literature check.
 **Prior notes this builds on.** `RESEARCH_PDP_SPEEDUP_AND_ISOGENY.md` (2-/3-isogenous
 binary neighbours: identical Macaulay ranks, yield moves only with |F|),
 `RESEARCH_KOBLITZ_INDEX_CALCULUS.md`, `RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM.md`.
@@ -119,8 +120,8 @@ binary neighbours: identical Macaulay ranks, yield moves only with |F|),
 
 9. **Rounds 5 and 6 (§19) change constants and bookkeeping, not the map.**
    Fifteen leads were run (R5.1–R5.4, R6.1–R6.11); §19 gives each one's
-   hypothesis, falsifier, verdict and numbers, and marks the five whose pull
-   requests were still open on 2026-10-24. A quotient-coordinate oracle removes
+   hypothesis, falsifier, verdict and numbers; five of them were in pull
+   requests still open on 2026-10-24 and have all merged since (§19.19). A quotient-coordinate oracle removes
    the 2^{m−2} penalty in characteristic 2 as well (R5.1); a finite-size
    A-pair correction explains the ensemble ζ-closed census but not the single
    recorded value (R6.5, falsifier fired); relation yield is the same on the
@@ -1998,18 +1999,24 @@ or the named part of it. *Open*: the data do not decide it. A hypothesis can
 have a part that is refuted and a part that survives; the entry then says
 which.
 
-**Status of the sources (read on 2026-10-24).** Merged into `main`
-(`5cb553810e`): R5.1 #2179, R5.2 #2181, R5.4 #2180, R6.10 #2183, R6.3 #2193,
-R6.5 #2194, R6.6 #2195, R6.7 #2217, R6.11 #2197, R6.2 #2230. **Unmerged, pull
-request still open:** R5.3 #2192 (`e8e0bf1296`), R6.8 #2196 (`7d6d50d268`), R6.4
-#2240 (`325c8345b8`), R6.9 #2502 (`6ac9a3877e`), R6.1 #2511 (`ff6fd1dc6c`).
-Entries from open pull requests are marked **UNMERGED**; they quote the
-`RESULTS.md` on the pull request's branch, can still change, and their links
-name the pull request because the file is not on `main`. Open pull requests
-#2192, #2240 and #2196 carry validation holds recorded in their own
-descriptions (§19.3, §19.8, §19.12). Known defects: R6.2 (merged, two open
-defects, §19.6), one miscount in the merged R6.7 `RESULTS.md` (§19.11), and one
-internal count discrepancy in the unmerged R6.9 (§19.13).
+**Status of the sources (first read on 2026-10-24; updated on 2026-10-31).**
+Merged into `main` when first read (`5cb553810e`): R5.1 #2179, R5.2 #2181, R5.4
+#2180, R6.10 #2183, R6.3 #2193, R6.5 #2194, R6.6 #2195, R6.7 #2217, R6.11
+#2197, R6.2 #2230. Five pull requests were still open then and were marked
+**UNMERGED**: R5.3 #2192, R6.8 #2196, R6.4 #2240, R6.9 #2502, R6.1 #2511. The
+GitHub pull-request records read on 2026-10-31 show that all five have merged:
+R6.4 #2240, R6.9 #2502 and R6.1 #2511 on 2026-10-26, R5.3 #2192 on 2026-10-29
+and R6.8 #2196 on 2026-10-30. The R6.2 correction #2543 merged on 2026-10-25,
+and the round-7 follow-up R7.1 #2542 (stacked on #2502) on 2026-10-26 (§19.19).
+Each entry that had been read from a pull request's branch was compared with
+the merged `RESULTS.md` on `main` on 2026-10-31; the verdicts and numbers
+quoted below are unchanged, and the entries now link the file on `main`. The
+validation holds that the descriptions of #2192, #2240 and #2196 recorded
+before they merged (§19.3, §19.8, §19.12) are quoted as they were written;
+whether each hold was cleared before the merge was not checked here. Known
+defects: R6.2's two defects were corrected in #2543 (§19.6, verdict still
+open); one miscount remains in the merged R6.7 `RESULTS.md` (§19.11), and one
+internal count discrepancy remains in the merged R6.9 `RESULTS.md` (§19.13).
 
 ### Round 5
 
@@ -2060,10 +2067,18 @@ curves in those classes reach one, at mean distance 1.3–3.0 isogeny steps
 degenerate at these sizes, and model P and the structural definitions were
 added after M1 and A came out degenerate, so they are post-hoc.
 *Other numbers (measured unless noted).* The best class sits 1.65–2.42 bits
-above rho under P (derived). The `ec_trapdoor::audit_curve` genus rule differs
-from the formula derived in the source on 1 248 of 1 500 sampled rows at
-N = 12 (the example's magic number agrees on 1 500/1 500). 2-isogenies never
-change the magic number m (derived; measured invariance).
+above rho under P (derived). The source reports that the `ec_trapdoor::audit_curve`
+genus rule differs from the formula derived in the source on 1 248 of 1 500
+sampled rows at N = 12 (the example's magic number agrees on 1 500/1 500).
+*Update (#2524, merged 2026-10-26; its audit note
+`docs/audits/AUDIT_CURVE_GHS_GENUS_R52_STALE_BASE_20261024.md`).* That
+discrepancy is stated there to come from a stale base: R5.2's example linked a
+`crypto_lib` that predates the 2026-10-13 magic-number correction, and on
+`main` `audit_curve` already implements the formula R5.2 derived. #2524 adds
+three regression tests, makes no `src/` rule change and leaves R5.2's frozen
+`RESULTS.md` unedited, so the sentence above is the source's, superseded for
+current `main`. 2-isogenies never change the magic number m (derived; measured
+invariance).
 *Corrections from R6.10 (§19.14).* The condition "n odd, or m = n, or
 Tr(a) = 0" is the Gaudry–Hess–Smart (GHS02) theorem, not Menezes–Qu (L22), and
 the "m = m′ + [f(1) ≠ 0]" form attributed to Menezes–Qu is unverified. The
@@ -2074,7 +2089,7 @@ large g, and model P applies it at small g (L41).
 "transfer" is the Hasse–Weil size test. Only ℓ ∈ {3, 5, 7}, toy N ≤ 20.
 *Source.* [`round5/r5_2_ghs_class/RESULTS.md`](research/isogeny_fibers_20261010/round5/r5_2_ghs_class/RESULTS.md).
 
-### 19.3 R5.3 — a three-prime NTT for √élu (**UNMERGED**, open #2192)
+### 19.3 R5.3 — a three-prime NTT for √élu (merged, #2192; first read as UNMERGED)
 
 *Hypothesis.* With fast polynomial multiplication the √élu exponent (0.82
 [0.805, 0.838] with Karatsuba in round 4) drops toward 0.5–0.6; the
@@ -2098,11 +2113,14 @@ kernels stay beyond ℓ_max = 2√p for r = 2^64, 2^128, 2^256; generic kernels
 contended wall ratio says this NTT is dearer per counted unit); the generic
 arm stopped at ℓ = 863 by the time cap; crossover rows are extrapolations by
 many octaves.
-*Status.* The pull request description records an exact-head validation hold:
-the gate reports a missing `VALIDATION.json` and no pre-gate freeze for
-`20261019-r5-3-ntt-sqrt-velu`, so the benchmark row is unadmitted.
-*Source.* PR #2192, branch `research/r5-ntt-sqrt-velu`,
-`research/isogeny_fibers_20261010/round5/r5_3_ntt_sqrt_velu/RESULTS.md`.
+*Status.* Merged 2026-10-29. Before the merge the pull request description
+recorded an exact-head validation hold (2026-10-23): the gate reported a
+missing `VALIDATION.json` and no pre-gate freeze for
+`20261019-r5-3-ntt-sqrt-velu`, so the benchmark row was unadmitted; whether the
+hold was cleared was not checked here. The numbers above were re-read in the
+merged `RESULTS.md` and are unchanged.
+*Source.* PR #2192 (merged),
+[`round5/r5_3_ntt_sqrt_velu/RESULTS.md`](research/isogeny_fibers_20261010/round5/r5_3_ntt_sqrt_velu/RESULTS.md).
 
 ### 19.4 R5.4 — Conjecture 10 over prime fields and the oracle's enumeration domain (merged, #2180)
 
@@ -2149,7 +2167,7 @@ Proposition 15.2′ refines is anticipated by Faugère–Huot–Joux–Renault�
 
 ### Round 6
 
-### 19.5 R6.1 — direct S5 systems and the chained x-frame `ic` plug-in (**UNMERGED**, open #2511)
+### 19.5 R6.1 — direct S5 systems and the chained x-frame `ic` plug-in (merged, #2511; first read as UNMERGED)
 
 *Hypothesis.* The direct symmetrised S5 is feasible wherever the chained
 symmetrised system is and cheaper per relation; it still never beats a
@@ -2173,62 +2191,94 @@ arm to mitm m = 2 is 2.3× (n = 13, m = 3). Discrepancy protocol: panel and
 pipeline drivers agree on 396/396 target outcomes and XOR counts; 1/24 against
 66/300 has Fisher two-sided p = 0.036.
 *Library change.* `ChainedXOracle` (`chained-x`) in
-`src/cryptanalysis/ic_framework/plugins.rs`, two unit tests; not yet
-registered in `src/bin/ic/bench.rs`.
+`src/cryptanalysis/ic_framework/plugins.rs`, two unit tests; not
+registered in `src/bin/ic/bench.rs` (still the case on `main` on 2026-10-31).
 *Limits.* No instance at n = 15 and a = 1 only at n = 17; six cells marked NOT
 RUN; "not buildable" is a contended wall-time observation, not a counted bound;
 the symbolic build is not counted in the XOR figures; no matched rho was run
 (round-4 rho references on these curves are S ≈ 1–2, below every row).
-*Source.* PR #2511, branch `research/r6-direct-s5`,
-`research/isogeny_fibers_20261010/round6/r6_1_direct_s5/RESULTS.md`.
+*Source.* PR #2511 (merged 2026-10-26; the numbers above were re-read in the
+merged file and are unchanged),
+[`round6/r6_1_direct_s5/RESULTS.md`](research/isogeny_fibers_20261010/round6/r6_1_direct_s5/RESULTS.md).
 
-### 19.6 R6.2 — pooled multi-target rho on an isogeny class, and path-finding cost (merged, #2230; **known defects pending correction**)
+### 19.6 R6.2 — pooled multi-target rho on an isogeny class, and path-finding cost (merged, #2230; corrected in #2543, merged)
 
 *Hypothesis (PROGRAM.md).* The transported batch costs B/C ∈ [0.97, 1.03] of
 single-curve L-target rho for L ≤ 256; path finding between two curves of a
 class costs O(√(class size)) Φ_ℓ-root evaluations and is instance-independent.
 *Falsifier.* B/C outside [0.95, 1.05] with the 95% interval excluding 1 at any
 L; or a path-finding cost that scales with r.
-*Verdict.* **Open.** The harness computed no paired interval, so the report
-makes no difference or equivalence claim and the B/C falsifier was not
-evaluated. The merged result is on hold for two defects (below), so its path
-numbers should not be quoted until corrected.
-*Numbers (measured; one base curve, p = 11018534707, r = 2^28.04, h = 40, a
-class of 257 curves, 20 trials per L; S = total counted group operations/√r,
-mean ± SE).* B (transported) / C (same-curve pooled control): L = 1: 1.084 ±
-0.153 / 0.843 ± 0.106; L = 4: 2.089 ± 0.107 / 2.285 ± 0.092; L = 16: 4.272 ±
-0.097 / 4.424 ± 0.130; L = 64: 9.395 ± 0.093 / 9.266 ± 0.112; L = 256: 20.165
-± 0.138 / 20.170 ± 0.086. The means of B and C lie within about 2 SE of each
-other (source). The ratios of means B/C are 1.287, 0.914, 0.966, 1.014, 0.9998
-(derived). Both pooled arms stay above the Kuhn–Struik reference (15.992 at
-L = 256) and far below L times the single-target mean (1.042 ± 0.120 at
-L = 256, so about 267, derived). Transport costs at most 163.0 M + 18.1 I per
-target at L = 256. 13 740 recovered logarithms were verified on their original
-curves. Paths: 18 components of the rational ℓ ∈ {2, 3, 5, 7} graph (cap 3 000
-curves; 5, 9 and 45 components skipped over the cap at 24, 28 and 32 bits);
-mean neighbour enumerations per pair range from 7.2 to 5 620.8 and, in the
-source's words, "grow with component size and stay on the order of the
-component size". The O(√(class size)) hypothesis is therefore not shown by
-these data (my reading; the source gives no verdict on it); selection is
-biased toward small components by the cap.
-*Known defects (owner's source review on the pull request).* (1) The pooled
-method is registered with `Applies::Any` but its dispatch handles only
-`Instance::Prime`; an explicit prime-only contract with negative controls is
-owed. (2) The bidirectional search expands outgoing neighbours on both sides;
-degree-5/7 root-based edges need not have a reverse edge available, so a
-meeting `a → c ← b` does not construct an executable `a → b` route. A
-symmetric certified edge set, or actual predecessors with the dual edges
-validated and their work counted, plus a versioned corrected path analysis, are
-owed. Until then the path-finding results are pending correction.
+*Verdict.* **Open** (unchanged by the correction). The harness computed no
+paired interval, so the report makes no difference or equivalence claim and the
+B/C falsifier was not evaluated. For paths, the O(√(class size)) part is not
+shown by the data, before or after the correction: the cost grows with the
+component size and stays on its order. The r-scaling falsifier was not
+evaluated either (no formal test was run). The batch half was not re-run in
+#2543.
+*Batch numbers (measured; unchanged by the correction; one base curve, p =
+11018534707, r = 2^28.04, h = 40, a class of 257 curves, 20 trials per L; S =
+total counted group operations/√r, mean ± SE).* B (transported) / C
+(same-curve pooled control): L = 1: 1.084 ± 0.153 / 0.843 ± 0.106; L = 4: 2.089
+± 0.107 / 2.285 ± 0.092; L = 16: 4.272 ± 0.097 / 4.424 ± 0.130; L = 64: 9.395 ±
+0.093 / 9.266 ± 0.112; L = 256: 20.165 ± 0.138 / 20.170 ± 0.086. The means of B
+and C lie within about 2 SE of each other (source). The ratios of means B/C are
+1.287, 0.914, 0.966, 1.014, 0.9998 (derived). Both pooled arms stay above the
+Kuhn–Struik reference (15.992 at L = 256) and far below L times the
+single-target mean (1.042 ± 0.120 at L = 256, so about 267, derived). Transport
+costs at most 163.0 M + 18.1 I per target at L = 256. 13 740 recovered
+logarithms were verified on their original curves.
+*First path numbers (schema `r6_2.paths/v1`, `paths.json`, frozen; superseded,
+do not quote as route costs).* 18 components of the rational ℓ ∈ {2, 3, 5, 7}
+graph (cap 3 000 curves; 5, 9 and 45 components skipped over the cap at 24, 28
+and 32 bits); mean neighbour enumerations per pair from 7.2 to 5 620.8. The
+corrected source states that these lengths, counts and component sizes are not
+the cost of any executable route (below).
+*Correction (merged in #2543 on 2026-10-25; source: `RESULTS.md`, section
+"Correction (paths v2)", and the pull request description).*
+(1) The pooled method had been registered `Applies::Any` while its dispatch
+handles only `Instance::Prime`. It is now `Applies::PrimeOnly`; the planner
+(`applicable`) and `solve` both refuse a non-prime instance, with negative
+controls (Koblitz and random binary curves) and a positive control (a prime
+curve) in the tests named in the source, and `docs/ecbench/README.md` states
+the contract. (2) The v1 bidirectional search expanded outgoing neighbours from
+both ends, but for ℓ = 5, 7 with p ≠ ±1 mod ℓ an outgoing edge need not have a
+reverse edge, so a meeting a → c ← b is not an executable route a → b. The
+search now keeps an edge only when `SmallIsogeny::dual` certifies its reverse
+(each certification counted) and re-validates every returned route forward
+from a, edge by edge, on the chained curves (counted). The pre-fix search runs
+on the same pairs as a control; v1 stays reproducible as `--mode paths-legacy`
+and `paths.json` is untouched.
+*Corrected re-run (counts; contended host, no isolation; 10 pairs per class,
+18 classes, 180 pairs each for fresh classes at seed 7 and for a replay of the
+18 frozen v1 start curves).* 360 of 360 corrected routes validate forward (180
+of 180 and 180 of 180). On the corrected components' pairs the pre-fix search
+returned a non-executable route for 19 (fresh) and 4 (replay) of 180 pairs, and
+a shorter-than-executable length for 27 and 9; these are lower bounds on the v1
+defect, because v1 drew its pairs from the larger outgoing components. In the
+replay 8 of 18 components shrink (one-way ℓ = 5, 7 edges removed): 480 to 6, 844
+to 4, 240 to 4, 2424 to 8, 1024 to 16, 692 to 2, 620 to 2, 647 to 1. Mean total
+enumerations per pair for components above 1 000 curves: 3 044 to 12 905
+(fresh) and 4 132 to 10 158 (replay); total per pair over component size 2.7 to
+5.1 (fresh) and 3.0 to 4.3 (replay) (derived). In the source's words the cost
+still grows with the component size and stays on its order, so the
+O(√(class size)) hypothesis is still not shown. No B/C interval was computed.
 *Limits (source).* Only r = 2^28 of the planned {2^28, 2^32, 2^36}; every ℓ = 5
 and ℓ = 7 edge of the batch class was dropped for lack of a rational-kernel dual
 (p ≡ 2 mod 5, p ≡ 5 mod 7), so the batch class uses ℓ ∈ {2, 3}; no isolated or
 independent-runner measurement, no ecbench session or paired bootstrap, no
-replay certificate.
-*Source.* [`round6/r6_2_pooled_rho/reports/run-20261018T2219Z/report.typ`](research/isogeny_fibers_20261010/round6/r6_2_pooled_rho/reports/run-20261018T2219Z/report.typ)
-(PDF beside it), records `batch.json` and `paths.json` in
+replay certificate; path pairs are drawn from components under the 3 000 cap
+(selection toward small components), and a bidirectional breadth-first search
+on a toy class is not an Elkies walk. The #2543 description states that clippy
+and the committed-session ecbench tests that read files outside the author's
+sparse checkout were not run locally (CI was to cover them; not checked here).
+*Source.* [`round6/r6_2_pooled_rho/RESULTS.md`](research/isogeny_fibers_20261010/round6/r6_2_pooled_rho/RESULTS.md)
+(created by #2543); run reports
+[`reports/run-20261018T2219Z/`](research/isogeny_fibers_20261010/round6/r6_2_pooled_rho/reports/run-20261018T2219Z/report.typ)
+(batch, #2230) and
+[`reports/run-20261025T0156Z/`](research/isogeny_fibers_20261010/round6/r6_2_pooled_rho/reports/run-20261025T0156Z/report.typ)
+(corrected paths, #2543; PDF beside each); records `batch.json`, `paths.json`
+(frozen v1) and `v2/` in
 [`round6/r6_2_pooled_rho/`](research/isogeny_fibers_20261010/round6/r6_2_pooled_rho/).
-There is no `RESULTS.md` for this lead.
 
 ### 19.7 R6.3 — the trace pair as a coset label of E/4E (merged, #2193)
 
@@ -2258,7 +2308,7 @@ example's table version (1.23–1.57× in wall time against the library's own
 *Prior work.* R6.10 found no earlier statement of the label (§19.14).
 *Source.* [`round6/r6_3_coset_label/RESULTS.md`](research/isogeny_fibers_20261010/round6/r6_3_coset_label/RESULTS.md).
 
-### 19.8 R6.4 — the vertical margin, phase two (**UNMERGED**, open #2240; wording as corrected after review)
+### 19.8 R6.4 — the vertical margin, phase two (merged, #2240; first read as UNMERGED; wording as corrected after review)
 
 *Hypothesis.* Generic kernel finding stays ≥ ℓ², so the §17.3 generic
 crossover moves by less than one bit of ℓ; ascending edges cost the same as
@@ -2294,12 +2344,14 @@ only under that model; the complete-cost ordering is unresolved, and the
 0 / 0.1 / 1 M addition-weight band was not computed because the library counter
 has no addition tally. A Sutherland CRT evaluation of Φ_ℓ(j, Y) was not
 implemented.
-*Status.* The pull request also adds a paragraph to §17.3 of this note
-superseding the generic-kernel row; that paragraph is not in this text until
-the pull request merges. Its description records a benchmark-admission hold
-(the validation gate names the unvalidated row `r5-3-ntt-sqrt-velu`).
-*Source.* PR #2240, branch `research/r6-vertical-margin-2`,
-`research/isogeny_fibers_20261010/round6/r6_4_vertical_margin_2/RESULTS.md`.
+*Status.* Merged 2026-10-26. The pull request's paragraph superseding the
+generic-kernel row is now in §17.3 of this note. Before the merge its
+description recorded a benchmark-admission hold (2026-10-23: the validation
+gate named the unvalidated row `r5-3-ntt-sqrt-velu`); whether it was cleared
+was not checked here. The numbers above were re-read in the merged
+`RESULTS.md` and are unchanged.
+*Source.* PR #2240 (merged),
+[`round6/r6_4_vertical_margin_2/RESULTS.md`](research/isogeny_fibers_20261010/round6/r6_4_vertical_margin_2/RESULTS.md).
 
 ### 19.9 R6.5 — the finite-size A-pair correction applied to the §15.2 census (merged, #2194)
 
@@ -2394,7 +2446,7 @@ inversion price is a Fermat inversion (12–25 M), not a measured hardware I/M
 ratio; contended host.
 *Source.* [`round6/r6_7_zeta_fold_phase2/RESULTS.md`](research/isogeny_fibers_20261010/round6/r6_7_zeta_fold_phase2/RESULTS.md).
 
-### 19.12 R6.8 — transport oracles on factor-base points (**UNMERGED**, open #2196; proof claim withdrawn)
+### 19.12 R6.8 — transport oracles on factor-base points (merged, #2196; first read as UNMERGED; proof claim withdrawn)
 
 *Hypothesis (theory, Proposition 5′).* A transport oracle lets the attacker use
 the union of pulled-back factor bases; pullbacks only grow (Prop. 3.2, Thm.
@@ -2420,7 +2472,7 @@ filtering, table construction and path evaluations. These gaps concern the
 proposed proof; they do not show that a corrected simulation is impossible or
 that transport gives an asymptotic advantage. The general exact-simulation
 theorem and its cost bound remain open (tracked in
-`problems/transport-oracle-exact-simulation-gap.md` on the branch); the owner
+`problems/transport-oracle-exact-simulation-gap.md`); the owner
 has stated that the gap is being corrected separately.
 *Numbers (measured, exact census; retained as finite measurements only, they
 do not validate the withdrawn theorem).* Curves (named by p; the source
@@ -2432,12 +2484,14 @@ for the h = 6 curve). Union cost over plain cost: 0.305–0.436 at m = 2 and
 0.516–3.733 at m = 3 (above 1 in 5 of the 8 m = 3 cells). Every isogeny and dual passed 500/500 on-curve,
 homomorphism and ψ̂ψ = [ℓ] checks; the Theorem 1 simulated answers agreed
 2000/2000.
-*Source.* PR #2196, branch `research/r6-transport-oracle`,
-`research/isogeny_fibers_20261010/round6/r6_8_transport_oracle/RESULTS.md`
-(the superseded original is retained there under `historical-04c3e817/`). The
-description records that exact-head CI was not clean when last updated.
+*Source.* PR #2196 (merged 2026-10-30; the numbers above were re-read in the
+merged file and are unchanged),
+[`round6/r6_8_transport_oracle/RESULTS.md`](research/isogeny_fibers_20261010/round6/r6_8_transport_oracle/RESULTS.md)
+(the superseded original is retained there under `historical-04c3e817/`).
+Before the merge the description recorded that exact-head CI was not clean
+(2026-10-23); whether that was resolved was not checked here.
 
-### 19.13 R6.9 — GHS phase two: walk cost and relation rate (**UNMERGED**, open #2502)
+### 19.13 R6.9 — GHS phase two: walk cost and relation rate (merged, #2502; first read as UNMERGED)
 
 *Hypothesis.* The walk to the nearest weak curve costs at most 2·(class size)^{1/2}
 isogeny evaluations; the measured relation rate at the smallest weak instance
@@ -2467,16 +2521,20 @@ the count of 6 appears to omit one; recount derived from its table), and by 585�
 smallest weak instance (N = 12, (l, n) = (2, 6), descended genus 8 over F₄,
 where all 53 searches ended at a curve with (g, l, n, m) = (8, 2, 6, 4)). The
 source explains it as 1/g! assuming q ≫ g.
-*Library limit, stated.* The library cannot construct the GHS descended curve
-for m ≥ 2 (`descend_m2_affine` has a documented TODO for the smooth model;
-`prime_hyperelliptic` and `jv_cover` are prime-field only), so the relation-rate
-arm is a stand-in. The relation rate covers decomposition-phase smoothness only.
+*Library limit, stated (at the time of R6.9).* The library could not construct
+the GHS descended curve for m ≥ 2 (`descend_m2_affine` has a documented TODO for
+the smooth model; `prime_hyperelliptic` and `jv_cover` are prime-field only),
+so the relation-rate arm is a stand-in. The relation rate covers
+decomposition-phase smoothness only. R7.1 (#2542, merged) later built the
+smooth model and re-measured the smallest weak instance on it (§19.19).
 *Limits.* N ≤ 18, ℓ ≤ 7; the walk uses orbit representatives, and an attacker
 without Galois-orbit canonicalisation may pay up to the orbit length (≤ N),
 which is not measured; larger deviations from the exact model come with low
 coverage and were not resolved.
-*Source.* PR #2502, branch `research/r6-ghs-2`,
-`research/isogeny_fibers_20261010/round6/r6_9_ghs_2/RESULTS.md`.
+*Source.* PR #2502 (merged 2026-10-26; the numbers above were re-read in the
+merged file and are unchanged; its §4 sentence that R5.2's genus-rule bug
+"still stands" is superseded for current `main` by #2524, §19.2),
+[`round6/r6_9_ghs_2/RESULTS.md`](research/isogeny_fibers_20261010/round6/r6_9_ghs_2/RESULTS.md).
 
 ### 19.14 R6.10 — literature closure for rounds 4–5 (merged, #2183)
 
@@ -2568,22 +2626,24 @@ step. The primes tested are ℓ ≤ 13 at p ≈ 2^20–2^22, i.e. ℓ ≤ p^{0.1
 |:--|:--|:--|:--|:--|
 | R5.1 quotient oracle, char 2 | #2179 merged | not fired | confirmed (n = 31, 37) | m = 3 quotient 0.95 [0.85, 1.05], 0.99 [0.93, 1.05] vs sweeping F 1.90 [1.69, 2.11], 1.99 [1.86, 2.10] |
 | R5.2 GHS across a class | #2181 merged | fired, trivially, under model P | open as a cost statement; structural reading holds | 0 of 2 858 996 curves weak under P; low-genus curves 0.09%–3.1%; walks 1.3–3.0 steps |
-| R5.3 NTT √élu | #2192 **open** | refuted part: exponent "toward 0.5–0.6" | refuted at measured range | 0.798 [0.775, 0.820] (2^16..2^24); generic crossover unchanged |
+| R5.3 NTT √élu | #2192 merged | refuted part: exponent "toward 0.5–0.6" | refuted at measured range | 0.798 [0.775, 0.820] (2^16..2^24); generic crossover unchanged |
 | R5.4 theory | #2180 merged | not fired | theorems as labelled; Conjecture 10 reduced, not proved | open only across ℓ ≥ p^ε gaps; 2.95 = 2.17 × 1.36 (derived) |
-| R6.1 direct S5 | #2511 **open** | not fired | mixed: falsifier not met, hypothesis partly refuted | sym S5 S = 7.61·10^5 vs mitm m = 2 186 (n = 13) |
-| R6.2 pooled rho | #2230 merged, **defects pending** | not evaluated | open | B/C ratio of means 0.914–1.287, no paired interval; paths ~ component size |
+| R6.1 direct S5 | #2511 merged | not fired | mixed: falsifier not met, hypothesis partly refuted | sym S5 S = 7.61·10^5 vs mitm m = 2 186 (n = 13) |
+| R6.2 pooled rho | #2230 merged; correction #2543 merged | not evaluated | open | B/C ratio of means 0.914–1.287, no paired interval (batch not re-run); corrected paths: 360 of 360 routes validate forward, pre-fix non-executable on 19 + 4 of 180 + 180 pairs (lower bounds), cost still tracks component size (2.7–5.1× above 1 000 curves, derived) |
 | R6.3 E/4E label | #2193 merged | not fired | confirmed, refined to n mod 4 | 44 740 508 points, 0 exceptions; CT variant 2.5–5.0× misses < 2× |
-| R6.4 vertical margin 2 | #2240 **open** | not fired (generic); fired (ψ, Φ asc/desc) | mixed | 1.919 [1.724, 2.115] (insufficient evidence either way); 2^21.7 → 2^24.2–2^25.1 (projected, restricted model) |
+| R6.4 vertical margin 2 | #2240 merged | not fired (generic); fired (ψ, Φ asc/desc) | mixed | 1.919 [1.724, 2.115] (insufficient evidence either way); 2^21.7 → 2^24.2–2^25.1 (projected, restricted model) |
 | R6.5 A-pair correction | #2194 merged | fired | refuted for the recorded census; correction confirmed in ensemble | 1.130 [1.095, 1.170], 1.059 [1.043, 1.077], 1.033 [1.024, 1.044] |
 | R6.6 genus 2 oracle | #2195 merged | not fired | confirmed | A-gain 10.00 [10.00, 10.00]; image 3.53–4.20; overlap ≤ 2 |
 | R6.7 ζ-fold 2 | #2217 merged | not fired (PROGRAM reading) | consistent with law; 4× budget not shown | B/A 2.976–3.277; C/A 0.980–1.075; torsion streams stall on 9 of 9 |
-| R6.8 transport oracles | #2196 **open** | not fired (census); proof withdrawn | census finite; theorem open | union/best c/U 0.020–0.268 in 16 cells |
-| R6.9 GHS phase 2 | #2502 **open** | not fired (walk); fired vs 1/g! | mixed | slope 0.84; "6 of 34" runs (7 in its table) > 10× from 1/g!; 0.88–3.22× from exact |
+| R6.8 transport oracles | #2196 merged | not fired (census); proof withdrawn | census finite; theorem open | union/best c/U 0.020–0.268 in 16 cells |
+| R6.9 GHS phase 2 | #2502 merged | not fired (walk); fired vs 1/g! | mixed | slope 0.84; "6 of 34" runs (7 in its table) > 10× from 1/g!; 0.88–3.22× from exact |
 | R6.10 literature | #2183 merged | none | saturation penalty anticipated | 47 rows: 13 / 4 / 14 / 8 / 7 / 1 / 0 |
 | R6.11 conductor yield | #2197 merged | not fired | confirmed at toy size | all crater/floor ratios within 0.5% of 1 |
 
 The summary figure is `round6/s19_summary/verdicts.svg` (data
-`verdicts.json`, report `report.pdf` beside it).
+`verdicts.json`, report `report.pdf` beside it); it was regenerated on
+2026-10-31 for the status updates of §19.19. The table's PR column gives the
+status read on 2026-10-31.
 
 ### 19.17 What is settled, and what is still open
 
@@ -2617,26 +2677,33 @@ The summary figure is `round6/s19_summary/verdicts.svg` (data
 *Still open or pending.*
 * The exact-simulation theorem for transport oracles (Proposition 5′) and its
   cost bound: the proof claim is withdrawn, the finite census does not
-  establish it (R6.8, unmerged).
+  establish it (R6.8, merged with the withdrawal).
 * The pooled-rho result in ecbench (no paired interval, no replay certificate,
-  one r, ℓ = 5, 7 edges dropped) and the path-finding cost, until the two known
-  defects are corrected (R6.2).
+  one r, ℓ = 5, 7 edges dropped; the batch half was not re-run after the
+  correction) and the O(√(class size)) path-finding hypothesis, which the
+  corrected, forward-validated search (#2543, merged) still does not show
+  (R6.2, verdict open).
 * The √élu exponent, the generic-kernel exponent (1.919 [1.724, 2.115]) and
   every crossover, which hold only under the restricted M + W + 91 I cost
   model; complete-cost ordering of routes; Φ_ℓ construction cost; Sutherland
-  CRT evaluation (R5.3, R6.4, both unmerged).
+  CRT evaluation (R5.3, R6.4, both merged).
 * Direct S5 systems are not buildable beyond ℓ = 5; the `chained-x` plug-in is
-  unregistered in `ic bench` (R6.1, unmerged).
-* GHS: whether any toy instance is weak under a cost model (R5.2); the smooth
-  model of the GHS cover is missing in the library, so the relation rate on a
-  real descended Jacobian is unmeasured (R6.9, unmerged); the `audit_curve` genus
-  rule disagrees with the derived formula.
+  unregistered in `ic bench` (R6.1, merged).
+* GHS: whether any toy instance is weak under a cost model (R5.2). The smooth
+  model of the GHS cover is now in the library (R7.1, #2542), and the relation
+  rate on the real descended Jacobian is measured only for N = 12 and N = 14 at
+  q = 4 (g = 8) and N = 12 at q = 8 with g = 2 and 4; the q = 8, g = 8 instance
+  did not finish, and the factor-base decomposition step, the cost comparison
+  with rho and any larger N or q are not done (§19.19). The `audit_curve`
+  genus-rule discrepancy that R5.2 reported is stated by #2524 to come from a
+  stale base and is not present on current `main` (§19.2).
 * Conjecture 10′: a conductor-sensitive algorithm has not been tested (R6.11
   tests only the plain x-frame, ℓ ≤ 13, h(D) = 1 craters).
 * The E/4E label for a = 1 and for E/8E (R6.3); King §5 and the
   Eagle–Galbraith–Ong cofactor-4 test were not read (R6.10).
 * The binary-Edwards check of Corollary 9.2 (R5.4); the R6.7 `RESULTS.md`
-  count (12 of 18) and the §17.3 generic row await their corrections to land.
+  count (12 of 18) still awaits its correction in the frozen file; the §17.3
+generic row has been superseded in place by the paragraph from #2240.
 
 ### 19.18 Edits made to earlier sections in this revision
 
@@ -2652,5 +2719,60 @@ measured numbers of earlier sections are unchanged.
   Eagle–Galbraith–Ong status.
 * §17.7: walk-cost qualifier for composite-degree fields.
 * §18: replaced by the R6.10 reference list with status tags.
-* §17.3 is not edited here; pull request #2240 carries its own superseding
-  paragraph.
+* §17.3 was not edited by this revision; the superseding paragraph came with
+  pull request #2240 (merged).
+
+Revision of 2026-10-31: §19.19 and the status edits recorded there.
+
+### 19.19 Status update of 2026-10-31, and R7.1
+
+*What changed since 2026-10-24 (pull-request records read on 2026-10-31; no
+experiment was run for this update and no measured value was changed).*
+* R6.2: correction #2543 merged 2026-10-25 (§19.6); verdict stays open.
+* R6.4 #2240 (2026-10-26), R6.9 #2502 (2026-10-26), R6.1 #2511 (2026-10-26),
+  R5.3 #2192 (2026-10-29) and R6.8 #2196 (2026-10-30) merged; their entries
+  were compared with the merged `RESULTS.md` files and their numbers and
+  verdicts are unchanged. The R6.8 proof claim stays withdrawn. The R6.9
+  "6 of 34" count in its merged `RESULTS.md` is still not corrected.
+* #2524 (merged 2026-10-26): `audit_curve` genus rule, R5.2's reported
+  discrepancy attributed to a stale base (§19.2).
+* #2538 (merged 2026-10-26): clippy fixes; no research content.
+
+**R7.1 — the smooth GHS descended curve for m ≥ 2, and R6.9's relation rate
+redone on it (merged, #2542).** *Source.* PR #2542 was stacked on #2502
+(base `research/r6-ghs-2`) and merged on 2026-10-26; its files are on `main`:
+[`round7/r7_ghs_smooth_cover/RESULTS.md`](research/isogeny_fibers_20261010/round7/r7_ghs_smooth_cover/RESULTS.md),
+`src/cryptanalysis/ghs_smooth.rs`, `examples/r7_ghs_smooth_cover.rs`. Its
+`RESULTS.md` states no separate hypothesis and falsifier; it re-measures R6.9's
+relation-rate falsifier (off the model by more than 10×) on the real descended
+curve.
+*Verdict (the source's words).* The construction is built and verified on the
+instances measured (13 of 13 curves pass every check). The R6.9 falsifier
+"still fires against 1/g! and does not fire against the exact split-divisor
+model, as in R6.9." Toy fields only; no claim about a deployed curve and no
+sub-rho claim.
+*Numbers (measured unless marked derived).* N = 12, (l, n) = (2, 6), g = 8 over
+F₄, 6 descended curves with distinct (a, β) orbits: measured fully-split rate
+0.00064 to 0.00261 per walk step (100 000 steps each); 0.87 to 1.23 of the
+exactly enumerated split fraction of the group the walk lives in (derived,
+within 2.1 binomial standard errors); 26× to 105× Gaudry's 1/g! = 2.48e-5
+(recalled; derived ratio). R6.9's two stand-in curves gave 585× and 858×; the
+source attributes the difference to the real descended curves having only 5
+F₄-points (4 affine), hence exactly 60 fully split reduced divisors in a group
+of 24 120 to 81 200 elements, and measures the exact fraction at 0.00074 to
+0.00249, 6× to 23× below the stand-ins' 0.0147 and 0.0170 (derived). Other
+instances run: N = 14, (2, 7) (three curves, rate near 0.0108 for g = 8) and N =
+12, (3, 4) with g = 2 and 4; all agree with the exact model. Checks: 5 library
+tests and 71 existing tests pass; genus confirmed by point counts 13/13; the
+homomorphism Φ 260/260; order checks 156, 0 failures; Frobenius relation with a
+trace-perturbed negative control; closed-form split count equals enumeration
+13/13.
+*Limits and not done (source).* (l, n) = (3, 4) with g = 8 over F₈ did not
+finish (stopped after about 25 minutes; cause not isolated), so there is no
+descended q = 8, g = 8 measurement; `a` must lie in the base field; the odd-genus
+t-model was exercised by one curve; the factor-base decomposition step was not
+run and no cost comparison with rho was made; the source draws no conclusion
+from the relation rate per group addition; N ≤ 14 at q = 4. The walk's binomial
+standard errors treat steps as independent and understate the error of a
+correlated walk; the source notes one walk-B z-score of −3.94 that it
+attributes, unchecked, to that.

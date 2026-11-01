@@ -93,6 +93,28 @@ contexts under Sage, Python-FLINT and the optimized native backend. Those
 
 ## Acceptance status and next construction
 
+The [complete native control runner](complete-pipeline/README.md) now wires
+canonical coverage, quotient moments, point maps and paired scalar recovery.
+Two complete ordinary-curve fixtures match independent PARI coefficients
+and 42 evaluated inputs; 34 paired known answers recover on both endpoints.
+These tiny-subgroup software controls do not establish the 80-bit crossing
+or performance. The target's incomplete-prefix gate returns no quotient or
+images, and production S3-resumable coverage remains to be integrated.
+
+The [native polynomial-block stage](poly-blocks/README.md) now prepares
+bounded products and streams six reciprocal-power sums across supplied
+blocks. The 4,096-root fixture matches a direct oracle at 32 source and
+32 actual giant contexts (384 compared values),
+including split-block/order controls. It does not establish global coverage,
+full-work feasibility or an isogeny image; actual giant-batch/codomain
+integration and complete point evaluation are still required.
+
+The [S3 root-chunk storage fixture](s3-chunks/README.md) adds a bounded native
+producer and independent PARI validation of 4,096 roots. Its object-store
+upload uses the trusted artifact workflow's full-byte readback. This prepares
+root data without the full vector allocation; external-memory polynomial
+processing and complete point evaluation remain separate implementation work.
+
 The follow-up [measurement protocol](MEASUREMENT_PROTOCOL.md) and
 [exact native eligibility audit](measurement-readiness.json) identify the
 current launch blockers: the earlier codomain constructor has a 64-bit degree

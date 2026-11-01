@@ -35,7 +35,8 @@ enum Action {
     },
     /// Import one part of a pack too large for the package, sent in the
     /// event as base64 of the gzipped part (`ecdb pack` writes the parts;
-    /// deploy-aws.sh sends them). Only `ecbench` is packed this way.
+    /// deploy-aws.sh sends them): `ecbench`, or `generated` (Sage output,
+    /// ecdb/deploy/load-generated.sh).
     ImportPack { name: String, data: String },
 }
 
@@ -140,7 +141,7 @@ async fn handle(admin: &Admin, payload: Value) -> Result<Value> {
             Ok(json!({ "seconds": started.elapsed().as_secs(), "reports": reports }))
         }
         Action::ImportPack { name, data } => {
-            if name != import::ecbench::PACK {
+            if name != import::ecbench::PACK && name != import::generated::PACK {
                 return Err(anyhow!("unknown pack {name}"));
             }
             let gz = base64::Engine::decode(&base64::engine::general_purpose::STANDARD, data.trim())?;
@@ -151,7 +152,11 @@ async fn handle(admin: &Admin, payload: Value) -> Result<Value> {
                 git_commit: admin.commit.clone(),
             };
             let started = std::time::Instant::now();
-            let report = import::ecbench::import_part(&ctx, &gz).await?;
+            let report = if name == import::generated::PACK {
+                import::generated::import_part(&ctx, &gz).await?
+            } else {
+                import::ecbench::import_part(&ctx, &gz).await?
+            };
             Ok(json!({ "seconds": started.elapsed().as_secs(), "reports": [report] }))
         }
     }

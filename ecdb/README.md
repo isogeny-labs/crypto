@@ -58,6 +58,15 @@ curl -s -X POST localhost:8080/v1/sql -H 'content-type: application/json' \
   `boundary_targets.json` and the `benchmarks/` index.
 - `ecbench` loads every ecbench session under the checkout: about 1,100
   sessions and 543k runs, in 8 minutes.
+- `generated PATH...` loads the JSONL that `sage/generate.sage` writes:
+  - the census of every curve over F_p (p < 2^10) and over GF(2^m) (m ≤ 10);
+  - random and CM prime-field curves at 32–256 bits, with their twists;
+  - BN, BLS and KSS pairing curves;
+  - random genus-2 Jacobians.
+
+  Every record is re-verified first (ICV1, Hasse, [N]P = O, [r]G = O,
+  Miller–Rabin, embedding degree, genus-2 L-polynomials). See
+  [`sage/README.md`](sage/README.md).
 - `ecdb pack --out DIR` writes what the Lambda package carries instead of
   those directory trees (`deploy/build-lambda.sh`).
 - `lmfdb-av-fq <file>` loads an LMFDB `av_fq_isog` JSON export (isogeny
