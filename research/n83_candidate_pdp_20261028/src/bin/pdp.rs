@@ -280,6 +280,14 @@ fn selector(x: u128, coordinate_bit: Option<usize>) -> usize {
     assert_eq!(x, decoded, "x outside base domain");
     i as usize
 }
+fn decode_selector(i: u128, coordinate_bit: Option<usize>) -> u128 {
+    assert!(i < (1u128 << 27));
+    if let Some(bit) = coordinate_bit {
+        (i & ((1u128 << 26) - 1)) | ((i >> 26) << bit)
+    } else {
+        i
+    }
+}
 fn base_record(raw: &[u8], pt: (u128, u128), coordinate_bit: Option<usize>) -> bool {
     assert!(raw.len() >= 32);
     let spike = &raw[..8] == b"N83FB02\n";
@@ -436,15 +444,21 @@ fn generate(root: &Path, bases: &Path, matched: &Path, arm: &str) -> Vec<Value> 
                     "binary" => 2,
                     _ => 3,
                 };
-            let (mut pts, mut sums, mut q) = (Vec::new(), Vec::new(), None);
+            let (mut pts, mut selectors, mut sums, mut q) = (Vec::new(), Vec::new(), Vec::new(), None);
             while pts.len() < m {
-                let x = draw(&mut rng) & ((1u128 << 26) - 1);
+                // Draw a selector uniformly over the complete 2^27 factor-base
+                // domain, then decode the omitted coordinate bit for this arm.
+                // This keeps selector positions matched across candidate bases
+                // while making the curve points genuinely base-specific.
+                let selected = draw(&mut rng) & ((1u128 << ell) - 1);
+                let x = decode_selector(selected, coordinate_bit);
                 if let Some(pt) = curve.lift(x) {
                     let r = curve.add(q, Some(pt));
                     if r.is_none() {
                         continue;
                     }
                     pts.push(pt);
+                    selectors.push(selected as u32);
                     q = r;
                     sums.push(r.unwrap());
                 }
@@ -473,7 +487,7 @@ fn generate(root: &Path, bases: &Path, matched: &Path, arm: &str) -> Vec<Value> 
                     base_record(&raw, pt, coordinate_bit),
                     "planted point absent from saved factor base"
                 );
-                membership.push(json!({"x":pt.0.to_string(),"y":pt.1.to_string(),"shard":cert["file"],"sha256":cert["sha256"],"present":true}));
+                membership.push(json!({"selector":selectors[membership.len()],"x":pt.0.to_string(),"y":pt.1.to_string(),"shard":cert["file"],"sha256":cert["sha256"],"present":true}));
             }
             let prior_natural = prior
                 .iter()
@@ -652,10 +666,11 @@ fn generate(root: &Path, bases: &Path, matched: &Path, arm: &str) -> Vec<Value> 
                     .map(|j| basis_bit(j, coordinate_bit))
                     .collect::<Vec<_>>());
                 row["target_distribution"] = json!(if kind == "planted" {
-                    "common-support-planted: same low26 tuple and target in both arms; not uniform over full domain"
+                    "planted: m points sampled by matched selectors across the full 2^27 domain; target is their curve sum"
                 } else {
                     "same saved original natural target in both arms"
                 });
+                row["selected_base_selectors"] = json!(selectors);
                 row["matched_original_inputs_sha256"] = json!(hash(&matched_bytes));
                 row["factor_base_manifest_sha256"] = json!(manifest_hash);
                 row["factor_base_membership"] = json!(membership);
@@ -931,7 +946,7 @@ mod candidate_tests {
     fn coordinate_map_and_lift_lookup() {
         for bit in 27..=40 {
             for i in [0u128, 7, (1 << 26) - 1, 1 << 26, (1 << 27) - 1] {
-                let x = (i & ((1 << 26) - 1)) | ((i >> 26) << bit);
+                let x = decode_selector(i, Some(bit));
                 assert_eq!(selector(x, Some(bit)) as u128, i);
                 let mut raw = vec![0; 32];
                 raw[..8].copy_from_slice(b"N83FB02\n");
@@ -944,6 +959,11 @@ mod candidate_tests {
                 assert_eq!(peval(&base_linear(0, Some(bit)), &bits), x);
             }
         }
+        for i in [0u128, 7, (1 << 26) - 1, 1 << 26, (1 << 27) - 1] {
+            let x = decode_selector(i, None);
+            assert_eq!(selector(x, None) as u128, i);
+        }
         assert!(std::panic::catch_unwind(|| selector(1 << 26, Some(40))).is_err());
+        assert!(std::panic::catch_unwind(|| decode_selector(1 << 27, Some(40))).is_err());
     }
 }
