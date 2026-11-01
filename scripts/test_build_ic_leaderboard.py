@@ -105,5 +105,33 @@ curves:
         self.assertTrue(all(record["curves_yaml_key"] for record in records.values()))
 
 
+class Roster(unittest.TestCase):
+    def names_with(self, params):
+        row = {"slug": "ext", "family": "extension", "params": params,
+               "order": "1000003", "standard_names": [], "aliases": []}
+        return type("N", (), {"reg": {"curves": [row]}})()
+
+    def field_of(self, params):
+        try:
+            return builder.roster(self.names_with(params), set())[0]["field"]
+        except KeyError as err:  # a missing key must never escape as KeyError
+            self.fail(f"roster raised KeyError({err})")
+
+    def test_extension_degree_from_k(self):
+        self.assertEqual(self.field_of({"p": 7, "k": 3, "a": 1, "b": 2}), "GF(7^3)")
+
+    def test_extension_degree_from_degree_key(self):
+        # 47 registry rows (coverage-fixtures-v3) spell the degree "degree", not "k".
+        self.assertEqual(self.field_of({"p": 7, "degree": 3, "a": 1, "b": 2}), "GF(7^3)")
+
+    def test_extension_without_degree_names_the_slug(self):
+        with self.assertRaisesRegex(ValueError, "ext"):
+            builder.roster(self.names_with({"p": 7, "a": 1, "b": 2}), set())
+
+    def test_whole_registry_yields_one_entry_per_curve(self):
+        names = builder.Names()
+        self.assertEqual(len(builder.roster(names, set())), len(names.reg["curves"]))
+
+
 if __name__ == "__main__":
     unittest.main()
