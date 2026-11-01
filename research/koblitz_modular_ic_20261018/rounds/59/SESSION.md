@@ -11,3 +11,17 @@ UseactualnormalA4presentationandall100numeratorswithcoordinatebridge,notunnormal
 
 ### Errors
 NoR59dataorproducerinvocationyet.
+
+## 2026-11-01T06:27:03.185227+00:00 — source-data helper import repair
+
+### What was done
+data59-01terminalnative0butrejected:unitmatwasunavailablewithoutlinalg.lib;allcascadingerrorsandlatePASSretained/excluded. R58head297c1cb9all6checksnowSUCCESS.
+
+### Decisions made
+Importretainedlinalg.lib andfreezebeforefreshdata02. Do notuseany01dataforquotient/cohort. Originalcaps/ownerspersist.
+
+### Open threads
+Acceptedfullsource-dataassembly,thenbinary640/320quotientandall18cohort.
+
+### Errors
+Missinghelperlibrary,notamathematicalnull.

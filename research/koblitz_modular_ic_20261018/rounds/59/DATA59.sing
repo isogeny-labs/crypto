@@ -1,3 +1,4 @@
+LIB "linalg.lib";
 proc require59(int ok,string tag){if(!ok){ERROR(tag);quit;}}
 proc dump59(link out,string name,matrix A){int i;int j;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");for(i=1;i<=nrows(A);i++){for(j=1;j<=ncols(A);j++){if(A[i,j]!=0){write(out,name+"["+string(i)+","+string(j)+"]="+string(A[i,j])+";");}}}}
 execute(read("../../../55/runs/quotient55-02/source-annihilator55.sing"));
