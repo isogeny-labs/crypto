@@ -3168,6 +3168,13 @@ fn classify_wide_linear_retention(
     }
 }
 
+fn require_wide_group_persistence(stop: prime_f4_wide_dynamic::GroupStop) -> Result<(), String> {
+    if stop == prime_f4_wide_dynamic::GroupStop::PersistenceFailure {
+        return Err("wide dynamic group event persistence stopped: PersistenceFailure".into());
+    }
+    Ok(())
+}
+
 /// First activated higher-arity profile. The native reducer and original
 /// signed-group traversal have separate bounded receipts. A positive witness
 /// is useful even when the native or full-domain search remains incomplete.
@@ -3235,6 +3242,7 @@ fn prime_f4_wide_dynamic(
         &mut forward,
         &mut publisher,
     );
+    require_wide_group_persistence(group.stop)?;
     if group.certificate_durably_persisted {
         d::confirm_step4_witness(&mut phase.prepared, &mut publisher)
             .map_err(|e| format!("wide dynamic witness confirmation stopped: {e:?}"))?;
@@ -4209,7 +4217,7 @@ mod tests {
                     super::super::capture::capture_limits(64).unwrap(),
                     Some(&context),
                 )
-                .unwrap();
+                .unwrap_or_else(|e| panic!("m={m}, n={n}, twist={twist}: {e}"));
                 assert_eq!(data.outcome["strategy"], dynamic_strategy(m).unwrap());
                 assert_eq!(data.outcome["native_backend_invoked"], true);
                 assert_eq!(data.outcome["solver_completed"], false);
@@ -4248,6 +4256,99 @@ mod tests {
             assert!(super::classify_wide_linear_retention(Err(stop))
                 .unwrap_err()
                 .contains(&format!("{stop:?}")));
+        }
+    }
+
+    #[test]
+    fn wide_group_persistence_failure_cannot_seal_as_partial() {
+        use super::prime_f4_wide_dynamic::GroupStop;
+        assert!(super::require_wide_group_persistence(GroupStop::CheckWorkLimit).is_ok());
+        assert!(super::require_wide_group_persistence(GroupStop::Deadline).is_ok());
+        assert!(
+            super::require_wide_group_persistence(GroupStop::PersistenceFailure)
+                .unwrap_err()
+                .contains("event persistence stopped")
+        );
+    }
+
+    #[test]
+    fn wide_frozen_m13_m15_boundary_retains_terminal_on_both_twists() {
+        use super::super::execution::{LaunchContext, SolverExecutionContext};
+        for (n, m, twist) in [
+            (47, 13, false),
+            (47, 13, true),
+            (47, 15, false),
+            (47, 15, true),
+            (61, 15, false),
+            (61, 15, true),
+        ] {
+            let mut cfg = config("prime", "f4");
+            cfg.n = n;
+            cfg.m = m;
+            cfg.twist = twist;
+            cfg.curve_seed = 0;
+            cfg.generator_index = 0;
+            cfg.key_index = 0;
+            cfg.seed = 20261101;
+            cfg.factor_base_size = 2;
+            cfg.degree_bound = 3;
+            cfg.work_limit = 50_000;
+            let mut case = curves::generate(&cfg).unwrap();
+            case.private_witness = Value::Null;
+            let binding = AttemptBinding {
+                schema: "crypto.ml-dataset.attempt-binding/v1".into(),
+                run_sha256: "1".repeat(64),
+                plan_sha256: "2".repeat(64),
+                protocol_sha256: "3".repeat(64),
+                config_sha256: "4".repeat(64),
+                source_commit: "5".repeat(40),
+                binary_sha256: "6".repeat(64),
+                cell_index: n as u64 + u64::from(twist),
+                attempt_sha256: "7".repeat(64),
+            };
+            let context = SolverExecutionContext {
+                launch: LaunchContext {
+                    schema: "crypto.ml-dataset.execution-context/v1".into(),
+                    binding: binding.clone(),
+                    boot_id: "00000000-0000-0000-0000-000000000000".into(),
+                    start_monotonic_ns: 1,
+                    deadline_monotonic_ns: 30_000_000_001,
+                    seconds_per_case: 30,
+                    memory_bytes: 2048 * 1024 * 1024,
+                    trace_bytes: 64 * 1024 * 1024,
+                },
+                deadline: Instant::now() + Duration::from_secs(30),
+            };
+            let root = std::env::temp_dir().join(format!(
+                "prime-wide-m{m}-frozen-{n}-{twist}-{}-{}",
+                std::process::id(),
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_nanos()
+            ));
+            let result = solve_with_bound_event_sink_context(
+                &cfg,
+                &case,
+                &root.join("capture"),
+                binding,
+                super::super::capture::capture_limits(64).unwrap(),
+                Some(&context),
+            );
+            let _ = fs::remove_dir_all(&root);
+            let data = result.unwrap_or_else(|e| panic!("m={m}, n={n}, twist={twist}: {e}"));
+            assert_eq!(data.outcome["status"], "partial");
+            assert_eq!(data.outcome["native_backend_invoked"], true);
+            assert!(data.outcome["first_fall_degree"].is_null());
+            assert!(data.outcome["last_fall_degree"].is_null());
+            let terminal = data
+                .artifacts
+                .iter()
+                .find(|a| a.path == "prime-f4-wide-dynamic-result.json")
+                .unwrap();
+            let terminal: Value = serde_json::from_slice(&terminal.bytes).unwrap();
+            assert_ne!(terminal["native_stop"], "observer");
+            assert_eq!(terminal["accounting"]["events"]["pending"], 0);
         }
     }
 
