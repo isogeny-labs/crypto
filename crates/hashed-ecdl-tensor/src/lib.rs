@@ -16,6 +16,7 @@ mod serialization;
 pub mod arithmetic;
 pub mod binary;
 pub mod canonical;
+pub mod census;
 pub mod contraction;
 pub mod curve;
 pub mod encoding;
