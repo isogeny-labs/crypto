@@ -6317,6 +6317,7 @@ mod verified_worker_original_tests {
                 positive_control,
                 policy,
                 "koblitz",
+                3,
             )
         }
         pub(super) fn with_ordinary_runtime_shape(n: u32, twist: bool, solver: &str) -> Self {
@@ -6328,16 +6329,36 @@ mod verified_worker_original_tests {
             solver: &str,
             controlled: bool,
         ) -> Self {
+            Self::with_ordinary_degree_shape(n, twist, solver, controlled, 3)
+        }
+        pub(super) fn with_ordinary_degree_shape(
+            n: u32,
+            twist: bool,
+            solver: &str,
+            controlled: bool,
+            degree_bound: u32,
+        ) -> Self {
+            Self::with_ordinary_limits_shape(n, twist, solver, controlled, degree_bound, 16384)
+        }
+        pub(super) fn with_ordinary_limits_shape(
+            n: u32,
+            twist: bool,
+            solver: &str,
+            controlled: bool,
+            degree_bound: u32,
+            work_limit: u64,
+        ) -> Self {
             let fixture = Self::with_family_policy_profile(
                 n,
                 twist,
                 4,
                 solver,
-                16384,
+                work_limit,
                 true,
                 controlled,
                 Some(crate::ml_dataset::types::FactorBasePolicy::Legacy {}),
                 "binary",
+                degree_bound,
             );
             // Test-only supervisor setup: these are the original frozen attempt
             // and trace limits, not permission to activate ordinary dispatch.
@@ -6379,6 +6400,7 @@ mod verified_worker_original_tests {
             positive_control: bool,
             policy: Option<crate::ml_dataset::types::FactorBasePolicy>,
             family: &str,
+            degree_bound: u32,
         ) -> Self {
             let nonce = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
@@ -6420,7 +6442,7 @@ mod verified_worker_original_tests {
                 keys: 1,
                 seed: 42,
                 factor_base_size,
-                degree_bound: 3,
+                degree_bound,
                 work_limit,
                 twists: true,
                 protocol_sha256: Some(dataset::digest(&bytes)),

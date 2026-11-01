@@ -174,23 +174,10 @@ pub(in crate::ml_dataset::solvers) fn verify(
         && config.factor_base_size == 4
         && matches!(config.solver.as_str(), "f4" | "f5")
         && ((23..=31).contains(&config.n) || (47..=61).contains(&config.n));
-    if !reserved_source && !expected_route {
+    let unsupported_source = outcome["strategy"] == "ordinary-binary-profile-unsupported";
+    if !reserved_source && !expected_route && !unsupported_source {
         return Ok(None);
     }
-    if !outcome.is_object()
-        || config.family != "binary"
-        || config.m != 3
-        || !((23..=31).contains(&config.n) || (47..=61).contains(&config.n))
-        || config.factor_base_size != 4
-        || !(1..=6).contains(&config.degree_bound)
-    {
-        return Err("ordinary artifact outside original profile".into());
-    }
-    let engine = match config.solver.as_str() {
-        "f4" => native::Engine::F4Macaulay,
-        "f5" => native::Engine::F5KoszulFrobenius,
-        _ => return Err("ordinary engine outside profile".into()),
-    };
     let saved: CaseConfig = crate::ml_dataset::read_json(&dir.join("config.json"))?;
     if &saved != config {
         return Err("ordinary config differs from saved original".into());
@@ -204,7 +191,6 @@ pub(in crate::ml_dataset::solvers) fn verify(
     if launch.binding != binding {
         return Err("ordinary launch/capture binding mismatch".into());
     }
-    let limits = OriginalLimits::from_original(config, &launch)?;
     let config_bytes = solvers::prime_f4_wide::read_bounded(dir, "config.json", 64 * 1024)?;
     let public_bytes = solvers::prime_f4_wide::read_bounded(dir, "public.json", 64 * 1024)?;
     let factor_bytes = solvers::prime_f4_wide::read_bounded(dir, "factor-base.json", 128 * 1024)?;
@@ -213,34 +199,6 @@ pub(in crate::ml_dataset::solvers) fn verify(
         factor_base: serde_json::from_slice(&factor_bytes).map_err(|e| e.to_string())?,
         private_witness: Value::Null,
     };
-    if !reserved_source
-        && outcome["strategy"] == "ordinary-binary-profile-unsupported"
-        && outcome["solver_completed"] == false
-        && !solvers::ordinary_worker_profile(config, &case)
-    {
-        return Ok(None);
-    }
-    let math = solvers::binary_m3_original::authenticate(Profile::OrdinaryBinary, config, &case)?;
-    for slot in Slot::ALL {
-        root(artifacts, slot)?;
-    }
-    for artifact in artifacts {
-        let path = artifact
-            .path
-            .strip_prefix("live/payloads/")
-            .unwrap_or(&artifact.path);
-        if (path.starts_with("binary-m3-")
-            || path.starts_with("partial-binary-m3-")
-            || artifact.role.starts_with("restricted-binary-m3-"))
-            && !Slot::ALL.iter().any(|s| {
-                let (p, r, e) = s.identity();
-                path == p && artifact.role == r && artifact.encoding == e
-            })
-            && !(artifact.role == "unregistered-partial-artifact" && artifact.encoding == "native")
-        {
-            return Err("unknown or relabeled reserved ordinary artifact".into());
-        }
-    }
     for name in [
         "fall_degree_verified",
         "independent_derivation_verified",
@@ -262,6 +220,77 @@ pub(in crate::ml_dataset::solvers) fn verify(
     ] {
         if !outcome[name].is_null() {
             return Err(format!("ordinary unsupported numerical claim {name}"));
+        }
+    }
+    // Unsupported output still needs the authentic original context, but does
+    // not need the native profile's degree or resource admission.
+    if !reserved_source && unsupported_source {
+        if config.family != "binary"
+            || config.m != 3
+            || !matches!(config.solver.as_str(), "f4" | "f5")
+            || outcome["status"] != "unsupported"
+            || outcome["solver_completed"] != false
+            || solvers::ordinary_worker_profile(config, &case)
+        {
+            return Err("ordinary unsupported outcome differs from original profile".into());
+        }
+        for name in [
+            "scalar_recovered_without_witness",
+            "pdp_witness_verified",
+            "retained_pdp_witness_verified",
+            "certificate_durably_persisted",
+            "group_domain_complete",
+            "exhaustive_no_decomposition",
+            "algebra_completed",
+            "native_backend_invoked",
+            "native_statistics_complete",
+            "fall_degree_verified",
+            "exact_instruction_count_verified",
+        ] {
+            must_false(outcome, name)?;
+        }
+        solvers::curves::verify_public(&case.public_instance)?;
+        solvers::curves::verify_factor_base_config(
+            config,
+            &case.public_instance,
+            &case.factor_base,
+        )?;
+        return Ok(None);
+    }
+    if !outcome.is_object()
+        || config.family != "binary"
+        || config.m != 3
+        || !((23..=31).contains(&config.n) || (47..=61).contains(&config.n))
+        || config.factor_base_size != 4
+        || !(1..=6).contains(&config.degree_bound)
+    {
+        return Err("ordinary artifact outside original profile".into());
+    }
+    let engine = match config.solver.as_str() {
+        "f4" => native::Engine::F4Macaulay,
+        "f5" => native::Engine::F5KoszulFrobenius,
+        _ => return Err("ordinary engine outside profile".into()),
+    };
+    let limits = OriginalLimits::from_original(config, &launch)?;
+    let math = solvers::binary_m3_original::authenticate(Profile::OrdinaryBinary, config, &case)?;
+    for slot in Slot::ALL {
+        root(artifacts, slot)?;
+    }
+    for artifact in artifacts {
+        let path = artifact
+            .path
+            .strip_prefix("live/payloads/")
+            .unwrap_or(&artifact.path);
+        if (path.starts_with("binary-m3-")
+            || path.starts_with("partial-binary-m3-")
+            || artifact.role.starts_with("restricted-binary-m3-"))
+            && !Slot::ALL.iter().any(|s| {
+                let (p, r, e) = s.identity();
+                path == p && artifact.role == r && artifact.encoding == e
+            })
+            && !(artifact.role == "unregistered-partial-artifact" && artifact.encoding == "native")
+        {
+            return Err("unknown or relabeled reserved ordinary artifact".into());
         }
     }
     let mut admission = ReplayAdmission { work: 0, bytes: 0 };
@@ -306,6 +335,44 @@ pub(in crate::ml_dataset::solvers) fn verify(
         .as_ref()
         .map(|b| serde_json::from_slice(b).map_err(|e| format!("ordinary matrix result: {e}")))
         .transpose()?;
+    if let Some(value) = outcome.get("admission_ledger") {
+        let bytes = serde_json::to_vec(value).map_err(|e| e.to_string())?;
+        let assessment = verify_budget_ledger(&bytes, limits)?;
+        let ledger: SavedBudgetLedger =
+            serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+        if assessment.reported_over_limit
+            || result.is_some()
+            || input_bytes.is_some()
+            || ledger.phase != Phase::Setup
+            || ledger.first_stop.is_none()
+            || ledger.native_reserved != Reservation::default()
+            || ledger.group_additions != 0
+            || ledger.checking_reserved_work
+                < 32 * WORKER_TERMINAL_CAP as u64 + 65536 + WORKER_TERMINAL_GUARD_WORK
+            || ledger.adapter_reserved_bytes < 2 * 1024 * 1024 + 128 * 1024
+            || outcome["status"] != "partial"
+            || outcome["solver_completed"] != false
+            || outcome["first_stop"]
+                != serde_json::to_value(ledger.first_stop).map_err(|e| e.to_string())?
+        {
+            return Err("ordinary early admission ledger is not a censored setup".into());
+        }
+        for (name, value) in [
+            ("adapter_reserved_native_work", ledger.native_reserved.work),
+            (
+                "adapter_reserved_checking_work",
+                ledger.checking_reserved_work,
+            ),
+            ("adapter_reserved_bytes", ledger.adapter_reserved_bytes),
+            ("native_reserved_bytes", ledger.native_reserved.bytes),
+            ("charged_trace_bytes", ledger.charged_trace_bytes),
+            ("performed_group_additions", ledger.group_additions),
+        ] {
+            if outcome[name].as_u64() != Some(value) {
+                return Err(format!("ordinary early outcome counter differs: {name}"));
+            }
+        }
+    }
     let input_sha: Option<[u8; 32]> = input_bytes.as_ref().map(|b| sha2::Sha256::digest(b).into());
     let events_root = root(artifacts, Slot::Events)?;
     let index: Option<SavedEventIndex> = events_root

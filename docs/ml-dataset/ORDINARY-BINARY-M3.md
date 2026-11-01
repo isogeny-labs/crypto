@@ -16,6 +16,14 @@ Replay validates the entire live hash chain, exact input/index endpoints, native
 
 The result format retains v1–v4 accounting branches. Version 4 reserves the bounded counting pass before serialization and admits the exact counted size before the second encoding pass writes bytes. Charges survive later refusal. These are modeled work/memory/trace reservations and counted group-addition calls; they are not retired hardware instructions or a performance measurement.
 
+## Early refusals and unsupported degree bounds
+
+A valid CLI configuration outside the native degree1–6 profile remains an authenticated unsupported result. Replay verifies the original configuration, manifest, execution/capture binding and curve/domain before accepting that result; it does not require native-profile admission first. Degree7 and32 controls cover both engines and twists. Unsupported results cannot carry native completion or witness claims.
+
+After the worker has admitted its fixed terminal-report allowance, an early setup refusal retains the cumulative work/memory/trace ledger and its first stop. It creates no replacement capture attempt. Central replay checks the original limits, setup phase, admitted terminal charges, reported counters and absence of native results. Genuine low-work controls at390,391 and392 retain their exact charges and an empty committed capture stream; modified ledger/counter/stop records are rejected.
+
+The corrected dataset gate passed611 tests with0failures and2ignored. It uses real measured construction and solver phases before the early-refusal assertions. Exact-source full-library validation for this correction is pending; the6034-test result below belongs to the preceding revision.
+
 ## Causal export
 
 The ordinary signed-prefix projector authenticates cached original inputs and the capture watermark, replays the entire bounded arithmetic prefix before callbacks, and checks the manifest/head again before output. Public features describe original public inputs, the next group action, and the pre-addition accumulator. Resulting sums, labels, target matches, capture positions, and provenance remain in restricted records. Unsupported profiles emit no public examples and retain a restricted summary with an unknown suffix.
