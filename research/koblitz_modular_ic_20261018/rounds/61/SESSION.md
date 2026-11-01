@@ -81,3 +81,17 @@ FIX61,all818/checker,6Leanclaims/report/custody;complete61holodifferentials/Cart
 
 ### Errors
 NoFIELD61errors. NativeCUBIC01indexingfailure onlyR61failuretodate;protocolauxiliarymetadatarepairdisclosedwithoutpastbytechanges.
+
+## 2026-11-01T19:11:37.669724+00:00 — migration reconciliation
+
+### What was done
+Read approved root-owned migration receipt via scoped sudo; inspected Diem native status and service, EKS inventory and Conductor scope (clear). HEAD335013c57 retained; only COHORT61.sing draft untracked. fix61-01 has frozen sources but no native-start/output/exit receipts and no live matching process. Retained interrupted.json; accepted R59/R60 producers not repeated.
+
+### Decisions made
+Diem deadline expired50/52, pendingfalse, serviceinactive: leave managed owner untouched. No Koblitz EKS job found; other jobs unchanged. Fresh fix61-02 uses unchanged frozen mathematical source/caps after checkpoint gate.
+
+### Open threads
+Complete FIX61 then all818 cohort and six Lean claims. Waiting-freeze lane stays quiesced; complete original authorization/output record not located in inspected migration metadata. Preserve all original research scope.
+
+### Errors
+Ordinary receipt access denied; scoped sudo read succeeded. Interrupted FIX61 is a launch interruption, not a mathematical null.
