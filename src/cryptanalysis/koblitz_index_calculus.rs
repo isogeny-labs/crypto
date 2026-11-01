@@ -9643,7 +9643,13 @@ pub fn chain_s3_meet_front(
     if let Some(hit) = cache.lock().expect("meet cache").get(&key) {
         return Arc::clone(hit);
     }
-    let mut fingerprints: Vec<u64> = Vec::new();
+    // Reserve the exact multiset count C(|signed| + depth - 1, depth) so a
+    // deep set is never reallocated (a doubling would need twice the memory).
+    let multisets = (0..depth).fold(1u128, |acc, i| {
+        acc * (signed.len() + i) as u128 / (i as u128 + 1)
+    });
+    let mut fingerprints: Vec<u64> =
+        Vec::with_capacity(usize::try_from(multisets).unwrap_or(0));
     let mut scratch = ChainS3Scratch::default();
     chain_s3_enumerate(
         &kc.curve,
