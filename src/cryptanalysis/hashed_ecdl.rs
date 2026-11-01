@@ -16,6 +16,7 @@
 /// Arbitrary-precision compact encodings, recursive contraction and reduction.
 pub use hashed_ecdl_tensor as tensor;
 
+#[cfg(test)]
 use std::collections::BTreeMap;
 
 /// Affine coordinates; `None` denotes the identity.
@@ -837,24 +838,57 @@ impl Rng {
     }
 }
 
-fn matrix(bases: &[Vec<Point>], relations: &[Relation]) -> Result<Vec<Vec<u64>>, Error> {
-    let n: usize = bases.iter().map(Vec::len).sum();
+// Validate every relation before elimination, including rows after the first
+// dependency. Keep one column per slot instead of an N-by-N staging matrix.
+fn incidence_columns(
+    bases: &[Vec<Point>],
+    relations: &[Relation],
+) -> Result<Vec<Vec<usize>>, Error> {
     relations
         .iter()
         .map(|rel| {
             if rel.points.len() != bases.len() {
                 return Err(Error::Verification);
             }
-            let mut row = vec![0; n];
+            let mut row = Vec::with_capacity(bases.len());
             let mut offset = 0;
             for (base, point) in bases.iter().zip(&rel.points) {
                 let index = base.binary_search(point).map_err(|_| Error::Verification)?;
-                row[offset + index] = 1;
+                row.push(offset + index);
                 offset += base.len();
             }
             Ok(row)
         })
         .collect()
+}
+
+#[cfg(test)]
+fn matrix(bases: &[Vec<Point>], relations: &[Relation]) -> Result<Vec<Vec<u64>>, Error> {
+    let n = bases.iter().map(Vec::len).sum();
+    Ok(incidence_columns(bases, relations)?
+        .iter()
+        .map(|columns| {
+            let mut row = vec![0; n];
+            for &column in columns {
+                row[column] = 1;
+            }
+            row
+        })
+        .collect())
+}
+
+fn relation_dependency(
+    bases: &[Vec<Point>],
+    relations: &[Relation],
+    r: u64,
+) -> Result<Option<Vec<u64>>, Error> {
+    let columns = incidence_columns(bases, relations)?;
+    let n = bases.iter().map(Vec::len).sum();
+    Ok(dependency_rows(relations.len(), n, r, |i, row| {
+        for &column in &columns[i] {
+            row[column] = 1;
+        }
+    }))
 }
 
 // Store sparse pivot tails only when their payload is no larger than dense.
@@ -907,7 +941,19 @@ impl PivotTail {
 // First row dependency, independent of u/v. Keep elimination factors instead
 // of updating a full provenance vector at every pivot; reconstruct once by
 // triangular back-substitution when the first dependent row is reached.
+#[cfg(test)]
 fn dependency(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
+    dependency_rows(rows.len(), rows.first().map_or(0, Vec::len), r, |i, row| {
+        row.copy_from_slice(&rows[i]);
+    })
+}
+
+fn dependency_rows(
+    row_count: usize,
+    width: usize,
+    r: u64,
+    fill_row: impl Fn(usize, &mut [u64]),
+) -> Option<Vec<u64>> {
     let modulus = Modulus::new(r);
     struct Pivot {
         tail: PivotTail,
@@ -915,12 +961,17 @@ fn dependency(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
         inverse: u64,
         factors: Vec<(usize, u64)>,
     }
-    let mut columns = BTreeMap::<usize, usize>::new();
+    // Elimination traverses the whole directory in column order on every row.
+    // Keep that hot traversal contiguous; provenance indices retain insertion
+    // order even when a new pivot column precedes existing columns.
+    let mut columns = Vec::<(usize, usize)>::new();
     let mut pivots: Vec<Pivot> = Vec::new();
-    for (i, source) in rows.iter().enumerate() {
-        let mut row = source.clone();
+    let mut row = vec![0; width];
+    for i in 0..row_count {
+        row.fill(0);
+        fill_row(i, &mut row);
         let mut factors = Vec::new();
-        for (&col, &index) in &columns {
+        for &(col, index) in &columns {
             let k = row[col];
             if k == 0 {
                 continue;
@@ -933,7 +984,7 @@ fn dependency(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
         }
         match row.iter().position(|&a| a != 0) {
             None => {
-                let mut combination = vec![0; rows.len()];
+                let mut combination = vec![0; row_count];
                 combination[i] = 1;
                 let mut weights = vec![0; pivots.len()];
                 for (j, k) in factors {
@@ -958,7 +1009,11 @@ fn dependency(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
                         *a = modulus.mul(*a, inv);
                     }
                 }
-                columns.insert(col, pivots.len());
+                let position = columns.partition_point(|&(existing, _)| existing < col);
+                debug_assert!(columns
+                    .get(position)
+                    .is_none_or(|&(existing, _)| existing != col));
+                columns.insert(position, (col, pivots.len()));
                 pivots.push(Pivot {
                     tail: PivotTail::new(&row[col + 1..]),
                     source: i,
@@ -1184,7 +1239,7 @@ fn solve_reduction<const PROFILE: bool>(
             continue;
         }
         let stage = PROFILE.then(Instant::now);
-        let coeff = dependency(&matrix(&bases, &relations)?, curve.r).ok_or(Error::Verification)?;
+        let coeff = relation_dependency(&bases, &relations, curve.r)?.ok_or(Error::Verification)?;
         let scalar = extract(&relations, &coeff, curve.r);
         if let Some(stage) = stage {
             stats.linear += stage.elapsed();
@@ -1223,6 +1278,17 @@ struct Jacobian {
 impl Jacobian {
     fn from_affine(point: Point) -> Self {
         point.map_or(Self { x: 0, y: 1, z: 0 }, |(x, y)| Self { x, y, z: 1 })
+    }
+    // Compare validated group elements without normalizing either operand.
+    fn same_point(self, other: Self, modulus: Modulus) -> bool {
+        if self.z == 0 || other.z == 0 {
+            return self.z == 0 && other.z == 0;
+        }
+        let z2 = modulus.mul(self.z, self.z);
+        let other_z2 = modulus.mul(other.z, other.z);
+        modulus.mul(self.x, other_z2) == modulus.mul(other.x, z2)
+            && modulus.mul(self.y, modulus.mul(other_z2, other.z))
+                == modulus.mul(other.y, modulus.mul(z2, self.z))
     }
     fn affine(self, modulus: Modulus, inverses: &[u64]) -> Point {
         if self.z == 0 {
@@ -1327,6 +1393,23 @@ impl FixedPair {
         let modulus = curve.field;
         let table = |mut base| {
             let mut out = Vec::with_capacity(windows);
+            // With a complete inverse table, affine addition uses a lookup
+            // rather than Euclid. Avoid projective products and normalization
+            // scratch space in this bounded-field path.
+            if !curve.inverses.is_empty() {
+                for window in 0..windows {
+                    let mut row = [None; 16];
+                    row[1] = base;
+                    for digit in 2..16 {
+                        row[digit] = curve.add_valid(row[digit - 1], base);
+                    }
+                    if window + 1 < windows {
+                        base = curve.add_valid(row[15], base);
+                    }
+                    out.push(row);
+                }
+                return out;
+            }
             for window in 0..windows {
                 let mut row = [Jacobian::from_affine(None); 17];
                 row[1] = Jacobian::from_affine(base);
@@ -1352,6 +1435,21 @@ impl FixedPair {
     }
     fn evaluate(&self, curve: &Curve, mut u: u64, mut v: u64) -> Point {
         debug_assert!(u < curve.r && v < curve.r);
+        if !curve.inverses.is_empty() {
+            let mut out = None;
+            for (p, q) in self.p.iter().zip(&self.q) {
+                out = curve.add_valid(out, p[(u & 15) as usize]);
+                out = curve.add_valid(out, q[(v & 15) as usize]);
+                u >>= 4;
+                v >>= 4;
+            }
+            return out;
+        }
+        self.evaluate_projective(curve, u, v)
+            .affine(self.modulus, &curve.inverses)
+    }
+    fn evaluate_projective(&self, curve: &Curve, mut u: u64, mut v: u64) -> Jacobian {
+        debug_assert!(u < curve.r && v < curve.r);
         let mut out = Jacobian::from_affine(None);
         for (p, q) in self.p.iter().zip(&self.q) {
             out = out.add_affine(p[(u & 15) as usize], curve.a, self.modulus);
@@ -1359,7 +1457,28 @@ impl FixedPair {
             u >>= 4;
             v >>= 4;
         }
-        out.affine(self.modulus, &curve.inverses)
+        out
+    }
+}
+
+// Inputs have already passed point and base-membership checks. For fields
+// without an inverse cache, compare X=x*Z^2 and Y=y*Z^3 directly, avoiding
+// affine inversions for the sum and its normalization.
+fn relation_sum_matches(curve: &Curve, points: &[Point], target: Point) -> bool {
+    if !curve.inverses.is_empty() {
+        return points.iter().fold(None, |sum, &p| curve.add_valid(sum, p)) == target;
+    }
+    let sum = points.iter().fold(Jacobian::from_affine(None), |sum, &p| {
+        sum.add_affine(p, curve.a, curve.field)
+    });
+    match target {
+        None => sum.z == 0,
+        Some((x, y)) => {
+            let z2 = curve.field.mul(sum.z, sum.z);
+            sum.z != 0
+                && sum.x == curve.field.mul(x, z2)
+                && sum.y == curve.field.mul(y, curve.field.mul(z2, sum.z))
+        }
     }
 }
 
@@ -1376,14 +1495,12 @@ fn check_collected_relation(
     if rel.u >= curve.r || rel.v >= curve.r || rel.points.len() != bases.len() {
         return Err(Error::Verification);
     }
-    let mut sum = None;
     for (base, &point) in bases.iter().zip(&rel.points) {
         if point.is_none() || !curve.contains(point) || base.binary_search(&point).is_err() {
             return Err(Error::Verification);
         }
-        sum = curve.add_valid(sum, point);
     }
-    if sum != target {
+    if !relation_sum_matches(curve, &rel.points, target) {
         return Err(Error::Verification);
     }
     Ok(())
@@ -1398,14 +1515,23 @@ fn check_relation(
     if rel.u >= curve.r || rel.v >= curve.r || rel.points.len() != bases.len() {
         return Err(Error::Verification);
     }
-    let mut sum = None;
     for (base, &point) in bases.iter().zip(&rel.points) {
         if point.is_none() || !curve.contains(point) || base.binary_search(&point).is_err() {
             return Err(Error::Verification);
         }
-        sum = curve.add_valid(sum, point);
     }
-    if sum != fixed.evaluate(curve, rel.u, rel.v) {
+    let matches = if curve.inverses.is_empty() {
+        let sum = rel
+            .points
+            .iter()
+            .fold(Jacobian::from_affine(None), |sum, &p| {
+                sum.add_affine(p, curve.a, curve.field)
+            });
+        sum.same_point(fixed.evaluate_projective(curve, rel.u, rel.v), curve.field)
+    } else {
+        relation_sum_matches(curve, &rel.points, fixed.evaluate(curve, rel.u, rel.v))
+    };
+    if !matches {
         return Err(Error::Verification);
     }
     Ok(())
@@ -1474,6 +1600,98 @@ pub fn verify(curve: &Curve, p: Point, q: Point, cert: &Certificate) -> Result<(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn projective_equality_and_replay_match_independent_affine_targets() {
+        let (mut small, generator) = fixture();
+        small.inverses.clear();
+        let wide_p = 1_099_511_627_563;
+        let wide_generator = Some((1, 15_267_301_451));
+        let wide =
+            Curve::with_order_witness(wide_p, wide_p - 3, 56, 1_099_512_551_701, wide_generator)
+                .unwrap();
+        for (curve, p) in [(small, generator), (wide, wide_generator)] {
+            let q = curve.mul(p, 42).unwrap();
+            let fixed = FixedPair::new(&curve, p, q);
+            let scale = |point, z| {
+                let mut result = Jacobian::from_affine(point);
+                if point.is_some() {
+                    let z2 = curve.field.mul(z, z);
+                    result.x = curve.field.mul(result.x, z2);
+                    result.y = curve.field.mul(result.y, curve.field.mul(z2, z));
+                    result.z = z;
+                }
+                result
+            };
+            for u in [0, 1, 15, 16, 42, curve.r / 2, curve.r - 1] {
+                for v in [0, 1, 15, 16, 42, curve.r / 2, curve.r - 1] {
+                    let up = curve.mul(p, u).unwrap();
+                    let vq = curve.mul(q, v).unwrap();
+                    let expected = curve.add(up, vq).unwrap();
+                    let target = fixed.evaluate_projective(&curve, u, v);
+                    assert_eq!(target.affine(curve.field, &[]), expected);
+                    let wrong = curve.add(expected, p).unwrap();
+                    for z in [1, 2, curve.p - 1] {
+                        for other_z in [1, 3, curve.p - 1] {
+                            let lhs = scale(expected, z);
+                            assert!(lhs.same_point(scale(expected, other_z), curve.field));
+                            assert!(!lhs.same_point(scale(wrong, other_z), curve.field));
+                            assert!(target.same_point(lhs, curve.field));
+                            if let Some((x, y)) = expected {
+                                if y != 0 {
+                                    assert!(!lhs.same_point(
+                                        scale(Some((x, curve.p - y)), other_z),
+                                        curve.field
+                                    ));
+                                }
+                            }
+                        }
+                    }
+                    // Replay must still reject an incorrect u even when all
+                    // tuple points are valid members of their respective bases.
+                    if up.is_some() && vq.is_some() {
+                        let bases = vec![vec![up], vec![vq]];
+                        let mut relation = Relation {
+                            u,
+                            v,
+                            points: vec![up, vq],
+                        };
+                        assert!(check_relation(&curve, &fixed, &bases, &relation).is_ok());
+                        relation.u = (u + 1) % curve.r;
+                        assert!(check_relation(&curve, &fixed, &bases, &relation).is_err());
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn projective_relation_sums_match_affine_with_cancellation_and_doubling() {
+        let (cached, generator) = fixture();
+        let mut uncached = cached.clone();
+        uncached.inverses.clear();
+        let multiples: Vec<_> = (0..cached.r)
+            .map(|k| cached.mul(generator, k).unwrap())
+            .collect();
+        for (i, &p) in multiples.iter().enumerate() {
+            for &q in &multiples {
+                // Identity, doubling, inverse cancellation, and unequal sums.
+                let inverse_p = multiples[(cached.r as usize - i) % multiples.len()];
+                let sequence = [p, q, inverse_p, q, p, p, inverse_p, inverse_p];
+                let mut expected = None;
+                for n in 0..=sequence.len() {
+                    if n != 0 {
+                        expected = cached.add_valid(expected, sequence[n - 1]);
+                    }
+                    assert!(relation_sum_matches(&uncached, &sequence[..n], expected));
+                    assert!(relation_sum_matches(&cached, &sequence[..n], expected));
+                    let wrong = cached.add_valid(expected, generator);
+                    assert!(!relation_sum_matches(&uncached, &sequence[..n], wrong));
+                    assert!(!relation_sum_matches(&cached, &sequence[..n], wrong));
+                }
+            }
+        }
+    }
+
     fn fixture() -> (Curve, Point) {
         (Curve::new(211, 0, 7, 199).unwrap(), Some((3, 33)))
     }
@@ -1913,6 +2131,51 @@ mod tests {
     }
 
     #[test]
+    fn cached_affine_fixed_pair_matches_projective_tables_and_evaluation() {
+        for (p, a, b, r, generator) in [
+            (17, 2, 2, 19, Some((5, 1))),
+            (211, 0, 7, 199, Some((3, 33))),
+        ] {
+            let cached = Curve::new(p, a, b, r).unwrap();
+            let mut reference = cached.clone();
+            reference.inverses.clear(); // Force the preserved projective path.
+            for scalar in 0..r {
+                let target = reference.mul(generator, scalar).unwrap();
+                let fast = FixedPair::new(&cached, generator, target);
+                let slow = FixedPair::new(&reference, generator, target);
+                assert_eq!(fast.p, slow.p);
+                assert_eq!(fast.q, slow.q);
+                let scalars: Vec<_> = if p == 17 {
+                    (0..r).collect()
+                } else {
+                    vec![0, 1, 15, 16, r - 1]
+                };
+                for &u in &scalars {
+                    for &v in &scalars {
+                        let expected = reference
+                            .add(
+                                reference.mul(generator, u).unwrap(),
+                                reference.mul(target, v).unwrap(),
+                            )
+                            .unwrap();
+                        assert_eq!(fast.evaluate(&cached, u, v), expected);
+                        assert_eq!(slow.evaluate(&reference, u, v), expected);
+                    }
+                }
+            }
+            // Identity first base exercises the table's infinity cases too.
+            let fast = FixedPair::new(&cached, None, generator);
+            let slow = FixedPair::new(&reference, None, generator);
+            assert_eq!(fast.p, slow.p);
+            assert_eq!(fast.q, slow.q);
+            assert_eq!(
+                fast.evaluate(&cached, r - 1, r - 1),
+                slow.evaluate(&reference, r - 1, r - 1)
+            );
+        }
+    }
+
+    #[test]
     fn fixed_pair_matches_independent_binary_multiplication() {
         for (p, a, b, r, generator) in [
             (211, 0, 7, 199, Some((3, 33))),
@@ -2130,6 +2393,40 @@ mod tests {
                 }
             }
             None
+        }
+        // Force pivot arrival out of column order. This exercises insertion
+        // before and between existing pivots, while provenance is still in
+        // source-row order. The final row is a known nontrivial combination.
+        for r in [3, 199, 1_099_512_551_701] {
+            for n in 1..13 {
+                for shift in 0..n {
+                    let mut rows: Vec<Vec<u64>> = (0..n)
+                        .rev()
+                        .map(|i| {
+                            (0..n)
+                                .map(|j| {
+                                    if j < i {
+                                        0
+                                    } else if j == i {
+                                        1
+                                    } else {
+                                        (j as u64 + 2) % r
+                                    }
+                                })
+                                .collect()
+                        })
+                        .collect();
+                    rows.rotate_left(shift);
+                    let mut last = vec![0; n];
+                    for (i, row) in rows.iter().enumerate() {
+                        for (value, &entry) in last.iter_mut().zip(row) {
+                            *value = (*value + mulmod((i as u64 + 1) % r, entry, r)) % r;
+                        }
+                    }
+                    rows.push(last);
+                    assert_eq!(dependency(&rows, r), eager(&rows, r));
+                }
+            }
         }
         let mut rng = Rng(321);
         for r in [3, 199, 1_099_512_551_701] {
@@ -2351,6 +2648,63 @@ mod tests {
             Enumerate.find(&c, &bases, None, 1),
             Err(Error::Limit(_))
         ));
+    }
+
+    #[test]
+    fn streamed_incidence_matches_dense_dependencies() {
+        let mut rng = Rng(71823);
+        for slots in 2..=8 {
+            for size in 1..=7 {
+                // Repeated points across slots must retain separate columns.
+                let base: Vec<_> = (0..size).map(|i| Some((i as u64, 1))).collect();
+                let bases = vec![base.clone(); slots];
+                let mut relations = Vec::new();
+                let mut dense = Vec::new();
+                for _ in 0..slots * size + 3 {
+                    let mut points = Vec::new();
+                    let mut row = vec![0; slots * size];
+                    for slot in 0..slots {
+                        let index = rng.below(size as u64) as usize;
+                        points.push(base[index]);
+                        row[slot * size + index] = 1;
+                    }
+                    relations.push(Relation { u: 0, v: 0, points });
+                    dense.push(row);
+                }
+                for r in [3, 199, 1_099_512_551_701] {
+                    assert_eq!(
+                        relation_dependency(&bases, &relations, r).unwrap(),
+                        dependency(&dense, r)
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn streamed_incidence_validates_rows_after_first_dependency() {
+        let point = Some((3, 33));
+        let bases = vec![vec![point], vec![point]];
+        let valid = Relation {
+            u: 0,
+            v: 0,
+            points: vec![point, point],
+        };
+        let mut relations = vec![valid; 3];
+        assert_eq!(
+            relation_dependency(&bases, &relations, 199).unwrap(),
+            Some(vec![198, 1, 0])
+        );
+        relations[2].points[1] = Some((0, 0));
+        assert_eq!(
+            relation_dependency(&bases, &relations, 199),
+            Err(Error::Verification)
+        );
+        relations[2].points.pop();
+        assert_eq!(
+            relation_dependency(&bases, &relations, 199),
+            Err(Error::Verification)
+        );
     }
 
     #[test]
