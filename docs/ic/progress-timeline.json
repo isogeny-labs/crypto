@@ -271,6 +271,17 @@
      "class": "engineering",
      "anchor": "#rho-parity-ledger",
      "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
+    },
+    {
+     "date": "2026-10-31",
+     "value": 26.734,
+     "reference": "matched",
+     "unit": "S",
+     "label": "PS-6: the ledger's S4-family oracles in ecbench, best cold cell: negation-folded MITM on icv1-f2m15-t131-ed7256f0 (r = 2^14.0)",
+     "detail": "One-target cold S of the negation-folded meet-in-the-middle table over rho.negation on the same 16 verified runs: 26.73 [22.61, 31.94] at w = 0; 15.45 when rho's unpriced canonicalisations cost 1 GAE each (section 5a band). The index-calculus arms are above rho at every rung (n = 15..27) and weight; the ratio grows with n (MITM 181x at n = 27). Class: engineering; no advance, no leaderboard row.",
+     "class": "engineering",
+     "anchor": "#lab-ps6-charge",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/pdp_oracle_speedup_20261011/ps6_charge/README.md"
     }
    ],
    "role": "emphasis"
@@ -652,6 +663,17 @@
      "class": "engineering",
      "anchor": "#prime-ksum-pooled-20261029",
      "source": "https://github.com/isogeny-labs/crypto/blob/main/research/prime_ksum_pooled_20261029/README.md"
+    },
+    {
+     "date": "2026-10-31",
+     "value": 12.64,
+     "reference": "matched",
+     "unit": "counted GAE lower-bound diagnostic",
+     "label": "PS-6: PS-2 group-law kernel (S4 pairs-and-solve), recorded S over rho.negation, best cell icv1-f2m24-tm3047-2d0c0e8c (r = 2^21.0)",
+     "detail": "The kernel's pairs have no pinned conversion, so they are counted and left out of S: the recorded S is a lower bound and a ratio of two lower bounds does not bound the full-cost ratio. Over the same 16 verified runs per arm the recorded ratio is 12.64; with each kernel pair priced at 0.1 and 1 GAE it is 150 and 800. Against the baseline pairs-and-solve the kernel is below at every weight; against the library's MITM table the order flips inside the band (kernel/MITM 0.17, 2.25, 20.9 at w = 0, 0.1, 1): unresolved. Class: engineering (stage diagnostic).",
+     "class": "engineering",
+     "anchor": "#lab-ps6-charge",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/pdp_oracle_speedup_20261011/ps6_charge/README.md"
     }
    ],
    "role": "context"
@@ -952,8 +974,8 @@
      "class": "diagnostic",
      "anchor": "#n53-s3-root-batch-20261012",
      "source": "https://github.com/aburan28/crypto/blob/main/research/notes/ecc2k130/n53_s3_root_batch_20261012/RESULT.md"
-   },
-   {
+    },
+    {
      "date": "2026-10-17",
      "value": 0.04508348816596248,
      "reference": "matched",
@@ -1184,6 +1206,26 @@
      "class": "engineering",
      "anchor": "#rho-parity-ledger",
      "source": "https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l11_l12_20261016/REPORT.typ"
+    },
+    {
+     "date": "2026-10-31",
+     "value": 0.0865,
+     "reference": "stage",
+     "label": "PS-6: group-law kernel vs pairs-and-solve in the counted unit at n = 27 (l = 9), each kernel pair priced at 1 GAE",
+     "detail": "Sum S of the kernel over sum S of the baseline pairs-and-solve on the same 8 one-target runs (identical trial streams; 0 witness mismatches in 27,938 audited targets over the five rungs): 0.00020 with the kernel's pairs unpriced, 0.0088 at 0.1 GAE per pair, 0.0865 at 1 GAE (a baseline pair is priced 3.09 GAE by the pinned calibration). Value plotted: the 1 GAE end of the band, the conservative one. Stage diagnostic; the kernel has no pinned price; no end-to-end speedup is claimed.",
+     "class": "engineering",
+     "anchor": "#lab-ps6-charge",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/pdp_oracle_speedup_20261011/ps6_charge/README.md"
+    },
+    {
+     "date": "2026-10-31",
+     "value": 0.00172,
+     "reference": "stage",
+     "label": "PS-6: the library's MITM pair table vs pairs-and-solve in the counted unit at n = 27 (l = 9), table build inside S",
+     "detail": "Sum S of mitm:m=3 over sum S of the baseline on the same 8 one-target runs, every phase priced (no unpriced counter): 0.00172 (the baseline costs 582 times as much); the table has 69,118 entries and grows resident memory by about 2.1 MiB, which is not in S. Fitted total-cost exponents over n = 15..27: baseline 1.063, MITM 0.645. Class: engineering.",
+     "class": "engineering",
+     "anchor": "#lab-ps6-charge",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/pdp_oracle_speedup_20261011/ps6_charge/README.md"
     }
    ]
   },

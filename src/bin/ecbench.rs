@@ -39,6 +39,10 @@ mod pdp3_koblitz;
 mod pdp_split_oracle;
 #[path = "ecbench/pkm_tower.rs"]
 mod pkm_tower;
+#[path = "ecbench/ps6_charge.rs"]
+mod ps6_charge;
+#[path = "ecbench/ps6_kernel.rs"]
+mod ps6_kernel;
 #[path = "ecbench/structured_s4.rs"]
 mod structured_s4;
 
@@ -837,7 +841,7 @@ enum DbCmd {
 
 /// Every plug-in this binary links: `pdp3_koblitz`'s, then
 /// `pdp_split_oracle`'s (the `pdp-split` oracle and the `koblitz-closure`
-/// base).  Names do not overlap, so the order only fixes lookup.
+/// base), then `ps6_charge`'s PS-6 oracles. Names do not overlap, so the order only fixes lookup.
 fn binary_plugins() -> crypto_lib::cryptanalysis::ecbench::methods::BinaryPlugins {
     crypto_lib::cryptanalysis::ecbench::methods::BinaryPlugins {
         base: |name, instance| {
@@ -849,6 +853,7 @@ fn binary_plugins() -> crypto_lib::cryptanalysis::ecbench::methods::BinaryPlugin
             (pdp3_koblitz::plugins().oracle)(name, summands, instance)
                 .or_else(|| pdp_split_oracle::oracle(name, summands, instance))
                 .or_else(|| structured_s4::oracle(name, summands, instance))
+                .or_else(|| ps6_charge::oracle(name, summands, instance))
         },
     }
 }
