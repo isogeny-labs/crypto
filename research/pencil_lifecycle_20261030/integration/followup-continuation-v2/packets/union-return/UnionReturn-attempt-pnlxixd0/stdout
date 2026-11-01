@@ -1,0 +1,44 @@
+/var/tmp/pencil-union-return-20261101-v1/UnionReturn.lean:38:5: error: Type mismatch: After simplification, term
+  hh
+ has type
+  outDecode r
+      (constraint r (GraphRingWord.sub r xy.1 (transportPair r p ab).1)
+        (GraphRingWord.sub r xy.2 (transportPair r p ab).2)) =
+    GraphSameRoot.constraint (↑xy.1.toNat - ↑(transportPair r p ab).1.toNat)
+      (↑xy.2.toNat - ↑(transportPair r p ab).2.toNat)
+but is expected to have type
+  outDecode r
+      (constraint r (GraphRingWord.sub r xy.1 (transportPair r p ab).1)
+        (GraphRingWord.sub r xy.2 (transportPair r p ab).2)) =
+    GraphSameRoot.constraint (↑xy.1.toNat - (GraphUnion.transport (decPot r p) (↑ab.1.toNat, ↑ab.2.toNat)).1)
+      (↑xy.2.toNat - (GraphUnion.transport (decPot r p) (↑ab.1.toNat, ↑ab.2.toNat)).2)
+/var/tmp/pencil-union-return-20261101-v1/UnionReturn.lean:56:6: error: unknown tactic
+/var/tmp/pencil-union-return-20261101-v1/UnionReturn.lean:53:5: error: Tactic `apply` failed: could not unify the conclusion of `@GraphSameRoot.constraint_safe`
+  GraphSameRoot.Safe (GraphSameRoot.constraint ?a ?b) ?k
+with the goal
+  GraphSameRoot.Safe (field s child parent p) k
+
+Note: The full type of `@GraphSameRoot.constraint_safe` is
+  ∀ {K : Type ?u.63} [inst : Field K] [inst_1 : DecidableEq K] (a b k : K),
+    a + b * k = 0 → GraphSameRoot.Safe (GraphSameRoot.constraint a b) k
+
+case some.some
+n : ℕ
+K : Type u_1
+inst✝¹ : Field K
+inst✝ : DecidableEq K
+s : GraphUnion.State K n
+child parent : Fin n
+p : SignedGraphAlgebra.Potential K
+v : Fin n → K
+k : K
+hv : GraphUnion.Valid s v k
+hs : p.s * p.s = 1
+he : v child = SignedGraphAlgebra.eval p (v parent) k
+ab : K × K
+hc : s.fixed child = some ab
+xy : K × K
+ht : s.fixed parent = some xy
+hm : v parent = p.s * (ab.1 - p.a) + p.s * (ab.2 - p.b) * k
+hx : v parent = xy.1 + xy.2 * k
+⊢ GraphSameRoot.Safe (field s child parent p) k

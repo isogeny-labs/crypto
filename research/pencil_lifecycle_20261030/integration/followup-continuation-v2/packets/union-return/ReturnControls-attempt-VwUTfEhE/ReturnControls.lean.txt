@@ -1,0 +1,14 @@
+import ReturnAfterFinds
+set_option autoImplicit false
+namespace ReturnControls
+open SignedWord UnionReturn
+def state (left right : Option (UInt64×UInt64)) : UnionState 2 :=
+ ⟨⟨id,fun _=>ident⟩,fun i=>if i.val=0 then left else right⟩
+theorem no_anchors : word 7 (state none none) 0 1 ident=.none := by decide
+theorem only_child : word 7 (state (some (1,2)) none) 0 1 ident=.none := by decide
+theorem only_parent : word 7 (state none (some (3,4))) 0 1 ident=.none := by decide
+theorem equal_anchors : word 7 (state (some (1,2)) (some (1,2))) 0 1 ident=.none := by decide
+theorem inconsistent_anchors : word 7 (state (some (1,2)) (some (3,2))) 0 1 ident=.inconsistent := by decide
+theorem forward_answer : branch 7 (state (some (1,2)) (some (3,4))) 0 1 ident true=.answer 6 := by decide
+theorem reverse_answer : branch 7 (state (some (1,2)) (some (3,4))) 0 1 ident false=.answer 6 := by decide
+end ReturnControls
