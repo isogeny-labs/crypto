@@ -170,7 +170,7 @@ font-map/recent-manager warnings after writable XDG scratch paths were
 supplied. The hardened `report.pdf` has five letter-size pages. Its text was
 extracted and the newly affected rendered pages were opened; the cost bridge,
 hardening diagram and decision text are legible. Its 2026-11-01 SHA-256 is
-`3d1eb286a6c4dc768c9f3d0864fecb03323393358d2511a77a978b85cb979b29`.
+`01633ab9f601cff2f79e9e50e0bc3d81ce5880bac0f99a7f692e3c165bf2f9dc`.
 
 ## Scientific execution status
 
