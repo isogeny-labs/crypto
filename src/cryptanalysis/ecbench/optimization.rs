@@ -108,6 +108,12 @@ macro_rules! policy {
 // Deliberately explicit.  A new method must choose a search strategy and a
 // claim/accounting scope; the registry-exhaustiveness test fails otherwise.
 const POLICIES: &[PolicyDecl] = &[
+    policy!(
+        "ic.prime_orbit_relations_v1",
+        NativeGrid,
+        SpecializedDomain,
+        StandardBand
+    ),
     policy!("ic.aps_v1", NativeAdaptive, SpecializedDomain, StandardBand),
     policy!(
         "ic.three_leads_genus2_pencil_symbolic_v2",
@@ -565,6 +571,8 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "cap_multiple"
         | "matrix_coefficient_cap"
         | "max_pair_work"
+        | "max_descent_ops"
+        | "max_ops"
         | "max_restarts"
         | "max_states"
         | "max_sums"
@@ -582,15 +590,59 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "trial_cap"
         | "unit_trials"
         | "units" => ResourceEnvelope,
-        "baby" | "base" | "base_multiplier" | "base_scale" | "beta" | "branches"
-        | "collection_aim" | "collection_window" | "d" | "d_step_in" | "degree"
-        | "descent_summands" | "dp_bits" | "ell" | "encoding" | "entries"
-        | "envelope_dimension" | "extra_relations" | "factor_base" | "factor_base_points"
-        | "fb_size" | "independent" | "inner" | "jumps" | "k" | "labels" | "lambda" | "lanes"
-        | "large_primes" | "linalg" | "line" | "lp_exponent" | "m" | "mode" | "oracle"
-        | "orbit" | "prune" | "random_base" | "roots" | "size" | "small_denominator"
-        | "small_dimension" | "solver" | "stop" | "subset_size" | "summands" | "table_scale"
-        | "targets" | "unique_relations" | "walks" => Knob,
+        "baby"
+        | "base"
+        | "base_multiplier"
+        | "base_scale"
+        | "beta"
+        | "branches"
+        | "collection_aim"
+        | "collection_window"
+        | "coordinates"
+        | "d"
+        | "d_step_in"
+        | "degree"
+        | "descent_summands"
+        | "dp_bits"
+        | "ell"
+        | "encoding"
+        | "entries"
+        | "envelope_dimension"
+        | "extra_relations"
+        | "factor_base"
+        | "factor_base_points"
+        | "fb_size"
+        | "independent"
+        | "inner"
+        | "jumps"
+        | "k"
+        | "labels"
+        | "lambda"
+        | "lanes"
+        | "large_primes"
+        | "linalg"
+        | "line"
+        | "lp_exponent"
+        | "m"
+        | "mode"
+        | "oracle"
+        | "orbit"
+        | "orbits"
+        | "prune"
+        | "random_base"
+        | "relations_per_orbit"
+        | "roots"
+        | "size"
+        | "small_denominator"
+        | "small_dimension"
+        | "solver"
+        | "stop"
+        | "subset_size"
+        | "summands"
+        | "table_scale"
+        | "targets"
+        | "unique_relations"
+        | "walks" => Knob,
         _ => return None,
     })
 }
@@ -1116,6 +1168,8 @@ mod tests {
             "max_trials",
             "trial_cap",
             "solver_budget_seconds",
+            "max_ops",
+            "max_descent_ops",
             "base_seed",
             "rank_seed",
         ] {

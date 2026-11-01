@@ -9,25 +9,24 @@ mandatory checkpoint upload. The repository requires a durable checkpoint
 before queue submission. Therefore no EKS job was submitted, and local wall
 timing is recorded as descriptive rather than substituted for EKS L2 evidence.
 
-The artifact-policy sweep selected all 37 raw `records.jsonl` payloads (about
-8.2 MiB total), including the 34 earlier campaign files and three post-merge
-files. The actual repository uploader stopped because `aws` is unavailable and
-no alternate `ARTIFACTS_AWS`/checkpoint identity is configured. The raw files
-remain local and untracked, not deleted. Their exact hashes, audit results, and
-compact comparisons are retained in tracked receipts; this does not satisfy
-remote evidence delivery or promotion.
+The trusted repository workflow has now uploaded, independently downloaded,
+and replayed 37 campaign payloads, including all three new prime-orbit
+sessions, replacing them with hash-bound artifact manifests. Three older
+post-merge diagnostics remain local because they were never admitted to that
+migration. This runtime still has no direct artifact/checkpoint identity, and
+artifact delivery never substitutes for the missing L2 promotion evidence.
 
-The all-method roster blocker is resolved. `full-development-audit.json` admits
-111 development specs covering all 78 current methods and all 24 nested
+The all-method roster blocker is resolved. `full-development-audit-79.json` admits
+114 development specs covering all 79 current methods and all 24 nested
 algorithms, with no missing entries or reused development/holdout seeds. Local
-sessions actually invoked all 72 runnable native methods, all 11 system
+sessions actually invoked all 73 runnable native methods, all 11 system
 solvers, all nine PDP3 engines, and all four PKM tower engines.
 The six external CM registry methods remain blocked on a real backend path and
 SHA-256 identity; placeholder bindings were never executed.
 
 The repository also now contains an N83 chained-S3 meet-in-the-middle lookup
 with separate decomposition-stage measurements. It is not selectable through
-ECBench, so the 78+24 audit does not and must not imply coverage. An admitted
+ECBench, so the 79+24 audit does not and must not imply coverage. An admitted
 frontier comparison still requires an ECBench arm, matched rho/reference,
 complete reusable-versus-online pricing, deterministic replay, and a disjoint
 L2 holdout.
@@ -61,7 +60,7 @@ disjoint confirmatory roster passing:
 ecbench optimize audit --development ... --holdout ... --require-all
 ```
 
-The 35 admitted local sessions are L0 development diagnostics: one target per lane, four
+The 38 admitted local sessions are L0 development diagnostics: one target per lane, four
 measured rounds, and no admitted wall interval. They select candidates and
 locate failures, but cannot update the leaderboard. The generator-orbit n=29
 candidate therefore remains `awaiting L2 holdout`; the six CM wrappers remain

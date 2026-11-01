@@ -355,7 +355,10 @@ pub fn band(records: &[Record], weights: &[f64]) -> Result<BandReport, String> {
     Ok(BandReport {
         schema: "ecbench.band/v1".into(),
         weights: weights.to_vec(),
-        exempt_counters: NON_OPERATION_COUNTERS.iter().map(|s| s.to_string()).collect(),
+        exempt_counters: NON_OPERATION_COUNTERS
+            .iter()
+            .map(|s| s.to_string())
+            .collect(),
         rows,
         ranks,
     })
@@ -441,7 +444,11 @@ mod tests {
         assert_eq!(exempt_counts(&r)[name], Some(1_000_000));
         assert!(!priced_counts(&r).contains_key(name));
         assert_eq!(unpriced_total(&r), (u0, missing0), "not in U");
-        assert_eq!(priced_gae(&r, 1.0).unwrap().unwrap(), g0, "not in the price");
+        assert_eq!(
+            priced_gae(&r, 1.0).unwrap().unwrap(),
+            g0,
+            "not in the price"
+        );
 
         // Named without a count: an exempt counter does not block ranking.
         r.counters.remove(name);

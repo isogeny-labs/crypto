@@ -138,6 +138,16 @@ committed weighted comparison of the four studies into each study's
 | `ic_planner_exhaustive_20261026` | 136 | 36 | 12 | 0 |
 | `ic_planner_weight_rule_binkob_20261026` | 6 | 2 | 4 | 0 |
 | `ic_koblitz_descent_routing_20261026` | 0 (none committed) | | | |
+| `ic_residual_scale_20261101` (landed with #3119) | 42 | see below | | 0 |
+
+`ic_residual_scale_20261101` was re-run afterwards, with `scripts/c1_exbytes.py`
+for its pre-registered C1. Under the rule C1 is met in 2 of 8 cells, not 6 of 8:
+the `eq` candidate's w = 1 intervals reach or cross 1 in all four cells (p40
+res1eq 1.181 [0.859, 1.625], res4eq 1.089 [0.924, 1.285]; p42 res1eq 0.955
+[0.774, 1.177], res4eq 1.084 [0.964, 1.219]); `dp` stays 2 of 4, failing at w = 0
+as before. Baseline distance to rho becomes 2.5 (res1) and 3.4-4.1 (res4) at every
+weight, from 17-18 and 42-53 at w = 1. Its README's errata count of 9 of 12 cells
+does not match its own `summary.json` (8 of 12 as built); not reconciled here.
 
 Band rows of arms that name no byte counter are identical to the committed
 ones (checked row by row: no changed row lacks a byte counter); in
