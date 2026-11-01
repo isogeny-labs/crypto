@@ -1,0 +1,15 @@
+import Composition
+set_option autoImplicit false
+namespace Pegcd
+open Polynomial
+theorem control_quotient_sign :
+ (step (initial (X : ℚ[X]) 1) X 0).s1 = 1 ∧
+ (step (initial (X : ℚ[X]) 1) X 0).t1 = -X := by simp [step,initial]
+theorem control_zero_second : Valid (X : ℚ[X]) 0 (initial X 0) := initial_valid _ _
+theorem control_unscaled_bezout_rejected : C (2 : ℚ)*X ≠ (X : ℚ[X]) := by
+ intro h
+ have hh := congrArg (fun p : ℚ[X] => p.coeff 1) h
+ norm_num at hh
+theorem control_zero_gcd_excluded :
+ (initial (X : ℚ[X]) 0).r0 ≠ 0 := by simp [initial]
+end Pegcd

@@ -1,0 +1,52 @@
+{
+  "schema": "formal-component-result/v1",
+  "task": "T-1237",
+  "component": "quotient-word-storage",
+  "machine_status": "passed",
+  "independent_review": "pending_publication",
+  "main_declarations": 15,
+  "controls": 13,
+  "readbacks": 28,
+  "acceptance": "acceptance.json",
+  "interfaces": [
+    "QuotientStorage.word_projection",
+    "QuotientStorage.word_good",
+    "QuotientStorage.word_normal",
+    "QuotientStorage.word_success",
+    "QuotientStorage.word_total",
+    "QuotientStorage.word_exact"
+  ],
+  "storage_model": "zero Array UInt64 / Array.set / same selected word remainder / final trim",
+  "allocation_bound": "for w>0,a<2^w,b>0: a-b+1<2^w",
+  "assumptions": [
+    "prime p",
+    "0<p.toNat<2^31",
+    "canonical dividend and divisor",
+    "last divisor word1",
+    "fuel >= original input length for success/exact existence"
+  ],
+  "remaining_boundaries": [
+    "allocator and Vec byte/isize capacity",
+    "usize implementation refinement",
+    "nonmonic division leading inverse",
+    "general pegcd",
+    "instrumentation/compiled equivalence"
+  ],
+  "failed_attempts": [
+    "division1 equality transport and pair projection syntax"
+  ],
+  "source_binding": "source-binding.json",
+  "scientific_execution": false,
+  "repository_edits": false,
+  "full_cohort_targets": 1260,
+  "scientific_authorization": "expired preserved",
+  "visual_inspection": {
+    "pages": [
+      1,
+      2
+    ],
+    "svg_embedded": true,
+    "result": "all pages inspected; legible without clipping"
+  },
+  "dependencies": "bound direct proof roots and olean files; transitive cache/compiler trusted"
+}

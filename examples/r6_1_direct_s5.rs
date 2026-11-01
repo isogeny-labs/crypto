@@ -1190,6 +1190,7 @@ impl FixedBase {
             cost: self.fb.cost.clone(),
             subspace_basis: self.fb.subspace_basis.clone(),
             known_logs: self.fb.known_logs.clone(),
+            frobenius_orbit_layout: self.fb.frobenius_orbit_layout,
         }
     }
 }

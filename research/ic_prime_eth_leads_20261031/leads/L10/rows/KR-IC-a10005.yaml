@@ -1,0 +1,29 @@
+# DRAFT (L10). Provisional id. Source review: prime-sat-tensor-review-20261031/REVIEW.md s2.1, A1 (KR-1), A2. Derived by hand, no Lean in this lane.
+id: KR-IC-a10005
+area: index-calculus
+kind: known_negative
+title: Leading-form degree of regularity is presentation-dependent; one-hot grouping forces G+1
+claim: >-
+  Scoped as in the sources: for the two-summand Boolean-digit Semaev system the accepted result is
+  d_reg(grouped, raw S3) = s+1 (even s; s+2 at odd s, reviewer-derived) against s + ceil((s+2)/2) for
+  the bit presentation (Caminata-Gorla Def. 1.4 convention); the accepted general statement is the
+  UPPER bound d_reg <= G+1 (DEC-20261029-0857a9). Equality G+1 for any Boolean system is the
+  producer's own Section D (unreviewed, elementary). The local quotient keeps dimension 4^s in both
+  presentations, so a lower d_reg here is a regrading, not lower solving cost. Do not use leading-form
+  d_reg as a progress metric; use last fall degree and measured solver work.
+status: proven
+setting: {field: prime, curve_family: generic, model: boolean_digit_semaev_m2}
+sources:
+  # TODO: mint KN-LIT for Caminata-Gorla arXiv:2112.05579 (not in corpus); the validator needs a resolving KN ref.
+  - ref: KN-LIT-025
+    locator: "context only (prime-field algebraic approaches); NOT the proof source"
+    verification_state: abstract_read
+forecloses:
+  - lower degree of regularity by one-hot re-encoding
+  - grouped Boolean encoding reduces regularity
+  - membership predicate lowers d_reg as a complexity gain
+internal:
+  - {ref: DEC-20261029-0857a9, relation: extends, note: "accepted <=G+1 and exact S3 case"}
+dominated_by: null
+added: '2026-10-31'
+superseded_by: null

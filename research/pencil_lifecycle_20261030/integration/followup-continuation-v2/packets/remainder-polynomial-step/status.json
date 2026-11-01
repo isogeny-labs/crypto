@@ -1,0 +1,172 @@
+{
+  "schema": "research.proof-packet-status/v1",
+  "task": "T-1193",
+  "kind": "generated_divisor_polynomial_cancellation",
+  "main_declarations": 8,
+  "control_declarations": 8,
+  "checks": {
+    "events2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "connect1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "post1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "readback": [
+    {
+      "name": "RemainderPolynomial.events_good",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderPolynomial.events_polynomial",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderPolynomial.event_coeff",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderPolynomial.event_coeff_high",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderPolynomial.run_polynomial",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderPolynomial.generated_polynomial_step",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderPolynomial.trimmed_polynomial_step",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderPolynomial.event_operands",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderPolynomialControls.first_array",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderPolynomialControls.first_trim",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderPolynomialControls.second_array",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderPolynomialControls.second_trim",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderPolynomialControls.offset_order",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderPolynomialControls.empty_divisor_events",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderPolynomialControls.bad_shift_excluded",
+      "axioms": []
+    },
+    {
+      "name": "RemainderPolynomialControls.zero_coefficient",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    }
+  ],
+  "failed_attempts": [
+    "events1"
+  ],
+  "assumptions": [
+    "prime 0<p<2^31",
+    "canonical word array, scalar and divisor coefficients",
+    "j+divisor length <= array length"
+  ],
+  "established": [
+    "generated operand list unchanged",
+    "event polynomial is shifted product",
+    "word traversal decodes to polynomial subtraction",
+    "trimming preserves resulting polynomial"
+  ],
+  "outer_loop_choices": "pending",
+  "termination": "pending",
+  "independent_source_fidelity_review": "pending",
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "pdf_inspection": "one page readable and unclipped",
+  "upstream_compiled_dependencies": "retained trust boundary"
+}
