@@ -20,3 +20,5 @@ done
 "$CC" -O3 -Wall -Wextra -std=c11 -I"$NATIVE_PREFIX/include" "$SOURCE_DIR/search80.c" -L"$NATIVE_PREFIX/lib" -Wl,-rpath,"$NATIVE_PREFIX/lib" -lflint -lgmp -o "$BUILD_DIR/search80"
 "$CC" -O2 -Wall -Wextra -std=c11 -I"$NATIVE_PREFIX/include" "$SOURCE_DIR/pari_verify.c" -L"$NATIVE_PREFIX/lib" -Wl,-rpath,"$NATIVE_PREFIX/lib" -lpari -o "$BUILD_DIR/pari_verify"
 "$CXX" -O2 -Wall -Wextra -std=c++17 -I"$NATIVE_PREFIX/include" "$SOURCE_DIR/measurement_preflight.cpp" -L"$NATIVE_PREFIX/lib" -Wl,-rpath,"$NATIVE_PREFIX/lib" -lgmpxx -lgmp -o "$BUILD_DIR/measurement_preflight"
+"$CC" -O2 -Wall -Wextra -std=c11 -I"$NATIVE_PREFIX/include" "$SOURCE_DIR/root_chunk.c" -L"$NATIVE_PREFIX/lib" -Wl,-rpath,"$NATIVE_PREFIX/lib" -lflint -lgmp -o "$BUILD_DIR/root_chunk"
+"$CC" -O2 -Wall -Wextra -std=c11 -I"$NATIVE_PREFIX/include" "$SOURCE_DIR/check_root_chunk.c" -L"$NATIVE_PREFIX/lib" -Wl,-rpath,"$NATIVE_PREFIX/lib" -lpari -o "$BUILD_DIR/check_root_chunk"
