@@ -25,6 +25,8 @@ Sources (all committed, read at --ref unless noted):
                                 verified fixed-cohort cutoff coverage, not random sampling or security
   research/nist_skip_criterion_20261025/broader_census_reanalysis_20261030/results/verification.json
                                 verified broader recorded-census coverage, not historical use or security
+  research/nist_skip_criterion_20261025/exact_pair_audit_20261030/results/verification.json
+                                exact fixed-score allocation coverage, not sampled curves or security
   research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json
                                 IC collect-phase component: paired native ratio and its A/A floor
   research/explicit_relations_e2e_20261030/results-v*/
@@ -383,6 +385,19 @@ def nist_selection_broader_census(ref, since):
                  date=date, problem="nist-candidate-selection", unit=unit, better="neutral",
                  label="Broader recorded census: independently verified coverage; not security or sampling",
                  source=f"{path}@{commit}")
+
+
+def nist_selection_exact_pair_audit(ref, since):
+    """Export the verified allocation inventory; do not compute a statistic."""
+    path = "research/nist_skip_criterion_20261025/exact_pair_audit_20261030/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        if data.get("all_five_files_equal") is not True:
+            continue
+        emit("nist.selection_exact_pair_audit.verified_assignments", data.get("assignments"),
+             date=date, problem="nist-candidate-selection", unit="label assignments", better="neutral",
+             label="Verified fixed-score allocation inventory; not sampled curves or security",
+             source=f"{path}@{commit}")
 
 
 def koblitz_modular_augmentation(ref, since):
@@ -778,6 +793,7 @@ def main():
     nist_selection_strict_elkies(a.ref, a.since)
     nist_selection_expanded_cutoff(a.ref, a.since)
     nist_selection_broader_census(a.ref, a.since)
+    nist_selection_exact_pair_audit(a.ref, a.since)
 
 
     ghs_ipsec_archive(a.ref, a.since)
