@@ -141,6 +141,13 @@ jobs:
           AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
         run: |
           if ! command -v aws >/dev/null; then
+            curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip" -o "$RUNNER_TEMP/awscli.zip"
+            python3 -c "import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" "$RUNNER_TEMP/awscli.zip" "$RUNNER_TEMP/awscli"
+            chmod -R u+x "$RUNNER_TEMP/awscli"
+            "$RUNNER_TEMP/awscli/aws/install" --update -i "$RUNNER_TEMP/aws-cli" -b "$RUNNER_TEMP/aws-bin"
+            export ARTIFACTS_AWS="$RUNNER_TEMP/aws-bin/aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/bitop_ladder_20261019 research/hec_bitop_20261020 research/n83_e2e_finalist_results_20261017 research/quartic_n4_20261019 research/quartic_n4v2_20261020 research/validation_sweep_20261019
             python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
             artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
             artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
