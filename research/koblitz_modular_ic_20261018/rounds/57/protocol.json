@@ -1,44 +1,31 @@
 {
   "schema": "experiment.protocol/v1",
-  "id": "KOBLITZ-R57-RR-SPACE",
+  "id": "KOBLITZ-R57-RR-FIELD",
   "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
   "claims": [
     {
-      "id": "kernel",
+      "id": "actual-functions",
       "class": "exact_computation",
-      "statement": "All68 original sections meet ambient bounds on20 charts; restriction to degree80 is complete48-row matrix, with exact complete kernel splitting."
+      "statement": "Bind every24 kernel section to actual descended R50 degree32 source functions; check all four control identities and exact inverseA."
     },
     {
-      "id": "descent-kernel",
-      "class": "exact_computation",
-      "statement": "Invertible48x48 row change identifies ordinary coefficient kernel with descended coefficient kernel."
-    },
-    {
-      "id": "geometry",
+      "id": "divided-space",
       "class": "theorem",
-      "statement": "Given the retained complete ambient RR space and stage1 complete pole geometry, the restriction kernel represents full L((A)_infinity). These geometric premises are not re-proved by linear algebra."
-    },
-    {
-      "id": "map",
-      "class": "out_of_scope",
-      "statement": "No modular-factor map or nonzero level11 action follows from this space alone."
+      "statement": "Given complete L(D) and divA=P-D, division byA maps it isomorphically onto complete L(P). Native checks every section product."
     }
   ],
   "arms": {
     "reference": "R27 original complete68 basis, R43 descended literals, R56 closed pole table",
     "baseline": "retained degree128 complete ambient space",
-    "candidate": "All48 removed coefficients at e1/e7 Q0 and sigma partners, all68 sections",
+    "candidate": "Complete24-dimensional source-bound basis and its quotient byA",
     "positive": [
-      "1360 ambient pole-bound checks",
-      "129-jet rank68",
-      "reconstruct1,A,lambda,b",
-      "1,A,lambda in kernel",
-      "two-sided row isomorphism",
-      "C K=0, R K=I, K R+H C=I",
-      "actual sigma stability"
+      "actual source degree32",
+      "4 original-control vector reconstructions in descended source",
+      "all24 A times divided-section identities",
+      "3 positive controls reconstructed from24 basis"
     ],
     "negative": [
-      "actual b has nonzero restricted image"
+      "changed divided section by1 must fail product identity"
     ],
     "A_A": {
       "not_applicable_reason": "fixed exhaustive exact algebra, no statistical comparison"
@@ -77,16 +64,14 @@
     "power": "notapplicable"
   },
   "metrics": [
-    "actual constraint rank and kernel dimension without target value",
-    "1360 ambient bound checks",
-    "all48 row-change products",
-    "68-column independence",
-    "all complete-splitting entries",
-    "positive and negative control outcomes",
-    "actual restricted sigma nilpotent rank"
+    "24 actual source functions",
+    "24 divided functions",
+    "actual source dimension32",
+    "4 control bindings",
+    "changed section rejection"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh space57-02 SPACE57.sing SPACE57_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_CAS.sh field57-01 FIELD57.sing FIELD57_ALL_CHECKS_PASS",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
     "threads": 1,
@@ -121,10 +106,10 @@
     }
   ],
   "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
-  "version": 4,
+  "version": 5,
   "amendment": {
     "before_affected_data": true,
-    "reason": "space57-01 rejected reserved Singular name denominator in cache procedure; rename cacheDen57",
-    "preserved": "all raw sources and late marker rejected"
+    "reason": "stage2 accepted rank44/dimension24; freeze actual descended source-field binding",
+    "stage2": "space57-02 accepted"
   }
 }
