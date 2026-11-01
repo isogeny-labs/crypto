@@ -24,7 +24,7 @@ for d in sorted((h/'runs').iterdir()):
    row.update(kind='Singular',native_exit=code,marker=markers[0],marker_present=markers[0] in log.splitlines(),error_count=len(errors),first_errors=errors[:8],native_results=[s for s in log.splitlines() if re.match(r'^[A-Z0-9_]+_RESULT ',s)])
    row['status']='accepted' if code==0 and not errors and row['marker_present'] else 'rejected'
    row['result_lines_accepted']=row['status']=='accepted'
-   row['outcome']='manual_resource_stop' if d.name in ('check62-01','check62-03') else 'time_cap' if code==124 else 'native_error' if errors else 'completed' if row['status']=='accepted' else 'missing_marker'
+   row['outcome']='time_cap' if code==124 else 'native_error' if errors else 'completed' if row['status']=='accepted' else 'missing_marker'
    start=(d/'started-utc.txt').read_text().strip();finish=(d/'finished-utc.txt').read_text().strip();row.update(started_utc=start,finished_utc=finish,native_wall_seconds=(datetime.fromisoformat(finish.replace('Z','+00:00'))-datetime.fromisoformat(start.replace('Z','+00:00'))).total_seconds())
   candidates=[]
   for p in h.glob('*.sing'):
@@ -44,12 +44,20 @@ for d in sorted((h/'runs').iterdir()):
  row['artifacts']=[{'path':str(p.relative_to(h)),'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'bytes':p.stat().st_size} for p in sorted(d.iterdir()) if p.is_file()]
  rows.append(row)
 accepted={r['attempt']:r for r in rows if r['status']=='accepted'}
-required=['matrix62-01','split62-02','check62-01','direct62-01','kernel62-01','square-lean62-03']
+required=['matrix62-01','split62-02','check62-01','direct62-01','kernel62-01','rustcheck62-01','square-lean62-03']
 assert all(n in accepted for n in required),(required,list(accepted))
+def kernel_counts(attempt,prefix):
+ return {row['family']:row for row in (dict(part.split('=',1) for part in line.split()[1:]) for line in accepted[attempt]['native_results'] if line.startswith(prefix))}
+native_counts=kernel_counts('kernel62-01','KERNEL62_RESULT ')
+rust_counts=kernel_counts('rustcheck62-01','RUSTCHECK62_RESULT ')
+assert set(native_counts)==set(rust_counts)=={'mixed','cubic'}
+for family in native_counts:
+ for field in ['functions','binary_rows','odd_rank','square_dimension']:
+  assert native_counts[family][field]==rust_counts[family][field],(family,field)
 result={'schema':'koblitz.results/v1','round':62,'runs':rows,'input_pins':pins,'authored_proved_claims':sorted(authored),'audited_declarations':accepted['square-lean62-03']['audited_declarations'],'protocol_metadata_disclosure':'Historical versions immutable; v4 repairs ideal-comparison syntax, v5 freezes independent435 replay and direct formula before their data'}
 (h/'results.json').write_text(json.dumps(result,indent=2)+'\n')
 protocols=[]
 for row in rows:
  d=h/'runs'/row['attempt'];name='LEAN-PROTOCOL.md' if row['kind']=='Lean' else 'protocol.json';p=d/name;protocols.append({'attempt':d.name,'path':str(p.relative_to(h)),'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'frozen_revision':row['source_revision']})
-export={'schema':'experiment.export/v1','experiment_id':'KOBLITZ-R62','claim_class':'exact_computation','protocols':protocols,'raw_archive':'runs.tar.xz; content address in .artifacts.json after custody publication','results':{'path':'results.json','sha256':hashlib.sha256((h/'results.json').read_bytes()).hexdigest()},'flow':{s:sum(r['status']==s for r in rows) for s in ['accepted','rejected','interrupted']},'canonical_schema_validation':'unavailable in selected Git index and disk; manual source-byte and exact contract checks only','protocol_metadata_disclosure':'v4 cache syntax repair before fresh435; v5 independent replay/direct formula before their data','notes':'Native exact certificates and twelve abstract Lean claims have distinct scope; proper-source/RR/normalization premises retained. Global holomorphic forms, Cartier matrix and order11 action remain construction tasks. Changed matrix/root controls are checked; no fuzzing claim. Direct formula shares rational scalar parity helper but does not read the squared-basis operator.'}
+export={'schema':'experiment.export/v1','experiment_id':'KOBLITZ-R62','claim_class':'exact_computation','protocols':protocols,'raw_archive':'runs.tar.xz; content address in .artifacts.json after custody publication','results':{'path':'results.json','sha256':hashlib.sha256((h/'results.json').read_bytes()).hexdigest()},'flow':{s:sum(r['status']==s for r in rows) for s in ['accepted','rejected','interrupted']},'canonical_schema_validation':'unavailable in selected Git index and disk; manual source-byte and exact contract checks only','protocol_metadata_disclosure':'v4 cache syntax repair before fresh435; v5 independent replay/direct formula;v6 full F2 kernels;v7 independent Rust replay before affected data','notes':'Native exact certificates and twelve abstract Lean claims have distinct scope; proper-source/RR/normalization premises retained. Global holomorphic forms, Cartier matrix and order11 action remain construction tasks. Changed matrix/root controls are checked; no fuzzing claim. Direct formula shares rational scalar parity helper but does not read the squared-basis operator.'}
 (h/'export.json').write_text(json.dumps(export,indent=2)+'\n');print(json.dumps({'workflows':len(rows),**export['flow'],'historical_byte_pins':len(pins),'authored_claims':len(authored)}))

@@ -183,3 +183,25 @@ normality/global61differentials and larger112operator/alloriginal lanes.
 
 ### Errors
 Lean02 artifact rejected;no audit. Explicit Ring import omitted,nowfixed.
+
+## 2026-11-01T23:33:12.975270+00:00 — complete square subspaces accepted
+
+### What was done
+kernel62-01 terminal native0/exactmarker/noerrors. Mixed76:1328rows,
+rank66,kernel10; cubic324:1377rows,rank196,kernel128. All138 roots
+pass whole-source square identities;all changed roots and changed kernels
+rejected. Independent Rust binary checker prepared;donor hashes frozen
+before its compile/run.
+
+### Decisions made
+Square dimension counts full F2 combinations,not zero columns or F2(u)
+relations. Native source/denominator proof separate from Rust rank replay.
+Ten mixed roots/sevenlambda expressions supply next controlled-pole space.
+
+### Open threads
+Rust replay/Lean03serially,records/report/custody/PR;actual descent and
+half-pole geometry,normality/full61differentials,degree112andalloriginalscope.
+
+### Errors
+No native kernel error or cap. Do not infer global pole geometry solely
+from this binary linear calculation;actual source/RR bridge stays explicit.

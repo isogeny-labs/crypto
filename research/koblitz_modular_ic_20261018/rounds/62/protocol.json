@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "id": "KOBLITZ-R62-COMPLETE435-AND-GENERATOR",
-  "version": 6,
+  "version": 7,
   "goal": "generate and pursue Koblitz cover/modular transfer leads at larger sizes",
   "claims": [
     {
@@ -23,6 +23,11 @@
       "id": "square_kernel",
       "class": "exact_computation",
       "statement": "Complete F2 odd-part kernels on all76mixed and324cubic functions,with checked denominator clearing,binary row reconstruction,rank/kernel dimension and every whole-source square root"
+    },
+    {
+      "id": "independent_binary_kernel",
+      "class": "exact_computation",
+      "statement": "Independent packed-F2 Rust ranks and nullspace products on both complete saved coefficient matrices"
     }
   ],
   "arms": {
@@ -90,7 +95,7 @@
     "every full-source square root and changed-kernel/root negative controls"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh check62-01 CHECK62.sing CHECK62_ALL_CHECKS_PASS; then DIRECT62.sing in a fresh direct62-01 attempt; then REPLAY_CAS.sh kernel62-01 KERNEL62.sing KERNEL62_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_CAS.sh check62-01 CHECK62.sing CHECK62_ALL_CHECKS_PASS; then DIRECT62.sing in a fresh direct62-01 attempt; then REPLAY_CAS.sh kernel62-01 KERNEL62.sing KERNEL62_ALL_CHECKS_PASS; then REPLAY_RUST.sh rustcheck62-01",
     "backend": "original manually authorized local Singular",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
@@ -124,6 +129,6 @@
   "validation_note": "canonical protocol tools/schema absent in selected index; manual contract/source byte verification only",
   "amendment": {
     "before_affected_data": true,
-    "reason": "Freeze complete F2 square-kernel calculation beyond individual zero columns; all76/324 functions retained, no coefficientfield kernel substitution"
+    "reason": "Freeze standalone Rust binary certificate replay and exact hashes of both accepted native kernel matrices before Rust build/run"
   }
 }

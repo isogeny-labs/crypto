@@ -22,6 +22,25 @@ for x,f in zip(xs,families):
 ax.set_xticks(xs,families);ax.set_ylabel('Number of source functions');ax.set_ylim(0,365)
 ax.legend(frameon=False);ax.set_title('All 435 source functions retained (split62-02)')
 fig.tight_layout();fig.savefig(h/'cohort62.svg');plt.close(fig)
+kernel_rows=[]
+for receipt in result['runs']:
+ if receipt['status']=='accepted':
+  for line in receipt.get('native_results',[]):
+   if line.startswith('KERNEL62_RESULT '):
+    kernel_rows.append(dict(part.split('=',1) for part in line.split()[1:]))
+assert len(kernel_rows)==2
+kernel_by_family={r['family']:r for r in kernel_rows}
+data['complete_square_kernels']=kernel_rows
+(h/'plot-data62.json').write_text(json.dumps(data,indent=2)+'\n')
+fig,ax=plt.subplots(figsize=(8.3,2.5))
+labels=['mixed','cubic'];xi=list(range(2))
+ax.bar([x-.18 for x in xi],[zeros[f] for f in labels],width=.36,label='Individual zero odd columns',color='#d38127')
+ax.bar([x+.18 for x in xi],[int(kernel_by_family[f]['square_dimension']) for f in labels],width=.36,label='Complete F2 kernel dimension',color='#205984')
+for x,f in zip(xi,labels):
+ ax.text(x-.18,zeros[f]+.3,str(zeros[f]),ha='center',fontsize=9)
+ ax.text(x+.18,int(kernel_by_family[f]['square_dimension'])+.3,kernel_by_family[f]['square_dimension'],ha='center',fontsize=9)
+ax.set_xticks(xi,['Mixed (all76 columns)','Cubic (all324 columns)']);ax.set_ylabel('Dimension / column count');ax.set_title('Full combinations versus individual zero outputs')
+ax.set_ylim(0,max(int(r['square_dimension']) for r in kernel_rows)*1.3+2);ax.legend(frameon=False,fontsize=8);fig.tight_layout();fig.savefig(h/'kernels62.svg');plt.close(fig)
 status=collections.Counter(r['status'] for r in result['runs'])
 table=[]
 for r in result['runs']:
@@ -56,7 +75,14 @@ Wall times are native receipt intervals, not controlled performance comparisons.
 Lean compile and audit intervals were not recorded by the proof driver.
 
 #pagebreak()
-= Direct generator route and proof scope
+= Complete square subspaces and generator route
+#image("kernels62.svg", width: 100%)
+All76mixed and324cubic functions are retained in the complete F2 kernel.
+Native checked denominator clearing and binary row reconstruction precede
+rank/nullspace computation; every resulting root is checked in the full source.
+The independent Rust checker replays both full binary matrices and kernels.
+
+== Direct generator route and proof scope
 For a grouped characteristic-two source polynomial,
 $ P(t)=a^2+u b^2+t c^2+u t d^2 $, put $q=c^2+u d^2$.
 With $P(t)=0$ and a checked nonzero derivative/inverse,
@@ -79,7 +105,8 @@ action are not inferred from these abstract implications.
 == Failures retained
 The first complete435 attempt used unsupported ideal equality and is rejected
 in full despite a late marker. The first Lean compile failed on a lemma name
-and numeral-cast normalization; its artifact is rejected. All later failures,
+and numeral-cast normalization; the second lacked a Ring tactic import.
+Both artifacts are rejected. All later failures,
 if present, are listed in results.json with their actual errors. An early
 raw-index mistake was corrected without deleting local bytes or rewriting
 Git history. Accepted producers were not repeated for publication.

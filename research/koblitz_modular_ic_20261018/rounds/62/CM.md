@@ -87,3 +87,17 @@ DIFFERENTIAL-DESIGN61.md; R51/BASE23-STRUCT-PROTOCOL.md; R52/CM.md;
 https://www.singular.uni-kl.de/index.php/singular.pdf for native coefficient
 and field operations. The algebraic formula is a direct derivation, with
 no novelty claim.
+
+## Complete square subspaces
+Accepted kernel62-01 retains every one of the76mixed and324cubic inputs.
+Checked rational denominator clearing yields1328binary rows for mixed
+and1377for cubic;every cleared polynomial is reconstructed completely.
+Mixed odd rank66 leaves square dimension10; cubic odd rank196 leaves
+square dimension128. Kernel entries are explicitly0/1,not F2(u) solutions.
+Every one of the138 resulting roots is checked against its actual full
+source-function combination;corrupted kernels and all changed roots fail.
+This tests full F2 combinations,not just individual zero-odd columns.
+The ten mixed roots include seven with lambda in their canonical expressions.
+Given the retained proper-source/RR identification and even pole caps,
+squaring halves the mixed caps34,12,20,2 to17,6,10,1. Actual involution,
+complete divisor/normality binding and target-factor transport are next.

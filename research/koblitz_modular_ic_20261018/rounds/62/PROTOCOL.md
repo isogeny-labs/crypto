@@ -74,3 +74,10 @@ kernel combination has full-source odd partzero and g²=f. Reject changed
 kernel column and each changed root; save complete matrices/roots.
 Run all76mixed and324cubic in one fresh kernel62-01, same limits, no
 filtering on zero columns/cost. No predicted kernel dimension is assumed.
+
+## Independent packed-F2 kernel replay
+Both accepted native kernel certificate hashes are pinned before Rust data.
+RUST-PROTOCOL.md and CHECK62.rs freeze independent binary parsing/ranks,
+M*K=0,dimension completeness and corrupted-kernel/row rejection. All76/324
+columns retained. No CAS/new field calculation in Rust. Source/denominator
+and whole-root identities remain native checks; same original limits.
