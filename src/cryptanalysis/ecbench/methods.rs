@@ -5595,11 +5595,14 @@ fn prime_base_for<'a>(
         "prime-isogeny" => Box::new(PrimeIsogenyBase { instance: inst }),
         "cm-scalar-orbit" => Box::new(CmOrbitBase { instance: inst }),
         "known-log" => Box::new(crate::cryptanalysis::ic_framework::plugins::KnownLogBase),
-        other => {
-            return Err(format!(
-                "factor base `{other}` does not run on a prime curve"
-            ))
-        }
+        other => match prime_plugins().and_then(|p| (p.base)(other, inst)) {
+            Some(b) => b,
+            None => {
+                return Err(format!(
+                    "factor base `{other}` does not run on a prime curve"
+                ))
+            }
+        },
     })
 }
 
@@ -5640,6 +5643,7 @@ fn solve_ic_prime(
     let mut rootfind_mitm = RootfindMitmOracle::new(ms);
     let mut rootfind_pairs = RootfindPairsOracle::new(ms);
     let mut rootfind = RootfindSubtractOracle::new(ms, inst);
+    let mut plugin_oracle = prime_plugins().and_then(|p| (p.oracle)(or_name.as_str(), ms, inst));
     // `pkm-semaev` writes its system on the base's own tower, so it reads
     // the tower from the `prime-kummer` spec and runs on no other base.
     let mut pkm = match or_name.as_str() {
@@ -5671,7 +5675,10 @@ fn solve_ic_prime(
         "rootfind-mitm" => &mut rootfind_mitm,
         "rootfind-pairs" => &mut rootfind_pairs,
         "rootfind-subtract" => &mut rootfind,
-        other => return Err(format!("oracle `{other}` does not run on a prime curve")),
+        other => match plugin_oracle.as_deref_mut() {
+            Some(o) => o,
+            None => return Err(format!("oracle `{other}` does not run on a prime curve")),
+        },
     };
     let ctx = prime_ctx(inst, curve, target);
     let calib = pinned_only_calibration("prime", &curve.slug);
@@ -6242,6 +6249,44 @@ pub fn register_binary_plugins(plugins: BinaryPlugins) {
 
 fn binary_plugins() -> Option<&'static BinaryPlugins> {
     BINARY_PLUGINS.get()
+}
+
+/// A prime-curve factor base that a linking binary adds to `ic.pipeline`
+/// by name, or `None` when the name is not its.
+pub type PrimeBasePlugin = for<'i> fn(
+    &str,
+    &'i PrimeInstance,
+) -> Option<
+    Box<dyn FactorBaseBuilder<crate::cryptanalysis::ic_boundary::PrimeCurve> + 'i>,
+>;
+
+/// A prime-curve decomposition oracle that a linking binary adds to
+/// `ic.pipeline` by name, given the summand count `m`, or `None`.
+pub type PrimeOraclePlugin = for<'i> fn(
+    &str,
+    u32,
+    &'i PrimeInstance,
+) -> Option<
+    Box<dyn DecompositionOracle<crate::cryptanalysis::ic_boundary::PrimeCurve> + 'i>,
+>;
+
+/// Prime-curve plug-ins a binary registers at start-up, for the same
+/// reason as [`BinaryPlugins`].
+#[derive(Clone, Copy)]
+pub struct PrimePlugins {
+    pub base: PrimeBasePlugin,
+    pub oracle: PrimeOraclePlugin,
+}
+
+static PRIME_PLUGINS: std::sync::OnceLock<PrimePlugins> = std::sync::OnceLock::new();
+
+/// Register a binary's prime-curve plug-ins; the first registration wins.
+pub fn register_prime_plugins(plugins: PrimePlugins) {
+    let _ = PRIME_PLUGINS.set(plugins);
+}
+
+fn prime_plugins() -> Option<&'static PrimePlugins> {
+    PRIME_PLUGINS.get()
 }
 
 /// The factor-base builder `fb_name` names on a binary curve: a built-in
@@ -6970,6 +7015,7 @@ pub fn dump_factor_base(
             let multiplier = CmMultiplierBase { instance: i };
             let kummer = PrimeKummerBase { instance: i };
             let isogeny = PrimeIsogenyBase { instance: i };
+            let plugin_base = prime_plugins().and_then(|p| (p.base)(name.as_str(), i));
             let base: &dyn FactorBaseBuilder<_> = match name.as_str() {
                 "explicit-x" => &explicit,
                 "prime-abscissa" => &abscissa,
@@ -6978,11 +7024,14 @@ pub fn dump_factor_base(
                 "cm-multiplier" => &multiplier,
                 "prime-kummer" => &kummer,
                 "prime-isogeny" => &isogeny,
-                other => {
-                    return Err(format!(
-                        "factor base `{other}` does not run on a prime curve"
-                    ))
-                }
+                other => match plugin_base.as_deref() {
+                    Some(b) => b,
+                    None => {
+                        return Err(format!(
+                            "factor base `{other}` does not run on a prime curve"
+                        ))
+                    }
+                },
             };
             let ctx = InstanceCtx {
                 group: &i.curve,
