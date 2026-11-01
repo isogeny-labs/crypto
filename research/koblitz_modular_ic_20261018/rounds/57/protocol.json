@@ -1,25 +1,38 @@
 {
   "schema": "experiment.protocol/v1",
-  "id": "KOBLITZ-R57-INDEPENDENT-CHECK",
+  "id": "KOBLITZ-R57-FIXED-MOD-TRACE",
   "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
   "claims": [
     {
-      "id": "certificate-replay",
+      "id": "trace-quotient",
       "class": "exact_computation",
-      "statement": "Independently replay all saved kernel, recovery, row, involution, rank, control and actual field-binding products."
+      "statement": "Explicit14-dimensional fixed space splits into10 trace directions and4 quotient representatives with full span/recovery products."
+    },
+    {
+      "id": "actual-action",
+      "class": "exact_computation",
+      "statement": "All24 source functions satisfy actual sigma substitution lambda->lambda+A;4 fixed functions and10 trace preimages match their columns."
+    },
+    {
+      "id": "target",
+      "class": "out_of_scope",
+      "statement": "These4 directions are not identified with the intended modular factor; test target identities and order11 action next."
     }
   ],
   "arms": {
     "reference": "R27 original complete68 basis, R43 descended literals, R56 closed pole table",
     "baseline": "retained degree128 complete ambient space",
-    "candidate": "Complete24-dimensional source-bound basis and its quotient byA",
+    "candidate": "Actual fixed space modulo trace image and source-bound representatives",
     "positive": [
-      "all saved complete splitting/row inverse products",
-      "all24 source function reconstructions",
-      "all24 divided-section identities"
+      "N^2=0 rank10",
+      "14-dimensional fixed kernel and complete14-column splitting",
+      "4 quotient representatives and10 trace preimages",
+      "all24 actual sigma source identities",
+      "registered lambda trace=A",
+      "constant1 trace membership is an outcome"
     ],
     "negative": [
-      "corrupted kernel column rejected"
+      "addlambda to actual trace preimage; resulting trace differs by nonzeroA"
     ],
     "A_A": {
       "not_applicable_reason": "fixed exhaustive exact algebra, no statistical comparison"
@@ -58,14 +71,14 @@
     "power": "notapplicable"
   },
   "metrics": [
-    "24 actual source functions",
-    "24 divided functions",
-    "actual source dimension32",
-    "4 control bindings",
-    "changed section rejection"
+    "fixed14 trace10 quotient4",
+    "24 actual substitution identities",
+    "4 actual fixed functions",
+    "10 actual trace preimages",
+    "constant1/A trace membership"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh check57-01 CHECK57.sing CHECK57_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_CAS.sh trace57-01 TRACE57.sing TRACE57_ALL_CHECKS_PASS",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
     "threads": 1,
@@ -100,9 +113,9 @@
     }
   ],
   "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
-  "version": 6,
+  "version": 7,
   "amendment": {
     "before_affected_data": true,
-    "reason": "field57-01 accepted24 actual/divided functions; independent certificate replay without rerunning producer"
+    "reason": "complete checker accepted; freeze actual fixed-modulo-trace representatives and source action"
   }
 }

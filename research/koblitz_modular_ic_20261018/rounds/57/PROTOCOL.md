@@ -22,3 +22,6 @@ Stage2 measured rank44, dimension24, sigma+I rank10, all1360 ambient bounds and 
 
 ## Stage4 independent saved-certificate checker
 After accepted field57-01, replay full matrix products/ranks, all24 source bindings and24 A-division identities from saved data. Corrupt a genuine kernel entry in a nonzero constraint row as negative control. No accepted producer is rerun. Freeze this stage before data.
+
+## Stage5 explicit fixed modulo trace investigation
+Frozen after checker and before this data. In24-space N=sigma+I has square0 and rank10. Compute complete14-column kernel,10-column trace image and4 additional kernel representatives. Certify direct-sum rank14, left inverse, complete fixed-kernel reconstruction, and every trace preimage. Decide constant1 trace membership by exact module reduction; verify the registered lambda has traceA. Then verify ALL24 sigma actions by actual substitution lambda->lambda+A in the source field; export all4 fixed representatives and10 functions with exact trace identities. Addinglambda to a trace preimage changes its trace by nonzeroA and must be rejected as the original preimage. Numerical4 is not by itself an identification with a modular factor or with special RR cohomology.
