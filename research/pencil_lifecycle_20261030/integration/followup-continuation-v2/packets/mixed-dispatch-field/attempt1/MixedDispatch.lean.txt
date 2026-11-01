@@ -1,0 +1,47 @@
+import Tripling
+set_option autoImplicit false
+namespace MixedDispatcher
+open Polynomial MixedCancellation
+variable {K : Type*} [Field K] [DecidableEq K]
+inductive Tag | common | cancellation | mismatch | tripling | positiveDistinct
+ deriving DecidableEq
+abbrev Value (K : Type*) := Sum (WeightedAdd11.Input K) (D2 K)
+def dispatch (a0 a1 a2 a3 : K) (a : WeightedAdd11.Input K) (b : D2 K) : Option (Value K) × Tag :=
+ if rawK a b ≠ 0 then ((MixedGeneric.dispatch a b a3).map Sum.inr,.common)
+ else if a.y*rawW3 b = -(rawY3 a b*a.w) then (some (.inl (other a b)),.cancellation)
+ else if a.y*rawW3 b ≠ rawY3 a b*a.w then (none,.mismatch)
+ else if a.x*(b.z*b.z)=(other a b).x then (some (.inr (MixedTripling.rawOutput a1 a2 a3 a)),.tripling)
+ else ((MixedGeneric.dispatch (other a b) (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3).map Sum.inr,.positiveDistinct)
+def valid (f : K[X]) : Value K → Prop
+ | .inl a => a.z≠0 ∧ a.w≠0 ∧ validPoint f a
+ | .inr b => b.z≠0 ∧ b.w≠0 ∧ validTwo f b
+
+theorem source_order_total_valid (a0 a1 a2 a3 : K) (a : WeightedAdd11.Input K) (b : D2 K)
+ (haz : a.z≠0) (haw : a.w≠0) (hbz : b.z≠0) (hbw : b.w≠0)
+ (ha : validPoint (MixedGeneric.curve a0 a1 a2 a3) a)
+ (hb : validTwo (MixedGeneric.curve a0 a1 a2 a3) b) :
+ ∃ (v : Value K) (tag : Tag), dispatch a0 a1 a2 a3 a b=(some v,tag) ∧
+ valid (MixedGeneric.curve a0 a1 a2 a3) v ∧ tag≠.mismatch := by
+ by_cases hk : rawK a b=0
+ · by_cases hc : a.y*rawW3 b = -(rawY3 a b*a.w)
+   · obtain ⟨_,hz,hw,hv⟩ := cancellation_preserves (MixedGeneric.curve a0 a1 a2 a3) a b haz haw hbz hbw ha hb hk hc
+     exact ⟨.inl (other a b),.cancellation,by simp [dispatch,hk,hc],⟨hz,hw,hv⟩,by decide⟩
+   · have hp := ((shared_support_conclusions (MixedGeneric.curve a0 a1 a2 a3) a b haz haw hbz hbw ha hb hk).1).resolve_left hc
+     by_cases he : a.x*(b.z*b.z)=(other a b).x
+     · obtain ⟨_,_,_,hz,hw,hv⟩ := MixedTripling.source_repeated_preserves a0 a1 a2 a3 a b haz haw hbz hbw ha hb hk hc he
+       exact ⟨.inr (MixedTripling.rawOutput a1 a2 a3 a),.tripling,by simp [dispatch,hk,hc,hp,he],⟨hz,hw,hv⟩,by decide⟩
+     · obtain ⟨_,_,_,hd,hz,hw,hv⟩ := MixedPositiveDistinct.source_branch_preserves a0 a1 a2 a3 a b haz haw hbz hbw ha hb hk hc he
+       exact ⟨.inr (MixedGeneric.output (other a b) (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3),.positiveDistinct,by simp [dispatch,hk,hc,hp,he,hd],⟨hz,hw,hv⟩,by decide⟩
+ · have hg : MixedGeneric.genericK a b≠0 := by rw [MixedGeneric.genericK_same];exact hk
+   obtain ⟨hz,hw,hv⟩ := MixedGeneric.weighted_generic_preserves a0 a1 a2 a3 a b haz haw hbz hbw hg ha hb
+   have hd := MixedGeneric.generic_dispatch a b a3 hg
+   exact ⟨.inr (MixedGeneric.output a b a3),.common,by simp [dispatch,hk,hd],⟨hz,hw,hv⟩,by decide⟩
+
+theorem none_excluded (a0 a1 a2 a3 : K) (a : WeightedAdd11.Input K) (b : D2 K)
+ (haz : a.z≠0) (haw : a.w≠0) (hbz : b.z≠0) (hbw : b.w≠0)
+ (ha : validPoint (MixedGeneric.curve a0 a1 a2 a3) a)
+ (hb : validTwo (MixedGeneric.curve a0 a1 a2 a3) b) :
+ (dispatch a0 a1 a2 a3 a b).1≠none := by
+ obtain ⟨v,tag,hd,_,_⟩ := source_order_total_valid a0 a1 a2 a3 a b haz haw hbz hbw ha hb
+ rw [hd];simp
+end MixedDispatcher

@@ -62,6 +62,13 @@ async fn migrate_import_and_query() {
         assert!(r.problems.is_empty(), "walk problems: {:?}", r.problems);
     }
     import::traits::import(&ctx).await.unwrap();
+    import::derive::import(&ctx).await.unwrap();
+    let enrich = import::enrich::import(&ctx).await.unwrap();
+    assert!(enrich.problems.is_empty(), "enrich problems: {:?}", enrich.problems);
+    assert_eq!(enrich.counts.get("class_polynomial_curve_checks_failed"), Some(&0));
+    assert!(enrich.counts["class_polynomial_curve_checks_passed"] > 0);
+    assert!(enrich.counts["division_polynomials"] > 80_000);
+    assert!(enrich.counts["glv_lattices"] > 0);
     // Idempotent: a second registry import adds nothing.
     let again = import::registry::import(&ctx).await.unwrap();
     assert_eq!(again.counts.get("curves"), Some(&0));
@@ -116,4 +123,31 @@ async fn migrate_import_and_query() {
     );
     let (s, _) = post(&app, "/v1/evidence", r#"{}"#).await;
     assert_eq!(s, StatusCode::FORBIDDEN);
+
+    // secp256k1: GLV eigenvalue verified on the generator, lattice stored
+    let (s, endo) = get(&app, "/v1/curves/secp256k1/endomorphisms").await;
+    assert_eq!(s, StatusCode::OK);
+    assert!(endo["endomorphisms"].as_array().unwrap().iter().any(|e| e["kind"] == "glv" && !e["eigenvalue"].is_null()));
+    assert_eq!(endo["scalar_decompositions"].as_array().unwrap().len(), 1);
+
+    // MCP: handshake, tool list, a tool call routed to the REST API
+    let (s, init) = post(
+        &app,
+        "/mcp",
+        r#"{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{}}}"#,
+    )
+    .await;
+    assert_eq!(s, StatusCode::OK);
+    assert_eq!(init["result"]["protocolVersion"], "2025-06-18");
+    let (_, list) = post(&app, "/mcp", r#"{"jsonrpc":"2.0","id":2,"method":"tools/list"}"#).await;
+    assert_eq!(list["result"]["tools"].as_array().unwrap().len(), 9);
+    let (_, call) = post(
+        &app,
+        "/mcp",
+        r#"{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"ecdb_get_curve","arguments":{"ref":"P-256"}}}"#,
+    )
+    .await;
+    assert_eq!(call["result"]["isError"], false);
+    let doc: Value = serde_json::from_str(call["result"]["content"][0]["text"].as_str().unwrap()).unwrap();
+    assert!(doc["standards"].to_string().contains("P-256"));
 }

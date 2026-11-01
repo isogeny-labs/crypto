@@ -134,6 +134,8 @@ enum ImportWhat {
     Certificates,
     /// Facts derived in SQL from imported rows (automorphism groups, attack-surface summary).
     Derived,
+    /// Polynomials, GLV endomorphisms, twist relations, group structures (src/import/enrich.rs).
+    Enrich,
     /// An LMFDB av_fq_isog JSON export (rows of isogeny classes over finite fields).
     LmfdbAvFq {
         path: PathBuf,
@@ -187,6 +189,7 @@ async fn main() -> Result<()> {
                 ImportWhat::Transfers => import::run(&ctx, Selection::Transfers, None).await?,
                 ImportWhat::Certificates => import::run(&ctx, Selection::Certificates, None).await?,
                 ImportWhat::Derived => import::run(&ctx, Selection::Derived, None).await?,
+                ImportWhat::Enrich => import::run(&ctx, Selection::Enrich, None).await?,
                 ImportWhat::LmfdbAvFq { path, title } => vec![import::lmfdb::import(&client, &path, &title).await?],
             };
             print(&reports)?;
