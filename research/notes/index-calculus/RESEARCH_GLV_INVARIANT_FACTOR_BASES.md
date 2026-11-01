@@ -3654,6 +3654,99 @@ selection that costs `O(1)` per row update (B″) could keep part of B's saving 
 saving; if so, no sparsest-pivot rule here ranks ahead of A across the band, and the next lever is the
 echelon's arithmetic itself, not its pivot order.
 
+### 9.36 E32 measured: the distance to rho over `2^{22.6}`–`2^{42.4}`, falling as `n^{−0.24}`; no crossover reached; fitted crossover order `2^{85.5}` `[2^{79.2}, 2^{94.3}]` at `0` GAE
+
+*2026-10-31 to 2026-11-01.*  Binaries pinned from `e75771052` (`experiments/36_handover_ladder/binary_commit.txt`),
+run only from the scratchpad copies (sha256 re-verified after a container restart).  Runner
+`experiments/36_handover_ladder/run_ladder.sh` (it replaced the pre-registration's `run_ladder.py` after the three
+`p = 101` curves, with the same logic, because AGENTS.md forbids Python orchestration); records `ic_p*s*.json`,
+`walk_p*s*.json`, log `run.log`; tables and fits `examples/e32_tables.rs` → `tables.md`, `summary.json`, `fit.json`.
+Report: `research/e32_handover_ladder_20261031/`.  **Route:** local 4-vCPU container, `taskset -c 1-3`,
+operation counts only, **no wall-time claim** (isolab-eks unreachable, §9.34).  Compute used: `8,952` s of the
+`14` h budget.
+
+**What ran.**  Eleven sizes `p = 101`–`3089`, three curves each (seeds `1`–`3`; every seed gave an `h = 16` curve,
+no replacement), **33 paired curves**: arm B with solver A and Karatsuba, and `16` walk-(iii) `⟨±ψ⟩` walks per
+curve (`528` walks).  Every logarithm recovered, every kept row re-added, every walk correct.
+**Deviations, both disclosed:** (1) the container restarted during the `p = 2213` seed 2 walk; the restart-safe
+runner reran that walk only (its interrupted wall time is not in the budget count). (2) `p = 4337` qualified
+under the budget rule, and its seed 1 index calculus completed (`S = 2.484·10¹¹`, `y = 1,252`, `282` columns), but
+its 16-walk pool was killed by the session's memory-cgroup OOM killer at `4.8` GB. `/proc/meminfo` had passed the
+registered `8` GB gate, but the cgroup limit is lower. Shrinking the pool would change the matched reference, so
+`p = 4337` is not completed. Its record is kept unpaired, outside every fit. **The ladder reached
+`p = 3089`, `log₂ n = 42.37`.**
+
+**Identity (G2.114).**  The ten E25-curve runs reproduce E27's arm-B records in all `604` compared fields each
+(`6,040`, wall times aside), and the walks reproduce E27's `rho_e27` and mean steps exactly on all ten curves.
+
+| p | log₂ n | curves | y median | `D(0)` median [min, max] | `D(0.1)` median | `D(1)` median |
+|--:|--:|--:|--:|:--|--:|--:|
+| 101 | 22.63 | 3 | 1,366 | `2.07·10⁴` [`1.71·10⁴`, `3.93·10⁴`] | `7.21·10⁴` | `3.83·10⁵` |
+| 149 | 24.88 | 3 | 4,272 | `4.03·10⁴` [`8.26·10³`, `1.52·10⁵`] | `1.38·10⁵` | `6.59·10⁵` |
+| 197 | 26.49 | 3 | 969 | `1.49·10⁴` [`1.07·10⁴`, `3.49·10⁴`] | `5.09·10⁴` | `2.38·10⁵` |
+| 269 | 28.29 | 3 | 1,918 | `1.75·10⁴` [`8.83·10³`, `2.75·10⁴`] | `5.90·10⁴` | `2.61·10⁵` |
+| 397 | 30.53 | 3 | 1,349 | `8.75·10³` [`6.39·10³`, `9.72·10³`] | `2.91·10⁴` | `1.24·10⁵` |
+| 557 | 32.49 | 3 | 1,180 | `6.46·10³` [`4.98·10³`, `7.43·10³`] | `2.13·10⁴` | `8.94·10⁴` |
+| 773 | 34.38 | 3 | 2,268 | `7.63·10³` [`6.52·10³`, `1.15·10⁴`] | `2.50·10⁴` | `1.04·10⁵` |
+| 1093 | 36.38 | 3 | 1,563 | `4.37·10³` [`3.67·10³`, `5.06·10³`] | `1.42·10⁴` | `5.84·10⁴` |
+| 1549 | 38.39 | 3 | 1,392 | `2.37·10³` [`2.07·10³`, `3.72·10³`] | `7.66·10³` | `3.14·10⁴` |
+| 2213 | 40.45 | 3 | 1,369 | `1.61·10³` [`1.34·10³`, `2.05·10³`] | `5.15·10³` | `2.10·10⁴` |
+| 3089 | 42.37 | 3 | 1,496 | `1.54·10³` [`1.14·10³`, `1.70·10³`] | `4.93·10³` | `2.01·10⁴` |
+
+`D(g) = (S + 97g·E) / (rho + 97g·steps)`, `rho` = walk (iii) without the `[d]G` check.  Per-curve rows (with `S`, `rho`,
+`C`, shares, steps) are in `tables.md`.  `C` median rises slowly, `5.99·10⁵` (`p = 101`) to `6.65·10⁵` (`p = 3089`);
+Macaulay entries per residual `1.76`–`1.82·10⁵`; the solve is `98.3`–`99.1 %` of `S`, the linear algebra `≤ 0.006 %`.
+The walk's cost per step falls from `175`–`229` (`p = 101`, set-up dominated) to `95.9` (`p = 3089`).
+
+**Fits** (`log₂ D = α + β(log₂ n − 32)`; stratified cluster bootstrap over curves, `10,000` replicates, seed `32`;
+no replicate had `β ≥ 0`):
+
+| GAE | model | curves | `β` [95 %] | `log₂ n*` [95 %] |
+|--:|:--|--:|:--|:--|
+| 0 | **M1** (`p ≥ 269`) | 24 | `−0.243` [`−0.279`, `−0.205`] | **`85.5` [`79.2`, `94.3`]** |
+| 0 | M1-all | 33 | `−0.232` [`−0.272`, `−0.191`] | `87.7` [`80.2`, `98.6`] |
+| 0 | M2 (`β = −1/4`) | 24 | — | `84.0` [`83.4`, `84.6`] |
+| 0.1 | **M1** | 24 | `−0.248` [`−0.284`, `−0.211`] | **`91.2` [`84.4`, `100.7`]** |
+| 0.1 | M1-all | 33 | `−0.239` [`−0.278`, `−0.197`] | `93.5` [`85.4`, `105.4`] |
+| 0.1 | M2 | 24 | — | `90.9` [`90.3`, `91.4`] |
+| 1 | **M1** | 24 | `−0.256` [`−0.292`, `−0.219`] | **`97.6` [`90.1`, `107.9`]** |
+| 1 | M1-all | 33 | `−0.256` [`−0.295`, `−0.216`] | `97.7` [`89.6`, `108.9`] |
+| 1 | M2 | 24 | — | `99.1` [`98.5`, `99.6`] |
+
+Yield exponent in `p`: `−0.066` (OLS 95 % `[−0.285, 0.154]`).  Linear-algebra sensitivity: `0.0044 %` of `S` at
+`p = 3089` (`∝ p²` against the rest `∝ p`) extrapolates to `≈ 5.6 %` at M2's `n*` (`p ≈ 4.2·10⁶`); it would move
+`n*` by well under a bit.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.114 | `6,040` of `6,040` fields; ten walk references exact; every log, row and walk correct at every size | **holds** |
+| G2.115 | `33` of `33` seeds gave `h = 16` curves; columns / `p` `0.057`–`0.068` at `p ≥ 557` | **holds** (for the sizes reached) |
+| G2.116 | `C` median `6.39`–`6.67·10⁵`; entries per residual `1.762`–`1.770·10⁵` at `p ≥ 557` | **holds** |
+| G2.117 | solve `≥ 98.28 %`; linear algebra `≤ 0.0057 %` | **holds** |
+| G2.118 | exponent `−0.066`; per-size median `y` `969`–`4,272` | **holds** |
+| G2.119 | steps / `√n` `0.468`–`0.787`; per step at `p ≥ 1549` `95.9`–`96.5` | steps **hold**; per step **falsified high**: the band `[66, 80]` priced the batched addition alone and missed the `ψ` map (`26`) the class representative costs at every step |
+| G2.120 | largest size `D(0)` median `1.54·10³` (in band); no row at or below rho at any weight; medians fall from `2^{14}`–`2^{15}` to `2^{10.6}`, but not monotonically (up at `149`, `269`, `773`, within the per-curve scatter) | level and "rho ahead" **hold**; "falls with `n`" **holds as a trend** (`β < 0` in every replicate) and is **falsified read as monotone**, at 3 of 10 steps |
+| G2.121 | `β = −0.243` `[−0.279, −0.205]` | **holds** (contains `−0.25`) |
+| G2.122 | M1 `85.5`, interval `15.1` bits wide; M2 `84.0`, interval `1.1` bits wide | **holds** |
+| G2.123 | M2 shift `+6.8` bits (`0.1` GAE), `+15.1` (`1` GAE); `D(0) < D(0.1) < D(1)` on all 33 rows | **holds** |
+
+**What it says.**  On the line's best configuration (arm B, solver A, Karatsuba) and against its strongest
+matched walk, **the distance to rho was measured over twenty bits of `n`, from `2^{22.6}` to `2^{42.4}`: per-size
+median `2.1·10⁴×` → `1.5·10³×` at `0` GAE (best row `1.14·10³×`, `p = 3089` seed 2), `4.9·10³×` at `0.1` GAE and
+`2.0·10⁴×` at `1` GAE at the largest size.  The crossover is empty in the reachable range: `n* > 2^{42.4}`, measured.**
+The free-slope fit gives `β = −0.243` with a `±0.04` interval that contains the theory's `−1/4`, so with eleven
+sizes and three curves each the slope is identified, unlike the four-size ratio exponent of
+`LEAD-ICE-charged-toy-ic-exponent-vs-rho`. The crossover order it implies is
+**`2^{85.5}` [`2^{79.2}`, `2^{94.3}`] at `0` GAE, `2^{91.2}` [`2^{84.4}`, `2^{100.7}`] at `0.1`, and `2^{97.6}`
+[`2^{90.1}`, `2^{107.9}`] at `1` GAE**. The theory-slope fit puts it at `2^{84.0}`, `2^{90.9}` and `2^{99.1}`. The
+`15`-bit width of the free-slope interval is what the ladder can say about an extrapolation over `43` bits beyond
+its top size. **Class:** a measurement of distance, and a fitted extrapolation of where it would reach `1`. It is not
+an improvement, and the fitted `n*` is not a measured crossing. It replaces §9.33's single-point model handover
+(`2^{88}`–`2^{90}`, before E31 and E27) with an interval that contains it. **Distance remaining:** `≈ 1.5·10³×`
+at `2^{42.4}` and `0` GAE, and `≈ 43` bits of `n` to the fitted crossover. **Scope:** E25's GLS twists
+(`h = 16`, `p ≡ 1 (mod 4)`), the degree-11 `V₄` solve, `p ≤ 3089`, operation counts. The validation gate is not run;
+the owner arranges it.
+
 ### 9.38 E34 pre-registration: a cheaper order-24 class representative, and which walk is the matched rho on E18's `j = 0` curves across the §5a band
 
 *Registered 2026-10-31, before any E34 code.*  **Question.**  §9.31 and §9.33 left the matched reference on
