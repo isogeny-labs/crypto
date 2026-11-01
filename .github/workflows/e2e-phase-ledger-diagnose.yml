@@ -1,0 +1,196 @@
+name: Diagnose fixed E2E phase-ledger failures
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AWS_REGION: ${{ vars.ISOLAB_AWS_REGION }}
+      ISOLAB_BUCKET: ${{ vars.ISOLAB_RESULTS_BUCKET }}
+      SOURCE_REVISION: 32303a6d51d7a43ce887cd9da8f6d82afea4793c
+      ECBENCH_SHA256: f3aab23417ece64cb3373e5c66d2c3be343e18c0e89347f626e0aea18ab1b774
+      T0_WORKFLOW_RUN: '41343651715'
+      T0_JOB_NAME: gh-41343651715-1
+      T0_LAUNCHER_ID: 9328d1c0-bdf3-4119-881a-5ce7a2c91bd9
+      T1_WORKFLOW_RUN: '41343654905'
+      T1_JOB_NAME: gh-41343654905-1
+      T1_LAUNCHER_ID: a518dca6-0894-4dce-bc3c-5bf02a165242
+      T1_REQUEST_SHA256: 3516bd65ea320e1d5555def621f8130684312f8a9eef654dc89d5e28f790ce19
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Test the failed-run diagnosis contract
+        run: taskq/deploy/eks-karpenter/remote/test-diagnose-failed-run.sh
+      - name: Obtain temporary read credentials
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
+        with:
+          role-to-assume: ${{ vars.ISOLAB_TRIGGER_ROLE_ARN }}
+          role-session-name: e2e-ledger-diagnose-${{ github.run_id }}
+          role-duration-seconds: 1800
+          aws-region: ${{ env.AWS_REGION }}
+          mask-aws-account-id: true
+      - name: Classify the target-1 Kubernetes failure
+        run: |
+          set -euo pipefail
+          mkdir -p diagnosis
+          taskq/deploy/eks-karpenter/remote/diagnose-failed-run \
+            "$T1_JOB_NAME" "$T1_LAUNCHER_ID" "$T1_REQUEST_SHA256" \
+            "$SOURCE_REVISION" "$ECBENCH_SHA256" "$T1_WORKFLOW_RUN" \
+            "diagnosis/$T1_WORKFLOW_RUN.json"
+      - name: Classify the target-0 missing final receipt
+        run: |
+          set -euo pipefail
+          build_id="isolab-experiment-launcher:$T0_LAUNCHER_ID"
+          aws codebuild batch-get-builds --ids "$build_id" > "$RUNNER_TEMP/t0-build.json"
+          jq -e --arg id "$build_id" \
+            '.builds|length==1 and .[0].id==$id and .[0].buildComplete==true' \
+            "$RUNNER_TEMP/t0-build.json" >/dev/null
+
+          request_key=$(jq -er '.builds[0].environment.environmentVariables[]
+            | select(.name=="ISOLAB_REQUEST_KEY" and .type=="PLAINTEXT") | .value' \
+            "$RUNNER_TEMP/t0-build.json")
+          [[ "$request_key" =~ ^inputs/requests/([a-f0-9]{64})\.json$ ]]
+          request_sha=${BASH_REMATCH[1]}
+
+          # The trigger role deliberately cannot read inputs/requests/*. The
+          # launcher copies the validated request into its exact receipt
+          # prefix, which is inside the role's narrow read boundary.
+          prefix="runs/$T0_JOB_NAME/launcher/$T0_LAUNCHER_ID/"
+          fetch_optional_receipt() {
+            local name=$1
+            if aws s3 cp "s3://$ISOLAB_BUCKET/${prefix}${name}" \
+              "$RUNNER_TEMP/t0-$name" --only-show-errors \
+              2> "$RUNNER_TEMP/t0-$name.stderr"; then
+              rm -f "$RUNNER_TEMP/t0-$name.stderr"
+              return 0
+            fi
+            rm -f "$RUNNER_TEMP/t0-$name" "$RUNNER_TEMP/t0-$name.stderr"
+            return 1
+          }
+
+          if fetch_optional_receipt request.json; then
+            request_access=hash_verified
+            [[ $(sha256sum "$RUNNER_TEMP/t0-request.json" | cut -d ' ' -f1) == "$request_sha" ]]
+            jq -e --arg job "$T0_JOB_NAME" --arg source "$SOURCE_REVISION" \
+              --arg binary "$ECBENCH_SHA256" \
+              '.job.job_name==$job and .job.build.source_revision==$source
+               and .job.build.ecbench_sha256==$binary
+               and .provenance.source_revision==$source' \
+              "$RUNNER_TEMP/t0-request.json" >/dev/null
+          else
+            request_access=not_readable
+          fi
+
+          if fetch_optional_receipt status.json; then
+            status_access=readable
+            jq -e --arg job "$T0_JOB_NAME" \
+              '.job.job_name==$job and (.job.uid|type)=="string"
+               and (.job.state|type)=="string" and (.pods|type)=="array"' \
+              "$RUNNER_TEMP/t0-status.json" >/dev/null
+            jq '{job_state:.job.state,job_uid:.job.uid,pod_count:(.pods|length),
+              terminated_exit_codes:[.pods[]?.status.containerStatuses[]?
+                | .state.terminated.exitCode | select(type=="number")]}' \
+              "$RUNNER_TEMP/t0-status.json" > "$RUNNER_TEMP/t0-status-summary.json"
+          else
+            status_access=not_readable
+            printf 'null\n' > "$RUNNER_TEMP/t0-status-summary.json"
+          fi
+
+          if fetch_optional_receipt objects.json; then
+            objects_access=readable
+            jq -e '(.objects|type)=="array"
+              and all(.objects[]; (.Key|type)=="string")' \
+              "$RUNNER_TEMP/t0-objects.json" >/dev/null
+            jq '{object_count:(.objects|length)}' "$RUNNER_TEMP/t0-objects.json" \
+              > "$RUNNER_TEMP/t0-objects-summary.json"
+          else
+            objects_access=not_readable
+            printf 'null\n' > "$RUNNER_TEMP/t0-objects-summary.json"
+          fi
+
+          if fetch_optional_receipt result.json; then
+            result_access=readable
+            jq -e --arg job "$T0_JOB_NAME" --arg launcher "$T0_LAUNCHER_ID" \
+              --arg request "$request_sha" --arg source "$SOURCE_REVISION" \
+              --arg binary "$ECBENCH_SHA256" \
+              '.schema=="isolab.eks.result/v1" and .job_name==$job
+               and .launcher==("isolab-experiment-launcher:"+$launcher)
+               and .request_sha256==$request and .build.source_revision==$source
+               and .build.ecbench_sha256==$binary' "$RUNNER_TEMP/t0-result.json" >/dev/null
+            jq '{state,exit_code,job_uid,pod_uid,results_uri_present:(.results_uri!="")}' \
+              "$RUNNER_TEMP/t0-result.json" > "$RUNNER_TEMP/t0-result-summary.json"
+          else
+            result_access=not_readable
+            printf 'null\n' > "$RUNNER_TEMP/t0-result-summary.json"
+          fi
+
+          jq -n --argjson workflow "$T0_WORKFLOW_RUN" --arg job "$T0_JOB_NAME" \
+            --arg launcher "$T0_LAUNCHER_ID" --arg request "$request_sha" \
+            --arg source "$SOURCE_REVISION" --arg binary "$ECBENCH_SHA256" \
+            --arg request_access "$request_access" --arg status_access "$status_access" \
+            --arg objects_access "$objects_access" --arg result_access "$result_access" \
+            --slurpfile build "$RUNNER_TEMP/t0-build.json" \
+            --slurpfile status "$RUNNER_TEMP/t0-status-summary.json" \
+            --slurpfile objects "$RUNNER_TEMP/t0-objects-summary.json" \
+            --slurpfile result "$RUNNER_TEMP/t0-result-summary.json" '
+            {schema:"isolab.eks.missing-receipt-diagnosis/v1",workflow_run:$workflow,
+             job_name:$job,launcher_id:$launcher,request_sha256:$request,
+             source_revision:$source,ecbench_sha256:$binary,
+             codebuild:{status:$build[0].builds[0].buildStatus,
+               current_phase:$build[0].builds[0].currentPhase,
+               phases:[$build[0].builds[0].phases[]?
+                 | {phaseType,phaseStatus,
+                    statusCodes:[.contexts[]?.statusCode|select(type=="string")]}]},
+             launcher_receipts:{request_access:$request_access,status_access:$status_access,
+               objects_access:$objects_access,result_access:$result_access},
+             status:$status[0],objects:$objects[0],
+             result:$result[0],experiment_retry:false,
+             classification:(if $result[0]!=null then
+                 (if $result[0].state=="succeeded" and $result[0].exit_code==0
+                  then "remote_success_receipt_recovered"
+                  elif $result[0].state=="failed" then "remote_failure_receipt_recovered"
+                  else "remote_terminal_receipt_recovered" end)
+               elif $status[0]!=null then
+                 (if $status[0].job_state=="succeeded"
+                  then "remote_success_final_receipt_not_readable"
+                  elif $status[0].job_state=="failed"
+                  then "remote_failure_final_receipt_not_readable"
+                  else "remote_nonterminal_final_receipt_not_readable" end)
+               else "remote_outcome_unknown_receipts_not_readable" end),
+             scope:"allowlisted infrastructure metadata only; exact receipt probes conflate absent and unauthorized objects; raw records, timing values, logs and stderr remain private"}' \
+            > "diagnosis/$T0_WORKFLOW_RUN.json"
+          jq -e '.experiment_retry==false' "diagnosis/$T0_WORKFLOW_RUN.json" >/dev/null
+      - name: Summarize classifications
+        run: |
+          set -euo pipefail
+          jq -r '"Target-0 workflow `\(.workflow_run)`: CodeBuild **\(.codebuild.status)**; **\(.classification)**."' \
+            "diagnosis/$T0_WORKFLOW_RUN.json" >> "$GITHUB_STEP_SUMMARY"
+          jq -r '"Target-1 workflow `\(.workflow_run)`: **\(if (.pods|length)==0 then "no retained pod identity" else (.pods|map(.classification)|join(", ")) end)**."' \
+            "diagnosis/$T1_WORKFLOW_RUN.json" >> "$GITHUB_STEP_SUMMARY"
+          printf '\nNo experiment retry occurred. Raw records, timing values, logs and stderr remain private.\n' \
+            >> "$GITHUB_STEP_SUMMARY"
+      - name: Emit the allowlisted diagnoses to the job log
+        run: |
+          set -euo pipefail
+          jq -c '{allowlisted_diagnosis:"target-0",diagnosis:.}' \
+            "diagnosis/$T0_WORKFLOW_RUN.json"
+          jq -c '{allowlisted_diagnosis:"target-1",diagnosis:.}' \
+            "diagnosis/$T1_WORKFLOW_RUN.json"
+      - name: Retain only the allowlisted diagnoses
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: e2e-phase-ledger-failure-diagnoses
+          path: diagnosis/*.json
+          if-no-files-found: error
+          retention-days: 30

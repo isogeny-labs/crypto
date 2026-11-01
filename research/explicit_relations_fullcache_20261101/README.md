@@ -74,3 +74,15 @@ low). No pod was created and no trial or preflight ran; zero GPU time was
 allocated. `launch-refused-v3.json` records the refusal and reconciled inventory.
 The frozen protocol and verified S3 source archive are ready for a submission
 after account funds are restored. No version3 performance result exists yet.
+
+After the owner confirmed funding, a separate administrative submission ran the
+same frozen version3 protocol. Pod k1mjc0sf1gpzvq completed all three63-bit
+seed202 recoveries and was deleted. Candidate cold time was1053.896752seconds
+versus1183.823571 and1185.763838seconds for the baseline controls:11.05% lower
+than their mean, A/A spread0.164%. All certificates and work counts match;
+fresh CPU replay and scalar+1 rejection pass. Frozen analysis replay and
+canonical export/schema/file/coverage checks pass. See [RESULTS.md](RESULTS.md),
+[version3 export](results-v3/export.json) and [session log](SESSION-v3.md).
+The earlier refused submission and all earlier incomplete outcomes remain
+immutable. No GPU remains running; conservative charge3840seconds leaves5160
+seconds of the original worker budget.

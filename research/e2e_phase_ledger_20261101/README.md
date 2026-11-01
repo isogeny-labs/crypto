@@ -1,7 +1,8 @@
 # Complete cold E2E phase ledger
 
-Status: protocol work only. No records from this study existed when the
-protocol was frozen.
+Status: frozen protocol; the first two-shard attempt produced no admissible
+result set. See [AMENDMENT_1.md](AMENDMENT_1.md) for the retained failure
+classification and prospective infrastructure remediation.
 
 This study fills a specific accounting gap in the binary-curve index-calculus
 work: it measures a complete, current-source, cold solve from setup through an

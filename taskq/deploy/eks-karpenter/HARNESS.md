@@ -28,6 +28,9 @@ flowchart LR
   C --> R[Versioned result receipt]
 ```
 
+Before any build or run, follow [cost controls and GitHub custody](COST_CONTROLS.md).
+These owner limits also apply to direct MCP and arbitrary-command submissions.
+
 ## The request
 
 ```json
@@ -217,8 +220,10 @@ use the native cancel tool or an authorized Kubernetes Job deletion. Cancellatio
 can lose artifacts that were not uploaded yet.
 
 CodeBuild allows two concurrent launchers, with a ten-minute queue timeout and
-70-minute build timeout. The EKS Spot pool retains its separate aggregate
-combined 64-vCPU limit (32 per ordinary/benchmark pool). Native Job objects expire after a day; empty workers and their pod
+100-minute build timeout. The portable client waits the requested EKS duration
+plus one hour for provisioning, verification and a terminal launcher state.
+The EKS Spot pool retains its separate aggregate
+combined 24-vCPU / 160-GiB ceiling (ordinary 16/128, L2 8/32). Native Job objects expire after a day; empty workers and their pod
 logs can disappear after two minutes. S3 is the durable experiment record.
 
 ## Deploy and update the portable launcher

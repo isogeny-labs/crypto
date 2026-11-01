@@ -166,7 +166,10 @@ Isogeny, fiber, transfer and conductor-gap leads are all closed as constant-fact
 **K. Other closed prime-field probes**
 - Symmetric `S₃` rewrite (asymptotic reach 1/9 < 1/6) is closed on paper. — [Source](RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM.md) §4.6
 - Multiplicative-subgroup bases (`x^B = 1`, no exponent change) are closed on paper. — same source
-- xedni lifting is closed on paper (JKSST 2000). — same source
+- classic xedni lifting has a strong conditional obstruction on paper (JKSST
+  2000); its selected-lift and probability interfaces are not unconditional
+  closure theorems. — same source; see the Lean audit in
+  `research/jksst_xedni_audit_20261101/`
 - Embedding into `F_{p^n}` is closed on paper (`p^{2−2/n}` against `√p`). — same source
 - The zero-minor guess-and-determine method (Mahalanobis, arXiv 2607.09814) has slope 0.905. Its cost ratio to rho grows from 260× to 6,715× over 16 to 26 bits. — [Source](research/lit2026_w12_flagged_claims_20261011/README.md)
 - The P-256 backdoor map ranks four hypotheses. "UnknownAlgorithm" is "NotPubliclyTestable". The prime-regime IC ladder "remains above rho at every measured size". — [Source](RESEARCH_P256_BACKDOOR_SPECULATION.md) §4
