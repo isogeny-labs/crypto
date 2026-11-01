@@ -333,20 +333,51 @@ fn main() {
             for (s, rec) in &recs {
                 let x = arm(rec, a);
                 let sel = f(&x, "pivot_selection_ops");
-                let d31 = diff_fields(&x31, &x, may_differ_vs_e31);
-                let solve_eq = x["solve_muls"] == x31["solve_muls"]
-                    && x["macaulay_entries"] == x31["macaulay_entries"];
+                // Today's records carry `folded.recovered`, which E31's lack
+                // (a schema addition after E31; E27's records carry it too).
+                let mut xs = x.clone();
+                let schema_added = x31["folded"].get("recovered").is_none()
+                    && xs["folded"]
+                        .as_object_mut()
+                        .and_then(|o| o.remove("recovered"))
+                        .is_some();
+                let d31 = diff_fields(&x31, &xs, may_differ_vs_e31);
+                // B″ chooses other pivots: its solve multiplications (and what
+                // derives from them) may differ; nothing else may.
+                let est = s == "chain-sparsest-est";
+                let entries_eq = x["macaulay_entries"] == x31["macaulay_entries"];
+                let solve_eq = est || x["solve_muls"] == x31["solve_muls"];
+                let allow_bc: fn(&str) -> bool = if est {
+                    |k| {
+                        may_differ_vs_bc(k)
+                            || matches!(k, "call" | "ratio" | "solve_muls" | "total_muls")
+                    }
+                } else {
+                    may_differ_vs_bc
+                };
                 let dbc = bc
                     .as_ref()
-                    .map(|b| diff_fields(b, &x, may_differ_vs_bc))
+                    .map(|b| diff_fields(b, &x, allow_bc))
                     .unwrap_or_default();
                 identity.push(json!({"p": p, "seed": seed, "arm": a, "solver": s,
-                    "fields_differing_from_e31_b": d31, "solve_and_entries_equal_e31_b": solve_eq,
+                    "fields_differing_from_e31_b": d31,
+                    "schema_addition_folded_recovered": schema_added,
+                    "entries_equal_e31_b": entries_eq,
+                    "solve_equal_e31_b_or_est": solve_eq,
                     "fields_differing_from_b_counted": dbc}));
-                // Schoolbook B (E31's record) with this run's selection work.
+                // Schoolbook S of X: X's Karatsuba total plus the schoolbook
+                // re-pricing of the non-solve F_{p⁴} work, measured on B (E31 B's
+                // total minus B counted's Karatsuba total; the same calls, so
+                // the same for B′ and B″).  For B and B′ this is E31 B's total.
+                let karatsuba_shift =
+                    f(&x31, "total_muls") - f(bc.as_ref().expect("B counted record"), "total_muls");
                 let s_b_school: Vec<f64> = GS
                     .iter()
-                    .map(|g| f(&x31, "total_muls") + GAE * g * (f(&x31, "macaulay_entries") + sel))
+                    .map(|g| {
+                        f(&x, "total_muls")
+                            + karatsuba_shift
+                            + GAE * g * (f(&x, "macaulay_entries") + sel)
+                    })
                     .collect();
                 let s_bk: Vec<f64> = GS
                     .iter()
@@ -456,13 +487,14 @@ fn main() {
             .as_array()
             .unwrap()
             .is_empty()
-            && i["solve_and_entries_equal_e31_b"] == true
+            && i["entries_equal_e31_b"] == true
+            && i["solve_equal_e31_b_or_est"] == true
             && i["fields_differing_from_b_counted"]
                 .as_array()
                 .unwrap()
                 .is_empty()
     });
-    writeln!(md, "\nEnd-to-end identity (every non-product field of E31 B's records; every field of B counted's apart from the selection fields and the tag): **{ident_ok}**\n").unwrap();
+    writeln!(md, "\nEnd-to-end identity (every non-product field of E31 B's records, `folded.recovered` aside: a key added to the records after E31, present in E27's too; every field of B counted's apart from the selection fields and the tag, and for B″ also its solve multiplications and what derives from them): **{ident_ok}**\n").unwrap();
     fs::write(format!("{dir}/tables.md"), &md).unwrap();
     let summary = json!({
         "experiment": "e33",

@@ -3747,6 +3747,105 @@ at `2^{42.4}` and `0` GAE, and `≈ 43` bits of `n` to the fitted crossover. **S
 (`h = 16`, `p ≡ 1 (mod 4)`), the degree-11 `V₄` solve, `p ≤ 3089`, operation counts. The validation gate is not run;
 the owner arranges it.
 
+### 9.37 E33 measured: solver B's pivot selection costs `1.05·10⁶` native operations per call — B is ahead of A and E25 at `0` GAE only; a counted estimate (B″) stays ahead of A through `0.1` GAE but not at `1`
+
+*2026-11-01.*  Code `c443138920` (compile fix of the unit test and the checks example `c689d19821`; the
+library build is unchanged), binaries pinned in `experiments/37_solver_b_pivot_count/binary_sha256.txt`.
+**Stage A:** `examples/e33_stage_a.rs`, one thread, E31's calls exactly (the first 1,000 targets of
+E25 arm A's stream on each of E25's ten curves), seven solvers per call from the same per-target seed:
+existing, A, A counted, B, B counted, B′, B″ (`stage_a.{json,log}`; the JSON is in the artifact store,
+sha256 `7bc6e00b…`).  **End to end:** `run_e2e.sh` (E27's command with `--solver chain-sparsest-counted`,
+`chain-sparsest-inc`, `chain-sparsest-est`; `--karatsuba`; `RAYON_NUM_THREADS=4` on two cores), E25's ten
+curves, both arms, 30 runs, 0 failures.  Tables: `examples/e33_tables.rs` → `tables.md`, `summary.json`.
+Host: the 4-vCPU container; isolab-eks is not reachable from it (no AWS CLI; the GitHub route refused
+through the proxy), so operation counts only, no wall-time claim.  Report:
+`research/e33_solver_b_pivot_count_20261031/`.
+
+**Identity.**  On all 10,000 Stage A calls every solver returned the existing solver's solutions,
+degree, outcome and decomposition set.  A counted reproduced A's phase counts, and B counted and B′
+reproduced B's, on every call.  B′ chose B's pivot in every column of every call (equal digests), and its
+maintained counts never differed from a recount.  B's initial pass was exactly `rows · cols` on every
+call: `393 · 448 = 176,064` on 9,999 calls, and `396 · 448` on one.  End to end, all 30 records
+reproduce every non-product field of E31 B's records.  The one exception is `folded.recovered`, a key
+added to the records after E31 (E27's records carry it too).  B′'s records equal B counted's apart from
+the selection fields and the tag.  B″'s also differ in its solve multiplications and what derives from
+them, and in nothing else: every relation, log and walk is the same.  The pre-E33 binary (E32's pinned
+build) and E33's give identical records for `macaulay`, `chain`, `chain-sparsest` and
+`chain --karatsuba` at `p = 101` seed 2 (1,206–1,214 leaves each, timing aside).  The new
+`chain --karatsuba` record equals E27's stored one, and no uncounted solver emits an E33 field
+(`identity_existing_solvers.json`).  Negative controls (`e33_checks`, 32 calls): a second-best pivot in
+one column changed the digest on 32/32 calls and the output on none; a count off by one was flagged on
+32/32.
+
+**Selection work per call** (Stage A means over 1,000 calls per curve; end to end in brackets):
+
+| solver | initial counts | comparisons | count updates | total | end to end |
+|:--|--:|--:|--:|--:|--:|
+| B (as built, counted) | `176,064` | `3,680`–`3,713` | `8.69`–`8.77·10⁵` | `1.049`–`1.057·10⁶` | `1.049`–`1.057·10⁶` |
+| B′ (incremental) | `505`–`506` | as B | `2.92`–`2.98·10⁵` | `2.93`–`2.98·10⁵` | `2.93`–`2.98·10⁵` |
+| B″ (Markowitz estimate) | `505`–`506` | `4,069`–`4,105` | `8,121`–`8,192` | `12,696`–`12,803` | `12,694`–`12,802` |
+
+B's selection pass reads the matrix about six times per call: once in the initial count (`176,064`
+entries, the validator's lower bound) and about five times more in recounts.  The recounts are 83 % of the
+pass.  B′ removes the initial pass and replaces recounts with two status tests per touched entry,
+`0.279`–`0.282` of B's work.  B″ does `O(1)` work per row update.  Its estimate picks other pivots, so its
+`C` median is `1.205`–`1.221 ×` B's (`3.71`–`4.02·10⁵` against `3.04`–`3.33·10⁵`; A's is `6.01`–`6.34·10⁵`).
+Lead-scan reads (`79,114`–`79,119` per call) are identical for A, B, B′ and B″ on every call: a row's
+lead-scan reads telescope to its final lead, which the shared pivot columns fix.
+
+**End to end** (20 rows; `S_E25/S_X` in schoolbook arithmetic against E25's records, X's schoolbook `S`
+being E31 B's total re-priced by X's own solve; `S_A/S_X` with Karatsuba products against E27's
+solver-A records; `S_X/rho` against walk (iii) of E27 without the `[d]G` check; one GAE `= 97` per
+Macaulay entry, per selection operation and per walk step):
+
+| X | quantity | `0` GAE | `0.1` GAE | `1` GAE | rank across the band |
+|:--|:--|:--|:--|:--|:--|
+| B | `S_E25 / S_B` | `4.53`–`4.76` | `0.274`–`0.276` | `0.157`–`0.158` | unresolved: the order flips between `0` and `0.1` |
+| B | `S_A / S_B` | `1.82`–`1.86` | `0.193`–`0.197` | `0.149`–`0.153` | unresolved: the order flips between `0` and `0.1` |
+| B | `S_B / rho` | `3.45·10³`–`2.19·10⁵` | `1.10·10⁵`–`7.17·10⁶` | `6.10·10⁵`–`4.40·10⁷` | rho ahead at every weight |
+| B′ | `S_E25 / S_B′` | `4.53`–`4.76` | `0.679`–`0.683` | `0.404`–`0.407` | unresolved: the order flips between `0` and `0.1` |
+| B′ | `S_A / S_B′` | `1.82`–`1.86` | `0.478`–`0.487` | `0.384`–`0.393` | unresolved: the order flips between `0` and `0.1` |
+| B′ | `S_B′ / rho` | `3.45·10³`–`2.19·10⁵` | `4.45·10⁴`–`2.89·10⁶` | `2.36·10⁵`–`1.71·10⁷` | rho ahead at every weight |
+| B″ | `S_E25 / S_B″` | `3.83`–`3.98` | `1.457`–`1.497` | `0.981`–`0.997` | unresolved: B″ ahead at `0` and `0.1`, behind at `1` on all 20 rows |
+| B″ | `S_A / S_B″` | `1.538`–`1.558` | `1.046`–`1.048` | `0.9465`–`0.9480` | unresolved: B″ ahead at `0` and `0.1`, behind at `1` on all 20 rows |
+| B″ | `S_B″ / rho` | `4.12·10³`–`2.61·10⁵` | `2.03·10⁴`–`1.33·10⁶` | `9.58·10⁴`–`7.01·10⁶` | rho ahead at every weight |
+
+For comparison, solver A (E27, walk (iii)) is at `6.39·10³`–`4.06·10⁵` (`0`), `2.13·10⁴`–`1.39·10⁶`
+(`0.1`) and `9.07·10⁴`–`6.64·10⁶` (`1` GAE).  **Sensitivity (G2.133):** pricing every arm's lead-scan
+reads too (E25's taken as A's: the same echelon on the same rows) moves the Stage A per-call ratios but
+reverses none.  B″/A becomes `1.035`–`1.036` at `0.1` and `0.962`–`0.963` at `1` GAE; E25/B″ becomes
+`0.986`–`0.999` at `1` GAE.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.124 | identical outputs on all 10,000 Stage A calls and all 30 end-to-end records, with the field rule above; phase counts and digests as registered; old binary = new for the four existing configurations; both negative controls detected 32/32. The in-crate unit tests type-check (`cargo check --release --lib --tests`) but were not executed: a release test build of the library needs about 9 GB of RSS, which the shared container could not provide beside E32. Their solver-level content runs as `e33_checks`. | **holds** (unit tests not executed; disclosed) |
+| G2.125 | initial pass `rows · cols` exactly; comparisons `0.35 %` of the total; recount `8.7·10⁵` > initial `1.76·10⁵`; total `1.049`–`1.057·10⁶` | **holds** |
+| G2.126 | B′/B `0.279`–`0.282` | **holds** |
+| G2.127 | B″ `12,696`–`12,803` per call (≤ `2·10⁴`); `C` median B″/B `1.205`–`1.221` | **holds** |
+| G2.128 | `S_A/S_B` `1.82`–`1.86` (0), `0.193`–`0.197` (0.1), `0.149`–`0.153` (1) on every row | **holds**: the order flips; B is not ranked ahead of A |
+| G2.129 | `S_E25/S_B` `4.53`–`4.76`, `0.274`–`0.276`, `0.157`–`0.158` | **holds** (far below the validator's lower-bound values `0.885`–`0.899` and `0.542`–`0.544`: the recounts were the larger part) |
+| G2.130 | B′ behind A (`0.478`–`0.487`, `0.384`–`0.393`) and E25 (`0.679`–`0.683`, `0.404`–`0.407`) at `0.1` and `1` GAE on every row | **holds** |
+| G2.131 | against A: ahead at `0` and `0.1`, behind at `1` GAE on every row, as registered; against E25: ahead at `0` and `0.1`, **behind at `1` GAE on all 20 rows** (`0.981`–`0.997`) | **falsified** for E25 at `1` GAE; holds against A |
+| G2.132 | `S_B/rho` `3.45·10³`–`2.19·10⁵` at `0` GAE; rho ahead of every row of B, B′, B″ at every weight | **holds** |
+| G2.133 | lead scans identical across rules; no rank reverses | **holds** |
+
+**What it says.**  Counting B's selection work is accounting, not an improvement.  The count settles
+what §9.24 left open: **B as built is ahead of A and E25 at `0` GAE only.**  Its pass costs about six
+matrix reads per call, and at `0.1` GAE each read costs more than the multiplications sparser pivots
+save, so B falls to `0.19×` A.  Maintaining the counts incrementally (B′) keeps B's choices for `28 %` of
+the work, which is still behind A and E25 at `0.1` and `1` GAE.  A counted estimate (B″), with `O(1)` work
+per row update, gives up `22.5`–`22.7 %` of B's saving in mean `C` (worse pivots).  With its `1.27·10⁴` selection
+operations counted, it is ahead of A at `0` GAE (`1.54`–`1.56×`) and at `0.1` GAE (`1.046`–`1.048×`).  At
+`1` GAE it is behind A (`0.947`–`0.948`) and E25 (`0.981`–`0.997`): at that weight its selection
+operations cost `1.2·10⁶` multiplications per call, more than the `2.30`–`2.33·10⁵` it saves against A's mean `C`.  **No pivot rule
+tested here ranks ahead of A across the band; A remains the ranked solver.**  B″ is a measured
+improvement of the baseline at `0` and `0.1` GAE only.  Under the §5a rule it is not ranked, and it is
+not claimed as an improvement across the band.  **Distance remaining:** the best row (`p = 397` seed 1,
+arm B) is `4.12·10³×` the matched rho for B″ and `6.39·10³×` for A at `0` GAE.  Rho is ahead of every row
+at every weight.  **Next lever:** the band is set by the Macaulay entries (`176,064` per call, `1.7·10⁷`
+multiplications at `1` GAE).  No pivot rule removes them; a smaller matrix would.  Not done here: the
+validation gate, the leaderboard and `benchmarks/`.
+
 ### 9.38 E34 pre-registration: a cheaper order-24 class representative, and which walk is the matched rho on E18's `j = 0` curves across the §5a band
 
 *Registered 2026-10-31, before any E34 code.*  **Question.**  §9.31 and §9.33 left the matched reference on
