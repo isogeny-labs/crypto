@@ -41,7 +41,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench docs/ic research/n83_dense_root_20261013 research/n83_final_extended_20261018 research/n83_highk_beyond4405_20261021 research/n83_highk_online_tiebreak_20261020 research/n83_nearby_k_current_source_20261021 research/n83_root4_frontier_current_20261018 research/n83_online_finalists_20261018
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench docs/ic research/n83_dense_root_20261013 research/n83_final_extended_20261018 research/n83_highk_beyond4405_20261021 research/n83_highk_online_tiebreak_20261020 research/n83_nearby_k_current_source_20261021 research/n83_root4_frontier_current_20261018 research/n83_online_finalists_20261018
       - name: Verify sealed fixture and resolve a reviewed dispatch
         id: dispatch
         shell: bash
@@ -161,7 +161,7 @@ python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench doc
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench docs/ic research/n83_dense_root_20261013 research/n83_final_extended_20261018 research/n83_highk_beyond4405_20261021 research/n83_highk_online_tiebreak_20261020 research/n83_nearby_k_current_source_20261021 research/n83_root4_frontier_current_20261018 research/n83_online_finalists_20261018
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench docs/ic research/n83_dense_root_20261013 research/n83_final_extended_20261018 research/n83_highk_beyond4405_20261021 research/n83_highk_online_tiebreak_20261020 research/n83_nearby_k_current_source_20261021 research/n83_root4_frontier_current_20261018 research/n83_online_finalists_20261018
 
       - name: Fetch and independently replay the admitted screen
         shell: bash
@@ -282,7 +282,7 @@ python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench doc
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench docs/ic research/n83_dense_root_20261013 research/n83_final_extended_20261018 research/n83_highk_beyond4405_20261021 research/n83_highk_online_tiebreak_20261020 research/n83_nearby_k_current_source_20261021 research/n83_root4_frontier_current_20261018 research/n83_online_finalists_20261018
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench docs/ic research/n83_dense_root_20261013 research/n83_final_extended_20261018 research/n83_highk_beyond4405_20261021 research/n83_highk_online_tiebreak_20261020 research/n83_nearby_k_current_source_20261021 research/n83_root4_frontier_current_20261018 research/n83_online_finalists_20261018
       - name: Fetch exact screen and both stratum artifacts
         shell: bash
         run: |
