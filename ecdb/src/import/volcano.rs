@@ -22,6 +22,9 @@
 //! - each edge's direction;
 //! - `endomorphism_ring` when v is {2, 3, 5}-smooth, which pins f_E = ∏ ℓ^level.
 //!
+//! ℓ = p (the classes over F_5 at ℓ = 5) is skipped: there is no volcano in
+//! characteristic ℓ.
+//!
 //! Every other curve with a known conductor gets level 0 for each ℓ ∤ v: its
 //! ℓ-volcano is a bare crater.
 
@@ -132,6 +135,7 @@ fn val(n: &BigInt, l: u64) -> u32 {
 
 struct Vertex {
     class_id: i64,
+    p: u64,
     v: BigInt,
     d_k: BigInt,
 }
@@ -267,9 +271,10 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
             continue; // supersingular: no volcano
         }
         let class_id: i64 = r.get(1);
+        let p: u64 = r.get::<_, String>(2).parse()?;
         let v: BigInt = r.get::<_, String>(3).parse()?;
         let d_k: BigInt = r.get::<_, String>(4).parse()?;
-        vertices.insert(id, Vertex { class_id, v, d_k });
+        vertices.insert(id, Vertex { class_id, p, v, d_k });
         by_class.entry(class_id).or_default().push(id);
     }
     let mut out: BTreeMap<u64, BTreeMap<i64, Vec<i64>>> = BTreeMap::new();
@@ -291,6 +296,10 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
         let first = &vertices[&verts[0]];
         let special = first.d_k == BigInt::from(-3) || first.d_k == BigInt::from(-4);
         for l in ELLS {
+            if l == first.p {
+                report.count("classes_skipped_l_equals_p", 1); // no volcano: l-isogenies in characteristic l
+                continue;
+            }
             let depth = val(&first.v, l);
             let chi = kronecker(&first.d_k, l);
             let o = out.get(&l).unwrap_or(&empty);
