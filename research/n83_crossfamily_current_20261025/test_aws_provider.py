@@ -14,12 +14,12 @@ class AwsProviderTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             controller = {'schema': 'n83.crossfamily-aws-controller/v1',
-                          'account_id': '590183823895', 'region': 'us-east-1',
+                          'account_id': '590183823895', 'region': 'us-west-2',
                           'source_head_sha': head, 'run_id': 'run1',
                           'instance_ids': ['i-first', 'i-second'],
                           'strata': []}
             strata, instances = [], []
-            for index, zone in enumerate(('us-east-1d', 'us-east-1d')):
+            for index, zone in enumerate(('us-west-2c', 'us-west-2c')):
                 instance_id = controller['instance_ids'][index]
                 results = root / str(index)
                 usage = results / 'points' / f'p{index:02d}' / 'runs' / 'arm'
