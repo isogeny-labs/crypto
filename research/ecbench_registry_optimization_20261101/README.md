@@ -22,6 +22,12 @@ into a speed claim.
 - Actual execution coverage: **72/72 runnable native methods**, **11/11 system
   solvers**, and **8/8 PDP3 engines**. The remaining six registry entries are
   external CM wrappers and require a real hash-bound backend.
+- After merging current `main`, the inventory and 109-spec audit remained
+  byte-identical and a fresh merged-binary audit again reproduced **742/742**
+  eligible runs across all 33 admitted sessions. The separate invalid
+  pre-fix three-leads negative control is now refused during planning, as
+  intended. Receipts are under
+  [`execution/current-head-replay/`](execution/current-head-replay/).
 - No leaderboard row changes. These are one-target/four-round development
   diagnostics, not L2 confirmatory holdouts.
 - Confirmatory execution is blocked because this managed runtime has no ready

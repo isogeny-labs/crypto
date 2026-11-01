@@ -13,6 +13,9 @@ Status: replay-verified L0 development evidence; not a leaderboard result.
 - 11/11 system solvers and 8/8 PDP3 engines executed.
 - The campaign-structure audit separately admits 109 specs with 78/78 methods
   and 19/19 nested algorithms.
+- A post-merge audit with current `main` reproduced the same 742/742 eligible
+  runs across all 33 admitted sessions with zero problems. Its binary-bound
+  receipts and summary are in [`current-head-replay/`](current-head-replay/).
 
 Every timing here is L0 and descriptive. The completion and nested panels use
 one target, one warm-up, and four measured rounds. Deterministic work can select
@@ -70,6 +73,10 @@ refused the 18-unknown/17-equation system; Buchberger hit the common cap.
   Their direct F5/F4 ordering is unresolved because of censoring and pricing.
 - F6 versus inherited F4 is unresolved across the pricing band: a solver-local
   count advantage does not survive every end-to-end price.
+- WDSAT is a historical external path, not one of the 11 live native
+  `SystemSolver` backends. No hash-bound WDSAT binary was available here, and
+  the retained false-UNSAT regression described in the comprehensive report
+  still blocks promotion; it is recorded as unmeasured, not folded into SAT.
 - APS exact, k4 Gaudry, and the tiny Jacobian-image strong-rho controls retain
   20 total exhausted outcomes rather than being converted into losses or
   discarded.
