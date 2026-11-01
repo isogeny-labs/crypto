@@ -67,7 +67,7 @@
     "changed-row negative control"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh check61-02 CHECK61.sing CHECK61_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_CAS.sh check61-03 CHECK61.sing CHECK61_ALL_CHECKS_PASS",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
     "threads": 1,
@@ -104,9 +104,9 @@
     }
   ],
   "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
-  "version": 11,
+  "version": 12,
   "amendment": {
     "before_affected_data": true,
-    "reason": "check61-01 manually stopped after source review found avoidable per-cell interpreter copies; replace with whole native module-vector copies, verify all row-vector bindings, keep all818 full pre-projection ambient products/certificates and original caps"
+    "reason": "check61-02 rejected native module(int) initialization error and late PASS; remove unnecessary reset since all136 selected row slots are overwritten each case. Same complete818 reconstruction, row-binding controls/products and caps"
   }
 }

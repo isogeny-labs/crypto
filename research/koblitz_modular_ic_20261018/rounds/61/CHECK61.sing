@@ -25,7 +25,7 @@ intvec caps61=34,12,20,2;intvec offsets61=0,136,184,264;
 matrix bound61[136][324];matrix calculated61[136][38];matrix actual61[136][38];matrix H61[38][136];matrix K61[38][1];matrix R61[1][38];
 for(e161=-6;e161<=6;e161++){for(e261=-10;e261<=10;e261++){for(e361=-1;e361<=1;e361++){
  e061=-e161-e261-e361;e61=e061,e161,e261,e361;
- selectedRows61=module(0);row61=0;
+ row61=0; // All136 slots are overwritten below, including zero vectors.
  for(p61=1;p61<=4;p61++){for(ord61=-caps61[p61];ord61<2*e61[p61];ord61++){
   src61=offsets61[p61]+2*(ord61+caps61[p61])+1;
   selectedRows61[row61+1]=ambientRows61[src61];selectedRows61[row61+2]=ambientRows61[src61+1];row61=row61+2;

@@ -83,7 +83,9 @@ fixed-space launch was interrupted at the checkpoint gate during migration,
 before native start; all saved inputs are retained. Fresh02 used unchanged
 mathematical source. The first checker was manually stopped after an
 avoidable per-cell interpreter loop was identified; it has no accepted
-result and is not labelled a timeout. Fresh02 uses native row-vector copies,
+result and is not labelled a timeout. Checker02 then failed on unsupported
+module(int) zero initialization; its late PASS and numbers are rejected.
+Fresh03 removes that unnecessary reset, uses native row-vector copies,
 checks all272 row bindings and retains all818 pre-projection products.
 No accepted producer was repeated for publication.
 Historical auxiliary protocol metadata defects and prospective repairs are

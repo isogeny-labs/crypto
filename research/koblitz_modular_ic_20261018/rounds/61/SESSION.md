@@ -179,3 +179,17 @@ FreshCHECK02thenrecords/report/custody;all6Leanclaimsalreadyaudited0failing0trus
 
 ### Errors
 Inefficientfirstcheckerimplementationmanuallystopped;sourcecopyrepairbeforefreshdata,allrawpreserved.
+
+## 2026-11-01T19:51:04.969892+00:00 — checker02 rejected native zero-constructor error
+
+### What was done
+check61-02terminalnative0/FAIL:error module(int)atselectedRows61=module(0),latePASS/numbersrejected. Preservedallraw.
+
+### Decisions made
+Removeunnecessaryreset:all136vectorsareoverwritteneachcase. Freezefresh03full818pre-projectionproducts,all272rowbindings/controls/certificatesandoriginalcaps.
+
+### Open threads
+CHECK03thenrecords/report/custody;all6formalclaimsaccepted.
+
+### Errors
+IusedunsupportedSingularmodule(int)constructor. Sourcecorrectionbeforefreshdata;noacceptedproducerrepeated.

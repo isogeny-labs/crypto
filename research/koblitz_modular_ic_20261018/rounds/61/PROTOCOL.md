@@ -113,3 +113,11 @@ ambientrowsasmodulevectorsandchecksthefullmatrixreconstruction. Select
 all136rowsbywhole-vectorcopy,thenmultiplytheactual136x324matrixbythe
 mixed/fixedinclusionasbefore. All818casecomparisons/certificates,controls,
 source dimensions and originalcapsunchanged. Progressmarkersareobservational.
+
+### Checker03 zero-initialization syntax repair
+CHECK02rejectednative module(int)error;itslatePASS/numericlinesnotaccepted.
+Whole272row-modulebindingandspaceproductsarecontrolsinsideeachfreshcheck,
+notseparatelypublishedresults. Removeunnecessarymodule(0)reset:everyoneof
+136selectedgeneratorsisoverwritteninALLcases,includingzeros. All818
+pre-projectionproducts/comparisons/certificates/capsunchanged,sourcefrozen
+beforefresh03. Fullmatrixcomparisonsdetectanystalerow.
