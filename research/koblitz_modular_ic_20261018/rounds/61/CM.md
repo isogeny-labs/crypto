@@ -22,11 +22,14 @@ cohort has no principal x to feed the scalar/AS stage. This includes every
 minor triple in[-6,6]×[-10,10]×[-1,1] exceptzero; balancing fixes the first
 multiplicity, and the conditional map degree is at most34.
 
-Fresh checker status: packed Rust replay is the next frozen attempt. It reconstructs every constraint
-matrix from selected rows of the324 ambient profiles BEFORE multiplying by
-the mixed/fixed inclusions, and checks every certificate and the complete
-space/involution/trace/control products. Read terminal results.json before
-calling this fresh reconstruction accepted.
+The independent packed Rust checker is accepted (build0/run0/exactPASS).
+It reconstructs all818 matrices from selected324-dimensional ambient rows
+BEFORE projection, verifies every left inverse, the complete ambient/mixed/
+fixed/involution/Jordan/trace products, actual source profiles/regular jets,
+the constant control and changed-inverse/source-row controls. The strict
+parser checks every recorded binary entry; malformed-input guards are not
+reported as a separately injected fuzz fixture. All three Singular checker
+attempts are unaccepted and retained in the record.
 
 The affine normal trace-dual lattice is also accepted: all528 product
 columns,1024 ordered trace products, full-rank32 Gram, both inverse products,

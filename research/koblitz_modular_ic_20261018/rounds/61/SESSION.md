@@ -207,3 +207,17 @@ Rustcompile/replayafterfreeze;records/report/custody/delivery;alloriginalleads.
 
 ### Errors
 GenericSingularmatrixproductsresource-stopped,notatimeoutoramathematicalnull. All3Singularcheckerattemptsretained.
+
+## 2026-11-01T20:05:30.043658+00:00 — complete independent replay and all historical pins
+
+### What was done
+Rustcheck61-01terminalacceptedbuild0/run0/exactPASS:all818ambient-rowreconstructions,leftinverses,complete324/76/38spaces/involutions/Jordan/contraction/sourceprofiles/regularcontrol,changedinverse/source-rowcontrols. Metadatarecorderverified72historicalGitbytepins;12attempts7accepted4rejected1interrupted;6Leanclaimsaudited0failing0trusted.
+
+### Decisions made
+KeepallSingularcheckerattemptsunaccepted. Strictparserguardsareactualinputassertions,notaseparatelyinjectedfuzzfixture. Publishrecords/exportbeforederivativePDF,theninspects/source-seal/custody.
+
+### Open threads
+Renderallreportpages,seal/freshS3readback,newPRoriginalbase/noautomerge;nextcompleteholomorphic61/Cartier/sourceunitlatticeandalloriginallanes.
+
+### Errors
+Allfourrejectedattemptsretained:initialcubicpairindices,checker01resourcestop,checker02moduleconstructorerror,checker03resourcestop. Pre-nativeFIX01interruptionseparate. NoRustassertionfailure.

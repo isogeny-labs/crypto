@@ -27,3 +27,11 @@ itsownfrozen driver/protocolstate. Version10removesunrelatedcompilerfields
 anddescribestheactualSingular affinitybeforeCHECK61data. Historicalcopies
 remainimmutable; no mathematicalsource/cap/seed/cohort/thresholdchanged and
 no comparativeclockclaimreliesonthisannotation.
+
+## Rust stage, version13 before its data
+Version13 intentionally uses actual Rust compiler/CPU0 fields for the new
+RUST_DRIVER, with separate compile/run caps. It is a distinct exact binary
+replay of the same full818 source matrices; historical Singular contracts
+remain immutable. Injected negative controls are changed-inverse and changed
+source-row products. Invalid sparse-input syntax is guarded by assertions;
+no separately injected malformed-input/fuzz fixture is claimed.

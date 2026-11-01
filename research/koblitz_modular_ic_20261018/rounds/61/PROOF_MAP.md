@@ -9,8 +9,10 @@ FIELD61 binds all324/76 functions and76 source involutions in degree32.
 FIX61 produces complete38/38 fixed/trace splitting, full Jordan basis,
 contraction, all38 actual fixed/preimage functions and an actual odd trace1.
 COHORT61 retains all818 source-bound136x38 matrices and their left inverses,
-with the global regular kernel1 positive control. CHECK61 reconstructs rows
-from the324-dimensional ambient profiles before applying the inclusions.
+with the global regular kernel1 positive control. The accepted CHECK61.rs
+Rust row-dot replay reconstructs all818 matrices from324-dimensional ambient
+rows before applying the inclusions. All three CHECK61.sing attempts are
+unaccepted and preserved; do not cite their partial/late numeric output.
 Read terminal status in results.json; a frozen input alone is not a result.
 
 These finite exact products depend on the retained proper-source, normal
