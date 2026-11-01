@@ -1,0 +1,96 @@
+import Comparator
+set_option autoImplicit false
+namespace RepairClosure
+open ProjectiveComparator
+variable {K : Type*} [Field K]
+abbrev Mat (K : Type*) := Fin 4 → Fin 4 → K
+-- Four successive adds from zero in native linear, interpreted in the field.
+def linear (m : Mat K) (x : V K) : V K := fun i =>
+ (((0 + m i 0*x 0) + m i 1*x 1) + m i 2*x 2) + m i 3*x 3
+def mm (m n : Mat K) : Mat K := fun i j =>
+ m i 0*n 0 j + m i 1*n 1 j + m i 2*n 2 j + m i 3*n 3 j
+def squareScalar (m : Mat K) (c : K) : Prop :=
+ ∀ i j, mm m m i j = if i=j then c else 0
+
+theorem linear_zero (m : Mat K) : linear m (fun _=>0) = fun _=>0 := by
+ funext i; simp [linear]
+theorem linear_scale (m : Mat K) (x : V K) (c : K) :
+ linear m (fun i=>c*x i) = fun i=>c*linear m x i := by
+ funext i; simp only [linear]; ring
+theorem linear_comp (m n : Mat K) (x : V K) :
+ linear m (linear n x) = linear (mm m n) x := by
+ funext i; simp only [linear,mm]; ring
+theorem twice (m : Mat K) (c : K) (h : squareScalar m c) (x : V K) :
+ linear m (linear m x) = fun i=>c*x i := by
+ rw [linear_comp]
+ change ∀ i j, mm m m i j = if i=j then c else 0 at h
+ funext i
+ simp only [linear,h]
+ fin_cases i <;> simp
+
+theorem preserves_nonzero (m : Mat K) (c : K) (hc : c≠0)
+ (h : squareScalar m c) (x : V K) (hx : nonzero x) : nonzero (linear m x) := by
+ by_contra hn
+ have hz : linear m x = fun _=>0 := by
+  funext i
+  by_contra hi
+  exact hn ⟨i,hi⟩
+ have ht := twice m c h x
+ rw [hz,linear_zero] at ht
+ rcases hx with ⟨i,hi⟩
+ have he := congrFun ht i
+ exact hi ((mul_eq_zero.mp he.symm).resolve_left hc)
+
+theorem nonzero_iff (m : Mat K) (c : K) (hc:c≠0) (h:squareScalar m c)
+ (x:V K) : nonzero (linear m x) ↔ nonzero x := by
+ constructor
+ · rintro ⟨i,hi⟩
+   by_contra hn
+   have hz : x=fun _=>0 := by
+    funext j; by_contra hj; exact hn ⟨j,hj⟩
+   rw [hz,linear_zero] at hi
+   exact hi rfl
+ · exact preserves_nonzero m c hc h x
+
+theorem twice_same (m : Mat K) (c : K) (h:squareScalar m c) (x:V K) :
+ same x (linear m (linear m x)) := by
+ rw [twice m c h x]
+ exact scaled_same x c
+
+theorem same_preserved (m : Mat K) (c : K) (hc:c≠0) (h:squareScalar m c)
+ (x y:V K) (hx:nonzero x) (hy:nonzero y) (hs:same x y) :
+ same (linear m x) (linear m y) := by
+ rcases (same_iff_nonzero_scale x y hx hy).mp hs with ⟨a,ha,haxy⟩
+ have he : y=fun i=>a*x i := funext haxy
+ rw [he,linear_scale]
+ exact scaled_same (linear m x) a
+
+theorem same_iff (m : Mat K) (c : K) (hc:c≠0) (h:squareScalar m c)
+ (x y:V K) (hx:nonzero x) (hy:nonzero y) :
+ same (linear m x) (linear m y) ↔ same x y := by
+ constructor
+ · intro hs
+   have hh := same_preserved m c hc h (linear m x) (linear m y)
+     (preserves_nonzero m c hc h x hx) (preserves_nonzero m c hc h y hy) hs
+   rw [twice m c h x,twice m c h y] at hh
+   intro i j
+   have ht := hh i j
+   have ht' : (c*c)*(x i*y j)=(c*c)*(x j*y i) := by
+    calc (c*c)*(x i*y j)=(c*x i)*(c*y j) := by ring
+         _=(c*x j)*(c*y i) := ht
+         _=(c*c)*(x j*y i) := by ring
+   exact mul_left_cancel₀ (mul_ne_zero hc hc) ht'
+ · exact same_preserved m c hc h x y hx hy
+end RepairClosure
+namespace RepairClosure
+open ProjectiveComparator
+variable {K : Type*} [Field K]
+theorem chart_basis_change (c1 c2 : Mat K) (σ a0 a1 q3 : K)
+ (h0:∀ i,c2 i 0=c1 i 0) (h1:∀ i,c2 i 1=c1 i 1)
+ (h2:∀ i,c2 i 2= -c1 i 2-σ*c1 i 3) (h3:∀ i,c2 i 3=c1 i 3) :
+ linear c2 (fun j=>if j=0 then 1 else if j=1 then -a1 else if j=2 then -a0 else q3)=linear c1 (fun j=>if j=0 then 1 else if j=1 then -a1 else if j=2 then a0 else q3+σ*a0) := by
+ funext i
+ norm_num [linear]
+ rw [h0 i,h1 i,h2 i,h3 i]
+ ring
+end RepairClosure

@@ -6,7 +6,7 @@ dst.mkdir(parents=True,exist_ok=True);files=[]
 for p in sorted(src.rglob('*')):
  if not p.is_file() or p.is_symlink():continue
  rel=p.relative_to(src)
- if any(x in ('build','target','.lake','deps','dependency-union','__pycache__') for x in rel.parts):continue
+ if any(x in ('build','reviewer-build','target','.lake','deps','dependency-union','__pycache__') for x in rel.parts):continue
  data=p.read_bytes();omit=p.suffix in ('.olean','.ilean','.o','.png','.aux','.out','.pyc') or p.name=='render.log'
  if rel.parts[0]=='native-matrix-review' and ('inputs' in rel.parts or ('negative' in rel.parts and 'subject' in rel.parts and rel.parts.index('negative')>rel.parts.index('subject'))):omit=True
  name=str(rel)+('.txt' if p.suffix=='.lean' else '')
