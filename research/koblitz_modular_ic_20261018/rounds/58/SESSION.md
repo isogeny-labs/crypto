@@ -39,3 +39,17 @@ Field100,Lean,fullcontraction/inclusion4sourcepreimages,independentchecker,repor
 
 ### Errors
 None in firstR58nativeattempt;no acceptedproducerrepeated.
+
+## 2026-11-01T05:29:37.893191+00:00 — actual100-function source basis accepted
+
+### What was done
+field58-01accepted:degree32source,196actualquadraticbindings,100actualsections,100dividedfunctions,100divisionproducts,100actualsigmaidentities,3sourcecontrols andchanged-sectionnegativecontrol.
+
+### Decisions made
+Freezefulltracecontraction/inclusion andfirstLeancompile with explicitintegere≥1. Original limits persist;no acceptedproducerrepeated.
+
+### Open threads
+Lean,include4sourcepreimages,Qcontraction,checker,report/custody.
+
+### Errors
+None in two completednativeattempts.

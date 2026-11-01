@@ -17,6 +17,7 @@ theorem local_unit_double_zero {K Γ : Type*} [Field K]
 simple-pole bound. Surjectivity and valuation compatibility are premises. -/
 theorem no_simple_pole (e sourceOrder : ℤ) (he : 0 < e)
     (hpull : sourceOrder = -(2 * e)) (hbound : -1 ≤ sourceOrder) : False := by
+  have he1 : 1 ≤ e := Int.add_one_le_iff.mpr he
   rw [hpull] at hbound
   linarith
 

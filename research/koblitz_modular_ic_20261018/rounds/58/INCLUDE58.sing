@@ -90,7 +90,8 @@ require58(newKernel58*inclusion58==ambientInclusion58 && mat_rk(inclusion58)==24
 require58(newSigmaRestricted58*inclusion58==inclusion58*oldSigmaRestricted58,"INCLUDE58_ACTUAL_EQUIVARIANCE");
 matrix newN58=newSigmaRestricted58+unitmat(100);matrix oldTargets58=inclusion58*oldExceptional58;
 require58(mat_rk(newN58)==50,"INCLUDE58_FREE_TRACE_RANK");
-matrix traceBasis58=matrix(std(module(newN58)));
+module traceModule58=std(module(newN58));require58(size(traceModule58)==50,"INCLUDE58_TRACE_MODULE_SIZE");
+matrix traceBasis58[100][50];for(i58=1;i58<=100;i58++){for(j58=1;j58<=50;j58++){traceBasis58[i58,j58]=traceModule58[j58][i58];}}
 require58(ncols(traceBasis58)==50 && mat_rk(traceBasis58)==50,"INCLUDE58_TRACE_IMAGE_BASIS");
 matrix traceLifts58=lift(module(newN58),module(traceBasis58));
 require58(newN58*traceLifts58==traceBasis58,"INCLUDE58_ALL50_TRACE_LIFTS");

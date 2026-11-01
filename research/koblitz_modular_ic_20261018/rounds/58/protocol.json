@@ -1,31 +1,38 @@
 {
   "schema": "experiment.protocol/v1",
-  "id": "KOBLITZ-R58-FULL100-FIELD",
+  "id": "KOBLITZ-R58-TRACE-CONTRACTION-INCLUSION",
   "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
   "claims": [
     {
-      "id": "actual100",
+      "id": "inclusion",
       "class": "exact_computation",
-      "statement": "Bind all196 actual product pairs and all100 kernel/divided functions in whole degree32 source; verify100 actual sigma substitutions."
+      "statement": "Full normalized24-to100 injection,E,S compatibility,all24 actual source identities."
     },
     {
-      "id": "finite-poles",
-      "class": "theorem",
-      "statement": "Given divA=P-D and complete L(2D),division byA\u00b2 identifies full L(2P)."
+      "id": "trace-contraction",
+      "class": "exact_computation",
+      "statement": "Complete100-space N admits binaryQ withNQ+QN=I,Q\u00b2=0;allfixedfunctions have explicit trace preimages."
+    },
+    {
+      "id": "old-four",
+      "class": "exact_computation",
+      "statement": "Four oldfixed-mod-trace representatives have actual trace preimages inL(2P),verifiedbywhole-source equations."
     }
   ],
   "arms": {
     "reference": "R57 full descent/cusp bridge and R50 actual196-product packet",
     "baseline": "complete68-section degree128 space and24-section degree80 restriction",
-    "candidate": "All100 actual complete/divided source functions",
+    "candidate": "Complete trace contraction and source-bound normalized inclusion",
     "positive": [
-      "196 actual source product identities",
-      "100 division byA\u00b2 products",
-      "all100 actual sigma substitutions",
-      "control1,A\u00b2,b\u00b2 bindings"
+      "24 inclusion jet bindings andsource equations",
+      "inclusion rank24 andactualequivariance",
+      "50 trace image columns and50 lifts",
+      "full100x100 Jordaninverse",
+      "NQ+QN=I andQ\u00b2=0",
+      "all4 actualoldclass traceidentities"
     ],
     "negative": [
-      "changed divided section by1 fails A\u00b2-product"
+      "addlambda/A to tracepreimage changestraceby1 andmustfail originalidentity"
     ],
     "A_A": {
       "not_applicable_reason": "fixed exhaustive exact calculation, no noisy comparison"
@@ -67,14 +74,13 @@
     "power": "notapplicable"
   },
   "metrics": [
-    "196 actual product bindings",
-    "100 actual complete sections",
-    "100 divided sections",
-    "100 actual sigma identities",
-    "3 control source bindings"
+    "inclusionrank24",
+    "100-space contractionproducts",
+    "all4 actualsource tracepreimages",
+    "24 actual inclusionidentities"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh field58-01 FIELD58.sing FIELD58_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_CAS.sh include58-01 INCLUDE58.sing INCLUDE58_ALL_CHECKS_PASS",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
     "threads": 1,
@@ -110,9 +116,9 @@
     }
   ],
   "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
-  "version": 3,
+  "version": 4,
   "amendment": {
     "before_affected_data": true,
-    "reason": "space58-01 accepted ambient196,96-row rank96,full100 kernel andsigmaNrank50; freeze actual field100 stage"
+    "reason": "field58-01 accepted all100 source/division/sigma identities; freeze normalized24-to100 inclusion,fulltrace contraction and4 actual preimages"
   }
 }
