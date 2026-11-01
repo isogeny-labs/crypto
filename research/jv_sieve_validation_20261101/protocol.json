@@ -89,10 +89,27 @@
         "image_digest": null
       },
       "parameters": {
-        "primes": [1009, 1511, 1823],
-        "seeds": [33, 34, 35, 36, 37, 38, 39, 40],
+        "primes": [
+          1009,
+          1511,
+          1823
+        ],
+        "seeds": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40
+        ],
         "moves": 8,
-        "jumps": [3, 5, 7],
+        "jumps": [
+          3,
+          5,
+          7
+        ],
         "walk_cap": "3*p^2",
         "trace_scope": "cold per run"
       }
@@ -268,36 +285,63 @@
     "independent": [
       {
         "name": "prime",
-        "levels": [1009, 1511, 1823]
+        "levels": [
+          1009,
+          1511,
+          1823
+        ]
       },
       {
         "name": "instance_seed",
-        "levels": [33, 34, 35, 36, 37, 38, 39, 40]
+        "levels": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40
+        ]
       }
     ],
     "factors": [
       {
         "name": "algorithm",
         "treatment": "crossed",
-        "value": ["ic", "rho_r3", "rho_r0"],
+        "value": [
+          "ic",
+          "rho_r3",
+          "rho_r0"
+        ],
         "how": "Every algorithm receives the same challenge tuple at every prime/seed."
       },
       {
         "name": "rho_run_index",
         "treatment": "fixed",
-        "value": [0, 1],
+        "value": [
+          0,
+          1
+        ],
         "how": "Run 0 is the reference and run 1 is frozen as A/A before data."
       },
       {
         "name": "process_repeat",
         "treatment": "fixed",
-        "value": ["first", "repeat"],
+        "value": [
+          "first",
+          "repeat"
+        ],
         "how": "IC seed 33 is repeated in a separate process for the exact A/A check."
       },
       {
         "name": "native_price_weight_gae",
         "treatment": "crossed",
-        "value": [0, 0.1, 1],
+        "value": [
+          0,
+          0.1,
+          1
+        ],
         "how": "Every recorded row is repriced at all three frozen weights."
       },
       {
@@ -310,31 +354,48 @@
     "comparisons": [
       {
         "id": "C-main",
-        "arms": ["ic", "rho_r3"],
-        "differs_in": ["algorithm"],
+        "arms": [
+          "ic",
+          "rho_r3"
+        ],
+        "differs_in": [
+          "algorithm"
+        ],
         "design": "one_factor",
         "reason": "Same public challenge, target, source binary, primitive unit, and retained advice; only the algorithm differs.",
         "threshold": "All four paired-bootstrap upper bounds below 1."
       },
       {
         "id": "C-rho-aa",
-        "arms": ["rho_r3_aa", "rho_r3"],
-        "differs_in": ["rho_run_index"],
+        "arms": [
+          "rho_r3_aa",
+          "rho_r3"
+        ],
+        "differs_in": [
+          "rho_run_index"
+        ],
         "design": "aa",
         "reason": "Independent rho randomness on identical instances.",
         "threshold": "Point in [0.50,2.00] and CI contains 1."
       },
       {
         "id": "C-ic-aa",
-        "arms": ["ic_aa", "ic"],
-        "differs_in": ["process_repeat"],
+        "arms": [
+          "ic_aa",
+          "ic"
+        ],
+        "differs_in": [
+          "process_repeat"
+        ],
         "design": "aa",
         "reason": "Deterministic counter reproducibility.",
         "threshold": "All non-wall fields bit-identical."
       },
       {
         "id": "C-r0-theory",
-        "arms": ["rho_r0"],
+        "arms": [
+          "rho_r0"
+        ],
         "differs_in": [],
         "design": "absolute",
         "reason": "Theory-anchored positive control.",
@@ -356,7 +417,16 @@
     "arm_order_reason": "Fixed IC,R3-0,R0,R3-1 order per seed; four one-thread attempts run concurrently and wall time is not a claim.",
     "seed_derivation": {
       "method": "explicit_list",
-      "seeds": [33, 34, 35, 36, 37, 38, 39, 40],
+      "seeds": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
       "nonce": null,
       "note": "Disjoint from historical seeds 1..32 and fixed before the study."
     },
@@ -508,7 +578,9 @@
   ],
   "decision_rule": {
     "text": "At each prime, below_strong_rho requires every control and attempt to pass and the upper 95% bound to be below one for native bitop/v1 and all three GAE weights. Above requires all four lower bounds above one. Otherwise report unresolved; any failed/missing control or attempt is withheld.",
-    "comparison_ids": ["C-main"],
+    "comparison_ids": [
+      "C-main"
+    ],
     "threshold": "1.0 for each of four IC/R3 intervals, plus the frozen control windows",
     "statistic": "Paired ratio of means by seed with 10,000-resample percentile bootstrap CI95.",
     "interval": "Paired percentile bootstrap CI95, fixed deterministic seeds derived from 20261101 and prime/metric tags.",
@@ -579,10 +651,10 @@
   },
   "amendments": [],
   "freeze": {
-    "status": "draft",
-    "protocol_sha256": null,
-    "commit": null,
-    "frozen_at": null,
-    "filed_before_affected_data": null
+    "status": "frozen",
+    "protocol_sha256": "397768e24c3cbc7822d63a68a98bde14a3555c787786c442252ebf1da6374e6f",
+    "commit": "60e580a85544f4070d8c76d86792f6093c14fe79",
+    "frozen_at": "2026-11-01T20:12:41Z",
+    "filed_before_affected_data": true
   }
 }
