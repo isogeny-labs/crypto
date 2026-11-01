@@ -5,7 +5,7 @@ use crate::binary_ecc::{F2mElement, IrreduciblePoly};
 use crate::cryptanalysis::binary_semaev::binary_semaev_s4;
 use crate::cryptanalysis::pq_groebner_f2::{cmp_mono, F2BoolMono, F2BoolPoly, Mask};
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub(super) enum Failure {
     Input,
     Admission,
@@ -40,6 +40,104 @@ pub(super) struct Constructed {
     values: [u64; 8],
     pub equations: Vec<F2BoolPoly>,
 }
+/// Fixed-width coordinate ANFs and all eight selector values. Distinct from
+/// group completeness or native matrix traces; every coordinate has eight bits.
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(super) struct Evidence {
+    pub n: u32,
+    pub modulus: u64,
+    pub b: u64,
+    pub target_x: u64,
+    pub codes: [u64; 2],
+    pub values: [u64; 8],
+    pub coordinate_anfs: Vec<u8>,
+}
+pub(super) fn evidence(
+    built: &Constructed,
+    admission: &mut impl OriginalAdmission,
+) -> Result<Evidence, Failure> {
+    admission.reserve(Quote {
+        work: 4096 + 61 * 8 * 16,
+        bytes: 128,
+    })?;
+    admission.check_deadline()?;
+    if !(2..=61).contains(&built.n)
+        || built.equations.len() != built.n as usize
+        || built.equations.iter().any(|p| {
+            p.n_vars != 3
+                || p.terms.len() > 8
+                || p.terms.iter().any(|m| m.mask > 7)
+                || !p.is_canonical()
+        })
+    {
+        return Err(Failure::Input);
+    }
+    let mut coordinate_anfs = Vec::new();
+    coordinate_anfs
+        .try_reserve_exact(built.equations.len())
+        .map_err(|_| Failure::Allocation)?;
+    for p in &built.equations {
+        let mut bits = 0u8;
+        for term in &p.terms {
+            bits |= 1u8 << term.mask;
+        }
+        coordinate_anfs.push(bits);
+    }
+    Ok(Evidence {
+        n: built.n,
+        modulus: built.modulus,
+        b: built.b,
+        target_x: built.target_x,
+        codes: built.codes,
+        values: built.values,
+        coordinate_anfs,
+    })
+}
+pub(super) fn verify_evidence(
+    input: &Input<'_>,
+    saved: &Evidence,
+    admission: &mut impl OriginalAdmission,
+) -> Result<(), Failure> {
+    // Decode allocation is bounded and charged before constructing polynomials.
+    admission.reserve(Quote {
+        work: 16384,
+        bytes: 61
+            * (std::mem::size_of::<F2BoolPoly>() + 8 * std::mem::size_of::<F2BoolMono>()) as u64,
+    })?;
+    admission.check_deadline()?;
+    if saved.n > 61 || saved.coordinate_anfs.len() != saved.n as usize {
+        return Err(Failure::Input);
+    }
+    let mut equations = Vec::new();
+    equations
+        .try_reserve_exact(saved.n as usize)
+        .map_err(|_| Failure::Allocation)?;
+    for &bits in &saved.coordinate_anfs {
+        let mut terms = Vec::new();
+        terms
+            .try_reserve_exact(8)
+            .map_err(|_| Failure::Allocation)?;
+        for bit in 0..8 {
+            if bits & (1 << bit) != 0 {
+                terms.push(F2BoolMono::from_mask(bit as Mask));
+            }
+        }
+        terms.sort_unstable_by(|a, b| cmp_mono(*b, *a));
+        equations.push(F2BoolPoly { terms, n_vars: 3 });
+    }
+    let built = Constructed {
+        n: saved.n,
+        modulus: saved.modulus,
+        b: saved.b,
+        target_x: saved.target_x,
+        codes: saved.codes,
+        values: saved.values,
+        equations,
+    };
+    verify(input, &built, admission)
+}
+
 fn word(e: &F2mElement, n: u32) -> Result<u64, Failure> {
     if e.m_value() != n || e.raw_bits().len() != 1 || e.raw_bits()[0] >> n != 0 {
         return Err(Failure::Input);

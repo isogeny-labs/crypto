@@ -1412,8 +1412,9 @@ fn finish_worker_solver_artifacts(
     measurement: Result<(), String>,
 ) -> Result<Value, String> {
     if let Err(error) = measurement {
-        let native = data.outcome["adapter_id"] == "koblitz-m3-native-v1"
-            && data.outcome["strategy"] == "koblitz-m3-native-v1";
+        let native = ["koblitz-m3-native-v1", "binary-m3-native-v1"]
+            .into_iter()
+            .any(|id| data.outcome["adapter_id"] == id && data.outcome["strategy"] == id);
         // No new pending writes after a telemetry failure. Already acknowledged
         // roots remain in the registry before handling the censored outcome.
         data.artifacts.clear();
@@ -1457,6 +1458,9 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
     }
     let mut known_answer = false;
     let mut factor_base_verified = false;
+    // Keep residual owner bytes and actual rejected receipts alive through
+    // result/registry finalization, including telemetry failure. No retry.
+    let mut retained_solver_custody = solvers::WorkerResidualCustody::default();
     let result = (|| {
         let case = telemetry::measured(&out, &mut registry, "curve-construction", || {
             curves::generate(config)
@@ -1508,7 +1512,8 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
                     .unwrap_or_else(|| "solver returned no output".into()))
             }
         };
-        let (data, stored) = solved.into_parts();
+        let (data, stored, residual) = solved.into_parts();
+        retained_solver_custody = residual;
         finish_worker_solver_artifacts(&out, &mut registry, data, stored, measurement)
     })();
     let mut outcome = match result {
@@ -1530,6 +1535,9 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
         "artifact-registry",
         &registry,
     )?;
+    // Owner destruction is after finalization; failed raw storage is recorded
+    // as censored in the outcome, never silently retried or called durable.
+    drop(retained_solver_custody);
     Ok(())
 }
 
@@ -2694,6 +2702,14 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     // Reserved Koblitz artifacts must be checked even if strategy/labels were
     // stripped, and even when optional known-answer replay was not requested.
     solvers::verify_koblitz_m3_cell(
+        dir,
+        &manifest.config,
+        &manifest.outcome,
+        &manifest.artifacts,
+    )?;
+    // Reserved ordinary paths/roles cannot evade semantic replay by removing
+    // strategy labels or disabling optional known-answer replay.
+    solvers::verify_ordinary_m3_cell(
         dir,
         &manifest.config,
         &manifest.outcome,

@@ -8,6 +8,17 @@ use std::time::{Duration, Instant};
 
 #[path = "koblitz_m3_causal.rs"]
 mod causal_projection;
+#[path = "binary_m3_causal.rs"]
+mod ordinary_causal_projection;
+pub(super) fn project_ordinary_worker_prefixes(
+    dir: &std::path::Path,
+    config: &crate::ml_dataset::types::CaseConfig,
+    outcome: &serde_json::Value,
+    artifacts: &[crate::ml_dataset::types::Artifact],
+    emit: &mut impl FnMut(Option<serde_json::Value>, serde_json::Value) -> Result<(), String>,
+) -> Result<serde_json::Value, String> {
+    ordinary_causal_projection::project(dir, config, outcome, artifacts, emit)
+}
 
 /// Source-authenticated group examples; matrix/construction projection remains
 /// explicitly unavailable. Exporter integration needs its own policy validation.
@@ -69,6 +80,8 @@ pub(super) struct NativeLimits {
 /// One ledger per original attempt. No phase refunds cumulative reservations.
 #[derive(Debug)]
 pub(super) struct Budget {
+    // Process-local ownership token, never a scientific measured counter.
+    ownership_id: u64,
     native_work_limit: u64,
     memory_limit: u64,
     trace_limit: u64,
@@ -107,7 +120,16 @@ impl Budget {
             .checked_add(Duration::from_secs(5))
             .ok_or(Stop::Overflow)?
             .min(original_deadline);
+        static NEXT_OWNERSHIP: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
+        let ownership_id = NEXT_OWNERSHIP
+            .fetch_update(
+                std::sync::atomic::Ordering::Relaxed,
+                std::sync::atomic::Ordering::Relaxed,
+                |id| id.checked_add(1),
+            )
+            .map_err(|_| Stop::Overflow)?;
         Ok(Self {
+            ownership_id,
             native_work_limit: work.min(NATIVE_WORK_MAX),
             memory_limit: memory_bytes,
             trace_limit: trace_bytes,
@@ -641,20 +663,50 @@ where
         &mut Budget,
     ) -> Result<(), ()>,
 {
-    use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native;
     let PersistedInput {
         output,
         budget,
         bytes,
     } = input;
+    let (report, adapter_stop) = matrix_equations(
+        &output.equations,
+        output.n_vars,
+        budget,
+        engine,
+        degree,
+        forward,
+    );
+    MatrixStep {
+        original_bytes: bytes,
+        report,
+        adapter_stop,
+    }
+}
+
+// Only authenticated persisted owners call this shared invocation body. It
+// neither mints an input token nor publishes any family-specific native event.
+fn matrix_equations<F>(
+    equations: &[crate::cryptanalysis::pq_groebner_f2::F2BoolPoly],
+    n_vars: usize,
+    budget: &mut Budget,
+    engine: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Engine,
+    degree: u32,
+    forward: &mut F,
+) -> (
+    Option<crate::cryptanalysis::koblitz_groebner::bounded_matrix::Report>,
+    Option<Stop>,
+)
+where
+    F: FnMut(
+        &crate::cryptanalysis::koblitz_groebner::bounded_matrix::Event,
+        &mut Budget,
+    ) -> Result<(), ()>,
+{
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native;
     let limits = match budget.begin_native(true, Instant::now()) {
         Ok(limits) => limits,
         Err(stop) => {
-            return MatrixStep {
-                original_bytes: bytes,
-                report: None,
-                adapter_stop: Some(stop),
-            }
+            return (None, Some(stop));
         }
     };
     let deadline = budget.deadline;
@@ -682,8 +734,8 @@ where
     };
     let report = match engine {
         native::Engine::F4Macaulay => native::matrix_f4_f2_bounded(
-            &output.equations,
-            output.n_vars,
+            equations,
+            n_vars,
             degree,
             native_limits,
             deadline,
@@ -691,8 +743,8 @@ where
         ),
         native::Engine::F5KoszulFrobenius => {
             crate::cryptanalysis::matrix_f5_f2::matrix_f5_f2_bounded(
-                &output.equations,
-                output.n_vars,
+                equations,
+                n_vars,
                 degree,
                 native_limits,
                 deadline,
@@ -713,11 +765,7 @@ where
         // native failure recorded in the sticky ledger to the pipeline caller.
         Some(*budget.stopped.get_or_insert(Stop::NativeFailure))
     };
-    MatrixStep {
-        original_bytes: bytes,
-        report: Some(report),
-        adapter_stop,
-    }
+    (Some(report), adapter_stop)
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
@@ -2018,6 +2066,36 @@ pub(super) fn verify_signed_replay(
     input_sha256: &str,
     addition_limit: u64,
 ) -> Result<PrefixAssessment, String> {
+    verify_signed_replay_profile(
+        bytes,
+        original,
+        binding,
+        public_sha256,
+        factor_base_sha256,
+        input_sha256,
+        addition_limit,
+        super::binary_m3_original::Profile::Koblitz,
+    )
+}
+
+fn verify_signed_replay_profile(
+    bytes: &[u8],
+    original: &MathInput,
+    binding: &super::super::capture::AttemptBinding,
+    public_sha256: &str,
+    factor_base_sha256: &str,
+    input_sha256: &str,
+    addition_limit: u64,
+    profile: super::binary_m3_original::Profile,
+) -> Result<PrefixAssessment, String> {
+    let expected_schema = match profile {
+        super::binary_m3_original::Profile::Koblitz => {
+            "crypto.ml-dataset.koblitz-m3-signed-prefix/v1"
+        }
+        super::binary_m3_original::Profile::OrdinaryBinary => {
+            "crypto.ml-dataset.binary-m3-signed-prefix/v1"
+        }
+    };
     if bytes.len() > SIGNED_REPLAY_BYTE_CAP {
         return Err("signed replay exceeds byte cap".into());
     }
@@ -2025,7 +2103,7 @@ pub(super) fn verify_signed_replay(
         serde_json::from_slice(bytes).map_err(|e| format!("strict signed replay: {e}"))?;
     saved.binding.validate()?;
     let hash_valid = |s: &str| s.len() == 64 && s.bytes().all(|b| b.is_ascii_hexdigit());
-    if saved.schema != "crypto.ml-dataset.koblitz-m3-signed-prefix/v1"
+    if saved.schema != expected_schema
         || saved.binding != *binding
         || !hash_valid(public_sha256)
         || !hash_valid(factor_base_sha256)
@@ -10573,9 +10651,20 @@ fn verify_parent_delivery(
 // Native source review: F2mElement::from_bit_positions uses inline Words for
 // n<=61; it avoids temporary BigUint digit vectors. Worker verification already
 // checks irreducibility, curve/order, subgroup and factor-base mathematics.
+#[path = "binary_m3_construction.rs"]
+pub(super) mod ordinary_construction;
+
 fn decode_verified_worker_math(
     token: &super::VerifiedWorkerOriginal<'_>,
     budget: &mut Budget,
+) -> Result<MathInput, Stop> {
+    decode_verified_profile_math(token, budget, super::binary_m3_original::Profile::Koblitz)
+}
+
+fn decode_verified_profile_math(
+    token: &super::VerifiedWorkerOriginal<'_>,
+    budget: &mut Budget,
+    profile: super::binary_m3_original::Profile,
 ) -> Result<MathInput, Stop> {
     use crate::binary_ecc::{BinaryCurve, BinaryPoint, F2mElement, IrreduciblePoly};
     use num_bigint::BigUint;
@@ -10596,12 +10685,12 @@ fn decode_verified_worker_math(
         let p = token.public;
         let base = token.factor_base;
         if token.binding.is_none()
-            || c.family != "koblitz"
+            || c.family != profile.family()
             || c.m != 3
             || !((23..=31).contains(&c.n) || (47..=61).contains(&c.n))
             || token.public_bytes > 64 * 1024
             || token.factor_base_bytes > 128 * 1024
-            || p["family"] != "koblitz"
+            || p["family"] != profile.family()
             || p["n"].as_u64() != Some(c.n as u64)
             || p["m"].as_u64() != Some(3)
             || p["twist"].as_bool() != Some(c.twist)
@@ -10635,7 +10724,8 @@ fn decode_verified_worker_math(
             Ok((x, y))
         };
         let a = word(&p["curve"]["a"])?;
-        if a >= q || word(&p["curve"]["b"])? != 1 {
+        let b = word(&p["curve"]["b"])?;
+        if a >= q || b >= q || !profile.accepts_b(Some(b)) {
             return Err(Stop::InvalidLimits);
         }
         let generator = point(&p["generator"])?;
@@ -10707,7 +10797,7 @@ fn decode_verified_worker_math(
                     low_terms,
                 },
                 a: element(a),
-                b: element(1),
+                b: element(b),
                 generator: BinaryPoint::Affine {
                     x: element(generator.0),
                     y: element(generator.1),
@@ -12387,7 +12477,8 @@ mod worker_central_replay_tests {
                         run_verified_worker_entry(&token, &context, &f.binding, &capture_limits)
                     })
                     .unwrap();
-                    let (data, roots) = output.into_parts();
+                    let (data, roots, residual) = output.into_parts();
+                    assert!(residual.items.is_empty());
                     assert!(
                         data.artifacts.is_empty(),
                         "runtime must not hand duplicate payloads to worker"
@@ -13054,6 +13145,77 @@ fn guard_worker_terminal(v: &serde_json::Value) -> Result<usize, Stop> {
     worker_terminal_encoded_size(v, WORKER_TERMINAL_CAP)
 }
 
+fn guard_worker_terminal_profile(
+    profile: super::binary_m3_original::Profile,
+    v: &serde_json::Value,
+) -> Result<usize, Stop> {
+    if matches!(profile, super::binary_m3_original::Profile::Koblitz) {
+        return guard_worker_terminal(v);
+    }
+    let object = v.as_object().ok_or(Stop::Serialization)?;
+    if object.len() > 64 {
+        return Err(Stop::Serialization);
+    }
+    for (key, value) in object {
+        let valid = match key.as_str() {
+            "adapter_id" | "strategy" => value == "binary-m3-native-v1",
+            "reason" => {
+                value.is_null()
+                    || value
+                        .as_str()
+                        .is_some_and(|s| s.len() <= 128 && s.is_ascii())
+            }
+            "unpublished_retained_bytes" | "unpublished_owner_count" => value.as_u64().is_some(),
+            "untransferred_root_present" | "scalar_recovered_without_witness" => value.is_boolean(),
+            "residual_custody_scope" => value
+                == "owned through parent result and registry finalization; not durable publication",
+            "live_persistence_errors" => value.as_array().is_some_and(|errors| {
+                errors.len() <= 2
+                    && errors
+                        .iter()
+                        .all(|e| e == "ordinary final capture delivery incomplete")
+                    && worker_terminal_encoded_size(value, 512).is_ok()
+            }),
+            "capture_finalization" => {
+                worker_terminal_named_object(
+                    value,
+                    &[
+                        "event_attempted",
+                        "event_acknowledged",
+                        "finish_attempted",
+                        "finish_acknowledged",
+                        "stop",
+                    ],
+                    |key, value| {
+                        if key == "stop" {
+                            worker_terminal_stop(value)
+                        } else {
+                            value.is_boolean()
+                        }
+                    },
+                ) && worker_terminal_encoded_size(value, 256).is_ok()
+            }
+            _ => WORKER_TERMINAL_SCALARS
+                .iter()
+                .find(|(name, _)| *name == key)
+                .is_some_and(|(_, kind)| match kind {
+                    WorkerTerminalKind::Bool => value.is_boolean(),
+                    WorkerTerminalKind::U64 => value.as_u64().is_some(),
+                    WorkerTerminalKind::Null => value.is_null(),
+                    WorkerTerminalKind::Stop => worker_terminal_stop(value),
+                    WorkerTerminalKind::Fixed(expected) => value.as_str() == Some(*expected),
+                    WorkerTerminalKind::Status => {
+                        matches!(value.as_str(), Some("verified" | "partial"))
+                    }
+                }),
+        };
+        if !valid {
+            return Err(Stop::Serialization);
+        }
+    }
+    worker_terminal_encoded_size(v, WORKER_TERMINAL_CAP)
+}
+
 /// Dedicated capture proves a retained witness; ordinary PDP/certificate labels
 /// additionally require its canonical root to be accepted by the worker registry.
 fn apply_worker_witness_claims(
@@ -13073,6 +13235,24 @@ fn apply_worker_witness_claims(
 fn finalize_worker_capture(
     outcome: &mut serde_json::Value,
     budget: &mut Budget,
+    now: impl FnMut() -> Instant,
+    event: impl FnMut(&serde_json::Value) -> Result<(), String>,
+    finish: impl FnMut() -> Result<(), String>,
+) {
+    finalize_worker_capture_profile(
+        super::binary_m3_original::Profile::Koblitz,
+        outcome,
+        budget,
+        now,
+        event,
+        finish,
+    )
+}
+
+fn finalize_worker_capture_profile(
+    profile: super::binary_m3_original::Profile,
+    outcome: &mut serde_json::Value,
+    budget: &mut Budget,
     mut now: impl FnMut() -> Instant,
     mut event: impl FnMut(&serde_json::Value) -> Result<(), String>,
     mut finish: impl FnMut() -> Result<(), String>,
@@ -13086,7 +13266,7 @@ fn finalize_worker_capture(
     let mut finish_acknowledged = false;
     if now() >= budget.deadline {
         stop = Some(Stop::Deadline);
-    } else if guard_worker_terminal(outcome).is_err() {
+    } else if guard_worker_terminal_profile(profile, outcome).is_err() {
         // No clone, event or finish on a failed invariant. Preserve the complete
         // input Value and moved receipts for failure custody, never truncate.
         stop = Some(Stop::Serialization);
@@ -13143,7 +13323,12 @@ fn finalize_worker_capture(
             outcome[key] = false.into();
         }
         outcome["status"] = json!("partial");
-        let error = json!("Koblitz final capture delivery incomplete");
+        let error = json!(match profile {
+            super::binary_m3_original::Profile::Koblitz =>
+                "Koblitz final capture delivery incomplete",
+            super::binary_m3_original::Profile::OrdinaryBinary =>
+                "ordinary final capture delivery incomplete",
+        });
         match outcome
             .get_mut("live_persistence_errors")
             .and_then(|v| v.as_array_mut())
@@ -13163,7 +13348,7 @@ fn finalize_worker_capture(
     // A final count covers fields added after capture finish. No second capture
     // or storage attempt is allowed. A current-constructor outcome is bounded;
     // a schema invariant failure remains an explicit censored retained Value.
-    if guard_worker_terminal(outcome).is_err() {
+    if guard_worker_terminal_profile(profile, outcome).is_err() {
         budget.stopped.get_or_insert(Stop::Serialization);
         outcome["first_stop"] = json!(budget.stopped);
         // Preserve the first finalization stop (especially an expired-entry
@@ -13414,13 +13599,13 @@ fn verify_reported_capture_finalization(outcome: &serde_json::Value) -> Result<(
 // Append inside koblitz_m3.rs. Requires positive fixture and witness collision
 // patches. These are conditioned software controls, not unconditioned samples.
 #[cfg(test)]
-mod positive_original_bound_worker_tests {
+pub(super) mod positive_original_bound_worker_tests {
     use super::*;
     use crate::ml_dataset::solvers::{self, verified_worker_original_tests::Fixture};
     use crate::ml_dataset::{self as dataset, capture, execution, storage, telemetry};
     use serde_json::json;
 
-    fn positive_original(
+    pub(super) fn positive_original(
         config: &crate::ml_dataset::types::CaseConfig,
     ) -> Result<crate::ml_dataset::types::CaseData, String> {
         if config.n != 23 || config.m != 3 || config.factor_base_size != 4 {
@@ -13591,7 +13776,8 @@ mod positive_original_bound_worker_tests {
                 })
                 .unwrap();
                 assert!(solvers::LIVE_SINK.with(|slot| slot.borrow().is_none()));
-                let (data, roots) = output.into_parts();
+                let (data, roots, residual) = output.into_parts();
+                assert!(residual.items.is_empty());
                 assert!(data.artifacts.is_empty());
                 assert!(roots.iter().all(|a| a.path != "pdp-witness.json"));
                 for a in roots {
@@ -14622,5 +14808,39 @@ mod signed_event_closed_wire_tests {
                 .len() as u64
         );
         assert_eq!(SIGNED_EVENT_BUFFER_CAP, 2048);
+    }
+}
+
+#[cfg(test)]
+mod ordinary_terminal_nested_guard_tests {
+    use super::*;
+    use serde_json::json;
+    #[test]
+    fn ordinary_finalization_accepts_closed_nested_shape_and_rejects_extensions() {
+        let profile = super::super::binary_m3_original::Profile::OrdinaryBinary;
+        let good = json!({"adapter_id":"binary-m3-native-v1",
+            "capture_finalization":{"event_attempted":true,"event_acknowledged":true,
+            "finish_attempted":true,"finish_acknowledged":true,"stop":null}});
+        assert!(guard_worker_terminal_profile(profile, &good).is_ok());
+        for key in [
+            "event_attempted",
+            "event_acknowledged",
+            "finish_attempted",
+            "finish_acknowledged",
+        ] {
+            let mut bad = good.clone();
+            bad["capture_finalization"][key] = json!(1);
+            assert!(guard_worker_terminal_profile(profile, &bad).is_err());
+        }
+        let mut bad = good.clone();
+        bad["capture_finalization"]["extra"] = json!(true);
+        assert!(guard_worker_terminal_profile(profile, &bad).is_err());
+        let mut bad = good.clone();
+        bad["live_persistence_errors"] = json!(["foreign error"]);
+        assert!(guard_worker_terminal_profile(profile, &bad).is_err());
+        let mut partial = good;
+        partial["live_persistence_errors"] = json!(["ordinary final capture delivery incomplete"]);
+        partial["capture_finalization"]["stop"] = json!(Stop::Work);
+        assert!(guard_worker_terminal_profile(profile, &partial).is_ok());
     }
 }

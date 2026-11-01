@@ -8,13 +8,13 @@ pub(super) enum Profile {
     OrdinaryBinary,
 }
 impl Profile {
-    fn family(self) -> &'static str {
+    pub(super) fn family(self) -> &'static str {
         match self {
             Self::Koblitz => "koblitz",
             Self::OrdinaryBinary => "binary",
         }
     }
-    fn accepts_b(self, b: Option<u64>) -> bool {
+    pub(super) fn accepts_b(self, b: Option<u64>) -> bool {
         match self {
             Self::Koblitz => b == Some(1),
             Self::OrdinaryBinary => b.is_some_and(|b| b != 0),
