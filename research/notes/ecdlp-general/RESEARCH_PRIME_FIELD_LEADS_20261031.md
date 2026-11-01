@@ -259,7 +259,52 @@ sentence that claims a speedup not admitted by a counted measurement.
 
 ## 5. Outcomes
 
-Pending; filled by the synthesis step of the workflow.
+Written 2026-11-01 by the synthesis step, from the per-lead directories under
+`research/prime_field_leads_20261031/` (status table also in `SYNTHESIS.md`
+there). The workflow (`workflow.js`, run `wf_c23b552f-88c`) was stopped by host
+load (load average 137 to 430 on 14 cores) before its synthesis stage; L2a,
+L2b and C2 lost their agents mid-run and were read from what they had written
+to disk. No lead admits a speedup, an exponent change or a scoreboard change.
+Every decision below is the one the frozen rule in `PLAN.md` gives on the data
+in the directory; none was moved after the data.
+
+| Lead | Status | Decision | Counted result or derived statement |
+|---|---|---|---|
+| L1 | done (derivation) | writeup | Theorem 1 (direct presentation): cost ≥ c_m · r given H_C, H_E. Theorem 2 (tower): cost ≥ r^{1/2 − o(1)} iff the solving-degree slope clears c ≥ (m − 1)/2, given H_T, H_C, H_E. Four gaps named (A4 tower degree growth, B4 generic floor, C3 sub-base, E3 adaptive targets). Full text `RESEARCH_ALGEBRAIC_IC_LOWER_BOUND.md`. |
+| L2a | partial (s = 6..11 of 6..12) | does not reopen; G closes | e = 1.98 [1.94, 2.01] (group MITM), 2.21 [2.16, 2.24] (S₄ root finding), 3.21 [3.00, 3.40] (triple scan, 3 points); threshold to beat rho at m = 3 is e < 0.5. 96 attempts per s per arm, no cell hit the stop guard. |
+| L2b | incomplete | none | One ladder cell (p = 65521, control arm) plus five real-arm probe cells; two probes timed out at 600 s. Maximal step degree N + 8 in every completed cell of either arm. No trajectory ratio can be formed. |
+| L3 | done (write-up) | writeup | Bernstein–Lange: precomputation 2^{170.7} (P-256), 2^{168} (Curve25519), 2^{86.8} (ECCp-131) against rho 2^{128}, 2^{126}, 2^{65.1}; online ℓ^{1/3} after it. Kuhn–Struik total √(2kℓ) is tight. Not a break. Section added to `RESEARCH_ECDLP_STATE_OF_THE_ART.md`. |
+| C1 | done (derivation) | closes | For p ∤ N the reduction sequence splits on every good lift, with a unique homomorphic section; every additive p-adic functional vanishes on it. Corrections to the lead text: "canonical" → "unique per lift"; non-splitting is "p \| N, lift-dependent", not only N = p; the CM field degree is N^{1 to 2}, not N. |
+| C2 | done | null_confirmed | Crater/floor counted-work ratio 0.9998 (M, B = 47) and 1.000 (S, B = 12), spreads overlapping; msolve maximal step degree equal on both sides (20 on S at completion, 55 on M on the 95-round common prefix; 11 of 16 M cells timed out at 420 s). Weakness stated in advance: about three quarters of the counted work is fixed by B. |
+| C3 | done (table) | writeup | Mass gain ≤ 1/f and screen budget p^{1/2 − 1/m} leave an empty window at m = 3 and one boundary point at m = 4 (needed f ≤ p^{−1/m}). Of 18 catalogue mechanisms: 6 close, 6 are sieve-pricing only, 3 unaffected, 3 not scored. |
+| C4 | done | null_confirmed | Additive energy of the interval base against a negation-closed random null: ratio 0.993 to 1.013 at m = √N and N^{1/3}, p from 2^{12} to 2^{18}, 8 curves per p, within one curve-to-curve sd everywhere, slope against log₂ p below 10^{−4} per bit. Against a plain null the ratio is 4/3 and 3/2 by exact bookkeeping. |
+| C5 | done (write-up) | writeup | Doubling is a degree-4 map on x, x ↦ 2x is not a curve map, and no proper subset of a prime-order group is addition-closed; special prime shapes touch the field multiplication only. Rational 2-torsion Möbius action left to `LEAD-ICP-xline-symmetry-special-j`. |
+
+What the round adds to the record:
+
+- The MITM arithmetic of §2 is now measured at one point: at m = 3 the
+  counted cost per decomposition attempt has slope 2 for the group
+  meet-in-the-middle and slope 2.2 for the algebraic S₄ arm, four times the
+  exponent that would beat rho. The SAT/SMT encodings named in L2a were not
+  the arm run; that remains the one unmeasured encoding.
+- L1 turns the record into two conditional theorems and names exactly which
+  hypothesis each still rests on; the tower case is decided by a solving-degree
+  slope bar that no record proves or refutes. L2b was the measurement aimed at
+  that bar and did not complete.
+- C1, C3 and C5 are closures by derivation; C2 and C4 are nulls by counted
+  measurement at toy scale. C2 retires the solve-cost side of the CM-panel
+  question at one volcano; the yield side of the atlas card stays blocked.
+- The C1 argument also corrects the P-256 note's wording: the vanishing of the
+  Smart-type functional needs the choice of the torsion section, not a
+  canonical lift.
+
+Not done, and what finishing it needs: L2a s = 12 (both arms, about an hour of
+one core per curve for the S arm at s = 11 extrapolated); the L2b ladder as
+frozen in `run_ladder.sh` on a quiet host, where the k = 18 and k = 20 real-arm
+cells will exceed 600 s; the C2 msolve leg on M to completion (16 cells at
+more than 420 s each). None of these changes the reading unless L2b returns a
+flat real-arm trajectory against a growing control, which is the one open
+falsifier of this round.
 
 ## 6. What this note does not claim
 
