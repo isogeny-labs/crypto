@@ -13,7 +13,7 @@ On the canonical model $y^2 = x^3 + b_0 t^3$, candidate $(j, k)$ of a class is $
 - *Representative identity*: 0 mismatches over 39,936 order-24 class members (both cheap variants) and 9,984 order-6 members (200 random points of $chevron.l G chevron.r$ plus 8 forced $x_0 = 0$ points per curve), $"rep" = [m]P$ on every scalar check. No curve has a point with $x = 0$.
 - *Walk identity*: 768 of 768 cheap walks equal their built walk (steps, group operations, escapes, log, correctness, visit digest).
 - *Negative controls*: omitted candidate 3,328 of 39,936 mismatches and digest differs on 16 of 16 walks; wrong ordinate 39,936 of 39,936 mismatches.
-- *Unit tests* written but not run: the crate's test build fails on another experiment's committed test (`klein_v4.rs`, E0369). Clippy and rustfmt pass on E34's files.
+- *Unit tests*: 3 of 3 pass (`cargo test --release --lib twist24_rep`). Clippy and rustfmt pass on E34's files.
 
 == Measured (per step, schoolbook, $p >= 541$)
 Representative $FF_p$ products per call: E29 order 24 $86$–$92$, cheap $15.17$, mul-lean $10.17$, E29 order 6 $8.00$, cheap order 6 $4.00$. Multiplications per step: cheap order 24 $117.2$–$120.2$ against $109.1$–$111.2$ (E29 order 6). Native operations per step: $25.8$ (cheap order 24; $13.95$ comparisons), $16.8$ (E29 order 6), $65.3$ (E29 order 24, of which $40.6$ mod-$n$).

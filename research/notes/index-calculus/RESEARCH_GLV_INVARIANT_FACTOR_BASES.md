@@ -3892,7 +3892,7 @@ ratio `1.29`–`2.10` per curve, `1.701` pooled), not the representative.
 | id | result | verdict |
 |:--|:--|:--|
 | G2.134 | `0` mismatches on `49,920` members; both controls caught on all eight curves | **holds** (the `x = 0` case has no point to test) |
-| G2.135 | `512/512` E29 records identical; E29's functions untouched (the unit test `e34_built_arms_reproduce_e29_walks` is written but not run: see below) | **holds** (registered count `256` was per arithmetic) |
+| G2.135 | `512/512` E29 records identical; E29's functions untouched; unit test `e34_built_arms_reproduce_e29_walks` passes | **holds** (registered count `256` was per arithmetic) |
 | G2.136 | `768/768` | **holds** |
 | G2.137 | `16/16` | **holds** |
 | G2.138 | `8.00`; `4.00`; `86`–`92`; `15.16`–`15.18`; `10.17`–`10.18`; equal in both arithmetics | **holds** |
@@ -3910,10 +3910,7 @@ cheaper representative is `1.035`–`1.039×` at `0` GAE; the rest is the order-
 correction, not an improvement**: no index-calculus cost changed, the rho reference got stronger.  §9.33's "lower
 bounds at `1` GAE" now has a value.
 
-**Unit tests.**  `twist24_rep::tests` (built arms = E29's walks with E29's functions; cheap walks = built walks; cheap
-representatives = E29's, both controls caught) are written but could not be run: the crate's test build fails on
-E33's committed test in `src/cryptanalysis/klein_v4.rs` (`2095`–`2122`, a 13-element tuple comparison, `E0369`).
-The same assertions hold on the full Stage R records above.  Clippy (no warning in E34's files; one `is_multiple_of` rewrite after the runs, behaviour-identical) and rustfmt pass.
+**Unit tests.**  `cargo test --release --lib twist24_rep`: `3` passed (`e34_built_arms_reproduce_e29_walks`: the counted copies equal `rho4_folded_with` / `rho_twist24_with` on `p = 241`, both arithmetics, with the positive control of `8` products per order-6 representative; `e34_cheap_arms_give_e29s_walks`; `e34_cheap_representatives_equal_e29s_and_controls_are_caught`), run after E33's compile fix of the crate's test build (`c689d1982`).  Clippy (no warning in E34's files; one `is_multiple_of` rewrite after the runs, behaviour-identical) and rustfmt pass.
 
 **What it says.**  The order-24 action is the stronger rho on E18's `j = 0` curves once its class representative is
 built as the coordinate-wise structure allows: `15` multiplications instead of `86`–`92`, so a step costs `7–10 %`
