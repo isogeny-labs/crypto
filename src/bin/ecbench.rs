@@ -2,6 +2,8 @@
 //!
 //! ```text
 //! ecbench methods                      what can be measured
+//! ecbench optimize inventory           registry-wide optimization coverage
+//! ecbench optimize audit --development S... --holdout H...
 //! ecbench host                         the host capsule and its class id
 //! ecbench plan   --spec S              validate a spec, print its workloads and identities
 //! ecbench run    --spec S --out D      run a session (pinned, interleaved, sealed records)
@@ -46,8 +48,8 @@ use clap::{Parser, Subcommand};
 
 use crypto_lib::cryptanalysis::ecbench::{
     audit, bounds, calibration, callgrind, canonical, challenge, claim, compare, db, fbm, frontier,
-    full_price, gpu, host, isolab, isolation, methods, record, resources, runner, signals, spec,
-    stats, trend, wordram_price, workload,
+    full_price, gpu, host, isolab, isolation, methods, optimization, record, resources, runner,
+    signals, spec, stats, trend, wordram_price, workload,
 };
 
 #[derive(Parser)]
@@ -195,6 +197,8 @@ enum Cmd {
         #[arg(long)]
         json: bool,
     },
+    /// Inventory and audit the registry-wide optimization loop.
+    Optimize(OptimizeArgs),
     /// Measure the full-pricing units (src/cryptanalysis/ecbench/full_prices.json) on
     /// this host for Koblitz curves `a:n`, median of `reps` passes each.
     PriceUnits {
@@ -519,6 +523,37 @@ enum Cmd {
     Challenge {
         #[command(subcommand)]
         cmd: ChallengeCmd,
+    },
+}
+
+#[derive(clap::Args)]
+struct OptimizeArgs {
+    #[command(subcommand)]
+    action: OptimizeAction,
+}
+
+#[derive(Subcommand)]
+enum OptimizeAction {
+    /// List every registered method, tuning role, and nested solver/engine.
+    Inventory {
+        /// Print the machine-readable inventory instead of the compact table.
+        #[arg(long)]
+        json: bool,
+    },
+    /// Audit adaptive-development and fresh-holdout ecbench specs.
+    Audit {
+        /// Development specs; every live method/engine belongs here before
+        /// `--require-all` admits the campaign.
+        #[arg(long, num_args = 1.., required = true)]
+        development: Vec<PathBuf>,
+        /// Fresh winner-only confirmatory specs. Seeds must be disjoint from
+        /// development; holdouts require public targets and L2 isolation.
+        #[arg(long, num_args = 1..)]
+        holdout: Vec<PathBuf>,
+        /// Refuse admission unless development covers the live method registry,
+        /// every system solver, and every PDP3 F4/F5/F6/root-finding engine.
+        #[arg(long)]
+        require_all: bool,
     },
 }
 
@@ -1076,6 +1111,45 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 }
             }
         }
+        Cmd::Optimize(args) => match args.action {
+            OptimizeAction::Inventory { json } => {
+                if json {
+                    print_json(&optimization::inventory_json()?)?;
+                } else {
+                    let profiles = optimization::profiles()?;
+                    println!(
+                        "{:<43} {:<20} {:<21} {:>5}",
+                        "method", "search", "claim scope", "knobs"
+                    );
+                    for p in profiles {
+                        let knobs = p
+                            .parameters
+                            .iter()
+                            .filter(|parameter| parameter.role == optimization::ParameterRole::Knob)
+                            .count();
+                        println!(
+                            "{:<43} {:<20?} {:<21?} {:>5}",
+                            p.id, p.strategy, p.claim_scope, knobs
+                        );
+                    }
+                    println!(
+                        "\nUse `ecbench optimize inventory --json` for parameter roles and nested solvers/engines."
+                    );
+                }
+            }
+            OptimizeAction::Audit {
+                development,
+                holdout,
+                require_all,
+            } => {
+                let report = optimization::audit_campaign(&development, &holdout, require_all)?;
+                let admissible = report["admissible"].as_bool().unwrap_or(false);
+                print_json(&report)?;
+                if !admissible {
+                    return Ok(ExitCode::from(1));
+                }
+            }
+        },
         Cmd::PriceUnits { curve, reps } => {
             let mut rows = serde_json::Map::new();
             for c in &curve {

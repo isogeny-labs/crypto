@@ -1,0 +1,2406 @@
+{
+  "claim_scope_counts": {
+    "diagnostic_only": 12,
+    "frontier_eligible": 13,
+    "frozen_historical": 21,
+    "pricing_sensitivity": 6,
+    "specialized_domain": 26
+  },
+  "coverage_rule": "exact equality with the live method registry; new methods fail closed",
+  "development_rule": "adaptive/grid observations select candidates only and are never promotion evidence",
+  "method_count": 78,
+  "methods": [
+    {
+      "accounting_scope": "standard_band",
+      "applies": "prime_only",
+      "claim_scope": "specialized_domain",
+      "entry": "ecbench::aps::solve",
+      "family": "ic",
+      "id": "ic.aps_v1",
+      "parameters": [
+        {
+          "default": null,
+          "help": "partitioned3, unordered3, line3, expanded4, split4 or block_symmetric4",
+          "name": "encoding",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "exact (domains/factoring) or legacy (full-field scan)",
+          "name": "roots",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "exhaustive or first_informative; legacy requires exhaustive",
+          "name": "stop",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "random or guaranteed",
+          "name": "labels",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "1..4 seed abscissae per original partition",
+          "name": "subset_size",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "1..128 independent bases, including failed draws",
+          "name": "attempts",
+          "role": "resource_envelope"
+        },
+        {
+          "default": null,
+          "help": "F4 degree cap, 1..24",
+          "name": "degree",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "1..60000 cooperative milliseconds per complete attempt",
+          "name": "budget_ms",
+          "role": "resource_envelope"
+        },
+        {
+          "default": null,
+          "help": "1..10000 draws per attempt; aborted attempts retained",
+          "name": "sampling_draws",
+          "role": "resource_envelope"
+        },
+        {
+          "default": null,
+          "help": "none or cubic (certified order-three orbit expansion)",
+          "name": "orbit",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "field automorphism parameter; 0 when orbit=none",
+          "name": "beta",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "subgroup eigenvalue; 0 when orbit=none",
+          "name": "lambda",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "true only for certified cubic line3; otherwise false",
+          "name": "prune",
+          "role": "knob"
+        }
+      ],
+      "strategy": "native_adaptive"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "specialized_domain",
+      "entry": "three_leads::pencil::solve",
+      "family": "ic",
+      "id": "ic.three_leads_genus2_pencil_symbolic_v2",
+      "parameters": [
+        {
+          "default": null,
+          "help": "fixed symbolic small-base denominator: 2, 4, 8 or 16; no adaptive selection",
+          "name": "small_denominator",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "working and retained coefficient cap, 1000000..25000000; pencil has exactly 16 walks",
+          "name": "matrix_coefficient_cap",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_grid"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "specialized_domain",
+      "entry": "three_leads_followup::solve_genus2_choice2",
+      "family": "ic",
+      "id": "ic.three_leads_genus2_choice2_v1",
+      "parameters": [
+        {
+          "default": null,
+          "help": "deterministic maximum collision-search iterations; exhaustion is retained",
+          "name": "trial_cap",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "specialized_domain",
+      "entry": "three_leads_followup::solve_genus2_projective",
+      "family": "ic",
+      "id": "ic.three_leads_genus2_projective_chart_v1",
+      "parameters": [
+        {
+          "default": null,
+          "help": "deterministic maximum collision-search iterations; exhaustion is retained",
+          "name": "trial_cap",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "specialized_domain",
+      "entry": "three_leads_followup::solve_genus2_target_rank",
+      "family": "ic",
+      "id": "ic.three_leads_genus2_target_rank_v1",
+      "parameters": [
+        {
+          "default": null,
+          "help": "deterministic maximum collision-search iterations; exhaustion is retained",
+          "name": "trial_cap",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "specialized_domain",
+      "entry": "three_leads::solve_rho",
+      "family": "rho",
+      "id": "rho.three_leads_plain_v1",
+      "parameters": [
+        {
+          "default": null,
+          "help": "deterministic maximum collision-search iterations; exhaustion is retained",
+          "name": "trial_cap",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "specialized_domain",
+      "entry": "three_leads::solve_rho",
+      "family": "rho",
+      "id": "rho.three_leads_negation_v1",
+      "parameters": [
+        {
+          "default": null,
+          "help": "deterministic maximum collision-search iterations; exhaustion is retained",
+          "name": "trial_cap",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "specialized_domain",
+      "entry": "three_leads::solve_rho",
+      "family": "rho",
+      "id": "rho.three_leads_jacobian_v1",
+      "parameters": [
+        {
+          "default": null,
+          "help": "deterministic maximum collision-search iterations; exhaustion is retained",
+          "name": "trial_cap",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "specialized_domain",
+      "entry": "three_leads::solve_genus2_v2",
+      "family": "ic",
+      "id": "ic.three_leads_genus2_v2",
+      "parameters": [
+        {
+          "default": null,
+          "help": "deterministic maximum processed divisors",
+          "name": "trial_cap",
+          "role": "resource_envelope"
+        },
+        {
+          "default": null,
+          "help": "0: Jacobian walk; 1: independent source scalar combinations followed by tau",
+          "name": "independent",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "1 discards repeated divisors up to sign and charges walk restarts; 0 is the duplicate-permitting diagnostic",
+          "name": "unique_relations",
+          "role": "knob"
+        }
+      ],
+      "strategy": "native_adaptive"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "frozen_historical",
+      "entry": "three_leads::solve_genus2",
+      "family": "ic",
+      "id": "ic.three_leads_genus2_v1",
+      "parameters": [
+        {
+          "default": null,
+          "help": "deterministic maximum processed divisors",
+          "name": "trial_cap",
+          "role": "resource_envelope"
+        },
+        {
+          "default": null,
+          "help": "0: Jacobian walk; 1: independent source scalar combinations followed by tau",
+          "name": "independent",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "1 discards repeated divisors up to sign and charges walk restarts; 0 is the duplicate-permitting diagnostic",
+          "name": "unique_relations",
+          "role": "knob"
+        }
+      ],
+      "strategy": "replay_control"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "specialized_domain",
+      "entry": "three_leads::solve_subfield_or_pkm_v2",
+      "family": "ic",
+      "id": "ic.three_leads_decomposition_v2",
+      "parameters": [
+        {
+          "default": null,
+          "help": "maximum relation trials",
+          "name": "trial_cap",
+          "role": "resource_envelope"
+        },
+        {
+          "default": null,
+          "help": "linearized (binary subfield only), semaev (odd short models) or subtract",
+          "name": "oracle",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "0 structured base; 1 same-size random sign-orbit control",
+          "name": "random_base",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "fixed factor-base seed independent of target and algorithm seed",
+          "name": "base_seed",
+          "role": "seed"
+        }
+      ],
+      "strategy": "native_adaptive"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "frozen_historical",
+      "entry": "three_leads::solve_subfield_or_pkm",
+      "family": "ic",
+      "id": "ic.three_leads_decomposition_v1",
+      "parameters": [
+        {
+          "default": null,
+          "help": "maximum relation trials",
+          "name": "trial_cap",
+          "role": "resource_envelope"
+        },
+        {
+          "default": null,
+          "help": "linearized (binary subfield only), semaev (odd short models) or subtract",
+          "name": "oracle",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "0 structured base; 1 same-size random sign-orbit control",
+          "name": "random_base",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "fixed factor-base seed independent of target and algorithm seed",
+          "name": "base_seed",
+          "role": "seed"
+        }
+      ],
+      "strategy": "replay_control"
+    },
+    {
+      "accounting_scope": "diagnostic_model",
+      "applies": "prime_only",
+      "claim_scope": "diagnostic_only",
+      "entry": "ecbench::best2_model::solve(best2=false)",
+      "family": "rho",
+      "id": "rho.plus_model_v1",
+      "parameters": [
+        {
+          "default": null,
+          "help": "jump table size, 1..256",
+          "name": "jumps",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "parallel model lanes, 1..64",
+          "name": "walks",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "hashed distinguished-point bits, 0..24",
+          "name": "dp_bits",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "physical-step budget / sqrt(r)",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_grid"
+    },
+    {
+      "accounting_scope": "diagnostic_model",
+      "applies": "prime_only",
+      "claim_scope": "diagnostic_only",
+      "entry": "ecbench::best2_model::solve(best2=true)",
+      "family": "rho",
+      "id": "rho.best2_model_v1",
+      "parameters": [
+        {
+          "default": null,
+          "help": "jump table size, 1..256",
+          "name": "jumps",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "parallel model lanes, 1..64",
+          "name": "walks",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "hashed distinguished-point bits, 0..24",
+          "name": "dp_bits",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "physical-step budget / sqrt(r)",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_grid"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "frozen_historical",
+      "entry": "ic_boundary::rho_reference",
+      "family": "rho",
+      "id": "rho.frozen_reference",
+      "parameters": [
+        {
+          "default": "64",
+          "help": "step budget as a multiple of √r before the run counts as exhausted",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "replay_control"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "frozen_historical",
+      "entry": "ic_boundary::rho_walk_with(PointClasses, RhoWalk::plain())",
+      "family": "rho",
+      "id": "rho.plain",
+      "parameters": [
+        {
+          "default": "64",
+          "help": "step budget as a multiple of √r before the run counts as exhausted",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "replay_control"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "frozen_historical",
+      "entry": "ic_boundary::rho_walk_with(NegationClasses, RhoWalk::negation())",
+      "family": "rho",
+      "id": "rho.negation",
+      "parameters": [
+        {
+          "default": "64",
+          "help": "step budget as a multiple of √r before the run counts as exhausted",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "replay_control"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "specialized_domain",
+      "entry": "ecbench::negation_strong::NegStrongRho::solve",
+      "family": "rho",
+      "id": "rho.negation_strong",
+      "parameters": [
+        {
+          "default": null,
+          "help": "walks stepped in lockstep: the batch-inversion width (1 to 4096)",
+          "name": "lanes",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "distinguished-point bits (1 to 39), or `auto`: round(log2(√(πr/4))/2) from 1 to 20",
+          "name": "dp_bits",
+          "role": "knob"
+        },
+        {
+          "default": "64",
+          "help": "give up after this multiple of √(πr/4) walk steps (at least 10⁶)",
+          "name": "step_cap_factor",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_grid"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "prime_only",
+      "claim_scope": "diagnostic_only",
+      "entry": "ic_boundary::rho_batch_with(NegationClasses, RhoWalk::negation())",
+      "family": "rho",
+      "id": "rho.multitarget_pooled",
+      "parameters": [
+        {
+          "default": "64",
+          "help": "step budget per target as a multiple of √r before that target counts as unsolved",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        },
+        {
+          "default": null,
+          "help": "L, the number of targets pooled into one run: the record's target plus L − 1 public companions",
+          "name": "batch",
+          "role": "workload_scope"
+        }
+      ],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "prime_only",
+      "claim_scope": "diagnostic_only",
+      "entry": "ic_boundary::PreprocessingRho::{build, solve}(NegationClasses, RhoWalk::negation())",
+      "family": "rho",
+      "id": "rho.preprocessing",
+      "parameters": [
+        {
+          "default": null,
+          "help": "S, distinguished points kept in the target-blind table",
+          "name": "entries",
+          "role": "knob"
+        },
+        {
+          "default": "0",
+          "help": "distinguished-point bits; 0 takes round(log2 √(r/(2S)))",
+          "name": "dp_bits",
+          "role": "knob"
+        },
+        {
+          "default": "20261028",
+          "help": "seed of the jumps and the precomputation starts (target-independent)",
+          "name": "table_seed",
+          "role": "seed"
+        },
+        {
+          "default": "0",
+          "help": "bound on precomputation walk operations; 0 takes 64·√(r·S) + 2^20",
+          "name": "precompute_cap",
+          "role": "resource_envelope"
+        },
+        {
+          "default": "64",
+          "help": "online step budget as a multiple of √r before the run counts as exhausted",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_adaptive"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "specialized_domain",
+      "entry": "ecbench::fp4::solve_k4",
+      "family": "ic",
+      "id": "ic.k4_gaudry",
+      "parameters": [
+        {
+          "default": null,
+          "help": "`xline` ({P : x(P) ∈ F_p}) or `yline-d4` ({P : Y(P) ∈ F_p}, columns {±P, ±(P+T)})",
+          "name": "base",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "0 (full relations) or 2 (double large primes)",
+          "name": "large_primes",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "F_p multiplications charged per trial: the algebraic solve's measured cost (§11.17 S₄: 1.213e12; D₄: 2.54e10)",
+          "name": "c4",
+          "role": "identity_or_price"
+        },
+        {
+          "default": "0.75",
+          "help": "|F'| = ⌈|F|^lp_exponent⌉ when large_primes > 0 (Gaudry's |F|^{1−1/k})",
+          "name": "lp_exponent",
+          "role": "knob"
+        },
+        {
+          "default": "2000",
+          "help": "trials per column before the run counts as exhausted",
+          "name": "trial_cap",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_adaptive"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "frozen_historical",
+      "entry": "ic_boundary::CubicClasses with RhoWalk::negation()",
+      "family": "rho",
+      "id": "rho.cubic",
+      "parameters": [
+        {
+          "default": "64",
+          "help": "step budget as a multiple of √r before the run counts as exhausted",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "replay_control"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "frozen_historical",
+      "entry": "ic_boundary::QuarticClasses with RhoWalk::negation()",
+      "family": "rho",
+      "id": "rho.quartic",
+      "parameters": [
+        {
+          "default": "64",
+          "help": "step budget as a multiple of √r before the run counts as exhausted",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "replay_control"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "specialized_domain",
+      "entry": "endo_rho::EndomorphismClasses(FrobeniusType) with RhoWalk::negation()",
+      "family": "rho",
+      "id": "rho.frobenius_orbit",
+      "parameters": [
+        {
+          "default": "64",
+          "help": "step budget as a multiple of √r before the run counts as exhausted",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "specialized_domain",
+      "entry": "endo_rho::EndomorphismClasses(GlsEndomorphism) with RhoWalk::negation()",
+      "family": "rho",
+      "id": "rho.gls",
+      "parameters": [
+        {
+          "default": "64",
+          "help": "step budget as a multiple of √r before the run counts as exhausted",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "koblitz_only",
+      "claim_scope": "frozen_historical",
+      "entry": "ic_boundary::signed_frobenius_rho_tuned",
+      "family": "rho",
+      "id": "rho.signed_frobenius",
+      "parameters": [
+        {
+          "default": "64",
+          "help": "step budget as a multiple of √r before the run counts as exhausted",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "replay_control"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "koblitz_only",
+      "claim_scope": "frozen_historical",
+      "entry": "koblitz_strong_rho::StrongRho::solve",
+      "family": "rho",
+      "id": "rho.signed_frobenius_strong",
+      "parameters": [
+        {
+          "default": "32",
+          "help": "walks advanced in lockstep (batch-inversion width); the reference measured 32",
+          "name": "lanes",
+          "role": "knob"
+        },
+        {
+          "default": "4",
+          "help": "distinguished-point bits; the reference measured 4",
+          "name": "dp_bits",
+          "role": "knob"
+        },
+        {
+          "default": "2000",
+          "help": "give up after this multiple of the ideal step count",
+          "name": "step_cap_factor",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "replay_control"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "koblitz_only",
+      "claim_scope": "frozen_historical",
+      "entry": "koblitz_strong_rho::StrongRho::solve_legacy",
+      "family": "rho",
+      "id": "rho.signed_frobenius_strong_legacy",
+      "parameters": [
+        {
+          "default": "32",
+          "help": "walks advanced in lockstep (batch-inversion width); the reference measured 32",
+          "name": "lanes",
+          "role": "knob"
+        },
+        {
+          "default": "4",
+          "help": "distinguished-point bits; the reference measured 4",
+          "name": "dp_bits",
+          "role": "knob"
+        },
+        {
+          "default": "2000",
+          "help": "give up after this multiple of the ideal step count",
+          "name": "step_cap_factor",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "replay_control"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "koblitz_only",
+      "claim_scope": "frontier_eligible",
+      "entry": "koblitz_strong_rho::StrongRho::solve (escape_fruitless)",
+      "family": "rho",
+      "id": "rho.signed_frobenius_strong_escape",
+      "parameters": [
+        {
+          "default": "32",
+          "help": "walks advanced in lockstep (batch-inversion width)",
+          "name": "lanes",
+          "role": "knob"
+        },
+        {
+          "default": "4",
+          "help": "distinguished-point bits; the table holds about steps / 2^dp_bits entries",
+          "name": "dp_bits",
+          "role": "knob"
+        },
+        {
+          "default": "2000",
+          "help": "give up after this multiple of the ideal step count",
+          "name": "step_cap_factor",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_grid"
+    },
+    {
+      "accounting_scope": "jacobian_image_native",
+      "applies": "binary_only",
+      "claim_scope": "specialized_domain",
+      "entry": "binary_ecc::hcdlp_pollard_rho_counted",
+      "family": "rho",
+      "id": "jacobian_image.rho3",
+      "parameters": [
+        {
+          "default": "64",
+          "help": "walk-step budget per restart as a multiple of sqrt(r)",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        },
+        {
+          "default": "64",
+          "help": "deterministic restart cap for degenerate rho collisions",
+          "name": "max_restarts",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "jacobian_image_native",
+      "applies": "binary_only",
+      "claim_scope": "specialized_domain",
+      "entry": "binary_ecc::hcdlp_bsgs_counted",
+      "family": "bsgs",
+      "id": "jacobian_image.bsgs",
+      "parameters": [],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "jacobian_image_native",
+      "applies": "binary_only",
+      "claim_scope": "diagnostic_only",
+      "entry": "binary_ecc::hcdlp_pollard_rho_counted + operation_tally",
+      "family": "rho",
+      "id": "jacobian_image.rho3_field_tally",
+      "parameters": [
+        {
+          "default": "64",
+          "help": "walk-step budget per restart as a multiple of sqrt(r)",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        },
+        {
+          "default": "64",
+          "help": "deterministic restart cap for degenerate rho collisions",
+          "name": "max_restarts",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "jacobian_image_native",
+      "applies": "binary_only",
+      "claim_scope": "diagnostic_only",
+      "entry": "binary_ecc::hcdlp_bsgs_counted + operation_tally",
+      "family": "bsgs",
+      "id": "jacobian_image.bsgs_field_tally",
+      "parameters": [],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "frozen_historical",
+      "entry": "ecbench::generic::bsgs_textbook",
+      "family": "bsgs",
+      "id": "bsgs.textbook",
+      "parameters": [],
+      "strategy": "replay_control"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "frozen_historical",
+      "entry": "ecbench::generic::bsgs_interleaved",
+      "family": "bsgs",
+      "id": "bsgs.interleaved",
+      "parameters": [],
+      "strategy": "replay_control"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "frozen_historical",
+      "entry": "ecbench::generic::bsgs_negation",
+      "family": "bsgs",
+      "id": "bsgs.negation",
+      "parameters": [],
+      "strategy": "replay_control"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "diagnostic_only",
+      "entry": "ecbench::generic::bsgs_negation_table",
+      "family": "bsgs",
+      "id": "bsgs.negation_table",
+      "parameters": [
+        {
+          "default": "0",
+          "help": "baby table half-width m (table entries m + 1); 0 means ceil(sqrt(r)/2), which is bsgs.negation",
+          "name": "baby",
+          "role": "knob"
+        }
+      ],
+      "strategy": "native_grid"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "frozen_historical",
+      "entry": "ecbench::generic::kangaroo",
+      "family": "kangaroo",
+      "id": "kangaroo.vow",
+      "parameters": [
+        {
+          "default": "64",
+          "help": "step budget as a multiple of √r before the run counts as exhausted",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "replay_control"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "specialized_domain",
+      "entry": "ecbench::isogeny::{find_isogeny, Isogeny::map}",
+      "family": "rho",
+      "id": "transfer.isogeny",
+      "parameters": [
+        {
+          "default": "3",
+          "help": "isogeny degree, 2 or 3",
+          "name": "ell",
+          "role": "knob"
+        },
+        {
+          "default": "rho.negation",
+          "help": "the generic method run on the isogenous curve: rho.plain, rho.negation, bsgs.textbook, bsgs.interleaved, bsgs.negation or kangaroo.vow",
+          "name": "inner",
+          "role": "knob"
+        },
+        {
+          "default": "64",
+          "help": "the inner rho or kangaroo's step cap, in multiples of √r",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_grid"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "frozen_historical",
+      "entry": "ecbench::cover_quartic::{QuarticCover, transfer}",
+      "family": "rho",
+      "id": "transfer.quartic_cover",
+      "parameters": [
+        {
+          "default": "rho.plain",
+          "help": "the generic method run in J(C): rho.plain, bsgs.textbook, bsgs.interleaved or kangaroo.vow (negation is not free on the quartic, so rho.negation and bsgs.negation are refused)",
+          "name": "inner",
+          "role": "knob"
+        },
+        {
+          "default": "64",
+          "help": "the inner rho or kangaroo's step cap, in multiples of √r",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "replay_control"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "specialized_domain",
+      "entry": "ecbench::cover_quartic::{QuarticCover, transfer}",
+      "family": "rho",
+      "id": "transfer.quartic_cover_v2",
+      "parameters": [
+        {
+          "default": "rho.plain",
+          "help": "the generic method run in J(C): rho.plain, bsgs.textbook, bsgs.interleaved or kangaroo.vow (negation is not free on the quartic, so rho.negation and bsgs.negation are refused)",
+          "name": "inner",
+          "role": "knob"
+        },
+        {
+          "default": "64",
+          "help": "the inner rho or kangaroo's step cap, in multiples of √r",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_grid"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "specialized_domain",
+      "entry": "ecbench::ghs_cover::transfer (jv_cover::Cover::transfer)",
+      "family": "rho",
+      "id": "transfer.ghs_cover",
+      "parameters": [
+        {
+          "default": "rho.negation",
+          "help": "the generic method run on Jac_H(F_q): rho.plain, rho.negation, bsgs.textbook, bsgs.interleaved, bsgs.negation or kangaroo.vow",
+          "name": "inner",
+          "role": "knob"
+        },
+        {
+          "default": "64",
+          "help": "the inner rho or kangaroo's step cap, in multiples of √r",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_grid"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "frozen_historical",
+      "entry": "hyperelliptic_index_calculus::hec_index_calculus_dlp",
+      "family": "ic",
+      "id": "ic.hyperelliptic",
+      "parameters": [
+        {
+          "default": "0",
+          "help": "cap on the factor base (degree-1 places up to ±); 0 keeps every place",
+          "name": "fb_size",
+          "role": "knob"
+        },
+        {
+          "default": "8",
+          "help": "relations collected beyond the factor-base size",
+          "name": "extra_relations",
+          "role": "knob"
+        },
+        {
+          "default": "2000000",
+          "help": "relation-search trials before giving up",
+          "name": "max_trials",
+          "role": "resource_envelope"
+        },
+        {
+          "default": "0",
+          "help": "1 keeps one-large-prime partials and combines pairs",
+          "name": "large_primes",
+          "role": "knob"
+        }
+      ],
+      "strategy": "replay_control"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "specialized_domain",
+      "entry": "hyperelliptic_index_calculus::hec_index_calculus_dlp + ecbench::hyper_ic::factor_base_scan_muls",
+      "family": "ic",
+      "id": "ic.hyperelliptic_v2",
+      "parameters": [
+        {
+          "default": "0",
+          "help": "cap on the factor base (degree-1 places up to ±); 0 keeps every place",
+          "name": "fb_size",
+          "role": "knob"
+        },
+        {
+          "default": "8",
+          "help": "relations collected beyond the factor-base size",
+          "name": "extra_relations",
+          "role": "knob"
+        },
+        {
+          "default": "2000000",
+          "help": "relation-search trials before giving up",
+          "name": "max_trials",
+          "role": "resource_envelope"
+        },
+        {
+          "default": "0",
+          "help": "1 keeps one-large-prime partials and combines pairs",
+          "name": "large_primes",
+          "role": "knob"
+        }
+      ],
+      "strategy": "native_adaptive"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "koblitz_only",
+      "claim_scope": "frozen_historical",
+      "entry": "ecbench::claw::pair_claw",
+      "family": "claw",
+      "id": "claw.pair_table",
+      "parameters": [
+        {
+          "default": null,
+          "help": "seed orbits S = ⌈base_scale · r^(1/4) · n^(−3/4)⌉; the PR's n=83 base is ≈ 1.06",
+          "name": "base_scale",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "table classes M = ⌈table_scale · √(r/n)⌉; 1 minimises additions, the PR's n=83 tables are ≈ 1/32",
+          "name": "table_scale",
+          "role": "knob"
+        },
+        {
+          "default": "64",
+          "help": "charged-addition budget as a multiple of √r before the run counts as exhausted",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "replay_control"
+    },
+    {
+      "accounting_scope": "external_native",
+      "applies": "any",
+      "claim_scope": "frozen_historical",
+      "entry": "ecbench::cm_folded::solve",
+      "family": "ic",
+      "id": "ic.cm_folded_native_v1",
+      "parameters": [
+        {
+          "default": null,
+          "help": "compiled native/folded.cpp executable",
+          "name": "backend",
+          "role": "external_binding"
+        },
+        {
+          "default": null,
+          "help": "required content hash of native backend",
+          "name": "backend_sha256",
+          "role": "identity_or_price"
+        },
+        {
+          "default": "scalar",
+          "help": "scalar or velu (crater only)",
+          "name": "mode",
+          "role": "knob"
+        },
+        {
+          "default": "8192",
+          "help": "abscissae, four seed columns",
+          "name": "size",
+          "role": "knob"
+        },
+        {
+          "default": "1000000000",
+          "help": "injective point query cap below r",
+          "name": "query_limit",
+          "role": "resource_envelope"
+        },
+        {
+          "default": "1800",
+          "help": "cold wall watchdog; failures are censored",
+          "name": "seconds",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "replay_control"
+    },
+    {
+      "accounting_scope": "external_native",
+      "applies": "any",
+      "claim_scope": "frozen_historical",
+      "entry": "ecbench::cm_folded::solve",
+      "family": "ic",
+      "id": "ic.cm_folded_recurrence_v1",
+      "parameters": [
+        {
+          "default": null,
+          "help": "compiled native/folded.cpp executable",
+          "name": "backend",
+          "role": "external_binding"
+        },
+        {
+          "default": null,
+          "help": "required content hash of native backend",
+          "name": "backend_sha256",
+          "role": "identity_or_price"
+        },
+        {
+          "default": "scalar",
+          "help": "scalar or velu (crater only)",
+          "name": "mode",
+          "role": "knob"
+        },
+        {
+          "default": "8192",
+          "help": "abscissae, four seed columns",
+          "name": "size",
+          "role": "knob"
+        },
+        {
+          "default": "1000000000",
+          "help": "injective point query cap below r",
+          "name": "query_limit",
+          "role": "resource_envelope"
+        },
+        {
+          "default": "1800",
+          "help": "cold wall watchdog; failures are censored",
+          "name": "seconds",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "replay_control"
+    },
+    {
+      "accounting_scope": "external_native",
+      "applies": "any",
+      "claim_scope": "frozen_historical",
+      "entry": "ecbench::cm_folded::solve",
+      "family": "ic",
+      "id": "ic.cm_folded_native_d43_v1",
+      "parameters": [
+        {
+          "default": null,
+          "help": "compiled native/folded.cpp executable",
+          "name": "backend",
+          "role": "external_binding"
+        },
+        {
+          "default": null,
+          "help": "required content hash of native backend",
+          "name": "backend_sha256",
+          "role": "identity_or_price"
+        },
+        {
+          "default": "scalar",
+          "help": "scalar or velu (crater only)",
+          "name": "mode",
+          "role": "knob"
+        },
+        {
+          "default": "8192",
+          "help": "abscissae, four seed columns",
+          "name": "size",
+          "role": "knob"
+        },
+        {
+          "default": "1000000000",
+          "help": "injective point query cap below r",
+          "name": "query_limit",
+          "role": "resource_envelope"
+        },
+        {
+          "default": "1800",
+          "help": "cold wall watchdog; failures are censored",
+          "name": "seconds",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "replay_control"
+    },
+    {
+      "accounting_scope": "external_native",
+      "applies": "any",
+      "claim_scope": "specialized_domain",
+      "entry": "ecbench::cm_folded::solve",
+      "family": "ic",
+      "id": "ic.cm_folded_native_v2",
+      "parameters": [
+        {
+          "default": null,
+          "help": "compiled native/folded.cpp executable",
+          "name": "backend",
+          "role": "external_binding"
+        },
+        {
+          "default": null,
+          "help": "required content hash of native backend",
+          "name": "backend_sha256",
+          "role": "identity_or_price"
+        },
+        {
+          "default": "scalar",
+          "help": "scalar or velu (crater only)",
+          "name": "mode",
+          "role": "knob"
+        },
+        {
+          "default": "8192",
+          "help": "abscissae, four seed columns",
+          "name": "size",
+          "role": "knob"
+        },
+        {
+          "default": "1000000000",
+          "help": "injective point query cap below r",
+          "name": "query_limit",
+          "role": "resource_envelope"
+        },
+        {
+          "default": "1800",
+          "help": "cold wall watchdog; failures are censored",
+          "name": "seconds",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "external_backend_ab"
+    },
+    {
+      "accounting_scope": "external_native",
+      "applies": "any",
+      "claim_scope": "specialized_domain",
+      "entry": "ecbench::cm_folded::solve",
+      "family": "ic",
+      "id": "ic.cm_folded_recurrence_v2",
+      "parameters": [
+        {
+          "default": null,
+          "help": "compiled native/folded.cpp executable",
+          "name": "backend",
+          "role": "external_binding"
+        },
+        {
+          "default": null,
+          "help": "required content hash of native backend",
+          "name": "backend_sha256",
+          "role": "identity_or_price"
+        },
+        {
+          "default": "scalar",
+          "help": "scalar or velu (crater only)",
+          "name": "mode",
+          "role": "knob"
+        },
+        {
+          "default": "8192",
+          "help": "abscissae, four seed columns",
+          "name": "size",
+          "role": "knob"
+        },
+        {
+          "default": "1000000000",
+          "help": "injective point query cap below r",
+          "name": "query_limit",
+          "role": "resource_envelope"
+        },
+        {
+          "default": "1800",
+          "help": "cold wall watchdog; failures are censored",
+          "name": "seconds",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "external_backend_ab"
+    },
+    {
+      "accounting_scope": "external_native",
+      "applies": "any",
+      "claim_scope": "specialized_domain",
+      "entry": "ecbench::cm_folded::solve",
+      "family": "ic",
+      "id": "ic.cm_folded_native_d43_v2",
+      "parameters": [
+        {
+          "default": null,
+          "help": "compiled native/folded.cpp executable",
+          "name": "backend",
+          "role": "external_binding"
+        },
+        {
+          "default": null,
+          "help": "required content hash of native backend",
+          "name": "backend_sha256",
+          "role": "identity_or_price"
+        },
+        {
+          "default": "scalar",
+          "help": "scalar or velu (crater only)",
+          "name": "mode",
+          "role": "knob"
+        },
+        {
+          "default": "8192",
+          "help": "abscissae, four seed columns",
+          "name": "size",
+          "role": "knob"
+        },
+        {
+          "default": "1000000000",
+          "help": "injective point query cap below r",
+          "name": "query_limit",
+          "role": "resource_envelope"
+        },
+        {
+          "default": "1800",
+          "help": "cold wall watchdog; failures are censored",
+          "name": "seconds",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "external_backend_ab"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "specialized_domain",
+      "entry": "ecbench::hyper_ic::solve",
+      "family": "ic",
+      "id": "ic.hyperelliptic_thread",
+      "parameters": [
+        {
+          "default": null,
+          "help": "factor-base cap: `all` (every degree-1 place, m ≈ p/2 columns after the ± fold) or N (the first N places by x, Gaudry's reduced base)",
+          "name": "fb_size",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "0 (full relations only) or 1 (single large primes: keep a candidate with one place outside a truncated base and combine pairs sharing it)",
+          "name": "large_primes",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "rows collected beyond the m + 1 unknowns before the first solve (the thread uses 8); each further round adds m/4 + 8",
+          "name": "extra_relations",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "factor-base places the walk steps by, drawn by a seeded shuffle (the thread uses 64; capped at m)",
+          "name": "branches",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "one step in d_step_in adds D₁, one adds D₂, the rest add a place (the thread uses 4; at least 2)",
+          "name": "d_step_in",
+          "role": "knob"
+        },
+        {
+          "default": "200000",
+          "help": "relation trials before the run counts as exhausted",
+          "name": "max_trials",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_adaptive"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "frontier_eligible",
+      "entry": "ic_framework::run_pipeline",
+      "family": "ic",
+      "id": "ic.pipeline",
+      "parameters": [
+        {
+          "default": null,
+          "help": "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), binary-subspace:dimension=D, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
+          "name": "factor_base",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4|5 (one probe a target into a negation-folded table of every signed m-sum of the base); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
+          "name": "oracle",
+          "role": "knob"
+        },
+        {
+          "default": "",
+          "help": "descent-algebraic and descent-algebraic-fiber only: f4-f2, buchberger-f2, sat-cdcl, exhaustive (with :k=v options)",
+          "name": "solver",
+          "role": "knob"
+        },
+        {
+          "default": "incremental-gauss",
+          "help": "incremental-gauss (stop at target pin), incremental-gauss-full-rank (all columns independent), incremental-gauss-full-rank-checked (also point-check each base column), structured-gauss, sparse-cado = filter+wiedemann (CADO-style filter + block Wiedemann, full-rank rule), filter+lanczos, wiedemann or lanczos (no filter, block Wiedemann / block Lanczos, full-rank rule)",
+          "name": "linalg",
+          "role": "knob"
+        },
+        {
+          "default": "walk",
+          "help": "random ([a]G+[b]Q per trial), walk, or walk-prime-fast (same guarded stream using native Montgomery additions on prime curves)",
+          "name": "targets",
+          "role": "knob"
+        },
+        {
+          "default": "100000000",
+          "help": "relation trials before the run counts as exhausted",
+          "name": "max_trials",
+          "role": "resource_envelope"
+        },
+        {
+          "default": "0",
+          "help": "per-call wall budget for an algebraic solver; nonzero makes the run nondeterministic",
+          "name": "solver_budget_seconds",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_adaptive"
+    },
+    {
+      "accounting_scope": "full_price",
+      "applies": "binary_only",
+      "claim_scope": "pricing_sensitivity",
+      "entry": "ic_framework::run_pipeline + ecbench::full_price::reprice",
+      "family": "ic",
+      "id": "ic.pipeline_full",
+      "parameters": [
+        {
+          "default": null,
+          "help": "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), binary-subspace:dimension=D, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
+          "name": "factor_base",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4|5 (one probe a target into a negation-folded table of every signed m-sum of the base); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
+          "name": "oracle",
+          "role": "knob"
+        },
+        {
+          "default": "",
+          "help": "descent-algebraic and descent-algebraic-fiber only: f4-f2, buchberger-f2, sat-cdcl, exhaustive (with :k=v options)",
+          "name": "solver",
+          "role": "knob"
+        },
+        {
+          "default": "incremental-gauss",
+          "help": "incremental-gauss (stop at target pin), incremental-gauss-full-rank (all columns independent), incremental-gauss-full-rank-checked (also point-check each base column), structured-gauss, sparse-cado = filter+wiedemann (CADO-style filter + block Wiedemann, full-rank rule), filter+lanczos, wiedemann or lanczos (no filter, block Wiedemann / block Lanczos, full-rank rule)",
+          "name": "linalg",
+          "role": "knob"
+        },
+        {
+          "default": "walk",
+          "help": "random ([a]G+[b]Q per trial), walk, or walk-prime-fast (same guarded stream using native Montgomery additions on prime curves)",
+          "name": "targets",
+          "role": "knob"
+        },
+        {
+          "default": "100000000",
+          "help": "relation trials before the run counts as exhausted",
+          "name": "max_trials",
+          "role": "resource_envelope"
+        },
+        {
+          "default": "0",
+          "help": "per-call wall budget for an algebraic solver; nonzero makes the run nondeterministic",
+          "name": "solver_budget_seconds",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_adaptive"
+    },
+    {
+      "accounting_scope": "full_price",
+      "applies": "koblitz_only",
+      "claim_scope": "pricing_sensitivity",
+      "entry": "ic_boundary::signed_frobenius_rho_tuned + ecbench::full_price::reprice",
+      "family": "rho",
+      "id": "rho.signed_frobenius_full",
+      "parameters": [
+        {
+          "default": "64",
+          "help": "step budget as a multiple of √r before the run counts as exhausted",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "full_price",
+      "applies": "koblitz_only",
+      "claim_scope": "pricing_sensitivity",
+      "entry": "koblitz_strong_rho::StrongRho::solve + ecbench::full_price::reprice",
+      "family": "rho",
+      "id": "rho.signed_frobenius_strong_full",
+      "parameters": [
+        {
+          "default": "32",
+          "help": "walks advanced in lockstep (batch-inversion width); the reference measured 32",
+          "name": "lanes",
+          "role": "knob"
+        },
+        {
+          "default": "4",
+          "help": "distinguished-point bits; the reference measured 4",
+          "name": "dp_bits",
+          "role": "knob"
+        },
+        {
+          "default": "2000",
+          "help": "give up after this multiple of the ideal step count",
+          "name": "step_cap_factor",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_grid"
+    },
+    {
+      "accounting_scope": "word_ram",
+      "applies": "binary_only",
+      "claim_scope": "pricing_sensitivity",
+      "entry": "ic_framework::run_pipeline + ecbench::wordram_price::reprice",
+      "family": "ic",
+      "id": "ic.pipeline_wordram",
+      "parameters": [
+        {
+          "default": null,
+          "help": "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), binary-subspace:dimension=D, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
+          "name": "factor_base",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4|5 (one probe a target into a negation-folded table of every signed m-sum of the base); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
+          "name": "oracle",
+          "role": "knob"
+        },
+        {
+          "default": "",
+          "help": "descent-algebraic and descent-algebraic-fiber only: f4-f2, buchberger-f2, sat-cdcl, exhaustive (with :k=v options)",
+          "name": "solver",
+          "role": "knob"
+        },
+        {
+          "default": "incremental-gauss",
+          "help": "incremental-gauss (stop at target pin), incremental-gauss-full-rank (all columns independent), incremental-gauss-full-rank-checked (also point-check each base column), structured-gauss, sparse-cado = filter+wiedemann (CADO-style filter + block Wiedemann, full-rank rule), filter+lanczos, wiedemann or lanczos (no filter, block Wiedemann / block Lanczos, full-rank rule)",
+          "name": "linalg",
+          "role": "knob"
+        },
+        {
+          "default": "walk",
+          "help": "random ([a]G+[b]Q per trial), walk, or walk-prime-fast (same guarded stream using native Montgomery additions on prime curves)",
+          "name": "targets",
+          "role": "knob"
+        },
+        {
+          "default": "100000000",
+          "help": "relation trials before the run counts as exhausted",
+          "name": "max_trials",
+          "role": "resource_envelope"
+        },
+        {
+          "default": "0",
+          "help": "per-call wall budget for an algebraic solver; nonzero makes the run nondeterministic",
+          "name": "solver_budget_seconds",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_adaptive"
+    },
+    {
+      "accounting_scope": "word_ram",
+      "applies": "koblitz_only",
+      "claim_scope": "pricing_sensitivity",
+      "entry": "ic_boundary::signed_frobenius_rho_tuned + ecbench::wordram_price::reprice",
+      "family": "rho",
+      "id": "rho.signed_frobenius_wordram",
+      "parameters": [
+        {
+          "default": "64",
+          "help": "step budget as a multiple of √r before the run counts as exhausted",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "word_ram",
+      "applies": "koblitz_only",
+      "claim_scope": "pricing_sensitivity",
+      "entry": "koblitz_strong_rho::StrongRho::solve + ecbench::wordram_price::reprice",
+      "family": "rho",
+      "id": "rho.signed_frobenius_strong_wordram",
+      "parameters": [
+        {
+          "default": "32",
+          "help": "walks advanced in lockstep (batch-inversion width); the reference measured 32",
+          "name": "lanes",
+          "role": "knob"
+        },
+        {
+          "default": "4",
+          "help": "distinguished-point bits; the reference measured 4",
+          "name": "dp_bits",
+          "role": "knob"
+        },
+        {
+          "default": "2000",
+          "help": "give up after this multiple of the ideal step count",
+          "name": "step_cap_factor",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_grid"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "diagnostic_only",
+      "entry": "ic_framework::run_pipeline + ecbench::ic_report(counted)",
+      "family": "ic",
+      "id": "ic.pipeline_counted",
+      "parameters": [
+        {
+          "default": null,
+          "help": "factor-base plug-in spec",
+          "name": "factor_base",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "decomposition oracle plug-in spec",
+          "name": "oracle",
+          "role": "knob"
+        },
+        {
+          "default": "",
+          "help": "algebraic solver plug-in spec",
+          "name": "solver",
+          "role": "knob"
+        },
+        {
+          "default": "incremental-gauss",
+          "help": "linear algebra plug-in",
+          "name": "linalg",
+          "role": "knob"
+        },
+        {
+          "default": "walk",
+          "help": "random, walk, or walk-prime-fast on single-word prime curves",
+          "name": "targets",
+          "role": "knob"
+        },
+        {
+          "default": "100000000",
+          "help": "relation trial cap",
+          "name": "max_trials",
+          "role": "resource_envelope"
+        },
+        {
+          "default": "0",
+          "help": "per-call solver wall budget",
+          "name": "solver_budget_seconds",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_adaptive"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "prime_only",
+      "claim_scope": "diagnostic_only",
+      "entry": "ecdl_tensor_ic::Solver with SparseContractor",
+      "family": "ic",
+      "id": "ic.tensor_contraction_v1",
+      "parameters": [
+        {
+          "default": null,
+          "help": "hashed factor bases, at least 2; the relation network has (2m−1)(2b+1) edges",
+          "name": "m",
+          "role": "knob"
+        },
+        {
+          "default": "8",
+          "help": "factor-base redraws before the run counts as exhausted",
+          "name": "max_restarts",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_grid"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "diagnostic_only",
+      "entry": "ecbench::known_log::{prepare,recover}",
+      "family": "ic",
+      "id": "ic.known_log_mitm2_v1",
+      "parameters": [
+        {
+          "default": null,
+          "help": "unsigned base pairs; signed point count is twice this",
+          "name": "size",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "target-independent base seed",
+          "name": "base_seed",
+          "role": "seed"
+        },
+        {
+          "default": "1",
+          "help": "H=[u]G; use c^-1 when transporting a base to generator [c]G",
+          "name": "base_multiplier",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "hard bound on size*(size+1) pair-construction attempts",
+          "name": "max_pair_work",
+          "role": "resource_envelope"
+        },
+        {
+          "default": null,
+          "help": "maximum target-dependent queries; at most one subgroup cycle",
+          "name": "max_trials",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_adaptive"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "prime_only",
+      "claim_scope": "diagnostic_only",
+      "entry": "ecbench::known_log::{prepare_ksum,recover}",
+      "family": "ic",
+      "id": "ic.known_log_ksum_v1",
+      "parameters": [
+        {
+          "default": null,
+          "help": "unsigned base points; signed point count is twice this (at most 2047)",
+          "name": "size",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "summands, 3, 4 or 5",
+          "name": "k",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "target-independent base seed",
+          "name": "base_seed",
+          "role": "seed"
+        },
+        {
+          "default": "1",
+          "help": "H=[u]G; use c^-1 when transporting a base to generator [c]G",
+          "name": "base_multiplier",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "hard bound on the table's 2^(k-1)·C(size,k) sums, checked before any work",
+          "name": "max_sums",
+          "role": "resource_envelope"
+        },
+        {
+          "default": null,
+          "help": "maximum target-dependent queries; at most one subgroup cycle",
+          "name": "max_trials",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_adaptive"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "binary_only",
+      "claim_scope": "frozen_historical",
+      "entry": "ecbench_large_prime::solve",
+      "family": "ic",
+      "id": "ic.large_prime",
+      "parameters": [
+        {
+          "default": null,
+          "help": "dimension of the nested small x-coordinate subspace",
+          "name": "small_dimension",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "dimension of the full x-coordinate factor-base envelope",
+          "name": "envelope_dimension",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "exact summand count, or n-1 (never silently downscaled)",
+          "name": "summands",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "maximum accepted large-prime columns: 0, 1, or 2",
+          "name": "large_primes",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "relation trials before an exhausted result",
+          "name": "max_trials",
+          "role": "resource_envelope"
+        },
+        {
+          "default": null,
+          "help": "hard cap on exact meet-in-the-middle combination states",
+          "name": "max_states",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "replay_control"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "binary_only",
+      "claim_scope": "specialized_domain",
+      "entry": "ecbench_large_prime::trace_line + solve_candidate_with_basis",
+      "family": "ic",
+      "id": "ic.trace_line_2lp",
+      "parameters": [
+        {
+          "default": null,
+          "help": "standard or trace; n must equal 4d",
+          "name": "line",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "subfield dimension, positive with n=4d<=62",
+          "name": "d",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "nested small-base dimension <= d, same policy in both arms",
+          "name": "small_dimension",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "inclusive deterministic multiplier scan limit; no fallback",
+          "name": "max_u",
+          "role": "resource_envelope"
+        },
+        {
+          "default": null,
+          "help": "relation trial cap",
+          "name": "max_trials",
+          "role": "resource_envelope"
+        },
+        {
+          "default": null,
+          "help": "exact MITM state cap",
+          "name": "max_states",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_adaptive"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "koblitz_only",
+      "claim_scope": "diagnostic_only",
+      "entry": "ic_framework::shared_rank::run_shared_rank_targets",
+      "family": "ic",
+      "id": "ic.shared_rank",
+      "parameters": [
+        {
+          "default": null,
+          "help": "compact-orbit-scan:columns=N,raw_x_cap=M; exact base construction",
+          "name": "factor_base",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "seed of the target-blind relation search",
+          "name": "rank_seed",
+          "role": "seed"
+        },
+        {
+          "default": null,
+          "help": "target-blind relation trial cap",
+          "name": "rank_max_trials",
+          "role": "resource_envelope"
+        },
+        {
+          "default": null,
+          "help": "direct Q query followed by at most this many total residual attempts",
+          "name": "target_max_attempts",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_adaptive"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "koblitz_only",
+      "claim_scope": "specialized_domain",
+      "entry": "ecbench::koblitz_descent::run",
+      "family": "ic",
+      "id": "ic.koblitz_descent",
+      "parameters": [
+        {
+          "default": "3",
+          "help": "collection summands; the §23 recipe's aimed window needs 3",
+          "name": "summands",
+          "role": "knob"
+        },
+        {
+          "default": "rule_v8",
+          "help": "summands the walked descent asks for (2..4; rule v8: 2, 3 at k1n47)",
+          "name": "descent_summands",
+          "role": "knob"
+        },
+        {
+          "default": "true",
+          "help": "aim each unit's window at the columns still uncovered (ColumnCoverage)",
+          "name": "collection_aim",
+          "role": "knob"
+        },
+        {
+          "default": "rule_v8",
+          "help": "factor-base summands each m = 3 probe scans",
+          "name": "collection_window",
+          "role": "knob"
+        },
+        {
+          "default": "rule_v8",
+          "help": "points of the subgroup-orbit factor base",
+          "name": "factor_base_points",
+          "role": "knob"
+        },
+        {
+          "default": "rule_v8",
+          "help": "walked probes per collection work unit",
+          "name": "unit_trials",
+          "role": "resource_envelope"
+        },
+        {
+          "default": "rule_v8",
+          "help": "units collected before the first solve",
+          "name": "units",
+          "role": "resource_envelope"
+        },
+        {
+          "default": "100000",
+          "help": "units the extension may reach before the run fails",
+          "name": "max_units",
+          "role": "resource_envelope"
+        },
+        {
+          "default": "rule_v8",
+          "help": "descent probe cap before an exhausted result",
+          "name": "max_trials",
+          "role": "resource_envelope"
+        },
+        {
+          "default": "rule_v8",
+          "help": "seed of the factor base, the probes and the descent walks (`run`: the run's algorithm seed)",
+          "name": "seed",
+          "role": "seed"
+        }
+      ],
+      "strategy": "native_adaptive"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "frontier_eligible",
+      "entry": "ic_boundary::rho_walk_with_policy(NegationClasses, RhoWalk::negation(), WalkPolicy::v2())",
+      "family": "rho",
+      "id": "rho.negation_v2",
+      "parameters": [
+        {
+          "default": "64",
+          "help": "step budget as a multiple of √r before the run counts as exhausted",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "frontier_eligible",
+      "entry": "ic_boundary::CubicClasses with rho_walk_with_policy(WalkPolicy::v2())",
+      "family": "rho",
+      "id": "rho.cubic_v2",
+      "parameters": [
+        {
+          "default": "64",
+          "help": "step budget as a multiple of √r before the run counts as exhausted",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "frontier_eligible",
+      "entry": "ic_boundary::QuarticClasses with rho_walk_with_policy(WalkPolicy::v2())",
+      "family": "rho",
+      "id": "rho.quartic_v2",
+      "parameters": [
+        {
+          "default": "64",
+          "help": "step budget as a multiple of √r before the run counts as exhausted",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "koblitz_only",
+      "claim_scope": "frontier_eligible",
+      "entry": "ic_boundary::signed_frobenius_rho_tuned_policy(WalkPolicy::v2())",
+      "family": "rho",
+      "id": "rho.signed_frobenius_v2",
+      "parameters": [
+        {
+          "default": "64",
+          "help": "step budget as a multiple of √r before the run counts as exhausted",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "koblitz_only",
+      "claim_scope": "frontier_eligible",
+      "entry": "koblitz_strong_rho::StrongRho::solve_accounted (jumps_fixed_base)",
+      "family": "rho",
+      "id": "rho.signed_frobenius_strong_v2",
+      "parameters": [
+        {
+          "default": "auto",
+          "help": "walks advanced in lockstep: auto = the power of two at most (ideal steps)/2^(dp_bits+3), from 1 to 32; or an integer",
+          "name": "lanes",
+          "role": "knob"
+        },
+        {
+          "default": "auto",
+          "help": "distinguished-point bits: auto = round(log2(ideal steps)/2), from 1 to 20 (a walk of about √ideal steps); or an integer",
+          "name": "dp_bits",
+          "role": "knob"
+        },
+        {
+          "default": "auto",
+          "help": "distinct jump scalars, a divisor of 32 repeated to fill the 32-entry table: auto = the largest of 32, 16, 8 whose fixed set-up (jump table, start multiplications, final check) is at most a tenth of the ideal steps (never fewer than 8); or 4, 8, 16, 32",
+          "name": "jumps",
+          "role": "knob"
+        },
+        {
+          "default": "2000",
+          "help": "give up after this multiple of the ideal step count",
+          "name": "step_cap_factor",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_grid"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "frontier_eligible",
+      "entry": "ecbench::generic::bsgs_textbook + verify_candidate",
+      "family": "bsgs",
+      "id": "bsgs.textbook_v2",
+      "parameters": [],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "frontier_eligible",
+      "entry": "ecbench::generic::bsgs_interleaved + verify_candidate",
+      "family": "bsgs",
+      "id": "bsgs.interleaved_v2",
+      "parameters": [],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "frontier_eligible",
+      "entry": "ecbench::generic::bsgs_negation + verify_candidate",
+      "family": "bsgs",
+      "id": "bsgs.negation_v2",
+      "parameters": [],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "any",
+      "claim_scope": "frontier_eligible",
+      "entry": "ecbench::generic::kangaroo_with(restarts_apart) + verify_candidate",
+      "family": "kangaroo",
+      "id": "kangaroo.vow_v2",
+      "parameters": [
+        {
+          "default": "64",
+          "help": "step budget as a multiple of √r before the run counts as exhausted",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "implementation_ab"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "koblitz_only",
+      "claim_scope": "frontier_eligible",
+      "entry": "ecbench::claw::pair_claw_with(v2)",
+      "family": "claw",
+      "id": "claw.pair_table_v2",
+      "parameters": [
+        {
+          "default": null,
+          "help": "seed orbits S = ⌈base_scale · r^(1/4) · n^(−3/4)⌉; the PR's n=83 base is ≈ 1.06",
+          "name": "base_scale",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "table classes M = ⌈table_scale · √(r/n)⌉; 1 minimises additions, the PR's n=83 tables are ≈ 1/32",
+          "name": "table_scale",
+          "role": "knob"
+        },
+        {
+          "default": "64",
+          "help": "charged-addition budget as a multiple of √r before the run counts as exhausted",
+          "name": "cap_multiple",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_grid"
+    },
+    {
+      "accounting_scope": "standard_band",
+      "applies": "binary_only",
+      "claim_scope": "frontier_eligible",
+      "entry": "ecbench_large_prime::solve_candidate_v2",
+      "family": "ic",
+      "id": "ic.large_prime_v2",
+      "parameters": [
+        {
+          "default": null,
+          "help": "dimension of the nested small x-coordinate subspace",
+          "name": "small_dimension",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "dimension of the full x-coordinate factor-base envelope",
+          "name": "envelope_dimension",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "exact summand count, or n-1 (never silently downscaled)",
+          "name": "summands",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "maximum accepted large-prime columns: 0, 1, or 2",
+          "name": "large_primes",
+          "role": "knob"
+        },
+        {
+          "default": null,
+          "help": "relation trials before an exhausted result",
+          "name": "max_trials",
+          "role": "resource_envelope"
+        },
+        {
+          "default": null,
+          "help": "hard cap on exact meet-in-the-middle combination states",
+          "name": "max_states",
+          "role": "resource_envelope"
+        }
+      ],
+      "strategy": "native_adaptive"
+    }
+  ],
+  "nested_algorithm_count": 19,
+  "nested_algorithms": [
+    {
+      "accounting": "backend-native operation unit; rank only where the unit and scope match",
+      "key": "system_solver/f4-f2",
+      "kind": "system_solver",
+      "name": "f4-f2"
+    },
+    {
+      "accounting": "backend-native operation unit; rank only where the unit and scope match",
+      "key": "system_solver/buchberger-f2",
+      "kind": "system_solver",
+      "name": "buchberger-f2"
+    },
+    {
+      "accounting": "backend-native operation unit; rank only where the unit and scope match",
+      "key": "system_solver/matrix-f4",
+      "kind": "system_solver",
+      "name": "matrix-f4"
+    },
+    {
+      "accounting": "backend-native operation unit; rank only where the unit and scope match",
+      "key": "system_solver/matrix-f5",
+      "kind": "system_solver",
+      "name": "matrix-f5"
+    },
+    {
+      "accounting": "backend-native operation unit; rank only where the unit and scope match",
+      "key": "system_solver/inherited-f4",
+      "kind": "system_solver",
+      "name": "inherited-f4"
+    },
+    {
+      "accounting": "backend-native operation unit; rank only where the unit and scope match",
+      "key": "system_solver/crossbred-f2",
+      "kind": "system_solver",
+      "name": "crossbred-f2"
+    },
+    {
+      "accounting": "backend-native operation unit; rank only where the unit and scope match",
+      "key": "system_solver/xl-f2",
+      "kind": "system_solver",
+      "name": "xl-f2"
+    },
+    {
+      "accounting": "backend-native operation unit; rank only where the unit and scope match",
+      "key": "system_solver/sat-cdcl",
+      "kind": "system_solver",
+      "name": "sat-cdcl"
+    },
+    {
+      "accounting": "backend-native operation unit; rank only where the unit and scope match",
+      "key": "system_solver/fes-f2",
+      "kind": "system_solver",
+      "name": "fes-f2"
+    },
+    {
+      "accounting": "backend-native operation unit; rank only where the unit and scope match",
+      "key": "system_solver/fes-f2-wide",
+      "kind": "system_solver",
+      "name": "fes-f2-wide"
+    },
+    {
+      "accounting": "backend-native operation unit; rank only where the unit and scope match",
+      "key": "system_solver/exhaustive",
+      "kind": "system_solver",
+      "name": "exhaustive"
+    },
+    {
+      "accounting": "solver-local work plus the enclosing pipeline accounting",
+      "key": "pdp3_engine/inherited-f4",
+      "kind": "pdp3_engine",
+      "name": "inherited-f4"
+    },
+    {
+      "accounting": "solver-local work plus the enclosing pipeline accounting",
+      "key": "pdp3_engine/f6-ic",
+      "kind": "pdp3_engine",
+      "name": "f6-ic"
+    },
+    {
+      "accounting": "solver-local work plus the enclosing pipeline accounting",
+      "key": "pdp3_engine/matrix-f4",
+      "kind": "pdp3_engine",
+      "name": "matrix-f4"
+    },
+    {
+      "accounting": "solver-local work plus the enclosing pipeline accounting",
+      "key": "pdp3_engine/matrix-f5",
+      "kind": "pdp3_engine",
+      "name": "matrix-f5"
+    },
+    {
+      "accounting": "pair-table setup/probe route; not an algebraic-solver claim",
+      "key": "pdp3_engine/rootfind",
+      "kind": "pdp3_engine",
+      "name": "rootfind"
+    },
+    {
+      "accounting": "pair-table setup/probe route; not an algebraic-solver claim",
+      "key": "pdp3_engine/rootfind-window",
+      "kind": "pdp3_engine",
+      "name": "rootfind-window"
+    },
+    {
+      "accounting": "pair-table setup/probe route; not an algebraic-solver claim",
+      "key": "pdp3_engine/rootfind-negfold",
+      "kind": "pdp3_engine",
+      "name": "rootfind-negfold"
+    },
+    {
+      "accounting": "pair-table setup/probe route; not an algebraic-solver claim",
+      "key": "pdp3_engine/rootfind-window-negfold",
+      "kind": "pdp3_engine",
+      "name": "rootfind-window-negfold"
+    }
+  ],
+  "promotion_rule": "fresh holdout, same output/counts, A/A admission, complete symmetric pricing, independent replay, and the repository validation gate",
+  "schema": "ecbench.optimization-inventory/v1",
+  "strategy_counts": {
+    "external_backend_ab": 3,
+    "implementation_ab": 23,
+    "native_adaptive": 17,
+    "native_grid": 14,
+    "replay_control": 21
+  }
+}
