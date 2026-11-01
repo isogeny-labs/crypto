@@ -64,12 +64,14 @@ success-probability bound under Lang's canonical-height conjecture and their
 explicit discriminant/height assumption, then find prohibitively low useful-lift
 rates experimentally. That theorem does not directly analyse extension-field
 point lifts. A 2002 IEICE report by Jun Kogure explicitly treats xedni in
-characteristic two and is indexed with Koblitz curves; its full text was not
-available in the sources checked here, so its construction and conclusion remain
-a primary-source gate.
+characteristic two and is indexed with Koblitz curves. It cites Kogure's earlier
+seven-page 2000 report, “Implementation of the Xedni Calculus algorithm.” Neither
+full text was available in the sources checked here, so their constructions and
+conclusions remain primary-source gates.
 
 ### Cited Findings
 - Jacobson-Koblitz-Silverman-Stein-Teske, "Analysis of the xedni calculus attack", DCC 20 (2000) 41-64: full paper read, including the original algorithm in section 3, conditional Theorem 4.1 and its assumptions, experiments in section 5, and conclusion. The theorem derives the bounded relation coefficients and `C_0/p` success bound under its stated assumptions; the experiments find that useful dependencies are already prohibitively rare at tiny parameters. — [xedni.pdf](https://pages.cpsc.ucalgary.ca/~jacobs/PDF/xedni.pdf); [DOI](https://www.doi.org/10.1023/A:1008312401197); [Waterloo CORR 1999-06 first page](https://uwaterloo.ca/combinatorics-and-optimization/sites/default/files/uploads/documents/1999_06.pdf)
+- Kogure, “Implementation of the Xedni Calculus algorithm,” IEICE Technical Report, 100(77), 17-23 (26 May 2000): complete bibliographic metadata verified, and the 2002 characteristic-two report cites it directly. CiNii's legacy PDF route now resolves to a 404 and the NDL record offers copy/library access rather than an online text, so no implementation detail or result is inferred. — [CiNii](https://cir.nii.ac.jp/crid/1520572360230590720); [NDL](https://ndlsearch.ndl.go.jp/books/R000000004-I5409112); NAID 110003297769
 - Kogure, "xedni calculus法について(標数2の場合)", IEICE Technical Report ISEC2002-10, 102(71), 57-60 (2002): bibliographic metadata and subject tags verified; the title identifies the characteristic-two case and CiNii indexes Koblitz curves. Full text was not obtained, so no substantive claim is attributed to it. — [CiNii](https://cir.nii.ac.jp/crid/1520853833621034368); NDL bibliographic ID 6188214
 - Mahalanobis-Mallick (arXiv 1703.07544, 2017): a Las Vegas ECDLP algorithm, non-generic but not xedni, which says xedni "was found to be no better than exhaustive search". A related ePrint (2018/134) and a 2020 follow-up (arXiv 2005.05039) introduce an "initial minors" conjecture for reducing to linear algebra. — [arXiv 1703.07544](https://arxiv.org/pdf/1703.07544); [ePrint 2018/134](https://eprint.iacr.org/2018/134.pdf); [arXiv 2005.05039](https://arxiv.org/pdf/2005.05039)
 - A popular-press blog walkthrough of xedni exists (LeetArxiv Substack). It is non-scholarly. — [Substack](https://leetarxiv.substack.com/p/analysis-of-the-xedni-calculus-attack)
@@ -84,8 +86,10 @@ a primary-source gate.
   `cryptanalysis:research/xedni_cross_field_20261101/`.
 
 ### Gaps
-- Obtain and read Kogure ISEC2002-10 before specifying or funding a
-  characteristic-two/Koblitz xedni implementation.
+- Obtain and read both Kogure reports (the 2000 implementation and
+  ISEC2002-10) before specifying or funding a characteristic-two/Koblitz xedni
+  implementation. The verified public routes currently require library/copy
+  access; neither legacy CiNii PDF endpoint serves the text.
 - Mahdavi-Shafiee lifting work: not found in my searches.
 - [unverified-recall] Silverman-Suzuki and Huang-Kueh-Tan on "lifting and ECDLP" (ANTS 2000) treat lifting obstructions for E(Q) of rank. Not verified this session.
 
