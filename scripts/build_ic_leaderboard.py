@@ -79,6 +79,11 @@ SOURCES = {
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
+    "glv_k4": "research/glv_k4_pipeline_d4_20261017/summary.json",
+    "glv_gls": "research/glv_gls_v4_20261018/summary.json",
+    "glv_e31": "research/e31_chain_solve_20261024/summary.json",
+    "glv_e27": "experiments/32_walk_karatsuba/summary.json",
+    "glv_e30": "experiments/35_invariants_lite/summary.json",
     "lazy_members": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
     "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
     "lazy_columns2": "research/ecbench_lazy_columns2_20261018/figures/ratios.json",
@@ -872,6 +877,84 @@ def lazy_columns2_component() -> dict:
     return {"rows": d["rows"], "unit": d["unit"], "class": d["class"], "note": d["note"],
             "study": d["study"] + "/", "report": d["study"] + "/REPORT.pdf",
             "source": SOURCES["lazy_columns2"], "validation": NOT_VALIDATED}
+
+def k4_v4_component() -> dict:
+    """The k = 4 decomposition oracle on its own family: E19 (the tau_T line,
+    weighted D4 solve) as the before figure and E24 (the full-2-torsion V4
+    line and its invariant solve) as the after, end to end on curves over
+    F_{p^4} with rational 2-torsion, copied from the study's summary.json
+    (written by examples/glv_invariant_experiment_tables.rs --k4-summary from
+    the raw records). A solver speed-up on curves no table A-C row prices:
+    it moves no row there."""
+    sm = load(SOURCES["glv_k4"])
+    if (sm.get("schema") != "crypto.glv_k4_pipeline_summary/v1"
+            or sm.get("all_verified") is not True
+            or sm.get("class") != "engineering"):
+        raise SystemExit("review the k = 4 V4-line summary before updating the leaderboard")
+    gls = load(SOURCES["glv_gls"])
+    if (gls.get("schema") != "crypto.glv_gls_v4_summary/v1"
+            or gls.get("all_verified") is not True
+            or gls.get("class") != "engineering"):
+        raise SystemExit("review the E25 GLS summary before updating the leaderboard")
+    e31 = load(SOURCES["glv_e31"])
+    e2e = e31.get("end_to_end", {})
+    if (e31.get("experiment") != "E31"
+            or e31.get("class") != "engineering (phase speed-up)"
+            or e2e.get("all_correct") is not True
+            or e2e.get("all_replay_fields_identical") is not True
+            or e2e.get("rho_ahead_every_row_every_weight") is not True):
+        raise SystemExit("review the E31 chain-solve summary before updating the leaderboard")
+    e27 = load(SOURCES["glv_e27"])
+    e27_study = "research/e27_walk_20261030"
+    if (e27.get("experiment") != "e27" or e27.get("all_walks_identical") is not True
+            or not all(z["other_fields_equal"] for z in e27["rows"])
+            or gate.check_evidence_dir(REPO / e27_study, REPO)):
+        raise SystemExit("review the E27 walk summary and its VALIDATION.json before updating the leaderboard")
+    span = lambda key, i: [min(z[key][i] for z in e27["rows"]), max(z[key][i] for z in e27["rows"])]
+    e30 = load(SOURCES["glv_e30"])
+    e30_study = "research/e30_invariants_lite_20261030"
+    if (e30.get("experiment") != "e30" or not all(z["other_fields_equal"] for z in e30["rows"])
+            or gate.check_evidence_dir(REPO / e30_study, REPO)):
+        raise SystemExit("review the E30 audit summary and its VALIDATION.json before updating the leaderboard")
+    span30 = lambda f: [min(f(z) for z in e30["rows"]), max(f(z) for z in e30["rows"])]
+    return {**sm, "source": SOURCES["glv_k4"],
+            "report": "research/glv_k4_pipeline_d4_20261017/REPORT.pdf",
+            "gls": {**gls, "source": SOURCES["glv_gls"],
+                    "report": "research/glv_gls_v4_20261018/REPORT.pdf"},
+            "e31": {"source": SOURCES["glv_e31"],
+                    "report": "research/e31_chain_solve_20261024/REPORT.pdf",
+                    "validation": "benchmarks/20261024-e31-chain-solve/VALIDATION.json",
+                    "e25_over_a": e2e["E25_over_A_range_by_weight"],
+                    "e25_over_b": e2e["E25_over_B_range_by_weight"],
+                    "s_over_rho_e25": e2e["S_over_rho_E25_range_by_weight"],
+                    "s_over_rho_a": e2e["S_over_rho_A_range_by_weight"],
+                    "s_over_rho_b": e2e["S_over_rho_B_range_by_weight"],
+                    "per_call_a": e31["stage_a"]["existing_over_A_range"],
+                    "per_call_b": e31["stage_a"]["existing_over_B_range"],
+                    "rows": [{k: z[k] for k in ("p", "seed", "arm", "log2_n", "S_E25", "S_A", "S_B",
+                                                "E25_over_A", "E25_over_B", "S_over_rho_A")}
+                             for z in e2e["rows"]]},
+            "e27": {"source": SOURCES["glv_e27"],
+                    "report": f"{e27_study}/REPORT.pdf",
+                    "validation": f"{e27_study}/VALIDATION.json",
+                    "add_cost": [e27["per_op_costs"]["schoolbook"]["add_distinct_unbatched"],
+                                 e27["per_op_costs"]["karatsuba"]["add_distinct_unbatched"]],
+                    "walk_ratio": e27["walk_ratio_range"],
+                    "ic_ratio": [min(z["S_A"] / z["S_AK"] for z in e27["rows"]),
+                                 max(z["S_A"] / z["S_AK"] for z in e27["rows"])],
+                    "growth": [span("growth", i) for i in range(3)],
+                    "dist_new": [span("dist_new", i) for i in range(3)],
+                    "rows": [{k: z[k] for k in ("p", "seed", "arm", "S_A", "S_AK", "rho_e25", "rho_e27",
+                                                "dist_old", "dist_new", "growth")}
+                             for z in e27["rows"]]},
+            "e30": {"source": SOURCES["glv_e30"],
+                    "report": f"{e30_study}/REPORT.pdf",
+                    "validation": f"{e30_study}/VALIDATION.json",
+                    "share": span30(lambda z: 100 * z["saving_share"]),
+                    "change": [span30(lambda z, i=i: 100 * z["distance_change"][i]) for i in range(3)],
+                    "rows": [{k: z[k] for k in ("p", "seed", "arm", "S_K", "saving", "saving_share",
+                                                "walk_saving", "distance_change")}
+                             for z in e30["rows"]]}}
 
 def postgb_linear_stage_component() -> dict:
     """The linear stage after F4 across Gröbner-basis corpora, from
@@ -1951,6 +2034,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
+        "k4_v4_component": k4_v4_component(),
         "prime_base_size_component": prime_base_size_component(),
         "lazy_members_component": lazy_members_component(),
         "lazy_columns2_component": lazy_columns2_component(),
@@ -2946,6 +3030,74 @@ def markdown(doc: dict) -> str:
     L += ["", "## Sources", ""]
     for k, v in doc["sources"].items():
         L.append(f"- `{v['path']}` — sha256 `{v['sha256'][:16]}…`")
+    k = doc["k4_v4_component"]
+
+    def rr(v, fmt="{:.2e}"):
+        return "—" if v is None else "–".join(fmt.format(x) for x in v)
+
+    L += ["## k = 4 decomposition oracle on curves with rational 2-torsion, outside tables A–C", "",
+          f"Before: {k['before']}. After: {k['after']}. Both end to end over F_p^4 "
+          f"({k['e19_curves']} and {k['e24_curves']} curves, every logarithm verified), every phase "
+          "charged in F_p multiplications against 16 matched negation walks per curve. "
+          f"Handover from each pipeline's own constants: 2^{k['e19_handover_log2_n']:.1f} → "
+          f"2^{k['e24_handover_log2_n']:.1f} (extrapolated). Class: {k['class']}, a constant; "
+          f"every row still {rr(k['e24_s_over_rho_all'])}× slower than rho. "
+          f"Read the [report](../../{k['report']}) and [summary](../../{k['source']}).", "",
+          "| p | log2 n | E19 S/rho | E24 S/rho | E19 / E24 (by seed) | E19 C per call | E24 C per call |",
+          "|--:|--:|--:|--:|--:|--:|--:|"]
+    for z in k["rows"]:
+        L.append(f"| {z['p']} | {z['log2_n']:.1f} | {rr(z['e19_s_over_rho'])} | {rr(z['e24_s_over_rho'])} | "
+                 f"{rr(z['e19_over_e24_by_seed'], '{:.0f}')} | {rr(z['e19_c_median'])} | {rr(z['e24_c_median'])} |")
+    L.append("")
+    g = k["gls"]
+    L += [f"**The GLS endomorphism on the V₄ line (E25).** Before: {g['before']}. After: {g['after']}. "
+          f"Same curve, base and target stream ({g['curves']} GLS curves, h = 16, every logarithm verified); "
+          f"handover from each arm's own constants 2^{g['handover_log2_n_a']:.1f} → 2^{g['handover_log2_n_b']:.1f} "
+          f"(extrapolated). Class: {g['class']}, a constant, on this family only. "
+          f"Read the [report](../../{g['report']}) and [summary](../../{g['source']}).", "",
+          "| p | seed | log2 n | cols A / B | S_A / S_B | S_A / rho (negation) | S_B / rho (±ψ) |",
+          "|--:|--:|--:|:--|--:|--:|--:|"]
+    for z in g["rows"]:
+        L.append(f"| {z['p']} | {z['seed']} | {z['log2_n']:.1f} | {z['columns'][0]} / {z['columns'][1]} | "
+                 f"{z['s_a_over_s_b']:.2f} | {z['s_a_over_rho_negation']:.2e} | {z['s_b_over_rho_psi']:.2e} |")
+    L.append("")
+    e = k["e31"]
+    R = lambda r, f="{:.2f}": f"{f.format(r[0])}–{f.format(r[1])}×"
+    L += [("The chain solve (E31, phase speed-up). E25's k = 4 solve replaced by its P₂-chain solve, identical decompositions on every call; per call {pa} (A) and {pb} (B) fewer F_p multiplications. End to end on E25's 20 arm runs S_E25 / S_A is {a0} at 0 GAE, {a1} at 0.1 and {a2} at 1 (ahead across the §5a band under the registered model). B is {b0} at 0 GAE but, with its pivot-selection pass priced, falls behind E25 at 0.1 and 1 GAE: its rank is unresolved across the band. Distance remaining to the matched ⟨±ψ⟩ rho: A {r0} at 0 GAE (E25 {e0}); rho ahead at every weight. Class: engineering, a constant; validated (note §9.21–§9.24).").format(pa=R(e["per_call_a"]), pb=R(e["per_call_b"]), a0=R(e["e25_over_a"][0]),
+                      a1=R(e["e25_over_a"][1]), a2=R(e["e25_over_a"][2], "{:.3f}"), b0=R(e["e25_over_b"][0]),
+                      r0=R(e["s_over_rho_a"][0], "{:.2e}"), e0=R(e["s_over_rho_e25"][0], "{:.2e}"))
+          + f" Read the [report](../../{e['report']}), [summary](../../{e['source']}) and "
+            f"[validation](../../{e['validation']}).", "",
+          "| p | seed | arm | S E25 | S A | S B | E25 / A (0, 0.1, 1 GAE) | E25 / B (0 GAE) | S_A / rho (0 GAE) |",
+          "|--:|--:|:--|--:|--:|--:|:--|--:|--:|"]
+    for z in e["rows"]:
+        L.append(f"| {z['p']} | {z['seed']} | {z['arm']} | {z['S_E25']:.2e} | {z['S_A']:.2e} | {z['S_B']:.2e} | "
+                 f"{z['E25_over_A'][0]:.2f}, {z['E25_over_A'][1]:.2f}, {z['E25_over_A'][2]:.3f} | "
+                 f"{z['E25_over_B'][0]:.2f} | {z['S_over_rho_A'][0]:.2e} |")
+    L.append("")
+    e = k["e27"]
+    L += [("The matched walk made stronger (E27, reference correction). Karatsuba F_p⁴ products and the norm inversions of 16 lockstep walks batched by Montgomery's trick take an affine addition from {a0} to {a1} F_p multiplications ({a2} with the batch share); every walk is bit-identical across the three arithmetics. The matched ⟨±ψ⟩ / negation walk becomes {w} cheaper; the index-calculus side, whose non-solve F_p⁴ work is about 2 % of S, only {ic}. Every row therefore moves further from rho, by {g0} at 0 GAE, {g1} at 0.1 and {g2} at 1; distance remaining {d0} at 0 GAE. Rho ahead at every weight. Class: a correction to the rho reference, not an improvement; validated (independent replay 11/11 runs, note §9.25 and §9.29).").format(a0=e["add_cost"][0], a1=e["add_cost"][1], a2="66.3–66.7", w=R(e["walk_ratio"], "{:.3f}"), ic=R(e["ic_ratio"], "{:.4f}"), g0=R(e["growth"][0], "{:.3f}"), g1=R(e["growth"][1], "{:.3f}"), g2=R(e["growth"][2], "{:.3f}"), d0=R(e["dist_new"][0], "{:.2e}"))
+          + f" Read the [report](../../{e['report']}), [summary](../../{e['source']}) and "
+            f"[validation](../../{e['validation']}).", "",
+          "| p | seed | arm | S (E31 A) | S (E27) | rho E25 walk | rho E27 walk | S / rho before → after (0 GAE) | growth (0, 0.1, 1 GAE) |",
+          "|--:|--:|:--|--:|--:|--:|--:|:--|:--|"]
+    for z in e["rows"]:
+        L.append(f"| {z['p']} | {z['seed']} | {z['arm']} | {z['S_A']:.3e} | {z['S_AK']:.3e} | {z['rho_e25']:.4g} | "
+                 f"{z['rho_e27']:.4g} | {z['dist_old'][0]:.3e} → {z['dist_new'][0]:.3e} | "
+                 f"{z['growth'][0]:.3f}, {z['growth'][1]:.3f}, {z['growth'][2]:.3f} |")
+    L.append("")
+    e = k["e30"]
+    P2 = lambda r, f="{:.3f}": f"{f.format(r[0])} to {f.format(r[1])} %"
+    L += [("Trivial products repriced (E30, accounting). An audit of E27's records reprices every F_p multiplication by 0, 1 or an F_p element inside an F_p⁴ product at what it would really cost: such products are {s} of S on the index-calculus side and at most 0.0002 % of the walk, so the distance to the matched rho changes by {c0} at 0 GAE, {c1} at 0.1 and {c2} at 1. Every other field reproduces E27's. Class: accounting, not an improvement; validated (independent replay, note §9.28 and §9.32). E28 (ψ fold on E19's τ_T line) and E29 (order-24 twist action on E18's j = 0 line) were replayed and their measured stages verified, but are not shown: E28's end-to-end S is a model and E29 has no index-calculus cost, so neither can pass the validation gate (note §9.30–§9.31; research/e28_tau_20261030, research/e29_twists_20261030).").format(s=P2(e["share"]), c0=P2(e["change"][0]), c1=P2(e["change"][1], "{:.4f}"), c2=P2(e["change"][2], "{:.4f}"))
+          + f" Read the [report](../../{e['report']}), [summary](../../{e['source']}) and "
+            f"[validation](../../{e['validation']}).", "",
+          "| p | seed | arm | S (E27) | trivial-product saving | share of S | walk saving | distance change (0, 0.1, 1 GAE) |",
+          "|--:|--:|:--|--:|--:|--:|--:|:--|"]
+    for z in e["rows"]:
+        L.append(f"| {z['p']} | {z['seed']} | {z['arm']} | {z['S_K']:.3e} | {z['saving']:.3e} | "
+                 f"{100 * z['saving_share']:.3f} % | {z['walk_saving']:.3g} | "
+                 + ", ".join(f"{100 * x:.4f} %" for x in z["distance_change"]) + " |")
+    L.append("")
     return "\n".join(L) + "\n"
 
 
@@ -4096,6 +4248,80 @@ def page(doc: dict, standalone: bool) -> str:
              'operation-unit S rankings.</p>' +
              gh(n83["source"], 'Frozen IC1 rows and candidate identities') + '</section>')
 
+    k = doc["k4_v4_component"]
+
+    def rh(v, fmt="{:.2e}"):
+        return "—" if v is None else "–".join(fmt.format(x) for x in v)
+
+    P.append('<section id="k4-v4-line"><h2>k = 4 decomposition oracle on curves with rational 2-torsion, '
+             'outside tables A–C</h2>'
+             f'<p>Before: {esc(k["before"])}. After: {esc(k["after"])}. Both end to end over '
+             f'F<sub>p⁴</sub> ({k["e19_curves"]} and {k["e24_curves"]} curves, every logarithm verified), '
+             'every phase charged in F<sub>p</sub> multiplications against 16 matched negation walks per curve. '
+             f'Handover from each pipeline&rsquo;s own constants: 2<sup>{k["e19_handover_log2_n"]:.1f}</sup> &rarr; '
+             f'2<sup>{k["e24_handover_log2_n"]:.1f}</sup> (extrapolated). Class: {esc(k["class"])}, a constant; '
+             f'every row still {rh(k["e24_s_over_rho_all"])}&times; slower than rho.</p>'
+             '<div class="scroll"><table><thead><tr><th>p</th><th>log2 n</th><th>E19 S/rho</th>'
+             '<th>E24 S/rho</th><th>E19 / E24 (by seed)</th><th>E19 C per call</th><th>E24 C per call</th>'
+             '</tr></thead><tbody>')
+    for z in k["rows"]:
+        P.append(f'<tr><td>{z["p"]}</td><td>{z["log2_n"]:.1f}</td><td>{rh(z["e19_s_over_rho"])}</td>'
+                 f'<td>{rh(z["e24_s_over_rho"])}</td><td>{rh(z["e19_over_e24_by_seed"], "{:.0f}")}</td>'
+                 f'<td>{rh(z["e19_c_median"])}</td><td>{rh(z["e24_c_median"])}</td></tr>')
+    g = k["gls"]
+    P.append('</tbody></table></div>' + gh(k["source"], 'Frozen study summary')
+             + f'<h3>The GLS endomorphism on the V₄ line (E25)</h3><p>Before: {esc(g["before"])}. '
+             f'After: {esc(g["after"])}. Same curve, base and target stream ({g["curves"]} GLS curves, '
+             f'h = 16, every logarithm verified); handover from each arm&rsquo;s own constants '
+             f'2<sup>{g["handover_log2_n_a"]:.1f}</sup> &rarr; 2<sup>{g["handover_log2_n_b"]:.1f}</sup> '
+             f'(extrapolated). Class: {esc(g["class"])}, a constant, on this family only.</p>'
+             '<div class="scroll"><table><thead><tr><th>p</th><th>seed</th><th>log2 n</th><th>cols A / B</th>'
+             '<th>S_A / S_B</th><th>S_A / rho (negation)</th><th>S_B / rho (±ψ)</th></tr></thead><tbody>')
+    for z in g["rows"]:
+        P.append(f'<tr><td>{z["p"]}</td><td>{z["seed"]}</td><td>{z["log2_n"]:.1f}</td>'
+                 f'<td>{z["columns"][0]} / {z["columns"][1]}</td><td>{z["s_a_over_s_b"]:.2f}</td>'
+                 f'<td>{z["s_a_over_rho_negation"]:.2e}</td><td>{z["s_b_over_rho_psi"]:.2e}</td></tr>')
+    e = k["e31"]
+    R = lambda r, f="{:.2f}": f"{f.format(r[0])}–{f.format(r[1])}×"
+    P.append('</tbody></table></div>' + gh(g["source"], 'Frozen study summary')
+             + '<h3>The chain solve (E31)</h3><p>' + esc(("The chain solve (E31, phase speed-up). E25's k = 4 solve replaced by its P₂-chain solve, identical decompositions on every call; per call {pa} (A) and {pb} (B) fewer F_p multiplications. End to end on E25's 20 arm runs S_E25 / S_A is {a0} at 0 GAE, {a1} at 0.1 and {a2} at 1 (ahead across the §5a band under the registered model). B is {b0} at 0 GAE but, with its pivot-selection pass priced, falls behind E25 at 0.1 and 1 GAE: its rank is unresolved across the band. Distance remaining to the matched ⟨±ψ⟩ rho: A {r0} at 0 GAE (E25 {e0}); rho ahead at every weight. Class: engineering, a constant; validated (note §9.21–§9.24).").format(
+                 pa=R(e["per_call_a"]), pb=R(e["per_call_b"]), a0=R(e["e25_over_a"][0]),
+                 a1=R(e["e25_over_a"][1]), a2=R(e["e25_over_a"][2], "{:.3f}"), b0=R(e["e25_over_b"][0]),
+                 r0=R(e["s_over_rho_a"][0], "{:.2e}"), e0=R(e["s_over_rho_e25"][0], "{:.2e}"))) + '</p>'
+             '<div class="scroll"><table><thead><tr><th>p</th><th>seed</th><th>arm</th><th>S E25</th><th>S A</th>'
+             '<th>S B</th><th>E25 / A (0, 0.1, 1 GAE)</th><th>E25 / B (0 GAE)</th><th>S_A / rho (0 GAE)</th>'
+             '</tr></thead><tbody>')
+    for z in e["rows"]:
+        P.append(f'<tr><td>{z["p"]}</td><td>{z["seed"]}</td><td>{z["arm"]}</td><td>{z["S_E25"]:.2e}</td>'
+                 f'<td>{z["S_A"]:.2e}</td><td>{z["S_B"]:.2e}</td><td>{z["E25_over_A"][0]:.2f}, '
+                 f'{z["E25_over_A"][1]:.2f}, {z["E25_over_A"][2]:.3f}</td><td>{z["E25_over_B"][0]:.2f}</td>'
+                 f'<td>{z["S_over_rho_A"][0]:.2e}</td></tr>')
+    P.append('</tbody></table></div>' + gh(e["source"], 'Frozen study summary'))
+    e = k["e27"]
+    P.append('<h3>The matched walk made stronger (E27)</h3><p>' + esc(("The matched walk made stronger (E27, reference correction). Karatsuba F_p⁴ products and the norm inversions of 16 lockstep walks batched by Montgomery's trick take an affine addition from {a0} to {a1} F_p multiplications ({a2} with the batch share); every walk is bit-identical across the three arithmetics. The matched ⟨±ψ⟩ / negation walk becomes {w} cheaper; the index-calculus side, whose non-solve F_p⁴ work is about 2 % of S, only {ic}. Every row therefore moves further from rho, by {g0} at 0 GAE, {g1} at 0.1 and {g2} at 1; distance remaining {d0} at 0 GAE. Rho ahead at every weight. Class: a correction to the rho reference, not an improvement; validated (independent replay 11/11 runs, note §9.25 and §9.29).").format(a0=e["add_cost"][0], a1=e["add_cost"][1], a2="66.3–66.7", w=R(e["walk_ratio"], "{:.3f}"), ic=R(e["ic_ratio"], "{:.4f}"), g0=R(e["growth"][0], "{:.3f}"), g1=R(e["growth"][1], "{:.3f}"), g2=R(e["growth"][2], "{:.3f}"), d0=R(e["dist_new"][0], "{:.2e}"))) + '</p>'
+             '<div class="scroll"><table><thead><tr><th>p</th><th>seed</th><th>arm</th><th>S (E31 A)</th>'
+             '<th>S (E27)</th><th>rho E25 walk</th><th>rho E27 walk</th><th>S / rho before → after (0 GAE)</th>'
+             '<th>growth (0, 0.1, 1 GAE)</th></tr></thead><tbody>')
+    for z in e["rows"]:
+        P.append(f'<tr><td>{z["p"]}</td><td>{z["seed"]}</td><td>{z["arm"]}</td><td>{z["S_A"]:.3e}</td>'
+                 f'<td>{z["S_AK"]:.3e}</td><td>{z["rho_e25"]:.4g}</td><td>{z["rho_e27"]:.4g}</td>'
+                 f'<td>{z["dist_old"][0]:.3e} → {z["dist_new"][0]:.3e}</td>'
+                 f'<td>{z["growth"][0]:.3f}, {z["growth"][1]:.3f}, {z["growth"][2]:.3f}</td></tr>')
+    P.append('</tbody></table></div>' + gh(e["source"], 'Frozen study summary') + ' · '
+             + gh(e["validation"], 'Validation'))
+    e = k["e30"]
+    P2 = lambda r, f="{:.3f}": f"{f.format(r[0])} to {f.format(r[1])} %"
+    P.append('<h3>Trivial products repriced (E30)</h3><p>' + esc(("Trivial products repriced (E30, accounting). An audit of E27's records reprices every F_p multiplication by 0, 1 or an F_p element inside an F_p⁴ product at what it would really cost: such products are {s} of S on the index-calculus side and at most 0.0002 % of the walk, so the distance to the matched rho changes by {c0} at 0 GAE, {c1} at 0.1 and {c2} at 1. Every other field reproduces E27's. Class: accounting, not an improvement; validated (independent replay, note §9.28 and §9.32). E28 (ψ fold on E19's τ_T line) and E29 (order-24 twist action on E18's j = 0 line) were replayed and their measured stages verified, but are not shown: E28's end-to-end S is a model and E29 has no index-calculus cost, so neither can pass the validation gate (note §9.30–§9.31; research/e28_tau_20261030, research/e29_twists_20261030).").format(s=P2(e["share"]), c0=P2(e["change"][0]), c1=P2(e["change"][1], "{:.4f}"), c2=P2(e["change"][2], "{:.4f}"))) + '</p>'
+             '<div class="scroll"><table><thead><tr><th>p</th><th>seed</th><th>arm</th><th>S (E27)</th>'
+             '<th>trivial-product saving</th><th>share of S</th><th>walk saving</th>'
+             '<th>distance change (0, 0.1, 1 GAE)</th></tr></thead><tbody>')
+    for z in e["rows"]:
+        P.append(f'<tr><td>{z["p"]}</td><td>{z["seed"]}</td><td>{z["arm"]}</td><td>{z["S_K"]:.3e}</td>'
+                 f'<td>{z["saving"]:.3e}</td><td>{100 * z["saving_share"]:.3f} %</td>'
+                 f'<td>{z["walk_saving"]:.3g}</td><td>'
+                 + ", ".join(f"{100 * x:.4f} %" for x in z["distance_change"]) + '</td></tr>')
+    P.append('</tbody></table></div>' + gh(e["source"], 'Frozen study summary') + ' · '
+             + gh(e["validation"], 'Validation') + '</section>')
     b = doc["bitop_prime_ladder"]
     t = bitop_text(b)
     P.append(f'<section class="card" id="bitop-prime-ladder"><h2>{esc(t["title"])}, outside the priced tables</h2>'
