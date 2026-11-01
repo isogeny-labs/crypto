@@ -180,6 +180,13 @@ jobs:
             "diagnosis/$T1_WORKFLOW_RUN.json" >> "$GITHUB_STEP_SUMMARY"
           printf '\nNo experiment retry occurred. Raw records, timing values, logs and stderr remain private.\n' \
             >> "$GITHUB_STEP_SUMMARY"
+      - name: Emit the allowlisted diagnoses to the job log
+        run: |
+          set -euo pipefail
+          jq -c '{allowlisted_diagnosis:"target-0",diagnosis:.}' \
+            "diagnosis/$T0_WORKFLOW_RUN.json"
+          jq -c '{allowlisted_diagnosis:"target-1",diagnosis:.}' \
+            "diagnosis/$T1_WORKFLOW_RUN.json"
       - name: Retain only the allowlisted diagnoses
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
