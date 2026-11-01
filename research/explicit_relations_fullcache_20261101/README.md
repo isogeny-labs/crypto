@@ -61,3 +61,16 @@ formulas and exact completed-cell checks, reports every complete matched set,
 and keeps the interrupted/unstarted slots outside timing calculations.
 `retained-analysis-v2/analysis-custody.json` identifies its source and outputs.
 No new measurement or replacement GPU is authorized by that analysis artifact.
+
+Version3 (`protocol-v3.json`) was frozen after the owner authorized completing
+the remaining second input within the original budget. `ladder-v3.rs`,
+`analyze-v3.rs` and `run-v3.sh` select only63-bit seed202 in the original x/v/b
+order, preserving the GPU/driver source, limits, preflight and exact checks.
+All three arms must run on one fresh RTX4090; old-host clocks are never pooled
+or substituted. Worker cap9000s, controller9300s, one GPU<=USD0.90/hour.
+
+The first version3 submission was refused with HTTP402 (account balance too
+low). No pod was created and no trial or preflight ran; zero GPU time was
+allocated. `launch-refused-v3.json` records the refusal and reconciled inventory.
+The frozen protocol and verified S3 source archive are ready for a submission
+after account funds are restored. No version3 performance result exists yet.
