@@ -9178,6 +9178,16 @@ pub struct ChainS3Stats {
     pub domain_clauses: usize,
     pub refuted: bool,
     pub exhausted: bool,
+    /// Identity patterns refuted by the meet-in-the-middle lookup
+    /// ([`ChainS3Tables::meet`]) without building or solving their SAT
+    /// instance; they are also counted in `patterns_attempted` and
+    /// `patterns_refuted`.
+    #[serde(default)]
+    pub patterns_refuted_by_lookup: usize,
+    /// Size of the lookup domain of the middle intermediate, when the
+    /// lookup ran.
+    #[serde(default)]
+    pub meet_domain: Option<usize>,
 }
 
 /// Solve a retained finite-coordinate union by a chain of binary S3
@@ -9367,11 +9377,26 @@ pub fn sat_decompose_chained_s3_ordered(
 /// (the base is closed under negation, and the chain may take either sign
 /// at each link), so no decomposition in any order or pattern is lost. A
 /// table larger than `max_points` leaves its step unconstrained.
+///
+/// `meet = d` (with `2 <= d`, `d < m` and `m - d <= d`) adds a
+/// meet-in-the-middle lookup for the middle intermediate `y_(d-1)`, whose
+/// front depth `d` is too deep to materialise as a table: the
+/// x-fingerprints of every signed `d`-sum are built once per base
+/// ([`chain_s3_meet_front`], query-independent), and per query the points
+/// `R - s` over every signed `(m - d)`-sum `s` are kept when their x lies in
+/// that set. The survivors are the exact domain of `y_(d-1)` (a fingerprint
+/// collision can only add a value, never drop one). An identity pattern
+/// that puts the identity at `y_(d-1)` needs `R` itself to be a signed
+/// `(m - d)`-sum; when the enumeration never meets the identity, those
+/// patterns are refuted without a solve, and so is every other pattern when
+/// the domain is empty.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ChainS3Tables {
     pub front: usize,
     pub back: usize,
     pub max_points: usize,
+    #[serde(default)]
+    pub meet: usize,
 }
 
 /// Everything a chained-S3 search can vary besides its limits.
@@ -9455,6 +9480,194 @@ fn chain_s3_codes<'a>(points: impl Iterator<Item = &'a BinaryPoint>) -> Vec<BigU
     codes.sort_unstable();
     codes.dedup();
     codes
+}
+
+/// A 64-bit fingerprint of an x-coordinate. Two x-codes may share one; a
+/// membership test by fingerprint can only report extra members, so a domain
+/// filtered with it contains the exact domain.
+fn chain_s3_fingerprint(x: &F2mElement) -> u64 {
+    let mut h = 0x9e37_79b9_7f4a_7c15u64;
+    for &w in x.raw_bits() {
+        h ^= w;
+        h = (h ^ (h >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+        h = (h ^ (h >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
+        h ^= h >> 31;
+    }
+    h
+}
+
+/// The factor base and every negation, each point once.
+fn chain_s3_signed_base(fb: &FrobeniusFactorBase) -> Vec<BinaryPoint> {
+    let mut seen: HashSet<(BigUint, BigUint)> = HashSet::new();
+    let mut signed = Vec::with_capacity(2 * fb.points.len());
+    for p in &fb.points {
+        for q in [p.clone(), point_neg(p)] {
+            if seen.insert(point_key(&q)) {
+                signed.push(q);
+            }
+        }
+    }
+    signed
+}
+
+#[derive(Default)]
+struct ChainS3Scratch {
+    index: Vec<usize>,
+    dens: Vec<F2mElement>,
+    prefix: Vec<F2mElement>,
+}
+
+/// `visit(x(q + p))` for every `p` of `points` (`None` for the identity),
+/// with one field inversion for the whole batch (Montgomery's trick).
+fn chain_s3_leaf_x(
+    curve: &BinaryCurve,
+    q: &BinaryPoint,
+    points: &[BinaryPoint],
+    scratch: &mut ChainS3Scratch,
+    visit: &mut impl FnMut(Option<&F2mElement>),
+) {
+    let BinaryPoint::Affine { x: x1, y: y1 } = q else {
+        for p in points {
+            match p {
+                BinaryPoint::Affine { x, .. } => visit(Some(x)),
+                BinaryPoint::Infinity => visit(None),
+            }
+        }
+        return;
+    };
+    let irr = &curve.irreducible;
+    scratch.index.clear();
+    scratch.dens.clear();
+    scratch.prefix.clear();
+    let mut acc = F2mElement::one(x1.m_value());
+    for (i, p) in points.iter().enumerate() {
+        match p {
+            BinaryPoint::Affine { x, .. } if x != x1 => {
+                let den = x.add(x1);
+                scratch.prefix.push(acc.clone());
+                acc = acc.mul(&den, irr);
+                scratch.dens.push(den);
+                scratch.index.push(i);
+            }
+            _ => match point_add(curve, q, p) {
+                BinaryPoint::Affine { x, .. } => visit(Some(&x)),
+                BinaryPoint::Infinity => visit(None),
+            },
+        }
+    }
+    if scratch.index.is_empty() {
+        return;
+    }
+    let mut inv = acc
+        .flt_inverse(irr)
+        .expect("a product of non-zero denominators is invertible");
+    for k in (0..scratch.index.len()).rev() {
+        let inv_den = inv.mul(&scratch.prefix[k], irr);
+        inv = inv.mul(&scratch.dens[k], irr);
+        let BinaryPoint::Affine { x: x2, y: y2 } = &points[scratch.index[k]] else {
+            unreachable!("only affine points are batched");
+        };
+        let lambda = y1.add(y2).mul(&inv_den, irr);
+        let x3 = lambda
+            .square(irr)
+            .add(&lambda)
+            .add(x1)
+            .add(x2)
+            .add(&curve.a);
+        visit(Some(&x3));
+    }
+}
+
+/// `visit(x(start + s))` for every sum `s` of exactly `depth` points of
+/// `signed` taken as a multiset. Returns `false` when `deadline` passed
+/// before the enumeration finished.
+fn chain_s3_enumerate(
+    curve: &BinaryCurve,
+    start: &BinaryPoint,
+    signed: &[BinaryPoint],
+    depth: usize,
+    first: usize,
+    deadline: Option<std::time::Instant>,
+    scratch: &mut ChainS3Scratch,
+    visit: &mut impl FnMut(Option<&F2mElement>),
+) -> bool {
+    match depth {
+        0 => {
+            match start {
+                BinaryPoint::Affine { x, .. } => visit(Some(x)),
+                BinaryPoint::Infinity => visit(None),
+            }
+            true
+        }
+        1 => {
+            chain_s3_leaf_x(curve, start, &signed[first..], scratch, visit);
+            true
+        }
+        _ => {
+            for i in first..signed.len() {
+                if depth == 2 && deadline.is_some_and(|d| std::time::Instant::now() >= d) {
+                    return false;
+                }
+                let next = point_add(curve, start, &signed[i]);
+                if !chain_s3_enumerate(
+                    curve, &next, signed, depth - 1, i, deadline, scratch, visit,
+                ) {
+                    return false;
+                }
+            }
+            true
+        }
+    }
+}
+
+type ChainS3MeetCache = std::sync::Mutex<HashMap<u64, Arc<Vec<u64>>>>;
+static CHAIN_S3_MEET_CACHE: OnceLock<ChainS3MeetCache> = OnceLock::new();
+
+/// The sorted, distinct x-fingerprints of every affine sum of `depth`
+/// signed base points: the query-independent side of
+/// [`ChainS3Tables::meet`]. Built once per (base, depth) and process, so a
+/// caller can pay for it before timing queries.
+pub fn chain_s3_meet_front(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    depth: usize,
+) -> Arc<Vec<u64>> {
+    use std::hash::{Hash, Hasher};
+    let signed = chain_s3_signed_base(fb);
+    let mut keys: Vec<(BigUint, BigUint)> = signed.iter().map(point_key).collect();
+    keys.sort_unstable();
+    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+    (kc.n, depth, kc.label(), &keys).hash(&mut hasher);
+    let key = hasher.finish();
+    let cache = CHAIN_S3_MEET_CACHE.get_or_init(Default::default);
+    if let Some(hit) = cache.lock().expect("meet cache").get(&key) {
+        return Arc::clone(hit);
+    }
+    let mut fingerprints: Vec<u64> = Vec::new();
+    let mut scratch = ChainS3Scratch::default();
+    chain_s3_enumerate(
+        &kc.curve,
+        &BinaryPoint::Infinity,
+        &signed,
+        depth,
+        0,
+        None,
+        &mut scratch,
+        &mut |x| {
+            if let Some(x) = x {
+                fingerprints.push(chain_s3_fingerprint(x));
+            }
+        },
+    );
+    fingerprints.sort_unstable();
+    fingerprints.dedup();
+    fingerprints.shrink_to_fit();
+    let front = Arc::new(fingerprints);
+    cache
+        .lock()
+        .expect("meet cache")
+        .insert(key, Arc::clone(&front));
+    front
 }
 
 /// [`sat_decompose_chained_s3_ordered`] with the pattern coverage chosen
@@ -9633,6 +9846,53 @@ fn sat_decompose_chained_s3_checked(
             *slot = codes;
         }
     }
+    // Meet-in-the-middle lookup for the middle intermediate y_(d-1).
+    let mut meet_step: Option<usize> = None;
+    let mut target_is_short = true;
+    let depth = tables.meet;
+    if depth >= 2 && m > depth && m - depth <= depth && matches!(target, BinaryPoint::Affine { .. })
+    {
+        let step = depth - 1;
+        let front = chain_s3_meet_front(kc, fb, depth);
+        let signed = chain_s3_signed_base(fb);
+        let mut hits: Vec<BigUint> = Vec::new();
+        let mut short = false;
+        let mut scratch = ChainS3Scratch::default();
+        let complete = chain_s3_enumerate(
+            &kc.curve,
+            target,
+            &signed,
+            m - depth,
+            0,
+            deadline,
+            &mut scratch,
+            &mut |x| match x {
+                None => short = true,
+                Some(x) => {
+                    if front.binary_search(&chain_s3_fingerprint(x)).is_ok() {
+                        hits.push(x.to_biguint());
+                    }
+                }
+            },
+        );
+        if !complete {
+            stats.exhausted = true;
+            return (None, stats);
+        }
+        hits.sort_unstable();
+        hits.dedup();
+        let slot = &mut intermediate_codes[step];
+        *slot = Some(match slot.take() {
+            Some(earlier) => earlier
+                .into_iter()
+                .filter(|c| hits.binary_search(c).is_ok())
+                .collect(),
+            None => hits,
+        });
+        stats.meet_domain = slot.as_ref().map(Vec::len);
+        meet_step = Some(step);
+        target_is_short = short;
+    }
     let masks = match patterns {
         ChainS3Patterns::All => 1u32 << (m - 2),
         ChainS3Patterns::AffineOnly => 1,
@@ -9641,6 +9901,18 @@ fn sat_decompose_chained_s3_checked(
         if stats.conflicts >= limits.conflict_budget {
             stats.exhausted = true;
             return (None, stats);
+        }
+        if let Some(step) = meet_step {
+            let identity_here = (identity_mask & (1 << (step - 1))) != 0;
+            let empty_here = intermediate_codes[step]
+                .as_ref()
+                .is_some_and(|codes| codes.is_empty());
+            if (identity_here && !target_is_short) || (!identity_here && empty_here) {
+                stats.patterns_attempted += 1;
+                stats.patterns_refuted += 1;
+                stats.patterns_refuted_by_lookup += 1;
+                continue;
+            }
         }
         let mut enc = match ChainedS3Encoding::build(
             m,
@@ -23259,6 +23531,7 @@ mod chain_s3_tables_tests {
             front: 2,
             back: 1,
             max_points: 300_000,
+            meet: 0,
         };
         let (found, stats) =
             sat_decompose_chained_s3_with(&kc, &fb, &target, 3, LIMITS, options(tables));
@@ -23280,6 +23553,7 @@ mod chain_s3_tables_tests {
             front: 2,
             back: 1,
             max_points: 300_000,
+            meet: 0,
         };
         let (found, stats) =
             sat_decompose_chained_s3_with(&kc, &fb, &target, 3, LIMITS, options(tables));
@@ -23288,5 +23562,93 @@ mod chain_s3_tables_tests {
             "{stats:?}"
         );
         assert_eq!(stats.patterns_attempted, 2);
+    }
+
+    fn meet_options(depth: usize) -> ChainS3Options {
+        options(ChainS3Tables {
+            meet: depth,
+            ..ChainS3Tables::default()
+        })
+    }
+
+    fn sum_of(kc: &KoblitzCurve, fb: &FrobeniusFactorBase, idx: &[usize]) -> BinaryPoint {
+        idx.iter()
+            .fold(BinaryPoint::Infinity, |acc, &i| kc.add(&acc, &fb.points[i]))
+    }
+
+    /// Batched leaf additions equal `point_add`, including `q = p`,
+    /// `q = -p` and the identity.
+    #[test]
+    fn n83_batched_leaf_matches_point_add() {
+        let kc = KoblitzCurve::known_n83_k1().expect("fixture");
+        let fb = union_base(&kc);
+        let signed = chain_s3_signed_base(&fb);
+        for q in [
+            kc.mul(kc.generator(), &BigUint::from(977u32)),
+            signed[5].clone(),
+            point_neg(&signed[5]),
+            BinaryPoint::Infinity,
+        ] {
+            let mut batched: Vec<Option<BigUint>> = Vec::new();
+            chain_s3_leaf_x(
+                &kc.curve,
+                &q,
+                &signed,
+                &mut ChainS3Scratch::default(),
+                &mut |x| batched.push(x.map(F2mElement::to_biguint)),
+            );
+            let mut direct: Vec<Option<BigUint>> = signed
+                .iter()
+                .map(|p| match kc.add(&q, p) {
+                    BinaryPoint::Affine { x, .. } => Some(x.to_biguint()),
+                    BinaryPoint::Infinity => None,
+                })
+                .collect();
+            batched.sort();
+            direct.sort();
+            assert_eq!(batched, direct);
+        }
+    }
+
+    /// The depth-2 lookup set holds exactly the x-codes of the depth-2 table.
+    #[test]
+    fn n83_meet_front_matches_the_sum_table() {
+        let kc = KoblitzCurve::known_n83_k1().expect("fixture");
+        let fb = union_base(&kc);
+        let signed = chain_s3_signed_base(&fb);
+        let layer = chain_s3_sum_layer(&kc, &signed, 2, 1_000_000).expect("small layer");
+        let mut expected: Vec<u64> = layer
+            .iter()
+            .filter_map(|p| match p {
+                BinaryPoint::Affine { x, .. } => Some(chain_s3_fingerprint(x)),
+                BinaryPoint::Infinity => None,
+            })
+            .collect();
+        expected.sort_unstable();
+        expected.dedup();
+        assert_eq!(*chain_s3_meet_front(&kc, &fb, 2), expected);
+    }
+
+    /// The lookup keeps a planted witness, one whose summands contain a
+    /// zero-sum pair (the identity pattern at the looked-up step), and
+    /// refutes a public target by lookup alone.
+    #[test]
+    fn n83_meet_keeps_witnesses_and_refutes_by_lookup() {
+        let kc = KoblitzCurve::known_n83_k1().expect("fixture");
+        let fb = union_base(&kc);
+        for target in [sum_of(&kc, &fb, &[3, 40, 97]), fb.points[11].clone()] {
+            let (found, stats) =
+                sat_decompose_chained_s3_with(&kc, &fb, &target, 3, LIMITS, meet_options(2));
+            let found = found.unwrap_or_else(|| panic!("witness lost: {stats:?}"));
+            assert_eq!(found.len(), 3);
+            assert_eq!(sum_of(&kc, &fb, &found), target);
+        }
+        let target = kc.mul(kc.generator(), &BigUint::from(0x5eed_83u64));
+        let (found, stats) =
+            sat_decompose_chained_s3_with(&kc, &fb, &target, 3, LIMITS, meet_options(2));
+        assert!(found.is_none() && stats.refuted && !stats.exhausted, "{stats:?}");
+        assert_eq!(stats.patterns_refuted_by_lookup, 2);
+        assert_eq!(stats.conflicts, 0);
+        assert_eq!(stats.meet_domain, Some(0));
     }
 }
