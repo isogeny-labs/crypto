@@ -65,6 +65,22 @@ mismatch is reported.
   Targets cut off by the guard are recorded as `TIMEOUT_20MIN_NOT_RUN` and excluded
   from the mean, as the harness does; their count is reported per cell.
 
+- **A5, msolve kernel (added 2026-11-01 after the first parity attempt, before any
+  stage-1 to stage-3 data).** The first P1 attempt (card R0 at 122535fb3; receipt and
+  outputs kept in `attempt1_msolve065_l2/`) failed on all 32 cells: msolve 0.6.5
+  segfaults in its first F4 round with its default exact sparse kernel (`-l 2`) and
+  with `-l 44`, on characteristic 105037. P2 (characteristics below 2^16) passed on
+  every column. With the exact sparse/dense kernel `-l 1`, the cell crater_0_t1 gave
+  168 rounds, maximal degree 20, largest matrix 268 × 1142 and summed cells 7767106,
+  equal to the original record, and a reduced basis identical to the original
+  `.out`. Building a newer msolve from source was refused by this session's
+  permission policy. So every msolve call of the rerun passes `-l 1` (`MSOLVE_LA=1`
+  for the C2 harness, `MSOLVE_EXTRA="-l 1"` for `run_cell.sh`; unset, both keep the
+  original command), and P1 and P2 are repeated in full with it before stage 1. The
+  F4 round table (degree, rows, columns per round) is produced by symbolic
+  preprocessing and is the same for both exact kernels; P1 and P2 test that claim on
+  35 cells.
+
 ## Decision rules (unchanged, copied for the reader)
 
 - **L2a** (`../PLAN.md`): bootstrap interval of e entirely below 0.5 reopens; an

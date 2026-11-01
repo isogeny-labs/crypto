@@ -10,7 +10,7 @@ Leads L2a, L2b (catalogue M008) and C2 of the note above. Null predictions: L2a 
 research/prime_field_leads_20261031/rerun_20261101/RERUN_PLAN.md (frozen before data), driver run_stage.sh in the same directory. Inputs: committed C2 .ms files (sha256 in each stage's inputs.sha256), seeded generators.
 
 ## State
-Instruments ported to Linux (L2b run_cell.sh env overrides, rsswatch Linux branch); binaries built (binaries.sha256); generator reproduces all original instance parameters. No stage has run yet.
+Instruments ported to Linux; generator reproduces all original instance parameters. First parity attempt (card R0 at 122535fb3) found msolve 0.6.5 segfaults with its default kernel above 2^16 (evidence in attempt1_msolve065_l2/); L2b probe parity passed. Amendment A5: every msolve call uses -l 1, which reproduced one C2 cell exactly. Binaries rebuilt (binaries.sha256). Cards to be recompiled for the new commit; then R0 again, R1, R2, R3 in order.
 
 ## Next steps
 cd research/prime_field_leads_20261031/rerun_20261101; for s in parity_c2 parity_l2b l2b c2m l2a l2a_fit; do ./run_stage.sh $s; done (one at a time; ./run_stage.sh build first in a fresh container; apt-get install msolve). Then write REPORT.md, graphs, PDF; update lead reports, note §5, SYNTHESIS.md; PR with auto-merge.

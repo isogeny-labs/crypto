@@ -9,6 +9,9 @@ L=$(cd "$H/.." && pwd)
 B=${RERUN_BUILD:-/home/user/cargo-rerun}
 export CARGO_TARGET_DIR=$B
 stage=${1:?stage}
+# Amendment A5 (RERUN_PLAN.md): msolve 0.6.5 segfaults in its default exact-sparse kernel (-l 2) for
+# characteristics above 2^16; every msolve call of the rerun uses the exact sparse/dense kernel -l 1.
+export MSOLVE_LA=1 MSOLVE_EXTRA="-l 1"
 need() { command -v "$1" >/dev/null || { echo "missing tool: $1" >&2; exit 3; }; }
 case "$stage" in
   build)

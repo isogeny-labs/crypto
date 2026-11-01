@@ -4,7 +4,7 @@
 # appends one CSV row to results/cells.csv. Wall time is used only as the kill cap.
 set -u
 # Environment overrides (added 2026-11-01 for the Linux rerun; defaults are the original macOS paths):
-#   L2B_GEN MSOLVE RSSWATCH L2B_RESULTS L2B_WORK L2B_RSSCAP_KB
+#   L2B_GEN MSOLVE MSOLVE_EXTRA RSSWATCH L2B_RESULTS L2B_WORK L2B_RSSCAP_KB
 D=$(cd "$(dirname "$0")" && pwd)
 P=$1; CS=$2; TS=$3; ARM=$4; CAP=${5:-1800}
 RSSCAP_KB=$((16*1024*1024))
@@ -18,7 +18,7 @@ W=$WORK/p${P}_c${CS}_t${TS}_${ARM}
 mkdir -p "$RES" "$WORK/logs"
 META=$($G $P $CS $TS $ARM $W.ms)
 N=$(echo "$META" | sed 's/.*"N":\([0-9]*\).*/\1/')
-"$MSOLVE" -f $W.ms -g 2 -v 2 -t 1 -o $W.out > $W.log 2>&1 &
+"$MSOLVE" ${MSOLVE_EXTRA:-} -f $W.ms -g 2 -v 2 -t 1 -o $W.out > $W.log 2>&1 &
 PID=$!
 T0=$(date +%s); STATUS=ok
 while kill -0 $PID 2>/dev/null; do
