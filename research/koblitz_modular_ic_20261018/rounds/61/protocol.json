@@ -1,0 +1,113 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R61-NORMAL-TRACE-DUAL",
+  "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
+  "claims": [
+    {
+      "id": "trace-dual",
+      "class": "exact_computation",
+      "statement": "All1024actual normal trace-Gram entries,fullrank32 inverse and source-bound dual lattice"
+    }
+  ],
+  "arms": {
+    "reference": "R55normalA andsourceannihilator;R52normalbasis/table/nu;R58complete100functions",
+    "baseline": "reducedB/A80sourcequotient",
+    "candidate": "640/320normalA4quotientwithcomplete18-patternprincipaldivisortest",
+    "positive": [
+      "allE M4=0,E G=I320,M4H+GE=I640",
+      "fourpoint-labelled80-dimensionalnilpotentJordanblocks",
+      "full100-columnfiniteevaluationleftinverse",
+      "all160oldCRTcolumnsrecovered",
+      "globallyregularxspacepositivekernelA\u00b2dimension1",
+      "all18completeC K/R K/K R+H Cproducts"
+    ],
+    "negative": [
+      "knownx=1/A\u00b2failsglobalregularconditions",
+      "changedcokernelprojectionfailsinverseproduct"
+    ],
+    "A_A": {
+      "not_applicable_reason": "fixedexactproducts,no noisycomparison"
+    }
+  },
+  "variables": {
+    "fixed": [
+      "all528sourceproducts",
+      "normal32basis",
+      "seed61",
+      "4GiB/1200s",
+      "onejob/thread"
+    ],
+    "measured": [
+      "binaryhash",
+      "nativeUTC",
+      "exit/errors"
+    ],
+    "statistical": "notapplicable"
+  },
+  "randomization": {
+    "method": "fixed",
+    "reason": "exhaustive prescribed polynomial identities",
+    "seeds": [
+      61
+    ]
+  },
+  "blinding": {
+    "method": "none",
+    "reason": "exactpredeclaredproducts"
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": "notapplicable"
+  },
+  "metrics": [
+    "1024orderedtraceproducts",
+    "normalrank32",
+    "528sourceproductcolumns",
+    "twoinverseproducts",
+    "32dualcoordinatesourcebindings"
+  ],
+  "execution": {
+    "launcher": "REPLAY_CAS.sh trace61-01 TRACE61.sing TRACE61_ALL_CHECKS_PASS",
+    "timeout_seconds": 1200,
+    "virtual_KiB": 4194304,
+    "threads": 1,
+    "seed": 61,
+    "queue": "one mathematical job atonce",
+    "checkpoint": "immutable raw sources,logs,exit,binaryhash,tar",
+    "source_gate": "sixexecutedfiles matchGit;all donor hashes",
+    "backend": "original manually authorized local exact Singular",
+    "compiler_timeout_seconds": 1200,
+    "run_timeout_seconds": 1200,
+    "compiler": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+    "CPU_affinity": "0"
+  },
+  "stopping": {
+    "accepted": "exit0,exactmarker,no nativeerrorlines,allprescribedchecks",
+    "failure": "retain errors/caps/partials;freeze repairbeforefreshattempt",
+    "no_duplicate": "reconcilelivehandlebeforeretry"
+  },
+  "decision": {
+    "accept": "exit0,exactmarker,no nativeerrorlines,allpredeclaredsourceproducts",
+    "failure": "preserveeverycap/error/partial;freezearepairbeforefreshattempt",
+    "scope": "affinetracedualonly;global61holodifferentials/Cartier andcubic818next"
+  },
+  "analysis": {
+    "kind": "exactpolynomialmatrix/rationalcoefficienttransportandbinarypresentation",
+    "comparative": false,
+    "precision": "exact,no seriestruncationinthisstage"
+  },
+  "literature": [
+    {
+      "source": "R52normalRR/PID/table,R27tamedifferent,R60NEW-LEADS/TRACE-DUAL-NEXT",
+      "use": "actualsourcebasis andglobaldifferentialobligations"
+    },
+    {
+      "url": "https://stacks.math.columbia.edu/tag/0BW0",
+      "use": "complementarymodule=relative dualizingmodule forfinitegenericallyetale extension"
+    }
+  ],
+  "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
+  "version": 1
+}
