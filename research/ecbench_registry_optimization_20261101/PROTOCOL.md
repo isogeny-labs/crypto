@@ -1,16 +1,16 @@
 # Protocol: optimize the complete ECBench registry
 
 Status: the methodology and admission rules below were frozen before new
-measurements. The 109-spec all-method development roster now passes `ecbench
-optimize audit --require-all` with 78/78 methods and 19/19 nested algorithms.
+measurements. The 111-spec all-method development roster now passes `ecbench
+optimize audit --require-all` with 78/78 methods and 24/24 nested algorithms.
 No paid job may launch before the independent checkpoint gate also passes.
 
 ## 1. Boundary and question
 
 The boundary is the live `methods::registry()` plus the native nested solver
-registry and the PDP3 engines linked by the ECBench binary. At the source state
-used to start this work, that is 78 top-level methods, 11 system solvers and
-eight PDP3 engines.
+registry and the binary-linked PDP3 and prime PKM tower engines. At the current
+source state, that is 78 top-level methods, 11 system solvers, nine PDP3
+engines, and four PKM tower engines.
 
 The question for each compatible method/domain cell is:
 
@@ -146,6 +146,7 @@ The PDP3 inventory separately requires:
 
 - inherited F4;
 - F6-IC;
+- F6-IC with the exact pair-sum index;
 - matrix F4;
 - matrix F5;
 - full root finding;
@@ -156,6 +157,11 @@ The PDP3 inventory separately requires:
 Root-finding table methods are the generic/reference track, not an algebraic
 sub-square-root claim. Solver-local gains must survive base construction,
 relation yield, linear algebra, recovery and final verification.
+
+The prime PKM tower inventory separately requires F4, signature F5, F6
+geometric closure, and direct geometric enumeration. Its `F_p` multiply-add
+counter is not assigned a GAE price by default; comparisons retain it as
+unpriced work and cannot promote a lower-bound-only winner.
 
 ## 7. Rho optimization lane
 
@@ -177,7 +183,7 @@ table costs.
 ## 8. Admission and publication
 
 The all-method development roster is admitted only when the native auditor says
-all 78 methods and all 19 nested paths are present and every structural error
+all 78 methods and all 24 nested paths are present and every structural error
 list is empty. A successful run then additionally requires queue export checks,
 native L2 admission where clocks are used, record audit, exact payload hashes
 and independent replay.

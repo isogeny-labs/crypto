@@ -4,18 +4,25 @@ Status: replay-verified L0 development evidence; not a leaderboard result.
 
 ## Coverage and integrity
 
-- 33 complete sessions, 955 records.
-- 902 verified outcomes, 20 exhausted, 23 timed out, and 10 explicit errors.
-- All 33 receipts passed; 742/742 eligible deterministic measured replays
+- 35 complete admitted sessions, 1,005 records.
+- 952 verified outcomes, 20 exhausted, 23 timed out, and 10 explicit errors.
+- All 35 admitted receipts passed; 782/782 eligible deterministic measured replays
   reproduced exactly; zero audit problems.
 - 72/72 runnable native top-level methods executed. The six unexecuted registry
   entries are external CM wrappers awaiting a real backend and digest.
-- 11/11 system solvers and 8/8 PDP3 engines executed.
-- The campaign-structure audit separately admits 109 specs with 78/78 methods
-  and 19/19 nested algorithms.
+- 11/11 system solvers, 9/9 PDP3 engines, and 4/4 PKM tower engines executed.
+- The campaign-structure audit separately admits 111 specs with 78/78 methods
+  and 24/24 nested algorithms.
 - A post-merge audit with current `main` reproduced the same 742/742 eligible
   runs across all 33 admitted sessions with zero problems. Its binary-bound
   receipts and summary are in [`current-head-replay/`](current-head-replay/).
+- The new PKM panel passed 24/24 measured replays. The first PDP3 pair-index
+  session exposed cross-record cache charging (13/16 replays); it is retained
+  as a failed negative control. After resetting the cache once per independent
+  pipeline invocation, the corrected session passed 16/16.
+- Those three post-merge raw JSONL payloads are local pending artifact-store
+  delivery; tracked receipts bind their hashes and results. They are not a
+  remotely hydrated evidence bundle and cannot support promotion.
 
 Every timing here is L0 and descriptive. The completion and nested panels use
 one target, one warm-up, and four measured rounds. Deterministic work can select
@@ -26,6 +33,12 @@ a holdout candidate, but one target cannot establish a curve-family frontier.
 | lane | candidate/reference work ratio | result at this boundary |
 |:--|--:|:--|
 | Koblitz n=29 full-price generator-orbit pipeline / signed-Frobenius rho | 0.4405, 95% within-target interval [0.363, 0.534] | selected for holdout; wins at pricing weights 0, 0.1, and 1, but only one L0 development target |
+| Koblitz n=13 pair-index F6-IC / inherited F6-IC | 0.2792 [0.246, 0.317] | same solver count; pair-index closure cuts charged group work and wins at all recorded weights, but L0 method wall is 0.922 [0.828, 1.027] |
+| Koblitz n=13 pair-index F6-IC / strong rho | 139.3034 [85.480, 227.016] | rho leads at every pricing weight |
+| prime p9 PKM signature F5 / negation rho | 4.6179 [4.140, 5.151] | rho leads at every pricing weight; F5 uses 0.2253× F4's native multiply-adds, but the unit is unpriced |
+| prime p9 PKM F4 / negation rho | 4.6179 [4.140, 5.151] | rho leads at every pricing weight |
+| prime p9 PKM F6 / negation rho | 4.7313 [4.235, 5.285] | rho leads at every pricing weight |
+| prime p9 PKM enumeration / negation rho | 5.0328 [4.024, 6.295] | rho leads at every pricing weight |
 | Koblitz n=17 best matched system-solver lane (FES-wide) / strong rho | 4.2817 [3.580, 5.121] | rho leads at every pricing weight |
 | Koblitz n=13 rootfind-negfold / strong rho | 7.6894 [5.604, 10.551] | rho leads at every pricing weight |
 | Koblitz n=13 rootfind / strong rho | 16.2245 [13.424, 19.609] | rho leads at every pricing weight |
@@ -40,6 +53,9 @@ The Koblitz n=29 result is the only new candidate selection. Its comparison is
 [`smoke-completion-generator-orbit-a1-n29-t0/comparison-rho-frob-full__ic-gen-layout-c1.json`](smoke-completion-generator-orbit-a1-n29-t0/comparison-rho-frob-full__ic-gen-layout-c1.json).
 The matched solver comparisons and raw records are under
 [`smoke-nested-solver-backends-k17-matched/`](smoke-nested-solver-backends-k17-matched/).
+The post-merge receipts and comparisons are under
+[`post-merge-pdp3-pair-fixed/`](post-merge-pdp3-pair-fixed/) and
+[`post-merge-pkm-tower/`](post-merge-pkm-tower/).
 
 ## Matched n=17 system-solver panel
 

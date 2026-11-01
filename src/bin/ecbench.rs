@@ -553,7 +553,8 @@ enum OptimizeAction {
         #[arg(long, num_args = 1..)]
         holdout: Vec<PathBuf>,
         /// Refuse admission unless development covers the live method registry,
-        /// every system solver, and every PDP3 F4/F5/F6/root-finding engine.
+        /// every system solver, every PDP3 engine, and every prime PKM tower
+        /// engine.
         #[arg(long)]
         require_all: bool,
     },

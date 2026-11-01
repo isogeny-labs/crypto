@@ -8,31 +8,39 @@ into a speed claim.
 ## Current state
 
 - Current source registry: **78 methods**.
-- Nested algebraic inventory: **11 system solvers** and **8 PDP3 engines**,
-  including matrix/inherited F4, matrix F5, F6-IC, SAT-CDCL, both FES/Gray-code
-  routes, exhaustive search and all four root-finding table variants.
+- Nested algebraic inventory: **11 system solvers**, **9 PDP3 engines**, and
+  **4 prime PKM tower engines**, including matrix/inherited F4, matrix and
+  signature F5, both F6-IC closures, SAT-CDCL, both FES/Gray-code routes,
+  exhaustive search, all four root-finding table variants, and PKM geometric
+  enumeration.
 - Native implementation: `ecbench optimize inventory` and `ecbench optimize
   audit`.
-- Complete development roster: **109 specs**, **78/78 methods** and **19/19
+- Complete development roster: **111 specs**, **78/78 methods** and **24/24
   nested algorithms**, with no structural errors or seed leakage. The native
   `--require-all` audit is admitted.
-- Fresh diagnostic execution: **33 L0 sessions**, **955 records**, **902
-  verified outcomes**, and **742/742 eligible deterministic measured replays**
+- Fresh diagnostic execution: **35 L0 sessions**, **1,005 records**, **952
+  verified outcomes**, and **782/782 eligible deterministic measured replays**
   reproduced with zero audit problems.
 - Actual execution coverage: **72/72 runnable native methods**, **11/11 system
-  solvers**, and **8/8 PDP3 engines**. The remaining six registry entries are
-  external CM wrappers and require a real hash-bound backend.
-- After merging current `main`, the inventory and 109-spec audit remained
-  byte-identical and a fresh merged-binary audit again reproduced **742/742**
-  eligible runs across all 33 admitted sessions. The separate invalid
-  pre-fix three-leads negative control is now refused during planning, as
-  intended. Receipts are under
+  solvers**, **9/9 PDP3 engines**, and **4/4 PKM tower engines**. The remaining
+  six registry entries are external CM wrappers and require a real hash-bound
+  backend.
+- The latest `main` added the PDP3 pair-index F6 closure and the four PKM tower
+  engines. Both new panels verify; the current binary reproduces all 40
+  measured runs. The first pair-index replay also exposed and retained an
+  accounting-cache regression; resetting the cache at the independent-run
+  boundary makes the corrected session reproduce 16/16. The earlier
+  33-session current-head receipts remain under
   [`execution/current-head-replay/`](execution/current-head-replay/).
 - No leaderboard row changes. These are one-target/four-round development
   diagnostics, not L2 confirmatory holdouts.
 - Confirmatory execution is blocked because this managed runtime has no ready
   checkpoint upload identity. EKS submission is not attempted without the
   mandatory resumable-output gate.
+- The three post-merge raw `records.jsonl` payloads also remain local: the
+  repository artifact uploader found them but this runtime has neither the AWS
+  CLI nor an artifact identity. Their hash-bound audit receipts and compact
+  comparisons are tracked; they are not promotion evidence until hydrated.
 
 The admitted roster receipt is
 [`execution/full-development-audit.json`](execution/full-development-audit.json).
@@ -66,7 +74,8 @@ accounting and claim scopes fails closed.
 checks:
 
 - complete development coverage when `--require-all` is selected;
-- the 11 solver backends and eight PDP3 engines separately;
+- the 11 solver backends, nine PDP3 engines, and four PKM tower engines
+  separately;
 - at least four balanced development rounds and six balanced holdout rounds;
 - a warm-up, a reference, a baseline/candidate and an exact A/A duplicate;
 - public targets and L2-or-better isolation in holdout;

@@ -9,10 +9,18 @@ mandatory checkpoint upload. The repository requires a durable checkpoint
 before queue submission. Therefore no EKS job was submitted, and local wall
 timing is recorded as descriptive rather than substituted for EKS L2 evidence.
 
+The artifact-policy dry run selected the three post-merge `records.jsonl`
+payloads (0.6 MiB total), but the actual repository uploader stopped because
+`aws` is unavailable and no alternate `ARTIFACTS_AWS`/checkpoint identity is
+configured. The raw files remain local and uncommitted. Their exact hashes,
+audit results, and compact comparisons are retained in tracked receipts; this
+does not satisfy remote evidence delivery or promotion.
+
 The all-method roster blocker is resolved. `full-development-audit.json` admits
-109 development specs covering all 78 current methods and all 19 nested
+111 development specs covering all 78 current methods and all 24 nested
 algorithms, with no missing entries or reused development/holdout seeds. Local
-sessions actually invoked all 72 runnable native methods and all nested paths.
+sessions actually invoked all 72 runnable native methods, all 11 system
+solvers, all nine PDP3 engines, and all four PKM tower engines.
 The six external CM registry methods remain blocked on a real backend path and
 SHA-256 identity; placeholder bindings were never executed.
 
@@ -23,7 +31,7 @@ disjoint confirmatory roster passing:
 ecbench optimize audit --development ... --holdout ... --require-all
 ```
 
-The 33 local sessions are L0 development diagnostics: one target per lane, four
+The 35 admitted local sessions are L0 development diagnostics: one target per lane, four
 measured rounds, and no admitted wall interval. They select candidates and
 locate failures, but cannot update the leaderboard. The generator-orbit n=29
 candidate therefore remains `awaiting L2 holdout`; the six CM wrappers remain

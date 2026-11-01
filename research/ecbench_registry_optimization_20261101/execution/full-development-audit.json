@@ -4,7 +4,7 @@
     "missing_development_methods": [],
     "missing_development_nested_algorithms": [],
     "required_method_count": 78,
-    "required_nested_algorithm_count": 19
+    "required_nested_algorithm_count": 24
   },
   "development": {
     "method_count": 78,
@@ -88,9 +88,10 @@
       "transfer.quartic_cover",
       "transfer.quartic_cover_v2"
     ],
-    "nested_algorithm_count": 19,
+    "nested_algorithm_count": 24,
     "nested_algorithms": [
       "pdp3_engine/f6-ic",
+      "pdp3_engine/f6-ic-pair",
       "pdp3_engine/inherited-f4",
       "pdp3_engine/matrix-f4",
       "pdp3_engine/matrix-f5",
@@ -98,6 +99,10 @@
       "pdp3_engine/rootfind-negfold",
       "pdp3_engine/rootfind-window",
       "pdp3_engine/rootfind-window-negfold",
+      "pkm_tower_engine/enum",
+      "pkm_tower_engine/f4",
+      "pkm_tower_engine/f6",
+      "pkm_tower_engine/sig-f5",
       "system_solver/buchberger-f2",
       "system_solver/crossbred-f2",
       "system_solver/exhaustive",
@@ -2142,6 +2147,52 @@
         "target_seed": 202611010211,
         "warmup": 1,
         "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L0",
+        "label": "Post-merge PDP3 F6 pair-index diagnostic",
+        "measurement_seed": 202611019613,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/f6-ic",
+          "pdp3_engine/f6-ic-pair"
+        ],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/post-merge-pdp3-pair.json",
+        "rounds": 4,
+        "target_seed": 202611019513,
+        "warmup": 1,
+        "warnings": [
+          "development clocks are descriptive below L2; only deterministic counts may rank"
+        ]
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L0",
+        "label": "Post-merge prime PKM tower engine diagnostic",
+        "measurement_seed": 202611019617,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [
+          "pkm_tower_engine/enum",
+          "pkm_tower_engine/f4",
+          "pkm_tower_engine/f6",
+          "pkm_tower_engine/sig-f5"
+        ],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/post-merge-pkm-tower.json",
+        "rounds": 4,
+        "target_seed": 202611019517,
+        "warmup": 1,
+        "warnings": [
+          "development clocks are descriptive below L2; only deterministic counts may rank"
+        ]
       },
       {
         "aa_pairs": 1,

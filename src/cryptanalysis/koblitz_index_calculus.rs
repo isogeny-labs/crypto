@@ -7501,6 +7501,18 @@ thread_local! {
         const { RefCell::new(None) };
 }
 
+/// Start a new independent F6-IC pair-index run.
+///
+/// The index is deliberately shared by all decomposition targets inside one
+/// pipeline invocation, but its construction work is charged once per run.
+/// ECBench's normal runner isolates records in child processes whereas its
+/// deterministic auditor replays several records in one process, so the
+/// binary adapter must call this at the invocation boundary to keep both
+/// execution paths' accounting identical.
+pub fn reset_f6_ic_pair_index_cache() {
+    SHARED_PAIR_INDEX.with(|cache| *cache.borrow_mut() = None);
+}
+
 /// `KIC_F6_PARTIAL_SUPPORT=0` turns the gate's partial support test off, as
 /// a same-binary control; read once per process.
 fn partial_support_enabled() -> bool {

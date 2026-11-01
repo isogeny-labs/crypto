@@ -676,6 +676,7 @@ pub fn profiles() -> Result<Vec<MethodProfile<'static>>, String> {
 enum NestedKind {
     SystemSolver,
     Pdp3Engine,
+    PkmTowerEngine,
 }
 
 #[derive(Debug, Serialize)]
@@ -689,6 +690,7 @@ struct NestedAlgorithm {
 const PDP3_ENGINES: &[&str] = &[
     "inherited-f4",
     "f6-ic",
+    "f6-ic-pair",
     "matrix-f4",
     "matrix-f5",
     "rootfind",
@@ -696,6 +698,8 @@ const PDP3_ENGINES: &[&str] = &[
     "rootfind-negfold",
     "rootfind-window-negfold",
 ];
+
+const PKM_TOWER_ENGINES: &[&str] = &["f4", "sig-f5", "f6", "enum"];
 
 fn nested_algorithms() -> Vec<NestedAlgorithm> {
     let mut out: Vec<_> = solver_registry()
@@ -715,6 +719,16 @@ fn nested_algorithms() -> Vec<NestedAlgorithm> {
             "pair-table setup/probe route; not an algebraic-solver claim"
         } else {
             "solver-local work plus the enclosing pipeline accounting"
+        },
+    }));
+    out.extend(PKM_TOWER_ENGINES.iter().map(|name| NestedAlgorithm {
+        key: format!("pkm_tower_engine/{name}"),
+        name: (*name).into(),
+        kind: NestedKind::PkmTowerEngine,
+        accounting: if *name == "enum" {
+            "geometric enumeration through the enclosing pipeline accounting"
+        } else {
+            "prime-tower solver-local work plus the enclosing pipeline accounting"
         },
     }));
     out
@@ -790,6 +804,16 @@ fn nested_coverage(spec: &Spec) -> BTreeSet<String> {
                     .any(|part| part == format!("engine={engine}"))
                 {
                     found.insert(format!("pdp3_engine/{engine}"));
+                }
+            }
+            if oracle.split(':').next() == Some("pkm-tower") {
+                for engine in PKM_TOWER_ENGINES {
+                    if oracle
+                        .split(',')
+                        .any(|part| part == format!("engine={engine}"))
+                    {
+                        found.insert(format!("pkm_tower_engine/{engine}"));
+                    }
                 }
             }
         }
@@ -925,8 +949,8 @@ fn audit_stage(paths: &[PathBuf], stage: Stage) -> Result<(Vec<Spec>, Vec<SpecAu
 
 /// Audit the split between adaptive development and confirmatory holdout.
 /// When `require_all` is true, every live method and every registered system
-/// solver/PDP3 engine must occur in development.  Holdout is intentionally a
-/// winner-only subset.
+/// solver/PDP3/PKM-tower engine must occur in development. Holdout is
+/// intentionally a winner-only subset.
 pub fn audit_campaign(
     development: &[PathBuf],
     holdout: &[PathBuf],
@@ -1060,7 +1084,7 @@ mod tests {
     }
 
     #[test]
-    fn every_native_solver_and_requested_pdp_engine_is_in_the_inventory() {
+    fn every_native_solver_and_nested_engine_is_in_the_inventory() {
         let nested = nested_algorithms();
         let keys: BTreeSet<_> = nested.iter().map(|a| a.key.as_str()).collect();
         for name in [
@@ -1080,6 +1104,9 @@ mod tests {
         }
         for name in PDP3_ENGINES {
             assert!(keys.contains(format!("pdp3_engine/{name}").as_str()));
+        }
+        for name in PKM_TOWER_ENGINES {
+            assert!(keys.contains(format!("pkm_tower_engine/{name}").as_str()));
         }
     }
 

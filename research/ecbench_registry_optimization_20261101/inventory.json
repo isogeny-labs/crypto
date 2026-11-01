@@ -1445,7 +1445,7 @@
       "parameters": [
         {
           "default": null,
-          "help": "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), binary-subspace:dimension=D, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
+          "help": "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, cm-multiplier:size=N,norm=B[,endo=I][,mult=M], prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), binary-subspace:dimension=D, binary-multiplier:size=N,mult=M, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
           "name": "factor_base",
           "role": "knob"
         },
@@ -1498,7 +1498,7 @@
       "parameters": [
         {
           "default": null,
-          "help": "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), binary-subspace:dimension=D, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
+          "help": "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, cm-multiplier:size=N,norm=B[,endo=I][,mult=M], prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), binary-subspace:dimension=D, binary-multiplier:size=N,mult=M, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
           "name": "factor_base",
           "role": "knob"
         },
@@ -1597,7 +1597,7 @@
       "parameters": [
         {
           "default": null,
-          "help": "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), binary-subspace:dimension=D, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
+          "help": "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, cm-multiplier:size=N,norm=B[,endo=I][,mult=M], prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), binary-subspace:dimension=D, binary-multiplier:size=N,mult=M, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
           "name": "factor_base",
           "role": "knob"
         },
@@ -2277,7 +2277,7 @@
       "strategy": "native_adaptive"
     }
   ],
-  "nested_algorithm_count": 19,
+  "nested_algorithm_count": 24,
   "nested_algorithms": [
     {
       "accounting": "backend-native operation unit; rank only where the unit and scope match",
@@ -2359,6 +2359,12 @@
     },
     {
       "accounting": "solver-local work plus the enclosing pipeline accounting",
+      "key": "pdp3_engine/f6-ic-pair",
+      "kind": "pdp3_engine",
+      "name": "f6-ic-pair"
+    },
+    {
+      "accounting": "solver-local work plus the enclosing pipeline accounting",
       "key": "pdp3_engine/matrix-f4",
       "kind": "pdp3_engine",
       "name": "matrix-f4"
@@ -2392,6 +2398,30 @@
       "key": "pdp3_engine/rootfind-window-negfold",
       "kind": "pdp3_engine",
       "name": "rootfind-window-negfold"
+    },
+    {
+      "accounting": "prime-tower solver-local work plus the enclosing pipeline accounting",
+      "key": "pkm_tower_engine/f4",
+      "kind": "pkm_tower_engine",
+      "name": "f4"
+    },
+    {
+      "accounting": "prime-tower solver-local work plus the enclosing pipeline accounting",
+      "key": "pkm_tower_engine/sig-f5",
+      "kind": "pkm_tower_engine",
+      "name": "sig-f5"
+    },
+    {
+      "accounting": "prime-tower solver-local work plus the enclosing pipeline accounting",
+      "key": "pkm_tower_engine/f6",
+      "kind": "pkm_tower_engine",
+      "name": "f6"
+    },
+    {
+      "accounting": "geometric enumeration through the enclosing pipeline accounting",
+      "key": "pkm_tower_engine/enum",
+      "kind": "pkm_tower_engine",
+      "name": "enum"
     }
   ],
   "promotion_rule": "fresh holdout, same output/counts, A/A admission, complete symmetric pricing, independent replay, and the repository validation gate",
