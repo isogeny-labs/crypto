@@ -95,6 +95,7 @@ these generic kernel-checked implications. Compile/audit receipts identify
 all six declarations and their axiom status.
 
 == Trace dual and new construction paths
+#image("square-plan61.svg",width:100%)
 All528 normal-product columns and1024 ordered trace products give a
 rank32 trace pairing. Both inverse products and32 actual source-coordinate
 dual columns are certified, with a changed-Gram negative control. This is
@@ -109,6 +110,8 @@ Artin-Schreier quotient's nonzero joint fixed-space control and convention
 checks. CUSPIDAL-UNIT-LEAD61.md gives a second path through exact generated
 unit lattices and characteristic2 saturation. Neither proposed path is
 reported as an executed differential or saturation result here.
+SQUARE-DECOMPOSITION61.md proposes one certified32x32 square-basis inverse
+for both paths, with exact rational coefficient splitting and source checks.
 
 All original integral level77 factor/action, proper polarized embedding,
 separate full quotient saturation, coupled divisors and arbitrary reverse

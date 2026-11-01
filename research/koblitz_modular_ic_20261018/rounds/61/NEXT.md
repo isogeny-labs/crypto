@@ -7,7 +7,9 @@
    then every infinity regularity condition. Require dimension61, full
    kernel/recovery products, actual functions and sigma identities. See
    DIFFERENTIAL-DESIGN61.md. Do not replace the certified bound by a box.
-2. Compute actual field square decompositions and all61 Cartier columns,
+2. Use SQUARE-DECOMPOSITION61.md to freeze one cached actual32x32 square-basis
+   inverse with both inverse products and whole-source coefficient splitting.
+   Compute actual field square decompositions and all61 Cartier columns,
    with the coefficient inverse-Frobenius convention checked. Solve the
    full305-binary-coordinate F32 Cartier/sigma system. The free etale
    Artin-Schreier quotient supplies a nonzero joint-fixed positive control;
