@@ -1,1 +1,1 @@
-PROPOSED source only. No R63 mathematical job launched. Complete protocol/donor hash/source freeze required first. R62 proof/custody/publication remains current delivery task. Preserve one math job and original limits.
+Prepared actual degree112 source,protocol2 and donor hashes; no R63 mathematical output yet. All112basis/124functions retained. R62science is sealed and raw custody verified. Launcher enforces copied source bytes againstGit before first generator112-01. Original limits/owners/approval rules persist.

@@ -22,3 +22,9 @@ R27–R61science sealed,R62math/custody delivery completes before thisdata.
 Python/shell metadata,literal source assembly/hashes/rendering only;math
 in Singular/Rust/Lean. No statistical/timing/comparative claim; deterministic
 complete exact identities. Manual contract checks are not schema validation.
+
+Before first data,version2 adds immediate closed generator cache files:
+each contains all source equations and the eight grouped/derivative/inverse/
+root entries. Preserve them even if later full-cohort work caps;any reuse
+requires a fresh exact source-bound checker. A partial generator cache
+is not an accepted124-function outcome. All112/124scope/limits unchanged.

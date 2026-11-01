@@ -60,10 +60,18 @@ proc generator63(poly P,int which){
  require63(reduce(g^2+x*h^2+t,GB63)==0,"GEN112_ACTUAL_GENERATOR_FORMULA");
  list bundle=a,b,c,d,q,qi,g,h;return(bundle);
 }
-list yBundle63=generator63(f51,3);list yPair63=yBundle63[7],yBundle63[8];list temp63=poly(1),poly(0);yPowers63[1]=temp63;
+proc saveBundle63(list bundle,string name,string file){
+ link cache63="ASCII:w "+file;open(cache63);
+ write(cache63,"// Retained actual degree112 source; compare every cached equation before use.");
+ write(cache63,"ideal cachedSource63;list "+name+";");int i;
+ for(i=1;i<=size(sourceIdeal63);i++){write(cache63,"cachedSource63["+string(i)+"]="+string(sourceIdeal63[i])+";");}
+ for(i=1;i<=8;i++){write(cache63,name+"["+string(i)+"]="+string(bundle[i])+";");}
+ close(cache63);return(1);
+}
+list yBundle63=generator63(f51,3);saveBundle63(yBundle63,"baseGenerator63","generator112-base63.sing");list yPair63=yBundle63[7],yBundle63[8];list temp63=poly(1),poly(0);yPowers63[1]=temp63;
 for(i63=2;i63<=7;i63++){temp63=pairMul63(temp63,yPair63);yPowers63[i63]=temp63;}
 print("GEN112_BASE_GENERATOR_PASS");
-list lambdaBundle63=generator63(G51,2);list lambdaPair63=lambdaBundle63[7],lambdaBundle63[8];list lambdaPowers63;temp63=poly(1),poly(0);lambdaPowers63[1]=temp63;
+list lambdaBundle63=generator63(G51,2);saveBundle63(lambdaBundle63,"lambdaGenerator63","generator112-lambda63.sing");list lambdaPair63=lambdaBundle63[7],lambdaBundle63[8];list lambdaPowers63;temp63=poly(1),poly(0);lambdaPowers63[1]=temp63;
 for(i63=2;i63<=16;i63++){temp63=pairMul63(temp63,lambdaPair63);lambdaPowers63[i63]=temp63;}
 list basisPairs63;
 for(j63=1;j63<=7;j63++){for(i63=1;i63<=16;i63++){

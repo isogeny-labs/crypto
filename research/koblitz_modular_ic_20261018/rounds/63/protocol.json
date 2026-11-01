@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "id": "KOBLITZ-R63-DEGREE112-GENERATOR",
-  "version": 1,
+  "version": 2,
   "goal": "generate and pursue Koblitz cover/modular transfer leads at larger sizes",
   "claims": [
     {
@@ -102,5 +102,9 @@
       "use": "native field/coefficient/linalg operations, established R62 APIs"
     }
   ],
-  "validation_note": "canonical schema/checker absent selectedindex; manual contract/source checks only"
+  "validation_note": "canonical schema/checker absent selectedindex; manual contract/source checks only",
+  "amendment": {
+    "before_affected_data": true,
+    "reason": "Persist checked generator/derivative bundles with full source equations immediately before larger basis/evaluation stages; same112/124fullcohort and limits, no prior R63 data"
+  }
 }
