@@ -24,7 +24,7 @@
   },
   "progress_timeline": {
    "path": "docs/ic/progress-timeline.json",
-   "sha256": "6c62c182babfb64b711af9e2e0b9da8d8303dcc4da44624f0e0ed2f119fbdb1a"
+   "sha256": "fd19ac4eea242e74769757d08a9514cedb618e9839b8bdb2aacae9d4c7b2a690"
   },
   "native_tournament26": {
    "path": "research/ic_candidate_tournament_20260915/runs/round-0026/measurements.json",
@@ -109,6 +109,18 @@
   "conductor_gap_counts": {
    "path": "research/ecbench_conductor_gap_20261012/analysis.json",
    "sha256": "0ff9b20fd773ea67fa8fc2c434635e77f97422b2904d687b61eac75a02c04279"
+  },
+  "f4_fp_ic_effect": {
+   "path": "research/f4_fp_ic_effect_20261018/summary.json",
+   "sha256": "7eff13424e0e9b1a9dca5117f7598d797bb2a27366b60ecf7c61aadc45c13a60"
+  },
+  "f4_fp_ic_main": {
+   "path": "research/f4_fp_ic_effect_20261018/reports/run-20261018T1548Z/raw/dlp_main.json",
+   "sha256": "bca0162f22f19c74c3e105e79d038d7e9dbb813709bcd58d6face0f9cb6ff9ca"
+  },
+  "f4_fp_ic_new": {
+   "path": "research/f4_fp_ic_effect_20261018/reports/run-20261018T1548Z/raw/dlp_new.json",
+   "sha256": "114f27cd5a3eb09113ddc5f0555375a1fd7d8ef2996dd9ce2405850752f43ed7"
   },
   "la_engines": {
    "path": "research/la_engines_20261014/summary.json",
@@ -739,7 +751,7 @@
  },
  "progress": {
   "source": "docs/ic/progress-timeline.json",
-  "updated": "2026-10-31",
+  "updated": "2026-11-01",
   "series_id": "ec-cold",
   "label": "Elliptic curve, whole method, cold, one target",
   "points": [
@@ -986,6 +998,17 @@
     "class": "engineering",
     "anchor": "#rho-parity-ledger",
     "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
+   },
+   {
+    "anchor": "#late-main-79th-method-reconciliation",
+    "class": "diagnostic",
+    "date": "2026-11-01",
+    "detail": "The late-main prime-orbit relation collector was admitted to the fail-closed 79-method optimization inventory. On one planted generic a=-3 toy target, the affine eight-orbit candidate costs 5.4169 [3.389, 8.658] times same-target rho.negation_v2 in counted GAE; pricing every uncharged native operation at 0, 0.1 and 1 GAE leaves ratios 5.4169, 5.0235 and 3.0548. Prospective j=0 and j=1728 cross-checks remain 4.2011 and 5.7901 times their cubic/quartic rho references. All 90 records verified and all 72 measured deterministic executions replayed exactly. Factor-base draws remain unpriced, all clocks are L0, each comparison has one workload and four measured pairs, and no ranked leaderboard row or shipped default changes.",
+    "label": "Prime-orbit relation collector, affine eight-orbit candidate vs negation rho, generic 14-bit toy curve",
+    "reference": "matched",
+    "source": "https://github.com/isogeny-labs/crypto/blob/main/research/ecbench_e2e_frontier_20261031/REPORT.md#late-main-79th-method-reconciliation",
+    "unit": "counted GAE lower-bound diagnostic",
+    "value": 5.41693461951
    }
   ]
  },
@@ -313635,6 +313658,203 @@
   "report": "research/ecbench_lazy_columns2_20261018/REPORT.pdf",
   "source": "research/ecbench_lazy_columns2_20261018/figures/ratios.json",
   "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates."
+ },
+ "f4_fp_ic_component": {
+  "study": "research/f4_fp_ic_effect_20261018",
+  "run": "run-20261018T1548Z",
+  "pipeline": "examples/jv_cover.rs (Nagao decompositions on a genus-2 cover of E(F_{p^6}); every decomposition one f4_fp solve)",
+  "change": "f4_fp as on main before #1717 (4b6e09b78) against after #1717",
+  "class": "engineering",
+  "unit": "S counted by jv_cover (field multiplications priced in group additions); unpriced native work is not emitted by either arm, so S/rho is a lower-bound comparison",
+  "ccov": [
+   {
+    "p": 53,
+    "tests": 120,
+    "planted_found": [
+     20,
+     20
+    ],
+    "constructed": 20,
+    "c_cov_before": 6157721.75,
+    "c_cov_after": 1224314.95833,
+    "f4_muls_before": 5671366.45833,
+    "f4_muls_after": 737959.666667,
+    "lin_muls": [
+     482158.808333,
+     482158.808333
+    ],
+    "f4_degree": [
+     9.95833333333,
+     7.95833333333
+    ],
+    "max_rows": [
+     769.166666667,
+     234.583333333
+    ],
+    "total_ms": [
+     22.9666666667,
+     10.825
+    ],
+    "c_cov_ratio": 5.02952423156,
+    "f4_ratio": 7.68519841193
+   },
+   {
+    "p": 101,
+    "tests": 120,
+    "planted_found": [
+     20,
+     20
+    ],
+    "constructed": 20,
+    "c_cov_before": 6172092.33333,
+    "c_cov_after": 1222626.66667,
+    "f4_muls_before": 5686392.225,
+    "f4_muls_after": 736926.558333,
+    "lin_muls": [
+     481526.158333,
+     481526.158333
+    ],
+    "f4_degree": [
+     9.95833333333,
+     7.98333333333
+    ],
+    "max_rows": [
+     766.583333333,
+     231.283333333
+    ],
+    "total_ms": [
+     23.5583333333,
+     8.85833333333
+    ],
+    "c_cov_ratio": 5.04822322431,
+    "f4_ratio": 7.71636218114
+   },
+   {
+    "p": 251,
+    "tests": 120,
+    "planted_found": [
+     20,
+     20
+    ],
+    "constructed": 20,
+    "c_cov_before": 6252565.74167,
+    "c_cov_after": 1284448.725,
+    "f4_muls_before": 5712778.63333,
+    "f4_muls_after": 744661.616667,
+    "lin_muls": [
+     534854.541667,
+     534854.541667
+    ],
+    "f4_degree": [
+     9.95,
+     7.975
+    ],
+    "max_rows": [
+     766.566666667,
+     231.216666667
+    ],
+    "total_ms": [
+     23.725,
+     9.06666666667
+    ],
+    "c_cov_ratio": 4.86789828194,
+    "f4_ratio": 7.67164374458
+   }
+  ],
+  "dlp": [
+   {
+    "p": 53,
+    "seed": 1,
+    "bits": 32.367524182,
+    "residuals": 19020,
+    "relations": 31,
+    "solved": [
+     true,
+     true
+    ],
+    "correct": [
+     true,
+     true
+    ],
+    "s_before": 4734.31642876,
+    "s_after": 936.893173124,
+    "s_ratio": 5.05320837484,
+    "rho_s_mean": 1.10181839577,
+    "rho_s_sd": 0.203886577414,
+    "rho_runs": 4,
+    "s_over_rho_before": 4296.82100694,
+    "s_over_rho_after": 850.315421057
+   },
+   {
+    "p": 53,
+    "seed": 2,
+    "bits": 32.367516421,
+    "residuals": 8486,
+    "relations": 33,
+    "solved": [
+     true,
+     true
+    ],
+    "correct": [
+     true,
+     true
+    ],
+    "s_before": 2120.62816189,
+    "s_after": 425.190667611,
+    "s_ratio": 4.98747579245,
+    "rho_s_mean": 1.15071081783,
+    "rho_s_sd": 0.68853994202,
+    "rho_runs": 4,
+    "s_over_rho_before": 1842.8853966,
+    "s_over_rho_after": 369.502624833
+   },
+   {
+    "p": 101,
+    "seed": 1,
+    "bits": 37.9492681424,
+    "residuals": 40100,
+    "relations": 53,
+    "solved": [
+     true,
+     true
+    ],
+    "correct": [
+     true,
+     true
+    ],
+    "s_before": 1454.61532544,
+    "s_after": 287.523438271,
+    "s_ratio": 5.05911912497,
+    "rho_s_mean": 1.48264380916,
+    "rho_s_sd": 0.521461378759,
+    "rho_runs": 4,
+    "s_over_rho_before": 981.095605333,
+    "s_over_rho_after": 193.926171948
+   },
+   {
+    "p": 101,
+    "seed": 2,
+    "bits": 37.9492710976,
+    "residuals": 65422,
+    "relations": 50,
+    "solved": [
+     true,
+     true
+    ],
+    "correct": [
+     true,
+     true
+    ],
+    "s_before": 2370.4731038,
+    "s_after": 466.435697425,
+    "s_ratio": 5.08210052722,
+    "rho_s_mean": 1.24943925903,
+    "rho_s_sd": 0.577182217748,
+    "rho_runs": 4,
+    "s_over_rho_before": 1897.22956653,
+    "s_over_rho_after": 373.316024814
+   }
+  ]
  },
  "jv_cover_linear_stage_component": {
   "study": "research/jv_cover_sparse_fglm_20261018",
