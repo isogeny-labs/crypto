@@ -1,0 +1,61 @@
+1536: #[derive(Clone, Copy, Debug)]
+1537: struct Potential {
+1538:     s: i8,
+1539:     a: u64,
+1540:     b: u64,
+1541: }
+1542: impl Potential {
+1543:     const ID: Self = Self { s: 1, a: 0, b: 0 };
+1544: }
+1545: /// Signed disjoint-set forest. A node denotes s*root+a+b*k. A negative
+1546: /// graph cycle anchors a root; it is not automatically a target relation.
+1547: pub struct SignedGraph {
+1548:     ring: Ring,
+1549:     parent: Vec<usize>,
+1550:     size: Vec<usize>,
+1551:     pot: Vec<Potential>,
+1552:     fixed: Vec<Option<(u64, u64)>>,
+1553:     pub cycles: u64,
+1554:     pub negative_cycles: u64,
+1555:     pub zero_coefficient: u64,
+1556:     pub operations: u64,
+1557: }
+1558: impl SignedGraph {
+1559:     pub fn new(ring: Ring) -> Self {
+1560:         Self {
+1561:             ring,
+1562:             parent: vec![0],
+1563:             size: vec![1],
+1564:             pot: vec![Potential::ID],
+1565:             fixed: vec![Some((0, 0))],
+1566:             cycles: 0,
+1567:             negative_cycles: 0,
+1568:             zero_coefficient: 0,
+1569:             operations: 0,
+1570:         }
+1571:     }
+1572:     pub fn node(&mut self) -> usize {
+1573:         let i = self.parent.len();
+1574:         self.parent.push(i);
+1575:         self.size.push(1);
+1576:         self.pot.push(Potential::ID);
+1577:         self.fixed.push(None);
+1578:         i
+1579:     }
+1580:     fn find(&mut self, x: usize) -> (usize, Potential) {
+1581:         self.operations += 1;
+1582:         let parent = self.parent[x];
+1583:         if parent == x {
+1584:             return (x, Potential::ID);
+1585:         }
+1586:         let (root, q) = self.find(parent);
+1587:         let p = self.pot[x];
+1588:         let out = Potential {
+1589:             s: p.s * q.s,
+1590:             a: self.ring.add(p.a, self.ring.signed(p.s, q.a)),
+1591:             b: self.ring.add(p.b, self.ring.signed(p.s, q.b)),
+1592:         };
+1593:         self.parent[x] = root;
+1594:         self.pot[x] = out;
+1595:         (root, out)
+1596:     }

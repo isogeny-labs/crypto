@@ -1,0 +1,13 @@
+# Stored divisor normalization validity
+
+T-1180; producer proof packet, 2026-10-31. Independent source-fidelity review pending.
+
+The composition connects canonical degree-sliced UInt64 coefficients to computed-scale affine transformation, trailing-zero trimming, padding and the returned polynomial pair. For degrees one and two, the outputs equal T_d(u) and T_3(v); they satisfy Mumford validity on T_6(f) and retain degree d. Storage capacities are three and two words. For degree zero, input validity implies u=1 and v=0, which remain valid on the destination curve polynomial when returned unchanged.
+
+Here T_n(h)=a^(-n) h(aX+b). Validity means: u is monic; natDegree(u)<=2; degree(v)<degree(u); and u divides f-v^2. The field assumptions are prime 1<p<2^31, canonical input coefficients and parameters, and a nonzero. The recorded degree d=natDegree(u) and input validity are explicit premises. Polynomial validity does not require a smoothness assertion.
+
+Eight main declarations cover capacities, stored polynomials, validity, identity characterization and the conditional return branch. Ten controls cover valid degrees zero/one/two, nonmonic input, equal ordinate degree, inconsistent degree metadata, identity normalization and exact stored words. At p=17,a=2,b=3 the storage fixtures are [1,0,0], [10,1,0], and [2,3,1], with zero ordinate storage. The rational validity controls and finite-field storage fixtures are separate checks.
+
+Canonical source is research/five_leads_e2e_20261019/native/genus2_model_gate.rs. Named choose/transform/map_divisor excerpts and full snapshots use the prior corrected extraction and source map. The proof is a logical source model, not a compiled Rust equivalence proof or a geometric divisor-class transport theorem. Upstream compiled proof dependencies remain in the trust boundary. The next mathematical connection is geometric class transport; the next review connection is independent comparison of the source and model, including degree metadata and branch preconditions.
+
+Failed attempts are retained: Stored first used an unavailable degree lemma; Controls first used unavailable monic/degree tactics; Controls second and third needed an explicit natDegree-power simplification. The final Stored, Branch, Controls and separate Readback checks passed with unchanged input hashes. All 18 named readbacks use only propext, Classical.choice and Quot.sound. Receipts are recorded in status.json. The first PDF render failed on an unescaped caret; the corrected one-page PDF was inspected. No scientific campaign, timing observations or cost ratios were produced.
