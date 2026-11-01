@@ -16,6 +16,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      local_runner:
+        description: Use the dedicated local validation runner
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -38,6 +43,7 @@ jobs:
       # SDKs it does not use, check out only the head, and fetch only the
       # base tip; its blobs arrive on demand.
       - name: Free runner disk
+        if: runner.environment == 'github-hosted'
         run: |
           df -h /
           sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
@@ -66,11 +72,11 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst research/four_followups_20261021/results/matched research/four_followups_20261021/results/pencil-pilot research/ic_aimed_gather_20261023/aa2_20261029/runs research/kummer_coordinates_20261022/results research/kummer_differential_collector_20261022/results research/pencil_sparse_20261022/results research/postgb_linear_stage_20261026 research/projective_law_followup_20261022/results
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/blindspots_20261018/01-fp2-gaudry-k2/raw research/ecbench_generator_orbit_20261022/sessions research/ecbench_overhead_review_20261022/sessions research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst research/four_followups_20261021/results/matched research/four_followups_20261021/results/pencil-pilot research/ic_aimed_gather_20261023/aa2_20261029/runs research/kummer_coordinates_20261022/results research/kummer_differential_collector_20261022/results research/pencil_sparse_20261022/results research/pkm_tower_rootfind_20261018/sessions research/postgb_linear_stage_20261026 research/projective_law_followup_20261022/results
       - name: Fetch the base tip
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.local_runner)
         env:
-          BASE_REF: ${{ github.base_ref }}
+          BASE_REF: ${{ github.base_ref || 'main' }}
         run: |
           git fetch --no-tags --depth=1 --filter=blob:none origin \
             "+refs/heads/$BASE_REF:refs/remotes/origin/$BASE_REF"
@@ -78,6 +84,9 @@ jobs:
           # fail here rather than let the freeze comparison pass silently.
           git rev-parse --verify "origin/$BASE_REF^{commit}"
       - uses: actions/setup-python@v5
+        # EKS runners may default to Python 3.12; the dedicated local runner
+        # already includes 3.11 and keeps its isolated tool cache untouched.
+        if: runner.environment == 'github-hosted' || !startsWith(runner.name, 'crypto-cli-gate-')
         with:
           python-version: '3.11'
       - name: Restore tracked benchmark inputs for committed-tree tests
@@ -85,7 +94,9 @@ jobs:
           git restore --source=HEAD --worktree -- \
             research/postgb_linear_stage_20261026 \
             research/ic_m2_linear_ladder_20261024 \
-            research/s5_plain_c4_options_20261019
+            research/s5_plain_c4_options_20261019 \
+            benchmarks/20261029-ic-aimed-gather/registry-binding-20261030 \
+            benchmarks/20261029-ic-aimed-gather/registry-binding-20261101
       - name: The gate's own tests, with a positive and a negative fixture
         run: python3 scripts/test_validation_gate.py
       - name: Reject stale native curve catalog bindings
@@ -93,9 +104,11 @@ jobs:
           python3 scripts/test_curve_catalog_consistency.py
           python3 scripts/check_curve_catalog_consistency.py
       - name: Every leaderboard and benchmarks row is validated or frozen pre-gate
+        env:
+          BASE_REF: ${{ github.base_ref || (github.event_name == 'workflow_dispatch' && inputs.local_runner && 'main') || '' }}
         run: |
-          base=""
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            base="--base origin/${{ github.base_ref }}"
+          if [ -n "$BASE_REF" ]; then
+            python3 scripts/validation_gate.py check --base "origin/$BASE_REF"
+          else
+            python3 scripts/validation_gate.py check
           fi
-          python3 scripts/validation_gate.py check $base

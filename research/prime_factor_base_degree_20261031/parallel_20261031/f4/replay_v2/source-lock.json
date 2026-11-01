@@ -1,0 +1,42 @@
+{
+  "schema": "secant-f4-offline-replay-source-lock/v2",
+  "scope": "post-data exact verification of saved bases; no CAS reruns",
+  "frozen_v1_source": {
+    "path": "../main.rs",
+    "sha256": "e201eda231b41820b1733eefd725841036075aadceb9d4cada92926893025842"
+  },
+  "source_files": [
+    {"path": "main.rs", "sha256": "9cb099173c2f5145100c9b994657cb5eac715e7239121b8d9281834a247c2880"},
+    {"path": "build.rs", "sha256": "fbc8c5d5643b6713c1a08c5a1bf6cbbfaea52b4f3fe1707db39e7261ed295fae"},
+    {"path": "Cargo.toml", "sha256": "7a360d682a0f78d31d1703ca71354f4a622d8dd3cdb07920b92c1eb35b691900"},
+    {"path": "Cargo.lock", "sha256": "6ad90c0afd997678a403a9df797f41c42ee9e28635a1f629e6f2cfc51992ad3c"},
+    {"path": ".gitignore", "sha256": "6299ce0b51aa118b832412ca27dab18bfe22bef37e11c184d82167784dd8709c"},
+    {"path": "README.md", "sha256": "cc1f11c25bd4e6a3367803789575031552f274b178e9b0db56ecd6c77a1c185d"},
+    {"path": "VERIFICATION.md", "sha256": "680adb8fa9cabaf37b0324a3703135bab8767aac1ecf20ad531ffd82c917e059"}
+  ],
+  "development_logs": [
+    {"path": "development/test.log", "sha256": "623fa64992ced48a2a3b17f4a54f0d8d0b71a3f43a9b5b73f40ec8f5ed57e2f2", "exit_code": 0, "tests_passed": 4},
+    {"path": "development/clippy.log", "sha256": "ee1d3fffa2022e962e63e0dbe4d35c9c198450a20c29fc09030f635dbb38bfcd", "exit_code": 0, "warnings_denied": true},
+    {"path": "development/fmt.log", "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "exit_code": 0}
+  ],
+  "binary": {
+    "path": "target/release/secant-f4-offline-replay-v2",
+    "sha256": "8854879038a86812ad29849369f9f1ac19d0c95676695e6473d3f9ab00a673af",
+    "tracked": false,
+    "rust_cargo_version": "1.94.1"
+  },
+  "observed_replay": {
+    "manifest": "/workspace/scratch/secant-parallel-runs/replay-v2-20261031T201044Z/manifest.json",
+    "manifest_sha256": "adca412a6d4adcd970989aa8342d58060db4bb472c9435dbadad0e20a41be8f0",
+    "manifest_bytes": 4767211,
+    "verified_cases": 14220,
+    "failed_cases": 0,
+    "unattempted_cases": 0,
+    "v1_failed_or_capped_cases_verified_by_v2": 26,
+    "new_cas_calls": 0,
+    "coordinate_cube_search": false,
+    "original_operational_caps_preserved": true,
+    "exit_code": 0,
+    "measured_elapsed_seconds": null
+  }
+}

@@ -1,0 +1,16 @@
+/var/tmp/pencil-doubling-word-composition-20261031-v1/WordDoubling.lean:14:1: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  f ≥ 0
+  e ≥ 0
+  e - f ≥ 1
+  d ≥ 0
+  0 ≤ c ≤ 3689348814741910323
+  1 ≤ b ≤ 2147483647
+  b - c ≥ 1
+  b - d ≥ 1
+where
+ b := ↑p.toNat
+ c := ↑a.toNat
+ d := ↑(5 % p).toNat
+ e := ↑(5 % p.toNat * a.toNat) % ↑p.toNat
+ f := ↑(5 * a.toNat) % ↑p.toNat

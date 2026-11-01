@@ -1,0 +1,88 @@
+{
+  "baseline": "51d8b2932c64e9adf47e1afab3ef43eff233c5ed",
+  "scope": "ordinary software build/test and exact metadata reconciliation review",
+  "metadata_backend": {
+    "passed": 42,
+    "failed": 0
+  },
+  "shared_auditor_backend": {
+    "passed": 22,
+    "failed": 0,
+    "representative_crate": "cm8-transfer-audit",
+    "identical_module_prefixes": 7,
+    "crate_local_test_declarations": 0
+  },
+  "workflow_parser": {
+    "passed": 4,
+    "failed": 0,
+    "workflow_files": 510
+  },
+  "root_library": {
+    "argv": [
+      "cargo",
+      "test",
+      "--release",
+      "--locked",
+      "--lib"
+    ],
+    "build_succeeded": true,
+    "declared_tests": 5057,
+    "complete": false,
+    "exit_code": 101,
+    "green": false,
+    "status": "interrupted after600-second test-phase budget; no complete suite result",
+    "observed_completed_ok_lines": 2817,
+    "observed_failed_names": [
+      "cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar",
+      "cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures",
+      "cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic",
+      "cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver",
+      "cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed",
+      "cryptanalysis::curve_traits::tests::extension_registry_preserves_field_and_subgroup_records",
+      "cryptanalysis::ecbench::band::tests::exact_sums_reproduce_the_band_means",
+      "cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload",
+      "cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible",
+      "cryptanalysis::ecbench::bounds::tests::a_session_counted_twice_is_refused_and_a_copy_of_its_draws_too",
+      "cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples",
+      "cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version",
+      "cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band",
+      "cryptanalysis::ecbench::challenge::tests::the_committed_verdicts_read_as_version_1_and_a_new_one_is_version_2",
+      "cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload",
+      "cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup",
+      "cryptanalysis::ecbench::koblitz_descent::tests::the_rule_v8_defaults_are_the_parameter_files",
+      "cryptanalysis::ecbench::work::tests::fixture_records_reprice_to_their_committed_blocks",
+      "cryptanalysis::ic_framework::planner::tests::every_cited_file_exists",
+      "cryptanalysis::ic_framework::plugins::tests::compact_orbit_scan_matches_archived_n37_source42"
+    ],
+    "other_failures": "not assumed inherited; full classification remains open",
+    "nested_summary_note": "The log contains a successful one-test subprocess summary with5056 filtered tests; that is not the5057-test parent suite result."
+  },
+  "strict_registry_test": {
+    "exit_code": 101,
+    "actual_extension_count": 1324,
+    "expected_extension_count": 2287,
+    "assertion_unchanged": true
+  },
+  "registry": {
+    "historical_models": 4493,
+    "merged_models": 20592,
+    "missing_historical_models": 1921,
+    "missing_prime": 958,
+    "missing_extension": 963,
+    "new_models": 18020,
+    "changed_shared_models": 150,
+    "active_reconciliation": "unresolved; no registry side selected"
+  },
+  "scientific_launches_local": 0,
+  "new_lean_elaborations": 0,
+  "new_polynomial_certificates": 0,
+  "uploads": 0,
+  "paid_compute": 0,
+  "holds": [
+    "pending checkpoint-only authorization and secure token access",
+    "active registered-model reconciliation",
+    "generic mathematics and calibrated cost",
+    "Conductor unavailable/no reservation",
+    "keep open/auto-merge disabled/current-head merge set"
+  ]
+}

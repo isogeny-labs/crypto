@@ -1,0 +1,7 @@
+research/ideas_execution_20261018/bounded_memory/src/disk_macaulay.cpp: In function ‘int reduce(const std::filesystem::__cxx11::path&, const std::filesystem::__cxx11::path&, U, const std::string&, U, U, U, U, bool)’:
+research/ideas_execution_20261018/bounded_memory/src/disk_macaulay.cpp:71:3: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   71 |   if(row.empty())c.zero++;c.processed++;offset=U(f.tellg());if(checkpoint_every&&c.processed%checkpoint_every==0)checkpoint(basis,offset,hash,policy,c);
+      |   ^~
+research/ideas_execution_20261018/bounded_memory/src/disk_macaulay.cpp:71:27: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   71 |   if(row.empty())c.zero++;c.processed++;offset=U(f.tellg());if(checkpoint_every&&c.processed%checkpoint_every==0)checkpoint(basis,offset,hash,policy,c);
+      |                           ^
