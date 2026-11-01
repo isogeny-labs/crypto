@@ -1,0 +1,32 @@
+--- a/tools/progress_metrics.py
++++ b/tools/progress_metrics.py
+@@ -411,6 +411,29 @@
+                  label=label, source=f"{path}@{commit}")
+ 
+ 
++    path = f"{base}37/results.json"
++    for date, commit, text in file_history(ref, path, since):
++        record = json.loads(text)
++        for key, metric, unit, label in (
++            ("actual_deck_labels_bound", "koblitz_modular.actual_deck_labels_bound", "closed points",
++             "Full-coordinate Frobenius binding and literal function controls"),
++            ("nonprincipal_signed_source_classes", "koblitz_modular.nonprincipal_signed_source_classes", "source classes",
++             "Actual signed Picard class under proper/RR bridge; intended CM sign image remains separate")):
++            emit(metric, record.get("construction_counts", {}).get(key), date=date,
++                 problem=P_IC, unit=unit, better="neutral", label=label, source=f"{path}@{commit}")
++
++    path = f"{base}38/results.json"
++    for date, commit, text in file_history(ref, path, since):
++        record = json.loads(text)
++        for key, metric, unit, label in (
++            ("closed_point_algebra_dimension", "koblitz_modular.closed_point_algebra_dimension", "F2 dimensions",
++             "Exact larger closed-point algebra; larger RR spaces and supports remain separate"),
++            ("local_precision", "koblitz_modular.closed_point_algebra_local_precision", "algebra coefficients",
++             "Algebra precision only; source jets at this precision not yet constructed")):
++            emit(metric, record.get("construction_counts", {}).get(key), date=date,
++                 problem=P_IC, unit=unit, better="neutral", label=label, source=f"{path}@{commit}")
++
++
+ def ghs_ipsec_archive(ref, since):
+     """Export recorded archive counters; no cryptographic computation or estimates."""
+     path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"

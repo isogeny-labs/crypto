@@ -1,0 +1,34 @@
+// The identical generic source/gcd/syzygy/denominator prefix precedes this.
+matrix jacRat33[4][3];
+for(iLoc33=1;iLoc33<=4;iLoc33++){for(jLoc33=1;jLoc33<=3;jLoc33++){jacRat33[iLoc33,jLoc33]=diff(JLoc33[iLoc33],var(jLoc33));}}
+proc emitRational33(link out,string lhs,poly value){
+ poly cleared=DLoc33*value;int k;
+ for(k=1;k<=size(cleared);k++){if(denominator(leadcoef(cleared[k]))!=1){ERROR("LOCAL33_COMPACT_DENOMINATOR_NOT_CLEARED");}}
+ write(out,lhs+"="+string(value)+";");
+}
+short=0;
+link ratOut33="ASCII:w rational-family.sing";open(ratOut33);
+write(ratOut33,"ring rationalFamily33=(2,u),(n,l,v),dp;");
+write(ratOut33,"poly rationalDenominator33;poly rationalH33;poly rationalBase33;ideal rationalTate33;matrix rationalBezout33[2][1];ideal rationalOriginalQR33;ideal rationalSource33;");
+write(ratOut33,"matrix rationalSyzygies33[4]["+string(colsLoc33)+"];matrix rationalJacobian33[4][3];");
+emitRational33(ratOut33,"rationalDenominator33",poly(DLoc33));
+emitRational33(ratOut33,"rationalH33",hLoc33);emitRational33(ratOut33,"rationalBase33",baseLoc33);
+for(iLoc33=1;iLoc33<=2;iLoc33++){
+ emitRational33(ratOut33,"rationalTate33["+string(iLoc33)+"]",rawLoc33[iLoc33]);
+ emitRational33(ratOut33,"rationalBezout33["+string(iLoc33)+",1]",bezoutLoc33[iLoc33,1]);
+}
+for(iLoc33=1;iLoc33<=3;iLoc33++){emitRational33(ratOut33,"rationalOriginalQR33["+string(iLoc33)+"]",rawLoc33[iLoc33+2]);}
+for(iLoc33=1;iLoc33<=4;iLoc33++){
+ emitRational33(ratOut33,"rationalSource33["+string(iLoc33)+"]",JLoc33[iLoc33]);
+ for(jLoc33=1;jLoc33<=colsLoc33;jLoc33++){emitRational33(ratOut33,"rationalSyzygies33["+string(iLoc33)+","+string(jLoc33)+"]",SLoc33[iLoc33,jLoc33]);}
+ for(jLoc33=1;jLoc33<=3;jLoc33++){emitRational33(ratOut33,"rationalJacobian33["+string(iLoc33)+","+string(jLoc33)+"]",jacRat33[iLoc33,jLoc33]);}
+}
+close(ratOut33);
+execute(read("rational-family.sing"));
+ideal refJ33=imap(localGeneric33,JLoc33);matrix refS33=imap(localGeneric33,SLoc33);poly refH33=imap(localGeneric33,hLoc33);
+if(matrix(refJ33)!=matrix(rationalSource33) || refS33!=rationalSyzygies33 || refH33!=rationalH33){ERROR("LOCAL33_RATIONAL_SERIALIZATION_ROUNDTRIP");}
+int rationalColumns33=ncols(rationalSyzygies33);matrix rationalZero33[1][rationalColumns33];
+if(matrix(rationalSource33)*rationalSyzygies33!=rationalZero33){ERROR("LOCAL33_RATIONAL_SYZYGY_IDENTITY");}
+matrix rationalTateCheck33=matrix(rationalTate33)*rationalBezout33;
+if(rationalTateCheck33[1,1]!=rationalH33*rationalBase33){ERROR("LOCAL33_RATIONAL_TATE_IDENTITY");}
+print("LOCAL33_COMPACT_DUMP_ALL_CHECKS_PASS");quit;

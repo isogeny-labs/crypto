@@ -1,0 +1,15 @@
+list actualPoints37;list actualLabels37;int actualCount37;
+proc store37(int root,int factor,number b,number c,number l,number n){
+ actualCount37++;string label="r"+string(root)+"-f"+string(factor);
+ number u0=(b+c)/c^2;number v0=((b/c)*u0^3+1)/(u0+1);
+ if(v0^2+v0+u0^3+u0!=0){ERROR("ORDER37_BASE_CURVE");}
+ map ev=twistBasis33,n,l,v0,u0;ideal vals=ev(twistNumerators33);ideal saved=savedEvaluations37[actualCount37];
+ for(int k=1;k<=68;k++){if(vals[k]/(u0^49*(u0+1)^16)!=saved[k]){ERROR("ORDER37_OLD_VALUE_BINDING");}}
+ actualPoints37[actualCount37]=list(b,c,l,n);actualLabels37[actualCount37]=label;
+}
+proc equal37(list p,list q){for(int k=1;k<=4;k++){if(number(p[k])!=number(q[k])){return(0);}}return(1);}
+proc square37(list p){list q;for(int k=1;k<=4;k++){q[k]=number(p[k])^2;}return(q);}
+proc deck37(list p){number b=p[1];number c=p[2];number l=p[3];number n=p[4];number aa=1+c;
+ if(b==0 || c==0){ERROR("ORDER37_DECK_DENOMINATOR");}number s=b/c+aa;number v=s*(aa+s);if(v==0){ERROR("ORDER37_DECK_V_ZERO");}number iu=v/(b*c);
+ return(list(v*iu^2,1+aa*iu,(l+s)*iu,(l*b+n+b*c)*iu^3));
+}

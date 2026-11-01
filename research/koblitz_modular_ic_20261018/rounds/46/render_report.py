@@ -1,0 +1,8 @@
+from pathlib import Path
+import json,typst
+h=Path(__file__).resolve().parent;r=json.loads((h/'results.json').read_text());baseline=json.loads((h/'../45/results.json').read_text());cases=sorted(r['collector_cases'],key=lambda x:x['extension_degree']);svg=['<svg xmlns="http://www.w3.org/2000/svg" width="780" height="220"><rect width="780" height="220" fill="white"/><text x="20" y="25" font-family="sans-serif" font-size="16">Detector inputs; all complete point sets match</text><text x="20" y="53" font-family="sans-serif" font-size="12">Degree</text><text x="170" y="53" font-family="sans-serif" font-size="12">R45 lambda trials</text><text x="420" y="53" font-family="sans-serif" font-size="12">R46 algebraic candidates</text>'];data=[]
+for i,x in enumerate(cases):
+ d=x['extension_degree'];old=next(v for v in baseline['collector_cases']if v['extension_degree']==d);yy=82+i*30
+ svg.append(f'<text x="20" y="{yy}" font-family="sans-serif" font-size="14">{d}</text><text x="170" y="{yy}" font-family="sans-serif" font-size="14">{old["lambda_candidates"]:,}</text><text x="420" y="{yy}" font-family="sans-serif" font-size="14">{x["lambda_candidates"]:,}</text><text x="650" y="{yy}" font-family="sans-serif" font-size="12">byte-identical</text>')
+ data.append({'degree':d,'old_detector_inputs':old['lambda_candidates'],'algebraic_candidates':x['lambda_candidates'],'candidate_run':x['attempt']})
+svg.append('<text x="20" y="211" font-family="sans-serif" font-size="11">control7/9/11/13-01; different stages, not total cost or IC performance</text></svg>');(h/'round46.svg').write_text('\n'.join(svg)+'\n');(h/'plot-data.json').write_text(json.dumps(data,indent=2)+'\n');typst.compile(str(h/'report.typ'),output=str(h/'report.pdf'))

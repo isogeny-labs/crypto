@@ -1,0 +1,28 @@
+LIB "normal.lib";
+option(redSB);short=0;
+ring control49=2,(x,y),dp;
+ideal smooth49=y+x^2;
+list smoothNorm49=normalP(smooth49,"withRing");
+intvec smoothTest49=norTest(smooth49,smoothNorm49);
+if(smoothTest49[1]!=1 || smoothTest49[2]!=1 || smoothTest49[3]!=1){ERROR("CONTROL49_SMOOTH_NORMAP");}
+if(smoothNorm49[3][2]!=0){ERROR("CONTROL49_SMOOTH_DELTA");}
+print("CONTROL49_RESULT case=smooth characteristic=2 injective=1 finite=1 normal=1 delta=0");
+ideal cusp49=y^2+x^3;
+list cuspNorm49=normalP(cusp49,"withRing");
+intvec cuspTest49=norTest(cusp49,cuspNorm49);
+if(cuspTest49[1]!=1 || cuspTest49[2]!=1 || cuspTest49[3]!=1){ERROR("CONTROL49_CUSP_NORMAP");}
+if(cuspNorm49[3][2]!=1){ERROR("CONTROL49_CUSP_DELTA");}
+print("CONTROL49_RESULT case=cusp characteristic=2 injective=1 finite=1 normal=1 input_delta=1");
+def cuspRing49=cuspNorm49[1][1];setring cuspRing49;
+ideal cuspStd49=std(norid);
+poly actualRelation49=normap[2]^2+normap[1]^3;
+poly corruptedRelation49=normap[2]^2+(normap[1]+1)^3;
+if(reduce(actualRelation49,cuspStd49)!=0){ERROR("CONTROL49_SOURCE_RELATION");}
+if(reduce(corruptedRelation49,cuspStd49)==0){ERROR("CONTROL49_CORRUPTION_ACCEPTED");}
+link controlOut49="ASCII:w control-normalization.sing";open(controlOut49);
+write(controlOut49,"ring controlNormalized49=2,("+varstr(basering)+"),dp;ideal norid;ideal normap;");
+int indexControl49;for(indexControl49=1;indexControl49<=size(norid);indexControl49++){write(controlOut49,"norid["+string(indexControl49)+"]="+string(norid[indexControl49])+";");}
+for(indexControl49=1;indexControl49<=size(normap);indexControl49++){write(controlOut49,"normap["+string(indexControl49)+"]="+string(normap[indexControl49])+";");}
+close(controlOut49);
+print("CONTROL49_RESULT original_relation=checked corrupted_map=rejected normalization_export=complete");
+print("CONTROL49_ALL_CHECKS_PASS");quit;

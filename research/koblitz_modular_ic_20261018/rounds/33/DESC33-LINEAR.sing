@@ -1,0 +1,63 @@
+// Actual old sigma columns and complete389jets loaded over F4 in variable w.
+proc apply33(poly bits,ideal cols){poly ans=0;int j;for(j=1;j<=size(bits);j++){ans=ans+leadcoef(bits[j])*cols[deg(bits[j])+1];}return(ans);}
+proc solve33(poly value,list piv,list coords){
+ poly co=0;int j;number lc;
+ while(value!=0){j=deg(value)+1;if(piv[j]==0){break;}lc=leadcoef(value);value=value+lc*piv[j];co=co+lc*coords[j];}
+ return(list(value,co));
+}
+matrix S33[68][68];matrix I33[68][68];int i33;int j33;int t33;int row33;
+for(i33=1;i33<=68;i33++){I33[i33,i33]=1;}
+for(i33=1;i33<=68;i33++){
+ for(t33=1;t33<=size(sigmaColumns[i33]);t33++){
+  if(leadcoef(sigmaColumns[i33][t33])!=1){ERROR("DESC33_NONBINARY_SIGMA");}
+  row33=deg(sigmaColumns[i33][t33])+1;if(row33>68){ERROR("DESC33_SIGMA_FRAMING");}S33[row33,i33]=1;
+ }
+}
+matrix N33=S33+I33;matrix C33=I33+tau*N33;matrix barC33[68][68];matrix zero33[68][68];
+for(i33=1;i33<=68;i33++){for(j33=1;j33<=68;j33++){barC33[i33,j33]=number(C33[i33,j33])^2;}}
+if(S33*S33!=I33 || N33*N33!=zero33 || C33*C33!=I33 || S33*barC33!=C33){ERROR("DESC33_MATRIX_IDENTITY");}
+matrix badC33=C33;badC33[1,1]=badC33[1,1]+1;
+if(badC33*badC33==I33){ERROR("DESC33_CORRUPTION_ACCEPTED");}
+link matrixOut33="ASCII:w descent-matrix.sing";open(matrixOut33);
+write(matrixOut33,"matrix descentMatrix33[68][68]="+string(C33)+";");close(matrixOut33);
+ideal gJets33;
+for(i33=1;i33<=68;i33++){gJets33[i33]=basisJets389[i33]+tau*(basisJets389[i33]+apply33(sigmaColumns[i33],basisJets389));}
+proc products33(ideal first,ideal second,int countA,int countB,int symmetric,int precision,int expected,string tag){
+ list piv;list coords;list selected;list chosenA;list chosenB;list allValues;list allCoords;
+ int i;int j;int k;int p;int term;int start;int spaceRank33=0;int columns=0;
+ poly full;poly value;poly co;poly rebuilt;number lc;list sol;
+ for(k=1;k<=precision;k++){piv[k]=poly(0);coords[k]=poly(0);}
+ for(i=1;i<=countA;i++){
+  start=1;if(symmetric==1){start=i;}
+  for(j=start;j<=countB;j++){
+   full=jet(first[i]*second[j],388);value=jet(full,precision-1);columns++;
+   sol=solve33(value,piv,coords);
+   if(sol[1]!=0){
+    spaceRank33++;selected[spaceRank33]=full;chosenA[spaceRank33]=i;chosenB[spaceRank33]=j;
+    p=deg(sol[1])+1;lc=leadcoef(sol[1]);piv[p]=sol[1]/lc;coords[p]=(sol[2]+w^(spaceRank33-1))/lc;co=w^(spaceRank33-1);
+   }else{co=sol[2];}
+   allValues[columns]=value;allCoords[columns]=co;
+   for(term=1;term<=size(co);term++){if(leadcoef(co[term])!=1){ERROR("DESC33_MULTIPLICATION_COORDINATE_NOT_F2");}}
+  }
+ }
+ if(spaceRank33!=expected){ERROR("DESC33_RR_PRODUCT_RANK_"+tag);}
+ // Independently reconstruct every original vector from the selected originals.
+ for(k=1;k<=columns;k++){
+  rebuilt=0;co=allCoords[k];
+  for(term=1;term<=size(co);term++){rebuilt=rebuilt+leadcoef(co[term])*selected[deg(co[term])+1];}
+  if(jet(rebuilt,precision-1)!=allValues[k]){ERROR("DESC33_PRODUCT_RECOMBINATION_"+tag);}
+ }
+ link output="ASCII:w products"+tag+".sing";open(output);
+ write(output,"intmat sectionPairs"+tag+"["+string(spaceRank33)+"][2];ideal sectionJets"+tag+";ideal sectionCoordinates"+tag+";");
+ for(k=1;k<=spaceRank33;k++){
+  write(output,"sectionPairs"+tag+"["+string(k)+",1]="+string(chosenA[k])+";sectionPairs"+tag+"["+string(k)+",2]="+string(chosenB[k])+";");
+  write(output,"sectionJets"+tag+"["+string(k)+"]="+string(selected[k])+";");
+ }
+ for(k=1;k<=columns;k++){write(output,"sectionCoordinates"+tag+"["+string(k)+"]="+string(allCoords[k])+";");}
+ close(output);
+ print("DESC33_PRODUCT_RESULT "+tag+" columns="+string(columns)+" spaceRank33="+string(spaceRank33)+" precision="+string(precision)+" F2_coordinates=all recombination=all");
+ ideal result;for(k=1;k<=spaceRank33;k++){result[k]=selected[k];}return(result);
+}
+ideal degree233=products33(gJets33,gJets33,68,68,1,257,196,"2");
+ideal degree333=products33(gJets33,degree233,68,196,0,389,324,"3");
+print("DESC33_ALL_CHECKS_PASS");quit;

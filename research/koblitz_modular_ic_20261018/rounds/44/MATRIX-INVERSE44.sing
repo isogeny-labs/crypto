@@ -1,0 +1,20 @@
+int compareOld44;int matrixInverseCalls44;
+proc inv44(poly value,ideal q){
+ ideal kb44=kbase(q);int dim44=vdim(q);if(dim44<=0 || size(kb44)!=dim44){ERROR("MATRIX44_FINITE_BASIS");}
+ matrix aug44[dim44][dim44+1];int row44;int col44;int term44;int hit44;poly val44;poly mon44;
+ for(row44=1;row44<=dim44;row44++){if(kb44[row44]==1){aug44[row44,dim44+1]=1;}}
+ for(col44=1;col44<=dim44;col44++){val44=reduce(value*kb44[col44],q);for(term44=1;term44<=size(val44);term44++){mon44=leadmonom(val44[term44]);hit44=0;for(row44=1;row44<=dim44;row44++){if(mon44==kb44[row44]){aug44[row44,col44]=aug44[row44,col44]+leadcoef(val44[term44]);hit44++;}}if(hit44!=1){ERROR("MATRIX44_COORDINATE");}}}
+ matrix originalMatrix44=aug44;int pivot44;int k44;number inversePivot44;number factor44;poly tmp44;
+ for(k44=1;k44<=dim44;k44++){
+  pivot44=0;for(row44=k44;row44<=dim44;row44++){if(pivot44==0 && aug44[row44,k44]!=0){pivot44=row44;}}
+  if(pivot44==0){ERROR("MATRIX44_NONUNIT");}
+  if(pivot44!=k44){for(col44=1;col44<=dim44+1;col44++){tmp44=aug44[k44,col44];aug44[k44,col44]=aug44[pivot44,col44];aug44[pivot44,col44]=tmp44;}}
+  inversePivot44=1/leadcoef(aug44[k44,k44]);for(col44=k44;col44<=dim44+1;col44++){aug44[k44,col44]=aug44[k44,col44]*inversePivot44;}
+  for(row44=1;row44<=dim44;row44++){if(row44!=k44){factor44=leadcoef(aug44[row44,k44]);if(factor44!=0){for(col44=k44;col44<=dim44+1;col44++){aug44[row44,col44]=aug44[row44,col44]+factor44*aug44[k44,col44];}}}}
+ }
+ poly ans44=0;for(col44=1;col44<=dim44;col44++){ans44=ans44+aug44[col44,dim44+1]*kb44[col44];}
+ for(row44=1;row44<=dim44;row44++){val44=originalMatrix44[row44,dim44+1];for(col44=1;col44<=dim44;col44++){val44=val44+originalMatrix44[row44,col44]*aug44[col44,dim44+1];}if(val44!=0){ERROR("MATRIX44_ORIGINAL_ROW");}}
+ if(reduce(value*ans44+1,q)!=0){ERROR("MATRIX44_INVERSE_PRODUCT");}
+ if(compareOld44==1){poly old44=invOld44(value,q);if(reduce(ans44+old44,q)!=0){ERROR("MATRIX44_REFERENCE_MISMATCH");}}
+ matrixInverseCalls44++;return(reduce(ans44,q));
+}

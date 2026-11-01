@@ -1,0 +1,177 @@
+{
+  "schema": "koblitz.results/v1",
+  "round": 46,
+  "runs": [
+    {
+      "attempt": "control11-01",
+      "kind": "native",
+      "build_exit": 0,
+      "native_exit": 0,
+      "status": "accepted",
+      "source_revision": "b56f33cb9bcd31a804d72e42b5b09a1d4add4ace",
+      "source_sha256": "1a35a746b1012886f5b46f1946c0369ed668fec038f1996188ddbe399d2922a7"
+    },
+    {
+      "attempt": "control13-01",
+      "kind": "native",
+      "build_exit": 0,
+      "native_exit": 0,
+      "status": "accepted",
+      "source_revision": "3253ac2027e9bd96f637d092c16f9771ac01c7c8",
+      "source_sha256": "1a35a746b1012886f5b46f1946c0369ed668fec038f1996188ddbe399d2922a7"
+    },
+    {
+      "attempt": "control7-01",
+      "kind": "native",
+      "build_exit": 0,
+      "native_exit": 0,
+      "status": "accepted",
+      "source_revision": "e6e0f962288869d2c0e1a36b2fc6f721fe02f5aa",
+      "source_sha256": "1a35a746b1012886f5b46f1946c0369ed668fec038f1996188ddbe399d2922a7"
+    },
+    {
+      "attempt": "control9-01",
+      "kind": "native",
+      "build_exit": 0,
+      "native_exit": 0,
+      "status": "accepted",
+      "source_revision": "b56f33cb9bcd31a804d72e42b5b09a1d4add4ace",
+      "source_sha256": "1a35a746b1012886f5b46f1946c0369ed668fec038f1996188ddbe399d2922a7"
+    },
+    {
+      "attempt": "lean46-01",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "status": "accepted",
+      "audited_declarations": 2,
+      "audit_log": "AuditAxioms.lean:49:13: warning: `String.mk` has been deprecated: Use `String.ofList` instead\nok    RootCertificate46.complete_root_certificate  [propext, Classical.choice, Quot.sound]\nok    RootCertificate46.linear_product_roots  [propext, Classical.choice, Quot.sound]\naudited 2 theorems in [RootCertificate46]; 0 failing, 0 trusted (native_decide)\n"
+    }
+  ],
+  "collector_cases": [
+    {
+      "attempt": "control11-01",
+      "status": "accepted",
+      "role": "control",
+      "extension_degree": 11,
+      "field": 2048,
+      "base_points": 1980,
+      "chart_base_points": 1980,
+      "lambda_candidates": 2860,
+      "source_passes": 2860,
+      "rational_source_points": 2860,
+      "closed_points": 260,
+      "deck_orbits": 26,
+      "jacobian_rank2_points": 2860,
+      "points_sha256": "7fb1a0fd10b04ecb2b84c02a61ed5efaaeb62fe88bfce22a3ca45e4cf44eaa51",
+      "degree_partition": [
+        {
+          "degree": 11,
+          "closed_points": 260
+        }
+      ]
+    },
+    {
+      "attempt": "control13-01",
+      "status": "accepted",
+      "role": "control",
+      "extension_degree": 13,
+      "field": 8192,
+      "base_points": 8060,
+      "chart_base_points": 8060,
+      "lambda_candidates": 7540,
+      "source_passes": 7540,
+      "rational_source_points": 7540,
+      "closed_points": 580,
+      "deck_orbits": 58,
+      "jacobian_rank2_points": 7540,
+      "points_sha256": "e3109fe37b22fe5a0112157cd2e8e45bc13426b3de6690331ea127a9bd031aa6",
+      "degree_partition": [
+        {
+          "degree": 13,
+          "closed_points": 580
+        }
+      ]
+    },
+    {
+      "attempt": "control7-01",
+      "status": "accepted",
+      "role": "control",
+      "extension_degree": 7,
+      "field": 128,
+      "base_points": 140,
+      "chart_base_points": 140,
+      "lambda_candidates": 420,
+      "source_passes": 420,
+      "rational_source_points": 420,
+      "closed_points": 60,
+      "deck_orbits": 6,
+      "jacobian_rank2_points": 420,
+      "points_sha256": "cf760f2506c175f220ffc9a864043cf4c5d2e7d8f5d321fa392d64f44fa19104",
+      "degree_partition": [
+        {
+          "degree": 7,
+          "closed_points": 60
+        }
+      ]
+    },
+    {
+      "attempt": "control9-01",
+      "status": "accepted",
+      "role": "control",
+      "extension_degree": 9,
+      "field": 512,
+      "base_points": 540,
+      "chart_base_points": 540,
+      "lambda_candidates": 540,
+      "source_passes": 540,
+      "rational_source_points": 540,
+      "closed_points": 60,
+      "deck_orbits": 6,
+      "jacobian_rank2_points": 540,
+      "points_sha256": "91c1c854a083f20138a6f2897c50a83781b90fcac683b68a7845cbdd282ab989",
+      "degree_partition": [
+        {
+          "degree": 9,
+          "closed_points": 60
+        }
+      ]
+    }
+  ],
+  "point_set_comparisons": [
+    {
+      "degree": 11,
+      "candidate_attempt": "control11-01",
+      "reference_attempt": "collect11-01",
+      "byte_identical": true,
+      "reference_sha256": "7fb1a0fd10b04ecb2b84c02a61ed5efaaeb62fe88bfce22a3ca45e4cf44eaa51"
+    },
+    {
+      "degree": 13,
+      "candidate_attempt": "control13-01",
+      "reference_attempt": "collect13-01",
+      "byte_identical": true,
+      "reference_sha256": "e3109fe37b22fe5a0112157cd2e8e45bc13426b3de6690331ea127a9bd031aa6"
+    },
+    {
+      "degree": 7,
+      "candidate_attempt": "control7-01",
+      "reference_attempt": "control7-01",
+      "byte_identical": true,
+      "reference_sha256": "cf760f2506c175f220ffc9a864043cf4c5d2e7d8f5d321fa392d64f44fa19104"
+    },
+    {
+      "degree": 9,
+      "candidate_attempt": "control9-01",
+      "reference_attempt": "collect9-01",
+      "byte_identical": true,
+      "reference_sha256": "91c1c854a083f20138a6f2897c50a83781b90fcac683b68a7845cbdd282ab989"
+    }
+  ],
+  "proper_geometry_formalized": false,
+  "Picard_classes_evaluated": false,
+  "target_images_evaluated": false,
+  "larger_n_transfer": false,
+  "independent_scientific_replay": false,
+  "independent_semantic_review": false
+}

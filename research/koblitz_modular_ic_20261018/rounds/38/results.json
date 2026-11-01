@@ -1,0 +1,57 @@
+{
+  "schema": "koblitz.round-results/v1",
+  "round": 38,
+  "runs": [
+    {
+      "attempt": "algebra38-01",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "observations": [
+        "ALG38_RESULT dimension=3075 precision=615 basis_rank=3075 inverse_recombination=all ring_identities=all actual_coefficient_embedding=checked"
+      ]
+    },
+    {
+      "attempt": "lean38-01",
+      "kind": "Lean",
+      "status": "accepted",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "audited_declarations": 1
+    }
+  ],
+  "construction_counts": {
+    "closed_point_algebra_dimension": 3075,
+    "local_precision": 615,
+    "verified_inverse_columns": 3075
+  },
+  "controls": {
+    "actual_coefficient_embedding": true,
+    "all_basis_inverse_pivot_recombinations": true,
+    "ring_identities": true,
+    "corrupt_inverse_and_field_controls": true
+  },
+  "larger_geometry": {
+    "proposed_base_degree": 512,
+    "maximum_L6_pole_degree": 3072,
+    "larger_source_jets_constructed": false,
+    "larger_complete_RR_spaces_constructed": false,
+    "ordinary367_or_460_divisors_evaluated": false,
+    "prospective_RR_dimensions_only": [
+      452,
+      1476,
+      3012
+    ]
+  },
+  "formal": {
+    "accepted_runs": 1,
+    "audited_declarations": 1,
+    "native_arrays_formalized": false,
+    "proper_geometry_formalized": false
+  },
+  "performance_measured": false,
+  "IC_relation_rank": null,
+  "public_input_recoveries": 0,
+  "independent_scientific_replay": false,
+  "global_metrics_integration": "pending exclusive scope T-865; scoped patch retained"
+}
