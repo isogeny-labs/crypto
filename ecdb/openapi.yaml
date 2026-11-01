@@ -384,6 +384,38 @@ paths:
         "200": { description: gzipped COPY text, content: { application/gzip: {} } }
         "404": { description: no such table }
         "413": { description: page too large }
+  /v1/factor-bases:
+    get:
+      summary: Factor bases of the IC work over ec.v_factor_base_summary (size, results, solved, best solved S).
+      parameters:
+        - { name: curve, in: query, schema: { type: string }, description: any curve reference, or the producer's curve name }
+        - { name: family, in: query, schema: { type: string } }
+        - { name: scheme, in: query, schema: { type: string, enum: [fb1, fbarchive, spec] } }
+        - { name: min_columns, in: query, schema: { type: integer } }
+        - { name: max_columns, in: query, schema: { type: integer } }
+        - { name: solved, in: query, schema: { type: boolean } }
+        - { name: sort, in: query, schema: { type: string, enum: [results, best_s, columns, key] } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
+      responses: { "200": { description: OK } }
+  /v1/factor-bases/{key}:
+    get:
+      summary: One factor base by FB1/FBS1 id, archive digest, alias (PS1 label, cited digest) or id, with aliases, FBM1 configurations and results by source.
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+      responses: { "200": { description: OK }, "404": { description: unknown }, "409": { description: ambiguous alias } }
+  /v1/factor-bases/{key}/results:
+    get:
+      summary: The base's results (ecbench runs, large-prime cells, SECG small-x yields), or its points with points=true.
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+        - { name: source, in: query, schema: { type: string } }
+        - { name: fbm_id, in: query, schema: { type: string } }
+        - { name: solved, in: query, schema: { type: boolean } }
+        - { name: points, in: query, schema: { type: boolean } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
+      responses: { "200": { description: OK } }
   /v1/sql:
     post:
       summary: Run one read-only SQL query (search_path ec, public).
