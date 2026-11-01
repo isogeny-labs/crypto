@@ -1,0 +1,51 @@
+proc require57(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../../../56/runs/check56-01/closed-poles56.sing"));
+execute(read("../../source-data/r27-basis-functions.sing"));
+execute(read("../../source-data/rr-literals57.sing"));
+map basisMap57=rrBasis27,N,L,V,U;ideal originalFromArtifact57=basisMap57(basisNumerators);
+require57(size(original57)==68 && size(descended57)==68 && originalFromArtifact57==original57,"MATCH57_ALL_68_ORIGINAL_BASIS_NUMERATORS");
+ring descent57=(2,a),(N,L,V,U),dp;minpoly=a^2+a+1;short=0;
+map literalMap57=rrLiteral57,N,L,V,U;ideal original57=literalMap57(original57);ideal descended57=literalMap57(descended57);
+poly E57=V^2+V+U^3+U;ideal baseGB57=std(ideal(E57));
+poly Rnum57=(1+U)*V+1;poly bnum57=reduce(Rnum57*(Rnum57+U^3),baseGB57);poly Anum57=(1+U)*V+1+U^3+U^4;
+list universal57;int en57;int el57;int ev57;int index57;int i57;int j57;intvec ex57;
+for(ev57=0;ev57<=1;ev57++){for(el57=0;el57<=3;el57++){for(en57=0;en57<=3;en57++){
+ index57=1+en57+4*el57+16*ev57;
+ universal57[index57]=reduce(U^(33-7*en57-4*el57)*V^ev57*((1+a)*(U^7*N+a*bnum57)^en57*(U^4*L+a*Anum57)^el57+a*(U^7*N+a^2*bnum57)^en57*(U^4*L+a^2*Anum57)^el57),baseGB57);
+}}}
+poly rest57;poly term57;poly reconstructed57;poly residual57;
+for(i57=1;i57<=68;i57++){
+ rest57=original57[i57];reconstructed57=0;
+ while(rest57!=0){term57=lead(rest57);ex57=leadexp(term57);require57(ex57[1]<=3 && ex57[2]<=3 && ex57[3]<=1,"MATCH57_FIXED_MONOMIAL_FAMILY");index57=1+ex57[1]+4*ex57[2]+16*ex57[3];reconstructed57=reconstructed57+universal57[index57]*U^ex57[4];rest57=rest57-term57;}
+ residual57=reduce(reconstructed57+descended57[i57],baseGB57);
+ require57(residual57==0,"MATCH57_COMPLETE_LITERAL_DESCENT_IDENTITY");
+}
+require57(reduce(reconstructed57+descended57[68]+1,baseGB57)!=0,"MATCH57_CHANGED_DESCENT_NUMERATOR_REJECTED");
+print("MATCH57_DESCENT sections=68 original_artifact_bindings=68 full_polynomial_identities=68 coefficient_field=F4 changed_numerator_rejected=1");
+ring matchJets57=2,(w),dp;
+execute(read("../../source-data/laurent-helper57.sing"));
+execute(read("../../source-data/r27-charts.sing"));
+require57(size(charts)==20,"MATCH57_COMPLETE_CUSP_CHART_INPUT");
+int ch57;int cusp57;int e57;int countA57=0;int countB57=0;int dAmbient57=0;int dTarget57=0;int newConditions57=0;
+list chart57;list coords57;list u57;list v57;list Rn57;list cn57;list bn57;list b57;list c57;list A57;list test57;
+for(ch57=1;ch57<=20;ch57++){
+ chart57=charts[ch57];coords57=chart57[1];u57=chart57[2];v57=chart57[3];e57=chart57[4];cusp57=chart57[5];
+ test57=la(la(lpw(v57,2),v57),la(lpw(u57,3),u57));lzero("MATCH57_BASE_E",test57);
+ Rn57=la(lm(la(lc(1),u57),v57),lc(1));cn57=la(Rn57,lpw(u57,3));bn57=lm(Rn57,cn57);
+ b57=lm(bn57,lpw(li(u57),7));c57=lm(cn57,lpw(li(u57),4));A57=la(lc(1),c57);
+ lzero("MATCH57_ACTUAL_B",la(b57,coords57[3]));lzero("MATCH57_ACTUAL_C",la(c57,coords57[4]));
+ if(cusp57==1){
+  require57(u57[1]!=0 && u57[2]==e57 && v57[1]!=0 && v57[2]==e57,"MATCH57_A_EQUALS_Q0_RESIDUE");
+  require57(b57[2]==-7*e57 && c57[2]==-4*e57 && A57[2]==-4*e57,"MATCH57_A_POLE_BINDING");
+  countA57++;dAmbient57=dAmbient57+7*e57;dTarget57=dTarget57+4*e57;newConditions57=newConditions57+3*e57;
+ }
+ if(cusp57==4){
+  test57=la(v57,lc(1));require57(u57[1]!=0 && u57[2]==e57 && test57[1]!=0 && test57[2]==e57,"MATCH57_B_EQUALS_Q1_RESIDUE");
+  require57(b57[2]==e57 && c57[2]==-e57 && A57[2]==-e57,"MATCH57_B_POLE_BINDING");
+  countB57++;dAmbient57=dAmbient57+e57;dTarget57=dTarget57+e57;
+ }
+}
+require57(countA57==4 && countB57==4 && dAmbient57==128 && dTarget57==80 && newConditions57==48,"MATCH57_COMPLETE_DIVISOR_INCLUSION_AND_DEGREES");
+require57(points56[1,1]==0 && points56[1,2]==7 && points56[1,3]==2 && points56[1,4]==28 && points56[2,2]==1 && points56[2,4]==4 && points56[3,1]==1 && points56[3,4]==7 && points56[4,4]==1,"MATCH57_R56_CLOSED_POINT_BINDING");
+print("MATCH57_RESULT original_sections=68 literal_descent=68 cusp_charts=20 ambient_degree=128 target_degree=80 exact_binary_constraints=48 A_cusp_Q0=1 B_cusp_Q1=1");
+print("MATCH57_ALL_CHECKS_PASS");quit;

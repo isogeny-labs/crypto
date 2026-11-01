@@ -1,0 +1,9 @@
+# R57 exact complete-space preparation, stage1
+
+Freeze before any R57 mathematics. Preserve original manual local authorization: native Singular only, one mathematical job, seed57, 4GiB virtual,1200seconds, one Singular/FLINT thread. No new EKS/Diem/freezer/Conductor claim or delegation. R27-R56 science remains sealed.
+
+Stage1 matches all68 R27 original sections to their literal artifacts, then checks all68 full F4 polynomial descent identities after clearing exactly33 powers of u. It binds all20 cusp charts to the actual base equation and b,c coordinates, identifies A=(0,0) with Q0 and B=(0,1) with Q1, and checks divisor inclusion degree128 to80 against R56. The48 prospective binary constraints are all21 removed ramified coefficients and3 unramified coefficients, each with residue degree2. No expected kernel dimension is an acceptance criterion. No new kernel result is claimed by this stage.
+
+Positive controls are every actual source/descent/cusp identity; the negative control changes a descended numerator by1. Native acceptance requires exit0, exact final marker, and no whitespace-question-mark error. Preserve every failure/cap; a repair is a separately frozen fresh attempt. Never repeat an accepted producer for publication. Runtimes are custody diagnostics only; A/A, statistical power, randomization and blinded analysis are inapplicable to exhaustive exact identities.
+
+Next stages, frozen before their data: complete48x68 restriction kernel with two-sided certificates and full source-field bindings, then Lean proofs of the algebraic implications. The original and descended lambda coordinates must remain distinguished. Prior literature: retained R27/R43/R50/R56 notes and https://stacks.math.columbia.edu/tag/0B5B, checked before this design. Completeness here depends on the retained complete ambient space and all required local constraints; degree alone does not establish it.

@@ -1,0 +1,116 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R57-RR-MATCH",
+  "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
+  "claims": [
+    {
+      "id": "descent",
+      "class": "exact_computation",
+      "statement": "All 68 retained original numerators equal their R27 artifact and all 68 descended numerators satisfy the full F4 twist identity."
+    },
+    {
+      "id": "divisor",
+      "class": "exact_computation",
+      "statement": "All20 original cusp charts bind the ambient degree128 divisor and actual degree80 pole divisor, giving48 binary conditions."
+    },
+    {
+      "id": "complete-space",
+      "class": "out_of_scope",
+      "statement": "Kernel computation and actual function-field basis require a subsequent frozen stage; no dimension assumed."
+    }
+  ],
+  "arms": {
+    "reference": "R27 original complete68 basis, R43 descended literals, R56 closed pole table",
+    "baseline": "retained degree128 complete ambient space",
+    "candidate": "exact descent and cusp matching for degree80 restriction",
+    "positive": [
+      "all68 original artifact comparisons",
+      "all68 full polynomial descent identities",
+      "all20 base and actual b,c identities",
+      "R56 four-point binding"
+    ],
+    "negative": [
+      "last descended numerator changed by1 must fail equality"
+    ],
+    "A_A": {
+      "not_applicable_reason": "fixed exhaustive exact algebra, no statistical comparison"
+    }
+  },
+  "variables": {
+    "fixed": [
+      "all donor bytes",
+      "Singular/FLINT one thread",
+      "4GiB virtual/1200s",
+      "seed57",
+      "complete68 sections and20 charts"
+    ],
+    "measured": [
+      "binary digest",
+      "start/end UTC",
+      "exit status"
+    ],
+    "statistical": "not applicable"
+  },
+  "randomization": {
+    "method": "fixed",
+    "reason": "exhaustive prescribed polynomial identities",
+    "seeds": [
+      57
+    ]
+  },
+  "blinding": {
+    "method": "none",
+    "reason": "exactpredeclaredproducts"
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": "notapplicable"
+  },
+  "metrics": [
+    "68 literal equalities",
+    "68 global descent residuals",
+    "20 base and b,c residuals",
+    "ambient and target divisor degrees",
+    "48 coefficient conditions",
+    "changed numerator rejection"
+  ],
+  "execution": {
+    "launcher": "REPLAY_CAS.sh match57-01 MATCH57.sing MATCH57_ALL_CHECKS_PASS",
+    "timeout_seconds": 1200,
+    "virtual_KiB": 4194304,
+    "threads": 1,
+    "seed": 57,
+    "queue": "one mathematical job atonce",
+    "checkpoint": "immutable raw sources,logs,exit,binaryhash,tar",
+    "source_gate": "sixexecutedfiles matchGit;all donor hashes",
+    "backend": "existing user-authorized manual local exact algebra; no EKS submission"
+  },
+  "stopping": {
+    "accepted": "exit0,exactmarker,no nativeerrorlines,allprescribedchecks",
+    "failure": "retain errors/caps/partials;freeze repairbeforefreshattempt",
+    "no_duplicate": "reconcilelivehandlebeforeretry"
+  },
+  "decision": {
+    "accept": "every prescribed exact identity and degree holds; exit0, marker and no question-mark errors",
+    "failure": "preserve failed attempt; no mathematical null inferred from syntax or precision errors"
+  },
+  "analysis": {
+    "kind": "exact polynomial reduction and rigorous Laurent valuation",
+    "comparative": false,
+    "precision": "retained absolute precision propagated by original native Laurent helper; zero residual requires positive precision"
+  },
+  "literature": [
+    {
+      "source": "R27 RR27-EXPORT/LAURENT27/CUSP27, R43 descent literals, R50 RR_FIELD, R56 CM and closed-poles56",
+      "use": "original complete ambient basis, actual coordinate transition and complete poles"
+    },
+    {
+      "url": "https://stacks.math.columbia.edu/tag/0B5B",
+      "use": "RR on proper normal curves; pole restriction inside an already complete ambient space"
+    }
+  ],
+  "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
+  "version": 1
+}
