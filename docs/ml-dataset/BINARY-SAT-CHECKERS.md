@@ -16,4 +16,4 @@ VerifiedInitial borrows both the CheckedMap and the actual events. Its counts de
 
 ## Validation
 
-The focused binary_semaev_chain_sat suite passed 23 tests with 0 failures, including the new formula and initial-state controls, with source/fixture hashes unchanged. The combined dataset suite later passed 611 tests with 0 failures and 2 ignored. Required full-library validation is running on the same implementation. These are local software checks, with no new scientific cloud campaign or instruction-cost claim.
+The focused binary_semaev_chain_sat suite passed 23 tests with 0 failures, including the new formula and initial-state controls, with source/fixture hashes unchanged. The combined dataset suite later passed 611 tests with 0 failures and 2 ignored. Full-library validation then passed 6,043 tests with 0 failures and 125 ignored, with all source and fixture hashes unchanged. The full-library log SHA-256 is `b7ea0bbf1b3ba5bad1f546b1c00310e9472f4fe63c41d1d1303c02b8a70d69b8`. These are local software checks, with no new scientific cloud campaign or instruction-cost claim.
