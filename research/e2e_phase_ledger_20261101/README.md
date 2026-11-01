@@ -1,7 +1,13 @@
 # Complete cold E2E phase ledger
 
-Status: protocol work only. No records from this study existed when the
-protocol was frozen.
+Status: frozen protocol; the first two-shard attempt produced no admissible
+result set. See [AMENDMENT_1.md](AMENDMENT_1.md) for the retained failure
+classification and prospective infrastructure remediation. A fixed receipt-only
+diagnostic is prepared in [`diagnostic/`](diagnostic/): it submits no EKS work
+and publishes only hash-verified gate booleans, counts, and failed predicate
+names for the retained target-1 audit failure. [AMENDMENT_2.md](AMENDMENT_2.md)
+records the resulting censored-outcome gate defect and freezes its candidate
+correction. It authorizes publication-only verification, not a retry.
 
 This study fills a specific accounting gap in the binary-curve index-calculus
 work: it measures a complete, current-source, cold solve from setup through an
@@ -60,3 +66,10 @@ target or measured round was observed during instrument calibration.
 
 See [PROTOCOL.md](PROTOCOL.md), [LITERATURE.md](LITERATURE.md), and
 [`protocol.json`](protocol.json).
+
+The diagnostic transport follows the official AWS CodeBuild
+[`StartBuild`](https://docs.aws.amazon.com/codebuild/latest/APIReference/API_StartBuild.html)
+and [buildspec](https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html)
+contracts: an S3 ARN may supply a per-build buildspec in the project's Region.
+Here both the buildspec and script are SHA-256 pinned before upload and again
+before execution.

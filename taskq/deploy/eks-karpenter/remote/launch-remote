@@ -10,13 +10,33 @@ mkdir -p "$output"
 digest=$(sha256sum "$output/request.json" | cut -d ' ' -f1)
 key="inputs/requests/$digest.json"
 aws s3 cp "$output/request.json" "s3://$ISOLAB_BUCKET/$key" --only-show-errors
-jq -n --arg project "$ISOLAB_CODEBUILD_PROJECT" --arg key "$key" --arg token "$digest" \
-  '{projectName:$project,idempotencyToken:$token,environmentVariablesOverride:[{name:"ISOLAB_REQUEST_KEY",value:$key,type:"PLAINTEXT"}]}' > "$output/start-request.json"
+run_request="$here/run-request"
+buildspec="$here/current-run-request-buildspec.yml"
+run_request_sha=$(sha256sum "$run_request" | cut -d ' ' -f1)
+buildspec_sha=$(sha256sum "$buildspec" | cut -d ' ' -f1)
+aws s3 cp "$run_request" \
+  "s3://$ISOLAB_BUCKET/inputs/requests/$run_request_sha.run-request" --only-show-errors
+aws s3 cp "$buildspec" \
+  "s3://$ISOLAB_BUCKET/inputs/requests/$buildspec_sha.buildspec.yml" --only-show-errors
+buildspec_arn="arn:aws:s3:::$ISOLAB_BUCKET/inputs/requests/$buildspec_sha.buildspec.yml"
+token=$(printf '%s\n%s\n%s\n' "$digest" "$run_request_sha" "$buildspec_sha" \
+  | sha256sum | cut -d ' ' -f1)
+jq -n --arg project "$ISOLAB_CODEBUILD_PROJECT" --arg key "$key" --arg token "$token" \
+  --arg run_request_sha "$run_request_sha" --arg buildspec "$buildspec_arn" \
+  '{projectName:$project,idempotencyToken:$token,timeoutInMinutesOverride:100,
+    buildspecOverride:$buildspec,environmentVariablesOverride:[
+      {name:"ISOLAB_REQUEST_KEY",value:$key,type:"PLAINTEXT"},
+      {name:"ISOLAB_RUN_REQUEST_SHA256",value:$run_request_sha,type:"PLAINTEXT"}]}' \
+  > "$output/start-request.json"
 # Do not retry an ambiguous StartBuild failure automatically. Inspect by job name.
 aws codebuild start-build --cli-input-json "file://$output/start-request.json" > "$output/build-start.json"
 build_id=$(jq -er .build.id "$output/build-start.json")
 printf 'Launcher: %s\n' "$build_id"
-deadline=$((SECONDS+5400))
+# The CodeBuild project has a 100-minute terminal bound. Allow one hour beyond
+# the requested EKS deadline for provisioning, receipt verification and a
+# definitive launcher status, while remaining below the Actions job bound.
+duration=$(jq -er .job.seconds "$output/request.json")
+deadline=$((SECONDS+duration+3600))
 while (( SECONDS < deadline )); do
   aws codebuild batch-get-builds --ids "$build_id" > "$output/build.json"
   status=$(jq -er '.builds[0].buildStatus' "$output/build.json")

@@ -59,10 +59,43 @@ jq -e --arg pod "$pod" '
     l2:{accepted:false,executions:2,below_l2:1,invalid_outcomes:0,grades:[{level:"L1",count:2}]},
     audit:null,control:{wall:{status:"rejected",pairs:5,pairs_below_level:1,aa_pairs:5,aa_ci95_present:true}},
     owner_checks:{run:false,replay:false},
-    private_stderr:{run_sha256:.pods[0].private_stderr.run_sha256,audit_sha256:null,content_published:false}}]
-  and (.pods[0].private_stderr.run_sha256|length)==64' "$tmp/out.json" >/dev/null
+    private_stderr:{run_sha256:null,audit_sha256:null,content_published:false}}]' \
+  "$tmp/out.json" >/dev/null
 ! rg -q 'private timing line' "$tmp/out.json"
 ! rg -q 'private control detail|123\.456|234\.567' "$tmp/out.json"
+
+# A native-audit failure exposes only counts and booleans from the hash-bound
+# audit receipt. Problem text and raw stderr remain private.
+jq --arg pod "$pod" '.pods[0].status.containerStatuses[0].state.terminated.exitCode=41' \
+  "$launcher_dir/status.json" > "$tmp/status-audit.json"
+mv "$tmp/status-audit.json" "$launcher_dir/status.json"
+jq --argjson exit 41 '.exit_code=$exit' "$pod_dir/job-exit.json" > "$tmp/job-exit-audit.json"
+mv "$tmp/job-exit-audit.json" "$pod_dir/job-exit.json"
+jq -n '{ok:false,regraded:true,records_bound:true,records:364,verified_records:363,
+  replays:[{reproduced:false}],problems:["private audit detail"]}' > "$pod_dir/audit.json"
+(cd "$pod_dir" && sha256sum job-exit.json build-info.json binary.sha256 input-spec.json l2-gate.json \
+  audit.json control-comparison.json run.stderr) > "$pod_dir/SHA256SUMS"
+jq --arg job "$job" --arg pod "$pod" '.objects += [
+  {Key:("runs/"+$job+"/"+$pod+"/audit.json")}]' "$launcher_dir/objects.json" \
+  > "$tmp/objects-audit.json"
+mv "$tmp/objects-audit.json" "$launcher_dir/objects.json"
+PATH="$tmp/bin:$PATH" FAKE_S3_ROOT="$tmp/s3" ISOLAB_BUCKET="$bucket" \
+  "$here/diagnose-failed-run" "$job" "$launcher" "$request" "$source" "$binary" 41260778856 \
+  "$tmp/audit-failure.json"
+jq -e --arg pod "$pod" '.pods[0] | .pod_uid==$pod
+  and .classification=="native_audit_gate" and .exit_code==41
+  and .exit_source=="hash_verified_job_exit"
+  and .artifact_access=="selected_objects_hash_verified" and .manifest_verified==true
+  and .audit=={ok:false,regraded:true,records_bound:true,records:364,
+    verified_records:363,replay_count:1,reproduced:0,problem_count:1}
+  and .private_stderr=={run_sha256:null,audit_sha256:null,content_published:false}' \
+  "$tmp/audit-failure.json" >/dev/null
+! rg -q 'private audit detail|private timing line' "$tmp/audit-failure.json"
+
+# Restore the L2 exit for status-only/read-unavailable classification tests.
+jq --argjson exit 42 '.pods[0].status.containerStatuses[0].state.terminated.exitCode=$exit' \
+  "$launcher_dir/status.json" > "$tmp/status-l2.json"
+mv "$tmp/status-l2.json" "$launcher_dir/status.json"
 
 # A complete artifact-upload failure remains classifiable from the retained
 # Kubernetes status without inventing hash verification or exposing logs.
