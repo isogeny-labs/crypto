@@ -44,6 +44,10 @@ It holds:
   graphs over every F_p with p < 2^10, and the ℓ-neighbours of the crypto
   and pairing curves. Walk them with `ecdb_curve_detail part=graph` or
   `GET /v1/curves/{ref}/graph?ell=&depth=`.
+- the ℓ-volcanoes of those graphs: each curve's level (`endomorphism_level`),
+  the components (`isogeny_volcano`, `volcano_vertex`) and each edge's
+  direction (horizontal, ascending, descending). End(E) is stored for 149,593
+  census curves whose conductor is {2, 3, 5}-smooth.
 
 The design and the full table list are in [`SCHEMA.md`](SCHEMA.md). The
 routes are in [`../openapi.yaml`](../openapi.yaml).
