@@ -1,45 +1,31 @@
 {
   "schema": "experiment.protocol/v1",
-  "id": "KOBLITZ-R58-DOUBLED-POLE",
+  "id": "KOBLITZ-R58-FULL100-FIELD",
   "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
   "claims": [
     {
-      "id": "ambient",
+      "id": "actual100",
       "class": "exact_computation",
-      "statement": "All196 actual descended product sections satisfy full2D0 cusp bounds and have rank196 in257 F4 jets."
+      "statement": "Bind all196 actual product pairs and all100 kernel/divided functions in whole degree32 source; verify100 actual sigma substitutions."
     },
     {
-      "id": "restriction",
-      "class": "exact_computation",
-      "statement": "Complete96 binary local conditions, full kernel/recovery products, actual involution stability."
-    },
-    {
-      "id": "RR",
+      "id": "finite-poles",
       "class": "theorem",
-      "statement": "Given retained proper genus61 source and complete pole geometry, degree256 ambient dimension196 and degree160 restriction dimension100 follow from RR nonspecialness."
-    },
-    {
-      "id": "target",
-      "class": "out_of_scope",
-      "statement": "No modular-factor identification or target order11 action is inferred from a function space."
+      "statement": "Given divA=P-D and complete L(2D),division byA\u00b2 identifies full L(2P)."
     }
   ],
   "arms": {
     "reference": "R57 full descent/cusp bridge and R50 actual196-product packet",
     "baseline": "complete68-section degree128 space and24-section degree80 restriction",
-    "candidate": "actual196 quadratic products,full96-row restriction,degree160 complete space",
+    "candidate": "All100 actual complete/divided source functions",
     "positive": [
-      "68 actual descended sections on20 charts",
-      "all68 F4 conjugates checked at every chart",
-      "196 product bounds perchart",
-      "257 F4-jet independence",
-      "both source coefficient orientations",
-      "all complete kernel/row/recovery products",
-      "actual196 involution reconstruction",
-      "registered1 andA\u00b2 controls"
+      "196 actual source product identities",
+      "100 division byA\u00b2 products",
+      "all100 actual sigma substitutions",
+      "control1,A\u00b2,b\u00b2 bindings"
     ],
     "negative": [
-      "actual b\u00b2 reconstructed in ambient and excluded by96-row restriction"
+      "changed divided section by1 fails A\u00b2-product"
     ],
     "A_A": {
       "not_applicable_reason": "fixed exhaustive exact calculation, no noisy comparison"
@@ -81,15 +67,14 @@
     "power": "notapplicable"
   },
   "metrics": [
-    "196 ambient independence rank",
-    "3920 full ambient product bounds",
-    "1360 actual section conjugate checks",
-    "96-row rank and complete kernel dimension",
-    "actual restricted sigma rank",
-    "control outcomes"
+    "196 actual product bindings",
+    "100 actual complete sections",
+    "100 divided sections",
+    "100 actual sigma identities",
+    "3 control source bindings"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh space58-01 SPACE58.sing SPACE58_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_CAS.sh field58-01 FIELD58.sing FIELD58_ALL_CHECKS_PASS",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
     "threads": 1,
@@ -125,9 +110,9 @@
     }
   ],
   "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
-  "version": 2,
+  "version": 3,
   "amendment": {
     "before_affected_data": true,
-    "reason": "before first invocation, require every nonzero exported matrix entry exactly1 so GF2 serialization is certified"
+    "reason": "space58-01 accepted ambient196,96-row rank96,full100 kernel andsigmaNrank50; freeze actual field100 stage"
   }
 }
