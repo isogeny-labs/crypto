@@ -1,0 +1,55 @@
+{
+  "schema": "n83.factor-base-recovery-layout/v1",
+  "original_job": "n83-fb-variants-r36-20261031-r1",
+  "entries": [
+    {
+      "path": "listing-chunks/",
+      "purpose": "20 lossless chunks of the paginated S3 object inventory"
+    },
+    {
+      "path": "s3-object-listing.json",
+      "purpose": "ordered reconstruction of 790 S3 objects: six staged source assets and 784 factor-base producer snapshots"
+    },
+    {
+      "path": "recovered-file-map.json",
+      "purpose": "maps 784 content-addressed S3 object path hashes to expected logical output paths, bytes and SHA-256"
+    },
+    {
+      "path": "recovered-s3-file-index.json",
+      "purpose": "recovery mapping for the 784 original output files plus reconstructed manifest.sha256"
+    },
+    {
+      "path": "restored-noncompressed/",
+      "purpose": "400 downloaded non-compressed producer output files restored under their original relative paths and SHA-256 checked"
+    },
+    {
+      "path": "reconstructed-manifest.sha256",
+      "purpose": "deterministic sha256sum manifest rebuilt from the 784 source object hashes"
+    },
+    {
+      "path": "recovered/",
+      "purpose": "seven key producer artifacts plus reconstructed manifest copy"
+    },
+    {
+      "path": "RUN_OUTPUT_FORMAT.json",
+      "purpose": "documented producer output tree, path hashing, and content hash contract"
+    },
+    {
+      "path": "job-status.json",
+      "purpose": "terminal EKS status with BackoffLimitExceeded"
+    },
+    {
+      "path": "worker-logs.json",
+      "purpose": "terminal log endpoint readback (empty after pod expiration)"
+    },
+    {
+      "path": "recover_file_map.py",
+      "purpose": "reproducible path recovery and payload verification"
+    },
+    {
+      "path": "publish_recovery.py",
+      "purpose": "content-addressed S3 publication helper"
+    }
+  ],
+  "excluded_payloads": "384 compressed .bin.zst shards remain in original attempt-01 S3 prefix; recovered index maps them and each key SHA/size matches the corresponding family manifest."
+}
