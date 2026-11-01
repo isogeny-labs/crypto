@@ -18,6 +18,7 @@ use tokio_postgres::types::ToSql;
 mod catalog;
 mod curves;
 pub mod export;
+mod factor_bases;
 mod mcp;
 mod results;
 mod sql;
@@ -214,6 +215,9 @@ pub fn router(state: Shared) -> Router {
         .route("/v1/modular-polynomials", get(catalog::modular_polynomials))
         .route("/v1/class-polynomials", get(catalog::class_polynomials))
         .route("/v1/summation-polynomials", get(catalog::summation_polynomials))
+        .route("/v1/factor-bases", get(factor_bases::list))
+        .route("/v1/factor-bases/{key}", get(factor_bases::document))
+        .route("/v1/factor-bases/{key}/results", get(factor_bases::results))
         .route("/v1/sql", post(sql::run))
         .route("/v1/export", get(export::manifest))
         .route("/v1/export/{table}", get(export::page))

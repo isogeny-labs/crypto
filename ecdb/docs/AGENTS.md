@@ -120,6 +120,7 @@ Rules for the token:
 | `ecdb_polynomials` | `modular` (Phi_l, l = 2..19), `class` (H_D, class number one) or `summation` (Semaev S_2, S_3) | `GET /v1/*-polynomials` |
 | `ecdb_results` | `leaderboard` (filters `family`, `regime`, `validation`; `recipes=true`), `progress` (`series`), `boundary` (`regime`, `stage`), `benchmarks` (`listed`, `q`) | `GET /v1/ic/*`, `GET /v1/benchmarks` |
 | `ecdb_ecbench` | a page of ecbench sessions (filters `method`, `curve`, `label`, `path`); with `session_id`, its per-arm summaries and comparisons | `GET /v1/ecbench/sessions[/{id}]` |
+| `ecdb_factor_bases` | factor bases of the IC work: a page filtered by `curve`, `family`, `scheme`, `min_columns`, `max_columns`, `solved` (sorted by `results`, `best_s`, `columns`, `key`). With `key` (FB1h…, FBS1h…, archive digest, PS1 label, cited digest), the base with its aliases, FBM1 configurations and results by source. Add `results=true` for its results, or `points=true` for its points | `GET /v1/factor-bases[/{key}[/results]]` |
 | `ecdb_sql` | one read-only SELECT over schema `ec` (15 s timeout, 5,000 rows) | `POST /v1/sql` |
 | `ecdb_record_evidence` | attach a claim, with its artifact, to a curve; needs the write token | `POST /v1/evidence` |
 
@@ -197,6 +198,19 @@ own rules:
   - `v_ecbench_arm` excludes warm-up runs.
   - A session's replay audit, when it has one, is in
     `ecbench_session.audit`.
+- **Factor bases.**
+  - Cite a yield, rank or degree of regularity with both its FB1 and FBM1
+    ids, as `docs/ecbench/FACTOR_BASE_PROTOCOL.md` asks.
+  - `digest_verified = true` means ecdb recomputed the id from its
+    preimage.
+  - FBS1 ids are ecdb's own. They name a construction (`curve`, `family`,
+    `params`), not a point set, so don't cite one as if it were FB1.
+  - A large-prime cell's `solved` is the producer's
+    `recovered_matches_planted`. SECG small-x rows hold yields, not solves:
+    `yield_log2` is the exact pair-sum yield.
+  - `best_s_solved` is the minimum over all solved runs of that base: a best
+    case, not an arm summary. Compare arms with `v_ecbench_arm` and the §5a
+    band.
 - **Sibling measurements.** `measurement` keeps each producer's metric and
   unit:
   - ml-cryptanalysis S of plain and automorphism-class rho, with SEM and
@@ -273,7 +287,11 @@ re-imports every catalogue and the computed enrichment:
     `jacobian-transfers.json`, the certificates, or a walk output;
   - `docs/ic/leaderboard.json`, `progress-timeline.json`,
     `boundary_targets.json` or `benchmarks/`;
-  - a new ecbench session;
+  - a new ecbench session (its factor bases come with it: run
+    `import factor-bases` after `import ecbench`);
+  - `research/ecbench_factor_bases_20261013/`, the large-prime receipts,
+    the SECG small-x data, or the cryptanalysis `experiments/fb-archive/`
+    index;
   - the sibling files listed in `ecdb/src/import/siblings.rs`.
 
   `scripts/ecdb.sh check` lists the files whose checkout differs from what
