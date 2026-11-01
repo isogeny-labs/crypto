@@ -1,7 +1,7 @@
 # E1 exact boundary-census implementation receipt
 
-Date: 2026-11-01  
-Status: exact census core implemented and locally verified; protocol remains draft  
+Date: 2026-11-01
+Status: exact census core implemented and locally verified; protocol remains draft
 Affected E1 data: none
 
 ## Outcome
@@ -108,4 +108,3 @@ Before E1 freezes, the workstream still needs:
 - fresh-process A/A and known-rank control records from the same runner;
 - disjoint preflight, final cap and ladder, power justification and hashes;
 - a committed source revision and verified Iso Lab execution image.
-
