@@ -7,7 +7,7 @@ into a speed claim.
 
 ## Current state
 
-- Current source registry: **78 methods**.
+- Current source registry: **79 methods**.
 - Nested algebraic inventory: **11 system solvers**, **9 PDP3 engines**, and
   **4 prime PKM tower engines**, including matrix/inherited F4, matrix and
   signature F5, both F6-IC closures, SAT-CDCL, both FES/Gray-code routes,
@@ -15,16 +15,26 @@ into a speed claim.
   enumeration.
 - Native implementation: `ecbench optimize inventory` and `ecbench optimize
   audit`.
-- Complete development roster: **111 specs**, **78/78 methods** and **24/24
+- Complete development roster: **114 specs**, **79/79 methods** and **24/24
   nested algorithms**, with no structural errors or seed leakage. The native
   `--require-all` audit is admitted.
-- Fresh diagnostic execution: **35 L0 sessions**, **1,005 records**, **952
-  verified outcomes**, and **782/782 eligible deterministic measured replays**
+- Fresh diagnostic execution: **38 L0 sessions**, **1,095 records**, **1,042
+  verified outcomes**, and **854/854 eligible deterministic measured replays**
   reproduced with zero audit problems.
-- Actual execution coverage: **72/72 runnable native methods**, **11/11 system
+- Actual execution coverage: **73/73 runnable native methods**, **11/11 system
   solvers**, **9/9 PDP3 engines**, and **4/4 PKM tower engines**. The remaining
   six registry entries are external CM wrappers and require a real hash-bound
   backend.
+- The late-main `ic.prime_orbit_relations_v1` method is now inside the
+  fail-closed policy and measured boundary. Its best generic development arm
+  uses affine coordinates, eight factor-base orbits, and 1.5 relations/orbit:
+  it costs 0.8721 [0.754, 1.008] of the 16-orbit affine baseline, while
+  Jacobian costs 1.3351 [1.229, 1.450] times matched affine. It remains 5.4169
+  [3.389, 8.658] times negation rho on the generic shape, 4.2011 [3.085,
+  5.721] times cubic rho on j=0, and 5.7901 [3.824, 8.768] times quartic rho
+  on j=1728. All 72 measured deterministic runs reproduced exactly. These are
+  one-target L0 operation comparisons with unpriced work, not wall or
+  leaderboard results.
 - Exact merged-head replay at source `907d68631e79` and release-binary SHA-256
   `e91c0ec7...f065f65` reproduces all **782/782** eligible measured runs across
   all 35 admitted sessions. Its receipts and aggregate are under
@@ -38,14 +48,14 @@ into a speed claim.
   lookup. Its separate 50-record experiment reports zero soundness flags and
   successful public-target lookup refutations through `m = 8`, but it is not
   an ECBench-selectable method or nested engine and is therefore not counted
-  in the 78+24 claim. Wiring and pricing that decomposition stage end to end is
+  in the 79+24 claim. Wiring and pricing that decomposition stage end to end is
   an explicit coverage gap, not an assumed result.
 - The same reconciliation registered a distinct `chained-x` decomposition
   oracle in `ic bench`. A matched Koblitz n=13 diagnostic now covers all three
   engines at `m = 2, 3` and inherited F4 at `m = 4`: inherited F4 remains
   24.71x, 144.09x, and 794.37x matched rho, respectively. Both `m = 4`
   matrix-engine cells censored. This is end-to-end IC-framework evidence, but
-  it still lacks an ECBench spec/receipt and is not part of 78+24.
+  it still lacks an ECBench spec/receipt and is not part of 79+24.
 - Current `main` also adds a separate end-to-end GHS experiment outside
   ECBench. It verified IC, rho, and BSGS on all 600 planted logs from 30 toy
   instances at N=12..28. Every priced IC row remains generic-led: the best
@@ -75,16 +85,17 @@ into a speed claim.
 - Confirmatory execution is blocked because this managed runtime has no ready
   checkpoint upload identity. EKS submission is not attempted without the
   mandatory resumable-output gate.
-- All 37 raw `records.jsonl` payloads remain local and untracked under the
-  repository artifact policy: the uploader found them, but this runtime has
-  neither the AWS CLI nor an artifact identity. Their hash-bound audit receipts
-  and compact comparisons are tracked; they are not promotion evidence until
-  hydrated.
+- The trusted artifact workflow has uploaded, independently downloaded, and
+  replayed **34** earlier campaign payloads, replacing them with hash-bound
+  manifests. Three older post-merge diagnostic payloads remain local. The
+  three new prime-orbit payloads are staged for the same trusted migration in
+  this change. Artifact delivery does not promote L0 evidence.
 
-The admitted roster receipt is
-[`execution/full-development-audit.json`](execution/full-development-audit.json).
-The earlier [`execution/development-audit.json`](execution/development-audit.json)
-is retained as the pre-expansion negative control. The execution totals,
+The current admitted roster receipt is
+[`execution/full-development-audit-79.json`](execution/full-development-audit-79.json).
+The 78-method [`execution/full-development-audit.json`](execution/full-development-audit.json)
+and earlier [`execution/development-audit.json`](execution/development-audit.json)
+are retained as provenance snapshots. The execution totals,
 bottlenecks, and diagnostic comparisons are in
 [`execution/SMOKE.md`](execution/SMOKE.md).
 The separate chained-x addendum is
