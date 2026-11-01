@@ -7,7 +7,12 @@ diagnostic is prepared in [`diagnostic/`](diagnostic/): it submits no EKS work
 and publishes only hash-verified gate booleans, counts, and failed predicate
 names for the retained target-1 audit failure. [AMENDMENT_2.md](AMENDMENT_2.md)
 records the resulting censored-outcome gate defect and freezes its candidate
-correction. It authorizes publication-only verification, not a retry.
+correction. It authorizes publication-only verification, not a retry. The
+study-specific publication verifier uses the immutable artifact ID and the
+cross-run `actions/download-artifact` contract documented by the pinned v4
+action, then accepts only the exact two-file receipt shape and frozen source,
+binary, toolchain and image identities. It executes neither artifact content
+nor cloud experiment work.
 
 This study fills a specific accounting gap in the binary-curve index-calculus
 work: it measures a complete, current-source, cold solve from setup through an
