@@ -38,3 +38,11 @@ driver validation/builds run on the GPU worker. The small and large strata have 
 true replicate counts. Both source and frozen protocols
 are committed, pushed and checkpointed before launch. The controller deletes
 only its owned pod and verifies deletion, including failure/deadline paths.
+
+Version1 stopped before measurement because the standalone driver's lockfile
+lacked the newly required sha2 dependency from main. `results-v1/failure.json`
+retains the failure, final archive and verified pod deletion. Version2 repairs
+the lockfile, preserves the kernel, analyzer and all workloads, and subtracts
+180seconds (rounded up from150.841seconds) from the original worker allowance:
+17,820seconds worker /18,120seconds controller. Its separate frozen protocols
+are `protocol-v2.json` and `protocol-small-v2.json`; no version1 cell was timed.
