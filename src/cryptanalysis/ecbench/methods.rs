@@ -479,6 +479,14 @@ const BEST2_MODEL_PARAMS: &[ParamDecl] = &[
 pub fn registry() -> &'static [MethodDecl] {
     &[
         MethodDecl {
+            id: super::prime_orbit::ID,
+            family: "ic",
+            summary: "prime-field orbit IC relation collector inside a verified one-target solve; affine is one lane, Jacobian is 32 lanes with batch normalization, and relation wall time is a native phase",
+            entry: "ecbench::prime_orbit::solve",
+            applies: Applies::PrimeOnly,
+            params: super::prime_orbit::PARAMS,
+        },
+        MethodDecl {
             id: super::aps::ID,
             family: "ic",
             summary: "bounded APS summation-polynomial instrument: exclusive cold/online wall accounting, retained failures, separate affine witness checks; native operation pricing is incomplete",
@@ -2784,6 +2792,9 @@ fn solve_inner(
         }
         (Instance::Prime(i), _) if m.id == super::aps::ID => {
             super::aps::solve(m, i, PrimePoint::affine(tx, ty), seed)
+        }
+        (Instance::Prime(i), _) if m.id == super::prime_orbit::ID => {
+            super::prime_orbit::solve(m, i, curve, PrimePoint::affine(tx, ty), seed)
         }
         (Instance::Prime(i), _) if m.id == "ic.tensor_contraction_v1" => {
             solve_tensor_contraction(m, i, PrimePoint::affine(tx, ty), seed)
