@@ -480,8 +480,7 @@ pub fn run_shell<'g, L: Leaf>(cfg: &ShellCfg<'g>, leaf: L) -> (ShellRun, ShellSt
     let mut witness = None;
     let mut models = 0u64;
     let mut outcome;
-    let stats: Stats;
-    match cfg.engine {
+    let stats: Stats = match cfg.engine {
         Engine::Library => {
             let mut s = sat::Solver::new(lay.n_vars());
             for c in statics {
@@ -518,7 +517,7 @@ pub fn run_shell<'g, L: Leaf>(cfg: &ShellCfg<'g>, leaf: L) -> (ShellRun, ShellSt
                     break;
                 }
             }
-            stats = s.stats.into();
+            s.stats.into()
         }
         Engine::Hooked => {
             let mut s = sat_hooked::Solver::new(lay.n_vars());
@@ -562,9 +561,9 @@ pub fn run_shell<'g, L: Leaf>(cfg: &ShellCfg<'g>, leaf: L) -> (ShellRun, ShellSt
                     break;
                 }
             }
-            stats = s.stats.into();
+            s.stats.into()
         }
-    }
+    };
     let wall_ns = t0.elapsed().as_nanos();
     roots.sort_unstable();
     roots.dedup();
