@@ -1,0 +1,629 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "COMPANION-SCHUR-20261101",
+  "version": 1,
+  "created": "2026-11-01",
+  "repository": "other",
+  "study_dir": "companion-schur-validation",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "source": "check.py"
+  },
+  "question": "Do complete Schur construction, products, nested work counts and leading-block obstructions agree with independent dense references on every retained source and synthetic context?",
+  "claims": [
+    {
+      "id": "correctness",
+      "text": "All642contexts,conditionalSchuridentities,certifiedleadingobstructions,exactnestedwork,mutations,equalwrapguards andAA pass with no cases excluded.",
+      "class": "exact_computation",
+      "decided_by": [
+        "correctness"
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "candidate",
+      "role": "candidate",
+      "description": "Schur operator/generator and obstruction checks; AA changes query list to tuple",
+      "instrument": {
+        "repo": "primefield-ecdlp-research",
+        "commit": "14e9ee90393e3171834156f5b5b3e96fa035201e",
+        "build": null,
+        "binary_sha256": "d6efd715c17738e0cdbb2780b0e175d38271884c183492a81352fee78778503d",
+        "threads": 1,
+        "flags": {
+          "arithmetic": "exact prime field",
+          "timing": "none"
+        }
+      },
+      "parameters": {
+        "contract": "CONTRACT.md"
+      }
+    },
+    {
+      "id": "aa",
+      "role": "control_aa",
+      "description": "Schur operator/generator and obstruction checks; AA changes query list to tuple",
+      "instrument": {
+        "repo": "primefield-ecdlp-research",
+        "commit": "14e9ee90393e3171834156f5b5b3e96fa035201e",
+        "build": null,
+        "binary_sha256": "d6efd715c17738e0cdbb2780b0e175d38271884c183492a81352fee78778503d",
+        "threads": 1,
+        "flags": {
+          "arithmetic": "exact prime field",
+          "timing": "none"
+        }
+      },
+      "parameters": {
+        "contract": "CONTRACT.md"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "aa-check",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "not_applicable_reason": "Embedded dense Schur references and fixed regular,zeroSchur,singularSchur cases.",
+      "arm": null,
+      "expected_detection": null
+    },
+    "negative": {
+      "present": false,
+      "not_applicable_reason": "Expected leading obstructions,including96invertible-full/blocked-leadingcases acrossarms; equalwrap andper-branch corruption controls.",
+      "arm": null,
+      "null_population": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [],
+    "factors": [
+      {
+        "name": "order",
+        "treatment": "crossed",
+        "how": "A/A changes input vector container list to tuple; seeds and arithmetic fixed."
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "how": "Source and imported files locked; one Python runtime; exact counted arithmetic"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Record platform and CPU count; no clock claims"
+      },
+      {
+        "name": "memory_environment",
+        "treatment": "fixed",
+        "how": "Single-threaded Python; no performance inference from allocation or shared host"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "No blinding; fixed acceptance checks, all fixtures retained"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "correctness",
+        "arms": [
+          "candidate"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "All642contexts satisfy frozen conditional identities,counts,obstruction certificates,controls andAA; no partial panel decides completion."
+      },
+      {
+        "id": "aa-check",
+        "arms": [
+          "candidate",
+          "aa"
+        ],
+        "differs_in": [
+          "order"
+        ],
+        "design": "aa"
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20981172,
+        20981173,
+        20981174,
+        21581772,
+        21581773,
+        21581774,
+        22182072,
+        22182073,
+        22182074,
+        24582072,
+        24582073,
+        24582074,
+        27582072,
+        27582073,
+        27582074,
+        55182072,
+        55182073,
+        55182074,
+        56181872,
+        56181873,
+        56181874,
+        56181972,
+        56181973,
+        56181974,
+        56182072,
+        56182073,
+        56182074,
+        68182072,
+        68182073,
+        68182074,
+        68182172,
+        68182173,
+        68182174,
+        68182272,
+        68182273,
+        68182274,
+        88582172,
+        88582173,
+        88582174,
+        88582272,
+        88582273,
+        88582274,
+        88582372,
+        88582373,
+        88582374,
+        20980672,
+        20980673,
+        20980674,
+        21580672,
+        21580673,
+        21580674,
+        22180672,
+        22180673,
+        22180674,
+        24580672,
+        24580673,
+        24580674,
+        27580672,
+        27580673,
+        27580674,
+        55180672,
+        55180673,
+        55180674,
+        56180672,
+        56180673,
+        56180674,
+        68180672,
+        68180673,
+        68180674,
+        88580672,
+        88580673,
+        88580674,
+        20980872,
+        20980873,
+        20980874,
+        21580972,
+        21580973,
+        21580974,
+        22180972,
+        22180973,
+        22180974,
+        20331314,
+        20331315,
+        20331316,
+        20331317,
+        20331318,
+        20331414,
+        20331415,
+        20331416,
+        20331417,
+        20331418,
+        20331424,
+        20331425,
+        20331426,
+        20331427,
+        20331428,
+        20331514,
+        20331515,
+        20331516,
+        20331517,
+        20331518,
+        20331524,
+        20331525,
+        20331526,
+        20331527,
+        20331528,
+        20331534,
+        20331535,
+        20331536,
+        20331537,
+        20331538,
+        20331814,
+        20331815,
+        20331816,
+        20331817,
+        20331818,
+        20331834,
+        20331835,
+        20331836,
+        20331837,
+        20331838,
+        20331864,
+        20331865,
+        20331866,
+        20331867,
+        20331868,
+        20332314,
+        20332315,
+        20332316,
+        20332317,
+        20332318,
+        20332364,
+        20332365,
+        20332366,
+        20332367,
+        20332368,
+        20332414,
+        20332415,
+        20332416,
+        20332417,
+        20332418,
+        20391314,
+        20391315,
+        20391316,
+        20391317,
+        20391318,
+        20391414,
+        20391415,
+        20391416,
+        20391417,
+        20391418,
+        20391424,
+        20391425,
+        20391426,
+        20391427,
+        20391428,
+        20391514,
+        20391515,
+        20391516,
+        20391517,
+        20391518,
+        20391524,
+        20391525,
+        20391526,
+        20391527,
+        20391528,
+        20391534,
+        20391535,
+        20391536,
+        20391537,
+        20391538,
+        20391814,
+        20391815,
+        20391816,
+        20391817,
+        20391818,
+        20391834,
+        20391835,
+        20391836,
+        20391837,
+        20391838,
+        20391864,
+        20391865,
+        20391866,
+        20391867,
+        20391868,
+        20392314,
+        20392315,
+        20392316,
+        20392317,
+        20392318,
+        20392364,
+        20392365,
+        20392366,
+        20392367,
+        20392368,
+        20392414,
+        20392415,
+        20392416,
+        20392417,
+        20392418,
+        20451314,
+        20451315,
+        20451316,
+        20451317,
+        20451318,
+        20451414,
+        20451415,
+        20451416,
+        20451417,
+        20451418,
+        20451424,
+        20451425,
+        20451426,
+        20451427,
+        20451428,
+        20451514,
+        20451515,
+        20451516,
+        20451517,
+        20451518,
+        20451524,
+        20451525,
+        20451526,
+        20451527,
+        20451528,
+        20451534,
+        20451535,
+        20451536,
+        20451537,
+        20451538,
+        20451814,
+        20451815,
+        20451816,
+        20451817,
+        20451818,
+        20451834,
+        20451835,
+        20451836,
+        20451837,
+        20451838,
+        20451864,
+        20451865,
+        20451866,
+        20451867,
+        20451868,
+        20452314,
+        20452315,
+        20452316,
+        20452317,
+        20452318,
+        20452364,
+        20452365,
+        20452366,
+        20452367,
+        20452368,
+        20452414,
+        20452415,
+        20452416,
+        20452417,
+        20452418,
+        20691314,
+        20691315,
+        20691316,
+        20691317,
+        20691318,
+        20691414,
+        20691415,
+        20691416,
+        20691417,
+        20691418,
+        20691424,
+        20691425,
+        20691426,
+        20691427,
+        20691428,
+        20691514,
+        20691515,
+        20691516,
+        20691517,
+        20691518,
+        20691524,
+        20691525,
+        20691526,
+        20691527,
+        20691528,
+        20691534,
+        20691535,
+        20691536,
+        20691537,
+        20691538,
+        20691814,
+        20691815,
+        20691816,
+        20691817,
+        20691818,
+        20691834,
+        20691835,
+        20691836,
+        20691837,
+        20691838,
+        20691864,
+        20691865,
+        20691866,
+        20691867,
+        20691868,
+        20692314,
+        20692315,
+        20692316,
+        20692317,
+        20692318,
+        20692364,
+        20692365,
+        20692366,
+        20692367,
+        20692368,
+        20692414,
+        20692415,
+        20692416,
+        20692417,
+        20692418
+      ],
+      "note": "Exactly321plan-rowseeds repeatedperarm; seed-preflight checksall642cells. Queryseed=rowseed+991; allfixedinputs andbranches inCONTRACT/checker."
+    },
+    "instance_sampling": {
+      "rule": "All81source contexts atbalancedcut and240synthetic contexts perarm; singularleadingblocks retained.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Unblinded exact algebra checks, public operatorinputs only."
+    },
+    "arm_order_reason": "Exact candidate then tuple-vectorAA; no timing comparison."
+  },
+  "sample_size": {
+    "instances": 321,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Complete fixed finite algebra panel; no statistical inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 3600,
+      "measured_on": "No affected execution before freeze; deterministic counts only; shared-host estimate, not a measurement"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "checked_cases",
+        "name": "Exact component cases",
+        "unit": "cases",
+        "kind": "counted",
+        "definition": "One complete source or synthetic context, including all its fixed vector/identity/control subchecks.",
+        "source": "runs/export.json runs.measurements.counted.checked_cases",
+        "aggregation": "per_row",
+        "resolution": "integer",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "checked_cases",
+      "directional_checks",
+      "leading_obstruction",
+      "mutations_rejected",
+      "source_forward_calls",
+      "source_transpose_calls",
+      "leading_forward_calls",
+      "leading_transpose_calls",
+      "field_products",
+      "field_additions",
+      "integer_multiplications",
+      "packing_bytes",
+      "product_bytes",
+      "decoded_bytes",
+      "dense_terms",
+      "coefficient_reductions"
+    ],
+    "record": [
+      "Allsourceandnative ledgers,referenceinversecallwork,generatedSchurgenerators,products,nullwitnesses,expectedobstructions,rawrowhashes andtimestamps"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 3600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "All642contexts or3600secondcap; singleinvocation,no restart.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "All642rows verified under frozen branchrules; validSchur plusleadingobstructions accountsforallcases. Synthetic288valid,192obstructedincluding96invertiblefullcontrols; sourcestatuses observedandretained.",
+    "comparison_ids": [
+      "correctness"
+    ],
+    "statistic": "Exact dense and naive polynomial equality plus symbolic ledgers",
+    "interval": "None: exact fixed panel",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Separate arithmetic vectors; no mixed score",
+    "verdict_vocabulary": [
+      "verified",
+      "exhausted",
+      "incomplete",
+      "out_of_scope"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "analyze.py",
+      "sha256": "a328990754b69cad7d77a40b76b0e047c4b4e067f42cf7e9f5b552aff02ba3e9"
+    },
+    "inputs": [
+      "runs/cases.jsonl",
+      "runs/row-index.json",
+      "runs/summary.json",
+      "runs/host.json"
+    ],
+    "outputs": [
+      "runs/export.json",
+      "runs/recomputed-summary.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "inadmissible": [
+    "No excluded ECDLP techniques or extension-field source substitution.",
+    "No target scalar labels in production compiler or source; no saved decoder.",
+    "No wall-clock/asymptotic claim from counts.",
+    "Do not drop unsuccessful feature spans or failed recovery."
+  ],
+  "literature": [
+    {
+      "ref": "../companion-blocks/SCHUR_NEXT.md",
+      "provenance": "internal",
+      "claim": "Derived width-s+2Schurgenerators,explicitnestedcallsandblockobstructiondistinction; unexecutedprototype.",
+      "verified_by": "Codex"
+    },
+    {
+      "ref": "https://cs.uwaterloo.ca/~eschost/publications/BoJeMoSc17.pdf",
+      "provenance": "retrieved",
+      "claim": "Section6.2 structured Schur generators background; no small-base-field randomized solve guarantee imported.",
+      "verified_by": "Codex"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "7403509a477e478f03427db64fd4c864e8e62ea99dba3f5d84f8bcd249204480",
+    "commit": "14e9ee90393e3171834156f5b5b3e96fa035201e",
+    "frozen_at": "2026-11-01T20:35:44Z",
+    "filed_before_affected_data": true
+  }
+}

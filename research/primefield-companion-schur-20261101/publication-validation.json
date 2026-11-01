@@ -1,0 +1,209 @@
+{
+  "observed_at": "2026-11-01T23:28:32.860226+00:00",
+  "bundle_verification": {
+    "status": "verified",
+    "files": 186,
+    "compressed_archives": 3,
+    "frozen_lock_entries": 43,
+    "restored": 0,
+    "numerical_trials_run": 0
+  },
+  "archive_restore": {
+    "status": "verified",
+    "files": 186,
+    "compressed_archives": 3,
+    "frozen_lock_entries": 43,
+    "restored": 3,
+    "numerical_trials_run": 0
+  },
+  "export_checks": [
+    {
+      "component": "direct-companion-validation",
+      "returncode": 0,
+      "output": "OK: export research/primefield-companion-schur-20261101/direct-companion-validation/runs/export.json against research/primefield-companion-schur-20261101/direct-companion-validation/protocol.json (0 finding(s))\n"
+    },
+    {
+      "component": "companion-blocks-validation",
+      "returncode": 0,
+      "output": "OK: export research/primefield-companion-schur-20261101/companion-blocks-validation/runs/export.json against research/primefield-companion-schur-20261101/companion-blocks-validation/protocol.json (0 finding(s))\n"
+    }
+  ],
+  "python_syntax_files": 42,
+  "fused_protocol_validation": "passed with zero findings",
+  "numerical_trials_run_for_publication": 0,
+  "rust_library_test": {
+    "command": "cargo test --release --lib",
+    "status": "failed",
+    "initial_attempts": [
+      "missing sparse path crates/ecdl-tensor-ic",
+      "missing sparse path tools/factor-base",
+      "library compile stopped on51missing embedded sparse fixture files;20 fixture directories subsequently materialized"
+    ],
+    "observed_failed_tests": [
+      "cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar",
+      "cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures",
+      "cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic",
+      "cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed",
+      "cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver",
+      "cryptanalysis::ecbench::band::tests::exact_sums_reproduce_the_band_means",
+      "cryptanalysis::ecbench::band::tests::memory_size_counters_are_listed_but_not_priced",
+      "cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload",
+      "cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible",
+      "cryptanalysis::ecbench::bounds::tests::a_session_counted_twice_is_refused_and_a_copy_of_its_draws_too",
+      "cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples",
+      "cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version",
+      "cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band",
+      "cryptanalysis::ecbench::challenge::tests::the_committed_verdicts_read_as_version_1_and_a_new_one_is_version_2",
+      "cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload",
+      "cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup",
+      "cryptanalysis::ecbench::koblitz_descent::tests::the_rule_v8_defaults_are_the_parameter_files",
+      "cryptanalysis::ic_framework::planner::tests::every_cited_file_exists",
+      "cryptanalysis::ic_framework::plugins::tests::compact_orbit_scan_matches_archived_n37_source42",
+      "cryptanalysis::ic_framework::residual::tests::fused_residual_collector_recovers_and_halves_the_additions_per_step",
+      "ecc::cryptopro_b_chain_set::tests::a_step_that_does_not_compose_is_refused - should panic",
+      "ecc::cryptopro_b_chain_set::tests::frozen_set_reproduces_its_test_vectors",
+      "ecc::cryptopro_b_chain_set::tests::frozen_chains_are_multiplication_by_lambda_and_orderings_agree",
+      "ecc::cryptopro_b_chain_set::tests::frozen_set_loads_and_every_chain_prepares",
+      "ecc::cryptopro_b_chain_set::tests::tampered_sets_are_refused",
+      "ecc::endo_generic_chain_set::tests::cryptopro_b_set_loads_and_reproduces_its_vectors_on_the_generic_path",
+      "ecc::endo_generic_chain_set::tests::tampered_sets_are_refused",
+      "ml_dataset::solvers::tests::dynamic_original_rejects_unbound_or_different_profile_limits",
+      "cryptanalysis::ic_wide::tests::run_f2m4_is_the_one_word_pipeline"
+    ],
+    "isolated_failures": [
+      {
+        "test": "cryptanalysis::ic_framework::residual::tests::fused_residual_collector_recovers_and_halves_the_additions_per_step",
+        "returncode": 101,
+        "detail": "residual.rs:739: fused per-step 4.900233826968043 exceeds asserted <1.35"
+      },
+      {
+        "test": "ml_dataset::solvers::tests::dynamic_original_rejects_unbound_or_different_profile_limits",
+        "returncode": 101,
+        "detail": "solvers.rs:3658: dynamic_original(...).is_err() assertion failed"
+      }
+    ],
+    "scope": "Rust source and Cargo inputs are unchanged from the publication base. Sparse runtime fixtures are being materialized; unrelated assertion failures are not repaired by this research publication.",
+    "returncode": 101,
+    "passed": 5898,
+    "failed": 29,
+    "ignored": 128,
+    "log_sha256": "862884270340df7c547b47c7e82e2f5a964283efbcd0fe6eda41283abb5a396e",
+    "additional_failure": "ic_wide.rs:918: one-word pipeline mismatch 13130 versus 3757",
+    "fixture_reruns": [
+      {
+        "test": "cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar",
+        "returncode": 0
+      },
+      {
+        "test": "cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures",
+        "returncode": 0
+      },
+      {
+        "test": "cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic",
+        "returncode": 0
+      },
+      {
+        "test": "cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed",
+        "returncode": 0
+      },
+      {
+        "test": "cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver",
+        "returncode": 0
+      },
+      {
+        "test": "cryptanalysis::ecbench::band::tests::exact_sums_reproduce_the_band_means",
+        "returncode": 0
+      },
+      {
+        "test": "cryptanalysis::ecbench::band::tests::memory_size_counters_are_listed_but_not_priced",
+        "returncode": 0
+      },
+      {
+        "test": "cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload",
+        "returncode": 0
+      },
+      {
+        "test": "cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible",
+        "returncode": 0
+      },
+      {
+        "test": "cryptanalysis::ecbench::bounds::tests::a_session_counted_twice_is_refused_and_a_copy_of_its_draws_too",
+        "returncode": 0
+      },
+      {
+        "test": "cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples",
+        "returncode": 0
+      },
+      {
+        "test": "cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version",
+        "returncode": 0
+      },
+      {
+        "test": "cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band",
+        "returncode": 0
+      },
+      {
+        "test": "cryptanalysis::ecbench::challenge::tests::the_committed_verdicts_read_as_version_1_and_a_new_one_is_version_2",
+        "returncode": 0
+      },
+      {
+        "test": "cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload",
+        "returncode": 0
+      },
+      {
+        "test": "cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup",
+        "returncode": 0
+      },
+      {
+        "test": "cryptanalysis::ecbench::koblitz_descent::tests::the_rule_v8_defaults_are_the_parameter_files",
+        "returncode": 0
+      },
+      {
+        "test": "cryptanalysis::ic_framework::planner::tests::every_cited_file_exists",
+        "returncode": 0
+      },
+      {
+        "test": "cryptanalysis::ic_framework::plugins::tests::compact_orbit_scan_matches_archived_n37_source42",
+        "returncode": 0
+      },
+      {
+        "test": "ecc::cryptopro_b_chain_set::tests::a_step_that_does_not_compose_is_refused - should panic",
+        "returncode": 0
+      },
+      {
+        "test": "ecc::cryptopro_b_chain_set::tests::frozen_set_reproduces_its_test_vectors",
+        "returncode": 0
+      },
+      {
+        "test": "ecc::cryptopro_b_chain_set::tests::frozen_chains_are_multiplication_by_lambda_and_orderings_agree",
+        "returncode": 0
+      },
+      {
+        "test": "ecc::cryptopro_b_chain_set::tests::frozen_set_loads_and_every_chain_prepares",
+        "returncode": 0
+      },
+      {
+        "test": "ecc::cryptopro_b_chain_set::tests::tampered_sets_are_refused",
+        "returncode": 0
+      },
+      {
+        "test": "ecc::endo_generic_chain_set::tests::cryptopro_b_set_loads_and_reproduces_its_vectors_on_the_generic_path",
+        "returncode": 0
+      },
+      {
+        "test": "ecc::endo_generic_chain_set::tests::tampered_sets_are_refused",
+        "returncode": 0
+      }
+    ],
+    "fixture_resolution": "All 26 file-related failures pass in isolated reruns after sparse fixture restoration. Three unchanged Rust assertion failures remain; the full original suite remains failed."
+  },
+  "base_commit": "4beb9c4dba7b334113c3857ee2d633ab35294677",
+  "diff_check": "passed",
+  "artifact_store": {
+    "entries": 21,
+    "uploaded_bytes": 178188126,
+    "manifests": 13,
+    "remote_verification": "21 hydrated, 0 not pulled, 0 problems",
+    "returncode": 0
+  }
+}
