@@ -1,14 +1,18 @@
 # Research Report: Isogeny Fibers, Hidden Geometric Structure, and ECDLP Hardness Discrepancies
 
 **Date.** 2026-10-10 (rounds 1–3); extended through 2026-10-24 (§17 round 4,
-§19 rounds 5–6; status update 2026-10-31, §19.19). **Status.** Theorem audit + proofs at the level of
+§19 rounds 5–6; status update 2026-10-31, §19.19; §20 round 7, 2026-11-01).
+**Status.** Theorem audit + proofs at the level of
 propositions, with a toy-field computational probe
 (`research/isogeny_fibers_20261010/`, pure Python + sympy, reproducible with
 `python3 -I fiber_probe.py` and `python3 -I pullback_factor.py`). Rounds 4–6
 (§17, §19) are native Rust, toy and synthetic instances only. §19 records the
 verdict of every round-5 and round-6 lead; it was written on 2026-10-24 with
 five leads still in open pull requests and was updated on 2026-10-31 (§19.19),
-when all of them and the R6.2 correction (#2543) had merged; §18 is the
+when all of them and the R6.2 correction (#2543) had merged. §20 records round 7
+(eight pull requests; R7.1, R7.3, R7.5 and R7.7 merged on 2026-11-01;
+R7.8 #3125 merged at 03:58 UTC, leaving R7.2, R7.4 and R7.6 open and
+**UNMERGED**); §18 is the
 reference list as revised by the R6.10 literature check.
 **Prior notes this builds on.** `RESEARCH_PDP_SPEEDUP_AND_ISOGENY.md` (2-/3-isogenous
 binary neighbours: identical Macaulay ranks, yield moves only with |F|),
@@ -128,6 +132,23 @@ binary neighbours: identical Macaulay ranks, yield moves only with |F|),
    crater and floor of ℓ-volcanoes with ℓ ≤ 13 at toy size (R6.11); the
    transport-oracle simulation proof is withdrawn and open (R6.8). No lead
    claims to move an exponent or a row of §15.4; R6.5 states that it moves none.
+
+10. **Round 7 (§20) closes bookkeeping and tests open ends; no lead reports a
+    single-target speedup over the best generic method.** Eight pull requests; R7.1, R7.3,
+    R7.5 and R7.7 merged on 2026-11-01; R7.8 #3125 merged at 03:58 UTC,
+    leaving R7.2, R7.4 and R7.6 open (**UNMERGED**).
+    Counting additions and the Φ_ℓ construction leaves the generic-kernel
+    exponent at 1.919 and still insufficient to show a value below 2, with one
+    near-tie reordering in one accounting (R7.1). End to end on the real GHS
+    Jacobian, index calculus is dearer than the best generic method on all 30
+    toy instances, 1.91 [1.72, 2.11] at best (R7.2). A conductor-sensitive
+    algorithm shows a constant 1.46× in counted multiplications on an inferior
+    walk and nothing in iterations or yield (R7.3). Corollary 9.2 extends to
+    binary Edwards curves by a proved proposition (R7.4); the trace-pair label
+    extends to every curve with Tr(a) = 0, and its premise for a = 1 is false
+    (R7.7); pooled rho gains 0.43–0.52 in exponent against separate runs, and
+    corrected path-finding costs about component size to the power 1.13 (R7.6);
+    two miscounts are corrected in versioned errata (R7.5).
 
 ---
 
@@ -2017,6 +2038,8 @@ whether each hold was cleared before the merge was not checked here. Known
 defects: R6.2's two defects were corrected in #2543 (§19.6, verdict still
 open); one miscount remains in the merged R6.7 `RESULTS.md` (§19.11), and one
 internal count discrepancy remains in the merged R6.9 `RESULTS.md` (§19.13).
+Both are corrected in versioned errata that are in an open pull request
+(R7.5, #3109, merged, §20.5); the frozen files are not edited.
 
 ### Round 5
 
@@ -2192,7 +2215,9 @@ pipeline drivers agree on 396/396 target outcomes and XOR counts; 1/24 against
 66/300 has Fisher two-sided p = 0.036.
 *Library change.* `ChainedXOracle` (`chained-x`) in
 `src/cryptanalysis/ic_framework/plugins.rs`, two unit tests; not
-registered in `src/bin/ic/bench.rs` (still the case on `main` on 2026-10-31).
+registered in `src/bin/ic/bench.rs` (still the case on `main` on 2026-10-31;
+registration and the procedure-2 integration test are in #3125 (merged,
+§20.8).
 *Limits.* No instance at n = 15 and a = 1 only at n = 17; six cells marked NOT
 RUN; "not buildable" is a contended wall-time observation, not a counted bound;
 the symbolic build is not counted in the XOR figures; no matched rho was run
@@ -2419,15 +2444,27 @@ full-rank streams reach rank with a 4× budget on the 3-torsion curves.
 bootstrap interval; the repository oracle on F/⟨T⟩ paying > 1.5.
 *Verdict.* The source's `RESULTS.md` gives no verdict word; it reports its
 status against round 4's falsifier. Read against the PROGRAM falsifier, **not
-fired** (derived from the source's numbers: pricing moves no ratio by more than
-0.011; the F/⟨T⟩ oracle costs 0.980–1.075 against plain). The 4× budget part
+fired** (derived from the source's numbers: the F/⟨T⟩ oracle costs 0.980–1.075
+against plain, and pricing moves no m = 3 point value by more than 0.0151, the
+largest being B/A priced as run; the source's "0.011" is not reproduced by its
+records, R7.5 recount, #3109 merged, §20.5. That shift is below the B/A and
+C/A interval widths, 0.05 to 0.40, and the m = 3 containment counts are the same
+under all three pricings. It is above B/C's interval width, below 0.001 (largest
+B/C shift 0.0093; B/C stays at least 0.031 above 3 under every pricing), so
+the clause "moves with inversion pricing by more than the bootstrap interval",
+read literally, is met for B/C; the "not fired" reading rests on the round-4 form
+of the falsifier, a factor far from 3 outside the sampling intervals, which B/A
+and C/A satisfy on 8 of 9 curves under every pricing, and this wording is a
+flagged reading, not a re-judgement of the source). The 4× budget part
 is **not shown**: the stall is reproduced.
 *Numbers (measured; per-curve bootstrap 95% over targets).* m = 3, torsion
 family, 9 curves (bits 9, 10, 11): B/A size-matched 2.976–3.277 (law 3), with
 the interval containing 3 on 8 of 9; C/A 0.980–1.075 (law 1), 8 of 9; B/C
 3.037–3.055 with intervals narrower than 0.001 that exclude 3 on all 9, about
 1.4% above 3, which the source attributes to the wrapper's own charged work
-(φ on R − P₁ and the lift). Inversions are 38–44% of the priced-as-run cost.
+(φ on R − P₁ and the lift). Inversions are 38–44% of the priced-as-run cost at
+m = 3 (0.378 to 0.437 over 27 arm-curves; at m = 2 the recorded shares are 36%
+to 51%, R7.5 recount).
 m = 2: (b)/(a) = 0.3333 on 30 of 30 curves under all three pricings. Relation
 streams: on the prime family both arms reach full achievable rank on 9 of 9
 (relations to full rank 2.79–4.97); on the torsion family the base is
@@ -2440,7 +2477,10 @@ per-curve (c)/(b) size-matched intervals contain 1 at m = 2. The committed
 11 of 18 (priced essential); the review comment on the pull request reports the
 same counts and I recounted them from the records. Use the record counts; the
 merged `RESULTS.md` and `report.pdf` have not been regenerated. The point
-range 0.542–1.127 is unaffected.
+range 0.542–1.127 is unaffected. R7.5 (#3109, merged) writes this
+correction as `round6/r6_7_zeta_fold_phase2/ERRATUM_v2.md` (§20.5): the seven
+intervals that exclude 1 unpriced all lie below 1, 14 of the 18 point values are
+below 1, and only two curves change status between pricings.
 *Limits.* p ≤ 2^11 at m = 3 and ≤ 2^16 at m = 2; 3 seeds per size; the
 inversion price is a Fermat inversion (12–25 M), not a measured hardware I/M
 ratio; contended host.
@@ -2517,7 +2557,8 @@ measured smooth rate within 0.88–3.22× of the exact split-divisor fraction in
 all 34; against 1/g! off by more than 10× in "6 of 34 runs" per the source (q = 4
 with g ∈ {6, 7, 8}; q = 8 with g = 6; the source's own table has 7 rows above
 10×: the six q = 4 rows at g ∈ {6, 7, 8} and the q = 8, g = 6 row at 12.1×, so
-the count of 6 appears to omit one; recount derived from its table), and by 585× and 858× on the two curves of the
+the count of 6 omits one: 7 of 34, confirmed by the R7.5 recount of `relrate.json`,
+#3109 merged, §20.5; the nearest uncounted run is q = 4, g = 4 at 9.1×), and by 585× and 858× on the two curves of the
 smallest weak instance (N = 12, (l, n) = (2, 6), descended genus 8 over F₄,
 where all 53 searches ended at a curve with (g, l, n, m) = (8, 2, 6, 4)). The
 source explains it as 1/g! assuming q ≫ g.
@@ -2634,9 +2675,9 @@ step. The primes tested are ℓ ≤ 13 at p ≈ 2^20–2^22, i.e. ℓ ≤ p^{0.1
 | R6.4 vertical margin 2 | #2240 merged | not fired (generic); fired (ψ, Φ asc/desc) | mixed | 1.919 [1.724, 2.115] (insufficient evidence either way); 2^21.7 → 2^24.2–2^25.1 (projected, restricted model) |
 | R6.5 A-pair correction | #2194 merged | fired | refuted for the recorded census; correction confirmed in ensemble | 1.130 [1.095, 1.170], 1.059 [1.043, 1.077], 1.033 [1.024, 1.044] |
 | R6.6 genus 2 oracle | #2195 merged | not fired | confirmed | A-gain 10.00 [10.00, 10.00]; image 3.53–4.20; overlap ≤ 2 |
-| R6.7 ζ-fold 2 | #2217 merged | not fired (PROGRAM reading) | consistent with law; 4× budget not shown | B/A 2.976–3.277; C/A 0.980–1.075; torsion streams stall on 9 of 9 |
+| R6.7 ζ-fold 2 | #2217 merged | not fired (PROGRAM reading) | consistent with law; 4× budget not shown | B/A 2.976–3.277; C/A 0.980–1.075; torsion streams stall on 9 of 9; (c)/(b) intervals containing 1: 11 / 9 / 11 of 18, not 12 |
 | R6.8 transport oracles | #2196 merged | not fired (census); proof withdrawn | census finite; theorem open | union/best c/U 0.020–0.268 in 16 cells |
-| R6.9 GHS phase 2 | #2502 merged | not fired (walk); fired vs 1/g! | mixed | slope 0.84; "6 of 34" runs (7 in its table) > 10× from 1/g!; 0.88–3.22× from exact |
+| R6.9 GHS phase 2 | #2502 merged | not fired (walk); fired vs 1/g! | mixed | slope 0.84; "6 of 34" runs (7 in its table, 7 by the R7.5 recount) > 10× from 1/g!; 0.88–3.22× from exact |
 | R6.10 literature | #2183 merged | none | saturation penalty anticipated | 47 rows: 13 / 4 / 14 / 8 / 7 / 1 / 0 |
 | R6.11 conductor yield | #2197 merged | not fired | confirmed at toy size | all crater/floor ratios within 0.5% of 1 |
 
@@ -2682,28 +2723,48 @@ status read on 2026-10-31.
   one r, ℓ = 5, 7 edges dropped; the batch half was not re-run after the
   correction) and the O(√(class size)) path-finding hypothesis, which the
   corrected, forward-validated search (#2543, merged) still does not show
-  (R6.2, verdict open).
+  (R6.2, verdict open). Round 7 re-ran the batch half with paired intervals and
+  measured the path cost against component size (R7.6, #3128, **UNMERGED**,
+  §20.6); the ecbench part there is a same-curve pooled arm at L0 with a
+  same-host receipt only.
 * The √élu exponent, the generic-kernel exponent (1.919 [1.724, 2.115]) and
   every crossover, which hold only under the restricted M + W + 91 I cost
-  model; complete-cost ordering of routes; Φ_ℓ construction cost; Sutherland
-  CRT evaluation (R5.3, R6.4, both merged).
-* Direct S5 systems are not buildable beyond ℓ = 5; the `chained-x` plug-in is
-  unregistered in `ic bench` (R6.1, merged).
-* GHS: whether any toy instance is weak under a cost model (R5.2). The smooth
-  model of the GHS cover is now in the library (R7.1, #2542), and the relation
-  rate on the real descended Jacobian is measured only for N = 12 and N = 14 at
-  q = 4 (g = 8) and N = 12 at q = 8 with g = 2 and 4; the q = 8, g = 8 instance
-  did not finish, and the factor-base decomposition step, the cost comparison
-  with rho and any larger N or q are not done (§19.19). The `audit_curve`
-  genus-rule discrepancy that R5.2 reported is stated by #2524 to come from a
+  model (R5.3, R6.4, both merged). Round 7 counted additions and the Φ_ℓ
+  construction (library builder) and left the exponent unchanged (R7.1, #3107,
+  merged, §20.1); the Sutherland CRT evaluation of Φ_ℓ is still not
+  implemented, so the cold Φ route is not a state-of-the-art one.
+* Direct S5 systems are not buildable beyond ℓ = 5 (R6.1, merged). The
+  `chained-x` plug-in is now registered in `ic bench`, and #3125 added an
+  end-to-end test of ecbench verdict procedure 2 (R7.8, merged, §20.8).
+* GHS: the smooth model of the GHS cover is in the library (the smooth-cover
+  lead of §19.19, #2542, merged), and the relation rate on the real descended
+  Jacobian is measured for N = 12 and N = 14 at q = 4 (g = 8) and N = 12 at
+  q = 8 with g = 2 and 4 (§19.19). Whether any toy instance is weak under a
+  counted cost model, with the factor-base decomposition step, linear algebra
+  and a comparison with rho and BSGS, was run end to end in R7.2 (#3124,
+  **UNMERGED**, §20.2): none of 30 instances; the q = 8, g = 8 instance that
+  "did not finish" ran in 1175 s there. The `audit_curve` genus-rule
+  discrepancy that R5.2 reported is stated by #2524 (merged) to come from a
   stale base and is not present on current `main` (§19.2).
-* Conjecture 10′: a conductor-sensitive algorithm has not been tested (R6.11
-  tests only the plain x-frame, ℓ ≤ 13, h(D) = 1 craters).
-* The E/4E label for a = 1 and for E/8E (R6.3); King §5 and the
-  Eagle–Galbraith–Ong cofactor-4 test were not read (R6.10).
-* The binary-Edwards check of Corollary 9.2 (R5.4); the R6.7 `RESULTS.md`
-  count (12 of 18) still awaits its correction in the frozen file; the §17.3
-generic row has been superseded in place by the paragraph from #2240.
+* Conjecture 10′: R6.11 tested only the plain x-frame, ℓ ≤ 13, h(D) = 1
+  craters. R7.3 (#3105, merged, §20.3) tested automorphism-class rho, an
+  endomorphism-mixed rho and h(D) = 2, 3 craters at toy size: null after the
+  |Aut| baseline, apart from a 1.46× multiplication-count gap on one inferior
+  algorithm. The library `LineOracle` ζ-fold and a level-dependent
+  index-calculus oracle were not run.
+* The E/4E label for a = 1 and for E/8E: R7.7 (#3113, merged, §20.7)
+  found the a = 1 premise false (E/4E = Z/2), extended R6.3 to every (a, b)
+  with Tr(a) = 0 (one lemma measured, not proved) and labelled E/8E, not
+  cheaper than halving. King §5 and the Eagle–Galbraith–Ong cofactor-4 test
+  are still unread; access was blocked again in R7.4 (#3092, **UNMERGED**,
+  §20.4).
+* The binary-Edwards check of Corollary 9.2 (R5.4): proved in general for
+  rational 2-power torsion in R7.4 (Proposition 9.3), with the pair-table yield
+  not confirmed at toy size; no Gröbner/F4 oracle was run on Edwards summation
+  polynomials. The R6.7 `RESULTS.md` count (12 of 18) and the R6.9 count (6 of
+  34) are corrected in versioned errata in R7.5 (#3109, merged, §20.5)
+  and the frozen files are still uncorrected on `main`. The §17.3 generic row
+  has been superseded in place by the paragraph from #2240.
 
 ### 19.18 Edits made to earlier sections in this revision
 
@@ -2723,8 +2784,13 @@ measured numbers of earlier sections are unchanged.
   pull request #2240 (merged).
 
 Revision of 2026-10-31: §19.19 and the status edits recorded there.
+Revision of 2026-11-01: §20, and the edits listed in §20.11.
 
 ### 19.19 Status update of 2026-10-31, and R7.1
+
+*Numbering.* The lead called R7.1 here (#2542, the smooth GHS cover) is not the
+R7.1 of §20 (#3107, complete-cost ordering); §20 calls this one the smooth-cover
+lead.
 
 *What changed since 2026-10-24 (pull-request records read on 2026-10-31; no
 experiment was run for this update and no measured value was changed).*
@@ -2768,11 +2834,667 @@ homomorphism Φ 260/260; order checks 156, 0 failures; Frobenius relation with a
 trace-perturbed negative control; closed-form split count equals enumeration
 13/13.
 *Limits and not done (source).* (l, n) = (3, 4) with g = 8 over F₈ did not
-finish (stopped after about 25 minutes; cause not isolated), so there is no
-descended q = 8, g = 8 measurement; `a` must lie in the base field; the odd-genus
+finish (stopped after about 25 minutes; cause not isolated; R7.2, #3124
+**UNMERGED**, §20.2, reports that the same run finishes in 1175 s, spent on
+point counting and a subgroup closure, with no bug in `ghs_smooth.rs`), so
+there is no descended q = 8, g = 8 relation-rate measurement from that lead; `a` must lie in the base field; the odd-genus
 t-model was exercised by one curve; the factor-base decomposition step was not
 run and no cost comparison with rho was made; the source draws no conclusion
 from the relation rate per group addition; N ≤ 14 at q = 4. The walk's binomial
 standard errors treat steps as independent and understate the error of a
 correlated walk; the source notes one walk-B z-score of −3.94 that it
 attributes, unchecked, to that.
+
+## 20. Round 7: the R7 leads, measured and reviewed (2026-11-01)
+
+Round 7 ran eight follow-ups to the open ends that §19.17 listed: the
+complete-cost ordering of the kernel-finding routes (R7.1), a GHS attack end to
+end (R7.2), conductor-sensitive algorithms (R7.3), the two unread sources and a
+binary-Edwards check of Corollary 9.2 (R7.4), two count errata (R7.5), the
+batch half and the path half of R6.2 (R7.6), the trace-pair label beyond a = 0
+and for E/8E (R7.7), and two library follow-ups (R7.8). This section follows
+§19: one subsection per lead with the hypothesis, the falsifier, the verdict,
+the numbers exactly as the lead's own `RESULTS.md` gives them (intervals are
+the source's, never strengthened), the limits, and the link; then a synthesis
+table, a list of what is settled and what is still open, the leads the results
+motivate, and the edits made to earlier sections. The reference list is §18.
+
+**Scope, as in every round.** Toy and synthetic instances; native Rust for every
+result (Python only plots recorded numbers); ledger slugs or standard names; no
+sub-rho claim and no statement about a deployed curve. Wall times are contended
+and not used for any claim. This section reports; it does not promote a
+hypothesis. Where a source contains a model, a heuristic or an extrapolation,
+the entry says so. Verdict words are those of §19 (*not fired*, *fired*,
+*refuted*, *open*).
+
+**Numbering.** §19.19 called #2542 (the smooth GHS cover) "R7.1". In this
+section R7.1 is #3107 (complete-cost ordering); #2542 is called the smooth-cover
+lead.
+
+**Status of the sources (pull-request records checked on 2026-11-01 at 04:11
+UTC).** Five round-7 pull requests are merged: R7.1 #3107, R7.3 #3105, R7.5
+#3109, R7.7 #3113 and R7.8 #3125 (merged at 03:58 UTC). R7.2 #3124, R7.4
+#3092 and R7.6 #3128 remain **open and UNMERGED**. Every entry below quotes the
+`RESULTS.md` on the pull request's branch (R7.5: the two `ERRATUM_v2.md` files;
+R7.8: the merged pull request description, which has no `RESULTS.md`); the
+open source records can still change. The references used when this entry was
+written were: R7.1 #3107 (`c3d38a7c0a`), R7.2 #3124 (`82b02896bf`),
+R7.3 #3105 (`a668d003c8`), R7.4 #3092 (`98ee823ca0`), R7.5 #3109 (`34896a4992`),
+R7.6 #3128 (`ede77e08f2`), R7.7 #3113 (`f92bfaea3b`), R7.8 #3125
+(`f5ff41a23a`; merged). Merged earlier in round 7 and recorded in §19: the smooth-cover
+lead #2542 (§19.19), the R6.2 correction #2543 (§19.6), `audit_curve` #2524 (no
+bug on `main`, §19.2) and clippy #2538 (no research content). The §19 update
+#3072 merged on 2026-11-01, so §19 above is now the text on `main`; #3074 (two
+`tests/ecbench.rs` fixes, context for R7.8) remains open. CI state and validation
+holds of the round-7 pull requests were not read. Reduced builds are recorded in the
+descriptions of #3107 (full-crate build OOM-killed; tests, clippy and rustfmt on
+a minimal crate), #3092 (clippy on a single file) and #3113 (full crate not
+built); details in the entries. The descriptions of every round-7 pull request
+except #3113 say that Conductor was not installed in the author's session (hooks
+warn and let edits through), so no task was reserved.
+
+### 20.1 R7.1 — complete-cost ordering of the kernel-finding routes (**merged**, #3107)
+
+*Hypothesis.* The ordering of R6.4's three routes (ladder with NTT, ψ_ℓ plus
+factoring, Φ_ℓ(j, Y)) and the crossover with rho at r = 2^128 survive when
+additions are counted at weight a ∈ {0, 0.1, 0.3, 1} M each and when the Φ_ℓ
+construction and the Elkies step that R6.4's route (c) left out are charged.
+*Falsifier.* The ordering of the cheapest two routes changes at some a in the
+band for some ℓ in the measured range, or the exponent interval's lower end
+falls below 1.5 or its upper end rises above 2.3.
+*Verdict (the source's words).* "The ordering part of the falsifier is
+triggered; H is not confirmed as stated. The exponent part is not triggered."
+The ordering falsifier fires in **one accounting only**: cold (Φ_ℓ construction
+charged), ascending edges. There the second place between ψ and Φ cold swaps with
+a at ℓ = 89, 109, 131 (3 of 22 values of ℓ); the two routes come within 1.6%,
+0.3% and 0.4% of each other, which the source reads as a near tie in one
+instance per ℓ, "not a robust reordering". The ladder is the cheapest route at
+every ℓ, every a, both directions, in the cold accounting. In the other three
+accountings the order never changes with a: amortised (Φ_ℓ given) descending and
+ascending (25 and 22 values of ℓ) and cold descending (25 values of ℓ). The
+amortised order is Φ(j, Y) < ladder < ψ.
+*Numbers (measured counts in Meq + a(A + WA); crossovers extrapolated).*
+Exponent of the projected generic-kernel ladder (PolyMul::Auto, ℓ ≥ 2^13):
+1.919 at every a; the OLS 95% interval is at worst [1.717, 2.121] and the
+bootstrap interval at worst [1.781, 2.126] over the four weights; at a = 0 these
+are R6.4's 1.919 [1.724, 2.115]. All lie inside [1.5, 2.3]. The source repeats
+R6.4's reading: this is insufficient to show an exponent below 2 (the intervals
+contain 2 and values below it), and is not evidence that the exponent is at least
+2. Additions per M-equivalent: 1.0 in the Φ_ℓ construction up to about 1.8 in ψ
+and the NTT ladder; at a = 1 the cost relative to a = 0 is 2.0 (Φ cold) to 2.8 (ψ)
+at ℓ = 103 and 131. Crossover with rho (r = 2^128, g = 6 multiplications and 6
+additions per rho step, an assumption): from a = 0 to a = 1, the ladder's
+log₂ ℓ* shifts by −0.24 to −0.39 bit (2^21.7..2^25.1 becomes 2^21.4..2^24.8), ψ's
+by −0.37 bit, Φ cold's by −0.01 bit and Φ amortised's by −1.48 bit (a fit over
+ℓ ≤ 103 extrapolated to 2^30); the rank of the routes by ℓ* does not change with
+a. With the construction counted the extrapolated Φ cold crossover (13.7) is
+below ψ's (15.4), whereas R6.4 had ψ smallest (derived in the source). The cold
+Φ_ℓ construction is the library's q-series builder, exponent 4.69; construction
+over ladder cost at a = 0 is 7.5 (ℓ = 37), 28 (67), 81 (103), 129 (131).
+*Checks.* The addition tally is opt-in; `OpTally` and every `M`, `W`, `I` count
+are unchanged. The a = 0 columns reproduce R6.4: ladder 20/20, ψ 9/9, Φ
+evaluation and roots 23/23, projection 119/119 arm rows; the unmodified R6.4
+example rebuilt on the new library reproduces its frozen records (9/9 ladder, 2/2
+ψ, 5/5 Φ rows). The counted Φ_ℓ builder equals the library table for all 23
+ℓ ≤ 103; the counted Elkies kernel polynomial equals the library's for all 28 ℓ
+in both directions.
+*Limits.* Sutherland's CRT evaluation of Φ_ℓ is **not implemented**; the source
+calls this a scope limit of its session, not a mathematical obstruction. Not
+counted: the F_{p^k} setup of the ladder, kernel certification, additions inside
+inversions (I = 91 M), memory and storage of the Φ_ℓ table, wall time.
+PolyMul::Auto still chooses by M + W (a whole-ladder best-of Karatsuba/Auto check
+equals Auto for ℓ ≥ 2^13). One instance per ℓ; ladder ℓ ≤ 863, ψ ℓ ≤ 131, Φ
+ℓ ≤ 131; the projection to ℓ = 2^16 and every crossover are extrapolations. The
+pull request description states that the full-crate build was OOM-killed in the
+author's container; the 18 `isogeny_eval` tests, clippy `-D warnings` and rustfmt
+ran on a minimal crate that includes the same source files, and the full-crate
+`cargo test --lib` was not run.
+*Source.* PR #3107, branch `research/r7-1-complete-cost`,
+`research/isogeny_fibers_20261010/round7/r7_1_complete_cost/RESULTS.md`.
+
+### 20.2 R7.2 — is any toy binary curve weak under GHS, end to end? (**UNMERGED**, open #3124)
+
+*Hypothesis.* At some toy instance with N up to about 18, Gaudry-style index
+calculus on the descended Jacobian solves a planted ECDLP on E(F_{q^n}) with
+fewer counted group operations than Pollard rho and than the best generic method
+on the same E.
+*Falsifier.* At every measured instance the total counted cost (relation
+collection with the factor base, linear algebra, extraction) is at least the rho
+cost, or index calculus fails to solve.
+*Verdict.* **Falsifier fired; H refuted: no instance is weak** (source: "H is
+refuted. No instance is weak."). 30 applicable instances, N = 12 to 28 (the
+requested N ≤ 18 plus larger instances to see the trend), 600 planted logs (20
+per instance, paired seeds); index calculus, rho and BSGS solved and verified
+all 600.
+*Numbers (measured; priced in `bitop/v1` and expressed in E additions of the same
+curve; ratios derived from the 20 paired logs, 95% percentile bootstrap).*
+Index calculus over the best generic method, total online cost: 1.91 [1.72, 2.11]
+at best (N = 28, q = 128, g = 4, n = 4) up to 131 [123, 141] (N = 12, q = 4,
+g = 8); all 30 intervals are above 1. At N ≤ 18 the smallest is 9.18 [8.49, 9.96]
+((l, n) = (4, 4), q = 16, N = 16). Against Pollard rho alone the smallest is
+1.60 [1.25, 2.12] at N = 28 (the arms table of the source prints 1.59
+[1.24, 2.11] for the same instance); the best generic method was BSGS on 28
+instances and tuned table rho on 2. Genus 4 over F_{q^4} (n = 4): the ratio is
+11.5 and 9.2, 6.4 and 5.8, 3.1 and 3.3, 1.9 at q = 16, 32, 64, 128, i.e. it falls
+by about a half per doubling of q (fitted slope −0.83 [−0.94, −0.75] in log₂ per
+doubling); the same fit crosses 1 at l = 8.1 [7.8, 8.4], **N = 32 [31, 33]
+(extrapolated, one step beyond the last measurement; N = 32 was not built,
+because the library's irreducible-polynomial table stops at degree 31)**. Genus 4
+over F_{q^3} (n = 3): flat at 18 to 30 from q = 16 to 256 (slope −0.12
+[−0.18, −0.03]); its fitted crossing, l = 43 [31, 141], is not supported,
+because the linear algebra grows as q^2.1 against q^1.4 for the generic methods.
+With the n = 4 linear-algebra exponent (q^2.04) close to the generic one (q^1.93),
+the source derives that plain linear algebra caps the advantage at a constant
+factor of about 2.5. Counting only Jacobian additions (one per E addition,
+everything else free) would put index calculus below the generic method for
+n = 4 from N = 20 (0.83 and 0.93 at N = 20, 0.41 at N = 24, 0.21 at N = 28); the
+source labels this a stage diagnostic, not a speed: the library's Cantor addition
+costs 5.4 to 10.4 E additions at g = 4. The relation search is the largest phase
+from N = 18 (60% to 84% at N ≥ 20), at about g! = 24 positions per relation.
+Tuning: the sparse walk was chosen in 30 of 30 instances and the whole F_q-point
+set as factor base in 26 of 30 (cost falls monotonically as the base grows in the
+25 instances with four or more columns).
+*The (l, n) = (3, 4), g = 8, q = 8 run.* R5.2 and the smooth-cover lead reported
+it as not finished. Source: it was not hung; the smooth-cover lead's own example
+finishes it in 1175 s (point counts up to N₉ over F_{2^27}, about 9 minutes, and
+a closure of 400 000 elements with 8·10⁶ validated Cantor additions, about 14
+minutes), there is no bug in `ghs_smooth.rs`, and no regression test applies.
+Index calculus on that instance: ratio 122 [104, 143]. The measured fully-split
+rate there is 3.0·10⁻⁴ per step from 6 hits against a closed-form split fraction
+of 1.42·10⁻⁴ (ratio 2.1 with a wide interval).
+*Checks.* 600/600 logs verified on E for each method; tallied and untallied runs
+identical (600/600); ledger-priced E additions equal the `GroupAdd` formula
+(ratio 1.000 on 400 additions); `add_unchecked` equals `add` on 200 random sums;
+`cargo test --release --lib -- ghs_ic ghs_smooth hyperelliptic`: 96 passed, 0
+failed, 2 ignored.
+*Limits (source).* Toy sizes; the library's generic Cantor arithmetic (an
+explicit genus-4 formula would be cheaper); no large-prime variation; plain
+echelon form; generic arms are table-based without the negation map (BSGS keeps
+√ℓ points, table rho keeps every visited point), so they are lower bounds on a
+distinguished-point rho in the same unit, and a negation map (about 1.4× cheaper,
+recalled) would move the crossover up; the curves are a selected class (β of
+magic number 3), two per size; the cover construction is not priced; **ecbench
+was not used**, so there is no replay certificate and no scoreboard or
+leaderboard entry; the (3, 4, 0, 0xa2) instance attacks only an order-7 subgroup
+(trivial; its full ECDLP is not solved); `a` outside the base field and N > 31
+are not covered; wall times contended. Not a statement about any deployed curve.
+*Source.* PR #3124, branch `research/r7-2-ghs-end-to-end`,
+`research/isogeny_fibers_20261010/round7/r7_2_ghs_end_to_end/RESULTS.md`.
+
+### 20.3 R7.3 — conductor-sensitive algorithms across an ℓ-volcano gap (**merged**, #3105)
+
+*Hypothesis.* Some implemented algorithm whose cost depends on End(E), and not
+only on the group structure of E(F_p), shows a measurable crater-versus-floor
+cost gap on ℓ-volcanoes at toy size, i.e. Conjecture 10′ is non-vacuous.
+*Falsifier.* For every algorithm tried the crater/floor cost-ratio interval
+contains 1 after the known automorphism baseline is removed ("null"), or a ratio
+interval excludes 1 (then report size, cause and whether it exceeds the bounded
+factor Conjecture 10 allows).
+*Verdict (two parts, the source's).* (1) **Rho iterations and relation yield:
+null** after the baseline. (2) **In counted F_p multiplications the falsifier's
+second branch fires for one algorithm**, the endomorphism-mixed walk, which is
+dominated by plain rho. Conjecture 10′ is, in the source's words,
+"untested-but-not-contradicted at this scale" for the algorithms tried.
+*Numbers (measured; geometric means over instances, 95% cluster bootstrap over
+instances).* Known baseline, which the harness resolves: the automorphism group
+changes the rho iteration count by 0.5534 [0.5511, 0.5559] at j = 0 (ideal 0.5774)
+and 0.6820 [0.6791, 0.6848] at j = 1728 (ideal 0.7071). Conductor effect after
+removing it (crater/floor, `{±1}` walk): 1.0018 [0.9986, 1.0050] (j = 0, 32
+instances) and 0.9997 [0.9966, 1.0030] (j = 1728, 32 instances). Endomorphism-mixed
+walk (explicit Vélu ω on the crater, ψωφ of degree ℓ² on the floor, h = 1, 40
+instances): iterations 1.0001 [0.9921, 1.0080], no fewer than plain rho (0.9993
+[0.989, 1.009] on the crater); plain walk 0.9999 [0.9939, 1.0061]. Relation-yield
+class factor at h(D) = 2, 3 craters (56 instances, 12 discriminants, m = 3,
+|F| = 200): 0.9998 [0.9993, 1.0004]; 5 of 48 per-discriminant intervals exclude 1,
+by at most 0.34% and in both directions (about 2.4 expected by chance, unadjusted).
+Transport: the census of a base equals that of its image on the other level
+exactly in 120/120 checks; transporting a floor DLP to the crater costs 187
+multiplications on average, 1.2% of a crater rho solve. **The one gap:** the
+endomorphism-mixed walk costs the floor 1.46× [1.44, 1.48] the crater in counted
+multiplications (ratio 0.6847 [0.6764, 0.6932]); the iteration counts are equal
+and the whole gap is the evaluation of the cheapest explicit non-scalar
+endomorphism, floor/crater 2.72 [2.59, 2.85] per evaluation (112 against 304
+multiplications; three Vélu maps instead of one; 2.5 to 2.9× over ℓ = 5..13). That
+walk is 1.22× [1.20, 1.25] (crater) and 1.79× [1.77, 1.81] (floor) dearer than
+plain rho, so the best strategy (ignore ω) has crater/floor cost 0.9999
+[0.9945, 1.0055]. The source calls the gap a polynomial-in-ℓ constant on an
+inferior algorithm, below √3 ≈ 1.73 (the largest rho constant R5.4 allows) but
+not bounded independently of ℓ by these data, and consistent with Theorem 4
+pricing the transport at poly(ℓ). GLV lattice (known-scalar splitting, not a DLP
+quantity): floor minus crater +0.15 bits (standard error 0.11), ratio 1.018
+[0.991, 1.047]. Derived in the source: over F_p an endomorphism of an ordinary
+curve acts on the prime-order subgroup as a scalar, so the walk dynamics depend
+on it only through a "generic" multiplier, and an endomorphism of infinite order
+gives no equivalence classes; the repository's `volcano_rho` and the 53-bit
+`conductor_gap_cm_orbits` study are consistent with this.
+*Limits.* Toy p ∈ [2^20, 2^22), r between 4·10⁴ and 4·10⁶, one vertical step, ℓ ≤ 13,
+h ≤ 3; the endomorphism algorithms cover h = 1 only (D ∈ {−19, −43, −67, −163});
+the endomorphism slot fraction is fixed at 1/8, so "ε does not reduce iterations"
+is for this walk design; **the library `LineOracle` / F_{p²} ζ-fold and a new
+level-dependent index-calculus oracle were not run**; the observed automorphism
+effect falls about 4% short of the ideal (cause not investigated; the baseline is
+taken from the crater itself); Exp H intervals are unadjusted; no GLV
+multi-exponentiation, only the endomorphism-mixed walk. No sub-rho, cryptographic-size
+or deployed-curve claim.
+*Source.* PR #3105, branch `research/r7-3-conductor-sensitive`,
+`research/isogeny_fibers_20261010/round7/r7_3_conductor_sensitive/RESULTS.md`.
+
+### 20.4 R7.4 — King §5 and Eagle–Galbraith–Ong, and a binary-Edwards check of Corollary 9.2 (**UNMERGED**, open #3092)
+
+*Item 1: literature (no hypothesis, no code).* *Question.* What do King (PKC
+2004, §5) and Eagle–Galbraith–Ong (Adv. Math. Commun. 5(1) (2011); ePrint
+2009/086) say about the kernel-saturation law, symmetrisation and a cofactor-4
+test?
+*Verdict.* **The two primary texts could not be read** (an access limit, not a
+finding): King's chapter is behind a Springer login redirect and the IACR PDF
+returns a Cloudflare 403; the EGO PDF returns 403 and an empty body from the
+publisher's export. What was read: the ePrint 2009/086 abstract page, the
+publisher page of EGO (abstract and its 13-entry reference list; King is [4]; no
+index-calculus or symmetrisation entry), Eagle's 2008 thesis (a different
+document: Lemma 4.1.15 gives Tr(x) = Tr(a) on an odd-prime-order subgroup; no
+King, no halving, no cofactor-4 test) and Semantic Scholar metadata. None of
+these contradicts or pre-empts a statement of the note. A search snippet
+(unverified, not primary) says EGO refers to King §5 for the cofactor-4 case.
+*Item 2: binary Edwards.* *Hypothesis.* Symmetrisation by the small rational
+torsion of a binary Edwards curve is also null: (a) as an algebraic device (the
+same-size equivalence of Corollary 9.2); (b) for the pair-table oracle, the yield
+ratio of a symmetrised base against an unsymmetrised base of equal size has an
+interval containing 1.
+*Falsifier (as worded in the task).* A yield-ratio interval that excludes 1 on
+some curve family; the naive full sweep of a saturated base, whose ratio is
+predicted to be 1/μ, is not a falsifier.
+*Verdict (split, the source's).* (a) **Proved and structurally tested, not
+falsified.** Proposition 9.3 (proved in the source): for an ordinary binary curve
+in any model, every rational subgroup M of 2-power order is the kernel of the
+j-fold Verschiebung, the M-invariant coordinate is the 2^j-th root of x∘[2^j],
+and the M-symmetrised summation-polynomial system is the plain x-frame system
+after the F₂-linear substitution X = u^{2^j}. Binary Edwards curves are ordinary
+(b = d₁⁴(d₁² + d₁ + d₂)² ≠ 0). Tested on 46 toy binary Edwards curves (151 034
+points, n = 9..14), 11 identity families, 0 exceptions: Edwards-to-Weierstrass is
+a group isomorphism; the Edwards coordinate w = x + y has the orbits of ⟨T, −1⟩
+as fibres (37 792 fibres); for Z/4 (21 curves) the quotient coordinate
+u + b^{1/4}/u satisfies x(4P) = u⁴ with fibres the orbits of ⟨Q₄, −1⟩ (12 202
+fibres); 4 | N exactly when Tr(d₁) = 1, as 4 | N for Weierstrass exactly when
+Tr(a) = 0 (1 600 random curves each, 0 exceptions). (b) **The falsifier as worded
+fires at n ≤ 12, and the hypothesis is not confirmed at toy size; no gain is
+claimed.** On the 40 curves with n ≤ 12 the pooled interval of the quotient-sweep
+ratio excludes 1 in 39 of 40 cells under the primary metric. The sign depends on
+the convention: charging the relation matrix c rows gives 1.05 to 1.49 (the
+primary metric), charging c + 1 rows gives 0.80 to 0.97 in the source's verdict
+line (its pooled table has 0.880 to 0.963), and the hit-fraction metric gives 1.1
+to 2.8, whose excess is not attributed. At n = 13, 14 (6 curves) the primary
+metric's interval contains 1 in 10 of 16 cells. The naive full sweep reproduces
+the kernel-saturation law 1/μ (0.50 ± 0.02 for ⟨T⟩ and 0.25 to 0.29 for ⟨Q₄⟩ at
+n = 13, 14), and the quotient sweep finds the same relations with 1/μ lookups
+(268 000 of 268 000 checks). The finite-size reading of the c versus c + 1 split
+is derived, not proved.
+*Limits.* n ≤ 14, bases of 1 to 20 projected columns (the regime in which R5.1
+already found the law not reached); the n = 13, 14 sample is 6 curves (s4 rests
+on 5). **No Gröbner/F4 oracle was run on Edwards summation polynomials**, and the
+Galbraith–Gebregiyorgis and Huang–Petit–Shinohara–Takagi binary-Edwards setups
+mentioned in R5.4 were not read. The primary metric was chosen after a smoke run
+(all four are in the JSON). Proposition 9.3 says nothing about an implementation
+constant or about formulations of the summation polynomials not examined.
+*Source.* PR #3092, branch `research/r7-4-literature-edwards`,
+`research/isogeny_fibers_20261010/round7/r7_4_literature_edwards/RESULTS.md`.
+
+### 20.5 R7.5 — versioned errata for R6.7 and R6.9 (**merged**, #3109)
+
+*Question.* No hypothesis or falsifier. Recount two statements of merged,
+frozen results from their committed records.
+*Verdict.* Both counts are wrong in the frozen files and the correction is a new
+file next to each; **no verdict changes**.
+*R6.7 (#2217), `round6/r6_7_zeta_fold_phase2/ERRATUM_v2.md`.* The merged
+`RESULTS.md` and `report.pdf` say 12 of 18 per-curve (c)/(b) size-matched
+intervals (m = 2, torsion family) contain 1. The records of `m2_torsion.json`
+give **11 of 18 unpriced, 9 of 18 priced as run, 11 of 18 priced essential**
+(derived by the recount script); 12 occurs under no pricing. Two curves change
+status between pricings (bits 9 seed 2: unpriced [0.999, 1.263] contains 1, as
+run [1.006, 1.263] does not; bits 14 seed 2: unpriced [0.744, 1.010] contains 1,
+as run [0.747, 0.9997] does not). The seven intervals that exclude 1 unpriced all
+lie below 1, and 14 of the 18 point values are below 1; the point range
+0.542 to 1.127 is reproduced. A second discrepancy found while recounting: the
+sentence "pricing moves no ratio by more than 0.011 at m = 3" is not reproduced;
+the largest m = 3 shift of a point is **0.0151** (B/A, priced as run; 0.0149
+size-matched; B/C 0.0093, C/A 0.0028). The inversion share 38% to 44% holds for
+m = 3 only (0.378 to 0.437); at m = 2 the recorded shares are 0.360 to 0.510. The
+m = 3 containment counts (8, 8, 0 of 9) and (b)/(a) = 1/3 on 30 of 30 reproduce
+under all three pricings.
+*R6.9 (#2502), `round6/r6_9_ghs_2/ERRATUM_v2.md`.* The text says the relation
+rate is off from 1/g! by more than 10× in 6 of 34 runs. `relrate.json` gives
+**7 of 34**: the six q = 4 runs with g = 6, 7, 8 (33.1, 81.8, 97.0, 356.2, 584.6,
+857.8) and q = 8, g = 6 seed 1 (12.1×); the q = 8, g = 6 seed-2 run is 3.5×, the
+nearest uncounted run is q = 4, g = 4 seed 1 at 9.1× (so the count depends on a
+threshold between 9.1× and 12.1×), and no q = 16 or 32 run exceeds 1.8×. The
+text's own list already named the q = 8 case; only the count was short. The 34
+runs, the 0.88 to 3.22× range against the exact split-divisor fraction (0 runs
+outside a factor 4), the 585× and 858× at the smallest weak instance, the 136
+order checks with 0 failures all reproduce.
+*Independent check for this section.* Both `recount_v2.py` scripts were run on
+the committed records of `main`; their output is identical to the committed
+`recount_v2.txt` files.
+*Limits.* Recount of committed records only; no new run. The original
+`report.pdf` files and `ratios.svg` keep the wrong counts or print none and are
+superseded for those sentences by `erratum_v2.pdf`; the repository owner's
+independent count on #2217 is cited as quoted in §19.11 and was not re-read. The
+count in the R6.9 erratum is sensitive to the threshold (8 at "at least 9×").
+*Source.* PR #3109, branch `research/r7-5-errata`,
+[`round6/r6_7_zeta_fold_phase2/ERRATUM_v2.md`](research/isogeny_fibers_20261010/round6/r6_7_zeta_fold_phase2/ERRATUM_v2.md)
+and
+[`round6/r6_9_ghs_2/ERRATUM_v2.md`](research/isogeny_fibers_20261010/round6/r6_9_ghs_2/ERRATUM_v2.md)
+(both on the branch, not on `main`).
+
+### 20.6 R7.6 — R6.2 finished: pooled rho across a class with paired intervals, and path-finding against component size (**UNMERGED**, open #3128)
+
+*Hypotheses.* H1: pooling targets across an isogeny class of size C gives a total
+rho cost that scales as O(√C·√N), a pooled gain of about √C over separate runs.
+H2: the corrected path-finding cost per pair is O(√C) for a bidirectional search.
+*Falsifiers.* H1: no gain at multiple C, or a gain below the √C prediction by
+more than the interval. H2: the log-log exponent of cost against component size,
+with a 95% interval over at least 6 sizes spanning at least 2 decades, excludes
+0.5.
+*Verdict H1 (the source's words).* "Supported as a scaling law, falsified as the
+equality 'gain = √C'." *Verdict H2:* **refuted for this search.**
+*H1 numbers (measured counts; corrected certified-edge rule; 7 runs at four
+values of r, 2^24.7 to 2^36.9; 6 to 30 trials; paired on keys and seeds;
+percentile bootstrap over trials).* The gain over separate runs is above 1 with
+the interval excluding 1 at every C ≥ 4 in every run (at C = 2 the interval
+includes 1 in two runs). The exponent of the gain in C over 2..256 is 0.43 to
+0.52 (0.430 [0.396, 0.463] to 0.522 [0.461, 0.590]); the ideal Kuhn–Struik value
+over that range is 0.489 and lies inside the interval in the 5 runs with
+r ≥ 2^28 (the two runs at r = 2^24.7 are lower: 0.458 [0.429, 0.488] and 0.430
+[0.396, 0.463]). At C = 256 the gain is 11.0 to 13.9 against 16 for "gain = √C"
+(the ideal Kuhn–Struik gain is itself 14.19), and it is below √C by more than its
+interval from C = 32 up in every run (gain/√C at C = 256: 0.69, 0.69, 0.78, 0.80,
+0.83, 0.84, 0.87 for r = 2^24.7 to 2^36.9); pooled/separate over the ideal is
+1.28 and 1.29 at r = 2^24.7 falling to 1.022 [0.994, 1.053] at r = 2^36.9, whose interval
+alone contains 1. The source does not test why the distance shrinks with r (a
+finite-r overhead is its proposal). The transport control B/C (the open item of
+R6.2): 5 of 56 intervals exclude 1, in mixed directions, and 13 of the 14 cells
+with C ≥ 128 are inside [0.95, 1.05]; pricing the transport (61 to 163 M and 4 to
+18 I per target) changes the C = 256 ratio by 0.2% to 5.2% at I = 10 M. ecbench
+(session `ECBS1h4b0bd52ebc3a`; the same-curve pooled arm against `rho.negation` on 4
+registered prime curves, L0 counts only): `ecbench verify --replay-all`
+reproduced 640 of 640 records; pooled/separate 0.1100 [0.0975, 0.1235] and gain
+9.09 [8.10, 10.25] at L = 256 (derived from the harness ratio 28.164
+[24.968, 31.609]); it is a same-host replay certificate (env class
+`ECBENV3h13e37662a118`), **not** an independent one, and the harness has no
+transported-target method, so the arm is the control C and not the transported
+arm B.
+*H2 numbers (measured).* 40 classes (p of 12 to 34 bits), 32 distinct certified
+component sizes from 8 to 16 702 curves (3.3 decades), 230 pairs, every route
+re-validated forward: the exponent of the total cost per pair is **1.13
+[1.06, 1.21]** (search enumerations alone 1.13 [1.05, 1.22]); 0.5 lies outside
+every interval. Sub-fits: size ≥ 100, 1.09 [0.91, 1.30]; size < 1000, 1.16
+[0.98, 1.28]; size ≥ 1000 (11 classes), 1.28 [0.75, 1.90], wide. The data say
+"about linear, slightly above", not a more precise law. Total per pair over C is
+1.8 near C = 13, rising to 3.0 to 4.4 above 300 curves; about 0.44 of the
+component is expanded for C ≥ 100. The statement "not shown" of R6.2 becomes
+"contradicted at 3.3 decades", for breadth-first bidirectional search over
+certified ℓ ∈ {2, 3, 5, 7} edges. It says nothing about an Elkies walk or any
+other path-finding; the mechanism offered (a Cayley graph of the class group on at
+most four small primes, with polynomial ball growth) is proposed and untested.
+*Limits.* ecbench: same-curve pooled arm only, L0, one host class, a same-host
+receipt, no isolab or independent run, no admitted benchmark, no wall time; its
+reference is one `rho.negation` run per workload, so its intervals are wider than
+the example's. The class is the first C ≤ 256 curves of a breadth-first class of
+one base curve per run (seven base curves); p is a toy size (r up to 2^36.9, p to
+2^41); the 2^36.9 run has 6 trials. Path half: 5 to 6 pairs per class and a
+component cap (12 000 or 24 000), so components above it are excluded; only 11
+classes exceed 1000 curves; `scaling_v2.json` (33 minutes) was not replayed (the
+other native records replay identically). The ecbench session adds 10.3 MB of
+`records.jsonl` to the repository under a `keep` entry; no PNG is committed.
+Library `src/` is unchanged.
+*Source.* PR #3128, branch `research/r7-6-r62-batch`,
+`research/isogeny_fibers_20261010/round7/r7_6_r62_batch/RESULTS.md`.
+
+### 20.7 R7.7 — the trace pair as a coset label for a = 1 and for E/8E (**merged**, #3113)
+
+*Hypotheses.* H1: for a = 1 (Tr(a) = 1), E/4E has the structure R6.3 describes and
+the trace pair is a full label of it. H1′ (the live extension): for every curve
+with Tr(a) = 0 and any b, E/4E ≅ Z/4 and L(P) = (Tr(x), b₂(P)) is a full label.
+H2: a refined label is a full label of E/8E where E(F) has a Z/8 or Z/4 × Z/2
+2-primary part.
+*Falsifiers.* A curve or point where the predicted label is wrong, or a collision
+between distinct cosets; for H2 also a coset on which the refined label is not
+constant.
+*Verdicts (the source's).* **H1: refuted as posed; the premise is false.**
+**H1′: not fired; confirmed** (constancy measured, the 4E criterion and the closed
+form for β proved). **H2: confirmed with a datum that is not cheap**; Z/4 × Z/2
+cannot occur.
+*Numbers (measured unless marked proved).* y² + xy = x³ + ax² + b over F_{2^n},
+n odd: exhaustive for a ∈ {0, 1} and all b at n = 5..13 (21 814 curves), all
+(a, b) at n = 5..9 (278 880 curves), sampled at n = 17, 19, 21, 23 (12 000 curves,
+1 500 points each). (i) For Tr(a) = 1, v₂(#E) = 1, 2E has odd order and
+E/4E = E/8E = E/2E ≅ Z/2; the label is Tr(x) + Tr(a), with **0 wrong in
+148 598 015 points**. The R6.3 second bit is not a coset invariant:
+b₂(−P) = b₂(P) + Tr(x), so on 2E a point and its negative share a coset and differ
+in b₂ (proved); the pair is non-constant on 312 667 of 312 684 cosets (the 17
+exceptions are tiny cosets at n = 5), with 0 cross-coset collisions. On 2E, b₂ is
+the root selector for halving inside the odd-order subgroup (0 failures in
+35 780 448 + 33 947 136 + 4 495 324 points). (ii) For Tr(a) = 0: the 4E criterion
+(P ∈ 4E iff Tr(x) = 0 and b₂(P) = 0) is **proved for every a, b**; the odd cosets
+carry (1, β) and (1, 1 + β) with β = Tr(b·H(b)) (**proved**; (n + 1)/2 mod 2 at
+b = 1, which is R6.3's rule); constancy of b₂ on the odd cosets is **measured, not
+proved** for general (a, b), with 0 failures in 71.6 M points (n = 5..13, a ∈ {0, 1},
+all b), 68.0 M (n = 5..9, all a, b) and 9.0 M sampled (n = 17..23, 6 005 curves).
+(iii) E(F)[2] = {O, T}, so the 2-primary part is cyclic (proved). The pair cannot
+label E/8E (four values, eight cosets); the smallest counterexample is n = 5,
+a = 0, b = 6, #E = 24. With b₃(R) = b₂(R/2) for even R and b₃(P) = b₃(P + Q₀) for
+odd P the triple (Tr(x) + Tr(a), b₂, b₃) is a bijection E/8E → F₂³ (0 failures in
+74 118 081 points), and the same recursion labels E/16E and E/32E (0 failures in
+37 628 863 and 18 181 938 points). A search over 120 trace monomials found no
+closed-form third bit for odd points (a positive control finds b₂ at level 4E).
+(iv) Cost (counted operations, n = 23): the pair saves a point addition
+(I + 3M + 2S) over the halving route on odd points, at the price of one more
+trace; the triple label (J = 3) is not cheaper than halving; the scalar-
+multiplication ground truth costs about 60 M + 50 S + 30 I. (v) Constant-time
+bar (< 2×): met trivially for Tr(a) = 1 (one masked trace); **not met for
+Tr(a) = 0**: no new half-trace algorithm was found and nothing was re-timed, so
+R6.3's 2.5 to 5.0× (contended wall time) and 2.0 to 3.7× (counted word
+operations) stands, and the E/8E refinement needs two or three half-traces per
+point. Negative controls (a label that forgets a, a label that drops Tr(x·H))
+fail in the same code (for example 515 444 of 1 056 336 points mispredicted at
+J = 2 for the first).
+*Limits.* n odd only (for even n, a = 1 has Tr(a) = 0 and needs another
+quadratic solver, not run); exhaustive to n = 13 (n = 9 for all a); the E/8E,
+E/16E and E/32E tables inherit the unproved constancy; the 120-monomial search is
+a finite family; cost is counted operations in a log-table implementation, with no
+weights and no wall time; the rule depends on the coordinates as given (an
+isomorphism (a, b) → (a + t² + t, b) flips b₂ on odd points when Tr(t) = 1). The
+full crate was not built (the example needs no crate dependency; clippy ran on a
+minimal package).
+*Source.* PR #3113, branch `research/r7-7-coset-label-a1-e8e`,
+`research/isogeny_fibers_20261010/round7/r7_7_coset_label/RESULTS.md`.
+
+### 20.8 R7.8 — `chained-x` in `ic bench` and an end-to-end test of ecbench verdict procedure 2 (merged, #3125)
+
+*Nature.* Two small library follow-ups left open by merged work. The pull request
+states that it changes no frozen result; it has no separate `RESULTS.md`,
+hypothesis, falsifier or verdict. Its description reports the implementation
+checks, an `ic bench` comparison on a different base, and the procedure-2 test.
+*(1) `chained-x`.* R6.1 (#2511) added `ChainedXOracle` and did not register it in
+`src/bin/ic/bench.rs`. The pull request registers it (`run_binary` builds and
+dispatches it, as it does `symmetrised`; `ic bench --list` carries a catalogue
+entry with the parameters `m`, `engine`, `max_degree`, `node_budget`, `trace`;
+the oracle table in `docs/ic/FRAMEWORK.md` lists it) and adds two tests (the
+listing, and a small Koblitz run at n = 13 with `binary-subspace:dimension=6` and
+`chained-x:m=3` that recovers the logarithm). Against R6.1 at n = 13, a = 0, seed
+123212651130, planted log 1571: the bench run recovers the same logarithm, 1571,
+and every call finds a relation with 0 budget hits, as in R6.1; the numbers are
+**not bit-identical**, because `ic bench` cannot build R6.1's `FixedBase` (a
+random non-invariant V with the projected signed-Frobenius-orbit column fold) and
+offers `binary-subspace`, which folds differently and drops the abscissa 0. With
+R6.1's exact V words passed through `binary-subspace:basis=...`, S (cols / trials /
+relations) is 375.5 (35 / 28 / 28) at m = 3 against R6.1's 428.6 (30 / 26 / 26),
+and 863.6 (15 / 14 / 14) at m = 4 against 659 (12 / 13 / 13); the prefix subspace
+gives 419.4 and 895.4. At m = 2 the comparison is not like for like (R6.1's row is
+the `mitm` oracle, S = 186; the chained-x rows are 264.5 and 137.8). The ordering
+m = 2 < m = 3 < m = 4 holds for the R6.1-V runs (264.5, 375.5, 863.6); for the
+prefix runs it holds only if the dimension varies with m (7, 6, 5), as it did.
+These are measurements of the same oracle on a different base, not a
+reproduction of 429.
+*(2) Procedure 2.* #3074 noted that the commitment-plus-beacon procedure had only
+unit tests. The new test
+`challenge_verdict_procedure_2_derives_the_epoch_from_commitment_and_beacon` in
+`tests/ecbench.rs` injects a fixed beacon through the existing `--beacon HEX`
+option (no seam, no network), and asserts that the epoch equals the documented
+function of nonce, commitment id and beacon (computed in the test from
+`derive_u64` and SHA-256), that the spec names epoch, commitment and beacon, that
+re-running gives a byte-identical spec and another beacon a different one, the
+golden ids, a verdict `regresses` on memory (`bsgs.negation` against `rho.plain`,
+procedure 2, no bound written, drift check not outside), a self-comparison
+`matches` with ratio exactly 1, and seven refusals (short or non-hex beacon,
+commitment to another candidate, future-dated commitment, commitment with
+`--legacy-epoch`, a verdict under another beacon, a verdict without `--bounds`,
+`--epoch` without a commitment). The incumbent's bound is a committed fixture
+(`tests/fixtures/ecbench/procedure-2/rho-plain-bound.json`), because a bound
+fitted inside the test has a wall-clock-dependent id that moves the epoch (the
+first version failed 3 of 5 runs for this reason).
+*Checks stated in the description.* `procedure_2` 5 of 5 runs, `chained_x` 5 of 5,
+full `cargo test --release --test ecbench` 26 passed, clippy `-D warnings` clean on
+the `ic` binary and the test, rustfmt clean; builds used a private target
+directory. The description's `check_curve_names.py` run crashed on the sparse
+checkout; its files use no curve names beyond existing test ones.
+*Source.* PR #3125, branch `fix/chained-x-bench-and-proc2-test` (description; no
+`RESULTS.md`).
+
+### 20.9 Synthesis
+
+| lead | PR | falsifier | verdict | headline (measured unless marked) |
+|:--|:--|:--|:--|:--|
+| R7.1 complete-cost ordering | #3107 **merged** | ordering: fired in cold ascending only (ℓ = 89, 109, 131: near ties); exponent: not fired | mixed; H not confirmed as stated | exponent 1.919 at every a, OLS at worst [1.717, 2.121], boot [1.781, 2.126]; ladder crossover shifts −0.24 to −0.39 bit (extrapolated) |
+| R7.2 GHS end to end | #3124 **open** | fired (IC ≥ rho at every instance) | H refuted; no instance weak | IC / best generic 1.91 [1.72, 2.11] to 131 [123, 141] over 30 instances, N = 12..28; n = 4 ratio halves per q doubling, extrapolated crossing N ≈ 32 [31, 33], not built |
+| R7.3 conductor-sensitive | #3105 **merged** | iterations and yield: null; multiplications: second branch fires for one algorithm | null after baseline; one inferior algorithm 1.46× | conductor effect 1.0018 [0.9986, 1.0050], 0.9997 [0.9966, 1.0030]; ε-walk floor 1.46× [1.44, 1.48] mults, best strategy 0.9999 [0.9945, 1.0055] |
+| R7.4 literature + binary Edwards | #3092 **open** | (b) fires at n ≤ 12 as worded; (a) not fired | (a) proved (Prop. 9.3) and tested; (b) not confirmed; King/EGO unread | 46 curves, 151 034 points, 0 exceptions; 39 of 40 cells exclude 1 (primary); sign set by c vs c + 1 |
+| R7.5 errata R6.7, R6.9 | #3109 **merged** | none | counts corrected, no verdict changes | R6.7 (c)/(b): 11 / 9 / 11 of 18 (not 12); m = 3 shift 0.0151 (not 0.011); R6.9: 7 of 34 (not 6) |
+| R7.6 R6.2 batch + paths | #3128 **open** | H1: no-gain not met, below-√C met from C ≥ 32; H2: fired | H1 supported as a scaling law, not as gain = √C; H2 refuted | gain exponent 0.43 to 0.52 (ideal 0.489); gain 11.0 to 13.9 at C = 256 (16 under √C); path exponent 1.13 [1.06, 1.21] |
+| R7.7 trace pair, a = 1 and E/8E | #3113 **merged** | H1 fired (premise false); H1′, H2 not fired | H1 refuted as posed; H1′ confirmed (constancy measured); H2 confirmed, not cheap | label Tr(x) + Tr(a), 0 wrong in 148 598 015 points; triple label E/8E → F₂³, 74 118 081 points; CT bar still missed for Tr(a) = 0 |
+| R7.8 chained-x in `ic bench`, procedure-2 test | #3125 **merged** | none | no separate research verdict; library follow-up | `chained-x` registered; m = 3 S 375.5 / 419.4 against R6.1's 428.6 on different bases (not bit-identical); procedure-2 test 5 of 5 runs |
+
+The summary figure is `round7/s20_summary/verdicts.svg` (data `verdicts.json`,
+report `report.pdf` beside it); it carries the same hollow-marker convention as
+`round6/s19_summary/` for unmerged leads. Five merged round-7 leads are filled
+and the three open ones hollow. The table and figure show status checked on
+2026-11-01 at 04:11 UTC.
+
+### 20.10 What is settled, what is still open, and the leads the results motivate
+
+*Settled at the stated toy scope.* R7.1, R7.3, R7.5 and R7.7 are merged; the
+R7.8 library follow-up is also merged. R7.2, R7.4 and R7.6 remain open, so the
+research findings resting on those are provisional.
+The settled list of §19.17 (merged results) is unchanged.
+* Corollary 9.2 is not limited to the Weierstrass model or to the point T: for an
+  ordinary binary curve in any model every rational 2-power torsion subgroup
+  gives an M-symmetrised summation-polynomial system equal to the plain x-frame
+  system after an F₂-linear substitution (proved, Proposition 9.3), and binary
+  Edwards curves have no torsion that Weierstrass binary curves lack (R7.4).
+  This is the same-size statement; it says nothing about implementation
+  constants or about oracles not examined.
+* The generic-kernel exponent statement is unchanged by counting additions and
+  the Φ_ℓ construction: 1.919, insufficient evidence either way (R7.1). The
+  route order is robust to the addition weight except for near ties in one
+  accounting.
+* No toy binary curve (N = 12..28, the selected GHS class of R7.2) is weak under
+  the counted `bitop/v1` model against the best generic method on the same
+  curve (R7.2). This is a statement about 30 selected toy instances and this
+  implementation, not about the method.
+* Rho iterations and relation yield show no crater/floor conductor effect once
+  the automorphism baseline is removed, for the algorithms and the sizes tested
+  (R7.3); the one multiplication-count gap belongs to an algorithm that plain
+  rho dominates.
+* For the trace pair: the Tr(a) = 1 premise of R6.3's extension is false and the
+  label there is Tr(x) + Tr(a); the 4E criterion and the odd-coset labels hold
+  for every a, b with Tr(a) = 0 (the constancy of b₂ on odd cosets measured, not
+  proved); E/8E has a triple label that is not cheaper than halving; E(F)[2] =
+  {O, T}, so Z/4 × Z/2 does not occur (R7.7).
+* Pooling across a class of size C gains with exponent 0.43 to 0.52 in C over
+  separate runs (ideal Kuhn–Struik 0.489), below √C; corrected breadth-first
+  path-finding costs about the component size to the power 1.13 (R7.6).
+* The R6.7 and R6.9 counts: 11 / 9 / 11 of 18 and 7 of 34, with the two other
+  scoping fixes (R7.5).
+
+*Still open or pending.*
+* The Sutherland CRT evaluation of Φ_ℓ is not implemented, so the cold Φ route
+  is the library builder (exponent 4.69) and the cold order near ℓ = 89..131 is
+  one instance per ℓ (R7.1).
+* The extrapolated crossing near N ≈ 32 for genus 4 over F_{q^4} (R7.2) has not
+  been built or measured; the library's irreducible table stops at degree 31.
+  The estimate rests on this implementation (generic Cantor arithmetic, no
+  large-prime variation, generic arms without the negation map), so a better
+  index calculus moves it down and a stronger generic arm moves it up. No
+  ecbench session or replay certificate exists for the Jacobian index-calculus
+  arm.
+* Conjecture 10′ with the library `LineOracle` / F_{p²} ζ-fold, a
+  level-dependent index-calculus oracle, h > 1 endomorphism algorithms and larger
+  ℓ or deeper floors (R7.3).
+* King §5 and the Eagle–Galbraith–Ong cofactor-4 test: unread (access blocked in
+  R6.10 and again in R7.4). Edwards summation polynomials under an algebraic
+  (Gröbner/F4) oracle; the pair-table yield above n = 14 (R7.4).
+* Constancy of b₂ on the odd cosets for general (a, b); the n-even version; a
+  constant-time half-trace that meets the < 2× bar for Tr(a) = 0 (R7.7).
+* Pooled rho in a registered ecbench session with a transported-target method and
+  an independent host-class receipt; path-finding that does not enumerate (an
+  Elkies walk was not tested); C above 256 and the distance to the ideal
+  Kuhn–Struik gain at finite r (R7.6).
+* The R6.8 exact-simulation theorem; direct S5 beyond ℓ = 5 (unchanged from
+  §19.17).
+* Housekeeping that waited on merges: #3109 (errata files), #3072 and #3125
+  (`chained-x` registration and the procedure-2 test) merged on 2026-11-01;
+  #3074 remains open.
+
+*Leads the results motivate (each is the next step or a not-done item in its own
+source; none is a claim).*
+1. A genus-4 F_{q^4} instance at N = 32, which needs the irreducible-polynomial
+   table extended past degree 31, to test the extrapolated crossing of R7.2
+   rather than rely on it; with a negation-map generic arm so the comparison is
+   not against a deliberately weak baseline.
+2. Sutherland's CRT evaluation of Φ_ℓ and more than one instance per ℓ at
+   ℓ = 89..131 to settle the near ties of R7.1.
+3. The library `LineOracle` ζ-fold and a level-dependent index-calculus oracle
+   at the volcano levels of R7.3, since the only algorithms tested there either
+   ignore End(E) or lose to plain rho.
+4. A proof of the odd-coset constancy of b₂ for general (a, b) (R7.7), which also
+   fixes the status of the E/8E, E/16E and E/32E tables.
+5. A transported-target pooled method in ecbench with an independent receipt, and
+   a non-enumerating path search measured on the same component-size axis (R7.6).
+6. Access to King §5 and EGO from a source the agent can read (a person-supplied
+   copy), and an algebraic oracle on Edwards summation polynomials (R7.4).
+
+### 20.11 Edits made to earlier sections in this revision
+
+No frozen result file was edited, and the measured numbers of earlier sections
+are unchanged. Edits are to this note only.
+* Header status line and §0: date and status line extended to §20; item 10 added.
+* §19 status paragraph ("Known defects"): the R6.7 and R6.9 count errata are now
+  pointed to (R7.5, #3109, merged).
+* §19.5 (R6.1, *Library change*): the unregistered `chained-x` sentence points to
+  #3125 (R7.8, merged).
+* §19.11 (R6.7): the verdict sentence "pricing moves no ratio by more than 0.011"
+  is replaced by 0.0151 (B/A priced as run) with the B/A, C/A and B/C interval
+  widths stated and the tension for B/C (shift 0.0093 above its interval width,
+  below 0.001) flagged without changing the verdict word; the unscoped "Inversions are
+  38–44%" is scoped to m = 3 (36% to 51% at m = 2); the correction paragraph
+  points to `ERRATUM_v2.md` and adds the direction (all seven excluded intervals
+  below 1).
+* §19.13 (R6.9): "the count of 6 appears to omit one" now cites the R7.5 recount
+  (7 of 34, nearest uncounted 9.1×).
+* §19.16: the R6.7 and R6.9 rows carry the corrected counts.
+* §19.17: the open lines for the pooled-rho batch half (R7.6), the complete-cost
+  ordering and Φ_ℓ construction (R7.1), `chained-x` and procedure 2 (R7.8),
+  "whether any toy instance is weak" (R7.2, with the `audit_curve` and
+  smooth-cover facts of §19.19 kept), Conjecture 10′ (R7.3), the a = 1 and E/8E
+  label and the two unread sources (R7.7, R7.4), and the binary-Edwards check with
+  the R6.7/R6.9 counts (R7.4, R7.5) now name the round-7 result and its
+  pull-request status. The "awaits its correction" lines were kept in
+  substance, not removed, because R7.2, R7.4 and R7.6 remain open; the R7.5
+  errata (#3109), R7.8 library follow-up (#3125) and #3072 have merged.
+* §19.18, §19.19: a revision line; the "numbering" note under §19.19 (its R7.1 is
+  the smooth-cover lead); the (3, 4), g = 8 "did not finish" sentence now cites
+  the R7.2 measurement of 1175 s.
+* Not edited: §17.3 (the smooth-cover R7.1 #2542 does not supersede it; the
+  complete-cost R7.1 #3107 is a different lead and merged on 2026-11-01); the settled
+  list of §19.17 (merged results only; the round-7 settled items are in §20.10);
+  §19.2, §19.6 and the smooth-cover text already carry #2524, #2543 and #2542
+  from the revision of 2026-10-31, which this branch includes (#3072, merged
+  2026-11-01).
