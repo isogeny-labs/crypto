@@ -1,0 +1,40 @@
+/var/tmp/pencil-native-node-20261101-v1/NodeContract.lean:19:74: error: unsolved goals
+case hs
+n : ℕ
+r : UInt64
+inst✝ : Fact (Nat.Prime r.toNat)
+s : Columns n
+hs : Bounded s
+hn : n + 1 < USize.size
+hp : 0 < r.toNat
+owner : Fin n → Fin n
+rank : Fin n → ℕ
+v : Fin n → F r
+z k : F r
+hg : Good r (toWord s hs).graph
+ha : FixedGood r (toWord s hs)
+hv : GraphUnion.Valid (unionDecode r (toWord s hs)) v k
+hf : GraphFind.Forest (decode r (toWord s hs).graph) rank
+ho : ComponentMap.Valid (decode r (toWord s hs).graph) owner
+hz : ComponentMap.SizeValid owner s.size
+⊢ Bounded s
+
+case hn
+n : ℕ
+r : UInt64
+inst✝ : Fact (Nat.Prime r.toNat)
+s : Columns n
+hs : Bounded s
+hn : n + 1 < USize.size
+hp : 0 < r.toNat
+owner : Fin n → Fin n
+rank : Fin n → ℕ
+v : Fin n → F r
+z k : F r
+hg : Good r (toWord s hs).graph
+ha : FixedGood r (toWord s hs)
+hv : GraphUnion.Valid (unionDecode r (toWord s hs)) v k
+hf : GraphFind.Forest (decode r (toWord s hs).graph) rank
+ho : ComponentMap.Valid (decode r (toWord s hs).graph) owner
+hz : ComponentMap.SizeValid owner s.size
+⊢ n < USize.size
