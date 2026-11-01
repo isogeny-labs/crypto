@@ -3781,15 +3781,15 @@ one column changed the digest on 32/32 calls and the output on none; a count off
 
 | solver | initial counts | comparisons | count updates | total | end to end |
 |:--|--:|--:|--:|--:|--:|
-| B (as built, counted) | `176,064` | `3,680`–`3,713` | `8.69`–`8.77·10⁵` | `1.049`–`1.057·10⁶` | `1.049`–`1.057·10⁶` |
-| B′ (incremental) | `505`–`506` | as B | `2.92`–`2.98·10⁵` | `2.93`–`2.98·10⁵` | `2.93`–`2.98·10⁵` |
-| B″ (Markowitz estimate) | `505`–`506` | `4,069`–`4,105` | `8,121`–`8,192` | `12,696`–`12,803` | `12,694`–`12,802` |
+| B (as built, counted) | `176,064` | `3,681`–`3,713` | `8.69`–`8.77·10⁵` | `1.049`–`1.057·10⁶` | `1.049`–`1.057·10⁶` |
+| B′ (incremental) | `506`–`507` | as B | `2.89`–`2.94·10⁵` | `2.93`–`2.98·10⁵` | `2.93`–`2.98·10⁵` |
+| B″ (Markowitz estimate) | `506`–`507` | `4,070`–`4,105` | `8,121`–`8,192` | `12,696`–`12,804` | `12,694`–`12,802` |
 
 B's selection pass reads the matrix about six times per call: once in the initial count (`176,064`
 entries, the validator's lower bound) and about five times more in recounts.  The recounts are 83 % of the
 pass.  B′ removes the initial pass and replaces recounts with two status tests per touched entry,
 `0.279`–`0.282` of B's work.  B″ does `O(1)` work per row update.  Its estimate picks other pivots, so its
-`C` median is `1.205`–`1.221 ×` B's (`3.71`–`4.02·10⁵` against `3.04`–`3.33·10⁵`; A's is `6.01`–`6.34·10⁵`).
+`C` median is `1.205`–`1.222 ×` B's (`3.71`–`4.02·10⁵` against `3.04`–`3.33·10⁵`; A's is `6.01`–`6.34·10⁵`).
 Lead-scan reads (`79,114`–`79,119` per call) are identical for A, B, B′ and B″ on every call: a row's
 lead-scan reads telescope to its final lead, which the shared pivot columns fix.
 
@@ -3801,12 +3801,12 @@ Macaulay entry, per selection operation and per walk step):
 | X | quantity | `0` GAE | `0.1` GAE | `1` GAE | rank across the band |
 |:--|:--|:--|:--|:--|:--|
 | B | `S_E25 / S_B` | `4.53`–`4.76` | `0.274`–`0.276` | `0.157`–`0.158` | unresolved: the order flips between `0` and `0.1` |
-| B | `S_A / S_B` | `1.82`–`1.86` | `0.193`–`0.197` | `0.149`–`0.153` | unresolved: the order flips between `0` and `0.1` |
+| B | `S_A / S_B` | `1.82`–`1.86` | `0.193`–`0.197` | `0.149`–`0.152` | unresolved: the order flips between `0` and `0.1` |
 | B | `S_B / rho` | `3.45·10³`–`2.19·10⁵` | `1.10·10⁵`–`7.17·10⁶` | `6.10·10⁵`–`4.40·10⁷` | rho ahead at every weight |
-| B′ | `S_E25 / S_B′` | `4.53`–`4.76` | `0.679`–`0.683` | `0.404`–`0.407` | unresolved: the order flips between `0` and `0.1` |
+| B′ | `S_E25 / S_B′` | `4.53`–`4.76` | `0.678`–`0.683` | `0.404`–`0.407` | unresolved: the order flips between `0` and `0.1` |
 | B′ | `S_A / S_B′` | `1.82`–`1.86` | `0.478`–`0.487` | `0.384`–`0.393` | unresolved: the order flips between `0` and `0.1` |
 | B′ | `S_B′ / rho` | `3.45·10³`–`2.19·10⁵` | `4.45·10⁴`–`2.89·10⁶` | `2.36·10⁵`–`1.71·10⁷` | rho ahead at every weight |
-| B″ | `S_E25 / S_B″` | `3.83`–`3.98` | `1.457`–`1.497` | `0.981`–`0.997` | unresolved: B″ ahead at `0` and `0.1`, behind at `1` on all 20 rows |
+| B″ | `S_E25 / S_B″` | `3.83`–`3.98` | `1.457`–`1.497` | `0.980`–`0.997` | unresolved: B″ ahead at `0` and `0.1`, behind at `1` on all 20 rows |
 | B″ | `S_A / S_B″` | `1.538`–`1.558` | `1.046`–`1.048` | `0.9465`–`0.9480` | unresolved: B″ ahead at `0` and `0.1`, behind at `1` on all 20 rows |
 | B″ | `S_B″ / rho` | `4.12·10³`–`2.61·10⁵` | `2.03·10⁴`–`1.33·10⁶` | `9.58·10⁴`–`7.01·10⁶` | rho ahead at every weight |
 
@@ -3821,11 +3821,11 @@ reverses none.  B″/A becomes `1.035`–`1.036` at `0.1` and `0.962`–`0.963` 
 | G2.124 | identical outputs on all 10,000 Stage A calls and all 30 end-to-end records, with the field rule above; phase counts and digests as registered; old binary = new for the four existing configurations; both negative controls detected 32/32. The in-crate unit tests type-check (`cargo check --release --lib --tests`) but were not executed: a release test build of the library needs about 9 GB of RSS, which the shared container could not provide beside E32. Their solver-level content runs as `e33_checks`. | **holds** (unit tests not executed; disclosed) |
 | G2.125 | initial pass `rows · cols` exactly; comparisons `0.35 %` of the total; recount `8.7·10⁵` > initial `1.76·10⁵`; total `1.049`–`1.057·10⁶` | **holds** |
 | G2.126 | B′/B `0.279`–`0.282` | **holds** |
-| G2.127 | B″ `12,696`–`12,803` per call (≤ `2·10⁴`); `C` median B″/B `1.205`–`1.221` | **holds** |
-| G2.128 | `S_A/S_B` `1.82`–`1.86` (0), `0.193`–`0.197` (0.1), `0.149`–`0.153` (1) on every row | **holds**: the order flips; B is not ranked ahead of A |
+| G2.127 | B″ `12,696`–`12,804` per call (≤ `2·10⁴`); `C` median B″/B `1.205`–`1.222` | **holds** |
+| G2.128 | `S_A/S_B` `1.82`–`1.86` (0), `0.193`–`0.197` (0.1), `0.149`–`0.152` (1) on every row | **holds**: the order flips; B is not ranked ahead of A |
 | G2.129 | `S_E25/S_B` `4.53`–`4.76`, `0.274`–`0.276`, `0.157`–`0.158` | **holds** (far below the validator's lower-bound values `0.885`–`0.899` and `0.542`–`0.544`: the recounts were the larger part) |
-| G2.130 | B′ behind A (`0.478`–`0.487`, `0.384`–`0.393`) and E25 (`0.679`–`0.683`, `0.404`–`0.407`) at `0.1` and `1` GAE on every row | **holds** |
-| G2.131 | against A: ahead at `0` and `0.1`, behind at `1` GAE on every row, as registered; against E25: ahead at `0` and `0.1`, **behind at `1` GAE on all 20 rows** (`0.981`–`0.997`) | **falsified** for E25 at `1` GAE; holds against A |
+| G2.130 | B′ behind A (`0.478`–`0.487`, `0.384`–`0.393`) and E25 (`0.678`–`0.683`, `0.404`–`0.407`) at `0.1` and `1` GAE on every row | **holds** |
+| G2.131 | against A: ahead at `0` and `0.1`, behind at `1` GAE on every row, as registered; against E25: ahead at `0` and `0.1`, **behind at `1` GAE on all 20 rows** (`0.980`–`0.997`) | **falsified** for E25 at `1` GAE; holds against A |
 | G2.132 | `S_B/rho` `3.45·10³`–`2.19·10⁵` at `0` GAE; rho ahead of every row of B, B′, B″ at every weight | **holds** |
 | G2.133 | lead scans identical across rules; no rank reverses | **holds** |
 
@@ -3836,7 +3836,7 @@ save, so B falls to `0.19×` A.  Maintaining the counts incrementally (B′) kee
 the work, which is still behind A and E25 at `0.1` and `1` GAE.  A counted estimate (B″), with `O(1)` work
 per row update, gives up `22.5`–`22.7 %` of B's saving in mean `C` (worse pivots).  With its `1.27·10⁴` selection
 operations counted, it is ahead of A at `0` GAE (`1.54`–`1.56×`) and at `0.1` GAE (`1.046`–`1.048×`).  At
-`1` GAE it is behind A (`0.947`–`0.948`) and E25 (`0.981`–`0.997`): at that weight its selection
+`1` GAE it is behind A (`0.947`–`0.948`) and E25 (`0.980`–`0.997`): at that weight its selection
 operations cost `1.2·10⁶` multiplications per call, more than the `2.30`–`2.33·10⁵` it saves against A's mean `C`.  **No pivot rule
 tested here ranks ahead of A across the band; A remains the ranked solver.**  B″ is a measured
 improvement of the baseline at `0` and `0.1` GAE only.  Under the §5a rule it is not ranked, and it is
@@ -3845,6 +3845,13 @@ arm B) is `4.12·10³×` the matched rho for B″ and `6.39·10³×` for A at `0
 at every weight.  **Next lever:** the band is set by the Macaulay entries (`176,064` per call, `1.7·10⁷`
 multiplications at `1` GAE).  No pivot rule removes them; a smaller matrix would.  Not done here: the
 validation gate, the leaderboard and `benchmarks/`.
+
+
+**Erratum (2026-11-01, from the independent validator's recompute of `stage_a.json` and the end-to-end records).** Thirteen printed figures in this section disagreed with the raw records and are corrected in place above; no verdict or rank changes (G2.124–G2.130, G2.132, G2.133 hold; G2.131 is falsified against E25 at `1` GAE; no variant is ranked).
+
+1. Transcription: B′'s count updates were printed `2.92`–`2.98·10⁵`; the records give `288,884.5`–`294,201.3`, i.e. `2.89`–`2.94·10⁵` (`stage_a.log`, p = 101 seed 1: `289,121`).
+2. Truncated means, now rounded: B's comparisons minimum `3,680.79` → `3,681`; B′ and B″ initial counts `505.85`–`506.74` → `506`–`507`; B″ comparisons minimum `4,069.53` → `4,070`; B″ total maximum `12,803.90` → `12,804`; `C` median B″/B maximum `1.22156` → `1.222`.
+3. Double rounding (four places, then three), now rounded once: `S_A/S_B` at `1` GAE maximum `0.152475` → `0.152`; `S_E25/S_B′` at `0.1` GAE minimum `0.678485` → `0.678`; `S_E25/S_B″` at `1` GAE minimum `0.980463` → `0.980`.
 
 ### 9.38 E34 pre-registration: a cheaper order-24 class representative, and which walk is the matched rho on E18's `j = 0` curves across the §5a band
 

@@ -15,11 +15,11 @@ One native operation per Macaulay entry examined for its zero status and one per
 
 == Measured
 - *Identity (G2.124):* all 10,000 Stage A calls agree with the existing solver for every solver. Phase counts are equal (A counted = A, B counted = B′ = B), the B′ digests equal B's, and B′'s maintained counts never differ from a recount. All 30 end-to-end records keep every non-product field of E31 B's records (`folded.recovered` is a key added after E31). The old and new binaries give identical records for the four existing configurations. Both negative controls were detected on 32/32 calls. The in-crate unit tests type-check but were not executed (memory; see Limits).
-- *Selection work per call* (Stage A; end to end agrees): B $1.049$–$1.057 dot 10^6$ (initial 176,064, comparisons 3,680–3,713, recounts $8.69$–$8.77 dot 10^5$); B′ $2.93$–$2.98 dot 10^5$ ($0.279$–$0.282$ of B); B″ 12,696–12,803. B″'s $C$ median is $1.205$–$1.221 times$ B's.
+- *Selection work per call* (Stage A; end to end agrees): B $1.049$–$1.057 dot 10^6$ (initial 176,064, comparisons 3,681–3,713, recounts $8.69$–$8.77 dot 10^5$); B′ $2.93$–$2.98 dot 10^5$ ($0.279$–$0.282$ of B); B″ 12,696–12,804. B″'s $C$ median is $1.205$–$1.222 times$ B's.
 - *End to end* (20 rows), as ranges of $S_"E25"\/S_X$, $S_A\/S_X$ and $S_X\/"rho"$ at 0 / 0.1 / 1 GAE:
-  - B: E25 $4.53$–$4.76$ / $0.274$–$0.276$ / $0.157$–$0.158$; A $1.82$–$1.86$ / $0.193$–$0.197$ / $0.149$–$0.153$.
-  - B′: E25 $4.53$–$4.76$ / $0.679$–$0.683$ / $0.404$–$0.407$; A $1.82$–$1.86$ / $0.478$–$0.487$ / $0.384$–$0.393$.
-  - B″: E25 $3.83$–$3.98$ / $1.457$–$1.497$ / $0.981$–$0.997$; A $1.538$–$1.558$ / $1.046$–$1.048$ / $0.9465$–$0.9480$.
+  - B: E25 $4.53$–$4.76$ / $0.274$–$0.276$ / $0.157$–$0.158$; A $1.82$–$1.86$ / $0.193$–$0.197$ / $0.149$–$0.152$.
+  - B′: E25 $4.53$–$4.76$ / $0.678$–$0.683$ / $0.404$–$0.407$; A $1.82$–$1.86$ / $0.478$–$0.487$ / $0.384$–$0.393$.
+  - B″: E25 $3.83$–$3.98$ / $1.457$–$1.497$ / $0.980$–$0.997$; A $1.538$–$1.558$ / $1.046$–$1.048$ / $0.9465$–$0.9480$.
   - Distance to the matched rho (walk (iii) of E27): at 0 GAE, B and B′ $3.45 dot 10^3$–$2.19 dot 10^5$ and B″ $4.12 dot 10^3$–$2.61 dot 10^5$; at 1 GAE, B″ $9.58 dot 10^4$–$7.01 dot 10^6$. Rho is ahead of every row at every weight.
 
 #figure(image("figures/selection_parts.svg", width: 80%), caption: [Pivot-selection native operations per call by part, mean of the ten curves' Stage A means (1,000 calls each). B″'s comparisons (≈ 4,100) and updates (≈ 8,150), and B′'s initial counts (≈ 506), are too small to see at this scale; exact values are in `tables.md`. Source: `summary.json`.])
