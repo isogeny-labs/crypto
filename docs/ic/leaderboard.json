@@ -134,6 +134,18 @@
    "path": "experiments/35_invariants_lite/summary.json",
    "sha256": "62eb026c0dd363a6593fc054c308197b8f94b3146f9348d94844b47408ab30db"
   },
+  "glv_e32": {
+   "path": "experiments/36_handover_ladder/summary.json",
+   "sha256": "342fe7c9f0b1d1203aa1f03a98ebfb10afe9f0d4f3c365d48bc762475753c3a6"
+  },
+  "glv_e33": {
+   "path": "experiments/37_solver_b_pivot_count/summary.json",
+   "sha256": "d95a3ce1c20328052fe3829523f9f272fce0c857188dcceee6275597daaf00aa"
+  },
+  "glv_e34": {
+   "path": "experiments/38_twist24_cheap_rep/summary.json",
+   "sha256": "0f8ebdeecee3c4a700361478436cb0272533d3b02bc0e84a00e734b7d43a77fa"
+  },
   "lazy_members": {
    "path": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
    "sha256": "c86743775097e0e17e264d878021e30ce34c9231d572c1b16a679526d208b372"
@@ -313426,6 +313438,438 @@
      ]
     }
    ]
+  },
+  "e32": {
+   "source": "experiments/36_handover_ladder/summary.json",
+   "report": "research/e32_handover_ladder_20261031/REPORT.pdf",
+   "validation": "research/e32_handover_ladder_20261031/VALIDATION.json",
+   "reached_log2n": 42.371696612,
+   "curves": 33,
+   "best_d0": 1143.26713797,
+   "fits": {
+    "0": {
+     "log2_nstar": 85.479295594,
+     "ci": [
+      79.1890110256,
+      94.3150590766
+     ],
+     "beta": -0.242689113541,
+     "beta_ci": [
+      -0.279041267203,
+      -0.20513210219
+     ]
+    },
+    "0.1": {
+     "log2_nstar": 91.2325332973,
+     "ci": [
+      84.3509116661,
+      100.651106955
+     ],
+     "beta": -0.248275399108,
+     "beta_ci": [
+      -0.284156648223,
+      -0.211413714331
+     ]
+    },
+    "1": {
+     "log2_nstar": 97.5500243714,
+     "ci": [
+      90.1305280312,
+      107.904561169
+     ],
+     "beta": -0.256218550118,
+     "beta_ci": [
+      -0.292275201973,
+      -0.218741483966
+     ]
+    }
+   },
+   "rows": [
+    {
+     "p": 101,
+     "log2n": 22.6326644464,
+     "curves": 3,
+     "d": [
+      20673.0922427,
+      72134.5609938,
+      383126.264909
+     ],
+     "d_min": 17088.2664386,
+     "d_max": 39317.3374281
+    },
+    {
+     "p": 149,
+     "log2n": 24.8766247148,
+     "curves": 3,
+     "d": [
+      40334.0137433,
+      138316.325045,
+      658888.005912
+     ],
+     "d_min": 8263.75413517,
+     "d_max": 152316.877362
+    },
+    {
+     "p": 197,
+     "log2n": 26.4881346603,
+     "curves": 3,
+     "d": [
+      14944.6614705,
+      50900.570786,
+      237611.326407
+     ],
+     "d_min": 10746.620957,
+     "d_max": 34883.112307
+    },
+    {
+     "p": 269,
+     "log2n": 28.2858338086,
+     "curves": 3,
+     "d": [
+      17512.7882463,
+      58962.7869278,
+      261072.242471
+     ],
+     "d_min": 8828.16630231,
+     "d_max": 27474.6610494
+    },
+    {
+     "p": 397,
+     "log2n": 30.5319745848,
+     "curves": 3,
+     "d": [
+      8749.48008827,
+      29056.4162326,
+      123507.136496
+     ],
+     "d_min": 6391.73092893,
+     "d_max": 9719.08436065
+    },
+    {
+     "p": 557,
+     "log2n": 32.486134619,
+     "curves": 3,
+     "d": [
+      6459.56274002,
+      21286.3997899,
+      89353.0991657
+     ],
+     "d_min": 4984.94122348,
+     "d_max": 7428.77121623
+    },
+    {
+     "p": 773,
+     "log2n": 34.3772976258,
+     "curves": 3,
+     "d": [
+      7628.58246172,
+      25026.8616876,
+      103913.368422
+     ],
+     "d_min": 6518.61504665,
+     "d_max": 11461.5306412
+    },
+    {
+     "p": 1093,
+     "log2n": 36.3763096929,
+     "curves": 3,
+     "d": [
+      4371.66809624,
+      14179.2254659,
+      58366.1113076
+     ],
+     "d_min": 3669.48533647,
+     "d_max": 5059.96106981
+    },
+    {
+     "p": 1549,
+     "log2n": 38.3884847535,
+     "curves": 3,
+     "d": [
+      2368.16495681,
+      7663.01923446,
+      31414.0251559
+     ],
+     "d_min": 2072.78956628,
+     "d_max": 3716.8831213
+    },
+    {
+     "p": 2213,
+     "log2n": 40.4471505398,
+     "curves": 3,
+     "d": [
+      1613.46086815,
+      5147.06992659,
+      20971.7410467
+     ],
+     "d_min": 1341.17124746,
+     "d_max": 2050.53447227
+    },
+    {
+     "p": 3089,
+     "log2n": 42.3716964794,
+     "curves": 3,
+     "d": [
+      1542.24283476,
+      4933.09741382,
+      20105.986896
+     ],
+     "d_min": 1143.26713797,
+     "d_max": 1701.74680844
+    }
+   ]
+  },
+  "e33": {
+   "source": "experiments/37_solver_b_pivot_count/summary.json",
+   "report": "research/e33_solver_b_pivot_count_20261031/REPORT.pdf",
+   "validation": "research/e33_solver_b_pivot_count_20261031/VALIDATION.json",
+   "ranks": [
+    {
+     "solver": "chain-sparsest-counted",
+     "quantity": "S_E25 / S_X",
+     "ranges": [
+      [
+       4.5293478084,
+       4.75534107603
+      ],
+      [
+       0.273919870484,
+       0.275507155719
+      ],
+      [
+       0.156510108951,
+       0.157720002715
+      ]
+     ],
+     "rank": "unresolved (order changes inside the band or across rows)",
+     "rows": 20,
+     "rows_x_ahead": [
+      20,
+      0,
+      0
+     ]
+    },
+    {
+     "solver": "chain-sparsest-counted",
+     "quantity": "S_A / S_X",
+     "ranges": [
+      [
+       1.82211207387,
+       1.86305764115
+      ],
+      [
+       0.192540669188,
+       0.196533606836
+      ],
+      [
+       0.148665164149,
+       0.152475031345
+      ]
+     ],
+     "rank": "unresolved (order changes inside the band or across rows)",
+     "rows": 20,
+     "rows_x_ahead": [
+      20,
+      0,
+      0
+     ]
+    },
+    {
+     "solver": "chain-sparsest-counted",
+     "quantity": "S_X / rho",
+     "ranges": [
+      [
+       3446.2073839,
+       219434.244216
+      ],
+      [
+       110374.680743,
+       7171727.42851
+      ],
+      [
+       609892.142404,
+       44044626.2392
+      ]
+     ],
+     "rank": "X behind across the band",
+     "rows": 20,
+     "rows_x_ahead": [
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "solver": "chain-sparsest-inc",
+     "quantity": "S_E25 / S_X",
+     "ranges": [
+      [
+       4.5293478084,
+       4.75534107603
+      ],
+      [
+       0.678484584876,
+       0.683172401742
+      ],
+      [
+       0.404078533279,
+       0.4069865663
+      ]
+     ],
+     "rank": "unresolved (order changes inside the band or across rows)",
+     "rows": 20,
+     "rows_x_ahead": [
+      20,
+      0,
+      0
+     ]
+    },
+    {
+     "solver": "chain-sparsest-inc",
+     "quantity": "S_A / S_X",
+     "ranges": [
+      [
+       1.82211207387,
+       1.86305764115
+      ],
+      [
+       0.477762224694,
+       0.486807188495
+      ],
+      [
+       0.383903016202,
+       0.393424630582
+      ]
+     ],
+     "rank": "unresolved (order changes inside the band or across rows)",
+     "rows": 20,
+     "rows_x_ahead": [
+      20,
+      0,
+      0
+     ]
+    },
+    {
+     "solver": "chain-sparsest-inc",
+     "quantity": "S_X / rho",
+     "ranges": [
+      [
+       3446.2073839,
+       219434.244216
+      ],
+      [
+       44481.5721991,
+       2890655.38591
+      ],
+      [
+       236178.700446,
+       17058019.1964
+      ]
+     ],
+     "rank": "X behind across the band",
+     "rows": 20,
+     "rows_x_ahead": [
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "solver": "chain-sparsest-est",
+     "quantity": "S_E25 / S_X",
+     "ranges": [
+      [
+       3.82728593859,
+       3.98362334491
+      ],
+      [
+       1.45713719576,
+       1.49707919865
+      ],
+      [
+       0.980463240088,
+       0.996648707708
+      ]
+     ],
+     "rank": "unresolved (order changes inside the band or across rows)",
+     "rows": 20,
+     "rows_x_ahead": [
+      20,
+      20,
+      0
+     ]
+    },
+    {
+     "solver": "chain-sparsest-est",
+     "quantity": "S_A / S_X",
+     "ranges": [
+      [
+       1.53761521311,
+       1.5581455631
+      ],
+      [
+       1.04613085573,
+       1.04787959907
+      ],
+      [
+       0.94647833988,
+       0.947986965857
+      ]
+     ],
+     "rank": "unresolved (order changes inside the band or across rows)",
+     "rows": 20,
+     "rows_x_ahead": [
+      20,
+      20,
+      0
+     ]
+    },
+    {
+     "solver": "chain-sparsest-est",
+     "quantity": "S_X / rho",
+     "ranges": [
+      [
+       4115.29432835,
+       261482.036402
+      ],
+      [
+       20280.5884479,
+       1331440.92853
+      ],
+      [
+       95796.9259766,
+       7006185.20575
+      ]
+     ],
+     "rank": "X behind across the band",
+     "rows": 20,
+     "rows_x_ahead": [
+      0,
+      0,
+      0
+     ]
+    }
+   ],
+   "per_call": {
+    "chain-sparsest-counted": [
+     1049178.43696,
+     1056762.30542
+    ],
+    "chain-sparsest-inc": [
+     293195.982128,
+     298389.187867
+    ],
+    "chain-sparsest-est": [
+     12694.3031698,
+     12802.4884828
+    ]
+   }
+  },
+  "e34": {
+   "source": "experiments/38_twist24_cheap_rep/summary.json",
+   "report": "research/e34_twist24_cheap_rep_20261031/REPORT.pdf",
+   "validator_report": "research/e34_twist24_cheap_rep_20261031/validator-report.json",
+   "certificate": "research/e34_twist24_cheap_rep_20261031/replay-certificate.json"
   }
  },
  "prime_base_size_component": {

@@ -84,6 +84,9 @@ SOURCES = {
     "glv_e31": "research/e31_chain_solve_20261024/summary.json",
     "glv_e27": "experiments/32_walk_karatsuba/summary.json",
     "glv_e30": "experiments/35_invariants_lite/summary.json",
+    "glv_e32": "experiments/36_handover_ladder/summary.json",
+    "glv_e33": "experiments/37_solver_b_pivot_count/summary.json",
+    "glv_e34": "experiments/38_twist24_cheap_rep/summary.json",
     "lazy_members": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
     "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
     "lazy_columns2": "research/ecbench_lazy_columns2_20261018/figures/ratios.json",
@@ -917,6 +920,22 @@ def k4_v4_component() -> dict:
             or gate.check_evidence_dir(REPO / e30_study, REPO)):
         raise SystemExit("review the E30 audit summary and its VALIDATION.json before updating the leaderboard")
     span30 = lambda f: [min(f(z) for z in e30["rows"]), max(f(z) for z in e30["rows"])]
+    e32 = load(SOURCES["glv_e32"])
+    e32_study = "research/e32_handover_ladder_20261031"
+    if (e32.get("experiment") != "e32" or e32.get("rows_at_or_below_rho_any_weight") != 0
+            or not all(c["ic_correct"] and c["walks_correct"] for c in e32["curves"])
+            or gate.check_evidence_dir(REPO / e32_study, REPO)):
+        raise SystemExit("review the E32 ladder summary and its VALIDATION.json before updating the leaderboard")
+    e33 = load(SOURCES["glv_e33"])
+    e33_study = "research/e33_solver_b_pivot_count_20261031"
+    if (e33.get("experiment") != "e33" or e33.get("e2e_identity_ok") is not True
+            or gate.check_evidence_dir(REPO / e33_study, REPO)):
+        raise SystemExit("review the E33 pivot-count summary and its VALIDATION.json before updating the leaderboard")
+    e34 = load(SOURCES["glv_e34"])
+    e34_study = "research/e34_twist24_cheap_rep_20261031"
+    e34_val = load(f"{e34_study}/validator-report.json")
+    if e34.get("experiment") not in ("e34", "E34") or e34_val.get("status") != "pass":
+        raise SystemExit("review the E34 summary and its validator report before updating the leaderboard")
     return {**sm, "source": SOURCES["glv_k4"],
             "report": "research/glv_k4_pipeline_d4_20261017/REPORT.pdf",
             "gls": {**gls, "source": SOURCES["glv_gls"],
@@ -954,7 +973,35 @@ def k4_v4_component() -> dict:
                     "change": [span30(lambda z, i=i: 100 * z["distance_change"][i]) for i in range(3)],
                     "rows": [{k: z[k] for k in ("p", "seed", "arm", "S_K", "saving", "saving_share",
                                                 "walk_saving", "distance_change")}
-                             for z in e30["rows"]]}}
+                             for z in e30["rows"]]},
+            "e32": {"source": SOURCES["glv_e32"],
+                    "report": f"{e32_study}/REPORT.pdf",
+                    "validation": f"{e32_study}/VALIDATION.json",
+                    "reached_log2n": e32["reached_log2n"],
+                    "curves": len(e32["curves"]),
+                    "best_d0": min(c["D"]["0"] for c in e32["curves"]),
+                    "fits": {w: {"log2_nstar": e32["fits"][w]["M1"]["log2_nstar"],
+                                 "ci": e32["fits"][w]["M1"]["ci95"]["log2_nstar"],
+                                 "beta": e32["fits"][w]["M1"]["beta"],
+                                 "beta_ci": e32["fits"][w]["M1"]["ci95"]["beta"]}
+                             for w in ("0", "0.1", "1")},
+                    "rows": [{"p": z["p"], "log2n": z["log2n"], "curves": z["curves"],
+                              "d": [z[f"D_{w}"]["median"] for w in ("0", "0.1", "1")],
+                              "d_min": z["D_0"]["min"], "d_max": z["D_0"]["max"]}
+                             for z in e32["per_size"]]},
+            "e33": {"source": SOURCES["glv_e33"],
+                    "report": f"{e33_study}/REPORT.pdf",
+                    "validation": f"{e33_study}/VALIDATION.json",
+                    "ranks": [{"solver": r["solver"], "quantity": r["quantity"], "ranges": r["ranges"],
+                               "rank": r["rank"], "rows": r["rows"], "rows_x_ahead": r["rows_x_ahead"]}
+                              for r in e33["ranks"]],
+                    "per_call": {sv: [min(z[sv]["selection_per_call"] for z in e33["e2e"]),
+                                      max(z[sv]["selection_per_call"] for z in e33["e2e"])]
+                                 for sv in ("chain-sparsest-counted", "chain-sparsest-inc", "chain-sparsest-est")}},
+            "e34": {"source": SOURCES["glv_e34"],
+                    "report": f"{e34_study}/REPORT.pdf",
+                    "validator_report": f"{e34_study}/validator-report.json",
+                    "certificate": f"{e34_study}/replay-certificate.json"}}
 
 def postgb_linear_stage_component() -> dict:
     """The linear stage after F4 across Gröbner-basis corpora, from
@@ -3098,7 +3145,70 @@ def markdown(doc: dict) -> str:
                  f"{100 * z['saving_share']:.3f} % | {z['walk_saving']:.3g} | "
                  + ", ".join(f"{100 * x:.4f} %" for x in z["distance_change"]) + " |")
     L.append("")
+    t = glv_e32_e34_text(k)
+    for key, title, src, extra in (("e32", "e32", k["e32"], True), ("e33", "e33", k["e33"], True)):
+        L += [t[key] + f" Read the [report](../../{src['report']}), [summary](../../{src['source']}) and "
+              f"[validation](../../{src['validation']}).", "",
+              "| " + " | ".join(t[key + "_head"]) + " |",
+              "|" + "|".join(":--" if i == 0 or (key == "e33" and i in (1, 5)) else "--:"
+                             for i in range(len(t[key + "_head"]))) + "|"]
+        L += ["| " + " | ".join(r) + " |" for r in t[key + "_rows"]]
+        L.append("")
+    L += [t["e34"] + f" Read the [report](../../{k['e34']['report']}), [summary](../../{k['e34']['source']}) and "
+          f"[validator report](../../{k['e34']['validator_report']}).", ""]
     return "\n".join(L) + "\n"
+
+
+E33_NAMES = {"chain-sparsest-counted": "B (as built, counted)", "chain-sparsest-inc": "B′ (incremental counts)",
+             "chain-sparsest-est": "B″ (counted estimate)"}
+
+
+def glv_e32_e34_text(k: dict) -> dict:
+    """Prose and tables for E32 (measurement), E33 (accounting) and E34 (reference
+    correction, gate refused: no IC arm), shared by the Markdown and HTML pages."""
+    e, f = k["e32"], k["e32"]["fits"]
+    R2 = lambda r, fmt="{:.1f}": f"[{fmt.format(r[0])}, {fmt.format(r[1])}]"
+    e32 = ("The handover ladder (E32, measurement). E25's GLS curves at eleven sizes, {c} paired curves from 2^{lo:.1f} "
+           "to 2^{hi:.1f}: E31 solver A with Karatsuba products against E27's matched ⟨±ψ⟩ walk (iii). No crossover in "
+           "the measured range: rho is ahead on every curve at every weight, so n* > 2^{hi:.1f} is what is measured; "
+           "the best curve is {b:,.0f}× from rho at 0 GAE. The fitted slope of log D against log n is {be:.3f} {bci} "
+           "(theory −1/4), and the extrapolated crossover order log₂ n* is {n0:.1f} {c0} at 0 GAE, {n1:.1f} {c1} at "
+           "0.1 and {n2:.1f} {c2} at 1, an extrapolation 37–66 bits past the top size, not a measured crossing. "
+           "Class: measurement, not an improvement; validated (independent replay 66/66 runs, note §9.34 and §9.36)."
+           ).format(c=e["curves"], lo=e["rows"][0]["log2n"], hi=e["reached_log2n"], b=e["best_d0"],
+                    be=f["0"]["beta"], bci=R2(f["0"]["beta_ci"], "{:.3f}"),
+                    n0=f["0"]["log2_nstar"], c0=R2(f["0"]["ci"]), n1=f["0.1"]["log2_nstar"], c1=R2(f["0.1"]["ci"]),
+                    n2=f["1"]["log2_nstar"], c2=R2(f["1"]["ci"]))
+    e32_rows = [[str(z["p"]), f"{z['log2n']:.1f}", str(z["curves"]), f"{z['d'][0]:.3g}", f"{z['d'][1]:.3g}",
+                 f"{z['d'][2]:.3g}", f"{z['d_min']:.3g}–{z['d_max']:.3g}"] for z in e["rows"]]
+    g = k["e33"]
+    pc = g["per_call"]
+    e33 = ("Solver B's pivot selection counted (E33, accounting). E31 left solver B's pivot-selection pass unpriced; "
+           "counted, it is {b} native operations per call (B′, the same pivots with incremental counts, {bi}; "
+           "B″, a counted sparsity estimate with different pivots, {be}). With that work priced, no B variant is "
+           "ranked against solver A or E25 across the §5a band: B and B′ lead only at 0 GAE, B″ at 0 and 0.1 but "
+           "not at 1. Solver A stays the ranked solve, and rho is ahead of every row at every weight. Class: "
+           "accounting, not an improvement; validated (independent replay, note §9.35 and §9.37, with a "
+           "fourteen-figure erratum)."
+           ).format(b="–".join(f"{x:,.0f}" for x in pc["chain-sparsest-counted"]),
+                    bi="–".join(f"{x:,.0f}" for x in pc["chain-sparsest-inc"]),
+                    be="–".join(f"{x:,.0f}" for x in pc["chain-sparsest-est"]))
+    e33_rows = [[E33_NAMES.get(r["solver"], r["solver"]), r["quantity"]]
+                + ["–".join((f"{x:.3g}" if x >= 10 else f"{x:.3f}") for x in rg) for rg in r["ranges"]]
+                + [r["rank"]] for r in g["ranks"]]
+    e34 = ("A cheaper order-24 walk on E18's j = 0 curves (E34, reference correction; not shown as a row). A class "
+           "representative that compares one coordinate of the twelve candidates first makes the order-24 walk "
+           "cheaper than both order-6 walks, pooled, at every weight (1.563 / 1.254 / 1.126 against E29's order-6 "
+           "walk at 0 / 0.1 / 1 GAE; 1.505 / 1.167 / 1.026 against an equally cheap order-6 walk, the last within "
+           "sampling noise). E18's ψ-arm distances to rho therefore lengthen by 1.63×, 1.25× and 1.13× and the "
+           "modelled handover moves 2.8, 1.3 and 0.7 bits later. Independently replayed byte for byte from a fresh "
+           "build (validator report: pass), but it compares rho walks only and has no index-calculus arm, so like "
+           "E29 it cannot pass the validation gate (note §9.38 and §9.39).")
+    return {"e32": e32, "e32_head": ["p", "log₂ n", "curves", "median D (0 GAE)", "median D (0.1)", "median D (1)",
+                                     "D range (0 GAE)"],
+            "e32_rows": e32_rows, "e33": e33,
+            "e33_head": ["solver", "ratio", "0 GAE", "0.1 GAE", "1 GAE", "rank across the band"],
+            "e33_rows": e33_rows, "e34": e34}
 
 
 STYLE = """
@@ -4321,7 +4431,19 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{z["walk_saving"]:.3g}</td><td>'
                  + ", ".join(f"{100 * x:.4f} %" for x in z["distance_change"]) + '</td></tr>')
     P.append('</tbody></table></div>' + gh(e["source"], 'Frozen study summary') + ' · '
-             + gh(e["validation"], 'Validation') + '</section>')
+             + gh(e["validation"], 'Validation'))
+    t = glv_e32_e34_text(k)
+    for key, h in (("e32", "The handover ladder (E32)"), ("e33", "Solver B's pivot selection counted (E33)")):
+        src = k[key]
+        P.append(f'<h3>{esc(h)}</h3><p>' + esc(t[key]) + '</p><div class="scroll"><table><thead><tr>'
+                 + "".join(f"<th>{esc(c)}</th>" for c in t[key + "_head"]) + '</tr></thead><tbody>')
+        for r in t[key + "_rows"]:
+            P.append("<tr>" + "".join(f"<td>{esc(c)}</td>" for c in r) + "</tr>")
+        P.append('</tbody></table></div>' + gh(src["source"], 'Frozen study summary') + ' · '
+                 + gh(src["validation"], 'Validation') + ' · ' + gh(src["report"], 'Report'))
+    P.append('<h3>A cheaper order-24 walk (E34, not shown as a row)</h3><p>' + esc(t["e34"]) + '</p>'
+             + gh(k["e34"]["source"], 'Frozen study summary') + ' · '
+             + gh(k["e34"]["validator_report"], 'Validator report') + '</section>')
     b = doc["bitop_prime_ladder"]
     t = bitop_text(b)
     P.append(f'<section class="card" id="bitop-prime-ladder"><h2>{esc(t["title"])}, outside the priced tables</h2>'

@@ -798,6 +798,9 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/e31_chain_solve_20261024/summary.json` — sha256 `0ebac1878e112a7d…`
 - `experiments/32_walk_karatsuba/summary.json` — sha256 `b20666d943bd0c3e…`
 - `experiments/35_invariants_lite/summary.json` — sha256 `62eb026c0dd363a6…`
+- `experiments/36_handover_ladder/summary.json` — sha256 `342fe7c9f0b1d120…`
+- `experiments/37_solver_b_pivot_count/summary.json` — sha256 `d95a3ce1c2032805…`
+- `experiments/38_twist24_cheap_rep/summary.json` — sha256 `0f8ebdeecee3c4a7…`
 - `research/ecbench_lazy_orbit_members_20261018/figures/ratios.json` — sha256 `c86743775097e0e1…`
 - `research/jv_cover_sparse_fglm_20261018/summary.json` — sha256 `4217cb1de3458ee8…`
 - `research/ecbench_lazy_columns2_20261018/figures/ratios.json` — sha256 `e97bc0f02c39695a…`
@@ -1037,4 +1040,36 @@ Trivial products repriced (E30, accounting). An audit of E27's records reprices 
 | 397 | 1 | B | 1.619e+10 | 5.030e+07 | 0.311 % | 0 | -0.3107 %, -0.0855 %, -0.0114 % |
 | 397 | 2 | A | 5.123e+10 | 1.590e+08 | 0.310 % | 0 | -0.3104 %, -0.0854 %, -0.0114 % |
 | 397 | 2 | B | 2.204e+10 | 6.842e+07 | 0.310 % | 0 | -0.3104 %, -0.0854 %, -0.0114 % |
+
+The handover ladder (E32, measurement). E25's GLS curves at eleven sizes, 33 paired curves from 2^22.6 to 2^42.4: E31 solver A with Karatsuba products against E27's matched ⟨±ψ⟩ walk (iii). No crossover in the measured range: rho is ahead on every curve at every weight, so n* > 2^42.4 is what is measured; the best curve is 1,143× from rho at 0 GAE. The fitted slope of log D against log n is -0.243 [-0.279, -0.205] (theory −1/4), and the extrapolated crossover order log₂ n* is 85.5 [79.2, 94.3] at 0 GAE, 91.2 [84.4, 100.7] at 0.1 and 97.6 [90.1, 107.9] at 1, an extrapolation 37–66 bits past the top size, not a measured crossing. Class: measurement, not an improvement; validated (independent replay 66/66 runs, note §9.34 and §9.36). Read the [report](../../research/e32_handover_ladder_20261031/REPORT.pdf), [summary](../../experiments/36_handover_ladder/summary.json) and [validation](../../research/e32_handover_ladder_20261031/VALIDATION.json).
+
+| p | log₂ n | curves | median D (0 GAE) | median D (0.1) | median D (1) | D range (0 GAE) |
+|:--|--:|--:|--:|--:|--:|--:|
+| 101 | 22.6 | 3 | 2.07e+04 | 7.21e+04 | 3.83e+05 | 1.71e+04–3.93e+04 |
+| 149 | 24.9 | 3 | 4.03e+04 | 1.38e+05 | 6.59e+05 | 8.26e+03–1.52e+05 |
+| 197 | 26.5 | 3 | 1.49e+04 | 5.09e+04 | 2.38e+05 | 1.07e+04–3.49e+04 |
+| 269 | 28.3 | 3 | 1.75e+04 | 5.9e+04 | 2.61e+05 | 8.83e+03–2.75e+04 |
+| 397 | 30.5 | 3 | 8.75e+03 | 2.91e+04 | 1.24e+05 | 6.39e+03–9.72e+03 |
+| 557 | 32.5 | 3 | 6.46e+03 | 2.13e+04 | 8.94e+04 | 4.98e+03–7.43e+03 |
+| 773 | 34.4 | 3 | 7.63e+03 | 2.5e+04 | 1.04e+05 | 6.52e+03–1.15e+04 |
+| 1093 | 36.4 | 3 | 4.37e+03 | 1.42e+04 | 5.84e+04 | 3.67e+03–5.06e+03 |
+| 1549 | 38.4 | 3 | 2.37e+03 | 7.66e+03 | 3.14e+04 | 2.07e+03–3.72e+03 |
+| 2213 | 40.4 | 3 | 1.61e+03 | 5.15e+03 | 2.1e+04 | 1.34e+03–2.05e+03 |
+| 3089 | 42.4 | 3 | 1.54e+03 | 4.93e+03 | 2.01e+04 | 1.14e+03–1.7e+03 |
+
+Solver B's pivot selection counted (E33, accounting). E31 left solver B's pivot-selection pass unpriced; counted, it is 1,049,178–1,056,762 native operations per call (B′, the same pivots with incremental counts, 293,196–298,389; B″, a counted sparsity estimate with different pivots, 12,694–12,802). With that work priced, no B variant is ranked against solver A or E25 across the §5a band: B and B′ lead only at 0 GAE, B″ at 0 and 0.1 but not at 1. Solver A stays the ranked solve, and rho is ahead of every row at every weight. Class: accounting, not an improvement; validated (independent replay, note §9.35 and §9.37, with a fourteen-figure erratum). Read the [report](../../research/e33_solver_b_pivot_count_20261031/REPORT.pdf), [summary](../../experiments/37_solver_b_pivot_count/summary.json) and [validation](../../research/e33_solver_b_pivot_count_20261031/VALIDATION.json).
+
+| solver | ratio | 0 GAE | 0.1 GAE | 1 GAE | rank across the band |
+|:--|:--|--:|--:|--:|:--|
+| B (as built, counted) | S_E25 / S_X | 4.529–4.755 | 0.274–0.276 | 0.157–0.158 | unresolved (order changes inside the band or across rows) |
+| B (as built, counted) | S_A / S_X | 1.822–1.863 | 0.193–0.197 | 0.149–0.152 | unresolved (order changes inside the band or across rows) |
+| B (as built, counted) | S_X / rho | 3.45e+03–2.19e+05 | 1.1e+05–7.17e+06 | 6.1e+05–4.4e+07 | X behind across the band |
+| B′ (incremental counts) | S_E25 / S_X | 4.529–4.755 | 0.678–0.683 | 0.404–0.407 | unresolved (order changes inside the band or across rows) |
+| B′ (incremental counts) | S_A / S_X | 1.822–1.863 | 0.478–0.487 | 0.384–0.393 | unresolved (order changes inside the band or across rows) |
+| B′ (incremental counts) | S_X / rho | 3.45e+03–2.19e+05 | 4.45e+04–2.89e+06 | 2.36e+05–1.71e+07 | X behind across the band |
+| B″ (counted estimate) | S_E25 / S_X | 3.827–3.984 | 1.457–1.497 | 0.980–0.997 | unresolved (order changes inside the band or across rows) |
+| B″ (counted estimate) | S_A / S_X | 1.538–1.558 | 1.046–1.048 | 0.946–0.948 | unresolved (order changes inside the band or across rows) |
+| B″ (counted estimate) | S_X / rho | 4.12e+03–2.61e+05 | 2.03e+04–1.33e+06 | 9.58e+04–7.01e+06 | X behind across the band |
+
+A cheaper order-24 walk on E18's j = 0 curves (E34, reference correction; not shown as a row). A class representative that compares one coordinate of the twelve candidates first makes the order-24 walk cheaper than both order-6 walks, pooled, at every weight (1.563 / 1.254 / 1.126 against E29's order-6 walk at 0 / 0.1 / 1 GAE; 1.505 / 1.167 / 1.026 against an equally cheap order-6 walk, the last within sampling noise). E18's ψ-arm distances to rho therefore lengthen by 1.63×, 1.25× and 1.13× and the modelled handover moves 2.8, 1.3 and 0.7 bits later. Independently replayed byte for byte from a fresh build (validator report: pass), but it compares rho walks only and has no index-calculus arm, so like E29 it cannot pass the validation gate (note §9.38 and §9.39). Read the [report](../../research/e34_twist24_cheap_rep_20261031/REPORT.pdf), [summary](../../experiments/38_twist24_cheap_rep/summary.json) and [validator report](../../research/e34_twist24_cheap_rep_20261031/validator-report.json).
 
