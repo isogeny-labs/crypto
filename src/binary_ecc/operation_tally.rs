@@ -15,15 +15,22 @@ thread_local! {
     static TALLIES: RefCell<Vec<BTreeMap<String,u64>>> = const { RefCell::new(Vec::new()) };
 }
 
-pub(crate) fn tick(m: u32, operation: &str) {
+pub(crate) fn tick_n(m: u32, operation: &str, count: u64) {
+    if count == 0 {
+        return;
+    }
     if ACTIVE.load(Ordering::Relaxed) == 0 {
         return;
     }
     TALLIES.with(|stack| {
         if let Some(tally) = stack.borrow_mut().last_mut() {
-            *tally.entry(format!("f2m{m}_{operation}")).or_default() += 1;
+            *tally.entry(format!("f2m{m}_{operation}")).or_default() += count;
         }
     });
+}
+
+pub(crate) fn tick(m: u32, operation: &str) {
+    tick_n(m, operation, 1);
 }
 
 pub struct OperationTally {

@@ -1,0 +1,49 @@
+import PegcdWordDivision
+set_option autoImplicit false
+namespace PegcdWord
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest
+inductive Run (p : UInt64) : Registers → Registers → Prop
+ | stop (z) : z.r1=[] → Run p z z
+ | next (z last q r out) : z.r1.getLast?=some last →
+   NonmonicStorage.wordDiv p last z.r1 z.r0 z.r0.length=some (q,r) →
+   Run p (advance p z q r) out → Run p z out
+
+theorem run_total_fuel (p : UInt64) [Fact p.toNat.Prime]
+ (hp : 1 < p.toNat) (hb : p.toNat < 2^31) (fuel : Nat) (z : Registers)
+ (hg : Good p z) (hn0 : Normal z.r0) (hn1 : Normal z.r1) (hl : z.r1.length < fuel) :
+ ∃ out, Run p z out ∧ Good p out ∧ Normal out.r0 ∧ Normal out.r1 ∧ out.r1=[] ∧
+ Pegcd.Trace (decode p z) (decode p out) := by
+ induction fuel generalizing z with
+ | zero => omega
+ | succ fuel ih =>
+   by_cases he : z.r1=[]
+   · exact ⟨z,Run.stop z he,hg,hn0,hn1,he,Pegcd.Trace.refl _⟩
+   · let last := z.r1.getLast he
+     have hm : z.r1.getLast?=some last := List.getLast?_eq_some_getLast he
+     have hlast : last.toNat < p.toNat := hg.2.1 _ (List.getLast_mem he)
+     have hln : last ≠ 0 := by
+       intro hz
+       exact hn1 (by simpa [hz] using hm)
+     obtain ⟨q,r,hd,hcq,hcr,hnr,heq,hshort⟩ := division_total p last z.r0 z.r1 hp hb hlast hln hg.1 hg.2.1 hm
+     have hlt : r.length < z.r1.length := by
+       rcases hshort with hh | hh
+       · subst r; simpa using List.length_pos_iff.mpr he
+       · exact hh
+     have hstep := advance_correct p z q r (by omega) hb hg hcq hcr
+     obtain ⟨out,hw,hgo,hno0,hno1,hend,ht⟩ := ih (advance p z q r) hstep.1 hn1 hnr (by simpa [advance] using (show r.length < fuel by omega))
+     refine ⟨out,Run.next z last q r out hm hd hw,hgo,hno0,hno1,hend,?_⟩
+     have hnz : (decode p z).r1 ≠ 0 := by
+       change wordsPoly p z.r1 ≠ 0
+       exact fun hz => he ((zero_iff_empty p z.r1 hg.2.1 hn1).mp hz)
+     rw [hstep.2] at ht
+     exact Pegcd.Trace.next (decode p z) (wordsPoly p q) (wordsPoly p r) (decode p out) hnz heq ht
+
+theorem run_total (p : UInt64) [Fact p.toNat.Prime]
+ (hp : 1 < p.toNat) (hb : p.toNat < 2^31) (a b : List UInt64)
+ (ha : Canon p a) (hna : Normal a) (hc : Canon p b) (hn : Normal b) :
+ ∃ out, Run p (initial a b) out ∧ Good p out ∧ Normal out.r0 ∧ Normal out.r1 ∧ out.r1=[] ∧
+ Pegcd.Trace (Pegcd.initial (wordsPoly p a) (wordsPoly p b)) (decode p out) := by
+ obtain ⟨out,hr,hg,h0,h1,he,ht⟩ := run_total_fuel p hp hb (b.length+1) (initial a b)
+   (initial_good p a b hp ha hc) hna hn (by simp [initial])
+ exact ⟨out,hr,hg,h0,h1,he,by simpa [initial_decode] using ht⟩
+end PegcdWord

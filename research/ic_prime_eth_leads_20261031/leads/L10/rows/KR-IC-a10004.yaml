@@ -1,0 +1,29 @@
+# DRAFT (L10). Provisional id. Receipt: arithmetic in LEADS.md s6 (derived; NOT a Lean theorem).
+id: KR-IC-a10004
+area: index-calculus
+kind: known_negative
+title: Target-family amortisation is dominated inside the BTN (Boolean tensor network) cost model
+claim: >-
+  Making the target R = R0 + [T]G a free variable costs one point addition (~b edges) per bit of T,
+  whereas a base point costs ~b edges per b/m bits of window, so a free target bit is m times less
+  edge-efficient than a base bit, and letting (u,v) float costs 2b additions. Since D.1 cost depends
+  only on the edge count (KR-IC-a10002), amortising the transform over a target family gains nothing
+  inside D.1. The only amortisation the model admits is solver-side clause retention across targets
+  (lead L12), a constant. Descent trees are also dominated: the deepest level needs (m+1)b > mb edges.
+  Edge counts (b per addition, 10^5 b by the paper's gadget counts) are estimates, not measurements.
+status: heuristic
+setting: {field: prime, model: boolean_tensor_network}
+sources:
+  - ref: KN-LIT-caa51d
+    locator: "Thm D.1 cost depends on edge count s only"
+    verification_state: secondary_source
+forecloses:
+  - amortise tensor contraction over a family of targets
+  - target parameter T interpolation of relation counts
+  - retained setup online with tensor oracle
+  - descent tree with tensor oracle
+internal:
+  - {ref: LEAD-ICP-retained-setup-online, relation: extends, note: "BL rho 53-317x faster at equal advice (measured, separate lane)"}
+dominated_by: null
+added: '2026-10-31'
+superseded_by: null

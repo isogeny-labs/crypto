@@ -1,0 +1,19 @@
+/var/tmp/pencil-reduction-monic-20261101-v1/ReductionFinalStorage.lean:36:21: error: unsolved goals
+p : UInt64
+inst✝ : Fact (Nat.Prime p.toNat)
+q r : List UInt64
+f u v : (ZMod p.toNat)[X]
+hp : 1 < p.toNat
+hb : p.toNat < 2 ^ 31
+hc : Canon p q
+hn : Normal q
+hf : f.natDegree = 5
+hu : 3 ≤ u.natDegree
+hu4 : u.natDegree ≤ 4
+hv : v.natDegree < u.natDegree
+hq : f - v * v = wordsPoly p q * u
+hr : r.length < (monic p q).length
+hvalid : wordsPoly p (monic p q) ∣ f - wordsPoly p r ^ 2
+hd : wordsPoly p q ≠ 0 ∧ (wordsPoly p q).natDegree ≤ 2
+hz : q = []
+⊢ listPoly [] = 0

@@ -1,0 +1,17 @@
+\documentclass[10pt]{article}\usepackage[margin=0.8in]{geometry}\usepackage[T1]{fontenc}\begin{document}\section*{Mutable signed-graph find preservation}
+2026-11-01. Two main theorems, eight controls and ten named axiom readbacks pass.
+
+\textbf{Actual mutation model.} A finite functional heap stores parent and affine potential at each node. Run follows native source order: read parent, recurse, read child potential from the returned mutated heap, compose, then update both parent and potential. This is an execution relation, not an assumed scalar outcome.
+
+\textbf{Whole-state invariant.} Starting with decreasing parent ranks and every node equation valid, run\_preserves proves both invariants for the entire resulting heap, the returned root's self-parent property, the returned potential's value equation and root-rank bound. It simultaneously proves a greater-rank frame. That frame ensures recursive compression of a lower-ranked parent cannot change the current child before its post-recursion potential read.
+
+\begin{center}\fbox{Forest and values}\quad$\longrightarrow$\quad\fbox{Recursive mutation + frame}\quad$\longrightarrow$\quad\fbox{Preserved whole heap}\end{center}
+
+\textbf{Existence.} run\_exists proves a finite successful execution from the initial rank-decreasing forest by strong induction. The trace is not assumed to exist. The model does not assert native recursion-stack headroom or measured runtime.
+
+\textbf{Depth-two controls.} The chain $2\to1\to0$ with two negative affine edges is executed through actual Run constructors. At target k=2 and root value7, node values are1 and12. Both parent links compress to0, root remains fixed, the composed potential returns12 and every node equation remains valid. Resetting potentials incorrectly to identity fails representation. Two induction-API proof failures are retained; corrected checks pass.
+
+\textbf{Source and limits.} Native three\_leads.rs find1580--1596 matches the modeled read/write order. Nodes are typed finite indices and arithmetic is a commutative ring. Native arrays, words/i8 signs, counters, allocation, stack capacity and compilation remain separate. Initial forest and representation invariants must next be established across node creation and union mutation. Fixed-anchor metadata is not modeled. Independent review pending.
+
+\textbf{Evidence.} Prospective source-first plan, exact fresh checks, unchanged local bindings, source snapshot, receipts and editable flow.svg are retained. Cached helper dependencies retain their trust boundary. No scientific execution or cost claim.
+\end{document}
