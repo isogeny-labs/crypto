@@ -11,7 +11,7 @@ for d in sorted((h/'runs').iterdir()):
   code=int((d/'exit.txt').read_text());log=(d/'native.log').read_text();source=(d/'input.sing').read_text()
   markers=re.findall(r'print\("([A-Z0-9_]+_ALL_CHECKS_PASS)"\)',source);assert len(markers)==1
   errors=[s for s in log.splitlines() if re.match(r'^\s*\?',s)]
-  row.update(kind='Singular',native_exit=code,marker=markers[0],marker_present=markers[0] in log.splitlines(),error_count=len(errors),first_errors=errors[:8],native_results=[s for s in log.splitlines() if re.match(r'^(BASE56 |NEWTON56 |INFINITY56_RESULT |REFINEMENT56_|REFINE56_RESULT |UNIT56_RESULT )',s)],point_results=[s for s in log.splitlines() if re.match(r'^UNUSED_POINT ',s)])
+  row.update(kind='Singular',native_exit=code,marker=markers[0],marker_present=markers[0] in log.splitlines(),error_count=len(errors),first_errors=errors[:8],native_results=[s for s in log.splitlines() if re.match(r'^(BASE56 |NEWTON56 |INFINITY56_RESULT |REFINEMENT56_|REFINE56_RESULT |UNIT56_RESULT |CHECK56_RESULT |LOCALCHECK56 )',s)],point_results=[s for s in log.splitlines() if re.match(r'^UNUSED_POINT ',s)])
   row['status']='accepted' if code==0 and not errors and row['marker_present'] else 'rejected'
   row['outcome']='time_cap' if code==124 else 'native_error' if errors else 'completed' if row['status']=='accepted' else 'missing_marker'
   start=(d/'started-utc.txt').read_text().strip();finish=(d/'finished-utc.txt').read_text().strip()
@@ -35,7 +35,7 @@ for d in sorted((h/'runs').iterdir()):
   pins.append({'attempt':d.name,'artifact':local,'revision':rev,'git_source':path,'sha256':hashlib.sha256(actual).hexdigest()})
  rows.append(row)
 accepted={r['attempt']:r for r in rows if r['status']=='accepted'}
-assert all(n in accepted for n in ['infinity56-02','infinity-lean56-01','refine56-01','unit56-01'])
+assert all(n in accepted for n in ['infinity56-02','infinity-lean56-01','refine56-01','unit56-01','check56-01'])
 result={'schema':'koblitz.results/v1','round':56,'runs':rows,'input_pins':pins,'authored_proved_claims':sorted(authored),'audited_declarations':sorted(accepted['infinity-lean56-01']['audited_declarations'])}
 (h/'results.json').write_text(json.dumps(result,indent=2)+'\n')
 protocols=[]

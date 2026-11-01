@@ -27,11 +27,15 @@
    samefieldn5regressioncontrols. The Adivisor calculation is a specific
    completed component,not a substitute for those independent constructions.
 
-Research lead to check against retained history/literature:if all ten base
-cusps yield tame(7,1)factors with quadraticresiduefields,the relative
-Riemann-Hurwitz accounting predicts genus61. Compare the actual source with
-an appropriate diamond quotient of level77 only after certifying the models
-and allbranchpoints;this numerical pattern is a proposal,not an identification.
+The retained R50 source already has genus61 and complete68-section L(D0),
+D0=7D_A+D_B of degree128. Match those exact R27 cusp labels/divisors to the
+new infinityclosedpoints before reusing that ambientspace. If D_Anew≤D0,
+use complete L(D0) and impose the exact local vanishing constraints for
+D0-D_Anew(degree48),rather than guessing polynomialcoefficientdegreebounds.
+Verify that inclusion from actualdivisors;do not assume D0=4(z)_infinity.
+The full finite branchlocus could independently reconstruct genus61 by
+Riemann-Hurwitz and certify the specific modular diamond quotient model.
+This is a model-validation task,not a new genus or noveltyclaim.
 
 Same original manual limits/owners,one mathematical jobatonce. No newEKS,
 Diem/freezerrestart,newclaim,delegation,merge/automergechange. R27-R55sealed;
